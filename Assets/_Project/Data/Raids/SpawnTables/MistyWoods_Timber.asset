@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0350d03674ebe14c9eefa590636a638, type: 3}
+  m_Name: MistyWoods_Timber
+  m_EditorClassIdentifier: Assembly-CSharp::SpawnTable
+  entries:
+  - prefab: {fileID: 2009929089532973240, guid: e4175e4dc8cc5b847b691d128a9786aa, type: 3}
+    weight: 3
+    maxPerGroup: 0
+    minPerGroup: 1
+  - prefab: {fileID: 6821748221057059875, guid: 363571da353f0c9429cec15d631d1da9, type: 3}
+    weight: 1
+    maxPerGroup: 1
+    minPerGroup: 1

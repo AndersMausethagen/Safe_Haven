@@ -1,0 +1,224 @@
+using UnityEngine;
+
+/// <summary>
+/// Physical movement of the player. Input comes in through SetMovementInput and
+/// the resulting motion is exposed as read-only state for other systems
+/// (animation, audio, VFX) to observe.
+/// Two independent gates apply: the global GameState (speed/turn multipliers from the
+/// settings asset) and PlayerStateMachine.CanMove (player-specific actions such as interacting). Dash overrides input
+/// for a moment (the dodge, see PlayerDodge).
+/// </summary>
+[RequireComponent(typeof(CharacterController))]
+[RequireComponent(typeof(PlayerStateMachine))]
+public sealed class PlayerMovement : MonoBehaviour
+{
+    private const float MovingSpeedThreshold = 0.01f;
+
+    [SerializeField] private PlayerMovementSettings settings;
+
+    private CharacterController characterController;
+    private PlayerStateMachine stateMachine;
+    private GameStateManager gameState;
+
+    private GameState currentGameState;
+    private float verticalVelocity;
+    private Vector3 movementInput;
+    private Vector3 aimDirection;
+    private bool hasAimDirection;
+    private Vector3 horizontalVelocity;
+    private Vector3 dashVelocity;
+    private float dashUntil = -1f;
+
+    public PlayerMovementSettings Settings => settings;
+    /// <summary>True during a dash (a dodge): movement input is ignored and the character slides at the dash velocity.</summary>
+    public bool IsDashing => dashUntil >= 0f;
+    /// <summary>The requested movement direction (camera-relative, 0-1 long), before any gating.</summary>
+    public Vector3 MovementInput => movementInput;
+    public Vector3 HorizontalVelocity => horizontalVelocity;
+    public float HorizontalSpeed => horizontalVelocity.magnitude;
+    /// <summary>Horizontal velocity relative to the character's facing (x = strafe, z = forward), for strafe blend trees.</summary>
+    public Vector3 LocalVelocity => transform.InverseTransformDirection(horizontalVelocity);
+    public float VerticalVelocity => verticalVelocity;
+    public bool IsMoving => HorizontalSpeed > MovingSpeedThreshold;
+    public bool IsGrounded { get; private set; } = true;
+
+    /// <summary>Analog magnitude (0-1) of the requested movement, before any gating.</summary>
+    public float InputMagnitude => movementInput.magnitude;
+
+    /// <summary>The horizontal direction toward the aim point (the cursor), or the way the character faces when there is none.</summary>
+    public Vector3 AimDirection
+    {
+        get
+        {
+            if (hasAimDirection)
+            {
+                return aimDirection;
+            }
+
+            Vector3 forward = transform.forward;
+            forward.y = 0f;
+            return forward.sqrMagnitude > 0.0001f ? forward.normalized : Vector3.forward;
+        }
+    }
+
+    private void Awake()
+    {
+        characterController = GetComponent<CharacterController>();
+        stateMachine = GetComponent<PlayerStateMachine>();
+
+        if (settings == null)
+        {
+            Debug.LogError("PlayerMovement requires a PlayerMovementSettings asset.", this);
+            enabled = false;
+        }
+    }
+
+    private void OnEnable()
+    {
+        gameState = GameStateManager.Instance;
+        if (gameState == null)
+        {
+            Debug.LogWarning("PlayerMovement found no GameStateManager; using Exploration movement values.", this);
+            return;
+        }
+
+        currentGameState = gameState.CurrentState;
+        gameState.GameStateChanged += OnGameStateChanged;
+    }
+
+    private void OnDisable()
+    {
+        if (gameState != null)
+        {
+            gameState.GameStateChanged -= OnGameStateChanged;
+            gameState = null;
+        }
+
+        horizontalVelocity = Vector3.zero;
+        hasAimDirection = false;
+        dashUntil = -1f;
+    }
+
+    private void Update()
+    {
+        UpdateHorizontalVelocity();
+        ApplyGravity();
+        Move();
+    }
+
+    public void SetMovementInput(Vector3 direction)
+    {
+        direction.y = 0f;
+        movementInput = Vector3.ClampMagnitude(direction, 1f);
+    }
+
+    /// <summary>
+    /// Slides the character at a fixed velocity for a moment, ignoring input, and faces the way it goes. Used by
+    /// PlayerDodge; still blocked by walls through the CharacterController.
+    /// </summary>
+    public void Dash(Vector3 velocity, float duration)
+    {
+        velocity.y = 0f;
+        if (velocity.sqrMagnitude < 0.0001f || duration <= 0f)
+        {
+            return;
+        }
+
+        dashVelocity = velocity;
+        dashUntil = Time.time + duration;
+        transform.rotation = Quaternion.LookRotation(velocity.normalized, Vector3.up);
+    }
+
+    /// <summary>Sets the horizontal direction toward the aim point (e.g. the cursor). Used only in states that face the cursor.</summary>
+    public void SetAimDirection(Vector3 direction)
+    {
+        direction.y = 0f;
+        hasAimDirection = direction.sqrMagnitude > 0.0001f;
+        aimDirection = hasAimDirection ? direction.normalized : Vector3.zero;
+    }
+
+    public void ClearAimDirection()
+    {
+        hasAimDirection = false;
+        aimDirection = Vector3.zero;
+    }
+
+    public void FaceDirection(Vector3 direction)
+    {
+        if (!stateMachine.CanMove)
+        {
+            return;
+        }
+
+        TurnToward(direction);
+    }
+
+    /// <summary>Turns toward a direction even while movement is gated, e.g. to face an object being interacted with.</summary>
+    public void TurnToward(Vector3 direction)
+    {
+        direction.y = 0f;
+        if (direction.sqrMagnitude < 0.0001f)
+        {
+            return;
+        }
+
+        float turnSpeed = settings.TurnSpeed * settings.GetTurnSpeedMultiplier(currentGameState);
+        Quaternion targetRotation = Quaternion.LookRotation(direction.normalized, Vector3.up);
+        transform.rotation = Quaternion.RotateTowards(
+            transform.rotation,
+            targetRotation,
+            turnSpeed * Time.deltaTime);
+    }
+
+    private void OnGameStateChanged(GameState previous, GameState current)
+    {
+        currentGameState = current;
+    }
+
+    private void UpdateHorizontalVelocity()
+    {
+        if (dashUntil >= 0f)
+        {
+            if (Time.time < dashUntil)
+            {
+                horizontalVelocity = dashVelocity;
+                return;
+            }
+
+            dashUntil = -1f;
+        }
+
+        Vector3 direction = stateMachine.CanMove ? movementInput : Vector3.zero;
+
+        // Cursor-facing states keep aiming at the cursor even while standing still; otherwise face the travel direction.
+        if (settings.FacesCursor(currentGameState) && hasAimDirection)
+        {
+            FaceDirection(aimDirection);
+        }
+        else if (direction.sqrMagnitude > 0.0001f)
+        {
+            FaceDirection(direction);
+        }
+
+        float speed = settings.MoveSpeed * settings.GetSpeedMultiplier(currentGameState);
+        horizontalVelocity = direction * speed;
+    }
+
+    private void ApplyGravity()
+    {
+        if (IsGrounded && verticalVelocity < 0f)
+        {
+            verticalVelocity = settings.GroundedVerticalVelocity;
+        }
+
+        verticalVelocity += settings.Gravity * Time.deltaTime;
+    }
+
+    private void Move()
+    {
+        Vector3 velocity = horizontalVelocity;
+        velocity.y = verticalVelocity;
+        characterController.Move(velocity * Time.deltaTime);
+        IsGrounded = characterController.isGrounded;
+    }
+}

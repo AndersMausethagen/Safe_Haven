@@ -1,0 +1,56 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 702d2e93d0a019a40b6339daf41e2c2f, type: 3}
+  m_Name: ThroughThePortal
+  m_EditorClassIdentifier: Assembly-CSharp::QuestDefinition
+  id: through_the_portal
+  displayName: Into the Misty Woods
+  description: Craft stone tools by hand from your bag (B), then step through the portal. Gather hardwood and iron ore, and get back to an extraction point before the portal closes. Carried things are lost if you fall; your tools and weapon come back damaged.
+  chain: The First Days
+  prerequisites:
+  - {fileID: 11400000, guid: 2614c1d189f3a034691f98f3d3efeee0, type: 2}
+  start: 0
+  startEvent: {fileID: 0}
+  objectivesInOrder: 0
+  objectives:
+  - type: 4
+    description: 
+    amount: 1
+    item: {fileID: 11400000, guid: 27afb578446f7154cade27406cec81d3, type: 2}
+    resource: {fileID: 0}
+    monster: {fileID: 0}
+    building: {fileID: 0}
+    raid: {fileID: 0}
+    mustExtract: 1
+    withinMinutes: 0
+    questEvent: {fileID: 0}
+    countAlreadyOwned: 0
+  - type: 5
+    description: Extract from the Misty Woods
+    amount: 1
+    item: {fileID: 0}
+    resource: {fileID: 0}
+    monster: {fileID: 0}
+    building: {fileID: 0}
+    raid: {fileID: 11400000, guid: 4c3002f5090022648994d853c2583c8b, type: 2}
+    mustExtract: 1
+    withinMinutes: 0
+    questEvent: {fileID: 0}
+    countAlreadyOwned: 0
+  rewardItems:
+  - item: {fileID: 11400000, guid: a167bc765cfa5094491385117d4c09e9, type: 2}
+    amount: 1
+  rewardResources:
+  - resource: {fileID: 11400000, guid: 7c3265a359bc4024c824268926942039, type: 2}
+    amount: 1
+  rewardRecipes: []
+  completionEvent: {fileID: 0}

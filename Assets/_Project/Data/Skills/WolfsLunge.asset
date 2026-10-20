@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9139778d2cece034ba4eeb23169bbba8, type: 3}
+  m_Name: WolfsLunge
+  m_EditorClassIdentifier: Assembly-CSharp::SkillDefinition
+  displayName: Wolf's Lunge
+  description: Bound forward like the grey wolf of the north and bite into whatever stands at the end.
+  icon: {fileID: 21300000, guid: c59e2e1466b0a5742938e72a88fde724, type: 3}
+  school: 1
+  cooldown: 8
+  staminaCost: 25
+  castTime: 0.45
+  lungeDistance: 5
+  lungeDuration: 0.22
+  attack: {fileID: 11400000, guid: f1223a6650010ea41a5a2d33756ab8f2, type: 2}
+  heal: 0
+  buffs: []
+  buffDuration: 6
+  playAttackAnimation: 1

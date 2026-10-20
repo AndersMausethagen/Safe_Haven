@@ -1,0 +1,71 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42e5c6da77934e8439571a13e158376a, type: 3}
+  m_Name: Mistwing
+  m_EditorClassIdentifier: Assembly-CSharp::MonsterDefinition
+  id: Mistwing
+  displayName: Mistwing
+  description: A low-flying forest creature. Dodge its committed charge and strike during its two-second landing.
+  combatStats: {fileID: 11400000, guid: 441526584e8c6a846950ee1a352c85a1, type: 2}
+  faction: 1
+  drops:
+    entries:
+    - item: {fileID: 11400000, guid: 4f80b5d6098abc64b903316903de5b64, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 2
+      probability: 1
+    - item: {fileID: 0}
+      resource: {fileID: 11400000, guid: c0e409a7cd38400498ff1c7037737b96, type: 2}
+      minQuantity: 1
+      maxQuantity: 2
+      probability: 1
+  unlocksRecipes: []
+  animatorController: {fileID: 9100000, guid: 51388376d31e4294bb24b0004412608d, type: 2}
+  prefab: {fileID: 4830014356063024607, guid: a8600aa8041d7044c9a3afddd7102a7b, type: 3}
+  attack: {fileID: 0}
+  attackDamage: 8
+  attackCooldown: 0.6
+  moveSpeed: 4.8
+  detectionRange: 14
+  chaseRange: 28
+  leashRange: 45
+  attacks:
+  - attack: {fileID: 11400000, guid: 9b7792f8370753f4fbb167ebdf2f5125, type: 2}
+    kind: 2
+    damage: 11
+    minimumRange: 0
+    maximumRange: 8
+    priority: 10
+    cooldown: 3
+    interruptible: 0
+    projectilePrefab: {fileID: 0}
+    burstCount: 1
+    burstInterval: 0.2
+    projectileSpeed: 12
+    projectileRadius: 0.15
+    chargeSpeed: 13
+    chargeDistance: 8
+    exposedSeconds: 2
+    buffRadius: 10
+    buffSeconds: 8
+    damageBonus: 0.05
+    packLeaderOnly: 0
+  movementTactic: 1
+  temperament: 1
+  preferredDistance: 6
+  distanceTolerance: 1.5
+  fleeHealthFraction: 0.25
+  fleeDistance: 10
+  defensiveRadius: 8
+  hoverHeight: 0.65
+  deathSound: {fileID: 0}

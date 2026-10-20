@@ -1,0 +1,143 @@
+using System.Collections.Generic;
+using System.Text;
+using UnityEngine;
+
+/// <summary>How a quest begins once its prerequisites are done.</summary>
+public enum QuestStart
+{
+    /// <summary>As soon as every prerequisite quest is complete (or right away when there are none).</summary>
+    Automatically = 0,
+    /// <summary>When a Quest Event happens: walking into a zone, using an object.</summary>
+    OnQuestEvent = 1,
+    /// <summary>When something starts it: a QuestGiver the player interacts with, or any Inspector event calling QuestGiver.StartQuest.</summary>
+    ByQuestGiver = 2,
+}
+
+/// <summary>
+/// A quest: what the player is asked to do (objectives), what has to come first (prerequisites, which make chains), how
+/// it begins, whether it is handed in at a Quest Giver and what it rewards. Everything is authored data; the QuestLog keeps
+/// each player's progress. A chain is simply quests that list the previous quest as a prerequisite and start automatically.
+/// </summary>
+[CreateAssetMenu(fileName = "NewQuest", menuName = "Safe Haven/Quests/Quest")]
+public sealed class QuestDefinition : ScriptableObject
+{
+    [Header("Identity")]
+    [Tooltip("Stable unique identifier, used for saves.")]
+    [SerializeField] private string id;
+    [SerializeField] private string displayName;
+    [SerializeField, TextArea(2, 5)] private string description;
+    [Tooltip("Groups quests in the editor, e.g. \"Main Story\" or \"Smithing Chain\".")]
+    [SerializeField] private string chain;
+
+    [Header("Starting")]
+    [Tooltip("Quests that must be completed first. This is how chains are made.")]
+    [SerializeField] private List<QuestDefinition> prerequisites = new List<QuestDefinition>();
+    [SerializeField] private QuestStart start = QuestStart.Automatically;
+    [Tooltip("For On Quest Event: the event that starts the quest.")]
+    [SerializeField] private GameEventDefinition startEvent;
+
+    [Header("Objectives")]
+    [Tooltip("Off: objectives can be done in any order. On: each one only counts once the one above it is done.")]
+    [SerializeField] private bool objectivesInOrder;
+    [SerializeField] private List<QuestObjective> objectives = new List<QuestObjective>();
+
+    [Header("Finishing")]
+    [Tooltip("Off: the quest completes the moment its objectives are done. On: the player must return to a Quest Giver for this " +
+             "quest to hand it in; rewards and the completion event wait until then.")]
+    [SerializeField] private bool turnInToGiver;
+    [Tooltip("Who to return to, shown in the quest tracker as \"Return to ...\", e.g. \"the Smith\". Empty: \"the quest giver\".")]
+    [SerializeField] private string turnInTo;
+
+    [Header("Rewards")]
+    [SerializeField] private List<ItemAmount> rewardItems = new List<ItemAmount>();
+    [SerializeField] private List<ResourceAmount> rewardResources = new List<ResourceAmount>();
+    [SerializeField] private List<RecipeDefinition> rewardRecipes = new List<RecipeDefinition>();
+    [Tooltip("Raised when the quest is completed, for scene reactions (open a gate) through a GameEventListener.")]
+    [SerializeField] private GameEventDefinition completionEvent;
+
+    public string Id => string.IsNullOrWhiteSpace(id) ? name : id;
+    public string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;
+    public string Description => description;
+    public string Chain => chain;
+    public IReadOnlyList<QuestDefinition> Prerequisites => prerequisites;
+    public QuestStart Start => start;
+    public GameEventDefinition StartEvent => startEvent;
+    public bool ObjectivesInOrder => objectivesInOrder;
+    public IReadOnlyList<QuestObjective> Objectives => objectives;
+    public bool TurnInToGiver => turnInToGiver;
+    /// <summary>Who the quest is handed in to, for "Return to ..." text.</summary>
+    public string TurnInTo => string.IsNullOrWhiteSpace(turnInTo) ? "the quest giver" : turnInTo.Trim();
+    public IReadOnlyList<ItemAmount> RewardItems => rewardItems;
+    public IReadOnlyList<ResourceAmount> RewardResources => rewardResources;
+    public IReadOnlyList<RecipeDefinition> RewardRecipes => rewardRecipes;
+    public GameEventDefinition CompletionEvent => completionEvent;
+
+    /// <summary>The rewards in words: "3 Iron Ingot, 10 Hardwood, recipe: Iron Axe".</summary>
+    public string DescribeRewards()
+    {
+        var parts = new List<string> { AmountText.Describe(rewardItems), AmountText.Describe(rewardResources) };
+        foreach (RecipeDefinition recipe in rewardRecipes)
+        {
+            if (recipe != null)
+            {
+                parts.Add("recipe: " + recipe.DisplayName);
+            }
+        }
+
+        parts.RemoveAll(string.IsNullOrEmpty);
+        return string.Join(", ", parts);
+    }
+
+    /// <summary>Things wrong with the quest, in plain language.</summary>
+    public List<string> FindProblems()
+    {
+        var problems = new List<string>();
+        if (objectives.Count == 0)
+        {
+            problems.Add("No objectives, so it completes the moment it starts.");
+        }
+
+        for (int i = 0; i < objectives.Count; i++)
+        {
+            string problem = objectives[i]?.FindProblem();
+            if (problem != null)
+            {
+                problems.Add($"Objective {i + 1} {problem}.");
+            }
+        }
+
+        if (start == QuestStart.OnQuestEvent && startEvent == null)
+        {
+            problems.Add("Starts on a quest event, but none is chosen, so it never starts.");
+        }
+
+        if (prerequisites.Contains(this))
+        {
+            problems.Add("Lists itself as a prerequisite, so it can never start.");
+        }
+        else if (DependsOn(this, new HashSet<QuestDefinition>()))
+        {
+            problems.Add("Its prerequisites lead back to itself, so it can never start.");
+        }
+
+        return problems;
+    }
+
+    private bool DependsOn(QuestDefinition target, HashSet<QuestDefinition> visited)
+    {
+        foreach (QuestDefinition prerequisite in prerequisites)
+        {
+            if (prerequisite == null || !visited.Add(prerequisite))
+            {
+                continue;
+            }
+
+            if (prerequisite == target || prerequisite.DependsOn(target, visited))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+}

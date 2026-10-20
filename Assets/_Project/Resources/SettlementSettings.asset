@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e3af07ed91cc3840b0c8a2e011411d2, type: 3}
+  m_Name: SettlementSettings
+  m_EditorClassIdentifier: Assembly-CSharp::SettlementSettings
+  portalRepairCost:
+  - resource: {fileID: 11400000, guid: a86ac9a152512464ab08e0446c161e61, type: 2}
+    amount: 3
+  portalSpark: {fileID: 11400000, guid: 7c3265a359bc4024c824268926942039, type: 2}
+  secondsPerSpark: 180
+  maxSparksPerRaid: 2
+  baseWardRadius: 16
+  wardLevels:
+  - cost:
+    - resource: {fileID: 11400000, guid: e991fd5ccf0ce314cafafff8badfe173, type: 2}
+      amount: 6
+    extraRadius: 6
+  - cost:
+    - resource: {fileID: 11400000, guid: e991fd5ccf0ce314cafafff8badfe173, type: 2}
+      amount: 12
+    - resource: {fileID: 11400000, guid: a86ac9a152512464ab08e0446c161e61, type: 2}
+      amount: 4
+    extraRadius: 6
+  cursedEssence: {fileID: 11400000, guid: c0e409a7cd38400498ff1c7037737b96, type: 2}
+  purifiedEssence: {fileID: 11400000, guid: e991fd5ccf0ce314cafafff8badfe173, type: 2}
+  cursedPerBatch: 2
+  purifiedPerBatch: 1
+  secondsPerBatch: 20
+  maxQueuedBatches: 50
+  purifierJob: {fileID: 11400000, guid: f4c65068c1237a04b8a587a274672012, type: 2}

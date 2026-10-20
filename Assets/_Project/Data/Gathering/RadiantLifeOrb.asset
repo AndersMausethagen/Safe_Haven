@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2bdc7bfe8797f544855a0ab7846c453, type: 3}
+  m_Name: RadiantLifeOrb
+  m_EditorClassIdentifier: Assembly-CSharp::GatheringNodeDefinition
+  id: 
+  displayName: Radiant Life Orb
+  tier: 3
+  yields:
+    entries:
+    - item: {fileID: 0}
+      resource: {fileID: 11400000, guid: 7e7ce1240b073e24998850c32ad1c248, type: 2}
+      minQuantity: 1
+      maxQuantity: 3
+      probability: 1
+  gatherTool: 0
+  requiredToolTier: 1
+  gatherAnimation: 1
+  gatherSeconds: 4.5
+  gatherRange: 1.6
+  depleteOnGather: 1
+  respawnSeconds: 600
+  worldModelPrefab: {fileID: 7097349728917456308, guid: 2560fc16b34470249a4dd4f1c5585b44, type: 3}
+  worldPrefab: {fileID: 4707785568422404063, guid: 8c73a6bd5fac65d40856f43f9a67962d, type: 3}

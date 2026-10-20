@@ -1,0 +1,66 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c360799f7cfc244da5ce56979ccb45d, type: 3}
+  m_Name: RecipeBook
+  m_EditorClassIdentifier: Assembly-CSharp::RecipeBook
+  recipes:
+  - {fileID: 11400000, guid: 4e8563e7819e30d4ab442b08a08c6653, type: 2}
+  - {fileID: 11400000, guid: 16c776310de495a4a9ccc8f9e07ee96f, type: 2}
+  - {fileID: 11400000, guid: a1c819f1af01f1e4db80791b4a9831e4, type: 2}
+  - {fileID: 11400000, guid: 066477e42a717e04297d579ad95e4813, type: 2}
+  - {fileID: 11400000, guid: 02d95fc35e4be6c4cb4c2adc51da1a4e, type: 2}
+  - {fileID: 11400000, guid: de54719a8babe0743938c4f5610219bd, type: 2}
+  - {fileID: 11400000, guid: 283ce276e32f14e4bb9a1ab9068d8ae7, type: 2}
+  - {fileID: 11400000, guid: 70b48a7ea0eea624b98f1a500113451b, type: 2}
+  - {fileID: 11400000, guid: 0a7cdf721d4aa8e4ba0222031ca1e6d9, type: 2}
+  - {fileID: 11400000, guid: eafec73334f190b4f90904d5151c95a5, type: 2}
+  - {fileID: 11400000, guid: 30fe3ac3f65358e44863a3525d085df8, type: 2}
+  - {fileID: 11400000, guid: ee90fc968a1216241885cd9ee9937962, type: 2}
+  - {fileID: 11400000, guid: c6287ae55a5d905479e912ccf2302294, type: 2}
+  - {fileID: 11400000, guid: 3f7803232b50e354a8dc761eb093ddde, type: 2}
+  - {fileID: 11400000, guid: 78d155ea180e0304ebc63416e467734c, type: 2}
+  - {fileID: 11400000, guid: ea7fd4572f28d394b8509f09f00f8c5f, type: 2}
+  - {fileID: 11400000, guid: 6188361025614234b9e434545f1036f7, type: 2}
+  - {fileID: 11400000, guid: b12ef1fb9c1ac464ba5831fc8f3c7ac6, type: 2}
+  - {fileID: 11400000, guid: 0ac749e26c276994cb15323bd5728d50, type: 2}
+  - {fileID: 11400000, guid: fa581af5d2eb80a45a110cd420c1a74e, type: 2}
+  - {fileID: 11400000, guid: 75c88139bb66ec24e942221821b20985, type: 2}
+  - {fileID: 11400000, guid: 12aee824706af854c80fe6ad0c4025bd, type: 2}
+  - {fileID: 11400000, guid: 2c54f248ace478c47956005abf31c7f7, type: 2}
+  - {fileID: 11400000, guid: cd5beafe5776a2a4caf027c38e5b9cef, type: 2}
+  - {fileID: 11400000, guid: ed6668c1234762246a1666fc7a136fbe, type: 2}
+  - {fileID: 11400000, guid: a315c1493cd07fe489a77df856d603eb, type: 2}
+  - {fileID: 11400000, guid: 98ec8f2b51c768a438bbdb7a47d67cad, type: 2}
+  - {fileID: 11400000, guid: 8d67ac66b4de81844aefaa0bc92d57dc, type: 2}
+  - {fileID: 11400000, guid: 98de4e6ce8a111240998aa3246ae0a43, type: 2}
+  - {fileID: 11400000, guid: b1bcc6a2f13e5934fbe9eb54bbad5aab, type: 2}
+  - {fileID: 11400000, guid: 596fd850a34252a4fa319c4745d8df5d, type: 2}
+  - {fileID: 11400000, guid: d8fe52933b49ba0468edb78cc1d96fa7, type: 2}
+  - {fileID: 11400000, guid: 4d4bc01c7441880429b4433a3974baaf, type: 2}
+  - {fileID: 11400000, guid: 9c1a1c741f76443438409ab3664fdf04, type: 2}
+  - {fileID: 11400000, guid: 79e0d242b684bb249adc103a9a964a83, type: 2}
+  - {fileID: 11400000, guid: 933c81a4b9cacef41a927f29516e1f3c, type: 2}
+  - {fileID: 11400000, guid: db1d64d2b1165314c8a6fb92f336e291, type: 2}
+  - {fileID: 11400000, guid: ab38a9f0aa9a6c445ae55a8b272701bb, type: 2}
+  - {fileID: 11400000, guid: add52b3d2bed3e745a7d033add0238d0, type: 2}
+  - {fileID: 11400000, guid: ec5fa5faadfb45845b6ad3049ffce0b5, type: 2}
+  buildings:
+  - {fileID: 11400000, guid: a10bf06ba7306584f8632f492a16fdac, type: 2}
+  - {fileID: 11400000, guid: 25c95a1289ab72b4ea0bb96e2ec3f020, type: 2}
+  - {fileID: 11400000, guid: 6439e52b4c107bd478aa3e11a3ff7aec, type: 2}
+  - {fileID: 11400000, guid: 121fba5d9f19d0744b6295005ad38dcc, type: 2}
+  - {fileID: 11400000, guid: cfa8f019a4062c84f8e9b8cd432080e0, type: 2}
+  - {fileID: 11400000, guid: 95f7d6e0cc6f5144fa85269777959d65, type: 2}
+  - {fileID: 11400000, guid: c79543eccb64e534e836b5b64511ab72, type: 2}
+  - {fileID: 11400000, guid: dd9792482f40fc243a8d7294434f1ee9, type: 2}
+  - {fileID: 11400000, guid: 1fe15b30940bf7049a4e4966e9954e1b, type: 2}
+  - {fileID: 11400000, guid: 4e2c9152865ef064e968287cf20d1b5f, type: 2}

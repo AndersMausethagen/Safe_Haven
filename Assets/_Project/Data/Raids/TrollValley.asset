@@ -1,0 +1,77 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c72e5e4fd746250409a431420bdc103e, type: 3}
+  m_Name: TrollValley
+  m_EditorClassIdentifier: Assembly-CSharp::RaidDefinition
+  id: troll_valley
+  displayName: Troll Valley
+  description: A valley of old stone bridges where the trolls still collect their tolls. Trollstone is found only here.
+  tier: 2
+  sceneName: 
+  locked: 1
+  lockedText: The way to Troll Valley lies beyond the Misty Woods. The portal can't reach that far yet.
+  knownEnemies: []
+  likelyItems:
+  - {fileID: 11400000, guid: fcf0552d231ec8b40a3de2796f1bc4c3, type: 2}
+  likelyResources: []
+  durationSeconds: 300
+  extractionSeconds: 20
+  lootMultiplier: 1
+  enemyHealthMultiplier: 1
+  enemyPowerMultiplier: 1
+  enemyDensity: 1
+  overrideBands: 0
+  nearDistance: 60
+  farDistance: 110
+  spawnLists: []
+  systems:
+  - rid: 287757967972106341
+  roaming:
+    table: {fileID: 0}
+    firstDelay: 60
+    interval: 20
+    baseAlive: 2
+    perStage: 1
+    perAlarm: 2
+    maxAlive: 8
+    totalLimit: 12
+    minDistance: 35
+    maxDistance: 60
+    despawnDistance: 90
+    campClearance: 20
+    huntSpread: 15
+  stages: []
+  extractedArtwork: {fileID: 0}
+  failedArtwork: {fileID: 0}
+  references:
+    version: 2
+    RefIds:
+    - rid: 287757967972106341
+      type: {class: ForestAnnoyanceSystem, ns: , asm: SafeHaven}
+      data:
+        enabled: 1
+        settings:
+          perCritical: 4
+          perNormal: 13
+          perGlancing: 20
+          quietDelay: 8
+          decayPerSecond: 0.3
+          stirringAt: 25
+          angryAt: 50
+          wrathAt: 85
+          stirringExtraRoamers: 2
+          stirringIntervalScale: 0.6
+          huntInterval: 20
+          huntRadius: 60
+          wrathGroups: 3
+          wrathTable: {fileID: 0}
+          maxWraths: 1

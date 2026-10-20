@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c76fa069e85f784a9c1abb8f78fae26, type: 3}
+  m_Name: Linen
+  m_EditorClassIdentifier: Assembly-CSharp::ItemDefinition
+  id: linen
+  displayName: Linen
+  description: Cloth spun from flax.
+  category: 2
+  tier: 2
+  rarity: 0
+  value: 3
+  icon: {fileID: 21300000, guid: 1f85709f97b03e34794d77959b3d0044, type: 3}
+  prefab: {fileID: 0}
+  stackable: 1
+  maximumStack: 50
+  weight: 0.3
+  toolType: 0
+  toolTier: 0
+  weapon: {fileID: 0}
+  healAmount: 0
+  hungerRestore: 0
+  thirstRestore: 0
+  carryCapacityBonus: 0
+  bagSlotBonus: 0
+  armorSlot: 0
+  statBonuses: []
+  teachesBuildings: []
+  teachesRecipes: []
+  raidModifier: {fileID: 0}

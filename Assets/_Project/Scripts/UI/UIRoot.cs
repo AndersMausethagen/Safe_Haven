@@ -1,0 +1,90 @@
+﻿using UnityEngine;
+using UnityEngine.UI;
+
+/// <summary>
+/// The root of a scene's screen UI: the one screen-space canvas whose CanvasScaler decides how big all the UI is. Every
+/// HUD and window in the scene is a child of it with its own nested Canvas (with Override Sorting for its draw order), so
+/// a change inside one window only rebuilds that window, while scaling stays in one place.
+/// <para>
+/// In gameplay scenes use the UI Root prefab (Prefabs/UI/UIRoot), which also holds the UIStateManager, the EventSystem
+/// and the Escape menu, and put the scene's HUD prefabs under its canvas. World-space canvases (health bars, interaction
+/// prompts) and the loading screen are not part of it. Menu scenes can put this component on their own canvas.
+/// </para>
+/// <para>
+/// UI scale: <see cref="Scale"/> multiplies the whole UI (1 = designed size at 1920x1080). The options menu will set it
+/// and store the player's choice; until then it can be tried out in the Inspector.
+/// </para>
+/// </summary>
+[DisallowMultipleComponent]
+[RequireComponent(typeof(Canvas), typeof(CanvasScaler))]
+public sealed class UIRoot : MonoBehaviour
+{
+    public const float MinScale = 0.5f;
+    public const float MaxScale = 2f;
+
+    [Tooltip("The size the UI is designed for. Everything is laid out in these units.")]
+    [SerializeField] private Vector2 referenceResolution = new Vector2(1920f, 1080f);
+    [Tooltip("Multiplies the size of all UI in the scene. The future UI scale option sets this.")]
+    [SerializeField, Range(MinScale, MaxScale)] private float scale = 1f;
+
+    private CanvasScaler scaler;
+
+    /// <summary>The screen UI root of the loaded scene, or null.</summary>
+    public static UIRoot Current { get; private set; }
+
+    public Canvas Canvas { get; private set; }
+
+    public float Scale
+    {
+        get => scale;
+        set
+        {
+            scale = Mathf.Clamp(value, MinScale, MaxScale);
+            Apply();
+        }
+    }
+
+    private void Awake()
+    {
+        Canvas = GetComponent<Canvas>();
+        scaler = GetComponent<CanvasScaler>();
+        Apply();
+    }
+
+    private void OnEnable()
+    {
+        if (Current != null && Current != this)
+        {
+            Debug.LogWarning("More than one UIRoot is active; the UI scale option only reaches the newest.", this);
+        }
+
+        Current = this;
+    }
+
+    private void OnDisable()
+    {
+        if (Current == this)
+        {
+            Current = null;
+        }
+    }
+
+    private void OnValidate()
+    {
+        scaler = GetComponent<CanvasScaler>();
+        Apply();
+    }
+
+    // A smaller reference resolution makes every UI unit cover more screen pixels, so scale 1.5 means 1.5x bigger UI.
+    // Anchored windows keep their place at the screen edges; only their size changes.
+    private void Apply()
+    {
+        if (scaler == null)
+        {
+            return;
+        }
+
+        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+        scaler.referenceResolution = referenceResolution / Mathf.Max(MinScale, scale);
+    }
+}

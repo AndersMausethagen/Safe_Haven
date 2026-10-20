@@ -1,0 +1,292 @@
+using System.Collections.Generic;
+using System.Text;
+using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
+
+/// <summary>
+/// The raid's heads-up display: the time left, turning orange and then pulsing red as it runs low; the danger stage; how
+/// far the nearest open extraction is and which way (or how long an extraction under way still takes); every exit and
+/// whether it is open, opens later, has gone dark or has a cost; what would be lost if the raid failed now; and a banner
+/// with the outcome when the raid ends. Everything shown comes from the RaidDirector and the extraction points, so it
+/// only reads.
+/// </summary>
+public sealed class RaidHudView : MonoBehaviour
+{
+    [SerializeField] private TMP_Text raidNameLabel;
+    [SerializeField] private TMP_Text timerLabel;
+    [SerializeField] private TMP_Text extractionLabel;
+    [Tooltip("Optional. Every exit in the raid: its distance and whether it is open, opens later, has gone dark or has a cost.")]
+    [SerializeField] private TMP_Text exitsLabel;
+    [Tooltip("Optional. What would be lost if the raid failed now: everything carried but the safe pocket and deployed gear.")]
+    [SerializeField] private TMP_Text riskLabel;
+    [Tooltip("Seconds between recounts of what is at risk; counting snapshots the player's belongings.")]
+    [SerializeField, Min(0.1f)] private float riskRefreshSeconds = 1f;
+    [Tooltip("Optional. Turned to point at the nearest open extraction as the player sees it; its graphic should point up.")]
+    [SerializeField] private RectTransform extractionArrow;
+    [Tooltip("Shown when the raid ends.")]
+    [SerializeField] private GameObject banner;
+    [SerializeField] private TMP_Text bannerTitle;
+    [SerializeField] private TMP_Text bannerSubtitle;
+    [Tooltip("Seconds left at which the timer turns to the warning color.")]
+    [SerializeField, Min(0f)] private float warningTime = 120f;
+    [Tooltip("Seconds left at which the timer turns to the critical color and pulses.")]
+    [SerializeField, Min(0f)] private float criticalTime = 60f;
+    [SerializeField] private Color normalColor = Color.white;
+    [SerializeField] private Color warningColor = new Color(1f, 0.72f, 0.3f);
+    [SerializeField] private Color criticalColor = new Color(1f, 0.36f, 0.3f);
+    [SerializeField] private Color extractedColor = new Color(0.55f, 0.92f, 0.55f);
+    [SerializeField] private Color stageColor = new Color(1f, 0.6f, 0.3f);
+
+    private readonly List<ExtractionPoint> exits = new List<ExtractionPoint>();
+    private readonly StringBuilder text = new StringBuilder();
+    private RaidDirector director;
+    private float nextRiskRefresh;
+    private float nextExitsRefresh;
+
+    private void OnEnable()
+    {
+        if (banner != null)
+        {
+            banner.SetActive(false);
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (director != null)
+        {
+            director.Ended -= OnRaidEnded;
+            director.StageChanged -= OnStageChanged;
+            director = null;
+        }
+    }
+
+    private void Update()
+    {
+        // The director may wake after this view, so it is picked up on the first frame it exists.
+        if (director == null && RaidDirector.Current != null)
+        {
+            director = RaidDirector.Current;
+            director.Ended += OnRaidEnded;
+            director.StageChanged += OnStageChanged;
+            ShowRaidName();
+        }
+
+        if (director == null)
+        {
+            timerLabel.text = "-:--";
+            extractionLabel.text = "";
+            SetText(exitsLabel, "");
+            SetText(riskLabel, "");
+            PointArrowAt(null);
+            return;
+        }
+
+        RaidSession session = director.Session;
+        timerLabel.text = RaidStats.FormatTime(session.TimeRemaining);
+        timerLabel.color = TimerColor(session);
+        ExtractionPoint target = null;
+        extractionLabel.text = session.IsOver ? "" : DescribeExtraction(out target);
+        PointArrowAt(target);
+        if (session.IsOver)
+        {
+            SetText(exitsLabel, "");
+        }
+        else if (exitsLabel != null && Time.unscaledTime >= nextExitsRefresh)
+        {
+            nextExitsRefresh = Time.unscaledTime + 0.2f;
+            SetText(exitsLabel, DescribeExits());
+        }
+
+        if (session.IsOver)
+        {
+            SetText(riskLabel, "");
+        }
+        else if (riskLabel != null && Time.unscaledTime >= nextRiskRefresh)
+        {
+            nextRiskRefresh = Time.unscaledTime + riskRefreshSeconds;
+            riskLabel.text = DescribeRisk();
+        }
+    }
+
+    private void OnStageChanged(int index, RaidStage stage)
+    {
+        ShowRaidName();
+    }
+
+    private void ShowRaidName()
+    {
+        string raid = director.Session.Definition.DisplayName.ToUpperInvariant();
+        RaidStage stage = director.CurrentStage;
+        raidNameLabel.text = stage == null ? raid
+            : $"{raid}  ·  <color=#{ColorUtility.ToHtmlStringRGB(stageColor)}>{stage.DisplayName.ToUpperInvariant()}</color>";
+    }
+
+    private static void SetText(TMP_Text label, string value)
+    {
+        if (label != null && label.text != value)
+        {
+            label.text = value;
+        }
+    }
+
+    // One line per exit, nearest first: "Hollow Oak  32 m  opens in 1:20".
+    private string DescribeExits()
+    {
+        GameObject player = director.Player;
+        if (player == null)
+        {
+            return "";
+        }
+
+        Vector3 position = player.transform.position;
+        exits.Clear();
+        exits.AddRange(ExtractionPoint.Active);
+        exits.Sort((a, b) => a.DistanceFrom(position).CompareTo(b.DistanceFrom(position)));
+        text.Clear();
+        foreach (ExtractionPoint exit in exits)
+        {
+            if (text.Length > 0)
+            {
+                text.Append('\n');
+            }
+
+            int distance = Mathf.RoundToInt(exit.DistanceFrom(position));
+            switch (exit.Status)
+            {
+                case ExtractionStatus.NotYetOpen:
+                    text.Append($"<color=#9AA0AA>{exit.DisplayName}  {distance} m  opens in {RaidStats.FormatTime(exit.SecondsUntilChange)}</color>");
+                    break;
+                case ExtractionStatus.Closed:
+                    text.Append($"<color=#B05050><s>{exit.DisplayName}</s>  gone dark</color>");
+                    break;
+                default:
+                    float closesIn = exit.SecondsUntilChange;
+                    string color = closesIn >= 0f && closesIn <= 60f ? "#FFB84D" : "#8BE08B";
+                    text.Append($"<color={color}>{exit.DisplayName}  {distance} m");
+                    if (closesIn >= 0f)
+                    {
+                        text.Append($"  closes in {RaidStats.FormatTime(closesIn)}");
+                    }
+
+                    text.Append("</color>");
+                    break;
+            }
+
+            if (exit.CostItem != null)
+            {
+                text.Append($"  <color=#E0C070>needs {exit.CostText}</color>");
+            }
+        }
+
+        return text.ToString();
+    }
+
+    private string DescribeRisk()
+    {
+        GameObject player = director.Player;
+        if (player == null)
+        {
+            return "";
+        }
+
+        RaidRisk risk = RaidRisk.Of(PlayerSnapshot.Capture(player), director.Session.Loadout);
+        if (risk.IsEmpty)
+        {
+            return "<color=#9AA0AA>Nothing at risk yet</color>";
+        }
+
+        return $"At risk: <color=#FFB84D>{risk.Items} items ({risk.Value} value)  ·  {risk.Resources} materials</color>";
+    }
+
+    private Color TimerColor(RaidSession session)
+    {
+        if (session.IsOver)
+        {
+            return session.Outcome == RaidOutcome.Extracted ? extractedColor : criticalColor;
+        }
+
+        float remaining = session.TimeRemaining;
+        if (remaining <= criticalTime)
+        {
+            float pulse = 0.5f + 0.5f * Mathf.Sin(Time.unscaledTime * 8f);
+            return Color.Lerp(criticalColor, Color.white, pulse * 0.35f);
+        }
+
+        return remaining <= warningTime ? warningColor : normalColor;
+    }
+
+    private string DescribeExtraction(out ExtractionPoint nearest)
+    {
+        nearest = null;
+        foreach (ExtractionPoint point in ExtractionPoint.Active)
+        {
+            if (point.IsExtracting)
+            {
+                return $"<color=#8BE08B>Extracting... {point.TimeLeft:0.0}s</color>";
+            }
+        }
+
+        GameObject player = director.Player;
+        if (player == null)
+        {
+            return "";
+        }
+
+        nearest = ExtractionPoint.FindNearest(player.transform.position, out float distance);
+        return nearest != null ? $"Nearest open: {nearest.DisplayName}  {Mathf.RoundToInt(distance)} m" : "<color=#FF6B5B>No open way out right now</color>";
+    }
+
+    // Up on screen is the camera's forward along the ground, so the arrow turns by the angle from there to the target.
+    private void PointArrowAt(ExtractionPoint target)
+    {
+        if (extractionArrow == null)
+        {
+            return;
+        }
+
+        GameObject player = director != null ? director.Player : null;
+        Camera view = Camera.main;
+        bool show = target != null && player != null && view != null;
+        if (extractionArrow.gameObject.activeSelf != show)
+        {
+            extractionArrow.gameObject.SetActive(show);
+        }
+
+        if (show)
+        {
+            Vector3 forward = Vector3.ProjectOnPlane(view.transform.forward, Vector3.up);
+            Vector3 toTarget = Vector3.ProjectOnPlane(target.transform.position - player.transform.position, Vector3.up);
+            extractionArrow.localEulerAngles = new Vector3(0f, 0f, -Vector3.SignedAngle(forward, toTarget, Vector3.up));
+        }
+    }
+
+    private void OnRaidEnded(RaidSession session)
+    {
+        if (banner == null)
+        {
+            return;
+        }
+
+        banner.SetActive(true);
+        switch (session.Outcome)
+        {
+            case RaidOutcome.Extracted:
+                bannerTitle.text = "EXTRACTED";
+                bannerTitle.color = extractedColor;
+                bannerSubtitle.text = "Heading home with everything you carry.";
+                break;
+            case RaidOutcome.TimeExpired:
+                bannerTitle.text = "RAID COLLAPSED";
+                bannerTitle.color = criticalColor;
+                bannerSubtitle.text = "Time ran out. Everything you carried is lost.";
+                break;
+            default:
+                bannerTitle.text = "YOU DIED";
+                bannerTitle.color = criticalColor;
+                bannerSubtitle.text = "Everything you carried is lost.";
+                break;
+        }
+    }
+}

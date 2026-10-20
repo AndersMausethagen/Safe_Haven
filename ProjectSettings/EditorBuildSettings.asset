@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1045 &1
+EditorBuildSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Scenes:
+  - enabled: 1
+    path: Assets/_Project/Scenes/MainMenu.unity
+    guid: 0a217e6d473345243bd117db8a331754
+  - enabled: 1
+    path: Assets/_Project/Scenes/SafeHaven.unity
+    guid: dd3d6a852e0995249a7b747bf63f4d74
+  - enabled: 1
+    path: Assets/_Project/Scenes/Raids/Raid_MistyWoods.unity
+    guid: 90ccd9189a6cb8446bb9c0597aa49cc4
+  - enabled: 1
+    path: Assets/_Project/Scenes/RaidResults.unity
+    guid: b9bec01c2346e654aba8758c17a0d9f6
+  - enabled: 1
+    path: Assets/_Project/Scenes/SampleScene.unity
+    guid: 99c9720ab356a0642a771bea13969a05
+  - enabled: 1
+    path: Assets/_Project/Scenes/GameplayTestScene.unity
+    guid: 5afdd46ffac25394f8923774a39d255b
+  m_configObjects:
+    com.unity.dt.app-ui: {fileID: 11400000, guid: 1b1c20d82303e4b5781c3ef50ac1449f, type: 2}
+    com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}

@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e984d5700951ee48b9215d668e8218a, type: 3}
+  m_Name: HideRucksack
+  m_EditorClassIdentifier: Assembly-CSharp::RecipeDefinition
+  id: leather_pack
+  displayName: 
+  output: {fileID: 11400000, guid: 4a00889f8a6944449a33bdc6f69186a9, type: 2}
+  outputResource: {fileID: 0}
+  outputAmount: 1
+  resourceCost: []
+  itemCost:
+  - item: {fileID: 11400000, guid: 616026fe07c265041bdcd10e32bcd168, type: 2}
+    amount: 3
+  - item: {fileID: 11400000, guid: 8f121a970bae6f54dbcc8ff5e2c2a48e, type: 2}
+    amount: 2
+  - item: {fileID: 11400000, guid: 4df650debd4ce21459e04a0c92ffa207, type: 2}
+    amount: 2
+  - item: {fileID: 11400000, guid: 4af99768b5986d94e8882065ffe24693, type: 2}
+    amount: 1
+  station: 1
+  craftSeconds: 20
+  knownFromStart: 0
+  sortOrder: 12

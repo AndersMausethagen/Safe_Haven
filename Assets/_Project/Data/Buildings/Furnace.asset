@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 55433f6de2238c643b7ddfb32e5977d0, type: 3}
+  m_Name: Furnace
+  m_EditorClassIdentifier: Assembly-CSharp::BuildingDefinition
+  id: smelter
+  displayName: Furnace
+  description: A stone furnace that smelts ore into ingots.
+  icon: {fileID: 21300000, guid: 998402f8b1b813e47adf0d2c71f8847a, type: 3}
+  faction: 0
+  combatStats: {fileID: 11400000, guid: 01155c9e2dd7c27468c1a359f747e1a1, type: 2}
+  prefab: {fileID: 3656774741892624821, guid: aa3422737959e2942b7989b64e65989a, type: 3}
+  constructionCost: []
+  constructionItems:
+  - item: {fileID: 11400000, guid: ec438ce757d5e9e43bbd93390e7a2728, type: 2}
+    amount: 4
+  - item: {fileID: 11400000, guid: 59d371b7b63e8e24bb946051d808bc9b, type: 2}
+    amount: 4
+  - item: {fileID: 11400000, guid: b5567f7d75200bd46befbd1dab298f36, type: 2}
+    amount: 12
+  showInBuildMenu: 1
+  knownFromStart: 1
+  sortOrder: 4
+  yardDepth: 1.5
+  yardSide: 0
+  placeInLines: 0
+  station: 2
+  outputCapacity: 10
+  queueLength: 5
+  deathSound: {fileID: 0}

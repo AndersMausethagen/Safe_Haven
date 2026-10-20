@@ -1,0 +1,85 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Weathered Granite
+  m_Shader: {fileID: 4800000, guid: e1f821fcf64a76446acefd725f669f46, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _GroundColor:
+        m_Texture: {fileID: 2800000, guid: 9dbf25cac8d15114788ab047c7bca682, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _GroundNormal:
+        m_Texture: {fileID: 2800000, guid: d037b3cdf966d6840907ddd14bcb6bf5, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _GroundPacked:
+        m_Texture: {fileID: 2800000, guid: 2b77898372c3a35428847c28ae16c1d8, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _GroundSurface:
+        m_Texture: {fileID: 2800000, guid: 2b77898372c3a35428847c28ae16c1d8, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MossColor:
+        m_Texture: {fileID: 2800000, guid: ffd9c9a362dac52469ab4f23ae542c47, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MossNormal:
+        m_Texture: {fileID: 2800000, guid: 1d311e30c95e8584dab1d8b00dd7efc1, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MossSurface:
+        m_Texture: {fileID: 2800000, guid: 9f8742603e37b604ca0aa271637af373, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_Lightmaps:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_LightmapsInd:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_ShadowMasks:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _EdgeContrast: 1.5
+    - _EnvironmentReflections: 1
+    - _GroundNormalStrength: 0.65
+    - _MossCoverage: 0
+    - _MossNormalStrength: 0.85
+    - _QueueControl: 0
+    - _QueueOffset: 0
+    - _ReceiveShadows: 1
+    - _Relief: 0.018
+    - _ScreenSpaceReflections: 1
+    - _ScreenSpaceReflectionsContributeTransparent: 1
+    - _SlopeThreshold: 0.65
+    - _SpecularHighlights: 1
+    - _Tiling: 2
+    m_Colors:
+    - _Tint: {r: 1, g: 1, b: 1, a: 1}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1

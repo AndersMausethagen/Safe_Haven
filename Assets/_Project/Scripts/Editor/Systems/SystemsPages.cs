@@ -1,0 +1,661 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UnityEditor;
+using UnityEngine;
+
+// The Systems Editor's pages, one per game system. Each one tunes a settings asset (or the player prefab) and shows the
+// numbers that follow from it. See SystemsPage for the helpers and how to add a page.
+
+/// <summary>Hunger, thirst and food (GDD §11).</summary>
+public sealed class SurvivalPage : SystemsPage
+{
+    public override string Title => "Survival";
+    public override string Group => "Player";
+    public override string Help => "How fast hunger and thirst drain at home and in raids, what running out does, and what each food restores. " +
+                                   "Nothing here can kill the player.";
+
+    public override void Draw()
+    {
+        var settings = Settings<SurvivalSettings>(SurvivalSettings.ResourceName);
+        if (settings == null)
+        {
+            return;
+        }
+
+        SettingsPanel(settings, "Survival settings", "Resources/SurvivalSettings");
+        BeginDerived();
+        Derived("A full belly lasts at home", Minutes(SurvivalSettings.MinutesToEmpty(settings.MaxHunger, settings.HungerPerMinute)));
+        Derived("A full belly lasts in a raid", Minutes(SurvivalSettings.MinutesToEmpty(settings.MaxHunger, settings.HungerPerMinute, settings.RaidMultiplier)));
+        Derived("Full thirst lasts at home", Minutes(SurvivalSettings.MinutesToEmpty(settings.MaxThirst, settings.ThirstPerMinute)));
+        Derived("Full thirst lasts in a raid", Minutes(SurvivalSettings.MinutesToEmpty(settings.MaxThirst, settings.ThirstPerMinute, settings.RaidMultiplier)));
+        Derived("A new game wakes up hungry after", Minutes(SurvivalSettings.MinutesToEmpty(settings.MaxHunger * (settings.StartingHunger - settings.LowWarning), settings.HungerPerMinute)));
+        Derived("Starving", $"max stamina ×{settings.StarvingMaxStamina:0.##}, regeneration ×{settings.StarvingRegeneration:0.##}");
+        Derived("Parched (in combat)", $"regeneration ×{settings.ParchedCombatRegeneration:0.##}");
+        EndDerived();
+
+        var foods = LoadAll<ItemDefinition>().FindAll(item => item.IsConsumable);
+        Table("Food, drink and potions (items)", "Right-click in the bag to use. Health, hunger and thirst restored per use.", foods,
+            new[] { new Column("healAmount", "Health"), new Column("hungerRestore", "Hunger"), new Column("thirstRestore", "Thirst"), new Column("maximumStack", "Stack") },
+            item => item.HungerRestore > 0f ? $"{Mathf.CeilToInt(settings.MaxHunger / item.HungerRestore)} fill an empty belly" : "", "");
+    }
+}
+
+/// <summary>The bag's weight budget, item weights, essence caps and backpacks (GDD §12.4).</summary>
+public sealed class CarryingPage : SystemsPage
+{
+    public override string Title => "Carrying";
+    public override string Group => "Player";
+    public override string Help => "Everything in the bag has weight and must fit the bag's weight budget; gear worn and the safe pocket don't count. " +
+                                   "Essences are weightless and capped per bar. Backpacks add weight and bag slots. At home, crafting and " +
+                                   "building also use what is in storage.";
+
+    public override void Draw()
+    {
+        GameObject player = PlayerPrefab;
+        if (player == null)
+        {
+            EditorGUILayout.HelpBox("PlayerArmature prefab not found.", MessageType.Warning);
+            return;
+        }
+
+        var resources = player.GetComponent<ResourceInventory>();
+        var items = player.GetComponent<ItemInventory>();
+        SettingsPanel(resources, "Essence bars (player)", "PlayerArmature > Resource Inventory", "baseCapacity");
+        SettingsPanel(items, "Bag (player)", "PlayerArmature > Item Inventory", "carryWeight", "baseUnlockedSlots", "safePocketSlots");
+
+        var all = LoadAll<ItemDefinition>();
+        all.Sort((a, b) => a.Category != b.Category ? a.Category.CompareTo(b.Category) : string.CompareOrdinal(a.DisplayName, b.DisplayName));
+        float budget = items.CarryWeight;
+        Table("Item weights", "Weight per item. The last column is how many fit the bag's budget on their own.", all,
+            new[] { new Column("weight", "Weight"), new Column("maximumStack", "Stack"), new Column("tier", "Tier", 50f) },
+            item => budget <= 0f ? "no limit" : item.Weight <= 0f ? "weightless"
+                : $"{Mathf.FloorToInt(budget / item.Weight)} ({item.Category})", "Fits alone");
+
+        var packs = LoadAll<ItemDefinition>().FindAll(item => item.IsBackpack);
+        Table("Backpacks", "Only the best backpack carried counts.", packs,
+            new[] { new Column("carryCapacityBonus", "+Weight"), new Column("bagSlotBonus", "+Slots") },
+            item => $"{budget + item.CarryCapacityBonus:0} weight, {items.UnlockedSlotsWith(item.BagSlotBonus)} slots", "With it");
+    }
+}
+
+/// <summary>What a failed raid costs and what repairs cost (GDD §8.3, §13.4).</summary>
+public sealed class DeathAndRepairPage : SystemsPage
+{
+    public override string Title => "Death & Repair";
+    public override string Group => "Player";
+    public override string Help => "A failed raid loses what was carried but keeps the tools, weapons and backpacks taken through the portal, " +
+                                   "worn down. Broken gear is kept but useless until repaired at the repair station.";
+
+    public override void Draw()
+    {
+        var settings = Settings<DurabilitySettings>(DurabilitySettings.ResourceName);
+        if (settings == null)
+        {
+            return;
+        }
+
+        SettingsPanel(settings, "Durability settings", "Resources/DurabilitySettings");
+        BeginDerived();
+        Derived("New gear breaks after", settings.LossOnFailedRaid > 0f ? $"{settings.FailedRaidsUntilBroken} failed raids" : "never");
+        Derived("Repairs are made at", settings.RepairStation.WithArticle());
+        EndDerived();
+
+        var book = AssetDatabase.LoadAssetAtPath<RecipeBook>("Assets/_Project/Data/Crafting/RecipeBook.asset");
+        IReadOnlyList<RecipeDefinition> recipes = book != null ? book.Recipes : new List<RecipeDefinition>();
+        var gear = LoadAll<ItemDefinition>().FindAll(item => item.HasDurability);
+        ContentUtility.BeginPanel("Repair costs", "What repairing costs after one failed raid, and from broken. Change the recipe to change these.");
+        foreach (ItemDefinition item in gear)
+        {
+            RecipeDefinition recipe = Repairs.RecipeFor(item, recipes);
+            string worn = Repairs.Cost(new ItemStack(item, 1, 1f - settings.LossOnFailedRaid), recipe, settings).Describe();
+            string broken = Repairs.Cost(new ItemStack(item, 1, 0f), recipe, settings).Describe();
+            EditorGUILayout.LabelField(item.DisplayName, recipe == null ? "no recipe: repairs are free" : $"after one failed raid: {worn}     from broken: {broken}",
+                ContentUtility.WrappedMiniLabel);
+        }
+
+        ContentUtility.EndPanel();
+    }
+}
+
+/// <summary>How Quest Givers show their quest's state: the floating "!", "…" and "?" over their heads.</summary>
+public sealed class QuestMarkersPage : SystemsPage
+{
+    public override string Title => "Quest Markers";
+    public override string Group => "World";
+    public override string Help => "Every Quest Giver floats a marker over its head: \"!\" when its quest can be taken, \"…\" while the player is on it " +
+                                   "and \"?\" when it is ready to hand in (quests with \"Turn In To Giver\"). Set the symbols, colors and look " +
+                                   "for all givers here; a giver can hide its own marker with Show Marker. Quests themselves are made in the " +
+                                   "Content Editor (Quests).";
+
+    public override void Draw()
+    {
+        var settings = Settings<QuestMarkerSettings>(QuestMarkerSettings.ResourceName);
+        if (settings != null)
+        {
+            SettingsPanel(settings, "Quest markers", "Resources/QuestMarkerSettings");
+        }
+    }
+}
+
+/// <summary>The timed swing minigame for axe, pickaxe and sickle gathering.</summary>
+public sealed class GatheringMinigamePage : SystemsPage
+{
+    public override string Title => "Gathering Minigame";
+    public override string Group => "Player";
+    public override string Help => "Chopping, mining and cutting are a series of timed swings, one per bar. Stop the marker in the green zone for a " +
+                                   "                                   critical (+bonus yield, quiet, a brief freeze), in the yellow zone for a normal swing; missing or not pressing is a " +
+                                   "glancing blow that wears the tool. Each tool has a profile: bar speed, zone widths and loudness (the sickle is " +
+                                   "quick and quiet). In raids every swing makes noise that wakes and draws monsters, and feeds the Forest " +
+                                                                      "Annoyance raid system. Swings per node are set on each gathering node. Sounds, particles and node shake come " +
+                                                                      "from Harvest Feedback profiles (Content › Harvest Feedback); the Default profile here covers nodes without one.";
+
+    public override void Draw()
+    {
+        var settings = Settings<GatheringMinigameSettings>(GatheringMinigameSettings.ResourceName);
+        if (settings == null)
+        {
+            return;
+        }
+
+        SettingsPanel(settings, "Gathering minigame", "Resources/GatheringMinigameSettings");
+        float wear = DurabilitySettings.Current.WearPerGlancingBlow;
+        BeginDerived();
+        foreach (GatheringToolProfile profile in settings.Profiles)
+        {
+            if (profile == null)
+            {
+                continue;
+            }
+
+            float maxCrit = GatheringSession.CriticalWidthFor(profile.CriticalZoneWidth, settings.CriticalWidthPerCombo, settings.MaxCombo, settings.MaxCombo);
+            Derived($"{profile.Tool}: critical zone (base / max combo)", $"{profile.CriticalZoneWidth:P0} / {maxCrit:P0} of the bar");
+            Derived($"{profile.Tool}: critical window / normal noise",
+                $"{profile.CycleSeconds * 0.5f * profile.CriticalZoneWidth:0.00} s per pass / {settings.NoiseRadius(SwingResult.Normal) * profile.Loudness:0} m");
+        }
+
+        Derived("Glancing blows until a new tool breaks", wear > 0f ? Mathf.CeilToInt(1f / wear).ToString() : "never");
+        EndDerived();
+    }
+}
+
+/// <summary>Movement, dodge, stamina, combat rules and feel, and the camera.</summary>
+public sealed class MovementAndCombatPage : SystemsPage
+{
+    public override string Title => "Movement & Combat";
+    public override string Group => "Player";
+    public override string Help => "The player's movement and dodge (GDD §10.3: about 0.35 s with a 2–3 s cooldown), stamina costs, the combat " +
+                                   "formulas, hit feedback and the camera.";
+
+    public override void Draw()
+    {
+        var movement = AssetDatabase.LoadAssetAtPath<PlayerMovementSettings>("Assets/_Project/Data/Player/PlayerMovementSettings.asset");
+        var stamina = AssetDatabase.LoadAssetAtPath<PlayerStaminaSettings>("Assets/_Project/Data/Player/PlayerStaminaSettings.asset");
+        SettingsPanel(movement, "Movement and dodge", "Data/Player/PlayerMovementSettings");
+        if (movement != null)
+        {
+            BeginDerived();
+            Derived("Dodge", $"{movement.DodgeDuration:0.##} s, ready again after {movement.DodgeCooldown:0.##} s");
+            if (stamina != null)
+            {
+                Derived("Dodges from full stamina", stamina.DodgeCost > 0f ? $"{Mathf.FloorToInt(stamina.MaxStamina / stamina.DodgeCost)}" : "unlimited");
+                Derived("Attacks from full stamina", stamina.AttackCost > 0f ? $"{Mathf.FloorToInt(stamina.MaxStamina / stamina.AttackCost)}" : "unlimited");
+            }
+
+            EndDerived();
+        }
+
+        SettingsPanel(stamina, "Stamina", "Data/Player/PlayerStaminaSettings");
+        SettingsPanel(AssetDatabase.LoadAssetAtPath<CombatRules>("Assets/_Project/Data/Combat/CombatRules.asset"), "Combat rules", "Data/Combat/CombatRules");
+        SettingsPanel(Settings<CombatFeelSettings>(CombatFeelSettings.ResourceName), "Combat feel", "Resources/CombatFeel: hit stop, shake, flashes");
+        SettingsPanel(AssetDatabase.LoadAssetAtPath<PlayerCameraSettings>("Assets/_Project/Data/Camera/PlayerCameraSettings.asset"), "Camera", "Data/Camera/PlayerCameraSettings");
+    }
+}
+
+/// <summary>
+/// The Raids page, in two tabs. Global Rules: what every raid shares (spawn distances, density, the creature limit,
+/// sleeping), the portal and its sparks, and each destination's base rules at a glance. Raid Systems: pick a raid and
+/// add, switch off or tune its optional systems (roaming spawns, ...). A raid's own content (spawn lists, time,
+/// strength) is edited in the Content Editor.
+/// </summary>
+public sealed class RaidsAndPortalPage : SystemsPage
+{
+    private static readonly string[] Tabs = { "Global Rules", "Raid Systems" };
+    private const string TabKey = "SafeHaven.SystemsEditor.RaidTab";
+    private const string RaidKey = "SafeHaven.SystemsEditor.Raid";
+
+    public override string Title => "Raids & Portal";
+    public override string Group => "World";
+    public override string Help => "Global Rules apply to every raid. Raid Systems adds optional systems to one raid. What a single raid " +
+                                   "spawns, its time limit and its strength are edited in the Content Editor (Raids).";
+
+    /// <summary>Opens this page on the Raid Systems tab with the raid selected.</summary>
+    public static void ShowSystemsOf(RaidDefinition raid)
+    {
+        EditorPrefs.SetInt(TabKey, 1);
+        EditorPrefs.SetString(RaidKey, AssetDatabase.GetAssetPath(raid));
+        SystemsEditorWindow.ShowPage<RaidsAndPortalPage>();
+    }
+
+    public override void Draw()
+    {
+        int tab = Mathf.Clamp(EditorPrefs.GetInt(TabKey, 0), 0, Tabs.Length - 1);
+        int picked = GUILayout.Toolbar(tab, Tabs, GUILayout.Height(24f));
+        if (picked != tab)
+        {
+            EditorPrefs.SetInt(TabKey, picked);
+            GUI.FocusControl(null);
+        }
+
+        EditorGUILayout.Space(4f);
+        if (picked == 0)
+        {
+            DrawGlobalRules();
+        }
+        else
+        {
+            DrawRaidSystems();
+        }
+    }
+
+    private static void DrawGlobalRules()
+    {
+        SettingsPanel(Settings<RaidGlobalSettings>(RaidGlobalSettings.ResourceName), "Raid rules",
+            "Resources/RaidGlobalSettings: apply to every raid. A raid can use its own near/far distances (Content Editor > Rules).");
+
+        var settings = Settings<SettlementSettings>(SettlementSettings.ResourceName);
+        if (settings == null)
+        {
+            return;
+        }
+
+        SettingsPanel(settings, "Portal", "Resources/SettlementSettings", "portalRepairCost", "portalSpark", "secondsPerSpark", "maxSparksPerRaid");
+        var raids = LoadAll<RaidDefinition>();
+        Table("Destinations", "Each raid's base rules before modifiers and sparks, side by side. Edit everything else in the Content Editor.", raids,
+            new[] { new Column("durationSeconds", "Seconds"), new Column("extractionSeconds", "Extract s"), new Column("lootMultiplier", "Loot ×"),
+                    new Column("enemyHealthMultiplier", "Enemy HP ×"), new Column("enemyPowerMultiplier", "Enemy dmg ×"),
+                    new Column("enemyDensity", "Density"), new Column("locked", "Locked", 50f) },
+            raid => DescribeTimes(raid, settings), "With sparks");
+        var modifiers = LoadAll<RaidModifierDefinition>();
+        ContentUtility.BeginPanel("Raid modifiers", "Made from items in the Content Editor (Raid Modifiers).");
+        foreach (RaidModifierDefinition modifier in modifiers)
+        {
+            EditorGUILayout.LabelField(modifier.DisplayName, modifier.DescribeEffects(), ContentUtility.WrappedMiniLabel);
+        }
+
+        ContentUtility.EndPanel();
+        DrawSpawnTables();
+        SettingsPanel(Settings<SceneTransitionSettings>(SceneTransitionSettings.ResourceName), "Loading screen",
+            "Resources/SceneTransitionSettings: fades, minimum time, artwork and tips shown between scenes");
+    }
+
+    private static void DrawRaidSystems()
+    {
+        List<RaidDefinition> raids = LoadAll<RaidDefinition>();
+        if (raids.Count == 0)
+        {
+            EditorGUILayout.HelpBox("There are no raids yet. Make one in the Content Editor.", MessageType.Info);
+            return;
+        }
+
+        string savedPath = EditorPrefs.GetString(RaidKey, "");
+        int index = Mathf.Max(0, raids.FindIndex(raid => AssetDatabase.GetAssetPath(raid) == savedPath));
+        string[] names = raids.ConvertAll(raid => string.IsNullOrEmpty(raid.DisplayName) ? raid.name : raid.DisplayName).ToArray();
+        int pickedRaid = EditorGUILayout.Popup("Raid", index, names);
+        if (pickedRaid != index || savedPath == "")
+        {
+            EditorPrefs.SetString(RaidKey, AssetDatabase.GetAssetPath(raids[pickedRaid]));
+        }
+
+        RaidDefinition selected = raids[pickedRaid];
+        var data = new SerializedObject(selected);
+        data.Update();
+        SerializedProperty systems = data.FindProperty("systems");
+
+        EditorGUILayout.Space(4f);
+        if (systems.arraySize == 0)
+        {
+            EditorGUILayout.HelpBox("This raid uses no extra systems. Add one below.", MessageType.Info);
+        }
+
+        for (int i = 0; i < systems.arraySize; i++)
+        {
+            SerializedProperty element = systems.GetArrayElementAtIndex(i);
+            if (!(element.managedReferenceValue is RaidSystem system))
+            {
+                using (new EditorGUILayout.HorizontalScope(EditorStyles.helpBox))
+                {
+                    EditorGUILayout.LabelField("Missing system (its class was renamed or removed)");
+                    if (GUILayout.Button("Remove", GUILayout.Width(70f)))
+                    {
+                        systems.DeleteArrayElementAtIndex(i);
+                        break;
+                    }
+                }
+
+                continue;
+            }
+
+            ContentUtility.BeginPanel(system.DisplayName, system.Description);
+            SerializedProperty end = element.GetEndProperty();
+            SerializedProperty child = element.Copy();
+            bool enterChildren = true;
+            while (child.NextVisible(enterChildren) && !SerializedProperty.EqualContents(child, end))
+            {
+                enterChildren = false;
+                EditorGUILayout.PropertyField(child, true);
+            }
+
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                GUILayout.FlexibleSpace();
+                if (GUILayout.Button("Remove System", GUILayout.Width(110f))
+                    && EditorUtility.DisplayDialog("Remove raid system", $"Remove {system.DisplayName} from this raid? Its settings are lost.", "Remove", "Cancel"))
+                {
+                    systems.DeleteArrayElementAtIndex(i);
+                    ContentUtility.EndPanel();
+                    break;
+                }
+            }
+
+            ContentUtility.EndPanel();
+        }
+
+        EditorGUILayout.Space(4f);
+        if (GUILayout.Button("+ Add System", GUILayout.Height(24f)))
+        {
+            var menu = new GenericMenu();
+            foreach (Type type in TypeCache.GetTypesDerivedFrom<RaidSystem>())
+            {
+                if (type.IsAbstract || type.GetConstructor(Type.EmptyTypes) == null)
+                {
+                    continue;
+                }
+
+                var sample = (RaidSystem)Activator.CreateInstance(type);
+                bool present = selected.Systems.Any(existing => existing != null && existing.GetType() == type);
+                if (present)
+                {
+                    menu.AddDisabledItem(new GUIContent(sample.DisplayName + " (already added)"));
+                    continue;
+                }
+
+                menu.AddItem(new GUIContent(sample.DisplayName), false, () =>
+                {
+                    var target = new SerializedObject(selected);
+                    SerializedProperty list = target.FindProperty("systems");
+                    list.arraySize++;
+                    list.GetArrayElementAtIndex(list.arraySize - 1).managedReferenceValue = Activator.CreateInstance(type);
+                    target.ApplyModifiedProperties();
+                });
+            }
+
+            menu.ShowAsContext();
+        }
+
+        data.ApplyModifiedProperties();
+    }
+
+    // Raid layouts are rolled per raid from these tables by the Spawn Groups under "Raid Layout" in each raid scene.
+    private static void DrawSpawnTables()
+    {
+        ContentUtility.BeginPanel("Scene spawn tables", "Used only by Spawn Groups in a raid scene that no raid spawn list names " +
+                                                       "(spawn lists carry their own entries in the Content Editor).");
+        foreach (SpawnTable table in LoadAll<SpawnTable>())
+        {
+            var builder = new StringBuilder();
+            foreach (SpawnTable.Entry entry in table.Entries)
+            {
+                builder.Append(builder.Length > 0 ? ",  " : "").Append(entry.prefab != null ? entry.prefab.name : "(none)")
+                    .Append($" {table.ChanceOf(entry):P0}");
+                if (entry.minPerGroup > 0)
+                {
+                    builder.Append($" min {entry.minPerGroup}");
+                }
+
+                if (entry.maxPerGroup > 0)
+                {
+                    builder.Append($" max {entry.maxPerGroup}");
+                }
+            }
+
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField(table.name, builder.ToString(), ContentUtility.WrappedMiniLabel);
+            if (GUILayout.Button("Select", GUILayout.Width(60f)))
+            {
+                Selection.activeObject = table;
+                EditorGUIUtility.PingObject(table);
+            }
+
+            EditorGUILayout.EndHorizontal();
+        }
+
+        ContentUtility.EndPanel();
+    }
+
+    private static string DescribeTimes(RaidDefinition raid, SettlementSettings settings)
+    {
+        var builder = new StringBuilder();
+        for (int sparks = 0; sparks <= settings.MaxSparksPerRaid; sparks++)
+        {
+            float seconds = RaidParameters.Calculate(raid, null, sparks * settings.SecondsPerSpark).Duration;
+            builder.Append(sparks > 0 ? "   " : "").Append($"{sparks}: {RaidStats.FormatTime(seconds)}");
+        }
+
+        return builder.ToString();
+    }
+}
+
+/// <summary>The Heart Tree's ward, its upgrades and what buildings cost (GDD §6.4, §14).</summary>
+public sealed class HeartTreeAndBuildingPage : SystemsPage
+{
+    public override string Title => "Heart Tree & Building";
+    public override string Group => "World";
+    public override string Help => "The ward is the area around the Heart Tree where the player may build; Purified Essence grows it. Building " +
+                                   "costs are paid when a building is placed. Change costs and models in the Content Editor (Buildings).";
+
+    public override void Draw()
+    {
+        var settings = Settings<SettlementSettings>(SettlementSettings.ResourceName);
+        if (settings == null)
+        {
+            return;
+        }
+
+        SettingsPanel(settings, "Ward", "Resources/SettlementSettings", "baseWardRadius", "wardLevels");
+        BeginDerived("Ward levels");
+        for (int level = 0; level <= settings.WardLevels.Count; level++)
+        {
+            float radius = settings.WardRadiusAt(level);
+            string cost = level == 0 ? "start" : AmountText.Describe(settings.WardLevels[level - 1].cost);
+            Derived(level == 0 ? "Base ward" : $"Level {level}", $"{radius:0} m radius, {Mathf.PI * radius * radius:0} m²   ({cost})");
+        }
+
+        EndDerived();
+        var buildings = LoadAll<BuildingDefinition>();
+        buildings.Sort(RecipeBook.CompareForDisplay);
+        Table("Buildings", "Menu order, whether it is in the build menu and known from the start. Unknown buildings are taught by blueprints or jobs. " +
+                           "Stations: Output is how much the output slot holds, Queue how many crafts can wait.", buildings,
+            new[]
+            {
+                new Column("sortOrder", "Order", 50f), new Column("showInBuildMenu", "Menu", 45f), new Column("knownFromStart", "Known", 50f),
+                new Column("station", "Station", 120f), new Column("outputCapacity", "Output", 50f), new Column("queueLength", "Queue", 50f),
+            },
+            building => AmountText.Describe(building.ConstructionCost), "Cost");
+    }
+}
+
+/// <summary>Where things are crafted and how long stations take (GDD §13.3).</summary>
+public sealed class CraftingPage : SystemsPage
+{
+    public override string Title => "Crafting";
+    public override string Group => "World";
+    public override string Help => "By Hand recipes are instant from the bag window; keep them few and basic. Every other recipe is queued at its " +
+                                   "station, paid when queued, and takes Seconds per craft, also while the player is raiding. Output size and " +
+                                   "queue length per station are on the Heart Tree & Building page. Change costs and results in the Content Editor (Recipes).";
+
+    public override void Draw()
+    {
+        var recipes = LoadAll<RecipeDefinition>();
+        recipes.Sort((a, b) => a.Station != b.Station ? a.Station.CompareTo(b.Station) : RecipeBook.CompareForDisplay(a, b));
+        Table("Recipes", "Station, seconds per craft (ignored By Hand) and how many one craft makes.", recipes,
+            new[] { new Column("station", "Station", 120f), new Column("craftSeconds", "Seconds", 60f), new Column("outputAmount", "Makes", 50f) },
+            Summary, "Cost  ·  per minute at a station");
+
+        BeginDerived("Stations");
+        foreach (CraftingStationType type in (CraftingStationType[])System.Enum.GetValues(typeof(CraftingStationType)))
+        {
+            int count = recipes.FindAll(recipe => recipe.Station == type).Count;
+            if (count > 0)
+            {
+                Derived(type.DisplayName(), $"{count} recipe{(count == 1 ? "" : "s")}");
+            }
+        }
+
+        EndDerived();
+    }
+
+    private static string Summary(RecipeDefinition recipe)
+    {
+        string cost = AmountText.Describe(recipe.ResourceCost);
+        string items = AmountText.Describe(recipe.ItemCost);
+        cost = string.IsNullOrEmpty(items) ? cost : string.IsNullOrEmpty(cost) ? items : cost + ", " + items;
+        return recipe.IsHandcrafted ? $"{cost}  ·  instant" : $"{cost}  ·  {60f / recipe.CraftSeconds * recipe.OutputAmount:0.#} {recipe.OutputName}/min";
+    }
+}
+
+/// <summary>Residents, jobs and the Purification Altar (GDD §13.5, §15).</summary>
+public sealed class ResidentsAndPurificationPage : SystemsPage
+{
+    public override string Title => "Residents & Purification";
+    public override string Group => "World";
+    public override string Help => "Rescued residents take jobs that teach buildings and run stations. The Purification Altar turns Cursed " +
+                                   "Essence into Purified Essence while someone holds the purifier job.";
+
+    public override void Draw()
+    {
+        var settings = Settings<SettlementSettings>(SettlementSettings.ResourceName);
+        if (settings == null)
+        {
+            return;
+        }
+
+        SettingsPanel(settings, "Purification", "Resources/SettlementSettings", "cursedEssence", "purifiedEssence", "cursedPerBatch",
+            "purifiedPerBatch", "secondsPerBatch", "maxQueuedBatches", "purifierJob");
+        BeginDerived();
+        Derived("Ratio", $"{settings.CursedPerBatch} : {settings.PurifiedPerBatch}");
+        Derived("10 Purified Essence take", $"{Mathf.CeilToInt(10f / settings.PurifiedPerBatch) * settings.CursedPerBatch} Cursed Essence and " +
+                                            RaidStats.FormatTime(Mathf.CeilToInt(10f / settings.PurifiedPerBatch) * settings.SecondsPerBatch));
+        EndDerived();
+        foreach (ResidentDefinition resident in LoadAll<ResidentDefinition>())
+        {
+            SettingsPanel(resident, "Resident: " + resident.DisplayName, null);
+        }
+
+        foreach (JobDefinition job in LoadAll<JobDefinition>())
+        {
+            SettingsPanel(job, "Job: " + job.DisplayName, null);
+        }
+    }
+}
+
+/// <summary>Playtest run logging and the first-hours milestones runs are compared on (GDD §21).</summary>
+public sealed class PlaytestPage : SystemsPage
+{
+    public override string Title => "Playtest Log";
+    public override string Group => "Settings";
+    public override string Help => "Every new game is a run with its own CSV log; loading a save continues that run's log as a new session. " +
+                                   "Milestones are the moments compared across runs in the Run Comparison window.";
+
+    public override void Draw()
+    {
+        var settings = Settings<PlaytestSettings>(PlaytestSettings.ResourceName);
+        if (settings == null)
+        {
+            return;
+        }
+
+        SettingsPanel(settings, "Run log", "Resources/PlaytestSettings");
+        var known = new HashSet<string>(PlaytestLog.KnownEvents(), StringComparer.OrdinalIgnoreCase);
+        BeginDerived();
+        Derived("Logs saved to", PlaytestLog.Folder);
+        foreach (PlaytestMilestone milestone in settings.Milestones)
+        {
+            if (!known.Contains(milestone.eventName ?? string.Empty))
+            {
+                Derived("Unknown event", $"'{milestone.label}' waits for '{milestone.eventName}', which is never logged");
+            }
+        }
+
+        EndDerived();
+        using (new EditorGUILayout.HorizontalScope())
+        {
+            if (GUILayout.Button("Open Run Comparison"))
+            {
+                PlaytestRunsWindow.Open();
+            }
+
+            if (GUILayout.Button("Open Folder"))
+            {
+                System.IO.Directory.CreateDirectory(PlaytestLog.Folder);
+                EditorUtility.RevealInFinder(PlaytestLog.Folder + System.IO.Path.DirectorySeparatorChar);
+            }
+        }
+
+        EditorGUILayout.HelpBox("Known events: " + string.Join(", ", PlaytestLog.KnownEvents()), MessageType.None);
+    }
+}
+
+/// <summary>Ward breaches (GDD §6.6–6.9).</summary>
+public sealed class WardBreachPage : SystemsPage
+{
+    public override string Title => "Ward Breaches";
+    public override string Group => "World";
+    public override string Help => "Announced defenses of Safe Haven. Enemies come along the marked path and attack only the player; buildings " +
+                                   "can't be harmed. Falling ends the breach without losses, and it can be tried again.";
+
+    public override void Draw()
+    {
+        List<WardBreachDefinition> breaches = LoadAll<WardBreachDefinition>();
+        if (breaches.Count == 0)
+        {
+            EditorGUILayout.HelpBox("No ward breaches yet. Create one with Create > Safe Haven > Settlement > Ward Breach.", MessageType.Info);
+        }
+
+        foreach (WardBreachDefinition breach in breaches)
+        {
+            SettingsPanel(breach, breach.DisplayName, AssetDatabase.GetAssetPath(breach));
+            BeginDerived();
+            float health = EnemyHealth(breach.EnemyPrefab);
+            Derived("Each enemy's health", health > 0f ? $"{health * breach.EnemyHealthMultiplier:0} (normally {health:0})" : "unknown");
+            Derived("All enemies have arrived after", $"{(breach.EnemyCount - 1) * breach.SecondsBetweenEnemies:0.#} s");
+            Derived("Offered after", $"{breach.AvailableAfterExtractions} successful extraction(s)");
+            EndDerived();
+        }
+    }
+
+    private static float EnemyHealth(GameObject prefab)
+    {
+        if (prefab == null || !prefab.TryGetComponent(out Combatant combatant))
+        {
+            return 0f;
+        }
+
+        var stats = new SerializedObject(combatant).FindProperty("baseStats").objectReferenceValue as CombatStatsDefinition;
+        return stats != null ? stats.GetValue(StatType.MaxHealth) : 0f;
+    }
+}
+
+/// <summary>Rarity colors, names and pickup sounds.</summary>
+public sealed class LootAndRarityPage : SystemsPage
+{
+    public override string Title => "Loot & Rarity";
+    public override string Group => "Settings";
+    public override string Help => "How rare finds look and sound. Each item's rarity and value are set in the Content Editor (Items).";
+
+    public override void Draw()
+    {
+        SettingsPanel(Settings<RaritySettingsDefinition>("RaritySettings"), "Rarity", "Resources/RaritySettings");
+    }
+}

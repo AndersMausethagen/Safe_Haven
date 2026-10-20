@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad044708340368842899cf78f08bfbfb, type: 3}
+  m_Name: Alchemist
+  m_EditorClassIdentifier: Assembly-CSharp::JobDefinition
+  id: alchemist
+  displayName: Alchemist
+  description: Tends the Purification Altar, turning Cursed Essence into Purified Essence. Teaches you to build the altar.
+  acceptLine: An altar to cleanse the curse? I know the old way. Build it, and I'll keep it burning.
+  teachesBuildings:
+  - {fileID: 11400000, guid: dd9792482f40fc243a8d7294434f1ee9, type: 2}
+  teachesRecipes: []
+  workplace: {fileID: 11400000, guid: dd9792482f40fc243a8d7294434f1ee9, type: 2}
+  assignedEvent: {fileID: 11400000, guid: da5d7d1abc8282c40a98b65eea37ba76, type: 2}

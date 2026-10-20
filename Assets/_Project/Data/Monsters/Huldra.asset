@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42e5c6da77934e8439571a13e158376a, type: 3}
+  m_Name: Huldra
+  m_EditorClassIdentifier: Assembly-CSharp::MonsterDefinition
+  id: enemy_human_female_01
+  displayName: Huldra
+  description: A forest spirit in the shape of a beautiful woman, with a hollow back like a rotten tree. Never follow her into the trees.
+  combatStats: {fileID: 11400000, guid: 0041bfbbc54f5b842b538338d5148d23, type: 2}
+  faction: 1
+  drops:
+    entries:
+    - item: {fileID: 0}
+      resource: {fileID: 11400000, guid: c0e409a7cd38400498ff1c7037737b96, type: 2}
+      minQuantity: 1
+      maxQuantity: 2
+      probability: 0.8
+    - item: {fileID: 11400000, guid: 1b426c80d20dbcd4ea2e82901b9dbfb9, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.3
+    - item: {fileID: 11400000, guid: 7400170a621d51d43a051a8899ec5b20, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.15
+  unlocksRecipes: []
+  animatorController: {fileID: 9100000, guid: 51388376d31e4294bb24b0004412608d, type: 2}
+  prefab: {fileID: 1361258407523271697, guid: 280a30c33cf4c3444a326b93e937de36, type: 3}
+  attack: {fileID: 11400000, guid: ea84f5e69338fbd449215ef3ad11f3c3, type: 2}
+  attackDamage: 14
+  attackCooldown: 1.1
+  moveSpeed: 3.5
+  detectionRange: 10
+  chaseRange: 16
+  leashRange: 25
+  deathSound: {fileID: 0}

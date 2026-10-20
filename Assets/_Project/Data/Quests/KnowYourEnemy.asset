@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 702d2e93d0a019a40b6339daf41e2c2f, type: 3}
+  m_Name: KnowYourEnemy
+  m_EditorClassIdentifier: Assembly-CSharp::QuestDefinition
+  id: know_your_enemy
+  displayName: Know Your Enemy
+  description: Forest-Bitten Wolves prowl the Misty Woods beyond the portal. Thin their numbers before they grow bolder.
+  chain: The First Days
+  prerequisites:
+  - {fileID: 11400000, guid: 2614c1d189f3a034691f98f3d3efeee0, type: 2}
+  start: 0
+  startEvent: {fileID: 0}
+  objectivesInOrder: 0
+  objectives:
+  - type: 2
+    description: 
+    amount: 2
+    item: {fileID: 0}
+    resource: {fileID: 0}
+    monster: {fileID: 11400000, guid: afbf4a58442496641826a078787f7e2e, type: 2}
+    building: {fileID: 0}
+    raid: {fileID: 0}
+    mustExtract: 1
+    withinMinutes: 0
+    questEvent: {fileID: 0}
+    countAlreadyOwned: 0
+  rewardItems:
+  - item: {fileID: 11400000, guid: d0c7b274979b4ad46a9f3bf89b8cfa64, type: 2}
+    amount: 1
+  - item: {fileID: 11400000, guid: 183fddc5567e8b8479fcb1618e73496c, type: 2}
+    amount: 5
+  rewardResources: []
+  rewardRecipes: []
+  completionEvent: {fileID: 0}

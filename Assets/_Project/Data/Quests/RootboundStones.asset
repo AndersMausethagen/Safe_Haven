@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 702d2e93d0a019a40b6339daf41e2c2f, type: 3}
+  m_Name: RootboundStones
+  m_EditorClassIdentifier: Assembly-CSharp::QuestDefinition
+  id: rootboundstones
+  displayName: The Rootbound Stones
+  description: Three stones around the clearing still hold the Heart Tree's light, choked by cursed roots. Free their Life Orbs.
+  chain: The First Days
+  prerequisites:
+  - {fileID: 11400000, guid: 9ffed2822f546824fa97d9d34216d5d5, type: 2}
+  start: 0
+  startEvent: {fileID: 0}
+  objectivesInOrder: 0
+  objectives:
+  - type: 1
+    description: Free the Life Orbs from the rootbound stones
+    amount: 3
+    item: {fileID: 0}
+    resource: {fileID: 11400000, guid: a86ac9a152512464ab08e0446c161e61, type: 2}
+    monster: {fileID: 0}
+    building: {fileID: 0}
+    raid: {fileID: 0}
+    mustExtract: 1
+    withinMinutes: 0
+    questEvent: {fileID: 0}
+    countAlreadyOwned: 0
+  rewardItems: []
+  rewardResources: []
+  rewardRecipes: []
+  completionEvent: {fileID: 0}

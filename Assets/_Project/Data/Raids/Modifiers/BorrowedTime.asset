@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f449b695a0f8b08419c3d5f8a7b3cbe7, type: 3}
+  m_Name: BorrowedTime
+  m_EditorClassIdentifier: Assembly-CSharp::RaidModifierDefinition
+  id: borrowed_time
+  displayName: Norn's Gift
+  description: The portal stays open a little longer.
+  effects:
+  - stat: 0
+    op: 0
+    value: 120

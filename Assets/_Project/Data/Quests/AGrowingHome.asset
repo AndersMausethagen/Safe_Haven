@@ -1,0 +1,66 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 702d2e93d0a019a40b6339daf41e2c2f, type: 3}
+  m_Name: AGrowingHome
+  m_EditorClassIdentifier: Assembly-CSharp::QuestDefinition
+  id: agrowinghome
+  displayName: A Growing Home
+  description: What you bring home makes the clearing a home. Build a sawbench, a storage shed and a furnace.
+  chain: The First Days
+  prerequisites:
+  - {fileID: 11400000, guid: 08ed06b5fb8d1854c86788aa2a00156f, type: 2}
+  start: 0
+  startEvent: {fileID: 0}
+  objectivesInOrder: 0
+  objectives:
+  - type: 7
+    description: 
+    amount: 1
+    item: {fileID: 0}
+    resource: {fileID: 0}
+    monster: {fileID: 0}
+    building: {fileID: 11400000, guid: 1fe15b30940bf7049a4e4966e9954e1b, type: 2}
+    raid: {fileID: 0}
+    mustExtract: 1
+    withinMinutes: 0
+    questEvent: {fileID: 0}
+    countAlreadyOwned: 1
+  - type: 7
+    description: 
+    amount: 1
+    item: {fileID: 0}
+    resource: {fileID: 0}
+    monster: {fileID: 0}
+    building: {fileID: 11400000, guid: 4e2c9152865ef064e968287cf20d1b5f, type: 2}
+    raid: {fileID: 0}
+    mustExtract: 1
+    withinMinutes: 0
+    questEvent: {fileID: 0}
+    countAlreadyOwned: 1
+  - type: 7
+    description: 
+    amount: 1
+    item: {fileID: 0}
+    resource: {fileID: 0}
+    monster: {fileID: 0}
+    building: {fileID: 11400000, guid: 121fba5d9f19d0744b6295005ad38dcc, type: 2}
+    raid: {fileID: 0}
+    mustExtract: 1
+    withinMinutes: 0
+    questEvent: {fileID: 0}
+    countAlreadyOwned: 1
+  rewardItems:
+  - item: {fileID: 11400000, guid: d0c7b274979b4ad46a9f3bf89b8cfa64, type: 2}
+    amount: 2
+  rewardResources: []
+  rewardRecipes: []
+  completionEvent: {fileID: 0}

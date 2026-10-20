@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2bdc7bfe8797f544855a0ab7846c453, type: 3}
+  m_Name: Flax
+  m_EditorClassIdentifier: Assembly-CSharp::GatheringNodeDefinition
+  id: 
+  displayName: Flax
+  tier: 2
+  yields:
+    entries:
+    - item: {fileID: 11400000, guid: acb3416df6dae1b439a8b3945c3f098e, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 2
+      maxQuantity: 4
+      probability: 1
+  gatherTool: 3
+  requiredToolTier: 2
+  gatherAnimation: 2
+  gatherSeconds: 3
+  swings: 5
+  swingSpeed: 1
+  gatherRange: 1.6
+  depleteOnGather: 1
+  respawnSeconds: 360
+  feedback: {fileID: 11400000, guid: 5e19753f3a66da744ae5d17004fb63d5, type: 2}
+  worldModelPrefab: {fileID: 6089995343808359778, guid: d08301d09a9a74449b9cef4024873616, type: 3}
+  worldPrefab: {fileID: 4564521982437816396, guid: dd15144a20b00e2408502e401ea88a06, type: 3}

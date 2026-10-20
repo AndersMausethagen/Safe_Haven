@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e13db838556460d49bf5567463c08876, type: 3}
+  m_Name: LifeOrb
+  m_EditorClassIdentifier: Assembly-CSharp::ResourceDefinition
+  id: life_orb
+  displayName: Life Orb
+  category: {fileID: 11400000, guid: e289374eba5676d42a49c5a224658e6d, type: 2}
+  tier: 1
+  description: Forest light, freed from cursed roots. The portal drinks it.
+  weight: 0.5
+  hungerRestore: 0
+  thirstRestore: 0
+  icon: {fileID: 21300000, guid: f79a58b1e1304f64aa3c58d290c0f6a2, type: 3}
+  color: {r: 0.3, g: 0.85, b: 0.5, a: 1}
+  sortOrder: 0
+  gatherTool: 0
+  requiredToolTier: 1
+  gatherAnimation: 2
+  gatherSeconds: 3.5
+  gatherRange: 1.6
+  minYield: 1
+  maxYield: 1
+  depleteOnGather: 1
+  respawnSeconds: 0
+  worldModelPrefab: {fileID: 1250908268665326423, guid: dd7f9f97cf3878b459cd2f3733bd7c83, type: 3}
+  worldPrefab: {fileID: 3616788768692720460, guid: 7bbc1b4511da00c4e81fb9d948fe6784, type: 3}

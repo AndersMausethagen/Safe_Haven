@@ -1,0 +1,285 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c72e5e4fd746250409a431420bdc103e, type: 3}
+  m_Name: MistyWoods
+  m_EditorClassIdentifier: Assembly-CSharp::RaidDefinition
+  id: wildlands
+  displayName: Misty Woods
+  description: The nearest wild forest beyond the portal, where mist hangs between old pines. Cursed wolves hunt here and Root Guardians stir. Hardwood and iron ore wait for a careful hand.
+  tier: 1
+  sceneName: Raid_MistyWoods
+  locked: 0
+  lockedText: The way there is not yet open.
+  knownEnemies:
+  - {fileID: 11400000, guid: afbf4a58442496641826a078787f7e2e, type: 2}
+  - {fileID: 11400000, guid: 2f66a8d86463697438ce75621f51e12d, type: 2}
+  likelyItems:
+  - {fileID: 11400000, guid: 7e57bf86766de2341bd9c47b5830cf76, type: 2}
+  - {fileID: 11400000, guid: a9f806359436036488427616ef8b8c44, type: 2}
+  - {fileID: 11400000, guid: 8ae2883815327b74fa7975309c803f92, type: 2}
+  - {fileID: 11400000, guid: d799dc8161ff2854dae1eedf4b74fb09, type: 2}
+  - {fileID: 11400000, guid: 3790e5e25892e2a49adf1a7cb473a699, type: 2}
+  likelyResources:
+  - {fileID: 11400000, guid: a86ac9a152512464ab08e0446c161e61, type: 2}
+  - {fileID: 11400000, guid: c0e409a7cd38400498ff1c7037737b96, type: 2}
+  durationSeconds: 300
+  extractionSeconds: 20
+  lootMultiplier: 1
+  enemyHealthMultiplier: 1
+  enemyPowerMultiplier: 1
+  enemyDensity: 1.5
+  overrideBands: 0
+  nearDistance: 25
+  farDistance: 110
+  spawnLists:
+  - name: Creatures
+    category: 0
+    pointGroups:
+    - Wolf Packs
+    - Root Guardians
+    - Moss Trolls
+    - Mistwings
+    count: {x: 7, y: 10}
+    entryBand: 0
+    separation: 12
+    trigger: 0
+    stage: 1
+    huntPlayer: 0
+    entries:
+    - prefab: {fileID: 4584692032328657812, guid: 64cf9de042e1bc142907212054f70f50, type: 3}
+      weight: 29.411764
+      maxPerGroup: 0
+      minPerGroup: 0
+    - prefab: {fileID: 9066855856663566298, guid: 6e4b724e33048b246a0b54c712d80b6f, type: 3}
+      weight: 41.17647
+      maxPerGroup: 0
+      minPerGroup: 0
+    - prefab: {fileID: 6267209934607442583, guid: bb37a42ef72f5274d807155e3d054529, type: 3}
+      weight: 17.647058
+      maxPerGroup: 0
+      minPerGroup: 0
+    - prefab: {fileID: 4830014356063024607, guid: a8600aa8041d7044c9a3afddd7102a7b, type: 3}
+      weight: 11.764706
+      maxPerGroup: 0
+      minPerGroup: 0
+  - name: Resources
+    category: 1
+    pointGroups:
+    - Ore Veins
+    - Timber
+    - Herbs and Fibres
+    - Life Wells
+    count: {x: 100, y: 116}
+    entryBand: 0
+    separation: 0
+    trigger: 0
+    stage: 1
+    huntPlayer: 0
+    entries:
+    - prefab: {fileID: 8046387889879202812, guid: 262f869a4b8db6440b65cd5554060fce, type: 3}
+      weight: 27.245375
+      maxPerGroup: 0
+      minPerGroup: 1
+    - prefab: {fileID: 6288032578105571644, guid: dd1ab12d09fe61049b4f79441821d70a, type: 3}
+      weight: 5.6411524
+      maxPerGroup: 0
+      minPerGroup: 1
+    - prefab: {fileID: 1158895183621609222, guid: e010c7c1cd96e8a4cb11aa834ca0a563, type: 3}
+      weight: 5
+      maxPerGroup: 0
+      minPerGroup: 1
+    - prefab: {fileID: 3616788768692720460, guid: 7bbc1b4511da00c4e81fb9d948fe6784, type: 3}
+      weight: 11.882032
+      maxPerGroup: 0
+      minPerGroup: 1
+    - prefab: {fileID: 948381022197778722, guid: 15b33c21de24fb7418664d30fe242c26, type: 3}
+      weight: 50.23145
+      maxPerGroup: 0
+      minPerGroup: 1
+  - name: Supply Caches
+    category: 2
+    pointGroups:
+    - Supply Caches
+    count: {x: 1, y: 3}
+    entryBand: 0
+    separation: 0
+    trigger: 0
+    stage: 1
+    huntPlayer: 0
+    entries:
+    - prefab: {fileID: 4812547136345430722, guid: ba6f34ca967a1d043bcee3331d85f1a1, type: 3}
+      weight: 100
+      maxPerGroup: 0
+      minPerGroup: 0
+  - name: Event Sites
+    category: 2
+    pointGroups:
+    - Event Sites
+    count: {x: 3, y: 4}
+    entryBand: 0
+    separation: 0
+    trigger: 0
+    stage: 1
+    huntPlayer: 0
+    entries:
+    - prefab: {fileID: 6552391252369855886, guid: 1d252d78608fdb1418d14fbb401b04e9, type: 3}
+      weight: 25
+      maxPerGroup: 2
+      minPerGroup: 0
+    - prefab: {fileID: 4438480868590446949, guid: 692cc71abea731f41bfdced13178f974, type: 3}
+      weight: 25
+      maxPerGroup: 2
+      minPerGroup: 0
+    - prefab: {fileID: 3285891926514676715, guid: c4de1540097fc0849803d24d39735751, type: 3}
+      weight: 25
+      maxPerGroup: 2
+      minPerGroup: 0
+    - prefab: {fileID: 6328468425548948482, guid: f68eee4888e0624488d803cca7ceac64, type: 3}
+      weight: 25
+      maxPerGroup: 2
+      minPerGroup: 0
+  - name: Stirring Prowlers
+    category: 3
+    pointGroups:
+    - Stirring Prowlers
+    count: {x: 2, y: 2}
+    entryBand: 0
+    separation: 0
+    trigger: 1
+    stage: 1
+    huntPlayer: 0
+    entries:
+    - prefab: {fileID: 7477446688404098989, guid: 237fc76d161bb114aa2049a864298943, type: 3}
+      weight: 100
+      maxPerGroup: 0
+      minPerGroup: 0
+  - name: Hunters
+    category: 3
+    pointGroups:
+    - Hunters
+    count: {x: 1, y: 2}
+    entryBand: 0
+    separation: 0
+    trigger: 1
+    stage: 2
+    huntPlayer: 1
+    entries:
+    - prefab: {fileID: 7477446688404098989, guid: 237fc76d161bb114aa2049a864298943, type: 3}
+      weight: 100
+      maxPerGroup: 0
+      minPerGroup: 0
+  - name: Collapse Hunters
+    category: 3
+    pointGroups:
+    - Collapse Hunters
+    count: {x: 2, y: 2}
+    entryBand: 0
+    separation: 0
+    trigger: 1
+    stage: 3
+    huntPlayer: 1
+    entries:
+    - prefab: {fileID: 7477446688404098989, guid: 237fc76d161bb114aa2049a864298943, type: 3}
+      weight: 100
+      maxPerGroup: 0
+      minPerGroup: 0
+  - name: East Beacon Alarm
+    category: 3
+    pointGroups:
+    - East Beacon Alarm
+    count: {x: 2, y: 2}
+    entryBand: 0
+    separation: 0
+    trigger: 2
+    stage: 1
+    huntPlayer: 1
+    entries:
+    - prefab: {fileID: 7477446688404098989, guid: 237fc76d161bb114aa2049a864298943, type: 3}
+      weight: 100
+      maxPerGroup: 0
+      minPerGroup: 0
+  systems:
+  - rid: 287757967972106337
+  - rid: 287757967972106340
+  roaming:
+    table: {fileID: 11400000, guid: 55a919693f726634aa952bc05b8ac3a3, type: 2}
+    firstDelay: 60
+    interval: 20
+    baseAlive: 2
+    perStage: 1
+    perAlarm: 2
+    maxAlive: 8
+    totalLimit: 12
+    minDistance: 35
+    maxDistance: 60
+    despawnDistance: 90
+    campClearance: 20
+    huntSpread: 15
+  stages:
+  - displayName: The Mist Stirs
+    startsAtSecondsLeft: 480
+    message: The mist thickens. Something out there has caught your scent.
+    enemyHealthBonus: 0.1
+    enemyPowerBonus: 0.1
+  - displayName: The Hunt
+    startsAtSecondsLeft: 240
+    message: Howls echo through the trees. The hunt has begun!
+    enemyHealthBonus: 0.2
+    enemyPowerBonus: 0.2
+  - displayName: Collapse
+    startsAtSecondsLeft: 60
+    message: The woods are collapsing! Get out now!
+    enemyHealthBonus: 0.35
+    enemyPowerBonus: 0.35
+  extractedArtwork: {fileID: 0}
+  failedArtwork: {fileID: 0}
+  references:
+    version: 2
+    RefIds:
+    - rid: 287757967972106337
+      type: {class: RoamingSpawnsSystem, ns: , asm: SafeHaven}
+      data:
+        enabled: 1
+        settings:
+          table: {fileID: 11400000, guid: 55a919693f726634aa952bc05b8ac3a3, type: 2}
+          firstDelay: 60
+          interval: 20
+          baseAlive: 2
+          perStage: 1
+          perAlarm: 2
+          maxAlive: 8
+          totalLimit: 12
+          minDistance: 35
+          maxDistance: 60
+          despawnDistance: 90
+          campClearance: 20
+          huntSpread: 15
+    - rid: 287757967972106340
+      type: {class: ForestAnnoyanceSystem, ns: , asm: SafeHaven}
+      data:
+        enabled: 1
+        settings:
+          perCritical: 2.5
+          perNormal: 7
+          perGlancing: 11
+          quietDelay: 4
+          decayPerSecond: 1.2
+          stirringAt: 30
+          angryAt: 60
+          wrathAt: 100
+          stirringExtraRoamers: 2
+          stirringIntervalScale: 0.6
+          huntInterval: 20
+          huntRadius: 60
+          wrathGroups: 3
+          wrathTable: {fileID: 11400000, guid: 14f76a7cd21202c4f9876929a83f6ca9, type: 2}
+          maxWraths: 1

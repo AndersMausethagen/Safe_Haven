@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 55433f6de2238c643b7ddfb32e5977d0, type: 3}
+  m_Name: Forge
+  m_EditorClassIdentifier: Assembly-CSharp::BuildingDefinition
+  id: iron_anvil
+  displayName: Forge
+  description: A smith's forge for metal tools and weapons. Its heart must be made of Trollstone.
+  icon: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
+  faction: 0
+  combatStats: {fileID: 11400000, guid: ba3ea0b2c76aa9442945e1ff65be154a, type: 2}
+  prefab: {fileID: 3088187126403450786, guid: 0d738d283d4eac84fa081c39bb7f3fcd, type: 3}
+  constructionCost: []
+  constructionItems:
+  - item: {fileID: 11400000, guid: fcf0552d231ec8b40a3de2796f1bc4c3, type: 2}
+    amount: 3
+  - item: {fileID: 11400000, guid: 59d371b7b63e8e24bb946051d808bc9b, type: 2}
+    amount: 8
+  - item: {fileID: 11400000, guid: f243c15300698e044a98d785099354c6, type: 2}
+    amount: 6
+  showInBuildMenu: 1
+  knownFromStart: 0
+  sortOrder: 6
+  yardDepth: 1.5
+  yardSide: 0
+  placeInLines: 0
+  station: 3
+  outputCapacity: 10
+  queueLength: 5
+  deathSound: {fileID: 0}

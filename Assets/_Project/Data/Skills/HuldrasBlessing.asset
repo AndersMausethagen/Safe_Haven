@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9139778d2cece034ba4eeb23169bbba8, type: 3}
+  m_Name: HuldrasBlessing
+  m_EditorClassIdentifier: Assembly-CSharp::SkillDefinition
+  displayName: Huldra's Blessing
+  description: The hidden folk of the forest remember kindness. Their gift closes wounds and hardens the skin.
+  icon: {fileID: 21300000, guid: b429c2969f88a2a4cb4b2b065be172af, type: 3}
+  school: 4
+  cooldown: 20
+  staminaCost: 15
+  castTime: 0.4
+  lungeDistance: 0
+  lungeDuration: 0.22
+  attack: {fileID: 0}
+  heal: 35
+  buffs:
+  - stat: 7
+    op: 0
+    value: 20
+  buffDuration: 6
+  playAttackAnimation: 0

@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 761f1ee1822cb4844a3034bb7c1d4011, type: 3}
+  m_Name: Ingrid
+  m_EditorClassIdentifier: Assembly-CSharp::ResidentDefinition
+  id: ingrid
+  displayName: Ingrid
+  description: A wandering herb-woman who got lost in the mist while hunting for rare roots. She knows more about the curse than she lets on.
+  rescueLine: Thank the old gods! I've hidden from the wolves for days. Get me out of here and I'll follow you anywhere.
+  arrivalLine: A real home, under a living tree... I could be useful here. I know a thing or two about cursed things.
+  fallenLine: I can't... go on. I'll hide here. Come back for me.
+  model: {fileID: 4143811845303264333, guid: 98a5e3726f2d59d45b0da93e8ea043b5, type: 3}
+  jobs:
+  - {fileID: 11400000, guid: f4c65068c1237a04b8a587a274672012, type: 2}

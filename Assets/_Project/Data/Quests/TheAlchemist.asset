@@ -1,0 +1,54 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 702d2e93d0a019a40b6339daf41e2c2f, type: 3}
+  m_Name: TheAlchemist
+  m_EditorClassIdentifier: Assembly-CSharp::QuestDefinition
+  id: thealchemist
+  displayName: The Alchemist
+  description: Ingrid knows the old ways of cleansing cursed things. Give her work, and build what she teaches you.
+  chain: The First Days
+  prerequisites:
+  - {fileID: 11400000, guid: f7e615034e347bc438f7fdf1f08bd615, type: 2}
+  start: 0
+  startEvent: {fileID: 0}
+  objectivesInOrder: 0
+  objectives:
+  - type: 6
+    description: 
+    amount: 1
+    item: {fileID: 0}
+    resource: {fileID: 0}
+    monster: {fileID: 0}
+    building: {fileID: 0}
+    raid: {fileID: 0}
+    mustExtract: 1
+    withinMinutes: 0
+    questEvent: {fileID: 11400000, guid: da5d7d1abc8282c40a98b65eea37ba76, type: 2}
+    countAlreadyOwned: 0
+  - type: 7
+    description: 
+    amount: 1
+    item: {fileID: 0}
+    resource: {fileID: 0}
+    monster: {fileID: 0}
+    building: {fileID: 11400000, guid: dd9792482f40fc243a8d7294434f1ee9, type: 2}
+    raid: {fileID: 0}
+    mustExtract: 1
+    withinMinutes: 0
+    questEvent: {fileID: 0}
+    countAlreadyOwned: 0
+  rewardItems: []
+  rewardResources:
+  - resource: {fileID: 11400000, guid: c0e409a7cd38400498ff1c7037737b96, type: 2}
+    amount: 4
+  rewardRecipes: []
+  completionEvent: {fileID: 0}

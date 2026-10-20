@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2bdc7bfe8797f544855a0ab7846c453, type: 3}
+  m_Name: Hardwood
+  m_EditorClassIdentifier: Assembly-CSharp::GatheringNodeDefinition
+  id: 
+  displayName: Hardwood
+  tier: 2
+  yields:
+    entries:
+    - item: {fileID: 11400000, guid: 183fddc5567e8b8479fcb1618e73496c, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 2
+      probability: 1
+  gatherTool: 1
+  requiredToolTier: 2
+  gatherAnimation: 4
+  gatherSeconds: 3
+  swings: 3
+  swingSpeed: 1
+  gatherRange: 1.6
+  depleteOnGather: 1
+  respawnSeconds: 360
+  feedback: {fileID: 11400000, guid: 5c06cdc7d2e3557468f3fdeb64576beb, type: 2}
+  worldModelPrefab: {fileID: 5223330241212141927, guid: afcfd4c9ca5c89d41bdad0d18fc53fe4, type: 3}
+  worldPrefab: {fileID: 2009929089532973240, guid: e4175e4dc8cc5b847b691d128a9786aa, type: 3}

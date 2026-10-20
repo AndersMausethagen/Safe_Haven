@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e13db838556460d49bf5567463c08876, type: 3}
+  m_Name: PortalSpark
+  m_EditorClassIdentifier: Assembly-CSharp::ResourceDefinition
+  id: portal_spark
+  displayName: Portal Spark
+  category: {fileID: 11400000, guid: e289374eba5676d42a49c5a224658e6d, type: 2}
+  tier: 1
+  description: Life Orb light, condensed at the portal. Each one holds the portal open 3 minutes longer.
+  weight: 0.1
+  hungerRestore: 0
+  thirstRestore: 0
+  icon: {fileID: 21300000, guid: 6c5c8fbf3440bd94698f75874a0b1ec6, type: 3}
+  color: {r: 0.45, g: 0.9, b: 1, a: 1}
+  sortOrder: 0
+  gatherTool: 0
+  requiredToolTier: 1
+  gatherAnimation: 2
+  gatherSeconds: 3
+  gatherRange: 1.5
+  minYield: 1
+  maxYield: 3
+  depleteOnGather: 1
+  respawnSeconds: 180
+  worldModelPrefab: {fileID: 0}
+  worldPrefab: {fileID: 0}

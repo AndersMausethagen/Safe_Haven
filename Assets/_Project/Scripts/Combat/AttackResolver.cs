@@ -1,0 +1,48 @@
+using System.Collections.Generic;
+using UnityEngine;
+
+/// <summary>
+/// Carries out an attack: finds the targets in its hit area, builds each target's hit from the attacker's stats, applies
+/// it and tells the attacker how it went. The player's weapon swing calls it when the hit lands, and an ability caster
+/// does the same with its own AttackDefinition, so every source of damage goes through one pipeline.
+/// Projectiles and damage over time skip the area query and call DamageCalculator.Build and ApplyDamage directly.
+/// </summary>
+public static class AttackResolver
+{
+    /// <summary>
+    /// Hits everything the attack reaches from origin toward direction. weaponDamage is the damage of the weapon behind
+    /// the attack, or 0 for attacks that don't use one. Returns how many targets were hit.
+    /// </summary>
+    public static int Execute(
+        Combatant attacker,
+        AttackDefinition attack,
+        float weaponDamage,
+        Vector3 origin,
+        Vector3 direction,
+        int layerMask)
+    {
+        var hits = new List<HitDetector.Hit>(8);
+        HitDetector.FindTargets(origin, direction, attack, attacker.Faction, layerMask, hits);
+
+        foreach (HitDetector.Hit hit in hits)
+        {
+            Vector3 hitDirection = hit.Point - origin;
+            hitDirection.y = 0f;
+            hitDirection = hitDirection.sqrMagnitude > 0.0001f ? hitDirection.normalized : direction;
+
+            DamageInfo damage = DamageCalculator.Build(
+                attacker,
+                attack,
+                weaponDamage,
+                hit.Target.Category,
+                hit.Point,
+                hitDirection,
+                Random.value);
+
+            DamageResult result = hit.Target.ApplyDamage(damage);
+            attacker.ReportDamageDealt(hit.Target, damage, result);
+        }
+
+        return hits.Count;
+    }
+}

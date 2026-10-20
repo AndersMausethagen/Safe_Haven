@@ -1,0 +1,52 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 702d2e93d0a019a40b6339daf41e2c2f, type: 3}
+  m_Name: SettlingIn
+  m_EditorClassIdentifier: Assembly-CSharp::QuestDefinition
+  id: settling_in
+  displayName: Gifts of the Clearing
+  description: The clearing offers fallen branches and loose stones. Gather them by hand; watch your resource bars (I) fill.
+  chain: The First Days
+  prerequisites:
+  - {fileID: 11400000, guid: 00e21ff059394a4459d8cec92bc2d489, type: 2}
+  start: 0
+  startEvent: {fileID: 0}
+  objectivesInOrder: 0
+  objectives:
+  - type: 1
+    description: 
+    amount: 8
+    item: {fileID: 11400000, guid: 8ae2883815327b74fa7975309c803f92, type: 2}
+    resource: {fileID: 0}
+    monster: {fileID: 0}
+    building: {fileID: 0}
+    raid: {fileID: 0}
+    mustExtract: 1
+    withinMinutes: 0
+    questEvent: {fileID: 0}
+    countAlreadyOwned: 1
+  - type: 1
+    description: 
+    amount: 8
+    item: {fileID: 11400000, guid: b5567f7d75200bd46befbd1dab298f36, type: 2}
+    resource: {fileID: 0}
+    monster: {fileID: 0}
+    building: {fileID: 0}
+    raid: {fileID: 0}
+    mustExtract: 1
+    withinMinutes: 0
+    questEvent: {fileID: 0}
+    countAlreadyOwned: 1
+  rewardItems: []
+  rewardResources: []
+  rewardRecipes: []
+  completionEvent: {fileID: 0}

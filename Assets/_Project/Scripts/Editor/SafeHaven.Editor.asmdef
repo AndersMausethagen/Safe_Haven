@@ -1,0 +1,31 @@
+﻿{
+    "name": "SafeHaven.Editor",
+    "rootNamespace": "",
+    "references": [
+        "SafeHaven",
+        "Unity.TextMeshPro",
+        "Unity.TextMeshPro.Editor",
+        "UnityEngine.UI",
+        "Unity.AI.Navigation",
+        "Unity.AI.Navigation.Editor",
+        "Unity.Cinemachine",
+        "Unity.InputSystem",
+        "Unity.RenderPipelines.Core.Runtime",
+        "Unity.RenderPipelines.Core.Editor",
+        "Unity.RenderPipelines.Universal.Runtime",
+        "Unity.RenderPipelines.Universal.Editor",
+        "Unity.Pipeline",
+        "Unity.Pipeline.Attributes",
+        "Unity.Pipeline.Editor",
+        "AmplifyShaderEditor"
+    ],
+    "includePlatforms": ["Editor"],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

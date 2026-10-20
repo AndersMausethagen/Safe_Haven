@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59c68d9d1667bb94886127fa63deeb4c, type: 3}
+  m_Name: WoodFeedback
+  m_EditorClassIdentifier: SafeHaven::HarvestFeedbackProfile
+  critical:
+    sound: {fileID: 0}
+    effect: {fileID: 7535629084091954004, guid: 5d03391d77c79184187e1eb5ef1d9406, type: 3}
+    shakeDegrees: 8
+  normal:
+    sound: {fileID: 0}
+    effect: {fileID: 8295756250413705008, guid: 45368d8d22cd2124d91815e3daa02143, type: 3}
+    shakeDegrees: 4
+  glancing:
+    sound: {fileID: 0}
+    effect: {fileID: 8295756250413705008, guid: 45368d8d22cd2124d91815e3daa02143, type: 3}
+    shakeDegrees: 1.5
+  harvested:
+    sound: {fileID: 0}
+    effect: {fileID: 7535629084091954004, guid: 5d03391d77c79184187e1eb5ef1d9406, type: 3}
+    shakeDegrees: 0
+  breakSeconds: 0.35
+  regrowSeconds: 0.4

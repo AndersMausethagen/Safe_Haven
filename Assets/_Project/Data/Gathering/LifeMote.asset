@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2bdc7bfe8797f544855a0ab7846c453, type: 3}
+  m_Name: LifeMote
+  m_EditorClassIdentifier: Assembly-CSharp::GatheringNodeDefinition
+  id: 
+  displayName: Life Mote
+  tier: 1
+  yields:
+    entries:
+    - item: {fileID: 0}
+      resource: {fileID: 11400000, guid: 6d764d1847a8e4b4dade94e4406968b5, type: 2}
+      minQuantity: 3
+      maxQuantity: 5
+      probability: 1
+  gatherTool: 0
+  requiredToolTier: 1
+  gatherAnimation: 1
+  gatherSeconds: 2
+  gatherRange: 1.6
+  depleteOnGather: 1
+  respawnSeconds: 180
+  worldModelPrefab: {fileID: 9056648997488566577, guid: 4c86f5fd3167bd0499c2e377a5ce2ef1, type: 3}
+  worldPrefab: {fileID: 1158895183621609222, guid: e010c7c1cd96e8a4cb11aa834ca0a563, type: 3}

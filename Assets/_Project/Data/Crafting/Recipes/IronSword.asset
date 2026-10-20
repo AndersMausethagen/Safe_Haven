@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e984d5700951ee48b9215d668e8218a, type: 3}
+  m_Name: IronSword
+  m_EditorClassIdentifier: Assembly-CSharp::RecipeDefinition
+  id: ironsword
+  displayName: 
+  output: {fileID: 11400000, guid: 5b62859d111deea49b045373b4d1ae83, type: 2}
+  outputResource: {fileID: 0}
+  outputAmount: 1
+  resourceCost: []
+  itemCost:
+  - item: {fileID: 11400000, guid: 616026fe07c265041bdcd10e32bcd168, type: 2}
+    amount: 1
+  - item: {fileID: 11400000, guid: 8865a285b55516842a98bac1e1e53ef6, type: 2}
+    amount: 1
+  - item: {fileID: 11400000, guid: f243c15300698e044a98d785099354c6, type: 2}
+    amount: 3
+  station: 3
+  craftSeconds: 18
+  knownFromStart: 1
+  sortOrder: 0

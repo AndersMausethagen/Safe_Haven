@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e984d5700951ee48b9215d668e8218a, type: 3}
+  m_Name: OrbTincture
+  m_EditorClassIdentifier: Assembly-CSharp::RecipeDefinition
+  id: life_essence
+  displayName: 
+  output: {fileID: 0}
+  outputResource: {fileID: 11400000, guid: 3d259ba2e9b280c4388c17af0308cc69, type: 2}
+  outputAmount: 1
+  resourceCost:
+  - resource: {fileID: 11400000, guid: a86ac9a152512464ab08e0446c161e61, type: 2}
+    amount: 2
+  - resource: {fileID: 11400000, guid: 6d764d1847a8e4b4dade94e4406968b5, type: 2}
+    amount: 2
+  itemCost: []
+  station: 4
+  craftSeconds: 10
+  knownFromStart: 1
+  sortOrder: 15

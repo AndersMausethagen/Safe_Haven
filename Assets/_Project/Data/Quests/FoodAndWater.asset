@@ -1,0 +1,66 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 702d2e93d0a019a40b6339daf41e2c2f, type: 3}
+  m_Name: FoodAndWater
+  m_EditorClassIdentifier: Assembly-CSharp::QuestDefinition
+  id: foodandwater
+  displayName: Food and Water
+  description: Hunger and thirst creep up on you, slowly at home and faster beyond the portal. Pick berries, fetch water from the stream and stew a meal at the campfire.
+  chain: The First Days
+  prerequisites:
+  - {fileID: 11400000, guid: f89173a9aeb790c4f9aeb1cc56e0e655, type: 2}
+  start: 0
+  startEvent: {fileID: 0}
+  objectivesInOrder: 0
+  objectives:
+  - type: 1
+    description: 
+    amount: 5
+    item: {fileID: 11400000, guid: d799dc8161ff2854dae1eedf4b74fb09, type: 2}
+    resource: {fileID: 0}
+    monster: {fileID: 0}
+    building: {fileID: 0}
+    raid: {fileID: 0}
+    mustExtract: 1
+    withinMinutes: 0
+    questEvent: {fileID: 0}
+    countAlreadyOwned: 1
+  - type: 6
+    description: 
+    amount: 1
+    item: {fileID: 0}
+    resource: {fileID: 0}
+    monster: {fileID: 0}
+    building: {fileID: 0}
+    raid: {fileID: 0}
+    mustExtract: 1
+    withinMinutes: 0
+    questEvent: {fileID: 11400000, guid: ad183851ddcecbe44a19b74ad3392881, type: 2}
+    countAlreadyOwned: 0
+  - type: 4
+    description: 
+    amount: 1
+    item: {fileID: 11400000, guid: 253fefd8f83ac6e4c89379e2ad873d6c, type: 2}
+    resource: {fileID: 0}
+    monster: {fileID: 0}
+    building: {fileID: 0}
+    raid: {fileID: 0}
+    mustExtract: 1
+    withinMinutes: 0
+    questEvent: {fileID: 0}
+    countAlreadyOwned: 0
+  rewardItems:
+  - item: {fileID: 11400000, guid: 79744f7a29634cb408f4829b51ec5918, type: 2}
+    amount: 1
+  rewardResources: []
+  rewardRecipes: []
+  completionEvent: {fileID: 0}

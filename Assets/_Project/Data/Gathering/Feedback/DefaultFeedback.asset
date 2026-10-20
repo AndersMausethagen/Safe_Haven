@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59c68d9d1667bb94886127fa63deeb4c, type: 3}
+  m_Name: DefaultFeedback
+  m_EditorClassIdentifier: SafeHaven::HarvestFeedbackProfile
+  critical:
+    sound: {fileID: 0}
+    effect: {fileID: 5583508145942354200, guid: d9f0ff7865e61e24a85ad4aaa13a8213, type: 3}
+    shakeDegrees: 6
+  normal:
+    sound: {fileID: 0}
+    effect: {fileID: 0}
+    shakeDegrees: 3
+  glancing:
+    sound: {fileID: 0}
+    effect: {fileID: 0}
+    shakeDegrees: 1.5
+  harvested:
+    sound: {fileID: 0}
+    effect: {fileID: 2787300096364728406, guid: cb7f106800189e342b22b5aa2470030d, type: 3}
+    shakeDegrees: 0
+  breakSeconds: 0.35
+  regrowSeconds: 0.4

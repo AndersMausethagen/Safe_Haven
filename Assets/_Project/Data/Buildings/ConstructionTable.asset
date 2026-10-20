@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 55433f6de2238c643b7ddfb32e5977d0, type: 3}
+  m_Name: ConstructionTable
+  m_EditorClassIdentifier: Assembly-CSharp::BuildingDefinition
+  id: workbench
+  displayName: Construction Table
+  description: A sturdy table for basic tools, weapons and building parts. Worn gear is repaired here.
+  icon: {fileID: 21300000, guid: 999f104dd088abf4eb954b0ed3178060, type: 3}
+  faction: 0
+  combatStats: {fileID: 11400000, guid: 01155c9e2dd7c27468c1a359f747e1a1, type: 2}
+  prefab: {fileID: 7002535226095337219, guid: 6f787936c774afd46a23725c1f03548c, type: 3}
+  constructionCost: []
+  constructionItems:
+  - item: {fileID: 11400000, guid: b5567f7d75200bd46befbd1dab298f36, type: 2}
+    amount: 6
+  - item: {fileID: 11400000, guid: 8ae2883815327b74fa7975309c803f92, type: 2}
+    amount: 10
+  showInBuildMenu: 1
+  knownFromStart: 1
+  sortOrder: 1
+  yardDepth: 1.5
+  yardSide: 2
+  placeInLines: 0
+  station: 1
+  outputCapacity: 10
+  queueLength: 5
+  deathSound: {fileID: 0}

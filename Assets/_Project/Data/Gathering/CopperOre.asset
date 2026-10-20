@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2bdc7bfe8797f544855a0ab7846c453, type: 3}
+  m_Name: CopperOre
+  m_EditorClassIdentifier: Assembly-CSharp::GatheringNodeDefinition
+  id: 
+  displayName: Copper Ore
+  tier: 2
+  yields:
+    entries:
+    - item: {fileID: 11400000, guid: a9f806359436036488427616ef8b8c44, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 3
+      maxQuantity: 5
+      probability: 1
+  gatherTool: 2
+  requiredToolTier: 2
+  gatherAnimation: 5
+  gatherSeconds: 2
+  swings: 2
+  swingSpeed: 1
+  gatherRange: 1.6
+  depleteOnGather: 1
+  respawnSeconds: 180
+  feedback: {fileID: 11400000, guid: b1c449ba20565574596c83020c468036, type: 2}
+  worldModelPrefab: {fileID: 3559989584582170439, guid: 5b404aadb2ffc5746a54c35f3531a6cf, type: 3}
+  worldPrefab: {fileID: 8046387889879202812, guid: 262f869a4b8db6440b65cd5554060fce, type: 3}

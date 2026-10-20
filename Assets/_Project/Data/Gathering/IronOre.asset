@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2bdc7bfe8797f544855a0ab7846c453, type: 3}
+  m_Name: IronOre
+  m_EditorClassIdentifier: Assembly-CSharp::GatheringNodeDefinition
+  id: 
+  displayName: Iron Ore
+  tier: 2
+  yields:
+    entries:
+    - item: {fileID: 11400000, guid: ec438ce757d5e9e43bbd93390e7a2728, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 2
+      maxQuantity: 4
+      probability: 1
+  gatherTool: 2
+  requiredToolTier: 2
+  gatherAnimation: 5
+  gatherSeconds: 3
+  swings: 2
+  swingSpeed: 1
+  gatherRange: 1.6
+  depleteOnGather: 1
+  respawnSeconds: 360
+  feedback: {fileID: 11400000, guid: b1c449ba20565574596c83020c468036, type: 2}
+  worldModelPrefab: {fileID: 5637626651213697298, guid: bd389485d12cfca43a63d174562a9853, type: 3}
+  worldPrefab: {fileID: 297312215928108013, guid: 7b176e5facb909c44a2893050cbcc64a, type: 3}

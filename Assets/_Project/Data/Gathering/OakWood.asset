@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2bdc7bfe8797f544855a0ab7846c453, type: 3}
+  m_Name: OakWood
+  m_EditorClassIdentifier: Assembly-CSharp::GatheringNodeDefinition
+  id: 
+  displayName: Oak Wood
+  tier: 1
+  yields:
+    entries:
+    - item: {fileID: 11400000, guid: 8ae2883815327b74fa7975309c803f92, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 2
+      probability: 0.153
+  gatherTool: 1
+  requiredToolTier: 1
+  gatherAnimation: 4
+  gatherSeconds: 2
+  swings: 3
+  swingSpeed: 1
+  gatherRange: 1.6
+  depleteOnGather: 1
+  respawnSeconds: 180
+  feedback: {fileID: 11400000, guid: 5c06cdc7d2e3557468f3fdeb64576beb, type: 2}
+  worldModelPrefab: {fileID: 962954701236247394, guid: fb54f6832a611fb46a75194f39b19c77, type: 3}
+  worldPrefab: {fileID: 948381022197778722, guid: 15b33c21de24fb7418664d30fe242c26, type: 3}

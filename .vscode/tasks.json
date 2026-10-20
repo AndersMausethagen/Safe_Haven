@@ -1,0 +1,33 @@
+{
+    "version": "2.0.0",
+    "inputs": [
+        {
+            "id": "unityEditorPath",
+            "type": "promptString",
+            "description": "Path to Unity.exe for this project",
+            "default": "C:\\Program Files\\Unity\\Hub\\Editor\\6000.6.5f1\\Editor\\Unity.exe"
+        }
+    ],
+    "tasks": [
+        {
+            "label": "Unity: Build Windows x64",
+            "type": "process",
+            "command": "${input:unityEditorPath}",
+            "args": [
+                "-batchmode",
+                "-quit",
+                "-projectPath",
+                "${workspaceFolder}",
+                "-executeMethod",
+                "SafeHavenBuild.BuildWindows",
+                "-logFile",
+                "${workspaceFolder}\\Logs\\vscode-build.log"
+            ],
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ]
+}

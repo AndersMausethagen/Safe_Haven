@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2bdc7bfe8797f544855a0ab7846c453, type: 3}
+  m_Name: Deepstone
+  m_EditorClassIdentifier: Assembly-CSharp::GatheringNodeDefinition
+  id: 
+  displayName: Deepstone
+  tier: 3
+  yields:
+    entries:
+    - item: {fileID: 11400000, guid: 03656529f70038c47baa4a9103025a81, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 3
+      probability: 1
+  gatherTool: 2
+  requiredToolTier: 3
+  gatherAnimation: 5
+  gatherSeconds: 4.5
+  swings: 2
+  swingSpeed: 1
+  gatherRange: 1.6
+  depleteOnGather: 1
+  respawnSeconds: 600
+  feedback: {fileID: 11400000, guid: 99cfc3df29073df4385f6c1fe48d873e, type: 2}
+  worldModelPrefab: {fileID: 2301692306751156435, guid: 879e77959fcac1342bda17e8510976b1, type: 3}
+  worldPrefab: {fileID: 8886612018720869940, guid: 072aecd2c58a7024bb867d70e6bc410d, type: 3}
