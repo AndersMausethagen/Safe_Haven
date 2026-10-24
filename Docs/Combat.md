@@ -13,7 +13,8 @@ by motion, sound and weight rather than on-screen text.
 | Left mouse (hold) | Heavy swing: slow, nearly rooted, hard; breaks poise |
 | Right mouse / left trigger (hold) | Guard. Raised just before a hit lands: parry |
 | Left mouse while guarding | Shield bash with a shield; without one it drops the guard and swings |
-| Space / south button | Dodge |
+| Space / south button | Dodge: a quickstep, a roll or a heavy shoulder charge, by how much gear you wear |
+| Using food or drink | Stop and eat: takes a moment, heals over time |
 
 ## The rules
 
@@ -33,9 +34,36 @@ by motion, sound and weight rather than on-screen text.
   so tapping it is no free parry. A monster's ground telegraph turns pale and the monster glints exactly when to raise
   it.
 - **Perfect dodge.** Dodging through a hit (during the dodge's invulnerability) also readies a counter.
+- **Focus.** Fighting well earns Focus (the gold bar under stamina): each hit that lands (finishers twice as much, heavy
+  swings and counters half again), a parry (worth about six hits), a perfect dodge (about four), a block (a little). It
+  holds for ten seconds after the last gain, then drains. Skills cost Focus on top of their cooldown (Wolf's Lunge 25,
+  Whirling Steel 40, Trollsbane Wrath 60, ...), so they are what good fighting buys, not what opens a fight.
+- **Gear weight decides the dodge.** Worn armour, rings and the weapon add up to an equipment load. Light (6 or less): a
+  short, cheap quickstep. Normal: a half-second roll. Heavy (13 or more): a slow, costly shoulder charge that barges
+  enemies at its end (it breaks their poise), and you move a little slower.
+- **Eating is a commitment.** Using food or drink stops you for 1.3 s (slowed, no attacking or guarding). A hit that gets
+  through or a dodge stops the meal and the food is kept. Its healing then arrives over six seconds, not at once.
 - **Poise and stagger.** Every hit wears down a monster's poise (heavy swings, finishers and counters the most); at
   zero it staggers: its attack is cancelled, it stands reeling and takes 20% more damage. Poise comes back after two
   seconds without being hit. Tough monsters have more (Content Editor › Monsters › Poise).
+
+## Readable animation
+
+Combat lives or dies on seeing what is about to happen, so the animation is built for it:
+
+- **One body for every animation.** The player is Kevin Iglesias' human (the body the movement and work clips were
+  made for); the Quaternius combat clips retarget onto it cleanly (Safe Haven › Characters › Use Human Body for Player).
+- **Whole-body swings.** Standing still, swings play on a full-body layer, so the legs step into the blow and the weight
+  shifts; that is what reads from a top-down camera. While running only the arms swing.
+- **Slow wind-up, sharp strike.** Each attack's wind-up plays slower than its clip (Animation Speed) so the blow is
+  seen coming; from the moment it hits, the strike plays at its own speed (Follow Through Speed) and snaps through.
+  Chain swings that aren't followed up blend into their recovery at the matching pose instead of starting over.
+- **Monsters coil and lunge.** Monsters lean back, draw back and crouch through their wind-up (slowly, then fast at the
+  end), snap forward at the hit and settle; staggered monsters sway and sag (`AttackPose`, on top of any animation).
+  Their ground telegraph turns pale with a glint for the last moment: the time to parry.
+
+The Quaternius libraries need their own import setup (Bake Axis Conversion, the rig's root as root motion node, and an
+avatar made after that), or every pose comes out rotated; Set Up Combat Animations applies and checks it.
 
 ## Feedback
 
@@ -58,6 +86,9 @@ by motion, sound and weight rather than on-screen text.
 | An attack's damage, reach, timing, poise damage, lunge, animation and slash colour | Content Editor › Attacks & Abilities |
 | A monster's poise, hurt and wind-up sounds | Content Editor › Monsters |
 | Game-wide combat sounds | Sound Editor › Sound Effects › Game-wide effects |
+| Focus gains, how long it holds, eating time and heal-over-time | Combat technique (Focus, Eating and drinking) |
+| A skill's Focus cost | Content Editor › Skills › Focus Cost |
+| Gear weights for each dodge, and each dodge's distance, time, cost and speed | Systems Editor › Movement & Combat › Movement and dodge (Equipment load) |
 
 **Animations** come from the Quaternius Universal Animation Libraries (CC0, `Assets/Quaternius`) and the Kevin
 Iglesias packs. **Safe Haven › Characters › Set Up Combat Animations** imports them, adds the combat states to the

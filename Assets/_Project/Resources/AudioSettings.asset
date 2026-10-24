@@ -48,15 +48,19 @@ MonoBehaviour:
   playerHurt: {fileID: 11400000, guid: ee2cf50028890584ca318923714b8b41, type: 2}
   outOfStamina: {fileID: 11400000, guid: a968997479556a84eb50c3a892605866, type: 2}
   footstepSurfaces:
-  - layerWords: grass, moss, meadow, forest floor, leaves
+  - layerWords: grass, meadow, lawn
     sound: {fileID: 11400000, guid: 8851c665265695547b86b6c392a07373, type: 2}
+  - layerWords: forest, moss, leaves, needles, soil
+    sound: {fileID: 11400000, guid: a5853e373a57ebd4eabe397c3ca35302, type: 2}
   - layerWords: snow, frost
     sound: {fileID: 11400000, guid: 451238dc659bf994aa0a6c1c4309cd7f, type: 2}
   - layerWords: stone, rock, cliff, gravel, cobble
     sound: {fileID: 11400000, guid: 6a738cd93103c7041b64a8da776b19e5, type: 2}
-  - layerWords: dirt, path, soil, mud, sand, ground
+  - layerWords: dirt, path, mud, sand, ground
     sound: {fileID: 11400000, guid: 3ddf273eb602b7a4992cb722e3cd24b0, type: 2}
-  footstep: {fileID: 11400000, guid: 3ddf273eb602b7a4992cb722e3cd24b0, type: 2}
+  footstep: {fileID: 11400000, guid: a5853e373a57ebd4eabe397c3ca35302, type: 2}
+  footstepGrass: {fileID: 11400000, guid: 8851c665265695547b86b6c392a07373, type: 2}
+  grassForGrassSteps: 2
   footstepWood: {fileID: 11400000, guid: 78db89018c9e64a4d8f84def91caba6a, type: 2}
   footstepWater: {fileID: 11400000, guid: 5b92b167e5b591449b2fcd212c1db02b, type: 2}
   land: {fileID: 11400000, guid: f128174308231b54ca039cf243fc0567, type: 2}

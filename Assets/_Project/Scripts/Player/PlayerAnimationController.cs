@@ -84,8 +84,11 @@ public sealed class PlayerAnimationController : MonoBehaviour
     private PlayerDodge dodge;
     private PlayerSkills skills;
     private PlayerGuard guard;
+    private PlayerEating eating;
+    private static readonly int ConsumeStateHash = Animator.StringToHash("Consume");
     private int upperBodyLayer = -1;
     private int attackArmsLayer = -1;
+    private int fullBodyLayer = -1;
     private GameStateManager gameState;
     private HashSet<int> parameters;
     private float airborneTime;
@@ -132,6 +135,7 @@ public sealed class PlayerAnimationController : MonoBehaviour
         dodge = GetComponent<PlayerDodge>();
         skills = GetComponent<PlayerSkills>();
         guard = GetComponent<PlayerGuard>();
+        eating = GetComponent<PlayerEating>();
         animator = animator != null ? animator : GetComponentInChildren<Animator>();
 
         if (animator == null)
@@ -144,6 +148,7 @@ public sealed class PlayerAnimationController : MonoBehaviour
         CacheParameters();
         upperBodyLayer = animator.GetLayerIndex("Upper Body");
         attackArmsLayer = animator.GetLayerIndex("Attack Arms");
+        fullBodyLayer = animator.GetLayerIndex("Combat Full Body");
     }
 
     private void OnEnable()
@@ -159,6 +164,7 @@ public sealed class PlayerAnimationController : MonoBehaviour
         if (combat != null)
         {
             combat.SwingStarted += OnSwingStarted;
+            combat.SwingLanded += OnSwingLanded;
             combat.WeaponChanged += OnWeaponChanged;
         }
 
@@ -180,6 +186,13 @@ public sealed class PlayerAnimationController : MonoBehaviour
         if (dodge != null)
         {
             dodge.Dodged += OnDodged;
+            dodge.DodgeStarted += OnDodgeStarted;
+        }
+
+        if (eating != null)
+        {
+            eating.Started += OnEatingStarted;
+            eating.Ended += OnEatingEnded;
         }
 
         if (skills != null)
@@ -209,6 +222,7 @@ public sealed class PlayerAnimationController : MonoBehaviour
         if (combat != null)
         {
             combat.SwingStarted -= OnSwingStarted;
+            combat.SwingLanded -= OnSwingLanded;
             combat.WeaponChanged -= OnWeaponChanged;
         }
 
@@ -226,6 +240,13 @@ public sealed class PlayerAnimationController : MonoBehaviour
         if (dodge != null)
         {
             dodge.Dodged -= OnDodged;
+            dodge.DodgeStarted -= OnDodgeStarted;
+        }
+
+        if (eating != null)
+        {
+            eating.Started -= OnEatingStarted;
+            eating.Ended -= OnEatingEnded;
         }
 
         if (skills != null)
@@ -284,12 +305,14 @@ public sealed class PlayerAnimationController : MonoBehaviour
         SetTrigger(ShieldBashHash);
     }
 
-    // A swing with its own animation state plays it at once, on the arms while running; one without uses the stance's
-    // older triggered attack.
+    // A swing with its own animation state plays it at once: with the whole body when standing (the legs step into the
+    // blow, which is what reads from above), on the arms only while running; one without uses the stance's older
+    // triggered attack.
     private void OnSwingStarted(SwingInfo swing)
     {
         string stateName = swing.Attack != null ? swing.Attack.AnimationState : null;
-        int layer = movement.HorizontalSpeed > ArmsOnlySpeed && attackArmsLayer >= 0 ? attackArmsLayer : upperBodyLayer;
+        int standing = fullBodyLayer >= 0 ? fullBodyLayer : upperBodyLayer;
+        int layer = movement.HorizontalSpeed > ArmsOnlySpeed && attackArmsLayer >= 0 ? attackArmsLayer : standing;
         int hash = string.IsNullOrEmpty(stateName) ? 0 : Animator.StringToHash(stateName);
         if (hash == 0 || layer < 0 || !animator.HasState(layer, hash))
         {
@@ -307,10 +330,21 @@ public sealed class PlayerAnimationController : MonoBehaviour
 
         SetFloat(ActionSpeedHash, swing.Attack.AnimationSpeed * swing.Speed);
         animator.CrossFadeInFixedTime(hash, ActionFade, layer, 0f);
-        int other = layer == upperBodyLayer ? attackArmsLayer : upperBodyLayer;
-        if (other >= 0 && animator.HasState(other, EmptyStateHash))
+        foreach (int other in new[] { upperBodyLayer, attackArmsLayer, fullBodyLayer })
         {
-            animator.CrossFadeInFixedTime(EmptyStateHash, ActionFade, other);
+            if (other >= 0 && other != layer && animator.HasState(other, EmptyStateHash))
+            {
+                animator.CrossFadeInFixedTime(EmptyStateHash, ActionFade, other);
+            }
+        }
+    }
+
+    // The wind-up plays slower so it can be read; from the hit on, the strike plays at its own speed and snaps through.
+    private void OnSwingLanded(SwingInfo swing, int hits)
+    {
+        if (swing.Attack != null && !string.IsNullOrEmpty(swing.Attack.AnimationState))
+        {
+            SetFloat(ActionSpeedHash, swing.Attack.FollowThroughSpeed * swing.Speed);
         }
     }
 
@@ -322,14 +356,47 @@ public sealed class PlayerAnimationController : MonoBehaviour
         {
             // Straight into the guard, cutting off whatever swing was ending.
             CrossFadeUpper(combat != null && combat.HasShield ? GuardShieldStateHash : GuardStateHash, 0.08f);
-            if (attackArmsLayer >= 0 && animator.HasState(attackArmsLayer, EmptyStateHash))
+            foreach (int other in new[] { attackArmsLayer, fullBodyLayer })
             {
-                animator.CrossFadeInFixedTime(EmptyStateHash, 0.08f, attackArmsLayer);
+                if (other >= 0 && animator.HasState(other, EmptyStateHash))
+                {
+                    animator.CrossFadeInFixedTime(EmptyStateHash, 0.08f, other);
+                }
             }
         }
     }
 
     private void OnParried(DamageInfo damage) => CrossFadeUpper(ParryStateHash, 0.04f);
+
+    // The dodge the gear allows (quickstep, roll, heavy roll) plays with the whole body; anything on the other layers stops.
+    private void OnDodgeStarted(DodgeStyle style, DodgeShape shape)
+    {
+        int hash = string.IsNullOrEmpty(shape.animationState) ? 0 : Animator.StringToHash(shape.animationState);
+        if (fullBodyLayer < 0 || hash == 0 || !animator.HasState(fullBodyLayer, hash))
+        {
+            return;
+        }
+
+        SetFloat(ActionSpeedHash, shape.animationSpeed);
+        animator.CrossFadeInFixedTime(hash, 0.04f, fullBodyLayer, 0f);
+        foreach (int other in new[] { upperBodyLayer, attackArmsLayer })
+        {
+            if (other >= 0 && animator.HasState(other, EmptyStateHash))
+            {
+                animator.CrossFadeInFixedTime(EmptyStateHash, 0.04f, other);
+            }
+        }
+    }
+
+    private void OnEatingStarted(ItemDefinition item) => CrossFadeUpper(ConsumeStateHash, 0.15f);
+
+    private void OnEatingEnded(ItemDefinition item, bool eaten)
+    {
+        if (!eaten && upperBodyLayer >= 0 && animator.HasState(upperBodyLayer, EmptyStateHash))
+        {
+            animator.CrossFadeInFixedTime(EmptyStateHash, 0.12f, upperBodyLayer);
+        }
+    }
 
     private void OnGuardBroken(float seconds) => CrossFadeUpper(GuardBreakStateHash, 0.05f);
 
@@ -339,6 +406,11 @@ public sealed class PlayerAnimationController : MonoBehaviour
         {
             SetFloat(ActionSpeedHash, 1f);
             animator.CrossFadeInFixedTime(hash, fade, upperBodyLayer, 0f);
+            // The full-body layer sits above it, so a swing still playing there would hide the reaction.
+            if (fullBodyLayer >= 0 && animator.HasState(fullBodyLayer, EmptyStateHash))
+            {
+                animator.CrossFadeInFixedTime(EmptyStateHash, fade, fullBodyLayer);
+            }
         }
     }
 

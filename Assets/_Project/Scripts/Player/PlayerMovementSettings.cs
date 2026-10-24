@@ -40,6 +40,22 @@ public sealed class PlayerMovementSettings : ScriptableObject
     public float Gravity => gravity;
     public float GroundedVerticalVelocity => groundedVerticalVelocity;
     public float TurnSpeed => turnSpeed;
+    [Header("Equipment load (armor, rings and weapon weight)")]
+    [Tooltip("At or below this load the dodge is a quickstep; at or above Heavy Load it is a heavy roll that barges.")]
+    [SerializeField, Min(0f)] private float lightLoad = 6f;
+    [SerializeField, Min(0f)] private float heavyLoad = 13f;
+    [SerializeField] private DodgeShape quickstep = new DodgeShape(0.6f, 0.65f, 0.8f, 0.6f, 0.8f, 1.05f, "Quickstep");
+    [SerializeField] private DodgeShape roll = new DodgeShape(1f, 1f, 1f, 1f, 1f, 1f, "Roll");
+    [SerializeField] private DodgeShape heavyRoll = new DodgeShape(0.85f, 1.35f, 0.9f, 1.4f, 1.25f, 0.9f, "Heavy Roll");
+
+    public float LightLoad => lightLoad;
+    public float HeavyLoad => heavyLoad;
+
+    /// <summary>The kind of dodge a given equipment load allows.</summary>
+    public DodgeStyle StyleFor(float load) => load <= lightLoad ? DodgeStyle.Quickstep : load >= heavyLoad ? DodgeStyle.HeavyRoll : DodgeStyle.Roll;
+
+    public DodgeShape ShapeOf(DodgeStyle style) => style == DodgeStyle.Quickstep ? quickstep : style == DodgeStyle.HeavyRoll ? heavyRoll : roll;
+
     public float DodgeDistance => dodgeDistance;
     public float DodgeDuration => dodgeDuration;
     public float DodgeInvulnerability => dodgeInvulnerability;
@@ -83,5 +99,48 @@ public sealed class PlayerMovementSettings : ScriptableObject
         moveSpeed = Mathf.Max(0f, moveSpeed);
         gravity = Mathf.Min(-0.01f, gravity);
         turnSpeed = Mathf.Max(0f, turnSpeed);
+    }
+}
+
+/// <summary>How the player dodges, by how much they carry on their body (PlayerMovementSettings › Equipment load).</summary>
+public enum DodgeStyle
+{
+    /// <summary>Light gear: a short, quick, cheap sidestep.</summary>
+    Quickstep,
+    /// <summary>A full roll.</summary>
+    Roll,
+    /// <summary>Heavy gear: a slow, costly shoulder charge that barges enemies it reaches.</summary>
+    HeavyRoll,
+}
+
+/// <summary>One dodge style, as multipliers on the dodge settings, plus how fast the wearer moves and the animation.</summary>
+[System.Serializable]
+public sealed class DodgeShape
+{
+    [Min(0.1f)] public float distance = 1f;
+    [Min(0.1f)] public float duration = 1f;
+    [Min(0f)] public float invulnerability = 1f;
+    [Min(0f)] public float stamina = 1f;
+    [Min(0f)] public float cooldown = 1f;
+    [Tooltip("Movement speed with this much gear on, as a share of normal.")]
+    [Range(0.5f, 1.2f)] public float moveSpeed = 1f;
+    [Tooltip("Animator state it plays (Combat Full Body layer).")]
+    public string animationState;
+    [Tooltip("Playback speed of that animation (set by Set Up Combat Animations to fit the dodge).")]
+    [Min(0.1f)] public float animationSpeed = 1f;
+
+    public DodgeShape()
+    {
+    }
+
+    public DodgeShape(float distance, float duration, float invulnerability, float stamina, float cooldown, float moveSpeed, string state)
+    {
+        this.distance = distance;
+        this.duration = duration;
+        this.invulnerability = invulnerability;
+        this.stamina = stamina;
+        this.cooldown = cooldown;
+        this.moveSpeed = moveSpeed;
+        animationState = state;
     }
 }

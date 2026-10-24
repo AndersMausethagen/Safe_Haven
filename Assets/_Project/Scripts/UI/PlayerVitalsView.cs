@@ -4,7 +4,8 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// The player's health and stamina bars, and the smaller hunger and thirst bars (GDD §11, §18.2). Each bar has a fill that tracks the value at once and a pale trail behind it
+/// The player's health and stamina bars, the thin Focus bar (earned by fighting well, spent on skills), and the smaller
+/// hunger and thirst bars (GDD §11, §18.2). Each bar has a fill that tracks the value at once and a pale trail behind it
 /// that lingers and then drains, so a hit or a spend reads at a glance. Refused attacks, skills and dodges flash the
 /// stamina bar and post a warning through the existing message feed.
 /// <para>
@@ -33,6 +34,8 @@ public sealed class PlayerVitalsView : MonoBehaviour
 
     [SerializeField] private Bar health = new Bar();
     [SerializeField] private Bar stamina = new Bar();
+    [Tooltip("Optional: Focus, from PlayerFocus.")]
+    [SerializeField] private Bar focus = new Bar();
     [Tooltip("Optional: hunger, from PlayerNeeds.")]
     [SerializeField] private Bar hunger = new Bar();
     [Tooltip("Optional: thirst, from PlayerNeeds.")]
@@ -57,6 +60,7 @@ public sealed class PlayerVitalsView : MonoBehaviour
     private Color frameColor;
     private float flashUntil = -1f;
     private float nextStaminaMessageAt = -1f;
+    private PlayerFocus boundFocus;
 
     private void Awake()
     {
@@ -106,6 +110,14 @@ public sealed class PlayerVitalsView : MonoBehaviour
             SetTarget(stamina, bound.Stamina.Current, bound.Stamina.Max, snap: true);
         }
 
+        boundFocus = bound.GetComponent<PlayerFocus>();
+        if (boundFocus != null)
+        {
+            boundFocus.FocusChanged += OnFocusChanged;
+            boundFocus.SpendRefused += OnFocusRefused;
+            SetTarget(focus, boundFocus.Current, boundFocus.Max, snap: true);
+        }
+
         SetVisible(true);
     }
 
@@ -122,6 +134,13 @@ public sealed class PlayerVitalsView : MonoBehaviour
             }
         }
 
+        if (!ReferenceEquals(boundFocus, null) && boundFocus != null)
+        {
+            boundFocus.FocusChanged -= OnFocusChanged;
+            boundFocus.SpendRefused -= OnFocusRefused;
+        }
+
+        boundFocus = null;
         bound = null;
         nextStaminaMessageAt = -1f;
     }
@@ -129,6 +148,20 @@ public sealed class PlayerVitalsView : MonoBehaviour
     private void OnHealthChanged(float current, float max) => SetTarget(health, current, max, snap: false);
 
     private void OnStaminaChanged(float current, float max) => SetTarget(stamina, current, max, snap: false);
+
+    private void OnFocusChanged(float current, float max) => SetTarget(focus, current, max, snap: false);
+
+    private void OnFocusRefused()
+    {
+        float now = Time.unscaledTime;
+        if (now < nextStaminaMessageAt)
+        {
+            return;
+        }
+
+        nextStaminaMessageAt = now + StaminaMessageInterval;
+        GameMessages.Post("Not enough Focus. Fight well to earn it: land hits, parry, dodge at the last moment.", MessageKind.Warning);
+    }
 
     private void OnSpendRefused()
     {
@@ -181,6 +214,7 @@ public sealed class PlayerVitalsView : MonoBehaviour
 
         DrainTrail(health);
         DrainTrail(stamina);
+        DrainTrail(focus);
         if (bound != null && bound.Needs != null)
         {
             SetTarget(hunger, bound.Needs.Hunger.Current, bound.Needs.Hunger.Max, snap: true);

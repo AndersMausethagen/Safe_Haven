@@ -32,10 +32,10 @@ Material:
     m_Floats:
     - _AnimationDistance: 45
     - _BladeVariation: 0.3
-    - _ClumpHeight: 0.35
+    - _ClumpHeight: 0.226
     - _ClumpScale: 1.5
     - _Cutoff: 0.4
-    - _DryAmount: 0.2
+    - _DryAmount: 0.315
     - _FacingBlades: 1
     - _FarDensity: 0.35
     - _FarEnd: 50
@@ -47,10 +47,10 @@ Material:
     - _GroundBrightness: 1.1
     - _GroundColor: 0.6
     - _GroundTip: 0.3
-    - _NormalUp: 0.6
+    - _NormalUp: 0.914
     - _PatchScale: 6
     - _PushStrength: 0.3
-    - _Size: 1
+    - _Size: 1.48
     - _Smoothness: 0.15
     - _Translucency: 0.5
     - _WindSpeed: 1

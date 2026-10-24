@@ -76,6 +76,14 @@ public sealed class MonsterAI : MonoBehaviour
     private MonsterPack pack;
     private Transform visual;
     private Vector3 visualHome;
+    private Quaternion visualHomeRotation = Quaternion.identity;
+    private Vector3 visualHomeScale = Vector3.one;
+    private float hover;
+    // The attack whose pose is playing (it keeps settling after the attack ends) and the stagger's timing.
+    private AttackDefinition posedAttack;
+    private float posedAttackStart;
+    private float staggerStart = -1f;
+    private float staggerLength;
 
     private bool roaming;
     private PoiseMeter poise;
@@ -134,6 +142,9 @@ public sealed class MonsterAI : MonoBehaviour
         exposedAt = -1f;
         StopMoving();
         staggerUntil = Time.time + seconds;
+        staggerStart = Time.time;
+        staggerLength = seconds;
+        posedAttack = null;
         damageable.DamageTakenMultiplier = CombatTechniqueSettings.Current.StaggeredDamageTaken;
         SetState(State.Staggered);
         Staggered?.Invoke(seconds);
@@ -199,6 +210,8 @@ public sealed class MonsterAI : MonoBehaviour
         if (visual != null)
         {
             visualHome = visual.localPosition;
+            visualHomeRotation = visual.localRotation;
+            visualHomeScale = visual.localScale;
         }
 
         if (definition == null)
@@ -336,15 +349,47 @@ public sealed class MonsterAI : MonoBehaviour
         Engage();
     }
 
+    // The body language that makes attacks readable from above (AttackPose): coiling through the wind-up, snapping into
+    // the hit, swaying while staggered; plus the hover of flying monsters.
     private void LateUpdate()
     {
-        if (visual == null || definition == null || definition.HoverHeight <= 0f)
+        if (visual == null || definition == null)
         {
             return;
         }
-        float height = IsExposed || CurrentState == State.Dead ? 0f
+
+        float targetHover = definition.HoverHeight <= 0f || IsExposed || CurrentState == State.Dead ? 0f
             : definition.HoverHeight + Mathf.Sin(Time.time * 3f) * 0.08f;
-        visual.localPosition = Vector3.Lerp(visual.localPosition, visualHome + Vector3.up * height, Time.deltaTime * 10f);
+        hover = Mathf.Lerp(hover, targetHover, Time.deltaTime * 10f);
+
+        AttackPose.Pose pose = AttackPose.Pose.Rest;
+        if (CurrentState == State.Dead)
+        {
+            posedAttack = null;
+        }
+        else if (staggerStart >= 0f && Time.time - staggerStart < staggerLength)
+        {
+            pose = AttackPose.Stagger(Time.time - staggerStart, staggerLength);
+        }
+        else if (posedAttack != null)
+        {
+            float elapsed = Time.time - posedAttackStart;
+            if (elapsed > posedAttack.HitDelay + AttackPose.StrikeSeconds + AttackPose.SettleSeconds)
+            {
+                posedAttack = null;
+            }
+            else
+            {
+                // Charges move the whole body already; they only coil.
+                bool charge = action != null && action.kind == MonsterAttackKind.Charge && elapsed >= posedAttack.HitDelay;
+                pose = charge ? AttackPose.Pose.Rest : AttackPose.Attack(elapsed, posedAttack.HitDelay);
+            }
+        }
+
+        float width = 1f / Mathf.Sqrt(Mathf.Max(0.5f, pose.Height));
+        visual.localPosition = visualHome + Vector3.up * hover + Vector3.forward * pose.Shift;
+        visual.localRotation = Quaternion.Euler(-pose.Lean, 0f, pose.Sway) * visualHomeRotation;
+        visual.localScale = Vector3.Scale(visualHomeScale, new Vector3(width, pose.Height, width));
     }
 
     private void Engage()
@@ -459,6 +504,8 @@ public sealed class MonsterAI : MonoBehaviour
         exposedAt = -1f;
         chargeHit = false;
         SetState(State.Attacking);
+        posedAttack = CurrentAttack;
+        posedAttackStart = attackStartTime;
         AttackStarted?.Invoke();
     }
 
@@ -890,6 +937,7 @@ public sealed class MonsterAI : MonoBehaviour
         if (CurrentState == State.Attacking && action != null && action.interruptible
             && Time.time - attackStartTime < action.attack.HitDelay && result.HealthLost > 0f)
         {
+            posedAttack = null;
             FinishAction();
         }
 

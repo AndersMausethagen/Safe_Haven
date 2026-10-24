@@ -66,6 +66,25 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
     [SerializeField, Range(0.05f, 1f)] private float slowMotionScale = 0.4f;
     [SerializeField, Min(0f)] private float slowMotionSeconds = 0.09f;
 
+    [Header("Focus (earned by fighting well, spent on skills)")]
+    [SerializeField, Min(1f)] private float focusMax = 100f;
+    [Tooltip("Focus per target a swing hits (at most two count). Finishers count double, heavy swings 1.5 times, counters 1.5 times more.")]
+    [SerializeField, Min(0f)] private float focusPerHit = 6f;
+    [SerializeField, Min(0f)] private float focusOnParry = 35f;
+    [SerializeField, Min(0f)] private float focusOnPerfectDodge = 25f;
+    [SerializeField, Min(0f)] private float focusOnBlock = 2f;
+    [Tooltip("Seconds Focus holds after the last gain, then how fast it drains away (per second).")]
+    [SerializeField, Min(0f)] private float focusHoldSeconds = 10f;
+    [SerializeField, Min(0f)] private float focusDrainPerSecond = 4f;
+
+    [Header("Eating and drinking (committed healing)")]
+    [Tooltip("Seconds eating or drinking takes. Getting hit or dodging stops it, and the food is kept.")]
+    [SerializeField, Min(0.1f)] private float eatSeconds = 1.3f;
+    [Tooltip("Movement speed while eating, as a share of normal.")]
+    [SerializeField, Range(0f, 1f)] private float eatMoveSpeed = 0.35f;
+    [Tooltip("Seconds over which a meal's healing arrives, once eaten.")]
+    [SerializeField, Min(0f)] private float healOverSeconds = 6f;
+
     [Header("Poise and stagger (monsters)")]
     [Tooltip("Poise of monsters whose definition sets none. Hits wear it down; at zero the monster staggers.")]
     [SerializeField, Min(1f)] private float defaultPoise = 30f;
@@ -103,6 +122,16 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
     public float CounterDamageMultiplier => counterDamageMultiplier;
     public float SlowMotionScale => slowMotionScale;
     public float SlowMotionSeconds => slowMotionSeconds;
+    public float FocusMax => focusMax;
+    public float FocusPerHit => focusPerHit;
+    public float FocusOnParry => focusOnParry;
+    public float FocusOnPerfectDodge => focusOnPerfectDodge;
+    public float FocusOnBlock => focusOnBlock;
+    public float FocusHoldSeconds => focusHoldSeconds;
+    public float FocusDrainPerSecond => focusDrainPerSecond;
+    public float EatSeconds => eatSeconds;
+    public float EatMoveSpeed => eatMoveSpeed;
+    public float HealOverSeconds => healOverSeconds;
     public float DefaultPoise => defaultPoise;
     public float PoiseRecoveryDelay => poiseRecoveryDelay;
     public float PoiseRecoveryPerSecond => poiseRecoveryPerSecond;

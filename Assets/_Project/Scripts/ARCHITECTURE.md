@@ -399,10 +399,23 @@ The player is no super soldier: combat is about reading the enemy and committing
   enters `State.Staggered` (attack cancelled, extra damage taken, `MonsterAI.AnyStaggered`). `AttackTelegraph` turns
   the parry colour and glints for the last parry window of the wind-up.
 - **Perfect dodge:** a hit evaded during the dodge's invulnerability readies a counter (`PlayerCombat.PerfectDodge`).
+- **Focus** (`PlayerFocus`): earned from `SwingLanded`, parries, perfect dodges and blocks, drains after a hold; skills
+  with a `SkillDefinition.FocusCost` need it (`SkillCastResult.NoFocus`). Shown as the gold bar in `PlayerVitalsView`
+  (added by Safe Haven › UI › Add Focus Bar to Vitals HUD).
+- **Dodge by gear weight:** `PlayerEquipment.EquipLoad` (armour, rings, weapon) picks a `DodgeStyle` from
+  `PlayerMovementSettings` (Quickstep / Roll / Heavy Roll, each a `DodgeShape` of multipliers, move speed and animation);
+  `PlayerDodge.DodgeStarted` plays it; the heavy roll ends in the `shoulderBarge` attack.
+- **Committed eating** (`PlayerEating`, Survival): `ItemInventory.Use` sends food and drink there; 1.3 s, slowed, no
+  attacking/guarding/skills, interrupted (food kept) by a hit or dodge; healing arrives over time.
+- **Monster body language:** `AttackPose` (pure, tested) coils a monster's Model through the wind-up, lunges at the hit
+  and sways it while staggered; `MonsterAI.LateUpdate` applies it with the hover.
 - **Hits carry** `DamageInfo.Poise` and `Technique` (`HitTechnique`: Heavy, Finisher, Counter, Rhythm, ShieldBash);
   `AttackResolver.Execute` takes the swing's damage and poise multipliers.
 - **Animation:** swings are played by crossfading into the attack's **Animation State** by name
   (`PlayerAnimationController.OnSwingStarted`, `ActionSpeed` parameter), so the animation starts with the gameplay swing.
+  Standing swings and dodges play on the **Combat Full Body** layer (legs included), running swings on Attack Arms; the
+  wind-up plays at Animation Speed and, from the hit, the strike at Follow Through Speed.
+  The player's body is Kevin Iglesias' HumanM (`PlayerBodySetup`, Safe Haven › Characters › Use Human Body for Player).
   States and timings come from **Safe Haven › Characters › Set Up Combat Animations** (`CombatAnimationSetup`: imports
   the Quaternius UAL1/UAL2 clips, adds the states to `PlayerAnimator` and a Stagger state to `MonsterHumanoid`, measures
   each clip's contact moment from the weapon hand's speed and writes Hit Delay / Recovery, builds the weapons' chains).

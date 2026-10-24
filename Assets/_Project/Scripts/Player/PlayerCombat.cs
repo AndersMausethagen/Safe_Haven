@@ -95,6 +95,7 @@ public sealed class PlayerCombat : MonoBehaviour
     private PlayerDodge dodge;
     private PlayerStamina stamina;
     private PlayerGuard guard;
+    private PlayerEating eating;
     private GameStateManager gameState;
     private float lastActivityTime;
     private WeaponDefinition announcedWeapon;
@@ -206,6 +207,7 @@ public sealed class PlayerCombat : MonoBehaviour
         dodge = GetComponent<PlayerDodge>();
         stamina = GetComponent<PlayerStamina>();
         guard = GetComponent<PlayerGuard>();
+        eating = GetComponent<PlayerEating>();
         announcedWeapon = weapon;
     }
 
@@ -380,6 +382,11 @@ public sealed class PlayerCombat : MonoBehaviour
 
     private void Request(SwingKind kind, ChainPress judge)
     {
+        if (eating != null && eating.IsEating)
+        {
+            return; // eating takes both hands
+        }
+
         bool busy = activeKind != SwingKind.None || IsFlinching || (dodge != null && dodge.IsDodging) || (guard != null && guard.IsStunned);
         if (busy)
         {

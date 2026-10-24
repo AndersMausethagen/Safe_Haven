@@ -19,6 +19,10 @@ public sealed class PlayerDodge : MonoBehaviour
     [SerializeField, Min(0f)] private float trailHeight = 0.9f;
     [Tooltip("Optional: a trail to use instead of the one created from the CombatFeel settings.")]
     [SerializeField] private TrailRenderer trail;
+    [Tooltip("What a heavy roll (heavy gear) does to enemies at its end: a shoulder barge. Empty: it barges no one.")]
+    [SerializeField] private AttackDefinition shoulderBarge;
+    [Tooltip("Layers the barge can hit.")]
+    [SerializeField] private LayerMask bargeLayers = ~0;
 
     private PlayerMovement movement;
     private PlayerStateMachine stateMachine;
@@ -26,6 +30,9 @@ public sealed class PlayerDodge : MonoBehaviour
     private PlayerStamina stamina;
     private float readyAt;
     private float invulnerableUntil = -1f;
+    private PlayerEquipment equipment;
+    private float bargeAt = -1f;
+    private Vector3 bargeDirection;
 
     /// <summary>True from the start of a dodge until its dash ends.</summary>
     public bool IsDodging => movement.IsDashing;
@@ -34,6 +41,12 @@ public sealed class PlayerDodge : MonoBehaviour
 
     /// <summary>Raised when a dodge starts, with its direction.</summary>
     public event Action<Vector3> Dodged;
+
+    /// <summary>Raised as a dodge starts, with its style and shape (animation plays the shape's state).</summary>
+    public event Action<DodgeStyle, DodgeShape> DodgeStarted;
+
+    /// <summary>The dodge the player's current gear allows.</summary>
+    public DodgeStyle Style => movement.Settings != null ? movement.Settings.StyleFor(equipment != null ? equipment.EquipLoad : 0f) : DodgeStyle.Roll;
 
     // A dodge pressed during a swing's wind-up waits this long for the swing to land.
     private const float DodgeBuffer = 0.35f;
@@ -45,6 +58,7 @@ public sealed class PlayerDodge : MonoBehaviour
         stateMachine = GetComponent<PlayerStateMachine>();
         health = GetComponent<Damageable>();
         stamina = GetComponent<PlayerStamina>();
+        equipment = GetComponent<PlayerEquipment>();
     }
 
     private void OnEnable()
@@ -80,20 +94,32 @@ public sealed class PlayerDodge : MonoBehaviour
 
         bufferedUntil = -1f;
 
-        if (stamina != null && !stamina.TrySpend(stamina.DodgeCost))
+        DodgeStyle style = Style;
+        DodgeShape shape = settings.ShapeOf(style);
+        if (stamina != null && !stamina.TrySpend(stamina.DodgeCost * shape.stamina))
         {
             return false;
         }
 
+        float distance = settings.DodgeDistance * shape.distance;
+        float duration = settings.DodgeDuration * shape.duration;
         Vector3 direction = movement.MovementInput.sqrMagnitude > 0.01f ? movement.MovementInput.normalized : movement.AimDirection;
-        movement.Dash(direction * (settings.DodgeDistance / settings.DodgeDuration), settings.DodgeDuration);
-        readyAt = Time.time + settings.DodgeCooldown;
+        movement.Dash(direction * (distance / duration), duration);
+        readyAt = Time.time + settings.DodgeCooldown * shape.cooldown;
 
-        if (settings.DodgeInvulnerability > 0f)
+        if (settings.DodgeInvulnerability * shape.invulnerability > 0f)
         {
             health.AddInvulnerability(this);
-            invulnerableUntil = Time.time + settings.DodgeInvulnerability;
+            invulnerableUntil = Time.time + settings.DodgeInvulnerability * shape.invulnerability;
         }
+
+        if (style == DodgeStyle.HeavyRoll && shoulderBarge != null)
+        {
+            bargeAt = Time.time + duration * 0.85f;
+            bargeDirection = direction;
+        }
+
+        DodgeStarted?.Invoke(style, shape);
 
         SetTrail(true);
         Dodged?.Invoke(direction);
@@ -102,6 +128,22 @@ public sealed class PlayerDodge : MonoBehaviour
 
     private void Update()
     {
+        // The heavy roll ends in a shoulder barge into whatever it reached.
+        if (bargeAt >= 0f && Time.time >= bargeAt)
+        {
+            bargeAt = -1f;
+            if (TryGetComponent(out Combatant combatant))
+            {
+                AttackResolver.Execute(combatant, shoulderBarge, 0f, transform.position, bargeDirection, bargeLayers);
+            }
+        }
+
+        // Heavier gear moves slower.
+        if (movement.Settings != null && equipment != null)
+        {
+            movement.SetSpeedScale(equipment, movement.Settings.ShapeOf(Style).moveSpeed);
+        }
+
         if (bufferedUntil >= 0f)
         {
             if (Time.time > bufferedUntil)

@@ -11,6 +11,7 @@ public enum SkillCastResult
     /// <summary>Dead, interacting, dodging or still casting the previous skill.</summary>
     Busy,
     NoStamina,
+    NoFocus,
 }
 
 /// <summary>
@@ -191,9 +192,21 @@ public sealed class PlayerSkills : MonoBehaviour
     {
         SkillDefinition skill = loadout.Get(slot);
         SkillCastResult result = CheckCast(skill);
+        PlayerFocus focus = GetComponent<PlayerFocus>();
+        if (result == SkillCastResult.Cast && skill.FocusCost > 0f && focus != null && !focus.CanSpend(skill.FocusCost))
+        {
+            focus.TrySpend(skill.FocusCost); // refused: lets the HUD say so
+            result = SkillCastResult.NoFocus;
+        }
+
         if (result == SkillCastResult.Cast && skill.StaminaCost > 0f && stamina != null && !stamina.TrySpend(skill.StaminaCost))
         {
             result = SkillCastResult.NoStamina;
+        }
+
+        if (result == SkillCastResult.Cast && skill.FocusCost > 0f && focus != null)
+        {
+            focus.TrySpend(skill.FocusCost);
         }
 
         if (result != SkillCastResult.Cast)
@@ -218,6 +231,7 @@ public sealed class PlayerSkills : MonoBehaviour
             || stateMachine.CurrentState == PlayerState.Interacting
             || (dodge != null && dodge.IsDodging)
             || movement.IsDashing
+            || (TryGetComponent(out PlayerEating eating) && eating.IsEating)
             || Time.time < busyUntil)
         {
             return SkillCastResult.Busy;

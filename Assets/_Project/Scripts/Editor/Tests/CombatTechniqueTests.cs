@@ -99,6 +99,99 @@ public sealed class CombatTechniqueTests
     }
 
     [Test]
+    public void MonsterPose_CoilsThroughTheWindUp_LungesAtTheHit_AndSettles()
+    {
+        Assert.AreEqual(0f, AttackPose.Attack(0f, 0.6f).Lean, 1e-4f, "starts at rest");
+        Assert.Greater(AttackPose.Attack(0.55f, 0.6f).Lean, AttackPose.Attack(0.3f, 0.6f).Lean * 2f, "the coil speeds up near the end");
+        Assert.Less(AttackPose.Attack(0.55f, 0.6f).Shift, 0f, "draws back before the hit");
+        Assert.Greater(AttackPose.Attack(0.6f + AttackPose.StrikeSeconds * 0.9f, 0.6f).Shift, 0.2f, "lunges at the hit");
+        AttackPose.Pose settled = AttackPose.Attack(0.6f + AttackPose.StrikeSeconds + AttackPose.SettleSeconds, 0.6f);
+        Assert.AreEqual(0f, settled.Lean, 1e-3f);
+        Assert.AreEqual(1f, settled.Height, 1e-3f);
+        Assert.AreNotEqual(0f, AttackPose.Stagger(0.1f, 1f).Sway, "staggered monsters sway");
+        Assert.AreEqual(0f, AttackPose.Stagger(1f, 1f).Lean, 1e-4f, "and stop when it ends");
+    }
+
+    [Test]
+    public void Focus_IsEarnedByLandingHits_MoreForFinishersHeavySwingsAndCounters()
+    {
+        var light = new SwingInfo(SwingKind.Light, null, 0, 3, 0, 1f, HitTechnique.None, Vector3.forward);
+        var finisher = new SwingInfo(SwingKind.Light, null, 2, 3, 0, 1f, HitTechnique.Finisher, Vector3.forward);
+        var heavy = new SwingInfo(SwingKind.Heavy, null, 0, 3, 0, 1f, HitTechnique.Heavy, Vector3.forward);
+        var counter = new SwingInfo(SwingKind.Light, null, 0, 3, 0, 1f, HitTechnique.Counter, Vector3.forward);
+        Assert.AreEqual(0f, PlayerFocus.ForSwing(light, 0, rules), "a whiff earns nothing");
+        float one = PlayerFocus.ForSwing(light, 1, rules);
+        Assert.Greater(one, 0f);
+        Assert.AreEqual(one * 2f, PlayerFocus.ForSwing(light, 5, rules), 1e-4f, "at most two targets count");
+        Assert.AreEqual(one * 2f, PlayerFocus.ForSwing(finisher, 1, rules), 1e-4f);
+        Assert.AreEqual(one * 1.5f, PlayerFocus.ForSwing(heavy, 1, rules), 1e-4f);
+        Assert.AreEqual(one * 1.5f, PlayerFocus.ForSwing(counter, 1, rules), 1e-4f);
+        Assert.Greater(rules.FocusOnParry, one * 3f, "a parry is worth more than trading hits");
+    }
+
+    [Test]
+    public void GearWeight_DecidesTheDodge()
+    {
+        var settings = ScriptableObject.CreateInstance<PlayerMovementSettings>();
+        try
+        {
+            Assert.AreEqual(DodgeStyle.Quickstep, settings.StyleFor(0f));
+            Assert.AreEqual(DodgeStyle.Roll, settings.StyleFor((settings.LightLoad + settings.HeavyLoad) * 0.5f));
+            Assert.AreEqual(DodgeStyle.HeavyRoll, settings.StyleFor(settings.HeavyLoad + 1f));
+            DodgeShape quick = settings.ShapeOf(DodgeStyle.Quickstep), heavy = settings.ShapeOf(DodgeStyle.HeavyRoll);
+            Assert.Less(quick.distance * quick.stamina, heavy.distance * heavy.stamina, "light gear dodges cheaper");
+            Assert.Greater(heavy.duration, quick.duration, "heavy gear dodges slower");
+        }
+        finally
+        {
+            Object.DestroyImmediate(settings);
+        }
+    }
+
+    [Test]
+    public void PlayerPrefab_HasAHumanBody_TheNewSystems_AndItsAnimations()
+    {
+        var player = AssetDatabase.LoadAssetAtPath<GameObject>(CombatAnimationSetup.PlayerPrefabPath);
+        var animator = player.GetComponent<Animator>();
+        Assert.IsTrue(animator.avatar.isHuman);
+        Assert.AreEqual("HumanM_ModelAvatar", animator.avatar.name);
+        Assert.IsNotNull(player.GetComponent<PlayerFocus>());
+        Assert.IsNotNull(player.GetComponent<PlayerEating>());
+        Assert.IsNotNull(player.GetComponent<PlayerGuard>());
+        var controller = (UnityEditor.Animations.AnimatorController)animator.runtimeAnimatorController;
+        var fullBody = controller.layers.First(l => l.name == CombatAnimationSetup.FullBodyLayer).stateMachine.states.Select(s => s.state.name).ToList();
+        CollectionAssert.IsSubsetOf(new[] { "Sword A", "Sword Heavy", "Quickstep", "Roll", "Heavy Roll" }, fullBody);
+        var upper = controller.layers.First(l => l.name == "Upper Body").stateMachine.states.Select(s => s.state.name).ToList();
+        CollectionAssert.Contains(upper, "Consume");
+    }
+
+    [Test]
+    public void QuaterniusLibraries_UseTheirOwnSetup_SoBodiesStayUpright()
+    {
+        foreach (string path in new[] { CombatAnimationSetup.LibraryPath, CombatAnimationSetup.Library1Path })
+        {
+            var importer = (ModelImporter)AssetImporter.GetAtPath(path);
+            Assert.IsTrue(importer.bakeAxisConversion, path);
+            Assert.AreEqual("Armature/root", importer.motionNodeName, path);
+            SkeletonBone armature = importer.humanDescription.skeleton.First(b => b.name == "Armature");
+            Assert.Less(Quaternion.Angle(armature.rotation, Quaternion.identity), 1f, "the avatar's stored pose matches the converted axes");
+        }
+    }
+
+    [Test]
+    public void Footsteps_AreSoft_AndGrassHasItsOwn()
+    {
+        var sounds = Resources.Load<AudioSettingsDefinition>(AudioSettingsDefinition.ResourceName);
+        Assert.IsNotNull(sounds.FootstepGrass);
+        foreach (SoundDefinition step in new[] { sounds.FootstepGrass, sounds.Footstep, sounds.FootstepOn("Forest Soil") })
+        {
+            Assert.IsTrue(step.HasClips, step.name);
+            Assert.LessOrEqual(step.Volume, 0.35f, $"{step.name} is meant to be barely heard");
+            Assert.IsTrue(step.Clips.All(c => AssetDatabase.GetAssetPath(c).Contains("Safe Haven Footsteps")), $"{step.name} uses the soft steps");
+        }
+    }
+
+    [Test]
     public void SlashArc_IsAFlatSectorOfTheAttacksReach_AndShared()
     {
         Mesh mesh = SlashEffect.MeshFor(120f, 2f, false);

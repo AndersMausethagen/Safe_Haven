@@ -18,10 +18,10 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 01b1ca52366132d4e8c28b64603bf4e2, type: 3}
   - {fileID: 8300000, guid: 31549bd5b66f31541aa7bfc67e27f462, type: 3}
   channel: 2
-  volume: 0.45
+  volume: 0.25
   volumeVariation: 0.1
   pitchRange: {x: 0.9, y: 1.1}
   positional: 1
   fullVolumeDistance: 3
-  audibleDistance: 12
+  audibleDistance: 10
   maxAtOnce: 3

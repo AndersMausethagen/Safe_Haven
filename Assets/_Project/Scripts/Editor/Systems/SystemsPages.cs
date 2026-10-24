@@ -197,6 +197,14 @@ public sealed class MovementAndCombatPage : SystemsPage
         {
             BeginDerived();
             Derived("Dodge", $"{movement.DodgeDuration:0.##} s, ready again after {movement.DodgeCooldown:0.##} s");
+            foreach (DodgeStyle style in new[] { DodgeStyle.Quickstep, DodgeStyle.Roll, DodgeStyle.HeavyRoll })
+            {
+                DodgeShape shape = movement.ShapeOf(style);
+                string load = style == DodgeStyle.Quickstep ? $"gear load up to {movement.LightLoad:0.#}"
+                    : style == DodgeStyle.HeavyRoll ? $"gear load {movement.HeavyLoad:0.#} and up" : "in between";
+                Derived(ObjectNames.NicifyVariableName(style.ToString()), $"{load}: {movement.DodgeDistance * shape.distance:0.#} m in " +
+                    $"{movement.DodgeDuration * shape.duration:0.##} s, {shape.stamina:P0} stamina, moves at {shape.moveSpeed:P0}");
+            }
             if (stamina != null)
             {
                 Derived("Dodges from full stamina", stamina.DodgeCost > 0f ? $"{Mathf.FloorToInt(stamina.MaxStamina / stamina.DodgeCost)}" : "unlimited");
@@ -222,6 +230,9 @@ public sealed class MovementAndCombatPage : SystemsPage
             }
 
             Derived("Swings", technique.DodgeCancelsWindup ? "can be dodged out of at any time" : "are commitments: no dodging until they land");
+            Derived("Focus", $"a parry is worth {technique.FocusOnParry / Mathf.Max(0.01f, technique.FocusPerHit):0.#} hits, a perfect dodge " +
+                $"{technique.FocusOnPerfectDodge / Mathf.Max(0.01f, technique.FocusPerHit):0.#}; it drains after {technique.FocusHoldSeconds:0} s without a gain");
+            Derived("Eating", $"{technique.EatSeconds:0.#} s, interrupted by hits and dodges; healing arrives over {technique.HealOverSeconds:0} s");
             EndDerived();
         }
 

@@ -36,6 +36,26 @@ public sealed class PlayerEquipment : MonoBehaviour
     /// <summary>The main-hand weapon stack, or empty.</summary>
     public ItemStack MainHand => gear.Get(GearSlot.MainHand);
 
+    /// <summary>What the player carries on their body: the weight of worn armor, rings and the weapon (not the tool belt
+    /// or the backpack). Decides the dodge (PlayerMovementSettings › Equipment load).</summary>
+    public float EquipLoad
+    {
+        get
+        {
+            float load = 0f;
+            for (GearSlot slot = GearSlot.Head; slot <= GearSlot.MainHand; slot++)
+            {
+                ItemStack stack = gear.Get(slot);
+                if (!stack.IsEmpty)
+                {
+                    load += stack.Item.Weight;
+                }
+            }
+
+            return load;
+        }
+    }
+
     /// <summary>Raised after any gear slot changes: equipped, unequipped, worn down or repaired.</summary>
     public event Action Changed;
 

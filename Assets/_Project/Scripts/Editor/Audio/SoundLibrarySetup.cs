@@ -36,6 +36,11 @@ public static class SoundLibrarySetup
 
     private static string[] Files(string folder, params string[] names) => names.Select(n => $"{Sfx}{folder}/{n}.ogg").ToArray();
 
+    private static string[] Synth(string kind) => Enumerable.Range(1, 8).Select(i => $"{Sfx}Safe Haven Footsteps/Footstep {kind} {i}.wav").ToArray();
+
+    /// <summary>Set to rewrite the footstep surface list with the defaults on the next run (it is kept otherwise).</summary>
+    public static bool ResetFootstepSurfaces;
+
     [MenuItem("Safe Haven/Audio/Set Up Free Sound Library")]
     public static void SetUp()
     {
@@ -64,12 +69,14 @@ public static class SoundLibrarySetup
         Make(new Spec { Name = "Player Hurt", Clips = Numbered(impact, "impactSoft_medium_", 5), Volume = 0.8f, Pitch = new Vector2(0.85f, 1f), Positional = false, MaxAtOnce = 2 });
         Make(new Spec { Name = "Out of Stamina", Clips = Files(ui, "error_004"), Volume = 0.35f, Positional = false, MaxAtOnce = 1 });
         // Footsteps.
-        Make(new Spec { Name = "Footstep Grass", Clips = Numbered(impact, "footstep_grass_", 5), Volume = 0.35f, Pitch = new Vector2(0.9f, 1.1f), Audible = 12f, MaxAtOnce = 3 });
-        Make(new Spec { Name = "Footstep Dirt", Clips = Numbered(rpg, "footstep0", 10, "0"), Volume = 0.35f, Pitch = new Vector2(0.9f, 1.1f), Audible = 12f, MaxAtOnce = 3 });
-        Make(new Spec { Name = "Footstep Stone", Clips = Numbered(impact, "footstep_concrete_", 5), Volume = 0.35f, Pitch = new Vector2(0.9f, 1.1f), Audible = 12f, MaxAtOnce = 3 });
+        // Soft, faint steps made for the game (Tools/Audio/footsteps.py): barely there, like walking carefully through a forest.
+        Make(new Spec { Name = "Footstep Grass", Clips = Synth("Grass"), Volume = 0.3f, Pitch = new Vector2(0.92f, 1.08f), Audible = 10f, MaxAtOnce = 3 });
+        Make(new Spec { Name = "Footstep Forest", Clips = Synth("Forest"), Volume = 0.3f, Pitch = new Vector2(0.92f, 1.08f), Audible = 10f, MaxAtOnce = 3 });
+        Make(new Spec { Name = "Footstep Dirt", Clips = Synth("Dirt"), Volume = 0.3f, Pitch = new Vector2(0.92f, 1.08f), Audible = 10f, MaxAtOnce = 3 });
+        Make(new Spec { Name = "Footstep Stone", Clips = Numbered(impact, "footstep_concrete_", 5), Volume = 0.15f, Pitch = new Vector2(0.9f, 1.05f), Audible = 10f, MaxAtOnce = 3 });
         Make(new Spec { Name = "Footstep Snow", Clips = Numbered(impact, "footstep_snow_", 5), Volume = 0.35f, Pitch = new Vector2(0.9f, 1.1f), Audible = 12f, MaxAtOnce = 3 });
-        Make(new Spec { Name = "Footstep Wood", Clips = Numbered(impact, "footstep_wood_", 5), Volume = 0.4f, Pitch = new Vector2(0.9f, 1.1f), Audible = 12f, MaxAtOnce = 3 });
-        Make(new Spec { Name = "Footstep Water", Clips = Files(oga, "sfx100v2_footstep_wet_01", "sfx100v2_footstep_wet_02", "sfx100v2_footstep_wet_03"), Volume = 0.45f, Pitch = new Vector2(0.9f, 1.1f), Audible = 12f, MaxAtOnce = 3 });
+        Make(new Spec { Name = "Footstep Wood", Clips = Numbered(impact, "footstep_wood_", 5), Volume = 0.15f, Pitch = new Vector2(0.9f, 1.05f), Audible = 10f, MaxAtOnce = 3 });
+        Make(new Spec { Name = "Footstep Water", Clips = Files(oga, "sfx100v2_footstep_wet_01", "sfx100v2_footstep_wet_02", "sfx100v2_footstep_wet_03"), Volume = 0.25f, Pitch = new Vector2(0.9f, 1.1f), Audible = 10f, MaxAtOnce = 3 });
         Make(new Spec { Name = "Land", Clips = Numbered(impact, "impactGeneric_light_", 5), Volume = 0.5f, Pitch = new Vector2(0.7f, 0.85f), Audible = 12f, MaxAtOnce = 1 });
         // World and interface.
         Make(new Spec { Name = "Quest Started", Clips = Files(ui, "maximize_008"), Volume = 0.5f, Positional = false, MaxAtOnce = 1 });
@@ -164,7 +171,8 @@ public static class SoundLibrarySetup
         Slot("dodge", "Dodge");
         Slot("playerHurt", "Player Hurt");
         Slot("outOfStamina", "Out of Stamina");
-        Slot("footstep", "Footstep Dirt");
+        Slot("footstep", "Footstep Forest");
+        Slot("footstepGrass", "Footstep Grass");
         Slot("footstepWood", "Footstep Wood");
         Slot("footstepWater", "Footstep Water");
         Slot("land", "Land");
@@ -181,14 +189,15 @@ public static class SoundLibrarySetup
         Slot("waterLoop", "Stream Loop");
 
         SerializedProperty surfaces = data.FindProperty("footstepSurfaces");
-        if (surfaces.arraySize == 0)
+        if (surfaces.arraySize == 0 || ResetFootstepSurfaces)
         {
             (string words, string sound)[] defaults =
             {
-                ("grass, moss, meadow, forest floor, leaves", "Footstep Grass"),
+                ("grass, meadow, lawn", "Footstep Grass"),
+                ("forest, moss, leaves, needles, soil", "Footstep Forest"),
                 ("snow, frost", "Footstep Snow"),
                 ("stone, rock, cliff, gravel, cobble", "Footstep Stone"),
-                ("dirt, path, soil, mud, sand, ground", "Footstep Dirt"),
+                ("dirt, path, mud, sand, ground", "Footstep Dirt"),
             };
             surfaces.arraySize = defaults.Length;
             for (int i = 0; i < defaults.Length; i++)

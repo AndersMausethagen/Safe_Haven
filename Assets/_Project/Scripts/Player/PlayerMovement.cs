@@ -152,11 +152,11 @@ public sealed class PlayerMovement : MonoBehaviour
         lungeUntil = Time.time + duration;
     }
 
-    /// <summary>Scales movement speed while <paramref name="source"/> asks (guarding, a stun); 1 or clearing removes it.
+    /// <summary>Scales movement speed while <paramref name="source"/> asks (guarding, a stun, heavy gear); 1 removes it.
     /// Several sources multiply.</summary>
     public void SetSpeedScale(object source, float scale)
     {
-        if (scale >= 0.999f)
+        if (Mathf.Abs(scale - 1f) < 0.001f)
         {
             speedScales.Remove(source);
         }

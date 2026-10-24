@@ -196,6 +196,18 @@ public sealed class ItemInventory : MonoBehaviour
             return false;
         }
 
+        // The player stops to eat: it takes a moment, can be interrupted, and heals over time (PlayerEating).
+        if (TryGetComponent(out PlayerEating eating))
+        {
+            if (!eating.Begin(item, from))
+            {
+                GameMessages.Post(eating.IsEating ? "Already eating." : "Not now: you're busy fighting.", MessageKind.Warning);
+                return false;
+            }
+
+            return true;
+        }
+
         from.RemoveAt(slot, 1);
         if (heals)
         {

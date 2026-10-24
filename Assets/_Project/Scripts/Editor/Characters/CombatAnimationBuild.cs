@@ -18,7 +18,7 @@ public static partial class CombatAnimationSetup
     public const string ComboFolder = AttackFolder + "/Combos";
     public const string WeaponFolder = "Assets/_Project/Data/Combat/Weapons";
     public const string SettingsPath = "Assets/_Project/Resources/CombatTechniqueSettings.asset";
-    private const string Ual1Path = "Assets/Quaternius/Universal Animation Library/UAL1_Standard.fbx";
+    private const string Ual1Path = Library1Path;
     private const string ActionSpeed = "ActionSpeed";
     // The first slam of the heavy combo, cut out as its own clip.
     private const string HeavyClip = "Sword_Heavy";
@@ -39,6 +39,9 @@ public static partial class CombatAnimationSetup
         int attacks = BuildAttacksAndWeapons();
         EnsureSettings();
         AddGuardToPlayer();
+        FitDodges();
+        AddShoulderBarge();
+        SetSkillFocusCosts();
         AssetDatabase.SaveAssets();
         Debug.Log($"Combat animations set up: player and monster states, {attacks} attack(s), weapon chains, the player's guard.");
     }
@@ -57,15 +60,14 @@ public static partial class CombatAnimationSetup
         var heavy = new ModelImporterClipAnimation
         {
             name = HeavyClip, takeName = combo.takeName, firstFrame = 0f, lastFrame = Mathf.Round(HeavyClipSeconds * fps),
-            lockRootRotation = true, keepOriginalOrientation = true, lockRootHeightY = true, keepOriginalPositionY = true,
-            lockRootPositionXZ = true, keepOriginalPositionXZ = true,
+            keepOriginalPositionY = true,
         };
         clips.Add(heavy);
         importer.clipAnimations = clips.ToArray();
         importer.SaveAndReimport();
     }
 
-    private static AnimationClip Ual1(string name) => AssetDatabase.LoadAllAssetsAtPath(Ual1Path).OfType<AnimationClip>()
+    public static AnimationClip Ual1(string name) => AssetDatabase.LoadAllAssetsAtPath(Ual1Path).OfType<AnimationClip>()
         .FirstOrDefault(c => c.name == name || c.name == "Armature|" + name);
 
     // ----- Player controller -----
@@ -101,7 +103,43 @@ public static partial class CombatAnimationSetup
             new Action("Punch Cross", Ual1("Punch_Cross")),
             new Action("Punch Hook", ual["Melee_Hook"], "Punch Hook Recover"),
             new Action("Punch Hook Recover", ual["Melee_Hook_Rec"]),
+            new Action("Attack Two Handed", StateClip("Attack Two Handed")),
+            new Action("Attack Polearm", StateClip("Attack Polearm")),
+            new Action("Shield Bash", StateClip("Shield Bash")),
         };
+    }
+
+    public const string FullBodyLayer = "Combat Full Body";
+
+    /// <summary>
+    /// Where in the recovery clip to blend in when a chain swing isn't followed up. Each "_Rec" clip is the whole swing
+    /// plus its return to guard, so it is entered at its own contact plus the time the chain swing has played past its
+    /// contact: the pose matches and the swing isn't played twice.
+    /// </summary>
+    public static float RecoverOffset(AnimationClip swing, AnimationClip recover)
+    {
+        float swingContact = ContactTimes(swing).DefaultIfEmpty(swing.length * 0.5f).First();
+        // The recovery clip's own fastest moment can be the return to guard, so take its contact nearest the swing's.
+        float recoverContact = ContactTimes(recover, HumanBodyBones.RightHand, 4).DefaultIfEmpty(recover.length * 0.3f)
+            .OrderBy(t => Mathf.Abs(t - swingContact)).First();
+        return Mathf.Clamp01((recoverContact + swing.length - swingContact) / recover.length);
+    }
+
+    // A layer with no mask for swings made standing still, so the legs step and the weight shifts with the blow.
+    private static void EnsureFullBodyLayer(AnimatorController controller)
+    {
+        if (controller.layers.Any(l => l.name == FullBodyLayer))
+        {
+            return;
+        }
+
+        var machine = new AnimatorStateMachine { name = FullBodyLayer, hideFlags = HideFlags.HideInHierarchy };
+        AssetDatabase.AddObjectToAsset(machine, controller);
+        machine.AddState("Empty", new Vector3(300f, 0f));
+        controller.AddLayer(new AnimatorControllerLayer
+        {
+            name = FullBodyLayer, defaultWeight = 1f, blendingMode = AnimatorLayerBlendingMode.Override, stateMachine = machine,
+        });
     }
 
     public static void BuildPlayerController()
@@ -111,12 +149,14 @@ public static partial class CombatAnimationSetup
         Parameter(controller, ActionSpeed, AnimatorControllerParameterType.Float, 1f);
         Parameter(controller, "Guarding", AnimatorControllerParameterType.Bool, 0f);
         Parameter(controller, "HasShield", AnimatorControllerParameterType.Bool, 0f);
+        List<Action> actions = PlayerActions();
+        EnsureFullBodyLayer(controller);
 
-        foreach (AnimatorControllerLayer layer in controller.layers.Where(l => l.name == "Upper Body" || l.name == "Attack Arms"))
+        foreach (AnimatorControllerLayer layer in controller.layers.Where(l => l.name == "Upper Body" || l.name == "Attack Arms" || l.name == FullBodyLayer))
         {
             AnimatorStateMachine machine = layer.stateMachine;
             int row = 0;
-            foreach (Action action in PlayerActions())
+            foreach (Action action in actions)
             {
                 if (action.Clip == null)
                 {
@@ -128,7 +168,13 @@ public static partial class CombatAnimationSetup
                 state.speedParameterActive = true;
                 state.speedParameter = ActionSpeed;
                 ClearTransitions(state);
-                Exit(state, Find(machine, action.Then), 1f, 0.12f);
+                Action then = actions.FirstOrDefault(a => a.State == action.Then);
+                float offset = then.Clip is AnimationClip recover && action.Clip is AnimationClip swing ? RecoverOffset(swing, recover) : 0f;
+                AnimatorStateTransition exit = Exit(state, Find(machine, action.Then), 1f, 0.12f);
+                if (exit != null)
+                {
+                    exit.offset = offset;
+                }
             }
 
             // The older single attacks are crossfaded into by name too, so they follow the attack's speed.
@@ -142,12 +188,28 @@ public static partial class CombatAnimationSetup
                 }
             }
 
+            if (layer.name == FullBodyLayer)
+            {
+                // The dodges, one per gear weight (PlayerMovementSettings > Equipment load).
+                foreach ((string name, AnimationClip clip) in DodgeClips())
+                {
+                    AnimatorState dodge = State(machine, name, clip, new Vector3(1200f, 60f * row++));
+                    dodge.speedParameterActive = true;
+                    dodge.speedParameter = ActionSpeed;
+                    ClearTransitions(dodge);
+                    Exit(dodge, Find(machine, "Empty"), 0.92f, 0.15f);
+                }
+            }
+
             if (layer.name != "Upper Body")
             {
                 continue;
             }
 
             AnimatorState empty = Find(machine, "Empty");
+            AnimatorState consume = State(machine, "Consume", ual["Consume"], new Vector3(1200f, 300f));
+            ClearTransitions(consume);
+            Exit(consume, empty, 0.95f, 0.2f);
             AnimatorState guard = State(machine, "Guard", ual["Sword_Block"], new Vector3(1200f, 0f));
             AnimatorState guardShield = State(machine, "Guard Shield", ual["Idle_Shield_Loop"], new Vector3(1200f, 60f));
             AnimatorState parry = State(machine, "Parry", ual["Shield_OneShot"], new Vector3(1200f, 120f));
@@ -238,11 +300,11 @@ public static partial class CombatAnimationSetup
         }
     }
 
-    private static void Exit(AnimatorState from, AnimatorState to, float exitTime, float duration, params (string name, bool value)[] conditions)
+    private static AnimatorStateTransition Exit(AnimatorState from, AnimatorState to, float exitTime, float duration, params (string name, bool value)[] conditions)
     {
         if (to == null)
         {
-            return;
+            return null;
         }
 
         AnimatorStateTransition transition = from.AddTransition(to);
@@ -254,6 +316,8 @@ public static partial class CombatAnimationSetup
         {
             transition.AddCondition(value ? AnimatorConditionMode.If : AnimatorConditionMode.IfNot, 0f, name);
         }
+
+        return transition;
     }
 
     private static void When(AnimatorState from, AnimatorState to, float duration, params (string name, bool value)[] conditions)
@@ -277,8 +341,9 @@ public static partial class CombatAnimationSetup
         public string Template;
         public string State;
         public Motion Clip;
-        // Slower than the clips as authored: combat is deliberate, and every swing has weight.
-        public float Speed = 0.88f;
+        // Wind-ups slower than the clips as authored, so the blow is seen coming; the strike keeps the clip's snap.
+        public float Speed = 0.75f;
+        public float FollowThrough = 1f;
         // Seconds after the contact the next swing may start; below 0 the clip's end (light chain swings).
         public float RecoverAfterContact = -1f;
         public float Ratio = 1f;
@@ -294,6 +359,46 @@ public static partial class CombatAnimationSetup
     private static Motion StateClip(string state) =>
         AssetDatabase.LoadAssetAtPath<AnimatorController>(PlayerControllerPath).layers.SelectMany(l => l.stateMachine.states)
             .Select(s => s.state).FirstOrDefault(s => s.name == state)?.motion;
+
+    private static (string, AnimationClip)[] DodgeClips()
+    {
+        Dictionary<string, AnimationClip> ual = Clips();
+        return new[] { ("Quickstep", ual["NinjaJump_Land"]), ("Roll", Ual1("Roll")), ("Heavy Roll", ual["Shield_Dash"]) };
+    }
+
+    // A roll that reads as a roll: half a second, not a blink.
+    private const float DodgeSeconds = 0.5f;
+
+    // How much of each dodge clip is the dodge itself (the rest is getting back up), to fit it to the dash's time.
+    private static readonly Dictionary<string, float> DodgeShare = new Dictionary<string, float>
+    {
+        ["Quickstep"] = 0.45f, ["Roll"] = 0.6f, ["Heavy Roll"] = 0.5f,
+    };
+
+    /// <summary>Fits the dodge animations to the dodges (speed so the clip's dodge part lasts the dash), and makes the dodge
+    /// itself a deliberate roll rather than a blink. Returns a line per style.</summary>
+    public static string FitDodges()
+    {
+        var settings = AssetDatabase.LoadAssetAtPath<PlayerMovementSettings>("Assets/_Project/Data/Player/PlayerMovementSettings.asset");
+        var data = new SerializedObject(settings);
+        data.FindProperty("dodgeDistance").floatValue = 3.2f;
+        data.FindProperty("dodgeDuration").floatValue = DodgeSeconds;
+        data.FindProperty("dodgeInvulnerability").floatValue = 0.3f;
+        var report = new List<string>();
+        foreach ((string state, AnimationClip clip) in DodgeClips())
+        {
+            string field = state == "Quickstep" ? "quickstep" : state == "Roll" ? "roll" : "heavyRoll";
+            SerializedProperty shape = data.FindProperty(field);
+            float duration = DodgeSeconds * shape.FindPropertyRelative("duration").floatValue;
+            float speed = Mathf.Clamp(clip.length * DodgeShare[state] / duration, 0.6f, 2.5f);
+            shape.FindPropertyRelative("animationState").stringValue = state;
+            shape.FindPropertyRelative("animationSpeed").floatValue = speed;
+            report.Add($"{state} {duration:0.00}s x{speed:0.00}");
+        }
+
+        data.ApplyModifiedPropertiesWithoutUndo();
+        return string.Join(", ", report);
+    }
 
     public static int BuildAttacksAndWeapons()
     {
@@ -355,13 +460,15 @@ public static partial class CombatAnimationSetup
         var clip = spec.Clip as AnimationClip;
         float contact = clip != null ? ContactTimes(clip, spec.Hand).DefaultIfEmpty(0.3f).First() : 0.3f;
         float length = clip != null ? clip.length : 0.6f;
+        // The wind-up plays at the attack's speed, the strike after the hit at its own (FollowThrough).
         float hitDelay = contact / spec.Speed;
-        float recovery = spec.RecoverAfterContact >= 0f ? hitDelay + spec.RecoverAfterContact : length / spec.Speed;
+        float recovery = spec.RecoverAfterContact >= 0f ? hitDelay + spec.RecoverAfterContact : hitDelay + (length - contact) / spec.FollowThrough;
         var data = new SerializedObject(attack);
         data.FindProperty("hitDelay").floatValue = hitDelay;
         data.FindProperty("recoveryTime").floatValue = Mathf.Max(recovery, hitDelay + 0.05f);
         data.FindProperty("animationState").stringValue = spec.State;
         data.FindProperty("animationSpeed").floatValue = spec.Speed;
+        data.FindProperty("followThroughSpeed").floatValue = spec.FollowThrough;
         if (created || data.FindProperty("poiseDamage").floatValue == 10f && spec.Poise != 10f)
         {
             data.FindProperty("poiseDamage").floatValue = spec.Poise;
@@ -410,6 +517,70 @@ public static partial class CombatAnimationSetup
         data.ApplyModifiedPropertiesWithoutUndo();
     }
 
+    // The heavy roll's barge: a shove with no weapon behind it that knocks poise out of what it reaches.
+    private static void AddShoulderBarge()
+    {
+        string path = ComboFolder + "/Shoulder Barge.asset";
+        var barge = AssetDatabase.LoadAssetAtPath<AttackDefinition>(path);
+        if (barge == null)
+        {
+            barge = ScriptableObject.CreateInstance<AttackDefinition>();
+            AssetDatabase.CreateAsset(barge, path);
+            var data = new SerializedObject(barge);
+            data.FindProperty("displayName").stringValue = "Shoulder Barge";
+            data.FindProperty("baseDamage").floatValue = 6f;
+            data.FindProperty("weaponDamageRatio").floatValue = 0f;
+            data.FindProperty("range").floatValue = 1.7f;
+            data.FindProperty("arc").floatValue = 120f;
+            data.FindProperty("maxTargets").intValue = 3;
+            data.FindProperty("hitDelay").floatValue = 0f;
+            data.FindProperty("recoveryTime").floatValue = 0.1f;
+            data.FindProperty("poiseDamage").floatValue = 30f;
+            data.FindProperty("canCrit").boolValue = false;
+            data.FindProperty("slashColor").colorValue = Color.clear;
+            data.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        GameObject root = PrefabUtility.LoadPrefabContents(PlayerPrefabPath);
+        try
+        {
+            var dodge = new SerializedObject(root.GetComponent<PlayerDodge>());
+            if (dodge.FindProperty("shoulderBarge").objectReferenceValue == null)
+            {
+                dodge.FindProperty("shoulderBarge").objectReferenceValue = barge;
+                dodge.ApplyModifiedPropertiesWithoutUndo();
+                PrefabUtility.SaveAsPrefabAsset(root, PlayerPrefabPath);
+            }
+        }
+        finally
+        {
+            PrefabUtility.UnloadPrefabContents(root);
+        }
+    }
+
+    // Skills are paid with Focus, earned by fighting well; the stronger the skill, the more it takes. Only skills that
+    // have no cost yet are set.
+    private static void SetSkillFocusCosts()
+    {
+        var costs = new Dictionary<string, float>
+        {
+            ["WolfsLunge"] = 25f, ["WhirlingSteel"] = 40f, ["AshladsEmber"] = 35f, ["FrostRune"] = 35f,
+            ["TrollsbaneWrath"] = 60f, ["HuldrasBlessing"] = 30f,
+        };
+        foreach (string guid in AssetDatabase.FindAssets("t:SkillDefinition"))
+        {
+            var skill = AssetDatabase.LoadAssetAtPath<SkillDefinition>(AssetDatabase.GUIDToAssetPath(guid));
+            if (skill == null || skill.FocusCost > 0f || !costs.TryGetValue(skill.name, out float cost))
+            {
+                continue;
+            }
+
+            var data = new SerializedObject(skill);
+            data.FindProperty("focusCost").floatValue = cost;
+            data.ApplyModifiedPropertiesWithoutUndo();
+        }
+    }
+
     private static void EnsureSettings()
     {
         if (AssetDatabase.LoadAssetAtPath<CombatTechniqueSettings>(SettingsPath) == null)
@@ -423,9 +594,27 @@ public static partial class CombatAnimationSetup
         GameObject root = PrefabUtility.LoadPrefabContents(PlayerPrefabPath);
         try
         {
+            bool changed = false;
             if (root.GetComponent<PlayerGuard>() == null)
             {
                 root.AddComponent<PlayerGuard>();
+                changed = true;
+            }
+
+            if (root.GetComponent<PlayerFocus>() == null)
+            {
+                root.AddComponent<PlayerFocus>();
+                changed = true;
+            }
+
+            if (root.GetComponent<PlayerEating>() == null)
+            {
+                root.AddComponent<PlayerEating>();
+                changed = true;
+            }
+
+            if (changed)
+            {
                 PrefabUtility.SaveAsPrefabAsset(root, PlayerPrefabPath);
             }
         }

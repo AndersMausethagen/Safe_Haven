@@ -14,16 +14,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::SoundDefinition
   displayName: Footstep Grass
   clips:
-  - {fileID: 8300000, guid: e4b39905f79031642b53c84a5b77982c, type: 3}
-  - {fileID: 8300000, guid: 796d86f381c56d74ba8b51e124dae13a, type: 3}
-  - {fileID: 8300000, guid: b8a5ae3af1c6c244d8e143f24a33bcd0, type: 3}
-  - {fileID: 8300000, guid: 68f39895dc173024d83e0c0f77e48745, type: 3}
-  - {fileID: 8300000, guid: 2437eb2d2faea564495ea6bfd84e5ec9, type: 3}
+  - {fileID: 8300000, guid: 27ca13535e17bac4e8b4350291bf5722, type: 3}
+  - {fileID: 8300000, guid: df2700ad8f520984fb40acdb9eccac89, type: 3}
+  - {fileID: 8300000, guid: 9b02badc855244646ac84de28d2f5d26, type: 3}
+  - {fileID: 8300000, guid: 3c7daacb078e615459ab0caef64d2760, type: 3}
+  - {fileID: 8300000, guid: 0b6940536d3b8a1448a4ed79631d3477, type: 3}
+  - {fileID: 8300000, guid: 1f0e6394252b49c46aaffbd54381ee44, type: 3}
+  - {fileID: 8300000, guid: 83d079ee297a2cb43895ca9ab899fe44, type: 3}
+  - {fileID: 8300000, guid: 3797ccc22a0bcdc4b80b6892bdc7675d, type: 3}
   channel: 2
-  volume: 0.35
+  volume: 0.3
   volumeVariation: 0.1
-  pitchRange: {x: 0.9, y: 1.1}
+  pitchRange: {x: 0.92, y: 1.08}
   positional: 1
   fullVolumeDistance: 3
-  audibleDistance: 12
+  audibleDistance: 10
   maxAtOnce: 3

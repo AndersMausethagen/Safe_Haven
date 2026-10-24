@@ -14,21 +14,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::SoundDefinition
   displayName: Footstep Dirt
   clips:
-  - {fileID: 8300000, guid: 5a431c752eb29784b8b4e4eb475b45d0, type: 3}
-  - {fileID: 8300000, guid: 6d5e56738bd3b424ebd828dcf4a0f532, type: 3}
-  - {fileID: 8300000, guid: 7b0f0e5042d89164aa532a71da8aa1ba, type: 3}
-  - {fileID: 8300000, guid: 164f31b365ce06747aa8501ae301b561, type: 3}
-  - {fileID: 8300000, guid: 44874226f0f2e9f44acfc9ad44c20df5, type: 3}
-  - {fileID: 8300000, guid: 45c89f446d6ade94e9704e11b7cb5e53, type: 3}
-  - {fileID: 8300000, guid: e68db7b29eb051348b8dc9411cb3aa77, type: 3}
-  - {fileID: 8300000, guid: 3f1abdc0d8b12f248a92383a3d6793ba, type: 3}
-  - {fileID: 8300000, guid: 827720979751b0141abd002678310dc7, type: 3}
-  - {fileID: 8300000, guid: 3a213615530b60a459b9cd0c42111a8d, type: 3}
+  - {fileID: 8300000, guid: cbdd1cfdadbbd4147bb9c20421d38018, type: 3}
+  - {fileID: 8300000, guid: 2a313a40ff7d743458f12f862971214a, type: 3}
+  - {fileID: 8300000, guid: b42b491bb2b4f0a4786bb7dd189a5e98, type: 3}
+  - {fileID: 8300000, guid: 0c1fcb7a0bd4d374bb52bb1d96cd3d3d, type: 3}
+  - {fileID: 8300000, guid: a0157ed9546d9b64fb4c80ad6b1e9604, type: 3}
+  - {fileID: 8300000, guid: 59ce622f8b37a024093105e77511c465, type: 3}
+  - {fileID: 8300000, guid: f3c034f658f69e842b5f2102216927fb, type: 3}
+  - {fileID: 8300000, guid: b595c56e400174a4081d76d1d3e52fcc, type: 3}
   channel: 2
-  volume: 0.35
+  volume: 0.3
   volumeVariation: 0.1
-  pitchRange: {x: 0.9, y: 1.1}
+  pitchRange: {x: 0.92, y: 1.08}
   positional: 1
   fullVolumeDistance: 3
-  audibleDistance: 12
+  audibleDistance: 10
   maxAtOnce: 3

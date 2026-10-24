@@ -68,6 +68,10 @@ public sealed class AudioSettingsDefinition : ScriptableObject
     [SerializeField] private List<SurfaceSound> footstepSurfaces = new List<SurfaceSound>();
     [Tooltip("Steps on anything else: terrain no word matches, rocks, floors.")]
     [SerializeField] private SoundDefinition footstep;
+    [Tooltip("Steps where grass and plants grow on the terrain (detail cover), whatever the ground layer is.")]
+    [SerializeField] private SoundDefinition footstepGrass;
+    [Tooltip("Grass and plant instances in a terrain detail cell needed for grass steps.")]
+    [SerializeField, Min(1)] private int grassForGrassSteps = 2;
     [Tooltip("Steps on buildings and other non-terrain ground with a wooden look.")]
     [SerializeField] private SoundDefinition footstepWood;
     [Tooltip("Steps in water.")]
@@ -147,6 +151,8 @@ public sealed class AudioSettingsDefinition : ScriptableObject
     public SoundDefinition PlayerHurt => playerHurt;
     public SoundDefinition OutOfStamina => outOfStamina;
     public SoundDefinition Footstep => footstep;
+    public SoundDefinition FootstepGrass => footstepGrass;
+    public int GrassForGrassSteps => grassForGrassSteps;
     public SoundDefinition FootstepWood => footstepWood;
     public SoundDefinition FootstepWater => footstepWater;
     public SoundDefinition Land => land;

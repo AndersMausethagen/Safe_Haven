@@ -52,8 +52,11 @@ public sealed class AttackDefinition : ScriptableObject
     [Tooltip("Animator state the swing plays, by name (Safe Haven › Characters › Set Up Combat Animations makes them). " +
              "Empty uses the weapon stance's old attack animation.")]
     [SerializeField] private string animationState;
-    [Tooltip("Playback speed of that animation, so its swing lines up with Hit Delay.")]
+    [Tooltip("Playback speed of the wind-up, up to the moment it hits (Hit Delay follows it). Below 1 the wind-up reads more " +
+             "clearly: you see the blow coming.")]
     [SerializeField, Range(0.25f, 3f)] private float animationSpeed = 1f;
+    [Tooltip("Playback speed from the hit on: the strike and its follow-through. 1 keeps the clip's own snap.")]
+    [SerializeField, Range(0.25f, 3f)] private float followThroughSpeed = 1f;
 
     [Header("Sound and Effects")]
     [Tooltip("Plays as the swing starts. Empty uses the weapon's, then the game-wide swing sound.")]
@@ -80,6 +83,7 @@ public sealed class AttackDefinition : ScriptableObject
     public float StaminaCost => staminaCost;
     public string AnimationState => animationState;
     public float AnimationSpeed => animationSpeed;
+    public float FollowThroughSpeed => followThroughSpeed;
     public SoundDefinition SwingSound => swingSound;
     public SoundDefinition HitSound => hitSound;
     public Color SlashColor => slashColor;

@@ -24,6 +24,7 @@ public sealed class PlayerGuard : MonoBehaviour, IHitGuard
     private PlayerCombat combat;
     private PlayerStamina stamina;
     private PlayerDodge dodge;
+    private PlayerEating eating;
     private bool held;
     private float raisedAt = float.NegativeInfinity;
     private float loweredAt = float.NegativeInfinity;
@@ -56,6 +57,7 @@ public sealed class PlayerGuard : MonoBehaviour, IHitGuard
         combat = GetComponent<PlayerCombat>();
         stamina = GetComponent<PlayerStamina>();
         dodge = GetComponent<PlayerDodge>();
+        eating = GetComponent<PlayerEating>();
     }
 
     private void OnEnable()
@@ -89,7 +91,8 @@ public sealed class PlayerGuard : MonoBehaviour, IHitGuard
     {
         bool stunned = IsStunned;
         bool canRaise = !stunned && stateMachine.CanMove && (dodge == null || !dodge.IsDodging)
-                        && (combat == null || combat.CanGuard) && Time.time - loweredAt >= Rules.GuardRelock;
+                        && (combat == null || combat.CanGuard) && (eating == null || !eating.IsEating)
+                        && Time.time - loweredAt >= Rules.GuardRelock;
         if (held && !IsGuarding && canRaise)
         {
             combat?.CancelRecovery();

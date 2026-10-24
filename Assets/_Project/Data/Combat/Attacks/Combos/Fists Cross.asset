@@ -22,13 +22,14 @@ MonoBehaviour:
   range: 1.6
   arc: 90
   maxTargets: 3
-  hitDelay: 0.22727273
-  recoveryTime: 0.47727275
+  hitDelay: 0.26666668
+  recoveryTime: 0.51666665
   poiseDamage: 8
   lunge: 0.4
   staminaCost: -1
   animationState: Punch Cross
-  animationSpeed: 0.88
+  animationSpeed: 0.75
+  followThroughSpeed: 1
   swingSound: {fileID: 0}
   hitSound: {fileID: 0}
   slashColor: {r: 1, g: 0.95, b: 0.85, a: 0.75}

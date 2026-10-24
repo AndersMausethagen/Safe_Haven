@@ -16,9 +16,9 @@ MonoBehaviour:
   gravity: -9.81
   groundedVerticalVelocity: -2
   turnSpeed: 720
-  dodgeDistance: 3
-  dodgeDuration: 0.18
-  dodgeInvulnerability: 0.28
+  dodgeDistance: 3.2
+  dodgeDuration: 0.5
+  dodgeInvulnerability: 0.3
   dodgeCooldown: 2
   stateModifiers:
   - state: 0
@@ -29,3 +29,32 @@ MonoBehaviour:
     speedMultiplier: 1
     turnSpeedMultiplier: 1
     faceCursor: 1
+  lightLoad: 6
+  heavyLoad: 13
+  quickstep:
+    distance: 0.6
+    duration: 0.65
+    invulnerability: 0.8
+    stamina: 0.6
+    cooldown: 0.8
+    moveSpeed: 1.05
+    animationState: Quickstep
+    animationSpeed: 1.7538463
+  roll:
+    distance: 1
+    duration: 1
+    invulnerability: 1
+    stamina: 1
+    cooldown: 1
+    moveSpeed: 1
+    animationState: Roll
+    animationSpeed: 1.7600001
+  heavyRoll:
+    distance: 0.85
+    duration: 1.35
+    invulnerability: 0.9
+    stamina: 1.4
+    cooldown: 1.25
+    moveSpeed: 0.9
+    animationState: Heavy Roll
+    animationSpeed: 0.8148148

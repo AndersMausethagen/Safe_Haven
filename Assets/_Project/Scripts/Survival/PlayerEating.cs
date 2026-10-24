@@ -1,0 +1,174 @@
+using System;
+using UnityEngine;
+
+/// <summary>
+/// Eating and drinking take time and attention: the player stops to eat (slowed, unable to attack or guard) for a moment,
+/// and only then is the food used up; its healing then arrives over several seconds rather than at once. A hit that gets
+/// through or a dodge stops the meal, and the food is kept. Healing in a fight is a decision, not a button. Rules are in
+/// <see cref="CombatTechniqueSettings"/> (Eating and drinking); ItemInventory.Use sends food and drink here.
+/// </summary>
+[RequireComponent(typeof(Damageable))]
+public sealed class PlayerEating : MonoBehaviour
+{
+    private Damageable health;
+    private PlayerMovement movement;
+    private PlayerNeeds needs;
+    private PlayerDodge dodge;
+    private PlayerCombat combat;
+    private PlayerGuard guard;
+    private ItemDefinition eating;
+    private ItemContainer from;
+    private float doneAt;
+    private float healLeft;
+    private float healPerSecond;
+
+    public bool IsEating => eating != null;
+
+    /// <summary>The meal being eaten, or null.</summary>
+    public ItemDefinition Meal => eating;
+
+    /// <summary>Health still to come from meals already eaten.</summary>
+    public float HealingToCome => healLeft;
+
+    /// <summary>Raised when a meal starts (animation plays here).</summary>
+    public event Action<ItemDefinition> Started;
+
+    /// <summary>Raised when a meal ends: true when eaten, false when interrupted (the food is kept).</summary>
+    public event Action<ItemDefinition, bool> Ended;
+
+    private CombatTechniqueSettings Rules => CombatTechniqueSettings.Current;
+
+    private void Awake()
+    {
+        health = GetComponent<Damageable>();
+        movement = GetComponent<PlayerMovement>();
+        needs = GetComponent<PlayerNeeds>();
+        dodge = GetComponent<PlayerDodge>();
+        combat = GetComponent<PlayerCombat>();
+        guard = GetComponent<PlayerGuard>();
+    }
+
+    private void OnEnable()
+    {
+        health.Damaged += OnDamaged;
+        if (dodge != null)
+        {
+            dodge.Dodged += OnDodged;
+        }
+    }
+
+    private void OnDisable()
+    {
+        health.Damaged -= OnDamaged;
+        if (dodge != null)
+        {
+            dodge.Dodged -= OnDodged;
+        }
+
+        Stop(false);
+    }
+
+    /// <summary>Starts eating <paramref name="item"/> from <paramref name="container"/>. False while busy (eating already,
+    /// swinging, guarding, dodging or reeling).</summary>
+    public bool Begin(ItemDefinition item, ItemContainer container)
+    {
+        if (item == null || container == null || IsEating || !health.IsAlive
+            || (combat != null && (combat.IsAttacking || combat.IsFlinching))
+            || (guard != null && (guard.IsGuarding || guard.IsStunned))
+            || (dodge != null && dodge.IsDodging))
+        {
+            return false;
+        }
+
+        eating = item;
+        from = container;
+        doneAt = Time.time + Rules.EatSeconds;
+        movement?.SetSpeedScale(this, Rules.EatMoveSpeed);
+        Started?.Invoke(item);
+        return true;
+    }
+
+    private void Update()
+    {
+        if (IsEating && Time.time >= doneAt)
+        {
+            Finish();
+        }
+
+        if (healLeft > 0f && health.IsAlive)
+        {
+            float amount = Mathf.Min(healLeft, healPerSecond * Time.deltaTime);
+            healLeft -= amount;
+            health.Heal(amount);
+        }
+    }
+
+    private void Finish()
+    {
+        ItemDefinition item = eating;
+        if (from.Remove(item, 1) <= 0)
+        {
+            Stop(false); // it left the bag while being eaten
+            return;
+        }
+
+        if (needs != null && (item.HungerRestore > 0f || item.ThirstRestore > 0f))
+        {
+            needs.TryConsume(item.DisplayName, item.HungerRestore, item.ThirstRestore);
+        }
+
+        if (item.HealAmount > 0f)
+        {
+            float seconds = Mathf.Max(0.01f, Rules.HealOverSeconds);
+            healLeft += item.HealAmount;
+            healPerSecond = Mathf.Max(healPerSecond, item.HealAmount / seconds);
+            if (Rules.HealOverSeconds <= 0f)
+            {
+                health.Heal(healLeft);
+                healLeft = 0f;
+            }
+
+            GameMessages.Post($"{item.DisplayName}: +{Mathf.RoundToInt(item.HealAmount)} health over {Rules.HealOverSeconds:0} s", MessageKind.Gain);
+        }
+
+        GameEvents.Raise(new GameEvent(GameEventKind.Consumed, item, 1, gameObject));
+        Stop(true);
+    }
+
+    // Only a hit that gets through stops the meal; blocked and parried ones don't reach here.
+    private void OnDamaged(DamageInfo damage, DamageResult result)
+    {
+        if (IsEating && result.Damage > 0f && !result.Blocked)
+        {
+            GameMessages.Post($"Stopped eating the {eating.DisplayName}.", MessageKind.Warning);
+            Stop(false);
+        }
+    }
+
+    private void OnDodged(Vector3 direction)
+    {
+        if (IsEating)
+        {
+            Stop(false);
+        }
+    }
+
+    private void Stop(bool eaten)
+    {
+        if (!IsEating)
+        {
+            return;
+        }
+
+        ItemDefinition item = eating;
+        eating = null;
+        from = null;
+        if (healLeft <= 0f)
+        {
+            healPerSecond = 0f;
+        }
+
+        movement?.SetSpeedScale(this, 1f);
+        Ended?.Invoke(item, eaten);
+    }
+}

@@ -604,8 +604,10 @@ public sealed class SoundEditorWindow : EditorWindow
                 SoundField(data.FindProperty(field), label);
             }
 
-            Group("Footsteps", "Terrain steps follow the ground layer's name; the first surface whose words match wins.");
+            Group("Footsteps", "Steps follow the feet in the animation. Where grass grows the grass step plays; otherwise terrain steps follow the ground layer's name (first matching surface wins).");
             EditorGUILayout.PropertyField(data.FindProperty("footstepSurfaces"), new GUIContent("Surfaces"), true);
+            SoundField(data.FindProperty("footstepGrass"), "Where grass grows");
+            Field(data, "grassForGrassSteps", "Grass needed for grass steps");
             SoundField(data.FindProperty("footstep"), "Anything else");
             SoundField(data.FindProperty("footstepWood"), "Buildings");
             SoundField(data.FindProperty("footstepWater"), "In water");
