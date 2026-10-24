@@ -64,6 +64,7 @@ public sealed class PrefabTools
         }
 
         instance.transform.position = position;
+        GroundPlacement.Drop(instance.transform, false); // by the bottom of its meshes, not its pivot
         Undo.RegisterCreatedObjectUndo(instance, "Place " + prefab.name);
         Selection.activeGameObject = instance;
         if (view != null)

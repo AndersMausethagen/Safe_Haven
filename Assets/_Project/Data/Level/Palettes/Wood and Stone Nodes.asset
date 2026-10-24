@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b302529a90cd5d4eb925e50af633cad, type: 3}
+  m_Name: Wood and Stone Nodes
+  m_EditorClassIdentifier: SafeHaven.Editor::ScatterPalette
+  entries:
+  - prefab: {fileID: 948381022197778722, guid: 15b33c21de24fb7418664d30fe242c26, type: 3}
+    weight: 1
+    scale: {x: 0.85, y: 1.2}
+    alignToSlope: 0.1
+    sink: 0.05
+    randomYaw: 1
+  - prefab: {fileID: 6732680956308883498, guid: c7daa8f2fb6ef9c4a945c9f5c8b89e3b, type: 3}
+    weight: 1
+    scale: {x: 0.85, y: 1.2}
+    alignToSlope: 0.4
+    sink: 0.05
+    randomYaw: 1
+  - prefab: {fileID: 2009929089532973240, guid: e4175e4dc8cc5b847b691d128a9786aa, type: 3}
+    weight: 0.3
+    scale: {x: 0.85, y: 1.2}
+    alignToSlope: 0.1
+    sink: 0.05
+    randomYaw: 1
+  - prefab: {fileID: 8682228126172116304, guid: 3e31e979ada082348a0ae00bacfea168, type: 3}
+    weight: 0.3
+    scale: {x: 0.85, y: 1.2}
+    alignToSlope: 0.4
+    sink: 0.05
+    randomYaw: 1
+  spacing: 5

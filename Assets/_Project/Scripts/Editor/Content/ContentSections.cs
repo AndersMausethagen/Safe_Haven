@@ -1023,6 +1023,12 @@ public sealed class PrefabBrowserSection : ContentSection
                     PrefabTools.PlaceInScene(prefab);
                     GUIUtility.ExitGUI();
                 }
+
+                if (GUILayout.Button(new GUIContent("Paint with Scatter Brush", "Paint many of it over the ground in the Scene view")))
+                {
+                    ScatterBrush.OpenWith(prefab);
+                    GUIUtility.ExitGUI();
+                }
             }
         }
 

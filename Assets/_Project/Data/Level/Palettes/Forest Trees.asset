@@ -1,0 +1,52 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b302529a90cd5d4eb925e50af633cad, type: 3}
+  m_Name: Forest Trees
+  m_EditorClassIdentifier: SafeHaven.Editor::ScatterPalette
+  entries:
+  - prefab: {fileID: 9018092729994154052, guid: cbf6b224eae263a4fa0da9382fc0378e, type: 3}
+    weight: 1
+    scale: {x: 0.85, y: 1.2}
+    alignToSlope: 0.15
+    sink: 0.05
+    randomYaw: 1
+  - prefab: {fileID: 3842251888249152184, guid: 2a40a933c2bca86468ea2d582e91b1d4, type: 3}
+    weight: 1
+    scale: {x: 0.85, y: 1.2}
+    alignToSlope: 0.15
+    sink: 0.05
+    randomYaw: 1
+  - prefab: {fileID: 392566255979189769, guid: 001a5ac1ad512f84bade5542eef701c4, type: 3}
+    weight: 1
+    scale: {x: 0.85, y: 1.2}
+    alignToSlope: 0.15
+    sink: 0.05
+    randomYaw: 1
+  - prefab: {fileID: 1666386914703650363, guid: 541018515c094c040b18fd701beafa98, type: 3}
+    weight: 0.8
+    scale: {x: 0.85, y: 1.2}
+    alignToSlope: 0.15
+    sink: 0.05
+    randomYaw: 1
+  - prefab: {fileID: 6115765233837260235, guid: 5af76f63208fa8341b16d39bc62e6117, type: 3}
+    weight: 0.25
+    scale: {x: 0.85, y: 1.2}
+    alignToSlope: 0.15
+    sink: 0.05
+    randomYaw: 1
+  - prefab: {fileID: 8962447782804038261, guid: 8068e63c19e557943b162b67081918e2, type: 3}
+    weight: 0.5
+    scale: {x: 0.85, y: 1.2}
+    alignToSlope: 0.1
+    sink: 0.05
+    randomYaw: 1
+  spacing: 4
