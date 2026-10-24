@@ -36,6 +36,23 @@ public sealed class PlayerAnimationController : MonoBehaviour
     private static readonly int HitHash = Animator.StringToHash("Hit");
     private static readonly int DeadHash = Animator.StringToHash("Dead");
 
+    // Combat actions are played by crossfading into states by name (the attack's Animation State), so the swing starts
+    // exactly when the gameplay swing does; ActionSpeed scales them to the swing's speed.
+    private static readonly int ActionSpeedHash = Animator.StringToHash("ActionSpeed");
+    private static readonly int GuardingHash = Animator.StringToHash("Guarding");
+    private static readonly int HasShieldHash = Animator.StringToHash("HasShield");
+    private static readonly int EmptyStateHash = Animator.StringToHash("Empty");
+    private static readonly int GuardStateHash = Animator.StringToHash("Guard");
+    private static readonly int GuardShieldStateHash = Animator.StringToHash("Guard Shield");
+    private static readonly int ParryStateHash = Animator.StringToHash("Parry");
+    private static readonly int GuardBreakStateHash = Animator.StringToHash("Guard Break");
+    private static readonly int KnockbackStateHash = Animator.StringToHash("Knockback");
+    private const float ActionFade = 0.06f;
+    // Moving faster than this, swings play on the arms only so the legs keep running.
+    private const float ArmsOnlySpeed = 0.5f;
+    // A hit worth this share of max health knocks the player back instead of a flinch.
+    private const float KnockbackShare = 0.2f;
+
     // Equipment.
     private static readonly int WeaponStanceHash = Animator.StringToHash("WeaponStance");
     private static readonly int CarryHash = Animator.StringToHash("Carry");
@@ -66,6 +83,9 @@ public sealed class PlayerAnimationController : MonoBehaviour
     private Damageable health;
     private PlayerDodge dodge;
     private PlayerSkills skills;
+    private PlayerGuard guard;
+    private int upperBodyLayer = -1;
+    private int attackArmsLayer = -1;
     private GameStateManager gameState;
     private HashSet<int> parameters;
     private float airborneTime;
@@ -111,6 +131,7 @@ public sealed class PlayerAnimationController : MonoBehaviour
         health = GetComponent<Damageable>();
         dodge = GetComponent<PlayerDodge>();
         skills = GetComponent<PlayerSkills>();
+        guard = GetComponent<PlayerGuard>();
         animator = animator != null ? animator : GetComponentInChildren<Animator>();
 
         if (animator == null)
@@ -121,6 +142,8 @@ public sealed class PlayerAnimationController : MonoBehaviour
         }
 
         CacheParameters();
+        upperBodyLayer = animator.GetLayerIndex("Upper Body");
+        attackArmsLayer = animator.GetLayerIndex("Attack Arms");
     }
 
     private void OnEnable()
@@ -135,8 +158,7 @@ public sealed class PlayerAnimationController : MonoBehaviour
         ApplyEquipment();
         if (combat != null)
         {
-            combat.AttackPerformed += PlayAttack;
-            combat.ShieldBashPerformed += PlayShieldBash;
+            combat.SwingStarted += OnSwingStarted;
             combat.WeaponChanged += OnWeaponChanged;
         }
 
@@ -165,6 +187,13 @@ public sealed class PlayerAnimationController : MonoBehaviour
             skills.SkillCast += OnSkillCast;
         }
 
+        if (guard != null)
+        {
+            guard.GuardChanged += OnGuardChanged;
+            guard.Parried += OnParried;
+            guard.Broken += OnGuardBroken;
+        }
+
         gameState = GameStateManager.Instance;
         if (gameState == null)
         {
@@ -179,8 +208,7 @@ public sealed class PlayerAnimationController : MonoBehaviour
     {
         if (combat != null)
         {
-            combat.AttackPerformed -= PlayAttack;
-            combat.ShieldBashPerformed -= PlayShieldBash;
+            combat.SwingStarted -= OnSwingStarted;
             combat.WeaponChanged -= OnWeaponChanged;
         }
 
@@ -203,6 +231,13 @@ public sealed class PlayerAnimationController : MonoBehaviour
         if (skills != null)
         {
             skills.SkillCast -= OnSkillCast;
+        }
+
+        if (guard != null)
+        {
+            guard.GuardChanged -= OnGuardChanged;
+            guard.Parried -= OnParried;
+            guard.Broken -= OnGuardBroken;
         }
 
         if (gameState != null)
@@ -249,6 +284,64 @@ public sealed class PlayerAnimationController : MonoBehaviour
         SetTrigger(ShieldBashHash);
     }
 
+    // A swing with its own animation state plays it at once, on the arms while running; one without uses the stance's
+    // older triggered attack.
+    private void OnSwingStarted(SwingInfo swing)
+    {
+        string stateName = swing.Attack != null ? swing.Attack.AnimationState : null;
+        int layer = movement.HorizontalSpeed > ArmsOnlySpeed && attackArmsLayer >= 0 ? attackArmsLayer : upperBodyLayer;
+        int hash = string.IsNullOrEmpty(stateName) ? 0 : Animator.StringToHash(stateName);
+        if (hash == 0 || layer < 0 || !animator.HasState(layer, hash))
+        {
+            if (swing.Kind == SwingKind.ShieldBash)
+            {
+                PlayShieldBash();
+            }
+            else
+            {
+                PlayAttack();
+            }
+
+            return;
+        }
+
+        SetFloat(ActionSpeedHash, swing.Attack.AnimationSpeed * swing.Speed);
+        animator.CrossFadeInFixedTime(hash, ActionFade, layer, 0f);
+        int other = layer == upperBodyLayer ? attackArmsLayer : upperBodyLayer;
+        if (other >= 0 && animator.HasState(other, EmptyStateHash))
+        {
+            animator.CrossFadeInFixedTime(EmptyStateHash, ActionFade, other);
+        }
+    }
+
+    private void OnGuardChanged(bool guarding)
+    {
+        SetBool(HasShieldHash, combat != null && combat.HasShield);
+        SetBool(GuardingHash, guarding);
+        if (guarding)
+        {
+            // Straight into the guard, cutting off whatever swing was ending.
+            CrossFadeUpper(combat != null && combat.HasShield ? GuardShieldStateHash : GuardStateHash, 0.08f);
+            if (attackArmsLayer >= 0 && animator.HasState(attackArmsLayer, EmptyStateHash))
+            {
+                animator.CrossFadeInFixedTime(EmptyStateHash, 0.08f, attackArmsLayer);
+            }
+        }
+    }
+
+    private void OnParried(DamageInfo damage) => CrossFadeUpper(ParryStateHash, 0.04f);
+
+    private void OnGuardBroken(float seconds) => CrossFadeUpper(GuardBreakStateHash, 0.05f);
+
+    private void CrossFadeUpper(int hash, float fade)
+    {
+        if (upperBodyLayer >= 0 && animator.HasState(upperBodyLayer, hash))
+        {
+            SetFloat(ActionSpeedHash, 1f);
+            animator.CrossFadeInFixedTime(hash, fade, upperBodyLayer, 0f);
+        }
+    }
+
     // Skills reuse the weapon swing until they have animations of their own.
     private void OnSkillCast(int slot, SkillDefinition skill)
     {
@@ -266,10 +359,19 @@ public sealed class PlayerAnimationController : MonoBehaviour
     // A flinch on every hit that hurts; the killing blow is left to whatever handles death.
     private void OnDamaged(DamageInfo damage, DamageResult result)
     {
-        if (result.Damage > 0f && !result.Killed)
+        if (result.Damage <= 0f || result.Killed || result.Blocked)
         {
-            PlayHit();
+            return;
         }
+
+        if (health != null && result.Damage >= health.MaxHealth * KnockbackShare && upperBodyLayer >= 0
+            && animator.HasState(upperBodyLayer, KnockbackStateHash))
+        {
+            CrossFadeUpper(KnockbackStateHash, 0.05f);
+            return;
+        }
+
+        PlayHit();
     }
 
     // A dodge cancels the swing in gameplay, so a swing still waiting for the animator shouldn't play afterwards.
@@ -473,12 +575,23 @@ public sealed class PlayerAnimationController : MonoBehaviour
         }
     }
 
-    // Animation event receivers. Add Footstep / Land events to clips and hook audio or VFX here.
+    /// <summary>Raised by the clips' Footstep animation events that carry weight in the current blend.</summary>
+    public event System.Action Footstep;
+
+    /// <summary>Raised by the clips' Land animation event.</summary>
+    public event System.Action Landed;
+
+    // Animation event receivers. In a blend tree every clip fires its events, so only the ones that carry weight count.
     private void OnFootstep(AnimationEvent animationEvent)
     {
+        if (animationEvent.animatorClipInfo.weight > 0.5f)
+        {
+            Footstep?.Invoke();
+        }
     }
 
     private void OnLand(AnimationEvent animationEvent)
     {
+        Landed?.Invoke();
     }
 }

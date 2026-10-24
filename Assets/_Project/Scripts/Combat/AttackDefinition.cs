@@ -40,6 +40,29 @@ public sealed class AttackDefinition : ScriptableObject
     [Tooltip("Seconds after the attack starts before the next one can begin. Match it to where the animation can chain.")]
     [SerializeField, Min(0f)] private float recoveryTime = 0.6f;
 
+    [Header("Weight")]
+    [Tooltip("How much a hit wears down the target's poise. Enough of it in a short time staggers the target.")]
+    [SerializeField, Min(0f)] private float poiseDamage = 10f;
+    [Tooltip("Metres the attacker steps forward as the swing starts (toward a target within reach).")]
+    [SerializeField, Min(0f)] private float lunge;
+    [Tooltip("Stamina the player pays for it. Below 0 uses the player's normal attack cost.")]
+    [SerializeField] private float staminaCost = -1f;
+
+    [Header("Animation (player)")]
+    [Tooltip("Animator state the swing plays, by name (Safe Haven › Characters › Set Up Combat Animations makes them). " +
+             "Empty uses the weapon stance's old attack animation.")]
+    [SerializeField] private string animationState;
+    [Tooltip("Playback speed of that animation, so its swing lines up with Hit Delay.")]
+    [SerializeField, Range(0.25f, 3f)] private float animationSpeed = 1f;
+
+    [Header("Sound and Effects")]
+    [Tooltip("Plays as the swing starts. Empty uses the weapon's, then the game-wide swing sound.")]
+    [SerializeField] private SoundDefinition swingSound;
+    [Tooltip("Plays where it hits. Empty uses the weapon's, then the game-wide hit sound.")]
+    [SerializeField] private SoundDefinition hitSound;
+    [Tooltip("The slash arc drawn along the swing. Clear (alpha 0) draws none.")]
+    [SerializeField] private Color slashColor = new Color(1f, 0.95f, 0.85f, 0.8f);
+
     public string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;
     public DamageType DamageType => damageType;
     public float BaseDamage => baseDamage;
@@ -52,6 +75,35 @@ public sealed class AttackDefinition : ScriptableObject
     public int MaxTargets => maxTargets;
     public float HitDelay => hitDelay;
     public float RecoveryTime => recoveryTime;
+    public float PoiseDamage => poiseDamage;
+    public float Lunge => lunge;
+    public float StaminaCost => staminaCost;
+    public string AnimationState => animationState;
+    public float AnimationSpeed => animationSpeed;
+    public SoundDefinition SwingSound => swingSound;
+    public SoundDefinition HitSound => hitSound;
+    public Color SlashColor => slashColor;
+
+    /// <summary>Sets the player-facing extras in one go (editor setup and tests).</summary>
+    public void ConfigureTechnique(string state, float speed, float poise, float lungeDistance, Color slash)
+    {
+        animationState = state;
+        animationSpeed = speed;
+        poiseDamage = poise;
+        lunge = lungeDistance;
+        slashColor = slash;
+    }
+
+    /// <summary>Sets the damage, reach and timing (editor setup and tests).</summary>
+    public void ConfigureHit(float weaponRatio, float reach, float width, int targets, float landsAfter, float recoversAfter)
+    {
+        weaponDamageRatio = weaponRatio;
+        range = reach;
+        arc = width;
+        maxTargets = targets;
+        hitDelay = landsAfter;
+        recoveryTime = Mathf.Max(recoversAfter, landsAfter);
+    }
 
     private void OnValidate()
     {

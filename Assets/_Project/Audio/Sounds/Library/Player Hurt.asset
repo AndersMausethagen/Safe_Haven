@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0de871765cd6fce4c8fed103ef0082e3, type: 3}
+  m_Name: Player Hurt
+  m_EditorClassIdentifier: SafeHaven::SoundDefinition
+  displayName: Player Hurt
+  clips:
+  - {fileID: 8300000, guid: e07f851764728af4783bd244f5f50698, type: 3}
+  - {fileID: 8300000, guid: 9c60c16717e3de343982c0a464c4bc54, type: 3}
+  - {fileID: 8300000, guid: be98a7cd5b9f49b47938d4f7eb98609a, type: 3}
+  - {fileID: 8300000, guid: b1cec7d021ac0da4299b78ffc913bc83, type: 3}
+  - {fileID: 8300000, guid: 26c9f112d91d0aa408ea6db1f33567f3, type: 3}
+  channel: 2
+  volume: 0.8
+  volumeVariation: 0.1
+  pitchRange: {x: 0.85, y: 1}
+  positional: 0
+  fullVolumeDistance: 3
+  audibleDistance: 35
+  maxAtOnce: 2

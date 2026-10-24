@@ -33,6 +33,7 @@ public sealed class AttackTelegraph : MonoBehaviour
     private AttackDefinition attack;
     private float startTime;
     private float hideAt = -1f;
+    private bool cued;
     private static bool warnedNoMaterial;
 
     private void Awake()
@@ -71,6 +72,7 @@ public sealed class AttackTelegraph : MonoBehaviour
 
         startTime = Time.time;
         hideAt = -1f;
+        cued = false;
         areaFilter.sharedMesh = fillFilter.sharedMesh = FanFor(attack.Arc);
         float range = ai.ActiveAction != null && ai.ActiveAction.kind == MonsterAttackKind.Charge
             ? ai.ActiveAction.chargeDistance : attack.Range;
@@ -110,6 +112,24 @@ public sealed class AttackTelegraph : MonoBehaviour
         }
 
         UpdateFill(attack.HitDelay > 0f ? elapsed / attack.HitDelay : 1f);
+        UpdateParryCue(elapsed);
+    }
+
+    // The last moment before the hit is the time to raise the guard: the fill turns the parry color and the attacker glints.
+    private void UpdateParryCue(float elapsed)
+    {
+        float window = CombatTechniqueSettings.Current.ParryWindow;
+        if (cued || window <= 0f || attack.HitDelay <= window || elapsed < attack.HitDelay - window || elapsed >= attack.HitDelay)
+        {
+            return;
+        }
+
+        cued = true;
+        GameObject glint = CombatFeelSettings.Current.ParryCueEffect;
+        if (glint != null)
+        {
+            PrefabPool.Spawn(glint, transform.position + Vector3.up * 1.6f, Quaternion.identity);
+        }
     }
 
     private void Place()
@@ -125,7 +145,12 @@ public sealed class AttackTelegraph : MonoBehaviour
         progress = Mathf.Clamp01(progress);
         fill.localScale = new Vector3(progress, 1f, progress);
         Color color = CombatFeelSettings.Current.TelegraphFillColor;
-        if (progress >= 1f)
+        float window = CombatTechniqueSettings.Current.ParryWindow;
+        if (attack != null && attack.HitDelay > window && progress >= 1f - window / attack.HitDelay && progress < 1f)
+        {
+            color = CombatFeelSettings.Current.ParryCueColor;
+        }
+        else if (progress >= 1f)
         {
             color.a = Mathf.Min(1f, color.a * 1.8f);
         }

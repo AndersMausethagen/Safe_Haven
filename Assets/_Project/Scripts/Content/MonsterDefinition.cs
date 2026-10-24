@@ -58,9 +58,18 @@ public sealed class MonsterDefinition : ScriptableObject
     [Tooltip("Offsets the visual only, never the collider or navigation agent. Charge recovery lands the visual.")]
     [SerializeField, Min(0f)] private float hoverHeight;
 
+    [Header("Poise")]
+    [Tooltip("How much it takes before it staggers (attacks' Poise Damage wears it down). 0 uses the game-wide default; " +
+             "a very high value makes it unstoppable.")]
+    [SerializeField, Min(0f)] private float poise;
+
     [Header("Sound")]
     [Tooltip("Plays when it is killed. Empty uses the creature default from Audio Settings.")]
     [SerializeField] private SoundDefinition deathSound;
+    [Tooltip("Plays when it is hurt (on top of the hit sound). Empty: none.")]
+    [SerializeField] private SoundDefinition hurtSound;
+    [Tooltip("Plays as it winds up an attack, so the player hears it coming. Empty: none.")]
+    [SerializeField] private SoundDefinition attackSound;
 
     public string Id => string.IsNullOrWhiteSpace(id) ? name : id;
     public string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;
@@ -79,6 +88,10 @@ public sealed class MonsterDefinition : ScriptableObject
     public float ChaseRange => Mathf.Max(chaseRange, detectionRange);
     public float LeashRange => leashRange;
     public SoundDefinition DeathSound => deathSound;
+    public SoundDefinition HurtSound => hurtSound;
+    public SoundDefinition AttackSound => attackSound;
+    /// <summary>Its poise, or 0 when it uses the game-wide default.</summary>
+    public float Poise => poise;
     public IReadOnlyList<MonsterAttack> Attacks => attacks;
     public MonsterMovementTactic MovementTactic => movementTactic;
     public MonsterTemperament Temperament => temperament;

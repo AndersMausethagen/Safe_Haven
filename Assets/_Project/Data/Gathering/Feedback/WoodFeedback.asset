@@ -13,19 +13,19 @@ MonoBehaviour:
   m_Name: WoodFeedback
   m_EditorClassIdentifier: SafeHaven::HarvestFeedbackProfile
   critical:
-    sound: {fileID: 0}
+    sound: {fileID: 11400000, guid: a9b0d7eb07083d24baefd0c993180639, type: 2}
     effect: {fileID: 7535629084091954004, guid: 5d03391d77c79184187e1eb5ef1d9406, type: 3}
     shakeDegrees: 8
   normal:
-    sound: {fileID: 0}
+    sound: {fileID: 11400000, guid: a9b0d7eb07083d24baefd0c993180639, type: 2}
     effect: {fileID: 8295756250413705008, guid: 45368d8d22cd2124d91815e3daa02143, type: 3}
     shakeDegrees: 4
   glancing:
-    sound: {fileID: 0}
+    sound: {fileID: 11400000, guid: abf6eba37338af1409ab7f379cfdbc31, type: 2}
     effect: {fileID: 8295756250413705008, guid: 45368d8d22cd2124d91815e3daa02143, type: 3}
     shakeDegrees: 1.5
   harvested:
-    sound: {fileID: 0}
+    sound: {fileID: 11400000, guid: 33ed194ae04b9cc4d9e4a37a3ea4cc2a, type: 2}
     effect: {fileID: 7535629084091954004, guid: 5d03391d77c79184187e1eb5ef1d9406, type: 3}
     shakeDegrees: 0
   breakSeconds: 0.35

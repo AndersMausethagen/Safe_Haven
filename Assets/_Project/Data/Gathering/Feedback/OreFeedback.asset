@@ -13,19 +13,19 @@ MonoBehaviour:
   m_Name: OreFeedback
   m_EditorClassIdentifier: SafeHaven::HarvestFeedbackProfile
   critical:
-    sound: {fileID: 0}
+    sound: {fileID: 11400000, guid: 5554e81b9b23e8f46a4970e6063917ad, type: 2}
     effect: {fileID: 5583508145942354200, guid: d9f0ff7865e61e24a85ad4aaa13a8213, type: 3}
     shakeDegrees: 5
   normal:
-    sound: {fileID: 0}
+    sound: {fileID: 11400000, guid: 5554e81b9b23e8f46a4970e6063917ad, type: 2}
     effect: {fileID: 1800097642604793677, guid: aa3cec24f3dda2240a1beaa511aacb72, type: 3}
     shakeDegrees: 2.5
   glancing:
-    sound: {fileID: 0}
+    sound: {fileID: 11400000, guid: abf6eba37338af1409ab7f379cfdbc31, type: 2}
     effect: {fileID: 1800097642604793677, guid: aa3cec24f3dda2240a1beaa511aacb72, type: 3}
     shakeDegrees: 1
   harvested:
-    sound: {fileID: 0}
+    sound: {fileID: 11400000, guid: 10f67b83128cc194c8187151a24531c4, type: 2}
     effect: {fileID: 2357714975733934300, guid: edb20836c07f8ab4c85c791ec1186052, type: 3}
     shakeDegrees: 0
   breakSeconds: 0.35

@@ -58,9 +58,13 @@ public sealed class WeatherSystem : MonoBehaviour
     public void Strike()
     {
         flash = 1f;
+        Struck?.Invoke();
     }
 
     public event Action<WeatherDefinition> Changed;
+
+    /// <summary>Raised at every lightning strike (thunder follows it).</summary>
+    public event Action Struck;
 
     private void OnEnable()
     {
@@ -140,7 +144,7 @@ public sealed class WeatherSystem : MonoBehaviour
         flash = Mathf.Max(0f, flash - deltaTime * 5f);
         if (current.LightningPerMinute > 0f && random.NextDouble() < current.LightningPerMinute / 60f * deltaTime)
         {
-            flash = 1f;
+            Strike();
         }
 
         Apply();

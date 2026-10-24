@@ -16,3 +16,12 @@ MonoBehaviour:
   stance: 0
   damage: 5
   basicAttack: {fileID: 11400000, guid: ffeb578093ca93c4292bf2adf73c4027, type: 2}
+  combo:
+  - {fileID: 11400000, guid: ffeb578093ca93c4292bf2adf73c4027, type: 2}
+  - {fileID: 11400000, guid: 9a7b19c9a71e4094ba37320ae76f742c, type: 2}
+  - {fileID: 11400000, guid: cbb9c5beef19edd449c4d86ee5007ef9, type: 2}
+  heavyAttack: {fileID: 0}
+  counterAttack: {fileID: 0}
+  guardLetThrough: 0.6
+  swingSound: {fileID: 0}
+  hitSound: {fileID: 0}

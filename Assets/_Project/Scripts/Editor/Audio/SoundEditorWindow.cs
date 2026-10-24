@@ -542,8 +542,9 @@ public sealed class SoundEditorWindow : EditorWindow
     {
         EditorGUILayout.LabelField(sound.DisplayName, header);
         EditorGUILayout.LabelField(AssetDatabase.GetAssetPath(sound), note);
-        EditorGUILayout.LabelField("A reusable sound effect: one of its clips is picked at random each time. Hang it on a monster's or building's " +
-            "Death Sound, a DeathSound or SoundEmitter on a prefab, or a rarity's pickup sound.", note);
+        EditorGUILayout.LabelField("A reusable sound effect: one of its clips is picked at random each time. Hang it on a monster's Death, Hurt or " +
+            "Attack Sound, a building's Death Sound, a weapon's or attack's Swing and Hit Sound, a DeathSound or SoundEmitter on a prefab, " +
+            "a rarity's pickup sound, a gathering feedback profile, or a game-wide slot.", note);
         EditorGUILayout.Space(4f);
         using (new EditorGUILayout.HorizontalScope())
         {
@@ -557,10 +558,15 @@ public sealed class SoundEditorWindow : EditorWindow
         }
 
         if (!sound.HasClips) EditorGUILayout.HelpBox("No audio clips, so it plays nothing.", MessageType.Warning);
-        if (sound.Channel != AudioChannel.Effects)
+        if (sound.Channel == AudioChannel.Music)
         {
-            EditorGUILayout.HelpBox("Music and ambience are no longer sound assets: they are set as clips on each scene's Scene Music " +
-                "(Music tab). This sound is only useful as an effect.", MessageType.Info);
+            EditorGUILayout.HelpBox("Music is not a sound asset: it is set as clips on each scene's Scene Music (Music tab). This sound is " +
+                "only useful as an effect.", MessageType.Info);
+        }
+        else if (sound.Channel == AudioChannel.Ambience)
+        {
+            EditorGUILayout.HelpBox("An ambience loop: used by the rain, wind and stream slots (Game-wide effects › Weather and water). A " +
+                "scene's own ambience is set on its Scene Music (Music tab).", MessageType.Info);
         }
 
         EditorGUILayout.Space(4f);
@@ -585,7 +591,51 @@ public sealed class SoundEditorWindow : EditorWindow
             SoundField(data.FindProperty("creatureKilled"), "Creature killed (default)");
             SoundField(data.FindProperty("structureDestroyed"), "Structure destroyed (default)");
             Field(data, "maxSimultaneousEffects", "Max effects at once");
+
+            Group("Combat", "Weapons, attacks and monsters can set their own; these play when they don't.");
+            foreach ((string field, string label) in new[]
+            {
+                ("swing", "Swing"), ("heavySwing", "Heavy swing"), ("hit", "Hit (creature)"), ("criticalHit", "Critical / finisher / counter (layered)"),
+                ("structureHit", "Hit (structure)"), ("block", "Block"), ("parry", "Parry"), ("guardBreak", "Guard break"), ("stagger", "Stagger"),
+                ("perfectDodge", "Perfect dodge"), ("counterReady", "Counter ready"), ("dodge", "Dodge"), ("playerHurt", "Player hurt"),
+                ("outOfStamina", "Out of stamina"),
+            })
+            {
+                SoundField(data.FindProperty(field), label);
+            }
+
+            Group("Footsteps", "Terrain steps follow the ground layer's name; the first surface whose words match wins.");
+            EditorGUILayout.PropertyField(data.FindProperty("footstepSurfaces"), new GUIContent("Surfaces"), true);
+            SoundField(data.FindProperty("footstep"), "Anything else");
+            SoundField(data.FindProperty("footstepWood"), "Buildings");
+            SoundField(data.FindProperty("footstepWater"), "In water");
+            SoundField(data.FindProperty("land"), "Landing");
+            Field(data, "strideLength", "Stride without animation events (m)");
+
+            Group("World and interface", null);
+            foreach ((string field, string label) in new[]
+            {
+                ("questStarted", "Quest started"), ("questCompleted", "Quest completed"), ("crafted", "Crafted (by hand)"), ("built", "Built"),
+                ("consumed", "Eat or drink"), ("click", "Button click"), ("windowOpen", "Window opens"), ("windowClose", "Window closes"),
+            })
+            {
+                SoundField(data.FindProperty(field), label);
+            }
+
+            Group("Weather and water", "Loops on the Ambience volume: rain and wind follow the weather, water plays at every stream.");
+            foreach ((string field, string label) in new[] { ("rainLoop", "Rain"), ("windLoop", "Wind"), ("thunder", "Thunder"), ("waterLoop", "Streams") })
+            {
+                SoundField(data.FindProperty(field), label);
+            }
+
             data.ApplyModifiedProperties();
+            EditorGUILayout.Space(4f);
+            if (GUILayout.Button(new GUIContent("Fill Empty Slots from the Free Sound Library",
+                    "Safe Haven › Audio › Set Up Free Sound Library: CC0 sounds in Audio/SFX (see CREDITS.md). Slots already set are kept.")))
+            {
+                SoundLibrarySetup.SetUp();
+                Reload();
+            }
         }
 
         var rarity = AssetDatabase.LoadAssetAtPath<RaritySettingsDefinition>(RaritySettingsPath);
@@ -604,6 +654,16 @@ public sealed class SoundEditorWindow : EditorWindow
             }
 
             data.ApplyModifiedProperties();
+        }
+    }
+
+    private void Group(string title, string help)
+    {
+        EditorGUILayout.Space(8f);
+        EditorGUILayout.LabelField(title, EditorStyles.boldLabel);
+        if (!string.IsNullOrEmpty(help))
+        {
+            EditorGUILayout.LabelField(help, note);
         }
     }
 

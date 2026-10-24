@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -42,9 +43,140 @@ public sealed class AudioSettingsDefinition : ScriptableObject
     [Tooltip("When a building or other structure is destroyed.")]
     [SerializeField] private SoundDefinition structureDestroyed;
 
+    [Header("Combat Sounds (weapons, attacks and monsters can set their own)")]
+    [SerializeField] private SoundDefinition swing;
+    [SerializeField] private SoundDefinition heavySwing;
+    [Tooltip("A hit on a creature.")]
+    [SerializeField] private SoundDefinition hit;
+    [Tooltip("Played on top of the hit for critical hits, finishers and counters.")]
+    [SerializeField] private SoundDefinition criticalHit;
+    [Tooltip("A hit on a building or other structure.")]
+    [SerializeField] private SoundDefinition structureHit;
+    [SerializeField] private SoundDefinition block;
+    [SerializeField] private SoundDefinition parry;
+    [SerializeField] private SoundDefinition guardBreak;
+    [SerializeField] private SoundDefinition stagger;
+    [SerializeField] private SoundDefinition perfectDodge;
+    [SerializeField] private SoundDefinition counterReady;
+    [SerializeField] private SoundDefinition dodge;
+    [SerializeField] private SoundDefinition playerHurt;
+    [Tooltip("When an action is refused for lack of stamina.")]
+    [SerializeField] private SoundDefinition outOfStamina;
+
+    [Header("Footsteps")]
+    [Tooltip("Steps on terrain whose ground layer name contains one of the words (comma separated). First match wins.")]
+    [SerializeField] private List<SurfaceSound> footstepSurfaces = new List<SurfaceSound>();
+    [Tooltip("Steps on anything else: terrain no word matches, rocks, floors.")]
+    [SerializeField] private SoundDefinition footstep;
+    [Tooltip("Steps on buildings and other non-terrain ground with a wooden look.")]
+    [SerializeField] private SoundDefinition footstepWood;
+    [Tooltip("Steps in water.")]
+    [SerializeField] private SoundDefinition footstepWater;
+    [SerializeField] private SoundDefinition land;
+    [Tooltip("Metres walked per step when the animation has no footstep events.")]
+    [SerializeField, Min(0.2f)] private float strideLength = 1.4f;
+
+    [Header("World Sounds")]
+    [SerializeField] private SoundDefinition questStarted;
+    [SerializeField] private SoundDefinition questCompleted;
+    [SerializeField] private SoundDefinition crafted;
+    [SerializeField] private SoundDefinition built;
+    [Tooltip("Eating or drinking.")]
+    [SerializeField] private SoundDefinition consumed;
+
+    [Header("Interface Sounds")]
+    [Tooltip("Pressing a button.")]
+    [SerializeField] private SoundDefinition click;
+    [SerializeField] private SoundDefinition windowOpen;
+    [SerializeField] private SoundDefinition windowClose;
+
+    [Header("Weather and Water (loops on the Ambience volume)")]
+    [Tooltip("Loops while it rains, as loud as the rain is heavy.")]
+    [SerializeField] private SoundDefinition rainLoop;
+    [Tooltip("Loops with the wind, louder in strong wind and gusts.")]
+    [SerializeField] private SoundDefinition windLoop;
+    [Tooltip("Rolls a moment after each lightning flash.")]
+    [SerializeField] private SoundDefinition thunder;
+    [Tooltip("Loops at every water surface (streams, waterfalls), from the nearest point of it.")]
+    [SerializeField] private SoundDefinition waterLoop;
+
     [Header("Effects")]
     [Tooltip("How many sound effects can play at once. The oldest stops when more are needed.")]
     [SerializeField, Range(4, 64)] private int maxSimultaneousEffects = 24;
+
+    /// <summary>A footstep sound for ground layers whose name contains one of the words.</summary>
+    [System.Serializable]
+    public sealed class SurfaceSound
+    {
+        [Tooltip("Words to look for in the ground layer's name, comma separated (grass, moss).")]
+        public string layerWords;
+        public SoundDefinition sound;
+
+        public bool Matches(string layerName)
+        {
+            if (string.IsNullOrEmpty(layerWords) || string.IsNullOrEmpty(layerName))
+            {
+                return false;
+            }
+
+            foreach (string word in layerWords.Split(','))
+            {
+                string trimmed = word.Trim();
+                if (trimmed.Length > 0 && layerName.IndexOf(trimmed, System.StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+    }
+
+    public SoundDefinition Swing => swing;
+    public SoundDefinition HeavySwing => heavySwing;
+    public SoundDefinition Hit => hit;
+    public SoundDefinition CriticalHit => criticalHit;
+    public SoundDefinition StructureHit => structureHit;
+    public SoundDefinition Block => block;
+    public SoundDefinition Parry => parry;
+    public SoundDefinition GuardBreak => guardBreak;
+    public SoundDefinition Stagger => stagger;
+    public SoundDefinition PerfectDodge => perfectDodge;
+    public SoundDefinition CounterReady => counterReady;
+    public SoundDefinition Dodge => dodge;
+    public SoundDefinition PlayerHurt => playerHurt;
+    public SoundDefinition OutOfStamina => outOfStamina;
+    public SoundDefinition Footstep => footstep;
+    public SoundDefinition FootstepWood => footstepWood;
+    public SoundDefinition FootstepWater => footstepWater;
+    public SoundDefinition Land => land;
+    public float StrideLength => strideLength;
+    public SoundDefinition QuestStarted => questStarted;
+    public SoundDefinition QuestCompleted => questCompleted;
+    public SoundDefinition Crafted => crafted;
+    public SoundDefinition Built => built;
+    public SoundDefinition Consumed => consumed;
+    public SoundDefinition Click => click;
+    public SoundDefinition WindowOpen => windowOpen;
+    public SoundDefinition WindowClose => windowClose;
+    public SoundDefinition RainLoop => rainLoop;
+    public SoundDefinition WindLoop => windLoop;
+    public SoundDefinition Thunder => thunder;
+    public SoundDefinition WaterLoop => waterLoop;
+
+    /// <summary>The footstep for a terrain ground layer by name (the first matching surface), else the default.</summary>
+    public SoundDefinition FootstepOn(string layerName)
+    {
+        foreach (SurfaceSound surface in footstepSurfaces)
+        {
+            if (surface != null && surface.sound != null && surface.Matches(layerName))
+            {
+                return surface.sound;
+            }
+        }
+
+        return footstep;
+    }
 
     public MusicPlaylist DefaultExploring => defaultExploring;
     public MusicPlaylist DefaultCombat => defaultCombat;

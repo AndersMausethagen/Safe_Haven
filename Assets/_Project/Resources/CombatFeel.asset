@@ -69,3 +69,26 @@ MonoBehaviour:
   dodgeTrailWidth: 0.6
   dodgedText: Dodged
   dodgedTextColor: {r: 0.6, g: 0.9, b: 1, a: 1}
+  perfectDodgeText: 
+  parryText: 
+  guardBrokenText: 
+  staggerText: 
+  counterText: 
+  techniqueTextColor: {r: 1, g: 0.85, b: 0.4, a: 1}
+  parryCueColor: {r: 1, g: 0.92, b: 0.8, a: 0.55}
+  hitEffect: {fileID: 213189225444777386, guid: 005b43df436f75a428ebfa2fbd5b55e4, type: 3}
+  criticalHitEffect: {fileID: 1166098248584884335, guid: 8e9ba0abb4f7ab44498aeea2ed54782b, type: 3}
+  structureHitEffect: {fileID: 8295756250413705008, guid: 45368d8d22cd2124d91815e3daa02143, type: 3}
+  blockEffect: {fileID: 6609181195610218049, guid: 222ec1a8f47dc7846b95698a1d0d5401, type: 3}
+  parryEffect: {fileID: 446000042892583350, guid: 91d732e0cc1abbd46aef1892f15e5fbb, type: 3}
+  staggerEffect: {fileID: 3448059979457001899, guid: 14ad6f4879c11a64da0187a81c7a5b91, type: 3}
+  perfectDodgeEffect: {fileID: 1787437530139827587, guid: 86a01c434ea7768488bace9e1a63ad52, type: 3}
+  parryCueEffect: {fileID: 2567207178870873406, guid: 3c1734e30b572104ea3954b443333234, type: 3}
+  slashMaterial: {fileID: 2100000, guid: da6ce870da817894b98a9f869375c163, type: 2}
+  slashSeconds: 0.2
+  slashHeight: 1.05
+  hurtColor: {r: 0.65, g: 0.05, b: 0.02, a: 0.55}
+  hurtSeconds: 0.45
+  lowHealthBelow: 0.3
+  lowHealthStrength: 0.35
+  techniqueFlashColor: {r: 0.8, g: 0.85, b: 0.9, a: 0.12}

@@ -19,7 +19,7 @@ MonoBehaviour:
   dodgeDistance: 3
   dodgeDuration: 0.18
   dodgeInvulnerability: 0.28
-  dodgeCooldown: 1.5
+  dodgeCooldown: 2
   stateModifiers:
   - state: 0
     speedMultiplier: 1.2

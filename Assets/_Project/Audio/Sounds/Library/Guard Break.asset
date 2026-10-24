@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0de871765cd6fce4c8fed103ef0082e3, type: 3}
+  m_Name: Guard Break
+  m_EditorClassIdentifier: SafeHaven::SoundDefinition
+  displayName: Guard Break
+  clips:
+  - {fileID: 8300000, guid: 3dc555443cfcd3841bd09c568601400c, type: 3}
+  - {fileID: 8300000, guid: d7602906ed6cee24a8b5abb2b06b4b25, type: 3}
+  - {fileID: 8300000, guid: 8ed92dfea9752ac459a1d65f7c09284b, type: 3}
+  - {fileID: 8300000, guid: 6656b830f52e7c543851992f2e08dcc3, type: 3}
+  - {fileID: 8300000, guid: 9dfc00196d3b99c4989215a1368ec41a, type: 3}
+  channel: 2
+  volume: 0.9
+  volumeVariation: 0.1
+  pitchRange: {x: 0.75, y: 0.85}
+  positional: 1
+  fullVolumeDistance: 3
+  audibleDistance: 35
+  maxAtOnce: 2

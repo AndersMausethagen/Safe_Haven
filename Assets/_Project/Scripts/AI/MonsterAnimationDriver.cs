@@ -16,12 +16,16 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
     [SerializeField] private string attackParameter = "Attack";
     [Tooltip("Bool parameter set when the monster dies.")]
     [SerializeField] private string deadParameter = "Dead";
+    [Tooltip("Trigger parameter fired when the monster staggers (broken poise, a parried attack).")]
+    [SerializeField] private string staggerParameter = "Stagger";
     [SerializeField, Min(0f)] private float speedDampTime = 0.1f;
 
     private MonsterAI ai;
     private int speedHash;
     private int attackHash;
     private int deadHash;
+    private int staggerHash;
+    private bool hasStagger;
     private bool hasSpeed;
     private bool hasAttack;
     private bool hasDead;
@@ -37,12 +41,14 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
     {
         ai.AttackStarted += OnAttackStarted;
         ai.StateChanged += OnStateChanged;
+        ai.Staggered += OnStaggered;
     }
 
     private void OnDisable()
     {
         ai.AttackStarted -= OnAttackStarted;
         ai.StateChanged -= OnStateChanged;
+        ai.Staggered -= OnStaggered;
     }
 
     private void Update()
@@ -63,12 +69,14 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
         speedHash = Animator.StringToHash(speedParameter);
         attackHash = Animator.StringToHash(attackParameter);
         deadHash = Animator.StringToHash(deadParameter);
+        staggerHash = Animator.StringToHash(staggerParameter);
 
         foreach (AnimatorControllerParameter parameter in animator.parameters)
         {
             hasSpeed |= parameter.nameHash == speedHash && parameter.type == AnimatorControllerParameterType.Float;
             hasAttack |= parameter.nameHash == attackHash && parameter.type == AnimatorControllerParameterType.Trigger;
             hasDead |= parameter.nameHash == deadHash && parameter.type == AnimatorControllerParameterType.Bool;
+            hasStagger |= parameter.nameHash == staggerHash && parameter.type == AnimatorControllerParameterType.Trigger;
         }
     }
 
@@ -77,6 +85,15 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
         if (hasAttack)
         {
             animator.SetTrigger(attackHash);
+        }
+    }
+
+    private void OnStaggered(float seconds)
+    {
+        if (hasStagger)
+        {
+            if (hasAttack) animator.ResetTrigger(attackHash);
+            animator.SetTrigger(staggerHash);
         }
     }
 

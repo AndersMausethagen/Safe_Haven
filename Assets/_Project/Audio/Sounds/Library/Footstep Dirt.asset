@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0de871765cd6fce4c8fed103ef0082e3, type: 3}
+  m_Name: Footstep Dirt
+  m_EditorClassIdentifier: SafeHaven::SoundDefinition
+  displayName: Footstep Dirt
+  clips:
+  - {fileID: 8300000, guid: 5a431c752eb29784b8b4e4eb475b45d0, type: 3}
+  - {fileID: 8300000, guid: 6d5e56738bd3b424ebd828dcf4a0f532, type: 3}
+  - {fileID: 8300000, guid: 7b0f0e5042d89164aa532a71da8aa1ba, type: 3}
+  - {fileID: 8300000, guid: 164f31b365ce06747aa8501ae301b561, type: 3}
+  - {fileID: 8300000, guid: 44874226f0f2e9f44acfc9ad44c20df5, type: 3}
+  - {fileID: 8300000, guid: 45c89f446d6ade94e9704e11b7cb5e53, type: 3}
+  - {fileID: 8300000, guid: e68db7b29eb051348b8dc9411cb3aa77, type: 3}
+  - {fileID: 8300000, guid: 3f1abdc0d8b12f248a92383a3d6793ba, type: 3}
+  - {fileID: 8300000, guid: 827720979751b0141abd002678310dc7, type: 3}
+  - {fileID: 8300000, guid: 3a213615530b60a459b9cd0c42111a8d, type: 3}
+  channel: 2
+  volume: 0.35
+  volumeVariation: 0.1
+  pitchRange: {x: 0.9, y: 1.1}
+  positional: 1
+  fullVolumeDistance: 3
+  audibleDistance: 12
+  maxAtOnce: 3

@@ -13,19 +13,19 @@ MonoBehaviour:
   m_Name: FibreFeedback
   m_EditorClassIdentifier: SafeHaven::HarvestFeedbackProfile
   critical:
-    sound: {fileID: 0}
+    sound: {fileID: 11400000, guid: 16400df725fd2cf43a40159a00b8cb91, type: 2}
     effect: {fileID: 2787300096364728406, guid: cb7f106800189e342b22b5aa2470030d, type: 3}
     shakeDegrees: 10
   normal:
-    sound: {fileID: 0}
+    sound: {fileID: 11400000, guid: 16400df725fd2cf43a40159a00b8cb91, type: 2}
     effect: {fileID: 5277547486113585862, guid: 7da9f0968cebc3c4baca4d42d9d6a97a, type: 3}
     shakeDegrees: 6
   glancing:
-    sound: {fileID: 0}
+    sound: {fileID: 11400000, guid: abf6eba37338af1409ab7f379cfdbc31, type: 2}
     effect: {fileID: 5277547486113585862, guid: 7da9f0968cebc3c4baca4d42d9d6a97a, type: 3}
     shakeDegrees: 3
   harvested:
-    sound: {fileID: 0}
+    sound: {fileID: 11400000, guid: 16400df725fd2cf43a40159a00b8cb91, type: 2}
     effect: {fileID: 2787300096364728406, guid: cb7f106800189e342b22b5aa2470030d, type: 3}
     shakeDegrees: 0
   breakSeconds: 0.35

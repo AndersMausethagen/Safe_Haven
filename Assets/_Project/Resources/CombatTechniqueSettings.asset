@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d892a13fd3bffd547b889e347a4d00cd, type: 3}
+  m_Name: CombatTechniqueSettings
+  m_EditorClassIdentifier: SafeHaven::CombatTechniqueSettings
+  chainGrace: 0.45
+  rhythmEarly: 0.16
+  rhythmLate: 0.1
+  maxRhythm: 2
+  rhythmDamagePerStack: 0.05
+  rhythmSpeedPerStack: 0
+  earlyPressFumbles: 1
+  dodgeCancelsWindup: 0
+  swingMoveSpeed: 0.4
+  heavyMoveSpeed: 0.15
+  flinchShare: 0.05
+  flinchSeconds: 0.45
+  showComboHud: 0
+  heavyHoldSeconds: 0.3
+  blockArc: 140
+  parryWindow: 0.15
+  guardRelock: 0.3
+  blockStaminaPerDamage: 0.8
+  guardMoveSpeed: 0.5
+  unarmedLetThrough: 0.7
+  guardBreakStun: 1.1
+  parryStagger: 1
+  counterSeconds: 1
+  counterDamageMultiplier: 1.3
+  slowMotionScale: 0.4
+  slowMotionSeconds: 0.09
+  defaultPoise: 30
+  poiseRecoveryDelay: 2
+  poiseRecoveryPerSecond: 15
+  staggerSeconds: 1
+  staggeredDamageTaken: 1.2

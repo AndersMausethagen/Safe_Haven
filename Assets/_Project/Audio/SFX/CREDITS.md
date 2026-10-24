@@ -1,0 +1,16 @@
+# Sound effect credits
+
+Every sound in this folder is public domain (CC0 1.0, https://creativecommons.org/publicdomain/zero/1.0/): free for any
+use, credit not required. Credited here anyway.
+
+| Folder | Pack | Author | Source |
+|---|---|---|---|
+| Kenney Impact | Impact Sounds 1.0 | Kenney (www.kenney.nl) | https://kenney.nl/assets/impact-sounds |
+| Kenney RPG | RPG Audio | Kenney (www.kenney.nl) | https://kenney.nl/assets/rpg-audio |
+| Kenney Interface | Interface Sounds | Kenney (www.kenney.nl) | https://kenney.nl/assets/interface-sounds |
+| Kenney UI | UI Audio | Kenney (www.kenney.nl) | https://kenney.nl/assets/ui-audio |
+| OGA 100 CC0 SFX 2 | 100 CC0 SFX #2 | rubberduck | https://opengameart.org/content/100-cc0-sfx-2 |
+| OGA Rain Loops | Rain (loopable) | Ylmir | https://opengameart.org/content/rain-loopable |
+
+Animations: Universal Animation Library 1 and 2 (Standard), CC0, by Quaternius (https://quaternius.com), in
+Assets/Quaternius.

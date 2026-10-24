@@ -127,6 +127,7 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
     private AudioSettingsDefinition settings;
     private LoopLayer music;
     private LoopLayer ambience;
+    private WorldAudio world;
     private SceneAudio sceneAudio;
     private Damageable player;
     private float lastDamageTime = float.NegativeInfinity;
@@ -135,6 +136,9 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
     private bool enemyChasing;
 
     public static AudioManager Instance => instance;
+
+    /// <summary>The game-wide sounds and audio rules (null before the game has started its systems).</summary>
+    public static AudioSettingsDefinition Sounds => instance != null ? instance.settings : null;
 
     /// <summary>Whether the music thinks the player is fighting.</summary>
     public AudioMood Mood { get; private set; } = AudioMood.Exploring;
@@ -209,6 +213,7 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
 
         music = new LoopLayer(gameObject, AudioChannel.Music);
         ambience = new LoopLayer(gameObject, AudioChannel.Ambience);
+        world = new WorldAudio(gameObject);
         GameEvents.Raised += OnGameEvent;
     }
 
@@ -229,6 +234,11 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
         lastDamageTime = float.NegativeInfinity;
         enemyChasing = false;
         WatchPlayer(Player.Current != null ? Player.Current.Health : null);
+        world.OnSceneEntered();
+        if (Player.Current != null && !Player.Current.TryGetComponent(out PlayerAudio _))
+        {
+            Player.Current.gameObject.AddComponent<PlayerAudio>();
+        }
     }
 
     private void Update()
@@ -248,6 +258,7 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
         float fadeStep = settings.CrossfadeSeconds > 0f ? Time.unscaledDeltaTime / settings.CrossfadeSeconds : 1f;
         music.Update(fadeStep);
         ambience.Update(fadeStep);
+        world.Update(settings);
     }
 
     // ----- Combat -----
@@ -334,10 +345,37 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
             return;
         }
 
+        SoundDefinition moment = MomentSound(gameEvent);
+        if (moment != null)
+        {
+            Play(moment, gameEvent.Actor != null ? gameEvent.Actor.transform.position : transform.position);
+            return;
+        }
+
         bool died = gameEvent.Kind == GameEventKind.Killed || gameEvent.Kind == GameEventKind.Destroyed;
         if (died && gameEvent.Origin != null && gameEvent.Origin.TryGetComponent(out Damageable victim))
         {
             Play(DeathSoundFor(victim), victim.transform.position);
+        }
+    }
+
+    // Quests, crafting, building and eating, from Audio Settings › World Sounds. Only the player's own moments.
+    private SoundDefinition MomentSound(GameEvent gameEvent)
+    {
+        switch (gameEvent.Kind)
+        {
+            case GameEventKind.QuestStarted:
+                return settings.QuestStarted;
+            case GameEventKind.QuestCompleted:
+                return settings.QuestCompleted;
+            case GameEventKind.Crafted:
+                return gameEvent.Actor != null && Player.IsPlayer(gameEvent.Actor) ? settings.Crafted : null;
+            case GameEventKind.Built:
+                return settings.Built;
+            case GameEventKind.Consumed:
+                return gameEvent.ByPlayer ? settings.Consumed : null;
+            default:
+                return null;
         }
     }
 

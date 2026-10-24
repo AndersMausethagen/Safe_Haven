@@ -35,6 +35,10 @@ public sealed class PlayerDodge : MonoBehaviour
     /// <summary>Raised when a dodge starts, with its direction.</summary>
     public event Action<Vector3> Dodged;
 
+    // A dodge pressed during a swing's wind-up waits this long for the swing to land.
+    private const float DodgeBuffer = 0.35f;
+    private float bufferedUntil = -1f;
+
     private void Awake()
     {
         movement = GetComponent<PlayerMovement>();
@@ -66,6 +70,16 @@ public sealed class PlayerDodge : MonoBehaviour
             return false;
         }
 
+        // A swing is a commitment until it lands, and a flinching player can't throw themselves clear.
+        PlayerCombat combat = GetComponent<PlayerCombat>();
+        if (combat != null && !combat.CanDodge)
+        {
+            bufferedUntil = Time.time + DodgeBuffer; // it goes the moment the swing lands
+            return false;
+        }
+
+        bufferedUntil = -1f;
+
         if (stamina != null && !stamina.TrySpend(stamina.DodgeCost))
         {
             return false;
@@ -88,6 +102,18 @@ public sealed class PlayerDodge : MonoBehaviour
 
     private void Update()
     {
+        if (bufferedUntil >= 0f)
+        {
+            if (Time.time > bufferedUntil)
+            {
+                bufferedUntil = -1f;
+            }
+            else
+            {
+                TryDodge();
+            }
+        }
+
         if (invulnerableUntil >= 0f && Time.time >= invulnerableUntil)
         {
             EndInvulnerability();

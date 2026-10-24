@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0de871765cd6fce4c8fed103ef0082e3, type: 3}
+  m_Name: Stone Breaks
+  m_EditorClassIdentifier: SafeHaven::SoundDefinition
+  displayName: Stone Breaks
+  clips:
+  - {fileID: 8300000, guid: a6d67de22ff83d4469dd6257864160bc, type: 3}
+  - {fileID: 8300000, guid: 0cc2f787461d3d54e99d838ff95f9d5c, type: 3}
+  - {fileID: 8300000, guid: b243e9bc27a4d124e90d17951c249343, type: 3}
+  channel: 2
+  volume: 0.9
+  volumeVariation: 0.1
+  pitchRange: {x: 0.94, y: 1.06}
+  positional: 1
+  fullVolumeDistance: 3
+  audibleDistance: 35
+  maxAtOnce: 4

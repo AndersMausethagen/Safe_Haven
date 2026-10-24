@@ -61,6 +61,18 @@ public sealed class Damageable : MonoBehaviour, IDamageable, ISaveable
     /// <summary>Raised when a hit is ignored because this object is invulnerable, such as during a dodge.</summary>
     public event Action<DamageInfo> Evaded;
 
+    /// <summary>Raised when a guard (<see cref="IHitGuard"/>) takes a hit: blocked, parried or broken. Blocked and broken
+    /// hits are then applied as well (Damaged follows); parried ones are not.</summary>
+    public event Action<DamageInfo, GuardOutcome> Guarded;
+
+    /// <summary>Raised when any object's guard takes a hit, after its own Guarded event (CombatFeedback, the attacker's stagger).</summary>
+    public static event Action<Damageable, DamageInfo, GuardOutcome> AnyGuarded;
+
+    /// <summary>Multiplies the damage this object takes, after its defenses (a staggered monster takes more). 1 = normal.</summary>
+    public float DamageTakenMultiplier { get; set; } = 1f;
+
+    private IHitGuard[] guards;
+
     /// <summary>
     /// Makes the object ignore hits until the same source removes it. Several sources can overlap (a dodge during a
     /// cutscene); the object is vulnerable again only when all of them are gone.
@@ -84,6 +96,7 @@ public sealed class Damageable : MonoBehaviour, IDamageable, ISaveable
     private void Awake()
     {
         combatant = GetComponent<Combatant>();
+        guards = GetComponents<IHitGuard>();
         currentHealth = MaxHealth;
         knownMaxHealth = currentHealth;
     }
@@ -99,7 +112,7 @@ public sealed class Damageable : MonoBehaviour, IDamageable, ISaveable
         combatant.Stats.Changed -= OnStatChanged;
     }
 
-    public DamageResult ApplyDamage(in DamageInfo damage)
+    public DamageResult ApplyDamage(in DamageInfo hit)
     {
         if (!IsAlive)
         {
@@ -108,11 +121,34 @@ public sealed class Damageable : MonoBehaviour, IDamageable, ISaveable
 
         if (IsInvulnerable)
         {
-            Evaded?.Invoke(damage);
+            Evaded?.Invoke(hit);
             return DamageResult.None;
         }
 
-        float final = DamageCalculator.Mitigate(damage.Amount, damage.Type, combatant.Stats, combatant.Rules);
+        DamageInfo damage = hit;
+        GuardOutcome guard = GuardOutcome.None;
+        if (guards != null)
+        {
+            foreach (IHitGuard candidate in guards)
+            {
+                guard = candidate.Guard(damage, out float letThrough);
+                if (guard == GuardOutcome.None)
+                {
+                    continue;
+                }
+
+                RaiseGuarded(damage, guard);
+                if (guard == GuardOutcome.Parried)
+                {
+                    return new DamageResult(damage.Amount, 0f, 0f, false, false, damage.Type, guard);
+                }
+
+                damage = damage.WithAmount(damage.Amount * letThrough);
+                break;
+            }
+        }
+
+        float final = DamageCalculator.Mitigate(damage.Amount, damage.Type, combatant.Stats, combatant.Rules) * DamageTakenMultiplier;
         float healthLost = Mathf.Min(final, currentHealth);
         currentHealth -= healthLost;
 
@@ -123,7 +159,7 @@ public sealed class Damageable : MonoBehaviour, IDamageable, ISaveable
             IsAlive = false;
         }
 
-        var result = new DamageResult(damage.Amount, final, healthLost, killed, damage.IsCritical, damage.Type);
+        var result = new DamageResult(damage.Amount, final, healthLost, killed, damage.IsCritical, damage.Type, guard);
 
         if (logHits)
         {
@@ -161,6 +197,19 @@ public sealed class Damageable : MonoBehaviour, IDamageable, ISaveable
         }
 
         return result;
+    }
+
+    private void RaiseGuarded(in DamageInfo damage, GuardOutcome outcome)
+    {
+        Guarded?.Invoke(damage, outcome);
+        try
+        {
+            AnyGuarded?.Invoke(this, damage, outcome);
+        }
+        catch (Exception exception)
+        {
+            Debug.LogException(exception, this);
+        }
     }
 
     /// <summary>Restores health up to the maximum. Returns how much was actually restored.</summary>

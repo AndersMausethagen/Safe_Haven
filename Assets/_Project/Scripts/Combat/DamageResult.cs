@@ -10,8 +10,11 @@ public readonly struct DamageResult
     public readonly bool Killed;
     public readonly bool IsCritical;
     public readonly DamageType Type;
+    /// <summary>How a guard took it (see <see cref="IHitGuard"/>): blocked hits arrive reduced, parried ones not at all.</summary>
+    public readonly GuardOutcome Guard;
 
-    public DamageResult(float incoming, float damage, float healthLost, bool killed, bool isCritical, DamageType type)
+    public DamageResult(float incoming, float damage, float healthLost, bool killed, bool isCritical, DamageType type,
+        GuardOutcome guard = GuardOutcome.None)
     {
         Incoming = incoming;
         Damage = damage;
@@ -19,7 +22,11 @@ public readonly struct DamageResult
         Killed = killed;
         IsCritical = isCritical;
         Type = type;
+        Guard = guard;
     }
+
+    public bool Blocked => Guard == GuardOutcome.Blocked;
+    public bool Parried => Guard == GuardOutcome.Parried;
 
     /// <summary>What armor and resistances took off the hit.</summary>
     public float Mitigated => Incoming - Damage;

@@ -208,7 +208,24 @@ public sealed class MovementAndCombatPage : SystemsPage
 
         SettingsPanel(stamina, "Stamina", "Data/Player/PlayerStaminaSettings");
         SettingsPanel(AssetDatabase.LoadAssetAtPath<CombatRules>("Assets/_Project/Data/Combat/CombatRules.asset"), "Combat rules", "Data/Combat/CombatRules");
-        SettingsPanel(Settings<CombatFeelSettings>(CombatFeelSettings.ResourceName), "Combat feel", "Resources/CombatFeel: hit stop, shake, flashes");
+        var technique = Settings<CombatTechniqueSettings>(CombatTechniqueSettings.ResourceName);
+        SettingsPanel(technique, "Combat technique", "Resources/CombatTechniqueSettings: combo timing, heavy attack, guard and parry, flinch, poise and stagger");
+        if (technique != null)
+        {
+            BeginDerived();
+            Derived("Rhythm window", $"{(technique.RhythmEarly + technique.RhythmLate) * 1000f:0} ms around each swing's recovery");
+            Derived("Parry window", $"{technique.ParryWindow * 1000f:0} ms after raising the guard; then {technique.GuardRelock:0.##} s before it can go up again");
+            Derived("Best timed chain bonus", $"+{technique.MaxRhythm * technique.RhythmDamagePerStack:P0} damage, {(technique.RhythmSpeedPerStack > 0f ? $"+{technique.MaxRhythm * technique.RhythmSpeedPerStack:P0} speed" : "no speed-up")}");
+            if (stamina != null && technique.BlockStaminaPerDamage > 0f)
+            {
+                Derived("Guard holds against", $"{stamina.MaxStamina / technique.BlockStaminaPerDamage:0} damage from full stamina");
+            }
+
+            Derived("Swings", technique.DodgeCancelsWindup ? "can be dodged out of at any time" : "are commitments: no dodging until they land");
+            EndDerived();
+        }
+
+        SettingsPanel(Settings<CombatFeelSettings>(CombatFeelSettings.ResourceName), "Combat feel", "Resources/CombatFeel: hit stop, shake, flashes, effects, slash arcs, vignette");
         SettingsPanel(AssetDatabase.LoadAssetAtPath<PlayerCameraSettings>("Assets/_Project/Data/Camera/PlayerCameraSettings.asset"), "Camera", "Data/Camera/PlayerCameraSettings");
     }
 }

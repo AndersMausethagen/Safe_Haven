@@ -13,19 +13,19 @@ MonoBehaviour:
   m_Name: DefaultFeedback
   m_EditorClassIdentifier: SafeHaven::HarvestFeedbackProfile
   critical:
-    sound: {fileID: 0}
+    sound: {fileID: 11400000, guid: e152a28919b1d86439cf0f9a67a56b76, type: 2}
     effect: {fileID: 5583508145942354200, guid: d9f0ff7865e61e24a85ad4aaa13a8213, type: 3}
     shakeDegrees: 6
   normal:
-    sound: {fileID: 0}
+    sound: {fileID: 11400000, guid: e152a28919b1d86439cf0f9a67a56b76, type: 2}
     effect: {fileID: 0}
     shakeDegrees: 3
   glancing:
-    sound: {fileID: 0}
+    sound: {fileID: 11400000, guid: abf6eba37338af1409ab7f379cfdbc31, type: 2}
     effect: {fileID: 0}
     shakeDegrees: 1.5
   harvested:
-    sound: {fileID: 0}
+    sound: {fileID: 11400000, guid: c976c43373ecc004ba5149ddf6b2b63e, type: 2}
     effect: {fileID: 2787300096364728406, guid: cb7f106800189e342b22b5aa2470030d, type: 3}
     shakeDegrees: 0
   breakSeconds: 0.35

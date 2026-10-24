@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0de871765cd6fce4c8fed103ef0082e3, type: 3}
+  m_Name: Mine
+  m_EditorClassIdentifier: SafeHaven::SoundDefinition
+  displayName: Mine
+  clips:
+  - {fileID: 8300000, guid: d03ccb68b2995984ab444af228fcaea7, type: 3}
+  - {fileID: 8300000, guid: 0c25e20e67256f5409f983762064906e, type: 3}
+  - {fileID: 8300000, guid: 60a682d40ba7d5e46b4fa5376f9b064e, type: 3}
+  - {fileID: 8300000, guid: bc3b78e2a8378f946a0af02cdad626ce, type: 3}
+  - {fileID: 8300000, guid: 3489e528552057b438159b55ea6d803d, type: 3}
+  channel: 2
+  volume: 0.8
+  volumeVariation: 0.1
+  pitchRange: {x: 0.94, y: 1.06}
+  positional: 1
+  fullVolumeDistance: 3
+  audibleDistance: 35
+  maxAtOnce: 4

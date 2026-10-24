@@ -73,6 +73,45 @@ public sealed class CombatFeelSettings : ScriptableObject
     [SerializeField] private string dodgedText = "Dodged";
     [SerializeField] private Color dodgedTextColor = new Color(0.6f, 0.9f, 1f);
 
+    [Header("Technique callouts (text over the player; empty shows nothing, the default: sound and motion say it)")]
+    [SerializeField] private string perfectDodgeText = "";
+    [SerializeField] private string parryText = "";
+    [SerializeField] private string guardBrokenText = "";
+    [SerializeField] private string staggerText = "";
+    [SerializeField] private string counterText = "";
+    [SerializeField] private Color techniqueTextColor = new Color(1f, 0.85f, 0.4f);
+    [Tooltip("The telegraph fill turns this color for the last moment before the hit: the time to raise the guard and parry.")]
+    [SerializeField] private Color parryCueColor = new Color(1f, 0.92f, 0.8f, 0.55f);
+
+    [Header("Effects (pooled particle prefabs; empty plays none)")]
+    [SerializeField] private GameObject hitEffect;
+    [SerializeField] private GameObject criticalHitEffect;
+    [SerializeField] private GameObject structureHitEffect;
+    [SerializeField] private GameObject blockEffect;
+    [SerializeField] private GameObject parryEffect;
+    [SerializeField] private GameObject staggerEffect;
+    [SerializeField] private GameObject perfectDodgeEffect;
+    [Tooltip("Small glint on an attacker at the parry moment.")]
+    [SerializeField] private GameObject parryCueEffect;
+
+    [Header("Slash arcs")]
+    [Tooltip("Material of the arc drawn along a swing (Safe Haven/Slash). Empty draws none.")]
+    [SerializeField] private Material slashMaterial;
+    [Tooltip("Seconds the arc takes to sweep and fade.")]
+    [SerializeField, Min(0.02f)] private float slashSeconds = 0.2f;
+    [Tooltip("Height of the arc above the attacker's feet.")]
+    [SerializeField] private float slashHeight = 1.05f;
+
+    [Header("Hurt vignette")]
+    [Tooltip("Screen edges flash this color when the player is hurt. Alpha is the strength.")]
+    [SerializeField] private Color hurtColor = new Color(0.65f, 0.05f, 0.02f, 0.55f);
+    [SerializeField, Min(0f)] private float hurtSeconds = 0.45f;
+    [Tooltip("Below this share of health the edges pulse slowly.")]
+    [SerializeField, Range(0f, 1f)] private float lowHealthBelow = 0.3f;
+    [SerializeField, Range(0f, 1f)] private float lowHealthStrength = 0.35f;
+    [Tooltip("Edges flash this color on a parry or perfect dodge.")]
+    [SerializeField] private Color techniqueFlashColor = new Color(0.8f, 0.85f, 0.9f, 0.12f);
+
     private static CombatFeelSettings current;
 
     /// <summary>The settings from Resources/CombatFeel, or built-in defaults when the asset is missing.</summary>
@@ -122,6 +161,29 @@ public sealed class CombatFeelSettings : ScriptableObject
     public float DodgeTrailWidth => dodgeTrailWidth;
     public string DodgedText => dodgedText;
     public Color DodgedTextColor => dodgedTextColor;
+    public string PerfectDodgeText => perfectDodgeText;
+    public string ParryText => parryText;
+    public string GuardBrokenText => guardBrokenText;
+    public string StaggerText => staggerText;
+    public string CounterText => counterText;
+    public Color TechniqueTextColor => techniqueTextColor;
+    public Color ParryCueColor => parryCueColor;
+    public GameObject HitEffect => hitEffect;
+    public GameObject CriticalHitEffect => criticalHitEffect;
+    public GameObject StructureHitEffect => structureHitEffect;
+    public GameObject BlockEffect => blockEffect;
+    public GameObject ParryEffect => parryEffect;
+    public GameObject StaggerEffect => staggerEffect;
+    public GameObject PerfectDodgeEffect => perfectDodgeEffect;
+    public GameObject ParryCueEffect => parryCueEffect;
+    public Material SlashMaterial => slashMaterial;
+    public float SlashSeconds => slashSeconds;
+    public float SlashHeight => slashHeight;
+    public Color HurtColor => hurtColor;
+    public float HurtSeconds => hurtSeconds;
+    public float LowHealthBelow => lowHealthBelow;
+    public float LowHealthStrength => lowHealthStrength;
+    public Color TechniqueFlashColor => techniqueFlashColor;
 
     private static Gradient DefaultTrail()
     {

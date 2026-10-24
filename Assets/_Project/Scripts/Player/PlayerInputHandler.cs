@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
@@ -23,7 +23,7 @@ public sealed class PlayerInputHandler : MonoBehaviour
     private InputAction interactAction;
     private InputAction cancelAction;
     private InputAction attackAction;
-    private InputAction shieldBashAction;
+    private InputAction guardAction;
     private InputAction inventoryAction;
     private InputAction itemsAction;
     private InputAction dodgeAction;
@@ -41,7 +41,8 @@ public sealed class PlayerInputHandler : MonoBehaviour
 
     private Vector2 moveInput;
     private bool mouseAttackPending;
-    private bool mouseShieldBashPending;
+    private bool mouseGuardPending;
+    private bool mouseAttackReleasePending;
 
     private void Awake()
     {
@@ -105,7 +106,10 @@ public sealed class PlayerInputHandler : MonoBehaviour
 
         moveInput = Vector2.zero;
         mouseAttackPending = false;
-        mouseShieldBashPending = false;
+        mouseGuardPending = false;
+        mouseAttackReleasePending = false;
+        stateMachine?.ReleaseAttack();
+        stateMachine?.RequestGuard(false);
         movement?.SetMovementInput(Vector3.zero);
         movement?.ClearAimDirection();
     }
@@ -117,7 +121,7 @@ public sealed class PlayerInputHandler : MonoBehaviour
         yield return interactAction;
         yield return cancelAction;
         yield return attackAction;
-        yield return shieldBashAction;
+        yield return guardAction;
         yield return inventoryAction;
         yield return itemsAction;
         yield return dodgeAction;
@@ -208,7 +212,7 @@ public sealed class PlayerInputHandler : MonoBehaviour
         interactAction?.Dispose();
         cancelAction?.Dispose();
         attackAction?.Dispose();
-        shieldBashAction?.Dispose();
+        guardAction?.Dispose();
         inventoryAction?.Dispose();
         itemsAction?.Dispose();
         dodgeAction?.Dispose();
@@ -252,9 +256,10 @@ public sealed class PlayerInputHandler : MonoBehaviour
         attackAction.AddBinding("<Mouse>/leftButton");
         attackAction.AddBinding("<Gamepad>/rightTrigger");
 
-        shieldBashAction = new InputAction("ShieldBash", InputActionType.Button);
-        shieldBashAction.AddBinding("<Mouse>/rightButton");
-        shieldBashAction.AddBinding("<Gamepad>/leftTrigger");
+        // Hold to guard; raised just before a hit it parries. Attack while guarding with a shield is the shield bash.
+        guardAction = new InputAction("Guard", InputActionType.Button);
+        guardAction.AddBinding("<Mouse>/rightButton");
+        guardAction.AddBinding("<Gamepad>/leftTrigger");
 
         inventoryAction = new InputAction("ToggleInventory", InputActionType.Button);
         inventoryAction.AddBinding("<Keyboard>/i");
@@ -297,7 +302,9 @@ public sealed class PlayerInputHandler : MonoBehaviour
         interactAction.performed += OnInteract;
         cancelAction.performed += OnCancel;
         attackAction.performed += OnAttack;
-        shieldBashAction.performed += OnShieldBash;
+        attackAction.canceled += OnAttackReleased;
+        guardAction.performed += OnGuard;
+        guardAction.canceled += OnGuardReleased;
         inventoryAction.performed += OnInventoryToggle;
         itemsAction.performed += OnItemsToggle;
         dodgeAction.performed += OnDodge;
@@ -362,15 +369,33 @@ public sealed class PlayerInputHandler : MonoBehaviour
         stateMachine.RequestAttack();
     }
 
-    private void OnShieldBash(InputAction.CallbackContext context)
+    // A release that comes before its press was processed (a very quick click) waits for it.
+    private void OnAttackReleased(InputAction.CallbackContext context)
     {
-        if (IsMouseClick(context))
+        if (mouseAttackPending)
         {
-            mouseShieldBashPending = true;
+            mouseAttackReleasePending = true;
             return;
         }
 
-        stateMachine.RequestShieldBash();
+        stateMachine.ReleaseAttack();
+    }
+
+    private void OnGuard(InputAction.CallbackContext context)
+    {
+        if (IsMouseClick(context))
+        {
+            mouseGuardPending = true;
+            return;
+        }
+
+        stateMachine.RequestGuard(true);
+    }
+
+    private void OnGuardReleased(InputAction.CallbackContext context)
+    {
+        mouseGuardPending = false;
+        stateMachine.RequestGuard(false);
     }
 
     private void OnInventoryToggle(InputAction.CallbackContext context)
@@ -422,7 +447,7 @@ public sealed class PlayerInputHandler : MonoBehaviour
     // recorded there and checked here. Clicks on UI (resource tabs, scrollbar) must not also swing the weapon.
     private void ProcessPendingMouseClicks()
     {
-        if (!mouseAttackPending && !mouseShieldBashPending)
+        if (!mouseAttackPending && !mouseGuardPending)
         {
             return;
         }
@@ -436,14 +461,20 @@ public sealed class PlayerInputHandler : MonoBehaviour
                 stateMachine.RequestAttack();
             }
 
-            if (mouseShieldBashPending)
+            if (mouseAttackPending && mouseAttackReleasePending)
             {
-                stateMachine.RequestShieldBash();
+                stateMachine.ReleaseAttack();
+            }
+
+            if (mouseGuardPending)
+            {
+                stateMachine.RequestGuard(true);
             }
         }
 
         mouseAttackPending = false;
-        mouseShieldBashPending = false;
+        mouseAttackReleasePending = false;
+        mouseGuardPending = false;
     }
 
     private void OnCancel(InputAction.CallbackContext context)

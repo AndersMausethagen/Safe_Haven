@@ -22,6 +22,8 @@ public sealed class MonsterAI : MonoBehaviour
         Attacking,
         Returning,
         Dead,
+        /// <summary>Reeling from a broken poise or a parried attack: no moving or attacking, and it takes extra damage.</summary>
+        Staggered,
     }
 
     // Matches HitDetector, so the monster measures reach the same way its attack does.
@@ -76,6 +78,8 @@ public sealed class MonsterAI : MonoBehaviour
     private Vector3 visualHome;
 
     private bool roaming;
+    private PoiseMeter poise;
+    private float staggerUntil;
 
     private static readonly System.Collections.Generic.List<MonsterAI> active = new System.Collections.Generic.List<MonsterAI>();
     private static readonly System.Collections.Generic.List<MonsterAI> all = new System.Collections.Generic.List<MonsterAI>();
@@ -92,7 +96,60 @@ public sealed class MonsterAI : MonoBehaviour
     /// <summary>True while chasing or attacking the given target.</summary>
     public bool IsEngaging(IDamageable candidate)
     {
-        return candidate != null && target == candidate && (CurrentState == State.Chasing || CurrentState == State.Attacking);
+        return candidate != null && target == candidate
+            && (CurrentState == State.Chasing || CurrentState == State.Attacking || CurrentState == State.Staggered);
+    }
+
+    /// <summary>Its poise right now (null before it has woken).</summary>
+    public PoiseMeter Poise => poise;
+
+    public bool IsStaggered => CurrentState == State.Staggered;
+
+    /// <summary>Raised when it starts staggering, with how long it lasts.</summary>
+    public event Action<float> Staggered;
+
+    /// <summary>Raised when any monster starts staggering (game-wide feedback).</summary>
+    public static event Action<MonsterAI, float> AnyStaggered;
+
+    /// <summary>
+    /// Makes it reel for <paramref name="seconds"/>: any attack it was winding up is cancelled (its cooldown still
+    /// applies), it stands still and takes extra damage (<see cref="CombatTechniqueSettings.StaggeredDamageTaken"/>).
+    /// Broken poise and parried attacks call this.
+    /// </summary>
+    public void Stagger(float seconds)
+    {
+        if (definition == null || CurrentState == State.Dead || seconds <= 0f)
+        {
+            return;
+        }
+
+        if (action != null && actionIndex >= 0)
+        {
+            readyAt[actionIndex] = Time.time + action.cooldown;
+        }
+
+        action = null;
+        actionIndex = -1;
+        hitPending = false;
+        exposedAt = -1f;
+        StopMoving();
+        staggerUntil = Time.time + seconds;
+        damageable.DamageTakenMultiplier = CombatTechniqueSettings.Current.StaggeredDamageTaken;
+        SetState(State.Staggered);
+        Staggered?.Invoke(seconds);
+        AnyStaggered?.Invoke(this, seconds);
+    }
+
+    private void UpdateStagger()
+    {
+        if (Time.time < staggerUntil)
+        {
+            return;
+        }
+
+        damageable.DamageTakenMultiplier = 1f;
+        nextAttackTime = Time.time + 0.35f;
+        SetState(State.Chasing);
     }
 
     public State CurrentState { get; private set; } = State.Idle;
@@ -152,6 +209,9 @@ public sealed class MonsterAI : MonoBehaviour
 
         agent.speed = definition.MoveSpeed;
         readyAt = new float[definition.Attacks.Count];
+        CombatTechniqueSettings technique = CombatTechniqueSettings.Current;
+        poise = new PoiseMeter(definition.Poise > 0f ? definition.Poise : technique.DefaultPoise,
+            technique.PoiseRecoveryDelay, technique.PoiseRecoveryPerSecond);
         if (definition.Attack == null && definition.Attacks.Count == 0 && combatant.Faction != Faction.Neutral)
         {
             Debug.LogWarning($"{definition.DisplayName} has no attack, so it chases but never attacks.", this);
@@ -207,6 +267,13 @@ public sealed class MonsterAI : MonoBehaviour
     {
         if (CurrentState == State.Dead || definition == null)
         {
+            return;
+        }
+
+        poise?.Tick(Time.time, Time.deltaTime);
+        if (CurrentState == State.Staggered)
+        {
+            UpdateStagger();
             return;
         }
 
@@ -825,6 +892,13 @@ public sealed class MonsterAI : MonoBehaviour
         {
             FinishAction();
         }
+
+        if (poise != null && CurrentState != State.Staggered && CurrentState != State.Dead && !result.Killed
+            && poise.Hit(damage.Poise, Time.time))
+        {
+            Stagger(CombatTechniqueSettings.Current.StaggerSeconds);
+        }
+
         if (definition == null || CurrentState == State.Dead || (CurrentState == State.Returning && !roaming) || CanTarget(target))
         {
             return;
@@ -845,6 +919,7 @@ public sealed class MonsterAI : MonoBehaviour
 
     private void OnDied(Damageable victim, DamageInfo killingBlow)
     {
+        damageable.DamageTakenMultiplier = 1f;
         StopMoving();
         ClearTarget();
         agent.enabled = false;

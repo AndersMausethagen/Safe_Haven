@@ -22,5 +22,13 @@ MonoBehaviour:
   range: 2.6
   arc: 180
   maxTargets: 5
-  hitDelay: 0.55
-  recoveryTime: 0.9
+  hitDelay: 0.6250002
+  recoveryTime: 1.0250002
+  poiseDamage: 15
+  lunge: 0.6
+  staminaCost: -1
+  animationState: Attack Two Handed
+  animationSpeed: 0.88
+  swingSound: {fileID: 0}
+  hitSound: {fileID: 0}
+  slashColor: {r: 1, g: 0.95, b: 0.85, a: 0.8}

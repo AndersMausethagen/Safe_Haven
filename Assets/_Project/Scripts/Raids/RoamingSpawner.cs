@@ -180,7 +180,7 @@ public sealed class RoamingSpawner : MonoBehaviour
                 alive++;
                 // A pack's root stays where it spawned; its members are where the group really is.
                 position += ai.transform.position;
-                busy |= ai.CurrentState == MonsterAI.State.Chasing || ai.CurrentState == MonsterAI.State.Attacking;
+                busy |= ai.CurrentState == MonsterAI.State.Chasing || ai.CurrentState == MonsterAI.State.Attacking || ai.CurrentState == MonsterAI.State.Staggered;
                 idle |= ai.CurrentState == MonsterAI.State.Idle;
             }
 

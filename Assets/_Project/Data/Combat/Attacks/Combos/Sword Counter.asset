@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c5517319b40a047489a8fdcb2b152b82, type: 3}
+  m_Name: Sword Counter
+  m_EditorClassIdentifier: Assembly-CSharp::AttackDefinition
+  displayName: Sword Counter
+  damageType: 0
+  baseDamage: 0
+  weaponDamageRatio: 1.4
+  powerScaling: 1
+  structureDamageMultiplier: 1
+  canCrit: 1
+  range: 2.4
+  arc: 100
+  maxTargets: 3
+  hitDelay: 0.37878796
+  recoveryTime: 0.8287879
+  poiseDamage: 30
+  lunge: 1.8
+  staminaCost: -1
+  animationState: Sword Counter
+  animationSpeed: 0.88
+  swingSound: {fileID: 0}
+  hitSound: {fileID: 0}
+  slashColor: {r: 0.55, g: 0.85, b: 1, a: 0.95}

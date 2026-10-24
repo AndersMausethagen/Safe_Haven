@@ -28,6 +28,10 @@ public sealed class PlayerMovement : MonoBehaviour
     private Vector3 horizontalVelocity;
     private Vector3 dashVelocity;
     private float dashUntil = -1f;
+    private Vector3 lungeVelocity;
+    private float lungeUntil = -1f;
+    private readonly System.Collections.Generic.Dictionary<object, float> speedScales = new System.Collections.Generic.Dictionary<object, float>();
+    private float speedScale = 1f;
 
     public PlayerMovementSettings Settings => settings;
     /// <summary>True during a dash (a dodge): movement input is ignored and the character slides at the dash velocity.</summary>
@@ -97,6 +101,9 @@ public sealed class PlayerMovement : MonoBehaviour
         horizontalVelocity = Vector3.zero;
         hasAimDirection = false;
         dashUntil = -1f;
+        lungeUntil = -1f;
+        speedScales.Clear();
+        speedScale = 1f;
     }
 
     private void Update()
@@ -127,6 +134,52 @@ public sealed class PlayerMovement : MonoBehaviour
         dashVelocity = velocity;
         dashUntil = Time.time + duration;
         transform.rotation = Quaternion.LookRotation(velocity.normalized, Vector3.up);
+    }
+
+    /// <summary>
+    /// A short push on top of normal movement, without counting as a dash (an attack stepping into its swing). Faces
+    /// the way it pushes.
+    /// </summary>
+    public void Lunge(Vector3 velocity, float duration)
+    {
+        velocity.y = 0f;
+        if (velocity.sqrMagnitude < 0.0001f || duration <= 0f)
+        {
+            return;
+        }
+
+        lungeVelocity = velocity;
+        lungeUntil = Time.time + duration;
+    }
+
+    /// <summary>Scales movement speed while <paramref name="source"/> asks (guarding, a stun); 1 or clearing removes it.
+    /// Several sources multiply.</summary>
+    public void SetSpeedScale(object source, float scale)
+    {
+        if (scale >= 0.999f)
+        {
+            speedScales.Remove(source);
+        }
+        else
+        {
+            speedScales[source] = Mathf.Max(0f, scale);
+        }
+
+        speedScale = 1f;
+        foreach (float value in speedScales.Values)
+        {
+            speedScale *= value;
+        }
+    }
+
+    /// <summary>Faces <paramref name="direction"/> at once (the start of a swing), whatever the movement gate.</summary>
+    public void SnapFacing(Vector3 direction)
+    {
+        direction.y = 0f;
+        if (direction.sqrMagnitude > 0.0001f)
+        {
+            transform.rotation = Quaternion.LookRotation(direction.normalized, Vector3.up);
+        }
     }
 
     /// <summary>Sets the horizontal direction toward the aim point (e.g. the cursor). Used only in states that face the cursor.</summary>
@@ -200,8 +253,19 @@ public sealed class PlayerMovement : MonoBehaviour
             FaceDirection(direction);
         }
 
-        float speed = settings.MoveSpeed * settings.GetSpeedMultiplier(currentGameState);
+        float speed = settings.MoveSpeed * settings.GetSpeedMultiplier(currentGameState) * speedScale;
         horizontalVelocity = direction * speed;
+        if (lungeUntil >= 0f)
+        {
+            if (Time.time < lungeUntil)
+            {
+                horizontalVelocity += lungeVelocity;
+            }
+            else
+            {
+                lungeUntil = -1f;
+            }
+        }
     }
 
     private void ApplyGravity()

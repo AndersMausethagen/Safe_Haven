@@ -11,7 +11,8 @@ public static class AttackResolver
 {
     /// <summary>
     /// Hits everything the attack reaches from origin toward direction. weaponDamage is the damage of the weapon behind
-    /// the attack, or 0 for attacks that don't use one. Returns how many targets were hit.
+    /// the attack, or 0 for attacks that don't use one. The player's technique (rhythm, counters, finishers) comes in as
+    /// a damage and poise multiplier and the techniques the hits carry. Returns how many targets were hit.
     /// </summary>
     public static int Execute(
         Combatant attacker,
@@ -19,7 +20,11 @@ public static class AttackResolver
         float weaponDamage,
         Vector3 origin,
         Vector3 direction,
-        int layerMask)
+        int layerMask,
+        float damageMultiplier = 1f,
+        float poiseMultiplier = 1f,
+        HitTechnique technique = HitTechnique.None,
+        bool forceCritical = false)
     {
         var hits = new List<HitDetector.Hit>(8);
         HitDetector.FindTargets(origin, direction, attack, attacker.Faction, layerMask, hits);
@@ -37,7 +42,11 @@ public static class AttackResolver
                 hit.Target.Category,
                 hit.Point,
                 hitDirection,
-                Random.value);
+                forceCritical ? 0f : Random.value);
+            if (damageMultiplier != 1f || poiseMultiplier != 1f || technique != HitTechnique.None || forceCritical)
+            {
+                damage = damage.Scaled(damageMultiplier, poiseMultiplier, technique, forceCritical && attack.CanCrit);
+            }
 
             DamageResult result = hit.Target.ApplyDamage(damage);
             attacker.ReportDamageDealt(hit.Target, damage, result);

@@ -51,6 +51,29 @@ public sealed class WaterSurface : MonoBehaviour
         return false;
     }
 
+    /// <summary>The point of the surface nearest <paramref name="point"/> (on its top, inside its outline), for sounds.</summary>
+    public Vector3 NearestPoint(Vector3 point)
+    {
+        if (filter == null)
+        {
+            filter = GetComponent<MeshFilter>();
+        }
+
+        Mesh mesh = filter != null ? filter.sharedMesh : null;
+        if (mesh == null)
+        {
+            return transform.position;
+        }
+
+        Bounds bounds = mesh.bounds;
+        Vector3 local = transform.InverseTransformPoint(point);
+        local = new Vector3(Mathf.Clamp(local.x, bounds.min.x, bounds.max.x), bounds.max.y, Mathf.Clamp(local.z, bounds.min.z, bounds.max.z));
+        return transform.TransformPoint(local);
+    }
+
+    /// <summary>Every enabled water surface.</summary>
+    public static IReadOnlyList<WaterSurface> Surfaces => All;
+
     public bool Contains(Vector3 point, float reach, out float height)
     {
         height = 0f;

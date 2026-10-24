@@ -861,16 +861,35 @@ public sealed class WeaponSection : ContentSection
     public override Type AssetType => typeof(WeaponDefinition);
     public override string Folder => "Assets/_Project/Data/Combat/Weapons";
     public override string Help =>
-        "What the player can hold. A weapon sets the animation stance, its damage and the attack the left mouse button performs.";
+        "What the player can hold. A weapon sets the animation stance, its damage and its attacks: the combo chain the attack button " +
+        "walks through when pressed in time, the heavy attack a held press performs, the counter after a parry or perfect dodge, and " +
+        "how well it guards. Timings follow the animations (Safe Haven › Characters › Set Up Combat Animations).";
 
     public override string ListGroup(Object asset) => ObjectNames.NicifyVariableName(((WeaponDefinition)asset).Stance.ToString());
 
     public override List<string> FindProblems(Object asset, IList<Object> all)
     {
         List<string> problems = base.FindProblems(asset, all);
-        if (((WeaponDefinition)asset).BasicAttack == null)
+        var weapon = (WeaponDefinition)asset;
+        if (weapon.BasicAttack == null && weapon.Combo.Count == 0)
         {
             problems.Add("No basic attack, so swinging it does no damage.");
+        }
+
+        for (int i = 0; i < weapon.Combo.Count; i++)
+        {
+            if (weapon.Combo[i] == null)
+            {
+                problems.Add($"Combo step {i + 1} is empty.");
+            }
+        }
+
+        foreach (AttackDefinition attack in System.Linq.Enumerable.Concat(weapon.Combo, new[] { weapon.HeavyAttack, weapon.CounterAttack }))
+        {
+            if (attack != null && string.IsNullOrEmpty(attack.AnimationState))
+            {
+                problems.Add($"{attack.DisplayName} has no Animation State, so it plays the stance's old attack animation out of step with its timing.");
+            }
         }
 
         return problems;

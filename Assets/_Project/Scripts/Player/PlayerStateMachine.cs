@@ -16,7 +16,11 @@ public sealed class PlayerStateMachine : MonoBehaviour
     public event Action<PlayerState, PlayerState> StateChanged;
     public event Action InteractionRequested;
     public event Action AttackRequested;
+    /// <summary>Raised when the attack button is let go (a held press is the heavy attack).</summary>
+    public event Action AttackReleased;
     public event Action ShieldBashRequested;
+    /// <summary>Raised when the guard button goes down (true) or up (false).</summary>
+    public event Action<bool> GuardRequested;
     public event Action DodgeRequested;
     /// <summary>Raised with the skill bar slot (0-4) the player asked to cast.</summary>
     public event Action<int> SkillRequested;
@@ -71,6 +75,20 @@ public sealed class PlayerStateMachine : MonoBehaviour
         else
         {
             WorkPressed?.Invoke();
+        }
+    }
+
+    public void ReleaseAttack()
+    {
+        AttackReleased?.Invoke();
+    }
+
+    /// <summary>Raising the guard is refused while busy with an interaction; lowering it always goes through.</summary>
+    public void RequestGuard(bool raised)
+    {
+        if (!raised || CurrentState != PlayerState.Interacting)
+        {
+            GuardRequested?.Invoke(raised);
         }
     }
 

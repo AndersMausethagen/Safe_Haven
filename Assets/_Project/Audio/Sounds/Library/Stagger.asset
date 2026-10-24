@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0de871765cd6fce4c8fed103ef0082e3, type: 3}
+  m_Name: Stagger
+  m_EditorClassIdentifier: SafeHaven::SoundDefinition
+  displayName: Stagger
+  clips:
+  - {fileID: 8300000, guid: 4d3f5865a61c91e4da09ba299eff58b9, type: 3}
+  - {fileID: 8300000, guid: 7248d82dad0eda942a8bd5103d7f5074, type: 3}
+  - {fileID: 8300000, guid: 856d18d0733b00a429d1abcce347e271, type: 3}
+  - {fileID: 8300000, guid: 5e3ca152dfeaaeb4bbfc4aa86a1ada09, type: 3}
+  - {fileID: 8300000, guid: 9a9244b850093974f999dec1af047961, type: 3}
+  channel: 2
+  volume: 0.85
+  volumeVariation: 0.1
+  pitchRange: {x: 0.75, y: 0.9}
+  positional: 1
+  fullVolumeDistance: 3
+  audibleDistance: 35
+  maxAtOnce: 4

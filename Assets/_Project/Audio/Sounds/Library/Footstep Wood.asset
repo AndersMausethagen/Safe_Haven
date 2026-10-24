@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0de871765cd6fce4c8fed103ef0082e3, type: 3}
+  m_Name: Footstep Wood
+  m_EditorClassIdentifier: SafeHaven::SoundDefinition
+  displayName: Footstep Wood
+  clips:
+  - {fileID: 8300000, guid: 210287fe64173614bb94fe6b102c77e2, type: 3}
+  - {fileID: 8300000, guid: f294e94f77190c44b9b789972a3b2648, type: 3}
+  - {fileID: 8300000, guid: 18fe9b967597f7b4ba49ff831bb625c6, type: 3}
+  - {fileID: 8300000, guid: cd7ba83572a1656489008456ff61bccb, type: 3}
+  - {fileID: 8300000, guid: 23bd662d21cccdd4780796615af6b4c8, type: 3}
+  channel: 2
+  volume: 0.4
+  volumeVariation: 0.1
+  pitchRange: {x: 0.9, y: 1.1}
+  positional: 1
+  fullVolumeDistance: 3
+  audibleDistance: 12
+  maxAtOnce: 3
