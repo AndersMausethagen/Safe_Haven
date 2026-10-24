@@ -105,6 +105,11 @@ public sealed class WaterInteractor : MonoBehaviour
         }
 
         hasLast = false;
+        if (Application.isPlaying)
+        {
+            WaterRipples.Prewarm();
+        }
+
         UpdateAll(0f);
     }
 

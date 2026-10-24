@@ -576,6 +576,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 4416926081852918481, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
       insertIndex: -1
       addedObject: {fileID: 5481392375160473428}
+    - targetCorrespondingSourceObject: {fileID: 4416926081852918481, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3632635855292703234}
   m_SourcePrefab: {fileID: 100100000, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
 --- !u!1 &5943822763764690748 stripped
 GameObject:
@@ -922,6 +925,20 @@ MonoBehaviour:
   foam: 0.6
   splash: {fileID: 427604759136440720, guid: d500fd09614e25f46b5c5f1fa49f7033, type: 3}
   splashSpeed: 2.5
+--- !u!114 &3632635855292703234
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5943822763764690748}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30a9bca65104c7d4bb2fa7c634cb8da6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::HeldItemView
+  gripPosition: {x: 0.017659629, y: -0.051033758, z: -0.0021386836}
+  gripRotation: {x: 8.464898, y: 90.57634, z: 251.09476}
 --- !u!4 &6428716820787852678 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3893294197879345259, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}

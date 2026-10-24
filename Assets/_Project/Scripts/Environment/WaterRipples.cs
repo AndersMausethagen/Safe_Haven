@@ -59,6 +59,10 @@ public static class WaterRipples
         Pending.Add(new Vector4(point.x, point.z, radius, depth));
     }
 
+    /// <summary>Creates the textures and loads the shader now (at scene load) instead of on the first ripple, which
+    /// would otherwise hitch the frame the player first steps into water.</summary>
+    public static void Prewarm() => Ensure();
+
     /// <summary>Adds the frame time and returns how many simulation steps are due (at most 3 a frame).</summary>
     public static int Advance(float deltaTime)
     {

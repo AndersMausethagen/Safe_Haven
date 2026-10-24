@@ -21,6 +21,10 @@ MonoBehaviour:
   value: 1
   icon: {fileID: 21300000, guid: a5e96f6d58e3edf4cb6da3ddadbcc7c1, type: 3}
   prefab: {fileID: 0}
+  heldModel: {fileID: 759308911340851766, guid: b0b1d50816a46b14eb6752db3588fec9, type: 3}
+  heldPosition: {x: 0, y: 0, z: 0}
+  heldRotation: {x: 0, y: 0, z: 0}
+  heldScale: 1
   stackable: 0
   maximumStack: 99
   weight: 6

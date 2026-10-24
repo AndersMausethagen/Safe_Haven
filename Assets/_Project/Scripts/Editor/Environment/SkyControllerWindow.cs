@@ -19,14 +19,20 @@ public sealed class SkyControllerWindow : EditorWindow
     private float transition = 5f;
     private Vector2 scroll;
     private double lastRepaint;
+    private List<WeatherDefinition> projectWeathers;
 
     [MenuItem("Safe Haven/Environment/Sky Controller")]
     public static void Open() => GetWindow<SkyControllerWindow>("Sky Controller");
 
+    // Searching the project is slow (tens of ms), so the weather list is found once and again only when assets change.
+    private void OnEnable() => projectWeathers = null;
+
+    private void OnProjectChange() => projectWeathers = null;
+
     private void Update()
     {
-        // Follow the clock and the weather blend while playing.
-        if (Application.isPlaying && EditorApplication.timeSinceStartup - lastRepaint > 0.25)
+        // Follow the clock and the weather blend while playing (twice a second is enough for a readout).
+        if (Application.isPlaying && EditorApplication.timeSinceStartup - lastRepaint > 0.5)
         {
             lastRepaint = EditorApplication.timeSinceStartup;
             Repaint();
@@ -137,7 +143,7 @@ public sealed class SkyControllerWindow : EditorWindow
         }
 
         transition = EditorGUILayout.Slider("Blend over (seconds)", transition, 0f, 60f);
-        foreach (WeatherDefinition[] row in AllWeathers(weather).Select((w, i) => (w, i)).GroupBy(p => p.i / 3).Select(g => g.Select(p => p.w).ToArray()))
+        foreach (WeatherDefinition[] row in AllWeathers(weather, ref projectWeathers).Select((w, i) => (w, i)).GroupBy(p => p.i / 3).Select(g => g.Select(p => p.w).ToArray()))
         {
             using (new EditorGUILayout.HorizontalScope())
             {
@@ -176,24 +182,23 @@ public sealed class SkyControllerWindow : EditorWindow
         }
     }
 
-    /// <summary>The climate's weathers first, then any other weather assets in the project.</summary>
-    private static List<WeatherDefinition> AllWeathers(WeatherSystem weather)
+    /// <summary>The climate's weathers first, then any other weather assets in the project (searched once, cached).</summary>
+    private static List<WeatherDefinition> AllWeathers(WeatherSystem weather, ref List<WeatherDefinition> project)
     {
+        if (project == null)
+        {
+            project = AssetDatabase.FindAssets("t:" + nameof(WeatherDefinition))
+                .Select(guid => AssetDatabase.LoadAssetAtPath<WeatherDefinition>(AssetDatabase.GUIDToAssetPath(guid)))
+                .Where(w => w != null).ToList();
+        }
+
         var list = new List<WeatherDefinition>();
         if (weather.Climate != null)
         {
             list.AddRange(weather.Climate.Weathers.Select(e => e.weather).Where(w => w != null));
         }
 
-        foreach (string guid in AssetDatabase.FindAssets("t:" + nameof(WeatherDefinition)))
-        {
-            var definition = AssetDatabase.LoadAssetAtPath<WeatherDefinition>(AssetDatabase.GUIDToAssetPath(guid));
-            if (definition != null && !list.Contains(definition))
-            {
-                list.Add(definition);
-            }
-        }
-
+        list.AddRange(project.Where(w => w != null && !list.Contains(w)));
         return list;
     }
 

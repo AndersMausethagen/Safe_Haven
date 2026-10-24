@@ -417,6 +417,11 @@ checks saved assets and runs isolated live combat probes without loading a playe
 - **Gear model**: `Items/GearSlot.cs` (the slot enum, plus `GearSlots` for count, labels and `Describe`) and `Items/GearSet.cs`
   (an `ItemContainer` with a `SlotRule`, so each slot only takes items whose `ItemDefinition` gear slot matches; rings fit
   either finger). Slots: 12 armor slots, MainHand, Backpack, and a tool belt of Axe, Pickaxe and Sickle.
+- **Held items**: `HeldItemView` (on PlayerArmature) shows the main-hand weapon in the right hand, or, while gathering, the
+  belt tool for the job. Models come from `ItemDefinition` › Held In Hand (held model, else the world prefab; position,
+  rotation, scale in the grip). Held models are visual only (colliders, rigidbodies and scripts stripped). The grip is a fist
+  fitted to the rig's own fingers; tune items in **Safe Haven › Characters › Held Item Grips** (live in Play mode). Stand-in
+  models come from the Kevin Iglesias demo props until LocalSpawn makes real ones.
 - **`PlayerEquipment`** owns the `GearSet`. It applies each worn item's `StatBonus` list to `CombatStats` and removes it
   again when the item comes off or breaks. It exposes the weapon and `ToolTier`; tools only count while on the tool
   belt. Gear arriving through Give or crafting auto-equips into an empty matching slot.

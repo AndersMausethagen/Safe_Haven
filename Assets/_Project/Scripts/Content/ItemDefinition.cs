@@ -52,6 +52,16 @@ public sealed class ItemDefinition : ScriptableObject
     [Tooltip("Generated prefab used when the item lies in the world.")]
     [SerializeField] private GameObject prefab;
 
+    [Header("Held In Hand")]
+    [Tooltip("Model shown in the player's right hand when this is the equipped weapon or the tool being used. Empty: " +
+             "the world prefab above.")]
+    [SerializeField] private GameObject heldModel;
+    [Tooltip("Where the held model sits in the hand's grip (metres): zero for models made for the grip; tune it for " +
+             "others in Safe Haven > Characters > Held Item Grips.")]
+    [SerializeField] private Vector3 heldPosition;
+    [SerializeField] private Vector3 heldRotation;
+    [SerializeField, Min(0.01f)] private float heldScale = 1f;
+
     [Header("Stacking")]
     [Tooltip("Whether several of this item share one inventory slot.")]
     [SerializeField] private bool stackable = true;
@@ -112,6 +122,11 @@ public sealed class ItemDefinition : ScriptableObject
     public int Value => value;
     public Sprite Icon => icon;
     public GameObject Prefab => prefab;
+    /// <summary>Model shown in the hand (the held model, else the world prefab); null when the item has none.</summary>
+    public GameObject HeldModel => heldModel != null ? heldModel : prefab;
+    /// <summary>The held model's place in the hand's grip.</summary>
+    public Pose HeldPose => new Pose(heldPosition, Quaternion.Euler(heldRotation));
+    public float HeldScale => heldScale;
     /// <summary>Items with durability never stack, so every one keeps its own wear.</summary>
     public bool Stackable => stackable && !HasDurability;
     public int MaximumStack => Stackable ? Mathf.Max(1, maximumStack) : 1;
