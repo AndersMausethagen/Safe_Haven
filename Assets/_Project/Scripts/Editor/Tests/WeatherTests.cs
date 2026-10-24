@@ -23,15 +23,7 @@ public sealed class WeatherTests
     [TearDown]
     public void TearDown()
     {
-        for (int i = created.Count - 1; i >= 0; i--)
-        {
-            if (created[i] != null)
-            {
-                Object.DestroyImmediate(created[i]);
-            }
-        }
-
-        created.Clear();
+        TestCleanup.Destroy(created);
         RenderSettings.fogDensity = fogDensity;
         RenderSettings.fogColor = fogColour;
         RenderSettings.sun = renderSun;
@@ -90,6 +82,10 @@ public sealed class WeatherTests
         Assert.AreEqual(0f, profile.Evaluate(profile.Sunrise).LightIntensity, 1e-3f, "the light fades out at the horizon");
         Assert.Greater(profile.Evaluate(19.5f).GoldenHour, 0.9f);
         Assert.Greater(profile.Evaluate(6.5f).FogDensity, noon.FogDensity, "morning mist");
+        DayNightState evening = profile.Evaluate(19.5f);
+        Assert.GreaterOrEqual(evening.LightRotation.eulerAngles.x, 12f, "the evening light never grazes flat ground");
+        Assert.Greater(evening.LightIntensity, 1f, "golden hour is still well lit");
+        Assert.Greater(evening.LightColour.g, 0.6f, "warm gold, not deep orange");
     }
 
     [Test]

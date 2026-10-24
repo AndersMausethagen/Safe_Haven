@@ -3,6 +3,10 @@
 // Trunk, leaves and vines must all use it so leaves stay on the bending branches.
 // Direction and strength come from the scene's MossWind (and its WindZone): _SafeHavenWind / _SafeHavenTreeWind.
 // Materials are created on import by TreeWindMaterials (Safe Haven > Environment > Apply Tree Wind Materials).
+// Fast Leaf Lighting (leaves and vines): sun and ambient are lit per vertex, darker inside the canopy (the baked
+// flex: 0 at the trunk, 1 at the twig tips); the pixel samples the leaf texture, one hardware shadow compare
+// (no soft-shadow filtering) and a cheap Lambert for nearby point lights. Alpha-tested leaf cards overlap many times, so the
+// full PBR path (normal map, specular, reflections, soft shadows) per leaf pixel was the trees' main cost.
 Shader "Safe Haven/Tree Wind"
 {
     Properties
@@ -18,6 +22,8 @@ Shader "Safe Haven/Tree Wind"
         [Toggle(_ALPHATEST_ON)] _AlphaClip ("Alpha Clip (leaf cards)", Float) = 0
         _Cutoff ("Alpha Cutoff", Range(0, 1)) = 0.5
         [Enum(UnityEngine.Rendering.CullMode)] _Cull ("Cull", Float) = 2
+        [Toggle(_FAST_LEAF_LIGHTING)] _FastLeafLighting ("Fast Leaf Lighting (per vertex, no specular)", Float) = 0
+        _Translucency ("Light Through Leaves (fast lighting)", Range(0, 1)) = 0.5
         [Header(Wind)]
         _WindStrength ("Wind Strength", Range(0, 2)) = 1
         _TreeHeight ("Tree Height (object units)", Float) = 10
@@ -36,7 +42,7 @@ Shader "Safe Haven/Tree Wind"
         CBUFFER_START(UnityPerMaterial)
             float4 _BaseMap_ST;
             half4 _BaseColor;
-            half _BumpScale, _OcclusionStrength, _Roughness, _Metallic, _Cutoff;
+            half _BumpScale, _OcclusionStrength, _Roughness, _Metallic, _Cutoff, _Translucency;
             float _WindStrength, _TreeHeight;
         CBUFFER_END
         float4 _SafeHavenWind; // horizontal direction XZ (world), moss displacement, moss speed
@@ -61,6 +67,8 @@ Shader "Safe Haven/Tree Wind"
             half3 normalWS : TEXCOORD2;
             half4 tangentWS : TEXCOORD3;
             half fog : TEXCOORD4;
+            half3 ambient : TEXCOORD5; // fast leaf lighting: ambient (per vertex)
+            half3 sun : TEXCOORD6;     // fast leaf lighting: unshadowed sunlight (per vertex)
             UNITY_VERTEX_INPUT_INSTANCE_ID
             UNITY_VERTEX_OUTPUT_STEREO
         };
@@ -85,6 +93,15 @@ Shader "Safe Haven/Tree Wind"
             output.tangentWS = half4(normals.tangentWS, input.tangentOS.w * GetOddNegativeScale());
             output.uv = TRANSFORM_TEX(input.uv, _BaseMap);
             output.fog = ComputeFogFactor(output.positionCS.z);
+            #if defined(_FAST_LEAF_LIGHTING)
+                // Leaves are lit from both sides: the facing side directly, the far side by light shining through.
+                Light sun = GetMainLight();
+                half facing = dot(normals.normalWS, sun.direction);
+                half diffuse = saturate(abs(facing)) * (facing >= 0 ? 1.0 : _Translucency);
+                half canopy = lerp(0.45, 1.0, saturate(input.wind.y)); // inner leaves get less light
+                output.sun = sun.color * diffuse * canopy;
+                output.ambient = SampleSH(normals.normalWS) * canopy;
+            #endif
             return output;
         }
         half4 SampleBase(float2 uv)
@@ -108,11 +125,49 @@ Shader "Safe Haven/Tree Wind"
             half3 mapped = UnpackNormalScale(SAMPLE_TEXTURE2D(_BumpMap, sampler_BumpMap, input.uv), _BumpScale);
             return normalize(tangent * mapped.x + bitangent * mapped.y + normal * mapped.z);
         }
+        half3 FastLeafLighting(Varyings input, half faceSign)
+        {
+            half shadow = 1.0;
+            #if defined(_MAIN_LIGHT_SHADOWS_SCREEN)
+                shadow = GetMainLight(ComputeScreenPos(input.positionCS)).shadowAttenuation;
+            #elif defined(_MAIN_LIGHT_SHADOWS) || defined(_MAIN_LIGHT_SHADOWS_CASCADE)
+                // One hardware compare, no soft-shadow taps: dappled light through the canopy at little cost.
+                float4 coord = TransformWorldToShadowCoord(input.positionWS);
+                half raw = SAMPLE_TEXTURE2D_SHADOW(_MainLightShadowmapTexture, sampler_LinearClampCompare, coord.xyz);
+                shadow = BEYOND_SHADOW_FAR(coord) ? 1.0 : LerpWhiteTo(raw, GetMainLightShadowParams().x);
+                shadow = lerp(shadow, 1.0, GetMainLightShadowFade(input.positionWS));
+            #endif
+            half3 light = input.ambient + input.sun * shadow;
+            #if defined(_ADDITIONAL_LIGHTS)
+                half3 normal = normalize(input.normalWS) * faceSign;
+                InputData inputData = (InputData)0;
+                inputData.positionWS = input.positionWS;
+                inputData.normalizedScreenSpaceUV = GetNormalizedScreenSpaceUV(input.positionCS);
+                uint lightCount = GetAdditionalLightsCount();
+                #if USE_CLUSTER_LIGHT_LOOP
+                [loop] for (uint lightIndex = 0; lightIndex < min(URP_FP_DIRECTIONAL_LIGHTS_COUNT, MAX_VISIBLE_LIGHTS); lightIndex++)
+                {
+                    CLUSTER_LIGHT_LOOP_SUBTRACTIVE_LIGHT_CHECK
+                    Light extra = GetAdditionalLight(lightIndex, input.positionWS, half4(1, 1, 1, 1));
+                    light += extra.color * extra.distanceAttenuation * saturate(abs(dot(normal, extra.direction)));
+                }
+                #endif
+                LIGHT_LOOP_BEGIN(lightCount)
+                    Light extra = GetAdditionalLight(lightIndex, input.positionWS, half4(1, 1, 1, 1));
+                    light += extra.color * extra.distanceAttenuation * saturate(abs(dot(normal, extra.direction)));
+                LIGHT_LOOP_END
+            #endif
+            return light;
+        }
         half4 TreeFragment(Varyings input, FRONT_FACE_TYPE face : FRONT_FACE_SEMANTIC) : SV_Target
         {
             UNITY_SETUP_INSTANCE_ID(input);
             UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
             half4 baseColor = SampleBase(input.uv);
+            #if defined(_FAST_LEAF_LIGHTING)
+                half3 leaf = baseColor.rgb * FastLeafLighting(input, IS_FRONT_VFACE(face, 1.0, -1.0));
+                return half4(MixFog(leaf, input.fog), 1);
+            #endif
             half3 orm = SAMPLE_TEXTURE2D(_ORMMap, sampler_ORMMap, input.uv).rgb;
             InputData lighting = (InputData)0;
             lighting.positionWS = input.positionWS;
@@ -184,6 +239,7 @@ Shader "Safe Haven/Tree Wind"
             #pragma vertex TreeVertex
             #pragma fragment TreeFragment
             #pragma shader_feature_local _ALPHATEST_ON
+            #pragma shader_feature_local _FAST_LEAF_LIGHTING
             #pragma multi_compile_instancing
             #pragma multi_compile_fog
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE _MAIN_LIGHT_SHADOWS_SCREEN

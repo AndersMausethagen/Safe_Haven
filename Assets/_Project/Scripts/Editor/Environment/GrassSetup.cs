@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
@@ -20,7 +21,11 @@ public static class GrassSetup
         Grass,
         Bush,
         Mushrooms,
-        Flowers
+        Flowers,
+        Fern,
+        BerryShrub,
+        Heather,
+        WildFlowers
     }
 
     /// <summary>name, shape, blade/card/plant count, radius, height (metres).</summary>
@@ -31,7 +36,29 @@ public static class GrassSetup
         ("Bush", Shape.Bush, 70, 0.4f, 0.55f),
         ("Glow Mushrooms", Shape.Mushrooms, 5, 0.2f, 0.2f),
         ("Glow Flowers", Shape.Flowers, 5, 0.22f, 0.38f),
+        // Nordic forest floor (fill by ground, or paint them).
+        ("Fern", Shape.Fern, 8, 0.05f, 0.55f),
+        ("Blueberry", Shape.BerryShrub, 44, 0.3f, 0.3f),
+        ("Lingonberry", Shape.BerryShrub, 38, 0.26f, 0.22f),
+        ("Heather", Shape.Heather, 44, 0.18f, 0.28f),
+        ("White Flowers", Shape.WildFlowers, 7, 0.24f, 0.27f),
+        ("Yellow Flowers", Shape.WildFlowers, 6, 0.24f, 0.36f),
     };
+
+    /// <summary>The Nordic plants FillByGround grows in patches: name, patch noise scale (1/m), how rare the patches
+    /// are (noise threshold), and how thickly they grow inside one.</summary>
+    /// The plant clears grass this many cells around it, so it is not drowned in the lawn.
+    private static readonly (string Name, float Scale, float Threshold, float Thickness, int Clearing)[] Plants =
+    {
+        ("Fern", 0.11f, 0.64f, 0.5f, 1),
+        ("Blueberry", 0.15f, 0.66f, 0.6f, 1),
+        ("Lingonberry", 0.17f, 0.7f, 0.55f, 1),
+        ("Heather", 0.13f, 0.64f, 0.7f, 0),
+        ("White Flowers", 0.22f, 0.68f, 0.35f, 0),
+        ("Yellow Flowers", 0.2f, 0.74f, 0.3f, 0),
+    };
+
+    public static int KindCount => Kinds.Length;
 
     /// <summary>Night glow of the glowing plants (HDR, light blue); vertex colour B marks the parts that glow.</summary>
     public static readonly Color GlowColour = new Color(0.15f, 0.55f, 1f) * 1.4f;
@@ -70,7 +97,7 @@ public static class GrassSetup
         bool player = EnsurePlayerInteractor();
         Debug.Log($"Grass: added {added} detail prototype(s) to {terrains.Length} terrain(s)" +
                   (player ? "; the player now pushes grass aside" : "") +
-                  ". Select the terrain › Paint Details, pick Short Grass, Tall Grass, Bush, Glow Mushrooms or Glow Flowers and paint. " +
+                  ". Select the terrain › Paint Details, pick a grass, bush, fern, berry shrub, heather, flower or glowing plant and paint. " +
                   $"Tune size, colour, wind and push on the materials in {Folder}.");
     }
 
@@ -105,7 +132,7 @@ public static class GrassSetup
     private sealed class FillWizard : ScriptableWizard
     {
         [Tooltip("How much of each kind grows on each ground layer (a guess from the layer's colour to start with). " +
-                 "Replaces the Short Grass, Tall Grass and Bush paint; glowing plants and other details are kept.")]
+                 "Replaces the grass, bushes and Nordic plants (ferns, berry shrubs, heather, wild flowers); glowing plants and other details are kept.")]
         public GroundFill[] layers;
         public int seed = 1;
         private Terrain terrain;
@@ -169,6 +196,10 @@ public static class GrassSetup
                     Shape.Bush => BuildBush(count, radius, height, 11),
                     Shape.Mushrooms => BuildMushrooms(count, radius, height, 21),
                     Shape.Flowers => BuildFlowers(count, radius, height, 31),
+                    Shape.Fern => BuildFern(count, height, 41),
+                    Shape.BerryShrub => BuildBush(count, radius, height, name.Length * 7),
+                    Shape.Heather => BuildClump(count, radius, height, 51),
+                    Shape.WildFlowers => BuildFlowers(count, radius, height, name.Length * 3),
                     _ => BuildClump(count, radius, height, name.Length)
                 };
                 mesh.name = name;
@@ -180,37 +211,7 @@ public static class GrassSetup
             if (material == null)
             {
                 material = new Material(shader) { name = name, enableInstancing = true };
-                material.SetFloat("_FacingBlades", shape == Shape.Grass ? 1f : 0f);
-                if (bush)
-                {
-                    material.SetTexture("_BaseMap", leaves);
-                    material.SetFloat("_Cutoff", 0.5f);
-                    material.SetColor("_BottomColor", new Color(0.12f, 0.21f, 0.07f));
-                    material.SetColor("_TopColor", new Color(0.38f, 0.52f, 0.19f));
-                    material.SetFloat("_WindStrength", 0.05f);
-                    material.SetFloat("_PushStrength", 0.15f);
-                    material.SetFloat("_Flatten", 0.15f);
-                    material.SetFloat("_NormalUp", 0.55f);
-                    material.SetFloat("_GroundColor", 0.3f);
-                }
-                else if (glows)
-                {
-                    // Colours come from the palette texture (by UV); the glow from vertex colour B at night.
-                    material.SetTexture("_BaseMap", palette);
-                    material.SetFloat("_Cutoff", 0.1f);
-                    material.SetColor("_BottomColor", Color.white);
-                    material.SetColor("_TopColor", Color.white);
-                    material.SetFloat("_GroundColor", 0f);
-                    material.SetFloat("_DryAmount", 0f);
-                    material.SetFloat("_BladeVariation", 0.15f);
-                    material.SetFloat("_NormalUp", 0.25f);
-                    material.SetFloat("_ClumpHeight", 0.2f);
-                    material.SetFloat("_WindStrength", shape == Shape.Flowers ? 0.08f : 0.01f);
-                    material.SetFloat("_PushStrength", shape == Shape.Flowers ? 0.25f : 0.05f);
-                    material.SetFloat("_Flatten", shape == Shape.Flowers ? 0.4f : 0.1f);
-                    material.SetColor("_GlowColor", GlowColour);
-                }
-
+                Configure(material, name, shape, leaves, palette);
                 AssetDatabase.CreateAsset(material, materialPath);
             }
 
@@ -525,6 +526,8 @@ public static class GrassSetup
         [Range(0f, 1f)] public float shortGrass;
         [Range(0f, 1f)] public float tallGrass;
         [Range(0f, 1f)] public float bushes;
+        [Tooltip("Ferns, berry shrubs, heather and wild flowers, in patches.")]
+        [Range(0f, 1f)] public float plants;
     }
 
     /// <summary>A starting guess per layer from its colour: green layers (moss, grass) get dense grass with tall
@@ -544,19 +547,21 @@ public static class GrassSetup
                 layer = data.terrainLayers[i],
                 shortGrass = Mathf.Max(green, 0.2f * colourful),
                 tallGrass = 0.5f * green,
-                bushes = 0.4f * green
+                bushes = 0.4f * green,
+                plants = Mathf.Max(0.8f * green, 0.35f * colourful)
             };
             fills[i].shortGrass = fills[i].shortGrass < 0.08f ? 0f : fills[i].shortGrass;
             fills[i].tallGrass = fills[i].tallGrass < 0.08f ? 0f : fills[i].tallGrass;
             fills[i].bushes = fills[i].bushes < 0.08f ? 0f : fills[i].bushes;
+            fills[i].plants = fills[i].plants < 0.08f ? 0f : fills[i].plants;
         }
 
         return fills;
     }
 
-    /// <summary>Replaces the Short Grass, Tall Grass and Bush layers with grass grown by ground layer: patchy (noise),
-    /// none under water or under objects standing on the terrain (buildings, rocks). Other details (glowing plants)
-    /// are kept. Undoable. Returns the number of cells with grass.</summary>
+    /// <summary>Replaces the Short Grass, Tall Grass, Bush and Nordic plant layers (ferns, berry shrubs, heather, wild
+    /// flowers) with growth by ground layer: patchy (noise), none under water or under objects standing on the terrain
+    /// (buildings, rocks). Other details (glowing plants) are kept. Undoable. Returns the number of cells with grass.</summary>
     public static int FillByGround(Terrain terrain, IReadOnlyList<GameObject> prefabs, GroundFill[] fills, int seed = 1)
     {
         AddTo(terrain, prefabs);
@@ -583,6 +588,8 @@ public static class GrassSetup
             }
         }
 
+        int[] plantLayers = Plants.Select(plant => Layer(plant.Name)).ToArray();
+        int[][,] plantCells = plantLayers.Select(_ => new int[resolution, resolution]).ToArray();
         var shortCells = new int[resolution, resolution];
         var tallCells = new int[resolution, resolution];
         var bushCells = new int[resolution, resolution];
@@ -597,16 +604,17 @@ public static class GrassSetup
             {
                 float u = (x + 0.5f) / resolution, v = (z + 0.5f) / resolution;
                 int ax = Mathf.Min((int)(u * alphaWidth), alphaWidth - 1), az = Mathf.Min((int)(v * alphaHeight), alphaHeight - 1);
-                float shortAmount = 0f, tallAmount = 0f, bushAmount = 0f;
+                float shortAmount = 0f, tallAmount = 0f, bushAmount = 0f, plantAmount = 0f;
                 for (int l = 0; l < amounts.Length; l++)
                 {
                     float w = weights[az, ax, l];
                     shortAmount += w * amounts[l].shortGrass;
                     tallAmount += w * amounts[l].tallGrass;
                     bushAmount += w * amounts[l].bushes;
+                    plantAmount += w * amounts[l].plants;
                 }
 
-                if (shortAmount + tallAmount + bushAmount <= 0.01f)
+                if (shortAmount + tallAmount + bushAmount + plantAmount <= 0.01f)
                 {
                     continue;
                 }
@@ -626,13 +634,58 @@ public static class GrassSetup
                 shortCells[z, x] = Mathf.FloorToInt(2f * shortAmount * Mathf.Lerp(0.45f, 1f, lawn) + jitter);
                 tallCells[z, x] = Mathf.FloorToInt(tallAmount * Mathf.SmoothStep(0f, 1f, (tall - 0.5f) * 3.5f) + jitter * 0.999f);
                 bushCells[z, x] = bush > 1f - 0.12f * bushAmount && jitter < 0.15f ? 1 : 0;
+                for (int k = 0; k < Plants.Length; k++)
+                {
+                    // Each plant grows in its own patches (noise), thinly, and a few strays scatter everywhere.
+                    var plant = Plants[k];
+                    float patch = Mathf.PerlinNoise(point.x * plant.Scale + 31.7f * (k + 1) + offset, point.z * plant.Scale - 17.3f * (k + 1));
+                    float roll = Mathf.Repeat(Mathf.Sin(x * 12.9898f + z * 78.233f + (k + 1) * 3.17f) * 43758.547f, 1f);
+                    bool inPatch = patch > plant.Threshold && roll < plant.Thickness * plantAmount * Mathf.InverseLerp(plant.Threshold, 1f, patch) * 2f;
+                    plantCells[k][z, x] = inPatch || roll < 0.0015f * plantAmount ? 1 : 0;
+                }
                 grown++;
+            }
+        }
+
+        // Plants push the grass aside around them.
+        for (int k = 0; k < Plants.Length; k++)
+        {
+            int clearing = Plants[k].Clearing;
+            for (int z = 0; z < resolution; z++)
+            {
+                for (int x = 0; x < resolution; x++)
+                {
+                    if (plantCells[k][z, x] == 0)
+                    {
+                        continue;
+                    }
+
+                    for (int dz = -clearing; dz <= clearing; dz++)
+                    {
+                        for (int dx = -clearing; dx <= clearing; dx++)
+                        {
+                            int cz = z + dz, cx = x + dx;
+                            if (cz >= 0 && cx >= 0 && cz < resolution && cx < resolution)
+                            {
+                                shortCells[cz, cx] = 0;
+                                tallCells[cz, cx] = 0;
+                            }
+                        }
+                    }
+                }
             }
         }
 
         data.SetDetailLayer(0, 0, shortLayer, shortCells);
         data.SetDetailLayer(0, 0, tallLayer, tallCells);
         data.SetDetailLayer(0, 0, bushLayer, bushCells);
+        for (int k = 0; k < Plants.Length; k++)
+        {
+            if (plantLayers[k] >= 0)
+            {
+                data.SetDetailLayer(0, 0, plantLayers[k], plantCells[k]);
+            }
+        }
         EditorUtility.SetDirty(data);
         terrain.Flush();
         BakeGroundColour(terrain);
@@ -773,23 +826,134 @@ public static class GrassSetup
         return mesh;
     }
 
+    /// <summary>A new material's look for its kind (existing materials keep your tuning).</summary>
+    private static void Configure(Material material, string name, Shape shape, Texture2D leaves, Texture2D glowPalette)
+    {
+        material.SetFloat("_FacingBlades", shape == Shape.Grass || shape == Shape.Heather ? 1f : 0f);
+        switch (shape)
+        {
+            case Shape.Bush:
+                material.SetTexture("_BaseMap", leaves);
+                material.SetFloat("_Cutoff", 0.5f);
+                material.SetColor("_BottomColor", new Color(0.12f, 0.21f, 0.07f));
+                material.SetColor("_TopColor", new Color(0.38f, 0.52f, 0.19f));
+                material.SetFloat("_WindStrength", 0.05f);
+                material.SetFloat("_PushStrength", 0.15f);
+                material.SetFloat("_Flatten", 0.15f);
+                material.SetFloat("_NormalUp", 0.55f);
+                material.SetFloat("_GroundColor", 0.3f);
+                break;
+            case Shape.Mushrooms:
+            case Shape.Flowers:
+                // Colours come from the palette texture (by UV); the glow from vertex colour B at night.
+                Coloured(material, glowPalette, 0.1f);
+                material.SetFloat("_NormalUp", 0.25f);
+                material.SetFloat("_WindStrength", shape == Shape.Flowers ? 0.08f : 0.01f);
+                material.SetFloat("_PushStrength", shape == Shape.Flowers ? 0.25f : 0.05f);
+                material.SetFloat("_Flatten", shape == Shape.Flowers ? 0.4f : 0.1f);
+                material.SetColor("_GlowColor", GlowColour);
+                break;
+            case Shape.Fern:
+                Coloured(material, EnsureTexture("Fern Frond.png", () => FernPixels(128, 256)), 0.4f);
+                material.SetColor("_BottomColor", new Color(0.8f, 0.85f, 0.8f));
+                material.SetColor("_DryColor", new Color(0.62f, 0.5f, 0.24f));
+                material.SetFloat("_DryAmount", 0.15f);
+                material.SetFloat("_GroundColor", 0.12f);
+                material.SetFloat("_NormalUp", 0.5f);
+                material.SetFloat("_WindStrength", 0.07f);
+                material.SetFloat("_PushStrength", 0.25f);
+                material.SetFloat("_Flatten", 0.35f);
+                break;
+            case Shape.BerryShrub:
+                bool blue = name == "Blueberry";
+                Coloured(material, EnsureTexture(name + " Leaves.png", () => BerryShrubPixels(256, blue)), 0.5f);
+                material.SetColor("_BottomColor", new Color(0.75f, 0.8f, 0.75f));
+                material.SetFloat("_GroundColor", 0.1f);
+                material.SetFloat("_NormalUp", 0.5f);
+                material.SetFloat("_Smoothness", blue ? 0.15f : 0.35f); // lingonberry leaves are glossy
+                material.SetFloat("_WindStrength", 0.03f);
+                material.SetFloat("_PushStrength", 0.12f);
+                material.SetFloat("_Flatten", 0.2f);
+                break;
+            case Shape.Heather:
+                material.SetColor("_BottomColor", new Color(0.13f, 0.18f, 0.09f));
+                material.SetColor("_TopColor", new Color(0.56f, 0.33f, 0.58f));
+                material.SetColor("_DryColor", new Color(0.45f, 0.36f, 0.3f));
+                material.SetFloat("_DryAmount", 0.15f);
+                material.SetFloat("_GroundColor", 0.15f);
+                material.SetFloat("_GroundTip", 0.05f);
+                material.SetFloat("_WindStrength", 0.05f);
+                break;
+            case Shape.WildFlowers:
+                bool white = name.StartsWith("White");
+                Coloured(material, EnsurePalette(name + ".png", new[]
+                {
+                    Color.white, Color.white, new Color(0.25f, 0.42f, 0.17f),
+                    white ? new Color(0.96f, 0.96f, 0.92f) : new Color(1f, 0.84f, 0.15f),
+                    white ? new Color(0.98f, 0.85f, 0.25f) : new Color(0.9f, 0.62f, 0.08f)
+                }), 0.1f);
+                material.SetFloat("_NormalUp", 0.3f);
+                material.SetFloat("_WindStrength", 0.08f);
+                material.SetFloat("_PushStrength", 0.25f);
+                material.SetFloat("_Flatten", 0.4f);
+                break;
+        }
+    }
+
+    /// <summary>Colour from the texture, not from the grass gradient or the ground.</summary>
+    private static void Coloured(Material material, Texture2D texture, float cutoff)
+    {
+        material.SetTexture("_BaseMap", texture);
+        material.SetFloat("_Cutoff", cutoff);
+        material.SetColor("_BottomColor", Color.white);
+        material.SetColor("_TopColor", Color.white);
+        material.SetFloat("_GroundColor", 0f);
+        material.SetFloat("_DryAmount", 0f);
+        material.SetFloat("_BladeVariation", 0.15f);
+        material.SetFloat("_ClumpHeight", 0.2f);
+    }
+
+    private static Texture2D EnsureTexture(string file, System.Func<Texture2D> pixels)
+    {
+        string path = $"{Folder}/{file}";
+        if (!File.Exists(path))
+        {
+            Texture2D texture = pixels();
+            File.WriteAllBytes(path, texture.EncodeToPNG());
+            Object.DestroyImmediate(texture);
+            AssetDatabase.ImportAsset(path);
+            var importer = (TextureImporter)AssetImporter.GetAtPath(path);
+            importer.alphaIsTransparency = true;
+            importer.mipmapEnabled = true;
+            importer.mipMapsPreserveCoverage = true; // cut-outs keep their shape at a distance
+            importer.alphaTestReferenceValue = 0.45f;
+            importer.wrapMode = TextureWrapMode.Clamp;
+            importer.SaveAndReimport();
+        }
+
+        return AssetDatabase.LoadAssetAtPath<Texture2D>(path);
+    }
+
     // Palette texture of the glowing plants: one colour per column, picked by UV x.
     private const float StemU = 0.5f / 5f, CapU = 1.5f / 5f, StalkU = 2.5f / 5f, PetalU = 3.5f / 5f, CentreU = 4.5f / 5f;
 
-    private static Texture2D EnsureGlowPalette()
+    private static Texture2D EnsureGlowPalette() => EnsurePalette("Glow Plants.png", new[]
     {
-        string path = $"{Folder}/Glow Plants.png";
+        new Color(0.86f, 0.86f, 0.8f),  // mushroom stem
+        new Color(0.62f, 0.78f, 0.9f),  // mushroom cap
+        new Color(0.25f, 0.45f, 0.18f), // flower stalk
+        new Color(0.72f, 0.86f, 0.98f), // petals
+        new Color(0.9f, 0.95f, 0.75f),  // flower centre
+    });
+
+    /// <summary>Five colours in a row (mushroom stem, cap, flower stalk, petals, flower centre), picked by UV x.</summary>
+    private static Texture2D EnsurePalette(string file, Color[] colours)
+    {
+        string path = $"{Folder}/{file}";
         if (!File.Exists(path))
         {
             var texture = new Texture2D(5, 1, TextureFormat.RGBA32, false);
-            texture.SetPixels(new[]
-            {
-                new Color(0.86f, 0.86f, 0.8f),  // mushroom stem
-                new Color(0.62f, 0.78f, 0.9f),  // mushroom cap
-                new Color(0.25f, 0.45f, 0.18f), // flower stalk
-                new Color(0.72f, 0.86f, 0.98f), // petals
-                new Color(0.9f, 0.95f, 0.75f),  // flower centre
-            });
+            texture.SetPixels(colours);
             texture.Apply();
             File.WriteAllBytes(path, texture.EncodeToPNG());
             Object.DestroyImmediate(texture);
@@ -974,6 +1138,164 @@ public static class GrassSetup
         }
 
         return Finish(vertices, colours, uv, triangles);
+    }
+
+    /// <summary>A fern: fronds (textured cards) arching up and out from the middle, lying open so they show from above.
+    /// Vertex colour R = sway (0 at the root, 1 at the tip), G = per-frond random.</summary>
+    public static Mesh BuildFern(int fronds, float length, int seed)
+    {
+        var random = new System.Random(seed);
+        float Next(float low, float high) => low + (float)random.NextDouble() * (high - low);
+        var positions = new List<Vector3>();
+        var normals = new List<Vector3>();
+        var uvs = new List<Vector2>();
+        var colours = new List<Color>();
+        var triangles = new List<int>();
+        const int segments = 6;
+        for (int f = 0; f < fronds; f++)
+        {
+            float angle = (f + Next(-0.3f, 0.3f)) * Mathf.PI * 2f / fronds;
+            var direction = new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle));
+            var side = new Vector3(-direction.z, 0f, direction.x);
+            float frond = length * Next(0.7f, 1.1f);
+            float rise = Next(0.4f, 0.6f);
+            float width = frond * 0.45f;
+            float shade = Next(0f, 1f);
+            Vector3 root = direction * Next(0f, 0.04f);
+            int start = positions.Count;
+            for (int i = 0; i <= segments; i++)
+            {
+                float t = i / (float)segments;
+                Vector3 centre = root + direction * (frond * t * 0.9f) + Vector3.up * (frond * rise * Mathf.Sin(t * Mathf.PI * 0.75f));
+                foreach (float sign in new[] { -1f, 1f })
+                {
+                    positions.Add(centre + side * (width * 0.5f * sign));
+                    normals.Add((Vector3.up + direction * 0.3f).normalized);
+                    uvs.Add(new Vector2(sign < 0f ? 0f : 1f, t));
+                    colours.Add(new Color(t, shade, 0f, 1f));
+                }
+            }
+
+            for (int i = 0; i < segments; i++)
+            {
+                int a = start + i * 2;
+                triangles.AddRange(new[] { a, a + 2, a + 1, a + 1, a + 2, a + 3 });
+            }
+        }
+
+        return Finish(positions, normals, uvs, colours, triangles);
+    }
+
+    /// <summary>A fern frond (base at the bottom, tip at the top): a stem with paired, tapering leaflets.</summary>
+    public static Texture2D FernPixels(int width, int height)
+    {
+        var texture = new Texture2D(width, height, TextureFormat.RGBA32, false);
+        var pixels = new Color[width * height];
+        var stem = new Color(0.22f, 0.33f, 0.11f);
+        for (int y = 0; y < height; y++)
+        {
+            float v = (y + 0.5f) / height;
+            for (int x = 0; x < width; x++)
+            {
+                float u = (x + 0.5f) / width - 0.5f;
+                Color colour = Color.clear;
+                if (Mathf.Abs(u) < 0.012f + 0.01f * (1f - v) && v < 0.97f)
+                {
+                    colour = stem;
+                }
+                else
+                {
+                    for (int i = 0; i < 20; i++)
+                    {
+                        float at = 0.06f + i * 0.046f;
+                        float reach = 0.46f * Mathf.Pow(Mathf.Clamp01(1f - at), 0.7f) * (at < 0.15f ? 0.6f + at * 2.6f : 1f);
+                        float side = Mathf.Sign(u);
+                        // Each leaflet leans towards the tip; distance along and across it.
+                        Vector2 d = new Vector2(Mathf.Abs(u), v - at - Mathf.Abs(u) * 0.35f);
+                        float along = d.x / Mathf.Max(reach, 1e-3f);
+                        float half = 0.022f * (1f - 0.6f * at) * Mathf.Sqrt(Mathf.Max(0f, 1f - along * along));
+                        half *= 0.85f + 0.15f * Mathf.Sin(along * 40f); // small lobes
+                        if (along < 1f && Mathf.Abs(d.y) < half)
+                        {
+                            float light = 0.8f + 0.25f * along + 0.1f * side;
+                            colour = new Color(0.3f * light, 0.5f * light, 0.17f * light, 1f);
+                            break;
+                        }
+                    }
+                }
+
+                pixels[y * width + x] = colour;
+            }
+        }
+
+        texture.SetPixels(pixels);
+        texture.Apply();
+        return texture;
+    }
+
+    /// <summary>A sprig of a dwarf shrub: small oval leaves at all angles and a few berries (blue for blueberry, red
+    /// for lingonberry, whose leaves are darker).</summary>
+    public static Texture2D BerryShrubPixels(int size, bool blue)
+    {
+        var texture = new Texture2D(size, size, TextureFormat.RGBA32, false);
+        var pixels = new Color[size * size];
+        var random = new System.Random(blue ? 61 : 67);
+        float Next(float low, float high) => low + (float)random.NextDouble() * (high - low);
+        Color leafA = blue ? new Color(0.3f, 0.48f, 0.17f) : new Color(0.17f, 0.32f, 0.11f);
+        Color leafB = blue ? new Color(0.22f, 0.38f, 0.13f) : new Color(0.12f, 0.24f, 0.08f);
+        Color berry = blue ? new Color(0.18f, 0.22f, 0.5f) : new Color(0.75f, 0.08f, 0.1f);
+        var leaves = new List<(Vector2 Centre, float Angle, float Length, float Width, float Shade)>();
+        for (int i = 0; i < 26; i++)
+        {
+            float r = Mathf.Sqrt(Next(0f, 1f)) * 0.36f, a = Next(0f, Mathf.PI * 2f);
+            leaves.Add((new Vector2(0.5f + Mathf.Cos(a) * r, 0.5f + Mathf.Sin(a) * r), Next(0f, Mathf.PI * 2f),
+                        Next(0.1f, 0.15f), Next(0.045f, 0.065f), Next(0f, 1f)));
+        }
+
+        var berries = new List<(Vector2 Centre, float Radius)>();
+        for (int i = 0; i < 9; i++)
+        {
+            float r = Mathf.Sqrt(Next(0f, 1f)) * 0.3f, a = Next(0f, Mathf.PI * 2f);
+            berries.Add((new Vector2(0.5f + Mathf.Cos(a) * r, 0.5f + Mathf.Sin(a) * r), Next(0.025f, 0.038f)));
+        }
+
+        for (int y = 0; y < size; y++)
+        {
+            for (int x = 0; x < size; x++)
+            {
+                var p = new Vector2((x + 0.5f) / size, (y + 0.5f) / size);
+                Color colour = Color.clear;
+                foreach (var leaf in leaves)
+                {
+                    Vector2 d = p - leaf.Centre;
+                    float along = d.x * Mathf.Cos(leaf.Angle) + d.y * Mathf.Sin(leaf.Angle);
+                    float across = -d.x * Mathf.Sin(leaf.Angle) + d.y * Mathf.Cos(leaf.Angle);
+                    float e = (along / leaf.Length) * (along / leaf.Length) * 4f + (across / leaf.Width) * (across / leaf.Width) * 4f;
+                    if (e < 1f)
+                    {
+                        colour = Color.Lerp(leafA, leafB, leaf.Shade) * (0.85f + 0.3f * (1f - e));
+                        colour.a = 1f;
+                    }
+                }
+
+                foreach (var b in berries)
+                {
+                    float d = Vector2.Distance(p, b.Centre) / b.Radius;
+                    if (d < 1f)
+                    {
+                        float highlight = Mathf.Clamp01(1f - Vector2.Distance(p, b.Centre + new Vector2(-0.3f, 0.3f) * b.Radius) / (b.Radius * 0.45f));
+                        colour = Color.Lerp(berry * (1.1f - 0.4f * d), Color.white, highlight * 0.6f);
+                        colour.a = 1f;
+                    }
+                }
+
+                pixels[y * size + x] = colour;
+            }
+        }
+
+        texture.SetPixels(pixels);
+        texture.Apply();
+        return texture;
     }
 
     private static Mesh Finish(List<Vector3> vertices, List<Color> colours, List<Vector2> uv, List<int> triangles)

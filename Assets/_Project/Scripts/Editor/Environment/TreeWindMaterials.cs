@@ -200,6 +200,10 @@ public sealed class TreeWindMaterials : AssetPostprocessor
         if (clip) target.EnableKeyword("_ALPHATEST_ON");
         else target.DisableKeyword("_ALPHATEST_ON");
         target.SetFloat("_Cutoff", source.GetFloat("alphaCutoff"));
+        // Leaf cards (alpha clipped) light per vertex: their overlapping pixels are most of a tree's cost.
+        target.SetFloat("_FastLeafLighting", clip ? 1f : 0f);
+        if (clip) target.EnableKeyword("_FAST_LEAF_LIGHTING");
+        else target.DisableKeyword("_FAST_LEAF_LIGHTING");
         target.SetFloat("_Cull", source.GetFloat("_Cull"));
         target.renderQueue = clip ? (int)RenderQueue.AlphaTest : (int)RenderQueue.Geometry;
         target.SetOverrideTag("RenderType", clip ? "TransparentCutout" : "Opaque");

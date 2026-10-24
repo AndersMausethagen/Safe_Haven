@@ -161,7 +161,7 @@ public static class WaterSetup
     {
         Vector3 point = SceneView.lastActiveSceneView != null ? SceneView.lastActiveSceneView.pivot : Vector3.zero;
         Terrain terrain = Terrain.activeTerrain;
-        if (terrain != null)
+        if (terrain != null && terrain.terrainData != null)
         {
             point.y = terrain.SampleHeight(point) + terrain.transform.position.y;
         }

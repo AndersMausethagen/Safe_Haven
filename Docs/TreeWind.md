@@ -34,3 +34,18 @@ shader, because the sway bends the whole tree and leaves would otherwise detach 
 - **ORM map**: R = AO, G = roughness, B = metallic, matching the generator's packed map.
 
 Existing materials are never overwritten on reimport, so tuning is kept. Delete a material to regenerate it.
+
+## Performance
+
+- **Fast Leaf Lighting** is on for alpha-clipped materials (leaves, vines).
+  - Per vertex: sun and ambient, darker inside the canopy (using the baked flex).
+  - Per pixel: the leaf texture, one hardware shadow compare (no soft-shadow taps) and a cheap Lambert for point
+    lights.
+  - Skipped: the normal map, specular, reflection probes and soft-shadow filtering.
+
+  Bark keeps full PBR. Measured on a tree-filled 1080p view of SafeHaven, the frame went from 3.40 to 3.16 ms with
+  vertex-only shadows; with the per-pixel shadow added back the gain is within noise on this GPU. It matters more on
+  weaker GPUs and with many trees.
+- **Depth priming** (the PC renderer's Depth Priming Mode, now Disabled) shades each leaf pixel only once instead of
+  once per overlapping card. In the same view it cut the frame from about 3.2 ms to 2.7–3.0 ms. It is a project-wide
+  renderer setting, so it was measured but not changed.

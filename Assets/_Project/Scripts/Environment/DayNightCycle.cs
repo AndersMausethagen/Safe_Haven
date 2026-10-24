@@ -45,6 +45,11 @@ public sealed class DayNightCycle : MonoBehaviour
         set => clockRuns = value;
     }
 
+    /// <summary>How much faster than the profile's day length the clock runs (developer tools; not saved).</summary>
+    public float ClockSpeed { get; set; } = 1f;
+
+    public DayNightProfile Profile => profile;
+
     /// <summary>The look applied last (sun or moon, daylight, ambient...).</summary>
     public DayNightState State { get; private set; }
 
@@ -82,7 +87,7 @@ public sealed class DayNightCycle : MonoBehaviour
     {
         if (Application.isPlaying && clockRuns && profile != null)
         {
-            hour = Mathf.Repeat(hour + Time.deltaTime * 24f / (profile.DayLengthMinutes * 60f), 24f);
+            hour = Mathf.Repeat(hour + Time.deltaTime * ClockSpeed * 24f / (profile.DayLengthMinutes * 60f), 24f);
         }
 
         Apply(); // after WeatherSystem.Update, so clouds and lightning are this frame's

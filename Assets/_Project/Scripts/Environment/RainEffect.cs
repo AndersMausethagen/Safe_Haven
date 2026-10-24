@@ -88,6 +88,11 @@ public sealed class RainEffect : MonoBehaviour
     {
         Transform view = camera.transform;
         Terrain terrain = Terrain.activeTerrain;
+        if (terrain != null && terrain.terrainData == null)
+        {
+            terrain = null;
+        }
+
         float groundY = terrain != null ? terrain.transform.position.y + terrain.SampleHeight(view.position) : 0f;
         Vector3 forward = view.forward;
         Vector3 point = forward.y < -0.05f ? view.position + forward * ((view.position.y - groundY) / -forward.y) : view.position;

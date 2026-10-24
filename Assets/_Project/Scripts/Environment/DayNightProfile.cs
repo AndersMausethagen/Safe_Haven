@@ -19,13 +19,17 @@ public sealed class DayNightProfile : ScriptableObject
              "over the day, so pick a direction that casts readable shadows from the game camera.")]
     [SerializeField] private float noonYaw = 320f;
     [SerializeField, Range(5f, 90f)] private float noonElevation = 55f;
+    [Tooltip("Lowest angle the light comes from while the sun is up (it still fades out at sunrise and sunset). A real " +
+             "low sun barely lights flat ground; keeping the light a little higher keeps golden hour warm and readable.")]
+    [SerializeField, Range(0f, 30f)] private float lowestLightAngle = 12f;
     [SerializeField, Min(0f)] private float sunIntensity = 2.3f;
     [Tooltip("Sun strength by its height (0 = horizon, 1 = noon), times Sun Intensity.")]
     [SerializeField] private AnimationCurve sunIntensityByHeight = new AnimationCurve(
-        new Keyframe(0f, 0.9f), new Keyframe(0.3f, 0.9f), new Keyframe(1f, 1f)); // low sun still lights flat ground
+        new Keyframe(0f, 1.15f), new Keyframe(0.3f, 1f), new Keyframe(1f, 1f)); // low sun still lights flat ground
     [SerializeField] private Gradient sunColour = Clock(
-        (6f, new Color(1f, 0.45f, 0.25f)), (7.2f, new Color(1f, 0.72f, 0.48f)), (9f, new Color(1f, 0.89f, 0.78f)),
-        (17f, new Color(1f, 0.89f, 0.78f)), (18.8f, new Color(1f, 0.66f, 0.4f)), (20f, new Color(1f, 0.42f, 0.22f)));
+        // Warm gold rather than deep orange at the ends of the day: green grass under orange light turns muddy.
+        (6f, new Color(1f, 0.58f, 0.38f)), (7.2f, new Color(1f, 0.8f, 0.62f)), (9f, new Color(1f, 0.89f, 0.78f)),
+        (17f, new Color(1f, 0.89f, 0.78f)), (18.8f, new Color(1f, 0.8f, 0.6f)), (20f, new Color(1f, 0.62f, 0.4f)));
 
     [Header("Moon (the same light at night)")]
     [SerializeField] private Color moonColour = new Color(0.7f, 0.78f, 1f);
@@ -73,10 +77,12 @@ public sealed class DayNightProfile : ScriptableObject
         if (sinceSunrise < day)
         {
             float fraction = sinceSunrise / day;
-            float elevation = noonElevation * Mathf.Sin(Mathf.PI * fraction);
-            state.LightRotation = Quaternion.Euler(elevation, noonYaw + Mathf.Lerp(-80f, 80f, fraction), 0f);
+            float height = Mathf.Sin(Mathf.PI * fraction);
+            float elevation = noonElevation * height; // the real sun: fades the light at the horizon
+            float lightAngle = Mathf.Lerp(Mathf.Min(lowestLightAngle, noonElevation), noonElevation, height);
+            state.LightRotation = Quaternion.Euler(lightAngle, noonYaw + Mathf.Lerp(-80f, 80f, fraction), 0f);
             state.LightColour = sunColour.Evaluate(hour / 24f);
-            state.LightIntensity = sunIntensity * sunIntensityByHeight.Evaluate(elevation / noonElevation) * Horizon(elevation);
+            state.LightIntensity = sunIntensity * sunIntensityByHeight.Evaluate(height) * Horizon(elevation);
             state.Daylight = Mathf.Clamp01(elevation / 15f);
         }
         else

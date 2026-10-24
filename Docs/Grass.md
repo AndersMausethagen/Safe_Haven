@@ -1,4 +1,4 @@
-# Grass, bushes and glowing plants (terrain details)
+# Grass, bushes, Nordic plants and glowing plants (terrain details)
 
 Unity's terrain detail system draws painted grass with GPU instancing. `Safe Haven/Grass` (`Shaders/Grass.shader`)
 does the rest:
@@ -19,7 +19,13 @@ Terrain details are culled per patch, so grass outside the camera's view is not 
    - Nothing grows under water or under objects standing on the ground (buildings, rocks).
    - The first run also creates the assets in `Art/Generated/Grass/`, bakes the ground colour and gives
      `PlayerArmature` a `GrassInteractor`.
-2. Touch up with the terrain's **Paint Details** tool (Short Grass, Tall Grass, Bush, Glow Mushrooms, Glow Flowers).
+2. Touch up with the terrain's **Paint Details** tool:
+   - grass: Short Grass, Tall Grass, Bush;
+   - Nordic forest floor: Fern, Blueberry, Lingonberry, Heather, White Flowers (wood anemone), Yellow Flowers;
+   - Glow Mushrooms and Glow Flowers.
+
+   The fill tool's **Plants** amount grows the Nordic plants in natural patches: each kind in its own patches, with a
+   few strays. Ferns and berry shrubs clear the grass right around them so they don't drown in the lawn.
    **Add Grass and Bushes to Selected Terrain** only adds the kinds, for painting by hand.
 3. Repainting the terrain's textures rebakes the ground colour automatically. If it is ever out of date, run
    **Rebake Ground Colours of Selected Terrain**.

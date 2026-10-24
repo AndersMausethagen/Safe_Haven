@@ -88,6 +88,7 @@ public sealed class TreeWindTests
             Assert.That(target.GetColor("_BaseColor"), Is.EqualTo(new Color(0.5f, 0.6f, 0.7f, 1f)));
             Assert.That(target.GetFloat("_Roughness"), Is.EqualTo(0.6f).Within(1e-6f));
             Assert.That(target.IsKeywordEnabled("_ALPHATEST_ON"), Is.True);
+            Assert.That(target.IsKeywordEnabled("_FAST_LEAF_LIGHTING"), Is.True, "leaf cards light per vertex");
             Assert.That(target.GetFloat("_Cutoff"), Is.EqualTo(0.4f).Within(1e-6f));
             Assert.That(target.GetFloat("_Cull"), Is.EqualTo(0f));
             Assert.That(target.GetFloat("_OcclusionStrength"), Is.EqualTo(0f), "no ORM map, no occlusion");

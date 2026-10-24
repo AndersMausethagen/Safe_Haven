@@ -17,13 +17,14 @@ MonoBehaviour:
   sunset: 20
   noonYaw: 320
   noonElevation: 55
+  lowestLightAngle: 12
   sunIntensity: 2.3
   sunIntensityByHeight:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0.9
+      value: 1.15
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -32,7 +33,7 @@ MonoBehaviour:
       outWeight: 0
     - serializedVersion: 3
       time: 0.3
-      value: 0.9
+      value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -53,12 +54,12 @@ MonoBehaviour:
     m_RotationOrder: 4
   sunColour:
     serializedVersion: 2
-    key0: {r: 1, g: 0.45, b: 0.25, a: 1}
-    key1: {r: 1, g: 0.72, b: 0.48, a: 1}
+    key0: {r: 1, g: 0.58, b: 0.38, a: 1}
+    key1: {r: 1, g: 0.8, b: 0.62, a: 1}
     key2: {r: 1, g: 0.89, b: 0.78, a: 0}
     key3: {r: 1, g: 0.89, b: 0.78, a: 0}
-    key4: {r: 1, g: 0.66, b: 0.4, a: 0}
-    key5: {r: 1, g: 0.42, b: 0.22, a: 0}
+    key4: {r: 1, g: 0.8, b: 0.6, a: 0}
+    key5: {r: 1, g: 0.62, b: 0.4, a: 0}
     key6: {r: 0, g: 0, b: 0, a: 0}
     key7: {r: 0, g: 0, b: 0, a: 0}
     ctime0: 16384

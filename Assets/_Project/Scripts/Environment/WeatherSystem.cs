@@ -41,6 +41,25 @@ public sealed class WeatherSystem : MonoBehaviour
 
     public ClimateDefinition Climate => climate;
 
+    /// <summary>Whether the climate picks the next weather when one has lasted its time (developer tools can pause it).</summary>
+    public bool ChangesByItself
+    {
+        get => changesByItself;
+        set => changesByItself = value;
+    }
+
+    /// <summary>0..1 progress of the blend to <see cref="Weather"/>.</summary>
+    public float Blend => blend;
+
+    /// <summary>Seconds until the climate picks the next weather.</summary>
+    public float TimeLeft => timeLeft;
+
+    /// <summary>A lightning flash now (developer tools, scripted events).</summary>
+    public void Strike()
+    {
+        flash = 1f;
+    }
+
     public event Action<WeatherDefinition> Changed;
 
     private void OnEnable()

@@ -11,15 +11,7 @@ public sealed class WaterTests
     [TearDown]
     public void TearDown()
     {
-        foreach (Object o in created)
-        {
-            if (o != null)
-            {
-                Object.DestroyImmediate(o);
-            }
-        }
-
-        created.Clear();
+        TestCleanup.Destroy(created);
         WaterRipples.Release();
         WaterInteractor.UpdateAll(0f);
     }

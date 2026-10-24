@@ -11,12 +11,7 @@ public sealed class GrassTests
     [TearDown]
     public void TearDown()
     {
-        foreach (Object o in created)
-        {
-            if (o != null) Object.DestroyImmediate(o);
-        }
-
-        created.Clear();
+        TestCleanup.Destroy(created);
         AssetDatabase.DeleteAsset(GrassSetup.Folder + "/__GrassTest_GrassColour.png");
     }
 
@@ -112,7 +107,7 @@ public sealed class GrassTests
         Terrain terrain = terrainObject.GetComponent<Terrain>();
 
         List<GameObject> prefabs = GrassSetup.EnsureAssets();
-        Assert.AreEqual(5, GrassSetup.AddTo(terrain, prefabs));
+        Assert.AreEqual(GrassSetup.KindCount, GrassSetup.AddTo(terrain, prefabs));
         Assert.AreEqual(0, GrassSetup.AddTo(terrain, prefabs));
         Assert.IsTrue(data.detailPrototypes.All(p => p.useInstancing && p.usePrototypeMesh));
         Assert.Greater(data.detailResolution, 0, "the terrain can now be painted with details");
@@ -187,6 +182,31 @@ public sealed class GrassTests
         map.LoadImage(System.IO.File.ReadAllBytes(AssetDatabase.GetAssetPath(terrain.GetComponent<GrassTerrainColour>().ColourMap)));
         Assert.Less(map.GetPixel(4, 1).a, 0.5f, "the colour map hides grass painted under water later");
         Assert.Greater(map.GetPixel(4, 12).a, 0.5f);
+    }
+
+    [Test]
+    public void NordicPlants_FernsOpenUpAndShrubsCarryBerries()
+    {
+        Mesh fern = GrassSetup.BuildFern(8, 0.55f, 4);
+        created.Add(fern);
+        Assert.AreEqual(8 * 7 * 2, fern.vertexCount);
+        Assert.Greater(fern.bounds.size.x, 0.6f, "fronds spread out, visible from above");
+        Assert.Less(fern.bounds.max.y, 0.4f);
+        Assert.AreEqual(0f, fern.colors.Min(c => c.r), 1e-4f, "roots do not sway");
+
+        foreach (bool blue in new[] { true, false })
+        {
+            Texture2D leaves = GrassSetup.BerryShrubPixels(64, blue);
+            created.Add(leaves);
+            Color[] pixels = leaves.GetPixels();
+            Assert.Greater(pixels.Count(p => p.a > 0.5f), 64 * 64 / 10, "a sprig of leaves");
+            Assert.IsTrue(pixels.Any(p => p.a > 0.5f && (blue ? p.b > p.g && p.b > 0.3f : p.r > 0.5f && p.g < 0.3f)), "berries");
+        }
+
+        Texture2D frond = GrassSetup.FernPixels(32, 64);
+        created.Add(frond);
+        Assert.Greater(frond.GetPixel(16, 20).a, 0.5f, "the stem");
+        Assert.AreEqual(0f, frond.GetPixel(0, 63).a, 1e-4f, "open around the tip");
     }
 
     [Test]

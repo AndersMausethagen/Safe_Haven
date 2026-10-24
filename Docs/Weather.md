@@ -17,6 +17,18 @@ weather).
    - `DayNightCycle.Hour` (read it, or set it to jump the clock, e.g. after sleeping), `IsNight`, `ClockRuns`.
    - `WeatherSystem.SetWeather(weather, seconds)` (e.g. a storm before a ward breach); the `Changed` event; `Current`.
 
+## Developer tools
+
+- **Safe Haven > Environment > Sky Controller** (window), in Play mode or as an edit-mode preview:
+  - drag the hour, or jump to dawn, morning, noon, golden hour, dusk or night;
+  - run the clock ×1, ×10, ×60 or ×240, or pause it;
+  - switch weather instantly or blended over a few seconds;
+  - stop the climate changing the weather;
+  - strike lightning.
+  In edit mode, **Make This the Start Hour / Start Weather** saves the preview as the scene's start.
+- **Unity CLI:** `unity command sh_sky -- --hour 21 --weather Rain --transition 10 --speed 60 --lightning true`. Run
+  it with no arguments to show the current time and weather.
+
 ## What each part does
 
 | Part | Does |
@@ -34,6 +46,9 @@ weather).
   dusk keys near sunrise and sunset.
 - **Night brightness:** Moon Intensity and the night ends of the ambient gradients. Raise them if nights are too dark
   to play.
+- **Golden hour:** the sun's colour near sunrise and sunset is a warm gold, not deep orange, because green grass under
+  orange light turns muddy. **Lowest Light Angle** (12°) keeps the light from grazing flat ground while the sun is
+  low. The light still fades out at sunrise and sunset.
 - **A weather's look:**
   - Wind multiplies the Moss Wind.
   - Clouds dim the sun and soften shadows.
