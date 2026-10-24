@@ -1,0 +1,9 @@
+{
+  "parallax": 0.0,
+  "metallic": 0.0,
+  "emission": false,
+  "emission_intensity": 3.0,
+  "detail": false,
+  "detail_tiling": 8.0,
+  "detail_normal_scale": 1.0
+}

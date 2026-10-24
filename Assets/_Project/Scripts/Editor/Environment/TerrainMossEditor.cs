@@ -42,8 +42,10 @@ public sealed class MossWindEditor : Editor
 
     public override void OnInspectorGUI()
     {
-        EditorGUILayout.HelpBox("One wind source drives all Terrain Moss in the loaded scenes. Strength is tip movement in metres. " +
-            "Set Strength to zero for still moss. No physics or terrain movement.", MessageType.Info);
+        EditorGUILayout.HelpBox("One wind source drives all Terrain Moss and Tree Wind trees in the loaded scenes. " +
+            "With a Directional WindZone on this object, its arrow is the direction, Main scales moss Strength and tree sway, " +
+            "and Pulse Magnitude is the moss gusts. Strength is moss tip movement in metres. No physics or terrain movement.",
+            MessageType.Info);
         DrawDefaultInspector();
         animate = EditorGUILayout.Toggle("Preview wind in Scene view", animate);
         if (animate)
@@ -102,8 +104,14 @@ public static class TerrainMossTools
         MossWind existing = Object.FindAnyObjectByType<MossWind>();
         if (existing != null) return existing;
         var source = new GameObject("Forest Wind");
+        source.transform.rotation = Quaternion.Euler(0f, 35f, 0f);
         SceneManager.MoveGameObjectToScene(source, scene);
         Undo.RegisterCreatedObjectUndo(source, "Add moss wind");
+        // The WindZone is the shared wind for moss, Tree Wind trees and particles; MossWind finds it on this object.
+        var zone = source.AddComponent<WindZone>();
+        zone.mode = WindZoneMode.Directional;
+        zone.windMain = 1f;
+        zone.windPulseMagnitude = 0.35f;
         return Undo.AddComponent<MossWind>(source);
     }
 

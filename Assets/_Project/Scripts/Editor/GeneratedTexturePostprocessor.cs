@@ -5,15 +5,17 @@ using UnityEngine;
 
 /// <summary>
 /// Material maps exported by the Local Generator into Assets/_Project/Art/Generated/Materials/&lt;name&gt;/:
-/// sets the import type per map suffix (normal map, linear data, repeat wrap) and builds &lt;name&gt;.mat (URP Lit)
-/// once the base colour exists. Optional emission and detail maps are wired up when present; the extra masks
-/// (_Curvature, _EdgeWear, _Cavity, _Coverage, _BlendMask, _Splat) are imported as linear data for custom shaders.
-/// Re-exporting (or deleting a map) rebuilds the existing material.
+/// sets the import type per map suffix (normal map, linear data, repeat wrap) and builds &lt;name&gt;.mat once the base
+/// colour exists: "Safe Haven/Layered Lit" when a _BlendMask is exported (live moss/rust layers driven by
+/// SurfaceLayerController), otherwise URP Lit. Optional emission and detail maps are wired up when present; the extra
+/// masks (_Curvature, _EdgeWear, _Cavity, _Coverage, _BlendMask, _Splat) are imported as linear data.
+/// Re-exporting (or deleting a map) rebuilds the existing material and keeps its shader.
 /// </summary>
 public sealed class GeneratedTexturePostprocessor : AssetPostprocessor
 {
     internal const string MaterialsRoot = "Assets/_Project/Art/Generated/Materials/";
     private const string LitShader = "Universal Render Pipeline/Lit";
+    internal const string LayeredShader = "Safe Haven/Layered Lit";
 
     internal enum MapKind
     {
@@ -128,18 +130,23 @@ public sealed class GeneratedTexturePostprocessor : AssetPostprocessor
 
         string materialPath = prefix + ".mat";
         var material = AssetDatabase.LoadAssetAtPath<Material>(materialPath);
+        Sidecar sidecar = ReadSidecar(prefix + "_material.json");
         if (material == null)
         {
-            Shader shader = Shader.Find(LitShader);
+            string shaderName = WantsLayered(prefix, sidecar) ? LayeredShader : LitShader;
+            Shader shader = Shader.Find(shaderName);
             if (shader == null)
             {
-                Debug.LogWarning($"Generated material '{name}': shader '{LitShader}' not found.");
+                Debug.LogWarning($"Generated material '{name}': shader '{shaderName}' not found.");
                 return null;
             }
 
             material = new Material(shader) { name = name };
             AssetDatabase.CreateAsset(material, materialPath);
         }
+
+        // Layered Lit's base uses the same property names as Lit; the mask only matters to Layered Lit.
+        material.SetTexture("_BlendMask", AssetDatabase.LoadAssetAtPath<Texture2D>(prefix + "_BlendMask.png"));
 
         material.SetTexture("_BaseMap", baseColor);
         material.SetColor("_BaseColor", Color.white);
@@ -156,7 +163,6 @@ public sealed class GeneratedTexturePostprocessor : AssetPostprocessor
             material.SetFloat("_OcclusionStrength", 1f);
         }
 
-        Sidecar sidecar = ReadSidecar(prefix + "_material.json");
         float parallax = Mathf.Clamp(sidecar.parallax, 0f, 0.08f);
         if (parallax > 0f && AssignMap(material, "_ParallaxMap", "_PARALLAXMAP", prefix + "_Height.png"))
         {
@@ -174,6 +180,65 @@ public sealed class GeneratedTexturePostprocessor : AssetPostprocessor
         EditorUtility.SetDirty(material);
         AssetDatabase.SaveAssetIfDirty(material);
         return material;
+    }
+
+    /// <summary>New materials with a blend mask get live layers, unless they rely on Lit-only parallax or detail maps
+    /// (Layered Lit does not implement those). Existing materials keep whichever shader they use.</summary>
+    private static bool WantsLayered(string prefix, Sidecar sidecar)
+    {
+        return File.Exists(prefix + "_BlendMask.png")
+            && sidecar.parallax <= 0f
+            && !File.Exists(prefix + "_DetailAlbedo.png")
+            && !File.Exists(prefix + "_DetailNormal.png");
+    }
+
+    [MenuItem("Assets/Safe Haven/Use Layered Lit (live moss, rust...)", true)]
+    private static bool CanConvertSelection()
+    {
+        foreach (Object selected in Selection.objects)
+        {
+            if (selected is Material material && material.shader.name != LayeredShader)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>Switches the selected materials to Layered Lit. Base maps carry over (same property names); generated
+    /// materials are rebuilt so their blend mask is assigned.</summary>
+    [MenuItem("Assets/Safe Haven/Use Layered Lit (live moss, rust...)")]
+    private static void ConvertSelection()
+    {
+        Shader shader = Shader.Find(LayeredShader);
+        if (shader == null)
+        {
+            Debug.LogWarning($"Shader '{LayeredShader}' not found.");
+            return;
+        }
+
+        foreach (Object selected in Selection.objects)
+        {
+            if (selected is Material material && material.shader != shader)
+            {
+                ConvertToLayered(material, shader);
+            }
+        }
+    }
+
+    internal static void ConvertToLayered(Material material, Shader layered)
+    {
+        Undo.RecordObject(material, "Use Layered Lit");
+        material.shader = layered;
+        string path = AssetDatabase.GetAssetPath(material);
+        if (TryParse(path, out string folder, out string name, out _))
+        {
+            BuildMaterial(folder, name);
+        }
+
+        EditorUtility.SetDirty(material);
+        AssetDatabase.SaveAssetIfDirty(material);
     }
 
     private static bool AssignMap(Material material, string property, string keyword, string texturePath)

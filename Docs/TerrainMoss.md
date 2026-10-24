@@ -106,9 +106,10 @@ Shared Terrain Data means shared paint, just like ordinary Unity Terrain.
 
 **Forest Wind** controls horizontal direction, strength (maximum tip displacement in metres), speed and gusts.
 Keep just one enabled **Moss Wind** in the loaded scenes. No wind source, or strength zero, means still moss.
-This is a shader wind source: it does not automatically animate third-party trees or Unity WindZone vegetation.
-Other vegetation shaders can consume `_SafeHavenWind` (XZ direction, displacement, speed) and
-`_SafeHavenWindGusts` to share it later.
+A Directional **WindZone** on Forest Wind overrides the direction (its arrow), scales strength by **Main** and
+replaces gusts with **Pulse Magnitude**, so moss, generated trees ([tree wind](TreeWind.md)) and particles with
+External Forces share one wind. Speed stays on Moss Wind. Shaders read `_SafeHavenWind` (XZ direction, moss
+displacement, speed), `_SafeHavenWindGusts` and `_SafeHavenTreeWind` (Main).
 
 ## Limits and architecture
 

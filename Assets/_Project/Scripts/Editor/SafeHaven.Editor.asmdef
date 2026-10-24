@@ -17,7 +17,8 @@
         "Unity.Pipeline",
         "Unity.Pipeline.Attributes",
         "Unity.Pipeline.Editor",
-        "AmplifyShaderEditor"
+        "AmplifyShaderEditor",
+        "glTFast"
     ],
     "includePlatforms": ["Editor"],
     "excludePlatforms": [],

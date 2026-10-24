@@ -1,0 +1,127 @@
+{
+  "version": 1,
+  "shader": "Safe Haven/Layered Lit",
+  "layers": [
+    "Moss",
+    "Rust"
+  ],
+  "properties": [
+    {
+      "name": "_LayerTriplanar",
+      "type": "float",
+      "value": [
+        1.0
+      ]
+    },
+    {
+      "name": "_LAYERTRIPLANAR_ON",
+      "type": "keyword",
+      "value": [
+        1.0
+      ]
+    },
+    {
+      "name": "_L1Source",
+      "type": "float",
+      "value": [
+        4.0
+      ]
+    },
+    {
+      "name": "_L1Upward",
+      "type": "float",
+      "value": [
+        1.0
+      ]
+    },
+    {
+      "name": "_L1Tiling",
+      "type": "float",
+      "value": [
+        1.5211
+      ]
+    },
+    {
+      "name": "_L2Source",
+      "type": "float",
+      "value": [
+        4.0
+      ]
+    },
+    {
+      "name": "_L2Upward",
+      "type": "float",
+      "value": [
+        0.0
+      ]
+    },
+    {
+      "name": "_L2Tiling",
+      "type": "float",
+      "value": [
+        1.5211
+      ]
+    },
+    {
+      "name": "_L2Smoothness",
+      "type": "float",
+      "value": [
+        0.15
+      ]
+    },
+    {
+      "name": "_L1Color",
+      "type": "texture",
+      "texture": "Assets/_Project/Art/Generated/SurfaceLayers/moss/moss_Color.png"
+    },
+    {
+      "name": "_L1Normal",
+      "type": "texture",
+      "texture": "Assets/_Project/Art/Generated/SurfaceLayers/moss/moss_Normal.png"
+    },
+    {
+      "name": "_L1MetallicGloss",
+      "type": "texture",
+      "texture": "Assets/_Project/Art/Generated/SurfaceLayers/moss/moss_MetallicGloss.png"
+    },
+    {
+      "name": "_L1Height",
+      "type": "texture",
+      "texture": "Assets/_Project/Art/Generated/SurfaceLayers/moss/moss_Height.png"
+    },
+    {
+      "name": "_L1HeightChannel",
+      "type": "float",
+      "value": [
+        0.0
+      ]
+    },
+    {
+      "name": "_L2Color",
+      "type": "texture",
+      "texture": "Assets/_Project/Art/Generated/SurfaceLayers/rust/rust_Color.png"
+    },
+    {
+      "name": "_L2Normal",
+      "type": "texture",
+      "texture": "Assets/_Project/Art/Generated/SurfaceLayers/rust/rust_Normal.png"
+    },
+    {
+      "name": "_L2MetallicGloss",
+      "type": "texture",
+      "texture": "Assets/_Project/Art/Generated/SurfaceLayers/rust/rust_MetallicGloss.png"
+    },
+    {
+      "name": "_L2Height",
+      "type": "texture",
+      "texture": "Assets/_Project/Art/Generated/SurfaceLayers/rust/rust_Height.png"
+    },
+    {
+      "name": "_L2HeightChannel",
+      "type": "float",
+      "value": [
+        0.0
+      ]
+    }
+  ]
+}

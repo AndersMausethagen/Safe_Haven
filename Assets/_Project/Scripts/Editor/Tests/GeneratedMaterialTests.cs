@@ -110,6 +110,34 @@ public sealed class GeneratedMaterialTests
     }
 
     [Test]
+    public void BlendMaskWithoutParallax_GetsLayeredLitThatCompiles()
+    {
+        Directory.CreateDirectory(Folder);
+        WritePng("_BaseColor", Color.gray);
+        WritePng("_MetallicSmoothness", new Color(0f, 0f, 0f, 0.3f));
+        WritePng("_BlendMask", new Color(0f, 0f, 1f, 1f));
+        AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+
+        Material material = GeneratedTexturePostprocessor.BuildMaterial(Folder, Name);
+        Assert.AreEqual(GeneratedTexturePostprocessor.LayeredShader, material.shader.name);
+        Assert.IsFalse(ShaderUtil.ShaderHasError(material.shader));
+        Assert.IsNotNull(material.GetTexture("_BaseMap"));
+        Assert.IsNotNull(material.GetTexture("_BlendMask"));
+        Assert.IsNotNull(material.GetTexture("_MetallicGlossMap"));
+        Assert.IsTrue(material.IsKeywordEnabled("_METALLICSPECGLOSSMAP"));
+        Assert.AreEqual(0f, material.GetFloat("_L1Amount"));
+
+        // A rebuild keeps the shader the user chose.
+        material.shader = Shader.Find("Universal Render Pipeline/Lit");
+        material = GeneratedTexturePostprocessor.BuildMaterial(Folder, Name);
+        Assert.AreEqual("Universal Render Pipeline/Lit", material.shader.name);
+        GeneratedTexturePostprocessor.ConvertToLayered(material, Shader.Find(GeneratedTexturePostprocessor.LayeredShader));
+        Assert.AreEqual(GeneratedTexturePostprocessor.LayeredShader, material.shader.name);
+        Assert.IsNotNull(material.GetTexture("_BaseMap"));
+        Assert.IsNotNull(material.GetTexture("_BlendMask"));
+    }
+
+    [Test]
     public void DetailNormalSuffix_IsNotParsedAsNormal()
     {
         Assert.IsTrue(GeneratedTexturePostprocessor.TryParse(

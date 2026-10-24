@@ -1,0 +1,47 @@
+# Day, night and weather
+
+A scene's **Sky and Weather** rig lights it through a 24-hour day and changes its weather. It is visual only: no
+gameplay reads the time or the weather yet, and neither is saved (a loaded game starts at the start hour and start
+weather).
+
+## Use
+
+1. Open the scene and run **Safe Haven > Environment > Weather > Add Day, Night and Weather to Scene**. It creates
+   the data assets if they are missing and adds a `Sky and Weather` object wired to the scene's directional light and
+   Moss Wind. SafeHaven.unity already has one.
+2. Preview in the editor:
+   - **Day Night › Start Hour** shows any time of day.
+   - **Weather › Start Weather** shows a weather (Clear, Breezy, Mist, Rain, Storm).
+   - In Play mode the clock runs (24 real minutes per day) and the climate changes the weather every few minutes.
+3. From code:
+   - `DayNightCycle.Hour` (read it, or set it to jump the clock, e.g. after sleeping), `IsNight`, `ClockRuns`.
+   - `WeatherSystem.SetWeather(weather, seconds)` (e.g. a storm before a ward breach); the `Changed` event; `Current`.
+
+## What each part does
+
+| Part | Does |
+|---|---|
+| `DayNightCycle` + **Safe Haven Day Night** (`Data/Environment`) | Moves the directional light (the sun by day; the same light is the moon by night) and sets its colour and strength, ambient light, fog colour and density, sky reflections and the Night / Golden Hour volume weights from the profile's curves over the 24 hours. Sets `_SafeHavenNight` for glowing plants |
+| `WeatherSystem` + **Safe Haven Climate** + weathers (`Data/Environment/Weather`) | Blends from one weather to the next (Climate › Transition Seconds) and picks the next weather by chance when one has lasted its duration. Drives the Moss Wind's strength and gusts (grass, trees, moss and water chop follow), the rain, the Overcast volume and lightning |
+| `RainEffect` (Art/Generated/Weather/Rain prefab) | Rain streaks and ground splashes around what the camera looks at, slanted by the wind. Sets `_SafeHavenRain` (rain rings on water) |
+| Volumes (`Settings/Rendering/Volumes`) | `SafeHaven_Night` (cool, desaturated, vignette, stronger bloom so lights and glowing plants stand out), `SafeHaven_GoldenHour` (warm, soft split toning), `SafeHaven_Overcast` (grey, flat). They only override what they change, on top of the scene's own `SafeHaven_Volume` |
+
+## Tuning
+
+- **Day length, sunrise/sunset, sun height and the noon direction:** the profile. The noon direction should cast
+  readable shadows from the game camera.
+- **Colours over the day:** the profile's gradients (0..1 = 0..24 h) and curves (in hours). Keep their dawn and
+  dusk keys near sunrise and sunset.
+- **Night brightness:** Moon Intensity and the night ends of the ambient gradients. Raise them if nights are too dark
+  to play.
+- **A weather's look:**
+  - Wind multiplies the Moss Wind.
+  - Clouds dim the sun and soften shadows.
+  - Fog multiplies the hour's fog, and Fog Tint mixes in by its alpha.
+  - Lightning Per Minute sets the strike rate.
+  - Min/Max Minutes set how long it lasts.
+- **How often each weather comes up:** the climate's Chance. Make another climate (Create › Safe Haven ›
+  Environment › Climate) for a raid region and assign it to that scene's Weather.
+
+The ambient light is applied as a computed ambient probe each frame, because Unity only rebuilds the probe when
+lighting is baked. Fog here is Unity's distance fog; volumetric fog and light can read the same weather values later.

@@ -570,6 +570,12 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 4416926081852918481, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
       insertIndex: -1
       addedObject: {fileID: 292231967421496494}
+    - targetCorrespondingSourceObject: {fileID: 4416926081852918481, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4295313785714126276}
+    - targetCorrespondingSourceObject: {fileID: 4416926081852918481, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5481392375160473428}
   m_SourcePrefab: {fileID: 100100000, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
 --- !u!1 &5943822763764690748 stripped
 GameObject:
@@ -860,8 +866,14 @@ MonoBehaviour:
   ghostMaterial: {fileID: 2100000, guid: f9bd178c025c9844d939f9ad1a38402f, type: 2}
   validColor: {r: 0.45, g: 1, b: 0.55, a: 0.45}
   invalidColor: {r: 1, g: 0.35, b: 0.3, a: 0.45}
+  yardColor: {r: 1, g: 0.85, b: 0.35, a: 0.4}
+  placedYardColor: {r: 1, g: 0.95, b: 0.75, a: 0.28}
   gridSize: 0.5
   rotationStep: 45
+  fineRotationStep: 15
+  snapDistance: 0.75
+  lineAngleStep: 15
+  maxLinePieces: 20
   blockingLayers:
     serializedVersion: 2
     m_Bits: 4294967295
@@ -877,6 +889,39 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5589dcd02af0eab419842e53ff9767bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: SafeHaven::PlayerGathering
+--- !u!114 &4295313785714126276
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5943822763764690748}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b3dd31011736fe24695fdc1f1a976a83, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::GrassInteractor
+  radius: 0.6
+  offset: {x: 0, y: 0, z: 0}
+--- !u!114 &5481392375160473428
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5943822763764690748}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3eb7db4eff82d2b4891de162f4363ed6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::WaterInteractor
+  kind: 0
+  radius: 0.45
+  offset: {x: 0, y: 0.15, z: 0}
+  ripples: 1
+  foam: 0.6
+  splash: {fileID: 427604759136440720, guid: d500fd09614e25f46b5c5f1fa49f7033, type: 3}
+  splashSpeed: 2.5
 --- !u!4 &6428716820787852678 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3893294197879345259, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}

@@ -27,7 +27,7 @@ of the GDD, **Not started** = design only. Update this table when a system is ad
 | §16 Skills, levels, bosses | Partial | `SkillDefinition`, `SkillSchool`, `SkillLoadout`, `PlayerSkills`, `SkillWindow` | No levels/talents, Essence enhancements or bosses |
 | §17 Quests, trade | Partial | `Quests/*`, `Events/*`; chain "The First Days" + side quest "A Stranger in the Mist" | No trade/bargain or reactive world |
 | §18 UI, accessibility | Partial | `UI/*` (TMP), `ActionMenuWindow` (world menus), `UIStateManager`, `UITheme` | No rebinding, text scaling or reduced-shake option |
-| §19 Art, audio | Partial | `Audio/*` (a `SceneAudio` "Scene Music" component per scene), volumes `SafeHaven_Volume` / `MistyWoods_Volume` | Composed music (`Audio/Safe Haven - *.mp3`) set per scene and as game-wide defaults in `AudioSettings`; other sounds and models are placeholders |
+| §19 Art, audio | Partial | `Audio/*` (a `SceneAudio` "Scene Music" component per scene), volumes `SafeHaven_Volume` / `MistyWoods_Volume`; environment in `Environment/*` (terrain moss, tree wind, `SurfaceLayerController` moss/rust on LocalSpawn models, grass and glowing plants, water and waterfalls, day/night and weather) | Composed music (`Audio/Safe Haven - *.mp3`) set per scene and as game-wide defaults in `AudioSettings`; other sounds and models are placeholders. Day/night and weather are visual only and not saved (§11 "weather influences plans" not built); only SafeHaven has the sky rig, not the raid scene. No rain/thunder sounds |
 | §20 Technical design | Done | Definitions vs runtime state vs `Save/*`; rules in settings assets (`GameSettings<T>`) | Raid crash recovery and seeds not built |
 | §21 First 90 minutes | Done (prototype) | `SafeHaven.unity`, `Raid_MistyWoods.unity`, quest chain "The First Days"; `Playtest/*` (`PlaytestLogger` writes one CSV per run, `PlaytestSettings` milestones, **Safe Haven ▸ Playtest ▸ Run Comparison**) | Decisions and assumptions are recorded in GDD §26.1. A run = one playthrough (its id is in the save, so loads continue the same log as a new session) |
 | §23–24 MVP / milestones | M0–M3 (no boss-earned skill enhancement yet), plus M4's recruit with a job and M5's scripted ward breach | – | Next per GDD: M4 companions (down/revive) and cart transport; M5 boss, environmental event and polish |
@@ -51,7 +51,7 @@ of the GDD, **Not started** = design only. Update this table when a system is ad
 | `Raids` | Raid definitions, modifiers, the `RaidLauncher` (departure, Portal Sparks), the `RaidDirector` that runs a raid scene, extraction, loot caches, the portal. `Raids/Map`: painted raid maps (`RaidMapDefinition`, `RaidMapZone`, `RaidZoneGrid`, `RaidMap`, `MapRotation`, `RaidMapMarkers`; see "Raid maps") |
 | `Quests` | Quest data (`QuestDefinition`, `QuestObjective`), per-player progress (`QuestLog`), `QuestManager`, `QuestGiver` (state-aware: marker, start, hand-in), `QuestMarker` + `QuestMarkerSettings` |
 | `Audio` | `AudioManager`, `SceneAudio` + `MusicPlaylist`/`MusicRules` (music), `SoundDefinition` + `DeathSound`/`SoundEmitter` (effects). Edited in **Safe Haven > Audio > Sound Editor** |
-| `Environment` | `TerrainMoss`: disposable terrain-alphamap-masked PBR moss and optional leafy sprigs; `MossWind`: shared shader wind; `TerrainMossBloom`: animated moss paint of the Heart Tree ward circle (runtime copy of TerrainData, so the asset is untouched in Play mode). `Editor/Environment` contains setup, deterministic `ForestGroundTextures`, native Amplify graph creation (`ForestGroundShaders`) and preview-only `ForestGroundShowcase`. See [terrain moss usage](../../../Docs/TerrainMoss.md) for maps, materials and budgets. No gameplay/save coupling |
+| `Environment` | `TerrainMoss`: disposable terrain-alphamap-masked PBR moss and optional leafy sprigs; `MossWind`: shared shader wind, driven by a Directional `WindZone` on the same object when present (moss, `TreeWind.shader` trees and particles share it; see [tree wind](../../../Docs/TreeWind.md)); `TerrainMossBloom`: animated moss paint of the Heart Tree ward circle (runtime copy of TerrainData, so the asset is untouched in Play mode); `SurfaceLayerController`: per-object amount (`SetAmount`/`FadeTo` by layer name, via `MaterialPropertyBlock`) of the two live layers of `LayeredLit.shader` ("Safe Haven/Layered Lit"), which grows tileable moss/rust/dirt over a Local Generator model from its exported `_BlendMask` (curvature, edge wear, cavity, coverage). Grass: `Grass.shader` ("Safe Haven/Grass") on instanced terrain detail prototypes, `GrassInteractor` (up to 8 objects that push grass, as shader globals), `GrassTerrainColour` (baked ground colour the grass is tinted with); `Editor/Environment/GrassSetup` builds the assets and prototypes and rebakes on terrain paint (see [grass](../../../Docs/Grass.md)). Water: `Water.shader` ("Safe Haven/Water": depth colour, refraction, caustics, flow, waterfalls, foam), `WaterSurface` (a pond/river interactors look up; switches the simple look for cameras without depth/opaque textures), `WaterInteractor` (player/stone ripples, wake foam, splashes, or constant churn), `WaterRipples` (GPU ripple height field around the player, `Shaders/Resources/WaterRipples.shader`), `Waterfall` (generated falling sheet + plunge); `Editor/Environment/WaterSetup` makes the assets, creates water and carves beds (see [water](../../../Docs/Water.md)). Sky: `DayNightCycle` (+ `DayNightProfile` asset: sun/moon light, ambient probe, fog, reflections, Night/Golden Hour volume weights, `_SafeHavenNight`), `WeatherSystem` (+ `WeatherDefinition`s and a `ClimateDefinition`: wind via `MossWind.SetWeather`, `RainEffect`, Overcast volume, lightning); `Editor/Environment/WeatherSetup` adds the rig (see [weather](../../../Docs/Weather.md)). Grass also has glowing mushrooms/flowers and `GrassSetup.FillByGround` (grass by ground layer, none under water or objects). `GeneratedTexturePostprocessor` gives new generated materials with a blend mask that shader (Assets > Safe Haven > Use Layered Lit converts others). `Editor/Environment` contains setup, `TreeWindMaterials` (Local Generator trees → Tree Wind materials and `_Wind` prefab variants), deterministic `ForestGroundTextures`, native Amplify graph creation (`ForestGroundShaders`) and preview-only `ForestGroundShowcase`. See [terrain moss usage](../../../Docs/TerrainMoss.md) for maps, materials and budgets. No gameplay/save coupling |
 | `Save` | The save system, in layers (see below), plus `SaveableEntity` / `ISaveable` for objects in scenes |
 | `UI` | Views and windows. They only read game state and send requests; no game rules live here. `ActionMenuWindow` is the shared menu for world objects (Heart Tree, portal, residents, altar, repair bench, build menu). `StationWindow` is the crafting-station window (recipe icon grid with `RecipeTabs` tabs, selected recipe + Queue, queue grid with progress bar, output grid, extension actions as buttons); its prefab is generated by Safe Haven > UI > Build Station Window (`Editor/UI/StationWindowBuilder`). `ItemTooltipView` also describes recipes and bare definitions (`ShowRecipe`, `ShowDefinition`), used for hover tooltips on station cells and on the bag's hand-recipe rows. `UIRoot` (root canvas, UI scale) and `PauseMenu` (Escape menu); see "UI root, pause and the Escape menu" |
 | `Editor` | The Content Editor (`Editor/Content`), the Systems Editor (`Editor/Systems`), the UI theme tool (`Editor/UI`), prefab builders, placeholder generators and Edit Mode tests (`Editor/Tests`) |
@@ -472,6 +472,38 @@ checks saved assets and runs isolated live combat probes without loading a playe
 - **UI text** is TextMesh Pro (part of the uGUI package in Unity 6). Fields are typed `TMP_Text` and components are
   `TextMeshProUGUI`; don't add legacy `UnityEngine.UI.Text`. For an outline or shadow, use the material presets in
   `TextMesh Pro/Resources/Fonts & Materials` instead of the old Outline/Shadow components.
+- **Hand-written URP shaders** (`Shaders/*.shader`) must declare the Forward+ reflection-probe keywords
+  (`_REFLECTION_PROBE_BLENDING`, `_REFLECTION_PROBE_BOX_PROJECTION`, `_REFLECTION_PROBE_ATLAS`), as `LayeredLit` and
+  `TreeWind` do. Without them, a renderer with a `MaterialPropertyBlock` (hit flashes, `SurfaceLayerController`) is
+  drawn outside the SRP batcher with no reflections and turns noticeably darker.
+
+## Generated models from LocalSpawn
+
+LocalSpawn (the Local Generator app) exports models as GLBs into `Models/Generated/<asset>/`. `Editor/LocalSpawnMaterials`
+makes glTFast import them with the project's shader instead of `Shader Graphs/glTF-pbrMetallicRoughness`:
+**Safe Haven/Layered Lit** by default (base colour, normal, glTF ORM map, emission, plus two live layers), or the
+shader named in the model's sidecar `<model>.material.json`. glTFast's importer has no setting for this, so the class
+wraps glTFast's default material generator (reinstalled before every GLB import). Trees in `Models/Generated/Vegetation`
+keep the Tree Wind flow unless they have a sidecar; cut-out or transparent materials keep glTFast's shader.
+
+The sidecar (written by LocalSpawn's 3D export from the material editor's **Unity material** row) holds the shader, its
+values (linear colours, floats, keywords), texture paths (the model's `_BlendMask.png`, layer sets in
+`Art/Generated/SurfaceLayers/<name>/`) and the layer names (material tags `SurfaceLayer1/2`). Changing the sidecar or
+a texture it names reimports the model. `SurfaceLayerController` finds layers by those tags, so
+`GetComponent<SurfaceLayerController>().FadeTo("Moss", 1f, 30f)` grows the moss on any exported model.
+`Editor/LocalSpawnPreview.Render` renders a model with its real material in a preview scene (LocalSpawn's
+**Preview in Unity** calls it through the Unity CLI). Tests: `Editor/Tests/LocalSpawnMaterialsTests`.
+
+GLB is the recommended format. FBX/OBJ exports in `Models/Generated/` get the same sidecar plus their maps as separate
+files beside the model (`<model>_BaseColor.png`, `_Normal`, `_ORM_...`/`_MetallicRoughness_...`, `_Emissive`);
+`LocalSpawnModelImport.OnPreprocessMaterialDescription` applies it through Unity's model importer and imports those
+maps with the right settings (normal map, linear ORM). Multi-material FBX/OBJ keep Unity's own material.
+
+| I want to... | Do this |
+|---|---|
+| Give an exported model another shader or values | LocalSpawn: Materials editor › Layers › **Unity material**, then 💾 Save + export model. In Unity, editing the model's material is not kept: it is rebuilt on reimport |
+| Grow moss or rust on an object from code | Add `SurfaceLayerController` to the object and call `FadeTo("Moss", amount, seconds)` / `SetAmount` |
+| Use a new custom shader for models | Put it in `Shaders/` with URP Lit's property names (`_BaseMap`, `_BumpMap`, `_ORMMap` + `_ORMMAP`, `_EmissionMap`, `_EmissionColor`); LocalSpawn lists it automatically |
 
 ## Look and lighting
 
