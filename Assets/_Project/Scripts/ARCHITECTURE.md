@@ -339,6 +339,10 @@ filled in when it is saved (`SaveableEntityTools`). Safe Haven > Save > Assign M
 
 The three first stone-tool recipes consume Sticks and Small Rocks, not Oak Wood/Grey Stone. Stone Hatchet has tool strength 1; Stone Pickaxe intentionally keeps strength 2 to bootstrap copper. Item tier and tool strength are not interchangeable. Tests in `BootstrapProgressionTests` and `InteractionTests` (category `GatheringProgression`) cover the assets, hand-picked yields, crafting, and tool gating.
 
+`Interactable` ignores inactive visual colliders when measuring reach (including the repaired portal's hidden model); without a live solid collider it uses the interaction origin. `PlayerInteractionOutline` on the player prefab outlines nearby interactables or the first unobstructed collider under `CameraPointer` (mouse or action-camera crosshair). It uses disposable mesh/skinned-renderer children and shared `InteractionOutline`/`InteractionOutlineMask` materials, never changes original materials, hides depleted/disabled visuals and while windows/pause are open, and casts no shadows. The URP shaders draw a depth-tested, three-pixel amber silhouette, not an x-ray or a promise that tool requirements pass. A colourless mask reserves stencil bit 0 for the original silhouette; the expanded double-sided hull draws only outside it, so thin ground-level sticks do not lose their contour to buried backfaces. They run at queues 2998/2999, after opaque rendering, so URP Deferred does not override their stencil states. Tests: `InteractionReadability` (both orthographic and perspective rendered-pixel checks).
+
+The eight starter forage nodes have slightly larger model silhouettes and 1.1-metre local clearings in SafeHavenTerrain's detail layers; vegetation elsewhere is unchanged. Light equipment still uses Quickstep, now with `Slide_Start` instead of a landing-only clip; distance, stamina, invulnerability, load thresholds and cooldown are unchanged.
+
 ## Editors for designers
 
 | Editor | For | Menu |
@@ -348,6 +352,7 @@ The three first stone-tool recipes consume Sticks and Small Rocks, not Oak Wood/
 | UI theme | Window, button and text colors of every UI prefab | Safe Haven > UI |
 | Level tools (`Editor/Level`) | Building the world by hand: **Scatter Brush** paints weighted `ScatterPalette`s (`Data/Level/Palettes`: forest trees, rocks and logs, wood and stone nodes, forage) on the ground with spacing, slope tilt and sink (Shift erases); **Path Painter** paints a ground layer along a curve with a frayed edge, clears grass and smooths the ground; **Drop to Ground** (End / Shift+End aligns to the slope) sets objects down by the bottom of their meshes; **Level Check** finds floating, buried, unreachable, under-water, crowded and off-terrain gameplay objects, save id problems, missing scripts and leftovers, with fixes, and counts the level's contents. See [level design](../../../Docs/LevelDesign.md) | Safe Haven > Level |
 | Sky Controller | Time of day, clock speed and weather, in edit and Play mode | Safe Haven > Environment > Sky Controller |
+| Environment HUD | Read-only top-centred clock/phase timeline and vector weather symbol, bound to the scene sky rig; no separate clock or saved state (see [weather](../../../Docs/Weather.md)) | Safe Haven > UI > Add Environment HUD to Scene |
 | Planner import (`Editor/Planner`) | Reads `manifest.json` from the external Progression Planner app (`D:\Safe Haven\ProgressionPlanner`, outside this repo). Shows New / Changed / Error entries with old → new values and writes only after confirmation. Never deletes or overwrites; matches existing assets by GUID, then id. CLI: `sh_planner_preview`, `sh_planner_apply` | Safe Haven > Planner > Import Planner Data |
 
 ### CLI commands (`Editor/Cli/`)

@@ -172,6 +172,37 @@ public sealed class InteractionTests
         Assert.IsNull(user.FindFocus());
     }
 
+    [Test]
+    public void HiddenVisualColliderDoesNotMakeDistantPortalWinFocus()
+    {
+        PlayerInteractor user = Interactor();
+        Interactable portal = Target(new Vector3(-12f, 0f, 29f));
+        GameObject visual = NewObject("Portal active visual");
+        visual.transform.SetParent(portal.transform, false);
+        visual.AddComponent<BoxCollider>();
+        Invoke(portal, "Awake");
+        visual.SetActive(false);
+        Physics.SyncTransforms();
+
+        Interactable nearby = Target(Vector3.right);
+        Assert.AreEqual(Mathf.Sqrt(985f), portal.DistanceFrom(Vector3.zero), 0.001f);
+        Assert.AreSame(nearby, user.FindFocus());
+    }
+
+    [Test]
+    public void InactiveParentColliderFallsBackToInteractionOrigin()
+    {
+        Interactable target = Target(Vector3.forward * 10f);
+        GameObject visual = NewObject("Visual");
+        visual.transform.SetParent(target.transform, false);
+        GameObject mesh = NewObject("Mesh");
+        mesh.transform.SetParent(visual.transform, false);
+        mesh.AddComponent<BoxCollider>();
+        Invoke(target, "Awake");
+        visual.SetActive(false);
+        Assert.AreEqual(10f, target.DistanceFrom(Vector3.zero), 0.001f);
+    }
+
     private Interactable ToolTarget(ToolType type = ToolType.Pickaxe, int tier = 2)
     {
         var definition = ScriptableObject.CreateInstance<GatheringNodeDefinition>();

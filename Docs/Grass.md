@@ -34,6 +34,12 @@ Terrain details are culled per patch, so grass outside the camera's view is not 
 5. To make anything else part the grass (enemies, a cart, a thrown stone), select it and run **Make Selected Push
    Grass**, or add `GrassInteractor` yourself. Up to 8 are used at once; those nearest the camera win.
 
+Safe Haven's eight starter Sticks/Small Rocks nodes have small, painted-out detail clearings (1.1 m radius), plus
+slightly enlarged models. This preserves the dense forest floor elsewhere and makes hand-picked resources readable
+even before approaching. Refilling terrain details can repaint those clearings; preserve or repaint them when changing
+the vegetation. Nearby/hovered interactables also get a depth-tested amber outline from the player's
+`PlayerInteractionOutline`; it does not hide grass globally or bypass gathering-tool requirements.
+
 ## Why it looks full from above
 
 - **Camera-facing blades:** every blade turns around its own axis to show its full width to the camera (an axial

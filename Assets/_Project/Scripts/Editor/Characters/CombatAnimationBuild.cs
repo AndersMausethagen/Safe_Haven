@@ -363,7 +363,7 @@ public static partial class CombatAnimationSetup
     private static (string, AnimationClip)[] DodgeClips()
     {
         Dictionary<string, AnimationClip> ual = Clips();
-        return new[] { ("Quickstep", ual["NinjaJump_Land"]), ("Roll", Ual1("Roll")), ("Heavy Roll", ual["Shield_Dash"]) };
+        return new[] { ("Quickstep", ual["Slide_Start"]), ("Roll", Ual1("Roll")), ("Heavy Roll", ual["Shield_Dash"]) };
     }
 
     // A roll that reads as a roll: half a second, not a blink.
@@ -372,7 +372,7 @@ public static partial class CombatAnimationSetup
     // How much of each dodge clip is the dodge itself (the rest is getting back up), to fit it to the dash's time.
     private static readonly Dictionary<string, float> DodgeShare = new Dictionary<string, float>
     {
-        ["Quickstep"] = 0.45f, ["Roll"] = 0.6f, ["Heavy Roll"] = 0.5f,
+        ["Quickstep"] = 0.9f, ["Roll"] = 0.6f, ["Heavy Roll"] = 0.5f,
     };
 
     /// <summary>Fits the dodge animations to the dodges (speed so the clip's dodge part lasts the dash), and makes the dodge

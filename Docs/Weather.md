@@ -29,6 +29,23 @@ weather).
 - **Unity CLI:** `unity command sh_sky -- --hour 21 --weather Rain --transition 10 --speed 60 --lightning true`. Run
   it with no arguments to show the current time and weather.
 
+## Player HUD
+
+SafeHaven's **Screen Canvas > Environment HUD** reads the existing scene clock and weather; it does not run a second
+simulation. The top-centred strip shows the current phase and clock, a small vector weather icon and the weather's
+authored display name. The thin 24-hour line has a moving dot, coloured segments and ticks at each phase boundary.
+Labels below each segment give its name and start time. The two night segments join across midnight.
+
+- Dawn starts at the profile's Sunrise; day starts two game hours later. Dusk starts two hours before Sunset, and
+  night starts at Sunset. On short days, dawn/dusk each take at most a quarter of daylight. These are presentation
+  labels, not new gameplay rules; the light still blends continuously using the existing profile.
+- Clear conditions use a sun by day and moon by night. Wind, mist, cloud, rain and storm symbols are chosen from
+  the blended weather values, not filenames. During transitions the text says **To [weather]**, while the icon follows
+  the conditions currently visible. There is no forecast.
+- The strip does not intercept clicks and sits below inventory/pause windows. It inherits Screen Canvas scaling.
+- **Safe Haven > UI > Add Environment HUD to Scene** adds it to another scene that already has a Screen Canvas and
+  configured sky rig. Running it again returns the existing HUD without duplicating it or resetting sky settings.
+
 ## What each part does
 
 | Part | Does |

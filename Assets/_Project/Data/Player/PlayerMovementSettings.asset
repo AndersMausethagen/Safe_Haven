@@ -39,7 +39,7 @@ MonoBehaviour:
     cooldown: 0.8
     moveSpeed: 1.05
     animationState: Quickstep
-    animationSpeed: 1.7538463
+    animationSpeed: 2.3076925
   roll:
     distance: 1
     duration: 1

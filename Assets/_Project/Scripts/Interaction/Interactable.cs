@@ -194,7 +194,7 @@ public sealed class Interactable : MonoBehaviour
         for (int i = 0; i < colliders.Length; i++)
         {
             Collider candidate = colliders[i];
-            if (candidate == null || !candidate.enabled || candidate.isTrigger)
+            if (candidate == null || !candidate.enabled || !candidate.gameObject.activeInHierarchy || candidate.isTrigger)
             {
                 continue;
             }

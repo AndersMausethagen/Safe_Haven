@@ -2567,6 +2567,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 4416926081852918481, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
       insertIndex: -1
       addedObject: {fileID: 7369140670035313953}
+    - targetCorrespondingSourceObject: {fileID: 4416926081852918481, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3800643182948972781}
   m_SourcePrefab: {fileID: 100100000, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
 --- !u!1 &5943822763764690748 stripped
 GameObject:
@@ -2970,6 +2973,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3d050135bffd96a40a05e4f775f1f409, type: 3}
   m_Name: 
   m_EditorClassIdentifier: SafeHaven::PlayerEating
+--- !u!114 &3800643182948972781
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5943822763764690748}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4a99150e68eb3a44cb590f0a9c1cbfa1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::PlayerInteractionOutline
+  outlineMaterial: {fileID: 2100000, guid: 95b7372af1ad70a4cb85632353a34660, type: 2}
+  maskMaterial: {fileID: 2100000, guid: 255da0bc603577849b15a8df8e031fd8, type: 2}
+  hoverDistance: 80
 --- !u!4 &6428716820787852678 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3893294197879345259, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
