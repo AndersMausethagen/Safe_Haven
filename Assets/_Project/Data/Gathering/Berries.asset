@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GatheringNodeDefinition
   id: 
   displayName: Berries
-  tier: 1
+  tier: 0
   yields:
     entries:
     - item: {fileID: 11400000, guid: d799dc8161ff2854dae1eedf4b74fb09, type: 2}

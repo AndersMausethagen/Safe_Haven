@@ -331,6 +331,14 @@ filled in when it is saved (`SaveableEntityTools`). Safe Haven > Save > Assign M
 - **Purification:** `PurificationAltar` queues batches in `SettlementState`; `SettlementSystem` ticks them everywhere
   (also during raids) while someone holds the Alchemist job.
 
+## Gathering bootstrap and tiers
+
+`Tiers.Min` is 0; Tier 0 is shown as `0`, not an absent tier. Sticks, Small Rocks, and Berries are hand-picked Tier 0 items/nodes. SafeHaven contains four Sticks and four Small Rocks nodes under **Tier 0 Forage**, with separate save ids and 90-second regrowth. The new items have simple placeholder models, pickup prefabs, and rendered icons.
+
+`ItemInventory.GatheringTier` returns 0 without a tool. Players with `PlayerEquipment` must equip a matching, unbroken tool; inventory-only users use their best carried tool. `ResourceNode.CanInteract` enforces the requirement before preview and interaction start. `GatherTool.None` is explicitly hand-pickable; Tier I tool nodes no longer accept bare hands.
+
+The three first stone-tool recipes consume Sticks and Small Rocks, not Oak Wood/Grey Stone. Stone Hatchet has tool strength 1; Stone Pickaxe intentionally keeps strength 2 to bootstrap copper. Item tier and tool strength are not interchangeable. Tests in `BootstrapProgressionTests` and `InteractionTests` (category `GatheringProgression`) cover the assets, hand-picked yields, crafting, and tool gating.
+
 ## Editors for designers
 
 | Editor | For | Menu |
@@ -340,6 +348,7 @@ filled in when it is saved (`SaveableEntityTools`). Safe Haven > Save > Assign M
 | UI theme | Window, button and text colors of every UI prefab | Safe Haven > UI |
 | Level tools (`Editor/Level`) | Building the world by hand: **Scatter Brush** paints weighted `ScatterPalette`s (`Data/Level/Palettes`: forest trees, rocks and logs, wood and stone nodes, forage) on the ground with spacing, slope tilt and sink (Shift erases); **Path Painter** paints a ground layer along a curve with a frayed edge, clears grass and smooths the ground; **Drop to Ground** (End / Shift+End aligns to the slope) sets objects down by the bottom of their meshes; **Level Check** finds floating, buried, unreachable, under-water, crowded and off-terrain gameplay objects, save id problems, missing scripts and leftovers, with fixes, and counts the level's contents. See [level design](../../../Docs/LevelDesign.md) | Safe Haven > Level |
 | Sky Controller | Time of day, clock speed and weather, in edit and Play mode | Safe Haven > Environment > Sky Controller |
+| Planner import (`Editor/Planner`) | Reads `manifest.json` from the external Progression Planner app (`D:\Safe Haven\ProgressionPlanner`, outside this repo). Shows New / Changed / Error entries with old → new values and writes only after confirmation. Never deletes or overwrites; matches existing assets by GUID, then id. CLI: `sh_planner_preview`, `sh_planner_apply` | Safe Haven > Planner > Import Planner Data |
 
 ### CLI commands (`Editor/Cli/`)
 

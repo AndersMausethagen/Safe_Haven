@@ -351,7 +351,7 @@ public sealed class GatheringNodeSection : PrefabContentSection
             }
         }
 
-        if (node.GatherTool != ToolType.None && node.RequiredToolTier > 1 && !ToolExists(node.GatherTool, node.RequiredToolTier))
+        if (node.GatherTool != ToolType.None && !ToolExists(node.GatherTool, node.RequiredToolTier))
         {
             problems.Add($"No item is a Tier {Tiers.ToRoman(node.RequiredToolTier)} {node.GatherTool} or better, so nobody can gather it.");
         }

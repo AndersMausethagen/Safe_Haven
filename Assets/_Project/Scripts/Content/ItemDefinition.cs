@@ -38,7 +38,7 @@ public sealed class ItemDefinition : ScriptableObject
     [SerializeField, TextArea] private string description;
     [SerializeField] private ItemCategory category;
     [Tooltip("Progression tier, shown on the item. Usually the tier of the materials it is made from.")]
-    [SerializeField, Range(1, Tiers.Max)] private int tier = 1;
+    [SerializeField, Range(Tiers.Min, Tiers.Max)] private int tier = 1;
 
     [Header("Loot")]
     [Tooltip("How rare and exciting the item is: colors it in the UI and picks its pickup sound (see Resources/RaritySettings).")]

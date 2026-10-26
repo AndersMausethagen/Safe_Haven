@@ -239,7 +239,7 @@ public sealed class ItemInventory : MonoBehaviour
     }
 
     /// <summary>
-    /// The tier of tool the user gathers with: the tool of that kind on their tool belt (character screen), or 1 for bare
+    /// The tier of tool the user gathers with: the tool of that kind on their tool belt (character screen), or 0 for bare
     /// hands. Users without gear slots use their best tool in the bag. Nodes that need no tool are open to everyone.
     /// </summary>
     public static int GatheringTier(GameObject user, ToolType type)
@@ -252,10 +252,10 @@ public sealed class ItemInventory : MonoBehaviour
         PlayerEquipment equipment = user != null ? user.GetComponentInParent<PlayerEquipment>() : null;
         if (equipment != null)
         {
-            return Mathf.Max(1, equipment.Gear.ToolTier(type));
+            return equipment.Gear.ToolTier(type);
         }
 
         ItemInventory inventory = user != null ? user.GetComponentInParent<ItemInventory>() : null;
-        return Mathf.Max(1, inventory != null ? inventory.Container.BestToolTier(type) : 0);
+        return inventory != null ? inventory.Container.BestToolTier(type) : 0;
     }
 }

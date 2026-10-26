@@ -2,13 +2,14 @@ using UnityEngine;
 
 /// <summary>
 /// How tiers are shown everywhere: as Roman numerals with one color per tier, so resources, items, tools and recipes
-/// all agree. Tier 1 is the starting tier.
+/// all agree. Tier 0 contains hand-picked starting materials; Tier I introduces tools.
 /// </summary>
 public static class Tiers
 {
+    public const int Min = 0;
     public const int Max = 5;
 
-    private static readonly string[] Numerals = { "-", "I", "II", "III", "IV", "V" };
+    private static readonly string[] Numerals = { "0", "I", "II", "III", "IV", "V" };
 
     private static readonly Color[] Colors =
     {

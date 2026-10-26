@@ -441,6 +441,8 @@ The bag has a 150-point carrying budget (hard cap for now) plus slot limits. Bac
 
 Harvest nodes (Gathering Node Definitions) define required tools, interaction duration, item yield ranges, and respawn policy. Gathered materials go to the bag; what doesn't fit by slots or weight is left behind and reported. Enemies and special events use loot tables, including quantity ranges, rarity, and conditions. The same definition drives harvesting, loot, UI, recipes, and save data. Cursed Essence is primarily earned through enemy drops, elite encounters, bosses, and extraction bonuses, with stable, configurable loot tables. A node might drop **3–5 Grey Stone** in **1.5 seconds** and slowly respawn in Safe Haven, while raid nodes reset each run.
 
+**Bootstrap progression:** Tier 0 includes hand-picked Sticks, Small Rocks, and Berries. Sticks and Small Rocks make the first stone tools by hand, without requiring harvested wood, Grey Stone, or a station. Bare hands have tool strength 0; Oak Wood requires an equipped Tier I axe and Grey Stone requires an equipped Tier I pickaxe. Stone Hatchet has tool strength I and cannot harvest Hardwood. Stone Pickaxe deliberately retains tool strength II so the player can obtain copper for the first copper tools instead of needing a copper pickaxe to obtain its own ingredients. Item tier and tool strength are separate values. Higher-tier tools can still harvest lower-tier nodes.
+
 **Swinging tools (axe, pickaxe, sickle)** use a timing minigame instead of a hold: a marker sweeps a vertical bar and each node takes a set number of swings (trees 3, ores 2, fibre plants 5 by default). Each tool has its own rhythm: the sickle's bar is twice as fast with a narrower zone but is much quieter (quick cuts), the pickaxe is slower and loudest. A press in the red **critical** zone grants +1 of the main yield with a brief hit-stop; the yellow zone is a normal swing; missing or not pressing is a **glancing blow** that costs the tool 2% durability. Every swing makes the node itself react (it rocks away from the hit, chips/sparks fly; harder on a crit) and a gathered node breaks (debris, shrinks and sinks) and pops back when it regrows. This feel comes from shared **Harvest Feedback** profiles (Wood, Stone, Ore, Fibre) picked per node, with a Default profile as fallback; per-prefab one-offs hook the ResourceNodeFeedback events. Hand-picked nodes (berries, herbs, motes) stay hold-to-gather. Consecutive crits widen the crit zone (combo), higher tool tiers widen it too, and taking damage interrupts the swing. An auto-gather accessibility option replaces the bar with a normal swing each time. In raids every swing makes noise (scaled by the tool's loudness) that wakes nearby sleeping monsters and raises the **Forest Annoyance** (crits add only ~25% of a normal swing's noise). Annoyance decays while the player is quiet and escalates through *Stirring* (more roamers, faster spawns), *Angry* (monsters hunt the player) and *Wrath* (one wave of the raid's wrath spawn list). Each raid tunes its own annoyance: the Misty Woods is forgiving (slow rise, fast calm), Troll Valley is touchy (fast rise, slow calm, lower thresholds). The raid summary reports swings, crit rate, glancing blows and peak annoyance, rewarding quiet play.
 ### 12.6 Unique items
 
@@ -458,7 +460,7 @@ Crafting converts risky expeditions into visible safety and competence. Basic re
 
 ### 13.3 Crafting tiers
 
-**Tier 0:** handcrafting and campfire. **Tier 1:** construction table, sawbench, simple storage. **Tier 2:** furnace, smithy, cauldron, reinforced structures. **Tier 3+:** advanced enchantment, boss materials, specialized NPC workstations. Recipes should specify required station, ingredients, craft time, output quantity, and unlock conditions.
+**Tier 0:** hand-picked starting materials and food; handcraft the first tools from Sticks and Small Rocks. **Tier 1:** stone tools, Oak Wood and Grey Stone, campfire, construction table, sawbench, simple storage. **Tier 2:** furnace, first metals, and upgraded tools. **Tier 3+:** forge and iron work, advanced enchantment, boss materials, specialized NPC workstations. These are progression groupings, not a second station-level system; buildings derive their planner tier from their costs. Recipes should specify required station, ingredients, craft time, output quantity, and unlock conditions.
 
 ### 13.4 Repair and economy
 
@@ -695,7 +697,7 @@ Use readable finite-state behavior for enemies; companions require follow, hold,
 
 ### 21.1 Minutes 0–10: awakening
 
-The player wakes at the Heart Tree. A sunny clearing contains a stream, loose stones, and fallen branches. A short tree interaction creates mystery instead of a long opening cutscene. Teach movement, aiming, interacting, and the resource bar through Grey Stone and Oak Wood gathering.
+The player wakes at the Heart Tree. A sunny clearing contains a stream, loose Small Rocks, fallen Sticks, and Berries, all gathered by hand at Tier 0. A short tree interaction creates mystery instead of a long opening cutscene. Teach movement, aiming, interacting, and the bag by collecting these materials, handcrafting and equipping the first stone tools, then harvesting Tier I Grey Stone and Oak Wood. Never require wood or Grey Stone to make the tool that first unlocks it.
 
 ### 21.2 Minutes 10–25: first camp
 

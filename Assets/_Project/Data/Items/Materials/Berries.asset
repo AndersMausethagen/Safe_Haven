@@ -16,11 +16,15 @@ MonoBehaviour:
   displayName: Berries
   description: Lingonberries and bilberries from the clearing's bushes. Eat them raw, or stew them at a campfire.
   category: 2
-  tier: 1
+  tier: 0
   rarity: 0
   value: 1
   icon: {fileID: 21300000, guid: 6c89a0402d24c45469f82263f87731ae, type: 3}
   prefab: {fileID: 0}
+  heldModel: {fileID: 0}
+  heldPosition: {x: 0, y: 0, z: 0}
+  heldRotation: {x: 0, y: 0, z: 0}
+  heldScale: 1
   stackable: 1
   maximumStack: 50
   weight: 0.2

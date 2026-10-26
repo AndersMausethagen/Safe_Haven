@@ -17,7 +17,7 @@ public sealed class GatheringNodeDefinition : ScriptableObject
     [Tooltip("Shown on the interaction prompt. Falls back to the asset name when empty.")]
     [SerializeField] private string displayName;
     [Tooltip("Progression tier. Higher tiers need better tools and grow in more dangerous places.")]
-    [SerializeField, Range(1, Tiers.Max)] private int tier = 1;
+    [SerializeField, Range(Tiers.Min, Tiers.Max)] private int tier = 1;
 
     [Header("Yield")]
     [Tooltip("What one gather gives. Items go to the bag, essences to the essence bars.")]
@@ -26,7 +26,7 @@ public sealed class GatheringNodeDefinition : ScriptableObject
     [Header("Gathering")]
     [Tooltip("The tool needed to gather it. None means bare hands always work.")]
     [SerializeField] private ToolType gatherTool;
-    [Tooltip("Lowest tool tier that can gather it. 1 means bare hands work; Tier II nodes usually need a Tier II tool.")]
+    [Tooltip("Lowest tool tier that can gather it. 1 requires an actual Tier I tool; only Gather Tool None allows bare hands.")]
     [SerializeField, Range(1, Tiers.Max)] private int requiredToolTier = 1;
     [Tooltip("Animation the player plays while gathering.")]
     [SerializeField] private InteractionAnimation gatherAnimation = InteractionAnimation.GatherLow;
@@ -60,7 +60,7 @@ public sealed class GatheringNodeDefinition : ScriptableObject
     public int Tier => tier;
     public ItemDropTable Yields => yields;
     public ToolType GatherTool => gatherTool;
-    public int RequiredToolTier => gatherTool == ToolType.None ? 1 : requiredToolTier;
+    public int RequiredToolTier => gatherTool == ToolType.None ? 0 : Mathf.Max(1, requiredToolTier);
     public InteractionAnimation GatherAnimation => gatherAnimation;
     public float GatherSeconds => gatherSeconds;
     public int Swings => Mathf.Max(1, swings);

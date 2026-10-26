@@ -20,7 +20,7 @@ public sealed class ResourceDefinition : ScriptableObject
     [Tooltip("The inventory tab this resource is listed under.")]
     [SerializeField] private ResourceCategory category;
     [Tooltip("Progression tier. Higher tiers need better tools, take longer to gather and grow in more dangerous places.")]
-    [SerializeField, Range(1, Tiers.Max)] private int tier = 1;
+    [SerializeField, Range(Tiers.Min, Tiers.Max)] private int tier = 1;
     [Tooltip("One or two sentences for tooltips: what it is and what it is good for.")]
     [SerializeField, TextArea] private string description;
 

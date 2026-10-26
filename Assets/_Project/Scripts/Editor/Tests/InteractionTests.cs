@@ -5,6 +5,7 @@ using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
+[Category("GatheringProgression")]
 public sealed class InteractionTests
 {
     private readonly List<Object> created = new List<Object>();
@@ -74,6 +75,61 @@ public sealed class InteractionTests
         Assert.IsFalse(target.CanInteract(bag.gameObject, out _));
     }
 
+    [TestCase(ToolType.Axe)]
+    [TestCase(ToolType.Pickaxe)]
+    public void TierOneNodesRequireAnActualTool(ToolType type)
+    {
+        ItemInventory bag = NewObject("User").AddComponent<ItemInventory>();
+        Interactable target = ToolTarget(type, 1);
+        Assert.AreEqual(0, ItemInventory.GatheringTier(bag.gameObject, type));
+        Assert.IsFalse(target.CanInteract(bag.gameObject, out _));
+        Assert.IsFalse(target.TryBegin(bag.gameObject, out _));
+        bag.Container.Add(Tool(type, 1), 1);
+        Assert.IsTrue(target.CanInteract(bag.gameObject, out _));
+        bag.Container.RemoveAt(0, 1);
+        Assert.IsFalse(target.CanInteract(bag.gameObject, out _));
+    }
+
+    [Test]
+    public void BareHandsCanGatherToolFreeTierZeroNodes()
+    {
+        Interactable target = ToolTarget(ToolType.None, 1);
+        Assert.IsTrue(target.CanInteract(null, out _));
+    }
+
+    [Test]
+    public void TierOneAxeDoesNotUnlockTierTwoWood()
+    {
+        ItemInventory bag = NewObject("User").AddComponent<ItemInventory>();
+        Interactable target = ToolTarget(ToolType.Axe, 2);
+        bag.Container.Add(Tool(ToolType.Axe, 1), 1);
+        Assert.IsFalse(target.CanInteract(bag.gameObject, out _));
+        bag.Container.Add(Tool(ToolType.Axe, 2), 1);
+        Assert.IsTrue(target.CanInteract(bag.gameObject, out _));
+    }
+
+    [Test]
+    public void TierZeroHasItsOwnLabel()
+    {
+        Assert.AreEqual("0", Tiers.ToRoman(0));
+        StringAssert.Contains("Tier 0", Tiers.RichLabel(0));
+        Assert.AreEqual("I", Tiers.ToRoman(1));
+    }
+
+    [Test]
+    public void ToolBeltMustContainAnEquippedToolForTierOneNodes()
+    {
+        GameObject user = NewObject("Equipped user");
+        var equipment = user.AddComponent<PlayerEquipment>();
+        var bag = user.GetComponent<ItemInventory>();
+        Interactable target = ToolTarget(ToolType.Axe, 1);
+        Assert.IsFalse(target.CanInteract(user, out _));
+        bag.Container.Add(Tool(ToolType.Axe, 1), 1);
+        Assert.IsFalse(target.CanInteract(user, out _));
+        Assert.IsTrue(equipment.Gear.Equip(bag.Container, 0, out _));
+        Assert.IsTrue(target.CanInteract(user, out _));
+    }
+
     [Test]
     public void DisabledAndInUseTargetsAreNotReady()
     {
@@ -116,14 +172,15 @@ public sealed class InteractionTests
         Assert.IsNull(user.FindFocus());
     }
 
-    private Interactable ToolTarget()
+    private Interactable ToolTarget(ToolType type = ToolType.Pickaxe, int tier = 2)
     {
         var definition = ScriptableObject.CreateInstance<GatheringNodeDefinition>();
         created.Add(definition);
         definition.name = "Test Ore";
         var data = new SerializedObject(definition);
-        data.FindProperty("gatherTool").intValue = (int)ToolType.Pickaxe;
-        data.FindProperty("requiredToolTier").intValue = 2;
+        data.FindProperty("tier").intValue = type == ToolType.None ? 0 : tier;
+        data.FindProperty("gatherTool").intValue = (int)type;
+        data.FindProperty("requiredToolTier").intValue = tier;
         data.ApplyModifiedPropertiesWithoutUndo();
         Interactable target = Target(Vector3.zero);
         ResourceNode node = target.gameObject.AddComponent<ResourceNode>();

@@ -19,9 +19,9 @@ MonoBehaviour:
   outputAmount: 1
   resourceCost: []
   itemCost:
-  - item: {fileID: 11400000, guid: b5567f7d75200bd46befbd1dab298f36, type: 2}
+  - item: {fileID: 11400000, guid: 9f085f39a2da68c45b58d2db986835f4, type: 2}
     amount: 4
-  - item: {fileID: 11400000, guid: 8ae2883815327b74fa7975309c803f92, type: 2}
+  - item: {fileID: 11400000, guid: e8bb5d2fbded52b42a179a47cce32d53, type: 2}
     amount: 5
   station: 0
   craftSeconds: 5
