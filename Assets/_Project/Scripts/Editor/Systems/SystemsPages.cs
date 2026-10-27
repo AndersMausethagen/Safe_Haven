@@ -139,6 +139,48 @@ public sealed class QuestMarkersPage : SystemsPage
     }
 }
 
+/// <summary>How monsters notice the player (sight cone, close sense, hearing) and how the player stays unnoticed.</summary>
+public sealed class SensesAndStealthPage : SystemsPage
+{
+    public override string Title => "Senses & Stealth";
+    public override string Group => "World";
+    public override string Help => "Monsters see in a cone that cover blocks, notice anything very close from any direction and hear noise " +
+                                   "(footsteps, dodges, fights, gathering). A glimpse or a sound makes them suspicious (\"?\"): they come to " +
+                                   "look. Seeing you long enough spots you (\"!\"). A target they can't see for a while is lost: they search " +
+                                   "where they last saw it. Sneak with Left Ctrl / left bumper. Each monster's own eyes and ears are below " +
+                                   "(Sight = its Detection Range).";
+
+    public override void Draw()
+    {
+        var rules = Settings<PerceptionSettings>(PerceptionSettings.ResourceName);
+        if (rules != null)
+        {
+            SettingsPanel(rules, "Perception", "Resources/PerceptionSettings: noticing, searching, hearing, the player's visibility and noise");
+            var eyes = new SenseProfile(10f, 120f, 2.5f, 1f, 1f);
+            BeginDerived("For a monster with 10 m sight");
+            foreach ((string label, float visibility) in new[] { ("Walking", rules.MovingVisibility), ("Standing still", rules.StillVisibility),
+                         ("Sneaking", rules.SneakingVisibility), ("Fighting", rules.FightingVisibility) })
+            {
+                float range = PerceptionRules.EffectiveSightRange(eyes, visibility, rules);
+                float near = PerceptionRules.NoticeRate(eyes.CloseRange + 0.5f, 0f, eyes, visibility, rules);
+                float far = PerceptionRules.NoticeRate(range * 0.95f, 0f, eyes, visibility, rules);
+                Derived(label, range <= 0f ? "never seen" : $"seen up to {range:0.#} m; spotted in {Seconds(near)} up close, {Seconds(far)} at the edge");
+            }
+            Derived("Footsteps heard", $"{rules.FootstepNoise:0.#} m walking, {rules.SneakingFootstepNoise:0.#} m sneaking (× a monster's Hearing)");
+            Derived("Lost target", $"after {rules.LoseTrackSeconds:0.#} s out of sight; searched for {rules.SearchSeconds:0.#} s");
+            Derived("Ambush", rules.AmbushDamageTaken > 1f ? $"unaware monsters take {rules.AmbushDamageTaken - 1f:P0} more damage" : "no bonus");
+            EndDerived();
+        }
+
+        Table("Monster senses", "Sight is the Detection Range. Angle is the sight cone, Close is the all-around sense.",
+            LoadAll<MonsterDefinition>(),
+            new[] { new Column("detectionRange", "Sight"), new Column("sightAngle", "Angle"), new Column("closeSenseRange", "Close"),
+                new Column("hearing", "Hearing"), new Column("alertness", "Alertness"), new Column("chaseRange", "Chase") });
+    }
+
+    private static string Seconds(float rate) => rate > 0f ? $"{1f / rate:0.#} s" : "never";
+}
+
 /// <summary>The timed swing minigame for axe, pickaxe and sickle gathering.</summary>
 public sealed class GatheringMinigamePage : SystemsPage
 {

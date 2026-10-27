@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0de871765cd6fce4c8fed103ef0082e3, type: 3}
+  m_Name: Spotted
+  m_EditorClassIdentifier: SafeHaven::SoundDefinition
+  displayName: Spotted
+  clips:
+  - {fileID: 8300000, guid: 33c4dff5b28730746b6c4cc230a5c4aa, type: 3}
+  - {fileID: 8300000, guid: 0fac3a35f961952409814c73ce8db02b, type: 3}
+  - {fileID: 8300000, guid: 2d5bb449de5c8dd42a695c71b3948af7, type: 3}
+  - {fileID: 8300000, guid: d7034f7b1045fd74f8ed719256f7ae45, type: 3}
+  - {fileID: 8300000, guid: 7fe7f9acdfd4b33458efd46b96e75f83, type: 3}
+  channel: 2
+  volume: 0.7
+  volumeVariation: 0.05
+  pitchRange: {x: 0.5, y: 0.58}
+  positional: 1
+  fullVolumeDistance: 6
+  audibleDistance: 45
+  maxAtOnce: 1

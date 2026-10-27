@@ -37,6 +37,7 @@ public sealed class Player : MonoBehaviour
     public PlayerSkills Skills { get; private set; }
     public Combatant Combatant { get; private set; }
     public PlayerPersistence Persistence { get; private set; }
+    public PlayerStealth Stealth { get; private set; }
 
     /// <summary>True when the object is the player or part of it, such as a collider on a child bone.</summary>
     public static bool IsPlayer(GameObject candidate)
@@ -62,6 +63,7 @@ public sealed class Player : MonoBehaviour
         Skills = GetComponent<PlayerSkills>();
         Combatant = GetComponent<Combatant>();
         Persistence = GetComponent<PlayerPersistence>();
+        Stealth = GetComponent<PlayerStealth>();
     }
 
     private void Start()

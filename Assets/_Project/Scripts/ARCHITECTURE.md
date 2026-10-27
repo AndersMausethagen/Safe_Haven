@@ -14,20 +14,20 @@ of the GDD, **Not started** = design only. Update this table when a system is ad
 | GDD section | Status | Implemented by | Differences / missing |
 |---|---|---|---|
 | §5 Gameplay loops | Partial | `RaidPortal` → `RaidLauncher` → `RaidDirector` → `RaidReport`; `SettlementSystem`, `PurificationAltar`, `HeartTree` | The first-90-minutes loop works: home → raid → home, purification and the first ward upgrade. Later loops (seasons, endgame) not built |
-| §6 Safe Haven, ward breaches | Partial | `SafeHaven.unity`, `HeartTree`, `SettlementState`, `WardBreachDefinition` + `WardBreachDirector`, `HomeRevival` | Only the first scripted breach (wolves attack only the player, buildings can't be damaged). No later breaches or defender NPCs |
+| §6 Safe Haven, ward breaches | Partial | `SafeHaven.unity`, `HeartTree`, `SettlementState`, `WardBreachDefinition` + `WardBreachDirector`, `HomeRevival`, `NightProwlers` | Only the first scripted breach (wolves attack only the player, buildings can't be damaged). No later breaches or defender NPCs. After it is won, weak wolves prowl outside the light at night (§6.3, see [atmosphere](../../../Docs/Atmosphere.md)) |
 | §7 Raids, timer, planning | Partial | `RaidDefinition`, `RaidSession`, `RaidParameters`, `RaidLauncher` (Portal Sparks), `RaidPreparationWindow` (destinations, Spark stepper, briefing) | 12 min timer and Portal Sparks (+3 min, max 2, paid once) as designed; raid modifiers are crafted runes. Danger stages escalate the raid (`RaidStage`, see "Raid tension"). No objectives |
-| §8 Extraction, loss | Partial | `ExtractionPoint` (windows, availability, cost, alarm), `RaidRisk`, `PlayerSnapshot.AfterFailedRaid`, `DurabilitySettings`, safe pocket in `ItemInventory`, `RaidSummaryWindow`, `PlayerArrivalPoint` | Death/time-out rules as designed (deployed gear kept at −25% durability). No companions or carts |
+| §8 Extraction, loss | Partial | `ExtractionPoint` (lit once, then held: `ExtractionHold`, `ExtractionZoneView`; windows, availability, cost, alarm), `RaidRisk`, `PlayerSnapshot.AfterFailedRaid`, `DurabilitySettings`, safe pocket in `ItemInventory`, `RaidSummaryWindow`, `PlayerArrivalPoint` | Death/time-out rules as designed (deployed gear kept at −25% durability). No companions or carts |
 | §9 Raid world, events | Partial | `LootCache`, `ItemDropTable`, `GameEventTrigger`, `RescuableTraveler` | One hand-made map (`Raid_MistyWoods`) with a side path, a traveler and the Old Smithy Chest; no modular assembly or random events |
-| §10 Movement, combat, enemies | Partial | `Player*`, `PlayerEquipment`, `PlayerDodge`, `PlayerGuard`, `Combat/*` (`ComboRules`, `GuardRules`, `PoiseMeter`, `CombatTechniqueSettings`), `MonsterAI`, `MonsterAttack`, `MonsterProjectile`, `MonsterPack`, `MonsterHowlBuff`, `AttackTelegraph` | Slow, deliberate melee: timed combo chains with finishers, heavy attack, guard and parry, flinch, monster poise and stagger, perfect dodge and counters (see "Combat technique"). Composable enemy tactics/temperaments and multiple attacks; small ranged troll, low-hover charging Mistwing, wolf packs/howl. Player weapons still melee only. Dodge is **0.18 s / 2 s cooldown** (GDD: ~0.35 s / 2–3 s). No boss |
+| §10 Movement, combat, enemies | Partial | `Player*`, `PlayerEquipment`, `PlayerDodge`, `PlayerGuard`, `Combat/*` (`ComboRules`, `GuardRules`, `PoiseMeter`, `CombatTechniqueSettings`), `MonsterAI`, `MonsterAttack`, `MonsterProjectile`, `MonsterPack`, `MonsterHowlBuff`, `AttackTelegraph` | Slow, deliberate melee: timed combo chains with finishers, heavy attack, guard and parry, flinch, monster poise and stagger, perfect dodge and counters (see "Combat technique"). Composable enemy tactics/temperaments and multiple attacks; small ranged troll, low-hover charging Mistwing, wolf packs/howl. Monsters notice through senses: a sight cone blocked by cover, a close sense, hearing; the player can sneak (see "Senses and stealth"). Apex: the Old Moss Troll walks a round (`MonsterPatrol`) and is heard coming (`CreatureFootfalls`). Player weapons still melee only. Dodge is **0.18 s / 2 s cooldown** (GDD: ~0.35 s / 2–3 s). No boss |
 | §11 Survival, farming | Partial | `Survival/*` (`PlayerNeeds`, `NeedMeter`, `SurvivalSettings`, `WaterSource`), campfire recipes | Hunger and thirst as decided (never lethal). No farming or meal buffs |
 | §12 Resources, inventory | Done | Materials are items (`Data/Items/Materials`, each with a weight, bag capped at 150 by `ItemContainer`'s weight budget). Essences only in `ResourceInventory/*` (weightless bars). `GatheringNodeDefinition` + `ResourceSource`/`ResourceNode`, `MaterialPool`, `ItemInventory`, `BackpackCapacity` (slots + carry bonus), `Gathering/*` (axe/pickaxe/sickle timing minigame, raid noise, Forest Annoyance, raid summary stats) | |
 | §13 Crafting, refining | Partial | `RecipeDefinition`, `RecipeBook`, `PlayerCrafting` (hand recipes only), `CraftingStation` + `StationQueue`/`WorkshopState`/`StationCrafting`/`StationWindow` (timed station queues; `StationMenu` is the text fallback), `Durability/*` (repairs), `PurificationAltar` | Stone → Copper → Iron ladder, station queues (pay on queue, keep working during raids, resources to storage first, output slot), repairs and purification work. No Essence enhancements |
-| §14 Base building | Partial | `BuildPlacer` (G: preview inside the ward radius, instant, move for free; wheel/Shift+wheel rotate, grid + flush-beside-neighbour snapping, Alt = free; entrance yards kept clear; walls dragged in lines), `BuildPlacement` (footprint geometry), `BuildingDefinition`, `BuildingObject`, `SaveableEntity` | No upgrades or building damage |
+| §14 Base building | Partial | Torch (light against the night: `VisibilitySource`, `AtmosphereLight`), `BuildPlacer` (G: preview inside the ward radius, instant, move for free; wheel/Shift+wheel rotate, grid + flush-beside-neighbour snapping, Alt = free; entrance yards kept clear; walls dragged in lines), `BuildPlacement` (footprint geometry), `BuildingDefinition`, `BuildingObject`, `SaveableEntity` | No upgrades or building damage |
 | §15 NPCs, companions | Partial | `RescuableTraveler` → `ResidentDefinition`, `JobDefinition`, `ResidentNpc`, `ResidentSpawner` | One recruit (Ingrid) and one job (Alchemist). No companions, needs or relationships |
 | §16 Skills, levels, bosses | Partial | `SkillDefinition`, `SkillSchool`, `SkillLoadout`, `PlayerSkills`, `SkillWindow` | No levels/talents, Essence enhancements or bosses |
 | §17 Quests, trade | Partial | `Quests/*`, `Events/*`; chain "The First Days" + side quest "A Stranger in the Mist" | No trade/bargain or reactive world |
 | §18 UI, accessibility | Partial | `UI/*` (TMP), `ActionMenuWindow` (world menus), `UIStateManager`, `UITheme` | No rebinding, text scaling or reduced-shake option |
-| §19 Art, audio | Partial | `Audio/*` (a `SceneAudio` "Scene Music" component per scene), volumes `SafeHaven_Volume` / `MistyWoods_Volume`; environment in `Environment/*` (terrain moss, tree wind, `SurfaceLayerController` moss/rust on LocalSpawn models, grass and glowing plants, water and waterfalls, day/night and weather) | Composed music (`Audio/Safe Haven - *.mp3`) set per scene and as game-wide defaults in `AudioSettings`; effects from a CC0 library (`Audio/SFX`, credits in `Audio/SFX/CREDITS.md`): combat, footsteps by ground layer (`PlayerAudio`), quests, crafting, building, interface, rain, wind, thunder and stream loops (`WorldAudio`), gathering. Models are placeholders. Day/night and weather are visual only and not saved (§11 "weather influences plans" not built); only SafeHaven has the sky rig, not the raid scene |
+| §19 Art, audio | Partial | `Audio/*` (a `SceneAudio` "Scene Music" component per scene), volumes `SafeHaven_Volume` / `MistyWoods_Volume`; environment in `Environment/*` (terrain moss, tree wind, `SurfaceLayerController` moss/rust on LocalSpawn models, grass and glowing plants, water and waterfalls, day/night and weather) | Composed music (`Audio/Safe Haven - *.mp3`) set per scene and as game-wide defaults in `AudioSettings`; effects from a CC0 library (`Audio/SFX`, credits in `Audio/SFX/CREDITS.md`): combat, footsteps by ground layer (`PlayerAudio`), quests, crafting, building, interface, rain, wind, thunder and stream loops (`WorldAudio`), gathering. Models are placeholders. Day/night and weather are visual only and not saved (§11 "weather influences plans" not built); only SafeHaven has the sky rig, not the raid scene. Volumetric fog, fog of war (unexplored ground, the night veil) and fire in the fog: `Environment/Atmosphere`, see [atmosphere](../../../Docs/Atmosphere.md) |
 | §20 Technical design | Done | Definitions vs runtime state vs `Save/*`; rules in settings assets (`GameSettings<T>`) | Raid crash recovery and seeds not built |
 | §21 First 90 minutes | Done (prototype) | `SafeHaven.unity`, `Raid_MistyWoods.unity`, quest chain "The First Days"; `Playtest/*` (`PlaytestLogger` writes one CSV per run, `PlaytestSettings` milestones, **Safe Haven ▸ Playtest ▸ Run Comparison**) | Decisions and assumptions are recorded in GDD §26.1. A run = one playthrough (its id is in the save, so loads continue the same log as a new session) |
 | §23–24 MVP / milestones | M0–M3 (no boss-earned skill enhancement yet), plus M4's recruit with a job and M5's scripted ward breach | – | Next per GDD: M4 companions (down/revive) and cart transport; M5 boss, environmental event and polish |
@@ -40,7 +40,7 @@ of the GDD, **Not started** = design only. Update this table when a system is ad
 | `Events` | The game-event bus (`GameEvents`, `GameEvent`) and designer-facing pieces: `GameEventDefinition` (Quest Events), `GameEventTrigger` (zones/interactions raise events), `GameEventListener` (events trigger scene changes) |
 | `Player` | The player: `Player` (the front door to the player's parts), movement, input, combat, `PlayerEquipment` (worn gear, weapon and tool belt; see "Equipment"), interaction, `PlayerPersistence` + `PlayerSnapshot` (carrying the player across scenes, and what a failed raid keeps) |
 | `Combat` | Stats, damage, `Damageable` (health, death, invulnerability, revive), attacks and hit detection, and combat feel: `CombatFeedback` (hit stop, shake), `HitReaction` (flash, punch, knockback), `CombatFeelSettings` |
-| `AI` | `MonsterAI`, its animation driver and `AttackTelegraph` (ground warning during a wind-up) |
+| `AI` | `MonsterAI`, its animation driver and `AttackTelegraph` (ground warning during a wind-up). `AI/Perception`: how monsters notice things (`MonsterSenses`, `Awareness`, `PerceptionRules`, `WorldNoise`, `AwarenessIndicator`, `PerceptionSettings`; see "Senses and stealth"). `MonsterPatrol` (walks a route of waypoints through `MonsterAI.Roam`, keeps its monster awake), `CreatureFootfalls` (step sounds and camera shake of heavy creatures) |
 | `Camera` | `PlayerCameraController` (top-down and over-the-shoulder action style on one Cinemachine camera, framing per game state), `CameraPreferences`/`CameraStyleRules` (which style applies), `CameraPointer` (mouse vs screen-centre aiming) and `CameraShake` (Cinemachine extension) |
 | `Items`, `ResourceInventory`, `Crafting`, `Content` | Data definitions (ScriptableObjects) and their runtime containers. `Crafting/MaterialPool` is the one place costs are paid from |
 | `Survival` | Hunger and thirst: `PlayerNeeds` (on the player), `NeedMeter` (one meter's rules), `SurvivalSettings`, `WaterSource` (drink and fill waterskins) |
@@ -53,6 +53,7 @@ of the GDD, **Not started** = design only. Update this table when a system is ad
 | `Audio` | `AudioManager`, `SceneAudio` + `MusicPlaylist`/`MusicRules` (music), `SoundDefinition` + `DeathSound`/`SoundEmitter` (effects), `PlayerAudio` (footsteps, landing), `WorldAudio` (weather and water loops, thunder, interface sounds). Edited in **Safe Haven > Audio > Sound Editor**; the free library is set up by **Safe Haven > Audio > Set Up Free Sound Library** |
 | `Environment` | `TerrainMoss`: disposable terrain-alphamap-masked PBR moss and optional leafy sprigs; `MossWind`: shared shader wind, driven by a Directional `WindZone` on the same object when present (moss, `TreeWind.shader` trees and particles share it; see [tree wind](../../../Docs/TreeWind.md)); `TerrainMossBloom`: animated moss paint of the Heart Tree ward circle (runtime copy of TerrainData, so the asset is untouched in Play mode); `SurfaceLayerController`: per-object amount (`SetAmount`/`FadeTo` by layer name, via `MaterialPropertyBlock`) of the two live layers of `LayeredLit.shader` ("Safe Haven/Layered Lit"), which grows tileable moss/rust/dirt over a Local Generator model from its exported `_BlendMask` (curvature, edge wear, cavity, coverage). Grass: `Grass.shader` ("Safe Haven/Grass") on instanced terrain detail prototypes, `GrassInteractor` (up to 8 objects that push grass, as shader globals), `GrassTerrainColour` (baked ground colour the grass is tinted with); `Editor/Environment/GrassSetup` builds the assets and prototypes and rebakes on terrain paint (see [grass](../../../Docs/Grass.md)). Water: `Water.shader` ("Safe Haven/Water": depth colour, refraction, caustics, flow, waterfalls, foam), `WaterSurface` (a pond/river interactors look up; switches the simple look for cameras without depth/opaque textures), `WaterInteractor` (player/stone ripples, wake foam, splashes, or constant churn), `WaterRipples` (GPU ripple height field around the player, `Shaders/Resources/WaterRipples.shader`), `Waterfall` (generated falling sheet + plunge); `Editor/Environment/WaterSetup` makes the assets, creates water and carves beds (see [water](../../../Docs/Water.md)). Sky: `DayNightCycle` (+ `DayNightProfile` asset: sun/moon light, ambient probe, fog, reflections, Night/Golden Hour volume weights, `_SafeHavenNight`), `WeatherSystem` (+ `WeatherDefinition`s and a `ClimateDefinition`: wind via `MossWind.SetWeather`, `RainEffect`, Overcast volume, lightning); `Editor/Environment/WeatherSetup` adds the rig, `SkyControllerWindow` previews and drives it (see [weather](../../../Docs/Weather.md)). Grass also has glowing mushrooms/flowers, Nordic plants (fern, blueberry, lingonberry, heather, wild flowers) and `GrassSetup.FillByGround` (grass and plants by ground layer, none under water or objects). `TreeWind.shader` has Fast Leaf Lighting for leaf cards. `GeneratedTexturePostprocessor` gives new generated materials with a blend mask that shader (Assets > Safe Haven > Use Layered Lit converts others). `Editor/Environment` contains setup, `TreeWindMaterials` (Local Generator trees → Tree Wind materials and `_Wind` prefab variants), deterministic `ForestGroundTextures`, native Amplify graph creation (`ForestGroundShaders`) and preview-only `ForestGroundShowcase`. See [terrain moss usage](../../../Docs/TerrainMoss.md) for maps, materials and budgets. No gameplay/save coupling |
 | `Save` | The save system, in layers (see below), plus `SaveableEntity` / `ISaveable` for objects in scenes |
+| `Environment/Atmosphere` | The look of the world in the way of Gord ([atmosphere](../../../Docs/Atmosphere.md)): `AtmosphereFeature` (URP Render Graph feature on PC_Renderer, `Shaders/Atmosphere.shader`: half-resolution volumetric fog ray march with shadows and fire light, full-resolution composite with the fog of war), the volume overrides `AtmosphericFog` and `FogOfWar`, `VisibilitySource` (sight and light: lifts the night veil, thins fog, reveals ground, `IsLit` for night creatures), `AtmosphereLight` (a Light that glows in the fog), `ExplorationMap` + `ExplorationGrid` (explored ground, saved at home), `FogGround` (baked ground heights: fog that follows the terrain), `FogArea` (pockets of extra fog), `AtmosphereConditions` (weather fog, fog density for monster sight). `Environment/LightFlicker` for fire. `Environment/SeeThrough` + `Shaders/SeeThrough/` (Gord-style dithered see-through of whatever stands between camera and player; in Tree Wind, Layered Lit and the See-Through copies of URP Lit/Unlit). Designer tools: `Editor/Environment/AtmosphereSetup` (Set Up Open Scene, presets, Fog Area), `SeeThroughMaterials` |
 | `UI` | Views and windows. They only read game state and send requests; no game rules live here. `ActionMenuWindow` is the shared menu for world objects (Heart Tree, portal, residents, altar, repair bench, build menu). `StationWindow` is the crafting-station window (recipe icon grid with `RecipeTabs` tabs, selected recipe + Queue, queue grid with progress bar, output grid, extension actions as buttons); its prefab is generated by Safe Haven > UI > Build Station Window (`Editor/UI/StationWindowBuilder`). `ItemTooltipView` also describes recipes and bare definitions (`ShowRecipe`, `ShowDefinition`), used for hover tooltips on station cells and on the bag's hand-recipe rows. `UIRoot` (root canvas, UI scale) and `PauseMenu` (Escape menu); see "UI root, pause and the Escape menu" |
 | `Editor` | The Content Editor (`Editor/Content`), the Systems Editor (`Editor/Systems`), the level tools (`Editor/Level`), the UI theme tool (`Editor/UI`), prefab builders, placeholder generators and Edit Mode tests (`Editor/Tests`) |
 
@@ -208,14 +209,31 @@ play mode). Use `SceneLoader.Load` for gameplay scene changes so saveable object
 - **Waves:** a spawn list's (or unbound `SpawnGroup`'s) `trigger` is RaidStart (filled while loading), Stage (filled when stage `stage` begins) or
   Alarm (filled by `RaidDirector.Wake`). `huntPlayer` makes its creatures `PlayerOnly` + `Relentless` and engage the
   player at once. Late groups use the same seed (`RaidGenerator.SpawnNow`/`SpawnStage`) and get the raid's strength.
+- **Exits are held, not waited at** (GDD §8.1): one press lights an `ExtractionPoint` (an instant interaction; the
+  cost is paid and the `alarm` woken then; `IInteractionVerb` labels the prompt "[E] Light the way home"). From then
+  `ExtractionHold` (plain C#, tested) fills only while the player stands inside `holdRadius` and no creature that would
+  attack the player does: outside = Waiting, a creature inside = Contested; both pause, neither resets. Full = Done:
+  `RaidDirector.Extract`. Every `callInterval` a lit beacon emits a `WorldNoise` of `callRadius` (35 m), so idle
+  creatures come to look and the forest converges on the circle. A beacon whose window closes while lit gutters out and
+  loses what was held. Hold time = the raid's Extraction Time × `timeMultiplier` (Misty Woods 30 s, Troll Valley 35 s).
+  `ExtractionZoneView` (added automatically) draws the circle on the ground with the telegraph material, filling
+  clockwise, coloured by state (dim unlit, gold waiting, green holding, red contested), plus a beacon light.
 - **Exits are choices:** `ExtractionPoint` has an open window (`opensAtSecondsLeft` / `closesAtSecondsLeft`, pure
   `ExtractionWindow`), an `availabilityChance` rolled per raid by `RaidGenerator` (`RaidLayout.PickAvailable`, at least
   one exit always stays), a `timeMultiplier`, an optional item cost (checked as an `IInteractionCondition`, paid on
-  completion) and an optional `alarm` group woken the first time someone starts extracting there. Misty Woods: West
-  Beacon (far, always open), East Beacon (70% of raids, goes dark at 4:00, alarm wakes two hunters), Hollow Oak
-  (central, opens at 3:00, extracts in 60% of the time).
-- **HUD:** `RaidHudView` shows the stage beside the raid name, the nearest *open* exit with its arrow, every exit with
-  distance and state, and "At risk" (`RaidRisk.Of`: what a failed raid would cost, refreshed once a second).
+  lighting) and an optional `alarm` group woken when it is lit. Misty Woods: West Beacon (far, always open), East
+  Beacon (70% of raids, goes dark at 4:00, alarm wakes two hunters), Hollow Oak (central, opens at 3:00, held in 60%
+  of the time, inside the Old Moss Troll's round).
+- **The apex:** the Old Moss Troll (Content Editor › Monsters; built by `AgentScripts/BuildOldMossTroll.cs`) stands under
+  Map Content › Apex in Misty Woods with a `MonsterPatrol` round of four waypoints looping around the Hollow Oak. Weak
+  eyes (9 m, 100°), a 6 m nose (close sense) and keen ears (×1.8); 1400 health, poise 450, a 1 s sweep and a 1.3 s
+  360° stomp; it drops 2–3 Trollstone. `CreatureFootfalls` thuds every stride (`Audio/Sounds/Library/TrollStep`, heard
+  55 m) and shakes the camera within 28 m. Patrols walk at `walkSpeedScale` (`MonsterAI.RoamSpeedScale`) and set
+  `MonsterAI.KeepAwake`, so `CreatureSleep` leaves them walking far from the player.
+- **Turned maps:** `RaidMap` turns Map Content a frame after placed creatures have started, so it calls
+  `MonsterAI.ResetHome` on every monster under Map Content afterwards (their homes turn with them).
+- **HUD:** `RaidHudView` shows the stage beside the raid name, the nearest *open* exit with its arrow (or the lit one,
+  with "Holding… %", "contested!" or "Back to the circle"), every exit with distance, state and how much is held, and "At risk" (`RaidRisk.Of`: what a failed raid would cost, refreshed once a second).
 - Ideas this is built for: elites (`SpawnGroup` + stat bonus), event-driven `Wake` (a horn, a broken seal), raid
   modifiers that shift stage thresholds, and exits that cost a crafted rune.
 
@@ -266,6 +284,9 @@ filled in when it is saved (`SaveableEntityTools`). Safe Haven > Save > Assign M
 | Tune combo timing, parry window, guard, flinch, poise and stagger | `Resources/CombatTechniqueSettings` (Systems Editor › Movement & Combat). No code. |
 | Give a weapon a longer chain, a heavy attack or a counter | Content Editor › Weapons: **Combo**, **Heavy Attack**, **Counter Attack**. Each attack names its **Animation State**; rerun Safe Haven › Characters › Set Up Combat Animations to retime the built-in ones from their clips |
 | Make a monster harder to stagger | Content Editor › Monsters › **Poise** (0 = the game-wide default) |
+| Change how far or wide a monster sees, how well it hears, how quickly it spots you | Content Editor › Monsters › **Detection Range** (sight) and **Senses** (Sight Angle, Close Sense Range, Hearing, Alertness). All monsters side by side: Systems Editor › World › Senses & Stealth |
+| Tune noticing, searching, sneaking, the player's noise, the ?/! marks and their sounds | `Resources/PerceptionSettings` (Systems Editor › World › Senses & Stealth). No code. |
+| Make something new heard by monsters (a horn, a falling tree, a cart) | `WorldNoise.Emit(position, radius)` |
 | Change a combat, footstep, world or weather sound | Sound Editor › Sound Effects › Game-wide effects (or the weapon's, attack's or monster's own sound fields) |
 | Tune the dodge (distance, speed, i-frames, cooldown) | `PlayerMovementSettings` asset, Dodge header. No code. |
 | Give a monster a longer attack warning | Raise its attack's **Hit Delay** (the telegraph lasts exactly that long) |
@@ -273,6 +294,15 @@ filled in when it is saved (`SaveableEntityTools`). Safe Haven > Save > Assign M
 | React to the player dodging (sound, stamina) | Listen to `PlayerDodge.Dodged` |
 | Tune hunger/thirst, carry weight, death and repairs, raid time and Portal Sparks, the ward, purification or breaches | Systems Editor (Safe Haven > Systems Editor). No code. |
 | Add a raid destination | New `RaidDefinition` (Content Editor) + add it to the portal's destination list; base rules show in the Systems Editor |
+| Change how long an exit is held, its circle or how loudly a lit beacon calls | The raid's **Extraction Seconds** (Content Editor › Raids), and on the scene's `ExtractionPoint`: **Time Multiplier**, **Hold Radius**, **Call Radius** / **Call Interval** |
+| Give a new map fog, fog of war and night | Safe Haven › Environment › Atmosphere › Set Up Open Scene, then › Apply Preset; pockets with GameObject › Safe Haven › Fog Area. See [atmosphere](../../../Docs/Atmosphere.md) |
+| Make a tree, roof or prop dissolve when it hides the player | Safe Haven › Rendering › Make Materials See-Through › Selected (URP Lit/Unlit → See-Through copies; Tree Wind and Layered Lit already do). Size of the circle: `SeeThrough` on PlayerArmature |
+| Change the mist, the night veil or how dark unexplored ground is | The scene's volumes: **Atmospheric Fog** / **Fog of War** overrides (SafeHaven_Volume, SafeHaven_Night, MistyWoods_Volume). No code. See [atmosphere](../../../Docs/Atmosphere.md) |
+| Make something light the night (fog glow, veil lifted, prowlers kept off) | `Light` + `AtmosphereLight` (+ `LightFlicker`), and a `VisibilitySource` with **Is Light** |
+| Tune night creatures at home | `NightProwlers` on "Night Prowlers" in SafeHaven (prefabs, how many, interval, distance, light margin) |
+| Spawn something that must never be saved | `TransientSpawn.Spawn` |
+| Make a monster walk a round | Add `MonsterPatrol` to it in the scene and give it a **Route** (an object whose children are the waypoints, under Map Content in raids). Heavy footsteps: `CreatureFootfalls` on the prefab |
+| Say what pressing E does on an object | Implement `IInteractionVerb` next to its `Interactable` |
 | Reshape a raid map (paths, cliffs, where camps and resources are) | Select "Raid Map" › Map Painter: Sculpt Heights, Paint Zones, Markers, then Bake Map. See "Raid maps" |
 | Let ore, herbs or enemies appear in a painted area | Map Painter › Paint Zones › Add Spawn Zone (name it, paint it), set a `SpawnGroup`'s **Zone** to that name, Bake. Amount/density stay in the group or the raid's spawn list |
 | Add a buildable structure | `BuildingDefinition` in the Content Editor (cost, **Show In Build Menu**, **Known From Start**) with a prefab holding `BuildingObject` + `SaveableEntity` |
@@ -438,6 +468,48 @@ The player is no super soldier: combat is about reading the enemy and committing
   `CombatScreenEffects` vignette (hurt flash, low-health pulse), an optional `ComboHud`, and sounds from Audio Settings
   (attack, then weapon, then game-wide). Effects are built by **Safe Haven › Combat › Build Combat Effects**
   (`CombatEffectsBuilder`, Prefabs/Effects/Combat, "Safe Haven/Effect Particle"). Text callouts are empty by default.
+
+## Senses and stealth: monsters notice, the player hides
+
+Monsters no longer know about anything inside a radius; they see, hear and lose track (GDD §10.8). Rules are in
+`Resources/PerceptionSettings` (Systems Editor › World › Senses & Stealth); each monster's eyes and ears are on its
+`MonsterDefinition` (Detection Range = sight range, plus Senses: Sight Angle, Close Sense Range, Hearing, Alertness).
+
+- **Awareness** (`Awareness`, plain C#, tested): a level 0–1 and the place of the last thing noticed. Suspicious from
+  `SuspiciousAt`, Alerted (spotted) at 1, sticky until the monster loses track or calms down. `MonsterSenses` (owned by
+  `MonsterAI`) fills it: an `OverlapSphere`, then per candidate `PerceptionRules.NoticeRate` (close range from any
+  direction; otherwise only inside the cone, slower with distance; scaled by visibility × alertness) and a line of
+  sight raycast to the chest or the head (`HeadAboveTarget`, so a bump in the ground hides nobody) against `SightBlockers` (terrain, terrain trees, the baked "Tree Trunks", rocks, buildings; characters
+  with a NavMeshAgent or CharacterController never block). Seeing nothing drains it.
+- **Hearing:** `WorldNoise.Emit(position, radius)` first raises `WorldNoise.Emitted` (`CreatureSleep` wakes sleepers
+  inside it), then calls `MonsterAI.Hear` on every awake monster: `PerceptionRules.HeardLevel` lifts awareness to at
+  least suspicious but never to spotted, so a sound only brings them to look. Sources: `PlayerStealth` (footsteps,
+  dodges, hits landed or taken), `GatheringNoise` (each swing), a monster that spots its target (a call), and
+  `GatheringNoise.Investigate` (Forest Annoyance "Angry").
+- **`MonsterAI.State.Investigating`** (added at the end of the enum): idle, roaming or searching monsters that are
+  suspicious walk (at `InvestigateSpeedScale`) to the stimulus, clamped inside their leash and defensive radius, then
+  look around for `SearchSeconds` and walk home (roamers resume their roam). A new glimpse sends them there instead.
+  Spotting, a hit or a pack alert turns it into a hunt where it stands.
+- **Hunting and losing track:** `SetTarget` alerts awareness and, when it was not already alerted, shows the "!", plays
+  `SpottedSound` for the player (once per pack) and emits the call. While hunting, `TrackTarget` checks `CanSee`
+  (chase range, no cone, line of sight, or close range); out of sight for `LoseTrackSeconds` or beyond chase range, the
+  monster `LoseTrack`s: it investigates the last known position at `LostTrackAwareness` (a pale "?"). `Relentless`
+  monsters (ward-breach attackers, hunt waves, alarms) never lose track; `Engage` still targets at once.
+- **Idle gaze:** idle monsters glance up to `IdleGlanceAngle` either side of the way they first faced, every
+  `IdleGlanceSeconds`, so a sneaking player has to time their approach.
+- **Ambush:** an unaware monster has `Damageable.DamageTakenMultiplier = AmbushDamageTaken` (`MonsterAI.RefreshAmbush`;
+  a stagger still sets its own multiplier).
+- **The player** (`PlayerStealth` on PlayerArmature, `Player.Stealth`): hold Left Ctrl / left bumper to sneak
+  (`SneakSpeedScale` through `PlayerMovement.SetSpeedScale`). `Visibility`: fighting (for `FightingSeconds` after a hit
+  landed or taken) > moving > still > sneaking; sight range scales with √visibility between `Min/MaxRangeScale`.
+  Other targets (the traveller, residents) are always fully visible.
+- **Presentation:** `AwarenessIndicator` (created on a monster the first time it notices anything) floats a "?" that
+  brightens with awareness (amber; pale while searching for a lost target) and a red "!" for `SpottedShowSeconds`, in
+  the quest markers' font. `SpottedSound` is `Audio/Sounds/Library/Spotted` (the heavy bells pitched down);
+  `SuspiciousSound` is empty until a creature sound exists.
+- **Gizmos:** a selected monster draws its sight cone (yellow), close sense (orange), chase range and leash.
+- Night, fog and light will plug in through visibility and sight range, the only inputs `PerceptionRules` needs.
+- Tests: `Editor/Tests/PerceptionTests.cs` (rates, cone, sneaking range, hearing, stages, line of sight).
 
 ### Creating enemies with multiple attacks
 

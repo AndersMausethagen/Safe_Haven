@@ -2,47 +2,59 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// A way out of a raid. The player holds Interact on it for the raid's extraction time (scaled by this point's
-/// <see cref="timeMultiplier"/>); moving cancels it like any other interaction. When it completes, the RaidDirector ends
-/// the raid as extracted. The Interactable beside it should have no duration (this component completes it) and must not
-/// deactivate on completion. HUDs list the points through <see cref="Active"/>.
+/// A way out of a raid, held rather than waited at (GDD §8.1). The player lights it once with Interact (paying its cost
+/// and sounding its alarm), then has to hold its circle: the way home fills only while the player stands inside and no
+/// hostile creature does (<see cref="ExtractionHold"/>). Leaving or a creature in the circle pauses it; nothing resets
+/// it but the way going dark. A lit beacon calls out every few seconds (WorldNoise), so the forest comes to see. When
+/// it is full, the RaidDirector ends the raid as extracted. The Interactable beside it should have no duration and must
+/// not deactivate on completion. ExtractionZoneView draws the circle. HUDs list the points through <see cref="Active"/>.
 /// Exits are choices, not just destinations (GDD §7.2 "Extraction"): a point can open late or go dark at set times on
 /// the raid clock, be offered only in some raids (RaidGenerator rolls <see cref="AvailabilityChance"/>), ask for an
-/// item to pay its way, extract faster or slower, and sound an alarm that sends a spawn group hunting the player.
+/// item to light it, take more or less time to hold, and sound an alarm that sends a spawn group hunting the player.
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Interactable))]
-public sealed class ExtractionPoint : MonoBehaviour, IInteractionCondition
+public sealed class ExtractionPoint : MonoBehaviour, IInteractionCondition, IInteractionNote, IInteractionVerb
 {
     private static readonly List<ExtractionPoint> active = new List<ExtractionPoint>();
 
     [SerializeField] private string displayName = "Extraction";
-    [Tooltip("Seconds to extract when no raid is running, such as a scene without a RaidDirector.")]
+    [Tooltip("Seconds to hold when no raid is running, such as a scene without a RaidDirector.")]
     [SerializeField, Min(RaidParameters.MinimumExtractionTime)] private float fallbackSeconds = 5f;
 
     [Header("Window (seconds left on the raid clock)")]
     [Tooltip("Opens when this many seconds are left. 0 is open from the start.")]
     [SerializeField, Min(0f)] private float opensAtSecondsLeft;
-    [Tooltip("Goes dark when this many seconds are left. 0 never closes.")]
+    [Tooltip("Goes dark when this many seconds are left. 0 never closes. A lit beacon that goes dark loses what was held.")]
     [SerializeField, Min(0f)] private float closesAtSecondsLeft;
 
     [Header("Choice")]
     [Tooltip("Chance (0-1) this exit is offered in a raid, rolled from the raid's seed. At least one exit always is.")]
     [SerializeField, Range(0f, 1f)] private float availabilityChance = 1f;
-    [Tooltip("Multiplies the raid's extraction time here: below 1 is a quick exit, above 1 a slow one.")]
+    [Tooltip("Multiplies the raid's extraction time here: below 1 is a quick hold, above 1 a long one.")]
     [SerializeField, Range(0.2f, 4f)] private float timeMultiplier = 1f;
-    [Tooltip("Optional item spent to leave through here, such as a rune that wakes the way home.")]
+    [Tooltip("Optional item spent to light the way home here, such as a rune.")]
     [SerializeField] private ItemDefinition costItem;
     [SerializeField, Min(1)] private int costAmount = 1;
-    [Tooltip("Optional spawn group (set to Alarm) woken the first time anyone starts extracting here.")]
+    [Tooltip("Optional spawn group (set to Alarm) woken when the beacon is lit.")]
     [SerializeField] private SpawnGroup alarm;
     [Tooltip("Shown when the alarm goes off.")]
     [SerializeField] private string alarmMessage = "The beacon's light draws the forest's attention!";
 
+    [Header("Holding")]
+    [Tooltip("Radius of the circle the player has to hold, in metres from this point.")]
+    [SerializeField, Min(1f)] private float holdRadius = 5f;
+    [Tooltip("While lit, the beacon calls out this far every Call Interval: idle creatures inside come to look. 0 = silent.")]
+    [SerializeField, Min(0f)] private float callRadius = 35f;
+    [SerializeField, Min(0.5f)] private float callInterval = 5f;
+
+    private readonly ExtractionHold hold = new ExtractionHold();
     private Interactable interactable;
-    private float elapsed;
     private ExtractionStatus lastStatus;
+    private ExtractionHoldState lastHoldState = ExtractionHoldState.Unlit;
     private bool alarmRaised;
+    private bool extracted;
+    private float nextCallAt;
 
     /// <summary>Every enabled extraction point in the scene.</summary>
     public static IReadOnlyList<ExtractionPoint> Active => active;
@@ -53,10 +65,19 @@ public sealed class ExtractionPoint : MonoBehaviour, IInteractionCondition
     public int CostAmount => costItem != null ? costAmount : 0;
     public bool HasAlarm => alarm != null;
     public SpawnGroup Alarm => alarm;
-    public bool IsExtracting => interactable != null && interactable.IsInUse;
+    public float HoldRadius => holdRadius;
+
+    /// <summary>Seconds of holding this point needs.</summary>
     public float Duration => Mathf.Max(RaidParameters.MinimumExtractionTime,
         (RaidDirector.Current != null ? RaidDirector.Current.Parameters.ExtractionTime : fallbackSeconds) * timeMultiplier);
-    public float TimeLeft => IsExtracting ? Mathf.Max(0f, Duration - elapsed) : Duration;
+
+    /// <summary>True once lit, until the raid ends or the way goes dark.</summary>
+    public bool IsLit => hold.IsLit;
+    public ExtractionHoldState HoldState => hold.State;
+    /// <summary>0–1 of the way home held so far.</summary>
+    public float HoldFraction => hold.Fraction;
+    /// <summary>Seconds still to hold: the full duration before it is lit.</summary>
+    public float TimeLeft => IsLit ? hold.Remaining : Duration;
 
     /// <summary>Open, not yet open or closed, by the raid clock. Always open outside a raid.</summary>
     public ExtractionStatus Status => ExtractionWindow.StatusAt(opensAtSecondsLeft, closesAtSecondsLeft, SecondsLeft);
@@ -64,11 +85,21 @@ public sealed class ExtractionPoint : MonoBehaviour, IInteractionCondition
     /// <summary>Seconds until this point opens or closes, or -1 when it won't change again.</summary>
     public float SecondsUntilChange => ExtractionWindow.SecondsUntilChange(opensAtSecondsLeft, closesAtSecondsLeft, SecondsLeft);
 
+    public string Verb => "Light the way home";
+
+    /// <summary>A lit beacon blocks lighting it again; that message is a reminder, not a problem.</summary>
+    public bool IsNote => IsLit;
+
     private static float SecondsLeft => RaidDirector.Current != null ? RaidDirector.Current.Session.TimeRemaining : float.MaxValue;
 
     private void Awake()
     {
         interactable = GetComponent<Interactable>();
+        if (!TryGetComponent(out ExtractionZoneView _))
+        {
+            gameObject.AddComponent<ExtractionZoneView>();
+        }
+
         if (alarm != null && alarm.Trigger != SpawnTrigger.Alarm)
         {
             Debug.LogWarning($"Extraction point '{name}' uses '{alarm.name}' as its alarm, but that group isn't set to Alarm, so it also spawns on its own.", this);
@@ -81,7 +112,6 @@ public sealed class ExtractionPoint : MonoBehaviour, IInteractionCondition
         lastStatus = Status;
         interactable.Started.AddListener(OnStarted);
         interactable.Completed.AddListener(OnCompleted);
-        interactable.Cancelled.AddListener(OnCancelled);
     }
 
     private void OnDisable()
@@ -89,7 +119,6 @@ public sealed class ExtractionPoint : MonoBehaviour, IInteractionCondition
         active.Remove(this);
         interactable.Started.RemoveListener(OnStarted);
         interactable.Completed.RemoveListener(OnCompleted);
-        interactable.Cancelled.RemoveListener(OnCancelled);
     }
 
     private void Update()
@@ -101,19 +130,44 @@ public sealed class ExtractionPoint : MonoBehaviour, IInteractionCondition
             AnnounceChange(status);
         }
 
-        if (!IsExtracting)
+        if (!IsLit || extracted)
         {
             return;
         }
 
-        elapsed += Time.deltaTime;
-        if (elapsed >= Duration)
+        if (status != ExtractionStatus.Open)
         {
-            interactable.Complete();
+            hold.Douse();
+            lastHoldState = ExtractionHoldState.Unlit;
+            GameMessages.Post($"{displayName} gutters out. What you held is lost.", MessageKind.Warning);
+            return;
+        }
+
+        GameObject player = HolderCandidate();
+        bool inside = player != null && Inside(player.transform.position);
+        ExtractionHoldState state = hold.Tick(Time.deltaTime, inside, IsContested());
+        if (state != lastHoldState)
+        {
+            AnnounceHold(state);
+            lastHoldState = state;
+        }
+
+        if (Time.time >= nextCallAt)
+        {
+            nextCallAt = Time.time + callInterval;
+            WorldNoise.Emit(transform.position, callRadius);
+        }
+
+        if (state == ExtractionHoldState.Done)
+        {
+            Leave(player);
         }
     }
 
-    /// <summary>Blocks extracting while closed, and when the player can't pay the cost. Asked by the Interactable.</summary>
+    /// <summary>
+    /// Blocks lighting while closed, when the player can't pay the cost, and once lit (then it reminds them to hold the
+    /// circle). Asked by the Interactable.
+    /// </summary>
     public bool CanInteract(GameObject user, out string reason)
     {
         switch (Status)
@@ -126,9 +180,15 @@ public sealed class ExtractionPoint : MonoBehaviour, IInteractionCondition
                 return false;
         }
 
+        if (IsLit)
+        {
+            reason = "Lit. Hold the circle until the way opens.";
+            return false;
+        }
+
         if (costItem != null && MaterialPool.For(user).Have(costItem) < costAmount)
         {
-            reason = $"Needs {CostText} to open the way.";
+            reason = $"Needs {CostText} to light the way.";
             return false;
         }
 
@@ -138,6 +198,29 @@ public sealed class ExtractionPoint : MonoBehaviour, IInteractionCondition
 
     /// <summary>The cost as shown to the player, such as "2× Wayfinder Rune", or empty when free.</summary>
     public string CostText => costItem == null ? "" : costAmount > 1 ? $"{costAmount}× {costItem.DisplayName}" : costItem.DisplayName;
+
+    /// <summary>True when a creature that would attack the player stands inside the circle.</summary>
+    public bool IsContested()
+    {
+        foreach (MonsterAI monster in MonsterAI.Active)
+        {
+            if (monster.CurrentState != MonsterAI.State.Dead && monster.Definition != null
+                && monster.Definition.Faction.WillAttack(Faction.Player) && Inside(monster.transform.position))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>True when a position is inside the circle (measured on the ground plane).</summary>
+    public bool Inside(Vector3 position)
+    {
+        Vector3 offset = position - transform.position;
+        offset.y = 0f;
+        return offset.sqrMagnitude <= holdRadius * holdRadius;
+    }
 
     /// <summary>The closest open extraction point to a position, measured to its nearest edge, or null when there is none.</summary>
     public static ExtractionPoint FindNearest(Vector3 position, out float distance)
@@ -174,6 +257,17 @@ public sealed class ExtractionPoint : MonoBehaviour, IInteractionCondition
         return interactable.DistanceFrom(position);
     }
 
+    // The player is the one who holds it in a raid; outside one (a test scene), whoever is the player.
+    private static GameObject HolderCandidate()
+    {
+        if (RaidDirector.Current != null)
+        {
+            return RaidDirector.Current.Player;
+        }
+
+        return Player.Current != null ? Player.Current.gameObject : null;
+    }
+
     private void AnnounceChange(ExtractionStatus status)
     {
         if (RaidDirector.Current == null || RaidDirector.Current.Session.IsOver)
@@ -191,10 +285,46 @@ public sealed class ExtractionPoint : MonoBehaviour, IInteractionCondition
         }
     }
 
+    private void AnnounceHold(ExtractionHoldState state)
+    {
+        switch (state)
+        {
+            case ExtractionHoldState.Contested:
+                GameMessages.Post("Something is in the circle! Drive it out to keep the way open.", MessageKind.Warning);
+                break;
+            case ExtractionHoldState.Waiting when lastHoldState == ExtractionHoldState.Holding
+                                                  || lastHoldState == ExtractionHoldState.Contested:
+                GameMessages.Post($"Back into the circle! {hold.Remaining:0} s still to hold.", MessageKind.Warning);
+                break;
+        }
+    }
+
+    // Lighting is a single press: the interaction ends at once and the beacon is lit when it completes.
     private void OnStarted()
     {
-        elapsed = 0f;
-        GameMessages.Post($"Extracting... hold still for {Duration:0.#} seconds.");
+        interactable.Complete();
+    }
+
+    private void OnCompleted()
+    {
+        GameObject user = interactable.Interactor;
+        // The way may have closed, or the cost been dropped, in the moment of the press.
+        if (!CanInteract(user, out string reason))
+        {
+            GameMessages.Post(reason, MessageKind.Warning);
+            return;
+        }
+
+        if (costItem != null && !MaterialPool.For(user).TrySpend(null, new[] { new ItemAmount(costItem, costAmount) }))
+        {
+            GameMessages.Post($"Needs {CostText} to light the way.", MessageKind.Warning);
+            return;
+        }
+
+        hold.Light(Duration);
+        lastHoldState = hold.State;
+        nextCallAt = Time.time;
+        GameMessages.Post($"{displayName} is lit! Hold its circle for {Duration:0} seconds. The forest will come.", MessageKind.Warning);
         RaiseAlarm();
     }
 
@@ -212,9 +342,9 @@ public sealed class ExtractionPoint : MonoBehaviour, IInteractionCondition
         }
     }
 
-    private void OnCompleted()
+    private void Leave(GameObject player)
     {
-        elapsed = 0f;
+        extracted = true;
         RaidDirector director = RaidDirector.Current;
         if (director == null)
         {
@@ -222,31 +352,7 @@ public sealed class ExtractionPoint : MonoBehaviour, IInteractionCondition
             return;
         }
 
-        // The way may have closed, or the cost been dropped, while the player held still.
-        GameObject user = interactable.Interactor;
-        if (!CanInteract(user, out string reason))
-        {
-            GameMessages.Post(reason, MessageKind.Warning);
-            return;
-        }
-
-        if (costItem != null && !MaterialPool.For(user).TrySpend(null, new[] { new ItemAmount(costItem, costAmount) }))
-        {
-            GameMessages.Post($"Needs {CostText} to open the way.", MessageKind.Warning);
-            return;
-        }
-
-        director.Extract(user);
-    }
-
-    private void OnCancelled()
-    {
-        elapsed = 0f;
-        RaidDirector director = RaidDirector.Current;
-        if (director == null || !director.Session.IsOver)
-        {
-            GameMessages.Post("Extraction interrupted.", MessageKind.Warning);
-        }
+        director.Extract(player);
     }
 
 #if UNITY_EDITOR
@@ -278,6 +384,14 @@ public sealed class ExtractionPoint : MonoBehaviour, IInteractionCondition
             lines.Add("alarm: " + alarm.name);
             Gizmos.color = new Color(1f, 0.4f, 0.3f, 0.6f);
             Gizmos.DrawLine(transform.position + Vector3.up, alarm.transform.position + Vector3.up);
+        }
+
+        UnityEditor.Handles.color = new Color(0.55f, 0.92f, 0.55f, 0.9f);
+        UnityEditor.Handles.DrawWireDisc(transform.position, Vector3.up, holdRadius);
+        if (callRadius > 0f)
+        {
+            UnityEditor.Handles.color = new Color(1f, 0.75f, 0.3f, 0.35f);
+            UnityEditor.Handles.DrawWireDisc(transform.position, Vector3.up, callRadius);
         }
 
         UnityEditor.Handles.Label(transform.position + Vector3.up * 3f, string.Join("\n", lines));

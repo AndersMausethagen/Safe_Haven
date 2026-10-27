@@ -15,6 +15,7 @@ by motion, sound and weight rather than on-screen text.
 | Left mouse while guarding | Shield bash with a shield; without one it drops the guard and swings |
 | Space / south button | Dodge: a quickstep, a roll or a heavy shoulder charge, by how much gear you wear |
 | Using food or drink | Stop and eat: takes a moment, heals over time |
+| Left Ctrl / left bumper (hold) | Sneak: half speed, quiet, hard to see. A hit on a monster that hasn't noticed you is an ambush (+50%) |
 
 ## The rules
 

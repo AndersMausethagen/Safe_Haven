@@ -4,8 +4,8 @@ using UnityEngine.AI;
 
 /// <summary>
 /// Puts idle creatures far from the player to sleep: their AI, NavMeshAgent and animation stop running until the player
-/// comes back within wake distance or something hits them. The distances are global raid rules (RaidGlobalSettings). Lives next to the RaidDirector, which adds it when missing.
-/// Creatures that are chasing, fighting, returning or roaming are never put to sleep.
+/// comes back within wake distance, something hits them, or a noise (WorldNoise) reaches them. The distances are global raid rules (RaidGlobalSettings). Lives next to the RaidDirector, which adds it when missing.
+/// Creatures that are chasing, fighting, returning or roaming are never put to sleep, nor those marked KeepAwake.
 /// </summary>
 [RequireComponent(typeof(RaidDirector))]
 public sealed class CreatureSleep : MonoBehaviour
@@ -34,6 +34,21 @@ public sealed class CreatureSleep : MonoBehaviour
     private void Awake()
     {
         director = GetComponent<RaidDirector>();
+    }
+
+    private void OnEnable()
+    {
+        WorldNoise.Emitted += OnNoise;
+    }
+
+    private void OnDisable()
+    {
+        WorldNoise.Emitted -= OnNoise;
+    }
+
+    private void OnNoise(Vector3 position, float radius)
+    {
+        WakeWithin(position, radius);
     }
 
     private void OnDestroy()
@@ -69,7 +84,7 @@ public sealed class CreatureSleep : MonoBehaviour
             {
                 sleepers.Remove(ai);
             }
-            else if (FlatSqr(ai.transform.position - player) < wakeSqr)
+            else if (ai.KeepAwake || FlatSqr(ai.transform.position - player) < wakeSqr)
             {
                 Wake(ai, null);
             }
@@ -78,7 +93,7 @@ public sealed class CreatureSleep : MonoBehaviour
         foreach (MonsterAI ai in MonsterAI.All)
         {
             if (ai != null && ai.enabled && !sleepers.ContainsKey(ai) && ai.CurrentState == MonsterAI.State.Idle
-                && !ai.IsRoaming && FlatSqr(ai.transform.position - player) > sleepSqr)
+                && !ai.IsRoaming && !ai.KeepAwake && FlatSqr(ai.transform.position - player) > sleepSqr)
             {
                 Sleep(ai);
             }

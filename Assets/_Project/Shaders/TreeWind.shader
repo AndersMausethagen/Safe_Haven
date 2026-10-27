@@ -35,6 +35,7 @@ Shader "Safe Haven/Tree Wind"
         HLSLINCLUDE
         #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
         #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
+        #include "Assets/_Project/Shaders/SeeThrough/SeeThrough.hlsl"
         #include "Assets/_Project/Models/Generated/Vegetation/TreeWind.hlsl"
         TEXTURE2D(_BaseMap); SAMPLER(sampler_BaseMap);
         TEXTURE2D(_BumpMap); SAMPLER(sampler_BumpMap);
@@ -161,6 +162,7 @@ Shader "Safe Haven/Tree Wind"
         }
         half4 TreeFragment(Varyings input, FRONT_FACE_TYPE face : FRONT_FACE_SEMANTIC) : SV_Target
         {
+                SeeThroughClip(input.positionCS);
             UNITY_SETUP_INSTANCE_ID(input);
             UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
             half4 baseColor = SampleBase(input.uv);
@@ -220,6 +222,7 @@ Shader "Safe Haven/Tree Wind"
         }
         half4 NormalsFragment(Varyings input, FRONT_FACE_TYPE face : FRONT_FACE_SEMANTIC) : SV_Target
         {
+                SeeThroughClip(input.positionCS);
             SampleBase(input.uv);
             float3 normal = SurfaceNormal(input, IS_FRONT_VFACE(face, 1.0, -1.0));
             #if defined(_GBUFFER_NORMALS_OCT)
@@ -288,6 +291,7 @@ Shader "Safe Haven/Tree Wind"
             #pragma multi_compile_instancing
             half4 DepthFragment(Varyings input) : SV_Target
             {
+                SeeThroughClip(input.positionCS);
                 SampleBase(input.uv);
                 return input.positionCS.z;
             }

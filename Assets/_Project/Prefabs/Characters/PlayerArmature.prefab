@@ -2570,6 +2570,15 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 4416926081852918481, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3800643182948972781}
+    - targetCorrespondingSourceObject: {fileID: 4416926081852918481, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3998472964798623133}
+    - targetCorrespondingSourceObject: {fileID: 4416926081852918481, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4795039146242631264}
+    - targetCorrespondingSourceObject: {fileID: 4416926081852918481, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 9148900643414580268}
   m_SourcePrefab: {fileID: 100100000, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
 --- !u!1 &5943822763764690748 stripped
 GameObject:
@@ -2988,6 +2997,54 @@ MonoBehaviour:
   outlineMaterial: {fileID: 2100000, guid: 95b7372af1ad70a4cb85632353a34660, type: 2}
   maskMaterial: {fileID: 2100000, guid: 255da0bc603577849b15a8df8e031fd8, type: 2}
   hoverDistance: 80
+--- !u!114 &3998472964798623133
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5943822763764690748}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3edec0945f4d1e34c98b6100bf324aab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::PlayerStealth
+--- !u!114 &4795039146242631264
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5943822763764690748}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6501044ae7c61614e92b98909fef8e09, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::VisibilitySource
+  radius: 12
+  softness: 0.45
+  reveals: 1
+  revealRadius: 20
+  followsWard: 0
+  isLight: 0
+--- !u!114 &9148900643414580268
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5943822763764690748}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2bb17cfb91f4ec24a8a228c0a14b34ae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::SeeThrough
+  targetHeight: 1.2
+  radius: 3.5
+  radiusAtCamera: 1.2
+  softness: 0.55
+  margin: 1.6
+  fadeSeconds: 0.25
 --- !u!4 &6428716820787852678 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3893294197879345259, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}

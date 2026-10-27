@@ -37,7 +37,7 @@ public sealed class RaidDefinition : ScriptableObject
     [Header("Base Rules")]
     [Tooltip("Seconds the player has to extract before the raid collapses (GDD §7.3: 12 minutes). Portal Sparks add more.")]
     [SerializeField, Min(RaidParameters.MinimumDuration)] private float durationSeconds = 720f;
-    [Tooltip("Seconds the player must hold still at an extraction point to leave.")]
+    [Tooltip("Seconds the player must hold a lit extraction point's circle to leave (time outside it or contested doesn't count).")]
     [SerializeField, Min(RaidParameters.MinimumExtractionTime)] private float extractionSeconds = 5f;
     [Tooltip("Multiplier on what supply caches hold. 1 is normal.")]
     [SerializeField, Min(0f)] private float lootMultiplier = 1f;

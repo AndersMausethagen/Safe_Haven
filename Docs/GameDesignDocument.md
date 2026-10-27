@@ -214,6 +214,13 @@ Gather basics; place structures; cook and fill water; craft and refine; tend cro
 
 The default state of Safe Haven is peaceful. No enemies spawn arbitrarily while the player is farming or crafting, and no attacks are simulated while the player is inside a Raid, offline, loading, or absent from the settlement. The Heart Tree ward may be breached **only during discrete, communicated defense events**. Before a breach, show its trigger, likely approach, and preparation state. If the player fails, apply bounded, repairable consequences instead of deleting all buildings, permanent unlocks, or irreplaceable NPCs. The Heart Tree may be strained but must never be permanently destroyed.
 
+**Night at home (amended October 27, 2026).** Once the first breach has been won, the night outside the ward is no
+longer empty. A few weak creatures prowl the dark beyond the ward and the light of campfires and torches. They never
+step into light and cannot see or follow anyone standing in it, so the settlement itself stays a refuge; whoever walks
+out into the dark is fair game. They come out of sight, close in now and then, and slink away at dawn. None come during
+a breach, while the player is away, or before the first breach is won. Torches built at the edge of the clearing push
+the dark back: this is how the home grows into the night (see Docs/Atmosphere.md).
+
 ### 6.4 Extending the clearing
 
 The player may expand buildable space through runes, Heart Tree upgrades, specific resources, or story milestones. Expansion should produce a visible change to the settlement and unlock meaningful placement options, rather than simply adding empty ground.
@@ -272,7 +279,7 @@ Randomness changes the details, not whether the raid is completable. A viable ro
 
 ### 8.1 Normal extraction
 
-Reach an active extraction point before the effective deadline and interact long enough to complete the return. Cargo to be recovered must be within the designated extraction radius. Clearly signal which companions, loose objects, and carts will be included. A successful return ends the instance and opens a detailed debrief.
+Reach an active extraction point before the effective deadline, **light it** with one press and **hold its circle**: the way home fills only while the player stands inside and no hostile creature does. Leaving the circle or a creature inside it pauses the return without resetting it. A lit beacon calls out into the forest every few seconds, so creatures come to the circle: extraction is a short stand, not a button held down (prototype: 30 s in the Misty Woods, an item cost or alarm paid when lit, what was held is lost if the way goes dark first). Cargo to be recovered must be within the designated extraction radius. Clearly signal which companions, loose objects, and carts will be included. A successful return ends the instance and opens a detailed debrief.
 
 ### 8.2 What comes home?
 
@@ -322,7 +329,9 @@ Limit the number of major events per raid and give each biome its own curated po
 
 ### 9.5 Exploration and mapping
 
-Reveal local maps as the player travels. Keep major biome discoveries and portal landmarks persistent; vary minor loot and hazards between runs. A recruited scout may reveal a useful point of interest or safe path before departure.
+Reveal local maps as the player travels: ground never seen lies in dark fog until the player has been near it
+(the fog of war; remembered at home, fresh every raid). At night, everything beyond the reach of sight and light lies
+under a grey, colourless veil. Keep major biome discoveries and portal landmarks persistent; vary minor loot and hazards between runs. A recruited scout may reveal a useful point of interest or safe path before departure.
 
 ## 10. Movement, combat, and enemies
 
@@ -377,6 +386,12 @@ There are no locked classes; chosen gear and abilities define a build. Gathering
   enemies retreat at low health and re-engage after gaining space; defensive enemies stay near their home.
 
 The new creatures use placeholder visuals and appear at low frequency beyond the Misty Woods entry area.
+
+**Apex creature (October 27, 2026): the Old Moss Troll.** One per Misty Woods raid, walking a slow round through the
+middle of the map, around the Hollow Oak. It is heard before it is seen: heavy steps that shake the ground. Its eyes
+are weak, but it smells a person close by and hears far (§10.8). It is meant to be avoided, not farmed: huge health,
+hardly staggers, slow but crushing sweeps and stomps. Killing it is possible for a prepared player and pays in
+Trollstone, the material the Forge needs.
 These values remain editable prototyping defaults pending encounter playtesting.
 
 ### 10.6 Status effects
@@ -386,6 +401,28 @@ These values remain editable prototyping defaults pending encounter playtesting.
 ### 10.7 Example boss: The Brukam Troll
 
 A massive troll guards a stone bridge in Troll Valley. Phase one teaches a wide club sweep, a ground slam, and thrown boulders. Phase two destroys parts of the bridge, reducing safe ground while creating openings behind the boss. Phase three tempts the player with a valuable side cache as time runs low. Winning grants a permanent Mountain Leap ability (short leap and shockwave) through a boss sigil. Rare trollstone and newly looted equipment still need successful extraction. The permanent skill unlock remains even if the player dies before bringing the physical loot home.
+
+### 10.8 Senses and stealth
+
+Danger should come from creatures that notice the player, not from creatures that simply know. Monsters **see** in a
+cone that terrain, trees, rocks and buildings block, **notice anything very close** from any direction, and **hear**
+footsteps, dodges, fights and gathering. A glimpse or a sound makes a monster **suspicious** (a "?" over it): it comes
+to look and searches the spot. Seeing the player long enough **spots** them (a "!" and a low bell): it hunts, and its
+call brings idle monsters nearby to look. A hunted player who breaks line of sight for a few seconds is **lost**: the
+monster searches where it last saw them, then goes home. Wolves hear keenly, Mistwings see wide from above, Root
+Guardians are slow to notice.
+
+The player can **sneak** (hold Left Ctrl / left bumper): half speed, much quieter footsteps, seen from closer and more
+slowly. Standing still helps a little; fighting makes the player stand out. A hit on an unaware monster deals extra
+damage (an ambush). Sneaking is a way to avoid or open fights, never a requirement: combat stays as in §10.3, and
+ward-breach attackers and hunt waves always know where the player is.
+
+Fog hides the player too: in dense fog monsters see only about half as far, so misty weather and foggy hollows are
+places to slip past danger.
+
+Prototype values (tunable in the Systems Editor): spotting a plainly visible player takes about 0.6 s close up and
+3 s at the edge of sight; a lost target is searched for 6 s after 3 s out of sight; footsteps carry 5 m walking and
+1.2 m sneaking; an ambush deals +50%. Night, fog and light will later change visibility and sight range.
 
 ## 11. Survival, cooking, drinking, and farming
 
@@ -633,6 +670,14 @@ Teach systems in the order encountered: movement → gathering → building → 
 A stylized but tangible Nordic fairy-tale world: mossy pines, birch, timber cabins, weathered stones, rune-carved bridges, firelight, thick mist, mountains, and creatures grounded in local folklore. Avoid copying V Rising's visual assets, silhouettes, or UI layout; use its combat responsiveness only as high-level interaction inspiration.
 
 ### 19.2 Color and light
+
+Volumetric fog carries the mood: thin morning mist at home, thick drifting mist in the Misty Woods, thickening and
+darkening at night, lit by the sun or moon through the trees and glowing warm around fire. It lies over the ground like
+a blanket, rolls in and out in banks, thickens with the weather and gathers in hollows and marshes. Whatever stands
+between the camera and the player (a tree crown, a roof) dissolves in a soft, stippled circle, so the player is never
+lost from view. Light at night is warm and
+local (campfires, torches, a lit beacon); the dark around it is cold and grey.
+
 
 Safe Haven uses warm amber, fresh greens, soft sunlight, and inviting interiors. Raid regions shift toward colder greens and blues, fog, hard shadows, and supernatural accents. Distinct biome palettes should aid navigation as well as atmosphere.
 

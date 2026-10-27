@@ -24,7 +24,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: fcf0552d231ec8b40a3de2796f1bc4c3, type: 2}
   likelyResources: []
   durationSeconds: 300
-  extractionSeconds: 20
+  extractionSeconds: 35
   lootMultiplier: 1
   enemyHealthMultiplier: 1
   enemyPowerMultiplier: 1

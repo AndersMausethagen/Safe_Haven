@@ -76,4 +76,5 @@ Labels below each segment give its name and start time. The two night segments j
   Environment › Climate) for a raid region and assign it to that scene's Weather.
 
 The ambient light is applied as a computed ambient probe each frame, because Unity only rebuilds the probe when
-lighting is baked. Fog here is Unity's distance fog; volumetric fog and light can read the same weather values later.
+lighting is baked. Fog here is Unity's distance fog. The volumetric fog, fog of war and night veil are separate (see
+[atmosphere](Atmosphere.md)); the veil follows `_SafeHavenNight`, set here.

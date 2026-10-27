@@ -1,0 +1,59 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4bf91a34ba78f674f9003e07ccb08408, type: 3}
+  m_Name: PerceptionSettings
+  m_EditorClassIdentifier: SafeHaven::PerceptionSettings
+  suspiciousAt: 0.35
+  nearNoticeSeconds: 0.6
+  farNoticeSeconds: 3
+  closeNoticeSeconds: 0.35
+  decayPerSecond: 0.15
+  minRangeScale: 0.45
+  maxRangeScale: 1.3
+  eyeHeight: 1.4
+  targetHeight: 1.1
+  sightBlockers:
+    serializedVersion: 2
+    m_Bits: 1
+  loseTrackSeconds: 3
+  searchSeconds: 6
+  maxInvestigateSeconds: 15
+  investigateSpeedScale: 0.55
+  lookAroundSpeed: 70
+  lostTrackAwareness: 0.8
+  idleGlanceSeconds: {x: 4, y: 9}
+  idleGlanceAngle: 75
+  spottedCallRadius: 10
+  heardAwarenessFar: 0.35
+  heardAwarenessNear: 0.9
+  ambushDamageTaken: 1.5
+  movingVisibility: 1
+  stillVisibility: 0.75
+  sneakingVisibility: 0.45
+  fightingVisibility: 1.4
+  fightingSeconds: 3
+  sneakSpeedScale: 0.5
+  footstepNoise: 5
+  sneakingFootstepNoise: 1.2
+  footstepInterval: 0.45
+  dodgeNoise: 7
+  combatNoise: 13
+  combatNoiseInterval: 0.6
+  showIndicators: 1
+  indicatorHeight: 2.4
+  indicatorFontSize: 6
+  suspiciousColor: {r: 1, g: 0.82, b: 0.3, a: 1}
+  searchingColor: {r: 0.8, g: 0.8, b: 0.75, a: 1}
+  spottedColor: {r: 1, g: 0.25, b: 0.18, a: 1}
+  spottedShowSeconds: 1.4
+  spottedSound: {fileID: 11400000, guid: 4cc9bc40fb223354aa6032cf0c7fb0f2, type: 2}
+  suspiciousSound: {fileID: 0}

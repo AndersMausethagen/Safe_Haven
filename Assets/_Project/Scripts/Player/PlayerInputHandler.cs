@@ -30,6 +30,8 @@ public sealed class PlayerInputHandler : MonoBehaviour
     private InputAction skillsWindowAction;
     private InputAction characterAction;
     private InputAction buildAction;
+    private InputAction sneakAction;
+    private PlayerStealth stealth;
     private readonly InputAction[] skillActions = new InputAction[SkillLoadout.SlotCount];
 
     // V Rising style skill keys (E is taken by Interact, C by the character screen), with 1-5 as alternatives.
@@ -48,6 +50,7 @@ public sealed class PlayerInputHandler : MonoBehaviour
     {
         movement = GetComponent<PlayerMovement>();
         stateMachine = GetComponent<PlayerStateMachine>();
+        stealth = GetComponent<PlayerStealth>();
         movementCamera = movementCamera != null ? movementCamera : Camera.main;
 
         if (movementCamera == null)
@@ -112,6 +115,7 @@ public sealed class PlayerInputHandler : MonoBehaviour
         stateMachine?.RequestGuard(false);
         movement?.SetMovementInput(Vector3.zero);
         movement?.ClearAimDirection();
+        stealth?.SetSneaking(false);
     }
 
     private System.Collections.Generic.IEnumerable<InputAction> AllActions()
@@ -128,6 +132,7 @@ public sealed class PlayerInputHandler : MonoBehaviour
         yield return skillsWindowAction;
         yield return characterAction;
         yield return buildAction;
+        yield return sneakAction;
         foreach (InputAction action in skillActions)
         {
             yield return action;
@@ -219,6 +224,7 @@ public sealed class PlayerInputHandler : MonoBehaviour
         skillsWindowAction?.Dispose();
         characterAction?.Dispose();
         buildAction?.Dispose();
+        sneakAction?.Dispose();
         foreach (InputAction action in skillActions)
         {
             action?.Dispose();
@@ -284,6 +290,11 @@ public sealed class PlayerInputHandler : MonoBehaviour
         buildAction.AddBinding("<Keyboard>/g");
         buildAction.AddBinding("<Gamepad>/rightStickPress");
 
+        // Held: sneaking lasts as long as the button is down.
+        sneakAction = new InputAction("Sneak", InputActionType.Button);
+        sneakAction.AddBinding("<Keyboard>/leftCtrl");
+        sneakAction.AddBinding("<Gamepad>/leftShoulder");
+
         for (int i = 0; i < skillActions.Length; i++)
         {
             var action = new InputAction("Skill" + (i + 1), InputActionType.Button);
@@ -311,6 +322,8 @@ public sealed class PlayerInputHandler : MonoBehaviour
         skillsWindowAction.performed += OnSkillsToggle;
         characterAction.performed += OnCharacterToggle;
         buildAction.performed += OnBuildToggle;
+        sneakAction.performed += _ => stealth?.SetSneaking(true);
+        sneakAction.canceled += _ => stealth?.SetSneaking(false);
         for (int i = 0; i < skillActions.Length; i++)
         {
             int slot = i;

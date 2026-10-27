@@ -38,12 +38,23 @@ public sealed class MonsterDefinition : ScriptableObject
     [Tooltip("Extra seconds after an attack has recovered before the next one can start.")]
     [SerializeField, Min(0f)] private float attackCooldown = 0.6f;
     [SerializeField, Min(0f)] private float moveSpeed = 3.5f;
-    [Tooltip("How close a target must come before the monster notices it.")]
+    [Tooltip("How far it sees a plainly visible target in front of it (inside its Sight Angle, with nothing in between). " +
+             "Sneaking targets are seen from closer, fighting ones from further (Systems Editor › Senses & Stealth).")]
     [SerializeField, Min(0f)] private float detectionRange = 10f;
-    [Tooltip("The monster gives up on a target that gets further away than this.")]
+    [Tooltip("The monster loses a target that gets further away than this, and goes to look where it last saw it.")]
     [SerializeField, Min(0f)] private float chaseRange = 16f;
     [Tooltip("The monster stops chasing and walks home when it gets this far from where it spawned. 0 disables it.")]
     [SerializeField, Min(0f)] private float leashRange = 25f;
+
+    [Header("Senses")]
+    [Tooltip("Width of its sight cone in degrees. 360 sees all around.")]
+    [SerializeField, Range(0f, 360f)] private float sightAngle = 120f;
+    [Tooltip("It notices anything this close from any direction, even behind it or through cover.")]
+    [SerializeField, Min(0f)] private float closeSenseRange = 2.5f;
+    [Tooltip("Multiplies how far it hears noise (footsteps, fights, gathering). 0 = deaf.")]
+    [SerializeField, Min(0f)] private float hearing = 1f;
+    [Tooltip("Multiplies how quickly a glimpse turns into spotting you. Above 1 = watchful, below 1 = dull.")]
+    [SerializeField, Min(0f)] private float alertness = 1f;
 
     [Header("Composable combat")]
     [Tooltip("Empty keeps the original single attack above. Otherwise these actions replace it.")]
@@ -87,6 +98,10 @@ public sealed class MonsterDefinition : ScriptableObject
     public float DetectionRange => detectionRange;
     public float ChaseRange => Mathf.Max(chaseRange, detectionRange);
     public float LeashRange => leashRange;
+    public float SightAngle => sightAngle;
+    public float CloseSenseRange => closeSenseRange;
+    public float Hearing => hearing;
+    public float Alertness => alertness;
     public SoundDefinition DeathSound => deathSound;
     public SoundDefinition HurtSound => hurtSound;
     public SoundDefinition AttackSound => attackSound;

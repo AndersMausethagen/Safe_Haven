@@ -3,11 +3,14 @@ using UnityEngine;
 using UnityEngine.AI;
 
 /// <summary>
-/// Drives a monster in a fight: it notices hostile targets nearby, chases them on the NavMesh and attacks with its
-/// definition's attack through AttackResolver, the same pipeline as the player's weapon. Who it fights follows
-/// FactionRelations, so Enemy monsters hunt the Player faction, Player-faction monsters hunt Enemies and Neutral
-/// monsters never start or return a fight. Led too far from where it spawned, it gives up and walks home.
-/// Tuning lives in the MonsterDefinition; the current target, timers and home position are this instance's own.
+/// Drives a monster in a fight: it notices hostile targets with its senses (MonsterSenses: a sight cone blocked by
+/// cover, a close sense all around, hearing through WorldNoise), goes to look at what it half-noticed, chases what it
+/// spotted on the NavMesh and attacks with its definition's attack through AttackResolver, the same pipeline as the
+/// player's weapon. A target it can't see for a while is lost: it searches where it last saw it, then walks home.
+/// Who it fights follows FactionRelations, so Enemy monsters hunt the Player faction, Player-faction monsters hunt
+/// Enemies and Neutral monsters never start or return a fight. Led too far from where it spawned, it gives up and
+/// walks home. Tuning lives in the MonsterDefinition and PerceptionSettings; the current target, awareness, timers and
+/// home position are this instance's own.
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Combatant))]
@@ -24,6 +27,8 @@ public sealed class MonsterAI : MonoBehaviour
         Dead,
         /// <summary>Reeling from a broken poise or a parried attack: no moving or attacking, and it takes extra damage.</summary>
         Staggered,
+        /// <summary>Going to look at something it half-noticed (a glimpse, a sound, a target it lost), then searching there.</summary>
+        Investigating,
     }
 
     // Matches HitDetector, so the monster measures reach the same way its attack does.
@@ -35,8 +40,13 @@ public sealed class MonsterAI : MonoBehaviour
     private const float SwitchTargetMargin = 1.5f;
     private const float HomeTolerance = 0.6f;
     private const float NavMeshSnapDistance = 2f;
+    // Close enough to the spot it went to check to start searching there.
+    private const float ArriveDistance = 1.5f;
+    // When a whole pack spots the player at once, the spotted sound plays once.
+    private const float SpottedSoundSpacing = 0.5f;
 
     private static readonly Collider[] Overlaps = new Collider[64];
+    private static float nextSpottedSoundAt;
 
     [SerializeField] private MonsterDefinition definition;
     [Tooltip("Layers searched for targets and hit by attacks. Targets still have to be damageable and hostile.")]
@@ -89,6 +99,21 @@ public sealed class MonsterAI : MonoBehaviour
     private PoiseMeter poise;
     private float staggerUntil;
 
+    private MonsterSenses senses;
+    private AwarenessIndicator indicator;
+    private float lastSenseTime;
+    private float lastSeenTargetAt;
+    private Vector3 lastKnownTargetPosition;
+    private bool searchingLostTarget;
+    // Investigation: walking to the spot until it gets there or gives up, then looking around until searchUntil.
+    private float searchUntil = -1f;
+    private float investigateGiveUpAt;
+    private float lookDirection = 1f;
+    // Idle glances around the way it first faced.
+    private Vector3 homeForward = Vector3.forward;
+    private Vector3 glanceHeading = Vector3.forward;
+    private float nextGlanceAt;
+
     private static readonly System.Collections.Generic.List<MonsterAI> active = new System.Collections.Generic.List<MonsterAI>();
     private static readonly System.Collections.Generic.List<MonsterAI> all = new System.Collections.Generic.List<MonsterAI>();
 
@@ -110,6 +135,12 @@ public sealed class MonsterAI : MonoBehaviour
 
     /// <summary>Its poise right now (null before it has woken).</summary>
     public PoiseMeter Poise => poise;
+
+    /// <summary>What it has noticed: its awareness and what it saw last (null without a definition).</summary>
+    public MonsterSenses Senses => senses;
+
+    /// <summary>True while it searches for a target it lost sight of, rather than checking a glimpse or a sound.</summary>
+    public bool IsSearchingLostTarget => CurrentState == State.Investigating && searchingLostTarget;
 
     public bool IsStaggered => CurrentState == State.Staggered;
 
@@ -221,6 +252,7 @@ public sealed class MonsterAI : MonoBehaviour
         }
 
         agent.speed = definition.MoveSpeed;
+        senses = new MonsterSenses(transform, definition, targetLayers, IsSenseCandidate);
         readyAt = new float[definition.Attacks.Count];
         CombatTechniqueSettings technique = CombatTechniqueSettings.Current;
         poise = new PoiseMeter(definition.Poise > 0f ? definition.Poise : technique.DefaultPoise,
@@ -233,16 +265,32 @@ public sealed class MonsterAI : MonoBehaviour
 
     private void Start()
     {
-        if (!roaming)
-        {
-            home = transform.position;
-        }
+        ResetHome();
+        lastSenseTime = Time.time;
+        nextGlanceAt = Time.time + UnityEngine.Random.Range(0f, PerceptionSettings.Current.IdleGlanceSeconds.y);
         EnsureOnNavMesh();
+        RefreshAmbush();
     }
 
     private void OnDestroy()
     {
         all.Remove(this);
+    }
+
+    /// <summary>
+    /// Makes where it stands, facing the way it faces, its home (the raid map turned under it). A roaming monster keeps
+    /// the place it walks to.
+    /// </summary>
+    public void ResetHome()
+    {
+        if (!roaming)
+        {
+            home = transform.position;
+        }
+
+        Vector3 facing = transform.forward;
+        facing.y = 0f;
+        homeForward = glanceHeading = facing.sqrMagnitude > 0.001f ? facing.normalized : Vector3.forward;
     }
 
     /// <summary>
@@ -260,6 +308,7 @@ public sealed class MonsterAI : MonoBehaviour
         home = destination;
         roaming = true;
         BeginReturn();
+        ApplySpeed();
     }
 
     private void OnEnable()
@@ -296,6 +345,12 @@ public sealed class MonsterAI : MonoBehaviour
             return;
         }
 
+        if (CurrentState == State.Investigating)
+        {
+            UpdateInvestigation();
+            return;
+        }
+
         if (CurrentState == State.Returning)
         {
             if (!roaming)
@@ -309,8 +364,12 @@ public sealed class MonsterAI : MonoBehaviour
                 nextScanTime = Time.time + scanInterval;
                 if (definition.HasTemperament(MonsterTemperament.Aggressive))
                 {
-                    ScanForTarget();
+                    Sense();
                 }
+            }
+            if (CurrentState == State.Investigating)
+            {
+                return;
             }
             if (!CanTarget(target))
             {
@@ -325,17 +384,36 @@ public sealed class MonsterAI : MonoBehaviour
         if (Time.time >= nextScanTime)
         {
             nextScanTime = Time.time + scanInterval;
-            if (definition.HasTemperament(MonsterTemperament.Aggressive)
-                || definition.HasTemperament(MonsterTemperament.Defensive))
+            if (IsWatchful())
             {
-                ScanForTarget();
+                Sense();
             }
         }
 
-        if (!CanTarget(target) || (!Relentless && DistanceToTarget() > definition.ChaseRange))
+        if (CurrentState == State.Investigating)
+        {
+            return;
+        }
+
+        if (!CanTarget(target))
         {
             ClearTarget();
+            if (senses.Awareness.IsAlerted)
+            {
+                senses.Awareness.Calm();
+                RefreshAmbush();
+            }
             GoHomeOrIdle();
+            if (CurrentState == State.Idle)
+            {
+                UpdateIdleGaze();
+            }
+            return;
+        }
+
+        if (!Relentless && (DistanceToTarget() > definition.ChaseRange || IsAvoided(targetComponent.transform.position)))
+        {
+            LoseTrack();
             return;
         }
 
@@ -347,6 +425,262 @@ public sealed class MonsterAI : MonoBehaviour
         }
 
         Engage();
+    }
+
+    // Monsters that start fights look and listen for targets; retaliation-only ones only react to being hit.
+    private bool IsWatchful()
+    {
+        return definition.HasTemperament(MonsterTemperament.Aggressive)
+            || definition.HasTemperament(MonsterTemperament.Defensive);
+    }
+
+    /// <summary>
+    /// A sound of <paramref name="radius"/> metres at <paramref name="position"/> (WorldNoise). An idle, roaming or
+    /// investigating monster that hears it grows suspicious and comes to look; one that hunts, fights or walks home
+    /// ignores it. A sound alone never makes it spot anyone.
+    /// </summary>
+    public void Hear(Vector3 position, float radius)
+    {
+        if (!CanInvestigate())
+        {
+            return;
+        }
+
+        float level = PerceptionRules.HeardLevel(HorizontalDistance(position), radius, definition.Hearing, PerceptionSettings.Current);
+        if (level <= 0f)
+        {
+            return;
+        }
+
+        senses.Awareness.Hear(level, position);
+        if (senses.Stage != AwarenessStage.Unaware)
+        {
+            BeginInvestigate(false);
+        }
+    }
+
+    /// <summary>Sends it to look at a position as if it had heard something loud there (an angry forest).</summary>
+    public void Investigate(Vector3 position)
+    {
+        if (!CanInvestigate())
+        {
+            return;
+        }
+
+        senses.Awareness.Hear(PerceptionSettings.Current.HeardAwarenessNear, position);
+        BeginInvestigate(false);
+    }
+
+    private bool CanInvestigate()
+    {
+        if (definition == null || senses == null || !isActiveAndEnabled || !IsWatchful())
+        {
+            return false;
+        }
+
+        return CurrentState == State.Idle || CurrentState == State.Investigating
+            || (CurrentState == State.Returning && roaming);
+    }
+
+    // Looks for targets: while hunting one, keeps track of it; otherwise fills awareness and, once suspicious, goes to look.
+    private void Sense()
+    {
+        float elapsed = Mathf.Min(Time.time - lastSenseTime, 1f);
+        lastSenseTime = Time.time;
+        if (CanTarget(target))
+        {
+            TrackTarget();
+            return;
+        }
+
+        if (senses.Look(elapsed))
+        {
+            SetTarget(senses.Spotted, senses.SpottedCollider);
+            return;
+        }
+
+        if (senses.Stage == AwarenessStage.Suspicious && CurrentState != State.Investigating && CanInvestigate())
+        {
+            BeginInvestigate(false);
+        }
+
+        RefreshAmbush();
+    }
+
+    private void TrackTarget()
+    {
+        if (senses.CanSee(targetComponent.transform, definition.ChaseRange))
+        {
+            lastSeenTargetAt = Time.time;
+            lastKnownTargetPosition = targetComponent.transform.position;
+            senses.Awareness.Alert(lastKnownTargetPosition);
+            ScanForNearerTarget();
+            return;
+        }
+
+        if (!Relentless && Time.time - lastSeenTargetAt > PerceptionSettings.Current.LoseTrackSeconds)
+        {
+            LoseTrack();
+        }
+    }
+
+    // Out of sight for too long or out of chase range: it goes to where it last saw the target and searches there.
+    private void LoseTrack()
+    {
+        ClearTarget();
+        senses.Awareness.LoseTrack(lastKnownTargetPosition, PerceptionSettings.Current.LostTrackAwareness);
+        BeginInvestigate(true);
+    }
+
+    private void BeginInvestigate(bool lostTarget)
+    {
+        bool fresh = CurrentState != State.Investigating;
+        searchingLostTarget = lostTarget || (!fresh && searchingLostTarget);
+        searchUntil = -1f;
+        investigateGiveUpAt = Time.time + PerceptionSettings.Current.MaxInvestigateSeconds;
+        nextRepathTime = 0f;
+        if (fresh && !lostTarget)
+        {
+            AudioManager.Play(PerceptionSettings.Current.SuspiciousSound, transform.position);
+        }
+
+        EnsureIndicator();
+        SetState(State.Investigating);
+        RefreshAmbush();
+    }
+
+    private void UpdateInvestigation()
+    {
+        if (CanTarget(target))
+        {
+            // Spotted it, was hit or was told by its pack: the hunt starts where it stands.
+            if (roaming)
+            {
+                roaming = false;
+                home = transform.position;
+            }
+            searchingLostTarget = false;
+            SetState(State.Chasing);
+            return;
+        }
+
+        if (Time.time >= nextScanTime)
+        {
+            nextScanTime = Time.time + scanInterval;
+            Sense();
+            if (CurrentState != State.Investigating || CanTarget(target))
+            {
+                return;
+            }
+        }
+
+        PerceptionSettings rules = PerceptionSettings.Current;
+        if (senses.IsSeeingSomething)
+        {
+            // Another glimpse: go there instead of searching here.
+            searchUntil = -1f;
+        }
+
+        if (searchUntil < 0f)
+        {
+            Vector3 spot = InvestigationSpot(senses.Awareness.Stimulus);
+            if (HorizontalDistance(spot) > ArriveDistance && Time.time < investigateGiveUpAt && MoveTo(spot))
+            {
+                return;
+            }
+
+            StopMoving();
+            searchUntil = Time.time + rules.SearchSeconds;
+            lookDirection = UnityEngine.Random.value < 0.5f ? -1f : 1f;
+        }
+
+        transform.Rotate(0f, lookDirection * rules.LookAroundSpeed * Time.deltaTime, 0f);
+        if (Time.time >= searchUntil)
+        {
+            EndInvestigation();
+        }
+    }
+
+    // Where to look, kept inside its leash (and defensive radius), so checking a noise never drags it off for good.
+    private Vector3 InvestigationSpot(Vector3 stimulus)
+    {
+        float limit = definition.LeashRange;
+        if (definition.HasTemperament(MonsterTemperament.Defensive))
+        {
+            limit = limit > 0f ? Mathf.Min(limit, definition.DefensiveRadius) : definition.DefensiveRadius;
+        }
+
+        if (IsAvoided(stimulus))
+        {
+            return transform.position;
+        }
+
+        Vector3 offset = stimulus - home;
+        offset.y = 0f;
+        if (roaming || Relentless || limit <= 0f || offset.magnitude <= limit)
+        {
+            return stimulus;
+        }
+
+        return home + offset.normalized * (limit * 0.9f);
+    }
+
+    private void EndInvestigation()
+    {
+        searchingLostTarget = false;
+        BeginReturn();
+    }
+
+    // Idle monsters glance around the way they first faced, so a sneaking player has to watch them.
+    private void UpdateIdleGaze()
+    {
+        PerceptionSettings rules = PerceptionSettings.Current;
+        if (Time.time >= nextGlanceAt)
+        {
+            Vector2 seconds = rules.IdleGlanceSeconds;
+            nextGlanceAt = Time.time + UnityEngine.Random.Range(seconds.x, Mathf.Max(seconds.x, seconds.y));
+            glanceHeading = Quaternion.Euler(0f, UnityEngine.Random.Range(-rules.IdleGlanceAngle, rules.IdleGlanceAngle), 0f) * homeForward;
+        }
+
+        transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(glanceHeading),
+            rules.LookAroundSpeed * Time.deltaTime);
+    }
+
+    // Unaware monsters take extra damage, a hit from the shadows (PerceptionSettings › Ambush).
+    private void RefreshAmbush()
+    {
+        if (senses == null || CurrentState == State.Staggered || CurrentState == State.Dead)
+        {
+            return;
+        }
+
+        bool unaware = !CanTarget(target) && senses.Stage == AwarenessStage.Unaware;
+        damageable.DamageTakenMultiplier = unaware ? PerceptionSettings.Current.AmbushDamageTaken : 1f;
+    }
+
+    private AwarenessIndicator EnsureIndicator()
+    {
+        if (indicator == null && PerceptionSettings.Current.ShowIndicators)
+        {
+            indicator = AwarenessIndicator.CreateFor(this);
+        }
+
+        return indicator;
+    }
+
+    // It has just spotted (or been set on) a target: the "!", a sound when it's the player, and a call that sends idle
+    // monsters nearby to look.
+    private void OnSpotted()
+    {
+        PerceptionSettings rules = PerceptionSettings.Current;
+        EnsureIndicator()?.ShowSpotted();
+        if (global::Player.IsPlayer(targetComponent.gameObject) && Time.time >= nextSpottedSoundAt)
+        {
+            nextSpottedSoundAt = Time.time + SpottedSoundSpacing;
+            AudioManager.Play(rules.SpottedSound, transform.position);
+        }
+
+        WorldNoise.Emit(transform.position, rules.SpottedCallRadius);
     }
 
     // The body language that makes attacks readable from above (AttackPose): coiling through the wind-up, snapping into
@@ -726,7 +1060,9 @@ public sealed class MonsterAI : MonoBehaviour
     private void BeginReturn()
     {
         nextRepathTime = 0f;
+        senses?.Awareness.Calm();
         SetState(State.Returning);
+        RefreshAmbush();
     }
 
     private bool IsBeyondLeash()
@@ -734,7 +1070,8 @@ public sealed class MonsterAI : MonoBehaviour
         return definition.LeashRange > 0f && HorizontalDistance(home) > definition.LeashRange;
     }
 
-    private void ScanForTarget()
+    // While hunting one target, switches to a clearly nearer one it can see (a traveller between it and the player).
+    private void ScanForNearerTarget()
     {
         Vector3 center = transform.position + Vector3.up * CenterHeight;
         int count = Physics.OverlapSphereNonAlloc(center, definition.DetectionRange, Overlaps, targetLayers, QueryTriggerInteraction.Ignore);
@@ -746,18 +1083,13 @@ public sealed class MonsterAI : MonoBehaviour
         for (int i = 0; i < count; i++)
         {
             IDamageable candidate = Overlaps[i].GetComponentInParent<IDamageable>();
-            if (!CanTarget(candidate))
+            if (ReferenceEquals(candidate, target) || !IsSenseCandidate(candidate, Overlaps[i]))
             {
                 continue;
             }
 
             float distance = HorizontalDistance(HitDetector.NearestPoint(Overlaps[i], center));
-            if (!Relentless && definition.HasTemperament(MonsterTemperament.Defensive)
-                && Vector3.Distance(home, Overlaps[i].transform.position) > definition.DefensiveRadius)
-            {
-                continue;
-            }
-            if (distance < bestDistance)
+            if (distance < bestDistance && senses.CanSee(((Component)candidate).transform, definition.DetectionRange))
             {
                 best = candidate;
                 bestCollider = Overlaps[i];
@@ -777,6 +1109,25 @@ public sealed class MonsterAI : MonoBehaviour
 
         SetTarget(best, bestCollider);
     }
+
+    // A target its senses may notice: one it would fight, and for a defensive monster, one inside its ground.
+    private bool IsSenseCandidate(IDamageable candidate, Collider candidateCollider)
+    {
+        if (!CanTarget(candidate))
+        {
+            return false;
+        }
+
+        if (IsAvoided(candidateCollider.transform.position))
+        {
+            return false;
+        }
+
+        return Relentless || !definition.HasTemperament(MonsterTemperament.Defensive)
+            || Vector3.Distance(home, candidateCollider.transform.position) <= definition.DefensiveRadius;
+    }
+
+    private bool IsAvoided(Vector3 position) => AvoidArea != null && AvoidArea(position);
 
     private bool CanTarget(IDamageable candidate)
     {
@@ -803,6 +1154,28 @@ public sealed class MonsterAI : MonoBehaviour
     /// <summary>When set, the monster never gives up a chase or returns home (ward-breach attackers crossing the clearing).</summary>
     public bool Relentless { get; set; }
 
+    /// <summary>
+    /// Ground it will not enter (night prowlers: light). It neither notices targets standing there nor follows them in:
+    /// a hunt that leads into it is lost at the edge, and anything heard there is searched for from where it stands.
+    /// </summary>
+    public System.Predicate<Vector3> AvoidArea { get; set; }
+
+    /// <summary>When set, CreatureSleep never puts it to sleep, however far the player is (a patrolling apex).</summary>
+    public bool KeepAwake { get; set; }
+
+    /// <summary>Movement speed while roaming (<see cref="Roam"/>), as a share of its own: patrols walk, hunts run.</summary>
+    public float RoamSpeedScale
+    {
+        get => roamSpeedScale;
+        set
+        {
+            roamSpeedScale = Mathf.Max(0.05f, value);
+            ApplySpeed();
+        }
+    }
+
+    private float roamSpeedScale = 1f;
+
     /// <summary>Starts chasing a target right away, wherever it is. Returns false when it can't target it.</summary>
     public bool Engage(IDamageable newTarget)
     {
@@ -821,6 +1194,20 @@ public sealed class MonsterAI : MonoBehaviour
         targetComponent = (Component)newTarget;
         targetCollider = hitCollider != null ? hitCollider : targetComponent.GetComponentInChildren<Collider>();
         nextRepathTime = 0f;
+        lastSeenTargetAt = Time.time;
+        lastKnownTargetPosition = targetComponent.transform.position;
+        searchingLostTarget = false;
+        if (senses != null)
+        {
+            bool fresh = !senses.Awareness.IsAlerted;
+            senses.Awareness.Alert(lastKnownTargetPosition);
+            if (fresh)
+            {
+                OnSpotted();
+            }
+        }
+
+        RefreshAmbush();
         if (pack != null)
         {
             pack.Alert(newTarget);
@@ -983,7 +1370,29 @@ public sealed class MonsterAI : MonoBehaviour
 
         State previous = CurrentState;
         CurrentState = next;
+        ApplySpeed();
         StateChanged?.Invoke(previous, next);
+    }
+
+    // Going to look is a cautious walk and a patrol a stroll; everything else moves at full speed.
+    private void ApplySpeed()
+    {
+        if (definition == null || agent == null)
+        {
+            return;
+        }
+
+        float scale = CurrentState == State.Investigating ? PerceptionSettings.Current.InvestigateSpeedScale
+            : CurrentState == State.Returning && roaming ? roamSpeedScale
+            : 1f;
+        agent.speed = definition.MoveSpeed * scale;
+    }
+
+    // Entering play mode doesn't reload scripts in this project, so the shared sound timer is reset here.
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession()
+    {
+        nextSpottedSoundAt = 0f;
     }
 
     private void OnDrawGizmosSelected()
@@ -995,7 +1404,9 @@ public sealed class MonsterAI : MonoBehaviour
 
         Vector3 origin = Application.isPlaying ? home : transform.position;
         Gizmos.color = new Color(1f, 0.8f, 0.2f, 0.8f);
-        Gizmos.DrawWireSphere(transform.position, definition.DetectionRange);
+        DrawSightCone(definition.DetectionRange, definition.SightAngle);
+        Gizmos.color = new Color(1f, 0.55f, 0.2f, 0.8f);
+        Gizmos.DrawWireSphere(transform.position, definition.CloseSenseRange);
         Gizmos.color = new Color(1f, 0.35f, 0.2f, 0.6f);
         Gizmos.DrawWireSphere(transform.position, definition.ChaseRange);
 
@@ -1003,6 +1414,30 @@ public sealed class MonsterAI : MonoBehaviour
         {
             Gizmos.color = new Color(0.3f, 0.7f, 1f, 0.6f);
             Gizmos.DrawWireSphere(origin, definition.LeashRange);
+        }
+    }
+
+    private void DrawSightCone(float range, float angle)
+    {
+        const int segments = 24;
+        Vector3 center = transform.position + Vector3.up * 0.1f;
+        float half = Mathf.Clamp(angle, 0f, 360f) * 0.5f;
+        Vector3 previous = center + Quaternion.Euler(0f, -half, 0f) * transform.forward * range;
+        if (half < 180f)
+        {
+            Gizmos.DrawLine(center, previous);
+        }
+
+        for (int i = 1; i <= segments; i++)
+        {
+            Vector3 next = center + Quaternion.Euler(0f, Mathf.Lerp(-half, half, i / (float)segments), 0f) * transform.forward * range;
+            Gizmos.DrawLine(previous, next);
+            previous = next;
+        }
+
+        if (half < 180f)
+        {
+            Gizmos.DrawLine(center, previous);
         }
     }
 }

@@ -54,6 +54,7 @@ public sealed class SystemsEditorWindow : EditorWindow
             new DeathAndRepairPage(),
             new GatheringMinigamePage(),
             new MovementAndCombatPage(),
+            new SensesAndStealthPage(),
             new RaidsAndPortalPage(),
             new HeartTreeAndBuildingPage(),
             new CraftingPage(),

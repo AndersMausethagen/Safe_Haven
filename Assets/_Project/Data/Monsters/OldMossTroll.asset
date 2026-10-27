@@ -1,0 +1,98 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42e5c6da77934e8439571a13e158376a, type: 3}
+  m_Name: OldMossTroll
+  m_EditorClassIdentifier: Assembly-CSharp::MonsterDefinition
+  id: OldMossTroll
+  displayName: Old Moss Troll
+  description: A troll as old as the hills, walking its round through the Misty Woods. Its eyes are weak, but it smells you long before it sees you and hears every step. Best avoided; if you must fight, its blows are slow but they break bones. It carries trollstone.
+  combatStats: {fileID: 11400000, guid: 4ce37b840b31f7943a1a7e1c0bf696e5, type: 2}
+  faction: 1
+  drops:
+    entries:
+    - item: {fileID: 11400000, guid: fcf0552d231ec8b40a3de2796f1bc4c3, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 2
+      maxQuantity: 3
+      probability: 1
+    - item: {fileID: 0}
+      resource: {fileID: 11400000, guid: c0e409a7cd38400498ff1c7037737b96, type: 2}
+      minQuantity: 9
+      maxQuantity: 12
+      probability: 1
+  unlocksRecipes: []
+  animatorController: {fileID: 9100000, guid: 51388376d31e4294bb24b0004412608d, type: 2}
+  prefab: {fileID: 9066855856663566298, guid: c62686ef298686e40ae6736dc586a03f, type: 3}
+  attack: {fileID: 11400000, guid: 76995dcb3b55a3c489221f337a8f9b8d, type: 2}
+  attackDamage: 70
+  attackCooldown: 1.2
+  moveSpeed: 3.4
+  detectionRange: 9
+  chaseRange: 26
+  leashRange: 40
+  sightAngle: 100
+  closeSenseRange: 6
+  hearing: 1.8
+  alertness: 0.8
+  attacks:
+  - attack: {fileID: 11400000, guid: 76995dcb3b55a3c489221f337a8f9b8d, type: 2}
+    kind: 0
+    damage: 70
+    minimumRange: 0
+    maximumRange: 4
+    priority: 1
+    cooldown: 1.2
+    interruptible: 0
+    projectilePrefab: {fileID: 0}
+    burstCount: 0
+    burstInterval: 0
+    projectileSpeed: 0
+    projectileRadius: 0
+    chargeSpeed: 0
+    chargeDistance: 0
+    exposedSeconds: 0
+    buffRadius: 0
+    buffSeconds: 0
+    damageBonus: 0
+    packLeaderOnly: 0
+  - attack: {fileID: 11400000, guid: 366b223e4e5df8548802df8a32de601e, type: 2}
+    kind: 0
+    damage: 95
+    minimumRange: 0
+    maximumRange: 3
+    priority: 2
+    cooldown: 7
+    interruptible: 0
+    projectilePrefab: {fileID: 0}
+    burstCount: 0
+    burstInterval: 0
+    projectileSpeed: 0
+    projectileRadius: 0
+    chargeSpeed: 0
+    chargeDistance: 0
+    exposedSeconds: 0
+    buffRadius: 0
+    buffSeconds: 0
+    damageBonus: 0
+    packLeaderOnly: 0
+  movementTactic: 0
+  temperament: 1
+  preferredDistance: 7
+  distanceTolerance: 1.5
+  fleeHealthFraction: 0.25
+  fleeDistance: 10
+  defensiveRadius: 8
+  hoverHeight: 0
+  poise: 450
+  deathSound: {fileID: 0}
+  hurtSound: {fileID: 0}
+  attackSound: {fileID: 0}

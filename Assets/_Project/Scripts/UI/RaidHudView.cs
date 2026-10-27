@@ -165,6 +165,11 @@ public sealed class RaidHudView : MonoBehaviour
                     float closesIn = exit.SecondsUntilChange;
                     string color = closesIn >= 0f && closesIn <= 60f ? "#FFB84D" : "#8BE08B";
                     text.Append($"<color={color}>{exit.DisplayName}  {distance} m");
+                    if (exit.IsLit)
+                    {
+                        text.Append($"  lit {Mathf.FloorToInt(exit.HoldFraction * 100f)}%");
+                    }
+
                     if (closesIn >= 0f)
                     {
                         text.Append($"  closes in {RaidStats.FormatTime(closesIn)}");
@@ -220,15 +225,29 @@ public sealed class RaidHudView : MonoBehaviour
     private string DescribeExtraction(out ExtractionPoint nearest)
     {
         nearest = null;
+        GameObject player = director.Player;
         foreach (ExtractionPoint point in ExtractionPoint.Active)
         {
-            if (point.IsExtracting)
+            if (!point.IsLit)
             {
-                return $"<color=#8BE08B>Extracting... {point.TimeLeft:0.0}s</color>";
+                continue;
+            }
+
+            nearest = point;
+            int percent = Mathf.FloorToInt(point.HoldFraction * 100f);
+            switch (point.HoldState)
+            {
+                case ExtractionHoldState.Holding:
+                case ExtractionHoldState.Done:
+                    return $"<color=#8BE08B>Holding {point.DisplayName}... {percent}%  ({point.TimeLeft:0} s)</color>";
+                case ExtractionHoldState.Contested:
+                    return $"<color=#FF6B5B>{point.DisplayName} contested! Drive them out  ({percent}%)</color>";
+                default:
+                    float away = player != null ? point.DistanceFrom(player.transform.position) : 0f;
+                    return $"<color=#FFB84D>Back to {point.DisplayName}'s circle  {Mathf.RoundToInt(away)} m  ({percent}%)</color>";
             }
         }
 
-        GameObject player = director.Player;
         if (player == null)
         {
             return "";

@@ -36,9 +36,13 @@ MonoBehaviour:
   attackDamage: 8
   attackCooldown: 0.6
   moveSpeed: 4.8
-  detectionRange: 14
+  detectionRange: 16
   chaseRange: 28
   leashRange: 45
+  sightAngle: 220
+  closeSenseRange: 3
+  hearing: 0.8
+  alertness: 1.2
   attacks:
   - attack: {fileID: 11400000, guid: 9b7792f8370753f4fbb167ebdf2f5125, type: 2}
     kind: 2
@@ -68,4 +72,7 @@ MonoBehaviour:
   fleeDistance: 10
   defensiveRadius: 8
   hoverHeight: 0.65
+  poise: 0
   deathSound: {fileID: 0}
+  hurtSound: {fileID: 0}
+  attackSound: {fileID: 0}

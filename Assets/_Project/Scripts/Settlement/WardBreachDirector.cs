@@ -120,7 +120,9 @@ public sealed class WardBreachDirector : MonoBehaviour
         Vector3 origin = spawnPoint != null ? spawnPoint.position : transform.position;
         Vector2 offset = Random.insideUnitCircle * spawnSpread;
         Vector3 position = origin + new Vector3(offset.x, 0f, offset.y);
-        GameObject enemy = SpawnTransient(definition.EnemyPrefab, position, spawnPoint != null ? spawnPoint.rotation : Quaternion.identity);
+        // Breach enemies aren't part of the saved scene and carry no loot (the breach has its own reward).
+        GameObject enemy = TransientSpawn.Spawn(definition.EnemyPrefab, position,
+            spawnPoint != null ? spawnPoint.rotation : Quaternion.identity, false);
 
         if (enemy.TryGetComponent(out Combatant combatant))
         {
@@ -141,28 +143,6 @@ public sealed class WardBreachDirector : MonoBehaviour
             ai.Relentless = true;
             ai.Engage(playerHealth);
         }
-    }
-
-    // Breach enemies aren't part of the saved scene and carry no loot (the breach has its own reward), so those parts are
-    // removed before the copy wakes up.
-    private static GameObject SpawnTransient(GameObject prefab, Vector3 position, Quaternion rotation)
-    {
-        var holder = new GameObject("Spawning");
-        holder.SetActive(false);
-        GameObject copy = Instantiate(prefab, position, rotation, holder.transform);
-        foreach (SaveableEntity saveable in copy.GetComponentsInChildren<SaveableEntity>(true))
-        {
-            DestroyImmediate(saveable);
-        }
-
-        foreach (LootOnDeath loot in copy.GetComponentsInChildren<LootOnDeath>(true))
-        {
-            DestroyImmediate(loot);
-        }
-
-        copy.transform.SetParent(null, true);
-        Destroy(holder);
-        return copy;
     }
 
     private void OnAttackerDied(Damageable victim, DamageInfo killingBlow)

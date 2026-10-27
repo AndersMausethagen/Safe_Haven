@@ -117,6 +117,15 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
                     agent.enabled = true;
                 }
             }
+
+            // Creatures placed on the map may have started before the turn; their home turned with them.
+            if (content != null)
+            {
+                foreach (MonsterAI monster in content.GetComponentsInChildren<MonsterAI>(true))
+                {
+                    monster.ResetHome();
+                }
+            }
         }
 
         MovePlayerToStart();
