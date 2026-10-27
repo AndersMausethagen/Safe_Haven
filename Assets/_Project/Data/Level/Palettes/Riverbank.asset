@@ -1,0 +1,88 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b302529a90cd5d4eb925e50af633cad, type: 3}
+  m_Name: Riverbank
+  m_EditorClassIdentifier: SafeHaven::ScatterPalette
+  entries:
+  - prefab: {fileID: 1180026198634854818, guid: 6696ebb474b5fa045bac60ffe4cc1662, type: 3}
+    weight: 1.2
+    scale: {x: 0.9, y: 1.6}
+    alignToSlope: 0.4
+    sink: 0.02
+    randomYaw: 1
+  - prefab: {fileID: 1353998045703403019, guid: 3ac95055c8744764db9b5006303284fb, type: 3}
+    weight: 1.2
+    scale: {x: 0.9, y: 1.6}
+    alignToSlope: 0.4
+    sink: 0.02
+    randomYaw: 1
+  - prefab: {fileID: 8451479683513436419, guid: e48ca914ec008614a83034f7e97d555e, type: 3}
+    weight: 1.2
+    scale: {x: 0.9, y: 1.6}
+    alignToSlope: 0.4
+    sink: 0.02
+    randomYaw: 1
+  - prefab: {fileID: 7410247519590673645, guid: e1c93886323fbc949bd6686622f45f6b, type: 3}
+    weight: 1.2
+    scale: {x: 0.9, y: 1.6}
+    alignToSlope: 0.4
+    sink: 0.02
+    randomYaw: 1
+  - prefab: {fileID: 225912737988797396, guid: 9e17c4ae208a7d24b8a851b80f6014fd, type: 3}
+    weight: 0.4
+    scale: {x: 0.4, y: 0.9}
+    alignToSlope: 0.7
+    sink: 0.1
+    randomYaw: 1
+  - prefab: {fileID: 2538495701534876734, guid: 1c9f42b45c0381f469367e741527976d, type: 3}
+    weight: 0.4
+    scale: {x: 0.4, y: 0.9}
+    alignToSlope: 0.7
+    sink: 0.1
+    randomYaw: 1
+  - prefab: {fileID: 6226507181307509843, guid: 69e4bbaf9cc54504595bee4572a21fa0, type: 3}
+    weight: 0.4
+    scale: {x: 0.4, y: 0.9}
+    alignToSlope: 0.7
+    sink: 0.1
+    randomYaw: 1
+  - prefab: {fileID: 8000748847422738343, guid: 257fe5a1d98a99f4ca9e1b6ee0882baf, type: 3}
+    weight: 0.4
+    scale: {x: 0.4, y: 0.9}
+    alignToSlope: 0.7
+    sink: 0.1
+    randomYaw: 1
+  - prefab: {fileID: 6657086601232118556, guid: 6a1c715ec6fb275438328b9be470c152, type: 3}
+    weight: 0.4
+    scale: {x: 0.4, y: 0.9}
+    alignToSlope: 0.7
+    sink: 0.1
+    randomYaw: 1
+  - prefab: {fileID: 4094653607621720674, guid: 551b5d2db40a94a4fac330643d408c04, type: 3}
+    weight: 0.4
+    scale: {x: 0.4, y: 0.9}
+    alignToSlope: 0.7
+    sink: 0.1
+    randomYaw: 1
+  - prefab: {fileID: 3464992738141714380, guid: 660ef33ba863e7647aa76666ce30c743, type: 3}
+    weight: 0.4
+    scale: {x: 0.4, y: 0.9}
+    alignToSlope: 0.7
+    sink: 0.1
+    randomYaw: 1
+  - prefab: {fileID: 9059090298066854213, guid: 715b6cb0bef66414ab99494876082ffd, type: 3}
+    weight: 0.4
+    scale: {x: 0.8, y: 1.2}
+    alignToSlope: 0.95
+    sink: 0.05
+    randomYaw: 1
+  spacing: 1.6

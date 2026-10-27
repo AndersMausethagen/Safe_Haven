@@ -31,6 +31,13 @@ All menus are under **Safe Haven > Environment > Water**:
 | **Carve Terrain Under Selected Water...** | Digs a bed with sloping banks into the terrain under the selected water, so depth colour, the visible bed and shore foam show. Undoable. If the bed would go below the terrain's lowest height, the terrain is lowered and its heights raised by the same amount, so the ground stays put |
 | **Make Selected Disturb Water** | Adds a `WaterInteractor`, so a thrown stone, a boat or a monster makes ripples and splashes |
 
+For a winding river, use the World Builder's **River** (GameObject › Safe Haven › World › River; see
+[level design](LevelDesign.md)): it digs the bed, lays a water mesh along the spline and turns steep drops into
+waterfalls. Its material (*Water River (World)*) has **Flow Follows the Mesh** on: each vertex carries its own flow
+direction and speed (UV2), and the ripples and foam cross-fade two phases so the flow can bend without stretching them.
+Its `WaterSurface` gets the river's centre line (surface height and half width along it), so "in the water" and the
+surface height are right along the whole river, not just inside the mesh's box.
+
 The create and make menus also give `PlayerArmature` a `WaterInteractor`. Making or carving water also removes the
 grass and other terrain details under it (and grass painted there later stays hidden; see [grass](Grass.md)).
 

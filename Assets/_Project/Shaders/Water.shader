@@ -2,7 +2,9 @@
 // - Colour by depth: the scene depth under the surface gives the water's depth (shallow -> deep colour) and how much
 //   of the bed shows through (Clarity); the bed is refracted and lit by caustics.
 // - Flow: flat water scrolls its ripples and foam in world XZ along _FlowDirection (object space, so rotating the
-//   object turns the river); steep faces (waterfalls) run down the mesh UV (metres, v downhill) at _FallSpeed.
+//   object turns the river), or, with Flow Follows the Mesh, along each vertex's own direction (UV2: object-space
+//   XZ, its length scales the speed; spline rivers), cross-fading two phases so curving flow never stretches the
+//   ripples; steep faces (waterfalls) run down the mesh UV (metres, v downhill) at _FallSpeed.
 //   Faster and steeper water turns whiter, murkier and foamier.
 // - Foam where the bed or a stone comes near the surface, trailing downstream behind stones (upstream depth taps),
 //   on fast or falling water, and around WaterInteractor foam spots (_WaterFoamSpots: x, z, radius, strength).
@@ -32,6 +34,7 @@ Shader "Safe Haven/Water"
         [Header(Flow)]
         _FlowDirection ("Flow Direction (object X, Z)", Vector) = (1, 0, 0, 0)
         _FlowSpeed ("Flow Speed (metres per second)", Range(0, 6)) = 0
+        [Toggle] _FlowFromMesh ("Flow Follows the Mesh (UV2 direction; spline rivers)", Float) = 0
         _FallSpeed ("Fall Speed on Steep Water (m/s)", Range(0, 15)) = 6
         _FallTiling ("Fall Streak Size (metres)", Float) = 2
         [Toggle] _SteepFaces ("Has Steep Faces (waterfalls; off hides the sides of boxes)", Float) = 0
@@ -96,7 +99,7 @@ Shader "Safe Haven/Water"
                 float _DepthDistance, _Clarity, _Murk, _NormalTiling, _NormalStrength, _WindRipples, _Smoothness;
                 float _Reflection, _Refraction, _FlowSpeed, _FallSpeed, _FallTiling, _VertexAlpha, _Cull, _SteepFaces;
                 float _FoamTiling, _ShoreFoam, _FoamTrail, _SpeedFoam, _FallFoam, _Caustics, _CausticsTiling;
-                float _RippleStrength, _RainRipples;
+                float _RippleStrength, _RainRipples, _FlowFromMesh;
             CBUFFER_END
             // Ripple height field (WaterRipples): R = height. UV = (xz - rect.xy) * rect.z; rect.w = one texel in UV.
             TEXTURE2D(_WaterRippleTex); SAMPLER(sampler_WaterRippleTex);
@@ -113,6 +116,7 @@ Shader "Safe Haven/Water"
                 float3 normalOS : NORMAL;
                 float4 tangentOS : TANGENT;
                 float2 uv : TEXCOORD0;
+                float2 flowOS : TEXCOORD1; // Flow Follows the Mesh: object-space XZ flow direction, length = speed scale
                 half4 color : COLOR;
                 UNITY_VERTEX_INPUT_INSTANCE_ID
             };
@@ -141,8 +145,11 @@ Shader "Safe Haven/Water"
                 output.normalWS = normals.normalWS;
                 output.tangentWS = half4(normals.tangentWS, input.tangentOS.w * GetOddNegativeScale());
                 output.uv = input.uv;
-                float2 direction = TransformObjectToWorldDir(float3(_FlowDirection.x, 0, _FlowDirection.y), false).xz;
-                output.flow = dot(direction, direction) > 1e-6 ? normalize(direction) * _FlowSpeed : 0;
+                bool meshFlow = _FlowFromMesh > 0.5;
+                float2 flowOS = meshFlow ? input.flowOS : _FlowDirection.xy;
+                float2 direction = TransformObjectToWorldDir(float3(flowOS.x, 0, flowOS.y), false).xz;
+                float speedScale = meshFlow ? length(input.flowOS) : 1.0;
+                output.flow = dot(direction, direction) > 1e-6 ? normalize(direction) * (_FlowSpeed * speedScale) : 0;
                 output.alphaFog = half2(_VertexAlpha > 0.5 ? input.color.a : 1.0, ComputeFogFactor(output.positionCS.z));
                 return output;
             }
@@ -166,12 +173,34 @@ Shader "Safe Haven/Water"
                 float2 wind = _SafeHavenWind.xy;
                 float2 drift = length(flow) > 0.02 ? flow : (dot(wind, wind) > 1e-4 ? normalize(wind) : float2(0.6, 0.8)) * 0.06;
                 float2 p = xz / max(_NormalTiling, 0.05);
-                half3 a = SampleRipple(p - frac(drift * time / max(_NormalTiling, 0.05)));
                 float2 q = float2(p.x * 0.8 - p.y * 0.6, p.x * 0.6 + p.y * 0.8) * 1.7 + 0.31; // turned and smaller
                 float2 drift2 = float2(drift.x * 0.8 - drift.y * 0.6, drift.x * 0.6 + drift.y * 0.8) * 1.15
                               + float2(-drift.y, drift.x) * 0.35;
-                half3 b = SampleRipple(q - frac(drift2 * time * 1.7 / max(_NormalTiling, 0.05)));
-                return half3((a.xy + b.xy) * strength, a.z * b.z);
+                half3 ripples;
+                if (_FlowFromMesh > 0.5)
+                {
+                    // The flow turns across the surface: scroll two copies over a short cycle, each restarting while
+                    // invisible, and cross-fade them, so neighbouring pixels never drift apart (flow-map technique).
+                    float cycle = 1.6;
+                    float t0 = frac(time / cycle);
+                    float t1 = frac(time / cycle + 0.5);
+                    half w0 = 1.0 - abs(1.0 - 2.0 * t0);
+                    float scale = cycle / max(_NormalTiling, 0.05);
+                    half3 a0 = SampleRipple(p - drift * t0 * scale);
+                    half3 b0 = SampleRipple(q - drift2 * t0 * scale * 1.7);
+                    half3 a1 = SampleRipple(p - drift * t1 * scale + 0.5);
+                    half3 b1 = SampleRipple(q - drift2 * t1 * scale * 1.7 + 0.5);
+                    half3 phase0 = half3((a0.xy + b0.xy) * strength, a0.z * b0.z);
+                    half3 phase1 = half3((a1.xy + b1.xy) * strength, a1.z * b1.z);
+                    ripples = lerp(phase1, phase0, w0);
+                }
+                else
+                {
+                    half3 a = SampleRipple(p - frac(drift * time / max(_NormalTiling, 0.05)));
+                    half3 b = SampleRipple(q - frac(drift2 * time * 1.7 / max(_NormalTiling, 0.05)));
+                    ripples = half3((a.xy + b.xy) * strength, a.z * b.z);
+                }
+                return ripples;
             }
 
             // Tangent-space ripples of steep water along the mesh UV: long streaks running down at the fall speed.
@@ -386,6 +415,17 @@ Shader "Safe Haven/Water"
                 // Foam: pattern scrolling with the water, revealed by the foam mask.
                 float2 foamUV = positionWS.xz / max(_FoamTiling, 0.05) - frac(input.flow * time / max(_FoamTiling, 0.05));
                 half2 foamFlat = SAMPLE_TEXTURE2D(_FoamMap, sampler_FoamMap, foamUV).rg;
+                if (_FlowFromMesh > 0.5) // two cross-faded phases, as in FlatRipples
+                {
+                    float cycle = 2.4;
+                    float t0 = frac(time / cycle);
+                    float t1 = frac(time / cycle + 0.5);
+                    float2 foamP = positionWS.xz / max(_FoamTiling, 0.05);
+                    float2 foamDrift = input.flow * cycle / max(_FoamTiling, 0.05);
+                    half2 f0 = SAMPLE_TEXTURE2D(_FoamMap, sampler_FoamMap, foamP - foamDrift * t0).rg;
+                    half2 f1 = SAMPLE_TEXTURE2D(_FoamMap, sampler_FoamMap, foamP - foamDrift * t1 + 0.5).rg;
+                    foamFlat = lerp(f1, f0, 1.0 - abs(1.0 - 2.0 * t0));
+                }
                 half pattern = foamFlat.r;
                 shore = 1.0 - saturate(shoreDepth / max(_ShoreFoam * lerp(0.3, 1.6, foamFlat.g), 0.01)); // uneven foam line
                 if (steep > 0.01)

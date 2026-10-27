@@ -26,6 +26,8 @@ using Texture = UnityEngine.Texture;
 public static class LocalSpawnMaterials
 {
     public const string ModelsRoot = "Assets/_Project/Models/Generated/";
+    /// <summary>Downloaded CC0 models (Poly Haven) that import the same way: FBX with a sidecar naming their maps.</summary>
+    public const string DownloadedModelsRoot = "Assets/_Project/Models/PolyHaven/";
     public const string LayerTexturesRoot = "Assets/_Project/Art/Generated/SurfaceLayers/";
     public const string DefaultShader = "Safe Haven/Layered Lit";
     public const string SidecarSuffix = ".material.json";
@@ -101,10 +103,15 @@ public static class LocalSpawnMaterials
     public static bool IsGeneratedModelFile(string path)
     {
         path = path.Replace('\\', '/');
-        return path.StartsWith(ModelsRoot, StringComparison.Ordinal) &&
+        return IsInModelRoot(path) &&
                (path.EndsWith(".fbx", StringComparison.OrdinalIgnoreCase) ||
                 path.EndsWith(".obj", StringComparison.OrdinalIgnoreCase));
     }
+
+    /// <summary>Whether the path is under a folder whose models get the project shader (generated or downloaded).</summary>
+    public static bool IsInModelRoot(string path) =>
+        path.StartsWith(ModelsRoot, StringComparison.Ordinal) ||
+        path.StartsWith(DownloadedModelsRoot, StringComparison.Ordinal);
 
     /// <summary>Whether this GLB gets the project shader: generated models, except trees without a sidecar.</summary>
     public static bool UsesProjectShader(string path, Sidecar sidecar) =>
@@ -401,7 +408,7 @@ public sealed class LocalSpawnModelImport : AssetPostprocessor
     {
         string path = assetPath.Replace('\\', '/');
         bool layer = path.StartsWith(LocalSpawnMaterials.LayerTexturesRoot, StringComparison.Ordinal);
-        bool model = path.StartsWith(LocalSpawnMaterials.ModelsRoot, StringComparison.Ordinal);
+        bool model = LocalSpawnMaterials.IsInModelRoot(path);
         string stem = Path.GetFileNameWithoutExtension(path);
         bool mask = model && path.EndsWith("_BlendMask.png", StringComparison.Ordinal);
         if (model && !mask)

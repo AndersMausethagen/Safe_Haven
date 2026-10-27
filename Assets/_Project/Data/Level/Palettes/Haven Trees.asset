@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b302529a90cd5d4eb925e50af633cad, type: 3}
+  m_Name: Haven Trees
+  m_EditorClassIdentifier: SafeHaven::ScatterPalette
+  entries:
+  - prefab: {fileID: 8962447782804038261, guid: 8068e63c19e557943b162b67081918e2, type: 3}
+    weight: 1
+    scale: {x: 0.85, y: 1.2}
+    alignToSlope: 0.05
+    sink: 0.05
+    randomYaw: 1
+  - prefab: {fileID: 7976308315729542160, guid: fcb7e142faedd2343a8c660c974b209c, type: 3}
+    weight: 0.7
+    scale: {x: 0.85, y: 1.2}
+    alignToSlope: 0.05
+    sink: 0.05
+    randomYaw: 1
+  - prefab: {fileID: 5505034768409955292, guid: 826eb366a51f8f84cb3b4dd5a40e7a31, type: 3}
+    weight: 0.35
+    scale: {x: 0.9, y: 1.2}
+    alignToSlope: 0.1
+    sink: 0.05
+    randomYaw: 1
+  - prefab: {fileID: 342216150029137331, guid: 05d9be943be862447a1933d69a8e3cc7, type: 3}
+    weight: 0.2
+    scale: {x: 0.8, y: 1.1}
+    alignToSlope: 0.1
+    sink: 0.05
+    randomYaw: 1
+  spacing: 6

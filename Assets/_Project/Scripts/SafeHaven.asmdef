@@ -2,6 +2,8 @@
     "name": "SafeHaven",
     "rootNamespace": "",
     "references": [
+        "Unity.Mathematics",
+        "Unity.Splines",
         "Unity.TextMeshPro",
         "UnityEngine.UI",
         "Unity.AI.Navigation",

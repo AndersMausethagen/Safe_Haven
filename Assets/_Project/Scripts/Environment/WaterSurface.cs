@@ -16,6 +16,9 @@ public sealed class WaterSurface : MonoBehaviour
     [SerializeField] private bool takesRipples = true;
     [Tooltip("How far below the surface something still counts as in the water (metres), e.g. the feet of a wading player.")]
     [SerializeField, Min(0f)] private float depth = 2f;
+    [Tooltip("Spline rivers (written by the World Builder): the surface's centre line in local space, xyz = a point on " +
+             "the surface, w = half the width there. Empty: the top of the mesh bounds is the water.")]
+    [SerializeField, HideInInspector] private Vector4[] centreline = System.Array.Empty<Vector4>();
 
     private static readonly List<WaterSurface> All = new List<WaterSurface>();
     private const string SimpleKeyword = "SAFE_HAVEN_WATER_SIMPLE";
@@ -60,6 +63,15 @@ public sealed class WaterSurface : MonoBehaviour
         }
 
         Mesh mesh = filter != null ? filter.sharedMesh : null;
+        if (centreline.Length >= 2)
+        {
+            Vector3 onLine = transform.InverseTransformPoint(point);
+            NearestOnCentreline(centreline, new Vector2(onLine.x, onLine.z), out Vector4 at, out float away);
+            Vector2 toPoint = new Vector2(onLine.x - at.x, onLine.z - at.z);
+            Vector2 offset = away > at.w && away > 1e-4f ? toPoint * (at.w / away) : toPoint;
+            return transform.TransformPoint(new Vector3(at.x + offset.x, at.y, at.z + offset.y));
+        }
+
         if (mesh == null)
         {
             return transform.position;
@@ -95,8 +107,49 @@ public sealed class WaterSurface : MonoBehaviour
             return false;
         }
 
-        height = transform.TransformPoint(new Vector3(local.x, bounds.max.y, local.z)).y;
+        float top = bounds.max.y;
+        if (centreline.Length >= 2)
+        {
+            NearestOnCentreline(centreline, new Vector2(local.x, local.z), out Vector4 at, out float away);
+            if (away > at.w)
+            {
+                return false;
+            }
+
+            top = at.y;
+        }
+
+        height = transform.TransformPoint(new Vector3(local.x, top, local.z)).y;
         return point.y <= height + reach && point.y >= height - depth;
+    }
+
+    /// <summary>Gives a spline river its shape (local space; see <see cref="centreline"/>). Null or fewer than two
+    /// points goes back to the mesh bounds.</summary>
+    public void SetCentreline(Vector4[] points) => centreline = points ?? System.Array.Empty<Vector4>();
+
+    public bool HasCentreline => centreline.Length >= 2;
+
+    /// <summary>The centre line point nearest <paramref name="xz"/> (interpolated: xyz on the surface, w the half
+    /// width there) and how far <paramref name="xz"/> is from it on the ground plane.</summary>
+    public static void NearestOnCentreline(Vector4[] line, Vector2 xz, out Vector4 nearest, out float distance)
+    {
+        nearest = line[0];
+        distance = float.MaxValue;
+        for (int i = 0; i + 1 < line.Length; i++)
+        {
+            Vector4 a = line[i];
+            Vector4 b = line[i + 1];
+            Vector2 ab = new Vector2(b.x - a.x, b.z - a.z);
+            float lengthSq = ab.sqrMagnitude;
+            float t = lengthSq > 1e-8f ? Mathf.Clamp01(Vector2.Dot(xz - new Vector2(a.x, a.z), ab) / lengthSq) : 0f;
+            Vector4 p = Vector4.Lerp(a, b, t);
+            float d = Vector2.Distance(xz, new Vector2(p.x, p.z));
+            if (d < distance)
+            {
+                distance = d;
+                nearest = p;
+            }
+        }
     }
 
     private void OnEnable()

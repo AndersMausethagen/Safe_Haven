@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b302529a90cd5d4eb925e50af633cad, type: 3}
+  m_Name: Ferns
+  m_EditorClassIdentifier: SafeHaven::ScatterPalette
+  entries:
+  - prefab: {fileID: 1180026198634854818, guid: 6696ebb474b5fa045bac60ffe4cc1662, type: 3}
+    weight: 1
+    scale: {x: 0.9, y: 1.7}
+    alignToSlope: 0.5
+    sink: 0.02
+    randomYaw: 1
+  - prefab: {fileID: 1353998045703403019, guid: 3ac95055c8744764db9b5006303284fb, type: 3}
+    weight: 1
+    scale: {x: 0.9, y: 1.7}
+    alignToSlope: 0.5
+    sink: 0.02
+    randomYaw: 1
+  - prefab: {fileID: 8451479683513436419, guid: e48ca914ec008614a83034f7e97d555e, type: 3}
+    weight: 1
+    scale: {x: 0.9, y: 1.7}
+    alignToSlope: 0.5
+    sink: 0.02
+    randomYaw: 1
+  - prefab: {fileID: 7410247519590673645, guid: e1c93886323fbc949bd6686622f45f6b, type: 3}
+    weight: 1
+    scale: {x: 0.9, y: 1.7}
+    alignToSlope: 0.5
+    sink: 0.02
+    randomYaw: 1
+  spacing: 0.9

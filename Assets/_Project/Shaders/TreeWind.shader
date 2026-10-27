@@ -75,7 +75,9 @@ Shader "Safe Haven/Tree Wind"
         };
         float3 WindPositionWS(Attributes input)
         {
-            float3 dirOS = TransformWorldToObjectDir(float3(_SafeHavenWind.x, 0.0, _SafeHavenWind.y));
+            // No Moss Wind in the scene leaves the direction at zero, and normalising it would give NaN (an invisible tree).
+            float2 windXZ = dot(_SafeHavenWind.xy, _SafeHavenWind.xy) > 1e-8 ? _SafeHavenWind.xy : float2(1.0, 0.0);
+            float3 dirOS = TransformWorldToObjectDir(float3(windXZ.x, 0.0, windXZ.y));
             float3 moved;
             TreeWind_float(input.positionOS.xyz, input.normalOS, input.wind, input.windPhase,
                 _Time.y, _WindStrength * _SafeHavenTreeWind, _TreeHeight, dirOS, moved);

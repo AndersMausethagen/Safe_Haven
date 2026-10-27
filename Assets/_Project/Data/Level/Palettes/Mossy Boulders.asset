@@ -1,0 +1,58 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b302529a90cd5d4eb925e50af633cad, type: 3}
+  m_Name: Mossy Boulders
+  m_EditorClassIdentifier: SafeHaven::ScatterPalette
+  entries:
+  - prefab: {fileID: 2470783685879844320, guid: ea2e596f9ba483c40a5e2f3ee217c9f8, type: 3}
+    weight: 1
+    scale: {x: 0.5, y: 0.9}
+    alignToSlope: 0.6
+    sink: 0.15
+    randomYaw: 1
+  - prefab: {fileID: 7814142195533569554, guid: 39439dd013de8a346bb24ad6aa48f5f5, type: 3}
+    weight: 1
+    scale: {x: 0.5, y: 0.9}
+    alignToSlope: 0.6
+    sink: 0.15
+    randomYaw: 1
+  - prefab: {fileID: 4082366105949265426, guid: 64759cb5a79e3b742bf589c75405c7cf, type: 3}
+    weight: 1
+    scale: {x: 0.5, y: 0.9}
+    alignToSlope: 0.6
+    sink: 0.15
+    randomYaw: 1
+  - prefab: {fileID: 57745194578040785, guid: 5384e39ea2c999546a9f2a17013df603, type: 3}
+    weight: 1
+    scale: {x: 0.5, y: 0.9}
+    alignToSlope: 0.6
+    sink: 0.15
+    randomYaw: 1
+  - prefab: {fileID: 3291966478110141713, guid: 853e092de1ad97c4fb001468c8f3e077, type: 3}
+    weight: 1
+    scale: {x: 0.5, y: 0.9}
+    alignToSlope: 0.6
+    sink: 0.15
+    randomYaw: 1
+  - prefab: {fileID: 160188614382290671, guid: 6699727a69f9bef4883d6d15f0b2da37, type: 3}
+    weight: 1
+    scale: {x: 0.5, y: 0.9}
+    alignToSlope: 0.6
+    sink: 0.15
+    randomYaw: 1
+  - prefab: {fileID: 7810725117079759313, guid: 75f39e11fceba884d824fd4b239861a6, type: 3}
+    weight: 0.6
+    scale: {x: 0.6, y: 1}
+    alignToSlope: 0.6
+    sink: 0.15
+    randomYaw: 1
+  spacing: 4

@@ -1,0 +1,128 @@
+{
+  "version": 1,
+  "shader": "Safe Haven/Layered Lit",
+  "layers": [
+    "Moss"
+  ],
+  "properties": [
+    {
+      "name": "_BaseMap",
+      "type": "texture",
+      "texture": "root_cluster_01_Color.jpg"
+    },
+    {
+      "name": "_BumpMap",
+      "type": "texture",
+      "texture": "root_cluster_01_Normal.jpg"
+    },
+    {
+      "name": "_ORMMap",
+      "type": "texture",
+      "texture": "root_cluster_01_ORM_2k.jpg"
+    },
+    {
+      "name": "_ORMMAP",
+      "type": "keyword",
+      "value": [
+        1.0
+      ]
+    },
+    {
+      "name": "_Roughness",
+      "type": "float",
+      "value": [
+        1.0
+      ]
+    },
+    {
+      "name": "_OcclusionStrength",
+      "type": "float",
+      "value": [
+        1.0
+      ]
+    },
+    {
+      "name": "_Metallic",
+      "type": "float",
+      "value": [
+        0.0
+      ]
+    },
+    {
+      "name": "_LayerTriplanar",
+      "type": "float",
+      "value": [
+        1.0
+      ]
+    },
+    {
+      "name": "_LAYERTRIPLANAR_ON",
+      "type": "keyword",
+      "value": [
+        1.0
+      ]
+    },
+    {
+      "name": "_L1Amount",
+      "type": "float",
+      "value": [
+        0.55
+      ]
+    },
+    {
+      "name": "_L1Source",
+      "type": "float",
+      "value": [
+        4.0
+      ]
+    },
+    {
+      "name": "_L1Upward",
+      "type": "float",
+      "value": [
+        1.0
+      ]
+    },
+    {
+      "name": "_L1Patchiness",
+      "type": "float",
+      "value": [
+        0.75
+      ]
+    },
+    {
+      "name": "_L1Tiling",
+      "type": "float",
+      "value": [
+        1.2
+      ]
+    },
+    {
+      "name": "_L1Color",
+      "type": "texture",
+      "texture": "Assets/_Project/Art/Generated/SurfaceLayers/moss/moss_Color.png"
+    },
+    {
+      "name": "_L1Normal",
+      "type": "texture",
+      "texture": "Assets/_Project/Art/Generated/SurfaceLayers/moss/moss_Normal.png"
+    },
+    {
+      "name": "_L1MetallicGloss",
+      "type": "texture",
+      "texture": "Assets/_Project/Art/Generated/SurfaceLayers/moss/moss_MetallicGloss.png"
+    },
+    {
+      "name": "_L1Height",
+      "type": "texture",
+      "texture": "Assets/_Project/Art/Generated/SurfaceLayers/moss/moss_Height.png"
+    },
+    {
+      "name": "_L1HeightChannel",
+      "type": "float",
+      "value": [
+        0.0
+      ]
+    }
+  ]
+}

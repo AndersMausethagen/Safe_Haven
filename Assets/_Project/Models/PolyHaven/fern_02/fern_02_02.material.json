@@ -1,0 +1,70 @@
+{
+  "version": 1,
+  "shader": "Safe Haven/Tree Wind",
+  "properties": [
+    {
+      "name": "_BaseMap",
+      "type": "texture",
+      "texture": "fern_02_Color.png"
+    },
+    {
+      "name": "_BumpMap",
+      "type": "texture",
+      "texture": "fern_02_Normal.jpg"
+    },
+    {
+      "name": "_ORMMap",
+      "type": "texture",
+      "texture": "fern_02_ORM_2k.jpg"
+    },
+    {
+      "name": "_AlphaClip",
+      "type": "float",
+      "value": [
+        1.0
+      ]
+    },
+    {
+      "name": "_ALPHATEST_ON",
+      "type": "keyword",
+      "value": [
+        1.0
+      ]
+    },
+    {
+      "name": "_Cutoff",
+      "type": "float",
+      "value": [
+        0.45
+      ]
+    },
+    {
+      "name": "_Cull",
+      "type": "float",
+      "value": [
+        0.0
+      ]
+    },
+    {
+      "name": "_Roughness",
+      "type": "float",
+      "value": [
+        1.0
+      ]
+    },
+    {
+      "name": "_WindStrength",
+      "type": "float",
+      "value": [
+        0.35
+      ]
+    },
+    {
+      "name": "_TreeHeight",
+      "type": "float",
+      "value": [
+        1.0
+      ]
+    }
+  ]
+}

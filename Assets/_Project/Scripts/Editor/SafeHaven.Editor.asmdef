@@ -2,6 +2,9 @@
     "name": "SafeHaven.Editor",
     "rootNamespace": "",
     "references": [
+        "Unity.Mathematics",
+        "Unity.Splines.Editor",
+        "Unity.Splines",
         "SafeHaven",
         "Unity.TextMeshPro",
         "Unity.TextMeshPro.Editor",
