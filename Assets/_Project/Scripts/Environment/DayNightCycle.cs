@@ -111,7 +111,7 @@ public sealed class DayNightCycle : MonoBehaviour
         sun.useColorTemperature = false;
         sun.color = Color.Lerp(state.LightColour, LightningColour, flash);
         sun.intensity = state.LightIntensity * (1f - 0.75f * sky.Clouds) + flash * 3f;
-        sun.shadowStrength = Mathf.Lerp(1f, 0.35f, sky.Clouds);
+        sun.shadowStrength = Mathf.Lerp(state.ShadowStrength, Mathf.Min(state.ShadowStrength, 0.35f), sky.Clouds);
         RenderSettings.sun = sun;
 
         // Clouds grey the ambient light a little; lightning lights everything up.

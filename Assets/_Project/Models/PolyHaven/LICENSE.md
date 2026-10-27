@@ -18,6 +18,8 @@ required. Sources: [Poly Haven](https://polyhaven.com) and [ambientCG](https://a
 | dead_tree_trunk, dead_tree_trunk_02 | Dead Branch, Rotting Log | https://polyhaven.com/a/dead_tree_trunk, https://polyhaven.com/a/dead_tree_trunk_02 |
 | root_cluster_01 | Root Tangle | https://polyhaven.com/a/root_cluster_01 |
 | fern_02 | Fern 1-4 | https://polyhaven.com/a/fern_02 |
+| fir_tree_01 | Norway Spruce A-C (baked to branch cards by bake_conifer.py) | https://polyhaven.com/a/fir_tree_01 |
+| pine_tree_01 | Scots Pine A-C (baked to branch cards by bake_conifer.py) | https://polyhaven.com/a/pine_tree_01 |
 
 ## Ground textures (`Art/Terrain/World`)
 
@@ -37,4 +39,8 @@ required. Sources: [Poly Haven](https://polyhaven.com) and [ambientCG](https://a
 bottom centre, LOD0 decimated to a budget plus LOD1 at 35 % and LOD2 at 12 %, a convex collider of at most 255
 triangles, and a material sidecar: Safe Haven/Layered Lit with moss on upward faces, or Tree Wind with alpha clip for
 ferns), `make_terrain_layers.py` builds the terrain layer maps (colour, OpenGL normal, mask: metallic, occlusion,
-height, smoothness). Safe Haven › World › Set Up World Assets makes the prefabs, layers and palettes from them.
+height, smoothness), `bake_conifer.py` (Blender) turns the scanned conifers into game trees: their needle cards are
+grouped into voxels, each group becomes one branch card laid in its own plane, the cards show a needle atlas rendered
+from the tree (unlit colour, ragged round edge, self-shadow, a normal map raised from the needles), the bark is welded,
+cleared of tiny twigs and decimated, LOD1/LOD2 use coarser groups, and wind weights go in the extra UV sets. Safe Haven ›
+World › Set Up World Assets makes the prefabs, layers and palettes from them.

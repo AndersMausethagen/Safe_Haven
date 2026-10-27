@@ -63,6 +63,9 @@ Labels below each segment give its name and start time. The two night segments j
   dusk keys near sunrise and sunset.
 - **Night brightness:** Moon Intensity and the night ends of the ambient gradients. Raise them if nights are too dark
   to play.
+- **Shadow readability:** the profile's **Shadow Fill** multiplies all the ambient light (the only light in shade;
+  1.35) and **Shadow Darkness** sets how dark the sun's and moon's shadows get in clear weather (0.8; clouds soften
+  them further). Raise Shadow Fill or lower Shadow Darkness if things in shade are hard to read.
 - **Golden hour:** the sun's colour near sunrise and sunset is a warm gold, not deep orange, because green grass under
   orange light turns muddy. **Lowest Light Angle** (12°) keeps the light from grazing flat ground while the sun is
   low. The light still fades out at sunrise and sunset.

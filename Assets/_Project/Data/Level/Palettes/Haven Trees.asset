@@ -25,16 +25,16 @@ MonoBehaviour:
     alignToSlope: 0.05
     sink: 0.05
     randomYaw: 1
-  - prefab: {fileID: 5505034768409955292, guid: 826eb366a51f8f84cb3b4dd5a40e7a31, type: 3}
+  - prefab: {fileID: 2408711775195427255, guid: 44f27b25762228b4fb447f248a34b0ed, type: 3}
     weight: 0.35
-    scale: {x: 0.9, y: 1.2}
-    alignToSlope: 0.1
-    sink: 0.05
+    scale: {x: 0.8, y: 1.05}
+    alignToSlope: 0.05
+    sink: 0.1
     randomYaw: 1
-  - prefab: {fileID: 342216150029137331, guid: 05d9be943be862447a1933d69a8e3cc7, type: 3}
-    weight: 0.2
-    scale: {x: 0.8, y: 1.1}
-    alignToSlope: 0.1
-    sink: 0.05
+  - prefab: {fileID: 8291259786857351406, guid: e2f94ad40f03362448b953ce3962e670, type: 3}
+    weight: 0.25
+    scale: {x: 0.7, y: 1}
+    alignToSlope: 0.05
+    sink: 0.1
     randomYaw: 1
   spacing: 6

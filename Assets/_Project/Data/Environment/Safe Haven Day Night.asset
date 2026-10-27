@@ -274,6 +274,8 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  shadowFill: 1.35
+  shadowDarkness: 0.8
   reflection:
     serializedVersion: 2
     m_Curve:

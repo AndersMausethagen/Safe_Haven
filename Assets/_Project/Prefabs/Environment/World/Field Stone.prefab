@@ -52,6 +52,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Field Stone
       objectReference: {fileID: 0}
+    - target: {fileID: 4742473837712756890, guid: ffc96803adaf0b546ad4a5029515f5ef, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

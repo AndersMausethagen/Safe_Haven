@@ -1,9 +1,11 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Unity.Mathematics;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.Splines;
 
 /// <summary>
@@ -87,9 +89,110 @@ public static class WorldDemo
         camera.farClipPlane = 600f;
         EditorSceneManager.SaveScene(scene, ScenePath);
         WorldBuilder.BuildChanged(true);
+        string gameplay = AddGameplay();
         EditorSceneManager.SaveScene(scene);
         AssetDatabase.SaveAssets();
-        return "demo built: " + WorldBuilder.LastReport;
+        return "demo built: " + WorldBuilder.LastReport + "\n" + gameplay;
+    }
+
+    // What a walk-through needs, copied from the Haven: the player and its camera, the HUD and windows, sun, sky,
+    // weather and the day cycle, wind and fog. Saving, music, the NavMesh and the Haven's own content stay behind,
+    // so playing the demo never writes into a real save.
+    private static readonly string[] GameplayRoots =
+    {
+        "Directional Light", "Global Volume", "Main Camera", "Player Cinemachine Camera", "PlayerArmature",
+        "GameStateManager", "Forest Wind", "UI Root", "Sky and Weather", "Atmosphere",
+    };
+
+    private const string GameplaySource = "Assets/_Project/Scenes/SafeHaven.unity";
+    private static readonly Vector2 PlayerStart = new Vector2(30f, 50f); // on the path, west of the ford
+
+    /// <summary>Makes the open demo playable: replaces its camera and light with the Haven's gameplay rig (duplicated
+    /// together, so the references between them hold) and stands the player on the path.</summary>
+    public static string AddGameplay()
+    {
+        Scene demo = EditorSceneManager.GetActiveScene();
+        if (demo.path != ScenePath)
+        {
+            return "open the World Builder demo first";
+        }
+
+        if (demo.GetRootGameObjects().Any(r => r.GetComponentInChildren<Player>(true) != null))
+        {
+            return "the demo already has a player";
+        }
+
+        Scene source = EditorSceneManager.OpenScene(GameplaySource, OpenSceneMode.Additive);
+        try
+        {
+            GameObject[] originals = source.GetRootGameObjects().Where(r => GameplayRoots.Contains(r.name)).ToArray();
+            if (originals.Length != GameplayRoots.Length)
+            {
+                return "missing in the Haven: " + string.Join(", ", GameplayRoots.Except(originals.Select(o => o.name)));
+            }
+
+            // Sky, ambient light and fog are scene settings, not objects: carry them over too.
+            EditorSceneManager.SetActiveScene(source);
+            Material skybox = RenderSettings.skybox;
+            var ambientMode = RenderSettings.ambientMode;
+            Color ambientSky = RenderSettings.ambientSkyColor, ambientEquator = RenderSettings.ambientEquatorColor, ambientGround = RenderSettings.ambientGroundColor;
+            float ambientIntensity = RenderSettings.ambientIntensity;
+            bool fog = RenderSettings.fog;
+            var fogMode = RenderSettings.fogMode;
+            Color fogColor = RenderSettings.fogColor;
+            float fogDensity = RenderSettings.fogDensity, fogStart = RenderSettings.fogStartDistance, fogEnd = RenderSettings.fogEndDistance;
+            string sunName = RenderSettings.sun != null ? RenderSettings.sun.name : null;
+            EditorSceneManager.SetActiveScene(demo);
+
+            Selection.objects = originals;
+            Unsupported.DuplicateGameObjectsUsingPasteboard();
+            GameObject[] copies = Selection.gameObjects;
+            foreach (GameObject old in demo.GetRootGameObjects().Where(r => r.GetComponent<Camera>() != null || r.GetComponent<Light>() != null))
+            {
+                Object.DestroyImmediate(old);
+            }
+
+            foreach (GameObject copy in copies)
+            {
+                copy.name = originals.First(o => copy.name.StartsWith(o.name)).name; // drop the " (1)" suffix
+                SceneManager.MoveGameObjectToScene(copy, demo);
+            }
+
+            RenderSettings.skybox = skybox;
+            RenderSettings.ambientMode = ambientMode;
+            RenderSettings.ambientSkyColor = ambientSky;
+            RenderSettings.ambientEquatorColor = ambientEquator;
+            RenderSettings.ambientGroundColor = ambientGround;
+            RenderSettings.ambientIntensity = ambientIntensity;
+            RenderSettings.fog = fog;
+            RenderSettings.fogMode = fogMode;
+            RenderSettings.fogColor = fogColor;
+            RenderSettings.fogDensity = fogDensity;
+            RenderSettings.fogStartDistance = fogStart;
+            RenderSettings.fogEndDistance = fogEnd;
+            GameObject sun = copies.FirstOrDefault(c => c.name == sunName);
+            RenderSettings.sun = sun != null ? sun.GetComponent<Light>() : null;
+
+            // Stand the player on the ground and bring its camera along.
+            GameObject player = copies.First(c => c.name == "PlayerArmature");
+            Vector3 start = new Vector3(PlayerStart.x, 0f, PlayerStart.y);
+            start.y = Terrain.activeTerrain.SampleHeight(start) + Terrain.activeTerrain.transform.position.y + 0.1f;
+            Vector3 offset = start - player.transform.position;
+            player.transform.position = start;
+            foreach (string follower in new[] { "Main Camera", "Player Cinemachine Camera" })
+            {
+                copies.First(c => c.name == follower).transform.position += offset;
+            }
+
+            Camera.main.farClipPlane = Mathf.Max(Camera.main.farClipPlane, 600f);
+            EditorSceneManager.MarkSceneDirty(demo);
+            return "gameplay added: " + string.Join(", ", copies.Select(c => c.name)) + $"; player at {start}";
+        }
+        finally
+        {
+            EditorSceneManager.CloseScene(source, true);
+            Selection.objects = new Object[0];
+        }
     }
 
     public static string Report()

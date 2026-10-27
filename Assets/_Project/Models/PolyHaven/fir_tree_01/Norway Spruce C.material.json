@@ -1,0 +1,797 @@
+{
+  "version": 1,
+  "shader": "Safe Haven/Layered Lit",
+  "materials": [
+    {
+      "match": "fir_tree_01_bark",
+      "shader": "Safe Haven/Layered Lit",
+      "layers": [
+        "Moss"
+      ],
+      "properties": [
+        {
+          "name": "_BaseMap",
+          "type": "texture",
+          "texture": "fir_tree_01_bark_Color.jpg"
+        },
+        {
+          "name": "_BumpMap",
+          "type": "texture",
+          "texture": "fir_tree_01_bark_Normal.jpg"
+        },
+        {
+          "name": "_ORMMap",
+          "type": "texture",
+          "texture": "fir_tree_01_bark_ORM_2k.jpg"
+        },
+        {
+          "name": "_ORMMAP",
+          "type": "keyword",
+          "value": [
+            1.0
+          ]
+        },
+        {
+          "name": "_Roughness",
+          "type": "float",
+          "value": [
+            1.0
+          ]
+        },
+        {
+          "name": "_OcclusionStrength",
+          "type": "float",
+          "value": [
+            1.0
+          ]
+        },
+        {
+          "name": "_Metallic",
+          "type": "float",
+          "value": [
+            0.0
+          ]
+        },
+        {
+          "name": "_LayerTriplanar",
+          "type": "float",
+          "value": [
+            1.0
+          ]
+        },
+        {
+          "name": "_LAYERTRIPLANAR_ON",
+          "type": "keyword",
+          "value": [
+            1.0
+          ]
+        },
+        {
+          "name": "_L1Amount",
+          "type": "float",
+          "value": [
+            0.0
+          ]
+        },
+        {
+          "name": "_L1Source",
+          "type": "float",
+          "value": [
+            4.0
+          ]
+        },
+        {
+          "name": "_L1Upward",
+          "type": "float",
+          "value": [
+            0.0
+          ]
+        },
+        {
+          "name": "_L1Patchiness",
+          "type": "float",
+          "value": [
+            0.75
+          ]
+        },
+        {
+          "name": "_L1PatchScale",
+          "type": "float",
+          "value": [
+            0.6
+          ]
+        },
+        {
+          "name": "_L1Tiling",
+          "type": "float",
+          "value": [
+            1.4
+          ]
+        },
+        {
+          "name": "_L1Color",
+          "type": "texture",
+          "texture": "Assets/_Project/Art/Generated/SurfaceLayers/moss/moss_Color.png"
+        },
+        {
+          "name": "_L1Normal",
+          "type": "texture",
+          "texture": "Assets/_Project/Art/Generated/SurfaceLayers/moss/moss_Normal.png"
+        },
+        {
+          "name": "_L1MetallicGloss",
+          "type": "texture",
+          "texture": "Assets/_Project/Art/Generated/SurfaceLayers/moss/moss_MetallicGloss.png"
+        },
+        {
+          "name": "_L1Height",
+          "type": "texture",
+          "texture": "Assets/_Project/Art/Generated/SurfaceLayers/moss/moss_Height.png"
+        },
+        {
+          "name": "_L1HeightChannel",
+          "type": "float",
+          "value": [
+            0.0
+          ]
+        },
+        {
+          "name": "_BaseMap_ST",
+          "type": "vector",
+          "value": [
+            1.2000000476837158,
+            0.09999993443489075,
+            0,
+            0.0
+          ]
+        }
+      ]
+    },
+    {
+      "match": "fir_tree_01_dead_branches",
+      "shader": "Safe Haven/Layered Lit",
+      "layers": [
+        "Moss"
+      ],
+      "properties": [
+        {
+          "name": "_BaseMap",
+          "type": "texture",
+          "texture": "fir_tree_01_bark_Color.jpg"
+        },
+        {
+          "name": "_BumpMap",
+          "type": "texture",
+          "texture": "fir_tree_01_bark_Normal.jpg"
+        },
+        {
+          "name": "_ORMMap",
+          "type": "texture",
+          "texture": "fir_tree_01_bark_ORM_2k.jpg"
+        },
+        {
+          "name": "_ORMMAP",
+          "type": "keyword",
+          "value": [
+            1.0
+          ]
+        },
+        {
+          "name": "_Roughness",
+          "type": "float",
+          "value": [
+            1.0
+          ]
+        },
+        {
+          "name": "_OcclusionStrength",
+          "type": "float",
+          "value": [
+            1.0
+          ]
+        },
+        {
+          "name": "_Metallic",
+          "type": "float",
+          "value": [
+            0.0
+          ]
+        },
+        {
+          "name": "_LayerTriplanar",
+          "type": "float",
+          "value": [
+            1.0
+          ]
+        },
+        {
+          "name": "_LAYERTRIPLANAR_ON",
+          "type": "keyword",
+          "value": [
+            1.0
+          ]
+        },
+        {
+          "name": "_L1Amount",
+          "type": "float",
+          "value": [
+            0.0
+          ]
+        },
+        {
+          "name": "_L1Source",
+          "type": "float",
+          "value": [
+            4.0
+          ]
+        },
+        {
+          "name": "_L1Upward",
+          "type": "float",
+          "value": [
+            0.0
+          ]
+        },
+        {
+          "name": "_L1Patchiness",
+          "type": "float",
+          "value": [
+            0.75
+          ]
+        },
+        {
+          "name": "_L1PatchScale",
+          "type": "float",
+          "value": [
+            0.6
+          ]
+        },
+        {
+          "name": "_L1Tiling",
+          "type": "float",
+          "value": [
+            1.4
+          ]
+        },
+        {
+          "name": "_L1Color",
+          "type": "texture",
+          "texture": "Assets/_Project/Art/Generated/SurfaceLayers/moss/moss_Color.png"
+        },
+        {
+          "name": "_L1Normal",
+          "type": "texture",
+          "texture": "Assets/_Project/Art/Generated/SurfaceLayers/moss/moss_Normal.png"
+        },
+        {
+          "name": "_L1MetallicGloss",
+          "type": "texture",
+          "texture": "Assets/_Project/Art/Generated/SurfaceLayers/moss/moss_MetallicGloss.png"
+        },
+        {
+          "name": "_L1Height",
+          "type": "texture",
+          "texture": "Assets/_Project/Art/Generated/SurfaceLayers/moss/moss_Height.png"
+        },
+        {
+          "name": "_L1HeightChannel",
+          "type": "float",
+          "value": [
+            0.0
+          ]
+        }
+      ]
+    },
+    {
+      "match": "fir_tree_01_trunk_a",
+      "shader": "Safe Haven/Layered Lit",
+      "layers": [
+        "Moss"
+      ],
+      "properties": [
+        {
+          "name": "_BaseMap",
+          "type": "texture",
+          "texture": "fir_tree_01_trunk_a_Color.jpg"
+        },
+        {
+          "name": "_BumpMap",
+          "type": "texture",
+          "texture": "fir_tree_01_trunk_a_Normal.jpg"
+        },
+        {
+          "name": "_ORMMap",
+          "type": "texture",
+          "texture": "fir_tree_01_trunk_a_ORM_2k.jpg"
+        },
+        {
+          "name": "_ORMMAP",
+          "type": "keyword",
+          "value": [
+            1.0
+          ]
+        },
+        {
+          "name": "_Roughness",
+          "type": "float",
+          "value": [
+            1.0
+          ]
+        },
+        {
+          "name": "_OcclusionStrength",
+          "type": "float",
+          "value": [
+            1.0
+          ]
+        },
+        {
+          "name": "_Metallic",
+          "type": "float",
+          "value": [
+            0.0
+          ]
+        },
+        {
+          "name": "_LayerTriplanar",
+          "type": "float",
+          "value": [
+            1.0
+          ]
+        },
+        {
+          "name": "_LAYERTRIPLANAR_ON",
+          "type": "keyword",
+          "value": [
+            1.0
+          ]
+        },
+        {
+          "name": "_L1Amount",
+          "type": "float",
+          "value": [
+            0.0
+          ]
+        },
+        {
+          "name": "_L1Source",
+          "type": "float",
+          "value": [
+            4.0
+          ]
+        },
+        {
+          "name": "_L1Upward",
+          "type": "float",
+          "value": [
+            0.0
+          ]
+        },
+        {
+          "name": "_L1Patchiness",
+          "type": "float",
+          "value": [
+            0.75
+          ]
+        },
+        {
+          "name": "_L1PatchScale",
+          "type": "float",
+          "value": [
+            0.6
+          ]
+        },
+        {
+          "name": "_L1Tiling",
+          "type": "float",
+          "value": [
+            1.4
+          ]
+        },
+        {
+          "name": "_L1Color",
+          "type": "texture",
+          "texture": "Assets/_Project/Art/Generated/SurfaceLayers/moss/moss_Color.png"
+        },
+        {
+          "name": "_L1Normal",
+          "type": "texture",
+          "texture": "Assets/_Project/Art/Generated/SurfaceLayers/moss/moss_Normal.png"
+        },
+        {
+          "name": "_L1MetallicGloss",
+          "type": "texture",
+          "texture": "Assets/_Project/Art/Generated/SurfaceLayers/moss/moss_MetallicGloss.png"
+        },
+        {
+          "name": "_L1Height",
+          "type": "texture",
+          "texture": "Assets/_Project/Art/Generated/SurfaceLayers/moss/moss_Height.png"
+        },
+        {
+          "name": "_L1HeightChannel",
+          "type": "float",
+          "value": [
+            0.0
+          ]
+        }
+      ]
+    },
+    {
+      "match": "fir_tree_01_trunk_b",
+      "shader": "Safe Haven/Layered Lit",
+      "layers": [
+        "Moss"
+      ],
+      "properties": [
+        {
+          "name": "_BaseMap",
+          "type": "texture",
+          "texture": "fir_tree_01_trunk_b_Color.jpg"
+        },
+        {
+          "name": "_BumpMap",
+          "type": "texture",
+          "texture": "fir_tree_01_trunk_b_Normal.jpg"
+        },
+        {
+          "name": "_ORMMap",
+          "type": "texture",
+          "texture": "fir_tree_01_trunk_b_ORM_2k.jpg"
+        },
+        {
+          "name": "_ORMMAP",
+          "type": "keyword",
+          "value": [
+            1.0
+          ]
+        },
+        {
+          "name": "_Roughness",
+          "type": "float",
+          "value": [
+            1.0
+          ]
+        },
+        {
+          "name": "_OcclusionStrength",
+          "type": "float",
+          "value": [
+            1.0
+          ]
+        },
+        {
+          "name": "_Metallic",
+          "type": "float",
+          "value": [
+            0.0
+          ]
+        },
+        {
+          "name": "_LayerTriplanar",
+          "type": "float",
+          "value": [
+            1.0
+          ]
+        },
+        {
+          "name": "_LAYERTRIPLANAR_ON",
+          "type": "keyword",
+          "value": [
+            1.0
+          ]
+        },
+        {
+          "name": "_L1Amount",
+          "type": "float",
+          "value": [
+            0.0
+          ]
+        },
+        {
+          "name": "_L1Source",
+          "type": "float",
+          "value": [
+            4.0
+          ]
+        },
+        {
+          "name": "_L1Upward",
+          "type": "float",
+          "value": [
+            0.0
+          ]
+        },
+        {
+          "name": "_L1Patchiness",
+          "type": "float",
+          "value": [
+            0.75
+          ]
+        },
+        {
+          "name": "_L1PatchScale",
+          "type": "float",
+          "value": [
+            0.6
+          ]
+        },
+        {
+          "name": "_L1Tiling",
+          "type": "float",
+          "value": [
+            1.4
+          ]
+        },
+        {
+          "name": "_L1Color",
+          "type": "texture",
+          "texture": "Assets/_Project/Art/Generated/SurfaceLayers/moss/moss_Color.png"
+        },
+        {
+          "name": "_L1Normal",
+          "type": "texture",
+          "texture": "Assets/_Project/Art/Generated/SurfaceLayers/moss/moss_Normal.png"
+        },
+        {
+          "name": "_L1MetallicGloss",
+          "type": "texture",
+          "texture": "Assets/_Project/Art/Generated/SurfaceLayers/moss/moss_MetallicGloss.png"
+        },
+        {
+          "name": "_L1Height",
+          "type": "texture",
+          "texture": "Assets/_Project/Art/Generated/SurfaceLayers/moss/moss_Height.png"
+        },
+        {
+          "name": "_L1HeightChannel",
+          "type": "float",
+          "value": [
+            0.0
+          ]
+        }
+      ]
+    },
+    {
+      "match": "fir_tree_01_trunk_c",
+      "shader": "Safe Haven/Layered Lit",
+      "layers": [
+        "Moss"
+      ],
+      "properties": [
+        {
+          "name": "_BaseMap",
+          "type": "texture",
+          "texture": "fir_tree_01_trunk_c_Color.jpg"
+        },
+        {
+          "name": "_BumpMap",
+          "type": "texture",
+          "texture": "fir_tree_01_trunk_c_Normal.jpg"
+        },
+        {
+          "name": "_ORMMap",
+          "type": "texture",
+          "texture": "fir_tree_01_trunk_c_ORM_2k.jpg"
+        },
+        {
+          "name": "_ORMMAP",
+          "type": "keyword",
+          "value": [
+            1.0
+          ]
+        },
+        {
+          "name": "_Roughness",
+          "type": "float",
+          "value": [
+            1.0
+          ]
+        },
+        {
+          "name": "_OcclusionStrength",
+          "type": "float",
+          "value": [
+            1.0
+          ]
+        },
+        {
+          "name": "_Metallic",
+          "type": "float",
+          "value": [
+            0.0
+          ]
+        },
+        {
+          "name": "_LayerTriplanar",
+          "type": "float",
+          "value": [
+            1.0
+          ]
+        },
+        {
+          "name": "_LAYERTRIPLANAR_ON",
+          "type": "keyword",
+          "value": [
+            1.0
+          ]
+        },
+        {
+          "name": "_L1Amount",
+          "type": "float",
+          "value": [
+            0.0
+          ]
+        },
+        {
+          "name": "_L1Source",
+          "type": "float",
+          "value": [
+            4.0
+          ]
+        },
+        {
+          "name": "_L1Upward",
+          "type": "float",
+          "value": [
+            0.0
+          ]
+        },
+        {
+          "name": "_L1Patchiness",
+          "type": "float",
+          "value": [
+            0.75
+          ]
+        },
+        {
+          "name": "_L1PatchScale",
+          "type": "float",
+          "value": [
+            0.6
+          ]
+        },
+        {
+          "name": "_L1Tiling",
+          "type": "float",
+          "value": [
+            1.4
+          ]
+        },
+        {
+          "name": "_L1Color",
+          "type": "texture",
+          "texture": "Assets/_Project/Art/Generated/SurfaceLayers/moss/moss_Color.png"
+        },
+        {
+          "name": "_L1Normal",
+          "type": "texture",
+          "texture": "Assets/_Project/Art/Generated/SurfaceLayers/moss/moss_Normal.png"
+        },
+        {
+          "name": "_L1MetallicGloss",
+          "type": "texture",
+          "texture": "Assets/_Project/Art/Generated/SurfaceLayers/moss/moss_MetallicGloss.png"
+        },
+        {
+          "name": "_L1Height",
+          "type": "texture",
+          "texture": "Assets/_Project/Art/Generated/SurfaceLayers/moss/moss_Height.png"
+        },
+        {
+          "name": "_L1HeightChannel",
+          "type": "float",
+          "value": [
+            0.0
+          ]
+        },
+        {
+          "name": "_BaseMap_ST",
+          "type": "vector",
+          "value": [
+            1.399999976158142,
+            1.399999976158142,
+            0,
+            0.0
+          ]
+        }
+      ]
+    },
+    {
+      "match": "Norway Spruce Needles",
+      "shader": "Safe Haven/Tree Wind",
+      "properties": [
+        {
+          "name": "_BaseMap",
+          "type": "texture",
+          "texture": "Norway Spruce Needles_Color.png"
+        },
+        {
+          "name": "_BumpMap",
+          "type": "texture",
+          "texture": "Norway Spruce Needles_Normal.png"
+        },
+        {
+          "name": "_BaseColor",
+          "type": "color",
+          "value": [
+            0.62,
+            0.8,
+            0.74,
+            1.0
+          ]
+        },
+        {
+          "name": "_AlphaClip",
+          "type": "float",
+          "value": [
+            1.0
+          ]
+        },
+        {
+          "name": "_ALPHATEST_ON",
+          "type": "keyword",
+          "value": [
+            1.0
+          ]
+        },
+        {
+          "name": "_Cutoff",
+          "type": "float",
+          "value": [
+            0.4
+          ]
+        },
+        {
+          "name": "_Cull",
+          "type": "float",
+          "value": [
+            0.0
+          ]
+        },
+        {
+          "name": "_Roughness",
+          "type": "float",
+          "value": [
+            0.85
+          ]
+        },
+        {
+          "name": "_FastLeafLighting",
+          "type": "float",
+          "value": [
+            1.0
+          ]
+        },
+        {
+          "name": "_FAST_LEAF_LIGHTING",
+          "type": "keyword",
+          "value": [
+            1.0
+          ]
+        },
+        {
+          "name": "_Translucency",
+          "type": "float",
+          "value": [
+            0.45
+          ]
+        },
+        {
+          "name": "_WindStrength",
+          "type": "float",
+          "value": [
+            1.0
+          ]
+        },
+        {
+          "name": "_TreeHeight",
+          "type": "float",
+          "value": [
+            14.509159088134766
+          ]
+        }
+      ]
+    }
+  ]
+}

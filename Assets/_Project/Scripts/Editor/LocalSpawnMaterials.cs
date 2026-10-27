@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using GLTFast;
 using GLTFast.Logging;
@@ -39,6 +41,32 @@ public static class LocalSpawnMaterials
         public int version = 1;
         public string shader;
         [Tooltip("Names of Layered Lit's layers (Layer 1, Layer 2), stored as material tags for SurfaceLayerController.")]
+        public string[] layers = Array.Empty<string>();
+        public Property[] properties = Array.Empty<Property>();
+        [Tooltip("FBX / OBJ with several materials (a tree's bark and needles): per material, by a part of its name, " +
+                 "its own shader, layers and values instead of the ones above.")]
+        public MaterialSection[] materials = Array.Empty<MaterialSection>();
+
+        /// <summary>The settings for one of the model's materials: its section, or the sidecar itself.</summary>
+        public Sidecar For(string materialName)
+        {
+            foreach (MaterialSection section in materials ?? Array.Empty<MaterialSection>())
+            {
+                if (section != null && !string.IsNullOrEmpty(section.match) && materialName.Contains(section.match))
+                {
+                    return new Sidecar { version = version, shader = section.shader, layers = section.layers, properties = section.properties };
+                }
+            }
+
+            return this;
+        }
+    }
+
+    [Serializable]
+    public sealed class MaterialSection
+    {
+        public string match;
+        public string shader;
         public string[] layers = Array.Empty<string>();
         public Property[] properties = Array.Empty<Property>();
     }
@@ -355,7 +383,10 @@ public sealed class LocalSpawnModelImport : AssetPostprocessor
         if (sidecar != null)
         {
             context.DependsOnSourceAsset(LocalSpawnMaterials.SidecarPath(assetPath));
-            foreach (LocalSpawnMaterials.Property property in sidecar.properties ?? Array.Empty<LocalSpawnMaterials.Property>())
+            IEnumerable<LocalSpawnMaterials.Property> properties = (sidecar.properties ?? Array.Empty<LocalSpawnMaterials.Property>())
+                .Concat((sidecar.materials ?? Array.Empty<LocalSpawnMaterials.MaterialSection>())
+                        .SelectMany(m => m?.properties ?? Array.Empty<LocalSpawnMaterials.Property>()));
+            foreach (LocalSpawnMaterials.Property property in properties)
             {
                 string texture = property?.type == "texture"
                     ? LocalSpawnMaterials.ResolveTexture(assetPath, property.texture)
@@ -391,7 +422,7 @@ public sealed class LocalSpawnModelImport : AssetPostprocessor
             return;
         }
 
-        LocalSpawnMaterials.Sidecar sidecar = LocalSpawnMaterials.ReadSidecar(assetPath);
+        LocalSpawnMaterials.Sidecar sidecar = LocalSpawnMaterials.ReadSidecar(assetPath)?.For(material.name);
         string shaderName = string.IsNullOrEmpty(sidecar?.shader) ? null : sidecar.shader;
         Shader shader = shaderName != null ? Shader.Find(shaderName) : null;
         if (shader == null || shaderName == "Shader Graphs/glTF-pbrMetallicRoughness")
@@ -422,6 +453,13 @@ public sealed class LocalSpawnModelImport : AssetPostprocessor
             else if (stem.Contains("_ORM_") || stem.Contains("_MetallicRoughness"))
             {
                 mapImporter.sRGBTexture = false;
+            }
+            else if (stem.EndsWith("Needles_Color", StringComparison.Ordinal))
+            {
+                // Baked conifer needles (alpha-clipped cards): keep the needles' coverage in the smaller mipmaps, or
+                // distant trees thin out to nothing or blur into clumps.
+                mapImporter.mipMapsPreserveCoverage = true;
+                mapImporter.alphaTestReferenceValue = 0.4f;
             }
 
             return;

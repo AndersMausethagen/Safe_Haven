@@ -56,6 +56,13 @@ public sealed class DayNightProfile : ScriptableObject
     [Tooltip("Fog density (exponential squared) by hour: thicker as morning mist.")]
     [SerializeField] private AnimationCurve fogDensity = Hours((0f, 0.008f), (5f, 0.01f), (6.5f, 0.012f), (9f, 0.006f),
                                                                 (17f, 0.006f), (20f, 0.008f), (24f, 0.008f));
+    [Header("Shadows")]
+    [Tooltip("Multiplies the ambient light above, the only light that reaches shade: raise it when shadowed ground, " +
+             "trunks and creatures read too dark, lower it for gloomier shade. Night stays relatively darker.")]
+    [SerializeField, Range(0.5f, 2.5f)] private float shadowFill = 1.35f;
+    [Tooltip("How much the sun or moon's shadows darken in clear weather (1 = only ambient light in shade). Clouds " +
+             "soften them further.")]
+    [SerializeField, Range(0f, 1f)] private float shadowDarkness = 0.8f;
     [Tooltip("Sky reflection strength by hour (water and shiny surfaces stop reflecting a bright sky at night).")]
     [SerializeField] private AnimationCurve reflection = Hours((0f, 0.15f), (6f, 0.5f), (9f, 1f), (18f, 1f), (21f, 0.2f), (24f, 0.15f));
 
@@ -96,9 +103,10 @@ public sealed class DayNightProfile : ScriptableObject
         }
 
         float t = hour / 24f;
-        state.AmbientSky = ambientSky.Evaluate(t);
-        state.AmbientEquator = ambientEquator.Evaluate(t);
-        state.AmbientGround = ambientGround.Evaluate(t);
+        state.AmbientSky = Fill(ambientSky.Evaluate(t));
+        state.AmbientEquator = Fill(ambientEquator.Evaluate(t));
+        state.AmbientGround = Fill(ambientGround.Evaluate(t));
+        state.ShadowStrength = shadowDarkness;
         state.FogColour = fogColour.Evaluate(t);
         state.FogDensity = Mathf.Max(0f, fogDensity.Evaluate(hour));
         state.Reflection = Mathf.Clamp01(reflection.Evaluate(hour));
@@ -106,6 +114,8 @@ public sealed class DayNightProfile : ScriptableObject
         state.GoldenHour = Mathf.Clamp01(goldenHour.Evaluate(hour));
         return state;
     }
+
+    private Color Fill(Color ambient) => new Color(ambient.r * shadowFill, ambient.g * shadowFill, ambient.b * shadowFill, ambient.a);
 
     /// <summary>Fades a light in over its first 6° above the horizon.</summary>
     private static float Horizon(float elevation) => Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(elevation / 6f));
@@ -148,4 +158,6 @@ public struct DayNightState
     public float Daylight;
     public Color AmbientSky, AmbientEquator, AmbientGround, FogColour;
     public float FogDensity, Reflection, Night, GoldenHour;
+    /// <summary>The light's shadow strength in clear weather.</summary>
+    public float ShadowStrength;
 }

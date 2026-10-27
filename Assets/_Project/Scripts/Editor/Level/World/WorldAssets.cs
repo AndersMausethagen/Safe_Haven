@@ -17,7 +17,6 @@ public static class WorldAssets
     public const string PrefabFolder = "Assets/_Project/Prefabs/Environment/World";
     public const string LayerFolder = "Assets/_Project/Art/Terrain/World";
     private const string ModelFolder = LocalSpawnMaterials.DownloadedModelsRoot;
-    private const string Vegetation = "Assets/_Project/Data/Prologue/Vegetation/";
     private const string Oaks = "Assets/_Project/Models/Generated/Vegetation/";
 
     /// <summary>Prefab names for the downloaded models (by file name; numbered set pieces keep their number).</summary>
@@ -80,12 +79,60 @@ public static class WorldAssets
             var model = AssetDatabase.LoadAssetAtPath<GameObject>(modelPath);
             var instance = (GameObject)PrefabUtility.InstantiatePrefab(model);
             instance.name = name;
+            if (IsTree(instance))
+            {
+                AddTrunkCollider(instance);
+            }
+
             PrefabUtility.SaveAsPrefabAsset(instance, PrefabPath(name));
             Object.DestroyImmediate(instance);
             made++;
         }
 
         return made;
+    }
+
+    /// <summary>A baked conifer (bake_conifer.py): its needles use Tree Wind.</summary>
+    public static bool IsTree(GameObject model) =>
+        model.GetComponentsInChildren<Renderer>().SelectMany(r => r.sharedMaterials)
+             .Any(m => m != null && m.name.Contains("Needles") && m.shader.name == "Safe Haven/Tree Wind");
+
+    /// <summary>A capsule round the trunk (the bark near the ground), so the player and monsters bump into it but walk
+    /// under the branches.</summary>
+    private static void AddTrunkCollider(GameObject tree)
+    {
+        MeshFilter lod0 = tree.GetComponentsInChildren<MeshFilter>().FirstOrDefault(f => f.name.EndsWith("_LOD0"));
+        if (lod0 == null || lod0.sharedMesh == null)
+        {
+            return;
+        }
+
+        Mesh mesh = lod0.sharedMesh;
+        Material[] materials = lod0.GetComponent<MeshRenderer>().sharedMaterials;
+        Vector3[] vertices = mesh.vertices;
+        float radius = 0f;
+        float height = mesh.bounds.max.y;
+        for (int sub = 0; sub < mesh.subMeshCount && sub < materials.Length; sub++)
+        {
+            if (materials[sub] != null && materials[sub].name.Contains("Needles"))
+            {
+                continue;
+            }
+
+            foreach (int index in mesh.GetIndices(sub))
+            {
+                Vector3 v = lod0.transform.localToWorldMatrix.MultiplyPoint3x4(vertices[index]);
+                if (v.y < 1.2f)
+                {
+                    radius = Mathf.Max(radius, new Vector2(v.x, v.z).magnitude);
+                }
+            }
+        }
+
+        var capsule = tree.AddComponent<CapsuleCollider>();
+        capsule.radius = Mathf.Clamp(radius * 0.8f, 0.12f, 0.8f);
+        capsule.height = Mathf.Max(height * 0.6f, capsule.radius * 2f);
+        capsule.center = new Vector3(0f, capsule.height * 0.5f, 0f);
     }
 
     public static string PrefabName(string file)
@@ -176,11 +223,6 @@ public static class WorldAssets
     public static int EnsurePalettes()
     {
         Directory.CreateDirectory(ScatterBrush.PaletteFolder);
-        GameObject spruceA = AssetDatabase.LoadAssetAtPath<GameObject>(Vegetation + "Spruce A Wind.prefab");
-        GameObject spruceB = AssetDatabase.LoadAssetAtPath<GameObject>(Vegetation + "Spruce B Wind.prefab");
-        GameObject spruceC = AssetDatabase.LoadAssetAtPath<GameObject>(Vegetation + "Spruce C Wind.prefab");
-        GameObject deadSpruce = AssetDatabase.LoadAssetAtPath<GameObject>(Vegetation + "Dead Spruce Wind.prefab");
-        GameObject pine = AssetDatabase.LoadAssetAtPath<GameObject>(Vegetation + "Pine Wind.prefab");
         GameObject oak = AssetDatabase.LoadAssetAtPath<GameObject>(Oaks + "rich_oak/rich_oak_Wind.prefab");
         GameObject greenOak = AssetDatabase.LoadAssetAtPath<GameObject>(Oaks + "rich_green_oak_tree_set_in_a_magical_lan/rich_green_oak_tree_set_in_a_magical_lan_Wind.prefab");
 
@@ -195,10 +237,12 @@ public static class WorldAssets
             Entry(Prefab("Grey Boulder"), 1f, 0.6f, 1.3f, 0.6f, 0.15f), Entry(Prefab("Lichen Boulder"), 0.8f, 0.7f, 1.4f, 0.6f, 0.15f),
             Entry(Prefab("Field Stone"), 1f, 0.6f, 1.5f, 0.7f, 0.1f),
         }.Concat(Numbered("Mossy Rock").Select(p => Entry(p, 0.3f, 0.5f, 1f, 0.7f, 0.1f))));
-        made += MakePalette("Dark Forest Trees", 3.2f, new[]
+        // The dark forest: tall Norway spruce with some Scots pine (baked from Poly Haven scans, see bake_conifer.py).
+        made += MakePalette("Dark Forest Trees", 4f, new[]
         {
-            Entry(spruceA, 1f, 0.85f, 1.3f, 0.1f, 0.05f), Entry(spruceB, 1f, 0.85f, 1.3f, 0.1f, 0.05f), Entry(spruceC, 1f, 0.85f, 1.3f, 0.1f, 0.05f),
-            Entry(deadSpruce, 0.45f, 0.8f, 1.2f, 0.1f, 0.05f), Entry(pine, 0.25f, 0.9f, 1.2f, 0.1f, 0.05f),
+            Entry(Prefab("Norway Spruce A"), 1f, 0.8f, 1.15f, 0.05f, 0.1f), Entry(Prefab("Norway Spruce B"), 1f, 0.85f, 1.2f, 0.05f, 0.1f),
+            Entry(Prefab("Norway Spruce C"), 0.8f, 0.85f, 1.2f, 0.05f, 0.1f), Entry(Prefab("Scots Pine A"), 0.35f, 0.85f, 1.1f, 0.05f, 0.1f),
+            Entry(Prefab("Scots Pine B"), 0.35f, 0.85f, 1.1f, 0.05f, 0.1f), Entry(Prefab("Scots Pine C"), 0.3f, 0.85f, 1.1f, 0.05f, 0.1f),
         });
         made += MakePalette("Forest Floor Debris", 3f, new[]
         {
@@ -210,7 +254,7 @@ public static class WorldAssets
         made += MakePalette("Haven Trees", 6f, new[]
         {
             Entry(oak, 1f, 0.85f, 1.2f, 0.05f, 0.05f), Entry(greenOak, 0.7f, 0.85f, 1.2f, 0.05f, 0.05f),
-            Entry(pine, 0.35f, 0.9f, 1.2f, 0.1f, 0.05f), Entry(spruceA, 0.2f, 0.8f, 1.1f, 0.1f, 0.05f),
+            Entry(Prefab("Scots Pine B"), 0.35f, 0.8f, 1.05f, 0.05f, 0.1f), Entry(Prefab("Norway Spruce C"), 0.25f, 0.7f, 1f, 0.05f, 0.1f),
         });
         made += MakePalette("Mossy Boulders", 4f, Numbered("Mossy Boulder").Select(p => Entry(p, 1f, 0.5f, 0.9f, 0.6f, 0.15f))
                                                    .Append(Entry(Prefab("Lichen Boulder"), 0.6f, 0.6f, 1f, 0.6f, 0.15f)));

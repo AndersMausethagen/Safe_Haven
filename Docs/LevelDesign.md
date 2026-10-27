@@ -124,6 +124,13 @@ All CC0 (free for any use, no credit needed; see `Models/PolyHaven/LICENSE.md`),
 - **Prefabs/Environment/World**: Rock Face A and B, Mountainside Crag, Lichen Boulder, Grey Boulder, Field Stone,
   Mossy Boulder 1-6, Mossy Rock 1-7, Old Stump A and B, Rotting Log, Dead Branch, Root Tangle, Fern 1-4. Rocks use
   Layered Lit with moss on their tops; ferns use Tree Wind (they sway).
+- **Trees**: Norway Spruce A-C and Scots Pine A-C, realistic Nordic conifers baked from Poly Haven scans by
+  `AgentScripts/PolyHaven/bake_conifer.py` (Blender): the scans' millions of needle cards become a few hundred
+  elongated branch-spray cards (pointing out from the trunk and drooping) showing a 2:1 needle atlas rendered from the
+  tree itself, tinted per species. The bark is kept as a decimated mesh (Layered Lit, moss layer present but off: the
+  generic moss painted the trunks green); the trunk has its own triangle budget so it survives decimation. Three LODs (the farther, the fewer and bigger the cards, and only the trunk and main limbs), branches
+  sway in the wind (Tree Wind, wind data in the second and third UV sets; the trunk stands still) and a capsule round the
+  trunk. The dark forest's *Dark Forest Trees* palette uses them; the Haven's *Haven Trees* mixes a few in with its oaks.
 - **Ground layers** (Art/Terrain/World): Pine Needle Floor, Mossy Forest Floor, Muddy Bank, Gravel and Cliff Rock for
   the dark raid forests; Meadow Grass, Lush Grass, Trodden Path and Damp Earth for the Haven.
 - **Palettes** (Data/Level/Palettes): River Stones, Riverbank, Cliff Rubble, Dark Forest Trees, Forest Floor Debris,
