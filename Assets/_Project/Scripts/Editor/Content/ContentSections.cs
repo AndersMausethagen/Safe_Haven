@@ -868,6 +868,8 @@ public sealed class WeaponSection : ContentSection
         "What the player can hold. A weapon sets the animation stance, its damage and its attacks: the combo chain the attack button " +
         "walks through when pressed in time, the heavy attack a held press performs, the counter after a parry or perfect dodge, and " +
         "how well it guards. Kind = Torch permits the off hand beside a one-handed weapon; Two Handed and Polearm need both hands. " +
+        "Kind = Bow (Bow stance, held in the left hand) draws and shoots instead of swinging: set the Bow header and a Shot Attack; " +
+        "its arrows (Arrows page) set the damage. " +
         "Create its Item and Recipe in the usual Items / Crafting pages. Held torch models retain their Light and LightFlicker. " +
         "Timings follow the animations (Safe Haven › Characters › Set Up Combat Animations).";
 
@@ -879,6 +881,21 @@ public sealed class WeaponSection : ContentSection
         var weapon = (WeaponDefinition)asset;
         if (weapon.Kind == WeaponKind.Torch && weapon.RequiresBothHands)
             problems.Add("A torch must use the One Handed stance to fit the off hand.");
+        if (weapon.IsBow)
+        {
+            if (weapon.ShotAttack == null)
+            {
+                problems.Add("No Shot Attack, so its arrows do no damage.");
+            }
+
+            if (weapon.Stance != WeaponStance.Bow)
+            {
+                problems.Add("A bow needs the Bow stance for its animations.");
+            }
+
+            return problems;
+        }
+
         if (weapon.BasicAttack == null && weapon.Combo.Count == 0)
         {
             problems.Add("No basic attack, so swinging it does no damage.");
@@ -898,6 +915,30 @@ public sealed class WeaponSection : ContentSection
             {
                 problems.Add($"{attack.DisplayName} has no Animation State, so it plays the stance's old attack animation out of step with its timing.");
             }
+        }
+
+        return problems;
+    }
+}
+
+public sealed class ArrowSection : ContentSection
+{
+    public override string Title => "Arrows";
+    public override string Noun => "Arrow";
+    public override string SidebarGroup => "Combat";
+    public override Type AssetType => typeof(ArrowDefinition);
+    public override string Folder => "Assets/_Project/Data/Combat/Arrows";
+    public override string Help =>
+        "What a bow shoots: the damage of a fully drawn hit, how it changes the bow's speed, how strongly it drops and the " +
+        "projectile that flies. Point an item's Arrow field here to make it ammunition (Items page); bows use the first " +
+        "arrows in the bag.";
+
+    public override List<string> FindProblems(Object asset, IList<Object> all)
+    {
+        List<string> problems = base.FindProblems(asset, all);
+        if (((ArrowDefinition)asset).Projectile == null)
+        {
+            problems.Add("No projectile, so it can't be shot.");
         }
 
         return problems;

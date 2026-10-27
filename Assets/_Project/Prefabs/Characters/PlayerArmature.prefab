@@ -2579,6 +2579,18 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 4416926081852918481, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
       insertIndex: -1
       addedObject: {fileID: 9148900643414580268}
+    - targetCorrespondingSourceObject: {fileID: 4416926081852918481, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5797044328345205871}
+    - targetCorrespondingSourceObject: {fileID: 4416926081852918481, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1143076731806142729}
+    - targetCorrespondingSourceObject: {fileID: 4416926081852918481, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 9188364912005250223}
+    - targetCorrespondingSourceObject: {fileID: 4416926081852918481, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8158091080614937131}
   m_SourcePrefab: {fileID: 100100000, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
 --- !u!1 &5943822763764690748 stripped
 GameObject:
@@ -3047,6 +3059,70 @@ MonoBehaviour:
   softness: 0.55
   margin: 1.6
   fadeSeconds: 0.25
+--- !u!114 &5797044328345205871
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5943822763764690748}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 962c456ba1a511840bd2f288aad30ebf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::PlayerArchery
+  viewCamera: {fileID: 0}
+  bowHeight: 1.45
+  bowForward: 0.35
+  aimRange: 45
+  aimAssistAngle: 5
+  aimAssistRadius: 1.5
+--- !u!114 &1143076731806142729
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5943822763764690748}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ed64ba8de9e20ce4c87a64b02228912a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::PlayerArcheryAnimation
+  animator: {fileID: 0}
+  loadClipSeconds: 0.83
+  releaseClipSeconds: 0.8
+  fadeSpeed: 6
+--- !u!114 &9188364912005250223
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5943822763764690748}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fff4b437e5801b848a33aa53af45d0ad, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::ArcheryTargetOutline
+  outlineMaterial: {fileID: 2100000, guid: a128e8d3ba4112240ab48de7f523053e, type: 2}
+  maskMaterial: {fileID: 2100000, guid: 255da0bc603577849b15a8df8e031fd8, type: 2}
+--- !u!114 &8158091080614937131
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5943822763764690748}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8214a91f5349b2d499c125ef4b9ff084, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::HeldBowView
+  stringMaterial: {fileID: 2100000, guid: d499e308f1441324e931cdf28ea84c10, type: 2}
+  stringWidth: 0.008
+  nockedArrow: {fileID: 396537742097517126, guid: 5b8271a67262cf843ba18abe5fb4c071, type: 3}
+  pullSpeed: 5
 --- !u!4 &6428716820787852678 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3893294197879345259, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}

@@ -1,13 +1,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum WeaponKind { Melee = 0, Torch = 1 }
+public enum WeaponKind { Melee = 0, Torch = 1, Bow = 2 }
 
 /// <summary>
 /// A weapon the player can hold. It sets the animation stance, how much damage it carries and its attacks: the combo
 /// chain of light swings the attack button walks through (pressed in time; see <see cref="ComboRules"/>), the heavy
 /// attack a held press performs, and how well it guards. The player's power and crit stats then scale the attack; the
 /// weapon itself only holds its own numbers.
+/// <para>
+/// A bow (Kind Bow) uses none of the swings: holding attack draws it (Draw Seconds to full), letting go looses an arrow
+/// from the bag, and the next one is nocked in Reload Seconds (see PlayerArchery). The arrow sets the damage
+/// (ArrowDefinition); the bow sets how fast it flies, how quickly it is drawn and reloaded, and how steady it is.
+/// </para>
 /// </summary>
 [CreateAssetMenu(fileName = "Weapon", menuName = "Safe Haven/Combat/Weapon")]
 public sealed class WeaponDefinition : ScriptableObject
@@ -33,6 +38,23 @@ public sealed class WeaponDefinition : ScriptableObject
     [Tooltip("Share of a blocked hit that still gets through with this weapon (a shield blocks better).")]
     [SerializeField, Range(0f, 1f)] private float guardLetThrough = 0.35f;
 
+    [Header("Bow")]
+    [Tooltip("Seconds from nocking to full draw. A shot loosed earlier flies slower, hits softer and strays more.")]
+    [SerializeField, Min(0.1f)] private float drawSeconds = 1f;
+    [Tooltip("Seconds to nock the next arrow after a shot.")]
+    [SerializeField, Min(0f)] private float reloadSeconds = 0.6f;
+    [Tooltip("How fast an arrow leaves the bow at full draw, in metres per second (the arrow can change it).")]
+    [SerializeField, Min(1f)] private float arrowSpeed = 32f;
+    [Tooltip("How far a fully drawn shot can stray from the aim, in degrees. Half-drawn shots stray up to three times more.")]
+    [SerializeField, Range(0f, 15f)] private float spread = 1.5f;
+    [Tooltip("Share of a full draw needed before letting go shoots; earlier, the arrow stays on the string.")]
+    [SerializeField, Range(0f, 1f)] private float minimumDraw = 0.25f;
+    [Tooltip("Movement speed while drawing, as a share of normal.")]
+    [SerializeField, Range(0f, 1f)] private float drawMoveSpeed = 0.55f;
+    [Tooltip("Damage type, power scaling, crit and poise of a shot. Its damage comes from the arrow.")]
+    [SerializeField] private AttackDefinition shotAttack;
+    [SerializeField] private SoundDefinition drawSound;
+
     [Header("Sound")]
     [SerializeField] private SoundDefinition swingSound;
     [SerializeField] private SoundDefinition hitSound;
@@ -40,7 +62,16 @@ public sealed class WeaponDefinition : ScriptableObject
     public string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;
     public WeaponStance Stance => stance;
     public WeaponKind Kind => kind;
-    public bool RequiresBothHands => stance == WeaponStance.TwoHanded || stance == WeaponStance.Polearm;
+    public bool IsBow => kind == WeaponKind.Bow;
+    public float DrawSeconds => Mathf.Max(0.1f, drawSeconds);
+    public float ReloadSeconds => Mathf.Max(0f, reloadSeconds);
+    public float ArrowSpeed => Mathf.Max(1f, arrowSpeed);
+    public float Spread => spread;
+    public float MinimumDraw => minimumDraw;
+    public float DrawMoveSpeed => drawMoveSpeed;
+    public AttackDefinition ShotAttack => shotAttack;
+    public SoundDefinition DrawSound => drawSound;
+    public bool RequiresBothHands => stance == WeaponStance.TwoHanded || stance == WeaponStance.Polearm || stance == WeaponStance.Bow;
     public bool CanUseOffHand => kind == WeaponKind.Torch && !RequiresBothHands;
     public float Damage => damage;
     public AttackDefinition BasicAttack => basicAttack;

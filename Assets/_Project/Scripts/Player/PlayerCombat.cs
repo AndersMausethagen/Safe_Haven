@@ -301,6 +301,11 @@ public sealed class PlayerCombat : MonoBehaviour
 
     private void OnAttackPressed()
     {
+        if (weapon != null && weapon.IsBow)
+        {
+            return; // PlayerArchery draws and shoots
+        }
+
         if (guard != null && guard.IsGuarding)
         {
             if (hasShield)
@@ -335,7 +340,7 @@ public sealed class PlayerCombat : MonoBehaviour
 
     private void OnAttackReleased()
     {
-        if (pressTime < 0f)
+        if (pressTime < 0f || weapon != null && weapon.IsBow)
         {
             return;
         }
@@ -684,6 +689,9 @@ public sealed class PlayerCombat : MonoBehaviour
             lastActivityTime = Time.time;
         }
     }
+
+    /// <summary>Enters (or stays in) GameState.Combat as if attacking, e.g. while drawing a bow.</summary>
+    public void KeepInCombat() => EnterCombat();
 
     private void EnterCombat()
     {

@@ -3,7 +3,8 @@ using UnityEngine;
 
 /// <summary>
 /// Shows what the player holds in the right hand: the equipped main-hand weapon, or, while gathering, the tool for the
-/// job from the tool belt (axe, pickaxe, sickle), then the weapon again. Models come from the item
+/// job from the tool belt (axe, pickaxe, sickle), then the weapon again. A bow is held in the left hand (the off-hand
+/// grip), as archers do; the right hand draws the string. Models come from the item
 /// (<see cref="ItemDefinition.HeldModel"/>, placed by its held pose) and sit in a grip under the hand bone; each is made
 /// once and reused. Held models are only visuals: their colliders, rigidbodies and scripts are removed.
 /// <para>Where it belongs: on the PlayerArmature prefab. The grip (relative to the hand bone) is fitted by
@@ -31,6 +32,9 @@ public sealed class HeldItemView : MonoBehaviour
 
     /// <summary>The item in the hand right now (null when empty-handed).</summary>
     public ItemDefinition Shown { get; private set; }
+
+    /// <summary>The model of <see cref="Shown"/> (null when there is none), e.g. for the bow's string.</summary>
+    public GameObject ShownModel => current;
 
     /// <summary>An item to hold instead of the equipped one (the grip tool's preview); null for normal play.</summary>
     public ItemDefinition Preview { get; set; }
@@ -101,6 +105,8 @@ public sealed class HeldItemView : MonoBehaviour
 
     private static bool IsTorch(ItemDefinition item) => item != null && item.IsWeapon && item.Weapon.Kind == WeaponKind.Torch;
 
+    private static bool IsBow(ItemDefinition item) => item != null && item.IsWeapon && item.Weapon.IsBow;
+
     private GameObject ModelFor(ItemDefinition item, Transform parent, Dictionary<ItemDefinition, GameObject> cache)
     {
         if (item == null || item.HeldModel == null || parent == null) return null;
@@ -158,7 +164,7 @@ public sealed class HeldItemView : MonoBehaviour
             return;
         }
 
-        current = ModelFor(item, grip, models);
+        current = ModelFor(item, IsBow(item) && offHandGrip != null ? offHandGrip : grip, models);
     }
 
     /// <summary>Forgets the models made so far (an item's held model or grip changed) and shows the hand again.</summary>

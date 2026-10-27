@@ -8,4 +8,6 @@ public enum WeaponStance
     OneHanded = 1,
     TwoHanded = 2,
     Polearm = 3,
+    /// <summary>Bow in the left hand; the "Bow" animator layer poses the upper body (see PlayerArcheryAnimation).</summary>
+    Bow = 4,
 }

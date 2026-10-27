@@ -35,6 +35,7 @@ public static partial class CombatAnimationSetup
         ConfigureImport();
         AddHeavyClip();
         BuildPlayerController();
+        Debug.Log(BuildBowLayer());
         BuildMonsterController();
         int attacks = BuildAttacksAndWeapons();
         EnsureSettings();

@@ -215,6 +215,7 @@ public sealed class ContentEditorWindow : EditorWindow, IContentEditorHost
             new ItemSection(),
             new RecipeSection(),
             new WeaponSection(),
+            new ArrowSection(),
             new AttackSection(),
             new CombatStatsSection(),
             new RaidSection(),

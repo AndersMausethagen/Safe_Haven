@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.Rendering;
 
 [DisallowMultipleComponent]
 [RequireComponent(typeof(PlayerInteractor))]
@@ -11,8 +10,7 @@ public sealed class PlayerInteractionOutline : MonoBehaviour
     [SerializeField] private Material maskMaterial;
     [SerializeField, Min(1f)] private float hoverDistance = 80f;
 
-    private readonly Dictionary<Interactable, List<(Renderer source, Renderer outline, Renderer mask)>> outlines =
-        new Dictionary<Interactable, List<(Renderer, Renderer, Renderer)>>();
+    private readonly Dictionary<Interactable, List<OutlineCopies.Entry>> outlines = new Dictionary<Interactable, List<OutlineCopies.Entry>>();
     private readonly RaycastHit[] hits = new RaycastHit[64];
     private readonly List<Interactable> removed = new List<Interactable>();
     private PlayerInteractor interactor;
@@ -44,7 +42,7 @@ public sealed class PlayerInteractionOutline : MonoBehaviour
                 {
                     if (!outlines.ContainsKey(target))
                     {
-                        outlines.Add(target, CreateOutlines(target));
+                        outlines.Add(target, CreateOutlines(target, outlineMaterial, maskMaterial));
                     }
                 }
             }
@@ -62,15 +60,7 @@ public sealed class PlayerInteractionOutline : MonoBehaviour
 
             bool show = visible && target.IsAvailable &&
                 (target == hovered || target.DistanceFrom(transform.position) <= target.Range);
-            foreach (var entry in pair.Value)
-            {
-                if (entry.outline != null)
-                {
-                    entry.outline.enabled = show && entry.source != null && entry.source.enabled
-                        && entry.source.gameObject.activeInHierarchy;
-                    if (entry.mask != null) entry.mask.enabled = entry.outline.enabled;
-                }
-            }
+            OutlineCopies.SetShown(pair.Value, show);
         }
         foreach (Interactable target in removed)
         {
@@ -110,80 +100,17 @@ public sealed class PlayerInteractionOutline : MonoBehaviour
         return hit != null ? hit.GetComponentInParent<Interactable>() : null;
     }
 
-    private List<(Renderer source, Renderer outline, Renderer mask)> CreateOutlines(Interactable target)
+    private static List<OutlineCopies.Entry> CreateOutlines(Interactable target, Material outline, Material mask)
     {
-        var result = new List<(Renderer, Renderer, Renderer)>();
-        foreach (Renderer source in target.GetComponentsInChildren<Renderer>(true))
-        {
-            if (source.GetComponentInParent<Interactable>() != target)
-            {
-                continue;
-            }
-            Mesh mesh;
-            if (source is SkinnedMeshRenderer skin)
-            {
-                mesh = skin.sharedMesh;
-            }
-            else if (source is MeshRenderer && source.TryGetComponent(out MeshFilter filter))
-            {
-                mesh = filter.sharedMesh;
-            }
-            else
-            {
-                continue;
-            }
-            if (mesh == null)
-            {
-                continue;
-            }
-
-            Renderer outline = CopyRenderer(source, mesh, outlineMaterial, "Interaction Outline");
-            Renderer mask = CopyRenderer(source, mesh, maskMaterial, "Interaction Mask");
-            result.Add((source, outline, mask));
-        }
-        return result;
-    }
-
-    // Mask the unexpanded mesh first, so even thin meshes touching the ground get a hollow, depth-tested contour.
-    private static Renderer CopyRenderer(Renderer source, Mesh mesh, Material material, string name)
-    {
-        var holder = new GameObject(name) { hideFlags = HideFlags.DontSave, layer = source.gameObject.layer };
-        holder.transform.SetParent(source.transform, false);
-        Renderer copy;
-        if (source is SkinnedMeshRenderer skinned)
-        {
-            var skin = holder.AddComponent<SkinnedMeshRenderer>();
-            skin.sharedMesh = mesh;
-            skin.bones = skinned.bones;
-            skin.rootBone = skinned.rootBone;
-            skin.localBounds = skinned.localBounds;
-            copy = skin;
-        }
-        else
-        {
-            holder.AddComponent<MeshFilter>().sharedMesh = mesh;
-            copy = holder.AddComponent<MeshRenderer>();
-        }
-        var materials = new Material[mesh.subMeshCount];
-        for (int i = 0; i < materials.Length; i++) materials[i] = material;
-        copy.sharedMaterials = materials;
-        copy.shadowCastingMode = ShadowCastingMode.Off;
-        copy.receiveShadows = false;
-        copy.lightProbeUsage = LightProbeUsage.Off;
-        copy.reflectionProbeUsage = ReflectionProbeUsage.Off;
-        copy.enabled = false;
-        return copy;
+        return OutlineCopies.Create(target.transform, outline, mask, "Interaction Outline", "Interaction Mask",
+            source => source.GetComponentInParent<Interactable>() == target);
     }
 
     private void OnDisable()
     {
         foreach (var pair in outlines)
         {
-            foreach (var entry in pair.Value)
-            {
-                if (entry.outline != null) entry.outline.enabled = false;
-                if (entry.mask != null) entry.mask.enabled = false;
-            }
+            OutlineCopies.SetShown(pair.Value, false);
         }
     }
 
@@ -191,15 +118,7 @@ public sealed class PlayerInteractionOutline : MonoBehaviour
     {
         foreach (var pair in outlines)
         {
-            foreach (var entry in pair.Value)
-            {
-                foreach (Renderer renderer in new[] { entry.outline, entry.mask })
-                {
-                    if (renderer == null) continue;
-                    if (Application.isPlaying) Destroy(renderer.gameObject);
-                    else DestroyImmediate(renderer.gameObject);
-                }
-            }
+            OutlineCopies.Destroy(pair.Value);
         }
         outlines.Clear();
     }

@@ -81,6 +81,8 @@ public sealed class ItemDefinition : ScriptableObject
     [Header("Weapon")]
     [Tooltip("Makes this item a weapon the player can equip (right-click in the bag). Empty for other items.")]
     [SerializeField] private WeaponDefinition weapon;
+    [Tooltip("Makes this item ammunition a bow shoots from the bag. Empty for other items.")]
+    [SerializeField] private ArrowDefinition arrow;
 
     [Header("Consumable")]
     [Tooltip("Health restored when the item is used (right-click in the inventory).")]
@@ -136,6 +138,8 @@ public sealed class ItemDefinition : ScriptableObject
     public bool IsTool => toolType != ToolType.None && toolTier > 0;
     public WeaponDefinition Weapon => weapon;
     public bool IsWeapon => weapon != null;
+    public ArrowDefinition Arrow => arrow;
+    public bool IsArrow => arrow != null;
     public float HealAmount => healAmount;
     public float HungerRestore => hungerRestore;
     public float ThirstRestore => thirstRestore;

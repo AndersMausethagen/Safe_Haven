@@ -16,6 +16,7 @@ by motion, sound and weight rather than on-screen text.
 | Space / south button | Dodge: a quickstep, a roll or a heavy shoulder charge, by how much gear you wear |
 | Using food or drink | Stop and eat: takes a moment, heals over time |
 | Left Ctrl / left bumper (hold) | Sneak: half speed, quiet, hard to see. A hit on a monster that hasn't noticed you is an ambush (+50%) |
+| Left mouse with a bow (hold, let go) | Draw while moving (slowed), let go to shoot. Let go too early and the arrow stays on the string |
 
 ## The rules
 
@@ -47,6 +48,28 @@ by motion, sound and weight rather than on-screen text.
 - **Poise and stagger.** Every hit wears down a monster's poise (heavy swings, finishers and counters the most); at
   zero it staggers: its attack is cancelled, it stands reeling and takes 20% more damage. Poise comes back after two
   seconds without being hit. Tough monsters have more (Content Editor › Monsters › Poise).
+
+## The bow
+
+A bow is held in the left hand and shoots arrows from the bag. It trades the melee chain for range and positioning.
+
+- **Draw and loose.** Hold attack to draw, let go to shoot. You keep moving while drawing, at about half speed, facing
+  the aim (drawing puts you in combat, so you strafe). A full draw takes the bow's **Draw Time**; after a shot the next
+  arrow is nocked in its **Reload Time**, and holding through the reload draws again at once.
+- **The draw matters.** A full draw flies at the bow's **Arrow Speed** and deals the arrow's whole damage. Letting go
+  early is weaker (at a quarter draw about 60% speed and 45% damage) and strays three times further. Before a quarter
+  draw nothing is shot. Holding a full draw for more than 2.5 s makes the arms shake and the aim wander.
+- **The arrow decides the damage.** The Crude Stone Arrow does 14 before the player's power and the target's armor; the
+  bow's Bow Shot attack sets the type, power scaling, crit and poise. Arrows fall on an arc: the bow aims high enough to
+  land on the target, so the arc only shows on long shots.
+- **The target in sight is outlined red.** The hostile monster nearest the cursor (within 1.5 m of its spot) or the
+  crosshair (within 5°), in the bow's line of sight and in range (45 m), glows red; that is where the arrow flies.
+  Without one, top-down arrows fly level at chest height toward the cursor.
+- **Arrows are spent.** Each shot uses one arrow from the bag. Arrows that miss stick in the ground or trees for a while,
+  and the strike is heard: a shot into the brush draws monsters to it, away from you. A dodge, a hit that staggers you,
+  eating or raising the guard puts the drawn arrow back.
+- **Crafting.** From the bag (By Hand): Crude Wooden Bow from 5 Sticks and 3 Nettle Fiber; 5 Crude Stone Arrows from 2
+  Sticks and 1 Small Rocks.
 
 ## Readable animation
 
@@ -90,9 +113,12 @@ avatar made after that), or every pose comes out rotated; Set Up Combat Animatio
 | Focus gains, how long it holds, eating time and heal-over-time | Combat technique (Focus, Eating and drinking) |
 | A skill's Focus cost | Content Editor › Skills › Focus Cost |
 | Gear weights for each dodge, and each dodge's distance, time, cost and speed | Systems Editor › Movement & Combat › Movement and dodge (Equipment load) |
+| A bow's draw time, reload time, arrow speed, spread, minimum draw, move speed while drawing and shot attack | Content Editor › Weapons (Bow) |
+| An arrow's damage, speed, drop, impact noise and what flies | `Data/Combat/Arrows` (Arrow) and the arrow item's Arrow field |
 
 **Animations** come from the Quaternius Universal Animation Libraries (CC0, `Assets/Quaternius`) and the Kevin
 Iglesias packs. **Safe Haven › Characters › Set Up Combat Animations** imports them, adds the combat states to the
 player's and monsters' animator controllers, and sets every built-in attack's Hit Delay and Recovery from its clip (it
 finds the contact by playing the clip on the player's rig and watching the weapon hand). Rerun it after changing an
-attack's Animation Speed. Effects are rebuilt with **Safe Haven › Combat › Build Combat Effects**.
+attack's Animation Speed. It also builds the **Bow** layer from Kevin Iglesias' *Human Archer Animations FREE* (Load,
+Hold, Release and a bow idle, upper body only). Effects are rebuilt with **Safe Haven › Combat › Build Combat Effects**.
