@@ -46,7 +46,8 @@ TEXTURES = os.path.join(os.path.dirname(SRC), "textures")
 LOD_CELL = (1.0, 1.8, 3.2)      # voxel size per LOD, times the LOD0 size
 LOD_TRUNK = (1.0, 0.4, 0.15)    # bark triangles per LOD, times the LOD0 budget
 TRUNK_SHARE, TRUNK_MIN = 0.2, 150  # the trunk's own share of the bark budget, and its floor
-LOD_TWIGS = (0.5, 1.5, 4.0)     # loose bark pieces smaller than this (metres) are dropped: hidden in the needles
+LOD_TWIGS = (1.2, 2.5, 5.0)     # loose bark pieces smaller than this (metres) are dropped: hidden in the needles
+BRANCH_MIN = 24                 # triangles each kept branch keeps at least, so it stays round instead of a flat shard
 os.makedirs(OUT, exist_ok=True)
 
 
@@ -342,9 +343,10 @@ def save_png(pixels, path):
 # ---------------------------------------------------------------------------------------------- building a LOD
 
 def drop_small_parts(bm, smallest):
-    """Deletes loose pieces whose size (bounding diagonal) is under <smallest> metres."""
+    """Deletes loose pieces whose size (bounding diagonal) is under <smallest> metres; returns how many are kept."""
     seen = set()
     doomed = []
+    kept = 0
     for start in bm.verts:
         if start.index in seen:
             continue
@@ -364,8 +366,11 @@ def drop_small_parts(bm, smallest):
         size = math.dist((min(xs), min(ys), min(zs)), (max(xs), max(ys), max(zs)))
         if size < smallest:
             doomed.extend(part)
+        else:
+            kept += 1
     import bmesh
     bmesh.ops.delete(bm, geom=doomed, context="VERTS")
+    return kept
 
 
 def bark_part(bark, keep, name, smallest):
@@ -389,13 +394,14 @@ def bark_part(bark, keep, name, smallest):
     bm.from_mesh(me)
     bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=1e-4)
     bm.verts.index_update()
-    drop_small_parts(bm, smallest)
+    pieces = drop_small_parts(bm, smallest)
     bm.to_mesh(me)
     bm.free()
     if not me.polygons:
         bpy.data.meshes.remove(me)
         return None
     obj = bpy.data.objects.new(name, me)
+    obj["pieces"] = pieces
     bpy.context.scene.collection.objects.link(obj)
     return obj
 
@@ -429,7 +435,9 @@ def bark_object(bark, ratio, name, smallest):
         parts.append(trunk)
     branches = bark_part(bark, ~is_trunk, name + "_branches", smallest)
     if branches:
-        decimate(branches, max(target, TRUNK_MIN))
+        # A shared budget spread over hundreds of limbs crushed each to a few triangles (black shards in the crown):
+        # every limb keeps enough to stay a tube.
+        decimate(branches, max(target, TRUNK_MIN, branches["pieces"] * BRANCH_MIN))
         parts.append(branches)
     return join(parts, name) if len(parts) > 1 else parts[0]
 

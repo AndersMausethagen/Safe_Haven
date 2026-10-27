@@ -199,6 +199,40 @@ MonoBehaviour:
   texture:
     m_OverrideState: 1
     m_Value: {fileID: 0}
+--- !u!114 &-5553646391895835277
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7fd608e032301834a981e04255f13a9d, type: 3}
+  m_Name: FogOfWar
+  m_EditorClassIdentifier: SafeHaven::FogOfWar
+  active: 1
+  unexplored:
+    m_OverrideState: 1
+    m_Value: 0
+  unexploredColor:
+    m_OverrideState: 1
+    m_Value: {r: 0.03, g: 0.035, b: 0.045, a: 1}
+  nightVeil:
+    m_OverrideState: 1
+    m_Value: 0
+  veilColor:
+    m_OverrideState: 1
+    m_Value: {r: 0.42, g: 0.45, b: 0.5, a: 1}
+  veilDesaturation:
+    m_OverrideState: 1
+    m_Value: 0.85
+  veilDarkening:
+    m_OverrideState: 1
+    m_Value: 0.45
+  veilHaze:
+    m_OverrideState: 1
+    m_Value: 0.05
 --- !u!114 &-5520245016509672950
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -468,6 +502,8 @@ MonoBehaviour:
   - {fileID: -6288072647309666549}
   - {fileID: 7518938298396184218}
   - {fileID: -1410297666881709256}
+  - {fileID: 5569797337508775128}
+  - {fileID: -5553646391895835277}
 --- !u!114 &853819529557874667
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -856,6 +892,76 @@ MonoBehaviour:
   intensity:
     m_OverrideState: 1
     m_Value: 0
+--- !u!114 &5569797337508775128
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bda7b6dadfed6bd4a959f7d91fcade74, type: 3}
+  m_Name: AtmosphericFog
+  m_EditorClassIdentifier: SafeHaven::AtmosphericFog
+  active: 1
+  density:
+    m_OverrideState: 1
+    m_Value: 0
+  baseHeight:
+    m_OverrideState: 1
+    m_Value: 0
+  followTerrain:
+    m_OverrideState: 1
+    m_Value: 0
+  heightFalloff:
+    m_OverrideState: 1
+    m_Value: 0.25
+  albedo:
+    m_OverrideState: 1
+    m_Value: {r: 0.85, g: 0.9, b: 0.95, a: 1}
+  ambient:
+    m_OverrideState: 1
+    m_Value: {r: 0.25, g: 0.28, b: 0.3, a: 1}
+  mainLight:
+    m_OverrideState: 1
+    m_Value: 1
+  anisotropy:
+    m_OverrideState: 1
+    m_Value: 0.45
+  localLights:
+    m_OverrideState: 1
+    m_Value: 1
+  noiseSize:
+    m_OverrideState: 1
+    m_Value: 14
+  noiseStrength:
+    m_OverrideState: 1
+    m_Value: 0.6
+  wind:
+    m_OverrideState: 1
+    m_Value: {x: 0.6, y: 0.05, z: 0.3}
+  bankSize:
+    m_OverrideState: 1
+    m_Value: 120
+  bankStrength:
+    m_OverrideState: 1
+    m_Value: 0
+  bankSpeed:
+    m_OverrideState: 1
+    m_Value: 0.5
+  weatherInfluence:
+    m_OverrideState: 1
+    m_Value: 0.5
+  clearing:
+    m_OverrideState: 1
+    m_Value: 0.5
+  maxDistance:
+    m_OverrideState: 1
+    m_Value: 90
+  steps:
+    m_OverrideState: 1
+    m_Value: 28
 --- !u!114 &6940869943325143175
 MonoBehaviour:
   m_ObjectHideFlags: 3

@@ -101,38 +101,84 @@ public static class WorldAssets
     /// under the branches.</summary>
     private static void AddTrunkCollider(GameObject tree)
     {
+        var capsule = tree.GetComponent<CapsuleCollider>();
+        if (capsule == null)
+        {
+            capsule = tree.AddComponent<CapsuleCollider>();
+        }
+
+        FitTrunkCollider(tree, capsule);
+    }
+
+    /// <summary>Fits the capsule to the trunk: its vertices 0.5-2 m above the trunk's foot (above the root flare), the
+    /// 75th percentile of their distance from the trunk's axis (a few bark ridges do not widen it). Only the trunk's
+    /// own material counts (not branches, dead twigs or needles).</summary>
+    public static bool FitTrunkCollider(GameObject tree, CapsuleCollider capsule)
+    {
         MeshFilter lod0 = tree.GetComponentsInChildren<MeshFilter>().FirstOrDefault(f => f.name.EndsWith("_LOD0"));
         if (lod0 == null || lod0.sharedMesh == null)
         {
-            return;
+            return false;
         }
 
         Mesh mesh = lod0.sharedMesh;
         Material[] materials = lod0.GetComponent<MeshRenderer>().sharedMaterials;
+        Matrix4x4 toTree = tree.transform.worldToLocalMatrix * lod0.transform.localToWorldMatrix;
         Vector3[] vertices = mesh.vertices;
-        float radius = 0f;
-        float height = mesh.bounds.max.y;
+        var trunk = new List<Vector3>();
         for (int sub = 0; sub < mesh.subMeshCount && sub < materials.Length; sub++)
         {
-            if (materials[sub] != null && materials[sub].name.Contains("Needles"))
+            if (materials[sub] != null && materials[sub].name.Contains("trunk"))
             {
-                continue;
-            }
-
-            foreach (int index in mesh.GetIndices(sub))
-            {
-                Vector3 v = lod0.transform.localToWorldMatrix.MultiplyPoint3x4(vertices[index]);
-                if (v.y < 1.2f)
-                {
-                    radius = Mathf.Max(radius, new Vector2(v.x, v.z).magnitude);
-                }
+                trunk.AddRange(mesh.GetIndices(sub).Distinct().Select(i => toTree.MultiplyPoint3x4(vertices[i])));
             }
         }
 
-        var capsule = tree.AddComponent<CapsuleCollider>();
-        capsule.radius = Mathf.Clamp(radius * 0.8f, 0.12f, 0.8f);
-        capsule.height = Mathf.Max(height * 0.6f, capsule.radius * 2f);
-        capsule.center = new Vector3(0f, capsule.height * 0.5f, 0f);
+        if (trunk.Count == 0)
+        {
+            return false;
+        }
+
+        float foot = trunk.Min(v => v.y);
+        List<Vector3> band = trunk.Where(v => v.y > foot + 0.5f && v.y < foot + 2f).ToList();
+        if (band.Count < 6)
+        {
+            band = trunk.Where(v => v.y < foot + 3f).ToList();
+        }
+
+        var axis = new Vector2(band.Average(v => v.x), band.Average(v => v.z));
+        float[] distances = band.Select(v => Vector2.Distance(new Vector2(v.x, v.z), axis)).OrderBy(d => d).ToArray();
+        float radius = distances[Mathf.Min(distances.Length - 1, (int)(distances.Length * 0.75f))];
+        capsule.radius = Mathf.Clamp(radius, 0.08f, 0.9f);
+        capsule.height = Mathf.Max(mesh.bounds.size.y * 0.6f, capsule.radius * 2f);
+        capsule.center = new Vector3(axis.x, foot + capsule.height * 0.5f, axis.y);
+        return true;
+    }
+
+    /// <summary>Refits the trunk capsules of the existing tree prefabs (after a rebake); returns how many changed.</summary>
+    public static int RefitTreeColliders()
+    {
+        int changed = 0;
+        foreach (string guid in AssetDatabase.FindAssets("t:Prefab", new[] { PrefabFolder }))
+        {
+            string path = AssetDatabase.GUIDToAssetPath(guid);
+            GameObject root = PrefabUtility.LoadPrefabContents(path);
+            try
+            {
+                if (IsTree(root))
+                {
+                    AddTrunkCollider(root);
+                    PrefabUtility.SaveAsPrefabAsset(root, path);
+                    changed++;
+                }
+            }
+            finally
+            {
+                PrefabUtility.UnloadPrefabContents(root);
+            }
+        }
+
+        return changed;
     }
 
     public static string PrefabName(string file)
