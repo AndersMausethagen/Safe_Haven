@@ -9,17 +9,17 @@ using UnityEngine.Rendering.Universal;
 /// <summary>
 /// Designer tools for the atmosphere (Docs/Atmosphere.md):
 /// <list type="bullet">
-/// <item>Safe Haven › Environment › Atmosphere › Set Up Open Scene: everything a new map needs (the renderer feature, an
+/// <item>Safe Haven › World › Sky and Weather › Fog › Set Up Open Scene: everything a new map needs (the renderer feature, an
 /// "Atmosphere" object with ExplorationMap and FogGround, a global volume whose profile has Atmospheric Fog and Fog of
 /// War). Safe to run again: it only adds what is missing and reports what it did.</item>
 /// <item>… › Apply Preset › …: a starting look for the fog (Morning Mist, Ground Blanket, Misty Woods, Marsh, Night Mist,
 /// Clear) on the selected Volume Profile, or else the open scene's base volume. Undoable.</item>
-/// <item>GameObject › Safe Haven › Fog Area: a pocket of extra fog, placed in the Scene view (under Map Content in a raid).</item>
+/// <item>GameObject › Safe Haven › World › Fog Area: a pocket of extra fog, placed in the Scene view (under Map Content in a raid).</item>
 /// </list>
 /// </summary>
 public static class AtmosphereSetup
 {
-    private const string Menu = "Safe Haven/Environment/Atmosphere/";
+    private const string Menu = "Safe Haven/World/Sky and Weather/Fog/";
     private const string Renderer = "Assets/_Project/Settings/Rendering/PC_Renderer.asset";
     private const string AtmosphereObject = "Atmosphere";
 
@@ -48,7 +48,7 @@ public static class AtmosphereSetup
     [MenuItem(Menu + "Apply Preset/Marsh", false, 24)] private static void PresetMarsh() => ApplyToTarget(Preset.Marsh);
     [MenuItem(Menu + "Apply Preset/Night Mist (for a night volume)", false, 25)] private static void PresetNight() => ApplyToTarget(Preset.NightMist);
 
-    [MenuItem("GameObject/Safe Haven/Fog Area", false, 30)]
+    [MenuItem("GameObject/Safe Haven/World/Fog Area", false, 30)]
     private static void CreateFogArea(MenuCommand command)
     {
         var area = new GameObject("Fog Area");
@@ -143,7 +143,7 @@ public static class AtmosphereSetup
             report.AppendLine("• No day/night rig: the night veil stays off here (Safe Haven › Environment › Weather adds one).");
         }
 
-        report.AppendLine("Fog areas: GameObject › Safe Haven › Fog Area. Looks: … › Atmosphere › Apply Preset. Save the scene to keep it.");
+        report.AppendLine("Fog areas: GameObject › Safe Haven › World › Fog Area. Looks: … › Atmosphere › Apply Preset. Save the scene to keep it.");
         EditorSceneManager.MarkSceneDirty(scene);
         return report.ToString();
     }

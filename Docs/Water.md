@@ -21,7 +21,7 @@ waterfalls:
 
 ## Use
 
-All menus are under **Safe Haven > Environment > Water**:
+All menus are under **Safe Haven > World > Water**:
 
 | Menu | Does |
 |---|---|

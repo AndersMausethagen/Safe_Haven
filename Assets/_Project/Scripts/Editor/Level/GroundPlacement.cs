@@ -4,17 +4,17 @@ using UnityEngine;
 
 /// <summary>Puts objects on the ground for the level design tools: finds the ground under a point (colliders, then
 /// terrain height), sets an object down by the bottom of its meshes rather than its pivot, and optionally tilts it with
-/// the slope. Menu: Safe Haven > Level > Drop Selection to Ground (End) / Drop and Align to Slope (Shift+End).</summary>
+/// the slope. Menu: Safe Haven > World > Place > Drop Selection to Ground (End) / Drop and Align to Slope (Shift+End).</summary>
 public static class GroundPlacement
 {
-    [MenuItem("Safe Haven/Level/Drop Selection to Ground _END")]
+    [MenuItem("Safe Haven/World/Place/Drop Selection to Ground _END")]
     private static void DropMenu() => DropSelection(false);
 
-    [MenuItem("Safe Haven/Level/Drop and Align to Slope #_END")]
+    [MenuItem("Safe Haven/World/Place/Drop and Align to Slope #_END")]
     private static void AlignMenu() => DropSelection(true);
 
-    [MenuItem("Safe Haven/Level/Drop Selection to Ground _END", true)]
-    [MenuItem("Safe Haven/Level/Drop and Align to Slope #_END", true)]
+    [MenuItem("Safe Haven/World/Place/Drop Selection to Ground _END", true)]
+    [MenuItem("Safe Haven/World/Place/Drop and Align to Slope #_END", true)]
     private static bool HasSelection() => Selection.transforms.Length > 0;
 
     private static void DropSelection(bool align)

@@ -331,7 +331,9 @@ public sealed class WorldTerrainEditor : Editor
         }
     }
 
-    private static void UseLook(WorldTerrain world, Terrain terrain, bool haven)
+    /// <summary>The world terrain material (rock on steep ground) and the matching paint rules: the dark raid forest's or
+    /// the light, green Haven's.</summary>
+    public static void UseLook(WorldTerrain world, Terrain terrain, bool haven)
     {
         WorldAssets.EnsureAll();
         Undo.RecordObjects(new Object[] { world, terrain }, "World Terrain Look");

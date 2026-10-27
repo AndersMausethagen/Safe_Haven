@@ -21,7 +21,7 @@ public sealed class SkyControllerWindow : EditorWindow
     private double lastRepaint;
     private List<WeatherDefinition> projectWeathers;
 
-    [MenuItem("Safe Haven/Environment/Sky Controller")]
+    [MenuItem("Safe Haven/World/Sky and Weather/Sky Controller")]
     public static void Open() => GetWindow<SkyControllerWindow>("Sky Controller");
 
     // Searching the project is slow (tens of ms), so the weather list is found once and again only when assets change.

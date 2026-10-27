@@ -18,7 +18,7 @@ public sealed class LevelIssue
 }
 
 /// <summary>
-/// Checks a level for the mistakes that are easy to make and hard to spot (Safe Haven > Level > Level Check, or
+/// Checks a level for the mistakes that are easy to make and hard to spot (Safe Haven > Scene > Level Check, or
 /// `unity command sh_level`): gameplay objects floating above or buried in the ground, out of the NavMesh's reach,
 /// under water, crowded on top of each other or off the terrain; duplicate or missing save ids; missing scripts; and
 /// leftover objects (empty terrains, stray primitives at the origin). Also counts what the level contains.
@@ -184,7 +184,7 @@ public sealed class LevelCheckWindow : EditorWindow
     private Vector2 scroll;
     private string filter = "All";
 
-    [MenuItem("Safe Haven/Level/Level Check")]
+    [MenuItem("Safe Haven/Scene/Level Check")]
     public static void Open() => GetWindow<LevelCheckWindow>("Level Check").Run();
 
     private void Run()

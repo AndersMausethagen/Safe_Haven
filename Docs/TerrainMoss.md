@@ -6,7 +6,7 @@ These are authored procedural materials, not photogrammetry; scanned textures or
 
 ## Try it
 
-Choose **Safe Haven > Environment > Open Moss Preview**. This opens a separate, saved demonstration scene with
+Choose **Safe Haven > Art Pipeline > Open Moss Preview**. This opens a separate, saved demonstration scene with
 a moss-covered clearing and a bare winding path. It is not a gameplay scene and is not added to Build Settings.
 Enter Play mode to see the wind, or select **Forest Wind** and enable **Preview wind in Scene view**.
 The upgraded preview contains moss-covered granite, a leaf-litter path, and four labelled material samples.
@@ -40,7 +40,7 @@ Each 1024-square texture set (**Moss**, **Soil**, **Stone**) has:
 | TerrainMask | R metallic (0), G occlusion, B height, A smoothness | Linear |
 
 All maps repeat and include mipmaps. Replace them with compatible art without changing gameplay code.
-Use **Safe Haven > Environment > Regenerate Forest Ground Textures** to recreate the original maps;
+Use **Safe Haven > Art Pipeline > Regenerate Forest Ground Textures** to recreate the original maps;
 it confirms before overwriting them. Their deterministic source is `ForestGroundTextures.cs`.
 **Create Amplify Forest Shaders** creates missing graphs without overwriting populated graphs or designer edits.
 **Upgrade Moss Preview Materials** upgrades the saved preview once; it refuses duplicate showcase roots.
@@ -69,7 +69,7 @@ Rebuild moss after repainting; rebake the scene's **NavMesh** if you sculpt the 
 ### Other terrains
 
 1. Select a Unity **Terrain** object.
-2. Choose **Safe Haven > Environment > Add Moss to Selected Terrain**.
+2. Choose **Safe Haven > World > Terrain > Add Moss to Selected Terrain**.
 3. In Terrain's **Paint Texture** tool, select **Forest Moss** and paint where moss belongs.
    Paint another layer over it to remove moss. Terrain alphamaps are blend weights, not image transparency.
 4. Select **Terrain Moss > Rebuild Moss** after painting or sculpting. This redistributes the tufts and refits

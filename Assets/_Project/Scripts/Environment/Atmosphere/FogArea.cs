@@ -4,7 +4,7 @@ using UnityEngine;
 /// <summary>
 /// A pocket of extra fog placed in the world: a misty hollow, a marsh, the breath of a waterfall. An upright ellipsoid
 /// (Radius wide, Height tall) whose fog fades out over its edge, seen from anywhere like the rest of the volumetric fog
-/// and drifting with it. Add one with GameObject › Safe Haven › Fog Area; in a raid, keep it under Map Content so it
+/// and drifting with it. Add one with GameObject › Safe Haven › World › Fog Area; in a raid, keep it under Map Content so it
 /// turns with the map. AtmosphereFeature draws the nearest few (MaxAreas) to the camera.
 /// </summary>
 [ExecuteAlways]

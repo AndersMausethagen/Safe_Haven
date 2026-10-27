@@ -76,7 +76,7 @@ public static class GrassSetup
         return Shape.Grass;
     }
 
-    [MenuItem("Safe Haven/Environment/Grass/Add Grass and Bushes to Selected Terrain")]
+    [MenuItem("Safe Haven/World/Grass and Plants/Add Grass and Bushes to Selected Terrain")]
     public static void AddToSelection()
     {
         Terrain[] terrains = Selection.GetFiltered<Terrain>(SelectionMode.Editable | SelectionMode.TopLevel);
@@ -101,11 +101,11 @@ public static class GrassSetup
                   $"Tune size, colour, wind and push on the materials in {Folder}.");
     }
 
-    [MenuItem("Safe Haven/Environment/Grass/Add Grass and Bushes to Selected Terrain", true)]
+    [MenuItem("Safe Haven/World/Grass and Plants/Add Grass and Bushes to Selected Terrain", true)]
     private static bool CanAdd() => Selection.GetFiltered<Terrain>(SelectionMode.Editable).Length > 0 ||
                                      Terrain.activeTerrain != null;
 
-    [MenuItem("Safe Haven/Environment/Grass/Rebake Ground Colours of Selected Terrain")]
+    [MenuItem("Safe Haven/World/Grass and Plants/Rebake Ground Colours of Selected Terrain")]
     private static void RebakeSelection()
     {
         foreach (Terrain terrain in Selection.GetFiltered<Terrain>(SelectionMode.Editable))
@@ -114,10 +114,10 @@ public static class GrassSetup
         }
     }
 
-    [MenuItem("Safe Haven/Environment/Grass/Fill Selected Terrain With Grass...")]
+    [MenuItem("Safe Haven/World/Grass and Plants/Fill Selected Terrain With Grass...")]
     private static void FillMenu() => ScriptableWizard.DisplayWizard<FillWizard>("Fill Terrain With Grass", "Fill");
 
-    [MenuItem("Safe Haven/Environment/Grass/Clear Grass Under Water")]
+    [MenuItem("Safe Haven/World/Grass and Plants/Clear Grass Under Water")]
     private static void ClearUnderWaterMenu()
     {
         int cleared = 0;
@@ -158,7 +158,7 @@ public static class GrassSetup
         }
     }
 
-    [MenuItem("Safe Haven/Environment/Grass/Make Selected Push Grass")]
+    [MenuItem("Safe Haven/World/Grass and Plants/Make Selected Push Grass")]
     private static void AddInteractorToSelection()
     {
         foreach (GameObject go in Selection.gameObjects)

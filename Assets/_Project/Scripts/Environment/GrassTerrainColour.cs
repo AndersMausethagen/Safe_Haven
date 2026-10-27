@@ -1,7 +1,7 @@
 using UnityEngine;
 
 /// <summary>Lets "Safe Haven/Grass" take the colour of the ground it grows on: a top-down colour map of this terrain
-/// (baked by Safe Haven › Environment › Grass, and again whenever the terrain's paint changes) goes to the grass shader
+/// (baked by Safe Haven › World › Grass and Plants, and again whenever the terrain's paint changes) goes to the grass shader
 /// as a global, with the terrain's position and size. One terrain's map is active at a time (the last enabled).
 /// How much each grass material follows it: the material's Take Ground Colour / Ground Colour at the Tips.</summary>
 [ExecuteAlways]

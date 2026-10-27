@@ -28,7 +28,7 @@ public static class WeatherSetup
         public GameObject RainPrefab;
     }
 
-    [MenuItem("Safe Haven/Environment/Weather/Add Day, Night and Weather to Scene")]
+    [MenuItem("Safe Haven/World/Sky and Weather/Add Day, Night and Weather to Scene")]
     private static void AddMenu()
     {
         GameObject rig = AddToScene(EnsureAssets());

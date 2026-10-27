@@ -10,7 +10,7 @@ public static class ForestGroundShaders
     public const string GroundPath = "Assets/_Project/Shaders/Forest Ground ASE.shader";
     public const string StonePath = "Assets/_Project/Shaders/Mossy Stone ASE.shader";
 
-    [MenuItem("Safe Haven/Environment/Create Amplify Forest Shaders")]
+    [MenuItem("Safe Haven/Art Pipeline/Create Amplify Forest Shaders")]
     public static void CreateMissing()
     {
         Build(GroundPath, "Safe Haven/Forest Ground ASE", false);

@@ -5,14 +5,14 @@ using Unity.AI.Navigation.Editor;
 using UnityEditor;
 using UnityEngine;
 
-/// <summary>Gentle relief for a flat terrain (Safe Haven > Environment > Terrain > Add Gentle Relief): soft rises and
+/// <summary>Gentle relief for a flat terrain (Safe Haven > World > Terrain > Add Gentle Relief): soft rises and
 /// dips (noise, a few tens of centimetres) so sunlight and shadow vary across the ground instead of lying flat. Only
 /// level ground changes: sculpted or carved areas (stream beds) keep their shape, and the ground stays level within a
 /// clearance of anything standing on it (buildings, rocks, trees, water), so nothing floats or sinks. Optionally keeps
 /// the Heart Tree's ward (where the player builds) level. Undoable; rebake the NavMesh afterwards.</summary>
 public static class TerrainRelief
 {
-    [MenuItem("Safe Haven/Environment/Terrain/Add Gentle Relief...")]
+    [MenuItem("Safe Haven/World/Terrain/Add Gentle Relief...")]
     private static void Menu() => ScriptableWizard.DisplayWizard<ReliefWizard>("Add Gentle Relief", "Add Relief");
 
     private sealed class ReliefWizard : ScriptableWizard

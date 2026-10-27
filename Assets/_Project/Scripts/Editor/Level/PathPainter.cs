@@ -4,7 +4,7 @@ using UnityEditor;
 using UnityEngine;
 
 /// <summary>
-/// Paints a path into the terrain (Safe Haven > Level > Path Painter): press Draw, click points along the way in the
+/// Paints a path into the terrain (Safe Haven > World > Terrain > Path Painter): press Draw, click points along the way in the
 /// Scene view (drag a point to move it, Backspace removes the last, Esc stops), pick the ground layer, width and soft
 /// edge, then Paint Path. The path follows a smooth curve through the points; the edge is ragged so it does not look
 /// ruled. It clears grass and plants along the middle and can smooth the ground under it. Undoable.
@@ -30,7 +30,7 @@ public sealed class PathPainter : EditorWindow
     private bool clearDetails = true;
     private float smooth;
 
-    [MenuItem("Safe Haven/Level/Path Painter")]
+    [MenuItem("Safe Haven/World/Terrain/Path Painter (paints once)")]
     public static void Open() => GetWindow<PathPainter>("Path Painter");
 
     private void OnDisable() => SetDrawing(false);

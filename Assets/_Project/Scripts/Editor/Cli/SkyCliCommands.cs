@@ -19,7 +19,7 @@ public static class SkyCliCommands
         var system = Object.FindFirstObjectByType<WeatherSystem>();
         if (cycle == null && system == null)
         {
-            return "This scene has no day/night cycle or weather (Safe Haven > Environment > Weather > Add Day, Night and Weather to Scene).";
+            return "This scene has no day/night cycle or weather (Safe Haven > World > Sky and Weather > Add Day, Night and Weather to Scene).";
         }
 
         if (system != null && !string.IsNullOrEmpty(weather))

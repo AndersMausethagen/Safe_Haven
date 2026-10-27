@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>What the Scatter Brush paints (Safe Haven > Level > Scatter Brush): weighted prefabs with their size range,
+/// <summary>What the Scatter Brush paints (Safe Haven > World > Place > Scatter Brush): weighted prefabs with their size range,
 /// how much they follow the slope and how deep they sit, plus the spacing between them. Defaults live in
 /// Data/Level/Palettes (forest trees, rocks and logs, wood and stone nodes, forage); make more with Create › Safe Haven ›
 /// Level › Scatter Palette.</summary>

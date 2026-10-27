@@ -226,7 +226,7 @@ public sealed class TerrainMossTests
     public void SavedPreview_ContainsMossAndBarePath()
     {
         TerrainData preview = AssetDatabase.LoadAssetAtPath<TerrainData>("Assets/_Project/Art/Moss/MossPreviewTerrain.asset");
-        Assert.IsNotNull(preview, "Create the preview with Safe Haven > Environment > Open Moss Preview.");
+        Assert.IsNotNull(preview, "Create the preview with Safe Haven > Art Pipeline > Open Moss Preview.");
         Assert.AreEqual(1f, preview.GetAlphamaps(10, 32, 1, 1)[0, 0, 1], 0.01f);
         Assert.AreEqual(0f, preview.GetAlphamaps(27, 32, 1, 1)[0, 0, 1], 0.01f);
     }

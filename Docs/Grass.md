@@ -12,7 +12,7 @@ Terrain details are culled per patch, so grass outside the camera's view is not 
 
 ## Use
 
-1. Select the terrain and run **Safe Haven > Environment > Grass > Fill Selected Terrain With Grass...**.
+1. Select the terrain and run **Safe Haven > World > Grass and Plants > Fill Selected Terrain With Grass...**.
    - It suggests how much Short Grass, Tall Grass and Bush grows on each ground layer, guessed from the layer's
      colour: green moss is dense, brown soil sparse, grey stone bare. Adjust the amounts and press Fill.
    - It replaces the three grass layers and leaves glowing plants and other details alone.

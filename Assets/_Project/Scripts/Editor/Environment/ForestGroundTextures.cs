@@ -8,7 +8,7 @@ public static class ForestGroundTextures
     public const string Root = "Assets/_Project/Art/Moss/Ground";
     public const int Resolution = 1024;
 
-    [MenuItem("Safe Haven/Environment/Regenerate Forest Ground Textures")]
+    [MenuItem("Safe Haven/Art Pipeline/Regenerate Forest Ground Textures")]
     private static void Regenerate()
     {
         if (EditorUtility.DisplayDialog("Regenerate ground textures",

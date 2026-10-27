@@ -15,7 +15,7 @@ shader, because the sway bends the whole tree and leaves would otherwise detach 
    - `<tree>/Materials/<Bark|Leaves|Vines>.mat` (Tree Wind, copied from the glTF materials);
    - a `<glb name>_Wind.prefab` variant next to each GLB.
    glTFast ignores material remaps, so **place the `_Wind` prefab**, not the GLB.
-2. If a GLB instance is already in a scene, select it and run **Safe Haven > Environment > Apply Tree Wind
+2. If a GLB instance is already in a scene, select it and run **Safe Haven > Art Pipeline > Apply Tree Wind
    Materials**. Running it on a GLB or folder in the Project window rebuilds that tree's materials and variants.
 3. Wind comes from the scene's **Forest Wind** (Moss Wind + Directional **WindZone**):
    - **WindZone arrow** sets the direction.

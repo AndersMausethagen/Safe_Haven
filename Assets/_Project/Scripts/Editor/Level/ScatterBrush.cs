@@ -6,7 +6,7 @@ using UnityEngine;
 using Object = UnityEngine.Object;
 
 /// <summary>
-/// Paints prefabs on the ground in the Scene view (Safe Haven > Level > Scatter Brush): pick a palette, press Paint,
+/// Paints prefabs on the ground in the Scene view (Safe Haven > World > Place > Scatter Brush): pick a palette, press Paint,
 /// then drag in the Scene view. Shift-drag erases what this palette painted, [ and ] resize the brush, Esc stops.
 /// Objects keep the palette's spacing, sit on the ground by the bottom of their meshes, get a random turn and size,
 /// and go under a "Level Scatter / &lt;palette&gt;" folder object; each stroke is one undo. Painted gameplay objects
@@ -28,7 +28,7 @@ public sealed class ScatterBrush : EditorWindow
     private List<ScatterPalette> palettes;
     private Vector2 scroll;
 
-    [MenuItem("Safe Haven/Level/Scatter Brush")]
+    [MenuItem("Safe Haven/World/Place/Scatter Brush")]
     public static void Open() => GetWindow<ScatterBrush>("Scatter Brush");
 
     /// <summary>Opens the brush painting only <paramref name="prefab"/> (a palette kept in memory, not saved).</summary>
@@ -317,7 +317,7 @@ public sealed class ScatterBrush : EditorWindow
 
     // ---------------------------------------------------------------- default palettes
 
-    [MenuItem("Safe Haven/Level/Create Default Scatter Palettes")]
+    [MenuItem("Safe Haven/World/Place/Create Default Scatter Palettes")]
     private static void CreateDefaultsMenu() => Debug.Log($"Level: {EnsureDefaultPalettes()} scatter palette(s) created in {PaletteFolder}.");
 
     /// <summary>Forest trees, rocks and logs, wood and stone nodes and forage, from the project's own prefabs. Existing

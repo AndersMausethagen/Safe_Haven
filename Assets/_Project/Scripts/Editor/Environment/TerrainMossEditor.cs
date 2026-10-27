@@ -28,7 +28,7 @@ public sealed class TerrainMossEditor : Editor
         {
             MossWind wind = Object.FindAnyObjectByType<MossWind>();
             if (wind != null) Selection.activeGameObject = wind.gameObject;
-            else EditorUtility.DisplayDialog("Moss wind", "Add a wind source using Safe Haven > Environment > Add Shared Moss Wind.", "OK");
+            else EditorUtility.DisplayDialog("Moss wind", "Add a wind source using Safe Haven > World > Sky and Weather > Add Shared Moss Wind.", "OK");
         }
     }
 }
@@ -63,7 +63,7 @@ public static class TerrainMossTools
     public const string PreviewPath = "Assets/_Project/Scenes/MossPreview.unity";
     private const string ShaderName = "Safe Haven/Terrain Moss";
 
-    [MenuItem("Safe Haven/Environment/Add Moss to Selected Terrain")]
+    [MenuItem("Safe Haven/World/Terrain/Add Moss to Selected Terrain")]
     public static void AddToSelectedTerrain()
     {
         Terrain terrain = Selection.activeGameObject != null ? Selection.activeGameObject.GetComponent<Terrain>() : null;
@@ -93,7 +93,7 @@ public static class TerrainMossTools
         Selection.activeGameObject = terrain.gameObject;
     }
 
-    [MenuItem("Safe Haven/Environment/Add Shared Moss Wind")]
+    [MenuItem("Safe Haven/World/Sky and Weather/Add Shared Moss Wind")]
     public static void AddWindToScene()
     {
         Selection.activeGameObject = AddWind(SceneManager.GetActiveScene()).gameObject;
@@ -115,7 +115,7 @@ public static class TerrainMossTools
         return Undo.AddComponent<MossWind>(source);
     }
 
-    [MenuItem("Safe Haven/Environment/Open Moss Preview")]
+    [MenuItem("Safe Haven/Art Pipeline/Open Moss Preview")]
     public static void OpenPreview()
     {
         if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;

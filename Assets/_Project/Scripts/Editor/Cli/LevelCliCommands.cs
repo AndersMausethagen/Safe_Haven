@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 
 /// <summary>
 /// The Level Check for the Unity CLI (`unity command sh_level`, `-- --fix true` to apply every fix it can), the
-/// command-line twin of Safe Haven > Level > Level Check.
+/// command-line twin of Safe Haven > Scene > Level Check.
 /// </summary>
 public static class LevelCliCommands
 {

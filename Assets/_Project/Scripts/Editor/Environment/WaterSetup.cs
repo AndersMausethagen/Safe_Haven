@@ -24,7 +24,7 @@ public static class WaterSetup
         public GameObject Splash, Plunge;
     }
 
-    [MenuItem("Safe Haven/Environment/Water/Create Pond")]
+    [MenuItem("Safe Haven/World/Water/Create Pond")]
     private static void CreatePondMenu()
     {
         Set set = EnsureAssets();
@@ -32,7 +32,7 @@ public static class WaterSetup
         LogPlayer(set);
     }
 
-    [MenuItem("Safe Haven/Environment/Water/Create River Section")]
+    [MenuItem("Safe Haven/World/Water/Create River Section")]
     private static void CreateRiverMenu()
     {
         Set set = EnsureAssets();
@@ -40,11 +40,11 @@ public static class WaterSetup
         LogPlayer(set);
     }
 
-    [MenuItem("Safe Haven/Environment/Water/Create Waterfall...")]
+    [MenuItem("Safe Haven/World/Water/Create Waterfall...")]
     private static void CreateWaterfallMenu() =>
         ScriptableWizard.DisplayWizard<WaterfallWizard>("Create Waterfall", "Create");
 
-    [MenuItem("Safe Haven/Environment/Water/Make Selected Still Water")]
+    [MenuItem("Safe Haven/World/Water/Make Selected Still Water")]
     private static void MakeStillMenu()
     {
         Set set = EnsureAssets();
@@ -52,7 +52,7 @@ public static class WaterSetup
         LogPlayer(set);
     }
 
-    [MenuItem("Safe Haven/Environment/Water/Make Selected Flowing Water")]
+    [MenuItem("Safe Haven/World/Water/Make Selected Flowing Water")]
     private static void MakeRiverMenu()
     {
         Set set = EnsureAssets();
@@ -61,8 +61,8 @@ public static class WaterSetup
         LogPlayer(set);
     }
 
-    [MenuItem("Safe Haven/Environment/Water/Make Selected Still Water", true)]
-    [MenuItem("Safe Haven/Environment/Water/Make Selected Flowing Water", true)]
+    [MenuItem("Safe Haven/World/Water/Make Selected Still Water", true)]
+    [MenuItem("Safe Haven/World/Water/Make Selected Flowing Water", true)]
     private static bool HasMeshSelection()
     {
         foreach (GameObject go in Selection.gameObjects)
@@ -76,7 +76,7 @@ public static class WaterSetup
         return false;
     }
 
-    [MenuItem("Safe Haven/Environment/Water/Make Selected Disturb Water")]
+    [MenuItem("Safe Haven/World/Water/Make Selected Disturb Water")]
     private static void AddInteractorMenu()
     {
         Set set = EnsureAssets();
@@ -89,7 +89,7 @@ public static class WaterSetup
         }
     }
 
-    [MenuItem("Safe Haven/Environment/Water/Carve Terrain Under Selected Water...")]
+    [MenuItem("Safe Haven/World/Water/Carve Terrain Under Selected Water...")]
     private static void CarveMenu() =>
         ScriptableWizard.DisplayWizard<CarveWizard>("Carve Terrain Under Water", "Carve");
 

@@ -1,9 +1,54 @@
 # Level design tools
 
-Tools for building the home world (and any hand-made scene) in the Scene view. All of them are under
-**Safe Haven › Level** and **Safe Haven › World**, all are undoable, and none add runtime code: what they place are
-ordinary prefab instances and terrain paint. Raid maps have their own painted workflow (the Map Painter on "Raid Map";
-see ARCHITECTURE "Raid maps").
+Tools for building the home world, raids and any hand-made scene in the Scene view. They are all in one window,
+**World Tools** (Safe Haven › World Tools, or the Scene view's **Safe Haven World** panel), and in the menus
+**Safe Haven › World** (place, terrain, water, grass and plants, sky and weather) and **Safe Haven › Scene** (make
+playable, Level Check). All are undoable, and none add runtime code: what they place are ordinary prefab instances and
+terrain paint. Raid maps have their own painted workflow (the Map Painter on "Raid Map"; see ARCHITECTURE "Raid maps").
+
+## World Tools
+
+| Tab | What is there |
+|---|---|
+| **Place** | Every level prefab as a picture, in groups (Rocks & Cliffs, Trees, Forest Floor, Resources, Buildings, Raid, Creatures, Other) with a search box. Click one, then click in the Scene view: a preview follows the mouse and sits on the ground (or on a rock); each click places one, with a new random turn and size. **R** turns the next one (Shift+R back), **[ ]** size, **Esc** or right-click stops. Or drag a picture into the Scene view. Placed objects go under "Level Props" (in a raid map, under its Map Content, so they turn with the map). Also the Scatter Brush and Drop to Ground |
+| **Terrain** | Sculpt & Paint (selects the terrain in view, whose Inspector has Unity's brushes), the Terrain Toolbox, Gentle Relief, the World Builder's rivers, paths, cliffs and forests, Build Now, the Dark Forest or Haven look, Auto-Paint, moss, Rebake NavMesh |
+| **Water & Plants** | Ponds, straight rivers, waterfalls, making a mesh water, carving a bed; grass and plants |
+| **Sky & Weather** | The Sky Controller, the day/night and weather rig, shared wind, fog set-up, fog presets and fog areas |
+| **Scene** | Make Playable (as Safe Haven or as a Raid) and what is missing |
+
+The **Safe Haven World** panel in the Scene view (shown by default; the Scene view's overlay menu hides or moves it) has
+Place…, Tools…, **Stick to ground**, Drop / Drop + Align, Sculpt, Build World and Check Scene, so the tools are at hand
+while you work.
+
+### Stick to ground
+
+While **Stick to ground** is on (the panel or the Place tab), prefab objects dragged into the Scene view from the Project
+window (or the Place tab), duplicated, or moved sideways with the Move tool settle on the ground under them: by the
+bottom of their meshes, sunk by **Sink**, tilted with the slope if **Align to slope** is on. The settling is part of the
+same undo step. Lifting or lowering an object by hand is left alone, as are cameras, lights, volumes, UI, terrains,
+whole maps and what the World Builder and Scatter Brush place themselves. The settings are yours (kept per user, not in
+the project).
+
+### Make a scene playable
+
+World Tools › Scene (or Safe Haven › Scene › Make Playable as Safe Haven / as Raid) turns any saved scene with ground
+into one you can press Play in:
+
+- It copies what every gameplay scene needs from the real scene of that kind (SafeHaven.unity or Raid_MistyWoods.unity),
+  so it is always the current setup: the player rig (player, cameras, HUD and windows, game state, sun, sky, weather and
+  fog, copied together so they stay connected, replacing the scene's own camera and sun), the NavMesh surface, save keys
+  and scene audio. A home also gets its wind, persistence, the raid portal and a wake-up point (Player Arrival Point
+  "HeartTree"); a raid gets its director (with a raid to test with), a Raid Layout with the Raid Generator (put spawn
+  groups under it) and an extraction point 30 m ahead (move it where it belongs).
+- It stands the player on the ground at the wake-up point or the middle of the Scene view, bakes the NavMesh and adds the
+  scene to Build Settings. One undo step; save the scene to keep it.
+- **What is missing** lists errors (it will not play), warnings (it will play badly) and notes, most with a button that
+  fixes them: no player, camera, game state or HUD, nothing to stand on, an unbaked NavMesh or a player off it, not in
+  Build Settings, two suns or audio listeners; for a raid no director, raid, generator, exit or spawn groups, or no raid
+  that uses the scene (**Make a Raid for This Scene** copies one and points it here); for a home no persistence,
+  wake-up point, portal or Heart Tree. It also counts what Level Check finds.
+
+A home scene saves into the save file like the real Haven does when you play it.
 
 ## World Builder (rivers, paths, cliffs, forests)
 
@@ -144,7 +189,7 @@ A demo: **Scenes/Demo/WorldBuilderDemo** (a river falling over a cliff, a ford, 
 
 ## Scatter Brush
 
-**Safe Haven › Level › Scatter Brush.** Pick a palette, press **Paint**, then click or drag over the ground.
+**Safe Haven › World › Place › Scatter Brush** (or World Tools › Place). Pick a palette, press **Paint**, then click or drag over the ground.
 
 | Input | Does |
 |---|---|
@@ -153,11 +198,11 @@ A demo: **Scenes/Demo/WorldBuilderDemo** (a river falling over a cliff, a ford, 
 | `[` / `]` | Smaller / larger brush |
 | Esc | Stops painting |
 
-- A **palette** (`ScatterPalette`, Create › Safe Haven › Level › Scatter Palette) is a list of prefabs with a weight,
+- A **palette** (`ScatterPalette`, Create › Safe Haven › World › Scatter Palette) is a list of prefabs with a weight,
   a random scale range, how much each tilts with the slope (0 upright, 1 fully), how deep it sinks into the ground and
   whether it turns randomly. Its **spacing** is the smallest distance between two painted objects, so painting over
   the same spot again only fills the gaps.
-- Defaults in `Data/Level/Palettes` (made by Safe Haven › Level › Create Default Scatter Palettes, kept if they exist):
+- Defaults in `Data/Level/Palettes` (made by Safe Haven › World › Place › Create Default Scatter Palettes, kept if they exist):
   **Forest Trees** (spruces, pine, the odd dead spruce, wind oak), **Rocks and Logs**, **Wood and Stone Nodes**
   (oak, grey stone, hardwood, granite) and **Forage** (berries, healing herb, flax, nettle).
 - Objects go under **Level Scatter › &lt;palette name&gt;** in the scene, so one palette's objects can be hidden,
@@ -170,7 +215,7 @@ A demo: **Scenes/Demo/WorldBuilderDemo** (a river falling over a cliff, a ford, 
 
 For paths you may want to move later, use a World Builder **Path** instead: this one paints once.
 
-**Safe Haven › Level › Path Painter.** Press **Draw**, click points along the path in the Scene view (drag a point to
+**Safe Haven › World › Terrain › Path Painter.** Press **Draw**, click points along the path in the Scene view (drag a point to
 move it, Backspace removes the last, Esc stops drawing), then **Paint Path**.
 
 - The path follows a smooth curve through the points. **Width** is the fully painted middle; **Soft edge** is how far
@@ -181,13 +226,13 @@ move it, Backspace removes the last, Esc stops drawing), then **Paint Path**.
 
 ## Drop to Ground
 
-**Safe Haven › Level › Drop Selection to Ground** (End) and **Drop and Align to Slope** (Shift+End) set the selected
+**Safe Haven › World › Place › Drop Selection to Ground** (End) and **Drop and Align to Slope** (Shift+End) set the selected
 objects on whatever is below them (colliders first, then the terrain) by the bottom of their meshes. The Content
 Editor's **Place in Scene** does the same.
 
 ## Level Check
 
-**Safe Haven › Level › Level Check** (or `unity command sh_level`, `-- --fix true` to apply every fix) lists what the
+**Safe Haven › Scene › Level Check** (or `unity command sh_level`, `-- --fix true` to apply every fix) lists what the
 open scene contains (resource nodes per kind, interactables, monsters, spawn groups, saveable objects, lights, water,
 scattered objects per palette) and what looks wrong:
 

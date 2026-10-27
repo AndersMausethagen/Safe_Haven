@@ -59,7 +59,7 @@ weather, gathers in fog areas (hollows, marshes) and makes monsters see less far
 
 ## For designers: fog on a new map in a few minutes
 
-1. **Open the scene** and run **Safe Haven › Environment › Atmosphere › Set Up Open Scene**. It adds what is missing
+1. **Open the scene** and run **Safe Haven › World › Sky and Weather › Fog › Set Up Open Scene**. It adds what is missing
    and tells you what it did: the renderer feature (once for the project), an "Atmosphere" object with the
    Exploration Map (saved at home, fresh every raid: it decides by the scene's name, `Raid_…` = raid) and Fog Ground,
    a global Volume with a profile beside the scene if there is none, and Atmospheric Fog + Fog of War overrides on it
@@ -67,10 +67,10 @@ weather, gathers in fog areas (hollows, marshes) and makes monsters see less far
 2. **Pick a look**: **… › Atmosphere › Apply Preset › …** on the selected Volume Profile (or else the scene's base
    volume): *Clear*, *Morning Mist* (thin, home), *Ground Blanket* (thick, low, follows the ground), *Misty Woods*,
    *Marsh* (dense, green, close clumps), *Night Mist* (for a night volume). Then fine-tune on the profile (below).
-3. **Add pockets of fog**: **GameObject › Safe Haven › Fog Area** drops one at the Scene view's centre, on the ground
+3. **Add pockets of fog**: **GameObject › Safe Haven › World › Fog Area** drops one at the Scene view's centre, on the ground
    (in a raid, under Map Content so it turns with the map). Move and size it; the gizmo shows its shape and soft edge.
    Good places: hollows, marshes, waterfalls, a cursed grove. Misty Woods has one, "Misty Hollow", as an example.
-4. **Night**: add the sky rig (Safe Haven › Environment › Weather › Add Day, Night and Weather to Scene) and put a
+4. **Night**: add the sky rig (Safe Haven › World › Sky and Weather › Add Day, Night and Weather to Scene) and put a
    *Night Mist* override on its night volume: the veil, darker mist and stronger fire glow come with it.
 5. **Check in Play mode** (the effect is drawn in the Game view only, so the Scene view stays clear for editing).
 
@@ -132,7 +132,7 @@ there ("Time of day: Night (23:30) +40% cache loot"), and kept for the raid (`Ra
 The raid scene's sky rig has a `RaidSky` that sets that hour and stops the clock. At night the veil and the darker
 night volume (`MistyWoods_Night`) come with the day/night cycle, and monsters see less far (**Sight At Night**, 75%,
 on top of fog); they hear as well as ever. Misty Woods and Troll Valley: Day 55%, Dusk 25% (+15% loot), Night 20%
-(+40% loot). A new raid scene gets the rig with Safe Haven › Environment › Weather › Add Day, Night and Weather to
+(+40% loot). A new raid scene gets the rig with Safe Haven › World › Sky and Weather › Add Day, Night and Weather to
 Scene, then a `RaidSky` on it.
 
 ## Tuning

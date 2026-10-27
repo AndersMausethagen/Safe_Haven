@@ -6,7 +6,7 @@ weather).
 
 ## Use
 
-1. Open the scene and run **Safe Haven > Environment > Weather > Add Day, Night and Weather to Scene**. It creates
+1. Open the scene and run **Safe Haven > World > Sky and Weather > Add Day, Night and Weather to Scene**. It creates
    the data assets if they are missing and adds a `Sky and Weather` object wired to the scene's directional light and
    Moss Wind. SafeHaven.unity already has one.
 2. Preview in the editor:
@@ -19,7 +19,7 @@ weather).
 
 ## Developer tools
 
-- **Safe Haven > Environment > Sky Controller** (window), in Play mode or as an edit-mode preview:
+- **Safe Haven > World > Sky and Weather > Sky Controller** (window), in Play mode or as an edit-mode preview:
   - drag the hour, or jump to dawn, morning, noon, golden hour, dusk or night;
   - run the clock ×1, ×10, ×60 or ×240, or pause it;
   - switch weather instantly or blended over a few seconds;
