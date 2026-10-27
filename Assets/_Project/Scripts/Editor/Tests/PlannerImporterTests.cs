@@ -96,6 +96,57 @@ public sealed class PlannerImporterTests
     }
 
     [Test]
+    public void WeaponDamage_IsUpdated_ButNewWeaponsAreRejected()
+    {
+        var weapon = (WeaponDefinition)InMemory(typeof(WeaponDefinition), null);
+        weapon.name = "plannertest_axe";
+        var data = new UnityEditor.SerializedObject(weapon);
+        data.FindProperty("damage").floatValue = 10f;
+        data.ApplyModifiedPropertiesWithoutUndo();
+
+        var manifest = new PlannerManifest { version = 1 };
+        var edit = new PlannerEntity { kind = "weapon", key = "weapon:plannertest_axe", id = "plannertest_axe", typeName = "WeaponDefinition" };
+        edit.fields.Add(new PlannerField { name = "damage", ftype = "float", value = "18.0" });
+        manifest.entities.Add(edit);
+        var created = new PlannerEntity { kind = "weapon", key = "weapon:plannertest_new", id = "plannertest_new", isNew = true,
+            path = "Assets/_Project/Data/Combat/Weapons/PlannerTestNew.asset" };
+        manifest.entities.Add(created);
+
+        var plan = PlannerImporter.Plan(manifest, new Object[] { weapon });
+        Assert.AreEqual(PlannerPlanEntry.Kind.Changed, plan[0].State);
+        Assert.AreEqual("10", plan[0].Changes[0].Old);
+        Assert.AreEqual(PlannerPlanEntry.Kind.Error, plan[1].State, "the planner never creates weapons");
+        PlannerImporter.Apply(plan, InMemory);
+        Assert.AreEqual(18f, weapon.Damage);
+    }
+
+    [Test]
+    public void ArmorStats_AreWritten_AndThenUnchanged()
+    {
+        var manifest = new PlannerManifest { version = 1 };
+        var cap = Item("plannertest_cap", 1);
+        cap.fields.RemoveAll(f => f.name == "category");
+        cap.fields.Add(new PlannerField { name = "armorSlot", ftype = "enum", value = "1" });
+        var stats = new PlannerField { name = "statBonuses", ftype = "stats" };
+        stats.lines.Add(new PlannerLine { stat = (int)StatType.Armor, op = 0, value = 5f });
+        stats.lines.Add(new PlannerLine { stat = (int)StatType.MaxHealth, op = 1, value = 0.1f });
+        cap.fields.Add(stats);
+        manifest.entities.Add(cap);
+
+        var plan = PlannerImporter.Plan(manifest, new Object[0]);
+        Assert.AreEqual(PlannerPlanEntry.Kind.New, plan[0].State, string.Join("; ", plan[0].Errors));
+        PlannerImporter.Apply(plan, InMemory);
+        var item = (ItemDefinition)plan[0].Asset;
+        Assert.AreEqual(ArmorSlot.Head, item.ArmorSlot);
+        Assert.AreEqual(2, item.StatBonuses.Count);
+        Assert.AreEqual(StatType.Armor, item.StatBonuses[0].stat);
+        Assert.AreEqual(5f, item.StatBonuses[0].value);
+        Assert.AreEqual(StatModifierOp.Percent, item.StatBonuses[1].op);
+
+        Assert.AreEqual(PlannerPlanEntry.Kind.Unchanged, PlannerImporter.Plan(manifest, new Object[] { item })[0].State);
+    }
+
+    [Test]
     public void NewPathOutsideAssets_IsRejected()
     {
         var manifest = new PlannerManifest { version = 1 };

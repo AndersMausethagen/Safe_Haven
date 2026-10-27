@@ -43,7 +43,11 @@ public static class PlannerImporter
         { "building", typeof(BuildingDefinition) },
         { "recipe", typeof(RecipeDefinition) },
         { "node", typeof(GatheringNodeDefinition) },
+        { "weapon", typeof(WeaponDefinition) },
     };
+
+    // Kinds the planner edits but never creates: a new weapon needs attacks and animations from the Content Editor.
+    private static readonly HashSet<string> EditOnlyKinds = new HashSet<string> { "weapon" };
 
     public static PlannerManifest Parse(string json)
     {
@@ -84,6 +88,7 @@ public static class PlannerImporter
             case BuildingDefinition building: return "building:" + building.Id;
             case RecipeDefinition recipe: return "recipe:" + recipe.Id;
             case GatheringNodeDefinition node: return "node:" + node.Id;
+            case WeaponDefinition weapon: return "weapon:" + weapon.name;
             default: return null;
         }
     }
@@ -113,6 +118,10 @@ public static class PlannerImporter
             if (!KindTypes.ContainsKey(entity.kind))
             {
                 entry.Errors.Add("Unknown kind '" + entity.kind + "'.");
+            }
+            else if (entry.Asset == null && EditOnlyKinds.Contains(entity.kind))
+            {
+                entry.Errors.Add($"New {entity.kind}s are made in the Content Editor; the planner only edits existing ones.");
             }
             else if (entry.Asset == null && !IsValidNewPath(entity.path))
             {
@@ -262,7 +271,7 @@ public static class PlannerImporter
 
         foreach (PlannerLine line in field.lines)
         {
-            if (!willExist.Contains(line.target))
+            if (field.ftype != "stats" && !willExist.Contains(line.target))
             {
                 errors.Add($"{field.name} refers to {line.target}, which does not exist.");
             }
@@ -283,6 +292,7 @@ public static class PlannerImporter
             case "float": return Float(float.Parse(string.IsNullOrEmpty(f.value) ? "0" : f.value, CultureInfo.InvariantCulture));
             case "amounts": return Join(f.lines, l => $"{l.target}*{l.amount}");
             case "drops": return Join(f.lines, l => $"{l.target}*{l.min}-{l.max}@{Math.Round(l.prob, 3).ToString("0.###", CultureInfo.InvariantCulture)}");
+            case "stats": return Join(f.lines, l => $"{l.stat}:{l.op}:{Float(l.value)}");
             default: return (f.value ?? string.Empty).Trim();
         }
     }
@@ -328,6 +338,17 @@ public static class PlannerImporter
 
                 return string.Join(";", parts);
             }
+            case "stats":
+            {
+                var parts = new List<string>();
+                for (int i = 0; i < p.arraySize; i++)
+                {
+                    SerializedProperty e = p.GetArrayElementAtIndex(i);
+                    parts.Add($"{e.FindPropertyRelative("stat").intValue}:{e.FindPropertyRelative("op").intValue}:{Float(e.FindPropertyRelative("value").floatValue)}");
+                }
+
+                return string.Join(";", parts);
+            }
             case "drops":
             {
                 var parts = new List<string>();
@@ -369,6 +390,17 @@ public static class PlannerImporter
                     SerializedProperty e = p.GetArrayElementAtIndex(i);
                     (e.FindPropertyRelative("item") ?? e.FindPropertyRelative("resource")).objectReferenceValue = index[f.lines[i].target];
                     e.FindPropertyRelative("amount").intValue = f.lines[i].amount;
+                }
+
+                break;
+            case "stats":
+                p.arraySize = f.lines.Count;
+                for (int i = 0; i < f.lines.Count; i++)
+                {
+                    SerializedProperty e = p.GetArrayElementAtIndex(i);
+                    e.FindPropertyRelative("stat").intValue = f.lines[i].stat;
+                    e.FindPropertyRelative("op").intValue = f.lines[i].op;
+                    e.FindPropertyRelative("value").floatValue = f.lines[i].value;
                 }
 
                 break;

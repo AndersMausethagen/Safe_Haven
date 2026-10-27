@@ -34,7 +34,7 @@ public sealed class PlannerEntity
 public sealed class PlannerField
 {
     public string name;
-    /// <summary>int float bool string text enum ref amounts drops lookup.</summary>
+    /// <summary>int float bool string text enum ref amounts drops stats lookup.</summary>
     public string ftype;
     /// <summary>Written only when the asset is created.</summary>
     public bool createOnly;
@@ -50,4 +50,8 @@ public sealed class PlannerLine
     public int min;
     public int max;
     public float prob;
+    /// <summary>Stats lines (armor and jewelry): a StatType, a StatModifierOp and the value.</summary>
+    public int stat;
+    public int op;
+    public float value;
 }
