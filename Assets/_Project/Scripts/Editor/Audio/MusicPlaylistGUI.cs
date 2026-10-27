@@ -202,6 +202,7 @@ public sealed class SceneAudioEditor : Editor
 
         EditorGUILayout.Space(2f);
         EditorGUI.BeginChangeCheck();
+        EditorGUILayout.PropertyField(data.FindProperty("startSilent"));
         EditorGUILayout.PropertyField(data.FindProperty("combatMusic"));
         EditorGUILayout.PropertyField(data.FindProperty("finalStretchSeconds"));
         changed |= EditorGUI.EndChangeCheck();

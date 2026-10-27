@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 702d2e93d0a019a40b6339daf41e2c2f, type: 3}
+  m_Name: FindShelter
+  m_EditorClassIdentifier: SafeHaven::QuestDefinition
+  id: prologue.findshelter
+  displayName: Shelter from the Storm
+  description: Our expedition came to investigate rumours of a bewitched forest. Trolls and witches wander freely, and its creatures have become aggressive and unpredictable. First, find dry shelter along the old road.
+  chain: Prologue - The Unquiet Forest
+  prerequisites: []
+  start: 2
+  startEvent: {fileID: 11400000, guid: 8eb5d1eaca7f351419207cf31f6401cf, type: 2}
+  objectivesInOrder: 0
+  objectives:
+  - type: 6
+    description: Find the rock shelter along the old road
+    amount: 1
+    item: {fileID: 0}
+    resource: {fileID: 0}
+    monster: {fileID: 0}
+    building: {fileID: 0}
+    raid: {fileID: 0}
+    mustExtract: 0
+    withinMinutes: 0
+    questEvent: {fileID: 11400000, guid: 3e4af787a3ca3d241a28d20824384e0f, type: 2}
+    countAlreadyOwned: 0
+  turnInToGiver: 0
+  turnInTo: 
+  rewardItems: []
+  rewardResources: []
+  rewardRecipes: []
+  completionEvent: {fileID: 0}

@@ -22,6 +22,8 @@ public sealed class SceneAudio : MonoBehaviour
     [Header("Rules")]
     [Tooltip("Switch to combat music when the player fights. Turn off for menus and calm scenes.")]
     [SerializeField] private bool combatMusic = true;
+    [Tooltip("Silences music, including default/combat tracks, until a quest/event starts it. Ambience still plays.")]
+    [SerializeField] private bool startSilent;
     [Tooltip("The final stretch music starts when this many seconds of the raid are left.")]
     [SerializeField, Min(0f)] private float finalStretchSeconds = 60f;
 
@@ -31,4 +33,32 @@ public sealed class SceneAudio : MonoBehaviour
     public MusicPlaylist Ambience => ambience;
     public bool CombatMusic => combatMusic;
     public float FinalStretchSeconds => finalStretchSeconds;
+    private bool musicOverridden;
+    private MusicPlaylist eventMusic;
+    public bool MusicOverridden => musicOverridden || startSilent;
+    public MusicPlaylist EventMusic => eventMusic;
+
+    public void PlayEventMusic(MusicPlaylist playlist)
+    {
+        if (playlist == null || !playlist.HasTracks)
+        {
+            Debug.LogError("Event music needs a playlist with at least one audio clip.", this);
+            return;
+        }
+        musicOverridden = true;
+        eventMusic = playlist;
+    }
+
+    public void SilenceMusic()
+    {
+        musicOverridden = true;
+        eventMusic = null;
+    }
+
+    public void ResumeMusic()
+    {
+        startSilent = false;
+        musicOverridden = false;
+        eventMusic = null;
+    }
 }

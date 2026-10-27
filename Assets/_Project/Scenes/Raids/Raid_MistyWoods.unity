@@ -3290,6 +3290,14 @@ PrefabInstance:
       propertyPath: m_TextStyleHashCode
       value: -1183493901
       objectReference: {fileID: 0}
+    - target: {fileID: 8752267155051898545, guid: dc2783eabfee2ad48acedb8cc9c36064, type: 3}
+      propertyPath: m_fontColor32.rgba
+      value: 4283743725
+      objectReference: {fileID: 0}
+    - target: {fileID: 8752267155051898545, guid: dc2783eabfee2ad48acedb8cc9c36064, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
     - target: {fileID: 8918298119282045253, guid: dc2783eabfee2ad48acedb8cc9c36064, type: 3}
       propertyPath: m_fontColor32.rgba
       value: 4290633451

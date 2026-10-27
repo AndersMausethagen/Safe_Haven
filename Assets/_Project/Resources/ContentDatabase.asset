@@ -79,6 +79,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 5148bc82bfb79f94ca5482ed8e4ea69f, type: 2}
   - {fileID: 11400000, guid: 9f085f39a2da68c45b58d2db986835f4, type: 2}
   - {fileID: 11400000, guid: e8bb5d2fbded52b42a179a47cce32d53, type: 2}
+  - {fileID: 11400000, guid: 3ed1b8336d9f73749968dc70e483ba5d, type: 2}
+  - {fileID: 11400000, guid: 7e69e97c2a5edf149a174a57b97507dc, type: 2}
   resourceCatalog: {fileID: 11400000, guid: 82528be8462042341acfc62489e5c91f, type: 2}
   recipeBook: {fileID: 11400000, guid: cd7724124d8b393439143345d7f2b45f, type: 2}
   saveablePrefabs:
@@ -90,6 +92,7 @@ MonoBehaviour:
   - {fileID: 3468862131618844974, guid: 6e4b724e33048b246a0b54c712d80b6f, type: 3}
   - {fileID: 1128096445022021513, guid: bb37a42ef72f5274d807155e3d054529, type: 3}
   - {fileID: 4474678388156085877, guid: 2ed04a7f37f319e4ba101d693a7c82f5, type: 3}
+  - {fileID: 8084320429954264949, guid: adb5c66554122b44eba4e8706172e86b, type: 3}
   - {fileID: 3694057216285352694, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
   - {fileID: 7277722667243312615, guid: 262f869a4b8db6440b65cd5554060fce, type: 3}
   - {fileID: 7686612642358983904, guid: 072aecd2c58a7024bb867d70e6bc410d, type: 3}
@@ -121,6 +124,15 @@ MonoBehaviour:
   - {fileID: 8240163907587623572, guid: 9d024b95ef7f523459132197e6bb60ca, type: 3}
   - {fileID: 2963280910055392739, guid: 4449290ed476d304abffd54d77fd946d, type: 3}
   quests:
+  - {fileID: 11400000, guid: 5699d07d5ceee6144855cc88c1a5f255, type: 2}
+  - {fileID: 11400000, guid: b2306560eba5c594886d38a592bdb05d, type: 2}
+  - {fileID: 11400000, guid: 2f76858ea1c6b6043bdee39be76ef0b1, type: 2}
+  - {fileID: 11400000, guid: 0279feb93b7c8b74e9fd8683d9d10fd3, type: 2}
+  - {fileID: 11400000, guid: 4f625534621489e4183de610d93d4f36, type: 2}
+  - {fileID: 11400000, guid: a089752e48d75934fb5e34dbeec0b389, type: 2}
+  - {fileID: 11400000, guid: 2ba326763b19a9e46be36507850aed82, type: 2}
+  - {fileID: 11400000, guid: cd536373f8f639f4db60c8810e546ebf, type: 2}
+  - {fileID: 11400000, guid: 84d6a79cd30dba342ae6ae24a0109f98, type: 2}
   - {fileID: 11400000, guid: b95103f99c217d3489eb46bd97d706d8, type: 2}
   - {fileID: 11400000, guid: f7e615034e347bc438f7fdf1f08bd615, type: 2}
   - {fileID: 11400000, guid: 00e21ff059394a4459d8cec92bc2d489, type: 2}
@@ -136,6 +148,12 @@ MonoBehaviour:
   - {fileID: 11400000, guid: fea0201f13773f04a96efbcb5b364ea9, type: 2}
   - {fileID: 11400000, guid: 08ed06b5fb8d1854c86788aa2a00156f, type: 2}
   residents:
+  - {fileID: 11400000, guid: de521ad7beeb20b49878a9b40c96bced, type: 2}
+  - {fileID: 11400000, guid: 33e7204287863854f8c6ad025490f531, type: 2}
+  - {fileID: 11400000, guid: 8adfc30233928ec499c01587419eabaa, type: 2}
+  - {fileID: 11400000, guid: 4260d606f7c62c042b848adc806c44d3, type: 2}
+  - {fileID: 11400000, guid: b230d041259b863428e4e973c6ff0d86, type: 2}
+  - {fileID: 11400000, guid: df34e8e1df8ff0241a216bfddf9b631c, type: 2}
   - {fileID: 11400000, guid: 272895da9ba7e784b8a97bcd2be637c8, type: 2}
   jobs:
   - {fileID: 11400000, guid: f4c65068c1237a04b8a587a274672012, type: 2}

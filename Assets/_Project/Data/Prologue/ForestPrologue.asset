@@ -1,0 +1,116 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3cc8e143b95636a48905855f49fb9185, type: 3}
+  m_Name: ForestPrologue
+  m_EditorClassIdentifier: SafeHaven::PrologueDefinition
+  chapters:
+  - quest: {fileID: 11400000, guid: 0279feb93b7c8b74e9fd8683d9d10fd3, type: 2}
+    behaviour: 0
+    arrivalText: 'The villages sent us to investigate the rumours: trolls leaving their crags, witches walking the roads, even wolves attacking without warning. Something has bewitched these woods. We cannot find the cause in this storm. Keep your torch up and follow the old road. Find dry shelter; we will follow you.'
+    statusText: 
+    duration: 0
+    initialEnemies: 0
+    acceptText: I will find us shelter.
+  - quest: {fileID: 11400000, guid: 4f625534621489e4183de610d93d4f36, type: 2}
+    behaviour: 1
+    arrivalText: Dry stone overhead. Good work. We need warmth before anyone can think clearly. Gather four Sticks and six Small Rocks nearby; there is loose fuel on the forest floor.
+    statusText: 
+    duration: 0
+    initialEnemies: 0
+    acceptText: I will gather the supplies.
+  - quest: {fileID: 11400000, guid: 2ba326763b19a9e46be36507850aed82, type: 2}
+    behaviour: 2
+    arrivalText: That is enough. Let us put your building skills to use. Press G to open Build, choose Campfire and place it on open ground beside the shelter. The supplies you collected will pay for it.
+    statusText: Build a Campfire beside the shelter (G)
+    duration: 0
+    initialEnemies: 0
+    acceptText: I will build the campfire.
+  - quest: {fileID: 11400000, guid: b2306560eba5c594886d38a592bdb05d, type: 2}
+    behaviour: 3
+    arrivalText: A fire at last. Stay close for a moment and catch your breath. Speak with the others; each of them has seen something different in these woods.
+    statusText: 'A MOMENT OF WARMTH
+
+      Talk to your companions, or catch your breath.'
+    duration: 35
+    initialEnemies: 0
+    acceptText: Let us catch our breath.
+  - quest: {fileID: 11400000, guid: 2f76858ea1c6b6043bdee39be76ef0b1, type: 2}
+    behaviour: 4
+    arrivalText: 'Runa: Wolves! They are not hunting; something is driving them towards us. Protect the camp!'
+    statusText: 
+    duration: 0
+    initialEnemies: 2
+    acceptText: Defend the camp!
+  - quest: {fileID: 11400000, guid: cd536373f8f639f4db60c8810e546ebf, type: 2}
+    behaviour: 5
+    arrivalText: 'Sigrid: That rumble is not thunder. Something enormous is coming. Leave the fire! Follow the old road towards those stones!'
+    statusText: 'SOMETHING IS COMING
+
+      Follow the old road to the standing stones.'
+    duration: 0
+    initialEnemies: 0
+    acceptText: Run!
+  - quest: {fileID: 11400000, guid: 5699d07d5ceee6144855cc88c1a5f255, type: 2}
+    behaviour: 6
+    arrivalText: These markings are older than the road. Liv thinks they may be a way out. Touch the waystones and see if they still answer. We will hold the clearing.
+    statusText: 
+    duration: 0
+    initialEnemies: 0
+    acceptText: I will try the waystones.
+  - quest: {fileID: 11400000, guid: a089752e48d75934fb5e34dbeec0b389, type: 2}
+    behaviour: 7
+    arrivalText: 'Liv: The stones are drawing power! Hold them off until the connection forms!'
+    statusText: 'THE CONNECTION IS WAKING
+
+      Hold them back. Stay close to the portal!'
+    duration: 180
+    initialEnemies: 2
+    acceptText: Hold the clearing!
+  startedEvent: {fileID: 11400000, guid: 8eb5d1eaca7f351419207cf31f6401cf, type: 2}
+  shelterEvent: {fileID: 11400000, guid: 3e4af787a3ca3d241a28d20824384e0f, type: 2}
+  fireEvent: {fileID: 11400000, guid: c717e4480417eb34ba75f12df32acda0, type: 2}
+  restedEvent: {fileID: 11400000, guid: 84bdc29fd2b08244590c6231422d7c78, type: 2}
+  campDefendedEvent: {fileID: 11400000, guid: 85e5ea341ff20374e9fca42d46bb9222, type: 2}
+  portalReachedEvent: {fileID: 11400000, guid: e7d3f1e76eaac0c4093ec068db341d61, type: 2}
+  portalActivatedEvent: {fileID: 11400000, guid: 3bbc727584d9a984cb3a088c5fe2d14b, type: 2}
+  finishedEvent: {fileID: 11400000, guid: c6fcca05195d1544bbfe5dd48999cf29, type: 2}
+  sticks: {fileID: 11400000, guid: e8bb5d2fbded52b42a179a47cce32d53, type: 2}
+  stones: {fileID: 11400000, guid: 9f085f39a2da68c45b58d2db986835f4, type: 2}
+  startingWeapon: {fileID: 11400000, guid: 7e69e97c2a5edf149a174a57b97507dc, type: 2}
+  startingTorch: {fileID: 11400000, guid: 3ed1b8336d9f73749968dc70e483ba5d, type: 2}
+  startingArmor:
+  - {fileID: 11400000, guid: 04c42d35a9586f14c8712e4d62a6209f, type: 2}
+  - {fileID: 11400000, guid: b5086eda803a21340a00ddc09a8ce499, type: 2}
+  - {fileID: 11400000, guid: db5ce53299353984885aa0b5f2707a6f, type: 2}
+  - {fileID: 11400000, guid: 10111c97f83125f4180f05e30f25974d, type: 2}
+  - {fileID: 11400000, guid: 7243958d017ac4342ab8fb9df54f8d32, type: 2}
+  campfire: {fileID: 11400000, guid: c5579431ac7bb1146b3db512a4783ee8, type: 2}
+  buildRadius: 5
+  waitingForLeaderText: Speak to Sigrid about the next step.
+  dialogueCameraDistance: 0.65
+  waveInterval: 25
+  firstWaveSize: 3
+  waveGrowth: 1
+  maximumWaveSize: 7
+  maximumEnemies: 14
+  wolfPrefab: {fileID: 4509420567327699722, guid: 133e61ca36473ab4999a603e504581a7, type: 3}
+  rumble: {fileID: 11400000, guid: 6510718f5af764e4aa78349c4b3f7cdf, type: 2}
+  homeScene: SafeHaven
+  survivedText: 'Liv: It is open! Sigrid: Everyone, through! Something vast strikes the stones. You reach for the others... and the forest disappears.'
+  overwhelmedText: 'Liv: I cannot hold it! Sigrid: Take my hand! A white light tears through the dark...'
+  endingStatus: 'THE CONNECTION BREAKS
+
+    A voice calls your name. Then silence.'
+  homecomingText: Warmth. Stillness. You wake beneath a living canopy. The others are gone. Nearby, a familiar ring of stones stands dark. Through it, for a moment, you hear Sigrid calling your name.
+  recoveryText: Eirik pulls you back into shelter. Try again; your companions are still with you.
+  endingSeconds: 3
+  recoverySeconds: 2

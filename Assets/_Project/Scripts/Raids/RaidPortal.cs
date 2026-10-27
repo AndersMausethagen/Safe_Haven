@@ -34,6 +34,9 @@ public sealed class RaidPortal : MonoBehaviour, IStationMenuExtension
     [SerializeField] private GameObject activeVisual;
     [Tooltip("Raised when the portal is repaired, for quests.")]
     [SerializeField, RaisedByGame] private GameEventDefinition repairedEvent;
+    [Tooltip("Optional progression requirement for repairs only. Inspecting the dormant portal remains possible.")]
+    [SerializeField] private QuestCondition repairRequires;
+    [SerializeField] private string repairLockedText = "Free the Heart Tree's light first.";
     [SerializeField, TextArea] private string ruinText = "Ancient standing stones, cracked and cold. A faint hum lingers in them, as if they remember being a door. Life Orbs might wake them.";
 
     private Interactable interactable;
@@ -159,14 +162,21 @@ public sealed class RaidPortal : MonoBehaviour, IStationMenuExtension
     {
         IReadOnlyList<ResourceAmount> cost = SettlementSettings.Current.PortalRepairCost;
         bool affordable = MaterialPool.For(user).CanAfford(cost, null, out string missing);
+        bool unlocked = repairRequires.IsMet;
         var page = new MenuPage { Title = "Ruined Portal", Body = ruinText };
-        page.Add(new MenuAction("Repair the portal", AmountText.Describe(cost) + (affordable ? "" : $"   <color=#FF7B6B>{missing}</color>"), affordable,
+        page.Add(new MenuAction("Repair the portal", !unlocked ? repairLockedText
+            : AmountText.Describe(cost) + (affordable ? "" : $"   <color=#FF7B6B>{missing}</color>"), unlocked && affordable,
             () => Repair(user), closesMenu: true));
         return page;
     }
 
     private void Repair(GameObject user)
     {
+        if (!repairRequires.IsMet)
+        {
+            GameMessages.Post(repairLockedText, MessageKind.Warning);
+            return;
+        }
         if (IsRepaired || !MaterialPool.For(user).TrySpend(SettlementSettings.Current.PortalRepairCost))
         {
             return;

@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 702d2e93d0a019a40b6339daf41e2c2f, type: 3}
+  m_Name: LightFire
+  m_EditorClassIdentifier: SafeHaven::QuestDefinition
+  id: prologue.lightfire
+  displayName: A Fire of Our Own
+  description: Use the build menu (G) to place a Campfire beside the shelter. Construction uses four Sticks and six Small Rocks.
+  chain: Prologue - The Unquiet Forest
+  prerequisites:
+  - {fileID: 11400000, guid: 4f625534621489e4183de610d93d4f36, type: 2}
+  start: 2
+  startEvent: {fileID: 0}
+  objectivesInOrder: 0
+  objectives:
+  - type: 7
+    description: Build a Campfire beside the shelter (G)
+    amount: 1
+    item: {fileID: 0}
+    resource: {fileID: 0}
+    monster: {fileID: 0}
+    building: {fileID: 11400000, guid: c5579431ac7bb1146b3db512a4783ee8, type: 2}
+    raid: {fileID: 0}
+    mustExtract: 0
+    withinMinutes: 0
+    questEvent: {fileID: 0}
+    countAlreadyOwned: 1
+  turnInToGiver: 0
+  turnInTo: 
+  rewardItems: []
+  rewardResources: []
+  rewardRecipes: []
+  completionEvent: {fileID: 0}

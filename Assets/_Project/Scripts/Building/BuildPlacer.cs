@@ -93,6 +93,9 @@ public sealed class BuildPlacer : MonoBehaviour
     public static bool IsBusy { get; private set; }
 
     private BuildingDefinition Kind => placing != null ? placing : moving != null ? moving.Definition : null;
+    private PrologueDirector Expedition => PrologueDirector.Current;
+    private bool HasBuildArea => Expedition != null ? Expedition.CanBuild : HeartTree.Current != null;
+    private Vector3 BuildOrigin => Expedition != null ? Expedition.BuildOrigin : HeartTree.Current.transform.position;
 
     private void OnEnable()
     {
@@ -126,9 +129,10 @@ public sealed class BuildPlacer : MonoBehaviour
             return;
         }
 
-        if (HeartTree.Current == null)
+        if (!HasBuildArea)
         {
-            GameMessages.Post("You can only build in Safe Haven, inside the Heart Tree's ward.", MessageKind.Warning);
+            GameMessages.Post(Expedition != null ? Expedition.Definition.WaitingForLeaderText
+                : "You can only build in Safe Haven, inside the Heart Tree's ward.", MessageKind.Warning);
             return;
         }
 
@@ -151,7 +155,8 @@ public sealed class BuildPlacer : MonoBehaviour
         var page = new MenuPage
         {
             Title = "Build",
-            Body = $"Build inside the Heart Tree's ward ({HeartTree.Current.WardRadius:0} m). Left-click to place, mouse wheel to turn "
+            Body = (Expedition != null ? "Build the expedition's campfire beside the shelter. "
+                : $"Build inside the Heart Tree's ward ({HeartTree.Current.WardRadius:0} m). ") + "Left-click to place, mouse wheel to turn "
                 + "(Shift for small steps), hold Alt to place freely without snapping. Walls are drawn by dragging. Right-click or Esc cancels.",
         };
 
@@ -162,9 +167,12 @@ public sealed class BuildPlacer : MonoBehaviour
         }
 
         var buildings = new List<BuildingDefinition>();
-        foreach (BuildingDefinition building in crafting.Buildings)
+        IEnumerable<BuildingDefinition> available = Expedition != null
+            ? new[] { Expedition.Definition.Campfire } : crafting.Buildings;
+        foreach (BuildingDefinition building in available)
         {
-            if (building != null && building.ShowInBuildMenu && building.Prefab != null && crafting.IsKnown(building))
+            if (building != null && building.Prefab != null &&
+                (Expedition != null || building.ShowInBuildMenu && crafting.IsKnown(building)))
             {
                 buildings.Add(building);
             }
@@ -180,7 +188,8 @@ public sealed class BuildPlacer : MonoBehaviour
                 () => BeginPlacing(building), closesMenu: true));
         }
 
-        page.Add(new MenuAction("Move a building", "Pick up something you built and place it again, for free", true, BeginPicking, closesMenu: true));
+        if (Expedition == null)
+            page.Add(new MenuAction("Move a building", "Pick up something you built and place it again, for free", true, BeginPicking, closesMenu: true));
         return page;
     }
 
@@ -229,7 +238,7 @@ public sealed class BuildPlacer : MonoBehaviour
         }
 
         // Escape cancels through BackHandlers (CancelByBack), so the Escape menu doesn't also open.
-        if (Mouse.current == null || HeartTree.Current == null)
+        if (Mouse.current == null || !HasBuildArea)
         {
             Cancel();
             return;
@@ -350,8 +359,24 @@ public sealed class BuildPlacer : MonoBehaviour
 
     private bool TryGetGroundPoint(out Vector3 point)
     {
-        var ground = new Plane(Vector3.up, HeartTree.Current.transform.position);
+        if (Expedition != null)
+        {
+            point = default;
+            if (!CameraPointer.TryGetRay(view, out Ray ray) ||
+                !Expedition.BuildTerrain.GetComponent<TerrainCollider>().Raycast(ray, out RaycastHit hit, 200f))
+                return false;
+            point = hit.point;
+            return true;
+        }
+        var ground = new Plane(Vector3.up, BuildOrigin);
         return CameraPointer.TryGetPointOnPlane(view, ground, out point);
+    }
+
+    private Vector3 OnBuildGround(Vector3 point)
+    {
+        if (Expedition != null)
+            point.y = Expedition.BuildTerrain.SampleHeight(point) + Expedition.BuildTerrain.transform.position.y;
+        return point;
     }
 
     private Vector3 Grid(Vector3 point)
@@ -377,12 +402,12 @@ public sealed class BuildPlacer : MonoBehaviour
 
         if (snapDistance > 0f && TrySnapBesideNeighbour(cursor, out Vector3 snapped, out float snappedYaw))
         {
-            point = snapped;
+            point = OnBuildGround(snapped);
             pieceYaw = snappedYaw;
             return;
         }
 
-        point = Grid(cursor);
+        point = OnBuildGround(Grid(cursor));
     }
 
     private bool TrySnapBesideNeighbour(Vector3 cursor, out Vector3 point, out float pieceYaw)
@@ -507,9 +532,23 @@ public sealed class BuildPlacer : MonoBehaviour
     {
         FootprintRect footprint = BuildPlacement.Footprint(point, pieceYaw, localBounds);
         float reach = Mathf.Max(footprint.HalfSize.x, footprint.HalfSize.y);
-        if (!HeartTree.Current.Contains(footprint.WorldCenter(point.y), reach))
+        if (Expedition != null ? !Expedition.IsBuildSpot(footprint.WorldCenter(point.y), reach)
+            : !HeartTree.Current.Contains(footprint.WorldCenter(point.y), reach))
         {
-            return "Outside the Heart Tree's ward. Build closer to the tree.";
+            return Expedition != null ? "Build the fire beside the shelter."
+                : "Outside the Heart Tree's ward. Build closer to the tree.";
+        }
+        if (Expedition != null)
+        {
+            Vector2 x = footprint.AxisX * footprint.HalfSize.x;
+            Vector2 z = footprint.AxisZ * footprint.HalfSize.y;
+            for (int corner = 0; corner < 4; corner++)
+            {
+                Vector2 sample = footprint.Center + ((corner & 1) == 0 ? x : -x) + ((corner & 2) == 0 ? z : -z);
+                Vector3 ground = OnBuildGround(new Vector3(sample.x, 0f, sample.y));
+                if (Mathf.Abs(ground.y - point.y) > 0.2f)
+                    return "The ground is too uneven. Try flatter ground beside the shelter.";
+            }
         }
 
         Quaternion rotation = Quaternion.Euler(0f, pieceYaw, 0f);
@@ -656,6 +695,11 @@ public sealed class BuildPlacer : MonoBehaviour
     // Pays and places one building. False when it can't be paid for.
     private bool Build(BuildingDefinition building, Vector3 position, Quaternion rotation)
     {
+        if (Expedition != null && (!Expedition.CanBuild || building != Expedition.Definition.Campfire))
+        {
+            GameMessages.Post("Only the expedition's campfire can be built here, when the leader asks for it.", MessageKind.Warning);
+            return false;
+        }
         if (!MaterialPool.For(gameObject).TrySpend(building.ConstructionCost, building.ConstructionItems))
         {
             return false;
@@ -802,7 +846,7 @@ public sealed class BuildPlacer : MonoBehaviour
     // Marks the yards of the buildings already standing, so the player sees where not to build.
     private void ShowPlacedYards()
     {
-        float height = HeartTree.Current != null ? HeartTree.Current.transform.position.y + MarkerHeight : MarkerHeight;
+        float height = HasBuildArea ? BuildOrigin.y + MarkerHeight : MarkerHeight;
         foreach (BuildingObject building in BuildingObject.Active)
         {
             if (!building.TryGetYard(out FootprintRect yard))

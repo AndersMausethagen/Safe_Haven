@@ -622,6 +622,10 @@ public sealed class ItemSection : PrefabContentSection
         {
             problems.Add("Tools and backpacks usually shouldn't stack.");
         }
+        if (item.IsWeapon && item.Weapon.Kind == WeaponKind.Torch &&
+            (item.HeldModel == null || item.HeldModel.GetComponentInChildren<Light>(true) == null ||
+             item.HeldModel.GetComponentInChildren<LightFlicker>(true) == null))
+            problems.Add("Torch weapons need a held model with a Light and LightFlicker.");
 
         return problems;
     }
@@ -863,7 +867,9 @@ public sealed class WeaponSection : ContentSection
     public override string Help =>
         "What the player can hold. A weapon sets the animation stance, its damage and its attacks: the combo chain the attack button " +
         "walks through when pressed in time, the heavy attack a held press performs, the counter after a parry or perfect dodge, and " +
-        "how well it guards. Timings follow the animations (Safe Haven › Characters › Set Up Combat Animations).";
+        "how well it guards. Kind = Torch permits the off hand beside a one-handed weapon; Two Handed and Polearm need both hands. " +
+        "Create its Item and Recipe in the usual Items / Crafting pages. Held torch models retain their Light and LightFlicker. " +
+        "Timings follow the animations (Safe Haven › Characters › Set Up Combat Animations).";
 
     public override string ListGroup(Object asset) => ObjectNames.NicifyVariableName(((WeaponDefinition)asset).Stance.ToString());
 
@@ -871,6 +877,8 @@ public sealed class WeaponSection : ContentSection
     {
         List<string> problems = base.FindProblems(asset, all);
         var weapon = (WeaponDefinition)asset;
+        if (weapon.Kind == WeaponKind.Torch && weapon.RequiresBothHands)
+            problems.Add("A torch must use the One Handed stance to fit the off hand.");
         if (weapon.BasicAttack == null && weapon.Combo.Count == 0)
         {
             problems.Add("No basic attack, so swinging it does no damage.");

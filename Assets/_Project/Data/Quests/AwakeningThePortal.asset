@@ -33,7 +33,9 @@ MonoBehaviour:
     mustExtract: 1
     withinMinutes: 0
     questEvent: {fileID: 11400000, guid: 33b3fdbc627e48d4f9a56fdda934ff2e, type: 2}
-    countAlreadyOwned: 0
+    countAlreadyOwned: 1
+  turnInToGiver: 0
+  turnInTo: 
   rewardItems: []
   rewardResources: []
   rewardRecipes: []

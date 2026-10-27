@@ -44,13 +44,14 @@ public enum GearSlot
     AxeTool = 14,
     PickaxeTool = 15,
     SickleTool = 16,
+    OffHand = 17,
 }
 
 /// <summary>The rules of the gear slots: what fits where, and their names.</summary>
 public static class GearSlots
 {
     /// <summary>How many gear slots there are.</summary>
-    public const int Count = 17;
+    public const int Count = 18;
 
     /// <summary>Whether the item can go into the gear slot.</summary>
     public static bool Accepts(GearSlot slot, ItemDefinition item)
@@ -64,6 +65,8 @@ public static class GearSlots
         {
             case GearSlot.MainHand:
                 return item.IsWeapon;
+            case GearSlot.OffHand:
+                return item.IsWeapon && item.Weapon.CanUseOffHand;
             case GearSlot.Backpack:
                 return item.IsBackpack;
             case GearSlot.AxeTool:
@@ -91,6 +94,11 @@ public static class GearSlots
     {
         bool found = false;
         slot = GearSlot.Head;
+        if (Accepts(GearSlot.OffHand, item) && (gear == null || gear.GetSlot((int)GearSlot.OffHand).IsEmpty))
+        {
+            slot = GearSlot.OffHand;
+            return true;
+        }
         for (int i = 0; i < Count; i++)
         {
             if (!Accepts((GearSlot)i, item))
@@ -144,6 +152,8 @@ public static class GearSlots
                 return "Finger";
             case GearSlot.MainHand:
                 return "Main Hand";
+            case GearSlot.OffHand:
+                return "Off Hand";
             case GearSlot.AxeTool:
                 return "Axe";
             case GearSlot.PickaxeTool:
@@ -170,7 +180,7 @@ public static class GearSlots
 
         if (item.IsWeapon)
         {
-            return "Main Hand";
+            return item.Weapon.CanUseOffHand ? "Main Hand / Off Hand" : item.Weapon.RequiresBothHands ? "Both Hands" : "Main Hand";
         }
 
         if (item.IsBackpack)

@@ -35,6 +35,18 @@ shader, because the sway bends the whole tree and leaves would otherwise detach 
 
 Existing materials are never overwritten on reimport, so tuning is kept. Delete a material to regenerate it.
 
+## Prologue's procedural conifers
+
+The prologue's existing spruce/pine/dead-spruce models were not generator exports and had no wind UVs.
+Their scene-specific copies in `Data/Prologue/Vegetation` contain baked height/radial sway and flex weights
+in UV1, with branch phase and flutter in UV2, and use the same **Safe Haven/Tree Wind** shader. Wind materials
+preserve the original colour/texture look, with matching strength for bark and needles; needles use fast leaf
+lighting. Mesh bounds include a sway margin to avoid edge-of-screen culling.
+
+Only the prologue TerrainData references these five wind prefabs. Original raid prefabs/materials are unchanged;
+boulders and fallen logs retain their original static prototypes. Adjust the prologue's Forest Wind and its
+storm multiplier, or the copied materials' Wind Strength, to tune movement without changing the raid.
+
 ## Performance
 
 - **Fast Leaf Lighting** is on for alpha-clipped materials (leaves, vines).

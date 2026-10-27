@@ -15,12 +15,19 @@ public sealed class HeldItemView : MonoBehaviour
     [Tooltip("Where held models sit relative to the right hand bone (the grip).")]
     [SerializeField] private Vector3 gripPosition;
     [SerializeField] private Vector3 gripRotation;
+    [SerializeField] private Vector3 offHandGripPosition;
+    [SerializeField] private Vector3 offHandGripRotation;
 
     private readonly Dictionary<ItemDefinition, GameObject> models = new Dictionary<ItemDefinition, GameObject>();
     private PlayerEquipment equipment;
     private PlayerGathering gathering;
     private Transform grip;
     private GameObject current;
+    private Transform offHandGrip;
+    private GameObject offHandModel;
+    private ItemDefinition offHandShown;
+    private readonly Dictionary<ItemDefinition, GameObject> offHandModels = new Dictionary<ItemDefinition, GameObject>();
+    public ItemDefinition OffHandShown => offHandShown;
 
     /// <summary>The item in the hand right now (null when empty-handed).</summary>
     public ItemDefinition Shown { get; private set; }
@@ -60,6 +67,13 @@ public sealed class HeldItemView : MonoBehaviour
         grip = new GameObject("Held Item Grip").transform;
         grip.SetParent(hand, false);
         grip.SetLocalPositionAndRotation(gripPosition, Quaternion.Euler(gripRotation));
+        Transform left = animator.GetBoneTransform(HumanBodyBones.LeftHand);
+        if (left != null)
+        {
+            offHandGrip = new GameObject("Off Hand Item Grip").transform;
+            offHandGrip.SetParent(left, false);
+            offHandGrip.SetLocalPositionAndRotation(offHandGripPosition, Quaternion.Euler(offHandGripRotation));
+        }
     }
 
     private void LateUpdate()
@@ -69,12 +83,44 @@ public sealed class HeldItemView : MonoBehaviour
         {
             Show(wanted);
         }
+        ItemStack offHand = equipment != null ? equipment.OffHand : ItemStack.Empty;
+        // Gathering tools and broken lights do not leave a burning torch in the other hand.
+        bool previewOffHand = Preview != null && Preview.IsWeapon && Preview.Weapon.CanUseOffHand;
+        bool needsBothHands = wanted != null && wanted.IsWeapon && wanted.Weapon.RequiresBothHands;
+        ItemDefinition offItem = previewOffHand ? Preview : !offHand.IsEmpty && !offHand.IsBroken &&
+            !needsBothHands && (gathering == null || gathering.Session == null) ? offHand.Item : null;
+        if (offItem != offHandShown)
+        {
+            if (offHandModel != null) offHandModel.SetActive(false);
+            offHandShown = offItem;
+            offHandModel = ModelFor(offItem, offHandGrip, offHandModels);
+        }
+        if (IsTorch(Shown) && current != null) current.transform.rotation = Quaternion.identity;
+        if (offHandModel != null && IsTorch(offHandShown)) offHandModel.transform.rotation = Quaternion.identity;
+    }
+
+    private static bool IsTorch(ItemDefinition item) => item != null && item.IsWeapon && item.Weapon.Kind == WeaponKind.Torch;
+
+    private GameObject ModelFor(ItemDefinition item, Transform parent, Dictionary<ItemDefinition, GameObject> cache)
+    {
+        if (item == null || item.HeldModel == null || parent == null) return null;
+        if (!cache.TryGetValue(item, out GameObject model) || model == null)
+        {
+            model = Instantiate(item.HeldModel, parent);
+            model.name = item.HeldModel.name + " (held)";
+            StripToVisual(model, IsTorch(item));
+            cache[item] = model;
+        }
+        model.transform.SetLocalPositionAndRotation(item.HeldPose.position, item.HeldPose.rotation);
+        model.transform.localScale = Vector3.one * item.HeldScale;
+        model.SetActive(true);
+        return model;
     }
 
     /// <summary>The tool while gathering with one on the belt, else the main-hand weapon.</summary>
     private ItemDefinition Wanted()
     {
-        if (Preview != null)
+        if (Preview != null && !(Preview.IsWeapon && Preview.Weapon.CanUseOffHand))
         {
             return Preview;
         }
@@ -94,7 +140,7 @@ public sealed class HeldItemView : MonoBehaviour
         }
 
         ItemStack weapon = equipment.MainHand;
-        return weapon.IsEmpty ? null : weapon.Item;
+        return weapon.IsEmpty || weapon.IsBroken ? null : weapon.Item;
     }
 
     /// <summary>Puts <paramref name="item"/>'s model in the hand (nothing for null or an item without a model).</summary>
@@ -112,18 +158,7 @@ public sealed class HeldItemView : MonoBehaviour
             return;
         }
 
-        if (!models.TryGetValue(item, out GameObject model) || model == null)
-        {
-            model = Instantiate(item.HeldModel, grip);
-            model.name = item.HeldModel.name + " (held)";
-            StripToVisual(model);
-            models[item] = model;
-        }
-
-        model.transform.SetLocalPositionAndRotation(item.HeldPose.position, item.HeldPose.rotation);
-        model.transform.localScale = Vector3.one * item.HeldScale;
-        model.SetActive(true);
-        current = model;
+        current = ModelFor(item, grip, models);
     }
 
     /// <summary>Forgets the models made so far (an item's held model or grip changed) and shows the hand again.</summary>
@@ -138,6 +173,11 @@ public sealed class HeldItemView : MonoBehaviour
         }
 
         models.Clear();
+        foreach (GameObject model in offHandModels.Values)
+            if (model != null) Destroy(model);
+        offHandModels.Clear();
+        offHandModel = null;
+        offHandShown = null;
         current = null;
         Shown = null;
         Show(Wanted());
@@ -145,11 +185,16 @@ public sealed class HeldItemView : MonoBehaviour
 
     /// <summary>Removes everything but transforms, meshes and renderers: a held model must not collide, fall or run
     /// its world behaviour (pickups, interactables).</summary>
-    public static void StripToVisual(GameObject model)
+    public static void StripToVisual(GameObject model, bool keepTorchLight = false)
     {
-        foreach (Component component in model.GetComponentsInChildren<Component>(true))
+        Component[] components = model.GetComponentsInChildren<Component>(true);
+        // Remove behaviours before their required components (e.g. LightFlicker requires Light).
+        for (int pass = 0; pass < 2; pass++)
+        foreach (Component component in components)
         {
-            if (component is Transform || component is MeshFilter || component is Renderer || component is LODGroup)
+            if (component == null || (component is MonoBehaviour) != (pass == 0)) continue;
+            if (component is Transform || component is MeshFilter || component is Renderer || component is LODGroup ||
+                keepTorchLight && (component is Light || component is LightFlicker))
             {
                 continue;
             }
@@ -158,6 +203,7 @@ public sealed class HeldItemView : MonoBehaviour
             {
                 collider.enabled = false;
             }
+            if (component is Behaviour behaviour) behaviour.enabled = false;
 
             if (Application.isPlaying)
             {

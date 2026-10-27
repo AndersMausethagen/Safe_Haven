@@ -122,6 +122,8 @@ public static class MusicRules
 {
     public static MusicChoice Choose(SceneAudio scene, AudioSettingsDefinition defaults, AudioMood mood, float raidTimeLeft)
     {
+        if (scene != null && scene.MusicOverridden)
+            return new MusicChoice(scene.EventMusic, scene.EventMusic != null ? "Quest/event: music" : "Quest/event: silence");
         if (scene != null && scene.FinalStretch.HasTracks && raidTimeLeft <= scene.FinalStretchSeconds)
         {
             return new MusicChoice(scene.FinalStretch, "Scene: final stretch");

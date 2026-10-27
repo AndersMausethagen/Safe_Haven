@@ -29,7 +29,7 @@ of the GDD, **Not started** = design only. Update this table when a system is ad
 | §18 UI, accessibility | Partial | `UI/*` (TMP), `ActionMenuWindow` (world menus), `UIStateManager`, `UITheme` | No rebinding, text scaling or reduced-shake option |
 | §19 Art, audio | Partial | `Audio/*` (a `SceneAudio` "Scene Music" component per scene), volumes `SafeHaven_Volume` / `MistyWoods_Volume`; environment in `Environment/*` (terrain moss, tree wind, `SurfaceLayerController` moss/rust on LocalSpawn models, grass and glowing plants, water and waterfalls, day/night and weather) | Composed music (`Audio/Safe Haven - *.mp3`) set per scene and as game-wide defaults in `AudioSettings`; effects from a CC0 library (`Audio/SFX`, credits in `Audio/SFX/CREDITS.md`): combat, footsteps by ground layer (`PlayerAudio`), quests, crafting, building, interface, rain, wind, thunder and stream loops (`WorldAudio`), gathering. Models are placeholders. Day/night and weather are visual only and not saved (§11 "weather influences plans" not built); only SafeHaven has the sky rig, not the raid scene. Volumetric fog, fog of war (unexplored ground, the night veil) and fire in the fog: `Environment/Atmosphere`, see [atmosphere](../../../Docs/Atmosphere.md) |
 | §20 Technical design | Done | Definitions vs runtime state vs `Save/*`; rules in settings assets (`GameSettings<T>`) | Raid crash recovery and seeds not built |
-| §21 First 90 minutes | Done (prototype) | `SafeHaven.unity`, `Raid_MistyWoods.unity`, quest chain "The First Days"; `Playtest/*` (`PlaytestLogger` writes one CSV per run, `PlaytestSettings` milestones, **Safe Haven ▸ Playtest ▸ Run Comparison**) | Decisions and assumptions are recorded in GDD §26.1. A run = one playthrough (its id is in the save, so loads continue the same log as a new session) |
+| §21 First 90 minutes | Done (prototype), prologue added | `Prologue_MistyWoods.unity`, `Prologue/*`, `SafeHaven.unity`, `Raid_MistyWoods.unity`; quest chains "Prologue - The Unquiet Forest", "The Lost Expedition", "The First Days"; `Playtest/*` | Prologue uses a separate authored scene, not a raid. Seven story escorts; Ingrid already has a later rescue, the other six rescue encounters/profession effects are not authored yet. Shelter and waystones are blockout art. |
 | §23–24 MVP / milestones | M0–M3 (no boss-earned skill enhancement yet), plus M4's recruit with a job and M5's scripted ward breach | – | Next per GDD: M4 companions (down/revive) and cart transport; M5 boss, environmental event and polish |
 
 ## Folders
@@ -65,6 +65,72 @@ created before the split carries `[MovedFrom(sourceAssembly: "Assembly-CSharp")]
 
 ## How systems talk to each other
 
+### Designer-authored prologue
+
+`Data/Prologue/ForestPrologue.asset` owns the ordered `PrologueChapter` list: quest, behaviour, automatic-entry
+messages, HUD text, duration and initial enemy count. Sigrid's ordinary `QuestGiver` component owns the ordered
+**Offers** for peaceful chapters: quest reference, briefing text, acceptance label and waiting text.
+**Confirm In Dialogue** uses the shared action menu and close-camera framing; reading or closing it does not
+accept anything. Set a chapter quest's Start to **By Quest Giver**, then author its offer on the giver.
+Acceptance uses `QuestGiver → QuestManager → QuestLog`; there is no director acceptance API or leader flag.
+The director does not run an unaccepted chapter's timer/encounter.
+Automatically-started emergency chapters need no conversation. Add or reorder chapters together with their quest prerequisites in
+the existing Quest Map; chapter list order does not rewrite the prerequisite graph. A chapter waits for its quest
+to complete. Reusable behaviour presets handle shelter, fuel, fire, rest, camp defence, travel, activation and the
+portal hold; new kinds of scene mechanics still require code. The same asset holds the field building, building radius,
+starting armor, dialogue camera distance scale, waiting-for-leader text, wolf prefab, wave
+interval, first-wave size, wave growth/caps, rumble, ending/recovery/homecoming text and transition timing. It is never mutated at runtime.
+
+Select an expedition NPC in `Prologue_MistyWoods` to edit its `PrologueCompanion`: resident identity, forest/camp/
+portal dialogue, a conversation story event, formation offset, and support amount/interval.
+When an NPC also has a `QuestGiver`, that component owns its conversations instead; edit its offer/waiting/after text there.
+Escorts stay put until the first briefing is accepted, and stop walking during conversations.
+Hand-mounted `ExpeditionTorch` objects keep their authored lit models upright during animation; their Light and
+LightFlicker components are scene-editable. Scene `GameEventTrigger`s control discovery zones;
+`PrologueInteraction` handles portal activation, with editable before/after-step prompts. `PrologueDirector` derives its
+chapter from `GameSession.Quests`, owns temporary enemies/timers, and raises encounter/story facts. The camp quest
+counts the cleared encounter, not player kill credit. No `RaidSession`, regular raid loot loss, result screen or
+durability penalty is involved. Supplies deliberately reset to home starting contents.
+
+`BuildPlacer` retains its ordinary placement, footprint checks, material payment and Built event. In the forest
+it exposes only `Data/Prologue/ExpeditionCampfire.asset`, only during the accepted building chapter, and only inside
+the shelter's build radius. The separate field definition/prefab uses Sticks and Small Rocks without changing the
+settlement hearth's materials or exposing another campfire in the home menu. Keep the gathering objectives aligned
+with its Construction Items when tuning costs. The fire quest counts **Build Structure**, not a use-fire event.
+Forest ghosts raycast the director's TerrainCollider, resample height after snapping, and reject footprints whose
+corners differ by more than 0.2 m from the base; the normal flat settlement placement is unchanged.
+`PersistentScene` and the registered field prefab preserve the player's placement and resource depletion.
+The expedition wolf prefab has no SaveableEntity: encounters intentionally restart at checkpoints.
+Starting weapon, off-hand torch and armor are granted and auto-equipped once from the prologue definition, before the saved
+Started event is raised; loading never grants duplicates. The forest player's inventory defaults are empty.
+The starting weapon is the one-handed Woodsman's Axe, not the two-handed Stone Axe. Torches are normal
+`WeaponDefinition` / `ItemDefinition` / `RecipeDefinition` assets, crafted by hand for two Sticks. `WeaponKind.Torch`
+allows the appended `GearSlot.OffHand` (17); existing saved slot indices stay unchanged. `GearSet` enforces hand
+occupancy in its container rule as well as equip commands, so drag/drop and auto-equip cannot pair an occupied off
+hand with a TwoHanded/Polearm weapon. Conflicting equips are rejected, not silently unequipped.
+`HeldItemView` renders both hands, preserves only the torch's Light/LightFlicker alongside normal visual components,
+and stows the off-hand light during gathering. **Held Item Grips** fits both palms and previews torches in the left hand.
+Dialogue camera framing uses `PlayerCameraController`'s owned
+BeginDialogue/EndDialogue override without changing saved zoom or camera style. The menu's close callback releases
+it on close, replacement, walk-away or disable; combat closes conversations.
+
+Safe chapter entries auto-save. Manual saves are blocked during combat/transition; loading restarts the chapter.
+Early death revives at the chapter rally point; death during the hold and surviving its countdown both reach the
+narrative homecoming. `PrologueHomecoming` starts the home Awakening event (also for legacy/direct-home starts),
+then raises the homecoming event; the expedition-search quest uses ordinary **On Quest Event** start configuration.
+It saves the first arrival for prologue survivors only. Portal inspection
+is a normal quest event; its repair objective can count an already-raised event, preventing early repair softlocks.
+The home portal allows inspection immediately; `RaidPortal.repairRequires` retains the existing repair quest gate
+on the repair action itself, with designer-editable locked text.
+`MainMenuView` keeps new-game destination and missing-save-scene fallback separate.
+
+For safe designer playtesting use **Safe Haven > Quests > Play Prologue (Isolated Saves)**. It starts only the
+prologue, preserves open scene setup, and redirects checkpoints to Unity's temporary cache before scene loading,
+including across domain reloads. Stopping restores the previous start scene, background setting and normal storage.
+Ordinary Editor Play is blocked when the prologue is loaded alongside other scenes without an explicit Play Mode
+start scene: duplicate players and raid setup otherwise compete for the global player and spawn position.
+Open the prologue alone for ordinary Play, or use the isolated preview while keeping other scenes open.
+
 The game uses four communication paths. Picking the right one keeps systems independent.
 
 1. **Game events (`GameEvents.Raise` / `GameEvents.Raised`)** – facts about the game: an item was obtained, a
@@ -79,6 +145,42 @@ The game uses four communication paths. Picking the right one keeps systems inde
    `RaidDirector.Current`, `MonsterAI.Active`, `Interactable.Active`, `SaveableEntity.Live`, `BuildingObject.Active`, `UIStateManager.Find<T>(UIWindowId)` for window scripts). Systems read these instead
    of searching the scene.
 
+The quest scene index reads real `QuestGiver` references, including ordered Offers, in saved scenes and
+prefabs. Sigrid is indexed exactly like any other giver; the index has no prologue binding rules.
+A **By Quest Giver** quest without a placed giver still warns. Ordered offers select the first unfinished
+quest without skipping locked prerequisites or required turn-in; old single-quest givers retain their
+immediate-interaction behavior. **Select All Uses in Open Scenes** finds the same serialized references,
+including unsaved edits. `QuestLog` owns progress; `QuestManager` alone dispatches lifecycle and authored
+start/completion events through `GameEvents`, feeding them back into the log and designer reactions.
+
+### Authoring dynamic quest reactions
+
+1. Open the intended gameplay scene. In **Safe Haven > Content Editor**, select a quest (or select its node in
+   **Quest Map** and open the Content Editor). Its **Scene Reactions** panel offers **On Quest Started** and
+   **On Quest Completed**. Quest Event pages offer **When Event Is Raised**.
+2. The button creates an undoable, always-active `GameEventListener` in that scene. Edit its ordered **Actions**
+   directly in the same panel: **Play Music**, **Silence Music**, **Resume Music** (automatic scene rules),
+   **Change Weather** (definition + transition seconds), **Set Object Active**, or **Parameters**.
+3. **Parameters** uses UnityEvent's standard target/property/method picker, not reflection/property-path strings.
+   Examples: Light intensity, AudioSource volume, component enabled, Animator trigger, and exposed gameplay setters.
+   Unity's supported single float/int/bool/string/Object arguments are available; vector/multi-argument operations
+   need a small explicit public adapter method. Optional **Response** remains compatible with existing listeners.
+4. Save the **scene**, not just the quest asset. Shared quests/events never store scene object references. Keep the
+   listener active; disable target objects, not its host. Missing action references report runtime errors explicitly.
+5. To signal other quests or several scenes, add named events to a quest's **On Started** / **On Completed** lists.
+   Legacy **Completion Event** still fires first on completion. The event index/Used By panel recognises both lists.
+   **Play Test > Raise event now** on the event page exercises its listeners in Play Mode.
+6. **Respond If Already Happened** restores state from saved quest/event history on scene load. Uncheck it for
+   one-shot sounds/cinematics. Put persistent state and one-shots on separate listeners. For multiple historical
+   reactions writing the same property, author an explicit final-state restore response/condition; listener order
+   is not a timeline. **Already Happened Response**, when configured, replaces the optional Response only;
+   typed Actions still restore. Changes to live weather/music are restored by listeners, not serialized as assets.
+
+`SceneAudio.Start Silent` suppresses all automatic/default/combat/final-stretch music, not ambience. Event music
+holds priority until Silence/Resume/another Play Music action or leaving the scene. The forest starts silent and its
+Hold Portal **Quest Started** listener plays the authored defence playlist, including checkpoint replay. Designers
+can replace that clip or add weather, lights and object actions in the quest's Scene Reactions panel.
+
 ### Who raises which game event
 
 | Event | Raised by |
@@ -91,7 +193,7 @@ The game uses four communication paths. Picking the right one keeps systems inde
 | Consumed | `ItemInventory` when food or drink is used (berries and herbs are items too) |
 | RaidFinished | `RaidDirector` when a raid ends |
 | QuestStarted / QuestCompleted | `QuestManager` |
-| Custom (Quest Events) | `GameEventTrigger`, `GameEventDefinition.Raise`, a quest's completion event, and the Quest Event fields on `RescuableTraveler` (freed/rescued), `HeartTree` (talked to), `RaidPortal` (repaired), `JobDefinition` (job assigned, via `ResidentNpc`) and `WardBreachDefinition` (breach won). The Content Editor's "nothing raises this event" check finds these by the `[RaisedByGame]` attribute on the field; when you add a new Quest Event field that the game raises, mark it `[RaisedByGame]` |
+| Custom (Quest Events) | `GameEventTrigger`, `GameEventDefinition.Raise`, a quest's completion event and On Started/On Completed lists, and the Quest Event fields on `RescuableTraveler` (freed/rescued), `HeartTree` (talked to), `RaidPortal` (repaired), `JobDefinition` (job assigned, via `ResidentNpc`) and `WardBreachDefinition` (breach won). The Content Editor's "nothing raises this event" check finds these by the `[RaisedByGame]` attribute on the field; when you add a new Quest Event field that the game raises, mark it `[RaisedByGame]` |
 
 ## Lifetimes
 

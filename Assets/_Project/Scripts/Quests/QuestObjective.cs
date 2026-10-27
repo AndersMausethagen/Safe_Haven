@@ -54,12 +54,12 @@ public sealed class QuestObjective
     [Tooltip("Only raids finished within this many minutes count. 0 ignores time.")]
     [SerializeField, Min(0f)] private float withinMinutes;
     [SerializeField] private GameEventDefinition questEvent;
-    [Tooltip("Counts what the player already has when the quest starts, so 10 ore in the bag completes \"Collect 10 ore\" at once, and a campfire built early counts for \"Build a campfire\".")]
+    [Tooltip("Counts what the player already has when the quest starts, including a Quest Event that already happened (counts once).")]
     [SerializeField] private bool countAlreadyOwned;
 
     public ObjectiveType Type => type;
     public int Amount => Mathf.Max(1, amount);
-    public bool CountAlreadyOwned => countAlreadyOwned && (type == ObjectiveType.CollectItem || type == ObjectiveType.GatherResource || type == ObjectiveType.BuildStructure);
+    public bool CountAlreadyOwned => countAlreadyOwned && (type == ObjectiveType.CollectItem || type == ObjectiveType.GatherResource || type == ObjectiveType.BuildStructure || type == ObjectiveType.QuestEvent);
     public ItemDefinition Item => item;
     public ResourceDefinition Resource => resource;
     /// <summary>What a gather objective counts: the material item, or the essence when no item is set.</summary>

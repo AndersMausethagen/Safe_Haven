@@ -222,8 +222,9 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
     private void OnQuestStarted(QuestDefinition quest)
     {
         GameMessages.Post("New quest: " + quest.DisplayName, MessageKind.Info);
-        CountOwned(quest);
         GameEvents.Raise(new GameEvent(GameEventKind.QuestStarted, quest));
+        RaiseAuthoredEvents(quest.OnStarted, quest);
+        CountOwned(quest);
         RaiseChanged();
     }
 
@@ -265,6 +266,7 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
         {
             GameEvents.Raise(quest.CompletionEvent);
         }
+        RaiseAuthoredEvents(quest.OnCompleted, quest);
 
         RaiseChanged();
         // The next quests of a chain may be waiting for this one.
@@ -306,6 +308,15 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
         return quest.DescribeRewards();
     }
 
+    private static void RaiseAuthoredEvents(IReadOnlyList<GameEventDefinition> events, QuestDefinition quest)
+    {
+        foreach (var gameEvent in events)
+        {
+            if (gameEvent == null) Debug.LogError($"Quest '{quest.DisplayName}' has an empty lifecycle event.", quest);
+            else GameEvents.Raise(gameEvent);
+        }
+    }
+
     // "Collect 10 ore" with Count Already Owned starts from what is in the bag.
     private void CountOwned(QuestDefinition quest)
     {
@@ -326,6 +337,9 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
             int owned;
             switch (objective.Type)
             {
+                case ObjectiveType.QuestEvent:
+                    owned = log.HasHappened(objective.QuestEvent) ? 1 : 0;
+                    break;
                 case ObjectiveType.CollectItem:
                     owned = player.Bag.Container.Count(objective.Item)
                         + (player.Equipment != null ? player.Equipment.Gear.Slots.Count(objective.Item) : 0);

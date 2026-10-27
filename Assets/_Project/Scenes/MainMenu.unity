@@ -1461,7 +1461,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MainMenuView
   content: {fileID: 11400000, guid: 9a13bf9732fa5814da5ab7a5fbedb47f, type: 2}
-  newGameScene: SafeHaven
+  newGameScene: Prologue_MistyWoods
+  fallbackLoadScene: SafeHaven
   newGameButton: {fileID: 944248883}
   loadGameButton: {fileID: 1583193345}
   exitButton: {fileID: 383159040}

@@ -12,8 +12,10 @@ public sealed class MainMenuView : MonoBehaviour
 {
     [Tooltip("Turns the ids in a save file back into items, resources and recipes.")]
     [SerializeField] private ContentDatabase content;
-    [Tooltip("Where a new game starts, and where a save goes when its own scene no longer exists.")]
-    [SerializeField] private string newGameScene = "SafeHaven";
+    [Tooltip("Where a new game starts.")]
+    [SerializeField] private string newGameScene = "Prologue_MistyWoods";
+    [Tooltip("Where an existing save goes when its own scene no longer exists. Never restart its prologue.")]
+    [SerializeField] private string fallbackLoadScene = "SafeHaven";
     [SerializeField] private Button newGameButton;
     [SerializeField] private Button loadGameButton;
     [SerializeField] private Button exitButton;
@@ -47,7 +49,7 @@ public sealed class MainMenuView : MonoBehaviour
         if (!SaveGameService.HasSave)
         {
             loadGameButton.interactable = false;
-            saveInfoLabel.text = "No saved game yet. Press F5 in Safe Haven to save.";
+            saveInfoLabel.text = "No saved game yet. The prologue saves safe checkpoints; press F5 at home to save.";
             return;
         }
 
@@ -70,7 +72,7 @@ public sealed class MainMenuView : MonoBehaviour
 
     private void LoadGame()
     {
-        if (SaveGameService.TryLoad(content, newGameScene, out string problem))
+        if (SaveGameService.TryLoad(content, fallbackLoadScene, out string problem))
         {
             SetButtons(false);
         }

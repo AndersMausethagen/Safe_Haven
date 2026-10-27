@@ -62,6 +62,21 @@ public sealed class PlayerCameraController : MonoBehaviour
     private float actionWeight;
     private float actionPitch;
     private bool lockedCursor;
+    private Transform dialogueTarget;
+    private float dialogueDistance = 1f;
+    private float dialogueWeight;
+    private Vector3 dialoguePoint;
+
+    public void BeginDialogue(Transform speaker, float distanceScale)
+    {
+        dialogueTarget = speaker;
+        dialogueDistance = Mathf.Clamp(distanceScale, 0.3f, 1f);
+    }
+
+    public void EndDialogue(Transform speaker)
+    {
+        if (dialogueTarget == speaker) dialogueTarget = null;
+    }
 
     private void Awake()
     {
@@ -143,6 +158,8 @@ public sealed class PlayerCameraController : MonoBehaviour
         }
 
         CameraPointer.UsesScreenCenter = false;
+        dialogueTarget = null;
+        dialogueWeight = 0f;
         ReleaseCursor();
     }
 
@@ -168,6 +185,7 @@ public sealed class PlayerCameraController : MonoBehaviour
         UpdateStyle();
         ReadInput();
         BlendTowardProfile();
+        dialogueWeight = Mathf.MoveTowards(dialogueWeight, dialogueTarget != null ? 1f : 0f, Time.unscaledDeltaTime / 0.4f);
         UpdateFocus();
         ApplyToCinemachine();
     }
@@ -336,6 +354,9 @@ public sealed class PlayerCameraController : MonoBehaviour
         Vector3 shoulder = Quaternion.Euler(0f, yaw, 0f) * Vector3.right * settings.ActionShoulderOffset;
         Vector3 actionOffset = (shoulder + Vector3.up * settings.ActionLookHeight) * actionWeight;
         focus.position = target.position + lookAheadOffset + actionOffset;
+        if (dialogueTarget != null)
+            dialoguePoint = (target.position + dialogueTarget.position + Vector3.up) * 0.5f;
+        focus.position = Vector3.Lerp(focus.position, dialoguePoint, dialogueWeight);
     }
 
     private Vector3 GetCursorOffset()
@@ -374,6 +395,7 @@ public sealed class PlayerCameraController : MonoBehaviour
             Mathf.Lerp(settings.ActionMinDistance, settings.ActionMaxDistance, zoom),
             w);
         float viewPitch = Mathf.Lerp(pitch, actionPitch, w);
+        distance *= Mathf.Lerp(1f, dialogueDistance, dialogueWeight);
         Vector3 back = Quaternion.Euler(viewPitch, yaw, 0f) * Vector3.back;
 
         // The action camera orbits the point the composer looks at, not the focus below it.

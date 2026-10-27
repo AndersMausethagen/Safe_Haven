@@ -2945,6 +2945,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::HeldItemView
   gripPosition: {x: -0.005311981, y: 0.081857964, z: 0.019505477}
   gripRotation: {x: 356.0683, y: 0.7642652, z: 80.988785}
+  offHandGripPosition: {x: 0.0053115385, y: 0.08185808, z: 0.019505434}
+  offHandGripRotation: {x: 3.9317157, y: 179.23506, z: 80.988556}
 --- !u!114 &8110191198095941634
 MonoBehaviour:
   m_ObjectHideFlags: 0

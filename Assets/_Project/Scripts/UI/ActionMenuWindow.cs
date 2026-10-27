@@ -83,12 +83,19 @@ public sealed class ActionMenuWindow : MonoBehaviour
 
     private void OnDestroy()
     {
+        OnOpenChanged(false);
         if (Current == this)
         {
             Current = null;
         }
 
         window.OpenChanged -= OnOpenChanged;
+    }
+
+    private void OnDisable()
+    {
+        if (window != null && window.IsOpen) window.Close();
+        OnOpenChanged(false);
     }
 
     /// <summary>

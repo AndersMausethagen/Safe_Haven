@@ -130,7 +130,9 @@ public static class QuestSceneIndex
     {
         foreach (QuestDefinition quest in quests)
         {
-            if (quest != null && quest.CompletionEvent == gameEvent)
+            if (quest != null && (quest.CompletionEvent == gameEvent ||
+                System.Linq.Enumerable.Contains(quest.OnStarted, gameEvent) ||
+                System.Linq.Enumerable.Contains(quest.OnCompleted, gameEvent)))
             {
                 return true;
             }
@@ -147,7 +149,7 @@ public static class QuestSceneIndex
         return false;
     }
 
-    /// <summary>Whether a Quest Giver (or a prefab override that may be one) points at the quest.</summary>
+    /// <summary>Whether a standard giver or potential giver prefab override offers the quest.</summary>
     public static bool HasGiver(QuestDefinition quest)
     {
         foreach (QuestSceneUse use in UsesOf(quest))
@@ -286,14 +288,25 @@ public static class QuestSceneIndex
             }
 
             bool topLevel = reference.Groups[1].Value.Length == 2;
+            // A list's first member can be on the "- quest:" line or indented below another member.
+            bool orderedOffer = type == typeof(QuestGiver) && reference.Groups[2].Value == "quest" &&
+                RootFieldAt(document, reference.Index) == "offers";
             uses.Add(new QuestSceneUse
             {
                 AssetPath = path,
                 ObjectFileId = ownerId,
-                Role = topLevel ? RoleOf(type, reference.Groups[2].Value) : QuestSceneRole.Other,
+                Role = topLevel || orderedOffer ? RoleOf(type, reference.Groups[2].Value) : QuestSceneRole.Other,
                 TargetGuid = guid,
             });
         }
+    }
+
+    private static string RootFieldAt(string document, int index)
+    {
+        string field = null;
+        foreach (Match match in Regex.Matches(document.Substring(0, index), @"^  (\w+):", RegexOptions.Multiline))
+            field = match.Groups[1].Value;
+        return field;
     }
 
     private static QuestSceneRole RoleOf(Type type, string field)
@@ -396,7 +409,8 @@ public static class QuestSceneIndex
             {
                 foreach (MonoBehaviour behaviour in root.GetComponentsInChildren<MonoBehaviour>(true))
                 {
-                    if (behaviour != null && !found.Contains(behaviour.gameObject) && References(behaviour, asset))
+                    if (behaviour != null && !found.Contains(behaviour.gameObject) &&
+                        References(behaviour, asset))
                     {
                         found.Add(behaviour.gameObject);
                     }

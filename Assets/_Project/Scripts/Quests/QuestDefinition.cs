@@ -35,6 +35,8 @@ public sealed class QuestDefinition : ScriptableObject
     [SerializeField] private QuestStart start = QuestStart.Automatically;
     [Tooltip("For On Quest Event: the event that starts the quest.")]
     [SerializeField] private GameEventDefinition startEvent;
+    [Tooltip("Custom events raised when this quest starts. Use them to drive scene listeners, weather, music and other quests.")]
+    [SerializeField, RaisedByGame] private List<GameEventDefinition> onStarted = new List<GameEventDefinition>();
 
     [Header("Objectives")]
     [Tooltip("Off: objectives can be done in any order. On: each one only counts once the one above it is done.")]
@@ -54,6 +56,8 @@ public sealed class QuestDefinition : ScriptableObject
     [SerializeField] private List<RecipeDefinition> rewardRecipes = new List<RecipeDefinition>();
     [Tooltip("Raised when the quest is completed, for scene reactions (open a gate) through a GameEventListener.")]
     [SerializeField] private GameEventDefinition completionEvent;
+    [Tooltip("Additional custom events raised when this quest completes, after Completion Event.")]
+    [SerializeField, RaisedByGame] private List<GameEventDefinition> onCompleted = new List<GameEventDefinition>();
 
     public string Id => string.IsNullOrWhiteSpace(id) ? name : id;
     public string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;
@@ -62,6 +66,8 @@ public sealed class QuestDefinition : ScriptableObject
     public IReadOnlyList<QuestDefinition> Prerequisites => prerequisites;
     public QuestStart Start => start;
     public GameEventDefinition StartEvent => startEvent;
+    public IReadOnlyList<GameEventDefinition> OnStarted => onStarted;
+    public IReadOnlyList<GameEventDefinition> OnCompleted => onCompleted;
     public bool ObjectivesInOrder => objectivesInOrder;
     public IReadOnlyList<QuestObjective> Objectives => objectives;
     public bool TurnInToGiver => turnInToGiver;
@@ -120,6 +126,12 @@ public sealed class QuestDefinition : ScriptableObject
             problems.Add("Its prerequisites lead back to itself, so it can never start.");
         }
 
+        if (onStarted.Contains(null) || onCompleted.Contains(null))
+            problems.Add("Lifecycle events contain an empty entry. Choose an event or remove the entry.");
+        if (onStarted.Count != new HashSet<GameEventDefinition>(onStarted).Count ||
+            onCompleted.Count != new HashSet<GameEventDefinition>(onCompleted).Count ||
+            completionEvent != null && onCompleted.Contains(completionEvent))
+            problems.Add("A lifecycle event is listed more than once, which would trigger reactions twice.");
         return problems;
     }
 

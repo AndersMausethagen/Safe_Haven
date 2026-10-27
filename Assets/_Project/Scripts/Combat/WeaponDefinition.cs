@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum WeaponKind { Melee = 0, Torch = 1 }
+
 /// <summary>
 /// A weapon the player can hold. It sets the animation stance, how much damage it carries and its attacks: the combo
 /// chain of light swings the attack button walks through (pressed in time; see <see cref="ComboRules"/>), the heavy
@@ -13,6 +15,7 @@ public sealed class WeaponDefinition : ScriptableObject
     [SerializeField] private string displayName;
     [Tooltip("Selects the combat idle, attack animation and arm pose.")]
     [SerializeField] private WeaponStance stance = WeaponStance.OneHanded;
+    [SerializeField] private WeaponKind kind;
     [Tooltip("The weapon's base damage, before the player's power and the attack's ratio.")]
     [SerializeField, Min(0f)] private float damage = 10f;
     [Tooltip("The first swing, and the only one when the combo chain is empty.")]
@@ -36,6 +39,9 @@ public sealed class WeaponDefinition : ScriptableObject
 
     public string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;
     public WeaponStance Stance => stance;
+    public WeaponKind Kind => kind;
+    public bool RequiresBothHands => stance == WeaponStance.TwoHanded || stance == WeaponStance.Polearm;
+    public bool CanUseOffHand => kind == WeaponKind.Torch && !RequiresBothHands;
     public float Damage => damage;
     public AttackDefinition BasicAttack => basicAttack;
     public AttackDefinition HeavyAttack => heavyAttack;

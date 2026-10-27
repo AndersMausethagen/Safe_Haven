@@ -49,7 +49,7 @@ public sealed class HeldItemGrips : EditorWindow
 
         HeldItemView view = Application.isPlaying ? FindFirstObjectByType<HeldItemView>() : null;
         EditorGUILayout.HelpBox(Application.isPlaying
-            ? "Pick an item to hold it; change its grip and see it in the hand. Changes are saved to the item."
+            ? "Pick an item to hold it; torches preview in the left hand, other weapons in the right. Changes are saved to the item."
             : "Enter Play mode to see an item in the player's hand while you tune it.", MessageType.None);
 
         scroll = EditorGUILayout.BeginScrollView(scroll);
@@ -58,7 +58,8 @@ public sealed class HeldItemGrips : EditorWindow
             using (new EditorGUILayout.HorizontalScope())
             {
                 bool isSelected = item == selected;
-                string kind = item.IsWeapon ? "weapon" : item.ToolType.ToString().ToLowerInvariant();
+                string kind = item.IsWeapon ? item.Weapon.CanUseOffHand ? "torch / off hand" :
+                    item.Weapon.RequiresBothHands ? "both hands" : "main hand" : item.ToolType.ToString().ToLowerInvariant();
                 if (GUILayout.Toggle(isSelected, $"{item.DisplayName}  ({kind})", EditorStyles.miniButtonLeft, GUILayout.Width(220)) && !isSelected)
                 {
                     selected = item;
@@ -119,6 +120,7 @@ public sealed class HeldItemGrips : EditorWindow
         }
 
         Pose grip = ComputeGrip(playerAsset);
+        Pose leftGrip = ComputeGrip(playerAsset, true);
         GameObject contents = PrefabUtility.LoadPrefabContents(playerPath);
         try
         {
@@ -129,6 +131,10 @@ public sealed class HeldItemGrips : EditorWindow
             }
 
             view.GripPose = grip;
+            var data = new SerializedObject(view);
+            data.FindProperty("offHandGripPosition").vector3Value = leftGrip.position;
+            data.FindProperty("offHandGripRotation").vector3Value = leftGrip.rotation.eulerAngles;
+            data.ApplyModifiedPropertiesWithoutUndo();
             PrefabUtility.SaveAsPrefabAsset(contents, playerPath);
         }
         finally
@@ -143,7 +149,7 @@ public sealed class HeldItemGrips : EditorWindow
     /// runs across the palm from the little finger past the index finger, its +X (the edge, the axe head) faces the way
     /// the knuckles point, and the grip point sits in the palm. Relative to the hand bone, so it holds in every animation.
     /// Models made handle-up with the grip at their origin (the Kevin Iglesias props, most tool kits) sit right.</summary>
-    public static Pose ComputeGrip(GameObject character)
+    public static Pose ComputeGrip(GameObject character, bool leftHand = false)
     {
         UnityEngine.SceneManagement.Scene scene = EditorSceneManager.NewPreviewScene();
         try
@@ -151,11 +157,11 @@ public sealed class HeldItemGrips : EditorWindow
             GameObject instance = Object.Instantiate(character);
             UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(instance, scene);
             Animator animator = instance.GetComponentInChildren<Animator>();
-            Transform hand = animator.GetBoneTransform(HumanBodyBones.RightHand);
-            Transform index = animator.GetBoneTransform(HumanBodyBones.RightIndexProximal);
-            Transform little = animator.GetBoneTransform(HumanBodyBones.RightLittleProximal);
-            Transform middle = animator.GetBoneTransform(HumanBodyBones.RightMiddleProximal);
-            Transform thumb = animator.GetBoneTransform(HumanBodyBones.RightThumbProximal);
+            Transform hand = animator.GetBoneTransform(leftHand ? HumanBodyBones.LeftHand : HumanBodyBones.RightHand);
+            Transform index = animator.GetBoneTransform(leftHand ? HumanBodyBones.LeftIndexProximal : HumanBodyBones.RightIndexProximal);
+            Transform little = animator.GetBoneTransform(leftHand ? HumanBodyBones.LeftLittleProximal : HumanBodyBones.RightLittleProximal);
+            Transform middle = animator.GetBoneTransform(leftHand ? HumanBodyBones.LeftMiddleProximal : HumanBodyBones.RightMiddleProximal);
+            Transform thumb = animator.GetBoneTransform(leftHand ? HumanBodyBones.LeftThumbProximal : HumanBodyBones.RightThumbProximal);
             if (index == null || little == null || middle == null)
             {
                 return new Pose(Vector3.zero, Quaternion.identity); // no finger bones: hold at the hand bone

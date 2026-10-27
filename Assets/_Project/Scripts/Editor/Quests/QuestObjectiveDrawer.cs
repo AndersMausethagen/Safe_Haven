@@ -19,7 +19,7 @@ public sealed class QuestObjectiveDrawer : PropertyDrawer
         { ObjectiveType.DestroyBuilding, new[] { "building" } },
         { ObjectiveType.CraftItem, new[] { "item", "resource" } },
         { ObjectiveType.CompleteRaids, new[] { "raid", "mustExtract", "withinMinutes" } },
-        { ObjectiveType.QuestEvent, new[] { "questEvent" } },
+        { ObjectiveType.QuestEvent, new[] { "questEvent", "countAlreadyOwned" } },
         { ObjectiveType.BuildStructure, new[] { "building", "countAlreadyOwned" } },
     };
 

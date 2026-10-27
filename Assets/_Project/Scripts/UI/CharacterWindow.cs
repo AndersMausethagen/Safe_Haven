@@ -18,7 +18,7 @@ public sealed class CharacterWindow : MonoBehaviour, IItemSlotHandler
     // Slot order in each column, top to bottom (left to right for the bottom row).
     private static readonly GearSlot[] LeftSlots = { GearSlot.Head, GearSlot.Neck, GearSlot.Shoulders, GearSlot.Back, GearSlot.Chest, GearSlot.Wrists };
     private static readonly GearSlot[] RightSlots = { GearSlot.Hands, GearSlot.Waist, GearSlot.Legs, GearSlot.Feet, GearSlot.Finger1, GearSlot.Finger2 };
-    private static readonly GearSlot[] BottomSlots = { GearSlot.MainHand, GearSlot.Backpack, GearSlot.AxeTool, GearSlot.PickaxeTool, GearSlot.SickleTool };
+    private static readonly GearSlot[] BottomSlots = { GearSlot.MainHand, GearSlot.OffHand, GearSlot.Backpack, GearSlot.AxeTool, GearSlot.PickaxeTool, GearSlot.SickleTool };
 
     [Tooltip("Left empty, the player's PlayerEquipment is used.")]
     [SerializeField] private PlayerEquipment equipment;
@@ -234,9 +234,17 @@ public sealed class CharacterWindow : MonoBehaviour, IItemSlotHandler
             Destroy(root.GetChild(i).gameObject);
         }
 
+        var horizontal = root == bottomRow ? root.GetComponent<HorizontalLayoutGroup>() : null;
+        if (horizontal != null) horizontal.spacing = Mathf.Min(horizontal.spacing, 4f);
         foreach (GearSlot slot in order)
         {
             ItemSlotView view = Instantiate(slotPrefab, root);
+            if (horizontal != null)
+            {
+                float width = (root.rect.width - horizontal.padding.horizontal - horizontal.spacing * (order.Length - 1)) / order.Length;
+                var rect = (RectTransform)view.transform;
+                rect.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, Mathf.Min(rect.rect.width, width));
+            }
             view.name = "Gear " + slot;
             view.Bind(this, (int)slot);
             views[slot] = view;
@@ -274,6 +282,7 @@ public sealed class CharacterWindow : MonoBehaviour, IItemSlotHandler
             case GearSlot.Finger1:
             case GearSlot.Finger2: return "Ring";
             case GearSlot.MainHand: return "Weapon";
+            case GearSlot.OffHand: return "Off Hand";
             case GearSlot.Backpack: return "Pack";
             case GearSlot.AxeTool: return "Axe";
             case GearSlot.PickaxeTool: return "Pickaxe";

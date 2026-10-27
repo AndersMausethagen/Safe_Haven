@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 702d2e93d0a019a40b6339daf41e2c2f, type: 3}
+  m_Name: ActivatePortal
+  m_EditorClassIdentifier: SafeHaven::QuestDefinition
+  id: prologue.activateportal
+  displayName: Wake the Waystones
+  description: Liv recognises a passage in the ancient waystones. Touch the centre stone to wake the connection.
+  chain: Prologue - The Unquiet Forest
+  prerequisites:
+  - {fileID: 11400000, guid: cd536373f8f639f4db60c8810e546ebf, type: 2}
+  start: 2
+  startEvent: {fileID: 0}
+  objectivesInOrder: 0
+  objectives:
+  - type: 6
+    description: Touch the centre stone
+    amount: 1
+    item: {fileID: 0}
+    resource: {fileID: 0}
+    monster: {fileID: 0}
+    building: {fileID: 0}
+    raid: {fileID: 0}
+    mustExtract: 0
+    withinMinutes: 0
+    questEvent: {fileID: 11400000, guid: 3bbc727584d9a984cb3a088c5fe2d14b, type: 2}
+    countAlreadyOwned: 0
+  turnInToGiver: 0
+  turnInTo: 
+  rewardItems: []
+  rewardResources: []
+  rewardRecipes: []
+  completionEvent: {fileID: 0}

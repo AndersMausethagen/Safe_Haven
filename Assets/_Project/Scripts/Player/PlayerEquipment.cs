@@ -35,6 +35,7 @@ public sealed class PlayerEquipment : MonoBehaviour
 
     /// <summary>The main-hand weapon stack, or empty.</summary>
     public ItemStack MainHand => gear.Get(GearSlot.MainHand);
+    public ItemStack OffHand => gear.Get(GearSlot.OffHand);
 
     /// <summary>What the player carries on their body: the weight of worn armor, rings and the weapon (not the tool belt
     /// or the backpack). Decides the dodge (PlayerMovementSettings › Equipment load).</summary>
@@ -52,6 +53,8 @@ public sealed class PlayerEquipment : MonoBehaviour
                 }
             }
 
+            ItemStack offHand = OffHand;
+            if (!offHand.IsEmpty) load += offHand.Item.Weight;
             return load;
         }
     }

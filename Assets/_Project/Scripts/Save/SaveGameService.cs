@@ -48,6 +48,11 @@ public static class SaveGameService
             return "You can't save during a raid. Extract first.";
         }
 
+        if (PrologueDirector.Current != null && !PrologueDirector.Current.CanSave)
+        {
+            return "Finish this prologue encounter first. Safe phases save checkpoints; loading restarts the current phase.";
+        }
+
         return Player.Current == null || Player.Current.Persistence == null ? "There is nothing to save here." : null;
     }
 

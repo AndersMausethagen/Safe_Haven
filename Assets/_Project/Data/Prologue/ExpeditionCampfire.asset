@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 55433f6de2238c643b7ddfb32e5977d0, type: 3}
+  m_Name: ExpeditionCampfire
+  m_EditorClassIdentifier: Assembly-CSharp::BuildingDefinition
+  id: expedition-campfire
+  displayName: Campfire
+  description: The expedition's field fire, built from loose sticks and small rocks.
+  icon: {fileID: 21300000, guid: 83f9f2336afdaf74daa5a6ebb3a09ce0, type: 3}
+  faction: 0
+  combatStats: {fileID: 11400000, guid: 01155c9e2dd7c27468c1a359f747e1a1, type: 2}
+  prefab: {fileID: 6113176800454676674, guid: adb5c66554122b44eba4e8706172e86b, type: 3}
+  constructionCost: []
+  constructionItems:
+  - item: {fileID: 11400000, guid: e8bb5d2fbded52b42a179a47cce32d53, type: 2}
+    amount: 4
+  - item: {fileID: 11400000, guid: 9f085f39a2da68c45b58d2db986835f4, type: 2}
+    amount: 6
+  showInBuildMenu: 0
+  knownFromStart: 0
+  sortOrder: 0
+  yardDepth: 0
+  yardSide: 0
+  placeInLines: 0
+  station: 6
+  outputCapacity: 10
+  queueLength: 5
+  deathSound: {fileID: 0}

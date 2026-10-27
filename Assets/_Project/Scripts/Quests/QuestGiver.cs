@@ -1,4 +1,21 @@
 using UnityEngine;
+using System;
+using System.Collections.Generic;
+
+/// <summary>An authored offer in a giver's ordered quest sequence. Progress stays in QuestLog.</summary>
+[Serializable]
+public sealed class QuestOffer
+{
+    [SerializeField] private QuestDefinition quest;
+    [SerializeField, TextArea(2, 6)] private string text;
+    [SerializeField] private string acceptText = "I'll do it.";
+    [SerializeField, TextArea] private string waitingText;
+
+    public QuestDefinition Quest => quest;
+    public string Text => text;
+    public string AcceptText => acceptText;
+    public string WaitingText => waitingText;
+}
 
 /// <summary>What a Quest Giver currently offers the player, which decides its marker and whether it can be used.</summary>
 public enum QuestGiverState
@@ -48,15 +65,25 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
     [SerializeField] private DialogueLines afterLines = new DialogueLines();
     [Tooltip("Shows the floating !, … and ? above the giver. Their look is shared: Systems Editor › Quests.")]
     [SerializeField] private bool showMarker = true;
+    [Tooltip("Optional ordered offers, replacing the single Quest above. The first unfinished offer is selected; prerequisites still apply.")]
+    [SerializeField] private QuestOffer[] offers = Array.Empty<QuestOffer>();
+    [Tooltip("Open a conversation and require explicit acceptance instead of starting on interaction.")]
+    [SerializeField] private bool confirmInDialogue;
+    [SerializeField] private string speakerName;
+    [SerializeField, Range(0.3f, 1f)] private float dialogueCameraDistance = 0.65f;
 
     private Interactable interactable;
     private QuestMarker marker;
     private QuestGiverState state = QuestGiverState.None;
     private float lastAsked = float.NegativeInfinity;
+    private QuestOffer offer;
+    private PlayerCameraController dialogueCamera;
+    private bool talking;
 
-    public QuestDefinition Quest => quest;
+    public IReadOnlyList<QuestOffer> Offers => offers;
+    public QuestDefinition Quest => offer != null ? offer.Quest : quest;
     public QuestGiverState State => state;
-    public bool IsNote => state == QuestGiverState.InProgress || state == QuestGiverState.Done;
+    public bool IsNote => !confirmInDialogue && (state == QuestGiverState.InProgress || state == QuestGiverState.Done);
 
     private void Awake()
     {
@@ -82,6 +109,21 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
         }
 
         QuestManager.Changed -= Refresh;
+        if (talking) ActionMenuWindow.Current?.Close();
+        dialogueCamera?.EndDialogue(transform);
+    }
+
+    /// <summary>Selects the first unfinished offer, never skipping a locked quest to offer a later one.</summary>
+    public static QuestOffer SelectOffer(IReadOnlyList<QuestOffer> sequence, QuestLog log)
+    {
+        QuestOffer last = null;
+        foreach (var candidate in sequence)
+        {
+            if (candidate?.Quest == null) continue;
+            last = candidate;
+            if (log.StatusOf(candidate.Quest) != QuestStatus.Completed) return candidate;
+        }
+        return last;
     }
 
     /// <summary>What a giver for this quest offers, given the player's progress.</summary>
@@ -113,13 +155,14 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
     public bool CanInteract(GameObject user, out string reason)
     {
         reason = null;
+        if (confirmInDialogue && state != QuestGiverState.None) return true;
         switch (state)
         {
             case QuestGiverState.Available:
             case QuestGiverState.ReadyToTurnIn:
                 return true;
             case QuestGiverState.NotYet:
-                reason = QuestManager.Instance != null ? "Not yet: finish " + QuestManager.Instance.DescribeMissing(quest) + " first." : "Not yet.";
+                reason = QuestManager.Instance != null ? "Not yet: finish " + QuestManager.Instance.DescribeMissing(Quest) + " first." : "Not yet.";
                 return false;
             case QuestGiverState.InProgress:
                 reason = waitingLines.HasAny ? Line(waitingLines) : DefaultWaitingText;
@@ -145,6 +188,11 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
     /// <summary>Starts or hands in the quest, whichever fits its state. What the Interactable calls.</summary>
     public void Interact()
     {
+        if (confirmInDialogue)
+        {
+            OpenDialogue();
+            return;
+        }
         if (state == QuestGiverState.ReadyToTurnIn)
         {
             TurnIn();
@@ -163,9 +211,11 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
             return;
         }
 
-        if (QuestManager.Instance.TryStartQuest(quest, out string reason))
+        // Starting can synchronously complete quests and select the next offer.
+        string line = offer != null ? offer.Text : greeting;
+        if (QuestManager.Instance.TryStartQuest(Quest, out string reason))
         {
-            Post(greeting);
+            if (!confirmInDialogue) Post(line);
         }
         else
         {
@@ -181,7 +231,7 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
             return;
         }
 
-        if (QuestManager.Instance.TryTurnIn(quest, out string reason))
+        if (QuestManager.Instance.TryTurnIn(Quest, out string reason))
         {
             Post(turnInText);
         }
@@ -201,11 +251,14 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
 
     private void Refresh()
     {
-        state = QuestManager.Instance != null ? StateFor(quest, QuestManager.Instance.Log) : StateFor(quest, GameSession.Quests);
+        QuestLog log = QuestManager.Instance != null ? QuestManager.Instance.Log : GameSession.Quests;
+        offer = SelectOffer(offers, log);
+        state = StateFor(Quest, log);
         if (interactable != null)
         {
             // A finished giver with nothing more to say stops offering the interaction at all.
-            interactable.enabled = !(state == QuestGiverState.Done && !afterLines.HasAny) && state != QuestGiverState.None;
+            interactable.enabled = (confirmInDialogue || !(state == QuestGiverState.Done && !afterLines.HasAny)) &&
+                state != QuestGiverState.None;
         }
 
         if (showMarker && Application.isPlaying)
@@ -217,5 +270,58 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
 
             marker.Show(state);
         }
+    }
+
+    /// <summary>The same authored confirmation UI is available to any NPC, board or other giver.</summary>
+    public MenuPage BuildDialoguePage()
+    {
+        Refresh();
+        var page = new MenuPage { Title = string.IsNullOrWhiteSpace(speakerName) ? gameObject.name : speakerName };
+        QuestDefinition offeredQuest = Quest;
+        if (state == QuestGiverState.Available)
+        {
+            page.Body = offer != null ? offer.Text : greeting;
+            page.Add(new MenuAction(offer != null ? offer.AcceptText : "I'll do it.", offeredQuest.DisplayName, true,
+                () => AcceptOffer(offeredQuest), closesMenu: true));
+        }
+        else if (state == QuestGiverState.ReadyToTurnIn)
+        {
+            page.Body = turnInText;
+            page.Add(new MenuAction("It's done.", offeredQuest.DisplayName, true, () => {
+                Refresh();
+                if (Quest == offeredQuest && state == QuestGiverState.ReadyToTurnIn) TurnIn();
+            }, closesMenu: true));
+        }
+        else
+        {
+            page.Body = state == QuestGiverState.Done ? Line(afterLines) :
+                offer != null && !string.IsNullOrWhiteSpace(offer.WaitingText) ? offer.WaitingText :
+                waitingLines.HasAny ? Line(waitingLines) : DefaultWaitingText;
+        }
+        return page;
+    }
+
+    private void AcceptOffer(QuestDefinition expected)
+    {
+        Refresh();
+        // A menu may outlive its offer (an event or another interaction can advance the log).
+        if (Quest == expected && state == QuestGiverState.Available) StartQuest();
+    }
+
+    private void OpenDialogue()
+    {
+        if (ActionMenuWindow.Current == null)
+        {
+            Debug.LogError("Quest conversations require an ActionMenuWindow.", this);
+            return;
+        }
+        dialogueCamera = FindAnyObjectByType<PlayerCameraController>();
+        ActionMenuWindow.Current.Open(BuildDialoguePage, interactable != null ? interactable.Interactor : null,
+            transform, 4f, () => {
+                talking = false;
+                dialogueCamera?.EndDialogue(transform);
+            });
+        talking = true;
+        dialogueCamera?.BeginDialogue(transform, dialogueCameraDistance);
     }
 }

@@ -17,8 +17,8 @@ MonoBehaviour:
   description: You wake beneath a great tree in a quiet clearing. Its bark is warm, and something in it seems to be waiting for you.
   chain: The First Days
   prerequisites: []
-  start: 0
-  startEvent: {fileID: 0}
+  start: 1
+  startEvent: {fileID: 11400000, guid: d34acdcfc02a80243b371e93f882cd0c, type: 2}
   objectivesInOrder: 0
   objectives:
   - type: 6
@@ -33,6 +33,8 @@ MonoBehaviour:
     withinMinutes: 0
     questEvent: {fileID: 11400000, guid: c06332984c04ae244b8513b7d0e6178c, type: 2}
     countAlreadyOwned: 0
+  turnInToGiver: 0
+  turnInTo: 
   rewardItems: []
   rewardResources: []
   rewardRecipes: []

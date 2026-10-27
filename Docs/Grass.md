@@ -84,3 +84,14 @@ Blade width/height ranges and density are on the terrain's detail prototype (Edi
 
 Wind comes from `MossWind` (direction, strength and gusts), the same source as moss and trees. Weather scales it
 (see [weather](Weather.md)).
+
+## Forest prologue
+
+`Prologue_MistyWoods` uses its own `Data/Prologue/Vegetation/Prologue Forest Terrain.asset`, not the raid's
+TerrainData. Short/tall grass, ferns, berry shrubs, heather and flowers are painted in ground-layer-based patches;
+the central story route, shelter, portal and hand-gatherable fuel have clearings. Use Paint Details to tune these
+layers, preserving the clearings. The existing grass materials are shared and retain their tuning.
+
+The scene's **Forest Wind - Storm Vegetation** (`WindZone` + `MossWind`) feeds the existing grass and tree
+shaders. `WeatherSystem.wind` points to it so the authored storm scales both. WindZone Main and direction tune
+the base wind; individual materials tune their response. Terrain detail distance is 50 m.

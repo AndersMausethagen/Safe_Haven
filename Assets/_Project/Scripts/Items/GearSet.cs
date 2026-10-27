@@ -17,7 +17,7 @@ public sealed class GearSet
 
     public GearSet()
     {
-        Slots = new ItemContainer(GearSlots.Count, 1) { SlotRule = GearSlots.Accepts };
+        Slots = new ItemContainer(GearSlots.Count, 1) { SlotRule = Accepts };
         for (int i = 0; i < sources.Length; i++)
         {
             sources[i] = new object();
@@ -33,6 +33,21 @@ public sealed class GearSet
     public event Action<GearSlot> Changed;
 
     public ItemStack Get(GearSlot slot) => Slots.GetSlot((int)slot);
+
+    public bool Accepts(int index, ItemDefinition item)
+    {
+        return GearSlots.Accepts(index, item) && HandConflict((GearSlot)index, item) == null;
+    }
+
+    private string HandConflict(GearSlot slot, ItemDefinition item)
+    {
+        if (slot == GearSlot.MainHand && item != null && item.IsWeapon && item.Weapon.RequiresBothHands &&
+            !Get(GearSlot.OffHand).IsEmpty)
+            return "Put away your off-hand item before equipping a two-handed weapon.";
+        if (slot == GearSlot.OffHand && !Get(GearSlot.MainHand).IsEmpty && Get(GearSlot.MainHand).Item.Weapon.RequiresBothHands)
+            return "A two-handed weapon leaves no hand free for a torch.";
+        return null;
+    }
 
     /// <summary>
     /// Whether the stack can be equipped; reason says why not. Broken gear can't be put on: it has to be repaired first.
@@ -87,6 +102,8 @@ public sealed class GearSet
             reason = $"{stack.Item.DisplayName} doesn't go in the {GearSlots.Label(slot)} slot.";
             return false;
         }
+        reason = HandConflict(slot, stack.Item);
+        if (reason != null) return false;
 
         if (from.MoveTo(index, Slots, (int)slot))
         {
@@ -143,9 +160,14 @@ public sealed class GearSet
                 continue;
             }
 
+            if (stack.Item.IsWeapon && stack.Item.Weapon.CanUseOffHand)
+            {
+                if (Get(GearSlot.OffHand).IsEmpty && EquipTo(from, i, GearSlot.OffHand, out _)) equipped++;
+                continue;
+            }
             for (int s = 0; s < GearSlots.Count; s++)
             {
-                if (Slots.GetSlot(s).IsEmpty && GearSlots.Accepts((GearSlot)s, stack.Item) && from.MoveTo(i, Slots, s))
+                if (Slots.GetSlot(s).IsEmpty && Accepts(s, stack.Item) && from.MoveTo(i, Slots, s))
                 {
                     equipped++;
                     break;

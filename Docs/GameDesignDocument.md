@@ -745,9 +745,57 @@ Use readable finite-state behavior for enemies; companions require follow, hold,
 
 ## 21. First 90 minutes: player journey
 
+### 21.0 Prologue: the Unquiet Forest
+
+New Game begins in a dedicated, hand-authored variant of Misty Woods, before the home progression below.
+The expedition is investigating reports of a bewitched forest: trolls and witches are roaming beyond their old
+territories, while normally predictable creatures have become aggressive and erratic. The cause remains unknown.
+
+The player travels with seven future recruits: Sigrid (expedition leader), Ingrid (Alchemist), Bjarne (Smith),
+Tor (Carpenter), Eirik (Soldier), Runa (Tracker), and Liv (Rune Scholar). Names and dialogue are provisional authored
+content. Ingrid reuses the existing recruit identity; the other professions' full settlement effects remain future work.
+
+1. Start with a one-handed Woodsman's Axe, an off-hand lit torch and a complete set of Woven Hide armor. All seven companions carry torches.
+   The torch is a normal craftable weapon (two Sticks, by hand), with a brighter flickering light. An occupied off hand
+   rejects two-handed weapons; the player must put the torch away first.
+   Speak with Sigrid and accept her briefing before the expedition follows or the shelter quest begins.
+2. Find a dry rock shelter, then speak with Sigrid to receive the gathering task: four Sticks and six Small Rocks.
+   Return for her building instructions and use the normal build menu (G) to place a campfire beside the shelter.
+   Construction pays this cost once; there is no prebuilt fire or additional fuel payment.
+3. Speak with Sigrid again to begin a 35-second rest by default, with optional companion conversations.
+   Conversations bring the camera closer and frame the player and speaker; closing or leaving restores the view.
+4. Defend the camp against two wolves. The encounter counts regardless of who lands the killing blow.
+5. A rumbling, approaching presence forces the group onward to ancient waystones.
+6. Speak with Sigrid at the waystones, then touch them to start a visible three-minute connection countdown. Music starts here,
+   not during the opening or camp defence; wind/rain ambience remains throughout. Increasing enemy waves pressure the group;
+   the soldier offers limited nearby support and the Alchemist tends the player's wounds.
+7. Reaching zero opens the connection as a vast impact separates the expedition. Falling during this final defence
+   gives an abbreviated version of the same narrative transition, not an ordinary raid failure.
+8. Wake alive at the Heart Tree, without a raid report or durability penalty. The expedition supplies do not carry
+   into the settlement. Inspect the dormant portal and restore it to begin searching for the companions.
+
+Before the final defence, falling returns the player to the current phase's checkpoint with health restored.
+Safe phases save automatically and allow manual saving; combat phases do not. Loading restarts the current phase
+and its transient actors/timers, not a partially completed wave. The placed campfire keeps its location and state across saves.
+Arrival at home is saved once.
+
+The forest scene has no ordinary raid director or random raid generation. Quests and stable story events own
+progression; authored chapter behaviours control scene reactions, timing and encounters. Dialogue, chapter quests,
+entry/status text, acceptance choices, timed-phase duration, initial enemy counts, building costs, wave interval, enemy cap,
+starting armor, dialogue camera distance and companion support settings are designer-editable. Sigrid uses the same
+Quest Giver component as other NPCs: ordered offers own briefing text, acceptance choices and waiting lines, and
+confirmation starts the quest through the normal Quest Manager. There are no prologue-specific giver rules.
+Peaceful next objectives
+wait for the leader's briefing; attacks, the escape alarm and countdown remain automatic.
+The quest/event designer exposes scene-owned reactions for music, weather transitions, object activation and parameter
+changes. Quests can raise named events on start and completion. These reactions are authored in the Content Editor's
+Scene Reactions panel and saved with the scene; stateful reactions can replay from quest/event history on load.
+The field fire does not replace the permanent hearth and
+Construction Table needed for home crafting. Times in §21.1–21.5 describe the home/raid journey after this prologue.
+
 ### 21.1 Minutes 0–10: awakening
 
-The player wakes at the Heart Tree. A sunny clearing contains a stream, loose Small Rocks, fallen Sticks, and Berries, all gathered by hand at Tier 0. A short tree interaction creates mystery instead of a long opening cutscene. Teach movement, aiming, interacting, and the bag by collecting these materials, handcrafting and equipping the first stone tools, then harvesting Tier I Grey Stone and Oak Wood. Never require wood or Grey Stone to make the tool that first unlocks it.
+The player wakes at the Heart Tree after losing contact with the expedition. A sunny clearing contains a stream, loose Small Rocks, fallen Sticks, and Berries, all gathered by hand at Tier 0. A short tree interaction creates mystery instead of a long opening cutscene. Reinforce the prologue's movement and interaction lessons while introducing permanent equipment and home crafting, then harvest Tier I Grey Stone and Oak Wood. Never require wood or Grey Stone to make the tool that first unlocks it.
 
 ### 21.2 Minutes 10–25: first camp
 

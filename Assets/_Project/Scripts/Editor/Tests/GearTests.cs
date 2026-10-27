@@ -224,22 +224,27 @@ public sealed class GearTests
         var lookup = new Lookup();
         ItemDefinition cap = Armor("cap", ArmorSlot.Head);
         ItemDefinition pickaxe = Tool("pickaxe", ToolType.Pickaxe);
+        ItemDefinition torch = AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Project/Data/Items/HandTorch.asset");
         lookup.Items[cap.Id] = cap;
         lookup.Items[pickaxe.Id] = pickaxe;
+        lookup.Items[torch.Id] = torch;
         var gear = new ItemContainer(GearSlots.Count, 1);
         gear.SetSlot((int)GearSlot.Head, new ItemStack(cap, 1, 0.25f));
         gear.SetSlot((int)GearSlot.PickaxeTool, new ItemStack(pickaxe, 1));
+        gear.SetSlot((int)GearSlot.OffHand, new ItemStack(torch, 1, 0.6f));
         PlayerSnapshot player = PlayerSnapshot.Capture(new ItemContainer(4, 4), null, null, null, null, PlayerSnapshot.Condition.None, gear);
 
         SaveData data = SaveMapper.ToSaveData(player, null, "SafeHaven", null, DateTime.UtcNow);
         LoadedGame loaded = SaveMapper.FromSaveData(JsonUtility.FromJson<SaveData>(JsonUtility.ToJson(data)), lookup);
 
         Assert.IsTrue(loaded.Player.HasGear);
-        Assert.AreEqual(2, loaded.Player.Gear.Count);
+        Assert.AreEqual(3, loaded.Player.Gear.Count);
         PlayerSnapshot.SlotRecord head = Find(loaded.Player.Gear, (int)GearSlot.Head);
         Assert.AreEqual(cap, head.Stack.Item);
         Assert.AreEqual(0.25f, head.Stack.Durability, 0.001f);
         Assert.AreEqual(pickaxe, Find(loaded.Player.Gear, (int)GearSlot.PickaxeTool).Stack.Item);
+        Assert.AreEqual(torch, Find(loaded.Player.Gear, (int)GearSlot.OffHand).Stack.Item);
+        Assert.AreEqual(0.6f, Find(loaded.Player.Gear, (int)GearSlot.OffHand).Stack.Durability, 0.001f);
     }
 
     [Test]

@@ -27,12 +27,16 @@ public sealed class GameEventListener : MonoBehaviour
     [SerializeField] private QuestDefinition quest;
     [Tooltip("Also respond when the scene loads if it already happened (the quest started/completed, or the Quest Event was raised in this game), so a built bridge stays built.")]
     [SerializeField] private bool respondIfAlreadyHappened = true;
+    [Tooltip("Authored scene reactions run in order, then the optional Response below. Put this listener on an always-active object.")]
+    [SerializeField] private SceneEventAction[] actions = new SceneEventAction[0];
     [SerializeField] private UnityEvent response = new UnityEvent();
     [Tooltip("Optional. Used instead of Response on scene load, e.g. jump straight to the end state without sounds or effects. Leave empty to reuse Response.")]
     [SerializeField] private UnityEvent alreadyHappenedResponse = new UnityEvent();
+    private bool respondedSinceEnabled;
 
     private void OnEnable()
     {
+        respondedSinceEnabled = false;
         GameEvents.Raised += OnGameEvent;
     }
 
@@ -43,9 +47,10 @@ public sealed class GameEventListener : MonoBehaviour
 
     private void Start()
     {
-        if (respondIfAlreadyHappened && AlreadyHappened())
+        if (!respondedSinceEnabled && respondIfAlreadyHappened && AlreadyHappened())
         {
             UnityEvent onLoad = alreadyHappenedResponse.GetPersistentEventCount() > 0 ? alreadyHappenedResponse : response;
+            ExecuteActions();
             onLoad.Invoke();
         }
     }
@@ -74,7 +79,18 @@ public sealed class GameEventListener : MonoBehaviour
 
         if (matches)
         {
+            respondedSinceEnabled = true;
+            ExecuteActions();
             response.Invoke();
+        }
+    }
+
+    private void ExecuteActions()
+    {
+        foreach (var action in actions)
+        {
+            if (action == null) Debug.LogError("Quest scene reaction contains an empty action.", this);
+            else action.Execute(this);
         }
     }
 }

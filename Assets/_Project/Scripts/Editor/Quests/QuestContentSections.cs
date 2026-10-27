@@ -111,6 +111,7 @@ public sealed class QuestSection : ContentSection
 
         ContentUtility.EndPanel();
 
+        QuestReactionEditor.Draw(quest);
         if (GUILayout.Button("Open Quest Map"))
         {
             QuestMapWindow.Open();
@@ -279,7 +280,8 @@ public sealed class QuestSection : ContentSection
             case QuestStart.OnQuestEvent:
                 return $"When \"{(quest.StartEvent != null ? quest.StartEvent.DisplayName : "?")}\" happens, {after}.";
             case QuestStart.ByQuestGiver:
-                return $"When the player talks to a Quest Giver for it, {after}. Add one with GameObject > Safe Haven > Quest Giver.";
+                return $"When the player talks to a Quest Giver for it, {after}. Add one with GameObject > Safe Haven > Quest Giver. " +
+                    "Use its single Quest or ordered Offers; Confirm In Dialogue adds authored text and an acceptance choice.";
             default:
                 return $"Automatically, {after}.";
         }
@@ -354,7 +356,8 @@ public sealed class QuestEventSection : ContentSection
         bool any = false;
         foreach (QuestDefinition quest in ResourceCatalogTools.LoadAll<QuestDefinition>())
         {
-            string use = quest.StartEvent == gameEvent ? "starts it" : quest.CompletionEvent == gameEvent ? "raised when it completes" : null;
+            string use = quest.StartEvent == gameEvent ? "starts it" : quest.CompletionEvent == gameEvent || quest.OnCompleted.Contains(gameEvent)
+                ? "raised when it completes" : quest.OnStarted.Contains(gameEvent) ? "raised when it starts" : null;
             for (int i = 0; use == null && i < quest.Objectives.Count; i++)
             {
                 if (quest.Objectives[i].Progress(new GameEvent(GameEventKind.Custom, gameEvent)) > 0)
@@ -386,6 +389,7 @@ public sealed class QuestEventSection : ContentSection
         QuestSection.DrawSelectInOpenScenes(gameEvent);
         ContentUtility.EndPanel();
 
+        QuestReactionEditor.Draw(gameEvent);
         if (EditorApplication.isPlaying)
         {
             ContentUtility.BeginPanel("Play Test", "The game is running.");
