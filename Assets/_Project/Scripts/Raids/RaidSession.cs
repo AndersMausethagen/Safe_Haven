@@ -37,7 +37,11 @@ public sealed class RaidSession
         Loadout = loadout;
         ReturnScene = returnScene;
         SparksUsed = Math.Max(0, sparksUsed);
+        TimeOfDay = RaidTimeOfDay.For(definition, Seed);
     }
+
+    /// <summary>The hour this run takes place at (rolled from the seed), or null for the scene's own hour.</summary>
+    public RaidTimeOfDay TimeOfDay { get; }
 
     /// <summary>
     /// Picks this run's layout (see RaidGenerator): which spawn points get creatures, caches and resources. Fixed for the

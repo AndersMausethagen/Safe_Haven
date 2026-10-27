@@ -224,6 +224,12 @@ play mode). Use `SceneLoader.Load` for gameplay scene changes so saveable object
   lighting) and an optional `alarm` group woken when it is lit. Misty Woods: West Beacon (far, always open), East
   Beacon (70% of raids, goes dark at 4:00, alarm wakes two hunters), Hollow Oak (central, opens at 3:00, held in 60%
   of the time, inside the Old Moss Troll's round).
+- **Time of day:** `RaidDefinition.TimesOfDay` (`RaidTimeOfDay`: name, hour, chance, loot multiplier, briefing line).
+  `RaidTimeOfDay.For(raid, seed)` rolls one from the run's seed (tested); `RaidPreparationWindow` rolls the seed when it
+  opens, shows the hour and passes the seed to `RaidLauncher.TryLaunch`, so the briefing is what the raid gets. The
+  loot multiplier enters `RaidParameters.Calculate` like a modifier. `RaidSky` (an `ISceneSetup` on the raid's sky rig)
+  sets the `DayNightCycle` hour and stops its clock. Night shortens monster sight (`AtmosphereConditions.Night`,
+  `PerceptionSettings.SightAtNight`).
 - **The apex:** the Old Moss Troll (Content Editor › Monsters; built by `AgentScripts/BuildOldMossTroll.cs`) stands under
   Map Content › Apex in Misty Woods with a `MonsterPatrol` round of four waypoints looping around the Hollow Oak. Weak
   eyes (9 m, 100°), a 6 m nose (close sense) and keen ears (×1.8); 1400 health, poise 450, a 1 s sweep and a 1.3 s
@@ -294,6 +300,7 @@ filled in when it is saved (`SaveableEntityTools`). Safe Haven > Save > Assign M
 | React to the player dodging (sound, stamina) | Listen to `PlayerDodge.Dodged` |
 | Tune hunger/thirst, carry weight, death and repairs, raid time and Portal Sparks, the ward, purification or breaches | Systems Editor (Safe Haven > Systems Editor). No code. |
 | Add a raid destination | New `RaidDefinition` (Content Editor) + add it to the portal's destination list; base rules show in the Systems Editor |
+| Change when a raid takes place (day/dusk/night chances, night's reward) | Content Editor › Raids › the raid › Rules › **Time of day** |
 | Change how long an exit is held, its circle or how loudly a lit beacon calls | The raid's **Extraction Seconds** (Content Editor › Raids), and on the scene's `ExtractionPoint`: **Time Multiplier**, **Hold Radius**, **Call Radius** / **Call Interval** |
 | Give a new map fog, fog of war and night | Safe Haven › Environment › Atmosphere › Set Up Open Scene, then › Apply Preset; pockets with GameObject › Safe Haven › Fog Area. See [atmosphere](../../../Docs/Atmosphere.md) |
 | Make a tree, roof or prop dissolve when it hides the player | Safe Haven › Rendering › Make Materials See-Through › Selected (URP Lit/Unlit → See-Through copies; Tree Wind and Layered Lit already do). Size of the circle: `SeeThrough` on PlayerArmature |

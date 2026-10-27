@@ -124,6 +124,17 @@ the object and its shadow stay, and nothing behind the player is touched.
 - The two copies come from URP 17.6's own shaders: when URP is upgraded, regenerate them (the header in each says how).
 - Amplify shaders (Forest Ground, Mossy Stone) don't cut yet; boulders rarely hide the player.
 
+## Raids at day, dusk or night
+
+A raid's **Time of Day** list (Content Editor › Raids › Rules) holds the hours it can take place at, each with a chance,
+a loot multiplier and a briefing line. The hour is rolled from the run's seed when the portal's briefing opens, shown
+there ("Time of day: Night (23:30) +40% cache loot"), and kept for the raid (`RaidTimeOfDay`, `RaidSession.TimeOfDay`).
+The raid scene's sky rig has a `RaidSky` that sets that hour and stops the clock. At night the veil and the darker
+night volume (`MistyWoods_Night`) come with the day/night cycle, and monsters see less far (**Sight At Night**, 75%,
+on top of fog); they hear as well as ever. Misty Woods and Troll Valley: Day 55%, Dusk 25% (+15% loot), Night 20%
+(+40% loot). A new raid scene gets the rig with Safe Haven › Environment › Weather › Add Day, Night and Weather to
+Scene, then a `RaidSky` on it.
+
 ## Tuning
 
 | To change | Edit |
@@ -139,7 +150,6 @@ the object and its shadow stay, and nothing behind the player is touched.
 
 ## Not yet
 
-- Raids have no day/night rig, so they are always day (no veil there yet); a raid's hour could come from its seed.
 - A hand-held torch for the player, and night spawns in raids.
 - Some resource-node props (Elderwood) use an unlit material, so they stay dark at night; a lit material would let
   moonlight and torches reach them.

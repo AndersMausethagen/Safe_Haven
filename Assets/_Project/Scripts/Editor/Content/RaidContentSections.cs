@@ -249,6 +249,11 @@ public sealed class RaidSection : ContentSection
         Field("extractionSeconds");
         ContentUtility.EndPanel();
 
+        ContentUtility.BeginPanel("Time of day", "The hours a run can take place at, rolled from its seed and shown in the briefing. " +
+            "Chance weighs them against each other; Loot Multiplier pays for the dark. Empty: the scene's own hour.");
+        Field("timesOfDay");
+        ContentUtility.EndPanel();
+
         ContentUtility.BeginPanel("Strength", "Multipliers on top of each creature's and cache's own values. Raid modifiers change them further.");
         Field("lootMultiplier");
         Field("enemyHealthMultiplier");

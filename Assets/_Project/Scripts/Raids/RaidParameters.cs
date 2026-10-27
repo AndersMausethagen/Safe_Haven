@@ -40,7 +40,8 @@ public sealed class RaidParameters
     }
 
     /// <summary>The rules with the modifiers applied, plus extra seconds bought with Portal Sparks (GDD §7.3).</summary>
-    public static RaidParameters Calculate(RaidDefinition raid, IEnumerable<RaidModifierDefinition> modifiers, float extraSeconds)
+    public static RaidParameters Calculate(RaidDefinition raid, IEnumerable<RaidModifierDefinition> modifiers, float extraSeconds,
+        RaidTimeOfDay timeOfDay = null)
     {
         var effects = new List<RaidStatModifier>();
         if (modifiers != null)
@@ -57,6 +58,12 @@ public sealed class RaidParameters
         if (extraSeconds > 0f)
         {
             effects.Add(new RaidStatModifier(RaidStat.Duration, StatModifierOp.Flat, extraSeconds));
+        }
+
+        // The hour's reward works like a modifier, so it shows in the briefing's rules.
+        if (timeOfDay != null && !Mathf.Approximately(timeOfDay.lootMultiplier, 1f))
+        {
+            effects.Add(new RaidStatModifier(RaidStat.LootQuantity, StatModifierOp.Percent, timeOfDay.lootMultiplier - 1f));
         }
 
         return Calculate(raid, effects);

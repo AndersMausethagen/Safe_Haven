@@ -46,6 +46,11 @@ public sealed class RaidDefinition : ScriptableObject
     [Tooltip("Multiplier on enemies' physical and spell power. 1 is normal.")]
     [SerializeField, Min(0f)] private float enemyPowerMultiplier = 1f;
 
+    [Header("Time of Day")]
+    [Tooltip("The hours this raid can take place at, rolled from each run's seed (shown in the briefing). Empty: the " +
+             "scene's own hour. Night is darker for the player and the monsters alike, and should pay more.")]
+    [SerializeField] private List<RaidTimeOfDay> timesOfDay = new List<RaidTimeOfDay>();
+
     [Header("Spawns")]
     [Tooltip("Multiplier on how many creatures every enemy spawn list places (its min and max count), on top of the " +
              "global density. 1 is as authored. A list never fills more points than it has.")]
@@ -93,6 +98,7 @@ public sealed class RaidDefinition : ScriptableObject
     public ResourceDefinition[] LikelyResources => likelyResources;
     /// <summary>Danger stages, the earliest (most time left) first.</summary>
     public IReadOnlyList<RaidStage> Stages => stages;
+    public IReadOnlyList<RaidTimeOfDay> TimesOfDay => timesOfDay;
 
     public float EnemyDensity => enemyDensity;
     /// <summary>This raid's enemy density times the global one (RaidGlobalSettings).</summary>

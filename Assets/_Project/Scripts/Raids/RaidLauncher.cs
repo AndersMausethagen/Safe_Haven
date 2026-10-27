@@ -76,7 +76,8 @@ public static class RaidLauncher
     /// Sends the player into the raid with the chosen modifier items (each kind once, one of it used up) and Portal Sparks.
     /// Returns false, with a reason for the player, when it can't.
     /// </summary>
-    public static bool TryLaunch(RaidDefinition raid, GameObject player, IEnumerable<ItemDefinition> modifierItems, out string problem, int sparks = 0)
+    public static bool TryLaunch(RaidDefinition raid, GameObject player, IEnumerable<ItemDefinition> modifierItems, out string problem,
+        int sparks = 0, int? seed = null)
     {
         problem = CheckLaunch(raid);
         ItemInventory inventory = player != null ? player.GetComponent<ItemInventory>() : null;
@@ -125,9 +126,12 @@ public static class RaidLauncher
             modifiers.Add(item.RaidModifier);
         }
 
-        RaidParameters parameters = RaidParameters.Calculate(raid, modifiers, sparks * SettlementSettings.Current.SecondsPerSpark);
+        // The seed is usually rolled when the briefing opens, so the hour it shows is the hour the raid gets.
+        int runSeed = seed ?? RaidSession.NewSeed();
+        RaidParameters parameters = RaidParameters.Calculate(raid, modifiers, sparks * SettlementSettings.Current.SecondsPerSpark,
+            RaidTimeOfDay.For(raid, runSeed));
         PlayerSnapshot loadout = PlayerSnapshot.Capture(player);
-        GameSession.BeginRaid(new RaidSession(raid, modifiers, parameters, loadout, SceneManager.GetActiveScene().name, sparks));
+        GameSession.BeginRaid(new RaidSession(raid, modifiers, parameters, loadout, SceneManager.GetActiveScene().name, sparks, runSeed));
         GameSession.CarryPlayerState(loadout);
 
         // The player stays in this scene until the raid scene has loaded, so keep them from wandering off meanwhile.

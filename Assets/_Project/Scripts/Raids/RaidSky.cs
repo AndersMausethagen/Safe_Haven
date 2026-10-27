@@ -1,0 +1,48 @@
+using System.Collections;
+using UnityEngine;
+
+/// <summary>
+/// Sets a raid scene's sky to the hour the run was rolled (RaidSession.TimeOfDay, chosen from the raid's Time of Day
+/// list and shown in the briefing) and stops the clock, so a night raid stays night. On the raid's "Sky and Weather"
+/// rig. Without a rolled hour (a test raid, a raid with no times of day) the rig's own start hour stands.
+/// </summary>
+[DisallowMultipleComponent]
+public sealed class RaidSky : MonoBehaviour, ISceneSetup
+{
+    [Tooltip("The scene's day/night cycle (found in children when empty).")]
+    [SerializeField] private DayNightCycle cycle;
+
+    public int SetupOrder => -90;
+
+    public IEnumerator Setup()
+    {
+        Apply();
+        yield break;
+    }
+
+    private void Start()
+    {
+        // Covers scenes started straight from the editor, which run setup before Start as well; applying twice is harmless.
+        Apply();
+    }
+
+    private void Apply()
+    {
+        if (cycle == null)
+        {
+            cycle = GetComponentInChildren<DayNightCycle>();
+        }
+
+        if (cycle == null)
+        {
+            return;
+        }
+
+        cycle.ClockRuns = false;
+        RaidTimeOfDay timeOfDay = GameSession.ActiveRaid?.TimeOfDay;
+        if (timeOfDay != null)
+        {
+            cycle.Hour = timeOfDay.hour;
+        }
+    }
+}

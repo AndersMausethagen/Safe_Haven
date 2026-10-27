@@ -54,6 +54,7 @@ public sealed class RaidPreparationWindow : MonoBehaviour
     private bool dirty;
     private int destinationIndex;
     private int sparks;
+    private int pendingSeed;
 
     private void Awake()
     {
@@ -108,6 +109,8 @@ public sealed class RaidPreparationWindow : MonoBehaviour
         picked.Clear();
         destinationIndex = 0;
         sparks = 0;
+        // Rolled now, so the briefing shows the hour (and layout) the raid will really have.
+        pendingSeed = RaidSession.NewSeed();
         Watch(user != null ? user.GetComponentInParent<ItemInventory>() : null);
         Rebuild();
         window.Open();
@@ -260,7 +263,8 @@ public sealed class RaidPreparationWindow : MonoBehaviour
         }
 
         raidLabel.text = $"{raid.DisplayName}  <size=16>{Tiers.RichLabel(raid.Tier)}{(raid.IsLocked ? "  <color=#AAB0BC>locked</color>" : "")}</size>";
-        descriptionLabel.text = raid.Description + DescribeBriefing(raid);
+        RaidTimeOfDay timeOfDay = RaidTimeOfDay.For(raid, pendingSeed);
+        descriptionLabel.text = raid.Description + DescribeTimeOfDay(timeOfDay) + DescribeBriefing(raid);
 
         var modifiers = new List<RaidModifierDefinition>();
         foreach (ItemDefinition item in picked)
@@ -268,7 +272,7 @@ public sealed class RaidPreparationWindow : MonoBehaviour
             modifiers.Add(item.RaidModifier);
         }
 
-        RaidParameters rules = RaidParameters.Calculate(raid, modifiers, sparks * SettlementSettings.Current.SecondsPerSpark);
+        RaidParameters rules = RaidParameters.Calculate(raid, modifiers, sparks * SettlementSettings.Current.SecondsPerSpark, timeOfDay);
         var builder = new StringBuilder();
         AppendRule(builder, "Time limit", RaidStats.FormatTime(rules.Duration), raid, rules, RaidStat.Duration);
         AppendRule(builder, "Extraction", $"{rules.ExtractionTime:0.#}s", raid, rules, RaidStat.ExtractionTime);
@@ -278,6 +282,20 @@ public sealed class RaidPreparationWindow : MonoBehaviour
         rulesLabel.text = builder.ToString();
 
         riskLabel.text = problem != null ? $"<color={Warning}>{problem}</color>" : DescribeRisk();
+    }
+
+    private static string DescribeTimeOfDay(RaidTimeOfDay timeOfDay)
+    {
+        if (timeOfDay == null)
+        {
+            return "";
+        }
+
+        string reward = timeOfDay.lootMultiplier > 1.001f ? $"  <color=#8BE08B>+{timeOfDay.lootMultiplier - 1f:P0} cache loot</color>" : "";
+        string line = string.IsNullOrWhiteSpace(timeOfDay.briefing) ? "" : $" {timeOfDay.briefing}";
+        int hours = Mathf.FloorToInt(timeOfDay.hour) % 24;
+        int minutes = Mathf.FloorToInt((timeOfDay.hour - Mathf.Floor(timeOfDay.hour)) * 60f);
+        return $"\n<color=#C9B8FF>Time of day:</color> {timeOfDay.DisplayName} ({hours:00}:{minutes:00}){reward}.{line}";
     }
 
     private static string DescribeBriefing(RaidDefinition raid)
@@ -392,7 +410,7 @@ public sealed class RaidPreparationWindow : MonoBehaviour
             return;
         }
 
-        if (RaidLauncher.TryLaunch(Destination, player, picked, out string problem, sparks))
+        if (RaidLauncher.TryLaunch(Destination, player, picked, out string problem, sparks, pendingSeed))
         {
             Close();
         }

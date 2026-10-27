@@ -74,6 +74,7 @@ public sealed class DayNightCycle : MonoBehaviour
     {
         Shader.SetGlobalFloat(NightId, 0f);
         AtmosphereConditions.WeatherFog = 1f;
+        AtmosphereConditions.Night = 0f;
     }
 
     private void OnDestroy()
@@ -131,6 +132,7 @@ public sealed class DayNightCycle : MonoBehaviour
         RenderSettings.fogDensity = state.FogDensity * sky.Fog;
         // The volumetric fog thickens with the weather too (Atmospheric Fog › Weather Influence).
         AtmosphereConditions.WeatherFog = sky.Fog;
+        AtmosphereConditions.Night = state.Night;
         RenderSettings.reflectionIntensity = state.Reflection * (1f - 0.4f * sky.Clouds);
 
         if (nightVolume != null)

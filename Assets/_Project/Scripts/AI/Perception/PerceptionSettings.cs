@@ -31,11 +31,13 @@ public sealed class PerceptionSettings : GameSettings<PerceptionSettings>
     [Tooltip("What blocks sight: terrain, trees, rocks and buildings. Characters never block it.")]
     [SerializeField] private LayerMask sightBlockers = 1;
 
-    [Header("Fog")]
+    [Header("Fog and Dark")]
     [Tooltip("Volumetric fog density (Atmospheric Fog, weather included) counted as dense fog.")]
     [SerializeField, Min(0.001f)] private float denseFog = 0.06f;
     [Tooltip("Share of their sight range monsters keep in dense fog; thinner fog costs proportionally less.")]
     [SerializeField, Range(0.2f, 1f)] private float sightInDenseFog = 0.55f;
+    [Tooltip("Share of their sight range monsters keep at night (they still hear as well).")]
+    [SerializeField, Range(0.2f, 1f)] private float sightAtNight = 0.75f;
 
     [Header("Hunting and searching")]
     [Tooltip("Seconds a hunting monster keeps after a target it can no longer see before it goes to where it last saw it.")]
@@ -116,6 +118,7 @@ public sealed class PerceptionSettings : GameSettings<PerceptionSettings>
     public LayerMask SightBlockers => sightBlockers;
     public float DenseFog => denseFog;
     public float SightInDenseFog => sightInDenseFog;
+    public float SightAtNight => sightAtNight;
 
     public float LoseTrackSeconds => loseTrackSeconds;
     public float SearchSeconds => searchSeconds;

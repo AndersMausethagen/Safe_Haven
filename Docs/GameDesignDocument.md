@@ -263,6 +263,11 @@ The proposed baseline is **12 minutes**. One **Portal Spark** grants **+3 minute
 
 Time extensions should be a resource-planning tradeoff and never remove all tension. The clock must not secretly scale against the player after purchases. Pausing, dialogues, inventory interactions, and cutscenes need a documented timer policy.
 
+**Time of day (October 27, 2026).** Each run takes place at an hour rolled before the portal opens and shown in the
+briefing: mostly day, sometimes dusk or night. Night is the grey dark of the night veil: the player sees little beyond
+arm's reach and monsters see less far too, but hear as well as ever. Night pays more (prototype: +40% cache loot, dusk
++15%) so the choice to go in at night is a real one.
+
 ### 7.4 Raid objectives
 
 Resource run, scouting, NPC rescue, missing-person search, lost-carriage recovery, rare-item hunt, shrine restoration, contract, and boss hunt. Side objectives should be optional temptations. A boss raid can be more structured so random events do not compromise encounter fairness.
