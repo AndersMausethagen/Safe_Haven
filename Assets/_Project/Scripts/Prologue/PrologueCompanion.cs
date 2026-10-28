@@ -23,7 +23,6 @@ public sealed class PrologueCompanion : MonoBehaviour
     private float nextPath;
     private float nextSupport;
     private bool hasSpeed;
-    private PlayerCameraController dialogueCamera;
     private bool talking;
     private static readonly int Speed = Animator.StringToHash("Speed");
 
@@ -47,8 +46,7 @@ public sealed class PrologueCompanion : MonoBehaviour
     private void OnDisable()
     {
         if (interactable != null) interactable.Completed.RemoveListener(Talk);
-        if (talking) ActionMenuWindow.Current?.Close();
-        dialogueCamera?.EndDialogue(transform);
+        if (talking && DialogueBox.IsOpen) DialogueBox.Current.Close();
     }
 
     public void RallyAt(Transform point, bool restore)
@@ -97,24 +95,12 @@ public sealed class PrologueCompanion : MonoBehaviour
     private void Talk()
     {
         if (resident == null || PrologueDirector.Current == null) return;
-        var director = PrologueDirector.Current;
         PrologueStep step = PrologueDirector.Current.Step;
         string line = step >= PrologueStep.ReachPortal ? portalLine
             : step >= PrologueStep.GatherFuel ? campLine : forestLine;
         GameEvents.Raise(talkedEvent, interactable.Interactor);
-        if (ActionMenuWindow.Current == null)
-        {
-            Debug.LogError("Expedition conversations require an ActionMenuWindow.", this);
-            return;
-        }
-        dialogueCamera = FindAnyObjectByType<PlayerCameraController>();
-        ActionMenuWindow.Current.Open(() => {
-            return new MenuPage { Title = resident.DisplayName, Body = line };
-        }, interactable.Interactor, transform, 4f, () => {
-            talking = false;
-            dialogueCamera?.EndDialogue(transform);
-        });
         talking = true;
-        dialogueCamera?.BeginDialogue(transform, director.Definition.DialogueCameraDistance);
+        DialogueBox.Current.Say(new DialogueSpeaker(resident.DisplayName, transform, null, PrologueDirector.Current.Definition.DialogueCameraDistance),
+            line, () => talking = false);
     }
 }

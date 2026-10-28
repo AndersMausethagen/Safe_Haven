@@ -24,4 +24,6 @@ public enum UIWindowId
     PauseMenu = 8,
     /// <summary>A crafting station's recipes, queue and output, opened at the station.</summary>
     Station = 9,
+    /// <summary>A conversation: the speaker's portrait, their line and the player's answers (DialogueBox).</summary>
+    Dialogue = 10,
 }

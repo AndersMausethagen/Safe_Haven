@@ -10,7 +10,8 @@ using UnityEngine.Rendering.Universal;
 /// march at half resolution gathers the fog's light and transmittance along each view ray (sun or moon through its
 /// shadow cascades, the nearest AtmosphereLights, thinned around VisibilitySources), then a full-resolution composite
 /// lays the fog over the scene and adds the fog of war: unexplored ground (ExplorationMap) and, at night, the grey
-/// veil beyond every visibility source. Game cameras only, so the Scene view stays clear for editing.
+/// veil beyond every visibility source. Game cameras only, so the Scene view stays clear for editing, and not cameras
+/// that render into a texture (portraits, icons).
 /// Shader: Shaders/Atmosphere.shader ("Hidden/Safe Haven/Atmosphere").
 /// </summary>
 public sealed class AtmosphereFeature : ScriptableRendererFeature
@@ -53,7 +54,9 @@ public sealed class AtmosphereFeature : ScriptableRendererFeature
         }
 
         CameraType type = renderingData.cameraData.cameraType;
-        if (type != CameraType.Game)
+        // Cameras that render into a texture (the dialogue portrait, icons) are close-ups without fog; the march's
+        // buffers are sized for the screen, so on them it would leave a dark band.
+        if (type != CameraType.Game || renderingData.cameraData.camera.targetTexture != null)
         {
             return;
         }

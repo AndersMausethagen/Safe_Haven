@@ -70,6 +70,8 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
     [Tooltip("Open a conversation and require explicit acceptance instead of starting on interaction.")]
     [SerializeField] private bool confirmInDialogue;
     [SerializeField] private string speakerName;
+    [Tooltip("Shown in the dialogue box instead of a live portrait of this object. Optional.")]
+    [SerializeField] private Sprite portrait;
     [SerializeField, Range(0.3f, 1f)] private float dialogueCameraDistance = 0.65f;
 
     private Interactable interactable;
@@ -77,7 +79,6 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
     private QuestGiverState state = QuestGiverState.None;
     private float lastAsked = float.NegativeInfinity;
     private QuestOffer offer;
-    private PlayerCameraController dialogueCamera;
     private bool talking;
 
     public IReadOnlyList<QuestOffer> Offers => offers;
@@ -109,8 +110,7 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
         }
 
         QuestManager.Changed -= Refresh;
-        if (talking) ActionMenuWindow.Current?.Close();
-        dialogueCamera?.EndDialogue(transform);
+        if (talking && DialogueBox.IsOpen) DialogueBox.Current.Close();
     }
 
     /// <summary>Selects the first unfinished offer, never skipping a locked quest to offer a later one.</summary>
@@ -215,7 +215,7 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
         string line = offer != null ? offer.Text : greeting;
         if (QuestManager.Instance.TryStartQuest(Quest, out string reason))
         {
-            if (!confirmInDialogue) Post(line);
+            if (!confirmInDialogue) Say(line);
         }
         else
         {
@@ -233,7 +233,7 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
 
         if (QuestManager.Instance.TryTurnIn(Quest, out string reason))
         {
-            Post(turnInText);
+            Say(turnInText);
         }
         else
         {
@@ -241,13 +241,24 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
         }
     }
 
-    private static void Post(string line)
+    // The giver's line in the dialogue box (outside Play mode, such as in tests, in the message feed).
+    private void Say(string line)
     {
-        if (!string.IsNullOrWhiteSpace(line))
+        if (string.IsNullOrWhiteSpace(line))
+        {
+            return;
+        }
+
+        if (!Application.isPlaying)
         {
             GameMessages.Post(line, MessageKind.Info);
+            return;
         }
+
+        DialogueBox.Current.Say(new DialogueSpeaker(SpeakerName, transform, portrait, dialogueCameraDistance), line);
     }
+
+    private string SpeakerName => string.IsNullOrWhiteSpace(speakerName) ? gameObject.name : speakerName;
 
     private void Refresh()
     {
@@ -276,7 +287,7 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
     public MenuPage BuildDialoguePage()
     {
         Refresh();
-        var page = new MenuPage { Title = string.IsNullOrWhiteSpace(speakerName) ? gameObject.name : speakerName };
+        var page = new MenuPage { Title = SpeakerName };
         QuestDefinition offeredQuest = Quest;
         if (state == QuestGiverState.Available)
         {
@@ -310,18 +321,7 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
 
     private void OpenDialogue()
     {
-        if (ActionMenuWindow.Current == null)
-        {
-            Debug.LogError("Quest conversations require an ActionMenuWindow.", this);
-            return;
-        }
-        dialogueCamera = FindAnyObjectByType<PlayerCameraController>();
-        ActionMenuWindow.Current.Open(BuildDialoguePage, interactable != null ? interactable.Interactor : null,
-            transform, 4f, () => {
-                talking = false;
-                dialogueCamera?.EndDialogue(transform);
-            });
         talking = true;
-        dialogueCamera?.BeginDialogue(transform, dialogueCameraDistance);
+        DialogueBox.Current.Talk(BuildDialoguePage(), new DialogueSpeaker(SpeakerName, transform, portrait, dialogueCameraDistance), () => talking = false);
     }
 }

@@ -22,6 +22,13 @@ public sealed class UIWindow : MonoBehaviour
     /// <summary>Raised after the window opens (true) or closes (false).</summary>
     public event Action<bool> OpenChanged;
 
+    /// <summary>Sets up a window made in code. Call it while its object is still inactive (before OnEnable).</summary>
+    public void Configure(UIWindowId windowId, GameObject windowContent)
+    {
+        id = windowId;
+        content = windowContent;
+    }
+
     private void OnEnable()
     {
         if (content == null || content == gameObject)
