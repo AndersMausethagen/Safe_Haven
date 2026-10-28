@@ -1,3 +1,4 @@
+using System.Globalization;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -5,11 +6,19 @@ using UnityEngine.Rendering;
 /// directional light is the sun by day and the moon by night; ambient light, fog, sky reflections and the Night and
 /// Golden Hour volumes follow the hour. A <see cref="WeatherSystem"/>, when set, dims the sun under clouds, thickens
 /// and tints the fog, and flashes lightning. In the editor, drag Start Hour to preview any time of day.
-/// The time is not saved: a loaded game starts at Start Hour. Visual only; no gameplay reads it yet.</summary>
+/// <para>
+/// Saved (ISaveable; needs a SaveableEntity on the same object in a persistent scene): the hour is kept when the player
+/// leaves for a raid or saves. Coming back in the same play session, the clock has moved on by the real time spent away
+/// (a raid takes part of a day), so the Haven doesn't freeze at the hour you left. A loaded game resumes at the saved hour.
+/// </para></summary>
 [ExecuteAlways]
 [DisallowMultipleComponent]
-public sealed class DayNightCycle : MonoBehaviour
+public sealed class DayNightCycle : MonoBehaviour, ISaveable
 {
+    // Identifies this run of the game, so a restore can tell "away on a raid" (same run: time passed) from "loaded from
+    // disk" (another run: no way to know how long it was).
+    private static readonly string Run = System.Guid.NewGuid().ToString("N");
+
     [SerializeField] private DayNightProfile profile;
     [Tooltip("The scene's directional light: the sun by day, the moon by night.")]
     [SerializeField] private Light sun;
@@ -54,6 +63,30 @@ public sealed class DayNightCycle : MonoBehaviour
     public DayNightState State { get; private set; }
 
     public bool IsNight => State.IsMoon;
+
+    public string SaveKey => "clock";
+
+    public string CaptureState() =>
+        string.Join("|", hour.ToString("R", CultureInfo.InvariantCulture), Run,
+            Time.realtimeSinceStartupAsDouble.ToString("R", CultureInfo.InvariantCulture));
+
+    public void RestoreState(string state)
+    {
+        string[] parts = string.IsNullOrEmpty(state) ? new string[0] : state.Split('|');
+        if (parts.Length == 0 || !float.TryParse(parts[0], NumberStyles.Float, CultureInfo.InvariantCulture, out float saved))
+        {
+            return;
+        }
+
+        float away = 0f;
+        if (parts.Length >= 3 && parts[1] == Run && clockRuns && profile != null
+            && double.TryParse(parts[2], NumberStyles.Float, CultureInfo.InvariantCulture, out double then))
+        {
+            away = (float)(Time.realtimeSinceStartupAsDouble - then) * 24f / (profile.DayLengthMinutes * 60f);
+        }
+
+        Hour = saved + Mathf.Max(0f, away);
+    }
 
     private void OnEnable()
     {

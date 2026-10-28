@@ -20,9 +20,9 @@ RenderSettings:
   m_FogDensity: 0.006
   m_LinearFogStart: 0
   m_LinearFogEnd: 300
-  m_AmbientSkyColor: {r: 0.6200099, g: 0.68, b: 0.77999336, a: 1}
-  m_AmbientEquatorColor: {r: 0.5200099, g: 0.49000385, b: 0.4400022, a: 1}
-  m_AmbientGroundColor: {r: 0.30000332, g: 0.26000163, b: 0.2200011, a: 1}
+  m_AmbientSkyColor: {r: 0.83701336, g: 0.91800004, b: 1.052991, a: 1}
+  m_AmbientEquatorColor: {r: 0.7020134, g: 0.6615052, b: 0.59400296, a: 1}
+  m_AmbientGroundColor: {r: 0.4050045, g: 0.35100222, b: 0.29700148, a: 1}
   m_AmbientIntensity: 1
   m_AmbientMode: 1
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
@@ -644,7 +644,6 @@ MonoBehaviour:
   prologue: {fileID: 11400000, guid: 8ed476859a86aac4f832d87932262e2c, type: 2}
   homeEnteredEvent: {fileID: 11400000, guid: d34acdcfc02a80243b371e93f882cd0c, type: 2}
   reunitedTrailEvent: {fileID: 11400000, guid: 6f84424e4c227b4449220dab22e7e824, type: 2}
-  rescueQuest: {fileID: 11400000, guid: 84d6a79cd30dba342ae6ae24a0109f98, type: 2}
 --- !u!4 &61183412
 Transform:
   m_ObjectHideFlags: 0
@@ -6352,7 +6351,7 @@ Light:
     m_Type: 2
     m_Resolution: -1
     m_CustomResolution: -1
-    m_Strength: 1
+    m_Strength: 0.8
     m_Bias: 0.05
     m_NormalBias: 0.4
     m_NearPlane: 0.2
@@ -9718,6 +9717,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::WaterSurface
   takesRipples: 1
   depth: 2
+  centreline: []
 --- !u!1001 &853848495
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -12324,6 +12324,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::WaterSurface
   takesRipples: 1
   depth: 2
+  centreline: []
 --- !u!1 &1204828337
 GameObject:
   m_ObjectHideFlags: 0
@@ -13971,6 +13972,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::WaterSurface
   takesRipples: 1
   depth: 2
+  centreline: []
 --- !u!1 &1424555203
 GameObject:
   m_ObjectHideFlags: 0
@@ -14922,6 +14924,7 @@ MonoBehaviour:
   gameEvent: {fileID: 11400000, guid: 1f41472694654b946a93bec725e2174e, type: 2}
   quest: {fileID: 0}
   respondIfAlreadyHappened: 1
+  actions: []
   response:
     m_PersistentCalls:
       m_Calls:
@@ -15774,6 +15777,10 @@ MonoBehaviour:
     lines: []
     order: 0
   showMarker: 1
+  offers: []
+  confirmInDialogue: 0
+  speakerName: 
+  dialogueCameraDistance: 0.65
 --- !u!114 &1593342185
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17027,6 +17034,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1783169802}
   - component: {fileID: 1783169803}
+  - component: {fileID: 1783169804}
   m_Layer: 0
   m_Name: Day Night
   m_TagString: Untagged
@@ -17068,6 +17076,24 @@ MonoBehaviour:
   nightVolume: {fileID: 1175042949}
   goldenHourVolume: {fileID: 1685765450}
   weather: {fileID: 1484205663}
+--- !u!114 &1783169804
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1783169801}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aecdc764a0346784e9958a956dddd948, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::SaveableEntity
+  id: 70c9f1280b03487aaf3c99a37cfe0005
+  prefabId: 
+  saveTransform: 0
+  saveActiveState: 0
+  rememberDestruction: 0
+  saveComponents: 1
 --- !u!1 &1815655577
 GameObject:
   m_ObjectHideFlags: 0
@@ -17424,6 +17450,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::WaterSurface
   takesRipples: 1
   depth: 2
+  centreline: []
 --- !u!1 &1871047931
 GameObject:
   m_ObjectHideFlags: 0
@@ -18363,8 +18390,39 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 8771091787928289351, guid: 18764a86ece898a49881be5710037b60, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1941680514}
   m_SourcePrefab: {fileID: -4161369568681901532, guid: 18764a86ece898a49881be5710037b60, type: 3}
+--- !u!1 &1941680513 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8771091787928289351, guid: 18764a86ece898a49881be5710037b60, type: 3}
+  m_PrefabInstance: {fileID: 1941680512}
+  m_PrefabAsset: {fileID: 0}
+--- !u!136 &1941680514
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1941680513}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 1.1939279
+  m_Height: 10.929605
+  m_Direction: 1
+  m_Center: {x: -0.19326858, y: 4.8284216, z: -0.046722755}
 --- !u!1 &1960657523 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 3297963709419939464, guid: 0fe564bf746ab6a4981ab527c459bf3a, type: 3}
@@ -18543,6 +18601,7 @@ MonoBehaviour:
       volume: 0.2
     order: 0
   combatMusic: 1
+  startSilent: 0
   finalStretchSeconds: 60
 --- !u!4 &1963846609
 Transform:

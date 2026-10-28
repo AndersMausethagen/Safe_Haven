@@ -1,8 +1,9 @@
 # Day, night and weather
 
 A scene's **Sky and Weather** rig lights it through a 24-hour day and changes its weather. It is visual only: no
-gameplay reads the time or the weather yet, and neither is saved (a loaded game starts at the start hour and start
-weather).
+gameplay reads the time or the weather yet. The Haven's hour is saved (its Day Night object has a SaveableEntity):
+leaving for a raid and coming back, the clock has moved on by the time spent away, and a loaded game resumes at the
+saved hour. The weather is not saved (a loaded game starts at the start weather).
 
 ## Use
 

@@ -39,6 +39,20 @@ public sealed class WorldToolsTests
     }
 
     [Test]
+    public void GeneratedTreesCantBeWalkedThrough()
+    {
+        foreach (string guid in AssetDatabase.FindAssets("t:Prefab", new[] { "Assets/_Project/Models/Generated/Vegetation" }))
+        {
+            var tree = AssetDatabase.LoadAssetAtPath<UnityEngine.GameObject>(AssetDatabase.GUIDToAssetPath(guid));
+            bool whole = tree.GetComponentsInChildren<UnityEngine.MeshFilter>(true).Any(f => f.name == "Trunk" && f.transform != tree.transform);
+            if (whole)
+            {
+                Assert.IsNotNull(tree.GetComponentInChildren<UnityEngine.Collider>(true), $"{tree.name} has no trunk collider");
+            }
+        }
+    }
+
+    [Test]
     public void AnEmptySceneIsReportedAsUnplayable()
     {
         // The test runner's own scene: untitled and empty of gameplay.
