@@ -241,6 +241,8 @@ public sealed class ChoiceNode : StoryNode
     [TextArea(2, 5)] public string line;
     [Tooltip("The answers; each has its own output. Walking away leaves through no output at all.")]
     public List<string> answers = new List<string> { "Yes.", "No." };
+    [Tooltip("Asks again when the player closes the box without answering (a choice the story can't go on without).")]
+    public bool mustAnswer;
 
     public override string Title => "Choice";
     public override string Category => "Talk";
@@ -256,10 +258,21 @@ public sealed class ChoiceNode : StoryNode
             choices.Add(new DialogueChoice(answer));
         }
 
-        DialogueBox.Current.Ask(speaker.ToSpeaker(), line, choices, index => picked = index);
-        while (picked == -2)
+        while (true)
         {
-            yield return null;
+            picked = -2;
+            DialogueBox.Current.Ask(speaker.ToSpeaker(), line, choices, index => picked = index);
+            while (picked == -2)
+            {
+                yield return null;
+            }
+
+            if (picked >= 0 || !mustAnswer)
+            {
+                break;
+            }
+
+            yield return new WaitForSeconds(1f);
         }
 
         context.Output = picked;
@@ -302,6 +315,49 @@ public sealed class WaitUntilDefeatedNode : StoryNode
     }
 
     public override string FindProblem() => zone == null ? "choose the Mob Spawn Zone" : null;
+}
+
+[Serializable]
+public sealed class HasHappenedNode : StoryNode
+{
+    [Tooltip("Leaves through Yes when this Quest Event has happened in this game (saved in the quest log), through No when not.")]
+    public GameEventDefinition questEvent;
+
+    public override string Title => "Has It Happened?";
+    public override string Category => "Flow";
+    public override int OutputCount => 2;
+    public override string OutputName(int index) => index == 0 ? "Yes" : "No";
+
+    public override IEnumerator Run(StoryContext context)
+    {
+        QuestLog log = QuestManager.Instance != null ? QuestManager.Instance.Log : GameSession.Quests;
+        context.Output = log.HasHappened(questEvent) ? 0 : 1;
+        yield break;
+    }
+
+    public override string FindProblem() => questEvent == null ? "choose the Quest Event" : null;
+}
+
+[Serializable]
+public sealed class CheckQuestNode : StoryNode
+{
+    [Tooltip("Leaves through the output for where the player is with this quest (waiting to be handed in counts as Active).")]
+    public QuestDefinition quest;
+
+    public override string Title => "Check Quest";
+    public override string Category => "Flow";
+    public override int OutputCount => 3;
+    public override string OutputName(int index) => index == 0 ? "Not Started" : index == 1 ? "Active" : "Completed";
+
+    public override IEnumerator Run(StoryContext context)
+    {
+        QuestLog log = QuestManager.Instance != null ? QuestManager.Instance.Log : GameSession.Quests;
+        QuestStatus status = log.StatusOf(quest);
+        context.Output = status == QuestStatus.Completed ? 2 : status == QuestStatus.NotStarted ? 0 : 1;
+        yield break;
+    }
+
+    public override string FindProblem() => quest == null ? "choose the quest" : null;
 }
 
 // ----- Quest -----
@@ -349,6 +405,8 @@ public sealed class StartQuestNode : StoryNode
 public sealed class GiveItemsNode : StoryNode
 {
     public List<ItemAmount> items = new List<ItemAmount>();
+    [Tooltip("Puts on what can be worn or held right away (a two-handed weapon puts the torch away).")]
+    public bool equip;
 
     public override string Title => "Give Items";
     public override string Category => "Quest";
@@ -361,6 +419,17 @@ public sealed class GiveItemsNode : StoryNode
             if (result.HasOverflow)
             {
                 GameMessages.Post($"Can't carry it all: {AmountText.Describe(result.Overflow)} left behind.", MessageKind.Warning);
+            }
+
+            if (equip && context.Player.Equipment != null)
+            {
+                foreach (ItemAmount amount in items)
+                {
+                    if (amount.Item != null && amount.Item.IsEquippable)
+                    {
+                        context.Player.Equipment.EquipFromBag(amount.Item);
+                    }
+                }
             }
         }
 
@@ -423,6 +492,91 @@ public sealed class SetActiveNode : StoryNode
 }
 
 [Serializable]
+public sealed class MoveObjectNode : StoryNode
+{
+    [Tooltip("What moves (a creature walks: its Animator's Speed is set while it moves).")]
+    public Transform target;
+    [Tooltip("Where it goes; it turns to face the way it is going.")]
+    public Transform destination;
+    [Min(0f)] public float seconds = 4f;
+    [Tooltip("Carry on only once it has arrived.")]
+    public bool waitUntilArrived;
+
+    private static readonly int Speed = Animator.StringToHash("Speed");
+
+    public override string Title => "Move Object";
+    public override string Category => "World";
+
+    public override IEnumerator Run(StoryContext context)
+    {
+        if (target == null || destination == null)
+        {
+            yield break;
+        }
+
+        IEnumerator moving = Move(target, destination.position, seconds);
+        if (waitUntilArrived)
+        {
+            yield return moving;
+        }
+        else
+        {
+            context.Script.StartCoroutine(moving);
+        }
+    }
+
+    private static IEnumerator Move(Transform mover, Vector3 to, float seconds)
+    {
+        Vector3 from = mover.position;
+        Vector3 flat = new Vector3(to.x - from.x, 0f, to.z - from.z);
+        if (flat.sqrMagnitude > 0.01f)
+        {
+            mover.rotation = Quaternion.LookRotation(flat);
+        }
+
+        Animator animator = mover.GetComponentInChildren<Animator>();
+        bool walks = animator != null && HasSpeed(animator);
+        float speed = seconds > 0f ? Vector3.Distance(from, to) / seconds : 0f;
+        for (float t = 0f; t < seconds && mover != null; t += Time.deltaTime)
+        {
+            mover.position = Vector3.Lerp(from, to, t / seconds);
+            if (walks)
+            {
+                animator.SetFloat(Speed, speed);
+            }
+
+            yield return null;
+        }
+
+        if (mover == null)
+        {
+            yield break;
+        }
+
+        mover.position = to;
+        if (walks)
+        {
+            animator.SetFloat(Speed, 0f);
+        }
+    }
+
+    private static bool HasSpeed(Animator animator)
+    {
+        foreach (AnimatorControllerParameter parameter in animator.parameters)
+        {
+            if (parameter.nameHash == Speed && parameter.type == AnimatorControllerParameterType.Float)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public override string FindProblem() => target == null ? "choose what moves" : destination == null ? "choose where it goes" : null;
+}
+
+[Serializable]
 public sealed class SetUsableNode : StoryNode
 {
     [Tooltip("Whether the player can use this object (its Interactable): off when its part in the story is over.")]
@@ -448,7 +602,7 @@ public sealed class SetUsableNode : StoryNode
 [Serializable]
 public sealed class GlowNode : StoryNode
 {
-    [Tooltip("What glows: a light appears at it (and fades out again when Glow is off).")]
+    [Tooltip("What glows: a light appears at it (and fades out again when Glow is off). It lifts the dark around it, so it is seen at night.")]
     public Transform target;
     public bool glow = true;
     public Color colour = new Color(0.55f, 0.85f, 1f);
@@ -478,6 +632,14 @@ public sealed class GlowNode : StoryNode
             light.intensity = 0f;
             light.shadows = LightShadows.None;
         }
+
+        if (!light.TryGetComponent(out VisibilitySource sight))
+        {
+            sight = light.gameObject.AddComponent<VisibilitySource>();
+        }
+
+        sight.Configure(range * 0.6f, 0.5f, true, range * 0.6f);
+        sight.enabled = glow;
 
         light.color = colour;
         light.range = range;
@@ -601,6 +763,8 @@ public sealed class FocusCameraNode : StoryNode
     [Tooltip("What the camera turns to look at, for Seconds, before turning back to the player.")]
     public Transform target;
     [Min(0f)] public float seconds = 3f;
+    [Tooltip("Lifts the dark (the night and unexplored ground) this many metres around it while the camera looks, so it can be seen. 0: off.")]
+    [Min(0f)] public float revealRadius = 14f;
 
     public override string Title => "Focus Camera";
     public override string Category => "Camera & Sound";
@@ -613,12 +777,46 @@ public sealed class FocusCameraNode : StoryNode
             yield break;
         }
 
+        GameObject sight = null;
+        if (revealRadius > 0f)
+        {
+            sight = new GameObject("Story Sight");
+            sight.transform.SetParent(target, false);
+            sight.AddComponent<VisibilitySource>().Configure(revealRadius, 0.4f, true, revealRadius, false);
+        }
+
         camera.BeginFocus(target);
         yield return new WaitForSeconds(seconds);
         camera.EndFocus(target);
+        if (sight != null)
+        {
+            UnityEngine.Object.Destroy(sight);
+        }
     }
 
     public override string FindProblem() => target == null ? "choose what to look at" : null;
+}
+
+[Serializable]
+public sealed class LightningNode : StoryNode
+{
+    public override string Title => "Lightning";
+    public override string Category => "Camera & Sound";
+
+    public override IEnumerator Run(StoryContext context)
+    {
+        WeatherSystem system = UnityEngine.Object.FindAnyObjectByType<WeatherSystem>();
+        if (system != null)
+        {
+            system.Strike();
+        }
+        else
+        {
+            Debug.LogWarning("Lightning: the scene has no WeatherSystem (World Tools › Sky & Weather).", context.Script);
+        }
+
+        yield break;
+    }
 }
 
 [Serializable]

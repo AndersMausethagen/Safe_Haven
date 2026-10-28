@@ -29,7 +29,7 @@ of the GDD, **Not started** = design only. Update this table when a system is ad
 | §18 UI, accessibility | Partial | `UI/*` (TMP), `DialogueBox` (conversations at the bottom of the screen: live `DialoguePortrait` of the speaker, name, typed-out line, answers 1-4; QuestGiver, companions and story graphs talk through it), `ActionMenuWindow` (world menus), `UIStateManager`, `UITheme` | No rebinding, text scaling or reduced-shake option |
 | §19 Art, audio | Partial | `Audio/*` (a `SceneAudio` "Scene Music" component per scene), volumes `SafeHaven_Volume` / `MistyWoods_Volume`; environment in `Environment/*` (terrain moss, tree wind, `SurfaceLayerController` moss/rust on LocalSpawn models, grass and glowing plants, water and waterfalls, day/night and weather) | Composed music (`Audio/Safe Haven - *.mp3`) set per scene and as game-wide defaults in `AudioSettings`; effects from a CC0 library (`Audio/SFX`, credits in `Audio/SFX/CREDITS.md`): combat, footsteps by ground layer (`PlayerAudio`), quests, crafting, building, interface, rain, wind, thunder and stream loops (`WorldAudio`), gathering. Models are placeholders. Day/night and weather are visual only; the Haven's hour is saved (`DayNightCycle` is an `ISaveable` on a SaveableEntity, and time spent on a raid moves the clock on), the weather is not (§11 "weather influences plans" not built); only SafeHaven has the sky rig, not the raid scene. Volumetric fog, fog of war (unexplored ground, the night veil) and fire in the fog: `Environment/Atmosphere`, see [atmosphere](../../../Docs/Atmosphere.md) |
 | §20 Technical design | Done | Definitions vs runtime state vs `Save/*`; rules in settings assets (`GameSettings<T>`) | Raid crash recovery and seeds not built |
-| §21 First 90 minutes | Done (prototype), prologue added | `Prologue_MistyWoods.unity`, `Prologue/*`, `SafeHaven.unity`, `Raid_MistyWoods.unity`; quest chains "Prologue - The Unquiet Forest", "The Lost Expedition", "The First Days"; `Playtest/*` | Prologue uses a separate authored scene, not a raid. Seven story escorts; Ingrid already has a later rescue, the other six rescue encounters/profession effects are not authored yet. Shelter and waystones are blockout art. |
+| §21 First 90 minutes | Done (prototype), prologue added | `Prologue_MistyWoods.unity`, `Prologue/*`, `SafeHaven.unity`, `Raid_MistyWoods.unity`; quest chains "Prologue - The Unquiet Forest", "The Lost Expedition", "The First Days"; `Playtest/*` | Prologue uses a separate authored scene, not a raid. Three story escorts (Sigrid, Eirik, Runa) with camp topics; Bjarne, Tor, Liv and Ingrid are left out to be rescued later (Ingrid already has a rescue; the others are not authored yet). Weapon choice, cooking, troll ambush and the old troll are story graphs. Shelter and waystones are blockout art. |
 | §23–24 MVP / milestones | M0–M3 (no boss-earned skill enhancement yet), plus M4's recruit with a job and M5's scripted ward breach | – | Next per GDD: M4 companions (down/revive) and cart transport; M5 boss, environmental event and polish |
 
 ## Folders
@@ -82,8 +82,13 @@ starting armor, dialogue camera distance scale, waiting-for-leader text, wolf pr
 interval, first-wave size, wave growth/caps, rumble, ending/recovery/homecoming text and transition timing. It is never mutated at runtime.
 
 Select an expedition NPC in `Prologue_MistyWoods` to edit its `PrologueCompanion`: resident identity, forest/camp/
-portal dialogue, a conversation story event, formation offset, and support amount/interval.
+portal dialogue, camp topics (questions the player can ask around the camp, from gathering fuel until the wolves), a
+conversation story event, formation offset, and support amount/interval.
 When an NPC also has a `QuestGiver`, that component owns its conversations instead; edit its offer/waiting/after text there.
+The companion's camp topics are still added to the giver's conversation (`IConversationTopics`).
+The intro's other moments are story graphs under **Intro Moments** in the scene (`Docs/StoryGraphs.md`): the choice of
+bow or axe, Eirik's waterskin for the cooking chapter (**Berries for the Pot**, started automatically after the fire),
+the small trolls' ambush in the berry clearing, and the old troll walking towards the fire when the wolves are beaten.
 Escorts stay put until the first briefing is accepted, and stop walking during conversations.
 Hand-mounted `ExpeditionTorch` objects keep their authored lit models upright during animation; their Light and
 LightFlicker components are scene-editable. Scene `GameEventTrigger`s control discovery zones;
@@ -101,9 +106,10 @@ Forest ghosts raycast the director's TerrainCollider, resample height after snap
 corners differ by more than 0.2 m from the base; the normal flat settlement placement is unchanged.
 `PersistentScene` and the registered field prefab preserve the player's placement and resource depletion.
 The expedition wolf prefab has no SaveableEntity: encounters intentionally restart at checkpoints.
-Starting weapon, off-hand torch and armor are granted and auto-equipped once from the prologue definition, before the saved
+Off-hand torch and armor are granted and auto-equipped once from the prologue definition, before the saved
 Started event is raised; loading never grants duplicates. The forest player's inventory defaults are empty.
-The starting weapon is the one-handed Woodsman's Axe, not the two-handed Stone Axe. Torches are normal
+The definition's Starting Weapon is empty: the player picks the one-handed Woodsman's Axe or the Crude Wooden Bow (with
+arrows) in the **Bow or Axe** story. L (`PlayerEquipment.ToggleTorch`) swaps the torch and a two-handed weapon. Torches are normal
 `WeaponDefinition` / `ItemDefinition` / `RecipeDefinition` assets, crafted by hand for two Sticks. `WeaponKind.Torch`
 allows the appended `GearSlot.OffHand` (17); existing saved slot indices stay unchanged. `GearSet` enforces hand
 occupancy in its container rule as well as equip commands, so drag/drop and auto-equip cannot pair an occupied off

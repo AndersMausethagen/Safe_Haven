@@ -6,7 +6,7 @@ using TMPro;
 /// <summary>
 /// Short messages near the bottom of the screen: what was gathered or looted ("+3 Oak Wood"), newly found resources, and
 /// anything posted through GameMessages ("Needs a Tier II Pickaxe"). Each line fades out after a few seconds; the newest
-/// is at the bottom.
+/// is at the bottom. While the dialogue box is open the lines move up above it.
 /// </summary>
 public sealed class MessageFeedView : MonoBehaviour
 {
@@ -24,10 +24,23 @@ public sealed class MessageFeedView : MonoBehaviour
     [SerializeField] private Color infoColor = new Color(0.92f, 0.92f, 0.92f);
     [SerializeField] private Color gainColor = new Color(0.62f, 0.92f, 0.55f);
     [SerializeField] private Color warningColor = new Color(1f, 0.7f, 0.35f);
+    [Tooltip("How far the lines move up while the dialogue box is open, so they don't cover what is said.")]
+    [SerializeField, Min(0f)] private float liftWhileTalking = 230f;
 
     private readonly List<Line> lines = new List<Line>();
     private ResourceInventory resources;
     private ItemInventory items;
+    private RectTransform area;
+    private Vector2 restingPosition;
+
+    private void Awake()
+    {
+        area = lineTemplate.transform.parent as RectTransform;
+        if (area != null)
+        {
+            restingPosition = area.anchoredPosition;
+        }
+    }
 
     private void OnEnable()
     {
@@ -65,6 +78,11 @@ public sealed class MessageFeedView : MonoBehaviour
 
     private void Update()
     {
+        if (area != null)
+        {
+            area.anchoredPosition = restingPosition + (DialogueBox.IsOpen ? Vector2.up * liftWhileTalking : Vector2.zero);
+        }
+
         for (int i = lines.Count - 1; i >= 0; i--)
         {
             float age = Time.unscaledTime - lines[i].ShownAt;

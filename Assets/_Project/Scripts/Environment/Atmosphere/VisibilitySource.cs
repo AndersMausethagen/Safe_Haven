@@ -46,8 +46,9 @@ public sealed class VisibilitySource : MonoBehaviour
     public bool IsLight => isLight;
 
     /// <summary>Sets it up from code (a source added at runtime, such as a beacon's).</summary>
-    public void Configure(float newRadius, float newSoftness, bool revealsGround, float newRevealRadius)
+    public void Configure(float newRadius, float newSoftness, bool revealsGround, float newRevealRadius, bool light = true)
     {
+        isLight = light;
         radius = Mathf.Max(0f, newRadius);
         softness = Mathf.Clamp(newSoftness, 0.05f, 1f);
         reveals = revealsGround;

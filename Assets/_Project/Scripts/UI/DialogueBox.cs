@@ -64,6 +64,10 @@ public sealed class DialogueBox : MonoBehaviour
     // Ignores the key press that opened the conversation (E is also "use").
     private const float InputDelay = 0.2f;
     private const float WalkAwayDistance = 6f;
+    private const float PanelWidth = 1060f;
+    private const float PanelHeight = 250f;
+    private const float AnswerRowHeight = 46f;
+    private const float AnswerRowStep = 52f;
 
     private static readonly Color Panel = new Color(0.075f, 0.062f, 0.05f, 0.95f);
     private static readonly Color Rim = new Color(0.64f, 0.49f, 0.29f, 0.9f);
@@ -78,6 +82,7 @@ public sealed class DialogueBox : MonoBehaviour
     private readonly List<TMP_Text> buttonLabels = new List<TMP_Text>();
     private UIWindow window;
     private GameObject content;
+    private RectTransform answerColumn;
     private RawImage portrait;
     private Image picture;
     private TMP_Text nameLabel;
@@ -201,9 +206,19 @@ public sealed class DialogueBox : MonoBehaviour
                       (speaker.Model.position - global::Player.Current.transform.position).sqrMagnitude <= WalkAwayDistance * WalkAwayDistance;
         anchor = beside ? speaker.Model : speaker.Model != null && global::Player.Current != null && speaker.Model == global::Player.Current.transform ? anchor : null;
 
+        int count = answers != null ? answers.Count : 0;
+        while (buttons.Count < count)
+        {
+            AddAnswerRow();
+        }
+
+        // Up to four answers fit the box; more make it taller, growing upwards.
+        float height = Mathf.Max(PanelHeight, count * AnswerRowStep + 30f);
+        ((RectTransform)content.transform).sizeDelta = new Vector2(PanelWidth, height);
+        answerColumn.sizeDelta = new Vector2(answerColumn.sizeDelta.x, height - 30f);
         for (int i = 0; i < buttons.Count; i++)
         {
-            bool shown = answers != null && i < answers.Count;
+            bool shown = i < count;
             buttons[i].gameObject.SetActive(shown);
             if (shown)
             {
@@ -257,7 +272,7 @@ public sealed class DialogueBox : MonoBehaviour
 
         if (choices != null && choices.Count > 0)
         {
-            Key[] numbers = { Key.Digit1, Key.Digit2, Key.Digit3, Key.Digit4 };
+            Key[] numbers = { Key.Digit1, Key.Digit2, Key.Digit3, Key.Digit4, Key.Digit5, Key.Digit6, Key.Digit7, Key.Digit8, Key.Digit9 };
             for (int i = 0; i < Mathf.Min(numbers.Length, choices.Count); i++)
             {
                 if (keys != null && keys[numbers[i]].wasPressedThisFrame && choices[i].Enabled)
@@ -386,7 +401,8 @@ public sealed class DialogueBox : MonoBehaviour
         root.AddComponent<GraphicRaycaster>();
         var box = root.AddComponent<DialogueBox>();
 
-        RectTransform panel = Rect("Panel", root.transform, new Vector2(0.5f, 0f), new Vector2(1060f, 250f), new Vector2(0f, 170f));
+        RectTransform panel = Rect("Panel", root.transform, new Vector2(0.5f, 0f), new Vector2(PanelWidth, PanelHeight), new Vector2(0f, 45f));
+        panel.pivot = new Vector2(0.5f, 0f);
         box.content = panel.gameObject;
         var background = panel.gameObject.AddComponent<Image>();
         background.color = Panel;
@@ -413,27 +429,16 @@ public sealed class DialogueBox : MonoBehaviour
         box.lineLabel.fontSizeMax = 24f;
         box.hint = Text("Hint", panel, 18f, Title, new Vector2(1f, 0f), new Vector2(200f, 30f), new Vector2(-110f, 22f), TextAlignmentOptions.Right);
 
-        RectTransform answers = Rect("Answers", panel, new Vector2(1f, 0.5f), new Vector2(300f, 220f), new Vector2(-160f, 0f));
-        var column = answers.gameObject.AddComponent<VerticalLayoutGroup>();
-        column.spacing = 6f;
+        box.answerColumn = Rect("Answers", panel, new Vector2(1f, 0.5f), new Vector2(300f, PanelHeight - 30f), new Vector2(-160f, 0f));
+        var column = box.answerColumn.gameObject.AddComponent<VerticalLayoutGroup>();
+        column.spacing = AnswerRowStep - AnswerRowHeight;
         column.childForceExpandHeight = false;
         column.childControlHeight = true;
         column.childControlWidth = true;
         column.childAlignment = TextAnchor.MiddleCenter;
         for (int i = 0; i < 4; i++)
         {
-            int index = i;
-            var row = new GameObject("Answer " + (i + 1), typeof(RectTransform));
-            row.transform.SetParent(answers, false);
-            var element = row.AddComponent<LayoutElement>();
-            element.preferredHeight = 46f;
-            var image = row.AddComponent<Image>();
-            var button = row.AddComponent<Button>();
-            button.targetGraphic = image;
-            button.onClick.AddListener(() => box.Choose(index));
-            TMP_Text label = Text("Label", row.transform, 20f, Body, new Vector2(0.5f, 0.5f), new Vector2(284f, 44f), Vector2.zero, TextAlignmentOptions.Left);
-            box.buttons.Add(button);
-            box.buttonLabels.Add(label);
+            box.AddAnswerRow();
         }
 
         box.window = root.AddComponent<UIWindow>();
@@ -441,6 +446,23 @@ public sealed class DialogueBox : MonoBehaviour
         box.window.OpenChanged += box.OnOpenChanged;
         root.SetActive(true);
         return box;
+    }
+
+    private void AddAnswerRow()
+    {
+        int index = buttons.Count;
+        var row = new GameObject("Answer " + (index + 1), typeof(RectTransform));
+        row.transform.SetParent(answerColumn, false);
+        var element = row.AddComponent<LayoutElement>();
+        element.preferredHeight = AnswerRowHeight;
+        var image = row.AddComponent<Image>();
+        var button = row.AddComponent<Button>();
+        button.targetGraphic = image;
+        button.onClick.AddListener(() => Choose(index));
+        TMP_Text label = Text("Label", row.transform, 20f, Body, new Vector2(0.5f, 0.5f), new Vector2(284f, 44f), Vector2.zero, TextAlignmentOptions.Left);
+        row.SetActive(false);
+        buttons.Add(button);
+        buttonLabels.Add(label);
     }
 
     private static RectTransform Rect(string name, Transform parent, Vector2 anchorAt, Vector2 size, Vector2 position)

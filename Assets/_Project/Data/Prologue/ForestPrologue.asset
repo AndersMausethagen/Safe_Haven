@@ -31,6 +31,12 @@ MonoBehaviour:
     statusText: Build a Campfire beside the shelter (G)
     duration: 0
     initialEnemies: 0
+  - quest: {fileID: 11400000, guid: 83fc380c709c01a4383dfa7c9300d48a, type: 2}
+    behaviour: 1
+    arrivalText: 'Eirik: Warm hands, empty bellies. There are berry bushes in the clearing west of the shelter. Pick five and stew them over the fire; take my waterskin for the pot.'
+    statusText: 
+    duration: 0
+    initialEnemies: 0
   - quest: {fileID: 11400000, guid: b2306560eba5c594886d38a592bdb05d, type: 2}
     behaviour: 3
     arrivalText: A fire at last. Stay close for a moment and catch your breath. Speak with the others; each of them has seen something different in these woods.
@@ -47,7 +53,7 @@ MonoBehaviour:
     initialEnemies: 2
   - quest: {fileID: 11400000, guid: cd536373f8f639f4db60c8810e546ebf, type: 2}
     behaviour: 5
-    arrivalText: 'Sigrid: That rumble is not thunder. Something enormous is coming. Leave the fire! Follow the old road towards those stones!'
+    arrivalText: 
     statusText: 'SOMETHING IS COMING
 
       Follow the old road to the standing stones.'
@@ -77,7 +83,7 @@ MonoBehaviour:
   finishedEvent: {fileID: 11400000, guid: c6fcca05195d1544bbfe5dd48999cf29, type: 2}
   sticks: {fileID: 11400000, guid: e8bb5d2fbded52b42a179a47cce32d53, type: 2}
   stones: {fileID: 11400000, guid: 9f085f39a2da68c45b58d2db986835f4, type: 2}
-  startingWeapon: {fileID: 11400000, guid: 7e69e97c2a5edf149a174a57b97507dc, type: 2}
+  startingWeapon: {fileID: 0}
   startingTorch: {fileID: 11400000, guid: 3ed1b8336d9f73749968dc70e483ba5d, type: 2}
   startingArmor:
   - {fileID: 11400000, guid: 04c42d35a9586f14c8712e4d62a6209f, type: 2}

@@ -20,11 +20,11 @@ draw it as nodes in **Safe Haven › Quests › Story Graph** instead of wiring 
 | Group | Nodes |
 |---|---|
 | Triggers | When Scene Starts, When Quest Event, When Quest Starts / Is Completed, When Object Is Used, When Player Comes Near, When Enemies Are Defeated (each fires once unless Once is off) |
-| Talk | Say (a line in the dialogue box: the player or someone in the scene, with their live portrait), Choice (a line with answers; each answer has its own output) |
-| Flow | Wait, Wait Until Enemies Are Defeated |
-| Quest | Raise Quest Event (completes objectives waiting for it, starts quests and other stories), Start Quest, Give Items |
-| World | Spawn Enemies (a Mob Spawn Zone, optionally waiting until they are dead), Show / Hide Object, Make Usable / Stop Being Usable, Start / Stop Glowing (a light fades in at an object), Wither / Restore Ground (the grass dies brown around a point), Change Weather, Do Something (any component's method, picked in the Inspector) |
-| Camera & Sound | Shake Camera, Focus Camera (the view turns to something for a few seconds), Play Sound, Play / Silence / Resume Music |
+| Talk | Say (a line in the dialogue box: the player or someone in the scene, with their live portrait), Choice (a line with answers; each answer has its own output; Must Answer asks again if the box is closed) |
+| Flow | Wait, Wait Until Enemies Are Defeated, Has It Happened? (Yes / No: a Quest Event raised in this game, saved), Check Quest (Not Started / Active / Completed) |
+| Quest | Raise Quest Event (completes objectives waiting for it, starts quests and other stories), Start Quest, Give Items (Equip puts it on at once; a two-handed weapon puts the torch away) |
+| World | Spawn Enemies (a Mob Spawn Zone, optionally waiting until they are dead), Show / Hide Object, Move Object (walks something to a point over a few seconds), Make Usable / Stop Being Usable, Start / Stop Glowing (a light fades in at an object and lifts the dark around it), Wither / Restore Ground (the grass dies brown around a point), Change Weather, Do Something (any component's method, picked in the Inspector) |
+| Camera & Sound | Shake Camera, Focus Camera (the view turns to something for a few seconds, lifting the dark around it so it is seen at night), Lightning, Play Sound, Play / Silence / Resume Music |
 
 ## Quests and stories
 
@@ -42,6 +42,18 @@ Quests stay data (objectives, rewards, chains); stories make the moments around 
 - **The Waking Stone:** When Object Is Used (the stone) › Start Quest › Start Glowing (+ Play Sound) › Wither Ground ›
   Say "The grass... it's dying." › Spawn Enemies (wait until defeated) › Stop Glowing › Stop Being Usable › Raise
   Quest Event (the quest's objective: it completes and rewards).
+
+The intro (`Prologue_MistyWoods`, under **Intro Moments**, built by `AgentScripts/BuildIntroPart3.cs`):
+
+- **Bow or Axe:** When Quest Event (Started, every time) › Has It Happened? (Weapon Chosen) › No › Wait › Choice (Sigrid,
+  must answer) › Give Items (bow and arrows, or the axe; equipped) › Raise Quest Event (Weapon Chosen) › Say (Runa or
+  Eirik). Asking only while the event hasn't happened makes it safe to quit before answering.
+- **Troll Ambush:** When Player Comes Near (the berry clearing, every time) › Has It Happened? (Troll Ambush) › No ›
+  Check Quest (Berries for the Pot) › Active › Raise Quest Event (Troll Ambush) › Wait › Say (Runa) + Spawn Enemies.
+  When Enemies Are Defeated › Say (Runa).
+- **The Old Troll:** When Quest Starts (Something Is Coming) › Show Object (the troll) › Shake Camera + Play Sound +
+  Lightning + Start Glowing + Move Object (it walks towards the fire) + Focus Camera › Say (Sigrid, Runa, Sigrid);
+  then footsteps and smaller shakes every ten seconds.
 
 ## Notes
 

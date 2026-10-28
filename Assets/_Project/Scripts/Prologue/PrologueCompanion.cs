@@ -1,15 +1,31 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-/// <summary>Lightweight story escort. Its resident definition is reused when the person is rescued later.</summary>
+/// <summary>Something to ask a companion by the fire, and what they answer.</summary>
+[Serializable]
+public sealed class CompanionTopic
+{
+    public string question;
+    [TextArea(2, 5)] public string answer;
+}
+
+/// <summary>
+/// Lightweight story escort. Its resident definition is reused when the person is rescued later. Talking to them says
+/// their line for the part of the night it is; around the camp the player can also ask their topics, one after another,
+/// to get to know them.
+/// </summary>
 [RequireComponent(typeof(NavMeshAgent), typeof(Interactable))]
-public sealed class PrologueCompanion : MonoBehaviour
+public sealed class PrologueCompanion : MonoBehaviour, IConversationTopics
 {
     [SerializeField] private ResidentDefinition resident;
     [SerializeField] private Vector3 formationOffset;
     [SerializeField, TextArea] private string forestLine;
     [SerializeField, TextArea] private string campLine;
     [SerializeField, TextArea] private string portalLine;
+    [Tooltip("Asked around the camp (from gathering fuel until the wolves come), each once per visit to the scene.")]
+    [SerializeField] private CompanionTopic[] campTopics = new CompanionTopic[0];
     [SerializeField, RaisedByGame] private GameEventDefinition talkedEvent;
     [SerializeField] private bool soldier;
     [SerializeField] private bool alchemist;
@@ -28,6 +44,7 @@ public sealed class PrologueCompanion : MonoBehaviour
     private float nextSupport;
     private bool hasSpeed;
     private bool talking;
+    private readonly HashSet<int> asked = new HashSet<int>();
     private static readonly int Speed = Animator.StringToHash("Speed");
 
     public ResidentDefinition Resident => resident;
@@ -128,8 +145,37 @@ public sealed class PrologueCompanion : MonoBehaviour
         string line = step >= PrologueStep.ReachPortal ? portalLine
             : step >= PrologueStep.GatherFuel ? campLine : forestLine;
         GameEvents.Raise(talkedEvent, interactable.Interactor);
-        talking = true;
-        DialogueBox.Current.Say(new DialogueSpeaker(resident.DisplayName, transform, null, PrologueDirector.Current.Definition.DialogueCameraDistance),
-            line, () => talking = false);
+        Converse(line, true);
     }
+
+    // The line, then the topics not asked yet as answers; each answer is said and the rest offered again.
+    private void Converse(string line, bool withTopics)
+    {
+        talking = true;
+        var page = new MenuPage { Title = resident.DisplayName, Body = line };
+        if (withTopics) AddTopics(page, Speaker, () => Converse(AfterTopicLine, true));
+        DialogueBox.Current.Talk(page, Speaker, () => talking = false);
+    }
+
+    private const string AfterTopicLine = "Anything else?";
+
+    /// <summary>Adds the camp topics not asked yet to a conversation (also a quest giver's, such as Sigrid's).</summary>
+    public void AddTopics(MenuPage page, DialogueSpeaker speaker, Action afterAnswer)
+    {
+        PrologueStep step = PrologueDirector.Current != null ? PrologueDirector.Current.Step : PrologueStep.Finished;
+        if (step < PrologueStep.GatherFuel || step > PrologueStep.CatchBreath) return;
+        for (int i = 0; i < campTopics.Length; i++)
+        {
+            int topic = i;
+            if (asked.Contains(topic) || string.IsNullOrWhiteSpace(campTopics[topic].question)) continue;
+            page.Add(new MenuAction(campTopics[topic].question, null, true, () =>
+            {
+                asked.Add(topic);
+                DialogueBox.Current.Say(speaker, campTopics[topic].answer, afterAnswer);
+            }));
+        }
+    }
+
+    private DialogueSpeaker Speaker =>
+        new DialogueSpeaker(resident.DisplayName, transform, null, PrologueDirector.Current.Definition.DialogueCameraDistance);
 }

@@ -32,7 +32,9 @@ public sealed class PlayerInputHandler : MonoBehaviour
     private InputAction buildAction;
     private InputAction sneakAction;
     private InputAction arrowAction;
+    private InputAction torchAction;
     private PlayerStealth stealth;
+    private PlayerEquipment equipment;
     private readonly InputAction[] skillActions = new InputAction[SkillLoadout.SlotCount];
 
     // V Rising style skill keys (E is taken by Interact, C by the character screen), with 1-5 as alternatives.
@@ -52,6 +54,7 @@ public sealed class PlayerInputHandler : MonoBehaviour
         movement = GetComponent<PlayerMovement>();
         stateMachine = GetComponent<PlayerStateMachine>();
         stealth = GetComponent<PlayerStealth>();
+        equipment = GetComponent<PlayerEquipment>();
         movementCamera = movementCamera != null ? movementCamera : Camera.main;
 
         if (movementCamera == null)
@@ -135,6 +138,7 @@ public sealed class PlayerInputHandler : MonoBehaviour
         yield return buildAction;
         yield return sneakAction;
         yield return arrowAction;
+        yield return torchAction;
         foreach (InputAction action in skillActions)
         {
             yield return action;
@@ -228,6 +232,7 @@ public sealed class PlayerInputHandler : MonoBehaviour
         buildAction?.Dispose();
         sneakAction?.Dispose();
         arrowAction?.Dispose();
+        torchAction?.Dispose();
         foreach (InputAction action in skillActions)
         {
             action?.Dispose();
@@ -302,6 +307,10 @@ public sealed class PlayerInputHandler : MonoBehaviour
         arrowAction = new InputAction("CycleArrows", InputActionType.Button);
         arrowAction.AddBinding("<Keyboard>/z");
 
+        // The torch and a two-handed weapon (a bow) take turns in the hands.
+        torchAction = new InputAction("ToggleTorch", InputActionType.Button);
+        torchAction.AddBinding("<Keyboard>/l");
+
         for (int i = 0; i < skillActions.Length; i++)
         {
             var action = new InputAction("Skill" + (i + 1), InputActionType.Button);
@@ -332,6 +341,7 @@ public sealed class PlayerInputHandler : MonoBehaviour
         sneakAction.performed += _ => stealth?.SetSneaking(true);
         sneakAction.canceled += _ => stealth?.SetSneaking(false);
         arrowAction.performed += _ => stateMachine.RequestArrowCycle();
+        torchAction.performed += _ => equipment?.ToggleTorch();
         for (int i = 0; i < skillActions.Length; i++)
         {
             int slot = i;

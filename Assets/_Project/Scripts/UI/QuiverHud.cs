@@ -5,7 +5,7 @@ using UnityEngine.UI;
 /// <summary>
 /// The bow's readout above the action bar, shown while a bow is in hand: the chosen arrows and how many are left
 /// ("Crude Stone Arrow ×17 · Z"), a draw bar that fills while drawing and turns gold in the perfect release window, and
-/// "Quick shot ready" while a perfect dodge has readied the instant shot. Made by CombatFeedback for the player in every
+/// "Quick shot ready" while a perfect dodge has readied the instant shot. Hidden while the dialogue box is open. Made by CombatFeedback for the player in every
 /// scene; it only reads PlayerArchery.
 /// </summary>
 public sealed class QuiverHud : MonoBehaviour
@@ -89,7 +89,7 @@ public sealed class QuiverHud : MonoBehaviour
             return;
         }
 
-        bool bow = archery.isActiveAndEnabled && archery.Bow != null && !GamePause.IsPaused;
+        bool bow = archery.isActiveAndEnabled && archery.Bow != null && !GamePause.IsPaused && !DialogueBox.IsOpen;
         group.alpha = Mathf.MoveTowards(group.alpha, bow ? 1f : 0f, Time.unscaledDeltaTime * 6f);
         if (!bow)
         {

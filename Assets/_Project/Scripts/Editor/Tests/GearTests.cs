@@ -362,4 +362,38 @@ public sealed class GearTests
         created.Add(asset);
         return asset;
     }
+
+    [Test]
+    public void TorchKey_SwapsATwoHandedWeaponAndTheTorch()
+    {
+        var torch = AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Project/Data/Items/HandTorch.asset");
+        var bow = AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Project/Data/Items/CrudeWoodenBow.asset");
+        var user = new GameObject("Torch user");
+        try
+        {
+            var equipment = user.AddComponent<PlayerEquipment>();
+            ItemContainer bag = user.GetComponent<ItemInventory>().Container;
+            bag.Add(torch, 1);
+            bag.Add(bow, 1);
+            Assert.IsTrue(equipment.EquipFromBag(torch));
+            Assert.AreSame(torch, equipment.OffHand.Item);
+
+            Assert.IsTrue(equipment.EquipFromBag(bow), "a handed-over bow puts the torch away");
+            Assert.AreSame(bow, equipment.MainHand.Item);
+            Assert.IsTrue(equipment.OffHand.IsEmpty);
+
+            Assert.IsTrue(equipment.ToggleTorch());
+            Assert.IsTrue(equipment.MainHand.IsEmpty, "the bow goes to the bag for the torch");
+            Assert.AreSame(torch, equipment.OffHand.Item);
+
+            Assert.IsTrue(equipment.ToggleTorch());
+            Assert.AreSame(bow, equipment.MainHand.Item, "and comes back when the torch is put away");
+            Assert.IsTrue(equipment.OffHand.IsEmpty);
+            Assert.AreEqual(1, bag.Count(torch));
+        }
+        finally
+        {
+            Object.DestroyImmediate(user);
+        }
+    }
 }

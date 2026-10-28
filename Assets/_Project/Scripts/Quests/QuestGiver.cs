@@ -2,6 +2,15 @@ using UnityEngine;
 using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// More to talk about with someone who also gives quests (a companion's questions by the fire): added as answers to the
+/// giver's conversation. After an answer is said, <c>afterAnswer</c> brings the conversation back.
+/// </summary>
+public interface IConversationTopics
+{
+    void AddTopics(MenuPage page, DialogueSpeaker speaker, Action afterAnswer);
+}
+
 /// <summary>An authored offer in a giver's ordered quest sequence. Progress stays in QuestLog.</summary>
 [Serializable]
 public sealed class QuestOffer
@@ -322,6 +331,13 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
     private void OpenDialogue()
     {
         talking = true;
-        DialogueBox.Current.Talk(BuildDialoguePage(), new DialogueSpeaker(SpeakerName, transform, portrait, dialogueCameraDistance), () => talking = false);
+        var speaker = new DialogueSpeaker(SpeakerName, transform, portrait, dialogueCameraDistance);
+        MenuPage page = BuildDialoguePage();
+        if (TryGetComponent(out IConversationTopics topics))
+        {
+            topics.AddTopics(page, speaker, OpenDialogue);
+        }
+
+        DialogueBox.Current.Talk(page, speaker, () => talking = false);
     }
 }

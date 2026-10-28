@@ -190,7 +190,10 @@ public sealed class DynamicQuestTests
     public void AuthoredPrologue_UsesRegisteredCraftableTorchAndOneHandedAxe()
     {
         var definition = AssetDatabase.LoadAssetAtPath<PrologueDefinition>("Assets/_Project/Data/Prologue/ForestPrologue.asset");
-        Assert.AreEqual(WeaponStance.OneHanded, definition.StartingWeapon.Weapon.Stance);
+        // The weapon is chosen in the scene's story: the axe leaves a hand for the torch, the bow does not (L swaps them).
+        var axe = AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Project/Data/Items/WoodsmansAxe.asset");
+        Assert.AreEqual(WeaponStance.OneHanded, axe.Weapon.Stance);
+        Assert.IsTrue(AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Project/Data/Items/CrudeWoodenBow.asset").Weapon.RequiresBothHands);
         var torch = definition.StartingTorch;
         Assert.AreEqual(WeaponKind.Torch, torch.Weapon.Kind);
         Assert.IsTrue(torch.Weapon.CanUseOffHand);

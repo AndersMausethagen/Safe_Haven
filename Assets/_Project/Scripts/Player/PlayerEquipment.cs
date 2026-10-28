@@ -26,6 +26,8 @@ public sealed class PlayerEquipment : MonoBehaviour
     private readonly GearSet gear = new GearSet();
     private readonly bool[] wasBroken = new bool[GearSlots.Count];
     private ItemInventory inventory;
+    // The two-handed weapon put away for the torch (ToggleTorch), taken out again when the torch goes back.
+    private ItemDefinition stowedWeapon;
     private PlayerCombat combat;
     private Combatant combatant;
     private bool restoring;
@@ -121,6 +123,88 @@ public sealed class PlayerEquipment : MonoBehaviour
         {
             GameMessages.Post($"Equipped {item.DisplayName}.");
         }
+    }
+
+    /// <summary>
+    /// Puts on this item from the bag right away, such as a weapon handed over in a story: what is in its slot goes back
+    /// to the bag, and a two-handed weapon puts the off-hand item (the torch) away first.
+    /// </summary>
+    public bool EquipFromBag(ItemDefinition item)
+    {
+        ItemContainer bag = Inventory.Container;
+        int index = FindInBag(found => found == item);
+        if (index < 0 || !item.IsEquippable)
+        {
+            return false;
+        }
+
+        if (item.IsWeapon && item.Weapon.RequiresBothHands && !OffHand.IsEmpty && !gear.Unequip(GearSlot.OffHand, bag, out _))
+        {
+            return false;
+        }
+
+        return Equip(bag, index);
+    }
+
+    /// <summary>
+    /// Lights the torch or puts it away (L), so a two-handed weapon such as a bow and the torch can take turns in the
+    /// hands: taking the torch out puts the two-handed weapon in the bag; putting the torch away takes that weapon out again.
+    /// </summary>
+    public bool ToggleTorch()
+    {
+        ItemContainer bag = Inventory.Container;
+        if (IsTorch(OffHand.Item))
+        {
+            if (!gear.Unequip(GearSlot.OffHand, bag, out string reason))
+            {
+                return Report(false, reason, null);
+            }
+
+            ItemDefinition weapon = stowedWeapon;
+            stowedWeapon = null;
+            if (weapon != null && MainHand.IsEmpty)
+            {
+                EquipFromBag(weapon);
+            }
+
+            return true;
+        }
+
+        int torch = FindInBag(IsTorch);
+        if (torch < 0)
+        {
+            GameMessages.Post("You have no torch.", MessageKind.Warning);
+            return false;
+        }
+
+        if (!MainHand.IsEmpty && MainHand.Item.IsWeapon && MainHand.Item.Weapon.RequiresBothHands)
+        {
+            ItemDefinition held = MainHand.Item;
+            if (!gear.Unequip(GearSlot.MainHand, bag, out string reason))
+            {
+                return Report(false, reason, null);
+            }
+
+            stowedWeapon = held;
+        }
+
+        return EquipTo(bag, torch, GearSlot.OffHand);
+    }
+
+    private static bool IsTorch(ItemDefinition item) => item != null && item.IsWeapon && item.Weapon.Kind == WeaponKind.Torch;
+
+    private int FindInBag(Predicate<ItemDefinition> match)
+    {
+        ItemContainer bag = Inventory.Container;
+        for (int i = 0; i < bag.SlotCount; i++)
+        {
+            if (!bag.GetSlot(i).IsEmpty && match(bag.GetSlot(i).Item))
+            {
+                return i;
+            }
+        }
+
+        return -1;
     }
 
     /// <summary>

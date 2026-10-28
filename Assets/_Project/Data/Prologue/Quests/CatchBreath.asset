@@ -17,9 +17,10 @@ MonoBehaviour:
   description: Warm yourself by the fire. Speak to your companions to learn why they joined the expedition. Conversations are optional.
   chain: Prologue - The Unquiet Forest
   prerequisites:
-  - {fileID: 11400000, guid: 2ba326763b19a9e46be36507850aed82, type: 2}
+  - {fileID: 11400000, guid: 83fc380c709c01a4383dfa7c9300d48a, type: 2}
   start: 2
   startEvent: {fileID: 0}
+  onStarted: []
   objectivesInOrder: 0
   objectives:
   - type: 6
@@ -40,3 +41,4 @@ MonoBehaviour:
   rewardResources: []
   rewardRecipes: []
   completionEvent: {fileID: 0}
+  onCompleted: []

@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using NUnit.Framework;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -94,5 +95,76 @@ public sealed class StoryTests
         StringAssert.Contains("Story - The Waking Stone", scene);
         StringAssert.Contains("WitherGroundNode", scene);
         StringAssert.Contains("FocusCameraNode", scene);
+    }
+
+    [Test]
+    public void CheckNodesLeaveThroughWhatHasHappened()
+    {
+        var quest = ScriptableObject.CreateInstance<QuestDefinition>();
+        var gameEvent = ScriptableObject.CreateInstance<GameEventDefinition>();
+        try
+        {
+            var check = new CheckQuestNode { quest = quest };
+            Assert.AreEqual(3, check.OutputCount);
+            Assert.AreEqual(0, Run(check), "a quest never started");
+
+            var happened = new HasHappenedNode { questEvent = gameEvent };
+            var data = new SerializedObject(gameEvent);
+            data.FindProperty("id").stringValue = "test.story_check_" + Guid.NewGuid().ToString("N");
+            data.ApplyModifiedPropertiesWithoutUndo();
+            Assert.AreEqual(1, Run(happened), "No: it hasn't happened");
+            GameSession.Quests.Handle(new GameEvent(GameEventKind.Custom, gameEvent));
+            Assert.AreEqual(0, Run(happened), "Yes once it was raised");
+            Assert.AreEqual("Yes", happened.OutputName(0));
+        }
+        finally
+        {
+            Object.DestroyImmediate(quest);
+            Object.DestroyImmediate(gameEvent);
+        }
+    }
+
+    [Test]
+    public void TheIntroMomentsAreCompleteStories()
+    {
+        var scene = EditorSceneManager.OpenPreviewScene("Assets/_Project/Scenes/Prologue_MistyWoods.unity");
+        try
+        {
+            StoryScript[] stories = scene.GetRootGameObjects().SelectMany(r => r.GetComponentsInChildren<StoryScript>(true)).ToArray();
+            CollectionAssert.IsSubsetOf(new[] { "Story - Bow or Axe", "Story - Eirik's Waterskin", "Story - Troll Ambush", "Story - The Old Troll" },
+                stories.Select(s => s.name).ToArray());
+            foreach (StoryScript story in stories)
+            {
+                CollectionAssert.IsEmpty(story.FindProblems(), story.name);
+                Assert.NotNull(story.GetComponent<SaveableEntity>(), $"{story.name} remembers what has fired");
+            }
+
+            ChoiceNode choice = stories.Single(s => s.name == "Story - Bow or Axe").Nodes.OfType<ChoiceNode>().Single();
+            Assert.IsTrue(choice.mustAnswer, "Nobody leaves without a weapon.");
+            Assert.AreEqual(2, choice.answers.Count);
+            Assert.IsTrue(stories.Single(s => s.name == "Story - Bow or Axe").Nodes.OfType<GiveItemsNode>().All(g => g.equip));
+
+            PrologueCompanion[] companions = scene.GetRootGameObjects().SelectMany(r => r.GetComponentsInChildren<PrologueCompanion>()).ToArray();
+            Assert.AreEqual(3, companions.Length);
+            foreach (PrologueCompanion companion in companions)
+            {
+                Assert.AreEqual(3, new SerializedObject(companion).FindProperty("campTopics").arraySize, companion.name);
+            }
+        }
+        finally
+        {
+            EditorSceneManager.ClosePreviewScene(scene);
+        }
+    }
+
+    private static int Run(StoryNode node)
+    {
+        var context = new StoryContext(null);
+        System.Collections.IEnumerator steps = node.Run(context);
+        while (steps.MoveNext())
+        {
+        }
+
+        return context.Output;
     }
 }

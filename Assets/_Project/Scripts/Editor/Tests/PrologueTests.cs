@@ -44,9 +44,11 @@ public sealed class PrologueTests
     {
         Assert.NotNull(Definition);
         Assert.IsNull(Definition.FindProblem());
-        Assert.AreEqual(8, Definition.Chapters.Length);
+        Assert.AreEqual(9, Definition.Chapters.Length);
         Assert.AreEqual(180f, Definition.Chapters.Single(c => c.Behaviour == PrologueStep.HoldPortal).Duration);
-        Assert.IsTrue(Definition.Chapters.All(c => !string.IsNullOrWhiteSpace(c.ArrivalText)));
+        // The flight from the old troll is told by its story graph in the scene (Story - The Old Troll), not an arrival line.
+        Assert.IsTrue(Definition.Chapters.Where(c => c.Behaviour != PrologueStep.ReachPortal).All(c => !string.IsNullOrWhiteSpace(c.ArrivalText)));
+        Assert.IsNull(Definition.StartingWeapon, "The bow or the axe is chosen in the scene's story (Story - Bow or Axe).");
         Assert.AreEqual(3, Definition.WaveSize(1));
         Assert.AreEqual(7, Definition.WaveSize(100));
     }
@@ -62,7 +64,8 @@ public sealed class PrologueTests
             Assert.IsEmpty(chapter.Quest.FindProblems(), chapter.Quest.DisplayName);
             foreach (QuestObjective objective in chapter.Quest.Objectives)
                 log.Handle(new GameEvent(objective.Type == ObjectiveType.QuestEvent ? GameEventKind.Custom :
-                    objective.Type == ObjectiveType.BuildStructure ? GameEventKind.Built : GameEventKind.ItemObtained,
+                    objective.Type == ObjectiveType.BuildStructure ? GameEventKind.Built :
+                    objective.Type == ObjectiveType.CraftItem ? GameEventKind.Crafted : GameEventKind.ItemObtained,
                     objective.Type == ObjectiveType.QuestEvent ? (UnityEngine.Object)objective.QuestEvent :
                     objective.Type == ObjectiveType.BuildStructure ? (UnityEngine.Object)objective.Building : objective.Item, objective.Amount));
             Assert.AreEqual(QuestStatus.Completed, log.StatusOf(chapter.Quest));
@@ -81,11 +84,13 @@ public sealed class PrologueTests
     [Test]
     public void PeacefulChapters_NeedLeaderAcceptanceButEmergenciesRemainAutomatic()
     {
+        // The leader's briefings wait to be accepted; what a companion calls out ("Eirik: ...", "Runa: Wolves!") or a
+        // story tells starts at once.
         foreach (var chapter in Definition.Chapters)
         {
-            bool briefing = chapter.Behaviour == PrologueStep.FindShelter || chapter.Behaviour == PrologueStep.GatherFuel ||
-                chapter.Behaviour == PrologueStep.LightFire || chapter.Behaviour == PrologueStep.CatchBreath ||
-                chapter.Behaviour == PrologueStep.ActivatePortal;
+            int colon = chapter.ArrivalText.IndexOf(':');
+            bool spokenByCompanion = colon > 0 && colon < 16;
+            bool briefing = !string.IsNullOrWhiteSpace(chapter.ArrivalText) && !spokenByCompanion;
             Assert.AreEqual(briefing ? QuestStart.ByQuestGiver : QuestStart.Automatically, chapter.Quest.Start, chapter.Quest.name);
             Assert.IsFalse(chapter.Quest.TurnInToGiver, "The next briefing is the handoff; avoid two separate leader interactions.");
         }
@@ -100,7 +105,7 @@ public sealed class PrologueTests
         Assert.IsTrue(log.TryStart(fire));
         log.Handle(new GameEvent(GameEventKind.Custom, Definition.FireEvent));
         Assert.AreEqual(QuestStatus.Active, log.StatusOf(fire), "The old use-fire shortcut must not complete construction.");
-        var gather = Definition.Chapters.Single(c => c.Behaviour == PrologueStep.GatherFuel).Quest;
+        var gather = Definition.Chapters[1].Quest;
         foreach (var cost in Definition.Campfire.ConstructionItems)
             Assert.AreEqual(cost.Amount, gather.Objectives.Single(o => o.Item == cost.Item).Amount);
         log.Handle(new GameEvent(GameEventKind.Built, Definition.Campfire));

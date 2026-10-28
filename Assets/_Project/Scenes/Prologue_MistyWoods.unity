@@ -524,6 +524,72 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameStateManager
   initialState: 0
+--- !u!1001 &102475068
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1201455676}
+    m_Modifications:
+    - target: {fileID: 2365936010395217316, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 2.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2365936010395217316, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.06330848
+      objectReference: {fileID: 0}
+    - target: {fileID: 2365936010395217316, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2365936010395217316, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: -0.74358624
+      objectReference: {fileID: 0}
+    - target: {fileID: 2365936010395217316, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2365936010395217316, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.6686401
+      objectReference: {fileID: 0}
+    - target: {fileID: 2365936010395217316, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2365936010395217316, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2365936010395217316, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2365936010395217316, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3694057216285352694, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: id
+      value: 641aca3fc15e42c593760e39a50c57e7
+      objectReference: {fileID: 0}
+    - target: {fileID: 8775155884352199117, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: m_Name
+      value: BerriesNode
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+--- !u!4 &102475069 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2365936010395217316, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+  m_PrefabInstance: {fileID: 102475068}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &126782497
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -920,6 +986,72 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1.0000001}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1001 &229058069
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1201455676}
+    m_Modifications:
+    - target: {fileID: 2365936010395217316, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2365936010395217316, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.59785867
+      objectReference: {fileID: 0}
+    - target: {fileID: 2365936010395217316, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -4
+      objectReference: {fileID: 0}
+    - target: {fileID: 2365936010395217316, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: -0.94732666
+      objectReference: {fileID: 0}
+    - target: {fileID: 2365936010395217316, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2365936010395217316, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.32026908
+      objectReference: {fileID: 0}
+    - target: {fileID: 2365936010395217316, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2365936010395217316, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2365936010395217316, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2365936010395217316, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3694057216285352694, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: id
+      value: 78636e9977cc4aab8ff0eaed82bc8a63
+      objectReference: {fileID: 0}
+    - target: {fileID: 8775155884352199117, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: m_Name
+      value: BerriesNode
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+--- !u!4 &229058070 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2365936010395217316, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+  m_PrefabInstance: {fileID: 229058069}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &230088404
 GameObject:
   m_ObjectHideFlags: 0
@@ -983,11 +1115,271 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1500380933}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &249137170
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1201455676}
+    m_Modifications:
+    - target: {fileID: 2365936010395217316, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2365936010395217316, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.23377681
+      objectReference: {fileID: 0}
+    - target: {fileID: 2365936010395217316, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2365936010395217316, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: -0.030997718
+      objectReference: {fileID: 0}
+    - target: {fileID: 2365936010395217316, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2365936010395217316, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.99951947
+      objectReference: {fileID: 0}
+    - target: {fileID: 2365936010395217316, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2365936010395217316, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2365936010395217316, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2365936010395217316, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3694057216285352694, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: id
+      value: f1e974860e8d4423ad46e27cd3b219c6
+      objectReference: {fileID: 0}
+    - target: {fileID: 8775155884352199117, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: m_Name
+      value: BerriesNode
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+--- !u!4 &249137171 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2365936010395217316, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+  m_PrefabInstance: {fileID: 249137170}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &253988364 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3694066081101222592, guid: 98a5e3726f2d59d45b0da93e8ea043b5, type: 3}
   m_PrefabInstance: {fileID: 1439357356}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &272836870
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 272836871}
+  - component: {fileID: 272836873}
+  - component: {fileID: 272836872}
+  m_Layer: 0
+  m_Name: Story - Bow or Axe
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &272836871
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 272836870}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 981106771}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &272836872
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 272836870}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7585b9b1e2e24704186225f4b6f8d69a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::StoryScript
+  nodes:
+  - rid: 287758218191176000
+  - rid: 287758218191176001
+  - rid: 287758218191176002
+  - rid: 287758218191176003
+  - rid: 287758218191176004
+  - rid: 287758218191176005
+  - rid: 287758218191176006
+  - rid: 287758218191176007
+  - rid: 287758218191176008
+  - rid: 287758218191176009
+  links:
+  - from: 966b2236176e4e1c8e560938ddf6bbb7
+    output: 0
+    to: ed1febcd95324faeba09d37e43e63625
+  - from: ed1febcd95324faeba09d37e43e63625
+    output: 1
+    to: 1f3aa86cafa2445bab8a20e89259e2fe
+  - from: 1f3aa86cafa2445bab8a20e89259e2fe
+    output: 0
+    to: e03c8a2a1e1e472fbfbc5e995ca62abd
+  - from: e03c8a2a1e1e472fbfbc5e995ca62abd
+    output: 0
+    to: e3a0ee10e7a0428599795bfa9d4cf356
+  - from: e3a0ee10e7a0428599795bfa9d4cf356
+    output: 0
+    to: 97e3d1a32d7e4518b91b0d5c5e47c7d2
+  - from: 97e3d1a32d7e4518b91b0d5c5e47c7d2
+    output: 0
+    to: 7de89dfa0465455fa9a946afd60149cb
+  - from: e03c8a2a1e1e472fbfbc5e995ca62abd
+    output: 1
+    to: eaf5291ff4964641a66fa469abc10cc8
+  - from: eaf5291ff4964641a66fa469abc10cc8
+    output: 0
+    to: b6018d47fe6e4a8ca694bf9db8e219fc
+  - from: b6018d47fe6e4a8ca694bf9db8e219fc
+    output: 0
+    to: 6c61254c6ac1429e956b3343133a1f30
+  logSteps: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 287758218191176000
+      type: {class: WhenQuestEvent, ns: , asm: SafeHaven}
+      data:
+        id: 966b2236176e4e1c8e560938ddf6bbb7
+        position: {x: 40, y: 60}
+        once: 0
+        questEvent: {fileID: 11400000, guid: 8eb5d1eaca7f351419207cf31f6401cf, type: 2}
+    - rid: 287758218191176001
+      type: {class: HasHappenedNode, ns: , asm: SafeHaven}
+      data:
+        id: ed1febcd95324faeba09d37e43e63625
+        position: {x: 340, y: 60}
+        questEvent: {fileID: 11400000, guid: 99f43a387e2b30a408b5faf35fc3f1f9, type: 2}
+    - rid: 287758218191176002
+      type: {class: WaitNode, ns: , asm: SafeHaven}
+      data:
+        id: 1f3aa86cafa2445bab8a20e89259e2fe
+        position: {x: 640, y: 60}
+        seconds: 1.2
+    - rid: 287758218191176003
+      type: {class: ChoiceNode, ns: , asm: SafeHaven}
+      data:
+        id: e03c8a2a1e1e472fbfbc5e995ca62abd
+        position: {x: 940, y: 60}
+        speaker:
+          player: 0
+          name: Sigrid
+          model: {fileID: 983162859}
+          portrait: {fileID: 0}
+        line: 'Before we set out: the cart only had room for two weapons, and you are the one walking in front. The bow keeps them at a distance. The axe keeps them honest. Which will you carry?'
+        answers:
+        - The bow.
+        - The axe.
+        mustAnswer: 1
+    - rid: 287758218191176004
+      type: {class: GiveItemsNode, ns: , asm: SafeHaven}
+      data:
+        id: e3a0ee10e7a0428599795bfa9d4cf356
+        position: {x: 1240, y: 60}
+        items:
+        - item: {fileID: 11400000, guid: 99887c135c70abc40aae37cfc66809b9, type: 2}
+          amount: 1
+        - item: {fileID: 11400000, guid: 14b1c5230b317074b8251810d5264494, type: 2}
+          amount: 30
+        equip: 1
+    - rid: 287758218191176005
+      type: {class: RaiseQuestEventNode, ns: , asm: SafeHaven}
+      data:
+        id: 97e3d1a32d7e4518b91b0d5c5e47c7d2
+        position: {x: 1540, y: 60}
+        questEvent: {fileID: 11400000, guid: 99f43a387e2b30a408b5faf35fc3f1f9, type: 2}
+    - rid: 287758218191176006
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 7de89dfa0465455fa9a946afd60149cb
+        position: {x: 1840, y: 60}
+        speaker:
+          player: 0
+          name: Runa
+          model: {fileID: 334759803}
+          portrait: {fileID: 0}
+        line: A bow! Then there are two of us. It wants both hands, so your torch went into your pack. Press L to swap bow and torch whenever you need the light. Hold the left button to draw, let go to shoot.
+    - rid: 287758218191176007
+      type: {class: GiveItemsNode, ns: , asm: SafeHaven}
+      data:
+        id: eaf5291ff4964641a66fa469abc10cc8
+        position: {x: 1240, y: 230}
+        items:
+        - item: {fileID: 11400000, guid: 7e69e97c2a5edf149a174a57b97507dc, type: 2}
+          amount: 1
+        equip: 1
+    - rid: 287758218191176008
+      type: {class: RaiseQuestEventNode, ns: , asm: SafeHaven}
+      data:
+        id: b6018d47fe6e4a8ca694bf9db8e219fc
+        position: {x: 1540, y: 230}
+        questEvent: {fileID: 11400000, guid: 99f43a387e2b30a408b5faf35fc3f1f9, type: 2}
+    - rid: 287758218191176009
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 6c61254c6ac1429e956b3343133a1f30
+        position: {x: 1840, y: 230}
+        speaker:
+          player: 0
+          name: Eirik
+          model: {fileID: 810501267}
+          portrait: {fileID: 0}
+        line: The axe. Good. It splits wolves and firewood alike, and you keep the torch in your other hand.
+--- !u!114 &272836873
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 272836870}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aecdc764a0346784e9958a956dddd948, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::SaveableEntity
+  id: 3fec5be63c20421aa03e9f5df2979026
+  prefabId: 
+  saveTransform: 1
+  saveActiveState: 1
+  rememberDestruction: 1
+  saveComponents: 1
 --- !u!1 &282416515
 GameObject:
   m_ObjectHideFlags: 0
@@ -1396,7 +1788,7 @@ Transform:
   m_GameObject: {fileID: 334759802}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 2, y: 3.2647104, z: -53.8}
+  m_LocalPosition: {x: 2, y: 5.7227736, z: -75.8}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1421,6 +1813,13 @@ MonoBehaviour:
   forestLine: Tracks everywhere, all running the same way. Whatever they are fleeing, we are walking towards it. Lovely.
   campLine: I counted three wolves circling and one shape that was not a wolf. Keep your voice down. I would rather see them before they see us.
   portalLine: I will take the ones on the stones. You just keep breathing.
+  campTopics:
+  - question: Where did you learn to shoot like that?
+    answer: Poaching on the jarl's land. You learn to hit with the first arrow when the second one brings the wardens.
+  - question: What did you see out there?
+    answer: Troll tracks. Small ones, the moss kind. They never come this far down. Something is pushing everything out of the high woods, and it is big.
+  - question: Any advice for the dark?
+    answer: Walk where the moss is thick; it's quieter. Keep your back to the fire, never your face. And if you hear something heavy breathing, don't run until I say so.
   talkedEvent: {fileID: 11400000, guid: eb2539c68ce00724ea300d5133c29bdc, type: 2}
   soldier: 0
   alchemist: 0
@@ -2435,7 +2834,7 @@ Transform:
   m_GameObject: {fileID: 505453358}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 3.1311533, z: -50}
+  m_LocalPosition: {x: 0, y: 4.7578115, z: -72}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2666,6 +3065,7 @@ GameObject:
   - component: {fileID: 628045894}
   - component: {fileID: 628045896}
   - component: {fileID: 628045895}
+  - component: {fileID: 628045897}
   m_Layer: 0
   m_Name: Name
   m_TagString: Untagged
@@ -2836,6 +3236,18 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &628045897
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 628045893}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 618b46bf90e97c2458f18ced9be2ff4a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::FaceCamera
 --- !u!1 &630507425
 GameObject:
   m_ObjectHideFlags: 0
@@ -2980,6 +3392,333 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4722242926601522340, guid: 98a5e3726f2d59d45b0da93e8ea043b5, type: 3}
   m_PrefabInstance: {fileID: 673176293}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &716558345
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 716558346}
+  - component: {fileID: 716558348}
+  - component: {fileID: 716558347}
+  m_Layer: 0
+  m_Name: Story - The Old Troll
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &716558346
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 716558345}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 3}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 981106771}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &716558347
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 716558345}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7585b9b1e2e24704186225f4b6f8d69a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::StoryScript
+  nodes:
+  - rid: 287758218191175966
+  - rid: 287758218191175967
+  - rid: 287758218191175968
+  - rid: 287758218191175969
+  - rid: 287758218191175970
+  - rid: 287758218191175971
+  - rid: 287758218191175972
+  - rid: 287758218191175973
+  - rid: 287758218191175974
+  - rid: 287758218191175975
+  - rid: 287758218191175976
+  - rid: 287758218191175977
+  - rid: 287758218191175978
+  - rid: 287758218191175979
+  - rid: 287758218191175980
+  - rid: 287758218191175981
+  - rid: 287758218191175982
+  - rid: 287758218191175983
+  - rid: 287758218191175984
+  - rid: 287758218191175985
+  - rid: 287758218191175986
+  - rid: 287758218191175987
+  - rid: 287758218191175988
+  links:
+  - from: df8fdfbec14f4fdbbcaa0be43bc4b643
+    output: 0
+    to: a3928e6e723549a6b6585d96cf82b930
+  - from: a3928e6e723549a6b6585d96cf82b930
+    output: 0
+    to: 55eee2e3611d4ab89e42597708b38004
+  - from: a3928e6e723549a6b6585d96cf82b930
+    output: 0
+    to: 5f847cde442b4c32888fcffd18597f5a
+  - from: a3928e6e723549a6b6585d96cf82b930
+    output: 0
+    to: 06060c90b70e4fcc83156684399e7f27
+  - from: a3928e6e723549a6b6585d96cf82b930
+    output: 0
+    to: 80342dbc4365452bb5459d14ebb62f89
+  - from: a3928e6e723549a6b6585d96cf82b930
+    output: 0
+    to: 1e9ebb84aba94e3ea065761659dcf7d8
+  - from: a3928e6e723549a6b6585d96cf82b930
+    output: 0
+    to: b621e51164154b23acd6dfac271a9441
+  - from: a3928e6e723549a6b6585d96cf82b930
+    output: 0
+    to: 57b4167c2b5a48daa0ef5944aa0bf2d4
+  - from: 57b4167c2b5a48daa0ef5944aa0bf2d4
+    output: 0
+    to: 38b2f01a8c574580a1745821b950f9c8
+  - from: 57b4167c2b5a48daa0ef5944aa0bf2d4
+    output: 0
+    to: d6bcc57bc4344e1d87b8a5b5ad350246
+  - from: 80342dbc4365452bb5459d14ebb62f89
+    output: 0
+    to: 32966d984aa043dda40cd20b0046d1e0
+  - from: 32966d984aa043dda40cd20b0046d1e0
+    output: 0
+    to: d846e196665147669e5fb0466ecd4dc2
+  - from: d846e196665147669e5fb0466ecd4dc2
+    output: 0
+    to: 5637c00fa3e64e4eb5619bd0817c537c
+  - from: 5637c00fa3e64e4eb5619bd0817c537c
+    output: 0
+    to: d9a99b371830439cbf527b0d5a9059e3
+  - from: d9a99b371830439cbf527b0d5a9059e3
+    output: 0
+    to: cba223b86c654836957684e14b53b0c6
+  - from: d9a99b371830439cbf527b0d5a9059e3
+    output: 0
+    to: 64556c1a95d64dd79d889b7bb644ebec
+  - from: d9a99b371830439cbf527b0d5a9059e3
+    output: 0
+    to: 7450ed7ba6b04e11970cfe72416dde18
+  - from: 7450ed7ba6b04e11970cfe72416dde18
+    output: 0
+    to: a339be4854c8476886c20d48120916a8
+  - from: 7450ed7ba6b04e11970cfe72416dde18
+    output: 0
+    to: 78e0c739f37d40c0833f0b580e02ead0
+  - from: 7450ed7ba6b04e11970cfe72416dde18
+    output: 0
+    to: c7b77f4db4a74725aadc3cc99af972e9
+  - from: c7b77f4db4a74725aadc3cc99af972e9
+    output: 0
+    to: 8b79938097884123935bf4e5c2fce1ec
+  - from: c7b77f4db4a74725aadc3cc99af972e9
+    output: 0
+    to: 3ca461f4de99414b980fcf919c7829a9
+  logSteps: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 287758218191175966
+      type: {class: WhenQuest, ns: , asm: SafeHaven}
+      data:
+        id: df8fdfbec14f4fdbbcaa0be43bc4b643
+        position: {x: 40, y: 60}
+        once: 1
+        quest: {fileID: 11400000, guid: cd536373f8f639f4db60c8810e546ebf, type: 2}
+        when: 0
+    - rid: 287758218191175967
+      type: {class: SetActiveNode, ns: , asm: SafeHaven}
+      data:
+        id: a3928e6e723549a6b6585d96cf82b930
+        position: {x: 340, y: 60}
+        target: {fileID: 1803281363}
+        active: 1
+    - rid: 287758218191175968
+      type: {class: ShakeCameraNode, ns: , asm: SafeHaven}
+      data:
+        id: 55eee2e3611d4ab89e42597708b38004
+        position: {x: 640, y: 60}
+        strength: 0.75
+    - rid: 287758218191175969
+      type: {class: PlaySoundNode, ns: , asm: SafeHaven}
+      data:
+        id: 5f847cde442b4c32888fcffd18597f5a
+        position: {x: 640, y: 230}
+        sound: {fileID: 11400000, guid: ad5c451edd0edde49967af502c90ec94, type: 2}
+        at: {fileID: 1803281364}
+    - rid: 287758218191175970
+      type: {class: MoveObjectNode, ns: , asm: SafeHaven}
+      data:
+        id: 06060c90b70e4fcc83156684399e7f27
+        position: {x: 640, y: 400}
+        target: {fileID: 1803281364}
+        destination: {fileID: 864501000}
+        seconds: 9
+        waitUntilArrived: 0
+    - rid: 287758218191175971
+      type: {class: FocusCameraNode, ns: , asm: SafeHaven}
+      data:
+        id: 80342dbc4365452bb5459d14ebb62f89
+        position: {x: 640, y: 570}
+        target: {fileID: 1803281364}
+        seconds: 4
+        revealRadius: 14
+    - rid: 287758218191175972
+      type: {class: LightningNode, ns: , asm: SafeHaven}
+      data:
+        id: 1e9ebb84aba94e3ea065761659dcf7d8
+        position: {x: 640, y: 740}
+    - rid: 287758218191175973
+      type: {class: GlowNode, ns: , asm: SafeHaven}
+      data:
+        id: b621e51164154b23acd6dfac271a9441
+        position: {x: 640, y: 910}
+        target: {fileID: 1803281364}
+        glow: 1
+        colour: {r: 0.55, g: 0.65, b: 0.85, a: 1}
+        intensity: 9
+        range: 22
+        fadeSeconds: 0.6
+    - rid: 287758218191175974
+      type: {class: WaitNode, ns: , asm: SafeHaven}
+      data:
+        id: 57b4167c2b5a48daa0ef5944aa0bf2d4
+        position: {x: 640, y: 1080}
+        seconds: 1.6
+    - rid: 287758218191175975
+      type: {class: LightningNode, ns: , asm: SafeHaven}
+      data:
+        id: 38b2f01a8c574580a1745821b950f9c8
+        position: {x: 940, y: 60}
+    - rid: 287758218191175976
+      type: {class: PlaySoundNode, ns: , asm: SafeHaven}
+      data:
+        id: d6bcc57bc4344e1d87b8a5b5ad350246
+        position: {x: 940, y: 230}
+        sound: {fileID: 11400000, guid: 6510718f5af764e4aa78349c4b3f7cdf, type: 2}
+        at: {fileID: 1803281364}
+    - rid: 287758218191175977
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 32966d984aa043dda40cd20b0046d1e0
+        position: {x: 940, y: 400}
+        speaker:
+          player: 0
+          name: Sigrid
+          model: {fileID: 983162859}
+          portrait: {fileID: 0}
+        line: That is no thunder. An old one, a mountain troll, and it is walking towards our fire.
+    - rid: 287758218191175978
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: d846e196665147669e5fb0466ecd4dc2
+        position: {x: 1240, y: 60}
+        speaker:
+          player: 0
+          name: Runa
+          model: {fileID: 334759803}
+          portrait: {fileID: 0}
+        line: It hasn't seen us yet. It will smell the smoke soon enough.
+    - rid: 287758218191175979
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 5637c00fa3e64e4eb5619bd0817c537c
+        position: {x: 1540, y: 60}
+        speaker:
+          player: 0
+          name: Sigrid
+          model: {fileID: 983162859}
+          portrait: {fileID: 0}
+        line: Leave the fire! Follow the old road north, to the standing stones. Now!
+    - rid: 287758218191175980
+      type: {class: WaitNode, ns: , asm: SafeHaven}
+      data:
+        id: d9a99b371830439cbf527b0d5a9059e3
+        position: {x: 340, y: 60}
+        seconds: 10
+    - rid: 287758218191175981
+      type: {class: ShakeCameraNode, ns: , asm: SafeHaven}
+      data:
+        id: cba223b86c654836957684e14b53b0c6
+        position: {x: 640, y: 60}
+        strength: 0.35
+    - rid: 287758218191175982
+      type: {class: PlaySoundNode, ns: , asm: SafeHaven}
+      data:
+        id: 64556c1a95d64dd79d889b7bb644ebec
+        position: {x: 640, y: 230}
+        sound: {fileID: 11400000, guid: ad5c451edd0edde49967af502c90ec94, type: 2}
+        at: {fileID: 1803281364}
+    - rid: 287758218191175983
+      type: {class: WaitNode, ns: , asm: SafeHaven}
+      data:
+        id: 7450ed7ba6b04e11970cfe72416dde18
+        position: {x: 340, y: 60}
+        seconds: 10
+    - rid: 287758218191175984
+      type: {class: ShakeCameraNode, ns: , asm: SafeHaven}
+      data:
+        id: a339be4854c8476886c20d48120916a8
+        position: {x: 640, y: 60}
+        strength: 0.45
+    - rid: 287758218191175985
+      type: {class: PlaySoundNode, ns: , asm: SafeHaven}
+      data:
+        id: 78e0c739f37d40c0833f0b580e02ead0
+        position: {x: 640, y: 230}
+        sound: {fileID: 11400000, guid: ad5c451edd0edde49967af502c90ec94, type: 2}
+        at: {fileID: 1803281364}
+    - rid: 287758218191175986
+      type: {class: WaitNode, ns: , asm: SafeHaven}
+      data:
+        id: c7b77f4db4a74725aadc3cc99af972e9
+        position: {x: 340, y: 60}
+        seconds: 10
+    - rid: 287758218191175987
+      type: {class: ShakeCameraNode, ns: , asm: SafeHaven}
+      data:
+        id: 8b79938097884123935bf4e5c2fce1ec
+        position: {x: 640, y: 60}
+        strength: 0.55
+    - rid: 287758218191175988
+      type: {class: PlaySoundNode, ns: , asm: SafeHaven}
+      data:
+        id: 3ca461f4de99414b980fcf919c7829a9
+        position: {x: 640, y: 230}
+        sound: {fileID: 11400000, guid: ad5c451edd0edde49967af502c90ec94, type: 2}
+        at: {fileID: 1803281364}
+--- !u!114 &716558348
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 716558345}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aecdc764a0346784e9958a956dddd948, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::SaveableEntity
+  id: 0c434b538e634e36ab7a4a73192262ab
+  prefabId: 
+  saveTransform: 1
+  saveActiveState: 1
+  rememberDestruction: 1
+  saveComponents: 1
 --- !u!1 &721401212
 GameObject:
   m_ObjectHideFlags: 0
@@ -3180,6 +3919,7 @@ GameObject:
   - component: {fileID: 758813920}
   - component: {fileID: 758813922}
   - component: {fileID: 758813921}
+  - component: {fileID: 758813923}
   m_Layer: 0
   m_Name: Name
   m_TagString: Untagged
@@ -3350,6 +4090,18 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &758813923
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 758813919}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 618b46bf90e97c2458f18ced9be2ff4a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::FaceCamera
 --- !u!1001 &767604592
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3537,6 +4289,7 @@ MonoBehaviour:
   forestLine: We came to learn why this forest has become bewitched. First, we need shelter. Follow the old road.
   campLine: I came to examine the old iron markers. Whatever protects the road has cracked. Steel will help tonight, but steel alone will not mend this.
   portalLine: Stay near the stones. We can still get out of this together.
+  campTopics: []
   talkedEvent: {fileID: 11400000, guid: 45b20a2d17557304a8cb59976d6b5ca7, type: 2}
   soldier: 0
   alchemist: 0
@@ -3744,7 +4497,7 @@ Transform:
   m_GameObject: {fileID: 810501266}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 3.2148154, z: -53.8}
+  m_LocalPosition: {x: 0, y: 5.7270837, z: -75.8}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -3769,6 +4522,13 @@ MonoBehaviour:
   forestLine: Stay between me and the trees. If anything comes out of the dark, it meets my shield first.
   campLine: Eat something, even if you are not hungry. I have buried enough friends who thought they could fight on an empty stomach.
   portalLine: Go! I will hold them. Nobody gets left behind, not while I am standing.
+  campTopics:
+  - question: How long have you been a soldier?
+    answer: Twenty winters in the shield wall at Granheim. I stopped counting the fights a long time ago. I still count the friends.
+  - question: Why did you join the expedition?
+    answer: My sister's farm is two valleys from here. Her dogs ran into these woods last month and never came back. Someone has to walk in front. Better me than you.
+  - question: Do you trust Sigrid?
+    answer: I trust that she wants to get out of here alive. That is enough for tonight. But watch her hands when she talks about the stones. She knows more than she says.
   talkedEvent: {fileID: 11400000, guid: 1bb643130e8944049b38a3399cf7edf9, type: 2}
   soldier: 1
   alchemist: 0
@@ -3945,6 +4705,37 @@ MonoBehaviour:
   height: 3.5
   softness: 0.6
   followsWeather: 1
+--- !u!1 &864500999
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 864501000}
+  m_Layer: 0
+  m_Name: Old Troll Walks To
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &864501000
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 864500999}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 21, y: 3.3779461, z: -53}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 981106771}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &890475678
 GameObject:
   m_ObjectHideFlags: 0
@@ -4332,6 +5123,7 @@ Transform:
   m_Children:
   - {fileID: 351156311}
   - {fileID: 1464162918}
+  - {fileID: 1901900327}
   m_Father: {fileID: 1500380933}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &921286817
@@ -4395,6 +5187,72 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: SafeHaven::FogGround
   cellSize: 2
+--- !u!1001 &972437386
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1201455676}
+    m_Modifications:
+    - target: {fileID: 2365936010395217316, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2365936010395217316, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.29955602
+      objectReference: {fileID: 0}
+    - target: {fileID: 2365936010395217316, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2365936010395217316, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.791918
+      objectReference: {fileID: 0}
+    - target: {fileID: 2365936010395217316, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2365936010395217316, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.6106276
+      objectReference: {fileID: 0}
+    - target: {fileID: 2365936010395217316, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2365936010395217316, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2365936010395217316, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2365936010395217316, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3694057216285352694, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: id
+      value: 17b6797d3179413db72956a40da161f2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8775155884352199117, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: m_Name
+      value: BerriesNode
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+--- !u!4 &972437387 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2365936010395217316, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+  m_PrefabInstance: {fileID: 972437386}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &974906609
 GameObject:
   m_ObjectHideFlags: 0
@@ -4624,6 +5482,45 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 980884484}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &981106770
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 981106771}
+  m_Layer: 0
+  m_Name: Intro Moments
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &981106771
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 981106770}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 272836871}
+  - {fileID: 1201455676}
+  - {fileID: 1416806798}
+  - {fileID: 1503720727}
+  - {fileID: 1569805110}
+  - {fileID: 1803281364}
+  - {fileID: 864501000}
+  - {fileID: 716558346}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &983162858
 GameObject:
   m_ObjectHideFlags: 0
@@ -4654,7 +5551,7 @@ Transform:
   m_GameObject: {fileID: 983162858}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -2, y: 3.2248816, z: -52}
+  m_LocalPosition: {x: -2, y: 5.1178813, z: -74}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -4680,6 +5577,13 @@ MonoBehaviour:
   forestLine: Keep the torch high and the road under your feet. The forest is listening tonight. Let it hear only footsteps.
   campLine: The villages think we came for wolves and witches. Let them. The stones out here are older than any village, and someone has been waking them.
   portalLine: Stand inside the ring. Whatever you see, do not let go of the stone until I say.
+  campTopics:
+  - question: Why did the villages send you?
+    answer: They did not send me. They asked for someone who could read the old marks, and I was the only one who answered. Draw your own conclusions. Everyone else does.
+  - question: What do the runes on your staff say?
+    answer: Words for things your tongue has no names for. Most of them mean wait. One of them means open. Pray we only need the first kind.
+  - question: Do you know what is doing this to the forest?
+    answer: 'I know what it feels like: a door left open in winter. Someone opened it on purpose. Whether they meant to let something in or out... that is what we came to find.'
   talkedEvent: {fileID: 11400000, guid: 3943805714479a044b6e4e23704963cd, type: 2}
   soldier: 0
   alchemist: 1
@@ -4817,6 +5721,7 @@ GameObject:
   - component: {fileID: 985677806}
   - component: {fileID: 985677808}
   - component: {fileID: 985677807}
+  - component: {fileID: 985677809}
   m_Layer: 0
   m_Name: Name
   m_TagString: Untagged
@@ -4987,6 +5892,18 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &985677809
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 985677805}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 618b46bf90e97c2458f18ced9be2ff4a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::FaceCamera
 --- !u!1 &993608490
 GameObject:
   m_ObjectHideFlags: 0
@@ -5889,6 +6806,44 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3694066081101222592, guid: 98a5e3726f2d59d45b0da93e8ea043b5, type: 3}
   m_PrefabInstance: {fileID: 1097260850}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1201455675
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1201455676}
+  m_Layer: 0
+  m_Name: Berry Clearing
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1201455676
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1201455675}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -25, y: 3.966224, z: -36}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 249137171}
+  - {fileID: 102475069}
+  - {fileID: 1327233165}
+  - {fileID: 229058070}
+  - {fileID: 972437387}
+  - {fileID: 1915190751}
+  - {fileID: 1308209543}
+  m_Father: {fileID: 981106771}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1204332461
 GameObject:
   m_ObjectHideFlags: 0
@@ -9297,6 +10252,119 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2063496794}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1308209542
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1308209543}
+  - component: {fileID: 1308209544}
+  m_Layer: 0
+  m_Name: Quest Waypoint - Berries for the Pot 1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1308209543
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1308209542}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1201455676}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1308209544
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1308209542}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b33558da32530e547ac0e3c72d87df24, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::QuestWaypoint
+  quest: {fileID: 11400000, guid: 83fc380c709c01a4383dfa7c9300d48a, type: 2}
+  objective: 1
+  label: Berries
+--- !u!1001 &1327233164
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1201455676}
+    m_Modifications:
+    - target: {fileID: 2365936010395217316, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 2365936010395217316, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.14579844
+      objectReference: {fileID: 0}
+    - target: {fileID: 2365936010395217316, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2365936010395217316, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: -0.5252588
+      objectReference: {fileID: 0}
+    - target: {fileID: 2365936010395217316, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2365936010395217316, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.85094255
+      objectReference: {fileID: 0}
+    - target: {fileID: 2365936010395217316, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2365936010395217316, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2365936010395217316, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2365936010395217316, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3694057216285352694, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: id
+      value: ad75ef27a6e446589f4efc158e1e0779
+      objectReference: {fileID: 0}
+    - target: {fileID: 8775155884352199117, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: m_Name
+      value: BerriesNode
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+--- !u!4 &1327233165 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2365936010395217316, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+  m_PrefabInstance: {fileID: 1327233164}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1338675508
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -9609,6 +10677,135 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1001 &1416806796
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 981106771}
+    m_Modifications:
+    - target: {fileID: 500424062596816808, guid: eefa6649a4b17b24fa8383ad769dab93, type: 3}
+      propertyPath: m_Name
+      value: Small Troll Ambush
+      objectReference: {fileID: 0}
+    - target: {fileID: 4428770297748371014, guid: eefa6649a4b17b24fa8383ad769dab93, type: 3}
+      propertyPath: count.y
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4428770297748371014, guid: eefa6649a4b17b24fa8383ad769dab93, type: 3}
+      propertyPath: trigger
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4428770297748371014, guid: eefa6649a4b17b24fa8383ad769dab93, type: 3}
+      propertyPath: huntPlayer
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4428770297748371014, guid: eefa6649a4b17b24fa8383ad769dab93, type: 3}
+      propertyPath: creatures.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4428770297748371014, guid: eefa6649a4b17b24fa8383ad769dab93, type: 3}
+      propertyPath: corners.Array.data[0].x
+      value: -4
+      objectReference: {fileID: 0}
+    - target: {fileID: 4428770297748371014, guid: eefa6649a4b17b24fa8383ad769dab93, type: 3}
+      propertyPath: corners.Array.data[0].z
+      value: -4
+      objectReference: {fileID: 0}
+    - target: {fileID: 4428770297748371014, guid: eefa6649a4b17b24fa8383ad769dab93, type: 3}
+      propertyPath: corners.Array.data[1].x
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 4428770297748371014, guid: eefa6649a4b17b24fa8383ad769dab93, type: 3}
+      propertyPath: corners.Array.data[1].z
+      value: -4
+      objectReference: {fileID: 0}
+    - target: {fileID: 4428770297748371014, guid: eefa6649a4b17b24fa8383ad769dab93, type: 3}
+      propertyPath: corners.Array.data[2].x
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 4428770297748371014, guid: eefa6649a4b17b24fa8383ad769dab93, type: 3}
+      propertyPath: corners.Array.data[2].z
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 4428770297748371014, guid: eefa6649a4b17b24fa8383ad769dab93, type: 3}
+      propertyPath: corners.Array.data[3].x
+      value: -4
+      objectReference: {fileID: 0}
+    - target: {fileID: 4428770297748371014, guid: eefa6649a4b17b24fa8383ad769dab93, type: 3}
+      propertyPath: corners.Array.data[3].z
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 4428770297748371014, guid: eefa6649a4b17b24fa8383ad769dab93, type: 3}
+      propertyPath: creatures.Array.data[0].prefab
+      value: 
+      objectReference: {fileID: 6267209934607442583, guid: bb37a42ef72f5274d807155e3d054529, type: 3}
+    - target: {fileID: 4428770297748371014, guid: eefa6649a4b17b24fa8383ad769dab93, type: 3}
+      propertyPath: creatures.Array.data[0].weight
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7147372502583846198, guid: eefa6649a4b17b24fa8383ad769dab93, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -36
+      objectReference: {fileID: 0}
+    - target: {fileID: 7147372502583846198, guid: eefa6649a4b17b24fa8383ad769dab93, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 3.1822627
+      objectReference: {fileID: 0}
+    - target: {fileID: 7147372502583846198, guid: eefa6649a4b17b24fa8383ad769dab93, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -42
+      objectReference: {fileID: 0}
+    - target: {fileID: 7147372502583846198, guid: eefa6649a4b17b24fa8383ad769dab93, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7147372502583846198, guid: eefa6649a4b17b24fa8383ad769dab93, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7147372502583846198, guid: eefa6649a4b17b24fa8383ad769dab93, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7147372502583846198, guid: eefa6649a4b17b24fa8383ad769dab93, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7147372502583846198, guid: eefa6649a4b17b24fa8383ad769dab93, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7147372502583846198, guid: eefa6649a4b17b24fa8383ad769dab93, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7147372502583846198, guid: eefa6649a4b17b24fa8383ad769dab93, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: eefa6649a4b17b24fa8383ad769dab93, type: 3}
+--- !u!114 &1416806797 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4428770297748371014, guid: eefa6649a4b17b24fa8383ad769dab93, type: 3}
+  m_PrefabInstance: {fileID: 1416806796}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c73904d3801ccee4aba129e47e1b5e4f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::MobSpawnZone
+--- !u!4 &1416806798 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7147372502583846198, guid: eefa6649a4b17b24fa8383ad769dab93, type: 3}
+  m_PrefabInstance: {fileID: 1416806796}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1419928851
 GameObject:
   m_ObjectHideFlags: 0
@@ -9842,6 +11039,7 @@ MonoBehaviour:
   forestLine: We came to learn why this forest has become bewitched. First, we need shelter. Follow the old road.
   campLine: There are old paths here, older than the villages. My teacher said the waystones connected places of shelter. I thought that was only a story.
   portalLine: The stones are answering you. Stay close. I will try to keep the passage open.
+  campTopics: []
   talkedEvent: {fileID: 11400000, guid: d656e5181cedb8f408b76012090c7439, type: 2}
   soldier: 0
   alchemist: 0
@@ -10389,6 +11587,97 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::PersistentScene
   writeToSaveFile: 1
   content: {fileID: 11400000, guid: 9a13bf9732fa5814da5ab7a5fbedb47f, type: 2}
+--- !u!1 &1503720726
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1503720727}
+  - component: {fileID: 1503720729}
+  - component: {fileID: 1503720728}
+  m_Layer: 0
+  m_Name: Story - Eirik's Waterskin
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1503720727
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1503720726}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 981106771}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1503720728
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1503720726}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7585b9b1e2e24704186225f4b6f8d69a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::StoryScript
+  nodes:
+  - rid: 287758218191175998
+  - rid: 287758218191175999
+  links:
+  - from: 2f7f362aef624bbfb77f305d787297da
+    output: 0
+    to: 18caa251fd3849d89f80866f00a45a14
+  logSteps: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 287758218191175998
+      type: {class: WhenQuest, ns: , asm: SafeHaven}
+      data:
+        id: 2f7f362aef624bbfb77f305d787297da
+        position: {x: 40, y: 60}
+        once: 1
+        quest: {fileID: 11400000, guid: 83fc380c709c01a4383dfa7c9300d48a, type: 2}
+        when: 0
+    - rid: 287758218191175999
+      type: {class: GiveItemsNode, ns: , asm: SafeHaven}
+      data:
+        id: 18caa251fd3849d89f80866f00a45a14
+        position: {x: 340, y: 60}
+        items:
+        - item: {fileID: 11400000, guid: 79744f7a29634cb408f4829b51ec5918, type: 2}
+          amount: 1
+        equip: 0
+--- !u!114 &1503720729
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1503720726}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aecdc764a0346784e9958a956dddd948, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::SaveableEntity
+  id: cbe9758f1a62441ab4e80b186a356bae
+  prefabId: 
+  saveTransform: 1
+  saveActiveState: 1
+  rememberDestruction: 1
+  saveComponents: 1
 --- !u!1 &1528673796
 GameObject:
   m_ObjectHideFlags: 0
@@ -10605,6 +11894,173 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1987402904}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1569805109
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1569805110}
+  - component: {fileID: 1569805112}
+  - component: {fileID: 1569805111}
+  m_Layer: 0
+  m_Name: Story - Troll Ambush
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1569805110
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1569805109}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 2}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 981106771}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1569805111
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1569805109}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7585b9b1e2e24704186225f4b6f8d69a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::StoryScript
+  nodes:
+  - rid: 287758218191175989
+  - rid: 287758218191175990
+  - rid: 287758218191175991
+  - rid: 287758218191175992
+  - rid: 287758218191175993
+  - rid: 287758218191175994
+  - rid: 287758218191175995
+  - rid: 287758218191175996
+  - rid: 287758218191175997
+  links:
+  - from: f8e0756b9fcb416aa153c77dd66f1bb6
+    output: 0
+    to: 54586ec6723a4cc4993635b78e385392
+  - from: 54586ec6723a4cc4993635b78e385392
+    output: 1
+    to: 33a20f758bd34564adada680cdf96849
+  - from: 33a20f758bd34564adada680cdf96849
+    output: 1
+    to: eccb8cd4b99d4dce910b9dfac7096072
+  - from: eccb8cd4b99d4dce910b9dfac7096072
+    output: 0
+    to: c55320e6897842c2add749bd2c86b10e
+  - from: c55320e6897842c2add749bd2c86b10e
+    output: 0
+    to: ff22dafecfa04322a82416b310000a76
+  - from: c55320e6897842c2add749bd2c86b10e
+    output: 0
+    to: e8b946b7d40c4a1d8a49b19591fc0569
+  - from: 961bb4754c244470b5b241ae4927bd70
+    output: 0
+    to: 8fe77923f6e4420385c5b4122369f7f4
+  logSteps: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 287758218191175989
+      type: {class: WhenPlayerNear, ns: , asm: SafeHaven}
+      data:
+        id: f8e0756b9fcb416aa153c77dd66f1bb6
+        position: {x: 40, y: 60}
+        once: 0
+        place: {fileID: 1201455676}
+        radius: 7
+    - rid: 287758218191175990
+      type: {class: HasHappenedNode, ns: , asm: SafeHaven}
+      data:
+        id: 54586ec6723a4cc4993635b78e385392
+        position: {x: 340, y: 60}
+        questEvent: {fileID: 11400000, guid: f544ff0162e4f174a8d91b7d7dc42b37, type: 2}
+    - rid: 287758218191175991
+      type: {class: CheckQuestNode, ns: , asm: SafeHaven}
+      data:
+        id: 33a20f758bd34564adada680cdf96849
+        position: {x: 640, y: 60}
+        quest: {fileID: 11400000, guid: 83fc380c709c01a4383dfa7c9300d48a, type: 2}
+    - rid: 287758218191175992
+      type: {class: RaiseQuestEventNode, ns: , asm: SafeHaven}
+      data:
+        id: eccb8cd4b99d4dce910b9dfac7096072
+        position: {x: 940, y: 60}
+        questEvent: {fileID: 11400000, guid: f544ff0162e4f174a8d91b7d7dc42b37, type: 2}
+    - rid: 287758218191175993
+      type: {class: WaitNode, ns: , asm: SafeHaven}
+      data:
+        id: c55320e6897842c2add749bd2c86b10e
+        position: {x: 1240, y: 60}
+        seconds: 2.5
+    - rid: 287758218191175994
+      type: {class: SpawnEnemiesNode, ns: , asm: SafeHaven}
+      data:
+        id: ff22dafecfa04322a82416b310000a76
+        position: {x: 1540, y: 60}
+        zone: {fileID: 1416806797}
+        waitUntilDefeated: 0
+    - rid: 287758218191175995
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: e8b946b7d40c4a1d8a49b19591fc0569
+        position: {x: 1540, y: 230}
+        speaker:
+          player: 0
+          name: Runa
+          model: {fileID: 334759803}
+          portrait: {fileID: 0}
+        line: Down! Moss trolls in the bushes, the small kind. Don't let them get behind you!
+    - rid: 287758218191175996
+      type: {class: WhenZoneCleared, ns: , asm: SafeHaven}
+      data:
+        id: 961bb4754c244470b5b241ae4927bd70
+        position: {x: 40, y: 230}
+        once: 1
+        zone: {fileID: 1416806797}
+    - rid: 287758218191175997
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 8fe77923f6e4420385c5b4122369f7f4
+        position: {x: 340, y: 230}
+        speaker:
+          player: 0
+          name: Runa
+          model: {fileID: 334759803}
+          portrait: {fileID: 0}
+        line: Small ones never come alone and never come this far down. Something up in the high woods is scaring them. Finish the berries and get back to the fire.
+--- !u!114 &1569805112
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1569805109}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aecdc764a0346784e9958a956dddd948, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::SaveableEntity
+  id: e2fcad5ba41a4c7d9ee0e2ec45330a66
+  prefabId: 
+  saveTransform: 1
+  saveActiveState: 1
+  rememberDestruction: 1
+  saveComponents: 1
 --- !u!1001 &1591531885
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10725,6 +12181,7 @@ MonoBehaviour:
   forestLine: We came to learn why this forest has become bewitched. First, we need shelter. Follow the old road.
   campLine: This stone is dry enough. Give me sound timber and a little daylight, and I could make somewhere worth staying. For now, this fire will do.
   portalLine: Stay near the stones. We can still get out of this together.
+  campTopics: []
   talkedEvent: {fileID: 11400000, guid: 3c4a3556d9e8a7741ac54999bfd13e25, type: 2}
   soldier: 0
   alchemist: 0
@@ -11889,6 +13346,105 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 6781998647769579098, guid: 5cee4a0c0de6b6c4f9484157396c7511, type: 3}
   m_PrefabInstance: {fileID: 1799253847}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1803281362
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 981106771}
+    m_Modifications:
+    - target: {fileID: 339849147602867128, guid: c62686ef298686e40ae6736dc586a03f, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 758846370938356049, guid: c62686ef298686e40ae6736dc586a03f, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 758846370938356049, guid: c62686ef298686e40ae6736dc586a03f, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 758846370938356049, guid: c62686ef298686e40ae6736dc586a03f, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 758846370938356049, guid: c62686ef298686e40ae6736dc586a03f, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 758846370938356049, guid: c62686ef298686e40ae6736dc586a03f, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 5.5508585
+      objectReference: {fileID: 0}
+    - target: {fileID: 758846370938356049, guid: c62686ef298686e40ae6736dc586a03f, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -65
+      objectReference: {fileID: 0}
+    - target: {fileID: 758846370938356049, guid: c62686ef298686e40ae6736dc586a03f, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.9446912
+      objectReference: {fileID: 0}
+    - target: {fileID: 758846370938356049, guid: c62686ef298686e40ae6736dc586a03f, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 758846370938356049, guid: c62686ef298686e40ae6736dc586a03f, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.3279613
+      objectReference: {fileID: 0}
+    - target: {fileID: 758846370938356049, guid: c62686ef298686e40ae6736dc586a03f, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 758846370938356049, guid: c62686ef298686e40ae6736dc586a03f, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 758846370938356049, guid: c62686ef298686e40ae6736dc586a03f, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 758846370938356049, guid: c62686ef298686e40ae6736dc586a03f, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3468862131618844974, guid: c62686ef298686e40ae6736dc586a03f, type: 3}
+      propertyPath: id
+      value: 7410715367ce434c9fb065069e43fbb2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5457787183531467037, guid: c62686ef298686e40ae6736dc586a03f, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8875997469976927249, guid: c62686ef298686e40ae6736dc586a03f, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9066855856663566298, guid: c62686ef298686e40ae6736dc586a03f, type: 3}
+      propertyPath: m_Name
+      value: The Old Troll (story)
+      objectReference: {fileID: 0}
+    - target: {fileID: 9066855856663566298, guid: c62686ef298686e40ae6736dc586a03f, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c62686ef298686e40ae6736dc586a03f, type: 3}
+--- !u!1 &1803281363 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 9066855856663566298, guid: c62686ef298686e40ae6736dc586a03f, type: 3}
+  m_PrefabInstance: {fileID: 1803281362}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1803281364 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 758846370938356049, guid: c62686ef298686e40ae6736dc586a03f, type: 3}
+  m_PrefabInstance: {fileID: 1803281362}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1815962769
 GameObject:
   m_ObjectHideFlags: 0
@@ -12767,6 +14323,119 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1500380933}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1901900326
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1901900327}
+  - component: {fileID: 1901900328}
+  m_Layer: 0
+  m_Name: Quest Waypoint - Berries for the Pot 2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1901900327
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1901900326}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 913407437}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1901900328
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1901900326}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b33558da32530e547ac0e3c72d87df24, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::QuestWaypoint
+  quest: {fileID: 11400000, guid: 83fc380c709c01a4383dfa7c9300d48a, type: 2}
+  objective: 2
+  label: Campfire
+--- !u!1001 &1915190750
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1201455676}
+    m_Modifications:
+    - target: {fileID: 2365936010395217316, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2365936010395217316, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.08567691
+      objectReference: {fileID: 0}
+    - target: {fileID: 2365936010395217316, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2365936010395217316, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: -0.99915135
+      objectReference: {fileID: 0}
+    - target: {fileID: 2365936010395217316, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2365936010395217316, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.041190088
+      objectReference: {fileID: 0}
+    - target: {fileID: 2365936010395217316, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2365936010395217316, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2365936010395217316, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2365936010395217316, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3694057216285352694, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: id
+      value: eec7b6f76a42450e80111b1d6e18c603
+      objectReference: {fileID: 0}
+    - target: {fileID: 8775155884352199117, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      propertyPath: m_Name
+      value: BerriesNode
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+--- !u!4 &1915190751 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2365936010395217316, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+  m_PrefabInstance: {fileID: 1915190750}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1937565226
 GameObject:
   m_ObjectHideFlags: 0
@@ -13551,6 +15220,7 @@ MonoBehaviour:
   forestLine: We came to learn why this forest has become bewitched. First, we need shelter. Follow the old road.
   campLine: The plants are wrong. Roots that should sleep in this season are warm to the touch. Something is feeding the enchantment. Stay close; I brought a little medicine.
   portalLine: Stay near the stones. We can still get out of this together.
+  campTopics: []
   talkedEvent: {fileID: 11400000, guid: 5b6e9cf3d8ea3e44cabe07b5cf724775, type: 2}
   soldier: 0
   alchemist: 1
@@ -16067,11 +17737,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6428716820787852678, guid: 7c9023ff58d8fd54fad4fbace119c49b, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 3.1311533
+      value: 4.7578115
       objectReference: {fileID: 0}
     - target: {fileID: 6428716820787852678, guid: 7c9023ff58d8fd54fad4fbace119c49b, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -50
+      value: -72
       objectReference: {fileID: 0}
     - target: {fileID: 6428716820787852678, guid: 7c9023ff58d8fd54fad4fbace119c49b, type: 3}
       propertyPath: m_LocalRotation.w
@@ -16374,3 +18044,4 @@ SceneRoots:
   - {fileID: 1375478518}
   - {fileID: 1241450795}
   - {fileID: 1789325584}
+  - {fileID: 981106771}
