@@ -2,8 +2,9 @@ using UnityEngine;
 
 /// <summary>
 /// A loosed arrow: it flies on a falling arc, swept each frame so it can't skip through thin things, and turns along its
-/// path. A hostile target takes the hit (DamageCalculator with the bow's shot attack and the arrow's damage); scenery
-/// keeps the arrow stuck in it for a while. Either way the strike is heard (WorldNoise), so a stray shot can lure
+/// path. A hostile target takes the hit (DamageCalculator with the bow's shot attack and the arrow's damage; a fire arrow
+/// also sets it burning); scenery keeps the arrow stuck in it for a while, and some of those (the arrow's Recover Chance)
+/// can be picked up again by walking over them. Either way the strike is heard (WorldNoise), so a stray shot can lure
 /// monsters. Copies come from and return to <see cref="PrefabPool"/>, so Launch resets everything a flight uses.
 /// </summary>
 public sealed class ArrowProjectile : MonoBehaviour
@@ -12,6 +13,9 @@ public sealed class ArrowProjectile : MonoBehaviour
     private const float Radius = 0.04f;
     // How far the tip sinks into what it strikes.
     private const float Embed = 0.12f;
+    // Walking this close to a recoverable arrow picks it up.
+    private const float PickupRange = 1.6f;
+    private const float RecoverableSeconds = 90f;
 
     [Tooltip("Seconds an arrow stays stuck in the ground or a tree.")]
     [SerializeField, Min(0f)] private float stuckSeconds = 12f;
@@ -21,8 +25,11 @@ public sealed class ArrowProjectile : MonoBehaviour
     private readonly RaycastHit[] hits = new RaycastHit[16];
     private Combatant owner;
     private AttackDefinition attack;
+    private ItemDefinition item;
     private ArrowDefinition arrow;
     private float damage;
+    private HitTechnique technique;
+    private bool critical;
     private Vector3 velocity;
     private float gravity;
     private float flightEnds;
@@ -34,13 +41,23 @@ public sealed class ArrowProjectile : MonoBehaviour
 
     public Vector3 Velocity => velocity;
 
-    /// <summary>Starts a flight from where the copy stands.</summary>
-    public void Launch(Combatant source, AttackDefinition shot, ArrowDefinition definition, float shotDamage, Vector3 launchVelocity)
+    /// <summary>True while stuck and waiting to be picked up again.</summary>
+    public bool Recoverable { get; private set; }
+
+    /// <summary>Starts a flight from where the copy stands. <paramref name="arrowItem"/>'s Arrow sets the drop, burning and
+    /// recovery; <paramref name="forceCritical"/> makes the hit critical (a perfect release).</summary>
+    public void Launch(Combatant source, AttackDefinition shot, ItemDefinition arrowItem, float shotDamage, Vector3 launchVelocity,
+        HitTechnique hitTechnique = HitTechnique.None, bool forceCritical = false)
     {
         owner = source;
         attack = shot;
+        item = arrowItem;
+        ArrowDefinition definition = arrowItem != null ? arrowItem.Arrow : null;
         arrow = definition;
         damage = shotDamage;
+        technique = hitTechnique;
+        critical = forceCritical;
+        Recoverable = false;
         velocity = launchVelocity;
         gravity = Physics.gravity.magnitude * (definition != null ? definition.GravityScale : 1f);
         flightEnds = Time.time + MaxFlightSeconds;
@@ -60,7 +77,7 @@ public sealed class ArrowProjectile : MonoBehaviour
     {
         if (!IsFlying)
         {
-            if (Time.time >= releaseAt)
+            if (Time.time >= releaseAt || Recoverable && TryPickUp())
             {
                 PrefabPool.Release(gameObject);
             }
@@ -120,9 +137,18 @@ public sealed class ArrowProjectile : MonoBehaviour
         IDamageable victim = hit.collider.GetComponentInParent<IDamageable>();
         if (victim != null && victim.IsAlive && owner != null && owner.Faction.WillAttack(victim.Faction) && attack != null)
         {
-            DamageInfo info = DamageCalculator.Build(owner, attack, damage, victim.Category, hit.point, direction, Random.value);
+            DamageInfo info = DamageCalculator.Build(owner, attack, damage, victim.Category, hit.point, direction, critical ? 0f : Random.value);
+            if (technique != HitTechnique.None || critical)
+            {
+                info = info.Scaled(1f, 1f, technique, critical && attack.CanCrit);
+            }
+
             DamageResult result = victim.ApplyDamage(info);
             owner.ReportDamageDealt(victim, info, result);
+            if (arrow != null && arrow.Burns && victim is Damageable body && victim.Category == TargetCategory.Creature)
+            {
+                Burning.Apply(body, owner, arrow.BurnDamagePerSecond, arrow.BurnSeconds);
+            }
         }
 
         if (arrow != null)
@@ -139,12 +165,24 @@ public sealed class ArrowProjectile : MonoBehaviour
         }
 
         transform.SetPositionAndRotation(hit.point + direction * Embed - direction * TipOffset, Quaternion.LookRotation(direction));
-        releaseAt = Time.time + stuckSeconds;
+        Recoverable = item != null && arrow != null && Random.value < arrow.RecoverChance;
+        releaseAt = Time.time + (Recoverable ? Mathf.Max(stuckSeconds, RecoverableSeconds) : stuckSeconds);
         velocity = Vector3.zero;
         if (flightOnly != null)
         {
             flightOnly.SetActive(false);
         }
+    }
+
+    private bool TryPickUp()
+    {
+        Player player = Player.Current;
+        if (player == null || player.Bag == null || (player.transform.position - transform.position).sqrMagnitude > PickupRange * PickupRange)
+        {
+            return false;
+        }
+
+        return player.Bag.Give(item, 1) > 0;
     }
 
     // The tip sits this far ahead of the arrow's pivot (+Z), measured from its meshes once.

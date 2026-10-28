@@ -2591,6 +2591,12 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 4416926081852918481, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
       insertIndex: -1
       addedObject: {fileID: 8158091080614937131}
+    - targetCorrespondingSourceObject: {fileID: 4416926081852918481, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7461880621715758884}
+    - targetCorrespondingSourceObject: {fileID: 4416926081852918481, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2463425479615711349}
   m_SourcePrefab: {fileID: 100100000, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
 --- !u!1 &5943822763764690748 stripped
 GameObject:
@@ -3093,6 +3099,9 @@ MonoBehaviour:
   loadClipSeconds: 0.83
   releaseClipSeconds: 0.8
   fadeSpeed: 6
+  maxAimYaw: 90
+  maxAimPitch: 35
+  aimBlendSpeed: 5
 --- !u!114 &9188364912005250223
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3123,6 +3132,35 @@ MonoBehaviour:
   stringWidth: 0.008
   nockedArrow: {fileID: 396537742097517126, guid: 5b8271a67262cf843ba18abe5fb4c071, type: 3}
   pullSpeed: 5
+--- !u!114 &7461880621715758884
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5943822763764690748}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c843d26e2c468b4785b01887895a62f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::ArcheryCameraAim
+--- !u!114 &2463425479615711349
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5943822763764690748}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bfd9bbed4c1ef4041bd812b91e3ca1e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::ArcheryTrajectoryView
+  lineMaterial: {fileID: 2100000, guid: f8acc04d258c58546ad41828b8d43aaa, type: 2}
+  color: {r: 1, g: 0.95, b: 0.8, a: 0.35}
+  width: 0.03
+  fadeInFrom: 10
+  fullAt: 18
 --- !u!4 &6428716820787852678 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3893294197879345259, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}

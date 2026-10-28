@@ -1,0 +1,115 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &7181050601474800403
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7194407880142003326}
+  - component: {fileID: 6022296611726269854}
+  m_Layer: 0
+  m_Name: WhistlingArrowProjectile
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7194407880142003326
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7181050601474800403}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 3386789145004400488}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6022296611726269854
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7181050601474800403}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e38a2968601a63438f155610f7a1b53, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::ArrowProjectile
+  stuckSeconds: 12
+  flightOnly: {fileID: 0}
+--- !u!1001 &3911230774756775756
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 7194407880142003326}
+    m_Modifications:
+    - target: {fileID: 250210634900689921, guid: 74312a4bca8b0db44a5b062b5d085543, type: 3}
+      propertyPath: m_CastShadows
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1821478872593909796, guid: 74312a4bca8b0db44a5b062b5d085543, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1821478872593909796, guid: 74312a4bca8b0db44a5b062b5d085543, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1821478872593909796, guid: 74312a4bca8b0db44a5b062b5d085543, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1821478872593909796, guid: 74312a4bca8b0db44a5b062b5d085543, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1821478872593909796, guid: 74312a4bca8b0db44a5b062b5d085543, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1821478872593909796, guid: 74312a4bca8b0db44a5b062b5d085543, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1821478872593909796, guid: 74312a4bca8b0db44a5b062b5d085543, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1821478872593909796, guid: 74312a4bca8b0db44a5b062b5d085543, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1821478872593909796, guid: 74312a4bca8b0db44a5b062b5d085543, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1821478872593909796, guid: 74312a4bca8b0db44a5b062b5d085543, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8282744909757236203, guid: 74312a4bca8b0db44a5b062b5d085543, type: 3}
+      propertyPath: m_Name
+      value: WhistlingArrowModel
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 74312a4bca8b0db44a5b062b5d085543, type: 3}
+--- !u!4 &3386789145004400488 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1821478872593909796, guid: 74312a4bca8b0db44a5b062b5d085543, type: 3}
+  m_PrefabInstance: {fileID: 3911230774756775756}
+  m_PrefabAsset: {fileID: 0}

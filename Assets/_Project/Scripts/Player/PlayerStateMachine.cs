@@ -24,6 +24,8 @@ public sealed class PlayerStateMachine : MonoBehaviour
     public event Action DodgeRequested;
     /// <summary>Raised with the skill bar slot (0-4) the player asked to cast.</summary>
     public event Action<int> SkillRequested;
+    /// <summary>Raised when the player asks for the next kind of arrow (a bow's quiver).</summary>
+    public event Action ArrowCycleRequested;
 
     public bool BeginInteraction()
     {
@@ -108,6 +110,8 @@ public sealed class PlayerStateMachine : MonoBehaviour
             SkillRequested?.Invoke(slot);
         }
     }
+
+    public void RequestArrowCycle() => ArrowCycleRequested?.Invoke();
 
     /// <summary>Dodging while working on something (gathering, crafting) stops the work first.</summary>
     public void RequestDodge()

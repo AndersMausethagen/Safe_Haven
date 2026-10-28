@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ed07f61665e06f84dab00e819c832c6f, type: 3}
+  m_Name: FireArrow
+  m_EditorClassIdentifier: SafeHaven::ArrowDefinition
+  displayName: Fire Arrow
+  damage: 10
+  speedMultiplier: 1
+  gravityScale: 0.65
+  projectile: {fileID: 6113091915592432668, guid: d38e2891d1a3db147b9e40df9d8ea220, type: 3}
+  hitSound: {fileID: 11400000, guid: e152a28919b1d86439cf0f9a67a56b76, type: 2}
+  impactNoise: 8
+  recoverChance: 0
+  burnDamagePerSecond: 5
+  burnSeconds: 4

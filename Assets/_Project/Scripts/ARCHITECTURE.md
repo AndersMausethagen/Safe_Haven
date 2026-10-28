@@ -569,7 +569,13 @@ The player is no super soldier: combat is about reading the enemy and committing
   (pooled) flies a swept arc, damages through `DamageCalculator` + `Combatant.ReportDamageDealt`, sticks in scenery and
   emits `WorldNoise`. Presentation: `PlayerArcheryAnimation` (the animator's "Bow" layer, under "Upper Body"; it also
   turns the spine after animation so the draw line points at the aim, since the archer clips stand sideways) and
-  `HeldBowView` (string between the bow rig's tips, pulled to the right hand, and the nocked arrow). Content:
+  `HeldBowView` (string between the bow rig's tips, pulled to the right hand, and the nocked arrow),
+  `ArcheryCameraAim` (`PlayerCameraController.SetAiming`), `ArcheryTrajectoryView` (arc preview for long shots) and
+  `QuiverHud` (made by `CombatFeedback`: arrows, draw bar, quick shot). Technique: perfect release
+  (`ArcheryRules.IsPerfectRelease`, forced crit), guard button aims with a bow (`PlayerGuard` ignores it then),
+  the counter a perfect dodge readies looses an instant shot (`PlayerCombat.SpendCounter`), Z cycles arrow kinds
+  (`PlayerStateMachine.ArrowCycleRequested`). Fire arrows add `Burning` (Fire ticks marked `HitTechnique.OverTime`,
+  which `CombatFeedback` keeps quiet); stuck arrows may be `Recoverable` (walk over them). Content:
   `AgentScripts/BuildArchery.cs`; the layer: `CombatAnimationSetup.BuildBowLayer` (part of Set Up Combat Animations).
   Tests: `ArcheryTests`.
 - **Focus** (`PlayerFocus`): earned from `SwingLanded`, parries, perfect dodges and blocks, drains after a hold; skills

@@ -17,6 +17,8 @@ by motion, sound and weight rather than on-screen text.
 | Using food or drink | Stop and eat: takes a moment, heals over time |
 | Left Ctrl / left bumper (hold) | Sneak: half speed, quiet, hard to see. A hit on a monster that hasn't noticed you is an ambush (+50%) |
 | Left mouse with a bow (hold, let go) | Draw while moving (slowed), let go to shoot. Let go too early and the arrow stays on the string |
+| Right mouse with a bow (hold) | Aim: steadier shots, slower walk, the camera looks further ahead (no guard with a bow) |
+| Z | Next kind of arrow in the bag |
 
 ## The rules
 
@@ -65,11 +67,24 @@ A bow is held in the left hand and shoots arrows from the bag. It trades the mel
 - **The target in sight is outlined red.** The hostile monster nearest the cursor (within 1.5 m of its spot) or the
   crosshair (within 5°), in the bow's line of sight and in range (45 m), glows red; that is where the arrow flies.
   Without one, top-down arrows fly level at chest height toward the cursor.
-- **Arrows are spent.** Each shot uses one arrow from the bag. Arrows that miss stick in the ground or trees for a while,
-  and the strike is heard: a shot into the brush draws monsters to it, away from you. A dodge, a hit that staggers you,
-  eating or raising the guard puts the drawn arrow back.
+- **Perfect release.** Let go within 0.2 s of the draw filling (the draw bar above the action bar turns gold) and the
+  shot is critical, flies true and hits 25% harder.
+- **Aim.** Hold right mouse: half the spread, you walk at drawing speed, and the camera narrows and (top-down) leans
+  further toward the cursor. A bow can't guard or parry; dodge instead.
+- **Quick shot.** A perfect dodge readies an instant shot: the next press looses an arrow at once (even mid-reload) for
+  60% of a normal shot's damage. "Quick shot ready" shows above the action bar.
+- **Sneak shots.** A monster that hasn't noticed you takes the ambush bonus (+50%) from arrows too.
+- **Arrows are spent, some come back.** Each shot uses one arrow from the bag. Arrows that miss stick in the ground or
+  trees; about half of them can be picked up again by walking over them (for 90 s). The strike is heard: a shot into the
+  brush draws monsters to it, away from you. A dodge, a hit that staggers you or eating puts the drawn arrow back.
+- **Kinds of arrows** (Z cycles; the HUD shows the chosen kind and how many are left):
+  Crude Stone Arrow (14 damage); Fire Arrow (10, sets creatures burning for 4 s at 5 per second and lights the fog where
+  it lands; burns up); Whistling Arrow (6, heard 25 m around where it strikes: a lure).
+- **Long shots** show a faint line along the arc while drawing (from 10 m out).
 - **Crafting.** From the bag (By Hand): Crude Wooden Bow from 5 Sticks and 3 Nettle Fiber; 5 Crude Stone Arrows from 2
-  Sticks and 1 Small Rocks.
+  Sticks and 1 Small Rocks; 3 Fire Arrows from 3 Crude Stone Arrows and 2 Flax; 3 Whistling Arrows from 3 Crude Stone
+  Arrows and 1 Bone. At the Construction Table: the **Hunter's Bow** (Tier II: 0.85 s draw, 0.5 s reload, 40 m/s,
+  steadier) from 3 Oak Planks, 2 Nettle Cord and 1 Rough Hide.
 
 ## Readable animation
 
@@ -113,8 +128,8 @@ avatar made after that), or every pose comes out rotated; Set Up Combat Animatio
 | Focus gains, how long it holds, eating time and heal-over-time | Combat technique (Focus, Eating and drinking) |
 | A skill's Focus cost | Content Editor › Skills › Focus Cost |
 | Gear weights for each dodge, and each dodge's distance, time, cost and speed | Systems Editor › Movement & Combat › Movement and dodge (Equipment load) |
-| A bow's draw time, reload time, arrow speed, spread, minimum draw, move speed while drawing and shot attack | Content Editor › Weapons (Bow) |
-| An arrow's damage, speed, drop, impact noise and what flies | `Data/Combat/Arrows` (Arrow) and the arrow item's Arrow field |
+| A bow's draw time, reload time, arrow speed, spread, minimum draw, move speed while drawing, perfect release window and bonus, aim spread, quick shot damage and shot attack | Content Editor › Weapons (Bow) |
+| An arrow's damage, speed, drop, impact noise, recover chance, burning and what flies | Content Editor › Arrows, and the arrow item's Arrow field |
 
 **Animations** come from the Quaternius Universal Animation Libraries (CC0, `Assets/Quaternius`) and the Kevin
 Iglesias packs. **Safe Haven › Characters › Set Up Combat Animations** imports them, adds the combat states to the

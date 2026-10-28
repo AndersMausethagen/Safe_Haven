@@ -19,3 +19,6 @@ MonoBehaviour:
   projectile: {fileID: 1599385821644580387, guid: 1ad11245cdbb4a5419a6e5af52d49463, type: 3}
   hitSound: {fileID: 11400000, guid: e152a28919b1d86439cf0f9a67a56b76, type: 2}
   impactNoise: 6
+  recoverChance: 0.5
+  burnDamagePerSecond: 0
+  burnSeconds: 4

@@ -12,6 +12,7 @@ public enum WeaponKind { Melee = 0, Torch = 1, Bow = 2 }
 /// A bow (Kind Bow) uses none of the swings: holding attack draws it (Draw Seconds to full), letting go looses an arrow
 /// from the bag, and the next one is nocked in Reload Seconds (see PlayerArchery). The arrow sets the damage
 /// (ArrowDefinition); the bow sets how fast it flies, how quickly it is drawn and reloaded, and how steady it is.
+/// Letting go just as the draw is full is a perfect release; holding guard aims (steadier, slower).
 /// </para>
 /// </summary>
 [CreateAssetMenu(fileName = "Weapon", menuName = "Safe Haven/Combat/Weapon")]
@@ -51,6 +52,14 @@ public sealed class WeaponDefinition : ScriptableObject
     [SerializeField, Range(0f, 1f)] private float minimumDraw = 0.25f;
     [Tooltip("Movement speed while drawing, as a share of normal.")]
     [SerializeField, Range(0f, 1f)] private float drawMoveSpeed = 0.55f;
+    [Tooltip("Seconds after reaching full draw in which letting go is a perfect release: a critical hit.")]
+    [SerializeField, Range(0f, 1f)] private float perfectReleaseSeconds = 0.2f;
+    [Tooltip("Damage multiplier of a perfect release, on top of the critical hit.")]
+    [SerializeField, Range(1f, 3f)] private float perfectReleaseDamage = 1.25f;
+    [Tooltip("Spread while aiming (holding guard) as a share of normal.")]
+    [SerializeField, Range(0.1f, 1f)] private float aimSpread = 0.5f;
+    [Tooltip("Share of a normal shot's damage the instant shot after a perfect dodge deals.")]
+    [SerializeField, Range(0f, 2f)] private float counterShotDamage = 0.6f;
     [Tooltip("Damage type, power scaling, crit and poise of a shot. Its damage comes from the arrow.")]
     [SerializeField] private AttackDefinition shotAttack;
     [SerializeField] private SoundDefinition drawSound;
@@ -69,6 +78,10 @@ public sealed class WeaponDefinition : ScriptableObject
     public float Spread => spread;
     public float MinimumDraw => minimumDraw;
     public float DrawMoveSpeed => drawMoveSpeed;
+    public float PerfectReleaseSeconds => perfectReleaseSeconds;
+    public float PerfectReleaseDamage => perfectReleaseDamage;
+    public float AimSpread => aimSpread;
+    public float CounterShotDamage => counterShotDamage;
     public AttackDefinition ShotAttack => shotAttack;
     public SoundDefinition DrawSound => drawSound;
     public bool RequiresBothHands => stance == WeaponStance.TwoHanded || stance == WeaponStance.Polearm || stance == WeaponStance.Bow;

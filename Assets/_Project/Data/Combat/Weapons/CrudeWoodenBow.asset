@@ -27,6 +27,10 @@ MonoBehaviour:
   spread: 2
   minimumDraw: 0.25
   drawMoveSpeed: 0.55
+  perfectReleaseSeconds: 0.2
+  perfectReleaseDamage: 1.25
+  aimSpread: 0.5
+  counterShotDamage: 0.6
   shotAttack: {fileID: 11400000, guid: ce3c793cb6a27644ea3474e6fe877fd9, type: 2}
   drawSound: {fileID: 0}
   swingSound: {fileID: 11400000, guid: e3702f94155b6bc42b71a0d0872c141d, type: 2}

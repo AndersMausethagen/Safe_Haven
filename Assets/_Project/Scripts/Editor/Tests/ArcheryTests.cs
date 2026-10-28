@@ -110,13 +110,62 @@ public sealed class ArcheryTests
         Assert.IsNotNull(arrow.Icon);
     }
 
-    [TestCase("CrudeWoodenBow", "Sticks")]
-    [TestCase("CrudeStoneArrow", "Sticks", "SmallRocks")]
-    public void TheyAreCraftedByHandFromTheBag(string output, params string[] materials)
+    [Test]
+    public void APerfectReleaseIsJustAfterTheDrawFills()
+    {
+        Assert.IsFalse(ArcheryRules.IsPerfectRelease(0.9f, 1f, 0.2f), "not yet full");
+        Assert.IsTrue(ArcheryRules.IsPerfectRelease(1f, 1f, 0.2f));
+        Assert.IsTrue(ArcheryRules.IsPerfectRelease(1.15f, 1f, 0.2f));
+        Assert.IsFalse(ArcheryRules.IsPerfectRelease(1.3f, 1f, 0.2f), "held too long");
+        Assert.IsFalse(ArcheryRules.IsPerfectRelease(1f, 1f, 0f), "a bow without a window has none");
+    }
+
+    [Test]
+    public void SpecialArrowsAndTheHuntersBowAreReady()
+    {
+        var fire = AssetDatabase.LoadAssetAtPath<ItemDefinition>(Items + "FireArrow.asset");
+        var whistle = AssetDatabase.LoadAssetAtPath<ItemDefinition>(Items + "WhistlingArrow.asset");
+        var hunter = AssetDatabase.LoadAssetAtPath<ItemDefinition>(Items + "HuntersBow.asset");
+        var crude = AssetDatabase.LoadAssetAtPath<ItemDefinition>(Items + "CrudeWoodenBow.asset");
+        Assert.IsTrue(fire.IsArrow && fire.Arrow.Burns);
+        Assert.AreEqual(0f, fire.Arrow.RecoverChance, "fire arrows burn up");
+        Assert.IsNotNull(fire.Arrow.Projectile.GetComponentInChildren<VisibilitySource>(), "a fire arrow lights the fog");
+        Assert.IsTrue(whistle.IsArrow && !whistle.Arrow.Burns);
+        Assert.Greater(whistle.Arrow.ImpactNoise, 2f * AssetDatabase.LoadAssetAtPath<ItemDefinition>(Items + "CrudeStoneArrow.asset").Arrow.ImpactNoise,
+            "a whistling arrow is heard far away");
+        Assert.IsTrue(hunter.IsWeapon && hunter.Weapon.IsBow);
+        Assert.AreEqual(2, hunter.Tier);
+        Assert.Less(hunter.Weapon.DrawSeconds, crude.Weapon.DrawSeconds);
+        Assert.Greater(hunter.Weapon.ArrowSpeed, crude.Weapon.ArrowSpeed);
+        Assert.Less(hunter.Weapon.Spread, crude.Weapon.Spread);
+        Assert.IsNotNull(fire.Icon);
+        Assert.IsNotNull(whistle.Icon);
+        Assert.IsNotNull(hunter.Icon);
+    }
+
+    [Test]
+    public void TheHuntersBowIsMadeAtTheConstructionTable()
+    {
+        RecipeDefinition recipe = RecipeFor("HuntersBow");
+        Assert.AreEqual(CraftingStationType.Workbench, recipe.Station);
+        Assert.IsTrue(recipe.KnownFromStart);
+    }
+
+    private static RecipeDefinition RecipeFor(string output)
     {
         var book = AssetDatabase.LoadAssetAtPath<RecipeBook>("Assets/_Project/Data/Crafting/RecipeBook.asset");
         RecipeDefinition recipe = book.Recipes.FirstOrDefault(r => r != null && r.Output != null && r.Output.name == output);
         Assert.IsNotNull(recipe, $"{output} is in the recipe book");
+        return recipe;
+    }
+
+    [TestCase("CrudeWoodenBow", "Sticks")]
+    [TestCase("CrudeStoneArrow", "Sticks", "SmallRocks")]
+    [TestCase("FireArrow", "CrudeStoneArrow", "Flax")]
+    [TestCase("WhistlingArrow", "CrudeStoneArrow", "Bone")]
+    public void TheyAreCraftedByHandFromTheBag(string output, params string[] materials)
+    {
+        RecipeDefinition recipe = RecipeFor(output);
         Assert.IsTrue(recipe.IsHandcrafted && recipe.KnownFromStart);
         foreach (string material in materials)
         {
@@ -131,6 +180,8 @@ public sealed class ArcheryTests
         Assert.IsNotNull(player.GetComponent<PlayerArchery>());
         Assert.IsNotNull(player.GetComponent<PlayerArcheryAnimation>());
         Assert.IsNotNull(player.GetComponent<HeldBowView>());
+        Assert.IsNotNull(player.GetComponent<ArcheryCameraAim>());
+        Assert.IsNotNull(new SerializedObject(player.GetComponent<ArcheryTrajectoryView>()).FindProperty("lineMaterial").objectReferenceValue);
         var outline = new SerializedObject(player.GetComponent<ArcheryTargetOutline>());
         Assert.IsNotNull(outline.FindProperty("outlineMaterial").objectReferenceValue);
         Assert.IsNotNull(outline.FindProperty("maskMaterial").objectReferenceValue);

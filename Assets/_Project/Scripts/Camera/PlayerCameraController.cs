@@ -23,6 +23,10 @@ using UnityEngine.InputSystem;
 public sealed class PlayerCameraController : MonoBehaviour
 {
     private const float MinClipDistance = 0.4f;
+    // While aiming a bow: the view narrows by this share and the top-down cursor lean reaches this much further.
+    private const float AimFieldOfView = 0.85f;
+    private const float AimLookAhead = 2f;
+    private const float AimBlendSpeed = 4f;
 
     [SerializeField] private PlayerCameraSettings settings;
 
@@ -66,6 +70,12 @@ public sealed class PlayerCameraController : MonoBehaviour
     private float dialogueDistance = 1f;
     private float dialogueWeight;
     private Vector3 dialoguePoint;
+    private bool aiming;
+    private float aimWeight;
+
+    /// <summary>Aiming a bow (ArcheryCameraAim): the view narrows a little and, top-down, leans further toward the
+    /// cursor, so long shots can be seen.</summary>
+    public void SetAiming(bool aim) => aiming = aim;
 
     public void BeginDialogue(Transform speaker, float distanceScale)
     {
@@ -335,6 +345,7 @@ public sealed class PlayerCameraController : MonoBehaviour
         maxLookAhead = Mathf.Lerp(maxLookAhead, profile.maxLookAhead, t);
 
         zoom = Mathf.Lerp(zoom, zoomTarget, Blend(settings.ZoomSmoothTime, dt));
+        aimWeight = Mathf.MoveTowards(aimWeight, aiming ? 1f : 0f, AimBlendSpeed * dt);
     }
 
     private void UpdateFocus()
@@ -382,9 +393,10 @@ public sealed class PlayerCameraController : MonoBehaviour
             return Vector3.zero;
         }
 
-        Vector3 offset = (ray.GetPoint(distance) - target.position) * lookAheadFraction;
+        float reach = Mathf.Lerp(1f, AimLookAhead, aimWeight);
+        Vector3 offset = (ray.GetPoint(distance) - target.position) * (lookAheadFraction * reach);
         offset.y = 0f;
-        return Vector3.ClampMagnitude(offset, maxLookAhead);
+        return Vector3.ClampMagnitude(offset, maxLookAhead * reach);
     }
 
     private void ApplyToCinemachine()
@@ -418,7 +430,7 @@ public sealed class PlayerCameraController : MonoBehaviour
         }
 
         LensSettings lens = cinemachineCamera.Lens;
-        lens.FieldOfView = Mathf.Lerp(fieldOfView, settings.ActionFieldOfView, w);
+        lens.FieldOfView = Mathf.Lerp(fieldOfView, settings.ActionFieldOfView, w) * Mathf.Lerp(1f, AimFieldOfView, aimWeight);
         cinemachineCamera.Lens = lens;
     }
 

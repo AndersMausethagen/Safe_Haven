@@ -11,4 +11,6 @@ public enum HitTechnique
     Counter = 4,
     Rhythm = 8,
     ShieldBash = 16,
+    /// <summary>A tick of damage over time (burning): no hit stop, shake, sparks or flinch.</summary>
+    OverTime = 32,
 }

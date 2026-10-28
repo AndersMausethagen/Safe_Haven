@@ -20,6 +20,11 @@ public static class ArcheryRules
     /// <summary>Share of a full draw (0-1) after holding for <paramref name="heldSeconds"/>.</summary>
     public static float DrawShare(float heldSeconds, float drawSeconds) => Mathf.Clamp01(heldSeconds / Mathf.Max(0.01f, drawSeconds));
 
+    /// <summary>True when letting go after <paramref name="heldSeconds"/> is a perfect release: within
+    /// <paramref name="windowSeconds"/> of the draw becoming full.</summary>
+    public static bool IsPerfectRelease(float heldSeconds, float drawSeconds, float windowSeconds) =>
+        windowSeconds > 0f && heldSeconds >= drawSeconds && heldSeconds <= drawSeconds + windowSeconds;
+
     /// <summary>Share of the bow's arrow speed a shot at <paramref name="draw"/> gets.</summary>
     public static float SpeedShare(float draw) => Mathf.Lerp(MinSpeedShare, 1f, Mathf.Clamp01(draw));
 

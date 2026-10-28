@@ -61,6 +61,7 @@ public static class BuildArchery
         RecipeDefinition arrowRecipe = Recipe("Assets/_Project/Data/Crafting/Recipes/CrudeStoneArrow.asset", "crudestonearrow", arrowItem, 5, -2,
             (sticks, 2), (rocks, 1));
         AddToBook(bowRecipe, arrowRecipe);
+        log.Add(MoreArrowsAndBows(wood, arrowItem, shot, sticks, rocks));
 
         log.Add(SetUpPlayer(targetOutline, bowstring, arrowModel));
         log.Add(CombatAnimationSetup.BuildBowLayer());
@@ -346,6 +347,192 @@ public static class BuildArchery
         });
     }
 
+    // ----- More arrows and a better bow -----
+
+    // Fire arrows (burn creatures, light the fog), whistling arrows (a loud strike that lures monsters) and the Tier II
+    // Hunter's Bow from the Construction Table.
+    private static string MoreArrowsAndBows(Material wood, ItemDefinition crudeArrow, AttackDefinition shot, ItemDefinition sticks, ItemDefinition rocks)
+    {
+        var flax = AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Project/Data/Items/Materials/Flax.asset");
+        var bone = AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Project/Data/Items/Materials/Bone.asset");
+        var plank = AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Project/Data/Items/Materials/OakPlank.asset");
+        var cord = AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Project/Data/Items/Materials/NettleCord.asset");
+        var hide = AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Project/Data/Items/Materials/RoughHide.asset");
+
+        GameObject fireModel = FireArrowModel(ModelFolder + "/FireArrowModel.prefab", wood);
+        ArrowProjectile fireProjectile = Projectile(fireModel, ProjectileFolder + "/FireArrowProjectile.prefab");
+        Set(fireProjectile, so => so.FindProperty("stuckSeconds").floatValue = 20f);
+        ArrowDefinition fire = ArrowKind(ArrowFolder + "/FireArrow.asset", fireProjectile, "Fire Arrow", 10f, 0.65f, 0f, 5f, 8f);
+        ItemDefinition fireItem = Item("Assets/_Project/Data/Items/FireArrow.asset", "fire_arrow", "Fire Arrow",
+            "An arrow wrapped in flax and lit as it is loosed. Sets creatures burning for a few seconds and lights the fog " +
+            "where it lands. Burns up.", ItemCategory.Equipment, true, 50, 0.06f, fireModel);
+        Set(fireItem, so => so.FindProperty("arrow").objectReferenceValue = fire);
+        Icon(fireItem, fireModel, "FireArrow");
+
+        GameObject whistleModel = Model(Pack + "HumanArcher_Arrow.fbx", ModelFolder + "/WhistlingArrowModel.prefab",
+            Tinted(ArtFolder + "/Bone Arrow.mat", wood, new Color(1f, 0.95f, 0.82f)), new Vector3(90f, 0f, 0f), Vector3.one * 0.8f);
+        ArrowProjectile whistleProjectile = Projectile(whistleModel, ProjectileFolder + "/WhistlingArrowProjectile.prefab");
+        ArrowDefinition whistle = ArrowKind(ArrowFolder + "/WhistlingArrow.asset", whistleProjectile, "Whistling Arrow", 6f, 0.6f, 0.5f, 0f, 25f);
+        ItemDefinition whistleItem = Item("Assets/_Project/Data/Items/WhistlingArrow.asset", "whistling_arrow", "Whistling Arrow",
+            "A hollow bone head that shrieks in flight and cracks loudly where it strikes. Monsters far around come to look: " +
+            "shoot it past them to draw them away.", ItemCategory.Equipment, true, 50, 0.05f, whistleModel);
+        Set(whistleItem, so => so.FindProperty("arrow").objectReferenceValue = whistle);
+        Icon(whistleItem, whistleModel, "WhistlingArrow");
+
+        GameObject hunterModel = Model(Pack + "HumanArcher_Bow.fbx", ModelFolder + "/HuntersBowModel.prefab",
+            Tinted(ArtFolder + "/Hunters Bow.mat", wood, new Color(0.62f, 0.5f, 0.42f)), Vector3.zero, Vector3.one * 0.8f);
+        WeaponDefinition hunter = BowKind(CombatAnimationSetup.WeaponFolder + "/HuntersBow.asset", shot, "Hunter's Bow", 0.85f, 0.5f, 40f, 1.2f, 0.6f);
+        ItemDefinition hunterItem = Item("Assets/_Project/Data/Items/HuntersBow.asset", "hunters_bow", "Hunter's Bow",
+            "Oak planks glued and bound in nettle cord, with a hide grip. Draws faster, reloads quicker and shoots further and " +
+            "straighter than a crude bow.", ItemCategory.Equipment, false, 1, 2f, hunterModel);
+        Set(hunterItem, so =>
+        {
+            so.FindProperty("weapon").objectReferenceValue = hunter;
+            so.FindProperty("tier").intValue = 2;
+            so.FindProperty("heldRotation").vector3Value = new Vector3(0f, 180f, 0f);
+        });
+        Icon(hunterItem, hunterModel, "HuntersBow");
+
+        RecipeDefinition fireRecipe = Recipe("Assets/_Project/Data/Crafting/Recipes/FireArrow.asset", "firearrow", fireItem, 3, -1, (crudeArrow, 3), (flax, 2));
+        RecipeDefinition whistleRecipe = Recipe("Assets/_Project/Data/Crafting/Recipes/WhistlingArrow.asset", "whistlingarrow", whistleItem, 3, 0, (crudeArrow, 3), (bone, 1));
+        RecipeDefinition hunterRecipe = Recipe("Assets/_Project/Data/Crafting/Recipes/HuntersBow.asset", "huntersbow", hunterItem, 1, 5, (plank, 3), (cord, 2), (hide, 1));
+        Set(hunterRecipe, so =>
+        {
+            so.FindProperty("station").intValue = (int)CraftingStationType.Workbench;
+            so.FindProperty("craftSeconds").floatValue = 30f;
+        });
+        AddToBook(fireRecipe, whistleRecipe, hunterRecipe);
+        return $"more: fire={fireItem.Icon != null} whistling={whistleItem.Icon != null} hunter's bow={hunterItem.Icon != null}";
+    }
+
+    private static ArrowDefinition ArrowKind(string path, ArrowProjectile projectile, string displayName, float damage, float gravity,
+        float recover, float burnPerSecond, float noise)
+    {
+        var arrow = AssetDatabase.LoadAssetAtPath<ArrowDefinition>(path);
+        bool made = arrow == null;
+        if (made)
+        {
+            arrow = ScriptableObject.CreateInstance<ArrowDefinition>();
+            AssetDatabase.CreateAsset(arrow, path);
+        }
+
+        Set(arrow, so =>
+        {
+            so.FindProperty("projectile").objectReferenceValue = projectile;
+            if (made)
+            {
+                so.FindProperty("displayName").stringValue = displayName;
+                so.FindProperty("damage").floatValue = damage;
+                so.FindProperty("speedMultiplier").floatValue = 1f;
+                so.FindProperty("gravityScale").floatValue = gravity;
+                so.FindProperty("recoverChance").floatValue = recover;
+                so.FindProperty("burnDamagePerSecond").floatValue = burnPerSecond;
+                so.FindProperty("burnSeconds").floatValue = 4f;
+                so.FindProperty("hitSound").objectReferenceValue = Sound("Hit");
+                so.FindProperty("impactNoise").floatValue = noise;
+            }
+        });
+        return arrow;
+    }
+
+    private static WeaponDefinition BowKind(string path, AttackDefinition shot, string displayName, float draw, float reload, float speed,
+        float spread, float moveSpeed)
+    {
+        var bow = AssetDatabase.LoadAssetAtPath<WeaponDefinition>(path);
+        bool made = bow == null;
+        if (made)
+        {
+            bow = ScriptableObject.CreateInstance<WeaponDefinition>();
+            AssetDatabase.CreateAsset(bow, path);
+        }
+
+        Set(bow, so =>
+        {
+            so.FindProperty("stance").intValue = (int)WeaponStance.Bow;
+            so.FindProperty("kind").intValue = (int)WeaponKind.Bow;
+            so.FindProperty("shotAttack").objectReferenceValue = shot;
+            if (made)
+            {
+                so.FindProperty("displayName").stringValue = displayName;
+                so.FindProperty("damage").floatValue = 0f;
+                so.FindProperty("guardLetThrough").floatValue = 0.6f;
+                so.FindProperty("drawSeconds").floatValue = draw;
+                so.FindProperty("reloadSeconds").floatValue = reload;
+                so.FindProperty("arrowSpeed").floatValue = speed;
+                so.FindProperty("spread").floatValue = spread;
+                so.FindProperty("minimumDraw").floatValue = 0.25f;
+                so.FindProperty("drawMoveSpeed").floatValue = moveSpeed;
+                so.FindProperty("swingSound").objectReferenceValue = Sound("Swing");
+            }
+        });
+        return bow;
+    }
+
+    private static Material Tinted(string path, Material from, Color tint)
+    {
+        var material = AssetDatabase.LoadAssetAtPath<Material>(path);
+        if (material == null)
+        {
+            material = new Material(from);
+            material.SetColor("_BaseColor", tint);
+            AssetDatabase.CreateAsset(material, path);
+        }
+
+        return material;
+    }
+
+    private static Material TrajectoryMaterial(string path)
+    {
+        var material = AssetDatabase.LoadAssetAtPath<Material>(path);
+        if (material == null)
+        {
+            // Unlit, transparent and tinted by the line's vertex colours.
+            material = new Material(Shader.Find("Sprites/Default"));
+            AssetDatabase.CreateAsset(material, path);
+        }
+
+        return material;
+    }
+
+    // The crude arrow with the hand torch's flame and light at its tip, lighting the fog (VisibilitySource).
+    private static GameObject FireArrowModel(string path, Material wood)
+    {
+        var existing = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+        if (existing != null)
+        {
+            return existing;
+        }
+
+        var root = (GameObject)PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>(ModelFolder + "/CrudeStoneArrowModel.prefab"));
+        PrefabUtility.UnpackPrefabInstance(root, PrefabUnpackMode.Completely, InteractionMode.AutomatedAction);
+        root.name = "FireArrowModel";
+        var torch = (GameObject)PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>(ModelFolder + "/HandTorchModel.prefab"));
+        PrefabUtility.UnpackPrefabInstance(torch, PrefabUnpackMode.Completely, InteractionMode.AutomatedAction);
+        Transform flame = torch.GetComponentsInChildren<Transform>().First(t => t.name == "Sphere");
+        Transform light = torch.GetComponentsInChildren<Transform>().First(t => t.name == "Torchlight");
+        flame.SetParent(root.transform, false);
+        flame.localPosition = new Vector3(0f, 0f, 0.7f);
+        flame.localScale = new Vector3(0.07f, 0.07f, 0.12f);
+        light.SetParent(root.transform, false);
+        light.localPosition = new Vector3(0f, 0.1f, 0.7f);
+        if (light.TryGetComponent(out Light lamp))
+        {
+            lamp.range = Mathf.Min(lamp.range, 6f);
+            lamp.shadows = LightShadows.None;
+        }
+
+        Object.DestroyImmediate(torch);
+        var visibility = root.AddComponent<VisibilitySource>();
+        Set(visibility, so =>
+        {
+            so.FindProperty("radius").floatValue = 5f;
+            so.FindProperty("revealRadius").floatValue = 8f;
+        });
+        GameObject prefab = PrefabUtility.SaveAsPrefabAsset(root, path);
+        Object.DestroyImmediate(root);
+        return prefab;
+    }
+
     // ----- Player -----
 
     private static string SetUpPlayer(Material targetOutline, Material bowstring, GameObject arrowModel)
@@ -368,8 +555,11 @@ public static class BuildArchery
                 so.FindProperty("stringMaterial").objectReferenceValue = bowstring;
                 so.FindProperty("nockedArrow").objectReferenceValue = arrowModel;
             });
+            Component(root, out ArcheryCameraAim _);
+            Component(root, out ArcheryTrajectoryView trajectory);
+            Set(trajectory, so => so.FindProperty("lineMaterial").objectReferenceValue = TrajectoryMaterial(ArtFolder + "/Arrow Trajectory.mat"));
             PrefabUtility.SaveAsPrefabAsset(root, PlayerPrefab);
-            return "player: archery, its animation, target outline and bow view";
+            return "player: archery, its animation, target outline, bow view, camera aim and trajectory";
         }
         finally
         {

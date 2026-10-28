@@ -11,23 +11,35 @@ public readonly struct ArrowShot
     public readonly Vector3 Origin;
     public readonly Vector3 Velocity;
     public readonly float ReloadSeconds;
+    /// <summary>Let go just as the draw was full: a critical hit.</summary>
+    public readonly bool Perfect;
+    /// <summary>The instant shot a perfect dodge readies.</summary>
+    public readonly bool Counter;
 
-    public ArrowShot(ItemDefinition arrow, float draw, Vector3 origin, Vector3 velocity, float reloadSeconds)
+    public ArrowShot(ItemDefinition arrow, float draw, Vector3 origin, Vector3 velocity, float reloadSeconds, bool perfect = false, bool counter = false)
     {
         Arrow = arrow;
         Draw = draw;
         Origin = origin;
         Velocity = velocity;
         ReloadSeconds = reloadSeconds;
+        Perfect = perfect;
+        Counter = counter;
     }
 }
 
 /// <summary>
 /// Shooting a bow. While the equipped main-hand weapon is a bow (WeaponDefinition › Kind Bow), the attack button draws
-/// instead of swinging: hold to draw (the bow's Draw Seconds to full), let go to loose the first arrow stack in the bag,
-/// then the next arrow is nocked in Reload Seconds. Holding through the reload draws again at once. The player keeps
-/// moving while drawing, slowed to the bow's Draw Move Speed and facing the aim (drawing enters GameState.Combat, which
-/// strafes); a dodge, a staggering hit, eating or lowering the bow puts the arrow back.
+/// instead of swinging: hold to draw (the bow's Draw Seconds to full), let go to loose the chosen arrows (Z cycles the
+/// kinds in the bag; else the first), then the next arrow is nocked in Reload Seconds. Holding through the reload draws
+/// again at once. The player keeps moving while drawing, slowed to the bow's Draw Move Speed and facing the aim (drawing
+/// enters GameState.Combat, which strafes); a dodge, a staggering hit or eating puts the arrow back.
+/// <para>
+/// Technique: letting go within the bow's Perfect Release window after the draw fills is a <b>perfect release</b>: a
+/// critical hit that flies true and hits harder. The guard button <b>aims</b> instead of guarding: slower, steadier
+/// (the bow's Aim Spread) and the camera looks further ahead (ArcheryCameraAim). After a perfect dodge (the counter
+/// PlayerCombat readies) the next press looses an <b>instant shot</b> at the bow's Counter Shot Damage, even mid-reload.
+/// </para>
 /// <para>
 /// Aim: the hostile monster nearest the cursor or crosshair (within <see cref="aimAssistAngle"/> with the action camera,
 /// or <see cref="aimAssistRadius"/> of the cursor's spot top-down) that the bow can see is the <see cref="Target"/>,
@@ -67,6 +79,7 @@ public sealed class PlayerArchery : MonoBehaviour
 
     private readonly RaycastHit[] hits = new RaycastHit[32];
     private readonly Dictionary<MonsterAI, Collider> bodies = new Dictionary<MonsterAI, Collider>();
+    private readonly List<ItemDefinition> kinds = new List<ItemDefinition>();
     private PlayerStateMachine stateMachine;
     private PlayerMovement movement;
     private Combatant combatant;
@@ -80,9 +93,12 @@ public sealed class PlayerArchery : MonoBehaviour
     private Damageable health;
 
     private bool held;
+    private bool aimHeld;
+    private bool fullDrawAnnounced;
     private float drawStartedAt;
     private float reloadEndsAt;
     private float noArrowsMessageAt = float.NegativeInfinity;
+    private ItemDefinition chosen;
 
     public Phase State { get; private set; }
 
@@ -91,8 +107,17 @@ public sealed class PlayerArchery : MonoBehaviour
 
     public bool IsDrawing => State == Phase.Drawing;
 
+    /// <summary>True while the guard button is held with a bow: steadier, slower, the camera looks ahead.</summary>
+    public bool IsAiming => aimHeld && Bow != null && CanDraw();
+
     /// <summary>Share of a full draw right now (0 when not drawing).</summary>
     public float Draw => IsDrawing && Bow != null ? ArcheryRules.DrawShare(Time.time - drawStartedAt, Bow.DrawSeconds) : 0f;
+
+    /// <summary>True while letting go now would be a perfect release.</summary>
+    public bool InPerfectWindow => IsDrawing && Bow != null && IsPerfect(Bow, Time.time - drawStartedAt);
+
+    /// <summary>True while a perfect dodge has readied an instant shot.</summary>
+    public bool CounterShotReady => Bow != null && combat != null && combat.CounterIsReady;
 
     /// <summary>The monster an arrow loosed now would fly at; null when there is none in sight.</summary>
     public Damageable Target { get; private set; }
@@ -103,11 +128,18 @@ public sealed class PlayerArchery : MonoBehaviour
     /// <summary>Where arrows leave from.</summary>
     public Vector3 Origin => transform.position + Vector3.up * bowHeight + transform.forward * bowForward;
 
-    /// <summary>The arrows a shot would use: the first arrow stack in the bag, or null.</summary>
+    /// <summary>The arrows a shot would use: the chosen kind while there are some in the bag, else the first; null
+    /// without arrows.</summary>
     public ItemDefinition NextArrow => FindArrow();
+
+    /// <summary>How many of <paramref name="arrow"/> the bag holds.</summary>
+    public int Count(ItemDefinition arrow) => arrow != null && items != null ? items.Container.Count(arrow) : 0;
 
     /// <summary>Raised when drawing starts, with the seconds to full draw.</summary>
     public event Action<float> DrawStarted;
+
+    /// <summary>Raised when the draw becomes full: the perfect release window opens.</summary>
+    public event Action FullDraw;
 
     /// <summary>Raised when a draw ends without a shot (let go too early, dodged, staggered, bow lowered).</summary>
     public event Action DrawCancelled;
@@ -116,6 +148,9 @@ public sealed class PlayerArchery : MonoBehaviour
 
     /// <summary>Raised when a bow is taken up (true) or put away (false).</summary>
     public event Action<bool> BowChanged;
+
+    /// <summary>Raised when another kind of arrow is chosen.</summary>
+    public event Action<ItemDefinition> ArrowChosen;
 
     private void Awake()
     {
@@ -136,6 +171,8 @@ public sealed class PlayerArchery : MonoBehaviour
     {
         stateMachine.AttackRequested += OnAttackPressed;
         stateMachine.AttackReleased += OnAttackReleased;
+        stateMachine.GuardRequested += OnGuardRequested;
+        stateMachine.ArrowCycleRequested += CycleArrow;
         if (combat != null)
         {
             combat.WeaponChanged += OnWeaponChanged;
@@ -159,6 +196,8 @@ public sealed class PlayerArchery : MonoBehaviour
     {
         stateMachine.AttackRequested -= OnAttackPressed;
         stateMachine.AttackReleased -= OnAttackReleased;
+        stateMachine.GuardRequested -= OnGuardRequested;
+        stateMachine.ArrowCycleRequested -= CycleArrow;
         if (combat != null)
         {
             combat.WeaponChanged -= OnWeaponChanged;
@@ -176,7 +215,9 @@ public sealed class PlayerArchery : MonoBehaviour
         }
 
         held = false;
+        aimHeld = false;
         CancelDraw();
+        movement.SetSpeedScale(this, 1f);
         Target = null;
     }
 
@@ -186,6 +227,7 @@ public sealed class PlayerArchery : MonoBehaviour
         if (bow == null)
         {
             Target = null;
+            movement.SetSpeedScale(this, 1f);
             return;
         }
 
@@ -204,9 +246,18 @@ public sealed class PlayerArchery : MonoBehaviour
             if (!CanDraw())
             {
                 CancelDraw();
-                return;
             }
+            else if (!fullDrawAnnounced && Draw >= 1f)
+            {
+                fullDrawAnnounced = true;
+                FullDraw?.Invoke();
+            }
+        }
 
+        bool steady = IsDrawing || IsAiming;
+        movement.SetSpeedScale(this, steady ? bow.DrawMoveSpeed : 1f);
+        if (steady)
+        {
             combat?.KeepInCombat();
         }
     }
@@ -215,15 +266,22 @@ public sealed class PlayerArchery : MonoBehaviour
 
     private void OnAttackPressed()
     {
-        if (Bow == null)
+        WeaponDefinition bow = Bow;
+        if (bow == null)
         {
             return;
         }
 
         held = true;
+        if (CounterShotReady && State != Phase.Drawing && CanDraw())
+        {
+            CounterShot(bow);
+            return;
+        }
+
         if (State == Phase.Ready)
         {
-            TryStartDraw(Bow);
+            TryStartDraw(bow);
         }
     }
 
@@ -242,34 +300,48 @@ public sealed class PlayerArchery : MonoBehaviour
             return;
         }
 
-        Loose(bow);
+        float heldFor = Time.time - drawStartedAt;
+        float draw = ArcheryRules.DrawShare(heldFor, bow.DrawSeconds);
+        bool perfect = IsPerfect(bow, heldFor);
+        float spread = perfect ? 0f : ArcheryRules.SpreadDegrees(bow.Spread, draw, heldFor, bow.DrawSeconds) * (IsAiming ? bow.AimSpread : 1f);
+        Loose(bow, draw, spread, perfect ? bow.PerfectReleaseDamage : 1f, perfect, false);
     }
 
+    private void OnGuardRequested(bool raised) => aimHeld = raised;
+
     // ----- Drawing and shooting -----
+
+    private static bool IsPerfect(WeaponDefinition bow, float heldFor) =>
+        ArcheryRules.IsPerfectRelease(heldFor, bow.DrawSeconds, bow.PerfectReleaseSeconds);
 
     private bool CanDraw()
     {
         return stateMachine.CanMove && (health == null || health.IsAlive) && (dodge == null || !dodge.IsDodging)
                && (eating == null || !eating.IsEating) && (gathering == null || gathering.Session == null)
-               && (combat == null || !combat.IsFlinching) && (guard == null || !guard.IsStunned && !guard.IsGuarding);
+               && (combat == null || !combat.IsFlinching) && (guard == null || !guard.IsStunned);
+    }
+
+    private bool HasArrows()
+    {
+        if (FindArrow() != null)
+        {
+            return true;
+        }
+
+        held = false;
+        if (Time.time >= noArrowsMessageAt)
+        {
+            noArrowsMessageAt = Time.time + NoArrowsMessageSeconds;
+            GameMessages.Post("No arrows", MessageKind.Warning);
+        }
+
+        return false;
     }
 
     private void TryStartDraw(WeaponDefinition bow)
     {
-        if (!CanDraw())
+        if (!CanDraw() || !HasArrows())
         {
-            return;
-        }
-
-        if (FindArrow() == null)
-        {
-            held = false;
-            if (Time.time >= noArrowsMessageAt)
-            {
-                noArrowsMessageAt = Time.time + NoArrowsMessageSeconds;
-                GameMessages.Post("No arrows", MessageKind.Warning);
-            }
-
             return;
         }
 
@@ -281,7 +353,7 @@ public sealed class PlayerArchery : MonoBehaviour
 
         State = Phase.Drawing;
         drawStartedAt = Time.time;
-        movement.SetSpeedScale(this, bow.DrawMoveSpeed);
+        fullDrawAnnounced = false;
         combat?.KeepInCombat();
         AudioManager.Play(bow.DrawSound, Origin);
         DrawStarted?.Invoke(bow.DrawSeconds);
@@ -295,11 +367,22 @@ public sealed class PlayerArchery : MonoBehaviour
         }
 
         State = Bow != null ? Phase.Ready : Phase.None;
-        movement.SetSpeedScale(this, 1f);
         DrawCancelled?.Invoke();
     }
 
-    private void Loose(WeaponDefinition bow)
+    // A perfect dodge's reward: loosed at once at full speed, for the bow's share of a normal shot's damage.
+    private void CounterShot(WeaponDefinition bow)
+    {
+        if (!HasArrows())
+        {
+            return;
+        }
+
+        combat.SpendCounter();
+        Loose(bow, 1f, bow.Spread * (IsAiming ? bow.AimSpread : 1f), bow.CounterShotDamage, false, true);
+    }
+
+    private void Loose(WeaponDefinition bow, float draw, float spread, float damageMultiplier, bool perfect, bool counter)
     {
         ItemDefinition arrowItem = FindArrow();
         if (arrowItem == null || arrowItem.Arrow.Projectile == null || items.Container.Remove(arrowItem, 1) < 1)
@@ -308,28 +391,90 @@ public sealed class PlayerArchery : MonoBehaviour
             return;
         }
 
-        float heldFor = Time.time - drawStartedAt;
-        float draw = ArcheryRules.DrawShare(heldFor, bow.DrawSeconds);
         ArrowDefinition arrow = arrowItem.Arrow;
         Vector3 origin = Origin;
-        float speed = bow.ArrowSpeed * arrow.SpeedMultiplier * ArcheryRules.SpeedShare(draw);
-        float gravity = Physics.gravity.magnitude * arrow.GravityScale;
-        Vector3 direction = ArcheryRules.LaunchDirection(origin, AimPoint, speed, gravity);
-        float spread = ArcheryRules.SpreadDegrees(bow.Spread, draw, heldFor, bow.DrawSeconds);
+        float speed = LaunchSpeed(bow, arrow, draw);
+        Vector3 direction = ArcheryRules.LaunchDirection(origin, AimPoint, speed, Gravity(arrow));
         direction = ArcheryRules.Stray(direction, spread, UnityEngine.Random.value, UnityEngine.Random.value);
 
         ArrowProjectile projectile = PrefabPool.Spawn(arrow.Projectile, origin, Quaternion.LookRotation(direction));
-        projectile.Launch(combatant, bow.ShotAttack, arrow, arrow.Damage * ArcheryRules.DamageShare(draw), direction * speed);
+        float damage = arrow.Damage * ArcheryRules.DamageShare(draw) * damageMultiplier;
+        projectile.Launch(combatant, bow.ShotAttack, arrowItem, damage, direction * speed, counter ? HitTechnique.Counter : HitTechnique.None, perfect);
 
         movement.SnapFacing(direction);
-        movement.SetSpeedScale(this, 1f);
         AudioManager.Play(bow.SwingSound, origin);
         WorldNoise.Emit(transform.position, ShotNoise);
         combat?.KeepInCombat();
 
         State = Phase.Reloading;
         reloadEndsAt = Time.time + bow.ReloadSeconds;
-        Shot?.Invoke(new ArrowShot(arrowItem, draw, origin, direction * speed, bow.ReloadSeconds));
+        Shot?.Invoke(new ArrowShot(arrowItem, draw, origin, direction * speed, bow.ReloadSeconds, perfect, counter));
+    }
+
+    private static float LaunchSpeed(WeaponDefinition bow, ArrowDefinition arrow, float draw) =>
+        bow.ArrowSpeed * arrow.SpeedMultiplier * ArcheryRules.SpeedShare(draw);
+
+    private static float Gravity(ArrowDefinition arrow) => Physics.gravity.magnitude * arrow.GravityScale;
+
+    /// <summary>The flight a shot loosed now would take, before any stray: for the trajectory preview. False when not
+    /// drawing.</summary>
+    public bool TryGetShotPreview(out Vector3 origin, out Vector3 velocity, out float gravity)
+    {
+        origin = Origin;
+        velocity = Vector3.zero;
+        gravity = 0f;
+        WeaponDefinition bow = Bow;
+        ItemDefinition arrowItem = IsDrawing ? FindArrow() : null;
+        if (bow == null || arrowItem == null)
+        {
+            return false;
+        }
+
+        float speed = LaunchSpeed(bow, arrowItem.Arrow, Mathf.Max(Draw, bow.MinimumDraw));
+        gravity = Gravity(arrowItem.Arrow);
+        velocity = ArcheryRules.LaunchDirection(origin, AimPoint, speed, gravity) * speed;
+        return true;
+    }
+
+    // ----- Arrows -----
+
+    /// <summary>Chooses the next kind of arrow in the bag (in bag order) for the next shots.</summary>
+    public void CycleArrow()
+    {
+        if (Bow == null || IsDrawing)
+        {
+            return;
+        }
+
+        CollectKinds();
+        if (kinds.Count == 0)
+        {
+            GameMessages.Post("No arrows", MessageKind.Warning);
+            return;
+        }
+
+        int index = kinds.IndexOf(FindArrow());
+        chosen = kinds[(index + 1) % kinds.Count];
+        ArrowChosen?.Invoke(chosen);
+    }
+
+    private void CollectKinds()
+    {
+        kinds.Clear();
+        ItemContainer bag = items != null ? items.Container : null;
+        if (bag == null)
+        {
+            return;
+        }
+
+        for (int i = 0; i < bag.SlotCount; i++)
+        {
+            ItemStack stack = bag.GetSlot(i);
+            if (!stack.IsEmpty && stack.Item.IsArrow && !kinds.Contains(stack.Item))
+            {
+                kinds.Add(stack.Item);
+            }
+        }
     }
 
     private ItemDefinition FindArrow()
@@ -338,6 +483,11 @@ public sealed class PlayerArchery : MonoBehaviour
         if (bag == null)
         {
             return null;
+        }
+
+        if (chosen != null && bag.Count(chosen) > 0)
+        {
+            return chosen;
         }
 
         for (int i = 0; i < bag.SlotCount; i++)

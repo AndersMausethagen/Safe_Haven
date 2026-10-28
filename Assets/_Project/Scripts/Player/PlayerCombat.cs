@@ -577,6 +577,9 @@ public sealed class PlayerCombat : MonoBehaviour
         }
     }
 
+    /// <summary>Uses up a ready counter without a swing (a bow's instant shot after a perfect dodge).</summary>
+    public void SpendCounter() => counterUntil = float.NegativeInfinity;
+
     /// <summary>Readies a counter: the next swing within the settings' counter time is a critical counter.</summary>
     public void GrantCounter()
     {

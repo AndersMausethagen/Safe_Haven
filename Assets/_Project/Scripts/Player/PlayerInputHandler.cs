@@ -31,6 +31,7 @@ public sealed class PlayerInputHandler : MonoBehaviour
     private InputAction characterAction;
     private InputAction buildAction;
     private InputAction sneakAction;
+    private InputAction arrowAction;
     private PlayerStealth stealth;
     private readonly InputAction[] skillActions = new InputAction[SkillLoadout.SlotCount];
 
@@ -133,6 +134,7 @@ public sealed class PlayerInputHandler : MonoBehaviour
         yield return characterAction;
         yield return buildAction;
         yield return sneakAction;
+        yield return arrowAction;
         foreach (InputAction action in skillActions)
         {
             yield return action;
@@ -225,6 +227,7 @@ public sealed class PlayerInputHandler : MonoBehaviour
         characterAction?.Dispose();
         buildAction?.Dispose();
         sneakAction?.Dispose();
+        arrowAction?.Dispose();
         foreach (InputAction action in skillActions)
         {
             action?.Dispose();
@@ -295,6 +298,10 @@ public sealed class PlayerInputHandler : MonoBehaviour
         sneakAction.AddBinding("<Keyboard>/leftCtrl");
         sneakAction.AddBinding("<Gamepad>/leftShoulder");
 
+        // A bow's next kind of arrow.
+        arrowAction = new InputAction("CycleArrows", InputActionType.Button);
+        arrowAction.AddBinding("<Keyboard>/z");
+
         for (int i = 0; i < skillActions.Length; i++)
         {
             var action = new InputAction("Skill" + (i + 1), InputActionType.Button);
@@ -324,6 +331,7 @@ public sealed class PlayerInputHandler : MonoBehaviour
         buildAction.performed += OnBuildToggle;
         sneakAction.performed += _ => stealth?.SetSneaking(true);
         sneakAction.canceled += _ => stealth?.SetSneaking(false);
+        arrowAction.performed += _ => stateMachine.RequestArrowCycle();
         for (int i = 0; i < skillActions.Length; i++)
         {
             int slot = i;

@@ -82,7 +82,8 @@ public sealed class PlayerGuard : MonoBehaviour, IHitGuard
         movement?.SetSpeedScale(this, 1f);
     }
 
-    private void OnGuardRequested(bool raised) => held = raised;
+    // With a bow the guard button aims instead (PlayerArchery).
+    private void OnGuardRequested(bool raised) => held = raised && (combat == null || combat.Weapon == null || !combat.Weapon.IsBow);
 
     // A dodge drops the guard; holding the button raises it again once the dodge is over.
     private void OnDodged(Vector3 direction) => SetGuarding(false);

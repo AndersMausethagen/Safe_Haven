@@ -2,8 +2,9 @@ using UnityEngine;
 
 /// <summary>
 /// What an arrow does once loosed: its damage (before the shooter's power and the draw), how it changes the bow's speed,
-/// how strongly it drops, and what flies. An arrow item points here (ItemDefinition › Arrow); a bow shoots the first
-/// arrow stack in the bag. Nothing here changes while playing.
+/// how strongly it drops, what flies, whether it can be picked up again and whether it sets creatures burning. An arrow
+/// item points here (ItemDefinition › Arrow); a bow shoots the chosen arrows (Z cycles), else the first in the bag.
+/// Nothing here changes while playing.
 /// </summary>
 [CreateAssetMenu(fileName = "Arrow", menuName = "Safe Haven/Combat/Arrow")]
 public sealed class ArrowDefinition : ScriptableObject
@@ -21,6 +22,14 @@ public sealed class ArrowDefinition : ScriptableObject
     [SerializeField] private SoundDefinition hitSound;
     [Tooltip("How far the strike is heard by monsters, in metres. A shot into the brush lures them away from the archer.")]
     [SerializeField, Min(0f)] private float impactNoise = 6f;
+    [Tooltip("Chance an arrow stuck in the ground or a tree can be picked up again (walk over it).")]
+    [SerializeField, Range(0f, 1f)] private float recoverChance = 0.5f;
+
+    [Header("Fire")]
+    [Tooltip("Fire damage per second a hit creature burns for. 0: the arrow doesn't set things alight.")]
+    [SerializeField, Min(0f)] private float burnDamagePerSecond;
+    [Tooltip("Seconds a hit creature burns.")]
+    [SerializeField, Min(0f)] private float burnSeconds = 4f;
 
     public string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;
     public float Damage => damage;
@@ -29,4 +38,8 @@ public sealed class ArrowDefinition : ScriptableObject
     public ArrowProjectile Projectile => projectile;
     public SoundDefinition HitSound => hitSound;
     public float ImpactNoise => impactNoise;
+    public float RecoverChance => recoverChance;
+    public float BurnDamagePerSecond => burnDamagePerSecond;
+    public float BurnSeconds => burnSeconds;
+    public bool Burns => burnDamagePerSecond > 0f && burnSeconds > 0f;
 }

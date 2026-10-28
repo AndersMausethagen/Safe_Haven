@@ -124,7 +124,8 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
 
     private void OnAnyDamaged(Damageable victim, DamageInfo damage, DamageResult result)
     {
-        if (result.Damage <= 0f)
+        // Damage over time (burning) shows only its numbers: no sparks, flinch, hit stop or shake every tick.
+        if (result.Damage <= 0f || (damage.Technique & HitTechnique.OverTime) != 0)
         {
             return;
         }
@@ -288,6 +289,11 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
         if (playerCombat != null && CombatTechniqueSettings.Current.ShowComboHud)
         {
             comboHud = ComboHud.Create(playerCombat);
+        }
+
+        if (player.TryGetComponent(out PlayerArchery archery))
+        {
+            QuiverHud.Create(archery);
         }
     }
 
