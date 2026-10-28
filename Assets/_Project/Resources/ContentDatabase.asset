@@ -164,3 +164,25 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 272895da9ba7e784b8a97bcd2be637c8, type: 2}
   jobs:
   - {fileID: 11400000, guid: f4c65068c1237a04b8a587a274672012, type: 2}
+  gatheringNodes:
+  - {fileID: 11400000, guid: 07c3b9e4b909aa8499906160d424e40d, type: 2}
+  - {fileID: 11400000, guid: 73554f3fb638fbf4bbe5fc5e583aef36, type: 2}
+  - {fileID: 11400000, guid: 48de95cada8257c47bbee161d2e32c8c, type: 2}
+  - {fileID: 11400000, guid: c7d7eebd6d8c3e143a3b221d92a3c486, type: 2}
+  - {fileID: 11400000, guid: 960aeb1466abee949a23c9100d24c813, type: 2}
+  - {fileID: 11400000, guid: 7eb4a39e522533a4baadf639e41256d0, type: 2}
+  - {fileID: 11400000, guid: e4e5ed837b9ba3d4b9191035a871dc6b, type: 2}
+  - {fileID: 11400000, guid: 722c003ae9974774e904b3602a018469, type: 2}
+  - {fileID: 11400000, guid: 3e099ac7dae81a844a18a518d437da43, type: 2}
+  - {fileID: 11400000, guid: 87ebe03cc3ef05d49a5b874921e7c979, type: 2}
+  - {fileID: 11400000, guid: 3c785907f2c4f734e9dded3f24f5dc7e, type: 2}
+  - {fileID: 11400000, guid: 91d9ec419ae83074dabf82f1814f21e7, type: 2}
+  - {fileID: 11400000, guid: e77aff8a4e388bd47bdc46d19aab4460, type: 2}
+  - {fileID: 11400000, guid: 0f9ee456effddc34eadcc24a1eb3a666, type: 2}
+  - {fileID: 11400000, guid: 042ca0d1ffdb83f44b93dc1e02eebe96, type: 2}
+  - {fileID: 11400000, guid: 7fe91c2456449cd4084e759d6450700a, type: 2}
+  - {fileID: 11400000, guid: 2f179176c38b2214e9d80a142ebcc33f, type: 2}
+  - {fileID: 11400000, guid: 5182aff1ad3931d4997a7a780b6ec0e8, type: 2}
+  - {fileID: 11400000, guid: 6cd4516a036ee9d4bbc3c2703f702a65, type: 2}
+  - {fileID: 11400000, guid: 67001cdb00fa76a4ca674fbd8fe7b0b8, type: 2}
+  - {fileID: 11400000, guid: 0a3ad1d1b8eb1d74aa08464c83d48fef, type: 2}

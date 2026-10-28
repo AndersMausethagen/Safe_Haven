@@ -26,11 +26,14 @@ public sealed class ContentDatabase : ScriptableObject, IContentLookup
     [SerializeField] private List<ResidentDefinition> residents = new List<ResidentDefinition>();
     [Tooltip("Every job in the game. Filled in automatically in the Editor.")]
     [SerializeField] private List<JobDefinition> jobs = new List<JobDefinition>();
+    [Tooltip("Every gathering node, for nodes that pick one at random (RandomResourceNode).")]
+    [SerializeField] private List<GatheringNodeDefinition> gatheringNodes = new List<GatheringNodeDefinition>();
 
     [NonSerialized] private Dictionary<string, ItemDefinition> itemsById;
     [NonSerialized] private Dictionary<string, RecipeDefinition> recipesById;
 
     public IReadOnlyList<ItemDefinition> Items => items;
+    public IReadOnlyList<GatheringNodeDefinition> GatheringNodes => gatheringNodes;
     public IReadOnlyList<QuestDefinition> Quests => quests;
 
     public IReadOnlyList<ResidentDefinition> Residents => residents;
@@ -151,6 +154,7 @@ public sealed class ContentDatabase : ScriptableObject, IContentLookup
         CollectQuests();
         CollectAll(ref residents);
         CollectAll(ref jobs);
+        CollectAll(ref gatheringNodes);
         return added;
     }
 

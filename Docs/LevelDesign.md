@@ -50,6 +50,33 @@ into one you can press Play in:
 
 A home scene saves into the save file like the real Haven does when you play it.
 
+## Mob Spawn Zones and Random Resource Nodes
+
+Both are in World Tools › Place (**Mob Spawn Zone** under Raid, **Random Resource Node** under Resources) and work in
+any scene.
+
+**Mob Spawn Zone** (`MobSpawnZone`): an area drawn on the ground where creatures appear. In the Scene view drag its
+corners (they follow the ground), Shift-click near an edge to add a corner, Ctrl-click a corner to remove one; Drop
+Corners to Ground in the Inspector settles them all. It spawns Count creatures at random spots inside it on walkable
+ground, Separation apart:
+
+- **What:** one entry in Creatures for a specific creature, several for a weighted random pick (Min/Max Per Group cap
+  each), or a shared Spawn Table asset. Use the creature prefab, not its model (the Inspector warns).
+- **When:** On Start; Player Near (within Wake Distance of the zone's edge); or Manual (only `Spawn()`, from a quest or
+  an event). Respawn fills it again Respawn Seconds after its creatures are dead, never in front of the player.
+- **Hunt Player** sends them straight at the player. In a raid they get the raid's strength.
+- **On Cleared** (and the `Cleared` event) fires when everything it spawned is dead: what a "kill them all" step uses.
+  In Play mode the Inspector has Spawn Now and Despawn.
+
+**Random Resource Node** (`RandomResourceNode`): becomes a gathering node when the scene starts, picked from every node
+of its Kind (Wood: axe, Rock: pickaxe, stone and ore; Plant: sickle; Forage: by hand; or Any) within its Tier range,
+or from its Only list. Stable Pick makes a spot always become the same node (home); otherwise each visit rolls again
+(raids). Its gizmo is coloured by kind. What it becomes is not saved.
+
+**Look variants:** a gathering node can carry other looks (GatheringNodeDefinition › Model Variants, Variant Scale):
+each placed node picks its own model or a variant (the same one every time for the same spot), fitted to the original's
+size, at a random size and facing. Grey Stone has three (Field Stone, Grey Boulder, Lichen Boulder).
+
 ## World Builder (rivers, paths, cliffs, forests)
 
 Draw the world with splines and let the World Builder shape, paint and fill the terrain. Everything it does is

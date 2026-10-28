@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 /// <summary>
@@ -61,6 +63,11 @@ public sealed class ResourceNode : MonoBehaviour, IInteractionCondition, ISaveab
     private void Awake()
     {
         interactable = GetComponent<Interactable>();
+        if (Application.isPlaying)
+        {
+            ApplyVariant();
+        }
+
         renderers = GetComponentsInChildren<Renderer>(true);
         colliders = GetComponentsInChildren<Collider>(true);
         if (!TryGetComponent(out feedback))
@@ -92,6 +99,68 @@ public sealed class ResourceNode : MonoBehaviour, IInteractionCondition, ISaveab
             SetPresent(true);
             Regrown?.Invoke();
         }
+    }
+
+    /// <summary>The look this spot gets: the node's own model or one of its definition's variants (the same one every
+    /// time for the same spot), at a random size and facing. A variant takes the place and size of the model it replaces
+    /// (its "Model" child, or the part holding its mesh), whose colliders stay.</summary>
+    private void ApplyVariant()
+    {
+        Transform model = transform.Find("Model");
+        Renderer first = GetComponentsInChildren<Renderer>(true).FirstOrDefault(r => !(r is ParticleSystemRenderer));
+        if (node == null || first == null)
+        {
+            return;
+        }
+
+        Transform look = model != null ? model : first.transform;
+        Vector3 at = transform.position;
+        var random = new System.Random(Mathf.RoundToInt(at.x * 10f) * 73856093 ^ Mathf.RoundToInt(at.z * 10f) * 19349663 ^ node.name.GetHashCode());
+        IReadOnlyList<GameObject> variants = node.ModelVariants;
+        int pick = random.Next(variants.Count + 1) - 1;
+        if (pick >= 0 && variants[pick] != null)
+        {
+            Bounds original = BoundsOf(look);
+            foreach (Renderer part in look.GetComponentsInChildren<Renderer>(true))
+            {
+                if (part.TryGetComponent(out MeshFilter filter))
+                {
+                    DestroyImmediate(filter);
+                }
+
+                DestroyImmediate(part);
+            }
+
+            GameObject variant = Instantiate(variants[pick], look, false);
+            variant.name = variants[pick].name;
+            HeldItemView.StripToVisual(variant);
+            Bounds fitted = BoundsOf(variant.transform);
+            float factor = fitted.size.magnitude > 0.0001f ? original.size.magnitude / fitted.size.magnitude : 1f;
+            variant.transform.localScale *= factor;
+            fitted = BoundsOf(variant.transform);
+            variant.transform.position += new Vector3(original.center.x - fitted.center.x, original.min.y - fitted.min.y, original.center.z - fitted.center.z);
+        }
+
+        Vector2 scale = node.VariantScale;
+        look.localScale *= Mathf.Lerp(Mathf.Min(scale.x, scale.y), Mathf.Max(scale.x, scale.y), (float)random.NextDouble());
+        look.localRotation = Quaternion.Euler(0f, (float)random.NextDouble() * 360f, 0f) * look.localRotation;
+    }
+
+    private static Bounds BoundsOf(Transform root)
+    {
+        Renderer[] parts = root.GetComponentsInChildren<Renderer>(true);
+        if (parts.Length == 0)
+        {
+            return new Bounds(root.position, Vector3.zero);
+        }
+
+        Bounds bounds = parts[0].bounds;
+        foreach (Renderer part in parts)
+        {
+            bounds.Encapsulate(part.bounds);
+        }
+
+        return bounds;
     }
 
     public bool CanInteract(GameObject user, out string reason)

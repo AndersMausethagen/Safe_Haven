@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 
@@ -54,6 +55,11 @@ public sealed class GatheringNodeDefinition : ScriptableObject
     [SerializeField] private GameObject worldModelPrefab;
     [Tooltip("Generated gathering node prefab.")]
     [SerializeField] private GameObject worldPrefab;
+    [Tooltip("Other looks for the same node (stones that each look a little different): each placed node picks its own " +
+             "(or keeps its own model), always the same one for the same spot. Colliders and scripts on them are ignored.")]
+    [SerializeField] private List<GameObject> modelVariants = new List<GameObject>();
+    [Tooltip("Each placed node is scaled by a random amount in this range and turned at random, so copies don't match.")]
+    [SerializeField] private Vector2 variantScale = new Vector2(0.9f, 1.1f);
 
     public string Id => string.IsNullOrWhiteSpace(id) ? MakeId(name) : id.Trim();
     public string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;
@@ -71,6 +77,8 @@ public sealed class GatheringNodeDefinition : ScriptableObject
     public HarvestFeedbackProfile Feedback => feedback;
     public GameObject WorldModelPrefab => worldModelPrefab;
     public GameObject WorldPrefab => worldPrefab;
+    public IReadOnlyList<GameObject> ModelVariants => modelVariants;
+    public Vector2 VariantScale => variantScale;
 
     /// <summary>The first thing the node yields, for icons and lists.</summary>
     public Object MainYield => yields.Entries.Count > 0 && yields.Entries[0] != null ? yields.Entries[0].Drop : null;
