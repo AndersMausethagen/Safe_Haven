@@ -72,6 +72,18 @@ public sealed class PlayerCameraController : MonoBehaviour
     private Vector3 dialoguePoint;
     private bool aiming;
     private float aimWeight;
+    private Transform focusTarget;
+    private float focusWeight;
+    private Vector3 focusPoint;
+
+    /// <summary>Turns the view to look at <paramref name="target"/> instead of the player (a story moment: the troll
+    /// roaring on the ridge), until EndFocus. The player keeps control.</summary>
+    public void BeginFocus(Transform target) => focusTarget = target;
+
+    public void EndFocus(Transform target)
+    {
+        if (focusTarget == target) focusTarget = null;
+    }
 
     /// <summary>Aiming a bow (ArcheryCameraAim): the view narrows a little and, top-down, leans further toward the
     /// cursor, so long shots can be seen.</summary>
@@ -170,6 +182,8 @@ public sealed class PlayerCameraController : MonoBehaviour
         CameraPointer.UsesScreenCenter = false;
         dialogueTarget = null;
         dialogueWeight = 0f;
+        focusTarget = null;
+        focusWeight = 0f;
         ReleaseCursor();
     }
 
@@ -196,6 +210,7 @@ public sealed class PlayerCameraController : MonoBehaviour
         ReadInput();
         BlendTowardProfile();
         dialogueWeight = Mathf.MoveTowards(dialogueWeight, dialogueTarget != null ? 1f : 0f, Time.unscaledDeltaTime / 0.4f);
+        focusWeight = Mathf.MoveTowards(focusWeight, focusTarget != null ? 1f : 0f, Time.unscaledDeltaTime / 0.6f);
         UpdateFocus();
         ApplyToCinemachine();
     }
@@ -368,6 +383,9 @@ public sealed class PlayerCameraController : MonoBehaviour
         if (dialogueTarget != null)
             dialoguePoint = (target.position + dialogueTarget.position + Vector3.up) * 0.5f;
         focus.position = Vector3.Lerp(focus.position, dialoguePoint, dialogueWeight);
+        if (focusTarget != null)
+            focusPoint = focusTarget.position + Vector3.up;
+        focus.position = Vector3.Lerp(focus.position, focusPoint, Mathf.SmoothStep(0f, 1f, focusWeight));
     }
 
     private Vector3 GetCursorOffset()

@@ -6,7 +6,7 @@
 // terrain colour map GrassTerrainColour bakes) and varies by clumps and dry patches. Far away (camera distance)
 // blades thin out, stop animating and shrink to nothing at the draw distance, so the field stays cheap.
 // Glowing plants (mushrooms, flowers) set vertex colour B where they glow; _GlowColor shines there at night
-// (_SafeHavenNight from DayNightCycle).
+// (_SafeHavenNight from DayNightCycle). Around WitherSpots (_SafeHavenWither) the blades turn dead brown.
 Shader "Safe Haven/Grass"
 {
     Properties
@@ -77,6 +77,9 @@ Shader "Safe Haven/Grass"
         float4 _SafeHavenWind; // horizontal direction XZ (world), moss displacement, speed
         float _SafeHavenWindGusts, _SafeHavenTreeWind;
         float4 _GrassInteractors[GRASS_MAX_INTERACTORS]; // world position, radius
+        // Withered ground (WitherSpot, from story graphs): world XZ, radius, how withered (0-1).
+        float4 _SafeHavenWither[4];
+        float _SafeHavenWitherCount;
         float _GrassInteractorCount;
 
         struct Attributes
@@ -202,6 +205,12 @@ Shader "Safe Haven/Grass"
             }
             half dry = smoothstep(1.0 - _DryAmount, 1.0 - _DryAmount + 0.25, Noise(rootWS.xz / max(_PatchScale, 0.01)));
             colour = lerp(colour, _DryColor.rgb * lerp(0.6, 1.0, tip), dry * saturate(tip + 0.2));
+            for (int w = 0; w < (int)_SafeHavenWitherCount; w++)
+            {
+                float4 spot = _SafeHavenWither[w];
+                float near = 1.0 - smoothstep(spot.z * 0.55, spot.z, distance(rootWS.xz, spot.xy));
+                colour = lerp(colour, half3(0.33, 0.24, 0.12) * lerp(0.55, 1.0, tip), saturate(near * spot.w));
+            }
             half clump = Noise(rootWS.xz / max(_ClumpScale, 0.05) + 17.0);
             return colour * (1.0 + (input.color.g - 0.5) * 2.0 * _BladeVariation) * lerp(0.85, 1.12, clump);
         }
