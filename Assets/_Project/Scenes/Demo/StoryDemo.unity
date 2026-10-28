@@ -1808,7 +1808,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 7435044622066447211, guid: 75f39e11fceba884d824fd4b239861a6, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2142857947}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 7810725117079759313, guid: 75f39e11fceba884d824fd4b239861a6, type: 3}
       insertIndex: -1
@@ -3497,6 +3500,53 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+--- !u!1 &2142857946
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2142857947}
+  - component: {fileID: 2142857948}
+  m_Layer: 0
+  m_Name: Quest Waypoint - The Waking Stone
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2142857947
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2142857946}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 978158637}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2142857948
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2142857946}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b33558da32530e547ac0e3c72d87df24, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::QuestWaypoint
+  quest: {fileID: 11400000, guid: 5c4164292dd0e954abdfb4a34880765b, type: 2}
+  objective: 0
+  label: The stone
 --- !u!1 &2144183109
 GameObject:
   m_ObjectHideFlags: 0

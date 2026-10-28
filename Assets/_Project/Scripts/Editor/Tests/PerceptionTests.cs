@@ -7,17 +7,26 @@ public sealed class PerceptionTests
 {
     private readonly List<Object> created = new List<Object>();
     private PerceptionSettings rules;
+    private float fog;
+    private float night;
 
     [SetUp]
     public void SetUp()
     {
         rules = ScriptableObject.CreateInstance<PerceptionSettings>();
         created.Add(rules);
+        // Sight shrinks in fog and at night; the open scene's sky must not decide these tests.
+        fog = AtmosphereConditions.FogDensity;
+        night = AtmosphereConditions.Night;
+        AtmosphereConditions.FogDensity = 0f;
+        AtmosphereConditions.Night = 0f;
     }
 
     [TearDown]
     public void TearDown()
     {
+        AtmosphereConditions.FogDensity = fog;
+        AtmosphereConditions.Night = night;
         foreach (Object value in created)
         {
             Object.DestroyImmediate(value);

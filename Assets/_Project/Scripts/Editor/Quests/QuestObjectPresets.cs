@@ -52,6 +52,14 @@ public static class QuestObjectPresets
         Place(listener, command, "Create Quest Event Listener");
     }
 
+    [MenuItem(Menu + "Quest Waypoint", false, Priority + 3)]
+    private static void CreateWaypoint(MenuCommand command)
+    {
+        var waypoint = new GameObject("Quest Waypoint");
+        waypoint.AddComponent<QuestWaypoint>();
+        Place(waypoint, command, "Create Quest Waypoint");
+    }
+
     [MenuItem(Menu + "World Event (Zone + Response)", false, Priority + 4)]
     private static void CreateWorldEvent(MenuCommand command)
     {

@@ -7,7 +7,8 @@ using TMPro;
 /// <summary>
 /// The quest tracker on screen: every active quest with its objectives and progress, done objectives in green, and
 /// "Return to ..." for quests waiting to be handed in, and the time left on timed quests (QuestTimers). It only reads the
-/// QuestLog, refreshing when quests change (and every second while a timer runs).
+/// QuestLog, refreshing when quests change (and every second while a timer runs). It also makes the waypoint arrow
+/// that points the way to the active quest (QuestWaypointHud).
 /// </summary>
 public sealed class QuestTrackerView : MonoBehaviour
 {
@@ -19,10 +20,16 @@ public sealed class QuestTrackerView : MonoBehaviour
     [SerializeField] private GameObject panel;
     [SerializeField, Min(1)] private int maxQuests = 4;
 
+    private QuestWaypointHud waypoints;
+
     private void OnEnable()
     {
         QuestManager.Changed += Refresh;
         Refresh();
+        if (waypoints == null && Application.isPlaying)
+        {
+            waypoints = QuestWaypointHud.Create();
+        }
     }
 
     private void OnDisable()

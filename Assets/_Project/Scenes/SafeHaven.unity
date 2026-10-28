@@ -11163,7 +11163,10 @@ PrefabInstance:
     m_RemovedComponents:
     - {fileID: 818772515401357772, guid: 83e508b71ba177149a0f08689ff8aea4, type: 3}
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 557135111737939404, guid: 83e508b71ba177149a0f08689ff8aea4, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1433688874}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 9200326555112114397, guid: 83e508b71ba177149a0f08689ff8aea4, type: 3}
       insertIndex: -1
@@ -14013,6 +14016,53 @@ Transform:
   - {fileID: 330077088}
   m_Father: {fileID: 1927287394}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1433688873
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1433688874}
+  - component: {fileID: 1433688875}
+  m_Layer: 0
+  m_Name: Quest Waypoint - They Are Still Out There
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1433688874
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1433688873}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1038728947}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1433688875
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1433688873}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b33558da32530e547ac0e3c72d87df24, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::QuestWaypoint
+  quest: {fileID: 11400000, guid: 84d6a79cd30dba342ae6ae24a0109f98, type: 2}
+  objective: 0
+  label: Portal
 --- !u!1001 &1449205986
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -15780,6 +15830,7 @@ MonoBehaviour:
   offers: []
   confirmInDialogue: 0
   speakerName: 
+  portrait: {fileID: 0}
   dialogueCameraDistance: 0.65
 --- !u!114 &1593342185
 MonoBehaviour:
