@@ -20,9 +20,9 @@ RenderSettings:
   m_FogDensity: 0.017600002
   m_LinearFogStart: 0
   m_LinearFogEnd: 300
-  m_AmbientSkyColor: {r: 0.29760215, g: 0.31593555, b: 0.41493553, a: 0.6862689}
-  m_AmbientEquatorColor: {r: 0.19316517, g: 0.20049855, b: 0.25916517, a: 0.63683194}
-  m_AmbientGroundColor: {r: 0.103648566, g: 0.103648566, b: 0.12564856, a: 0.59498197}
+  m_AmbientSkyColor: {r: 0.4017629, g: 0.426513, b: 0.56016296, a: 0.7339631}
+  m_AmbientEquatorColor: {r: 0.26077297, g: 0.27067307, b: 0.349873, a: 0.66722316}
+  m_AmbientGroundColor: {r: 0.13992555, g: 0.13992555, b: 0.16962555, a: 0.61072564}
   m_AmbientIntensity: 1
   m_AmbientMode: 1
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
@@ -1418,12 +1418,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::PrologueCompanion
   resident: {fileID: 11400000, guid: 4260d606f7c62c042b848adc806c44d3, type: 2}
   formationOffset: {x: 2, y: 0, z: -3.8}
-  forestLine: We came to learn why this forest has become bewitched. First, we need shelter. Follow the old road.
-  campLine: The tracks cross each other over and over. Predators and prey running the same way. Something has made the whole forest afraid.
-  portalLine: Stay near the stones. We can still get out of this together.
+  forestLine: Tracks everywhere, all running the same way. Whatever they are fleeing, we are walking towards it. Lovely.
+  campLine: I counted three wolves circling and one shape that was not a wolf. Keep your voice down. I would rather see them before they see us.
+  portalLine: I will take the ones on the stones. You just keep breathing.
   talkedEvent: {fileID: 11400000, guid: eb2539c68ce00724ea300d5133c29bdc, type: 2}
   soldier: 0
   alchemist: 0
+  archer: 1
+  archerRange: 15
+  shotSound: {fileID: 11400000, guid: e3702f94155b6bc42b71a0d0872c141d, type: 2}
   supportInterval: 6
   supportAmount: 8
 --- !u!114 &334759805
@@ -3452,7 +3455,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &786901625
 Transform:
   m_ObjectHideFlags: 0
@@ -3490,6 +3493,9 @@ MonoBehaviour:
   talkedEvent: {fileID: 11400000, guid: 45b20a2d17557304a8cb59976d6b5ca7, type: 2}
   soldier: 0
   alchemist: 0
+  archer: 0
+  archerRange: 15
+  shotSound: {fileID: 0}
   supportInterval: 6
   supportAmount: 8
 --- !u!114 &786901627
@@ -3713,12 +3719,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::PrologueCompanion
   resident: {fileID: 11400000, guid: 33e7204287863854f8c6ad025490f531, type: 2}
   formationOffset: {x: 0, y: 0, z: -3.8}
-  forestLine: We came to learn why this forest has become bewitched. First, we need shelter. Follow the old road.
-  campLine: Two of us watching the entrance. Nobody wanders off alone. These beasts do not fight like animals defending a den.
-  portalLine: Stay near the stones. We can still get out of this together.
+  forestLine: Stay between me and the trees. If anything comes out of the dark, it meets my shield first.
+  campLine: Eat something, even if you are not hungry. I have buried enough friends who thought they could fight on an empty stomach.
+  portalLine: Go! I will hold them. Nobody gets left behind, not while I am standing.
   talkedEvent: {fileID: 11400000, guid: 1bb643130e8944049b38a3399cf7edf9, type: 2}
   soldier: 1
   alchemist: 0
+  archer: 0
+  archerRange: 15
+  shotSound: {fileID: 0}
   supportInterval: 6
   supportAmount: 8
 --- !u!114 &810501269
@@ -4619,12 +4628,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::PrologueCompanion
   resident: {fileID: 11400000, guid: b230d041259b863428e4e973c6ff0d86, type: 2}
   formationOffset: {x: -2, y: 0, z: -2}
-  forestLine: We came to learn why this forest has become bewitched. First, we need shelter. Follow the old road.
-  campLine: The villages sent us because livestock vanished and people saw witches on the road. Now trolls leave their hills, and even wolves attack without hunger. We find the cause, then we go home together.
-  portalLine: Hold together! Nobody gets left behind. We will find each other, whatever happens.
+  forestLine: Keep the torch high and the road under your feet. The forest is listening tonight. Let it hear only footsteps.
+  campLine: The villages think we came for wolves and witches. Let them. The stones out here are older than any village, and someone has been waking them.
+  portalLine: Stand inside the ring. Whatever you see, do not let go of the stone until I say.
   talkedEvent: {fileID: 11400000, guid: 3943805714479a044b6e4e23704963cd, type: 2}
   soldier: 0
-  alchemist: 0
+  alchemist: 1
+  archer: 0
+  archerRange: 15
+  shotSound: {fileID: 0}
   supportInterval: 6
   supportAmount: 8
 --- !u!114 &983162861
@@ -4738,11 +4750,12 @@ MonoBehaviour:
     acceptText: Let us catch our breath.
     waitingText: The villages sent us because livestock vanished and people saw witches on the road. Now trolls leave their hills, and even wolves attack without hunger. We find the cause, then we go home together.
   - quest: {fileID: 11400000, guid: 5699d07d5ceee6144855cc88c1a5f255, type: 2}
-    text: These markings are older than the road. Liv thinks they may be a way out. Touch the waystones and see if they still answer. We will hold the clearing.
+    text: These markings are older than the road. Sigrid says they may be a way out, and does not say how she knows. Touch the waystones and see if they still answer. We will hold the clearing.
     acceptText: I will try the waystones.
     waitingText: Hold together! Nobody gets left behind. We will find each other, whatever happens.
   confirmInDialogue: 1
   speakerName: Sigrid
+  portrait: {fileID: 0}
   dialogueCameraDistance: 0.65
 --- !u!1 &985677805
 GameObject:
@@ -9649,7 +9662,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1447795151
 Transform:
   m_ObjectHideFlags: 0
@@ -9687,6 +9700,9 @@ MonoBehaviour:
   talkedEvent: {fileID: 11400000, guid: d656e5181cedb8f408b76012090c7439, type: 2}
   soldier: 0
   alchemist: 0
+  archer: 0
+  archerRange: 15
+  shotSound: {fileID: 0}
   supportInterval: 6
   supportAmount: 8
 --- !u!114 &1447795153
@@ -10163,12 +10179,8 @@ MonoBehaviour:
   - {fileID: 1827974037}
   companions:
   - {fileID: 983162860}
-  - {fileID: 2111941102}
-  - {fileID: 786901626}
-  - {fileID: 1606609654}
   - {fileID: 810501268}
   - {fileID: 334759804}
-  - {fileID: 1447795152}
   portalVisual: {fileID: 1270953187}
   statusLabel: {fileID: 1664224448}
 --- !u!114 &1500380935
@@ -10486,7 +10498,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1606609653
 Transform:
   m_ObjectHideFlags: 0
@@ -10524,6 +10536,9 @@ MonoBehaviour:
   talkedEvent: {fileID: 11400000, guid: 3c4a3556d9e8a7741ac54999bfd13e25, type: 2}
   soldier: 0
   alchemist: 0
+  archer: 0
+  archerRange: 15
+  shotSound: {fileID: 0}
   supportInterval: 6
   supportAmount: 8
 --- !u!114 &1606609655
@@ -13309,7 +13324,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2111941101
 Transform:
   m_ObjectHideFlags: 0
@@ -13347,6 +13362,9 @@ MonoBehaviour:
   talkedEvent: {fileID: 11400000, guid: 5b6e9cf3d8ea3e44cabe07b5cf724775, type: 2}
   soldier: 0
   alchemist: 1
+  archer: 0
+  archerRange: 15
+  shotSound: {fileID: 0}
   supportInterval: 6
   supportAmount: 8
 --- !u!114 &2111941103

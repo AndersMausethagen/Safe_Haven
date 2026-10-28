@@ -407,6 +407,10 @@ public sealed class DialogueBox : MonoBehaviour
         box.nameLabel = Text("Name", panel, 28f, Title, new Vector2(0f, 1f), new Vector2(560f, 40f), new Vector2(530f, -36f), TextAlignmentOptions.Left);
         box.nameLabel.fontStyle = FontStyles.Bold;
         box.lineLabel = Text("Line", panel, 24f, Body, new Vector2(0f, 1f), new Vector2(480f, 175f), new Vector2(510f, -140f), TextAlignmentOptions.TopLeft);
+        // Long lines (a leader's briefing) shrink to fit rather than run out of the box.
+        box.lineLabel.enableAutoSizing = true;
+        box.lineLabel.fontSizeMin = 15f;
+        box.lineLabel.fontSizeMax = 24f;
         box.hint = Text("Hint", panel, 18f, Title, new Vector2(1f, 0f), new Vector2(200f, 30f), new Vector2(-110f, 22f), TextAlignmentOptions.Right);
 
         RectTransform answers = Rect("Answers", panel, new Vector2(1f, 0.5f), new Vector2(300f, 220f), new Vector2(-160f, 0f));

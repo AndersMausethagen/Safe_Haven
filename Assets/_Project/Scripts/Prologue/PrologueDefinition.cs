@@ -58,6 +58,8 @@ public sealed class PrologueDefinition : ScriptableObject
     [SerializeField] private BuildingDefinition campfire;
     [SerializeField, Min(1f)] private float buildRadius = 4f;
     [SerializeField, TextArea] private string waitingForLeaderText = "Speak to Sigrid about the next step.";
+    [Tooltip("Who speaks a chapter's arrival text when it doesn't start with a name (\"Runa: ...\"): the expedition's leader.")]
+    [SerializeField] private ResidentDefinition leader;
     [SerializeField, Range(0.3f, 1f)] private float dialogueCameraDistance = 0.65f;
     [Header("Encounters")]
     [SerializeField, Min(1f)] private float waveInterval = 25f;
@@ -94,6 +96,7 @@ public sealed class PrologueDefinition : ScriptableObject
     public BuildingDefinition Campfire => campfire;
     public float BuildRadius => buildRadius;
     public string WaitingForLeaderText => waitingForLeaderText;
+    public ResidentDefinition Leader => leader;
     public float DialogueCameraDistance => dialogueCameraDistance;
     public float WaveInterval => waveInterval;
     public int MaximumEnemies => maximumEnemies;

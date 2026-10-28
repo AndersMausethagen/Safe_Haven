@@ -6,7 +6,8 @@ using TMPro;
 
 /// <summary>
 /// The quest tracker on screen: every active quest with its objectives and progress, done objectives in green, and
-/// "Return to ..." for quests waiting to be handed in. It only reads the QuestLog, refreshing when quests change.
+/// "Return to ..." for quests waiting to be handed in, and the time left on timed quests (QuestTimers). It only reads the
+/// QuestLog, refreshing when quests change (and every second while a timer runs).
 /// </summary>
 public sealed class QuestTrackerView : MonoBehaviour
 {
@@ -29,6 +30,18 @@ public sealed class QuestTrackerView : MonoBehaviour
         QuestManager.Changed -= Refresh;
     }
 
+    private float nextTick;
+    private bool timed;
+
+    private void Update()
+    {
+        if (timed && Time.time >= nextTick)
+        {
+            nextTick = Time.time + 1f;
+            Refresh();
+        }
+    }
+
     public void Refresh()
     {
         var active = new List<QuestLog.Entry>();
@@ -43,10 +56,16 @@ public sealed class QuestTrackerView : MonoBehaviour
         active.Sort((a, b) => string.CompareOrdinal(a.Quest.DisplayName, b.Quest.DisplayName));
         panel.SetActive(active.Count > 0);
         var builder = new StringBuilder();
+        timed = false;
         for (int q = 0; q < active.Count && q < maxQuests; q++)
         {
             QuestLog.Entry entry = active[q];
             builder.Append(q > 0 ? "\n\n" : "").Append("<b>").Append(entry.Quest.DisplayName).Append("</b>");
+            if (QuestTimers.TryGet(entry.Quest, out float left))
+            {
+                timed = true;
+                builder.Append($"  <color={Muted}>{(int)left / 60}:{(int)left % 60:00}</color>");
+            }
             if (entry.Status == QuestStatus.ReadyToTurnIn)
             {
                 builder.Append($"\n<color={Done}>• Return to {entry.Quest.TurnInTo}</color>");

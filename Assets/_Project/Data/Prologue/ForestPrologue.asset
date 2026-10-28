@@ -55,13 +55,13 @@ MonoBehaviour:
     initialEnemies: 0
   - quest: {fileID: 11400000, guid: 5699d07d5ceee6144855cc88c1a5f255, type: 2}
     behaviour: 6
-    arrivalText: These markings are older than the road. Liv thinks they may be a way out. Touch the waystones and see if they still answer. We will hold the clearing.
+    arrivalText: These markings are older than the road. Sigrid says they may be a way out, and does not say how she knows. Touch the waystones and see if they still answer. We will hold the clearing.
     statusText: 
     duration: 0
     initialEnemies: 0
   - quest: {fileID: 11400000, guid: a089752e48d75934fb5e34dbeec0b389, type: 2}
     behaviour: 7
-    arrivalText: 'Liv: The stones are drawing power! Hold them off until the connection forms!'
+    arrivalText: 'Sigrid: The stones are drawing power! Hold them off until the connection forms!'
     statusText: 'THE CONNECTION IS WAKING
 
       Hold them back. Stay close to the portal!'
@@ -87,6 +87,7 @@ MonoBehaviour:
   campfire: {fileID: 11400000, guid: c5579431ac7bb1146b3db512a4783ee8, type: 2}
   buildRadius: 5
   waitingForLeaderText: Speak to Sigrid about the next step.
+  leader: {fileID: 11400000, guid: b230d041259b863428e4e973c6ff0d86, type: 2}
   dialogueCameraDistance: 0.65
   waveInterval: 25
   firstWaveSize: 3
@@ -96,8 +97,8 @@ MonoBehaviour:
   wolfPrefab: {fileID: 4509420567327699722, guid: 133e61ca36473ab4999a603e504581a7, type: 3}
   rumble: {fileID: 11400000, guid: 6510718f5af764e4aa78349c4b3f7cdf, type: 2}
   homeScene: SafeHaven
-  survivedText: 'Liv: It is open! Sigrid: Everyone, through! Something vast strikes the stones. You reach for the others... and the forest disappears.'
-  overwhelmedText: 'Liv: I cannot hold it! Sigrid: Take my hand! A white light tears through the dark...'
+  survivedText: 'Sigrid: It is open! Everyone, through! Something vast strikes the stones. You reach for the others... and the forest disappears.'
+  overwhelmedText: 'Sigrid: I cannot hold it! Take my hand! A white light tears through the dark...'
   endingStatus: 'THE CONNECTION BREAKS
 
     A voice calls your name. Then silence.'

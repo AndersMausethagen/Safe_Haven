@@ -13,6 +13,10 @@ public sealed class PrologueCompanion : MonoBehaviour
     [SerializeField, RaisedByGame] private GameEventDefinition talkedEvent;
     [SerializeField] private bool soldier;
     [SerializeField] private bool alchemist;
+    [Tooltip("Shoots the nearest enemy within Archer Range during a fight (Runa).")]
+    [SerializeField] private bool archer;
+    [SerializeField, Min(1f)] private float archerRange = 15f;
+    [SerializeField] private SoundDefinition shotSound;
     [SerializeField, Min(1f)] private float supportInterval = 6f;
     [SerializeField, Min(0f)] private float supportAmount = 8f;
 
@@ -67,7 +71,7 @@ public sealed class PrologueCompanion : MonoBehaviour
             if (hasSpeed) animator.SetFloat(Speed, 0f);
             return;
         }
-        agent.isStopped = ActionMenuWindow.Current != null && ActionMenuWindow.Current.IsOpen;
+        agent.isStopped = ActionMenuWindow.Current != null && ActionMenuWindow.Current.IsOpen || DialogueBox.IsOpen;
         if (Time.time >= nextPath)
         {
             nextPath = Time.time + 0.3f;
@@ -81,6 +85,7 @@ public sealed class PrologueCompanion : MonoBehaviour
         nextSupport = Time.time + supportInterval;
         if (alchemist && Vector3.Distance(transform.position, Player.Current.transform.position) < 10f)
             Player.Current.Health.Heal(supportAmount);
+        if (archer && Shoot(director)) return;
         if (!soldier) return;
         foreach (Damageable enemy in director.Enemies)
         {
@@ -90,6 +95,30 @@ public sealed class PrologueCompanion : MonoBehaviour
                 enemy.transform.position, enemy.transform.position - transform.position));
             break;
         }
+    }
+
+    // The nearest enemy in range takes an arrow.
+    private bool Shoot(PrologueDirector director)
+    {
+        Damageable target = null;
+        float best = archerRange * archerRange;
+        foreach (Damageable enemy in director.Enemies)
+        {
+            if (enemy == null || !enemy.IsAlive) continue;
+            float distance = (enemy.transform.position - transform.position).sqrMagnitude;
+            if (distance < best)
+            {
+                best = distance;
+                target = enemy;
+            }
+        }
+
+        if (target == null) return false;
+        transform.LookAt(new Vector3(target.transform.position.x, transform.position.y, target.transform.position.z));
+        AudioManager.Play(shotSound, transform.position);
+        target.ApplyDamage(new DamageInfo(null, null, supportAmount, DamageType.Physical, false,
+            target.transform.position + Vector3.up, target.transform.position - transform.position));
+        return true;
     }
 
     private void Talk()

@@ -14,12 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::QuestDefinition
   id: prologue.activateportal
   displayName: Wake the Waystones
-  description: Liv recognises a passage in the ancient waystones. Touch the centre stone to wake the connection.
+  description: Sigrid recognises a passage in the ancient waystones. Touch the centre stone to wake the connection.
   chain: Prologue - The Unquiet Forest
   prerequisites:
   - {fileID: 11400000, guid: cd536373f8f639f4db60c8810e546ebf, type: 2}
   start: 2
   startEvent: {fileID: 0}
+  onStarted: []
   objectivesInOrder: 0
   objectives:
   - type: 6
@@ -40,3 +41,4 @@ MonoBehaviour:
   rewardResources: []
   rewardRecipes: []
   completionEvent: {fileID: 0}
+  onCompleted: []

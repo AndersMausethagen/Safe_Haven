@@ -4,7 +4,11 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.AI;
 
-/// <summary>Runs authored encounters from quest progress; never creates a raid or applies raid loss rules.</summary>
+/// <summary>
+/// Runs authored encounters from quest progress; never creates a raid or applies raid loss rules. Everything the player
+/// is asked to do shows in the quest tracker like any quest (timed chapters with their time left, QuestTimers); a
+/// chapter's arrival text is said in the dialogue box by the companion it names ("Runa: ...") or the leader.
+/// </summary>
 [DisallowMultipleComponent]
 public sealed class PrologueDirector : MonoBehaviour
 {
@@ -17,6 +21,7 @@ public sealed class PrologueDirector : MonoBehaviour
     [SerializeField] private Transform[] portalSpawns;
     [SerializeField] private PrologueCompanion[] companions;
     [SerializeField] private GameObject portalVisual;
+    [Tooltip("Retired: the quest tracker shows the chapter now. Hidden when the prologue starts.")]
     [SerializeField] private TMP_Text statusLabel;
 
     private readonly List<Damageable> enemies = new List<Damageable>();
@@ -81,6 +86,7 @@ public sealed class PrologueDirector : MonoBehaviour
         }
         health = Player.Current.Health;
         health.Died += OnPlayerDied;
+        if (statusLabel != null) statusLabel.gameObject.SetActive(false);
         SceneTransition.WhenReady(Begin);
     }
 
@@ -134,7 +140,6 @@ public sealed class PrologueDirector : MonoBehaviour
         if (!ready || ending) return;
         if (!chapterActive)
         {
-            if (statusLabel != null) statusLabel.text = definition.WaitingForLeaderText;
             return;
         }
         elapsed += Time.deltaTime;
@@ -162,9 +167,6 @@ public sealed class PrologueDirector : MonoBehaviour
                 nextRumble += 18f;
             }
         }
-        if (statusLabel != null)
-            statusLabel.text = chapter == null ? "" : chapter.StatusText +
-                (step == PrologueStep.HoldPortal ? "\n" + RaidStats.FormatTime(SecondsRemaining) : "");
     }
 
     private void RefreshStep(bool restoring)
@@ -172,6 +174,7 @@ public sealed class PrologueDirector : MonoBehaviour
         PrologueChapter next = definition.Chapter(GameSession.Quests);
         bool active = next != null && GameSession.Quests.StatusOf(next.Quest) != QuestStatus.NotStarted;
         if (!restoring && next == chapter && chapterActive == active) return;
+        if (chapter != null) QuestTimers.Clear(chapter.Quest);
         chapter = next;
         chapterActive = active;
         step = chapter != null ? chapter.Behaviour : PrologueStep.Finished;
@@ -189,7 +192,9 @@ public sealed class PrologueDirector : MonoBehaviour
             MovePlayer(step >= PrologueStep.ActivatePortal ? portalPoint
                 : step >= PrologueStep.GatherFuel ? campPoint : startPoint);
         if (chapterActive && chapter.Quest.Start != QuestStart.ByQuestGiver && !string.IsNullOrWhiteSpace(chapter.ArrivalText))
-            GameMessages.Post(chapter.ArrivalText);
+            Speak(chapter.ArrivalText);
+        if (chapterActive && chapter.Duration > 0f)
+            QuestTimers.Set(chapter.Quest, chapter.Duration);
         if (chapterActive && step == PrologueStep.DefendCamp)
         {
             Spawn(campSpawns, chapter.InitialEnemies);
@@ -210,6 +215,29 @@ public sealed class PrologueDirector : MonoBehaviour
         }
         if (CanSave && !SaveGameService.TrySave(out string problem))
             GameMessages.Post("Prologue checkpoint could not be saved: " + problem, MessageKind.Warning);
+    }
+
+    // "Runa: Wolves!" is said by Runa; a line without a name by the leader.
+    private void Speak(string text)
+    {
+        PrologueCompanion speaker = null;
+        int colon = text.IndexOf(':');
+        if (colon > 0 && colon < 16)
+        {
+            string name = text.Substring(0, colon).Trim();
+            speaker = System.Array.Find(companions, c => c != null && c.Resident != null && c.Resident.DisplayName == name);
+            if (speaker != null) text = text.Substring(colon + 1).Trim();
+        }
+
+        if (speaker == null && definition.Leader != null)
+            speaker = System.Array.Find(companions, c => c != null && c.isActiveAndEnabled && c.Resident == definition.Leader);
+        if (speaker == null)
+        {
+            GameMessages.Post(text);
+            return;
+        }
+
+        DialogueBox.Current.Say(new DialogueSpeaker(speaker.Resident.DisplayName, speaker.transform, null, definition.DialogueCameraDistance), text);
     }
 
     private void OnGameEvent(GameEvent gameEvent)
@@ -295,6 +323,7 @@ public sealed class PrologueDirector : MonoBehaviour
             return;
         }
         ending = true;
+        if (chapter != null) QuestTimers.Clear(chapter.Quest);
         StartCoroutine(EndSequence(overwhelmed));
     }
 
