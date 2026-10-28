@@ -211,6 +211,13 @@ All CC0 (free for any use, no credit needed; see `Models/PolyHaven/LICENSE.md`),
 
 Safe Haven › World › **Set Up World Assets** remakes anything missing (existing assets are kept).
 
+**Safe Haven** is made with it too (`AgentScripts/BuildHavenWorld.cs`): one 400 m terrain round the Heart Tree in the
+Haven look, a flat clearing, hills rolling outward and the land rising north to a crag (*North Crag*), a Haven river
+past the east of the base (the drinking spot on its bank), two Haven paths (up the slope from the portal, east over a
+ford) and four Haven groves round the clearing. Edit them under **World** in the scene. After changing the ground,
+bake the NavMesh with its Bake button (a script uses `HavenNavMesh.Bake`, which keeps the data in its own asset:
+NavMesh data inside a scene makes Unity save the whole scene as binary).
+
 A demo: **Scenes/Demo/WorldBuilderDemo** (a river falling over a cliff, a ford, an outcrop and a dark forest).
 `AgentScripts/WorldDemo.cs` rebuilds it.
 
