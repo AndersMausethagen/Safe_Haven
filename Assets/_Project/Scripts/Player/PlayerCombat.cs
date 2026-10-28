@@ -301,9 +301,9 @@ public sealed class PlayerCombat : MonoBehaviour
 
     private void OnAttackPressed()
     {
-        if (weapon != null && weapon.IsBow)
+        if (weapon != null && weapon.TakesAttackInput)
         {
-            return; // PlayerArchery draws and shoots
+            return; // PlayerArchery draws and shoots; PlayerFishing casts
         }
 
         if (guard != null && guard.IsGuarding)
@@ -340,7 +340,7 @@ public sealed class PlayerCombat : MonoBehaviour
 
     private void OnAttackReleased()
     {
-        if (pressTime < 0f || weapon != null && weapon.IsBow)
+        if (pressTime < 0f || weapon != null && weapon.TakesAttackInput)
         {
             return;
         }

@@ -14,6 +14,8 @@ public sealed class WaterSurface : MonoBehaviour
 {
     [Tooltip("Ponds and rivers: the player and stones make ripples and splashes on it. Off for waterfalls.")]
     [SerializeField] private bool takesRipples = true;
+    [Tooltip("A pond or lake: other fish bite, and something old waits in the deep (fishing).")]
+    [SerializeField] private bool still;
     [Tooltip("How far below the surface something still counts as in the water (metres), e.g. the feet of a wading player.")]
     [SerializeField, Min(0f)] private float depth = 2f;
     [Tooltip("Spline rivers (written by the World Builder): the surface's centre line in local space, xyz = a point on " +
@@ -85,6 +87,28 @@ public sealed class WaterSurface : MonoBehaviour
 
     /// <summary>Every enabled water surface.</summary>
     public static IReadOnlyList<WaterSurface> Surfaces => All;
+
+    /// <summary>Still water (a pond, a tarn) rather than a river.</summary>
+    public bool IsStill
+    {
+        get => still;
+        set => still = value;
+    }
+
+    /// <summary>The water at a point, if any (within reach of its edge), with its surface height.</summary>
+    public static WaterSurface At(Vector3 point, float reach, out float height)
+    {
+        height = 0f;
+        foreach (WaterSurface surface in All)
+        {
+            if (surface != null && surface.Contains(point, reach, out height))
+            {
+                return surface;
+            }
+        }
+
+        return null;
+    }
 
     public bool Contains(Vector3 point, float reach, out float height)
     {

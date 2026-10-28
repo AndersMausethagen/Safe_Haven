@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8bc49664ac533524f8d9a2bfd443f4fa, type: 3}
+  m_Name: FishingRod
+  m_EditorClassIdentifier: Assembly-CSharp::WeaponDefinition
+  displayName: Fishing Rod
+  stance: 1
+  kind: 3
+  damage: 2
+  basicAttack: {fileID: 11400000, guid: a7b6140013b6a534fac54896856f7660, type: 2}
+  combo:
+  - {fileID: 11400000, guid: a7b6140013b6a534fac54896856f7660, type: 2}
+  - {fileID: 11400000, guid: 2bb886f084a65db46be3e113eac1044b, type: 2}
+  - {fileID: 11400000, guid: 72952aea0799d8f4293ae88df456eb20, type: 2}
+  heavyAttack: {fileID: 11400000, guid: c27b7f4b0e8770b468650d183df959b8, type: 2}
+  counterAttack: {fileID: 11400000, guid: 46f9dbd915280b241b67edb6b238f24f, type: 2}
+  guardLetThrough: 0.35
+  drawSeconds: 1
+  reloadSeconds: 0.6
+  arrowSpeed: 32
+  spread: 1.5
+  minimumDraw: 0.25
+  drawMoveSpeed: 0.55
+  perfectReleaseSeconds: 0.2
+  perfectReleaseDamage: 1.25
+  aimSpread: 0.5
+  counterShotDamage: 0.6
+  shotAttack: {fileID: 0}
+  drawSound: {fileID: 0}
+  swingSound: {fileID: 0}
+  hitSound: {fileID: 0}

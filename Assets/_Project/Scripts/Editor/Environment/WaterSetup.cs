@@ -408,8 +408,10 @@ public static class WaterSetup
     /// edge; outside the water nothing changes. When the bed would go below the terrain's lowest possible height, the
     /// whole terrain is lowered and its heights raised by the same amount first, so the ground stays where it is.
     /// With <paramref name="bedLayer"/> (one of the terrain's layers) the bed is painted with it, fading out up the
-    /// banks. Undoable. Returns the number of height samples changed.</summary>
-    public static int Carve(Terrain terrain, Transform water, float depth, float bank, TerrainLayer bedLayer = null)
+    /// banks. With <paramref name="oval"/> the bed is a slightly uneven oval inside the bounds (a natural pond or tarn:
+    /// lay the water a little below the ground and only the oval shows). Undoable. Returns the number of height samples
+    /// changed.</summary>
+    public static int Carve(Terrain terrain, Transform water, float depth, float bank, TerrainLayer bedLayer = null, bool oval = false)
     {
         var filter = water.GetComponent<MeshFilter>();
         if (terrain == null || filter == null || filter.sharedMesh == null)
@@ -452,6 +454,15 @@ public static class WaterSetup
         float Signed(float worldX, float worldZ)
         {
             Vector3 p = water.InverseTransformPoint(new Vector3(worldX, top, worldZ)) - centre;
+            if (oval)
+            {
+                float ex = local.extents.x * Mathf.Abs(scale.x), ez = local.extents.z * Mathf.Abs(scale.z);
+                float nx = p.x * Mathf.Abs(scale.x) / ex, nz = p.z * Mathf.Abs(scale.z) / ez;
+                float angle = Mathf.Atan2(nz, nx);
+                float wobble = 1f + 0.07f * Mathf.Sin(angle * 3f + 1.3f) + 0.04f * Mathf.Sin(angle * 7f);
+                return (Mathf.Sqrt(nx * nx + nz * nz) / wobble - 1f) * Mathf.Min(ex, ez);
+            }
+
             float dx = (Mathf.Abs(p.x) - local.extents.x) * Mathf.Abs(scale.x);
             float dz = (Mathf.Abs(p.z) - local.extents.z) * Mathf.Abs(scale.z);
             return new Vector2(Mathf.Max(dx, 0f), Mathf.Max(dz, 0f)).magnitude + Mathf.Min(Mathf.Max(dx, dz), 0f);

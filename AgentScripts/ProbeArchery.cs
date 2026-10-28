@@ -129,9 +129,8 @@ public static class ProbeArchery
     /// <summary>Plays <paramref name="scene"/> without opening it (the open scene and its unsaved changes stay as they are).</summary>
     public static string PlayIn(string scene)
     {
-        EditorSceneManager.playModeStartScene = AssetDatabase.LoadAssetAtPath<SceneAsset>(scene);
-        EditorApplication.EnterPlaymode();
-        return "entering play in " + scene;
+        // TemporaryPlayScene clears the start scene again when Play mode ends, however it is stopped.
+        return TemporaryPlayScene.Play(scene) ? "entering play in " + scene : "could not play " + scene;
     }
 
     public static string StopAndForget()

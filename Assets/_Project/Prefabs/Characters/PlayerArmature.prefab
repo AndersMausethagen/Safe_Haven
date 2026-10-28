@@ -2600,6 +2600,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 4416926081852918481, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3284753492103805021}
+    - targetCorrespondingSourceObject: {fileID: 4416926081852918481, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1926680673806028005}
   m_SourcePrefab: {fileID: 100100000, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
 --- !u!1 &5943822763764690748 stripped
 GameObject:
@@ -3176,6 +3179,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 275fb34f35595fb4182df79626ea27cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: SafeHaven::PlayerTalents
+--- !u!114 &1926680673806028005
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5943822763764690748}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa7ca03bc00162841acff9eecff839c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::PlayerFishing
 --- !u!4 &6428716820787852678 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3893294197879345259, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}

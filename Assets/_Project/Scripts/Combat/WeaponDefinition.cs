@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum WeaponKind { Melee = 0, Torch = 1, Bow = 2 }
+public enum WeaponKind { Melee = 0, Torch = 1, Bow = 2, FishingRod = 3 }
 
 /// <summary>
 /// A weapon the player can hold. It sets the animation stance, how much damage it carries and its attacks: the combo
@@ -72,6 +72,9 @@ public sealed class WeaponDefinition : ScriptableObject
     public WeaponStance Stance => stance;
     public WeaponKind Kind => kind;
     public bool IsBow => kind == WeaponKind.Bow;
+    public bool IsFishingRod => kind == WeaponKind.FishingRod;
+    /// <summary>The attack and guard buttons belong to the weapon's own use (PlayerArchery, PlayerFishing), not to swings.</summary>
+    public bool TakesAttackInput => kind == WeaponKind.Bow || kind == WeaponKind.FishingRod;
     public float DrawSeconds => Mathf.Max(0.1f, drawSeconds);
     public float ReloadSeconds => Mathf.Max(0f, reloadSeconds);
     public float ArrowSpeed => Mathf.Max(1f, arrowSpeed);

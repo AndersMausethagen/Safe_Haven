@@ -1,0 +1,62 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2dfa92d2333ed524ba180408fa0c3465, type: 3}
+  m_Name: FishingSettings
+  m_EditorClassIdentifier: SafeHaven::FishingSettings
+  minimumCast: 3
+  maximumCast: 12
+  chargeSeconds: 1.2
+  biteWait: {x: 5, y: 14}
+  strikeWindow: 1.1
+  zoneSize: 0.28
+  zoneLift: 2.6
+  zoneFall: 2.2
+  catchFill: 0.32
+  catchDrain: 0.15
+  fish:
+  - item: {fileID: 11400000, guid: 0318e752045b5e54f87bb7ba2814fb8e, type: 2}
+    weight: 3
+    water: 1
+    fight: 0.35
+    size: {x: 0.3, y: 1.4}
+  - item: {fileID: 11400000, guid: 1deba4cfdd0cc854ba9f9d3fa96aacd9, type: 2}
+    weight: 4
+    water: 0
+    fight: 0.2
+    size: {x: 0.2, y: 0.8}
+  - item: {fileID: 11400000, guid: 389ceb339c3db65489b99ee795eac79c, type: 2}
+    weight: 1.5
+    water: 2
+    fight: 0.75
+    size: {x: 1.5, y: 6}
+  - item: {fileID: 11400000, guid: c21953f6b8b2a344fab83a50731723fa, type: 2}
+    weight: 0.8
+    water: 2
+    fight: 0.55
+    size: {x: 0.5, y: 2.5}
+  bait:
+  - item: {fileID: 11400000, guid: 10c81a33462696a469286ca0416bb78e, type: 2}
+    lure: 1.4
+  - item: {fileID: 11400000, guid: d799dc8161ff2854dae1eedf4b74fb09, type: 2}
+    lure: 0.8
+  nokkenChance: 0.06
+  nokkenPresses: 14
+  nokkenSeconds: 7
+  nokkenDamagePerSecond: 3
+  nokkenWinsDamage: 0.35
+  nokkenModel: {fileID: 1361258407523271697, guid: 280a30c33cf4c3444a326b93e937de36, type: 3}
+  nokkenScream: {fileID: 11400000, guid: 6510718f5af764e4aa78349c4b3f7cdf, type: 2}
+  nokkenSplash: {fileID: 11400000, guid: 5b92b167e5b591449b2fcd212c1db02b, type: 2}
+  metNokken: {fileID: 11400000, guid: 59322588444ffdc4189d97bdc8cd89cd, type: 2}
+  castSound: {fileID: 11400000, guid: e3702f94155b6bc42b71a0d0872c141d, type: 2}
+  biteSound: {fileID: 11400000, guid: 5b92b167e5b591449b2fcd212c1db02b, type: 2}
+  catchSound: {fileID: 11400000, guid: 267e4afb23133494087d8d9ce98fe7e4, type: 2}

@@ -218,6 +218,19 @@ building and its levels, a second of a kind counts half, cleared overgrowth, res
 Heart Tree) celebrates each `HavenSettings` rank once and records it in `SettlementState.HavenRank`, which widens the
 ward (`HeartTree.WardRadius`; the moss spreads out to the new edge). Content is built by `AgentScripts/BuildHaven.cs`.
 
+### Fishing and the Nøkken
+
+A Fishing Rod is a weapon of kind Fishing Rod (`WeaponDefinition.TakesAttackInput`, like the bow), so `PlayerFishing`
+owns the attack and guard buttons while it is held: hold to swing back, let go to cast at the cursor (one bait from the
+bag, best first: Grubs from rotten logs and stumps, or Berries), wait for the float to go under, strike, then the
+reeling game (`ReelSession`, plain C#: keep the catch zone on the darting fish until the catch fills). Which fish bite
+where (`WaterSurface.IsStill`: the Safe Haven tarn; rivers flow), bait, timings and the Nøkken are in
+`Resources/FishingSettings`. In still water a struck bite can be the Nøkken (`NokkenEncounter`): it rises at the water's
+edge, the camera closes in, it drags the player towards the deep and hurts them until Space is hammered enough (or it
+wins and takes a third of their health); the first meeting raises Met The Nøkken. `FishingHud` draws it all. Content:
+`AgentScripts/BuildFishing.cs`. Editor scripts that play a scene without opening it use `TemporaryPlayScene.Play`, which
+clears Unity's play mode start scene again whenever Play mode ends.
+
 ### Levels and talents
 
 `GameSession.Progress` (`CharacterProgress`, plain C#) owns the level, experience towards the next level, talent ranks

@@ -22,6 +22,11 @@ MonoBehaviour:
       minQuantity: 2
       maxQuantity: 3
       probability: 1
+    - item: {fileID: 11400000, guid: 10c81a33462696a469286ca0416bb78e, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 3
+      probability: 0.8
   gatherTool: 1
   requiredToolTier: 1
   gatherAnimation: 5
