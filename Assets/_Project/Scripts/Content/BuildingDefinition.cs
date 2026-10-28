@@ -1,5 +1,30 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
+
+/// <summary>
+/// One upgrade of a building (level 2, 3, ...): what it costs, how long it is hammered, and what it brings: renown for
+/// Safe Haven, a faster and bigger crafting station, more storage. Each level also adds visible dressing to the
+/// building (Construction).
+/// </summary>
+[Serializable]
+public sealed class BuildingLevel
+{
+    [Tooltip("Shown before the building's name, e.g. \"Sturdy\" Sawbench.")]
+    public string title = "Sturdy";
+    [TextArea(1, 3)] public string description;
+    public List<ItemAmount> cost = new List<ItemAmount>();
+    [Tooltip("Seconds of hammering at the scaffold.")]
+    [Min(0f)] public float work = 6f;
+    [Tooltip("Renown added to Safe Haven on top of the building's own.")]
+    [Min(0)] public int renown = 4;
+    [Tooltip("Share faster a crafting station works. 0.25 means 25% faster. Levels add up.")]
+    [Min(0f)] public float craftSpeed;
+    [Min(0)] public int extraQueue;
+    [Min(0)] public int extraOutput;
+    [Tooltip("Extra stash slots for storage (chests, sheds).")]
+    [Min(0)] public int extraStorage;
+}
 
 /// <summary>
 /// Authored data for a kind of building: identity, how it looks in menus, its combat stats and what it costs to build.
@@ -56,6 +81,14 @@ public sealed class BuildingDefinition : ScriptableObject
     [Tooltip("How many crafts can wait in the station's queue, including the one being made.")]
     [SerializeField, Min(1)] private int queueLength = CraftingStation.DefaultQueueLength;
 
+    [Header("Building Up")]
+    [Tooltip("Seconds of hammering to put it up (hold E at its scaffold). 0: it stands at once (campfires, torches, walls).")]
+    [SerializeField, Min(0f)] private float buildWork;
+    [Tooltip("Renown it brings Safe Haven once built (HavenRenown). Each more of the same kind brings half as much.")]
+    [SerializeField, Min(0)] private int renown = 5;
+    [Tooltip("Upgrades, in order: level 2, level 3, ...")]
+    [SerializeField] private List<BuildingLevel> upgrades = new List<BuildingLevel>();
+
     [Header("Sound")]
     [Tooltip("Plays when it is destroyed. Empty uses the structure default from Audio Settings.")]
     [SerializeField] private SoundDefinition deathSound;
@@ -79,4 +112,20 @@ public sealed class BuildingDefinition : ScriptableObject
     public int OutputCapacity => Mathf.Max(1, outputCapacity);
     public int QueueLength => Mathf.Max(1, queueLength);
     public SoundDefinition DeathSound => deathSound;
+    public float BuildWork => buildWork;
+    public int Renown => renown;
+    public IReadOnlyList<BuildingLevel> Upgrades => upgrades;
+    /// <summary>The highest level: 1 plus the upgrades.</summary>
+    public int MaxLevel => 1 + upgrades.Count;
+
+    /// <summary>The upgrade that reaches <paramref name="level"/> (2 or more), or null.</summary>
+    public BuildingLevel UpgradeTo(int level) => level >= 2 && level - 2 < upgrades.Count ? upgrades[level - 2] : null;
+
+    /// <summary>Sets up how it is built and upgraded (editor tools and tests).</summary>
+    public void ConfigureBuildingUp(float work, int renownValue, IEnumerable<BuildingLevel> levels)
+    {
+        buildWork = Mathf.Max(0f, work);
+        renown = Mathf.Max(0, renownValue);
+        upgrades = new List<BuildingLevel>(levels);
+    }
 }

@@ -18,6 +18,7 @@ GameObject:
   - component: {fileID: 7808011021100657923}
   - component: {fileID: 6389527268772469217}
   - component: {fileID: 5858454304245219569}
+  - component: {fileID: 649737005222528546}
   m_Layer: 0
   m_Name: Sawbench
   m_TagString: Untagged
@@ -196,6 +197,19 @@ MonoBehaviour:
   cancelled:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &649737005222528546
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2057275120005155185}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8b1e3484b4dcf94bb2a28630c5d9946, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::Construction
+  startsRuined: 0
 --- !u!1001 &5354192547165794795
 PrefabInstance:
   m_ObjectHideFlags: 0

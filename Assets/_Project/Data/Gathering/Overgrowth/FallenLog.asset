@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2bdc7bfe8797f544855a0ab7846c453, type: 3}
+  m_Name: FallenLog
+  m_EditorClassIdentifier: SafeHaven::GatheringNodeDefinition
+  id: overgrowth_fallenlog
+  displayName: Fallen Log
+  tier: 1
+  yields:
+    entries:
+    - item: {fileID: 11400000, guid: 8ae2883815327b74fa7975309c803f92, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 2
+      maxQuantity: 3
+      probability: 1
+  gatherTool: 1
+  requiredToolTier: 1
+  gatherAnimation: 5
+  gatherSeconds: 3
+  swings: 3
+  swingSpeed: 1
+  gatherRange: 1.8
+  depleteOnGather: 1
+  respawnSeconds: 0
+  feedback: {fileID: 11400000, guid: 5c06cdc7d2e3557468f3fdeb64576beb, type: 2}
+  worldModelPrefab: {fileID: 5035752482725312658, guid: 61758a9f84bb750488971937b21e2e86, type: 3}
+  worldPrefab: {fileID: 2635725661611749432, guid: 490127f00d1dad143b56c0e7399a7110, type: 3}
+  modelVariants:
+  - {fileID: 5035752482725312658, guid: 61758a9f84bb750488971937b21e2e86, type: 3}
+  - {fileID: 1837494934203422482, guid: 10ee0a94545bc4446a0bde7f3e1cdb47, type: 3}
+  variantScale: {x: 0.9, y: 1.1}

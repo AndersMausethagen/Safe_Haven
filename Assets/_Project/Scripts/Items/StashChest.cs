@@ -25,7 +25,11 @@ public sealed class StashChest : MonoBehaviour
     private Interactable interactable;
 
     /// <summary>Stash slots this chest gives room for (all of them for 0).</summary>
-    public int StashSlots => stashSlots > 0 ? Mathf.Min(stashSlots, StashStorage.Columns * StashStorage.Rows) : StashStorage.Columns * StashStorage.Rows;
+    public int StashSlots => Mathf.Min(StashStorage.Columns * StashStorage.Rows,
+        (stashSlots > 0 ? stashSlots : StashStorage.Columns * StashStorage.Rows) + Mathf.RoundToInt(Upgraded));
+
+    // Upgrades (Construction) add stash slots.
+    private float Upgraded => TryGetComponent(out Construction construction) ? construction.Sum(level => level.extraStorage) : 0f;
 
     /// <summary>The stash slots the chests standing now give room for: the biggest one's; -1 with no chest.</summary>
     public static int SlotsStanding()
@@ -33,7 +37,11 @@ public sealed class StashChest : MonoBehaviour
         int most = -1;
         foreach (StashChest chest in standing)
         {
-            most = Mathf.Max(most, chest.StashSlots);
+            // A chest still being built (or a ruin) holds nothing yet.
+            if (!chest.TryGetComponent(out Construction construction) || construction.IsStanding)
+            {
+                most = Mathf.Max(most, chest.StashSlots);
+            }
         }
 
         return most;
@@ -48,6 +56,7 @@ public sealed class StashChest : MonoBehaviour
     {
         interactable.Completed.AddListener(OnUsed);
         standing.Add(this);
+        Construction.Finished += OnUpgraded;
         RefreshStash();
     }
 
@@ -55,7 +64,16 @@ public sealed class StashChest : MonoBehaviour
     {
         interactable.Completed.RemoveListener(OnUsed);
         standing.Remove(this);
+        Construction.Finished -= OnUpgraded;
         RefreshStash();
+    }
+
+    private void OnUpgraded(Construction upgraded)
+    {
+        if (upgraded.gameObject == gameObject)
+        {
+            RefreshStash();
+        }
     }
 
     // Away from home (no chest standing) the stash keeps its size: it can't be opened there anyway.

@@ -41,6 +41,9 @@ public sealed class SettlementState
 
     public bool PortalRepaired { get; private set; }
     public int WardLevel { get; private set; }
+
+    /// <summary>The highest Haven rank reached (HavenSettings): it never drops, so the ward it grew stays grown.</summary>
+    public int HavenRank { get; private set; }
     public int SuccessfulExtractions { get; private set; }
     public BreachStatus Breach { get; private set; }
     public IReadOnlyList<ResidentRecord> Residents => residents;
@@ -161,6 +164,19 @@ public sealed class SettlementState
         }
 
         return finished;
+    }
+
+    /// <summary>Records a Haven rank reached; lower ranks than the best so far are ignored.</summary>
+    public bool ReachHavenRank(int rank)
+    {
+        if (rank <= HavenRank)
+        {
+            return false;
+        }
+
+        HavenRank = rank;
+        Changed?.Invoke();
+        return true;
     }
 
     /// <summary>Puts back saved state. Used by SaveMapper only.</summary>

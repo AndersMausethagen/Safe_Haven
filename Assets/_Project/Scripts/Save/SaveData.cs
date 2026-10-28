@@ -47,6 +47,8 @@ public sealed class SettlementSaveData
 {
     public bool portalRepaired;
     public int wardLevel;
+    /// <summary>Highest Haven rank reached. 0 in older saves.</summary>
+    public int havenRank;
     public int successfulExtractions;
     /// <summary>A BreachStatus.</summary>
     public int breach;

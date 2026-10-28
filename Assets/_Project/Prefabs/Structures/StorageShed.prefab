@@ -18,6 +18,7 @@ GameObject:
   - component: {fileID: 2813291349044586580}
   - component: {fileID: 4864007411741167405}
   - component: {fileID: 1696432620605292310}
+  - component: {fileID: 1514811901155397273}
   m_Layer: 0
   m_Name: StorageShed
   m_TagString: Untagged
@@ -195,6 +196,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::StashChest
   window: {fileID: 0}
   windowRange: 4
+  stashSlots: 0
+--- !u!114 &1514811901155397273
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3831839064812491060}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8b1e3484b4dcf94bb2a28630c5d9946, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::Construction
+  startsRuined: 0
 --- !u!1001 &2926729782532158187
 PrefabInstance:
   m_ObjectHideFlags: 0

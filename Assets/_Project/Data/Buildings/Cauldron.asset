@@ -34,4 +34,33 @@ MonoBehaviour:
   station: 4
   outputCapacity: 10
   queueLength: 5
+  buildWork: 5
+  renown: 6
+  upgrades:
+  - title: Sturdy
+    description: A hook to hang herbs to dry.
+    cost:
+    - item: {fileID: 11400000, guid: 8ae2883815327b74fa7975309c803f92, type: 2}
+      amount: 6
+    - item: {fileID: 11400000, guid: b5567f7d75200bd46befbd1dab298f36, type: 2}
+      amount: 6
+    work: 8
+    renown: 4
+    craftSpeed: 0.3
+    extraQueue: 0
+    extraOutput: 0
+    extraStorage: 0
+  - title: Master's
+    description: A cook's shelf of spices from far away.
+    cost:
+    - item: {fileID: 11400000, guid: a370187223419a048b6cebe8f7e345a3, type: 2}
+      amount: 6
+    - item: {fileID: 11400000, guid: 8cf878eb4a61eb943917a1f9421bb40a, type: 2}
+      amount: 2
+    work: 9
+    renown: 6
+    craftSpeed: 0.3
+    extraQueue: 2
+    extraOutput: 0
+    extraStorage: 0
   deathSound: {fileID: 0}

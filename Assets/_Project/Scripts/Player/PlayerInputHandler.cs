@@ -34,6 +34,7 @@ public sealed class PlayerInputHandler : MonoBehaviour
     private InputAction arrowAction;
     private InputAction torchAction;
     private InputAction talentsAction;
+    private InputAction havenAction;
     private PlayerStealth stealth;
     private PlayerEquipment equipment;
     private readonly InputAction[] skillActions = new InputAction[SkillLoadout.SlotCount];
@@ -141,6 +142,7 @@ public sealed class PlayerInputHandler : MonoBehaviour
         yield return arrowAction;
         yield return torchAction;
         yield return talentsAction;
+        yield return havenAction;
         foreach (InputAction action in skillActions)
         {
             yield return action;
@@ -236,6 +238,7 @@ public sealed class PlayerInputHandler : MonoBehaviour
         arrowAction?.Dispose();
         torchAction?.Dispose();
         talentsAction?.Dispose();
+        havenAction?.Dispose();
         foreach (InputAction action in skillActions)
         {
             action?.Dispose();
@@ -317,6 +320,9 @@ public sealed class PlayerInputHandler : MonoBehaviour
         talentsAction = new InputAction("Talents", InputActionType.Button);
         talentsAction.AddBinding("<Keyboard>/n");
 
+        havenAction = new InputAction("Haven", InputActionType.Button);
+        havenAction.AddBinding("<Keyboard>/h");
+
         for (int i = 0; i < skillActions.Length; i++)
         {
             var action = new InputAction("Skill" + (i + 1), InputActionType.Button);
@@ -349,6 +355,10 @@ public sealed class PlayerInputHandler : MonoBehaviour
         arrowAction.performed += _ => stateMachine.RequestArrowCycle();
         torchAction.performed += _ => equipment?.ToggleTorch();
         talentsAction.performed += _ => RequestWindow(UIWindowId.Talents);
+        havenAction.performed += _ =>
+        {
+            if (HeartTree.Current != null) HeartTree.Current.OpenHaven(gameObject);
+        };
         for (int i = 0; i < skillActions.Length; i++)
         {
             int slot = i;

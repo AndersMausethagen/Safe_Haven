@@ -144,6 +144,7 @@ GameObject:
   - component: {fileID: 7281727314402313437}
   - component: {fileID: 2739863785985149535}
   - component: {fileID: 7010370737702096850}
+  - component: {fileID: 8616385251098900437}
   m_Layer: 0
   m_Name: Torch
   m_TagString: Untagged
@@ -301,6 +302,19 @@ MonoBehaviour:
   revealRadius: 12
   followsWard: 0
   isLight: 1
+--- !u!114 &8616385251098900437
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2858870712050343428}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8b1e3484b4dcf94bb2a28630c5d9946, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::Construction
+  startsRuined: 0
 --- !u!1001 &2218266730917395056
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -18,6 +18,7 @@ GameObject:
   - component: {fileID: 8887040786340553995}
   - component: {fileID: 8084618751595307552}
   - component: {fileID: 6416467867322952086}
+  - component: {fileID: 3798446431626645260}
   m_Layer: 0
   m_Name: PurificationAltar
   m_TagString: Untagged
@@ -194,6 +195,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PurificationAltar
   menuRange: 6
+--- !u!114 &3798446431626645260
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6037293471147771744}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8b1e3484b4dcf94bb2a28630c5d9946, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::Construction
+  startsRuined: 0
 --- !u!1001 &4725953703355215939
 PrefabInstance:
   m_ObjectHideFlags: 0

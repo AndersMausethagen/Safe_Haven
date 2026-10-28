@@ -34,4 +34,18 @@ MonoBehaviour:
   station: 6
   outputCapacity: 10
   queueLength: 5
+  buildWork: 0
+  renown: 3
+  upgrades:
+  - title: Stone Hearth
+    description: A ring of stones that holds the heat.
+    cost:
+    - item: {fileID: 11400000, guid: b5567f7d75200bd46befbd1dab298f36, type: 2}
+      amount: 6
+    work: 7.5
+    renown: 3
+    craftSpeed: 0.25
+    extraQueue: 0
+    extraOutput: 0
+    extraStorage: 0
   deathSound: {fileID: 0}

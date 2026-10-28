@@ -69,6 +69,8 @@ public sealed class BuildPlacer : MonoBehaviour
     private BuildingDefinition placing;
     private BuildingObject moving;
     private bool picking;
+    // Picking a building to upgrade or repair rather than to move.
+    private bool upgrading;
     private Bounds localBounds;
     private MaterialPropertyBlock block;
     private float yaw;
@@ -189,7 +191,11 @@ public sealed class BuildPlacer : MonoBehaviour
         }
 
         if (Expedition == null)
-            page.Add(new MenuAction("Move a building", "Pick up something you built and place it again, for free", true, BeginPicking, closesMenu: true));
+        {
+            page.Add(new MenuAction("Upgrade or repair a building", "Make something you built better, or bring a ruin back", true,
+                () => BeginPicking(true), closesMenu: true));
+            page.Add(new MenuAction("Move a building", "Pick up something you built and place it again, for free", true, () => BeginPicking(false), closesMenu: true));
+        }
         return page;
     }
 
@@ -222,12 +228,65 @@ public sealed class BuildPlacer : MonoBehaviour
         GameMessages.Post(hint.ToString());
     }
 
-    private void BeginPicking()
+    private void BeginPicking(bool toUpgrade)
     {
         Cancel();
         picking = true;
+        upgrading = toUpgrade;
         IsBusy = true;
-        GameMessages.Post("Click a building to move it. Right-click to cancel.");
+        GameMessages.Post(toUpgrade ? "Click a building to upgrade or repair it. Right-click to cancel." : "Click a building to move it. Right-click to cancel.");
+    }
+
+    // The next level of a building: what it costs and brings, and a button to order it (the scaffold goes up).
+    private void ShowUpgrade(BuildingObject building)
+    {
+        if (!building.TryGetComponent(out Construction construction))
+        {
+            GameMessages.Post($"The {building.Definition.DisplayName} can't be upgraded.", MessageKind.Warning);
+            return;
+        }
+
+        if (construction.IsBuilding)
+        {
+            GameMessages.Post(construction.Paid ? $"The {building.Definition.DisplayName} is waiting for you: hold E at its scaffold."
+                : $"Walk up to the {building.Definition.DisplayName} and hold E to repair it.");
+            return;
+        }
+
+        BuildingLevel next = building.Definition.UpgradeTo(construction.Level + 1);
+        if (next == null)
+        {
+            GameMessages.Post($"The {construction.Title} is as good as it gets.");
+            return;
+        }
+
+        ActionMenuWindow menu = ActionMenuWindow.Current;
+        if (menu == null)
+        {
+            return;
+        }
+
+        menu.Open(() => UpgradePage(building, construction, next), gameObject);
+    }
+
+    private MenuPage UpgradePage(BuildingObject building, Construction construction, BuildingLevel next)
+    {
+        var bonuses = new List<string>();
+        if (next.craftSpeed > 0f) bonuses.Add($"works {next.craftSpeed * 100f:0}% faster");
+        if (next.extraQueue > 0) bonuses.Add($"+{next.extraQueue} queue");
+        if (next.extraOutput > 0) bonuses.Add($"+{next.extraOutput} output");
+        if (next.extraStorage > 0) bonuses.Add($"+{next.extraStorage} storage slots");
+        bonuses.Add($"+{next.renown} renown");
+        var page = new MenuPage
+        {
+            Title = $"{next.title} {building.Definition.DisplayName}",
+            Body = $"Level {construction.Level + 1} of {building.Definition.MaxLevel}. {next.description}\n<color=#8BE08B>{string.Join(", ", bonuses)}</color>",
+        };
+        bool affordable = MaterialPool.For(gameObject).CanAfford(System.Array.Empty<ResourceAmount>(), next.cost, out string missing);
+        string cost = AmountText.Describe(next.cost);
+        page.Add(new MenuAction("Upgrade", affordable ? cost : $"{cost}   <color=#FF7B6B>{missing}</color>", affordable,
+            () => construction.TryOrderUpgrade(gameObject), closesMenu: true));
+        return page;
     }
 
     private void Update()
@@ -343,6 +402,19 @@ public sealed class BuildPlacer : MonoBehaviour
         }
 
         BuildingObject building = hit.collider.GetComponentInParent<BuildingObject>();
+        if (upgrading)
+        {
+            if (building == null || building.Definition == null)
+            {
+                GameMessages.Post("Click one of your buildings.", MessageKind.Warning);
+                return;
+            }
+
+            Cancel();
+            ShowUpgrade(building);
+            return;
+        }
+
         if (building == null || building.Definition == null || !building.Definition.ShowInBuildMenu)
         {
             GameMessages.Post("That can't be moved.", MessageKind.Warning);
@@ -645,13 +717,22 @@ public sealed class BuildPlacer : MonoBehaviour
         }
 
         BuildingDefinition building = placing;
-        if (!Build(building, point, rotation))
+        GameObject placed = Build(building, point, rotation);
+        if (placed == null)
         {
             return;
         }
 
-        GameMessages.Post($"Built the {building.DisplayName}.", MessageKind.Gain);
-        GameEvents.Raise(new GameEvent(GameEventKind.Built, building, 1, gameObject));
+        if (placed.TryGetComponent(out Construction construction) && construction.IsBuilding)
+        {
+            GameMessages.Post($"The scaffold for the {building.DisplayName} is up. Hold E at it to build.");
+        }
+        else
+        {
+            GameMessages.Post($"Built the {building.DisplayName}.", MessageKind.Gain);
+            GameEvents.Raise(new GameEvent(GameEventKind.Built, building, 1, gameObject));
+        }
+
         Cancel();
     }
 
@@ -672,7 +753,7 @@ public sealed class BuildPlacer : MonoBehaviour
                 continue;
             }
 
-            if (!Build(building, piece.Root.transform.position, piece.Root.transform.rotation))
+            if (Build(building, piece.Root.transform.position, piece.Root.transform.rotation) == null)
             {
                 break;
             }
@@ -692,29 +773,29 @@ public sealed class BuildPlacer : MonoBehaviour
         Cancel();
     }
 
-    // Pays and places one building. False when it can't be paid for.
-    private bool Build(BuildingDefinition building, Vector3 position, Quaternion rotation)
+    // Pays and places one building: a scaffold to hammer up when its kind takes work (Construction). Null when it can't
+    // be paid for.
+    private GameObject Build(BuildingDefinition building, Vector3 position, Quaternion rotation)
     {
         if (Expedition != null && (!Expedition.CanBuild || building != Expedition.Definition.Campfire))
         {
             GameMessages.Post("Only the expedition's campfire can be built here, when the leader asks for it.", MessageKind.Warning);
-            return false;
+            return null;
         }
         if (!MaterialPool.For(gameObject).TrySpend(building.ConstructionCost, building.ConstructionItems))
         {
-            return false;
+            return null;
         }
 
-        if (building.Prefab.TryGetComponent(out SaveableEntity saveable))
+        GameObject placed = building.Prefab.TryGetComponent(out SaveableEntity saveable)
+            ? SaveableEntity.Spawn(saveable, position, rotation).gameObject
+            : Instantiate(building.Prefab, position, rotation);
+        if (building.BuildWork > 0f && placed.TryGetComponent(out Construction construction))
         {
-            SaveableEntity.Spawn(saveable, position, rotation);
-        }
-        else
-        {
-            Instantiate(building.Prefab, position, rotation);
+            construction.BeginBuilding();
         }
 
-        return true;
+        return placed;
     }
 
     private void Cancel()
@@ -747,6 +828,7 @@ public sealed class BuildPlacer : MonoBehaviour
         drawingLine = false;
         placing = null;
         picking = false;
+        upgrading = false;
         IsBusy = false;
     }
 

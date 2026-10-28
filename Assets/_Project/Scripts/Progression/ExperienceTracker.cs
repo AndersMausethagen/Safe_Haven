@@ -25,6 +25,7 @@ public sealed class ExperienceTracker : MonoBehaviour, IGameSystem
         GameEvents.Raised += OnGameEvent;
         ResourceSource.Harvested += OnHarvested;
         ExplorationMap.Explored += OnExplored;
+        Construction.Finished += OnConstructionFinished;
     }
 
     private void OnDestroy()
@@ -32,6 +33,7 @@ public sealed class ExperienceTracker : MonoBehaviour, IGameSystem
         GameEvents.Raised -= OnGameEvent;
         ResourceSource.Harvested -= OnHarvested;
         ExplorationMap.Explored -= OnExplored;
+        Construction.Finished -= OnConstructionFinished;
         if (Instance == this)
         {
             Instance = null;
@@ -120,6 +122,14 @@ public sealed class ExperienceTracker : MonoBehaviour, IGameSystem
 
         float health = body != null && body.TryGetComponent(out Damageable damageable) ? damageable.MaxHealth : 0f;
         return Mathf.Max(settings.MinimumKillExperience, Mathf.RoundToInt(health * settings.KillExperiencePerHealth));
+    }
+
+    private void OnConstructionFinished(Construction construction)
+    {
+        if (Application.isPlaying)
+        {
+            Grant(construction.Level <= 1 ? settings.BuildExperience : settings.UpgradeExperience);
+        }
     }
 
     private void OnHarvested(GameObject gatherer)

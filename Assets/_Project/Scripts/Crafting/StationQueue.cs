@@ -122,6 +122,9 @@ public sealed class StationQueue
         return last.Recipe;
     }
 
+    /// <summary>How fast it works: 1 is normal. Set by its CraftingStation from upgrades and a worker; not saved.</summary>
+    public float SpeedMultiplier { get; set; } = 1f;
+
     /// <summary>
     /// Works for the given seconds, delivering every craft that finishes. Resources go to storage first (may be null).
     /// Calls finished once per delivered craft. Returns how many crafts were delivered.
@@ -133,7 +136,7 @@ public sealed class StationQueue
             return 0;
         }
 
-        Progress += seconds;
+        Progress += seconds * SpeedMultiplier;
         int delivered = 0;
         while (jobs.Count > 0 && Progress >= jobs[0].Recipe.CraftSeconds)
         {

@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 55433f6de2238c643b7ddfb32e5977d0, type: 3}
+  m_Name: HavenBanner
+  m_EditorClassIdentifier: SafeHaven::BuildingDefinition
+  id: havenbanner
+  displayName: Haven Banner
+  description: Safe Haven's colours, raised for all the forest to see.
+  icon: {fileID: 0}
+  faction: 0
+  combatStats: {fileID: 0}
+  prefab: {fileID: 812568838218764070, guid: d8acdce49e03fa844b47d38b4111b3e7, type: 3}
+  constructionCost: []
+  constructionItems:
+  - item: {fileID: 11400000, guid: 8ae2883815327b74fa7975309c803f92, type: 2}
+    amount: 2
+  - item: {fileID: 11400000, guid: 4df650debd4ce21459e04a0c92ffa207, type: 2}
+    amount: 2
+  showInBuildMenu: 1
+  knownFromStart: 1
+  sortOrder: 900
+  yardDepth: 0
+  yardSide: 0
+  placeInLines: 0
+  station: 0
+  outputCapacity: 10
+  queueLength: 5
+  buildWork: 3
+  renown: 4
+  upgrades: []
+  deathSound: {fileID: 0}

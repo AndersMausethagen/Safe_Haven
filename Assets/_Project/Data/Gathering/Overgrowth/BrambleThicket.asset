@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2bdc7bfe8797f544855a0ab7846c453, type: 3}
+  m_Name: BrambleThicket
+  m_EditorClassIdentifier: SafeHaven::GatheringNodeDefinition
+  id: overgrowth_bramblethicket
+  displayName: Bramble Thicket
+  tier: 1
+  yields:
+    entries:
+    - item: {fileID: 11400000, guid: e8bb5d2fbded52b42a179a47cce32d53, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 2
+      probability: 1
+    - item: {fileID: 11400000, guid: 3790e5e25892e2a49adf1a7cb473a699, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 2
+      probability: 1
+  gatherTool: 0
+  requiredToolTier: 1
+  gatherAnimation: 2
+  gatherSeconds: 2.5
+  swings: 1
+  swingSpeed: 1
+  gatherRange: 1.8
+  depleteOnGather: 1
+  respawnSeconds: 0
+  feedback: {fileID: 11400000, guid: 5e19753f3a66da744ae5d17004fb63d5, type: 2}
+  worldModelPrefab: {fileID: 3076921921766683128, guid: 32b734343ece0684b9954902174df0c2, type: 3}
+  worldPrefab: {fileID: 8762092223118949935, guid: c9dcb12e6a28c2d4680da62b63d2deee, type: 3}
+  modelVariants:
+  - {fileID: 3076921921766683128, guid: 32b734343ece0684b9954902174df0c2, type: 3}
+  variantScale: {x: 0.9, y: 1.3}

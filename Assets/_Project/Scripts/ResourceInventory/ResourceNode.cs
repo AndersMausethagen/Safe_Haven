@@ -205,7 +205,10 @@ public sealed class ResourceNode : MonoBehaviour, IInteractionCondition, ISaveab
         IsDepleted = !present;
         foreach (Collider part in colliders)
         {
-            part.enabled = present;
+            if (part != null)
+            {
+                part.enabled = present;
+            }
         }
 
         interactable.enabled = present;

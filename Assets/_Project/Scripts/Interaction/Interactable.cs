@@ -42,6 +42,13 @@ public sealed class Interactable : MonoBehaviour
     public static IReadOnlyList<Interactable> Active => active;
 
     public InteractionAnimation AnimationType => animationType;
+
+    /// <summary>Seconds the work takes. Can be changed while playing, such as the work left on a scaffold.</summary>
+    public float Duration
+    {
+        get => duration;
+        set => duration = Mathf.Max(0f, value);
+    }
     public float Range => range;
     public bool IsInUse => inUse;
     public bool IsAvailable => isActiveAndEnabled && !inUse;
@@ -62,6 +69,17 @@ public sealed class Interactable : MonoBehaviour
 
     private void Awake()
     {
+        colliders = GetComponentsInChildren<Collider>();
+        conditions = GetComponents<IInteractionCondition>();
+    }
+
+    /// <summary>Sets it up from code (an interaction made while playing, such as a construction site).</summary>
+    public void Configure(InteractionAnimation animation, float seconds, float reach, bool deactivateWhenComplete)
+    {
+        animationType = animation;
+        duration = Mathf.Max(0f, seconds);
+        range = Mathf.Max(0f, reach);
+        deactivateOnComplete = deactivateWhenComplete;
         colliders = GetComponentsInChildren<Collider>();
         conditions = GetComponents<IInteractionCondition>();
     }

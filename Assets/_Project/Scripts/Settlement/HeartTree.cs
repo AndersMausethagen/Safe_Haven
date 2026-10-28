@@ -49,7 +49,8 @@ public sealed class HeartTree : MonoBehaviour
     public static HeartTree Current { get; private set; }
 
     /// <summary>How far from the tree the player may build, at the current ward level.</summary>
-    public float WardRadius => SettlementSettings.Current.WardRadiusAt(GameSession.Settlement.WardLevel);
+    public float WardRadius => SettlementSettings.Current.WardRadiusAt(GameSession.Settlement.WardLevel)
+        + HavenSettings.Current.WardBonusAt(GameSession.Settlement.HavenRank);
 
     /// <summary>True when a point (and a margin around it, such as a building's size) is inside the ward.</summary>
     public bool Contains(Vector3 position, float margin = 0f)
@@ -61,6 +62,11 @@ public sealed class HeartTree : MonoBehaviour
 
     private void Awake()
     {
+        if (!TryGetComponent(out HavenProgress _))
+        {
+            gameObject.AddComponent<HavenProgress>();
+        }
+
         interactable = GetComponent<Interactable>();
         Current = this;
     }
@@ -123,6 +129,23 @@ public sealed class HeartTree : MonoBehaviour
         return null;
     }
 
+    /// <summary>Opens the overview of Safe Haven in the action menu: its rank, renown and what to do next (H).</summary>
+    public void OpenHaven(GameObject user)
+    {
+        ActionMenuWindow menu = ActionMenuWindow.Current;
+        if (menu == null)
+        {
+            return;
+        }
+
+        if (menu.IsOpen)
+        {
+            menu.Close();
+        }
+
+        menu.Open(() => HavenRenown.Page(user), user);
+    }
+
     private MenuPage BuildPage(GameObject user)
     {
         SettlementSettings settings = SettlementSettings.Current;
@@ -166,6 +189,7 @@ public sealed class HeartTree : MonoBehaviour
             page.Add(new MenuAction("Begin the defense", breach.Definition.StartHint, true, breach.Begin, closesMenu: true));
         }
 
+        page.Add(new MenuAction("How is Safe Haven doing?", "Rank, renown and what to do next (H)", true, () => OpenHaven(user)));
         return page;
     }
 

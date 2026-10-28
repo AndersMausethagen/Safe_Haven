@@ -127,6 +127,7 @@ GameObject:
   - component: {fileID: 5995521089143354328}
   - component: {fileID: 496618339047125914}
   - component: {fileID: 5586801724730291153}
+  - component: {fileID: 2084990266287670973}
   m_Layer: 0
   m_Name: Palisade
   m_TagString: Untagged
@@ -244,6 +245,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BuildingObject
   definition: {fileID: 11400000, guid: c79543eccb64e534e836b5b64511ab72, type: 2}
+--- !u!114 &2084990266287670973
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5723684251509998500}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8b1e3484b4dcf94bb2a28630c5d9946, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::Construction
+  startsRuined: 0
 --- !u!1001 &3331500084782049718
 PrefabInstance:
   m_ObjectHideFlags: 0

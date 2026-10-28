@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2bdc7bfe8797f544855a0ab7846c453, type: 3}
+  m_Name: OldStump
+  m_EditorClassIdentifier: SafeHaven::GatheringNodeDefinition
+  id: overgrowth_oldstump
+  displayName: Old Stump
+  tier: 3
+  yields:
+    entries:
+    - item: {fileID: 11400000, guid: 8ae2883815327b74fa7975309c803f92, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 3
+      maxQuantity: 5
+      probability: 1
+    - item: {fileID: 11400000, guid: 183fddc5567e8b8479fcb1618e73496c, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 0
+      maxQuantity: 1
+      probability: 1
+  gatherTool: 1
+  requiredToolTier: 3
+  gatherAnimation: 5
+  gatherSeconds: 4
+  swings: 4
+  swingSpeed: 1
+  gatherRange: 1.8
+  depleteOnGather: 1
+  respawnSeconds: 0
+  feedback: {fileID: 11400000, guid: 5c06cdc7d2e3557468f3fdeb64576beb, type: 2}
+  worldModelPrefab: {fileID: 3127879682646864738, guid: 4793d6a709931094aba2220314c09d5d, type: 3}
+  worldPrefab: {fileID: 6073743355422804455, guid: a21219cc54991944aa282f3806398111, type: 3}
+  modelVariants:
+  - {fileID: 3127879682646864738, guid: 4793d6a709931094aba2220314c09d5d, type: 3}
+  - {fileID: 8426248579888908114, guid: 06e8e4166908fba468b5400ac10894a5, type: 3}
+  variantScale: {x: 1.1, y: 1.4}

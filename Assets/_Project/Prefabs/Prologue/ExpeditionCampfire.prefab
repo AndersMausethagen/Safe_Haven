@@ -19,6 +19,7 @@ GameObject:
   - component: {fileID: 3296322273664643192}
   - component: {fileID: 4559366941313991132}
   - component: {fileID: 4852473079880410220}
+  - component: {fileID: 1140891006008936116}
   m_Layer: 0
   m_Name: ExpeditionCampfire
   m_TagString: Untagged
@@ -215,6 +216,19 @@ MonoBehaviour:
   revealRadius: 12
   followsWard: 0
   isLight: 1
+--- !u!114 &1140891006008936116
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6113176800454676674}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8b1e3484b4dcf94bb2a28630c5d9946, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::Construction
+  startsRuined: 0
 --- !u!1001 &605138512638561886
 PrefabInstance:
   m_ObjectHideFlags: 0

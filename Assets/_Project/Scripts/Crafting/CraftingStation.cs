@@ -117,11 +117,56 @@ public sealed class CraftingStation : MonoBehaviour
         }
     }
 
-    public int OutputCapacity => building != null && building.Definition != null ? building.Definition.OutputCapacity : DefaultOutputCapacity;
-    public int QueueLength => building != null && building.Definition != null ? building.Definition.QueueLength : DefaultQueueLength;
+    public int OutputCapacity => (building != null && building.Definition != null ? building.Definition.OutputCapacity : DefaultOutputCapacity)
+        + Mathf.RoundToInt(Upgrades(level => level.extraOutput));
+    public int QueueLength => (building != null && building.Definition != null ? building.Definition.QueueLength : DefaultQueueLength)
+        + Mathf.RoundToInt(Upgrades(level => level.extraQueue));
+
+    /// <summary>How fast it works: upgrades, plus a resident whose job works here (WorkerSpeedBonus).</summary>
+    public float Speed => 1f + Upgrades(level => level.craftSpeed) + (HasWorker ? WorkerSpeedBonus : 0f);
+
+    /// <summary>A resident working here makes the station this much faster.</summary>
+    public const float WorkerSpeedBonus = 0.5f;
+
+    /// <summary>True when a resident's job has this building as its workplace.</summary>
+    public bool HasWorker
+    {
+        get
+        {
+            if (building == null || building.Definition == null)
+            {
+                return false;
+            }
+
+            foreach (ResidentRecord resident in GameSession.Settlement.Residents)
+            {
+                if (resident.Job != null && resident.Job.Workplace == building.Definition)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+    }
 
     /// <summary>The station's queue and output slot, created on first use.</summary>
-    public StationQueue Queue => GameSession.Settlement.Workshops.GetOrCreate(Id, type, OutputCapacity, QueueLength);
+    public StationQueue Queue
+    {
+        get
+        {
+            StationQueue queue = GameSession.Settlement.Workshops.GetOrCreate(Id, type, OutputCapacity, QueueLength);
+            if (queue != null)
+            {
+                queue.SpeedMultiplier = Speed;
+            }
+
+            return queue;
+        }
+    }
+
+    private float Upgrades(System.Func<BuildingLevel, float> bonus) =>
+        TryGetComponent(out Construction construction) ? construction.Sum(bonus) : 0f;
 
     private void Awake()
     {

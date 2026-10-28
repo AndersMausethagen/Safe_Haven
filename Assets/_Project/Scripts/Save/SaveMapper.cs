@@ -132,6 +132,7 @@ public static class SaveMapper
 
         into.portalRepaired = settlement.PortalRepaired;
         into.wardLevel = settlement.WardLevel;
+        into.havenRank = settlement.HavenRank;
         into.successfulExtractions = settlement.SuccessfulExtractions;
         into.breach = (int)settlement.Breach;
         into.purificationQueued = settlement.PurificationQueued;
@@ -178,6 +179,7 @@ public static class SaveMapper
 
         settlement.Restore(saved.portalRepaired, saved.wardLevel, saved.successfulExtractions, (BreachStatus)saved.breach,
             saved.purificationQueued, saved.purificationProgress);
+        settlement.ReachHavenRank(saved.havenRank);
         foreach (ResidentSaveData entry in saved.residents)
         {
             ResidentDefinition resident = Resolve(content.FindResident(entry?.id), "resident", entry?.id, missing);

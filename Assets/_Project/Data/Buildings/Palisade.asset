@@ -32,4 +32,7 @@ MonoBehaviour:
   station: 0
   outputCapacity: 10
   queueLength: 5
+  buildWork: 0
+  renown: 1
+  upgrades: []
   deathSound: {fileID: 0}

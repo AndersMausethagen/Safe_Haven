@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c82ebd1b10cd73744949470d6541c308, type: 3}
+  m_Name: ConstructionSettings
+  m_EditorClassIdentifier: SafeHaven::ConstructionSettings
+  scaffoldMaterial: {fileID: 2100000, guid: 420685b78b64bb749a1addd95d416edd, type: 2}
+  stoneMaterial: {fileID: 2100000, guid: f1c097b2d6239524bbf53c9c2eb1a861, type: 2}
+  clothMaterial: {fileID: 2100000, guid: 29fdfc01f87cb8f4ebd26dc33b1f4d17, type: 2}
+  lanternMaterial: {fileID: 2100000, guid: 67e569e1677d23b4e87f66004f00a36a, type: 2}
+  dustMaterial: {fileID: 2100000, guid: 46dab55ca30410144a1d5f4403b27279, type: 2}
+  lanternLight: {r: 1, g: 0.72, b: 0.4, a: 1}
+  ruinShade: 0.45
+  hammerSound: {fileID: 11400000, guid: c976c43373ecc004ba5149ddf6b2b63e, type: 2}
+  finishSound: {fileID: 11400000, guid: 71d32d19fa2628e499bcf9ca9b6cbc57, type: 2}
+  blowInterval: 0.55
+  blowShake: 0.05
+  finishShake: 0.18
+  finishPop: 1.12
+  repairWork: 8

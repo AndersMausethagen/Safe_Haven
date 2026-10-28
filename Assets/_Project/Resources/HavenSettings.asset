@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cd994db2c23810a488bbc0b5cdd0a58a, type: 3}
+  m_Name: HavenSettings
+  m_EditorClassIdentifier: SafeHaven::HavenSettings
+  repeatShare: 0.5
+  clearingRenown: 40
+  residentRenown: 8
+  rankExperience: 150
+  rankSound: {fileID: 11400000, guid: c08cfff61a51d7442a93c4dae8255955, type: 2}
+  ranks:
+  - name: Overgrown Camp
+    renown: 0
+    wardBonus: 0
+    line: A fire and a tree, and the forest pressing in.
+  - name: Homestead
+    renown: 25
+    wardBonus: 3
+    line: Someone lives here now. The ward reaches further.
+  - name: Hamlet
+    renown: 60
+    wardBonus: 6
+    line: Smoke from more than one chimney.
+  - name: Village
+    renown: 110
+    wardBonus: 10
+    line: Travellers speak of a light in the old wood.
+  - name: Haven
+    renown: 180
+    wardBonus: 15
+    line: A true haven. The forest itself seems to breathe easier.

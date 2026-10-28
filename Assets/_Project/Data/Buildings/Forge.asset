@@ -36,4 +36,33 @@ MonoBehaviour:
   station: 3
   outputCapacity: 10
   queueLength: 5
+  buildWork: 10
+  renown: 10
+  upgrades:
+  - title: Sturdy
+    description: An anvil that rings true.
+    cost:
+    - item: {fileID: 11400000, guid: f243c15300698e044a98d785099354c6, type: 2}
+      amount: 3
+    - item: {fileID: 11400000, guid: 59d371b7b63e8e24bb946051d808bc9b, type: 2}
+      amount: 6
+    work: 9
+    renown: 6
+    craftSpeed: 0.25
+    extraQueue: 1
+    extraOutput: 0
+    extraStorage: 0
+  - title: Master's
+    description: Hammers for every metal.
+    cost:
+    - item: {fileID: 11400000, guid: f243c15300698e044a98d785099354c6, type: 2}
+      amount: 6
+    - item: {fileID: 11400000, guid: 3b6626518ea9eb040b7d45591fac015b, type: 2}
+      amount: 4
+    work: 10
+    renown: 8
+    craftSpeed: 0.25
+    extraQueue: 0
+    extraOutput: 5
+    extraStorage: 0
   deathSound: {fileID: 0}

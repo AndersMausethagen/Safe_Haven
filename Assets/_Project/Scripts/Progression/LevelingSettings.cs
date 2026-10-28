@@ -30,6 +30,10 @@ public sealed class LevelingSettings : GameSettings<LevelingSettings>
     [SerializeField, Min(0)] private int raidFailedExperience = 40;
     [Tooltip("The first time each item is crafted.")]
     [SerializeField, Min(0)] private int firstCraftExperience = 10;
+    [Tooltip("A building hammered up (or a ruin repaired) at home.")]
+    [SerializeField, Min(0)] private int buildExperience = 15;
+    [Tooltip("A building upgraded at home.")]
+    [SerializeField, Min(0)] private int upgradeExperience = 25;
     [Tooltip("Every node gathered (a bush picked, a rock mined, a tree felled).")]
     [SerializeField, Min(0)] private int gatherExperience = 2;
     [Tooltip("1 experience for this many square metres of new ground explored.")]
@@ -51,6 +55,8 @@ public sealed class LevelingSettings : GameSettings<LevelingSettings>
     public int RaidFailedExperience => raidFailedExperience;
     public int FirstCraftExperience => firstCraftExperience;
     public int GatherExperience => gatherExperience;
+    public int BuildExperience => buildExperience;
+    public int UpgradeExperience => upgradeExperience;
     public int ExploredCellsPerExperience => exploredCellsPerExperience;
     public int PointsPerRow => pointsPerRow;
     public IReadOnlyList<TalentDefinition> Talents => talents;

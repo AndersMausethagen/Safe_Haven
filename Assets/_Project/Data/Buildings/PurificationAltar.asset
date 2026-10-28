@@ -34,4 +34,33 @@ MonoBehaviour:
   station: 0
   outputCapacity: 10
   queueLength: 5
+  buildWork: 8
+  renown: 10
+  upgrades:
+  - title: Carved
+    description: Runes cut deep around the basin.
+    cost:
+    - item: {fileID: 11400000, guid: b5567f7d75200bd46befbd1dab298f36, type: 2}
+      amount: 12
+    - item: {fileID: 11400000, guid: 59d371b7b63e8e24bb946051d808bc9b, type: 2}
+      amount: 2
+    work: 9
+    renown: 6
+    craftSpeed: 0
+    extraQueue: 0
+    extraOutput: 0
+    extraStorage: 0
+  - title: Radiant
+    description: It hums softly at night.
+    cost:
+    - item: {fileID: 11400000, guid: 59d371b7b63e8e24bb946051d808bc9b, type: 2}
+      amount: 6
+    - item: {fileID: 11400000, guid: 3b6626518ea9eb040b7d45591fac015b, type: 2}
+      amount: 3
+    work: 10
+    renown: 8
+    craftSpeed: 0
+    extraQueue: 0
+    extraOutput: 0
+    extraStorage: 0
   deathSound: {fileID: 0}

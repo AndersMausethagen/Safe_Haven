@@ -34,4 +34,20 @@ MonoBehaviour:
   station: 0
   outputCapacity: 10
   queueLength: 5
+  buildWork: 2
+  renown: 2
+  upgrades:
+  - title: Bound
+    description: Iron bands and a sturdier lid.
+    cost:
+    - item: {fileID: 11400000, guid: 8ae2883815327b74fa7975309c803f92, type: 2}
+      amount: 4
+    - item: {fileID: 11400000, guid: 9f085f39a2da68c45b58d2db986835f4, type: 2}
+      amount: 4
+    work: 7
+    renown: 2
+    craftSpeed: 0
+    extraQueue: 0
+    extraOutput: 0
+    extraStorage: 4
   deathSound: {fileID: 0}
