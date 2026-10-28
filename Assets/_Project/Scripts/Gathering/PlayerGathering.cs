@@ -241,7 +241,8 @@ public sealed class PlayerGathering : MonoBehaviour
 
     private void WearTool(ToolType tool)
     {
-        float wear = DurabilitySettings.Current.WearPerGlancingBlow;
+        float care = TryGetComponent(out Combatant self) ? Mathf.Clamp01(self.Stats.Get(StatType.ToolCare)) : 0f;
+        float wear = DurabilitySettings.Current.WearPerGlancingBlow * (1f - care);
         if (equipment == null || wear <= 0f)
         {
             return;

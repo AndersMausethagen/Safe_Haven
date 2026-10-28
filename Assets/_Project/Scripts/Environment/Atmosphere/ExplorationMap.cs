@@ -33,6 +33,9 @@ public sealed class ExplorationMap : MonoBehaviour, ISaveable
     /// <summary>The map in the loaded scene, or null.</summary>
     public static ExplorationMap Current { get; private set; }
 
+    /// <summary>Raised with how many cells the player has just explored (for experience).</summary>
+    public static event System.Action<int> Explored;
+
     public ExplorationGrid Grid => grid;
     public Texture2D Texture => texture;
     public string SaveKey => "exploration";
@@ -88,6 +91,13 @@ public sealed class ExplorationMap : MonoBehaviour, ISaveable
                     dirty |= grid.Reveal(new Vector2(position.x, position.z), source.RevealRadius, source.Softness);
                 }
             }
+        }
+
+        if (grid.NewlyExplored > 0)
+        {
+            int explored = grid.NewlyExplored;
+            grid.NewlyExplored = 0;
+            Explored?.Invoke(explored);
         }
 
         if (dirty)

@@ -29,6 +29,8 @@ public sealed class SaveData
     public PlaytestSaveData playtest = new PlaytestSaveData();
     /// <summary>Ids of Quest Events raised so far, so one-time world moments stay done. Missing in older saves.</summary>
     public List<string> happenedEvents = new List<string>();
+    /// <summary>Level, experience and talents. Missing in older saves (they start at level 1).</summary>
+    public ProgressSaveData progress = new ProgressSaveData();
 }
 
 /// <summary>A PlaytestRun.</summary>
@@ -86,6 +88,16 @@ public sealed class ResidentSaveData
     public string id;
     /// <summary>The job's id, or empty while unassigned.</summary>
     public string job;
+}
+
+[Serializable]
+public sealed class ProgressSaveData
+{
+    public int level = 1;
+    public int experience;
+    public List<AmountSaveData> talents = new List<AmountSaveData>();
+    public List<string> crafted = new List<string>();
+    public List<string> stones = new List<string>();
 }
 
 [Serializable]

@@ -68,7 +68,7 @@ public static class SaveGameService
         // Objects keep their own state; it is gathered into memory first, then copied to disk.
         SaveableEntity.CaptureAll();
         SaveData data = SaveMapper.ToSaveData(player.Capture(), GameSession.Stash, SceneManager.GetActiveScene().name, player.Pose, DateTime.UtcNow,
-            GameSession.World, GameSession.Quests, GameSession.Settlement, GameSession.Playtest);
+            GameSession.World, GameSession.Quests, GameSession.Settlement, GameSession.Playtest, GameSession.Progress);
         try
         {
             Storage.Write(SaveStorage.DefaultSlot, data);

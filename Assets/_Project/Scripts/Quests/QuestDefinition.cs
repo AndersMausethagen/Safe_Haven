@@ -54,6 +54,8 @@ public sealed class QuestDefinition : ScriptableObject
     [SerializeField] private List<ItemAmount> rewardItems = new List<ItemAmount>();
     [SerializeField] private List<ResourceAmount> rewardResources = new List<ResourceAmount>();
     [SerializeField] private List<RecipeDefinition> rewardRecipes = new List<RecipeDefinition>();
+    [Tooltip("Experience for completing it. 0: the Quest Experience from LevelingSettings.")]
+    [SerializeField, Min(0)] private int experience;
     [Tooltip("Raised when the quest is completed, for scene reactions (open a gate) through a GameEventListener.")]
     [SerializeField] private GameEventDefinition completionEvent;
     [Tooltip("Additional custom events raised when this quest completes, after Completion Event.")]
@@ -74,6 +76,7 @@ public sealed class QuestDefinition : ScriptableObject
     /// <summary>Who the quest is handed in to, for "Return to ..." text.</summary>
     public string TurnInTo => string.IsNullOrWhiteSpace(turnInTo) ? "the quest giver" : turnInTo.Trim();
     public IReadOnlyList<ItemAmount> RewardItems => rewardItems;
+    public int Experience => experience;
     public IReadOnlyList<ResourceAmount> RewardResources => rewardResources;
     public IReadOnlyList<RecipeDefinition> RewardRecipes => rewardRecipes;
     public GameEventDefinition CompletionEvent => completionEvent;

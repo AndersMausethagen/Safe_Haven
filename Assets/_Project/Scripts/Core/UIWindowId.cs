@@ -26,4 +26,6 @@ public enum UIWindowId
     Station = 9,
     /// <summary>A conversation: the speaker's portrait, their line and the player's answers (DialogueBox).</summary>
     Dialogue = 10,
+    /// <summary>Level, experience and the four talent trees (N).</summary>
+    Talents = 11,
 }

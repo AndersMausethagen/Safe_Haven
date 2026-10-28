@@ -1,0 +1,49 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: af0f6b169804769498ca60a33584093c, type: 3}
+  m_Name: LevelingSettings
+  m_EditorClassIdentifier: SafeHaven::LevelingSettings
+  maxLevel: 30
+  firstLevelExperience: 100
+  levelGrowth: 1.18
+  talentPointsPerLevel: 1
+  levelUpSound: {fileID: 11400000, guid: c08cfff61a51d7442a93c4dae8255955, type: 2}
+  killExperiencePerHealth: 0.25
+  minimumKillExperience: 3
+  questExperience: 50
+  raidExtractedExperience: 150
+  raidFailedExperience: 40
+  firstCraftExperience: 10
+  gatherExperience: 2
+  exploredCellsPerExperience: 150
+  pointsPerRow: 3
+  talents:
+  - {fileID: 11400000, guid: fcc7ce9febb30a7458b88ae7a8ec5d5f, type: 2}
+  - {fileID: 11400000, guid: 372e1c2908f10564b8d9ecce2a9108d3, type: 2}
+  - {fileID: 11400000, guid: 7cedd76d72811cf418d418ce312e486c, type: 2}
+  - {fileID: 11400000, guid: eab8482458e883c4f885f2dfa974a1f3, type: 2}
+  - {fileID: 11400000, guid: 871ad09c902c05844ad3a0c8832a274d, type: 2}
+  - {fileID: 11400000, guid: afafe1bbb85145b41b0686c7ed170c01, type: 2}
+  - {fileID: 11400000, guid: 42f2d8e6a6ce51845bc1517a0e950224, type: 2}
+  - {fileID: 11400000, guid: 299656a47c96270419ed8cba66a4d988, type: 2}
+  - {fileID: 11400000, guid: 922919b5c25a4d049afaec764a1a22ed, type: 2}
+  - {fileID: 11400000, guid: 889c3a466f866b945a59489ecacc511c, type: 2}
+  - {fileID: 11400000, guid: ead5d7eb0dbef6348992f074620d6ed6, type: 2}
+  - {fileID: 11400000, guid: 24ad8f4bd15b4d9439c6ce2d102c86fc, type: 2}
+  - {fileID: 11400000, guid: 8df998bc0d774f348b6066080f432b01, type: 2}
+  - {fileID: 11400000, guid: 0ef0d56cf9fe09b42bf51f48ab2610e8, type: 2}
+  - {fileID: 11400000, guid: b26e14a25093a284181e40f038e8137b, type: 2}
+  - {fileID: 11400000, guid: 23ff66fe0fa9bbc4d889d6930d2d0d2c, type: 2}
+  - {fileID: 11400000, guid: 2b91af5560d7bfc499d3ffa0cc7091fe, type: 2}
+  - {fileID: 11400000, guid: cb5bb57eb6e3a9f4f872b7a5fc1e773e, type: 2}
+  - {fileID: 11400000, guid: 1b5dcda54a06ef948ba444c9ee80cc20, type: 2}
+  - {fileID: 11400000, guid: 31dcb5a7adc0bb34fbc897d2785d35cd, type: 2}

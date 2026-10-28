@@ -29,6 +29,8 @@ public sealed class MonsterDefinition : ScriptableObject
     [SerializeField] private RuntimeAnimatorController animatorController;
     [Tooltip("Generated monster prefab placed in the world.")]
     [SerializeField] private GameObject prefab;
+    [Tooltip("Experience for killing it. 0: worked out from its health (LevelingSettings).")]
+    [SerializeField, Min(0)] private int experience;
 
     [Header("Behaviour")]
     [Tooltip("What the monster does when it attacks.")]
@@ -89,6 +91,7 @@ public sealed class MonsterDefinition : ScriptableObject
     public CombatStatsDefinition CombatStats => combatStats;
     public Faction Faction => faction;
     public ItemDropTable Drops => drops;
+    public int Experience => experience;
     public IReadOnlyList<RecipeDefinition> UnlocksRecipes => unlocksRecipes;
     public RuntimeAnimatorController AnimatorController => animatorController;
     public AttackDefinition Attack => attack;

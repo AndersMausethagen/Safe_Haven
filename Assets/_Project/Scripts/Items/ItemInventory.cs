@@ -6,7 +6,7 @@ using UnityEngine;
 /// The player's bag: a grid of item slots (see ItemContainer) for materials, weapons, tools, backpacks, consumables,
 /// blueprints and unique finds, plus the safe pocket. Only essences live in the ResourceInventory as bars (GDD §12.1).
 /// Gameplay gives items through Give, so the HUD can announce them; the UI moves them around through Container and
-/// SafePocket, and right-click goes through Use (equip, study, eat, drink, heal).
+/// SafePocket, and right-click goes through Use (equip, study, read a rune book, eat, drink, heal).
 ///
 /// Carry space: only the first baseUnlockedSlots slots are usable; the best backpack carried unlocks more
 /// (BackpackCapacity calls SetBonusSlots). The bag also has a carry-weight budget (carryWeight, raised by the equipped
@@ -158,6 +158,14 @@ public sealed class ItemInventory : MonoBehaviour
         if (item.IsBlueprint)
         {
             return Study(from, slot, item);
+        }
+
+        if (item.Experience > 0)
+        {
+            // Reading a rune book: the experience is granted by whoever listens (ExperienceTracker).
+            from.RemoveAt(slot, 1);
+            GameEvents.Raise(new GameEvent(GameEventKind.Consumed, item, 1, gameObject));
+            return true;
         }
 
         return Consume(from, slot, item);

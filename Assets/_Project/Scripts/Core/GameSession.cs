@@ -18,6 +18,7 @@ public static class GameSession
     private static StashStorage stash;
     private static WorldState world;
     private static QuestLog quests;
+    private static CharacterProgress progress;
     private static SettlementState settlement;
     private static PlaytestRun playtest;
     private static string pendingArrivalPoint;
@@ -36,6 +37,9 @@ public static class GameSession
 
     /// <summary>The player's quests and their progress. Created on first use.</summary>
     public static QuestLog Quests => quests ??= new QuestLog();
+
+    /// <summary>The player's level, experience and talents: permanent, kept across scenes and saved.</summary>
+    public static CharacterProgress Progress => progress ??= new CharacterProgress();
 
     /// <summary>Safe Haven as a place: portal, ward, residents, breach, purification. Created on first use.</summary>
     public static SettlementState Settlement => settlement ??= new SettlementState();
@@ -120,6 +124,7 @@ public static class GameSession
         stash = game.Stash;
         world = game.World;
         quests = game.Quests;
+        progress = game.Progress;
         settlement = game.Settlement;
         playtest = game.Playtest;
         pendingPlayerState = game.Player;
@@ -133,6 +138,7 @@ public static class GameSession
         stash = null;
         world = null;
         quests = null;
+        progress = null;
         settlement = null;
         playtest = null;
         pendingArrivalPoint = null;

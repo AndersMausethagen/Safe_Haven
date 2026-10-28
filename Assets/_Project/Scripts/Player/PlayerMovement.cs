@@ -15,6 +15,7 @@ public sealed class PlayerMovement : MonoBehaviour
     private const float MovingSpeedThreshold = 0.01f;
 
     [SerializeField] private PlayerMovementSettings settings;
+    private Combatant combatant;
 
     private CharacterController characterController;
     private PlayerStateMachine stateMachine;
@@ -67,6 +68,7 @@ public sealed class PlayerMovement : MonoBehaviour
 
     private void Awake()
     {
+        combatant = GetComponent<Combatant>();
         characterController = GetComponent<CharacterController>();
         stateMachine = GetComponent<PlayerStateMachine>();
 
@@ -253,7 +255,8 @@ public sealed class PlayerMovement : MonoBehaviour
             FaceDirection(direction);
         }
 
-        float speed = settings.MoveSpeed * settings.GetSpeedMultiplier(currentGameState) * speedScale;
+        float bonus = combatant != null ? Mathf.Max(-0.5f, combatant.Stats.Get(StatType.MoveSpeed)) : 0f;
+        float speed = settings.MoveSpeed * settings.GetSpeedMultiplier(currentGameState) * speedScale * (1f + bonus);
         horizontalVelocity = direction * speed;
         if (lungeUntil >= 0f)
         {

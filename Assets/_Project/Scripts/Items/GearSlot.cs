@@ -256,6 +256,12 @@ public static class StatNames
             case StatType.FrostResistance: return "Frost Resistance";
             case StatType.HolyResistance: return "Holy Resistance";
             case StatType.StructureDamage: return "Structure Damage";
+            case StatType.DamageBonus: return "Damage";
+            case StatType.MaxStamina: return "Stamina";
+            case StatType.MoveSpeed: return "Movement Speed";
+            case StatType.DrawSpeed: return "Draw Speed";
+            case StatType.GatherYield: return "Extra Yield Chance";
+            case StatType.ToolCare: return "Less Tool Wear";
             default: return stat.ToString();
         }
     }
@@ -274,6 +280,11 @@ public static class StatNames
             case StatType.FrostResistance:
             case StatType.HolyResistance:
             case StatType.StructureDamage:
+            case StatType.DamageBonus:
+            case StatType.MoveSpeed:
+            case StatType.DrawSpeed:
+            case StatType.GatherYield:
+            case StatType.ToolCare:
                 return true;
             default:
                 return false;

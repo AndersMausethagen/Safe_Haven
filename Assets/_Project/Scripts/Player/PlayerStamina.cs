@@ -14,6 +14,8 @@ using UnityEngine;
 public sealed class PlayerStamina : MonoBehaviour
 {
     [SerializeField] private PlayerStaminaSettings settings;
+    private Combatant combatant;
+    private float maxEfficiency = 1f;
 
     private Damageable health;
     private StaminaPool pool;
@@ -44,6 +46,27 @@ public sealed class PlayerStamina : MonoBehaviour
         }
 
         pool = new StaminaPool(settings != null ? settings.MaxStamina : 100f);
+        if (TryGetComponent(out combatant))
+        {
+            combatant.Stats.Changed += OnStatChanged;
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (combatant != null)
+        {
+            combatant.Stats.Changed -= OnStatChanged;
+        }
+    }
+
+    // Talents adding stamina points resize the pool at once.
+    private void OnStatChanged(StatType stat)
+    {
+        if (stat == StatType.MaxStamina)
+        {
+            SetEfficiency(maxEfficiency, regenMultiplier);
+        }
     }
 
     /// <summary>Pays the full action cost. Returns false when stamina is insufficient, and the action must not happen.</summary>
@@ -69,7 +92,8 @@ public sealed class PlayerStamina : MonoBehaviour
     /// </summary>
     public void SetEfficiency(float maxMultiplier, float regenerationMultiplier)
     {
-        float baseMax = settings != null ? settings.MaxStamina : 100f;
+        maxEfficiency = maxMultiplier;
+        float baseMax = (settings != null ? settings.MaxStamina : 100f) + (combatant != null ? combatant.Stats.Get(StatType.MaxStamina) : 0f);
         pool.SetMax(baseMax * Mathf.Max(0.1f, maxMultiplier));
         regenMultiplier = Mathf.Max(0f, regenerationMultiplier);
         StaminaChanged?.Invoke(pool.Current, pool.Max);

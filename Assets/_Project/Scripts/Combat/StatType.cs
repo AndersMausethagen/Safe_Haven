@@ -29,4 +29,14 @@ public enum StatType
     Strength = 13,
     /// <summary>Share of extra damage on every hit dealt. 0.25 means +25%. Raids and breaches use it to scale enemies.</summary>
     DamageBonus = 14,
+    /// <summary>Extra stamina points on top of the player's base (talents).</summary>
+    MaxStamina = 15,
+    /// <summary>Share of extra movement speed. 0.05 means +5%.</summary>
+    MoveSpeed = 16,
+    /// <summary>Share faster a bow draws. 0.1 means it reaches full draw in 1/1.1 of the time.</summary>
+    DrawSpeed = 17,
+    /// <summary>Chance from 0 to 1 that gathering a node gives one extra of its main yield.</summary>
+    GatherYield = 18,
+    /// <summary>Share less wear on gathering tools. 0.25 means a quarter less.</summary>
+    ToolCare = 19,
 }

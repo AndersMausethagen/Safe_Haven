@@ -39,6 +39,12 @@ public sealed class ExplorationGrid
     /// Explores a circle: fully inside radius × (1 − softness), fading to nothing at the radius. Never makes a cell less
     /// explored. Returns true when anything changed.
     /// </summary>
+    /// <summary>A cell counts as explored once it is at least half revealed.</summary>
+    public const byte ExploredThreshold = 128;
+
+    /// <summary>Cells that became explored through Reveal (not by loading), counted up for experience.</summary>
+    public int NewlyExplored { get; set; }
+
     public bool Reveal(Vector2 centerXZ, float radius, float softness)
     {
         if (radius <= 0f)
@@ -69,6 +75,11 @@ public sealed class ExplorationGrid
                 int index = y * Width + x;
                 if (value > Cells[index])
                 {
+                    if (Cells[index] < ExploredThreshold && value >= ExploredThreshold)
+                    {
+                        NewlyExplored++;
+                    }
+
                     Cells[index] = value;
                     changed = true;
                 }

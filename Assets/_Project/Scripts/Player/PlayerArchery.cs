@@ -111,7 +111,11 @@ public sealed class PlayerArchery : MonoBehaviour
     public bool IsAiming => aimHeld && Bow != null && CanDraw();
 
     /// <summary>Share of a full draw right now (0 when not drawing).</summary>
-    public float Draw => IsDrawing && Bow != null ? ArcheryRules.DrawShare(Time.time - drawStartedAt, Bow.DrawSeconds) : 0f;
+    /// <summary>Seconds to full draw with this bow: its Draw Seconds, shortened by Draw Speed (talents).</summary>
+    public float DrawTime(WeaponDefinition bow) =>
+        bow.DrawSeconds / (1f + Mathf.Max(0f, combatant != null ? combatant.Stats.Get(StatType.DrawSpeed) : 0f));
+
+    public float Draw => IsDrawing && Bow != null ? ArcheryRules.DrawShare(Time.time - drawStartedAt, DrawTime(Bow)) : 0f;
 
     /// <summary>True while letting go now would be a perfect release.</summary>
     public bool InPerfectWindow => IsDrawing && Bow != null && IsPerfect(Bow, Time.time - drawStartedAt);
@@ -301,9 +305,9 @@ public sealed class PlayerArchery : MonoBehaviour
         }
 
         float heldFor = Time.time - drawStartedAt;
-        float draw = ArcheryRules.DrawShare(heldFor, bow.DrawSeconds);
+        float draw = ArcheryRules.DrawShare(heldFor, DrawTime(bow));
         bool perfect = IsPerfect(bow, heldFor);
-        float spread = perfect ? 0f : ArcheryRules.SpreadDegrees(bow.Spread, draw, heldFor, bow.DrawSeconds) * (IsAiming ? bow.AimSpread : 1f);
+        float spread = perfect ? 0f : ArcheryRules.SpreadDegrees(bow.Spread, draw, heldFor, DrawTime(bow)) * (IsAiming ? bow.AimSpread : 1f);
         Loose(bow, draw, spread, perfect ? bow.PerfectReleaseDamage : 1f, perfect, false);
     }
 
@@ -311,8 +315,8 @@ public sealed class PlayerArchery : MonoBehaviour
 
     // ----- Drawing and shooting -----
 
-    private static bool IsPerfect(WeaponDefinition bow, float heldFor) =>
-        ArcheryRules.IsPerfectRelease(heldFor, bow.DrawSeconds, bow.PerfectReleaseSeconds);
+    private bool IsPerfect(WeaponDefinition bow, float heldFor) =>
+        ArcheryRules.IsPerfectRelease(heldFor, DrawTime(bow), bow.PerfectReleaseSeconds);
 
     private bool CanDraw()
     {
@@ -356,7 +360,7 @@ public sealed class PlayerArchery : MonoBehaviour
         fullDrawAnnounced = false;
         combat?.KeepInCombat();
         AudioManager.Play(bow.DrawSound, Origin);
-        DrawStarted?.Invoke(bow.DrawSeconds);
+        DrawStarted?.Invoke(DrawTime(bow));
     }
 
     private void CancelDraw()

@@ -9,6 +9,7 @@ public sealed class LoadedGame
     public StashStorage Stash { get; set; }
     public WorldState World { get; set; } = new WorldState();
     public QuestLog Quests { get; set; } = new QuestLog();
+    public CharacterProgress Progress { get; set; } = new CharacterProgress();
     public SettlementState Settlement { get; set; } = new SettlementState();
     /// <summary>The playtest run the save belongs to; null for older saves, which then start a new run.</summary>
     public PlaytestRun Playtest { get; set; }
@@ -29,7 +30,8 @@ public static class SaveMapper
     public const int CurrentVersion = 1;
 
     public static SaveData ToSaveData(PlayerSnapshot player, StashStorage stash, string scene, PlayerPose? pose, DateTime savedAtUtc,
-        WorldState world = null, QuestLog quests = null, SettlementState settlement = null, PlaytestRun playtest = null)
+        WorldState world = null, QuestLog quests = null, SettlementState settlement = null, PlaytestRun playtest = null,
+        CharacterProgress progress = null)
     {
         var data = new SaveData
         {
@@ -107,6 +109,7 @@ public static class SaveMapper
             data.happenedEvents.AddRange(quests.HappenedEventIds);
         }
         WriteSettlement(settlement, data.settlement);
+        WriteProgress(progress, data.progress);
         if (playtest != null)
         {
             data.playtest = new PlaytestSaveData { runId = playtest.Id, playedSeconds = playtest.PlayedSeconds, sessions = playtest.Sessions };
@@ -419,12 +422,55 @@ public static class SaveMapper
             }
         }
         loaded.Settlement = ReadSettlement(data.settlement, content, loaded.MissingContent);
+        loaded.Progress = ReadProgress(data.progress);
         if (!string.IsNullOrEmpty(data.playtest?.runId))
         {
             loaded.Playtest = new PlaytestRun(data.playtest.runId, data.playtest.playedSeconds, data.playtest.sessions);
         }
 
         return loaded;
+    }
+
+    private static void WriteProgress(CharacterProgress progress, ProgressSaveData into)
+    {
+        if (progress == null)
+        {
+            return;
+        }
+
+        into.level = progress.Level;
+        into.experience = progress.Experience;
+        foreach (KeyValuePair<string, int> rank in progress.Ranks)
+        {
+            into.talents.Add(new AmountSaveData { id = rank.Key, amount = rank.Value });
+        }
+
+        into.crafted.AddRange(progress.CraftedItems);
+        into.stones.AddRange(progress.UsedStones);
+    }
+
+    // Talents that no longer exist give their points back.
+    private static CharacterProgress ReadProgress(ProgressSaveData saved)
+    {
+        var progress = new CharacterProgress();
+        if (saved == null)
+        {
+            return progress;
+        }
+
+        LevelingSettings settings = LevelingSettings.Current;
+        var ranks = new List<KeyValuePair<string, int>>();
+        foreach (AmountSaveData talent in saved.talents ?? new List<AmountSaveData>())
+        {
+            TalentDefinition known = settings.FindTalent(talent.id);
+            if (known != null)
+            {
+                ranks.Add(new KeyValuePair<string, int>(talent.id, Math.Min(talent.amount, known.MaxRank)));
+            }
+        }
+
+        progress.Restore(saved.level, saved.experience, ranks, saved.crafted, saved.stones);
+        return progress;
     }
 
     private static void WriteAmounts(IEnumerable<ResourceAmount> amounts, List<AmountSaveData> into)

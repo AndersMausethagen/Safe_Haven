@@ -69,6 +69,8 @@ public sealed class GameSystems : MonoBehaviour
 
         Add<PlaytestLogger>().Initialise(PlaytestSettings.Current);
 
+        Add<ExperienceTracker>().Initialise(LevelingSettings.Current);
+
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
 

@@ -17,6 +17,9 @@ public sealed class ResourceSource : MonoBehaviour
 
     private Interactable interactable;
 
+    /// <summary>Raised with whoever gathered a node (its yield granted), for experience.</summary>
+    public static event System.Action<GameObject> Harvested;
+
     public ItemDropTable Drops => drops;
 
     private void Awake()
@@ -62,7 +65,20 @@ public sealed class ResourceSource : MonoBehaviour
         var leftBehind = new List<string>();
         Give(bag, recipient, drops.Roll(), drops.RollResources(), leftBehind);
         ReportLeftBehind(leftBehind);
+        AfterHarvest(recipient);
         return true;
+    }
+
+    // A talent's chance of one extra of the main yield (StatType.GatherYield), then the Harvested news.
+    private void AfterHarvest(GameObject recipient)
+    {
+        Combatant gatherer = recipient != null ? recipient.GetComponentInParent<Combatant>() : null;
+        if (gatherer != null && Random.value < gatherer.Stats.Get(StatType.GatherYield))
+        {
+            GrantBonus(recipient, 1);
+        }
+
+        Harvested?.Invoke(recipient);
     }
 
     /// <summary>Gives these items instead of a roll of the drop table (a felled tree's logs, which depend on the axe), with
@@ -78,6 +94,7 @@ public sealed class ResourceSource : MonoBehaviour
         var leftBehind = new List<string>();
         Give(bag, recipient, items, new List<ResourceAmount>(), leftBehind);
         ReportLeftBehind(leftBehind);
+        AfterHarvest(recipient);
         return true;
     }
 

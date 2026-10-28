@@ -33,6 +33,7 @@ public sealed class PlayerInputHandler : MonoBehaviour
     private InputAction sneakAction;
     private InputAction arrowAction;
     private InputAction torchAction;
+    private InputAction talentsAction;
     private PlayerStealth stealth;
     private PlayerEquipment equipment;
     private readonly InputAction[] skillActions = new InputAction[SkillLoadout.SlotCount];
@@ -139,6 +140,7 @@ public sealed class PlayerInputHandler : MonoBehaviour
         yield return sneakAction;
         yield return arrowAction;
         yield return torchAction;
+        yield return talentsAction;
         foreach (InputAction action in skillActions)
         {
             yield return action;
@@ -233,6 +235,7 @@ public sealed class PlayerInputHandler : MonoBehaviour
         sneakAction?.Dispose();
         arrowAction?.Dispose();
         torchAction?.Dispose();
+        talentsAction?.Dispose();
         foreach (InputAction action in skillActions)
         {
             action?.Dispose();
@@ -311,6 +314,9 @@ public sealed class PlayerInputHandler : MonoBehaviour
         torchAction = new InputAction("ToggleTorch", InputActionType.Button);
         torchAction.AddBinding("<Keyboard>/l");
 
+        talentsAction = new InputAction("Talents", InputActionType.Button);
+        talentsAction.AddBinding("<Keyboard>/n");
+
         for (int i = 0; i < skillActions.Length; i++)
         {
             var action = new InputAction("Skill" + (i + 1), InputActionType.Button);
@@ -342,6 +348,7 @@ public sealed class PlayerInputHandler : MonoBehaviour
         sneakAction.canceled += _ => stealth?.SetSneaking(false);
         arrowAction.performed += _ => stateMachine.RequestArrowCycle();
         torchAction.performed += _ => equipment?.ToggleTorch();
+        talentsAction.performed += _ => RequestWindow(UIWindowId.Talents);
         for (int i = 0; i < skillActions.Length; i++)
         {
             int slot = i;
