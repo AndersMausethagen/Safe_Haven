@@ -157,6 +157,23 @@ A closed loop filled by **layers**, each a palette at a **Density** (per 100 m²
 keeps them off anything already standing there with a collider (buildings, nodes, rocks). The same seed always gives the
 same forest; it regrows when a river, path or cliff changes under it. Saveable objects (resource nodes) get save ids.
 
+### Ground Paint (a look for an area)
+
+**GameObject › Safe Haven › World › Ground Paint (Haven Meadow / Haven Old-Growth / Raid Dark Forest)**: draw a closed
+loop and the ground inside it is painted with that look's **Paint Rules** (the same rules the terrain's auto-paint
+uses: steepness, height, hollows, patches), fading in over **Edge Fade** metres with a frayed edge, at **Strength**.
+It builds before paths and rivers (order 5), so they paint over it, and a forest area grows on top of it. Point
+**Rules** at any Paint Rules asset (Create › Safe Haven › World › Terrain Paint Rules) for your own look.
+
+- *Haven Meadow*: meadow grass, lush patches, trodden earth in hollows.
+- *Old-Growth Forest* (Norwegian old growth, round the Haven): Forest Moss (a dark moss carpet), Muddy Bank (moss on
+  mud) and Forest Litter in patches, Dark Humus (near-black soil) in hollows. Under Safe Haven's groves.
+- *Dark Forest* (raids): pine-needle floor, mossy floor, muddy banks.
+
+The forest floor layers come with every map: colour, OpenGL normal, a mask (occlusion, height, smoothness) and the
+height (displacement), occlusion and roughness on their own. The terrain blends layers by height (Enable Height-based
+Blend on the World Terrain material), so moss fills the soil's hollows rather than cross-fading.
+
 ### The terrain
 
 The first feature over a terrain adds a **World Terrain** component (and a stash asset next to the TerrainData that
@@ -204,7 +221,9 @@ All CC0 (free for any use, no credit needed; see `Models/PolyHaven/LICENSE.md`),
   sway in the wind (Tree Wind, wind data in the second and third UV sets; the trunk stands still) and a capsule round the
   trunk. The dark forest's *Dark Forest Trees* palette uses them; the Haven's *Haven Trees* mixes a few in with its oaks.
 - **Ground layers** (Art/Terrain/World): Pine Needle Floor, Mossy Forest Floor, Muddy Bank, Gravel and Cliff Rock for
-  the dark raid forests; Meadow Grass, Lush Grass, Trodden Path and Damp Earth for the Haven.
+  the dark raid forests; Meadow Grass, Lush Grass, Trodden Path and Damp Earth for the Haven; Forest Moss (ambientCG
+  Moss004), Dark Humus (Poly Haven mud_forest) and Forest Litter (forest_ground_06) for the old-growth floor.
+  `AgentScripts/PolyHaven/make_terrain_layers.py <work> <out> [layer ...]` rebuilds named layers only.
 - **Palettes** (Data/Level/Palettes): River Stones, Riverbank, Cliff Rubble, Dark Forest Trees, Forest Floor Debris,
   Ferns, Haven Trees, Mossy Boulders. They work with the Scatter Brush too.
 - **Data/World**: the Rock Faces cliff kit and the two paint rule sets.

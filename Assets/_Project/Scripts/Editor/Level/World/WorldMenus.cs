@@ -43,6 +43,18 @@ public static class WorldMenus
     [MenuItem("GameObject/Safe Haven/World/Haven Grove Area", false, 31)]
     private static void HavenGrove() => Create<BiomeArea>("Haven Grove").Configure(HavenGroveLayers());
 
+    [MenuItem("GameObject/Safe Haven/World/Ground Paint (Haven Meadow)", false, 40)]
+    private static void PaintMeadow() => Paint("Haven Meadow");
+
+    [MenuItem("GameObject/Safe Haven/World/Ground Paint (Haven Old-Growth)", false, 41)]
+    private static void PaintOldGrowth() => Paint("Old-Growth Forest");
+
+    [MenuItem("GameObject/Safe Haven/World/Ground Paint (Raid Dark Forest)", false, 42)]
+    private static void PaintDarkForest() => Paint("Dark Forest");
+
+    /// <summary>A Ground Paint Area with a ready-made look; draw its loop on the ground.</summary>
+    private static void Paint(string look) => Create<GroundPaintArea>("Ground Paint (" + look + ")").Configure(WorldAssets.PaintRules(look));
+
     [MenuItem("Safe Haven/World/Build Now")]
     private static void BuildNow() => WorldBuilder.BuildChanged(false);
 

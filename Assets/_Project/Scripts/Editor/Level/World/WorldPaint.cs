@@ -7,7 +7,7 @@ using UnityEngine;
 /// features paint over the result in the build that follows.</summary>
 public static class WorldPaint
 {
-    private const float HollowRadius = 4f;
+    public const float HollowRadius = 4f;
 
     /// <summary>How much a point sits in a hollow (+1) or on a ridge or hump (-1), from the ground around it.</summary>
     public static float Hollowness(float centre, float around, float radius) =>

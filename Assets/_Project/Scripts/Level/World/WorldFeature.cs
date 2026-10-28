@@ -49,6 +49,9 @@ public abstract class WorldFeature : MonoBehaviour
     /// <summary>Whether the feature changes the terrain (heights, paint, plants) or only places objects.</summary>
     public virtual bool ShapesTerrain => true;
 
+    /// <summary>A closed loop that covers what is inside it (a forest, a painted ground), rather than a line.</summary>
+    public virtual bool IsArea => false;
+
     protected abstract int DefaultOrder { get; }
 
     /// <summary>The child that holds what this feature generated (created when <paramref name="create"/>).</summary>

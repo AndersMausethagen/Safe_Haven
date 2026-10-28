@@ -11,7 +11,8 @@ Material:
   m_Shader: {fileID: 4800000, guid: aa59cd2dc74da0a448fab311a279d086, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
-  m_ValidKeywords: []
+  m_ValidKeywords:
+  - _TERRAIN_BLEND_HEIGHT
   m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 1
@@ -103,7 +104,7 @@ Material:
     - _CliffSlopeStart: 40
     - _CliffStrength: 1
     - _CliffTiling: 7
-    - _EnableHeightBlend: 0
+    - _EnableHeightBlend: 1
     - _EnableInstancedPerPixelNormal: 1
     - _HeightTransition: 0
     - _Metallic0: 0

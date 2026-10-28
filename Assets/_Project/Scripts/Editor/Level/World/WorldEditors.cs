@@ -41,7 +41,7 @@ public sealed class WorldFeatureEditor : Editor
                 ToolManager.SetActiveContext<SplineToolContext>();
             }
 
-            if (!(feature is BiomeArea) && GUILayout.Button(new GUIContent("Reverse", "Swap the start and end (a river runs from the first knot to the last; a cliff's high side swaps)")))
+            if (!feature.IsArea && GUILayout.Button(new GUIContent("Reverse", "Swap the start and end (a river runs from the first knot to the last; a cliff's high side swaps)")))
             {
                 Undo.RecordObjects(new Object[] { feature.Container, feature }, "Reverse Spline");
                 foreach (KnotValues values in feature.PerKnot)
@@ -64,9 +64,9 @@ public sealed class WorldFeatureEditor : Editor
             WorldBuilder.BuildChanged(false);
         }
 
-        if (feature.Spline != null && feature.Spline.Count < (feature is BiomeArea ? 3 : 2))
+        if (feature.Spline != null && feature.Spline.Count < (feature.IsArea ? 3 : 2))
         {
-            EditorGUILayout.HelpBox("Press Draw and click points on the ground (at least " + (feature is BiomeArea ? 3 : 2) +
+            EditorGUILayout.HelpBox("Press Draw and click points on the ground (at least " + (feature.IsArea ? 3 : 2) +
                                     ") to give it a shape.", MessageType.Info);
         }
 
@@ -150,7 +150,7 @@ public sealed class WorldFeatureEditor : Editor
     private static void Finish(WorldFeature feature)
     {
         drawing = null;
-        if (feature is BiomeArea && feature.Spline.Count >= 3 && !feature.Spline.Closed)
+        if (feature.IsArea && feature.Spline.Count >= 3 && !feature.Spline.Closed)
         {
             Undo.RecordObject(feature.Container, "Close Area");
             feature.Spline.Closed = true;

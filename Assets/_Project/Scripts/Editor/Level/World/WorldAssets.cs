@@ -221,6 +221,9 @@ public static class WorldAssets
             SetUpTexture(basePath + "_Normal.jpg", TextureImporterType.NormalMap, true);
             SetUpTexture(basePath + "_Mask.png", TextureImporterType.Default, false);
             SetUpTexture(basePath + "_Color.jpg", TextureImporterType.Default, true);
+            SetUpTexture(basePath + "_Height.png", TextureImporterType.Default, false);
+            SetUpTexture(basePath + "_AO.jpg", TextureImporterType.Default, false);
+            SetUpTexture(basePath + "_Roughness.jpg", TextureImporterType.Default, false);
             if (Layer(name) != null)
             {
                 continue;
@@ -232,7 +235,7 @@ public static class WorldAssets
                 diffuseTexture = AssetDatabase.LoadAssetAtPath<Texture2D>(basePath + "_Color.jpg"),
                 normalMapTexture = AssetDatabase.LoadAssetAtPath<Texture2D>(basePath + "_Normal.jpg"),
                 maskMapTexture = AssetDatabase.LoadAssetAtPath<Texture2D>(basePath + "_Mask.png"),
-                tileSize = name == "Cliff Rock" ? new Vector2(7f, 7f) : new Vector2(4f, 4f),
+                tileSize = name == "Cliff Rock" ? new Vector2(7f, 7f) : name == "Forest Moss" ? new Vector2(3f, 3f) : new Vector2(4f, 4f),
                 normalScale = 1f,
             };
             AssetDatabase.CreateAsset(layer, basePath + ".terrainlayer");
@@ -429,8 +432,11 @@ public static class WorldAssets
 
     // ------------------------------------------------------------------ paint rules
 
-    public static TerrainPaintRules PaintRules(bool haven) =>
-        AssetDatabase.LoadAssetAtPath<TerrainPaintRules>($"{DataFolder}/Paint Rules - {(haven ? "Haven Meadow" : "Dark Forest")}.asset");
+    public static TerrainPaintRules PaintRules(bool haven) => PaintRules(haven ? "Haven Meadow" : "Dark Forest");
+
+    /// <summary>A ready-made paint rule set: "Haven Meadow", "Old-Growth Forest" or "Dark Forest".</summary>
+    public static TerrainPaintRules PaintRules(string name) =>
+        AssetDatabase.LoadAssetAtPath<TerrainPaintRules>($"{DataFolder}/Paint Rules - {name}.asset");
 
     public static void EnsurePaintRules()
     {
@@ -440,6 +446,14 @@ public static class WorldAssets
             Rule("Pine Needle Floor", 1f, 0f, 90f, 0f, 0f, 8f),
             Rule("Mossy Forest Floor", 0.9f, 0f, 28f, 0f, 0.65f, 11f),
             Rule("Muddy Bank", 0.85f, 0f, 30f, 0.55f, 0.35f, 6f),
+        });
+        // Norwegian old growth round the Haven: a dark moss carpet, mossy mud and litter in patches, black humus in hollows.
+        MakeRules("Old-Growth Forest", new[]
+        {
+            Rule("Forest Moss", 1f, 0f, 90f, 0f, 0f, 8f),
+            Rule("Muddy Bank", 0.6f, 0f, 35f, 0f, 0.75f, 9f),
+            Rule("Forest Litter", 0.5f, 0f, 35f, -0.2f, 0.8f, 12f),
+            Rule("Dark Humus", 0.8f, 0f, 30f, 0.75f, 0.5f, 5f),
         });
         MakeRules("Haven Meadow", new[]
         {

@@ -56,6 +56,7 @@ public sealed class BiomeArea : WorldFeature
 
     public override float Reach => 0f;
     public override bool ShapesTerrain => false;
+    public override bool IsArea => true;
     protected override int DefaultOrder => 30;
 
     public void Configure(IEnumerable<Layer> defaults)

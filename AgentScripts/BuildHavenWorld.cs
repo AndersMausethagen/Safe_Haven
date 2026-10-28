@@ -51,11 +51,7 @@ public static class BuildHavenWorld
         WorldBuilder.BuildChanged(true);
         string report = WorldBuilder.LastReport;
 
-        List<GameObject> grass = GrassSetup.EnsureAssets();
-        GrassSetup.AddTo(terrain, grass);
-        GrassSetup.FillByGround(terrain, grass, GrassSetup.DefaultFill(terrain.terrainData), 3);
-        GrassSetup.ClearUnderWater(terrain);
-        GrassSetup.BakeGroundColour(terrain);
+        HavenOldGrowth.Grass(terrain);
 
         int moved = 0;
         foreach (KeyValuePair<Transform, float> item in heights)
@@ -232,6 +228,7 @@ public static class BuildHavenWorld
             var grove = Feature<BiomeArea>(root, name, points);
             grove.Spline.Closed = true;
             grove.Configure(WorldMenus.HavenGroveLayers());
+            HavenOldGrowth.PaintUnder(root, name, points);
         }
 
         return river;
@@ -335,5 +332,116 @@ public static class HavenNavMesh
         AssetDatabase.SaveAssets();
         if (!string.IsNullOrEmpty(previous) && previous != scene.path) EditorSceneManager.OpenScene(previous);
         return "baked into " + AssetPath;
+    }
+}
+
+/// <summary>
+/// The groves round Safe Haven get a Norwegian old-growth floor (`--entry HavenOldGrowth.Apply`): a Ground Paint Area
+/// with the Old-Growth Forest rules (moss carpet, mossy mud, litter, black humus in hollows) under each grove, fading in
+/// over 10 m from the meadow; the terrain blends its layers by height (the textures' displacement); and the grass is
+/// filled again, sparse on the forest floor (ferns, berry shrubs and heather instead). Reopens the scene that was open.
+/// </summary>
+public static class HavenOldGrowth
+{
+    private static readonly (string name, Vector2[] points)[] Groves =
+    {
+        ("Grove North", new[] { new Vector2(-198f, 52f), new Vector2(198f, 52f), new Vector2(198f, 198f), new Vector2(-198f, 198f) }),
+        ("Grove South", new[] { new Vector2(-198f, -198f), new Vector2(198f, -198f), new Vector2(198f, -55f), new Vector2(-198f, -55f) }),
+        ("Grove West", new[] { new Vector2(-198f, -55f), new Vector2(-58f, -55f), new Vector2(-58f, 52f), new Vector2(-198f, 52f) }),
+        ("Grove East", new[] { new Vector2(62f, -55f), new Vector2(198f, -55f), new Vector2(198f, 52f), new Vector2(62f, 52f) }),
+    };
+
+    public static string Apply()
+    {
+        string previous = SceneManager.GetActiveScene().path;
+        if (SceneManager.GetActiveScene().isDirty) return "the open scene has unsaved changes";
+        WorldAssets.EnsureAll();
+        Scene scene = EditorSceneManager.OpenScene("Assets/_Project/Scenes/SafeHaven.unity");
+        Transform root = GameObject.Find("World").transform;
+        foreach ((string name, Vector2[] points) in Groves)
+        {
+            Transform old = root.Find(name + " Floor");
+            if (old != null) Object.DestroyImmediate(old.gameObject);
+            PaintUnder(root, name, points);
+        }
+
+        Terrain terrain = Object.FindObjectsByType<Terrain>().First();
+        WorldBuilder.BuildChanged(true);
+        Grass(terrain);
+        EditorSceneManager.MarkSceneDirty(scene);
+        EditorSceneManager.SaveScene(scene);
+        AssetDatabase.SaveAssets();
+        if (!string.IsNullOrEmpty(previous) && previous != scene.path) EditorSceneManager.OpenScene(previous);
+        return $"old-growth floor under {Groves.Length} groves; layers {string.Join(", ", terrain.terrainData.terrainLayers.Select(l => l.name))}";
+    }
+
+    /// <summary>After the rules change in the open Safe Haven (the World Builder has already rebuilt it): the grass again,
+    /// then save (`--entry HavenOldGrowth.Refresh`).</summary>
+    public static string Refresh()
+    {
+        Scene scene = SceneManager.GetActiveScene();
+        if (scene.path != "Assets/_Project/Scenes/SafeHaven.unity") return "open Safe Haven first";
+        Terrain terrain = Object.FindObjectsByType<Terrain>().First();
+        Grass(terrain);
+        EditorSceneManager.SaveScene(scene);
+        return "grass refilled, saved";
+    }
+
+    public static void PaintUnder(Transform root, string grove, Vector2[] points)
+    {
+        var go = new GameObject(grove + " Floor", typeof(SplineContainer));
+        go.transform.SetParent(root, false);
+        var paint = go.AddComponent<GroundPaintArea>();
+        paint.Spline.Clear();
+        foreach (Vector2 p in points)
+        {
+            float y = WorldGround.TryGround(p, out Vector3 ground, out _) ? ground.y : 0f;
+            paint.Spline.Add(new BezierKnot(new float3(p.x, y, p.y)), TangentMode.Linear);
+        }
+
+        paint.Spline.Closed = true;
+        paint.Configure(WorldAssets.PaintRules("Old-Growth Forest"), 10f);
+        UseHeightBlend(Object.FindObjectsByType<Terrain>().FirstOrDefault());
+    }
+
+    // The layers' displacement (in their mask maps) decides which one shows where they meet: moss over the soil's
+    // hollows rather than a smooth cross-fade.
+    private static void UseHeightBlend(Terrain terrain)
+    {
+        Material material = terrain != null ? terrain.materialTemplate : null;
+        if (material == null || !material.HasProperty("_EnableHeightBlend")) return;
+        material.SetFloat("_EnableHeightBlend", 1f);
+        material.EnableKeyword("_TERRAIN_BLEND_HEIGHT");
+        EditorUtility.SetDirty(material);
+    }
+
+    /// <summary>Grass by ground layer, but sparse on the forest floor: ferns, berry shrubs and heather instead.</summary>
+    public static void Grass(Terrain terrain)
+    {
+        List<GameObject> grass = GrassSetup.EnsureAssets();
+        GrassSetup.AddTo(terrain, grass);
+        GrassSetup.GroundFill[] fills = GrassSetup.DefaultFill(terrain.terrainData);
+        for (int i = 0; i < fills.Length; i++)
+        {
+            switch (fills[i].layer != null ? fills[i].layer.name : "")
+            {
+                case "Forest Moss": Set(ref fills[i], 0.12f, 0f, 0.12f, 0.45f); break;
+                case "Forest Litter": Set(ref fills[i], 0.05f, 0f, 0.05f, 0.3f); break;
+                case "Dark Humus": Set(ref fills[i], 0f, 0f, 0f, 0.15f); break;
+                case "Muddy Bank": Set(ref fills[i], 0.1f, 0f, 0.08f, 0.3f); break;
+            }
+        }
+
+        GrassSetup.FillByGround(terrain, grass, fills, 3);
+        GrassSetup.ClearUnderWater(terrain);
+        GrassSetup.BakeGroundColour(terrain);
+    }
+
+    private static void Set(ref GrassSetup.GroundFill fill, float shortGrass, float tallGrass, float bushes, float plants)
+    {
+        fill.shortGrass = shortGrass;
+        fill.tallGrass = tallGrass;
+        fill.bushes = bushes;
+        fill.plants = plants;
     }
 }
