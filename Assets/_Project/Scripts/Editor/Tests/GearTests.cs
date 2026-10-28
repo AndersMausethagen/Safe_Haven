@@ -33,7 +33,8 @@ public sealed class GearTests
         Assert.IsTrue(GearSlots.Accepts(GearSlot.Head, helmet));
         Assert.IsFalse(GearSlots.Accepts(GearSlot.Chest, helmet));
         Assert.IsTrue(GearSlots.Accepts(GearSlot.Finger1, ring));
-        Assert.IsTrue(GearSlots.Accepts(GearSlot.Finger2, ring));
+        Assert.IsFalse(GearSlots.Accepts(GearSlot.Finger2, ring), "one ring: the second finger is retired");
+        Assert.IsFalse(GearSlots.Accepts(GearSlot.Legs, Armor("leggings", ArmorSlot.Legs)), "the body covers the legs");
         Assert.IsTrue(GearSlots.Accepts(GearSlot.PickaxeTool, pickaxe));
         Assert.IsFalse(GearSlots.Accepts(GearSlot.AxeTool, pickaxe));
         Assert.IsFalse(GearSlots.Accepts(GearSlot.Head, Create<ItemDefinition>("berry")));
@@ -88,20 +89,37 @@ public sealed class GearTests
     }
 
     [Test]
-    public void Equip_SecondRingGoesOnTheOtherFinger()
+    public void Equip_ASecondRingSwapsWithTheFirst()
     {
         ItemDefinition ring = Armor("ring", ArmorSlot.Finger);
+        ItemDefinition other = Armor("other ring", ArmorSlot.Finger);
         var gear = new GearSet();
         var bag = new ItemContainer(4, 4);
         bag.SetSlot(0, new ItemStack(ring, 1));
-        bag.SetSlot(1, new ItemStack(ring, 1));
+        bag.SetSlot(1, new ItemStack(other, 1));
 
         Assert.IsTrue(gear.Equip(bag, 0, out _));
         Assert.IsTrue(gear.Equip(bag, 1, out _));
 
-        Assert.AreEqual(ring, gear.Get(GearSlot.Finger1).Item);
-        Assert.AreEqual(ring, gear.Get(GearSlot.Finger2).Item);
-        Assert.AreEqual(0, bag.Count(ring));
+        Assert.AreEqual(other, gear.Get(GearSlot.Finger1).Item);
+        Assert.IsTrue(gear.Get(GearSlot.Finger2).IsEmpty);
+        Assert.AreEqual(1, bag.Count(ring), "the first ring went back to the bag");
+    }
+
+    [Test]
+    public void SevenArmorSlotsAreInUse()
+    {
+        int worn = 0;
+        foreach (GearSlot slot in System.Enum.GetValues(typeof(GearSlot)))
+        {
+            bool armor = slot < GearSlot.MainHand;
+            if (armor && !GearSlots.IsRetired(slot))
+            {
+                worn++;
+            }
+        }
+
+        Assert.AreEqual(7, worn);
     }
 
     [Test]

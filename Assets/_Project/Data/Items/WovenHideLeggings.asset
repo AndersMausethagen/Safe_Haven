@@ -14,25 +14,30 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ItemDefinition
   id: woven_hide_leggings
   displayName: Woven Hide Leggings
-  description: Hide leggings that keep the mist's chill off.
-  category: 0
+  description: Old hide leggings. Armor covers the legs now; worth a little as hide.
+  category: 5
   tier: 1
   rarity: 0
   value: 9
   icon: {fileID: 21300000, guid: b0494db28e370bb49962c524252e8e7d, type: 3}
   prefab: {fileID: 0}
+  heldModel: {fileID: 0}
+  heldPosition: {x: 0, y: 0, z: 0}
+  heldRotation: {x: 0, y: 0, z: 0}
+  heldScale: 1
   stackable: 0
   maximumStack: 1
   weight: 2
   toolType: 0
   toolTier: 0
   weapon: {fileID: 0}
+  arrow: {fileID: 0}
   healAmount: 0
   hungerRestore: 0
   thirstRestore: 0
   carryCapacityBonus: 0
   bagSlotBonus: 0
-  armorSlot: 9
+  armorSlot: 0
   statBonuses:
   - stat: 7
     op: 0

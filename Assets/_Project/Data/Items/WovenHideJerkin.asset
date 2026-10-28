@@ -13,20 +13,25 @@ MonoBehaviour:
   m_Name: WovenHideJerkin
   m_EditorClassIdentifier: Assembly-CSharp::ItemDefinition
   id: woven_hide_jerkin
-  displayName: Woven Hide Jerkin
-  description: Layered hide over a nettle-fibre lining. Takes the edge off claws and teeth.
+  displayName: Woven Hide Armor
+  description: Layered hide over a nettle-fibre lining, from shoulders to boots. Takes the edge off claws and teeth.
   category: 0
   tier: 1
   rarity: 0
   value: 12
   icon: {fileID: 21300000, guid: ce30b47dde4e3404b995e5826e3c2f67, type: 3}
   prefab: {fileID: 0}
+  heldModel: {fileID: 0}
+  heldPosition: {x: 0, y: 0, z: 0}
+  heldRotation: {x: 0, y: 0, z: 0}
+  heldScale: 1
   stackable: 0
   maximumStack: 1
   weight: 3
   toolType: 0
   toolTier: 0
   weapon: {fileID: 0}
+  arrow: {fileID: 0}
   healAmount: 0
   hungerRestore: 0
   thirstRestore: 0
@@ -36,13 +41,16 @@ MonoBehaviour:
   statBonuses:
   - stat: 7
     op: 0
-    value: 10
+    value: 17
   - stat: 0
     op: 0
-    value: 15
+    value: 25
   - stat: 13
     op: 0
     value: 1
+  - stat: 10
+    op: 0
+    value: 0.05
   teachesBuildings: []
   teachesRecipes: []
   raidModifier: {fileID: 0}

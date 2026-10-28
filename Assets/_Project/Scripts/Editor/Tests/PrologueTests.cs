@@ -111,9 +111,10 @@ public sealed class PrologueTests
     [Test]
     public void StartingArmor_IsACompleteHideSetAndEncounterActorsDoNotPersist()
     {
-        Assert.AreEqual(5, Definition.StartingArmor.Length);
+        // Head, body (which covers the legs), hands and feet.
+        Assert.AreEqual(4, Definition.StartingArmor.Length);
         Assert.IsTrue(Definition.StartingArmor.All(i => i != null && i.IsArmor && i.name.StartsWith("WovenHide")));
-        Assert.AreEqual(5, Definition.StartingArmor.Select(i => i.ArmorSlot).Distinct().Count());
+        Assert.AreEqual(4, Definition.StartingArmor.Select(i => i.ArmorSlot).Distinct().Count());
         Assert.IsEmpty(Definition.WolfPrefab.GetComponentsInChildren<SaveableEntity>(true),
             "Encounters reset on load; only placed construction and gathering nodes persist.");
         var database = AssetDatabase.LoadAssetAtPath<ContentDatabase>("Assets/_Project/Resources/ContentDatabase.asset");

@@ -19,21 +19,18 @@ MonoBehaviour:
     statusText: 
     duration: 0
     initialEnemies: 0
-    acceptText: I will find us shelter.
   - quest: {fileID: 11400000, guid: 4f625534621489e4183de610d93d4f36, type: 2}
     behaviour: 1
     arrivalText: Dry stone overhead. Good work. We need warmth before anyone can think clearly. Gather four Sticks and six Small Rocks nearby; there is loose fuel on the forest floor.
     statusText: 
     duration: 0
     initialEnemies: 0
-    acceptText: I will gather the supplies.
   - quest: {fileID: 11400000, guid: 2ba326763b19a9e46be36507850aed82, type: 2}
     behaviour: 2
     arrivalText: That is enough. Let us put your building skills to use. Press G to open Build, choose Campfire and place it on open ground beside the shelter. The supplies you collected will pay for it.
     statusText: Build a Campfire beside the shelter (G)
     duration: 0
     initialEnemies: 0
-    acceptText: I will build the campfire.
   - quest: {fileID: 11400000, guid: b2306560eba5c594886d38a592bdb05d, type: 2}
     behaviour: 3
     arrivalText: A fire at last. Stay close for a moment and catch your breath. Speak with the others; each of them has seen something different in these woods.
@@ -42,14 +39,12 @@ MonoBehaviour:
       Talk to your companions, or catch your breath.'
     duration: 35
     initialEnemies: 0
-    acceptText: Let us catch our breath.
   - quest: {fileID: 11400000, guid: 2f76858ea1c6b6043bdee39be76ef0b1, type: 2}
     behaviour: 4
     arrivalText: 'Runa: Wolves! They are not hunting; something is driving them towards us. Protect the camp!'
     statusText: 
     duration: 0
     initialEnemies: 2
-    acceptText: Defend the camp!
   - quest: {fileID: 11400000, guid: cd536373f8f639f4db60c8810e546ebf, type: 2}
     behaviour: 5
     arrivalText: 'Sigrid: That rumble is not thunder. Something enormous is coming. Leave the fire! Follow the old road towards those stones!'
@@ -58,14 +53,12 @@ MonoBehaviour:
       Follow the old road to the standing stones.'
     duration: 0
     initialEnemies: 0
-    acceptText: Run!
   - quest: {fileID: 11400000, guid: 5699d07d5ceee6144855cc88c1a5f255, type: 2}
     behaviour: 6
     arrivalText: These markings are older than the road. Liv thinks they may be a way out. Touch the waystones and see if they still answer. We will hold the clearing.
     statusText: 
     duration: 0
     initialEnemies: 0
-    acceptText: I will try the waystones.
   - quest: {fileID: 11400000, guid: a089752e48d75934fb5e34dbeec0b389, type: 2}
     behaviour: 7
     arrivalText: 'Liv: The stones are drawing power! Hold them off until the connection forms!'
@@ -74,7 +67,6 @@ MonoBehaviour:
       Hold them back. Stay close to the portal!'
     duration: 180
     initialEnemies: 2
-    acceptText: Hold the clearing!
   startedEvent: {fileID: 11400000, guid: 8eb5d1eaca7f351419207cf31f6401cf, type: 2}
   shelterEvent: {fileID: 11400000, guid: 3e4af787a3ca3d241a28d20824384e0f, type: 2}
   fireEvent: {fileID: 11400000, guid: c717e4480417eb34ba75f12df32acda0, type: 2}
@@ -91,7 +83,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 04c42d35a9586f14c8712e4d62a6209f, type: 2}
   - {fileID: 11400000, guid: b5086eda803a21340a00ddc09a8ce499, type: 2}
   - {fileID: 11400000, guid: db5ce53299353984885aa0b5f2707a6f, type: 2}
-  - {fileID: 11400000, guid: 10111c97f83125f4180f05e30f25974d, type: 2}
   - {fileID: 11400000, guid: 7243958d017ac4342ab8fb9df54f8d32, type: 2}
   campfire: {fileID: 11400000, guid: c5579431ac7bb1146b3db512a4783ee8, type: 2}
   buildRadius: 5

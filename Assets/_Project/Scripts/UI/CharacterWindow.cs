@@ -16,8 +16,9 @@ using TMPro;
 public sealed class CharacterWindow : MonoBehaviour, IItemSlotHandler
 {
     // Slot order in each column, top to bottom (left to right for the bottom row).
-    private static readonly GearSlot[] LeftSlots = { GearSlot.Head, GearSlot.Neck, GearSlot.Shoulders, GearSlot.Back, GearSlot.Chest, GearSlot.Wrists };
-    private static readonly GearSlot[] RightSlots = { GearSlot.Hands, GearSlot.Waist, GearSlot.Legs, GearSlot.Feet, GearSlot.Finger1, GearSlot.Finger2 };
+    // Armor down the left, jewellery and the belt down the right (see GearSlots for the retired slots).
+    private static readonly GearSlot[] LeftSlots = { GearSlot.Head, GearSlot.Chest, GearSlot.Hands, GearSlot.Feet };
+    private static readonly GearSlot[] RightSlots = { GearSlot.Neck, GearSlot.Waist, GearSlot.Finger1 };
     private static readonly GearSlot[] BottomSlots = { GearSlot.MainHand, GearSlot.OffHand, GearSlot.Backpack, GearSlot.AxeTool, GearSlot.PickaxeTool, GearSlot.SickleTool };
 
     [Tooltip("Left empty, the player's PlayerEquipment is used.")]
@@ -278,9 +279,11 @@ public sealed class CharacterWindow : MonoBehaviour, IItemSlotHandler
     {
         switch (slot)
         {
-            case GearSlot.Shoulders: return "Shoulder";
             case GearSlot.Finger1:
             case GearSlot.Finger2: return "Ring";
+            case GearSlot.Chest: return "Body";
+            case GearSlot.Waist: return "Belt";
+            case GearSlot.Neck: return "Amulet";
             case GearSlot.MainHand: return "Weapon";
             case GearSlot.OffHand: return "Off Hand";
             case GearSlot.Backpack: return "Pack";

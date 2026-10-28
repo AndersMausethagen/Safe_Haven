@@ -8,13 +8,20 @@ public enum ArmorSlot
 {
     None = 0,
     Head = 1,
+    /// <summary>Amulets.</summary>
     Neck = 2,
+    /// <summary>Retired: nothing is worn here any more (see GearSlots.IsRetired).</summary>
     Shoulders = 3,
+    /// <summary>Retired.</summary>
     Back = 4,
+    /// <summary>The body: torso and legs.</summary>
     Chest = 5,
+    /// <summary>Retired.</summary>
     Wrists = 6,
     Hands = 7,
+    /// <summary>Belts (the buckle carries stats).</summary>
     Waist = 8,
+    /// <summary>Retired: the body covers the legs.</summary>
     Legs = 9,
     Feet = 10,
     /// <summary>Rings: fit either finger slot.</summary>
@@ -47,16 +54,25 @@ public enum GearSlot
     OffHand = 17,
 }
 
-/// <summary>The rules of the gear slots: what fits where, and their names.</summary>
+/// <summary>
+/// The rules of the gear slots: what fits where, and their names. Worn armor uses seven slots: Head, Body (Chest),
+/// Hands, Feet, Belt (Waist), Amulet (Neck) and one Ring (Finger1). Shoulders, Back, Wrists, Legs and the second ring
+/// are retired: they keep their numbers (saves store slots by number) but take nothing, and gear found there in an old
+/// save goes to the bag (PlayerEquipment.Restore).
+/// </summary>
 public static class GearSlots
 {
-    /// <summary>How many gear slots there are.</summary>
+    /// <summary>How many gear slots there are, retired ones included.</summary>
     public const int Count = 18;
+
+    /// <summary>Slots that no longer take anything.</summary>
+    public static bool IsRetired(GearSlot slot) =>
+        slot == GearSlot.Shoulders || slot == GearSlot.Back || slot == GearSlot.Wrists || slot == GearSlot.Legs || slot == GearSlot.Finger2;
 
     /// <summary>Whether the item can go into the gear slot.</summary>
     public static bool Accepts(GearSlot slot, ItemDefinition item)
     {
-        if (item == null)
+        if (item == null || IsRetired(slot))
         {
             return false;
         }
@@ -147,9 +163,14 @@ public static class GearSlots
         switch (slot)
         {
             case GearSlot.Finger1:
-                return "Finger";
             case GearSlot.Finger2:
-                return "Finger";
+                return "Ring";
+            case GearSlot.Chest:
+                return "Body";
+            case GearSlot.Waist:
+                return "Belt";
+            case GearSlot.Neck:
+                return "Amulet";
             case GearSlot.MainHand:
                 return "Main Hand";
             case GearSlot.OffHand:

@@ -693,8 +693,8 @@ checks saved assets and runs isolated live combat probes without loading a playe
 ## Equipment and the character screen (C)
 
 - **Gear model**: `Items/GearSlot.cs` (the slot enum, plus `GearSlots` for count, labels and `Describe`) and `Items/GearSet.cs`
-  (an `ItemContainer` with a `SlotRule`, so each slot only takes items whose `ItemDefinition` gear slot matches; rings fit
-  either finger). Slots: 12 armor slots, MainHand, Backpack, and a tool belt of Axe, Pickaxe and Sickle.
+  (an `ItemContainer` with a `SlotRule`, so each slot only takes items whose `ItemDefinition` gear slot matches; there is
+  one ring). Slots: 7 armor slots (Head, Body, Hands, Feet, Belt, Amulet, Ring; Shoulders, Back, Wrists, Legs and the second ring are retired: `GearSlots.IsRetired`, numbers kept for saves, gear found there moves to the bag on load), MainHand, Off Hand, Backpack, and a tool belt of Axe, Pickaxe and Sickle.
 - **Held items**: `HeldItemView` (on PlayerArmature) shows the main-hand weapon in the right hand (a bow in the left), or,
   while gathering, the belt tool for the job. Models come from `ItemDefinition` › Held In Hand (held model, else the world prefab; position,
   rotation, scale in the grip). Held models are visual only (colliders, rigidbodies and scripts stripped). The grip is a fist

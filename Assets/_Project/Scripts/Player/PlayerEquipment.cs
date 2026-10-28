@@ -150,6 +150,7 @@ public sealed class PlayerEquipment : MonoBehaviour
                 gear.AutoEquipFrom(Inventory.Container);
             }
 
+            MoveOutOfRetiredSlots();
             for (int i = 0; i < wasBroken.Length; i++)
             {
                 wasBroken[i] = gear.Slots.GetSlot(i).IsBroken;
@@ -162,6 +163,27 @@ public sealed class PlayerEquipment : MonoBehaviour
 
         ApplyWeapon();
         Changed?.Invoke();
+    }
+
+    // Gear worn in a slot that has since been retired (an old save) goes to the bag, or the stash when the bag is full.
+    private void MoveOutOfRetiredSlots()
+    {
+        for (int i = 0; i < GearSlots.Count; i++)
+        {
+            ItemStack stack = gear.Slots.GetSlot(i);
+            if (stack.IsEmpty || !GearSlots.IsRetired((GearSlot)i))
+            {
+                continue;
+            }
+
+            gear.Slots.SetSlot(i, ItemStack.Empty);
+            if (Inventory.Container.AddStack(stack) < stack.Count)
+            {
+                GameSession.Stash.Items.AddStack(stack);
+            }
+
+            GameMessages.Post($"{stack.Item.DisplayName} has no gear slot any more: put in your bag.", MessageKind.Info);
+        }
     }
 
     private bool Report(bool done, string reason, ItemDefinition item)
