@@ -38,6 +38,8 @@ by motion, sound and weight rather than on-screen text.
   so tapping it is no free parry. A monster's ground telegraph turns pale and the monster glints exactly when to raise
   it.
 - **Perfect dodge.** Dodging through a hit (during the dodge's invulnerability) also readies a counter.
+- **Stamina.** 100, back at 26 per second from 0.9 s after the last spend (empty to full in under five seconds): a
+  light swing costs 12, a dodge 20 (more for a heavy roll), a shield bash 18, a drawn arrow 4, a block part of the hit.
 - **Focus.** Fighting well earns Focus (the gold bar under stamina): each hit that lands (finishers twice as much, heavy
   swings and counters half again), a parry (worth about six hits), a perfect dodge (about four), a block (a little). It
   holds for ten seconds after the last gain, then drains. Skills cost Focus on top of their cooldown (Wolf's Lunge 25,

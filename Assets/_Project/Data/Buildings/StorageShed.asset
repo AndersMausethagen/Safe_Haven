@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BuildingDefinition
   id: storageshed
   displayName: Storage Shed
-  description: Keeps your things safe at home. What is stored here never goes on a raid, and building and crafting at home can use it.
+  description: 'Keeps your things safe at home: the whole stash. What is stored here never goes on a raid, and building and crafting at home can use it.'
   icon: {fileID: 21300000, guid: 55ea9404246bfe24c8ec49ddff46071b, type: 3}
   faction: 0
   combatStats: {fileID: 11400000, guid: 01155c9e2dd7c27468c1a359f747e1a1, type: 2}

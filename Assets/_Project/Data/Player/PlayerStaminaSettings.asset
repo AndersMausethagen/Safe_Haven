@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: PlayerStaminaSettings
   m_EditorClassIdentifier: Assembly-CSharp::PlayerStaminaSettings
   maxStamina: 100
-  regenPerSecond: 14
-  regenDelay: 1.5
-  attackCost: 15
-  shieldBashCost: 20
-  dodgeCost: 25
+  regenPerSecond: 26
+  regenDelay: 0.9
+  attackCost: 12
+  shieldBashCost: 18
+  dodgeCost: 20
