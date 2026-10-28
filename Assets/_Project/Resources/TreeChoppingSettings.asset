@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e3eb9523ce88404d9afbce853fecd02, type: 3}
+  m_Name: TreeChoppingSettings
+  m_EditorClassIdentifier: SafeHaven::TreeChoppingSettings
+  woodByTier:
+  - {fileID: 11400000, guid: 8ae2883815327b74fa7975309c803f92, type: 2}
+  - {fileID: 11400000, guid: 183fddc5567e8b8479fcb1618e73496c, type: 2}
+  - {fileID: 11400000, guid: 50d6dfa982b3a264980eaec31b4aae11, type: 2}
+  baseLogs: 2
+  logsPerAxeTier: 1
+  referenceHeight: 8
+  minSize: 0.5
+  maxSize: 2.5
+  baseChance: 0.08
+  chancePerAxeTier: 0.2
+  chancePerSize: 0.12
+  maxChance: 0.75
+  terrainTreeProxy: {fileID: 1000865458160168767, guid: 36ef7e4c9d335574089c821a1f07f8f1, type: 3}
+  terrainTreeRegrowSeconds: 900

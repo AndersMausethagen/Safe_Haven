@@ -65,6 +65,22 @@ public sealed class ResourceSource : MonoBehaviour
         return true;
     }
 
+    /// <summary>Gives these items instead of a roll of the drop table (a felled tree's logs, which depend on the axe), with
+    /// the same overflow handling. Returns false when there is nobody to give them to.</summary>
+    public bool GrantItems(GameObject recipient, List<ItemAmount> items)
+    {
+        ItemInventory bag = recipient != null ? recipient.GetComponentInParent<ItemInventory>() : null;
+        if (recipient == null || items == null || items.Count == 0)
+        {
+            return false;
+        }
+
+        var leftBehind = new List<string>();
+        Give(bag, recipient, items, new List<ResourceAmount>(), leftBehind);
+        ReportLeftBehind(leftBehind);
+        return true;
+    }
+
     /// <summary>
     /// Gives extra units of the main yield (the first drop entry): the bonus for well-timed gathering swings. Returns
     /// false when there is no main yield or nobody to give it to.

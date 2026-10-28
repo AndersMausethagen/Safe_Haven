@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ItemDefinition
   id: stone_hatchet
   displayName: Stone Hatchet
-  description: A sharp stone lashed to a stick. Harvests Tier I oak wood; hardwood needs a stronger axe.
+  description: A sharp stone lashed to a stick. Fells any tree; a better axe brings more logs and better wood.
   category: 4
   tier: 1
   rarity: 0
@@ -31,6 +31,7 @@ MonoBehaviour:
   toolType: 1
   toolTier: 1
   weapon: {fileID: 0}
+  arrow: {fileID: 0}
   healAmount: 0
   hungerRestore: 0
   thirstRestore: 0

@@ -59,6 +59,18 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 64cf339f5be4ce047adc2774ce1370e0, type: 3}
       insertIndex: -1
       addedObject: {fileID: 7918071775107336738}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 64cf339f5be4ce047adc2774ce1370e0, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8492103388692160583}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 64cf339f5be4ce047adc2774ce1370e0, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1190518535667192915}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 64cf339f5be4ce047adc2774ce1370e0, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6129824669250838770}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 64cf339f5be4ce047adc2774ce1370e0, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 483154064303999494}
   m_SourcePrefab: {fileID: 100100000, guid: 64cf339f5be4ce047adc2774ce1370e0, type: 3}
 --- !u!1 &205465211577325349 stripped
 GameObject:
@@ -88,3 +100,73 @@ CapsuleCollider:
   m_Height: 11.402417
   m_Direction: 1
   m_Center: {x: -0.026628496, y: 5.702719, z: -0.03965328}
+--- !u!114 &8492103388692160583
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 205465211577325349}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f655434a56283ac419a02d53bb587f9e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::Interactable
+  animationType: 4
+  duration: 2
+  range: 1.8
+  deactivateOnComplete: 0
+  started:
+    m_PersistentCalls:
+      m_Calls: []
+  completed:
+    m_PersistentCalls:
+      m_Calls: []
+  cancelled:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &1190518535667192915
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 205465211577325349}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1e0af811c8e11d478f809a8ace77dbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::ResourceSource
+  drops:
+    entries:
+    - item: {fileID: 11400000, guid: 8ae2883815327b74fa7975309c803f92, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 1
+  grantOnInteractionComplete: 0
+--- !u!114 &6129824669250838770
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 205465211577325349}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7832ee47638141c46941c6f60e75da8e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::ResourceNode
+  node: {fileID: 11400000, guid: 0a3ad1d1b8eb1d74aa08464c83d48fef, type: 2}
+--- !u!114 &483154064303999494
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 205465211577325349}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9f9c0a17caeb0b8499b87857f58ed6c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::ChoppableTree

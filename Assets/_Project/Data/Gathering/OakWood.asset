@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: OakWood
   m_EditorClassIdentifier: Assembly-CSharp::GatheringNodeDefinition
   id: 
-  displayName: Oak Wood
+  displayName: Wood
   tier: 1
   yields:
     entries:

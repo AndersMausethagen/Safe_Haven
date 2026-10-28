@@ -13,20 +13,25 @@ MonoBehaviour:
   m_Name: OakWood
   m_EditorClassIdentifier: Assembly-CSharp::ItemDefinition
   id: softwood
-  displayName: Oak Wood
-  description: Fallen branches and young oak from the clearing. The first thing every home is built from.
+  displayName: Wood
+  description: Logs from any tree. Felled with an axe; a better axe and a bigger tree give more, and sometimes better wood.
   category: 2
   tier: 1
   rarity: 0
   value: 1
   icon: {fileID: 21300000, guid: 820c229c04231d044b3f4230f7d7c5b8, type: 3}
   prefab: {fileID: 0}
+  heldModel: {fileID: 0}
+  heldPosition: {x: 0, y: 0, z: 0}
+  heldRotation: {x: 0, y: 0, z: 0}
+  heldScale: 1
   stackable: 1
   maximumStack: 50
   weight: 1
   toolType: 0
   toolTier: 0
   weapon: {fileID: 0}
+  arrow: {fileID: 0}
   healAmount: 0
   hungerRestore: 0
   thirstRestore: 0

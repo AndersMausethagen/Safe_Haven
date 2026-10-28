@@ -222,6 +222,44 @@ public sealed class GatheringMinigamePage : SystemsPage
     }
 }
 
+/// <summary>What felling a tree gives: logs by axe tier and tree size, and the chance of better wood.</summary>
+public sealed class TreeChoppingPage : SystemsPage
+{
+    public override string Title => "Tree Chopping";
+    public override string Group => "Player";
+    public override string Help => "Every tree in the world can be felled with an axe (hatchet). A better axe and a bigger tree give more logs, " +
+                                   "and each log may come out as a better wood (Hardwood, Elderwood): a wood at most one tier above the axe. " +
+                                   "The trees grow back (the Tree gathering node's respawn time).";
+
+    public override void Draw()
+    {
+        var settings = Settings<TreeChoppingSettings>(TreeChoppingSettings.ResourceName);
+        if (settings == null)
+        {
+            return;
+        }
+
+        SettingsPanel(settings, "Tree chopping", "Resources/TreeChoppingSettings");
+        BeginDerived();
+        foreach (int axe in new[] { 1, 3, 4 })
+        {
+            foreach (float size in new[] { 0.6f, 1f, 2f })
+            {
+                string woods = "";
+                for (int tier = 2; tier <= settings.WoodByTier.Count; tier++)
+                {
+                    ItemDefinition wood = settings.WoodByTier[tier - 1];
+                    woods += $", {(wood != null ? wood.DisplayName : "?")} {settings.ChanceOf(tier, axe, size):P0}";
+                }
+
+                Derived($"Tier {Tiers.ToRoman(axe)} axe, tree size {size:0.0}", $"{settings.Logs(axe, size)} logs{woods} each");
+            }
+        }
+
+        EndDerived();
+    }
+}
+
 /// <summary>Movement, dodge, stamina, combat rules and feel, and the camera.</summary>
 public sealed class MovementAndCombatPage : SystemsPage
 {
