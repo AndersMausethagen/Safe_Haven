@@ -53,7 +53,7 @@ Rules written as special cases instead of following the existing model. Work top
        recovery as a `Launch` parameter instead of checking whether the owner is the player.
 4. [x] **Split large classes**: `Companion` (movement/combat, downed, orders, looks) and the target choice out of
        `MonsterAI`.
-5. [ ] **Non-blocking lines in combat**: lines without answers during a fight show as subtitles and don't hold attacks,
+5. [x] **Non-blocking lines in combat**: lines without answers during a fight show as subtitles and don't hold attacks,
        so the prologue's wait-for-the-line rule and the Troll Ambush reorder become unnecessary.
 6. [ ] Smaller: companions stop only when they themselves are talked to (not on any open dialogue); companion grips as
        rig data instead of the player's HeldItemView; one encounter definition per prologue chapter (camp wolves and

@@ -53,6 +53,12 @@ public sealed class DialogueChoice
 /// the player (PlayerCameraController.BeginDialogue). It is a UI window (UIWindowId.Dialogue), so the player doesn't
 /// attack or use things while talking.
 /// <para>
+/// In a fight (a monster hunting the player or a companion, <see cref="MonsterAI.AnyHuntingPlayerSide"/>) a line without
+/// answers is a subtitle instead: one strip above the HUD, shown for its reading time, that leaves the controls, the
+/// cursor and the camera to the player; a fight that starts during such a line turns it into one. Lines with answers
+/// always wait for the player.
+/// </para>
+/// <para>
 /// Callers chain lines: <see cref="Say"/> and <see cref="Ask"/> call back when the player moves on, and the box closes
 /// unless the callback says or asks something else. Quest givers, companions and story graphs (StoryScript) all talk
 /// through it. Made on first use in each scene; nothing to set up.
@@ -68,6 +74,11 @@ public sealed class DialogueBox : MonoBehaviour
     private const float PanelHeight = 250f;
     private const float AnswerRowHeight = 46f;
     private const float AnswerRowStep = 52f;
+    // A subtitle stays for its reading time: a second plus letters at this pace, within these bounds.
+    private const float SubtitleLettersPerSecond = 18f;
+    private const float SubtitleMinSeconds = 2.5f;
+    private const float SubtitleMaxSeconds = 8f;
+    private const float FightCheckInterval = 0.25f;
 
     private static readonly Color Panel = new Color(0.075f, 0.062f, 0.05f, 0.95f);
     private static readonly Color Rim = new Color(0.64f, 0.49f, 0.29f, 0.9f);
@@ -100,6 +111,12 @@ public sealed class DialogueBox : MonoBehaviour
     private int letters;
     private bool answered;
     private Transform anchor;
+    private GameObject subtitleStrip;
+    private TMP_Text subtitle;
+    private Action subtitleDone;
+    private float subtitleEnds = -1f;
+    private float nextFightCheck;
+    private bool demoting;
 
     /// <summary>The dialogue box of the loaded scene, made on first use.</summary>
     public static DialogueBox Current
@@ -124,9 +141,18 @@ public sealed class DialogueBox : MonoBehaviour
     /// <summary>Shows a line; <paramref name="done"/> runs when the player moves on. Without a follow-up the box closes.</summary>
     public void Say(DialogueSpeaker speaker, string line, Action done = null)
     {
+        if (!IsOpen && MonsterAI.AnyHuntingPlayerSide())
+        {
+            Subtitle(speaker.Name, line, done);
+            return;
+        }
+
         Show(speaker, line, null);
         onContinue = done;
     }
+
+    /// <summary>True while a subtitle is shown.</summary>
+    public bool IsSubtitling => subtitleEnds >= 0f;
 
     /// <summary>Shows a line with answers; <paramref name="chosen"/> gets the answer's index, or -1 when the player walks
     /// away or the box is closed.</summary>
@@ -167,6 +193,12 @@ public sealed class DialogueBox : MonoBehaviour
     /// <summary>Closes the box: whoever waited for an answer gets -1.</summary>
     public void Close()
     {
+        if (IsSubtitling)
+        {
+            subtitleDone = null;
+            EndSubtitle();
+        }
+
         Action<int> waiting = onChosen;
         onChosen = null;
         onContinue = null;
@@ -180,6 +212,10 @@ public sealed class DialogueBox : MonoBehaviour
 
     private void Show(DialogueSpeaker speaker, string line, IReadOnlyList<DialogueChoice> answers)
     {
+        // The box takes over from a subtitle; whoever waited for it hears Closed when the box closes.
+        subtitleDone = null;
+        subtitleEnds = -1f;
+        subtitleStrip.SetActive(false);
         onContinue = null;
         onChosen = null;
         choices = answers;
@@ -237,9 +273,25 @@ public sealed class DialogueBox : MonoBehaviour
 
     private void Update()
     {
+        if (IsSubtitling && Time.time >= subtitleEnds)
+        {
+            FinishSubtitle();
+        }
+
         if (!window.IsOpen)
         {
             return;
+        }
+
+        bool asking = choices != null && choices.Count > 0;
+        if (!asking && !answered && Time.unscaledTime >= nextFightCheck)
+        {
+            nextFightCheck = Time.unscaledTime + FightCheckInterval;
+            if (MonsterAI.AnyHuntingPlayerSide())
+            {
+                ToSubtitle();
+                return;
+            }
         }
 
         if (!Revealed)
@@ -356,6 +408,14 @@ public sealed class DialogueBox : MonoBehaviour
             return;
         }
 
+        if (demoting)
+        {
+            portraitCamera.Show(null);
+            Frame(null);
+            anchor = null;
+            return;
+        }
+
         // Closed some other way (Escape closes every window): nobody waits for an answer that won't come.
         Action<int> waiting = onChosen;
         onChosen = null;
@@ -365,6 +425,52 @@ public sealed class DialogueBox : MonoBehaviour
         Frame(null);
         anchor = null;
         Closed?.Invoke();
+    }
+
+    // ----- Subtitles -----
+
+    private void Subtitle(string speakerName, string line, Action done)
+    {
+        subtitleDone = done;
+        subtitle.text = string.IsNullOrWhiteSpace(speakerName) ? line : $"<color=#E8C46A>{speakerName}:</color> {line}";
+        subtitleStrip.SetActive(true);
+        float seconds = 1f + (line ?? "").Length / SubtitleLettersPerSecond;
+        subtitleEnds = Time.time + Mathf.Clamp(seconds, SubtitleMinSeconds, SubtitleMaxSeconds);
+    }
+
+    // The line on screen when the fight started goes on as a subtitle, with whatever was to follow it.
+    private void ToSubtitle()
+    {
+        Action done = onContinue;
+        onContinue = null;
+        string speakerName = nameLabel.text;
+        string line = lineLabel.text;
+        demoting = true;
+        window.Close();
+        demoting = false;
+        Subtitle(speakerName, line, done);
+    }
+
+    private void FinishSubtitle()
+    {
+        Action done = subtitleDone;
+        subtitleDone = null;
+        subtitleEnds = -1f;
+        done?.Invoke();
+        if (!IsSubtitling && !window.IsOpen)
+        {
+            EndSubtitle();
+        }
+    }
+
+    private void EndSubtitle()
+    {
+        subtitleEnds = -1f;
+        subtitleStrip.SetActive(false);
+        if (!window.IsOpen)
+        {
+            Closed?.Invoke();
+        }
     }
 
     private static bool OverButton()
@@ -437,6 +543,18 @@ public sealed class DialogueBox : MonoBehaviour
         {
             box.AddAnswerRow();
         }
+
+        // Above the HUD, and never in the way of a click: the fight goes on beneath it.
+        RectTransform strip = Rect("Subtitle", root.transform, new Vector2(0.5f, 0f), new Vector2(PanelWidth, 64f), new Vector2(0f, 330f));
+        Image stripBackground = strip.gameObject.AddComponent<Image>();
+        stripBackground.color = new Color(Panel.r, Panel.g, Panel.b, 0.78f);
+        stripBackground.raycastTarget = false;
+        box.subtitle = Text("Line", strip, 24f, Body, new Vector2(0.5f, 0.5f), new Vector2(PanelWidth - 40f, 56f), Vector2.zero, TextAlignmentOptions.Center);
+        box.subtitle.enableAutoSizing = true;
+        box.subtitle.fontSizeMin = 16f;
+        box.subtitle.fontSizeMax = 24f;
+        box.subtitleStrip = strip.gameObject;
+        strip.gameObject.SetActive(false);
 
         box.window = root.AddComponent<UIWindow>();
         box.window.Configure(UIWindowId.Dialogue, panel.gameObject);

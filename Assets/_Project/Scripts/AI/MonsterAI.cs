@@ -124,6 +124,20 @@ public sealed class MonsterAI : MonoBehaviour
     /// <summary>True while walking to a point given by <see cref="Roam"/>, watching for targets on the way.</summary>
     public bool IsRoaming => roaming && CurrentState == State.Returning;
 
+    /// <summary>True while any monster chases or attacks the player or someone on their side: a fight is on.</summary>
+    public static bool AnyHuntingPlayerSide()
+    {
+        foreach (MonsterAI monster in active)
+        {
+            if (monster.targetComponent != null && monster.IsEngaging(monster.target) && monster.target.Faction.IsPlayerSide())
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /// <summary>True while chasing or attacking the given target.</summary>
     public bool IsEngaging(IDamageable candidate)
     {

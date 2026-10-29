@@ -36,8 +36,6 @@ public sealed class PrologueDirector : MonoBehaviour
     private bool ending;
     private bool reviving;
     private bool chapterActive;
-    private bool briefing;
-    private int briefings;
 
     public static PrologueDirector Current { get; private set; }
     public PrologueDefinition Definition => definition;
@@ -140,7 +138,7 @@ public sealed class PrologueDirector : MonoBehaviour
         if (!ready || ending || reviving) return;
         RefreshStep(false);
         if (!ready || ending) return;
-        if (!chapterActive || briefing)
+        if (!chapterActive)
         {
             return;
         }
@@ -199,26 +197,12 @@ public sealed class PrologueDirector : MonoBehaviour
             return;
         }
 
-        briefing = false;
         if (chapterActive)
         {
-            bool speaks = chapter.Quest.Start != QuestStart.ByQuestGiver && !string.IsNullOrWhiteSpace(chapter.ArrivalText);
-            // The dialogue box holds the player's attacks, so a fight waits until its arrival line has been read:
-            // the wolves come, and its clock starts, when the player moves on.
-            if (speaks && IsFighting)
-            {
-                briefing = true;
-                int briefed = ++briefings;
-                Speak(chapter.ArrivalText, () =>
-                {
-                    if (this != null && briefing && briefed == briefings) StartChapter();
-                });
-            }
-            else
-            {
-                if (speaks) Speak(chapter.ArrivalText, null);
-                StartChapter();
-            }
+            // In a fight the line becomes a subtitle once the enemies close in (DialogueBox), so nothing waits for it.
+            if (chapter.Quest.Start != QuestStart.ByQuestGiver && !string.IsNullOrWhiteSpace(chapter.ArrivalText))
+                Speak(chapter.ArrivalText, null);
+            StartChapter();
         }
         if (CanSave && !SaveGameService.TrySave(out string problem))
             GameMessages.Post("Prologue checkpoint could not be saved: " + problem, MessageKind.Warning);
@@ -227,7 +211,6 @@ public sealed class PrologueDirector : MonoBehaviour
     // The chapter's clock and arrivals: wolves, the portal's rumble.
     private void StartChapter()
     {
-        briefing = false;
         elapsed = 0f;
         if (chapter.Duration > 0f)
             QuestTimers.Set(chapter.Quest, chapter.Duration);

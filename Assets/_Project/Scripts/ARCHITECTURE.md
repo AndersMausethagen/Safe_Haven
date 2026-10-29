@@ -112,9 +112,9 @@ Her `Talkable` makes the offers a conversation (close-camera framing, walk-away 
 accept anything. Set a chapter quest's Start to **By Quest Giver**, then author its offer on the giver.
 Acceptance uses `QuestGiver → QuestManager → QuestLog`; there is no director acceptance API or leader flag.
 The director does not run an unaccepted chapter's timer/encounter.
-Automatically-started emergency chapters need no conversation; a fighting chapter (camp defence, portal hold) with
-an arrival line waits until the player has read it before its enemies, clock and win check start, since the dialogue
-box holds attacks. Story graphs follow the same rule by linking Say before Spawn Enemies (Troll Ambush). Add or reorder chapters together with their quest prerequisites in
+Automatically-started emergency chapters need no conversation; a fighting chapter (camp defence, portal hold) says
+its arrival line and starts at once: in a fight a line without answers is a subtitle that leaves the controls to the
+player (`DialogueBox`), so nothing waits for it, and story graphs can Spawn Enemies before Say (Troll Ambush). Add or reorder chapters together with their quest prerequisites in
 the existing Quest Map; chapter list order does not rewrite the prerequisite graph. A chapter waits for its quest
 to complete. Reusable behaviour presets handle shelter, fuel, fire, rest, camp defence, travel, activation and the
 portal hold; new kinds of scene mechanics still require code. The same asset holds the field building, building radius,
