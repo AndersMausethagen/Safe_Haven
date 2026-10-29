@@ -48,8 +48,8 @@ Rules written as special cases instead of following the existing model. Work top
        the `Instant` flag set in four `Awake`s, the fake 0.2-0.4 s durations and ExtractionPoint's Complete-on-Started.
    - [ ] **Talkable**: one shared conversation component (open, camera framing, walk-away close) that gathers pages
          from `IConversationTopics` sources, replacing the copies in QuestGiver, PrologueCompanion and ResidentNpc.
-2. [ ] **IInteractionName** instead of the type checks in `WorldInteractionIndicator.NameOf`.
-3. [ ] **Target priority as data** (`Combatant`) instead of `Player.IsPlayer` in MonsterAI target choice; arrow
+2. [x] **IInteractionName** instead of the type checks in `WorldInteractionIndicator.NameOf`.
+3. [x] **Target priority as data** (`Combatant`) instead of `Player.IsPlayer` in MonsterAI target choice; arrow
        recovery as a `Launch` parameter instead of checking whether the owner is the player.
 4. [ ] **Split large classes**: `Companion` (movement/combat, downed, orders, looks) and the target choice out of
        `MonsterAI`.

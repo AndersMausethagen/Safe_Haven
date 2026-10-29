@@ -30,6 +30,7 @@ public sealed class ArrowProjectile : MonoBehaviour
     private float damage;
     private HitTechnique technique;
     private bool critical;
+    private bool canBeRecovered;
     private Vector3 velocity;
     private float gravity;
     private float flightEnds;
@@ -47,7 +48,7 @@ public sealed class ArrowProjectile : MonoBehaviour
     /// <summary>Starts a flight from where the copy stands. <paramref name="arrowItem"/>'s Arrow sets the drop, burning and
     /// recovery; <paramref name="forceCritical"/> makes the hit critical (a perfect release).</summary>
     public void Launch(Combatant source, AttackDefinition shot, ItemDefinition arrowItem, float shotDamage, Vector3 launchVelocity,
-        HitTechnique hitTechnique = HitTechnique.None, bool forceCritical = false)
+        HitTechnique hitTechnique = HitTechnique.None, bool forceCritical = false, bool recoverable = false)
     {
         owner = source;
         attack = shot;
@@ -57,6 +58,7 @@ public sealed class ArrowProjectile : MonoBehaviour
         damage = shotDamage;
         technique = hitTechnique;
         critical = forceCritical;
+        canBeRecovered = recoverable;
         Recoverable = false;
         velocity = launchVelocity;
         gravity = Physics.gravity.magnitude * (definition != null ? definition.GravityScale : 1f);
@@ -165,9 +167,8 @@ public sealed class ArrowProjectile : MonoBehaviour
         }
 
         transform.SetPositionAndRotation(hit.point + direction * Embed - direction * TipOffset, Quaternion.LookRotation(direction));
-        // Only the player's own arrows can be picked up again; a companion's never run out, so they'd be free arrows.
-        Recoverable = item != null && arrow != null && owner != null && Player.IsPlayer(owner.gameObject)
-            && Random.value < arrow.RecoverChance;
+        // The shooter decides: the player's arrows can be picked up again; a companion's never run out.
+        Recoverable = canBeRecovered && item != null && arrow != null && Random.value < arrow.RecoverChance;
         releaseAt = Time.time + (Recoverable ? Mathf.Max(stuckSeconds, RecoverableSeconds) : stuckSeconds);
         velocity = Vector3.zero;
         if (flightOnly != null)

@@ -116,32 +116,12 @@ public sealed class WorldInteractionIndicator : MonoBehaviour
         }
     }
 
-    // The name players know the thing by: a resource, building or person's display name, else the object's name.
+    // The name players know the thing by (IInteractionName on the object), else the object's name.
     private static string NameOf(Interactable target)
     {
-        if (target.TryGetComponent(out ResourceNode node) && node.Definition != null)
+        if (target.TryGetComponent(out IInteractionName named) && !string.IsNullOrEmpty(named.InteractionName))
         {
-            return node.Definition.DisplayName;
-        }
-
-        if (target.TryGetComponent(out BuildingObject building) && building.Definition != null)
-        {
-            return building.Definition.DisplayName;
-        }
-
-        if (target.TryGetComponent(out RescuableTraveler traveler) && traveler.Resident != null)
-        {
-            return traveler.IsFollowing ? traveler.Resident.DisplayName : "Someone hiding";
-        }
-
-        if (target.TryGetComponent(out RaidPortal portal))
-        {
-            return portal.IsRepaired ? "Portal" : "Ruined Portal";
-        }
-
-        if (target.TryGetComponent<WaterSource>(out _))
-        {
-            return "Stream";
+            return named.InteractionName;
         }
 
         return target.name.Replace("(Clone)", "").Replace('_', ' ').Trim();

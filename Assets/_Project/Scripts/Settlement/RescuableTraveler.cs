@@ -13,7 +13,7 @@ using UnityEngine.AI;
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Interactable), typeof(NavMeshAgent))]
-public sealed class RescuableTraveler : MonoBehaviour
+public sealed class RescuableTraveler : MonoBehaviour, IInteractionName
 {
     private enum State
     {
@@ -45,6 +45,8 @@ public sealed class RescuableTraveler : MonoBehaviour
 
     public ResidentDefinition Resident => resident;
     public bool IsFollowing => state == State.Following;
+    // Hidden until freed: the player doesn't know who it is yet.
+    public string InteractionName => resident == null ? null : IsFollowing ? resident.DisplayName : "Someone hiding";
 
     private void Awake()
     {

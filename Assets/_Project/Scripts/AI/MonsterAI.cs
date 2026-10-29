@@ -1070,8 +1070,9 @@ public sealed class MonsterAI : MonoBehaviour
         return definition.LeashRange > 0f && HorizontalDistance(home) > definition.LeashRange;
     }
 
-    // While hunting one target, looks for a better one it can see: the player first while it can reach them, otherwise
-    // a clearly nearer one (a companion or traveller between it and the player). See TargetPriority.
+    // While hunting one target, looks for a better one it can see: a priority target (Combatant: the player) first while
+    // it can reach them, otherwise a clearly nearer one (a companion or traveller between it and the player). See
+    // TargetPriority.
     private void ScanForNearerTarget()
     {
         Vector3 center = transform.position + Vector3.up * CenterHeight;
@@ -1092,7 +1093,7 @@ public sealed class MonsterAI : MonoBehaviour
             }
 
             Transform body = ((Component)candidate).transform;
-            bool isPlayer = global::Player.IsPlayer(body.gameObject);
+            bool isPlayer = IsPriorityTarget(body);
             if (isPlayer && seenPlayer != null)
             {
                 continue;
@@ -1114,7 +1115,7 @@ public sealed class MonsterAI : MonoBehaviour
             }
         }
 
-        bool huntingPlayer = CanTarget(target) && global::Player.IsPlayer(targetComponent.gameObject);
+        bool huntingPlayer = CanTarget(target) && IsPriorityTarget(targetComponent);
         if (seenPlayer == null && best == null)
         {
             return;
@@ -1157,6 +1158,8 @@ public sealed class MonsterAI : MonoBehaviour
     }
 
     private NavMeshPath reachPath;
+
+    private static bool IsPriorityTarget(Component body) => body.TryGetComponent(out Combatant side) && side.IsPriorityTarget;
 
     // A target its senses may notice: one it would fight, and for a defensive monster, one inside its ground.
     private bool IsSenseCandidate(IDamageable candidate, Collider candidateCollider)

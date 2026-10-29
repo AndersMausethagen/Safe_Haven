@@ -6,7 +6,7 @@ using UnityEngine;
 /// Active, so systems (quests, residents, the ward breach) don't have to search the scene.
 /// </summary>
 [DisallowMultipleComponent]
-public sealed class BuildingObject : MonoBehaviour
+public sealed class BuildingObject : MonoBehaviour, IInteractionName
 {
     private static readonly List<BuildingObject> active = new List<BuildingObject>();
 
@@ -15,6 +15,7 @@ public sealed class BuildingObject : MonoBehaviour
     private Bounds? localBounds;
 
     public BuildingDefinition Definition => definition;
+    public string InteractionName => definition != null ? definition.DisplayName : null;
 
     /// <summary>Bounds of the building's meshes in its own space. Measured once; buildings don't change shape.</summary>
     public Bounds LocalBounds => localBounds ??= BuildPlacement.LocalBounds(transform);

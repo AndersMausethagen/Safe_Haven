@@ -1,5 +1,6 @@
 /// <summary>
-/// Who a hunting monster goes for when it can see more than one target: the player comes first while it can reach them;
+/// Who a hunting monster goes for when it can see more than one target: a priority target (Combatant › Priority Target:
+/// the player; "player" below) comes first while it can reach them;
 /// anyone else on the player's side (a companion, a traveller) only when the player is out of sight or out of reach, and
 /// then the nearest (switching only to a clearly nearer one, so it doesn't flip between two). Plain C#, tested in
 /// MonsterBehaviorTests; MonsterAI asks it on every target scan.

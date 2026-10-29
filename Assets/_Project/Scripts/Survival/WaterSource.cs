@@ -11,8 +11,10 @@ using UnityEngine;
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Interactable))]
-public sealed class WaterSource : MonoBehaviour
+public sealed class WaterSource : MonoBehaviour, IInteractionName
 {
+    public string InteractionName => "Stream";
+
     [Tooltip("Thirst restored by drinking here.")]
     [SerializeField, Min(0f)] private float drinkAmount = 100f;
     [Tooltip("The water container handed out, such as a Waterskin. Empty means the source is only for drinking.")]

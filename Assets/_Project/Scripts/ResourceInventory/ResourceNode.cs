@@ -10,7 +10,7 @@ using UnityEngine;
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Interactable), typeof(ResourceSource))]
-public sealed class ResourceNode : MonoBehaviour, IInteractionCondition, ISaveable
+public sealed class ResourceNode : MonoBehaviour, IInteractionCondition, ISaveable, IInteractionName
 {
     [System.Serializable]
     private struct SavedNode
@@ -30,6 +30,7 @@ public sealed class ResourceNode : MonoBehaviour, IInteractionCondition, ISaveab
     private Coroutine countdown;
 
     public GatheringNodeDefinition Definition => node;
+    public string InteractionName => node != null ? node.DisplayName : null;
     public bool IsDepleted { get; private set; }
 
     /// <summary>A minigame swing landed on this node: its result and where the swinger stood.</summary>

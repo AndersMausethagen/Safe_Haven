@@ -14,7 +14,7 @@ using UnityEngine;
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Interactable))]
-public sealed class RaidPortal : MonoBehaviour, IStationMenuExtension
+public sealed class RaidPortal : MonoBehaviour, IStationMenuExtension, IInteractionName
 {
     [Tooltip("The first destination offered.")]
     [SerializeField] private RaidDefinition raid;
@@ -69,6 +69,7 @@ public sealed class RaidPortal : MonoBehaviour, IStationMenuExtension
     }
 
     public bool IsRepaired => !needsRepair || GameSession.Settlement.PortalRepaired;
+    public string InteractionName => IsRepaired ? "Portal" : "Ruined Portal";
 
     private void Awake()
     {

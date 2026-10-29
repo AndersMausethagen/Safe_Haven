@@ -13,10 +13,13 @@ public sealed class Combatant : MonoBehaviour
     [SerializeField] private CombatStatsDefinition baseStats;
     [Tooltip("Left empty, the default rules are used.")]
     [SerializeField] private CombatRules rules;
+    [Tooltip("Enemies go for this first while they can reach it, before anyone nearer on its side (the player, not their companions). See TargetPriority.")]
+    [SerializeField] private bool priorityTarget;
 
     private StatSheet stats;
 
     public Faction Faction => faction;
+    public bool IsPriorityTarget => priorityTarget;
     public CombatRules Rules => rules != null ? rules : CombatRules.Default;
 
     /// <summary>The live stats. Built on first use, so it is safe to read from any Awake.</summary>

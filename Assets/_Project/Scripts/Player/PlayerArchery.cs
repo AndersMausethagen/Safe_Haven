@@ -403,7 +403,7 @@ public sealed class PlayerArchery : MonoBehaviour
 
         ArrowProjectile projectile = PrefabPool.Spawn(arrow.Projectile, origin, Quaternion.LookRotation(direction));
         float damage = arrow.Damage * ArcheryRules.DamageShare(draw) * damageMultiplier;
-        projectile.Launch(combatant, bow.ShotAttack, arrowItem, damage, direction * speed, counter ? HitTechnique.Counter : HitTechnique.None, perfect);
+        projectile.Launch(combatant, bow.ShotAttack, arrowItem, damage, direction * speed, counter ? HitTechnique.Counter : HitTechnique.None, perfect, recoverable: true);
 
         movement.SnapFacing(direction);
         AudioManager.Play(bow.SwingSound, origin);

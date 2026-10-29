@@ -147,6 +147,22 @@ public sealed class CompanionTests
     }
 
     [Test]
+    public void ThePlayerIsThePriorityTarget_CompanionsAreNot()
+    {
+        var player = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Project/Prefabs/Characters/PlayerArmature.prefab");
+        Assert.IsTrue(player.GetComponent<Combatant>().IsPriorityTarget, "Enemies go for the player first (data, not a player check).");
+        var go = new GameObject("Companion body");
+        try
+        {
+            Assert.IsFalse(go.AddComponent<Combatant>().IsPriorityTarget);
+        }
+        finally
+        {
+            Object.DestroyImmediate(go);
+        }
+    }
+
+    [Test]
     public void Monsters_PreferThePlayer_WhileTheyCanReachThem()
     {
         // Hunting a companion, the player comes into sight and can be reached: switch to the player.
