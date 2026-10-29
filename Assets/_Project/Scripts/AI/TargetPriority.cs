@@ -3,7 +3,7 @@
 /// the player; "player" below) comes first while it can reach them;
 /// anyone else on the player's side (a companion, a traveller) only when the player is out of sight or out of reach, and
 /// then the nearest (switching only to a clearly nearer one, so it doesn't flip between two). Plain C#, tested in
-/// MonsterBehaviorTests; MonsterAI asks it on every target scan.
+/// CompanionTests; MonsterTargeting asks it on every target scan.
 /// </summary>
 public static class TargetPriority
 {

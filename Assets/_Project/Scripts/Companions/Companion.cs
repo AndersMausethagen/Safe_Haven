@@ -6,8 +6,10 @@ using UnityEngine.AI;
 /// <summary>
 /// Someone who goes along with the player and fights at their side (GDD §15.5): the expedition in the prologue now,
 /// raid companions later. It carries out its current <see cref="CompanionOrder"/> through
-/// <see cref="CompanionTactics"/> (which enemy, where to stand), walks on the NavMesh, swings through AttackResolver or
-/// shoots pooled arrows like the player, and at no health is knocked down for a while instead of dying.
+/// <see cref="CompanionTactics"/> (which enemy, where to stand), walks on the NavMesh, and at no health is knocked down
+/// for a while instead of dying. Its parts are plain C#: <see cref="CompanionLeader"/> (whom it follows and their
+/// target), <see cref="CompanionWeapon"/> (swings and arrows) and <see cref="CompanionBody"/> (animation and the weapon
+/// in its hand).
 /// <para>
 /// Orders come from code (<see cref="Command(CompanionOrder)"/>: a story rally point, a future command wheel) or from the
 /// player in conversation, as answers its CompanionDefinition lists. "Attack my target" is whatever the leader (the
@@ -25,14 +27,8 @@ using UnityEngine.AI;
 public sealed class Companion : MonoBehaviour, IConversationTopics
 {
     private const float ThinkInterval = 0.2f;
-    private const float LeaderTargetMemory = 15f;
-    private const float TurnSpeed = 540f;
-    private const float ShotHeight = 1.4f;
 
     private static readonly List<Companion> active = new List<Companion>();
-    private static readonly int SpeedHash = Animator.StringToHash("Speed");
-    private static readonly int AttackHash = Animator.StringToHash("Attack");
-    private static readonly int DeadHash = Animator.StringToHash("Dead");
 
     [SerializeField] private CompanionDefinition definition;
     [Tooltip("Who they are: the name used when they are knocked down.")]
@@ -45,28 +41,20 @@ public sealed class Companion : MonoBehaviour, IConversationTopics
 
     private readonly List<CompanionThreat> threats = new List<CompanionThreat>();
     private readonly List<MonsterAI> threatMonsters = new List<MonsterAI>();
+    private readonly CompanionLeader leader = new CompanionLeader();
     private NavMeshAgent agent;
     private Combatant combatant;
     private Damageable health;
-    private Animator animator;
     private Interactable interactable;
-    private bool hasSpeed;
-    private bool hasAttack;
-    private bool hasDead;
+    private CompanionBody body;
+    private CompanionWeapon weapon;
 
     private CompanionIntent intent = CompanionIntent.Idle;
     private MonsterAI engaged;
     private Vector3 holdPoint;
     private float nextThink;
-    private float nextAttack;
-    private float strikeAt = -1f;
-    private MonsterAI striking;
     private float getUpAt = -1f;
-    private Player leader;
-    private MonsterAI leaderTarget;
-    private float leaderTargetAt;
     private CompanionRevive revive;
-    private bool armed;
 
     /// <summary>Every enabled companion, for systems that give orders or show them.</summary>
     public static IReadOnlyList<Companion> Active => active;
@@ -110,22 +98,7 @@ public sealed class Companion : MonoBehaviour, IConversationTopics
         combatant = GetComponent<Combatant>();
         health = GetComponent<Damageable>();
         interactable = GetComponent<Interactable>();
-        animator = GetComponentInChildren<Animator>();
-        if (animator != null && definition != null && definition.Animations != null)
-        {
-            animator.runtimeAnimatorController = definition.Animations;
-        }
-
-        if (animator != null && animator.runtimeAnimatorController != null)
-        {
-            foreach (AnimatorControllerParameter parameter in animator.parameters)
-            {
-                hasSpeed |= parameter.nameHash == SpeedHash && parameter.type == AnimatorControllerParameterType.Float;
-                hasAttack |= parameter.nameHash == AttackHash && parameter.type == AnimatorControllerParameterType.Trigger;
-                hasDead |= parameter.nameHash == DeadHash && parameter.type == AnimatorControllerParameterType.Bool;
-            }
-        }
-
+        body = new CompanionBody(GetComponentInChildren<Animator>(), definition);
         if (definition == null || definition.Attack == null)
         {
             Debug.LogError("A Companion needs a CompanionDefinition with an Attack.", this);
@@ -138,6 +111,7 @@ public sealed class Companion : MonoBehaviour, IConversationTopics
             Debug.LogWarning("A companion's Damageable should not be destroyed on death; it is knocked down instead.", this);
         }
 
+        weapon = new CompanionWeapon(transform, combatant, definition, body, IsFoe);
         Order = startingOrder;
         holdPoint = transform.position;
         revive = CompanionRevive.Create(this, definition.ReviveSeconds);
@@ -153,15 +127,15 @@ public sealed class Companion : MonoBehaviour, IConversationTopics
     {
         active.Remove(this);
         health.Died -= OnKnockedDown;
-        Follow(null);
+        leader.Follow(null);
     }
 
     private void Update()
     {
-        Follow(Player.Current);
-        if (!armed && leader != null)
+        leader.Follow(Player.Current);
+        if (!body.IsArmed && leader.Player != null)
         {
-            Arm();
+            body.Arm(definition.Weapon, leader.Player.GetComponent<HeldItemView>());
         }
 
         if (IsDowned)
@@ -174,15 +148,11 @@ public sealed class Companion : MonoBehaviour, IConversationTopics
             return;
         }
 
-        if (strikeAt >= 0f && Time.time >= strikeAt)
-        {
-            Strike();
-        }
-
-        if (Paused || leader == null || !agent.isActiveAndEnabled || !agent.isOnNavMesh)
+        weapon.LandDue();
+        if (Paused || leader.Player == null || !agent.isActiveAndEnabled || !agent.isOnNavMesh)
         {
             Halt();
-            SetSpeed(0f);
+            body.SetSpeed(0f);
             return;
         }
 
@@ -192,10 +162,10 @@ public sealed class Companion : MonoBehaviour, IConversationTopics
             Think();
         }
 
-        Fight();
+        weapon.Fight(engaged);
         // Stops to listen while the player is in a conversation, unless there is fighting to do.
         agent.isStopped = threats.Count == 0 && InConversation();
-        SetSpeed(agent.isStopped ? 0f : agent.velocity.magnitude);
+        body.SetSpeed(agent.isStopped ? 0f : agent.velocity.magnitude);
     }
 
     // ----- Deciding -----
@@ -203,17 +173,15 @@ public sealed class Companion : MonoBehaviour, IConversationTopics
     private void Think()
     {
         GatherThreats();
-        int target = leaderTarget != null && Time.time - leaderTargetAt <= LeaderTargetMemory
-            ? threatMonsters.IndexOf(leaderTarget)
-            : -1;
+        MonsterAI leaderTarget = leader.Target;
         var situation = new CompanionSituation
         {
             Order = Order,
             Self = transform.position,
-            Leader = leader.transform.position,
-            FollowPoint = leader.transform.position + formationOffset,
+            Leader = leader.Player.transform.position,
+            FollowPoint = leader.Player.transform.position + formationOffset,
             HoldPoint = holdPoint,
-            LeaderTarget = target,
+            LeaderTarget = leaderTarget != null ? threatMonsters.IndexOf(leaderTarget) : -1,
             Threats = threats,
         };
 
@@ -246,10 +214,11 @@ public sealed class Companion : MonoBehaviour, IConversationTopics
     {
         threats.Clear();
         threatMonsters.Clear();
-        IDamageable leaderBody = leader.Health;
+        IDamageable leaderBody = leader.Player.Health;
+        MonsterAI leaderTarget = leader.Target;
         float awareness = definition.Awareness;
         Vector3 self = transform.position;
-        Vector3 leaderPosition = leader.transform.position;
+        Vector3 leaderPosition = leader.Player.transform.position;
         foreach (MonsterAI monster in MonsterAI.Active)
         {
             if (!IsFoe(monster))
@@ -275,122 +244,16 @@ public sealed class Companion : MonoBehaviour, IConversationTopics
             && monster.TryGetComponent(out Damageable body) && body.IsAlive;
     }
 
-    // ----- Fighting -----
-
-    private void Fight()
-    {
-        if (engaged == null || !IsFoe(engaged))
-        {
-            return;
-        }
-
-        Vector3 toTarget = engaged.transform.position - transform.position;
-        toTarget.y = 0f;
-        if (toTarget.magnitude > definition.ReachFor(0.5f))
-        {
-            return;
-        }
-
-        if (toTarget.sqrMagnitude > 0.0001f)
-        {
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(toTarget),
-                TurnSpeed * Time.deltaTime);
-        }
-
-        if (Time.time >= nextAttack && strikeAt < 0f)
-        {
-            nextAttack = Time.time + definition.AttackInterval;
-            strikeAt = Time.time + definition.StrikeDelay;
-            striking = engaged;
-            if (hasAttack)
-            {
-                animator.SetTrigger(AttackHash);
-            }
-        }
-    }
-
-    // The swing lands (or the arrow leaves) at the attack's hit delay.
-    private void Strike()
-    {
-        strikeAt = -1f;
-        MonsterAI target = striking;
-        striking = null;
-        if (target == null || !IsFoe(target))
-        {
-            return;
-        }
-
-        if (definition.IsRanged)
-        {
-            Shoot(target);
-        }
-        else
-        {
-            Vector3 direction = target.transform.position - transform.position;
-            direction.y = 0f;
-            direction = direction.sqrMagnitude > 0.0001f ? direction.normalized : transform.forward;
-            AttackResolver.Execute(combatant, definition.Attack, definition.WeaponDamage, transform.position, direction, ~0);
-        }
-
-        AudioManager.Play(definition.AttackSound, transform.position);
-    }
-
-    private void Shoot(MonsterAI target)
-    {
-        ItemDefinition arrowItem = definition.Arrow;
-        ArrowDefinition arrow = arrowItem.Arrow;
-        if (arrow.Projectile == null)
-        {
-            return;
-        }
-
-        Vector3 origin = transform.position + Vector3.up * ShotHeight + transform.forward * 0.4f;
-        Vector3 aim = target.TryGetComponent(out Collider body) ? body.bounds.center : target.transform.position + Vector3.up * 0.5f;
-        float speed = definition.ArrowSpeed * arrow.SpeedMultiplier;
-        Vector3 direction = ArcheryRules.LaunchDirection(origin, aim, speed, Physics.gravity.magnitude * arrow.GravityScale);
-        ArrowProjectile projectile = PrefabPool.Spawn(arrow.Projectile, origin, Quaternion.LookRotation(direction));
-        projectile.Launch(combatant, definition.Attack, arrowItem, arrow.Damage * definition.ArrowDamageShare, direction * speed);
-    }
-
-    // The definition's weapon in the hand, held the way the player holds it (the player's grip; a bow in the left hand).
-    private void Arm()
-    {
-        armed = true;
-        ItemDefinition weapon = definition.Weapon;
-        if (weapon == null || animator == null || !animator.isHuman)
-        {
-            return;
-        }
-
-        bool bow = HeldItemView.IsBow(weapon);
-        Transform hand = animator.GetBoneTransform(bow ? HumanBodyBones.LeftHand : HumanBodyBones.RightHand);
-        if (hand == null)
-        {
-            return;
-        }
-
-        HeldItemView reference = leader.GetComponent<HeldItemView>();
-        Pose pose = reference == null ? Pose.identity : bow ? reference.OffHandGripPose : reference.GripPose;
-        var grip = new GameObject("Weapon Grip").transform;
-        grip.SetParent(hand, false);
-        grip.SetLocalPositionAndRotation(pose.position, pose.rotation);
-        HeldItemView.CreateModel(weapon, grip);
-    }
-
     // ----- Knocked down -----
 
     private void OnKnockedDown(Damageable victim, DamageInfo hit)
     {
         getUpAt = Time.time + definition.DownedSeconds;
-        strikeAt = -1f;
-        striking = null;
+        weapon.Cancel();
         engaged = null;
         Halt();
-        SetSpeed(0f);
-        if (hasDead)
-        {
-            animator.SetBool(DeadHash, true);
-        }
+        body.SetSpeed(0f);
+        body.SetDown(true);
 
         if (interactable != null)
         {
@@ -418,10 +281,7 @@ public sealed class Companion : MonoBehaviour, IConversationTopics
         getUpAt = -1f;
         health.Revive(healthShare);
         revive.SetAvailable(false);
-        if (hasDead)
-        {
-            animator.SetBool(DeadHash, false);
-        }
+        body.SetDown(false);
 
         if (interactable != null)
         {
@@ -429,38 +289,6 @@ public sealed class Companion : MonoBehaviour, IConversationTopics
         }
 
         nextThink = 0f;
-    }
-
-    // ----- Leader -----
-
-    // Listens to what the leader hits, so "attack my target" knows what that is.
-    private void Follow(Player player)
-    {
-        if (player == leader)
-        {
-            return;
-        }
-
-        if (leader != null && leader.Combatant != null)
-        {
-            leader.Combatant.DamageDealt -= OnLeaderHit;
-        }
-
-        leader = player;
-        leaderTarget = null;
-        if (leader != null && leader.Combatant != null)
-        {
-            leader.Combatant.DamageDealt += OnLeaderHit;
-        }
-    }
-
-    private void OnLeaderHit(IDamageable target, DamageInfo damage, DamageResult result)
-    {
-        if (target is Component hit && hit.TryGetComponent(out MonsterAI monster))
-        {
-            leaderTarget = monster;
-            leaderTargetAt = Time.time;
-        }
     }
 
     // ----- Conversation -----
@@ -512,14 +340,6 @@ public sealed class Companion : MonoBehaviour, IConversationTopics
         if (agent.isActiveAndEnabled && agent.isOnNavMesh && agent.hasPath)
         {
             agent.ResetPath();
-        }
-    }
-
-    private void SetSpeed(float speed)
-    {
-        if (hasSpeed)
-        {
-            animator.SetFloat(SpeedHash, speed, 0.15f, Time.deltaTime);
         }
     }
 

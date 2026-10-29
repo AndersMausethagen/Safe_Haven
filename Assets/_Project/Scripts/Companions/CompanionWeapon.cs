@@ -1,0 +1,118 @@
+using System;
+using UnityEngine;
+
+/// <summary>
+/// How a companion fights the enemy it is engaged with: within reach it turns to face it and starts an attack every
+/// Attack Interval (the animation), which lands at the Strike Delay as a swing through AttackResolver or a pooled arrow
+/// like the player's. Plain C#, owned by a Companion.
+/// </summary>
+public sealed class CompanionWeapon
+{
+    private const float TurnSpeed = 540f;
+    private const float ShotHeight = 1.4f;
+
+    private readonly Transform self;
+    private readonly Combatant combatant;
+    private readonly CompanionDefinition definition;
+    private readonly CompanionBody body;
+    private readonly Predicate<MonsterAI> isFoe;
+
+    private float nextAttack;
+    private float strikeAt = -1f;
+    private MonsterAI striking;
+
+    public CompanionWeapon(Transform self, Combatant combatant, CompanionDefinition definition, CompanionBody body, Predicate<MonsterAI> isFoe)
+    {
+        this.self = self;
+        this.combatant = combatant;
+        this.definition = definition;
+        this.body = body;
+        this.isFoe = isFoe;
+    }
+
+    /// <summary>Lands an attack whose strike moment has come (even while standing still for a story moment).</summary>
+    public void LandDue()
+    {
+        if (strikeAt >= 0f && Time.time >= strikeAt)
+        {
+            Strike();
+        }
+    }
+
+    /// <summary>Faces <paramref name="engaged"/> when within reach and starts the next attack when it is ready.</summary>
+    public void Fight(MonsterAI engaged)
+    {
+        if (engaged == null || !isFoe(engaged))
+        {
+            return;
+        }
+
+        Vector3 toTarget = engaged.transform.position - self.position;
+        toTarget.y = 0f;
+        if (toTarget.magnitude > definition.ReachFor(0.5f))
+        {
+            return;
+        }
+
+        if (toTarget.sqrMagnitude > 0.0001f)
+        {
+            self.rotation = Quaternion.RotateTowards(self.rotation, Quaternion.LookRotation(toTarget), TurnSpeed * Time.deltaTime);
+        }
+
+        if (Time.time >= nextAttack && strikeAt < 0f)
+        {
+            nextAttack = Time.time + definition.AttackInterval;
+            strikeAt = Time.time + definition.StrikeDelay;
+            striking = engaged;
+            body.PlayAttack();
+        }
+    }
+
+    /// <summary>Drops an attack in progress (knocked down).</summary>
+    public void Cancel()
+    {
+        strikeAt = -1f;
+        striking = null;
+    }
+
+    private void Strike()
+    {
+        MonsterAI target = striking;
+        Cancel();
+        if (target == null || !isFoe(target))
+        {
+            return;
+        }
+
+        if (definition.IsRanged)
+        {
+            Shoot(target);
+        }
+        else
+        {
+            Vector3 direction = target.transform.position - self.position;
+            direction.y = 0f;
+            direction = direction.sqrMagnitude > 0.0001f ? direction.normalized : self.forward;
+            AttackResolver.Execute(combatant, definition.Attack, definition.WeaponDamage, self.position, direction, ~0);
+        }
+
+        AudioManager.Play(definition.AttackSound, self.position);
+    }
+
+    private void Shoot(MonsterAI target)
+    {
+        ItemDefinition arrowItem = definition.Arrow;
+        ArrowDefinition arrow = arrowItem.Arrow;
+        if (arrow.Projectile == null)
+        {
+            return;
+        }
+
+        Vector3 origin = self.position + Vector3.up * ShotHeight + self.forward * 0.4f;
+        Vector3 aim = target.TryGetComponent(out Collider targetBody) ? targetBody.bounds.center : target.transform.position + Vector3.up * 0.5f;
+        float speed = definition.ArrowSpeed * arrow.SpeedMultiplier;
+        Vector3 direction = ArcheryRules.LaunchDirection(origin, aim, speed, Physics.gravity.magnitude * arrow.GravityScale);
+        ArrowProjectile projectile = PrefabPool.Spawn(arrow.Projectile, origin, Quaternion.LookRotation(direction));
+        projectile.Launch(combatant, definition.Attack, arrowItem, arrow.Damage * definition.ArrowDamageShare, direction * speed);
+    }
+}

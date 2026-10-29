@@ -51,7 +51,7 @@ Rules written as special cases instead of following the existing model. Work top
 2. [x] **IInteractionName** instead of the type checks in `WorldInteractionIndicator.NameOf`.
 3. [x] **Target priority as data** (`Combatant`) instead of `Player.IsPlayer` in MonsterAI target choice; arrow
        recovery as a `Launch` parameter instead of checking whether the owner is the player.
-4. [ ] **Split large classes**: `Companion` (movement/combat, downed, orders, looks) and the target choice out of
+4. [x] **Split large classes**: `Companion` (movement/combat, downed, orders, looks) and the target choice out of
        `MonsterAI`.
 5. [ ] **Non-blocking lines in combat**: lines without answers during a fight show as subtitles and don't hold attacks,
        so the prologue's wait-for-the-line rule and the Troll Ambush reorder become unnecessary.

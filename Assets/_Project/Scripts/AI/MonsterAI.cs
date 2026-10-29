@@ -32,12 +32,10 @@ public sealed class MonsterAI : MonoBehaviour
     }
 
     // Matches HitDetector, so the monster measures reach the same way its attack does.
-    private const float CenterHeight = 1f;
+    internal const float CenterHeight = 1f;
     // Attacks start a little inside their range, so a target backing away is still hit.
     private const float AttackReachFactor = 0.85f;
     private const float FacingTolerance = 20f;
-    // A new target has to be this much nearer before the monster switches, so it doesn't flip between two.
-    private const float SwitchTargetMargin = 1.5f;
     private const float HomeTolerance = 0.6f;
     private const float NavMeshSnapDistance = 2f;
     // Close enough to the spot it went to check to start searching there.
@@ -45,7 +43,6 @@ public sealed class MonsterAI : MonoBehaviour
     // When a whole pack spots the player at once, the spotted sound plays once.
     private const float SpottedSoundSpacing = 0.5f;
 
-    private static readonly Collider[] Overlaps = new Collider[64];
     private static float nextSpottedSoundAt;
 
     [SerializeField] private MonsterDefinition definition;
@@ -100,6 +97,7 @@ public sealed class MonsterAI : MonoBehaviour
     private float staggerUntil;
 
     private MonsterSenses senses;
+    private readonly MonsterTargeting targeting = new MonsterTargeting();
     private AwarenessIndicator indicator;
     private float lastSenseTime;
     private float lastSeenTargetAt;
@@ -237,6 +235,7 @@ public sealed class MonsterAI : MonoBehaviour
         damageable = GetComponent<Damageable>();
         agent = GetComponent<NavMeshAgent>();
         pack = GetComponentInParent<MonsterPack>();
+        targeting.Bind(transform, definition, combatant, damageable, agent, targetLayers);
         visual = transform.Find("Model");
         if (visual != null)
         {
@@ -252,7 +251,8 @@ public sealed class MonsterAI : MonoBehaviour
         }
 
         agent.speed = definition.MoveSpeed;
-        senses = new MonsterSenses(transform, definition, targetLayers, IsSenseCandidate);
+        senses = new MonsterSenses(transform, definition, targetLayers,
+            (candidate, collider) => targeting.IsSenseCandidate(candidate, collider, home, Relentless));
         readyAt = new float[definition.Attacks.Count];
         CombatTechniqueSettings technique = CombatTechniqueSettings.Current;
         poise = new PoiseMeter(definition.Poise > 0f ? definition.Poise : technique.DefaultPoise,
@@ -1070,137 +1070,28 @@ public sealed class MonsterAI : MonoBehaviour
         return definition.LeashRange > 0f && HorizontalDistance(home) > definition.LeashRange;
     }
 
-    // While hunting one target, looks for a better one it can see: a priority target (Combatant: the player) first while
-    // it can reach them, otherwise a clearly nearer one (a companion or traveller between it and the player). See
-    // TargetPriority.
+    // While hunting one target, looks for a better one it can see (MonsterTargeting: the player first while reachable).
     private void ScanForNearerTarget()
     {
-        Vector3 center = transform.position + Vector3.up * CenterHeight;
-        int count = Physics.OverlapSphereNonAlloc(center, definition.DetectionRange, Overlaps, targetLayers, QueryTriggerInteraction.Ignore);
-
-        IDamageable best = null;
-        Collider bestCollider = null;
-        float bestDistance = float.MaxValue;
-        IDamageable seenPlayer = null;
-        Collider seenPlayerCollider = null;
-
-        for (int i = 0; i < count; i++)
+        if (targeting.TryFindBetter(target, DistanceToTarget(), senses, home, Relentless, out IDamageable better, out Collider betterCollider))
         {
-            IDamageable candidate = Overlaps[i].GetComponentInParent<IDamageable>();
-            if (ReferenceEquals(candidate, target) || !IsSenseCandidate(candidate, Overlaps[i]))
-            {
-                continue;
-            }
-
-            Transform body = ((Component)candidate).transform;
-            bool isPlayer = IsPriorityTarget(body);
-            if (isPlayer && seenPlayer != null)
-            {
-                continue;
-            }
-
-            float distance = HorizontalDistance(HitDetector.NearestPoint(Overlaps[i], center));
-            if ((isPlayer || distance < bestDistance) && senses.CanSee(body, definition.DetectionRange))
-            {
-                if (isPlayer)
-                {
-                    seenPlayer = candidate;
-                    seenPlayerCollider = Overlaps[i];
-                    continue;
-                }
-
-                best = candidate;
-                bestCollider = Overlaps[i];
-                bestDistance = distance;
-            }
-        }
-
-        bool huntingPlayer = CanTarget(target) && IsPriorityTarget(targetComponent);
-        if (seenPlayer == null && best == null)
-        {
-            return;
-        }
-
-        // Reachability costs a path query, so it is only asked when the answer can change the choice.
-        bool playerReachable = huntingPlayer ? best == null || CanReach(targetComponent.transform.position)
-            : seenPlayer != null && CanReach(((Component)seenPlayer).transform.position);
-        bool otherNearer = best != null && (!CanTarget(target) || bestDistance <= DistanceToTarget() - SwitchTargetMargin);
-        bool otherReachable = best != null && (huntingPlayer ? !playerReachable : otherNearer) && CanReach(((Component)best).transform.position);
-        switch (TargetPriority.Decide(huntingPlayer, seenPlayer != null, playerReachable, best != null, otherReachable, otherNearer))
-        {
-            case TargetPriority.Choice.Player:
-                SetTarget(seenPlayer, seenPlayerCollider);
-                break;
-            case TargetPriority.Choice.Other:
-                SetTarget(best, bestCollider);
-                break;
+            SetTarget(better, betterCollider);
         }
     }
 
-    // True when it can walk to within striking distance of the point: a complete path to the NavMesh beneath it.
-    // A player on a boulder or a roof is out of reach; their companions are not.
-    private bool CanReach(Vector3 point)
-    {
-        if (agent == null || !agent.isActiveAndEnabled || !agent.isOnNavMesh)
-        {
-            return true;
-        }
+    private bool IsAvoided(Vector3 position) => targeting.IsAvoided(position);
 
-        float reach = Mathf.Max(1.5f, definition.Attack != null ? definition.Attack.Range : 0f);
-        if (!NavMesh.SamplePosition(point, out NavMeshHit hit, reach, agent.areaMask))
-        {
-            return false;
-        }
-
-        reachPath ??= new NavMeshPath();
-        return NavMesh.CalculatePath(agent.nextPosition, hit.position, agent.areaMask, reachPath)
-            && reachPath.status == NavMeshPathStatus.PathComplete;
-    }
-
-    private NavMeshPath reachPath;
-
-    private static bool IsPriorityTarget(Component body) => body.TryGetComponent(out Combatant side) && side.IsPriorityTarget;
-
-    // A target its senses may notice: one it would fight, and for a defensive monster, one inside its ground.
-    private bool IsSenseCandidate(IDamageable candidate, Collider candidateCollider)
-    {
-        if (!CanTarget(candidate))
-        {
-            return false;
-        }
-
-        if (IsAvoided(candidateCollider.transform.position))
-        {
-            return false;
-        }
-
-        return Relentless || !definition.HasTemperament(MonsterTemperament.Defensive)
-            || Vector3.Distance(home, candidateCollider.transform.position) <= definition.DefensiveRadius;
-    }
-
-    private bool IsAvoided(Vector3 position) => AvoidArea != null && AvoidArea(position);
-
-    private bool CanTarget(IDamageable candidate)
-    {
-        var component = candidate as Component;
-        if (component == null || !component.gameObject.activeInHierarchy || ReferenceEquals(candidate, damageable))
-        {
-            return false;
-        }
-
-        if (PlayerOnly && !global::Player.IsPlayer(component.gameObject))
-        {
-            return false;
-        }
-
-        return candidate.IsAlive && combatant.Faction.WillAttack(candidate.Faction);
-    }
+    private bool CanTarget(IDamageable candidate) => targeting.CanTarget(candidate);
 
     /// <summary>
     /// When set, the monster only targets the player, leaving buildings and residents alone (ward-breach attackers,
     /// design decision for the first breach).
     /// </summary>
-    public bool PlayerOnly { get; set; }
+    public bool PlayerOnly
+    {
+        get => targeting.PlayerOnly;
+        set => targeting.PlayerOnly = value;
+    }
 
     /// <summary>When set, the monster never gives up a chase or returns home (ward-breach attackers crossing the clearing).</summary>
     public bool Relentless { get; set; }
@@ -1209,7 +1100,11 @@ public sealed class MonsterAI : MonoBehaviour
     /// Ground it will not enter (night prowlers: light). It neither notices targets standing there nor follows them in:
     /// a hunt that leads into it is lost at the edge, and anything heard there is searched for from where it stands.
     /// </summary>
-    public System.Predicate<Vector3> AvoidArea { get; set; }
+    public System.Predicate<Vector3> AvoidArea
+    {
+        get => targeting.AvoidArea;
+        set => targeting.AvoidArea = value;
+    }
 
     /// <summary>When set, CreatureSleep never puts it to sleep, however far the player is (a patrolling apex).</summary>
     public bool KeepAwake { get; set; }
