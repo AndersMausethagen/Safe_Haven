@@ -58,3 +58,21 @@ Rules written as special cases instead of following the existing model. Work top
 6. [x] Smaller: companions stop only when they themselves are talked to (not on any open dialogue); companion grips as
        rig data instead of the player's HeldItemView; one encounter definition per prologue chapter (camp wolves and
        portal enemies the same way).
+
+## Code quality: quests and events (analysis 2026-10-29)
+
+Same review for Quests/ and Events/. Work top to bottom.
+
+1. [ ] **One "by the player" rule.** `GameEvent.ByPlayer` (`Player.IsPlayer`; no actor counts as the player) and
+       `ExperienceTracker.ByPlayer` (no actor does not count) disagree. Decide once, on the side (`Faction.IsPlayerSide`
+       of the actor's Combatant), so a companion's kill counts for "kill 5 wolves" and a wolf burnt by nobody doesn't.
+2. [ ] **Objective rules in one place.** `ObjectiveType` is switched on in `QuestObjective` (Progress, Describe,
+       FindProblem), `QuestObjectiveDrawer` and `QuestManager.CountOwned`. Move CountOwned into the objective first;
+       later consider one class per objective type (`[SerializeReference]`, like `StoryNode`) with an asset migration.
+3. [ ] **Death subject without type checks.** `GameEvents.OnAnyDied` asks for MonsterAI, then BuildingObject; give the
+       dying object a small interface for its definition (like `IInteractionName`).
+4. [ ] **No Heart Tree inside the generic trigger.** `GameEventTrigger`'s PlayerInsideWard polls `HeartTree.Current`;
+       an area interface (or a ward trigger component) keeps the trigger generic.
+5. [ ] Smaller: `QuestObjective.Name` switches on Item/Resource definitions (a shared display-name interface);
+       `QuestGiver.CanInteract` advances its waiting lines (a query with a side effect); HeartTree keeps its own talked
+       event beside `Talkable`'s.
