@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 5626277980551194959}
   - component: {fileID: 4945390627761567952}
   - component: {fileID: 1245479689944205082}
+  - component: {fileID: 3006251393943685264}
   m_Layer: 0
   m_Name: Resident
   m_TagString: Untagged
@@ -95,4 +96,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 683369c5b21094145abf4e937ec02559, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ResidentNpc
-  menuRange: 6
+--- !u!114 &3006251393943685264
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5596541946649547047}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0ca3a01e591cddc479e4248212a79c64, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::Talkable
+  speakerName: 
+  portrait: {fileID: 0}
+  cameraDistance: 0.65
+  followUpLine: Anything else?
+  talkedEvent: {fileID: 0}

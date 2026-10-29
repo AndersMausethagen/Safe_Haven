@@ -13,12 +13,12 @@ public sealed class CompanionTopic
 
 /// <summary>
 /// The story side of an expedition member; walking and fighting are its Companion's. Its resident definition is reused
-/// when the person is rescued later. Talking to them says their line for the part of the night it is; around the camp
-/// the player can also ask their topics, one after another, to get to know them. The director's rally points become
+/// when the person is rescued later. In their conversation (their Talkable) they say their line for the part of the night
+/// it is; around the camp the player can also ask their topics, one after another, to get to know them. The director's rally points become
 /// Companion orders (stay at the camp, at the portal; otherwise follow), and the companion stands still until the
 /// expedition sets out. An alchemist also heals the player now and then during a fight.
 /// </summary>
-[RequireComponent(typeof(NavMeshAgent), typeof(Interactable))]
+[RequireComponent(typeof(NavMeshAgent), typeof(Talkable))]
 public sealed class PrologueCompanion : MonoBehaviour, IConversationTopics
 {
     [SerializeField] private ResidentDefinition resident;
@@ -27,17 +27,14 @@ public sealed class PrologueCompanion : MonoBehaviour, IConversationTopics
     [SerializeField, TextArea] private string portalLine;
     [Tooltip("Asked around the camp (from gathering fuel until the wolves come), each once per visit to the scene.")]
     [SerializeField] private CompanionTopic[] campTopics = new CompanionTopic[0];
-    [SerializeField, RaisedByGame] private GameEventDefinition talkedEvent;
     [Tooltip("Heals the player by Support Amount every Support Interval during a fight, when within 10 m.")]
     [SerializeField] private bool alchemist;
     [SerializeField, Min(1f)] private float supportInterval = 6f;
     [SerializeField, Min(0f)] private float supportAmount = 8f;
 
     private NavMeshAgent agent;
-    private Interactable interactable;
     private Companion companion;
     private float nextSupport;
-    private bool talking;
     private readonly HashSet<int> asked = new HashSet<int>();
 
     public ResidentDefinition Resident => resident;
@@ -45,20 +42,8 @@ public sealed class PrologueCompanion : MonoBehaviour, IConversationTopics
     private void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
-        interactable = GetComponent<Interactable>();
         companion = GetComponent<Companion>();
         if (companion == null) Debug.LogError("An expedition member needs a Companion to walk and fight.", this);
-    }
-
-    private void OnEnable()
-    {
-        // A standard giver owns its interaction, including confirmation and camera framing.
-        if (GetComponent<QuestGiver>() == null) GetComponent<Interactable>().Completed.AddListener(Talk);
-    }
-    private void OnDisable()
-    {
-        if (interactable != null) interactable.Completed.RemoveListener(Talk);
-        if (talking && DialogueBox.IsOpen) DialogueBox.Current.Close();
     }
 
     /// <summary>The director's rally point: stay there (in formation), or follow the player when there is none.</summary>
@@ -88,34 +73,12 @@ public sealed class PrologueCompanion : MonoBehaviour, IConversationTopics
             Player.Current.Health.Heal(supportAmount);
     }
 
-    private void Talk()
-    {
-        if (resident == null || PrologueDirector.Current == null) return;
-        PrologueStep step = PrologueDirector.Current.Step;
-        string line = step >= PrologueStep.ReachPortal ? portalLine
-            : step >= PrologueStep.GatherFuel ? campLine : forestLine;
-        GameEvents.Raise(talkedEvent, interactable.Interactor);
-        Converse(line, true);
-    }
-
-    // The line, then the topics not asked yet as answers; each answer is said and the rest offered again.
-    private void Converse(string line, bool withTopics)
-    {
-        talking = true;
-        var page = new MenuPage { Title = resident.DisplayName, Body = line };
-        // Its own camp topics and anything else to talk about here (the Companion's orders).
-        if (withTopics)
-            foreach (IConversationTopics topics in GetComponents<IConversationTopics>())
-                topics.AddTopics(page, Speaker, () => Converse(AfterTopicLine, true));
-        DialogueBox.Current.Talk(page, Speaker, () => talking = false);
-    }
-
-    private const string AfterTopicLine = "Anything else?";
-
-    /// <summary>Adds the camp topics not asked yet to a conversation (also a quest giver's, such as Sigrid's).</summary>
+    /// <summary>Their line for this part of the night (when nothing before it spoke) and the camp topics not asked yet.</summary>
     public void AddTopics(MenuPage page, DialogueSpeaker speaker, Action afterAnswer)
     {
         PrologueStep step = PrologueDirector.Current != null ? PrologueDirector.Current.Step : PrologueStep.Finished;
+        if (string.IsNullOrWhiteSpace(page.Body))
+            page.Body = step >= PrologueStep.ReachPortal ? portalLine : step >= PrologueStep.GatherFuel ? campLine : forestLine;
         if (step < PrologueStep.GatherFuel || step > PrologueStep.CatchBreath) return;
         for (int i = 0; i < campTopics.Length; i++)
         {
@@ -128,7 +91,4 @@ public sealed class PrologueCompanion : MonoBehaviour, IConversationTopics
             }));
         }
     }
-
-    private DialogueSpeaker Speaker =>
-        new DialogueSpeaker(resident.DisplayName, transform, null, PrologueDirector.Current.Definition.DialogueCameraDistance);
 }

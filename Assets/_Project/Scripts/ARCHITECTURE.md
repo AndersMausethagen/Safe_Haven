@@ -84,7 +84,7 @@ of the GDD, **Not started** = design only. Update this table when a system is ad
 | `Durability` | Wear on deployed equipment: `DurabilitySettings` (loss per failed raid, repair cost share), `Repairs` (cost and repair), `RepairBench` |
 | `Building` | `BuildPlacer`: the build menu (G), the placement preview inside the ward radius, moving buildings, snapping, yards and line drawing. `BuildPlacement`: pure footprint/yard/snap/line geometry (tested in `BuildPlacementTests`) |
 | `Settlement` | Safe Haven as a place: `SettlementState` (portal, ward level, breach, residents, purification queue), `SettlementSystem` (persistent; ticks purification), `SettlementSettings`, `HeartTree`, `WardBreachDefinition` + `WardBreachDirector`, `HomeRevival`, residents and jobs (`ResidentDefinition`, `JobDefinition`, `ResidentNpc`, `ResidentSpawner`, `RescuableTraveler`), `PurificationAltar` |
-| `Interaction` | `Interactable` – anything the player interacts with on E. Its **Kind** says how it runs (`InteractionKind`): **Work** over Duration with a work bar and animation (gathering, repairing; Duration 0 = until `Complete()`), or **Use**, done on the press with no player state, animation or bar (talking, chests, stations, portal, altar, lighting an exit). Set it in data; `BuildingPrefabBuilder` makes stations Use. Side concerns are small interfaces: `IInteractionCondition`, `IInteractionVerb`, `IInteractionNote`, `IInteractionName` (the prompt's name) |
+| `Interaction` | `Interactable` – anything the player interacts with on E. Its **Kind** says how it runs (`InteractionKind`): **Work** over Duration with a work bar and animation (gathering, repairing; Duration 0 = until `Complete()`), or **Use**, done on the press with no player state, animation or bar (talking, chests, stations, portal, altar, lighting an exit). Set it in data; `BuildingPrefabBuilder` makes stations Use. Side concerns are small interfaces: `IInteractionCondition`, `IInteractionVerb`, `IInteractionNote`, `IInteractionName` (the prompt's name). `Talkable` is the one way to talk to someone: on Use it opens a DialogueBox conversation gathered from every `IConversationTopics` on the object in component order (the first with a line speaks it; each adds answers: `QuestGiver` offers, `PrologueCompanion` camp topics, `Companion` orders, `ResidentNpc` jobs), and after an answer opens again with its follow-up line. It holds the speaker's name, portrait, camera distance and an optional talked event. A `QuestGiver` without a Talkable starts or hands in on the press (notice boards) |
 | `Raids` | Raid definitions, modifiers, the `RaidLauncher` (departure, Portal Sparks), the `RaidDirector` that runs a raid scene, extraction, loot caches, the portal. `Raids/Map`: painted raid maps (`RaidMapDefinition`, `RaidMapZone`, `RaidZoneGrid`, `RaidMap`, `MapRotation`, `RaidMapMarkers`; see "Raid maps") |
 | `Progression` | Levels, experience and talents (see "Levels and talents") |
 | `Quests` | Quest data (`QuestDefinition`, `QuestObjective`), per-player progress (`QuestLog`), `QuestManager`, `QuestGiver` (state-aware: marker, start, hand-in), `QuestMarker` + `QuestMarkerSettings` |
@@ -108,7 +108,7 @@ created before the split carries `[MovedFrom(sourceAssembly: "Assembly-CSharp")]
 `Data/Prologue/ForestPrologue.asset` owns the ordered `PrologueChapter` list: quest, behaviour, automatic-entry
 messages, HUD text, duration and initial enemy count. Sigrid's ordinary `QuestGiver` component owns the ordered
 **Offers** for peaceful chapters: quest reference, briefing text, acceptance label and waiting text.
-**Confirm In Dialogue** uses the shared action menu and close-camera framing; reading or closing it does not
+Her `Talkable` makes the offers a conversation (close-camera framing, walk-away close); reading or closing it does not
 accept anything. Set a chapter quest's Start to **By Quest Giver**, then author its offer on the giver.
 Acceptance uses `QuestGiver → QuestManager → QuestLog`; there is no director acceptance API or leader flag.
 The director does not run an unaccepted chapter's timer/encounter.
@@ -123,12 +123,12 @@ starting armor, dialogue camera distance scale, waiting-for-leader text, wolf pr
 `AgentScripts/BuildPrologueFinale.cs`, which also sets the one-minute hold), wave interval, first-wave size, wave growth/caps, rumble, ending/recovery/homecoming text and transition timing. It is never mutated at runtime.
 
 Select an expedition NPC in `Prologue_MistyWoods` to edit its `PrologueCompanion`: resident identity, forest/camp/
-portal dialogue, camp topics (questions the player can ask around the camp, from gathering fuel until the wolves), a
-conversation story event, and the alchemist's healing amount/interval. Walking and fighting are its `Companion`
+portal dialogue, camp topics (questions the player can ask around the camp, from gathering fuel until the wolves) and
+the alchemist's healing amount/interval; the speaker's name, camera distance and TalkedTo event are on its `Talkable`. Walking and fighting are its `Companion`
 (formation offset, Fighter or Archer definition): the director's rally points become Stay orders, no rally is Follow,
 and it stands still until the expedition sets out.
-When an NPC also has a `QuestGiver`, that component owns its conversations instead; edit its offer/waiting/after text there.
-The companion's camp topics are still added to the giver's conversation (`IConversationTopics`).
+When an NPC also has a `QuestGiver`, keep it above the `PrologueCompanion`: the first part with a line speaks it (the
+offer before the camp chatter), and every part adds its answers (`IConversationTopics`).
 The intro's other moments are story graphs under **Intro Moments** in the scene (`Docs/StoryGraphs.md`): the choice of
 bow or axe, Eirik's waterskin for the cooking chapter (**Berries for the Pot**, started automatically after the fire),
 the small trolls' ambush in the berry clearing, and the old troll walking towards the fire when the wolves are beaten.
@@ -568,7 +568,7 @@ filled in when it is saved (`SaveableEntityTools`). Safe Haven > Save > Assign M
   `BuildPlacer`'s radius). `WardBreachDirector` spawns the breach's enemies along its marked path and makes buildings
   invulnerable while it runs.
 - **Residents:** `RescuableTraveler` follows the player in a raid; extracting with her adds a `ResidentRecord` to
-  `SettlementState`. `ResidentSpawner` places residents in Safe Haven; `ResidentNpc` opens their job menu.
+  `SettlementState`. `ResidentSpawner` places residents in Safe Haven; `ResidentNpc` offers their jobs in conversation (`Talkable`).
 - **Purification:** `PurificationAltar` queues batches in `SettlementState`; `SettlementSystem` ticks them everywhere
   (also during raids) while someone holds the Alchemist job.
 

@@ -64,13 +64,15 @@ public sealed class QuestGiverIntegrationTests
         return manager;
     }
 
-    QuestGiver Giver(params QuestDefinition[] quests)
+    QuestGiver Giver(params QuestDefinition[] quests) => Giver(true, quests);
+
+    QuestGiver Giver(bool talks, params QuestDefinition[] quests)
     {
         var host = new GameObject("Standard giver");
         created.Add(host);
+        if (talks) host.AddComponent<Talkable>();
         var giver = host.AddComponent<QuestGiver>();
         Edit(giver, data => {
-            data.FindProperty("confirmInDialogue").boolValue = true;
             data.FindProperty("showMarker").boolValue = false;
             var offers = data.FindProperty("offers");
             offers.arraySize = quests.Length;
@@ -121,6 +123,23 @@ public sealed class QuestGiverIntegrationTests
     }
 
     [Test]
+    public void Talkable_GathersTheGiversLineAndAnswers_AndFollowsUpWithItsOwnLine()
+    {
+        var quest = Quest();
+        Manager(quest);
+        var giver = Giver(quest);
+        var talkable = giver.GetComponent<Talkable>();
+        var page = talkable.BuildPage();
+        Assert.AreEqual("Authored briefing 0", page.Body);
+        Assert.AreEqual("Accept 0", page.Actions.Single().Label);
+        page = talkable.BuildPage("Anything else?");
+        Assert.AreEqual("Anything else?", page.Body, "After an answer the giver doesn't repeat the briefing.");
+        Assert.AreEqual(1, page.Actions.Count);
+        Assert.IsTrue(giver.CanInteract(null, out _), "The conversation stays open; the giver only adds to it.");
+        Assert.AreEqual(talkable.SpeakerName, ((IInteractionName)talkable).InteractionName);
+    }
+
+    [Test]
     public void OrderedOffers_DoNotSkipLockedEarlierOffers_OrSkipRequiredTurnIn()
     {
         var prerequisite = Quest();
@@ -147,11 +166,8 @@ public sealed class QuestGiverIntegrationTests
         var quest = Quest();
         Edit(quest, d => d.FindProperty("turnInToGiver").boolValue = true);
         Manager(quest);
-        var giver = Giver();
-        Edit(giver, data => {
-            data.FindProperty("quest").objectReferenceValue = quest;
-            data.FindProperty("confirmInDialogue").boolValue = false;
-        });
+        var giver = Giver(false);
+        Edit(giver, data => data.FindProperty("quest").objectReferenceValue = quest);
         giver.BuildDialoguePage(); // refresh after test authoring
         giver.Interact();
         Assert.AreEqual(QuestStatus.Active, manager.Log.StatusOf(quest));
@@ -215,9 +231,11 @@ public sealed class QuestGiverIntegrationTests
             CollectionAssert.AreEqual(new[] { "I will find us shelter.", "I will gather the supplies.",
                 "I will build the campfire.", "Let us catch our breath.", "I will try the waystones." },
                 giver.Offers.Select(o => o.AcceptText));
-            var data = new SerializedObject(giver);
-            Assert.IsTrue(data.FindProperty("confirmInDialogue").boolValue);
-            Assert.AreEqual(definition.DialogueCameraDistance, data.FindProperty("dialogueCameraDistance").floatValue);
+            var talkable = leader.GetComponent<Talkable>();
+            Assert.NotNull(talkable, "The leader's offers are taken in a conversation.");
+            Assert.AreEqual(definition.DialogueCameraDistance, new SerializedObject(talkable).FindProperty("cameraDistance").floatValue);
+            var components = leader.GetComponents<IConversationTopics>().ToList();
+            Assert.Less(components.IndexOf(giver), components.IndexOf(leader), "The quest offer speaks before the camp chatter.");
             Assert.IsTrue(giver.Offers.All(o => !string.IsNullOrWhiteSpace(o.WaitingText)));
             string before = EditorJsonUtility.ToJson(definition);
             Manager(definition.Chapters.Select(c => c.Quest).ToArray());

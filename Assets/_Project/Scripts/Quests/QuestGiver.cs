@@ -2,16 +2,6 @@ using UnityEngine;
 using System;
 using System.Collections.Generic;
 
-/// <summary>
-/// More to talk about with someone who also gives quests (a companion's questions by the fire, their orders): added as
-/// answers to the giver's conversation; every one on the person adds its own. After an answer is said,
-/// <c>afterAnswer</c> brings the conversation back.
-/// </summary>
-public interface IConversationTopics
-{
-    void AddTopics(MenuPage page, DialogueSpeaker speaker, Action afterAnswer);
-}
-
 /// <summary>An authored offer in a giver's ordered quest sequence. Progress stays in QuestLog.</summary>
 [Serializable]
 public sealed class QuestOffer
@@ -54,12 +44,13 @@ public enum QuestGiverState
 /// <item>ready to hand in: shows "?" and interacting completes the quest (with the thanks line);</item>
 /// <item>done: says the after line, or switches the interaction off when there is none.</item>
 /// </list>
-/// Without an Interactable, call StartQuest or TurnIn from any Inspector event. Quick setup: GameObject › Safe Haven ›
-/// Quest Giver.
+/// With a Talkable beside it, the giver is part of a conversation instead: its line opens it and taking or handing in the
+/// quest are answers, chosen explicitly. Without an Interactable, call StartQuest or TurnIn from any Inspector event.
+/// Quick setup: GameObject › Safe Haven › Quest Giver.
 /// </summary>
 [DisallowMultipleComponent]
 [AddComponentMenu("Safe Haven/Quests/Quest Giver")]
-public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteractionNote
+public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteractionNote, IConversationTopics
 {
     private const string DefaultWaitingText = "Come back when it's done.";
     private const float LookAwaySeconds = 1f;
@@ -77,10 +68,9 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
     [SerializeField] private bool showMarker = true;
     [Tooltip("Optional ordered offers, replacing the single Quest above. The first unfinished offer is selected; prerequisites still apply.")]
     [SerializeField] private QuestOffer[] offers = Array.Empty<QuestOffer>();
-    [Tooltip("Open a conversation and require explicit acceptance instead of starting on interaction.")]
-    [SerializeField] private bool confirmInDialogue;
+    [Tooltip("Who says the lines when there is no Talkable (which then names the speaker). Empty: the object's name.")]
     [SerializeField] private string speakerName;
-    [Tooltip("Shown in the dialogue box instead of a live portrait of this object. Optional.")]
+    [Tooltip("Shown in the dialogue box instead of a live portrait of this object. Optional; without a Talkable.")]
     [SerializeField] private Sprite portrait;
     [SerializeField, Range(0.3f, 1f)] private float dialogueCameraDistance = 0.65f;
 
@@ -89,12 +79,12 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
     private QuestGiverState state = QuestGiverState.None;
     private float lastAsked = float.NegativeInfinity;
     private QuestOffer offer;
-    private bool talking;
+    private Talkable talkable;
 
     public IReadOnlyList<QuestOffer> Offers => offers;
     public QuestDefinition Quest => offer != null ? offer.Quest : quest;
     public QuestGiverState State => state;
-    public bool IsNote => !confirmInDialogue && (state == QuestGiverState.InProgress || state == QuestGiverState.Done);
+    public bool IsNote => talkable == null && (state == QuestGiverState.InProgress || state == QuestGiverState.Done);
 
     private void Awake()
     {
@@ -103,7 +93,9 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
 
     private void OnEnable()
     {
-        if (interactable != null)
+        // A Talkable owns the interaction: the quest is taken in its conversation.
+        talkable = GetComponent<Talkable>();
+        if (interactable != null && talkable == null)
         {
             interactable.Completed.AddListener(Interact);
         }
@@ -120,7 +112,6 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
         }
 
         QuestManager.Changed -= Refresh;
-        if (talking && DialogueBox.IsOpen) DialogueBox.Current.Close();
     }
 
     /// <summary>Selects the first unfinished offer, never skipping a locked quest to offer a later one.</summary>
@@ -165,7 +156,7 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
     public bool CanInteract(GameObject user, out string reason)
     {
         reason = null;
-        if (confirmInDialogue && state != QuestGiverState.None) return true;
+        if (talkable != null) return true;
         switch (state)
         {
             case QuestGiverState.Available:
@@ -198,11 +189,6 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
     /// <summary>Starts or hands in the quest, whichever fits its state. What the Interactable calls.</summary>
     public void Interact()
     {
-        if (confirmInDialogue)
-        {
-            OpenDialogue();
-            return;
-        }
         if (state == QuestGiverState.ReadyToTurnIn)
         {
             TurnIn();
@@ -225,7 +211,7 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
         string line = offer != null ? offer.Text : greeting;
         if (QuestManager.Instance.TryStartQuest(Quest, out string reason))
         {
-            if (!confirmInDialogue) Say(line);
+            if (talkable == null) Say(line);
         }
         else
         {
@@ -265,7 +251,7 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
             return;
         }
 
-        DialogueBox.Current.Say(new DialogueSpeaker(SpeakerName, transform, portrait, dialogueCameraDistance), line);
+        DialogueBox.Current.Say(talkable != null ? talkable.Speaker : new DialogueSpeaker(SpeakerName, transform, portrait, dialogueCameraDistance), line);
     }
 
     private string SpeakerName => string.IsNullOrWhiteSpace(speakerName) ? gameObject.name : speakerName;
@@ -275,11 +261,10 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
         QuestLog log = QuestManager.Instance != null ? QuestManager.Instance.Log : GameSession.Quests;
         offer = SelectOffer(offers, log);
         state = StateFor(Quest, log);
-        if (interactable != null)
+        if (interactable != null && talkable == null)
         {
             // A finished giver with nothing more to say stops offering the interaction at all.
-            interactable.enabled = (confirmInDialogue || !(state == QuestGiverState.Done && !afterLines.HasAny)) &&
-                state != QuestGiverState.None;
+            interactable.enabled = !(state == QuestGiverState.Done && !afterLines.HasAny) && state != QuestGiverState.None;
         }
 
         if (showMarker && Application.isPlaying)
@@ -293,11 +278,11 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
         }
     }
 
-    /// <summary>The same authored confirmation UI is available to any NPC, board or other giver.</summary>
+    /// <summary>What the giver says in a conversation and the answers that take or hand in the quest.</summary>
     public MenuPage BuildDialoguePage()
     {
         Refresh();
-        var page = new MenuPage { Title = SpeakerName };
+        var page = new MenuPage { Title = talkable != null ? talkable.SpeakerName : SpeakerName };
         QuestDefinition offeredQuest = Quest;
         if (state == QuestGiverState.Available)
         {
@@ -313,7 +298,7 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
                 if (Quest == offeredQuest && state == QuestGiverState.ReadyToTurnIn) TurnIn();
             }, closesMenu: true));
         }
-        else
+        else if (state != QuestGiverState.None)
         {
             page.Body = state == QuestGiverState.Done ? Line(afterLines) :
                 offer != null && !string.IsNullOrWhiteSpace(offer.WaitingText) ? offer.WaitingText :
@@ -329,16 +314,18 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
         if (Quest == expected && state == QuestGiverState.Available) StartQuest();
     }
 
-    private void OpenDialogue()
+    /// <summary>Adds the giver's line (when nothing before it spoke) and its quest answers to a Talkable's conversation.</summary>
+    public void AddTopics(MenuPage page, DialogueSpeaker speaker, Action afterAnswer)
     {
-        talking = true;
-        var speaker = new DialogueSpeaker(SpeakerName, transform, portrait, dialogueCameraDistance);
-        MenuPage page = BuildDialoguePage();
-        foreach (IConversationTopics topics in GetComponents<IConversationTopics>())
+        MenuPage mine = BuildDialoguePage();
+        if (string.IsNullOrWhiteSpace(page.Body))
         {
-            topics.AddTopics(page, speaker, OpenDialogue);
+            page.Body = mine.Body;
         }
 
-        DialogueBox.Current.Talk(page, speaker, () => talking = false);
+        foreach (MenuAction action in mine.Actions)
+        {
+            page.Add(action);
+        }
     }
 }
