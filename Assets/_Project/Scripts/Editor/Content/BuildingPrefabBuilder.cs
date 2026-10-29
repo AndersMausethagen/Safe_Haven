@@ -145,6 +145,8 @@ public static class BuildingPrefabBuilder
             PrefabBuildUtility.Configure(PrefabBuildUtility.GetOrAdd<Interactable>(root, out bool interactableAdded), data =>
             {
                 data.FindProperty("deactivateOnComplete").boolValue = false;
+                // Opening a station is a Use: done on the press.
+                data.FindProperty("kind").intValue = (int)InteractionKind.Use;
                 if (interactableAdded)
                 {
                     data.FindProperty("duration").floatValue = 0.3f;

@@ -353,6 +353,7 @@ MonoBehaviour:
   duration: 0.3
   range: 1.8
   deactivateOnComplete: 0
+  kind: 1
   started:
     m_PersistentCalls:
       m_Calls: []

@@ -267,21 +267,20 @@ public sealed class InteractionTests
     }
 
     [Test]
-    public void InstantInteraction_CompletesOnTheFirstTick_WithoutAWorkBar()
+    public void UseInteraction_CompletesOnThePress_WithoutWorkInProgress()
     {
-        var person = new GameObject("Someone to talk to");
-        try
-        {
-            var interactable = person.AddComponent<Interactable>();
-            interactable.Configure(InteractionAnimation.None, 3f, 2f, false);
-            interactable.Instant = true;
-            Assert.IsTrue(interactable.TryBegin(person));
-            Assert.AreEqual(0f, interactable.Progress, "No work bar.");
-            Assert.IsTrue(interactable.Tick(0f), "Done at once, however long its duration.");
-        }
-        finally
-        {
-            Object.DestroyImmediate(person);
-        }
+        PlayerInteractor user = Interactor();
+        Interactable target = Target(new Vector3(1f, 0f, 0f));
+        var data = new SerializedObject(target);
+        data.FindProperty("kind").intValue = (int)InteractionKind.Use;
+        data.FindProperty("duration").floatValue = 3f;
+        data.FindProperty("deactivateOnComplete").boolValue = false;
+        data.ApplyModifiedPropertiesWithoutUndo();
+        int completed = 0;
+        target.Completed.AddListener(() => completed++);
+        Invoke(user, "OnInteractionRequested");
+        Assert.AreEqual(1, completed, "Done on the press, whatever its duration.");
+        Assert.IsNull(user.Current, "No work in progress, so no work bar.");
+        Assert.IsFalse(target.IsInUse);
     }
 }

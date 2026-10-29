@@ -443,6 +443,7 @@ MonoBehaviour:
   duration: 0
   range: 1.2
   deactivateOnComplete: 0
+  kind: 1
   started:
     m_PersistentCalls:
       m_Calls: []
@@ -466,3 +467,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ExtractionPoint
   displayName: Extraction Beacon
   fallbackSeconds: 5
+  opensAtSecondsLeft: 0
+  closesAtSecondsLeft: 0
+  availabilityChance: 1
+  timeMultiplier: 1
+  costItem: {fileID: 0}
+  costAmount: 1
+  alarm: {fileID: 0}
+  alarmMessage: The beacon's light draws the forest's attention!
+  holdRadius: 5
+  callRadius: 35
+  callInterval: 5

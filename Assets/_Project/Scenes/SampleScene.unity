@@ -2471,6 +2471,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Human_Anvil
       objectReference: {fileID: 0}
+    - target: {fileID: 3095375422957463083, guid: 0d738d283d4eac84fa081c39bb7f3fcd, type: 3}
+      propertyPath: kind
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -5291,6 +5295,11 @@ MonoBehaviour:
     lines: []
     order: 0
   showMarker: 1
+  offers: []
+  confirmInDialogue: 0
+  speakerName: 
+  portrait: {fileID: 0}
+  dialogueCameraDistance: 0.65
 --- !u!114 &1593342185
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5307,6 +5316,7 @@ MonoBehaviour:
   duration: 0.4
   range: 1.5
   deactivateOnComplete: 0
+  kind: 1
   started:
     m_PersistentCalls:
       m_Calls: []
@@ -6491,6 +6501,7 @@ MonoBehaviour:
     tracks: []
     order: 0
   combatMusic: 1
+  startSilent: 0
   finalStretchSeconds: 60
 --- !u!4 &1963846609
 Transform:

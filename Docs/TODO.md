@@ -37,3 +37,24 @@ Open work and ideas. Tick items off (`[x]`) or delete them when done. Architectu
 - [ ] Ground drop prefabs for materials (a generic sack/bundle prefab) so dropping a material spawns something to pick up.
 - [ ] Per-material stack size tuning after playtest (hides 20, trollstone 10, the rest 50).
 - [ ] Show the weight of a full stack in the raid preparation window, so the loadout's weight is visible before leaving.
+
+## Code quality: SOLID refactor (analysis 2026-10-29)
+
+Rules written as special cases instead of following the existing model. Work top to bottom.
+
+1. [x] **Interaction kinds.** `Interactable` gets an explicit Kind: **Use** (completes on the press: talking, opening
+       a chest, station, portal, lighting an exit; no player state, animation or work bar) or **Work** (today's timed
+       work; duration 0 still means "until Complete()"). Set Use in data (prefabs, scenes, prefab builders), and remove
+       the `Instant` flag set in four `Awake`s, the fake 0.2-0.4 s durations and ExtractionPoint's Complete-on-Started.
+   - [ ] **Talkable**: one shared conversation component (open, camera framing, walk-away close) that gathers pages
+         from `IConversationTopics` sources, replacing the copies in QuestGiver, PrologueCompanion and ResidentNpc.
+2. [ ] **IInteractionName** instead of the type checks in `WorldInteractionIndicator.NameOf`.
+3. [ ] **Target priority as data** (`Combatant`) instead of `Player.IsPlayer` in MonsterAI target choice; arrow
+       recovery as a `Launch` parameter instead of checking whether the owner is the player.
+4. [ ] **Split large classes**: `Companion` (movement/combat, downed, orders, looks) and the target choice out of
+       `MonsterAI`.
+5. [ ] **Non-blocking lines in combat**: lines without answers during a fight show as subtitles and don't hold attacks,
+       so the prologue's wait-for-the-line rule and the Troll Ambush reorder become unnecessary.
+6. [ ] Smaller: companions stop only when they themselves are talked to (not on any open dialogue); companion grips as
+       rig data instead of the player's HeldItemView; one encounter definition per prologue chapter (camp wolves and
+       portal enemies the same way).

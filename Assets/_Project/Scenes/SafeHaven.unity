@@ -30160,6 +30160,7 @@ MonoBehaviour:
   duration: 1.5
   range: 1.5
   deactivateOnComplete: 0
+  kind: 0
   started:
     m_PersistentCalls:
       m_Calls: []
@@ -114960,6 +114961,7 @@ MonoBehaviour:
   duration: 0.3
   range: 1.8
   deactivateOnComplete: 0
+  kind: 1
   started:
     m_PersistentCalls:
       m_Calls: []
@@ -120825,6 +120827,7 @@ MonoBehaviour:
   duration: 0.4
   range: 1.5
   deactivateOnComplete: 0
+  kind: 1
   started:
     m_PersistentCalls:
       m_Calls: []

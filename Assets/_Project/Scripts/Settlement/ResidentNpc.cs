@@ -27,8 +27,6 @@ public sealed class ResidentNpc : MonoBehaviour
     private void Awake()
     {
         interactable = GetComponent<Interactable>();
-        // Talking opens at once: no work bar.
-        if (interactable != null) interactable.Instant = true;
     }
 
     private void OnEnable()

@@ -110,14 +110,12 @@ public sealed class ExtractionPoint : MonoBehaviour, IInteractionCondition, IInt
     {
         active.Add(this);
         lastStatus = Status;
-        interactable.Started.AddListener(OnStarted);
         interactable.Completed.AddListener(OnCompleted);
     }
 
     private void OnDisable()
     {
         active.Remove(this);
-        interactable.Started.RemoveListener(OnStarted);
         interactable.Completed.RemoveListener(OnCompleted);
     }
 
@@ -297,12 +295,6 @@ public sealed class ExtractionPoint : MonoBehaviour, IInteractionCondition, IInt
                 GameMessages.Post($"Back into the circle! {hold.Remaining:0} s still to hold.", MessageKind.Warning);
                 break;
         }
-    }
-
-    // Lighting is a single press: the interaction ends at once and the beacon is lit when it completes.
-    private void OnStarted()
-    {
-        interactable.Complete();
     }
 
     private void OnCompleted()

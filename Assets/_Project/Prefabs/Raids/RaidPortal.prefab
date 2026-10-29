@@ -336,6 +336,7 @@ MonoBehaviour:
   duration: 0.3
   range: 1.5
   deactivateOnComplete: 0
+  kind: 1
   started:
     m_PersistentCalls:
       m_Calls: []
@@ -366,6 +367,10 @@ MonoBehaviour:
   dormantVisual: {fileID: 6857296150623158302}
   activeVisual: {fileID: 4255096957276469750}
   repairedEvent: {fileID: 11400000, guid: 33b3fdbc627e48d4f9a56fdda934ff2e, type: 2}
+  repairRequires:
+    quest: {fileID: 0}
+    requirement: 0
+  repairLockedText: Free the Heart Tree's light first.
   ruinText: Ancient standing stones, cracked and cold. A faint hum lingers in them, as if they remember being a door. Life Orbs might wake them.
 --- !u!208 &3261299308856630606
 NavMeshObstacle:

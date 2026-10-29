@@ -273,6 +273,7 @@ MonoBehaviour:
   duration: 0.3
   range: 1.3
   deactivateOnComplete: 0
+  kind: 1
   started:
     m_PersistentCalls:
       m_Calls: []
@@ -296,6 +297,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::StashChest
   window: {fileID: 0}
   windowRange: 3
+  stashSlots: 0
 --- !u!1 &5588644177549006631
 GameObject:
   m_ObjectHideFlags: 0

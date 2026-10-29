@@ -141,6 +141,13 @@ public sealed class PlayerInteractor : MonoBehaviour
             return;
         }
 
+        // A Use is done on the press: no Interacting state, animation or work bar.
+        if (target.Kind == InteractionKind.Use)
+        {
+            target.End(InteractionResult.Completed);
+            return;
+        }
+
         if (!stateMachine.BeginInteraction())
         {
             target.End(InteractionResult.Cancelled);
@@ -150,11 +157,6 @@ public sealed class PlayerInteractor : MonoBehaviour
         current = target;
         isInteracting = true;
         InteractionStarted?.Invoke(target);
-        // Talking and menus open on the press itself, never through a work bar.
-        if (target.Instant && !target.HoldOpen)
-        {
-            End(InteractionResult.Completed);
-        }
     }
 
     private void OnPlayerStateChanged(PlayerState previous, PlayerState next)
