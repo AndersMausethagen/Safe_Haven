@@ -71,8 +71,8 @@ MonoBehaviour:
     statusText: 'THE CONNECTION IS WAKING
 
       Hold them back. Stay close to the portal!'
-    duration: 180
-    initialEnemies: 2
+    duration: 60
+    initialEnemies: 4
   startedEvent: {fileID: 11400000, guid: 8eb5d1eaca7f351419207cf31f6401cf, type: 2}
   shelterEvent: {fileID: 11400000, guid: 3e4af787a3ca3d241a28d20824384e0f, type: 2}
   fireEvent: {fileID: 11400000, guid: c717e4480417eb34ba75f12df32acda0, type: 2}
@@ -95,12 +95,22 @@ MonoBehaviour:
   waitingForLeaderText: Speak to Sigrid about the next step.
   leader: {fileID: 11400000, guid: b230d041259b863428e4e973c6ff0d86, type: 2}
   dialogueCameraDistance: 0.65
-  waveInterval: 25
+  waveInterval: 12
   firstWaveSize: 3
   waveGrowth: 1
-  maximumWaveSize: 7
-  maximumEnemies: 14
+  maximumWaveSize: 6
+  maximumEnemies: 16
   wolfPrefab: {fileID: 4509420567327699722, guid: 133e61ca36473ab4999a603e504581a7, type: 3}
+  portalEnemies:
+  - prefab: {fileID: 4509420567327699722, guid: 133e61ca36473ab4999a603e504581a7, type: 3}
+    weight: 3
+    fromWave: 1
+  - prefab: {fileID: 8296844003842886986, guid: 6e3976bda74c8ee47a348b92a853028a, type: 3}
+    weight: 2
+    fromWave: 1
+  - prefab: {fileID: 8277675663346761700, guid: 80e5c084eeb0c7d4d9a3027eabb4a2a8, type: 3}
+    weight: 1.5
+    fromWave: 2
   rumble: {fileID: 11400000, guid: 6510718f5af764e4aa78349c4b3f7cdf, type: 2}
   homeScene: SafeHaven
   survivedText: 'Sigrid: It is open! Everyone, through! Something vast strikes the stones. You reach for the others... and the forest disappears.'

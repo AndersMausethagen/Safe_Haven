@@ -20,6 +20,9 @@ MonoBehaviour:
   arrowSpeed: 30
   arrowDamageShare: 0.6
   attackSound: {fileID: 11400000, guid: e3702f94155b6bc42b71a0d0872c141d, type: 2}
+  strikeDelay: 0.75
+  weapon: {fileID: 11400000, guid: 99887c135c70abc40aae37cfc66809b9, type: 2}
+  animations: {fileID: 22100000, guid: 5f82225f7e7d06647b04484b65a5f27d, type: 2}
   engageRadius: 9
   defendRadius: 3.5
   holdRadius: 12
@@ -44,3 +47,5 @@ MonoBehaviour:
     reply: Point the way.
   downedSeconds: 12
   getUpHealth: 0.4
+  reviveSeconds: 3
+  reviveHealth: 0.6

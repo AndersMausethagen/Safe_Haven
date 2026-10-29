@@ -7,7 +7,8 @@ using UnityEngine.UI;
 /// The player's health and stamina bars, the thin Focus bar (earned by fighting well, spent on skills), and the smaller
 /// hunger and thirst bars (GDD §11, §18.2). Each bar has a fill that tracks the value at once and a pale trail behind it
 /// that lingers and then drains, so a hit or a spend reads at a glance. Refused attacks, skills and dodges flash the
-/// stamina bar and post a warning through the existing message feed.
+/// stamina bar and post a warning through the existing message feed. While the dodge cools down the stamina bar glows
+/// red around its edge, and the glow going out says the dodge is ready.
 /// <para>
 /// Where it belongs: the PlayerVitalsHUD prefab, placed in every gameplay scene. It finds the player through
 /// Player.Current / Player.Spawned, so it needs no scene references.
@@ -53,9 +54,23 @@ public sealed class PlayerVitalsView : MonoBehaviour
     [SerializeField] private Color exhaustedColor = new Color(0.85f, 0.32f, 0.18f, 1f);
     [SerializeField, Min(0.01f)] private float flashDuration = 0.4f;
 
+    [Header("Dodge cooldown glow")]
+    [Tooltip("The stamina bar glows this colour around its edge while the dodge is cooling down.")]
+    [SerializeField] private Color dodgeCooldownGlow = new Color(0.95f, 0.16f, 0.08f, 0.95f);
+    [Tooltip("How far the glow reaches out from the bar, in UI units.")]
+    [SerializeField, Min(1f)] private float glowSpread = 9f;
+
     [Tooltip("Optional: hidden while there is no player.")]
     [SerializeField] private CanvasGroup group;
 
+    private const int GlowTexture = 64;
+    private const int GlowBorder = 24;
+    // The glow fades out over the dodge's last moment of cooldown, so "ready" reads as the glow going out.
+    private const float GlowFadeSeconds = 0.2f;
+    private static Sprite glowSprite;
+
+    private Image dodgeGlow;
+    private PlayerDodge boundDodge;
     private Player bound;
     private Color frameColor;
     private float flashUntil = -1f;
@@ -68,6 +83,85 @@ public sealed class PlayerVitalsView : MonoBehaviour
         {
             frameColor = staminaFrame.color;
         }
+
+        BuildDodgeGlow();
+    }
+
+    // A soft red ring laid just behind the stamina bar's frame (or its bar, without a frame), reaching out past its edge.
+    private void BuildDodgeGlow()
+    {
+        var around = (staminaFrame != null ? staminaFrame.transform : stamina.fill != null ? stamina.fill.parent : null) as RectTransform;
+        if (around == null)
+        {
+            return;
+        }
+
+        var glow = new GameObject("Dodge Cooldown Glow", typeof(RectTransform), typeof(Image), typeof(LayoutElement));
+        glow.GetComponent<LayoutElement>().ignoreLayout = true;
+        var rect = (RectTransform)glow.transform;
+        rect.SetParent(around.parent, false);
+        rect.SetSiblingIndex(around.GetSiblingIndex());
+        rect.anchorMin = around.anchorMin;
+        rect.anchorMax = around.anchorMax;
+        rect.pivot = around.pivot;
+        rect.anchoredPosition = around.anchoredPosition;
+        rect.sizeDelta = around.sizeDelta + Vector2.one * (glowSpread * 2f);
+        dodgeGlow = glow.GetComponent<Image>();
+        dodgeGlow.sprite = GlowSprite();
+        dodgeGlow.type = Image.Type.Sliced;
+        dodgeGlow.fillCenter = false;
+        dodgeGlow.pixelsPerUnitMultiplier = GlowBorder / glowSpread;
+        dodgeGlow.raycastTarget = false;
+        dodgeGlow.color = Color.clear;
+    }
+
+    // White, opaque at the inner edge and fading out to nothing at the outer one; sliced so only the ring is drawn.
+    private static Sprite GlowSprite()
+    {
+        if (glowSprite != null)
+        {
+            return glowSprite;
+        }
+
+        var texture = new Texture2D(GlowTexture, GlowTexture, TextureFormat.RGBA32, false)
+        {
+            wrapMode = TextureWrapMode.Clamp,
+            hideFlags = HideFlags.HideAndDontSave,
+        };
+        var pixels = new Color32[GlowTexture * GlowTexture];
+        float inner = GlowTexture - GlowBorder;
+        for (int y = 0; y < GlowTexture; y++)
+        {
+            for (int x = 0; x < GlowTexture; x++)
+            {
+                float dx = Mathf.Max(GlowBorder - (x + 0.5f), 0f, (x + 0.5f) - inner);
+                float dy = Mathf.Max(GlowBorder - (y + 0.5f), 0f, (y + 0.5f) - inner);
+                float d = Mathf.Clamp01(Mathf.Sqrt(dx * dx + dy * dy) / GlowBorder);
+                float a = (1f - d) * (1f - d);
+                pixels[y * GlowTexture + x] = new Color32(255, 255, 255, (byte)(a * 255f));
+            }
+        }
+
+        texture.SetPixels32(pixels);
+        texture.Apply(false, true);
+        glowSprite = Sprite.Create(texture, new Rect(0, 0, GlowTexture, GlowTexture), new Vector2(0.5f, 0.5f), 100f, 0,
+            SpriteMeshType.FullRect, Vector4.one * GlowBorder);
+        glowSprite.hideFlags = HideFlags.HideAndDontSave;
+        return glowSprite;
+    }
+
+    private void UpdateDodgeGlow()
+    {
+        if (dodgeGlow == null)
+        {
+            return;
+        }
+
+        float remaining = boundDodge != null && boundDodge.CooldownFraction > 0f ? boundDodge.CooldownRemaining : 0f;
+        float strength = Mathf.Clamp01(remaining / GlowFadeSeconds) * (0.8f + 0.2f * Mathf.Sin(Time.unscaledTime * 12f));
+        Color color = dodgeCooldownGlow;
+        color.a *= strength;
+        dodgeGlow.color = color;
     }
 
     private void OnEnable()
@@ -110,6 +204,7 @@ public sealed class PlayerVitalsView : MonoBehaviour
             SetTarget(stamina, bound.Stamina.Current, bound.Stamina.Max, snap: true);
         }
 
+        boundDodge = bound.GetComponent<PlayerDodge>();
         boundFocus = bound.GetComponent<PlayerFocus>();
         if (boundFocus != null)
         {
@@ -141,6 +236,7 @@ public sealed class PlayerVitalsView : MonoBehaviour
         }
 
         boundFocus = null;
+        boundDodge = null;
         bound = null;
         nextStaminaMessageAt = -1f;
     }
@@ -221,6 +317,7 @@ public sealed class PlayerVitalsView : MonoBehaviour
             SetTarget(thirst, bound.Needs.Thirst.Current, bound.Needs.Thirst.Max, snap: true);
         }
 
+        UpdateDodgeGlow();
         if (staminaFrame != null && flashUntil >= 0f)
         {
             float t = Mathf.Clamp01((flashUntil - Time.unscaledTime) / flashDuration);

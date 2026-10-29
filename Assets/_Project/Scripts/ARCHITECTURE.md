@@ -76,7 +76,7 @@ of the GDD, **Not started** = design only. Update this table when a system is ad
 | `Events` | The game-event bus (`GameEvents`, `GameEvent`) and designer-facing pieces: `GameEventDefinition` (Quest Events), `GameEventTrigger` (zones/interactions raise events), `GameEventListener` (events trigger scene changes) |
 | `Player` | The player: `Player` (the front door to the player's parts), movement, input, combat, `PlayerEquipment` (worn gear, weapon and tool belt; see "Equipment"), interaction, `PlayerPersistence` + `PlayerSnapshot` (carrying the player across scenes, and what a failed raid keeps) |
 | `Combat` | Stats, damage, `Damageable` (health, death, invulnerability, revive), attacks and hit detection, and combat feel: `CombatFeedback` (hit stop, shake), `HitReaction` (flash, punch, knockback), `CombatFeelSettings`. `Faction` (Player, Enemy, Neutral, Ally): the player and Ally (companions, travellers) are one side with no friendly fire (`FactionRelations.AreAllies`); Enemy AI hunts both (`WillAttack`). Kills carry the fallen side (`GameEvent.KilledFaction`), so a quest's "kill 5 enemies" (`QuestObjective` › Faction, used when no monster is set) never counts the player or a companion falling |
-| `Companions` | People who fight beside the player. `Companion` (on the NPC: walks, fights, is knocked down and gets up, takes orders in conversation through `IConversationTopics`), `CompanionDefinition` (a kind of companion: attack or arrow, order ranges, the orders it takes and its answers; `Data/Companions`), `CompanionOrder` and `CompanionTactics` (plain C#, tested in `CompanionTests`: which enemy, where to stand, per order). Monsters go for the player first while they can reach them (`TargetPriority`, `MonsterAI.CanReach`); a companion only when the player is out of reach. Content: `AgentScripts/BuildCompanions.cs`. A new order = a `CompanionOrder` value at the end + its case in `CompanionTactics` + an answer line in the definitions |
+| `Companions` | People who fight beside the player. `Companion` (on the NPC: walks, fights, is knocked down and gets up, takes orders in conversation through `IConversationTopics`), `CompanionDefinition` (a kind of companion: attack or arrow, order ranges, the orders it takes and its answers; `Data/Companions`), `CompanionOrder` and `CompanionTactics` (plain C#, tested in `CompanionTests`: which enemy, where to stand, per order). Monsters go for the player first while they can reach them (`TargetPriority`, `MonsterAI.CanReach`); a companion only when the player is out of reach. A definition also gives the weapon in their hand (`HeldItemView.CreateModel` with the player's grip; a bow in the left hand), optional animations (Archer: `ArcherAnimations` override whose Attack is a bow draw) and the strike delay. Orders in conversation can be switched off per companion (the prologue expedition follows the story). Content: `AgentScripts/BuildCompanions.cs`. A new order = a `CompanionOrder` value at the end + its case in `CompanionTactics` + an answer line in the definitions |
 | `AI` | `MonsterAI`, its animation driver and `AttackTelegraph` (ground warning during a wind-up). `AI/Perception`: how monsters notice things (`MonsterSenses`, `Awareness`, `PerceptionRules`, `WorldNoise`, `AwarenessIndicator`, `PerceptionSettings`; see "Senses and stealth"). `MonsterPatrol` (walks a route of waypoints through `MonsterAI.Roam`, keeps its monster awake), `CreatureFootfalls` (step sounds and camera shake of heavy creatures) |
 | `Camera` | `PlayerCameraController` (top-down and over-the-shoulder action style on one Cinemachine camera, framing per game state), `CameraPreferences`/`CameraStyleRules` (which style applies), `CameraPointer` (mouse vs screen-centre aiming) and `CameraShake` (Cinemachine extension) |
 | `Items`, `ResourceInventory`, `Crafting`, `Content` | Data definitions (ScriptableObjects) and their runtime containers. `Crafting/MaterialPool` is the one place costs are paid from |
@@ -84,7 +84,7 @@ of the GDD, **Not started** = design only. Update this table when a system is ad
 | `Durability` | Wear on deployed equipment: `DurabilitySettings` (loss per failed raid, repair cost share), `Repairs` (cost and repair), `RepairBench` |
 | `Building` | `BuildPlacer`: the build menu (G), the placement preview inside the ward radius, moving buildings, snapping, yards and line drawing. `BuildPlacement`: pure footprint/yard/snap/line geometry (tested in `BuildPlacementTests`) |
 | `Settlement` | Safe Haven as a place: `SettlementState` (portal, ward level, breach, residents, purification queue), `SettlementSystem` (persistent; ticks purification), `SettlementSettings`, `HeartTree`, `WardBreachDefinition` + `WardBreachDirector`, `HomeRevival`, residents and jobs (`ResidentDefinition`, `JobDefinition`, `ResidentNpc`, `ResidentSpawner`, `RescuableTraveler`), `PurificationAltar` |
-| `Interaction` | `Interactable` – anything the player works on with E |
+| `Interaction` | `Interactable` – anything the player works on with E. **Instant** ones (talking to someone, opening a menu: set by `QuestGiver`, `PrologueCompanion`, `ResidentNpc`, `HeartTree`) complete on the press itself, with no work bar |
 | `Raids` | Raid definitions, modifiers, the `RaidLauncher` (departure, Portal Sparks), the `RaidDirector` that runs a raid scene, extraction, loot caches, the portal. `Raids/Map`: painted raid maps (`RaidMapDefinition`, `RaidMapZone`, `RaidZoneGrid`, `RaidMap`, `MapRotation`, `RaidMapMarkers`; see "Raid maps") |
 | `Progression` | Levels, experience and talents (see "Levels and talents") |
 | `Quests` | Quest data (`QuestDefinition`, `QuestObjective`), per-player progress (`QuestLog`), `QuestManager`, `QuestGiver` (state-aware: marker, start, hand-in), `QuestMarker` + `QuestMarkerSettings` |
@@ -118,8 +118,9 @@ box holds attacks. Story graphs follow the same rule by linking Say before Spawn
 the existing Quest Map; chapter list order does not rewrite the prerequisite graph. A chapter waits for its quest
 to complete. Reusable behaviour presets handle shelter, fuel, fire, rest, camp defence, travel, activation and the
 portal hold; new kinds of scene mechanics still require code. The same asset holds the field building, building radius,
-starting armor, dialogue camera distance scale, waiting-for-leader text, wolf prefab, wave
-interval, first-wave size, wave growth/caps, rumble, ending/recovery/homecoming text and transition timing. It is never mutated at runtime.
+starting armor, dialogue camera distance scale, waiting-for-leader text, wolf prefab, the portal hold's enemy mix
+(Portal Enemies: prefab, weight, from wave; ExpeditionSmallMossTroll/ExpeditionMistwing are unsaved copies made by
+`AgentScripts/BuildPrologueFinale.cs`, which also sets the one-minute hold), wave interval, first-wave size, wave growth/caps, rumble, ending/recovery/homecoming text and transition timing. It is never mutated at runtime.
 
 Select an expedition NPC in `Prologue_MistyWoods` to edit its `PrologueCompanion`: resident identity, forest/camp/
 portal dialogue, camp topics (questions the player can ask around the camp, from gathering fuel until the wolves), a
@@ -224,7 +225,8 @@ start/completion events through `GameEvents`, feeding them back into the log and
    is not a timeline. **Already Happened Response**, when configured, replaces the optional Response only;
    typed Actions still restore. Changes to live weather/music are restored by listeners, not serialized as assets.
 
-`SceneAudio.Start Silent` suppresses all automatic/default/combat/final-stretch music, not ambience. Event music
+`SceneAudio.Start Silent` (and Silence Music) suppresses automatic/default/final-stretch music, not ambience; a fight
+still brings combat music (the prologue's wolves and trolls), and event music beats both. Event music
 holds priority until Silence/Resume/another Play Music action or leaving the scene. The forest starts silent and its
 Hold Portal **Quest Started** listener plays the authored defence playlist, including checkpoint replay. Designers
 can replace that clip or add weather, lights and object actions in the quest's Scene Reactions panel.
@@ -680,7 +682,9 @@ The player is no super soldier: combat is about reading the enemy and committing
   (added by Safe Haven › UI › Add Focus Bar to Vitals HUD).
 - **Dodge by gear weight:** `PlayerEquipment.EquipLoad` (armour, rings, weapon) picks a `DodgeStyle` from
   `PlayerMovementSettings` (Quickstep / Roll / Heavy Roll, each a `DodgeShape` of multipliers, move speed and animation);
-  `PlayerDodge.DodgeStarted` plays it; the heavy roll ends in the `shoulderBarge` attack.
+  `PlayerDodge.DodgeStarted` plays it; the heavy roll ends in the `shoulderBarge` attack. While the dodge cools down the
+  stamina bar glows red around its edge (`PlayerVitalsView`, from `PlayerDodge.CooldownFraction`); the glow going out
+  means it is ready.
 - **Committed eating** (`PlayerEating`, Survival): `ItemInventory.Use` sends food and drink there; 1.3 s, slowed, no
   attacking/guarding/skills, interrupted (food kept) by a hit or dodge; healing arrives over time.
 - **Monster body language:** `AttackPose` (pure, tested) coils a monster's Model through the wind-up, lunges at the hit

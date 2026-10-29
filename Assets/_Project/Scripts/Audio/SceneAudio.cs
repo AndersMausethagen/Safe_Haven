@@ -22,7 +22,7 @@ public sealed class SceneAudio : MonoBehaviour
     [Header("Rules")]
     [Tooltip("Switch to combat music when the player fights. Turn off for menus and calm scenes.")]
     [SerializeField] private bool combatMusic = true;
-    [Tooltip("Silences music, including default/combat tracks, until a quest/event starts it. Ambience still plays.")]
+    [Tooltip("Silences music until a quest/event starts it; a fight still brings combat music. Ambience still plays.")]
     [SerializeField] private bool startSilent;
     [Tooltip("The final stretch music starts when this many seconds of the raid are left.")]
     [SerializeField, Min(0f)] private float finalStretchSeconds = 60f;

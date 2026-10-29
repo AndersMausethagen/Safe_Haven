@@ -7,9 +7,10 @@ using UnityEngine.SceneManagement;
 
 /// <summary>
 /// Companions (`unity command run_script --file AgentScripts/BuildCompanions.cs --entry BuildCompanions.Apply`): the
-/// companion kinds (Data/Companions: Fighter and Archer), their health (Data/Combat/Stats/CompanionStats) and, in the
-/// prologue, a Companion on every expedition member: Ally faction, a solid body enemies can see and hit, knocked down
-/// instead of killed, their old place in the formation. Rescuable travellers in the raid become Ally as well. Safe to run
+/// companion kinds (Data/Companions: Fighter with a sword, Archer with a bow and a bow-draw animation), their health
+/// (Data/Combat/Stats/CompanionStats) and, in the prologue, a Companion on every expedition member: Ally faction, a solid
+/// body enemies can see and hit, knocked down instead of killed, their old place in the formation, no player orders
+/// (they follow the story), and Runa's torch put away for the bow. Rescuable travellers in the raid become Ally as well. Safe to run
 /// again. Reopens the scene that was open.
 /// </summary>
 public static class BuildCompanions
@@ -39,10 +40,14 @@ public static class BuildCompanions
 
         Stats();
         var bow = AssetDatabase.LoadAssetAtPath<WeaponDefinition>("Assets/_Project/Data/Combat/Weapons/CrudeWoodenBow.asset");
-        Definition("Fighter", "MonsterStrike", null, 9f, 1.6f, null);
+        Definition("Fighter", "MonsterStrike", null, 9f, 1.6f, null,
+            AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Project/Data/Items/IronSword.asset"), null, 0f);
+        // The draw (BowShot01 - Load) instead of a sword swing; the arrow leaves as the draw ends.
         Definition("Archer", "BowShot",
             AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Project/Data/Items/CrudeStoneArrow.asset"), 0f, 2.2f,
-            bow != null ? bow.SwingSound : null);
+            bow != null ? bow.SwingSound : null,
+            AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Project/Data/Items/CrudeWoodenBow.asset"),
+            ArcherAnimations(), 0.75f);
         AssetDatabase.SaveAssets();
 
         var report = new StringBuilder();
@@ -61,7 +66,13 @@ public static class BuildCompanions
             data.FindProperty("definition").objectReferenceValue = name == "Runa" ? archer : fighter;
             data.FindProperty("resident").objectReferenceValue = member.Resident;
             data.FindProperty("formationOffset").vector3Value = Formation.TryGetValue(name, out Vector3 offset) ? offset : Vector3.zero;
+            // The expedition follows the story, not the player's orders.
+            data.FindProperty("ordersInConversation").boolValue = false;
             data.ApplyModifiedPropertiesWithoutUndo();
+            // An archer needs both hands for the bow: the left-hand torch is put away.
+            if (name == "Runa")
+                foreach (ExpeditionTorch torch in body.GetComponentsInChildren<ExpeditionTorch>(true))
+                    torch.gameObject.SetActive(false);
             report.Append(name).Append(name == "Runa" ? " (archer) " : " (fighter) ");
         }
 
@@ -141,8 +152,35 @@ public static class BuildCompanions
         entry.FindPropertyRelative("value").floatValue = value;
     }
 
+    // MonsterHumanoid with its Attack (a one-handed swing) replaced by drawing a bow.
+    private static RuntimeAnimatorController ArcherAnimations()
+    {
+        const string path = Folder + "/ArcherAnimations.overrideController";
+        var baseController = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>("Assets/_Project/Animation/Controllers/MonsterHumanoid.controller");
+        AnimationClip swing = Clip("Assets/Kevin Iglesias/Human Animations/Animations/Male/Combat/1H/HumanM@Attack1H01_R.fbx");
+        AnimationClip draw = Clip("Assets/Kevin Iglesias/Human Animations/Animations/Male/Combat/Bow/HumanM@BowShot01 - Load.fbx");
+        var animations = AssetDatabase.LoadAssetAtPath<AnimatorOverrideController>(path);
+        if (animations == null)
+        {
+            animations = new AnimatorOverrideController(baseController);
+            AssetDatabase.CreateAsset(animations, path);
+        }
+
+        animations.runtimeAnimatorController = baseController;
+        animations[swing] = draw;
+        EditorUtility.SetDirty(animations);
+        return animations;
+    }
+
+    private static AnimationClip Clip(string path)
+    {
+        foreach (Object asset in AssetDatabase.LoadAllAssetsAtPath(path))
+            if (asset is AnimationClip clip && !clip.name.StartsWith("__preview")) return clip;
+        return null;
+    }
+
     private static CompanionDefinition Definition(string name, string attack, ItemDefinition arrow, float weaponDamage,
-        float interval, SoundDefinition sound)
+        float interval, SoundDefinition sound, ItemDefinition weapon, RuntimeAnimatorController animations, float strikeDelay)
     {
         string path = $"{Folder}/{name}.asset";
         var definition = AssetDatabase.LoadAssetAtPath<CompanionDefinition>(path);
@@ -159,6 +197,9 @@ public static class BuildCompanions
         data.FindProperty("attackInterval").floatValue = interval;
         data.FindProperty("arrow").objectReferenceValue = arrow;
         data.FindProperty("attackSound").objectReferenceValue = sound;
+        data.FindProperty("weapon").objectReferenceValue = weapon;
+        data.FindProperty("animations").objectReferenceValue = animations;
+        data.FindProperty("strikeDelay").floatValue = strikeDelay;
         // The prologue's rally points (camp, portal) are Stay orders, so they fight across the whole clearing.
         data.FindProperty("holdRadius").floatValue = 12f;
         data.ApplyModifiedPropertiesWithoutUndo();

@@ -41,6 +41,14 @@ public sealed class CompanionDefinition : ScriptableObject
     [Tooltip("Share of the arrow's damage each shot does, so a companion helps without taking the fight from the player.")]
     [SerializeField, Range(0.1f, 2f)] private float arrowDamageShare = 0.6f;
     [SerializeField] private SoundDefinition attackSound;
+    [Tooltip("Seconds from the start of the attack animation to the hit or the arrow leaving. 0 uses the attack's Hit Delay.")]
+    [SerializeField, Min(0f)] private float strikeDelay;
+
+    [Header("Looks")]
+    [Tooltip("The weapon in their hand (its held model): a bow sits in the left hand, anything else in the right.")]
+    [SerializeField] private ItemDefinition weapon;
+    [Tooltip("Optional: animations for this kind of companion (an override of their controller whose Attack is a bow draw).")]
+    [SerializeField] private RuntimeAnimatorController animations;
 
     [Header("Orders")]
     [Tooltip("Following: fights enemies this close to the leader.")]
@@ -84,6 +92,9 @@ public sealed class CompanionDefinition : ScriptableObject
     public float ArrowSpeed => arrowSpeed;
     public float ArrowDamageShare => arrowDamageShare;
     public SoundDefinition AttackSound => attackSound;
+    public float StrikeDelay => strikeDelay > 0f ? strikeDelay : attack != null ? attack.HitDelay : 0.4f;
+    public ItemDefinition Weapon => weapon;
+    public RuntimeAnimatorController Animations => animations;
     public float Awareness => awareness;
     public CompanionOrderOption[] Orders => orders;
     public float DownedSeconds => downedSeconds;

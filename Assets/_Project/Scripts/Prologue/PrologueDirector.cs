@@ -295,7 +295,8 @@ public sealed class PrologueDirector : MonoBehaviour
                 Debug.LogError("A prologue encounter spawn is not on the NavMesh.", this);
                 continue;
             }
-            GameObject enemy = Instantiate(definition.WolfPrefab, hit.position, point.rotation);
+            GameObject prefab = step == PrologueStep.HoldPortal ? definition.PortalEnemy(wave, Random.value) : definition.WolfPrefab;
+            GameObject enemy = Instantiate(prefab, hit.position, point.rotation);
             enemies.Add(enemy.GetComponent<Damageable>());
             MonsterAI ai = enemy.GetComponent<MonsterAI>();
             if (ai != null) ai.Roam(Player.Current.transform.position);

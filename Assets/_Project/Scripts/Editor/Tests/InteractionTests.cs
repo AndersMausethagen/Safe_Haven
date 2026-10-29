@@ -265,4 +265,23 @@ public sealed class InteractionTests
     {
         target.GetType().GetMethod(method, BindingFlags.Instance | BindingFlags.NonPublic).Invoke(target, null);
     }
+
+    [Test]
+    public void InstantInteraction_CompletesOnTheFirstTick_WithoutAWorkBar()
+    {
+        var person = new GameObject("Someone to talk to");
+        try
+        {
+            var interactable = person.AddComponent<Interactable>();
+            interactable.Configure(InteractionAnimation.None, 3f, 2f, false);
+            interactable.Instant = true;
+            Assert.IsTrue(interactable.TryBegin(person));
+            Assert.AreEqual(0f, interactable.Progress, "No work bar.");
+            Assert.IsTrue(interactable.Tick(0f), "Done at once, however long its duration.");
+        }
+        finally
+        {
+            Object.DestroyImmediate(person);
+        }
+    }
 }

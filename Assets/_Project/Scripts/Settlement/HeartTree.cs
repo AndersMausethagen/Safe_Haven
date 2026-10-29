@@ -68,6 +68,8 @@ public sealed class HeartTree : MonoBehaviour
         }
 
         interactable = GetComponent<Interactable>();
+        // Talking opens at once: no work bar.
+        if (interactable != null) interactable.Instant = true;
         Current = this;
     }
 

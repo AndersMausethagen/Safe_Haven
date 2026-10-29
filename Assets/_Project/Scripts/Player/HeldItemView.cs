@@ -105,16 +105,31 @@ public sealed class HeldItemView : MonoBehaviour
 
     private static bool IsTorch(ItemDefinition item) => item != null && item.IsWeapon && item.Weapon.Kind == WeaponKind.Torch;
 
-    private static bool IsBow(ItemDefinition item) => item != null && item.IsWeapon && item.Weapon.IsBow;
+    /// <summary>Bows are held in the off (left) hand.</summary>
+    public static bool IsBow(ItemDefinition item) => item != null && item.IsWeapon && item.Weapon.IsBow;
+
+    /// <summary>Where off-hand models (a bow, a torch) sit relative to the left hand bone.</summary>
+    public Pose OffHandGripPose => new Pose(offHandGripPosition, Quaternion.Euler(offHandGripRotation));
+
+    /// <summary>A visual-only copy of <paramref name="item"/>'s held model on <paramref name="grip"/>, placed by the
+    /// item's held pose and scale. Also how companions hold their weapons. Null for an item without a model.</summary>
+    public static GameObject CreateModel(ItemDefinition item, Transform grip)
+    {
+        if (item == null || item.HeldModel == null || grip == null) return null;
+        GameObject model = Instantiate(item.HeldModel, grip);
+        model.name = item.HeldModel.name + " (held)";
+        StripToVisual(model, IsTorch(item));
+        model.transform.SetLocalPositionAndRotation(item.HeldPose.position, item.HeldPose.rotation);
+        model.transform.localScale = Vector3.one * item.HeldScale;
+        return model;
+    }
 
     private GameObject ModelFor(ItemDefinition item, Transform parent, Dictionary<ItemDefinition, GameObject> cache)
     {
         if (item == null || item.HeldModel == null || parent == null) return null;
         if (!cache.TryGetValue(item, out GameObject model) || model == null)
         {
-            model = Instantiate(item.HeldModel, parent);
-            model.name = item.HeldModel.name + " (held)";
-            StripToVisual(model, IsTorch(item));
+            model = CreateModel(item, parent);
             cache[item] = model;
         }
         model.transform.SetLocalPositionAndRotation(item.HeldPose.position, item.HeldPose.rotation);

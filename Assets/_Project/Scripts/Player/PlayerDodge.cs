@@ -39,6 +39,11 @@ public sealed class PlayerDodge : MonoBehaviour
     /// <summary>Seconds until the next dodge is possible; 0 when ready.</summary>
     public float CooldownRemaining => Mathf.Max(0f, readyAt - Time.time);
 
+    /// <summary>Share of the last dodge's cooldown still to wait: 1 just after dodging, 0 when ready.</summary>
+    public float CooldownFraction => cooldownLength > 0f ? Mathf.Clamp01(CooldownRemaining / cooldownLength) : 0f;
+
+    private float cooldownLength;
+
     /// <summary>Raised when a dodge starts, with its direction.</summary>
     public event Action<Vector3> Dodged;
 
@@ -105,7 +110,8 @@ public sealed class PlayerDodge : MonoBehaviour
         float duration = settings.DodgeDuration * shape.duration;
         Vector3 direction = movement.MovementInput.sqrMagnitude > 0.01f ? movement.MovementInput.normalized : movement.AimDirection;
         movement.Dash(direction * (distance / duration), duration);
-        readyAt = Time.time + settings.DodgeCooldown * shape.cooldown;
+        cooldownLength = settings.DodgeCooldown * shape.cooldown;
+        readyAt = Time.time + cooldownLength;
 
         if (settings.DodgeInvulnerability * shape.invulnerability > 0f)
         {

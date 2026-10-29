@@ -66,6 +66,7 @@ public sealed class Companion : MonoBehaviour, IConversationTopics
     private MonsterAI leaderTarget;
     private float leaderTargetAt;
     private CompanionRevive revive;
+    private bool armed;
 
     /// <summary>Every enabled companion, for systems that give orders or show them.</summary>
     public static IReadOnlyList<Companion> Active => active;
@@ -110,6 +111,11 @@ public sealed class Companion : MonoBehaviour, IConversationTopics
         health = GetComponent<Damageable>();
         interactable = GetComponent<Interactable>();
         animator = GetComponentInChildren<Animator>();
+        if (animator != null && definition != null && definition.Animations != null)
+        {
+            animator.runtimeAnimatorController = definition.Animations;
+        }
+
         if (animator != null && animator.runtimeAnimatorController != null)
         {
             foreach (AnimatorControllerParameter parameter in animator.parameters)
@@ -153,6 +159,11 @@ public sealed class Companion : MonoBehaviour, IConversationTopics
     private void Update()
     {
         Follow(Player.Current);
+        if (!armed && leader != null)
+        {
+            Arm();
+        }
+
         if (IsDowned)
         {
             if (Time.time >= getUpAt)
@@ -289,7 +300,7 @@ public sealed class Companion : MonoBehaviour, IConversationTopics
         if (Time.time >= nextAttack && strikeAt < 0f)
         {
             nextAttack = Time.time + definition.AttackInterval;
-            strikeAt = Time.time + definition.Attack.HitDelay;
+            strikeAt = Time.time + definition.StrikeDelay;
             striking = engaged;
             if (hasAttack)
             {
@@ -339,6 +350,31 @@ public sealed class Companion : MonoBehaviour, IConversationTopics
         Vector3 direction = ArcheryRules.LaunchDirection(origin, aim, speed, Physics.gravity.magnitude * arrow.GravityScale);
         ArrowProjectile projectile = PrefabPool.Spawn(arrow.Projectile, origin, Quaternion.LookRotation(direction));
         projectile.Launch(combatant, definition.Attack, arrowItem, arrow.Damage * definition.ArrowDamageShare, direction * speed);
+    }
+
+    // The definition's weapon in the hand, held the way the player holds it (the player's grip; a bow in the left hand).
+    private void Arm()
+    {
+        armed = true;
+        ItemDefinition weapon = definition.Weapon;
+        if (weapon == null || animator == null || !animator.isHuman)
+        {
+            return;
+        }
+
+        bool bow = HeldItemView.IsBow(weapon);
+        Transform hand = animator.GetBoneTransform(bow ? HumanBodyBones.LeftHand : HumanBodyBones.RightHand);
+        if (hand == null)
+        {
+            return;
+        }
+
+        HeldItemView reference = leader.GetComponent<HeldItemView>();
+        Pose pose = reference == null ? Pose.identity : bow ? reference.OffHandGripPose : reference.GripPose;
+        var grip = new GameObject("Weapon Grip").transform;
+        grip.SetParent(hand, false);
+        grip.SetLocalPositionAndRotation(pose.position, pose.rotation);
+        HeldItemView.CreateModel(weapon, grip);
     }
 
     // ----- Knocked down -----

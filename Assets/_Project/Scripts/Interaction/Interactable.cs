@@ -26,6 +26,8 @@ public sealed class Interactable : MonoBehaviour
     [SerializeField, Min(0f)] private float range = 1.5f;
     [Tooltip("Disable this object when the interaction completes (the resource is used up).")]
     [SerializeField] private bool deactivateOnComplete = true;
+    [Tooltip("Completes the moment the player presses Interact, with no work bar: talking to someone, opening a menu.")]
+    [SerializeField] private bool instant;
 
     [SerializeField] private UnityEvent started = new UnityEvent();
     [SerializeField] private UnityEvent completed = new UnityEvent();
@@ -50,6 +52,15 @@ public sealed class Interactable : MonoBehaviour
         set => duration = Mathf.Max(0f, value);
     }
     public float Range => range;
+
+    /// <summary>Completes as soon as it begins (PlayerInteractor ends it in the same frame), so no work bar shows.
+    /// Components that open a conversation or menu set it.</summary>
+    public bool Instant
+    {
+        get => instant;
+        set => instant = value;
+    }
+
     public bool IsInUse => inUse;
     public bool IsAvailable => isActiveAndEnabled && !inUse;
     /// <summary>Who is working on this right now. Still set while the Completed and Cancelled events run.</summary>
@@ -207,7 +218,7 @@ public sealed class Interactable : MonoBehaviour
         }
 
         elapsed += deltaTime;
-        return completeRequested || (duration > 0f && !HoldOpen && elapsed >= duration);
+        return completeRequested || (instant && !HoldOpen) || (duration > 0f && !HoldOpen && elapsed >= duration);
     }
 
     public void End(InteractionResult result)

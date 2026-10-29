@@ -136,13 +136,16 @@ public sealed class DynamicQuestTests
         audio.FinalStretch.tracks.Add(new MusicTrack(clip, 1f));
         Edit(audio, d => d.FindProperty("startSilent").boolValue = true);
         Assert.IsNull(MusicRules.Choose(audio, defaults, AudioMood.Exploring, float.PositiveInfinity).Playlist);
-        Assert.IsNull(MusicRules.Choose(audio, defaults, AudioMood.Combat, 1f).Playlist);
+        Assert.IsNull(MusicRules.Choose(audio, defaults, AudioMood.Exploring, 1f).Playlist, "Silence also holds the final stretch.");
+        Assert.AreSame(defaults.DefaultCombat, MusicRules.Choose(audio, defaults, AudioMood.Combat, 1f).Playlist,
+            "A fight brings combat music even in a silent scene.");
         var eventMusic = new MusicPlaylist();
         eventMusic.tracks.Add(new MusicTrack(clip, .7f));
         audio.PlayEventMusic(eventMusic);
         Assert.AreSame(eventMusic, MusicRules.Choose(audio, defaults, AudioMood.Combat, 1f).Playlist);
         audio.SilenceMusic();
-        Assert.IsNull(MusicRules.Choose(audio, defaults, AudioMood.Combat, 1f).Playlist);
+        Assert.IsNull(MusicRules.Choose(audio, defaults, AudioMood.Exploring, 1f).Playlist);
+        Assert.AreSame(defaults.DefaultCombat, MusicRules.Choose(audio, defaults, AudioMood.Combat, 1f).Playlist);
         audio.ResumeMusic();
         Assert.AreSame(defaults.DefaultExploring, MusicRules.Choose(audio, defaults, AudioMood.Exploring, float.PositiveInfinity).Playlist);
     }

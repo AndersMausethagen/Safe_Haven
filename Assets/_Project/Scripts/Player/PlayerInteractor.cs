@@ -150,6 +150,11 @@ public sealed class PlayerInteractor : MonoBehaviour
         current = target;
         isInteracting = true;
         InteractionStarted?.Invoke(target);
+        // Talking and menus open on the press itself, never through a work bar.
+        if (target.Instant && !target.HoldOpen)
+        {
+            End(InteractionResult.Completed);
+        }
     }
 
     private void OnPlayerStateChanged(PlayerState previous, PlayerState next)

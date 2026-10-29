@@ -16,7 +16,7 @@ MonoBehaviour:
   gravity: -9.81
   groundedVerticalVelocity: -2
   turnSpeed: 720
-  dodgeDistance: 3.2
+  dodgeDistance: 4
   dodgeDuration: 0.5
   dodgeInvulnerability: 0.3
   dodgeCooldown: 2

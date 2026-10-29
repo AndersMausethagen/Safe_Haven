@@ -32,6 +32,18 @@ public sealed class PrologueChapter
     public int InitialEnemies => initialEnemies;
 }
 
+/// <summary>One kind of enemy that comes at the portal hold, and how often.</summary>
+[Serializable]
+public sealed class PrologueWaveEnemy
+{
+    [Tooltip("A monster prefab without a SaveableEntity (encounters restart at checkpoints).")]
+    public GameObject prefab;
+    [Tooltip("How often it comes, against the others' weights.")]
+    [Min(0f)] public float weight = 1f;
+    [Tooltip("It comes from this wave on (1 = the enemies waiting when the hold starts).")]
+    [Min(1)] public int fromWave = 1;
+}
+
 /// <summary>Authored prologue content. Progress belongs to the saved quest log, not this shared asset.</summary>
 [CreateAssetMenu(menuName = "Safe Haven/Story/Prologue", fileName = "ForestPrologue")]
 public sealed class PrologueDefinition : ScriptableObject
@@ -68,6 +80,8 @@ public sealed class PrologueDefinition : ScriptableObject
     [SerializeField, Min(1)] private int maximumWaveSize = 7;
     [SerializeField, Min(1)] private int maximumEnemies = 14;
     [SerializeField] private GameObject wolfPrefab;
+    [Tooltip("Who comes at the portal hold, picked at random by weight; empty sends only the wolf.")]
+    [SerializeField] private PrologueWaveEnemy[] portalEnemies = new PrologueWaveEnemy[0];
     [SerializeField] private SoundDefinition rumble;
     [SerializeField] private string homeScene = "SafeHaven";
     [Header("Narrative")]
@@ -102,6 +116,30 @@ public sealed class PrologueDefinition : ScriptableObject
     public int MaximumEnemies => maximumEnemies;
     public int WaveSize(int wave) => Mathf.Min(firstWaveSize + Mathf.Max(0, wave - 1) * waveGrowth, maximumWaveSize);
     public GameObject WolfPrefab => wolfPrefab;
+
+    /// <summary>The enemy for one spawn at the portal hold: picked by weight among those allowed in this wave, with
+    /// <paramref name="roll"/> in [0, 1); the wolf when none are.</summary>
+    public GameObject PortalEnemy(int wave, float roll)
+    {
+        float total = 0f;
+        foreach (PrologueWaveEnemy enemy in portalEnemies)
+            if (Allowed(enemy, wave)) total += enemy.weight;
+        if (total <= 0f) return wolfPrefab;
+
+        float pick = Mathf.Clamp01(roll) * total;
+        GameObject last = wolfPrefab;
+        foreach (PrologueWaveEnemy enemy in portalEnemies)
+        {
+            if (!Allowed(enemy, wave)) continue;
+            last = enemy.prefab;
+            pick -= enemy.weight;
+            if (pick < 0f) return enemy.prefab;
+        }
+        return last;
+    }
+
+    private static bool Allowed(PrologueWaveEnemy enemy, int wave) =>
+        enemy != null && enemy.prefab != null && enemy.weight > 0f && Mathf.Max(1, wave) >= enemy.fromWave;
     public SoundDefinition Rumble => rumble;
     public string HomeScene => homeScene;
     public string SurvivedText => survivedText;
@@ -141,6 +179,10 @@ public sealed class PrologueDefinition : ScriptableObject
             return "The prologue needs fuel items and a damageable wolf prefab.";
         if (campfire == null || campfire.Prefab == null || campfire.Prefab.GetComponent<SaveableEntity>() == null)
             return "The prologue needs a saveable campfire building.";
+        foreach (PrologueWaveEnemy enemy in portalEnemies)
+            if (enemy != null && enemy.prefab != null && (enemy.prefab.GetComponent<Damageable>() == null ||
+                enemy.prefab.GetComponentInChildren<SaveableEntity>(true) != null))
+                return $"Portal enemy {enemy.prefab.name} must be damageable and must not be saveable.";
         if (waveInterval <= 0f || maximumEnemies < 1 || firstWaveSize < 1 || waveGrowth < 0 || maximumWaveSize < 1 ||
             string.IsNullOrWhiteSpace(homeScene))
             return "Prologue timing, costs, enemy limit and home scene must be valid.";

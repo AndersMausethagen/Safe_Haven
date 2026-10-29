@@ -46,6 +46,8 @@ public sealed class PrologueCompanion : MonoBehaviour, IConversationTopics
     {
         agent = GetComponent<NavMeshAgent>();
         interactable = GetComponent<Interactable>();
+        // Talking opens at once: no work bar.
+        interactable.Instant = true;
         companion = GetComponent<Companion>();
         if (companion == null) Debug.LogError("An expedition member needs a Companion to walk and fight.", this);
     }

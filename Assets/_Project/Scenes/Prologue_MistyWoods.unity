@@ -1842,6 +1842,7 @@ MonoBehaviour:
   duration: 0.2
   range: 2
   deactivateOnComplete: 0
+  instant: 0
   started:
     m_PersistentCalls:
       m_Calls: []
@@ -1912,7 +1913,7 @@ MonoBehaviour:
   resident: {fileID: 11400000, guid: 4260d606f7c62c042b848adc806c44d3, type: 2}
   startingOrder: 0
   formationOffset: {x: 2, y: 0, z: -3.8}
-  ordersInConversation: 1
+  ordersInConversation: 0
 --- !u!114 &334759809
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3916,6 +3917,7 @@ MonoBehaviour:
   duration: 2
   range: 1.3
   deactivateOnComplete: 0
+  instant: 0
   started:
     m_PersistentCalls:
       m_Calls: []
@@ -4423,6 +4425,7 @@ MonoBehaviour:
   duration: 0.2
   range: 2
   deactivateOnComplete: 0
+  instant: 0
   started:
     m_PersistentCalls:
       m_Calls: []
@@ -4493,7 +4496,7 @@ MonoBehaviour:
   resident: {fileID: 11400000, guid: de521ad7beeb20b49878a9b40c96bced, type: 2}
   startingOrder: 0
   formationOffset: {x: 2, y: 0, z: -2}
-  ordersInConversation: 1
+  ordersInConversation: 0
 --- !u!114 &786901631
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4595,6 +4598,7 @@ MonoBehaviour:
   duration: 1
   range: 3
   deactivateOnComplete: 0
+  instant: 0
   started:
     m_PersistentCalls:
       m_Calls: []
@@ -4708,6 +4712,7 @@ MonoBehaviour:
   duration: 0.2
   range: 2
   deactivateOnComplete: 0
+  instant: 0
   started:
     m_PersistentCalls:
       m_Calls: []
@@ -4778,7 +4783,7 @@ MonoBehaviour:
   resident: {fileID: 11400000, guid: 33e7204287863854f8c6ad025490f531, type: 2}
   startingOrder: 0
   formationOffset: {x: 0, y: 0, z: -3.8}
-  ordersInConversation: 1
+  ordersInConversation: 0
 --- !u!114 &810501273
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5809,6 +5814,7 @@ MonoBehaviour:
   duration: 0.2
   range: 2
   deactivateOnComplete: 0
+  instant: 0
   started:
     m_PersistentCalls:
       m_Calls: []
@@ -5927,7 +5933,7 @@ MonoBehaviour:
   resident: {fileID: 11400000, guid: b230d041259b863428e4e973c6ff0d86, type: 2}
   startingOrder: 0
   formationOffset: {x: -2, y: 0, z: -2}
-  ordersInConversation: 1
+  ordersInConversation: 0
 --- !u!114 &983162866
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11345,6 +11351,7 @@ MonoBehaviour:
   duration: 0.2
   range: 2
   deactivateOnComplete: 0
+  instant: 0
   started:
     m_PersistentCalls:
       m_Calls: []
@@ -11415,7 +11422,7 @@ MonoBehaviour:
   resident: {fileID: 11400000, guid: 8adfc30233928ec499c01587419eabaa, type: 2}
   startingOrder: 0
   formationOffset: {x: -2, y: 0, z: -5.6}
-  ordersInConversation: 1
+  ordersInConversation: 0
 --- !u!114 &1447795157
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12534,6 +12541,7 @@ MonoBehaviour:
   duration: 0.2
   range: 2
   deactivateOnComplete: 0
+  instant: 0
   started:
     m_PersistentCalls:
       m_Calls: []
@@ -12604,7 +12612,7 @@ MonoBehaviour:
   resident: {fileID: 11400000, guid: df34e8e1df8ff0241a216bfddf9b631c, type: 2}
   startingOrder: 0
   formationOffset: {x: -2, y: 0, z: -3.8}
-  ordersInConversation: 1
+  ordersInConversation: 0
 --- !u!114 &1606609659
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15715,6 +15723,7 @@ MonoBehaviour:
   duration: 0.2
   range: 2
   deactivateOnComplete: 0
+  instant: 0
   started:
     m_PersistentCalls:
       m_Calls: []
@@ -15785,7 +15794,7 @@ MonoBehaviour:
   resident: {fileID: 11400000, guid: 272895da9ba7e784b8a97bcd2be637c8, type: 2}
   startingOrder: 0
   formationOffset: {x: 0, y: 0, z: -2}
-  ordersInConversation: 1
+  ordersInConversation: 0
 --- !u!114 &2111941107
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -18042,7 +18051,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &7505454125702223452
 MonoBehaviour:
   m_ObjectHideFlags: 0

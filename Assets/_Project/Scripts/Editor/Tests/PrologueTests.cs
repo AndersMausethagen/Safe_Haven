@@ -40,17 +40,17 @@ public sealed class PrologueTests
     }
 
     [Test]
-    public void AuthoredPrologue_IsValidAndUsesThreeMinutePortal()
+    public void AuthoredPrologue_IsValidAndUsesOneMinutePortal()
     {
         Assert.NotNull(Definition);
         Assert.IsNull(Definition.FindProblem());
         Assert.AreEqual(9, Definition.Chapters.Length);
-        Assert.AreEqual(180f, Definition.Chapters.Single(c => c.Behaviour == PrologueStep.HoldPortal).Duration);
+        Assert.AreEqual(60f, Definition.Chapters.Single(c => c.Behaviour == PrologueStep.HoldPortal).Duration);
         // The flight from the old troll is told by its story graph in the scene (Story - The Old Troll), not an arrival line.
         Assert.IsTrue(Definition.Chapters.Where(c => c.Behaviour != PrologueStep.ReachPortal).All(c => !string.IsNullOrWhiteSpace(c.ArrivalText)));
         Assert.IsNull(Definition.StartingWeapon, "The bow or the axe is chosen in the scene's story (Story - Bow or Axe).");
         Assert.AreEqual(3, Definition.WaveSize(1));
-        Assert.AreEqual(7, Definition.WaveSize(100));
+        Assert.AreEqual(6, Definition.WaveSize(100), "Waves are capped; the companions fight too.");
     }
 
     [Test]
@@ -275,5 +275,20 @@ public sealed class PrologueTests
         {
             UnityEngine.Object.DestroyImmediate(copy);
         }
+    }
+    [Test]
+    public void PortalHold_IsOneMinute_WithMixedEnemiesThatDoNotPersist()
+    {
+        PrologueChapter hold = Definition.Chapters.Single(c => c.Behaviour == PrologueStep.HoldPortal);
+        Assert.AreEqual(60f, hold.Duration);
+        Assert.IsNull(Definition.FindProblem());
+        var first = Enumerable.Range(0, 50).Select(i => Definition.PortalEnemy(1, i / 50f).name).Distinct().ToArray();
+        var later = Enumerable.Range(0, 50).Select(i => Definition.PortalEnemy(3, i / 50f).name).Distinct().ToArray();
+        Assert.Greater(first.Length, 1, "More than wolves come through the dark.");
+        CollectionAssert.DoesNotContain(first, "ExpeditionMistwing", "Mistwings come from the second wave.");
+        CollectionAssert.Contains(later, "ExpeditionMistwing");
+        foreach (string name in later)
+            Assert.IsNull(AssetDatabase.LoadAssetAtPath<GameObject>(Root + "/" + name + ".prefab").GetComponentInChildren<SaveableEntity>(true),
+                "Encounters restart at checkpoints.");
     }
 }
