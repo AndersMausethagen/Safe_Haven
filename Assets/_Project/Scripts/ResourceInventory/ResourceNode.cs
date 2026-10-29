@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -26,6 +27,7 @@ public sealed class ResourceNode : MonoBehaviour, IInteractionCondition, ISaveab
     private Collider[] colliders;
     private float respawnAt;
     private float hideAt = -1f;
+    private Coroutine countdown;
 
     public GatheringNodeDefinition Definition => node;
     public bool IsDepleted { get; private set; }
@@ -79,26 +81,51 @@ public sealed class ResourceNode : MonoBehaviour, IInteractionCondition, ISaveab
     private void OnEnable()
     {
         interactable.Completed.AddListener(OnGathered);
+        WatchTimers();
     }
 
     private void OnDisable()
     {
         interactable.Completed.RemoveListener(OnGathered);
+        if (countdown != null)
+        {
+            StopCoroutine(countdown);
+            countdown = null;
+        }
     }
 
-    private void Update()
+    private bool HasTimer => hideAt >= 0f || (IsDepleted && node != null && node.RespawnSeconds > 0f);
+
+    private void WatchTimers()
     {
-        if (hideAt >= 0f && Time.time >= hideAt)
+        if (countdown == null && isActiveAndEnabled && HasTimer)
         {
-            hideAt = -1f;
-            SetRenderers(false);
+            countdown = StartCoroutine(CountDown());
+        }
+    }
+
+    // Runs only while the break plays or the node grows back: an untouched node costs nothing per frame (there are a
+    // thousand round the Haven).
+    private IEnumerator CountDown()
+    {
+        while (HasTimer)
+        {
+            if (hideAt >= 0f && Time.time >= hideAt)
+            {
+                hideAt = -1f;
+                SetRenderers(false);
+            }
+
+            if (IsDepleted && node != null && node.RespawnSeconds > 0f && Time.time >= respawnAt)
+            {
+                SetPresent(true);
+                Regrown?.Invoke();
+            }
+
+            yield return null;
         }
 
-        if (IsDepleted && node != null && node.RespawnSeconds > 0f && Time.time >= respawnAt)
-        {
-            SetPresent(true);
-            Regrown?.Invoke();
-        }
+        countdown = null;
     }
 
     /// <summary>The look this spot gets: the node's own model or one of its definition's variants (the same one every
@@ -215,11 +242,14 @@ public sealed class ResourceNode : MonoBehaviour, IInteractionCondition, ISaveab
         if (!present && hideDelay > 0f)
         {
             hideAt = Time.time + hideDelay;
-            return;
+        }
+        else
+        {
+            hideAt = -1f;
+            SetRenderers(present);
         }
 
-        hideAt = -1f;
-        SetRenderers(present);
+        WatchTimers();
     }
 
     private void SetRenderers(bool visible)

@@ -605,7 +605,7 @@ public sealed class PlayerCombat : MonoBehaviour
         for (int i = 0; i < count; i++)
         {
             IDamageable target = Nearby[i].GetComponentInParent<IDamageable>();
-            if (target == null || !target.IsAlive || target.Faction == combatant.Faction || target.Category != TargetCategory.Creature)
+            if (target == null || !target.IsAlive || target.Faction.AreAllies(combatant.Faction) || target.Category != TargetCategory.Creature)
             {
                 continue;
             }

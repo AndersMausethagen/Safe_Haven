@@ -25,7 +25,7 @@ public sealed class PlayerCameraController : MonoBehaviour
     private const float MinClipDistance = 0.4f;
     // While aiming a bow: the view narrows by this share and the top-down cursor lean reaches this much further.
     private const float AimFieldOfView = 0.85f;
-    private const float AimLookAhead = 2f;
+    private const float AimLookAhead = 1.5f;
     private const float AimBlendSpeed = 4f;
 
     [SerializeField] private PlayerCameraSettings settings;
@@ -340,7 +340,8 @@ public sealed class PlayerCameraController : MonoBehaviour
             actionPitch += settings.ActionInvertY ? delta.y : -delta.y;
             actionPitch = Mathf.Clamp(actionPitch, settings.ActionMinPitch, settings.ActionMaxPitch);
         }
-        else if (profile.allowOrbit && orbitAction.IsPressed())
+        // Aiming a bow holds the same right button, so the view must not turn under the aim.
+        else if (profile.allowOrbit && !aiming && orbitAction.IsPressed())
         {
             yaw += Mouse.current.delta.ReadValue().x * settings.OrbitSensitivity;
         }
@@ -404,15 +405,19 @@ public sealed class PlayerCameraController : MonoBehaviour
             }
         }
 
-        Ray ray = outputCamera.ScreenPointToRay(Mouse.current.position.ReadValue());
+        // Measured from the ground under the middle of the screen, not from the player: the camera then holds still while
+        // the cursor does. Measured from the player, the lean moved the view, which moved the cursor's ground point,
+        // which leaned further, so the view kept sliding (2.3x the cursor's distance while aiming).
         Plane ground = new Plane(Vector3.up, target.position);
-        if (!ground.Raycast(ray, out float distance))
+        Ray cursorRay = outputCamera.ScreenPointToRay(Mouse.current.position.ReadValue());
+        Ray centreRay = outputCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
+        if (!ground.Raycast(cursorRay, out float cursorDistance) || !ground.Raycast(centreRay, out float centreDistance))
         {
             return Vector3.zero;
         }
 
         float reach = Mathf.Lerp(1f, AimLookAhead, aimWeight);
-        Vector3 offset = (ray.GetPoint(distance) - target.position) * (lookAheadFraction * reach);
+        Vector3 offset = (cursorRay.GetPoint(cursorDistance) - centreRay.GetPoint(centreDistance)) * (lookAheadFraction * reach);
         offset.y = 0f;
         return Vector3.ClampMagnitude(offset, maxLookAhead * reach);
     }

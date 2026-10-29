@@ -26,10 +26,7 @@ public sealed class QuestWaypointHud : MonoBehaviour
         var canvas = go.AddComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
         canvas.sortingOrder = 120;
-        var scaler = go.AddComponent<CanvasScaler>();
-        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-        scaler.referenceResolution = new Vector2(1920f, 1080f);
-        scaler.matchWidthOrHeight = 0.5f;
+        UIRoot.ConfigureScaler(go.AddComponent<CanvasScaler>());
         var hud = go.AddComponent<QuestWaypointHud>();
         hud.root = (RectTransform)go.transform;
 

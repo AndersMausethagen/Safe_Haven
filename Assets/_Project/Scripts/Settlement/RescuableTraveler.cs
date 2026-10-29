@@ -8,7 +8,7 @@ using UnityEngine.AI;
 /// person not extracted never arrives at home. Once they live in Safe Haven they no longer appear in raids.
 /// <para>
 /// Where it belongs: on a character in a raid scene with an Interactable (deactivates on completion), a NavMeshAgent, a
-/// Combatant of the Player faction and a Damageable that isn't destroyed on death. The person is a ResidentDefinition.
+/// Combatant of the Ally faction and a Damageable that isn't destroyed on death. The person is a ResidentDefinition.
 /// </para>
 /// </summary>
 [DisallowMultipleComponent]

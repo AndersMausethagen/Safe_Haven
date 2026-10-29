@@ -37,8 +37,7 @@ public sealed class PlayerInteractionOutline : MonoBehaviour
         {
             foreach (Interactable target in Interactable.Active)
             {
-                if (target != null && target.IsAvailable &&
-                    (target == hovered || target.DistanceFrom(transform.position) <= target.Range))
+                if (target != null && target.IsAvailable && (target == hovered || InReach(target)))
                 {
                     if (!outlines.ContainsKey(target))
                     {
@@ -58,8 +57,7 @@ public sealed class PlayerInteractionOutline : MonoBehaviour
                 continue;
             }
 
-            bool show = visible && target.IsAvailable &&
-                (target == hovered || target.DistanceFrom(transform.position) <= target.Range);
+            bool show = visible && target.IsAvailable && (target == hovered || InReach(target));
             OutlineCopies.SetShown(pair.Value, show);
         }
         foreach (Interactable target in removed)
@@ -67,6 +65,10 @@ public sealed class PlayerInteractionOutline : MonoBehaviour
             outlines.Remove(target);
         }
     }
+
+    // The bounds test first: this runs over every Interactable in the scene each frame.
+    private bool InReach(Interactable target) =>
+        target.MightBeWithin(transform.position, target.Range) && target.DistanceFrom(transform.position) <= target.Range;
 
     private Interactable FindHovered()
     {

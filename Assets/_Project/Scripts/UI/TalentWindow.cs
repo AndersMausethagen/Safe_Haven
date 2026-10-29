@@ -49,10 +49,7 @@ public sealed class TalentWindow : MonoBehaviour
         var canvas = root.AddComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
         canvas.sortingOrder = 200;
-        var scaler = root.AddComponent<CanvasScaler>();
-        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-        scaler.referenceResolution = new Vector2(1920f, 1080f);
-        scaler.matchWidthOrHeight = 0.5f;
+        UIRoot.ConfigureScaler(root.AddComponent<CanvasScaler>());
         root.AddComponent<GraphicRaycaster>();
         var view = root.AddComponent<TalentWindow>();
         view.Build(root.transform);

@@ -48,9 +48,11 @@ public readonly struct GameEvent
     public readonly RaidOutcome Outcome;
     /// <summary>For RaidFinished: how long the raid took.</summary>
     public readonly float Seconds;
+    /// <summary>For Killed and Destroyed: the side of what fell. Null when unknown.</summary>
+    public readonly Faction? VictimFaction;
 
     public GameEvent(GameEventKind kind, Object subject, int amount = 1, GameObject actor = null, RaidOutcome outcome = RaidOutcome.InProgress,
-        float seconds = 0f, GameObject origin = null)
+        float seconds = 0f, GameObject origin = null, Faction? victimFaction = null)
     {
         Kind = kind;
         Subject = subject;
@@ -59,7 +61,11 @@ public readonly struct GameEvent
         Outcome = outcome;
         Seconds = seconds;
         Origin = origin;
+        VictimFaction = victimFaction;
     }
+
+    /// <summary>The side of what was killed: the victim's own, or, when the event didn't say, its monster's.</summary>
+    public Faction? KilledFaction => VictimFaction ?? (Subject is MonsterDefinition monster ? monster.Faction : (Faction?)null);
 
     /// <summary>True when the player caused it, or nobody in particular did (raids, quest events).</summary>
     public bool ByPlayer => Actor == null || Player.IsPlayer(Actor);
@@ -132,18 +138,19 @@ public static class GameEvents
     {
         GameObject killer = killingBlow.Source != null ? killingBlow.Source.gameObject : null;
         GameObject origin = victim.gameObject;
+        Faction side = victim.Faction;
         if (victim.TryGetComponent(out MonsterAI monster))
         {
-            Raise(new GameEvent(GameEventKind.Killed, monster.Definition, 1, killer, origin: origin));
+            Raise(new GameEvent(GameEventKind.Killed, monster.Definition, 1, killer, origin: origin, victimFaction: side));
         }
         else if (victim.TryGetComponent(out BuildingObject building))
         {
-            Raise(new GameEvent(GameEventKind.Destroyed, building.Definition, 1, killer, origin: origin));
+            Raise(new GameEvent(GameEventKind.Destroyed, building.Definition, 1, killer, origin: origin, victimFaction: side));
         }
         else
         {
             GameEventKind kind = victim.Category == TargetCategory.Structure ? GameEventKind.Destroyed : GameEventKind.Killed;
-            Raise(new GameEvent(kind, null, 1, killer, origin: origin));
+            Raise(new GameEvent(kind, null, 1, killer, origin: origin, victimFaction: side));
         }
     }
 }

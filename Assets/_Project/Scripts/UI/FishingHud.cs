@@ -40,10 +40,7 @@ public sealed class FishingHud : MonoBehaviour
         var canvas = go.AddComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
         canvas.sortingOrder = 110;
-        var scaler = go.AddComponent<CanvasScaler>();
-        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-        scaler.referenceResolution = new Vector2(1920f, 1080f);
-        scaler.matchWidthOrHeight = 0.5f;
+        UIRoot.ConfigureScaler(go.AddComponent<CanvasScaler>());
         var hud = go.AddComponent<FishingHud>();
         hud.root = (RectTransform)go.transform;
         hud.Build();

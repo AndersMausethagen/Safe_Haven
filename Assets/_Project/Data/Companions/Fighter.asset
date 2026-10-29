@@ -1,0 +1,46 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 139da827bc5f30b4fbafd2770c4c9e11, type: 3}
+  m_Name: Fighter
+  m_EditorClassIdentifier: SafeHaven::CompanionDefinition
+  attack: {fileID: 11400000, guid: ea84f5e69338fbd449215ef3ad11f3c3, type: 2}
+  weaponDamage: 9
+  attackInterval: 1.6
+  arrow: {fileID: 0}
+  shootingRange: 14
+  arrowSpeed: 30
+  arrowDamageShare: 0.6
+  attackSound: {fileID: 0}
+  engageRadius: 9
+  defendRadius: 3.5
+  holdRadius: 12
+  retreatDistance: 10
+  slack: 1.5
+  awareness: 20
+  orders:
+  - order: 0
+    ask: Follow me.
+    reply: Right behind you.
+  - order: 1
+    ask: Wait here.
+    reply: I'll hold this spot.
+  - order: 2
+    ask: Stay close and guard me.
+    reply: Nothing gets to you without going through me.
+  - order: 3
+    ask: Stay out of the fighting.
+    reply: I'll keep back.
+  - order: 4
+    ask: Attack what I attack.
+    reply: Point the way.
+  downedSeconds: 12
+  getUpHealth: 0.4

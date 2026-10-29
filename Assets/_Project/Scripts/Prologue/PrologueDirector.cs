@@ -36,6 +36,8 @@ public sealed class PrologueDirector : MonoBehaviour
     private bool ending;
     private bool reviving;
     private bool chapterActive;
+    private bool briefing;
+    private int briefings;
 
     public static PrologueDirector Current { get; private set; }
     public PrologueDefinition Definition => definition;
@@ -138,7 +140,7 @@ public sealed class PrologueDirector : MonoBehaviour
         if (!ready || ending || reviving) return;
         RefreshStep(false);
         if (!ready || ending) return;
-        if (!chapterActive)
+        if (!chapterActive || briefing)
         {
             return;
         }
@@ -191,34 +193,55 @@ public sealed class PrologueDirector : MonoBehaviour
         if (restoring)
             MovePlayer(step >= PrologueStep.ActivatePortal ? portalPoint
                 : step >= PrologueStep.GatherFuel ? campPoint : startPoint);
-        if (chapterActive && chapter.Quest.Start != QuestStart.ByQuestGiver && !string.IsNullOrWhiteSpace(chapter.ArrivalText))
-            Speak(chapter.ArrivalText);
-        if (chapterActive && chapter.Duration > 0f)
-            QuestTimers.Set(chapter.Quest, chapter.Duration);
-        if (chapterActive && step == PrologueStep.DefendCamp)
-        {
-            Spawn(campSpawns, chapter.InitialEnemies);
-        }
-
-        else if (chapterActive && step == PrologueStep.ReachPortal)
-        {
-            Rumble(0.4f);
-        }
-        else if (chapterActive && step == PrologueStep.HoldPortal)
-        {
-            Spawn(portalSpawns, chapter.InitialEnemies);
-        }
-        else if (step == PrologueStep.Finished)
+        if (step == PrologueStep.Finished)
         {
             BeginEnding(false);
             return;
+        }
+
+        briefing = false;
+        if (chapterActive)
+        {
+            bool speaks = chapter.Quest.Start != QuestStart.ByQuestGiver && !string.IsNullOrWhiteSpace(chapter.ArrivalText);
+            // The dialogue box holds the player's attacks, so a fight waits until its arrival line has been read:
+            // the wolves come, and its clock starts, when the player moves on.
+            if (speaks && IsFighting)
+            {
+                briefing = true;
+                int briefed = ++briefings;
+                Speak(chapter.ArrivalText, () =>
+                {
+                    if (this != null && briefing && briefed == briefings) StartChapter();
+                });
+            }
+            else
+            {
+                if (speaks) Speak(chapter.ArrivalText, null);
+                StartChapter();
+            }
         }
         if (CanSave && !SaveGameService.TrySave(out string problem))
             GameMessages.Post("Prologue checkpoint could not be saved: " + problem, MessageKind.Warning);
     }
 
-    // "Runa: Wolves!" is said by Runa; a line without a name by the leader.
-    private void Speak(string text)
+    // The chapter's clock and arrivals: wolves, the portal's rumble.
+    private void StartChapter()
+    {
+        briefing = false;
+        elapsed = 0f;
+        if (chapter.Duration > 0f)
+            QuestTimers.Set(chapter.Quest, chapter.Duration);
+        if (step == PrologueStep.DefendCamp)
+            Spawn(campSpawns, chapter.InitialEnemies);
+        else if (step == PrologueStep.ReachPortal)
+            Rumble(0.4f);
+        else if (step == PrologueStep.HoldPortal)
+            Spawn(portalSpawns, chapter.InitialEnemies);
+    }
+
+    // "Runa: Wolves!" is said by Runa; a line without a name by the leader. Done runs once the player has moved on
+    // from the line (or the box closed another way), or at once when no one can say it.
+    private void Speak(string text, System.Action done)
     {
         PrologueCompanion speaker = null;
         int colon = text.IndexOf(':');
@@ -234,10 +257,24 @@ public sealed class PrologueDirector : MonoBehaviour
         if (speaker == null)
         {
             GameMessages.Post(text);
+            done?.Invoke();
             return;
         }
 
-        DialogueBox.Current.Say(new DialogueSpeaker(speaker.Resident.DisplayName, speaker.transform, null, definition.DialogueCameraDistance), text);
+        DialogueBox box = DialogueBox.Current;
+        System.Action finish = null;
+        if (done != null)
+        {
+            // Closed also covers a line another story says over this one, which drops this line's callback.
+            finish = () =>
+            {
+                box.Closed -= finish;
+                done();
+            };
+            box.Closed += finish;
+        }
+
+        box.Say(new DialogueSpeaker(speaker.Resident.DisplayName, speaker.transform, null, definition.DialogueCameraDistance), text, finish);
     }
 
     private void OnGameEvent(GameEvent gameEvent)

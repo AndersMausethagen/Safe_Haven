@@ -193,9 +193,15 @@ public sealed class PlayerInteractor : MonoBehaviour
                 continue;
             }
 
+            float reach = Mathf.Max(previewRange, candidate.Range);
+            if (!candidate.MightBeWithin(origin, reach))
+            {
+                continue;
+            }
+
             float distance = candidate.DistanceFrom(origin);
             bool inReach = distance <= candidate.Range;
-            if (distance > Mathf.Max(previewRange, candidate.Range))
+            if (distance > reach)
             {
                 continue;
             }

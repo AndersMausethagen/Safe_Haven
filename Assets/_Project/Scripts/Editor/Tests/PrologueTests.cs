@@ -105,6 +105,9 @@ public sealed class PrologueTests
         Assert.IsTrue(log.TryStart(fire));
         log.Handle(new GameEvent(GameEventKind.Custom, Definition.FireEvent));
         Assert.AreEqual(QuestStatus.Active, log.StatusOf(fire), "The old use-fire shortcut must not complete construction.");
+        Assert.AreSame(AssetDatabase.LoadAssetAtPath<BuildingDefinition>("Assets/_Project/Data/Buildings/Campfire.asset"),
+            Definition.Campfire, "The expedition builds the same campfire the player can build at home.");
+        Assert.IsTrue(Definition.Campfire.ShowInBuildMenu);
         var gather = Definition.Chapters[1].Quest;
         foreach (var cost in Definition.Campfire.ConstructionItems)
             Assert.AreEqual(cost.Amount, gather.Objectives.Single(o => o.Item == cost.Item).Amount);

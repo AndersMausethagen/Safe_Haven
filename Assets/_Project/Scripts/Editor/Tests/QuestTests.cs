@@ -40,8 +40,17 @@ public sealed class QuestTests
         QuestObjective killAny = QuestObjective.Create(ObjectiveType.KillMonster, 5);
         Assert.AreEqual(1, killBrute.Progress(new GameEvent(GameEventKind.Killed, brute)));
         Assert.AreEqual(0, killBrute.Progress(new GameEvent(GameEventKind.Killed, ravager)));
-        Assert.AreEqual(1, killAny.Progress(new GameEvent(GameEventKind.Killed, ravager)), "An empty monster counts any kill.");
+        Assert.AreEqual(1, killAny.Progress(new GameEvent(GameEventKind.Killed, ravager)), "An empty monster counts any enemy kill.");
         Assert.AreEqual("Kill 5 enemies", killAny.Describe());
+
+        // Kills count by the side that fell: the player, a companion or a traveller falling is no enemy kill.
+        Assert.AreEqual(0, killAny.Progress(new GameEvent(GameEventKind.Killed, null, victimFaction: Faction.Player)));
+        Assert.AreEqual(0, killAny.Progress(new GameEvent(GameEventKind.Killed, null, victimFaction: Faction.Ally)));
+        Assert.AreEqual(1, killAny.Progress(new GameEvent(GameEventKind.Killed, null, victimFaction: Faction.Enemy)));
+        Assert.AreEqual(0, killAny.Progress(new GameEvent(GameEventKind.Killed, null)), "A kill of unknown side counts for no side.");
+        QuestObjective killAllies = QuestObjective.Create(ObjectiveType.KillMonster, 2, faction: Faction.Ally);
+        Assert.AreEqual(1, killAllies.Progress(new GameEvent(GameEventKind.Killed, null, victimFaction: Faction.Ally)));
+        Assert.AreEqual("Kill 2 allies", killAllies.Describe());
     }
 
     [Test]
@@ -153,7 +162,7 @@ public sealed class QuestTests
         log.TryStart(active);
         log.Handle(new GameEvent(GameEventKind.ResourceGathered, ore, 4));
         log.TryStart(done);
-        log.Handle(new GameEvent(GameEventKind.Killed, null));
+        log.Handle(new GameEvent(GameEventKind.Killed, null, victimFaction: Faction.Enemy));
         var lookup = new Lookup { Quests = { ["active"] = active, ["done"] = done } };
 
         SaveData data = SaveMapper.ToSaveData(null, null, "SampleScene", null, DateTime.UtcNow, null, log);
@@ -195,7 +204,7 @@ public sealed class QuestTests
         log.TryStart(quest);
         Assert.IsTrue(started.IsMetBy(log));
         Assert.IsFalse(completed.IsMetBy(log));
-        log.Handle(new GameEvent(GameEventKind.Killed, null));
+        log.Handle(new GameEvent(GameEventKind.Killed, null, victimFaction: Faction.Enemy));
         Assert.IsTrue(completed.IsMetBy(log));
     }
 
@@ -214,7 +223,7 @@ public sealed class QuestTests
 
         Assert.IsFalse(log.TryTurnIn(quest), "Nothing to hand in yet.");
         log.TryStart(quest);
-        log.Handle(new GameEvent(GameEventKind.Killed, null));
+        log.Handle(new GameEvent(GameEventKind.Killed, null, victimFaction: Faction.Enemy));
         Assert.AreEqual(QuestStatus.ReadyToTurnIn, log.StatusOf(quest));
         CollectionAssert.AreEqual(new[] { quest }, ready);
         CollectionAssert.IsEmpty(completed, "No rewards until it is handed in.");
@@ -242,7 +251,7 @@ public sealed class QuestTests
         SetField(quest, "turnInToGiver", true);
         var log = new QuestLog();
         log.TryStart(quest);
-        log.Handle(new GameEvent(GameEventKind.Killed, null));
+        log.Handle(new GameEvent(GameEventKind.Killed, null, victimFaction: Faction.Enemy));
         var lookup = new Lookup { Quests = { ["ready"] = quest } };
 
         SaveData data = SaveMapper.ToSaveData(null, null, "SampleScene", null, DateTime.UtcNow, null, log);
@@ -268,7 +277,7 @@ public sealed class QuestTests
         Assert.AreEqual(QuestGiverState.Available, QuestGiver.StateFor(given, log));
         log.TryStart(given);
         Assert.AreEqual(QuestGiverState.InProgress, QuestGiver.StateFor(given, log));
-        log.Handle(new GameEvent(GameEventKind.Killed, null));
+        log.Handle(new GameEvent(GameEventKind.Killed, null, victimFaction: Faction.Enemy));
         Assert.AreEqual(QuestGiverState.ReadyToTurnIn, QuestGiver.StateFor(given, log));
         log.TryTurnIn(given);
         Assert.AreEqual(QuestGiverState.Done, QuestGiver.StateFor(given, log));

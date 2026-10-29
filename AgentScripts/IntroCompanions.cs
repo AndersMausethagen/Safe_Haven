@@ -9,7 +9,8 @@ using UnityEngine.SceneManagement;
 /// Sigrid (the leader, a runemaster: mysterious, maybe not to be trusted; she takes over Liv's waystone knowledge and
 /// Ingrid's healing), Eirik (the soldier: protective, kind-hearted) and Runa (the tracker: sneaky, deadly with a bow).
 /// Bjarne, Tor, Liv and Ingrid leave the prologue (switched off in the scene) to be found and rescued later. Rewrites
-/// their lines and the chapter texts that named Liv. Reopens the scene that was open.
+/// their lines and the chapter texts that named Liv. Reopens the scene that was open. How they fight (Eirik's sword,
+/// Runa's bow) is set up by AgentScripts/BuildCompanions.cs.
 /// </summary>
 public static class IntroCompanions
 {
@@ -44,14 +45,11 @@ public static class IntroCompanions
                     Lines(so, "Stay between me and the trees. If anything comes out of the dark, it meets my shield first.",
                         "Eat something, even if you are not hungry. I have buried enough friends who thought they could fight on an empty stomach.",
                         "Go! I will hold them. Nobody gets left behind, not while I am standing.");
-                    so.FindProperty("soldier").boolValue = true;
                     break;
                 case "Runa":
                     Lines(so, "Tracks everywhere, all running the same way. Whatever they are fleeing, we are walking towards it. Lovely.",
                         "I counted three wolves circling and one shape that was not a wolf. Keep your voice down. I would rather see them before they see us.",
                         "I will take the ones on the stones. You just keep breathing.");
-                    so.FindProperty("archer").boolValue = true;
-                    so.FindProperty("shotSound").objectReferenceValue = AssetDatabase.LoadAssetAtPath<SoundDefinition>("Assets/_Project/Audio/Sounds/Library/Swing.asset");
                     break;
             }
 

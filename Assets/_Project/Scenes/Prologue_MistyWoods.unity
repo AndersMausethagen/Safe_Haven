@@ -1677,7 +1677,7 @@ Transform:
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
   m_LocalRotation: {x: 0.4520157, y: -9.1388824e-10, z: 4.6310225e-10, w: 0.89201}
-  m_LocalPosition: {x: 0, y: 19.131153, z: -61}
+  m_LocalPosition: {x: 0, y: 20.757812, z: -83}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1772,6 +1772,9 @@ GameObject:
   - component: {fileID: 334759806}
   - component: {fileID: 334759805}
   - component: {fileID: 334759804}
+  - component: {fileID: 334759810}
+  - component: {fileID: 334759809}
+  - component: {fileID: 334759808}
   m_Layer: 0
   m_Name: Runa - Expedition
   m_TagString: Untagged
@@ -1809,7 +1812,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: SafeHaven::PrologueCompanion
   resident: {fileID: 11400000, guid: 4260d606f7c62c042b848adc806c44d3, type: 2}
-  formationOffset: {x: 2, y: 0, z: -3.8}
   forestLine: Tracks everywhere, all running the same way. Whatever they are fleeing, we are walking towards it. Lovely.
   campLine: I counted three wolves circling and one shape that was not a wolf. Keep your voice down. I would rather see them before they see us.
   portalLine: I will take the ones on the stones. You just keep breathing.
@@ -1821,11 +1823,7 @@ MonoBehaviour:
   - question: Any advice for the dark?
     answer: Walk where the moss is thick; it's quieter. Keep your back to the fire, never your face. And if you hear something heavy breathing, don't run until I say so.
   talkedEvent: {fileID: 11400000, guid: eb2539c68ce00724ea300d5133c29bdc, type: 2}
-  soldier: 0
   alchemist: 0
-  archer: 1
-  archerRange: 15
-  shotSound: {fileID: 11400000, guid: e3702f94155b6bc42b71a0d0872c141d, type: 2}
   supportInterval: 6
   supportAmount: 8
 --- !u!114 &334759805
@@ -1890,7 +1888,7 @@ CapsuleCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
@@ -1898,6 +1896,54 @@ CapsuleCollider:
   m_Height: 1.8
   m_Direction: 1
   m_Center: {x: 0, y: 0.9, z: 0}
+--- !u!114 &334759808
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 334759802}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0df3140b7bc2dc9478c05f442fd011b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::Companion
+  definition: {fileID: 11400000, guid: bfeda7cc0c77ea24dac614548220c4eb, type: 2}
+  resident: {fileID: 11400000, guid: 4260d606f7c62c042b848adc806c44d3, type: 2}
+  startingOrder: 0
+  formationOffset: {x: 2, y: 0, z: -3.8}
+  ordersInConversation: 1
+--- !u!114 &334759809
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 334759802}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 822fe7ba7a35a52488fac3657ca87c71, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::Damageable
+  category: 0
+  destroyOnDeath: 0
+  destroyDelay: 1.5
+  logHits: 0
+--- !u!114 &334759810
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 334759802}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 327ef24172055e7439aadcdc7baae1ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::Combatant
+  faction: 3
+  baseStats: {fileID: 11400000, guid: 1ca1d148e32d86b479d916e0784f7472, type: 2}
+  rules: {fileID: 0}
 --- !u!1 &351156310
 GameObject:
   m_ObjectHideFlags: 0
@@ -2605,7 +2651,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 4352166826710475781, guid: 5b6b6a84034d49945b10b28c2c445dba, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1271334264}
   m_SourcePrefab: {fileID: 100100000, guid: 5b6b6a84034d49945b10b28c2c445dba, type: 3}
 --- !u!4 &457076109 stripped
 Transform:
@@ -4310,6 +4359,9 @@ GameObject:
   - component: {fileID: 786901628}
   - component: {fileID: 786901627}
   - component: {fileID: 786901626}
+  - component: {fileID: 786901632}
+  - component: {fileID: 786901631}
+  - component: {fileID: 786901630}
   m_Layer: 0
   m_Name: Bjarne - Expedition
   m_TagString: Untagged
@@ -4347,17 +4399,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: SafeHaven::PrologueCompanion
   resident: {fileID: 11400000, guid: de521ad7beeb20b49878a9b40c96bced, type: 2}
-  formationOffset: {x: 2, y: 0, z: -2}
   forestLine: We came to learn why this forest has become bewitched. First, we need shelter. Follow the old road.
   campLine: I came to examine the old iron markers. Whatever protects the road has cracked. Steel will help tonight, but steel alone will not mend this.
   portalLine: Stay near the stones. We can still get out of this together.
   campTopics: []
   talkedEvent: {fileID: 11400000, guid: 45b20a2d17557304a8cb59976d6b5ca7, type: 2}
-  soldier: 0
   alchemist: 0
-  archer: 0
-  archerRange: 15
-  shotSound: {fileID: 0}
   supportInterval: 6
   supportAmount: 8
 --- !u!114 &786901627
@@ -4422,7 +4469,7 @@ CapsuleCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
@@ -4430,6 +4477,54 @@ CapsuleCollider:
   m_Height: 1.8
   m_Direction: 1
   m_Center: {x: 0, y: 0.9, z: 0}
+--- !u!114 &786901630
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 786901624}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0df3140b7bc2dc9478c05f442fd011b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::Companion
+  definition: {fileID: 11400000, guid: 60d284aaf3c06f24fba9e928940c43c5, type: 2}
+  resident: {fileID: 11400000, guid: de521ad7beeb20b49878a9b40c96bced, type: 2}
+  startingOrder: 0
+  formationOffset: {x: 2, y: 0, z: -2}
+  ordersInConversation: 1
+--- !u!114 &786901631
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 786901624}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 822fe7ba7a35a52488fac3657ca87c71, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::Damageable
+  category: 0
+  destroyOnDeath: 0
+  destroyDelay: 1.5
+  logHits: 0
+--- !u!114 &786901632
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 786901624}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 327ef24172055e7439aadcdc7baae1ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::Combatant
+  faction: 3
+  baseStats: {fileID: 11400000, guid: 1ca1d148e32d86b479d916e0784f7472, type: 2}
+  rules: {fileID: 0}
 --- !u!1 &802275000
 GameObject:
   m_ObjectHideFlags: 0
@@ -4543,6 +4638,9 @@ GameObject:
   - component: {fileID: 810501270}
   - component: {fileID: 810501269}
   - component: {fileID: 810501268}
+  - component: {fileID: 810501274}
+  - component: {fileID: 810501273}
+  - component: {fileID: 810501272}
   m_Layer: 0
   m_Name: Eirik - Expedition
   m_TagString: Untagged
@@ -4580,7 +4678,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: SafeHaven::PrologueCompanion
   resident: {fileID: 11400000, guid: 33e7204287863854f8c6ad025490f531, type: 2}
-  formationOffset: {x: 0, y: 0, z: -3.8}
   forestLine: Stay between me and the trees. If anything comes out of the dark, it meets my shield first.
   campLine: Eat something, even if you are not hungry. I have buried enough friends who thought they could fight on an empty stomach.
   portalLine: Go! I will hold them. Nobody gets left behind, not while I am standing.
@@ -4592,11 +4689,7 @@ MonoBehaviour:
   - question: Do you trust Sigrid?
     answer: I trust that she wants to get out of here alive. That is enough for tonight. But watch her hands when she talks about the stones. She knows more than she says.
   talkedEvent: {fileID: 11400000, guid: 1bb643130e8944049b38a3399cf7edf9, type: 2}
-  soldier: 1
   alchemist: 0
-  archer: 0
-  archerRange: 15
-  shotSound: {fileID: 0}
   supportInterval: 6
   supportAmount: 8
 --- !u!114 &810501269
@@ -4661,7 +4754,7 @@ CapsuleCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
@@ -4669,6 +4762,54 @@ CapsuleCollider:
   m_Height: 1.8
   m_Direction: 1
   m_Center: {x: 0, y: 0.9, z: 0}
+--- !u!114 &810501272
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 810501266}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0df3140b7bc2dc9478c05f442fd011b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::Companion
+  definition: {fileID: 11400000, guid: 60d284aaf3c06f24fba9e928940c43c5, type: 2}
+  resident: {fileID: 11400000, guid: 33e7204287863854f8c6ad025490f531, type: 2}
+  startingOrder: 0
+  formationOffset: {x: 0, y: 0, z: -3.8}
+  ordersInConversation: 1
+--- !u!114 &810501273
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 810501266}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 822fe7ba7a35a52488fac3657ca87c71, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::Damageable
+  category: 0
+  destroyOnDeath: 0
+  destroyDelay: 1.5
+  logHits: 0
+--- !u!114 &810501274
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 810501266}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 327ef24172055e7439aadcdc7baae1ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::Combatant
+  faction: 3
+  baseStats: {fileID: 11400000, guid: 1ca1d148e32d86b479d916e0784f7472, type: 2}
+  rules: {fileID: 0}
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
@@ -5416,7 +5557,7 @@ Transform:
   m_GameObject: {fileID: 974906609}
   serializedVersion: 2
   m_LocalRotation: {x: 0.4520157, y: -1.4709302e-10, z: -0.0000000010500951, w: 0.89201}
-  m_LocalPosition: {x: 0, y: 19.131153, z: -61}
+  m_LocalPosition: {x: 0, y: 20.757812, z: -83}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5597,6 +5738,9 @@ GameObject:
   - component: {fileID: 983162861}
   - component: {fileID: 983162860}
   - component: {fileID: 983162864}
+  - component: {fileID: 983162867}
+  - component: {fileID: 983162866}
+  - component: {fileID: 983162865}
   m_Layer: 0
   m_Name: Sigrid - Expedition
   m_TagString: Untagged
@@ -5635,7 +5779,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: SafeHaven::PrologueCompanion
   resident: {fileID: 11400000, guid: b230d041259b863428e4e973c6ff0d86, type: 2}
-  formationOffset: {x: -2, y: 0, z: -2}
   forestLine: Keep the torch high and the road under your feet. The forest is listening tonight. Let it hear only footsteps.
   campLine: The villages think we came for wolves and witches. Let them. The stones out here are older than any village, and someone has been waking them.
   portalLine: Stand inside the ring. Whatever you see, do not let go of the stone until I say.
@@ -5647,11 +5790,7 @@ MonoBehaviour:
   - question: Do you know what is doing this to the forest?
     answer: 'I know what it feels like: a door left open in winter. Someone opened it on purpose. Whether they meant to let something in or out... that is what we came to find.'
   talkedEvent: {fileID: 11400000, guid: 3943805714479a044b6e4e23704963cd, type: 2}
-  soldier: 0
   alchemist: 1
-  archer: 0
-  archerRange: 15
-  shotSound: {fileID: 0}
   supportInterval: 6
   supportAmount: 8
 --- !u!114 &983162861
@@ -5716,7 +5855,7 @@ CapsuleCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
@@ -5772,6 +5911,54 @@ MonoBehaviour:
   speakerName: Sigrid
   portrait: {fileID: 0}
   dialogueCameraDistance: 0.65
+--- !u!114 &983162865
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 983162858}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0df3140b7bc2dc9478c05f442fd011b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::Companion
+  definition: {fileID: 11400000, guid: 60d284aaf3c06f24fba9e928940c43c5, type: 2}
+  resident: {fileID: 11400000, guid: b230d041259b863428e4e973c6ff0d86, type: 2}
+  startingOrder: 0
+  formationOffset: {x: -2, y: 0, z: -2}
+  ordersInConversation: 1
+--- !u!114 &983162866
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 983162858}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 822fe7ba7a35a52488fac3657ca87c71, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::Damageable
+  category: 0
+  destroyOnDeath: 0
+  destroyDelay: 1.5
+  logHits: 0
+--- !u!114 &983162867
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 983162858}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 327ef24172055e7439aadcdc7baae1ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::Combatant
+  faction: 3
+  baseStats: {fileID: 11400000, guid: 1ca1d148e32d86b479d916e0784f7472, type: 2}
+  rules: {fileID: 0}
 --- !u!1 &985677805
 GameObject:
   m_ObjectHideFlags: 0
@@ -10180,6 +10367,40 @@ MonoBehaviour:
   revealRadius: 22
   followsWard: 0
   isLight: 1
+--- !u!1 &1271334262 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4352166826710475781, guid: 5b6b6a84034d49945b10b28c2c445dba, type: 3}
+  m_PrefabInstance: {fileID: 457076108}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1271334264
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1271334262}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.UniversalAdditionalLightData
+  m_UsePipelineSettings: 1
+  m_AdditionalLightsShadowResolutionTier: 2
+  m_CustomShadowLayers: 0
+  m_LightCookieSize: {x: 1, y: 1}
+  m_LightCookieOffset: {x: 0, y: 0}
+  m_SoftShadowQuality: 0
+  m_RenderingLayersMask:
+    serializedVersion: 0
+    m_Bits: 1
+  m_ShadowRenderingLayersMask:
+    serializedVersion: 0
+    m_Bits: 1
+  m_Version: 4
+  m_LightLayerMask: 1
+  m_ShadowLayerMask: 1
+  m_RenderingLayers: 1
+  m_ShadowRenderingLayers: 1
 --- !u!1 &1271903818
 GameObject:
   m_ObjectHideFlags: 0
@@ -11060,6 +11281,9 @@ GameObject:
   - component: {fileID: 1447795154}
   - component: {fileID: 1447795153}
   - component: {fileID: 1447795152}
+  - component: {fileID: 1447795158}
+  - component: {fileID: 1447795157}
+  - component: {fileID: 1447795156}
   m_Layer: 0
   m_Name: Liv - Expedition
   m_TagString: Untagged
@@ -11097,17 +11321,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: SafeHaven::PrologueCompanion
   resident: {fileID: 11400000, guid: 8adfc30233928ec499c01587419eabaa, type: 2}
-  formationOffset: {x: -2, y: 0, z: -5.6}
   forestLine: We came to learn why this forest has become bewitched. First, we need shelter. Follow the old road.
   campLine: There are old paths here, older than the villages. My teacher said the waystones connected places of shelter. I thought that was only a story.
   portalLine: The stones are answering you. Stay close. I will try to keep the passage open.
   campTopics: []
   talkedEvent: {fileID: 11400000, guid: d656e5181cedb8f408b76012090c7439, type: 2}
-  soldier: 0
   alchemist: 0
-  archer: 0
-  archerRange: 15
-  shotSound: {fileID: 0}
   supportInterval: 6
   supportAmount: 8
 --- !u!114 &1447795153
@@ -11172,7 +11391,7 @@ CapsuleCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
@@ -11180,6 +11399,54 @@ CapsuleCollider:
   m_Height: 1.8
   m_Direction: 1
   m_Center: {x: 0, y: 0.9, z: 0}
+--- !u!114 &1447795156
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1447795150}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0df3140b7bc2dc9478c05f442fd011b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::Companion
+  definition: {fileID: 11400000, guid: 60d284aaf3c06f24fba9e928940c43c5, type: 2}
+  resident: {fileID: 11400000, guid: 8adfc30233928ec499c01587419eabaa, type: 2}
+  startingOrder: 0
+  formationOffset: {x: -2, y: 0, z: -5.6}
+  ordersInConversation: 1
+--- !u!114 &1447795157
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1447795150}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 822fe7ba7a35a52488fac3657ca87c71, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::Damageable
+  category: 0
+  destroyOnDeath: 0
+  destroyDelay: 1.5
+  logHits: 0
+--- !u!114 &1447795158
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1447795150}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 327ef24172055e7439aadcdc7baae1ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::Combatant
+  faction: 3
+  baseStats: {fileID: 11400000, guid: 1ca1d148e32d86b479d916e0784f7472, type: 2}
+  rules: {fileID: 0}
 --- !u!1001 &1458015706
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -11938,6 +12205,7 @@ MonoBehaviour:
   climate: {fileID: 11400000, guid: 73c218396bceafc4f88b70affc4e9a1b, type: 2}
   startWeather: {fileID: 11400000, guid: fb724509576cf1a4290415d1a7e0fdd3, type: 2}
   changesByItself: 0
+  weatherOnlyAtmosphere: 1
   wind: {fileID: 1375478516}
   rain: {fileID: 1994325182}
   overcastVolume: {fileID: 1551466492}
@@ -12026,13 +12294,13 @@ MonoBehaviour:
     to: c55320e6897842c2add749bd2c86b10e
   - from: c55320e6897842c2add749bd2c86b10e
     output: 0
-    to: ff22dafecfa04322a82416b310000a76
-  - from: c55320e6897842c2add749bd2c86b10e
-    output: 0
     to: e8b946b7d40c4a1d8a49b19591fc0569
   - from: 961bb4754c244470b5b241ae4927bd70
     output: 0
     to: 8fe77923f6e4420385c5b4122369f7f4
+  - from: e8b946b7d40c4a1d8a49b19591fc0569
+    output: 0
+    to: ff22dafecfa04322a82416b310000a76
   logSteps: 0
   references:
     version: 2
@@ -12202,6 +12470,9 @@ GameObject:
   - component: {fileID: 1606609656}
   - component: {fileID: 1606609655}
   - component: {fileID: 1606609654}
+  - component: {fileID: 1606609660}
+  - component: {fileID: 1606609659}
+  - component: {fileID: 1606609658}
   m_Layer: 0
   m_Name: Tor - Expedition
   m_TagString: Untagged
@@ -12239,17 +12510,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: SafeHaven::PrologueCompanion
   resident: {fileID: 11400000, guid: df34e8e1df8ff0241a216bfddf9b631c, type: 2}
-  formationOffset: {x: -2, y: 0, z: -3.8}
   forestLine: We came to learn why this forest has become bewitched. First, we need shelter. Follow the old road.
   campLine: This stone is dry enough. Give me sound timber and a little daylight, and I could make somewhere worth staying. For now, this fire will do.
   portalLine: Stay near the stones. We can still get out of this together.
   campTopics: []
   talkedEvent: {fileID: 11400000, guid: 3c4a3556d9e8a7741ac54999bfd13e25, type: 2}
-  soldier: 0
   alchemist: 0
-  archer: 0
-  archerRange: 15
-  shotSound: {fileID: 0}
   supportInterval: 6
   supportAmount: 8
 --- !u!114 &1606609655
@@ -12314,7 +12580,7 @@ CapsuleCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
@@ -12322,6 +12588,54 @@ CapsuleCollider:
   m_Height: 1.8
   m_Direction: 1
   m_Center: {x: 0, y: 0.9, z: 0}
+--- !u!114 &1606609658
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1606609652}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0df3140b7bc2dc9478c05f442fd011b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::Companion
+  definition: {fileID: 11400000, guid: 60d284aaf3c06f24fba9e928940c43c5, type: 2}
+  resident: {fileID: 11400000, guid: df34e8e1df8ff0241a216bfddf9b631c, type: 2}
+  startingOrder: 0
+  formationOffset: {x: -2, y: 0, z: -3.8}
+  ordersInConversation: 1
+--- !u!114 &1606609659
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1606609652}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 822fe7ba7a35a52488fac3657ca87c71, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::Damageable
+  category: 0
+  destroyOnDeath: 0
+  destroyDelay: 1.5
+  logHits: 0
+--- !u!114 &1606609660
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1606609652}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 327ef24172055e7439aadcdc7baae1ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::Combatant
+  faction: 3
+  baseStats: {fileID: 11400000, guid: 1ca1d148e32d86b479d916e0784f7472, type: 2}
+  rules: {fileID: 0}
 --- !u!1 &1630528394
 GameObject:
   m_ObjectHideFlags: 0
@@ -14162,6 +14476,9 @@ GameObject:
   - component: {fileID: 1865125222}
   - component: {fileID: 1865125221}
   - component: {fileID: 1865125223}
+  - component: {fileID: 1865125225}
+  - component: {fileID: 1865125224}
+  - component: {fileID: 1865125226}
   m_Layer: 0
   m_Name: Raid Terrain
   m_TagString: Untagged
@@ -14226,12 +14543,12 @@ Terrain:
   m_HeightmapMaximumLOD: 0
   m_ShadowCastingMode: 2
   m_DrawHeightmap: 1
-  m_DrawInstanced: 1
+  m_DrawInstanced: 0
   m_DrawTreesAndFoliage: 1
   m_StaticShadowCaster: 0
   m_IgnoreQualitySettings: 0
   m_ReflectionProbeUsage: 1
-  m_MaterialTemplate: {fileID: 2100000, guid: a8286b09a6780e54faab5ac0e4ecd549, type: 2}
+  m_MaterialTemplate: {fileID: 2100000, guid: 030101798d9955f4ea78a4f001a77a0c, type: 2}
   m_BakeLightProbesForTrees: 1
   m_PreserveTreePrototypeLayers: 0
   m_DeringLightProbesForTrees: 1
@@ -14258,6 +14575,67 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: SafeHaven::GrassTerrainColour
   colourMap: {fileID: 2800000, guid: fc9422cc4b6cc7d478389433c4259105, type: 3}
+--- !u!114 &1865125224
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1865125219}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ba67bb1f324657d418bf74b1204c6383, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::TerrainFootprints
+  stampShader: {fileID: 4800000, guid: a4ec8c8bc9d064e4eba99b3c5d2eeaef, type: 3}
+--- !u!114 &1865125225
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1865125219}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 50090a03477d8554fa1d0b47e4dcabde, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::TerrainSurface
+  profile: {fileID: 11400000, guid: 21133d55e7eb3174dbc1fbfbf8a1518b, type: 2}
+  quality: 3
+--- !u!114 &1865125226
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1865125219}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 13b1172324ca34649930e22adcd62eef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::TerrainMist
+  density: 0.12
+  tint: {r: 0.8, g: 0.87, b: 0.94, a: 1}
+  skyLight: 0.2
+  bottom: 0.15
+  thickness: 3.5
+  cloudSize: 18
+  coverage: 0.65
+  erosion: 0.35
+  flowStretch: 3.5
+  wind: {x: 0.7, y: 0.25}
+  driftSpeed: 2.5
+  waveAmplitude: 0.5
+  waveLength: 12
+  waveSpeed: 0.6
+  lowlandBoost: 1.5
+  poolingDepth: 2
+  waterBoost: 2
+  edgeFade: 5
+  baseAmount: 0
+  weatherAmount: 1
+  goldenHourAmount: 1
+  weatherWindInfluence: 1
 --- !u!1 &1874386227
 GameObject:
   m_ObjectHideFlags: 0
@@ -15273,6 +15651,9 @@ GameObject:
   - component: {fileID: 2111941104}
   - component: {fileID: 2111941103}
   - component: {fileID: 2111941102}
+  - component: {fileID: 2111941108}
+  - component: {fileID: 2111941107}
+  - component: {fileID: 2111941106}
   m_Layer: 0
   m_Name: Ingrid - Expedition
   m_TagString: Untagged
@@ -15310,17 +15691,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: SafeHaven::PrologueCompanion
   resident: {fileID: 11400000, guid: 272895da9ba7e784b8a97bcd2be637c8, type: 2}
-  formationOffset: {x: 0, y: 0, z: -2}
   forestLine: We came to learn why this forest has become bewitched. First, we need shelter. Follow the old road.
   campLine: The plants are wrong. Roots that should sleep in this season are warm to the touch. Something is feeding the enchantment. Stay close; I brought a little medicine.
   portalLine: Stay near the stones. We can still get out of this together.
   campTopics: []
   talkedEvent: {fileID: 11400000, guid: 5b6e9cf3d8ea3e44cabe07b5cf724775, type: 2}
-  soldier: 0
   alchemist: 1
-  archer: 0
-  archerRange: 15
-  shotSound: {fileID: 0}
   supportInterval: 6
   supportAmount: 8
 --- !u!114 &2111941103
@@ -15385,7 +15761,7 @@ CapsuleCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
@@ -15393,6 +15769,54 @@ CapsuleCollider:
   m_Height: 1.8
   m_Direction: 1
   m_Center: {x: 0, y: 0.9, z: 0}
+--- !u!114 &2111941106
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2111941100}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0df3140b7bc2dc9478c05f442fd011b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::Companion
+  definition: {fileID: 11400000, guid: 60d284aaf3c06f24fba9e928940c43c5, type: 2}
+  resident: {fileID: 11400000, guid: 272895da9ba7e784b8a97bcd2be637c8, type: 2}
+  startingOrder: 0
+  formationOffset: {x: 0, y: 0, z: -2}
+  ordersInConversation: 1
+--- !u!114 &2111941107
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2111941100}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 822fe7ba7a35a52488fac3657ca87c71, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::Damageable
+  category: 0
+  destroyOnDeath: 0
+  destroyDelay: 1.5
+  logHits: 0
+--- !u!114 &2111941108
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2111941100}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 327ef24172055e7439aadcdc7baae1ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::Combatant
+  faction: 3
+  baseStats: {fileID: 11400000, guid: 1ca1d148e32d86b479d916e0784f7472, type: 2}
+  rules: {fileID: 0}
 --- !u!1 &2124942152
 GameObject:
   m_ObjectHideFlags: 0

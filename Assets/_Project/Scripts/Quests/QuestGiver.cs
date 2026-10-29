@@ -3,8 +3,9 @@ using System;
 using System.Collections.Generic;
 
 /// <summary>
-/// More to talk about with someone who also gives quests (a companion's questions by the fire): added as answers to the
-/// giver's conversation. After an answer is said, <c>afterAnswer</c> brings the conversation back.
+/// More to talk about with someone who also gives quests (a companion's questions by the fire, their orders): added as
+/// answers to the giver's conversation; every one on the person adds its own. After an answer is said,
+/// <c>afterAnswer</c> brings the conversation back.
 /// </summary>
 public interface IConversationTopics
 {
@@ -333,7 +334,7 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
         talking = true;
         var speaker = new DialogueSpeaker(SpeakerName, transform, portrait, dialogueCameraDistance);
         MenuPage page = BuildDialoguePage();
-        if (TryGetComponent(out IConversationTopics topics))
+        foreach (IConversationTopics topics in GetComponents<IConversationTopics>())
         {
             topics.AddTopics(page, speaker, OpenDialogue);
         }

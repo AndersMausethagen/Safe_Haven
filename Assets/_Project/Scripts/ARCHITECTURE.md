@@ -6,6 +6,42 @@ and where to make common changes. Each script's own summary comment explains its
 The *what and why* of the game lives in the design document,
 [Docs/GameDesignDocument.md](../../../Docs/GameDesignDocument.md) (GDD). This file is the *how*.
 
+Scene environment defaults: `Editor/Environment/SceneEnvironmentDefaults` wires new Single-mode scenes through
+`WeatherSetup` and `AtmosphereSetup` to the existing weather/day-night systems, shaft rendering and ground sampler.
+`TerrainMist` has calm rolling wave crests and stronger density in hollows and over `WaterSurface` footprints.
+`FogGround` bakes RGBA terrain height, mist-support height, water mask and local depression depth;
+water searches happen at bake time, not per raymarch sample. Global fog stays stationary and uses terrain height only.
+Terrains added to weather scenes with a ground sampler receive weather/golden-hour-driven `TerrainMist`; existing
+authored components are preserved. Private transient volume profiles are persisted beside the scene on first save.
+`WeatherSystem.Weather Only Atmosphere` gates fog fully by weather and suppresses baseline/golden-hour terrain mist,
+allowing random Mist/Fog weather with fully clear periods while shaft parameters remain independent.
+`WorldToolsWindow` separates continuous fog setup from light-shaft setup; `ScenePlayability` completes atmosphere
+after copying game rigs. See [Atmosphere](../../../Docs/Atmosphere.md).
+
+Terrain geometry detail: `Editor/Environment/TerrainDisplacementEditor` configures per-terrain persistent height arrays,
+layer UV/remap data and a dedicated world material. `TerrainSurfaceProfile` owns authored height sources and shape
+settings; `TerrainSurface` owns per-terrain runtime quality overrides through MaterialPropertyBlock (future graphics
+options hook). `Editor/Environment/TerrainSurfaceWindow` is the unified setup/tuning UI. The generated
+`Shaders/Terrain/WorldTerrain*` passes share distance-adaptive tessellation/displacement and height-derived lighting
+normals across all painted layers; colliders and NavMesh are unchanged.
+`TerrainFootprints` owns a bounded, rolling RFloat GPU impression field per terrain; its stamp shader draws recovering
+boot tread without changing source assets. `PlayerAudio.FootPlanted` shares animation/bone-based contacts with
+`PlayerTerrainFootprints`, which raycasts the actual surface before stamping (not through bridges or water).
+`PlayerAudio` ensures that contact routing exists on every runtime player, including players in other scenes.
+Terrain displacement setup disables instanced terrain patches, which the current domain passes do not support.
+Profile controls own lifetime, sole shape, depth and flattening; baked per-layer response excludes hard surfaces.
+All terrain geometry passes and height-derived normals sample the same footprint field.
+The four nearest active footprint fields also feed `Safe Haven/Grass`, so trampled plants recover with the ground
+instead of hiding it immediately after the player passes. Globals are cleared on scene teardown/subsystem reset.
+See [terrain displacement](../../../Docs/LevelDesign.md#true-terrain-displacement).
+
+Mesh geometry detail: `Shaders/MeshSurface.shader` is an opt-in URP Lit surface with adaptive hardware
+tessellation and world-metre height displacement. Forward-only lighting (also in Deferred), shadows, depth and
+depth normals share `MeshSurfaceTessellation.hlsl`; the Meta pass exports the undisplaced surface for baking.
+`Environment/MeshSurface` expands renderer-local culling bounds without modifying shared meshes or colliders.
+`Editor/Environment/MeshSurfaceWindow` creates dedicated material copies and exposes all material controls.
+Existing terrain and mesh materials are never globally replaced.
+
 ## Design reference: GDD sections and the systems that implement them
 
 Status: **Done** = playable as designed, **Partial** = a working base that differs from or covers only part
@@ -23,7 +59,7 @@ of the GDD, **Not started** = design only. Update this table when a system is ad
 | §12 Resources, inventory | Done | Materials are items (`Data/Items/Materials`, each with a weight, bag capped at 150 by `ItemContainer`'s weight budget). Essences only in `ResourceInventory/*` (weightless bars). `GatheringNodeDefinition` + `ResourceSource`/`ResourceNode`, `MaterialPool`, `ItemInventory`, `BackpackCapacity` (slots + carry bonus), `Gathering/*` (axe/pickaxe/sickle timing minigame, raid noise, Forest Annoyance, raid summary stats). Every tree can be felled with an axe: tree prefabs carry the shared Tree node and `ChoppableTree` (logs by axe tier and tree size, a chance of Hardwood/Elderwood: `TreeChoppingSettings`, Systems Editor › Tree Chopping); painted terrain trees get invisible stand-ins near the player and shrink away when felled (`TerrainTreeFelling`, added to terrains by itself, on a runtime copy of the terrain data). Oak Wood is shown as Wood | |
 | §13 Crafting, refining | Partial | `RecipeDefinition`, `RecipeBook`, `PlayerCrafting` (hand recipes only), `CraftingStation` + `StationQueue`/`WorkshopState`/`StationCrafting`/`StationWindow` (timed station queues; `StationMenu` is the text fallback), `Durability/*` (repairs), `PurificationAltar` | Stone → Copper → Iron ladder, station queues (pay on queue, keep working during raids, resources to storage first, output slot), repairs and purification work. No Essence enhancements |
 | §14 Base building | Partial | Torch (light against the night: `VisibilitySource`, `AtmosphereLight`), `BuildPlacer` (G: preview inside the ward radius; buildings with Build Work become a `Construction` scaffold the player hammers up (E), the rest stand at once; "Upgrade or repair a building"; move for free; wheel/Shift+wheel rotate, grid + flush-beside-neighbour snapping, Alt = free; entrance yards kept clear; walls dragged in lines), `BuildPlacement` (footprint geometry), `BuildingDefinition` (Build Work, Renown, Upgrades: `BuildingLevel` cost/work/craft speed/queue/output/storage/renown), `BuildingObject`, `Construction` (level, scaffold, rising model, generated level dressing, saved), `SaveableEntity`; Safe Haven starts overgrown (`Overgrowth` on never-regrowing gathering nodes) with a ruined shed; `HavenRenown`/`HavenSettings`/`HavenProgress` (renown, ranks that widen the ward), `HavenHud`, the Heart Tree's Haven page (H); decorations Lantern Post, Haven Banner, Herb Planter | Building damage; real art for level dressing (generated from primitives now) |
-| §15 NPCs, companions | Partial | `RescuableTraveler` → `ResidentDefinition`, `JobDefinition`, `ResidentNpc`, `ResidentSpawner` | One recruit (Ingrid) and one job (Alchemist). No companions, needs or relationships |
+| §15 NPCs, companions | Partial | `RescuableTraveler` → `ResidentDefinition`, `JobDefinition`, `ResidentNpc`, `ResidentSpawner`; `Companions/*` (`Companion`, `CompanionDefinition`, `CompanionOrder`, `CompanionTactics`) | One recruit (Ingrid) and one job (Alchemist). Companions fight beside the player with orders (follow, stay, defend, retreat, attack my target) given in conversation; the prologue expedition uses them. Knocked down, they get up after a while: no player revive, permanent death or raid deployment yet. No needs or relationships |
 | §16 Skills, levels, bosses | Partial | `SkillDefinition`, `SkillSchool`, `SkillLoadout`, `PlayerSkills`, `SkillWindow`; levels and talents in `Progression/*` (`CharacterProgress` in `GameSession.Progress`, `ExperienceTracker`, `PlayerTalents`, `TalentDefinition` × 20 in four free-mix trees, `LevelingSettings`, `ExperienceStone`), `TalentWindow` (N), `ExperienceHud`, the Rune Book | Essence enhancements and bosses |
 | §17 Quests, trade | Partial | `Quests/*`, `Events/*`, story graphs (`Story/*`: `StoryScript` in the scene with `[SerializeReference]` `StoryNode`s and links, edited in `Editor/Story/StoryGraphWindow` (GraphView); see [story graphs](../../../Docs/StoryGraphs.md)); chain "The First Days" + side quest "A Stranger in the Mist" | No trade/bargain or reactive world |
 | §18 UI, accessibility | Partial | `UI/*` (TMP), `DialogueBox` (conversations at the bottom of the screen: live `DialoguePortrait` of the speaker, name, typed-out line, answers 1-4; QuestGiver, companions and story graphs talk through it), `ActionMenuWindow` (world menus), `UIStateManager`, `UITheme` | No rebinding, text scaling or reduced-shake option |
@@ -39,7 +75,8 @@ of the GDD, **Not started** = design only. Update this table when a system is ad
 | `Core` | Game-wide plumbing: `GameSession` (in-memory game state), `GameSystems` (starts persistent systems), `SceneLoader` (scene changes; thin front for `SceneTransition`, the async loader with the loading screen and `ISceneSetup`), `GameStateManager` / `UIStateManager` (scene singletons), `GamePause` + `BackHandlers` (pause ownership, Escape routing), `GameMessages` (on-screen text), `GameSettings<T>` (rule assets loaded from `Resources`), `PlayerArrivalPoint` (where the player appears at home), `AmountText`, `Tiers` |
 | `Events` | The game-event bus (`GameEvents`, `GameEvent`) and designer-facing pieces: `GameEventDefinition` (Quest Events), `GameEventTrigger` (zones/interactions raise events), `GameEventListener` (events trigger scene changes) |
 | `Player` | The player: `Player` (the front door to the player's parts), movement, input, combat, `PlayerEquipment` (worn gear, weapon and tool belt; see "Equipment"), interaction, `PlayerPersistence` + `PlayerSnapshot` (carrying the player across scenes, and what a failed raid keeps) |
-| `Combat` | Stats, damage, `Damageable` (health, death, invulnerability, revive), attacks and hit detection, and combat feel: `CombatFeedback` (hit stop, shake), `HitReaction` (flash, punch, knockback), `CombatFeelSettings` |
+| `Combat` | Stats, damage, `Damageable` (health, death, invulnerability, revive), attacks and hit detection, and combat feel: `CombatFeedback` (hit stop, shake), `HitReaction` (flash, punch, knockback), `CombatFeelSettings`. `Faction` (Player, Enemy, Neutral, Ally): the player and Ally (companions, travellers) are one side with no friendly fire (`FactionRelations.AreAllies`); Enemy AI hunts both (`WillAttack`). Kills carry the fallen side (`GameEvent.KilledFaction`), so a quest's "kill 5 enemies" (`QuestObjective` › Faction, used when no monster is set) never counts the player or a companion falling |
+| `Companions` | People who fight beside the player. `Companion` (on the NPC: walks, fights, is knocked down and gets up, takes orders in conversation through `IConversationTopics`), `CompanionDefinition` (a kind of companion: attack or arrow, order ranges, the orders it takes and its answers; `Data/Companions`), `CompanionOrder` and `CompanionTactics` (plain C#, tested in `CompanionTests`: which enemy, where to stand, per order). Monsters go for the player first while they can reach them (`TargetPriority`, `MonsterAI.CanReach`); a companion only when the player is out of reach. Content: `AgentScripts/BuildCompanions.cs`. A new order = a `CompanionOrder` value at the end + its case in `CompanionTactics` + an answer line in the definitions |
 | `AI` | `MonsterAI`, its animation driver and `AttackTelegraph` (ground warning during a wind-up). `AI/Perception`: how monsters notice things (`MonsterSenses`, `Awareness`, `PerceptionRules`, `WorldNoise`, `AwarenessIndicator`, `PerceptionSettings`; see "Senses and stealth"). `MonsterPatrol` (walks a route of waypoints through `MonsterAI.Roam`, keeps its monster awake), `CreatureFootfalls` (step sounds and camera shake of heavy creatures) |
 | `Camera` | `PlayerCameraController` (top-down and over-the-shoulder action style on one Cinemachine camera, framing per game state), `CameraPreferences`/`CameraStyleRules` (which style applies), `CameraPointer` (mouse vs screen-centre aiming) and `CameraShake` (Cinemachine extension) |
 | `Items`, `ResourceInventory`, `Crafting`, `Content` | Data definitions (ScriptableObjects) and their runtime containers. `Crafting/MaterialPool` is the one place costs are paid from |
@@ -75,7 +112,9 @@ messages, HUD text, duration and initial enemy count. Sigrid's ordinary `QuestGi
 accept anything. Set a chapter quest's Start to **By Quest Giver**, then author its offer on the giver.
 Acceptance uses `QuestGiver → QuestManager → QuestLog`; there is no director acceptance API or leader flag.
 The director does not run an unaccepted chapter's timer/encounter.
-Automatically-started emergency chapters need no conversation. Add or reorder chapters together with their quest prerequisites in
+Automatically-started emergency chapters need no conversation; a fighting chapter (camp defence, portal hold) with
+an arrival line waits until the player has read it before its enemies, clock and win check start, since the dialogue
+box holds attacks. Story graphs follow the same rule by linking Say before Spawn Enemies (Troll Ambush). Add or reorder chapters together with their quest prerequisites in
 the existing Quest Map; chapter list order does not rewrite the prerequisite graph. A chapter waits for its quest
 to complete. Reusable behaviour presets handle shelter, fuel, fire, rest, camp defence, travel, activation and the
 portal hold; new kinds of scene mechanics still require code. The same asset holds the field building, building radius,
@@ -84,7 +123,9 @@ interval, first-wave size, wave growth/caps, rumble, ending/recovery/homecoming 
 
 Select an expedition NPC in `Prologue_MistyWoods` to edit its `PrologueCompanion`: resident identity, forest/camp/
 portal dialogue, camp topics (questions the player can ask around the camp, from gathering fuel until the wolves), a
-conversation story event, formation offset, and support amount/interval.
+conversation story event, and the alchemist's healing amount/interval. Walking and fighting are its `Companion`
+(formation offset, Fighter or Archer definition): the director's rally points become Stay orders, no rally is Follow,
+and it stands still until the expedition sets out.
 When an NPC also has a `QuestGiver`, that component owns its conversations instead; edit its offer/waiting/after text there.
 The companion's camp topics are still added to the giver's conversation (`IConversationTopics`).
 The intro's other moments are story graphs under **Intro Moments** in the scene (`Docs/StoryGraphs.md`): the choice of
@@ -99,13 +140,13 @@ counts the cleared encounter, not player kill credit. No `RaidSession`, regular 
 durability penalty is involved. Supplies deliberately reset to home starting contents.
 
 `BuildPlacer` retains its ordinary placement, footprint checks, material payment and Built event. In the forest
-it exposes only `Data/Prologue/ExpeditionCampfire.asset`, only during the accepted building chapter, and only inside
-the shelter's build radius. The separate field definition/prefab uses Sticks and Small Rocks without changing the
-settlement hearth's materials or exposing another campfire in the home menu. Keep the gathering objectives aligned
-with its Construction Items when tuning costs. The fire quest counts **Build Structure**, not a use-fire event.
+it exposes only the prologue definition's Campfire, the same `Data/Buildings/Campfire.asset` the player builds at home
+(Sticks and Small Rocks; upgrades only at home), only during the accepted building chapter, and only inside the
+shelter's build radius. Keep the gathering objectives aligned with its Construction Items when tuning costs
+(PrologueTests checks this). The fire quest counts **Build Structure**, not a use-fire event.
 Forest ghosts raycast the director's TerrainCollider, resample height after snapping, and reject footprints whose
 corners differ by more than 0.2 m from the base; the normal flat settlement placement is unchanged.
-`PersistentScene` and the registered field prefab preserve the player's placement and resource depletion.
+`PersistentScene` and the campfire's registered prefab preserve the player's placement and resource depletion.
 The expedition wolf prefab has no SaveableEntity: encounters intentionally restart at checkpoints.
 Off-hand torch and armor are granted and auto-equipped once from the prologue definition, before the saved
 Started event is raised; loading never grants duplicates. The forest player's inventory defaults are empty.
@@ -459,8 +500,10 @@ filled in when it is saved (`SaveableEntityTools`). Safe Haven > Save > Assign M
 | Change how long an exit is held, its circle or how loudly a lit beacon calls | The raid's **Extraction Seconds** (Content Editor › Raids), and on the scene's `ExtractionPoint`: **Time Multiplier**, **Hold Radius**, **Call Radius** / **Call Interval** |
 | Give a new map fog, fog of war and night | Safe Haven › World › Sky and Weather › Fog › Set Up Open Scene, then › Apply Preset; pockets with GameObject › Safe Haven › World › Fog Area. See [atmosphere](../../../Docs/Atmosphere.md) |
 | Make a tree, roof or prop dissolve when it hides the player | Safe Haven › Rendering › Make Materials See-Through › Selected (URP Lit/Unlit → See-Through copies; Tree Wind and Layered Lit already do). Size of the circle: `SeeThrough` on PlayerArmature |
-| Change the mist, the night veil or how dark unexplored ground is | The scene's volumes: **Atmospheric Fog** / **Fog of War** overrides (SafeHaven_Volume, SafeHaven_Night, MistyWoods_Volume). No code. See [atmosphere](../../../Docs/Atmosphere.md) |
+| Change the mist, the night veil or how dark unexplored ground is | The scene's volumes: **Atmospheric Fog** / **Fog of War** overrides (SafeHaven_Volume, SafeHaven_Night, MistyWoods_Volume). Independent sun/moon shafts: Atmospheric Fog's **Shaft Density / Intensity / Height**. Drifting terrain clouds: select a Terrain, **Safe Haven > World > Sky and Weather > Fog > Add Drifting Mist to Selected Terrain**, then adjust **TerrainMist** (density, finite height band, cloud size/coverage/erosion, wind, edge fade). Uses FogGround heights and the existing raymarch, up to four nearest tiles; visual only. No code. See [atmosphere](../../../Docs/Atmosphere.md) |
 | Make something light the night (fog glow, veil lifted, prowlers kept off) | `Light` + `AtmosphereLight` (+ `LightFlicker`), and a `VisibilitySource` with **Is Light** |
+| Make a torch push back physical mist | `AtmosphereLight` on a point Light: **Clearing Radius / Strength / Softness**, default 4 m / 1 / 0.6. Removes base fog, FogArea, TerrainMist and shaft particles in a soft 3D sphere; limited by Light range, follows enabled/intensity. HeldItemView preserves/adds it for equipped torches; ExpeditionTorch attaches it to expedition point lights in Awake. No fog-of-war reveal or gameplay sight changes. |
+| Tie fog/mist to existing weather and golden hour | `WeatherDefinition.Mist` blends in `WeatherState`; existing `WeatherSystem` publishes fog/wind/mist through `AtmosphereConditions`, `DayNightCycle` publishes its existing cloud-reduced golden-hour curve. `TerrainMist` combines independent Base/Weather/Golden Hour amounts. `AtmosphereFeature` integrates weather-scaled drift once per game-time interval for fog clumps, banks and terrain clouds, avoiding time-times-speed phase jumps. No second weather/clock simulation. |
 | Tune night creatures at home | `NightProwlers` on "Night Prowlers" in SafeHaven (prefabs, how many, interval, distance, light margin) |
 | Spawn something that must never be saved | `TransientSpawn.Spawn` |
 | Make a monster walk a round | Add `MonsterPatrol` to it in the scene and give it a **Route** (an object whose children are the waypoints, under Map Content in raids). Heavy footsteps: `CreatureFootfalls` on the prefab |
@@ -777,6 +820,9 @@ checks saved assets and runs isolated live combat probes without loading a playe
   screen stay separate. MainMenu and RaidResults are single-canvas scenes with a `UIRoot` component on their canvas.
 - **UI scale:** `UI/UIRoot.cs` sits on the root screen canvas. `UIRoot.Current.Scale` (0.5–2) divides the scaler's
   reference resolution, so one value scales all screen UI. The future options page only needs to set and save it.
+  Scalers use Expand, so the whole 1920x1080 layout stays on screen at any aspect (on ultra-wide the height sets the
+  size). Screen canvases made in code (HUDs, dialogue box, loading screen) call `UIRoot.ConfigureScaler` instead of
+  setting up their own `CanvasScaler`.
 - **Pause:** `Core/GamePause.cs` owns pausing. Systems call `Request(owner)` / `Release(owner)`, and the game stays
   paused while any request is held. In single-player a pause freezes time (`Time.timeScale = 0`), which also stops the
   raid timer. For multiplayer, set `GamePause.FreezesTime = false`: the menu still opens and input is still blocked,
@@ -793,7 +839,8 @@ checks saved assets and runs isolated live combat probes without loading a playe
 - **Camera styles:** V toggles between top-down and the action camera at any time. In action style the cursor is
   locked (mouse looks around, wheel zooms, `UI/ActionCrosshair.cs` shows the aim point) and released whenever a window
   or the pause menu is open. If an override forces the current situation, V still changes the choice and a message says
-  which situation overrides it.
+  which situation overrides it. The top-down cursor lean is measured from the ground under the screen centre, not the
+  player, so the view holds still while the cursor does; aiming a bow leans 1.5x further and blocks right-mouse orbit.
 
 ## Conventions
 
@@ -848,6 +895,7 @@ maps with the right settings (normal map, linear ORM). Multi-material FBX/OBJ ke
 |---|---|
 | Color grade, bloom, vignette of Safe Haven / the raid | `Settings/Rendering/Volumes/SafeHaven_Volume` / `MistyWoods_Volume` (each scene's Global Volume uses one) |
 | Sun, ambient light, fog | The scene's Lighting window (Environment) and its Directional Light |
-| Anti-aliasing, shadow quality, HDR, render scale | `Settings/Rendering/PC_RPAsset` (Mobile_RPAsset for the Mobile quality level) |
+| Anti-aliasing, shadow quality, HDR, render scale | `Settings/Rendering/PC_RPAsset` (Mobile_RPAsset for the Mobile quality level). Shadows are fitted to the top-down camera (14–28 m away): 2 cascades split at 30 m, 50 m distance. Lowering quality for frame rate belongs in player options, not these defaults |
+| A heavy model's triangle count (Local Generator trees reach 100k) | **Safe Haven › Art Pipeline › Simplify Model Meshes** (`Editor/Environment/ModelSimplifier`): picks a Unity mesh-LOD level per mesh, bakes it to `Simplified/` beside the prefab and points the prefab at it (vertices and wind data kept; level 0 restores). Trunks and rocks simplify well; leaf cards lose whole cards, so leave leaves alone. The oak trunks round the Haven use it |
 | Ambient occlusion | The SSAO feature on `Settings/Rendering/PC_Renderer` |
 | A new place's mood | Duplicate a volume profile, assign it to the new scene's Global Volume, set its lighting |

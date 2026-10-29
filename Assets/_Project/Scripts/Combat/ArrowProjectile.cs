@@ -165,7 +165,9 @@ public sealed class ArrowProjectile : MonoBehaviour
         }
 
         transform.SetPositionAndRotation(hit.point + direction * Embed - direction * TipOffset, Quaternion.LookRotation(direction));
-        Recoverable = item != null && arrow != null && Random.value < arrow.RecoverChance;
+        // Only the player's own arrows can be picked up again; a companion's never run out, so they'd be free arrows.
+        Recoverable = item != null && arrow != null && owner != null && Player.IsPlayer(owner.gameObject)
+            && Random.value < arrow.RecoverChance;
         releaseAt = Time.time + (Recoverable ? Mathf.Max(stuckSeconds, RecoverableSeconds) : stuckSeconds);
         velocity = Vector3.zero;
         if (flightOnly != null)

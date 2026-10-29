@@ -1070,7 +1070,8 @@ public sealed class MonsterAI : MonoBehaviour
         return definition.LeashRange > 0f && HorizontalDistance(home) > definition.LeashRange;
     }
 
-    // While hunting one target, switches to a clearly nearer one it can see (a traveller between it and the player).
+    // While hunting one target, looks for a better one it can see: the player first while it can reach them, otherwise
+    // a clearly nearer one (a companion or traveller between it and the player). See TargetPriority.
     private void ScanForNearerTarget()
     {
         Vector3 center = transform.position + Vector3.up * CenterHeight;
@@ -1079,6 +1080,8 @@ public sealed class MonsterAI : MonoBehaviour
         IDamageable best = null;
         Collider bestCollider = null;
         float bestDistance = float.MaxValue;
+        IDamageable seenPlayer = null;
+        Collider seenPlayerCollider = null;
 
         for (int i = 0; i < count; i++)
         {
@@ -1088,27 +1091,72 @@ public sealed class MonsterAI : MonoBehaviour
                 continue;
             }
 
-            float distance = HorizontalDistance(HitDetector.NearestPoint(Overlaps[i], center));
-            if (distance < bestDistance && senses.CanSee(((Component)candidate).transform, definition.DetectionRange))
+            Transform body = ((Component)candidate).transform;
+            bool isPlayer = global::Player.IsPlayer(body.gameObject);
+            if (isPlayer && seenPlayer != null)
             {
+                continue;
+            }
+
+            float distance = HorizontalDistance(HitDetector.NearestPoint(Overlaps[i], center));
+            if ((isPlayer || distance < bestDistance) && senses.CanSee(body, definition.DetectionRange))
+            {
+                if (isPlayer)
+                {
+                    seenPlayer = candidate;
+                    seenPlayerCollider = Overlaps[i];
+                    continue;
+                }
+
                 best = candidate;
                 bestCollider = Overlaps[i];
                 bestDistance = distance;
             }
         }
 
-        if (best == null || ReferenceEquals(best, target))
+        bool huntingPlayer = CanTarget(target) && global::Player.IsPlayer(targetComponent.gameObject);
+        if (seenPlayer == null && best == null)
         {
             return;
         }
 
-        if (CanTarget(target) && bestDistance > DistanceToTarget() - SwitchTargetMargin)
+        // Reachability costs a path query, so it is only asked when the answer can change the choice.
+        bool playerReachable = huntingPlayer ? best == null || CanReach(targetComponent.transform.position)
+            : seenPlayer != null && CanReach(((Component)seenPlayer).transform.position);
+        bool otherNearer = best != null && (!CanTarget(target) || bestDistance <= DistanceToTarget() - SwitchTargetMargin);
+        bool otherReachable = best != null && (huntingPlayer ? !playerReachable : otherNearer) && CanReach(((Component)best).transform.position);
+        switch (TargetPriority.Decide(huntingPlayer, seenPlayer != null, playerReachable, best != null, otherReachable, otherNearer))
         {
-            return;
+            case TargetPriority.Choice.Player:
+                SetTarget(seenPlayer, seenPlayerCollider);
+                break;
+            case TargetPriority.Choice.Other:
+                SetTarget(best, bestCollider);
+                break;
         }
-
-        SetTarget(best, bestCollider);
     }
+
+    // True when it can walk to within striking distance of the point: a complete path to the NavMesh beneath it.
+    // A player on a boulder or a roof is out of reach; their companions are not.
+    private bool CanReach(Vector3 point)
+    {
+        if (agent == null || !agent.isActiveAndEnabled || !agent.isOnNavMesh)
+        {
+            return true;
+        }
+
+        float reach = Mathf.Max(1.5f, definition.Attack != null ? definition.Attack.Range : 0f);
+        if (!NavMesh.SamplePosition(point, out NavMeshHit hit, reach, agent.areaMask))
+        {
+            return false;
+        }
+
+        reachPath ??= new NavMeshPath();
+        return NavMesh.CalculatePath(agent.nextPosition, hit.position, agent.areaMask, reachPath)
+            && reachPath.status == NavMeshPathStatus.PathComplete;
+    }
+
+    private NavMeshPath reachPath;
 
     // A target its senses may notice: one it would fight, and for a defensive monster, one inside its ground.
     private bool IsSenseCandidate(IDamageable candidate, Collider candidateCollider)

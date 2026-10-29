@@ -75,8 +75,29 @@ public sealed class UIRoot : MonoBehaviour
         Apply();
     }
 
+    /// <summary>
+    /// Sets up the scaler of a screen canvas made in code outside the root (a HUD, the dialogue box, the loading screen)
+    /// the way the root's own is: designed at 1920x1080, at the current UI scale.
+    /// </summary>
+    public static void ConfigureScaler(CanvasScaler scaler)
+    {
+        Configure(scaler, DesignResolution, Current != null ? Current.scale : 1f);
+    }
+
+    private static readonly Vector2 DesignResolution = new Vector2(1920f, 1080f);
+
     // A smaller reference resolution makes every UI unit cover more screen pixels, so scale 1.5 means 1.5x bigger UI.
     // Anchored windows keep their place at the screen edges; only their size changes.
+    // Expand keeps the whole reference layout on screen at any aspect: on an ultra-wide screen the height sets the size
+    // and the extra width is room at the sides. (Matching width and height halfway grew the UI with the width until its
+    // top and bottom fell off a 32:9 screen.)
+    private static void Configure(CanvasScaler scaler, Vector2 reference, float uiScale)
+    {
+        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+        scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.Expand;
+        scaler.referenceResolution = reference / Mathf.Max(MinScale, uiScale);
+    }
+
     private void Apply()
     {
         if (scaler == null)
@@ -84,7 +105,6 @@ public sealed class UIRoot : MonoBehaviour
             return;
         }
 
-        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-        scaler.referenceResolution = referenceResolution / Mathf.Max(MinScale, scale);
+        Configure(scaler, referenceResolution, scale);
     }
 }

@@ -50,7 +50,7 @@ public static class HitDetector
         {
             // Resolve the target first: most colliders (ground, props) aren't damageable and need no further work.
             IDamageable target = Overlaps[i].GetComponentInParent<IDamageable>();
-            if (target == null || !target.IsAlive || target.Faction == attackerFaction || Contains(results, target))
+            if (target == null || !target.IsAlive || target.Faction.AreAllies(attackerFaction) || Contains(results, target))
             {
                 continue;
             }

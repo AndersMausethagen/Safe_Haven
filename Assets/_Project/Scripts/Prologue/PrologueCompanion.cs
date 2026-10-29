@@ -12,40 +12,33 @@ public sealed class CompanionTopic
 }
 
 /// <summary>
-/// Lightweight story escort. Its resident definition is reused when the person is rescued later. Talking to them says
-/// their line for the part of the night it is; around the camp the player can also ask their topics, one after another,
-/// to get to know them.
+/// The story side of an expedition member; walking and fighting are its Companion's. Its resident definition is reused
+/// when the person is rescued later. Talking to them says their line for the part of the night it is; around the camp
+/// the player can also ask their topics, one after another, to get to know them. The director's rally points become
+/// Companion orders (stay at the camp, at the portal; otherwise follow), and the companion stands still until the
+/// expedition sets out. An alchemist also heals the player now and then during a fight.
 /// </summary>
 [RequireComponent(typeof(NavMeshAgent), typeof(Interactable))]
 public sealed class PrologueCompanion : MonoBehaviour, IConversationTopics
 {
     [SerializeField] private ResidentDefinition resident;
-    [SerializeField] private Vector3 formationOffset;
     [SerializeField, TextArea] private string forestLine;
     [SerializeField, TextArea] private string campLine;
     [SerializeField, TextArea] private string portalLine;
     [Tooltip("Asked around the camp (from gathering fuel until the wolves come), each once per visit to the scene.")]
     [SerializeField] private CompanionTopic[] campTopics = new CompanionTopic[0];
     [SerializeField, RaisedByGame] private GameEventDefinition talkedEvent;
-    [SerializeField] private bool soldier;
+    [Tooltip("Heals the player by Support Amount every Support Interval during a fight, when within 10 m.")]
     [SerializeField] private bool alchemist;
-    [Tooltip("Shoots the nearest enemy within Archer Range during a fight (Runa).")]
-    [SerializeField] private bool archer;
-    [SerializeField, Min(1f)] private float archerRange = 15f;
-    [SerializeField] private SoundDefinition shotSound;
     [SerializeField, Min(1f)] private float supportInterval = 6f;
     [SerializeField, Min(0f)] private float supportAmount = 8f;
 
     private NavMeshAgent agent;
     private Interactable interactable;
-    private Animator animator;
-    private Transform rally;
-    private float nextPath;
+    private Companion companion;
     private float nextSupport;
-    private bool hasSpeed;
     private bool talking;
     private readonly HashSet<int> asked = new HashSet<int>();
-    private static readonly int Speed = Animator.StringToHash("Speed");
 
     public ResidentDefinition Resident => resident;
 
@@ -53,10 +46,8 @@ public sealed class PrologueCompanion : MonoBehaviour, IConversationTopics
     {
         agent = GetComponent<NavMeshAgent>();
         interactable = GetComponent<Interactable>();
-        animator = GetComponentInChildren<Animator>();
-        if (animator != null)
-            foreach (AnimatorControllerParameter parameter in animator.parameters)
-                hasSpeed |= parameter.nameHash == Speed && parameter.type == AnimatorControllerParameterType.Float;
+        companion = GetComponent<Companion>();
+        if (companion == null) Debug.LogError("An expedition member needs a Companion to walk and fight.", this);
     }
 
     private void OnEnable()
@@ -70,72 +61,31 @@ public sealed class PrologueCompanion : MonoBehaviour, IConversationTopics
         if (talking && DialogueBox.IsOpen) DialogueBox.Current.Close();
     }
 
+    /// <summary>The director's rally point: stay there (in formation), or follow the player when there is none.</summary>
     public void RallyAt(Transform point, bool restore)
     {
-        rally = point;
-        if (restore && agent != null && point != null &&
-            NavMesh.SamplePosition(point.position + formationOffset, out NavMeshHit hit, 5f, NavMesh.AllAreas))
+        if (companion == null) return;
+        if (point == null)
+        {
+            companion.Command(CompanionOrder.Follow);
+            return;
+        }
+
+        Vector3 spot = point.position + companion.FormationOffset;
+        companion.Command(CompanionOrder.Stay, spot);
+        if (restore && agent != null && NavMesh.SamplePosition(spot, out NavMeshHit hit, 5f, NavMesh.AllAreas))
             agent.Warp(hit.position);
     }
 
     private void Update()
     {
-        if (Player.Current == null || !agent.isActiveAndEnabled || !agent.isOnNavMesh) return;
-        var expedition = PrologueDirector.Current;
-        if (expedition == null || !expedition.ExpeditionStarted)
-        {
-            agent.isStopped = true;
-            if (hasSpeed) animator.SetFloat(Speed, 0f);
-            return;
-        }
-        agent.isStopped = ActionMenuWindow.Current != null && ActionMenuWindow.Current.IsOpen || DialogueBox.IsOpen;
-        if (Time.time >= nextPath)
-        {
-            nextPath = Time.time + 0.3f;
-            Vector3 destination = (rally != null ? rally.position : Player.Current.transform.position) + formationOffset;
-            if (NavMesh.SamplePosition(destination, out NavMeshHit hit, 4f, NavMesh.AllAreas))
-                agent.SetDestination(hit.position);
-        }
-        if (hasSpeed) animator.SetFloat(Speed, agent.velocity.magnitude, 0.15f, Time.deltaTime);
-        PrologueDirector director = PrologueDirector.Current;
-        if (director == null || !director.IsFighting || Time.time < nextSupport) return;
+        PrologueDirector expedition = PrologueDirector.Current;
+        if (companion != null) companion.Paused = expedition == null || !expedition.ExpeditionStarted;
+        if (!alchemist || Player.Current == null || expedition == null || !expedition.IsFighting || Time.time < nextSupport) return;
         nextSupport = Time.time + supportInterval;
-        if (alchemist && Vector3.Distance(transform.position, Player.Current.transform.position) < 10f)
+        if ((companion == null || !companion.IsDowned) &&
+            Vector3.Distance(transform.position, Player.Current.transform.position) < 10f)
             Player.Current.Health.Heal(supportAmount);
-        if (archer && Shoot(director)) return;
-        if (!soldier) return;
-        foreach (Damageable enemy in director.Enemies)
-        {
-            if (enemy == null || !enemy.IsAlive || Vector3.Distance(transform.position, enemy.transform.position) > 3.5f) continue;
-            transform.LookAt(new Vector3(enemy.transform.position.x, transform.position.y, enemy.transform.position.z));
-            enemy.ApplyDamage(new DamageInfo(null, null, supportAmount, DamageType.Physical, false,
-                enemy.transform.position, enemy.transform.position - transform.position));
-            break;
-        }
-    }
-
-    // The nearest enemy in range takes an arrow.
-    private bool Shoot(PrologueDirector director)
-    {
-        Damageable target = null;
-        float best = archerRange * archerRange;
-        foreach (Damageable enemy in director.Enemies)
-        {
-            if (enemy == null || !enemy.IsAlive) continue;
-            float distance = (enemy.transform.position - transform.position).sqrMagnitude;
-            if (distance < best)
-            {
-                best = distance;
-                target = enemy;
-            }
-        }
-
-        if (target == null) return false;
-        transform.LookAt(new Vector3(target.transform.position.x, transform.position.y, target.transform.position.z));
-        AudioManager.Play(shotSound, transform.position);
-        target.ApplyDamage(new DamageInfo(null, null, supportAmount, DamageType.Physical, false,
-            target.transform.position + Vector3.up, target.transform.position - transform.position));
-        return true;
     }
 
     private void Talk()
@@ -153,7 +103,10 @@ public sealed class PrologueCompanion : MonoBehaviour, IConversationTopics
     {
         talking = true;
         var page = new MenuPage { Title = resident.DisplayName, Body = line };
-        if (withTopics) AddTopics(page, Speaker, () => Converse(AfterTopicLine, true));
+        // Its own camp topics and anything else to talk about here (the Companion's orders).
+        if (withTopics)
+            foreach (IConversationTopics topics in GetComponents<IConversationTopics>())
+                topics.AddTopics(page, Speaker, () => Converse(AfterTopicLine, true));
         DialogueBox.Current.Talk(page, Speaker, () => talking = false);
     }
 

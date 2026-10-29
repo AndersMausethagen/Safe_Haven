@@ -100,6 +100,44 @@ public sealed class Interactable : MonoBehaviour
         return DirectionFrom(point).magnitude;
     }
 
+    /// <summary>
+    /// A cheap first test for scans over every Interactable (a thousand trees and rocks round the Haven): false when no
+    /// collider's bounds come within <paramref name="distance"/> (horizontally) of the point, so the precise
+    /// <see cref="DistanceFrom"/>, which asks the physics engine per collider, can be skipped. True does not promise
+    /// the object is that close.
+    /// </summary>
+    public bool MightBeWithin(Vector3 point, float distance)
+    {
+        float reach = distance * distance;
+        bool anyCollider = false;
+        for (int i = 0; i < colliders.Length; i++)
+        {
+            Collider candidate = colliders[i];
+            if (!IsUsable(candidate))
+            {
+                continue;
+            }
+
+            anyCollider = true;
+            Bounds bounds = candidate.bounds;
+            // Two-argument Max: the three-argument overload takes a params array and allocates on every call.
+            float dx = Mathf.Max(0f, Mathf.Max(bounds.min.x - point.x, point.x - bounds.max.x));
+            float dz = Mathf.Max(0f, Mathf.Max(bounds.min.z - point.z, point.z - bounds.max.z));
+            if (dx * dx + dz * dz <= reach)
+            {
+                return true;
+            }
+        }
+
+        if (anyCollider)
+        {
+            return false;
+        }
+
+        Vector3 offset = transform.position - point;
+        return offset.x * offset.x + offset.z * offset.z <= reach;
+    }
+
     /// <summary>Horizontal vector from a point to the nearest point of this object.</summary>
     public Vector3 DirectionFrom(Vector3 point)
     {
@@ -212,7 +250,7 @@ public sealed class Interactable : MonoBehaviour
         for (int i = 0; i < colliders.Length; i++)
         {
             Collider candidate = colliders[i];
-            if (candidate == null || !candidate.enabled || !candidate.gameObject.activeInHierarchy || candidate.isTrigger)
+            if (!IsUsable(candidate))
             {
                 continue;
             }
@@ -230,4 +268,7 @@ public sealed class Interactable : MonoBehaviour
 
         return closest;
     }
+
+    private static bool IsUsable(Collider candidate) =>
+        candidate != null && candidate.enabled && candidate.gameObject.activeInHierarchy && !candidate.isTrigger;
 }

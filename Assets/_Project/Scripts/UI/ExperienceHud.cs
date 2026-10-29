@@ -32,10 +32,7 @@ public sealed class ExperienceHud : MonoBehaviour
         var canvas = root.AddComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
         canvas.sortingOrder = 90;
-        var scaler = root.AddComponent<CanvasScaler>();
-        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-        scaler.referenceResolution = new Vector2(1920f, 1080f);
-        scaler.matchWidthOrHeight = 0.5f;
+        UIRoot.ConfigureScaler(root.AddComponent<CanvasScaler>());
         var hud = root.AddComponent<ExperienceHud>();
         hud.group = root.AddComponent<CanvasGroup>();
         hud.group.blocksRaycasts = false;

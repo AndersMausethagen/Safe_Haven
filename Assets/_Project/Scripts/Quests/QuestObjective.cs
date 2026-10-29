@@ -9,7 +9,7 @@ public enum ObjectiveType
     CollectItem = 0,
     /// <summary>Gather X of a material item or an essence: from nodes, monster loot or caches.</summary>
     GatherResource = 1,
-    /// <summary>Kill X of a monster (or any monster).</summary>
+    /// <summary>Kill X of a monster, or any of a faction (enemies).</summary>
     KillMonster = 2,
     /// <summary>Destroy X of a building (or any structure).</summary>
     DestroyBuilding = 3,
@@ -43,8 +43,10 @@ public sealed class QuestObjective
 
     [SerializeField] private ItemDefinition item;
     [SerializeField] private ResourceDefinition resource;
-    [Tooltip("Empty counts any monster.")]
+    [Tooltip("Empty counts any kill of the Faction below.")]
     [SerializeField] private MonsterDefinition monster;
+    [Tooltip("With no monster set: whose kills count. Enemy = monsters and hostile people; Ally = friendly NPCs.")]
+    [SerializeField] private Faction faction = Faction.Enemy;
     [Tooltip("Empty counts any structure.")]
     [SerializeField] private BuildingDefinition building;
     [Tooltip("Empty counts raids anywhere.")]
@@ -68,9 +70,10 @@ public sealed class QuestObjective
     public BuildingDefinition Building => building;
     public GameEventDefinition QuestEvent => questEvent;
 
-    public static QuestObjective Create(ObjectiveType type, int amount, Object target = null, bool mustExtract = true, float withinMinutes = 0f)
+    public static QuestObjective Create(ObjectiveType type, int amount, Object target = null, bool mustExtract = true, float withinMinutes = 0f,
+        Faction faction = Faction.Enemy)
     {
-        var objective = new QuestObjective { type = type, amount = amount, mustExtract = mustExtract, withinMinutes = withinMinutes };
+        var objective = new QuestObjective { type = type, amount = amount, mustExtract = mustExtract, withinMinutes = withinMinutes, faction = faction };
         objective.item = target as ItemDefinition;
         objective.resource = target as ResourceDefinition;
         objective.monster = target as MonsterDefinition;
@@ -97,7 +100,10 @@ public sealed class QuestObjective
                 GameEventKind arrives = item != null ? GameEventKind.ItemObtained : GameEventKind.ResourceGathered;
                 return gameEvent.Kind == arrives && Is(GatherTarget, gameEvent.Subject, true) ? gameEvent.Amount : 0;
             case ObjectiveType.KillMonster:
-                return gameEvent.Kind == GameEventKind.Killed && Is(monster, gameEvent.Subject, false) ? gameEvent.Amount : 0;
+                // With no monster set, kills of the chosen side count: "kill 5 enemies" never counts the player, a
+                // companion or a traveller falling.
+                if (gameEvent.Kind != GameEventKind.Killed) return 0;
+                return (monster != null ? monster == gameEvent.Subject : gameEvent.KilledFaction == faction) ? gameEvent.Amount : 0;
             case ObjectiveType.DestroyBuilding:
                 return gameEvent.Kind == GameEventKind.Destroyed && Is(building, gameEvent.Subject, false) ? gameEvent.Amount : 0;
             case ObjectiveType.CraftItem:
@@ -138,7 +144,7 @@ public sealed class QuestObjective
             case ObjectiveType.GatherResource:
                 return $"Gather {count} {Name(GatherTarget)}";
             case ObjectiveType.KillMonster:
-                return $"Kill {count} {(monster != null ? monster.DisplayName : Amount == 1 ? "enemy" : "enemies")}";
+                return $"Kill {count} {(monster != null ? monster.DisplayName : faction.Noun(Amount != 1))}";
             case ObjectiveType.DestroyBuilding:
                 return $"Destroy {count} {(building != null ? building.DisplayName : Amount == 1 ? "structure" : "structures")}";
             case ObjectiveType.CraftItem:
