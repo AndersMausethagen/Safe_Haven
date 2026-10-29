@@ -23,6 +23,8 @@ public sealed class PrologueChapter
     [SerializeField, TextArea(1, 3)] private string statusText;
     [SerializeField, Min(0f)] private float duration;
     [SerializeField, Min(0)] private int initialEnemies;
+    [Tooltip("Who comes in this chapter's fight (camp defence, portal hold), picked at random by weight.")]
+    [SerializeField] private PrologueWaveEnemy[] enemies = new PrologueWaveEnemy[0];
 
     public QuestDefinition Quest => quest;
     public PrologueStep Behaviour => behaviour;
@@ -30,9 +32,31 @@ public sealed class PrologueChapter
     public string StatusText => statusText;
     public float Duration => duration;
     public int InitialEnemies => initialEnemies;
+    public PrologueWaveEnemy[] Enemies => enemies;
+
+    /// <summary>The enemy for one spawn: picked by weight among those allowed in this wave, with <paramref name="roll"/>
+    /// in [0, 1); null when there are none.</summary>
+    public GameObject Enemy(int wave, float roll)
+    {
+        float total = 0f;
+        foreach (PrologueWaveEnemy enemy in enemies)
+            if (enemy.Allowed(wave)) total += enemy.weight;
+        if (total <= 0f) return null;
+
+        float pick = Mathf.Clamp01(roll) * total;
+        GameObject last = null;
+        foreach (PrologueWaveEnemy enemy in enemies)
+        {
+            if (!enemy.Allowed(wave)) continue;
+            last = enemy.prefab;
+            pick -= enemy.weight;
+            if (pick < 0f) return enemy.prefab;
+        }
+        return last;
+    }
 }
 
-/// <summary>One kind of enemy that comes at the portal hold, and how often.</summary>
+/// <summary>One kind of enemy that comes in a chapter's fight, and how often.</summary>
 [Serializable]
 public sealed class PrologueWaveEnemy
 {
@@ -42,6 +66,8 @@ public sealed class PrologueWaveEnemy
     [Min(0f)] public float weight = 1f;
     [Tooltip("It comes from this wave on (1 = the enemies waiting when the hold starts).")]
     [Min(1)] public int fromWave = 1;
+
+    public bool Allowed(int wave) => prefab != null && weight > 0f && Mathf.Max(1, wave) >= fromWave;
 }
 
 /// <summary>Authored prologue content. Progress belongs to the saved quest log, not this shared asset.</summary>
@@ -79,9 +105,6 @@ public sealed class PrologueDefinition : ScriptableObject
     [SerializeField, Min(0)] private int waveGrowth = 1;
     [SerializeField, Min(1)] private int maximumWaveSize = 7;
     [SerializeField, Min(1)] private int maximumEnemies = 14;
-    [SerializeField] private GameObject wolfPrefab;
-    [Tooltip("Who comes at the portal hold, picked at random by weight; empty sends only the wolf.")]
-    [SerializeField] private PrologueWaveEnemy[] portalEnemies = new PrologueWaveEnemy[0];
     [SerializeField] private SoundDefinition rumble;
     [SerializeField] private string homeScene = "SafeHaven";
     [Header("Narrative")]
@@ -115,31 +138,6 @@ public sealed class PrologueDefinition : ScriptableObject
     public float WaveInterval => waveInterval;
     public int MaximumEnemies => maximumEnemies;
     public int WaveSize(int wave) => Mathf.Min(firstWaveSize + Mathf.Max(0, wave - 1) * waveGrowth, maximumWaveSize);
-    public GameObject WolfPrefab => wolfPrefab;
-
-    /// <summary>The enemy for one spawn at the portal hold: picked by weight among those allowed in this wave, with
-    /// <paramref name="roll"/> in [0, 1); the wolf when none are.</summary>
-    public GameObject PortalEnemy(int wave, float roll)
-    {
-        float total = 0f;
-        foreach (PrologueWaveEnemy enemy in portalEnemies)
-            if (Allowed(enemy, wave)) total += enemy.weight;
-        if (total <= 0f) return wolfPrefab;
-
-        float pick = Mathf.Clamp01(roll) * total;
-        GameObject last = wolfPrefab;
-        foreach (PrologueWaveEnemy enemy in portalEnemies)
-        {
-            if (!Allowed(enemy, wave)) continue;
-            last = enemy.prefab;
-            pick -= enemy.weight;
-            if (pick < 0f) return enemy.prefab;
-        }
-        return last;
-    }
-
-    private static bool Allowed(PrologueWaveEnemy enemy, int wave) =>
-        enemy != null && enemy.prefab != null && enemy.weight > 0f && Mathf.Max(1, wave) >= enemy.fromWave;
     public SoundDefinition Rumble => rumble;
     public string HomeScene => homeScene;
     public string SurvivedText => survivedText;
@@ -169,20 +167,21 @@ public sealed class PrologueDefinition : ScriptableObject
             if (chapter.Behaviour == PrologueStep.Finished) return "Finished is reserved for the end of the sequence.";
             if ((chapter.Behaviour == PrologueStep.CatchBreath || chapter.Behaviour == PrologueStep.HoldPortal) &&
                 chapter.Duration <= 0f) return "Timed chapters need a positive duration.";
-            if (chapter.Behaviour == PrologueStep.DefendCamp && chapter.InitialEnemies < 1)
-                return "A camp defence needs at least one enemy.";
+            bool fight = chapter.Behaviour == PrologueStep.DefendCamp || chapter.Behaviour == PrologueStep.HoldPortal;
+            if (fight && (chapter.InitialEnemies < 1 || chapter.Enemy(1, 0f) == null))
+                return $"The {chapter.Behaviour} chapter needs enemies for its first wave.";
+            foreach (PrologueWaveEnemy enemy in chapter.Enemies)
+                if (enemy != null && enemy.prefab != null && (enemy.prefab.GetComponent<Damageable>() == null ||
+                    enemy.prefab.GetComponentInChildren<SaveableEntity>(true) != null))
+                    return $"Enemy {enemy.prefab.name} must be damageable and must not be saveable.";
         }
         if (startedEvent == null || shelterEvent == null || fireEvent == null || restedEvent == null ||
             campDefendedEvent == null || portalReachedEvent == null || portalActivatedEvent == null || finishedEvent == null)
             return "A prologue story event is missing.";
-        if (sticks == null || stones == null || wolfPrefab == null || wolfPrefab.GetComponent<Damageable>() == null)
-            return "The prologue needs fuel items and a damageable wolf prefab.";
+        if (sticks == null || stones == null)
+            return "The prologue needs fuel items.";
         if (campfire == null || campfire.Prefab == null || campfire.Prefab.GetComponent<SaveableEntity>() == null)
             return "The prologue needs a saveable campfire building.";
-        foreach (PrologueWaveEnemy enemy in portalEnemies)
-            if (enemy != null && enemy.prefab != null && (enemy.prefab.GetComponent<Damageable>() == null ||
-                enemy.prefab.GetComponentInChildren<SaveableEntity>(true) != null))
-                return $"Portal enemy {enemy.prefab.name} must be damageable and must not be saveable.";
         if (waveInterval <= 0f || maximumEnemies < 1 || firstWaveSize < 1 || waveGrowth < 0 || maximumWaveSize < 1 ||
             string.IsNullOrWhiteSpace(homeScene))
             return "Prologue timing, costs, enemy limit and home scene must be valid.";

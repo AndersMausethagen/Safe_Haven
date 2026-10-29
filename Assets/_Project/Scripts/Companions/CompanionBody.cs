@@ -62,9 +62,9 @@ public sealed class CompanionBody
         }
     }
 
-    /// <summary>Puts <paramref name="weapon"/> in the hand, held the way <paramref name="grips"/> holds it (a bow in the
-    /// left hand). Once; later calls do nothing.</summary>
-    public void Arm(ItemDefinition weapon, HeldItemView grips)
+    /// <summary>Puts the definition's weapon in the hand at its grip (a bow in the left hand). Once; later calls do
+    /// nothing.</summary>
+    public void Arm(CompanionDefinition definition)
     {
         if (IsArmed)
         {
@@ -72,6 +72,7 @@ public sealed class CompanionBody
         }
 
         IsArmed = true;
+        ItemDefinition weapon = definition.Weapon;
         if (weapon == null || animator == null || !animator.isHuman)
         {
             return;
@@ -84,7 +85,7 @@ public sealed class CompanionBody
             return;
         }
 
-        Pose pose = grips == null ? Pose.identity : bow ? grips.OffHandGripPose : grips.GripPose;
+        Pose pose = bow ? definition.OffHandGripPose : definition.GripPose;
         var grip = new GameObject("Weapon Grip").transform;
         grip.SetParent(hand, false);
         grip.SetLocalPositionAndRotation(pose.position, pose.rotation);

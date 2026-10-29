@@ -49,6 +49,12 @@ public sealed class CompanionDefinition : ScriptableObject
     [SerializeField] private ItemDefinition weapon;
     [Tooltip("Optional: animations for this kind of companion (an override of their controller whose Attack is a bow draw).")]
     [SerializeField] private RuntimeAnimatorController animations;
+    [Tooltip("Where the weapon sits relative to the right hand bone of their (humanoid) rig.")]
+    [SerializeField] private Vector3 gripPosition;
+    [SerializeField] private Vector3 gripRotation;
+    [Tooltip("Where a bow sits relative to the left hand bone.")]
+    [SerializeField] private Vector3 offHandGripPosition;
+    [SerializeField] private Vector3 offHandGripRotation;
 
     [Header("Orders")]
     [Tooltip("Following: fights enemies this close to the leader.")]
@@ -95,6 +101,8 @@ public sealed class CompanionDefinition : ScriptableObject
     public float StrikeDelay => strikeDelay > 0f ? strikeDelay : attack != null ? attack.HitDelay : 0.4f;
     public ItemDefinition Weapon => weapon;
     public RuntimeAnimatorController Animations => animations;
+    public Pose GripPose => new Pose(gripPosition, Quaternion.Euler(gripRotation));
+    public Pose OffHandGripPose => new Pose(offHandGripPosition, Quaternion.Euler(offHandGripRotation));
     public float Awareness => awareness;
     public CompanionOrderOption[] Orders => orders;
     public float DownedSeconds => downedSeconds;

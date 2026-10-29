@@ -21,12 +21,14 @@ public static class BuildPrologueFinale
         var definition = AssetDatabase.LoadAssetAtPath<PrologueDefinition>(Prologue + "ForestPrologue.asset");
         var data = new SerializedObject(definition);
         SerializedProperty chapters = data.FindProperty("chapters");
+        SerializedProperty enemies = null;
         for (int i = 0; i < chapters.arraySize; i++)
         {
             SerializedProperty chapter = chapters.GetArrayElementAtIndex(i);
             if (chapter.FindPropertyRelative("behaviour").intValue != (int)PrologueStep.HoldPortal) continue;
             chapter.FindPropertyRelative("duration").floatValue = 60f;
             chapter.FindPropertyRelative("initialEnemies").intValue = 4;
+            enemies = chapter.FindPropertyRelative("enemies");
         }
 
         // Waves at 12, 24, 36 and 48 s of 3-6 enemies, never more than 16 at once.
@@ -36,7 +38,6 @@ public static class BuildPrologueFinale
         data.FindProperty("maximumWaveSize").intValue = 6;
         data.FindProperty("maximumEnemies").intValue = 16;
 
-        SerializedProperty enemies = data.FindProperty("portalEnemies");
         enemies.ClearArray();
         Enemy(enemies, wolf, 3f, 1);
         Enemy(enemies, troll, 2f, 1);

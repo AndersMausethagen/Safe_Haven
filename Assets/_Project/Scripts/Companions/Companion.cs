@@ -46,6 +46,7 @@ public sealed class Companion : MonoBehaviour, IConversationTopics
     private Combatant combatant;
     private Damageable health;
     private Interactable interactable;
+    private Talkable talkable;
     private CompanionBody body;
     private CompanionWeapon weapon;
 
@@ -98,6 +99,7 @@ public sealed class Companion : MonoBehaviour, IConversationTopics
         combatant = GetComponent<Combatant>();
         health = GetComponent<Damageable>();
         interactable = GetComponent<Interactable>();
+        talkable = GetComponent<Talkable>();
         body = new CompanionBody(GetComponentInChildren<Animator>(), definition);
         if (definition == null || definition.Attack == null)
         {
@@ -133,10 +135,7 @@ public sealed class Companion : MonoBehaviour, IConversationTopics
     private void Update()
     {
         leader.Follow(Player.Current);
-        if (!body.IsArmed && leader.Player != null)
-        {
-            body.Arm(definition.Weapon, leader.Player.GetComponent<HeldItemView>());
-        }
+        body.Arm(definition);
 
         if (IsDowned)
         {
@@ -163,8 +162,8 @@ public sealed class Companion : MonoBehaviour, IConversationTopics
         }
 
         weapon.Fight(engaged);
-        // Stops to listen while the player is in a conversation, unless there is fighting to do.
-        agent.isStopped = threats.Count == 0 && InConversation();
+        // Stops to listen while the player talks to them, unless there is fighting to do.
+        agent.isStopped = threats.Count == 0 && talkable != null && talkable.IsTalking;
         body.SetSpeed(agent.isStopped ? 0f : agent.velocity.magnitude);
     }
 
@@ -316,9 +315,6 @@ public sealed class Companion : MonoBehaviour, IConversationTopics
             }));
         }
     }
-
-    private static bool InConversation() =>
-        DialogueBox.IsOpen || (ActionMenuWindow.Current != null && ActionMenuWindow.Current.IsOpen);
 
     // ----- Moving -----
 

@@ -123,8 +123,10 @@ public sealed class PrologueTests
         Assert.AreEqual(4, Definition.StartingArmor.Length);
         Assert.IsTrue(Definition.StartingArmor.All(i => i != null && i.IsArmor && i.name.StartsWith("WovenHide")));
         Assert.AreEqual(4, Definition.StartingArmor.Select(i => i.ArmorSlot).Distinct().Count());
-        Assert.IsEmpty(Definition.WolfPrefab.GetComponentsInChildren<SaveableEntity>(true),
-            "Encounters reset on load; only placed construction and gathering nodes persist.");
+        foreach (PrologueChapter chapter in Definition.Chapters)
+            foreach (PrologueWaveEnemy enemy in chapter.Enemies)
+                Assert.IsEmpty(enemy.prefab.GetComponentsInChildren<SaveableEntity>(true),
+                    "Encounters reset on load; only placed construction and gathering nodes persist.");
         var database = AssetDatabase.LoadAssetAtPath<ContentDatabase>("Assets/_Project/Resources/ContentDatabase.asset");
         var prefab = Definition.Campfire.Prefab.GetComponent<SaveableEntity>();
         Assert.AreSame(prefab, database.FindPrefab(prefab.PrefabId));
@@ -282,8 +284,11 @@ public sealed class PrologueTests
         PrologueChapter hold = Definition.Chapters.Single(c => c.Behaviour == PrologueStep.HoldPortal);
         Assert.AreEqual(60f, hold.Duration);
         Assert.IsNull(Definition.FindProblem());
-        var first = Enumerable.Range(0, 50).Select(i => Definition.PortalEnemy(1, i / 50f).name).Distinct().ToArray();
-        var later = Enumerable.Range(0, 50).Select(i => Definition.PortalEnemy(3, i / 50f).name).Distinct().ToArray();
+        var first = Enumerable.Range(0, 50).Select(i => hold.Enemy(1, i / 50f).name).Distinct().ToArray();
+        var later = Enumerable.Range(0, 50).Select(i => hold.Enemy(3, i / 50f).name).Distinct().ToArray();
+        PrologueChapter camp = Definition.Chapters.Single(c => c.Behaviour == PrologueStep.DefendCamp);
+        CollectionAssert.AreEqual(new[] { "ExpeditionWolf" }, Enumerable.Range(0, 20).Select(i => camp.Enemy(1, i / 20f).name).Distinct(),
+            "The camp is attacked by wolves; both fights are authored the same way.");
         Assert.Greater(first.Length, 1, "More than wolves come through the dark.");
         CollectionAssert.DoesNotContain(first, "ExpeditionMistwing", "Mistwings come from the second wave.");
         CollectionAssert.Contains(later, "ExpeditionMistwing");
