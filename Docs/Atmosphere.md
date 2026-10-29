@@ -59,6 +59,31 @@ weather, gathers in fog areas (hollows, marshes) and makes monsters see less far
 
 ## For designers: fog on a new map in a few minutes
 
+**Default scene environment:** creating a new scene through Unity (Single mode, not additive tooling/test scenes)
+automatically adds the existing weather/day-night rig, terrain ground sampler and volumetric sun/moon support.
+New terrains in scenes with weather and Fog Ground receive Terrain Mist automatically, including terrains added later.
+The Weather component's **Weather Only Atmosphere** defaults on: mist and global fog follow the climate's random
+weather, not a constant baseline or guaranteed golden-hour event. **Clear/Breezy** have Fog 0 and Mist 0;
+**Mist** has Mist 1 and Fog 0; **Fog** has Fog 2.2 and Mist 0. Rain/storm can combine both. Transitions use the
+existing weather blend. Shafts keep their independent density, lighting and shadows in all weathers.
+New profiles carry fog strength 0.025 for foggy weather; Clear multiplies this to zero even with partial legacy
+Weather Influence. Existing authored strengths and disabled mist components are preserved.
+
+**Safe Haven > World Tools > Sky & Weather** provides:
+- **Complete Scene Environment** for older scenes: the weather/day-night setup also supplies mist and shaft support.
+  **Make Playable** likewise completes atmosphere support after copying the game's rig.
+- **Set Up Fog**: optional continuous fog, independent of shafts. Does not add fog of war.
+- **Set Up Light Shafts**: enable sun/moon scattering without adding continuous fog.
+- **Add Mist to Selected Terrain**: manual repair, plus an expandable inline Inspector for terrain mist.
+- A list of this scene's fog volume profiles, **Edit** for inline fog/shaft controls, **Profile** to select the asset,
+  and **Save This Fog Profile** to persist that profile without saving the scene.
+- Warnings for missing terrain, ground sampler, directional light or shadow support. Preview in **Game view**.
+
+Unsaved scenes work immediately; their private atmosphere profile is stored beside the scene on first save.
+Scene edits remain unsaved until you save them yourself. Additive/preview scenes are not automatically populated.
+Shared volume profiles affect other scenes using those assets; the tool labels this explicitly. Existing day/night
+and weather controls remain directly above Atmosphere and are not recreated by fog setup.
+
 1. **Open the scene** and run **Safe Haven › World › Sky and Weather › Fog › Set Up Open Scene**. It adds what is missing
    and tells you what it did: the renderer feature (once for the project), an "Atmosphere" object with the
    Exploration Map (saved at home, fresh every raid: it decides by the scene's name, `Raid_…` = raid) and Fog Ground,
@@ -83,14 +108,129 @@ weather, gathers in fog areas (hollows, marshes) and makes monsters see less far
 | Follow Terrain | 0: fog lies at a fixed height and pools in valleys. 1: a blanket over the ground, as deep on hills as in hollows, spilling down slopes | 1 at home, 0.6 in forests with valleys |
 | Height Falloff | How quickly it thins upward. High = a thin layer on the ground | 0.2 tall, 0.6 low |
 | Noise Size / Strength | Size of the drifting clumps, and how patchy they are | 10–20 m / 0.5–0.8 |
-| Wind | Drift direction and speed of the clumps (m/s) | (0.6, 0.05, 0.3) |
+| Drift Speed / Wind | Fog is stationary at Drift Speed 0 (default). Opt into animated fog with a positive multiplier; Wind then sets direction and m/s | 0 / (0.6, 0.05, 0.3) |
 | Bank Size / Strength / Speed | Large banks rolling over the land: size, how much they matter (0 = even fog), speed × the wind | 120 m / 0.5 / 0.5 |
-| Weather Influence | How much the weather (Clear 1, Mist thicker) thickens it | 0.6 |
+| Weather Influence | Partial influence when Weather Only Atmosphere is off; otherwise weather fully controls global fog | 0.6 |
 | Albedo, Ambient | Fog colour and the light it has everywhere | darker ambient at night |
 | Main Light, Anisotropy | How strongly sun/moon lights it (through shadows: light shafts) and how much it glows toward the light | 1.2–2 / 0.5 |
 | Local Lights | How strongly torches, campfires and lit beacons glow in it | 1.5–2.5 |
 | Clearing | How much it thins around the player, torches and the ward | 0.4–0.6 |
 | Max Distance, Steps | How far and how finely it is gathered (cost) | 90 m / 24–28 |
+
+### Drifting morning mist on a terrain
+
+Select a Terrain and run **Safe Haven > World > Sky and Weather > Fog > Add Drifting Mist to Selected Terrain**.
+The **Terrain Mist** component is the independent cloud layer: it does not change the existing fog, fog of war,
+weather or lighting. The menu ensures the renderer feature and ground-height sampler exist; save the scene.
+Preview in **Game view**, not Scene view.
+
+| Terrain Mist field | Purpose |
+|---|---|
+| Density | Thickness inside clouds; 0 disables this layer only |
+| Tint / Sky Light | Independent cloud colour and soft fill; Sky Light helps read clouds under trees, lower it at night |
+| Bottom / Thickness | Bottom offset and maximum vertical depth, metres; default 0.03 / 2. The core is dense near the ground and rapidly thins upward |
+| Cloud Size / Coverage | Cloud width in metres / fraction covered; lower coverage leaves clear gaps |
+| Erosion | Small billows break up cloud edges rather than making an even grey blanket |
+| Flow Stretch | Elongates cloud pockets along the wind into flowing veils; default 3.5, 1 gives round pockets |
+| Wind / Drift Speed | World X/Z direction and base speed, multiplied by Drift Speed (default 2.5) and Weather Wind Influence |
+| Edge Fade | Soft perimeter on the terrain tile, in metres |
+
+#### Existing weather and day/night integration
+
+No separate weather or clock runs for mist. **WeatherSystem** publishes the smoothly blended **Wind**, **Fog** and
+independent **Mist** from the existing WeatherDefinition assets. **DayNightCycle** publishes the existing profile's
+golden-hour curve, reduced under clouds. These values reset to neutral when their driver is disabled.
+
+On **Terrain Mist**, under **Weather and time of day**:
+- **Base Amount** is the minimum amount at all times. **0** allows the clouds to disappear outside suitable conditions;
+  **1** preserves the original always-on mist.
+- **Weather Amount** scales the weather preset's **Mist**, independently of its **Fog** multiplier.
+- **Golden Hour Amount** adds a dawn/dusk opportunity using the existing golden-hour curve, not fixed new clock times.
+  **Weather Only Atmosphere** on Weather suppresses this and Base Amount, so even clear dawn/dusk can be mist-free.
+  Turn that option off explicitly for a scene that should retain always-on or guaranteed golden-hour mist.
+- The strongest of these amounts wins; multiplying it by **Density** gives the actual cloud density.
+- **Weather Wind Influence** blends between authored drift speed (0) and the existing weather's Wind multiplier (1).
+  Global fog stays stationary by default, including its banks; it only responds to its own
+  **Weather Wind Influence** if **Drift Speed** is explicitly raised above 0.
+  Storm's default Wind **2.8** makes terrain mist move 2.8 times its authored speed; Mist's **0.4** moves slowly.
+  Drift is integrated, so a weather transition changes speed without teleporting the cloud pattern.
+  Terrain Mist also multiplies its authored Wind by **Drift Speed**: the default (0.7, 0.25) and 2.5
+  give about **0.74 m/s in Mist weather** and **5.2 m/s in Storm**. Flow Stretch makes long terrain-following
+  veils; smaller wisps shear and billow within them rather than translating a frozen cloud pattern.
+
+**Fog and Mist have different roles:** Fog is a dense, broad, stationary airborne veil (new-scene
+authored density 0.025/m, height falloff 0.08/m, low noise). Mist has denser, separated flowing
+cores close to the terrain, with rapidly fading tops. They can coexist without sharing motion.
+Light shafts and torch clearing work with both.
+
+The existing **Mist / Rain / Storm** assets use independent Mist amounts **1 / 0.25 / 0.4**. Clear and Breezy use 0.
+Prologue's terrain is configured with Base Amount 0, Weather Amount 1, Golden Hour Amount 1.
+To have **mist without global fog**, set Atmospheric Fog Density to 0 (and disable unwanted Fog Areas), or set a
+weather's Fog to 0 with Atmospheric Fog's Weather Influence at 1. Terrain Mist still renders. For **fog without mist**,
+use a weather with Mist 0 and set Base/Golden Hour Amount to 0. Both can also coexist.
+
+Mist follows the baked **Fog Ground** height field over multiple tiles. Rebake Fog Ground after sculpting terrain
+or moving tiles (the loading-screen setup does this automatically after rotating a raid map).
+The nearest four mist tiles are rendered, selected by distance to their rectangles, not their origins.
+Mist is visual only: it does not change monster sight, navigation or collision.
+
+#### Rolling waves, hollows and water
+
+Terrain Mist now has slow, broad crests rather than only translating cloud noise:
+**Wave Amplitude** (default 0.5 m), **Wave Length** (12 m) and **Wave Speed** (0.6 m/s before
+weather influence). Crests gently bend the ribbons sideways, thicken them and raise their tops;
+they never lift the entire layer off the ground. Set amplitude to 0 to disable these waves.
+Fronts use warped noise at different scales and directions, not evenly spaced sine waves.
+Their shape evolves continuously rather than looping a fixed set of patches. Breezy and Storm
+increase lateral shearing, internal billowing and edge breakup as well as drift/wave travel.
+This follows the blended Weather Wind and Terrain Mist's Weather Wind Influence; Fog is unaffected.
+
+**Lowland Boost** increases density in local depressions, measured against terrain 12 metres
+around each sample. **Pooling Depth** sets the depression depth receiving the full boost.
+This is visual pooling, not a fluid simulation or a global sea-level cutoff.
+**Water Boost** adds density over enabled, ripple-taking **Water Surface** footprints (including
+spline rivers), and anchors mist to the water surface instead of the submerged terrain.
+Water hidden below dry land does not receive a boost. Fog and shaft heights still use actual terrain.
+
+These habitat channels are baked into Fog Ground alongside terrain height, with no water searches
+in the per-frame raymarch. Use **Rebake Mist Ground and Water Map** after editing terrain,
+adding/moving water or changing river outlines. Scene startup and loading-screen setup also rebake.
+
+### Torches push back physical fog
+
+Point lights with **Atmosphere Light** now remove the participating medium around the flame, not just brighten it.
+This applies to base fog, Fog Areas, Terrain Mist and shaft particles; it does not reveal unexplored terrain or
+change the night veil. Existing torch/campfire/beacon Atmosphere Lights get the defaults automatically.
+Handheld torch models retain (or receive) Atmosphere Light when equipped; expedition torches attach it at runtime.
+
+- **Clearing Radius**: default **4 m**, capped by the Light's range. A soft 3D sphere follows a moving light.
+- **Clearing Strength**: default **1**, fully clears the inner region; **0** restores glow-only behaviour.
+- **Clearing Softness**: default **0.6**, smooth outer transition rather than a hard hole.
+- Disabled, zero-intensity or black lights stop clearing. Intensity below 1 fades the effect.
+  Fog Strength controls glow independently. Overlapping clearings use the strongest, not an additive sum.
+
+The existing limit of eight nearest Atmosphere Lights applies. Point lights only: a spotlight does not incorrectly
+clear a sphere outside its cone. This is immediate, artistic density displacement, not a fluid simulation or
+shadow-tested propagation through walls. Sun/moon lights do not clear all the mist.
+
+### Sun and moon shafts through branches
+
+In the scene's **Atmospheric Fog** volume override, enable **Shaft Density** (start at **0.004**),
+**Shaft Intensity** (**4**) and **Shaft Height** (**18 m**). Set these in the night profile too if it overrides fog.
+These particles scatter only directional light, independently of base fog/ambient. Zero Shaft Density restores
+the original base fog; turning off Terrain Mist also removes the independent ground clouds.
+
+The renderer samples the **directional shadow atlas at every air sample**, including when URP uses screen-space
+shadows for surfaces. Branch/leaf materials must cast alpha-clipped shadows, the sun/moon must cast shadows,
+and URP's shadow distance must cover the visible trees. The day/night rig uses the same directional light for
+sun and moon, so shafts follow it automatically. Overcast skies and a dim moon naturally produce weaker shafts;
+forward scattering is strongest looking toward the light. The extra shaft medium uses full geometric occlusion
+instead of the artistic surface-shadow strength, and fades at the shadow-distance limit.
+
+This is shadow-map single scattering, not offline multiple-scattering simulation. Shadow resolution, leaf geometry,
+camera/light angle and sample spacing limit fine branch detail. Try **48–64 Steps** for shafts and shallow cloud
+layers; this increases GPU cost over the original 28-step preset. Existing fog remains half-resolution. No beam
+meshes or unoccluded light overlays are used.
 
 ### Fog Area, field by field
 

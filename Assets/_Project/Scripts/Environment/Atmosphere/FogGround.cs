@@ -5,8 +5,11 @@ using UnityEngine;
 /// Lets the volumetric fog follow the ground (Atmospheric Fog › Follow Terrain): bakes the height of every terrain tile
 /// in the scene into a small texture the fog shader reads, so the fog lies as a blanket at the same depth over hills
 /// and hollows and spills down slopes. Baked once during scene setup, after a raid map has been turned, and again with
-/// <see cref="Bake"/> when the ground changes. One per scene, on the "Atmosphere" object.
+/// <see cref="Bake"/> when the ground or water changes. Extra channels record water-surface height, water footprints
+/// and local depressions for TerrainMist; global fog still samples only terrain height.
+/// One per scene, on the "Atmosphere" object.
 /// </summary>
+[ExecuteAlways]
 [DisallowMultipleComponent]
 public sealed class FogGround : MonoBehaviour, ISceneSetup
 {
@@ -36,15 +39,13 @@ public sealed class FogGround : MonoBehaviour, ISceneSetup
     private void OnEnable()
     {
         Current = this;
+        Bake();
     }
 
     private void Start()
     {
-        // Scenes without a loading-screen pass (an editor test scene) still get a ground.
-        if (texture == null)
-        {
-            Bake();
-        }
+        // All water surfaces have registered by Start, unlike during OnEnable on scene load.
+        Bake();
     }
 
     private void OnDisable()
@@ -59,11 +60,11 @@ public sealed class FogGround : MonoBehaviour, ISceneSetup
     {
         if (texture != null)
         {
-            Destroy(texture);
+            ReleaseTexture();
         }
     }
 
-    /// <summary>Samples every terrain tile into the height texture.</summary>
+    /// <summary>Samples this scene's terrain, local depressions and water footprints into the height texture.</summary>
     public void Bake()
     {
         Rect area = TerrainArea(out float minY, out float maxY);
@@ -74,14 +75,14 @@ public sealed class FogGround : MonoBehaviour, ISceneSetup
 
         int width = Mathf.Clamp(Mathf.CeilToInt(area.width / cellSize), 2, 1024);
         int height = Mathf.Clamp(Mathf.CeilToInt(area.height / cellSize), 2, 1024);
-        if (texture == null || texture.width != width || texture.height != height)
+        if (texture == null || texture.width != width || texture.height != height || texture.format != TextureFormat.RGBAHalf)
         {
             if (texture != null)
             {
-                Destroy(texture);
+                ReleaseTexture();
             }
 
-            texture = new Texture2D(width, height, TextureFormat.RHalf, false, true)
+            texture = new Texture2D(width, height, TextureFormat.RGBAHalf, false, true)
             {
                 name = "Fog Ground",
                 wrapMode = TextureWrapMode.Clamp,
@@ -98,7 +99,29 @@ public sealed class FogGround : MonoBehaviour, ISceneSetup
             for (int x = 0; x < width; x++)
             {
                 float wx = area.xMin + (x + 0.5f) / width * area.width;
-                heights[y * width + x] = new Color((GroundAt(new Vector3(wx, 0f, z), minY) - minY) / span, 0f, 0f, 0f);
+                var position = new Vector3(wx, 0f, z);
+                float ground = GroundAt(position, minY);
+                float surrounding = (GroundAt(position + Vector3.right * 12f, ground)
+                    + GroundAt(position + Vector3.left * 12f, ground)
+                    + GroundAt(position + Vector3.forward * 12f, ground)
+                    + GroundAt(position + Vector3.back * 12f, ground)) * 0.25f;
+                float surfaceHeight = ground;
+                float waterMask = 0f;
+                foreach (WaterSurface water in WaterSurface.Surfaces)
+                {
+                    if (water == null || !water.TakesRipples || water.gameObject.scene != gameObject.scene)
+                        continue;
+                    Vector3 nearest = water.NearestPoint(position);
+                    var probe = new Vector3(wx, nearest.y, z);
+                    if (water.Contains(probe, 0.1f, out float waterHeight) && waterHeight > ground + 0.02f)
+                    {
+                        surfaceHeight = Mathf.Max(surfaceHeight, waterHeight);
+                        waterMask = 1f;
+                    }
+                }
+                // R: ground, G: mist support surface, B: water footprint, A: local depression in metres.
+                heights[y * width + x] = new Color((ground - minY) / span, (surfaceHeight - minY) / span,
+                    waterMask, Mathf.Max(0f, surrounding - ground));
             }
         }
 
@@ -108,11 +131,25 @@ public sealed class FogGround : MonoBehaviour, ISceneSetup
         HeightRange = new Vector2(minY, span);
     }
 
-    private static float GroundAt(Vector3 position, float fallback)
+    private void ReleaseTexture()
+    {
+        if (Application.isPlaying)
+        {
+            Destroy(texture);
+        }
+        else
+        {
+            DestroyImmediate(texture);
+        }
+
+        texture = null;
+    }
+
+    private float GroundAt(Vector3 position, float fallback)
     {
         foreach (Terrain terrain in Terrain.activeTerrains)
         {
-            if (terrain == null || terrain.terrainData == null)
+            if (terrain == null || terrain.terrainData == null || terrain.gameObject.scene != gameObject.scene)
             {
                 continue;
             }
@@ -128,7 +165,7 @@ public sealed class FogGround : MonoBehaviour, ISceneSetup
         return fallback;
     }
 
-    private static Rect TerrainArea(out float minY, out float maxY)
+    private Rect TerrainArea(out float minY, out float maxY)
     {
         bool any = false;
         float xMin = 0f, zMin = 0f, xMax = 0f, zMax = 0f;
@@ -136,7 +173,7 @@ public sealed class FogGround : MonoBehaviour, ISceneSetup
         maxY = 0f;
         foreach (Terrain terrain in Terrain.activeTerrains)
         {
-            if (terrain == null || terrain.terrainData == null)
+            if (terrain == null || terrain.terrainData == null || terrain.gameObject.scene != gameObject.scene)
             {
                 continue;
             }

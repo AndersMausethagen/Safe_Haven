@@ -136,13 +136,14 @@ public sealed class SkyControllerWindow : EditorWindow
         WeatherState now = weather.Current;
         string arriving = weather.Blend < 1f ? $" (blending {weather.Blend:P0})" : "";
         EditorGUILayout.LabelField("Now", (weather.Weather != null ? weather.Weather.DisplayName : "none") + arriving);
-        EditorGUILayout.LabelField(" ", $"wind ×{now.Wind:0.0}, rain {now.Rain:0.00}, clouds {now.Clouds:0.00}, fog ×{now.Fog:0.0}");
+        EditorGUILayout.LabelField(" ", $"wind ×{now.Wind:0.0}, rain {now.Rain:0.00}, clouds {now.Clouds:0.00}, fog ×{now.Fog:0.0}, mist {now.Mist:0.00}");
         if (Application.isPlaying && weather.ChangesByItself && weather.Climate != null && !float.IsInfinity(weather.TimeLeft))
         {
             EditorGUILayout.LabelField(" ", $"Next change in {weather.TimeLeft / 60f:0.0} min");
         }
 
         transition = EditorGUILayout.Slider("Blend over (seconds)", transition, 0f, 60f);
+        EditorGUILayout.HelpBox("Mist combinations: Breezy + Mist and Storm + Mist keep the base weather's wind, rain and lightning, with full ground mist. Wind drives mist drift and rolling waves; Fog remains stationary. Pause climate changes in Play mode to hold a test.", MessageType.Info);
         foreach (WeatherDefinition[] row in AllWeathers(weather, ref projectWeathers).Select((w, i) => (w, i)).GroupBy(p => p.i / 3).Select(g => g.Select(p => p.w).ToArray()))
         {
             using (new EditorGUILayout.HorizontalScope())

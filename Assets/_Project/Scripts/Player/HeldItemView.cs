@@ -200,7 +200,7 @@ public sealed class HeldItemView : MonoBehaviour
         {
             if (component == null || (component is MonoBehaviour) != (pass == 0)) continue;
             if (component is Transform || component is MeshFilter || component is Renderer || component is LODGroup ||
-                keepTorchLight && (component is Light || component is LightFlicker))
+                keepTorchLight && (component is Light || component is LightFlicker || component is AtmosphereLight))
             {
                 continue;
             }
@@ -218,6 +218,15 @@ public sealed class HeldItemView : MonoBehaviour
             else
             {
                 DestroyImmediate(component);
+            }
+
+            if (keepTorchLight)
+            {
+                foreach (Light light in model.GetComponentsInChildren<Light>(true))
+                {
+                    if (light.type == LightType.Point && light.GetComponent<AtmosphereLight>() == null)
+                        light.gameObject.AddComponent<AtmosphereLight>();
+                }
             }
         }
     }

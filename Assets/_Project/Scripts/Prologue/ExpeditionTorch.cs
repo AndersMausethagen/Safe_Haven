@@ -4,6 +4,15 @@ using UnityEngine;
 [DisallowMultipleComponent]
 public sealed class ExpeditionTorch : MonoBehaviour
 {
+    private void Awake()
+    {
+        foreach (Light light in GetComponentsInChildren<Light>(true))
+        {
+            if (light.type == LightType.Point && light.GetComponent<AtmosphereLight>() == null)
+                light.gameObject.AddComponent<AtmosphereLight>();
+        }
+    }
+
     private void LateUpdate()
     {
         transform.rotation = Quaternion.identity;

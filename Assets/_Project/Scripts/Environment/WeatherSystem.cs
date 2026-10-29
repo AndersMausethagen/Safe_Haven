@@ -16,6 +16,8 @@ public sealed class WeatherSystem : MonoBehaviour
     [SerializeField] private WeatherDefinition startWeather;
     [Tooltip("Off: the weather stays until a script calls SetWeather.")]
     [SerializeField] private bool changesByItself = true;
+    [Tooltip("Mist and fog follow the randomly selected weather only. Clear can remove both completely, even at dawn/dusk or in night volumes. Turn off to allow authored constant/golden-hour mist and partial fog weather influence.")]
+    [SerializeField] private bool weatherOnlyAtmosphere = true;
     [SerializeField] private MossWind wind;
     [SerializeField] private RainEffect rain;
     [Tooltip("Global volume with the overcast / rain look; its weight follows clouds and rain.")]
@@ -81,6 +83,10 @@ public sealed class WeatherSystem : MonoBehaviour
 
     private void OnDisable()
     {
+        AtmosphereConditions.WeatherOnlyAtmosphere = false;
+        AtmosphereConditions.WeatherFog = 1f;
+        AtmosphereConditions.WeatherWind = 1f;
+        AtmosphereConditions.WeatherMist = 0f;
         if (wind != null)
         {
             wind.SetWeather(1f, 0f);
@@ -175,6 +181,10 @@ public sealed class WeatherSystem : MonoBehaviour
 
     private void Apply()
     {
+        AtmosphereConditions.WeatherOnlyAtmosphere = weatherOnlyAtmosphere;
+        AtmosphereConditions.WeatherFog = current.Fog;
+        AtmosphereConditions.WeatherWind = Mathf.Max(0f, current.Wind);
+        AtmosphereConditions.WeatherMist = Mathf.Clamp01(current.Mist);
         if (wind != null)
         {
             wind.SetWeather(current.Wind, current.Gusts);

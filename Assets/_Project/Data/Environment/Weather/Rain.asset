@@ -18,6 +18,7 @@ MonoBehaviour:
   rain: 0.7
   clouds: 0.8
   fog: 1.8
+  mist: 0.25
   fogTint: {r: 0.55, g: 0.6, b: 0.65, a: 0.5}
   lightningPerMinute: 0
   minMinutes: 2

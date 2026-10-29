@@ -926,6 +926,15 @@ MonoBehaviour:
   mainLight:
     m_OverrideState: 1
     m_Value: 1
+  shaftDensity:
+    m_OverrideState: 1
+    m_Value: 0
+  shaftIntensity:
+    m_OverrideState: 1
+    m_Value: 2
+  shaftHeight:
+    m_OverrideState: 1
+    m_Value: 18
   anisotropy:
     m_OverrideState: 1
     m_Value: 0.45
@@ -938,9 +947,15 @@ MonoBehaviour:
   noiseStrength:
     m_OverrideState: 1
     m_Value: 0.6
+  driftSpeed:
+    m_OverrideState: 1
+    m_Value: 0
   wind:
     m_OverrideState: 1
     m_Value: {x: 0.6, y: 0.05, z: 0.3}
+  weatherWindInfluence:
+    m_OverrideState: 1
+    m_Value: 1
   bankSize:
     m_OverrideState: 1
     m_Value: 120

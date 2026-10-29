@@ -17,7 +17,7 @@ RenderSettings:
   m_Fog: 1
   m_FogColor: {r: 0.8, g: 0.74999285, b: 0.67999125, a: 1}
   m_FogMode: 3
-  m_FogDensity: 0.006
+  m_FogDensity: 0
   m_LinearFogStart: 0
   m_LinearFogEnd: 300
   m_AmbientSkyColor: {r: 0.83701336, g: 0.91800004, b: 1.052991, a: 1}
@@ -8129,7 +8129,7 @@ BoxCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Size: {x: 1, y: 4, z: 14.5}
   m_Center: {x: 0, y: 0, z: 0}
@@ -13366,7 +13366,7 @@ BoxCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Size: {x: 1, y: 4, z: 14.5}
   m_Center: {x: 0, y: 0, z: 0}
@@ -19850,6 +19850,10 @@ PrefabInstance:
     - target: {fileID: 6732680956308883498, guid: c7daa8f2fb6ef9c4a945c9f5c8b89e3b, type: 3}
       propertyPath: m_Name
       value: GreyStoneNode
+      objectReference: {fileID: 0}
+    - target: {fileID: 6732680956308883498, guid: c7daa8f2fb6ef9c4a945c9f5c8b89e3b, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -43111,7 +43115,7 @@ BoxCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Size: {x: 1, y: 4, z: 14.5}
   m_Center: {x: 0, y: 0, z: 0}
@@ -60673,7 +60677,7 @@ BoxCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Size: {x: 1, y: 4, z: 14.5}
   m_Center: {x: 0, y: 0, z: 0}
@@ -64367,7 +64371,7 @@ BoxCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Size: {x: 1, y: 4, z: 14.5}
   m_Center: {x: 0, y: 0, z: 0}
@@ -69486,6 +69490,9 @@ GameObject:
   - component: {fileID: 954570850}
   - component: {fileID: 954570849}
   - component: {fileID: 954570848}
+  - component: {fileID: 954570853}
+  - component: {fileID: 954570854}
+  - component: {fileID: 954570855}
   m_Layer: 0
   m_Name: Safe Haven Terrain
   m_TagString: Untagged
@@ -69684,7 +69691,7 @@ Terrain:
   m_StaticShadowCaster: 0
   m_IgnoreQualitySettings: 0
   m_ReflectionProbeUsage: 1
-  m_MaterialTemplate: {fileID: 2100000, guid: 4571419a68b56e44a83408a084a37c95, type: 2}
+  m_MaterialTemplate: {fileID: 2100000, guid: 55162576e0434ef4e9f0247de884b1d3, type: 2}
   m_BakeLightProbesForTrees: 1
   m_PreserveTreePrototypeLayers: 0
   m_DeringLightProbesForTrees: 1
@@ -69698,6 +69705,67 @@ Terrain:
   m_EnableTreesAndDetailsRayTracing: 0
   m_EnableHeightmapLODFrustumCulling: 1
   m_TreeMotionVectorModeOverride: 3
+--- !u!114 &954570853
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 954570846}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 50090a03477d8554fa1d0b47e4dcabde, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::TerrainSurface
+  profile: {fileID: 11400000, guid: 375ecb22a4e31034ea353339a56f7c12, type: 2}
+  quality: 3
+--- !u!114 &954570854
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 954570846}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ba67bb1f324657d418bf74b1204c6383, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::TerrainFootprints
+  stampShader: {fileID: 4800000, guid: a4ec8c8bc9d064e4eba99b3c5d2eeaef, type: 3}
+--- !u!114 &954570855
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 954570846}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 13b1172324ca34649930e22adcd62eef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::TerrainMist
+  density: 0.12
+  tint: {r: 0.8, g: 0.87, b: 0.94, a: 1}
+  skyLight: 0.2
+  bottom: 0.15
+  thickness: 3.5
+  cloudSize: 18
+  coverage: 0.65
+  erosion: 0.35
+  flowStretch: 3.5
+  wind: {x: 0.7, y: 0.25}
+  driftSpeed: 2.5
+  waveAmplitude: 0.5
+  waveLength: 12
+  waveSpeed: 0.6
+  lowlandBoost: 1.5
+  poolingDepth: 2
+  waterBoost: 2
+  edgeFade: 5
+  baseAmount: 0
+  weatherAmount: 1
+  goldenHourAmount: 1
+  weatherWindInfluence: 1
 --- !u!1001 &954845291
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -75762,7 +75830,7 @@ BoxCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Size: {x: 1, y: 4, z: 14.5}
   m_Center: {x: 0, y: 0, z: 0}
@@ -81881,6 +81949,10 @@ PrefabInstance:
     - target: {fileID: 2635725661611749432, guid: 490127f00d1dad143b56c0e7399a7110, type: 3}
       propertyPath: m_Name
       value: FallenLogNode
+      objectReference: {fileID: 0}
+    - target: {fileID: 5734859760328829701, guid: 490127f00d1dad143b56c0e7399a7110, type: 3}
+      propertyPath: m_Enabled
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -91102,7 +91174,7 @@ BoxCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Size: {x: 1, y: 4, z: 14.5}
   m_Center: {x: 0, y: 0, z: 0}
@@ -93760,7 +93832,7 @@ BoxCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Size: {x: 1, y: 4, z: 14.5}
   m_Center: {x: 0, y: 0, z: 0}
@@ -95211,7 +95283,7 @@ BoxCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Size: {x: 1, y: 4, z: 14.5}
   m_Center: {x: 0, y: 0, z: 0}
@@ -111672,6 +111744,7 @@ MonoBehaviour:
   climate: {fileID: 11400000, guid: 73c218396bceafc4f88b70affc4e9a1b, type: 2}
   startWeather: {fileID: 0}
   changesByItself: 1
+  weatherOnlyAtmosphere: 1
   wind: {fileID: 543998791}
   rain: {fileID: 1665316400}
   overcastVolume: {fileID: 779228786}
@@ -118593,7 +118666,7 @@ BoxCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Size: {x: 1, y: 4, z: 14.5}
   m_Center: {x: 0, y: 0, z: 0}
@@ -122208,7 +122281,7 @@ BoxCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Size: {x: 1, y: 4, z: 14.5}
   m_Center: {x: 0, y: 0, z: 0}
@@ -123067,7 +123140,7 @@ BoxCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Size: {x: 1, y: 4, z: 14.5}
   m_Center: {x: 0, y: 0, z: 0}
@@ -131259,7 +131332,7 @@ BoxCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Size: {x: 1, y: 4, z: 14.5}
   m_Center: {x: 0, y: 0, z: 0}
@@ -135814,7 +135887,7 @@ BoxCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Size: {x: 1, y: 4, z: 14.5}
   m_Center: {x: 0, y: 0, z: 0}
@@ -140074,7 +140147,7 @@ BoxCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Size: {x: 1, y: 4, z: 14.5}
   m_Center: {x: 0, y: 0, z: 0}
@@ -151697,7 +151770,7 @@ BoxCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Size: {x: 1, y: 4, z: 14.5}
   m_Center: {x: 0, y: 0, z: 0}
@@ -156403,19 +156476,54 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5943822763764690748, guid: 7c9023ff58d8fd54fad4fbace119c49b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8243610294833734714}
+    - targetCorrespondingSourceObject: {fileID: 5943822763764690748, guid: 7c9023ff58d8fd54fad4fbace119c49b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8243610294833734713}
   m_SourcePrefab: {fileID: 100100000, guid: 7c9023ff58d8fd54fad4fbace119c49b, type: 3}
 --- !u!114 &8243610294833734711 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 393527493262788704, guid: 7c9023ff58d8fd54fad4fbace119c49b, type: 3}
   m_PrefabInstance: {fileID: 8243610294833734710}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 8243610294833734712}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0e0c0f7f648201c4cadbfbcf6ad04e7c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ResourceInventory
+--- !u!1 &8243610294833734712 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5943822763764690748, guid: 7c9023ff58d8fd54fad4fbace119c49b, type: 3}
+  m_PrefabInstance: {fileID: 8243610294833734710}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &8243610294833734713
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8243610294833734712}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d4cc3073dcea6e4ba021c0f55f87a5e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::PlayerTerrainFootprints
+--- !u!114 &8243610294833734714
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8243610294833734712}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 680e4025dcff3924098ef436f38fff41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::PlayerAudio
 --- !u!1001 &8536624609235332028
 PrefabInstance:
   m_ObjectHideFlags: 0

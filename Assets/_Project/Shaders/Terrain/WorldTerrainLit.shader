@@ -40,6 +40,36 @@ Shader "Safe Haven/Terrain (World)"
         [HideInInspector] _TerrainHolesTexture("Holes Map (RGB)", 2D) = "white" {}
 
 
+        [Header(Geometric displacement)]
+        _DisplacementStrength("Displacement Height Range (metres)", Range(0, 1)) = 0
+        _DisplacementNear("Full Detail Distance (metres)", Float) = 8
+        _DisplacementFar("Detail Fade Distance (metres)", Float) = 35
+        _TessellationFactor("Maximum Tessellation", Range(1, 64)) = 8
+        _TessellationEdgeLength("Target Edge Length (metres)", Float) = 0.08
+        _TessellationPixels("Target Edge Length (pixels, 0 disables)", Range(0, 32)) = 0
+        _DisplacementMip("Height Smoothing (mip level)", Range(0, 5)) = 0
+        _HeightBlendSharpness("Height Blend Sharpness", Range(0, 8)) = 0
+        [Header(Surface lighting)]
+        _DisplacementNormalStrength("Height Normal Strength", Range(0, 2)) = 1
+        _NormalMapStrength("Normal Map Strength", Range(0, 3)) = 1
+        _SurfaceOcclusion("Occlusion Strength", Range(0, 2)) = 1
+        _SurfaceSmoothness("Smoothness Multiplier", Range(0, 2)) = 1
+        [Enum(Lit,0,Height,1,WorldNormals,2,Footprints,3)] _SurfaceDebug("Surface Preview", Float) = 0
+        [HideInInspector] _TerrainDetailQuality("Runtime Detail Quality", Vector) = (1,1,1,1)
+        [HideInInspector] _FootprintField("Runtime Footprints", 2D) = "black" {}
+        [HideInInspector] _FootprintArea("Footprint Origin and Inverse Size", Vector) = (0,0,1,0)
+        [HideInInspector] _FootprintSettings("Footprint Depth and Flattening", Vector) = (0,0,0,0)
+        [HideInInspector] _FootprintDarkening("Runtime Footprint Darkening", Float) = 0
+        [HideInInspector] _DisplacementTerrainSize("Terrain Size and Normal Sample Step", Vector) = (1,1,0.01,0)
+        [HideInInspector] _DisplacementDataVersion("Height Data Version", Float) = 0
+        [HideInInspector] _DisplacementLayerCount("Displacement Layers", Float) = 0
+        [HideInInspector] _DisplacementMasks("Displacement Masks", 2DArray) = "" {}
+        [HideInInspector] _DisplacementLayers("Displacement Layer Data", 2D) = "black" {}
+        [HideInInspector] _DisplacementControl0("Displacement Control 0", 2D) = "black" {}
+        [HideInInspector] _DisplacementControl1("Displacement Control 1", 2D) = "black" {}
+        [HideInInspector] _DisplacementControl2("Displacement Control 2", 2D) = "black" {}
+        [HideInInspector] _DisplacementControl3("Displacement Control 3", 2D) = "black" {}
+
         [Header(Rock on steep ground)]
         _CliffStrength("Rock on Steep Ground", Range(0, 1)) = 1
         _CliffSlopeStart("Rock Starts At (degrees)", Range(0, 90)) = 36
@@ -70,9 +100,11 @@ Shader "Safe Haven/Terrain (World)"
             Name "ForwardLit"
             Tags { "LightMode" = "UniversalForward" }
             HLSLPROGRAM
-            #pragma target 3.0
+            #pragma target 4.6
 
-            #pragma vertex SplatmapVert
+            #pragma vertex WorldTessVertex
+            #pragma hull WorldHull
+            #pragma domain WorldDomain
             #pragma fragment SplatmapFragment
 
             #define _METALLICSPECGLOSSMAP 1
@@ -128,6 +160,11 @@ Shader "Safe Haven/Terrain (World)"
 
             #include "Packages/com.unity.render-pipelines.universal/Shaders/Terrain/TerrainLitInput.hlsl"
             #include "WorldTerrainLitPasses.hlsl"
+                        #define WORLD_ATTRIBUTES Attributes
+            #define WORLD_VARYINGS Varyings
+            #define WORLD_POSITION positionOS
+            #define WORLD_VERTEX SplatmapVert
+            #include "WorldTerrainDomain.hlsl"
             ENDHLSL
         }
 
@@ -140,9 +177,11 @@ Shader "Safe Haven/Terrain (World)"
             ColorMask 0
 
             HLSLPROGRAM
-            #pragma target 2.0
+            #pragma target 4.6
 
-            #pragma vertex ShadowPassVertex
+            #pragma vertex WorldTessVertex
+            #pragma hull WorldHull
+            #pragma domain WorldDomain
             #pragma fragment ShadowPassFragment
 
             #pragma multi_compile_instancing
@@ -152,10 +191,15 @@ Shader "Safe Haven/Terrain (World)"
             // Universal Pipeline keywords
 
             // This is used during shadow map generation to differentiate between directional and punctual light shadows, as they use different formulas to apply Normal Bias
-            #pragma multi_compile_vertex _ _CASTING_PUNCTUAL_LIGHT_SHADOW
+            #pragma multi_compile _ _CASTING_PUNCTUAL_LIGHT_SHADOW
 
             #include "Packages/com.unity.render-pipelines.universal/Shaders/Terrain/TerrainLitInput.hlsl"
             #include "WorldTerrainLitPasses.hlsl"
+                        #define WORLD_ATTRIBUTES AttributesLean
+            #define WORLD_VARYINGS VaryingsLean
+            #define WORLD_POSITION position
+            #define WORLD_VERTEX ShadowPassVertex
+            #include "WorldTerrainDomain.hlsl"
             ENDHLSL
         }
 
@@ -165,13 +209,15 @@ Shader "Safe Haven/Terrain (World)"
             Tags{"LightMode" = "UniversalGBuffer"}
 
             HLSLPROGRAM
-            #pragma target 4.5
+            #pragma target 4.6
 
             // Deferred Rendering Path does not support the OpenGL-based graphics API:
             // Desktop OpenGL, OpenGL ES 3.0, WebGL 2.0.
             #pragma exclude_renderers gles3 glcore
 
-            #pragma vertex SplatmapVert
+            #pragma vertex WorldTessVertex
+            #pragma hull WorldHull
+            #pragma domain WorldDomain
             #pragma fragment SplatmapFragment
 
             #define _METALLICSPECGLOSSMAP 1
@@ -221,6 +267,11 @@ Shader "Safe Haven/Terrain (World)"
             #include "Packages/com.unity.render-pipelines.universal/Shaders/Terrain/TerrainLitInput.hlsl"
             #include "WorldTerrainLitPasses.hlsl"
             #include_with_pragmas "Packages/com.unity.render-pipelines.universal/ShaderLibrary/GBufferOutputFormat.hlsl"
+                        #define WORLD_ATTRIBUTES Attributes
+            #define WORLD_VARYINGS Varyings
+            #define WORLD_POSITION positionOS
+            #define WORLD_VERTEX SplatmapVert
+            #include "WorldTerrainDomain.hlsl"
             ENDHLSL
         }
 
@@ -233,9 +284,11 @@ Shader "Safe Haven/Terrain (World)"
             ColorMask R
 
             HLSLPROGRAM
-            #pragma target 2.0
+            #pragma target 4.6
 
-            #pragma vertex DepthOnlyVertex
+            #pragma vertex WorldTessVertex
+            #pragma hull WorldHull
+            #pragma domain WorldDomain
             #pragma fragment DepthOnlyFragment
 
             #pragma multi_compile_instancing
@@ -243,6 +296,11 @@ Shader "Safe Haven/Terrain (World)"
 
             #include "Packages/com.unity.render-pipelines.universal/Shaders/Terrain/TerrainLitInput.hlsl"
             #include "WorldTerrainLitPasses.hlsl"
+                        #define WORLD_ATTRIBUTES AttributesLean
+            #define WORLD_VARYINGS VaryingsLean
+            #define WORLD_POSITION position
+            #define WORLD_VERTEX DepthOnlyVertex
+            #include "WorldTerrainDomain.hlsl"
             ENDHLSL
         }
 
@@ -255,8 +313,10 @@ Shader "Safe Haven/Terrain (World)"
             ZWrite On
 
             HLSLPROGRAM
-            #pragma target 2.0
-            #pragma vertex DepthNormalOnlyVertex
+            #pragma target 4.6
+            #pragma vertex WorldTessVertex
+            #pragma hull WorldHull
+            #pragma domain WorldDomain
             #pragma fragment DepthNormalOnlyFragment
 
             #pragma shader_feature_local _NORMALMAP
@@ -268,7 +328,12 @@ Shader "Safe Haven/Terrain (World)"
             #pragma instancing_options assumeuniformscaling nomatrices nolightprobe nolightmap
 
             #include "Packages/com.unity.render-pipelines.universal/Shaders/Terrain/TerrainLitInput.hlsl"
-            #include "Packages/com.unity.render-pipelines.universal/Shaders/Terrain/TerrainLitDepthNormalsPass.hlsl"
+            #include "WorldTerrainDepthNormals.hlsl"
+                        #define WORLD_ATTRIBUTES AttributesDepthNormal
+            #define WORLD_VARYINGS VaryingsDepthNormal
+            #define WORLD_POSITION positionOS
+            #define WORLD_VERTEX DepthNormalOnlyVertex
+            #include "WorldTerrainDomain.hlsl"
             ENDHLSL
         }
 
@@ -278,9 +343,11 @@ Shader "Safe Haven/Terrain (World)"
             Tags { "LightMode" = "SceneSelectionPass" }
 
             HLSLPROGRAM
-            #pragma target 2.0
+            #pragma target 4.6
 
-            #pragma vertex DepthOnlyVertex
+            #pragma vertex WorldTessVertex
+            #pragma hull WorldHull
+            #pragma domain WorldDomain
             #pragma fragment DepthOnlyFragment
 
             #pragma multi_compile_instancing
@@ -289,6 +356,11 @@ Shader "Safe Haven/Terrain (World)"
             #define SCENESELECTIONPASS
             #include "Packages/com.unity.render-pipelines.universal/Shaders/Terrain/TerrainLitInput.hlsl"
             #include "WorldTerrainLitPasses.hlsl"
+                        #define WORLD_ATTRIBUTES AttributesLean
+            #define WORLD_VARYINGS VaryingsLean
+            #define WORLD_POSITION position
+            #define WORLD_VERTEX DepthOnlyVertex
+            #include "WorldTerrainDomain.hlsl"
             ENDHLSL
         }
 
@@ -318,8 +390,8 @@ Shader "Safe Haven/Terrain (World)"
 
         UsePass "Hidden/Nature/Terrain/Utilities/PICKING"
     }
-    Dependency "AddPassShader" = "Hidden/Universal Render Pipeline/Terrain/Lit (Add Pass)"
-    Dependency "BaseMapShader" = "Hidden/Universal Render Pipeline/Terrain/Lit (Base Pass)"
+    Dependency "AddPassShader" = "Hidden/Safe Haven/Terrain/Add"
+    Dependency "BaseMapShader" = "Hidden/Safe Haven/Terrain/Base"
     Dependency "BaseMapGenShader" = "Hidden/Universal Render Pipeline/Terrain/Lit (Basemap Gen)"
 
     Fallback "Hidden/Universal Render Pipeline/FallbackError"

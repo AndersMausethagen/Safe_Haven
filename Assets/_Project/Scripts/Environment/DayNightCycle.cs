@@ -106,7 +106,7 @@ public sealed class DayNightCycle : MonoBehaviour, ISaveable
     private void OnDisable()
     {
         Shader.SetGlobalFloat(NightId, 0f);
-        AtmosphereConditions.WeatherFog = 1f;
+        AtmosphereConditions.GoldenHour = 0f;
         AtmosphereConditions.Night = 0f;
     }
 
@@ -137,8 +137,9 @@ public sealed class DayNightCycle : MonoBehaviour, ISaveable
 
         DayNightState state = profile.Evaluate(hour);
         State = state;
-        WeatherState sky = weather != null ? weather.Current : WeatherState.Clear;
-        float flash = weather != null ? weather.LightningFlash * (0.6f + 0.4f * Mathf.PerlinNoise(Time.time * 30f, 0f)) : 0f;
+        bool hasWeather = weather != null && weather.isActiveAndEnabled;
+        WeatherState sky = hasWeather ? weather.Current : WeatherState.Clear;
+        float flash = hasWeather ? weather.LightningFlash * (0.6f + 0.4f * Mathf.PerlinNoise(Time.time * 30f, 0f)) : 0f;
 
         sun.transform.rotation = state.LightRotation;
         sun.useColorTemperature = false;
@@ -163,8 +164,7 @@ public sealed class DayNightCycle : MonoBehaviour, ISaveable
         Color tint = sky.FogTint * (Brightness(state.FogColour) / Mathf.Max(Brightness(sky.FogTint), 0.05f));
         RenderSettings.fogColor = Color.Lerp(state.FogColour, tint, sky.FogTint.a) + flashAmbient * 0.3f;
         RenderSettings.fogDensity = state.FogDensity * sky.Fog;
-        // The volumetric fog thickens with the weather too (Atmospheric Fog › Weather Influence).
-        AtmosphereConditions.WeatherFog = sky.Fog;
+        AtmosphereConditions.GoldenHour = state.GoldenHour * (1f - sky.Clouds);
         AtmosphereConditions.Night = state.Night;
         RenderSettings.reflectionIntensity = state.Reflection * (1f - 0.4f * sky.Clouds);
 

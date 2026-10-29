@@ -29,6 +29,10 @@ public sealed class PlayerAudio : MonoBehaviour
     private float airborne;
     private readonly Foot left = new Foot();
     private readonly Foot right = new Foot();
+    private bool fallbackLeft;
+
+    /// <summary>A grounded moving foot contact, shared by sound and terrain impressions.</summary>
+    public event System.Action<Vector3, Vector3> FootPlanted;
 
     private sealed class Foot
     {
@@ -48,6 +52,8 @@ public sealed class PlayerAudio : MonoBehaviour
             left.Bone = animator.GetBoneTransform(HumanBodyBones.LeftFoot);
             right.Bone = animator.GetBoneTransform(HumanBodyBones.RightFoot);
         }
+        if (!TryGetComponent(out PlayerTerrainFootprints _))
+            gameObject.AddComponent<PlayerTerrainFootprints>();
     }
 
     private void OnEnable()
@@ -71,7 +77,8 @@ public sealed class PlayerAudio : MonoBehaviour
     private void OnFootstepEvent()
     {
         lastEventStep = Time.time;
-        Step();
+        Step(left.Bone != null && right.Bone != null
+            ? (left.Bone.position.y <= right.Bone.position.y ? left.Bone : right.Bone) : null);
     }
 
     private void OnLanded() => AudioManager.Play(AudioManager.Sounds != null ? AudioManager.Sounds.Land : null, transform.position);
@@ -79,7 +86,7 @@ public sealed class PlayerAudio : MonoBehaviour
     // After the animator has posed the feet this frame.
     private void LateUpdate()
     {
-        if (movement == null || AudioManager.Sounds == null)
+        if (movement == null)
         {
             return;
         }
@@ -107,12 +114,12 @@ public sealed class PlayerAudio : MonoBehaviour
 
         if (!walking || eventsDrive)
         {
-            distanceSinceStep = Mathf.Min(distanceSinceStep, AudioManager.Sounds.StrideLength * 0.5f);
+            distanceSinceStep = Mathf.Min(distanceSinceStep, StrideLength * 0.5f);
             return;
         }
 
         distanceSinceStep += movement.HorizontalSpeed * Time.deltaTime;
-        if (distanceSinceStep >= AudioManager.Sounds.StrideLength)
+        if (distanceSinceStep >= StrideLength)
         {
             distanceSinceStep = 0f;
             Step();
@@ -130,7 +137,7 @@ public sealed class PlayerAudio : MonoBehaviour
             // The bottom of a fall: a step if the foot was really lifted and came down near the ground.
             if (counts && foot.Peak - height >= MinimumFall && height < PlantHeight && Time.time - lastStep >= MinimumStepGap)
             {
-                Step();
+                Step(foot.Bone);
             }
 
             foot.Peak = height;
@@ -140,10 +147,19 @@ public sealed class PlayerAudio : MonoBehaviour
         foot.Height = height;
     }
 
-    private void Step()
+    private float StrideLength => AudioManager.Sounds != null ? AudioManager.Sounds.StrideLength : 0.7f;
+
+    private void Step(Transform foot = null)
     {
         lastStep = Time.time;
         AudioManager.Play(SurfaceSound(transform.position), transform.position);
+        if (movement != null && movement.IsGrounded && !movement.IsDashing && movement.HorizontalSpeed >= MinimumMovingSpeed)
+        {
+            fallbackLeft = !fallbackLeft;
+            Vector3 position = foot != null ? foot.position
+                : transform.position + transform.right * (fallbackLeft ? -0.1f : 0.1f);
+            FootPlanted?.Invoke(position, transform.forward);
+        }
     }
 
     /// <summary>The footstep for the ground at <paramref name="position"/>.</summary>

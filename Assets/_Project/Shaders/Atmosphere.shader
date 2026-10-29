@@ -32,9 +32,24 @@ Shader "Hidden/Safe Haven/Atmosphere"
         float4 _FogAlbedo;
         float4 _FogAmbient;
         float4 _FogWind;
+        float _FogDriftSpeed;
+        float4 _ShaftParams;                         // density, intensity, height
+        float _HasFogGround;
+        float _AtmosphereShadowCascades;
+        #define MAX_TERRAIN_MISTS 4
+        int _TerrainMistCount;
+        float4 _TerrainMistRects[MAX_TERRAIN_MISTS]; // x, z, width, depth
+        float4 _TerrainMistShapes[MAX_TERRAIN_MISTS];// density, bottom, thickness, edge fade
+        float4 _TerrainMistClouds[MAX_TERRAIN_MISTS];// inverse size, coverage, erosion, flow stretch
+        float4 _TerrainMistWinds[MAX_TERRAIN_MISTS]; // world x/z velocity, integrated time offset, weather agitation
+        float4 _TerrainMistTints[MAX_TERRAIN_MISTS]; // linear tint, sky fill
+        float4 _TerrainMistWaves[MAX_TERRAIN_MISTS]; // amplitude, wavelength, travel speed
+        float4 _TerrainMistPooling[MAX_TERRAIN_MISTS]; // lowland boost, depression depth, water boost
+        float _HasMistHabitat;
         float _FogLightCount;
         float4 _FogLightPositions[MAX_FOG_LIGHTS];   // xyz, range
         float4 _FogLightColors[MAX_FOG_LIGHTS];      // linear rgb × intensity
+        float4 _FogLightClearings[MAX_FOG_LIGHTS];   // radius, strength, edge softness
         float _SourceCount;
         float4 _Sources[MAX_SOURCES];                // x, z, radius, softness
         #define MAX_FOG_AREAS 8
@@ -113,9 +128,10 @@ Shader "Hidden/Safe Haven/Atmosphere"
             Name "March"
 
             HLSLPROGRAM
+            #pragma target 3.5
             #pragma vertex Vert
             #pragma fragment FragMarch
-            #pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE
+            #pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE _MAIN_LIGHT_SHADOWS_SCREEN
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
 
             // Ground height under a point, from FogGround's baked height field.
@@ -152,21 +168,112 @@ Shader "Hidden/Safe Haven/Atmosphere"
 
                 float above = max(0.0, p.y - baseHeight);
                 float density = _FogParams0.x * exp(-above * _FogParams0.z);
-                float3 drift = p * _FogParams1.z - _Time.y * _FogWind.xyz * _FogParams1.z;
+                float windTime = (_Time.y + _FogWind.w) * _FogDriftSpeed;
+                float3 drift = p * _FogParams1.z - windTime * _FogWind.xyz * _FogParams1.z;
                 float patch = saturate(FogNoise(drift) * 1.7 - 0.25);
                 density *= lerp(1.0, patch, _FogParams1.w);
 
                 // Large banks rolling over the land: thick where the slow noise is high, clear stretches between.
                 if (_FogParams3.z > 0.0)
                 {
-                    float2 bankUV = p.xz * _FogParams3.y - _Time.y * _FogWind.xz * _FogParams3.w * _FogParams3.y;
-                    float bank = smoothstep(0.3, 0.7, ValueNoise(float3(bankUV, _Time.y * 0.004)));
+                    float2 bankUV = p.xz * _FogParams3.y - windTime * _FogWind.xz * _FogParams3.w * _FogParams3.y;
+                    float bank = smoothstep(0.3, 0.7, ValueNoise(float3(bankUV, windTime * 0.004)));
                     density *= lerp(1.0, bank * 2.0, _FogParams3.z);
                 }
 
                 density += AreaDensity(p) * lerp(1.0, patch, _FogParams1.w * 0.5);
                 density *= 1.0 - _FogParams2.z * Visibility(p.xz);
                 return density;
+            }
+
+            float MistDensity(float3 p, out float3 tintDensity, out float3 skyDensity)
+            {
+                tintDensity = 0.0;
+                skyDensity = 0.0;
+                if (_TerrainMistCount == 0)
+                    return 0.0;
+
+                float4 habitat = 0.0;
+                if (_HasMistHabitat > 0.0)
+                    habitat = SAMPLE_TEXTURE2D_LOD(_GroundTex, sampler_LinearClamp,
+                        saturate((p.xz - _GroundRect.xy) * _GroundRect.zw), 0);
+                float supportHeight = _HasMistHabitat > 0.0
+                    ? _GroundRange.x + habitat.g * _GroundRange.y : GroundHeight(p.xz);
+                float height = p.y - supportHeight;
+                float density = 0.0;
+                for (int i = 0; i < _TerrainMistCount; i++)
+                {
+                    float4 rect = _TerrainMistRects[i];
+                    float4 shape = _TerrainMistShapes[i];
+                    float4 cloud = _TerrainMistClouds[i];
+                    float2 local = p.xz - rect.xy;
+                    float edge = min(min(local.x, local.y), min(rect.z - local.x, rect.w - local.y));
+                    if (edge <= 0.0 || height <= shape.y)
+                        continue;
+
+                    float windTime = _Time.y + _TerrainMistWinds[i].z;
+                    float2 velocity = _TerrainMistWinds[i].xy;
+                    float speed = length(velocity);
+                    float2 along = speed > 0.0001 ? velocity / speed : float2(1.0, 0.0);
+                    float2 across = float2(-along.y, along.x);
+                    float4 waves = _TerrainMistWaves[i];
+                    float agitation = _TerrainMistWinds[i].w;
+                    float2 waveDrift = (p.xz - along * windTime * waves.z) / max(1.0, waves.y);
+                    float3 waveUV = float3(dot(waveDrift, along), dot(waveDrift, across), windTime * waves.z * 0.025);
+                    float2 bend = float2(
+                        ValueNoise(waveUV * 0.57 + 17.31),
+                        ValueNoise(waveUV.yxz * 0.83 + 43.79)) - 0.5;
+                    // Irregular rolling fronts, not a periodic sine train of evenly spaced patches.
+                    float3 rolling = waveUV + float3(bend * (1.8 + agitation * 0.45), 0.0);
+                    float broad = ValueNoise(rolling);
+                    float crossing = ValueNoise(float3(rolling.x * 0.61 - rolling.y * 0.79,
+                        rolling.x * 0.79 + rolling.y * 0.61, rolling.z * 1.37) * 1.73 + 9.41);
+                    float crest = smoothstep(0.18, 0.82, broad * 0.65 + crossing * 0.35);
+                    float roll = crest * 2.0 - 1.0;
+                    float band = (height - shape.y) / (shape.z + waves.x * crest);
+                    if (band >= 1.0)
+                        continue;
+                    float2 drift = (p.xz - windTime * velocity) * cloud.x;
+                    drift += (across * roll + along * bend.y) * (waves.x * (3.0 + agitation * 2.0) * cloud.x);
+                    float stretch = sqrt(max(1.0, cloud.w));
+                    float3 uv = float3(dot(drift, along) / stretch, dot(drift, across) * stretch, band * 0.7);
+                    // Advect the broad veil while smaller wisps shear and roll inside it.
+                    float phase = windTime * speed * cloud.x;
+                    float evolution = phase * (0.12 + agitation * 0.16);
+                    float warp = ValueNoise(uv * 0.63 + 13.7 + float3(0.0, evolution, evolution * 0.67)) - 0.5;
+                    float3 deformed = uv + float3(warp * (1.8 + agitation * 0.6), bend.x, evolution * 0.35);
+                    float billow = FogNoise(deformed);
+                    float detail = ValueNoise(deformed * 4.1 + 29.3 + float3(-phase * 0.7, phase * 0.35, phase * 0.4));
+                    float threshold = lerp(0.78, 0.15, cloud.y);
+                    float coverage = smoothstep(threshold - 0.04, threshold + 0.22, billow - (1.0 - detail) * cloud.z * (0.25 + agitation * 0.08));
+                    // Dense close to the ground, rapidly thinning above the flowing core.
+                    float above = 1.0 - band;
+                    float vertical = 2.5 * smoothstep(0.0, 0.06, band) * above * above * above;
+                    float4 pooling = _TerrainMistPooling[i];
+                    float pooled = 1.0 + pooling.x * saturate(habitat.a / max(0.1, pooling.y)) + pooling.z * habitat.b;
+                    float waveDensity = lerp(1.0, 0.45 + 1.25 * crest, saturate(waves.x * 2.0));
+                    float cloudDensity = shape.x * coverage * vertical * waveDensity * pooled * smoothstep(0.0, shape.w, edge);
+                    density += cloudDensity;
+                    tintDensity += _TerrainMistTints[i].rgb * cloudDensity;
+                    skyDensity += _TerrainMistTints[i].rgb * (_TerrainMistTints[i].w * cloudDensity);
+                }
+                return density;
+            }
+
+            // Screen-space shadows describe the opaque surface, not a sample floating in the air.
+            // Always sample the directional atlas at the raymarch position, including on screen-shadow renderers.
+            float AirShadow(float3 p)
+            {
+            #if defined(MAIN_LIGHT_CALCULATE_SHADOWS)
+                half cascade = _AtmosphereShadowCascades > 1.0 ? ComputeCascadeIndex(p) : 0;
+                float4 coord = float4(mul(_MainLightWorldToShadow[cascade], float4(p, 1.0)).xyz, 1.0);
+                half4 parameters = GetMainLightShadowParams();
+                parameters.x = 1.0;
+                return SampleShadowmap(TEXTURE2D_SHADOW_ARGS(_MainLightShadowmapTexture, sampler_LinearClampCompare),
+                    coord, GetMainLightShadowSamplingData(), parameters, false);
+            #else
+                return 1.0;
+            #endif
             }
 
             // Henyey-Greenstein, scaled so isotropic scattering is 1.
@@ -193,6 +300,23 @@ Shader "Hidden/Safe Haven/Atmosphere"
                     }
                 }
                 return light;
+            }
+
+            float LightFogRemaining(float3 p)
+            {
+                float clearing = 0.0;
+                for (int i = 0; i < (int)_FogLightCount; i++)
+                {
+                    float3 settings = _FogLightClearings[i].xyz;
+                    if (settings.x > 0.0 && settings.y > 0.0)
+                    {
+                        float radius = settings.x;
+                        float inner = radius * (1.0 - settings.z);
+                        float amount = 1.0 - smoothstep(inner, radius, distance(p, _FogLightPositions[i].xyz));
+                        clearing = max(clearing, amount * settings.y);
+                    }
+                }
+                return 1.0 - saturate(clearing);
             }
 
             float4 FragMarch(Varyings input) : SV_Target
@@ -222,11 +346,36 @@ Shader "Hidden/Safe Haven/Atmosphere"
                 float3 p = origin + direction * (stepLength * jitter);
                 for (int i = 0; i < steps; i++)
                 {
-                    float density = Density(p);
+                    float fogDensity = Density(p);
+                    float3 mistTintDensity, mistSkyDensity;
+                    float mistDensity = MistDensity(p, mistTintDensity, mistSkyDensity);
+                    float shaftDensity = 0.0;
+                    if (_ShaftParams.x > 0.0)
+                    {
+                        float ground = _HasFogGround > 0.0 ? GroundHeight(p.xz) : _FogParams0.y;
+                        shaftDensity = _ShaftParams.x * exp(-max(0.0, p.y - ground) / _ShaftParams.z);
+                    }
+                #if defined(MAIN_LIGHT_CALCULATE_SHADOWS)
+                    shaftDensity *= 1.0 - GetMainLightShadowFade(p);
+                #else
+                    shaftDensity = 0.0;
+                #endif
+                    float remaining = LightFogRemaining(p);
+                    fogDensity *= remaining;
+                    mistDensity *= remaining;
+                    mistTintDensity *= remaining;
+                    mistSkyDensity *= remaining;
+                    shaftDensity *= remaining;
+                    float density = fogDensity + mistDensity + shaftDensity;
                     if (density > 1e-5)
                     {
-                        float shadow = MainLightRealtimeShadow(TransformWorldToShadowCoord(p));
-                        float3 scatter = (_FogAmbient.rgb + sunLight * shadow + LocalLights(p) * _FogParams1.y) * _FogAlbedo.rgb;
+                        float occlusion = AirShadow(p);
+                        float shadow = lerp(1.0, occlusion, GetMainLightShadowParams().x);
+                        float3 directLight = sunLight * shadow + LocalLights(p) * _FogParams1.y;
+                        float3 scatter = (_FogAmbient.rgb + directLight) * _FogAlbedo.rgb;
+                        float3 shafts = mainLight.color * phase * _ShaftParams.y * occlusion;
+                        scatter = (scatter * fogDensity + mistTintDensity * directLight + mistSkyDensity
+                            + shafts * _FogAlbedo.rgb * shaftDensity) / density;
                         float stepTransmittance = exp(-density * stepLength);
                         gathered += transmittance * (1.0 - stepTransmittance) * scatter;
                         transmittance *= stepTransmittance;

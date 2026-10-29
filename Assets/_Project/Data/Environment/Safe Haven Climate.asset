@@ -24,4 +24,6 @@ MonoBehaviour:
     chance: 1.5
   - weather: {fileID: 11400000, guid: fb724509576cf1a4290415d1a7e0fdd3, type: 2}
     chance: 0.5
+  - weather: {fileID: 11400000, guid: f42530a2c0060db4185f9e18da004943, type: 2}
+    chance: 1
   transitionSeconds: 45

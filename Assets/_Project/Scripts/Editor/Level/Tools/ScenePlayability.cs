@@ -358,6 +358,7 @@ public static class ScenePlayability
             }
         }
 
+        AtmosphereSetup.EnsureSceneDefaults(scene);
         SaveableEntityTools.AssignSceneIds(scene);
         Undo.CollapseUndoOperations(group);
         EditorSceneManager.MarkSceneDirty(scene);

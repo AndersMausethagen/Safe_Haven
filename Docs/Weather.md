@@ -7,12 +7,17 @@ saved hour. The weather is not saved (a loaded game starts at the start weather)
 
 ## Use
 
-1. Open the scene and run **Safe Haven > World > Sky and Weather > Add Day, Night and Weather to Scene**. It creates
+1. New Unity scenes automatically receive weather, day/night, weather-driven terrain mist and volumetric sun/moon
+   support. This applies to normal Single-mode creation, not additive tooling/preview scenes.
+   For an existing scene, use **World Tools > Sky & Weather > Complete Scene Environment**, or
+   **Safe Haven > World > Sky and Weather > Add Day, Night and Weather to Scene**. It creates
    the data assets if they are missing and adds a `Sky and Weather` object wired to the scene's directional light and
-   Moss Wind. SafeHaven.unity already has one.
+   Moss Wind. Missing sunlight is created with shadows; existing profile/reference tuning is preserved.
+   Terrain mist is added automatically when terrain is added later. Continuous fog is optional and separate from
+   light shafts; see [Atmosphere](Atmosphere.md). Scene changes are not automatically saved.
 2. Preview in the editor:
    - **Day Night › Start Hour** shows any time of day.
-   - **Weather › Start Weather** shows a weather (Clear, Breezy, Mist, Rain, Storm).
+   - **Weather › Start Weather** shows a weather (Clear, Breezy, Mist, Fog, Rain, Storm).
    - In Play mode the clock runs (24 real minutes per day) and the climate changes the weather every few minutes.
 3. From code:
    - `DayNightCycle.Hour` (read it, or set it to jump the clock, e.g. after sleeping), `IsNight`, `ClockRuns`.
@@ -24,6 +29,11 @@ saved hour. The weather is not saved (a loaded game starts at the start weather)
   - drag the hour, or jump to dawn, morning, noon, golden hour, dusk or night;
   - run the clock ×1, ×10, ×60 or ×240, or pause it;
   - switch weather instantly or blended over a few seconds;
+  - compare **Mist**, **Breezy + Mist** and **Storm + Mist**: the combinations retain the base weather's
+    wind/gusts, rain, clouds, fog and lightning, but use Mist's full ground-mist amount. Wind scales
+    mist drift and wave travel (default multipliers 0.4 / 1.6 / 2.8); Fog stays stationary.
+    They are ordinary editable weather assets, selectable as Start Weather too, but are not added
+    to the random climate automatically. Disable **Climate changes the weather** to hold a Play-mode test;
   - stop the climate changing the weather;
   - strike lightning.
   In edit mode, **Make This the Start Hour / Start Weather** saves the preview as the scene's start.
@@ -62,6 +72,9 @@ Labels below each segment give its name and start time. The two night segments j
   readable shadows from the game camera.
 - **Colours over the day:** the profile's gradients (0..1 = 0..24 h) and curves (in hours). Keep their dawn and
   dusk keys near sunrise and sunset.
+- **SafeHaven daytime colour grading:** the base `SafeHaven_Volume` uses Saturation **16**, Contrast **15**
+  and Post Exposure **0.05** for stronger colour without adding more brightness. Night, Golden Hour and
+  Overcast keep their own authored overrides; this is a scene look, not a change to weather or terrain textures.
 - **Night brightness:** Moon Intensity and the night ends of the ambient gradients. Raise them if nights are too dark
   to play.
 - **Shadow readability:** the profile's **Shadow Fill** multiplies all the ambient light (the only light in shade;
@@ -73,7 +86,17 @@ Labels below each segment give its name and start time. The two night segments j
 - **A weather's look:**
   - Wind multiplies the Moss Wind.
   - Clouds dim the sun and soften shadows.
-  - Fog multiplies the hour's fog, and Fog Tint mixes in by its alpha.
+  - Fog multiplies the hour's fog, and Fog Tint mixes in by its alpha. Clear/Breezy use Fog 0 and Mist 0.
+    Mist is a separate ground-cloud weather (Mist 1, Fog 0), while Fog is a distance/volumetric fog weather
+    (Fog 2.2, Mist 0). Both appear in the default climate with weight 1; Clear 5, Breezy 3, Rain 1.5, Storm 0.5.
+  - **Weather Only Atmosphere** (on by default on Weather) fully gates global fog by the weather and suppresses
+    Terrain Mist's Base/Golden Hour amounts. Thus even a clear dawn/dusk is mist-free, without disabling shafts.
+    Disable this explicitly to restore authored constant/golden-hour mist and partial fog weather influence.
+  - **Mist** independently controls terrain-following cloud pockets, blended by the same WeatherSystem. It can coexist
+    with fog or run alone. On Terrain Mist use Base Amount 0 and Weather Amount 1 for weather-driven clouds.
+  - **Wind** scales mist drift and wave travel when Weather Wind Influence is 1. Fog stays stationary unless
+    its Drift Speed is explicitly raised above 0. Storms speed mist up without pattern
+    jumps. DayNightCycle's existing golden-hour curve drives Terrain Mist's Golden Hour Amount at dawn/dusk.
   - Lightning Per Minute sets the strike rate.
   - Min/Max Minutes set how long it lasts.
 - **How often each weather comes up:** the climate's Chance. Make another climate (Create › Safe Haven ›

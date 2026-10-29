@@ -41,12 +41,168 @@ public static class AtmosphereSetup
         EditorUtility.DisplayDialog("Atmosphere", report, "OK");
     }
 
+    [MenuItem(Menu + "Set Up Fog", false, 2)]
+    private static void SetUpFogMenu() => Debug.Log(SetUpFog());
+
+    public static string SetUpFog()
+    {
+        string report = SetUpOpenScene(false);
+        VolumeProfile profile = BaseProfile(EditorSceneManager.GetActiveScene(), null);
+        if (profile != null && profile.TryGet(out AtmosphericFog fog) && fog.density.value <= 0f)
+            Apply(fog, Preset.MorningMist);
+        return report;
+    }
+
+    [MenuItem(Menu + "Set Up Light Shafts", false, 3)]
+    private static void SetUpLightShaftsMenu() => Debug.Log(SetUpLightShafts());
+
+    public static string SetUpLightShafts()
+    {
+        EnsureSceneDefaults(EditorSceneManager.GetActiveScene());
+        foreach (Volume volume in Object.FindObjectsByType<Volume>(FindObjectsInactive.Include))
+        {
+            if (volume.gameObject.scene == EditorSceneManager.GetActiveScene() && volume.sharedProfile != null
+                && volume.sharedProfile.TryGet(out AtmosphericFog fog))
+            {
+                EnableLightShafts(fog);
+                EditorUtility.SetDirty(fog);
+            }
+        }
+        return "Light shafts enabled. Fog density was not changed. Save the scene and profiles when ready.";
+    }
+
+    /// <summary>Completes visual support without changing existing authored fog or mist settings.</summary>
+    public static void EnsureSceneDefaults(UnityEngine.SceneManagement.Scene scene)
+    {
+        var previous = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
+        UnityEngine.SceneManagement.SceneManager.SetActiveScene(scene);
+        try
+        {
+            EnsureRendererFeature();
+            GameObject atmosphere = FindRoot(scene, AtmosphereObject);
+            if (atmosphere == null)
+            {
+                atmosphere = new GameObject(AtmosphereObject);
+                Undo.RegisterCreatedObjectUndo(atmosphere, "Add default atmosphere");
+            }
+            if (atmosphere.GetComponent<FogGround>() == null)
+                Undo.AddComponent<FogGround>(atmosphere);
+
+            var report = new StringBuilder();
+            VolumeProfile profile = BaseProfile(scene, report);
+            bool addedFog = !profile.Has<AtmosphericFog>();
+            var fog = Get<AtmosphericFog>(profile);
+            if (addedFog)
+            {
+                // Authored strength when fog weather arrives; Clear weather removes it completely.
+                fog.density.Override(0.025f);
+                fog.weatherInfluence.Override(1f);
+            }
+            if (addedFog || (fog.active && !fog.shaftDensity.overrideState))
+            {
+                EnableLightShafts(fog);
+                EditorUtility.SetDirty(profile);
+                if (AssetDatabase.Contains(profile))
+                    AssetDatabase.SaveAssetIfDirty(profile);
+            }
+            EnsureTerrainMist(scene);
+        }
+        finally
+        {
+            UnityEngine.SceneManagement.SceneManager.SetActiveScene(previous);
+        }
+    }
+
+    public static void EnsureTerrainMist(UnityEngine.SceneManagement.Scene scene)
+    {
+        bool added = false;
+        foreach (Terrain terrain in Object.FindObjectsByType<Terrain>(FindObjectsInactive.Include))
+        {
+            if (terrain.gameObject.scene != scene || terrain.GetComponent<TerrainMist>() != null)
+                continue;
+            Undo.AddComponent<TerrainMist>(terrain.gameObject);
+            added = true;
+        }
+        if (added)
+        {
+            foreach (FogGround ground in Object.FindObjectsByType<FogGround>(FindObjectsInactive.Include))
+                if (ground.gameObject.scene == scene) ground.Bake();
+        }
+    }
+
+    public static void PersistSceneProfiles(UnityEngine.SceneManagement.Scene scene, string scenePath)
+    {
+        foreach (Volume volume in Object.FindObjectsByType<Volume>(FindObjectsInactive.Include))
+        {
+            VolumeProfile profile = volume.sharedProfile;
+            if (volume.gameObject.scene != scene || profile == null || profile.name != "Scene Atmosphere"
+                || AssetDatabase.Contains(profile))
+                continue;
+            string path = AssetDatabase.GenerateUniqueAssetPath(
+                $"{System.IO.Path.GetDirectoryName(scenePath)}/{System.IO.Path.GetFileNameWithoutExtension(scenePath)}_Atmosphere.asset");
+            AssetDatabase.CreateAsset(profile, path);
+            foreach (VolumeComponent component in profile.components)
+                AssetDatabase.AddObjectToAsset(component, profile);
+            AssetDatabase.SetMainObject(profile, path);
+            EditorUtility.SetDirty(volume);
+            EditorUtility.SetDirty(profile);
+            AssetDatabase.SaveAssetIfDirty(profile);
+            AssetDatabase.ImportAsset(path);
+        }
+    }
+
+    public static void EnableLightShafts(AtmosphericFog fog)
+    {
+        Undo.RecordObject(fog, "Enable atmospheric light shafts");
+        fog.active = true;
+        if (!fog.shaftDensity.overrideState || fog.shaftDensity.value <= 0f)
+            fog.shaftDensity.Override(0.004f);
+        if (!fog.shaftIntensity.overrideState || fog.shaftIntensity.value <= 0f)
+            fog.shaftIntensity.Override(4f);
+        if (!fog.shaftHeight.overrideState)
+            fog.shaftHeight.Override(18f);
+        if (!fog.steps.overrideState || fog.steps.value < 48)
+            fog.steps.Override(48);
+    }
+
     [MenuItem(Menu + "Apply Preset/Clear (no fog)", false, 20)] private static void PresetClear() => ApplyToTarget(Preset.Clear);
     [MenuItem(Menu + "Apply Preset/Morning Mist", false, 21)] private static void PresetMorning() => ApplyToTarget(Preset.MorningMist);
     [MenuItem(Menu + "Apply Preset/Ground Blanket", false, 22)] private static void PresetBlanket() => ApplyToTarget(Preset.GroundBlanket);
     [MenuItem(Menu + "Apply Preset/Misty Woods", false, 23)] private static void PresetWoods() => ApplyToTarget(Preset.MistyWoods);
     [MenuItem(Menu + "Apply Preset/Marsh", false, 24)] private static void PresetMarsh() => ApplyToTarget(Preset.Marsh);
     [MenuItem(Menu + "Apply Preset/Night Mist (for a night volume)", false, 25)] private static void PresetNight() => ApplyToTarget(Preset.NightMist);
+
+    [MenuItem(Menu + "Add Drifting Mist to Selected Terrain", false, 5)]
+    private static void AddTerrainMist()
+    {
+        Terrain terrain = Selection.activeGameObject != null ? Selection.activeGameObject.GetComponent<Terrain>() : null;
+        if (terrain == null)
+        {
+            EditorUtility.DisplayDialog("Terrain Mist", "Select a Terrain first. Existing fog and volume settings will not be changed.", "OK");
+            return;
+        }
+
+        Debug.Log(EnsureRendererFeature());
+        FogGround ground = System.Array.Find(Object.FindObjectsByType<FogGround>(FindObjectsInactive.Include),
+            candidate => candidate.gameObject.scene == terrain.gameObject.scene);
+        if (ground == null)
+        {
+            var go = new GameObject("Atmosphere Ground");
+            UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(go, terrain.gameObject.scene);
+            Undo.RegisterCreatedObjectUndo(go, "Add Terrain Mist Ground");
+            ground = Undo.AddComponent<FogGround>(go);
+        }
+
+        ground.Bake();
+        if (terrain.GetComponent<TerrainMist>() == null)
+        {
+            Undo.AddComponent<TerrainMist>(terrain.gameObject);
+        }
+
+        EditorSceneManager.MarkSceneDirty(terrain.gameObject.scene);
+        EditorGUIUtility.PingObject(terrain);
+        Debug.Log("Terrain Mist added. Adjust its component on the terrain; preview in Game view. Save the scene to keep it.");
+    }
 
     [MenuItem("GameObject/Safe Haven/World/Fog Area", false, 30)]
     private static void CreateFogArea(MenuCommand command)
@@ -80,7 +236,9 @@ public static class AtmosphereSetup
     }
 
     /// <summary>Adds whatever the open scene lacks for fog, fog of war and night, and says what it did.</summary>
-    public static string SetUpOpenScene()
+    public static string SetUpOpenScene() => SetUpOpenScene(true);
+
+    private static string SetUpOpenScene(bool includeFogOfWar)
     {
         var report = new StringBuilder();
         var scene = EditorSceneManager.GetActiveScene();
@@ -97,7 +255,7 @@ public static class AtmosphereSetup
             report.AppendLine("• Added the \"Atmosphere\" object.");
         }
 
-        if (atmosphere.GetComponent<ExplorationMap>() == null)
+        if (includeFogOfWar && atmosphere.GetComponent<ExplorationMap>() == null)
         {
             var map = Undo.AddComponent<ExplorationMap>(atmosphere);
             var data = new SerializedObject(map);
@@ -107,7 +265,7 @@ public static class AtmosphereSetup
             report.AppendLine("• Added an Exploration Map (fog of war memory).");
         }
 
-        if (!raid && atmosphere.GetComponent<SaveableEntity>() == null)
+        if (includeFogOfWar && !raid && atmosphere.GetComponent<SaveableEntity>() == null)
         {
             Undo.AddComponent<SaveableEntity>(atmosphere);
             report.AppendLine("• Added a Saveable Entity, so exploration is saved.");
@@ -128,14 +286,14 @@ public static class AtmosphereSetup
                 report.AppendLine($"• Added Atmospheric Fog to {profile.name} ({(raid ? "Misty Woods" : "Morning Mist")} preset).");
             }
 
-            if (!profile.Has<FogOfWar>())
+            if (includeFogOfWar && !profile.Has<FogOfWar>())
             {
                 SetFogOfWar(Get<FogOfWar>(profile));
                 report.AppendLine($"• Added Fog of War to {profile.name}.");
             }
 
             EditorUtility.SetDirty(profile);
-            AssetDatabase.SaveAssets();
+            AssetDatabase.SaveAssetIfDirty(profile);
         }
 
         if (Object.FindAnyObjectByType<DayNightCycle>() == null)
@@ -239,7 +397,7 @@ public static class AtmosphereSetup
 
         Apply(Get<AtmosphericFog>(profile), preset);
         EditorUtility.SetDirty(profile);
-        AssetDatabase.SaveAssets();
+        AssetDatabase.SaveAssetIfDirty(profile);
         Selection.activeObject = profile;
         Debug.Log($"Fog preset {ObjectNames.NicifyVariableName(preset.ToString())} applied to {profile.name}.", profile);
     }
@@ -250,7 +408,7 @@ public static class AtmosphereSetup
         Volume best = null;
         foreach (Volume volume in Object.FindObjectsByType<Volume>(FindObjectsInactive.Include))
         {
-            if (volume.isGlobal && volume.gameObject.scene == scene && (best == null || volume.priority < best.priority))
+            if (volume.isGlobal && volume.priority <= 0f && volume.gameObject.scene == scene && (best == null || volume.priority < best.priority))
             {
                 best = volume;
             }
@@ -275,12 +433,16 @@ public static class AtmosphereSetup
             report.AppendLine("• Added a Global Volume.");
         }
 
-        string folder = System.IO.Path.GetDirectoryName(scene.path);
-        string path = AssetDatabase.GenerateUniqueAssetPath($"{folder}/{scene.name}_Volume.asset");
         var profile = ScriptableObject.CreateInstance<VolumeProfile>();
-        AssetDatabase.CreateAsset(profile, path);
+        profile.name = "Scene Atmosphere";
+        if (!string.IsNullOrEmpty(scene.path))
+        {
+            string folder = System.IO.Path.GetDirectoryName(scene.path);
+            string path = AssetDatabase.GenerateUniqueAssetPath($"{folder}/{scene.name}_Volume.asset");
+            AssetDatabase.CreateAsset(profile, path);
+        }
         best.sharedProfile = profile;
-        report.AppendLine($"• Created the volume profile {path}.");
+        report.AppendLine("• Created a scene atmosphere profile (stored beside the scene on save).");
         return profile;
     }
 
@@ -293,7 +455,8 @@ public static class AtmosphereSetup
 
         component = profile.Add<T>();
         component.name = typeof(T).Name;
-        AssetDatabase.AddObjectToAsset(component, profile);
+        if (AssetDatabase.Contains(profile))
+            AssetDatabase.AddObjectToAsset(component, profile);
         return component;
     }
 
@@ -330,7 +493,7 @@ public static class AtmosphereSetup
         so.ApplyModifiedPropertiesWithoutUndo();
         data.SetDirty();
         EditorUtility.SetDirty(data);
-        AssetDatabase.SaveAssets();
+        AssetDatabase.SaveAssetIfDirty(data);
         return "• Added the Atmosphere renderer feature to PC_Renderer.";
     }
 

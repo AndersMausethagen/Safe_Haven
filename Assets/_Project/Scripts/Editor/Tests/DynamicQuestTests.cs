@@ -104,15 +104,20 @@ public sealed class DynamicQuestTests
     {
         var model = GameObject.CreatePrimitive(PrimitiveType.Cube);
         created.Add(model);
-        model.AddComponent<Light>();
+        var light = model.AddComponent<Light>();
+        light.type = LightType.Point;
         model.AddComponent<LightFlicker>();
         model.AddComponent<GrassInteractor>();
         HeldItemView.StripToVisual(model, true);
         Assert.NotNull(model.GetComponent<Light>());
         Assert.NotNull(model.GetComponent<LightFlicker>());
+        Assert.NotNull(model.GetComponent<AtmosphereLight>());
+        HeldItemView.StripToVisual(model, true);
+        Assert.AreEqual(1, model.GetComponents<AtmosphereLight>().Length);
         Assert.IsNull(model.GetComponent<GrassInteractor>());
         Assert.IsNull(model.GetComponent<Collider>());
         HeldItemView.StripToVisual(model);
+        Assert.IsNull(model.GetComponent<AtmosphereLight>());
         Assert.IsNull(model.GetComponent<LightFlicker>());
         Assert.IsNull(model.GetComponent<Light>());
     }

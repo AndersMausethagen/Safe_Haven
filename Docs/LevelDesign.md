@@ -205,6 +205,144 @@ Tint and Normal Strength are on the material (*World Terrain (Dark Forest)* and 
 generated from URP's shader by `AgentScripts/GenerateWorldTerrainShader.py`: run it again after a URP upgrade. It works
 best with up to 4 ground layers per terrain (above 4 URP draws the terrain twice and the rock blends less).
 
+#### True terrain displacement
+
+The world shader now tessellates actual terrain triangles (not parallax). Select a terrain using this shader and run
+**Safe Haven > World > Terrain > Enable or Refresh Displacement**, then save the scene. The command creates a dedicated
+material and persistent height-mask array beside its TerrainData; the painted layers, holes and cliff settings are kept.
+Up to 16 layers are supported. Each layer's mask-map **blue** channel, height remap, tile size and offset drive the
+displacement, weighted by the original terrain paint textures. Missing height maps contribute a neutral height.
+All layer passes use the same height resources, including layers 5-16, so their geometry stays aligned.
+
+On the material, **Displacement Height Range** defaults to 0.10 metres (approximately +/-5 cm for a 0-1 height map).
+**Full Detail Distance** / **Detail Fade Distance** default to 8 / 35 metres; **Maximum Tessellation** defaults to 8,
+with a target triangle edge length of 8 cm. Detail fades smoothly with distance and on steep cliffs.
+Forward, deferred, shadow, depth, depth-normal, selection and distant base-map passes share the displaced surface.
+The existing mesh-only *Forest Ground ASE* shader is not used for this: it does not preserve the terrain's painted layers.
+
+Painting existing layers updates displacement immediately. Run the command again after changing the layer list, tiling,
+height remaps or source mask textures, or after switching between Haven / Dark Forest looks. Refresh keeps the material's
+displacement tuning. Height copies now use linear **RHalf** textures (16-bit floating point), at 512, 1024 or 2048 per layer;
+source textures and TerrainData are not modified. Higher precision preserves available input detail; it cannot recover
+detail already lost in a compressed/low-resolution source map.
+Hardware tessellation (shader model 4.6, e.g. desktop D3D11) is required; this shader is not a mobile/WebGL fallback.
+Displacement is visual geometry only: the TerrainCollider, NavMesh and placement sampling still use the original
+heightfield. Keep the amplitude small for walkable ground. Adjacent terrain tiles need matching layers, UV phase and
+displacement settings to avoid seams. Refreshing does not save unrelated scene changes.
+
+#### Designer workflow: Terrain Surface
+
+Open **Safe Haven > World > Terrain Surface**. This single window contains:
+
+- The target terrain and its assigned material. **Set Up / Rebuild Height Resources** safely accepts the world shader,
+  URP Terrain Lit, or an unassigned terrain; other custom shaders are rejected rather than silently losing features.
+- Geometry height, distance falloff, subdivision cap (up to 64), target edge size, height mip smoothing and height-aware
+  displacement blending. **Balanced** and **Maximum** density presets keep authored heights and layer settings.
+- Height-derived normal strength, normal-map multiplier, mask AO strength and smoothness multiplier.
+  Height normals are sampled from the same layered height field as displacement and composed with existing mapped
+  normals in Forward, Deferred and DepthNormals passes. Low quality skips height-normal sampling.
+- Forward-only diagnostic previews: lit, blended height and final world-space normals.
+- A persistent **Terrain Surface Profile** beside TerrainData, containing height-array resolution and per-layer source
+  override, channel, amplitude, midpoint and contrast. Setup discovers matching sibling `LayerName_Height.png` maps;
+  otherwise it reads the original mask blue channel. Explicit overrides must have sRGB disabled.
+- Per-layer albedo/normal/mask references, normal strength, UV size/offset and mask remaps, plus all cliff controls.
+  Terrain Layer assets are shared: editing these affects every terrain using them. Profile height shaping is local to
+  that profile and does not alter source maps.
+
+Material lighting/geometry controls update immediately. Profile/source/tiling changes require **Rebuild**; zero height
+is preserved on refresh. Existing paint updates the bound control maps. The profile only defines bake inputs; a player
+does not rebake them. Save Surface Assets saves the relevant material, profile and terrain layers only. Saving the scene
+is a separate explicit action, and includes any other work in that scene.
+
+`TerrainSurface.SetQuality(DetailQuality)` is the runtime hook for the future graphics options menu:
+**Off**, **Low**, **Balanced**, **Ultra**. Ultra uses the full authored density/range; Balanced scales density to 65% and
+range to 75%; Low uses 35%/45% and skips height-derived normals. Off removes displacement and height-derived normals,
+but is not a shader-model fallback (the hull/domain pipeline still requires tessellation hardware).
+
+#### Recovering terrain footprints
+
+The **Terrain Surface > Recovering Footprints** controls set the footprint lifetime (default **30 game-time seconds**),
+depth (default **2.5 cm**), height-detail flattening, normal-map flattening, compressed-ground darkening,
+grass flattening, boot width/length, and optional sole mask. Darkening can be set to zero; it makes tread readable among noisy textures.
+An empty sole mask draws a procedural boot with heel, rounded toe and tread grooves; replace it with a linear
+greyscale texture for another sole. White presses down; black does not. These controls update at runtime without
+rebaking. Changing field resolution/area resets the local field on the next step.
+SafeHaven uses realistic **0.13 x 0.30 m** bootprints, darkening **0.8**, and full grass/height/normal
+flattening. Width and length remain adjustable independently of visibility and recovery.
+
+Each profile layer has **Footprint Response**: use 1 for soft moss/mud, a smaller value for firm earth or gravel, and
+0 for hard rock. **Rebuild Height Resources** after changing the response. Painted layer weights blend the response;
+the cliff slope fade also suppresses impressions on steep rock. Setup assigns `TerrainFootprints` and its stamp shader.
+`PlayerAudio` automatically adds `PlayerTerrainFootprints` in every scene: it listens to `PlayerAudio.FootPlanted`, sharing actual
+foot-plant timing from animation events/bones, with alternating contacts for non-humanoid rigs. It raycasts the
+contact, so floors/bridges block stamping the ground below, and water contacts are excluded.
+Terrain setup disables **Draw Instanced**: the tessellation domain passes require non-instanced terrain geometry.
+Keep this disabled after setup. Per-layer amplitude/height edits need **Rebuild Height Resources**; changing only
+the profile does not update the baked height metadata. This applies to Prologue/MistyWoods as well as SafeHaven.
+Prologue/MistyWoods uses a 64-subdivision cap and 0.02-metre target edges to resolve small boot tread.
+Its moss response is 1, soil response 0.6 and stone response 0; footprints use full compression and 0.8 darkening,
+with realistic 0.13 x 0.30-metre soles and 30-second recovery. Its dark storm lighting can conceal relief and
+darkened tracks from the game camera; use a close view and the Tracks preview to distinguish lighting from missing stamps.
+
+Footprints press down the real rendered geometry rather than adding a floating decal. The whole sole compresses
+height detail toward the painted layers' minimum height, including detail below the terrain origin, without raising
+valleys. Tread adds secondary depressions. Height-detail flattening also softens fine albedo detail inside the sole,
+while normal-map flattening removes the uncompressed moss lighting; shallow grooves still compress the whole sole.
+Preview **3 Tracks** displays the field on the actual terrain (Forward rendering) for checking contact
+placement. Footprint lookup uses actual world positions, not reconstructed terrain UVs, so patch draw transforms
+cannot offset the trail. All displacement geometry passes share the field, including shadows and depth. Recovery is gradual;
+pausing freezes recovery. Repeated steps refresh the pressed area. The field is local to each terrain (default
+24 m square, 2048 pixels); it recentres with new steps, preserving overlapping texels and discarding distant tracks.
+It is a bounded visual effect, not a persistent trail system: leaving its area, disabling the component or leaving the
+scene removes tracks. TerrainData, shared material/profile assets, colliders and NavMesh are never changed by steps.
+Painted **Safe Haven/Grass** plants also bend down in the recovering field, revealing the surface trail rather than
+immediately springing upright behind the player. Their roots descend toward the profile's lowest compressed layer
+so flattened grass does not float above and hide the tread. Up to four nearby terrain fields feed the grass shader without
+changing shared plant materials or detail instances; trees are unaffected. Off quality hides displacement and trail bending;
+Low retains pressed geometry but omits expensive height-derived lighting normals.
+Quality is set per terrain through a MaterialPropertyBlock, preserving shared material assets and unrelated properties.
+The component rebinds paint textures when terrain painting replaces them, reapplies patch-bounds expansion on load,
+and restores its bounds/quality override on disable. The future options menu must call it for each terrain; no player
+settings UI or persistence is added here.
+
+Maximum is a near-camera quality option, not a measured frame-rate guarantee. Use a short detailed range and profile
+the target GPU before shipping. Larger height ranges do not solve flat lighting, and neither tessellation nor map
+baking can create roots/rocks missing from the source height field. Overhangs require real meshes/vector displacement,
+not this vertical terrain heightfield. Blender baking is only useful when a corresponding high-detail source exists;
+the existing authored height maps do not require a Blender round trip.
+
+### Tessellation on meshes
+
+Use **Safe Haven > World > Mesh Surface** with a selected static mesh. Choose its material slot and
+**Create Tessellated Copy and Assign** for a basic opaque URP Lit material. The original material is preserved.
+The tool adds `MeshSurface` for expanded displacement culling bounds. Save the scene/prefab after assignment.
+No existing scene objects are converted automatically.
+
+For custom/Amplify materials, create a material with **Safe Haven/Mesh Surface (Tessellated)**, assign its
+maps manually, then assign it to the mesh and use **Add Displacement Bounds Support** in the window.
+The reusable **Mesh Surface Moss** material in `Assets/_Project/Art/Terrain/SafeHaven` provides a configured example.
+This is a hand-written URP shader, not an editable Amplify graph; existing ASE graphs remain untouched.
+
+All controls are in the Mesh Surface window or material Inspector:
+
+- **Height Map (Linear)**: use a real height texture with sRGB disabled, not an albedo/normal map.
+  **Height Channel** `(1,0,0,0)` selects red; `(0,0,1,0)` selects blue for packed terrain masks.
+- **Height Range (metres)** controls physical displacement independently of object scale.
+  Start around `0.02` to `0.05`. **Height Midpoint** selects the zero-height level.
+- **Height Normal Strength**, **Normal Strength**, **Height Smoothing** tune lighting and fine noise.
+- **Maximum Subdivision**, **Target Edge Length**, **Full Detail Distance**, **Fade Distance**
+  control adaptive density and distance fade. Shared edges use the same factors to avoid tessellation cracks.
+- **Base Map** tiling/offset applies to every map. Metallic uses R/smoothness A; occlusion uses G.
+  Alpha clipping is supported, transparent blending is not. Click **Save Material** to persist tuning.
+
+Requires tessellation-capable hardware; unsupported platforms fall back to ordinary URP Lit without displacement.
+Intended for UV-mapped MeshRenderers with normals and tangents, not skinned characters, terrain or grass blades.
+Hard edges, split normals and UV seams can open under displacement: use continuous height and smooth welded
+surfaces. Disable static batching for displaced objects. Each LOD needs the intended material/bounds component.
+The collider, NavMesh and baked mesh silhouette are unchanged; light baking uses an undisplaced Meta surface.
+No motion-vector pass is supplied (avoid relying on this surface for animated displacement/TAA motion vectors).
+Increasing subdivision has a GPU cost; use short detail distances and reserve high settings for close-up assets.
+
 ### Assets
 
 All CC0 (free for any use, no credit needed; see `Models/PolyHaven/LICENSE.md`), made game-ready by the scripts in

@@ -22,6 +22,7 @@ public sealed class AtmosphereFeature : ScriptableRendererFeature
     public const int MaxSources = 16;
     /// <summary>Fog areas per frame, nearest to the camera first.</summary>
     public const int MaxAreas = 8;
+    public const int MaxMists = 4;
 
     [SerializeField] private Shader shader;
     [Tooltip("Gathers the fog at this share of the screen's resolution.")]
@@ -65,7 +66,7 @@ public sealed class AtmosphereFeature : ScriptableRendererFeature
         var fog = stack.GetComponent<AtmosphericFog>();
         var fogOfWar = stack.GetComponent<FogOfWar>();
         // Fog areas show even in a scene without base fog.
-        bool fogOn = fog != null && fog.active && (fog.IsActive() || FogArea.Active.Count > 0);
+        bool fogOn = fog != null && fog.active && (fog.IsActive() || FogArea.Active.Count > 0 || TerrainMist.Active.Count > 0);
         bool warOn = fogOfWar != null && fogOfWar.IsActive();
         if (!fogOn && !warOn)
         {
@@ -97,6 +98,7 @@ public sealed class AtmosphereFeature : ScriptableRendererFeature
         private static readonly int LightCount = Shader.PropertyToID("_FogLightCount");
         private static readonly int LightPositions = Shader.PropertyToID("_FogLightPositions");
         private static readonly int LightColors = Shader.PropertyToID("_FogLightColors");
+        private static readonly int LightClearings = Shader.PropertyToID("_FogLightClearings");
         private static readonly int SourceCount = Shader.PropertyToID("_SourceCount");
         private static readonly int Sources = Shader.PropertyToID("_Sources");
         private static readonly int WarParams = Shader.PropertyToID("_WarParams");
@@ -112,25 +114,45 @@ public sealed class AtmosphereFeature : ScriptableRendererFeature
         private static readonly int AreaCount = Shader.PropertyToID("_FogAreaCount");
         private static readonly int Areas = Shader.PropertyToID("_FogAreas");
         private static readonly int AreaShapes = Shader.PropertyToID("_FogAreaShapes");
+        private static readonly int ShaftParams = Shader.PropertyToID("_ShaftParams");
+        private static readonly int MistCount = Shader.PropertyToID("_TerrainMistCount");
+        private static readonly int MistRects = Shader.PropertyToID("_TerrainMistRects");
+        private static readonly int MistShapes = Shader.PropertyToID("_TerrainMistShapes");
+        private static readonly int MistClouds = Shader.PropertyToID("_TerrainMistClouds");
+        private static readonly int MistWinds = Shader.PropertyToID("_TerrainMistWinds");
+        private static readonly int MistTints = Shader.PropertyToID("_TerrainMistTints");
+        private static readonly int ShadowCascades = Shader.PropertyToID("_AtmosphereShadowCascades");
 
         private readonly Material material;
         private readonly Vector4[] lightPositions = new Vector4[MaxLights];
         private readonly Vector4[] lightColors = new Vector4[MaxLights];
+        private readonly Vector4[] lightClearings = new Vector4[MaxLights];
         private readonly Vector4[] sources = new Vector4[MaxSources];
         private readonly Vector4[] areas = new Vector4[MaxAreas];
         private readonly Vector4[] areaShapes = new Vector4[MaxAreas];
         private readonly List<FogArea> areaOrder = new List<FogArea>();
         private readonly List<AtmosphereLight> lightOrder = new List<AtmosphereLight>();
         private readonly List<VisibilitySource> sourceOrder = new List<VisibilitySource>();
+        private readonly List<TerrainMist> mistOrder = new List<TerrainMist>();
+        private readonly Vector4[] mistRects = new Vector4[MaxMists];
+        private readonly Vector4[] mistShapes = new Vector4[MaxMists];
+        private readonly Vector4[] mistClouds = new Vector4[MaxMists];
+        private readonly Vector4[] mistWinds = new Vector4[MaxMists];
+        private readonly Vector4[] mistTints = new Vector4[MaxMists];
+        private readonly Vector4[] mistWaves = new Vector4[MaxMists];
+        private readonly Vector4[] mistPooling = new Vector4[MaxMists];
         private AtmosphericFog fog;
         private FogOfWar fogOfWar;
         private bool fogOn;
         private bool warOn;
         private float resolution;
+        private float extraWindTime;
+        private float lastWindTime;
 
         public AtmospherePass(Material material)
         {
             this.material = material;
+            lastWindTime = Time.time;
             profilingSampler = new ProfilingSampler("Safe Haven Atmosphere");
         }
 
@@ -160,6 +182,8 @@ public sealed class AtmosphereFeature : ScriptableRendererFeature
             }
 
             UploadParameters(camera.camera.transform.position);
+            var pipeline = UniversalRenderPipeline.asset;
+            material.SetFloat(ShadowCascades, pipeline != null ? pipeline.shadowCascadeCount : 1);
 
             TextureHandle color = resources.activeColorTexture;
             TextureDesc fogDesc = renderGraph.GetTextureDesc(color);
@@ -182,6 +206,10 @@ public sealed class AtmosphereFeature : ScriptableRendererFeature
                     data.material = material;
                     data.pass = 0;
                     builder.UseTexture(resources.cameraDepthTexture);
+                    if (resources.mainShadowsTexture.IsValid())
+                    {
+                        builder.UseTexture(resources.mainShadowsTexture);
+                    }
                     builder.UseAllGlobalTextures(true);
                     builder.SetRenderAttachment(fogTexture, 0, AccessFlags.Write);
                     builder.SetGlobalTextureAfterPass(fogTexture, FogTextureId);
@@ -223,7 +251,12 @@ public sealed class AtmosphereFeature : ScriptableRendererFeature
 
         private void UploadParameters(Vector3 cameraPosition)
         {
-            float weather = fogOn ? Mathf.Lerp(1f, AtmosphereConditions.WeatherFog, fog.weatherInfluence.value) : 1f;
+            float now = Time.time;
+            if (now < lastWindTime)
+                extraWindTime = 0f;
+            extraWindTime += Mathf.Max(0f, now - lastWindTime) * (AtmosphereConditions.WeatherWind - 1f);
+            lastWindTime = now;
+            float weather = fogOn ? AtmosphereConditions.FogMultiplier(fog.weatherInfluence.value) : 1f;
             AtmosphereConditions.FogDensity = fogOn ? fog.density.value * weather : 0f;
             if (fogOn)
             {
@@ -232,19 +265,60 @@ public sealed class AtmosphereFeature : ScriptableRendererFeature
                 material.SetVector(FogParams2, new Vector4(fog.maxDistance.value, fog.steps.value, fog.clearing.value, 0f));
                 material.SetColor(FogAlbedo, fog.albedo.value.linear);
                 material.SetColor(FogAmbient, fog.ambient.value.linear);
-                material.SetVector(FogWind, fog.wind.value);
+                Vector3 wind = fog.wind.value;
+                material.SetVector(FogWind, new Vector4(wind.x, wind.y, wind.z, extraWindTime * fog.weatherWindInfluence.value));
+                material.SetFloat("_FogDriftSpeed", fog.driftSpeed.value);
+                material.SetVector(ShaftParams, new Vector4(fog.shaftDensity.value, fog.shaftIntensity.value, fog.shaftHeight.value, 0f));
 
                 FogGround ground = FogGround.Current;
-                bool follow = ground != null && ground.Texture != null && fog.followTerrain.value > 0f;
-                material.SetVector(FogParams3, new Vector4(follow ? fog.followTerrain.value : 0f, 1f / fog.bankSize.value,
+                bool hasGround = ground != null && ground.Texture != null;
+                material.SetVector(FogParams3, new Vector4(hasGround ? fog.followTerrain.value : 0f, 1f / fog.bankSize.value,
                     fog.bankStrength.value, fog.bankSpeed.value));
-                if (follow)
+                material.SetFloat("_HasFogGround", hasGround ? 1f : 0f);
+                material.SetFloat("_HasMistHabitat", hasGround ? 1f : 0f);
+                if (hasGround)
                 {
                     Rect area = ground.Area;
                     material.SetTexture(GroundTexture, ground.Texture);
                     material.SetVector(GroundRect, new Vector4(area.xMin, area.yMin, 1f / area.width, 1f / area.height));
                     material.SetVector(GroundRange, ground.HeightRange);
                 }
+
+                mistOrder.Clear();
+                foreach (TerrainMist mist in TerrainMist.Active)
+                {
+                    if (mist != null && mist.Density > 0f && mist.Terrain != null && mist.Terrain.terrainData != null)
+                    {
+                        mistOrder.Add(mist);
+                    }
+                }
+
+                mistOrder.Sort((a, b) => a.DistanceSquared(cameraPosition).CompareTo(b.DistanceSquared(cameraPosition)));
+                int mists = hasGround ? Mathf.Min(MaxMists, mistOrder.Count) : 0;
+                for (int i = 0; i < mists; i++)
+                {
+                    TerrainMist mist = mistOrder[i];
+                    Vector3 origin = mist.Terrain.transform.position;
+                    Vector3 size = mist.Terrain.terrainData.size;
+                    mistRects[i] = new Vector4(origin.x, origin.z, size.x, size.z);
+                    mistShapes[i] = new Vector4(mist.EffectiveDensity, mist.Bottom, mist.Thickness, mist.EdgeFade);
+                    mistClouds[i] = new Vector4(1f / mist.CloudSize, mist.Coverage, mist.Erosion, mist.FlowStretch);
+                    mistWinds[i] = new Vector4(mist.Wind.x, mist.Wind.y, extraWindTime * mist.WeatherWindInfluence,
+                        Mathf.Max(0f, AtmosphereConditions.WeatherWind - 0.4f) * mist.WeatherWindInfluence);
+                    Color tint = mist.Tint;
+                    mistTints[i] = new Vector4(tint.r, tint.g, tint.b, mist.SkyLight);
+                    mistWaves[i] = mist.Waves;
+                    mistPooling[i] = mist.Pooling;
+                }
+
+                material.SetInt(MistCount, mists);
+                material.SetVectorArray(MistRects, mistRects);
+                material.SetVectorArray(MistShapes, mistShapes);
+                material.SetVectorArray(MistClouds, mistClouds);
+                material.SetVectorArray(MistWinds, mistWinds);
+                material.SetVectorArray(MistTints, mistTints);
+                material.SetVectorArray("_TerrainMistWaves", mistWaves);
+                material.SetVectorArray("_TerrainMistPooling", mistPooling);
 
                 int areaCount = Nearest(FogArea.Active, areaOrder, cameraPosition, MaxAreas);
                 for (int i = 0; i < areaCount; i++)
@@ -269,11 +343,13 @@ public sealed class AtmosphereFeature : ScriptableRendererFeature
                 lightPositions[i] = new Vector4(p.x, p.y, p.z, Mathf.Max(0.01f, light.Range));
                 Color c = light.FogColor;
                 lightColors[i] = new Vector4(c.r, c.g, c.b, 0f);
+                lightClearings[i] = new Vector4(light.ClearingRadius, light.ClearingStrength, light.ClearingSoftness, 0f);
             }
 
             material.SetFloat(LightCount, lights);
             material.SetVectorArray(LightPositions, lightPositions);
             material.SetVectorArray(LightColors, lightColors);
+            material.SetVectorArray(LightClearings, lightClearings);
 
             int count = Nearest(VisibilitySource.Active, sourceOrder, cameraPosition, MaxSources);
             for (int i = 0; i < count; i++)

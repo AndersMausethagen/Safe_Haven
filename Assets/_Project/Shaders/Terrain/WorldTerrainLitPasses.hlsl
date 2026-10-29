@@ -16,6 +16,8 @@ struct Attributes
     UNITY_VERTEX_INPUT_INSTANCE_ID
 };
 
+#include "WorldTerrainDisplacement.hlsl"
+
 struct Varyings
 {
     float4 uvMainAndLM              : TEXCOORD0; // xy: control, zw: lightmap
@@ -247,6 +249,7 @@ void NormalMapMix(float4 uvSplat01, float4 uvSplat23, inout half4 splatControl, 
             nrm.z += 1e-5f;
         #endif
 
+        nrm.xy *= _NormalMapStrength;
         mixedNormal = normalize(nrm.xyz);
     #endif
 }
@@ -404,7 +407,6 @@ Varyings SplatmapVert(Attributes v)
 
     UNITY_SETUP_INSTANCE_ID(v);
     UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
-    TerrainInstancing(v.positionOS, v.normalOS, v.texcoord);
 
     VertexPositionInputs Attributes = GetVertexPositionInputs(v.positionOS.xyz);
 
@@ -549,6 +551,27 @@ void SplatmapFragment(
     InitializeInputData(IN, normalTS, inputData);
     SetupTerrainDebugTextureData(inputData, IN.uvMainAndLM.xy);
 
+    inputData.normalWS = WorldSurfaceNormal(IN.uvMainAndLM.xy, IN.positionWS,
+        WorldGeometricNormal(IN), inputData.normalWS);
+    float footprintMask = WorldFootprintMask(IN.positionWS.xz);
+    if (footprintMask > 0)
+    {
+        float response;
+        WorldDisplacementHeightLOD(IN.uvMainAndLM.xy, _DisplacementMip, response);
+        float compression = saturate(footprintMask * 4) * response * _FootprintSettings.y;
+        #ifdef TERRAIN_SPLAT_BASEPASS
+            half3 compressedAlbedo = SAMPLE_TEXTURE2D_LOD(_MainTex, sampler_MainTex, IN.uvMainAndLM.xy, 2).rgb;
+        #else
+            half3 compressedAlbedo = SAMPLE_TEXTURE2D_LOD(_Splat0, sampler_Splat0, IN.uvSplat01.xy, 5).rgb * _DiffuseRemapScale0.rgb * splatControl.r;
+            compressedAlbedo += SAMPLE_TEXTURE2D_LOD(_Splat1, sampler_Splat0, IN.uvSplat01.zw, 5).rgb * _DiffuseRemapScale1.rgb * splatControl.g;
+            compressedAlbedo += SAMPLE_TEXTURE2D_LOD(_Splat2, sampler_Splat0, IN.uvSplat23.xy, 5).rgb * _DiffuseRemapScale2.rgb * splatControl.b;
+            compressedAlbedo += SAMPLE_TEXTURE2D_LOD(_Splat3, sampler_Splat0, IN.uvSplat23.zw, 5).rgb * _DiffuseRemapScale3.rgb * splatControl.a;
+        #endif
+        albedo = lerp(albedo, compressedAlbedo, saturate(compression));
+        albedo *= 1 - saturate(footprintMask * response * _FootprintDarkening);
+    }
+    occlusion = saturate(1 - (1 - occlusion) * _SurfaceOcclusion);
+    smoothness = saturate(smoothness * _SurfaceSmoothness);
 #ifndef TERRAIN_SPLAT_BASEPASS
     WorldCliffs(IN, inputData, albedo, smoothness, metallic, occlusion);
 #endif
@@ -598,6 +621,20 @@ void SplatmapFragment(
     SplatmapFinalColor(color, inputData.fogCoord);
 
     outColor = half4(color.rgb, 1.0h);
+    if (_SurfaceDebug > 0.5)
+    {
+        float footprintResponse;
+        WorldDisplacementHeightLOD(IN.uvMainAndLM.xy, _DisplacementMip, footprintResponse);
+        half3 preview = _SurfaceDebug < 1.5
+            ? (WorldDisplacementHeight(IN.uvMainAndLM.xy) + 0.5).xxx
+            : _SurfaceDebug < 2.5 ? inputData.normalWS * 0.5 + 0.5
+            : (WorldFootprintMask(IN.positionWS.xz) * footprintResponse).xxx;
+        outColor.rgb = preview;
+        #ifdef TERRAIN_SPLAT_ADDPASS
+            outColor.rgb = 0;
+        #endif
+    }
+
 
 #ifdef _WRITE_RENDERING_LAYERS
     outRenderingLayers = EncodeMeshRenderingLayer();
@@ -632,7 +669,6 @@ VaryingsLean ShadowPassVertex(AttributesLean v)
 {
     VaryingsLean o = (VaryingsLean)0;
     UNITY_SETUP_INSTANCE_ID(v);
-    TerrainInstancing(v.position, v.normalOS, v.texcoord);
 
     float3 positionWS = TransformObjectToWorld(v.position.xyz);
     float3 normalWS = TransformObjectToWorldNormal(v.normalOS);
@@ -673,7 +709,6 @@ VaryingsLean DepthOnlyVertex(AttributesLean v)
     VaryingsLean o = (VaryingsLean)0;
     UNITY_SETUP_INSTANCE_ID(v);
     UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
-    TerrainInstancing(v.position, v.normalOS);
     o.clipPos = TransformObjectToHClip(v.position.xyz);
     o.texcoord = v.texcoord;
     return o;

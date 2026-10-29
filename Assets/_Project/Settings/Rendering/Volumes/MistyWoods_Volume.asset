@@ -194,6 +194,15 @@ MonoBehaviour:
   mainLight:
     m_OverrideState: 1
     m_Value: 1.5
+  shaftDensity:
+    m_OverrideState: 1
+    m_Value: 0.004
+  shaftIntensity:
+    m_OverrideState: 1
+    m_Value: 4
+  shaftHeight:
+    m_OverrideState: 1
+    m_Value: 18
   anisotropy:
     m_OverrideState: 1
     m_Value: 0.55
@@ -229,7 +238,7 @@ MonoBehaviour:
     m_Value: 100
   steps:
     m_OverrideState: 1
-    m_Value: 28
+    m_Value: 48
 --- !u!114 &849379129802519247
 MonoBehaviour:
   m_ObjectHideFlags: 3

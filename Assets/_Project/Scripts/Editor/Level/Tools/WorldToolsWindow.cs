@@ -2,8 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Object = UnityEngine.Object;
 
 /// <summary>
 /// One place for building the world (Safe Haven › World Tools, or the Scene view's "Safe Haven World" overlay):
@@ -48,6 +51,9 @@ public sealed class WorldToolsWindow : EditorWindow
         "Safe Haven/World/Grass and Plants/Make Selected Push Grass",
         "Safe Haven/World/Sky and Weather/Sky Controller", "Safe Haven/World/Sky and Weather/Add Day, Night and Weather to Scene",
         "Safe Haven/World/Sky and Weather/Add Shared Moss Wind", "Safe Haven/World/Sky and Weather/Fog/Set Up Open Scene",
+        "Safe Haven/World/Sky and Weather/Fog/Set Up Fog",
+        "Safe Haven/World/Sky and Weather/Fog/Set Up Light Shafts",
+        "Safe Haven/World/Sky and Weather/Fog/Add Drifting Mist to Selected Terrain",
         "Safe Haven/World/Sky and Weather/Fog/Apply Preset/Clear (no fog)", "Safe Haven/World/Sky and Weather/Fog/Apply Preset/Morning Mist",
         "Safe Haven/World/Sky and Weather/Fog/Apply Preset/Ground Blanket", "Safe Haven/World/Sky and Weather/Fog/Apply Preset/Misty Woods",
         "Safe Haven/World/Sky and Weather/Fog/Apply Preset/Marsh", "GameObject/Safe Haven/World/Fog Area",
@@ -61,6 +67,11 @@ public sealed class WorldToolsWindow : EditorWindow
     private ScenePlayability.Kind kind;
     private List<ScenePlayability.Issue> issues;
     private string sceneReport = "";
+    private Editor fogEditor;
+    private Editor mistEditor;
+    private AtmosphericFog atmosphereTarget;
+    private bool showFogSettings;
+    private bool showMistSettings;
 
     [MenuItem("Safe Haven/World Tools", false, 0)]
     private static void OpenMenu() => Open(Tab.Place);
@@ -85,7 +96,12 @@ public sealed class WorldToolsWindow : EditorWindow
         EditorApplication.projectChanged += PrefabCatalog.Refresh;
     }
 
-    private void OnDisable() => EditorApplication.projectChanged -= PrefabCatalog.Refresh;
+    private void OnDisable()
+    {
+        EditorApplication.projectChanged -= PrefabCatalog.Refresh;
+        if (fogEditor != null) DestroyImmediate(fogEditor);
+        if (mistEditor != null) DestroyImmediate(mistEditor);
+    }
 
     private void OnGUI()
     {
@@ -377,24 +393,133 @@ public sealed class WorldToolsWindow : EditorWindow
         MenuButton("Selected Pushes Grass", "Safe Haven/World/Grass and Plants/Make Selected Push Grass", "The selected object bends grass as it moves");
     }
 
-    private static void DrawSky()
+    private void DrawSky()
     {
         Section("Day, night and weather");
         using (new EditorGUILayout.HorizontalScope())
         {
             MenuButton("Sky Controller", "Safe Haven/World/Sky and Weather/Sky Controller", "Preview and drive time of day and weather");
-            MenuButton("Add Day/Night & Weather", "Safe Haven/World/Sky and Weather/Add Day, Night and Weather to Scene", "The sky rig for a new scene");
+            MenuButton("Complete Scene Environment", "Safe Haven/World/Sky and Weather/Add Day, Night and Weather to Scene", "Weather, day/night, weather-driven terrain mist and volumetric sun/moon support");
         }
 
         MenuButton("Add Shared Wind", "Safe Haven/World/Sky and Weather/Add Shared Moss Wind", "One wind for moss, trees and particles");
 
-        Section("Fog");
+        DrawAtmosphere();
+        Section("Fog presets and exploration");
         using (new EditorGUILayout.HorizontalScope())
         {
-            MenuButton("Set Up Fog", "Safe Haven/World/Sky and Weather/Fog/Set Up Open Scene", "Volumetric fog and fog of war for this scene");
+            MenuButton("Set Up Fog of War", "Safe Haven/World/Sky and Weather/Fog/Set Up Open Scene", "Optional gameplay exploration memory; not required for mist or light shafts");
             MenuButton("Fog Area", "GameObject/Safe Haven/World/Fog Area", "Thicker or thinner fog in one place (a hollow, a marsh)");
         }
 
+        DrawFogPresets();
+    }
+
+    private void DrawAtmosphere()
+        {
+            Scene scene = SceneManager.GetActiveScene();
+            Section("Atmosphere");
+            EditorGUILayout.HelpBox("New scenes include weather, mist and volumetric sun/moon support automatically. Mist and Fog are random weather types; Clear removes both while keeping light shafts. Weather Only Atmosphere on Weather controls this. Use Complete Scene Environment for an older scene. Preview in Game view.", MessageType.Info);
+            using (new EditorGUI.DisabledScope(EditorApplication.isPlaying))
+            {
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    MenuButton("Set Up Fog", "Safe Haven/World/Sky and Weather/Fog/Set Up Fog",
+                        "Optional continuous fog. Does not enable or change light shafts.");
+                    MenuButton("Set Up Light Shafts", "Safe Haven/World/Sky and Weather/Fog/Set Up Light Shafts",
+                        "Enables sun/moon shafts without adding continuous fog.");
+                }
+            }
+
+            Terrain terrain = Selection.activeGameObject != null && !EditorUtility.IsPersistent(Selection.activeGameObject)
+                ? Selection.activeGameObject.GetComponent<Terrain>() : null;
+            if (terrain != null && terrain.gameObject.scene != scene)
+                terrain = null;
+            if (terrain != null && terrain.GetComponent<TerrainMist>() == null)
+            {
+                using (new EditorGUI.DisabledScope(EditorApplication.isPlaying))
+                    MenuButton("Add Mist to Selected Terrain", "Safe Haven/World/Sky and Weather/Fog/Add Drifting Mist to Selected Terrain",
+                        "Manual repair for a terrain without mist. Weather scenes automatically support newly added terrains.");
+            }
+            if (terrain == null)
+                EditorGUILayout.HelpBox("Select a Terrain to tune its mist. Terrains in weather scenes receive weather-driven mist automatically.", MessageType.Info);
+
+            var volumes = Object.FindObjectsByType<Volume>(FindObjectsInactive.Include)
+                .Where(v => v.gameObject.scene == scene && v.sharedProfile != null && v.sharedProfile.Has<AtmosphericFog>()).ToArray();
+            foreach (Volume volume in volumes)
+            {
+                volume.sharedProfile.TryGet(out AtmosphericFog fog);
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    EditorGUILayout.LabelField(volume.name + " / " + volume.sharedProfile.name, EditorStyles.miniLabel);
+                    if (GUILayout.Button("Edit", GUILayout.Width(44f)))
+                    {
+                        atmosphereTarget = fog;
+                        showFogSettings = true;
+                    }
+                    if (GUILayout.Button("Profile", GUILayout.Width(52f)))
+                        Selection.activeObject = volume.sharedProfile;
+                }
+            }
+            if (volumes.Length == 0)
+                EditorGUILayout.HelpBox("Atmosphere support is missing. Run Complete Scene Environment.", MessageType.Warning);
+            if (atmosphereTarget == null || !volumes.Any(v => v.sharedProfile.components.Contains(atmosphereTarget)))
+                atmosphereTarget = volumes.Length > 0 ? volumes[0].sharedProfile.components.OfType<AtmosphericFog>().First() : null;
+            if (atmosphereTarget != null)
+            {
+                showFogSettings = EditorGUILayout.Foldout(showFogSettings, "Fog and light shaft settings", true);
+                if (showFogSettings)
+                {
+                    EditorGUILayout.HelpBox("Editing the authored volume profile. Shared profiles affect every scene that uses them. Higher-priority volumes may override this look.", MessageType.Info);
+                    Editor.CreateCachedEditor(atmosphereTarget, null, ref fogEditor);
+                    using (new EditorGUI.DisabledScope(EditorApplication.isPlaying))
+                        fogEditor.OnInspectorGUI();
+                    if (!AssetDatabase.Contains(atmosphereTarget))
+                        EditorGUILayout.HelpBox("Save the scene once to store its private atmosphere profile.", MessageType.Info);
+                    using (new EditorGUI.DisabledScope(!AssetDatabase.Contains(atmosphereTarget)))
+                    if (GUILayout.Button("Save This Fog Profile"))
+                    {
+                        AssetDatabase.SaveAssetIfDirty(atmosphereTarget);
+                        foreach (Volume volume in volumes.Where(v => v.sharedProfile.components.Contains(atmosphereTarget)))
+                            AssetDatabase.SaveAssetIfDirty(volume.sharedProfile);
+                    }
+                }
+            }
+
+            TerrainMist mist = terrain != null ? terrain.GetComponent<TerrainMist>() : null;
+            if (mist != null)
+            {
+                showMistSettings = EditorGUILayout.Foldout(showMistSettings, "Selected terrain mist settings", true);
+                if (showMistSettings)
+                {
+                    Editor.CreateCachedEditor(mist, null, ref mistEditor);
+                    using (new EditorGUI.DisabledScope(EditorApplication.isPlaying))
+                        mistEditor.OnInspectorGUI();
+                }
+            }
+            bool hasTerrain = Object.FindObjectsByType<Terrain>().Any(t => t.gameObject.scene == scene);
+            if (!hasTerrain)
+                EditorGUILayout.HelpBox("No active Terrain: ground-following mist needs a terrain tile.", MessageType.Warning);
+            if (!Object.FindObjectsByType<FogGround>().Any(g => g.gameObject.scene == scene))
+                EditorGUILayout.HelpBox("Fog Ground is missing. Run the atmosphere or terrain-mist setup.", MessageType.Warning);
+            var sun = RenderSettings.sun;
+            if (sun == null || sun.gameObject.scene != scene)
+                sun = Object.FindObjectsByType<Light>()
+                    .FirstOrDefault(l => l.gameObject.scene == scene && l.type == LightType.Directional && l.enabled);
+            if (sun == null || !sun.isActiveAndEnabled || sun.type != LightType.Directional)
+                EditorGUILayout.HelpBox("An enabled directional sun/moon light is required for shafts.", MessageType.Warning);
+            else if (sun.shadows == LightShadows.None)
+                EditorGUILayout.HelpBox("Enable shadows on the sun/moon. Branches must also cast shadows to shape the shafts.", MessageType.Warning);
+            else if (sun.intensity <= 0f)
+                EditorGUILayout.HelpBox("The sun/moon intensity is zero; shafts need direct light.", MessageType.Warning);
+            var pipeline = GraphicsSettings.currentRenderPipeline as UniversalRenderPipelineAsset;
+            if (pipeline == null || !pipeline.supportsMainLightShadows || pipeline.shadowDistance <= 0f)
+                EditorGUILayout.HelpBox("The active URP pipeline needs main-light shadows and a positive shadow distance.", MessageType.Warning);
+            EditorGUILayout.LabelField("Local lights: add Atmosphere Light to a Point Light for glow and fog clearing.", EditorStyles.wordWrappedMiniLabel);
+        }
+
+    private static void DrawFogPresets()
+    {
         EditorGUILayout.LabelField("Presets", EditorStyles.miniBoldLabel);
         using (new EditorGUILayout.HorizontalScope())
         {

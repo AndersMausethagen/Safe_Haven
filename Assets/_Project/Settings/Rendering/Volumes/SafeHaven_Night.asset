@@ -147,6 +147,9 @@ MonoBehaviour:
   baseHeight:
     m_OverrideState: 0
     m_Value: 0
+  followTerrain:
+    m_OverrideState: 0
+    m_Value: 0
   heightFalloff:
     m_OverrideState: 0
     m_Value: 0.25
@@ -159,6 +162,15 @@ MonoBehaviour:
   mainLight:
     m_OverrideState: 1
     m_Value: 2.2
+  shaftDensity:
+    m_OverrideState: 1
+    m_Value: 0.004
+  shaftIntensity:
+    m_OverrideState: 1
+    m_Value: 4
+  shaftHeight:
+    m_OverrideState: 1
+    m_Value: 18
   anisotropy:
     m_OverrideState: 0
     m_Value: 0.45
@@ -171,9 +183,27 @@ MonoBehaviour:
   noiseStrength:
     m_OverrideState: 0
     m_Value: 0.6
+  driftSpeed:
+    m_OverrideState: 0
+    m_Value: 0
   wind:
     m_OverrideState: 0
     m_Value: {x: 0.6, y: 0.05, z: 0.3}
+  weatherWindInfluence:
+    m_OverrideState: 0
+    m_Value: 1
+  bankSize:
+    m_OverrideState: 0
+    m_Value: 120
+  bankStrength:
+    m_OverrideState: 0
+    m_Value: 0
+  bankSpeed:
+    m_OverrideState: 0
+    m_Value: 0.5
+  weatherInfluence:
+    m_OverrideState: 0
+    m_Value: 0.5
   clearing:
     m_OverrideState: 0
     m_Value: 0.5
@@ -181,8 +211,8 @@ MonoBehaviour:
     m_OverrideState: 0
     m_Value: 90
   steps:
-    m_OverrideState: 0
-    m_Value: 28
+    m_OverrideState: 1
+    m_Value: 48
 --- !u!114 &8716265183419951852
 MonoBehaviour:
   m_ObjectHideFlags: 3

@@ -81,6 +81,35 @@ Shader "Safe Haven/Grass"
         float4 _SafeHavenWither[4];
         float _SafeHavenWitherCount;
         float _GrassInteractorCount;
+        TEXTURE2D(_GrassFootprint0); SAMPLER(sampler_GrassFootprint0);
+        TEXTURE2D(_GrassFootprint1);
+        TEXTURE2D(_GrassFootprint2);
+        TEXTURE2D(_GrassFootprint3);
+        float4 _GrassFootprintAreas[4];
+        float4 _GrassFootprintDarkening;
+        float4 _GrassFootprintDepths;
+        float _GrassFootprintCount;
+
+        float3 GrassFootprint(float2 worldXZ)
+        {
+            float3 pressed = 0;
+            for (int i = 0; i < (int)min(_GrassFootprintCount, 4); i++)
+            {
+                float4 area = _GrassFootprintAreas[i];
+                float2 uv = (worldXZ - area.xy) * area.z;
+                if (area.w <= 0 || any(uv < 0) || any(uv > 1)) continue;
+                float mask = 0;
+                if (i == 0) mask = SAMPLE_TEXTURE2D_LOD(_GrassFootprint0, sampler_GrassFootprint0, uv, 0).r;
+                else if (i == 1) mask = SAMPLE_TEXTURE2D_LOD(_GrassFootprint1, sampler_GrassFootprint0, uv, 0).r;
+                else if (i == 2) mask = SAMPLE_TEXTURE2D_LOD(_GrassFootprint2, sampler_GrassFootprint0, uv, 0).r;
+                else mask = SAMPLE_TEXTURE2D_LOD(_GrassFootprint3, sampler_GrassFootprint0, uv, 0).r;
+                // Plants bend under the whole sole, including the shallow tread grooves.
+                pressed.x = max(pressed.x, saturate(mask * 4) * area.w);
+                pressed.y = max(pressed.y, mask * area.w * _GrassFootprintDarkening[i]);
+                pressed.z = max(pressed.z, saturate(mask * 4) * area.w * _GrassFootprintDepths[i]);
+            }
+            return float3(saturate(pressed.xy), pressed.z);
+        }
 
         struct Attributes
         {
@@ -155,8 +184,10 @@ Shader "Safe Haven/Grass"
                 float halfWidth = input.color.a * 0.05 * (input.uv.x * 2.0 - 1.0);
                 world += sideWS * (halfWidth * instanceScale * _Size * scale * keep);
             }
+            float2 footprint = GrassFootprint(world.xz).xz;
             if (animate <= 0.0 || keep <= 0.0)
             {
+                world.y = lerp(world.y, min(world.y, rootWS.y + 0.01), footprint.x) - footprint.y;
                 return world;
             }
             float bend = input.color.r * input.color.r * animate;
@@ -189,6 +220,7 @@ Shader "Safe Haven/Grass"
                     world.y -= (_Flatten * reach * height * 0.6 + dot(push, push) / (2.0 * height)) * input.color.r;
                 }
             }
+            world.y = lerp(world.y, min(world.y, rootWS.y + 0.01), footprint.x) - footprint.y;
             return world;
         }
 
@@ -212,6 +244,7 @@ Shader "Safe Haven/Grass"
                 colour = lerp(colour, half3(0.33, 0.24, 0.12) * lerp(0.55, 1.0, tip), saturate(near * spot.w));
             }
             half clump = Noise(rootWS.xz / max(_ClumpScale, 0.05) + 17.0);
+            colour *= 1 - GrassFootprint(rootWS.xz).y;
             return colour * (1.0 + (input.color.g - 0.5) * 2.0 * _BladeVariation) * lerp(0.85, 1.12, clump);
         }
 
