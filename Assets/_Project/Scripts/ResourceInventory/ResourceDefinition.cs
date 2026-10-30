@@ -9,7 +9,7 @@ using UnityEngine;
 /// changes while playing.
 /// </summary>
 [CreateAssetMenu(fileName = "NewResource", menuName = "Safe Haven/Resources/Resource Definition")]
-public sealed class ResourceDefinition : ScriptableObject
+public sealed class ResourceDefinition : ScriptableObject, IDisplayName
 {
     [Header("Identity")]
     [Tooltip("Stable unique identifier, used for lookups and saves. Leave empty to use the asset name, " +

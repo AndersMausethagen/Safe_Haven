@@ -104,16 +104,6 @@ public static class StationMenu
         return string.IsNullOrEmpty(resources) ? items : resources + ", " + items;
     }
 
-    private static string NameOf(Object definition)
-    {
-        switch (definition)
-        {
-            case ItemDefinition item:
-                return item.DisplayName;
-            case ResourceDefinition resource:
-                return resource.DisplayName;
-            default:
-                return definition != null ? definition.name : "";
-        }
-    }
+    private static string NameOf(Object definition) =>
+        definition is IDisplayName named ? named.DisplayName : definition != null ? definition.name : "";
 }

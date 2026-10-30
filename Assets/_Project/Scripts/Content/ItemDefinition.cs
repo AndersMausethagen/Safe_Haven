@@ -28,7 +28,7 @@ public enum ItemCategory
 /// </para>
 /// </summary>
 [CreateAssetMenu(fileName = "NewItem", menuName = "Safe Haven/Items/Item Definition")]
-public sealed class ItemDefinition : ScriptableObject
+public sealed class ItemDefinition : ScriptableObject, IDisplayName
 {
     [Header("Identity")]
     [Tooltip("Stable unique identifier, used for lookups and saves.")]

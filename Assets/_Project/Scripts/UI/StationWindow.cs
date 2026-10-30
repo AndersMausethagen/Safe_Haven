@@ -494,7 +494,7 @@ public sealed class StationWindow : MonoBehaviour
             }
         }
 
-        string name = thing is ItemDefinition outputItem ? outputItem.DisplayName : thing is ResourceDefinition resource ? resource.DisplayName : "";
+        string name = thing is IDisplayName named ? named.DisplayName : "";
         outputLabel.text = thing != null
             ? $"Output  <color=#AAB0BC>{queue.OutputAmount}/{queue.Capacity} {name}</color>"
             : $"Output  <color=#AAB0BC>empty (holds {queue.Capacity})</color>";

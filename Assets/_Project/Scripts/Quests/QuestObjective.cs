@@ -234,16 +234,5 @@ public sealed class QuestObjective
         }
     }
 
-    private static string Name(Object definition)
-    {
-        switch (definition)
-        {
-            case ItemDefinition found:
-                return found.DisplayName;
-            case ResourceDefinition found:
-                return found.DisplayName;
-            default:
-                return "(nothing chosen)";
-        }
-    }
+    private static string Name(Object definition) => definition is IDisplayName named ? named.DisplayName : "(nothing chosen)";
 }

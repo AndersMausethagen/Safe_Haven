@@ -77,6 +77,8 @@ Same review for Quests/ and Events/. Work top to bottom.
 4. [x] **No Heart Tree inside the generic trigger.** Done: `TriggerWhen.PlayerInsideArea` watches any `IArea`
        (HeartTree is one); the SafeHaven scene's Heart Tree Bloom points at the tree. `GameEventTrigger`'s PlayerInsideWard polls `HeartTree.Current`;
        an area interface (or a ward trigger component) keeps the trigger generic.
-5. [ ] Smaller: `QuestObjective.Name` switches on Item/Resource definitions (a shared display-name interface);
-       `QuestGiver.CanInteract` advances its waiting lines (a query with a side effect); HeartTree keeps its own talked
-       event beside `Talkable`'s.
+5. [x] Smaller. Done: `IDisplayName` (ItemDefinition, ResourceDefinition) replaces the type switches in
+       QuestObjective, StationMenu and StationWindow. Kept on purpose: `QuestGiver.CanInteract` advancing its waiting
+       lines only happens for givers without a Talkable (notice boards), whose prompt is the line; a clean fix needs a
+       "focused" hook on Interactable. HeartTree's talked event is raised when its menu (ward, breach) closes, not on
+       talk, so it is not Talkable's.
