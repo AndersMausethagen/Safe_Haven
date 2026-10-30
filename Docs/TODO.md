@@ -110,7 +110,8 @@ Same review for the rest of the runtime code (SOLID, Unity practice, no special-
        can pick a chest's inventory. Bind to `Player.Current` (and rebind when the player arrives). The
        `PlayerCameraController` is looked up with Find in five places (DialogueBox, NokkenEncounter twice,
        ArcheryCameraAim, StoryNodes): one owner exposes it.
-5. [ ] **One rule for spawned encounters and saving.** `TransientSpawn` strips SaveableEntity from copies at runtime,
+5. [x] **One rule for spawned encounters and saving.** Done: SaveableEntity leaves copies without an id unsaved (no
+       warning; Level Check reports scene objects missing one); TransientSpawn is gone. Was: `TransientSpawn` strips SaveableEntity from copies at runtime,
        and the prologue rejects saveable enemy prefabs in validation. Let SaveableEntity decide: a copy made while
        playing that wasn't spawned through `SaveableEntity.Spawn` is simply not persistent (no warning, nothing to
        strip).

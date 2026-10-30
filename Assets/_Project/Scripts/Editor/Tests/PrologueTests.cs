@@ -117,16 +117,12 @@ public sealed class PrologueTests
     }
 
     [Test]
-    public void StartingArmor_IsACompleteHideSetAndEncounterActorsDoNotPersist()
+    public void StartingArmor_IsACompleteHideSetAndTheCampfirePersists()
     {
         // Head, body (which covers the legs), hands and feet.
         Assert.AreEqual(4, Definition.StartingArmor.Length);
         Assert.IsTrue(Definition.StartingArmor.All(i => i != null && i.IsArmor && i.name.StartsWith("WovenHide")));
         Assert.AreEqual(4, Definition.StartingArmor.Select(i => i.ArmorSlot).Distinct().Count());
-        foreach (PrologueChapter chapter in Definition.Chapters)
-            foreach (PrologueWaveEnemy enemy in chapter.Enemies)
-                Assert.IsEmpty(enemy.prefab.GetComponentsInChildren<SaveableEntity>(true),
-                    "Encounters reset on load; only placed construction and gathering nodes persist.");
         var database = AssetDatabase.LoadAssetAtPath<ContentDatabase>("Assets/_Project/Resources/ContentDatabase.asset");
         var prefab = Definition.Campfire.Prefab.GetComponent<SaveableEntity>();
         Assert.AreSame(prefab, database.FindPrefab(prefab.PrefabId));
@@ -292,8 +288,5 @@ public sealed class PrologueTests
         Assert.Greater(first.Length, 1, "More than wolves come through the dark.");
         CollectionAssert.DoesNotContain(first, "ExpeditionMistwing", "Mistwings come from the second wave.");
         CollectionAssert.Contains(later, "ExpeditionMistwing");
-        foreach (string name in later)
-            Assert.IsNull(AssetDatabase.LoadAssetAtPath<GameObject>(Root + "/" + name + ".prefab").GetComponentInChildren<SaveableEntity>(true),
-                "Encounters restart at checkpoints.");
     }
 }

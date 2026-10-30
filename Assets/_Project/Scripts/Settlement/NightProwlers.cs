@@ -164,7 +164,7 @@ public sealed class NightProwlers : MonoBehaviour
                 return;
             }
 
-            GameObject prowler = TransientSpawn.Spawn(prefab, hit.position, Quaternion.LookRotation(player - hit.position), true);
+            GameObject prowler = Instantiate(prefab, hit.position, Quaternion.LookRotation(player - hit.position));
             if (prowler.TryGetComponent(out MonsterAI ai))
             {
                 ai.AvoidArea = position => VisibilitySource.IsLit(position);

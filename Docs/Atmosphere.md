@@ -55,7 +55,7 @@ weather, gathers in fog areas (hollows, marshes) and makes monsters see less far
   from the player and outside light at night once the first breach is won (never during one). They avoid light
   (`MonsterAI.AvoidArea`): they don't notice anyone standing in it and lose a hunt that leads into it. Every 8–16 s an
   idle prowler closes in, on the player in the dark or to the edge of the light nearest it. At dawn they walk off and
-  are removed. Spawned through `TransientSpawn`, so they are never saved.
+  are removed. Like every copy made while playing (not through `SaveableEntity.Spawn`), they are never saved.
 
 ## For designers: fog on a new map in a few minutes
 

@@ -120,9 +120,12 @@ public sealed class WardBreachDirector : MonoBehaviour
         Vector3 origin = spawnPoint != null ? spawnPoint.position : transform.position;
         Vector2 offset = Random.insideUnitCircle * spawnSpread;
         Vector3 position = origin + new Vector3(offset.x, 0f, offset.y);
-        // Breach enemies aren't part of the saved scene and carry no loot (the breach has its own reward).
-        GameObject enemy = TransientSpawn.Spawn(definition.EnemyPrefab, position,
-            spawnPoint != null ? spawnPoint.rotation : Quaternion.identity, false);
+        GameObject enemy = Instantiate(definition.EnemyPrefab, position, spawnPoint != null ? spawnPoint.rotation : Quaternion.identity);
+        // Breach enemies carry no loot: the breach has its own reward.
+        foreach (LootOnDeath loot in enemy.GetComponentsInChildren<LootOnDeath>(true))
+        {
+            loot.enabled = false;
+        }
 
         if (enemy.TryGetComponent(out Combatant combatant))
         {

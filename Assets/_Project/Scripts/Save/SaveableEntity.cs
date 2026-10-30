@@ -8,7 +8,9 @@ using UnityEngine.AI;
 /// stays picked. Add it to an object (or its prefab) in a scene with a PersistentScene, and choose below what is kept.
 /// Every ISaveable component on the same object is saved with it. Scene objects get a stable id in the editor; objects
 /// created while playing (placed buildings) get one when spawned through <see cref="Spawn"/> and are recreated from their
-/// prefab. The state lives in memory in GameSession while playing and only reaches disk when the game is saved.
+/// prefab. Any other copy made while playing (a breach attacker, a prowler, a prologue wave) has no id and is simply not
+/// saved, so encounters can use the same prefabs as placed monsters; a scene object missing its id is Level Check's to
+/// report. The state lives in memory in GameSession while playing and only reaches disk when the game is saved.
 /// </summary>
 [DisallowMultipleComponent]
 [DefaultExecutionOrder(-80)]
@@ -109,11 +111,6 @@ public sealed class SaveableEntity : MonoBehaviour
         owner = PersistentScene.For(gameObject.scene);
         if (owner == null || owner.State == null || string.IsNullOrEmpty(id))
         {
-            if (owner != null && string.IsNullOrEmpty(id))
-            {
-                Debug.LogWarning($"{name} has no save id, so its state isn't saved. Use Safe Haven > Save > Assign Missing Save Ids.", this);
-            }
-
             return;
         }
 

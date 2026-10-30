@@ -60,7 +60,7 @@ public sealed class PrologueChapter
 [Serializable]
 public sealed class PrologueWaveEnemy
 {
-    [Tooltip("A monster prefab without a SaveableEntity (encounters restart at checkpoints).")]
+    [Tooltip("A monster prefab. Copies made while playing aren't saved, so encounters restart at checkpoints.")]
     public GameObject prefab;
     [Tooltip("How often it comes, against the others' weights.")]
     [Min(0f)] public float weight = 1f;
@@ -171,9 +171,8 @@ public sealed class PrologueDefinition : ScriptableObject
             if (fight && (chapter.InitialEnemies < 1 || chapter.Enemy(1, 0f) == null))
                 return $"The {chapter.Behaviour} chapter needs enemies for its first wave.";
             foreach (PrologueWaveEnemy enemy in chapter.Enemies)
-                if (enemy != null && enemy.prefab != null && (enemy.prefab.GetComponent<Damageable>() == null ||
-                    enemy.prefab.GetComponentInChildren<SaveableEntity>(true) != null))
-                    return $"Enemy {enemy.prefab.name} must be damageable and must not be saveable.";
+                if (enemy != null && enemy.prefab != null && enemy.prefab.GetComponent<Damageable>() == null)
+                    return $"Enemy {enemy.prefab.name} must be damageable.";
         }
         if (startedEvent == null || shelterEvent == null || fireEvent == null || restedEvent == null ||
             campDefendedEvent == null || portalReachedEvent == null || portalActivatedEvent == null || finishedEvent == null)
