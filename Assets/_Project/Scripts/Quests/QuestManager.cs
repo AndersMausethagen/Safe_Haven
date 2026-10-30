@@ -320,42 +320,9 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
     // "Collect 10 ore" with Count Already Owned starts from what is in the bag.
     private void CountOwned(QuestDefinition quest)
     {
-        Player player = Player.Current;
-        if (player == null)
-        {
-            return;
-        }
-
         for (int i = 0; i < quest.Objectives.Count; i++)
         {
-            QuestObjective objective = quest.Objectives[i];
-            if (!objective.CountAlreadyOwned)
-            {
-                continue;
-            }
-
-            int owned;
-            switch (objective.Type)
-            {
-                case ObjectiveType.QuestEvent:
-                    owned = log.HasHappened(objective.QuestEvent) ? 1 : 0;
-                    break;
-                case ObjectiveType.CollectItem:
-                    owned = player.Bag.Container.Count(objective.Item)
-                        + (player.Equipment != null ? player.Equipment.Gear.Slots.Count(objective.Item) : 0);
-                    break;
-                case ObjectiveType.BuildStructure:
-                    owned = BuildingObject.Count(objective.Building);
-                    break;
-                case ObjectiveType.GatherResource when objective.Item != null:
-                    owned = player.Bag.Container.Count(objective.Item);
-                    break;
-                default:
-                    owned = player.Resources.Storage.GetAmount(objective.Resource);
-                    break;
-            }
-
-            log.AddProgress(quest, i, owned);
+            log.AddProgress(quest, i, quest.Objectives[i].Owned(Player.Current, log));
         }
     }
 

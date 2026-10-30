@@ -67,9 +67,10 @@ Same review for Quests/ and Events/. Work top to bottom.
        `GameEvent.ByPlayer` (sounds, the prologue's own fire, gather experience). `GameEvent.ByPlayer` (`Player.IsPlayer`; no actor counts as the player) and
        `ExperienceTracker.ByPlayer` (no actor does not count) disagree. Decide once, on the side (`Faction.IsPlayerSide`
        of the actor's Combatant), so a companion's kill counts for "kill 5 wolves" and a wolf burnt by nobody doesn't.
-2. [ ] **Objective rules in one place.** `ObjectiveType` is switched on in `QuestObjective` (Progress, Describe,
-       FindProblem), `QuestObjectiveDrawer` and `QuestManager.CountOwned`. Move CountOwned into the objective first;
-       later consider one class per objective type (`[SerializeReference]`, like `StoryNode`) with an asset migration.
+2. [x] **Objective rules in one place.** Done: every per-type rule is in `QuestObjective` (Progress, Describe,
+       FindProblem, Owned, FieldsOf for the drawer). Fixed on the way: the Inspector hid a gather objective's material
+       item. Left for when a type needs it: one class per type (`[SerializeReference]`, like `StoryNode`) with an asset
+       migration.
 3. [ ] **Death subject without type checks.** `GameEvents.OnAnyDied` asks for MonsterAI, then BuildingObject; give the
        dying object a small interface for its definition (like `IInteractionName`).
 4. [ ] **No Heart Tree inside the generic trigger.** `GameEventTrigger`'s PlayerInsideWard polls `HeartTree.Current`;

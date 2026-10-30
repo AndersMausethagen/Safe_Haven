@@ -1,27 +1,14 @@
-using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
 /// <summary>
-/// Draws a quest objective with only the fields its type uses, plus a line showing how it will read in the game, so
-/// designers aren't faced with settings that do nothing.
+/// Draws a quest objective with only the fields its type uses (QuestObjective.FieldsOf), plus a line showing how it will
+/// read in the game, so designers aren't faced with settings that do nothing.
 /// </summary>
 [CustomPropertyDrawer(typeof(QuestObjective))]
 public sealed class QuestObjectiveDrawer : PropertyDrawer
 {
     private const float Gap = 2f;
-
-    private static readonly Dictionary<ObjectiveType, string[]> FieldsByType = new Dictionary<ObjectiveType, string[]>
-    {
-        { ObjectiveType.CollectItem, new[] { "item", "countAlreadyOwned" } },
-        { ObjectiveType.GatherResource, new[] { "resource", "countAlreadyOwned" } },
-        { ObjectiveType.KillMonster, new[] { "monster", "faction" } },
-        { ObjectiveType.DestroyBuilding, new[] { "building" } },
-        { ObjectiveType.CraftItem, new[] { "item", "resource" } },
-        { ObjectiveType.CompleteRaids, new[] { "raid", "mustExtract", "withinMinutes" } },
-        { ObjectiveType.QuestEvent, new[] { "questEvent", "countAlreadyOwned" } },
-        { ObjectiveType.BuildStructure, new[] { "building", "countAlreadyOwned" } },
-    };
 
     public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
     {
@@ -71,7 +58,7 @@ public sealed class QuestObjectiveDrawer : PropertyDrawer
     private static string[] Fields(SerializedProperty property)
     {
         var type = (ObjectiveType)property.FindPropertyRelative("type").enumValueIndex;
-        return FieldsByType.TryGetValue(type, out string[] fields) ? fields : new string[0];
+        return QuestObjective.FieldsOf(type);
     }
 
     private static string Describe(SerializedProperty property)

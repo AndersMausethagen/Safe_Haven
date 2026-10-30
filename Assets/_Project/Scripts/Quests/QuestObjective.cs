@@ -28,9 +28,11 @@ public enum ObjectiveType
 /// and fill in the fields it uses (the Inspector shows only those). It counts matching game events; it holds no progress
 /// itself, which the QuestLog keeps per player.
 /// <para>
-/// Extending, to add an objective type: 1) add an ObjectiveType at the end, 2) add any field it needs here, 3) count it
-/// in <see cref="Progress"/> from a GameEventKind (add one in GameEvents if nothing reports it yet), 4) word it in
-/// <see cref="Describe"/>, 5) list its fields in QuestObjectiveDrawer so the Inspector shows them.
+/// Every rule of a type lives here. Extending, to add an objective type: 1) add an ObjectiveType at the end, 2) add any
+/// field it needs, 3) list its fields in <see cref="FieldsOf"/> (the Inspector shows those), 4) count it in
+/// <see cref="Progress"/> from a GameEventKind (add one in GameEvents if nothing reports it yet), 5) word it in
+/// <see cref="Describe"/>; check it in <see cref="FindProblem"/> and, if it can be met before the quest starts, in
+/// <see cref="Owned"/>.
 /// </para>
 /// </summary>
 [Serializable]
@@ -61,7 +63,7 @@ public sealed class QuestObjective
 
     public ObjectiveType Type => type;
     public int Amount => Mathf.Max(1, amount);
-    public bool CountAlreadyOwned => countAlreadyOwned && (type == ObjectiveType.CollectItem || type == ObjectiveType.GatherResource || type == ObjectiveType.BuildStructure || type == ObjectiveType.QuestEvent);
+    public bool CountAlreadyOwned => countAlreadyOwned && Array.IndexOf(FieldsOf(type), nameof(countAlreadyOwned)) >= 0;
     public ItemDefinition Item => item;
     public ResourceDefinition Resource => resource;
     /// <summary>What a gather objective counts: the material item, or the essence when no item is set.</summary>
@@ -81,6 +83,32 @@ public sealed class QuestObjective
         objective.raid = target as RaidDefinition;
         objective.questEvent = target as GameEventDefinition;
         return objective;
+    }
+
+    /// <summary>The serialized fields an objective of <paramref name="type"/> uses, besides its type, amount and text.</summary>
+    public static string[] FieldsOf(ObjectiveType type)
+    {
+        switch (type)
+        {
+            case ObjectiveType.CollectItem:
+                return new[] { nameof(item), nameof(countAlreadyOwned) };
+            case ObjectiveType.GatherResource:
+                return new[] { nameof(item), nameof(resource), nameof(countAlreadyOwned) };
+            case ObjectiveType.KillMonster:
+                return new[] { nameof(monster), nameof(faction) };
+            case ObjectiveType.DestroyBuilding:
+                return new[] { nameof(building) };
+            case ObjectiveType.CraftItem:
+                return new[] { nameof(item), nameof(resource) };
+            case ObjectiveType.CompleteRaids:
+                return new[] { nameof(raid), nameof(mustExtract), nameof(withinMinutes) };
+            case ObjectiveType.QuestEvent:
+                return new[] { nameof(questEvent), nameof(countAlreadyOwned) };
+            case ObjectiveType.BuildStructure:
+                return new[] { nameof(building), nameof(countAlreadyOwned) };
+            default:
+                return Array.Empty<string>();
+        }
     }
 
     /// <summary>How much the event advances this objective; 0 when it doesn't count.</summary>
@@ -117,6 +145,30 @@ public sealed class QuestObjective
                 return gameEvent.Kind == GameEventKind.Built && Is(building, gameEvent.Subject, false) ? gameEvent.Amount : 0;
             case ObjectiveType.QuestEvent:
                 return gameEvent.Kind == GameEventKind.Custom && questEvent != null && gameEvent.Subject == questEvent ? gameEvent.Amount : 0;
+            default:
+                return 0;
+        }
+    }
+
+    /// <summary>What already counts when the quest starts, with Count Already Owned: what the player holds (bag and gear,
+    /// or their essences), the structures standing, or a Quest Event that already happened (once). 0 otherwise.</summary>
+    public int Owned(Player player, QuestLog log)
+    {
+        if (!CountAlreadyOwned || player == null)
+        {
+            return 0;
+        }
+
+        switch (type)
+        {
+            case ObjectiveType.QuestEvent:
+                return log != null && log.HasHappened(questEvent) ? 1 : 0;
+            case ObjectiveType.CollectItem:
+                return player.Bag.Container.Count(item) + (player.Equipment != null ? player.Equipment.Gear.Slots.Count(item) : 0);
+            case ObjectiveType.BuildStructure:
+                return BuildingObject.Count(building);
+            case ObjectiveType.GatherResource:
+                return item != null ? player.Bag.Container.Count(item) : player.Resources.Storage.GetAmount(resource);
             default:
                 return 0;
         }

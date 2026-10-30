@@ -70,6 +70,20 @@ public sealed class QuestTests
     }
 
     [Test]
+    public void Objectives_ShowTheFieldsTheirTypeUses()
+    {
+        foreach (ObjectiveType type in Enum.GetValues(typeof(ObjectiveType)))
+        {
+            foreach (string field in QuestObjective.FieldsOf(type))
+            {
+                Assert.IsNotNull(typeof(QuestObjective).GetField(field, BindingFlags.NonPublic | BindingFlags.Instance), $"{type}: {field}");
+            }
+        }
+
+        CollectionAssert.Contains(QuestObjective.FieldsOf(ObjectiveType.GatherResource), "item", "Material items are gathered too.");
+    }
+
+    [Test]
     public void RaidObjectives_RespectPlaceExtractionAndTime()
     {
         var wilds = Create<RaidDefinition>("wilds");
