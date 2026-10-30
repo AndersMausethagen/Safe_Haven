@@ -82,3 +82,36 @@ Same review for Quests/ and Events/. Work top to bottom.
        lines only happens for givers without a Talkable (notice boards), whose prompt is the line; a clean fix needs a
        "focused" hook on Interactable. HeartTree's talked event is raised when its menu (ward, breach) closes, not on
        talk, so it is not Talkable's.
+
+## Code quality: other systems (analysis 2026-10-30)
+
+Same review for the rest of the runtime code (SOLID, Unity practice, no special-case rules). Work top to bottom.
+
+1. [ ] **MonsterAI is still 1404 lines.** Targeting is out (`MonsterTargeting`); perception and investigation
+       (Hear, Sense, TrackTarget, the investigation states, idle gaze, ambush, indicator) and attack actions
+       (BeginAttack, UpdateAction, charge, howl, projectile, retreat) are two more plain C# parts, as `Companion` was
+       split. Behaviour unchanged; the existing AI tests cover it.
+2. [ ] **Item or resource is one idea.** "Is it an ItemDefinition or a ResourceDefinition?" is asked in
+       StationCrafting (deliver output), ResourceSource (harvest), SaveMapper (output id), ItemTooltipView,
+       StationWindow (icon, tint, stack) and the quest/station names (now `IDisplayName`). One interface for what both
+       share (id, name, icon, tint) and one place that gives an amount of either to someone (bag or material pool).
+3. [ ] **Monster checks outside AI.** AudioManager (death sound, "a fight is on"), CombatFeedback (hurt sound),
+       PlayerGuard (parry stagger) and CompanionLeader ask for `MonsterAI`. Sounds come from the definition the
+       object reports (`IEventSubject` + a small sounds interface, like BuildingObject already has); stagger is an
+       `IStaggerable`, so a companion or a future NPC can be staggered too.
+4. [ ] **UI binds to the player, not to whatever is found.** CharacterWindow, ItemInventoryWindow, MessageFeedView,
+       ResourceInventoryPanel and SkillWindow fall back to `FindAnyObjectByType<ItemInventory>()` and the like, which
+       can pick a chest's inventory. Bind to `Player.Current` (and rebind when the player arrives). The
+       `PlayerCameraController` is looked up with Find in five places (DialogueBox, NokkenEncounter twice,
+       ArcheryCameraAim, StoryNodes): one owner exposes it.
+5. [ ] **One rule for spawned encounters and saving.** `TransientSpawn` strips SaveableEntity from copies at runtime,
+       and the prologue rejects saveable enemy prefabs in validation. Let SaveableEntity decide: a copy made while
+       playing that wasn't spawned through `SaveableEntity.Spawn` is simply not persistent (no warning, nothing to
+       strip).
+6. [ ] **BuildPlacer (981 lines)** holds the build menu pages, the placement rules (grid, snap, lines, CheckSpot)
+       and the ghost visuals. Split the menu and the ghost out; the rules become testable without a scene.
+
+Fine as they are: the six `Instance` singletons (AudioManager, CombatFeedback, GameStateManager, UIStateManager,
+ExperienceTracker, QuestManager) are scene services with one owner each; spawners configuring `MonsterAI` directly
+(NightProwlers, WardBreachDirector, PrologueDirector) are spawning monsters, so knowing the type is their job; raid
+generation's Find calls run once per raid build.
