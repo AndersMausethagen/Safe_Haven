@@ -46,6 +46,7 @@ public sealed class EnvironmentHudTests
     [TestCase("Clear", WeatherIconGraphic.Symbol.Sun)]
     [TestCase("Breezy", WeatherIconGraphic.Symbol.Wind)]
     [TestCase("Mist", WeatherIconGraphic.Symbol.Mist)]
+    [TestCase("Fog", WeatherIconGraphic.Symbol.Mist)]
     [TestCase("Rain", WeatherIconGraphic.Symbol.Rain)]
     [TestCase("Storm", WeatherIconGraphic.Symbol.Storm)]
     public void Weather_UsesActualAuthoredConditions(string name, WeatherIconGraphic.Symbol expected)

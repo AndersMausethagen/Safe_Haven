@@ -24,7 +24,7 @@ public sealed class WeatherIconGraphic : MaskableGraphic
     {
         if (state.LightningPerMinute > 0.1f) return Symbol.Storm;
         if (state.Rain > 0.1f) return Symbol.Rain;
-        if (state.Fog > 1.5f) return Symbol.Mist;
+        if (state.Fog > 1.5f || state.Mist > 0.5f) return Symbol.Mist;
         if (state.Wind > 1.2f) return Symbol.Wind;
         if (state.Clouds > 0.4f) return Symbol.Cloud;
         return night ? Symbol.Moon : Symbol.Sun;
