@@ -69,7 +69,7 @@ public sealed class NokkenEncounter : MonoBehaviour
         }
 
         CameraShake.Add(first ? 0.9f : 0.6f);
-        PlayerCameraController camera = FindAnyObjectByType<PlayerCameraController>();
+        PlayerCameraController camera = PlayerCameraController.Current;
         if (camera != null)
         {
             camera.BeginDialogue(figure, first ? 0.3f : 0.42f);
@@ -146,7 +146,7 @@ public sealed class NokkenEncounter : MonoBehaviour
         }
 
         AudioManager.Play(settings.NokkenSplash, surfaceAt);
-        PlayerCameraController camera = FindAnyObjectByType<PlayerCameraController>();
+        PlayerCameraController camera = PlayerCameraController.Current;
         if (camera != null)
         {
             camera.EndDialogue(figure);

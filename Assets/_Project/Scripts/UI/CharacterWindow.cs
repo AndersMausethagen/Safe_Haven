@@ -48,7 +48,7 @@ public sealed class CharacterWindow : MonoBehaviour, IItemSlotHandler
     {
         if (equipment == null)
         {
-            equipment = Player.Current != null ? Player.Current.Equipment : FindAnyObjectByType<PlayerEquipment>();
+            equipment = Player.Current != null ? Player.Current.Equipment : null;
         }
 
         if (equipment == null || slotPrefab == null || leftColumn == null || rightColumn == null || bottomRow == null

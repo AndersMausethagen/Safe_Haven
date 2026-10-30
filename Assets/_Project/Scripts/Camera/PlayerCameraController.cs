@@ -30,6 +30,9 @@ public sealed class PlayerCameraController : MonoBehaviour
 
     [SerializeField] private PlayerCameraSettings settings;
 
+    /// <summary>The scene's player camera rig, while it is enabled; null in scenes without one.</summary>
+    public static PlayerCameraController Current { get; private set; }
+
     private static readonly RaycastHit[] ClipHits = new RaycastHit[16];
 
     private CinemachineCamera cinemachineCamera;
@@ -136,6 +139,7 @@ public sealed class PlayerCameraController : MonoBehaviour
 
     private void OnEnable()
     {
+        Current = this;
         orbitAction?.Enable();
         zoomAction?.Enable();
         toggleAction?.Enable();
@@ -169,6 +173,11 @@ public sealed class PlayerCameraController : MonoBehaviour
 
     private void OnDisable()
     {
+        if (Current == this)
+        {
+            Current = null;
+        }
+
         orbitAction?.Disable();
         zoomAction?.Disable();
         toggleAction?.Disable();

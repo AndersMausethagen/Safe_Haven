@@ -35,7 +35,7 @@ public sealed class SkillWindow : MonoBehaviour, IItemSlotHandler
 
     private void OnEnable()
     {
-        skills = skills != null ? skills : Player.Current != null ? Player.Current.Skills : FindAnyObjectByType<PlayerSkills>();
+        skills = skills != null ? skills : Player.Current != null ? Player.Current.Skills : null;
         if (skills == null || barGrid == null || bookGrid == null || slotPrefab == null || tooltip == null || dragIcon == null)
         {
             Debug.LogError("SkillWindow is missing a reference (player skills, bar grid, book grid, slot prefab, tooltip or drag icon).", this);

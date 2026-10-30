@@ -67,7 +67,7 @@ public sealed class ItemInventoryWindow : MonoBehaviour, IItemSlotHandler
 
     private void OnEnable()
     {
-        inventory = inventory != null ? inventory : Player.Current != null ? Player.Current.Bag : FindAnyObjectByType<ItemInventory>();
+        inventory = inventory != null ? inventory : Player.Current != null ? Player.Current.Bag : null;
         if (inventory == null || grid == null || slotPrefab == null || tooltip == null || dragIcon == null || recipeList == null || recipeRowPrefab == null)
         {
             Debug.LogError("ItemInventoryWindow is missing a reference (inventory, grid, slot prefab, tooltip, drag icon, recipe list or row prefab).", this);

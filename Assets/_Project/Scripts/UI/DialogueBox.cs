@@ -394,7 +394,7 @@ public sealed class DialogueBox : MonoBehaviour
         }
 
         framed = speaker != null && (global::Player.Current == null || speaker != global::Player.Current.transform) ? speaker : null;
-        framing = framing != null ? framing : FindAnyObjectByType<PlayerCameraController>();
+        framing = framing != null ? framing : PlayerCameraController.Current;
         if (framing != null && framed != null)
         {
             framing.BeginDialogue(framed, distance > 0f ? distance : 0.65f);

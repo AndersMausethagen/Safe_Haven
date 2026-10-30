@@ -771,7 +771,7 @@ public sealed class FocusCameraNode : StoryNode
 
     public override IEnumerator Run(StoryContext context)
     {
-        PlayerCameraController camera = UnityEngine.Object.FindAnyObjectByType<PlayerCameraController>();
+        PlayerCameraController camera = PlayerCameraController.Current;
         if (camera == null || target == null)
         {
             yield break;

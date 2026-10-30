@@ -104,7 +104,8 @@ Same review for the rest of the runtime code (SOLID, Unity practice, no special-
        PlayerGuard (parry stagger) and CompanionLeader ask for `MonsterAI`. Sounds come from the definition the
        object reports (`IEventSubject` + a small sounds interface, like BuildingObject already has); stagger is an
        `IStaggerable`, so a companion or a future NPC can be staggered too.
-4. [ ] **UI binds to the player, not to whatever is found.** CharacterWindow, ItemInventoryWindow, MessageFeedView,
+4. [x] **UI binds to the player, not to whatever is found.** Done: the windows take `Player.Current` (MessageFeedView
+       also rebinds on `Player.Spawned`, like PlayerVitalsView); `PlayerCameraController.Current` replaces the Finds. Was: CharacterWindow, ItemInventoryWindow, MessageFeedView,
        ResourceInventoryPanel and SkillWindow fall back to `FindAnyObjectByType<ItemInventory>()` and the like, which
        can pick a chest's inventory. Bind to `Player.Current` (and rebind when the player arrives). The
        `PlayerCameraController` is looked up with Find in five places (DialogueBox, NokkenEncounter twice,

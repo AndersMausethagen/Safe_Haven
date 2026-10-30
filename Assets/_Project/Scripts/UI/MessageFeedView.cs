@@ -46,24 +46,47 @@ public sealed class MessageFeedView : MonoBehaviour
     {
         lineTemplate.gameObject.SetActive(false);
         GameMessages.Posted += Show;
+        // The player's own pickups, from the player now or once they arrive.
+        Player.Spawned += Bind;
+        Bind(Player.Current);
+    }
 
-        resources = Player.Current != null ? Player.Current.Resources : FindAnyObjectByType<ResourceInventory>();
+    private void OnDisable()
+    {
+        GameMessages.Posted -= Show;
+        Player.Spawned -= Bind;
+        Unbind();
+    }
+
+    private void Bind(Player player)
+    {
+        if (player != null && player.Resources == resources && player.Bag == items)
+        {
+            return;
+        }
+
+        Unbind();
+        if (player == null)
+        {
+            return;
+        }
+
+        resources = player.Resources;
         if (resources != null)
         {
             resources.Storage.Changed += OnResourceChanged;
             resources.Storage.Discovered += OnResourceDiscovered;
         }
 
-        items = Player.Current != null ? Player.Current.Bag : FindAnyObjectByType<ItemInventory>();
+        items = player.Bag;
         if (items != null)
         {
             items.Received += OnItemsReceived;
         }
     }
 
-    private void OnDisable()
+    private void Unbind()
     {
-        GameMessages.Posted -= Show;
         if (resources != null)
         {
             resources.Storage.Changed -= OnResourceChanged;
@@ -74,6 +97,9 @@ public sealed class MessageFeedView : MonoBehaviour
         {
             items.Received -= OnItemsReceived;
         }
+
+        resources = null;
+        items = null;
     }
 
     private void Update()

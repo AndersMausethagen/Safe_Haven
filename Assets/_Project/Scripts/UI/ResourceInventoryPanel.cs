@@ -68,7 +68,7 @@ public sealed class ResourceInventoryPanel : MonoBehaviour
 
     private void OnEnable()
     {
-        inventory = inventory != null ? inventory : Player.Current != null ? Player.Current.Resources : FindAnyObjectByType<ResourceInventory>();
+        inventory = inventory != null ? inventory : Player.Current != null ? Player.Current.Resources : null;
         if (inventory == null || catalog == null || barPrefab == null || headerPrefab == null || tabPrefab == null
             || tabBar == null || scrollRect == null || content == null)
         {

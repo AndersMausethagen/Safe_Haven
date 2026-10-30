@@ -2,8 +2,8 @@ using UnityEngine;
 
 /// <summary>
 /// Tells the camera when the player aims a bow (holding guard with a bow, or drawing it), so the view narrows a little
-/// and, top-down, leans further toward the cursor (PlayerCameraController.SetAiming). Finds the scene's camera rig
-/// itself, so the player prefab needs no reference to it.
+/// and, top-down, leans further toward the cursor (PlayerCameraController.SetAiming). It reaches the scene's camera rig
+/// through PlayerCameraController.Current, so the player prefab needs no reference to it.
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(PlayerArchery))]
@@ -28,7 +28,7 @@ public sealed class ArcheryCameraAim : MonoBehaviour
                 return;
             }
 
-            view = FindAnyObjectByType<PlayerCameraController>();
+            view = PlayerCameraController.Current;
             if (view == null)
             {
                 return;
