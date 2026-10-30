@@ -48,6 +48,14 @@ public sealed class CombatFeelSettings : ScriptableObject
     [SerializeField, Range(0f, 0.5f)] private float punchAmount = 0.12f;
     [SerializeField, Min(0f)] private float punchSeconds = 0.16f;
 
+    [Header("Hit recoil (monsters: the body snaps away from the blow)")]
+    [Tooltip("Degrees a monster's body tips away from a strong blow (crits, heavy swings, finishers, counters, kills); " +
+             "ordinary hits tip it 60% of that. It springs back with a small overshoot.")]
+    [SerializeField, Range(0f, 40f)] private float hitRecoilDegrees = 22f;
+    [Tooltip("Metres the body is shoved back by a strong blow, on top of the knockback.")]
+    [SerializeField, Range(0f, 0.5f)] private float hitRecoilShove = 0.14f;
+    [SerializeField, Min(0.05f)] private float hitRecoilSeconds = 0.28f;
+
     [Header("Knockback (monsters on the NavMesh)")]
     [Tooltip("Meters a monster is pushed by a normal hit.")]
     [SerializeField, Min(0f)] private float knockbackDistance = 0.35f;
@@ -101,6 +109,12 @@ public sealed class CombatFeelSettings : ScriptableObject
     [SerializeField, Min(0.02f)] private float slashSeconds = 0.2f;
     [Tooltip("Height of the arc above the attacker's feet.")]
     [SerializeField] private float slashHeight = 1.05f;
+    [Tooltip("Multiplies the attacks' Slash Color (HDR), so the arc glows through bloom instead of vanishing against " +
+             "bright ground seen from the high camera.")]
+    [SerializeField, Min(0f)] private float slashBrightness = 2.5f;
+    [Tooltip("Seconds before a swing lands that its whoosh plays: as the weapon moves, not as the wind-up starts (an " +
+             "axe's whoosh used to come over half a second early).")]
+    [SerializeField, Min(0f)] private float swingSoundLead = 0.12f;
 
     [Header("Hurt vignette")]
     [Tooltip("Screen edges flash this color when the player is hurt. Alpha is the strength.")]
@@ -150,6 +164,9 @@ public sealed class CombatFeelSettings : ScriptableObject
     public float FlashSeconds => flashSeconds;
     public float PunchAmount => punchAmount;
     public float PunchSeconds => punchSeconds;
+    public float HitRecoilDegrees => hitRecoilDegrees;
+    public float HitRecoilShove => hitRecoilShove;
+    public float HitRecoilSeconds => hitRecoilSeconds;
     public float KnockbackDistance => knockbackDistance;
     public float KnockbackDistanceCrit => knockbackDistanceCrit;
     public float KnockbackSeconds => knockbackSeconds;
@@ -179,6 +196,8 @@ public sealed class CombatFeelSettings : ScriptableObject
     public Material SlashMaterial => slashMaterial;
     public float SlashSeconds => slashSeconds;
     public float SlashHeight => slashHeight;
+    public float SlashBrightness => slashBrightness;
+    public float SwingSoundLead => swingSoundLead;
     public Color HurtColor => hurtColor;
     public float HurtSeconds => hurtSeconds;
     public float LowHealthBelow => lowHealthBelow;

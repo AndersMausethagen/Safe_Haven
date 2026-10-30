@@ -29,6 +29,9 @@ MonoBehaviour:
   flashSeconds: 0.08
   punchAmount: 0.12
   punchSeconds: 0.16
+  hitRecoilDegrees: 22
+  hitRecoilShove: 0.14
+  hitRecoilSeconds: 0.28
   knockbackDistance: 0.35
   knockbackDistanceCrit: 0.8
   knockbackSeconds: 0.12
@@ -87,6 +90,8 @@ MonoBehaviour:
   slashMaterial: {fileID: 2100000, guid: da6ce870da817894b98a9f869375c163, type: 2}
   slashSeconds: 0.2
   slashHeight: 1.05
+  slashBrightness: 2.5
+  swingSoundLead: 0.12
   hurtColor: {r: 0.65, g: 0.05, b: 0.02, a: 0.55}
   hurtSeconds: 0.45
   lowHealthBelow: 0.3

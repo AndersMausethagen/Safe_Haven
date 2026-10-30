@@ -46,7 +46,7 @@ Shader "Safe Haven/Terrain (World)"
         _DisplacementFar("Detail Fade Distance (metres)", Float) = 35
         _TessellationFactor("Maximum Tessellation", Range(1, 64)) = 8
         _TessellationEdgeLength("Target Edge Length (metres)", Float) = 0.08
-        _TessellationPixels("Target Edge Length (pixels, 0 disables)", Range(0, 32)) = 0
+        _TessellationPixels("Target Edge Length (pixels, 0 disables)", Range(0, 32)) = 4
         _DisplacementMip("Height Smoothing (mip level)", Range(0, 5)) = 0
         _HeightBlendSharpness("Height Blend Sharpness", Range(0, 8)) = 0
         [Header(Surface lighting)]

@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8bc49664ac533524f8d9a2bfd443f4fa, type: 3}
-  m_Name: IronSword
+  m_Name: HandTorch
   m_EditorClassIdentifier: Assembly-CSharp::WeaponDefinition
   displayName: Torch
   stance: 1
@@ -24,5 +24,18 @@ MonoBehaviour:
   heavyAttack: {fileID: 11400000, guid: c27b7f4b0e8770b468650d183df959b8, type: 2}
   counterAttack: {fileID: 11400000, guid: 46f9dbd915280b241b67edb6b238f24f, type: 2}
   guardLetThrough: 0.85
+  drawSeconds: 1
+  reloadSeconds: 0.6
+  arrowSpeed: 32
+  spread: 1.5
+  minimumDraw: 0.25
+  drawMoveSpeed: 0.55
+  perfectReleaseSeconds: 0.2
+  perfectReleaseDamage: 1.25
+  aimSpread: 0.5
+  counterShotDamage: 0.6
+  shotAttack: {fileID: 0}
+  drawSound: {fileID: 0}
   swingSound: {fileID: 0}
   hitSound: {fileID: 0}
+  hitEffect: {fileID: 0}

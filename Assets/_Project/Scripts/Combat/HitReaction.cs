@@ -35,6 +35,13 @@ public sealed class HitReaction : MonoBehaviour
     private Vector3 knockbackVelocity;
     private float knockbackUntil = -1f;
 
+    /// <summary>Squash on hits. Monsters turn it off: their MonsterPose owns the model's pose and recoils instead.</summary>
+    public bool Punch
+    {
+        get => punch;
+        set => punch = value;
+    }
+
     /// <summary>The target's HitReaction, added with the default settings when it has none.</summary>
     public static HitReaction For(Component target)
     {

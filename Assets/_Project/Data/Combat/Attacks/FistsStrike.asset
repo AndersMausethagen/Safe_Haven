@@ -22,14 +22,16 @@ MonoBehaviour:
   range: 1.6
   arc: 90
   maxTargets: 1
-  hitDelay: 0.24444444
-  recoveryTime: 0.49444443
+  hitDelay: 0.18333334
+  recoveryTime: 0.43333334
   poiseDamage: 6
   lunge: 0.4
   staminaCost: -1
   animationState: Punch Jab
-  animationSpeed: 0.75
+  animationSpeed: 1
   followThroughSpeed: 1
   swingSound: {fileID: 0}
   hitSound: {fileID: 0}
-  slashColor: {r: 1, g: 0.95, b: 0.85, a: 0.8}
+  slashColor: {r: 1, g: 0.95, b: 0.85, a: 0}
+  slashSweep: 0
+  slashTilt: 22.81998

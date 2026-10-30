@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WeaponDefinition
   displayName: Fists
   stance: 0
+  kind: 0
   damage: 5
   basicAttack: {fileID: 11400000, guid: ffeb578093ca93c4292bf2adf73c4027, type: 2}
   combo:
@@ -23,5 +24,18 @@ MonoBehaviour:
   heavyAttack: {fileID: 0}
   counterAttack: {fileID: 0}
   guardLetThrough: 0.6
-  swingSound: {fileID: 0}
-  hitSound: {fileID: 0}
+  drawSeconds: 1
+  reloadSeconds: 0.6
+  arrowSpeed: 32
+  spread: 1.5
+  minimumDraw: 0.25
+  drawMoveSpeed: 0.55
+  perfectReleaseSeconds: 0.2
+  perfectReleaseDamage: 1.25
+  aimSpread: 0.5
+  counterShotDamage: 0.6
+  shotAttack: {fileID: 0}
+  drawSound: {fileID: 0}
+  swingSound: {fileID: 11400000, guid: 8ea0cd3b53fb0d64b8105352ea14c1b5, type: 2}
+  hitSound: {fileID: 11400000, guid: 3c8f3ee6d3ab96d4ebc9f3e9c3b213f4, type: 2}
+  hitEffect: {fileID: 4050785798968798827, guid: 44a445af987eb9b4797ef7d7c3bf50ec, type: 3}

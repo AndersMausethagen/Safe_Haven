@@ -33,7 +33,7 @@ public static class CameraPointer
             return false;
         }
 
-        ray = camera.ScreenPointToRay(Mouse.current.position.ReadValue());
+        ray = camera.ScreenPointToRay(GameInput.PointerPosition);
         return true;
     }
 

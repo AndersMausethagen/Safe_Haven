@@ -18,3 +18,4 @@ MonoBehaviour:
   attackCost: 12
   shieldBashCost: 18
   dodgeCost: 20
+  swimCostPerSecond: 7

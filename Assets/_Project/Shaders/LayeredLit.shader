@@ -300,6 +300,7 @@ Shader "Safe Haven/Layered Lit"
             #pragma shader_feature_local_fragment _METALLICSPECGLOSSMAP
             #pragma shader_feature_local_fragment _ORMMAP
             #pragma multi_compile_instancing
+            #include_with_pragmas "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DOTS.hlsl"
             #pragma multi_compile_fog
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE _MAIN_LIGHT_SHADOWS_SCREEN
             #pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
@@ -387,6 +388,7 @@ Shader "Safe Haven/Layered Lit"
             #pragma vertex ShadowVertex
             #pragma fragment ShadowFragment
             #pragma multi_compile_instancing
+            #include_with_pragmas "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DOTS.hlsl"
             #pragma multi_compile_vertex _ _CASTING_PUNCTUAL_LIGHT_SHADOW
             float4 ShadowVertex(Attributes input) : SV_POSITION
             {
@@ -423,6 +425,7 @@ Shader "Safe Haven/Layered Lit"
             #pragma vertex LayeredVertex
             #pragma fragment DepthFragment
             #pragma multi_compile_instancing
+            #include_with_pragmas "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DOTS.hlsl"
             half4 DepthFragment(Varyings input) : SV_Target
             {
                 SeeThroughClip(input.positionCS);
@@ -440,6 +443,7 @@ Shader "Safe Haven/Layered Lit"
             #pragma vertex LayeredVertex
             #pragma fragment NormalsFragment
             #pragma multi_compile_instancing
+            #include_with_pragmas "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DOTS.hlsl"
             #pragma multi_compile_fragment _ _GBUFFER_NORMALS_OCT
             half4 NormalsFragment(Varyings input, FRONT_FACE_TYPE face : FRONT_FACE_SEMANTIC) : SV_Target
             {

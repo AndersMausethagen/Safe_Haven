@@ -30,6 +30,10 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
     private PlayerStamina playerStamina;
     private CombatScreenEffects screen;
     private ComboHud comboHud;
+    // The player's swing whoosh, waiting for the moment the weapon moves (Combat Feel › Swing Sound Lead).
+    private SoundDefinition pendingSwingSound;
+    private float pendingSwingAt;
+    private float pendingSwingStart;
 
     public static CombatFeedback Instance { get; private set; }
 
@@ -102,6 +106,24 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
         {
             EndHitStop();
         }
+
+        PlayPendingSwingSound();
+    }
+
+    // Only if that swing is still winding up: a swing dodged out of, lost to a flinch or turned heavy stays silent.
+    private void PlayPendingSwingSound()
+    {
+        if (pendingSwingSound == null || Time.time < pendingSwingAt)
+        {
+            return;
+        }
+
+        if (playerCombat != null && playerCombat.IsWindingUp && Mathf.Approximately(playerCombat.SwingStartTime, pendingSwingStart))
+        {
+            AudioManager.Play(pendingSwingSound, playerCombat.transform.position + Vector3.up);
+        }
+
+        pendingSwingSound = null;
     }
 
     private void EndHitStop()
@@ -135,7 +157,9 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
         bool strong = result.IsCritical || (damage.Technique & (HitTechnique.Heavy | HitTechnique.Finisher | HitTechnique.Counter)) != 0;
         if (!result.Blocked)
         {
-            GameObject effect = structure ? feel.StructureHitEffect : strong ? feel.CriticalHitEffect : feel.HitEffect;
+            GameObject weaponEffect = PlayerWeaponHitEffect(damage);
+            GameObject effect = structure ? feel.StructureHitEffect : strong ? feel.CriticalHitEffect
+                : weaponEffect != null ? weaponEffect : feel.HitEffect;
             Spawn(effect, damage.HitPoint, damage.Direction);
             AudioManager.Play(HitSoundFor(damage, structure), damage.HitPoint);
             if (strong && !structure)
@@ -168,6 +192,13 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
             HitStop((result.Killed ? feel.HitStopOnKill : strong ? feel.HitStopOnCrit : feel.HitStopOnHit) * extra);
             CameraShake.Add((result.Killed ? feel.ShakeOnKill : strong ? feel.ShakeOnCrit : feel.ShakeOnHit) * extra);
         }
+    }
+
+    // The player's weapon's own hit effect, when the hit is the player's.
+    private GameObject PlayerWeaponHitEffect(in DamageInfo damage)
+    {
+        bool players = playerCombat != null && damage.Source != null && damage.Source.gameObject == playerCombat.gameObject;
+        return players && playerCombat.Weapon != null ? playerCombat.Weapon.HitEffect : null;
     }
 
     // The attack's own sound, else the weapon's (for the player), else the game-wide one.
@@ -305,11 +336,21 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
         SoundDefinition sound = swing.Attack != null && swing.Attack.SwingSound != null ? swing.Attack.SwingSound
             : playerCombat.Weapon != null && playerCombat.Weapon.SwingSound != null && swing.Kind != SwingKind.Heavy ? playerCombat.Weapon.SwingSound
             : Sounds == null ? null : swing.Kind == SwingKind.Heavy ? Sounds.HeavySwing : Sounds.Swing;
-        AudioManager.Play(sound, playerCombat.transform.position + Vector3.up);
+        if (swing.Attack == null)
+        {
+            AudioManager.Play(sound, playerCombat.transform.position + Vector3.up);
+            return;
+        }
+
+        float landsIn = swing.Attack.HitDelay / Mathf.Max(0.01f, swing.Speed);
+        pendingSwingSound = sound;
+        pendingSwingAt = Time.time + Mathf.Max(0f, landsIn - feel.SwingSoundLead);
+        pendingSwingStart = playerCombat.SwingStartTime;
+        PlayPendingSwingSound();
     }
 
-    // The arc sweeps through the swing's reach as it connects (or whiffs). Chain steps alternate sides; heavy swings
-    // come down steeply.
+    // The arc sweeps through the swing's reach as it connects (or whiffs), the way the weapon moves in the animation
+    // (the attack's Slash Sweep and Tilt, measured from its clip).
     private void OnSwingLanded(SwingInfo swing, int hits)
     {
         AttackDefinition attack = swing.Attack;
@@ -318,15 +359,16 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
             return;
         }
 
-        bool reverse = swing.Kind == SwingKind.Light && swing.Step % 2 == 1;
-        float tilt = swing.Kind == SwingKind.Heavy ? 70f : swing.IsFinisher ? 0f : reverse ? -14f : 14f;
+        bool reverse = attack.SlashSweep == SlashSweep.RightToLeft;
+        float tilt = attack.SlashTilt;
         Color color = attack.SlashColor;
         if (swing.IsCounter)
         {
             color = Color.Lerp(color, new Color(0.55f, 0.85f, 1f, color.a), 0.6f);
         }
 
-        color *= 1f + swing.Rhythm * 0.15f;
+        float brightness = feel.SlashBrightness * (1f + swing.Rhythm * 0.15f);
+        color = new Color(color.r * brightness, color.g * brightness, color.b * brightness, color.a);
         Vector3 origin = playerCombat.transform.position + Vector3.up * feel.SlashHeight;
         SlashEffect.Play(feel.SlashMaterial, origin, swing.Direction, attack.Range + 0.2f, Mathf.Min(attack.Arc, 220f), color,
             feel.SlashSeconds * (swing.Kind == SwingKind.Heavy ? 1.3f : 1f), tilt, reverse);

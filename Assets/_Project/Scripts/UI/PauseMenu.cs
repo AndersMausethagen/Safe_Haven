@@ -52,17 +52,10 @@ public sealed class PauseMenu : MonoBehaviour
     [SerializeField] private string fallbackScene = "SafeHaven";
     [SerializeField] private string mainMenuScene = "MainMenu";
 
-    private InputAction escapeAction;
     private Action confirmPrimary;
     private Action confirmSecondary;
     private bool leaving;
     private bool bound;
-
-    private void Awake()
-    {
-        escapeAction = new InputAction("Escape", InputActionType.Button, "<Keyboard>/escape");
-        escapeAction.performed += OnEscape;
-    }
 
     private void OnEnable()
     {
@@ -73,7 +66,8 @@ public sealed class PauseMenu : MonoBehaviour
             return;
         }
 
-        escapeAction.Enable();
+        // System › Pause of the project-wide actions (GameInput), shared: subscribed while enabled.
+        if (GameInput.Pause != null) GameInput.Pause.performed += OnEscape;
         window.OpenChanged += OnOpenChanged;
         continueButton.onClick.AddListener(Close);
         saveButton.onClick.AddListener(Save);
@@ -97,7 +91,7 @@ public sealed class PauseMenu : MonoBehaviour
         }
 
         bound = false;
-        escapeAction.Disable();
+        if (GameInput.Pause != null) GameInput.Pause.performed -= OnEscape;
         window.OpenChanged -= OnOpenChanged;
         continueButton.onClick.RemoveListener(Close);
         saveButton.onClick.RemoveListener(Save);
@@ -108,11 +102,6 @@ public sealed class PauseMenu : MonoBehaviour
         confirmPrimaryButton.onClick.RemoveListener(OnConfirmPrimary);
         confirmSecondaryButton.onClick.RemoveListener(OnConfirmSecondary);
         confirmCancelButton.onClick.RemoveListener(ShowMain);
-    }
-
-    private void OnDestroy()
-    {
-        escapeAction.Dispose();
     }
 
     public bool IsOpen => window != null && window.IsOpen;

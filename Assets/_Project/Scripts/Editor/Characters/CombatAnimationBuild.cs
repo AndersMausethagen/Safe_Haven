@@ -26,6 +26,8 @@ public static partial class CombatAnimationSetup
 
     private static readonly Color LightSlash = new Color(1f, 0.95f, 0.85f, 0.75f);
     private static readonly Color FinisherSlash = new Color(1f, 0.8f, 0.45f, 0.9f);
+    // Fists: a punch draws no blade's arc; it lands with Punch Impact (the weapon's Hit Effect).
+    private static readonly Color NoSlash = new Color(1f, 1f, 1f, 0f);
     private static readonly Color HeavySlash = new Color(1f, 0.55f, 0.25f, 0.95f);
     private static readonly Color CounterSlash = new Color(0.55f, 0.85f, 1f, 0.95f);
 
@@ -342,8 +344,9 @@ public static partial class CombatAnimationSetup
         public string Template;
         public string State;
         public Motion Clip;
-        // Wind-ups slower than the clips as authored, so the blow is seen coming; the strike keeps the clip's snap.
-        public float Speed = 0.75f;
+        // Wind-ups a little slower than the clips as authored, for weight; the strike keeps the clip's snap. Heavy swings
+        // and finishers set their own, slower. (0.75 for every swing made the light chain feel late to answer.)
+        public float Speed = 0.9f;
         public float FollowThrough = 1f;
         // Seconds after the contact the next swing may start; below 0 the clip's end (light chain swings).
         public float RecoverAfterContact = -1f;
@@ -417,9 +420,9 @@ public static partial class CombatAnimationSetup
             new AttackSpec { Asset = ComboFolder + "/Sword Heavy.asset", Template = "SwordSlash", State = "Sword Heavy", Clip = ual[HeavyClip], Speed = 0.7f, RecoverAfterContact = 0.5f, Ratio = 2.2f, Range = 2.6f, Arc = 120f, Poise = 40f, Lunge = 0.5f, Slash = HeavySlash },
             new AttackSpec { Asset = ComboFolder + "/Sword Counter.asset", Template = "SwordSlash", State = "Sword Counter", Clip = ual["Sword_Dash"], RecoverAfterContact = 0.45f, Ratio = 1.4f, Range = 2.4f, Arc = 100f, Poise = 30f, Lunge = 1.8f, Slash = CounterSlash },
             // Fists: jab, cross, hook.
-            new AttackSpec { Asset = AttackFolder + "/FistsStrike.asset", State = "Punch Jab", Clip = Ual1("Punch_Jab"), RecoverAfterContact = 0.25f, Ratio = 1f, Range = 1.6f, Arc = 90f, Poise = 6f, Lunge = 0.4f },
-            new AttackSpec { Asset = ComboFolder + "/Fists Cross.asset", Template = "FistsStrike", State = "Punch Cross", Clip = Ual1("Punch_Cross"), RecoverAfterContact = 0.25f, Ratio = 1.1f, Range = 1.6f, Arc = 90f, Poise = 8f, Lunge = 0.4f },
-            new AttackSpec { Asset = ComboFolder + "/Fists Hook.asset", Template = "FistsStrike", State = "Punch Hook", Clip = ual["Melee_Hook"], Ratio = 1.5f, Range = 1.7f, Arc = 110f, Poise = 16f, Lunge = 0.6f, Slash = FinisherSlash },
+            new AttackSpec { Asset = AttackFolder + "/FistsStrike.asset", State = "Punch Jab", Clip = Ual1("Punch_Jab"), Speed = 1f, RecoverAfterContact = 0.25f, Ratio = 1f, Range = 1.6f, Arc = 90f, Poise = 6f, Lunge = 0.4f, Slash = NoSlash },
+            new AttackSpec { Asset = ComboFolder + "/Fists Cross.asset", Template = "FistsStrike", State = "Punch Cross", Clip = Ual1("Punch_Cross"), Speed = 1f, RecoverAfterContact = 0.25f, Ratio = 1.1f, Range = 1.6f, Arc = 90f, Poise = 8f, Lunge = 0.4f, Slash = NoSlash },
+            new AttackSpec { Asset = ComboFolder + "/Fists Hook.asset", Template = "FistsStrike", State = "Punch Hook", Clip = ual["Melee_Hook"], Ratio = 1.5f, Range = 1.7f, Arc = 110f, Poise = 16f, Lunge = 0.6f, Slash = NoSlash },
             // Axes (two-handed): the sweep, a spinning finisher; the heavy slam.
             new AttackSpec { Asset = AttackFolder + "/GreataxeSweep.asset", State = "Attack Two Handed", Clip = twoHanded, RecoverAfterContact = 0.4f, Ratio = 1f, Range = 2.6f, Arc = 180f, Poise = 15f },
             new AttackSpec { Asset = ComboFolder + "/Axe Finisher.asset", Template = "GreataxeSweep", State = "Sword Finisher", Clip = ual["Sword_Regular_C"], Speed = 0.75f, RecoverAfterContact = 0.55f, Ratio = 1.6f, Range = 2.7f, Arc = 200f, Poise = 28f, Lunge = 0.8f, Slash = FinisherSlash },
@@ -470,6 +473,10 @@ public static partial class CombatAnimationSetup
         data.FindProperty("animationState").stringValue = spec.State;
         data.FindProperty("animationSpeed").floatValue = spec.Speed;
         data.FindProperty("followThroughSpeed").floatValue = spec.FollowThrough;
+        // The slash arc runs the way the weapon hand moves at the contact.
+        (SlashSweep sweep, float tilt) = SlashFor(clip != null ? HandVelocity(clip, contact, spec.Hand) : Vector3.zero);
+        data.FindProperty("slashSweep").enumValueIndex = (int)sweep;
+        data.FindProperty("slashTilt").floatValue = tilt;
         if (created || data.FindProperty("poiseDamage").floatValue == 10f && spec.Poise != 10f)
         {
             data.FindProperty("poiseDamage").floatValue = spec.Poise;

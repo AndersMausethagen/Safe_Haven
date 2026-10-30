@@ -18,33 +18,14 @@ public sealed class PlayerInputHandler : MonoBehaviour
     private PlayerMovement movement;
     private PlayerStateMachine stateMachine;
 
-    private InputAction moveAction;
-    private InputAction combatAction;
-    private InputAction interactAction;
-    private InputAction cancelAction;
-    private InputAction attackAction;
-    private InputAction guardAction;
-    private InputAction inventoryAction;
-    private InputAction itemsAction;
-    private InputAction dodgeAction;
-    private InputAction skillsWindowAction;
-    private InputAction characterAction;
-    private InputAction buildAction;
-    private InputAction sneakAction;
-    private InputAction arrowAction;
-    private InputAction torchAction;
-    private InputAction talentsAction;
-    private InputAction havenAction;
     private PlayerStealth stealth;
     private PlayerEquipment equipment;
-    private readonly InputAction[] skillActions = new InputAction[SkillLoadout.SlotCount];
+    // The skill actions' callbacks, one per slot, kept so they can be unsubscribed.
+    private readonly System.Action<InputAction.CallbackContext>[] skillCallbacks = new System.Action<InputAction.CallbackContext>[SkillLoadout.SlotCount];
 
-    // V Rising style skill keys (E is taken by Interact, C by the character screen), with 1-5 as alternatives.
-    private static readonly string[] SkillKeys = { "q", "r", "f", "x", "t" };
-    private static readonly string[] SkillPads = { "buttonNorth", "dpad/up", "dpad/right", "dpad/down", "dpad/left" };
-
-    /// <summary>The keyboard key that casts a skill bar slot, for labels in the UI.</summary>
-    public static string SkillKeyLabel(int slot) => slot >= 0 && slot < SkillKeys.Length ? SkillKeys[slot].ToUpperInvariant() : "";
+    /// <summary>The keyboard key that casts a skill bar slot, for labels in the UI (from the Input Actions asset, so it
+    /// follows a rebinding).</summary>
+    public static string SkillKeyLabel(int slot) => slot >= 0 && slot < SkillLoadout.SlotCount ? GameInput.KeyLabel(GameInput.Skill(slot)) : "";
 
     private Vector2 moveInput;
     private bool mouseAttackPending;
@@ -66,14 +47,20 @@ public sealed class PlayerInputHandler : MonoBehaviour
             return;
         }
 
-        CreateActions();
-        BindActions();
+        for (int i = 0; i < skillCallbacks.Length; i++)
+        {
+            int slot = i;
+            skillCallbacks[i] = _ => stateMachine.RequestSkill(slot);
+        }
     }
 
+    // The actions are the project-wide ones (GameInput), shared with the rest of the game: subscribed here and
+    // unsubscribed in OnDisable, so a player that is gone leaves no callbacks behind.
     private void OnEnable()
     {
         GamePause.Changed += OnPauseChanged;
         BackHandlers.Register(BackHandlers.InteractionPriority, CancelInteraction);
+        Subscribe(true);
         SetActionsEnabled(!GamePause.IsPaused);
     }
 
@@ -81,6 +68,7 @@ public sealed class PlayerInputHandler : MonoBehaviour
     {
         GamePause.Changed -= OnPauseChanged;
         BackHandlers.Unregister(CancelInteraction);
+        Subscribe(false);
         SetActionsEnabled(false);
     }
 
@@ -89,22 +77,19 @@ public sealed class PlayerInputHandler : MonoBehaviour
         SetActionsEnabled(!paused);
     }
 
+    // The whole Player map goes off while paused (or without a player), so no gameplay key acts behind the menu.
     private void SetActionsEnabled(bool enable)
     {
-        foreach (InputAction action in AllActions())
+        InputActionMap map = GameInput.PlayerMap;
+        if (map != null)
         {
-            if (action == null)
-            {
-                continue;
-            }
-
             if (enable)
             {
-                action.Enable();
+                map.Enable();
             }
             else
             {
-                action.Disable();
+                map.Disable();
             }
         }
 
@@ -124,31 +109,6 @@ public sealed class PlayerInputHandler : MonoBehaviour
         if (stealth != null)
         {
             stealth.SetSneaking(false);
-        }
-    }
-
-    private System.Collections.Generic.IEnumerable<InputAction> AllActions()
-    {
-        yield return moveAction;
-        yield return combatAction;
-        yield return interactAction;
-        yield return cancelAction;
-        yield return attackAction;
-        yield return guardAction;
-        yield return inventoryAction;
-        yield return itemsAction;
-        yield return dodgeAction;
-        yield return skillsWindowAction;
-        yield return characterAction;
-        yield return buildAction;
-        yield return sneakAction;
-        yield return arrowAction;
-        yield return torchAction;
-        yield return talentsAction;
-        yield return havenAction;
-        foreach (InputAction action in skillActions)
-        {
-            yield return action;
         }
     }
 
@@ -223,149 +183,86 @@ public sealed class PlayerInputHandler : MonoBehaviour
         return toPoint.sqrMagnitude < MinAimDistance * MinAimDistance ? forward : toPoint;
     }
 
-    private void OnDestroy()
+    private void Subscribe(bool on)
     {
-        moveAction?.Dispose();
-        combatAction?.Dispose();
-        interactAction?.Dispose();
-        cancelAction?.Dispose();
-        attackAction?.Dispose();
-        guardAction?.Dispose();
-        inventoryAction?.Dispose();
-        itemsAction?.Dispose();
-        dodgeAction?.Dispose();
-        skillsWindowAction?.Dispose();
-        characterAction?.Dispose();
-        buildAction?.Dispose();
-        sneakAction?.Dispose();
-        arrowAction?.Dispose();
-        torchAction?.Dispose();
-        talentsAction?.Dispose();
-        havenAction?.Dispose();
-        foreach (InputAction action in skillActions)
+        Hook(GameInput.Move, OnMove, on, canceled: true);
+        Hook(GameInput.ToggleCombat, OnCombatToggle, on);
+        Hook(GameInput.Interact, OnInteract, on);
+        Hook(GameInput.CancelInteraction, OnCancel, on);
+        Hook(GameInput.Attack, OnAttack, on);
+        Hook(GameInput.Attack, OnAttackReleased, on, performed: false, canceled: true);
+        Hook(GameInput.Guard, OnGuard, on);
+        Hook(GameInput.Guard, OnGuardReleased, on, performed: false, canceled: true);
+        Hook(GameInput.Inventory, OnInventoryToggle, on);
+        Hook(GameInput.Items, OnItemsToggle, on);
+        Hook(GameInput.Dodge, OnDodge, on);
+        Hook(GameInput.Skills, OnSkillsToggle, on);
+        Hook(GameInput.Character, OnCharacterToggle, on);
+        Hook(GameInput.Build, OnBuildToggle, on);
+        Hook(GameInput.Sneak, OnSneak, on, canceled: true);
+        Hook(GameInput.CycleArrows, OnCycleArrows, on);
+        Hook(GameInput.ToggleTorch, OnToggleTorch, on);
+        Hook(GameInput.SwapWeapon, OnSwapWeapon, on);
+        Hook(GameInput.Talents, OnTalents, on);
+        Hook(GameInput.Haven, OnHaven, on);
+        for (int i = 0; i < skillCallbacks.Length; i++)
         {
-            action?.Dispose();
+            Hook(GameInput.Skill(i), skillCallbacks[i], on);
         }
     }
 
-    private void CreateActions()
+    private static void Hook(InputAction action, System.Action<InputAction.CallbackContext> callback, bool on,
+        bool performed = true, bool canceled = false)
     {
-        moveAction = new InputAction("Move", InputActionType.Value, expectedControlType: "Vector2");
-        moveAction.AddBinding("<Gamepad>/leftStick");
-        moveAction.AddCompositeBinding("2DVector")
-            .With("Up", "<Keyboard>/w")
-            .With("Down", "<Keyboard>/s")
-            .With("Left", "<Keyboard>/a")
-            .With("Right", "<Keyboard>/d");
-        moveAction.AddCompositeBinding("2DVector")
-            .With("Up", "<Keyboard>/upArrow")
-            .With("Down", "<Keyboard>/downArrow")
-            .With("Left", "<Keyboard>/leftArrow")
-            .With("Right", "<Keyboard>/rightArrow");
-
-        combatAction = new InputAction("ToggleCombat", InputActionType.Button);
-        combatAction.AddBinding("<Keyboard>/tab");
-        combatAction.AddBinding("<Gamepad>/rightShoulder");
-
-        interactAction = new InputAction("Interact", InputActionType.Button);
-        interactAction.AddBinding("<Keyboard>/e");
-        interactAction.AddBinding("<Gamepad>/buttonWest");
-
-        // Escape is routed through BackHandlers by the Escape menu (see CancelInteraction); the gamepad keeps B.
-        cancelAction = new InputAction("CancelInteraction", InputActionType.Button);
-        cancelAction.AddBinding("<Gamepad>/buttonEast");
-
-        attackAction = new InputAction("Attack", InputActionType.Button);
-        attackAction.AddBinding("<Mouse>/leftButton");
-        attackAction.AddBinding("<Gamepad>/rightTrigger");
-
-        // Hold to guard; raised just before a hit it parries. Attack while guarding with a shield is the shield bash.
-        guardAction = new InputAction("Guard", InputActionType.Button);
-        guardAction.AddBinding("<Mouse>/rightButton");
-        guardAction.AddBinding("<Gamepad>/leftTrigger");
-
-        inventoryAction = new InputAction("ToggleInventory", InputActionType.Button);
-        inventoryAction.AddBinding("<Keyboard>/i");
-        inventoryAction.AddBinding("<Gamepad>/select");
-
-        itemsAction = new InputAction("ToggleItems", InputActionType.Button);
-        itemsAction.AddBinding("<Keyboard>/b");
-        itemsAction.AddBinding("<Gamepad>/start");
-
-        dodgeAction = new InputAction("Dodge", InputActionType.Button);
-        dodgeAction.AddBinding("<Keyboard>/space");
-        dodgeAction.AddBinding("<Gamepad>/buttonSouth");
-
-        skillsWindowAction = new InputAction("ToggleSkills", InputActionType.Button);
-        skillsWindowAction.AddBinding("<Keyboard>/k");
-        skillsWindowAction.AddBinding("<Gamepad>/leftStickPress");
-
-        characterAction = new InputAction("ToggleCharacter", InputActionType.Button);
-        characterAction.AddBinding("<Keyboard>/c");
-
-        buildAction = new InputAction("ToggleBuild", InputActionType.Button);
-        buildAction.AddBinding("<Keyboard>/g");
-        buildAction.AddBinding("<Gamepad>/rightStickPress");
-
-        // Held: sneaking lasts as long as the button is down.
-        sneakAction = new InputAction("Sneak", InputActionType.Button);
-        sneakAction.AddBinding("<Keyboard>/leftCtrl");
-        sneakAction.AddBinding("<Gamepad>/leftShoulder");
-
-        // A bow's next kind of arrow.
-        arrowAction = new InputAction("CycleArrows", InputActionType.Button);
-        arrowAction.AddBinding("<Keyboard>/z");
-
-        // The torch and a two-handed weapon (a bow) take turns in the hands.
-        torchAction = new InputAction("ToggleTorch", InputActionType.Button);
-        torchAction.AddBinding("<Keyboard>/l");
-
-        talentsAction = new InputAction("Talents", InputActionType.Button);
-        talentsAction.AddBinding("<Keyboard>/n");
-
-        havenAction = new InputAction("Haven", InputActionType.Button);
-        havenAction.AddBinding("<Keyboard>/h");
-
-        for (int i = 0; i < skillActions.Length; i++)
+        if (action == null)
         {
-            var action = new InputAction("Skill" + (i + 1), InputActionType.Button);
-            action.AddBinding("<Keyboard>/" + SkillKeys[i]);
-            action.AddBinding("<Keyboard>/" + (i + 1));
-            action.AddBinding("<Gamepad>/" + SkillPads[i]);
-            skillActions[i] = action;
+            return;
+        }
+
+        if (performed)
+        {
+            if (on) action.performed += callback; else action.performed -= callback;
+        }
+
+        if (canceled)
+        {
+            if (on) action.canceled += callback; else action.canceled -= callback;
         }
     }
 
-    private void BindActions()
+    private void OnSneak(InputAction.CallbackContext context)
     {
-        moveAction.performed += OnMove;
-        moveAction.canceled += OnMove;
-        combatAction.performed += OnCombatToggle;
-        interactAction.performed += OnInteract;
-        cancelAction.performed += OnCancel;
-        attackAction.performed += OnAttack;
-        attackAction.canceled += OnAttackReleased;
-        guardAction.performed += OnGuard;
-        guardAction.canceled += OnGuardReleased;
-        inventoryAction.performed += OnInventoryToggle;
-        itemsAction.performed += OnItemsToggle;
-        dodgeAction.performed += OnDodge;
-        skillsWindowAction.performed += OnSkillsToggle;
-        characterAction.performed += OnCharacterToggle;
-        buildAction.performed += OnBuildToggle;
-        sneakAction.performed += _ => { if (stealth != null) stealth.SetSneaking(true); };
-        sneakAction.canceled += _ => { if (stealth != null) stealth.SetSneaking(false); };
-        arrowAction.performed += _ => stateMachine.RequestArrowCycle();
-        torchAction.performed += _ => { if (equipment != null) equipment.ToggleTorch(); };
-        talentsAction.performed += _ => RequestWindow(UIWindowId.Talents);
-        havenAction.performed += _ =>
+        if (stealth != null)
         {
-            if (HeartTree.Current != null) HeartTree.Current.OpenHaven(gameObject);
-        };
-        for (int i = 0; i < skillActions.Length; i++)
+            stealth.SetSneaking(context.performed);
+        }
+    }
+
+    private void OnCycleArrows(InputAction.CallbackContext context) => stateMachine.RequestArrowCycle();
+
+    private void OnToggleTorch(InputAction.CallbackContext context)
+    {
+        if (equipment != null)
         {
-            int slot = i;
-            skillActions[i].performed += _ => stateMachine.RequestSkill(slot);
+            equipment.ToggleTorch();
+        }
+    }
+
+    private void OnSwapWeapon(InputAction.CallbackContext context)
+    {
+        if (equipment != null)
+        {
+            equipment.SwapWeapon();
+        }
+    }
+
+    private void OnTalents(InputAction.CallbackContext context) => RequestWindow(UIWindowId.Talents);
+
+    private void OnHaven(InputAction.CallbackContext context)
+    {
+        if (HeartTree.Current != null)
+        {
+            HeartTree.Current.OpenHaven(gameObject);
         }
     }
 

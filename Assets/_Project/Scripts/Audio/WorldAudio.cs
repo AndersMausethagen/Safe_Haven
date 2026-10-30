@@ -195,7 +195,8 @@ public sealed class WorldAudio
         }
     }
 
-    // A click on an interactable button, toggle or slider under the pointer, or the gamepad's submit on a selected one.
+    // A click on an interactable button, toggle or slider under the pointer (UI › Click), or a submit on a selected one
+    // (UI › Submit: the gamepad's south button, Enter).
     private void UpdateClicks(SoundDefinition click)
     {
         if (click == null || EventSystem.current == null)
@@ -204,14 +205,14 @@ public sealed class WorldAudio
         }
 
         GameObject pressed = null;
-        if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
+        if (GameInput.Click.WasPressedThisFrame())
         {
-            var pointer = new PointerEventData(EventSystem.current) { position = Mouse.current.position.ReadValue() };
+            var pointer = new PointerEventData(EventSystem.current) { position = GameInput.PointerPosition };
             uiHits.Clear();
             EventSystem.current.RaycastAll(pointer, uiHits);
             pressed = uiHits.Count > 0 ? uiHits[0].gameObject : null;
         }
-        else if (Gamepad.current != null && Gamepad.current.buttonSouth.wasPressedThisFrame)
+        else if (GameInput.Submit.WasPressedThisFrame())
         {
             pressed = EventSystem.current.currentSelectedGameObject;
         }

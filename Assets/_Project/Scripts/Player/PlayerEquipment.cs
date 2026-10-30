@@ -28,6 +28,9 @@ public sealed class PlayerEquipment : MonoBehaviour
     private ItemInventory inventory;
     // The two-handed weapon put away for the torch (ToggleTorch), taken out again when the torch goes back.
     private ItemDefinition stowedWeapon;
+    // The weapon in hand now and the one before it (however it changed: Z, the bag, a story), for SwapWeapon.
+    private ItemDefinition heldWeapon;
+    private ItemDefinition previousWeapon;
     private PlayerCombat combat;
     private Combatant combatant;
     private bool restoring;
@@ -193,6 +196,66 @@ public sealed class PlayerEquipment : MonoBehaviour
 
     private static bool IsTorch(ItemDefinition item) => item != null && item.IsWeapon && item.Weapon.Kind == WeaponKind.Torch;
 
+    /// <summary>
+    /// Swaps the weapon in hand for the one held before it (Z), such as the axe and the bow. The first time, or when that
+    /// one is no longer in the bag, it takes out the next weapon in the bag; with no other weapon it puts the one in hand
+    /// away (fists), and the next press takes it out again. Not mid-swing. The torch keeps its own key (ToggleTorch).
+    /// </summary>
+    public bool SwapWeapon()
+    {
+        if (combat != null && combat.IsAttacking)
+        {
+            return false;
+        }
+
+        ItemDefinition held = MainHand.IsEmpty ? null : MainHand.Item;
+        ItemDefinition next = previousWeapon != null && previousWeapon != held && FindInBag(found => found == previousWeapon) >= 0
+            ? previousWeapon
+            : null;
+        if (next == null)
+        {
+            int index = FindInBag(found => IsSwappable(found) && found != held);
+            next = index >= 0 ? Inventory.Container.GetSlot(index).Item : null;
+        }
+
+        if (next != null)
+        {
+            return EquipFromBag(next);
+        }
+
+        if (held != null && Unequip(GearSlot.MainHand))
+        {
+            GameMessages.Post($"Put away {held.DisplayName}.");
+            return true;
+        }
+
+        if (held == null)
+        {
+            GameMessages.Post("You have no weapon to take out.", MessageKind.Warning);
+        }
+
+        return false;
+    }
+
+    private static bool IsSwappable(ItemDefinition item) => item != null && item.IsWeapon && item.Weapon.Kind != WeaponKind.Torch;
+
+    // Remembers the weapon put away whenever the main hand changes (equipping goes through an empty hand: old, none, new).
+    private void TrackHeldWeapon()
+    {
+        ItemDefinition now = MainHand.IsEmpty ? null : MainHand.Item;
+        if (now == heldWeapon)
+        {
+            return;
+        }
+
+        if (IsSwappable(heldWeapon) && !restoring)
+        {
+            previousWeapon = heldWeapon;
+        }
+
+        heldWeapon = now;
+    }
+
     private int FindInBag(Predicate<ItemDefinition> match)
     {
         ItemContainer bag = Inventory.Container;
@@ -294,6 +357,11 @@ public sealed class PlayerEquipment : MonoBehaviour
         }
 
         wasBroken[(int)slot] = broken;
+        if (slot == GearSlot.MainHand)
+        {
+            TrackHeldWeapon();
+        }
+
         if (restoring)
         {
             return;

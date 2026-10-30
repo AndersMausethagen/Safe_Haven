@@ -244,10 +244,7 @@ public sealed class StationWindow : MonoBehaviour
             progressImage.color = queue.Blocked ? BlockedFill : WorkingFill;
         }
 
-        if (Pointer.current != null)
-        {
-            tooltip.Follow(Pointer.current.position.ReadValue());
-        }
+        tooltip.Follow(GameInput.PointerPosition);
 
         if (Time.unscaledTime >= nextRefresh)
         {

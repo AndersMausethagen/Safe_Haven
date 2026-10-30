@@ -85,6 +85,7 @@ public sealed class PlayerAnimationController : MonoBehaviour
     private PlayerSkills skills;
     private PlayerGuard guard;
     private PlayerEating eating;
+    private PlayerSwimming swimming;
     private static readonly int ConsumeStateHash = Animator.StringToHash("Consume");
     private int upperBodyLayer = -1;
     private int attackArmsLayer = -1;
@@ -136,6 +137,7 @@ public sealed class PlayerAnimationController : MonoBehaviour
         skills = GetComponent<PlayerSkills>();
         guard = GetComponent<PlayerGuard>();
         eating = GetComponent<PlayerEating>();
+        swimming = GetComponent<PlayerSwimming>();
         animator = animator != null ? animator : GetComponentInChildren<Animator>();
 
         if (animator == null)
@@ -482,15 +484,19 @@ public sealed class PlayerAnimationController : MonoBehaviour
 
     private void UpdateLocomotion(float deltaTime)
     {
-        SetFloat(SpeedHash, movement.HorizontalSpeed, speedDampTime, deltaTime);
+        // Swimming is posed by PlayerSwimAnimation over the standing idle, so the legs don't walk under the water.
+        bool swim = IsSwimming;
+        SetFloat(SpeedHash, swim ? 0f : movement.HorizontalSpeed, speedDampTime, deltaTime);
 
-        Vector3 local = movement.LocalVelocity;
+        Vector3 local = swim ? Vector3.zero : movement.LocalVelocity;
         SetFloat(MoveXHash, local.x, speedDampTime, deltaTime);
         SetFloat(MoveZHash, local.z, speedDampTime, deltaTime);
 
         SetFloat(MotionSpeedHash, Mathf.Max(1f, movement.HorizontalSpeed / runClipSpeed));
-        SetBool(HasMoveInputHash, movement.InputMagnitude > MoveInputThreshold);
+        SetBool(HasMoveInputHash, !swim && movement.InputMagnitude > MoveInputThreshold);
     }
+
+    private bool IsSwimming => swimming != null && swimming.IsSwimming;
 
     private void UpdateTurn(float deltaTime)
     {
@@ -506,9 +512,11 @@ public sealed class PlayerAnimationController : MonoBehaviour
 
     private void UpdateAirborne(float deltaTime)
     {
-        airborneTime = movement.IsGrounded ? 0f : airborneTime + deltaTime;
+        // Held up by the water counts as on the ground: no falling pose.
+        bool grounded = movement.IsGrounded || IsSwimming;
+        airborneTime = grounded ? 0f : airborneTime + deltaTime;
 
-        SetBool(GroundedHash, movement.IsGrounded);
+        SetBool(GroundedHash, grounded);
         // The delay avoids flicker when walking over small drops and slopes.
         SetBool(FreeFallHash, airborneTime > fallDelay);
     }

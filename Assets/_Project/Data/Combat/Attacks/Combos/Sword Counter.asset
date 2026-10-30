@@ -22,14 +22,16 @@ MonoBehaviour:
   range: 2.4
   arc: 100
   maxTargets: 3
-  hitDelay: 0.44444454
-  recoveryTime: 0.8944445
+  hitDelay: 0.37037045
+  recoveryTime: 0.82037044
   poiseDamage: 30
   lunge: 1.8
   staminaCost: -1
   animationState: Sword Counter
-  animationSpeed: 0.75
+  animationSpeed: 0.9
   followThroughSpeed: 1
   swingSound: {fileID: 0}
   hitSound: {fileID: 0}
   slashColor: {r: 0.55, g: 0.85, b: 1, a: 0.95}
+  slashSweep: 0
+  slashTilt: 24.106356

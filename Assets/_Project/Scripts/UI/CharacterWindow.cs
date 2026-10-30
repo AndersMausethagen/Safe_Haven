@@ -114,7 +114,7 @@ public sealed class CharacterWindow : MonoBehaviour, IItemSlotHandler
 
     private void Update()
     {
-        Vector2 pointer = Pointer.current != null ? Pointer.current.position.ReadValue() : Vector2.zero;
+        Vector2 pointer = GameInput.PointerPosition;
         tooltip.Follow(pointer);
 
         // Several stats change at once when gear swaps, so the text is rebuilt once per frame at most.

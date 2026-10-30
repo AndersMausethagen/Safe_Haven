@@ -65,6 +65,8 @@ public sealed class InteractionOutlineTests
         Assert.IsFalse(mask.enabled);
         target.transform.position = Vector3.zero;
         Physics.SyncTransforms();
+        // Something that moves into reach is found by the next scan (a few times a second); the clock stands still here.
+        SetField(presentation, "nextScan", 0f);
         Invoke(presentation, "LateUpdate");
         Assert.IsTrue(outline.enabled);
         source.enabled = false;
@@ -206,5 +208,10 @@ public sealed class InteractionOutlineTests
     private static void Invoke(object target, string method)
     {
         target.GetType().GetMethod(method, BindingFlags.Instance | BindingFlags.NonPublic).Invoke(target, null);
+    }
+
+    private static void SetField(object target, string field, object value)
+    {
+        target.GetType().GetField(field, BindingFlags.Instance | BindingFlags.NonPublic).SetValue(target, value);
     }
 }

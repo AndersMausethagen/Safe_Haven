@@ -13,33 +13,17 @@ public sealed class SaveHotkeys : MonoBehaviour
     [Tooltip("Loaded instead when the saved scene no longer exists.")]
     [SerializeField] private string fallbackScene = "SafeHaven";
 
-    private InputAction saveAction;
-    private InputAction loadAction;
-
-    private void Awake()
-    {
-        saveAction = new InputAction("QuickSave", InputActionType.Button, "<Keyboard>/f5");
-        loadAction = new InputAction("QuickLoad", InputActionType.Button, "<Keyboard>/f6");
-        saveAction.performed += OnSave;
-        loadAction.performed += OnLoad;
-    }
-
+    // System › QuickSave and QuickLoad of the project-wide actions (GameInput), shared: subscribed while enabled.
     private void OnEnable()
     {
-        saveAction.Enable();
-        loadAction.Enable();
+        if (GameInput.QuickSave != null) GameInput.QuickSave.performed += OnSave;
+        if (GameInput.QuickLoad != null) GameInput.QuickLoad.performed += OnLoad;
     }
 
     private void OnDisable()
     {
-        saveAction.Disable();
-        loadAction.Disable();
-    }
-
-    private void OnDestroy()
-    {
-        saveAction.Dispose();
-        loadAction.Dispose();
+        if (GameInput.QuickSave != null) GameInput.QuickSave.performed -= OnSave;
+        if (GameInput.QuickLoad != null) GameInput.QuickLoad.performed -= OnLoad;
     }
 
     private void OnSave(InputAction.CallbackContext context)

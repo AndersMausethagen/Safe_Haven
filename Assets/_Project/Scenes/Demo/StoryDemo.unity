@@ -17,7 +17,7 @@ RenderSettings:
   m_Fog: 1
   m_FogColor: {r: 0.8, g: 0.75, b: 0.68, a: 1}
   m_FogMode: 2
-  m_FogDensity: 0.006
+  m_FogDensity: 0
   m_LinearFogStart: 0
   m_LinearFogEnd: 300
   m_AmbientSkyColor: {r: 0.837, g: 0.91800004, b: 1.053, a: 1}
@@ -1499,6 +1499,7 @@ MonoBehaviour:
   climate: {fileID: 11400000, guid: 73c218396bceafc4f88b70affc4e9a1b, type: 2}
   startWeather: {fileID: 0}
   changesByItself: 1
+  weatherOnlyAtmosphere: 1
   wind: {fileID: 0}
   rain: {fileID: 294128009}
   overcastVolume: {fileID: 302262938}
@@ -1843,6 +1844,7 @@ MonoBehaviour:
   duration: 1
   range: 2.5
   deactivateOnComplete: 0
+  kind: 0
   started:
     m_PersistentCalls:
       m_Calls: []
@@ -1981,6 +1983,7 @@ MonoBehaviour:
         position: {x: 1980, y: 0}
         target: {fileID: 1525686487}
         seconds: 3
+        revealRadius: 14
     - rid: 287758218191175796
       type: {class: SayNode, ns: , asm: SafeHaven}
       data:
@@ -3025,7 +3028,6 @@ GameObject:
   - component: {fileID: 1755097676}
   - component: {fileID: 1755097680}
   - component: {fileID: 1755097679}
-  - component: {fileID: 1755097678}
   - component: {fileID: 1755097677}
   m_Layer: 0
   m_Name: Main Camera
@@ -3117,18 +3119,6 @@ MonoBehaviour:
       m_PostInfinity: 2
       m_RotationOrder: 4
   CustomBlends: {fileID: 0}
---- !u!114 &1755097678
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1755097675}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1f1c17cda89de9946bdacec99cc8b952, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::NewMonoBehaviourScript
 --- !u!114 &1755097679
 MonoBehaviour:
   m_ObjectHideFlags: 0

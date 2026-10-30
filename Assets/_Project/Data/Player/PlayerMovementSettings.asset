@@ -58,3 +58,10 @@ MonoBehaviour:
     moveSpeed: 0.9
     animationState: Heavy Roll
     animationSpeed: 0.8148148
+  wadeFrom: 0.2
+  deepWadeSpeed: 0.55
+  swimDepth: 1.3
+  swimSpeed: 0.45
+  exhaustedSwimSpeed: 0.5
+  swimTurnSpeed: 0.4
+  buoyancy: 20

@@ -43,7 +43,8 @@ public readonly struct SwingInfo
 /// <summary>
 /// Runs the player's attacks. Light swings walk through the weapon's combo chain when pressed in time (see
 /// <see cref="ComboRules"/>: a press right as a swing recovers builds rhythm, mashing fumbles the chain back to the
-/// first swing); holding the button is the heavy attack; attacking while guarding with a shield is the shield bash. A
+/// first swing); the light swing starts on the press, and holding the button on turns it into the heavy attack while it
+/// is still winding up; attacking while guarding with a shield is the shield bash. A
 /// parry or a perfect dodge readies a counter: the next swing that lands soon after is a critical one. Swings snap
 /// toward a target near the aim and step into it. One press is buffered while a swing or a dodge is still going. It also
 /// keeps the global mode in step: attacking enters GameState.Combat, a stretch without fighting returns to Exploration.
@@ -123,6 +124,8 @@ public sealed class PlayerCombat : MonoBehaviour
     private float pressTime = -1f;
     private ChainPress pressJudge = ChainPress.Late;
     private bool heavyStarted;
+    // Stamina already paid for that light swing, taken off the heavy one's cost.
+    private float heavyCredit;
     private SwingKind queuedKind;
     private ChainPress queuedJudge;
 
@@ -151,6 +154,12 @@ public sealed class PlayerCombat : MonoBehaviour
 
     /// <summary>True while a swing is going.</summary>
     public bool IsAttacking => activeKind != SwingKind.None;
+
+    /// <summary>When the swing in progress started (Time.time); meaningful while <see cref="IsAttacking"/>.</summary>
+    public float SwingStartTime => activeStartTime;
+
+    /// <summary>True while the swing in progress hasn't landed yet (it can still be lost or turned into another).</summary>
+    public bool IsWindingUp => activeKind != SwingKind.None && hitPending;
 
     /// <summary>The guard can go up when no swing is going or the current one has already landed, and not while flinching.</summary>
     public bool CanGuard => !IsFlinching && (activeKind == SwingKind.None || !hitPending);
@@ -326,15 +335,11 @@ public sealed class PlayerCombat : MonoBehaviour
 
         ChainJudged?.Invoke(pressJudge);
 
-        // Without a heavy attack there is nothing to wait for: swing at once.
-        if (weapon == null || weapon.HeavyAttack == null)
-        {
-            pressTime = -1f;
-            Request(SwingKind.Light, pressJudge);
-            return;
-        }
-
-        pressTime = Time.time;
+        // The light swing starts on the press, so a tap is answered at once (waiting for the release to tell a tap from a
+        // hold made every light swing late). Held on, UpdateHeldPress turns it into the heavy one.
+        Request(SwingKind.Light, pressJudge);
+        bool hasHeavy = weapon != null && weapon.HeavyAttack != null;
+        pressTime = hasHeavy ? Time.time : -1f;
         heavyStarted = false;
     }
 
@@ -346,10 +351,6 @@ public sealed class PlayerCombat : MonoBehaviour
         }
 
         pressTime = -1f;
-        if (!heavyStarted)
-        {
-            Request(SwingKind.Light, pressJudge);
-        }
     }
 
     private void UpdateHeldPress()
@@ -359,11 +360,35 @@ public sealed class PlayerCombat : MonoBehaviour
             return;
         }
 
-        if (Time.time - pressTime >= Rules.HeavyHoldSeconds)
+        if (Time.time - pressTime < Rules.HeavyHoldSeconds)
         {
-            heavyStarted = true;
-            Request(SwingKind.Heavy, ChainPress.Late);
+            return;
         }
+
+        // Still winding up the light swing this press began (at once, or buffered behind the swing before): it becomes the
+        // heavy one, paying only the difference. A counter stays a counter, and without the stamina for the difference the
+        // light swing goes on.
+        bool turn = activeKind == SwingKind.Light && activeStartTime >= pressTime && hitPending && (activeTechnique & HitTechnique.Counter) == 0;
+        heavyStarted = true;
+        pressTime = -1f;
+        if (turn)
+        {
+            float credit = CostOf(SwingKind.Light, activeAttack);
+            float extra = Mathf.Max(0f, CostOf(SwingKind.Heavy, weapon.HeavyAttack) - credit);
+            if (stamina != null && stamina.Current < extra)
+            {
+                return;
+            }
+
+            EndSwing();
+            heavyCredit = credit;
+            Begin(SwingKind.Heavy, ChainPress.Late);
+            heavyCredit = 0f;
+            return;
+        }
+
+        // A light swing that has already landed (or a press buffered behind another swing): the heavy one follows.
+        Request(SwingKind.Heavy, ChainPress.Late);
     }
 
     // Kept for gamepads and scripts that ask for a bash directly.
@@ -436,7 +461,7 @@ public sealed class PlayerCombat : MonoBehaviour
         }
 
         // Pay the full cost when the swing actually starts, rechecking affordability for buffered swings.
-        if (stamina != null && !stamina.TrySpend(CostOf(kind, attack)))
+        if (stamina != null && !stamina.TrySpend(Mathf.Max(0f, CostOf(kind, attack) - heavyCredit)))
         {
             return;
         }

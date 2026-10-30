@@ -159,7 +159,7 @@ Material:
     - _SurfaceSmoothness: 1
     - _TessellationEdgeLength: 0.02
     - _TessellationFactor: 64
-    - _TessellationPixels: 0
+    - _TessellationPixels: 4
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _CliffTint: {r: 1.05, g: 1.02, b: 0.95, a: 1}

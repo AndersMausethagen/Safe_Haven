@@ -15,6 +15,9 @@ public sealed class PlayerStaminaSettings : ScriptableObject
     [SerializeField, Min(0f)] private float attackCost = 15f;
     [SerializeField, Min(0f)] private float shieldBashCost = 20f;
     [SerializeField, Min(0f)] private float dodgeCost = 25f;
+    [Tooltip("Stamina per second while swimming forward (treading water costs nothing). Out of stamina, the player " +
+             "swims slower (PlayerMovementSettings › Exhausted Swim Speed).")]
+    [SerializeField, Min(0f)] private float swimCostPerSecond = 7f;
 
     public float MaxStamina => maxStamina;
     public float RegenPerSecond => regenPerSecond;
@@ -22,4 +25,5 @@ public sealed class PlayerStaminaSettings : ScriptableObject
     public float AttackCost => attackCost;
     public float ShieldBashCost => shieldBashCost;
     public float DodgeCost => dodgeCost;
+    public float SwimCostPerSecond => swimCostPerSecond;
 }

@@ -5,7 +5,11 @@ using UnityEngine;
 /// The arc drawn along a weapon swing: a flat ring sector the size of the attack's reach and width, swept by a bright
 /// head with a fading tail ("Safe Haven/Slash" shader). Arcs are pooled and their meshes shared per shape, so a fight
 /// makes no garbage. CombatFeedback draws one for each of the player's swings; tune them in Combat Feel › Slash arcs and
-/// on each attack (Slash Color).
+/// on each attack (Slash Color, Sweep and Tilt).
+/// <para>
+/// Drawn with Graphics.RenderMesh each frame rather than a MeshRenderer: with the GPU Resident Drawer on, a renderer made
+/// at runtime whose (non-DOTS) shader is animated through a MaterialPropertyBlock was not drawn at all.
+/// </para>
 /// </summary>
 public sealed class SlashEffect : MonoBehaviour
 {
@@ -20,9 +24,10 @@ public sealed class SlashEffect : MonoBehaviour
     private static readonly Dictionary<int, Mesh> Meshes = new Dictionary<int, Mesh>();
     private static readonly Stack<SlashEffect> Idle = new Stack<SlashEffect>();
 
-    private MeshFilter filter;
-    private MeshRenderer meshRenderer;
+    private Mesh mesh;
+    private Material material;
     private MaterialPropertyBlock block;
+    private float reach;
     private float startTime;
     private float seconds;
     private Color color;
@@ -44,7 +49,8 @@ public sealed class SlashEffect : MonoBehaviour
         }
 
         SlashEffect slash = Take(material);
-        slash.filter.sharedMesh = MeshFor(Mathf.Clamp(arc, 10f, 360f), range, reverse);
+        slash.mesh = MeshFor(Mathf.Clamp(arc, 10f, 360f), range, reverse);
+        slash.reach = range;
         slash.transform.SetPositionAndRotation(origin, Quaternion.LookRotation(direction.normalized, Vector3.up) * Quaternion.Euler(0f, 0f, tilt));
         slash.color = color;
         slash.seconds = Mathf.Max(0.02f, seconds);
@@ -60,18 +66,13 @@ public sealed class SlashEffect : MonoBehaviour
             SlashEffect pooled = Idle.Pop();
             if (pooled != null)
             {
-                pooled.meshRenderer.sharedMaterial = material;
+                pooled.material = material;
                 return pooled;
             }
         }
 
-        var go = new GameObject("Slash");
-        var slash = go.AddComponent<SlashEffect>();
-        slash.filter = go.AddComponent<MeshFilter>();
-        slash.meshRenderer = go.AddComponent<MeshRenderer>();
-        slash.meshRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-        slash.meshRenderer.receiveShadows = false;
-        slash.meshRenderer.sharedMaterial = material;
+        var slash = new GameObject("Slash").AddComponent<SlashEffect>();
+        slash.material = material;
         slash.block = new MaterialPropertyBlock();
         return slash;
     }
@@ -87,6 +88,15 @@ public sealed class SlashEffect : MonoBehaviour
         }
 
         Apply(t);
+        var draw = new RenderParams(material)
+        {
+            matProps = block,
+            layer = gameObject.layer,
+            shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off,
+            receiveShadows = false,
+            worldBounds = new Bounds(transform.position, Vector3.one * (reach * 2f + 1f)),
+        };
+        Graphics.RenderMesh(draw, mesh, 0, transform.localToWorldMatrix);
     }
 
     private void Apply(float t)
@@ -94,7 +104,6 @@ public sealed class SlashEffect : MonoBehaviour
         block.SetColor(ColorId, color);
         block.SetFloat(ProgressId, t * (1f + Overshoot));
         block.SetFloat(FadeId, 1f - Mathf.SmoothStep(0.6f, 1f, t));
-        meshRenderer.SetPropertyBlock(block);
     }
 
     /// <summary>A flat ring sector in the XZ plane, centred on +Z: uv.x along the sweep, uv.y from inner to outer edge.</summary>

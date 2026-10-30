@@ -6,7 +6,8 @@ using UnityEngine;
 /// (animation, audio, VFX) to observe.
 /// Two independent gates apply: the global GameState (speed/turn multipliers from the
 /// settings asset) and PlayerStateMachine.CanMove (player-specific actions such as interacting). Dash overrides input
-/// for a moment (the dodge, see PlayerDodge).
+/// for a moment (the dodge, see PlayerDodge). While floating (swimming, see PlayerSwimming) buoyancy replaces gravity,
+/// holding the feet at the height asked for, and turning is slower.
 /// </summary>
 [RequireComponent(typeof(CharacterController))]
 [RequireComponent(typeof(PlayerStateMachine))]
@@ -33,8 +34,12 @@ public sealed class PlayerMovement : MonoBehaviour
     private float lungeUntil = -1f;
     private readonly System.Collections.Generic.Dictionary<object, float> speedScales = new System.Collections.Generic.Dictionary<object, float>();
     private float speedScale = 1f;
+    private bool floating;
+    private float floatHeight;
 
     public PlayerMovementSettings Settings => settings;
+    /// <summary>True while the water holds the player up (<see cref="FloatAt"/>): gravity is off.</summary>
+    public bool IsFloating => floating;
     /// <summary>True during a dash (a dodge): movement input is ignored and the character slides at the dash velocity.</summary>
     public bool IsDashing => dashUntil >= 0f;
     /// <summary>The requested movement direction (camera-relative, 0-1 long), before any gating.</summary>
@@ -106,6 +111,7 @@ public sealed class PlayerMovement : MonoBehaviour
         lungeUntil = -1f;
         speedScales.Clear();
         speedScale = 1f;
+        floating = false;
     }
 
     private void Update()
@@ -174,6 +180,17 @@ public sealed class PlayerMovement : MonoBehaviour
         }
     }
 
+    /// <summary>Holds the feet at <paramref name="feetHeight"/> instead of letting gravity act, pushed there by the
+    /// settings' Buoyancy (so a jump in dips under first). Asked every frame by PlayerSwimming while swimming.</summary>
+    public void FloatAt(float feetHeight)
+    {
+        floating = true;
+        floatHeight = feetHeight;
+    }
+
+    /// <summary>Gravity again (out of the water).</summary>
+    public void StopFloating() => floating = false;
+
     /// <summary>Faces <paramref name="direction"/> at once (the start of a swing), whatever the movement gate.</summary>
     public void SnapFacing(Vector3 direction)
     {
@@ -217,7 +234,7 @@ public sealed class PlayerMovement : MonoBehaviour
             return;
         }
 
-        float turnSpeed = settings.TurnSpeed * settings.GetTurnSpeedMultiplier(currentGameState);
+        float turnSpeed = settings.TurnSpeed * settings.GetTurnSpeedMultiplier(currentGameState) * (floating ? settings.SwimTurnSpeed : 1f);
         Quaternion targetRotation = Quaternion.LookRotation(direction.normalized, Vector3.up);
         transform.rotation = Quaternion.RotateTowards(
             transform.rotation,
@@ -245,8 +262,9 @@ public sealed class PlayerMovement : MonoBehaviour
 
         Vector3 direction = stateMachine.CanMove ? movementInput : Vector3.zero;
 
-        // Cursor-facing states keep aiming at the cursor even while standing still; otherwise face the travel direction.
-        if (settings.FacesCursor(currentGameState) && hasAimDirection)
+        // Cursor-facing states keep aiming at the cursor even while standing still; otherwise (and swimming) face the
+        // travel direction.
+        if (settings.FacesCursor(currentGameState) && hasAimDirection && !floating)
         {
             FaceDirection(aimDirection);
         }
@@ -273,6 +291,14 @@ public sealed class PlayerMovement : MonoBehaviour
 
     private void ApplyGravity()
     {
+        if (floating)
+        {
+            // Eases towards the float height (the gap closes in about a second), the change of speed capped by buoyancy.
+            float wanted = (floatHeight - transform.position.y) * 3f;
+            verticalVelocity = Mathf.MoveTowards(verticalVelocity, wanted, settings.Buoyancy * Time.deltaTime);
+            return;
+        }
+
         if (IsGrounded && verticalVelocity < 0f)
         {
             verticalVelocity = settings.GroundedVerticalVelocity;

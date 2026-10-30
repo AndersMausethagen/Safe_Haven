@@ -29,6 +29,9 @@ MonoBehaviour:
   staminaCost: -1
   animationState: Sword Finisher
   animationSpeed: 0.75
+  followThroughSpeed: 1
   swingSound: {fileID: 0}
   hitSound: {fileID: 0}
   slashColor: {r: 1, g: 0.8, b: 0.45, a: 0.9}
+  slashSweep: 1
+  slashTilt: 73.33535

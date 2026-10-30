@@ -65,6 +65,12 @@ public sealed class AttackDefinition : ScriptableObject
     [SerializeField] private SoundDefinition hitSound;
     [Tooltip("The slash arc drawn along the swing. Clear (alpha 0) draws none.")]
     [SerializeField] private Color slashColor = new Color(1f, 0.95f, 0.85f, 0.8f);
+    [Tooltip("Which way the slash arc sweeps, as seen from behind the attacker: the way the weapon moves in the " +
+             "animation. Set from the clip by Set Up Combat Animations.")]
+    [SerializeField] private SlashSweep slashSweep = SlashSweep.RightToLeft;
+    [Tooltip("Roll of the slash arc in degrees: 0 is a flat sweep, towards ±80 a steep chop; positive raises the right " +
+             "end. Set from the clip by Set Up Combat Animations.")]
+    [SerializeField, Range(-80f, 80f)] private float slashTilt;
 
     public string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;
     public DamageType DamageType => damageType;
@@ -87,6 +93,8 @@ public sealed class AttackDefinition : ScriptableObject
     public SoundDefinition SwingSound => swingSound;
     public SoundDefinition HitSound => hitSound;
     public Color SlashColor => slashColor;
+    public SlashSweep SlashSweep => slashSweep;
+    public float SlashTilt => slashTilt;
 
     /// <summary>Sets the player-facing extras in one go (editor setup and tests).</summary>
     public void ConfigureTechnique(string state, float speed, float poise, float lungeDistance, Color slash)
@@ -114,4 +122,11 @@ public sealed class AttackDefinition : ScriptableObject
         // The attack can't be ready to chain before the damage has landed.
         recoveryTime = Mathf.Max(recoveryTime, hitDelay);
     }
+}
+
+/// <summary>Which way a slash arc sweeps, as seen from behind the attacker.</summary>
+public enum SlashSweep
+{
+    LeftToRight,
+    RightToLeft,
 }

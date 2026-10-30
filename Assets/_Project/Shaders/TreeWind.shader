@@ -246,6 +246,7 @@ Shader "Safe Haven/Tree Wind"
             #pragma shader_feature_local _ALPHATEST_ON
             #pragma shader_feature_local _FAST_LEAF_LIGHTING
             #pragma multi_compile_instancing
+            #include_with_pragmas "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DOTS.hlsl"
             #pragma multi_compile_fog
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE _MAIN_LIGHT_SHADOWS_SCREEN
             #pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
@@ -276,6 +277,7 @@ Shader "Safe Haven/Tree Wind"
             #pragma fragment ClipFragment
             #pragma shader_feature_local _ALPHATEST_ON
             #pragma multi_compile_instancing
+            #include_with_pragmas "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DOTS.hlsl"
             #pragma multi_compile_vertex _ _CASTING_PUNCTUAL_LIGHT_SHADOW
             ENDHLSL
         }
@@ -291,6 +293,7 @@ Shader "Safe Haven/Tree Wind"
             #pragma fragment DepthFragment
             #pragma shader_feature_local _ALPHATEST_ON
             #pragma multi_compile_instancing
+            #include_with_pragmas "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DOTS.hlsl"
             half4 DepthFragment(Varyings input) : SV_Target
             {
                 SeeThroughClip(input.positionCS);
@@ -310,6 +313,7 @@ Shader "Safe Haven/Tree Wind"
             #pragma fragment NormalsFragment
             #pragma shader_feature_local _ALPHATEST_ON
             #pragma multi_compile_instancing
+            #include_with_pragmas "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DOTS.hlsl"
             #pragma multi_compile_fragment _ _GBUFFER_NORMALS_OCT
             ENDHLSL
         }

@@ -90,8 +90,43 @@ public static class CombatEffectsBuilder
             data.ApplyModifiedPropertiesWithoutUndo();
         }
 
+        BuildWeaponEffects();
         AssetDatabase.SaveAssets();
         Debug.Log($"Combat effects built in {PrefabFolder} and set in Combat Feel.");
+    }
+
+    /// <summary>Hit effects of a weapon's own, set where the weapon has none: fists land with a soft flash, a quick shock
+    /// ring and a puff of dust instead of a blade's sparks. Build Combat Effects runs it too.</summary>
+    [MenuItem("Safe Haven/Combat/Build Weapon Hit Effects")]
+    public static void BuildWeaponEffects()
+    {
+        // Run on its own, it reuses the particle materials Build Combat Effects made.
+        if (dot == null) dot = AssetDatabase.LoadAssetAtPath<Material>($"{ArtFolder}/Combat Dot.mat");
+        if (dot == null) dot = ParticleMaterial("Dot", DotPixels);
+        if (ring == null) ring = AssetDatabase.LoadAssetAtPath<Material>($"{ArtFolder}/Combat Ring.mat");
+        if (ring == null) ring = ParticleMaterial("Ring", RingPixels);
+        var pale = new Color(1f, 0.93f, 0.82f);
+        var dust = new Color(0.62f, 0.56f, 0.48f);
+        GameObject punch = Effect("Punch Impact", root =>
+        {
+            Flash(root, dot, 0.55f, 0.07f, pale * 1.6f);
+            Ring(root, false, 0.15f, 0.9f, 0.14f, pale * 1.2f);
+            Motes(root, 7, 0.8f, 2f, 0.25f, 0.45f, 0.06f, dust);
+        });
+
+        var fists = AssetDatabase.LoadAssetAtPath<WeaponDefinition>($"{CombatAnimationSetup.WeaponFolder}/Fists.asset");
+        if (fists != null)
+        {
+            var data = new SerializedObject(fists);
+            SerializedProperty effect = data.FindProperty("hitEffect");
+            if (effect.objectReferenceValue == null)
+            {
+                effect.objectReferenceValue = punch;
+                data.ApplyModifiedPropertiesWithoutUndo();
+            }
+        }
+
+        AssetDatabase.SaveAssets();
     }
 
     // ----- Prefabs -----

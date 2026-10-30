@@ -1,9 +1,43 @@
 using NUnit.Framework;
 using UnityEngine;
 
-/// <summary>Edit Mode tests for combat feel: telegraph shapes, the shared settings and the dodge tuning.</summary>
+/// <summary>Edit Mode tests for combat feel: slash arc direction, telegraph shapes, the shared settings and the dodge tuning.</summary>
 public sealed class CombatFeelTests
 {
+    [Test]
+    public void HitRecoil_SnapsOutThenSettlesWithASmallOvershoot()
+    {
+        Assert.AreEqual(0f, MonsterPose.RecoilCurve(0f), 0.0001f);
+        Assert.AreEqual(0f, MonsterPose.RecoilCurve(1f), 0.0001f, "Back at rest when it ends.");
+        Assert.Greater(MonsterPose.RecoilCurve(0.25f), 0.5f, "Most of the snap comes early.");
+        float overshoot = MonsterPose.RecoilCurve(0.8f);
+        Assert.Less(overshoot, 0f, "It swings a little past rest on the way back.");
+        Assert.Greater(overshoot, -0.25f);
+    }
+
+    [Test]
+    public void SlashArc_SweepsTheWayTheHandMoves()
+    {
+        Assert.AreEqual(SlashSweep.RightToLeft, CombatAnimationSetup.SlashFor(new Vector3(-8f, 0f, 1f)).sweep);
+        Assert.AreEqual(SlashSweep.LeftToRight, CombatAnimationSetup.SlashFor(new Vector3(8f, 0f, 1f)).sweep);
+        Assert.AreEqual(0f, CombatAnimationSetup.SlashFor(new Vector3(-8f, 0f, 1f)).tilt, 0.01f, "A level swing draws a flat arc.");
+    }
+
+    [Test]
+    public void SlashArc_RaisesTheEndTheSwingStartsFrom()
+    {
+        // Coming down from the right: the right end sits higher (positive roll); from the left, the left end.
+        Assert.Greater(CombatAnimationSetup.SlashFor(new Vector3(-3f, -3f, 0f)).tilt, 30f);
+        Assert.Less(CombatAnimationSetup.SlashFor(new Vector3(3f, -3f, 0f)).tilt, -30f);
+        Assert.LessOrEqual(Mathf.Abs(CombatAnimationSetup.SlashFor(new Vector3(-0.5f, -20f, 0f)).tilt), 80f, "Never fully on edge to the camera.");
+    }
+
+    [Test]
+    public void SlashArc_ThrustsStayFlat()
+    {
+        Assert.AreEqual(0f, CombatAnimationSetup.SlashFor(new Vector3(-1f, -1f, 12f)).tilt, 0.01f);
+    }
+
     [Test]
     public void TelegraphFan_CoversTheArcAtRadiusOne()
     {

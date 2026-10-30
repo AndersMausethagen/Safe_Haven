@@ -39,6 +39,24 @@ public sealed class StaminaPool
         return true;
     }
 
+    /// <summary>Takes up to <paramref name="amount"/>, as much as there is (a cost paid over time, such as swimming).
+    /// Returns true when the value changed.</summary>
+    public bool Drain(float amount)
+    {
+        if (amount <= 0f || IsEmpty)
+        {
+            return false;
+        }
+
+        Current = Mathf.Max(0f, Current - amount);
+        if (Current <= Epsilon)
+        {
+            Current = 0f;
+        }
+
+        return true;
+    }
+
     /// <summary>Restores stamina up to the maximum. Returns true when the value changed.</summary>
     public bool Regenerate(float amount)
     {

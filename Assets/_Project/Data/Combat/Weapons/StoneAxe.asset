@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WeaponDefinition
   displayName: Stone Axe
   stance: 2
+  kind: 0
   damage: 16
   basicAttack: {fileID: 11400000, guid: 67e0694526eb1a84f99f28f0ddcd76db, type: 2}
   combo:
@@ -22,5 +23,18 @@ MonoBehaviour:
   heavyAttack: {fileID: 11400000, guid: 93dfc0815102c974c961dba05f87b033, type: 2}
   counterAttack: {fileID: 0}
   guardLetThrough: 0.4
-  swingSound: {fileID: 0}
-  hitSound: {fileID: 0}
+  drawSeconds: 1
+  reloadSeconds: 0.6
+  arrowSpeed: 32
+  spread: 1.5
+  minimumDraw: 0.25
+  drawMoveSpeed: 0.55
+  perfectReleaseSeconds: 0.2
+  perfectReleaseDamage: 1.25
+  aimSpread: 0.5
+  counterShotDamage: 0.6
+  shotAttack: {fileID: 0}
+  drawSound: {fileID: 0}
+  swingSound: {fileID: 11400000, guid: 51662adc6a4b3a3438d04910bf5892fc, type: 2}
+  hitSound: {fileID: 11400000, guid: 8c50981295a2e3344b69d44400417b5c, type: 2}
+  hitEffect: {fileID: 0}

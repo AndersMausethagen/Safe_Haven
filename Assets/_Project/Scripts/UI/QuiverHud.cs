@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 /// <summary>
 /// The bow's readout above the action bar, shown while a bow is in hand: the chosen arrows and how many are left
-/// ("Crude Stone Arrow ×17 · Z"), a draw bar that fills while drawing and turns gold in the perfect release window, and
+/// ("Crude Stone Arrow ×17 · MMB": the key that picks the next kind, from the Input Actions asset), a draw bar that fills while drawing and turns gold in the perfect release window, and
 /// "Quick shot ready" while a perfect dodge has readied the instant shot. Hidden while the dialogue box is open. Made by CombatFeedback for the player in every
 /// scene; it only reads PlayerArchery.
 /// </summary>
@@ -99,7 +99,8 @@ public sealed class QuiverHud : MonoBehaviour
         {
             shownArrow = arrow;
             shownCount = count;
-            arrows.text = arrow != null ? $"{arrow.DisplayName} ×{count}  <size=70%><alpha=#99>Z</size>" : "<alpha=#99>No arrows";
+            // The key from the Input Actions asset (Player › CycleArrows), so the hint follows a rebinding.
+            arrows.text = arrow != null ? $"{arrow.DisplayName} ×{count}  <size=70%><alpha=#99>{GameInput.KeyLabel(GameInput.CycleArrows)}</size>" : "<alpha=#99>No arrows";
         }
 
         float draw = archery.Draw;

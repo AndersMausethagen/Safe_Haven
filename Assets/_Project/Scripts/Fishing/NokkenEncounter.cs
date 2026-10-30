@@ -90,8 +90,8 @@ public sealed class NokkenEncounter : MonoBehaviour
         float risen = Mathf.Clamp01((Time.time - started) / RiseSeconds);
         figure.position = Vector3.Lerp(surfaceAt + Vector3.down * 2.5f, surfaceAt + Vector3.down * 0.4f, 1f - (1f - risen) * (1f - risen));
 
-        Keyboard keys = Keyboard.current;
-        bool pressed = keys != null && keys.spaceKey.wasPressedThisFrame || Gamepad.current != null && Gamepad.current.buttonSouth.wasPressedThisFrame;
+        // Hammered on the dodge button (Space, south button): the way out of trouble.
+        bool pressed = GameInput.Dodge.WasPressedThisFrame();
         presses = Mathf.Max(0f, presses + (pressed ? 1f : 0f) - PressesFadePerSecond * Time.deltaTime);
         if (pressed)
         {

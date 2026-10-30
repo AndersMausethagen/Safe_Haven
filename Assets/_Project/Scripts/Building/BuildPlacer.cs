@@ -289,7 +289,8 @@ public sealed class BuildPlacer : MonoBehaviour
             return;
         }
 
-        if (Mouse.current.rightButton.wasPressedThisFrame)
+        // Build map of the project-wide actions (GameInput): place, cancel, turn, and the Shift/Alt modifiers.
+        if (GameInput.BuildCancel.WasPressedThisFrame())
         {
             if (drawingLine)
             {
@@ -315,10 +316,9 @@ public sealed class BuildPlacer : MonoBehaviour
             return;
         }
 
-        Keyboard keyboard = Keyboard.current;
-        bool free = keyboard != null && keyboard.altKey.isPressed;
-        bool fine = keyboard != null && keyboard.shiftKey.isPressed;
-        float scroll = Mouse.current.scroll.ReadValue().y;
+        bool free = GameInput.BuildFreePlace.IsPressed();
+        bool fine = GameInput.BuildFineRotate.IsPressed();
+        float scroll = GameInput.BuildRotate.ReadValue<float>();
         if (!drawingLine && Mathf.Abs(scroll) > 0.01f)
         {
             yaw = Mathf.Repeat(yaw + Mathf.Sign(scroll) * (fine ? fineRotationStep : rotationStep), 360f);
@@ -332,7 +332,7 @@ public sealed class BuildPlacer : MonoBehaviour
         if (drawingLine)
         {
             UpdateLine(cursor, free);
-            if (Mouse.current.leftButton.wasReleasedThisFrame)
+            if (GameInput.BuildPlace.WasReleasedThisFrame())
             {
                 ConfirmLine();
             }
@@ -351,7 +351,7 @@ public sealed class BuildPlacer : MonoBehaviour
         ghost.Place(0, point, pieceYaw, problem, Kind);
 
         bool overUI = EventSystem.current != null && EventSystem.current.IsPointerOverGameObject();
-        if (!Mouse.current.leftButton.wasPressedThisFrame || overUI)
+        if (!GameInput.BuildPlace.WasPressedThisFrame() || overUI)
         {
             return;
         }
@@ -377,7 +377,7 @@ public sealed class BuildPlacer : MonoBehaviour
 
     private void UpdatePicking()
     {
-        if (!Mouse.current.leftButton.wasPressedThisFrame || (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject()))
+        if (!GameInput.BuildPlace.WasPressedThisFrame() || (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject()))
         {
             return;
         }

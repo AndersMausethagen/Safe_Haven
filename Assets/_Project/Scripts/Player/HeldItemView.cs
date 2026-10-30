@@ -22,6 +22,7 @@ public sealed class HeldItemView : MonoBehaviour
     private readonly Dictionary<ItemDefinition, GameObject> models = new Dictionary<ItemDefinition, GameObject>();
     private PlayerEquipment equipment;
     private PlayerGathering gathering;
+    private PlayerSwimming swimming;
     private Transform grip;
     private GameObject current;
     private Transform offHandGrip;
@@ -59,6 +60,7 @@ public sealed class HeldItemView : MonoBehaviour
     {
         equipment = GetComponent<PlayerEquipment>();
         gathering = GetComponent<PlayerGathering>();
+        swimming = GetComponent<PlayerSwimming>();
         Animator animator = GetComponentInChildren<Animator>();
         Transform hand = animator != null && animator.isHuman ? animator.GetBoneTransform(HumanBodyBones.RightHand) : null;
         if (hand == null)
@@ -91,7 +93,7 @@ public sealed class HeldItemView : MonoBehaviour
         // Gathering tools and broken lights do not leave a burning torch in the other hand.
         bool previewOffHand = Preview != null && Preview.IsWeapon && Preview.Weapon.CanUseOffHand;
         bool needsBothHands = wanted != null && wanted.IsWeapon && wanted.Weapon.RequiresBothHands;
-        ItemDefinition offItem = previewOffHand ? Preview : !offHand.IsEmpty && !offHand.IsBroken &&
+        ItemDefinition offItem = previewOffHand ? Preview : !offHand.IsEmpty && !offHand.IsBroken && !IsSwimming &&
             !needsBothHands && (gathering == null || gathering.Session == null) ? offHand.Item : null;
         if (offItem != offHandShown)
         {
@@ -138,7 +140,9 @@ public sealed class HeldItemView : MonoBehaviour
         return model;
     }
 
-    /// <summary>The tool while gathering with one on the belt, else the main-hand weapon.</summary>
+    private bool IsSwimming => swimming != null && swimming.IsSwimming;
+
+    /// <summary>The tool while gathering with one on the belt, else the main-hand weapon; nothing while swimming.</summary>
     private ItemDefinition Wanted()
     {
         if (Preview != null && !(Preview.IsWeapon && Preview.Weapon.CanUseOffHand))
@@ -146,7 +150,7 @@ public sealed class HeldItemView : MonoBehaviour
             return Preview;
         }
 
-        if (equipment == null)
+        if (equipment == null || IsSwimming)
         {
             return null;
         }

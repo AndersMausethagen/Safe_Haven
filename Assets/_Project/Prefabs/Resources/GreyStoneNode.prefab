@@ -52,6 +52,7 @@ MonoBehaviour:
   duration: 2
   range: 1.6
   deactivateOnComplete: 0
+  kind: 0
   started:
     m_PersistentCalls:
       m_Calls: []
@@ -120,13 +121,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 5136407152241708498}
     m_Modifications:
+    - target: {fileID: -4014077355302088535, guid: 4d273acf2e8f7504792bdd273ac11fb6, type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: 4300000, guid: bdc49c222897c2641a0786e2ddae067a, type: 2}
     - target: {fileID: 1652333342555780229, guid: 4d273acf2e8f7504792bdd273ac11fb6, type: 3}
       propertyPath: m_Name
       value: a_worn_grey_minable_00005_x4_00002_paint_hunyuan3d_untextured
       objectReference: {fileID: 0}
     - target: {fileID: 1652333342555780229, guid: 4d273acf2e8f7504792bdd273ac11fb6, type: 3}
       propertyPath: m_StaticEditorFlags
-      value: 2147483647
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8640444601044301075, guid: 4d273acf2e8f7504792bdd273ac11fb6, type: 3}
       propertyPath: m_LocalPosition.x

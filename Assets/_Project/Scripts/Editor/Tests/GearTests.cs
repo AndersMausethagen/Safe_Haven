@@ -396,4 +396,59 @@ public sealed class GearTests
             Object.DestroyImmediate(user);
         }
     }
+
+    [Test]
+    public void WeaponKey_SwapsTheWeaponInHandForTheOneBefore()
+    {
+        var axe = AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Project/Data/Items/WoodsmansAxe.asset");
+        var bow = AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Project/Data/Items/CrudeWoodenBow.asset");
+        var torch = AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Project/Data/Items/HandTorch.asset");
+        var user = new GameObject("Weapon swapper");
+        try
+        {
+            var equipment = user.AddComponent<PlayerEquipment>();
+            ItemContainer bag = user.GetComponent<ItemInventory>().Container;
+            bag.Add(torch, 1);
+            bag.Add(axe, 1);
+            bag.Add(bow, 1);
+            Assert.IsTrue(equipment.EquipFromBag(axe));
+
+            Assert.IsTrue(equipment.SwapWeapon());
+            Assert.AreSame(bow, equipment.MainHand.Item, "the torch is never picked: it has its own key");
+            Assert.IsTrue(equipment.SwapWeapon());
+            Assert.AreSame(axe, equipment.MainHand.Item, "back to the weapon held before");
+            Assert.IsTrue(equipment.SwapWeapon());
+            Assert.AreSame(bow, equipment.MainHand.Item);
+            Assert.AreEqual(1, bag.Count(axe), "the other weapon waits in the bag");
+        }
+        finally
+        {
+            Object.DestroyImmediate(user);
+        }
+    }
+
+    [Test]
+    public void WeaponKey_PutsTheOnlyWeaponAwayAndTakesItOutAgain()
+    {
+        var axe = AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Project/Data/Items/WoodsmansAxe.asset");
+        var user = new GameObject("Weapon swapper");
+        try
+        {
+            var equipment = user.AddComponent<PlayerEquipment>();
+            ItemContainer bag = user.GetComponent<ItemInventory>().Container;
+            Assert.IsFalse(equipment.SwapWeapon(), "nothing to take out");
+            bag.Add(axe, 1);
+            Assert.IsTrue(equipment.SwapWeapon(), "empty-handed, the first weapon in the bag comes out");
+            Assert.AreSame(axe, equipment.MainHand.Item);
+
+            Assert.IsTrue(equipment.SwapWeapon());
+            Assert.IsTrue(equipment.MainHand.IsEmpty, "the only weapon is put away (fists)");
+            Assert.IsTrue(equipment.SwapWeapon());
+            Assert.AreSame(axe, equipment.MainHand.Item, "and taken out again");
+        }
+        finally
+        {
+            Object.DestroyImmediate(user);
+        }
+    }
 }

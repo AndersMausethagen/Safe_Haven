@@ -30,6 +30,7 @@ public sealed class PlayerStamina : MonoBehaviour
     public float AttackCost => settings != null ? settings.AttackCost : 0f;
     public float ShieldBashCost => settings != null ? settings.ShieldBashCost : 0f;
     public float DodgeCost => settings != null ? settings.DodgeCost : 0f;
+    public float SwimCostPerSecond => settings != null ? settings.SwimCostPerSecond : 0f;
 
     /// <summary>Raised whenever stamina changes. Arguments: current stamina, max stamina.</summary>
     public event Action<float, float> StaminaChanged;
@@ -85,6 +86,17 @@ public sealed class PlayerStamina : MonoBehaviour
         }
 
         return true;
+    }
+
+    /// <summary>Spends stamina over time (swimming): takes what there is, never refuses, and holds off regeneration
+    /// like any spend.</summary>
+    public void Drain(float amount)
+    {
+        if (pool.Drain(amount))
+        {
+            regenAt = Time.time + (settings != null ? settings.RegenDelay : 0f);
+            StaminaChanged?.Invoke(pool.Current, pool.Max);
+        }
     }
 
     /// <summary>

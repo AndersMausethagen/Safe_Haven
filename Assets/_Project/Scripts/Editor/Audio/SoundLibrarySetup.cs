@@ -105,8 +105,48 @@ public static class SoundLibrarySetup
         AssignHarvest("OreFeedback", sounds["Mine"], sounds["Stone Breaks"], sounds);
         AssignHarvest("FibreFeedback", sounds["Cut Fibre"], sounds["Cut Fibre"], sounds);
         AssignHarvest("DefaultFeedback", sounds["Hit"], sounds["Structure Hit"], sounds);
+        SetUpWeaponSounds();
         AssetDatabase.SaveAssets();
         Debug.Log($"Sound library: {sounds.Count} sounds in {SoundFolder}, set in Audio Settings and the gathering feedback.");
+    }
+
+    /// <summary>Swing and hit sounds of their own for fists and axes (the game-wide swing has a blade's ring), set on
+    /// those weapons where they have none. Set Up Free Sound Library runs it too.</summary>
+    [MenuItem("Safe Haven/Audio/Set Up Weapon Sounds")]
+    public static void SetUpWeaponSounds()
+    {
+        const string impact = "Kenney Impact", rpg = "Kenney RPG", oga = "OGA 100 CC0 SFX 2";
+        // Fists: a quick cloth swish and a dull punch; axes: a deep whoosh and a heavy, low thud.
+        SoundDefinition punchSwing = Sound(new Spec { Name = "Punch Swing", Clips = Files(rpg, "cloth1", "cloth2", "cloth3", "cloth4").Concat(Files(oga, "sfx100v2_air_01")).ToArray(), Volume = 0.45f, Pitch = new Vector2(1.1f, 1.3f), Audible = 15f });
+        SoundDefinition punchHit = Sound(new Spec { Name = "Punch Hit", Clips = Numbered(impact, "impactPunch_medium_", 5), Volume = 0.8f, Pitch = new Vector2(0.95f, 1.1f), MaxAtOnce = 6 });
+        SoundDefinition axeSwing = Sound(new Spec { Name = "Axe Swing", Clips = Files(oga, "sfx100v2_air_02", "sfx100v2_air_01"), Volume = 0.65f, Pitch = new Vector2(0.75f, 0.9f), Audible = 22f });
+        SoundDefinition axeHit = Sound(new Spec { Name = "Axe Hit", Clips = Numbered(impact, "impactPunch_heavy_", 5).Concat(Files(rpg, "chop")).ToArray(), Volume = 0.85f, Pitch = new Vector2(0.8f, 0.92f), MaxAtOnce = 6 });
+        AssignWeapon("Fists", punchSwing, punchHit);
+        AssignWeapon("StoneAxe", axeSwing, axeHit);
+        AssignWeapon("WoodsmansAxe", axeSwing, axeHit);
+        AssignWeapon("Greataxe", axeSwing, axeHit);
+        AssetDatabase.SaveAssets();
+    }
+
+    private static void AssignWeapon(string weapon, SoundDefinition swing, SoundDefinition hit)
+    {
+        var asset = AssetDatabase.LoadAssetAtPath<WeaponDefinition>($"{CombatAnimationSetup.WeaponFolder}/{weapon}.asset");
+        if (asset == null)
+        {
+            return;
+        }
+
+        var data = new SerializedObject(asset);
+        foreach ((string field, SoundDefinition sound) in new[] { ("swingSound", swing), ("hitSound", hit) })
+        {
+            SerializedProperty property = data.FindProperty(field);
+            if (property.objectReferenceValue == null)
+            {
+                property.objectReferenceValue = sound;
+            }
+        }
+
+        data.ApplyModifiedPropertiesWithoutUndo();
     }
 
     private static SoundDefinition Sound(Spec spec)

@@ -170,10 +170,7 @@ public sealed class StashWindow : MonoBehaviour
             return;
         }
 
-        if (Pointer.current != null)
-        {
-            tooltip.Follow(Pointer.current.position.ReadValue());
-        }
+        tooltip.Follow(GameInput.PointerPosition);
     }
 
     public void Open(StashChest source, GameObject user)

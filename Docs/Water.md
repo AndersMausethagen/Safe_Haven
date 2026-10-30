@@ -44,6 +44,18 @@ grass and other terrain details under it (and grass painted there later stays hi
 Water needs a bed below it: depth is what gives it colour. Water lying flat on the ground looks like a thin film
 with foam all over.
 
+## Wading and swimming
+
+The player wades through any ripple-taking water (`WaterSurface` › Takes Ripples; not waterfalls) and slows down the
+deeper it gets. Water as deep as **Swim Depth** (1.3 m, chest high) lifts them off the bottom: they tread water
+standing still and swim breaststroke when steered, at 45 % speed (half that out of stamina: swimming forward costs
+7 stamina a second, treading water is free), put away what they hold, and can't fight, dodge or interact. They stand
+again where the bottom comes up. The numbers are in `Data/Player/PlayerMovementSettings` › Water (`PlayerSwimming`).
+
+- Water is only swimmable where its bed lies deeper than Swim Depth: carve it deeper (**Carve Terrain Under Selected
+  Water...**) or the player only wades. The Safe Haven tarn is up to 2.2 m deep; the river is wading depth.
+- A surface's **Depth** must be more than Swim Depth, or the player isn't found in that water once they float.
+
 ## Look (per material, in `Art/Generated/Water/`)
 
 | Setting | Effect |

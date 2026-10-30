@@ -216,7 +216,9 @@ All layer passes use the same height resources, including layers 5-16, so their 
 
 On the material, **Displacement Height Range** defaults to 0.10 metres (approximately +/-5 cm for a 0-1 height map).
 **Full Detail Distance** / **Detail Fade Distance** default to 8 / 35 metres; **Maximum Tessellation** defaults to 8,
-with a target triangle edge length of 8 cm. Detail fades smoothly with distance and on steep cliffs.
+with a target triangle edge length of 8 cm, and no triangle smaller than **4 pixels** on screen (Target Edge Length in
+pixels; 0 would allow 1-pixel triangles, which cost the GPU most of its frame, see "Static flags and heavy models").
+Detail fades smoothly with distance and on steep cliffs.
 Forward, deferred, shadow, depth, depth-normal, selection and distant base-map passes share the displaced surface.
 The existing mesh-only *Forest Ground ASE* shader is not used for this: it does not preserve the terrain's painted layers.
 
@@ -420,6 +422,49 @@ move it, Backspace removes the last, Esc stops drawing), then **Paint Path**.
 **Safe Haven › World › Place › Drop Selection to Ground** (End) and **Drop and Align to Slope** (Shift+End) set the selected
 objects on whatever is below them (colliders first, then the terrain) by the bottom of their meshes. The Content
 Editor's **Place in Scene** does the same.
+
+## Static flags and heavy models
+
+Leave placed scenery **non-static**; the project runs on the SRP Batcher without the GPU Resident Drawer, and the
+camera only ever sees a small patch of the world.
+
+- **Measured in SafeHaven (2026-10-30):** marking the 1,735 decor rock and crag renderers Batching Static changed draw
+  calls from about 972 to 973 and CPU time not at all, but cost about 233 MB of graphics memory (each instance's
+  geometry is copied into the combined mesh).
+- **Never static batch anything using Tree Wind** (trees, ferns, plants). The wind works in object space, so batching
+  breaks it.
+- **Never static batch a gathering node, a choppable tree or a building.** They are rotated, scaled, swapped or felled
+  at runtime (`ResourceNode` picks a model variant in `Awake`).
+- **Terrains** are static (they are), but their **Draw Instanced** stays off. Terrain displacement needs it off
+  (`TerrainDisplacementEditor`).
+- **GPU Resident Drawer is on** (`PC_RPAsset`; static batching is off, as it requires). Identical mesh objects are
+  drawn instanced from data kept on the GPU, which scales with scene size where per-object drawing doesn't.
+  - Measured in the Editor (2026-10-30): draw calls halved (about 988 to 458 at the spawn, 527 to 268 in a dense
+    grove), URP's CPU time about the same (2.0 to 2.4 ms and 1.8 to 1.7 ms) and no visible change.
+  - **A shader only gets it with DOTS instancing:** put `#include_with_pragmas` URP's `ShaderLibrary/DOTS.hlsl` after
+    `#pragma multi_compile_instancing` in every pass, and go through the transform macros, not `unity_ObjectToWorld`
+    directly. Without it, objects silently fall back to normal drawing.
+  - Shaders with it: Layered Lit, Tree Wind, Lit/Unlit (See-Through), Shader Graph and URP's own. Not needed: terrain
+    (never drawn this way) and Grass (terrain details). Not done: Water and Mesh Surface (Tessellated).
+  - **A renderer made at runtime whose non-DOTS shader is animated through a `MaterialPropertyBlock` is not drawn at
+    all.** This hit the slash arcs. Draw such effects with `Graphics.RenderMesh` (as `SlashEffect` does), or give the
+    shader DOTS instancing. Effects on URP's own shaders (attack telegraphs, the build ghost, the extraction zone) and
+    the interaction outlines were checked and draw fine.
+  - With it on, `FrameTimingManager` reports no GPU time; measure the GPU with the Profiler's GPU module instead.
+- **The GPU's biggest cost was the terrain's tessellation** (`Safe Haven/Terrain (World)`, displacement within about
+  35 m of the camera). Its 2 cm edge length meant 1-pixel triangles at the game camera's distance, drawn again in
+  every tessellated pass: forward, both shadow cascades, depth and the normals SSAO reads. Measured at 1920x1080
+  (2026-10-30), the terrain was 23 of the grove's 24.8 ms.
+  - The fix is **Target Edge Length (pixels) = 4** (`_TessellationPixels`): no triangle smaller than about 4 pixels.
+    It is the shaders' default now, and the Terrain Surface window's presets set it.
+  - GPU time: about 24.7 to 7.2 ms in the grove, 9.0 to 4.3 ms at the spawn.
+  - No visible change from the game camera or from 3 m away. Close up the limit lets the tessellation back in, since
+    nearer triangles cover more pixels.
+  - Measure GPU time with the Profiler's GPU module (`RawFrameDataView.frameGpuTimeMs`) at 1080p. A small Game view
+    hides most of the cost.
+- **What does cost the frame is triangles.** Check a new model with Level Check's census and the visible-triangle
+  count, then lighten it with **Safe Haven › Art Pipeline › Simplify Model Meshes** (`ModelSimplifier`). Make sure a
+  model's LOD levels really differ: `boulder_01.fbx` shipped three identical ones.
 
 ## Level Check
 

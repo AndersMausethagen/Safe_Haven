@@ -64,9 +64,12 @@ public sealed class WeaponDefinition : ScriptableObject
     [SerializeField] private AttackDefinition shotAttack;
     [SerializeField] private SoundDefinition drawSound;
 
-    [Header("Sound")]
+    [Header("Sound and Effects")]
     [SerializeField] private SoundDefinition swingSound;
     [SerializeField] private SoundDefinition hitSound;
+    [Tooltip("Spawned where this weapon's ordinary hits land (fists: a puff, not a blade's sparks). Strong hits keep " +
+             "Combat Feel's critical effect. Empty uses Combat Feel's hit effect.")]
+    [SerializeField] private GameObject hitEffect;
 
     public string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;
     public WeaponStance Stance => stance;
@@ -96,6 +99,7 @@ public sealed class WeaponDefinition : ScriptableObject
     public float GuardLetThrough => guardLetThrough;
     public SoundDefinition SwingSound => swingSound;
     public SoundDefinition HitSound => hitSound;
+    public GameObject HitEffect => hitEffect;
 
     /// <summary>Number of steps in the light chain (at least 1 when there is a basic attack).</summary>
     public int ComboLength => combo.Count > 0 ? combo.Count : basicAttack != null ? 1 : 0;

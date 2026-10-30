@@ -20,12 +20,14 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
     [SerializeField, Range(0f, 0.5f)] private float rhythmDamagePerStack = 0.05f;
     [Tooltip("Faster swings per rhythm stack. 0 keeps every swing deliberate, however well timed.")]
     [SerializeField, Range(0f, 0.3f)] private float rhythmSpeedPerStack;
-    [Tooltip("Mashing: a press before a swing has even landed fumbles the chain, so the next swing starts it over.")]
-    [SerializeField] private bool earlyPressFumbles = true;
+    [Tooltip("Mashing: a press before a swing has even landed fumbles the chain, so the next swing starts it over. Off, " +
+             "an early press is buffered and the chain goes on; it only loses the rhythm bonus.")]
+    [SerializeField] private bool earlyPressFumbles;
 
     [Header("Commitment and danger")]
-    [Tooltip("Off: a swing can only be dodged out of once it has landed, so every swing is a commitment.")]
-    [SerializeField] private bool dodgeCancelsWindup;
+    [Tooltip("On: a dodge can cut a swing short while it winds up (it then deals no damage; its stamina is spent). Off: " +
+             "a swing can only be dodged out of once it has landed, so every swing is a commitment.")]
+    [SerializeField] private bool dodgeCancelsWindup = true;
     [Tooltip("Movement speed while swinging, and while swinging heavy, as a share of normal.")]
     [SerializeField, Range(0f, 1f)] private float swingMoveSpeed = 0.4f;
     [SerializeField, Range(0f, 1f)] private float heavyMoveSpeed = 0.15f;
@@ -36,8 +38,9 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
     [Tooltip("The chain pips and rhythm readout under the player. Off keeps the screen clean; the feel is in the sound and motion.")]
     [SerializeField] private bool showComboHud;
     [Header("Heavy attack (hold the attack button)")]
-    [Tooltip("Holding attack this long starts the heavy attack instead of the next light swing.")]
-    [SerializeField, Range(0.1f, 1f)] private float heavyHoldSeconds = 0.3f;
+    [Tooltip("Holding attack this long turns the light swing the press started into the heavy attack. Keep it shorter " +
+             "than the quickest light swing's Hit Delay (about 0.28 s), or holding gives a light swing and then a heavy one.")]
+    [SerializeField, Range(0.1f, 1f)] private float heavyHoldSeconds = 0.22f;
 
     [Header("Guard and parry (hold the guard button)")]
     [Tooltip("Width in degrees in front of the player that the guard covers.")]

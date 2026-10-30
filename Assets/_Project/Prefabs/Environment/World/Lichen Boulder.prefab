@@ -48,10 +48,22 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -2131746659038358002, guid: 0d907e3fe19fc5a4e9292802a546f636, type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: 4300000, guid: fd2096f744e7c2a4fbd3f65188a9f8fb, type: 2}
     - target: {fileID: 919132149155446097, guid: 0d907e3fe19fc5a4e9292802a546f636, type: 3}
       propertyPath: m_Name
       value: Lichen Boulder
       objectReference: {fileID: 0}
+    - target: {fileID: 4563149247136380718, guid: 0d907e3fe19fc5a4e9292802a546f636, type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: 4300000, guid: a12e1de1602f0194c954bcd794efef9a, type: 2}
+    - target: {fileID: 7904441658856581674, guid: 0d907e3fe19fc5a4e9292802a546f636, type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: 4300000, guid: 0061c8b07a153434d9094d55577a08c0, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

@@ -66,10 +66,7 @@ public sealed class SkillWindow : MonoBehaviour, IItemSlotHandler
 
     private void Update()
     {
-        Vector2 pointer = UnityEngine.InputSystem.Pointer.current != null
-            ? UnityEngine.InputSystem.Pointer.current.position.ReadValue()
-            : Vector2.zero;
-        tooltip.Follow(pointer);
+        tooltip.Follow(GameInput.PointerPosition);
     }
 
     // ----- Slots -----

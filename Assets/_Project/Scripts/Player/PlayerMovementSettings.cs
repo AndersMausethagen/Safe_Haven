@@ -61,6 +61,38 @@ public sealed class PlayerMovementSettings : ScriptableObject
     public float DodgeInvulnerability => dodgeInvulnerability;
     public float DodgeCooldown => dodgeCooldown;
 
+    [Header("Water (wading and swimming, see PlayerSwimming)")]
+    [Tooltip("Water this deep at the feet (metres) starts to slow the player.")]
+    [SerializeField, Min(0f)] private float wadeFrom = 0.2f;
+    [Tooltip("Speed, as a share of normal, in water just too shallow to swim. Between Wade From and Swim Depth the " +
+             "player slows down evenly the deeper it gets.")]
+    [SerializeField, Range(0.1f, 1f)] private float deepWadeSpeed = 0.55f;
+    [Tooltip("Water this deep at the feet (metres) lifts the player off the bottom: they swim, held with the water at " +
+             "their chest. Keep it below a water surface's Depth, or that water never gets deep enough to swim in.")]
+    [SerializeField, Min(0.3f)] private float swimDepth = 1.3f;
+    [Tooltip("Swimming speed, as a share of normal movement speed.")]
+    [SerializeField, Range(0.1f, 1f)] private float swimSpeed = 0.45f;
+    [Tooltip("Share of Swim Speed left when out of stamina (swimming costs stamina: PlayerStaminaSettings).")]
+    [SerializeField, Range(0.1f, 1f)] private float exhaustedSwimSpeed = 0.5f;
+    [Tooltip("Turning speed while swimming, as a share of normal.")]
+    [SerializeField, Range(0.1f, 1f)] private float swimTurnSpeed = 0.4f;
+    [Tooltip("How hard the water pushes a swimmer back to the surface (m/s²): low lets a jump in dip deep.")]
+    [SerializeField, Min(1f)] private float buoyancy = 20f;
+
+    public float SwimDepth => swimDepth;
+    public float SwimSpeed => swimSpeed;
+    public float ExhaustedSwimSpeed => exhaustedSwimSpeed;
+    public float SwimTurnSpeed => swimTurnSpeed;
+    public float Buoyancy => buoyancy;
+
+    /// <summary>Speed share while wading with the feet <paramref name="depth"/> metres under water: 1 down to Wade
+    /// From, falling evenly to Deep Wade Speed at Swim Depth.</summary>
+    public float WadeSpeedShare(float depth)
+    {
+        float deep = Mathf.InverseLerp(wadeFrom, Mathf.Max(wadeFrom + 0.01f, swimDepth), depth);
+        return Mathf.Lerp(1f, deepWadeSpeed, deep);
+    }
+
     public float GetSpeedMultiplier(GameState state)
     {
         return TryGetModifier(state, out GameStateModifier modifier) ? modifier.speedMultiplier : 1f;

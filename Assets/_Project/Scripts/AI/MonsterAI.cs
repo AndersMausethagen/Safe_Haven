@@ -212,6 +212,11 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject, IStaggerable
         targeting.Bind(transform, definition, combatant, damageable, agent, targetLayers);
         Transform visual = transform.Find("Model");
         pose = visual != null ? new MonsterPose(visual) : null;
+        if (pose != null && damageable != null)
+        {
+            // The pose recoils from blows and owns the model's scale, so the generic squash would fight it.
+            HitReaction.For(damageable).Punch = false;
+        }
 
         if (definition == null)
         {
@@ -947,6 +952,14 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject, IStaggerable
     // Being hit by something it would fight makes the monster fight back, even from outside its detection range.
     private void OnDamaged(DamageInfo damage, DamageResult result)
     {
+        // Burning ticks don't jolt the body; strong blows rock it hardest.
+        if (pose != null && result.Damage > 0f && !result.Blocked && (damage.Technique & HitTechnique.OverTime) == 0)
+        {
+            bool strong = result.IsCritical || result.Killed
+                || (damage.Technique & (HitTechnique.Heavy | HitTechnique.Finisher | HitTechnique.Counter)) != 0;
+            pose.Hit(damage.Direction, strong ? 1f : 0.6f, Time.time);
+        }
+
         if (CurrentState == State.Attacking && attacks.TryInterrupt(result.HealthLost))
         {
             pose?.CancelAttack();

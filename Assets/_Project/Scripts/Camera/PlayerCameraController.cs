@@ -48,6 +48,7 @@ public sealed class PlayerCameraController : MonoBehaviour
     private InputAction orbitAction;
     private InputAction zoomAction;
     private InputAction toggleAction;
+    private InputAction lookAction;
 
     private PlayerCameraSettings.Profile profile;
     private float pitch;
@@ -131,18 +132,16 @@ public sealed class PlayerCameraController : MonoBehaviour
         cameraTarget.LookAtTarget = null;
         cinemachineCamera.Target = cameraTarget;
 
-        orbitAction = new InputAction("OrbitCamera", InputActionType.Button);
-        orbitAction.AddBinding("<Mouse>/rightButton");
-        zoomAction = new InputAction("ZoomCamera", InputActionType.Value, "<Mouse>/scroll/y");
-        toggleAction = new InputAction("ToggleCameraStyle", InputActionType.Button, "<Keyboard>/v");
+        // The Camera map of the project-wide actions (GameInput); it stays enabled, so nothing to enable or dispose here.
+        orbitAction = GameInput.CameraOrbit;
+        zoomAction = GameInput.CameraZoom;
+        toggleAction = GameInput.CameraToggleStyle;
+        lookAction = GameInput.CameraLook;
     }
 
     private void OnEnable()
     {
         Current = this;
-        orbitAction?.Enable();
-        zoomAction?.Enable();
-        toggleAction?.Enable();
 
         gameState = GameStateManager.Instance;
         GameState state = GameState.Exploration;
@@ -178,10 +177,6 @@ public sealed class PlayerCameraController : MonoBehaviour
             Current = null;
         }
 
-        orbitAction?.Disable();
-        zoomAction?.Disable();
-        toggleAction?.Disable();
-
         if (gameState != null)
         {
             gameState.GameStateChanged -= OnGameStateChanged;
@@ -198,10 +193,6 @@ public sealed class PlayerCameraController : MonoBehaviour
 
     private void OnDestroy()
     {
-        orbitAction?.Dispose();
-        zoomAction?.Dispose();
-        toggleAction?.Dispose();
-
         if (focus != null)
         {
             Destroy(focus.gameObject);
@@ -344,7 +335,7 @@ public sealed class PlayerCameraController : MonoBehaviour
                 return;
             }
 
-            Vector2 delta = Mouse.current.delta.ReadValue() * settings.ActionLookSensitivity;
+            Vector2 delta = lookAction.ReadValue<Vector2>() * settings.ActionLookSensitivity;
             yaw += delta.x;
             actionPitch += settings.ActionInvertY ? delta.y : -delta.y;
             actionPitch = Mathf.Clamp(actionPitch, settings.ActionMinPitch, settings.ActionMaxPitch);
@@ -352,7 +343,7 @@ public sealed class PlayerCameraController : MonoBehaviour
         // Aiming a bow holds the same right button, so the view must not turn under the aim.
         else if (profile.allowOrbit && !aiming && orbitAction.IsPressed())
         {
-            yaw += Mouse.current.delta.ReadValue().x * settings.OrbitSensitivity;
+            yaw += lookAction.ReadValue<Vector2>().x * settings.OrbitSensitivity;
         }
     }
 
@@ -418,7 +409,7 @@ public sealed class PlayerCameraController : MonoBehaviour
         // the cursor does. Measured from the player, the lean moved the view, which moved the cursor's ground point,
         // which leaned further, so the view kept sliding (2.3x the cursor's distance while aiming).
         Plane ground = new Plane(Vector3.up, target.position);
-        Ray cursorRay = outputCamera.ScreenPointToRay(Mouse.current.position.ReadValue());
+        Ray cursorRay = outputCamera.ScreenPointToRay(GameInput.PointerPosition);
         Ray centreRay = outputCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
         if (!ground.Raycast(cursorRay, out float cursorDistance) || !ground.Raycast(centreRay, out float centreDistance))
         {

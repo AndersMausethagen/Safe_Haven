@@ -151,7 +151,7 @@ public sealed class ItemInventoryWindow : MonoBehaviour, IItemSlotHandler
     private void Update()
     {
         UpdateLayout();
-        Vector2 pointer = Pointer.current != null ? Pointer.current.position.ReadValue() : Vector2.zero;
+        Vector2 pointer = GameInput.PointerPosition;
         tooltip.Follow(pointer);
 
         // Hand recipes depend on what is carried, so they are rechecked now and then while the window is open.
@@ -209,10 +209,9 @@ public sealed class ItemInventoryWindow : MonoBehaviour, IItemSlotHandler
         }
 
         ItemContainer owner = ContainerOf(slot);
-        Keyboard keyboard = Keyboard.current;
         if (eventData.button == PointerEventData.InputButton.Right)
         {
-            if (keyboard != null && keyboard.ctrlKey.isPressed)
+            if (GameInput.DiscardModifier.IsPressed())
             {
                 inventory.Discard(owner, slot.Index);
             }
@@ -221,7 +220,7 @@ public sealed class ItemInventoryWindow : MonoBehaviour, IItemSlotHandler
                 inventory.Use(owner, slot.Index);
             }
         }
-        else if (eventData.button == PointerEventData.InputButton.Left && keyboard != null && keyboard.shiftKey.isPressed)
+        else if (eventData.button == PointerEventData.InputButton.Left && GameInput.SplitModifier.IsPressed())
         {
             if (!owner.SplitHalf(slot.Index) && owner.GetSlot(slot.Index).Count > 1)
             {

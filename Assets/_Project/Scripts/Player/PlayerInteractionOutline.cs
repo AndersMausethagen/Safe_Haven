@@ -10,6 +10,16 @@ public sealed class PlayerInteractionOutline : MonoBehaviour
     [SerializeField] private Material maskMaterial;
     [SerializeField, Min(1f)] private float hoverDistance = 80f;
 
+    // The scan over every Interactable (a thousand trees and rocks round the Haven) runs again only once the player has
+    // moved this far or this long has passed (something may have become available); outlines already made, and the
+    // hovered object, are checked every frame.
+    private const float RescanDistance = 0.25f;
+    private const float RescanInterval = 0.2f;
+
+    private Vector3 scannedAt;
+    private float nextScan;
+    private readonly HashSet<Interactable> shown = new HashSet<Interactable>();
+
     private readonly Dictionary<Interactable, List<OutlineCopies.Entry>> outlines = new Dictionary<Interactable, List<OutlineCopies.Entry>>();
     private readonly RaycastHit[] hits = new RaycastHit[64];
     private readonly List<Interactable> removed = new List<Interactable>();
@@ -33,16 +43,21 @@ public sealed class PlayerInteractionOutline : MonoBehaviour
         bool visible = interactor.isActiveAndEnabled && (health == null || health.IsAlive)
             && !GamePause.IsPaused && (UIStateManager.Instance == null || !UIStateManager.Instance.IsAnyWindowOpen);
         Interactable hovered = visible ? FindHovered() : null;
-        if (visible)
+        if (visible && hovered != null && hovered.IsAvailable && !outlines.ContainsKey(hovered))
         {
+            outlines.Add(hovered, CreateOutlines(hovered, outlineMaterial, maskMaterial));
+        }
+
+        bool scan = visible && (Time.time >= nextScan || (transform.position - scannedAt).sqrMagnitude > RescanDistance * RescanDistance);
+        if (scan)
+        {
+            scannedAt = transform.position;
+            nextScan = Time.time + RescanInterval;
             foreach (Interactable target in Interactable.Active)
             {
-                if (target != null && target.IsAvailable && (target == hovered || InReach(target)))
+                if (target != null && !outlines.ContainsKey(target) && target.IsAvailable && InReach(target))
                 {
-                    if (!outlines.ContainsKey(target))
-                    {
-                        outlines.Add(target, CreateOutlines(target, outlineMaterial, maskMaterial));
-                    }
+                    outlines.Add(target, CreateOutlines(target, outlineMaterial, maskMaterial));
                 }
             }
         }
@@ -57,16 +72,31 @@ public sealed class PlayerInteractionOutline : MonoBehaviour
                 continue;
             }
 
+            // Hidden outlines wait for the next scan; shown and hovered ones are checked every frame.
+            if (!scan && target != hovered && !shown.Contains(target))
+            {
+                continue;
+            }
+
             bool show = visible && target.IsAvailable && (target == hovered || InReach(target));
             OutlineCopies.SetShown(pair.Value, show);
+            if (show)
+            {
+                shown.Add(target);
+            }
+            else
+            {
+                shown.Remove(target);
+            }
         }
         foreach (Interactable target in removed)
         {
             outlines.Remove(target);
+            shown.Remove(target);
         }
     }
 
-    // The bounds test first: this runs over every Interactable in the scene each frame.
+    // The bounds test first: this runs over every Interactable in the scene on each scan.
     private bool InReach(Interactable target) =>
         target.MightBeWithin(transform.position, target.Range) && target.DistanceFrom(transform.position) <= target.Range;
 
@@ -114,6 +144,9 @@ public sealed class PlayerInteractionOutline : MonoBehaviour
         {
             OutlineCopies.SetShown(pair.Value, false);
         }
+
+        shown.Clear();
+        nextScan = 0f;
     }
 
     private void OnDestroy()

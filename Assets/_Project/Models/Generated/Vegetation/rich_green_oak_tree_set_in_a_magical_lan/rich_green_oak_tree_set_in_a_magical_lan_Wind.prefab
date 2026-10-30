@@ -52,6 +52,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2559082797155459512, guid: 3cd6c36c308921d46aff5106d937d400, type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: 4300000, guid: cdd75da53d549484b9afd02e864a97c5, type: 2}
     - target: {fileID: 7245229881345007946, guid: 3cd6c36c308921d46aff5106d937d400, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
@@ -128,6 +132,7 @@ MonoBehaviour:
   duration: 2
   range: 1.8
   deactivateOnComplete: 0
+  kind: 0
   started:
     m_PersistentCalls:
       m_Calls: []

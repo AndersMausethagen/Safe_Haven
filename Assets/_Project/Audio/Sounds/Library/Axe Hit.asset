@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0de871765cd6fce4c8fed103ef0082e3, type: 3}
+  m_Name: Axe Hit
+  m_EditorClassIdentifier: SafeHaven::SoundDefinition
+  displayName: Axe Hit
+  clips:
+  - {fileID: 8300000, guid: 088a5a83de824ef44a1919a3cefbab5e, type: 3}
+  - {fileID: 8300000, guid: 7a2a3249f4bd2a046a57af82a713666d, type: 3}
+  - {fileID: 8300000, guid: 2a8e265cb62ad5d4685ba81ff6e50ac7, type: 3}
+  - {fileID: 8300000, guid: ab435a178b17ee641bebaecf46346f0b, type: 3}
+  - {fileID: 8300000, guid: 72c3a7275f56d6541add7589dd53446e, type: 3}
+  - {fileID: 8300000, guid: 0c76d192e16c6914b86524188b8138e3, type: 3}
+  channel: 2
+  volume: 0.85
+  volumeVariation: 0.1
+  pitchRange: {x: 0.8, y: 0.92}
+  positional: 1
+  fullVolumeDistance: 3
+  audibleDistance: 35
+  maxAtOnce: 6

@@ -1,7 +1,7 @@
 # Combat
 
-Combat in Safe Haven is slow, deliberate and dangerous. The player is a survivor, not a super soldier: every swing is
-a commitment, getting hit costs you your swing, and the way to win is to read the enemy, guard or step out of the way
+Combat in Safe Haven is deliberate and dangerous. The player is a survivor, not a super soldier: every swing costs
+stamina and time, getting hit costs you your swing, and the way to win is to read the enemy, guard or step out of the way
 at the right moment, and strike when it is open. Skill is timing and patience, not clicking speed. Feedback is carried
 by motion, sound and weight rather than on-screen text.
 
@@ -9,8 +9,8 @@ by motion, sound and weight rather than on-screen text.
 
 | Input | Does |
 |---|---|
-| Left mouse / right trigger (tap) | Light swing. Pressed again **in time** after a swing lands, the next swing of the weapon's chain |
-| Left mouse (hold) | Heavy swing: slow, nearly rooted, hard; breaks poise |
+| Left mouse / right trigger (tap) | Light swing, starting the moment you press. Pressed again **in time** after a swing lands, the next swing of the weapon's chain |
+| Left mouse (hold) | Held on (0.22 s), the light swing turns into the heavy swing while it still winds up: slow, nearly rooted, hard; breaks poise. You pay only the difference in stamina |
 | Right mouse / left trigger (hold) | Guard. Raised just before a hit lands: parry |
 | Left mouse while guarding | Shield bash with a shield; without one it drops the guard and swings |
 | Space / south button | Dodge: a quickstep, a roll or a heavy shoulder charge, by how much gear you wear |
@@ -18,17 +18,20 @@ by motion, sound and weight rather than on-screen text.
 | Left Ctrl / left bumper (hold) | Sneak: half speed, quiet, hard to see. A hit on a monster that hasn't noticed you is an ambush (+50%) |
 | Left mouse with a bow (hold, let go) | Draw while moving (slowed), let go to shoot. Let go too early and the arrow stays on the string |
 | Right mouse with a bow (hold) | Aim: steadier shots, slower walk, the camera looks further ahead (no guard with a bow) |
-| Z | Next kind of arrow in the bag |
+| Z | Swap weapons: the weapon in hand and the one held before it (say the axe and the bow). With only one weapon it is put away (fists) and taken out again. Not mid-swing; the torch keeps L |
+| Middle mouse | Next kind of arrow in the bag |
 
 ## The rules
 
 - **Chains.** Each weapon has a chain of light swings (sword: three; axes: two; spear: three; fists: three). A press
   after a swing has landed continues the chain; the last swing is the **finisher** (wider, harder, more poise damage).
-  A press *before* the swing has landed (mashing) fumbles the chain, so spamming the button only ever repeats the first
-  swing. A press right as a swing recovers is **on the rhythm**: a small damage edge (+5% per step, at most two).
+  A press *before* the swing has landed is buffered: the chain goes on, but the press misses the rhythm bonus.
+  (Combat Technique › Early Press Fumbles turns mashing back into a fumble that restarts the chain.) A press right as a
+  swing recovers is **on the rhythm**: a small damage edge (+5% per step, at most two).
   Swings never get faster.
-- **Commitment.** Once a swing starts you can't dodge out of it until it lands. A dodge pressed during the wind-up
-  goes the moment the swing connects. You move slowly while swinging and hardly at all during a heavy swing.
+- **Getting out.** A dodge cuts a swing short at any time. During the wind-up the swing is lost: it deals no damage,
+  and its stamina is spent. You move slowly while swinging and hardly at all during a heavy swing. (Combat Technique ›
+  Dodge Cancels Windup off makes every swing a commitment again: no dodging until it lands.)
 - **Flinch.** A hit that gets through (not blocked) while you wind up loses the swing, and you reel for a moment
   (no attacking, guarding or dodging). Trading blows with a monster is a losing game.
 - **Guard.** Blocks hits from the front. Part of each hit still gets through (60% with fists, 35–40% with a weapon,
@@ -79,7 +82,7 @@ A bow is held in the left hand and shoots arrows from the bag. It trades the mel
 - **Arrows are spent, some come back.** Each shot uses one arrow from the bag. Arrows that miss stick in the ground or
   trees; about half of them can be picked up again by walking over them (for 90 s). The strike is heard: a shot into the
   brush draws monsters to it, away from you. A dodge, a hit that staggers you or eating puts the drawn arrow back.
-- **Kinds of arrows** (Z cycles; the HUD shows the chosen kind and how many are left):
+- **Kinds of arrows** (the middle mouse button cycles; the HUD shows the chosen kind and how many are left):
   Crude Stone Arrow (14 damage); Fire Arrow (10, sets creatures burning for 4 s at 5 per second and lights the fog where
   it lands; burns up); Whistling Arrow (6, heard 25 m around where it strikes: a lure).
 - **Long shots** show a faint line along the arc while drawing (from 10 m out).
@@ -96,8 +99,9 @@ Combat lives or dies on seeing what is about to happen, so the animation is buil
   made for); the Quaternius combat clips retarget onto it cleanly (Safe Haven › Characters › Use Human Body for Player).
 - **Whole-body swings.** Standing still, swings play on a full-body layer, so the legs step into the blow and the weight
   shifts; that is what reads from a top-down camera. While running only the arms swing.
-- **Slow wind-up, sharp strike.** Each attack's wind-up plays slower than its clip (Animation Speed) so the blow is
-  seen coming; from the moment it hits, the strike plays at its own speed (Follow Through Speed) and snaps through.
+- **Quick to answer, sharp strike.** Light swings wind up at 0.9 of their clip's speed (fists at full speed), so a press
+  is answered at once. Heavy swings and finishers wind up slower, for weight. From the moment a swing hits, the strike
+  plays at its own speed (Follow Through Speed) and snaps through.
   Chain swings that aren't followed up blend into their recovery at the matching pose instead of starting over.
 - **Monsters coil and lunge.** Monsters lean back, draw back and crouch through their wind-up (slowly, then fast at the
   end), snap forward at the hit and settle; staggered monsters sway and sag (`AttackPose`, on top of any animation).
@@ -108,9 +112,18 @@ avatar made after that), or every pose comes out rotated; Set Up Combat Animatio
 
 ## Feedback
 
-- Each swing draws a slash arc through its reach (gold for finishers, ember for heavy swings, pale blue for counters),
-  with a whoosh; hits spark where they land, with a thump layered for strong hits; blocks clang, parries ring, guard
-  breaks crash, staggers thud with a ground ring.
+- Each weapon swing draws a slash arc through its reach (gold for finishers, ember for heavy swings, pale blue for
+  counters). It sweeps the way the weapon moves in the animation, with its roll: Set Up Combat Animations measures the
+  weapon hand at the contact and stores it on the attack (Slash Sweep, Slash Tilt).
+- The swing's whoosh plays as the weapon moves, just before it lands (Combat Feel › Swing Sound Lead), not as the
+  wind-up starts. A swing that is dodged out of or turned heavy stays silent.
+- Monsters recoil from blows: the body tips and is shoved the way the blow went, squashes, and springs back with a small
+  overshoot (`MonsterPose`). Strong blows (crits, heavy swings, finishers, counters, kills) rock it hardest.
+- Hits spark where they land, with a thump layered for strong hits. Blocks clang, parries ring, guard breaks crash, and
+  staggers thud with a ground ring.
+- **Fists** draw no arc. They swish (Punch Swing) and land with a dull punch and a puff (Punch Hit, Punch Impact) instead
+  of a blade's sparks.
+- **Axes** have a deep whoosh and a heavy, low thud (Axe Swing, Axe Hit). Swords use the game-wide blade swing and hit.
 - Parries and perfect dodges give a short hitch (a beat of weight, not slow motion). Hits on and by the player stop
   time for a few milliseconds and shake the camera, more for heavy swings and finishers.
 - Hurt: the screen edges flash red, stronger for bigger hits; below 30% health they pulse.
@@ -122,9 +135,9 @@ avatar made after that), or every pose comes out rotated; Set Up Combat Animatio
 | What | Where |
 |---|---|
 | Chain timing, rhythm, heavy hold, guard, parry window, flinch, poise and stagger | Systems Editor › Player › Movement & Combat › Combat technique (`Resources/CombatTechniqueSettings`) |
-| Hit stop, shake, effects, slash arcs, vignette, telegraph colours, callouts | Systems Editor › Movement & Combat › Combat feel (`Resources/CombatFeel`) |
-| A weapon's chain, heavy and counter attack, how well it guards, its sounds | Content Editor › Weapons |
-| An attack's damage, reach, timing, poise damage, lunge, animation and slash colour | Content Editor › Attacks & Abilities |
+| Hit stop, shake, effects, slash arcs (time, height, Slash Brightness), swing sound lead, hit recoil, vignette, telegraph colours, callouts | Systems Editor › Movement & Combat › Combat feel (`Resources/CombatFeel`) |
+| A weapon's chain, heavy and counter attack, how well it guards, its sounds and Hit Effect | Content Editor › Weapons |
+| An attack's damage, reach, timing, poise damage, lunge, animation and slash colour, sweep and tilt | Content Editor › Attacks & Abilities |
 | A monster's poise, hurt and wind-up sounds | Content Editor › Monsters |
 | Game-wide combat sounds | Sound Editor › Sound Effects › Game-wide effects |
 | Focus gains, how long it holds, eating time and heal-over-time | Combat technique (Focus, Eating and drinking) |

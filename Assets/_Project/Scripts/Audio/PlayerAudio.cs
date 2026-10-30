@@ -1,7 +1,8 @@
 using UnityEngine;
 
 /// <summary>
-/// The player's own sounds: footsteps that match the ground and the thump of landing. A step plays when a foot plants
+/// The player's own sounds: footsteps that match the ground, the thump of landing and splashes while swimming (the water
+/// footstep, once per stroke's worth of distance; treading water is quiet). A step plays when a foot plants
 /// in the animation (it reaches its lowest point near the ground), so steps stay in time with whatever body and clip is
 /// playing; clips with Footstep events use those instead, and without a humanoid rig one plays every stride. The ground
 /// decides the sound (Audio Settings › Footsteps): water, grass where grass and plants grow on the terrain, the ground
@@ -19,8 +20,11 @@ public sealed class PlayerAudio : MonoBehaviour
     private const float MinimumStepGap = 0.25f;
     // A plant only counts after the foot has come down at least this far from its last high point (a lifted step).
     private const float MinimumFall = 0.05f;
+    // Metres swum per splash.
+    private const float StrokeLength = 1.1f;
 
     private PlayerMovement movement;
+    private PlayerSwimming swimming;
     private PlayerAnimationController animationController;
     private Animator animator;
     private float lastEventStep = float.NegativeInfinity;
@@ -45,6 +49,7 @@ public sealed class PlayerAudio : MonoBehaviour
     private void Awake()
     {
         movement = GetComponent<PlayerMovement>();
+        swimming = GetComponent<PlayerSwimming>();
         animationController = GetComponent<PlayerAnimationController>();
         animator = GetComponentInChildren<Animator>();
         if (animator != null && animator.isHuman)
@@ -88,6 +93,14 @@ public sealed class PlayerAudio : MonoBehaviour
     {
         if (movement == null)
         {
+            return;
+        }
+
+        // Floating isn't falling: standing up in the shallows makes no landing thump.
+        if (swimming != null && swimming.IsSwimming)
+        {
+            airborne = 0f;
+            Swim();
             return;
         }
 
@@ -145,6 +158,17 @@ public sealed class PlayerAudio : MonoBehaviour
 
         foot.Falling = falling;
         foot.Height = height;
+    }
+
+    private void Swim()
+    {
+        distanceSinceStep += movement.HorizontalSpeed * Time.deltaTime;
+        if (distanceSinceStep >= StrokeLength)
+        {
+            distanceSinceStep = 0f;
+            Vector3 at = new Vector3(transform.position.x, swimming.SurfaceHeight, transform.position.z);
+            AudioManager.Play(SurfaceSound(at), at);
+        }
     }
 
     private float StrideLength => AudioManager.Sounds != null ? AudioManager.Sounds.StrideLength : 0.7f;

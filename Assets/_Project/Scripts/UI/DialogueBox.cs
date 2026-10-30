@@ -312,9 +312,8 @@ public sealed class DialogueBox : MonoBehaviour
             return;
         }
 
-        Keyboard keys = Keyboard.current;
-        bool next = keys != null && (keys.eKey.wasPressedThisFrame || keys.spaceKey.wasPressedThisFrame || keys.enterKey.wasPressedThisFrame)
-                    || Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame && !OverButton();
+        // UI › Advance (E, Space, Enter), or a click that isn't on one of the answer buttons.
+        bool next = GameInput.Advance.WasPressedThisFrame() || GameInput.Click.WasPressedThisFrame() && !OverButton();
         if (next && !Revealed)
         {
             lineLabel.maxVisibleCharacters = letters;
@@ -324,10 +323,10 @@ public sealed class DialogueBox : MonoBehaviour
 
         if (choices != null && choices.Count > 0)
         {
-            Key[] numbers = { Key.Digit1, Key.Digit2, Key.Digit3, Key.Digit4, Key.Digit5, Key.Digit6, Key.Digit7, Key.Digit8, Key.Digit9 };
-            for (int i = 0; i < Mathf.Min(numbers.Length, choices.Count); i++)
+            // UI › Answer1-9: the number keys pick an answer.
+            for (int i = 0; i < Mathf.Min(GameInput.AnswerCount, choices.Count); i++)
             {
-                if (keys != null && keys[numbers[i]].wasPressedThisFrame && choices[i].Enabled)
+                if (GameInput.Answer(i).WasPressedThisFrame() && choices[i].Enabled)
                 {
                     Choose(i);
                     return;
