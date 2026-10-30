@@ -61,7 +61,7 @@ public sealed class HavenProgress : MonoBehaviour
             clearedQuarter = quarter;
             GameMessages.Post(quarter >= 4 ? "The clearing is free of the overgrowth. The whole glade breathes again."
                 : $"The clearing breathes again: {quarter * 25}% cleared.", MessageKind.Gain);
-            ExperienceTracker.Grant(25 * quarter);
+            ExperienceTracker.Grant(HavenSettings.Current.ClearingExperiencePerQuarter * quarter);
         }
 
         Count(true);

@@ -69,6 +69,9 @@ public sealed class FishingSettings : GameSettings<FishingSettings>
     [Tooltip("Health lost each second in its grip, and the share of maximum health lost if it wins.")]
     [SerializeField, Min(0f)] private float nokkenDamagePerSecond = 3f;
     [SerializeField, Range(0f, 1f)] private float nokkenWinsDamage = 0.35f;
+    [Tooltip("Experience for breaking free of the Nøkken the first time, and each time after.")]
+    [SerializeField, Min(0)] private int nokkenFirstEscapeExperience = 80;
+    [SerializeField, Min(0)] private int nokkenEscapeExperience = 30;
     [SerializeField] private GameObject nokkenModel;
     [SerializeField] private SoundDefinition nokkenScream;
     [SerializeField] private SoundDefinition nokkenSplash;
@@ -97,6 +100,7 @@ public sealed class FishingSettings : GameSettings<FishingSettings>
     public float NokkenSeconds => nokkenSeconds;
     public float NokkenDamagePerSecond => nokkenDamagePerSecond;
     public float NokkenWinsDamage => nokkenWinsDamage;
+    public int NokkenEscapeExperience(bool first) => first ? nokkenFirstEscapeExperience : nokkenEscapeExperience;
     public GameObject NokkenModel => nokkenModel;
     public SoundDefinition NokkenScream => nokkenScream;
     public SoundDefinition NokkenSplash => nokkenSplash;

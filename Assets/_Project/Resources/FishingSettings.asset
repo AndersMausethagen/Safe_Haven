@@ -53,6 +53,8 @@ MonoBehaviour:
   nokkenSeconds: 7
   nokkenDamagePerSecond: 3
   nokkenWinsDamage: 0.35
+  nokkenFirstEscapeExperience: 80
+  nokkenEscapeExperience: 30
   nokkenModel: {fileID: 1361258407523271697, guid: 280a30c33cf4c3444a326b93e937de36, type: 3}
   nokkenScream: {fileID: 11400000, guid: 6510718f5af764e4aa78349c4b3f7cdf, type: 2}
   nokkenSplash: {fileID: 11400000, guid: 5b92b167e5b591449b2fcd212c1db02b, type: 2}

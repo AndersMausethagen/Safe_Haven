@@ -30,6 +30,8 @@ public sealed class HavenSettings : GameSettings<HavenSettings>
     [SerializeField, Min(0)] private int residentRenown = 8;
     [Tooltip("Experience for each new rank.")]
     [SerializeField, Min(0)] private int rankExperience = 150;
+    [Tooltip("Experience for each quarter of the overgrowth cleared, times the quarters cleared (25, 50, 75, 100).")]
+    [SerializeField, Min(0)] private int clearingExperiencePerQuarter = 25;
     [SerializeField] private SoundDefinition rankSound;
     [SerializeField] private List<Rank> ranks = new List<Rank>
     {
@@ -44,6 +46,7 @@ public sealed class HavenSettings : GameSettings<HavenSettings>
     public int ClearingRenown => clearingRenown;
     public int ResidentRenown => residentRenown;
     public int RankExperience => rankExperience;
+    public int ClearingExperiencePerQuarter => clearingExperiencePerQuarter;
     public SoundDefinition RankSound => rankSound;
     public IReadOnlyList<Rank> Ranks => ranks;
 

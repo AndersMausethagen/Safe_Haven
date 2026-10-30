@@ -16,6 +16,7 @@ MonoBehaviour:
   clearingRenown: 40
   residentRenown: 8
   rankExperience: 150
+  clearingExperiencePerQuarter: 25
   rankSound: {fileID: 11400000, guid: c08cfff61a51d7442a93c4dae8255955, type: 2}
   ranks:
   - name: Overgrown Camp
