@@ -71,7 +71,8 @@ Same review for Quests/ and Events/. Work top to bottom.
        FindProblem, Owned, FieldsOf for the drawer). Fixed on the way: the Inspector hid a gather objective's material
        item. Left for when a type needs it: one class per type (`[SerializeReference]`, like `StoryNode`) with an asset
        migration.
-3. [ ] **Death subject without type checks.** `GameEvents.OnAnyDied` asks for MonsterAI, then BuildingObject; give the
+3. [x] **Death subject without type checks.** Done: `IEventSubject` (MonsterAI, BuildingObject); the kind comes from
+       the Damageable's category. `GameEvents.OnAnyDied` asks for MonsterAI, then BuildingObject; give the
        dying object a small interface for its definition (like `IInteractionName`).
 4. [ ] **No Heart Tree inside the generic trigger.** `GameEventTrigger`'s PlayerInsideWard polls `HeartTree.Current`;
        an area interface (or a ward trigger component) keeps the trigger generic.

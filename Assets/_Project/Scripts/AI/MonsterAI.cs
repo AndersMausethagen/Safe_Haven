@@ -16,7 +16,7 @@ using UnityEngine.AI;
 [RequireComponent(typeof(Combatant))]
 [RequireComponent(typeof(Damageable))]
 [RequireComponent(typeof(NavMeshAgent))]
-public sealed class MonsterAI : MonoBehaviour
+public sealed class MonsterAI : MonoBehaviour, IEventSubject
 {
     public enum State
     {
@@ -208,6 +208,7 @@ public sealed class MonsterAI : MonoBehaviour
 
     public State CurrentState { get; private set; } = State.Idle;
     public MonsterDefinition Definition => definition;
+    UnityEngine.Object IEventSubject.EventSubject => definition;
     public IDamageable Target => target;
     public Vector3 Home => home;
 

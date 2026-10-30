@@ -146,20 +146,8 @@ public static class GameEvents
     private static void OnAnyDied(Damageable victim, DamageInfo killingBlow)
     {
         GameObject killer = killingBlow.Source != null ? killingBlow.Source.gameObject : null;
-        GameObject origin = victim.gameObject;
-        Faction side = victim.Faction;
-        if (victim.TryGetComponent(out MonsterAI monster))
-        {
-            Raise(new GameEvent(GameEventKind.Killed, monster.Definition, 1, killer, origin: origin, victimFaction: side));
-        }
-        else if (victim.TryGetComponent(out BuildingObject building))
-        {
-            Raise(new GameEvent(GameEventKind.Destroyed, building.Definition, 1, killer, origin: origin, victimFaction: side));
-        }
-        else
-        {
-            GameEventKind kind = victim.Category == TargetCategory.Structure ? GameEventKind.Destroyed : GameEventKind.Killed;
-            Raise(new GameEvent(kind, null, 1, killer, origin: origin, victimFaction: side));
-        }
+        GameEventKind kind = victim.Category == TargetCategory.Structure ? GameEventKind.Destroyed : GameEventKind.Killed;
+        Object subject = victim.TryGetComponent(out IEventSubject known) ? known.EventSubject : null;
+        Raise(new GameEvent(kind, subject, 1, killer, origin: victim.gameObject, victimFaction: victim.Faction));
     }
 }
