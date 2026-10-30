@@ -63,7 +63,8 @@ Rules written as special cases instead of following the existing model. Work top
 
 Same review for Quests/ and Events/. Work top to bottom.
 
-1. [ ] **One "by the player" rule.** `GameEvent.ByPlayer` (`Player.IsPlayer`; no actor counts as the player) and
+1. [x] **One "by the player" rule.** Done: `GameEvent.ForPlayerSide` (quests, kill experience) and the strict
+       `GameEvent.ByPlayer` (sounds, the prologue's own fire, gather experience). `GameEvent.ByPlayer` (`Player.IsPlayer`; no actor counts as the player) and
        `ExperienceTracker.ByPlayer` (no actor does not count) disagree. Decide once, on the side (`Faction.IsPlayerSide`
        of the actor's Combatant), so a companion's kill counts for "kill 5 wolves" and a wolf burnt by nobody doesn't.
 2. [ ] **Objective rules in one place.** `ObjectiveType` is switched on in `QuestObjective` (Progress, Describe,

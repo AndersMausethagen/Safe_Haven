@@ -369,7 +369,7 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
             case GameEventKind.QuestCompleted:
                 return settings.QuestCompleted;
             case GameEventKind.Crafted:
-                return gameEvent.Actor != null && Player.IsPlayer(gameEvent.Actor) ? settings.Crafted : null;
+                return gameEvent.ByPlayer ? settings.Crafted : null;
             case GameEventKind.Built:
                 return settings.Built;
             case GameEventKind.Consumed:

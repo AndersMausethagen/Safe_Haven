@@ -86,7 +86,7 @@ public sealed class QuestObjective
     /// <summary>How much the event advances this objective; 0 when it doesn't count.</summary>
     public int Progress(in GameEvent gameEvent)
     {
-        if (!gameEvent.ByPlayer || gameEvent.Amount <= 0)
+        if (!gameEvent.ForPlayerSide || gameEvent.Amount <= 0)
         {
             return 0;
         }

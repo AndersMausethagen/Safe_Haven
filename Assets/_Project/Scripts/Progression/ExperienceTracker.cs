@@ -78,7 +78,7 @@ public sealed class ExperienceTracker : MonoBehaviour, IGameSystem
         switch (gameEvent.Kind)
         {
             case GameEventKind.Killed:
-                if (gameEvent.Subject is MonsterDefinition monster && ByPlayer(gameEvent.Actor))
+                if (gameEvent.Subject is MonsterDefinition monster && gameEvent.ForPlayerSide)
                 {
                     Grant(KillExperience(monster, gameEvent.Origin));
                 }
@@ -134,7 +134,7 @@ public sealed class ExperienceTracker : MonoBehaviour, IGameSystem
 
     private void OnHarvested(GameObject gatherer)
     {
-        if (ByPlayer(gatherer))
+        if (Player.IsPlayer(gatherer))
         {
             Grant(settings.GatherExperience);
         }
@@ -150,7 +150,4 @@ public sealed class ExperienceTracker : MonoBehaviour, IGameSystem
             Grant(experience);
         }
     }
-
-    private static bool ByPlayer(GameObject actor) =>
-        actor != null && Player.Current != null && actor.GetComponentInParent<Player>() == Player.Current;
 }

@@ -1,3 +1,5 @@
+using UnityEngine;
+
 /// <summary>
 /// Which side something is on. The player and their allies form one side and never hurt each other; enemies hunt that
 /// side; Neutral objects (crates, props) can be broken by anyone. Quests count kills by the side that fell
@@ -34,6 +36,13 @@ public static class FactionRelations
             default:
                 return false;
         }
+    }
+
+    /// <summary>The side <paramref name="actor"/> fights on (its Combatant); null when it takes no part in fights.</summary>
+    public static Faction? SideOf(GameObject actor)
+    {
+        Combatant combatant = actor != null ? actor.GetComponentInParent<Combatant>() : null;
+        return combatant != null ? combatant.Faction : (Faction?)null;
     }
 
     /// <summary>The player and their allies.</summary>

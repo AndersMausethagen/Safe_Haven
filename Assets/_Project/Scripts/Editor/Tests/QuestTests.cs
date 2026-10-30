@@ -38,35 +38,35 @@ public sealed class QuestTests
 
         QuestObjective killBrute = QuestObjective.Create(ObjectiveType.KillMonster, 1, brute);
         QuestObjective killAny = QuestObjective.Create(ObjectiveType.KillMonster, 5);
-        Assert.AreEqual(1, killBrute.Progress(new GameEvent(GameEventKind.Killed, brute)));
-        Assert.AreEqual(0, killBrute.Progress(new GameEvent(GameEventKind.Killed, ravager)));
-        Assert.AreEqual(1, killAny.Progress(new GameEvent(GameEventKind.Killed, ravager)), "An empty monster counts any enemy kill.");
+        Assert.AreEqual(1, killBrute.Progress(Kill(brute)));
+        Assert.AreEqual(0, killBrute.Progress(Kill(ravager)));
+        Assert.AreEqual(1, killAny.Progress(Kill(ravager)), "An empty monster counts any enemy kill.");
         Assert.AreEqual("Kill 5 enemies", killAny.Describe());
 
         // Kills count by the side that fell: the player, a companion or a traveller falling is no enemy kill.
-        Assert.AreEqual(0, killAny.Progress(new GameEvent(GameEventKind.Killed, null, victimFaction: Faction.Player)));
-        Assert.AreEqual(0, killAny.Progress(new GameEvent(GameEventKind.Killed, null, victimFaction: Faction.Ally)));
-        Assert.AreEqual(1, killAny.Progress(new GameEvent(GameEventKind.Killed, null, victimFaction: Faction.Enemy)));
-        Assert.AreEqual(0, killAny.Progress(new GameEvent(GameEventKind.Killed, null)), "A kill of unknown side counts for no side.");
+        Assert.AreEqual(0, killAny.Progress(Kill(null, Faction.Player)));
+        Assert.AreEqual(0, killAny.Progress(Kill(null, Faction.Ally)));
+        Assert.AreEqual(1, killAny.Progress(Kill(null, Faction.Enemy)));
+        Assert.AreEqual(0, killAny.Progress(Kill(null)), "A kill of unknown side counts for no side.");
         QuestObjective killAllies = QuestObjective.Create(ObjectiveType.KillMonster, 2, faction: Faction.Ally);
-        Assert.AreEqual(1, killAllies.Progress(new GameEvent(GameEventKind.Killed, null, victimFaction: Faction.Ally)));
+        Assert.AreEqual(1, killAllies.Progress(Kill(null, Faction.Ally)));
         Assert.AreEqual("Kill 2 allies", killAllies.Describe());
     }
 
     [Test]
-    public void Objectives_IgnoreThingsSomeoneElseDid()
+    public void Objectives_CountWhatThePlayersSideDid()
     {
         var brute = Create<MonsterDefinition>("brute");
-        var bystander = new GameObject("Another monster");
-        try
-        {
-            QuestObjective kill = QuestObjective.Create(ObjectiveType.KillMonster, 1, brute);
-            Assert.AreEqual(0, kill.Progress(new GameEvent(GameEventKind.Killed, brute, 1, bystander)));
-        }
-        finally
-        {
-            Object.DestroyImmediate(bystander);
-        }
+        QuestObjective kill = QuestObjective.Create(ObjectiveType.KillMonster, 1, brute);
+        Assert.AreEqual(1, kill.Progress(new GameEvent(GameEventKind.Killed, brute, 1, Fighter(Faction.Player))));
+        Assert.AreEqual(1, kill.Progress(new GameEvent(GameEventKind.Killed, brute, 1, Fighter(Faction.Ally))), "A companion's kill counts.");
+        Assert.AreEqual(0, kill.Progress(new GameEvent(GameEventKind.Killed, brute, 1, Fighter(Faction.Enemy))), "Another monster's kill doesn't.");
+        Assert.AreEqual(0, kill.Progress(new GameEvent(GameEventKind.Killed, brute, 1, Created(new GameObject("Bystander")))));
+        Assert.AreEqual(0, kill.Progress(new GameEvent(GameEventKind.Killed, brute)), "A death nobody caused is no one's kill.");
+
+        var ore = Create<ResourceDefinition>("ore");
+        QuestObjective gather = QuestObjective.Create(ObjectiveType.GatherResource, 5, ore);
+        Assert.AreEqual(2, gather.Progress(new GameEvent(GameEventKind.ResourceGathered, ore, 2)), "Nobody in particular: the world, for the player.");
     }
 
     [Test]
@@ -101,7 +101,7 @@ public sealed class QuestTests
         Assert.AreEqual(5, log.Get(quest).Counts[0], "Progress stops at the amount needed.");
         Assert.AreEqual(QuestStatus.Active, log.StatusOf(quest));
 
-        log.Handle(new GameEvent(GameEventKind.Killed, brute));
+        log.Handle(Kill(brute));
         Assert.AreEqual(QuestStatus.Completed, log.StatusOf(quest));
         CollectionAssert.AreEqual(new[] { quest }, completed);
         Assert.IsFalse(log.TryStart(quest), "A completed quest doesn't start again.");
@@ -117,11 +117,11 @@ public sealed class QuestTests
         var log = new QuestLog();
         log.TryStart(quest);
 
-        log.Handle(new GameEvent(GameEventKind.Killed, brute));
+        log.Handle(Kill(brute));
         Assert.AreEqual(0, log.Get(quest).Counts[1], "The kill doesn't count before the ore is gathered.");
 
         log.Handle(new GameEvent(GameEventKind.ResourceGathered, ore, 2));
-        log.Handle(new GameEvent(GameEventKind.Killed, brute));
+        log.Handle(Kill(brute));
         Assert.AreEqual(QuestStatus.Completed, log.StatusOf(quest));
     }
 
@@ -162,7 +162,7 @@ public sealed class QuestTests
         log.TryStart(active);
         log.Handle(new GameEvent(GameEventKind.ResourceGathered, ore, 4));
         log.TryStart(done);
-        log.Handle(new GameEvent(GameEventKind.Killed, null, victimFaction: Faction.Enemy));
+        log.Handle(Kill(null, Faction.Enemy));
         var lookup = new Lookup { Quests = { ["active"] = active, ["done"] = done } };
 
         SaveData data = SaveMapper.ToSaveData(null, null, "SampleScene", null, DateTime.UtcNow, null, log);
@@ -204,7 +204,7 @@ public sealed class QuestTests
         log.TryStart(quest);
         Assert.IsTrue(started.IsMetBy(log));
         Assert.IsFalse(completed.IsMetBy(log));
-        log.Handle(new GameEvent(GameEventKind.Killed, null, victimFaction: Faction.Enemy));
+        log.Handle(Kill(null, Faction.Enemy));
         Assert.IsTrue(completed.IsMetBy(log));
     }
 
@@ -223,7 +223,7 @@ public sealed class QuestTests
 
         Assert.IsFalse(log.TryTurnIn(quest), "Nothing to hand in yet.");
         log.TryStart(quest);
-        log.Handle(new GameEvent(GameEventKind.Killed, null, victimFaction: Faction.Enemy));
+        log.Handle(Kill(null, Faction.Enemy));
         Assert.AreEqual(QuestStatus.ReadyToTurnIn, log.StatusOf(quest));
         CollectionAssert.AreEqual(new[] { quest }, ready);
         CollectionAssert.IsEmpty(completed, "No rewards until it is handed in.");
@@ -251,7 +251,7 @@ public sealed class QuestTests
         SetField(quest, "turnInToGiver", true);
         var log = new QuestLog();
         log.TryStart(quest);
-        log.Handle(new GameEvent(GameEventKind.Killed, null, victimFaction: Faction.Enemy));
+        log.Handle(Kill(null, Faction.Enemy));
         var lookup = new Lookup { Quests = { ["ready"] = quest } };
 
         SaveData data = SaveMapper.ToSaveData(null, null, "SampleScene", null, DateTime.UtcNow, null, log);
@@ -277,7 +277,7 @@ public sealed class QuestTests
         Assert.AreEqual(QuestGiverState.Available, QuestGiver.StateFor(given, log));
         log.TryStart(given);
         Assert.AreEqual(QuestGiverState.InProgress, QuestGiver.StateFor(given, log));
-        log.Handle(new GameEvent(GameEventKind.Killed, null, victimFaction: Faction.Enemy));
+        log.Handle(Kill(null, Faction.Enemy));
         Assert.AreEqual(QuestGiverState.ReadyToTurnIn, QuestGiver.StateFor(given, log));
         log.TryTurnIn(given);
         Assert.AreEqual(QuestGiverState.Done, QuestGiver.StateFor(given, log));
@@ -626,6 +626,25 @@ public sealed class QuestTests
     private static void SetField(object target, string field, object value)
     {
         target.GetType().GetField(field, BindingFlags.Instance | BindingFlags.NonPublic).SetValue(target, value);
+    }
+
+    // A kill by someone on the player's side; the victim's side when the subject doesn't say.
+    private GameEvent Kill(MonsterDefinition monster, Faction? victim = null) =>
+        new GameEvent(GameEventKind.Killed, monster, 1, Fighter(Faction.Player), victimFaction: victim);
+
+    private GameObject Fighter(Faction faction)
+    {
+        var fighter = Created(new GameObject($"{faction} fighter"));
+        var serialized = new UnityEditor.SerializedObject(fighter.AddComponent<Combatant>());
+        serialized.FindProperty("faction").enumValueIndex = (int)faction;
+        serialized.ApplyModifiedPropertiesWithoutUndo();
+        return fighter;
+    }
+
+    private GameObject Created(GameObject gameObject)
+    {
+        created.Add(gameObject);
+        return gameObject;
     }
 
     private T Create<T>(string name) where T : ScriptableObject

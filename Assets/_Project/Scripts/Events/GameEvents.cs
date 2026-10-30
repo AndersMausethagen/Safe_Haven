@@ -67,8 +67,17 @@ public readonly struct GameEvent
     /// <summary>The side of what was killed: the victim's own, or, when the event didn't say, its monster's.</summary>
     public Faction? KilledFaction => VictimFaction ?? (Subject is MonsterDefinition monster ? monster.Faction : (Faction?)null);
 
-    /// <summary>True when the player caused it, or nobody in particular did (raids, quest events).</summary>
-    public bool ByPlayer => Actor == null || Player.IsPlayer(Actor);
+    /// <summary>True when the player themselves did it: their own pickups, meals and builds.</summary>
+    public bool ByPlayer => Player.IsPlayer(Actor);
+
+    /// <summary>
+    /// True when it counts for the player, for quests and experience: someone on their side did it (the player, a
+    /// companion, a tower), or nobody in particular did (raids, quest events, the settlement's work). A death nobody
+    /// caused (a fall, the water) is no one's kill.
+    /// </summary>
+    public bool ForPlayerSide => Actor == null
+        ? Kind != GameEventKind.Killed && Kind != GameEventKind.Destroyed
+        : FactionRelations.SideOf(Actor)?.IsPlayerSide() == true;
 }
 
 /// <summary>
