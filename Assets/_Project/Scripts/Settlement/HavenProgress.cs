@@ -74,7 +74,10 @@ public sealed class HavenProgress : MonoBehaviour
         int now = HavenRenown.Compute();
         if (announce && renown >= 0 && now > renown)
         {
-            HavenHud.Current?.ShowGain(now - renown);
+            if (HavenHud.Current != null)
+            {
+                HavenHud.Current.ShowGain(now - renown);
+            }
         }
 
         renown = now;
@@ -83,11 +86,14 @@ public sealed class HavenProgress : MonoBehaviour
         if (GameSession.Settlement.ReachHavenRank(rank))
         {
             HavenSettings.Rank reached = settings.Ranks[rank];
-            HavenHud.Current?.ShowRank(reached.name, reached.line);
+            if (HavenHud.Current != null)
+            {
+                HavenHud.Current.ShowRank(reached.name, reached.line);
+            }
             AudioManager.Play(settings.RankSound, transform.position);
             CameraShake.Add(0.15f);
             ExperienceTracker.Grant(settings.RankExperience);
-            GameMessages.Post($"Safe Haven is now a {reached.name}! The ward reaches {HeartTree.Current?.WardRadius:0} m.", MessageKind.Gain);
+            GameMessages.Post($"Safe Haven is now a {reached.name}! The ward reaches {(HeartTree.Current != null ? HeartTree.Current.WardRadius : 0f):0} m.", MessageKind.Gain);
         }
     }
 }

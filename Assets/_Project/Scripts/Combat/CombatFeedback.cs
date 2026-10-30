@@ -205,7 +205,10 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
                 SlowTime(rules.SlowMotionScale, rules.SlowMotionSeconds);
                 CameraShake.Add(feel.ShakeOnCrit);
                 Callout(victim, feel.ParryText);
-                screen?.Flash(feel.TechniqueFlashColor, 1f);
+                if (screen != null)
+                {
+                    screen.Flash(feel.TechniqueFlashColor, 1f);
+                }
                 break;
             case GuardOutcome.GuardBroken:
                 Spawn(feel.BlockEffect, point, -damage.Direction);
@@ -336,7 +339,10 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
         Spawn(feel.PerfectDodgeEffect, playerCombat.transform.position + Vector3.up * 0.05f, Vector3.forward);
         AudioManager.Play(Sounds != null ? Sounds.PerfectDodge : null, playerCombat.transform.position);
         Callout(playerCombat, feel.PerfectDodgeText);
-        screen?.Flash(feel.TechniqueFlashColor, 0.8f);
+        if (screen != null)
+        {
+            screen.Flash(feel.TechniqueFlashColor, 0.8f);
+        }
     }
 
     private void OnCounterReady()

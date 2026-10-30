@@ -117,11 +117,14 @@ public sealed class PlayerInputHandler : MonoBehaviour
         mouseAttackPending = false;
         mouseGuardPending = false;
         mouseAttackReleasePending = false;
-        stateMachine?.ReleaseAttack();
-        stateMachine?.RequestGuard(false);
-        movement?.SetMovementInput(Vector3.zero);
-        movement?.ClearAimDirection();
-        stealth?.SetSneaking(false);
+        stateMachine.ReleaseAttack();
+        stateMachine.RequestGuard(false);
+        movement.SetMovementInput(Vector3.zero);
+        movement.ClearAimDirection();
+        if (stealth != null)
+        {
+            stealth.SetSneaking(false);
+        }
     }
 
     private System.Collections.Generic.IEnumerable<InputAction> AllActions()
@@ -350,10 +353,10 @@ public sealed class PlayerInputHandler : MonoBehaviour
         skillsWindowAction.performed += OnSkillsToggle;
         characterAction.performed += OnCharacterToggle;
         buildAction.performed += OnBuildToggle;
-        sneakAction.performed += _ => stealth?.SetSneaking(true);
-        sneakAction.canceled += _ => stealth?.SetSneaking(false);
+        sneakAction.performed += _ => { if (stealth != null) stealth.SetSneaking(true); };
+        sneakAction.canceled += _ => { if (stealth != null) stealth.SetSneaking(false); };
         arrowAction.performed += _ => stateMachine.RequestArrowCycle();
-        torchAction.performed += _ => equipment?.ToggleTorch();
+        torchAction.performed += _ => { if (equipment != null) equipment.ToggleTorch(); };
         talentsAction.performed += _ => RequestWindow(UIWindowId.Talents);
         havenAction.performed += _ =>
         {

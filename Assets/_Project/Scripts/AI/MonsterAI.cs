@@ -642,7 +642,11 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject, IStaggerable
     private void OnSpotted()
     {
         PerceptionSettings rules = PerceptionSettings.Current;
-        EnsureIndicator()?.ShowSpotted();
+        AwarenessIndicator spotted = EnsureIndicator();
+        if (spotted != null)
+        {
+            spotted.ShowSpotted();
+        }
         if (global::Player.IsPlayer(targetComponent.gameObject) && Time.time >= nextSpottedSoundAt)
         {
             nextSpottedSoundAt = Time.time + SpottedSoundSpacing;

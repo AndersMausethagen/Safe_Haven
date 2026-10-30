@@ -241,7 +241,7 @@ public sealed class PrologueDirector : MonoBehaviour, IBuildArea
         nextWave = definition.WaveInterval;
         nextRumble = 12f;
         wave = 0;
-        if (IsFighting) ActionMenuWindow.Current?.Close();
+        if (IsFighting && ActionMenuWindow.Current != null) ActionMenuWindow.Current.Close();
         portalVisual.SetActive(step >= PrologueStep.HoldPortal);
         Transform rally = step >= PrologueStep.ActivatePortal ? portalPoint
             : step >= PrologueStep.GatherFuel && step <= PrologueStep.DefendCamp ? campPoint : null;
@@ -373,7 +373,7 @@ public sealed class PrologueDirector : MonoBehaviour, IBuildArea
         yield return new WaitForSeconds(definition.RecoverySeconds);
         ClearEnemies();
         health.Revive(1f);
-        Player.Current.GetComponent<PlayerAnimationController>()?.SetDead(false);
+        if (Player.Current.TryGetComponent(out PlayerAnimationController body)) body.SetDead(false);
         RefreshStep(true);
         reviving = false;
     }
@@ -415,7 +415,7 @@ public sealed class PrologueDirector : MonoBehaviour, IBuildArea
         portalVisual.SetActive(true);
         PlayerInputHandler input = Player.Current.GetComponent<PlayerInputHandler>();
         input.enabled = false;
-        ActionMenuWindow.Current?.Close();
+        if (ActionMenuWindow.Current != null) ActionMenuWindow.Current.Close();
         Rumble(0.65f);
         GameMessages.Post(overwhelmed ? definition.OverwhelmedText : definition.SurvivedText);
         if (statusLabel != null) statusLabel.text = definition.EndingStatus;

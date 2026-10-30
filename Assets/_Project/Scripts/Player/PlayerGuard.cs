@@ -79,7 +79,10 @@ public sealed class PlayerGuard : MonoBehaviour, IHitGuard
 
         held = false;
         SetGuarding(false);
-        movement?.SetSpeedScale(this, 1f);
+        if (movement != null)
+        {
+            movement.SetSpeedScale(this, 1f);
+        }
     }
 
     // With a bow the guard button aims instead (PlayerArchery).
@@ -96,7 +99,10 @@ public sealed class PlayerGuard : MonoBehaviour, IHitGuard
                         && Time.time - loweredAt >= Rules.GuardRelock;
         if (held && !IsGuarding && canRaise)
         {
-            combat?.CancelRecovery();
+            if (combat != null)
+            {
+                combat.CancelRecovery();
+            }
             SetGuarding(true);
         }
         else if (IsGuarding && (!held || stunned || !stateMachine.CanMove))
@@ -104,7 +110,10 @@ public sealed class PlayerGuard : MonoBehaviour, IHitGuard
             SetGuarding(false);
         }
 
-        movement?.SetSpeedScale(this, stunned ? 0f : IsGuarding ? Rules.GuardMoveSpeed : 1f);
+        if (movement != null)
+        {
+            movement.SetSpeedScale(this, stunned ? 0f : IsGuarding ? Rules.GuardMoveSpeed : 1f);
+        }
     }
 
     /// <summary>Drops the guard now (attacking out of it); it goes up again by itself while the button is still held.</summary>
@@ -163,11 +172,17 @@ public sealed class PlayerGuard : MonoBehaviour, IHitGuard
                 break;
             case GuardOutcome.Blocked:
                 letThrough = LetThrough;
-                stamina?.TrySpend(cost);
+                if (stamina != null)
+                {
+                    stamina.TrySpend(cost);
+                }
                 Blocked?.Invoke(damage);
                 break;
             case GuardOutcome.GuardBroken:
-                stamina?.TrySpend(stamina.Current);
+                if (stamina != null)
+                {
+                    stamina.TrySpend(stamina.Current);
+                }
                 stunnedUntil = Time.time + Rules.GuardBreakStun;
                 SetGuarding(false);
                 Broken?.Invoke(Rules.GuardBreakStun);
@@ -190,7 +205,10 @@ public sealed class PlayerGuard : MonoBehaviour, IHitGuard
             }
         }
 
-        combat?.GrantCounter();
+        if (combat != null)
+        {
+            combat.GrantCounter();
+        }
         Parried?.Invoke(damage);
     }
 }

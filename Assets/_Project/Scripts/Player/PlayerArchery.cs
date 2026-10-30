@@ -262,7 +262,10 @@ public sealed class PlayerArchery : MonoBehaviour
         movement.SetSpeedScale(this, steady ? bow.DrawMoveSpeed : 1f);
         if (steady)
         {
-            combat?.KeepInCombat();
+            if (combat != null)
+            {
+                combat.KeepInCombat();
+            }
         }
     }
 
@@ -358,7 +361,10 @@ public sealed class PlayerArchery : MonoBehaviour
         State = Phase.Drawing;
         drawStartedAt = Time.time;
         fullDrawAnnounced = false;
-        combat?.KeepInCombat();
+        if (combat != null)
+        {
+            combat.KeepInCombat();
+        }
         AudioManager.Play(bow.DrawSound, Origin);
         DrawStarted?.Invoke(DrawTime(bow));
     }
@@ -408,7 +414,10 @@ public sealed class PlayerArchery : MonoBehaviour
         movement.SnapFacing(direction);
         AudioManager.Play(bow.SwingSound, origin);
         WorldNoise.Emit(transform.position, ShotNoise);
-        combat?.KeepInCombat();
+        if (combat != null)
+        {
+            combat.KeepInCombat();
+        }
 
         State = Phase.Reloading;
         reloadEndsAt = Time.time + bow.ReloadSeconds;
