@@ -57,13 +57,10 @@ public sealed class AtmosphereTests
     [Test]
     public void MistHabitat_BakesHollowsAndActualWaterSurfaceAboveLakeBed()
     {
-        Scene original = SceneManager.GetActiveScene();
-        FogGround previousGround = FogGround.Current;
-        Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Additive);
+        TestScenes.StartClean();
         var data = new TerrainData { heightmapResolution = 33, size = new Vector3(40f, 10f, 40f) };
         try
         {
-            SceneManager.SetActiveScene(scene);
             var heights = new float[33, 33];
             for (int z = 0; z < 33; z++)
                 for (int x = 0; x < 33; x++)
@@ -94,10 +91,8 @@ public sealed class AtmosphereTests
         }
         finally
         {
-            SceneManager.SetActiveScene(original);
-            EditorSceneManager.CloseScene(scene, true);
+            TestScenes.StartClean();
             Object.DestroyImmediate(data);
-            if (previousGround != null) previousGround.SendMessage("OnEnable");
         }
     }
 
@@ -310,8 +305,11 @@ public sealed class AtmosphereTests
         Texture previousDepth = Shader.GetGlobalTexture("_CameraDepthTexture");
         Vector4 previousCamera = Shader.GetGlobalVector("_WorldSpaceCameraPos");
         Matrix4x4 previousInverse = Shader.GetGlobalMatrix("unity_MatrixInvVP");
+        Vector4 previousTime = Shader.GetGlobalVector("_Time");
         try
         {
+            // The mist moves with shader time; a fixed time makes what each step measures the same on every run.
+            Shader.SetGlobalVector("_Time", new Vector4(0.05f, 1f, 2f, 3f));
             Shader.SetGlobalTexture("_CameraDepthTexture", SystemInfo.usesReversedZBuffer ? Texture2D.blackTexture : Texture2D.whiteTexture);
             Shader.SetGlobalVector("_WorldSpaceCameraPos", Vector4.zero);
             Shader.SetGlobalMatrix("unity_MatrixInvVP", Matrix4x4.identity);
@@ -516,6 +514,7 @@ public sealed class AtmosphereTests
             Shader.SetGlobalTexture("_CameraDepthTexture", previousDepth);
             Shader.SetGlobalVector("_WorldSpaceCameraPos", previousCamera);
             Shader.SetGlobalMatrix("unity_MatrixInvVP", previousInverse);
+            Shader.SetGlobalVector("_Time", previousTime);
             RenderTexture.active = previousTarget;
             target.Release();
             Object.DestroyImmediate(target);
@@ -533,8 +532,8 @@ public sealed class AtmosphereTests
             var light = go.AddComponent<Light>();
             light.type = LightType.Point;
             var torch = go.AddComponent<ExpeditionTorch>();
-            torch.SendMessage("Awake");
-            torch.SendMessage("Awake");
+            torch.AddAtmosphereLights();
+            torch.AddAtmosphereLights();
             Assert.AreEqual(1, go.GetComponents<AtmosphereLight>().Length);
         }
         finally
@@ -608,9 +607,7 @@ public sealed class AtmosphereTests
     [Test]
     public void TerrainMist_RegistersAndMeasuresDistanceToTileNotOrigin()
     {
-        Scene previous = SceneManager.GetActiveScene();
-        Scene testScene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Additive);
-        SceneManager.SetActiveScene(testScene);
+        TestScenes.StartClean();
         var data = new TerrainData { heightmapResolution = 33, size = new Vector3(100f, 20f, 80f) };
         var go = Terrain.CreateTerrainGameObject(data);
         try
@@ -630,8 +627,6 @@ public sealed class AtmosphereTests
         {
             Object.DestroyImmediate(go);
             Object.DestroyImmediate(data);
-            SceneManager.SetActiveScene(previous);
-            EditorSceneManager.CloseScene(testScene, true);
         }
     }
 

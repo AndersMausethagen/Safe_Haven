@@ -11,19 +11,14 @@ public sealed class WorldToolsTests
     [Test]
     public void NewSceneDefaults_SupportWeatherMistAndShaftsBeforeSaveAndPersistOnSave()
     {
-        Scene original = SceneManager.GetActiveScene();
-        bool originalDirty = original.isDirty;
-        Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Additive);
+        Scene scene = TestScenes.StartClean();
         string folder = "Assets/EnvironmentDefaultsTest_" + System.Guid.NewGuid().ToString("N");
         AssetDatabase.CreateFolder("Assets", System.IO.Path.GetFileName(folder));
         TerrainData terrainData = null;
         VolumeProfile transientProfile = null;
         try
         {
-            SceneManager.SetActiveScene(scene);
-            var callback = typeof(SceneEnvironmentDefaults).GetMethod("OnNewScene",
-                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
-            callback.Invoke(null, new object[] { scene, NewSceneSetup.EmptyScene, NewSceneMode.Single });
+            new SafeHavenScenePipeline().AfterTemplateInstantiation(SafeHavenSceneTemplate.Ensure(), scene, false, "");
             Assert.AreEqual("", scene.path, "Support must work before the scene is saved.");
             var rig = scene.GetRootGameObjects().Single(root => root.name == WeatherSetup.RigName);
             Assert.IsNotNull(rig.GetComponentInChildren<WeatherSystem>());
@@ -88,8 +83,7 @@ public sealed class WorldToolsTests
             string profilePath = AssetDatabase.GetAssetPath(volume.sharedProfile);
             Assert.IsTrue(profilePath.StartsWith(folder + "/"));
             Assert.AreEqual(profilePath, AssetDatabase.GetAssetPath(fog), "Fog must be stored with the scene's profile.");
-            EditorSceneManager.CloseScene(scene, true);
-            scene = EditorSceneManager.OpenScene(path, OpenSceneMode.Additive);
+            scene = EditorSceneManager.OpenScene(path, OpenSceneMode.Single);
             var savedMist = scene.GetRootGameObjects().SelectMany(root => root.GetComponentsInChildren<TerrainMist>(true)).Single();
             Assert.AreEqual(0.07f, savedMist.Density);
             Assert.IsFalse(savedMist.enabled);
@@ -102,26 +96,34 @@ public sealed class WorldToolsTests
         }
         finally
         {
-            SceneManager.SetActiveScene(original);
-            if (scene.IsValid()) EditorSceneManager.CloseScene(scene, true);
+            TestScenes.StartClean();
             AssetDatabase.DeleteAsset(folder);
             if (terrainData != null && !AssetDatabase.Contains(terrainData)) Object.DestroyImmediate(terrainData);
             if (transientProfile != null && !AssetDatabase.Contains(transientProfile)) Object.DestroyImmediate(transientProfile);
         }
-        Assert.AreEqual(originalDirty, original.isDirty);
+    }
+
+    [Test]
+    public void NewScenes_ComeFromTheSafeHavenTemplateNotFromEveryNewScene()
+    {
+        var template = AssetDatabase.LoadAssetAtPath<UnityEditor.SceneTemplate.SceneTemplateAsset>(SafeHavenSceneTemplate.TemplatePath);
+        Assert.IsNotNull(template, "Safe Haven › World › Create Scene Template makes it.");
+        Assert.IsNotNull(template.templateScene);
+        Assert.AreEqual(typeof(SafeHavenScenePipeline), template.templatePipeline.GetClass());
+        Assert.IsTrue(template.addToDefaults, "Pinned in File › New Scene.");
+
+        Scene scene = TestScenes.StartClean();
+        Assert.AreEqual(0, scene.rootCount, "A scene made by code is left as it was made.");
     }
 
     [Test]
     public void AtmosphereSetup_IsIdempotentAndDoesNotAddExplorationOrReplaceExistingRig()
     {
-        Scene original = SceneManager.GetActiveScene();
-        bool originalDirty = original.isDirty;
-        Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Additive);
+        Scene scene = TestScenes.StartClean();
         string folder = "Assets/AtmosphereAuthoringTest_" + System.Guid.NewGuid().ToString("N");
         AssetDatabase.CreateFolder("Assets", System.IO.Path.GetFileName(folder));
         try
         {
-            SceneManager.SetActiveScene(scene);
             Assert.IsTrue(EditorSceneManager.SaveScene(scene, folder + "/Authoring.unity"));
             var profile = ScriptableObject.CreateInstance<VolumeProfile>();
             AssetDatabase.CreateAsset(profile, folder + "/Existing.asset");
@@ -145,11 +147,9 @@ public sealed class WorldToolsTests
         }
         finally
         {
-            SceneManager.SetActiveScene(original);
-            EditorSceneManager.CloseScene(scene, true);
+            TestScenes.StartClean();
             AssetDatabase.DeleteAsset(folder);
         }
-        Assert.AreEqual(originalDirty, original.isDirty, "The user's open scene must not be changed or saved.");
     }
 
     [Test]

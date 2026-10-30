@@ -59,8 +59,9 @@ weather, gathers in fog areas (hollows, marshes) and makes monsters see less far
 
 ## For designers: fog on a new map in a few minutes
 
-**Default scene environment:** creating a new scene through Unity (Single mode, not additive tooling/test scenes)
-automatically adds the existing weather/day-night rig, terrain ground sampler and volumetric sun/moon support.
+**Default scene environment:** File › New Scene › **Safe Haven Scene** (the pinned template) makes a scene with a
+camera and a sun, then adds the weather/day-night rig, terrain ground sampler and volumetric sun/moon support. Other
+templates, and scenes made by code (tests, tools), are left as made; Safe Haven › World › Create Scene Template rebuilds it.
 New terrains in scenes with weather and Fog Ground receive Terrain Mist automatically, including terrains added later.
 The Weather component's **Weather Only Atmosphere** defaults on: mist and global fog follow the climate's random
 weather, not a constant baseline or guaranteed golden-hour event. **Clear/Breezy** have Fog 0 and Mist 0;

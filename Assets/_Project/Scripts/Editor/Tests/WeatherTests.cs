@@ -197,6 +197,8 @@ public sealed class WeatherTests
     [Test]
     public void Setup_CreatesTheLooksAndWiresTheRig()
     {
+        // First: a new scene unloads assets only scripts hold, such as the set below.
+        TestScenes.StartClean();
         WeatherSetup.Set set = WeatherSetup.EnsureAssets();
         Assert.IsTrue(set.Night.TryGet(out ColorAdjustments night));
         Assert.IsTrue(night.saturation.overrideState);

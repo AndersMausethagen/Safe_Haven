@@ -6,8 +6,10 @@ and where to make common changes. Each script's own summary comment explains its
 The *what and why* of the game lives in the design document,
 [Docs/GameDesignDocument.md](../../../Docs/GameDesignDocument.md) (GDD). This file is the *how*.
 
-Scene environment defaults: `Editor/Environment/SceneEnvironmentDefaults` wires new Single-mode scenes through
-`WeatherSetup` and `AtmosphereSetup` to the existing weather/day-night systems, shaft rendering and ground sampler.
+Scene environment defaults: new scenes come from the **Safe Haven Scene** template (`Scenes/Templates`, pinned in
+File › New Scene); its `SafeHavenScenePipeline` calls `SceneEnvironmentDefaults.AddTo`, which wires the scene through
+`WeatherSetup` and `AtmosphereSetup` to the weather/day-night systems, shaft rendering and ground sampler. Scenes made by
+code (tests, tools) are left as made; Edit Mode tests that need a scene use `TestScenes.StartClean`.
 `TerrainMist` has calm rolling wave crests and stronger density in hollows and over `WaterSurface` footprints.
 `FogGround` bakes RGBA terrain height, mist-support height, water mask and local depression depth;
 water searches happen at bake time, not per raymarch sample. Global fog stays stationary and uses terrain height only.

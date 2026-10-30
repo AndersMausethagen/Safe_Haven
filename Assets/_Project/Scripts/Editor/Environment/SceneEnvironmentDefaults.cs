@@ -3,23 +3,24 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine.SceneManagement;
 
-/// <summary>New scenes get the same weather, mist and light-shaft support as authored game scenes.</summary>
+/// <summary>
+/// Weather, mist and light-shaft support for game scenes. A new scene gets it from the Safe Haven Scene template
+/// (File › New Scene, <see cref="SafeHavenScenePipeline"/>); scenes made by code, such as tests and tools, stay as they
+/// were made. Any scene with the weather rig then keeps its terrain mist complete and saves its fog profile beside it.
+/// </summary>
 [InitializeOnLoad]
 public static class SceneEnvironmentDefaults
 {
     static SceneEnvironmentDefaults()
     {
-        EditorSceneManager.newSceneCreated += OnNewScene;
         EditorSceneManager.sceneSaving += OnSceneSaving;
         EditorApplication.hierarchyChanged += CompleteTerrainMist;
     }
 
-    private static void OnNewScene(Scene scene, NewSceneSetup setup, NewSceneMode mode)
+    /// <summary>Adds the weather rig, mist and light shafts to <paramref name="scene"/>, as in authored game scenes.</summary>
+    public static void AddTo(Scene scene)
     {
-        // Additive scenes include tooling/test scratch scenes; do not populate those automatically.
-        if (mode != NewSceneMode.Single || EditorApplication.isPlayingOrWillChangePlaymode)
-            return;
-        var previous = SceneManager.GetActiveScene();
+        Scene previous = SceneManager.GetActiveScene();
         SceneManager.SetActiveScene(scene);
         try { WeatherSetup.AddToScene(WeatherSetup.EnsureAssets()); }
         finally { SceneManager.SetActiveScene(previous); }
