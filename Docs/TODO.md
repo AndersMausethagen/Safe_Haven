@@ -87,7 +87,8 @@ Same review for Quests/ and Events/. Work top to bottom.
 
 Same review for the rest of the runtime code (SOLID, Unity practice, no special-case rules). Work top to bottom.
 
-1. [ ] **MonsterAI is still 1404 lines.** Targeting is out (`MonsterTargeting`); perception and investigation
+1. [x] **MonsterAI is still 1404 lines.** Done: `MonsterMovement`, `MonsterAttacks` and `MonsterPose` (1063 lines
+       left: the state machine with perception and investigation, which drive its states). Targeting is out (`MonsterTargeting`); perception and investigation
        (Hear, Sense, TrackTarget, the investigation states, idle gaze, ambush, indicator) and attack actions
        (BeginAttack, UpdateAction, charge, howl, projectile, retreat) are two more plain C# parts, as `Companion` was
        split. Behaviour unchanged; the existing AI tests cover it.

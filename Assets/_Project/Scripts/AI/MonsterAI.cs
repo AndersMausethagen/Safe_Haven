@@ -11,6 +11,11 @@ using UnityEngine.AI;
 /// Enemies and Neutral monsters never start or return a fight. Led too far from where it spawned, it gives up and
 /// walks home. Tuning lives in the MonsterDefinition and PerceptionSettings; the current target, awareness, timers and
 /// home position are this instance's own.
+/// <para>
+/// Its parts: MonsterSenses (what it notices), MonsterTargeting (whom it may hunt), MonsterMovement (the NavMesh),
+/// MonsterAttacks (carrying out a strike) and MonsterPose (body language). This class is the state machine that decides
+/// between them: idle, investigating, chasing, attacking, staggered, returning, dead.
+/// </para>
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Combatant))]
@@ -35,9 +40,7 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject
     internal const float CenterHeight = 1f;
     // Attacks start a little inside their range, so a target backing away is still hit.
     private const float AttackReachFactor = 0.85f;
-    private const float FacingTolerance = 20f;
     private const float HomeTolerance = 0.6f;
-    private const float NavMeshSnapDistance = 2f;
     // Close enough to the spot it went to check to start searching there.
     private const float ArriveDistance = 1.5f;
     // When a whole pack spots the player at once, the spotted sound plays once.
@@ -57,7 +60,9 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject
 
     private Combatant combatant;
     private Damageable damageable;
-    private NavMeshAgent agent;
+    private MonsterMovement movement;
+    private MonsterAttacks attacks;
+    private MonsterPose pose;
 
     private IDamageable target;
     private Component targetComponent;
@@ -65,32 +70,8 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject
 
     private Vector3 home;
     private float nextScanTime;
-    private float nextRepathTime;
-    private float nextAttackTime;
-    private float attackStartTime;
-    private Vector3 attackDirection;
-    private bool hitPending;
-    private bool warnedOffNavMesh;
-    private MonsterAttack action;
-    private float[] readyAt;
-    private int actionIndex = -1;
-    private int shotsFired;
-    private float chargeTravelled;
-    private float chargeLength;
-    private float exposedAt = -1f;
-    private bool chargeHit;
     private bool fleeing;
     private MonsterPack pack;
-    private Transform visual;
-    private Vector3 visualHome;
-    private Quaternion visualHomeRotation = Quaternion.identity;
-    private Vector3 visualHomeScale = Vector3.one;
-    private float hover;
-    // The attack whose pose is playing (it keeps settling after the attack ends) and the stagger's timing.
-    private AttackDefinition posedAttack;
-    private float posedAttackStart;
-    private float staggerStart = -1f;
-    private float staggerLength;
 
     private bool roaming;
     private PoiseMeter poise;
@@ -174,20 +155,10 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject
             return;
         }
 
-        if (action != null && actionIndex >= 0)
-        {
-            readyAt[actionIndex] = Time.time + action.cooldown;
-        }
-
-        action = null;
-        actionIndex = -1;
-        hitPending = false;
-        exposedAt = -1f;
-        StopMoving();
+        attacks.Cancel();
+        movement.Stop();
         staggerUntil = Time.time + seconds;
-        staggerStart = Time.time;
-        staggerLength = seconds;
-        posedAttack = null;
+        pose?.Stagger(Time.time, seconds);
         damageable.DamageTakenMultiplier = CombatTechniqueSettings.Current.StaggeredDamageTaken;
         SetState(State.Staggered);
         Staggered?.Invoke(seconds);
@@ -202,7 +173,7 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject
         }
 
         damageable.DamageTakenMultiplier = 1f;
-        nextAttackTime = Time.time + 0.35f;
+        attacks.Delay(0.35f);
         SetState(State.Chasing);
     }
 
@@ -213,29 +184,16 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject
     public Vector3 Home => home;
 
     /// <summary>The attack being performed, or null when not attacking. Its HitDelay is the wind-up before the hit.</summary>
-    public AttackDefinition CurrentAttack => CurrentState == State.Attacking && definition != null ? action?.attack ?? definition.Attack : null;
-    public MonsterAttack ActiveAction => CurrentState == State.Attacking ? action : null;
-    public bool IsExposed => CurrentState == State.Attacking && exposedAt >= 0f;
+    public AttackDefinition CurrentAttack => CurrentState == State.Attacking ? attacks.Attack : null;
+    public MonsterAttack ActiveAction => CurrentState == State.Attacking ? attacks.Action : null;
+    public bool IsExposed => CurrentState == State.Attacking && attacks.IsExposed;
     public bool IsHowler => pack != null && pack.IsLeader(this);
 
     /// <summary>The direction the current attack was aimed when it started; it doesn't follow the target.</summary>
-    public Vector3 AttackDirection => attackDirection;
+    public Vector3 AttackDirection => attacks != null ? attacks.Direction : Vector3.zero;
 
     /// <summary>Horizontal movement speed in meters per second, for animation.</summary>
-    public float Speed
-    {
-        get
-        {
-            if (agent == null || !agent.isActiveAndEnabled)
-            {
-                return 0f;
-            }
-
-            Vector3 velocity = agent.velocity;
-            velocity.y = 0f;
-            return velocity.magnitude;
-        }
-    }
+    public float Speed => movement != null ? movement.Speed : 0f;
 
     /// <summary>Raised when the state changes. Arguments: previous state, new state.</summary>
     public event Action<State, State> StateChanged;
@@ -248,16 +206,12 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject
         all.Add(this);
         combatant = GetComponent<Combatant>();
         damageable = GetComponent<Damageable>();
-        agent = GetComponent<NavMeshAgent>();
+        var agent = GetComponent<NavMeshAgent>();
+        movement = new MonsterMovement(transform, agent, repathInterval, turnSpeed);
         pack = GetComponentInParent<MonsterPack>();
         targeting.Bind(transform, definition, combatant, damageable, agent, targetLayers);
-        visual = transform.Find("Model");
-        if (visual != null)
-        {
-            visualHome = visual.localPosition;
-            visualHomeRotation = visual.localRotation;
-            visualHomeScale = visual.localScale;
-        }
+        Transform visual = transform.Find("Model");
+        pose = visual != null ? new MonsterPose(visual) : null;
 
         if (definition == null)
         {
@@ -265,10 +219,10 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject
             return;
         }
 
-        agent.speed = definition.MoveSpeed;
+        movement.SetSpeed(definition.MoveSpeed);
         senses = new MonsterSenses(transform, definition, targetLayers,
             (candidate, collider) => targeting.IsSenseCandidate(candidate, collider, home, Relentless));
-        readyAt = new float[definition.Attacks.Count];
+        attacks = new MonsterAttacks(transform, definition, combatant, movement, targetLayers);
         CombatTechniqueSettings technique = CombatTechniqueSettings.Current;
         poise = new PoiseMeter(definition.Poise > 0f ? definition.Poise : technique.DefaultPoise,
             technique.PoiseRecoveryDelay, technique.PoiseRecoveryPerSecond);
@@ -283,7 +237,7 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject
         ResetHome();
         lastSenseTime = Time.time;
         nextGlanceAt = Time.time + UnityEngine.Random.Range(0f, PerceptionSettings.Current.IdleGlanceSeconds.y);
-        EnsureOnNavMesh();
+        movement.EnsureOnNavMesh();
         RefreshAmbush();
     }
 
@@ -553,7 +507,7 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject
         searchingLostTarget = lostTarget || (!fresh && searchingLostTarget);
         searchUntil = -1f;
         investigateGiveUpAt = Time.time + PerceptionSettings.Current.MaxInvestigateSeconds;
-        nextRepathTime = 0f;
+        movement.RepathNow();
         if (fresh && !lostTarget)
         {
             AudioManager.Play(PerceptionSettings.Current.SuspiciousSound, transform.position);
@@ -599,12 +553,12 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject
         if (searchUntil < 0f)
         {
             Vector3 spot = InvestigationSpot(senses.Awareness.Stimulus);
-            if (HorizontalDistance(spot) > ArriveDistance && Time.time < investigateGiveUpAt && MoveTo(spot))
+            if (HorizontalDistance(spot) > ArriveDistance && Time.time < investigateGiveUpAt && movement.MoveTo(spot))
             {
                 return;
             }
 
-            StopMoving();
+            movement.Stop();
             searchUntil = Time.time + rules.SearchSeconds;
             lookDirection = UnityEngine.Random.value < 0.5f ? -1f : 1f;
         }
@@ -698,47 +652,18 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject
         WorldNoise.Emit(transform.position, rules.SpottedCallRadius);
     }
 
-    // The body language that makes attacks readable from above (AttackPose): coiling through the wind-up, snapping into
-    // the hit, swaying while staggered; plus the hover of flying monsters.
+    // Body language (MonsterPose) after movement, so it shows this frame's attack and stagger.
     private void LateUpdate()
     {
-        if (visual == null || definition == null)
+        if (pose == null || definition == null)
         {
             return;
         }
 
-        float targetHover = definition.HoverHeight <= 0f || IsExposed || CurrentState == State.Dead ? 0f
-            : definition.HoverHeight + Mathf.Sin(Time.time * 3f) * 0.08f;
-        hover = Mathf.Lerp(hover, targetHover, Time.deltaTime * 10f);
-
-        AttackPose.Pose pose = AttackPose.Pose.Rest;
-        if (CurrentState == State.Dead)
-        {
-            posedAttack = null;
-        }
-        else if (staggerStart >= 0f && Time.time - staggerStart < staggerLength)
-        {
-            pose = AttackPose.Stagger(Time.time - staggerStart, staggerLength);
-        }
-        else if (posedAttack != null)
-        {
-            float elapsed = Time.time - posedAttackStart;
-            if (elapsed > posedAttack.HitDelay + AttackPose.StrikeSeconds + AttackPose.SettleSeconds)
-            {
-                posedAttack = null;
-            }
-            else
-            {
-                // Charges move the whole body already; they only coil.
-                bool charge = action != null && action.kind == MonsterAttackKind.Charge && elapsed >= posedAttack.HitDelay;
-                pose = charge ? AttackPose.Pose.Rest : AttackPose.Attack(elapsed, posedAttack.HitDelay);
-            }
-        }
-
-        float width = 1f / Mathf.Sqrt(Mathf.Max(0.5f, pose.Height));
-        visual.localPosition = visualHome + Vector3.up * hover + Vector3.forward * pose.Shift;
-        visual.localRotation = Quaternion.Euler(-pose.Lean, 0f, pose.Sway) * visualHomeRotation;
-        visual.localScale = Vector3.Scale(visualHomeScale, new Vector3(width, pose.Height, width));
+        bool dead = CurrentState == State.Dead;
+        float hoverHeight = IsExposed || dead ? 0f : definition.HoverHeight;
+        MonsterAttack current = attacks.Action;
+        pose.Update(hoverHeight, dead, current != null && current.kind == MonsterAttackKind.Charge);
     }
 
     private void Engage()
@@ -768,16 +693,14 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject
 
         if (definition.Attacks.Count > 0)
         {
-            int chosen = SelectAttack(definition.Attacks, readyAt, distance, Time.time, IsHowler);
-            if (chosen >= 0 && Time.time >= nextAttackTime)
+            int chosen = attacks.ChooseAction(distance, IsHowler);
+            if (chosen >= 0 && attacks.IsReady)
             {
-                StopMoving();
+                movement.Stop();
                 SetState(State.Chasing);
-                if (TurnTowards(toTarget) && (pack == null || pack.TryAttack()))
+                if (movement.TurnTowards(toTarget) && (pack == null || pack.TryAttack()))
                 {
-                    actionIndex = chosen;
-                    action = definition.Attacks[chosen];
-                    BeginAttack(toTarget);
+                    BeginAttack(chosen, toTarget);
                 }
                 return;
             }
@@ -790,34 +713,24 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject
                 }
                 else if (distance > definition.PreferredDistance + definition.DistanceTolerance)
                 {
-                    MoveTo(targetComponent.transform.position);
+                    movement.MoveTo(targetComponent.transform.position);
                 }
                 else
                 {
-                    StopMoving();
-                    TurnTowards(toTarget);
+                    movement.Stop();
+                    movement.TurnTowards(toTarget);
                 }
             }
             else
             {
-                bool inAttackRange = false;
-                foreach (MonsterAttack candidate in definition.Attacks)
+                if (attacks.AnyStrikeReaches(distance))
                 {
-                    if (candidate != null && candidate.attack != null && candidate.kind != MonsterAttackKind.Howl
-                        && distance >= candidate.minimumRange && distance <= candidate.maximumRange)
-                    {
-                        inAttackRange = true;
-                        break;
-                    }
-                }
-                if (inAttackRange)
-                {
-                    StopMoving();
-                    TurnTowards(toTarget);
+                    movement.Stop();
+                    movement.TurnTowards(toTarget);
                 }
                 else
                 {
-                    MoveTo(targetComponent.transform.position);
+                    movement.MoveTo(targetComponent.transform.position);
                 }
             }
             return;
@@ -826,236 +739,59 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject
 
         if (attack != null && toTarget.magnitude <= attack.Range * AttackReachFactor)
         {
-            StopMoving();
+            movement.Stop();
             SetState(State.Chasing);
-            bool facing = TurnTowards(toTarget);
-            if (facing && Time.time >= nextAttackTime && (pack == null || pack.TryAttack()))
+            bool facing = movement.TurnTowards(toTarget);
+            if (facing && attacks.IsReady && (pack == null || pack.TryAttack()))
             {
-                BeginAttack(toTarget);
+                BeginAttack(-1, toTarget);
             }
 
             return;
         }
 
         SetState(State.Chasing);
-        MoveTo(targetComponent.transform.position);
+        movement.MoveTo(targetComponent.transform.position);
     }
 
-    private void BeginAttack(Vector3 direction)
+    // Action index, or -1 for the definition's plain attack.
+    private void BeginAttack(int action, Vector3 toTarget)
     {
-        // The swing is aimed when it starts, so a target can still dodge out of it.
-        attackDirection = direction.sqrMagnitude > 0.0001f ? direction.normalized : transform.forward;
-        attackStartTime = Time.time;
-        hitPending = true;
-        shotsFired = 0;
-        chargeTravelled = 0f;
-        chargeLength = action != null ? Mathf.Min(action.chargeDistance, direction.magnitude + 0.7f) : 0f;
-        exposedAt = -1f;
-        chargeHit = false;
+        attacks.Begin(action, toTarget);
         SetState(State.Attacking);
-        posedAttack = CurrentAttack;
-        posedAttackStart = attackStartTime;
+        pose?.Attack(CurrentAttack, Time.time);
         AttackStarted?.Invoke();
     }
 
     private void UpdateAttack()
     {
-        AttackDefinition attack = CurrentAttack;
-        if (attack == null)
+        if (!attacks.Update(CanTarget(target) ? targetComponent.transform.position : (Vector3?)null))
         {
             SetState(State.Chasing);
-            return;
         }
-
-        TurnTowards(attackDirection);
-        float elapsed = Time.time - attackStartTime;
-
-        if (action != null)
-        {
-            UpdateAction(attack, elapsed);
-            return;
-        }
-
-        if (hitPending && elapsed >= attack.HitDelay)
-        {
-            hitPending = false;
-            AttackResolver.Execute(combatant, attack, definition.AttackDamage, transform.position, attackDirection, targetLayers);
-        }
-
-        if (elapsed >= attack.RecoveryTime)
-        {
-            nextAttackTime = Time.time + definition.AttackCooldown;
-            SetState(State.Chasing);
-        }
-    }
-
-    public static int SelectAttack(System.Collections.Generic.IReadOnlyList<MonsterAttack> attacks,
-        float[] cooldowns, float distance, float now, bool isLeader)
-    {
-        int chosen = -1;
-        for (int i = 0; i < attacks.Count; i++)
-        {
-            MonsterAttack candidate = attacks[i];
-            if (candidate != null && candidate.IsAvailable(distance, now, cooldowns[i], isLeader)
-                && (chosen < 0 || candidate.priority > attacks[chosen].priority))
-            {
-                chosen = i;
-            }
-        }
-        return chosen;
     }
 
     private void Retreat(Vector3 toTarget, float distance)
     {
         Vector3 away = toTarget.sqrMagnitude > 0.001f ? -toTarget.normalized : -transform.forward;
         Vector3 destination = transform.position + away * Mathf.Max(2f, distance);
-        if (NavMesh.SamplePosition(destination, out NavMeshHit hit, 2f, agent.areaMask)
-            && (Relentless || definition.LeashRange <= 0f || Vector3.Distance(home, hit.position) <= definition.LeashRange))
+        if (movement.TryFindGround(destination, 2f, out Vector3 ground)
+            && (Relentless || definition.LeashRange <= 0f || Vector3.Distance(home, ground) <= definition.LeashRange))
         {
-            MoveTo(hit.position);
+            movement.MoveTo(ground);
         }
         else
         {
-            StopMoving();
+            movement.Stop();
         }
-    }
-
-    private void UpdateAction(AttackDefinition attack, float elapsed)
-    {
-        if (elapsed < attack.HitDelay)
-        {
-            return;
-        }
-        switch (action.kind)
-        {
-            case MonsterAttackKind.Projectile:
-                if (shotsFired < action.burstCount && elapsed >= attack.HitDelay + shotsFired * action.burstInterval)
-                {
-                    FireProjectile();
-                    shotsFired++;
-                }
-                if (shotsFired >= action.burstCount
-                    && elapsed >= Mathf.Max(attack.RecoveryTime, attack.HitDelay + (action.burstCount - 1) * action.burstInterval + 0.5f))
-                {
-                    FinishAction();
-                }
-                break;
-            case MonsterAttackKind.Charge:
-                UpdateCharge(attack);
-                break;
-            case MonsterAttackKind.Howl:
-                if (hitPending)
-                {
-                    hitPending = false;
-                    ApplyHowl();
-                }
-                if (elapsed >= attack.RecoveryTime)
-                {
-                    FinishAction();
-                }
-                break;
-            default:
-                if (hitPending)
-                {
-                    hitPending = false;
-                    AttackResolver.Execute(combatant, attack, action.damage, transform.position, attackDirection, targetLayers);
-                }
-                if (elapsed >= attack.RecoveryTime)
-                {
-                    FinishAction();
-                }
-                break;
-        }
-    }
-
-    private void UpdateCharge(AttackDefinition attack)
-    {
-        if (exposedAt >= 0f)
-        {
-            if (Time.time - exposedAt >= action.exposedSeconds)
-            {
-                FinishAction();
-            }
-            return;
-        }
-        if (!EnsureOnNavMesh())
-        {
-            exposedAt = Time.time;
-            return;
-        }
-        float step = Mathf.Min(action.chargeSpeed * Time.deltaTime, chargeLength - chargeTravelled);
-        Vector3 before = transform.position;
-        Vector3 destination = before + attackDirection * step;
-        bool blocked = agent.Raycast(destination, out NavMeshHit wall);
-        agent.Move(blocked ? wall.position - before : attackDirection * step);
-        chargeTravelled += step;
-        if (!chargeHit)
-        {
-            chargeHit = AttackResolver.Execute(combatant, attack, action.damage,
-                transform.position, attackDirection, targetLayers) > 0;
-        }
-        if (blocked || chargeTravelled >= chargeLength || chargeHit)
-        {
-            exposedAt = Time.time;
-            StopMoving();
-        }
-    }
-
-    private void ApplyHowl()
-    {
-        foreach (MonsterAI other in active)
-        {
-            if (other.CurrentState == State.Dead || other.combatant.Faction != combatant.Faction
-                || Vector3.Distance(transform.position, other.transform.position) > action.buffRadius)
-            {
-                continue;
-            }
-            MonsterHowlBuff buff = other.GetComponent<MonsterHowlBuff>();
-            if (buff == null)
-            {
-                buff = other.gameObject.AddComponent<MonsterHowlBuff>();
-            }
-            buff.Refresh(action.damageBonus, action.buffSeconds);
-        }
-        GameMessages.Post($"{definition.DisplayName} howls! Nearby monsters gain +{action.damageBonus:P0} damage.", MessageKind.Warning);
-    }
-
-    private void FireProjectile()
-    {
-        if (action.projectilePrefab == null)
-        {
-            Debug.LogError($"{definition.DisplayName}: projectile action has no projectile prefab.", this);
-            return;
-        }
-        Vector3 origin = transform.position + Vector3.up;
-        Vector3 aim = CanTarget(target) ? targetComponent.transform.position + Vector3.up - origin : attackDirection;
-        GameObject projectile = PrefabPool.Spawn(action.projectilePrefab, origin + aim.normalized * 0.7f, Quaternion.LookRotation(aim));
-        MonsterProjectile flight = projectile.GetComponent<MonsterProjectile>();
-        if (flight == null)
-        {
-            Debug.LogError($"{projectile.name} has no MonsterProjectile component.", projectile);
-            PrefabPool.Release(projectile);
-            return;
-        }
-        flight.Initialize(combatant, action, aim);
-    }
-
-    private void FinishAction()
-    {
-        readyAt[actionIndex] = Time.time + action.cooldown;
-        nextAttackTime = Time.time + 0.15f;
-        action = null;
-        actionIndex = -1;
-        exposedAt = -1f;
-        SetState(State.Chasing);
     }
 
     private void UpdateReturn()
     {
-        if (HorizontalDistance(home) <= HomeTolerance || !MoveTo(home))
+        if (HorizontalDistance(home) <= HomeTolerance || !movement.MoveTo(home))
         {
             roaming = false;
-            StopMoving();
+            movement.Stop();
             SetState(State.Idle);
         }
     }
@@ -1068,13 +804,13 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject
             return;
         }
 
-        StopMoving();
+        movement.Stop();
         SetState(State.Idle);
     }
 
     private void BeginReturn()
     {
-        nextRepathTime = 0f;
+        movement.RepathNow();
         senses?.Awareness.Calm();
         SetState(State.Returning);
         RefreshAmbush();
@@ -1154,7 +890,7 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject
         target = newTarget;
         targetComponent = (Component)newTarget;
         targetCollider = hitCollider != null ? hitCollider : targetComponent.GetComponentInChildren<Collider>();
-        nextRepathTime = 0f;
+        movement.RepathNow();
         lastSeenTargetAt = Time.time;
         lastKnownTargetPosition = targetComponent.transform.position;
         searchingLostTarget = false;
@@ -1204,89 +940,13 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject
         return offset.magnitude;
     }
 
-    private bool MoveTo(Vector3 destination)
-    {
-        if (Time.time < nextRepathTime)
-        {
-            return true;
-        }
-
-        nextRepathTime = Time.time + repathInterval;
-        if (!EnsureOnNavMesh())
-        {
-            return false;
-        }
-
-        agent.updateRotation = true;
-        // Re-requesting the same spot while the last search is still running would restart it and, on a long path,
-        // keep it from ever finishing.
-        if (agent.pathPending && (agent.destination - destination).sqrMagnitude < 0.25f)
-        {
-            return true;
-        }
-
-        return agent.SetDestination(destination);
-    }
-
-    private void StopMoving()
-    {
-        agent.updateRotation = false;
-        nextRepathTime = 0f;
-        if (agent.isActiveAndEnabled && agent.isOnNavMesh && (agent.hasPath || agent.pathPending))
-        {
-            agent.ResetPath();
-            agent.velocity = Vector3.zero;
-        }
-    }
-
-    private bool EnsureOnNavMesh()
-    {
-        if (!agent.isActiveAndEnabled)
-        {
-            return false;
-        }
-
-        if (agent.isOnNavMesh)
-        {
-            return true;
-        }
-
-        if (NavMesh.SamplePosition(transform.position, out NavMeshHit hit, NavMeshSnapDistance, agent.areaMask)
-            && agent.Warp(hit.position))
-        {
-            return true;
-        }
-
-        if (!warnedOffNavMesh)
-        {
-            warnedOffNavMesh = true;
-            Debug.LogWarning($"{name} is not on a NavMesh, so it can't move. Add a NavMeshSurface to the scene and bake it.", this);
-        }
-
-        return false;
-    }
-
-    private bool TurnTowards(Vector3 direction)
-    {
-        direction.y = 0f;
-        if (direction.sqrMagnitude < 0.0001f)
-        {
-            return true;
-        }
-
-        Quaternion desired = Quaternion.LookRotation(direction);
-        transform.rotation = Quaternion.RotateTowards(transform.rotation, desired, turnSpeed * Time.deltaTime);
-        return Quaternion.Angle(transform.rotation, desired) <= FacingTolerance;
-    }
-
     // Being hit by something it would fight makes the monster fight back, even from outside its detection range.
     private void OnDamaged(DamageInfo damage, DamageResult result)
     {
-        if (CurrentState == State.Attacking && action != null && action.interruptible
-            && Time.time - attackStartTime < action.attack.HitDelay && result.HealthLost > 0f)
+        if (CurrentState == State.Attacking && attacks.TryInterrupt(result.HealthLost))
         {
-            posedAttack = null;
-            FinishAction();
+            pose?.CancelAttack();
+            SetState(State.Chasing);
         }
 
         if (poise != null && CurrentState != State.Staggered && CurrentState != State.Dead && !result.Killed
@@ -1316,9 +976,8 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject
     private void OnDied(Damageable victim, DamageInfo killingBlow)
     {
         damageable.DamageTakenMultiplier = 1f;
-        StopMoving();
         ClearTarget();
-        agent.enabled = false;
+        movement.Halt();
         SetState(State.Dead);
     }
 
@@ -1338,7 +997,7 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject
     // Going to look is a cautious walk and a patrol a stroll; everything else moves at full speed.
     private void ApplySpeed()
     {
-        if (definition == null || agent == null)
+        if (definition == null || movement == null)
         {
             return;
         }
@@ -1346,7 +1005,7 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject
         float scale = CurrentState == State.Investigating ? PerceptionSettings.Current.InvestigateSpeedScale
             : CurrentState == State.Returning && roaming ? roamSpeedScale
             : 1f;
-        agent.speed = definition.MoveSpeed * scale;
+        movement.SetSpeed(definition.MoveSpeed * scale);
     }
 
     // Entering play mode doesn't reload scripts in this project, so the shared sound timer is reset here.
