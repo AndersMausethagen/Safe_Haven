@@ -28,7 +28,7 @@ public enum ItemCategory
 /// </para>
 /// </summary>
 [CreateAssetMenu(fileName = "NewItem", menuName = "Safe Haven/Items/Item Definition")]
-public sealed class ItemDefinition : ScriptableObject, IDisplayName
+public sealed class ItemDefinition : ScriptableObject, IStackDefinition
 {
     [Header("Identity")]
     [Tooltip("Stable unique identifier, used for lookups and saves.")]
@@ -134,6 +134,8 @@ public sealed class ItemDefinition : ScriptableObject, IDisplayName
     /// <summary>Items with durability never stack, so every one keeps its own wear.</summary>
     public bool Stackable => stackable && !HasDurability;
     public int MaximumStack => Stackable ? Mathf.Max(1, maximumStack) : 1;
+    int IStackDefinition.StackSize => MaximumStack;
+    Color? IStackDefinition.SlotTint => rarity != ItemRarity.Common ? global::Rarity.ColorOf(rarity) : (Color?)null;
     public float Weight => weight;
     public ToolType ToolType => toolType;
     public int ToolTier => toolType == ToolType.None ? 0 : toolTier;

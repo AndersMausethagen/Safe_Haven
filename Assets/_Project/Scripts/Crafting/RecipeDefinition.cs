@@ -55,8 +55,8 @@ public sealed class RecipeDefinition : ScriptableObject
     public int OutputAmount => Mathf.Max(1, outputAmount);
     public bool HasOutput => output != null || outputResource != null;
     /// <summary>The result's name, whichever kind it is.</summary>
-    public string OutputName => output != null ? output.DisplayName : outputResource != null ? outputResource.DisplayName : name;
-    public Sprite OutputIcon => output != null ? output.Icon : outputResource != null ? outputResource.Icon : null;
+    public string OutputName => OutputDefinition is IStackDefinition made ? made.DisplayName : name;
+    public Sprite OutputIcon => OutputDefinition is IStackDefinition made ? made.Icon : null;
     /// <summary>The definition made, item or resource, for events and lookups.</summary>
     public Object OutputDefinition => output != null ? output : outputResource;
     public IReadOnlyList<ResourceAmount> ResourceCost => resourceCost;

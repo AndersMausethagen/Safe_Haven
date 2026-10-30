@@ -92,7 +92,9 @@ Same review for the rest of the runtime code (SOLID, Unity practice, no special-
        (Hear, Sense, TrackTarget, the investigation states, idle gaze, ambush, indicator) and attack actions
        (BeginAttack, UpdateAction, charge, howl, projectile, retreat) are two more plain C# parts, as `Companion` was
        split. Behaviour unchanged; the existing AI tests cover it.
-2. [ ] **Item or resource is one idea.** "Is it an ItemDefinition or a ResourceDefinition?" is asked in
+2. [x] **Item or resource is one idea.** Done: `IStackDefinition` (id, name, icon, stack size, slot tint) for
+       recipe output, station output and saves. Giving stays with each inventory (bag, essence storage, material pool).
+       Was: "Is it an ItemDefinition or a ResourceDefinition?" is asked in
        StationCrafting (deliver output), ResourceSource (harvest), SaveMapper (output id), ItemTooltipView,
        StationWindow (icon, tint, stack) and the quest/station names (now `IDisplayName`). One interface for what both
        share (id, name, icon, tint) and one place that gives an amount of either to someone (bag or material pool).

@@ -20,6 +20,23 @@ public sealed class StationQueueTests
     }
 
     [Test]
+    public void Outputs_ItemsAndEssencesShowTheSameWay()
+    {
+        ItemDefinition axe = Create<ItemDefinition>("axe");
+        ResourceDefinition essence = Create<ResourceDefinition>("essence");
+        RecipeDefinition makesAxe = Recipe("axe_recipe", axe, null, 1, 1f);
+        RecipeDefinition makesEssence = Recipe("essence_recipe", null, essence, 1, 1f);
+
+        IStackDefinition item = axe, resource = essence;
+        Assert.AreEqual(axe.MaximumStack, item.StackSize);
+        Assert.IsNull(item.SlotTint, "A common item sits in a plain slot.");
+        Assert.AreEqual(int.MaxValue, resource.StackSize, "Essences have no slots.");
+        Assert.AreEqual(essence.Color, resource.SlotTint);
+        Assert.AreEqual(axe.DisplayName, makesAxe.OutputName);
+        Assert.AreEqual(essence.DisplayName, makesEssence.OutputName);
+    }
+
+    [Test]
     public void Tick_DeliversItemsToOutputSlotAfterCraftTime()
     {
         ItemDefinition axe = Create<ItemDefinition>("axe");

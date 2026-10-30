@@ -477,7 +477,12 @@ public sealed class StationWindow : MonoBehaviour
     private void RefreshOutput(StationQueue queue)
     {
         UnityEngine.Object thing = queue.Output;
-        int stackSize = thing is ItemDefinition item ? item.MaximumStack : Mathf.Max(1, queue.Capacity);
+        int stackSize = Mathf.Max(1, queue.Capacity);
+        if (thing is IStackDefinition stack)
+        {
+            stackSize = Mathf.Min(stack.StackSize, stackSize);
+        }
+
         int[] amounts = RecipeTabs.SplitIntoCells(thing != null ? queue.OutputAmount : 0, stackSize, outputCells);
         outputAmounts = amounts;
         output.Resize(amounts.Length);
@@ -615,17 +620,12 @@ public sealed class StationWindow : MonoBehaviour
 
     private static Sprite IconOf(UnityEngine.Object definition)
     {
-        return definition is ItemDefinition item ? item.Icon : definition is ResourceDefinition resource ? resource.Icon : null;
+        return definition is IStackDefinition stack ? stack.Icon : null;
     }
 
     private static Color TintOf(UnityEngine.Object definition)
     {
-        if (definition is ItemDefinition item && item.Rarity != ItemRarity.Common)
-        {
-            return Rarity.ColorOf(item.Rarity);
-        }
-
-        return definition is ResourceDefinition resource ? resource.Color : PlainTint;
+        return definition is IStackDefinition stack && stack.SlotTint.HasValue ? stack.SlotTint.Value : PlainTint;
     }
 
     private static float HorizontalDistance(Vector3 a, Vector3 b)

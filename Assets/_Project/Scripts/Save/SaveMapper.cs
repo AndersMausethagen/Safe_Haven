@@ -156,7 +156,7 @@ public static class SaveMapper
                 capacity = queue.Capacity,
                 maxQueued = queue.MaxQueued,
                 progress = queue.Progress,
-                output = queue.Output is ItemDefinition item ? item.Id : queue.Output is ResourceDefinition resource ? resource.Id : "",
+                output = queue.Output is IStackDefinition made ? made.Id : "",
                 outputIsResource = queue.Output is ResourceDefinition,
                 outputAmount = queue.OutputAmount,
             };
