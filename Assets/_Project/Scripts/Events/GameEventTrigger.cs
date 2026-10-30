@@ -10,8 +10,8 @@ public enum TriggerWhen
     PlayerInteracts = 1,
     /// <summary>Only when something calls Raise, e.g. a button or another component's event in the Inspector.</summary>
     Manually = 2,
-    /// <summary>The player is inside the Heart Tree's ward circle (it grows with the ward level). No collider needed.</summary>
-    PlayerInsideWard = 3,
+    /// <summary>The player is inside the trigger's Area, such as the Heart Tree's ward (it grows with the ward level). No collider needed.</summary>
+    PlayerInsideArea = 3,
 }
 
 /// <summary>How often a GameEventTrigger may raise its event. Values match the old "Only Once" tick (0 off, 1 on).</summary>
@@ -27,7 +27,7 @@ public enum TriggerRepeat
 
 /// <summary>
 /// Raises a Quest Event when something happens to this object: the player walks into its zone, interacts with it, or
-/// steps inside the Heart Tree's ward. For a zone, give the object a collider with Is Trigger ticked. Use it for "Reach
+/// steps inside an area (any <see cref="IArea"/>, such as the Heart Tree's ward). For a zone, give the object a collider with Is Trigger ticked. Use it for "Reach
 /// the Old Tower", "Inspect the shrine", "The moss blooms when you first come home". Its Raise method can also be chosen
 /// from any event in the Inspector. Pair it with a Quest Event Listener to make something happen in the scene. Listed in
 /// Add Component as Safe Haven › Quests › Quest Event Trigger; quick setups under GameObject › Safe Haven.
@@ -35,10 +35,12 @@ public enum TriggerRepeat
 [AddComponentMenu("Safe Haven/Quests/Quest Event Trigger")]
 public sealed class GameEventTrigger : MonoBehaviour
 {
-    private const float WardCheckInterval = 0.25f;
+    private const float AreaCheckInterval = 0.25f;
 
     [SerializeField, RaisedByGame] private GameEventDefinition gameEvent;
     [SerializeField] private TriggerWhen when = TriggerWhen.PlayerEntersZone;
+    [Tooltip("For Player Inside Area: the area to watch, a component that is one (the Heart Tree, for its ward).")]
+    [SerializeField] private Component area;
     [Tooltip("Once Per Game is remembered in the save, for story moments that must never repeat.")]
     [FormerlySerializedAs("onlyOnce")]
     [SerializeField] private TriggerRepeat repeat = TriggerRepeat.OncePerGame;
@@ -49,8 +51,8 @@ public sealed class GameEventTrigger : MonoBehaviour
 
     private Interactable interactable;
     private bool raised;
-    private float nextWardCheck;
-    private bool wasInsideWard;
+    private float nextAreaCheck;
+    private bool wasInside;
 
     public GameEventDefinition Event => gameEvent;
     public TriggerWhen When => when;
@@ -62,6 +64,20 @@ public sealed class GameEventTrigger : MonoBehaviour
         if (when == TriggerWhen.PlayerEntersZone && !HasTriggerCollider())
         {
             Debug.LogWarning($"{name}: Quest Event Trigger is set to Player Enters Zone but has no collider with Is Trigger ticked.", this);
+        }
+
+        if (when == TriggerWhen.PlayerInsideArea && !(area is IArea))
+        {
+            Debug.LogWarning($"{name}: Quest Event Trigger is set to Player Inside Area but has no area.", this);
+        }
+    }
+
+    // A GameObject dropped on the field arrives as its first component; take the one that is an area.
+    private void OnValidate()
+    {
+        if (area != null && !(area is IArea))
+        {
+            area = area.GetComponent<IArea>() as Component;
         }
     }
 
@@ -83,23 +99,22 @@ public sealed class GameEventTrigger : MonoBehaviour
 
     private void Update()
     {
-        if (when != TriggerWhen.PlayerInsideWard || Time.time < nextWardCheck)
+        if (when != TriggerWhen.PlayerInsideArea || Time.time < nextAreaCheck)
         {
             return;
         }
 
-        nextWardCheck = Time.time + WardCheckInterval;
+        nextAreaCheck = Time.time + AreaCheckInterval;
         Player player = Player.Current;
-        HeartTree tree = HeartTree.Current;
-        bool inside = player != null && tree != null && tree.Contains(player.transform.position);
+        bool inside = player != null && area is IArea watched && watched.Contains(player.transform.position);
         // Every Time raises on stepping in; one-time triggers keep trying while inside, so a condition that comes true
-        // while the player is already in the circle (finishing a quest at the tree) still counts.
-        if (inside && (repeat != TriggerRepeat.EveryTime || !wasInsideWard))
+        // while the player is already in the area (finishing a quest at the tree) still counts.
+        if (inside && (repeat != TriggerRepeat.EveryTime || !wasInside))
         {
             Raise(player.gameObject);
         }
 
-        wasInsideWard = inside;
+        wasInside = inside;
     }
 
     /// <summary>True when every condition is met and the event would be raised right now.</summary>

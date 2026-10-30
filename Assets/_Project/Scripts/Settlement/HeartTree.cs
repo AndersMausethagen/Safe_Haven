@@ -14,7 +14,7 @@ using UnityEngine;
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Interactable))]
-public sealed class HeartTree : MonoBehaviour
+public sealed class HeartTree : MonoBehaviour, IArea
 {
     /// <summary>What the tree says while a quest is active, so it points the way one step at a time.</summary>
     [System.Serializable]
@@ -59,6 +59,8 @@ public sealed class HeartTree : MonoBehaviour
         offset.y = 0f;
         return offset.magnitude + margin <= WardRadius;
     }
+
+    bool IArea.Contains(Vector3 position) => Contains(position);
 
     private void Awake()
     {

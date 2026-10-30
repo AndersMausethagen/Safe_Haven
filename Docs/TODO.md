@@ -74,7 +74,8 @@ Same review for Quests/ and Events/. Work top to bottom.
 3. [x] **Death subject without type checks.** Done: `IEventSubject` (MonsterAI, BuildingObject); the kind comes from
        the Damageable's category. `GameEvents.OnAnyDied` asks for MonsterAI, then BuildingObject; give the
        dying object a small interface for its definition (like `IInteractionName`).
-4. [ ] **No Heart Tree inside the generic trigger.** `GameEventTrigger`'s PlayerInsideWard polls `HeartTree.Current`;
+4. [x] **No Heart Tree inside the generic trigger.** Done: `TriggerWhen.PlayerInsideArea` watches any `IArea`
+       (HeartTree is one); the SafeHaven scene's Heart Tree Bloom points at the tree. `GameEventTrigger`'s PlayerInsideWard polls `HeartTree.Current`;
        an area interface (or a ward trigger component) keeps the trigger generic.
 5. [ ] Smaller: `QuestObjective.Name` switches on Item/Resource definitions (a shared display-name interface);
        `QuestGiver.CanInteract` advances its waiting lines (a query with a side effect); HeartTree keeps its own talked

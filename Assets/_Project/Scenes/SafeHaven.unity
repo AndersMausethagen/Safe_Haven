@@ -30124,6 +30124,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GameEventTrigger
   gameEvent: {fileID: 11400000, guid: ad183851ddcecbe44a19b74ad3392881, type: 2}
   when: 1
+  area: {fileID: 0}
   repeat: 0
   onlyDuringQuest: {fileID: 0}
   requires:
@@ -77230,6 +77231,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::GameEventTrigger
   gameEvent: {fileID: 11400000, guid: b3710131b64b67644a96acc43d56964c, type: 2}
   when: 1
+  area: {fileID: 0}
   repeat: 2
   onlyDuringQuest: {fileID: 11400000, guid: 84d6a79cd30dba342ae6ae24a0109f98, type: 2}
   requires:
@@ -115806,6 +115808,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::GameEventTrigger
   gameEvent: {fileID: 11400000, guid: 1f41472694654b946a93bec725e2174e, type: 2}
   when: 3
+  area: {fileID: 1522981856}
   repeat: 2
   onlyDuringQuest: {fileID: 0}
   requires:
@@ -120807,7 +120810,6 @@ MonoBehaviour:
     order: 0
   showMarker: 1
   offers: []
-  confirmInDialogue: 0
   speakerName: 
   portrait: {fileID: 0}
   dialogueCameraDistance: 0.65
