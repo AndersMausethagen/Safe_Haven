@@ -143,9 +143,9 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
                 AudioManager.Play(Sounds != null ? Sounds.CriticalHit : null, damage.HitPoint);
             }
 
-            if (victim.TryGetComponent(out MonsterAI monster) && monster.Definition != null)
+            if (victim.TryGetComponent(out IEventSubject known) && known.EventSubject is ICombatSounds sounds)
             {
-                AudioManager.Play(monster.Definition.HurtSound, victim.transform.position);
+                AudioManager.Play(sounds.HurtSound, victim.transform.position);
             }
         }
 

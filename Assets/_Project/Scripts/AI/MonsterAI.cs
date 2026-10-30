@@ -21,7 +21,7 @@ using UnityEngine.AI;
 [RequireComponent(typeof(Combatant))]
 [RequireComponent(typeof(Damageable))]
 [RequireComponent(typeof(NavMeshAgent))]
-public sealed class MonsterAI : MonoBehaviour, IEventSubject
+public sealed class MonsterAI : MonoBehaviour, IEventSubject, IStaggerable
 {
     public enum State
     {

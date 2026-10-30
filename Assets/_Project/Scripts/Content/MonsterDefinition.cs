@@ -7,7 +7,7 @@ using UnityEngine;
 /// values such as current health and current target live on its components.
 /// </summary>
 [CreateAssetMenu(fileName = "NewMonster", menuName = "Safe Haven/Monsters/Monster Definition")]
-public sealed class MonsterDefinition : ScriptableObject
+public sealed class MonsterDefinition : ScriptableObject, ICombatSounds
 {
     [Header("Identity")]
     [Tooltip("Stable unique identifier, used for lookups and saves.")]

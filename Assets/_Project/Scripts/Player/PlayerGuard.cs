@@ -181,12 +181,12 @@ public sealed class PlayerGuard : MonoBehaviour, IHitGuard
     {
         // Only an attacker within reach of its own swing staggers: parrying an arrow doesn't stun the archer.
         Combatant attacker = damage.Source;
-        if (attacker != null && attacker.TryGetComponent(out MonsterAI monster))
+        if (attacker != null && attacker.TryGetComponent(out IStaggerable staggerable))
         {
             float reach = damage.Attack != null ? damage.Attack.Range + 1.5f : 3f;
             if (Vector3.Distance(attacker.transform.position, transform.position) <= reach)
             {
-                monster.Stagger(Rules.ParryStagger);
+                staggerable.Stagger(Rules.ParryStagger);
             }
         }
 

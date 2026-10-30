@@ -34,7 +34,7 @@ public sealed class BuildingLevel
 /// yard kept clear in front of the entrance, building walls in lines) are read by BuildPlacer.
 /// </summary>
 [CreateAssetMenu(fileName = "NewBuilding", menuName = "Safe Haven/Buildings/Building Definition")]
-public sealed class BuildingDefinition : ScriptableObject
+public sealed class BuildingDefinition : ScriptableObject, ICombatSounds
 {
     [Header("Identity")]
     [Tooltip("Stable unique identifier, used for lookups and saves.")]
@@ -112,6 +112,7 @@ public sealed class BuildingDefinition : ScriptableObject
     public int OutputCapacity => Mathf.Max(1, outputCapacity);
     public int QueueLength => Mathf.Max(1, queueLength);
     public SoundDefinition DeathSound => deathSound;
+    SoundDefinition ICombatSounds.HurtSound => null;
     public float BuildWork => buildWork;
     public int Renown => renown;
     public IReadOnlyList<BuildingLevel> Upgrades => upgrades;

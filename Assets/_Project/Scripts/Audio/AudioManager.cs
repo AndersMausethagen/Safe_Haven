@@ -327,7 +327,7 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
     // Breaking training dummies or walls isn't a fight; only hits on creatures that fight back count.
     private void OnPlayerDealtDamage(IDamageable target, DamageInfo damage, DamageResult result)
     {
-        if (target is Damageable hit && hit.Category == TargetCategory.Creature && hit.TryGetComponent(out MonsterAI _))
+        if (target is Damageable hit && hit.Category == TargetCategory.Creature && hit.Faction.WillAttack(Faction.Player))
         {
             lastDamageTime = Time.unscaledTime;
         }
@@ -395,14 +395,9 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
             }
         }
 
-        if (victim.TryGetComponent(out MonsterAI monster) && monster.Definition != null && monster.Definition.DeathSound != null)
+        if (victim.TryGetComponent(out IEventSubject known) && known.EventSubject is ICombatSounds sounds && sounds.DeathSound != null)
         {
-            return monster.Definition.DeathSound;
-        }
-
-        if (victim.TryGetComponent(out BuildingObject building) && building.Definition != null && building.Definition.DeathSound != null)
-        {
-            return building.Definition.DeathSound;
+            return sounds.DeathSound;
         }
 
         return settings.DefaultDeathSound(victim.Category);

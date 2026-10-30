@@ -98,7 +98,9 @@ Same review for the rest of the runtime code (SOLID, Unity practice, no special-
        StationCrafting (deliver output), ResourceSource (harvest), SaveMapper (output id), ItemTooltipView,
        StationWindow (icon, tint, stack) and the quest/station names (now `IDisplayName`). One interface for what both
        share (id, name, icon, tint) and one place that gives an amount of either to someone (bag or material pool).
-3. [ ] **Monster checks outside AI.** AudioManager (death sound, "a fight is on"), CombatFeedback (hurt sound),
+3. [x] **Monster checks outside AI.** Done: `ICombatSounds` on Monster/BuildingDefinition (reached through
+       `IEventSubject`), `IStaggerable` (MonsterAI) for parries, and "a fight is on" from the hit's faction (a Neutral
+       creature never fights back). CompanionLeader keeps MonsterAI: companions fight monsters, like the spawners. Was: AudioManager (death sound, "a fight is on"), CombatFeedback (hurt sound),
        PlayerGuard (parry stagger) and CompanionLeader ask for `MonsterAI`. Sounds come from the definition the
        object reports (`IEventSubject` + a small sounds interface, like BuildingObject already has); stagger is an
        `IStaggerable`, so a companion or a future NPC can be staggered too.
