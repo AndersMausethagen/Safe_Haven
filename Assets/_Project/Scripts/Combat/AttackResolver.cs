@@ -50,6 +50,7 @@ public static class AttackResolver
 
             DamageResult result = hit.Target.ApplyDamage(damage);
             attacker.ReportDamageDealt(hit.Target, damage, result);
+            StatusEffects.AfterHit(attack, hit.Target, attacker, result);
         }
 
         return hits.Count;

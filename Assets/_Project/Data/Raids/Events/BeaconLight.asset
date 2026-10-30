@@ -1,0 +1,61 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2f02987ee9197d4682f5db8cbc7a967, type: 3}
+  m_Name: BeaconLight
+  m_EditorClassIdentifier: SafeHaven::RaidEventDefinition
+  id: BeaconLight
+  displayName: Old Beacon
+  weight: 1
+  earliestSeconds: 60
+  latestSecondsLeft: 60
+  minimumStage: 0
+  warning: 'A faint glow on the slope: an old beacon, still laid with dry wood.'
+  warningSound: {fileID: 11400000, guid: 53fe372285257d84faf9ea69968a9b0f, type: 2}
+  sitePrefab: {fileID: 7819783059902628876, guid: 03cd33812c655e5469457169b3a9d51d, type: 3}
+  siteDistance: {x: 35, y: 70}
+  siteText: A stone hearth on a bare rise, stacked with dry wood. You can see a long way from here, and a long way off, things can see it.
+  onStart: []
+  choices:
+  - label: Light it
+    detail: Shows you the land and every way out. Everything for a long way will come to look.
+    cost: []
+    result: It goes up with a roar. For a moment the whole forest is laid out in front of you.
+    outcomes:
+    - rid: 287758281410609281
+    - rid: 287758281410609282
+  - label: Keep a small fire and rest
+    detail: Heals you. Costs you 20 seconds.
+    cost: []
+    result: You sit with your hands to the warmth until they stop shaking.
+    outcomes:
+    - rid: 287758281410609283
+    - rid: 287758281410609284
+  references:
+    version: 2
+    RefIds:
+    - rid: 287758281410609281
+      type: {class: RevealMapOutcome, ns: , asm: SafeHaven}
+      data:
+        radius: 90
+        showExits: 1
+    - rid: 287758281410609282
+      type: {class: MakeNoiseOutcome, ns: , asm: SafeHaven}
+      data:
+        radius: 50
+    - rid: 287758281410609283
+      type: {class: ChangeTimeOutcome, ns: , asm: SafeHaven}
+      data:
+        seconds: -20
+    - rid: 287758281410609284
+      type: {class: ChangeHealthOutcome, ns: , asm: SafeHaven}
+      data:
+        share: 0.5

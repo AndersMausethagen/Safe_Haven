@@ -23,6 +23,9 @@ public readonly struct DamageInfo
     public readonly float Poise;
     public readonly HitTechnique Technique;
 
+    /// <summary>A tick of damage over time, not a blow: burning, poison.</summary>
+    public bool IsOverTime => (Technique & HitTechnique.OverTime) != 0;
+
     public DamageInfo(Combatant source, AttackDefinition attack, float amount, DamageType type, bool isCritical, Vector3 hitPoint, Vector3 direction)
         : this(source, attack, amount, type, isCritical, hitPoint, direction, attack != null ? attack.PoiseDamage : 0f, HitTechnique.None)
     {

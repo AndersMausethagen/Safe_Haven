@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
@@ -232,9 +232,18 @@ public sealed class PlayerInputHandler : MonoBehaviour
 
     private void OnSneak(InputAction.CallbackContext context)
     {
-        if (stealth != null)
+        if (stealth == null)
+        {
+            return;
+        }
+
+        if (!GameOptions.ToggleSneak.On)
         {
             stealth.SetSneaking(context.performed);
+        }
+        else if (context.performed)
+        {
+            stealth.SetSneaking(!stealth.IsSneaking);
         }
     }
 

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -31,6 +31,8 @@ public sealed class SaveData
     public List<string> happenedEvents = new List<string>();
     /// <summary>Level, experience and talents. Missing in older saves (they start at level 1).</summary>
     public ProgressSaveData progress = new ProgressSaveData();
+    /// <summary>What the player calls this save. Missing in older saves, which then go by their file.</summary>
+    public string displayName;
 }
 
 /// <summary>A PlaytestRun.</summary>

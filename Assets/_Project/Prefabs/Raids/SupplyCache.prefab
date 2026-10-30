@@ -369,6 +369,7 @@ MonoBehaviour:
   duration: 2
   range: 1.3
   deactivateOnComplete: 0
+  kind: 0
   started:
     m_PersistentCalls:
       m_Calls: []
@@ -492,6 +493,46 @@ MonoBehaviour:
       minQuantity: 1
       maxQuantity: 1
       probability: 0.12
+    - item: {fileID: 11400000, guid: 05a3b8e12c05cb548b40065962d3b860, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 2
+      probability: 0.3
+    - item: {fileID: 11400000, guid: e562a89aa50aaad4e8e01141f4286a98, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 2
+      probability: 0.3
+    - item: {fileID: 11400000, guid: 1dd65120c9bb0304c8a45a8012af934c, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.15
+    - item: {fileID: 11400000, guid: 3b62415dd6630ea4ca86bcf751d2891a, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.15
+    - item: {fileID: 11400000, guid: 62524af394010894c92b8227da600ceb, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.08
+    - item: {fileID: 11400000, guid: ab9557872793c7140880753d737120a3, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.06
+    - item: {fileID: 11400000, guid: 197836aae9a387a4e9df44734dcdcfcb, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.05
+    - item: {fileID: 11400000, guid: 874fb5b96495c954cbd9144a4eba5231, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.05
   fullVisual: {fileID: 7691639898665871457}
   emptyVisual: {fileID: 2452368823239758751}
 --- !u!1 &6165068319856631502

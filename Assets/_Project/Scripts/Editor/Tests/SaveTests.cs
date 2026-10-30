@@ -1,9 +1,10 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.TestTools;
 using Object = UnityEngine.Object;
 
 /// <summary>Edit Mode tests for turning the game's in-memory state into save files and back.</summary>
@@ -46,6 +47,7 @@ public sealed class SaveTests
         }
 
         created.Clear();
+        SaveGameService.Storage = null;
         if (Directory.Exists(folder))
         {
             Directory.Delete(folder, true);
@@ -243,6 +245,108 @@ public sealed class SaveTests
 
         Assert.IsTrue(storage.TryRead("slot", out SaveData read, out string error), error);
         Assert.AreEqual("First", read.scene);
+    }
+
+    private SaveData Written(SaveStorage storage, string slot, string name, string savedAt, int level = 1)
+    {
+        var data = new SaveData { version = SaveMapper.CurrentVersion, savedAtUtc = savedAt, scene = "SafeHaven", displayName = name };
+        data.progress.level = level;
+        storage.Write(slot, data);
+        return data;
+    }
+
+    [Test]
+    public void Slots_AreListedOnceEachAndABackupAloneStillCounts()
+    {
+        var storage = new SaveStorage(folder);
+        Assert.IsEmpty(storage.ListSlots(), "a folder that doesn't exist yet holds no saves");
+        Written(storage, "first", "One", "2026-10-01T10:00:00Z");
+        Written(storage, "first", "One", "2026-10-02T10:00:00Z");
+        Written(storage, "second", "Two", "2026-10-03T10:00:00Z");
+        File.Delete(storage.PathFor("second"));
+        Written(storage, "third", "Three", "2026-10-03T10:00:00Z");
+        Written(storage, "third", "Three", "2026-10-03T11:00:00Z");
+        File.Delete(storage.PathFor("third"));
+        File.WriteAllText(Path.Combine(folder, "notes.txt"), "not a save");
+        CollectionAssert.AreEquivalent(new[] { "first", "third" }, storage.ListSlots());
+    }
+
+    [Test]
+    public void Slots_ANewOneNeverTakesAnExistingFile()
+    {
+        var storage = new SaveStorage(folder);
+        var now = new DateTime(2026, 10, 30, 12, 0, 0);
+        string first = storage.NewSlot(now);
+        Written(storage, first, "One", "2026-10-30T12:00:00Z");
+        string second = storage.NewSlot(now);
+        Assert.AreNotEqual(first, second);
+        Written(storage, second, "Two", "2026-10-30T12:00:00Z");
+        Assert.AreNotEqual(second, storage.NewSlot(now));
+    }
+
+    [Test]
+    public void Saves_AreListedNewestFirstAndADamagedOneIsShownButNotChosen()
+    {
+        var storage = new SaveStorage(folder);
+        SaveGameService.Storage = storage;
+        Written(storage, "old", "Old Game", "2026-01-01T10:00:00Z", 2);
+        Written(storage, "new", "New Game", "2026-06-01T10:00:00Z", 7);
+        Directory.CreateDirectory(folder);
+        File.WriteAllText(storage.PathFor("broken"), "{ this is not a save");
+        LogAssert.ignoreFailingMessages = true;
+        List<SaveSlotInfo> saves = SaveGameService.ListSaves();
+        LogAssert.ignoreFailingMessages = false;
+        Assert.AreEqual(3, saves.Count);
+        var readable = saves.FindAll(save => save.IsReadable);
+        Assert.AreEqual("New Game", readable[0].Name);
+        Assert.AreEqual(7, readable[0].Level);
+        Assert.AreEqual("Old Game", readable[1].Name);
+        Assert.IsFalse(saves.Find(save => save.Slot == "broken").IsReadable);
+        Assert.AreEqual("new", SaveGameService.LatestSave().Slot);
+    }
+
+    [Test]
+    public void Saves_FromBeforeNamesGoByTheirFile()
+    {
+        Assert.AreEqual("Journey 1", SaveSlotInfo.NameFor(SaveStorage.DefaultSlot, new SaveData()));
+        Assert.AreEqual("save 2026-10-27 before new game", SaveSlotInfo.NameFor("save_2026-10-27_before_new_game", new SaveData()));
+        Assert.AreEqual("Mine", SaveSlotInfo.NameFor("save", new SaveData { displayName = "Mine" }));
+    }
+
+    [Test]
+    public void Saves_CanBeRenamedAndNotToNothing()
+    {
+        var storage = new SaveStorage(folder);
+        SaveGameService.Storage = storage;
+        Written(storage, "game", "Before", "2026-01-01T10:00:00Z");
+        Assert.IsFalse(SaveGameService.TryRename("game", "   ", out string problem));
+        Assert.IsNotEmpty(problem);
+        Assert.IsTrue(SaveGameService.TryRename("game", "  The Long Winter  ", out _));
+        Assert.AreEqual("The Long Winter", SaveGameService.ListSaves()[0].Name);
+        Assert.IsTrue(SaveGameService.TryRename("game", new string('x', 80), out _));
+        Assert.AreEqual(32, SaveGameService.ListSaves()[0].Name.Length);
+    }
+
+    [Test]
+    public void Saves_DeletingOneLeavesTheOthersAndItsBackupGoesToo()
+    {
+        var storage = new SaveStorage(folder);
+        SaveGameService.Storage = storage;
+        Written(storage, "keep", "Keep", "2026-01-01T10:00:00Z");
+        Written(storage, "drop", "Drop", "2026-01-01T10:00:00Z");
+        Written(storage, "drop", "Drop", "2026-01-02T10:00:00Z");
+        Assert.IsTrue(SaveGameService.TryDelete("drop", out _));
+        CollectionAssert.AreEqual(new[] { "keep" }, storage.ListSlots());
+        Assert.IsFalse(storage.Exists("drop"));
+        Assert.IsTrue(SaveGameService.HasSave);
+    }
+
+    [Test]
+    public void Saves_DescribeThemselves()
+    {
+        Assert.AreEqual("Safe Haven", SaveSlotInfo.PlaceName("SafeHaven"));
+        Assert.AreEqual("12 min played", SaveSlotInfo.DescribePlayed(725f));
+        Assert.AreEqual("3 h 20 min played", SaveSlotInfo.DescribePlayed(12000f));
     }
 
     [Test]

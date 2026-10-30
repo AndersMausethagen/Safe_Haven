@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
@@ -35,6 +35,16 @@ public enum IconShape
     Belt,
     Leggings,
     Boots,
+    Ring,
+    Amulet,
+    Mushroom,
+    Meat,
+    Bread,
+    Bowl,
+    Grain,
+    Turnip,
+    Jar,
+    Mug,
 }
 
 /// <summary>
@@ -101,8 +111,9 @@ public static class PlaceholderIconPainter
             case ArmorSlot.Feet:
                 return IconShape.Boots;
             case ArmorSlot.Neck:
+                return IconShape.Amulet;
             case ArmorSlot.Finger:
-                return IconShape.Rune;
+                return IconShape.Ring;
         }
 
         switch (tool)
@@ -354,6 +365,73 @@ public static class PlaceholderIconPainter
                 canvas.Draw(Union(Box(0.4f, 0.56f, 0.12f, 0.24f, 0f, 0.04f), Box(0.52f, 0.26f, 0.24f, 0.09f, 0f, 0.06f)), primary);
                 canvas.Draw(Box(0.52f, 0.16f, 0.26f, 0.03f, 0f, 0.01f), dark);
                 canvas.Draw(Box(0.4f, 0.76f, 0.13f, 0.04f, 0f, 0.015f), light, 0f);
+                break;
+
+            case IconShape.Ring:
+                canvas.Draw(Ring(0.5f, 0.42f, 0.22f, 0.07f), primary);
+                canvas.Draw(Circle(0.5f, 0.68f, 0.09f), secondary, 0.012f);
+                canvas.Highlight(0.47f, 0.71f, 0.03f, 0.02f, 0.6f);
+                break;
+
+            case IconShape.Amulet:
+                canvas.Draw(Ring(0.5f, 0.62f, 0.24f, 0.022f), dark, 0.008f);
+                canvas.Draw(Circle(0.5f, 0.32f, 0.15f), primary);
+                canvas.Draw(Circle(0.5f, 0.32f, 0.075f), secondary, 0.012f);
+                canvas.Highlight(0.45f, 0.37f, 0.03f, 0.02f, 0.6f);
+                break;
+
+            case IconShape.Mushroom:
+                canvas.Draw(Box(0.5f, 0.32f, 0.08f, 0.18f, 0f, 0.05f), secondary);
+                canvas.Draw(Intersect(Ellipse(0.5f, 0.5f, 0.32f, 0.26f, 0f), Box(0.5f, 0.66f, 0.34f, 0.2f, 0f, 0f)), primary);
+                canvas.Highlight(0.4f, 0.62f, 0.07f, 0.04f, 0.4f);
+                break;
+
+            case IconShape.Meat:
+                canvas.Draw(Ellipse(0.46f, 0.54f, 0.28f, 0.22f, -25f), primary);
+                canvas.Draw(Capsule(0.66f, 0.38f, 0.82f, 0.22f, 0.04f), secondary);
+                canvas.Draw(Circle(0.42f, 0.56f, 0.06f), light, 0f);
+                break;
+
+            case IconShape.Bread:
+                canvas.Draw(Union(Ellipse(0.5f, 0.44f, 0.34f, 0.2f, 0f), Box(0.5f, 0.36f, 0.32f, 0.1f, 0f, 0.04f)), primary);
+                canvas.Draw(Capsule(0.36f, 0.5f, 0.42f, 0.42f, 0.014f), dark, 0f);
+                canvas.Draw(Capsule(0.5f, 0.52f, 0.56f, 0.44f, 0.014f), dark, 0f);
+                canvas.Draw(Capsule(0.64f, 0.5f, 0.7f, 0.42f, 0.014f), dark, 0f);
+                break;
+
+            case IconShape.Bowl:
+                canvas.Draw(Ellipse(0.5f, 0.56f, 0.32f, 0.08f, 0f), secondary);
+                canvas.Draw(Intersect(Circle(0.5f, 0.56f, 0.32f), HalfPlaneBelow(0.56f)), wood);
+                canvas.Highlight(0.4f, 0.57f, 0.07f, 0.02f, 0.4f);
+                break;
+
+            case IconShape.Grain:
+                canvas.Draw(Capsule(0.5f, 0.14f, 0.5f, 0.82f, 0.012f), dark, 0f);
+                foreach (float y in new[] { 0.42f, 0.54f, 0.66f, 0.78f })
+                {
+                    canvas.Draw(Ellipse(0.42f, y, 0.05f, 0.08f, -25f), primary, 0.01f);
+                    canvas.Draw(Ellipse(0.58f, y, 0.05f, 0.08f, 25f), primary, 0.01f);
+                }
+
+                break;
+
+            case IconShape.Turnip:
+                canvas.Draw(Capsule(0.5f, 0.64f, 0.42f, 0.84f, 0.02f), secondary, 0.008f);
+                canvas.Draw(Capsule(0.5f, 0.64f, 0.58f, 0.84f, 0.02f), secondary, 0.008f);
+                canvas.Draw(Union(Circle(0.5f, 0.46f, 0.22f), Polygon(new Vector2(0.38f, 0.32f), new Vector2(0.62f, 0.32f), new Vector2(0.5f, 0.12f))), primary);
+                canvas.Highlight(0.42f, 0.52f, 0.05f, 0.05f, 0.4f);
+                break;
+
+            case IconShape.Jar:
+                canvas.Draw(Box(0.5f, 0.42f, 0.22f, 0.26f, 0f, 0.07f), primary);
+                canvas.Draw(Box(0.5f, 0.72f, 0.17f, 0.05f, 0f, 0.02f), secondary);
+                canvas.Highlight(0.42f, 0.5f, 0.04f, 0.1f, 0.45f);
+                break;
+
+            case IconShape.Mug:
+                canvas.Draw(Ring(0.72f, 0.46f, 0.11f, 0.04f), wood);
+                canvas.Draw(Box(0.46f, 0.44f, 0.22f, 0.26f, 0f, 0.03f), wood);
+                canvas.Draw(Ellipse(0.46f, 0.7f, 0.22f, 0.06f, 0f), primary);
                 break;
 
             default:

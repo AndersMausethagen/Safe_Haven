@@ -46,6 +46,17 @@ public static class RaidReportText
             builder.Append(gathering).Append("\n\n");
         }
 
+        if (report.Events != null && report.Events.Count > 0)
+        {
+            builder.Append("<b>On the way</b>\n");
+            foreach (string happened in report.Events)
+            {
+                builder.Append($"<color={Muted}>{happened}</color>\n");
+            }
+
+            builder.Append('\n');
+        }
+
         foreach (ResidentDefinition rescued in report.Rescued)
         {
             builder.Append($"<b><color={Gain}>{rescued.DisplayName} came home with you.</color></b>\n<i>\"{rescued.ArrivalLine}\"</i>\n\n");

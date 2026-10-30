@@ -48,6 +48,12 @@ public sealed class AttackDefinition : ScriptableObject
     [Tooltip("Stamina the player pays for it. Below 0 uses the player's normal attack cost.")]
     [SerializeField] private float staminaCost = -1f;
 
+    [Header("Status")]
+    [Tooltip("Left behind by a hit that gets through (not blocked or parried): poison, chill, roots. Empty: none.")]
+    [SerializeField] private StatusEffectDefinition appliesStatus;
+    [Tooltip("Chance from 0 to 1 that a hit leaves the status.")]
+    [SerializeField, Range(0f, 1f)] private float statusChance = 1f;
+
     [Header("Animation (player)")]
     [Tooltip("Animator state the swing plays, by name (Safe Haven › Characters › Set Up Combat Animations makes them). " +
              "Empty uses the weapon stance's old attack animation.")]
@@ -87,6 +93,8 @@ public sealed class AttackDefinition : ScriptableObject
     public float PoiseDamage => poiseDamage;
     public float Lunge => lunge;
     public float StaminaCost => staminaCost;
+    public StatusEffectDefinition AppliesStatus => appliesStatus;
+    public float StatusChance => statusChance;
     public string AnimationState => animationState;
     public float AnimationSpeed => animationSpeed;
     public float FollowThroughSpeed => followThroughSpeed;

@@ -39,11 +39,14 @@ public sealed class RaidReport
         SparksUsed = session.SparksUsed;
         ReturnScene = session.ReturnScene;
         Gathering = session.Gathering;
+        Events = session.EventLog;
     }
 
     public RaidDefinition Definition { get; }
     /// <summary>How the player gathered: swings, criticals and the forest's peak annoyance.</summary>
     public GatheringStats Gathering { get; }
+    /// <summary>The raid events met and the choices made, in order.</summary>
+    public IReadOnlyList<string> Events { get; }
     public string RaidName { get; }
     /// <summary>The scene the player goes back to after reading the report.</summary>
     public string ReturnScene { get; }

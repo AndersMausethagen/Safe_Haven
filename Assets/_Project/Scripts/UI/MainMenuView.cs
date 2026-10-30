@@ -1,12 +1,12 @@
-using System;
-using System.Globalization;
+﻿using System.Globalization;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
 /// <summary>
-/// The start menu: start a new game, load the saved one (shown with when it was saved) or quit. It only reads the save
-/// to describe it; starting and loading go through SaveGameService.
+/// The start menu: start a new game, carry on with the newest save (shown with what it is), pick another from the saved
+/// games, change the options or quit. It only reads saves to describe them; starting and loading go through
+/// SaveGameService. A new game gets a save of its own, so it never touches the others.
 /// </summary>
 public sealed class MainMenuView : MonoBehaviour
 {
@@ -19,16 +19,49 @@ public sealed class MainMenuView : MonoBehaviour
     [SerializeField] private Button newGameButton;
     [SerializeField] private Button loadGameButton;
     [SerializeField] private Button exitButton;
+    [Tooltip("Empty: made at start as a copy of the Exit button, which moves down to make room.")]
+    [SerializeField] private Button savesButton;
+    [Tooltip("Empty: made at start as a copy of the Exit button, which moves down to make room.")]
+    [SerializeField] private Button optionsButton;
+    [Tooltip("How far the Exit button moves down for each button made.")]
+    [SerializeField, Min(0f)] private float buttonSpacing = 72f;
     [Tooltip("Describes the save under the Load Game button.")]
     [SerializeField] private TMP_Text saveInfoLabel;
     [Tooltip("Reports problems, such as a damaged save.")]
     [SerializeField] private TMP_Text statusLabel;
+
+    private SaveSlotInfo latest;
+
+    private void Awake()
+    {
+        savesButton = savesButton != null ? savesButton : AddButton("Saved Games Button", "SAVED GAMES");
+        optionsButton = optionsButton != null ? optionsButton : AddButton("Options Button", "OPTIONS");
+    }
+
+    // A copy of the Exit button in its place; Exit moves down one step.
+    private Button AddButton(string objectName, string text)
+    {
+        Button button = Instantiate(exitButton, exitButton.transform.parent);
+        button.name = objectName;
+        TMP_Text label = button.GetComponentInChildren<TMP_Text>();
+        if (label != null)
+        {
+            label.text = text;
+        }
+
+        var exitRect = (RectTransform)exitButton.transform;
+        ((RectTransform)button.transform).anchoredPosition = exitRect.anchoredPosition;
+        exitRect.anchoredPosition += Vector2.down * buttonSpacing;
+        return button;
+    }
 
     private void OnEnable()
     {
         newGameButton.onClick.AddListener(NewGame);
         loadGameButton.onClick.AddListener(LoadGame);
         exitButton.onClick.AddListener(Exit);
+        savesButton.onClick.AddListener(OpenSaves);
+        optionsButton.onClick.AddListener(OpenOptions);
     }
 
     private void OnDisable()
@@ -36,6 +69,8 @@ public sealed class MainMenuView : MonoBehaviour
         newGameButton.onClick.RemoveListener(NewGame);
         loadGameButton.onClick.RemoveListener(LoadGame);
         exitButton.onClick.RemoveListener(Exit);
+        savesButton.onClick.RemoveListener(OpenSaves);
+        optionsButton.onClick.RemoveListener(OpenOptions);
     }
 
     private void Start()
@@ -46,16 +81,19 @@ public sealed class MainMenuView : MonoBehaviour
 
     private void RefreshSave()
     {
-        if (!SaveGameService.HasSave)
+        savesButton.interactable = SaveGameService.HasSave;
+        latest = SaveGameService.LatestSave();
+        loadGameButton.interactable = latest != null;
+        if (latest != null)
         {
-            loadGameButton.interactable = false;
-            saveInfoLabel.text = "No saved game yet. The prologue saves safe checkpoints; press F5 at home to save.";
-            return;
+            saveInfoLabel.text = $"{latest.Name}, last saved {latest.SavedAt.ToString("d MMM yyyy, HH:mm", CultureInfo.InvariantCulture)}";
         }
-
-        bool readable = SaveGameService.TryReadSave(out SaveData save, out string problem);
-        loadGameButton.interactable = readable;
-        saveInfoLabel.text = readable ? $"Last saved {Describe(save.savedAtUtc)}" : $"<color=#FF7B6B>{problem}</color>";
+        else
+        {
+            saveInfoLabel.text = SaveGameService.HasSave
+                ? "<color=#FF7B6B>No save can be loaded. See Saved Games.</color>"
+                : "No saved game yet. The prologue saves safe checkpoints; press F5 at home to save.";
+        }
     }
 
     private void NewGame()
@@ -72,7 +110,12 @@ public sealed class MainMenuView : MonoBehaviour
 
     private void LoadGame()
     {
-        if (SaveGameService.TryLoad(content, fallbackLoadScene, out string problem))
+        if (latest == null)
+        {
+            return;
+        }
+
+        if (SaveGameService.TryLoad(latest.Slot, content, fallbackLoadScene, out string problem))
         {
             SetButtons(false);
         }
@@ -82,6 +125,10 @@ public sealed class MainMenuView : MonoBehaviour
             RefreshSave();
         }
     }
+
+    private void OpenSaves() => SavesScreen.Open(content, fallbackLoadScene, RefreshSave, () => SetButtons(false));
+
+    private static void OpenOptions() => OptionsScreen.Open();
 
     private static void Exit()
     {
@@ -97,12 +144,7 @@ public sealed class MainMenuView : MonoBehaviour
         newGameButton.interactable = interactable;
         loadGameButton.interactable = interactable;
         exitButton.interactable = interactable;
-    }
-
-    private static string Describe(string savedAtUtc)
-    {
-        return DateTime.TryParse(savedAtUtc, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out DateTime saved)
-            ? saved.ToLocalTime().ToString("d MMM yyyy, HH:mm", CultureInfo.InvariantCulture)
-            : "at an unknown time";
+        savesButton.interactable = interactable;
+        optionsButton.interactable = interactable;
     }
 }

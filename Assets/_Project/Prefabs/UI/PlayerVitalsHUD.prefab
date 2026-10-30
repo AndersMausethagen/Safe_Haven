@@ -2924,6 +2924,7 @@ GameObject:
   - component: {fileID: 1406806516999724221}
   - component: {fileID: 282500696814046423}
   - component: {fileID: 835034681540660938}
+  - component: {fileID: 8981782131860958907}
   m_Layer: 0
   m_Name: PlayerVitalsHUD
   m_TagString: Untagged
@@ -3024,7 +3025,24 @@ MonoBehaviour:
   staminaFrame: {fileID: 6857804814292429750}
   exhaustedColor: {r: 0.85, g: 0.32, b: 0.18, a: 1}
   flashDuration: 0.4
+  dodgeCooldownGlow: {r: 0.95, g: 0.16, b: 0.08, a: 0.95}
+  glowSpread: 9
   group: {fileID: 282500696814046423}
+--- !u!114 &8981782131860958907
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3824065097922945948}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0afa807ae071ab4698ceb4ba9e68b11, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::PlayerConditionsView
+  offset: {x: 0, y: -8}
+  fontSize: 15
+  boonColor: {r: 0.91, g: 0.77, b: 0.42, a: 1}
 --- !u!1 &3908122065205491854
 GameObject:
   m_ObjectHideFlags: 0

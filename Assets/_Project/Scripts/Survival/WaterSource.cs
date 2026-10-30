@@ -13,8 +13,10 @@ using UnityEngine;
 [RequireComponent(typeof(Interactable))]
 public sealed class WaterSource : MonoBehaviour, IInteractionName
 {
-    public string InteractionName => "Stream";
+    public string InteractionName => string.IsNullOrWhiteSpace(sourceName) ? "Stream" : sourceName;
 
+    [Tooltip("What the prompt calls it. Empty: Stream.")]
+    [SerializeField] private string sourceName;
     [Tooltip("Thirst restored by drinking here.")]
     [SerializeField, Min(0f)] private float drinkAmount = 100f;
     [Tooltip("The water container handed out, such as a Waterskin. Empty means the source is only for drinking.")]

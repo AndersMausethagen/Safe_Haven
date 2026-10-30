@@ -1,0 +1,93 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2f02987ee9197d4682f5db8cbc7a967, type: 3}
+  m_Name: CursedTree
+  m_EditorClassIdentifier: SafeHaven::RaidEventDefinition
+  id: CursedTree
+  displayName: The Blighted Tree
+  weight: 1
+  earliestSeconds: 60
+  latestSecondsLeft: 90
+  minimumStage: 0
+  warning: One tree stands dead in the green, and the ground around it is black.
+  warningSound: {fileID: 11400000, guid: 4cc9bc40fb223354aa6032cf0c7fb0f2, type: 2}
+  sitePrefab: {fileID: 3587139044830951848, guid: 4b5befddc72dfe940a9f019b42bedab8, type: 3}
+  siteDistance: {x: 35, y: 70}
+  siteText: Rot runs up the trunk in black veins and something like a pulse moves under the bark. Roots stir by your feet.
+  onStart: []
+  choices:
+  - label: Cut out the rot
+    detail: Costs 30 seconds. Rootlings will defend it.
+    cost: []
+    result: It screams without sound. Clean sap runs from the wound, and it gives something back.
+    outcomes:
+    - rid: 287758281410609300
+    - rid: 287758281410609301
+    - rid: 287758281410609302
+  - label: Drink from the black sap
+    detail: Strength for 4 minutes, and poison in your blood.
+    cost: []
+    result: It tastes like the bottom of a well.
+    outcomes:
+    - rid: 287758281410609303
+    - rid: 287758281410609304
+  references:
+    version: 2
+    RefIds:
+    - rid: 287758281410609300
+      type: {class: ChangeTimeOutcome, ns: , asm: SafeHaven}
+      data:
+        seconds: -30
+    - rid: 287758281410609301
+      type: {class: SpawnCreaturesOutcome, ns: , asm: SafeHaven}
+      data:
+        prefabs:
+        - {fileID: 6176781864247096722, guid: a8ac1434006f7a44fb55b3c510633858, type: 3}
+        count: 1
+        radius: 5
+        hunt: 1
+    - rid: 287758281410609302
+      type: {class: GiveLootOutcome, ns: , asm: SafeHaven}
+      data:
+        loot:
+          entries:
+          - item: {fileID: 0}
+            resource: {fileID: 11400000, guid: e991fd5ccf0ce314cafafff8badfe173, type: 2}
+            minQuantity: 2
+            maxQuantity: 3
+            probability: 1
+          - item: {fileID: 11400000, guid: 7e57bf86766de2341bd9c47b5830cf76, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 2
+            maxQuantity: 4
+            probability: 1
+          - item: {fileID: 11400000, guid: 50d6dfa982b3a264980eaec31b4aae11, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 1
+            maxQuantity: 2
+            probability: 0.6
+    - rid: 287758281410609303
+      type: {class: ApplyStatusOutcome, ns: , asm: SafeHaven}
+      data:
+        effect: {fileID: 11400000, guid: 5e5542ad4304a994f97fcb8f9b6e0f46, type: 2}
+    - rid: 287758281410609304
+      type: {class: GiveBoonOutcome, ns: , asm: SafeHaven}
+      data:
+        name: Black Sap
+        bonuses:
+        - stat: 13
+          op: 0
+          value: 6
+        - stat: 15
+          op: 0
+          value: 15
+        seconds: 240

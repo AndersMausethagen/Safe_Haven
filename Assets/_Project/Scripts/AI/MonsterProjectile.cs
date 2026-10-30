@@ -63,6 +63,7 @@ public sealed class MonsterProjectile : MonoBehaviour
                 DamageInfo info = DamageCalculator.Build(owner, attack, damage, victim.Category, hit.point, direction, Random.value);
                 DamageResult result = victim.ApplyDamage(info);
                 owner.ReportDamageDealt(victim, info, result);
+                StatusEffects.AfterHit(attack, victim, owner, result);
             }
             PrefabPool.Release(gameObject);
             return;

@@ -202,7 +202,7 @@ public sealed class PlayerGathering : MonoBehaviour
 
     private void OnDamaged(DamageInfo info, DamageResult result)
     {
-        if (Session != null && GatheringMinigameSettings.Current.InterruptOnHit)
+        if (Session != null && GatheringMinigameSettings.Current.InterruptOnHit && !info.IsOverTime)
         {
             GameMessages.Post("Gathering interrupted.", MessageKind.Warning);
             stateMachine.EndInteraction();

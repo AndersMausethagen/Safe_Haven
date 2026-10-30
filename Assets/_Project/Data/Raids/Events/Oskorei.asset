@@ -1,0 +1,53 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2f02987ee9197d4682f5db8cbc7a967, type: 3}
+  m_Name: Oskorei
+  m_EditorClassIdentifier: SafeHaven::RaidEventDefinition
+  id: Oskorei
+  displayName: The Oskorei
+  weight: 0.8
+  earliestSeconds: 150
+  latestSecondsLeft: 60
+  minimumStage: 1
+  warning: A horn, far off and coming closer. The Oskorei ride. Get off the path, or be ready.
+  warningSound: {fileID: 11400000, guid: 6510718f5af764e4aa78349c4b3f7cdf, type: 2}
+  sitePrefab: {fileID: 0}
+  siteDistance: {x: 35, y: 70}
+  siteText: 
+  onStart:
+  - rid: 287758281410609294
+  - rid: 287758281410609295
+  - rid: 287758281410609296
+  choices: []
+  references:
+    version: 2
+    RefIds:
+    - rid: 287758281410609294
+      type: {class: MakeNoiseOutcome, ns: , asm: SafeHaven}
+      data:
+        radius: 40
+    - rid: 287758281410609295
+      type: {class: SpawnCreaturesOutcome, ns: , asm: SafeHaven}
+      data:
+        prefabs:
+        - {fileID: 9066855856663566298, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
+        count: 2
+        radius: 34
+        hunt: 1
+    - rid: 287758281410609296
+      type: {class: SpawnCreaturesOutcome, ns: , asm: SafeHaven}
+      data:
+        prefabs:
+        - {fileID: 7477446688404098989, guid: 237fc76d161bb114aa2049a864298943, type: 3}
+        count: 2
+        radius: 30
+        hunt: 1

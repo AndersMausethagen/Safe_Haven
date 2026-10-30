@@ -146,7 +146,7 @@ public sealed class PlayerGuard : MonoBehaviour, IHitGuard
         {
             if (combat != null && combat.HasShield)
             {
-                return shieldLetThrough;
+                return combat.Shield != null ? combat.Shield.GuardLetThrough : shieldLetThrough;
             }
 
             return combat != null && combat.Weapon != null ? combat.Weapon.GuardLetThrough : Rules.UnarmedLetThrough;
@@ -156,7 +156,7 @@ public sealed class PlayerGuard : MonoBehaviour, IHitGuard
     public GuardOutcome Guard(in DamageInfo damage, out float letThrough)
     {
         letThrough = 1f;
-        if (!isActiveAndEnabled)
+        if (!isActiveAndEnabled || damage.IsOverTime)
         {
             return GuardOutcome.None;
         }

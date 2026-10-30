@@ -1,0 +1,104 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2f02987ee9197d4682f5db8cbc7a967, type: 3}
+  m_Name: ThreeWishes
+  m_EditorClassIdentifier: SafeHaven::RaidEventDefinition
+  id: ThreeWishes
+  displayName: Three Wishes
+  weight: 0.8
+  earliestSeconds: 90
+  latestSecondsLeft: 100
+  minimumStage: 0
+  warning: A hooded stranger stands at a crossing in the trees. You could swear they weren't there before.
+  warningSound: {fileID: 11400000, guid: 4cc9bc40fb223354aa6032cf0c7fb0f2, type: 2}
+  sitePrefab: {fileID: 5231722663379009252, guid: eb150ca2a9fe8dd42a5b3278c781c95d, type: 3}
+  siteDistance: {x: 35, y: 70}
+  siteText: '"Three roads," says the stranger, not looking up. "Take one. I always collect."'
+  onStart: []
+  choices:
+  - label: Ask for strength
+    detail: +25% damage for 3 minutes. It takes a quarter of your health to give it.
+    cost: []
+    result: Something in your arms wakes up. Something in your chest goes quiet.
+    outcomes:
+    - rid: 287758281410609257
+    - rid: 287758281410609258
+  - label: Ask for riches
+    detail: A troll's idol, worth a great deal. Everything nearby will know you have it.
+    cost: []
+    result: It's heavier than it looks, and the forest has noticed.
+    outcomes:
+    - rid: 287758281410609259
+    - rid: 287758281410609260
+    - rid: 287758281410609261
+  - label: Ask for time
+    detail: +2 minutes on the clock. -25 health until it's paid back.
+    cost: []
+    result: The light shifts. You feel older.
+    outcomes:
+    - rid: 287758281410609262
+    - rid: 287758281410609263
+  references:
+    version: 2
+    RefIds:
+    - rid: 287758281410609257
+      type: {class: ChangeHealthOutcome, ns: , asm: SafeHaven}
+      data:
+        share: -0.25
+    - rid: 287758281410609258
+      type: {class: GiveBoonOutcome, ns: , asm: SafeHaven}
+      data:
+        name: Stranger's Strength
+        bonuses:
+        - stat: 14
+          op: 0
+          value: 0.25
+        seconds: 180
+    - rid: 287758281410609259
+      type: {class: GiveLootOutcome, ns: , asm: SafeHaven}
+      data:
+        loot:
+          entries:
+          - item: {fileID: 11400000, guid: 6a6c76b4e635d9e48be91d875f758c4a, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 1
+            maxQuantity: 1
+            probability: 1
+    - rid: 287758281410609260
+      type: {class: SpawnCreaturesOutcome, ns: , asm: SafeHaven}
+      data:
+        prefabs:
+        - {fileID: 4584692032328657812, guid: 64cf9de042e1bc142907212054f70f50, type: 3}
+        count: 1
+        radius: 12
+        hunt: 1
+    - rid: 287758281410609261
+      type: {class: SpawnCreaturesOutcome, ns: , asm: SafeHaven}
+      data:
+        prefabs:
+        - {fileID: 6176781864247096722, guid: a8ac1434006f7a44fb55b3c510633858, type: 3}
+        count: 1
+        radius: 12
+        hunt: 1
+    - rid: 287758281410609262
+      type: {class: ChangeTimeOutcome, ns: , asm: SafeHaven}
+      data:
+        seconds: 120
+    - rid: 287758281410609263
+      type: {class: GiveBoonOutcome, ns: , asm: SafeHaven}
+      data:
+        name: Borrowed Time
+        bonuses:
+        - stat: 0
+          op: 0
+          value: -25
+        seconds: 300

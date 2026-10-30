@@ -1,0 +1,106 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2f02987ee9197d4682f5db8cbc7a967, type: 3}
+  m_Name: LivingStones
+  m_EditorClassIdentifier: SafeHaven::RaidEventDefinition
+  id: LivingStones
+  displayName: The Living Path
+  weight: 0.9
+  earliestSeconds: 60
+  latestSecondsLeft: 110
+  minimumStage: 0
+  warning: Close by, stone grinds on stone. The runestones are moving.
+  warningSound: {fileID: 11400000, guid: ad5c451edd0edde49967af502c90ec94, type: 2}
+  sitePrefab: {fileID: 1745827551758765297, guid: c3220598a4d922b4cb9f391a54f9ebd3, type: 3}
+  siteDistance: {x: 35, y: 70}
+  siteText: 'Three runestones stand where the path should be. One is green with fresh moss. One is warm to the touch. One is scored with claw marks. Old rhyme: "Moss grows slow, so moss won''t lie."'
+  onStart: []
+  choices:
+  - label: Follow the mossy stone
+    detail: It hasn't moved in a long time.
+    cost: []
+    result: The path opens, and it leads somewhere shorter than it should.
+    outcomes:
+    - rid: 287758281410609285
+    - rid: 287758281410609286
+  - label: Follow the warm stone
+    detail: Something is under it. Could be good.
+    cost: []
+    result: You put your shoulder to it.
+    outcomes:
+    - rid: 287758281410609287
+  - label: Follow the clawed stone
+    detail: Something else went this way.
+    cost: []
+    result: The path closes behind you, and the cold comes up out of the ground.
+    outcomes:
+    - rid: 287758281410609292
+    - rid: 287758281410609293
+  references:
+    version: 2
+    RefIds:
+    - rid: 287758281410609285
+      type: {class: ChangeTimeOutcome, ns: , asm: SafeHaven}
+      data:
+        seconds: 90
+    - rid: 287758281410609286
+      type: {class: RevealMapOutcome, ns: , asm: SafeHaven}
+      data:
+        radius: 40
+        showExits: 0
+    - rid: 287758281410609287
+      type: {class: ChanceOutcome, ns: , asm: SafeHaven}
+      data:
+        chance: 0.5
+        ifLucky:
+        - rid: 287758281410609288
+        - rid: 287758281410609289
+        ifNot:
+        - rid: 287758281410609290
+        - rid: 287758281410609291
+    - rid: 287758281410609288
+      type: {class: TellOutcome, ns: , asm: SafeHaven}
+      data:
+        text: A hollow under it, and something left there long ago.
+        kind: 1
+    - rid: 287758281410609289
+      type: {class: GiveLootOutcome, ns: , asm: SafeHaven}
+      data:
+        loot:
+          entries:
+          - item: {fileID: 11400000, guid: cbe9df10f8fa88f47be2f012ec678577, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 1
+            maxQuantity: 1
+            probability: 1
+          - item: {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 3
+            maxQuantity: 5
+            probability: 1
+    - rid: 287758281410609290
+      type: {class: TellOutcome, ns: , asm: SafeHaven}
+      data:
+        text: Nothing. The path has moved while your back was turned.
+        kind: 2
+    - rid: 287758281410609291
+      type: {class: ChangeTimeOutcome, ns: , asm: SafeHaven}
+      data:
+        seconds: -45
+    - rid: 287758281410609292
+      type: {class: ChangeTimeOutcome, ns: , asm: SafeHaven}
+      data:
+        seconds: -60
+    - rid: 287758281410609293
+      type: {class: ApplyStatusOutcome, ns: , asm: SafeHaven}
+      data:
+        effect: {fileID: 11400000, guid: 32e9e33fb8f2e0748970b5e855fe720e, type: 2}

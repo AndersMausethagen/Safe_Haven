@@ -196,7 +196,9 @@ public sealed class ItemInventory : MonoBehaviour
         var needs = GetComponent<PlayerNeeds>();
         bool heals = item.HealAmount > 0f && health.CurrentHealth < health.MaxHealth;
         bool feeds = needs != null && ((item.HungerRestore > 0f && !needs.Hunger.IsFull) || (item.ThirstRestore > 0f && !needs.Thirst.IsFull));
-        if (!heals && !feeds)
+        // A meal's bonuses are worth eating for on a full belly: that is the meal before a raid.
+        bool helps = item.HasBoon || (item.Cures.Count > 0 && Cures(item));
+        if (!heals && !feeds && !helps)
         {
             GameMessages.Post(item.HealAmount > 0f && item.HungerRestore <= 0f && item.ThirstRestore <= 0f
                 ? "Already at full health."
@@ -230,6 +232,25 @@ public sealed class ItemInventory : MonoBehaviour
 
         GameEvents.Raise(new GameEvent(GameEventKind.Consumed, item, 1, gameObject));
         return true;
+    }
+
+    // True when one of the status effects the item cures is on its user.
+    private bool Cures(ItemDefinition item)
+    {
+        if (!TryGetComponent(out StatusEffects effects))
+        {
+            return false;
+        }
+
+        foreach (StatusEffectDefinition effect in item.Cures)
+        {
+            if (effects.Has(effect))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /// <summary>Throws away a whole stack to make room. There are no ground items yet, so it is gone for good.</summary>

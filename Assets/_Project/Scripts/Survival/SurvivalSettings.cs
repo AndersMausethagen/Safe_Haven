@@ -36,6 +36,10 @@ public sealed class SurvivalSettings : GameSettings<SurvivalSettings>
     [Tooltip("Stamina regeneration in combat is multiplied by this.")]
     [SerializeField, Range(0f, 1f)] private float parchedCombatRegeneration = 0.5f;
 
+    [Header("Meals")]
+    [Tooltip("How many cooked meals can give their bonuses at once (GDD §11.4). Another meal pushes out the one closest to ending. Tonics don't count.")]
+    [SerializeField, Min(1)] private int mealSlots = 2;
+
     public float MaxHunger => maxHunger;
     public float MaxThirst => maxThirst;
     public float StartingHunger => startingHunger;
@@ -47,6 +51,7 @@ public sealed class SurvivalSettings : GameSettings<SurvivalSettings>
     public float StarvingMaxStamina => starvingMaxStamina;
     public float StarvingRegeneration => starvingRegeneration;
     public float ParchedCombatRegeneration => parchedCombatRegeneration;
+    public int MealSlots => Mathf.Max(1, mealSlots);
 
     /// <summary>Minutes a full meter lasts at the given drain, for the Systems Editor. Infinity when it doesn't drain.</summary>
     public static float MinutesToEmpty(float max, float perMinute, float multiplier = 1f)

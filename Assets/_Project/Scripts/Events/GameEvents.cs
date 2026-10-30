@@ -27,6 +27,8 @@ public enum GameEventKind
     Built = 9,
     /// <summary>Something was eaten or drunk. Subject: the ItemDefinition or ResourceDefinition consumed.</summary>
     Consumed = 10,
+    /// <summary>A raid event began (Amount 0) or the player acted on it (Amount: the choice, from 1). Subject: the RaidEventDefinition.</summary>
+    RaidEvent = 11,
 }
 
 /// <summary>

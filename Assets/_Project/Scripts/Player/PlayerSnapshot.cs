@@ -62,6 +62,8 @@ public sealed class PlayerSnapshot
     // Null when the snapshot was taken without a PlayerSkills (a save file): applying it then leaves the skills alone.
     private SkillDefinition[] skillLoadout;
     private Condition condition = Condition.None;
+    // Meals and other boons at work. Kept through the portal; a failed raid and a save file leave them behind.
+    private readonly List<BoonRecord> boons = new List<BoonRecord>();
 
     private PlayerSnapshot()
     {
@@ -162,6 +164,12 @@ public sealed class PlayerSnapshot
             snapshot.skillLoadout = skills.Loadout.ToArray();
         }
 
+        PlayerBoons playerBoons = player != null ? player.GetComponent<PlayerBoons>() : null;
+        if (playerBoons != null)
+        {
+            snapshot.boons.AddRange(playerBoons.Capture());
+        }
+
         return snapshot;
     }
 
@@ -258,6 +266,12 @@ public sealed class PlayerSnapshot
         if (equipment != null)
         {
             equipment.Restore(gear, hasGear, condition.EquippedSlot);
+        }
+
+        PlayerBoons playerBoons = player.GetComponent<PlayerBoons>();
+        if (playerBoons != null)
+        {
+            playerBoons.Restore(boons);
         }
 
         return unplaced;

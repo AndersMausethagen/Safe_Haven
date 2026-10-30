@@ -1,0 +1,117 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42e5c6da77934e8439571a13e158376a, type: 3}
+  m_Name: BlightBoar
+  m_EditorClassIdentifier: SafeHaven::MonsterDefinition
+  id: BlightBoar
+  displayName: Blight Boar
+  description: A boar gone sour in the blighted thickets. It will let you pass at a distance. Step too close and it comes straight at you, and stands blown and open when the charge is spent.
+  combatStats: {fileID: 11400000, guid: e62e0bcd763692144a6e4d543bfcc9b3, type: 2}
+  faction: 1
+  drops:
+    entries:
+    - item: {fileID: 11400000, guid: 8dbb4db9361b13f4d9df890da55ab723, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 2
+      maxQuantity: 3
+      probability: 1
+    - item: {fileID: 11400000, guid: 5022422f3d793b34dab4ad85e9581321, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 2
+      probability: 0.8
+    - item: {fileID: 11400000, guid: f502c59e5645f1c4f98fbca7982042d4, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.4
+    - item: {fileID: 0}
+      resource: {fileID: 11400000, guid: c0e409a7cd38400498ff1c7037737b96, type: 2}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.5
+  unlocksRecipes: []
+  animatorController: {fileID: 0}
+  prefab: {fileID: 8653230728158633359, guid: a661dc05d2e43f943a476376f636ef9a, type: 3}
+  experience: 0
+  attack: {fileID: 11400000, guid: 66435e9db0670ee4eaf6c67757f0857f, type: 2}
+  attackDamage: 8
+  attackCooldown: 0.6
+  moveSpeed: 4.6
+  detectionRange: 9
+  chaseRange: 18
+  leashRange: 24
+  sightAngle: 140
+  closeSenseRange: 3
+  hearing: 1
+  alertness: 1
+  attacks:
+  - attack: {fileID: 11400000, guid: 66435e9db0670ee4eaf6c67757f0857f, type: 2}
+    kind: 2
+    damage: 20
+    minimumRange: 3
+    maximumRange: 9
+    priority: 20
+    cooldown: 4
+    interruptible: 0
+    projectilePrefab: {fileID: 0}
+    burstCount: 1
+    burstInterval: 0.2
+    projectileSpeed: 13
+    projectileRadius: 0.15
+    chargeSpeed: 13
+    chargeDistance: 9
+    exposedSeconds: 2.5
+    buffRadius: 10
+    buffSeconds: 8
+    damageBonus: 0.05
+    packLeaderOnly: 0
+    summonPrefab: {fileID: 0}
+    summonCount: 2
+    summonRadius: 3
+    summonLimit: 4
+  - attack: {fileID: 11400000, guid: b18c885baf9358444a2ae7d863e2181e, type: 2}
+    kind: 0
+    damage: 12
+    minimumRange: 0
+    maximumRange: 1.8
+    priority: 10
+    cooldown: 1
+    interruptible: 0
+    projectilePrefab: {fileID: 0}
+    burstCount: 1
+    burstInterval: 0.2
+    projectileSpeed: 12
+    projectileRadius: 0.15
+    chargeSpeed: 12
+    chargeDistance: 8
+    exposedSeconds: 2
+    buffRadius: 10
+    buffSeconds: 8
+    damageBonus: 0.05
+    packLeaderOnly: 0
+    summonPrefab: {fileID: 0}
+    summonCount: 2
+    summonRadius: 3
+    summonLimit: 4
+  movementTactic: 0
+  temperament: 5
+  preferredDistance: 7
+  distanceTolerance: 1.5
+  fleeHealthFraction: 0.25
+  fleeDistance: 10
+  defensiveRadius: 11
+  hoverHeight: 0
+  poise: 70
+  deathSound: {fileID: 0}
+  hurtSound: {fileID: 0}
+  attackSound: {fileID: 0}

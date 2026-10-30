@@ -1,11 +1,12 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 /// <summary>
 /// How a monster carries out a strike once it has chosen to: aimed when it starts (so a target can still dodge), landing
 /// through AttackResolver at the attack's Hit Delay, then recovering. The definition's actions (MonsterAttack) add
-/// projectile bursts, charges that leave it exposed and howls that rally its side, each with its own cooldown. Plain C#,
-/// owned by a MonsterAI, which decides when to strike and what to do after.
+/// projectile bursts, charges that leave it exposed, howls that rally its side and summons that call in others, each with
+/// its own cooldown. Plain C#, owned by a MonsterAI, which decides when to strike and what to do after.
 /// </summary>
 public sealed class MonsterAttacks
 {
@@ -15,6 +16,7 @@ public sealed class MonsterAttacks
     private readonly MonsterMovement movement;
     private readonly LayerMask targetLayers;
     private readonly float[] readyAt;
+    private readonly List<GameObject> summoned = new List<GameObject>();
 
     private float nextAttackTime;
     private float startTime;
@@ -76,7 +78,7 @@ public sealed class MonsterAttacks
     {
         foreach (MonsterAttack candidate in definition.Attacks)
         {
-            if (candidate != null && candidate.attack != null && candidate.kind != MonsterAttackKind.Howl
+            if (candidate != null && candidate.attack != null && candidate.kind != MonsterAttackKind.Howl && candidate.kind != MonsterAttackKind.Summon
                 && distance >= candidate.minimumRange && distance <= candidate.maximumRange)
             {
                 return true;
@@ -196,6 +198,13 @@ public sealed class MonsterAttacks
                     Howl();
                 }
                 return elapsed < attack.RecoveryTime || Finish();
+            case MonsterAttackKind.Summon:
+                if (hitPending)
+                {
+                    hitPending = false;
+                    Summon();
+                }
+                return elapsed < attack.RecoveryTime || Finish();
             default:
                 if (hitPending)
                 {
@@ -256,6 +265,66 @@ public sealed class MonsterAttacks
         }
 
         GameMessages.Post($"{definition.DisplayName} howls! Nearby monsters gain +{action.damageBonus:P0} damage.", MessageKind.Warning);
+    }
+
+    // Others of its kind rise around it and go for the player. A raid gives them its own strength.
+    private void Summon()
+    {
+        if (action.summonPrefab == null)
+        {
+            Debug.LogError($"{definition.DisplayName}: summon action has no prefab.", self);
+            return;
+        }
+
+        summoned.RemoveAll(IsGone);
+        int called = 0;
+        Player player = Player.Current;
+        for (int i = 0; i < action.summonCount && summoned.Count < action.summonLimit; i++)
+        {
+            Vector2 offset = Random.insideUnitCircle.normalized * action.summonRadius;
+            if (!NavMesh.SamplePosition(self.position + new Vector3(offset.x, 0f, offset.y), out NavMeshHit hit, action.summonRadius, NavMesh.AllAreas))
+            {
+                continue;
+            }
+
+            GameObject root = Object.Instantiate(action.summonPrefab, hit.position, self.rotation, self.parent);
+            summoned.Add(root);
+            called++;
+            if (RaidDirector.Current != null)
+            {
+                RaidDirector.Current.PrepareSpawned(root, true);
+            }
+            else if (player != null)
+            {
+                foreach (MonsterAI ai in root.GetComponentsInChildren<MonsterAI>())
+                {
+                    ai.Engage(player.Health);
+                }
+            }
+        }
+
+        if (called > 0)
+        {
+            GameMessages.Post($"{definition.DisplayName} calls up its kin!", MessageKind.Warning);
+        }
+    }
+
+    private static bool IsGone(GameObject root)
+    {
+        if (root == null)
+        {
+            return true;
+        }
+
+        foreach (MonsterAI ai in root.GetComponentsInChildren<MonsterAI>())
+        {
+            if (ai.CurrentState != MonsterAI.State.Dead)
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private void FireProjectile(Vector3? aimPoint)

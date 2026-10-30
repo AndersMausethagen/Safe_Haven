@@ -26,6 +26,14 @@ public enum CraftingStationType
     [InspectorName("Sawbench")] Sawbench = 7,
     /// <summary>The repaired portal: Portal Sparks from Life Orbs.</summary>
     [InspectorName("Portal")] Portal = 8,
+    /// <summary>Proper cooking: meals with lasting bonuses (GDD Kitchen / Cauldron).</summary>
+    [InspectorName("Kitchen")] Kitchen = 9,
+    /// <summary>Hides into cured leather.</summary>
+    [InspectorName("Tanning Rack")] Tannery = 10,
+    /// <summary>Crops: a seed crop goes in, grows on its own, even during raids, and waits to be harvested (GDD Farm Plot).</summary>
+    [InspectorName("Farm Plot")] Farm = 11,
+    /// <summary>Bees turn flowers and berries into honey.</summary>
+    [InspectorName("Beehive")] Beehive = 12,
 }
 
 public static class CraftingStationTypes
@@ -44,6 +52,10 @@ public static class CraftingStationTypes
                 return "Forge";
             case CraftingStationType.AlchemyTable:
                 return "Cauldron";
+            case CraftingStationType.Tannery:
+                return "Tanning Rack";
+            case CraftingStationType.Farm:
+                return "Farm Plot";
             default:
                 return type.ToString();
         }

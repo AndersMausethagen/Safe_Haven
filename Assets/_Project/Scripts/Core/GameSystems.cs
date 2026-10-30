@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -70,6 +70,7 @@ public sealed class GameSystems : MonoBehaviour
         Add<PlaytestLogger>().Initialise(PlaytestSettings.Current);
 
         Add<ExperienceTracker>().Initialise(LevelingSettings.Current);
+        Add<OptionsSystem>().Initialise();
 
         SceneManager.sceneLoaded += OnSceneLoaded;
     }

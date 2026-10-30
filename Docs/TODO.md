@@ -38,6 +38,31 @@ Open work and ideas. Tick items off (`[x]`) or delete them when done. Architectu
 - [ ] Per-material stack size tuning after playtest (hides 20, trollstone 10, the rest 50).
 - [ ] Show the weight of a full stack in the raid preparation window, so the loadout's weight is visible before leaving.
 
+## Saved games (2026-10-30)
+
+- [ ] Show a picture of the place or the settlement on each save's row.
+- [ ] Saves with the same name are allowed; decide if that should stay.
+- [ ] Save list: confirm it stays quick with many saves (each row reads its whole file when the list opens).
+
+## Options (2026-10-30)
+
+- [ ] Key prompts written into text ("[E]" in `WorldInteractionIndicator`, "(N)", "(H)") should use `GameInput.KeyLabel`, so they follow a rebind.
+- [ ] Still missing from GDD §18.5: colour-independent signals and audio cues, and combat difficulty assists.
+
+## New content (2026-10-30)
+
+Raid events, gear, food, buildings and creatures are in, built by `AgentScripts/BuildGear.cs`, `BuildFood.cs`,
+`BuildCreatures.cs` and `BuildRaidEvents.cs` (run them in that order). Open:
+
+- [ ] Balance everything by playing: numbers are first guesses against the existing gear and monsters.
+- [ ] Decide the raid length. `MistyWoods.asset` has `durationSeconds: 300` while its stages and exits are written for 720.
+      Event windows are in seconds, so they fit either way, but fewer events fit in 300 s.
+- [ ] Real models and icons: new creatures, buildings and event sites are placeholder shapes.
+- [ ] Fit shields and new weapons in the hand (Safe Haven › Characters › Held Item Grips): grips are copied from similar items.
+- [ ] Status icons: conditions show as words above the vitals (GDD §10.6 asks for icons).
+- [ ] Scout Post (GDD §14.2): show the raid's coming events as rumours in the briefing.
+- [ ] Runic Ward Totem and defender roles for ward breaches.
+
 ## Code quality: SOLID refactor (analysis 2026-10-29)
 
 Rules written as special cases instead of following the existing model. Work top to bottom.

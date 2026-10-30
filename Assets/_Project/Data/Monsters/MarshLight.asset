@@ -1,0 +1,83 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42e5c6da77934e8439571a13e158376a, type: 3}
+  m_Name: MarshLight
+  m_EditorClassIdentifier: SafeHaven::MonsterDefinition
+  id: MarshLight
+  displayName: Marsh Light
+  description: A pale light drifting over wet ground. Follow it and it leads you off the path; get close and it runs. Its cold bolts slow you for what comes next.
+  combatStats: {fileID: 11400000, guid: b8ca0c73cc33aff4dbeb9ca5927ae2d3, type: 2}
+  faction: 1
+  drops:
+    entries:
+    - item: {fileID: 11400000, guid: c7138267f80f6644fb98ef1cc46e7dab, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.6
+    - item: {fileID: 0}
+      resource: {fileID: 11400000, guid: c0e409a7cd38400498ff1c7037737b96, type: 2}
+      minQuantity: 1
+      maxQuantity: 2
+      probability: 0.8
+  unlocksRecipes: []
+  animatorController: {fileID: 0}
+  prefab: {fileID: 5318185529198269020, guid: d281dc652b3e50445a465365ff40b433, type: 3}
+  experience: 0
+  attack: {fileID: 11400000, guid: 1a8ce5e4a858b50499cd9b8a27946517, type: 2}
+  attackDamage: 8
+  attackCooldown: 0.6
+  moveSpeed: 4.2
+  detectionRange: 15
+  chaseRange: 24
+  leashRange: 40
+  sightAngle: 300
+  closeSenseRange: 2
+  hearing: 0.6
+  alertness: 1.1
+  attacks:
+  - attack: {fileID: 11400000, guid: 1a8ce5e4a858b50499cd9b8a27946517, type: 2}
+    kind: 1
+    damage: 9
+    minimumRange: 3
+    maximumRange: 13
+    priority: 10
+    cooldown: 2.2
+    interruptible: 0
+    projectilePrefab: {fileID: 4774033439812504928, guid: 3b487dc075c5e8b44ab745829152528c, type: 3}
+    burstCount: 1
+    burstInterval: 0.2
+    projectileSpeed: 9
+    projectileRadius: 0.2
+    chargeSpeed: 9
+    chargeDistance: 8
+    exposedSeconds: 2
+    buffRadius: 10
+    buffSeconds: 8
+    damageBonus: 0.05
+    packLeaderOnly: 0
+    summonPrefab: {fileID: 0}
+    summonCount: 2
+    summonRadius: 3
+    summonLimit: 4
+  movementTactic: 1
+  temperament: 3
+  preferredDistance: 9
+  distanceTolerance: 1.5
+  fleeHealthFraction: 0.35
+  fleeDistance: 10
+  defensiveRadius: 8
+  hoverHeight: 1.1
+  poise: 15
+  deathSound: {fileID: 0}
+  hurtSound: {fileID: 0}
+  attackSound: {fileID: 0}

@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -66,6 +66,7 @@ public static class GameInput
     public static InputAction Point => Find("UI/Point");
     public static InputAction Click => Find("UI/Click");
     public static InputAction Submit => Find("UI/Submit");
+    public static InputAction Cancel => Find("UI/Cancel");
     public static InputAction Advance => Find("UI/Advance");
     public static InputAction SplitModifier => Find("UI/SplitModifier");
     public static InputAction DiscardModifier => Find("UI/DiscardModifier");
@@ -78,6 +79,34 @@ public static class GameInput
     private static readonly string[] SkillPaths = { "Player/Skill1", "Player/Skill2", "Player/Skill3", "Player/Skill4", "Player/Skill5" };
     private static readonly string[] AnswerPaths =
         { "UI/Answer1", "UI/Answer2", "UI/Answer3", "UI/Answer4", "UI/Answer5", "UI/Answer6", "UI/Answer7", "UI/Answer8", "UI/Answer9" };
+
+    private static readonly List<InputActionMap> Suspended = new List<InputActionMap>();
+
+    /// <summary>
+    /// Turns off every map but UI until <see cref="ResumeGameplay"/>, for when a key means something else for a moment:
+    /// choosing a new key, typing a name. The screen stays alive; everything that plays the game waits.
+    /// </summary>
+    public static void SuspendGameplay()
+    {
+        foreach (InputActionMap map in InputSystem.actions.actionMaps)
+        {
+            if (map.enabled && map.name != "UI")
+            {
+                Suspended.Add(map);
+                map.Disable();
+            }
+        }
+    }
+
+    public static void ResumeGameplay()
+    {
+        foreach (InputActionMap map in Suspended)
+        {
+            map.Enable();
+        }
+
+        Suspended.Clear();
+    }
 
     /// <summary>Where the pointer (mouse, pen, touch) is on the screen.</summary>
     public static Vector2 PointerPosition => Point.ReadValue<Vector2>();
@@ -113,6 +142,7 @@ public static class GameInput
     {
         Found.Clear();
         foundIn = null;
+        Suspended.Clear();
     }
 
     private static InputAction Find(string path)

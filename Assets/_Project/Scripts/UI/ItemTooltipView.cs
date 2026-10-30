@@ -235,6 +235,21 @@ public sealed class ItemTooltipView : MonoBehaviour
         {
             builder.Append("\n<color=#8BE08B>").Append(DescribeRestores(item.HealAmount, item.HungerRestore, item.ThirstRestore))
                 .Append(held ? " Right-click to use." : "").Append("</color>");
+            if (item.HasBoon)
+            {
+                builder.Append($"\n<color=#E8C46A>{(item.IsTonic ? "Tonic" : "Meal")}: {DescribeBonuses(item.BoonBonuses)} for {RaidStats.FormatTime(item.BoonSeconds)}.</color>");
+            }
+
+            if (item.Cures.Count > 0)
+            {
+                var cured = new System.Collections.Generic.List<string>();
+                foreach (StatusEffectDefinition effect in item.Cures)
+                {
+                    cured.Add(effect.DisplayName);
+                }
+
+                builder.Append($"\n<color=#8BE08B>Cures {string.Join(", ", cured)}.</color>");
+            }
         }
 
         if (item.IsBlueprint)
@@ -277,6 +292,18 @@ public sealed class ItemTooltipView : MonoBehaviour
         }
 
         return builder.ToString();
+    }
+
+    /// <summary>"+3 Strength, +15 Max Stamina".</summary>
+    public static string DescribeBonuses(System.Collections.Generic.IReadOnlyList<StatBonus> bonuses)
+    {
+        var parts = new System.Collections.Generic.List<string>();
+        foreach (StatBonus bonus in bonuses)
+        {
+            parts.Add(bonus.Describe());
+        }
+
+        return string.Join(", ", parts);
     }
 
     /// <summary>"Restores 30 health, 40 hunger." – the parts that are above zero.</summary>

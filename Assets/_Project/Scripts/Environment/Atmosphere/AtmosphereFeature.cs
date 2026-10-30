@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering;
 using UnityEngine.Rendering;
@@ -27,6 +27,9 @@ public sealed class AtmosphereFeature : ScriptableRendererFeature
     [SerializeField] private Shader shader;
     [Tooltip("Gathers the fog at this share of the screen's resolution.")]
     [SerializeField, Range(0.25f, 1f)] private float fogResolution = 0.5f;
+
+    /// <summary>Share of Fog Resolution the fog is drawn at: the player's Volumetric Fog setting. 1 is as authored.</summary>
+    public static float QualityScale { get; set; } = 1f;
 
     private Material material;
     private AtmospherePass pass;
@@ -74,7 +77,7 @@ public sealed class AtmosphereFeature : ScriptableRendererFeature
             return;
         }
 
-        pass.Setup(fog, fogOn, fogOfWar, warOn, fogResolution);
+        pass.Setup(fog, fogOn, fogOfWar, warOn, Mathf.Max(0.25f, fogResolution * QualityScale));
         pass.ConfigureInput(ScriptableRenderPassInput.Depth);
         renderer.EnqueuePass(pass);
     }

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -296,7 +296,8 @@ public sealed class DialogueBox : MonoBehaviour
 
         if (!Revealed)
         {
-            lineLabel.maxVisibleCharacters = Mathf.Min(letters, Mathf.FloorToInt((Time.unscaledTime - revealStarted) * LettersPerSecond));
+            float shown = (Time.unscaledTime - revealStarted) * GameOptions.DialogueLettersPerSecond(LettersPerSecond);
+            lineLabel.maxVisibleCharacters = float.IsInfinity(shown) || shown >= letters ? letters : Mathf.FloorToInt(shown);
             UpdateHint();
         }
 
@@ -433,7 +434,7 @@ public sealed class DialogueBox : MonoBehaviour
         subtitleDone = done;
         subtitle.text = string.IsNullOrWhiteSpace(speakerName) ? line : $"<color=#E8C46A>{speakerName}:</color> {line}";
         subtitleStrip.SetActive(true);
-        float seconds = 1f + (line ?? "").Length / SubtitleLettersPerSecond;
+        float seconds = (1f + (line ?? "").Length / SubtitleLettersPerSecond) * GameOptions.SubtitleHold;
         subtitleEnds = Time.time + Mathf.Clamp(seconds, SubtitleMinSeconds, SubtitleMaxSeconds);
     }
 

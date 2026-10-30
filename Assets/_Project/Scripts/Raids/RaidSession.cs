@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -21,6 +21,11 @@ public enum RaidOutcome
 /// </summary>
 public sealed class RaidSession
 {
+    private const float MinimumSecondsLeft = 15f;
+
+    private readonly List<string> eventLog = new List<string>();
+    private float bonusSeconds;
+
     public RaidSession(
         RaidDefinition definition,
         IReadOnlyList<RaidModifierDefinition> modifiers,
@@ -60,8 +65,12 @@ public sealed class RaidSession
     public string ReturnScene { get; }
     /// <summary>How the player gathered this raid, for the summary.</summary>
     public GatheringStats Gathering { get; } = new GatheringStats();
+    /// <summary>What happened on the way (raid events and the choices made), for the summary.</summary>
+    public IReadOnlyList<string> EventLog => eventLog;
     public float Elapsed { get; private set; }
-    public float TimeRemaining => Mathf.Max(0f, Parameters.Duration - Elapsed);
+    /// <summary>The raid's length: its rules plus what events have added or taken away.</summary>
+    public float TotalSeconds => Parameters.Duration + bonusSeconds;
+    public float TimeRemaining => Mathf.Max(0f, TotalSeconds - Elapsed);
     public RaidOutcome Outcome { get; private set; } = RaidOutcome.InProgress;
     public bool IsOver => Outcome != RaidOutcome.InProgress;
 
@@ -73,8 +82,28 @@ public sealed class RaidSession
             return false;
         }
 
-        Elapsed = Mathf.Min(Elapsed + deltaTime, Parameters.Duration);
-        return Elapsed >= Parameters.Duration && End(RaidOutcome.TimeExpired);
+        Elapsed = Mathf.Min(Elapsed + deltaTime, TotalSeconds);
+        return Elapsed >= TotalSeconds && End(RaidOutcome.TimeExpired);
+    }
+
+    /// <summary>Adds seconds to the clock, or takes them away; an event can't end the raid on the spot.</summary>
+    public void AddTime(float seconds)
+    {
+        bonusSeconds = Mathf.Max(bonusSeconds + seconds, Elapsed + MinimumSecondsLeft - Parameters.Duration);
+    }
+
+    /// <summary>Notes something that happened, for the summary, in place of <paramref name="replaces"/> when it was noted.</summary>
+    public void RecordEvent(string what, string replaces = null)
+    {
+        int at = replaces != null ? eventLog.IndexOf(replaces) : -1;
+        if (at >= 0)
+        {
+            eventLog[at] = what;
+        }
+        else
+        {
+            eventLog.Add(what);
+        }
     }
 
     public static int NewSeed()

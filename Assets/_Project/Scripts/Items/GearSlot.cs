@@ -80,7 +80,7 @@ public static class GearSlots
         switch (slot)
         {
             case GearSlot.MainHand:
-                return item.IsWeapon;
+                return item.IsWeapon && !item.Weapon.IsShield;
             case GearSlot.OffHand:
                 return item.IsWeapon && item.Weapon.CanUseOffHand;
             case GearSlot.Backpack:
@@ -201,7 +201,7 @@ public static class GearSlots
 
         if (item.IsWeapon)
         {
-            return item.Weapon.CanUseOffHand ? "Main Hand / Off Hand" : item.Weapon.RequiresBothHands ? "Both Hands" : "Main Hand";
+            return item.Weapon.IsShield ? "Off Hand" : item.Weapon.CanUseOffHand ? "Main Hand / Off Hand" : item.Weapon.RequiresBothHands ? "Both Hands" : "Main Hand";
         }
 
         if (item.IsBackpack)

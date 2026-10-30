@@ -370,6 +370,46 @@ public sealed class RaidSection : ContentSection
     }
 }
 
+/// <summary>Raid events in the Content Editor: what can happen during a raid and the choices offered.</summary>
+public sealed class RaidEventSection : ContentSection
+{
+    public override string Title => "Raid Events";
+    public override string Noun => "Raid Event";
+    public override string SidebarGroup => "Raids";
+    public override Type AssetType => typeof(RaidEventDefinition);
+    public override string Folder => "Assets/_Project/Data/Raids/Events";
+    public override string Help =>
+        "Things that happen during a raid: a warning, a place to reach and choices with a price. Add one to a raid's pool in " +
+        "Systems Editor > Raids & Portal > Raid Systems > Raid Events.";
+
+    public override List<string> FindProblems(Object asset, IList<Object> all)
+    {
+        List<string> problems = base.FindProblems(asset, all);
+        var raidEvent = (RaidEventDefinition)asset;
+        if (string.IsNullOrWhiteSpace(raidEvent.Warning))
+        {
+            problems.Add("No warning: the player won't know it happened.");
+        }
+
+        if (raidEvent.SitePrefab == null && raidEvent.OnStart.Count == 0)
+        {
+            problems.Add("No site and nothing on start, so nothing happens.");
+        }
+
+        if (raidEvent.SitePrefab != null && raidEvent.SitePrefab.GetComponent<RaidEventSite>() == null)
+        {
+            problems.Add("Its site prefab has no RaidEventSite.");
+        }
+
+        if (raidEvent.SitePrefab == null && raidEvent.Choices.Count > 0)
+        {
+            problems.Add("It has choices but no site to make them at.");
+        }
+
+        return problems;
+    }
+}
+
 /// <summary>Raid modifiers in the Content Editor: what they change and which items let the player use them.</summary>
 public sealed class RaidModifierSection : ContentSection
 {

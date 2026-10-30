@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 /// <summary>
 /// Shows a floating number whenever the Damageable on this object is hit. The numbers come from the scene's
@@ -32,6 +32,11 @@ public sealed class DamageNumberSpawner : MonoBehaviour
 
     private void OnDamaged(DamageInfo info, DamageResult result)
     {
+        if (!GameOptions.DamageNumbers.On)
+        {
+            return;
+        }
+
         if (prefab == null || result.Damage <= 0f)
         {
             return;

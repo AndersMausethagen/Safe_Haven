@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public enum MonsterAttackKind { Melee, Projectile, Charge, Howl }
+public enum MonsterAttackKind { Melee, Projectile, Charge, Howl, Summon }
 public enum MonsterMovementTactic { Chase, KeepDistance }
 
 [Flags]
@@ -39,6 +39,13 @@ public sealed class MonsterAttack
     [Min(0.1f)] public float buffSeconds = 8f;
     [Range(0f, 1f)] public float damageBonus = 0.05f;
     public bool packLeaderOnly;
+    [Header("Summon")]
+    [Tooltip("The creature called in. It appears near the summoner and goes straight for the player.")]
+    public GameObject summonPrefab;
+    [Min(1)] public int summonCount = 2;
+    [Min(0.5f)] public float summonRadius = 3f;
+    [Tooltip("The most of its summons alive at once.")]
+    [Min(1)] public int summonLimit = 4;
 
     public bool IsAvailable(float distance, float now, float readyAt, bool isLeader)
     {

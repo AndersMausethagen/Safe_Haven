@@ -148,9 +148,12 @@ public sealed class PlayerCombat : MonoBehaviour
 
     public bool HasShield
     {
-        get => hasShield;
+        get => hasShield || Shield != null;
         set => hasShield = value;
     }
+
+    /// <summary>The shield in the off hand (PlayerEquipment sets it), or null. Its Guard Let Through decides blocks.</summary>
+    public WeaponDefinition Shield { get; set; }
 
     /// <summary>True while a swing is going.</summary>
     public bool IsAttacking => activeKind != SwingKind.None;
@@ -317,7 +320,7 @@ public sealed class PlayerCombat : MonoBehaviour
 
         if (guard != null && guard.IsGuarding)
         {
-            if (hasShield)
+            if (HasShield)
             {
                 Request(SwingKind.ShieldBash, ChainPress.Late);
                 return;
@@ -394,7 +397,7 @@ public sealed class PlayerCombat : MonoBehaviour
     // Kept for gamepads and scripts that ask for a bash directly.
     private void OnShieldBashRequested()
     {
-        if (hasShield)
+        if (HasShield)
         {
             Request(SwingKind.ShieldBash, ChainPress.Late);
         }
@@ -667,7 +670,7 @@ public sealed class PlayerCombat : MonoBehaviour
     // is lost. Trading blows loses; read the telegraph, guard or get out of the way.
     private void OnHurt(DamageInfo damage, DamageResult result)
     {
-        if (result.Blocked || result.Killed || health == null || result.Damage < health.MaxHealth * Rules.FlinchShare)
+        if (result.Blocked || result.Killed || damage.IsOverTime || health == null || result.Damage < health.MaxHealth * Rules.FlinchShare)
         {
             return;
         }

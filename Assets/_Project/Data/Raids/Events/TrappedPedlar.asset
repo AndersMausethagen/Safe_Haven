@@ -1,0 +1,102 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2f02987ee9197d4682f5db8cbc7a967, type: 3}
+  m_Name: TrappedPedlar
+  m_EditorClassIdentifier: SafeHaven::RaidEventDefinition
+  id: TrappedPedlar
+  displayName: Cries from the Ditch
+  weight: 1
+  earliestSeconds: 40
+  latestSecondsLeft: 90
+  minimumStage: 0
+  warning: Someone is shouting for help, off the path.
+  warningSound: {fileID: 11400000, guid: 53fe372285257d84faf9ea69968a9b0f, type: 2}
+  sitePrefab: {fileID: 8216466046246968194, guid: c01d4d922b5f33041ba5c004979e6d57, type: 3}
+  siteDistance: {x: 35, y: 70}
+  siteText: A pedlar lies pinned under a fallen spruce, his pack just out of his reach. "Please. They'll smell me soon."
+  onStart: []
+  choices:
+  - label: Lift the log
+    detail: Costs you 45 seconds, and it's loud work.
+    cost: []
+    result: He limps off into the trees, but not before pressing his purse into your hand.
+    outcomes:
+    - rid: 287758281410609252
+    - rid: 287758281410609253
+    - rid: 287758281410609254
+  - label: Take his pack and go
+    detail: Quick. You'll carry it with you for a while.
+    cost: []
+    result: You don't look back. His voice follows you for a long time.
+    outcomes:
+    - rid: 287758281410609255
+    - rid: 287758281410609256
+  references:
+    version: 2
+    RefIds:
+    - rid: 287758281410609252
+      type: {class: ChangeTimeOutcome, ns: , asm: SafeHaven}
+      data:
+        seconds: -45
+    - rid: 287758281410609253
+      type: {class: MakeNoiseOutcome, ns: , asm: SafeHaven}
+      data:
+        radius: 20
+    - rid: 287758281410609254
+      type: {class: GiveLootOutcome, ns: , asm: SafeHaven}
+      data:
+        loot:
+          entries:
+          - item: {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 3
+            maxQuantity: 6
+            probability: 1
+          - item: {fileID: 11400000, guid: d0c7b274979b4ad46a9f3bf89b8cfa64, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 1
+            maxQuantity: 1
+            probability: 0.6
+          - item: {fileID: 11400000, guid: 3b62415dd6630ea4ca86bcf751d2891a, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 1
+            maxQuantity: 1
+            probability: 0.4
+          - item: {fileID: 11400000, guid: 1dd65120c9bb0304c8a45a8012af934c, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 1
+            maxQuantity: 2
+            probability: 0.5
+    - rid: 287758281410609255
+      type: {class: GiveLootOutcome, ns: , asm: SafeHaven}
+      data:
+        loot:
+          entries:
+          - item: {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 2
+            maxQuantity: 4
+            probability: 1
+          - item: {fileID: 11400000, guid: 616026fe07c265041bdcd10e32bcd168, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 1
+            maxQuantity: 2
+            probability: 0.6
+    - rid: 287758281410609256
+      type: {class: GiveBoonOutcome, ns: , asm: SafeHaven}
+      data:
+        name: Guilty Conscience
+        bonuses:
+        - stat: 15
+          op: 0
+          value: -15
+        seconds: 180

@@ -29,3 +29,15 @@ MonoBehaviour:
     weight: 1
     maxPerGroup: 0
     minPerGroup: 0
+  - prefab: {fileID: 4999243170976522981, guid: 07a704aacccfef242886f2875ff4fcdf, type: 3}
+    weight: 1
+    maxPerGroup: 0
+    minPerGroup: 0
+  - prefab: {fileID: 5318185529198269020, guid: d281dc652b3e50445a465365ff40b433, type: 3}
+    weight: 1
+    maxPerGroup: 0
+    minPerGroup: 0
+  - prefab: {fileID: 6176781864247096722, guid: a8ac1434006f7a44fb55b3c510633858, type: 3}
+    weight: 1
+    maxPerGroup: 0
+    minPerGroup: 0

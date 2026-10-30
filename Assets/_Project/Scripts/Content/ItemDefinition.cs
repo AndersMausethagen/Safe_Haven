@@ -91,6 +91,14 @@ public sealed class ItemDefinition : ScriptableObject, IStackDefinition
     [SerializeField, Min(0f)] private float hungerRestore;
     [Tooltip("Thirst restored when the item is drunk.")]
     [SerializeField, Min(0f)] private float thirstRestore;
+    [Tooltip("Bonuses for Boon Seconds after it is eaten or drunk (GDD §11.4): Strength, Max Stamina, Move Speed, Gather Yield...")]
+    [SerializeField] private List<StatBonus> boonBonuses = new List<StatBonus>();
+    [Tooltip("Seconds its bonuses last.")]
+    [SerializeField, Min(0f)] private float boonSeconds = 300f;
+    [Tooltip("A tonic: its bonuses take no meal slot.")]
+    [SerializeField] private bool tonic;
+    [Tooltip("Status effects it takes away: an antidote cures Poison.")]
+    [SerializeField] private List<StatusEffectDefinition> cures = new List<StatusEffectDefinition>();
 
     [Header("Backpack")]
     [Tooltip("Extra carry weight for the bag while this backpack is worn. 0 means it isn't a backpack.")]
@@ -147,8 +155,14 @@ public sealed class ItemDefinition : ScriptableObject, IStackDefinition
     public float HealAmount => healAmount;
     public float HungerRestore => hungerRestore;
     public float ThirstRestore => thirstRestore;
-    /// <summary>True for consumables: something restores health, hunger or thirst when used.</summary>
-    public bool IsConsumable => healAmount > 0f || hungerRestore > 0f || thirstRestore > 0f;
+    public IReadOnlyList<StatBonus> BoonBonuses => boonBonuses;
+    public float BoonSeconds => boonSeconds;
+    public bool IsTonic => tonic;
+    public IReadOnlyList<StatusEffectDefinition> Cures => cures;
+    /// <summary>True when eating it gives timed bonuses.</summary>
+    public bool HasBoon => boonBonuses.Count > 0 && boonSeconds > 0f;
+    /// <summary>True for consumables: something restores health, hunger or thirst, gives a boon or cures when used.</summary>
+    public bool IsConsumable => healAmount > 0f || hungerRestore > 0f || thirstRestore > 0f || HasBoon || cures.Count > 0;
     /// <summary>True when right-clicking does something: eat, drink, heal, equip or read.</summary>
     public bool IsUsable => IsConsumable || IsEquippable || IsBlueprint || experience > 0;
     public int CarryCapacityBonus => carryCapacityBonus;

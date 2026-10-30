@@ -219,6 +219,7 @@ public sealed class ContentEditorWindow : EditorWindow, IContentEditorHost
             new AttackSection(),
             new CombatStatsSection(),
             new RaidSection(),
+            new RaidEventSection(),
             new RaidModifierSection(),
             new ResidentSection(),
             new JobSection(),

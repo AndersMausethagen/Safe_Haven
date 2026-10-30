@@ -1,0 +1,165 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2f02987ee9197d4682f5db8cbc7a967, type: 3}
+  m_Name: TradersWagon
+  m_EditorClassIdentifier: SafeHaven::RaidEventDefinition
+  id: TradersWagon
+  displayName: Overturned Wagon
+  weight: 1.2
+  earliestSeconds: 40
+  latestSecondsLeft: 90
+  minimumStage: 0
+  warning: A broken wheel and scattered parcels on an old track. Someone left in a hurry.
+  warningSound: {fileID: 11400000, guid: 53fe372285257d84faf9ea69968a9b0f, type: 2}
+  sitePrefab: {fileID: 7940016432191105948, guid: bd8a1f03c8c250c41ae841b63b5f8ead, type: 3}
+  siteDistance: {x: 35, y: 70}
+  siteText: A trader's wagon on its side, one wheel in splinters. Parcels lie in the mud. Claw marks on the boards, not old.
+  onStart: []
+  choices:
+  - label: Search it carefully
+    detail: Costs you 30 seconds. Quiet.
+    cost: []
+    result: You go through it parcel by parcel.
+    outcomes:
+    - rid: 287758281410609264
+    - rid: 287758281410609265
+  - label: Grab what you can
+    detail: Fast and loud. Whatever did this may still be close.
+    cost: []
+    result: You tear it open and stuff your pack.
+    outcomes:
+    - rid: 287758281410609266
+    - rid: 287758281410609267
+    - rid: 287758281410609268
+  - label: Mend the wheel
+    detail: The trader hides close by. Fair traders pay fairly.
+    cost:
+    - item: {fileID: 11400000, guid: a370187223419a048b6cebe8f7e345a3, type: 2}
+      amount: 2
+    - item: {fileID: 11400000, guid: 4df650debd4ce21459e04a0c92ffa207, type: 2}
+      amount: 1
+    result: A thin man comes out of the ferns, thanks you three times and tells you the safe way.
+    outcomes:
+    - rid: 287758281410609271
+    - rid: 287758281410609272
+  references:
+    version: 2
+    RefIds:
+    - rid: 287758281410609264
+      type: {class: ChangeTimeOutcome, ns: , asm: SafeHaven}
+      data:
+        seconds: -30
+    - rid: 287758281410609265
+      type: {class: GiveLootOutcome, ns: , asm: SafeHaven}
+      data:
+        loot:
+          entries:
+          - item: {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 2
+            maxQuantity: 5
+            probability: 1
+          - item: {fileID: 11400000, guid: 616026fe07c265041bdcd10e32bcd168, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 1
+            maxQuantity: 3
+            probability: 0.7
+          - item: {fileID: 11400000, guid: 8cf878eb4a61eb943917a1f9421bb40a, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 2
+            maxQuantity: 4
+            probability: 0.7
+          - item: {fileID: 11400000, guid: f243c15300698e044a98d785099354c6, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 1
+            maxQuantity: 2
+            probability: 0.4
+    - rid: 287758281410609266
+      type: {class: MakeNoiseOutcome, ns: , asm: SafeHaven}
+      data:
+        radius: 30
+    - rid: 287758281410609267
+      type: {class: GiveLootOutcome, ns: , asm: SafeHaven}
+      data:
+        loot:
+          entries:
+          - item: {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 3
+            maxQuantity: 7
+            probability: 1
+          - item: {fileID: 11400000, guid: f243c15300698e044a98d785099354c6, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 2
+            maxQuantity: 3
+            probability: 0.7
+          - item: {fileID: 11400000, guid: 616026fe07c265041bdcd10e32bcd168, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 2
+            maxQuantity: 3
+            probability: 0.7
+          - item: {fileID: 11400000, guid: cbe9df10f8fa88f47be2f012ec678577, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 1
+            maxQuantity: 1
+            probability: 0.2
+    - rid: 287758281410609268
+      type: {class: ChanceOutcome, ns: , asm: SafeHaven}
+      data:
+        chance: 0.65
+        ifLucky:
+        - rid: 287758281410609269
+        - rid: 287758281410609270
+        ifNot: []
+    - rid: 287758281410609269
+      type: {class: TellOutcome, ns: , asm: SafeHaven}
+      data:
+        text: It was still close.
+        kind: 2
+    - rid: 287758281410609270
+      type: {class: SpawnCreaturesOutcome, ns: , asm: SafeHaven}
+      data:
+        prefabs:
+        - {fileID: 4584692032328657812, guid: 64cf9de042e1bc142907212054f70f50, type: 3}
+        count: 1
+        radius: 10
+        hunt: 1
+    - rid: 287758281410609271
+      type: {class: GiveLootOutcome, ns: , asm: SafeHaven}
+      data:
+        loot:
+          entries:
+          - item: {fileID: 11400000, guid: cbe9df10f8fa88f47be2f012ec678577, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 1
+            maxQuantity: 1
+            probability: 1
+          - item: {fileID: 11400000, guid: 1dd65120c9bb0304c8a45a8012af934c, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 2
+            maxQuantity: 2
+            probability: 1
+          - item: {fileID: 11400000, guid: 3b62415dd6630ea4ca86bcf751d2891a, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 1
+            maxQuantity: 2
+            probability: 1
+          - item: {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 4
+            maxQuantity: 8
+            probability: 1
+    - rid: 287758281410609272
+      type: {class: RevealMapOutcome, ns: , asm: SafeHaven}
+      data:
+        radius: 45
+        showExits: 1

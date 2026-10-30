@@ -16,6 +16,7 @@ public sealed class PlayerEating : MonoBehaviour
     private PlayerDodge dodge;
     private PlayerCombat combat;
     private PlayerGuard guard;
+    private PlayerBoons boons;
     private ItemDefinition eating;
     private ItemContainer from;
     private float doneAt;
@@ -46,6 +47,7 @@ public sealed class PlayerEating : MonoBehaviour
         dodge = GetComponent<PlayerDodge>();
         combat = GetComponent<PlayerCombat>();
         guard = GetComponent<PlayerGuard>();
+        boons = GetComponent<PlayerBoons>();
     }
 
     private void OnEnable()
@@ -131,6 +133,16 @@ public sealed class PlayerEating : MonoBehaviour
             GameMessages.Post($"{item.DisplayName}: +{Mathf.RoundToInt(item.HealAmount)} health over {Rules.HealOverSeconds:0} s", MessageKind.Gain);
         }
 
+        if (item.HasBoon && boons != null && boons.Add(item.Id, item.DisplayName, item.BoonBonuses, item.BoonSeconds, !item.IsTonic))
+        {
+            GameMessages.Post($"{item.DisplayName}: {ItemTooltipView.DescribeBonuses(item.BoonBonuses)} for {RaidStats.FormatTime(item.BoonSeconds)}", MessageKind.Gain);
+        }
+
+        if (item.Cures.Count > 0 && TryGetComponent(out StatusEffects effects) && effects.Cure(item.Cures) > 0)
+        {
+            GameMessages.Post($"{item.DisplayName} clears your blood.", MessageKind.Gain);
+        }
+
         GameEvents.Raise(new GameEvent(GameEventKind.Consumed, item, 1, gameObject));
         Stop(true);
     }
@@ -138,7 +150,7 @@ public sealed class PlayerEating : MonoBehaviour
     // Only a hit that gets through stops the meal; blocked and parried ones don't reach here.
     private void OnDamaged(DamageInfo damage, DamageResult result)
     {
-        if (IsEating && result.Damage > 0f && !result.Blocked)
+        if (IsEating && result.Damage > 0f && !result.Blocked && !damage.IsOverTime)
         {
             GameMessages.Post($"Stopped eating the {eating.DisplayName}.", MessageKind.Warning);
             Stop(false);

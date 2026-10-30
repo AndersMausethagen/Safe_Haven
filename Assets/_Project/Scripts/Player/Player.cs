@@ -38,6 +38,8 @@ public sealed class Player : MonoBehaviour
     public Combatant Combatant { get; private set; }
     public PlayerPersistence Persistence { get; private set; }
     public PlayerStealth Stealth { get; private set; }
+    /// <summary>Timed bonuses: meals, tonics, gifts.</summary>
+    public PlayerBoons Boons { get; private set; }
 
     /// <summary>True when the object is the player or part of it, such as a collider on a child bone.</summary>
     public static bool IsPlayer(GameObject candidate)
@@ -64,6 +66,7 @@ public sealed class Player : MonoBehaviour
         Combatant = GetComponent<Combatant>();
         Persistence = GetComponent<PlayerPersistence>();
         Stealth = GetComponent<PlayerStealth>();
+        Boons = GetComponent<PlayerBoons>();
     }
 
     private void Start()

@@ -433,7 +433,7 @@ public sealed class PlayerAnimationController : MonoBehaviour
     // A flinch on every hit that hurts; the killing blow is left to whatever handles death.
     private void OnDamaged(DamageInfo damage, DamageResult result)
     {
-        if (result.Damage <= 0f || result.Killed || result.Blocked)
+        if (result.Damage <= 0f || result.Killed || result.Blocked || damage.IsOverTime)
         {
             return;
         }

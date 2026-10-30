@@ -1,0 +1,85 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2f02987ee9197d4682f5db8cbc7a967, type: 3}
+  m_Name: OldBarrow
+  m_EditorClassIdentifier: SafeHaven::RaidEventDefinition
+  id: OldBarrow
+  displayName: The Open Barrow
+  weight: 1
+  earliestSeconds: 90
+  latestSecondsLeft: 90
+  minimumStage: 0
+  warning: The ground has slipped on a low mound. Something glints in the dark inside.
+  warningSound: {fileID: 11400000, guid: 4cc9bc40fb223354aa6032cf0c7fb0f2, type: 2}
+  sitePrefab: {fileID: 3059714547979966575, guid: 2ebf1cc60013d0a4380d52fcd6cc5dd4, type: 3}
+  siteDistance: {x: 35, y: 70}
+  siteText: A stone-framed door into the mound. Silver in the dark, and an old smell. Whoever lies in there has not been disturbed in a long time.
+  onStart: []
+  choices:
+  - label: Reach in and take it
+    detail: Barrow silver and grave iron. The owner may mind.
+    cost: []
+    result: Your fingers close on cold metal. Behind it, something breathes in.
+    outcomes:
+    - rid: 287758281410609297
+    - rid: 287758281410609298
+  - label: Leave an offering
+    detail: The dead remember manners.
+    cost:
+    - item: {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
+      amount: 2
+    result: A cold breath passes over you, and it feels like thanks.
+    outcomes:
+    - rid: 287758281410609299
+  references:
+    version: 2
+    RefIds:
+    - rid: 287758281410609297
+      type: {class: GiveLootOutcome, ns: , asm: SafeHaven}
+      data:
+        loot:
+          entries:
+          - item: {fileID: 11400000, guid: 96459a8d9566ae74cb04ee74d08a597b, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 2
+            maxQuantity: 3
+            probability: 1
+          - item: {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 5
+            maxQuantity: 10
+            probability: 1
+          - item: {fileID: 11400000, guid: 6a6c76b4e635d9e48be91d875f758c4a, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 1
+            maxQuantity: 1
+            probability: 0.15
+    - rid: 287758281410609298
+      type: {class: SpawnCreaturesOutcome, ns: , asm: SafeHaven}
+      data:
+        prefabs:
+        - {fileID: 9066855856663566298, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
+        count: 1
+        radius: 4
+        hunt: 1
+    - rid: 287758281410609299
+      type: {class: GiveBoonOutcome, ns: , asm: SafeHaven}
+      data:
+        name: Barrow's Blessing
+        bonuses:
+        - stat: 0
+          op: 0
+          value: 20
+        - stat: 10
+          op: 0
+          value: 0.15
+        seconds: 300

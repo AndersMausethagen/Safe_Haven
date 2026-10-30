@@ -1,4 +1,4 @@
-using Unity.Cinemachine;
+﻿using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.InputSystem;
@@ -335,15 +335,15 @@ public sealed class PlayerCameraController : MonoBehaviour
                 return;
             }
 
-            Vector2 delta = lookAction.ReadValue<Vector2>() * settings.ActionLookSensitivity;
+            Vector2 delta = lookAction.ReadValue<Vector2>() * (settings.ActionLookSensitivity * GameOptions.LookSensitivity.Value);
             yaw += delta.x;
-            actionPitch += settings.ActionInvertY ? delta.y : -delta.y;
+            actionPitch += settings.ActionInvertY != GameOptions.InvertY.On ? delta.y : -delta.y;
             actionPitch = Mathf.Clamp(actionPitch, settings.ActionMinPitch, settings.ActionMaxPitch);
         }
         // Aiming a bow holds the same right button, so the view must not turn under the aim.
         else if (profile.allowOrbit && !aiming && orbitAction.IsPressed())
         {
-            yaw += lookAction.ReadValue<Vector2>().x * settings.OrbitSensitivity;
+            yaw += lookAction.ReadValue<Vector2>().x * (settings.OrbitSensitivity * GameOptions.LookSensitivity.Value);
         }
     }
 

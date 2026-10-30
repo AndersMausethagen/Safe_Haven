@@ -1,4 +1,4 @@
-using Unity.Cinemachine;
+﻿using Unity.Cinemachine;
 using UnityEngine;
 
 /// <summary>
@@ -28,7 +28,7 @@ public sealed class CameraShake : CinemachineExtension
         }
 
         Decay();
-        trauma = Mathf.Clamp01(trauma + amount);
+        trauma = Mathf.Clamp01(trauma + amount * GameOptions.ScreenShake.Value);
     }
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]

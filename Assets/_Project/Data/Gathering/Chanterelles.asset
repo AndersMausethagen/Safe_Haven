@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2bdc7bfe8797f544855a0ab7846c453, type: 3}
+  m_Name: Chanterelles
+  m_EditorClassIdentifier: Assembly-CSharp::GatheringNodeDefinition
+  id: chanterelles
+  displayName: Chanterelles
+  tier: 1
+  yields:
+    entries:
+    - item: {fileID: 11400000, guid: 15d1c587fc1b8f34696d9b01c733b94e, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 2
+      maxQuantity: 4
+      probability: 1
+  gatherTool: 0
+  requiredToolTier: 1
+  gatherAnimation: 1
+  gatherSeconds: 1.5
+  swings: 3
+  swingSpeed: 1
+  gatherRange: 1.5
+  depleteOnGather: 1
+  respawnSeconds: 240
+  feedback: {fileID: 11400000, guid: 5e19753f3a66da744ae5d17004fb63d5, type: 2}
+  worldModelPrefab: {fileID: 1168973905803964099, guid: 78d5be29da6cc684fae47e66cf2bc074, type: 3}
+  worldPrefab: {fileID: 5701181132641860389, guid: 5e2206bd114732e4da8f8e504471a110, type: 3}
+  modelVariants: []
+  variantScale: {x: 0.9, y: 1.1}

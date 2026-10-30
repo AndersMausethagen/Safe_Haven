@@ -1,0 +1,160 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42e5c6da77934e8439571a13e158376a, type: 3}
+  m_Name: MossShaman
+  m_EditorClassIdentifier: SafeHaven::MonsterDefinition
+  id: MossShaman
+  displayName: Moss Shaman
+  description: 'An old troll with a staff of living wood. It doesn''t want to fight you: it wants the ground to. Rootlings rise wherever it points. Kill it first, if you can reach it.'
+  combatStats: {fileID: 11400000, guid: 9feced56207df704e8442128dac96f23, type: 2}
+  faction: 1
+  drops:
+    entries:
+    - item: {fileID: 11400000, guid: 67c64a707cfb7bb4dbb4695008c9df54, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.15
+    - item: {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 2
+      probability: 0.5
+    - item: {fileID: 0}
+      resource: {fileID: 11400000, guid: c0e409a7cd38400498ff1c7037737b96, type: 2}
+      minQuantity: 3
+      maxQuantity: 4
+      probability: 1
+  unlocksRecipes: []
+  animatorController: {fileID: 0}
+  prefab: {fileID: 3643037256157110189, guid: 8af413a8c10dbdc4f89f0537152651dc, type: 3}
+  experience: 0
+  attack: {fileID: 11400000, guid: 179f087bb370b614b981d8f3013bab0b, type: 2}
+  attackDamage: 8
+  attackCooldown: 0.6
+  moveSpeed: 3
+  detectionRange: 13
+  chaseRange: 20
+  leashRange: 28
+  sightAngle: 130
+  closeSenseRange: 3
+  hearing: 1.1
+  alertness: 1
+  attacks:
+  - attack: {fileID: 11400000, guid: 56b15306e2a60ba49a035492beb9146e, type: 2}
+    kind: 0
+    damage: 6
+    minimumRange: 0
+    maximumRange: 2
+    priority: 30
+    cooldown: 2
+    interruptible: 0
+    projectilePrefab: {fileID: 0}
+    burstCount: 1
+    burstInterval: 0.2
+    projectileSpeed: 12
+    projectileRadius: 0.15
+    chargeSpeed: 12
+    chargeDistance: 8
+    exposedSeconds: 2
+    buffRadius: 10
+    buffSeconds: 8
+    damageBonus: 0.05
+    packLeaderOnly: 0
+    summonPrefab: {fileID: 0}
+    summonCount: 2
+    summonRadius: 3
+    summonLimit: 4
+  - attack: {fileID: 11400000, guid: 1fc893bc90379cc428d0f2d7d4b3e0f9, type: 2}
+    kind: 4
+    damage: 0
+    minimumRange: 0
+    maximumRange: 14
+    priority: 25
+    cooldown: 14
+    interruptible: 1
+    projectilePrefab: {fileID: 0}
+    burstCount: 1
+    burstInterval: 0.2
+    projectileSpeed: 12
+    projectileRadius: 0.15
+    chargeSpeed: 12
+    chargeDistance: 8
+    exposedSeconds: 2
+    buffRadius: 10
+    buffSeconds: 8
+    damageBonus: 0.05
+    packLeaderOnly: 0
+    summonPrefab: {fileID: 3085881180223279310, guid: 049004d8140885f4db2790503b4ab12d, type: 3}
+    summonCount: 2
+    summonRadius: 3
+    summonLimit: 4
+  - attack: {fileID: 11400000, guid: 5b93413ae1d36cb469ab2a4f7b8d2422, type: 2}
+    kind: 3
+    damage: 0
+    minimumRange: 0
+    maximumRange: 12
+    priority: 20
+    cooldown: 18
+    interruptible: 1
+    projectilePrefab: {fileID: 0}
+    burstCount: 1
+    burstInterval: 0.2
+    projectileSpeed: 12
+    projectileRadius: 0.15
+    chargeSpeed: 12
+    chargeDistance: 8
+    exposedSeconds: 2
+    buffRadius: 12
+    buffSeconds: 8
+    damageBonus: 0.1
+    packLeaderOnly: 0
+    summonPrefab: {fileID: 0}
+    summonCount: 2
+    summonRadius: 3
+    summonLimit: 4
+  - attack: {fileID: 11400000, guid: 179f087bb370b614b981d8f3013bab0b, type: 2}
+    kind: 1
+    damage: 7
+    minimumRange: 2.2
+    maximumRange: 14
+    priority: 10
+    cooldown: 2.4
+    interruptible: 0
+    projectilePrefab: {fileID: 4774033439812504928, guid: f88eca45a0f3397429ff4fa29af1b9ae, type: 3}
+    burstCount: 1
+    burstInterval: 0.2
+    projectileSpeed: 12
+    projectileRadius: 0.15
+    chargeSpeed: 12
+    chargeDistance: 8
+    exposedSeconds: 2
+    buffRadius: 10
+    buffSeconds: 8
+    damageBonus: 0.05
+    packLeaderOnly: 0
+    summonPrefab: {fileID: 0}
+    summonCount: 2
+    summonRadius: 3
+    summonLimit: 4
+  movementTactic: 1
+  temperament: 3
+  preferredDistance: 10
+  distanceTolerance: 1.5
+  fleeHealthFraction: 0.3
+  fleeDistance: 10
+  defensiveRadius: 8
+  hoverHeight: 0
+  poise: 60
+  deathSound: {fileID: 0}
+  hurtSound: {fileID: 0}
+  attackSound: {fileID: 0}

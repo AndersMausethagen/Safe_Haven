@@ -1,0 +1,107 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42e5c6da77934e8439571a13e158376a, type: 3}
+  m_Name: BogSpitter
+  m_EditorClassIdentifier: SafeHaven::MonsterDefinition
+  id: BogSpitter
+  displayName: Bog Spitter
+  description: A bloated thing the size of a calf, squatting where the ground is wet. It spits venom that keeps working long after it lands. Close the distance, or carry an antidote.
+  combatStats: {fileID: 11400000, guid: d4be7b1b1de2ea8468d4ba5e7657b136, type: 2}
+  faction: 1
+  drops:
+    entries:
+    - item: {fileID: 11400000, guid: 54e1b03f55c96d14c96beff689a77318, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.7
+    - item: {fileID: 0}
+      resource: {fileID: 11400000, guid: c0e409a7cd38400498ff1c7037737b96, type: 2}
+      minQuantity: 1
+      maxQuantity: 2
+      probability: 0.9
+  unlocksRecipes: []
+  animatorController: {fileID: 0}
+  prefab: {fileID: 4999243170976522981, guid: 07a704aacccfef242886f2875ff4fcdf, type: 3}
+  experience: 0
+  attack: {fileID: 11400000, guid: afcd653bc45774044abc9bfc3b1ceb77, type: 2}
+  attackDamage: 8
+  attackCooldown: 0.6
+  moveSpeed: 3
+  detectionRange: 13
+  chaseRange: 18
+  leashRange: 22
+  sightAngle: 150
+  closeSenseRange: 2.5
+  hearing: 1
+  alertness: 0.9
+  attacks:
+  - attack: {fileID: 11400000, guid: 8fa9cea5d6eb777488d2c9e3787f8e59, type: 2}
+    kind: 0
+    damage: 6
+    minimumRange: 0
+    maximumRange: 2.2
+    priority: 20
+    cooldown: 1.6
+    interruptible: 0
+    projectilePrefab: {fileID: 0}
+    burstCount: 1
+    burstInterval: 0.2
+    projectileSpeed: 12
+    projectileRadius: 0.15
+    chargeSpeed: 12
+    chargeDistance: 8
+    exposedSeconds: 2
+    buffRadius: 10
+    buffSeconds: 8
+    damageBonus: 0.05
+    packLeaderOnly: 0
+    summonPrefab: {fileID: 0}
+    summonCount: 2
+    summonRadius: 3
+    summonLimit: 4
+  - attack: {fileID: 11400000, guid: afcd653bc45774044abc9bfc3b1ceb77, type: 2}
+    kind: 1
+    damage: 6
+    minimumRange: 2.5
+    maximumRange: 12
+    priority: 10
+    cooldown: 2.8
+    interruptible: 0
+    projectilePrefab: {fileID: 4774033439812504928, guid: db74ed924740f3f4a94f907842780bb3, type: 3}
+    burstCount: 1
+    burstInterval: 0.2
+    projectileSpeed: 11
+    projectileRadius: 0.22
+    chargeSpeed: 11
+    chargeDistance: 8
+    exposedSeconds: 2
+    buffRadius: 10
+    buffSeconds: 8
+    damageBonus: 0.05
+    packLeaderOnly: 0
+    summonPrefab: {fileID: 0}
+    summonCount: 2
+    summonRadius: 3
+    summonLimit: 4
+  movementTactic: 1
+  temperament: 1
+  preferredDistance: 8
+  distanceTolerance: 1.5
+  fleeHealthFraction: 0.25
+  fleeDistance: 10
+  defensiveRadius: 8
+  hoverHeight: 0
+  poise: 35
+  deathSound: {fileID: 0}
+  hurtSound: {fileID: 0}
+  attackSound: {fileID: 0}

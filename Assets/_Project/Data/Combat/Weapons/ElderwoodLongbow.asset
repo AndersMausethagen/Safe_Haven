@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8bc49664ac533524f8d9a2bfd443f4fa, type: 3}
+  m_Name: ElderwoodLongbow
+  m_EditorClassIdentifier: SafeHaven::WeaponDefinition
+  displayName: Elderwood Longbow
+  stance: 4
+  kind: 2
+  damage: 0
+  basicAttack: {fileID: 0}
+  combo: []
+  heavyAttack: {fileID: 0}
+  counterAttack: {fileID: 0}
+  guardLetThrough: 0.6
+  drawSeconds: 1
+  reloadSeconds: 0.55
+  arrowSpeed: 50
+  spread: 0.8
+  minimumDraw: 0.25
+  drawMoveSpeed: 0.6
+  perfectReleaseSeconds: 0.2
+  perfectReleaseDamage: 1.25
+  aimSpread: 0.5
+  counterShotDamage: 0.6
+  shotAttack: {fileID: 11400000, guid: ce3c793cb6a27644ea3474e6fe877fd9, type: 2}
+  drawSound: {fileID: 0}
+  swingSound: {fileID: 11400000, guid: e3702f94155b6bc42b71a0d0872c141d, type: 2}
+  hitSound: {fileID: 0}
+  hitEffect: {fileID: 0}

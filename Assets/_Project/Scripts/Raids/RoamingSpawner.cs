@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -17,7 +17,6 @@ public sealed class RoamingSpawner : MonoBehaviour
     private const float ThinkInterval = 1f;
     private const int PlacementAttempts = 12;
     private const float NavMeshSnap = 4f;
-    private const float GroundProbeHeight = 60f;
 
     private readonly List<GameObject> roots = new List<GameObject>();
     private readonly List<MonsterAI> members = new List<MonsterAI>();
@@ -192,7 +191,7 @@ public sealed class RoamingSpawner : MonoBehaviour
             }
 
             position /= alive;
-            if (!busy && Flat(position - player) > settings.DespawnDistance && !IsVisible(position))
+            if (!busy && Flat(position - player) > settings.DespawnDistance && !RaidSpots.IsVisible(position))
             {
                 spent = Mathf.Max(0, spent - alive);
                 nextHunt.Remove(root);
@@ -222,13 +221,13 @@ public sealed class RoamingSpawner : MonoBehaviour
             float angle = (float)random.NextDouble() * Mathf.PI * 2f;
             float distance = Mathf.Lerp(settings.MinDistance, settings.MaxDistance, (float)random.NextDouble());
             Vector3 candidate = player + new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle)) * distance;
-            if (!NavMesh.SamplePosition(Grounded(candidate), out NavMeshHit hit, NavMeshSnap, NavMesh.AllAreas))
+            if (!NavMesh.SamplePosition(RaidSpots.Grounded(candidate), out NavMeshHit hit, NavMeshSnap, NavMesh.AllAreas))
             {
                 continue;
             }
 
             Vector3 point = hit.position;
-            if (Flat(point - player) < settings.MinDistance || IsVisible(point) || NearCreature(point, settings.CampClearance)
+            if (Flat(point - player) < settings.MinDistance || RaidSpots.IsVisible(point) || NearCreature(point, settings.CampClearance)
                 || !NavMesh.CalculatePath(point, playerHit.position, NavMesh.AllAreas, path) || path.status != NavMeshPathStatus.PathComplete)
             {
                 continue;
@@ -268,7 +267,7 @@ public sealed class RoamingSpawner : MonoBehaviour
         Vector3 destination = player + new Vector3(offset.x, 0f, offset.y);
         MonsterAI lead = root.GetComponentInChildren<MonsterAI>();
         Vector3 from = lead != null ? lead.transform.position : root.transform.position;
-        bool found = NavMesh.SamplePosition(Grounded(destination), out NavMeshHit hit, NavMeshSnap * 2f, NavMesh.AllAreas);
+        bool found = NavMesh.SamplePosition(RaidSpots.Grounded(destination), out NavMeshHit hit, NavMeshSnap * 2f, NavMesh.AllAreas);
         // The ground probe can land on a rock top whose NavMesh is cut off from the rest; fall back to the player's spot.
         if (!found || !NavMesh.CalculatePath(from, hit.position, NavMesh.AllAreas, path) || path.status != NavMeshPathStatus.PathComplete)
         {
@@ -299,34 +298,6 @@ public sealed class RoamingSpawner : MonoBehaviour
         }
 
         return false;
-    }
-
-    // In front of the camera, inside its view and with nothing solid in between.
-    private static bool IsVisible(Vector3 point)
-    {
-        Camera view = Camera.main;
-        if (view == null)
-        {
-            return false;
-        }
-
-        Vector3 chest = point + Vector3.up * 1.2f;
-        Vector3 viewport = view.WorldToViewportPoint(chest);
-        if (viewport.z <= 0f || viewport.x < -0.1f || viewport.x > 1.1f || viewport.y < -0.1f || viewport.y > 1.1f)
-        {
-            return false;
-        }
-
-        return !Physics.Linecast(view.transform.position, chest, ~0, QueryTriggerInteraction.Ignore);
-    }
-
-    // Points are picked flat at the player's height; this drops one onto the ground below or above it so the NavMesh
-    // lookup works on hilly terrain.
-    private static Vector3 Grounded(Vector3 point)
-    {
-        return Physics.Raycast(point + Vector3.up * GroundProbeHeight, Vector3.down, out RaycastHit ground, GroundProbeHeight * 2f, ~0, QueryTriggerInteraction.Ignore)
-            ? ground.point
-            : point;
     }
 
     private static float Flat(Vector3 offset)

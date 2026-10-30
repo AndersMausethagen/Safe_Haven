@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Globalization;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -6,14 +6,15 @@ using UnityEngine.UI;
 using TMPro;
 
 /// <summary>
-/// The Escape menu: Continue, Save, Load, Options and Quit Game. It is the only listener for the Escape key. A press
+/// The Escape menu: Continue, Save, Saved Games, Options and Quit Game. It is the only listener for the Escape key. A press
 /// first goes to <see cref="BackHandlers"/> (cancel building placement, close open windows, stop an interaction), and
 /// the menu opens only when nothing used it. While open it holds a <see cref="GamePause"/> request, which freezes time
 /// in single-player and blocks player input.
 /// <para>
 /// It lives in the UI Root prefab, so every gameplay scene has one. Saving and loading go through SaveGameService
 /// (which refuses saving during a raid); quitting asks first, because progress since the last save is lost.
-/// The Options page holds the camera options (CameraOptionsPanel); UI scale, audio and controls will be added there.
+/// Saved Games and Options open their own screens over the menu (SavesScreen, OptionsScreen); this menu shows no page
+/// meanwhile and comes back when they close.
 /// </para>
 /// </summary>
 public sealed class PauseMenu : MonoBehaviour
@@ -22,7 +23,6 @@ public sealed class PauseMenu : MonoBehaviour
 
     [Header("Pages")]
     [SerializeField] private GameObject mainPage;
-    [SerializeField] private GameObject optionsPage;
     [SerializeField] private GameObject confirmPage;
 
     [Header("Main page")]
@@ -33,9 +33,6 @@ public sealed class PauseMenu : MonoBehaviour
     [SerializeField] private Button quitButton;
     [Tooltip("Explains why Save or Load is unavailable, and reports how they went.")]
     [SerializeField] private TMP_Text statusLabel;
-
-    [Header("Options page")]
-    [SerializeField] private Button optionsBackButton;
 
     [Header("Confirm page")]
     [SerializeField] private TMP_Text confirmMessage;
@@ -59,7 +56,7 @@ public sealed class PauseMenu : MonoBehaviour
 
     private void OnEnable()
     {
-        if (window == null || mainPage == null || optionsPage == null || confirmPage == null)
+        if (window == null || mainPage == null || confirmPage == null)
         {
             Debug.LogError("PauseMenu is missing its window or one of its pages.", this);
             enabled = false;
@@ -71,10 +68,9 @@ public sealed class PauseMenu : MonoBehaviour
         window.OpenChanged += OnOpenChanged;
         continueButton.onClick.AddListener(Close);
         saveButton.onClick.AddListener(Save);
-        loadButton.onClick.AddListener(AskLoad);
+        loadButton.onClick.AddListener(ShowSaves);
         optionsButton.onClick.AddListener(ShowOptions);
         quitButton.onClick.AddListener(AskQuit);
-        optionsBackButton.onClick.AddListener(ShowMain);
         confirmPrimaryButton.onClick.AddListener(OnConfirmPrimary);
         confirmSecondaryButton.onClick.AddListener(OnConfirmSecondary);
         confirmCancelButton.onClick.AddListener(ShowMain);
@@ -95,10 +91,9 @@ public sealed class PauseMenu : MonoBehaviour
         window.OpenChanged -= OnOpenChanged;
         continueButton.onClick.RemoveListener(Close);
         saveButton.onClick.RemoveListener(Save);
-        loadButton.onClick.RemoveListener(AskLoad);
+        loadButton.onClick.RemoveListener(ShowSaves);
         optionsButton.onClick.RemoveListener(ShowOptions);
         quitButton.onClick.RemoveListener(AskQuit);
-        optionsBackButton.onClick.RemoveListener(ShowMain);
         confirmPrimaryButton.onClick.RemoveListener(OnConfirmPrimary);
         confirmSecondaryButton.onClick.RemoveListener(OnConfirmSecondary);
         confirmCancelButton.onClick.RemoveListener(ShowMain);
@@ -121,7 +116,8 @@ public sealed class PauseMenu : MonoBehaviour
 
     private void OnEscape(InputAction.CallbackContext context)
     {
-        if (leaving || SceneTransition.IsBusy)
+        // The screens over this menu answer Escape themselves, and the press that closes one isn't one for this menu.
+        if (leaving || SceneTransition.IsBusy || OptionsScreen.HasEscape || SavesScreen.HasEscape)
         {
             return;
         }
@@ -172,13 +168,25 @@ public sealed class PauseMenu : MonoBehaviour
 
     private void ShowOptions()
     {
-        ShowPage(optionsPage);
+        ShowPage(null);
+        OptionsScreen.Open(ShowMain);
+    }
+
+    private void ShowSaves()
+    {
+        if (content == null)
+        {
+            Debug.LogError("PauseMenu needs a ContentDatabase to load saves.", this);
+            return;
+        }
+
+        ShowPage(null);
+        SavesScreen.Open(content, fallbackScene, ShowMain, BeginLeaving);
     }
 
     private void ShowPage(GameObject page)
     {
         mainPage.SetActive(page == mainPage);
-        optionsPage.SetActive(page == optionsPage);
         confirmPage.SetActive(page == confirmPage);
     }
 
@@ -243,30 +251,6 @@ public sealed class PauseMenu : MonoBehaviour
         }
 
         Refresh();
-    }
-
-    private void AskLoad()
-    {
-        Confirm("Load your last save?\nProgress since then will be lost.", "Load", Load);
-    }
-
-    private void Load()
-    {
-        if (content == null)
-        {
-            Debug.LogError("PauseMenu needs a ContentDatabase to load saves.", this);
-            return;
-        }
-
-        // Stays paused through the loading screen; the pause is released when this scene unloads.
-        if (SaveGameService.TryLoad(content, fallbackScene, out string problem))
-        {
-            BeginLeaving();
-            return;
-        }
-
-        statusLabel.text = $"<color=#FF7B6B>{problem}</color>";
-        ShowMain();
     }
 
     private void AskQuit()

@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
@@ -67,7 +67,7 @@ public sealed class CombatScreenEffects : MonoBehaviour
     public void Flash(Color color, float strength)
     {
         flashColor = color;
-        flash = Mathf.Max(flash, Mathf.Clamp01(strength));
+        flash = Mathf.Max(flash, Mathf.Clamp01(strength) * GameOptions.ScreenFlash.Value);
     }
 
     private void Update()
@@ -80,7 +80,7 @@ public sealed class CombatScreenEffects : MonoBehaviour
         if (player != null && player.IsAlive && feel.LowHealthBelow > 0f && player.HealthFraction < feel.LowHealthBelow)
         {
             float depth = 1f - player.HealthFraction / feel.LowHealthBelow;
-            float pulse = (0.6f + 0.4f * Mathf.Sin(Time.unscaledTime * Mathf.Lerp(3f, 6f, depth))) * feel.LowHealthStrength * depth;
+            float pulse = (0.6f + 0.4f * Mathf.Sin(Time.unscaledTime * Mathf.Lerp(3f, 6f, depth))) * feel.LowHealthStrength * depth * GameOptions.ScreenFlash.Value;
             if (pulse > alpha)
             {
                 color = feel.HurtColor;

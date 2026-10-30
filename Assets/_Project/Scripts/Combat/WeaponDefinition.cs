@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum WeaponKind { Melee = 0, Torch = 1, Bow = 2, FishingRod = 3 }
+public enum WeaponKind { Melee = 0, Torch = 1, Bow = 2, FishingRod = 3, Shield = 4 }
 
 /// <summary>
 /// A weapon the player can hold. It sets the animation stance, how much damage it carries and its attacks: the combo
@@ -13,6 +13,10 @@ public enum WeaponKind { Melee = 0, Torch = 1, Bow = 2, FishingRod = 3 }
 /// from the bag, and the next one is nocked in Reload Seconds (see PlayerArchery). The arrow sets the damage
 /// (ArrowDefinition); the bow sets how fast it flies, how quickly it is drawn and reloaded, and how steady it is.
 /// Letting go just as the draw is full is a perfect release; holding guard aims (steadier, slower).
+/// </para>
+/// <para>
+/// A shield (Kind Shield) is held in the off hand beside a one-handed weapon: its Guard Let Through decides blocks, and
+/// attacking while guarding bashes with it.
 /// </para>
 /// </summary>
 [CreateAssetMenu(fileName = "Weapon", menuName = "Safe Haven/Combat/Weapon")]
@@ -91,7 +95,8 @@ public sealed class WeaponDefinition : ScriptableObject
     public AttackDefinition ShotAttack => shotAttack;
     public SoundDefinition DrawSound => drawSound;
     public bool RequiresBothHands => stance == WeaponStance.TwoHanded || stance == WeaponStance.Polearm || stance == WeaponStance.Bow;
-    public bool CanUseOffHand => kind == WeaponKind.Torch && !RequiresBothHands;
+    public bool CanUseOffHand => (kind == WeaponKind.Torch || kind == WeaponKind.Shield) && !RequiresBothHands;
+    public bool IsShield => kind == WeaponKind.Shield;
     public float Damage => damage;
     public AttackDefinition BasicAttack => basicAttack;
     public AttackDefinition HeavyAttack => heavyAttack;

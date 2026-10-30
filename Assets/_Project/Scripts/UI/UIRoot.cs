@@ -11,8 +11,8 @@ using UnityEngine.UI;
 /// prompts) and the loading screen are not part of it. Menu scenes can put this component on their own canvas.
 /// </para>
 /// <para>
-/// UI scale: <see cref="Scale"/> multiplies the whole UI (1 = designed size at 1920x1080). The options menu will set it
-/// and store the player's choice; until then it can be tried out in the Inspector.
+/// UI scale: <see cref="Scale"/> multiplies the whole UI (1 = designed size at 1920x1080). It is the player's UI and Text
+/// Size setting (GameOptions.UiScale), times the value set here on the root.
 /// </para>
 /// </summary>
 [DisallowMultipleComponent]
@@ -24,7 +24,7 @@ public sealed class UIRoot : MonoBehaviour
 
     [Tooltip("The size the UI is designed for. Everything is laid out in these units.")]
     [SerializeField] private Vector2 referenceResolution = new Vector2(1920f, 1080f);
-    [Tooltip("Multiplies the size of all UI in the scene. The future UI scale option sets this.")]
+    [Tooltip("Multiplies the size of all UI in the scene, on top of the player's UI and Text Size setting.")]
     [SerializeField, Range(MinScale, MaxScale)] private float scale = 1f;
 
     private CanvasScaler scaler;
@@ -81,7 +81,28 @@ public sealed class UIRoot : MonoBehaviour
     /// </summary>
     public static void ConfigureScaler(CanvasScaler scaler)
     {
-        Configure(scaler, DesignResolution, Current != null ? Current.scale : 1f);
+        Configure(scaler, DesignResolution, (Current != null ? Current.scale : 1f) * GameOptions.UiScale.Value);
+    }
+
+    /// <summary>The player changed the UI size: every screen canvas follows, including those made in code.</summary>
+    public static void ApplyScaleEverywhere()
+    {
+        foreach (CanvasScaler each in FindObjectsByType<CanvasScaler>(FindObjectsInactive.Include))
+        {
+            if (each.uiScaleMode != CanvasScaler.ScaleMode.ScaleWithScreenSize)
+            {
+                continue;
+            }
+
+            if (each.TryGetComponent(out UIRoot root))
+            {
+                root.Apply();
+            }
+            else
+            {
+                ConfigureScaler(each);
+            }
+        }
     }
 
     private static readonly Vector2 DesignResolution = new Vector2(1920f, 1080f);
@@ -105,6 +126,6 @@ public sealed class UIRoot : MonoBehaviour
             return;
         }
 
-        Configure(scaler, referenceResolution, scale);
+        Configure(scaler, referenceResolution, Application.isPlaying ? scale * GameOptions.UiScale.Value : scale);
     }
 }

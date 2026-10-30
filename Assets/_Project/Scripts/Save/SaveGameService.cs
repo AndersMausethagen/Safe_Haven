@@ -1,4 +1,5 @@
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -7,8 +8,11 @@ using UnityEngine.SceneManagement;
 /// Starts, saves and loads games. Saving gathers the in-memory state (the live player and GameSession's stash, world and
 /// quests), turns it into a SaveData through SaveMapper and has SaveStorage write it. Loading reads it back, rebuilds the
 /// runtime objects, hands them to GameSession and loads the saved scene, where PlayerPersistence and the saveable
-/// objects apply them. There is one save slot for now; slots can be added by passing SaveStorage a slot name. Saving is
-/// refused during a raid, so a raid can't be replayed from the middle.
+/// objects apply them. Saving is refused during a raid, so a raid can't be replayed from the middle.
+/// <para>
+/// A game can have any number of saves, each its own file (a slot). The game being played writes to <see cref="CurrentSlot"/>:
+/// the slot it was loaded from, or a new one the first time a new game saves, so starting over never touches another game.
+/// </para>
 /// <para>
 /// The save system in layers, each in its own file (Assets/_Project/Scripts/Save):
 /// GameSession (what lives in memory) → SaveMapper (memory ↔ file format) → SaveData (the file format) →
@@ -22,6 +26,8 @@ using UnityEngine.SceneManagement;
 /// </summary>
 public static class SaveGameService
 {
+    private const int MaximumNameLength = 32;
+
     private static SaveStorage storage;
     private static bool loading;
     private static UnityEngine.Events.UnityAction<Scene, LoadSceneMode> pendingArrival;
@@ -30,10 +36,49 @@ public static class SaveGameService
     public static SaveStorage Storage
     {
         get => storage ??= new SaveStorage();
-        set => storage = value;
+        set
+        {
+            storage = value;
+            CurrentSlot = null;
+            CurrentName = null;
+        }
     }
 
-    public static bool HasSave => Storage.Exists(SaveStorage.DefaultSlot);
+    /// <summary>The save the game being played belongs to. Null until a new game first saves.</summary>
+    public static string CurrentSlot { get; private set; }
+
+    /// <summary>The name of the save being played, or null before it has one.</summary>
+    public static string CurrentName { get; private set; }
+
+    public static bool HasSave => Storage.ListSlots().Count > 0;
+
+    /// <summary>Every save, newest first. Reads each file, so call it when a list opens, not every frame.</summary>
+    public static List<SaveSlotInfo> ListSaves()
+    {
+        var saves = new List<SaveSlotInfo>();
+        foreach (string slot in Storage.ListSlots())
+        {
+            TryReadSave(slot, out SaveData data, out string problem);
+            saves.Add(new SaveSlotInfo(slot, data, problem, Storage.LastWritten(slot)));
+        }
+
+        saves.Sort((a, b) => b.SavedAt.CompareTo(a.SavedAt));
+        return saves;
+    }
+
+    /// <summary>The newest save that can be loaded, or null.</summary>
+    public static SaveSlotInfo LatestSave()
+    {
+        foreach (SaveSlotInfo save in ListSaves())
+        {
+            if (save.IsReadable)
+            {
+                return save;
+            }
+        }
+
+        return null;
+    }
 
     /// <summary>Why the game can't be saved right now, in words for the player, or null when it can.</summary>
     public static string CheckSave()
@@ -56,7 +101,26 @@ public static class SaveGameService
         return Player.Current == null || Player.Current.Persistence == null ? "There is nothing to save here." : null;
     }
 
+    /// <summary>Saves the game being played to its own save, making one if it has none yet.</summary>
     public static bool TrySave(out string problem)
+    {
+        return TryWrite(CurrentSlot ?? Storage.NewSlot(DateTime.Now), CurrentName ?? NextName(), out problem);
+    }
+
+    /// <summary>Saves the game being played as a new save, which it then carries on in.</summary>
+    public static bool TrySaveAsNew(out string problem)
+    {
+        return TryWrite(Storage.NewSlot(DateTime.Now), NextName(), out problem);
+    }
+
+    /// <summary>Replaces another save with the game being played, which then carries on in it under that name.</summary>
+    public static bool TryOverwrite(string slot, out string problem)
+    {
+        Storage.TryRead(slot, out SaveData existing, out _);
+        return TryWrite(slot, SaveSlotInfo.NameFor(slot, existing), out problem);
+    }
+
+    private static bool TryWrite(string slot, string name, out string problem)
     {
         problem = CheckSave();
         if (problem != null)
@@ -69,9 +133,12 @@ public static class SaveGameService
         SaveableEntity.CaptureAll();
         SaveData data = SaveMapper.ToSaveData(player.Capture(), GameSession.Stash, SceneManager.GetActiveScene().name, player.Pose, DateTime.UtcNow,
             GameSession.World, GameSession.Quests, GameSession.Settlement, GameSession.Playtest, GameSession.Progress);
+        data.displayName = name;
         try
         {
-            Storage.Write(SaveStorage.DefaultSlot, data);
+            Storage.Write(slot, data);
+            CurrentSlot = slot;
+            CurrentName = name;
             return true;
         }
         catch (Exception exception) when (exception is IOException || exception is UnauthorizedAccessException)
@@ -82,10 +149,98 @@ public static class SaveGameService
         }
     }
 
-    /// <summary>Reads the save without loading it, for showing what it holds. False, with a reason, when it can't be used.</summary>
+    /// <summary>Gives a save a new name. The name is trimmed; an empty one is refused.</summary>
+    public static bool TryRename(string slot, string name, out string problem)
+    {
+        name = (name ?? "").Trim();
+        if (name.Length == 0)
+        {
+            problem = "A save needs a name.";
+            return false;
+        }
+
+        if (name.Length > MaximumNameLength)
+        {
+            name = name.Substring(0, MaximumNameLength);
+        }
+
+        if (!TryReadSave(slot, out SaveData data, out problem))
+        {
+            return false;
+        }
+
+        data.displayName = name;
+        try
+        {
+            Storage.Write(slot, data);
+        }
+        catch (Exception exception) when (exception is IOException || exception is UnauthorizedAccessException)
+        {
+            Debug.LogException(exception);
+            problem = "The name couldn't be saved: " + exception.Message;
+            return false;
+        }
+
+        if (slot == CurrentSlot)
+        {
+            CurrentName = name;
+        }
+
+        return true;
+    }
+
+    /// <summary>Deletes a save and its backup. The game being played, if that was its save, gets a new one when it next saves.</summary>
+    public static bool TryDelete(string slot, out string problem)
+    {
+        problem = null;
+        try
+        {
+            Storage.Delete(slot);
+        }
+        catch (Exception exception) when (exception is IOException || exception is UnauthorizedAccessException)
+        {
+            Debug.LogException(exception);
+            problem = "The save couldn't be deleted: " + exception.Message;
+            return false;
+        }
+
+        if (slot == CurrentSlot)
+        {
+            CurrentSlot = null;
+            CurrentName = null;
+        }
+
+        return true;
+    }
+
+    /// <summary>The first free "Journey N".</summary>
+    private static string NextName()
+    {
+        var used = new HashSet<string>();
+        foreach (SaveSlotInfo save in ListSaves())
+        {
+            used.Add(save.Name);
+        }
+
+        int number = used.Count + 1;
+        while (used.Contains($"Journey {number}"))
+        {
+            number++;
+        }
+
+        return $"Journey {number}";
+    }
+
+    /// <summary>Reads the save being played, or the newest one, without loading it. False, with a reason, when it can't be used.</summary>
     public static bool TryReadSave(out SaveData data, out string problem)
     {
-        if (!Storage.TryRead(SaveStorage.DefaultSlot, out data, out problem))
+        return TryReadSave(SlotToLoad(), out data, out problem);
+    }
+
+    /// <summary>Reads a save without loading it, for showing what it holds. False, with a reason, when it can't be used.</summary>
+    public static bool TryReadSave(string slot, out SaveData data, out string problem)
+    {
+        if (!Storage.TryRead(slot, out data, out problem))
         {
             return false;
         }
@@ -102,11 +257,23 @@ public static class SaveGameService
         return true;
     }
 
-    /// <summary>
-    /// Loads the save and goes to its scene, or to fallbackScene if that scene no longer exists. False, with a reason
-    /// for the player, when there is nothing to load.
-    /// </summary>
+    // Quick load: back to the save being played, or else the newest.
+    private static string SlotToLoad()
+    {
+        return CurrentSlot != null && Storage.Exists(CurrentSlot) ? CurrentSlot : LatestSave()?.Slot ?? SaveStorage.DefaultSlot;
+    }
+
+    /// <summary>Loads the save being played, or the newest one (quick load).</summary>
     public static bool TryLoad(IContentLookup content, string fallbackScene, out string problem)
+    {
+        return TryLoad(SlotToLoad(), content, fallbackScene, out problem);
+    }
+
+    /// <summary>
+    /// Loads a save and goes to its scene, or to fallbackScene if that scene no longer exists. False, with a reason
+    /// for the player, when there is nothing to load. The game then carries on in that save.
+    /// </summary>
+    public static bool TryLoad(string slot, IContentLookup content, string fallbackScene, out string problem)
     {
         if (loading)
         {
@@ -114,7 +281,7 @@ public static class SaveGameService
             return false;
         }
 
-        if (!TryReadSave(out SaveData data, out problem))
+        if (!TryReadSave(slot, out SaveData data, out problem))
         {
             return false;
         }
@@ -142,11 +309,13 @@ public static class SaveGameService
         }
 
         GameSession.LoadGame(game);
+        CurrentSlot = slot;
+        CurrentName = SaveSlotInfo.NameFor(slot, data);
         Go(scene, notice, "Returning to your journey");
         return true;
     }
 
-    /// <summary>Forgets the current game and starts over in the given scene. The save on disk is kept until the next save.</summary>
+    /// <summary>Forgets the current game and starts over in the given scene. Every save stays: the new game makes its own.</summary>
     public static bool TryStartNewGame(string scene, out string problem)
     {
         problem = loading ? "The game is already loading." : !CanLoad(scene) ? $"The scene '{scene}' isn't in the build." : null;
@@ -156,6 +325,8 @@ public static class SaveGameService
         }
 
         GameSession.StartNewGame();
+        CurrentSlot = null;
+        CurrentName = null;
         Go(scene, null, "A new journey begins");
         return true;
     }
@@ -205,5 +376,7 @@ public static class SaveGameService
 
         loading = false;
         storage = null;
+        CurrentSlot = null;
+        CurrentName = null;
     }
 }

@@ -40,6 +40,12 @@ public sealed class ExplorationMap : MonoBehaviour, ISaveable
     public Texture2D Texture => texture;
     public string SaveKey => "exploration";
 
+    /// <summary>Lifts the fog of war around a place the player hasn't been (a beacon, a rumour).</summary>
+    public void RevealAround(Vector3 position, float radius)
+    {
+        dirty |= grid.Reveal(new Vector2(position.x, position.z), radius, 0.25f);
+    }
+
     /// <summary>0–1 how explored the ground under a position is.</summary>
     public float ExploredAt(Vector3 position) => grid != null ? grid.At(new Vector2(position.x, position.z)) : 1f;
 

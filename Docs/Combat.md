@@ -12,7 +12,7 @@ by motion, sound and weight rather than on-screen text.
 | Left mouse / right trigger (tap) | Light swing, starting the moment you press. Pressed again **in time** after a swing lands, the next swing of the weapon's chain |
 | Left mouse (hold) | Held on (0.22 s), the light swing turns into the heavy swing while it still winds up: slow, nearly rooted, hard; breaks poise. You pay only the difference in stamina |
 | Right mouse / left trigger (hold) | Guard. Raised just before a hit lands: parry |
-| Left mouse while guarding | Shield bash with a shield; without one it drops the guard and swings |
+| Left mouse while guarding | Shield bash with a shield (off hand); without one it drops the guard and swings |
 | Space / south button | Dodge: a quickstep, a roll or a heavy shoulder charge, by how much gear you wear |
 | Using food or drink | Stop and eat: takes a moment, heals over time |
 | Left Ctrl / left bumper (hold) | Sneak: half speed, quiet, hard to see. A hit on a monster that hasn't noticed you is an ambush (+50%) |
@@ -52,9 +52,33 @@ by motion, sound and weight rather than on-screen text.
   enemies at its end (it breaks their poise), and you move a little slower.
 - **Eating is a commitment.** Using food or drink stops you for 1.3 s (slowed, no attacking or guarding). A hit that gets
   through or a dodge stops the meal and the food is kept. Its healing then arrives over six seconds, not at once.
+- **Status effects.** Some attacks leave something behind when they get through (never when blocked or parried): **Poison**
+  (health drains; an Antidote cures it), **Chill** (slower; a Warming Brew cures it) and **Roots** (held in place for a
+  moment, but free to fight). They show above the vitals with their time left. Ticks don't flinch, can't be guarded and
+  don't count as a perfect dodge. A new hit restarts the time; they don't stack.
+- **Meals and tonics.** Cooked meals give timed bonuses on top of what they restore. Two meals at once: a third pushes out
+  the one closest to ending. Tonics from the Cauldron take no meal slot. Both go through the portal with you, so the meal
+  before a raid counts, and a failed raid loses them.
 - **Poise and stagger.** Every hit wears down a monster's poise (heavy swings, finishers and counters the most); at
   zero it staggers: its attack is cancelled, it stands reeling and takes 20% more damage. Poise comes back after two
   seconds without being hit. Tough monsters have more (Content Editor › Monsters › Poise).
+
+## Shields
+
+A shield is held in the off hand, beside a one-handed weapon. Two-handed weapons and bows don't leave a hand free; L swaps it
+for the torch and back. Each shield has its own Guard Let Through: Round Shield 22%, Copper-Bound 15%, Iron Kite 8%. Heavier
+ones add more to the equipment load, which decides the dodge.
+
+## Creatures
+
+| Creature | Reads as | How to beat it |
+|---|---|---|
+| Marsh Light | Pale hovering light, keeps its distance, flees when hurt | Its cold bolts are slow: dodge, then shoot it or run it down |
+| Draug | Slow armoured dead with a blade, hard to stagger | Fire hurts it more; bait the lunge, it stands open after |
+| Bog Spitter | Squat, spits venom from range | Close in: it is weak up close. Carry an Antidote |
+| Blight Boar | Leaves you alone at a distance | Sidestep the charge and hit it while it stands blown |
+| Rootling | Small, fast, always several; a grasp can root you | Sweeping swings. Kill the Shaman that calls them |
+| Moss Shaman | Hangs back with a staff, calls Rootlings, rallies its side | Reach it first; hitting it interrupts a call |
 
 ## The bow
 

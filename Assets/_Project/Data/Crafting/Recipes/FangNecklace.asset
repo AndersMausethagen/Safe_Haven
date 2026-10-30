@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e984d5700951ee48b9215d668e8218a, type: 3}
+  m_Name: FangNecklace
+  m_EditorClassIdentifier: SafeHaven::RecipeDefinition
+  id: fangnecklace
+  displayName: 
+  output: {fileID: 11400000, guid: 730e3d4d65f195c449f36401ef071ab6, type: 2}
+  outputResource: {fileID: 0}
+  outputAmount: 1
+  resourceCost: []
+  itemCost:
+  - item: {fileID: 11400000, guid: 5148bc82bfb79f94ca5482ed8e4ea69f, type: 2}
+    amount: 3
+  - item: {fileID: 11400000, guid: 4df650debd4ce21459e04a0c92ffa207, type: 2}
+    amount: 1
+  station: 1
+  craftSeconds: 12
+  knownFromStart: 1
+  sortOrder: 120

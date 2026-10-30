@@ -121,7 +121,12 @@ public sealed class Damageable : MonoBehaviour, IDamageable, ISaveable
 
         if (IsInvulnerable)
         {
-            Evaded?.Invoke(hit);
+            // A poison tick during a dodge is no perfect dodge.
+            if (!hit.IsOverTime)
+            {
+                Evaded?.Invoke(hit);
+            }
+
             return DamageResult.None;
         }
 

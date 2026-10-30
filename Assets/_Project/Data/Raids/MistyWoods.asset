@@ -22,6 +22,9 @@ MonoBehaviour:
   knownEnemies:
   - {fileID: 11400000, guid: afbf4a58442496641826a078787f7e2e, type: 2}
   - {fileID: 11400000, guid: 2f66a8d86463697438ce75621f51e12d, type: 2}
+  - {fileID: 11400000, guid: e646ff37405b36e43a4fa710a23060e2, type: 2}
+  - {fileID: 11400000, guid: 780dd3de177d4ca41b12a65f95fa709b, type: 2}
+  - {fileID: 11400000, guid: 20c7f11cbb9bb214f95fc0f2a51db9d9, type: 2}
   likelyItems:
   - {fileID: 11400000, guid: 7e57bf86766de2341bd9c47b5830cf76, type: 2}
   - {fileID: 11400000, guid: a9f806359436036488427616ef8b8c44, type: 2}
@@ -72,20 +75,44 @@ MonoBehaviour:
     huntPlayer: 0
     entries:
     - prefab: {fileID: 4584692032328657812, guid: 64cf9de042e1bc142907212054f70f50, type: 3}
-      weight: 29.411764
+      weight: 22
       maxPerGroup: 0
       minPerGroup: 0
     - prefab: {fileID: 9066855856663566298, guid: 6e4b724e33048b246a0b54c712d80b6f, type: 3}
-      weight: 41.17647
+      weight: 18
       maxPerGroup: 0
       minPerGroup: 0
     - prefab: {fileID: 6267209934607442583, guid: bb37a42ef72f5274d807155e3d054529, type: 3}
-      weight: 17.647058
+      weight: 12
       maxPerGroup: 0
       minPerGroup: 0
     - prefab: {fileID: 4830014356063024607, guid: a8600aa8041d7044c9a3afddd7102a7b, type: 3}
-      weight: 11.764706
+      weight: 8
       maxPerGroup: 0
+      minPerGroup: 0
+    - prefab: {fileID: 6176781864247096722, guid: a8ac1434006f7a44fb55b3c510633858, type: 3}
+      weight: 10
+      maxPerGroup: 0
+      minPerGroup: 0
+    - prefab: {fileID: 8653230728158633359, guid: a661dc05d2e43f943a476376f636ef9a, type: 3}
+      weight: 10
+      maxPerGroup: 0
+      minPerGroup: 0
+    - prefab: {fileID: 4999243170976522981, guid: 07a704aacccfef242886f2875ff4fcdf, type: 3}
+      weight: 8
+      maxPerGroup: 0
+      minPerGroup: 0
+    - prefab: {fileID: 5318185529198269020, guid: d281dc652b3e50445a465365ff40b433, type: 3}
+      weight: 6
+      maxPerGroup: 0
+      minPerGroup: 0
+    - prefab: {fileID: 9066855856663566298, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
+      weight: 4
+      maxPerGroup: 2
+      minPerGroup: 0
+    - prefab: {fileID: 3643037256157110189, guid: 8af413a8c10dbdc4f89f0537152651dc, type: 3}
+      weight: 2
+      maxPerGroup: 1
       minPerGroup: 0
   - name: Resources
     category: 1
@@ -102,24 +129,40 @@ MonoBehaviour:
     huntPlayer: 0
     entries:
     - prefab: {fileID: 8046387889879202812, guid: 262f869a4b8db6440b65cd5554060fce, type: 3}
-      weight: 27.245375
+      weight: 22.886112
       maxPerGroup: 0
       minPerGroup: 1
     - prefab: {fileID: 6288032578105571644, guid: dd1ab12d09fe61049b4f79441821d70a, type: 3}
-      weight: 5.6411524
+      weight: 4.738568
       maxPerGroup: 0
       minPerGroup: 1
     - prefab: {fileID: 1158895183621609222, guid: e010c7c1cd96e8a4cb11aa834ca0a563, type: 3}
-      weight: 5
+      weight: 4.2
       maxPerGroup: 0
       minPerGroup: 1
     - prefab: {fileID: 3616788768692720460, guid: 7bbc1b4511da00c4e81fb9d948fe6784, type: 3}
-      weight: 11.882032
+      weight: 9.9809065
       maxPerGroup: 0
       minPerGroup: 1
     - prefab: {fileID: 948381022197778722, guid: 15b33c21de24fb7418664d30fe242c26, type: 3}
-      weight: 50.23145
+      weight: 42.194412
       maxPerGroup: 0
+      minPerGroup: 1
+    - prefab: {fileID: 5701181132641860389, guid: 5e2206bd114732e4da8f8e504471a110, type: 3}
+      weight: 7
+      maxPerGroup: 0
+      minPerGroup: 1
+    - prefab: {fileID: 7806843326714637814, guid: 94dc1085a97345342b8f74fa9c096025, type: 3}
+      weight: 4
+      maxPerGroup: 0
+      minPerGroup: 1
+    - prefab: {fileID: 1699181372466110288, guid: f6d8bfacb080b84408ebd7afcb7fa627, type: 3}
+      weight: 4
+      maxPerGroup: 0
+      minPerGroup: 1
+    - prefab: {fileID: 7424242661901594498, guid: 415fc92bb3a4e3c4892211c08f38f779, type: 3}
+      weight: 1
+      maxPerGroup: 3
       minPerGroup: 1
   - name: Supply Caches
     category: 2
@@ -226,6 +269,7 @@ MonoBehaviour:
   systems:
   - rid: 287757967972106337
   - rid: 287757967972106340
+  - rid: 287758281410609305
   roaming:
     table: {fileID: 11400000, guid: 55a919693f726634aa952bc05b8ac3a3, type: 2}
     firstDelay: 60
@@ -299,3 +343,24 @@ MonoBehaviour:
           wrathGroups: 3
           wrathTable: {fileID: 11400000, guid: 14f76a7cd21202c4f9876929a83f6ca9, type: 2}
           maxWraths: 1
+    - rid: 287758281410609305
+      type: {class: RaidEventsSystem, ns: , asm: SafeHaven}
+      data:
+        enabled: 1
+        settings:
+          pool:
+          - {fileID: 11400000, guid: c741611bae9900b4da4b5f0226efdfe1, type: 2}
+          - {fileID: 11400000, guid: 99222c7a39ea478488c1567cd06e9ca6, type: 2}
+          - {fileID: 11400000, guid: eac64687f931d7c4784a86ae8f83b987, type: 2}
+          - {fileID: 11400000, guid: 1f5a45a9b02364c46a8f908efeb0de22, type: 2}
+          - {fileID: 11400000, guid: 96cb078123957d84a8fb85a77ce918bf, type: 2}
+          - {fileID: 11400000, guid: 0d4d797da4e8c0d4387a4cca400ce33a, type: 2}
+          - {fileID: 11400000, guid: ab909f1e102c2d446b08c2c49295dcb2, type: 2}
+          - {fileID: 11400000, guid: ef827d0bb7f46d447b0d6be2e2c6783c, type: 2}
+          - {fileID: 11400000, guid: e8fa9dbe99dd2df4a800731b224f1dfd, type: 2}
+          - {fileID: 11400000, guid: a3cb2529bab49724cb72ddb15212b062, type: 2}
+          firstDelay: 45
+          interval: 110
+          intervalSpread: 35
+          maxPerRaid: 4
+          maxOpenSites: 2

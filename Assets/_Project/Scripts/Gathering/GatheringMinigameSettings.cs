@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -108,7 +108,7 @@ public sealed class GatheringMinigameSettings : GameSettings<GatheringMinigameSe
     public int BonusPerCritical => bonusPerCritical;
     public float CriticalHitStop => criticalHitStop;
     public bool InterruptOnHit => interruptOnHit;
-    public bool AutoGather => autoGather;
+    public bool AutoGather => autoGather || GameOptions.AutoGather.On;
     public float AutoSwingSeconds => autoSwingSeconds;
     public HarvestFeedbackProfile DefaultFeedback => defaultFeedback;
 

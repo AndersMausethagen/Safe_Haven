@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
@@ -43,9 +43,11 @@ public sealed class RaidHudView : MonoBehaviour
     private RaidDirector director;
     private float nextRiskRefresh;
     private float nextExitsRefresh;
+    private float timerSize;
 
     private void OnEnable()
     {
+        timerSize = timerLabel.fontSize;
         if (banner != null)
         {
             banner.SetActive(false);
@@ -84,6 +86,7 @@ public sealed class RaidHudView : MonoBehaviour
         }
 
         RaidSession session = director.Session;
+        timerLabel.fontSize = GameOptions.LargeTimer.On ? timerSize * 1.6f : timerSize;
         timerLabel.text = RaidStats.FormatTime(session.TimeRemaining);
         timerLabel.color = TimerColor(session);
         ExtractionPoint target = null;
@@ -185,7 +188,41 @@ public sealed class RaidHudView : MonoBehaviour
             }
         }
 
+        AppendEventSites(position);
         return text.ToString();
+    }
+
+    // Raid events waiting to be reached, with which way they lie as the player sees it: "Overturned Wagon  45 m  ahead".
+    private void AppendEventSites(Vector3 position)
+    {
+        if (!director.TryGetComponent(out RaidEventDirector events))
+        {
+            return;
+        }
+
+        foreach (RaidEventSite site in events.OpenSites)
+        {
+            if (site == null || site.IsResolved)
+            {
+                continue;
+            }
+
+            Vector3 offset = site.transform.position - position;
+            offset.y = 0f;
+            text.Append($"\n<color=#C9A2FF>{site.DisplayName}  {Mathf.RoundToInt(offset.magnitude)} m  {SideOf(offset)}</color>");
+        }
+    }
+
+    private static string SideOf(Vector3 offset)
+    {
+        Camera view = Camera.main;
+        if (view == null)
+        {
+            return "";
+        }
+
+        float angle = Vector3.SignedAngle(Vector3.ProjectOnPlane(view.transform.forward, Vector3.up), offset, Vector3.up);
+        return Mathf.Abs(angle) < 45f ? "ahead" : Mathf.Abs(angle) > 135f ? "behind" : angle > 0f ? "to the right" : "to the left";
     }
 
     private string DescribeRisk()

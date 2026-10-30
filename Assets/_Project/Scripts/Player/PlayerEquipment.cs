@@ -28,6 +28,8 @@ public sealed class PlayerEquipment : MonoBehaviour
     private ItemInventory inventory;
     // The two-handed weapon put away for the torch (ToggleTorch), taken out again when the torch goes back.
     private ItemDefinition stowedWeapon;
+    // The shield put away for the torch, taken out again when the torch goes back.
+    private ItemDefinition stowedShield;
     // The weapon in hand now and the one before it (however it changed: Z, the bag, a story), for SwapWeapon.
     private ItemDefinition heldWeapon;
     private ItemDefinition previousWeapon;
@@ -170,6 +172,13 @@ public sealed class PlayerEquipment : MonoBehaviour
                 EquipFromBag(weapon);
             }
 
+            ItemDefinition shield = stowedShield;
+            stowedShield = null;
+            if (shield != null && OffHand.IsEmpty)
+            {
+                EquipFromBag(shield);
+            }
+
             return true;
         }
 
@@ -189,6 +198,17 @@ public sealed class PlayerEquipment : MonoBehaviour
             }
 
             stowedWeapon = held;
+        }
+
+        if (!OffHand.IsEmpty)
+        {
+            ItemDefinition shield = OffHand.Item;
+            if (!gear.Unequip(GearSlot.OffHand, bag, out string reason))
+            {
+                return Report(false, reason, null);
+            }
+
+            stowedShield = shield;
         }
 
         return EquipTo(bag, torch, GearSlot.OffHand);
@@ -237,7 +257,7 @@ public sealed class PlayerEquipment : MonoBehaviour
         return false;
     }
 
-    private static bool IsSwappable(ItemDefinition item) => item != null && item.IsWeapon && item.Weapon.Kind != WeaponKind.Torch;
+    private static bool IsSwappable(ItemDefinition item) => item != null && item.IsWeapon && item.Weapon.Kind != WeaponKind.Torch && !item.Weapon.IsShield;
 
     // Remembers the weapon put away whenever the main hand changes (equipping goes through an empty hand: old, none, new).
     private void TrackHeldWeapon()
@@ -383,6 +403,12 @@ public sealed class PlayerEquipment : MonoBehaviour
         if (combat != null && combat.Weapon != weapon)
         {
             combat.Weapon = weapon;
+        }
+
+        ItemStack offHand = OffHand;
+        if (combat != null)
+        {
+            combat.Shield = !offHand.IsEmpty && offHand.Item.IsWeapon && offHand.Item.Weapon.IsShield && !offHand.IsBroken ? offHand.Item.Weapon : null;
         }
     }
 }

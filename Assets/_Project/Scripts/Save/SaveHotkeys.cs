@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.InputSystem;
 
 /// <summary>
@@ -30,7 +30,7 @@ public sealed class SaveHotkeys : MonoBehaviour
     {
         if (SaveGameService.TrySave(out string problem))
         {
-            GameMessages.Post("Game saved.", MessageKind.Gain);
+            GameMessages.Post($"Game saved: {SaveGameService.CurrentName}", MessageKind.Gain);
         }
         else
         {

@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2f02987ee9197d4682f5db8cbc7a967, type: 3}
+  m_Name: ThickeningFog
+  m_EditorClassIdentifier: SafeHaven::RaidEventDefinition
+  id: ThickeningFog
+  displayName: Thickening Fog
+  weight: 1
+  earliestSeconds: 60
+  latestSecondsLeft: 100
+  minimumStage: 0
+  warning: The birdsong stops. Somewhere close, fog is gathering with pale lights in it.
+  warningSound: {fileID: 11400000, guid: 4cc9bc40fb223354aa6032cf0c7fb0f2, type: 2}
+  sitePrefab: {fileID: 5294197929266190911, guid: 9938570d0f90beb4da8145a9d1cd2e8f, type: 3}
+  siteDistance: {x: 35, y: 70}
+  siteText: Inside the fog a ring of old stones, and a chest nobody left by accident.
+  onStart:
+  - rid: 287758281410609280
+  choices: []
+  references:
+    version: 2
+    RefIds:
+    - rid: 287758281410609280
+      type: {class: SpawnCreaturesOutcome, ns: , asm: SafeHaven}
+      data:
+        prefabs:
+        - {fileID: 5318185529198269020, guid: d281dc652b3e50445a465365ff40b433, type: 3}
+        count: 3
+        radius: 7
+        hunt: 0

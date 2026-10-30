@@ -87,7 +87,7 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
     /// keep the slowest and the longest.</summary>
     public void SlowTime(float scale, float seconds)
     {
-        if (seconds <= 0f)
+        if (seconds <= 0f || !GameOptions.HitStop.On)
         {
             return;
         }
