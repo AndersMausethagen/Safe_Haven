@@ -14,6 +14,79 @@ public enum PrologueStep
     Finished
 }
 
+/// <summary>A place of the night: the forest where it starts, the camp by the shelter, the portal.</summary>
+public enum PrologueSite
+{
+    Forest,
+    Camp,
+    Portal,
+}
+
+/// <summary>
+/// What each step means for the places of the night, step by step in one place, so nothing depends on the order of the
+/// steps: where a checkpoint puts the player back, where the companions wait and what they talk about. Earlier or later
+/// in the story is still the order (PrologueInteraction's "not yet" and "already done").
+/// </summary>
+public static class PrologueSteps
+{
+    /// <summary>Where a checkpoint at this step puts the player back.</summary>
+    public static PrologueSite Checkpoint(this PrologueStep step)
+    {
+        switch (step)
+        {
+            case PrologueStep.FindShelter:
+                return PrologueSite.Forest;
+            case PrologueStep.ActivatePortal:
+            case PrologueStep.HoldPortal:
+            case PrologueStep.Finished:
+                return PrologueSite.Portal;
+            default:
+                return PrologueSite.Camp;
+        }
+    }
+
+    /// <summary>Where the companions wait during this step, or null while they walk with the player.</summary>
+    public static PrologueSite? Rally(this PrologueStep step)
+    {
+        switch (step)
+        {
+            case PrologueStep.FindShelter:
+            case PrologueStep.ReachPortal:
+                return null;
+            case PrologueStep.ActivatePortal:
+            case PrologueStep.HoldPortal:
+            case PrologueStep.Finished:
+                return PrologueSite.Portal;
+            default:
+                return PrologueSite.Camp;
+        }
+    }
+
+    /// <summary>The place the companions talk about: where the expedition is, or is heading.</summary>
+    public static PrologueSite Talk(this PrologueStep step)
+    {
+        switch (step)
+        {
+            case PrologueStep.FindShelter:
+                return PrologueSite.Forest;
+            case PrologueStep.ReachPortal:
+            case PrologueStep.ActivatePortal:
+            case PrologueStep.HoldPortal:
+            case PrologueStep.Finished:
+                return PrologueSite.Portal;
+            default:
+                return PrologueSite.Camp;
+        }
+    }
+
+    /// <summary>True while there is time at the camp to sit and talk (the companions' camp topics).</summary>
+    public static bool AtRest(this PrologueStep step) =>
+        step == PrologueStep.GatherFuel || step == PrologueStep.LightFire || step == PrologueStep.CatchBreath;
+
+    /// <summary>True once the portal stands open.</summary>
+    public static bool PortalOpen(this PrologueStep step) => step == PrologueStep.HoldPortal || step == PrologueStep.Finished;
+}
+
 [Serializable]
 public sealed class PrologueChapter
 {

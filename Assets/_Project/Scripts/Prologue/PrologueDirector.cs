@@ -242,14 +242,13 @@ public sealed class PrologueDirector : MonoBehaviour, IBuildArea
         nextRumble = 12f;
         wave = 0;
         if (IsFighting && ActionMenuWindow.Current != null) ActionMenuWindow.Current.Close();
-        portalVisual.SetActive(step >= PrologueStep.HoldPortal);
-        Transform rally = step >= PrologueStep.ActivatePortal ? portalPoint
-            : step >= PrologueStep.GatherFuel && step <= PrologueStep.DefendCamp ? campPoint : null;
+        portalVisual.SetActive(step.PortalOpen());
+        PrologueSite? waitAt = step.Rally();
+        Transform rally = waitAt.HasValue ? PointAt(waitAt.Value) : null;
         foreach (PrologueCompanion companion in companions)
             if (companion != null) companion.RallyAt(rally, restoring);
         if (restoring)
-            MovePlayer(step >= PrologueStep.ActivatePortal ? portalPoint
-                : step >= PrologueStep.GatherFuel ? campPoint : startPoint);
+            MovePlayer(PointAt(step.Checkpoint()));
         if (step == PrologueStep.Finished)
         {
             BeginEnding(false);
@@ -266,6 +265,9 @@ public sealed class PrologueDirector : MonoBehaviour, IBuildArea
         if (CanSave && !SaveGameService.TrySave(out string problem))
             GameMessages.Post("Prologue checkpoint could not be saved: " + problem, MessageKind.Warning);
     }
+
+    private Transform PointAt(PrologueSite site) =>
+        site == PrologueSite.Portal ? portalPoint : site == PrologueSite.Camp ? campPoint : startPoint;
 
     // The chapter's clock and arrivals: wolves, the portal's rumble.
     private void StartChapter()

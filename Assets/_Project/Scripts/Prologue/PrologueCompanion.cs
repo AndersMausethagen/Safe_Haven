@@ -78,8 +78,11 @@ public sealed class PrologueCompanion : MonoBehaviour, IConversationTopics
     {
         PrologueStep step = PrologueDirector.Current != null ? PrologueDirector.Current.Step : PrologueStep.Finished;
         if (string.IsNullOrWhiteSpace(page.Body))
-            page.Body = step >= PrologueStep.ReachPortal ? portalLine : step >= PrologueStep.GatherFuel ? campLine : forestLine;
-        if (step < PrologueStep.GatherFuel || step > PrologueStep.CatchBreath) return;
+        {
+            PrologueSite talk = step.Talk();
+            page.Body = talk == PrologueSite.Portal ? portalLine : talk == PrologueSite.Camp ? campLine : forestLine;
+        }
+        if (!step.AtRest()) return;
         for (int i = 0; i < campTopics.Length; i++)
         {
             int topic = i;

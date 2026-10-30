@@ -12,6 +12,22 @@ public sealed class PrologueTests
     private PrologueDefinition Definition => AssetDatabase.LoadAssetAtPath<PrologueDefinition>(Root + "/ForestPrologue.asset");
 
     [Test]
+    public void Steps_SayWhereTheNightIs()
+    {
+        // FindShelter, GatherFuel, LightFire, CatchBreath, DefendCamp, ReachPortal, ActivatePortal, HoldPortal, Finished
+        var steps = (PrologueStep[])System.Enum.GetValues(typeof(PrologueStep));
+        const PrologueSite F = PrologueSite.Forest, C = PrologueSite.Camp, P = PrologueSite.Portal;
+        CollectionAssert.AreEqual(new[] { F, C, C, C, C, C, P, P, P }, steps.Select(s => s.Checkpoint()),
+            "A checkpoint on the way to the portal restarts at the camp.");
+        CollectionAssert.AreEqual(new PrologueSite?[] { null, C, C, C, C, null, P, P, P }, steps.Select(s => s.Rally()),
+            "Companions walk with the player to the shelter and to the portal.");
+        CollectionAssert.AreEqual(new[] { F, C, C, C, C, P, P, P, P }, steps.Select(s => s.Talk()));
+        CollectionAssert.AreEqual(new[] { false, true, true, true, false, false, false, false, false }, steps.Select(s => s.AtRest()),
+            "No small talk while wolves attack.");
+        CollectionAssert.AreEqual(new[] { false, false, false, false, false, false, false, true, true }, steps.Select(s => s.PortalOpen()));
+    }
+
+    [Test]
     public void SavedLeaderOffers_AreIndexedAsStandardGivers()
     {
         QuestSceneIndex.Invalidate();
