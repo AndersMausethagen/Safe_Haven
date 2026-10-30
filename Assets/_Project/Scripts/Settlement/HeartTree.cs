@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 
@@ -14,7 +15,7 @@ using UnityEngine;
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Interactable))]
-public sealed class HeartTree : MonoBehaviour, IArea
+public sealed class HeartTree : MonoBehaviour, IArea, IBuildArea
 {
     /// <summary>What the tree says while a quest is active, so it points the way one step at a time.</summary>
     [System.Serializable]
@@ -62,6 +63,35 @@ public sealed class HeartTree : MonoBehaviour, IArea
 
     bool IArea.Contains(Vector3 position) => Contains(position);
 
+    // ----- Building (IBuildArea): the ward is where the player builds what they know -----
+
+    string IBuildArea.WhyClosed => null;
+    string IBuildArea.Guidance => $"Build inside the Heart Tree's ward ({WardRadius:0} m). ";
+    bool IBuildArea.AllowsChanges => true;
+    float IBuildArea.GroundHeight => transform.position.y;
+
+    IEnumerable<BuildingDefinition> IBuildArea.Buildable(PlayerCrafting crafting)
+    {
+        foreach (BuildingDefinition building in crafting.Buildings)
+        {
+            if (building != null && building.ShowInBuildMenu && crafting.IsKnown(building))
+            {
+                yield return building;
+            }
+        }
+    }
+
+    bool IBuildArea.TryGetGroundPoint(Camera view, out Vector3 point) =>
+        CameraPointer.TryGetPointOnPlane(view, new Plane(Vector3.up, transform.position), out point);
+
+    Vector3 IBuildArea.OnGround(Vector3 point) => point;
+
+    string IBuildArea.CheckSpot(FootprintRect footprint, Vector3 point) =>
+        Contains(footprint.WorldCenter(point.y), Mathf.Max(footprint.HalfSize.x, footprint.HalfSize.y))
+            ? null : "Outside the Heart Tree's ward. Build closer to the tree.";
+
+    string IBuildArea.CheckBuilding(BuildingDefinition building) => null;
+
     private void Awake()
     {
         if (!TryGetComponent(out HavenProgress _))
@@ -71,6 +101,7 @@ public sealed class HeartTree : MonoBehaviour, IArea
 
         interactable = GetComponent<Interactable>();
         Current = this;
+        BuildArea.Enter(this);
     }
 
     private void OnEnable()
@@ -88,6 +119,7 @@ public sealed class HeartTree : MonoBehaviour, IArea
 
     private void OnDestroy()
     {
+        BuildArea.Leave(this);
         if (Current == this)
         {
             Current = null;

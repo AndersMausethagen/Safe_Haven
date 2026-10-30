@@ -84,7 +84,7 @@ of the GDD, **Not started** = design only. Update this table when a system is ad
 | `Items`, `ResourceInventory`, `Crafting`, `Content` | Data definitions (ScriptableObjects) and their runtime containers. `Crafting/MaterialPool` is the one place costs are paid from |
 | `Survival` | Hunger and thirst: `PlayerNeeds` (on the player), `NeedMeter` (one meter's rules), `SurvivalSettings`, `WaterSource` (drink and fill waterskins) |
 | `Durability` | Wear on deployed equipment: `DurabilitySettings` (loss per failed raid, repair cost share), `Repairs` (cost and repair), `RepairBench` |
-| `Building` | `BuildPlacer`: the build menu (G), the placement preview inside the ward radius, moving buildings, snapping, yards and line drawing. `BuildPlacement`: pure footprint/yard/snap/line geometry (tested in `BuildPlacementTests`) |
+| `Building` | `BuildPlacer`: the build menu (G), placing, moving buildings, snapping, yards and line drawing. `BuildGhost` (plain C#): the see-through preview and the yard markers. `IBuildArea` / `BuildArea.Current`: where and what may be built (the `HeartTree`'s ward, the `PrologueDirector`'s camp: its guidance, ground, spot rules and buildable list), so the placer knows neither. `BuildPlacement`: pure footprint/yard/snap/line geometry (tested in `BuildPlacementTests`) |
 | `Settlement` | Safe Haven as a place: `SettlementState` (portal, ward level, breach, residents, purification queue), `SettlementSystem` (persistent; ticks purification), `SettlementSettings`, `HeartTree`, `WardBreachDefinition` + `WardBreachDirector`, `HomeRevival`, residents and jobs (`ResidentDefinition`, `JobDefinition`, `ResidentNpc`, `ResidentSpawner`, `RescuableTraveler`), `PurificationAltar` |
 | `Interaction` | `Interactable` – anything the player interacts with on E. Its **Kind** says how it runs (`InteractionKind`): **Work** over Duration with a work bar and animation (gathering, repairing; Duration 0 = until `Complete()`), or **Use**, done on the press with no player state, animation or bar (talking, chests, stations, portal, altar, lighting an exit). Set it in data; `BuildingPrefabBuilder` makes stations Use. Side concerns are small interfaces: `IInteractionCondition`, `IInteractionVerb`, `IInteractionNote`, `IInteractionName` (the prompt's name). `Talkable` is the one way to talk to someone: on Use it opens a DialogueBox conversation gathered from every `IConversationTopics` on the object in component order (the first with a line speaks it; each adds answers: `QuestGiver` offers, `PrologueCompanion` camp topics, `Companion` orders, `ResidentNpc` jobs), and after an answer opens again with its follow-up line. It holds the speaker's name, portrait, camera distance and an optional talked event. A `QuestGiver` without a Talkable starts or hands in on the press (notice boards) |
 | `Raids` | Raid definitions, modifiers, the `RaidLauncher` (departure, Portal Sparks), the `RaidDirector` that runs a raid scene, extraction, loot caches, the portal. `Raids/Map`: painted raid maps (`RaidMapDefinition`, `RaidMapZone`, `RaidZoneGrid`, `RaidMap`, `MapRotation`, `RaidMapMarkers`; see "Raid maps") |
@@ -144,12 +144,12 @@ counts the cleared encounter, not player kill credit. No `RaidSession`, regular 
 durability penalty is involved. Supplies deliberately reset to home starting contents.
 
 `BuildPlacer` retains its ordinary placement, footprint checks, material payment and Built event. In the forest
-it exposes only the prologue definition's Campfire, the same `Data/Buildings/Campfire.asset` the player builds at home
+the `PrologueDirector` is the build area (`IBuildArea`), which exposes only the prologue definition's Campfire, the same `Data/Buildings/Campfire.asset` the player builds at home
 (Sticks and Small Rocks; upgrades only at home), only during the accepted building chapter, and only inside the
 shelter's build radius. Keep the gathering objectives aligned with its Construction Items when tuning costs
 (PrologueTests checks this). The fire quest counts **Build Structure**, not a use-fire event.
-Forest ghosts raycast the director's TerrainCollider, resample height after snapping, and reject footprints whose
-corners differ by more than 0.2 m from the base; the normal flat settlement placement is unchanged.
+Its ground is the director's TerrainCollider (height resampled after snapping), and it rejects footprints whose
+corners differ by more than 0.2 m from the base; the Heart Tree's ward is a flat plane.
 `PersistentScene` and the campfire's registered prefab preserve the player's placement and resource depletion.
 The expedition wolf prefab has no SaveableEntity: encounters intentionally restart at checkpoints.
 Off-hand torch and armor are granted and auto-equipped once from the prologue definition, before the saved

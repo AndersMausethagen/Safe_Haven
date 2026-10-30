@@ -8,6 +8,43 @@ public sealed class BuildPlacementTests
     private static readonly Bounds Box = new Bounds(new Vector3(0f, 1f, 0f), new Vector3(2f, 2f, 2f));
     private static readonly Bounds Wall = new Bounds(new Vector3(0f, 1f, 0f), new Vector3(4f, 2f, 0.6f));
 
+    private sealed class TestArea : IBuildArea
+    {
+        public string WhyClosed => null;
+        public string Guidance => "";
+        public bool AllowsChanges => true;
+        public float GroundHeight => 0f;
+        public IEnumerable<BuildingDefinition> Buildable(PlayerCrafting crafting) => new BuildingDefinition[0];
+        public bool TryGetGroundPoint(Camera view, out Vector3 point) { point = Vector3.zero; return false; }
+        public Vector3 OnGround(Vector3 point) => point;
+        public string CheckSpot(FootprintRect footprint, Vector3 point) => null;
+        public string CheckBuilding(BuildingDefinition building) => null;
+    }
+
+    [Test]
+    public void BuildArea_TheLatestToEnterIsCurrent()
+    {
+        IBuildArea before = BuildArea.Current;
+        var home = new TestArea();
+        var camp = new TestArea();
+        try
+        {
+            BuildArea.Enter(home);
+            BuildArea.Enter(camp);
+            BuildArea.Enter(home);
+            Assert.AreSame(camp, BuildArea.Current, "Entering again doesn't move an area to the front.");
+            BuildArea.Leave(camp);
+            Assert.AreSame(home, BuildArea.Current);
+        }
+        finally
+        {
+            BuildArea.Leave(home);
+            BuildArea.Leave(camp);
+        }
+
+        Assert.AreSame(before, BuildArea.Current);
+    }
+
     [Test]
     public void Footprint_FollowsPositionAndBoundsCentre()
     {

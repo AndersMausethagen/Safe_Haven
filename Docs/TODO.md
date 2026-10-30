@@ -115,7 +115,8 @@ Same review for the rest of the runtime code (SOLID, Unity practice, no special-
        and the prologue rejects saveable enemy prefabs in validation. Let SaveableEntity decide: a copy made while
        playing that wasn't spawned through `SaveableEntity.Spawn` is simply not persistent (no warning, nothing to
        strip).
-6. [ ] **BuildPlacer (981 lines)** holds the build menu pages, the placement rules (grid, snap, lines, CheckSpot)
+6. [x] **BuildPlacer (981 lines)** Done (763 left): `BuildGhost` for the preview, and `IBuildArea` replaces the
+       nine "prologue or Heart Tree?" branches (HeartTree and PrologueDirector are build areas). Was: holds the build menu pages, the placement rules (grid, snap, lines, CheckSpot)
        and the ghost visuals. Split the menu and the ghost out; the rules become testable without a scene.
 
 Fine as they are: the six `Instance` singletons (AudioManager, CombatFeedback, GameStateManager, UIStateManager,

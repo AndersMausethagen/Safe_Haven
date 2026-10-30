@@ -16,20 +16,21 @@ using UnityEngine.InputSystem;
 /// keep the ground in front of their entrance clear: the yard is drawn under the ghost and under every placed building
 /// while building, and nothing may be built on one. Buildings that are placed in lines (walls, palisades) are drawn by
 /// dragging: pieces are laid end to end, start and finish snap to the ends of others like them, and only the pieces that
-/// fit and can be paid for are built. Geometry lives in BuildPlacement.
+/// fit and can be paid for are built. Geometry lives in BuildPlacement; what the player sees while placing in BuildGhost.
+/// </para>
+/// <para>
+/// Where and what may be built is the current build area's (<see cref="IBuildArea"/>: the Heart Tree's ward at home,
+/// the expedition's camp in the prologue), so this class knows neither.
 /// </para>
 /// <para>
 /// Placed buildings are created with SaveableEntity.Spawn so the save system recreates them, and raise a Built game event
 /// for quests. Where it belongs: on the PlayerArmature prefab. Tuning (grid, snapping, colors) is here; costs and
-/// placement rules are on each BuildingDefinition; the ward radius in SettlementSettings.
+/// placement rules are on each BuildingDefinition; the area's own rules on the area.
 /// </para>
 /// </summary>
 [DisallowMultipleComponent]
 public sealed class BuildPlacer : MonoBehaviour
 {
-    private const string YardName = "Yard";
-    // Yard markers float this far above the build plane so they don't flicker against the ground.
-    private const float MarkerHeight = 0.04f;
     // Overlap boxes start this far above the build plane so the ground itself doesn't count.
     private const float GroundLift = 0.15f;
 
@@ -56,12 +57,8 @@ public sealed class BuildPlacer : MonoBehaviour
     [Tooltip("Layers whose colliders block a building. Ground is ignored because the check starts above it.")]
     [SerializeField] private LayerMask blockingLayers = ~0;
 
-    private static readonly int BaseColor = Shader.PropertyToID("_BaseColor");
-    private static readonly int ColorId = Shader.PropertyToID("_Color");
     private static readonly Collider[] Overlaps = new Collider[16];
 
-    private readonly List<GhostPiece> pieces = new List<GhostPiece>();
-    private readonly List<GameObject> placedYards = new List<GameObject>();
     private readonly List<Vector3> lineCenters = new List<Vector3>();
     private readonly List<ResourceAmount> scaledResources = new List<ResourceAmount>();
     private readonly List<ItemAmount> scaledItems = new List<ItemAmount>();
@@ -71,10 +68,8 @@ public sealed class BuildPlacer : MonoBehaviour
     private bool picking;
     // Picking a building to upgrade or repair rather than to move.
     private bool upgrading;
-    private Bounds localBounds;
-    private MaterialPropertyBlock block;
+    private BuildGhost ghost;
     private float yaw;
-    private int shownPieces;
     private Camera view;
 
     // A line being dragged out. A short drag builds the single piece shown when the button went down.
@@ -83,21 +78,18 @@ public sealed class BuildPlacer : MonoBehaviour
     private Vector3 pressPoint;
     private float pressYaw;
 
-    private sealed class GhostPiece
-    {
-        public GameObject Root;
-        public Renderer[] Body;
-        public Renderer Yard;
-        public string Problem;
-    }
-
     /// <summary>True while any player is placing, moving or picking a building: mouse buttons and wheel belong to building.</summary>
     public static bool IsBusy { get; private set; }
 
     private BuildingDefinition Kind => placing != null ? placing : moving != null ? moving.Definition : null;
-    private PrologueDirector Expedition => PrologueDirector.Current;
-    private bool HasBuildArea => Expedition != null ? Expedition.CanBuild : HeartTree.Current != null;
-    private Vector3 BuildOrigin => Expedition != null ? Expedition.BuildOrigin : HeartTree.Current.transform.position;
+    private static IBuildArea Area => BuildArea.Current;
+    private static bool HasBuildArea => Area != null && Area.WhyClosed == null;
+    private Bounds LocalBounds => ghost.LocalBounds;
+
+    private void Awake()
+    {
+        ghost = new BuildGhost(ghostMaterial, validColor, invalidColor, yardColor, placedYardColor);
+    }
 
     private void OnEnable()
     {
@@ -121,7 +113,7 @@ public sealed class BuildPlacer : MonoBehaviour
         return true;
     }
 
-    /// <summary>Opens or closes the build menu. Only works where there is a Heart Tree.</summary>
+    /// <summary>Opens or closes the build menu. Only works in an open build area.</summary>
     public void ToggleMenu()
     {
         ActionMenuWindow menu = ActionMenuWindow.Current;
@@ -133,8 +125,7 @@ public sealed class BuildPlacer : MonoBehaviour
 
         if (!HasBuildArea)
         {
-            GameMessages.Post(Expedition != null ? Expedition.Definition.WaitingForLeaderText
-                : "You can only build in Safe Haven, inside the Heart Tree's ward.", MessageKind.Warning);
+            GameMessages.Post(Area != null ? Area.WhyClosed : "You can only build in Safe Haven, inside the Heart Tree's ward.", MessageKind.Warning);
             return;
         }
 
@@ -157,8 +148,7 @@ public sealed class BuildPlacer : MonoBehaviour
         var page = new MenuPage
         {
             Title = "Build",
-            Body = (Expedition != null ? "Build the expedition's campfire beside the shelter. "
-                : $"Build inside the Heart Tree's ward ({HeartTree.Current.WardRadius:0} m). ") + "Left-click to place, mouse wheel to turn "
+            Body = Area.Guidance + "Left-click to place, mouse wheel to turn "
                 + "(Shift for small steps), hold Alt to place freely without snapping. Walls are drawn by dragging. Right-click or Esc cancels.",
         };
 
@@ -169,12 +159,9 @@ public sealed class BuildPlacer : MonoBehaviour
         }
 
         var buildings = new List<BuildingDefinition>();
-        IEnumerable<BuildingDefinition> available = Expedition != null
-            ? new[] { Expedition.Definition.Campfire } : crafting.Buildings;
-        foreach (BuildingDefinition building in available)
+        foreach (BuildingDefinition building in Area.Buildable(crafting))
         {
-            if (building != null && building.Prefab != null &&
-                (Expedition != null || building.ShowInBuildMenu && crafting.IsKnown(building)))
+            if (building != null && building.Prefab != null)
             {
                 buildings.Add(building);
             }
@@ -190,7 +177,7 @@ public sealed class BuildPlacer : MonoBehaviour
                 () => BeginPlacing(building), closesMenu: true));
         }
 
-        if (Expedition == null)
+        if (Area.AllowsChanges)
         {
             page.Add(new MenuAction("Upgrade or repair a building", "Make something you built better, or bring a ruin back", true,
                 () => BeginPicking(true), closesMenu: true));
@@ -216,7 +203,6 @@ public sealed class BuildPlacer : MonoBehaviour
         placing = building;
         yaw = 0f;
         CreateGhost(building.Prefab.transform);
-        ShowPlacedYards();
 
         var hint = new StringBuilder($"Place the {building.DisplayName}: left-click to build");
         hint.Append(building.PlaceInLines ? ", or drag to build a line." : ".");
@@ -338,7 +324,7 @@ public sealed class BuildPlacer : MonoBehaviour
             yaw = Mathf.Repeat(yaw + Mathf.Sign(scroll) * (fine ? fineRotationStep : rotationStep), 360f);
         }
 
-        if (!TryGetGroundPoint(out Vector3 cursor))
+        if (!Area.TryGetGroundPoint(view, out Vector3 cursor))
         {
             return;
         }
@@ -355,14 +341,14 @@ public sealed class BuildPlacer : MonoBehaviour
         }
 
         ResolveSingle(cursor, free, out Vector3 point, out float pieceYaw);
-        ShowPieces(1);
+        ghost.Show(1);
         string problem = CheckSpot(point, pieceYaw);
         if (problem == null && placing != null && !CanAfford(placing, 1, out string missing))
         {
             problem = missing;
         }
 
-        Place(pieces[0], point, pieceYaw, problem);
+        ghost.Place(0, point, pieceYaw, problem, Kind);
 
         bool overUI = EventSystem.current != null && EventSystem.current.IsPointerOverGameObject();
         if (!Mouse.current.leftButton.wasPressedThisFrame || overUI)
@@ -426,29 +412,6 @@ public sealed class BuildPlacer : MonoBehaviour
         yaw = building.transform.eulerAngles.y;
         CreateGhost(building.transform);
         building.gameObject.SetActive(false);
-        ShowPlacedYards();
-    }
-
-    private bool TryGetGroundPoint(out Vector3 point)
-    {
-        if (Expedition != null)
-        {
-            point = default;
-            if (!CameraPointer.TryGetRay(view, out Ray ray) ||
-                !Expedition.BuildTerrain.GetComponent<TerrainCollider>().Raycast(ray, out RaycastHit hit, 200f))
-                return false;
-            point = hit.point;
-            return true;
-        }
-        var ground = new Plane(Vector3.up, BuildOrigin);
-        return CameraPointer.TryGetPointOnPlane(view, ground, out point);
-    }
-
-    private Vector3 OnBuildGround(Vector3 point)
-    {
-        if (Expedition != null)
-            point.y = Expedition.BuildTerrain.SampleHeight(point) + Expedition.BuildTerrain.transform.position.y;
-        return point;
     }
 
     private Vector3 Grid(Vector3 point)
@@ -474,12 +437,12 @@ public sealed class BuildPlacer : MonoBehaviour
 
         if (snapDistance > 0f && TrySnapBesideNeighbour(cursor, out Vector3 snapped, out float snappedYaw))
         {
-            point = OnBuildGround(snapped);
+            point = Area.OnGround(snapped);
             pieceYaw = snappedYaw;
             return;
         }
 
-        point = OnBuildGround(Grid(cursor));
+        point = Area.OnGround(Grid(cursor));
     }
 
     private bool TrySnapBesideNeighbour(Vector3 cursor, out Vector3 point, out float pieceYaw)
@@ -487,7 +450,7 @@ public sealed class BuildPlacer : MonoBehaviour
         point = cursor;
         pieceYaw = yaw;
         float bestGap = float.MaxValue;
-        float ownReach = Mathf.Max(localBounds.extents.x, localBounds.extents.z);
+        float ownReach = Mathf.Max(LocalBounds.extents.x, LocalBounds.extents.z);
         foreach (BuildingObject other in BuildingObject.Active)
         {
             FootprintRect footprint = other.Footprint;
@@ -497,7 +460,7 @@ public sealed class BuildPlacer : MonoBehaviour
                 continue;
             }
 
-            if (BuildPlacement.TrySnapBeside(cursor, yaw, localBounds, footprint, snapDistance, out Vector3 snapped, out float snappedYaw, out float gap)
+            if (BuildPlacement.TrySnapBeside(cursor, yaw, LocalBounds, footprint, snapDistance, out Vector3 snapped, out float snappedYaw, out float gap)
                 && gap < bestGap)
             {
                 bestGap = gap;
@@ -556,17 +519,17 @@ public sealed class BuildPlacer : MonoBehaviour
 
         Vector3 delta = end - lineStart;
         delta.y = 0f;
-        float length = BuildPlacement.PieceLength(localBounds);
+        float length = BuildPlacement.PieceLength(LocalBounds);
         if (delta.magnitude < length * 0.5f)
         {
-            ShowPieces(1);
+            ghost.Show(1);
             string problem = CheckSpot(pressPoint, pressYaw);
             if (problem == null && !CanAfford(placing, 1, out string missing))
             {
                 problem = missing;
             }
 
-            Place(pieces[0], pressPoint, pressYaw, problem);
+            ghost.Place(0, pressPoint, pressYaw, problem, Kind);
             return;
         }
 
@@ -576,12 +539,12 @@ public sealed class BuildPlacer : MonoBehaviour
         }
 
         Vector3 direction = BuildPlacement.LayLine(lineStart, end, length, maxLinePieces, lineCenters);
-        float pieceYaw = BuildPlacement.LineYaw(direction, BuildPlacement.RunsAlongX(localBounds));
-        ShowPieces(lineCenters.Count);
+        float pieceYaw = BuildPlacement.LineYaw(direction, BuildPlacement.RunsAlongX(LocalBounds));
+        ghost.Show(lineCenters.Count);
         int paid = 0;
         for (int i = 0; i < lineCenters.Count; i++)
         {
-            Vector3 position = BuildPlacement.PivotFor(lineCenters[i], pieceYaw, localBounds);
+            Vector3 position = BuildPlacement.PivotFor(lineCenters[i], pieceYaw, LocalBounds);
             string problem = CheckSpot(position, pieceYaw);
             if (problem == null)
             {
@@ -595,41 +558,27 @@ public sealed class BuildPlacer : MonoBehaviour
                 }
             }
 
-            Place(pieces[i], position, pieceYaw, problem);
+            ghost.Place(i, position, pieceYaw, problem, Kind);
         }
     }
 
     /// <summary>Why a building can't stand here, in words for the player, or null when it can. Doesn't check the cost.</summary>
     private string CheckSpot(Vector3 point, float pieceYaw)
     {
-        FootprintRect footprint = BuildPlacement.Footprint(point, pieceYaw, localBounds);
-        float reach = Mathf.Max(footprint.HalfSize.x, footprint.HalfSize.y);
-        if (Expedition != null ? !Expedition.IsBuildSpot(footprint.WorldCenter(point.y), reach)
-            : !HeartTree.Current.Contains(footprint.WorldCenter(point.y), reach))
+        FootprintRect footprint = BuildPlacement.Footprint(point, pieceYaw, LocalBounds);
+        string outside = Area.CheckSpot(footprint, point);
+        if (outside != null)
         {
-            return Expedition != null ? "Build the fire beside the shelter."
-                : "Outside the Heart Tree's ward. Build closer to the tree.";
-        }
-        if (Expedition != null)
-        {
-            Vector2 x = footprint.AxisX * footprint.HalfSize.x;
-            Vector2 z = footprint.AxisZ * footprint.HalfSize.y;
-            for (int corner = 0; corner < 4; corner++)
-            {
-                Vector2 sample = footprint.Center + ((corner & 1) == 0 ? x : -x) + ((corner & 2) == 0 ? z : -z);
-                Vector3 ground = OnBuildGround(new Vector3(sample.x, 0f, sample.y));
-                if (Mathf.Abs(ground.y - point.y) > 0.2f)
-                    return "The ground is too uneven. Try flatter ground beside the shelter.";
-            }
+            return outside;
         }
 
         Quaternion rotation = Quaternion.Euler(0f, pieceYaw, 0f);
-        Vector3 extents = new Vector3(localBounds.extents.x * 0.92f, Mathf.Max(0.05f, localBounds.extents.y - GroundLift * 0.5f), localBounds.extents.z * 0.92f);
-        Vector3 center = point + rotation * (localBounds.center + Vector3.up * GroundLift * 0.5f);
+        Vector3 extents = new Vector3(LocalBounds.extents.x * 0.92f, Mathf.Max(0.05f, LocalBounds.extents.y - GroundLift * 0.5f), LocalBounds.extents.z * 0.92f);
+        Vector3 center = point + rotation * (LocalBounds.center + Vector3.up * GroundLift * 0.5f);
         int count = Physics.OverlapBoxNonAlloc(center, extents, Overlaps, rotation, blockingLayers, QueryTriggerInteraction.Ignore);
         for (int i = 0; i < count; i++)
         {
-            if (!IsGhost(Overlaps[i]))
+            if (!ghost.Contains(Overlaps[i]))
             {
                 return "Something is in the way.";
             }
@@ -644,15 +593,15 @@ public sealed class BuildPlacer : MonoBehaviour
         }
 
         BuildingDefinition kind = Kind;
-        if (kind != null && BuildPlacement.TryGetYard(point, pieceYaw, localBounds, kind.YardSide, kind.YardDepth, out FootprintRect yard))
+        if (kind != null && BuildPlacement.TryGetYard(point, pieceYaw, LocalBounds, kind.YardSide, kind.YardDepth, out FootprintRect yard))
         {
-            float height = Mathf.Max(0.5f, localBounds.size.y);
+            float height = Mathf.Max(0.5f, LocalBounds.size.y);
             Vector3 yardCenter = yard.WorldCenter(point.y + GroundLift + height * 0.5f);
             Vector3 yardExtents = new Vector3(yard.HalfSize.x * 0.92f, height * 0.5f, yard.HalfSize.y * 0.92f);
             count = Physics.OverlapBoxNonAlloc(yardCenter, yardExtents, Overlaps, rotation, blockingLayers, QueryTriggerInteraction.Ignore);
             for (int i = 0; i < count; i++)
             {
-                if (!IsGhost(Overlaps[i]) && !IsMoving(Overlaps[i]))
+                if (!ghost.Contains(Overlaps[i]) && !IsMoving(Overlaps[i]))
                 {
                     return $"Its entrance is blocked. Keep {kind.YardDepth:0.#} m clear in front of it.";
                 }
@@ -660,19 +609,6 @@ public sealed class BuildPlacer : MonoBehaviour
         }
 
         return null;
-    }
-
-    private bool IsGhost(Collider collider)
-    {
-        foreach (GhostPiece piece in pieces)
-        {
-            if (collider.transform.IsChildOf(piece.Root.transform))
-            {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     // People and monsters walk out of the way, so they don't block a yard.
@@ -743,17 +679,18 @@ public sealed class BuildPlacer : MonoBehaviour
         int built = 0;
         int blocked = 0;
         string firstProblem = null;
-        for (int i = 0; i < shownPieces; i++)
+        for (int i = 0; i < ghost.Count; i++)
         {
-            GhostPiece piece = pieces[i];
-            if (piece.Problem != null)
+            string problem = ghost.ProblemAt(i);
+            if (problem != null)
             {
                 blocked++;
-                firstProblem ??= piece.Problem;
+                firstProblem ??= problem;
                 continue;
             }
 
-            if (Build(building, piece.Root.transform.position, piece.Root.transform.rotation) == null)
+            Transform piece = ghost.PieceAt(i);
+            if (Build(building, piece.position, piece.rotation) == null)
             {
                 break;
             }
@@ -777,9 +714,10 @@ public sealed class BuildPlacer : MonoBehaviour
     // be paid for.
     private GameObject Build(BuildingDefinition building, Vector3 position, Quaternion rotation)
     {
-        if (Expedition != null && (!Expedition.CanBuild || building != Expedition.Definition.Campfire))
+        string refused = Area != null ? Area.CheckBuilding(building) : "You can only build in Safe Haven, inside the Heart Tree's ward.";
+        if (refused != null)
         {
-            GameMessages.Post("Only the expedition's campfire can be built here, when the leader asks for it.", MessageKind.Warning);
+            GameMessages.Post(refused, MessageKind.Warning);
             return null;
         }
         if (!MaterialPool.For(gameObject).TrySpend(building.ConstructionCost, building.ConstructionItems))
@@ -806,25 +744,7 @@ public sealed class BuildPlacer : MonoBehaviour
             moving = null;
         }
 
-        foreach (GhostPiece piece in pieces)
-        {
-            if (piece.Root != null)
-            {
-                Destroy(piece.Root);
-            }
-        }
-
-        foreach (GameObject marker in placedYards)
-        {
-            if (marker != null)
-            {
-                Destroy(marker);
-            }
-        }
-
-        pieces.Clear();
-        placedYards.Clear();
-        shownPieces = 0;
+        ghost?.Clear();
         drawingLine = false;
         placing = null;
         picking = false;
@@ -832,150 +752,12 @@ public sealed class BuildPlacer : MonoBehaviour
         IsBusy = false;
     }
 
-    // The ghost copies only the meshes, so nothing on the real building (saving, crafting, health) wakes up. More
-    // pieces for a line are copies of this first one.
+    // The ghost of what is placed, and the yards already standing, while building.
     private void CreateGhost(Transform source)
     {
-        var ghost = new GameObject("Build Ghost");
-        localBounds = BuildPlacement.LocalBounds(source);
-        Matrix4x4 toRoot = source.worldToLocalMatrix;
-        foreach (MeshFilter filter in source.GetComponentsInChildren<MeshFilter>(true))
-        {
-            if (filter.sharedMesh == null || !filter.TryGetComponent(out MeshRenderer original) || !original.enabled)
-            {
-                continue;
-            }
-
-            Matrix4x4 relative = toRoot * filter.transform.localToWorldMatrix;
-            var part = new GameObject(filter.name);
-            part.transform.SetParent(ghost.transform, false);
-            part.transform.localPosition = relative.GetColumn(3);
-            part.transform.localRotation = relative.rotation;
-            part.transform.localScale = relative.lossyScale;
-            part.AddComponent<MeshFilter>().sharedMesh = filter.sharedMesh;
-            var renderer = part.AddComponent<MeshRenderer>();
-            var materials = new Material[filter.sharedMesh.subMeshCount];
-            for (int i = 0; i < materials.Length; i++)
-            {
-                materials[i] = ghostMaterial;
-            }
-
-            renderer.sharedMaterials = materials;
-            renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-        }
-
         BuildingDefinition kind = Kind;
-        if (kind != null && kind.YardDepth > 0f)
-        {
-            CreateMarker(YardName).transform.SetParent(ghost.transform, false);
-        }
-
-        block ??= new MaterialPropertyBlock();
-        pieces.Add(Describe(ghost));
-        shownPieces = 1;
+        ghost.Create(source, kind != null && kind.YardDepth > 0f);
+        ghost.ShowPlacedYards(Area.GroundHeight);
         IsBusy = true;
-    }
-
-    private static GhostPiece Describe(GameObject root)
-    {
-        var piece = new GhostPiece { Root = root };
-        var body = new List<Renderer>();
-        foreach (Renderer renderer in root.GetComponentsInChildren<Renderer>(true))
-        {
-            if (renderer.name == YardName)
-            {
-                piece.Yard = renderer;
-            }
-            else
-            {
-                body.Add(renderer);
-            }
-        }
-
-        piece.Body = body.ToArray();
-        return piece;
-    }
-
-    private void ShowPieces(int count)
-    {
-        while (pieces.Count < count)
-        {
-            pieces.Add(Describe(Instantiate(pieces[0].Root)));
-        }
-
-        for (int i = 0; i < pieces.Count; i++)
-        {
-            pieces[i].Root.SetActive(i < count);
-        }
-
-        shownPieces = count;
-    }
-
-    private void Place(GhostPiece piece, Vector3 point, float pieceYaw, string problem)
-    {
-        piece.Problem = problem;
-        piece.Root.transform.SetPositionAndRotation(point, Quaternion.Euler(0f, pieceYaw, 0f));
-        Tint(piece.Body, problem == null ? validColor : invalidColor);
-        BuildingDefinition kind = Kind;
-        if (piece.Yard != null && kind != null
-            && BuildPlacement.TryGetYard(point, pieceYaw, localBounds, kind.YardSide, kind.YardDepth, out FootprintRect yard))
-        {
-            Lay(piece.Yard.transform, yard, point.y + MarkerHeight);
-            Tint(piece.Yard, problem == null ? yardColor : invalidColor * new Color(1f, 1f, 1f, 0.6f));
-        }
-    }
-
-    // Marks the yards of the buildings already standing, so the player sees where not to build.
-    private void ShowPlacedYards()
-    {
-        float height = HasBuildArea ? BuildOrigin.y + MarkerHeight : MarkerHeight;
-        foreach (BuildingObject building in BuildingObject.Active)
-        {
-            if (!building.TryGetYard(out FootprintRect yard))
-            {
-                continue;
-            }
-
-            GameObject marker = CreateMarker("Placed Yard");
-            Lay(marker.transform, yard, height);
-            Tint(marker.GetComponent<Renderer>(), placedYardColor);
-            placedYards.Add(marker);
-        }
-    }
-
-    private GameObject CreateMarker(string markerName)
-    {
-        GameObject marker = GameObject.CreatePrimitive(PrimitiveType.Quad);
-        DestroyImmediate(marker.GetComponent<Collider>());
-        marker.name = markerName;
-        var renderer = marker.GetComponent<MeshRenderer>();
-        renderer.sharedMaterial = ghostMaterial;
-        renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-        renderer.receiveShadows = false;
-        return marker;
-    }
-
-    // A quad lies flat (its face up) when tilted a quarter turn about x; its height then runs along the ground's z.
-    private static void Lay(Transform marker, FootprintRect area, float height)
-    {
-        marker.SetPositionAndRotation(area.WorldCenter(height), Quaternion.Euler(90f, area.Yaw, 0f));
-        Vector3 parentScale = marker.parent != null ? marker.parent.lossyScale : Vector3.one;
-        marker.localScale = new Vector3(area.HalfSize.x * 2f / parentScale.x, area.HalfSize.y * 2f / parentScale.z, 1f);
-    }
-
-    private void Tint(Renderer[] renderers, Color color)
-    {
-        foreach (Renderer renderer in renderers)
-        {
-            Tint(renderer, color);
-        }
-    }
-
-    private void Tint(Renderer renderer, Color color)
-    {
-        block ??= new MaterialPropertyBlock();
-        block.SetColor(BaseColor, color);
-        block.SetColor(ColorId, color);
-        renderer.SetPropertyBlock(block);
     }
 }
