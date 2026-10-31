@@ -318,7 +318,7 @@ Transport options include a hand-dragged cart, a wheelbarrow, and a horse cart. 
 | Handcart | 200 | 320 | 92% | 78% | 35% |
 | Rowboat | 160 | 240 | 95% | 80% | 40% |
 
-Past its capacity a transport is overfilled: it still takes more, but the speed falls away steeply, and the HUD says so in words. A handcart trails behind the player and swings wide on a turn; a barrow is pushed ahead and goes where it is pointed. A loaded cart keeps rolling when the player stops, and a heavy one can be too much for a steep bank: the strain slows the player, and if it stays stuck they let go. It stops at what stops it, so narrow routes really are a choice. The boat floats on real buoyancy, sits lower the more it carries and has to be rowed to the bank to get out; a swimmer can climb back in.
+Past its capacity a transport is overfilled: it still takes more, but the speed falls away steeply, and the HUD says so in words. A handcart trails behind the player and swings wide on a turn; a barrow is pushed ahead and goes where it is pointed. A loaded cart keeps rolling when the player stops, and a heavy one can be too much for a steep bank: the strain slows the player, and if it stays stuck they let go. It stops at what stops it, so narrow routes really are a choice. The boat floats on real buoyancy, sits lower the more it carries and has to be rowed to the bank to get out; a swimmer can climb back in. A river carries it, fastest in the middle, so going downstream is quick and rowing up is hard. Left alone it is tied up and stays where it was left.
 
 At home a load never has to pass through the bag: a cart brought near a chest sends its cargo straight to storage, and what is in a cart or boat standing near the player counts as materials for building and crafting.
 

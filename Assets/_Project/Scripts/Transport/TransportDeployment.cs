@@ -10,7 +10,8 @@ public static class TransportDeployment
     private const float RoomRadius = 0.7f;
     private const float WaterReach = 1.5f;
     private const float MinimumDepth = 0.45f;
-    private const float HullReach = 1.9f;
+    private const float HullLength = 1.8f;
+    private const float HullBeam = 0.7f;
     private const float FarthestLaunch = 12f;
 
     public static bool Deploy(GameObject user, ItemContainer from, int slot)
@@ -22,16 +23,17 @@ public static class TransportDeployment
             return false;
         }
 
+        Vector3 forward = user.transform.forward;
+        forward.y = 0f;
+        Quaternion facing = Quaternion.LookRotation(forward.sqrMagnitude > 0.01f ? forward : Vector3.forward, Vector3.up);
         bool boat = definition.Prefab != null && definition.Prefab.GetComponent<Rowboat>() != null;
-        if (!(boat ? FindWater(user.transform, out Vector3 spot) : FindGround(user.transform, out spot)))
+        if (!(boat ? FindWater(user.transform, ref facing, out Vector3 spot) : FindGround(user.transform, out spot)))
         {
             GameMessages.Post(boat ? "Stand at the water's edge to launch it." : "There's no room to set it down here.", MessageKind.Warning);
             return false;
         }
 
-        Vector3 forward = user.transform.forward;
-        forward.y = 0f;
-        SaveableEntity.Spawn(definition.Prefab, spot, Quaternion.LookRotation(forward.sqrMagnitude > 0.01f ? forward : Vector3.forward, Vector3.up));
+        SaveableEntity.Spawn(definition.Prefab, spot, facing);
         from.RemoveAt(slot, 1);
         GameMessages.Post($"You set down the {definition.DisplayName}.");
         return true;
@@ -69,8 +71,9 @@ public static class TransportDeployment
     }
 
     // Rings out from the player until the whole hull fits over water deep enough; the nearest wins. Only the middle being
-    // deep isn't enough: a bow set down in the bank is thrown clear by the physics, boat and all.
-    private static bool FindWater(Transform player, out Vector3 spot)
+    // deep isn't enough: a bow set down in the bank is thrown clear by the physics, boat and all. A boat is long and narrow,
+    // so it is tried at several headings: in a small river it has to lie along the water.
+    private static bool FindWater(Transform player, ref Quaternion facing, out Vector3 spot)
     {
         spot = default;
         for (float radius = 2f; radius <= FarthestLaunch; radius += 1f)
@@ -78,10 +81,15 @@ public static class TransportDeployment
             for (int angle = 0; angle < 360; angle += 20)
             {
                 Vector3 point = player.position + Quaternion.Euler(0f, angle, 0f) * Vector3.forward * radius;
-                if (HullFits(point, out float surface))
+                for (int turn = 0; turn < 180; turn += 30)
                 {
-                    spot = new Vector3(point.x, surface + 0.1f, point.z);
-                    return true;
+                    Quaternion heading = facing * Quaternion.Euler(0f, turn, 0f);
+                    if (HullFits(point, heading, out float surface))
+                    {
+                        spot = new Vector3(point.x, surface + 0.1f, point.z);
+                        facing = heading;
+                        return true;
+                    }
                 }
             }
         }
@@ -89,22 +97,13 @@ public static class TransportDeployment
         return false;
     }
 
-    private static bool HullFits(Vector3 point, out float surface)
+    private static bool HullFits(Vector3 point, Quaternion heading, out float surface)
     {
-        if (!DeepAt(point, out surface))
-        {
-            return false;
-        }
-
-        for (int angle = 0; angle < 360; angle += 45)
-        {
-            if (!DeepAt(point + Quaternion.Euler(0f, angle, 0f) * Vector3.forward * HullReach, out _))
-            {
-                return false;
-            }
-        }
-
-        return true;
+        Vector3 along = heading * Vector3.forward * HullLength;
+        Vector3 across = heading * Vector3.right * HullBeam;
+        return DeepAt(point, out surface) && DeepAt(point + along, out _) && DeepAt(point - along, out _)
+            && DeepAt(point + along * 0.5f + across, out _) && DeepAt(point + along * 0.5f - across, out _)
+            && DeepAt(point - along * 0.5f + across, out _) && DeepAt(point - along * 0.5f - across, out _);
     }
 
     private static bool DeepAt(Vector3 point, out float surface)

@@ -18,6 +18,8 @@ public sealed class WaterSurface : MonoBehaviour
     [SerializeField] private bool still;
     [Tooltip("How far below the surface something still counts as in the water (metres), e.g. the feet of a wading player.")]
     [SerializeField, Min(0f)] private float depth = 2f;
+    [Tooltip("Spline rivers: how fast the water runs in the middle, in m/s. It carries boats, slower towards the banks.")]
+    [SerializeField, Min(0f)] private float flowSpeed = 1.4f;
     [Tooltip("Spline rivers (written by the World Builder): the surface's centre line in local space, xyz = a point on " +
              "the surface, w = half the width there. Empty: the top of the mesh bounds is the water.")]
     [SerializeField, HideInInspector] private Vector4[] centreline = System.Array.Empty<Vector4>();
@@ -155,6 +157,60 @@ public sealed class WaterSurface : MonoBehaviour
 
     /// <summary>The centre line point nearest <paramref name="xz"/> (interpolated: xyz on the surface, w the half
     /// width there) and how far <paramref name="xz"/> is from it on the ground plane.</summary>
+    /// <summary>How the water moves at a point: the way the river runs, as fast as it runs there. Nothing on still water.</summary>
+    public static Vector3 CurrentAt(Vector3 point, float reach)
+    {
+        WaterSurface surface = At(point, reach, out _);
+        return surface != null ? surface.Current(point) : Vector3.zero;
+    }
+
+    private Vector3 Current(Vector3 point)
+    {
+        if (centreline.Length < 2 || flowSpeed <= 0f)
+        {
+            return Vector3.zero;
+        }
+
+        Vector3 local = transform.InverseTransformPoint(point);
+        Vector2 flow = FlowOnCentreline(centreline, new Vector2(local.x, local.z));
+        return transform.TransformDirection(new Vector3(flow.x, 0f, flow.y)).normalized * (flow.magnitude * flowSpeed);
+    }
+
+    /// <summary>
+    /// Which way a spline river runs at a point, as a share of its full speed: the line's own direction, as it always runs
+    /// downhill (RiverBuilder.Downhill), fading to a third at the banks where the bed slows it.
+    /// </summary>
+    public static Vector2 FlowOnCentreline(Vector4[] line, Vector2 xz)
+    {
+        Vector2 direction = Vector2.zero;
+        float width = 1f;
+        float distance = float.MaxValue;
+        for (int i = 0; i + 1 < line.Length; i++)
+        {
+            Vector4 a = line[i];
+            Vector4 b = line[i + 1];
+            Vector2 ab = new Vector2(b.x - a.x, b.z - a.z);
+            float lengthSq = ab.sqrMagnitude;
+            if (lengthSq <= 1e-8f)
+            {
+                continue;
+            }
+
+            float t = Mathf.Clamp01(Vector2.Dot(xz - new Vector2(a.x, a.z), ab) / lengthSq);
+            Vector4 p = Vector4.Lerp(a, b, t);
+            float d = Vector2.Distance(xz, new Vector2(p.x, p.z));
+            if (d < distance)
+            {
+                distance = d;
+                direction = ab.normalized;
+                width = Mathf.Max(0.01f, p.w);
+            }
+        }
+
+        float across = Mathf.Clamp01(distance / width);
+        return direction * Mathf.Lerp(1f, 1f / 3f, across * across);
+    }
+
     public static void NearestOnCentreline(Vector4[] line, Vector2 xz, out Vector4 nearest, out float distance)
     {
         nearest = line[0];

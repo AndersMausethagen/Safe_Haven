@@ -253,6 +253,24 @@ public sealed class TransportTests
     }
 
     [Test]
+    public void ARiver_RunsAlongItsLine_AndSlowsAtTheBanks()
+    {
+        var line = new[] { new Vector4(0f, 5f, 0f, 4f), new Vector4(0f, 4f, 10f, 4f), new Vector4(10f, 3f, 10f, 4f) };
+
+        Vector2 middle = WaterSurface.FlowOnCentreline(line, new Vector2(0f, 5f));
+        Assert.AreEqual(0f, middle.x, 0.001f);
+        Assert.AreEqual(1f, middle.y, 0.001f, "full speed in the middle, the way the line runs");
+
+        Vector2 after = WaterSurface.FlowOnCentreline(line, new Vector2(5f, 10f));
+        Assert.AreEqual(1f, after.x, 0.001f, "round the bend it runs the new way");
+
+        float bank = WaterSurface.FlowOnCentreline(line, new Vector2(4f, 5f)).magnitude;
+        Assert.AreEqual(1f / 3f, bank, 0.001f, "a third of it at the bank");
+        float between = WaterSurface.FlowOnCentreline(line, new Vector2(2f, 5f)).magnitude;
+        Assert.That(between, Is.GreaterThan(bank).And.LessThan(1f));
+    }
+
+    [Test]
     public void AuthoredTransports_AreWiredUp()
     {
         var content = Resources.Load<ContentDatabase>(ContentDatabase.ResourceName);

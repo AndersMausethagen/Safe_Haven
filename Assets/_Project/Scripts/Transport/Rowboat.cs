@@ -5,6 +5,10 @@ using UnityEngine;
 /// boat sits lower, and rocks on what bumps it. The player sits at the oars and steers the way they would walk: the bow
 /// turns that way and each stroke drives it forward, so a heavy boat is slow to get going and slow to stop. It only rows
 /// while it is in the water. Getting out needs ground in reach; a swimmer can climb back in (PlayerTransport).
+/// <para>
+/// A river carries it: drag acts against the water, not the ground, so it drifts with the current and rowing upstream is
+/// slower than down. Only with someone aboard: left alone it is tied up, and stays where it was left.
+/// </para>
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Transport))]
@@ -198,7 +202,8 @@ public sealed class Rowboat : MonoBehaviour, ITransportDriver
 
     private void Drag(Rigidbody body)
     {
-        Vector3 local = transform.InverseTransformDirection(body.linearVelocity);
+        Vector3 water = rower != null ? WaterSurface.CurrentAt(transform.position + Vector3.up * WaterReach, WaterReach * 2f) : Vector3.zero;
+        Vector3 local = transform.InverseTransformDirection(body.linearVelocity - water);
         local.y = 0f;
         float along = -local.z * Mathf.Abs(local.z) * forwardDrag;
         float across = -local.x * Mathf.Abs(local.x) * sideDrag - local.x * sideDrag * 0.2f;
