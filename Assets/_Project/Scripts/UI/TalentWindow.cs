@@ -11,13 +11,9 @@ using UnityEngine.UI;
 /// </summary>
 public sealed class TalentWindow : MonoBehaviour
 {
-    private static readonly Color Panel = new Color(0.075f, 0.062f, 0.05f, 0.96f);
-    private static readonly Color Rim = new Color(0.64f, 0.49f, 0.29f, 0.9f);
-    private static readonly Color Title = new Color(0.91f, 0.77f, 0.42f, 1f);
-    private static readonly Color Body = new Color(0.93f, 0.89f, 0.8f, 1f);
-    private static readonly Color Card = new Color(0.22f, 0.17f, 0.12f, 1f);
-    private static readonly Color CardOwned = new Color(0.3f, 0.26f, 0.12f, 1f);
-    private static readonly Color CardLocked = new Color(0.12f, 0.1f, 0.08f, 1f);
+    private const float Width = 1380f;
+    private const float Height = 820f;
+    private const float ScreenMargin = 24f;
 
     private static readonly string[] TreeLines =
     {
@@ -28,9 +24,10 @@ public sealed class TalentWindow : MonoBehaviour
     };
 
     private UIWindow window;
+    private RectTransform panel;
     private TMP_Text header;
     private Button resetButton;
-    private readonly List<(TalentDefinition talent, Image card, TMP_Text text)> cards = new List<(TalentDefinition, Image, TMP_Text)>();
+    private readonly List<(TalentDefinition talent, Image card, Image owned, TMP_Text text)> cards = new List<(TalentDefinition, Image, Image, TMP_Text)>();
     private readonly TMP_Text[] treeHeaders = new TMP_Text[4];
     private CharacterProgress watched;
 
@@ -95,23 +92,23 @@ public sealed class TalentWindow : MonoBehaviour
 
     private void Build(Transform root)
     {
-        RectTransform panel = Rect("Panel", root, new Vector2(0.5f, 0.5f), new Vector2(1380f, 820f), Vector2.zero);
-        panel.gameObject.AddComponent<Image>().color = Panel;
-        var rim = panel.gameObject.AddComponent<Outline>();
-        rim.effectColor = Rim;
-        rim.effectDistance = new Vector2(2f, -2f);
+        UIStyle style = UIStyle.Current;
+        panel = Rect("Panel", root, new Vector2(0.5f, 0.5f), new Vector2(Width, Height), Vector2.zero);
+        panel.gameObject.AddComponent<Image>();
+        panel.gameObject.AddComponent<Outline>().effectDistance = new Vector2(1f, -1f);
+        panel.gameObject.AddComponent<UIRole>().Set(UIRole.Kind.Window);
 
-        TMP_Text title = Text("Title", panel, 34f, Title, new Vector2(0.5f, 1f), new Vector2(600f, 50f), new Vector2(0f, -36f), TextAlignmentOptions.Center);
+        TMP_Text title = Text("Title", panel, 38f, style.Text, new Vector2(0.5f, 1f), new Vector2(600f, 54f), new Vector2(0f, -38f), TextAlignmentOptions.Center);
         title.text = "Talents";
-        title.fontStyle = FontStyles.Bold;
-        header = Text("Header", panel, 22f, Body, new Vector2(0.5f, 1f), new Vector2(1200f, 36f), new Vector2(0f, -78f), TextAlignmentOptions.Center);
+        style.Title(title);
+        header = Text("Header", panel, 22f, style.Text, new Vector2(0.5f, 1f), new Vector2(1200f, 36f), new Vector2(0f, -78f), TextAlignmentOptions.Center);
 
         LevelingSettings settings = LevelingSettings.Current;
         for (int t = 0; t < 4; t++)
         {
             var tree = (TalentTree)t;
             float x = -510f + t * 340f;
-            treeHeaders[t] = Text(tree + " Header", panel, 26f, Title, new Vector2(0.5f, 1f), new Vector2(320f, 64f), new Vector2(x, -136f), TextAlignmentOptions.Center);
+            treeHeaders[t] = Text(tree + " Header", panel, 26f, style.Accent, new Vector2(0.5f, 1f), new Vector2(320f, 64f), new Vector2(x, -136f), TextAlignmentOptions.Center);
             var talents = new List<TalentDefinition>();
             foreach (TalentDefinition talent in settings.Talents)
             {
@@ -128,8 +125,8 @@ public sealed class TalentWindow : MonoBehaviour
             }
         }
 
-        resetButton = AddButton(panel, "Reset Talents", new Vector2(-110f, 40f), ResetTalents);
-        AddButton(panel, "Close", new Vector2(110f, 40f), () => window.Close());
+        CodeUI.AddButton("Reset Talents", panel, Width * 0.5f - 210f, Height - 63f, 200f, UIRole.Kind.Button, ResetTalents, out resetButton).text = "Reset Talents";
+        CodeUI.AddButton("Close", panel, Width * 0.5f + 10f, Height - 63f, 200f, UIRole.Kind.Button, () => window.Close(), out _).text = "Close";
 
         window = root.gameObject.AddComponent<UIWindow>();
         window.Configure(UIWindowId.Talents, panel.gameObject);
@@ -149,8 +146,13 @@ public sealed class TalentWindow : MonoBehaviour
         var button = card.gameObject.AddComponent<Button>();
         button.targetGraphic = image;
         button.onClick.AddListener(() => Raise(talent));
-        TMP_Text text = Text("Text", card, 17f, Body, new Vector2(0.5f, 0.5f), new Vector2(296f, 92f), Vector2.zero, TextAlignmentOptions.TopLeft);
-        cards.Add((talent, image, text));
+        TMP_Text text = Text("Text", card, 17f, UIStyle.Current.Text, new Vector2(0.5f, 0.5f), new Vector2(296f, 92f), Vector2.zero, TextAlignmentOptions.TopLeft);
+        // Amber down the edge marks what is yours: a bright card would wash out the bonuses written on it.
+        var owned = CodeUI.At("Owned", card, 0f, 0f, 4f, 100f).gameObject.AddComponent<Image>();
+        owned.color = UIStyle.Current.Accent;
+        owned.raycastTarget = false;
+        card.gameObject.AddComponent<UIRole>().Set(UIRole.Kind.Button);
+        cards.Add((talent, image, owned, text));
     }
 
     private void Raise(TalentDefinition talent)
@@ -187,43 +189,38 @@ public sealed class TalentWindow : MonoBehaviour
             return;
         }
 
+        Rect screen = ((RectTransform)transform).rect;
+        panel.localScale = Vector3.one * Mathf.Min(1f, (screen.width - ScreenMargin) / Width, (screen.height - ScreenMargin) / Height);
+
+        UIStyle style = UIStyle.Current;
+        string accent = UIStyle.Hex(style.Accent);
+        string muted = UIStyle.Hex(style.Muted);
         LevelingSettings settings = LevelingSettings.Current;
         CharacterProgress progress = GameSession.Progress;
         int points = progress.UnspentPoints(settings);
         string experience = progress.IsMaxLevel(settings) ? "highest level" : $"{progress.Experience} / {settings.ExperienceToNext(progress.Level)} experience";
-        header.text = $"Level {progress.Level}   ·   {experience}   ·   <color=#E8C46A>{points} talent point{(points == 1 ? "" : "s")}</color>";
+        header.text = $"Level {progress.Level}   ·   {experience}   ·   <color={accent}>{points} talent point{(points == 1 ? "" : "s")}</color>";
         for (int t = 0; t < 4; t++)
         {
             var tree = (TalentTree)t;
-            treeHeaders[t].text = $"{tree}  <size=70%><alpha=#99>{progress.SpentIn(tree, settings)}<alpha=#FF></size>\n<size=60%><alpha=#AA>{TreeLines[t]}</size>";
+            treeHeaders[t].text = $"{tree}  <size=70%><color={muted}>{progress.SpentIn(tree, settings)}</color></size>\n<size=60%><color={muted}>{TreeLines[t]}</color></size>";
         }
 
-        foreach ((TalentDefinition talent, Image card, TMP_Text text) in cards)
+        foreach ((TalentDefinition talent, Image card, Image owned, TMP_Text text) in cards)
         {
             int rank = progress.RankOf(talent);
             bool open = progress.SpentIn(talent.Tree, settings) >= talent.Row * settings.PointsPerRow;
-            card.color = rank > 0 ? CardOwned : open ? Card : CardLocked;
+            // The lit colour: the button role tints it down at rest, which leaves a locked card a step below an open one.
+            card.color = open ? style.ControlLit : style.Filled;
+            owned.enabled = rank > 0;
             string bonuses = talent.DescribeBonuses(Mathf.Max(1, rank));
-            string next = rank > 0 && rank < talent.MaxRank ? $"  <alpha=#88>(next: {talent.DescribeBonuses(rank + 1)})<alpha=#FF>" : "";
-            string locked = open ? "" : $"\n<color=#C07A5A>Needs {talent.Row * settings.PointsPerRow} points in {talent.Tree}</color>";
-            text.text = $"<b><color=#E8C46A>{talent.DisplayName}</color></b>  <alpha=#CC>{rank}/{talent.MaxRank}<alpha=#FF>\n" +
-                        $"<size=85%>{talent.Description}</size>\n<size=85%><color=#8BE08B>{bonuses}</color>{next}</size>{locked}";
+            string next = rank > 0 && rank < talent.MaxRank ? $"  <color={muted}>(next: {talent.DescribeBonuses(rank + 1)})</color>" : "";
+            string locked = open ? "" : $"\n<color={UIStyle.Hex(style.Warning)}>Needs {talent.Row * settings.PointsPerRow} points in {talent.Tree}</color>";
+            text.text = $"<b><color={accent}>{talent.DisplayName}</color></b>  <color={muted}>{rank}/{talent.MaxRank}</color>\n" +
+                        $"<size=85%>{talent.Description}</size>\n<size=85%><color={UIStyle.Hex(style.Good)}>{bonuses}</color>{next}</size>{locked}";
         }
 
         resetButton.interactable = CanReset && progress.PointsSpent > 0;
-    }
-
-    private Button AddButton(RectTransform panel, string label, Vector2 position, UnityEngine.Events.UnityAction onClick)
-    {
-        RectTransform rect = Rect(label, panel, new Vector2(0.5f, 0f), new Vector2(200f, 46f), position);
-        var image = rect.gameObject.AddComponent<Image>();
-        image.color = Card;
-        var button = rect.gameObject.AddComponent<Button>();
-        button.targetGraphic = image;
-        button.onClick.AddListener(onClick);
-        TMP_Text text = Text("Label", rect, 20f, Body, new Vector2(0.5f, 0.5f), new Vector2(190f, 40f), Vector2.zero, TextAlignmentOptions.Center);
-        text.text = label;
-        return button;
     }
 
     private static RectTransform Rect(string name, Transform parent, Vector2 anchorAt, Vector2 size, Vector2 position)

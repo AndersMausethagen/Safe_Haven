@@ -211,11 +211,12 @@ public sealed class HeartTree : MonoBehaviour, IArea, IBuildArea
             body.Append(whispers[Mathf.Clamp(whisperIndex, 0, whispers.Length - 1)]).Append("\n\n");
         }
 
-        body.Append($"<color=#E8C46A>The ward shelters {WardRadius:0} m around the tree. You can build inside it.</color>");
+        UIStyle style = UIStyle.Current;
+        body.Append($"<color={UIStyle.Hex(style.Accent)}>The ward shelters {WardRadius:0} m around the tree. You can build inside it.</color>");
         WardBreachDirector breach = WardBreachDirector.Current;
         if (breach != null && breach.IsPending)
         {
-            body.Append("\n\n<color=#FF9A6B>").Append(breach.Definition.PendingText).Append("</color>");
+            body.Append($"\n\n<color={UIStyle.Hex(style.Warning)}>").Append(breach.Definition.PendingText).Append("</color>");
         }
 
         var page = new MenuPage { Title = "The Heart Tree", Body = body.ToString() };
@@ -230,7 +231,7 @@ public sealed class HeartTree : MonoBehaviour, IArea, IBuildArea
             SettlementSettings.WardLevel next = settings.WardLevels[level];
             MaterialPool pool = MaterialPool.For(user);
             bool affordable = pool.CanAfford(next.cost, null, out string missing);
-            string detail = $"{AmountText.Describe(next.cost)}  →  ward {settings.WardRadiusAt(level + 1):0} m" + (affordable ? "" : $"   <color=#FF7B6B>{missing}</color>");
+            string detail = $"{AmountText.Describe(next.cost)}  →  ward {settings.WardRadiusAt(level + 1):0} m" + (affordable ? "" : $"   <color={UIStyle.Hex(style.Danger)}>{missing}</color>");
             page.Add(new MenuAction("Strengthen the ward", detail, affordable, () => Strengthen(user)));
         }
 

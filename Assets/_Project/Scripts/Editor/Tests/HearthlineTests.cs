@@ -1,5 +1,6 @@
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using NUnit.Framework;
 using TMPro;
 using UnityEditor;
@@ -34,6 +35,17 @@ public sealed class HearthlineTests
         foreach (string file in files)
         {
             StringAssert.DoesNotContain($"m_fontAsset: {{fileID: 11400000, guid: {old}", File.ReadAllText(file), file);
+        }
+    }
+
+    [Test]
+    public void CodeBuiltWindows_TakeTheirColoursFromTheStyle()
+    {
+        foreach (string file in new[] { "UI/TalentWindow.cs", "UI/HavenWindow.cs", "UI/AltarWindow.cs", "UI/CargoWindow.cs", "Settlement/HeartTree.cs" })
+        {
+            string source = File.ReadAllText("Assets/_Project/Scripts/" + file);
+            Assert.IsFalse(Regex.IsMatch(source, "<color=#[0-9A-Fa-f]{6}"), $"{file}: changing a colour in UIStyle has to change the game");
+            StringAssert.DoesNotContain("new Color(0.", source, file);
         }
     }
 

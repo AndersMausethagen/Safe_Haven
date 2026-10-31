@@ -74,6 +74,9 @@ public sealed class UIStyle : GameSettings<UIStyle>
     public Color Warning => warning;
     public Color Danger => danger;
 
+    /// <summary>A colour for rich text, with its #.</summary>
+    public static string Hex(Color color) => "#" + ColorUtility.ToHtmlStringRGB(color);
+
     /// <summary>Sets up text that sits directly on the world, with the shadow that keeps it readable there.</summary>
     public void OnWorld(TMP_Text label, bool title = false)
     {
