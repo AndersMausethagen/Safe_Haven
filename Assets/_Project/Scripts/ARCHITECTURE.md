@@ -974,6 +974,7 @@ Carts, barrows and boats (GDD §8.5). They are real rigidbodies; the rules read 
 - **`Rowboat`:** float points pushed up by how deep they are, so draught follows the load. Steering reads `PlayerMovement.MovementInput`. The player is parked with `PlayerMovement.SitAt`, which turns the CharacterController off.
 - **`PlayerTransport`** owns what the player is using, the speed scale and everything that lets go. `PlayerStateMachine.IsAboard` gates fighting like swimming does. `PlayerTransportPose` bends bones after the Animator, as there are no animations for this.
 - **Between scenes:** `GameSession.CarriedTransport` holds a definition and its saved cargo. `PlayerTransport.Start` waits until the player stands on the ground before setting it down: set down earlier it falls through a scene still waking.
+- **`TransportAudio`** reads everything from the physics: the loop follows real speed and load. The clips are made by `Tools/Audio/transport.py`, and the sounds are set in `TransportSettings`.
 - **Colliders are on Ignore Raycast** so a wheel's ground ray doesn't find its own cart; `Transport.GroundMask` also skips water.
 
 ## Essence

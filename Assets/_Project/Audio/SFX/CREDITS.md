@@ -13,5 +13,7 @@ use, credit not required. Credited here anyway.
 | OGA Rain Loops | Rain (loopable) | Ylmir | https://opengameart.org/content/rain-loopable |
 | Safe Haven Footsteps | Soft grass, forest-floor and dirt steps | Made for the game (synthesised by `Tools/Audio/footsteps.py`) | this project |
 
+| Safe Haven Transport | Rolling wheels, creaks, oars and water on a hull | Made for the game (synthesised by `Tools/Audio/transport.py`), CC0 |
+
 Animations: Universal Animation Library 1 and 2 (Standard), CC0, by Quaternius (https://quaternius.com), in
 Assets/Quaternius.

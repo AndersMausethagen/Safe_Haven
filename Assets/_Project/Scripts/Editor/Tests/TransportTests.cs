@@ -174,6 +174,23 @@ public sealed class TransportTests
     }
 
     [Test]
+    public void EveryTransport_HasItsSounds()
+    {
+        TransportSettings settings = TransportSettings.Current;
+        foreach (SoundDefinition sound in new[] { settings.Rolling, settings.HullWater, settings.Creak, settings.OarStroke, settings.Bump })
+        {
+            Assert.IsNotNull(sound);
+            Assert.IsTrue(sound.HasClips, sound.name);
+            Assert.IsTrue(sound.Positional, $"{sound.name}: heard from where the cart is");
+        }
+
+        foreach (string name in Kinds)
+        {
+            Assert.IsNotNull(Authored(name).Prefab.GetComponent<TransportAudio>(), name);
+        }
+    }
+
+    [Test]
     public void AuthoredTransports_AreWiredUp()
     {
         var content = Resources.Load<ContentDatabase>(ContentDatabase.ResourceName);

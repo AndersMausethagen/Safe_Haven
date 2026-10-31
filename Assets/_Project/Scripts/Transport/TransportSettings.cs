@@ -27,6 +27,23 @@ public sealed class TransportSettings : GameSettings<TransportSettings>
     [Tooltip("Seconds stuck at full strain before the player lets go.")]
     [SerializeField, Min(0f)] private float stuckSeconds = 1.5f;
 
+    [Header("Sounds")]
+    [Tooltip("Loops under a cart while it rolls, louder and higher the faster it goes, lower under a load.")]
+    [SerializeField] private SoundDefinition rolling;
+    [Tooltip("Loops along a hull while the boat moves.")]
+    [SerializeField] private SoundDefinition hullWater;
+    [Tooltip("Every few metres a cart rolls, more often when heavy.")]
+    [SerializeField] private SoundDefinition creak;
+    [Tooltip("Each stroke of the oars.")]
+    [SerializeField] private SoundDefinition oarStroke;
+    [Tooltip("When it really hits something.")]
+    [SerializeField] private SoundDefinition bump;
+
+    public SoundDefinition Rolling => rolling;
+    public SoundDefinition HullWater => hullWater;
+    public SoundDefinition Creak => creak;
+    public SoundDefinition OarStroke => oarStroke;
+    public SoundDefinition Bump => bump;
     public ItemSlotView SlotPrefab => slotPrefab;
     public float ExtractionRange => extractionRange;
     public float MaterialReach => materialReach;

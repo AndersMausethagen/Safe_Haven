@@ -14,8 +14,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::TransportSettings
   slotPrefab: {fileID: 6335682346606635300, guid: ab7a5151da033b841ab6b876615b0c17, type: 3}
   extractionRange: 12
+  materialReach: 12
+  storageReach: 8
   rumbleRadius: 5
   rumbleWhenFull: 8
   rumbleSeconds: 1.2
   strainedSpeed: 0.2
   stuckSeconds: 1.5
+  rolling: {fileID: 11400000, guid: 221176e61d48d034ab7213afeaf7d11f, type: 2}
+  hullWater: {fileID: 11400000, guid: 159e6d5b596a3694eaf0cebd4391ec7c, type: 2}
+  creak: {fileID: 11400000, guid: afb70e5f769c9fc43811760ef8aaea3d, type: 2}
+  oarStroke: {fileID: 11400000, guid: 553b5a9d2a2b18f43a0a30c564defb78, type: 2}
+  bump: {fileID: 11400000, guid: 9d340d307cad71748954517efe7c1394, type: 2}

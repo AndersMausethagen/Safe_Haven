@@ -24,6 +24,9 @@ public static class BuildTransport
     private const string Models = "Assets/_Project/Art/Haven/Models/";
     private const string Tints = "Assets/_Project/Materials/Haven/";
     private const string Player = "Assets/_Project/Prefabs/Characters/PlayerArmature.prefab";
+    private const string Sounds = "Assets/_Project/Audio/Sounds/Library/";
+    private const string Clips = "Assets/_Project/Audio/SFX/Safe Haven Transport/";
+    private const string Impacts = "Assets/_Project/Audio/SFX/Kenney Impact/";
 
     private static Material plank;
     private static Material darkPlank;
@@ -171,8 +174,48 @@ public static class BuildTransport
 
         var so = new SerializedObject(settings);
         so.FindProperty("slotPrefab").objectReferenceValue = AssetDatabase.LoadAssetAtPath<ItemSlotView>("Assets/_Project/Prefabs/UI/ItemSlot.prefab");
+        so.FindProperty("rolling").objectReferenceValue = Sound("Cart Roll", 0.55f, 0f, Vector2.one, 3f, 30f, 1, Clips + "Cart Roll Loop.wav");
+        so.FindProperty("hullWater").objectReferenceValue = Sound("Hull Water", 0.4f, 0f, Vector2.one, 3f, 25f, 1, Clips + "Hull Water Loop.wav");
+        so.FindProperty("creak").objectReferenceValue = Sound("Cart Creak", 0.32f, 0.3f, new Vector2(0.9f, 1.12f), 3f, 25f, 2,
+            Clips + "Cart Creak 1.wav", Clips + "Cart Creak 2.wav", Clips + "Cart Creak 3.wav", Clips + "Cart Creak 4.wav");
+        so.FindProperty("oarStroke").objectReferenceValue = Sound("Oar Stroke", 0.55f, 0.2f, new Vector2(0.92f, 1.08f), 3f, 30f, 2,
+            Clips + "Oar Stroke 1.wav", Clips + "Oar Stroke 2.wav", Clips + "Oar Stroke 3.wav", Clips + "Oar Stroke 4.wav");
+        so.FindProperty("bump").objectReferenceValue = Sound("Transport Bump", 0.7f, 0.25f, new Vector2(0.85f, 1.05f), 3f, 35f, 2,
+            Impacts + "impactWood_heavy_000.ogg", Impacts + "impactWood_heavy_001.ogg", Impacts + "impactWood_heavy_002.ogg", Impacts + "impactWood_heavy_003.ogg", Impacts + "impactWood_heavy_004.ogg");
         so.ApplyModifiedPropertiesWithoutUndo();
         EditorUtility.SetDirty(settings);
+    }
+
+    private static SoundDefinition Sound(string name, float volume, float variation, Vector2 pitch, float full, float audible, int atOnce, params string[] clips)
+    {
+        string path = Sounds + name + ".asset";
+        var sound = AssetDatabase.LoadAssetAtPath<SoundDefinition>(path);
+        if (sound == null)
+        {
+            sound = ScriptableObject.CreateInstance<SoundDefinition>();
+            AssetDatabase.CreateAsset(sound, path);
+        }
+
+        var so = new SerializedObject(sound);
+        SerializedProperty list = so.FindProperty("clips");
+        list.arraySize = clips.Length;
+        for (int i = 0; i < clips.Length; i++)
+        {
+            var clip = AssetDatabase.LoadAssetAtPath<AudioClip>(clips[i]);
+            list.GetArrayElementAtIndex(i).objectReferenceValue = clip != null ? clip : throw new Exception("No clip " + clips[i]);
+        }
+
+        so.FindProperty("channel").intValue = (int)AudioChannel.Effects;
+        so.FindProperty("volume").floatValue = volume;
+        so.FindProperty("volumeVariation").floatValue = variation;
+        so.FindProperty("pitchRange").vector2Value = pitch;
+        so.FindProperty("positional").boolValue = true;
+        so.FindProperty("fullVolumeDistance").floatValue = full;
+        so.FindProperty("audibleDistance").floatValue = audible;
+        so.FindProperty("maxAtOnce").intValue = atOnce;
+        so.ApplyModifiedPropertiesWithoutUndo();
+        EditorUtility.SetDirty(sound);
+        return sound;
     }
 
     // ----- Prefabs -----
@@ -320,6 +363,7 @@ public static class BuildTransport
         transport.FindProperty("definition").objectReferenceValue = definition;
         transport.ApplyModifiedPropertiesWithoutUndo();
         root.AddComponent<SaveableEntity>();
+        root.AddComponent<TransportAudio>();
 
         string path = Prefabs + definition.name + ".prefab";
         GameObject prefab = PrefabUtility.SaveAsPrefabAsset(root, path);
