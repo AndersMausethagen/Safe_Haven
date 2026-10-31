@@ -23,6 +23,7 @@ public sealed class HeldItemView : MonoBehaviour
     private PlayerEquipment equipment;
     private PlayerGathering gathering;
     private PlayerSwimming swimming;
+    private PlayerTransport transportUser;
     private Transform grip;
     private GameObject current;
     private Transform offHandGrip;
@@ -61,6 +62,7 @@ public sealed class HeldItemView : MonoBehaviour
         equipment = GetComponent<PlayerEquipment>();
         gathering = GetComponent<PlayerGathering>();
         swimming = GetComponent<PlayerSwimming>();
+        transportUser = GetComponent<PlayerTransport>();
         Animator animator = GetComponentInChildren<Animator>();
         Transform hand = animator != null && animator.isHuman ? animator.GetBoneTransform(HumanBodyBones.RightHand) : null;
         if (hand == null)
@@ -140,7 +142,8 @@ public sealed class HeldItemView : MonoBehaviour
         return model;
     }
 
-    private bool IsSwimming => swimming != null && swimming.IsSwimming;
+    // In the water or with the hands on a cart or the oars, what is held is put away.
+    private bool IsSwimming => (swimming != null && swimming.IsSwimming) || (transportUser != null && transportUser.Using != null);
 
     /// <summary>The tool while gathering with one on the belt, else the main-hand weapon; nothing while swimming.</summary>
     private ItemDefinition Wanted()

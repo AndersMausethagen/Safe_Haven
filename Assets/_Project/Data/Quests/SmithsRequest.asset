@@ -14,11 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::QuestDefinition
   id: smiths_request
   displayName: The Smith's Request
-  description: 'A note on the board: the smith needs copper, and proof you can use it.'
+  description: 'An old note on the board, in the last smith''s hand: this hearth wants copper, and proof you can work it.'
   chain: Side Quests
   prerequisites: []
   start: 2
   startEvent: {fileID: 0}
+  startDelay: 0
+  onStarted: []
   objectivesInOrder: 1
   objectives:
   - type: 4
@@ -27,6 +29,7 @@ MonoBehaviour:
     item: {fileID: 11400000, guid: 8cf878eb4a61eb943917a1f9421bb40a, type: 2}
     resource: {fileID: 0}
     monster: {fileID: 0}
+    faction: 1
     building: {fileID: 0}
     raid: {fileID: 0}
     mustExtract: 1
@@ -39,15 +42,20 @@ MonoBehaviour:
     item: {fileID: 11400000, guid: 174bdf8b6dd19c743a0a229e1ad4c35f, type: 2}
     resource: {fileID: 0}
     monster: {fileID: 0}
+    faction: 1
     building: {fileID: 0}
     raid: {fileID: 0}
     mustExtract: 1
     withinMinutes: 0
     questEvent: {fileID: 0}
     countAlreadyOwned: 0
+  turnInToGiver: 0
+  turnInTo: 
   rewardItems:
   - item: {fileID: 11400000, guid: f243c15300698e044a98d785099354c6, type: 2}
     amount: 2
   rewardResources: []
   rewardRecipes: []
+  experience: 0
   completionEvent: {fileID: 0}
+  onCompleted: []

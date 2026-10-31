@@ -4,7 +4,8 @@ using UnityEngine.Rendering;
 
 /// <summary>The scene's weather (see Docs/Weather.md). Blends from one <see cref="WeatherDefinition"/> to the next and
 /// applies the result: wind strength and gusts (the scene's <see cref="MossWind"/>), rain (<see cref="RainEffect"/>),
-/// the gloomy Overcast volume, and lightning flashes that <see cref="DayNightCycle"/> shows. With a
+/// the gloomy Overcast volume, how wet the ground is (it soaks and dries slower than the rain comes and goes), and
+/// lightning flashes that <see cref="DayNightCycle"/> shows. With a
 /// <see cref="ClimateDefinition"/> it changes weather by itself; scripts can force one with <see cref="SetWeather"/>
 /// (a storm before a ward breach). The weather is not saved: a loaded game starts with the start weather.</summary>
 [ExecuteAlways]
@@ -23,6 +24,8 @@ public sealed class WeatherSystem : MonoBehaviour
     [Tooltip("Global volume with the overcast / rain look; its weight follows clouds and rain.")]
     [SerializeField] private Volume overcastVolume;
 
+    private static readonly int WetnessId = Shader.PropertyToID("_SafeHavenWetness");
+
     private WeatherDefinition weather;
     private WeatherState from = WeatherState.Clear;
     private WeatherState current = WeatherState.Clear;
@@ -30,6 +33,7 @@ public sealed class WeatherSystem : MonoBehaviour
     private float transition;
     private float timeLeft;
     private float flash;
+    private float wetness;
     private System.Random random = new System.Random();
 
     /// <summary>The weather being blended to (or that has arrived).</summary>
@@ -37,6 +41,9 @@ public sealed class WeatherSystem : MonoBehaviour
 
     /// <summary>The blended weather right now.</summary>
     public WeatherState Current => current;
+
+    /// <summary>How wet the ground is, 0 dry to 1 soaked with full puddles. Lags behind the rain.</summary>
+    public float Wetness => wetness;
 
     /// <summary>Lightning brightness, 1 at a strike and fading within a fraction of a second.</summary>
     public float LightningFlash => flash;
@@ -87,6 +94,8 @@ public sealed class WeatherSystem : MonoBehaviour
         AtmosphereConditions.WeatherFog = 1f;
         AtmosphereConditions.WeatherWind = 1f;
         AtmosphereConditions.WeatherMist = 0f;
+        AtmosphereConditions.WeatherRain = 0f;
+        Shader.SetGlobalFloat(WetnessId, 0f);
         if (wind != null)
         {
             wind.SetWeather(1f, 0f);
@@ -129,6 +138,16 @@ public sealed class WeatherSystem : MonoBehaviour
         Changed?.Invoke(next);
     }
 
+    /// <summary>The ground's wetness after <paramref name="deltaTime"/> seconds: it rises towards the rain's strength,
+    /// as fast as the rain falls, and dries at its own pace.</summary>
+    public static float AdvanceWetness(float wetness, float rain, float deltaTime, float soakSeconds, float drySeconds)
+    {
+        rain = Mathf.Clamp01(rain);
+        return wetness < rain
+            ? Mathf.Min(rain, wetness + rain * deltaTime / Mathf.Max(soakSeconds, 1e-3f))
+            : Mathf.Max(rain, wetness - deltaTime / Mathf.Max(drySeconds, 1e-3f));
+    }
+
     /// <summary>Advances the blend, the climate's timer and lightning by <paramref name="deltaTime"/> seconds.</summary>
     public void Tick(float deltaTime)
     {
@@ -147,6 +166,7 @@ public sealed class WeatherSystem : MonoBehaviour
             }
         }
 
+        wetness = AdvanceWetness(wetness, current.Rain, deltaTime, climate != null ? climate.SoakSeconds : 75f, climate != null ? climate.DrySeconds : 240f);
         flash = Mathf.Max(0f, flash - deltaTime * 5f);
         if (current.LightningPerMinute > 0f && random.NextDouble() < current.LightningPerMinute / 60f * deltaTime)
         {
@@ -165,6 +185,7 @@ public sealed class WeatherSystem : MonoBehaviour
         current = from = weather != null ? weather.State : WeatherState.Clear;
         blend = 1f;
         flash = 0f;
+        wetness = Mathf.Clamp01(current.Rain);
         timeLeft = Duration(weather);
         Apply();
     }
@@ -185,6 +206,8 @@ public sealed class WeatherSystem : MonoBehaviour
         AtmosphereConditions.WeatherFog = current.Fog;
         AtmosphereConditions.WeatherWind = Mathf.Max(0f, current.Wind);
         AtmosphereConditions.WeatherMist = Mathf.Clamp01(current.Mist);
+        AtmosphereConditions.WeatherRain = Mathf.Clamp01(current.Rain);
+        Shader.SetGlobalFloat(WetnessId, wetness);
         if (wind != null)
         {
             wind.SetWeather(current.Wind, current.Gusts);

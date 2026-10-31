@@ -121,6 +121,10 @@ public sealed class ItemDefinition : ScriptableObject, IStackDefinition
     [Tooltip("Experience gained when the player reads this item (a rune book). Reading uses it up. 0: none.")]
     [SerializeField, Min(0)] private int experience;
 
+    [Header("Transport")]
+    [Tooltip("Makes this item a transport's kit: using it sets the cart or boat down. Empty for other items.")]
+    [SerializeField] private TransportDefinition transport;
+
     [Header("Raid")]
     [Tooltip("Makes this item a raid modifier: picked at the raid portal and used up when the raid starts. Empty for other items.")]
     [SerializeField] private RaidModifierDefinition raidModifier;
@@ -164,7 +168,8 @@ public sealed class ItemDefinition : ScriptableObject, IStackDefinition
     /// <summary>True for consumables: something restores health, hunger or thirst, gives a boon or cures when used.</summary>
     public bool IsConsumable => healAmount > 0f || hungerRestore > 0f || thirstRestore > 0f || HasBoon || cures.Count > 0;
     /// <summary>True when right-clicking does something: eat, drink, heal, equip or read.</summary>
-    public bool IsUsable => IsConsumable || IsEquippable || IsBlueprint || experience > 0;
+    public bool IsUsable => IsConsumable || IsEquippable || IsBlueprint || experience > 0 || transport != null;
+    public TransportDefinition Transport => transport;
     public int CarryCapacityBonus => carryCapacityBonus;
     public int BagSlotBonus => bagSlotBonus;
     public bool IsBackpack => carryCapacityBonus > 0 || bagSlotBonus > 0;

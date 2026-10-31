@@ -58,7 +58,7 @@ public sealed class LootOnDeath : MonoBehaviour
 
         if (killingBlow.Source.GetComponentInParent<ResourceInventory>() != null)
         {
-            List<ResourceAmount> overflow = LootGrant.GiveResources(killingBlow.Source.gameObject, drops.RollResources());
+            List<ResourceAmount> overflow = LootGrant.GiveResources(killingBlow.Source.gameObject, Reaped(drops.RollResources(), killingBlow.Source));
             if (overflow.Count > 0)
             {
                 GameMessages.Post("Can't carry more: " + AmountText.Describe(overflow) + " left behind.", MessageKind.Warning);
@@ -70,5 +70,23 @@ public sealed class LootOnDeath : MonoBehaviour
         {
             crafting.Unlock(unlocksRecipes);
         }
+    }
+
+    private static IReadOnlyList<ResourceAmount> Reaped(IReadOnlyList<ResourceAmount> rolled, Combatant killer)
+    {
+        float find = killer.Stats.Get(StatType.EssenceFind);
+        ResourceDefinition cursed = SettlementSettings.Current.CursedEssence;
+        if (find <= 0f || cursed == null)
+        {
+            return rolled;
+        }
+
+        var reaped = new List<ResourceAmount>(rolled.Count);
+        foreach (ResourceAmount entry in rolled)
+        {
+            reaped.Add(entry.Resource == cursed ? new ResourceAmount(cursed, GearPower.Reaped(entry.Amount, find, Random.value)) : entry);
+        }
+
+        return reaped;
     }
 }

@@ -56,5 +56,16 @@ public sealed class Combatant : MonoBehaviour
     public void ReportDamageDealt(IDamageable target, DamageInfo damage, DamageResult result)
     {
         DamageDealt?.Invoke(target, damage, result);
+        DrainLife(damage, result);
+    }
+
+    // Drain feeds on blows, not on poison ticking away, and only on what the target really lost.
+    private void DrainLife(DamageInfo damage, DamageResult result)
+    {
+        float share = Stats.Get(StatType.Lifesteal);
+        if (share > 0f && !damage.IsOverTime && result.HealthLost > 0f && TryGetComponent(out Damageable health))
+        {
+            health.Heal(result.HealthLost * share);
+        }
     }
 }

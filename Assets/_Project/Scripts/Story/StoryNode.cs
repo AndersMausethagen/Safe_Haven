@@ -32,6 +32,10 @@ public sealed class StoryContext
 
     /// <summary>The output the node just run leaves through (a choice's answer). 0 for most nodes; -1 stops here.</summary>
     public int Output { get; set; }
+
+    /// <summary>True in the quiet right after a fight (StoryPacing), when a line should wait.</summary>
+    public bool IsCatchingBreath => QuestManager.Instance != null
+        && QuestManager.Instance.Pacing.IsCatchingBreath(Time.time, StoryPacingSettings.Current);
 }
 
 /// <summary>

@@ -54,6 +54,9 @@ public sealed class SettlementState
     /// <summary>Every crafting station's queue and output slot.</summary>
     public WorkshopState Workshops { get; } = new WorkshopState();
 
+    /// <summary>Share faster the altar works for its upgrades. Set by the altar; kept here as batches finish during raids.</summary>
+    public float PurificationBonus { get; private set; }
+
     /// <summary>Raised after anything here changes (but not on every purification tick).</summary>
     public event Action Changed;
 
@@ -136,6 +139,11 @@ public sealed class SettlementState
         return added;
     }
 
+    public void SetPurificationBonus(float bonus)
+    {
+        PurificationBonus = Math.Max(0f, bonus);
+    }
+
     /// <summary>Advances the batch in progress. Returns how many batches finished.</summary>
     public int TickPurification(float seconds, float secondsPerBatch)
     {
@@ -180,8 +188,9 @@ public sealed class SettlementState
     }
 
     /// <summary>Puts back saved state. Used by SaveMapper only.</summary>
-    public void Restore(bool portalRepaired, int wardLevel, int extractions, BreachStatus breach, int queued, float progress)
+    public void Restore(bool portalRepaired, int wardLevel, int extractions, BreachStatus breach, int queued, float progress, float bonus = 0f)
     {
+        PurificationBonus = Math.Max(0f, bonus);
         PortalRepaired = portalRepaired;
         WardLevel = Math.Max(0, wardLevel);
         SuccessfulExtractions = Math.Max(0, extractions);

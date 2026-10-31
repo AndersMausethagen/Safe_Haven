@@ -8,7 +8,8 @@ using UnityEngine.UI;
 /// hunger and thirst bars (GDD §11, §18.2). Each bar has a fill that tracks the value at once and a pale trail behind it
 /// that lingers and then drains, so a hit or a spend reads at a glance. Refused attacks, skills and dodges flash the
 /// stamina bar and post a warning through the existing message feed. While the dodge cools down the stamina bar glows
-/// red around its edge, and the glow going out says the dodge is ready.
+/// red around its edge, and the glow going out says the dodge is ready. Quiet by default (GDD §18.2): with health and
+/// stamina full, needs in hand and nothing changing, the bars dim until something happens (Options: Always Show Vitals).
 /// <para>
 /// Where it belongs: the PlayerVitalsHUD prefab, placed in every gameplay scene. It finds the player through
 /// Player.Current / Player.Spawned, so it needs no scene references.
@@ -17,6 +18,13 @@ using UnityEngine.UI;
 public sealed class PlayerVitalsView : MonoBehaviour
 {
     private const float StaminaMessageInterval = 1f;
+    // How long everything has to stay full before the bars dim, how far, and how quickly they move.
+    private const float QuietAfterSeconds = 5f;
+    private const float QuietAlpha = 0.4f;
+    private const float QuietFadePerSecond = 1.5f;
+    private const float FullShare = 0.995f;
+    // Hunger and thirst below this keep the bars lit: they are worth seeing even with nothing else going on.
+    private const float NeedsInHandShare = 0.3f;
 
     [Serializable]
     private sealed class Bar
@@ -76,6 +84,7 @@ public sealed class PlayerVitalsView : MonoBehaviour
     private float flashUntil = -1f;
     private float nextStaminaMessageAt = -1f;
     private PlayerFocus boundFocus;
+    private float lastActiveAt;
 
     private void Awake()
     {
@@ -241,9 +250,17 @@ public sealed class PlayerVitalsView : MonoBehaviour
         nextStaminaMessageAt = -1f;
     }
 
-    private void OnHealthChanged(float current, float max) => SetTarget(health, current, max, snap: false);
+    private void OnHealthChanged(float current, float max)
+    {
+        lastActiveAt = Time.unscaledTime;
+        SetTarget(health, current, max, snap: false);
+    }
 
-    private void OnStaminaChanged(float current, float max) => SetTarget(stamina, current, max, snap: false);
+    private void OnStaminaChanged(float current, float max)
+    {
+        lastActiveAt = Time.unscaledTime;
+        SetTarget(stamina, current, max, snap: false);
+    }
 
     private void OnFocusChanged(float current, float max) => SetTarget(focus, current, max, snap: false);
 
@@ -317,6 +334,7 @@ public sealed class PlayerVitalsView : MonoBehaviour
             SetTarget(thirst, bound.Needs.Thirst.Current, bound.Needs.Thirst.Max, snap: true);
         }
 
+        UpdateQuiet();
         UpdateDodgeGlow();
         if (staminaFrame != null && flashUntil >= 0f)
         {
@@ -328,6 +346,22 @@ public sealed class PlayerVitalsView : MonoBehaviour
             }
         }
     }
+
+    private void UpdateQuiet()
+    {
+        if (group != null && bound != null)
+        {
+            group.alpha = Mathf.MoveTowards(group.alpha, IsQuiet ? QuietAlpha : 1f, QuietFadePerSecond * Time.unscaledDeltaTime);
+        }
+    }
+
+    // A refused action, a cooling dodge or a fight all count as something going on.
+    private bool IsQuiet => !GameOptions.AlwaysShowVitals.On
+        && Time.unscaledTime >= lastActiveAt + QuietAfterSeconds && flashUntil < 0f
+        && health.target >= FullShare && stamina.target >= FullShare
+        && (bound.Needs == null || (hunger.target >= NeedsInHandShare && thirst.target >= NeedsInHandShare))
+        && (boundDodge == null || boundDodge.CooldownFraction <= 0f)
+        && !MonsterAI.AnyHuntingPlayerSide();
 
     private void DrainTrail(Bar bar)
     {

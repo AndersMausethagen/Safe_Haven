@@ -54,6 +54,8 @@ public sealed class SkillDefinition : ScriptableObject
     [Header("Presentation")]
     [SerializeField] private bool playAttackAnimation = true;
 
+    /// <summary>Stable identifier, used for saves: the asset's name.</summary>
+    public string Id => name;
     public string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;
     public string Description => description;
     public Sprite Icon => icon;

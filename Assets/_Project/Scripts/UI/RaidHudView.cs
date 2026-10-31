@@ -159,14 +159,14 @@ public sealed class RaidHudView : MonoBehaviour
             switch (exit.Status)
             {
                 case ExtractionStatus.NotYetOpen:
-                    text.Append($"<color=#9AA0AA>{exit.DisplayName}  {distance} m  opens in {RaidStats.FormatTime(exit.SecondsUntilChange)}</color>");
+                    text.Append($"<color=#D9D2C4>{exit.DisplayName}  {distance} m  opens in {RaidStats.FormatTime(exit.SecondsUntilChange)}</color>");
                     break;
                 case ExtractionStatus.Closed:
-                    text.Append($"<color=#B05050><s>{exit.DisplayName}</s>  gone dark</color>");
+                    text.Append($"<color=#E09A88><s>{exit.DisplayName}</s>  gone dark</color>");
                     break;
                 default:
                     float closesIn = exit.SecondsUntilChange;
-                    string color = closesIn >= 0f && closesIn <= 60f ? "#FFB84D" : "#8BE08B";
+                    string color = closesIn >= 0f && closesIn <= 60f ? "#F0BC6C" : "#BFD8A5";
                     text.Append($"<color={color}>{exit.DisplayName}  {distance} m");
                     if (exit.IsLit)
                     {
@@ -184,7 +184,7 @@ public sealed class RaidHudView : MonoBehaviour
 
             if (exit.CostItem != null)
             {
-                text.Append($"  <color=#E0C070>needs {exit.CostText}</color>");
+                text.Append($"  <color=#EBD29A>needs {exit.CostText}</color>");
             }
         }
 
@@ -209,7 +209,7 @@ public sealed class RaidHudView : MonoBehaviour
 
             Vector3 offset = site.transform.position - position;
             offset.y = 0f;
-            text.Append($"\n<color=#C9A2FF>{site.DisplayName}  {Mathf.RoundToInt(offset.magnitude)} m  {SideOf(offset)}</color>");
+            text.Append($"\n<color=#DCCBF2>{site.DisplayName}  {Mathf.RoundToInt(offset.magnitude)} m  {SideOf(offset)}</color>");
         }
     }
 
@@ -236,10 +236,10 @@ public sealed class RaidHudView : MonoBehaviour
         RaidRisk risk = RaidRisk.Of(PlayerSnapshot.Capture(player), director.Session.Loadout);
         if (risk.IsEmpty)
         {
-            return "<color=#9AA0AA>Nothing at risk yet</color>";
+            return "<color=#D9D2C4>Nothing at risk yet</color>";
         }
 
-        return $"At risk: <color=#FFB84D>{risk.Items} items ({risk.Value} value)  ·  {risk.Resources} materials</color>";
+        return $"At risk: <color=#F0BC6C>{risk.Items} items ({risk.Value} value)  ·  {risk.Resources} materials</color>";
     }
 
     private Color TimerColor(RaidSession session)
@@ -276,12 +276,12 @@ public sealed class RaidHudView : MonoBehaviour
             {
                 case ExtractionHoldState.Holding:
                 case ExtractionHoldState.Done:
-                    return $"<color=#8BE08B>Holding {point.DisplayName}... {percent}%  ({point.TimeLeft:0} s)</color>";
+                    return $"<color=#BFD8A5>Holding {point.DisplayName}... {percent}%  ({point.TimeLeft:0} s)</color>";
                 case ExtractionHoldState.Contested:
-                    return $"<color=#FF6B5B>{point.DisplayName} contested! Drive them out  ({percent}%)</color>";
+                    return $"<color=#F0917E>{point.DisplayName} contested! Drive them out  ({percent}%)</color>";
                 default:
                     float away = player != null ? point.DistanceFrom(player.transform.position) : 0f;
-                    return $"<color=#FFB84D>Back to {point.DisplayName}'s circle  {Mathf.RoundToInt(away)} m  ({percent}%)</color>";
+                    return $"<color=#F0BC6C>Back to {point.DisplayName}'s circle  {Mathf.RoundToInt(away)} m  ({percent}%)</color>";
             }
         }
 
@@ -291,7 +291,7 @@ public sealed class RaidHudView : MonoBehaviour
         }
 
         nearest = ExtractionPoint.FindNearest(player.transform.position, out float distance);
-        return nearest != null ? $"Nearest open: {nearest.DisplayName}  {Mathf.RoundToInt(distance)} m" : "<color=#FF6B5B>No open way out right now</color>";
+        return nearest != null ? $"Nearest open: {nearest.DisplayName}  {Mathf.RoundToInt(distance)} m" : "<color=#F0917E>No open way out right now</color>";
     }
 
     // Up on screen is the camera's forward along the ground, so the arrow turns by the angle from there to the target.

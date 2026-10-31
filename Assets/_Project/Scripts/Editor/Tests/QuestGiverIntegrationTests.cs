@@ -250,6 +250,12 @@ public sealed class QuestGiverIntegrationTests
                     Assert.AreEqual(QuestStatus.NotStarted, manager.Log.StatusOf(chapter.Quest), "Reading isn't acceptance.");
                     page.Actions.Single().Chosen();
                 }
+                else
+                {
+                    Assert.AreEqual(QuestStatus.NotStarted, manager.Log.StatusOf(chapter.Quest), "It waits a moment after the last chapter.");
+                    manager.StartWaitingQuests(Time.time + 1000f);
+                }
+
                 Assert.AreEqual(QuestStatus.Active, manager.Log.StatusOf(chapter.Quest), chapter.Quest.name);
                 Assert.IsTrue(director.ExpeditionStarted);
                 foreach (var goal in chapter.Quest.Objectives)
@@ -293,6 +299,7 @@ public sealed class QuestGiverIntegrationTests
         foreach (var prerequisite in quest.Prerequisites) manager.Log.ForceComplete(prerequisite);
         Assert.AreEqual(QuestStatus.NotStarted, manager.Log.StatusOf(quest));
         GameEvents.Raise(quest.StartEvent);
+        manager.StartWaitingQuests(Time.time + 1000f);
         Assert.AreEqual(QuestStatus.Active, manager.Log.StatusOf(quest));
         Assert.IsTrue(manager.Log.HasHappened(quest.StartEvent));
         GameEvents.Raise(quest.StartEvent);

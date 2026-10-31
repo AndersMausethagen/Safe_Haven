@@ -23,6 +23,23 @@ saved hour. The weather is not saved (a loaded game starts at the start weather)
    - `DayNightCycle.Hour` (read it, or set it to jump the clock, e.g. after sleeping), `IsNight`, `ClockRuns`.
    - `WeatherSystem.SetWeather(weather, seconds)` (e.g. a storm before a ward breach); the `Changed` event; `Current`.
 
+## Wet ground and puddles
+
+Rain soaks the terrain. `WeatherSystem` keeps a **wetness** (0 dry, 1 soaked) that follows the rain slowly: **Soak Seconds**
+of downpour to fill up, less far and slower in light rain, then **Dry Seconds** to dry once the rain stops, both on the
+scene's Climate. It is sent to shaders as `_SafeHavenWetness` and isn't saved, like the weather. The terrain goes darker and
+shinier, and small puddles fill in on level ground, in the same places every time, growing with the wetness. Rain rings
+them while it falls. The look is `WorldWetness` in `AgentScripts/GenerateWorldTerrainShader.py`: change it there and run the
+generator, as the terrain shaders are generated. A terrain only gets this with the `Safe Haven/Terrain (World)` shader:
+the raid uses `SafeHavenTerrain World.mat`, a copy of its old material with displacement and cliffs off.
+
+## Fireflies
+
+The **Fireflies** prefab (`Prefabs/Environment`) in a scene flies them around what the camera looks at, each set down at
+its own height over the ground. A `FireflyProfile` (`Data/World`) holds their colour and numbers: green over the Haven,
+blue in the Misty Woods, a handful by day, many at night, fewer in the rain. `Night` and the rain come from
+`AtmosphereConditions`. For a new place, make a profile and drop the prefab in the scene.
+
 ## Developer tools
 
 - **Safe Haven > World > Sky and Weather > Sky Controller** (window), in Play mode or as an edit-mode preview:

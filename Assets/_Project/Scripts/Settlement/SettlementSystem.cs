@@ -46,7 +46,7 @@ public sealed class SettlementSystem : MonoBehaviour, IGameSystem
             return;
         }
 
-        int finished = settlement.TickPurification(Time.deltaTime, settings.SecondsPerBatch);
+        int finished = settlement.TickPurification(Time.deltaTime * (1f + settlement.PurificationBonus), settings.SecondsPerBatch);
         if (finished > 0 && settings.PurifiedEssence != null)
         {
             int made = GameSession.Stash.Resources.Add(settings.PurifiedEssence, finished * settings.PurifiedPerBatch);

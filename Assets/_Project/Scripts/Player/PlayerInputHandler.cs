@@ -267,13 +267,7 @@ public sealed class PlayerInputHandler : MonoBehaviour
 
     private void OnTalents(InputAction.CallbackContext context) => RequestWindow(UIWindowId.Talents);
 
-    private void OnHaven(InputAction.CallbackContext context)
-    {
-        if (HeartTree.Current != null)
-        {
-            HeartTree.Current.OpenHaven(gameObject);
-        }
-    }
+    private void OnHaven(InputAction.CallbackContext context) => RequestWindow(UIWindowId.Haven);
 
     private void OnDodge(InputAction.CallbackContext context)
     {

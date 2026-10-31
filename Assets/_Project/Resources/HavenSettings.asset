@@ -18,24 +18,37 @@ MonoBehaviour:
   rankExperience: 150
   clearingExperiencePerQuarter: 25
   rankSound: {fileID: 11400000, guid: c08cfff61a51d7442a93c4dae8255955, type: 2}
+  expedition:
+  - {fileID: 11400000, guid: b230d041259b863428e4e973c6ff0d86, type: 2}
+  - {fileID: 11400000, guid: 272895da9ba7e784b8a97bcd2be637c8, type: 2}
+  - {fileID: 11400000, guid: de521ad7beeb20b49878a9b40c96bced, type: 2}
+  - {fileID: 11400000, guid: df34e8e1df8ff0241a216bfddf9b631c, type: 2}
+  - {fileID: 11400000, guid: 33e7204287863854f8c6ad025490f531, type: 2}
+  - {fileID: 11400000, guid: 4260d606f7c62c042b848adc806c44d3, type: 2}
+  - {fileID: 11400000, guid: 8adfc30233928ec499c01587419eabaa, type: 2}
   ranks:
   - name: Overgrown Camp
     renown: 0
     wardBonus: 0
     line: A fire and a tree, and the forest pressing in.
+    reachedEvent: {fileID: 0}
   - name: Homestead
     renown: 25
     wardBonus: 3
     line: Someone lives here now. The ward reaches further.
+    reachedEvent: {fileID: 0}
   - name: Hamlet
     renown: 60
     wardBonus: 6
     line: Smoke from more than one chimney.
+    reachedEvent: {fileID: 11400000, guid: d81ec9226282a0a4f8cbcbb8094b2a98, type: 2}
   - name: Village
     renown: 110
     wardBonus: 10
     line: Travellers speak of a light in the old wood.
+    reachedEvent: {fileID: 0}
   - name: Haven
     renown: 180
     wardBonus: 15
     line: A true haven. The forest itself seems to breathe easier.
+    reachedEvent: {fileID: 0}

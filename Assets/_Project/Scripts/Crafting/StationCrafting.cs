@@ -38,6 +38,18 @@ public static class StationCrafting
         return MaterialPool.For(user).CanAfford(recipe.ResourceCost, recipe.ItemCost, out string missing) ? null : missing;
     }
 
+    /// <summary>How many crafts of the recipe can be queued right now, with what is held and the room in the queue.</summary>
+    public static int QueueableCount(GameObject user, StationQueue queue, RecipeDefinition recipe)
+    {
+        if (Check(user, queue, recipe) != null)
+        {
+            return 0;
+        }
+
+        MaterialPool pool = MaterialPool.For(user);
+        return Mathf.Min(queue.FreeQueueSlots, RecipeMaking.Batches(recipe, pool.Have, pool.Have));
+    }
+
     /// <summary>Pays for one craft and puts it at the end of the queue. Tells the player why not when it can't.</summary>
     public static bool TryQueue(GameObject user, StationQueue queue, RecipeDefinition recipe)
     {

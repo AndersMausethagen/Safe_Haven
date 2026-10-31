@@ -202,6 +202,76 @@ void WorldCliffs(Varyings IN, inout InputData inputData, inout half3 albedo, ino
     smoothness = lerp(smoothness, mask.a, w);
     inputData.normalWS = normalize(lerp(inputData.normalWS, rockNormal, w));
 }
+
+// Rain on the ground (WeatherSystem sets the wetness). Soaked ground is darker and shinier everywhere it is level enough
+// to hold water; puddles fill in the low spots of a noise that stays put, growing with the wetness, and ring under the rain.
+float _SafeHavenWetness, _SafeHavenRain;
+
+float WorldWetHash(float2 p)
+{
+    p = frac(p * float2(123.34, 456.21));
+    p += dot(p, p + 45.32);
+    return frac(p.x * p.y);
+}
+
+float WorldWetNoise(float2 p)
+{
+    float2 cell = floor(p);
+    float2 f = frac(p);
+    f = f * f * (3.0 - 2.0 * f);
+    return lerp(lerp(WorldWetHash(cell), WorldWetHash(cell + float2(1, 0)), f.x),
+                lerp(WorldWetHash(cell + float2(0, 1)), WorldWetHash(cell + float2(1, 1)), f.x), f.y);
+}
+
+// How much a raindrop's ring leans the surface here: expanding rings, one to a cell, each with its own moment.
+float2 WorldRainRings(float2 p, float time)
+{
+    float2 cell = floor(p);
+    float2 offset = frac(p) - 0.5;
+    float seed = WorldWetHash(cell);
+    float age = frac(time * 0.9 + seed);
+    offset -= (float2(seed, frac(seed * 7.13)) - 0.5) * 0.4;
+    float radius = length(offset);
+    float wave = sin((radius - age * 0.45) * 42.0) * saturate(1.0 - abs(radius - age * 0.45) * 9.0) * (1.0 - age);
+    return radius > 0.001 ? offset / radius * wave : 0;
+}
+
+void WorldWetness(Varyings IN, inout InputData inputData, inout half3 albedo, inout half smoothness, inout half metallic, inout half occlusion, out half skySheen)
+{
+    skySheen = 0;
+    half wetness = _SafeHavenWetness;
+    if (wetness <= 0.001)
+    {
+        return;
+    }
+
+    // Wide on purpose: terrain normals change from triangle to triangle, and a narrow range draws those triangles.
+    half level = smoothstep(0.62, 0.8, WorldGeometricNormal(IN).y);
+    half soaked = wetness * (0.5 + 0.5 * level);
+    albedo *= 1.0 - 0.34 * soaked;
+    smoothness = lerp(smoothness, max(smoothness, 0.62), soaked);
+
+    float2 xz = IN.positionWS.xz;
+    float lows = WorldWetNoise(xz * 0.75) * 0.55 + WorldWetNoise(xz * 2.1 + 17.3) * 0.3 + WorldWetNoise(xz * 5.3 + 41.7) * 0.15;
+    float shore = lerp(0.76, 0.63, wetness);
+    half puddle = smoothstep(shore, shore + 0.05, lows) * level * saturate(wetness * 3.0);
+    if (puddle <= 0.001)
+    {
+        return;
+    }
+
+    albedo = lerp(albedo, albedo * 0.6, puddle);
+    smoothness = lerp(smoothness, 0.97, puddle);
+    metallic = lerp(metallic, 0.2, puddle);
+    occlusion = lerp(occlusion, 1.0, puddle);
+    float2 lean = _SafeHavenRain * (WorldRainRings(xz * 1.9, _Time.y) + WorldRainRings(xz * 1.9 + 3.7, _Time.y * 1.3 + 0.5)) * 0.32;
+    inputData.normalWS = normalize(lerp(inputData.normalWS, normalize(half3(lean.x, 1.0, lean.y)), puddle));
+
+    // Water shows the sky, and more of it the flatter it is seen. There are no reflections of the scene to draw on, so
+    // the sky's ambient colour stands in; black puddles read as holes.
+    half facing = saturate(dot(inputData.normalWS, inputData.viewDirectionWS));
+    skySheen = puddle * lerp(0.26, 0.05, facing * facing);
+}
 // ---------------------------------------------------------------------------------------------------------------------
 
 void InitializeBakedGIData(Varyings IN, inout InputData inputData)
@@ -575,6 +645,8 @@ void SplatmapFragment(
 #ifndef TERRAIN_SPLAT_BASEPASS
     WorldCliffs(IN, inputData, albedo, smoothness, metallic, occlusion);
 #endif
+    half skySheen;
+    WorldWetness(IN, inputData, albedo, smoothness, metallic, occlusion, skySheen);
 
 #if defined(_DBUFFER)
     half3 specular = half3(0.0h, 0.0h, 0.0h);
@@ -600,6 +672,7 @@ void SplatmapFragment(
     MixRealtimeAndBakedGI(mainLight, inputData.normalWS, inputData.bakedGI, inputData.shadowMask);
     color.rgb = GlobalIllumination(brdfData, (BRDFData)0, 0, inputData.bakedGI, occlusion, inputData.positionWS,
                                    inputData.normalWS, inputData.viewDirectionWS, inputData.normalizedScreenSpaceUV);
+    color.rgb += skySheen * SampleSH(half3(0, 1, 0));
     color.a = alpha;
     SplatmapFinalColor(color, inputData.fogCoord);
 
@@ -616,7 +689,7 @@ void SplatmapFragment(
     return PackGBuffersBRDFData(brdfData, inputData, smoothness, color.rgb, occlusion);
 #else
 
-    half4 color = UniversalFragmentPBR(inputData, albedo, metallic, /* specular */ half3(0.0h, 0.0h, 0.0h), smoothness, occlusion, /* emission */ half3(0, 0, 0), alpha);
+    half4 color = UniversalFragmentPBR(inputData, albedo, metallic, /* specular */ half3(0.0h, 0.0h, 0.0h), smoothness, occlusion, /* emission */ skySheen * SampleSH(half3(0, 1, 0)), alpha);
 
     SplatmapFinalColor(color, inputData.fogCoord);
 

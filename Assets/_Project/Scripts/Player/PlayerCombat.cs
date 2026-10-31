@@ -513,7 +513,14 @@ public sealed class PlayerCombat : MonoBehaviour
             movement.Lunge(activeDirection * (distance / LungeSeconds), LungeSeconds);
         }
 
-        movement.SetSpeedScale(this, kind == SwingKind.Heavy ? Rules.HeavyMoveSpeed : Rules.SwingMoveSpeed);
+        // Planted, facing the blow, until it lands: legs running under a swing and a body skating through one both look wrong.
+        movement.FacingLocked = true;
+        movement.SetSpeedScale(this, Rules.WindupMoveSpeed);
+        if (!hitPending)
+        {
+            ReleaseFeet();
+        }
+
         EnterCombat();
 
         current = new SwingInfo(kind, attack, step, chain, rhythm, activeSpeed, technique, activeDirection);
@@ -561,6 +568,7 @@ public sealed class PlayerCombat : MonoBehaviour
             hitPending = false;
             int hits = AttackResolver.Execute(combatant, activeAttack, activeWeaponDamage, transform.position, activeDirection, hitLayers,
                 activeDamageMultiplier, activePoiseMultiplier, activeTechnique, activeForceCritical);
+            ReleaseFeet();
             SwingLanded?.Invoke(current, hits);
         }
 
@@ -576,6 +584,14 @@ public sealed class PlayerCombat : MonoBehaviour
         }
     }
 
+    // The blow has landed: the rest is follow-through the player can walk out of. The swing itself goes on, so walking off
+    // doesn't make the next attack come any sooner.
+    private void ReleaseFeet()
+    {
+        movement.FacingLocked = false;
+        movement.SetSpeedScale(this, activeKind == SwingKind.Heavy ? Rules.HeavyMoveSpeed : Rules.SwingMoveSpeed);
+    }
+
     private void EndSwing()
     {
         if (activeKind != SwingKind.None)
@@ -588,6 +604,7 @@ public sealed class PlayerCombat : MonoBehaviour
         activeKind = SwingKind.None;
         activeAttack = null;
         hitPending = false;
+        movement.FacingLocked = false;
         movement.SetSpeedScale(this, 1f);
     }
 

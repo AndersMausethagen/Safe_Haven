@@ -1,89 +1,72 @@
 using System;
-using System.Text;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using TMPro;
 
 /// <summary>
-/// One recipe in the crafting list: what it makes, what it costs (each cost green when the player has enough, red when
-/// not), why it can't be crafted yet, and a Craft button. Reports when the pointer is over it, so its owner can show the
-/// recipe's tooltip.
+/// One recipe in a RecipeBrowser's list: what it makes, its tier, and in a word or two whether it can be made and why
+/// not. Reports clicks; the browser decides what they do.
 /// </summary>
-public sealed class RecipeRowView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+public sealed class RecipeRowView : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
 {
-    private static readonly string Enough = "#8BE08B";
-    private static readonly string Missing = "#FF7B6B";
+    private static readonly Color DimIcon = new Color(1f, 1f, 1f, 0.45f);
 
+    [SerializeField] private Image background;
+    [Tooltip("The thin line that marks the selected row.")]
+    [SerializeField] private Image selectedLine;
     [SerializeField] private Image icon;
     [SerializeField] private TMP_Text nameLabel;
-    [Tooltip("Shows the costs with rich text.")]
-    [SerializeField] private TMP_Text costLabel;
     [SerializeField] private TMP_Text statusLabel;
-    [SerializeField] private Button craftButton;
+    [SerializeField] private TMP_Text tierLabel;
 
-    private RecipeDefinition recipe;
-    private Action<RecipeDefinition> onCraft;
+    private bool isSelected;
+    private bool hovered;
 
-    /// <summary>Raised with true when the pointer enters the row and false when it leaves.</summary>
-    public event Action<RecipeRowView, bool> HoverChanged;
+    /// <summary>Raised when the row is clicked.</summary>
+    public event Action<RecipeRowView, PointerEventData> Clicked;
 
-    public RecipeDefinition Recipe => recipe;
+    public RecipeDefinition Recipe { get; private set; }
 
-    private void Awake()
+    public void OnPointerClick(PointerEventData eventData) => Clicked?.Invoke(this, eventData);
+
+    public void OnPointerEnter(PointerEventData eventData)
     {
-        craftButton.onClick.AddListener(() => onCraft?.Invoke(recipe));
+        hovered = true;
+        Paint();
     }
 
-    public void OnPointerEnter(PointerEventData eventData) => HoverChanged?.Invoke(this, true);
-
-    public void OnPointerExit(PointerEventData eventData) => HoverChanged?.Invoke(this, false);
-
-    public void Bind(RecipeDefinition shown, Action<RecipeDefinition> craft)
+    public void OnPointerExit(PointerEventData eventData)
     {
-        recipe = shown;
-        onCraft = craft;
-        icon.sprite = shown.OutputIcon;
+        hovered = false;
+        Paint();
+    }
+
+    /// <summary>Shows the recipe. A count above zero says how many can be made; otherwise the problem does.</summary>
+    /// <param name="muted">The problem isn't something to fix here, such as a recipe made at another station.</param>
+    public void Show(RecipeDefinition recipe, int count, string problem, bool selected, bool muted)
+    {
+        Recipe = recipe;
+        isSelected = selected;
+        UIStyle style = UIStyle.Current;
+        bool canMake = count > 0;
+
+        icon.sprite = recipe.OutputIcon;
         icon.enabled = icon.sprite != null;
-        string amount = shown.OutputAmount > 1 ? $" ×{shown.OutputAmount}" : "";
-        nameLabel.text = $"{shown.DisplayName}{amount}  <size=13>{Tiers.RichLabel(shown.Tier)}</size>";
+        icon.color = canMake ? Color.white : DimIcon;
+        nameLabel.text = recipe.OutputAmount > 1 ? $"{recipe.DisplayName} ×{recipe.OutputAmount}" : recipe.DisplayName;
+        nameLabel.color = canMake ? style.Text : style.Muted;
+        tierLabel.text = Tiers.ToRoman(recipe.Tier);
+        tierLabel.color = Tiers.ColorOf(recipe.Tier);
+        statusLabel.text = canMake ? $"Can make {count}" : problem;
+        statusLabel.color = canMake ? style.Good : muted ? style.Muted : style.Danger;
+        Paint();
     }
 
-    /// <summary>Shows how much of each cost the player has, and whether the recipe can be crafted.</summary>
-    public void Refresh(PlayerCrafting crafting)
+    private void Paint()
     {
-        var builder = new StringBuilder();
-        foreach (ResourceAmount cost in recipe.ResourceCost)
-        {
-            if (cost.Resource != null)
-            {
-                AppendCost(builder, cost.Resource.DisplayName, crafting.Have(cost.Resource), cost.Amount);
-            }
-        }
-
-        foreach (ItemAmount cost in recipe.ItemCost)
-        {
-            if (cost.Item != null)
-            {
-                AppendCost(builder, cost.Item.DisplayName, crafting.Have(cost.Item), cost.Amount);
-            }
-        }
-
-        costLabel.text = builder.ToString();
-
-        PlayerCrafting.CraftCheck check = crafting.Check(recipe);
-        string where = recipe.Station == CraftingStationType.None ? "By hand" : recipe.Station.DisplayName();
-        statusLabel.text = check.CanCraft ? where : $"{where}  ·  <color={Missing}>{check.Problem}</color>";
-        craftButton.interactable = check.CanCraft;
-    }
-
-    private static void AppendCost(StringBuilder builder, string name, int have, int need)
-    {
-        if (builder.Length > 0)
-        {
-            builder.Append("   ");
-        }
-
-        builder.Append($"<color={(have >= need ? Enough : Missing)}>{need} {name}</color> <size=12>({have})</size>");
+        UIStyle style = UIStyle.Current;
+        background.color = isSelected ? style.ControlLit : hovered ? style.Control : style.Inset;
+        selectedLine.enabled = isSelected;
     }
 }

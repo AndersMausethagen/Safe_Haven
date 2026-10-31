@@ -57,6 +57,8 @@ public sealed class SettlementSaveData
     public List<ResidentSaveData> residents = new List<ResidentSaveData>();
     public int purificationQueued;
     public float purificationProgress;
+    /// <summary>Share faster the altar works for its upgrades. Missing in older saves; the altar sets it again at home.</summary>
+    public float purificationBonus;
     /// <summary>Every crafting station's queue and output slot. Missing in older saves.</summary>
     public List<StationSaveData> stations = new List<StationSaveData>();
 }
@@ -100,6 +102,8 @@ public sealed class ProgressSaveData
     public int level = 1;
     public int experience;
     public List<AmountSaveData> talents = new List<AmountSaveData>();
+    /// <summary>Ranks deepened at the altar, by skill id. Missing in older saves.</summary>
+    public List<AmountSaveData> skillRanks = new List<AmountSaveData>();
     public List<string> crafted = new List<string>();
     public List<string> stones = new List<string>();
 }
@@ -181,6 +185,10 @@ public sealed class SlotSaveData
     public int count;
     /// <summary>Durability lost, 0 (as new) to 1 (broken). Stored as wear so older saves load undamaged.</summary>
     public float wear;
+    /// <summary>Levels of empowering. Missing in older saves, where nothing was.</summary>
+    public int empower;
+    /// <summary>The enchantment's id, or empty.</summary>
+    public string enchantment;
 }
 
 [Serializable]

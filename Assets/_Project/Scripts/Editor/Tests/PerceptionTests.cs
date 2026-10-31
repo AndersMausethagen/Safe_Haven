@@ -83,6 +83,86 @@ public sealed class PerceptionTests
     }
 
     [Test]
+    public void Hearing_ThroughCover_ReachesLess()
+    {
+        Assert.Greater(PerceptionRules.HeardLevel(4f, 5f, 1f, rules), 0f, "in the open");
+        Assert.AreEqual(0f, PerceptionRules.HeardLevel(4f, 5f, 1f, rules, true), "4 m is too far through cover at 60% of 5 m");
+        Assert.Greater(PerceptionRules.HeardLevel(2f, 5f, 1f, rules, true), 0f, "cover muffles a sound, it doesn't stop it");
+    }
+
+    [Test]
+    public void Hearing_PlacesFarSoundsRoughly_AndNearOnesExactly()
+    {
+        Assert.AreEqual(0f, PerceptionRules.HeardError(0f, 10f, 1f, rules), "at the source");
+        Assert.AreEqual(rules.HeardSpreadAtEdge * 0.5f, PerceptionRules.HeardError(5f, 10f, 1f, rules), 1e-4f);
+        Assert.AreEqual(rules.HeardSpreadAtEdge, PerceptionRules.HeardError(10f, 10f, 1f, rules), 1e-4f, "at the edge");
+    }
+
+    [Test]
+    public void Noise_GearAndRain_ScaleWhatCarries()
+    {
+        Assert.AreEqual(1f, PerceptionRules.GearNoiseScale(6f, 6f, 13f, rules), 1e-5f, "a light load is as set");
+        Assert.AreEqual(rules.HeavyGearNoise, PerceptionRules.GearNoiseScale(20f, 6f, 13f, rules), 1e-5f, "capped from the heavy load");
+        Assert.AreEqual(1f, PerceptionRules.RainNoiseScale(0f, rules), 1e-5f, "dry");
+        Assert.AreEqual(rules.NoiseInRain, PerceptionRules.RainNoiseScale(1f, rules), 1e-5f, "the heaviest rain");
+    }
+
+    [Test]
+    public void NoiseMeter_ShowsTheLastSound_HoldsIt_ThenFalls()
+    {
+        var meter = new NoiseMeter();
+        Assert.AreEqual(5f, meter.Add(5f, rules), 1e-5f, "a first sound carries as it is");
+        Assert.AreEqual(5f, meter.Level, 1e-5f);
+        meter.Tick(rules.NoiseHoldSeconds * 0.5f, rules);
+        Assert.AreEqual(5f, meter.Level, 1e-5f, "held");
+        meter.Tick(rules.NoiseHoldSeconds, rules);
+        Assert.Less(meter.Level, 5f, "then it falls");
+        for (int i = 0; i < 100; i++)
+        {
+            meter.Tick(0.1f, rules);
+        }
+
+        Assert.AreEqual(0f, meter.Level, "and silence comes back");
+    }
+
+    [Test]
+    public void NoiseMeter_WalkingStaysLevel_ButAFightBuildsUp()
+    {
+        var walking = new NoiseMeter();
+        float step = 0f;
+        for (int i = 0; i < 40; i++)
+        {
+            step = walking.Add(rules.FootstepNoise, rules);
+            walking.Tick(rules.FootstepInterval, rules);
+        }
+
+        Assert.AreEqual(rules.FootstepNoise, step, 1e-4f, "steps don't add up");
+        Assert.AreEqual(rules.FootstepNoise, walking.Level, 1e-4f, "and the meter reads steady between them");
+
+        var fighting = new NoiseMeter();
+        float first = fighting.Add(rules.CombatNoise, rules);
+        float blow = first;
+        for (int i = 0; i < 60; i++)
+        {
+            fighting.Tick(rules.CombatNoiseInterval, rules);
+            blow = fighting.Add(rules.CombatNoise, rules);
+        }
+
+        Assert.Greater(blow, first + 1f, "a long fight carries further than one blow");
+        Assert.LessOrEqual(blow, rules.CombatNoise + rules.NoiseBuildMax + 1e-4f, "up to the cap");
+    }
+
+    [Test]
+    public void NoiseBand_NamesTheLevel()
+    {
+        Assert.AreEqual(NoiseBand.Silent, NoiseMeter.BandOf(0f, rules));
+        Assert.AreEqual(NoiseBand.Quiet, NoiseMeter.BandOf(rules.SneakingFootstepNoise, rules), "sneaking");
+        Assert.AreEqual(NoiseBand.Audible, NoiseMeter.BandOf(rules.FootstepNoise, rules), "walking");
+        Assert.AreEqual(NoiseBand.Loud, NoiseMeter.BandOf(rules.CombatNoise, rules), "a fight");
+        Assert.AreEqual(NoiseBand.Deafening, NoiseMeter.BandOf(rules.CombatNoise + rules.NoiseBuildMax, rules), "a long fight");
+    }
+
+    [Test]
     public void Fog_ShortensSight_DownToTheDenseFogShare()
     {
         Assert.AreEqual(1f, PerceptionRules.FogSightScale(0f, 0.06f, 0.55f), 1e-5f, "clear air");

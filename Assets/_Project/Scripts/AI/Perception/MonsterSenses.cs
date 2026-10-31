@@ -128,6 +128,13 @@ public sealed class MonsterSenses
         return distance <= range && CanSeeAny(Eye(rules), target, rules);
     }
 
+    /// <summary>True when no cover stands between it and a sound at <paramref name="position"/>.</summary>
+    public bool HasClearPathTo(Vector3 position)
+    {
+        PerceptionSettings rules = PerceptionSettings.Current;
+        return HasLineOfSight(Eye(rules), position + Vector3.up * rules.TargetHeight, self);
+    }
+
     private Vector3 Eye(PerceptionSettings rules) => self.position + Vector3.up * rules.EyeHeight;
 
     // Chest or head: a small rise in the ground that hides the body doesn't hide a standing head, a hill hides both.

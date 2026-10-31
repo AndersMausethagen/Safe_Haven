@@ -91,6 +91,7 @@ public sealed class PlayerArchery : MonoBehaviour
     private PlayerStamina stamina;
     private ItemInventory items;
     private Damageable health;
+    private PlayerNoise noise;
 
     private bool held;
     private bool aimHeld;
@@ -169,6 +170,7 @@ public sealed class PlayerArchery : MonoBehaviour
         stamina = GetComponent<PlayerStamina>();
         items = GetComponent<ItemInventory>();
         health = GetComponent<Damageable>();
+        noise = GetComponent<PlayerNoise>();
     }
 
     private void OnEnable()
@@ -413,7 +415,11 @@ public sealed class PlayerArchery : MonoBehaviour
 
         movement.SnapFacing(direction);
         AudioManager.Play(bow.SwingSound, origin);
-        WorldNoise.Emit(transform.position, ShotNoise);
+        if (noise != null)
+        {
+            noise.Make(transform.position, ShotNoise);
+        }
+
         if (combat != null)
         {
             combat.KeepInCombat();

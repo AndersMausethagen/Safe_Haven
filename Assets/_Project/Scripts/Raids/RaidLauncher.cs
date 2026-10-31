@@ -130,6 +130,11 @@ public static class RaidLauncher
         int runSeed = seed ?? RaidSession.NewSeed();
         RaidParameters parameters = RaidParameters.Calculate(raid, modifiers, sparks * SettlementSettings.Current.SecondsPerSpark,
             RaidTimeOfDay.For(raid, runSeed));
+        if (player.TryGetComponent(out PlayerTransport transport))
+        {
+            transport.LeaveForRaid();
+        }
+
         PlayerSnapshot loadout = PlayerSnapshot.Capture(player);
         GameSession.BeginRaid(new RaidSession(raid, modifiers, parameters, loadout, SceneManager.GetActiveScene().name, sparks, runSeed));
         GameSession.CarryPlayerState(loadout);

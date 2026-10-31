@@ -7,13 +7,12 @@ using UnityEngine.UI;
 using TMPro;
 
 /// <summary>
-/// The bag window (B): the grid of item slots on one side and the crafting list on the other. Drag a stack to move it
+/// The bag window (B): the grid of item slots on one side and a RecipeBrowser on the other. Drag a stack to move it
 /// (onto the same item to merge, onto another item to swap, into the safe pocket to protect it), Shift-click to split a
 /// stack in half, right-click to use a consumable or equip gear and Ctrl+right-click to drop a stack. Stacks can also be
 /// dragged to and from the character screen's gear slots (see ItemDrag). Locked slots (past what the
-/// carried backpack unlocks) are shown dark. The crafting list shows every known recipe with what the player has of each
-/// cost; recipes light up next to their station. Everything shown comes from the player's ItemInventory,
-/// ResourceInventory and PlayerCrafting.
+/// carried backpack unlocks) are shown dark. The browser makes what can be made by hand, and lists the recipes made at
+/// stations to plan with. Everything shown comes from the player's ItemInventory, ResourceInventory and PlayerCrafting.
 /// </summary>
 public sealed class ItemInventoryWindow : MonoBehaviour, IItemSlotHandler
 {
@@ -35,10 +34,8 @@ public sealed class ItemInventoryWindow : MonoBehaviour, IItemSlotHandler
     [SerializeField] private TMP_Text gatheringLabel;
 
     [Header("Crafting")]
-    [Tooltip("Parent for the recipe rows. Should be a ScrollRect's content with a layout group.")]
-    [SerializeField] private RectTransform recipeList;
-    [SerializeField] private RecipeRowView recipeRowPrefab;
-    [Tooltip("Says how many recipes are still to be learned.")]
+    [SerializeField] private RecipeBrowser recipes;
+    [Tooltip("Where buildings come from, and how many recipes are still to be learned.")]
     [SerializeField] private TMP_Text recipeFooter;
 
     [Header("Layout")]
@@ -47,7 +44,6 @@ public sealed class ItemInventoryWindow : MonoBehaviour, IItemSlotHandler
 
     private readonly List<ItemSlotView> slots = new List<ItemSlotView>();
     private readonly List<ItemSlotView> pocketSlots = new List<ItemSlotView>();
-    private readonly List<RecipeRowView> rows = new List<RecipeRowView>();
     private ItemContainer container;
     private ItemContainer pocket;
     private ResourceStorage storage;
@@ -55,7 +51,6 @@ public sealed class ItemInventoryWindow : MonoBehaviour, IItemSlotHandler
     private BackpackCapacity backpack;
     private int dragFrom = -1;
     private ItemSlotView hovered;
-    private RecipeRowView hoveredRow;
     private float nextRecipeRefresh;
     private bool recipesDirty = true;
     private PlayerEquipment equipment;
@@ -68,9 +63,9 @@ public sealed class ItemInventoryWindow : MonoBehaviour, IItemSlotHandler
     private void OnEnable()
     {
         inventory = inventory != null ? inventory : Player.Current != null ? Player.Current.Bag : null;
-        if (inventory == null || grid == null || slotPrefab == null || tooltip == null || dragIcon == null || recipeList == null || recipeRowPrefab == null)
+        if (inventory == null || grid == null || slotPrefab == null || tooltip == null || dragIcon == null || recipes == null)
         {
-            Debug.LogError("ItemInventoryWindow is missing a reference (inventory, grid, slot prefab, tooltip, drag icon, recipe list or row prefab).", this);
+            Debug.LogError("ItemInventoryWindow is missing a reference (inventory, grid, slot prefab, tooltip, drag icon or recipe browser).", this);
             enabled = false;
             return;
         }
@@ -144,7 +139,6 @@ public sealed class ItemInventoryWindow : MonoBehaviour, IItemSlotHandler
 
         CancelDrag();
         hovered = null;
-        hoveredRow = null;
         tooltip?.Hide();
     }
 
@@ -154,7 +148,7 @@ public sealed class ItemInventoryWindow : MonoBehaviour, IItemSlotHandler
         Vector2 pointer = GameInput.PointerPosition;
         tooltip.Follow(pointer);
 
-        // Hand recipes depend on what is carried, so they are rechecked now and then while the window is open.
+        // Recipes depend on what is carried, so they are rechecked now and then while the window is open.
         if (recipesDirty || Time.unscaledTime >= nextRecipeRefresh)
         {
             RefreshRecipes();
@@ -445,27 +439,15 @@ public sealed class ItemInventoryWindow : MonoBehaviour, IItemSlotHandler
 
     private void RebuildRecipes()
     {
-        for (int i = recipeList.childCount - 1; i >= 0; i--)
-        {
-            Destroy(recipeList.GetChild(i).gameObject);
-        }
-
-        rows.Clear();
-        if (hoveredRow != null)
-        {
-            hoveredRow = null;
-            tooltip.Hide();
-        }
-
         if (crafting == null)
         {
             SetFooter("No crafting on this character.");
             return;
         }
 
-        var known = new List<RecipeDefinition>();
+        var byHand = new List<RecipeDefinition>();
+        var atStations = new List<RecipeDefinition>();
         int locked = 0;
-        int atStations = 0;
         foreach (RecipeDefinition recipe in crafting.Recipes)
         {
             if (recipe == null)
@@ -479,36 +461,18 @@ public sealed class ItemInventoryWindow : MonoBehaviour, IItemSlotHandler
             }
             else if (recipe.IsHandcrafted)
             {
-                known.Add(recipe);
+                byHand.Add(recipe);
             }
             else
             {
-                atStations++;
+                atStations.Add(recipe);
             }
         }
 
-        known.Sort(RecipeBook.CompareForDisplay);
-        foreach (RecipeDefinition recipe in known)
-        {
-            RecipeRowView row = Instantiate(recipeRowPrefab, recipeList);
-            row.name = recipe.DisplayName;
-            row.Bind(recipe, Craft);
-            row.HoverChanged += OnRecipeHoverChanged;
-            rows.Add(row);
-        }
-
-        var footer = new List<string> { "Campfires, tables and other buildings aren't crafted: place them from the build menu (G) in Safe Haven." };
-        if (atStations > 0)
-        {
-            footer.Add($"{atStations} more recipe{(atStations == 1 ? " is" : "s are")} made at crafting stations.");
-        }
-
-        if (locked > 0)
-        {
-            footer.Add($"{locked} still to discover. Bosses teach new ones.");
-        }
-
-        SetFooter(string.Join(" ", footer));
+        byHand.Sort(RecipeBook.CompareForDisplay);
+        atStations.Sort(RecipeBook.CompareForDisplay);
+        recipes.Show(new HandMaker(crafting), byHand, atStations);
+        SetFooter("Buildings come from the build menu (G)." + (locked > 0 ? $"  {locked} recipes still to discover." : ""));
         recipesDirty = true;
     }
 
@@ -516,48 +480,7 @@ public sealed class ItemInventoryWindow : MonoBehaviour, IItemSlotHandler
     {
         recipesDirty = false;
         nextRecipeRefresh = Time.unscaledTime + RecipeRefreshInterval;
-        if (crafting == null)
-        {
-            return;
-        }
-
-        foreach (RecipeRowView row in rows)
-        {
-            row.Refresh(crafting);
-        }
-
-        ShowRecipeTooltip();
-    }
-
-    private void OnRecipeHoverChanged(RecipeRowView row, bool entered)
-    {
-        if (entered)
-        {
-            hoveredRow = row;
-            ShowRecipeTooltip();
-        }
-        else if (hoveredRow == row)
-        {
-            hoveredRow = null;
-            tooltip.Hide();
-        }
-    }
-
-    private void ShowRecipeTooltip()
-    {
-        if (hoveredRow != null && crafting != null && dragFrom < 0)
-        {
-            PlayerCrafting.CraftCheck check = crafting.Check(hoveredRow.Recipe);
-            tooltip.ShowRecipe(hoveredRow.Recipe, crafting, check.CanCraft ? null : check.Problem);
-        }
-    }
-
-    private void Craft(RecipeDefinition recipe)
-    {
-        if (crafting.TryCraft(recipe))
-        {
-            RefreshRecipes();
-        }
+        recipes.Refresh();
     }
 
     private void SetFooter(string text)

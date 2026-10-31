@@ -118,9 +118,33 @@ public static class SaveMapper
         return data;
     }
 
+    /// <summary>Every occupied slot of a container, for what saves its own contents (a cart's cargo).</summary>
+    public static List<SlotSaveData> ToSlots(ItemContainer container)
+    {
+        var slots = new List<SlotSaveData>();
+        for (int i = 0; i < container.SlotCount; i++)
+        {
+            ItemStack stack = container.GetSlot(i);
+            if (!stack.IsEmpty)
+            {
+                slots.Add(ToSlot(i, stack));
+            }
+        }
+
+        return slots;
+    }
+
     private static SlotSaveData ToSlot(int index, ItemStack stack)
     {
-        return new SlotSaveData { slot = index, item = stack.Item.Id, count = stack.Count, wear = 1f - stack.Durability };
+        return new SlotSaveData
+        {
+            slot = index,
+            item = stack.Item.Id,
+            count = stack.Count,
+            wear = 1f - stack.Durability,
+            empower = stack.Empower,
+            enchantment = stack.Enchantment != null ? stack.Enchantment.Id : "",
+        };
     }
 
     private static void WriteSettlement(SettlementState settlement, SettlementSaveData into)
@@ -137,6 +161,7 @@ public static class SaveMapper
         into.breach = (int)settlement.Breach;
         into.purificationQueued = settlement.PurificationQueued;
         into.purificationProgress = settlement.PurificationProgress;
+        into.purificationBonus = settlement.PurificationBonus;
         foreach (ResidentRecord record in settlement.Residents)
         {
             into.residents.Add(new ResidentSaveData { id = record.Resident.Id, job = record.Job != null ? record.Job.Id : "" });
@@ -178,7 +203,7 @@ public static class SaveMapper
         }
 
         settlement.Restore(saved.portalRepaired, saved.wardLevel, saved.successfulExtractions, (BreachStatus)saved.breach,
-            saved.purificationQueued, saved.purificationProgress);
+            saved.purificationQueued, saved.purificationProgress, saved.purificationBonus);
         settlement.ReachHavenRank(saved.havenRank);
         foreach (ResidentSaveData entry in saved.residents)
         {
@@ -447,6 +472,11 @@ public static class SaveMapper
             into.talents.Add(new AmountSaveData { id = rank.Key, amount = rank.Value });
         }
 
+        foreach (KeyValuePair<string, int> skill in progress.SkillRanks)
+        {
+            into.skillRanks.Add(new AmountSaveData { id = skill.Key, amount = skill.Value });
+        }
+
         into.crafted.AddRange(progress.CraftedItems);
         into.stones.AddRange(progress.UsedStones);
     }
@@ -471,7 +501,14 @@ public static class SaveMapper
             }
         }
 
-        progress.Restore(saved.level, saved.experience, ranks, saved.crafted, saved.stones);
+        int deepest = EssenceSettings.Current.SkillRanks.Count;
+        var skillRanks = new List<KeyValuePair<string, int>>();
+        foreach (AmountSaveData skill in saved.skillRanks ?? new List<AmountSaveData>())
+        {
+            skillRanks.Add(new KeyValuePair<string, int>(skill.id, Math.Min(skill.amount, deepest)));
+        }
+
+        progress.Restore(saved.level, saved.experience, ranks, saved.crafted, saved.stones, skillRanks);
         return progress;
     }
 
@@ -518,7 +555,7 @@ public static class SaveMapper
         }
     }
 
-    private static ItemContainer ReadSlots(List<SlotSaveData> slots, ItemContainer into, IContentLookup content, List<string> missing)
+    public static ItemContainer ReadSlots(List<SlotSaveData> slots, ItemContainer into, IContentLookup content, List<string> missing)
     {
         foreach (SlotSaveData slot in slots)
         {
@@ -528,7 +565,9 @@ public static class SaveMapper
                 continue;
             }
 
-            var stack = new ItemStack(item, slot.count, 1f - slot.wear);
+            EnchantmentDefinition enchantment = string.IsNullOrEmpty(slot.enchantment) ? null
+                : Resolve(EssenceSettings.Current.FindEnchantment(slot.enchantment), "enchantment", slot.enchantment, missing);
+            var stack = new ItemStack(item, slot.count, 1f - slot.wear, slot.empower, enchantment);
             if (into.IsValid(slot.slot) && into.GetSlot(slot.slot).IsEmpty)
             {
                 into.SetSlot(slot.slot, stack);

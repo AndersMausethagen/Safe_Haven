@@ -54,6 +54,46 @@ public sealed class SaveTests
         }
     }
 
+    private RaidSession StartRaid()
+    {
+        var raid = ScriptableObject.CreateInstance<RaidDefinition>();
+        created.Add(raid);
+        var none = new RaidModifierDefinition[0];
+        var session = new RaidSession(raid, none, RaidParameters.Calculate(raid, none), null, "SampleScene");
+        GameSession.BeginRaid(session);
+        return session;
+    }
+
+    [Test]
+    public void ADuringRaid_NeitherSavingNorLoading()
+    {
+        SaveGameService.Storage = new SaveStorage(folder);
+        RaidSession raid = StartRaid();
+        try
+        {
+            Assert.IsNotNull(SaveGameService.CheckSave());
+            Assert.IsNotNull(SaveGameService.CheckLoad());
+            Assert.IsFalse(SaveGameService.TryLoad("anything", new Lookup(), "SafeHaven", out string problem));
+            StringAssert.Contains("raid", problem);
+            Assert.IsNotNull(GameSession.ActiveRaid, "a refused load leaves the raid running");
+        }
+        finally
+        {
+            GameSession.AbandonRaid(raid);
+        }
+    }
+
+    [Test]
+    public void ARaidLeftWithoutAnEnding_LetsTheMenuLoadAgain()
+    {
+        RaidSession raid = StartRaid();
+        GameSession.AbandonRaid(new RaidSession(raid.Definition, new RaidModifierDefinition[0], raid.Parameters, null, "SampleScene"));
+        Assert.AreSame(raid, GameSession.ActiveRaid, "only the raid in hand can be left");
+        GameSession.AbandonRaid(raid);
+        Assert.IsNull(GameSession.ActiveRaid);
+        Assert.IsNull(SaveGameService.CheckLoad());
+    }
+
     [Test]
     public void Mapper_RoundTripsPlayerStashAndPose()
     {

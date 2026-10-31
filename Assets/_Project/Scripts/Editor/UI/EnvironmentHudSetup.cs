@@ -46,7 +46,7 @@ public static class EnvironmentHudSetup
         Undo.RegisterCreatedObjectUndo(root.gameObject, "Add Environment HUD");
         root.gameObject.SetActive(false);
         var background = root.gameObject.AddComponent<Image>();
-        background.color = new Color(0.075f, 0.062f, 0.05f, 0.72f);
+        background.color = Color.clear;
         background.raycastTarget = false;
         var group = root.gameObject.AddComponent<CanvasGroup>();
         group.interactable = false;

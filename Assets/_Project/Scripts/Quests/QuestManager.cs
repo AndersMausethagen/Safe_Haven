@@ -8,7 +8,8 @@ using UnityEngine.SceneManagement;
 /// Resources folder) and it lives across scenes. It:
 /// <list type="bullet">
 /// <item>starts quests when they become available: automatically after their prerequisites, on their start event, or
-/// when a QuestGiver asks;</item>
+/// when a QuestGiver asks. Those that start by themselves wait their turn (StoryPacing): a pause after the last quest and
+/// after a fight, and never over someone talking. Someone asking (a giver, a story's Start Quest) starts one at once;</item>
 /// <item>feeds every game event to the player's QuestLog, which counts progress;</item>
 /// <item>hands out rewards, raises the quest's completion event and tells the player what happened.</item>
 /// </list>
@@ -22,13 +23,30 @@ using UnityEngine.SceneManagement;
 [DisallowMultipleComponent]
 public sealed class QuestManager : MonoBehaviour, IGameSystem
 {
+    /// <summary>A quest that can start, waiting for its moment. Not saved: it is found again on entering a scene.</summary>
+    private readonly struct WaitingQuest
+    {
+        public readonly QuestDefinition Quest;
+        public readonly float ReadyAt;
+
+        public WaitingQuest(QuestDefinition quest, float readyAt)
+        {
+            Quest = quest;
+            ReadyAt = readyAt;
+        }
+    }
+
     private static QuestManager instance;
 
     private ContentDatabase content;
     private QuestLog log;
     private readonly List<QuestDefinition> pendingRewards = new List<QuestDefinition>();
+    private readonly List<WaitingQuest> waiting = new List<WaitingQuest>();
 
     public static QuestManager Instance => instance;
+
+    /// <summary>When the next story beat may come. Stories ask it before speaking.</summary>
+    public StoryPacing Pacing { get; } = new StoryPacing();
 
     /// <summary>Raised whenever any quest starts, progresses or completes, for UI such as the quest tracker.</summary>
     public static event Action Changed;
@@ -68,6 +86,61 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
         if (instance == this)
         {
             instance = null;
+        }
+    }
+
+    private void Update()
+    {
+        Pacing.Tick(Time.time, MonsterAI.AnyHuntingPlayerSide(), DialogueBox.IsSpeaking);
+        // Quests begin once there is a player to receive them and they can see it, not behind a loading screen.
+        if (waiting.Count > 0 && Player.Current != null && !SceneTransition.IsBusy)
+        {
+            StartWaitingQuests(Time.time);
+        }
+    }
+
+    /// <summary>True while the quest can start and is only waiting for its moment, for the designer's Play Test panel.</summary>
+    public bool IsWaiting(QuestDefinition quest) => waiting.Exists(entry => entry.Quest == quest);
+
+    /// <summary>Starts every waiting quest whose moment has come.</summary>
+    internal void StartWaitingQuests(float now)
+    {
+        StoryPacingSettings rules = StoryPacingSettings.Current;
+        // Backwards: starting one can complete it and add its followers to the end of the list.
+        for (int i = waiting.Count - 1; i >= 0; i--)
+        {
+            WaitingQuest entry = waiting[i];
+            if (!CanBegin(entry.Quest))
+            {
+                waiting.RemoveAt(i);
+            }
+            else if (Pacing.CanStart(entry.ReadyAt, now, rules))
+            {
+                waiting.RemoveAt(i);
+                Log.TryStart(entry.Quest);
+            }
+        }
+    }
+
+    private bool CanBegin(QuestDefinition quest) => Log.StatusOf(quest) == QuestStatus.NotStarted && Log.PrerequisitesMet(quest);
+
+    // Starts it now if nothing is in the way, or else keeps it until something isn't.
+    private void Begin(QuestDefinition quest)
+    {
+        if (!CanBegin(quest) || IsWaiting(quest))
+        {
+            return;
+        }
+
+        StoryPacingSettings rules = StoryPacingSettings.Current;
+        float readyAt = Pacing.ReadyAt(quest.StartDelay, Time.time, rules);
+        if (Pacing.CanStart(readyAt, Time.time, rules))
+        {
+            Log.TryStart(quest);
+        }
+        else
+        {
+            waiting.Add(new WaitingQuest(quest, readyAt));
         }
     }
 
@@ -153,6 +226,7 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
 
         Unbind();
         pendingRewards.Clear();
+        waiting.Clear();
         log = GameSession.Quests;
         log.Started += OnQuestStarted;
         log.Progressed += OnQuestProgressed;
@@ -188,6 +262,7 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
 
             pendingRewards.Clear();
             StartAvailableQuests();
+            StartQuestsWhoseEventHappened();
         }
 
         RaiseChanged();
@@ -202,7 +277,7 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
             {
                 if (quest != null && quest.Start == QuestStart.OnQuestEvent && quest.StartEvent == gameEvent.Subject)
                 {
-                    Log.TryStart(quest);
+                    Begin(quest);
                 }
             }
         }
@@ -214,7 +289,19 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
         {
             if (quest != null && quest.Start == QuestStart.Automatically)
             {
-                Log.TryStart(quest);
+                Begin(quest);
+            }
+        }
+    }
+
+    // A game saved while such a quest waited its turn has the event but not the quest, and the event won't come again.
+    internal void StartQuestsWhoseEventHappened()
+    {
+        foreach (QuestDefinition quest in Quests)
+        {
+            if (quest != null && quest.Start == QuestStart.OnQuestEvent && Log.HasHappened(quest.StartEvent))
+            {
+                Begin(quest);
             }
         }
     }
@@ -248,6 +335,7 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
 
     private void OnQuestCompleted(QuestDefinition quest)
     {
+        Pacing.QuestCompleted(Time.time);
         string rewards;
         // Once a raid is decided, what the player takes home is already settled, so rewards wait until they arrive.
         if (RaidDirector.Current != null && RaidDirector.Current.Session.IsOver && quest.DescribeRewards().Length > 0)

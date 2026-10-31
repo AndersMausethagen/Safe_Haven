@@ -117,8 +117,10 @@ public static class GameOptions
     public static readonly GameOption ScreenFlash = GameOption.Slider("ScreenFlash", "Screen Flashes", "How strongly the screen edges flash when you are hurt or low on health.", 1f, 0f, 1f, 0.05f);
     public static readonly GameOption TextSpeed = GameOption.Choice("TextSpeed", "Dialogue Speed", "How fast lines appear, and how long subtitles in a fight stay up.", 1, "Slow", "Normal", "Fast", "Instant");
     public static readonly GameOption LargeTimer = GameOption.Toggle("LargeTimer", "Large Raid Timer", "A bigger clock during raids.", false);
+    public static readonly GameOption AlwaysShowVitals = GameOption.Toggle("AlwaysShowVitals", "Always Show Vitals",
+        "Keeps health, stamina, hunger and thirst fully lit. Off, they dim while everything is full.", false);
 
-    public static readonly IReadOnlyList<GameOption> Accessibility = new[] { UiScale, ScreenShake, HitStop, ScreenFlash, TextSpeed, LargeTimer };
+    public static readonly IReadOnlyList<GameOption> Accessibility = new[] { UiScale, ScreenShake, HitStop, ScreenFlash, TextSpeed, LargeTimer, AlwaysShowVitals };
 
     /// <summary>Letters per second for dialogue, from a base speed. Infinity shows lines at once.</summary>
     public static float DialogueLettersPerSecond(float normal)

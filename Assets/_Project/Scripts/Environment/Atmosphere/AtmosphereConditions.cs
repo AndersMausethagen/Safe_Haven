@@ -12,6 +12,8 @@ public static class AtmosphereConditions
     public static float WeatherFog { get; set; } = 1f;
     public static float WeatherWind { get; set; } = 1f;
     public static float WeatherMist { get; set; }
+    /// <summary>How hard it rains, 0-1. Set by WeatherSystem; rain hides the player's noise.</summary>
+    public static float WeatherRain { get; set; }
     public static float GoldenHour { get; set; }
     public static bool WeatherOnlyAtmosphere { get; set; }
 
@@ -35,6 +37,7 @@ public static class AtmosphereConditions
         WeatherFog = 1f;
         WeatherWind = 1f;
         WeatherMist = 0f;
+        WeatherRain = 0f;
         GoldenHour = 0f;
         WeatherOnlyAtmosphere = false;
         FogDensity = 0f;

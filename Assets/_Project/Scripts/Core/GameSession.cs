@@ -25,6 +25,7 @@ public static class GameSession
     private static PlayerSnapshot pendingPlayerState;
     private static PlayerPose? pendingPose;
     private static RaidReport pendingReport;
+    private static CarriedTransport? pendingTransport;
 
     /// <summary>The raid being played, or null outside raids.</summary>
     public static RaidSession ActiveRaid { get; private set; }
@@ -64,6 +65,31 @@ public static class GameSession
         return id;
     }
 
+    /// <summary>A cart on its way between scenes: what it is and its saved cargo.</summary>
+    public readonly struct CarriedTransport
+    {
+        public readonly TransportDefinition Definition;
+        public readonly string State;
+
+        public CarriedTransport(TransportDefinition definition, string state)
+        {
+            Definition = definition;
+            State = state;
+        }
+    }
+
+    /// <summary>Hands a cart to the next scene; the player there takes it up on arrival (PlayerTransport).</summary>
+    public static void CarryTransport(CarriedTransport carried) => pendingTransport = carried;
+
+    /// <summary>Returns the cart handed over by the previous scene, once.</summary>
+    public static bool TakeCarriedTransport(out CarriedTransport carried)
+    {
+        carried = pendingTransport ?? default;
+        bool any = pendingTransport.HasValue;
+        pendingTransport = null;
+        return any;
+    }
+
     /// <summary>True while a report of the last raid is waiting to be shown.</summary>
     public static bool HasPendingReport => pendingReport != null;
 
@@ -92,6 +118,18 @@ public static class GameSession
     {
         ActiveRaid = null;
         pendingReport = report;
+    }
+
+    /// <summary>
+    /// A raid left without an ending (quit to the menu): it is simply over, with no report. What the player carried in it
+    /// is gone with the scene, and the game goes on from its last save.
+    /// </summary>
+    public static void AbandonRaid(RaidSession raid)
+    {
+        if (raid != null && ActiveRaid == raid)
+        {
+            ActiveRaid = null;
+        }
     }
 
     /// <summary>Returns the last raid's report, once. Null when there is none.</summary>
@@ -145,6 +183,7 @@ public static class GameSession
         pendingPlayerState = null;
         pendingPose = null;
         pendingReport = null;
+        pendingTransport = null;
         ActiveRaid = null;
     }
 }

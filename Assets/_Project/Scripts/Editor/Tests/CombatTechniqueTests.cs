@@ -179,6 +179,22 @@ public sealed class CombatTechniqueTests
     }
 
     [Test]
+    public void ASwing_PlantsTheFeet_ThenLetsThePlayerWalkOut()
+    {
+        CombatTechniqueSettings rules = Resources.Load<CombatTechniqueSettings>(CombatTechniqueSettings.ResourceName);
+        Assert.AreEqual(0f, rules.WindupMoveSpeed, "any speed here and the whole-body swing skates over the ground");
+        Assert.Greater(rules.SwingMoveSpeed, 0f, "the follow-through can be walked out of");
+        Assert.Greater(rules.HeavyMoveSpeed, 0f);
+        Assert.LessOrEqual(rules.HeavyMoveSpeed, rules.SwingMoveSpeed, "heavy swings commit the player for longer");
+
+        // Walking out hands the swing from the whole body to the arms, so every swing has to be on both.
+        var controller = AssetDatabase.LoadAssetAtPath<UnityEditor.Animations.AnimatorController>(CombatAnimationSetup.PlayerControllerPath);
+        var full = controller.layers.First(l => l.name == CombatAnimationSetup.FullBodyLayer).stateMachine.states.Select(s => s.state.name);
+        var arms = controller.layers.First(l => l.name == "Attack Arms").stateMachine.states.Select(s => s.state.name).ToList();
+        CollectionAssert.IsSubsetOf(full.Where(state => state.StartsWith("Sword") || state.StartsWith("Punch")), arms);
+    }
+
+    [Test]
     public void Footsteps_AreSoft_AndGrassHasItsOwn()
     {
         var sounds = Resources.Load<AudioSettingsDefinition>(AudioSettingsDefinition.ResourceName);

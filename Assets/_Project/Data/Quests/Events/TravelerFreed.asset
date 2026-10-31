@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GameEventDefinition
   id: travelerfreed
   displayName: Traveler freed
-  objectiveText: Help the stranded traveler
+  objectiveText: Find Ingrid in the Misty Woods
   notes: Raised by RescuableTraveler when freed.

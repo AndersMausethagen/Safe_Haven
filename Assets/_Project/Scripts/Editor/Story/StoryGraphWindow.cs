@@ -34,10 +34,29 @@ public sealed class StoryGraphWindow : EditorWindow
     [MenuItem("GameObject/Safe Haven/Story Script", false, 9)]
     private static void CreateScript(MenuCommand command)
     {
-        var go = new GameObject("Story Script");
+        Create("Story Script", command.context as GameObject, null);
+    }
+
+    /// <summary>
+    /// A new story in the open scene that begins with <paramref name="trigger"/>, opened in the graph: how the quest designer
+    /// makes the moments around a quest. The scene has to be saved to keep it.
+    /// </summary>
+    public static StoryScript CreateFor(string title, StoryTrigger trigger)
+    {
+        return Create(title, null, trigger);
+    }
+
+    private static StoryScript Create(string title, GameObject parent, StoryTrigger trigger)
+    {
+        var go = new GameObject(title);
         go.AddComponent<SaveableEntity>();
         var story = go.AddComponent<StoryScript>();
-        if (command.context is GameObject parent)
+        if (trigger != null)
+        {
+            story.AddNode(trigger);
+        }
+
+        if (parent != null)
         {
             GameObjectUtility.SetParentAndAlign(go, parent);
         }
@@ -50,6 +69,7 @@ public sealed class StoryGraphWindow : EditorWindow
         Selection.activeGameObject = go;
         Open();
         GetWindow<StoryGraphWindow>().Load(story);
+        return story;
     }
 
     private void OnEnable()

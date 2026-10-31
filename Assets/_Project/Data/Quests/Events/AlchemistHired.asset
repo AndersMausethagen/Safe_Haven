@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GameEventDefinition
   id: alchemisthired
   displayName: Alchemist hired
-  objectiveText: Give the traveler a job
+  objectiveText: Speak to Ingrid and give her work
   notes: Raised by the Alchemist job when assigned.

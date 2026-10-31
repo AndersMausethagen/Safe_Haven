@@ -5571,8 +5571,8 @@ MonoBehaviour:
 
     08:00'
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 2e36a575c28e2b14da05954bc26038fb, type: 2}
+  m_sharedMaterial: {fileID: 2100000, guid: 88ff5f3f7d60065468a90fd950118760, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -13390,7 +13390,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 543966685148724897, guid: dc2783eabfee2ad48acedb8cc9c36064, type: 3}
       propertyPath: m_fontColor32.rgba
-      value: 4289114275
+      value: 4292076780
       objectReference: {fileID: 0}
     - target: {fileID: 543966685148724897, guid: dc2783eabfee2ad48acedb8cc9c36064, type: 3}
       propertyPath: m_TextStyleHashCode
@@ -13402,7 +13402,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2610764128797772652, guid: dc2783eabfee2ad48acedb8cc9c36064, type: 3}
       propertyPath: m_fontColor32.rgba
-      value: 4285252840
+      value: 4292076780
       objectReference: {fileID: 0}
     - target: {fileID: 2610764128797772652, guid: dc2783eabfee2ad48acedb8cc9c36064, type: 3}
       propertyPath: m_TextStyleHashCode
@@ -13410,7 +13410,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2748988816469105136, guid: dc2783eabfee2ad48acedb8cc9c36064, type: 3}
       propertyPath: m_fontColor32.rgba
-      value: 4285252840
+      value: 4292076780
       objectReference: {fileID: 0}
     - target: {fileID: 2748988816469105136, guid: dc2783eabfee2ad48acedb8cc9c36064, type: 3}
       propertyPath: m_TextStyleHashCode
@@ -13502,7 +13502,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6400259329676477078, guid: dc2783eabfee2ad48acedb8cc9c36064, type: 3}
       propertyPath: m_fontColor32.rgba
-      value: 4289114275
+      value: 4292076780
       objectReference: {fileID: 0}
     - target: {fileID: 6400259329676477078, guid: dc2783eabfee2ad48acedb8cc9c36064, type: 3}
       propertyPath: m_TextStyleHashCode
@@ -13510,7 +13510,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7860443208739765100, guid: dc2783eabfee2ad48acedb8cc9c36064, type: 3}
       propertyPath: m_fontColor32.rgba
-      value: 4290633451
+      value: 4292076780
       objectReference: {fileID: 0}
     - target: {fileID: 7860443208739765100, guid: dc2783eabfee2ad48acedb8cc9c36064, type: 3}
       propertyPath: m_TextStyleHashCode
@@ -13526,7 +13526,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8918298119282045253, guid: dc2783eabfee2ad48acedb8cc9c36064, type: 3}
       propertyPath: m_fontColor32.rgba
-      value: 4290633451
+      value: 4292076780
       objectReference: {fileID: 0}
     - target: {fileID: 8918298119282045253, guid: dc2783eabfee2ad48acedb8cc9c36064, type: 3}
       propertyPath: m_TextStyleHashCode
@@ -15999,8 +15999,8 @@ MonoBehaviour:
 
     06:00'
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 2e36a575c28e2b14da05954bc26038fb, type: 2}
+  m_sharedMaterial: {fileID: 2100000, guid: 88ff5f3f7d60065468a90fd950118760, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -25048,6 +25048,166 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2954972716014409562, guid: ea2e596f9ba483c40a5e2f3ee217c9f8, type: 3}
   m_PrefabInstance: {fileID: 303543086}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &304989520
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 304989521}
+  - component: {fileID: 304989523}
+  - component: {fileID: 304989522}
+  m_Layer: 0
+  m_Name: Story - First Fire
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &304989521
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 304989520}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1258665220}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &304989522
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 304989520}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7585b9b1e2e24704186225f4b6f8d69a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::StoryScript
+  nodes:
+  - rid: 287758281410609317
+  - rid: 287758281410609318
+  - rid: 287758281410609319
+  - rid: 287758281410609320
+  - rid: 287758281410609321
+  - rid: 287758281410609322
+  - rid: 287758281410609323
+  links:
+  - from: 22adbdabd91b4f3ca93c81c6b37fc4bc
+    output: 0
+    to: b05e4d5fdff44a909ee8d69033422caf
+  - from: b05e4d5fdff44a909ee8d69033422caf
+    output: 0
+    to: 6d7a22b23e4f448bb7ddf0dbcc2ce2cb
+  - from: b05e4d5fdff44a909ee8d69033422caf
+    output: 0
+    to: ef8e024577384f1d84b33ee992c6614e
+  - from: b05e4d5fdff44a909ee8d69033422caf
+    output: 0
+    to: 549472384a554b129737f1741c5c2a2c
+  - from: 549472384a554b129737f1741c5c2a2c
+    output: 0
+    to: 48788c835e724521b03c36a4cccaa14f
+  - from: 48788c835e724521b03c36a4cccaa14f
+    output: 0
+    to: 5f82fa4167454b06b08f5a438e7ddf24
+  logSteps: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 287758281410609317
+      type: {class: WhenBuilt, ns: , asm: SafeHaven}
+      data:
+        id: 22adbdabd91b4f3ca93c81c6b37fc4bc
+        position: {x: 40, y: 60}
+        once: 1
+        building: {fileID: 11400000, guid: 95f7d6e0cc6f5144fa85269777959d65, type: 2}
+    - rid: 287758281410609318
+      type: {class: WaitNode, ns: , asm: SafeHaven}
+      data:
+        id: b05e4d5fdff44a909ee8d69033422caf
+        position: {x: 340, y: 60}
+        seconds: 1.2
+    - rid: 287758281410609319
+      type: {class: GlowNode, ns: , asm: SafeHaven}
+      data:
+        id: 6d7a22b23e4f448bb7ddf0dbcc2ce2cb
+        position: {x: 640, y: 60}
+        target: {fileID: 1522981859}
+        glow: 1
+        colour: {r: 1, g: 0.72, b: 0.38, a: 1}
+        intensity: 8
+        range: 16
+        fadeSeconds: 2
+    - rid: 287758281410609320
+      type: {class: PlaySoundNode, ns: , asm: SafeHaven}
+      data:
+        id: ef8e024577384f1d84b33ee992c6614e
+        position: {x: 640, y: 230}
+        sound: {fileID: 11400000, guid: c08cfff61a51d7442a93c4dae8255955, type: 2}
+        at: {fileID: 1522981859}
+    - rid: 287758281410609321
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 549472384a554b129737f1741c5c2a2c
+        position: {x: 640, y: 400}
+        speaker:
+          player: 0
+          name: The Heart Tree
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+        line: <i>There. A hearth under my branches, after a hundred winters.</i>
+        afterFightPause: 1
+    - rid: 287758281410609322
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 48788c835e724521b03c36a4cccaa14f
+        position: {x: 940, y: 60}
+        speaker:
+          player: 0
+          name: The Heart Tree
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+        line: <i>Do you feel that? The ward has remembered what it is for. And far out in the mist, little one, someone has stopped walking and turned to look.</i>
+        afterFightPause: 1
+    - rid: 287758281410609323
+      type: {class: GlowNode, ns: , asm: SafeHaven}
+      data:
+        id: 5f82fa4167454b06b08f5a438e7ddf24
+        position: {x: 1240, y: 60}
+        target: {fileID: 1522981859}
+        glow: 0
+        colour: {r: 0.55, g: 0.85, b: 1, a: 1}
+        intensity: 4
+        range: 6
+        fadeSeconds: 3
+--- !u!114 &304989523
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 304989520}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aecdc764a0346784e9958a956dddd948, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::SaveableEntity
+  id: 20a43aaf136d4e2c8ac46399ffb6450f
+  prefabId: 
+  saveTransform: 1
+  saveActiveState: 1
+  rememberDestruction: 1
+  saveComponents: 1
 --- !u!1001 &305571646
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -30356,6 +30516,142 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7224774371860010269, guid: 257fe5a1d98a99f4ca9e1b6ee0882baf, type: 3}
   m_PrefabInstance: {fileID: 377178380}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &377451004
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 377451005}
+  - component: {fileID: 377451007}
+  - component: {fileID: 377451006}
+  m_Layer: 0
+  m_Name: Story - Bjarne's Hammer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &377451005
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 377451004}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1258665220}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &377451006
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 377451004}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7585b9b1e2e24704186225f4b6f8d69a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::StoryScript
+  nodes:
+  - rid: 287758281410609307
+  - rid: 287758281410609308
+  - rid: 287758281410609309
+  - rid: 287758281410609310
+  - rid: 287758281410609311
+  links:
+  - from: 477f9d0ea524455da2fcd0d99fbb8690
+    output: 0
+    to: 6c4fb08d9d6a4e988ab68f4a799fc26b
+  - from: 6c4fb08d9d6a4e988ab68f4a799fc26b
+    output: 0
+    to: 0824ed521d874f65a56fc8a1dd00898a
+  - from: 0824ed521d874f65a56fc8a1dd00898a
+    output: 0
+    to: 23a681bf6ef64bbdb05660062fabd4a6
+  - from: 23a681bf6ef64bbdb05660062fabd4a6
+    output: 0
+    to: 281ad10b44cc4a28a0606701e4fbe915
+  logSteps: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 287758281410609307
+      type: {class: WhenQuest, ns: , asm: SafeHaven}
+      data:
+        id: 477f9d0ea524455da2fcd0d99fbb8690
+        position: {x: 40, y: 60}
+        once: 1
+        quest: {fileID: 11400000, guid: 95972d06dba0fda4bb5e87bc047956d1, type: 2}
+        when: 1
+    - rid: 287758281410609308
+      type: {class: WaitNode, ns: , asm: SafeHaven}
+      data:
+        id: 6c4fb08d9d6a4e988ab68f4a799fc26b
+        position: {x: 340, y: 60}
+        seconds: 1.5
+    - rid: 287758281410609309
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 0824ed521d874f65a56fc8a1dd00898a
+        position: {x: 640, y: 60}
+        speaker:
+          player: 0
+          name: The Heart Tree
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+        line: <i>Listen. Far to the north, past the troll country, a hammer on stone. Three beats and a rest, over and over. Someone out there has seen your light and is answering it.</i>
+        afterFightPause: 1
+    - rid: 287758281410609310
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 23a681bf6ef64bbdb05660062fabd4a6
+        position: {x: 940, y: 60}
+        speaker:
+          player: 1
+          name: 
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+        line: That's Bjarne.
+        afterFightPause: 1
+    - rid: 287758281410609311
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 281ad10b44cc4a28a0606701e4fbe915
+        position: {x: 1240, y: 60}
+        speaker:
+          player: 0
+          name: The Heart Tree
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+        line: <i>Then he is still himself. The way north is not open yet. Grow strong, little one, and keep this fire high. He can hold on a long while now.</i>
+        afterFightPause: 1
+--- !u!114 &377451007
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 377451004}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aecdc764a0346784e9958a956dddd948, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::SaveableEntity
+  id: a43465f84b0d4023b0083b351c593e09
+  prefabId: 
+  saveTransform: 1
+  saveActiveState: 1
+  rememberDestruction: 1
+  saveComponents: 1
 --- !u!1001 &378610507
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -48850,8 +49146,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Clear
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 2e36a575c28e2b14da05954bc26038fb, type: 2}
+  m_sharedMaterial: {fileID: 2100000, guid: 88ff5f3f7d60065468a90fd950118760, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -50025,8 +50321,8 @@ MonoBehaviour:
 
     18:00'
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 2e36a575c28e2b14da05954bc26038fb, type: 2}
+  m_sharedMaterial: {fileID: 2100000, guid: 88ff5f3f7d60065468a90fd950118760, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -51437,7 +51733,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1029164650126387047, guid: c12ba73d06c6f434191a1cfe2ff4d159, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 352
+      value: 420
       objectReference: {fileID: 0}
     - target: {fileID: 1029164650126387047, guid: c12ba73d06c6f434191a1cfe2ff4d159, type: 3}
       propertyPath: m_SizeDelta.y
@@ -51445,15 +51741,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1029164650126387047, guid: c12ba73d06c6f434191a1cfe2ff4d159, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 190
+      value: 210
       objectReference: {fileID: 0}
     - target: {fileID: 1029164650126387047, guid: c12ba73d06c6f434191a1cfe2ff4d159, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -30.529999
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2490581784567088541, guid: c12ba73d06c6f434191a1cfe2ff4d159, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 42.53
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2557403613520449311, guid: c12ba73d06c6f434191a1cfe2ff4d159, type: 3}
       propertyPath: m_Name
@@ -51465,7 +51761,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3772554344244728836, guid: c12ba73d06c6f434191a1cfe2ff4d159, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3772554344244728836, guid: c12ba73d06c6f434191a1cfe2ff4d159, type: 3}
       propertyPath: m_AnchorMin.x
@@ -51473,23 +51769,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3772554344244728836, guid: c12ba73d06c6f434191a1cfe2ff4d159, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3772554344244728836, guid: c12ba73d06c6f434191a1cfe2ff4d159, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 352
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3772554344244728836, guid: c12ba73d06c6f434191a1cfe2ff4d159, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 14.53
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3772554344244728836, guid: c12ba73d06c6f434191a1cfe2ff4d159, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 190
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3772554344244728836, guid: c12ba73d06c6f434191a1cfe2ff4d159, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -17.265
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3782563842580298593, guid: c12ba73d06c6f434191a1cfe2ff4d159, type: 3}
       propertyPath: m_AdditionalShaderChannelsFlag
@@ -73665,8 +73961,8 @@ MonoBehaviour:
 
     20:00'
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 2e36a575c28e2b14da05954bc26038fb, type: 2}
+  m_sharedMaterial: {fileID: 2100000, guid: 88ff5f3f7d60065468a90fd950118760, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -74047,9 +74343,69 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 30463167575573648, guid: cc8e4f910bb752b459ec7dbe4dfba11f, type: 3}
+      propertyPath: m_fontColor32.rgba
+      value: 4291617773
+      objectReference: {fileID: 0}
+    - target: {fileID: 30463167575573648, guid: cc8e4f910bb752b459ec7dbe4dfba11f, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
+    - target: {fileID: 1105996466531194561, guid: cc8e4f910bb752b459ec7dbe4dfba11f, type: 3}
+      propertyPath: m_fontColor32.rgba
+      value: 4291618546
+      objectReference: {fileID: 0}
+    - target: {fileID: 1105996466531194561, guid: cc8e4f910bb752b459ec7dbe4dfba11f, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
+    - target: {fileID: 3383687928926797960, guid: cc8e4f910bb752b459ec7dbe4dfba11f, type: 3}
+      propertyPath: m_AdditionalShaderChannelsFlag
+      value: 25
+      objectReference: {fileID: 0}
     - target: {fileID: 5529481927138026831, guid: cc8e4f910bb752b459ec7dbe4dfba11f, type: 3}
       propertyPath: m_Name
       value: UI Root
+      objectReference: {fileID: 0}
+    - target: {fileID: 5860119071088551165, guid: cc8e4f910bb752b459ec7dbe4dfba11f, type: 3}
+      propertyPath: m_fontColor32.rgba
+      value: 4291617773
+      objectReference: {fileID: 0}
+    - target: {fileID: 5860119071088551165, guid: cc8e4f910bb752b459ec7dbe4dfba11f, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
+    - target: {fileID: 6200950521656594019, guid: cc8e4f910bb752b459ec7dbe4dfba11f, type: 3}
+      propertyPath: m_fontColor32.rgba
+      value: 4291618546
+      objectReference: {fileID: 0}
+    - target: {fileID: 6200950521656594019, guid: cc8e4f910bb752b459ec7dbe4dfba11f, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
+    - target: {fileID: 6743536631904384826, guid: cc8e4f910bb752b459ec7dbe4dfba11f, type: 3}
+      propertyPath: m_fontColor32.rgba
+      value: 4291618546
+      objectReference: {fileID: 0}
+    - target: {fileID: 6743536631904384826, guid: cc8e4f910bb752b459ec7dbe4dfba11f, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
+    - target: {fileID: 7173563789846708314, guid: cc8e4f910bb752b459ec7dbe4dfba11f, type: 3}
+      propertyPath: m_fontColor32.rgba
+      value: 4291618546
+      objectReference: {fileID: 0}
+    - target: {fileID: 7173563789846708314, guid: cc8e4f910bb752b459ec7dbe4dfba11f, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
+    - target: {fileID: 7237760373373312398, guid: cc8e4f910bb752b459ec7dbe4dfba11f, type: 3}
+      propertyPath: m_fontColor32.rgba
+      value: 4291618546
+      objectReference: {fileID: 0}
+    - target: {fileID: 7237760373373312398, guid: cc8e4f910bb752b459ec7dbe4dfba11f, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
       objectReference: {fileID: 0}
     - target: {fileID: 7810533703431469710, guid: cc8e4f910bb752b459ec7dbe4dfba11f, type: 3}
       propertyPath: m_AdditionalShaderChannelsFlag
@@ -77157,6 +77513,10 @@ PrefabInstance:
     - target: {fileID: 557135111737939404, guid: 83e508b71ba177149a0f08689ff8aea4, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3995415526987974039, guid: 83e508b71ba177149a0f08689ff8aea4, type: 3}
+      propertyPath: ruinText
+      value: The stones that dropped you here, cracked and cold. A faint hum lingers in them, and under it a voice you know. Life Orbs might wake them.
       objectReference: {fileID: 0}
     - target: {fileID: 3995415526987974039, guid: 83e508b71ba177149a0f08689ff8aea4, type: 3}
       propertyPath: repairLockedText
@@ -84976,7 +85336,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 80320316941456974, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_fontColor32.rgba
-      value: 4285252840
+      value: 4292076780
       objectReference: {fileID: 0}
     - target: {fileID: 80320316941456974, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_TextStyleHashCode
@@ -85012,7 +85372,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1287952086780409538, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -148.69
+      value: -155.23
       objectReference: {fileID: 0}
     - target: {fileID: 2550968590466016538, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchorMax.x
@@ -85036,7 +85396,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2550968590466016538, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 14.53
+      value: 15.61
       objectReference: {fileID: 0}
     - target: {fileID: 2550968590466016538, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchoredPosition.x
@@ -85044,7 +85404,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2550968590466016538, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -37.375
+      value: -39.415
       objectReference: {fileID: 0}
     - target: {fileID: 2781801909437349992, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchorMax.x
@@ -85068,7 +85428,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2781801909437349992, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 52.64
+      value: 55.22
       objectReference: {fileID: 0}
     - target: {fileID: 2781801909437349992, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchoredPosition.x
@@ -85076,7 +85436,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2781801909437349992, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -93.37
+      value: -98.619995
       objectReference: {fileID: 0}
     - target: {fileID: 3847741542274230673, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AdditionalShaderChannelsFlag
@@ -85104,7 +85464,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4412456728309190097, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 52.64
+      value: 55.22
       objectReference: {fileID: 0}
     - target: {fileID: 4412456728309190097, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchoredPosition.x
@@ -85112,7 +85472,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4412456728309190097, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -26.32
+      value: -27.61
       objectReference: {fileID: 0}
     - target: {fileID: 4667224914870978213, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchorMax.x
@@ -85144,7 +85504,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4667224914870978213, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -57.05
+      value: -61.01
       objectReference: {fileID: 0}
     - target: {fileID: 4921377116238533035, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_TextStyleHashCode
@@ -85152,11 +85512,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5509936923344327392, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 185.69
+      value: 192.23
       objectReference: {fileID: 0}
     - target: {fileID: 6062876433978463432, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_fontColor32.rgba
-      value: 4291618546
+      value: 4292076780
       objectReference: {fileID: 0}
     - target: {fileID: 6062876433978463432, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_TextStyleHashCode
@@ -85164,7 +85524,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6525584142404825439, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_fontColor32.rgba
-      value: 4291618546
+      value: 4292076780
       objectReference: {fileID: 0}
     - target: {fileID: 6525584142404825439, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_TextStyleHashCode
@@ -85192,7 +85552,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6642281851726709689, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 20.11
+      value: 21.61
       objectReference: {fileID: 0}
     - target: {fileID: 6642281851726709689, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchoredPosition.x
@@ -85200,7 +85560,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6642281851726709689, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -18.055
+      value: -18.805
       objectReference: {fileID: 0}
     - target: {fileID: 7146083551378220311, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchorMax.x
@@ -85224,7 +85584,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7146083551378220311, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 29.05
+      value: 33.01
       objectReference: {fileID: 0}
     - target: {fileID: 7146083551378220311, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchoredPosition.x
@@ -85232,11 +85592,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7146083551378220311, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -32.525
+      value: -34.504997
       objectReference: {fileID: 0}
     - target: {fileID: 7197497295595193339, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_fontColor32.rgba
-      value: 4291618546
+      value: 4292076780
       objectReference: {fileID: 0}
     - target: {fileID: 7197497295595193339, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_TextStyleHashCode
@@ -93445,6 +93805,41 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 375700963711153684, guid: 490127f00d1dad143b56c0e7399a7110, type: 3}
   m_PrefabInstance: {fileID: 1258379224}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1258665219
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1258665220}
+  m_Layer: 0
+  m_Name: Home Moments
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1258665220
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1258665219}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1952896956}
+  - {fileID: 304989521}
+  - {fileID: 1577933049}
+  - {fileID: 377451005}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1259464237
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -106670,8 +107065,8 @@ MonoBehaviour:
 
     00:00'
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 2e36a575c28e2b14da05954bc26038fb, type: 2}
+  m_sharedMaterial: {fileID: 2100000, guid: 88ff5f3f7d60065468a90fd950118760, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -114956,24 +115351,43 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::HeartTree
   questWhispers:
   - quest: {fileID: 11400000, guid: 00e21ff059394a4459d8cec92bc2d489, type: 2}
-    text: Warmth stirs in the old bark. <i>Little one... you are safe here, inside my roots. But my strength is thin, and the clearing has gone quiet. Rest a moment. Then help me.</i>
+    text: <i>Listen, little one. Rest your hand on the bark.</i>
+    moment: {fileID: 11400000, guid: 3795709c84a5d1f4fa37ecf3e7b170a1, type: 2}
   - quest: {fileID: 11400000, guid: 09a9774284d0e6c44a03b94ad09483f7, type: 2}
-    text: <i>The clearing still gives. Gather fallen branches and loose stones with your hands. Your resource bars (I) will fill.</i>
+    text: <i>Start with what the clearing gives. Fallen branches, loose stones, your own two hands. That is how every hearth began. Your resource bars (I) will fill.</i>
+    moment: {fileID: 0}
   - quest: {fileID: 11400000, guid: f89173a9aeb790c4f9aeb1cc56e0e655, type: 2}
-    text: <i>Now a fire for warmth and food, and a table to work at. Open the build menu (G) and set them inside my ward.</i>
+    text: <i>Build your fire inside my ward, and a table to work at beside it. Open the build menu (G). The sooner it burns, the sooner they can see it.</i>
+    moment: {fileID: 0}
   - quest: {fileID: 11400000, guid: 9ffed2822f546824fa97d9d34216d5d5, type: 2}
-    text: <i>Hunger and thirst find you even here. Pick berries, fetch water from the stream, and stew a meal over your fire.</i>
+    text: <i>Now feed yourself. Berries, water from the stream, a stew over your fire. You will be walking people home.</i>
+    moment: {fileID: 0}
   - quest: {fileID: 11400000, guid: 8fd8f4db8a0b4d74cb71c5b4837010ac, type: 2}
-    text: <i>Three stones around the clearing still hold my light, choked by cursed roots. Free them, and bring the Life Orbs home.</i>
+    text: <i>The forest has put its roots in even here. Three stones around the clearing still hold my light, choked and cold. Free them, and bring the Life Orbs back.</i>
+    moment: {fileID: 0}
   - quest: {fileID: 11400000, guid: 2614c1d189f3a034691f98f3d3efeee0, type: 2}
-    text: <i>Across the stream stand old stones that were once a door. Feed them my light, and they will wake.</i>
+    text: <i>Now the door, across the stream. Feed it my light and it will open for you, as it did in the dark.</i>
+    moment: {fileID: 0}
   - quest: {fileID: 11400000, guid: 08ed06b5fb8d1854c86788aa2a00156f, type: 2}
-    text: <i>Beyond the portal the forest is sick. Make tools, go, take what you need, and come home before the door closes.</i>
+    text: <i>Make yourself tools and go. Take what the woods will give you, and come home before the door closes. It will not wait, and neither will the wolves.</i>
+    moment: {fileID: 0}
+  - quest: {fileID: 11400000, guid: f7e615034e347bc438f7fdf1f08bd615, type: 2}
+    text: <i>She is close, little one. Just past the door, off the path, hiding. Find her, keep her near you, and bring her through.</i>
+    moment: {fileID: 0}
+  - quest: {fileID: 11400000, guid: b95103f99c217d3489eb46bd97d706d8, type: 2}
+    text: '<i>One fire brought Ingrid home. The others will want more than a fire: a bench, a furnace, a dry place to set down what they carry. Build what they will need.</i>'
+    moment: {fileID: 0}
+  - quest: {fileID: 11400000, guid: fea0201f13773f04a96efbcb5b364ea9, type: 2}
+    text: <i>The light that reached her reached other things as well. They are on the old path now, testing me. Prepare yourself. When you are ready, tell me, and I will let them come.</i>
+    moment: {fileID: 0}
+  - quest: {fileID: 11400000, guid: 95972d06dba0fda4bb5e87bc047956d1, type: 2}
+    text: <i>The brighter this place burns, the further it can be seen. Build. Clear the old growth. Give them something worth walking towards.</i>
+    moment: {fileID: 0}
   whispers:
-  - Warmth stirs in the old bark. <i>Little one... you are safe here, inside my roots. But my strength is thin.</i>
-  - <i>Gather what the clearing offers. Wood, stone, berries, water. Build a fire, and a table to work at.</i>
-  - <i>Three stones still hold my light, choked by cursed roots. Free them, and the old portal may wake.</i>
-  - <i>Beyond the portal the forest is sick. Go, take what you need, and come home before it closes.</i>
+  - <i>Every hearth under my branches is a little more of the old pact kept.</i>
+  - <i>The forest cannot forget a place that someone tends.</i>
+  - <i>I listen for your people every night. Some nights I hear them.</i>
+  - <i>A hundred winters I kept this clearing alone. I had forgotten how loud a home is. Do not stop.</i>
   talkedEvent: {fileID: 11400000, guid: c06332984c04ae244b8513b7d0e6178c, type: 2}
   wardRing: {fileID: 313313493}
   ringSegments: 96
@@ -119432,6 +119846,138 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4700773003617771440, guid: fd144b73004214c429dec189d24adafb, type: 3}
   m_PrefabInstance: {fileID: 1577909693}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1577933048
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1577933049}
+  - component: {fileID: 1577933051}
+  - component: {fileID: 1577933050}
+  m_Layer: 0
+  m_Name: Story - The Door Wakes
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1577933049
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1577933048}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1258665220}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1577933050
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1577933048}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7585b9b1e2e24704186225f4b6f8d69a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::StoryScript
+  nodes:
+  - rid: 287758281410609312
+  - rid: 287758281410609313
+  - rid: 287758281410609314
+  - rid: 287758281410609315
+  - rid: 287758281410609316
+  links:
+  - from: 4e99394ff6f942539f2e9ea1cebf42ec
+    output: 0
+    to: d7587fdca1564414bc0b39cbd6dd216c
+  - from: d7587fdca1564414bc0b39cbd6dd216c
+    output: 0
+    to: 901bc585293a463a8300eed4f8583885
+  - from: d7587fdca1564414bc0b39cbd6dd216c
+    output: 0
+    to: be9dadacc0e84d43bde9b929736f5e43
+  - from: be9dadacc0e84d43bde9b929736f5e43
+    output: 0
+    to: 99d53a1421624c4ba0d269ce56d83503
+  logSteps: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 287758281410609312
+      type: {class: WhenQuest, ns: , asm: SafeHaven}
+      data:
+        id: 4e99394ff6f942539f2e9ea1cebf42ec
+        position: {x: 40, y: 60}
+        once: 1
+        quest: {fileID: 11400000, guid: 2614c1d189f3a034691f98f3d3efeee0, type: 2}
+        when: 1
+    - rid: 287758281410609313
+      type: {class: WaitNode, ns: , asm: SafeHaven}
+      data:
+        id: d7587fdca1564414bc0b39cbd6dd216c
+        position: {x: 340, y: 60}
+        seconds: 1
+    - rid: 287758281410609314
+      type: {class: FocusCameraNode, ns: , asm: SafeHaven}
+      data:
+        id: 901bc585293a463a8300eed4f8583885
+        position: {x: 640, y: 60}
+        target: {fileID: 1038728947}
+        seconds: 7
+        revealRadius: 14
+    - rid: 287758281410609315
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: be9dadacc0e84d43bde9b929736f5e43
+        position: {x: 640, y: 230}
+        speaker:
+          player: 0
+          name: Sigrid
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+        line: <i>...can anyone hear... Ingrid was right behind me when the stones broke. She's hurt. Find her first. Do you hear me? Find her first...</i>
+        afterFightPause: 1
+    - rid: 287758281410609316
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 99d53a1421624c4ba0d269ce56d83503
+        position: {x: 940, y: 60}
+        speaker:
+          player: 0
+          name: The Heart Tree
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+        line: <i>The stones have gone quiet, but she is right. One spark burns close, just past the door, hiding from the wolves. Make yourself tools, and go.</i>
+        afterFightPause: 1
+--- !u!114 &1577933051
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1577933048}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aecdc764a0346784e9958a956dddd948, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::SaveableEntity
+  id: 22434cfa89fa4bfcbdbb4af8756ab6a8
+  prefabId: 
+  saveTransform: 1
+  saveActiveState: 1
+  rememberDestruction: 1
+  saveComponents: 1
 --- !u!1001 &1578291860
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -120831,7 +121377,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::QuestGiver
   quest: {fileID: 11400000, guid: b056baccfd41442478d4f5da5ea2d76a, type: 2}
-  greeting: '"Need copper, and someone who can work it. Bring ingots and show me a pickaxe." - the Smith'
+  greeting: '"To whoever comes after: this hearth wants copper, and hands that can work it. Smelt ingots and make a pickaxe. What I left behind this board is yours." - the last smith'
   waitingLines:
     lines: []
     order: 0
@@ -125404,8 +125950,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: DAY  09:00
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 2e36a575c28e2b14da05954bc26038fb, type: 2}
+  m_sharedMaterial: {fileID: 2100000, guid: 88ff5f3f7d60065468a90fd950118760, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -141272,7 +141818,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0.075, g: 0.062, b: 0.05, a: 0.72}
+  m_Color: {r: 0, g: 0, b: 0, a: 0}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -145113,6 +145659,235 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 830622066108468587, guid: 5384e39ea2c999546a9f2a17013df603, type: 3}
   m_PrefabInstance: {fileID: 1947487048}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1952896955
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1952896956}
+  - component: {fileID: 1952896958}
+  - component: {fileID: 1952896957}
+  m_Layer: 0
+  m_Name: Story - The Waking
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1952896956
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1952896955}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1258665220}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1952896957
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1952896955}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7585b9b1e2e24704186225f4b6f8d69a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::StoryScript
+  nodes:
+  - rid: 287758281410609324
+  - rid: 287758281410609325
+  - rid: 287758281410609326
+  - rid: 287758281410609327
+  - rid: 287758281410609328
+  - rid: 287758281410609329
+  - rid: 287758281410609330
+  - rid: 287758281410609331
+  - rid: 287758281410609332
+  - rid: 287758281410609333
+  links:
+  - from: db744f88bd8f4135b93d047a711f0fe6
+    output: 0
+    to: b3a129720b6440e1aafc7d1de6ec2b48
+  - from: b3a129720b6440e1aafc7d1de6ec2b48
+    output: 0
+    to: 520bc1e54e6c45278d500f0130eda22c
+  - from: b3a129720b6440e1aafc7d1de6ec2b48
+    output: 1
+    to: f986bfdcd88e43e691cd92a74cf3c825
+  - from: f986bfdcd88e43e691cd92a74cf3c825
+    output: 0
+    to: 520bc1e54e6c45278d500f0130eda22c
+  - from: 520bc1e54e6c45278d500f0130eda22c
+    output: 0
+    to: bfb8ec03f1094bd889485b268a86768f
+  - from: bfb8ec03f1094bd889485b268a86768f
+    output: 0
+    to: 2c2daaa15b7e42e1939018e0af552b73
+  - from: bfb8ec03f1094bd889485b268a86768f
+    output: 1
+    to: eba4980314b94677ad41dc28996f6592
+  - from: eba4980314b94677ad41dc28996f6592
+    output: 0
+    to: 2c2daaa15b7e42e1939018e0af552b73
+  - from: 2c2daaa15b7e42e1939018e0af552b73
+    output: 0
+    to: ed02f3fab0d94a83a83c4972033faf9c
+  - from: ed02f3fab0d94a83a83c4972033faf9c
+    output: 0
+    to: b1461d8af2a948539e0196e681659847
+  - from: b1461d8af2a948539e0196e681659847
+    output: 0
+    to: d943681d6c1d4d33a08acb7b4e0eaca2
+  logSteps: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 287758281410609324
+      type: {class: WhenQuestEvent, ns: , asm: SafeHaven}
+      data:
+        id: db744f88bd8f4135b93d047a711f0fe6
+        position: {x: 40, y: 60}
+        once: 1
+        questEvent: {fileID: 11400000, guid: 3795709c84a5d1f4fa37ecf3e7b170a1, type: 2}
+    - rid: 287758281410609325
+      type: {class: ChoiceNode, ns: , asm: SafeHaven}
+      data:
+        id: b3a129720b6440e1aafc7d1de6ec2b48
+        position: {x: 340, y: 60}
+        speaker:
+          player: 0
+          name: The Heart Tree
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+        line: Warmth stirs in the old bark. <i>Little one. You fell out of the dark with the whole forest at your heels, and I caught you. I could only catch one.</i>
+        answers:
+        - Where are the others?
+        - What are you?
+        mustAnswer: 1
+        afterFightPause: 1
+    - rid: 287758281410609326
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 520bc1e54e6c45278d500f0130eda22c
+        position: {x: 640, y: 60}
+        speaker:
+          player: 0
+          name: The Heart Tree
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+        line: <i>Seven sparks, scattered through the Misty Woods. They are alive. I hear them when the wind is right. But the forest does not kill the lost, little one. It forgets them.</i>
+        afterFightPause: 1
+    - rid: 287758281410609327
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: f986bfdcd88e43e691cd92a74cf3c825
+        position: {x: 640, y: 230}
+        speaker:
+          player: 0
+          name: The Heart Tree
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+        line: <i>The last of an old promise. I keep the dark from this clearing. But that is not what you need to know.</i>
+        afterFightPause: 1
+    - rid: 287758281410609328
+      type: {class: ChoiceNode, ns: , asm: SafeHaven}
+      data:
+        id: bfb8ec03f1094bd889485b268a86768f
+        position: {x: 940, y: 60}
+        speaker:
+          player: 0
+          name: The Heart Tree
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+        line: <i>First the way home. Then their names. Then there is no one left to find.</i>
+        answers:
+        - How do I reach them?
+        - Open the door. I'll go now.
+        mustAnswer: 1
+        afterFightPause: 1
+    - rid: 287758281410609329
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 2c2daaa15b7e42e1939018e0af552b73
+        position: {x: 1240, y: 60}
+        speaker:
+          player: 0
+          name: The Heart Tree
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+        line: <i>The door across the stream sleeps, and I am too thin to wake it. Long ago people kept a hearth beneath my branches, and I kept the night from their door. That was the pact. No fire has burned here in a hundred winters.</i>
+        afterFightPause: 1
+    - rid: 287758281410609330
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: eba4980314b94677ad41dc28996f6592
+        position: {x: 1240, y: 230}
+        speaker:
+          player: 0
+          name: The Heart Tree
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+        line: <i>With what? You have nothing but your hands, and I cannot open it.</i>
+        afterFightPause: 1
+    - rid: 287758281410609331
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: ed02f3fab0d94a83a83c4972033faf9c
+        position: {x: 1540, y: 60}
+        speaker:
+          player: 0
+          name: The Heart Tree
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+        line: <i>So light one. The forest cannot forget a hearth that someone tends. It will feed my ward, and out in the mist your people will see it and know which way is home.</i>
+        afterFightPause: 1
+    - rid: 287758281410609332
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: b1461d8af2a948539e0196e681659847
+        position: {x: 1840, y: 60}
+        speaker:
+          player: 0
+          name: The Heart Tree
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+        line: <i>A fire first. Then a home worth coming back to. Then we go and fetch them. And one day, little one, you will tell me why those old stones woke for your hand.</i>
+        afterFightPause: 1
+    - rid: 287758281410609333
+      type: {class: RaiseQuestEventNode, ns: , asm: SafeHaven}
+      data:
+        id: d943681d6c1d4d33a08acb7b4e0eaca2
+        position: {x: 2140, y: 60}
+        questEvent: {fileID: 11400000, guid: c06332984c04ae244b8513b7d0e6178c, type: 2}
+--- !u!114 &1952896958
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1952896955}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aecdc764a0346784e9958a956dddd948, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::SaveableEntity
+  id: e12967934f544cd9a3b6c2a52c3de3b1
+  prefabId: 
+  saveTransform: 1
+  saveActiveState: 1
+  rememberDestruction: 1
+  saveComponents: 1
 --- !u!1001 &1953204788
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -151351,6 +152126,67 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3037297742660676365, guid: 44f27b25762228b4fb447f248a34b0ed, type: 3}
   m_PrefabInstance: {fileID: 2064901161}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &2065388234
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 5326914010263828036, guid: 60bc418ee7207e9449ecde59c8825917, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5326914010263828036, guid: 60bc418ee7207e9449ecde59c8825917, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5326914010263828036, guid: 60bc418ee7207e9449ecde59c8825917, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5326914010263828036, guid: 60bc418ee7207e9449ecde59c8825917, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5326914010263828036, guid: 60bc418ee7207e9449ecde59c8825917, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5326914010263828036, guid: 60bc418ee7207e9449ecde59c8825917, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5326914010263828036, guid: 60bc418ee7207e9449ecde59c8825917, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5326914010263828036, guid: 60bc418ee7207e9449ecde59c8825917, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5326914010263828036, guid: 60bc418ee7207e9449ecde59c8825917, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5326914010263828036, guid: 60bc418ee7207e9449ecde59c8825917, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5539201636396320044, guid: 60bc418ee7207e9449ecde59c8825917, type: 3}
+      propertyPath: m_Name
+      value: Fireflies
+      objectReference: {fileID: 0}
+    - target: {fileID: 7251748962878869683, guid: 60bc418ee7207e9449ecde59c8825917, type: 3}
+      propertyPath: profile
+      value: 
+      objectReference: {fileID: 11400000, guid: 1b1a8ece8038025468ac2f2b834fdd15, type: 2}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 60bc418ee7207e9449ecde59c8825917, type: 3}
 --- !u!1001 &2068991178
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -156534,7 +157370,7 @@ PrefabInstance:
       objectReference: {fileID: 330585545}
     - target: {fileID: 7539198652975494137, guid: 7c9023ff58d8fd54fad4fbace119c49b, type: 3}
       propertyPath: m_fontColor32.rgba
-      value: 4291617773
+      value: 4292076780
       objectReference: {fileID: 0}
     - target: {fileID: 7539198652975494137, guid: 7c9023ff58d8fd54fad4fbace119c49b, type: 3}
       propertyPath: m_TextStyleHashCode
@@ -156546,7 +157382,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8294500799499253835, guid: 7c9023ff58d8fd54fad4fbace119c49b, type: 3}
       propertyPath: m_fontColor32.rgba
-      value: 4291291381
+      value: 4292076780
       objectReference: {fileID: 0}
     - target: {fileID: 8294500799499253835, guid: 7c9023ff58d8fd54fad4fbace119c49b, type: 3}
       propertyPath: m_TextStyleHashCode
@@ -156745,3 +157581,5 @@ SceneRoots:
   - {fileID: 175952819}
   - {fileID: 1556087138}
   - {fileID: 1676152094}
+  - {fileID: 1258665220}
+  - {fileID: 2065388234}

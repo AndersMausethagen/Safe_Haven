@@ -139,6 +139,53 @@ public sealed class QuestMarkersPage : SystemsPage
     }
 }
 
+/// <summary>The fonts and colours of all the game's UI.</summary>
+public sealed class UIStylePage : SystemsPage
+{
+    public override string Title => "UI Style";
+    public override string Group => "Settings";
+    public override string Help => "Hearthline: the look of every window and HUD. Nothing frames the world: the HUD is type and thin lines with a soft " +
+                                   "shadow, and amber is the one accent. Windows are solid. Colours changed here reach the whole game when it next " +
+                                   "runs; new UI prefabs get their roles from Safe Haven › UI › Apply Hearthline.";
+
+    public override void Draw()
+    {
+        var style = Settings<UIStyle>(UIStyle.ResourceName);
+        if (style != null)
+        {
+            SettingsPanel(style, "UI style", "Resources/UIStyle");
+        }
+    }
+}
+
+/// <summary>The room the game leaves between quests, fights and lines.</summary>
+public sealed class StoryPacingPage : SystemsPage
+{
+    public override string Title => "Story Pacing";
+    public override string Group => "World";
+    public override string Help => "A quest that starts by itself (automatically, or on a Quest Event) waits its turn: a pause after the last quest, " +
+                                   "the end of any fight and a little more, and until nobody is talking. Story lines (Say, Choice) wait out the " +
+                                   "same pause after a fight; a line said during a fight stays a subtitle. A quest's own Start Delay replaces the " +
+                                   "pause after the last quest, for a beat before a big moment. Someone asking (a Quest Giver, a story's Start Quest) " +
+                                   "starts a quest at once. Add Wait For Quiet to a story for cutscenes that have no line.";
+
+    public override void Draw()
+    {
+        var settings = Settings<StoryPacingSettings>(StoryPacingSettings.ResourceName);
+        if (settings == null)
+        {
+            return;
+        }
+
+        SettingsPanel(settings, "Story pacing", "Resources/StoryPacingSettings");
+        BeginDerived();
+        Derived("Next quest in a chain", $"{settings.BetweenQuestsSeconds:0.#} s after the last, once the coast is clear");
+        Derived("After the last enemy falls", $"{settings.AfterFightSeconds:0.#} s before anything new begins");
+        Derived("Never later than", $"{settings.LongestHoldSeconds:0.#} s after it was due, even with a fight still on");
+        EndDerived();
+    }
+}
+
 /// <summary>How monsters notice the player (sight cone, close sense, hearing) and how the player stays unnoticed.</summary>
 public sealed class SensesAndStealthPage : SystemsPage
 {
@@ -166,7 +213,9 @@ public sealed class SensesAndStealthPage : SystemsPage
                 float far = PerceptionRules.NoticeRate(range * 0.95f, 0f, eyes, visibility, rules);
                 Derived(label, range <= 0f ? "never seen" : $"seen up to {range:0.#} m; spotted in {Seconds(near)} up close, {Seconds(far)} at the edge");
             }
-            Derived("Footsteps heard", $"{rules.FootstepNoise:0.#} m walking, {rules.SneakingFootstepNoise:0.#} m sneaking (× a monster's Hearing)");
+            Derived("Footsteps heard", $"{rules.FootstepNoise:0.#} m walking, {rules.SneakingFootstepNoise:0.#} m sneaking (× a monster's Hearing), up to {rules.HeavyGearNoise:0.#}× in heavy gear");
+            Derived("Cover and rain", $"cover leaves {rules.HeardThroughCover:P0} of a sound's reach; the heaviest rain {rules.NoiseInRain:P0} of the player's noise");
+            Derived("Longest a fight carries", $"{rules.CombatNoise + rules.NoiseBuildMax:0.#} m, once {rules.NoiseBuildMax:0.#} m of build-up has gathered");
             Derived("Lost target", $"after {rules.LoseTrackSeconds:0.#} s out of sight; searched for {rules.SearchSeconds:0.#} s");
             Derived("Ambush", rules.AmbushDamageTaken > 1f ? $"unaware monsters take {rules.AmbushDamageTaken - 1f:P0} more damage" : "no bonus");
             EndDerived();
@@ -179,6 +228,32 @@ public sealed class SensesAndStealthPage : SystemsPage
     }
 
     private static string Seconds(float rate) => rate > 0f ? $"{1f / rate:0.#} s" : "never";
+}
+
+/// <summary>Picking the lock on a chest in a raid.</summary>
+public sealed class LockpickingPage : SystemsPage
+{
+    public override string Title => "Lockpicking";
+    public override string Group => "World";
+    public override string Help => "A chest in a raid has to be picked before it can be searched. A marker runs along a bar and each press tries a " +
+                                   "pin: green sets it silently, yellow with a click, anywhere else slips, drops a pin and rattles the lock. Enough " +
+                                   "slips and it gives way by force, loudly, so a chest always opens in the end. The lid is heard either way. Pins " +
+                                   "are set on each Loot Cache; 0 means no lock. Sneaking doesn't help here: only clean presses are quiet.";
+
+    public override void Draw()
+    {
+        var settings = Settings<LockpickingSettings>(LockpickingSettings.ResourceName);
+        if (settings == null)
+        {
+            return;
+        }
+
+        SettingsPanel(settings, "Lockpicking", "Resources/LockpickingSettings");
+        BeginDerived();
+        Derived("Quietest chest (3 pins)", $"{settings.NoiseOf(SwingResult.Critical):0.#} m per pin, then the lid at {settings.OpenNoise:0.#} m");
+        Derived("Worst chest", $"{settings.SlipsAllowed - 1} slips at {settings.NoiseOf(SwingResult.Glancing):0.#} m, then forced open at {settings.ForcedNoise:0.#} m");
+        EndDerived();
+    }
 }
 
 /// <summary>The timed swing minigame for axe, pickaxe and sickle gathering.</summary>
@@ -664,6 +739,76 @@ public sealed class ResidentsAndPurificationPage : SystemsPage
         foreach (JobDefinition job in LoadAll<JobDefinition>())
         {
             SettingsPanel(job, "Job: " + job.DisplayName, null);
+        }
+    }
+}
+
+/// <summary>What Essence buys at the altar: empowering gear, enchantments and skill ranks (GDD §13.5, §16.4).</summary>
+public sealed class EssencePage : SystemsPage
+{
+    public override string Title => "Essence";
+    public override string Group => "World";
+    public override string Help => "Every upgrade at the altar is deterministic: it costs what it says and never fails. Purified Essence is the safe " +
+                                   "way; Cursed Essence is used raw, for enchantments that state their price as a negative bonus.";
+
+    public override void Draw()
+    {
+        var settings = Settings<EssenceSettings>(EssenceSettings.ResourceName);
+        if (settings == null)
+        {
+            return;
+        }
+
+        SettingsPanel(settings, "Empowering gear", "Resources/EssenceSettings", "empowerLevels", "purifiedPerTier", "statShare", "weaponDamage", "toolYield", "toolCare");
+        SettingsPanel(settings, "Skills", null, "skillRanks");
+        SettingsPanel(settings, "Enchantments", null, "enchantments");
+        int empower = 0;
+        foreach (EssenceSettings.EmpowerLevel level in settings.EmpowerLevels)
+        {
+            empower += level.purified;
+        }
+
+        int skill = 0;
+        foreach (EssenceSettings.SkillRank rank in settings.SkillRanks)
+        {
+            skill += rank.purified;
+        }
+
+        BeginDerived();
+        Derived("One tier I item to the top", $"{empower} Purified Essence");
+        Derived("One skill to the top", $"{skill} Purified Essence");
+        Derived("Weapon at the top", $"+{settings.WeaponDamage * settings.EmpowerLevels.Count * 100f:0}% damage");
+        Derived("Enchantments", settings.Enchantments.Count.ToString());
+        EndDerived();
+    }
+}
+
+/// <summary>Carts, barrows and boats: what they carry and what that costs in speed (GDD §8.5).</summary>
+public sealed class TransportPage : SystemsPage
+{
+    public override string Title => "Transport";
+    public override string Group => "World";
+    public override string Help => "Transport is moved by physics. Cargo weight is real mass and also sets the player's speed: a little slower empty, " +
+                                   "more when full, and steeply when overfilled past the rated capacity.";
+
+    public override void Draw()
+    {
+        var settings = Settings<TransportSettings>(TransportSettings.ResourceName);
+        if (settings == null)
+        {
+            return;
+        }
+
+        SettingsPanel(settings, "All transport", "Resources/TransportSettings", "extractionRange", "rumbleRadius", "rumbleWhenFull", "rumbleSeconds", "strainedSpeed", "stuckSeconds");
+        foreach (TransportDefinition definition in LoadAll<TransportDefinition>())
+        {
+            SettingsPanel(definition, definition.DisplayName, null);
+            BeginDerived();
+            Derived("Slower when empty", $"{(1f - definition.SpeedScale(0f)) * 100f:0}%");
+            Derived("Slower at capacity", $"{(1f - definition.SpeedScale(definition.Capacity)) * 100f:0}%");
+            Derived("Slower at the limit", $"{(1f - definition.SpeedScale(definition.OverloadLimit)) * 100f:0}%");
+            Derived("Mass at capacity", $"{definition.EmptyMass + definition.Capacity * definition.MassPerWeight:0} kg");
+            EndDerived();
         }
     }
 }

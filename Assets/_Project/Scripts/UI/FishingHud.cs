@@ -11,7 +11,7 @@ using UnityEngine.UI;
 public sealed class FishingHud : MonoBehaviour
 {
     private const float BarHeight = 340f;
-    private static readonly Color Gold = new Color(0.91f, 0.77f, 0.42f, 1f);
+    private static Color Gold => UIStyle.Current.Accent;
     private static readonly Color Body = new Color(0.93f, 0.89f, 0.8f, 1f);
 
     private RectTransform root;

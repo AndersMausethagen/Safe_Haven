@@ -268,8 +268,8 @@ public sealed class BuildPlacer : MonoBehaviour
             Title = $"{next.title} {building.Definition.DisplayName}",
             Body = $"Level {construction.Level + 1} of {building.Definition.MaxLevel}. {next.description}\n<color=#8BE08B>{string.Join(", ", bonuses)}</color>",
         };
-        bool affordable = MaterialPool.For(gameObject).CanAfford(System.Array.Empty<ResourceAmount>(), next.cost, out string missing);
-        string cost = AmountText.Describe(next.cost);
+        bool affordable = MaterialPool.For(gameObject).CanAfford(next.essence, next.cost, out string missing);
+        string cost = next.CostText;
         page.Add(new MenuAction("Upgrade", affordable ? cost : $"{cost}   <color=#FF7B6B>{missing}</color>", affordable,
             () => construction.TryOrderUpgrade(gameObject), closesMenu: true));
         return page;

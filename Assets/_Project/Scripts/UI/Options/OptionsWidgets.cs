@@ -38,15 +38,15 @@ public static class OptionsWidgets
     public const float RowHeight = 54f;
     private const float LabelWidth = 430f;
 
-    public static readonly Color Panel = new Color(0.075f, 0.062f, 0.05f, 0.98f);
-    public static readonly Color Rim = new Color(0.64f, 0.49f, 0.29f, 0.9f);
-    public static readonly Color Title = new Color(0.91f, 0.77f, 0.42f, 1f);
-    public static readonly Color Body = new Color(0.93f, 0.89f, 0.8f, 1f);
-    public static readonly Color Muted = new Color(0.7f, 0.66f, 0.58f, 1f);
-    public static readonly Color Control = new Color(0.22f, 0.17f, 0.12f, 1f);
-    public static readonly Color ControlLit = new Color(0.34f, 0.26f, 0.16f, 1f);
-    public static readonly Color ControlOn = new Color(0.42f, 0.33f, 0.14f, 1f);
-    public static readonly Color Track = new Color(0.12f, 0.1f, 0.08f, 1f);
+    public static Color Panel => UIStyle.Current.Panel;
+    public static Color Rim => UIStyle.Current.Rim;
+    public static Color Title => UIStyle.Current.Text;
+    public static Color Body => UIStyle.Current.Text;
+    public static Color Muted => UIStyle.Current.Muted;
+    public static Color Control => UIStyle.Current.Control;
+    public static Color ControlLit => UIStyle.Current.ControlLit;
+    public static Color ControlOn => UIStyle.Current.ControlOn;
+    public static Color Track => UIStyle.Current.Inset;
 
     public static RectTransform Rect(string name, Transform parent)
     {

@@ -28,4 +28,10 @@ public enum UIWindowId
     Dialogue = 10,
     /// <summary>Level, experience and the four talent trees (N).</summary>
     Talents = 11,
+    /// <summary>The overview of Safe Haven: its rank, renown, people and what to do next (H).</summary>
+    Haven = 12,
+    /// <summary>The Purification Altar: purifying, empowering and enchanting gear, deepening skills.</summary>
+    Altar = 13,
+    /// <summary>A cart's or boat's cargo beside the bag.</summary>
+    Cargo = 14,
 }

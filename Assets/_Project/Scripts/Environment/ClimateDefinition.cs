@@ -19,9 +19,15 @@ public sealed class ClimateDefinition : ScriptableObject
     [SerializeField] private List<Entry> weathers = new List<Entry>();
     [Tooltip("Seconds a new weather takes to blend in.")]
     [SerializeField, Min(0f)] private float transitionSeconds = 45f;
+    [Tooltip("Seconds of downpour until the ground is soaked and the puddles are full. Light rain takes longer.")]
+    [SerializeField, Min(1f)] private float soakSeconds = 75f;
+    [Tooltip("Seconds the ground takes to dry again after the rain stops.")]
+    [SerializeField, Min(1f)] private float drySeconds = 240f;
 
     public WeatherDefinition Start => start;
     public float TransitionSeconds => transitionSeconds;
+    public float SoakSeconds => soakSeconds;
+    public float DrySeconds => drySeconds;
     public IReadOnlyList<Entry> Weathers => weathers;
 
     public void Configure(WeatherDefinition startWeather, float transition, params Entry[] entries)

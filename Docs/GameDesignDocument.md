@@ -5,7 +5,7 @@
 Build a home worth protecting.  
 Venture into the darkness to give it a future.
 
-**VERSION** 0.3 • October 15, 2026
+**VERSION** 0.4 • October 30, 2026
 
 **FORMAT** Isometric Action RPG / Survival / Base Building
 
@@ -55,6 +55,8 @@ This document defines the game fantasy, player promises, gameplay loops, rule se
 **Version 0.2 design changes:** Cursed Essence and Purified Essence now form a shared magical progression economy; players unlock skills through milestones, develop talents through leveling, and improve magic using Essence. Safe Haven remains peaceful most of the time, but the Heart Tree ward can be breached during controlled, announced defense events. Defense structures and NPC defenders now have meaningful roles.
 
 **Version 0.3 design changes:** The decisions behind the first-90-minutes prototype are recorded in §26.1: a one-slot safe pocket that is never lost, durability rules for deployed equipment, Portal Sparks, hunger and thirst that always drain but never kill, the carry budget, free building inside the ward, the first recruit, and the first scripted ward breach.
+
+**Version 0.4 design changes:** Raids now have random events with warnings, places and priced choices (§9.3–9.4). Gear runs Stone → Copper → Iron → Moonsilver, with jewellery and shields (§10.4). Six new creatures and three status effects widen what a fight asks of the player (§10.5–10.6). Cooked meals give lasting bonuses, and crops grow at Farm Plots (§11.3–11.4). More structures from §14.2 exist. The game has a full Options screen (§18.5) and any number of saved games (§20.6). The decisions are recorded in §26.1.
 
 ## 1. Game overview and vision
 
@@ -149,6 +151,8 @@ A typical raid should take roughly 10–20 minutes, plus settlement preparation.
 Long ago, people promised to leave the forest enough room to live, while its guardians promised to keep ancient hungering forces at bay. The pact was broken—or perhaps forgotten. Trails disappeared, villages vanished, and the shadowed forest started consuming memories, wildlife, and people. At the center survives the **Heart Tree**, an ancient being whose protective ward still shelters one clearing. The ward is strong enough for daily peace, yet fractures in the old pact permit occasional, foreseeable intrusions.
 
 The protagonist wakes beside its roots with no clear memory of arriving there. Portal runes respond to their touch. Tiny lights guide them toward stones where the first Life Orbs can be released. The protagonist gradually learns that they are connected to the old pact and may influence the terms of a new one.
+
+**Why a haven.** The forest does not kill the lost: it forgets them. First the way home, then their names, then there is no one left to find. A hearth that someone tends is the one thing it cannot forget. That was the old pact: people kept a hearth beneath the Heart Tree and the tree kept the night from their door, and no fire has burned there in a hundred winters. So the player, the one survivor the tree could catch, doesn't build a base for its own sake. Each fire feeds the ward and carries further through the mist, the seven lost companions can see it and know which way is home, and a home is what there is to bring them back to. The game keeps this true in its rules: renown widens the ward (§6.4), and the Heart Tree's Haven page counts who is home and names who is still out there.
 
 ### 4.2 Narrative tone rules
 
@@ -306,6 +310,18 @@ Companions can be downed and given a clear revival window—**45 seconds** is a 
 
 Transport options include a hand-dragged cart, a wheelbarrow, and a horse cart. The player can deposit both items and resources into transport storage and retrieve them later. Transport increases carrying capacity but occupies physical space and may struggle on narrow routes. While the player drags a cart or pushes a wheelbarrow, movement speed decreases as the total cargo weight increases. The player can release or unequip it to fight, leaving it and its cargo in place, then reattach to continue moving. It can also be abandoned to escape or recovered partially filled. Display cargo weight, capacity, the current movement penalty, whether transport is attached, and whether it is in extraction range. Route width, navigation, and collision are core design constraints, not polish details.
 
+**As built.** A Wainwright's Yard builds a Wheelbarrow, a Handcart and a small Rowboat from planks, as kit items: using the kit sets the transport down, and it packs back into a kit once it is empty, which is how a boat reaches a pond far from the yard. All three are moved by physics, so cargo weight is real mass.
+
+| Transport | Capacity | Overfilled to | Speed empty | At capacity | At the limit |
+| --- | --- | --- | --- | --- | --- |
+| Wheelbarrow | 100 | 160 | 96% | 86% | 50% |
+| Handcart | 200 | 320 | 92% | 78% | 35% |
+| Rowboat | 160 | 240 | 95% | 80% | 40% |
+
+Past its capacity a transport is overfilled: it still takes more, but the speed falls away steeply, and the HUD says so in words. A handcart trails behind the player and swings wide on a turn; a barrow is pushed ahead and goes where it is pointed. A loaded cart keeps rolling when the player stops, and a heavy one can be too much for a steep bank: the strain slows the player, and if it stays stuck they let go. It stops at what stops it, so narrow routes really are a choice. The boat floats on real buoyancy, sits lower the more it carries and has to be rowed to the bank to get out; a swimmer can climb back in.
+
+Attacking, guarding, dodging or casting lets go at once, with no key to press, and leaves the cart where it stands. A cart in the hands goes through the portal, makes noise as it rolls, and comes home if it is within 12 m of the player at extraction. Otherwise it stays behind, and a failed raid loses it and its cargo. Essences stay in their bars, as they weigh nothing: only items go in the cargo.
+
 ## 9. Raid world, discovery, and events
 
 ### 9.1 Map assembly
@@ -328,9 +344,28 @@ An abandoned woodcutter camp; an overturned ore cart; a pond where the Nøkk off
 | The Living Path           | Runestones shift positions         | Solve for shortcut or lose time            |
 | Beacon Light              | A glow on a distant slope          | Reveal the map or a temporary refuge       |
 
+**Implemented events (October 30, 2026):** ten for the Misty Woods. Each gives a warning, then usually a place to reach, marked on the HUD and by a pale beacon, and choices that state their price.
+
+| **Event**            | **Based on**              | **The choice**                                                                 |
+|----------------------|---------------------------|--------------------------------------------------------------------------------|
+| Cries from the Ditch | Help from the Ditch       | Free a pinned pedlar (time and noise), or take his pack and carry the guilt    |
+| Three Wishes         | Three Wishes              | Strength for health, riches for hunters, or time borrowed against health       |
+| Overturned Wagon     | Overturned Trader's Wagon | Search slowly, grab it loudly (likely ambush), or mend the wheel for a reward  |
+| The Toll Troll       | Troll at the Bridge       | Pay in bones, answer a riddle, or walk through it. Needs no bridge             |
+| Thickening Fog       | Thickening Fog            | A fog bank with Marsh Lights around a chest nobody left by accident            |
+| Old Beacon           | Beacon Light              | Light it to see the land and be seen, or keep a small fire and heal            |
+| The Living Path      | The Living Path           | Three runestones: a rhyme says which, the wrong one costs time                 |
+| The Oskorei          | New                       | A horn, then Draug and wolves hunting the player. No site, from the first stage |
+| The Open Barrow      | New                       | Take the silver and wake a Draug, or leave an offering for a blessing          |
+| The Blighted Tree    | §9.2 cursed tree          | Cut out the rot among Rootlings, or drink the sap: strength and poison         |
+
+The raid clock keeps running while the player chooses, and walking away leaves a site open. The raid report lists what happened and what was chosen.
+
 ### 9.4 Event budgets
 
 Limit the number of major events per raid and give each biome its own curated pool. Do not allow two major encounters to block the same choke point. Boss missions prioritize predictable encounter conditions. Threat tiers and resident rumors may influence what spawns.
+
+**Implemented budget:** the first event comes 45 seconds in and the next about 110 seconds apart (±35), at most four in a raid and each at most once. No new event starts while two sites still wait for the player. Events are picked from the raid's seed and each sets the time window it can happen in. All of it is data per raid.
 
 ### 9.5 Exploration and mapping
 
@@ -359,7 +394,7 @@ Use responsive, isometric/top-down 3D movement and directional attacks, broadly 
 
 ### 10.3 Combat feel
 
-Combat should be driven by positioning and readable telegraphs. Enemies have distinguishable anticipation, active hit, and recovery windows. Hit detection must be dependable. Moving while aiming is generally allowed, while heavy weapons commit the player for longer. Dodge has a short invulnerability window and cannot be used without a meaningful cooldown. **Prototype dodge target:** approximately **0.35 seconds** duration, with an approximately **2–3-second** cooldown; adjust after enemy timings and animations are playable.
+Combat should be driven by positioning and readable telegraphs. Enemies have distinguishable anticipation, active hit, and recovery windows. Hit detection must be dependable. Moving while aiming is generally allowed, while heavy weapons commit the player for longer. A swing plants the feet from its wind-up until the blow lands, with only the attack's own lunge carrying the player in, and the body stays facing the blow; once it has landed the player can walk out of the follow-through, though the next attack still waits for the swing to finish, and a dodge can always break off a wind-up. Dodge has a short invulnerability window and cannot be used without a meaningful cooldown. **Prototype dodge target:** approximately **0.35 seconds** duration, with an approximately **2–3-second** cooldown; adjust after enemy timings and animations are playable.
 
 ### 10.4 Weapon families
 
@@ -372,6 +407,12 @@ Combat should be driven by positioning and readable telegraphs. Enemies have dis
 | Spear (later) | Reach / spacing         | Thrusts, throws, area denial                               |
 
 There are no locked classes; chosen gear and abilities define a build. Gathering should not require endlessly repeating full combat animations against ordinary rocks.
+
+**Implemented gear (October 30, 2026):** weapons now fill the tiers: Copper Sword, Hand Axe and Spear at the Construction Table, so metal arrives before the Forge; the Venom Fang, a quick dagger whose cuts can poison; Iron Greatsword and War Hammer, whose heavy blow breaks poise; the Grave Blade from barrow iron; the Trollstone Maul; the Moonsilver Blade; and the Elderwood Longbow, with Bodkin Arrows.
+
+**Armour** comes in four sets, and weight decides the dodge: Cured Leather (light, for moving and shooting), Copper Scale (the first metal), Iron Mail (heavy, the dodge becomes a shoulder charge) and Moonsilver (light for its strength, against what isn't flesh). Eight amulets and rings fill the jewellery slots.
+
+**Shields** go in the off hand beside a one-handed weapon: Round Shield, Copper-Bound Shield and Iron Kite Shield, each stopping more of a block. Guarding and attacking bashes.
 
 ### 10.5 Enemy archetypes
 
@@ -399,9 +440,22 @@ hardly staggers, slow but crushing sweeps and stomps. Killing it is possible for
 Trollstone, the material the Forge needs.
 These values remain editable prototyping defaults pending encounter playtesting.
 
+**Implemented creatures (October 30, 2026):** six more for the Misty Woods, each with its own answer.
+
+- **Marsh Light:** a hovering light that keeps its distance, slows with cold bolts and flees when hurt (the §10.5 archetype, without illusions yet).
+- **Draug:** a slow armoured dead warrior, hard to stagger, that chills on a hit and lunges from afar. Fire hurts it more; frost less.
+- **Bog Spitter:** spits poison from range and is weak up close.
+- **Blight Boar:** leaves the player alone at a distance, charges inside its ground, then stands open.
+- **Rootling:** small, fast and in swarms; a grasp can hold the feet.
+- **Moss Shaman:** hangs back, calls up Rootlings and rallies its side. The target to reach first.
+
+Their bodies are placeholders, and they appear through the raid's spawn lists and events.
+
 ### 10.6 Status effects
 
 **Poison:** damage over time, cleansed or mitigated by herbs and brews. **Frost:** slows movement/attacks; clothing or warming food helps. **Roots:** brief ground-telegraphed immobilization. **Enchanted:** temporarily weakens healing or abilities and can be cleansed. **Warmth / Courage:** beneficial effects from meals, equipment, and companions. Keep status icons distinct and accessible.
+
+**Implemented (October 30, 2026):** Poison (health drains; Antidote cures it), Chill (slower; Warming Brew cures it) and Roots (held briefly, free to fight). A hit that is blocked or parried leaves nothing. Ticks don't flinch, can't be guarded and don't count as a perfect dodge. A new hit restarts the time; effects don't stack. They show as words above the vitals until they have icons. Enchanted, and Warmth and Courage as effects of their own, are not built; meals cover the beneficial side for now.
 
 ### 10.7 Example boss: The Brukam Troll
 
@@ -417,10 +471,21 @@ call brings idle monsters nearby to look. A hunted player who breaks line of sig
 monster searches where it last saw them, then goes home. Wolves hear keenly, Mistwings see wide from above, Root
 Guardians are slow to notice.
 
-The player can **sneak** (hold Left Ctrl / left bumper): half speed, much quieter footsteps, seen from closer and more
-slowly. Standing still helps a little; fighting makes the player stand out. A hit on an unaware monster deals extra
-damage (an ambush). Sneaking is a way to avoid or open fights, never a requirement: combat stays as in §10.3, and
-ward-breach attackers and hunt waves always know where the player is.
+The player can **sneak** (hold Left Ctrl / left bumper): crouched, at half speed, with much quieter footsteps, seen from
+closer and more slowly. Standing still helps a little; fighting makes the player stand out. A hit on an unaware monster
+deals extra damage (an ambush). Sneaking is a way to avoid or open fights, never a requirement: combat stays as in
+§10.3, and ward-breach attackers and hunt waves always know where the player is.
+
+**Noise** is a single number the player can read: the HUD's meter shows how many metres they can be heard right now, with
+a word for it (Quiet, Audible, Loud, Deafening). Everything the player does feeds it: footsteps, swimming, hard landings,
+dodges, fights, gathering, the bow and picking locks. Heavy gear makes movement louder and rain hides noise. A run of
+loud sounds builds on itself, so a long fight carries further than one blow and stopping lets it fade. Cover muffles a
+sound, and a far sound only tells a monster roughly where to look: near sounds bring it straight to the player.
+
+**Locked chests:** a chest has to be picked before it can be searched, with a timing bar like gathering's. Each pin set
+in the green zone is silent, in the yellow a click; a slip rattles the lock and drops a pin. Too many slips and the lock
+gives way, loudly, so a chest can always be opened, only not always quietly. The lid is heard either way. Chests are a
+risk to weigh against the noise of opening them, not a free stop on the way to the exit.
 
 Fog hides the player too: in dense fog monsters see only about half as far, so misty weather and foggy hollows are
 places to slip past danger.
@@ -447,9 +512,13 @@ Survival should make preparation meaningful without competing constantly with co
 
 Build plots → plant seeds → water as appropriate → wait for growth → harvest. A gardener NPC can automate ordinary maintenance if seeds and water exist in storage. Advanced crops require seeds recovered on raids. A small starting crop set should expand into meaningful cooking recipes rather than a large mandatory farm simulator.
 
+**Implemented (October 30, 2026):** a Farm Plot is a station whose recipes are crops: one Wild Turnip or Barley goes in and several come out minutes later, and they keep growing during raids. Seeds come from wild plants in raids and from supply caches, which always offer at least one of each. A Beehive turns berries into honey the same way. Watering and a gardener NPC are not built.
+
 ### 11.4 Meals as preparation
 
 Simple food refills meters; cooked dishes additionally grant time-limited bonuses such as frost protection, extra stamina, or gathering speed. Limited meal slots support loadout planning. Recipes can combine safe ingredients with raid-only herbs and mushrooms.
+
+**Implemented (October 30, 2026):** simple food from the Campfire fills meters, and meals from the Kitchen also give bonuses for several minutes: Strength, Maximum Stamina, Maximum Health, Armor, Move Speed, Frost Resistance, Gather Yield or Damage, some at a price (Honey Mead hits harder and protects less). Two meals work at once; a third pushes out the one closest to ending. Tonics from the Cauldron take no meal slot and are for the fight rather than the road. Bonuses go through the portal, are lost on a failed raid and aren't kept in a save file. A Sauna gives a similar lasting warmth at home.
 
 ## 12. Resources, categories, and inventory
 
@@ -475,6 +544,8 @@ Materials are **ItemDefinitions** with category Material (id, name, icon, tier, 
 | Magical resources | Life Orb, Portal Spark, Cursed Essence, Purified Essence, Trollstone | Portal, magical progression, raid options, special recipes |
 | Quest / special   | Ancient Rune, Sealed Letter                                          | Discovery, contracts, narrative                            |
 
+**Added October 30, 2026:** organic: Chanterelle, Wild Turnip, Barley, Cloudberries, Honey and Boar Meat; refined: Cured Leather (Tanning Rack); from creatures: Boar Tusk, Bog Venom, Wisp Ember, Grave Iron and Rootling Bark. Materials that had little use (Moonsilver, Huldra Silk, Elderwood, Deepstone) now go into late gear.
+
 ### 12.4 Capacity and weight
 
 The bag has a 150-point carrying budget (hard cap for now) plus slot limits. Backpacks add slots and carry weight (Bark Pack +10, Woven Satchel +20, Hide Rucksack +40). The safe pocket and worn gear don't count. Heavy raw materials (ore 2, stone 1.5) are cheap per weight, refined goods (ingots, planks) and valuables are dense in value, so the most profitable cargo may not be the most efficient. Essences are weightless and capped per essence. Carts and wheelbarrows have their own cargo storage for items and resources, with capacity and cargo weight tracked separately from the player. A cart has a proposed +200-point capacity; capacity varies by transport type. For hand-dragged carts and wheelbarrows, heavier cargo progressively reduces movement speed while attached. Configure capacity, item/resource weights, and the weight-to-speed curve in Unity assets. Per-resource caps and overall carrying weight serve different purposes and must display separately. Storage structures can hold materials safely at home: every chest opens the same stash, sized by the biggest chest standing (a Small Chest from the start: 12 slots; the Storage Shed: all 60).
@@ -496,6 +567,8 @@ Weapons, armor, potions, carts, and narrative artifacts do not need to behave li
 
 Crafting converts risky expeditions into visible safety and competence. Basic recipes should be understandable and discoverable through stations, blueprints, quests, or NPC knowledge. Keep early production chains short; introduce multiple stages only when the new step creates a meaningful strategic choice.
 
+The bag and every station use one recipe browser (§18.8), so crafting works the same everywhere.
+
 ### 13.2 Example chains
 
 **Oak Wood → Oak Plank → advanced building**; **Iron Ore → Iron Ingot → weapon/tool upgrade**; **Grey Stone → Stone Block → sturdy construction**; **Berries + water → basic meal**; **Healing Herb + supporting ingredients → restorative brew**. Life Orbs and Portal Sparks interact with portal progression and raid planning rather than simply acting as generic currency. **Cursed Essence → Purified Essence** forms a separate magical refining chain; the initial prototype exchange is **2 Cursed Essence → 1 Purified Essence**, with a short processing time at a Purification Altar.
@@ -514,7 +587,20 @@ Equipment takes durability damage on death and can be repaired at home for a cle
 
 Essence has three main sinks: **equipment tier upgrades/enchantments**, **selected building and ward tiers**, and **skill enhancements**. Basic structures and initial boss-earned skill unlocks should not require Essence. Important tier transitions can additionally require normal materials and a boss-specific token, preventing unlimited farming of easy enemies from bypassing progression gates. Treat drop counts and prices as tunable data; aim for ordinary early upgrades after around one or two successful Raids and larger midgame milestones after a few more, rather than excessive grind.
 
-**Design guardrail:** Essence augments ordinary gathering rather than replacing it. A tier-II iron weapon still requires iron; Purified Essence empowers it. Optional direct use of Cursed Essence for high-risk enchantments is a future feature, not a second full economy in the MVP.
+**Design guardrail:** Essence augments ordinary gathering rather than replacing it. A tier-II iron weapon still requires iron; Purified Essence empowers it.
+
+**The choice at the altar.** Every Cursed Essence that comes home asks one question: purify it at 2:1 into something safe, or spend it raw on something stronger that costs you. Both are deterministic, so the risk is a known price and never a roll: nothing fails, breaks or wastes essence.
+
+| Use | Pays with | What it does |
+| --- | --- | --- |
+| **Empower** gear, +1 to +3 | Purified Essence by tier, and a share of the item's own recipe materials | Adds a share of the item's stats; weapons hit harder; tools yield more and wear less |
+| **Enchant** gear, one per item | Purified Essence | A safe bonus, with no drawback |
+| **Enchant** gear, one per item | Cursed Essence, raw | A stronger bonus with a stated price: *Bloodletting* +15% damage, -15 health. Replacing an enchantment costs the new one in full |
+| **Deepen** a skill, ranks I to III | Purified Essence | More power (damage, healing, buffs) and a shorter cooldown |
+| **Ward and great building tiers** | Purified Essence | Heart Tree ward levels; the top tier of the altar, Cauldron and Construction Table |
+| **Draughts** at a Cauldron | Purified or Cursed Essence, and herbs | Repeatable tonics, so essence still matters once everything is upgraded |
+
+Empowering and enchanting belong to the one item, survive a failed raid with it and are shown in its name: *Gravebound Iron Mail Hauberk +1*. Raw Cursed work happens at once, while purifying waits in the queue, which is part of the choice. Two enchantments feed the loop back: *Reaping* finds more Cursed Essence, *Hollow* drains life from what it hits. Upgrading the altar makes it purify faster. All of this happens in one window at the Purification Altar: Purify, Empower, Enchant and Skills.
 
 ## 14. Base building and structures
 
@@ -541,6 +627,8 @@ Place buildings within valid safe plots using a ghost preview, snapping rules wh
 | Palisade / Barricade | Guide and delay enemies during a ward breach           | Mid                  |
 | Watch Post / Trap    | Provide warnings, cover, or limited-use damage         | Mid                  |
 | Runic Ward Totem     | Improve defense of a key approach or ward anchor       | Mid–late             |
+
+**Implemented (October 30, 2026):** Farm Plot, Kitchen and Watch Post (a raised fire that lights the night) as in the table. A Spike Trap hurts enemies that walk over it. Added beyond the table: Tanning Rack, Beehive, Well (water inside the ward), Sauna (lasting warmth before a raid) and Cottage (Renown for now, with no one living in it yet). Not built: Scout Post and Runic Ward Totem.
 
 ### 14.3 Early recipes
 
@@ -630,6 +718,8 @@ Use concise, contextual objectives rather than a map cluttered with generic task
 
 Quest givers show their state with a small floating marker: "!" when a quest can be taken, "…" while the player is on it, and "?" when it is ready to hand in. Quests can optionally be handed back to their giver; this is off by default. When it is on, rewards arrive at the hand-in, not when the last objective completes. Once a giver's quest is done, the giver says an "after" line, or stops being interactable when it has none.
 
+The story leaves room to breathe. A quest that starts by itself waits a few seconds after the last one, and a fight is never followed straight away by a new quest or a line: the player gets a moment to see they won. Nothing starts over someone talking. A moment that matters can ask for a longer pause of its own; the troll after the wolves at the camp comes eight seconds after the last wolf falls.
+
 ### 17.2 Quest types
 
 Restore, discover, rescue, deliver, negotiate, escort, gather, investigate, and defeat. Each objective should have a clear condition, destination hint, reward, and save-state behavior. Events can spawn short raid-specific objectives without demanding a fully bespoke questline.
@@ -664,6 +754,20 @@ Prominent but nonintrusive clock; threat or danger-phase alert; objective tracke
 
 Rebindable input, controller support, readable text scaling, color-independent signals, subtitle and audio cue options, clear interaction highlights, reduced screen-shake choices, and settings for timer readability. Consider combat difficulty assists that do not invalidate the extraction system.
 
+**Implemented (October 30, 2026):** the Options screen, from the main menu and the Escape menu, has Gameplay, Graphics, Audio, Controls and Accessibility tabs. It covers rebindable keys for keyboard and gamepad, UI and text size, screen shake, hit stop and screen flashes, dialogue speed, a large raid timer, toggle sneak and auto-gather. Graphics default to the game as made; lowering quality is the player's choice. Still open: color-independent signals, audio cue options and difficulty assists.
+
+### 18.7 Hearthline: the look of the UI
+
+The main menu sets the style and the whole game follows it. Nothing frames the world: the HUD is type and thin lines held up by a soft shadow, with one amber accent, so the art carries the screen. Windows are solid dark panels with a single thin rim, readable over bright grass and dark forest alike. Gelasio sets titles and big numbers; Fira Sans sets everything read at a glance, chosen for lining numerals that stay clear at small sizes. Colour is never the only signal: a word or a value goes with it. Health and stamina dim while full and nothing is happening, and come back the moment anything changes, or stay lit with Always Show Vitals.
+
+### 18.8 Crafting windows
+
+The bag and every station share one recipe browser: tabs by what recipes make, a **Can make** filter, a list of named rows, and the selected recipe beside it with what it does and each material against what is held. A row says in words whether it can be made (*Can make 3*) or what is missing, so nothing has to be clicked to find out. The material list and the buttons stay in the same place from recipe to recipe. **Craft** or **Queue** makes one and a second button makes as many as possible; right-click or double-click on a row makes one. The bag also lists the known recipes made at stations, with their costs, to plan with. At a station the queue and output stand beside the browser.
+
+### 18.9 The Haven window
+
+Pressing **H** at home, or asking the Heart Tree, answers "how is my home doing, and what now?" at a glance. The rank stands large with its line, beside four figures: renown, ward, cleared and buildings. Below it the ranks run as a ladder of stops, each an equal step apart, filled up to where Safe Haven stands, with the renown still needed and what the next rank brings in words. Three columns follow: **What next**, each step with the key that starts it and the renown it brings; **Renown**, largest first with a kind on one line; and the **Expedition**, everyone by name, home or still out there. A Build button goes straight to the build menu, as most of what the window suggests starts there.
+
 ### 18.6 First-use comprehension
 
 Teach systems in the order encountered: movement → gathering → building → needs → Life Orbs → portal → timer → extraction → loss → NPCs. Explain loss rules explicitly **before the first raid**, not on the death screen.
@@ -685,6 +789,8 @@ local (campfires, torches, a lit beacon); the dark around it is cold and grey.
 
 
 Safe Haven uses warm amber, fresh greens, soft sunlight, and inviting interiors. Raid regions shift toward colder greens and blues, fog, hard shadows, and supernatural accents. Distinct biome palettes should aid navigation as well as atmosphere.
+
+Rain leaves a mark: the ground soaks and darkens, puddles fill on level ground, and it all dries slowly after. Fireflies come out at dusk, green over the Haven and blue in the Misty Woods, so the two places feel different even at night, and they shelter from the rain.
 
 ### 19.3 Character and creature design
 
@@ -738,6 +844,8 @@ RaidDirector chooses a seed, assembles compatible room modules and points of int
 Autosave in Safe Haven after major actions and upon returning from raids. At deployment, persist a transaction-like snapshot of committed equipment, companions, and the raid seed. A crash must not duplicate gear or corrupt the settlement. For MVP, interrupted raids may deliberately reset to the pre-raid snapshot, as long as the policy is explicit and tested. Before release, decide and test interrupted-raid recovery, save scumming, item duplication, and save version migration.
 
 **New persistent fields:** include purification queues, permanent Essence balances, provisional Raid Essence, learned skills/ranks, Talent Points, defense placements and health, ward status, upcoming breach state, and resolved defense-event IDs. Extraction commits Essence exactly once, and breach rewards/consequences must also be idempotent. A new game or recovery save must not spawn duplicated defenders or resurrect destroyed defensive objects.
+
+**Saved games (October 30, 2026):** a game can have any number of saves, each its own file, named by the player. A new game gets its own save the first time it saves, so it can never overwrite another. Saving, quick save and prologue checkpoints write to the game being played. The Saved Games screen loads, overwrites, renames and deletes, and Save as New copies the game in hand. Continue loads the newest. Saving and loading during a raid are both refused; quitting to the menu ends the raid, and what the player carried in it stays behind.
 
 ### 20.7 AI, navigation, and performance
 
@@ -795,23 +903,23 @@ Construction Table needed for home crafting. Times in §21.1–21.5 describe the
 
 ### 21.1 Minutes 0–10: awakening
 
-The player wakes at the Heart Tree after losing contact with the expedition. A sunny clearing contains a stream, loose Small Rocks, fallen Sticks, and Berries, all gathered by hand at Tier 0. A short tree interaction creates mystery instead of a long opening cutscene. Reinforce the prologue's movement and interaction lessons while introducing permanent equipment and home crafting, then harvest Tier I Grey Stone and Oak Wood. Never require wood or Grey Stone to make the tool that first unlocks it.
+The player wakes at the Heart Tree after losing contact with the expedition. A sunny clearing contains a stream, loose Small Rocks, fallen Sticks, and Berries, all gathered by hand at Tier 0. A short conversation with the tree gives the reason to build instead of a long opening cutscene: it caught only one, the other seven are alive, the forest is forgetting them, and a tended hearth is what they can see (§4.1). Reinforce the prologue's movement and interaction lessons while introducing permanent equipment and home crafting, then harvest Tier I Grey Stone and Oak Wood. Never require wood or Grey Stone to make the tool that first unlocks it.
 
 ### 21.2 Minutes 10–25: first camp
 
-Build a campfire and construction table, prepare simple berry food, and fill water. Demonstrate manageable hunger and thirst. Three nearby glowing stones are bound by enchanted roots; clearing them through simple interaction or puzzles releases the first Life Orbs.
+Build a campfire and construction table, prepare simple berry food, and fill water. The first fire is the first reward: the tree lights up, the ward wakes, and far out in the mist someone has turned to look. Demonstrate manageable hunger and thirst. Three nearby glowing stones are bound by enchanted roots; clearing them through simple interaction or puzzles releases the first Life Orbs.
 
 ### 21.3 Minutes 25–40: awakening the portal
 
-Repair and activate the portal. Introduce the Misty Woods destination and a clear briefing: “Carried inventory is lost on death. Your deployed equipment returns damaged and can be repaired at home. Your home remains safe.” The first raid is comparatively controlled and contains no major boss.
+Repair and activate the portal. Sigrid's voice comes through the stones: Ingrid is hurt and close, find her first. Introduce the Misty Woods destination and a clear briefing: “Carried inventory is lost on death. Your deployed equipment returns damaged and can be repaired at home. Your home remains safe.” The first raid is comparatively controlled and contains no major boss.
 
 ### 21.4 Minutes 40–60: first raid
 
-Meet one Forest-Bitten Wolf and a Root Guardian, gather hardwood and ore, and discover a clearly signposted extraction point. An optional side path leads to a stranded traveler. A visible clock teaches the decision to return. The first extraction should be a memorable success.
+Meet one Forest-Bitten Wolf and a Root Guardian, gather hardwood and ore, and discover a clearly signposted extraction point. A side path leads to Ingrid, marked by the quest; she saw the fire, which proves the plan works. Finding her isn't needed to finish the raid: if she falls, she waits there for the next one. A visible clock teaches the decision to return. The first extraction should be a memorable success.
 
 ### 21.5 Minutes 60–90: a growing home
 
-Recovered loot unlocks the sawbench, storage, or early forge progress. A rescued traveler appears at home as the first NPC. A new blueprint reveals missing material from the next destination. End the introduction with two meaningful options: expand the home or attempt a harder expedition.
+Recovered loot unlocks the sawbench, storage, or early forge progress, each built for someone: Tor's bench, Bjarne's furnace. Ingrid appears at home as the first NPC. The light that reached her reached other things too, which is why the first ward breach comes now. Raising the haven to a Hamlet carries the light further, and answers it: a hammer on stone far to the north, past the troll country, is Bjarne, and the road to Troll Valley is the next goal. A new blueprint reveals missing material from the next destination. End the introduction with two meaningful options: expand the home or attempt a harder expedition.
 
 ## 22. Worked raid example and balance targets
 
@@ -941,7 +1049,7 @@ These decisions cover §21 and the first ward breach. All numbers are tuning def
 - **Resources and carrying:** materials are resource bars in four categories (Raw, Refined, Organic, Magical). Each resource holds up to 100, within a 150 weight budget. At home, crafting, building, and repairs also draw from storage.
 - **Building:** complete structures are placed freely, with a preview, inside the Heart Tree's ward radius. Building is instant, and structures can be moved for free.
 - **Tools and weapons:** weapons are crafted, equippable items (the Stone Axe first). The tool ladder is Stone → Copper → Iron, each gathering one tier further. Hardwood and iron ore need only stone tools. Copper and iron gear are made at the Forge.
-- **First recruit:** a Stranded Traveler on a side path in the Misty Woods. Enemies can attack her; if she falls, she stays behind for that raid. If she is extracted with the player, she becomes a resident. Her first job, Alchemist, teaches the Purification Altar: 2 Cursed Essence become 1 Purified Essence, in a queue that keeps working while she holds the job.
+- **First recruit:** Ingrid, stranded on a side path in the Misty Woods. Enemies can attack her; if she falls, she stays behind for that raid. If she is extracted with the player, she becomes a resident. Her first job, Alchemist, teaches the Purification Altar: 2 Cursed Essence become 1 Purified Essence, in a queue that keeps working while she holds the job.
 - **First Essence upgrade:** strengthening the Heart Tree's ward grows the buildable area.
 - **First ward breach:** offered after the first successful extraction, with a warning; the player starts it at the Heart Tree. A few weak Forest-Bitten Wolves come along one marked path and attack only the player; buildings can't be damaged. The Palisade is the first defense. Winning gives 2 Life Orbs. If the player falls, they revive at the Heart Tree and can try again.
 - **Next destination:** Troll Valley is shown but locked. A Forge Blueprint is found in the Misty Woods; building the Forge needs Trollstone.
@@ -957,7 +1065,20 @@ These decisions cover §21 and the first ward breach. All numbers are tuning def
 - Repairing the ruined portal costs 3 Life Orbs.
 - A Portal Spark costs 2 Life Orbs.
 
+**Decided October 30, 2026 (all numbers are tuning defaults):**
+- **Raid events:** the clock keeps running while the player chooses, and an event happens at most once a raid.
+- **Meals:** two meal slots; tonics take none. Bonuses survive the portal, not a failed raid, and aren't saved to file.
+- **Status effects:** a blocked hit leaves none, and they never count as blows.
+- **Farming:** crops are station recipes, so they grow during raids. Seeds come from raids.
+- **Copper gear** is made at the Construction Table, so it comes before the Forge.
+- **Graphics defaults** stay at the game as made. Trade-offs are the player's, in Options.
+- **Saved games:** unlimited, one per game, named by the player. A save stays when a new game starts.
+
 ### 26.2 Still open
+
+- How long should a raid be? The design says 12 minutes, but Misty Woods runs at 5 for now while its danger stages and exits are written for 12. No 12-minute raid has been played yet, so its pacing with events is untested.
+
+- How strong should the new gear, creatures and meals be? Their numbers are first estimates and none have been playtested.
 
 - Should any lost inventory be recoverable through a corpse or rescue raid?
 
@@ -965,7 +1086,7 @@ These decisions cover §21 and the first ward breach. All numbers are tuning def
 
 - Does the final danger phase permit extraction, or only warn of an unavoidable failure boundary?
 
-- What capacities and weight-to-speed curves should hand-dragged carts, wheelbarrows, and horse carts use, and how should their storage interact with per-resource caps?
+- What capacity and weight-to-speed curve should a horse cart use?
 
 - How many NPCs may join raids in later tiers, and can an NPC be permanently captured?
 
@@ -986,8 +1107,6 @@ These decisions cover §21 and the first ward breach. All numbers are tuning def
 - Can any NPC die permanently during a settlement defense event, or are injuries the highest allowed consequence?
 
 - Beyond the Palisade, should later defenses be traditional barricades, magical totems, or a combination?
-
-- Should Cursed Essence support optional risky enchants later, or remain exclusively a refining input?
 
 - Is the Corruption meter a meaningful later addition, or are skill-specific costs enough?
 

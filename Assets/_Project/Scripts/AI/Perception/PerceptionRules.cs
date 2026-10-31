@@ -84,10 +84,11 @@ public static class PerceptionRules
     /// <summary>
     /// The awareness a sound of <paramref name="radius"/> metres gives a monster <paramref name="distance"/> metres away:
     /// 0 beyond the radius (× its hearing), from Heard Awareness Far at the edge up to Heard Awareness Near at the source.
+    /// A sound <paramref name="muffled"/> by cover reaches only Heard Through Cover of that.
     /// </summary>
-    public static float HeardLevel(float distance, float radius, float hearing, PerceptionSettings rules)
+    public static float HeardLevel(float distance, float radius, float hearing, PerceptionSettings rules, bool muffled = false)
     {
-        float reach = radius * Mathf.Max(0f, hearing);
+        float reach = HeardReach(radius, hearing, rules, muffled);
         if (reach <= 0f || distance > reach)
         {
             return 0f;
@@ -95,5 +96,32 @@ public static class PerceptionRules
 
         float closeness = 1f - distance / reach;
         return Mathf.Lerp(rules.HeardAwarenessFar, rules.HeardAwarenessNear, closeness);
+    }
+
+    /// <summary>
+    /// How many metres off the real spot a monster may place a sound: Heard Spread At Edge at the limit of its reach,
+    /// nothing at the source, so a far sound brings it to look around and a near one straight to you.
+    /// </summary>
+    public static float HeardError(float distance, float radius, float hearing, PerceptionSettings rules, bool muffled = false)
+    {
+        float reach = HeardReach(radius, hearing, rules, muffled);
+        return reach > 0f ? rules.HeardSpreadAtEdge * Mathf.Clamp01(distance / reach) : 0f;
+    }
+
+    /// <summary>How much louder footsteps are for the gear worn: 1 up to the light load, Heavy Gear Noise from the heavy load.</summary>
+    public static float GearNoiseScale(float load, float lightLoad, float heavyLoad, PerceptionSettings rules)
+    {
+        return Mathf.Lerp(1f, rules.HeavyGearNoise, Mathf.InverseLerp(lightLoad, heavyLoad, load));
+    }
+
+    /// <summary>How far the player's noise carries in rain of this strength (0-1): all of it dry, Noise In Rain at the heaviest.</summary>
+    public static float RainNoiseScale(float rain, PerceptionSettings rules)
+    {
+        return Mathf.Lerp(1f, rules.NoiseInRain, Mathf.Clamp01(rain));
+    }
+
+    private static float HeardReach(float radius, float hearing, PerceptionSettings rules, bool muffled)
+    {
+        return radius * Mathf.Max(0f, hearing) * (muffled ? rules.HeardThroughCover : 1f);
     }
 }

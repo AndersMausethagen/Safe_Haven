@@ -28,7 +28,12 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
     [Tooltip("On: a dodge can cut a swing short while it winds up (it then deals no damage; its stamina is spent). Off: " +
              "a swing can only be dodged out of once it has landed, so every swing is a commitment.")]
     [SerializeField] private bool dodgeCancelsWindup = true;
-    [Tooltip("Movement speed while swinging, and while swinging heavy, as a share of normal.")]
+    [Tooltip("Movement speed from the start of a swing until its blow lands, as a share of normal. 0 plants the feet, so the whole " +
+             "body swings and a chain looks the same every time; only the attack's own lunge moves the player. Above 0 a swing started " +
+             "on the run plays on the arms over the running legs.")]
+    [SerializeField, Range(0f, 1f)] private float windupMoveSpeed;
+    [Tooltip("Movement speed once the blow has landed, for the rest of the swing, and the same after a heavy swing, as a share of normal. " +
+             "Walking off lets the arms finish the swing over the legs; the next attack still waits for the swing's recovery.")]
     [SerializeField, Range(0f, 1f)] private float swingMoveSpeed = 0.4f;
     [SerializeField, Range(0f, 1f)] private float heavyMoveSpeed = 0.15f;
     [Tooltip("A hit that gets through (not blocked) worth at least this share of the player's max health makes them flinch: a swing " +
@@ -107,6 +112,7 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
     public float RhythmSpeedPerStack => rhythmSpeedPerStack;
     public bool EarlyPressFumbles => earlyPressFumbles;
     public bool DodgeCancelsWindup => dodgeCancelsWindup;
+    public float WindupMoveSpeed => windupMoveSpeed;
     public float SwingMoveSpeed => swingMoveSpeed;
     public float HeavyMoveSpeed => heavyMoveSpeed;
     public float FlinchShare => flinchShare;

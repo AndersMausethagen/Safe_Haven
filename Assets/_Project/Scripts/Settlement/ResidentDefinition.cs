@@ -20,6 +20,8 @@ public sealed class ResidentDefinition : ScriptableObject
     [SerializeField, TextArea] private string rescueLine = "Thank you! Get me out of here and I'll follow you anywhere.";
     [Tooltip("Said when they arrive in Safe Haven.")]
     [SerializeField, TextArea] private string arrivalLine = "So this is your haven. I could be useful here.";
+    [Tooltip("Said when the player talks to them at home, until they have a job. Empty: their description.")]
+    [SerializeField, TextArea] private string welcomeLine;
     [Tooltip("Said when they fall in a raid and are left behind.")]
     [SerializeField, TextArea] private string fallenLine = "I can't go on... come back for me.";
 
@@ -36,6 +38,7 @@ public sealed class ResidentDefinition : ScriptableObject
     public string Description => description;
     public string RescueLine => rescueLine;
     public string ArrivalLine => arrivalLine;
+    public string WelcomeLine => welcomeLine;
     public string FallenLine => fallenLine;
     public GameObject Model => model;
     public JobDefinition[] Jobs => jobs;

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>What a repair costs: material items and essences. Both lists are empty for a free repair.</summary>
+/// <summary>What work on gear costs, a repair or empowering it: material items and essences. Both lists are empty when free.</summary>
 public sealed class RepairCost
 {
     public readonly List<ItemAmount> Items = new List<ItemAmount>();

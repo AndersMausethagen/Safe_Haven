@@ -35,6 +35,9 @@ public sealed class QuestDefinition : ScriptableObject
     [SerializeField] private QuestStart start = QuestStart.Automatically;
     [Tooltip("For On Quest Event: the event that starts the quest.")]
     [SerializeField] private GameEventDefinition startEvent;
+    [Tooltip("Automatically and On Quest Event: seconds to wait once it is ready, for a beat of its own (a breather before a big moment). " +
+             "0 uses Between Quests (Systems Editor › World › Story Pacing). Either way it also waits out a fight and anyone talking.")]
+    [SerializeField, Min(0f)] private float startDelay;
     [Tooltip("Custom events raised when this quest starts. Use them to drive scene listeners, weather, music and other quests.")]
     [SerializeField, RaisedByGame] private List<GameEventDefinition> onStarted = new List<GameEventDefinition>();
 
@@ -68,6 +71,7 @@ public sealed class QuestDefinition : ScriptableObject
     public IReadOnlyList<QuestDefinition> Prerequisites => prerequisites;
     public QuestStart Start => start;
     public GameEventDefinition StartEvent => startEvent;
+    public float StartDelay => startDelay;
     public IReadOnlyList<GameEventDefinition> OnStarted => onStarted;
     public IReadOnlyList<GameEventDefinition> OnCompleted => onCompleted;
     public bool ObjectivesInOrder => objectivesInOrder;
@@ -118,6 +122,11 @@ public sealed class QuestDefinition : ScriptableObject
         if (start == QuestStart.OnQuestEvent && startEvent == null)
         {
             problems.Add("Starts on a quest event, but none is chosen, so it never starts.");
+        }
+
+        if (start == QuestStart.ByQuestGiver && startDelay > 0f)
+        {
+            problems.Add("Has a Start Delay, but it starts when someone asks, so the delay is never used.");
         }
 
         if (prerequisites.Contains(this))

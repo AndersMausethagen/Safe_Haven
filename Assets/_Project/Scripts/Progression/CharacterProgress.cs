@@ -2,14 +2,15 @@ using System;
 using System.Collections.Generic;
 
 /// <summary>
-/// The player's permanent growth: level, experience towards the next level and the ranks bought in each talent, plus
-/// the items crafted at least once (for first-craft experience) and the experience stones already touched. Lives in GameSession (it belongs to the game, not to
+/// The player's permanent growth: level, experience towards the next level, the ranks bought in each talent and the ranks
+/// skills have been deepened to (GDD §16.4), plus the items crafted at least once (for first-craft experience) and the experience stones already touched. Lives in GameSession (it belongs to the game, not to
 /// the player object, so it survives every scene change) and is saved by SaveMapper. Plain C#, so the rules are
 /// testable; the numbers come from LevelingSettings.
 /// </summary>
 public sealed class CharacterProgress
 {
     private readonly Dictionary<string, int> ranks = new Dictionary<string, int>();
+    private readonly Dictionary<string, int> skillRanks = new Dictionary<string, int>();
     private readonly HashSet<string> crafted = new HashSet<string>();
     private readonly HashSet<string> stones = new HashSet<string>();
 
@@ -25,6 +26,7 @@ public sealed class CharacterProgress
     public event Action<int> LeveledUp;
 
     public IReadOnlyDictionary<string, int> Ranks => ranks;
+    public IReadOnlyDictionary<string, int> SkillRanks => skillRanks;
     public IEnumerable<string> CraftedItems => crafted;
     public IEnumerable<string> UsedStones => stones;
 
@@ -49,6 +51,19 @@ public sealed class CharacterProgress
     public bool IsMaxLevel(LevelingSettings settings) => Level >= settings.MaxLevel;
 
     public int RankOf(TalentDefinition talent) => talent != null && ranks.TryGetValue(talent.Id, out int rank) ? rank : 0;
+
+    /// <summary>How far a skill has been deepened at the altar. 0 is the skill as it was learned.</summary>
+    public int RankOf(SkillDefinition skill) => skill != null && skillRanks.TryGetValue(skill.Id, out int rank) ? rank : 0;
+
+    /// <summary>Deepens a skill one rank. What it costs and how far it goes are the altar's business (AltarWork).</summary>
+    public void DeepenSkill(SkillDefinition skill)
+    {
+        if (skill != null)
+        {
+            skillRanks[skill.Id] = RankOf(skill) + 1;
+            Changed?.Invoke();
+        }
+    }
 
     /// <summary>Points spent in one tree, which opens its later rows.</summary>
     public int SpentIn(TalentTree tree, LevelingSettings settings)
@@ -152,21 +167,12 @@ public sealed class CharacterProgress
 
     /// <summary>Puts back saved progress (loading).</summary>
     public void Restore(int level, int experience, IEnumerable<KeyValuePair<string, int>> savedRanks, IEnumerable<string> craftedItems,
-        IEnumerable<string> usedStones = null)
+        IEnumerable<string> usedStones = null, IEnumerable<KeyValuePair<string, int>> savedSkillRanks = null)
     {
         Level = Math.Max(1, level);
         Experience = Math.Max(0, experience);
-        ranks.Clear();
-        if (savedRanks != null)
-        {
-            foreach (KeyValuePair<string, int> entry in savedRanks)
-            {
-                if (!string.IsNullOrEmpty(entry.Key) && entry.Value > 0)
-                {
-                    ranks[entry.Key] = entry.Value;
-                }
-            }
-        }
+        Fill(ranks, savedRanks);
+        Fill(skillRanks, savedSkillRanks);
 
         crafted.Clear();
         if (craftedItems != null)
@@ -181,5 +187,22 @@ public sealed class CharacterProgress
         }
 
         Changed?.Invoke();
+    }
+
+    private static void Fill(Dictionary<string, int> into, IEnumerable<KeyValuePair<string, int>> saved)
+    {
+        into.Clear();
+        if (saved == null)
+        {
+            return;
+        }
+
+        foreach (KeyValuePair<string, int> entry in saved)
+        {
+            if (!string.IsNullOrEmpty(entry.Key) && entry.Value > 0)
+            {
+                into[entry.Key] = entry.Value;
+            }
+        }
     }
 }

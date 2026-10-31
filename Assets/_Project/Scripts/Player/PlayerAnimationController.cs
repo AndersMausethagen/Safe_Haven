@@ -25,6 +25,8 @@ public sealed class PlayerAnimationController : MonoBehaviour
     private static readonly int HasMoveInputHash = Animator.StringToHash("HasMoveInput");
     private static readonly int GroundedHash = Animator.StringToHash("Grounded");
     private static readonly int FreeFallHash = Animator.StringToHash("FreeFall");
+    // Crouches the whole body on the Sneak layer, over Base and under every action.
+    private static readonly int SneakingHash = Animator.StringToHash("Sneaking");
     // The GameState value, which selects the exploration or combat locomotion set.
     private static readonly int GameStateHash = Animator.StringToHash("GameState");
 
@@ -48,8 +50,9 @@ public sealed class PlayerAnimationController : MonoBehaviour
     private static readonly int GuardBreakStateHash = Animator.StringToHash("Guard Break");
     private static readonly int KnockbackStateHash = Animator.StringToHash("Knockback");
     private const float ActionFade = 0.06f;
-    // Moving faster than this, swings play on the arms only so the legs keep running.
+    // Moving faster than this, a swing belongs on the arms only, so the legs can walk.
     private const float ArmsOnlySpeed = 0.5f;
+    private const float WalkOutFade = 0.12f;
     // A hit worth this share of max health knocks the player back instead of a flinch.
     private const float KnockbackShare = 0.2f;
 
@@ -86,6 +89,7 @@ public sealed class PlayerAnimationController : MonoBehaviour
     private PlayerGuard guard;
     private PlayerEating eating;
     private PlayerSwimming swimming;
+    private PlayerStealth stealth;
     private static readonly int ConsumeStateHash = Animator.StringToHash("Consume");
     private int upperBodyLayer = -1;
     private int attackArmsLayer = -1;
@@ -138,6 +142,7 @@ public sealed class PlayerAnimationController : MonoBehaviour
         guard = GetComponent<PlayerGuard>();
         eating = GetComponent<PlayerEating>();
         swimming = GetComponent<PlayerSwimming>();
+        stealth = GetComponent<PlayerStealth>();
         animator = animator != null ? animator : GetComponentInChildren<Animator>();
 
         if (animator == null)
@@ -277,6 +282,31 @@ public sealed class PlayerAnimationController : MonoBehaviour
         UpdateLocomotion(deltaTime);
         UpdateTurn(deltaTime);
         UpdateAirborne(deltaTime);
+        WalkOutOfSwing();
+    }
+
+    // A blow that has landed gives the legs back: when the player walks off, the arms finish the swing over them from
+    // where the body had got to, instead of a whole-body swing skating along the ground.
+    private void WalkOutOfSwing()
+    {
+        if (combat == null || !combat.IsAttacking || combat.IsWindingUp || movement.HorizontalSpeed <= ArmsOnlySpeed
+            || fullBodyLayer < 0 || attackArmsLayer < 0 || animator.IsInTransition(fullBodyLayer))
+        {
+            return;
+        }
+
+        AnimatorStateInfo swing = animator.GetCurrentAnimatorStateInfo(fullBodyLayer);
+        if (swing.shortNameHash == EmptyStateHash)
+        {
+            return;
+        }
+
+        if (animator.HasState(attackArmsLayer, swing.shortNameHash))
+        {
+            animator.CrossFadeInFixedTime(swing.shortNameHash, WalkOutFade, attackArmsLayer, swing.normalizedTime * swing.length);
+        }
+
+        animator.CrossFadeInFixedTime(EmptyStateHash, WalkOutFade, fullBodyLayer);
     }
 
     private void OnValidate()
@@ -307,14 +337,15 @@ public sealed class PlayerAnimationController : MonoBehaviour
         SetTrigger(ShieldBashHash);
     }
 
-    // A swing with its own animation state plays it at once: with the whole body when standing (the legs step into the
-    // blow, which is what reads from above), on the arms only while running; one without uses the stance's older
-    // triggered attack.
+    // A swing with its own animation state plays it at once: with the whole body (the legs step into the blow, which is
+    // what reads from above), as a swing plants the feet. Only if the settings let the player run through a wind-up does it
+    // go on the arms. One without a state uses the stance's older triggered attack.
     private void OnSwingStarted(SwingInfo swing)
     {
         string stateName = swing.Attack != null ? swing.Attack.AnimationState : null;
         int standing = fullBodyLayer >= 0 ? fullBodyLayer : upperBodyLayer;
-        int layer = movement.HorizontalSpeed > ArmsOnlySpeed && attackArmsLayer >= 0 ? attackArmsLayer : standing;
+        bool onTheRun = CombatTechniqueSettings.Current.WindupMoveSpeed > 0f && movement.HorizontalSpeed > ArmsOnlySpeed;
+        int layer = onTheRun && attackArmsLayer >= 0 ? attackArmsLayer : standing;
         int hash = string.IsNullOrEmpty(stateName) ? 0 : Animator.StringToHash(stateName);
         if (hash == 0 || layer < 0 || !animator.HasState(layer, hash))
         {
@@ -494,6 +525,9 @@ public sealed class PlayerAnimationController : MonoBehaviour
 
         SetFloat(MotionSpeedHash, Mathf.Max(1f, movement.HorizontalSpeed / runClipSpeed));
         SetBool(HasMoveInputHash, !swim && movement.InputMagnitude > MoveInputThreshold);
+        // Off in the air, in the water and in death, where Base's own poses have to show.
+        bool alive = health == null || health.IsAlive;
+        SetBool(SneakingHash, stealth != null && stealth.IsSneaking && movement.IsGrounded && !swim && alive);
     }
 
     private bool IsSwimming => swimming != null && swimming.IsSwimming;

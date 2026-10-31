@@ -9,13 +9,12 @@ using TMPro;
 /// <summary>
 /// The crafting window opened at a crafting station (Construction Table, Furnace, Forge...). It shows:
 /// <list type="bullet">
-/// <item>The station's known recipes as an icon grid, split into tabs by what they make (RecipeTabs).</item>
-/// <item>The selected recipe's costs and a Queue button.</item>
+/// <item>A RecipeBrowser over the station's known recipes, to choose and queue them.</item>
 /// <item>The queue, with a progress bar for the craft being worked on.</item>
 /// <item>The output slot as its own grid. Clicking it collects.</item>
 /// <item>The station's extra actions (IStationMenuExtension: "Repair gear…", "Plan a raid") as buttons.</item>
 /// </list>
-/// Hovering a recipe, queued craft or output shows its stats and description in the tooltip.
+/// Hovering a queued craft or the output shows its stats and description in the tooltip.
 /// <para>
 /// It only reads the station's StationQueue and asks StationCrafting to queue, cancel and collect; the rules live there.
 /// It closes when the player walks away. Where it belongs: one StationWindow prefab (Prefabs/UI/StationWindow, built by
@@ -91,35 +90,14 @@ public sealed class StationWindow : MonoBehaviour
         }
     }
 
-    private static readonly Color SelectedTint = new Color(0.95f, 0.72f, 0.3f, 1f);
     private static readonly Color PlainTint = new Color(0.3f, 0.31f, 0.36f, 1f);
-    private static readonly Color TabColor = new Color(0.3f, 0.235f, 0.17f, 1f);
-    private static readonly Color ActiveTabColor = new Color(0.62f, 0.45f, 0.2f, 1f);
-    private static readonly Color WorkingFill = new Color(0.33f, 0.5f, 0.22f, 1f);
-    private static readonly Color BlockedFill = new Color(0.55f, 0.2f, 0.16f, 1f);
 
     [SerializeField] private UIWindow window;
     [SerializeField] private TMP_Text titleLabel;
     [SerializeField] private Button closeButton;
     [SerializeField] private ItemTooltipView tooltip;
     [SerializeField] private ItemSlotView slotPrefab;
-
-    [Header("Recipes")]
-    [Tooltip("Parent for the tab buttons. Should have a horizontal layout group.")]
-    [SerializeField] private RectTransform tabBar;
-    [Tooltip("A hidden button with a TMP label, copied for each tab.")]
-    [SerializeField] private Button tabTemplate;
-    [Tooltip("Parent for the recipe cells. Should have a GridLayoutGroup.")]
-    [SerializeField] private RectTransform recipeGrid;
-    [Tooltip("Shown instead of the grid when no recipes for this station are known.")]
-    [SerializeField] private TMP_Text emptyLabel;
-
-    [Header("Selected recipe")]
-    [SerializeField] private Image detailIcon;
-    [SerializeField] private TMP_Text detailName;
-    [Tooltip("Costs, craft time and why it can't be queued, with rich text.")]
-    [SerializeField] private TMP_Text detailBody;
-    [SerializeField] private Button queueButton;
+    [SerializeField] private RecipeBrowser recipes;
 
     [Header("Queue")]
     [Tooltip("Parent for the queued crafts. Should have a GridLayoutGroup.")]
@@ -132,7 +110,7 @@ public sealed class StationWindow : MonoBehaviour
     [Header("Output")]
     [Tooltip("Parent for the output cells. Should have a GridLayoutGroup.")]
     [SerializeField] private RectTransform outputGrid;
-    [SerializeField, Min(1)] private int outputCells = 8;
+    [SerializeField, Min(1)] private int outputCells = 4;
     [SerializeField] private TMP_Text outputLabel;
     [SerializeField] private Button collectButton;
 
@@ -145,45 +123,39 @@ public sealed class StationWindow : MonoBehaviour
     [Tooltip("Seconds between refreshes of costs, queue and output while open. The progress bar moves every frame.")]
     [SerializeField, Min(0.05f)] private float refreshInterval = 0.25f;
 
-    private readonly List<Button> tabButtons = new List<Button>();
     private readonly List<Button> actionButtons = new List<Button>();
     private readonly List<MenuAction> actions = new List<MenuAction>();
-    private List<RecipeTabs.Tab> tabs = new List<RecipeTabs.Tab>();
-    private SlotGrid recipes;
     private SlotGrid queued;
     private SlotGrid output;
     private CraftingStation station;
     private GameObject user;
     private PlayerCrafting crafting;
     private float range;
-    private string activeTab;
-    private RecipeDefinition selected;
     private int knownCount = -1;
     private float nextRefresh;
     private SlotGrid hoveredGrid;
     private int hoveredIndex = -1;
     private int[] outputAmounts = new int[0];
     private Image progressImage;
-
-    private List<RecipeDefinition> Shown => tabs.Count > 0 ? TabNamed(activeTab).Recipes : new List<RecipeDefinition>();
+    private TMP_Text collectLabel;
 
     private void Awake()
     {
-        recipes = new SlotGrid(recipeGrid, slotPrefab, OnRecipeClicked, OnHovered, OnUnhovered);
         queued = new SlotGrid(queueGrid, slotPrefab, null, OnHovered, OnUnhovered);
         output = new SlotGrid(outputGrid, slotPrefab, (index, data) => Collect(), OnHovered, OnUnhovered);
         progressImage = progressFill.GetComponent<Image>();
-        tabTemplate.gameObject.SetActive(false);
+        collectLabel = collectButton.GetComponentInChildren<TMP_Text>();
         actionTemplate.gameObject.SetActive(false);
         closeButton.onClick.AddListener(Close);
-        queueButton.onClick.AddListener(() => Queue(selected));
         cancelButton.onClick.AddListener(CancelLast);
         collectButton.onClick.AddListener(Collect);
+        recipes.Made += Refresh;
         window.OpenChanged += OnOpenChanged;
     }
 
     private void OnDestroy()
     {
+        recipes.Made -= Refresh;
         window.OpenChanged -= OnOpenChanged;
     }
 
@@ -198,8 +170,6 @@ public sealed class StationWindow : MonoBehaviour
         range = maxDistance;
         titleLabel.text = source.Type.DisplayName();
         knownCount = -1;
-        activeTab = null;
-        selected = null;
         hoveredGrid = null;
         tooltip.Hide();
         window.Open();
@@ -241,7 +211,7 @@ public sealed class StationWindow : MonoBehaviour
         progressFill.anchorMax = new Vector2(queue.Blocked ? 1f : fraction, 1f);
         if (progressImage != null)
         {
-            progressImage.color = queue.Blocked ? BlockedFill : WorkingFill;
+            progressImage.color = queue.Blocked ? UIStyle.Current.Danger : UIStyle.Current.Good;
         }
 
         tooltip.Follow(GameInput.PointerPosition);
@@ -267,162 +237,17 @@ public sealed class StationWindow : MonoBehaviour
         if (known.Count != knownCount)
         {
             knownCount = known.Count;
-            BuildTabs(known);
+            recipes.Show(new StationMaker(user, queue), known);
         }
-
-        if (selected != null && !known.Contains(selected))
+        else
         {
-            selected = null;
+            recipes.Refresh();
         }
 
-        RefreshRecipes(queue);
-        RefreshDetail(queue);
         RefreshQueue(queue);
         RefreshOutput(queue);
         RefreshActions();
         RefreshTooltip();
-    }
-
-    // ----- Recipes -----
-
-    private void BuildTabs(List<RecipeDefinition> known)
-    {
-        tabs = RecipeTabs.Build(known);
-        if (tabs.Count > 0 && TabNamed(activeTab) == null)
-        {
-            activeTab = tabs[0].Label;
-        }
-
-        // A single tab says nothing, so the bar only shows with two or more.
-        int shownTabs = tabs.Count > 1 ? tabs.Count : 0;
-        while (tabButtons.Count < shownTabs)
-        {
-            Button button = Instantiate(tabTemplate, tabBar);
-            int index = tabButtons.Count;
-            button.onClick.AddListener(() => SelectTab(index));
-            tabButtons.Add(button);
-        }
-
-        for (int i = 0; i < tabButtons.Count; i++)
-        {
-            bool used = i < shownTabs;
-            tabButtons[i].gameObject.SetActive(used);
-            if (used)
-            {
-                tabButtons[i].name = "Tab " + tabs[i].Label;
-                tabButtons[i].GetComponentInChildren<TMP_Text>().text = $"{tabs[i].Label} <size=12>({tabs[i].Recipes.Count})</size>";
-            }
-        }
-
-        tabBar.gameObject.SetActive(shownTabs > 0);
-        emptyLabel.gameObject.SetActive(known.Count == 0);
-        PaintTabs();
-    }
-
-    private RecipeTabs.Tab TabNamed(string label)
-    {
-        foreach (RecipeTabs.Tab tab in tabs)
-        {
-            if (tab.Label == label)
-            {
-                return tab;
-            }
-        }
-
-        return null;
-    }
-
-    private void SelectTab(int index)
-    {
-        if (index < 0 || index >= tabs.Count)
-        {
-            return;
-        }
-
-        activeTab = tabs[index].Label;
-        PaintTabs();
-        Refresh();
-    }
-
-    private void PaintTabs()
-    {
-        for (int i = 0; i < tabButtons.Count && i < tabs.Count; i++)
-        {
-            if (tabButtons[i].targetGraphic != null)
-            {
-                tabButtons[i].targetGraphic.color = tabs[i].Label == activeTab ? ActiveTabColor : TabColor;
-            }
-        }
-    }
-
-    private void RefreshRecipes(StationQueue queue)
-    {
-        List<RecipeDefinition> shown = Shown;
-        recipes.Resize(shown.Count);
-        for (int i = 0; i < shown.Count; i++)
-        {
-            RecipeDefinition recipe = shown[i];
-            bool canQueue = StationCrafting.Check(user, queue, recipe) == null;
-            Color tint = recipe == selected ? SelectedTint : TintOf(recipe.OutputDefinition);
-            string badge = recipe.OutputAmount > 1 ? "×" + recipe.OutputAmount : "";
-            recipes.Views[i].Show(recipe.OutputIcon, tint, Tiers.ToRoman(recipe.Tier), badge, !canQueue);
-        }
-    }
-
-    private void OnRecipeClicked(int index, PointerEventData eventData)
-    {
-        List<RecipeDefinition> shown = Shown;
-        if (index < 0 || index >= shown.Count)
-        {
-            return;
-        }
-
-        selected = shown[index];
-        // Right-click or double-click queues straight away.
-        if (eventData.button == PointerEventData.InputButton.Right || eventData.clickCount >= 2)
-        {
-            Queue(selected);
-        }
-        else
-        {
-            Refresh();
-        }
-    }
-
-    private void RefreshDetail(StationQueue queue)
-    {
-        bool has = selected != null;
-        detailIcon.enabled = has && selected.OutputIcon != null;
-        detailIcon.sprite = has ? selected.OutputIcon : null;
-        queueButton.gameObject.SetActive(has);
-        if (!has)
-        {
-            detailName.text = knownCount > 0 ? "Choose a recipe" : "";
-            detailBody.text = knownCount > 0 ? "<color=#AAB0BC>Click a recipe to see what it costs. Right-click or double-click queues it.</color>" : "";
-            return;
-        }
-
-        string amount = selected.OutputAmount > 1 ? $" ×{selected.OutputAmount}" : "";
-        detailName.text = $"{selected.DisplayName}{amount}  <size=14>{Tiers.RichLabel(selected.Tier)}</size>";
-        string problem = StationCrafting.Check(user, queue, selected);
-        string body = "<b>Costs</b>" + ItemTooltipView.DescribeCosts(selected, crafting)
-            + $"\n<color=#AAB0BC>Takes {ItemTooltipView.FormatSeconds(selected.CraftSeconds)}</color>";
-        if (problem != null)
-        {
-            body += $"\n<color=#FF7B6B>{problem}</color>";
-        }
-
-        detailBody.text = body;
-        queueButton.interactable = problem == null;
-    }
-
-    private void Queue(RecipeDefinition recipe)
-    {
-        if (station != null && recipe != null)
-        {
-            StationCrafting.TryQueue(user, station.Queue, recipe);
-            Refresh();
-        }
     }
 
     // ----- Queue and output -----
@@ -437,7 +262,7 @@ public sealed class StationWindow : MonoBehaviour
             {
                 RecipeDefinition recipe = jobs[i].Recipe;
                 string badge = jobs[i].Count > 1 ? "×" + jobs[i].Count : "";
-                queued.Views[i].Show(recipe.OutputIcon, i == 0 ? SelectedTint : TintOf(recipe.OutputDefinition), "", badge);
+                queued.Views[i].Show(recipe.OutputIcon, i == 0 ? UIStyle.Current.Accent : TintOf(recipe.OutputDefinition), "", badge);
             }
             else
             {
@@ -447,7 +272,7 @@ public sealed class StationWindow : MonoBehaviour
 
         if (queue.Current == null)
         {
-            progressLabel.text = "<color=#AAB0BC>Idle – queue a recipe</color>";
+            progressLabel.text = "Idle: queue a recipe";
         }
         else if (queue.Blocked)
         {
@@ -498,9 +323,10 @@ public sealed class StationWindow : MonoBehaviour
 
         string name = thing is IDisplayName named ? named.DisplayName : "";
         outputLabel.text = thing != null
-            ? $"Output  <color=#AAB0BC>{queue.OutputAmount}/{queue.Capacity} {name}</color>"
-            : $"Output  <color=#AAB0BC>empty (holds {queue.Capacity})</color>";
+            ? $"Output  <color=#{Muted}>{queue.OutputAmount}/{queue.Capacity} {name}</color>"
+            : $"Output  <color=#{Muted}>empty (holds {queue.Capacity})</color>";
         collectButton.interactable = thing != null;
+        collectLabel.text = thing != null ? $"Collect {queue.OutputAmount} {name}" : "Collect";
     }
 
     private void Collect()
@@ -587,16 +413,7 @@ public sealed class StationWindow : MonoBehaviour
         }
 
         StationQueue queue = station.Queue;
-        if (hoveredGrid == recipes)
-        {
-            List<RecipeDefinition> shown = Shown;
-            if (hoveredIndex < shown.Count)
-            {
-                tooltip.ShowRecipe(shown[hoveredIndex], crafting, StationCrafting.Check(user, queue, shown[hoveredIndex]));
-                return;
-            }
-        }
-        else if (hoveredGrid == queued)
+        if (hoveredGrid == queued)
         {
             if (hoveredIndex < queue.Jobs.Count)
             {
@@ -614,6 +431,8 @@ public sealed class StationWindow : MonoBehaviour
     }
 
     // ----- Helpers -----
+
+    private static string Muted => ColorUtility.ToHtmlStringRGB(UIStyle.Current.Muted);
 
     private static Sprite IconOf(UnityEngine.Object definition)
     {

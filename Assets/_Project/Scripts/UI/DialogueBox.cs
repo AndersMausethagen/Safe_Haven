@@ -71,6 +71,11 @@ public sealed class DialogueBox : MonoBehaviour
     private const float InputDelay = 0.2f;
     private const float WalkAwayDistance = 6f;
     private const float PanelWidth = 1060f;
+    // The portrait's share of the box, which a voice with no face speaks into.
+    private const float FaceWidth = 226f;
+    private const float NameX = 530f;
+    private const float LineX = 510f;
+    private const float LineWidth = 480f;
     private const float PanelHeight = 250f;
     private const float AnswerRowHeight = 46f;
     private const float AnswerRowStep = 52f;
@@ -80,12 +85,12 @@ public sealed class DialogueBox : MonoBehaviour
     private const float SubtitleMaxSeconds = 8f;
     private const float FightCheckInterval = 0.25f;
 
-    private static readonly Color Panel = new Color(0.075f, 0.062f, 0.05f, 0.95f);
-    private static readonly Color Rim = new Color(0.64f, 0.49f, 0.29f, 0.9f);
-    private static readonly Color Title = new Color(0.91f, 0.77f, 0.42f, 1f);
-    private static readonly Color Body = new Color(0.93f, 0.89f, 0.8f, 1f);
-    private static readonly Color ButtonColour = new Color(0.3f, 0.235f, 0.17f, 1f);
-    private static readonly Color ButtonOff = new Color(0.18f, 0.15f, 0.12f, 1f);
+    private static Color Panel => UIStyle.Current.Panel;
+    private static Color Rim => UIStyle.Current.Rim;
+    private static Color Title => UIStyle.Current.Accent;
+    private static Color Body => UIStyle.Current.Text;
+    private static Color ButtonColour => UIStyle.Current.ControlLit;
+    private static Color ButtonOff => UIStyle.Current.Control;
 
     private static DialogueBox current;
 
@@ -94,6 +99,7 @@ public sealed class DialogueBox : MonoBehaviour
     private UIWindow window;
     private GameObject content;
     private RectTransform answerColumn;
+    private GameObject portraitFrame;
     private RawImage portrait;
     private Image picture;
     private TMP_Text nameLabel;
@@ -134,6 +140,9 @@ public sealed class DialogueBox : MonoBehaviour
 
     /// <summary>True while a line is shown.</summary>
     public static bool IsOpen => current != null && current.window != null && current.window.IsOpen;
+
+    /// <summary>True while anyone is talking: a line in the box or a subtitle.</summary>
+    public static bool IsSpeaking => IsOpen || (current != null && current.IsSubtitling);
 
     /// <summary>Raised when the box closes (moved on past the last line, walked away or closed).</summary>
     public event Action Closed;
@@ -236,6 +245,7 @@ public sealed class DialogueBox : MonoBehaviour
         picture.gameObject.SetActive(!live && speaker.Portrait != null);
         picture.sprite = speaker.Portrait;
         portraitCamera.Show(live ? speaker.Model : null);
+        LayOutFor(live || speaker.Portrait != null);
         Frame(speaker.Model, speaker.CameraDistance);
         // Walking away ends a conversation with someone standing beside the player, not a shout from afar.
         bool beside = speaker.Model != null && global::Player.Current != null && speaker.Model != global::Player.Current.transform &&
@@ -267,6 +277,16 @@ public sealed class DialogueBox : MonoBehaviour
         }
 
         UpdateHint();
+    }
+
+    // The tree and a voice through the stones have no face to show, so their words take its place.
+    private void LayOutFor(bool hasFace)
+    {
+        float freed = hasFace ? 0f : FaceWidth;
+        portraitFrame.SetActive(hasFace);
+        nameLabel.rectTransform.anchoredPosition = new Vector2(NameX - freed, nameLabel.rectTransform.anchoredPosition.y);
+        lineLabel.rectTransform.sizeDelta = new Vector2(LineWidth + freed, lineLabel.rectTransform.sizeDelta.y);
+        lineLabel.rectTransform.anchoredPosition = new Vector2(LineX - freed / 2f, lineLabel.rectTransform.anchoredPosition.y);
     }
 
     private bool Revealed => lineLabel.maxVisibleCharacters >= letters;
@@ -515,6 +535,7 @@ public sealed class DialogueBox : MonoBehaviour
 
         RectTransform frame = Rect("Portrait Frame", panel, new Vector2(0f, 0.5f), new Vector2(206f, 206f), new Vector2(125f, 0f));
         frame.gameObject.AddComponent<Image>().color = Rim;
+        box.portraitFrame = frame.gameObject;
         RectTransform face = Rect("Portrait", frame, new Vector2(0.5f, 0.5f), new Vector2(198f, 198f), Vector2.zero);
         box.portraitCamera = DialoguePortrait.Create();
         box.portrait = face.gameObject.AddComponent<RawImage>();
@@ -523,9 +544,9 @@ public sealed class DialogueBox : MonoBehaviour
         box.picture = still.gameObject.AddComponent<Image>();
         box.picture.preserveAspect = true;
 
-        box.nameLabel = Text("Name", panel, 28f, Title, new Vector2(0f, 1f), new Vector2(560f, 40f), new Vector2(530f, -36f), TextAlignmentOptions.Left);
+        box.nameLabel = Text("Name", panel, 28f, Title, new Vector2(0f, 1f), new Vector2(560f, 40f), new Vector2(NameX, -36f), TextAlignmentOptions.Left);
         box.nameLabel.fontStyle = FontStyles.Bold;
-        box.lineLabel = Text("Line", panel, 24f, Body, new Vector2(0f, 1f), new Vector2(480f, 175f), new Vector2(510f, -140f), TextAlignmentOptions.TopLeft);
+        box.lineLabel = Text("Line", panel, 24f, Body, new Vector2(0f, 1f), new Vector2(LineWidth, 175f), new Vector2(LineX, -140f), TextAlignmentOptions.TopLeft);
         // Long lines (a leader's briefing) shrink to fit rather than run out of the box.
         box.lineLabel.enableAutoSizing = true;
         box.lineLabel.fontSizeMin = 15f;

@@ -3,16 +3,19 @@ using System.Text;
 using UnityEngine;
 
 /// <summary>
-/// A supply cache found in raids: a chest, a crate, a fallen traveller's pack. Searching it (its Interactable) rolls the
-/// loot table once, scaled by the raid's loot modifier, and hands the player what fits: items to the bag, resources to the
+/// A supply cache found in raids: a chest, a crate, a fallen traveller's pack. A chest is locked: the player has to pick it
+/// first (PlayerLockpicking), which is heard, and so is its lid coming up. Searching it (its Interactable) rolls the loot
+/// table once, scaled by the raid's loot modifier, and hands the player what fits: items to the bag, resources to the
 /// resource bars. Whatever doesn't fit stays inside for another search; once empty it shows its empty look and can't be
-/// searched again. The Interactable beside it must not deactivate on completion.
+/// searched again. The Interactable beside it must be Work, not Use, and must not deactivate on completion.
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Interactable))]
-public sealed class LootCache : MonoBehaviour
+public sealed class LootCache : MonoBehaviour, IInteractionVerb
 {
     [SerializeField] private ItemDropTable drops = new ItemDropTable();
+    [Tooltip("Pins in its lock, each a press of the lockpicking bar. 0: no lock, as on a fallen traveller's pack.")]
+    [SerializeField, Range(0, 6)] private int lockPins = 3;
     [Tooltip("Shown while the cache still holds something, such as a closed lid. Optional.")]
     [SerializeField] private GameObject fullVisual;
     [Tooltip("Shown once the cache is empty, such as an open lid. Optional.")]
@@ -22,9 +25,24 @@ public sealed class LootCache : MonoBehaviour
     private readonly List<ResourceAmount> resourceContents = new List<ResourceAmount>();
     private Interactable interactable;
     private bool rolled;
+    private bool unlocked;
+    private bool forced;
 
     public ItemDropTable Drops => drops;
     public bool IsEmpty => rolled && contents.Count == 0 && resourceContents.Count == 0;
+    public int LockPins => lockPins;
+
+    /// <summary>True until its lock has been opened. Nothing is ever locked without pins.</summary>
+    public bool IsLocked => lockPins > 0 && !unlocked;
+
+    public string Verb => IsLocked ? "Pick the lock" : "Search";
+
+    /// <summary>The lock is open. <paramref name="byForce"/>: it broke, which was its own noise, so the lid adds none.</summary>
+    public void Unlock(bool byForce)
+    {
+        unlocked = true;
+        forced = byForce;
+    }
 
     private void Awake()
     {
@@ -59,6 +77,7 @@ public sealed class LootCache : MonoBehaviour
         if (!rolled)
         {
             Fill();
+            LiftLid(searcher);
         }
 
         if (contents.Count == 0 && resourceContents.Count == 0)
@@ -92,6 +111,23 @@ public sealed class LootCache : MonoBehaviour
         }
 
         ShowState();
+    }
+
+    // A chest's lid is heard however well the lock was picked; a pack without a lock opens silently.
+    private void LiftLid(GameObject searcher)
+    {
+        if (lockPins <= 0 || forced)
+        {
+            return;
+        }
+
+        LockpickingSettings settings = LockpickingSettings.Current;
+        AudioManager.Play(settings.OpenSound, transform.position);
+        PlayerNoise noise = searcher.GetComponentInParent<PlayerNoise>();
+        if (noise != null)
+        {
+            noise.Make(transform.position, settings.OpenNoise);
+        }
     }
 
     private void Fill()

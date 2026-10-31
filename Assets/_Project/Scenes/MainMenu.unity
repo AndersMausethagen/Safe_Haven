@@ -178,8 +178,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: AN ASHLAD'S TALE
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 2e36a575c28e2b14da05954bc26038fb, type: 2}
+  m_sharedMaterial: {fileID: -1336890024668442373, guid: 2e36a575c28e2b14da05954bc26038fb, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -537,8 +537,8 @@ MonoBehaviour:
 
     the old stories begin.'
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 2e36a575c28e2b14da05954bc26038fb, type: 2}
+  m_sharedMaterial: {fileID: -1336890024668442373, guid: 2e36a575c28e2b14da05954bc26038fb, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -766,8 +766,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: CONTINUE YOUR TALE
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 2e36a575c28e2b14da05954bc26038fb, type: 2}
+  m_sharedMaterial: {fileID: -1336890024668442373, guid: 2e36a575c28e2b14da05954bc26038fb, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -903,8 +903,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: LEAVE THE FOREST
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 2e36a575c28e2b14da05954bc26038fb, type: 2}
+  m_sharedMaterial: {fileID: -1336890024668442373, guid: 2e36a575c28e2b14da05954bc26038fb, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1312,8 +1312,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: 
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 2e36a575c28e2b14da05954bc26038fb, type: 2}
+  m_sharedMaterial: {fileID: -1336890024668442373, guid: 2e36a575c28e2b14da05954bc26038fb, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1466,6 +1466,9 @@ MonoBehaviour:
   newGameButton: {fileID: 944248883}
   loadGameButton: {fileID: 1583193345}
   exitButton: {fileID: 383159040}
+  savesButton: {fileID: 0}
+  optionsButton: {fileID: 0}
+  buttonSpacing: 72
   saveInfoLabel: {fileID: 2044175529}
   statusLabel: {fileID: 1018731605}
 --- !u!114 &1156488955
@@ -1787,8 +1790,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: GATHER  /  CRAFT  /  SURVIVE  /  RETURN
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 2e36a575c28e2b14da05954bc26038fb, type: 2}
+  m_sharedMaterial: {fileID: -1336890024668442373, guid: 2e36a575c28e2b14da05954bc26038fb, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1916,8 +1919,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: NORWEGIAN FOLKTALE  /  DARK FANTASY
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 2e36a575c28e2b14da05954bc26038fb, type: 2}
+  m_sharedMaterial: {fileID: -1336890024668442373, guid: 2e36a575c28e2b14da05954bc26038fb, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -2183,8 +2186,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: BEGIN YOUR TALE
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 2e36a575c28e2b14da05954bc26038fb, type: 2}
+  m_sharedMaterial: {fileID: -1336890024668442373, guid: 2e36a575c28e2b14da05954bc26038fb, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -2551,8 +2554,8 @@ MonoBehaviour:
 
     HAVEN'
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 41c1322f4c5c25c4c9626819be7d54c3, type: 2}
-  m_sharedMaterial: {fileID: -720554718684597472, guid: 41c1322f4c5c25c4c9626819be7d54c3, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 8579b3dc74ca4a64290753d5efddd637, type: 2}
+  m_sharedMaterial: {fileID: 6194868050850285253, guid: 8579b3dc74ca4a64290753d5efddd637, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -2589,7 +2592,7 @@ MonoBehaviour:
   m_characterSpacing: 5
   m_characterHorizontalScale: 1
   m_wordSpacing: 0
-  m_lineSpacing: -12
+  m_lineSpacing: -34
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
@@ -2749,8 +2752,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Your story awaits.
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 2e36a575c28e2b14da05954bc26038fb, type: 2}
+  m_sharedMaterial: {fileID: -1336890024668442373, guid: 2e36a575c28e2b14da05954bc26038fb, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []

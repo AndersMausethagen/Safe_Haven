@@ -288,7 +288,7 @@ public sealed class SavesScreen : MonoBehaviour
             add("Overwrite", () => AskOverwrite(save), !playing && SaveGameService.CheckSave() == null);
         }
 
-        add("Load", () => AskLoad(save), save.IsReadable);
+        add("Load", () => AskLoad(save), save.IsReadable && SaveGameService.CheckLoad() == null);
     }
 
     // ----- Actions -----

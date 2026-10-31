@@ -46,7 +46,7 @@ public readonly struct SwingZones
 /// widens the critical zone up to a cap, any other result resets it. A whole up-and-down cycle without a press is a
 /// glancing blow, so leaving the game alone still finishes the node, just badly. Driven by PlayerGathering.
 /// </summary>
-public sealed class GatheringSession
+public sealed class GatheringSession : ITimingBar
 {
     private readonly float cycleSeconds;
     private readonly float normalWidth;
@@ -92,6 +92,8 @@ public sealed class GatheringSession
     public float Position => phase < 0.5f ? phase * 2f : 2f - phase * 2f;
 
     public SwingZones Zones { get; private set; }
+
+    public string Counter => $"{Mathf.Min(SwingsDone + 1, SwingsRequired)}/{SwingsRequired}{(Combo > 1 ? $"  x{Combo}" : "")}";
 
     /// <summary>Moves the marker. When a whole cycle passes without a press the swing resolves as a glancing blow.</summary>
     /// <returns>True when this tick timed a swing out.</returns>

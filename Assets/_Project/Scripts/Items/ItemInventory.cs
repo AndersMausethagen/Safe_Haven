@@ -160,6 +160,11 @@ public sealed class ItemInventory : MonoBehaviour
             return Study(from, slot, item);
         }
 
+        if (item.Transport != null)
+        {
+            return TransportDeployment.Deploy(gameObject, from, slot);
+        }
+
         if (item.Experience > 0)
         {
             // Reading a rune book: the experience is granted by whoever listens (ExperienceTracker).

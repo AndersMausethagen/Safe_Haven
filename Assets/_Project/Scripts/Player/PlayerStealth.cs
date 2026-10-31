@@ -1,10 +1,9 @@
 using UnityEngine;
 
 /// <summary>
-/// How noticeable the player is: sneaking (hold Left Ctrl / left bumper) slows them down and makes them harder to see
-/// and quieter; standing still helps a little; fighting makes them stand out. Also makes the player's noise: footsteps,
-/// dodges and every hit they land or take go out through WorldNoise for monsters to hear. Numbers are in
-/// PerceptionSettings (Systems Editor › World › Senses & Stealth).
+/// How noticeable the player is to the eye: sneaking (hold Left Ctrl / left bumper) slows them down and makes them harder
+/// to see; standing still helps a little; fighting makes them stand out. The sounds they make are PlayerNoise's. Numbers
+/// are in PerceptionSettings (Systems Editor › World › Senses & Stealth).
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(PlayerMovement))]
@@ -15,9 +14,7 @@ public sealed class PlayerStealth : MonoBehaviour
     private Damageable health;
     private Combatant combatant;
     private bool sneakRequested;
-    private float nextStepAt;
     private float fightingUntil = -1f;
-    private float nextCombatNoiseAt;
 
     /// <summary>True while the player sneaks (held, and not dodging).</summary>
     public bool IsSneaking => sneakRequested && (dodge == null || !dodge.IsDodging);
@@ -59,20 +56,11 @@ public sealed class PlayerStealth : MonoBehaviour
     private void OnEnable()
     {
         Damageable.AnyDamaged += OnAnyDamaged;
-        if (dodge != null)
-        {
-            dodge.DodgeStarted += OnDodgeStarted;
-        }
     }
 
     private void OnDisable()
     {
         Damageable.AnyDamaged -= OnAnyDamaged;
-        if (dodge != null)
-        {
-            dodge.DodgeStarted -= OnDodgeStarted;
-        }
-
         SetSneaking(false);
     }
 
@@ -93,40 +81,12 @@ public sealed class PlayerStealth : MonoBehaviour
         SneakChanged?.Invoke(sneaking);
     }
 
-    private void Update()
-    {
-        if (!movement.IsMoving || !movement.IsGrounded || movement.IsDashing || Time.time < nextStepAt)
-        {
-            return;
-        }
-
-        PerceptionSettings rules = PerceptionSettings.Current;
-        nextStepAt = Time.time + rules.FootstepInterval;
-        WorldNoise.Emit(transform.position, IsSneaking ? rules.SneakingFootstepNoise : rules.FootstepNoise);
-    }
-
-    private void OnDodgeStarted(DodgeStyle style, DodgeShape shape)
-    {
-        WorldNoise.Emit(transform.position, PerceptionSettings.Current.DodgeNoise);
-    }
-
-    // Hits the player lands or takes: they stand out for a while, and the fight is heard (at most every interval).
+    // Hits the player lands or takes make them stand out for a while.
     private void OnAnyDamaged(Damageable victim, DamageInfo damage, DamageResult result)
     {
-        bool involved = victim == health || (combatant != null && damage.Source == combatant);
-        if (!involved)
+        if (victim == health || (combatant != null && damage.Source == combatant))
         {
-            return;
+            fightingUntil = Time.time + PerceptionSettings.Current.FightingSeconds;
         }
-
-        PerceptionSettings rules = PerceptionSettings.Current;
-        fightingUntil = Time.time + rules.FightingSeconds;
-        if (Time.time < nextCombatNoiseAt)
-        {
-            return;
-        }
-
-        nextCombatNoiseAt = Time.time + rules.CombatNoiseInterval;
-        WorldNoise.Emit(victim.transform.position, rules.CombatNoise);
     }
 }

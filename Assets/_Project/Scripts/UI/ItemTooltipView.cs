@@ -33,7 +33,7 @@ public sealed class ItemTooltipView : MonoBehaviour
         }
 
         ItemDefinition item = stack.Item;
-        Show(item.DisplayName, Rarity.ColorOf(item.Rarity), Describe(item, stack));
+        Show(stack.DisplayName, Rarity.ColorOf(item.Rarity), Describe(item, stack));
     }
 
     /// <summary>Shows a new item or a resource (an ItemDefinition or ResourceDefinition), such as a station's output.</summary>
@@ -72,18 +72,23 @@ public sealed class ItemTooltipView : MonoBehaviour
         Show(recipe.DisplayName + amount, color, DescribeRecipe(recipe, crafting, problem));
     }
 
-    public static string DescribeRecipe(RecipeDefinition recipe, PlayerCrafting crafting, string problem)
+    /// <summary>What the Show tooltip says about a held stack, for windows that show it in place.</summary>
+    public static string DescribeStack(ItemStack stack) => Describe(stack.Item, stack);
+
+    /// <summary>What a recipe makes: the item's stats and description, or the resource's.</summary>
+    public static string DescribeOutput(RecipeDefinition recipe)
     {
-        var builder = new StringBuilder();
         if (recipe.Output != null)
         {
-            builder.Append(Describe(recipe.Output, null));
-        }
-        else if (recipe.OutputResource != null)
-        {
-            builder.Append(DescribeResource(recipe.OutputResource));
+            return Describe(recipe.Output, null);
         }
 
+        return recipe.OutputResource != null ? DescribeResource(recipe.OutputResource) : "";
+    }
+
+    public static string DescribeRecipe(RecipeDefinition recipe, PlayerCrafting crafting, string problem)
+    {
+        var builder = new StringBuilder(DescribeOutput(recipe));
         builder.Append("\n\n<b>Costs</b>").Append(DescribeCosts(recipe, crafting));
         string where = recipe.IsHandcrafted ? "By hand" : recipe.Station.DisplayName();
         string time = recipe.IsHandcrafted ? "" : $"  ·  {FormatSeconds(recipe.CraftSeconds)}";
@@ -203,6 +208,11 @@ public sealed class ItemTooltipView : MonoBehaviour
             builder.Append("\n<color=#8BE08B>").Append(bonus.Describe()).Append("</color>");
         }
 
+        if (held)
+        {
+            AppendEssenceWork(builder, stack.Value);
+        }
+
         if (item.HasDurability && held)
         {
             ItemStack worn = stack.Value;
@@ -292,6 +302,25 @@ public sealed class ItemTooltipView : MonoBehaviour
         }
 
         return builder.ToString();
+    }
+
+    private static void AppendEssenceWork(StringBuilder builder, ItemStack stack)
+    {
+        foreach (StatBonus bonus in GearPower.EmpowerBonuses(stack.Item, stack.Empower, EssenceSettings.Current))
+        {
+            builder.Append("\n<color=#E8C46A>").Append(bonus.Describe()).Append(" (empowered)</color>");
+        }
+
+        if (stack.Enchantment == null)
+        {
+            return;
+        }
+
+        builder.Append($"\n\n<color=#E8C46A>{stack.Enchantment.DisplayName}</color>");
+        foreach (StatBonus bonus in stack.Enchantment.Bonuses)
+        {
+            builder.Append(bonus.value >= 0f ? "\n<color=#8BE08B>" : "\n<color=#FF7B6B>").Append(bonus.Describe()).Append("</color>");
+        }
     }
 
     /// <summary>"+3 Strength, +15 Max Stamina".</summary>

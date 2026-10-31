@@ -12,6 +12,8 @@ GameObject:
   - component: {fileID: 8034139743647951238}
   - component: {fileID: 3242962919146029352}
   - component: {fileID: 6335682346606635300}
+  - component: {fileID: 7934637510641176542}
+  - component: {fileID: 4427882621031575409}
   m_Layer: 5
   m_Name: ItemSlot
   m_TagString: Untagged
@@ -62,7 +64,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0.12, g: 0.13, b: 0.16, a: 0.9}
+  m_Color: {r: 0.112, g: 0.1, b: 0.085, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -95,12 +97,40 @@ MonoBehaviour:
   icon: {fileID: 1759093819731827574}
   countLabel: {fileID: 5737754022991339829}
   tierLabel: {fileID: 4226612308053486363}
-  emptyColor: {r: 0.12, g: 0.13, b: 0.16, a: 0.9}
-  filledColor: {r: 0.18, g: 0.19, b: 0.23, a: 0.95}
-  hoverColor: {r: 0.28, g: 0.3, b: 0.36, a: 1}
-  lockedColor: {r: 0.05, g: 0.05, b: 0.06, a: 0.3}
+  emptyColor: {r: 0.112, g: 0.1, b: 0.085, a: 1}
+  filledColor: {r: 0.15, g: 0.133, b: 0.11, a: 1}
+  hoverColor: {r: 0.25, g: 0.215, b: 0.17, a: 1}
+  lockedColor: {r: 0.075, g: 0.066, b: 0.055, a: 1}
   equippedColor: {r: 0.86, g: 0.66, b: 0.3, a: 1}
   rarityTint: 0.45
+--- !u!114 &7934637510641176542
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1032395063846245944}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a96014eda549d241a626058dc63c7bf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::UIRole
+  kind: 2
+--- !u!114 &4427882621031575409
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1032395063846245944}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Outline
+  m_EffectColor: {r: 0.925, g: 0.894, b: 0.827, a: 0.09}
+  m_EffectDistance: {x: 1, y: -1}
+  m_UseGraphicAlpha: 1
 --- !u!1 &1736659633979615062
 GameObject:
   m_ObjectHideFlags: 0
@@ -243,15 +273,15 @@ MonoBehaviour:
       m_Calls: []
   m_text: 
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2100000, guid: e73a58f6e2794ae7b1b7e50b7fb811b0, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 2e36a575c28e2b14da05954bc26038fb, type: 2}
+  m_sharedMaterial: {fileID: -1336890024668442373, guid: 2e36a575c28e2b14da05954bc26038fb, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontColor: {r: 0.93, g: 0.89, b: 0.8, a: 1}
+  m_fontColor: {r: 0.925, g: 0.894, b: 0.827, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -380,15 +410,15 @@ MonoBehaviour:
       m_Calls: []
   m_text: 
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2100000, guid: e73a58f6e2794ae7b1b7e50b7fb811b0, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 2e36a575c28e2b14da05954bc26038fb, type: 2}
+  m_sharedMaterial: {fileID: -1336890024668442373, guid: 2e36a575c28e2b14da05954bc26038fb, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontColor: {r: 0.93, g: 0.89, b: 0.8, a: 1}
+  m_fontColor: {r: 0.925, g: 0.894, b: 0.827, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:

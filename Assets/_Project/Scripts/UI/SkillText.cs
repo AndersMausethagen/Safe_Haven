@@ -8,7 +8,12 @@ public static class SkillText
     {
         var builder = new StringBuilder();
         builder.Append(SkillSchools.Rich(skill.School))
-            .Append($"  <color=#AAB0BC>Cooldown {skill.Cooldown:0.#}s  ·  Stamina {skill.StaminaCost:0}</color>");
+            .Append($"  <color=#AAB0BC>Cooldown {PlayerSkills.CooldownOf(skill):0.#}s  ·  Stamina {skill.StaminaCost:0}</color>");
+        int rank = GameSession.Progress.RankOf(skill);
+        if (rank > 0)
+        {
+            builder.Append($"\n<color=#E8C46A>Deepened to rank {AltarWork.Roman(rank)}: {(PlayerSkills.Power(skill) - 1f) * 100f:+0}% power.</color>");
+        }
 
         if (skill.LungeDistance > 0f)
         {

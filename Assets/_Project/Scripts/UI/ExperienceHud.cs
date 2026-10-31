@@ -10,7 +10,7 @@ using UnityEngine.UI;
 public sealed class ExperienceHud : MonoBehaviour
 {
     private const float GainSeconds = 1.6f;
-    private static readonly Color Gold = new Color(0.91f, 0.77f, 0.42f, 1f);
+    private static Color Gold => UIStyle.Current.Accent;
 
     private RectTransform fill;
     private TMP_Text level;
@@ -103,6 +103,7 @@ public sealed class ExperienceHud : MonoBehaviour
     private static TMP_Text Label(string name, Transform parent, Vector2 anchorAt, Vector2 size, Vector2 position, float fontSize, TextAlignmentOptions alignment)
     {
         var text = Rect(name, parent, anchorAt, size, position).gameObject.AddComponent<TextMeshProUGUI>();
+        UIStyle.Current.OnWorld(text);
         text.fontSize = fontSize;
         text.color = Gold;
         text.alignment = alignment;

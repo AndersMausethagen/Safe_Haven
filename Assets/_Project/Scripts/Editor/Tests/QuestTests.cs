@@ -596,6 +596,7 @@ public sealed class QuestTests
             Assert.AreEqual(QuestStatus.Completed, manager.Log.StatusOf(first));
             Assert.IsTrue(raised.Exists(e => e.Kind == GameEventKind.QuestCompleted && e.Subject == first));
             Assert.IsTrue(raised.Exists(e => e.Kind == GameEventKind.Custom && e.Subject == opened));
+            manager.StartWaitingQuests(Time.time + 1000f);
             Assert.AreEqual(QuestStatus.Active, manager.Log.StatusOf(second), "The next quest of the chain starts.");
             Assert.IsFalse(manager.TryStartQuest(first, out reason));
             StringAssert.Contains("already done", reason);

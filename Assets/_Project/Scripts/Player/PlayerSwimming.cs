@@ -64,6 +64,15 @@ public sealed class PlayerSwimming : MonoBehaviour
             return;
         }
 
+        // In a boat the water is under the hull, whatever it is under the feet.
+        if (movement.IsSeated)
+        {
+            SetSwimming(false);
+            Depth = 0f;
+            movement.SetSpeedScale(this, 1f);
+            return;
+        }
+
         // Probed a Swim Depth above the feet, so a swimmer who dips deep on jumping in is still found in the water.
         Vector3 feet = transform.position;
         float swimDepth = settings.SwimDepth;

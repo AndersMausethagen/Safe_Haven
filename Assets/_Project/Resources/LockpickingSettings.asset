@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e164b72f050f1d4d8907f668f383456, type: 3}
+  m_Name: LockpickingSettings
+  m_EditorClassIdentifier: SafeHaven::LockpickingSettings
+  cycleSeconds: 1.3
+  normalZoneWidth: 0.34
+  criticalZoneWidth: 0.1
+  narrowingPerPin: 0.12
+  zoneJitter: 0.25
+  slipsAllowed: 3
+  interruptOnHit: 1
+  autoPinSeconds: 1
+  criticalNoise: 1.5
+  normalNoise: 5
+  slipNoise: 12
+  forcedNoise: 20
+  openNoise: 7
+  pinSound: {fileID: 11400000, guid: eff8873ac748ee54a8ebd626d23d77c0, type: 2}
+  slipSound: {fileID: 11400000, guid: abf6eba37338af1409ab7f379cfdbc31, type: 2}
+  forcedSound: {fileID: 11400000, guid: 33ed194ae04b9cc4d9e4a37a3ea4cc2a, type: 2}
+  openSound: {fileID: 11400000, guid: 78db89018c9e64a4d8f84def91caba6a, type: 2}

@@ -3,7 +3,7 @@ using UnityEngine.InputSystem;
 
 /// <summary>
 /// Quick save (F5) and quick load (F6) while playing. Put one in every gameplay scene. It only turns key presses into
-/// SaveGameService calls and tells the player how it went; the rules (no saving during raids) live in the service.
+/// SaveGameService calls and tells the player how it went; the rules (no saving or loading during raids) live in the service.
 /// </summary>
 [DisallowMultipleComponent]
 public sealed class SaveHotkeys : MonoBehaviour

@@ -23,6 +23,8 @@ public sealed class HeartTree : MonoBehaviour, IArea, IBuildArea
     {
         public QuestDefinition quest;
         [TextArea(2, 5)] public string text;
+        [Tooltip("Optional: the first time the player talks to the tree during this quest, this Quest Event is raised instead of the menu opening. A Story Script listens for it (When Quest Event) and has the conversation; it raises Talked Event if a quest waits for that.")]
+        public GameEventDefinition moment;
     }
 
     [Tooltip("What the tree says while each quest is active. The last active one in the list wins. When none is active, it whispers the lines below.")]
@@ -129,6 +131,13 @@ public sealed class HeartTree : MonoBehaviour, IArea, IBuildArea
     private void OnUsed()
     {
         GameObject user = interactable.Interactor;
+        GameEventDefinition moment = PendingMoment();
+        if (moment != null)
+        {
+            GameEvents.Raise(moment, user);
+            return;
+        }
+
         if (ActionMenuWindow.Current == null)
         {
             Debug.LogError("The Heart Tree found no ActionMenuWindow in the scene.", this);
@@ -148,6 +157,22 @@ public sealed class HeartTree : MonoBehaviour, IArea, IBuildArea
         }
     }
 
+    /// <summary>The story moment waiting for the player to talk to the tree, or null. It plays once.</summary>
+    private GameEventDefinition PendingMoment()
+    {
+        for (int i = questWhispers.Length - 1; i >= 0; i--)
+        {
+            QuestWhisper whisper = questWhispers[i];
+            if (whisper.quest != null && whisper.moment != null && GameSession.Quests.StatusOf(whisper.quest) == QuestStatus.Active
+                && !GameSession.Quests.HasHappened(whisper.moment))
+            {
+                return whisper.moment;
+            }
+        }
+
+        return null;
+    }
+
     /// <summary>The tree's line for the current step of the story, or null when no quest whisper applies.</summary>
     private string QuestLine()
     {
@@ -163,21 +188,12 @@ public sealed class HeartTree : MonoBehaviour, IArea, IBuildArea
         return null;
     }
 
-    /// <summary>Opens the overview of Safe Haven in the action menu: its rank, renown and what to do next (H).</summary>
-    public void OpenHaven(GameObject user)
+    private static void OpenHaven()
     {
-        ActionMenuWindow menu = ActionMenuWindow.Current;
-        if (menu == null)
+        if (HavenWindow.Current != null)
         {
-            return;
+            HavenWindow.Current.Open();
         }
-
-        if (menu.IsOpen)
-        {
-            menu.Close();
-        }
-
-        menu.Open(() => HavenRenown.Page(user), user);
     }
 
     private MenuPage BuildPage(GameObject user)
@@ -223,7 +239,7 @@ public sealed class HeartTree : MonoBehaviour, IArea, IBuildArea
             page.Add(new MenuAction("Begin the defense", breach.Definition.StartHint, true, breach.Begin, closesMenu: true));
         }
 
-        page.Add(new MenuAction("How is Safe Haven doing?", "Rank, renown and what to do next (H)", true, () => OpenHaven(user)));
+        page.Add(new MenuAction("How is Safe Haven doing?", $"Rank, renown and what to do next ({GameInput.KeyLabel(GameInput.Haven)})", true, OpenHaven));
         return page;
     }
 

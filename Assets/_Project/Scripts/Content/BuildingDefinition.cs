@@ -14,6 +14,8 @@ public sealed class BuildingLevel
     public string title = "Sturdy";
     [TextArea(1, 3)] public string description;
     public List<ItemAmount> cost = new List<ItemAmount>();
+    [Tooltip("Essence the level also takes: Purified Essence for the great tiers (GDD §13.5). Most levels need none.")]
+    public List<ResourceAmount> essence = new List<ResourceAmount>();
     [Tooltip("Seconds of hammering at the scaffold.")]
     [Min(0f)] public float work = 6f;
     [Tooltip("Renown added to Safe Haven on top of the building's own.")]
@@ -24,6 +26,17 @@ public sealed class BuildingLevel
     [Min(0)] public int extraOutput;
     [Tooltip("Extra stash slots for storage (chests, sheds).")]
     [Min(0)] public int extraStorage;
+
+    /// <summary>"12 Oak Plank, 8 Purified Essence".</summary>
+    public string CostText
+    {
+        get
+        {
+            string items = AmountText.Describe(cost);
+            string magic = AmountText.Describe(essence);
+            return items.Length > 0 && magic.Length > 0 ? items + ", " + magic : items + magic;
+        }
+    }
 }
 
 /// <summary>

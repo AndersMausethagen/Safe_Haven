@@ -1308,6 +1308,7 @@ MonoBehaviour:
         - The bow.
         - The axe.
         mustAnswer: 1
+        afterFightPause: 1
     - rid: 287758218191176004
       type: {class: GiveItemsNode, ns: , asm: SafeHaven}
       data:
@@ -1336,6 +1337,7 @@ MonoBehaviour:
           model: {fileID: 334759803}
           portrait: {fileID: 0}
         line: A bow! Then there are two of us. It wants both hands, so your torch went into your pack. Press L to swap bow and torch whenever you need the light. Hold the left button to draw, let go to shoot.
+        afterFightPause: 1
     - rid: 287758218191176007
       type: {class: GiveItemsNode, ns: , asm: SafeHaven}
       data:
@@ -1362,6 +1364,7 @@ MonoBehaviour:
           model: {fileID: 810501267}
           portrait: {fileID: 0}
         line: The axe. Good. It splits wolves and firewood alike, and you keep the torch in your other hand.
+        afterFightPause: 1
 --- !u!114 &272836873
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2264,8 +2267,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Liv
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 2e36a575c28e2b14da05954bc26038fb, type: 2}
+  m_sharedMaterial: {fileID: -1336890024668442373, guid: 2e36a575c28e2b14da05954bc26038fb, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -2362,7 +2365,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  - {fileID: -1336890024668442373, guid: 2e36a575c28e2b14da05954bc26038fb, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -3244,8 +3247,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Runa
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 2e36a575c28e2b14da05954bc26038fb, type: 2}
+  m_sharedMaterial: {fileID: -1336890024668442373, guid: 2e36a575c28e2b14da05954bc26038fb, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -3342,7 +3345,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  - {fileID: -1336890024668442373, guid: 2e36a575c28e2b14da05954bc26038fb, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -3425,6 +3428,67 @@ MonoBehaviour:
   fixedSeed: 0
   spawnsPerFrame: 30
   logLayout: 1
+--- !u!1001 &635510885
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 5326914010263828036, guid: 60bc418ee7207e9449ecde59c8825917, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5326914010263828036, guid: 60bc418ee7207e9449ecde59c8825917, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5326914010263828036, guid: 60bc418ee7207e9449ecde59c8825917, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5326914010263828036, guid: 60bc418ee7207e9449ecde59c8825917, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5326914010263828036, guid: 60bc418ee7207e9449ecde59c8825917, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5326914010263828036, guid: 60bc418ee7207e9449ecde59c8825917, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5326914010263828036, guid: 60bc418ee7207e9449ecde59c8825917, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5326914010263828036, guid: 60bc418ee7207e9449ecde59c8825917, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5326914010263828036, guid: 60bc418ee7207e9449ecde59c8825917, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5326914010263828036, guid: 60bc418ee7207e9449ecde59c8825917, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5539201636396320044, guid: 60bc418ee7207e9449ecde59c8825917, type: 3}
+      propertyPath: m_Name
+      value: Fireflies
+      objectReference: {fileID: 0}
+    - target: {fileID: 7251748962878869683, guid: 60bc418ee7207e9449ecde59c8825917, type: 3}
+      propertyPath: profile
+      value: 
+      objectReference: {fileID: 11400000, guid: 5f4d490cd07dfc6489d5864fbd4a9461, type: 2}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 60bc418ee7207e9449ecde59c8825917, type: 3}
 --- !u!1 &639517392
 GameObject:
   m_ObjectHideFlags: 0
@@ -3752,6 +3816,7 @@ MonoBehaviour:
           model: {fileID: 983162859}
           portrait: {fileID: 0}
         line: That is no thunder. An old one, a mountain troll, and it is walking towards our fire.
+        afterFightPause: 1
     - rid: 287758218191175978
       type: {class: SayNode, ns: , asm: SafeHaven}
       data:
@@ -3763,6 +3828,7 @@ MonoBehaviour:
           model: {fileID: 334759803}
           portrait: {fileID: 0}
         line: It hasn't seen us yet. It will smell the smoke soon enough.
+        afterFightPause: 1
     - rid: 287758218191175979
       type: {class: SayNode, ns: , asm: SafeHaven}
       data:
@@ -3774,6 +3840,7 @@ MonoBehaviour:
           model: {fileID: 983162859}
           portrait: {fileID: 0}
         line: Leave the fire! Follow the old road north, to the standing stones. Now!
+        afterFightPause: 1
     - rid: 287758218191175980
       type: {class: WaitNode, ns: , asm: SafeHaven}
       data:
@@ -3917,6 +3984,7 @@ MonoBehaviour:
       minQuantity: 2
       maxQuantity: 3
       probability: 0.8
+  lockPins: 3
   fullVisual: {fileID: 1208768822}
   emptyVisual: {fileID: 993608490}
 --- !u!114 &721401215
@@ -4099,8 +4167,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Sigrid
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 2e36a575c28e2b14da05954bc26038fb, type: 2}
+  m_sharedMaterial: {fileID: -1336890024668442373, guid: 2e36a575c28e2b14da05954bc26038fb, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -4197,7 +4265,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  - {fileID: -1336890024668442373, guid: 2e36a575c28e2b14da05954bc26038fb, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -5200,8 +5268,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Ingrid
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 2e36a575c28e2b14da05954bc26038fb, type: 2}
+  m_sharedMaterial: {fileID: -1336890024668442373, guid: 2e36a575c28e2b14da05954bc26038fb, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -5298,7 +5366,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  - {fileID: -1336890024668442373, guid: 2e36a575c28e2b14da05954bc26038fb, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -6096,8 +6164,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Eirik
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 2e36a575c28e2b14da05954bc26038fb, type: 2}
+  m_sharedMaterial: {fileID: -1336890024668442373, guid: 2e36a575c28e2b14da05954bc26038fb, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -6194,7 +6262,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  - {fileID: -1336890024668442373, guid: 2e36a575c28e2b14da05954bc26038fb, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -7833,6 +7901,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::GameEventTrigger
   gameEvent: {fileID: 11400000, guid: e7d3f1e76eaac0c4093ec068db341d61, type: 2}
   when: 0
+  area: {fileID: 0}
   repeat: 2
   onlyDuringQuest: {fileID: 11400000, guid: cd536373f8f639f4db60c8810e546ebf, type: 2}
   requires:
@@ -12451,6 +12520,7 @@ MonoBehaviour:
           model: {fileID: 334759803}
           portrait: {fileID: 0}
         line: Down! Moss trolls in the bushes, the small kind. Don't let them get behind you!
+        afterFightPause: 1
     - rid: 287758218191175996
       type: {class: WhenZoneCleared, ns: , asm: SafeHaven}
       data:
@@ -12469,6 +12539,7 @@ MonoBehaviour:
           model: {fileID: 334759803}
           portrait: {fileID: 0}
         line: Small ones never come alone and never come this far down. Something up in the high woods is scaring them. Finish the berries and get back to the fire.
+        afterFightPause: 1
 --- !u!114 &1569805112
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12863,8 +12934,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: 
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 2e36a575c28e2b14da05954bc26038fb, type: 2}
+  m_sharedMaterial: {fileID: -1336890024668442373, guid: 2e36a575c28e2b14da05954bc26038fb, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -13000,8 +13071,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Bjarne
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 2e36a575c28e2b14da05954bc26038fb, type: 2}
+  m_sharedMaterial: {fileID: -1336890024668442373, guid: 2e36a575c28e2b14da05954bc26038fb, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -13098,7 +13169,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  - {fileID: -1336890024668442373, guid: 2e36a575c28e2b14da05954bc26038fb, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -14139,8 +14210,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Tor
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 2e36a575c28e2b14da05954bc26038fb, type: 2}
+  m_sharedMaterial: {fileID: -1336890024668442373, guid: 2e36a575c28e2b14da05954bc26038fb, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -14237,7 +14308,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  - {fileID: -1336890024668442373, guid: 2e36a575c28e2b14da05954bc26038fb, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -15623,6 +15694,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::GameEventTrigger
   gameEvent: {fileID: 11400000, guid: 3e4af787a3ca3d241a28d20824384e0f, type: 2}
   when: 0
+  area: {fileID: 0}
   repeat: 2
   onlyDuringQuest: {fileID: 11400000, guid: 0279feb93b7c8b74e9fd8683d9d10fd3, type: 2}
   requires:
@@ -18698,3 +18770,4 @@ SceneRoots:
   - {fileID: 1789325584}
   - {fileID: 981106771}
   - {fileID: 1944667214}
+  - {fileID: 635510885}

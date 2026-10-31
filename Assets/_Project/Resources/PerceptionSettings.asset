@@ -21,9 +21,13 @@ MonoBehaviour:
   maxRangeScale: 1.3
   eyeHeight: 1.4
   targetHeight: 1.1
+  headAboveTarget: 0.6
   sightBlockers:
     serializedVersion: 2
     m_Bits: 1
+  denseFog: 0.06
+  sightInDenseFog: 0.55
+  sightAtNight: 0.75
   loseTrackSeconds: 3
   searchSeconds: 6
   maxInvestigateSeconds: 15
@@ -35,6 +39,8 @@ MonoBehaviour:
   spottedCallRadius: 10
   heardAwarenessFar: 0.35
   heardAwarenessNear: 0.9
+  heardThroughCover: 0.6
+  heardSpreadAtEdge: 6
   ambushDamageTaken: 1.5
   movingVisibility: 1
   stillVisibility: 0.75
@@ -48,6 +54,18 @@ MonoBehaviour:
   dodgeNoise: 7
   combatNoise: 13
   combatNoiseInterval: 0.6
+  swimNoise: 4
+  landingNoise: 6
+  landingSpeed: 3
+  heavyGearNoise: 1.4
+  noiseInRain: 0.7
+  noiseBuildShare: 0.15
+  noiseBuildMax: 10
+  noiseBuildDecay: 2
+  noiseHoldSeconds: 0.6
+  noiseFallPerSecond: 10
+  noiseMeterMax: 24
+  noiseBands: {x: 3, y: 10, z: 18}
   showIndicators: 1
   indicatorHeight: 2.4
   indicatorFontSize: 6

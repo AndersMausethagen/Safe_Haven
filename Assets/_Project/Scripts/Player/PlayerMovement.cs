@@ -36,12 +36,18 @@ public sealed class PlayerMovement : MonoBehaviour
     private float speedScale = 1f;
     private bool floating;
     private float floatHeight;
+    private Transform seat;
+    private Vector3 seatOffset;
 
     public PlayerMovementSettings Settings => settings;
     /// <summary>True while the water holds the player up (<see cref="FloatAt"/>): gravity is off.</summary>
     public bool IsFloating => floating;
+    /// <summary>True while sitting on something that moves (a boat): it carries the character, and input is its to read.</summary>
+    public bool IsSeated => seat != null;
     /// <summary>True during a dash (a dodge): movement input is ignored and the character slides at the dash velocity.</summary>
     public bool IsDashing => dashUntil >= 0f;
+    /// <summary>Holds the way the character faces (a swing winding up): neither the aim nor travel turns it.</summary>
+    public bool FacingLocked { get; set; }
     /// <summary>The requested movement direction (camera-relative, 0-1 long), before any gating.</summary>
     public Vector3 MovementInput => movementInput;
     public Vector3 HorizontalVelocity => horizontalVelocity;
@@ -112,10 +118,18 @@ public sealed class PlayerMovement : MonoBehaviour
         speedScales.Clear();
         speedScale = 1f;
         floating = false;
+        FacingLocked = false;
+        seat = null;
     }
 
     private void Update()
     {
+        if (seat != null)
+        {
+            transform.SetPositionAndRotation(seat.TransformPoint(seatOffset), seat.rotation);
+            return;
+        }
+
         UpdateHorizontalVelocity();
         ApplyGravity();
         Move();
@@ -188,6 +202,26 @@ public sealed class PlayerMovement : MonoBehaviour
         floatHeight = feetHeight;
     }
 
+    /// <summary>Sits on <paramref name="at"/>: the controller is switched off and the character goes where the seat goes.</summary>
+    public void SitAt(Transform at, Vector3 offset)
+    {
+        seat = at;
+        seatOffset = offset;
+        horizontalVelocity = Vector3.zero;
+        verticalVelocity = 0f;
+        floating = false;
+        characterController.enabled = false;
+    }
+
+    /// <summary>Gets up, onto <paramref name="position"/>.</summary>
+    public void StandAt(Vector3 position)
+    {
+        seat = null;
+        transform.position = position;
+        Physics.SyncTransforms();
+        characterController.enabled = true;
+    }
+
     /// <summary>Gravity again (out of the water).</summary>
     public void StopFloating() => floating = false;
 
@@ -217,7 +251,7 @@ public sealed class PlayerMovement : MonoBehaviour
 
     public void FaceDirection(Vector3 direction)
     {
-        if (!stateMachine.CanMove)
+        if (!stateMachine.CanMove || FacingLocked)
         {
             return;
         }

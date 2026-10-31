@@ -86,6 +86,28 @@ public sealed class WhenQuest : StoryTrigger
 }
 
 [Serializable]
+public sealed class WhenBuilt : StoryTrigger
+{
+    [Tooltip("Starts when this structure is finished. Empty: any structure.")]
+    public BuildingDefinition building;
+
+    public override string Title => "When Structure Is Built";
+
+    public override Action Listen(StoryScript script, Action fire)
+    {
+        Action<GameEvent> heard = raised =>
+        {
+            if (raised.Kind == GameEventKind.Built && (building == null || raised.Subject == building))
+            {
+                fire();
+            }
+        };
+        GameEvents.Raised += heard;
+        return () => GameEvents.Raised -= heard;
+    }
+}
+
+[Serializable]
 public sealed class WhenUsed : StoryTrigger
 {
     [Tooltip("Starts when the player finishes using this object (its Interactable). Create one with the + button.")]
@@ -212,12 +234,24 @@ public sealed class SayNode : StoryNode
 {
     public StorySpeaker speaker = new StorySpeaker();
     [TextArea(2, 5)] public string line;
+    [Tooltip("Waits out the pause after a fight (Systems Editor › World › Story Pacing), so a line doesn't land on the last blow. Off: right away.")]
+    public bool afterFightPause = true;
 
     public override string Title => "Say";
     public override string Category => "Talk";
 
     public override IEnumerator Run(StoryContext context)
     {
+        if (afterFightPause)
+        {
+            // A frame first: the last enemy's death can be what started this, and the pacing hears of it next frame.
+            yield return null;
+            while (context.IsCatchingBreath)
+            {
+                yield return null;
+            }
+        }
+
         bool done = false;
         DialogueBox box = DialogueBox.Current;
         Action closed = () => done = true;
@@ -243,6 +277,8 @@ public sealed class ChoiceNode : StoryNode
     public List<string> answers = new List<string> { "Yes.", "No." };
     [Tooltip("Asks again when the player closes the box without answering (a choice the story can't go on without).")]
     public bool mustAnswer;
+    [Tooltip("Waits out the pause after a fight (Systems Editor › World › Story Pacing), so the question doesn't land on the last blow. Off: right away.")]
+    public bool afterFightPause = true;
 
     public override string Title => "Choice";
     public override string Category => "Talk";
@@ -251,6 +287,15 @@ public sealed class ChoiceNode : StoryNode
 
     public override IEnumerator Run(StoryContext context)
     {
+        if (afterFightPause)
+        {
+            yield return null;
+            while (context.IsCatchingBreath)
+            {
+                yield return null;
+            }
+        }
+
         int picked = -2;
         var choices = new List<DialogueChoice>();
         foreach (string answer in answers)
@@ -294,6 +339,23 @@ public sealed class WaitNode : StoryNode
     public override IEnumerator Run(StoryContext context)
     {
         yield return new WaitForSeconds(seconds);
+    }
+}
+
+[Serializable]
+public sealed class WaitForQuietNode : StoryNode
+{
+    public override string Title => "Wait For Quiet";
+    public override string Category => "Flow";
+
+    // Say and Choice do this themselves; this is for what comes without a line: a cutscene, a sound, a monster.
+    public override IEnumerator Run(StoryContext context)
+    {
+        yield return null;
+        while (MonsterAI.AnyHuntingPlayerSide() || context.IsCatchingBreath)
+        {
+            yield return null;
+        }
     }
 }
 

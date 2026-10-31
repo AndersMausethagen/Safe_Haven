@@ -66,6 +66,7 @@ public sealed class QuiverHud : MonoBehaviour
         var go = new GameObject(name, typeof(RectTransform));
         go.transform.SetParent(parent, false);
         var text = go.AddComponent<TextMeshProUGUI>();
+        UIStyle.Current.OnWorld(text);
         text.fontSize = size;
         text.fontStyle = FontStyles.Bold;
         text.alignment = TextAlignmentOptions.Center;

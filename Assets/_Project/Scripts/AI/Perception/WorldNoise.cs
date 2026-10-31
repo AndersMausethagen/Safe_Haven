@@ -2,10 +2,11 @@ using System;
 using UnityEngine;
 
 /// <summary>
-/// Sounds monsters can hear: footsteps, dodges, fights, gathering swings. <see cref="Emit"/> first raises
-/// <see cref="Emitted"/> (CreatureSleep wakes sleepers inside the radius) and then lets every awake monster hear it
-/// (MonsterAI.Hear: suspicious ones come to look). The radius is how far the sound carries before a monster's own
-/// hearing multiplier.
+/// Sounds monsters can hear. <see cref="Emit"/> first raises <see cref="Emitted"/> (CreatureSleep wakes sleepers inside
+/// the radius) and then lets every awake monster hear it (MonsterAI.Hear: suspicious ones come to look). The radius is
+/// how far the sound carries before a monster's own hearing multiplier and any cover in between. What the player does
+/// goes through PlayerNoise, which fills the HUD's meter; call Emit directly for sounds of the world (a beacon, an arrow
+/// striking far away).
 /// </summary>
 public static class WorldNoise
 {

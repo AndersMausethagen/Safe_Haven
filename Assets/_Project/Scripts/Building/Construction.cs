@@ -102,8 +102,9 @@ public sealed class Construction : MonoBehaviour, ISaveable
             return;
         }
 
-        resources = Array.Empty<ResourceAmount>();
-        items = Definition.UpgradeTo(next)?.cost ?? new List<ItemAmount>();
+        BuildingLevel level = Definition.UpgradeTo(next);
+        resources = level != null ? level.essence : (IReadOnlyList<ResourceAmount>)Array.Empty<ResourceAmount>();
+        items = level != null ? level.cost : new List<ItemAmount>();
     }
 
     /// <summary>Pays for the next level and puts the scaffold up. False (with a message) when it can't.</summary>

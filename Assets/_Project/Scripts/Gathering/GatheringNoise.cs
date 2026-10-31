@@ -21,7 +21,15 @@ public sealed class GatheringNoise : MonoBehaviour
 
     private static void OnSwung(GatheringSwing swing)
     {
-        WorldNoise.Emit(swing.Position, swing.NoiseRadius);
+        PlayerNoise noise = Player.Current != null ? Player.Current.Noise : null;
+        if (noise != null)
+        {
+            noise.Make(swing.Position, swing.NoiseRadius);
+        }
+        else
+        {
+            WorldNoise.Emit(swing.Position, swing.NoiseRadius);
+        }
     }
 
     /// <summary>Sends idle, roaming and investigating creatures within the radius to look at the position.</summary>

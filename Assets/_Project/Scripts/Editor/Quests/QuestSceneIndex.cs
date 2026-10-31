@@ -26,6 +26,8 @@ public enum QuestSceneRole
     Other,
     /// <summary>An override on a prefab instance, so the component type isn't known.</summary>
     PrefabOverride,
+    /// <summary>A story's Start Quest node, which starts the quest like a Quest Giver would.</summary>
+    Starts,
 }
 
 /// <summary>One scene or prefab object that uses a quest or Quest Event.</summary>
@@ -67,6 +69,7 @@ public static class QuestSceneIndex
     private static readonly Regex ScriptPattern = new Regex(@"^  m_Script: \{fileID: \d+, guid: ([0-9a-f]{32})", RegexOptions.Compiled | RegexOptions.Multiline);
     private static readonly Regex ReferencePattern = new Regex(@"^( *)(?:- )?(\w+): \{fileID: -?\d+, guid: ([0-9a-f]{32}), type: 2\}", RegexOptions.Compiled | RegexOptions.Multiline);
     private static readonly Regex OverridePattern = new Regex(@"propertyPath: (\S+)\s+value:[^\n]*\n\s+objectReference: \{fileID: -?\d+, guid: ([0-9a-f]{32}), type: 2\}", RegexOptions.Compiled);
+    private static readonly Regex StoryNodePattern = new Regex(@"^ *type: \{class: (\w+),", RegexOptions.Compiled | RegexOptions.Multiline);
 
     private static List<QuestSceneUse> cached;
     private static Dictionary<Type, HashSet<string>> raisingFields;
@@ -163,6 +166,20 @@ public static class QuestSceneIndex
         return false;
     }
 
+    /// <summary>Whether a story starts the quest with a Start Quest node.</summary>
+    public static bool IsStartedByStory(QuestDefinition quest)
+    {
+        foreach (QuestSceneUse use in UsesOf(quest))
+        {
+            if (use.Role == QuestSceneRole.Starts)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public static List<QuestSceneUse> All()
     {
         if (cached != null)
@@ -176,6 +193,7 @@ public static class QuestSceneIndex
             [ScriptGuid(typeof(QuestGate))] = typeof(QuestGate),
             [ScriptGuid(typeof(GameEventTrigger))] = typeof(GameEventTrigger),
             [ScriptGuid(typeof(GameEventListener))] = typeof(GameEventListener),
+            [ScriptGuid(typeof(StoryScript))] = typeof(StoryScript),
         };
 
         var targets = new HashSet<string>();
@@ -291,13 +309,45 @@ public static class QuestSceneIndex
             // A list's first member can be on the "- quest:" line or indented below another member.
             bool orderedOffer = type == typeof(QuestGiver) && reference.Groups[2].Value == "quest" &&
                 RootFieldAt(document, reference.Index) == "offers";
+            QuestSceneRole role = type == typeof(StoryScript) ? RoleOfStoryNode(NodeAt(document, reference.Index))
+                : topLevel || orderedOffer ? RoleOf(type, reference.Groups[2].Value) : QuestSceneRole.Other;
             uses.Add(new QuestSceneUse
             {
                 AssetPath = path,
                 ObjectFileId = ownerId,
-                Role = topLevel || orderedOffer ? RoleOf(type, reference.Groups[2].Value) : QuestSceneRole.Other,
+                Role = role,
                 TargetGuid = guid,
             });
+        }
+    }
+
+    // A story's nodes are written below it, each after a "type: {class: SayNode, ...}" line.
+    private static string NodeAt(string document, int index)
+    {
+        string node = null;
+        foreach (Match match in StoryNodePattern.Matches(document.Substring(0, index)))
+        {
+            node = match.Groups[1].Value;
+        }
+
+        return node;
+    }
+
+    private static QuestSceneRole RoleOfStoryNode(string node)
+    {
+        switch (node)
+        {
+            case nameof(StartQuestNode):
+                return QuestSceneRole.Starts;
+            case nameof(RaiseQuestEventNode):
+                return QuestSceneRole.Raises;
+            case nameof(WhenQuest):
+            case nameof(WhenQuestEvent):
+            case nameof(CheckQuestNode):
+            case nameof(HasHappenedNode):
+                return QuestSceneRole.Listens;
+            default:
+                return QuestSceneRole.Other;
         }
     }
 

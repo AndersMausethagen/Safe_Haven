@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d9d5f8a59dcb934bb2c43cf8b8645be, type: 3}
+  m_Name: UIStyle
+  m_EditorClassIdentifier: SafeHaven::UIStyle
+  bodyFont: {fileID: 11400000, guid: 2e36a575c28e2b14da05954bc26038fb, type: 2}
+  titleFont: {fileID: 11400000, guid: 8579b3dc74ca4a64290753d5efddd637, type: 2}
+  bodyOnWorld: {fileID: 2100000, guid: 88ff5f3f7d60065468a90fd950118760, type: 2}
+  titleOnWorld: {fileID: 2100000, guid: 8970dea510bfc75408b7da10eee05b5c, type: 2}
+  panel: {r: 0.075, g: 0.066, b: 0.055, a: 1}
+  rim: {r: 0.85, g: 0.65, b: 0.35, a: 0.5}
+  hairline: {r: 0.925, g: 0.894, b: 0.827, a: 0.09}
+  inset: {r: 0.112, g: 0.1, b: 0.085, a: 1}
+  filled: {r: 0.15, g: 0.133, b: 0.11, a: 1}
+  control: {r: 0.165, g: 0.145, b: 0.118, a: 1}
+  controlLit: {r: 0.25, g: 0.215, b: 0.17, a: 1}
+  controlOn: {r: 0.42, g: 0.32, b: 0.17, a: 1}
+  track: {r: 0.925, g: 0.894, b: 0.827, a: 0.24}
+  text: {r: 0.925, g: 0.894, b: 0.827, a: 1}
+  muted: {r: 0.66, g: 0.62, b: 0.555, a: 1}
+  accent: {r: 0.85, g: 0.655, b: 0.353, a: 1}
+  onAccent: {r: 0.075, g: 0.066, b: 0.055, a: 1}
+  good: {r: 0.525, g: 0.627, b: 0.435, a: 1}
+  warning: {r: 0.91, g: 0.62, b: 0.27, a: 1}
+  danger: {r: 0.79, g: 0.333, b: 0.247, a: 1}

@@ -24,20 +24,66 @@ public static class QuestReactionEditor
         return listener;
     }
 
+    /// <summary>A story in the open scene that starts at this moment of the quest, opened in the Story Graph.</summary>
+    public static StoryScript CreateStory(QuestDefinition quest, WhenQuest.Moment moment)
+    {
+        var trigger = new WhenQuest { quest = quest, when = moment };
+        return Finish(StoryGraphWindow.CreateFor($"{quest.DisplayName} - {trigger.Title}", trigger));
+    }
+
+    /// <summary>A story in the open scene that starts when the Quest Event is raised, opened in the Story Graph.</summary>
+    public static StoryScript CreateStory(GameEventDefinition gameEvent)
+    {
+        return Finish(StoryGraphWindow.CreateFor($"{gameEvent.DisplayName} - Story", new WhenQuestEvent { questEvent = gameEvent }));
+    }
+
+    private static StoryScript Finish(StoryScript story)
+    {
+        EditorSceneManager.MarkSceneDirty(story.gameObject.scene);
+        QuestSceneIndex.Invalidate();
+        return story;
+    }
+
     public static void Draw(Object source)
     {
-        ContentUtility.BeginPanel("Scene Reactions", "Add music, silence, weather, object activation or parameter actions here. " +
-            "Reactions belong to the currently open scene, not the shared quest asset. Save that scene to keep them. " +
+        ContentUtility.BeginPanel("Scene Reactions", "A reaction changes something when the quest moves on: music, silence, weather, an object, " +
+            "or any parameter. A story is a moment told step by step: lines, choices, the camera, a fight. Both belong to the open " +
+            "scene, not the shared quest asset. Save that scene to keep them. " +
             "Parameters uses Unity's standard property/method picker, including float/int/bool/string arguments.");
         using (new EditorGUI.DisabledScope(EditorApplication.isPlaying))
-        using (new EditorGUILayout.HorizontalScope())
         {
-            if (source is QuestDefinition)
+            using (new EditorGUILayout.HorizontalScope())
             {
-                if (GUILayout.Button("+ On Quest Started")) Create(source, ListenFor.QuestStarted);
-                if (GUILayout.Button("+ On Quest Completed")) Create(source, ListenFor.QuestCompleted);
+                if (source is QuestDefinition)
+                {
+                    if (GUILayout.Button("+ On Quest Started")) Create(source, ListenFor.QuestStarted);
+                    if (GUILayout.Button("+ On Quest Completed")) Create(source, ListenFor.QuestCompleted);
+                }
+                else if (GUILayout.Button("+ When Event Is Raised")) Create(source, ListenFor.QuestEvent);
             }
-            else if (GUILayout.Button("+ When Event Is Raised")) Create(source, ListenFor.QuestEvent);
+
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                if (source is QuestDefinition quest)
+                {
+                    if (GUILayout.Button("+ Story When It Starts"))
+                    {
+                        CreateStory(quest, WhenQuest.Moment.Starts);
+                        GUIUtility.ExitGUI();
+                    }
+
+                    if (GUILayout.Button("+ Story When It Completes"))
+                    {
+                        CreateStory(quest, WhenQuest.Moment.IsCompleted);
+                        GUIUtility.ExitGUI();
+                    }
+                }
+                else if (source is GameEventDefinition gameEvent && GUILayout.Button("+ Story When Raised"))
+                {
+                    CreateStory(gameEvent);
+                    GUIUtility.ExitGUI();
+                }
+            }
         }
         var listeners = Object.FindObjectsByType<GameEventListener>(FindObjectsInactive.Include);
         foreach (var listener in listeners.Where(l => !EditorUtility.IsPersistent(l)))

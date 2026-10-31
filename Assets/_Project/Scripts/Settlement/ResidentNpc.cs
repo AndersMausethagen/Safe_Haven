@@ -84,7 +84,7 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics
         JobDefinition current = GameSession.Settlement.Find(resident)?.Job;
         if (string.IsNullOrWhiteSpace(page.Body))
         {
-            var body = new StringBuilder(resident.Description);
+            var body = new StringBuilder(current == null && !string.IsNullOrWhiteSpace(resident.WelcomeLine) ? resident.WelcomeLine : resident.Description);
             body.Append("\n\n").Append(current != null
                 ? $"<color=#E8C46A>Works as the {current.DisplayName}.</color> {current.Description}"
                 : "<color=#E8C46A>Has no job yet.</color>");

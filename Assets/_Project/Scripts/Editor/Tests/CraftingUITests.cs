@@ -3,7 +3,7 @@ using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;
 
-/// <summary>Edit Mode tests for the crafting UI's pure parts: recipe tabs, output cells and recipe tooltips.</summary>
+/// <summary>Edit Mode tests for the crafting UI's pure parts: recipe tabs, the Can Make filter, batches, output cells and recipe tooltips.</summary>
 public sealed class CraftingUITests
 {
     private readonly List<Object> created = new List<Object>();
@@ -53,6 +53,40 @@ public sealed class CraftingUITests
         CollectionAssert.AreEqual(new[] { 1, 1, 3 }, RecipeTabs.SplitIntoCells(5, 1, 3));
         CollectionAssert.AreEqual(new[] { 0, 0 }, RecipeTabs.SplitIntoCells(0, 10, 2));
         CollectionAssert.AreEqual(new[] { 7 }, RecipeTabs.SplitIntoCells(7, 0, 1));
+    }
+
+    [Test]
+    public void OnlyMakeable_KeepsOrderAndDropsTheRest()
+    {
+        RecipeDefinition axe = Recipe("axe", Item("Axe", ItemCategory.Tool), null);
+        RecipeDefinition stew = Recipe("stew", Item("Stew", ItemCategory.Consumable), null);
+        RecipeDefinition pick = Recipe("pick", Item("Pick", ItemCategory.Tool), null);
+
+        List<RecipeDefinition> makeable = RecipeTabs.OnlyMakeable(new[] { axe, stew, pick }, recipe => recipe != stew);
+
+        CollectionAssert.AreEqual(new[] { axe, pick }, makeable);
+    }
+
+    [Test]
+    public void Batches_IsLimitedByTheScarcestMaterial()
+    {
+        ItemDefinition stick = Item("Stick", ItemCategory.Material);
+        ResourceDefinition wood = Create<ResourceDefinition>("Wood");
+        RecipeDefinition recipe = Recipe("axe", Item("Axe", ItemCategory.Tool), null);
+        var data = new SerializedObject(recipe);
+        SerializedProperty resources = data.FindProperty("resourceCost");
+        resources.arraySize = 1;
+        resources.GetArrayElementAtIndex(0).FindPropertyRelative("resource").objectReferenceValue = wood;
+        resources.GetArrayElementAtIndex(0).FindPropertyRelative("amount").intValue = 3;
+        SerializedProperty items = data.FindProperty("itemCost");
+        items.arraySize = 1;
+        items.GetArrayElementAtIndex(0).FindPropertyRelative("item").objectReferenceValue = stick;
+        items.GetArrayElementAtIndex(0).FindPropertyRelative("amount").intValue = 2;
+        data.ApplyModifiedPropertiesWithoutUndo();
+
+        Assert.AreEqual(3, RecipeMaking.Batches(recipe, _ => 10, _ => 7));
+        Assert.AreEqual(2, RecipeMaking.Batches(recipe, _ => 6, _ => 100));
+        Assert.AreEqual(0, RecipeMaking.Batches(recipe, _ => 2, _ => 100));
     }
 
     [Test]

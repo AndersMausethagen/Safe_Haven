@@ -16,7 +16,9 @@ public sealed class QuestSection : ContentSection
     public override string Help =>
         "Quests and quest chains. A quest has objectives (gather, kill, craft, complete raids, or any Quest Event), rewards, " +
         "and a way to start: automatically, on a Quest Event, or from a Quest Giver. To make a chain, list the previous quest " +
-        "as a prerequisite and let the next one start automatically.";
+        "as a prerequisite and let the next one start automatically; it leaves a pause after the last quest and any fight on its " +
+        "own (Start Delay asks for longer). What happens around a quest, such as a line, a camera move or a fight, is a story: " +
+        "Scene Reactions below makes one for it.";
 
     public override string ListGroup(Object asset)
     {
@@ -50,9 +52,9 @@ public sealed class QuestSection : ContentSection
     {
         var problems = new List<string>();
         bool hasGiver = QuestSceneIndex.HasGiver(quest);
-        if (quest.Start == QuestStart.ByQuestGiver && !hasGiver)
+        if (quest.Start == QuestStart.ByQuestGiver && !hasGiver && !QuestSceneIndex.IsStartedByStory(quest))
         {
-            problems.Add("Starts from a Quest Giver, but no scene or prefab has one for it (GameObject > Safe Haven > Quest Giver).");
+            problems.Add("Starts from a Quest Giver, but no scene or prefab has one for it and no story starts it (GameObject > Safe Haven > Quest Giver).");
         }
         else if (quest.TurnInToGiver && !hasGiver)
         {
@@ -133,7 +135,7 @@ public sealed class QuestSection : ContentSection
         QuestLog log = QuestManager.Instance.Log;
         QuestLog.Entry entry = log.Get(quest);
         ContentUtility.BeginPanel("Play Test", "The game is running: this quest's state for the current player.");
-        EditorGUILayout.LabelField("Status", log.StatusOf(quest).ToString());
+        EditorGUILayout.LabelField("Status", QuestManager.Instance.IsWaiting(quest) ? "Waiting for its moment" : log.StatusOf(quest).ToString());
         if (entry != null)
         {
             for (int i = 0; i < entry.Counts.Length; i++)
@@ -207,6 +209,7 @@ public sealed class QuestSection : ContentSection
         [QuestSceneRole.Listens] = "Listened for by",
         [QuestSceneRole.Other] = "Referenced by",
         [QuestSceneRole.PrefabOverride] = "Prefab override in",
+        [QuestSceneRole.Starts] = "Started by story",
     };
 
     /// <summary>Lists scene and prefab uses as links that open the scene and select the object.</summary>
@@ -278,13 +281,20 @@ public sealed class QuestSection : ContentSection
         switch (quest.Start)
         {
             case QuestStart.OnQuestEvent:
-                return $"When \"{(quest.StartEvent != null ? quest.StartEvent.DisplayName : "?")}\" happens, {after}.";
+                return $"When \"{(quest.StartEvent != null ? quest.StartEvent.DisplayName : "?")}\" happens, {after}. {DescribeTiming(quest)}";
             case QuestStart.ByQuestGiver:
-                return $"When the player talks to a Quest Giver for it, {after}. Add one with GameObject > Safe Haven > Quest Giver. " +
-                    "Use its single Quest or ordered Offers; Confirm In Dialogue adds authored text and an acceptance choice.";
+                return $"When the player talks to a Quest Giver for it, {after}, or when a story's Start Quest does. Add one with " +
+                    "GameObject > Safe Haven > Quest Giver and use its single Quest or ordered Offers.";
             default:
-                return $"Automatically, {after}.";
+                return $"Automatically, {after}. {DescribeTiming(quest)}";
         }
+    }
+
+    private static string DescribeTiming(QuestDefinition quest)
+    {
+        StoryPacingSettings pacing = StoryPacingSettings.Current;
+        string wait = quest.StartDelay > 0f ? $"{quest.StartDelay:0.#} s" : $"at least {pacing.BetweenQuestsSeconds:0.#} s after the last quest";
+        return $"It waits {wait}, and {pacing.AfterFightSeconds:0.#} s after any fight.";
     }
 
     private static List<QuestDefinition> Followers(QuestDefinition quest)

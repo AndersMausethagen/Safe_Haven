@@ -1,0 +1,250 @@
+using System.Collections;
+using UnityEngine;
+
+/// <summary>
+/// The player's side of transport: what they are moving, how much it slows them, and everything that makes them let go.
+/// Attacking, guarding, dodging, casting, swimming or dying drops the handles at once, so a fight never needs a key to
+/// get free of the cart; it stays where it fell, cargo and all, to come back to (GDD §8.5). A cart in the hands goes through
+/// the portal with the player. It comes home if it is near them when they extract, and it is lost if they fail.
+/// </summary>
+[DisallowMultipleComponent]
+[RequireComponent(typeof(PlayerMovement), typeof(PlayerStateMachine), typeof(CharacterController))]
+public sealed class PlayerTransport : MonoBehaviour
+{
+    private const float BoardReach = 3.5f;
+    private const float ArrivalSeconds = 5f;
+    private const float SettleSeconds = 0.3f;
+
+    private PlayerStateMachine stateMachine;
+    private Damageable health;
+
+    public static PlayerTransport Current { get; private set; }
+
+    /// <summary>What the player is moving now, or null.</summary>
+    public Transport Using { get; private set; }
+
+    public PlayerMovement Movement { get; private set; }
+    public CharacterController Controller { get; private set; }
+    /// <summary>The player's speed over the ground, for the spring at the handle.</summary>
+    public Vector3 Velocity => Movement.HorizontalVelocity;
+
+    private void Awake()
+    {
+        Movement = GetComponent<PlayerMovement>();
+        Controller = GetComponent<CharacterController>();
+        stateMachine = GetComponent<PlayerStateMachine>();
+        health = GetComponent<Damageable>();
+    }
+
+    private void OnEnable()
+    {
+        Current = this;
+        stateMachine.AttackRequested += LetGoToFight;
+        stateMachine.DodgeRequested += LetGoToFight;
+        stateMachine.ShieldBashRequested += LetGoToFight;
+        stateMachine.SkillRequested += OnSkill;
+        stateMachine.GuardRequested += OnGuard;
+        stateMachine.AboardInteraction += OnAboardInteraction;
+        stateMachine.SwimmingInteraction += OnSwimmingInteraction;
+        if (health != null)
+        {
+            health.Died += OnDied;
+        }
+    }
+
+    private void OnDisable()
+    {
+        stateMachine.AttackRequested -= LetGoToFight;
+        stateMachine.DodgeRequested -= LetGoToFight;
+        stateMachine.ShieldBashRequested -= LetGoToFight;
+        stateMachine.SkillRequested -= OnSkill;
+        stateMachine.GuardRequested -= OnGuard;
+        stateMachine.AboardInteraction -= OnAboardInteraction;
+        stateMachine.SwimmingInteraction -= OnSwimmingInteraction;
+        if (health != null)
+        {
+            health.Died -= OnDied;
+        }
+
+        if (Current == this)
+        {
+            Current = null;
+        }
+    }
+
+    private IEnumerator Start()
+    {
+        if (!GameSession.TakeCarriedTransport(out GameSession.CarriedTransport carried))
+        {
+            yield break;
+        }
+
+        // Set down too early it falls through a scene that is still waking. The player standing proves the ground is there.
+        for (float waited = 0f; !Movement.IsGrounded && waited < ArrivalSeconds; waited += Time.unscaledDeltaTime)
+        {
+            yield return null;
+        }
+
+        yield return new WaitForSecondsRealtime(SettleSeconds);
+        Arrive(carried);
+    }
+
+    private void Update()
+    {
+        if (Using == null)
+        {
+            return;
+        }
+
+        if (Using.Driver is Haulable haulable)
+        {
+            if (stateMachine.IsSwimming)
+            {
+                haulable.LetGo();
+                return;
+            }
+
+            Movement.SetSpeedScale(this, Using.SpeedScale * haulable.StrainScale);
+        }
+    }
+
+    /// <summary>Called by a driver when the player takes it.</summary>
+    public void Began(Transport transport)
+    {
+        Using = transport;
+        TransportHud.Create();
+    }
+
+    /// <summary>Called by a driver when the player no longer has it.</summary>
+    public void Ended()
+    {
+        Using = null;
+        Movement.SetSpeedScale(this, 1f);
+        if (stateMachine.IsAboard)
+        {
+            stateMachine.SetAboard(false);
+        }
+    }
+
+    /// <summary>Sits the player down on something that moves.</summary>
+    public void SitAt(Transform seat, Vector3 offset)
+    {
+        stateMachine.SetAboard(true);
+        Movement.SitAt(seat, offset);
+    }
+
+    public void StandAt(Vector3 spot) => Movement.StandAt(spot);
+
+    private void LetGoToFight()
+    {
+        if (Using != null && Using.Driver is Haulable haulable)
+        {
+            haulable.LetGo();
+        }
+    }
+
+    private void OnSkill(int slot) => LetGoToFight();
+
+    private void OnGuard(bool raised)
+    {
+        if (raised)
+        {
+            LetGoToFight();
+        }
+    }
+
+    private void OnDied(Damageable victim, DamageInfo killingBlow)
+    {
+        if (Using != null)
+        {
+            Using.Driver.LetGo();
+        }
+    }
+
+    private void OnAboardInteraction()
+    {
+        if (Using != null && Using.Driver is Rowboat boat)
+        {
+            boat.TryDisembark();
+        }
+    }
+
+    // Interacting is off while swimming, but a boat that drifted out must never be lost for it.
+    private void OnSwimmingInteraction()
+    {
+        foreach (Transport transport in Transport.All)
+        {
+            if (transport.Driver is Rowboat boat && !boat.InUse && (transport.transform.position - transform.position).sqrMagnitude < BoardReach * BoardReach)
+            {
+                boat.Board(this);
+                return;
+            }
+        }
+    }
+
+    // ----- Through the portal -----
+
+    /// <summary>A cart in the hands comes along through the portal, and leaves home for now.</summary>
+    public void LeaveForRaid()
+    {
+        if (Using == null || !(Using.Driver is Haulable))
+        {
+            return;
+        }
+
+        Transport transport = Using;
+        string name = transport.Definition.DisplayName;
+        GameSession.CarryTransport(new GameSession.CarriedTransport(transport.Definition, transport.CaptureState()));
+        transport.Driver.LetGo();
+        transport.Remove();
+        GameMessages.Post($"The {name} comes with you. Lose the raid, or leave it behind, and it is gone.", MessageKind.Warning);
+    }
+
+    /// <summary>The raid is over. On extraction the cart nearest the player comes home; the rest of the forest keeps.</summary>
+    public void LeaveRaid(bool extracted)
+    {
+        Transport nearest = null;
+        float best = float.PositiveInfinity;
+        foreach (Transport transport in Transport.All)
+        {
+            float distance = (transport.transform.position - transform.position).sqrMagnitude;
+            if (transport.Driver is Haulable && distance < best)
+            {
+                best = distance;
+                nearest = transport;
+            }
+        }
+
+        if (nearest == null)
+        {
+            return;
+        }
+
+        float reach = TransportSettings.Current.ExtractionRange;
+        if (extracted && best <= reach * reach)
+        {
+            GameSession.CarryTransport(new GameSession.CarriedTransport(nearest.Definition, nearest.CaptureState()));
+            GameMessages.Post($"The {nearest.Definition.DisplayName} comes home with you.", MessageKind.Gain);
+        }
+        else
+        {
+            GameMessages.Post($"The {nearest.Definition.DisplayName} and what is in it stay behind.", MessageKind.Warning);
+        }
+    }
+
+    private void Arrive(GameSession.CarriedTransport carried)
+    {
+        if (!TransportDeployment.FindGroundAround(transform, out Vector3 at))
+        {
+            at = transform.position + Vector3.up;
+        }
+
+        SaveableEntity spawned = SaveableEntity.Spawn(carried.Definition.Prefab, at, transform.rotation);
+        var transport = spawned.GetComponent<Transport>();
+        transport.RestoreState(carried.State);
+        if (transport.Driver is Haulable haulable)
+        {
+            haulable.Take(this);
+        }
+    }
+}

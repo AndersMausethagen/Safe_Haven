@@ -164,7 +164,12 @@ public sealed class WorldInteractionIndicator : MonoBehaviour
         if (status != null)
         {
             status.color = color;
-            if (working)
+            if (working && Target.HoldOpen)
+            {
+                // A minigame runs on its own bar, so there is no share of the work to report.
+                SetText(status, "Working...");
+            }
+            else if (working)
             {
                 status.SetText("Working... {0:0}%", Target.Progress * 100f);
             }

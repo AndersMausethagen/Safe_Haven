@@ -23,5 +23,5 @@ MonoBehaviour:
   outlineWidth: 0.2
   bobHeight: 0.08
   bobSpeed: 2.5
-  font: {fileID: 0}
-  fontMaterial: {fileID: 2100000, guid: f63709be63c8e154b8dc6677a1367ff0, type: 2}
+  font: {fileID: 11400000, guid: 8579b3dc74ca4a64290753d5efddd637, type: 2}
+  fontMaterial: {fileID: 2100000, guid: d5c31d1192ac930479ec0d0efe91efef, type: 2}

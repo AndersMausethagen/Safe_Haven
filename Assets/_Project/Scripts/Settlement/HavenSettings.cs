@@ -20,6 +20,8 @@ public sealed class HavenSettings : GameSettings<HavenSettings>
         [Tooltip("Metres the ward reaches beyond its level's radius once this rank is reached.")]
         [Min(0f)] public float wardBonus;
         [TextArea(1, 3)] public string line;
+        [Tooltip("Raised once when Safe Haven reaches this rank, for quests (a Quest Event objective with Count Already Owned) and stories. Optional.")]
+        public GameEventDefinition reachedEvent;
     }
 
     [Tooltip("Each more building of a kind already standing brings this share of its renown: variety is worth more.")]
@@ -33,6 +35,8 @@ public sealed class HavenSettings : GameSettings<HavenSettings>
     [Tooltip("Experience for each quarter of the overgrowth cleared, times the quarters cleared (25, 50, 75, 100).")]
     [SerializeField, Min(0)] private int clearingExperiencePerQuarter = 25;
     [SerializeField] private SoundDefinition rankSound;
+    [Tooltip("The people lost with the player. The Haven window shows who is home and who is still out there.")]
+    [SerializeField] private List<ResidentDefinition> expedition = new List<ResidentDefinition>();
     [SerializeField] private List<Rank> ranks = new List<Rank>
     {
         new Rank { name = "Overgrown Camp", renown = 0, line = "A fire and a tree, and the forest pressing in." },
@@ -49,6 +53,7 @@ public sealed class HavenSettings : GameSettings<HavenSettings>
     public int ClearingExperiencePerQuarter => clearingExperiencePerQuarter;
     public SoundDefinition RankSound => rankSound;
     public IReadOnlyList<Rank> Ranks => ranks;
+    public IReadOnlyList<ResidentDefinition> Expedition => expedition;
 
     /// <summary>The highest rank this much renown reaches (0 is the first).</summary>
     public int RankFor(int renown)

@@ -66,6 +66,42 @@ public sealed class HavenBuildingTests
     }
 
     [Test]
+    public void HavenLadder_StandsRanksAnEqualStepApart_AndEndsAtTheTop()
+    {
+        var ranks = new[]
+        {
+            new HavenSettings.Rank { renown = 0 },
+            new HavenSettings.Rank { renown = 10 },
+            new HavenSettings.Rank { renown = 100 },
+        };
+        Assert.AreEqual(0f, HavenOverview.ClimbOf(ranks, 0, 0));
+        Assert.AreEqual(0.25f, HavenOverview.ClimbOf(ranks, 0, 5), 0.0001f, "halfway to the second of three stops");
+        Assert.AreEqual(0.5f, HavenOverview.ClimbOf(ranks, 1, 10), 0.0001f, "the bigger gap doesn't move the stop");
+        Assert.AreEqual(0.5f, HavenOverview.ClimbOf(ranks, 1, 3), 0.0001f, "a rank once reached is kept, whatever the renown");
+        Assert.AreEqual(1f, HavenOverview.ClimbOf(ranks, 2, 100));
+        Assert.AreEqual(1f, HavenOverview.ClimbOf(ranks, 2, 900));
+        Assert.AreEqual(1f, HavenOverview.ClimbOf(System.Array.Empty<HavenSettings.Rank>(), 0, 0), "nothing to climb");
+    }
+
+    [Test]
+    public void HavenOverview_PutsAKindOnOneLine_LargestFirst()
+    {
+        var parts = new[]
+        {
+            new HavenRenown.Part("Campfire", 3),
+            new HavenRenown.Part("Forge", 10),
+            new HavenRenown.Part("Campfire", 2),
+            new HavenRenown.Part("Campfire", 2),
+            new HavenRenown.Part("Clearing the overgrowth", 0),
+        };
+        var grouped = HavenOverview.Grouped(parts).ToList();
+        Assert.AreEqual(2, grouped.Count, "nothing is shown for nothing");
+        Assert.AreEqual("Forge", grouped[0].Label);
+        Assert.AreEqual("Campfire ×3", grouped[1].Label);
+        Assert.AreEqual(7, grouped[1].Renown);
+    }
+
+    [Test]
     public void HavenRanks_ClimbWithRenown_AndTheWardOnlyGrows()
     {
         HavenSettings settings = HavenSettings.Current;

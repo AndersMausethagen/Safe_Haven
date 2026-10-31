@@ -4,8 +4,8 @@ using UnityEngine;
 /// Watches Safe Haven grow: adds up its renown (HavenRenown) whenever something is built, upgraded or cleared, shows
 /// the gain, and celebrates each new rank once: a banner, a sound, experience, and the ward widening (HavenSettings), so
 /// the moss spreads out to the new edge and there is new ground to build on. Clearing a quarter, half, three quarters
-/// and all of the overgrowth is announced too. Added to the Heart Tree when the scene starts; makes the Haven HUD (the
-/// overview is a page of the Heart Tree's menu, H: HeartTree.OpenHaven).
+/// and all of the overgrowth is announced too. Added to the Heart Tree when the scene starts; makes the Haven HUD and the
+/// Haven window (H).
 /// </summary>
 [DisallowMultipleComponent]
 public sealed class HavenProgress : MonoBehaviour
@@ -39,6 +39,7 @@ public sealed class HavenProgress : MonoBehaviour
     private void Start()
     {
         HavenHud.Create();
+        HavenWindow.Create();
         clearedQuarter = Mathf.FloorToInt(Overgrowth.ClearedShare * 4f + 0.001f);
         Count(false);
     }
@@ -94,6 +95,21 @@ public sealed class HavenProgress : MonoBehaviour
             CameraShake.Add(0.15f);
             ExperienceTracker.Grant(settings.RankExperience);
             GameMessages.Post($"Safe Haven is now a {reached.name}! The ward reaches {(HeartTree.Current != null ? HeartTree.Current.WardRadius : 0f):0} m.", MessageKind.Gain);
+        }
+
+        RaiseRankEvents(settings);
+    }
+
+    // Every rank reached counts, so a quest about a rank also finishes for a haven that got there before the event existed.
+    private static void RaiseRankEvents(HavenSettings settings)
+    {
+        for (int i = 0; i <= GameSession.Settlement.HavenRank && i < settings.Ranks.Count; i++)
+        {
+            GameEventDefinition reachedEvent = settings.Ranks[i].reachedEvent;
+            if (reachedEvent != null && !GameSession.Quests.HasHappened(reachedEvent))
+            {
+                GameEvents.Raise(reachedEvent, Player.Current != null ? Player.Current.gameObject : null);
+            }
         }
     }
 }

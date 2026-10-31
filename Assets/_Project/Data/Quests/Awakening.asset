@@ -14,11 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::QuestDefinition
   id: awakening
   displayName: Awakening
-  description: You wake beneath a great tree in a quiet clearing. Its bark is warm, and something in it seems to be waiting for you.
+  description: You wake beneath a great tree in a quiet clearing, and you wake alone. Its bark is warm, and something in it seems to be waiting for you.
   chain: The First Days
   prerequisites: []
   start: 1
   startEvent: {fileID: 11400000, guid: d34acdcfc02a80243b371e93f882cd0c, type: 2}
+  startDelay: 0
+  onStarted: []
   objectivesInOrder: 0
   objectives:
   - type: 6
@@ -27,6 +29,7 @@ MonoBehaviour:
     item: {fileID: 0}
     resource: {fileID: 0}
     monster: {fileID: 0}
+    faction: 1
     building: {fileID: 0}
     raid: {fileID: 0}
     mustExtract: 1
@@ -38,4 +41,6 @@ MonoBehaviour:
   rewardItems: []
   rewardResources: []
   rewardRecipes: []
+  experience: 0
   completionEvent: {fileID: 0}
+  onCompleted: []

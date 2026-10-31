@@ -14,12 +14,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::QuestDefinition
   id: theweakeningward
   displayName: The Weakening Ward
-  description: Your return through the portal was felt. Something is testing the ward. Prepare, then speak to the Heart Tree when you are ready.
+  description: The light that called Ingrid home was seen by other things too. Something is testing the ward. Prepare, then speak to the Heart Tree when you are ready.
   chain: The First Days
   prerequisites:
   - {fileID: 11400000, guid: 08ed06b5fb8d1854c86788aa2a00156f, type: 2}
   start: 0
   startEvent: {fileID: 0}
+  startDelay: 0
+  onStarted: []
   objectivesInOrder: 0
   objectives:
   - type: 6
@@ -28,13 +30,18 @@ MonoBehaviour:
     item: {fileID: 0}
     resource: {fileID: 0}
     monster: {fileID: 0}
+    faction: 1
     building: {fileID: 0}
     raid: {fileID: 0}
     mustExtract: 1
     withinMinutes: 0
     questEvent: {fileID: 11400000, guid: 1f08102c61035f343a7ca290ab90c84d, type: 2}
     countAlreadyOwned: 0
+  turnInToGiver: 0
+  turnInTo: 
   rewardItems: []
   rewardResources: []
   rewardRecipes: []
+  experience: 0
   completionEvent: {fileID: 0}
+  onCompleted: []

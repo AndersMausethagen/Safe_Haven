@@ -163,6 +163,9 @@ public sealed class RaidDirector : MonoBehaviour
         {
             Current = null;
         }
+
+        // Still active here means the scene was left mid-raid; the menu must be able to load a save again.
+        GameSession.AbandonRaid(Session);
     }
 
     private void Update()
@@ -332,6 +335,11 @@ public sealed class RaidDirector : MonoBehaviour
         var wear = new List<EquipmentWear>();
         PlayerSnapshot keeps = extracted ? final : final?.AfterFailedRaid(Session.Loadout, DurabilitySettings.Current.LossOnFailedRaid, wear);
         Report = RaidReport.Create(Session, Session.Loadout, keeps, final, wear);
+        if (PlayerTransport.Current != null)
+        {
+            PlayerTransport.Current.LeaveRaid(extracted);
+        }
+
         GameSession.EndRaid(Report);
         GameEvents.Raise(new GameEvent(GameEventKind.RaidFinished, Session.Definition, 1, null, Session.Outcome, Session.Elapsed));
         GameSession.CarryPlayerState(keeps);

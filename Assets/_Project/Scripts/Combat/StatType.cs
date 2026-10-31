@@ -39,4 +39,8 @@ public enum StatType
     GatherYield = 18,
     /// <summary>Share less wear on gathering tools. 0.25 means a quarter less.</summary>
     ToolCare = 19,
+    /// <summary>Share of the health a blow takes that comes back to the attacker. 0.05 means 5%.</summary>
+    Lifesteal = 20,
+    /// <summary>Share more Cursed Essence from kills. 0.25 means a quarter more on average.</summary>
+    EssenceFind = 21,
 }

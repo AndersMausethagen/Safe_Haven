@@ -38,6 +38,8 @@ public sealed class Player : MonoBehaviour
     public Combatant Combatant { get; private set; }
     public PlayerPersistence Persistence { get; private set; }
     public PlayerStealth Stealth { get; private set; }
+    /// <summary>The sounds the player makes, and how far they can be heard right now.</summary>
+    public PlayerNoise Noise { get; private set; }
     /// <summary>Timed bonuses: meals, tonics, gifts.</summary>
     public PlayerBoons Boons { get; private set; }
 
@@ -66,6 +68,7 @@ public sealed class Player : MonoBehaviour
         Combatant = GetComponent<Combatant>();
         Persistence = GetComponent<PlayerPersistence>();
         Stealth = GetComponent<PlayerStealth>();
+        Noise = GetComponent<PlayerNoise>();
         Boons = GetComponent<PlayerBoons>();
     }
 

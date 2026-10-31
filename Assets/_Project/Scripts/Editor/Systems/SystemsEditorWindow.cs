@@ -56,13 +56,18 @@ public sealed class SystemsEditorWindow : EditorWindow
             new TreeChoppingPage(),
             new MovementAndCombatPage(),
             new SensesAndStealthPage(),
+            new LockpickingPage(),
             new RaidsAndPortalPage(),
             new HeartTreeAndBuildingPage(),
             new CraftingPage(),
             new ResidentsAndPurificationPage(),
+            new EssencePage(),
+            new TransportPage(),
             new QuestMarkersPage(),
+            new StoryPacingPage(),
             new WardBreachPage(),
             new LootAndRarityPage(),
+            new UIStylePage(),
             new PlaytestPage(),
         };
     }

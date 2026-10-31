@@ -14,6 +14,14 @@ public sealed class PlayerStateMachine : MonoBehaviour
     public bool CanMove => CurrentState != PlayerState.Interacting;
     /// <summary>In deep water (PlayerSwimming): no attacks, guard, skills, dodges or interactions, only swimming.</summary>
     public bool IsSwimming { get; private set; }
+    /// <summary>At the oars (PlayerTransport): like swimming, no fighting; interacting means getting out.</summary>
+    public bool IsAboard { get; private set; }
+    private bool HandsTaken => IsSwimming || IsAboard;
+
+    /// <summary>Raised when Interact is pressed at the oars.</summary>
+    public event Action AboardInteraction;
+    /// <summary>Raised when Interact is pressed while swimming: a boat in reach can be climbed into.</summary>
+    public event Action SwimmingInteraction;
 
     public event Action<PlayerState, PlayerState> StateChanged;
     public event Action InteractionRequested;
@@ -53,8 +61,15 @@ public sealed class PlayerStateMachine : MonoBehaviour
 
     public void RequestInteraction()
     {
+        if (IsAboard)
+        {
+            AboardInteraction?.Invoke();
+            return;
+        }
+
         if (IsSwimming)
         {
+            SwimmingInteraction?.Invoke();
             return;
         }
 
@@ -77,7 +92,7 @@ public sealed class PlayerStateMachine : MonoBehaviour
     /// <summary>Attacks can't start while the player is busy with an interaction; the press goes to WorkPressed instead.</summary>
     public void RequestAttack()
     {
-        if (IsSwimming)
+        if (HandsTaken)
         {
             return;
         }
@@ -100,7 +115,7 @@ public sealed class PlayerStateMachine : MonoBehaviour
     /// <summary>Raising the guard is refused while busy with an interaction; lowering it always goes through.</summary>
     public void RequestGuard(bool raised)
     {
-        if (!raised || CurrentState != PlayerState.Interacting && !IsSwimming)
+        if (!raised || CurrentState != PlayerState.Interacting && !HandsTaken)
         {
             GuardRequested?.Invoke(raised);
         }
@@ -108,7 +123,7 @@ public sealed class PlayerStateMachine : MonoBehaviour
 
     public void RequestShieldBash()
     {
-        if (CurrentState != PlayerState.Interacting && !IsSwimming)
+        if (CurrentState != PlayerState.Interacting && !HandsTaken)
         {
             ShieldBashRequested?.Invoke();
         }
@@ -117,7 +132,7 @@ public sealed class PlayerStateMachine : MonoBehaviour
     /// <summary>Skills, like attacks, can't be cast while the player is busy with an interaction.</summary>
     public void RequestSkill(int slot)
     {
-        if (CurrentState != PlayerState.Interacting && !IsSwimming)
+        if (CurrentState != PlayerState.Interacting && !HandsTaken)
         {
             SkillRequested?.Invoke(slot);
         }
@@ -128,7 +143,7 @@ public sealed class PlayerStateMachine : MonoBehaviour
     /// <summary>Dodging while working on something (gathering, crafting) stops the work first.</summary>
     public void RequestDodge()
     {
-        if (IsSwimming)
+        if (HandsTaken)
         {
             return;
         }
@@ -151,6 +166,22 @@ public sealed class PlayerStateMachine : MonoBehaviour
 
         IsSwimming = swimming;
         if (swimming)
+        {
+            GuardRequested?.Invoke(false);
+            EndInteraction();
+        }
+    }
+
+    /// <summary>Set by PlayerTransport. Sitting down at the oars lowers a raised guard and stops any work.</summary>
+    public void SetAboard(bool aboard)
+    {
+        if (IsAboard == aboard)
+        {
+            return;
+        }
+
+        IsAboard = aboard;
+        if (aboard)
         {
             GuardRequested?.Invoke(false);
             EndInteraction();

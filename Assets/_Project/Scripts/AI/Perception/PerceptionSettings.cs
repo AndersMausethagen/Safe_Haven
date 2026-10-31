@@ -64,6 +64,10 @@ public sealed class PerceptionSettings : GameSettings<PerceptionSettings>
     [SerializeField, Range(0f, 1f)] private float heardAwarenessFar = 0.35f;
     [Tooltip("…and right at its source. Below 1, so a sound alone never spots you; they have to see you.")]
     [SerializeField, Range(0f, 0.99f)] private float heardAwarenessNear = 0.9f;
+    [Tooltip("Share of a sound's reach left when terrain, trees, rocks or buildings stand between it and the listener.")]
+    [SerializeField, Range(0.1f, 1f)] private float heardThroughCover = 0.6f;
+    [Tooltip("How many metres off the real spot a monster places a sound heard at the very edge of its reach. Nearer sounds are placed better, the source itself exactly.")]
+    [SerializeField, Min(0f)] private float heardSpreadAtEdge = 6f;
 
     [Header("Ambush")]
     [Tooltip("Damage an unaware monster takes (a hit from the shadows). 1 = no bonus.")]
@@ -89,6 +93,34 @@ public sealed class PerceptionSettings : GameSettings<PerceptionSettings>
     [SerializeField, Min(0f)] private float combatNoise = 13f;
     [Tooltip("Seconds between combat noises, so a long fight doesn't flood the forest with sounds.")]
     [SerializeField, Min(0f)] private float combatNoiseInterval = 0.6f;
+    [Tooltip("Each stroke while swimming, every Footstep Interval.")]
+    [SerializeField, Min(0f)] private float swimNoise = 4f;
+    [Tooltip("Coming down hard.")]
+    [SerializeField, Min(0f)] private float landingNoise = 6f;
+    [Tooltip("Falling at least this fast (m/s) counts as coming down hard.")]
+    [SerializeField, Min(0f)] private float landingSpeed = 3f;
+    [Tooltip("Footsteps, strokes and landings are this many times louder at a Heavy Load of gear (Movement & Combat › Equipment load); at a Light Load they are as set above.")]
+    [SerializeField, Min(1f)] private float heavyGearNoise = 1.4f;
+    [Tooltip("Share of the player's noise that carries in the heaviest rain; lighter rain hides less.")]
+    [SerializeField, Range(0.1f, 1f)] private float noiseInRain = 0.7f;
+
+    [Header("Noise build-up (a run of sounds carries further than one)")]
+    [Tooltip("Share of each sound that lingers and is added to the ones after it, so a long fight or a string of mistakes reaches further and further.")]
+    [SerializeField, Range(0f, 1f)] private float noiseBuildShare = 0.15f;
+    [Tooltip("Most metres the build-up can add.")]
+    [SerializeField, Min(0f)] private float noiseBuildMax = 10f;
+    [Tooltip("Metres of build-up lost per second. Above the build-up of walking, so only loud runs of sounds add up.")]
+    [SerializeField, Min(0f)] private float noiseBuildDecay = 2f;
+
+    [Header("Noise meter (the HUD)")]
+    [Tooltip("Seconds the meter holds a sound before it falls. Above Footstep Interval, so walking reads steady.")]
+    [SerializeField, Min(0f)] private float noiseHoldSeconds = 0.6f;
+    [Tooltip("Metres per second the meter falls once the hold is over.")]
+    [SerializeField, Min(0.1f)] private float noiseFallPerSecond = 10f;
+    [Tooltip("Metres that fill the bar.")]
+    [SerializeField, Min(1f)] private float noiseMeterMax = 24f;
+    [Tooltip("Below this many metres the meter says Quiet, then Audible, Loud and at the last one Deafening.")]
+    [SerializeField] private Vector3 noiseBands = new Vector3(3f, 10f, 18f);
 
     [Header("Presentation")]
     [Tooltip("Shows '?' over suspicious and searching monsters and '!' when one spots its target.")]
@@ -132,6 +164,8 @@ public sealed class PerceptionSettings : GameSettings<PerceptionSettings>
 
     public float HeardAwarenessFar => heardAwarenessFar;
     public float HeardAwarenessNear => Mathf.Max(heardAwarenessFar, heardAwarenessNear);
+    public float HeardThroughCover => heardThroughCover;
+    public float HeardSpreadAtEdge => heardSpreadAtEdge;
 
     public float AmbushDamageTaken => ambushDamageTaken;
 
@@ -148,6 +182,20 @@ public sealed class PerceptionSettings : GameSettings<PerceptionSettings>
     public float DodgeNoise => dodgeNoise;
     public float CombatNoise => combatNoise;
     public float CombatNoiseInterval => combatNoiseInterval;
+    public float SwimNoise => swimNoise;
+    public float LandingNoise => landingNoise;
+    public float LandingSpeed => landingSpeed;
+    public float HeavyGearNoise => heavyGearNoise;
+    public float NoiseInRain => noiseInRain;
+
+    public float NoiseBuildShare => noiseBuildShare;
+    public float NoiseBuildMax => noiseBuildMax;
+    public float NoiseBuildDecay => noiseBuildDecay;
+
+    public float NoiseHoldSeconds => noiseHoldSeconds;
+    public float NoiseFallPerSecond => noiseFallPerSecond;
+    public float NoiseMeterMax => noiseMeterMax;
+    public Vector3 NoiseBands => noiseBands;
 
     public bool ShowIndicators => showIndicators;
     public float IndicatorHeight => indicatorHeight;

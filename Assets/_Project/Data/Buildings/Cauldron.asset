@@ -44,6 +44,7 @@ MonoBehaviour:
       amount: 6
     - item: {fileID: 11400000, guid: b5567f7d75200bd46befbd1dab298f36, type: 2}
       amount: 6
+    essence: []
     work: 8
     renown: 4
     craftSpeed: 0.3
@@ -57,6 +58,9 @@ MonoBehaviour:
       amount: 6
     - item: {fileID: 11400000, guid: 8cf878eb4a61eb943917a1f9421bb40a, type: 2}
       amount: 2
+    essence:
+    - resource: {fileID: 11400000, guid: e991fd5ccf0ce314cafafff8badfe173, type: 2}
+      amount: 8
     work: 9
     renown: 6
     craftSpeed: 0.3

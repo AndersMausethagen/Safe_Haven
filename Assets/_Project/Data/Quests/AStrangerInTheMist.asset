@@ -13,13 +13,16 @@ MonoBehaviour:
   m_Name: AStrangerInTheMist
   m_EditorClassIdentifier: Assembly-CSharp::QuestDefinition
   id: astrangerinthemist
-  displayName: A Stranger in the Mist
-  description: You found a woman hiding from the wolves in the Misty Woods. She'll only be safe in your clearing.
-  chain: Side Quests
-  prerequisites: []
-  start: 1
-  startEvent: {fileID: 11400000, guid: 4db7fcedfe05ca34cb26fb8f31d5351b, type: 2}
-  objectivesInOrder: 0
+  displayName: Bring Ingrid Home
+  description: 'Sigrid''s voice came through the stones: Ingrid was right behind her when they broke, and she is hurt. Find her in the Misty Woods, keep her close, and bring her through an extraction point with you. If she falls she will wait where you found her.'
+  chain: The Lost Expedition
+  prerequisites:
+  - {fileID: 11400000, guid: 2614c1d189f3a034691f98f3d3efeee0, type: 2}
+  start: 0
+  startEvent: {fileID: 0}
+  startDelay: 0
+  onStarted: []
+  objectivesInOrder: 1
   objectives:
   - type: 6
     description: 
@@ -27,15 +30,31 @@ MonoBehaviour:
     item: {fileID: 0}
     resource: {fileID: 0}
     monster: {fileID: 0}
+    faction: 1
+    building: {fileID: 0}
+    raid: {fileID: 0}
+    mustExtract: 1
+    withinMinutes: 0
+    questEvent: {fileID: 11400000, guid: 4db7fcedfe05ca34cb26fb8f31d5351b, type: 2}
+    countAlreadyOwned: 1
+  - type: 6
+    description: 
+    amount: 1
+    item: {fileID: 0}
+    resource: {fileID: 0}
+    monster: {fileID: 0}
+    faction: 1
     building: {fileID: 0}
     raid: {fileID: 0}
     mustExtract: 1
     withinMinutes: 0
     questEvent: {fileID: 11400000, guid: 333d8f3d8fb83304ea285c56f7052dac, type: 2}
-    countAlreadyOwned: 0
+    countAlreadyOwned: 1
   turnInToGiver: 0
   turnInTo: 
   rewardItems: []
   rewardResources: []
   rewardRecipes: []
+  experience: 0
   completionEvent: {fileID: 0}
+  onCompleted: []

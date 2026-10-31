@@ -116,7 +116,7 @@ public sealed class PlayerSkills : MonoBehaviour
             SkillDefinition skill = pendingHit;
             pendingHit = null;
             float weaponDamage = combat != null && combat.Weapon != null ? combat.Weapon.Damage : 0f;
-            AttackResolver.Execute(combatant, skill.Attack, weaponDamage, transform.position, pendingDirection, hitLayers);
+            AttackResolver.Execute(combatant, skill.Attack, weaponDamage, transform.position, pendingDirection, hitLayers, Power(skill));
         }
 
         if (activeBuffs.Count > 0)
@@ -243,7 +243,7 @@ public sealed class PlayerSkills : MonoBehaviour
     private void Perform(SkillDefinition skill)
     {
         float now = Time.time;
-        cooldowns.Start(skill, now, skill.Cooldown);
+        cooldowns.Start(skill, now, CooldownOf(skill));
         busyUntil = now + skill.CastTime;
 
         // Like the weapon swing, the direction is locked in toward the cursor as the cast begins.
@@ -270,7 +270,7 @@ public sealed class PlayerSkills : MonoBehaviour
 
         if (skill.Heal > 0f)
         {
-            health.Heal(skill.Heal);
+            health.Heal(skill.Heal * Power(skill));
         }
 
         if (skill.HasBuffs)
@@ -279,13 +279,21 @@ public sealed class PlayerSkills : MonoBehaviour
         }
     }
 
+    /// <summary>What deepening a skill at the altar multiplies its damage, healing and buffs by.</summary>
+    public static float Power(SkillDefinition skill) => 1f + EssenceSettings.Current.PowerAt(GameSession.Progress.RankOf(skill));
+
+    /// <summary>The skill's cooldown at its rank.</summary>
+    public static float CooldownOf(SkillDefinition skill) =>
+        skill.Cooldown * (1f - EssenceSettings.Current.CooldownCutAt(GameSession.Progress.RankOf(skill)));
+
     private void ApplyBuffs(SkillDefinition skill, float now)
     {
         // Recasting refreshes the buff rather than stacking it.
         combatant.Stats.RemoveModifiersFrom(skill);
         foreach (SkillStatBuff buff in skill.Buffs)
         {
-            combatant.Stats.AddModifier(new StatModifier(buff.stat, buff.op, buff.value, skill));
+            float value = buff.value > 0f ? buff.value * Power(skill) : buff.value;
+            combatant.Stats.AddModifier(new StatModifier(buff.stat, buff.op, value, skill));
         }
 
         activeBuffs[skill] = now + skill.BuffDuration;

@@ -298,7 +298,19 @@ public sealed class ItemContainer
             return;
         }
 
-        Set(index, stack.IsEmpty ? ItemStack.Empty : new ItemStack(stack.Item, Mathf.Min(stack.Count, stack.Item.MaximumStack), stack.Durability));
+        Set(index, stack.IsEmpty ? ItemStack.Empty : new ItemStack(stack.Item, Mathf.Min(stack.Count, stack.Item.MaximumStack), stack.Durability, stack.Empower, stack.Enchantment));
+    }
+
+    /// <summary>How many items are in the container, of every kind.</summary>
+    public int CountItems()
+    {
+        int count = 0;
+        foreach (ItemStack stack in slots)
+        {
+            count += stack.Count;
+        }
+
+        return count;
     }
 
     /// <summary>Changes the durability of the item in a slot (wear on death, a repair). Does nothing to empty slots.</summary>

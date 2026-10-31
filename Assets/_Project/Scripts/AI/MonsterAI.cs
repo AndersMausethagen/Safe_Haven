@@ -411,7 +411,8 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject, IStaggerable
     /// <summary>
     /// A sound of <paramref name="radius"/> metres at <paramref name="position"/> (WorldNoise). An idle, roaming or
     /// investigating monster that hears it grows suspicious and comes to look; one that hunts, fights or walks home
-    /// ignores it. A sound alone never makes it spot anyone.
+    /// ignores it. Cover muffles a sound, and the further off it is the less exactly the monster can place it. A sound
+    /// alone never makes it spot anyone.
     /// </summary>
     public void Hear(Vector3 position, float radius)
     {
@@ -420,13 +421,23 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject, IStaggerable
             return;
         }
 
-        float level = PerceptionRules.HeardLevel(HorizontalDistance(position), radius, definition.Hearing, PerceptionSettings.Current);
+        PerceptionSettings rules = PerceptionSettings.Current;
+        float distance = HorizontalDistance(position);
+        // Out of reach even in the open, so the line check is only paid for sounds that could be heard.
+        if (PerceptionRules.HeardLevel(distance, radius, definition.Hearing, rules) <= 0f)
+        {
+            return;
+        }
+
+        bool muffled = !senses.HasClearPathTo(position);
+        float level = PerceptionRules.HeardLevel(distance, radius, definition.Hearing, rules, muffled);
         if (level <= 0f)
         {
             return;
         }
 
-        senses.Awareness.Hear(level, position);
+        Vector2 miss = UnityEngine.Random.insideUnitCircle * PerceptionRules.HeardError(distance, radius, definition.Hearing, rules, muffled);
+        senses.Awareness.Hear(level, position + new Vector3(miss.x, 0f, miss.y));
         if (senses.Stage != AwarenessStage.Unaware)
         {
             BeginInvestigate(false);

@@ -403,6 +403,8 @@ public sealed class QuestMapWindow : EditorWindow
         return max;
     }
 
+    private static string DelayText(QuestDefinition quest) => quest.StartDelay > 0f ? $", {quest.StartDelay:0.#} s later" : "";
+
     private static void Describe(Box box, List<QuestDefinition> quests)
     {
         QuestDefinition quest = box.Node.Quest;
@@ -410,14 +412,19 @@ public sealed class QuestMapWindow : EditorWindow
         {
             case QuestStart.ByQuestGiver:
                 bool hasGiver = QuestSceneIndex.HasGiver(quest);
-                box.Lines.Add(new Line { Text = hasGiver ? "Starts: from a Quest Giver" : "Starts: no Quest Giver in any scene", Problem = !hasGiver });
+                bool byStory = QuestSceneIndex.IsStartedByStory(quest);
+                box.Lines.Add(new Line
+                {
+                    Text = hasGiver ? "Starts: from a Quest Giver" : byStory ? "Starts: from a story" : "Starts: no Quest Giver in any scene",
+                    Problem = !hasGiver && !byStory,
+                });
                 break;
             case QuestStart.OnQuestEvent:
-                box.Lines.Add(new Line { Text = "Starts: on an event" });
+                box.Lines.Add(new Line { Text = "Starts: on an event" + DelayText(quest) });
                 AddEvent(box, quest.StartEvent, quests);
                 break;
             default:
-                box.Lines.Add(new Line { Text = "Starts: automatically" });
+                box.Lines.Add(new Line { Text = "Starts: automatically" + DelayText(quest) });
                 break;
         }
 

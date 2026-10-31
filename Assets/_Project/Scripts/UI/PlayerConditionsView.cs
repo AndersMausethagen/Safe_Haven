@@ -17,7 +17,7 @@ public sealed class PlayerConditionsView : MonoBehaviour
     private const float FontSize = 19f;
 
     private static readonly Vector2 Offset = new Vector2(6f, 8f);
-    private static readonly Color BoonColor = new Color(0.91f, 0.77f, 0.42f);
+    private static Color BoonColor => UIStyle.Current.Accent;
 
     private readonly StringBuilder text = new StringBuilder();
     private TMP_Text label;

@@ -262,6 +262,8 @@ public static class StatNames
             case StatType.DrawSpeed: return "Draw Speed";
             case StatType.GatherYield: return "Extra Yield Chance";
             case StatType.ToolCare: return "Less Tool Wear";
+            case StatType.Lifesteal: return "Life Drain";
+            case StatType.EssenceFind: return "Cursed Essence Found";
             default: return stat.ToString();
         }
     }
@@ -285,6 +287,8 @@ public static class StatNames
             case StatType.DrawSpeed:
             case StatType.GatherYield:
             case StatType.ToolCare:
+            case StatType.Lifesteal:
+            case StatType.EssenceFind:
                 return true;
             default:
                 return false;

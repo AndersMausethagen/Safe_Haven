@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 /// <summary>
@@ -9,6 +10,8 @@ public static class RecipeTabs
 {
     public const string All = "All";
     public const string Resources = "Resources";
+    /// <summary>The bag's extra tab: known recipes made somewhere else.</summary>
+    public const string Stations = "Stations";
 
     public sealed class Tab
     {
@@ -85,6 +88,21 @@ public static class RecipeTabs
         }
 
         return tabs;
+    }
+
+    /// <summary>The recipes that can be made, keeping their order.</summary>
+    public static List<RecipeDefinition> OnlyMakeable(IEnumerable<RecipeDefinition> recipes, Predicate<RecipeDefinition> canMake)
+    {
+        var result = new List<RecipeDefinition>();
+        foreach (RecipeDefinition recipe in recipes)
+        {
+            if (canMake(recipe))
+            {
+                result.Add(recipe);
+            }
+        }
+
+        return result;
     }
 
     /// <summary>

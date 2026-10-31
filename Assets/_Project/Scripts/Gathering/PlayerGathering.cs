@@ -41,7 +41,7 @@ public sealed class PlayerGathering : MonoBehaviour
     private ResourceNode node;
     private GatheringToolProfile profile;
     private float autoTimer;
-    private GatheringBarView barView;
+    private TimingBarView barView;
     private readonly System.Random random = new System.Random();
 
     /// <summary>Raised after every swing by any player.</summary>
@@ -52,9 +52,6 @@ public sealed class PlayerGathering : MonoBehaviour
 
     /// <summary>The tool of the gather in progress.</summary>
     public ToolType Tool => node != null && node.Definition != null ? node.Definition.GatherTool : ToolType.None;
-
-    /// <summary>Raised with the last swing's result, for this player's presentation (the swing bar).</summary>
-    public event Action<SwingResult> SwingResolved;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetStatics()
@@ -72,7 +69,7 @@ public sealed class PlayerGathering : MonoBehaviour
 
     private void Start()
     {
-        barView = GatheringBarView.Attach(this);
+        barView = TimingBarView.Attach(() => Session);
     }
 
     private void OnDestroy()
@@ -230,7 +227,11 @@ public sealed class PlayerGathering : MonoBehaviour
             node.NotifySwing(result, transform.position);
         }
 
-        SwingResolved?.Invoke(result);
+        if (barView != null)
+        {
+            barView.Flash(result == SwingResult.Critical ? "Critical!" : result == SwingResult.Normal ? "Good" : "Glancing", result);
+        }
+
         Swung?.Invoke(new GatheringSwing(result, position, settings.NoiseRadius(result) * loudness, tool, loudness));
 
         if (Session != null && Session.IsComplete && target != null)

@@ -12,7 +12,7 @@ using TMPro;
 /// in single-player and blocks player input.
 /// <para>
 /// It lives in the UI Root prefab, so every gameplay scene has one. Saving and loading go through SaveGameService
-/// (which refuses saving during a raid); quitting asks first, because progress since the last save is lost.
+/// (which refuses both during a raid); quitting asks first, because progress since the last save is lost.
 /// Saved Games and Options open their own screens over the menu (SavesScreen, OptionsScreen); this menu shows no page
 /// meanwhile and comes back when they close.
 /// </para>
@@ -194,7 +194,7 @@ public sealed class PauseMenu : MonoBehaviour
     {
         string saveProblem = SaveGameService.CheckSave();
         saveButton.interactable = !leaving && saveProblem == null;
-        loadButton.interactable = !leaving && SaveGameService.HasSave;
+        loadButton.interactable = !leaving && SaveGameService.HasSave && SaveGameService.CheckLoad() == null;
         continueButton.interactable = !leaving;
         optionsButton.interactable = !leaving;
         quitButton.interactable = !leaving;

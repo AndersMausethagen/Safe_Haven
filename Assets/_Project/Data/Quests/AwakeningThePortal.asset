@@ -14,12 +14,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::QuestDefinition
   id: awakeningtheportal
   displayName: Awakening the Portal
-  description: Across the stream stand old stones that were once a door. Feed them the Life Orbs.
+  description: Across the stream stand the stones that dropped you here. Feed them the Life Orbs and the way back to your people opens.
   chain: The First Days
   prerequisites:
   - {fileID: 11400000, guid: 8fd8f4db8a0b4d74cb71c5b4837010ac, type: 2}
   start: 0
   startEvent: {fileID: 0}
+  startDelay: 0
+  onStarted: []
   objectivesInOrder: 0
   objectives:
   - type: 6
@@ -28,6 +30,7 @@ MonoBehaviour:
     item: {fileID: 0}
     resource: {fileID: 0}
     monster: {fileID: 0}
+    faction: 1
     building: {fileID: 0}
     raid: {fileID: 0}
     mustExtract: 1
@@ -39,4 +42,6 @@ MonoBehaviour:
   rewardItems: []
   rewardResources: []
   rewardRecipes: []
+  experience: 0
   completionEvent: {fileID: 0}
+  onCompleted: []

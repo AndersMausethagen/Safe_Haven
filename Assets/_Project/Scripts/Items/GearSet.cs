@@ -7,7 +7,8 @@ using System;
 /// <para>
 /// Equipping moves an item out of a container (the bag) into its slot, swapping whatever was there back; unequipping
 /// moves it back. The slots only take matching items (ItemContainer.SlotRule), so drag and drop can't put a helmet on the
-/// feet. While bound to a StatSheet, every unbroken item adds its StatBonuses, removed again when it leaves or breaks.
+/// feet. While bound to a StatSheet, every unbroken item adds its StatBonuses, its empowering and its enchantment (GearPower),
+/// removed again when it leaves or breaks.
 /// </para>
 /// </summary>
 public sealed class GearSet
@@ -217,7 +218,7 @@ public sealed class GearSet
             return;
         }
 
-        foreach (StatBonus bonus in stack.Item.StatBonuses)
+        foreach (StatBonus bonus in GearPower.BonusesOf(stack, EssenceSettings.Current))
         {
             if (bonus.value != 0f)
             {

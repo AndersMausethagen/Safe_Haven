@@ -202,6 +202,20 @@ public sealed class PlayerCrafting : MonoBehaviour
         return CraftCheck.Ok;
     }
 
+    /// <summary>How many times the recipe can be crafted right now, with what is held and the room for what it makes.</summary>
+    public int CraftableCount(RecipeDefinition recipe)
+    {
+        if (!Check(recipe).CanCraft)
+        {
+            return 0;
+        }
+
+        MaterialPool pool = Pool;
+        int count = RecipeMaking.Batches(recipe, pool.Have, pool.Have);
+        int room = recipe.Output != null ? items.Container.SpaceFor(recipe.Output) : pool.FreeSpaceFor(recipe.OutputResource);
+        return Mathf.Min(count, room / Mathf.Max(1, recipe.OutputAmount));
+    }
+
     /// <summary>Crafts the recipe if possible; otherwise tells the player why not. Returns true when it was crafted.</summary>
     public bool TryCraft(RecipeDefinition recipe)
     {

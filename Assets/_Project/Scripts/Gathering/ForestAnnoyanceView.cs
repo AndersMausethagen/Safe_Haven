@@ -92,7 +92,8 @@ public sealed class ForestAnnoyanceView : MonoBehaviour
         var labelObject = new GameObject("Label", typeof(RectTransform), typeof(TextMeshProUGUI));
         labelObject.transform.SetParent(panelRect, false);
         label = labelObject.GetComponent<TextMeshProUGUI>();
-        label.fontSize = 18f;
+        UIStyle.Current.OnWorld(label);
+        label.fontSize = 17f;
         label.alignment = TextAlignmentOptions.Center;
         label.raycastTarget = false;
         label.rectTransform.anchorMin = label.rectTransform.anchorMax = new Vector2(0.5f, 0f);

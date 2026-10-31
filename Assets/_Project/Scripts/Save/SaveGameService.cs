@@ -8,7 +8,8 @@ using UnityEngine.SceneManagement;
 /// Starts, saves and loads games. Saving gathers the in-memory state (the live player and GameSession's stash, world and
 /// quests), turns it into a SaveData through SaveMapper and has SaveStorage write it. Loading reads it back, rebuilds the
 /// runtime objects, hands them to GameSession and loads the saved scene, where PlayerPersistence and the saveable
-/// objects apply them. Saving is refused during a raid, so a raid can't be replayed from the middle.
+/// objects apply them. Saving and loading are refused during a raid, so a raid can't be replayed from the middle or
+/// undone by going back to a save.
 /// <para>
 /// A game can have any number of saves, each its own file (a slot). The game being played writes to <see cref="CurrentSlot"/>:
 /// the slot it was loaded from, or a new one the first time a new game saves, so starting over never touches another game.
@@ -27,6 +28,7 @@ using UnityEngine.SceneManagement;
 public static class SaveGameService
 {
     private const int MaximumNameLength = 32;
+    private const string RaidRefusal = "You can't save or load during a raid. Extract first.";
 
     private static SaveStorage storage;
     private static bool loading;
@@ -90,7 +92,7 @@ public static class SaveGameService
 
         if (GameSession.ActiveRaid != null)
         {
-            return "You can't save during a raid. Extract first.";
+            return RaidRefusal;
         }
 
         if (PrologueDirector.Current != null && !PrologueDirector.Current.CanSave)
@@ -99,6 +101,17 @@ public static class SaveGameService
         }
 
         return Player.Current == null || Player.Current.Persistence == null ? "There is nothing to save here." : null;
+    }
+
+    /// <summary>Why a save can't be loaded right now, in words for the player, or null when one can.</summary>
+    public static string CheckLoad()
+    {
+        if (loading)
+        {
+            return "The game is already loading.";
+        }
+
+        return GameSession.ActiveRaid != null ? RaidRefusal : null;
     }
 
     /// <summary>Saves the game being played to its own save, making one if it has none yet.</summary>
@@ -271,13 +284,13 @@ public static class SaveGameService
 
     /// <summary>
     /// Loads a save and goes to its scene, or to fallbackScene if that scene no longer exists. False, with a reason
-    /// for the player, when there is nothing to load. The game then carries on in that save.
+    /// for the player, when there is nothing to load or a raid is under way. The game then carries on in that save.
     /// </summary>
     public static bool TryLoad(string slot, IContentLookup content, string fallbackScene, out string problem)
     {
-        if (loading)
+        problem = CheckLoad();
+        if (problem != null)
         {
-            problem = "The game is already loading.";
             return false;
         }
 

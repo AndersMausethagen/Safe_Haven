@@ -7,6 +7,28 @@ using UnityEngine.Rendering.Universal;
 
 public sealed class WeatherTests
 {
+    [Test]
+    public void TheGround_SoaksWithTheRainAndDriesSlowly()
+    {
+        Assert.AreEqual(0.5f, WeatherSystem.AdvanceWetness(0f, 1f, 30f, 60f, 240f), 0.001f, "half way through a minute's soak");
+        Assert.AreEqual(1f, WeatherSystem.AdvanceWetness(0.9f, 1f, 30f, 60f, 240f), 0.001f, "and no further");
+        Assert.AreEqual(0.1f, WeatherSystem.AdvanceWetness(0f, 0.25f, 24f, 60f, 240f), 0.001f, "light rain soaks slower");
+        Assert.AreEqual(0.25f, WeatherSystem.AdvanceWetness(0.25f, 0.25f, 24f, 60f, 240f), 0.001f, "and only so far");
+        Assert.AreEqual(0.75f, WeatherSystem.AdvanceWetness(1f, 0f, 60f, 60f, 240f), 0.001f, "drying has its own pace");
+        Assert.AreEqual(0f, WeatherSystem.AdvanceWetness(0.01f, 0f, 60f, 60f, 240f), 0.001f);
+    }
+
+    [Test]
+    public void Fireflies_ComeOutAtNightAndShelterFromTheRain()
+    {
+        var profile = ScriptableObject.CreateInstance<FireflyProfile>();
+
+        Assert.AreEqual(8, profile.CountFor(0f, 0f));
+        Assert.AreEqual(260, profile.CountFor(1f, 0f));
+        Assert.Less(profile.CountFor(1f, 1f), profile.CountFor(1f, 0f) / 4);
+        Object.DestroyImmediate(profile);
+    }
+
     private readonly List<Object> created = new List<Object>();
     private float fogDensity;
     private Color fogColour;

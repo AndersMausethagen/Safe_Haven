@@ -13,13 +13,15 @@ MonoBehaviour:
   m_Name: FoodAndWater
   m_EditorClassIdentifier: Assembly-CSharp::QuestDefinition
   id: foodandwater
-  displayName: Food and Water
-  description: Hunger and thirst creep up on you, slowly at home and faster beyond the portal. Pick berries, fetch water from the stream and stew a meal at the campfire.
+  displayName: Strength for the Road
+  description: 'Eirik was right: nobody fights well on an empty stomach, and you will be walking people home through the Misty Woods. Pick berries, fetch water from the stream and stew a meal at the campfire.'
   chain: The First Days
   prerequisites:
   - {fileID: 11400000, guid: f89173a9aeb790c4f9aeb1cc56e0e655, type: 2}
   start: 0
   startEvent: {fileID: 0}
+  startDelay: 0
+  onStarted: []
   objectivesInOrder: 0
   objectives:
   - type: 1
@@ -28,6 +30,7 @@ MonoBehaviour:
     item: {fileID: 11400000, guid: d799dc8161ff2854dae1eedf4b74fb09, type: 2}
     resource: {fileID: 0}
     monster: {fileID: 0}
+    faction: 1
     building: {fileID: 0}
     raid: {fileID: 0}
     mustExtract: 1
@@ -40,6 +43,7 @@ MonoBehaviour:
     item: {fileID: 0}
     resource: {fileID: 0}
     monster: {fileID: 0}
+    faction: 1
     building: {fileID: 0}
     raid: {fileID: 0}
     mustExtract: 1
@@ -52,15 +56,20 @@ MonoBehaviour:
     item: {fileID: 11400000, guid: 253fefd8f83ac6e4c89379e2ad873d6c, type: 2}
     resource: {fileID: 0}
     monster: {fileID: 0}
+    faction: 1
     building: {fileID: 0}
     raid: {fileID: 0}
     mustExtract: 1
     withinMinutes: 0
     questEvent: {fileID: 0}
     countAlreadyOwned: 0
+  turnInToGiver: 0
+  turnInTo: 
   rewardItems:
   - item: {fileID: 11400000, guid: 79744f7a29634cb408f4829b51ec5918, type: 2}
     amount: 1
   rewardResources: []
   rewardRecipes: []
+  experience: 0
   completionEvent: {fileID: 0}
+  onCompleted: []
