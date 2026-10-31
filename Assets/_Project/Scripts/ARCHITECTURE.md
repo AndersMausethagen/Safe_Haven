@@ -975,6 +975,10 @@ Carts, barrows and boats (GDD §8.5). They are real rigidbodies; the rules read 
 - **`PlayerTransport`** owns what the player is using, the speed scale and everything that lets go. `PlayerStateMachine.IsAboard` gates fighting like swimming does. `PlayerTransportPose` bends bones after the Animator, as there are no animations for this.
 - **Between scenes:** `GameSession.CarriedTransport` holds a definition and its saved cargo. `PlayerTransport.Start` waits until the player stands on the ground before setting it down: set down earlier it falls through a scene still waking.
 - **`TransportAudio`** reads everything from the physics: the loop follows real speed and load. The clips are made by `Tools/Audio/transport.py`, and the sounds are set in `TransportSettings`.
+- **`CargoPile`** shows the load on the cart itself: pieces grow in as weight rises and heap over the rim when overfilled.
+- **`CartScavenging`** is the risk of letting go in a raid: creatures nearby catch the scent (`MonsterAI.Investigate`, as a smell isn't a noise) and take cargo a bite at a time. `RaidRisk.WithCargo` and `RaidReport` put what is at stake in the briefing and the results.
+- **Rivers:** `WaterSurface.CurrentAt` gives the flow at a point, and `Rowboat` takes its drag relative to that water, so a boat left alone drifts downstream.
+- **Hauling is work:** rowing, climbing and pulling an overfilled load cost stamina, and costs paid through `MaterialPool` can draw on the cargo of a transport standing near the player.
 - **Colliders are on Ignore Raycast** so a wheel's ground ray doesn't find its own cart; `Transport.GroundMask` also skips water.
 
 ## Essence
@@ -984,7 +988,7 @@ What Cursed and Purified Essence buy (GDD §13.5, §16.4). The design rule is th
 - **Definitions:** `EnchantmentDefinition` (school, what it fits, cost, bonuses) and `EssenceSettings` (empower levels, skill ranks, the list of enchantments; saved by id through it). Built by `AgentScripts/BuildEssence.cs`, which also sets the altar's upgrades, the great building tiers (`BuildingLevel.essence`) and the two draughts.
 - **Runtime state:** `ItemStack.Empower` and `.Enchantment` belong to the one item (gear never stacks) and go wherever durability goes, so a new way of copying a stack has to keep them. Skill ranks are in `CharacterProgress`, keyed by `SkillDefinition.Id`, and aren't touched by a talent reset. `SettlementState.PurificationBonus` holds the altar's speed, because `SettlementSystem` works the queue during raids when the altar isn't loaded; the altar sets it when it loads and when a building finishes.
 - **Rules:** `GearPower` (bonuses, costs, Essence Find) and `AltarWork` (what can be done now and doing it) are pure enough to test; `GearSet` applies `GearPower.BonusesOf`. `Combatant` drains life from `StatType.Lifesteal`; `LootOnDeath` adds `StatType.EssenceFind` to Cursed Essence.
-- **UI:** `AltarWindow`, built in code the first time an altar is used. Empower, Enchant and Skills are one flow over `AltarSubject` and `AltarOffer`, so a new use is a new list of offers, not a new window. `CodeUI` holds the parts it shares with `HavenWindow`.
+- **UI:** `AltarWindow`, built in code the first time an altar is used. Empower, Enchant and Skills are one flow over `AltarSubject` and `AltarOffer`, so a new use is a new list of offers, not a new window. `CodeUI` holds the parts it shares with `HavenWindow`. `GearGlow` shows the work from outside: the colour of an item's frame in a slot and the glow on a weapon in the hand.
 
 ## Options
 
