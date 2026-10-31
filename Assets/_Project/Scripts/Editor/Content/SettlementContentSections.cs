@@ -63,7 +63,7 @@ public sealed class WardBreachSection : ContentSection
     public override List<string> FindProblems(Object asset, IList<Object> all)
     {
         List<string> problems = base.FindProblems(asset, all);
-        if (((WardBreachDefinition)asset).EnemyPrefab == null)
+        if (!((WardBreachDefinition)asset).HasEnemies)
         {
             problems.Add("Has no enemy prefab, so nothing comes.");
         }

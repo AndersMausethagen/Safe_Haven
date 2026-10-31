@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ce2d1b128047c645a32580aedb3b5b6, type: 3}
+  m_Name: WardBreachSettings
+  m_EditorClassIdentifier: SafeHaven::WardBreachSettings
+  breaches:
+  - {fileID: 11400000, guid: b723d3c3c8a02e74bab2f79e1831f16c, type: 2}
+  - {fileID: 11400000, guid: ae2a23cf8ba4c9e4ea42b90e570176d2, type: 2}
+  - {fileID: 11400000, guid: 5e04cc41865aedd49b4cb6b515e197b1, type: 2}
+  - {fileID: 11400000, guid: 8ce8e6d909419764a84877ebea469d22, type: 2}
+  raidsBetween: 3
+  raidsPutOff: 2
+  nightfallWarning: 20
+  strongerEachRepeat: 0.2
+  laneDistance: 16
+  wardAnchor: {fileID: 4280112419239228597, guid: cfa42f6502841384193c1fbec202cdaa, type: 3}
+  wardHealthPerLevel: 0.15
+  chaseLimit: 18
+  longestDefense: 300
+  repairShare: 0.3
+  strainRaids: 2
+  strainRadius: 4

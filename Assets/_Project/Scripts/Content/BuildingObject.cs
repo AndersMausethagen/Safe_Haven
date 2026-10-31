@@ -8,6 +8,9 @@ using UnityEngine;
 [DisallowMultipleComponent]
 public sealed class BuildingObject : MonoBehaviour, IInteractionName, IEventSubject
 {
+    // Nothing destroys what the player built (GDD §6.9): worn down to this it is broken, until it is mended.
+    private const float BrokenHealth = 1f;
+
     private static readonly List<BuildingObject> active = new List<BuildingObject>();
 
     [SerializeField] private BuildingDefinition definition;
@@ -77,6 +80,10 @@ public sealed class BuildingObject : MonoBehaviour, IInteractionName, IEventSubj
     private void OnEnable()
     {
         active.Add(this);
+        if (TryGetComponent(out Damageable health))
+        {
+            health.HealthFloor = BrokenHealth;
+        }
     }
 
     private void OnDisable()

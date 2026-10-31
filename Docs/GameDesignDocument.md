@@ -251,6 +251,8 @@ Start with **palisades/barricades** (routing and cover), **traps** (limited char
 
 Protect player agency with clearly marked spawn lanes, predictable pathing, visible structure health, a chance to recover, and limited repair costs. Early failure might damage a wall or temporarily disable a workstation; it should not destroy major progression buildings or permanently kill foundational residents without a separately agreed, clearly warned rule. The ward can weaken temporarily, motivating repairs or an expedition, but must not create a downward spiral where failure makes rebuilding impossible. Save persistent defense structures, damage, ward state, and event resolution. Resolve each defense reward/failure exactly once.
 
+**Implemented (October 31, 2026).** Four breaches in order, the last repeating 20% stronger each time; the next is due three successful raids after a win. A warned breach can be put off for two more raids, then the ward gives way at the next nightfall the player is home. Later breaches come in two or three waves down two or three lanes. Half the attackers go for the ward, half for the nearest building, and they turn on anyone close. Buildings are never destroyed: worn down, they are broken and out of use until mended, for 30% of the damage's build cost, all at once at the Heart Tree. The player falling doesn't end the defense. If the ward falls, the attackers leave, the ward draws in by 4 m until two more raids have been won, and the breach can be tried again.
+
 ## 7. Raids: the central system
 
 ### 7.1 Definition

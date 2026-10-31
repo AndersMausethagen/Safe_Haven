@@ -865,11 +865,12 @@ public sealed class WardBreachPage : SystemsPage
 {
     public override string Title => "Ward Breaches";
     public override string Group => "World";
-    public override string Help => "Announced defenses of Safe Haven. Enemies come along the marked path and attack only the player; buildings " +
-                                   "can't be harmed. Falling ends the breach without losses, and it can be tried again.";
+    public override string Help => "Announced defenses of Safe Haven. The first is gentle: enemies come along the marked path and attack only the player, and falling ends it. " +
+                                   "Later ones come in waves down several lanes for the buildings and the ward; buildings break but are never lost, and a fallen ward strains for a while.";
 
     public override void Draw()
     {
+        SettingsPanel(Settings<WardBreachSettings>(WardBreachSettings.ResourceName), "All breaches", "Resources/WardBreachSettings");
         List<WardBreachDefinition> breaches = LoadAll<WardBreachDefinition>();
         if (breaches.Count == 0)
         {

@@ -1,0 +1,52 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96ccf07651dd48641a9884291b9274b9, type: 3}
+  m_Name: ForestRemembersBreach
+  m_EditorClassIdentifier: SafeHaven::WardBreachDefinition
+  displayName: The Forest Remembers
+  warningText: Every root in the clearing turns toward the Heart Tree. The forest has not forgotten what was taken from it. This will come again and again, each time harder. Prepare.
+  pendingText: The forest remembers us. It will not stop. Stand with me when you are ready.
+  startHint: All the forest's anger will come
+  wonText: It draws back, as a tide does. The Heart Tree burns bright in the quiet.
+  failedText: The ward falls dark. The forest takes its due and withdraws to wait.
+  availableAfterExtractions: 1
+  threatensHome: 1
+  laneCount: 3
+  waves:
+  - groups:
+    - enemy: {fileID: 7477446688404098989, guid: 237fc76d161bb114aa2049a864298943, type: 3}
+      count: 4
+    - enemy: {fileID: 8653230728158633359, guid: a661dc05d2e43f943a476376f636ef9a, type: 3}
+      count: 2
+  - groups:
+    - enemy: {fileID: 9066855856663566298, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
+      count: 2
+    - enemy: {fileID: 4999243170976522981, guid: 07a704aacccfef242886f2875ff4fcdf, type: 3}
+      count: 2
+    - enemy: {fileID: 3643037256157110189, guid: 8af413a8c10dbdc4f89f0537152651dc, type: 3}
+      count: 1
+  - groups:
+    - enemy: {fileID: 6267209934607442583, guid: bb37a42ef72f5274d807155e3d054529, type: 3}
+      count: 2
+    - enemy: {fileID: 9066855856663566298, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
+      count: 2
+    - enemy: {fileID: 3085881180223279310, guid: 049004d8140885f4db2790503b4ab12d, type: 3}
+      count: 3
+  enemyPrefab: {fileID: 0}
+  enemyCount: 3
+  secondsBetweenEnemies: 1.5
+  enemyHealthMultiplier: 1
+  enemyPowerMultiplier: 1
+  reward:
+  - resource: {fileID: 11400000, guid: a86ac9a152512464ab08e0446c161e61, type: 2}
+    amount: 6
+  wonEvent: {fileID: 0}

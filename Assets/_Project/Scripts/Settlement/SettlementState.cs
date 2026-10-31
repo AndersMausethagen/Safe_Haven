@@ -1,14 +1,14 @@
 using System;
 using System.Collections.Generic;
 
-/// <summary>Where the first ward breach stands (GDD §6.6). Values are saved as numbers: add new ones at the end.</summary>
+/// <summary>Where the current ward breach stands (GDD §6.6). Values are saved as numbers: add new ones at the end.</summary>
 public enum BreachStatus
 {
     /// <summary>The ward holds; nothing threatens the clearing yet.</summary>
     Dormant = 0,
     /// <summary>The ward is weakening: the player has been warned and can start the defense at the Heart Tree.</summary>
     Pending = 1,
-    /// <summary>The breach was beaten back.</summary>
+    /// <summary>The last breach was beaten back.</summary>
     Won = 2,
 }
 
@@ -46,6 +46,19 @@ public sealed class SettlementState
     public int HavenRank { get; private set; }
     public int SuccessfulExtractions { get; private set; }
     public BreachStatus Breach { get; private set; }
+
+    /// <summary>How many ward breaches have been beaten back: which one comes next, and how hard.</summary>
+    public int BreachesWon { get; private set; }
+
+    /// <summary>Successful extractions at which the next breach comes due, after the first.</summary>
+    public int NextBreachAt { get; private set; }
+
+    /// <summary>Successful extractions when the waiting breach was announced, as it can only be put off so long.</summary>
+    public int BreachPendingSince { get; private set; }
+
+    /// <summary>Successful raids until a ward strained by a lost breach has recovered; 0 when it is whole.</summary>
+    public int WardStrain { get; private set; }
+
     public IReadOnlyList<ResidentRecord> Residents => residents;
     /// <summary>Purification batches waiting, including the one in progress.</summary>
     public int PurificationQueued { get; private set; }
@@ -78,6 +91,7 @@ public sealed class SettlementState
     public void RecordExtraction()
     {
         SuccessfulExtractions++;
+        WardStrain = Math.Max(0, WardStrain - 1);
         Changed?.Invoke();
     }
 
@@ -88,6 +102,31 @@ public sealed class SettlementState
             Breach = status;
             Changed?.Invoke();
         }
+    }
+
+    /// <summary>The next breach is announced: it waits for the player, and is put off from now.</summary>
+    public void WarnOfBreach()
+    {
+        Breach = BreachStatus.Pending;
+        BreachPendingSince = SuccessfulExtractions;
+        Changed?.Invoke();
+    }
+
+    /// <summary>A breach was beaten back: the next comes after this many more successful raids.</summary>
+    public void WinBreach(int raidsUntilNext)
+    {
+        Breach = BreachStatus.Won;
+        BreachesWon++;
+        NextBreachAt = SuccessfulExtractions + raidsUntilNext;
+        Changed?.Invoke();
+    }
+
+    /// <summary>The ward fell: it stays strained for a while, and the same breach waits to be tried again.</summary>
+    public void LoseBreach(int strainRaids)
+    {
+        WardStrain = Math.Max(WardStrain, strainRaids);
+        BreachPendingSince = SuccessfulExtractions;
+        Changed?.Invoke();
     }
 
     public ResidentRecord Find(ResidentDefinition resident)
@@ -185,6 +224,15 @@ public sealed class SettlementState
         HavenRank = rank;
         Changed?.Invoke();
         return true;
+    }
+
+    /// <summary>Puts back saved breach history. Used by SaveMapper only. A save from before there were several knows only of the first.</summary>
+    public void RestoreBreaches(int won, int nextAt, int pendingSince, int strain)
+    {
+        BreachesWon = Math.Max(won, Breach == BreachStatus.Won ? 1 : 0);
+        NextBreachAt = Math.Max(0, nextAt);
+        BreachPendingSince = Math.Max(0, pendingSince);
+        WardStrain = Math.Max(0, strain);
     }
 
     /// <summary>Puts back saved state. Used by SaveMapper only.</summary>

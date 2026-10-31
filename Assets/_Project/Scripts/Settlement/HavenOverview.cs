@@ -139,6 +139,18 @@ public sealed class HavenOverview
     {
         string use = GameInput.KeyLabel(GameInput.Interact);
         string build = GameInput.KeyLabel(GameInput.Build);
+        WardBreachDirector breach = WardBreachDirector.Current;
+        if (breach != null && breach.IsPending)
+        {
+            Steps.Add(new Step(breach.Definition.DisplayName, $"{breach.Hint}. Prepare, then begin the defense at the Heart Tree.", use, 0));
+        }
+
+        int hurt = BuildingRepairs.Damaged().Count;
+        if (hurt > 0)
+        {
+            Steps.Add(new Step("Mend the clearing", $"{hurt} building{(hurt == 1 ? " is" : "s are")} damaged. Pay for repairs at the Heart Tree.", use, 0));
+        }
+
         int left = Overgrowth.All.Count(piece => !piece.IsCleared);
         if (left > 0)
         {

@@ -29,6 +29,8 @@ public sealed class Construction : MonoBehaviour, ISaveable
     private readonly List<(Transform part, Vector3 position, Quaternion rotation)> model = new List<(Transform, Vector3, Quaternion)>();
     private readonly List<Renderer> modelRenderers = new List<Renderer>();
     private BuildingObject building;
+    private Damageable health;
+    private bool shownBroken;
     private Interactable siteInteractable;
     private Transform scaffold;
     private ParticleSystem dust;
@@ -162,6 +164,12 @@ public sealed class Construction : MonoBehaviour, ISaveable
     private void Awake()
     {
         building = GetComponent<BuildingObject>();
+        health = GetComponent<Damageable>();
+        if (health != null)
+        {
+            health.HealthChanged += OnHealthChanged;
+        }
+
         shade = new MaterialPropertyBlock();
         foreach (Transform child in transform)
         {
@@ -296,6 +304,24 @@ public sealed class Construction : MonoBehaviour, ISaveable
 
     // ----- Looks -----
 
+    private void OnDestroy()
+    {
+        if (health != null)
+        {
+            health.HealthChanged -= OnHealthChanged;
+        }
+    }
+
+    private void OnHealthChanged(float current, float maximum)
+    {
+        bool broken = health.IsBroken;
+        if (broken != shownBroken)
+        {
+            shownBroken = broken;
+            Refresh();
+        }
+    }
+
     private void Refresh()
     {
         if (building == null)
@@ -325,7 +351,13 @@ public sealed class Construction : MonoBehaviour, ISaveable
         }
 
         ShowRise();
-        Shade(rising ? Mathf.Lerp(ConstructionSettings.Current.RuinShade, 1f, Share) : 1f);
+        Shade(rising ? Mathf.Lerp(ConstructionSettings.Current.RuinShade, 1f, Share) : shownBroken ? ConstructionSettings.Current.RuinShade : 1f);
+        // A broken wall stops no one: the way through it opens.
+        if (Definition.PlaceInLines && TryGetComponent(out UnityEngine.AI.NavMeshObstacle wall))
+        {
+            wall.enabled = !shownBroken;
+        }
+
         for (int level = 2; level <= Mathf.Max(Definition.MaxLevel, 3); level++)
         {
             Transform dressing = transform.Find(Dressing + level);

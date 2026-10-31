@@ -1,13 +1,31 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
+
+/// <summary>Some of one kind of enemy in a wave.</summary>
+[Serializable]
+public sealed class BreachGroup
+{
+    [Tooltip("The monster prefab that attacks (it needs MonsterAI).")]
+    public GameObject enemy;
+    [Min(1)] public int count = 1;
+}
+
+/// <summary>Who comes at once.</summary>
+[Serializable]
+public sealed class BreachWave
+{
+    public List<BreachGroup> groups = new List<BreachGroup>();
+}
 
 /// <summary>
 /// One ward breach encounter (GDD §6.6–6.9): when it becomes possible, what the player is told, which enemies come, how
 /// strong they are and what winning gives. The first breach follows the decisions of the first-90-minutes pass: it is
 /// offered after the first successful extraction, the player starts it at the Heart Tree, a few weak Forest-Bitten Wolves
-/// come along one marked path and attack only the player, and winning gives 2 Life Orbs.
+/// come along one marked path and attack only the player, and winning gives 2 Life Orbs. Later ones threaten the home
+/// itself, in waves down several lanes.
 /// <para>
-/// Played by a WardBreachDirector in Safe Haven. Later breaches can be more assets with other enemies and triggers.
+/// Played by a WardBreachDirector in Safe Haven, in the order WardBreachSettings lists them.
 /// </para>
 /// </summary>
 [CreateAssetMenu(fileName = "NewWardBreach", menuName = "Safe Haven/Settlement/Ward Breach")]
@@ -29,6 +47,12 @@ public sealed class WardBreachDefinition : ScriptableObject
     [SerializeField, Min(0)] private int availableAfterExtractions = 1;
 
     [Header("Enemies")]
+    [Tooltip("Off: the first breach's gentle rules. Enemies hunt only the player, buildings can't be harmed and falling ends it. On: they go for the home and the ward, and the ward can fall.")]
+    [SerializeField] private bool threatensHome;
+    [Tooltip("How many ways in. 0 keeps to the scene's marked path.")]
+    [SerializeField, Min(0)] private int laneCount;
+    [Tooltip("Who comes, wave by wave. Empty: Enemy Count of the Enemy Prefab, all at once.")]
+    [SerializeField] private List<BreachWave> waves = new List<BreachWave>();
     [Tooltip("The monster prefab that attacks (it needs MonsterAI).")]
     [SerializeField] private GameObject enemyPrefab;
     [SerializeField, Min(1)] private int enemyCount = 3;
@@ -51,6 +75,10 @@ public sealed class WardBreachDefinition : ScriptableObject
     public string WonText => wonText;
     public string FailedText => failedText;
     public int AvailableAfterExtractions => availableAfterExtractions;
+    public bool ThreatensHome => threatensHome;
+    public int LaneCount => laneCount;
+    public int WaveCount => Mathf.Max(1, waves.Count);
+    public bool HasEnemies => waves.Count > 0 || enemyPrefab != null;
     public GameObject EnemyPrefab => enemyPrefab;
     public int EnemyCount => enemyCount;
     public float SecondsBetweenEnemies => secondsBetweenEnemies;
@@ -58,4 +86,29 @@ public sealed class WardBreachDefinition : ScriptableObject
     public float EnemyPowerMultiplier => enemyPowerMultiplier;
     public IReadOnlyList<ResourceAmount> Reward => reward;
     public GameEventDefinition WonEvent => wonEvent;
+
+    /// <summary>Everyone who comes in a wave (from 0), in the order they arrive.</summary>
+    public List<GameObject> Roster(int wave)
+    {
+        var roster = new List<GameObject>();
+        if (waves.Count == 0)
+        {
+            for (int i = 0; i < enemyCount && enemyPrefab != null; i++)
+            {
+                roster.Add(enemyPrefab);
+            }
+
+            return roster;
+        }
+
+        foreach (BreachGroup group in waves[Mathf.Clamp(wave, 0, waves.Count - 1)].groups)
+        {
+            for (int i = 0; i < group.count && group.enemy != null; i++)
+            {
+                roster.Add(group.enemy);
+            }
+        }
+
+        return roster;
+    }
 }

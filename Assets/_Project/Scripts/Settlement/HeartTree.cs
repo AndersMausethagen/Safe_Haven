@@ -53,7 +53,8 @@ public sealed class HeartTree : MonoBehaviour, IArea, IBuildArea
 
     /// <summary>How far from the tree the player may build, at the current ward level.</summary>
     public float WardRadius => SettlementSettings.Current.WardRadiusAt(GameSession.Settlement.WardLevel)
-        + HavenSettings.Current.WardBonusAt(GameSession.Settlement.HavenRank);
+        + HavenSettings.Current.WardBonusAt(GameSession.Settlement.HavenRank)
+        - (GameSession.Settlement.WardStrain > 0 ? WardBreachSettings.Current.StrainRadius : 0f);
 
     /// <summary>True when a point (and a margin around it, such as a building's size) is inside the ward.</summary>
     public bool Contains(Vector3 position, float margin = 0f)
@@ -219,6 +220,12 @@ public sealed class HeartTree : MonoBehaviour, IArea, IBuildArea
             body.Append($"\n\n<color={UIStyle.Hex(style.Warning)}>").Append(breach.Definition.PendingText).Append("</color>");
         }
 
+        if (settlement.WardStrain > 0)
+        {
+            int raids = settlement.WardStrain;
+            body.Append($"\n\n<color={UIStyle.Hex(style.Warning)}>The ward is strained. It will mend after {raids} more successful raid{(raids == 1 ? "" : "s")}.</color>");
+        }
+
         var page = new MenuPage { Title = "The Heart Tree", Body = body.ToString() };
         if (questLine == null && whispers.Length > 1)
         {
@@ -237,7 +244,13 @@ public sealed class HeartTree : MonoBehaviour, IArea, IBuildArea
 
         if (breach != null && breach.IsPending)
         {
-            page.Add(new MenuAction("Begin the defense", breach.Definition.StartHint, true, breach.Begin, closesMenu: true));
+            page.Add(new MenuAction("Begin the defense", breach.Hint, true, breach.Begin, closesMenu: true));
+        }
+
+        MenuAction mend = BuildingRepairs.MendAction(user);
+        if (mend != null)
+        {
+            page.Add(mend);
         }
 
         page.Add(new MenuAction("How is Safe Haven doing?", $"Rank, renown and what to do next ({GameInput.KeyLabel(GameInput.Haven)})", true, OpenHaven));

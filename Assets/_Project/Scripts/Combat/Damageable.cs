@@ -71,6 +71,12 @@ public sealed class Damageable : MonoBehaviour, IDamageable, ISaveable
     /// <summary>Multiplies the damage this object takes, after its defenses (a staggered monster takes more). 1 = normal.</summary>
     public float DamageTakenMultiplier { get; set; } = 1f;
 
+    /// <summary>A hit can't take its health below this, so it can't die: a building breaks and waits for repairs, but is never lost.</summary>
+    public float HealthFloor { get; set; }
+
+    /// <summary>True when it has been worn down to its floor.</summary>
+    public bool IsBroken => HealthFloor > 0f && currentHealth <= HealthFloor;
+
     private IHitGuard[] guards;
 
     /// <summary>
@@ -154,7 +160,7 @@ public sealed class Damageable : MonoBehaviour, IDamageable, ISaveable
         }
 
         float final = DamageCalculator.Mitigate(damage.Amount, damage.Type, combatant.Stats, combatant.Rules) * DamageTakenMultiplier;
-        float healthLost = Mathf.Min(final, currentHealth);
+        float healthLost = Mathf.Min(final, Mathf.Max(0f, currentHealth - HealthFloor));
         currentHealth -= healthLost;
 
         bool killed = currentHealth <= 0.0001f;

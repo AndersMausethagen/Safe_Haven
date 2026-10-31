@@ -54,6 +54,13 @@ public sealed class SettlementSaveData
     public int successfulExtractions;
     /// <summary>A BreachStatus.</summary>
     public int breach;
+    /// <summary>Ward breaches beaten back. Missing in older saves, where a Won breach counts as one.</summary>
+    public int breachesWon;
+    /// <summary>Successful extractions at which the next breach comes due. Missing in older saves.</summary>
+    public int nextBreachAt;
+    public int breachPendingSince;
+    /// <summary>Successful raids until the ward has recovered from a lost breach.</summary>
+    public int wardStrain;
     public List<ResidentSaveData> residents = new List<ResidentSaveData>();
     public int purificationQueued;
     public float purificationProgress;

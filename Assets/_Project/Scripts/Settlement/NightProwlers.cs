@@ -49,7 +49,7 @@ public sealed class NightProwlers : MonoBehaviour
                 return false;
             }
 
-            if (requireBreachWon && GameSession.Settlement.Breach != BreachStatus.Won)
+            if (requireBreachWon && GameSession.Settlement.BreachesWon == 0)
             {
                 return false;
             }

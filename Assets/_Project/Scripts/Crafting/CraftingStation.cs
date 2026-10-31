@@ -111,12 +111,20 @@ public sealed class CraftingStation : MonoBehaviour
     private Interactable interactable;
     private BuildingObject building;
     private SaveableEntity saveable;
+    private Damageable health;
+    private bool usable = true;
 
     public static IReadOnlyList<CraftingStation> Active => active;
     public CraftingStationType Type => type;
 
     /// <summary>False while the station can't be used yet, such as an unrepaired portal.</summary>
-    public bool Usable { get; set; } = true;
+    public bool Usable
+    {
+        get => usable && !IsBroken;
+        set => usable = value;
+    }
+
+    private bool IsBroken => health != null && health.IsBroken;
 
     /// <summary>The key of the station's queue in WorkshopState.</summary>
     public string Id
@@ -189,6 +197,7 @@ public sealed class CraftingStation : MonoBehaviour
         interactable = GetComponent<Interactable>();
         building = GetComponent<BuildingObject>();
         saveable = GetComponent<SaveableEntity>();
+        health = GetComponent<Damageable>();
     }
 
     private void OnEnable()
@@ -211,7 +220,11 @@ public sealed class CraftingStation : MonoBehaviour
 
     private void OnUsed()
     {
-        if (Usable)
+        if (IsBroken)
+        {
+            GameMessages.Post("It's broken. Mend the clearing at the Heart Tree.", MessageKind.Warning);
+        }
+        else if (Usable)
         {
             OpenMenu(interactable.Interactor);
         }
