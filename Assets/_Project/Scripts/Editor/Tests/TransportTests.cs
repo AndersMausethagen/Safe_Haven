@@ -237,6 +237,22 @@ public sealed class TransportTests
     }
 
     [Test]
+    public void Hauling_CostsNothingOnTheFlat_UntilOverfilledOrUphill()
+    {
+        TransportSettings settings = TransportSettings.Current;
+        Assert.AreEqual(0f, settings.HaulEffort(0f, 1f, 0f), "a full cart on the flat is free: only effort is paid for");
+        Assert.AreEqual(0f, settings.HaulEffort(0f, 0.3f, 0f));
+        Assert.Greater(settings.HaulEffort(0.5f, 1.2f, 0f), 0f, "overfilled costs even on the flat");
+        Assert.Greater(settings.HaulEffort(1f, 1.5f, 0f), settings.HaulEffort(0.5f, 1.2f, 0f), "and more the further past it");
+
+        float light = settings.HaulEffort(0f, 0.1f, 0.3f);
+        float heavy = settings.HaulEffort(0f, 1f, 0.3f);
+        Assert.Greater(light, 0f, "a slope costs anything");
+        Assert.Greater(heavy, light * 2f, "and a full load far more");
+        Assert.Greater(settings.HaulEffort(0f, 1f, 0.6f), heavy, "the steeper the dearer");
+    }
+
+    [Test]
     public void AuthoredTransports_AreWiredUp()
     {
         var content = Resources.Load<ContentDatabase>(ContentDatabase.ResourceName);

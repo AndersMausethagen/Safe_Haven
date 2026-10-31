@@ -14,9 +14,12 @@ public sealed class PlayerTransport : MonoBehaviour
     private const float BoardReach = 3.5f;
     private const float ArrivalSeconds = 5f;
     private const float SettleSeconds = 0.3f;
+    private const float ClimbSeconds = 1f;
 
     private PlayerStateMachine stateMachine;
     private Damageable health;
+    private PlayerStamina stamina;
+    private float climb;
 
     public static PlayerTransport Current { get; private set; }
 
@@ -25,6 +28,12 @@ public sealed class PlayerTransport : MonoBehaviour
 
     public PlayerMovement Movement { get; private set; }
     public CharacterController Controller { get; private set; }
+    /// <summary>True with no stamina left for the work.</summary>
+    public bool IsTired => stamina != null && stamina.IsEmpty;
+
+    /// <summary>The share of normal effort a tired player still manages.</summary>
+    public float EffortScale => IsTired ? TransportSettings.Current.TiredSpeed : 1f;
+
     /// <summary>The player's speed over the ground, for the spring at the handle.</summary>
     public Vector3 Velocity => Movement.HorizontalVelocity;
 
@@ -34,6 +43,7 @@ public sealed class PlayerTransport : MonoBehaviour
         Controller = GetComponent<CharacterController>();
         stateMachine = GetComponent<PlayerStateMachine>();
         health = GetComponent<Damageable>();
+        stamina = GetComponent<PlayerStamina>();
     }
 
     private void OnEnable()
@@ -104,7 +114,33 @@ public sealed class PlayerTransport : MonoBehaviour
                 return;
             }
 
-            Movement.SetSpeedScale(this, Using.SpeedScale * haulable.StrainScale);
+            Movement.SetSpeedScale(this, Using.SpeedScale * haulable.StrainScale * EffortScale);
+            PayForHaul();
+        }
+    }
+
+    private void PayForHaul()
+    {
+        Vector3 velocity = Using.Body.linearVelocity;
+        if (stamina == null || velocity.sqrMagnitude < 0.04f)
+        {
+            return;
+        }
+
+        TransportDefinition definition = Using.Definition;
+        float over = Mathf.InverseLerp(definition.Capacity, definition.OverloadLimit, Using.Weight);
+        float load = Using.Weight / definition.Capacity;
+        // Averaged over a moment, or every bump in the ground is a little hill.
+        climb = Mathf.Lerp(climb, velocity.y / velocity.magnitude, 1f - Mathf.Exp(-Time.deltaTime / ClimbSeconds));
+        stamina.Drain(TransportSettings.Current.HaulEffort(over, load, Mathf.Max(0f, climb)) * Time.deltaTime);
+    }
+
+    /// <summary>Rowing costs what swimming does, near enough; Rowboat asks for it each frame it rows.</summary>
+    public void PayForRowing(float deltaTime)
+    {
+        if (stamina != null)
+        {
+            stamina.Drain(TransportSettings.Current.RowingEffort * deltaTime);
         }
     }
 
@@ -112,6 +148,7 @@ public sealed class PlayerTransport : MonoBehaviour
     public void Began(Transport transport)
     {
         Using = transport;
+        climb = 0f;
         TransportHud.Create();
     }
 

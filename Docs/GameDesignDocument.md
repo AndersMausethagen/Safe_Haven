@@ -322,6 +322,8 @@ Past its capacity a transport is overfilled: it still takes more, but the speed 
 
 At home a load never has to pass through the bag: a cart brought near a chest sends its cargo straight to storage, and what is in a cart or boat standing near the player counts as materials for building and crafting.
 
+A full cart on the flat costs nothing, but pulling one overfilled or uphill takes stamina, more the heavier it is, and rowing costs about what swimming does. Out of stamina the player only slows down: a cart still moves and a boat still gets home.
+
 Attacking, guarding, dodging or casting lets go at once, with no key to press, and leaves the cart where it stands. A cart in the hands goes through the portal, makes noise as it rolls, and comes home if it is within 12 m of the player at extraction. Otherwise it stays behind, and a failed raid loses it and its cargo. In a raid the HUD keeps showing a cart that was let go, with how far off it is and whether it would come home, and lighting an extraction point warns about a cart out of reach. The portal's briefing names what the cart stakes, its load counts towards what the HUD shows at risk, and the report on the raid says what became of it. A loaded cart left unattended in a raid gives off a scent that draws creatures, and anything that reaches it tears cargo out a bite at a time, so letting go to fight is still right but a cart left for long comes back lighter. A cart in the hands doesn't get in the way of the portal, a chest or anything else in reach: Interact goes to those first. Essences stay in their bars, as they weigh nothing: only items go in the cargo.
 
 ## 9. Raid world, discovery, and events

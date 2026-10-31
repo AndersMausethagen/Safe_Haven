@@ -223,7 +223,8 @@ public sealed class Rowboat : MonoBehaviour, ITransportDriver
         Stroke = Mathf.Sin(Time.time * StrokesPerSecond * Mathf.PI * 2f);
         float power = 0.55f + 0.45f * Stroke;
         float facing = Mathf.Max(0f, Vector3.Dot(ahead, wish.normalized));
-        body.AddForce(ahead * (rowForce * wish.magnitude * facing * power * transport.SpeedScale));
+        body.AddForce(ahead * (rowForce * wish.magnitude * facing * power * transport.SpeedScale * rower.EffortScale));
+        rower.PayForRowing(Time.fixedDeltaTime);
     }
 
     private void LateUpdate()

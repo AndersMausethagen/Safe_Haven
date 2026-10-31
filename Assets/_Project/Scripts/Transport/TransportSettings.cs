@@ -27,6 +27,16 @@ public sealed class TransportSettings : GameSettings<TransportSettings>
     [Tooltip("Seconds stuck at full strain before the player lets go.")]
     [SerializeField, Min(0f)] private float stuckSeconds = 1.5f;
 
+    [Header("Effort")]
+    [Tooltip("Stamina per second to pull at the overload limit, on the flat. Within the capacity the flat costs nothing.")]
+    [SerializeField, Min(0f)] private float overfilledEffort = 5f;
+    [Tooltip("Stamina per second to pull a full load straight up a slope of 45 degrees. A light load costs a third of it.")]
+    [SerializeField, Min(0f)] private float uphillEffort = 16f;
+    [Tooltip("Stamina per second at the oars.")]
+    [SerializeField, Min(0f)] private float rowingEffort = 5f;
+    [Tooltip("The share of speed left with no stamina: a cart still moves, slowly, and a boat is still rowed home.")]
+    [SerializeField, Range(0.1f, 1f)] private float tiredSpeed = 0.6f;
+
     [Header("Left alone in a raid")]
     [Tooltip("Metres the scent of an unattended load carries. Creatures in reach come to look.")]
     [SerializeField, Min(0f)] private float scentRadius = 16f;
@@ -57,6 +67,8 @@ public sealed class TransportSettings : GameSettings<TransportSettings>
     public SoundDefinition Creak => creak;
     public SoundDefinition OarStroke => oarStroke;
     public SoundDefinition Bump => bump;
+    public float RowingEffort => rowingEffort;
+    public float TiredSpeed => tiredSpeed;
     public float ScentRadius => scentRadius;
     public float ScentSeconds => scentSeconds;
     public float AttendedReach => attendedReach;
@@ -64,6 +76,17 @@ public sealed class TransportSettings : GameSettings<TransportSettings>
     public float ScavengeSeconds => scavengeSeconds;
     public int ScavengeItems => scavengeItems;
     public ItemSlotView SlotPrefab => slotPrefab;
+
+    /// <summary>
+    /// Stamina per second a pull costs: nothing on the flat within the capacity. <paramref name="over"/> is how far past the
+    /// capacity it is, 0..1 to the limit; <paramref name="load"/> its share of the capacity; <paramref name="climb"/> the
+    /// sine of the slope it is going up, 0 on the flat or going down.
+    /// </summary>
+    public float HaulEffort(float over, float load, float climb)
+    {
+        float weight = Mathf.Lerp(1f / 3f, 1f, Mathf.Clamp01(load));
+        return overfilledEffort * Mathf.Clamp01(over) + uphillEffort * Mathf.Clamp01(climb / 0.7071f) * weight;
+    }
     public float ExtractionRange => extractionRange;
     public float MaterialReach => materialReach;
     public float StorageReach => storageReach;
