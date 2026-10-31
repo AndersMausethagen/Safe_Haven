@@ -207,7 +207,7 @@ public sealed class ItemInventoryWindow : MonoBehaviour, IItemSlotHandler
         {
             if (GameInput.DiscardModifier.IsPressed())
             {
-                inventory.Discard(owner, slot.Index);
+                inventory.Drop(owner, slot.Index);
             }
             else
             {

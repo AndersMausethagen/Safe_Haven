@@ -258,17 +258,17 @@ public sealed class ItemInventory : MonoBehaviour
         return false;
     }
 
-    /// <summary>Throws away a whole stack to make room. There are no ground items yet, so it is gone for good.</summary>
-    public bool Discard(ItemContainer from, int slot)
+    /// <summary>Puts a whole stack on the ground to make room. It lies there until it is picked up again (DroppedItem).</summary>
+    public bool Drop(ItemContainer from, int slot)
     {
         ItemStack stack = from != null ? from.GetSlot(slot) : ItemStack.Empty;
-        if (stack.IsEmpty)
+        if (stack.IsEmpty || DroppedItem.Drop(transform, stack) == null)
         {
             return false;
         }
 
         from.RemoveAt(slot, stack.Count);
-        GameMessages.Post($"Dropped {stack.Count} {stack.Item.DisplayName}.", MessageKind.Warning);
+        GameMessages.Post($"Dropped {stack.Count} {stack.DisplayName}.");
         return true;
     }
 

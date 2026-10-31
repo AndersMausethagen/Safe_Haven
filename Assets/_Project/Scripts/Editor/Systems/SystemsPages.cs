@@ -910,5 +910,6 @@ public sealed class LootAndRarityPage : SystemsPage
     public override void Draw()
     {
         SettingsPanel(Settings<RaritySettingsDefinition>("RaritySettings"), "Rarity", "Resources/RaritySettings");
+        SettingsPanel(Settings<DroppedItemSettings>(DroppedItemSettings.ResourceName), "Dropped items", "Resources/DroppedItemSettings");
     }
 }

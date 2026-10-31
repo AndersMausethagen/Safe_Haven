@@ -902,7 +902,12 @@ checks saved assets and runs isolated live combat probes without loading a playe
   lists the rarest finds first.
 - **Carry space**: `ItemContainer` has locked slots (past `UnlockedSlots`): they keep items but take no new ones.
   `ItemInventory` unlocks `baseUnlockedSlots`; `BackpackCapacity` adds the best carried backpack's `bagSlotBonus`.
-  Losing the backpack in a raid shrinks the bag again. Ctrl+right-click in the bag drops a stack.
+  Losing the backpack in a raid shrinks the bag again.
+- **Dropping**: Ctrl+right-click in the bag calls `ItemInventory.Drop`, and the stack lies on the ground as a `DroppedItem`
+  until E picks it up, keeping its wear and essence work. One prefab serves every item (`Resources/DroppedItemSettings`, built
+  by `AgentScripts/BuildDroppedItem.cs`): it copies the item's meshes, or shows a sack, as most items have no model. Saved at
+  home; raid scenes aren't persistent, so a drop stays behind with the raid. Picking up goes through
+  `ItemContainer.TransferTo`, not `Give`: raising `ItemObtained` again would let a drop fill a collect quest.
 - **Safe pocket**: `ItemInventory.SafePocket`, a separate small container. `PlayerSnapshot` carries it, and
   `WithoutBelongings` (a failed raid) keeps it. It is saved as `PlayerSaveData.safePocket`.
 
