@@ -147,6 +147,11 @@ public sealed class RaidDirector : MonoBehaviour
 
         running = true;
         StrengthenEnemies(true);
+        if (NightSettings.IsDark)
+        {
+            GameMessages.Post(NightSettings.Current.NightRaidText, MessageKind.Warning);
+        }
+
         GameMessages.Post($"{Session.Definition.DisplayName}: grab what you can and reach an extraction within {RaidStats.FormatTime(Session.TimeRemaining)}.");
     }
 
@@ -414,9 +419,9 @@ public sealed class RaidDirector : MonoBehaviour
         return !string.IsNullOrEmpty(scene) && Application.CanStreamedLevelBeLoaded(scene);
     }
 
-    // The raid's enemy multipliers times the current stage's bonus.
-    private float HealthMultiplier => Parameters.EnemyHealthMultiplier * (1f + (CurrentStage?.EnemyHealthBonus ?? 0f));
-    private float PowerMultiplier => Parameters.EnemyPowerMultiplier * (1f + (CurrentStage?.EnemyPowerBonus ?? 0f));
+    // The raid's enemy multipliers times the current stage's bonus and what the hour adds.
+    private float HealthMultiplier => Parameters.EnemyHealthMultiplier * (1f + (CurrentStage?.EnemyHealthBonus ?? 0f)) * NightSettings.Current.HealthAt(NightSettings.Darkness);
+    private float PowerMultiplier => Parameters.EnemyPowerMultiplier * (1f + (CurrentStage?.EnemyPowerBonus ?? 0f)) * NightSettings.Current.PowerAt(NightSettings.Darkness);
 
     /// <param name="fillHealth">
     /// At the start, living enemies are topped up to their new maximum. When a stage strengthens them mid-fight, they only

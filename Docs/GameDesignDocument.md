@@ -221,7 +221,7 @@ The default state of Safe Haven is peaceful. No enemies spawn arbitrarily while 
 **Night at home (amended October 27, 2026).** Once the first breach has been won, the night outside the ward is no
 longer empty. A few weak creatures prowl the dark beyond the ward and the light of campfires and torches. They never
 step into light and cannot see or follow anyone standing in it, so the settlement itself stays a refuge; whoever walks
-out into the dark is fair game. They come out of sight, close in now and then, and slink away at dawn. None come during
+out into the dark is fair game. They come out of sight, close in now and then, and slink away at dawn. One more may prowl for each breach beaten back, up to eight, and after two breaches some are boars and draugar. None come during
 a breach, while the player is away, or before the first breach is won. Torches built at the edge of the clearing push
 the dark back: this is how the home grows into the night (see Docs/Atmosphere.md).
 
@@ -273,6 +273,10 @@ Time extensions should be a resource-planning tradeoff and never remove all tens
 briefing: mostly day, sometimes dusk or night. Night is the grey dark of the night veil: the player sees little beyond
 arm's reach and monsters see less far too, but hear as well as ever. Night pays more (prototype: +40% cache loot, dusk
 +15%) so the choice to go in at night is a real one.
+
+**Night is dangerous, and worth it (amended October 31, 2026).** In the dark of night, in a raid or at home, creatures have
+30% more health and deal 25% more damage, and they carry twice the Cursed Essence; dusk counts for a share of that. A night
+raid holds 30% more creatures, dusk 15%. Breach attackers carry no loot, so a defense is never the way to farm it.
 
 ### 7.4 Raid objectives
 

@@ -132,8 +132,9 @@ public sealed class RaidDefinition : ScriptableObject
     public SpawnRules GetSpawnRules(Vector3? entry)
     {
         RaidGlobalSettings global = RaidGlobalSettings.Current;
-        return overrideBands ? new SpawnRules(EffectiveEnemyDensity, entry, nearDistance, farDistance)
-            : new SpawnRules(EffectiveEnemyDensity, entry, global.NearDistance, global.FarDistance);
+        float density = EffectiveEnemyDensity * (GameSession.ActiveRaid?.TimeOfDay?.enemyDensity ?? 1f);
+        return overrideBands ? new SpawnRules(density, entry, nearDistance, farDistance)
+            : new SpawnRules(density, entry, global.NearDistance, global.FarDistance);
     }
 
     private void OnValidate()

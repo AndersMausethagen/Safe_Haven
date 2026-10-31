@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 004b690e44dcd4c449f99851bfc56c37, type: 3}
+  m_Name: NightSettings
+  m_EditorClassIdentifier: SafeHaven::NightSettings
+  creatureHealth: 1.3
+  creaturePower: 1.25
+  cursedEssence: 2
+  prowlersPerBreach: 1
+  mostProwlers: 8
+  prowlerSpawnScale: 0.7
+  deepProwlers:
+  - {fileID: 8653230728158633359, guid: a661dc05d2e43f943a476376f636ef9a, type: 3}
+  - {fileID: 9066855856663566298, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
+  deepProwlersAfter: 2
+  deepProwlerShare: 0.3
+  nightfallText: Night falls. What walks the dark is stronger now, and rich with Cursed Essence.
+  nightRaidText: It is night here. What hunts you is stronger, and rich with Cursed Essence.

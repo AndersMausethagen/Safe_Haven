@@ -44,17 +44,20 @@ MonoBehaviour:
     hour: 11
     chance: 55
     lootMultiplier: 1
+    enemyDensity: 1
     briefing: Mist hangs in the valleys; the forest sees you coming.
   - name: Dusk
     hour: 19.2
     chance: 25
     lootMultiplier: 1.15
+    enemyDensity: 1.15
     briefing: Long shadows and failing light. Things wake.
   - name: Night
     hour: 23.5
     chance: 20
     lootMultiplier: 1.4
-    briefing: Grey dark beyond arm's reach. You see little, and so do they; they hear as well as ever.
+    enemyDensity: 1.3
+    briefing: Grey dark beyond arm's reach. More of them are out, and stronger; they see no better than you, but they hear as well as ever. They carry twice the Cursed Essence.
   enemyDensity: 1.5
   overrideBands: 0
   nearDistance: 25

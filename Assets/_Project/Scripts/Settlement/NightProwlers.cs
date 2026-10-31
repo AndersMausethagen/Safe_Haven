@@ -3,8 +3,9 @@ using UnityEngine;
 using UnityEngine.AI;
 
 /// <summary>
-/// Night at home (GDD §6.3): after the first ward breach has been won, a few weak creatures come out of the forest at
-/// night and prowl the dark outside the ward. They never step into light (the ward, campfires, torches:
+/// Night at home (GDD §6.3): after the first ward breach has been won, creatures come out of the forest at night and
+/// prowl the dark outside the ward, more of them and worse (NightSettings) with every breach beaten back, stronger for
+/// the dark, and carrying the night's Cursed Essence. They never step into light (the ward, campfires, torches:
 /// VisibilitySource.IsLit), so they can't see or follow anyone standing in it; whoever walks out into the dark is fair
 /// game. Every so often an idle prowler closes in: on the player in the dark, or to the edge of the light nearest it
 /// when the player stands in light. They appear out of sight, away from the player, and slink off at dawn. They are not saved. None come during a
@@ -36,6 +37,7 @@ public sealed class NightProwlers : MonoBehaviour
     private DayNightCycle cycle;
     private float nextCheck;
     private float nextSpawnAt;
+    private bool announced;
 
     public IReadOnlyList<MonsterAI> Alive => alive;
 
@@ -80,14 +82,23 @@ public sealed class NightProwlers : MonoBehaviour
 
         if (!IsProwlingTime)
         {
+            announced = false;
             SendHome();
             return;
         }
 
-        leavingUntil.Clear();
-        if (alive.Count < maxAlive && Time.time >= nextSpawnAt && prowlers.Count > 0)
+        NightSettings settings = NightSettings.Current;
+        if (!announced)
         {
-            nextSpawnAt = Time.time + spawnInterval;
+            announced = true;
+            GameMessages.Post(settings.NightfallText, MessageKind.Warning);
+        }
+
+        leavingUntil.Clear();
+        int most = settings.ProwlersAlive(maxAlive, GameSession.Settlement.BreachesWon);
+        if (alive.Count < most && Time.time >= nextSpawnAt && prowlers.Count > 0)
+        {
+            nextSpawnAt = Time.time + spawnInterval * settings.ProwlerSpawnScale;
             TrySpawn();
         }
 
@@ -158,13 +169,15 @@ public sealed class NightProwlers : MonoBehaviour
                 continue;
             }
 
-            GameObject prefab = prowlers[Random.Range(0, prowlers.Count)];
+            GameObject deep = NightSettings.Current.DeepProwler(GameSession.Settlement.BreachesWon, Random.value);
+            GameObject prefab = deep != null ? deep : prowlers[Random.Range(0, prowlers.Count)];
             if (prefab == null)
             {
                 return;
             }
 
             GameObject prowler = Instantiate(prefab, hit.position, Quaternion.LookRotation(player - hit.position));
+            NightSettings.Current.Strengthen(prowler, this);
             if (prowler.TryGetComponent(out MonsterAI ai))
             {
                 ai.AvoidArea = position => VisibilitySource.IsLit(position);

@@ -597,6 +597,7 @@ filled in when it is saved (`SaveableEntityTools`). Safe Haven > Save > Assign M
 | Change what empowering or skill ranks cost and give | `Resources/EssenceSettings` (Systems Editor › Essence) |
 | Add a kind of cart or boat | A `TransportDefinition` in `Data/Transport`, a prefab with `Transport`, `SaveableEntity`, an `Interactable` and a driver (`Haulable` or `Rowboat`) with every collider on Ignore Raycast, and a kit item whose Transport points back at it. See `AgentScripts/BuildTransport.cs`, and call `SaveableEntity.RefreshPrefabId` on a new prefab or it can't be recreated from a save |
 | Change what a transport carries and how it slows the player | Its `TransportDefinition` (Systems Editor › Transport) |
+| Change how much worse, and richer, the night is | `Resources/NightSettings` (Systems Editor › Loot & Rarity); how many more creatures a raid holds at an hour is that hour's **Enemy Density** in the raid's Time of Day list |
 | Add a ward breach | A `WardBreachDefinition` (Content Editor › Ward Breaches) with **Threatens Home**, **Lane Count** and **Waves**, then add it to `Resources/WardBreachSettings` › **Breaches** (Systems Editor › Ward Breaches). The last in the list is the one that repeats |
 | Change who the Haven window counts as the lost expedition | `Resources/HavenSettings` › **Expedition** |
 | Change how fast the ground soaks and dries | The scene's Climate: **Soak Seconds**, **Dry Seconds**. The puddles themselves: `WorldWetness` in `AgentScripts/GenerateWorldTerrainShader.py`, then run it (see [Weather](../../../Docs/Weather.md)) |
@@ -995,6 +996,13 @@ Attacks on the home (GDD §6.6–6.9): warning → preparation → defense → r
 - **The defense:** `WardBreachDirector`. The first breach keeps its gentle rules (`ThreatensHome` off): one marked path, enemies hunt only the player, buildings shielded, falling ends it. Later ones come in waves down `BreachLanes`, found on the NavMesh beyond the ward from a seed and drawn with copies of the scene's path marker. Each attacker is re-aimed once a second: every other one at the ward while a road to it is open, the rest at the nearest building; anyone close is fought first, and a chase over `ChaseLimit` is given up. Breach enemies carry no loot, as the breach has its own reward.
 - **The ward** is a `Ward Anchor` prefab raised at the tree only while a breach runs. If its `Damageable` falls the breach is lost: the attackers leave, `WardStrain` draws the ward in for a few raids, and the same breach waits to be tried again. The player falling doesn't end a real breach, as `HomeRevival` wakes them at the tree.
 - **Buildings break, they aren't lost:** `BuildingObject` sets `Damageable.HealthFloor`, so `destroyOnDeath` on a building can't fire. At the floor it is `IsBroken`: `Construction` darkens it and opens the NavMesh under a wall, and `CraftingStation.Usable` turns false. `BuildingRepairs` mends everything at once from the Heart Tree or the recovery page, for `RepairShare` of what the damage cost to build.
+
+## Night
+
+Anywhere the sky is dark, `Resources/NightSettings` applies, scaled by `AtmosphereConditions.Night`, so dusk counts for a little.
+
+- **Danger:** `RaidDirector` multiplies its enemy health and power by the hour; `NightProwlers` calls `NightSettings.Strengthen` on what it spawns and lets more prowl with every breach won (`ProwlersAlive`, `DeepProwler`). They still never step into light. How many creatures a raid holds is the hour's own: `RaidTimeOfDay.enemyDensity`, used by `RaidDefinition.GetSpawnRules`.
+- **Reward:** `LootOnDeath.Reaped` multiplies Cursed Essence by the night's share and the killer's Essence Find. Breach attackers carry no loot, so this can't turn a defense into a farm.
 
 ## Essence
 

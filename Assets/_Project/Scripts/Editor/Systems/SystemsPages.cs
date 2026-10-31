@@ -912,5 +912,6 @@ public sealed class LootAndRarityPage : SystemsPage
     {
         SettingsPanel(Settings<RaritySettingsDefinition>("RaritySettings"), "Rarity", "Resources/RaritySettings");
         SettingsPanel(Settings<DroppedItemSettings>(DroppedItemSettings.ResourceName), "Dropped items", "Resources/DroppedItemSettings");
+        SettingsPanel(Settings<NightSettings>(NightSettings.ResourceName), "Night", "Resources/NightSettings");
     }
 }

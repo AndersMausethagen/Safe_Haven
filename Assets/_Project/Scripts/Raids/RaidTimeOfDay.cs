@@ -6,7 +6,7 @@ using UnityEngine;
 /// One hour a raid can take place at (RaidDefinition › Time of Day): its name in the briefing, the clock hour, how
 /// often it comes up and what it pays. Which one a run gets is rolled from the run's seed (<see cref="For"/>), before
 /// the portal opens, so the briefing can show it. Night raids are darker (the night veil; monsters see less, the player
-/// too) and pay more.
+/// too), hold more and stronger creatures, and pay more.
 /// </summary>
 [Serializable]
 public sealed class RaidTimeOfDay
@@ -19,6 +19,8 @@ public sealed class RaidTimeOfDay
     [Min(0f)] public float chance = 1f;
     [Tooltip("Multiplies what supply caches hold, like a raid modifier (1 = normal).")]
     [Min(0f)] public float lootMultiplier = 1f;
+    [Tooltip("Multiplies how many creatures the raid spawns (1 = normal). How strong they are follows the dark: Resources/NightSettings.")]
+    [Min(0f)] public float enemyDensity = 1f;
     [Tooltip("One line for the briefing: what this hour means.")]
     [TextArea(1, 3)] public string briefing;
 
