@@ -250,6 +250,41 @@ public sealed class EssenceTests
     }
 
     [Test]
+    public void WorkedGear_ShowsWhatWasDone()
+    {
+        EssenceSettings settings = EssenceSettings.Current;
+        ItemDefinition helm = Helm(tier: 3);
+        EnchantmentDefinition enchantment = Enchantment();
+        Assert.AreEqual(Color.black, GearGlow.ColorFor(new ItemStack(helm, 1), settings), "plain gear doesn't glow");
+        Assert.IsNull(GearGlow.SlotTint(new ItemStack(helm, 1), UIStyle.Current));
+        Assert.AreEqual("III", GearGlow.CornerText(new ItemStack(helm, 1)));
+        Assert.AreEqual("III +2", GearGlow.CornerText(new ItemStack(helm, 1, 1f, 2)));
+        Assert.AreEqual("", GearGlow.CornerText(ItemStack.Empty));
+
+        Color plain = GearGlow.ColorFor(new ItemStack(helm, 1, 1f, 0, enchantment), settings);
+        Color strong = GearGlow.ColorFor(new ItemStack(helm, 1, 1f, 3, enchantment), settings);
+        Assert.AreEqual(settings.PurifiedGlow, plain);
+        Assert.Greater(strong.g, plain.g, "empowering strengthens it");
+        Assert.AreEqual(UIStyle.Current.Good, GearGlow.SlotTint(new ItemStack(helm, 1, 1f, 0, enchantment), UIStyle.Current));
+
+        var cursed = new SerializedObject(enchantment);
+        cursed.FindProperty("school").intValue = (int)EssenceSchool.Cursed;
+        cursed.ApplyModifiedPropertiesWithoutUndo();
+        Assert.AreEqual(settings.CursedGlow, GearGlow.ColorFor(new ItemStack(helm, 1, 1f, 0, enchantment), settings));
+        Assert.AreEqual(UIStyle.Current.Danger, GearGlow.SlotTint(new ItemStack(helm, 1, 1f, 0, enchantment), UIStyle.Current));
+    }
+
+    [Test]
+    public void TheWindowsSymbols_AreInTheFont()
+    {
+        TMPro.TMP_FontAsset font = TMPro.TMP_Settings.defaultFontAsset;
+        foreach (char symbol in new[] { '♦', '×', '•', '→' })
+        {
+            Assert.IsTrue(font.HasCharacter(symbol, true, true), $"{symbol} would show as a missing glyph");
+        }
+    }
+
+    [Test]
     public void TargetOf_SortsGearTheWayEnchantmentsMeanIt()
     {
         Assert.AreEqual(EnchantTarget.Armor, EnchantmentDefinition.TargetOf(Helm()));

@@ -65,16 +65,23 @@ public sealed class ItemSlotView : MonoBehaviour,
             : filled && stack.Item.Rarity != ItemRarity.Common
             ? Color.Lerp(filledColor, Rarity.ColorOf(stack.Item.Rarity), rarityTint)
             : filledColor;
+        Color? worked = isEquipped ? null : GearGlow.SlotTint(stack, UIStyle.Current);
+        if (worked.HasValue)
+        {
+            rarityColor = Color.Lerp(filledColor, worked.Value, rarityTint);
+        }
+
         icon.enabled = filled && stack.Item.Icon != null;
         icon.sprite = filled ? stack.Item.Icon : null;
         icon.color = locked ? new Color(1f, 1f, 1f, 0.45f) : stack.IsBroken ? new Color(1f, 0.55f, 0.5f, 0.7f) : Color.white;
         // Gear never stacks, so its corner shows wear instead of a count once it is damaged.
         countLabel.text = filled && stack.Count > 1 ? stack.Count.ToString()
             : stack.IsDamaged ? $"<color={(stack.IsBroken ? "#FF7B6B" : "#E8C46A")}>{Mathf.RoundToInt(stack.Durability * 100f)}%</color>"
+            : worked.HasValue ? $"<color=#{ColorUtility.ToHtmlStringRGB(worked.Value)}>♦</color>"
             : "";
         if (tierLabel != null)
         {
-            tierLabel.text = filled ? Tiers.ToRoman(stack.Item.Tier) : "";
+            tierLabel.text = GearGlow.CornerText(stack);
             tierLabel.color = filled ? Tiers.ColorOf(stack.Item.Tier) : Color.clear;
         }
 

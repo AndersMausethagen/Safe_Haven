@@ -24,6 +24,9 @@ public sealed class HeldItemView : MonoBehaviour
     private PlayerGathering gathering;
     private PlayerSwimming swimming;
     private PlayerTransport transportUser;
+    private GameObject glowing;
+    private EnchantmentDefinition glowEnchantment;
+    private int glowEmpower;
     private Transform grip;
     private GameObject current;
     private Transform offHandGrip;
@@ -91,6 +94,8 @@ public sealed class HeldItemView : MonoBehaviour
         {
             Show(wanted);
         }
+
+        UpdateGlow();
         ItemStack offHand = equipment != null ? equipment.OffHand : ItemStack.Empty;
         // Gathering tools and broken lights do not leave a burning torch in the other hand.
         bool previewOffHand = Preview != null && Preview.IsWeapon && Preview.Weapon.CanUseOffHand;
@@ -105,6 +110,21 @@ public sealed class HeldItemView : MonoBehaviour
         }
         if (IsTorch(Shown) && current != null) current.transform.rotation = Quaternion.identity;
         if (offHandModel != null && IsTorch(offHandShown)) offHandModel.transform.rotation = Quaternion.identity;
+    }
+
+    // Only touches the materials when what is in the hand, or what was done to it, has changed.
+    private void UpdateGlow()
+    {
+        ItemStack held = equipment != null && equipment.MainHand.Item == Shown ? equipment.MainHand : ItemStack.Empty;
+        if (current == glowing && held.Enchantment == glowEnchantment && held.Empower == glowEmpower)
+        {
+            return;
+        }
+
+        glowing = current;
+        glowEnchantment = held.Enchantment;
+        glowEmpower = held.Empower;
+        GearGlow.Apply(current, held, EssenceSettings.Current);
     }
 
     private static bool IsTorch(ItemDefinition item) => item != null && item.IsWeapon && item.Weapon.Kind == WeaponKind.Torch;

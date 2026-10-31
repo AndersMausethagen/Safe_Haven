@@ -52,4 +52,5 @@ MonoBehaviour:
   teachesBuildings: []
   teachesRecipes: []
   experience: 0
+  transport: {fileID: 0}
   raidModifier: {fileID: 0}

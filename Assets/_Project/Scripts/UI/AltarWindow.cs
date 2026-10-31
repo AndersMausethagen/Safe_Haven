@@ -352,7 +352,7 @@ public sealed class AltarWindow : MonoBehaviour
         subjectRows.Show(subjects.Count, (row, i) => row.Bind(subjects[i].Title, subjects[i].Detail, subjects[i].Icon, i == subjectIndex, false));
         List<AltarOffer> offers = subjects.Count > 0 ? subjects[subjectIndex].Offers : new List<AltarOffer>();
         offerIndex = Mathf.Clamp(offerIndex, 0, Mathf.Max(0, offers.Count - 1));
-        offerRows.Show(offers.Count, (row, i) => row.Bind(offers[i].Done ? "✓ " + offers[i].Title : offers[i].Title, offers[i].Detail, null, i == offerIndex, offers[i].Done));
+        offerRows.Show(offers.Count, (row, i) => row.Bind(offers[i].Done ? $"{offers[i].Title}  <size=75%>Done</size>" : offers[i].Title, offers[i].Detail, null, i == offerIndex, offers[i].Done));
         DrawOffer(offers.Count > 0 ? offers[offerIndex] : null);
     }
 

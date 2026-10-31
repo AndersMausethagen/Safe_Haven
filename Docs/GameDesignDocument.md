@@ -602,7 +602,7 @@ Essence has three main sinks: **equipment tier upgrades/enchantments**, **select
 | **Ward and great building tiers** | Purified Essence | Heart Tree ward levels; the top tier of the altar, Cauldron and Construction Table |
 | **Draughts** at a Cauldron | Purified or Cursed Essence, and herbs | Repeatable tonics, so essence still matters once everything is upgraded |
 
-Empowering and enchanting belong to the one item, survive a failed raid with it and are shown in its name: *Gravebound Iron Mail Hauberk +1*. Raw Cursed work happens at once, while purifying waits in the queue, which is part of the choice. Two enchantments feed the loop back: *Reaping* finds more Cursed Essence, *Hollow* drains life from what it hits. Upgrading the altar makes it purify faster. All of this happens in one window at the Purification Altar: Purify, Empower, Enchant and Skills.
+Empowering and enchanting belong to the one item, survive a failed raid with it and are shown in its name: *Gravebound Iron Mail Hauberk +1*. In a slot the level stands beside the tier and an enchantment colours the frame and adds a mark; in the hand a weapon sheds motes in its school's colour, stronger the more it has been empowered. Raw Cursed work happens at once, while purifying waits in the queue, which is part of the choice. Two enchantments feed the loop back: *Reaping* finds more Cursed Essence, *Hollow* drains life from what it hits. Upgrading the altar makes it purify faster. All of this happens in one window at the Purification Altar: Purify, Empower, Enchant and Skills.
 
 ## 14. Base building and structures
 

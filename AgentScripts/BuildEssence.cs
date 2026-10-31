@@ -101,6 +101,7 @@ public static class BuildEssence
         }
 
         var so = new SerializedObject(settings);
+        so.FindProperty("glowMaterial").objectReferenceValue = GlowMaterial();
         SerializedProperty list = so.FindProperty("enchantments");
         list.arraySize = enchantments.Count;
         for (int i = 0; i < enchantments.Count; i++)
@@ -110,6 +111,30 @@ public static class BuildEssence
 
         so.ApplyModifiedPropertiesWithoutUndo();
         EditorUtility.SetDirty(settings);
+    }
+
+    // Soft additive motes. Shared by all worked gear; the particles carry the colour.
+    private static Material GlowMaterial()
+    {
+        const string path = "Assets/_Project/Data/Essence/Gear Motes.mat";
+        var material = AssetDatabase.LoadAssetAtPath<Material>(path);
+        if (material == null)
+        {
+            material = new Material(Shader.Find("Universal Render Pipeline/Particles/Unlit"));
+            AssetDatabase.CreateAsset(material, path);
+        }
+
+        material.SetFloat("_Surface", 1f);
+        material.SetFloat("_Blend", 2f);
+        material.SetFloat("_SrcBlend", (float)UnityEngine.Rendering.BlendMode.SrcAlpha);
+        material.SetFloat("_DstBlend", (float)UnityEngine.Rendering.BlendMode.One);
+        material.SetFloat("_ZWrite", 0f);
+        material.SetOverrideTag("RenderType", "Transparent");
+        material.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
+        material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
+        material.SetTexture("_BaseMap", AssetDatabase.GetBuiltinExtraResource<Texture2D>("Default-Particle.psd"));
+        EditorUtility.SetDirty(material);
+        return material;
     }
 
     // The GDD promised altar upgrades that improve throughput; they added only renown until now.

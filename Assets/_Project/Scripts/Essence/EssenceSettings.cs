@@ -51,6 +51,18 @@ public sealed class EssenceSettings : GameSettings<EssenceSettings>
     [Header("Enchantments")]
     [SerializeField] private List<EnchantmentDefinition> enchantments = new List<EnchantmentDefinition>();
 
+    [Header("How worked gear looks in the hand")]
+    [Tooltip("A weapon with a Purified enchantment.")]
+    [SerializeField, ColorUsage(false, true)] private Color purifiedGlow = new Color(0.25f, 0.75f, 0.45f);
+    [Tooltip("A weapon with a Cursed enchantment.")]
+    [SerializeField, ColorUsage(false, true)] private Color cursedGlow = new Color(0.8f, 0.1f, 0.14f);
+    [Tooltip("A weapon empowered but not enchanted.")]
+    [SerializeField, ColorUsage(false, true)] private Color empowerGlow = new Color(0.45f, 0.3f, 0.1f);
+    [Tooltip("How much stronger the glow is for each level of empowering.")]
+    [SerializeField, Min(0f)] private float glowPerLevel = 0.35f;
+    [Tooltip("The motes that drift off worked gear.")]
+    [SerializeField] private Material glowMaterial;
+
     [Header("Skills")]
     [Tooltip("Ranks a known skill can be deepened through, in order. Each states its totals, not what it adds.")]
     [SerializeField] private List<SkillRank> skillRanks = new List<SkillRank>
@@ -67,6 +79,11 @@ public sealed class EssenceSettings : GameSettings<EssenceSettings>
     public float ToolYield => toolYield;
     public float ToolCare => toolCare;
     public IReadOnlyList<EnchantmentDefinition> Enchantments => enchantments;
+    public Color PurifiedGlow => purifiedGlow;
+    public Color CursedGlow => cursedGlow;
+    public Color EmpowerGlow => empowerGlow;
+    public float GlowPerLevel => glowPerLevel;
+    public Material GlowMaterial => glowMaterial;
     public IReadOnlyList<SkillRank> SkillRanks => skillRanks;
 
     public EnchantmentDefinition FindEnchantment(string id)

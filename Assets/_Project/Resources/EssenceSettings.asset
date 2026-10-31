@@ -39,6 +39,11 @@ MonoBehaviour:
   - {fileID: 11400000, guid: a6a45ef5bc7a2d34aa68160c7f6f8969, type: 2}
   - {fileID: 11400000, guid: 319c2ed817fc8f246a2ca6d804769dc9, type: 2}
   - {fileID: 11400000, guid: 188bd7074f530404dbe544530bc59b91, type: 2}
+  purifiedGlow: {r: 0.25, g: 0.75, b: 0.45, a: 1}
+  cursedGlow: {r: 0.8, g: 0.1, b: 0.14, a: 1}
+  empowerGlow: {r: 0.45, g: 0.3, b: 0.1, a: 1}
+  glowPerLevel: 0.35
+  glowMaterial: {fileID: 2100000, guid: ea9df3decb6be574fb7c119e45212704, type: 2}
   skillRanks:
   - purified: 10
     power: 0.15
