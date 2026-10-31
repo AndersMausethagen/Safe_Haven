@@ -16,6 +16,7 @@ public sealed class BreachHud : MonoBehaviour
     private CanvasGroup group;
     private TMP_Text title;
     private TMP_Text progress;
+    private RectTransform bar;
     private RectTransform fill;
     private Image fillImage;
 
@@ -56,7 +57,7 @@ public sealed class BreachHud : MonoBehaviour
         RectTransform box = Box("Breach", root, new Vector2(0.5f, 1f), new Vector2(Width, 56f), new Vector2(0f, -FromTop));
         title = Label("Title", box, 0f, 0f, Width, 26f, 20f, style.Accent, TextAlignmentOptions.Center);
         style.OnWorld(title, true);
-        RectTransform bar = At("Ward", box, 0f, 30f, Width, 3f);
+        bar = At("Ward", box, 0f, 30f, Width, 3f);
         bar.gameObject.AddComponent<Image>().color = style.Track;
         fill = Stretch("Fill", bar);
         fillImage = fill.gameObject.AddComponent<Image>();
@@ -78,7 +79,9 @@ public sealed class BreachHud : MonoBehaviour
         UIStyle style = UIStyle.Current;
         title.text = breach.Definition.DisplayName;
         int left = breach.AttackersLeft;
-        progress.text = $"Wave {breach.Wave} of {breach.WaveCount}  ·  {left} left  ·  Ward {Mathf.CeilToInt(breach.WardHealth * 100f)}%";
+        string ward = breach.WardAtRisk ? $"  ·  Ward {Mathf.CeilToInt(breach.WardHealth * 100f)}%" : "";
+        progress.text = $"Wave {breach.Wave} of {breach.WaveCount}  ·  {left} left{ward}";
+        bar.gameObject.SetActive(breach.WardAtRisk);
         fill.anchorMax = new Vector2(breach.WardHealth, 1f);
         fillImage.color = breach.WardHealth <= WardInDanger ? style.Danger : style.Accent;
     }

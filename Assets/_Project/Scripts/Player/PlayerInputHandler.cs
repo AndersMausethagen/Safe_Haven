@@ -205,6 +205,7 @@ public sealed class PlayerInputHandler : MonoBehaviour
         Hook(GameInput.SwapWeapon, OnSwapWeapon, on);
         Hook(GameInput.Talents, OnTalents, on);
         Hook(GameInput.Haven, OnHaven, on);
+        Hook(GameInput.Minimap, OnMinimap, on);
         for (int i = 0; i < skillCallbacks.Length; i++)
         {
             Hook(GameInput.Skill(i), skillCallbacks[i], on);
@@ -268,6 +269,14 @@ public sealed class PlayerInputHandler : MonoBehaviour
     private void OnTalents(InputAction.CallbackContext context) => RequestWindow(UIWindowId.Talents);
 
     private void OnHaven(InputAction.CallbackContext context) => RequestWindow(UIWindowId.Haven);
+
+    private void OnMinimap(InputAction.CallbackContext context)
+    {
+        if (MinimapHud.Current != null)
+        {
+            MinimapHud.Current.CycleZoom();
+        }
+    }
 
     private void OnDodge(InputAction.CallbackContext context)
     {

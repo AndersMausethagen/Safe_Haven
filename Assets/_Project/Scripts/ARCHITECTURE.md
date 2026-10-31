@@ -598,6 +598,7 @@ filled in when it is saved (`SaveableEntityTools`). Safe Haven > Save > Assign M
 | Add a kind of cart or boat | A `TransportDefinition` in `Data/Transport`, a prefab with `Transport`, `SaveableEntity`, an `Interactable` and a driver (`Haulable` or `Rowboat`) with every collider on Ignore Raycast, and a kit item whose Transport points back at it. See `AgentScripts/BuildTransport.cs`, and call `SaveableEntity.RefreshPrefabId` on a new prefab or it can't be recreated from a save |
 | Change what a transport carries and how it slows the player | Its `TransportDefinition` (Systems Editor › Transport) |
 | Change how much worse, and richer, the night is | `Resources/NightSettings` (Systems Editor › Loot & Rarity); how many more creatures a raid holds at an hour is that hour's **Enemy Density** in the raid's Time of Day list |
+| Show something new on the minimap | Add it in `MinimapHud.ReadMarkers`, from a list the system already keeps; check `Found` so nothing shows through the fog of war |
 | Add a ward breach | A `WardBreachDefinition` (Content Editor › Ward Breaches) with **Threatens Home**, **Lane Count** and **Waves**, then add it to `Resources/WardBreachSettings` › **Breaches** (Systems Editor › Ward Breaches). The last in the list is the one that repeats |
 | Change who the Haven window counts as the lost expedition | `Resources/HavenSettings` › **Expedition** |
 | Change how fast the ground soaks and dries | The scene's Climate: **Soak Seconds**, **Dry Seconds**. The puddles themselves: `WorldWetness` in `AgentScripts/GenerateWorldTerrainShader.py`, then run it (see [Weather](../../../Docs/Weather.md)) |
@@ -1003,6 +1004,16 @@ Anywhere the sky is dark, `Resources/NightSettings` applies, scaled by `Atmosphe
 
 - **Danger:** `RaidDirector` multiplies its enemy health and power by the hour; `NightProwlers` calls `NightSettings.Strengthen` on what it spawns and lets more prowl with every breach won (`ProwlersAlive`, `DeepProwler`). They still never step into light. How many creatures a raid holds is the hour's own: `RaidTimeOfDay.enemyDensity`, used by `RaidDefinition.GetSpawnRules`.
 - **Reward:** `LootOnDeath.Reaped` multiplies Cursed Essence by the night's share and the killer's Essence Find. Breach attackers carry no loot, so this can't turn a defense into a farm.
+
+## Minimap
+
+`MinimapHud` in the corner, made for every scene with a player (`ExperienceTracker`), when the scene has terrain.
+
+- **The ground** is painted once by `MinimapMap`, from the terrain's layers and heights, the water meshes and the NavMesh (what can't be walked is darker). Painting rather than a camera keeps it the same at noon and midnight, free of the fog and veil, and nothing renders after that. It is spread over frames, as it takes a noticeable moment on a 400 m terrain.
+- **`Shaders/Minimap.shader`** does the rest: the round shape, scrolling and turning, the ward's edge, and `ExplorationMap.Texture` as the fog of war. Moving the map is a few material values.
+- **Markers** are read four times a second and placed every frame, from the lists the game already keeps (`BuildingObject.Active`, `Transport.All`, `DroppedItem.All`, `ExtractionPoint.Active`, `Companion.Active`, `QuestWaypoint.Active`, `WardBreachDirector`). What hasn't been explored isn't marked. Quests and breach lanes stay pinned to the rim when out of reach.
+- **`MinimapHud.Project`** is the one place a world offset becomes a spot on the map; the shader does the same turn the other way round. Up is where the camera looks.
+- **M** (`GameInput.Minimap`) cycles near, far and hidden, kept in PlayerPrefs. Sizes and reaches: `Resources/MinimapSettings`.
 
 ## Essence
 

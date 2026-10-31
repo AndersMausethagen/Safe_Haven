@@ -383,6 +383,8 @@ Reveal local maps as the player travels: ground never seen lies in dark fog unti
 (the fog of war; remembered at home, fresh every raid). At night, everything beyond the reach of sight and light lies
 under a grey, colourless veil. Keep major biome discoveries and portal landmarks persistent; vary minor loot and hazards between runs. A recruited scout may reveal a useful point of interest or safe path before departure.
 
+**The minimap (added October 31, 2026).** A round map in the corner shows what has been explored and nothing more: ground still in the fog of war stays dark, at home and on every raid. It turns with the camera. Over it go the player, buildings, carts, dropped items, exits and companions once found, the quest in hand, and creatures close enough to be seen, a much shorter way off at night. A ward breach shows its lanes and every attacker, so the player can see where to go. M zooms out and hides it.
+
 ## 10. Movement, combat, and enemies
 
 ### 10.1 Perspective and controls

@@ -60,6 +60,7 @@ public static class InputRebinds
         new RebindRow("Windows", "Build", "Player/Build"),
         new RebindRow("Windows", "Talents", "Player/Talents"),
         new RebindRow("Windows", "Haven", "Player/Haven"),
+        new RebindRow("Windows", "Map Zoom", "Player/Minimap"),
 
         new RebindRow("Camera and Building", "Camera Style", "Camera/ToggleStyle"),
         new RebindRow("Camera and Building", "Turn Camera", "Camera/Orbit"),

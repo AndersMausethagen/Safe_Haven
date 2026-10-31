@@ -78,6 +78,9 @@ public sealed class WardBreachDirector : MonoBehaviour
     public int Wave { get; private set; }
     public int WaveCount => Definition != null ? Definition.WaveCount : 0;
 
+    /// <summary>True when this breach can bring the ward down: the first can't.</summary>
+    public bool WardAtRisk => ward != null;
+
     /// <summary>The ward's strength in this fight, 0..1; 1 when it isn't in danger.</summary>
     public float WardHealth => ward != null ? ward.HealthFraction : 1f;
 

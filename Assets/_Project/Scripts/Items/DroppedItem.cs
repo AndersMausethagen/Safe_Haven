@@ -29,6 +29,8 @@ public sealed class DroppedItem : MonoBehaviour, ISaveable, IInteractionName, II
         public List<SlotSaveData> slots;
     }
 
+    private static readonly List<DroppedItem> all = new List<DroppedItem>();
+
     [Tooltip("What moves when the stack is thrown down. The item's model is put in here.")]
     [SerializeField] private Transform visual;
     [Tooltip("Shown for items without a model of their own.")]
@@ -41,6 +43,9 @@ public sealed class DroppedItem : MonoBehaviour, ISaveable, IInteractionName, II
     private float thrown;
 
     private ItemContainer Held => held ??= new ItemContainer(1, 1);
+
+    /// <summary>Every drop lying in the loaded scene.</summary>
+    public static IReadOnlyList<DroppedItem> All => all;
 
     public ItemStack Stack => Held.GetSlot(0);
     public bool ShowsOwnModel => model != null;
@@ -79,13 +84,19 @@ public sealed class DroppedItem : MonoBehaviour, ISaveable, IInteractionName, II
     {
         interactable = GetComponent<Interactable>();
         interactable.Completed.AddListener(OnPickedUp);
+        all.Add(this);
         enabled = false;
     }
 
     private void OnDestroy()
     {
+        all.Remove(this);
         interactable.Completed.RemoveListener(OnPickedUp);
     }
+
+    // Entering play mode doesn't reload scripts in this project, so statics are reset here.
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStatics() => all.Clear();
 
     private void Update()
     {
