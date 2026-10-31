@@ -27,6 +27,19 @@ public sealed class TransportSettings : GameSettings<TransportSettings>
     [Tooltip("Seconds stuck at full strain before the player lets go.")]
     [SerializeField, Min(0f)] private float stuckSeconds = 1.5f;
 
+    [Header("Left alone in a raid")]
+    [Tooltip("Metres the scent of an unattended load carries. Creatures in reach come to look.")]
+    [SerializeField, Min(0f)] private float scentRadius = 16f;
+    [SerializeField, Min(0.5f)] private float scentSeconds = 6f;
+    [Tooltip("With the player this close it isn't unattended.")]
+    [SerializeField, Min(0f)] private float attendedReach = 8f;
+    [Tooltip("A creature this close to the cart tears at it.")]
+    [SerializeField, Min(0f)] private float scavengeReach = 3.5f;
+    [Tooltip("Seconds between bites.")]
+    [SerializeField, Min(0.1f)] private float scavengeSeconds = 4f;
+    [Tooltip("Items a bite takes.")]
+    [SerializeField, Min(1)] private int scavengeItems = 3;
+
     [Header("Sounds")]
     [Tooltip("Loops under a cart while it rolls, louder and higher the faster it goes, lower under a load.")]
     [SerializeField] private SoundDefinition rolling;
@@ -44,6 +57,12 @@ public sealed class TransportSettings : GameSettings<TransportSettings>
     public SoundDefinition Creak => creak;
     public SoundDefinition OarStroke => oarStroke;
     public SoundDefinition Bump => bump;
+    public float ScentRadius => scentRadius;
+    public float ScentSeconds => scentSeconds;
+    public float AttendedReach => attendedReach;
+    public float ScavengeReach => scavengeReach;
+    public float ScavengeSeconds => scavengeSeconds;
+    public int ScavengeItems => scavengeItems;
     public ItemSlotView SlotPrefab => slotPrefab;
     public float ExtractionRange => extractionRange;
     public float MaterialReach => materialReach;

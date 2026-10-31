@@ -21,6 +21,12 @@ MonoBehaviour:
   rumbleSeconds: 1.2
   strainedSpeed: 0.2
   stuckSeconds: 1.5
+  scentRadius: 16
+  scentSeconds: 6
+  attendedReach: 8
+  scavengeReach: 3.5
+  scavengeSeconds: 4
+  scavengeItems: 3
   rolling: {fileID: 11400000, guid: 221176e61d48d034ab7213afeaf7d11f, type: 2}
   hullWater: {fileID: 11400000, guid: 159e6d5b596a3694eaf0cebd4391ec7c, type: 2}
   creak: {fileID: 11400000, guid: afb70e5f769c9fc43811760ef8aaea3d, type: 2}

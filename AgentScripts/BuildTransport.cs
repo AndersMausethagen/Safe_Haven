@@ -421,6 +421,10 @@ public static class BuildTransport
         transport.ApplyModifiedPropertiesWithoutUndo();
         root.AddComponent<SaveableEntity>();
         root.AddComponent<TransportAudio>();
+        if (root.GetComponent<Haulable>() != null)
+        {
+            root.AddComponent<CartScavenging>();
+        }
 
         string path = Prefabs + definition.name + ".prefab";
         GameObject prefab = PrefabUtility.SaveAsPrefabAsset(root, path);

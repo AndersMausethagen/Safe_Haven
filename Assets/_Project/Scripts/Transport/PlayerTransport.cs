@@ -244,7 +244,9 @@ public sealed class PlayerTransport : MonoBehaviour
         if (report != null)
         {
             report.TransportHome = home;
-            report.TransportLine = RaidEnding(nearest.Definition.DisplayName, nearest.Cargo.CountItems(), home);
+            int taken = nearest.TryGetComponent(out CartScavenging scavenging) ? scavenging.Taken : 0;
+            report.TransportLine = RaidEnding(nearest.Definition.DisplayName, nearest.Cargo.CountItems(), home)
+                + (taken > 0 ? $" Creatures took {taken} from it." : "");
         }
     }
 

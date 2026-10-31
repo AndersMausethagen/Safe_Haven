@@ -212,6 +212,31 @@ public sealed class TransportTests
     }
 
     [Test]
+    public void ABite_TakesFromOneStack_AndNeverMoreThanThere()
+    {
+        ItemDefinition stone = Stone(1f);
+        ItemDefinition wood = Stone(1f);
+        var cargo = new ItemContainer(4, 1);
+        cargo.SetSlot(1, new ItemStack(stone, 10));
+        cargo.SetSlot(3, new ItemStack(wood, 2));
+
+        Assert.AreEqual(3, CartScavenging.Bite(cargo, 3, 0f));
+        Assert.AreEqual(7, cargo.GetSlot(1).Count, "the first stack, at a low pick");
+        Assert.AreEqual(2, CartScavenging.Bite(cargo, 3, 0.99f), "the last stack holds only two");
+        Assert.IsTrue(cargo.GetSlot(3).IsEmpty);
+        Assert.AreEqual(3, CartScavenging.Bite(cargo, 3, 1f), "a pick of exactly 1 still lands on a stack");
+        Assert.AreEqual(0, CartScavenging.Bite(new ItemContainer(2, 1), 3, 0.5f), "nothing to take");
+    }
+
+    [Test]
+    public void OnlyCarts_AreScavenged()
+    {
+        Assert.IsNotNull(Authored("Handcart").Prefab.GetComponent<CartScavenging>());
+        Assert.IsNotNull(Authored("Wheelbarrow").Prefab.GetComponent<CartScavenging>());
+        Assert.IsNull(Authored("Rowboat").Prefab.GetComponent<CartScavenging>(), "a boat stays out on the water");
+    }
+
+    [Test]
     public void AuthoredTransports_AreWiredUp()
     {
         var content = Resources.Load<ContentDatabase>(ContentDatabase.ResourceName);

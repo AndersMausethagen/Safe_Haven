@@ -101,6 +101,11 @@ public sealed class TransportHud : MonoBehaviour
         bool held = used != null && used == cart;
         status.text = cart != null ? RaidLine(held, away, reach) : "";
         status.color = held || away <= reach ? style.Text : style.Warning;
+        if (cart != null && !held && cart.TryGetComponent(out CartScavenging scavenging) && scavenging.IsBeingEaten)
+        {
+            status.text = $"{away:0} m away. Something is tearing at it";
+            status.color = style.Danger;
+        }
     }
 
     private void DrawLoad(Transport used, UIStyle style)
