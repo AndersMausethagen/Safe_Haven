@@ -117,6 +117,8 @@ public sealed class Transport : MonoBehaviour, ISaveable
         safePosition = transform.position;
     }
 
+    private void Start() => TransportHud.Create();
+
     private void OnDisable()
     {
         all.Remove(this);

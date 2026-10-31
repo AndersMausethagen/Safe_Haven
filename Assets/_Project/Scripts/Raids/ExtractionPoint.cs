@@ -314,6 +314,11 @@ public sealed class ExtractionPoint : MonoBehaviour, IInteractionCondition, IInt
         }
 
         hold.Light(Duration);
+        if (PlayerTransport.Current != null)
+        {
+            PlayerTransport.Current.WarnIfLeavingCart();
+        }
+
         lastHoldState = hold.State;
         nextCallAt = Time.time;
         GameMessages.Post($"{displayName} is lit! Hold its circle for {Duration:0} seconds. The forest will come.", MessageKind.Warning);

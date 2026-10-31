@@ -147,6 +147,15 @@ public sealed class TransportTests
     }
 
     [Test]
+    public void RaidHud_SaysWhetherACartComesHome()
+    {
+        StringAssert.Contains("Comes home", TransportHud.RaidLine(true, 40f, 12f), "the hands always bring it");
+        StringAssert.Contains("In reach", TransportHud.RaidLine(false, 12f, 12f), "right at the edge still counts");
+        StringAssert.Contains("stays behind", TransportHud.RaidLine(false, 12.5f, 12f));
+        StringAssert.Contains("40 m", TransportHud.RaidLine(false, 40f, 12f), "and it says how far");
+    }
+
+    [Test]
     public void AuthoredTransports_AreWiredUp()
     {
         var content = Resources.Load<ContentDatabase>(ContentDatabase.ResourceName);

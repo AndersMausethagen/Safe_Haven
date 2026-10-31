@@ -322,7 +322,7 @@ Past its capacity a transport is overfilled: it still takes more, but the speed 
 
 At home a load never has to pass through the bag: a cart brought near a chest sends its cargo straight to storage, and what is in a cart or boat standing near the player counts as materials for building and crafting.
 
-Attacking, guarding, dodging or casting lets go at once, with no key to press, and leaves the cart where it stands. A cart in the hands goes through the portal, makes noise as it rolls, and comes home if it is within 12 m of the player at extraction. Otherwise it stays behind, and a failed raid loses it and its cargo. Essences stay in their bars, as they weigh nothing: only items go in the cargo.
+Attacking, guarding, dodging or casting lets go at once, with no key to press, and leaves the cart where it stands. A cart in the hands goes through the portal, makes noise as it rolls, and comes home if it is within 12 m of the player at extraction. Otherwise it stays behind, and a failed raid loses it and its cargo. In a raid the HUD keeps showing a cart that was let go, with how far off it is and whether it would come home, and lighting an extraction point warns about a cart out of reach. Essences stay in their bars, as they weigh nothing: only items go in the cargo.
 
 ## 9. Raid world, discovery, and events
 

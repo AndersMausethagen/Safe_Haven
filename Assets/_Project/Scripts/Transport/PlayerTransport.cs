@@ -200,28 +200,44 @@ public sealed class PlayerTransport : MonoBehaviour
         GameMessages.Post($"The {name} comes with you. Lose the raid, or leave it behind, and it is gone.", MessageKind.Warning);
     }
 
-    /// <summary>The raid is over. On extraction the cart nearest the player comes home; the rest of the forest keeps.</summary>
-    public void LeaveRaid(bool extracted)
+    /// <summary>The cart that would come home if the raid ended now: the nearest to the player. Null with none.</summary>
+    public Transport RaidCart(out float distance)
     {
         Transport nearest = null;
-        float best = float.PositiveInfinity;
+        distance = float.PositiveInfinity;
         foreach (Transport transport in Transport.All)
         {
-            float distance = (transport.transform.position - transform.position).sqrMagnitude;
-            if (transport.Driver is Haulable && distance < best)
+            float away = Vector3.Distance(transport.transform.position, transform.position);
+            if (transport.Driver is Haulable && away < distance)
             {
-                best = distance;
+                distance = away;
                 nearest = transport;
             }
         }
 
+        return nearest;
+    }
+
+    /// <summary>Lighting the way home starts the clock on a cart left somewhere: say so while there is still time.</summary>
+    public void WarnIfLeavingCart()
+    {
+        Transport cart = RaidCart(out float distance);
+        if (cart != null && distance > TransportSettings.Current.ExtractionRange)
+        {
+            GameMessages.Post($"The {cart.Definition.DisplayName} is {distance:0} m away. Bring it to the circle or it stays behind.", MessageKind.Warning);
+        }
+    }
+
+    /// <summary>The raid is over. On extraction the cart nearest the player comes home; the rest of the forest keeps.</summary>
+    public void LeaveRaid(bool extracted)
+    {
+        Transport nearest = RaidCart(out float distance);
         if (nearest == null)
         {
             return;
         }
 
-        float reach = TransportSettings.Current.ExtractionRange;
-        if (extracted && best <= reach * reach)
+        if (extracted && distance <= TransportSettings.Current.ExtractionRange)
         {
             GameSession.CarryTransport(new GameSession.CarriedTransport(nearest.Definition, nearest.CaptureState()));
             GameMessages.Post($"The {nearest.Definition.DisplayName} comes home with you.", MessageKind.Gain);
