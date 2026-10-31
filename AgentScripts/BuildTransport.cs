@@ -32,6 +32,7 @@ public static class BuildTransport
     private static Material darkPlank;
     private static Material iron;
     private static PhysicsMaterial slick;
+    private static Material sack;
 
     public static string Apply()
     {
@@ -43,6 +44,7 @@ public static class BuildTransport
         plank = Tint("Cart Plank", new Color(0.46f, 0.31f, 0.18f));
         darkPlank = Tint("Cart Plank Dark", new Color(0.32f, 0.21f, 0.12f));
         iron = Tint("Dark Iron", new Color(0.2f, 0.21f, 0.24f));
+        sack = Tint("Cargo Sack", new Color(0.6f, 0.5f, 0.34f));
         slick = Slick();
 
         TransportDefinition barrow = Definition("Wheelbarrow", "Wheelbarrow", "One wheel and two handles. Goes where you point it, on any path you can walk.",
@@ -240,6 +242,7 @@ public static class BuildTransport
         Transform wheel = Wheel(root.transform, "Wheel", new Vector3(0f, 0.25f, 0.82f), 0.25f, 0.07f);
         Transform handle = Empty("Handle", root.transform, new Vector3(0f, 0.4f, -1f));
         Haulable(root, handle, new[] { wheel }, 0.25f, true, new Vector3(0f, 0.42f, 0.12f), 0.74f, 0.42f);
+        Pile(root, new Vector3(0f, 0.5f, 0.1f), new Vector3(0.42f, 0.13f, 0.68f), 0.62f, 5, 3);
         return Save(root, definition, 2.2f, new Vector3(0f, 0.5f, 0f), new Vector3(1f, 1f, 2.2f));
     }
 
@@ -265,6 +268,7 @@ public static class BuildTransport
         Transform right = Wheel(root.transform, "Wheel Right", new Vector3(0.74f, 0.43f, -0.35f), 0.43f, 0.09f);
         Transform handle = Empty("Handle", root.transform, new Vector3(0f, 0.58f, 1.85f));
         Haulable(root, handle, new[] { left, right }, 0.43f, false, new Vector3(0f, 0.5f, -0.15f), 0.76f, 0.5f);
+        Pile(root, new Vector3(0f, 0.7f, -0.3f), new Vector3(0.9f, 0.17f, 1.5f), 1f, 10, 5);
         return Save(root, definition, 2.6f, new Vector3(0f, 0.7f, 0f), new Vector3(1.6f, 1.2f, 3.2f));
     }
 
@@ -279,6 +283,14 @@ public static class BuildTransport
         var collider = root.AddComponent<MeshCollider>();
         collider.sharedMesh = hull;
         collider.convex = true;
+
+        var cap = new GameObject("Water Mask");
+        cap.transform.SetParent(root.transform, false);
+        cap.AddComponent<MeshFilter>().sharedMesh = HullCap();
+        var capRenderer = cap.AddComponent<MeshRenderer>();
+        capRenderer.sharedMaterial = WaterMask();
+        capRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+        capRenderer.receiveShadows = false;
 
         Transform frame = Empty("Frame", root.transform, Vector3.zero);
         Piece(frame, PrimitiveType.Cube, new Vector3(0f, 0.04f, -0.15f), new Vector3(0.96f, 0.05f, 0.26f), darkPlank);
@@ -302,6 +314,7 @@ public static class BuildTransport
         body.mass = definition.EmptyMass;
         root.AddComponent<Interactable>();
         root.AddComponent<Transport>();
+        Pile(root, new Vector3(0f, -0.08f, -0.68f), new Vector3(0.62f, 0.13f, 0.62f), 0.3f, 6, 3);
         var rowboat = root.AddComponent<Rowboat>();
         var so = new SerializedObject(rowboat);
         SetList(so.FindProperty("floats"), floats.ToArray());
@@ -316,6 +329,50 @@ public static class BuildTransport
         water.FindProperty("foam").floatValue = 0.4f;
         water.ApplyModifiedPropertiesWithoutUndo();
         return Save(root, definition, 2.4f, Vector3.zero, new Vector3(1.2f, 0.6f, 3.2f));
+    }
+
+    // Sacks, crates and logs, bottom layer first; the last ones are the heap over the rim. Seeded, so a rebuild changes nothing.
+    private static void Pile(GameObject root, Vector3 floor, Vector3 size, float rim, int full, int heap)
+    {
+        Transform load = Empty("Load", root.transform, Vector3.zero);
+        var random = new System.Random(root.name.GetHashCode() == 0 ? 7 : root.name.Length * 31 + 7);
+        float Spread(double span) => (float)((random.NextDouble() - 0.5) * span);
+        var pieces = new List<Transform>();
+        int total = full + heap;
+        for (int i = 0; i < total; i++)
+        {
+            bool heaped = i >= full;
+            float layer = heaped ? rim + (i - full + 1) * size.y * 0.5f : Mathf.Lerp(floor.y, rim - size.y * 0.25f, i / (float)full);
+            float narrow = heaped ? 0.55f : 1f;
+            // Measured to the piece's edge, so nothing pushes through the walls.
+            float widest = size.y * 3f;
+            var at = new Vector3(floor.x + Spread(Mathf.Max(0f, size.x - widest) * narrow), layer, floor.z + Spread(Mathf.Max(0f, size.z - widest) * narrow));
+            pieces.Add(Cargo(load, i, at, size.y * 2f, Spread(60.0)));
+        }
+
+        var so = new SerializedObject(root.AddComponent<CargoPile>());
+        SetList(so.FindProperty("pieces"), pieces.ToArray());
+        so.FindProperty("fullPieces").intValue = full;
+        so.ApplyModifiedPropertiesWithoutUndo();
+    }
+
+    private static Transform Cargo(Transform parent, int index, Vector3 at, float size, float turn)
+    {
+        switch (index % 3)
+        {
+            case 0:
+                Transform sackPiece = Piece(parent, PrimitiveType.Sphere, at, new Vector3(size * 1.5f, size, size * 1.2f), sack);
+                sackPiece.localRotation = Quaternion.Euler(0f, turn, 0f);
+                return sackPiece;
+            case 1:
+                Transform crate = Piece(parent, PrimitiveType.Cube, at, Vector3.one * size, darkPlank);
+                crate.localRotation = Quaternion.Euler(0f, turn, 0f);
+                return crate;
+            default:
+                Transform log = Piece(parent, PrimitiveType.Cylinder, at, new Vector3(size * 0.6f, size * 0.65f, size * 0.6f), plank);
+                log.localRotation = Quaternion.Euler(0f, turn, 90f);
+                return log;
+        }
     }
 
     private static Transform Oar(Transform parent, string name, float side)
@@ -447,18 +504,7 @@ public static class BuildTransport
             triangles[strake].AddRange(new[] { start, start + 1, start + 2, start, start + 2, start + 3 });
         }
 
-        Vector3 Point(int i, int j, float side, float inset)
-        {
-            float t = i / (float)along;
-            float v = j / (float)up;
-            float beam = t < 0.4f ? Mathf.Lerp(0.74f, 1f, Mathf.SmoothStep(0f, 1f, t / 0.4f)) : Mathf.Lerp(1f, 0.02f, Mathf.Pow((t - 0.4f) / 0.6f, 1.9f));
-            float top = 0.27f + 0.17f * t * t * t;
-            float bottom = -0.28f + 0.24f * Mathf.Pow(t, 4f);
-            float x = 0.58f * beam * Mathf.Pow(v, 0.55f);
-            float y = Mathf.Lerp(bottom, top, v);
-            x = Mathf.Max(0f, x - inset);
-            return new Vector3(x * side, y + inset * (1f - v), Mathf.Lerp(-1.55f, 1.7f, t));
-        }
+        Vector3 Point(int i, int j, float side, float inset) => HullPoint(i, along, j, up, side, inset);
 
         for (int i = 0; i < along; i++)
         {
@@ -534,6 +580,67 @@ public static class BuildTransport
         mesh.RecalculateBounds();
         EditorUtility.SetDirty(mesh);
         return mesh;
+    }
+
+    private static Vector3 HullPoint(int i, int along, int j, int up, float side, float inset)
+    {
+        float t = i / (float)along;
+        float v = j / (float)up;
+        float beam = t < 0.4f ? Mathf.Lerp(0.74f, 1f, Mathf.SmoothStep(0f, 1f, t / 0.4f)) : Mathf.Lerp(1f, 0.02f, Mathf.Pow((t - 0.4f) / 0.6f, 1.9f));
+        float top = 0.27f + 0.17f * t * t * t;
+        float bottom = -0.28f + 0.24f * Mathf.Pow(t, 4f);
+        float x = 0.58f * beam * Mathf.Pow(v, 0.55f);
+        float y = Mathf.Lerp(bottom, top, v);
+        x = Mathf.Max(0f, x - inset);
+        return new Vector3(x * side, y + inset * (1f - v), Mathf.Lerp(-1.55f, 1.7f, t));
+    }
+
+    // Spans the opening of the hull just under the rim. Only ever writes depth (Water Mask.shader).
+    private static Mesh HullCap()
+    {
+        const int along = 16;
+        const int up = 5;
+        var vertices = new List<Vector3>();
+        var triangles = new List<int>();
+        for (int i = 0; i <= along; i++)
+        {
+            vertices.Add(HullPoint(i, along, up, up, -1f, 0.03f) + Vector3.down * 0.02f);
+            vertices.Add(HullPoint(i, along, up, up, 1f, 0.03f) + Vector3.down * 0.02f);
+        }
+
+        for (int i = 0; i < along; i++)
+        {
+            int a = i * 2;
+            triangles.AddRange(new[] { a, a + 2, a + 1, a + 1, a + 2, a + 3 });
+        }
+
+        string path = Art + "Rowboat Hull Cap.asset";
+        var mesh = AssetDatabase.LoadAssetAtPath<Mesh>(path);
+        if (mesh == null)
+        {
+            mesh = new Mesh { name = "Rowboat Hull Cap" };
+            AssetDatabase.CreateAsset(mesh, path);
+        }
+
+        mesh.Clear();
+        mesh.SetVertices(vertices);
+        mesh.SetTriangles(triangles, 0);
+        mesh.RecalculateBounds();
+        EditorUtility.SetDirty(mesh);
+        return mesh;
+    }
+
+    private static Material WaterMask()
+    {
+        string path = Art + "Water Mask.mat";
+        var material = AssetDatabase.LoadAssetAtPath<Material>(path);
+        if (material == null)
+        {
+            material = new Material(AssetDatabase.LoadAssetAtPath<Shader>("Assets/_Project/Shaders/Water Mask.shader"));
+            AssetDatabase.CreateAsset(material, path);
+        }
+
+        return material;
     }
 
     // ----- The Wainwright's Yard -----

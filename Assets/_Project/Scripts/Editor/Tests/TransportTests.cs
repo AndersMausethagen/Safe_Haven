@@ -191,6 +191,27 @@ public sealed class TransportTests
     }
 
     [Test]
+    public void ThePile_ShowsTheLoad_AndHeapsWhenOverfilled()
+    {
+        Assert.AreEqual(0, CargoPile.PiecesFor(0f, 200f, 320f, 10, 15), "an empty cart looks empty");
+        Assert.AreEqual(1, CargoPile.PiecesFor(0.5f, 200f, 320f, 10, 15), "anything at all shows");
+        Assert.AreEqual(5, CargoPile.PiecesFor(100f, 200f, 320f, 10, 15));
+        Assert.AreEqual(10, CargoPile.PiecesFor(200f, 200f, 320f, 10, 15), "the heap starts past the capacity");
+        Assert.AreEqual(11, CargoPile.PiecesFor(201f, 200f, 320f, 10, 15));
+        Assert.AreEqual(15, CargoPile.PiecesFor(320f, 200f, 320f, 10, 15));
+        Assert.AreEqual(15, CargoPile.PiecesFor(900f, 200f, 320f, 10, 15), "never more than there are");
+    }
+
+    [Test]
+    public void EveryTransport_HasAPile()
+    {
+        foreach (string name in Kinds)
+        {
+            Assert.IsNotNull(Authored(name).Prefab.GetComponent<CargoPile>(), name);
+        }
+    }
+
+    [Test]
     public void AuthoredTransports_AreWiredUp()
     {
         var content = Resources.Load<ContentDatabase>(ContentDatabase.ResourceName);
