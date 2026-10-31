@@ -47,6 +47,21 @@ public sealed class StashChest : MonoBehaviour
         return most;
     }
 
+    /// <summary>True when a finished chest stands within <paramref name="reach"/> metres of a point.</summary>
+    public static bool AnyWithin(Vector3 point, float reach)
+    {
+        foreach (StashChest chest in standing)
+        {
+            bool finished = !chest.TryGetComponent(out Construction construction) || construction.IsStanding;
+            if (finished && chest.interactable.DistanceFrom(point) <= reach)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private void Awake()
     {
         interactable = GetComponent<Interactable>();

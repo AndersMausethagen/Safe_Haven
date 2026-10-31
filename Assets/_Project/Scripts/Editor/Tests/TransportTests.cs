@@ -110,6 +110,43 @@ public sealed class TransportTests
     }
 
     [Test]
+    public void NearbyCargo_CountsAsMaterials_AndIsSpentAfterTheBag()
+    {
+        ItemDefinition plank = Stone(1f);
+        var bag = new ItemContainer(2, 1);
+        bag.Add(plank, 2);
+        var cart = new ItemContainer(2, 1);
+        cart.Add(plank, 10);
+        var stash = new ItemContainer(2, 1);
+        stash.Add(plank, 5);
+        var pool = new MaterialPool(null, bag, null, stash, new List<ItemContainer> { cart });
+
+        Assert.AreEqual(17, pool.Have(plank));
+        Assert.IsTrue(pool.TrySpend(null, new[] { new ItemAmount(plank, 8) }));
+        Assert.AreEqual(0, bag.Count(plank), "the bag goes first");
+        Assert.AreEqual(4, cart.Count(plank), "then the cargo");
+        Assert.AreEqual(5, stash.Count(plank), "storage is left alone while the cargo can pay");
+
+        Assert.IsTrue(pool.TrySpend(null, new[] { new ItemAmount(plank, 6) }));
+        Assert.AreEqual(0, cart.Count(plank));
+        Assert.AreEqual(3, stash.Count(plank), "and storage pays the rest");
+
+        Assert.IsFalse(pool.TrySpend(null, new[] { new ItemAmount(plank, 4) }), "never half paid");
+        Assert.AreEqual(3, stash.Count(plank));
+    }
+
+    [Test]
+    public void NoCargoNearby_LeavesThePoolAsItWas()
+    {
+        ItemDefinition plank = Stone(1f);
+        var bag = new ItemContainer(2, 1);
+        bag.Add(plank, 2);
+        var pool = new MaterialPool(null, bag);
+        Assert.AreEqual(2, pool.Have(plank));
+        Assert.IsTrue(pool.TrySpend(null, new[] { new ItemAmount(plank, 2) }));
+    }
+
+    [Test]
     public void AuthoredTransports_AreWiredUp()
     {
         var content = Resources.Load<ContentDatabase>(ContentDatabase.ResourceName);

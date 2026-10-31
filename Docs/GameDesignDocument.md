@@ -320,6 +320,8 @@ Transport options include a hand-dragged cart, a wheelbarrow, and a horse cart. 
 
 Past its capacity a transport is overfilled: it still takes more, but the speed falls away steeply, and the HUD says so in words. A handcart trails behind the player and swings wide on a turn; a barrow is pushed ahead and goes where it is pointed. A loaded cart keeps rolling when the player stops, and a heavy one can be too much for a steep bank: the strain slows the player, and if it stays stuck they let go. It stops at what stops it, so narrow routes really are a choice. The boat floats on real buoyancy, sits lower the more it carries and has to be rowed to the bank to get out; a swimmer can climb back in.
 
+At home a load never has to pass through the bag: a cart brought near a chest sends its cargo straight to storage, and what is in a cart or boat standing near the player counts as materials for building and crafting.
+
 Attacking, guarding, dodging or casting lets go at once, with no key to press, and leaves the cart where it stands. A cart in the hands goes through the portal, makes noise as it rolls, and comes home if it is within 12 m of the player at extraction. Otherwise it stays behind, and a failed raid loses it and its cargo. Essences stay in their bars, as they weigh nothing: only items go in the cargo.
 
 ## 9. Raid world, discovery, and events

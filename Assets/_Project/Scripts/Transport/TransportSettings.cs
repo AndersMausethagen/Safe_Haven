@@ -12,6 +12,10 @@ public sealed class TransportSettings : GameSettings<TransportSettings>
     [SerializeField] private ItemSlotView slotPrefab;
     [Tooltip("A cart this close to the player when they extract comes home with them, attached or not. Metres.")]
     [SerializeField, Min(0f)] private float extractionRange = 12f;
+    [Tooltip("At home, what is in a cart or boat this close to the player can be built and crafted with. Metres.")]
+    [SerializeField, Min(0f)] private float materialReach = 12f;
+    [Tooltip("At home, a cart this close to a chest can send its cargo straight to storage. Metres.")]
+    [SerializeField, Min(0f)] private float storageReach = 8f;
     [Tooltip("Metres monsters hear a rolling cart from, empty.")]
     [SerializeField, Min(0f)] private float rumbleRadius = 5f;
     [Tooltip("More metres when full. A loaded cart is a loud cart.")]
@@ -25,6 +29,8 @@ public sealed class TransportSettings : GameSettings<TransportSettings>
 
     public ItemSlotView SlotPrefab => slotPrefab;
     public float ExtractionRange => extractionRange;
+    public float MaterialReach => materialReach;
+    public float StorageReach => storageReach;
     public float RumbleRadius => rumbleRadius;
     public float RumbleWhenFull => rumbleWhenFull;
     public float RumbleSeconds => rumbleSeconds;

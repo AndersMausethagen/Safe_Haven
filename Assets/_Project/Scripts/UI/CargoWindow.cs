@@ -124,6 +124,8 @@ public sealed class CargoWindow : MonoBehaviour
     private TMP_Text speedValue;
     private TMP_Text bagValue;
     private TMP_Text detailLabel;
+    private TMP_Text storageNote;
+    private Button storageButton;
     private Grid bag;
     private Grid cargo;
     private Transform anchor;
@@ -212,6 +214,29 @@ public sealed class CargoWindow : MonoBehaviour
         speedValue.color = transport.IsOverfilled ? style.Warning : style.Text;
         ItemContainer carried = bag.Container;
         bagValue.text = carried != null ? $"{carried.CurrentWeight:0} / {carried.WeightCapacity:0} weight" : "";
+
+        // Storage only exists at home, and the load still has to be brought to it.
+        bool atHome = RaidDirector.Current == null;
+        bool inReach = atHome && StashChest.AnyWithin(transport.transform.position, TransportSettings.Current.StorageReach);
+        storageButton.gameObject.SetActive(atHome);
+        storageButton.interactable = inReach && transport.Cargo.CountItems() > 0;
+        storageNote.text = atHome && !inReach ? "Bring it near a chest." : "";
+    }
+
+    private void SendToStorage()
+    {
+        ItemContainer stash = GameSession.Stash.Items;
+        ItemContainer load = transport.Cargo;
+        for (int i = 0; i < load.SlotCount; i++)
+        {
+            if (!load.GetSlot(i).IsEmpty)
+            {
+                load.TransferTo(i, stash);
+            }
+        }
+
+        GameMessages.Post(load.CountItems() > 0 ? "Storage is full. The rest stays in the cargo." : "The cargo goes into storage.",
+            load.CountItems() > 0 ? MessageKind.Warning : MessageKind.Info);
     }
 
     private void Move(Grid from, int index)
@@ -271,7 +296,9 @@ public sealed class CargoWindow : MonoBehaviour
         bag = new Grid(this, SlotGrid("Bag", Margin));
         cargo = new Grid(this, SlotGrid("Cargo", 620f));
 
-        detailLabel = Paragraph("Detail", panel, Margin, 544f, 760f, 120f, 18f, style.Text);
+        detailLabel = Paragraph("Detail", panel, Margin, 544f, 530f, 108f, 18f, style.Text);
+        AddButton("Store", panel, Margin, 660f, 210f, UIRole.Kind.Button, SendToStorage, out storageButton).text = "Send to storage";
+        storageNote = Label("Storage Note", panel, Margin + 222f, 660f, 300f, 46f, 18f, style.Muted);
         AddButton("Load", panel, 620f, 660f, 170f, UIRole.Kind.PrimaryButton, () => MoveAll(bag, cargo), out _).text = "Load all";
         AddButton("Unload", panel, 802f, 660f, 170f, UIRole.Kind.Button, () => MoveAll(cargo, bag), out _).text = "Unload all";
         AddButton("Close", panel, Width - Margin - 150f, 660f, 150f, UIRole.Kind.Button, () => window.Close(), out _).text = "Close";

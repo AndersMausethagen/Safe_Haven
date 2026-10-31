@@ -57,6 +57,23 @@ public sealed class Transport : MonoBehaviour, ISaveable
     /// <summary>Every transport in the loaded scenes.</summary>
     public static IReadOnlyList<Transport> All => all;
 
+    /// <summary>The cargo in reach of a point, to build and craft from. Null when there is none, which is nearly always.</summary>
+    public static List<ItemContainer> CargoNear(Vector3 point)
+    {
+        List<ItemContainer> near = null;
+        float reach = TransportSettings.Current.MaterialReach;
+        foreach (Transport transport in all)
+        {
+            if ((transport.transform.position - point).sqrMagnitude <= reach * reach)
+            {
+                near ??= new List<ItemContainer>();
+                near.Add(transport.Cargo);
+            }
+        }
+
+        return near;
+    }
+
     public TransportDefinition Definition => definition;
     public ItemContainer Cargo { get; private set; }
     public Rigidbody Body { get; private set; }
