@@ -37,6 +37,9 @@ public sealed class InputActionsTests : InputTestFixture
         }
 
         base.TearDown();
+        // The fixture's teardown puts the input system back without the project-wide actions, and nothing sets them again
+        // until the next domain reload: every GameInput lookup in the Editor would come back empty until then.
+        InputSystem.actions = actions;
     }
 
     [Test]
