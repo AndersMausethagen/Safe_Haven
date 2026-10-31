@@ -9,6 +9,17 @@ public enum AudioChannel
     Effects = 2,
 }
 
+/// <summary>What gives way when too many sounds play at once. Serialized as numbers, so add new ones at the end.</summary>
+public enum SoundPriority
+{
+    /// <summary>Mood: birds, footsteps, creaks. The first to go, and never cuts anything else off.</summary>
+    Background = 0,
+    /// <summary>Most of the game.</summary>
+    Normal = 1,
+    /// <summary>What the player needs to hear: being hurt, a parry, a warning. Only ever cut off by its own kind.</summary>
+    Important = 2,
+}
+
 /// <summary>
 /// One sound as designers think of it: "monster dies", "wall breaks", "Safe Haven theme". It holds one or more clips
 /// (one is picked at random each time, so repeats sound less mechanical), how loud it is, how much the pitch varies and
@@ -43,6 +54,10 @@ public sealed class SoundDefinition : ScriptableObject
     [Header("Repeats")]
     [Tooltip("At most this many copies play at the same time; more are skipped. Stops ten deaths at once from deafening.")]
     [SerializeField, Range(1, 16)] private int maxAtOnce = 4;
+    [Tooltip("Seconds that must pass between two plays. Two copies in the same instant only sound like one, louder and hollow.")]
+    [SerializeField, Range(0f, 0.5f)] private float minimumGap = 0.03f;
+    [Tooltip("What gives way when too many sounds play at once.")]
+    [SerializeField] private SoundPriority priority = SoundPriority.Normal;
 
     public string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;
     public IReadOnlyList<AudioClip> Clips => clips;
@@ -52,24 +67,37 @@ public sealed class SoundDefinition : ScriptableObject
     public float FullVolumeDistance => fullVolumeDistance;
     public float AudibleDistance => Mathf.Max(audibleDistance, fullVolumeDistance + 0.1f);
     public int MaxAtOnce => maxAtOnce;
+    public float MinimumGap => minimumGap;
+    public SoundPriority Priority => priority;
     public bool HasClips => clips.Exists(clip => clip != null);
 
-    /// <summary>A random clip, or null when there are none.</summary>
-    public AudioClip PickClip()
+    /// <summary>A random clip, or null when there are none. With a choice, never <paramref name="last"/>: a repeat is what gives a sound away.</summary>
+    public AudioClip PickClip(AudioClip last = null)
     {
-        if (!HasClips)
+        int usable = 0;
+        foreach (AudioClip candidate in clips)
         {
-            return null;
+            if (candidate != null && candidate != last)
+            {
+                usable++;
+            }
         }
 
-        AudioClip clip;
-        do
+        if (usable == 0)
         {
-            clip = clips[Random.Range(0, clips.Count)];
+            return last != null && clips.Contains(last) ? last : null;
         }
-        while (clip == null);
 
-        return clip;
+        int pick = Random.Range(0, usable);
+        foreach (AudioClip candidate in clips)
+        {
+            if (candidate != null && candidate != last && pick-- == 0)
+            {
+                return candidate;
+            }
+        }
+
+        return null;
     }
 
     public float PickVolume() => volume * (1f - Random.Range(0f, volumeVariation));

@@ -41,6 +41,7 @@ public sealed class WorldAudio
         source.playOnAwake = false;
         source.loop = true;
         source.spatialBlend = 0f;
+        source.ignoreListenerPause = true;
         return source;
     }
 
@@ -103,7 +104,7 @@ public sealed class WorldAudio
     private static void Follow(AudioSource source, SoundDefinition sound, float amount)
     {
         AudioClip clip = sound != null ? sound.Clips.Count > 0 ? sound.Clips[0] : null : null;
-        if (clip == null || amount <= 0.01f || AudioListener.pause)
+        if (clip == null || amount <= 0.01f)
         {
             if (source.isPlaying)
             {
@@ -160,6 +161,7 @@ public sealed class WorldAudio
                 AudioSource source = Loop("Water " + surface.name);
                 AudioManager.Configure(source, sound);
                 source.spatialBlend = 1f;
+                source.ignoreListenerPause = true;
                 source.clip = clip;
                 source.time = Random.Range(0f, clip.length);
                 source.Play();
@@ -174,14 +176,13 @@ public sealed class WorldAudio
         }
 
         nextWaterRefresh = Time.unscaledTime + WaterRefresh;
-        AudioListener listener = Object.FindAnyObjectByType<AudioListener>();
-        Vector3 ear = listener != null ? listener.transform.position : owner.transform.position;
+        Vector3 ear = AudioManager.EarPosition;
         foreach ((WaterSurface surface, AudioSource source) in water)
         {
             if (surface != null && source != null)
             {
                 source.transform.position = surface.NearestPoint(ear);
-                source.volume = sound.Volume * AudioManager.ChannelVolume(sound.Channel);
+                source.volume = AudioManager.SteadyVolume(sound);
             }
         }
     }

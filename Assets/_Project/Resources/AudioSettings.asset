@@ -23,6 +23,7 @@ MonoBehaviour:
       volume: 1
     order: 0
   crossfadeSeconds: 2
+  combatFadeSeconds: 0.9
   masterVolume: 1
   musicVolume: 0.6
   ambienceVolume: 0.7
@@ -69,7 +70,13 @@ MonoBehaviour:
   questCompleted: {fileID: 11400000, guid: c08cfff61a51d7442a93c4dae8255955, type: 2}
   crafted: {fileID: 11400000, guid: 267e4afb23133494087d8d9ce98fe7e4, type: 2}
   built: {fileID: 11400000, guid: 71d32d19fa2628e499bcf9ca9b6cbc57, type: 2}
-  consumed: {fileID: 0}
+  consumed: {fileID: 11400000, guid: ee31a77f3dbdcca43bcc610efc0a937e, type: 2}
+  itemDropped: {fileID: 11400000, guid: 84687844a16074a4183e5e77ab7f4054, type: 2}
+  repaired: {fileID: 11400000, guid: 71d32d19fa2628e499bcf9ca9b6cbc57, type: 2}
+  breachWarning: {fileID: 11400000, guid: 7494689eb1fc8014c9ed0f60e8c487b8, type: 2}
+  breachBegins: {fileID: 11400000, guid: d97657b0fc02de74889e233c5cddef21, type: 2}
+  breachWon: {fileID: 11400000, guid: f443c04be342be847a34cf586fe684b1, type: 2}
+  breachLost: {fileID: 11400000, guid: e9fabecc739f91c4a8a254619617abe8, type: 2}
   click: {fileID: 11400000, guid: eff8873ac748ee54a8ebd626d23d77c0, type: 2}
   windowOpen: {fileID: 11400000, guid: 9044e19de8efd554caa2dc573c052a9c, type: 2}
   windowClose: {fileID: 11400000, guid: 44120f3e32f7b744b91233bbcbda2e5e, type: 2}
@@ -78,3 +85,4 @@ MonoBehaviour:
   thunder: {fileID: 11400000, guid: 6510718f5af764e4aa78349c4b3f7cdf, type: 2}
   waterLoop: {fileID: 11400000, guid: 6b6bb4b9e485ef249affa8892b8d2198, type: 2}
   maxSimultaneousEffects: 24
+  worldSoundsLevel: 0.75

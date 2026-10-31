@@ -11,8 +11,14 @@ using UnityEngine.SceneManagement;
 /// <item>plays a sound whenever anything dies, reacting to the Killed and Destroyed game events: the object's
 /// DeathSound, else its monster or building data's death sound, else the default for creatures or structures;</item>
 /// <item>plays one-off sounds for anyone who asks through <see cref="Play"/>, from a pool of audio sources;</item>
-/// <item>keeps the player's volume per channel (PlayerPrefs, not the save file, since it is a preference).</item>
+/// <item>keeps the player's volume per channel (PlayerPrefs, not the save file, since it is a preference);</item>
+/// <item>holds the game's ears: at the player, turned with the camera. On the camera, far above in the top-down view, a
+/// sound at the player's feet would be heard from twenty metres off, and footsteps not at all.</item>
 /// </list>
+/// <para>
+/// While the game is paused the world's sounds hold their breath (AudioListener.pause); music, ambience and the interface
+/// go on, as they ignore it.
+/// </para>
 /// <para>
 /// Extending: to make another kind of game event audible (quest completed, item obtained), handle its kind in
 /// OnGameEvent and give Audio Settings a SoundDefinition field for it. To change what counts as combat, edit
@@ -24,12 +30,15 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
 {
     private const float CombatCheckInterval = 0.5f;
     private const string VolumeKey = "SafeHaven.Volume.";
+    private const float EarHeight = 1.6f;
 
     // Two sources per layer, so one fades out while the next fades in. Plays a playlist: one track loops, several take turns.
     private sealed class LoopLayer
     {
         private const float MinSecondsBeforeAdvance = 1f;
+        private const float ResumeWithinSeconds = 120f;
 
+        private readonly MusicMemory memory = new MusicMemory();
         private readonly AudioSource[] sources = new AudioSource[2];
         private readonly MusicTrack[] tracks = new MusicTrack[2];
         private readonly float[] fades = new float[2];
@@ -47,12 +56,16 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
                 sources[i] = owner.AddComponent<AudioSource>();
                 sources[i].playOnAwake = false;
                 sources[i].spatialBlend = 0f;
+                sources[i].ignoreListenerPause = true;
             }
         }
 
         public MusicPlaylist Playlist { get; private set; }
         public MusicTrack Track => targets[current] > 0f ? tracks[current] : null;
         public AudioSource Source => sources[current];
+
+        /// <summary>A new scene: its music has nothing to do with where the last scene's was.</summary>
+        public void Forget() => memory.Clear();
 
         public void Switch(MusicPlaylist playlist)
         {
@@ -61,7 +74,20 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
                 return;
             }
 
+            if (Playlist != null && index >= 0 && sources[current].isPlaying)
+            {
+                memory.Leave(Playlist, index, sources[current].time, Time.unscaledTime);
+            }
+
             Playlist = playlist;
+            if (memory.TryReturn(playlist, Time.unscaledTime, ResumeWithinSeconds, out int place, out float time) && place < playlist.tracks.Count)
+            {
+                targets[current] = 0f;
+                index = place;
+                StartTrack(time);
+                return;
+            }
+
             index = -1;
             PlayNext();
         }
@@ -71,11 +97,14 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
         {
             targets[current] = 0f;
             index = Playlist != null ? Playlist.NextIndex(index) : -1;
-            if (index < 0)
+            if (index >= 0)
             {
-                return;
+                StartTrack(0f);
             }
+        }
 
+        private void StartTrack(float from)
+        {
             MusicTrack track = Playlist.tracks[index];
             current = 1 - current;
             AudioSource next = sources[current];
@@ -87,6 +116,11 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
             next.pitch = 1f;
             next.volume = 0f;
             next.Play();
+            if (from > 0f && from < track.clip.length)
+            {
+                next.time = from;
+            }
+
             startedAt = Time.unscaledTime;
         }
 
@@ -95,7 +129,7 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
         {
             AudioSource active = sources[current];
             if (Playlist != null && targets[current] > 0f && !active.loop && !active.isPlaying
-                && Time.unscaledTime - startedAt > MinSecondsBeforeAdvance && !AudioListener.pause)
+                && Time.unscaledTime - startedAt > MinSecondsBeforeAdvance)
             {
                 PlayNext();
             }
@@ -109,7 +143,7 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
                 }
 
                 fades[i] = Mathf.MoveTowards(fades[i], targets[i], fadeStep);
-                source.volume = fades[i] * tracks[i].volume * ChannelVolume(channel);
+                source.volume = EqualPower(fades[i]) * tracks[i].volume * ChannelVolume(channel);
                 if (targets[i] <= 0f && fades[i] <= 0f)
                 {
                     source.Stop();
@@ -124,7 +158,10 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
 
     private readonly List<AudioSource> pool = new List<AudioSource>();
     private readonly Dictionary<AudioSource, SoundDefinition> playing = new Dictionary<AudioSource, SoundDefinition>();
+    private readonly Dictionary<SoundDefinition, float> lastPlayedAt = new Dictionary<SoundDefinition, float>();
+    private readonly Dictionary<SoundDefinition, AudioClip> lastClip = new Dictionary<SoundDefinition, AudioClip>();
     private AudioSettingsDefinition settings;
+    private AudioListener ears;
     private LoopLayer music;
     private LoopLayer ambience;
     private WorldAudio world;
@@ -179,6 +216,37 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
         }
     }
 
+    /// <summary>Where sounds are heard from: the player's head, or the camera while there is no player.</summary>
+    public static Vector3 EarPosition
+    {
+        get
+        {
+            if (instance != null && instance.ears != null && instance.ears.enabled)
+            {
+                return instance.ears.transform.position;
+            }
+
+            Camera view = Camera.main;
+            return view != null ? view.transform.position : Vector3.zero;
+        }
+    }
+
+    /// <summary>
+    /// How much of its volume a fade at this point (0..1) gives. Halfway through a plain fade both tracks are at half and the
+    /// music sinks; this keeps the power of the two together steady.
+    /// </summary>
+    public static float EqualPower(float fade) => Mathf.Sin(Mathf.Clamp01(fade) * Mathf.PI * 0.5f);
+
+    /// <summary>True when a new sound may take the voice of one already playing: only one of no more importance.</summary>
+    public static bool CanCutOff(SoundPriority playing, SoundPriority incoming) => incoming >= playing && incoming != SoundPriority.Background;
+
+    /// <summary>The volume a steady sound should sit at (a loop that follows the sliders), before any fade of its own.</summary>
+    public static float SteadyVolume(SoundDefinition sound)
+    {
+        float world = sound.Positional && instance != null ? instance.settings.WorldSoundsLevel : 1f;
+        return sound.Volume * ChannelVolume(sound.Channel) * world;
+    }
+
     /// <summary>Plays a sound once at a position. Safe to call with no sound or before the manager exists.</summary>
     public static void Play(SoundDefinition sound, Vector3 position)
     {
@@ -191,9 +259,12 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
     /// <summary>Sets up an audio source the way a sound asks: volume, pitch, 2D or 3D and distances.</summary>
     public static void Configure(AudioSource source, SoundDefinition sound)
     {
-        source.volume = sound.PickVolume() * ChannelVolume(sound.Channel);
+        float world = sound.Positional && instance != null ? instance.settings.WorldSoundsLevel : 1f;
+        source.volume = sound.PickVolume() * ChannelVolume(sound.Channel) * world;
         source.pitch = sound.PickPitch();
         source.spatialBlend = sound.Positional ? 1f : 0f;
+        // Sounds with a place are in the world, and stop when it does. The rest are the interface and warnings.
+        source.ignoreListenerPause = !sound.Positional;
         source.rolloffMode = AudioRolloffMode.Linear;
         source.minDistance = sound.FullVolumeDistance;
         source.maxDistance = sound.AudibleDistance;
@@ -214,6 +285,10 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
         music = new LoopLayer(gameObject, AudioChannel.Music);
         ambience = new LoopLayer(gameObject, AudioChannel.Ambience);
         world = new WorldAudio(gameObject);
+        var head = new GameObject("Ears");
+        head.transform.SetParent(transform, false);
+        ears = head.AddComponent<AudioListener>();
+        ears.enabled = false;
         GameEvents.Raised += OnGameEvent;
     }
 
@@ -221,6 +296,7 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
     {
         GameEvents.Raised -= OnGameEvent;
         WatchPlayer(null);
+        AudioListener.pause = false;
         if (instance == this)
         {
             instance = null;
@@ -233,7 +309,12 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
         combatUntil = float.NegativeInfinity;
         lastDamageTime = float.NegativeInfinity;
         enemyChasing = false;
+        music.Forget();
+        ambience.Forget();
+        lastPlayedAt.Clear();
+        lastClip.Clear();
         WatchPlayer(Player.Current != null ? Player.Current.Health : null);
+        UseEars(Player.Current != null);
         world.OnSceneEntered();
         if (Player.Current != null && !Player.Current.TryGetComponent(out PlayerAudio _))
         {
@@ -255,10 +336,48 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
             ambience.Switch(sceneAudio != null ? sceneAudio.Ambience : null);
         }
 
-        float fadeStep = settings.CrossfadeSeconds > 0f ? Time.unscaledDeltaTime / settings.CrossfadeSeconds : 1f;
-        music.Update(fadeStep);
+        AudioListener.pause = GamePause.IsPaused;
+        float fadeStep = FadeStep(settings.CrossfadeSeconds);
+        music.Update(Mood == AudioMood.Combat ? FadeStep(settings.CombatFadeSeconds) : fadeStep);
         ambience.Update(fadeStep);
         world.Update(settings);
+    }
+
+    private static float FadeStep(float seconds) => seconds > 0f ? Time.unscaledDeltaTime / seconds : 1f;
+
+    // After the camera has moved for the frame. Turned with the camera, so what is on the left of the screen is heard on the left.
+    private void LateUpdate()
+    {
+        Player player = Player.Current;
+        if ((player != null) != ears.enabled)
+        {
+            UseEars(player != null);
+        }
+
+        if (player == null)
+        {
+            return;
+        }
+
+        Camera view = Camera.main;
+        Vector3 forward = view != null ? view.transform.forward : player.transform.forward;
+        forward.y = 0f;
+        Quaternion facing = forward.sqrMagnitude > 0.001f ? Quaternion.LookRotation(forward) : Quaternion.identity;
+        ears.transform.SetPositionAndRotation(player.transform.position + Vector3.up * EarHeight, facing);
+    }
+
+    // A scene brings its own listener on its camera. Only one may listen, and with no player it has to be the camera's.
+    private void UseEars(bool onPlayer)
+    {
+        foreach (AudioListener listener in FindObjectsByType<AudioListener>())
+        {
+            if (listener != ears)
+            {
+                listener.enabled = !onPlayer;
+            }
+        }
+
+        ears.enabled = onPlayer;
     }
 
     // ----- Combat -----
@@ -407,24 +526,34 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
 
     private void PlayEffect(SoundDefinition sound, Vector3 position)
     {
-        AudioClip clip = sound != null ? sound.PickClip() : null;
-        if (clip == null)
+        if (sound == null || !sound.HasClips || CountPlaying(sound) >= sound.MaxAtOnce || TooSoon(sound) || OutOfEarshot(sound, position))
         {
             return;
         }
 
-        if (CountPlaying(sound) >= sound.MaxAtOnce)
+        AudioSource source = TakeSource(sound.Priority);
+        if (source == null)
         {
             return;
         }
 
-        AudioSource source = TakeSource();
+        lastClip.TryGetValue(sound, out AudioClip last);
+        AudioClip clip = sound.PickClip(last);
+        lastClip[sound] = clip;
+        lastPlayedAt[sound] = Time.unscaledTime;
         playing[source] = sound;
         source.transform.position = position;
         Configure(source, sound);
         source.clip = clip;
         source.Play();
     }
+
+    private bool TooSoon(SoundDefinition sound) =>
+        lastPlayedAt.TryGetValue(sound, out float last) && Time.unscaledTime - last < sound.MinimumGap;
+
+    // Nobody can hear it, so it needn't take a voice from something they can.
+    private static bool OutOfEarshot(SoundDefinition sound, Vector3 position) =>
+        sound.Positional && (position - EarPosition).sqrMagnitude > sound.AudibleDistance * sound.AudibleDistance;
 
     private int CountPlaying(SoundDefinition sound)
     {
@@ -440,9 +569,12 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
         return count;
     }
 
-    private AudioSource TakeSource()
+    // A free voice, a new one, or the voice of the least important sound playing, the oldest of those. Null when everything
+    // playing matters more.
+    private AudioSource TakeSource(SoundPriority priority)
     {
-        AudioSource oldest = null;
+        AudioSource victim = null;
+        SoundPriority lowest = SoundPriority.Important;
         foreach (AudioSource candidate in pool)
         {
             if (!candidate.isPlaying)
@@ -450,9 +582,11 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
                 return candidate;
             }
 
-            if (oldest == null || candidate.time > oldest.time)
+            SoundPriority kind = playing.TryGetValue(candidate, out SoundDefinition sound) ? sound.Priority : SoundPriority.Normal;
+            if (victim == null || kind < lowest || (kind == lowest && candidate.time > victim.time))
             {
-                oldest = candidate;
+                victim = candidate;
+                lowest = kind;
             }
         }
 
@@ -466,7 +600,12 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
             return created;
         }
 
-        oldest.Stop();
-        return oldest;
+        if (victim == null || !CanCutOff(lowest, priority))
+        {
+            return null;
+        }
+
+        victim.Stop();
+        return victim;
     }
 }

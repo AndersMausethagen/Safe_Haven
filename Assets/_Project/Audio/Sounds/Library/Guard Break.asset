@@ -27,3 +27,5 @@ MonoBehaviour:
   fullVolumeDistance: 3
   audibleDistance: 35
   maxAtOnce: 2
+  minimumGap: 0.03
+  priority: 2

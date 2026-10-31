@@ -16,6 +16,40 @@ public enum PlaylistOrder
     InOrder,
 }
 
+/// <summary>
+/// Where playlists were left, so a short fight doesn't send the exploring music back to its first bar every time. Forgotten
+/// after a while: a long way on, starting afresh is better than picking up a thought from ten minutes ago.
+/// </summary>
+public sealed class MusicMemory
+{
+    private readonly Dictionary<MusicPlaylist, (int index, float time, float leftAt)> places = new Dictionary<MusicPlaylist, (int, float, float)>();
+
+    public void Leave(MusicPlaylist playlist, int index, float time, float now) => places[playlist] = (index, time, now);
+
+    /// <summary>Where to pick a playlist up, when it was left no more than <paramref name="within"/> seconds ago. A place can be taken once.</summary>
+    public bool TryReturn(MusicPlaylist playlist, float now, float within, out int index, out float time)
+    {
+        index = -1;
+        time = 0f;
+        if (playlist == null || !places.TryGetValue(playlist, out (int index, float time, float leftAt) place))
+        {
+            return false;
+        }
+
+        places.Remove(playlist);
+        if (now - place.leftAt > within)
+        {
+            return false;
+        }
+
+        index = place.index;
+        time = place.time;
+        return true;
+    }
+
+    public void Clear() => places.Clear();
+}
+
 /// <summary>One music or ambience file and how loud it plays. Long files should use the Streaming load type.</summary>
 [Serializable]
 public sealed class MusicTrack

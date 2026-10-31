@@ -20,6 +20,8 @@ public sealed class AudioSettingsDefinition : ScriptableObject
     [SerializeField] private MusicPlaylist defaultCombat = new MusicPlaylist();
     [Tooltip("Seconds one piece of music takes to fade into the next.")]
     [SerializeField, Min(0f)] private float crossfadeSeconds = 2f;
+    [Tooltip("Seconds for the music to change when a fight starts: quicker, or the danger is over before it arrives.")]
+    [SerializeField, Min(0f)] private float combatFadeSeconds = 0.9f;
 
     [Header("Default Volumes (players can change these later in settings)")]
     [SerializeField, Range(0f, 1f)] private float masterVolume = 1f;
@@ -87,6 +89,19 @@ public sealed class AudioSettingsDefinition : ScriptableObject
     [SerializeField] private SoundDefinition built;
     [Tooltip("Eating or drinking.")]
     [SerializeField] private SoundDefinition consumed;
+    [Tooltip("A stack dropped from the bag landing on the ground.")]
+    [SerializeField] private SoundDefinition itemDropped;
+    [Tooltip("The clearing mended at the Heart Tree.")]
+    [SerializeField] private SoundDefinition repaired;
+
+    [Header("Ward Breaches (heard everywhere: they are warnings)")]
+    [Tooltip("A breach is coming, or the ward is about to give way.")]
+    [SerializeField] private SoundDefinition breachWarning;
+    [Tooltip("The attackers are coming, and every wave after the first.")]
+    [SerializeField] private SoundDefinition breachBegins;
+    [SerializeField] private SoundDefinition breachWon;
+    [Tooltip("The ward has fallen.")]
+    [SerializeField] private SoundDefinition breachLost;
 
     [Header("Interface Sounds")]
     [Tooltip("Pressing a button.")]
@@ -105,8 +120,10 @@ public sealed class AudioSettingsDefinition : ScriptableObject
     [SerializeField] private SoundDefinition waterLoop;
 
     [Header("Effects")]
-    [Tooltip("How many sound effects can play at once. The oldest stops when more are needed.")]
+    [Tooltip("How many sound effects can play at once. When more are needed the least important gives way, the oldest first.")]
     [SerializeField, Range(4, 64)] private int maxSimultaneousEffects = 24;
+    [Tooltip("How loud sounds in the world are, against the music and the interface. Sits under everything that has a place, so close sounds aren't deafening.")]
+    [SerializeField, Range(0f, 1f)] private float worldSoundsLevel = 0.75f;
 
     /// <summary>A footstep sound for ground layers whose name contains one of the words.</summary>
     [System.Serializable]
@@ -162,6 +179,14 @@ public sealed class AudioSettingsDefinition : ScriptableObject
     public SoundDefinition Crafted => crafted;
     public SoundDefinition Built => built;
     public SoundDefinition Consumed => consumed;
+    public SoundDefinition ItemDropped => itemDropped;
+    public SoundDefinition Repaired => repaired;
+    public SoundDefinition BreachWarning => breachWarning;
+    public SoundDefinition BreachBegins => breachBegins;
+    public SoundDefinition BreachWon => breachWon;
+    public SoundDefinition BreachLost => breachLost;
+    public float CombatFadeSeconds => combatFadeSeconds;
+    public float WorldSoundsLevel => worldSoundsLevel;
     public SoundDefinition Click => click;
     public SoundDefinition WindowOpen => windowOpen;
     public SoundDefinition WindowClose => windowClose;

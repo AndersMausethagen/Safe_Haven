@@ -185,11 +185,13 @@ public sealed class WardBreachDirector : MonoBehaviour
 
             settlement.WarnOfBreach();
             GameMessages.Post(next.WarningText, MessageKind.Warning);
+            AudioManager.Play(AudioManager.Sounds?.BreachWarning, transform.position);
         }
 
         if (IsOverdue)
         {
             GameMessages.Post("The Heart Tree can't hold much longer. At nightfall the ward will give way.", MessageKind.Warning);
+            AudioManager.Play(AudioManager.Sounds?.BreachWarning, transform.position);
         }
     }
 
@@ -219,6 +221,7 @@ public sealed class WardBreachDirector : MonoBehaviour
     {
         givingWay = true;
         GameMessages.Post($"{Definition.DisplayName}: the ward is giving way. Get to the clearing!", MessageKind.Warning);
+        AudioManager.Play(AudioManager.Sounds?.BreachWarning, transform.position);
         yield return new WaitForSeconds(WardBreachSettings.Current.NightfallWarning);
         givingWay = false;
         Begin();
@@ -249,6 +252,7 @@ public sealed class WardBreachDirector : MonoBehaviour
         UpdateMarker();
         BreachHud.Create();
         GameMessages.Post($"{breach.DisplayName}: they are coming. Hold the clearing!", MessageKind.Warning);
+        AudioManager.Play(AudioManager.Sounds?.BreachBegins, transform.position);
         StartCoroutine(SpawnAttackers());
     }
 
@@ -278,6 +282,7 @@ public sealed class WardBreachDirector : MonoBehaviour
             if (wave > 0)
             {
                 GameMessages.Post($"Wave {Wave} of {running.WaveCount}!", MessageKind.Warning);
+                AudioManager.Play(AudioManager.Sounds?.BreachBegins, transform.position);
             }
 
             List<GameObject> roster = running.Roster(wave);
@@ -462,6 +467,7 @@ public sealed class WardBreachDirector : MonoBehaviour
 
         string rewards = breach.Reward.Count > 0 ? $" Reward: {AmountText.Describe(breach.Reward)}." : "";
         GameMessages.Post(breach.WonText + rewards, MessageKind.Gain);
+        AudioManager.Play(AudioManager.Sounds?.BreachWon, transform.position);
         if (breach.WonEvent != null)
         {
             GameEvents.Raise(breach.WonEvent, player);
@@ -481,6 +487,7 @@ public sealed class WardBreachDirector : MonoBehaviour
         WardBreachSettings settings = WardBreachSettings.Current;
         GameSession.Settlement.LoseBreach(settings.StrainRaids);
         GameMessages.Post(breach.FailedText, MessageKind.Warning);
+        AudioManager.Play(AudioManager.Sounds?.BreachLost, transform.position);
         string strained = settings.StrainRaids > 0
             ? $"\n\n<color={UIStyle.Hex(UIStyle.Current.Warning)}>The ward draws in by {settings.StrainRadius:0} m until you have come home from {settings.StrainRaids} more raids.</color>"
             : "";

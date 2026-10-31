@@ -94,5 +94,6 @@ public static class BuildingRepairs
         }
 
         GameMessages.Post($"Mended {damaged.Count} building{(damaged.Count == 1 ? "" : "s")}.", MessageKind.Gain);
+        AudioManager.Play(AudioManager.Sounds?.Repaired, user.transform.position);
     }
 }

@@ -1016,6 +1016,16 @@ Anywhere the sky is dark, `Resources/NightSettings` applies, scaled by `Atmosphe
 - **`MinimapHud.Project`** is the one place a world offset becomes a spot on the map; the shader does the same turn the other way round. Up is where the camera looks.
 - **M** (`GameInput.Minimap`) cycles near, far and hidden, kept in PlayerPrefs. Sizes and reaches: `Resources/MinimapSettings`.
 
+## Sound
+
+`AudioManager` owns all of it, across scenes. Gameplay refers to `SoundDefinition` assets and calls `AudioManager.Play`.
+
+- **The ears** are an `AudioListener` of the manager's, at the player's head and turned with the camera. The top-down camera is about 19 m from the player, so with the scene's listener on it a footstep (audible to 10 m) was silent. `AudioManager.UseEars` turns the camera's listener off whenever there is a player, on every scene change, and back on without one: there must only ever be one. Use `AudioManager.EarPosition`, never the camera, for anything about what can be heard. `AudioSettings › World Sounds Level` sits under everything positional, against the music and interface.
+- **Voices:** `MaxSimultaneousEffects` is the limit. A sound nobody can hear takes no voice, nor does a repeat within `SoundDefinition.MinimumGap`. When they run out the lowest `Priority` gives way, the oldest first; `Background` (birds, footsteps) never takes a voice from anything, and `Important` (being hurt, a parry, warnings) only from its own kind.
+- **Music:** `MusicMemory` keeps where a playlist was left for two minutes, so a short fight doesn't send it back to the first bar. Fights change the music in `CombatFadeSeconds`, the rest in `CrossfadeSeconds`, and crossfades are equal-power.
+- **Pausing:** `AudioListener.pause` follows `GamePause`. `Configure` makes positional sounds obey it; music, ambience, weather, water and 2D sounds ignore it, so menus still click.
+- **Importing:** clips of 60 s or more stream, those of 8 s or more stay compressed in memory (streaming can gap at a loop), the rest decompress. `AgentScripts/BuildAudio.cs` applies it and `AudioSystemTests` holds it. A new loop that follows the sliders should use `AudioManager.SteadyVolume`.
+
 ## Essence
 
 What Cursed and Purified Essence buy (GDD §13.5, §16.4). The design rule is that everything is deterministic: an offer says what it costs and what it does, and it never fails or wastes essence. A risk is a stated price, written as a negative `StatBonus`.

@@ -67,6 +67,7 @@ public sealed class DroppedItem : MonoBehaviour, ISaveable, IInteractionName, II
         var dropped = SaveableEntity.Spawn(settings.Prefab, FindSpot(user, settings), facing).GetComponent<DroppedItem>();
         dropped.Hold(stack);
         dropped.ThrowFrom(user.position + Vector3.up * HandHeight);
+        AudioManager.Play(AudioManager.Sounds?.ItemDropped, dropped.transform.position);
         return dropped;
     }
 

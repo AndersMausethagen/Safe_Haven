@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0de871765cd6fce4c8fed103ef0082e3, type: 3}
+  m_Name: Ward Toll
+  m_EditorClassIdentifier: SafeHaven::SoundDefinition
+  displayName: 
+  clips:
+  - {fileID: 8300000, guid: 9ec1cc51bc87f334ea26c9cceff28600, type: 3}
+  channel: 2
+  volume: 0.6
+  volumeVariation: 0
+  pitchRange: {x: 1, y: 1}
+  positional: 0
+  fullVolumeDistance: 3
+  audibleDistance: 35
+  maxAtOnce: 1
+  minimumGap: 0.03
+  priority: 2

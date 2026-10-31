@@ -66,7 +66,7 @@ public sealed class SoundEmitter : MonoBehaviour
     {
         if (loopSource != null && loopSource.isPlaying)
         {
-            loopSource.volume = sound.Volume * AudioManager.ChannelVolume(sound.Channel);
+            loopSource.volume = AudioManager.SteadyVolume(sound);
         }
     }
 }

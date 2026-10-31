@@ -89,9 +89,9 @@ public sealed class TransportAudio : MonoBehaviour
             return;
         }
 
-        loop.volume = sound.Volume * level * AudioManager.ChannelVolume(sound.Channel);
+        loop.volume = AudioManager.SteadyVolume(sound) * level;
         loop.pitch = Mathf.Lerp(0.7f, 1.15f, share) * Mathf.Lerp(1.05f, 0.82f, load);
-        if (!loop.isPlaying && !AudioListener.pause)
+        if (!loop.isPlaying)
         {
             loop.Play();
         }

@@ -15,6 +15,7 @@ use, credit not required. Credited here anyway.
 
 | Safe Haven Transport | Rolling wheels, creaks, oars and water on a hull | Made for the game (synthesised by `Tools/Audio/transport.py`), CC0 |
 | Safe Haven Birds | Wings going up, crows calling, small birds singing | Made for the game (synthesised by `Tools/Audio/birds.py`), CC0 |
+| Safe Haven Moments | The ward breach bell, horn and endings, a dropped stack, a bite | Made for the game (synthesised by `Tools/Audio/moments.py`), CC0 |
 
 Animations: Universal Animation Library 1 and 2 (Standard), CC0, by Quaternius (https://quaternius.com), in
 Assets/Quaternius.

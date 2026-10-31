@@ -812,6 +812,8 @@ Humans should feel like ordinary people from a storybook world, not heroic armor
 
 At home: wind, birds, crackling fire, streams, hammering, quiet conversation. Outside: distant creaks, muffled birdsong, threatening footsteps, unusual echoes, and event-specific audio warnings. Combat hit sounds should communicate attack weight and successful timing.
 
+Sound is heard from the player's position, not the camera's, and turns with the view, so what is on the left of the screen is heard on the left. A ward breach is heard wherever the player is: a bell when it is coming, a horn when they attack and with every wave.
+
 ### 19.5 Music as a system
 
 Use gentle acoustic/folk-inspired motifs in the settlement, sparse atmospheric textures in exploration, and layered intensity in combat and extraction. The portal transition should produce a recognizable emotional shift. Original music may evoke Nordic instrumental traditions without simply imitating existing game scores.
