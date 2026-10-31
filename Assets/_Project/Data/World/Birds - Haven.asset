@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1796bb8140ce3dc4c94ca925f12461c5, type: 3}
+  m_Name: Birds - Haven
+  m_EditorClassIdentifier: SafeHaven::BirdProfile
+  colours:
+  - {r: 0.62, g: 0.47, b: 0.32, a: 1}
+  - {r: 0.78, g: 0.66, b: 0.3, a: 1}
+  - {r: 0.42, g: 0.56, b: 0.72, a: 1}
+  - {r: 0.72, g: 0.36, b: 0.24, a: 1}
+  - {r: 0.82, g: 0.78, b: 0.68, a: 1}
+  size: {x: 0.42, y: 0.56}
+  mostFlocks: 3
+  flockSize: {x: 3, y: 7}
+  arrivalSeconds: {x: 5, y: 13}
+  nightShare: 0
+  rainShyness: 0.8
+  flyoverChance: 0.25
+  landingDistance: {x: 11, y: 20}
+  flockSpread: 1.8
+  leaveDistance: 45
+  hearing: 0.9
+  startleDistance: {x: 1.6, y: 9}
+  flySpeed: {x: 7, y: 10}
+  climb: 3.5
+  flapRate: 15
+  glide: 0.04
+  fleeSeconds: 3.5
+  takeOff: {fileID: 11400000, guid: cfcb0f733264b9945a75d013432b8cc2, type: 2}
+  call: {fileID: 11400000, guid: c4639820e086f2a43b5f5ee621930a95, type: 2}
+  callSeconds: {x: 3, y: 9}
+  callsOnTakeOff: 0

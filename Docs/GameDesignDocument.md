@@ -802,7 +802,7 @@ local (campfires, torches, a lit beacon); the dark around it is cold and grey.
 
 Safe Haven uses warm amber, fresh greens, soft sunlight, and inviting interiors. Raid regions shift toward colder greens and blues, fog, hard shadows, and supernatural accents. Distinct biome palettes should aid navigation as well as atmosphere.
 
-Rain leaves a mark: the ground soaks and darkens, puddles fill on level ground, and it all dries slowly after. Fireflies come out at dusk, green over the Haven and blue in the Misty Woods, so the two places feel different even at night, and they shelter from the rain.
+Rain leaves a mark: the ground soaks and darkens, puddles fill on level ground, and it all dries slowly after. Small birds peck about the Haven and crows the Misty Woods; they go up when the player comes too close, which depends on how loud the player is, so running clears them and sneaking gets near. They are only mood: nothing else reacts to them. Fireflies come out at dusk, green over the Haven and blue in the Misty Woods, so the two places feel different even at night, and they shelter from the rain.
 
 ### 19.3 Character and creature design
 
