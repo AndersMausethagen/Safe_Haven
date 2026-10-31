@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: acb47e913a2759648a401929037aa9ea, type: 3}
+  m_Name: RimeTouched
+  m_EditorClassIdentifier: SafeHaven::EnchantmentDefinition
+  id: relic.rimetouched
+  displayName: Rime-Touched
+  description: Cold to hold, and colder to be struck by.
+  school: 2
+  targets: 1
+  cost: []
+  bonuses: []
+  effects:
+  - rid: 287758281410609421
+  references:
+    version: 2
+    RefIds:
+    - rid: 287758281410609421
+      type: {class: StatusOnHitEffect, ns: , asm: SafeHaven}
+      data:
+        status: {fileID: 11400000, guid: 32e9e33fb8f2e0748970b5e855fe720e, type: 2}
+        chance: 0.3

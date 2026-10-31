@@ -14,12 +14,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::SoundDefinition
   displayName: Heavy Swing
   clips:
-  - {fileID: 8300000, guid: b5540cefae54eac40a785b85284f8c49, type: 3}
+  - {fileID: 8300000, guid: f2f77f348d67b774e8046d1801e0093a, type: 3}
+  - {fileID: 8300000, guid: 4ac330d678975e546a89c1ea02fa4e04, type: 3}
+  - {fileID: 8300000, guid: ec7e6c5128ee1784fb3d241177f94f49, type: 3}
   channel: 2
-  volume: 0.7
+  volume: 0.74
   volumeVariation: 0.1
-  pitchRange: {x: 0.72, y: 0.85}
+  pitchRange: {x: 0.94, y: 1.06}
   positional: 1
   fullVolumeDistance: 3
   audibleDistance: 25
   maxAtOnce: 4
+  minimumGap: 0.03
+  priority: 1

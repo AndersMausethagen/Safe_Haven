@@ -60,6 +60,14 @@ public sealed class GatheringMinigameSettings : GameSettings<GatheringMinigameSe
         new GatheringToolProfile(ToolType.Sickle, 0.7f, 0.25f, 0.07f, 0.35f),
     };
 
+    [Header("The swing")]
+    [Tooltip("Seconds into the wall swing clip when the tool lands, measured from the clip (BuildWoodcutting).")]
+    [SerializeField, Min(0f)] private float wallSwingContact = 0.367f;
+    [Tooltip("Seconds into the ground swing clip when the tool lands, measured from the clip (BuildWoodcutting).")]
+    [SerializeField, Min(0f)] private float groundSwingContact = 0.4f;
+    [Tooltip("The tool waits this long before contact, raised, until the player swings: the delay from the press to the blow.")]
+    [SerializeField, Range(0.02f, 0.4f)] private float swingWindUp = 0.15f;
+
     [Header("Bar")]
     [Tooltip("Critical width added per tool tier above the node's required tier.")]
     [SerializeField, Range(0f, 0.2f)] private float criticalWidthPerTier = 0.03f;
@@ -141,6 +149,19 @@ public sealed class GatheringMinigameSettings : GameSettings<GatheringMinigameSe
     {
         return Mathf.Min(profile.CriticalZoneWidth + criticalWidthPerTier * Mathf.Max(0, toolTier - requiredTier), profile.NormalZoneWidth);
     }
+
+    /// <summary>Seconds into a swing clip when the tool lands, or 0 for an animation that isn't a swing.</summary>
+    public float SwingContact(InteractionAnimation animation)
+    {
+        switch (animation)
+        {
+            case InteractionAnimation.MineWall: return wallSwingContact;
+            case InteractionAnimation.MineGround: return groundSwingContact;
+            default: return 0f;
+        }
+    }
+
+    public float SwingWindUp => swingWindUp;
 
     public float NoiseRadius(SwingResult result)
     {

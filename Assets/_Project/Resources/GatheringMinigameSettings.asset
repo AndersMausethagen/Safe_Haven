@@ -29,6 +29,9 @@ MonoBehaviour:
     normalZoneWidth: 0.35
     criticalZoneWidth: 0.07
     loudness: 0.35
+  wallSwingContact: 0.36666676
+  groundSwingContact: 0.40000013
+  swingWindUp: 0.15
   criticalWidthPerTier: 0.03
   criticalWidthPerCombo: 0.02
   maxCombo: 3

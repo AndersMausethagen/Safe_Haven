@@ -61,6 +61,8 @@ public sealed class SettlementSaveData
     public int breachPendingSince;
     /// <summary>Successful raids until the ward has recovered from a lost breach.</summary>
     public int wardStrain;
+    /// <summary>Share taken off the next breach. Missing in older saves.</summary>
+    public float breachWeakening;
     public List<ResidentSaveData> residents = new List<ResidentSaveData>();
     public int purificationQueued;
     public float purificationProgress;

@@ -1,0 +1,50 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2f02987ee9197d4682f5db8cbc7a967, type: 3}
+  m_Name: BreachSource
+  m_EditorClassIdentifier: SafeHaven::RaidEventDefinition
+  id: rumour.breachsource
+  displayName: The Gathering Place
+  weight: 0
+  earliestSeconds: 30
+  latestSecondsLeft: 60
+  minimumStage: 0
+  warning: 
+  warningSound: {fileID: 0}
+  sitePrefab: {fileID: 6054274067264939789, guid: d2ae06c188317a247beb9add6f4ccf7b, type: 3}
+  siteDistance: {x: 35, y: 70}
+  siteText: Bones and antlers tied to a dead tree, and tracks all around it, all pointing towards home.
+  onStart: []
+  choices:
+  - label: Tear it down
+    detail: What gathered here will come for you instead. The next breach comes weaker.
+    cost: []
+    result: It comes apart in your hands. Far away, something howls.
+    outcomes:
+    - rid: 287758281410609451
+    - rid: 287758281410609452
+  references:
+    version: 2
+    RefIds:
+    - rid: 287758281410609451
+      type: {class: WeakenBreachOutcome, ns: , asm: SafeHaven}
+      data:
+        share: 0.3
+        most: 0.6
+    - rid: 287758281410609452
+      type: {class: SpawnCreaturesOutcome, ns: , asm: SafeHaven}
+      data:
+        prefabs:
+        - {fileID: 4584692032328657812, guid: 64cf9de042e1bc142907212054f70f50, type: 3}
+        count: 1
+        radius: 12
+        hunt: 1

@@ -4,8 +4,8 @@ using UnityEditor;
 using UnityEngine;
 
 /// <summary>
-/// Turns the free sound library in Audio/SFX (CC0; see Audio/SFX/CREDITS.md) into the game's sounds (Safe Haven › Audio ›
-/// Set Up Free Sound Library): one SoundDefinition per game moment in Audio/Sounds/Library, assigned to the game-wide
+/// Turns the sound library in Audio/SFX (CC0; see Audio/SFX/CREDITS.md), free packs and the sounds made for the game by
+/// Tools/Audio, into the game's sounds (Safe Haven › Audio › Set Up Free Sound Library): one SoundDefinition per game moment in Audio/Sounds/Library, assigned to the game-wide
 /// slots in Audio Settings (combat, footsteps, world, interface, weather and water) and to the gathering feedback
 /// profiles. Slots that already hold a sound are left alone, so designers' choices survive running it again; the sound
 /// assets it made are updated in place.
@@ -38,6 +38,11 @@ public static class SoundLibrarySetup
 
     private static string[] Synth(string kind) => Enumerable.Range(1, 8).Select(i => $"{Sfx}Safe Haven Footsteps/Footstep {kind} {i}.wav").ToArray();
 
+    /// <summary>Sounds made for the game by Tools/Audio. They are made to play near their own pitch, so their ranges stay small.</summary>
+    private static string[] Made(string folder, string stem, int count) => count == 1
+        ? new[] { $"{Sfx}Safe Haven {folder}/{stem}.wav" }
+        : Enumerable.Range(1, count).Select(i => $"{Sfx}Safe Haven {folder}/{stem} {i}.wav").ToArray();
+
     /// <summary>Set to rewrite the footstep surface list with the defaults on the next run (it is kept otherwise).</summary>
     public static bool ResetFootstepSurfaces;
 
@@ -49,25 +54,25 @@ public static class SoundLibrarySetup
             AssetDatabase.CreateFolder("Assets/_Project/Audio/Sounds", "Library");
         }
 
-        const string impact = "Kenney Impact", rpg = "Kenney RPG", ui = "Kenney Interface", clicks = "Kenney UI", oga = "OGA 100 CC0 SFX 2";
+        const string impact = "Kenney Impact", rpg = "Kenney RPG", oga = "OGA 100 CC0 SFX 2", combat = "Combat", face = "Interface", world = "World";
         var sounds = new Dictionary<string, SoundDefinition>();
         void Make(Spec spec) => sounds[spec.Name] = Sound(spec);
 
         // Combat.
-        Make(new Spec { Name = "Swing", Clips = Files(oga, "sfx100v2_air_03").Concat(Files(rpg, "knifeSlice", "knifeSlice2")).ToArray(), Volume = 0.55f, Pitch = new Vector2(0.9f, 1.15f), Audible = 20f });
-        Make(new Spec { Name = "Heavy Swing", Clips = Files(oga, "sfx100v2_air_02"), Volume = 0.7f, Pitch = new Vector2(0.72f, 0.85f), Audible = 25f });
-        Make(new Spec { Name = "Hit", Clips = Numbered(impact, "impactPunch_medium_", 5).Concat(Files(oga, "sfx100v2_hit_01", "sfx100v2_hit_02", "sfx100v2_hit_03")).ToArray(), Volume = 0.8f, MaxAtOnce = 6 });
-        Make(new Spec { Name = "Critical Hit", Clips = Numbered(impact, "impactPunch_heavy_", 5), Volume = 0.85f, Pitch = new Vector2(0.85f, 0.95f) });
+        Make(new Spec { Name = "Swing", Clips = Made(combat, "Swing", 4), Volume = 0.51f, Pitch = new Vector2(0.92f, 1.08f), Audible = 20f });
+        Make(new Spec { Name = "Heavy Swing", Clips = Made(combat, "Heavy Swing", 3), Volume = 0.74f, Pitch = new Vector2(0.94f, 1.06f), Audible = 25f });
+        Make(new Spec { Name = "Hit", Clips = Made(combat, "Hit", 8), Volume = 0.68f, MaxAtOnce = 6 });
+        Make(new Spec { Name = "Critical Hit", Clips = Made(combat, "Critical Hit", 5), Volume = 0.82f, Pitch = new Vector2(0.95f, 1.05f) });
         Make(new Spec { Name = "Structure Hit", Clips = Numbered(impact, "impactWood_medium_", 5), Volume = 0.8f });
-        Make(new Spec { Name = "Block", Clips = Numbered(impact, "impactMetal_medium_", 5), Volume = 0.75f, Pitch = new Vector2(0.95f, 1.1f) });
-        Make(new Spec { Name = "Parry", Clips = Numbered(impact, "impactBell_heavy_", 5), Volume = 0.85f, Pitch = new Vector2(1.1f, 1.25f), MaxAtOnce = 2 });
-        Make(new Spec { Name = "Guard Break", Clips = Numbered(impact, "impactPlate_heavy_", 5), Volume = 0.9f, Pitch = new Vector2(0.75f, 0.85f), MaxAtOnce = 2 });
-        Make(new Spec { Name = "Stagger", Clips = Numbered(impact, "impactSoft_heavy_", 5), Volume = 0.85f, Pitch = new Vector2(0.75f, 0.9f) });
-        Make(new Spec { Name = "Perfect Dodge", Clips = Files(oga, "sfx100v2_air_02"), Volume = 0.7f, Pitch = new Vector2(1.25f, 1.4f), Positional = false, MaxAtOnce = 1 });
-        Make(new Spec { Name = "Counter Ready", Clips = Files(ui, "confirmation_001"), Volume = 0.45f, Pitch = new Vector2(1f, 1f), Positional = false, MaxAtOnce = 1 });
-        Make(new Spec { Name = "Dodge", Clips = Files(rpg, "cloth1", "cloth2", "cloth3", "cloth4"), Volume = 0.6f, Audible = 15f });
-        Make(new Spec { Name = "Player Hurt", Clips = Numbered(impact, "impactSoft_medium_", 5), Volume = 0.8f, Pitch = new Vector2(0.85f, 1f), Positional = false, MaxAtOnce = 2 });
-        Make(new Spec { Name = "Out of Stamina", Clips = Files(ui, "error_004"), Volume = 0.35f, Positional = false, MaxAtOnce = 1 });
+        Make(new Spec { Name = "Block", Clips = Made(combat, "Block", 5), Volume = 0.55f, Pitch = new Vector2(0.95f, 1.05f) });
+        Make(new Spec { Name = "Parry", Clips = Made(combat, "Parry", 5), Volume = 0.65f, Pitch = new Vector2(0.95f, 1.05f), MaxAtOnce = 2 });
+        Make(new Spec { Name = "Guard Break", Clips = Made(combat, "Guard Break", 4), Volume = 0.55f, Pitch = new Vector2(0.95f, 1.05f), MaxAtOnce = 2 });
+        Make(new Spec { Name = "Stagger", Clips = Made(combat, "Stagger", 4), Volume = 0.69f, Pitch = new Vector2(0.95f, 1.05f) });
+        Make(new Spec { Name = "Perfect Dodge", Clips = Made(combat, "Perfect Dodge", 2), Volume = 0.77f, Pitch = new Vector2(0.95f, 1.05f), Positional = false, MaxAtOnce = 1 });
+        Make(new Spec { Name = "Counter Ready", Clips = Made(face, "Counter Ready", 2), Volume = 0.41f, Pitch = new Vector2(0.98f, 1.02f), Positional = false, MaxAtOnce = 1 });
+        Make(new Spec { Name = "Dodge", Clips = Made(combat, "Dodge", 4), Volume = 0.39f, Audible = 15f });
+        Make(new Spec { Name = "Player Hurt", Clips = Made(combat, "Player Hurt", 6), Volume = 0.74f, Pitch = new Vector2(0.95f, 1.05f), Positional = false, MaxAtOnce = 2 });
+        Make(new Spec { Name = "Out of Stamina", Clips = Made(face, "Out of Stamina", 2), Volume = 0.25f, Positional = false, MaxAtOnce = 1 });
         // Footsteps.
         // Soft, faint steps made for the game (Tools/Audio/footsteps.py): barely there, like walking carefully through a forest.
         Make(new Spec { Name = "Footstep Grass", Clips = Synth("Grass"), Volume = 0.3f, Pitch = new Vector2(0.92f, 1.08f), Audible = 10f, MaxAtOnce = 3 });
@@ -77,15 +82,15 @@ public static class SoundLibrarySetup
         Make(new Spec { Name = "Footstep Snow", Clips = Numbered(impact, "footstep_snow_", 5), Volume = 0.35f, Pitch = new Vector2(0.9f, 1.1f), Audible = 12f, MaxAtOnce = 3 });
         Make(new Spec { Name = "Footstep Wood", Clips = Numbered(impact, "footstep_wood_", 5), Volume = 0.15f, Pitch = new Vector2(0.9f, 1.05f), Audible = 10f, MaxAtOnce = 3 });
         Make(new Spec { Name = "Footstep Water", Clips = Files(oga, "sfx100v2_footstep_wet_01", "sfx100v2_footstep_wet_02", "sfx100v2_footstep_wet_03"), Volume = 0.25f, Pitch = new Vector2(0.9f, 1.1f), Audible = 10f, MaxAtOnce = 3 });
-        Make(new Spec { Name = "Land", Clips = Numbered(impact, "impactGeneric_light_", 5), Volume = 0.5f, Pitch = new Vector2(0.7f, 0.85f), Audible = 12f, MaxAtOnce = 1 });
+        Make(new Spec { Name = "Land", Clips = Made(combat, "Land", 4), Volume = 0.34f, Pitch = new Vector2(0.95f, 1.05f), Audible = 12f, MaxAtOnce = 1 });
         // World and interface.
-        Make(new Spec { Name = "Quest Started", Clips = Files(ui, "maximize_008"), Volume = 0.5f, Positional = false, MaxAtOnce = 1 });
-        Make(new Spec { Name = "Quest Completed", Clips = Files(ui, "confirmation_004"), Volume = 0.6f, Positional = false, MaxAtOnce = 1 });
-        Make(new Spec { Name = "Crafted", Clips = Files(rpg, "metalPot1", "metalPot2", "metalPot3"), Volume = 0.55f, Positional = false, MaxAtOnce = 2 });
+        Make(new Spec { Name = "Quest Started", Clips = Made(face, "Quest Started", 1), Volume = 0.4f, Pitch = Vector2.one, Positional = false, MaxAtOnce = 1 });
+        Make(new Spec { Name = "Quest Completed", Clips = Made(face, "Quest Completed", 1), Volume = 0.62f, Pitch = Vector2.one, Positional = false, MaxAtOnce = 1 });
+        Make(new Spec { Name = "Crafted", Clips = Made(face, "Crafted", 3), Volume = 0.5f, Positional = false, MaxAtOnce = 2 });
         Make(new Spec { Name = "Built", Clips = Numbered(impact, "impactPlank_medium_", 5), Volume = 0.8f, Pitch = new Vector2(0.85f, 1f) });
-        Make(new Spec { Name = "Click", Clips = Files(clicks, "click3", "click4"), Volume = 0.35f, Pitch = new Vector2(0.97f, 1.03f), Positional = false, MaxAtOnce = 2 });
-        Make(new Spec { Name = "Window Open", Clips = Files(ui, "open_001", "open_002"), Volume = 0.35f, Positional = false, MaxAtOnce = 1 });
-        Make(new Spec { Name = "Window Close", Clips = Files(ui, "close_001", "close_002"), Volume = 0.35f, Positional = false, MaxAtOnce = 1 });
+        Make(new Spec { Name = "Click", Clips = Made(face, "Click", 3), Volume = 0.17f, Pitch = new Vector2(0.97f, 1.03f), Positional = false, MaxAtOnce = 2 });
+        Make(new Spec { Name = "Window Open", Clips = Made(face, "Window Open", 2), Volume = 0.3f, Positional = false, MaxAtOnce = 1 });
+        Make(new Spec { Name = "Window Close", Clips = Made(face, "Window Close", 2), Volume = 0.3f, Positional = false, MaxAtOnce = 1 });
         // Weather and water (ambience loops).
         Make(new Spec { Name = "Rain Loop", Clips = new[] { Sfx + "OGA Rain Loops/Rain Loop 3.ogg" }, Volume = 0.6f, Pitch = Vector2.one, Positional = false, Channel = AudioChannel.Ambience, MaxAtOnce = 1 });
         Make(new Spec { Name = "Wind Loop", Clips = new[] { "Assets/_Project/Audio/Placeholder/Ambience_WildsWind.wav" }, Volume = 0.5f, Pitch = Vector2.one, Positional = false, Channel = AudioChannel.Ambience, MaxAtOnce = 1 });
@@ -95,9 +100,9 @@ public static class SoundLibrarySetup
         Make(new Spec { Name = "Chop", Clips = Numbered(impact, "impactWood_heavy_", 5).Concat(Files(rpg, "chop")).ToArray(), Volume = 0.8f });
         Make(new Spec { Name = "Mine", Clips = Numbered(impact, "impactMining_", 5), Volume = 0.8f });
         Make(new Spec { Name = "Cut Fibre", Clips = Files(rpg, "handleSmallLeather", "handleSmallLeather2", "cloth3"), Volume = 0.6f });
-        Make(new Spec { Name = "Glancing Blow", Clips = Numbered(impact, "impactGeneric_light_", 5), Volume = 0.6f, Pitch = new Vector2(1.05f, 1.2f) });
-        Make(new Spec { Name = "Wood Breaks", Clips = Files(oga, "sfx100v2_wood_hit_01", "sfx100v2_wood_hit_02", "sfx100v2_wood_hit_03"), Volume = 0.9f, Pitch = new Vector2(0.8f, 0.95f) });
-        Make(new Spec { Name = "Stone Breaks", Clips = Files(oga, "sfx100v2_stones_01", "sfx100v2_stones_02", "sfx100v2_stones_03"), Volume = 0.9f });
+        Make(new Spec { Name = "Glancing Blow", Clips = Made(combat, "Glancing Blow", 4), Volume = 0.33f });
+        Make(new Spec { Name = "Wood Breaks", Clips = Made(world, "Wood Breaks", 3), Volume = 0.58f });
+        Make(new Spec { Name = "Stone Breaks", Clips = Made(world, "Stone Breaks", 3), Volume = 0.54f });
 
         AssignSettings(sounds);
         AssignHarvest("WoodFeedback", sounds["Chop"], sounds["Wood Breaks"], sounds);
@@ -115,12 +120,12 @@ public static class SoundLibrarySetup
     [MenuItem("Safe Haven/Audio/Set Up Weapon Sounds")]
     public static void SetUpWeaponSounds()
     {
-        const string impact = "Kenney Impact", rpg = "Kenney RPG", oga = "OGA 100 CC0 SFX 2";
+        const string combat = "Combat";
         // Fists: a quick cloth swish and a dull punch; axes: a deep whoosh and a heavy, low thud.
-        SoundDefinition punchSwing = Sound(new Spec { Name = "Punch Swing", Clips = Files(rpg, "cloth1", "cloth2", "cloth3", "cloth4").Concat(Files(oga, "sfx100v2_air_01")).ToArray(), Volume = 0.45f, Pitch = new Vector2(1.1f, 1.3f), Audible = 15f });
-        SoundDefinition punchHit = Sound(new Spec { Name = "Punch Hit", Clips = Numbered(impact, "impactPunch_medium_", 5), Volume = 0.8f, Pitch = new Vector2(0.95f, 1.1f), MaxAtOnce = 6 });
-        SoundDefinition axeSwing = Sound(new Spec { Name = "Axe Swing", Clips = Files(oga, "sfx100v2_air_02", "sfx100v2_air_01"), Volume = 0.65f, Pitch = new Vector2(0.75f, 0.9f), Audible = 22f });
-        SoundDefinition axeHit = Sound(new Spec { Name = "Axe Hit", Clips = Numbered(impact, "impactPunch_heavy_", 5).Concat(Files(rpg, "chop")).ToArray(), Volume = 0.85f, Pitch = new Vector2(0.8f, 0.92f), MaxAtOnce = 6 });
+        SoundDefinition punchSwing = Sound(new Spec { Name = "Punch Swing", Clips = Made(combat, "Punch Swing", 4), Volume = 0.36f, Audible = 15f });
+        SoundDefinition punchHit = Sound(new Spec { Name = "Punch Hit", Clips = Made(combat, "Punch Hit", 5), Volume = 0.75f, Pitch = new Vector2(0.95f, 1.05f), MaxAtOnce = 6 });
+        SoundDefinition axeSwing = Sound(new Spec { Name = "Axe Swing", Clips = Made(combat, "Axe Swing", 3), Volume = 0.74f, Audible = 22f });
+        SoundDefinition axeHit = Sound(new Spec { Name = "Axe Hit", Clips = Made(combat, "Axe Hit", 5), Volume = 0.8f, Pitch = new Vector2(0.95f, 1.05f), MaxAtOnce = 6 });
         AssignWeapon("Fists", punchSwing, punchHit);
         AssignWeapon("StoneAxe", axeSwing, axeHit);
         AssignWeapon("WoodsmansAxe", axeSwing, axeHit);

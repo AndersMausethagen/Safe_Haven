@@ -33,7 +33,7 @@ public sealed class NightSettings : GameSettings<NightSettings>
     [SerializeField, Range(0f, 1f)] private float deepProwlerShare = 0.3f;
 
     [Header("Text")]
-    [SerializeField, TextArea] private string nightfallText = "Night falls. What walks the dark is stronger now, and rich with Cursed Essence.";
+    [SerializeField, TextArea] private string nightfallText = "Night falls. What walks the dark beyond the ward is stronger now.";
     [SerializeField, TextArea] private string nightRaidText = "It is night here. What hunts you is stronger, and rich with Cursed Essence.";
 
     /// <summary>How dark it is now, 0..1.</summary>

@@ -15,8 +15,10 @@ MonoBehaviour:
   id: expedition.liv
   displayName: Liv
   description: Rune Scholar from the expedition into the Unquiet Forest. Lost when the waystone connection broke.
-  rescueLine: You came back. I knew the forest had not taken all of us.
-  arrivalLine: We have a home now. Let us bring the others here.
-  fallenLine: I can't go on... come back for me.
+  rescueLine: The stones broke along a line. A line! Do you understand what that means?
+  arrivalLine: Your ward is a promise too. Did anyone tell you?
+  welcomeLine: 
+  fallenLine: Write it down. Somebody has to write it down.
   model: {fileID: 4143811845303264333, guid: 98a5e3726f2d59d45b0da93e8ea043b5, type: 3}
-  jobs: []
+  jobs:
+  - {fileID: 11400000, guid: e68d6cc3611cddc4ab1e165871f1a4ae, type: 2}

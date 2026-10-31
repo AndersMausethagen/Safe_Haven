@@ -120,6 +120,8 @@ public sealed class ItemDefinition : ScriptableObject, IStackDefinition
     [SerializeField] private List<RecipeDefinition> teachesRecipes = new List<RecipeDefinition>();
     [Tooltip("Experience gained when the player reads this item (a rune book). Reading uses it up. 0: none.")]
     [SerializeField, Min(0)] private int experience;
+    [Tooltip("What it teaches can only be taken in at home, so it has to survive the way back: plans found in a raid, a swarm of bees.")]
+    [SerializeField] private bool learnedAtHome;
 
     [Header("Transport")]
     [Tooltip("Makes this item a transport's kit: using it sets the cart or boat down. Empty for other items.")]
@@ -181,6 +183,7 @@ public sealed class ItemDefinition : ScriptableObject, IStackDefinition
     public IReadOnlyList<BuildingDefinition> TeachesBuildings => teachesBuildings;
     public IReadOnlyList<RecipeDefinition> TeachesRecipes => teachesRecipes;
     public bool IsBlueprint => teachesBuildings.Count > 0 || teachesRecipes.Count > 0;
+    public bool IsLearnedAtHome => learnedAtHome;
     /// <summary>Experience for reading it (a rune book).</summary>
     public int Experience => experience;
     /// <summary>Gear wears: tools, weapons, backpacks and armor are deployed equipment that survives death with damage.</summary>

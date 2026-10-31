@@ -14,14 +14,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::SoundDefinition
   displayName: Wood Breaks
   clips:
-  - {fileID: 8300000, guid: 93ad21cc4b740334b856608a2db2457c, type: 3}
-  - {fileID: 8300000, guid: af5f5de3c7aabb54590cbdf1f778ebb5, type: 3}
-  - {fileID: 8300000, guid: d631d788bb85b824dbf47ab203c809dd, type: 3}
+  - {fileID: 8300000, guid: 37e4ba380c2bfa34fbbb22385574a06b, type: 3}
+  - {fileID: 8300000, guid: 127d5919d50911849a6169008c75f580, type: 3}
+  - {fileID: 8300000, guid: a5922980299582a4698ea1598dbc3908, type: 3}
   channel: 2
-  volume: 0.9
+  volume: 0.58
   volumeVariation: 0.1
-  pitchRange: {x: 0.8, y: 0.95}
+  pitchRange: {x: 0.94, y: 1.06}
   positional: 1
   fullVolumeDistance: 3
   audibleDistance: 35
   maxAtOnce: 4
+  minimumGap: 0.03
+  priority: 1

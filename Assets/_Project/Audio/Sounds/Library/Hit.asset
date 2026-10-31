@@ -14,19 +14,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::SoundDefinition
   displayName: Hit
   clips:
-  - {fileID: 8300000, guid: cee1a0360d533cc42bb9cff55180c603, type: 3}
-  - {fileID: 8300000, guid: 1de296430027c134f9d4e249f1dd3cd1, type: 3}
-  - {fileID: 8300000, guid: 432096ac973fc964d97014a97ddcd0e4, type: 3}
-  - {fileID: 8300000, guid: dd01de3db84633e40bd286f665d195f6, type: 3}
-  - {fileID: 8300000, guid: 1f646ffc36b06524d8c07011c9c86629, type: 3}
-  - {fileID: 8300000, guid: 7879ca9152d1fcf4a9a99b8caae1cbd5, type: 3}
-  - {fileID: 8300000, guid: 1557b4fb81dccbe43bf817e691784757, type: 3}
-  - {fileID: 8300000, guid: a75dc0852bc9a8f488ebca735480e4f1, type: 3}
+  - {fileID: 8300000, guid: 69ef28b3ff37684479bab5b1846a3876, type: 3}
+  - {fileID: 8300000, guid: 448db19cd37ea7c4fbce7d4d1a540d69, type: 3}
+  - {fileID: 8300000, guid: 4040c116aaecc7e4bb098b1320fb184d, type: 3}
+  - {fileID: 8300000, guid: c80ca2e64586b2c47b98a1355adcb89c, type: 3}
+  - {fileID: 8300000, guid: d64e56ddb51266a449c8d9a83d6f2f86, type: 3}
+  - {fileID: 8300000, guid: 14649ae4cb3952f47abdf2f523f48c8b, type: 3}
+  - {fileID: 8300000, guid: 2aae98145930db24c8be7456c619c81b, type: 3}
+  - {fileID: 8300000, guid: 08e9c01a99afa1440b07d6b4d416dafb, type: 3}
   channel: 2
-  volume: 0.8
+  volume: 0.68
   volumeVariation: 0.1
   pitchRange: {x: 0.94, y: 1.06}
   positional: 1
   fullVolumeDistance: 3
   audibleDistance: 35
   maxAtOnce: 6
+  minimumGap: 0.03
+  priority: 1

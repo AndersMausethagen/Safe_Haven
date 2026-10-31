@@ -14,15 +14,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::SoundDefinition
   displayName: Parry
   clips:
-  - {fileID: 8300000, guid: 33c4dff5b28730746b6c4cc230a5c4aa, type: 3}
-  - {fileID: 8300000, guid: 0fac3a35f961952409814c73ce8db02b, type: 3}
-  - {fileID: 8300000, guid: 2d5bb449de5c8dd42a695c71b3948af7, type: 3}
-  - {fileID: 8300000, guid: d7034f7b1045fd74f8ed719256f7ae45, type: 3}
-  - {fileID: 8300000, guid: 7fe7f9acdfd4b33458efd46b96e75f83, type: 3}
+  - {fileID: 8300000, guid: 3417bbc0abeefea49bb513f3b20339fe, type: 3}
+  - {fileID: 8300000, guid: 2fbf5091c5798764abfbb40dc7fdcdef, type: 3}
+  - {fileID: 8300000, guid: 6e5aee6f66cd1bd42ab2ba6200d20f17, type: 3}
+  - {fileID: 8300000, guid: c041c1c88c4f6304984d592a761cd07c, type: 3}
+  - {fileID: 8300000, guid: b0fa9621252a68b49832cbfc8b4d25e2, type: 3}
   channel: 2
-  volume: 0.85
+  volume: 0.65
   volumeVariation: 0.1
-  pitchRange: {x: 1.1, y: 1.25}
+  pitchRange: {x: 0.95, y: 1.05}
   positional: 1
   fullVolumeDistance: 3
   audibleDistance: 35

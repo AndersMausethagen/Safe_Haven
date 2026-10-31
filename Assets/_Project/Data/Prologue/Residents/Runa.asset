@@ -15,8 +15,10 @@ MonoBehaviour:
   id: expedition.runa
   displayName: Runa
   description: Tracker from the expedition into the Unquiet Forest. Lost when the waystone connection broke.
-  rescueLine: You came back. I knew the forest had not taken all of us.
-  arrivalLine: We have a home now. Let us bring the others here.
-  fallenLine: I can't go on... come back for me.
+  rescueLine: I've watched you for two days. You leave a trail like a cart.
+  arrivalLine: This place can be found. Good. So can everything else, by the same road.
+  welcomeLine: 
+  fallenLine: I know the way. Go on. I'll catch you up.
   model: {fileID: 4143811845303264333, guid: 98a5e3726f2d59d45b0da93e8ea043b5, type: 3}
-  jobs: []
+  jobs:
+  - {fileID: 11400000, guid: 6af8ca180b22423448d6e1e307037eb6, type: 2}

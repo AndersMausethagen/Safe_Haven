@@ -14,13 +14,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SoundDefinition
   displayName: Creature Dies
   clips:
-  - {fileID: 8300000, guid: c439fef3cda31d543ae6b843dcb5fd2b, type: 3}
-  - {fileID: 8300000, guid: e9316073d2aff554eb86ca425fc0ff70, type: 3}
+  - {fileID: 8300000, guid: f7036929840bcae479d1a0d8d6dd998f, type: 3}
+  - {fileID: 8300000, guid: 085cea13f561b3c4993b6c8f22f86800, type: 3}
+  - {fileID: 8300000, guid: 215f1ad885f8ca6479d16fd70126dd1e, type: 3}
+  - {fileID: 8300000, guid: b82916bfb61cde14db45b6abbb814e9d, type: 3}
   channel: 2
-  volume: 0.85
+  volume: 0.81
   volumeVariation: 0.1
   pitchRange: {x: 0.95, y: 1.05}
   positional: 1
   fullVolumeDistance: 3
   audibleDistance: 35
-  minimumInterval: 0.05
+  maxAtOnce: 4
+  minimumGap: 0.03
+  priority: 1

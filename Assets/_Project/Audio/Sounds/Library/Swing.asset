@@ -14,14 +14,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::SoundDefinition
   displayName: Swing
   clips:
-  - {fileID: 8300000, guid: 3c56dd0da0b6042439203941bc9e10b7, type: 3}
-  - {fileID: 8300000, guid: 4a306ff8f8289af468962b66d78e8e30, type: 3}
-  - {fileID: 8300000, guid: 3c735754c22b71945af874471a9732fb, type: 3}
+  - {fileID: 8300000, guid: 543d62de020bb8641968f284d86d2864, type: 3}
+  - {fileID: 8300000, guid: e100c0113ce424444a5c963a503e72bd, type: 3}
+  - {fileID: 8300000, guid: edfc635c846c25e49b83699069b5cbed, type: 3}
+  - {fileID: 8300000, guid: 6f9b4bdb3b7fff748994c17102616b68, type: 3}
   channel: 2
-  volume: 0.55
+  volume: 0.51
   volumeVariation: 0.1
-  pitchRange: {x: 0.9, y: 1.15}
+  pitchRange: {x: 0.92, y: 1.08}
   positional: 1
   fullVolumeDistance: 3
   audibleDistance: 20
   maxAtOnce: 4
+  minimumGap: 0.03
+  priority: 1

@@ -27,3 +27,41 @@ MonoBehaviour:
   maxChance: 0.75
   terrainTreeProxy: {fileID: 1000865458160168767, guid: 36ef7e4c9d335574089c821a1f07f8f1, type: 3}
   terrainTreeRegrowSeconds: 900
+  fellingShare: 0.6
+  sectionsPerSize: 2
+  minSections: 2
+  maxSections: 6
+  logsPerSection: 1
+  sectionLogsPerAxeTier: 0.5
+  limbingItem: {fileID: 11400000, guid: e8bb5d2fbded52b42a179a47cce32d53, type: 2}
+  limbingItemsPerSize: 1.5
+  fallenTreeSeconds: 600
+  felledTreePrefab: {fileID: 1000865458160168767, guid: 379892440832bc346aac859c194abf5f, type: 3}
+  fallSpreadDegrees: 75
+  landingNoiseRadius: 30
+  landingShake: 0.6
+  landingFeltDistance: 30
+  timberSurface: {fileID: 13400000, guid: 8eb735b0983ec564da1dad17498794ed, type: 2}
+  crushDamage: 90
+  crushFromSpeed: 3
+  crushFullSpeed: 12
+  crushReach: 0.7
+  playerCrushShare: 0.5
+  playerCrushMost: 0.6
+  allyCrushShare: 0
+  mostKnockDegrees: 11
+  knockKept: 0.2
+  foliageWords: needle, leaf, leaves, vine
+  logBark: {fileID: 2100000, guid: ee20187adc4af5e4296878391cfd547d, type: 2}
+  cutFace: {fileID: 2100000, guid: 1132a7006f5440847854ba662439f53c, type: 2}
+  leafFall: {fileID: 4074184185658077091, guid: 450fe5a12a2c2d54b85d5db2a1434208, type: 3}
+  landingDust: {fileID: 1275639213483061923, guid: d957d0ed1e0ca2e46a5df4b75a89e73f, type: 3}
+  dustTint: {r: 0.46, g: 0.39, b: 0.29, a: 0.34}
+  creakSound: {fileID: 11400000, guid: b80d2d6aace12554aabbf3945cecd2ab, type: 2}
+  rushSound: {fileID: 11400000, guid: 86813d55f6eeb5c4aaabcbeb4b366172, type: 2}
+  landingSound: {fileID: 11400000, guid: 61044b9355c3f2f408b6e7d6b8288034, type: 2}
+  branchSnapSound: {fileID: 11400000, guid: d67d781650a4592488de5f920c90ef8f, type: 2}
+  limbingSound: {fileID: 11400000, guid: c7a52d45a6686234b96bf1ce70442440, type: 2}
+  logKnockSound: {fileID: 11400000, guid: 84f7d6afac392a849b3bcbd17b2ce417, type: 2}
+  strikeSound: {fileID: 11400000, guid: a64f38233b55f984ba11d164ae419e94, type: 2}
+  crushSound: {fileID: 11400000, guid: 1634eb2e81876944b8728e0657939a78, type: 2}

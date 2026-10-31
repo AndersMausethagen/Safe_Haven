@@ -13,10 +13,18 @@ public sealed class LootOnDeath : MonoBehaviour
     [SerializeField] private ItemDropTable drops = new ItemDropTable();
     [Tooltip("Recipes the killer learns, for bosses that unlock new crafting.")]
     [SerializeField] private List<RecipeDefinition> unlocksRecipes = new List<RecipeDefinition>();
+    [Tooltip("Chance it leaves a relic (RelicSettings), in a raid only: for what stands at the end of the map.")]
+    [SerializeField, Range(0f, 1f)] private float relicChance;
 
     private Damageable damageable;
 
     public ItemDropTable Drops => drops;
+
+    /// <summary>
+    /// This creature leaves no Cursed Essence: what is killed outside a raid (home's night prowlers) doesn't pay in what only
+    /// raids should give (GDD §13.5).
+    /// </summary>
+    public bool WithholdsEssence { get; set; }
     public IReadOnlyList<RecipeDefinition> UnlocksRecipes => unlocksRecipes;
 
     private void Awake()
@@ -58,11 +66,23 @@ public sealed class LootOnDeath : MonoBehaviour
 
         if (killingBlow.Source.GetComponentInParent<ResourceInventory>() != null)
         {
-            List<ResourceAmount> overflow = LootGrant.GiveResources(killingBlow.Source.gameObject, Reaped(drops.RollResources(), killingBlow.Source));
+            List<ResourceAmount> rolled = drops.RollResources();
+            if (WithholdsEssence)
+            {
+                rolled.RemoveAll(entry => entry.Resource == SettlementSettings.Current.CursedEssence);
+            }
+
+            List<ResourceAmount> overflow = LootGrant.GiveResources(killingBlow.Source.gameObject, Reaped(rolled, killingBlow.Source));
             if (overflow.Count > 0)
             {
                 GameMessages.Post("Can't carry more: " + AmountText.Describe(overflow) + " left behind.", MessageKind.Warning);
             }
+        }
+
+        RaidDirector raid = RaidDirector.Current;
+        if (raid != null && relicChance > 0f && inventory != null && Random.value < relicChance)
+        {
+            RelicSettings.Grant(inventory.gameObject, new System.Random(Random.Range(0, int.MaxValue)), raid.Session.Definition.Tier);
         }
 
         var crafting = killingBlow.Source.GetComponentInParent<PlayerCrafting>();

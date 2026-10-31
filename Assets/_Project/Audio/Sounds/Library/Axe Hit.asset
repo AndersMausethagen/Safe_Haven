@@ -14,17 +14,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::SoundDefinition
   displayName: Axe Hit
   clips:
-  - {fileID: 8300000, guid: 088a5a83de824ef44a1919a3cefbab5e, type: 3}
-  - {fileID: 8300000, guid: 7a2a3249f4bd2a046a57af82a713666d, type: 3}
-  - {fileID: 8300000, guid: 2a8e265cb62ad5d4685ba81ff6e50ac7, type: 3}
-  - {fileID: 8300000, guid: ab435a178b17ee641bebaecf46346f0b, type: 3}
-  - {fileID: 8300000, guid: 72c3a7275f56d6541add7589dd53446e, type: 3}
-  - {fileID: 8300000, guid: 0c76d192e16c6914b86524188b8138e3, type: 3}
+  - {fileID: 8300000, guid: c6e011afcb93ad14590a4bb9d54565b5, type: 3}
+  - {fileID: 8300000, guid: 572709789d60ff94381d38354389ab2c, type: 3}
+  - {fileID: 8300000, guid: 5cac16fa162fd764e8707ba942669a9a, type: 3}
+  - {fileID: 8300000, guid: 079aec9d8bc6d094fb65bf3897507e94, type: 3}
+  - {fileID: 8300000, guid: c75b17d83f701eb43befce61ba7c3970, type: 3}
   channel: 2
-  volume: 0.85
+  volume: 0.8
   volumeVariation: 0.1
-  pitchRange: {x: 0.8, y: 0.92}
+  pitchRange: {x: 0.95, y: 1.05}
   positional: 1
   fullVolumeDistance: 3
   audibleDistance: 35
   maxAtOnce: 6
+  minimumGap: 0.03
+  priority: 1

@@ -14,16 +14,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::SoundDefinition
   displayName: Block
   clips:
-  - {fileID: 8300000, guid: e4b740bbf06b1b941a4496c6842ed937, type: 3}
-  - {fileID: 8300000, guid: 8819d09baaf76794c9fde8ac4277c1b6, type: 3}
-  - {fileID: 8300000, guid: 29451377788dcfc44a43fb7fa8821b4d, type: 3}
-  - {fileID: 8300000, guid: dcb39d96e6d1c79458d029d9922849eb, type: 3}
-  - {fileID: 8300000, guid: dee0b754144a22347b65cf0822366120, type: 3}
+  - {fileID: 8300000, guid: bc6db0e715065fa408415edaa1a04aa0, type: 3}
+  - {fileID: 8300000, guid: 8f1f2d7fc4cf3804aa3f77a8dac1ae58, type: 3}
+  - {fileID: 8300000, guid: da6c02a16589cbd4ab9b02ff2750d2d3, type: 3}
+  - {fileID: 8300000, guid: 922b39c46c219aa43bdf38c7773d5385, type: 3}
+  - {fileID: 8300000, guid: 023f261abaa8e394ca7165f0314522b8, type: 3}
   channel: 2
-  volume: 0.75
+  volume: 0.55
   volumeVariation: 0.1
-  pitchRange: {x: 0.95, y: 1.1}
+  pitchRange: {x: 0.95, y: 1.05}
   positional: 1
   fullVolumeDistance: 3
   audibleDistance: 35
   maxAtOnce: 4
+  minimumGap: 0.03
+  priority: 1

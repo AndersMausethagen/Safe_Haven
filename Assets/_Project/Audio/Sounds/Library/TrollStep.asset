@@ -14,16 +14,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::SoundDefinition
   displayName: Troll Step
   clips:
-  - {fileID: 8300000, guid: 4d3f5865a61c91e4da09ba299eff58b9, type: 3}
-  - {fileID: 8300000, guid: 7248d82dad0eda942a8bd5103d7f5074, type: 3}
-  - {fileID: 8300000, guid: 856d18d0733b00a429d1abcce347e271, type: 3}
-  - {fileID: 8300000, guid: 5e3ca152dfeaaeb4bbfc4aa86a1ada09, type: 3}
-  - {fileID: 8300000, guid: 9a9244b850093974f999dec1af047961, type: 3}
+  - {fileID: 8300000, guid: 79596768e555ce44c8c5abf4338f6a80, type: 3}
+  - {fileID: 8300000, guid: 76c400206ba8e454ebe3149e4d2a7a66, type: 3}
+  - {fileID: 8300000, guid: 01e4165542b61af4ea2fdf57cbb20af1, type: 3}
+  - {fileID: 8300000, guid: 7d279377b25c0c84ebe3cbd45c2c5ab6, type: 3}
+  - {fileID: 8300000, guid: c993bd4c83f1c4544b20dfebc4171241, type: 3}
   channel: 2
   volume: 1
   volumeVariation: 0.1
-  pitchRange: {x: 0.35, y: 0.45}
+  pitchRange: {x: 0.94, y: 1.06}
   positional: 1
   fullVolumeDistance: 8
   audibleDistance: 55
   maxAtOnce: 2
+  minimumGap: 0.03
+  priority: 1

@@ -15,7 +15,7 @@ public sealed class UIStateManager : MonoBehaviour
     private readonly HashSet<UIWindow> openWindows = new HashSet<UIWindow>();
     private readonly Dictionary<UIWindowId, UIWindow> windows = new Dictionary<UIWindowId, UIWindow>();
 
-    // Intentionally not cleared in OnDestroy so listeners can still unsubscribe while a scene is torn down.
+    /// <summary>The manager of the current scene, or null in scenes without one.</summary>
     public static UIStateManager Instance { get; private set; }
 
     public bool IsAnyWindowOpen => openWindows.Count > 0;
@@ -37,6 +37,18 @@ public sealed class UIStateManager : MonoBehaviour
 
         Instance = this;
     }
+
+    // Listeners unsubscribe through the reference they took when they subscribed, so none of them need this one to outlive the scene.
+    private void OnDestroy()
+    {
+        if (Instance == this)
+        {
+            Instance = null;
+        }
+    }
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStatics() => Instance = null;
 
     private void OnEnable()
     {

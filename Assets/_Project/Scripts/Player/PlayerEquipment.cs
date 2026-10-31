@@ -75,6 +75,10 @@ public sealed class PlayerEquipment : MonoBehaviour
     {
         combat = GetComponent<PlayerCombat>();
         combatant = GetComponent<Combatant>();
+        if (!TryGetComponent(out PlayerRelics _))
+        {
+            gameObject.AddComponent<PlayerRelics>();
+        }
     }
 
     private void OnEnable()

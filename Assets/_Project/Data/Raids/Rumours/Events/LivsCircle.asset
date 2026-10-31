@@ -1,0 +1,62 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2f02987ee9197d4682f5db8cbc7a967, type: 3}
+  m_Name: LivsCircle
+  m_EditorClassIdentifier: SafeHaven::RaidEventDefinition
+  id: rumour.livscircle
+  displayName: The Humming Stones
+  weight: 0
+  earliestSeconds: 30
+  latestSecondsLeft: 60
+  minimumStage: 0
+  warning: 
+  warningSound: {fileID: 0}
+  sitePrefab: {fileID: 2733615617085584250, guid: ff3452000c1fa5645966cb98ffe59662, type: 3}
+  siteDistance: {x: 35, y: 70}
+  siteText: Liv sits in a ring of runestones, writing. She can't step out, and doesn't seem to have noticed.
+  onStart: []
+  choices:
+  - label: Break the ring
+    detail: Loud, and whatever is listening will hear it.
+    cost: []
+    result: The hum stops. Every bird in the forest goes up at once.
+    outcomes:
+    - rid: 287758281410609429
+    - rid: 287758281410609430
+  - label: Lift the stones aside, one by one
+    detail: 'Slow: a minute and a half. Quiet.'
+    cost: []
+    result: She doesn't look up until the last one is moved.
+    outcomes:
+    - rid: 287758281410609431
+    - rid: 287758281410609432
+  references:
+    version: 2
+    RefIds:
+    - rid: 287758281410609429
+      type: {class: MakeNoiseOutcome, ns: , asm: SafeHaven}
+      data:
+        radius: 45
+    - rid: 287758281410609430
+      type: {class: RescueResidentOutcome, ns: , asm: SafeHaven}
+      data:
+        resident: {fileID: 11400000, guid: 8adfc30233928ec499c01587419eabaa, type: 2}
+        traveler: {fileID: 4560087502640453408, guid: 34ab3b53d3ced634486fa4ab89e59887, type: 3}
+    - rid: 287758281410609431
+      type: {class: ChangeTimeOutcome, ns: , asm: SafeHaven}
+      data:
+        seconds: -90
+    - rid: 287758281410609432
+      type: {class: RescueResidentOutcome, ns: , asm: SafeHaven}
+      data:
+        resident: {fileID: 11400000, guid: 8adfc30233928ec499c01587419eabaa, type: 2}
+        traveler: {fileID: 4560087502640453408, guid: 34ab3b53d3ced634486fa4ab89e59887, type: 3}

@@ -131,6 +131,29 @@ public sealed class AudioSystemTests
     }
 
     [Test]
+    public void NoGameSound_UsesTheInterfaceBlipsOrSynthPlaceholders()
+    {
+        foreach (string guid in AssetDatabase.FindAssets("t:SoundDefinition", new[] { "Assets/_Project/Audio/Sounds" }))
+        {
+            var sound = AssetDatabase.LoadAssetAtPath<SoundDefinition>(AssetDatabase.GUIDToAssetPath(guid));
+            foreach (AudioClip clip in sound.Clips)
+            {
+                string path = AssetDatabase.GetAssetPath(clip);
+                StringAssert.DoesNotContain("Kenney Interface", path, sound.name);
+                StringAssert.DoesNotContain("Kenney UI", path, sound.name);
+                StringAssert.DoesNotContain("Placeholder/Sfx_", path, sound.name);
+            }
+        }
+    }
+
+    [Test]
+    public void TheCreatureHasASoundForNoticingSomething()
+    {
+        Assert.IsTrue(PerceptionSettings.Current.SuspiciousSound.HasClips);
+        Assert.IsTrue(PerceptionSettings.Current.SuspiciousSound.Positional);
+    }
+
+    [Test]
     public void TheWorldSoundsLevel_LeavesRoomForCloseSounds()
     {
         var settings = Resources.Load<AudioSettingsDefinition>(AudioSettingsDefinition.ResourceName);

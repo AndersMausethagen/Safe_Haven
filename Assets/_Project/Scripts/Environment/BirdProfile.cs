@@ -7,6 +7,14 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "Safe Haven/Environment/Bird Profile", fileName = "Birds")]
 public sealed class BirdProfile : ScriptableObject
 {
+    [Header("A loud noise")]
+    [Tooltip("A noise heard this far (metres) sends birds up out of the trees around it: a tree coming down, a horn.")]
+    [SerializeField, Min(1f)] private float flushNoise = 24f;
+    [Tooltip("How many flocks go up. 0: this place's birds are never in the trees.")]
+    [SerializeField, Range(0, 4)] private int flushFlocks = 2;
+    [Tooltip("How high in the trees they start, in metres.")]
+    [SerializeField, Min(1f)] private float flushHeight = 9f;
+
     [Header("Look")]
     [Tooltip("One is picked for each bird.")]
     [SerializeField] private Color[] colours = { new Color(0.55f, 0.42f, 0.3f) };
@@ -62,6 +70,12 @@ public sealed class BirdProfile : ScriptableObject
     [SerializeField] private Vector2 callSeconds = new Vector2(4f, 12f);
     [Tooltip("Whether it calls as it takes off: an alarm.")]
     [SerializeField] private bool callsOnTakeOff;
+
+    /// <summary>Whether a noise of this radius is loud enough to flush the birds out of the trees.</summary>
+    public bool FlushedBy(float noiseRadius) => flushFlocks > 0 && noiseRadius >= flushNoise;
+
+    public int FlushFlocks => flushFlocks;
+    public float FlushHeight => flushHeight;
 
     public int FlockSizeMin => flockSize.x;
     public int FlockSizeMax => Mathf.Max(flockSize.x, flockSize.y);

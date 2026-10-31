@@ -14,13 +14,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::SoundDefinition
   displayName: Window Close
   clips:
-  - {fileID: 8300000, guid: ee9b3f6e8d175ab42939aacf42fd4862, type: 3}
-  - {fileID: 8300000, guid: 83fec53dfb857424f983e22c910edb77, type: 3}
+  - {fileID: 8300000, guid: e669871a8f2cb314dbcaf789592585a0, type: 3}
+  - {fileID: 8300000, guid: 86a52fa576320284391cbbe84c444506, type: 3}
   channel: 2
-  volume: 0.35
+  volume: 0.3
   volumeVariation: 0.1
   pitchRange: {x: 0.94, y: 1.06}
   positional: 0
   fullVolumeDistance: 3
   audibleDistance: 35
   maxAtOnce: 1
+  minimumGap: 0.03
+  priority: 1

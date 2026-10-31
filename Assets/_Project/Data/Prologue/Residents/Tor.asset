@@ -15,8 +15,10 @@ MonoBehaviour:
   id: expedition.tor
   displayName: Tor
   description: Carpenter from the expedition into the Unquiet Forest. Lost when the waystone connection broke.
-  rescueLine: You came back. I knew the forest had not taken all of us.
-  arrivalLine: We have a home now. Let us bring the others here.
-  fallenLine: I can't go on... come back for me.
+  rescueLine: Still measuring. I knew someone would come, and I wanted something to show for it.
+  arrivalLine: It's built crooked, you know. All of it. Give me a week.
+  welcomeLine: 
+  fallenLine: My tools. Leave them, if you have to. Not me.
   model: {fileID: 4143811845303264333, guid: 98a5e3726f2d59d45b0da93e8ea043b5, type: 3}
-  jobs: []
+  jobs:
+  - {fileID: 11400000, guid: b33d365bf7bdfe74793c6d3f0f4b33a5, type: 2}

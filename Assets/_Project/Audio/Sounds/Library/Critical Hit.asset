@@ -14,16 +14,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::SoundDefinition
   displayName: Critical Hit
   clips:
-  - {fileID: 8300000, guid: 088a5a83de824ef44a1919a3cefbab5e, type: 3}
-  - {fileID: 8300000, guid: 7a2a3249f4bd2a046a57af82a713666d, type: 3}
-  - {fileID: 8300000, guid: 2a8e265cb62ad5d4685ba81ff6e50ac7, type: 3}
-  - {fileID: 8300000, guid: ab435a178b17ee641bebaecf46346f0b, type: 3}
-  - {fileID: 8300000, guid: 72c3a7275f56d6541add7589dd53446e, type: 3}
+  - {fileID: 8300000, guid: ba58650d2aba17b4eb42c780bcacc8c9, type: 3}
+  - {fileID: 8300000, guid: 6dd3ca6a60eaf5341a8df4c41b5229ec, type: 3}
+  - {fileID: 8300000, guid: b84ed9db6a8cfda498c15cc1a42a48e4, type: 3}
+  - {fileID: 8300000, guid: c21ac91857919fc459a74f59d7197bc7, type: 3}
+  - {fileID: 8300000, guid: 5b094ffcac86c7449be98c9ffbc10bfc, type: 3}
   channel: 2
-  volume: 0.85
+  volume: 0.82
   volumeVariation: 0.1
-  pitchRange: {x: 0.85, y: 0.95}
+  pitchRange: {x: 0.95, y: 1.05}
   positional: 1
   fullVolumeDistance: 3
   audibleDistance: 35
   maxAtOnce: 4
+  minimumGap: 0.03
+  priority: 1

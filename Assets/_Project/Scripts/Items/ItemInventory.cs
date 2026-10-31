@@ -184,6 +184,13 @@ public sealed class ItemInventory : MonoBehaviour
             return false;
         }
 
+        // Otherwise it would be read on the spot, and a raid's best find would never be at risk.
+        if (item.IsLearnedAtHome && RaidDirector.Current != null)
+        {
+            GameMessages.Post($"{item.DisplayName} is no use out here. Get it home.", MessageKind.Warning);
+            return false;
+        }
+
         int learned = crafting.UnlockBuildings(item.TeachesBuildings) + crafting.Unlock(item.TeachesRecipes);
         if (learned == 0)
         {

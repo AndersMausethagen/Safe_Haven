@@ -66,7 +66,7 @@ public sealed class PlayerInteractionOutline : MonoBehaviour
         foreach (var pair in outlines)
         {
             Interactable target = pair.Key;
-            if (target == null)
+            if (target == null || OutlineCopies.AllGone(pair.Value))
             {
                 removed.Add(target);
                 continue;

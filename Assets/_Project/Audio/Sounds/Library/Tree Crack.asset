@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0de871765cd6fce4c8fed103ef0082e3, type: 3}
+  m_Name: Tree Crack
+  m_EditorClassIdentifier: SafeHaven::SoundDefinition
+  displayName: Tree Crack
+  clips:
+  - {fileID: 8300000, guid: e96946f9fb11ff74db641a3620f91bef, type: 3}
+  - {fileID: 8300000, guid: 0a0873dfe622b2248bca443f6653be6e, type: 3}
+  - {fileID: 8300000, guid: f94fb6717bf76c9499e889cae1d519e8, type: 3}
+  channel: 2
+  volume: 0.8
+  volumeVariation: 0.1
+  pitchRange: {x: 0.96, y: 1.04}
+  positional: 1
+  fullVolumeDistance: 8
+  audibleDistance: 50
+  maxAtOnce: 2
+  minimumGap: 0.03
+  priority: 1

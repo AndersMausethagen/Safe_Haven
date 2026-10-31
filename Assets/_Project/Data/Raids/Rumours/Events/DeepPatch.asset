@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2f02987ee9197d4682f5db8cbc7a967, type: 3}
+  m_Name: DeepPatch
+  m_EditorClassIdentifier: SafeHaven::RaidEventDefinition
+  id: rumour.deeppatch
+  displayName: The Deep Patch
+  weight: 0
+  earliestSeconds: 30
+  latestSecondsLeft: 60
+  minimumStage: 0
+  warning: 
+  warningSound: {fileID: 0}
+  sitePrefab: {fileID: 2296875460002273048, guid: 67136cad105bb00419770426a7791d87, type: 3}
+  siteDistance: {x: 35, y: 70}
+  siteText: Cloudberry and chanterelle grow thick here, as they never would at home.
+  onStart: []
+  choices:
+  - label: Gather seed and spawn
+    detail: Half a minute of careful work.
+    cost: []
+    result: Enough to start a bed at home.
+    outcomes:
+    - rid: 287758281410609446
+    - rid: 287758281410609447
+  references:
+    version: 2
+    RefIds:
+    - rid: 287758281410609446
+      type: {class: ChangeTimeOutcome, ns: , asm: SafeHaven}
+      data:
+        seconds: -30
+    - rid: 287758281410609447
+      type: {class: GiveLootOutcome, ns: , asm: SafeHaven}
+      data:
+        loot:
+          entries:
+          - item: {fileID: 11400000, guid: 17b016991a7aa4846a121d6027443bf2, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 1
+            maxQuantity: 1
+            probability: 1

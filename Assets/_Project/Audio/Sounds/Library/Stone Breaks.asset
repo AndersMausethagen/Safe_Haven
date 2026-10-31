@@ -14,14 +14,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::SoundDefinition
   displayName: Stone Breaks
   clips:
-  - {fileID: 8300000, guid: a6d67de22ff83d4469dd6257864160bc, type: 3}
-  - {fileID: 8300000, guid: 0cc2f787461d3d54e99d838ff95f9d5c, type: 3}
-  - {fileID: 8300000, guid: b243e9bc27a4d124e90d17951c249343, type: 3}
+  - {fileID: 8300000, guid: 054713e76e97c5642b0a6df39a7a0305, type: 3}
+  - {fileID: 8300000, guid: 8a797451a2c21ce40b54d2023cebd50d, type: 3}
+  - {fileID: 8300000, guid: 9e884728a6ddee74ab65b5dccde199cb, type: 3}
   channel: 2
-  volume: 0.9
+  volume: 0.54
   volumeVariation: 0.1
   pitchRange: {x: 0.94, y: 1.06}
   positional: 1
   fullVolumeDistance: 3
   audibleDistance: 35
   maxAtOnce: 4
+  minimumGap: 0.03
+  priority: 1

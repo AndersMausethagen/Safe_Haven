@@ -62,6 +62,7 @@ public sealed class SystemsEditorWindow : EditorWindow
             new CraftingPage(),
             new ResidentsAndPurificationPage(),
             new EssencePage(),
+            new RelicsPage(),
             new TransportPage(),
             new QuestMarkersPage(),
             new StoryPacingPage(),

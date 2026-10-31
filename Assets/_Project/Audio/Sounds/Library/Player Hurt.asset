@@ -14,15 +14,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::SoundDefinition
   displayName: Player Hurt
   clips:
-  - {fileID: 8300000, guid: e07f851764728af4783bd244f5f50698, type: 3}
-  - {fileID: 8300000, guid: 9c60c16717e3de343982c0a464c4bc54, type: 3}
-  - {fileID: 8300000, guid: be98a7cd5b9f49b47938d4f7eb98609a, type: 3}
-  - {fileID: 8300000, guid: b1cec7d021ac0da4299b78ffc913bc83, type: 3}
-  - {fileID: 8300000, guid: 26c9f112d91d0aa408ea6db1f33567f3, type: 3}
+  - {fileID: 8300000, guid: ac05fd3ba0687c049bf9de1e923955fc, type: 3}
+  - {fileID: 8300000, guid: 5686896c89aa63e44a6547e54933131a, type: 3}
+  - {fileID: 8300000, guid: 3252b57ed1803cf49b395e04d60f920f, type: 3}
+  - {fileID: 8300000, guid: 1636fcc2c67d4804e8403888e873316f, type: 3}
+  - {fileID: 8300000, guid: fb447f5427c42364cad4d80556a0ed7d, type: 3}
+  - {fileID: 8300000, guid: 154978af28323ce4e978c00fca6671e0, type: 3}
   channel: 2
-  volume: 0.8
+  volume: 0.74
   volumeVariation: 0.1
-  pitchRange: {x: 0.85, y: 1}
+  pitchRange: {x: 0.95, y: 1.05}
   positional: 0
   fullVolumeDistance: 3
   audibleDistance: 35

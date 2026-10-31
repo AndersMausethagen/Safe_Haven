@@ -25,5 +25,5 @@ MonoBehaviour:
     amount: 2
   station: 3
   craftSeconds: 24
-  knownFromStart: 1
+  knownFromStart: 0
   sortOrder: 140

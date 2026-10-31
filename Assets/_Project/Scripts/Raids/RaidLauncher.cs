@@ -59,6 +59,10 @@ public static class RaidLauncher
         return MaterialPool.For(player).CanAfford(SparkCost(sparks), null, out string missing) ? null : missing;
     }
 
+    /// <summary>The seconds a raid gets on top of its rules: Portal Sparks, and what residents' jobs add.</summary>
+    public static float ExtraSeconds(int sparks) =>
+        sparks * SettlementSettings.Current.SecondsPerSpark + GameSession.Settlement.JobBonus(job => job.RaidSeconds);
+
     /// <summary>What a number of Portal Sparks costs, as resources.</summary>
     public static List<ResourceAmount> SparkCost(int sparks)
     {
@@ -128,8 +132,7 @@ public static class RaidLauncher
 
         // The seed is usually rolled when the briefing opens, so the hour it shows is the hour the raid gets.
         int runSeed = seed ?? RaidSession.NewSeed();
-        RaidParameters parameters = RaidParameters.Calculate(raid, modifiers, sparks * SettlementSettings.Current.SecondsPerSpark,
-            RaidTimeOfDay.For(raid, runSeed));
+        RaidParameters parameters = RaidParameters.Calculate(raid, modifiers, ExtraSeconds(sparks), RaidTimeOfDay.For(raid, runSeed));
         if (player.TryGetComponent(out PlayerTransport transport))
         {
             transport.LeaveForRaid();

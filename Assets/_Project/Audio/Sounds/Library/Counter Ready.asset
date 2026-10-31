@@ -14,12 +14,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::SoundDefinition
   displayName: Counter Ready
   clips:
-  - {fileID: 8300000, guid: 86b75c334fae90b43a6b33b575d234d1, type: 3}
+  - {fileID: 8300000, guid: 1af65f8d23a569348ae1ab3adf4f3a65, type: 3}
+  - {fileID: 8300000, guid: 518f3ff21486fd9419268dd6b8ff271c, type: 3}
   channel: 2
-  volume: 0.45
+  volume: 0.41
   volumeVariation: 0.1
-  pitchRange: {x: 1, y: 1}
+  pitchRange: {x: 0.98, y: 1.02}
   positional: 0
   fullVolumeDistance: 3
   audibleDistance: 35
   maxAtOnce: 1
+  minimumGap: 0.03
+  priority: 1

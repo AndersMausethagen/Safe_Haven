@@ -370,8 +370,8 @@ public sealed class ItemContainer
     }
 
     /// <summary>
-    /// Moves a slot's stack onto another slot: into it when empty, onto it when it holds the same item (what doesn't
-    /// fit stays behind), and swapping the two otherwise. Nothing moves into a locked slot.
+    /// Moves a slot's stack onto another slot: into it when empty, onto it when it holds the same stacking item (what
+    /// doesn't fit stays behind), and swapping the two otherwise. Nothing moves into a locked slot.
     /// </summary>
     public void Move(int from, int to)
     {
@@ -406,7 +406,8 @@ public sealed class ItemContainer
             return true;
         }
 
-        if (destination.Item == source.Item)
+        // Gear never stacks, so two copies of it swap: one may be worn, the other enchanted.
+        if (destination.Item == source.Item && source.Item.Stackable)
         {
             int moved = Mathf.Min(destination.SpaceLeft, source.Count);
             if (otherContainer)

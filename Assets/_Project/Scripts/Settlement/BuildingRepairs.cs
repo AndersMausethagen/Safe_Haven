@@ -8,6 +8,10 @@ using UnityEngine;
 public static class BuildingRepairs
 {
     /// <summary>What repairing part of a cost comes to: never nothing for a building that is hurt and cost something.</summary>
+    // A carpenter makes mending cheaper.
+    private static float MendShare => WardBreachSettings.Current.RepairShare
+        * Mathf.Clamp01(1f - GameSession.Settlement.JobBonus(job => job.BuildingRepairDiscount));
+
     public static int Share(int amount, float missing, float share) =>
         amount <= 0 || missing <= 0f || share <= 0f ? 0 : Mathf.CeilToInt(amount * Mathf.Clamp01(missing) * share);
 
@@ -70,7 +74,7 @@ public static class BuildingRepairs
             return null;
         }
 
-        Cost(damaged, WardBreachSettings.Current.RepairShare, out List<ResourceAmount> resources, out List<ItemAmount> items);
+        Cost(damaged, MendShare, out List<ResourceAmount> resources, out List<ItemAmount> items);
         MaterialPool pool = MaterialPool.For(user);
         bool affordable = pool.CanAfford(resources, items, out string missing);
         string costs = resources.Count > 0 ? AmountText.Describe(resources) + (items.Count > 0 ? ", " : "") : "";
@@ -82,7 +86,7 @@ public static class BuildingRepairs
     private static void Mend(GameObject user)
     {
         List<Damageable> damaged = Damaged();
-        Cost(damaged, WardBreachSettings.Current.RepairShare, out List<ResourceAmount> resources, out List<ItemAmount> items);
+        Cost(damaged, MendShare, out List<ResourceAmount> resources, out List<ItemAmount> items);
         if (!MaterialPool.For(user).TrySpend(resources, items))
         {
             return;

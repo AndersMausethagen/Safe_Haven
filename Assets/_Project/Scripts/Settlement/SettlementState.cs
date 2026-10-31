@@ -59,6 +59,12 @@ public sealed class SettlementState
     /// <summary>Successful raids until a ward strained by a lost breach has recovered; 0 when it is whole.</summary>
     public int WardStrain { get; private set; }
 
+    /// <summary>Share taken off the next breach by what was done to its source in a raid. 0 when nothing was.</summary>
+    public float BreachWeakening { get; private set; }
+
+    /// <summary>True when a breach is waiting, or the next successful raid will bring one on.</summary>
+    public bool BreachIsNear => Breach == BreachStatus.Pending || (BreachesWon > 0 && SuccessfulExtractions + 1 >= NextBreachAt);
+
     public IReadOnlyList<ResidentRecord> Residents => residents;
     /// <summary>Purification batches waiting, including the one in progress.</summary>
     public int PurificationQueued { get; private set; }
@@ -117,7 +123,15 @@ public sealed class SettlementState
     {
         Breach = BreachStatus.Won;
         BreachesWon++;
+        BreachWeakening = 0f;
         NextBreachAt = SuccessfulExtractions + raidsUntilNext;
+        Changed?.Invoke();
+    }
+
+    /// <summary>Something was done in a raid to the source of the next breach. Blows add up, to at most <paramref name="most"/>.</summary>
+    public void WeakenBreach(float share, float most)
+    {
+        BreachWeakening = Math.Min(most, BreachWeakening + Math.Max(0f, share));
         Changed?.Invoke();
     }
 
@@ -157,6 +171,30 @@ public sealed class SettlementState
             record.Job = job;
             Changed?.Invoke();
         }
+    }
+
+    /// <summary>What everyone's jobs add up to for one bonus (JobDefinition): the Tracker's rumours, say.</summary>
+    public int JobBonus(Func<JobDefinition, int> bonus)
+    {
+        int total = 0;
+        foreach (ResidentRecord record in residents)
+        {
+            total += record.Job != null ? bonus(record.Job) : 0;
+        }
+
+        return total;
+    }
+
+    /// <summary>What everyone's jobs add up to for one bonus, as a share or an amount.</summary>
+    public float JobBonus(Func<JobDefinition, float> bonus)
+    {
+        float total = 0f;
+        foreach (ResidentRecord record in residents)
+        {
+            total += record.Job != null ? bonus(record.Job) : 0f;
+        }
+
+        return total;
     }
 
     /// <summary>True when some resident holds the job.</summary>
@@ -227,8 +265,9 @@ public sealed class SettlementState
     }
 
     /// <summary>Puts back saved breach history. Used by SaveMapper only. A save from before there were several knows only of the first.</summary>
-    public void RestoreBreaches(int won, int nextAt, int pendingSince, int strain)
+    public void RestoreBreaches(int won, int nextAt, int pendingSince, int strain, float weakening = 0f)
     {
+        BreachWeakening = Math.Max(0f, weakening);
         BreachesWon = Math.Max(won, Breach == BreachStatus.Won ? 1 : 0);
         NextBreachAt = Math.Max(0, nextAt);
         BreachPendingSince = Math.Max(0, pendingSince);

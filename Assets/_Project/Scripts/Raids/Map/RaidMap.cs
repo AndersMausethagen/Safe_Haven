@@ -6,12 +6,12 @@ using UnityEngine;
 using UnityEngine.AI;
 
 /// <summary>
-/// A raid's hand-made map: the terrain baked from a RaidMapDefinition's images and everything placed on it (spawn
-/// groups, exits, story objects), kept under <see cref="Content"/>. While the loading screen is up it turns the whole map
-/// by 0–3 quarter turns from the raid's seed, so one layout feels like four, then puts the player at the start.
-/// A Terrain can't be rotated, so a copy of its data is turned in its arrays (the asset itself is never changed), the
-/// content is turned around the map's centre to match, and the navmesh is rebuilt. Runs before RaidGenerator, so spawn
-/// groups fill their already-turned points.
+/// A raid's map: the terrain and everything placed on it (spawn groups, exits, story objects), kept under
+/// <see cref="Content"/>. While the loading screen is up it makes this run's map, then puts the player at the start. A raid
+/// with Layout Rules gets a new map from its seed (RaidLayoutPlanner, RaidMapGenerator); any other plays the hand-painted
+/// one, turned by 0–3 quarter turns so one layout feels like four. A Terrain can't be rotated, so either way a copy of its
+/// data is rewritten (the asset itself is never changed) and the navmesh is rebuilt. Runs before RaidGenerator, so spawn
+/// groups fill points that are already in their place.
 /// <para>
 /// Where it belongs: one per raid scene. Reshape the map by repainting the definition's images and pressing Bake in this
 /// component's inspector. Anything that should turn with the map must sit under Content; the player, cameras, lights and
@@ -36,7 +36,9 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
     [Tooltip("Always use this many quarter turns (0–3) instead of the seed's, to test one facing. -1 uses the seed.")]
     [SerializeField, Range(-1, 3)] private int fixedQuarterTurns = -1;
 
+    private readonly List<Vector3> rumourSpots = new List<Vector3>();
     private TerrainData turnedData;
+    private Mesh generatedTrunks;
 
     public RaidMapDefinition Definition => definition;
     public Terrain Terrain => terrain;
@@ -46,6 +48,12 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
 
     /// <summary>How many quarter turns this raid's map was given.</summary>
     public int QuarterTurns { get; private set; }
+
+    /// <summary>This run's generated map, or null when it plays the painted one.</summary>
+    public RaidLayoutPlan Layout { get; private set; }
+
+    /// <summary>Where this run's rumours are to be found on a generated map; empty on a painted one.</summary>
+    public IReadOnlyList<Vector3> RumourSpots => rumourSpots;
 
     // Before RaidGenerator (0): spawn points must already be where the turned map put them.
     public int SetupOrder => -100;
@@ -70,24 +78,22 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
         int seed = RaidDirector.Current != null ? RaidDirector.Current.Session.Seed
             : GameSession.ActiveRaid != null ? GameSession.ActiveRaid.Seed
             : RaidSession.NewSeed();
+        RaidDefinition raid = RaidDirector.Current != null ? RaidDirector.Current.Session.Definition : GameSession.ActiveRaid?.Definition;
+        RaidLayoutRules rules = raid != null ? raid.LayoutRules : null;
+        if (rules != null && definition != null && terrain != null && content != null)
+        {
+            List<NavMeshAgent> paused = PauseAgents();
+            yield return Generate(rules, seed);
+            ResumeAgents(paused);
+            MovePlayerToStart();
+            yield break;
+        }
+
         QuarterTurns = !rotate ? 0 : fixedQuarterTurns >= 0 ? fixedQuarterTurns : MapRotation.Pick(seed);
 
         if (QuarterTurns != 0)
         {
-            // Creatures already on the map are switched off while the ground moves under them, then dropped back on.
-            var agents = new List<NavMeshAgent>();
-            if (content != null)
-            {
-                foreach (NavMeshAgent agent in content.GetComponentsInChildren<NavMeshAgent>())
-                {
-                    if (agent.enabled)
-                    {
-                        agent.enabled = false;
-                        agents.Add(agent);
-                    }
-                }
-            }
-
+            List<NavMeshAgent> agents = PauseAgents();
             TurnTerrain(QuarterTurns);
             yield return null;
             if (content != null)
@@ -100,36 +106,128 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
                 moss.Rebuild();
             }
 
-            Physics.SyncTransforms();
-            if (navMesh != null && navMesh.navMeshData != null)
-            {
-                AsyncOperation building = navMesh.UpdateNavMesh(navMesh.navMeshData);
-                while (building != null && !building.isDone)
-                {
-                    yield return null;
-                }
-            }
-
-            foreach (NavMeshAgent agent in agents)
-            {
-                if (agent != null)
-                {
-                    agent.enabled = true;
-                }
-            }
-
-            // Creatures placed on the map may have started before the turn; their home turned with them.
-            if (content != null)
-            {
-                foreach (MonsterAI monster in content.GetComponentsInChildren<MonsterAI>(true))
-                {
-                    monster.ResetHome();
-                }
-            }
+            yield return RebuildNavMesh();
+            ResumeAgents(agents);
         }
 
         MovePlayerToStart();
         Debug.Log($"Raid map turned {MapRotation.Yaw(QuarterTurns):0}° from seed {seed}.", this);
+    }
+
+    // Each attempt is a new map from the same seed, in the same shape and mood. The trails make every exit reachable by
+    // design; the navmesh has the last word, because a raid without a way out is the one thing that must never happen.
+    private IEnumerator Generate(RaidLayoutRules rules, int seed)
+    {
+        var clock = System.Diagnostics.Stopwatch.StartNew();
+        TerrainData source = terrain.terrainData;
+        turnedData = Instantiate(source);
+        turnedData.name = source.name + " (generated)";
+        terrain.terrainData = turnedData;
+        if (terrain.TryGetComponent(out TerrainCollider ground))
+        {
+            ground.terrainData = turnedData;
+        }
+
+        for (int attempt = 0; attempt < rules.Attempts; attempt++)
+        {
+            Layout = RaidLayoutPlanner.Plan(rules, definition.Size, seed, attempt);
+            yield return null;
+            RaidMapGenerator.ShapeGround(definition, turnedData, Layout, rules);
+            terrain.Flush();
+            yield return null;
+            RebuildTrunks();
+            rumourSpots.Clear();
+            rumourSpots.AddRange(RaidMapGenerator.PlaceContent(this, Layout, rules));
+            if (terrain.TryGetComponent(out TerrainMoss moss))
+            {
+                moss.Rebuild();
+            }
+
+            Physics.SyncTransforms();
+            yield return RebuildNavMesh();
+            if (RaidMapGenerator.ExitsReachable(this, Layout))
+            {
+                Debug.Log($"Raid map generated from seed {seed}: {Layout.Shape.shape}, {Layout.Mood.name}, {Layout.Rooms.Count} clearings, " +
+                          $"{Layout.Links.Count} trails, {turnedData.treeInstanceCount} trees, attempt {attempt + 1}, {clock.ElapsedMilliseconds} ms.", this);
+                yield break;
+            }
+
+            Debug.LogWarning($"Raid map from seed {seed}, attempt {attempt + 1}: no way to an exit on the navmesh.", this);
+        }
+
+        Debug.LogError($"Raid map from seed {seed}: no attempt gave a way to every exit. The player can still walk the trails.", this);
+    }
+
+    private void RebuildTrunks()
+    {
+        Transform holder = content.Find(RaidMapSurface.TrunksName);
+        if (holder == null || !holder.TryGetComponent(out MeshCollider trunks))
+        {
+            return;
+        }
+
+        Mesh mesh = RaidMapSurface.TrunkMesh(terrain, holder.position);
+        trunks.sharedMesh = mesh;
+        if (generatedTrunks != null)
+        {
+            Destroy(generatedTrunks);
+        }
+
+        generatedTrunks = mesh;
+    }
+
+    // Creatures already on the map are switched off while the ground moves under them, then dropped back on.
+    private List<NavMeshAgent> PauseAgents()
+    {
+        var agents = new List<NavMeshAgent>();
+        if (content != null)
+        {
+            foreach (NavMeshAgent agent in content.GetComponentsInChildren<NavMeshAgent>())
+            {
+                if (agent.enabled)
+                {
+                    agent.enabled = false;
+                    agents.Add(agent);
+                }
+            }
+        }
+
+        return agents;
+    }
+
+    private void ResumeAgents(List<NavMeshAgent> agents)
+    {
+        foreach (NavMeshAgent agent in agents)
+        {
+            if (agent != null)
+            {
+                agent.enabled = true;
+            }
+        }
+
+        // Creatures placed on the map may have started before the ground changed; their home moved with them.
+        if (content != null)
+        {
+            foreach (MonsterAI monster in content.GetComponentsInChildren<MonsterAI>(true))
+            {
+                monster.ResetHome();
+            }
+        }
+    }
+
+    private IEnumerator RebuildNavMesh()
+    {
+        Physics.SyncTransforms();
+        if (navMesh == null || navMesh.navMeshData == null)
+        {
+            yield break;
+        }
+
+        AsyncOperation building = navMesh.UpdateNavMesh(navMesh.navMeshData);
+        while (building != null && !building.isDone)
+        {
+            yield return null;
+        }
     }
 
     private void TurnTerrain(int quarterTurns)
@@ -204,6 +302,11 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
         if (turnedData != null)
         {
             Destroy(turnedData);
+        }
+
+        if (generatedTrunks != null)
+        {
+            Destroy(generatedTrunks);
         }
     }
 

@@ -15,8 +15,10 @@ MonoBehaviour:
   id: expedition.bjarne
   displayName: Bjarne
   description: Smith from the expedition into the Unquiet Forest. Lost when the waystone connection broke.
-  rescueLine: You came back. I knew the forest had not taken all of us.
-  arrivalLine: We have a home now. Let us bring the others here.
-  fallenLine: I can't go on... come back for me.
+  rescueLine: You took your time. Mind the hammer.
+  arrivalLine: Where's the anvil? No, don't tell me. I'll find it.
+  welcomeLine: 
+  fallenLine: Tell Sigrid I kept it lit.
   model: {fileID: 4143811845303264333, guid: 98a5e3726f2d59d45b0da93e8ea043b5, type: 3}
-  jobs: []
+  jobs:
+  - {fileID: 11400000, guid: be5a576d696f9f6459c1667a3521f7b8, type: 2}

@@ -256,6 +256,24 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
         }
     }
 
+    /// <summary>
+    /// Plays a sound for something of a given size, where 1 is the size it was made for: a bigger thing is lower, as it
+    /// would be, and a smaller one higher and quieter. So one recording serves a sapling and an old oak.
+    /// </summary>
+    public static void Play(SoundDefinition sound, Vector3 position, float size)
+    {
+        if (instance != null)
+        {
+            instance.PlayEffect(sound, position, size);
+        }
+    }
+
+    /// <summary>How much a sound's pitch moves for a thing of this size.</summary>
+    public static float PitchForSize(float size) => Mathf.Clamp(Mathf.Pow(Mathf.Max(0.01f, size), -0.3f), 0.72f, 1.3f);
+
+    /// <summary>How much of a sound's volume a thing of this size has. Nothing is louder than the sound itself.</summary>
+    public static float VolumeForSize(float size) => Mathf.Clamp(0.5f + 0.5f * size, 0.6f, 1f);
+
     /// <summary>Sets up an audio source the way a sound asks: volume, pitch, 2D or 3D and distances.</summary>
     public static void Configure(AudioSource source, SoundDefinition sound)
     {
@@ -391,7 +409,7 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
         }
 
         bool fighting = enemyChasing
-            || (settings.WeaponDrawnIsCombat && GameStateManager.Instance != null && GameStateManager.Instance.CurrentState == GameState.Combat)
+            || (settings.WeaponDrawnIsCombat && GameStateManager.InCombat)
             || (settings.RecentDamageSeconds > 0f && Time.unscaledTime - lastDamageTime < settings.RecentDamageSeconds);
         if (fighting)
         {
@@ -524,7 +542,7 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
 
     // ----- Effects -----
 
-    private void PlayEffect(SoundDefinition sound, Vector3 position)
+    private void PlayEffect(SoundDefinition sound, Vector3 position, float size = 1f)
     {
         if (sound == null || !sound.HasClips || CountPlaying(sound) >= sound.MaxAtOnce || TooSoon(sound) || OutOfEarshot(sound, position))
         {
@@ -544,6 +562,8 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
         playing[source] = sound;
         source.transform.position = position;
         Configure(source, sound);
+        source.pitch *= PitchForSize(size);
+        source.volume *= VolumeForSize(size);
         source.clip = clip;
         source.Play();
     }

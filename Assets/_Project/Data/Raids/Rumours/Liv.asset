@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 29a4813b55e8bc543a181501cef14e82, type: 3}
+  m_Name: Liv
+  m_EditorClassIdentifier: SafeHaven::RaidRumourDefinition
+  id: rumour.liv
+  briefing: A ring of old stones is said to be humming. There is someone inside it.
+  site: {fileID: 11400000, guid: 6750433c24e26b64fae46bc6a86848a6, type: 2}
+  weight: 2
+  hour: 0
+  seeks: {fileID: 11400000, guid: 8adfc30233928ec499c01587419eabaa, type: 2}
+  teaches: {fileID: 0}
+  breachComing: 0
+  afterExtractions: 1

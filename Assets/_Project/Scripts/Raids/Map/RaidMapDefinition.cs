@@ -11,9 +11,9 @@ using UnityEngine;
 /// candidate points go to the Spawn Groups that name them.</item>
 /// <item>Markers: draggable points for the player start, exits, camps and sites (<see cref="RaidMapMarker"/>).</item>
 /// </list>
-/// Bake turns zones and markers into paint, trees, rocks and spawn points. Used only in the editor: a raid at runtime
-/// turns the baked terrain (RaidMap), it never reads zones or markers. The older images (height, mask, marker PNGs) are
-/// kept only to import from once.
+/// Bake turns zones and markers into paint, trees, rocks and spawn points. A raid playing this map as painted turns the
+/// baked terrain (RaidMap) and never reads zones or markers; a raid with Layout Rules generates its zones on a copy of
+/// this asset (UseGenerated). The older images (height, mask, marker PNGs) are kept only to import from once.
 /// </summary>
 [CreateAssetMenu(fileName = "RaidMap", menuName = "Safe Haven/Raids/Raid Map")]
 public sealed class RaidMapDefinition : ScriptableObject
@@ -205,6 +205,37 @@ public sealed class RaidMapDefinition : ScriptableObject
         {
             zones.Add(new RaidMapZone { name = zoneName, role = role, color = color });
         }
+    }
+
+    /// <summary>
+    /// Makes this copy of a map paint from generated zones, in the forest of the given mood. Only ever for a copy made at
+    /// runtime (Instantiate): the asset itself never changes while playing.
+    /// </summary>
+    public void UseGenerated(int resolution, byte[] path, byte[] forest, byte[] clearing, RaidMapMood mood, int seed)
+    {
+        zoneResolution = resolution;
+        zones.Clear();
+        AddGenerated("Path", RaidZoneRole.Path, path, resolution);
+        AddGenerated("Forest", RaidZoneRole.Forest, forest, resolution);
+        AddGenerated("Clearing", RaidZoneRole.Clearing, clearing, resolution);
+        markers.Clear();
+        scatterSeed = seed;
+        treeSpacing *= mood.treeSpacing;
+        rocksInForest = Mathf.Clamp01(rocksInForest * mood.rocks);
+        for (int i = 0; i < trees.Count && i < mood.treeWeights.Count; i++)
+        {
+            if (trees[i] != null)
+            {
+                trees[i].weight = mood.treeWeights[i];
+            }
+        }
+    }
+
+    private void AddGenerated(string zoneName, RaidZoneRole role, byte[] weights, int resolution)
+    {
+        var zone = new RaidMapZone { name = zoneName, role = role };
+        zone.SetWeights(weights, resolution);
+        zones.Add(zone);
     }
 
     /// <summary>For the image import: replaces the zone resolution (the zones are resampled by EnsureZones).</summary>

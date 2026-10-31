@@ -14,12 +14,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::SoundDefinition
   displayName: Out of Stamina
   clips:
-  - {fileID: 8300000, guid: 4a6ed5d56fa92d54b8be8860f69ac56f, type: 3}
+  - {fileID: 8300000, guid: ee92e2ab68d1c43468a011b9a0e685b7, type: 3}
+  - {fileID: 8300000, guid: d6b5ca97e3d68e941872883b172a8c87, type: 3}
   channel: 2
-  volume: 0.35
+  volume: 0.25
   volumeVariation: 0.1
   pitchRange: {x: 0.94, y: 1.06}
   positional: 0
   fullVolumeDistance: 3
   audibleDistance: 35
   maxAtOnce: 1
+  minimumGap: 0.03
+  priority: 1

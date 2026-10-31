@@ -24,8 +24,10 @@ public readonly struct GatheringSwing
 /// <summary>
 /// Runs the gathering timing minigame on the player. When an interaction starts on a ResourceNode whose tool uses the
 /// minigame (GatheringMinigameSettings), it holds the interaction open and runs a GatheringSession: each Interact or
-/// Attack press is a swing; a whole bar cycle without one is a glancing blow. Glancing blows wear the tool. When the
-/// last swing lands the node completes as usual and every critical adds a bonus of its main yield. Taking damage can
+/// Attack press is a swing; a whole bar cycle without one is a glancing blow. How good a swing was is settled by the press,
+/// so timing stays fair, but the tool then has to come down: the blow itself, with its sound, chips and everything that
+/// follows, happens when it lands. Glancing blows wear the tool. When the last swing lands the node completes as usual and
+/// every critical adds a bonus of its main yield. Taking damage can
 /// interrupt the gather. Each swing is announced through <see cref="Swung"/> (raid noise and forest annoyance listen).
 /// Other nodes keep their timed gather. Lives on the PlayerArmature prefab, next to PlayerInteractor.
 /// </summary>
@@ -37,6 +39,10 @@ public sealed class PlayerGathering : MonoBehaviour
     private PlayerStateMachine stateMachine;
     private Damageable health;
     private PlayerEquipment equipment;
+    private PlayerAnimationController animations;
+    private bool blowComing;
+    private SwingResult blowResult;
+    private float blowLandsAt;
     private Interactable target;
     private ResourceNode node;
     private GatheringToolProfile profile;
@@ -65,6 +71,7 @@ public sealed class PlayerGathering : MonoBehaviour
         stateMachine = GetComponent<PlayerStateMachine>();
         health = GetComponent<Damageable>();
         equipment = GetComponent<PlayerEquipment>();
+        animations = GetComponent<PlayerAnimationController>();
     }
 
     private void Start()
@@ -102,10 +109,16 @@ public sealed class PlayerGathering : MonoBehaviour
         }
 
         Session = null;
+        blowComing = false;
     }
 
     private void Update()
     {
+        if (blowComing && Time.time >= blowLandsAt)
+        {
+            LandBlow();
+        }
+
         if (Session == null || Session.IsComplete)
         {
             return;
@@ -119,7 +132,7 @@ public sealed class PlayerGathering : MonoBehaviour
             {
                 autoTimer = 0f;
                 Session.Resolve(SwingResult.Normal);
-                AfterSwing(SwingResult.Normal);
+                Swing(SwingResult.Normal);
             }
 
             return;
@@ -127,7 +140,7 @@ public sealed class PlayerGathering : MonoBehaviour
 
         if (Session.Tick(Time.deltaTime))
         {
-            AfterSwing(SwingResult.Glancing);
+            Swing(SwingResult.Glancing);
         }
     }
 
@@ -152,6 +165,10 @@ public sealed class PlayerGathering : MonoBehaviour
         this.profile = profile;
         target.HoldOpen = true;
         autoTimer = 0f;
+        if (animations != null)
+        {
+            animations.HoldWorkSwings(started.AnimationType);
+        }
 
         int toolTier = ItemInventory.GatheringTier(gameObject, definition.GatherTool);
         Session = new GatheringSession(
@@ -181,6 +198,7 @@ public sealed class PlayerGathering : MonoBehaviour
             }
         }
 
+        blowComing = false;
         Session = null;
         target = null;
         node = null;
@@ -194,7 +212,7 @@ public sealed class PlayerGathering : MonoBehaviour
             return;
         }
 
-        AfterSwing(Session.Press());
+        Swing(Session.Press());
     }
 
     private void OnDamaged(DamageInfo info, DamageResult result)
@@ -206,8 +224,33 @@ public sealed class PlayerGathering : MonoBehaviour
         }
     }
 
-    private void AfterSwing(SwingResult result)
+    // The player sees at once how the swing went; the blow itself waits for the tool to land.
+    private void Swing(SwingResult result)
     {
+        if (barView != null)
+        {
+            barView.Flash(result == SwingResult.Critical ? "Critical!" : result == SwingResult.Normal ? "Good" : "Glancing", result);
+        }
+
+        if (blowComing)
+        {
+            LandBlow();
+        }
+
+        blowResult = result;
+        float wait = animations != null ? animations.StrikeWork() : 0f;
+        blowComing = true;
+        blowLandsAt = Time.time + wait;
+        if (wait <= 0f)
+        {
+            LandBlow();
+        }
+    }
+
+    private void LandBlow()
+    {
+        blowComing = false;
+        SwingResult result = blowResult;
         GatheringMinigameSettings settings = GatheringMinigameSettings.Current;
         ToolType tool = Tool;
         Vector3 position = target != null ? target.transform.position : transform.position;
@@ -225,11 +268,6 @@ public sealed class PlayerGathering : MonoBehaviour
         if (node != null)
         {
             node.NotifySwing(result, transform.position);
-        }
-
-        if (barView != null)
-        {
-            barView.Flash(result == SwingResult.Critical ? "Critical!" : result == SwingResult.Normal ? "Good" : "Glancing", result);
         }
 
         Swung?.Invoke(new GatheringSwing(result, position, settings.NoiseRadius(result) * loudness, tool, loudness));

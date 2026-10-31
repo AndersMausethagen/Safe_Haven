@@ -58,6 +58,7 @@ MonoBehaviour:
     lootMultiplier: 1.4
     enemyDensity: 1.3
     briefing: Grey dark beyond arm's reach. More of them are out, and stronger; they see no better than you, but they hear as well as ever. They carry twice the Cursed Essence.
+  layoutRules: {fileID: 11400000, guid: b673aa741c95f2547a2a6eb56ee32acc, type: 2}
   enemyDensity: 1.5
   overrideBands: 0
   nearDistance: 25
@@ -273,6 +274,7 @@ MonoBehaviour:
   - rid: 287757967972106337
   - rid: 287757967972106340
   - rid: 287758281410609305
+  - rid: 287758281410609374
   roaming:
     table: {fileID: 11400000, guid: 55a919693f726634aa952bc05b8ac3a3, type: 2}
     firstDelay: 60
@@ -367,3 +369,23 @@ MonoBehaviour:
           intervalSpread: 35
           maxPerRaid: 4
           maxOpenSites: 2
+    - rid: 287758281410609374
+      type: {class: RaidRumoursSystem, ns: , asm: SafeHaven}
+      data:
+        enabled: 1
+        pool:
+        - {fileID: 11400000, guid: 6687458ccdb8cda4f99dd732ac5c7771, type: 2}
+        - {fileID: 11400000, guid: 708a254e7ee8ac44a8a1e638c8e5010f, type: 2}
+        - {fileID: 11400000, guid: 41e1053407fbbfc479b924896108ef07, type: 2}
+        - {fileID: 11400000, guid: b710b538657bbd54c840e6e609c651eb, type: 2}
+        - {fileID: 11400000, guid: 15373f05f33835345be5bf8ffae686a6, type: 2}
+        - {fileID: 11400000, guid: 2c13833fea8c2864ba3482ca88853155, type: 2}
+        - {fileID: 11400000, guid: a46ac6d53cb567a44a39eebbde9b2003, type: 2}
+        - {fileID: 11400000, guid: 4db1a8b60e1233c41932d1e79c395c2a, type: 2}
+        - {fileID: 11400000, guid: fd3d2ac60a7f8054996f51a53d337f9b, type: 2}
+        - {fileID: 11400000, guid: 0e4687401d3ae5748bbb81157720ec5d, type: 2}
+        - {fileID: 11400000, guid: 54554a67a69b1624daabf915c7bd19ca, type: 2}
+        - {fileID: 11400000, guid: 7142359f944d1c74c94de742af777d96, type: 2}
+        - {fileID: 11400000, guid: 22c617519cf0b6d44a7d47dddda2e47b, type: 2}
+        - {fileID: 11400000, guid: e4f11f1cb84c80a469c77bad4e763eb5, type: 2}
+        count: 2

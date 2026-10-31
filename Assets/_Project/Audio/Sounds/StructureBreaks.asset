@@ -14,13 +14,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SoundDefinition
   displayName: Structure Breaks
   clips:
-  - {fileID: 8300000, guid: 1b23b9895fe7ad34c98b2b22d09233c4, type: 3}
-  - {fileID: 8300000, guid: a9322e653fd493d4a996824534f1776f, type: 3}
+  - {fileID: 8300000, guid: cbdc9fa9cbd62104389e09f8459be11c, type: 3}
+  - {fileID: 8300000, guid: bd9797c0e52732049870b60eeddf083f, type: 3}
+  - {fileID: 8300000, guid: 27f4318d659b5964195bebc71330d159, type: 3}
   channel: 2
-  volume: 0.9
+  volume: 0.72
   volumeVariation: 0.1
   pitchRange: {x: 0.95, y: 1.05}
   positional: 1
   fullVolumeDistance: 3
   audibleDistance: 35
-  minimumInterval: 0.05
+  maxAtOnce: 4
+  minimumGap: 0.03
+  priority: 1

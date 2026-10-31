@@ -75,6 +75,20 @@ public static class OutlineCopies
         return result;
     }
 
+    /// <summary>True when every original has gone, as when an object swaps its model: its outlines need making again.</summary>
+    public static bool AllGone(List<Entry> entries)
+    {
+        foreach (Entry entry in entries)
+        {
+            if (entry.Source != null)
+            {
+                return false;
+            }
+        }
+
+        return entries.Count > 0;
+    }
+
     /// <summary>Shows or hides the copies; a copy only shows while its original does.</summary>
     public static void SetShown(List<Entry> entries, bool show)
     {

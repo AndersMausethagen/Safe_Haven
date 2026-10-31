@@ -12,6 +12,12 @@ public enum RaidSiteKind
     SupplyCache = 5,
     EventSite = 6,
     Patrol = 7,
+    /// <summary>Generated maps: a place off the beaten track, for what stands apart (story objects, stones).</summary>
+    Side = 8,
+    /// <summary>Generated maps: where the raid's greatest danger lives.</summary>
+    Apex = 9,
+    /// <summary>Generated maps: where what the briefing's rumours speak of turns out to be.</summary>
+    Rumour = 10,
 }
 
 /// <summary>One marker found on a marker image: its kind and its centre, 0–1 across the map (x right, y up = north).</summary>

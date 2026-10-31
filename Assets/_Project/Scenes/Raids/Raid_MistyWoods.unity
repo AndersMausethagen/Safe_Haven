@@ -599,6 +599,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 57832579}
+  - component: {fileID: 57832580}
   m_Layer: 0
   m_Name: Apex
   m_TagString: Untagged
@@ -623,6 +624,22 @@ Transform:
   - {fileID: 1006530668}
   m_Father: {fileID: 792927705}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &57832580
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 57832578}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 39cbabbfdd334624a9d34665b365dbca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::RaidMapAnchor
+  site: 9
+  follows: {fileID: 0}
+  ring: {fileID: 987247171}
+  ringRadius: 10
 --- !u!1 &58332896
 GameObject:
   m_ObjectHideFlags: 0
@@ -1932,6 +1949,7 @@ GameObject:
   - component: {fileID: 321272995}
   - component: {fileID: 321272997}
   - component: {fileID: 321272996}
+  - component: {fileID: 321272998}
   m_Layer: 0
   m_Name: Echo Zone (starts Echoes in the Wilds)
   m_TagString: Untagged
@@ -1995,6 +2013,22 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 14, y: 4, z: 4}
   m_Center: {x: 0, y: 2, z: 0}
+--- !u!114 &321272998
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 321272994}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 39cbabbfdd334624a9d34665b365dbca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::RaidMapAnchor
+  site: 0
+  follows: {fileID: 1793646273}
+  ring: {fileID: 0}
+  ringRadius: 0
 --- !u!1 &325582580
 GameObject:
   m_ObjectHideFlags: 0
@@ -2917,13 +2951,37 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 8933221789679875159, guid: 5b6b6a84034d49945b10b28c2c445dba, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 457076111}
   m_SourcePrefab: {fileID: 100100000, guid: 5b6b6a84034d49945b10b28c2c445dba, type: 3}
 --- !u!4 &457076109 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7656596623380825417, guid: 5b6b6a84034d49945b10b28c2c445dba, type: 3}
   m_PrefabInstance: {fileID: 457076108}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &457076110 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8933221789679875159, guid: 5b6b6a84034d49945b10b28c2c445dba, type: 3}
+  m_PrefabInstance: {fileID: 457076108}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &457076111
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 457076110}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 39cbabbfdd334624a9d34665b365dbca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::RaidMapAnchor
+  site: 8
+  follows: {fileID: 0}
+  ring: {fileID: 0}
+  ringRadius: 0
 --- !u!1 &467460752
 GameObject:
   m_ObjectHideFlags: 0
@@ -4653,6 +4711,9 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 4812547136345430722, guid: ba6f34ca967a1d043bcee3331d85f1a1, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 711032571}
     - targetCorrespondingSourceObject: {fileID: 3420924203619102392, guid: ba6f34ca967a1d043bcee3331d85f1a1, type: 3}
       insertIndex: -1
       addedObject: {fileID: 711032569}
@@ -4696,6 +4757,27 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_RenderingLayers: 1
   m_ShadowRenderingLayers: 1
+--- !u!1 &711032570 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4812547136345430722, guid: ba6f34ca967a1d043bcee3331d85f1a1, type: 3}
+  m_PrefabInstance: {fileID: 711032566}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &711032571
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 711032570}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 39cbabbfdd334624a9d34665b365dbca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::RaidMapAnchor
+  site: 8
+  follows: {fileID: 0}
+  ring: {fileID: 0}
+  ringRadius: 0
 --- !u!1 &713284711
 GameObject:
   m_ObjectHideFlags: 0
@@ -8407,13 +8489,37 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 826176221312406214, guid: 34ab3b53d3ced634486fa4ab89e59887, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1639889935}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1588459315562376701, guid: 34ab3b53d3ced634486fa4ab89e59887, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1318257369}
   m_SourcePrefab: {fileID: 100100000, guid: 34ab3b53d3ced634486fa4ab89e59887, type: 3}
 --- !u!4 &1318257367 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 826176221312406214, guid: 34ab3b53d3ced634486fa4ab89e59887, type: 3}
   m_PrefabInstance: {fileID: 1318257366}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1318257368 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1588459315562376701, guid: 34ab3b53d3ced634486fa4ab89e59887, type: 3}
+  m_PrefabInstance: {fileID: 1318257366}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1318257369
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1318257368}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 39cbabbfdd334624a9d34665b365dbca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::RaidMapAnchor
+  site: 8
+  follows: {fileID: 0}
+  ring: {fileID: 0}
+  ringRadius: 0
 --- !u!1 &1318405199
 GameObject:
   m_ObjectHideFlags: 0
@@ -11761,6 +11867,9 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 8933221789679875159, guid: 5b6b6a84034d49945b10b28c2c445dba, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1854051806}
     - targetCorrespondingSourceObject: {fileID: 4352166826710475781, guid: 5b6b6a84034d49945b10b28c2c445dba, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1854051804}
@@ -11804,6 +11913,27 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_RenderingLayers: 1
   m_ShadowRenderingLayers: 1
+--- !u!1 &1854051805 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8933221789679875159, guid: 5b6b6a84034d49945b10b28c2c445dba, type: 3}
+  m_PrefabInstance: {fileID: 1854051801}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1854051806
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1854051805}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 39cbabbfdd334624a9d34665b365dbca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::RaidMapAnchor
+  site: 8
+  follows: {fileID: 0}
+  ring: {fileID: 0}
+  ringRadius: 0
 --- !u!1 &1858224423
 GameObject:
   m_ObjectHideFlags: 0
@@ -12413,6 +12543,9 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 8933221789679875159, guid: 5b6b6a84034d49945b10b28c2c445dba, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1944667218}
     - targetCorrespondingSourceObject: {fileID: 4352166826710475781, guid: 5b6b6a84034d49945b10b28c2c445dba, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1944667216}
@@ -12456,6 +12589,27 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_RenderingLayers: 1
   m_ShadowRenderingLayers: 1
+--- !u!1 &1944667217 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8933221789679875159, guid: 5b6b6a84034d49945b10b28c2c445dba, type: 3}
+  m_PrefabInstance: {fileID: 1944667213}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1944667218
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1944667217}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 39cbabbfdd334624a9d34665b365dbca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::RaidMapAnchor
+  site: 8
+  follows: {fileID: 0}
+  ring: {fileID: 0}
+  ringRadius: 0
 --- !u!1 &1949722248
 GameObject:
   m_ObjectHideFlags: 0
@@ -12808,6 +12962,7 @@ GameObject:
   - component: {fileID: 2005837647}
   - component: {fileID: 2005837649}
   - component: {fileID: 2005837648}
+  - component: {fileID: 2005837650}
   m_Layer: 0
   m_Name: Western Beacon Zone
   m_TagString: Untagged
@@ -12871,6 +13026,22 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 10, y: 4, z: 10}
   m_Center: {x: 0, y: 2, z: 0}
+--- !u!114 &2005837650
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2005837646}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 39cbabbfdd334624a9d34665b365dbca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::RaidMapAnchor
+  site: 0
+  follows: {fileID: 514469397}
+  ring: {fileID: 0}
+  ringRadius: 0
 --- !u!1 &2006522153
 GameObject:
   m_ObjectHideFlags: 0

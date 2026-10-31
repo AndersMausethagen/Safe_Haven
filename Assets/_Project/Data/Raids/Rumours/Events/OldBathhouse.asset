@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2f02987ee9197d4682f5db8cbc7a967, type: 3}
+  m_Name: OldBathhouse
+  m_EditorClassIdentifier: SafeHaven::RaidEventDefinition
+  id: rumour.oldbathhouse
+  displayName: The Old Bathhouse
+  weight: 0
+  earliestSeconds: 30
+  latestSecondsLeft: 60
+  minimumStage: 0
+  warning: 
+  warningSound: {fileID: 0}
+  sitePrefab: {fileID: 6554907131674613032, guid: 4160c0bc109aa1c42a6b0cf7da29d19c, type: 3}
+  siteDistance: {x: 35, y: 70}
+  siteText: Four walls and half a roof, and a door with a drawing cut into it.
+  onStart: []
+  choices:
+  - label: Copy the plans
+    detail: Half a minute with a bit of birch bark.
+    cost: []
+    result: It's better made than anything at home.
+    outcomes:
+    - rid: 287758281410609440
+    - rid: 287758281410609441
+  references:
+    version: 2
+    RefIds:
+    - rid: 287758281410609440
+      type: {class: ChangeTimeOutcome, ns: , asm: SafeHaven}
+      data:
+        seconds: -30
+    - rid: 287758281410609441
+      type: {class: GiveLootOutcome, ns: , asm: SafeHaven}
+      data:
+        loot:
+          entries:
+          - item: {fileID: 11400000, guid: c8b25d484404a234a8baf2c2dcf7394a, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 1
+            maxQuantity: 1
+            probability: 1

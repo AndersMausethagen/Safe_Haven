@@ -71,7 +71,7 @@ public static class BuildOldMossTroll
             clips.ClearArray();
             for (int i = 0; i < 5; i++)
             {
-                var clip = AssetDatabase.LoadAssetAtPath<AudioClip>($"Assets/_Project/Audio/SFX/Kenney Impact/impactSoft_heavy_00{i}.ogg");
+                var clip = AssetDatabase.LoadAssetAtPath<AudioClip>($"Assets/_Project/Audio/SFX/Safe Haven World/Troll Step {i + 1}.wav");
                 if (clip != null)
                 {
                     clips.InsertArrayElementAtIndex(clips.arraySize);
@@ -81,7 +81,7 @@ public static class BuildOldMossTroll
 
             so.FindProperty("volume").floatValue = 1f;
             so.FindProperty("volumeVariation").floatValue = 0.1f;
-            so.FindProperty("pitchRange").vector2Value = new Vector2(0.35f, 0.45f);
+            so.FindProperty("pitchRange").vector2Value = new Vector2(0.94f, 1.06f);
             so.FindProperty("positional").boolValue = true;
             so.FindProperty("fullVolumeDistance").floatValue = 8f;
             so.FindProperty("audibleDistance").floatValue = 55f;

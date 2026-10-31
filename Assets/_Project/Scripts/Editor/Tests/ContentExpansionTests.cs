@@ -126,7 +126,8 @@ public sealed class ContentExpansionTests
     [Test]
     public void EveryEventIsCompleteAndInTheRaidsPool()
     {
-        List<RaidEventDefinition> events = All<RaidEventDefinition>().ToList();
+        // A rumour's event has weight 0: it is placed by the rumour, not drawn (RaidReasonsTests covers those).
+        List<RaidEventDefinition> events = All<RaidEventDefinition>().Where(definition => definition.Weight > 0f).ToList();
         Assert.GreaterOrEqual(events.Count, 8);
         var raid = AssetDatabase.LoadAssetAtPath<RaidDefinition>("Assets/_Project/Data/Raids/MistyWoods.asset");
         RaidEventsSystem system = raid.Systems.OfType<RaidEventsSystem>().FirstOrDefault();

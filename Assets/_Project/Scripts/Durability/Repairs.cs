@@ -62,7 +62,9 @@ public static class Repairs
             return cost;
         }
 
-        float share = settings.FullRepairCostShare * (1f - stack.Durability) / Mathf.Max(1, recipe.OutputAmount);
+        // A smith makes repairs cheaper.
+        float discount = Mathf.Clamp01(GameSession.Settlement.JobBonus(job => job.GearRepairDiscount));
+        float share = settings.FullRepairCostShare * (1f - discount) * (1f - stack.Durability) / Mathf.Max(1, recipe.OutputAmount);
         foreach (ItemAmount part in recipe.ItemCost)
         {
             int amount = Share(part.Item != null ? part.Amount : 0, share, settings);

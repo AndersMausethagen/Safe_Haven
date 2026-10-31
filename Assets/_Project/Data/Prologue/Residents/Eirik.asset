@@ -15,8 +15,10 @@ MonoBehaviour:
   id: expedition.eirik
   displayName: Eirik
   description: Soldier from the expedition into the Unquiet Forest. Lost when the waystone connection broke.
-  rescueLine: You came back. I knew the forest had not taken all of us.
-  arrivalLine: We have a home now. Let us bring the others here.
-  fallenLine: I can't go on... come back for me.
+  rescueLine: Took you long enough. How many are behind you?
+  arrivalLine: Show me the wall. Then show me where it's weakest.
+  welcomeLine: 
+  fallenLine: Go. I've held worse.
   model: {fileID: 4143811845303264333, guid: 98a5e3726f2d59d45b0da93e8ea043b5, type: 3}
-  jobs: []
+  jobs:
+  - {fileID: 11400000, guid: f918ba89b7b235448905310320940c70, type: 2}

@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad044708340368842899cf78f08bfbfb, type: 3}
+  m_Name: Carpenter
+  m_EditorClassIdentifier: SafeHaven::JobDefinition
+  id: job.carpenter
+  displayName: Carpenter
+  description: 'Sees to what the forest breaks: mending buildings after a breach costs half, and work at the sawbench goes faster.'
+  acceptLine: '"I''ll have that lot square by morning."'
+  teachesBuildings: []
+  teachesRecipes: []
+  workplace: {fileID: 11400000, guid: 1fe15b30940bf7049a4e4966e9954e1b, type: 2}
+  assignedEvent: {fileID: 0}
+  extraRumours: 0
+  gearRepairDiscount: 0
+  buildingRepairDiscount: 0.5
+  wardHealth: 0
+  raidSeconds: 0

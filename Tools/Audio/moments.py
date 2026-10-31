@@ -1,17 +1,22 @@
 """Synthesises the moments that had no sound: a ward breach from warning to end, a stack dropped, a mouthful eaten.
 
-The toll is a low bell: inharmonic partials that ring and die at their own rates.
-The horn is a blown animal horn: a buzzing sawtooth swelling through a soft resonance, sliding up to its note.
-The ward mending is a warm chord rising out of a low hum. The ward falling is that hum breaking and sinking.
+The toll is a great cast bell heard across a valley. The horn is lip-reed: breath drives a buzz that grows brighter as it
+grows louder, as brass and animal horn do, and there are three of them, not quite together, from different distances.
+The ward mending is a held fifth in low strings and voices with a lyre across it, relieved rather than triumphant. The
+ward falling is stone cracking and the same strings sinking away under it.
 A dropped stack is a soft thud with a little rustle. A bite is a few short wet crunches.
 
 Run from the project root: python Tools/Audio/moments.py
 """
 import os
+import sys
 
 import numpy as np
 from scipy.io import wavfile
 from scipy.signal import butter, sosfilt
+
+sys.path.insert(0, os.path.dirname(__file__))
+import foley  # noqa: E402
 
 RATE = 44100
 OUT = "Assets/_Project/Audio/SFX/Safe Haven Moments"
@@ -42,46 +47,62 @@ def save(name, signal, peak=0.85):
 
 
 def toll():
-    t = times(4.5)
-    partials = [(0.56, 1.0, 2.6), (1.0, 0.8, 1.9), (1.19, 0.55, 1.5), (1.5, 0.4, 1.1), (2.0, 0.3, 0.8), (2.74, 0.18, 0.5), (3.76, 0.1, 0.3)]
-    base = 196.0
-    bell = sum(level * np.sin(2 * np.pi * base * ratio * t) * np.exp(-t / decay) for ratio, level, decay in partials)
-    strike = band(rng.standard_normal(len(t)), 300, 1800) * np.exp(-t / 0.018) * 0.5
-    return bell + strike
+    random = foley.seeded("Ward Toll")
+    seconds = 7.0
+    tolled = foley.bell(146.83, seconds, random, hold=1.5)
+    weight = foley.thump(random, seconds, 36, 80, 0.3, 0.05) * 0.3
+    return foley.space(foley.darken(tolled / np.abs(tolled).max() + weight, top=-3, weight=3), foley.VALE, 0.42)
 
 
-def horn(seconds=2.6, note=146.0):
-    t = times(seconds)
-    slide = note * (0.84 + 0.16 * np.clip(t / 0.22, 0, 1) ** 0.5)
-    wobble = 1 + 0.006 * np.sin(2 * np.pi * 5.2 * t) * np.clip((t - 0.5) / 0.5, 0, 1)
-    phase = np.cumsum(slide * wobble) / RATE
-    saw = 2 * (phase % 1) - 1
-    body = band(saw, 180, 900) + 0.5 * band(saw, 1000, 2200)
-    breath = band(rng.standard_normal(len(t)), 800, 3000) * 0.04
-    swell = np.clip(t / 0.3, 0, 1) * np.clip((seconds - t) / 0.7, 0, 1) ** 1.5
-    return (body + breath) * swell
+def blast(seconds, note, random):
+    t = foley.times(seconds)
+    swell = np.clip(t / 0.42, 0, 1) ** 0.8 * np.clip((seconds - t) / 1.1, 0, 1) ** 1.4
+    slide = note * (0.84 + 0.16 * np.clip(t / 0.28, 0, 1) ** 0.5)
+    tremble = foley.lowpass(foley.white(len(t), random), 9)
+    tremble /= max(1e-9, np.abs(tremble).max())
+    phase = np.cumsum(slide * (1 + 0.005 * tremble + 0.003 * np.sin(foley.TAU * 5.1 * t) * np.clip((t - 0.7) / 0.6, 0, 1))) / RATE
+    buzz = np.tanh((0.8 + 5.5 * swell) * np.sin(foley.TAU * phase) + 0.5 * swell * np.sin(foley.TAU * 2 * phase))
+    bore = foley.band(buzz, 110, 680) + 0.6 * foley.band(buzz, 680, 1500) + 0.16 * foley.band(buzz, 1500, 3200)
+    breath = foley.band(foley.pink(len(t), random), 500, 2400) * 0.035
+    return (bore + breath) * swell
+
+
+def horn():
+    random = foley.seeded("War Horn")
+    seconds = 5.0
+    near = blast(4.2, 98.0, random)
+    second = blast(4.0, 98.4, random)
+    far = blast(3.8, 146.8, random)
+    mix = foley.place(foley.place(foley.place(foley.blank(seconds), near, 0), second, 0.07, 0.7), far, 0.19, 0.3)
+    return foley.space(foley.darken(mix, top=-4, weight=4), foley.VALE, 0.55)
 
 
 def mended():
-    t = times(3.6)
-    chord = [130.8, 196.0, 261.6, 329.6, 392.0]
-    total = np.zeros(len(t))
-    for i, pitch in enumerate(chord):
-        rise = np.clip((t - i * 0.16) / 0.4, 0, 1)
-        fall = np.exp(-np.clip(t - 1.1 - i * 0.16, 0, None) / 1.0)
-        tone = np.sin(2 * np.pi * pitch * t) + 0.3 * np.sin(4 * np.pi * pitch * t) + 0.3 * np.sin(2 * np.pi * pitch * 1.003 * t)
-        total += tone * rise * fall
-    return total
+    random = foley.seeded("Ward Mended")
+    seconds = 5.0
+    low, fifth, high = 73.42, 110.0, 146.83
+    strings = foley.bowed(low, seconds, random, 0.5) + foley.bowed(fifth, seconds, random, 0.7) * 0.7 + foley.bowed(high, seconds, random, 0.9) * 0.4
+    voices = foley.choir(low * 2, seconds, random, attack=1.4) + foley.choir(fifth * 2, seconds, random, attack=1.6) * 0.6
+    strum = foley.blank(seconds)
+    for i, pitch in enumerate((low, fifth, high, 220.0, 293.66)):
+        foley.place(strum, foley.lyre(pitch, seconds, random), 0.5 + i * 0.06, 1 - i * 0.1)
+    mix = strings / np.abs(strings).max() * 0.55 + voices / np.abs(voices).max() * 0.4 + strum / np.abs(strum).max() * 0.5
+    return foley.space(foley.darken(mix, weight=2), foley.HALL, 0.4)
 
 
 def falls():
-    t = times(4.0)
-    pitch = 110.0 * np.exp(-t / 2.4)
-    drone = np.sin(2 * np.pi * np.cumsum(pitch) / RATE) + 0.6 * np.sin(2 * np.pi * np.cumsum(pitch * 1.5) / RATE)
-    tremble = 1 + 0.5 * np.sin(2 * np.pi * (9 - t * 1.6) * t)
-    crack = band(rng.standard_normal(len(t)), 90, 500) * np.exp(-t / 0.9) * 1.6
-    fade = np.clip(t / 0.05, 0, 1) * np.clip((4.0 - t) / 2.2, 0, 1)
-    return (drone * tremble + crack) * fade
+    random = foley.seeded("Ward Falls")
+    seconds = 5.5
+    t = foley.times(seconds)
+    crack = foley.strike(foley.stone(300, random, 40), seconds, 0.0008, random) * 3
+    debris = foley.scatter(2.4, 110, lambda: foley.chip(random, 400, 2200), random, early=1.5)
+    pitch = 73.42 * np.exp(-t / 3.4)
+    phase = np.cumsum(pitch) / RATE
+    saw = 2 * (phase % 1) - 1
+    sinking = (foley.band(saw, 50, 420) + 0.4 * foley.band(saw, 420, 1000)) * np.clip((seconds - t) / 3.4, 0, 1) ** 1.5 * (0.7 + 0.3 * np.sin(foley.TAU * (6 - t * 0.8) * t))
+    low = foley.band(foley.pink(len(t), random), 40, 240) * foley.bump(t, 0.01, 0.04, 1.1)
+    mix = foley.place(crack + foley.thump(random, seconds, 32, 100, 0.4, 0.05) * 1.3 + low + sinking * 0.8, debris, 0.02, 0.5)
+    return foley.space(foley.darken(foley.drive(mix, 2.0), weight=5), foley.VALE, 0.5)
 
 
 def thud(weight):
@@ -103,10 +124,10 @@ def bite():
 
 def main():
     os.makedirs(OUT, exist_ok=True)
-    save("Ward Toll", toll(), 0.8)
-    save("War Horn", horn(), 0.8)
-    save("Ward Mended", mended(), 0.7)
-    save("Ward Falls", falls(), 0.8)
+    foley.save(OUT, "Ward Toll", toll(), 0.85)
+    foley.save(OUT, "War Horn", horn(), 0.85)
+    foley.save(OUT, "Ward Mended", mended(), 0.8)
+    foley.save(OUT, "Ward Falls", falls(), 0.85)
     for i, weight in enumerate((1.0, 1.4, 0.8)):
         save(f"Item Drop {i + 1}", thud(weight), 0.75)
     for i in range(4):

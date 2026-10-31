@@ -264,7 +264,7 @@ public sealed class RaidPreparationWindow : MonoBehaviour
 
         raidLabel.text = $"{raid.DisplayName}  <size=16>{Tiers.RichLabel(raid.Tier)}{(raid.IsLocked ? "  <color=#AAB0BC>locked</color>" : "")}</size>";
         RaidTimeOfDay timeOfDay = RaidTimeOfDay.For(raid, pendingSeed);
-        descriptionLabel.text = raid.Description + DescribeTimeOfDay(timeOfDay) + DescribeBriefing(raid);
+        descriptionLabel.text = raid.Description + DescribeRumours(raid) + DescribeTimeOfDay(timeOfDay) + DescribeLayout(raid) + DescribeBriefing(raid);
 
         var modifiers = new List<RaidModifierDefinition>();
         foreach (ItemDefinition item in picked)
@@ -272,7 +272,7 @@ public sealed class RaidPreparationWindow : MonoBehaviour
             modifiers.Add(item.RaidModifier);
         }
 
-        RaidParameters rules = RaidParameters.Calculate(raid, modifiers, sparks * SettlementSettings.Current.SecondsPerSpark, timeOfDay);
+        RaidParameters rules = RaidParameters.Calculate(raid, modifiers, RaidLauncher.ExtraSeconds(sparks), timeOfDay);
         var builder = new StringBuilder();
         AppendRule(builder, "Time limit", RaidStats.FormatTime(rules.Duration), raid, rules, RaidStat.Duration);
         AppendRule(builder, "Extraction", $"{rules.ExtractionTime:0.#}s", raid, rules, RaidStat.ExtractionTime);
@@ -296,6 +296,30 @@ public sealed class RaidPreparationWindow : MonoBehaviour
         int hours = Mathf.FloorToInt(timeOfDay.hour) % 24;
         int minutes = Mathf.FloorToInt((timeOfDay.hour - Mathf.Floor(timeOfDay.hour)) * 60f);
         return $"\n<color=#C9B8FF>Time of day:</color> {timeOfDay.DisplayName} ({hours:00}:{minutes:00}){reward}.{line}";
+    }
+
+    // A new forest every run: the briefing says which, as its seed is already rolled.
+    private string DescribeLayout(RaidDefinition raid)
+    {
+        if (raid.LayoutRules == null)
+        {
+            return "";
+        }
+
+        (RaidShapeRule shape, RaidMapMood mood) = RaidLayoutPlanner.Choose(raid.LayoutRules, pendingSeed);
+        return $"\n<color=#9FD3C7>This run:</color> {mood.name}. {mood.briefing} {shape.briefing}";
+    }
+
+    private string DescribeRumours(RaidDefinition raid)
+    {
+        List<RaidRumourDefinition> rumours = RaidRumours.For(raid, pendingSeed, GameSession.Settlement, player != null ? player.GetComponent<PlayerCrafting>() : null);
+        var builder = new StringBuilder();
+        foreach (RaidRumourDefinition rumour in rumours)
+        {
+            builder.Append("\n<color=#FFD27A>Rumour:</color> ").Append(rumour.Briefing);
+        }
+
+        return builder.ToString();
     }
 
     private static string DescribeBriefing(RaidDefinition raid)

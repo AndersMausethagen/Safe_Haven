@@ -45,7 +45,7 @@ public sealed class GameSystems : MonoBehaviour
         var audioSettings = Resources.Load<AudioSettingsDefinition>(AudioSettingsDefinition.ResourceName);
         if (audioSettings != null)
         {
-            Add<AudioManager>().Initialise(audioSettings);
+            Add<AudioManager>(audio => audio.Initialise(audioSettings));
         }
         else
         {
@@ -55,7 +55,7 @@ public sealed class GameSystems : MonoBehaviour
         var content = Resources.Load<ContentDatabase>(ContentDatabase.ResourceName);
         if (content != null)
         {
-            Add<QuestManager>().Initialise(content);
+            Add<QuestManager>(quests => quests.Initialise(content));
         }
         else
         {
@@ -63,23 +63,32 @@ public sealed class GameSystems : MonoBehaviour
         }
 
         // Falls back to built-in defaults when the asset is missing, so combat always has feedback.
-        Add<CombatFeedback>().Initialise(CombatFeelSettings.Current);
+        Add<CombatFeedback>(feedback => feedback.Initialise(CombatFeelSettings.Current));
 
-        Add<SettlementSystem>().Initialise(SettlementSettings.Current);
+        Add<SettlementSystem>(settlement => settlement.Initialise(SettlementSettings.Current));
 
-        Add<PlaytestLogger>().Initialise(PlaytestSettings.Current);
+        Add<PlaytestLogger>(logger => logger.Initialise(PlaytestSettings.Current));
 
-        Add<ExperienceTracker>().Initialise(LevelingSettings.Current);
-        Add<OptionsSystem>().Initialise();
+        Add<ExperienceTracker>(experience => experience.Initialise(LevelingSettings.Current));
+        Add<OptionsSystem>(options => options.Initialise());
 
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
-    private T Add<T>() where T : Component, IGameSystem
+    // Each system starts in isolation, as it is told about scenes in isolation: one that fails is left out, and the others still run.
+    private void Add<T>(Action<T> initialise) where T : Component, IGameSystem
     {
         var system = gameObject.AddComponent<T>();
-        systems.Add(system);
-        return system;
+        try
+        {
+            initialise(system);
+            systems.Add(system);
+        }
+        catch (Exception exception)
+        {
+            Debug.LogException(exception, system);
+            Destroy(system);
+        }
     }
 
     private void OnDestroy()

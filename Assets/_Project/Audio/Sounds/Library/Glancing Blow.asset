@@ -14,16 +14,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::SoundDefinition
   displayName: Glancing Blow
   clips:
-  - {fileID: 8300000, guid: 0f2b205bb7eaa00468214b5a91ebc75c, type: 3}
-  - {fileID: 8300000, guid: fd339af9f086db14388a9b0d231b563d, type: 3}
-  - {fileID: 8300000, guid: a3366ca46fbe94840a973bdc6d43e9d1, type: 3}
-  - {fileID: 8300000, guid: ee0bc5d7e66bfff4bad97f72a159b92f, type: 3}
-  - {fileID: 8300000, guid: e5479f628f7df0a41b81f3db3800308c, type: 3}
+  - {fileID: 8300000, guid: 36fddba627f0a8043944f889a2c89d36, type: 3}
+  - {fileID: 8300000, guid: a5b886d92b793b44cae23384145b8739, type: 3}
+  - {fileID: 8300000, guid: 01753f9da8b6e6d47b162df2bff361f2, type: 3}
+  - {fileID: 8300000, guid: cb7c750e8b117d945bc4d35fcf704730, type: 3}
   channel: 2
-  volume: 0.6
+  volume: 0.33
   volumeVariation: 0.1
-  pitchRange: {x: 1.05, y: 1.2}
+  pitchRange: {x: 0.94, y: 1.06}
   positional: 1
   fullVolumeDistance: 3
   audibleDistance: 35
   maxAtOnce: 4
+  minimumGap: 0.03
+  priority: 1

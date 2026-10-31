@@ -141,6 +141,12 @@ public static class AltarWork
         foreach (Held held in Gear(user))
         {
             ItemStack stack = held.Stack;
+            // A relic's power can't be undone here: losing it to a misclick would be the worst loss in the game.
+            if (stack.Enchantment != null && stack.Enchantment.IsRelic)
+            {
+                continue;
+            }
+
             AltarSubject subject = Subject(held);
             foreach (EnchantmentDefinition enchantment in EssenceSettings.Current.Enchantments)
             {

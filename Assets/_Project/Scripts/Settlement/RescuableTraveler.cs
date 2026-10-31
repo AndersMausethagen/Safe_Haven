@@ -48,6 +48,23 @@ public sealed class RescuableTraveler : MonoBehaviour, IInteractionName
     // Hidden until freed: the player doesn't know who it is yet.
     public string InteractionName => resident == null ? null : IsFollowing ? resident.DisplayName : "Someone hiding";
 
+    /// <summary>
+    /// Brings someone out of a raid event already following the player, whoever the prefab was made for. The copy starts
+    /// under an inactive parent so that it doesn't wake as the prefab's own person.
+    /// </summary>
+    public static RescuableTraveler Spawn(RescuableTraveler prefab, ResidentDefinition who, Vector3 position, Transform parent)
+    {
+        var holder = new GameObject("Traveler");
+        holder.SetActive(false);
+        RescuableTraveler traveler = Instantiate(prefab, position, Quaternion.identity, holder.transform);
+        traveler.resident = who;
+        traveler.transform.SetParent(parent, true);
+        Destroy(holder);
+        traveler.OnFreed();
+        traveler.interactable.enabled = false;
+        return traveler;
+    }
+
     private void Awake()
     {
         interactable = GetComponent<Interactable>();

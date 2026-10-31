@@ -31,6 +31,8 @@ MonoBehaviour:
   gatherRange: 1.8
   depleteOnGather: 1
   respawnSeconds: 900
-  feedback: {fileID: 11400000, guid: 5c06cdc7d2e3557468f3fdeb64576beb, type: 2}
+  feedback: {fileID: 11400000, guid: e21771d5d49e3bc4a98faf50ad4cc586, type: 2}
   worldModelPrefab: {fileID: 0}
   worldPrefab: {fileID: 0}
+  modelVariants: []
+  variantScale: {x: 0.9, y: 1.1}

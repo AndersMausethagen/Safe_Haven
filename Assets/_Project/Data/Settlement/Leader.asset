@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad044708340368842899cf78f08bfbfb, type: 3}
+  m_Name: Leader
+  m_EditorClassIdentifier: SafeHaven::JobDefinition
+  id: job.leader
+  displayName: Leader
+  description: 'Keeps the portal''s watch: 30 more seconds in every raid, and everyone knows where they stand.'
+  acceptLine: '"We go out together, and we come back together."'
+  teachesBuildings: []
+  teachesRecipes: []
+  workplace: {fileID: 11400000, guid: b7c331e0fe28cf24a82f9fff7bc38e44, type: 2}
+  assignedEvent: {fileID: 0}
+  extraRumours: 0
+  gearRepairDiscount: 0
+  buildingRepairDiscount: 0
+  wardHealth: 0
+  raidSeconds: 30

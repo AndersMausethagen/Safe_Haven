@@ -267,7 +267,8 @@ public sealed class WardBreachDirector : MonoBehaviour
         }
 
         ward = Instantiate(prefab, HeartTree.Current.transform.position, Quaternion.identity);
-        float stronger = GameSession.Settlement.WardLevel * WardBreachSettings.Current.WardHealthPerLevel;
+        float stronger = GameSession.Settlement.WardLevel * WardBreachSettings.Current.WardHealthPerLevel
+                         + GameSession.Settlement.JobBonus(job => job.WardHealth);
         ward.GetComponent<Combatant>().Stats.AddModifier(new StatModifier(StatType.MaxHealth, StatModifierOp.Percent, stronger, this));
         ward.Heal(ward.MaxHealth);
         ward.Died += OnWardFell;
@@ -285,11 +286,13 @@ public sealed class WardBreachDirector : MonoBehaviour
                 AudioManager.Play(AudioManager.Sounds?.BreachBegins, transform.position);
             }
 
+            // What was done to the breach's source in a raid leaves it short of fighters, though never of all of them.
             List<GameObject> roster = running.Roster(wave);
-            for (int i = 0; i < roster.Count && IsActive; i++)
+            int fielded = Mathf.Max(1, Mathf.RoundToInt(roster.Count * (1f - GameSession.Settlement.BreachWeakening)));
+            for (int i = 0; i < fielded && IsActive; i++)
             {
                 Spawn(roster[i]);
-                if (i < roster.Count - 1)
+                if (i < fielded - 1)
                 {
                     yield return new WaitForSeconds(running.SecondsBetweenEnemies);
                 }
@@ -336,7 +339,7 @@ public sealed class WardBreachDirector : MonoBehaviour
             loot.enabled = false;
         }
 
-        float stronger = WardBreachSettings.Current.Strength(GameSession.Settlement.BreachesWon);
+        float stronger = WardBreachSettings.Current.Strength(GameSession.Settlement.BreachesWon) * (1f - GameSession.Settlement.BreachWeakening);
         if (enemy.TryGetComponent(out Combatant combatant))
         {
             StatSheet stats = combatant.Stats;

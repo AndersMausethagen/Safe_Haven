@@ -225,6 +225,8 @@ out into the dark is fair game. They come out of sight, close in now and then, a
 a breach, while the player is away, or before the first breach is won. Torches built at the edge of the clearing push
 the dark back: this is how the home grows into the night (see Docs/Atmosphere.md).
 
+**What prowlers carry (amended October 31, 2026).** Prowlers drop hide and bone but no Cursed Essence. Essence is the raids' reward: at home it would be free, with nothing at risk and no extraction to survive.
+
 ### 6.4 Extending the clearing
 
 The player may expand buildable space through runes, Heart Tree upgrades, specific resources, or story milestones. Expansion should produce a visible change to the settlement and unlock meaningful placement options, rather than simply adding empty ground.
@@ -275,7 +277,7 @@ arm's reach and monsters see less far too, but hear as well as ever. Night pays 
 +15%) so the choice to go in at night is a real one.
 
 **Night is dangerous, and worth it (amended October 31, 2026).** In the dark of night, in a raid or at home, creatures have
-30% more health and deal 25% more damage, and they carry twice the Cursed Essence; dusk counts for a share of that. A night
+30% more health and deal 25% more damage; dusk counts for a share of that. In a raid they also carry twice the Cursed Essence; at home they carry none (§6.3). A night
 raid holds 30% more creatures, dusk 15%. Breach attackers carry no loot, so a defense is never the way to farm it.
 
 ### 7.4 Raid objectives
@@ -286,9 +288,25 @@ Resource run, scouting, NPC rescue, missing-person search, lost-carriage recover
 
 Display destination, difficulty band, likely resource types, known enemies, objective, base duration, purchased extensions, extraction rules, deployed equipment, companion risk, projected load capacity, and clear “what can be lost” language. Known landmark and scout information should appear here.
 
+**Rumours (added October 31, 2026).** The briefing also says what is out there on this run: "A saw was heard in the deep woods, where nobody saws." Every rumour is true. What it promises stands at its own place on the map, marked by a gold beacon and listed on the HUD with its distance, for the whole raid, so a run has a reason from its first second. Two come up each run, or three with a Tracker at home. They come from the same seed as the hour and the map, so what the briefing says is what the raid holds, and some are only true after dark. A rumour only comes up while it can still matter: nobody is sought who has come home, and no plans are offered for what is already known.
+
 ### 7.6 Procedural fairness
 
 Randomness changes the details, not whether the raid is completable. A viable route and reachable extraction must always exist. Avoid placing mutually blocking events in mandatory corridors. Use reproducible seeds and objective validation so difficulty can be tuned and bugs reproduced.
+
+### 7.7 What only raids can give
+
+**The Haven makes more of what it knows; it can't make anything new.** Home is reliable and renewable. What is one of a kind, lost or alive is out there, and raids are how it comes home. Materials alone aren't a reason to go: going out for iron to make gear for going out is a circle. These are worth a raid for their own sake:
+
+| Reward | What it is | Why it has to be a raid |
+| --- | --- | --- |
+| **Relics** (§13.6) | Gear with a power that changes how it plays | Nobody at home can make one, and it never runs out: any piece of gear with any power that fits |
+| **People** (§15.3) | The lost expedition, each with a job that does something | A person not extracted doesn't arrive |
+| **Lost knowledge** | Plans for the Wainwright's Yard and the Sauna, the Moonsilver Folio | Taught only by what is found, and read only at home, so it has to survive the way back |
+| **Living things** | Bees (the Beehive), wild seed (new crops), an Elder sapling (a tree that stands in the Haven) | The Haven visibly grows from what was carried home |
+| **Blows against a breach** (§6.6) | Tearing down the place a coming breach gathers | A strike here means fewer and weaker attackers at home: up to 60% off, and it lasts until that breach is beaten |
+
+Cursed Essence belongs on this list too: it comes from raids alone (§6.3).
 
 ## 8. Extraction, loss, and recovery
 
@@ -337,6 +355,17 @@ Attacking, guarding, dodging or casting lets go at once, with no key to press, a
 ### 9.1 Map assembly
 
 Use **hand-authored terrain modules assembled procedurally**. This provides predictable fight arenas, readable lanes, and visually coherent Nordic environments while preserving variety. Define generation rules for entry, main paths, branches, harvest pockets, event locations, boss arenas, and exits.
+
+**As built (October 31, 2026): generated from rules, not assembled from modules.** The Misty Woods is laid out anew for every run from the raid's seed, the way a roguelike lays out a level, so the same seed always gives the same map:
+
+1. The start goes on the edge of the map and three exits across from it, one ahead and one to either side.
+2. Clearings fill the land between, spread evenly.
+3. Trails join them all (a spanning tree, so everything can be reached), with a few loops so there is often another way round. The **shape** decides how: a **Hub** where every trail meets at one great clearing, a **Ring** around wild ground nobody crosses, a **Spine** with one long trail and branches, or a **Thicket** that tangles.
+4. Sites go where their kind belongs: camps in clearings, what is worth the walk in dead ends, resources and caches in pockets off the trails, patrols on the trails, the raid's great troll in the clearing farthest from the start.
+5. The trails run along the valley floors and the wild ground rises between them, in places as cliffs, so what was joined is what can be walked.
+6. The **mood** dresses it: Old Growth, Windthrow, The Hollows, Open Glades or Pinewood change the trees, the ground, the fog and the width of the trails. The briefing names the shape and mood before the player commits.
+
+Before the raid starts, a path from the start to every exit is checked on the navmesh, and the map is laid out again if there isn't one (§7.6). The hand-painted map remains as what a raid without layout rules plays.
 
 ### 9.2 Points of interest
 
@@ -614,6 +643,23 @@ Essence has three main sinks: **equipment tier upgrades/enchantments**, **select
 
 Empowering and enchanting belong to the one item, survive a failed raid with it and are shown in its name: *Gravebound Iron Mail Hauberk +1*. In a slot the level stands beside the tier and an enchantment colours the frame and adds a mark; in the hand a weapon sheds motes in its school's colour, stronger the more it has been empowered. Raw Cursed work happens at once, while purifying waits in the queue, which is part of the choice. Two enchantments feed the loop back: *Reaping* finds more Cursed Essence, *Hollow* drains life from what it hits. Upgrading the altar makes it purify faster. All of this happens in one window at the Purification Altar: Purify, Empower, Enchant and Skills.
 
+### 13.6 Relics
+
+A **relic** is a piece of gear carrying a power nobody at home can make. Where an enchantment adds numbers, a relic changes how the game is played, and many state a price:
+
+| Power | Fits | What it does | Its price |
+| --- | --- | --- | --- |
+| Wolf-Fed | Weapons | Every kill gives back 6% health and 20% stamina | -10 health |
+| Hushed | Armor, jewelry | Every sound you make carries half as far | -10 stamina |
+| Twice-Buried | Armor, jewelry | Once each raid, a killing blow leaves you standing at 30% health | -5 health |
+| Moonbound | Weapons, jewelry | In the dark, 30% more damage and 10% more speed | 15% less damage by day |
+| Harefoot | Armor | 40% more speed for 2 seconds after a dodge | |
+| Far-Seeing | Armor, jewelry | The map fills in 32 metres around you | |
+| Trollblooded | Armor | After 8 seconds unhurt, wounds close by themselves | 6% less speed |
+| Rime-Touched | Weapons | 30% of hits leave Chill behind | |
+
+A relic is any piece of gear of up to one tier above the raid with any power that fits it, so finding another stays worthwhile. They come from rumours, from the raid's great troll, and now and then (6%) from a supply cache. A relic found in a raid is at risk like any find until extracted, and comes home in the safe pocket if the player thinks it worth it. Once home it can be empowered like any gear, but the altar can neither make a relic nor replace its power.
+
 ## 14. Base building and structures
 
 ### 14.1 Building rules
@@ -663,6 +709,17 @@ Find → make contact → meet conditions or secure rescue → escort to extract
 ### 15.3 Roles and useful contributions
 
 **Woodcutter:** processes and occasionally gathers nearby wood. **Miner:** supports stone and ore processing. **Farmer/Gardener:** tends cultivated plots. **Blacksmith:** expands weapon and repair options. **Cook/Herbalist:** offers meals, brews, and recipes. **Scout:** reveals raid opportunities, route intelligence, and impending breach warnings. **Carpenter:** improves building and furniture options. **Guard / Warden:** helps defend against announced ward breaches, maintains traps or runic defenses, and can be assigned from the existing settlement workforce. Some roles are essential to the settlement fantasy, but no individual irreplaceable character should permanently lock the game.
+
+**As built (October 31, 2026): the lost expedition.** The people in the Misty Woods are the expedition, found through rumours once a raid has been survived, each in their own way: Tor must be cut out, Eirik fought beside, Runa followed by marks seen only after dark, Liv freed from a ring of stones (loudly, or slowly), and Sigrid carried at the cost of a wound.
+
+| Person | Job | What it does for the haven |
+| --- | --- | --- |
+| Tor | Carpenter | Mending buildings after a breach costs half; the sawbench works faster |
+| Eirik | Warden | The ward holds half as long again in a breach |
+| Runa | Tracker | One more rumour in every briefing |
+| Liv | Rune Scholar | Teaches the raid runes, which nobody else knows; the cauldron works faster |
+| Sigrid | Leader | 30 more seconds in every raid |
+| Bjarne | Smith | Repairs to gear cost half; the forge works faster. He was thrown north, so he waits for the road to Troll Valley |
 
 ### 15.4 Personality and well-being
 
@@ -1110,7 +1167,7 @@ These decisions cover §21 and the first ward breach. All numbers are tuning def
 
 - Later, should players place individual architectural pieces, or only complete structures?
 
-- How much is handcrafted versus assembled procedurally, and what is the replayability target?
+- What is the replayability target? Maps are generated from rules (§9.1); a hand-authored module system is not built.
 
 - Will the narrative have authored alternate endings, or a largely linear resolution with local choices?
 

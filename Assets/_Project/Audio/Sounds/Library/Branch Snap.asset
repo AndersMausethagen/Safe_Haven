@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0de871765cd6fce4c8fed103ef0082e3, type: 3}
+  m_Name: Branch Snap
+  m_EditorClassIdentifier: SafeHaven::SoundDefinition
+  displayName: Branch Snap
+  clips:
+  - {fileID: 8300000, guid: fed019d17dbc02340b57867dc955b97b, type: 3}
+  - {fileID: 8300000, guid: 9c6c97838624f8f40ac3b1052b0da0cd, type: 3}
+  - {fileID: 8300000, guid: d185cda19bc20264aa3a5b43815c86b8, type: 3}
+  - {fileID: 8300000, guid: 5d61076875ae5234ca0c00fdbb653b58, type: 3}
+  channel: 2
+  volume: 0.6
+  volumeVariation: 0.1
+  pitchRange: {x: 0.9, y: 1.1}
+  positional: 1
+  fullVolumeDistance: 4
+  audibleDistance: 30
+  maxAtOnce: 3
+  minimumGap: 0.03
+  priority: 1

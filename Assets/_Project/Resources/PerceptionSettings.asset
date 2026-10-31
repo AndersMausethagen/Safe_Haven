@@ -74,4 +74,4 @@ MonoBehaviour:
   spottedColor: {r: 1, g: 0.25, b: 0.18, a: 1}
   spottedShowSeconds: 1.4
   spottedSound: {fileID: 11400000, guid: 4cc9bc40fb223354aa6032cf0c7fb0f2, type: 2}
-  suspiciousSound: {fileID: 0}
+  suspiciousSound: {fileID: 11400000, guid: 7d8b9863f1ce89e4f8124447eb47e843, type: 2}

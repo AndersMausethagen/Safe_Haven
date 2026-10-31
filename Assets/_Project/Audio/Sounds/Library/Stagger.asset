@@ -14,16 +14,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::SoundDefinition
   displayName: Stagger
   clips:
-  - {fileID: 8300000, guid: 4d3f5865a61c91e4da09ba299eff58b9, type: 3}
-  - {fileID: 8300000, guid: 7248d82dad0eda942a8bd5103d7f5074, type: 3}
-  - {fileID: 8300000, guid: 856d18d0733b00a429d1abcce347e271, type: 3}
-  - {fileID: 8300000, guid: 5e3ca152dfeaaeb4bbfc4aa86a1ada09, type: 3}
-  - {fileID: 8300000, guid: 9a9244b850093974f999dec1af047961, type: 3}
+  - {fileID: 8300000, guid: ae0878c248c1bfa409fccc01fb11b81e, type: 3}
+  - {fileID: 8300000, guid: 37aec7dabc6adb74a9fa3784395576f6, type: 3}
+  - {fileID: 8300000, guid: 040df9f01fd382546b54b5ec34d0aaaa, type: 3}
+  - {fileID: 8300000, guid: 44274baeb0d243d4091f48df414d49a6, type: 3}
   channel: 2
-  volume: 0.85
+  volume: 0.69
   volumeVariation: 0.1
-  pitchRange: {x: 0.75, y: 0.9}
+  pitchRange: {x: 0.95, y: 1.05}
   positional: 1
   fullVolumeDistance: 3
   audibleDistance: 35
   maxAtOnce: 4
+  minimumGap: 0.03
+  priority: 1

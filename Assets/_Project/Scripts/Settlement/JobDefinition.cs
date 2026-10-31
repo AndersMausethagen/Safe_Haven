@@ -29,6 +29,18 @@ public sealed class JobDefinition : ScriptableObject
     [Tooltip("Raised when someone takes the job, for quests such as \"Find work for the traveler\".")]
     [SerializeField, RaisedByGame] private GameEventDefinition assignedEvent;
 
+    [Header("What they do for the haven")]
+    [Tooltip("More rumours in the raid briefing: what is out there this run.")]
+    [SerializeField, Min(0)] private int extraRumours;
+    [Tooltip("Share off the cost of repairing gear.")]
+    [SerializeField, Range(0f, 1f)] private float gearRepairDiscount;
+    [Tooltip("Share off the cost of mending buildings after a breach.")]
+    [SerializeField, Range(0f, 1f)] private float buildingRepairDiscount;
+    [Tooltip("Share more health for the ward during a breach.")]
+    [SerializeField, Min(0f)] private float wardHealth;
+    [Tooltip("Seconds added to the clock of every raid.")]
+    [SerializeField, Min(0f)] private float raidSeconds;
+
     public string Id => string.IsNullOrWhiteSpace(id) ? name : id;
     public string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;
     public string Description => description;
@@ -37,4 +49,21 @@ public sealed class JobDefinition : ScriptableObject
     public IReadOnlyList<RecipeDefinition> TeachesRecipes => teachesRecipes;
     public BuildingDefinition Workplace => workplace;
     public GameEventDefinition AssignedEvent => assignedEvent;
+    public int ExtraRumours => extraRumours;
+    public float GearRepairDiscount => gearRepairDiscount;
+    public float BuildingRepairDiscount => buildingRepairDiscount;
+    public float WardHealth => wardHealth;
+    public float RaidSeconds => raidSeconds;
+
+    /// <summary>What the job does for the haven, in a line for the player. Empty when it does none of these.</summary>
+    public string DescribeBonus()
+    {
+        var parts = new List<string>();
+        if (extraRumours > 0) parts.Add($"{extraRumours} more rumour{(extraRumours == 1 ? "" : "s")} before each raid");
+        if (gearRepairDiscount > 0f) parts.Add($"gear repairs cost {Mathf.RoundToInt(gearRepairDiscount * 100f)}% less");
+        if (buildingRepairDiscount > 0f) parts.Add($"mending buildings costs {Mathf.RoundToInt(buildingRepairDiscount * 100f)}% less");
+        if (wardHealth > 0f) parts.Add($"the ward holds {Mathf.RoundToInt(wardHealth * 100f)}% longer in a breach");
+        if (raidSeconds > 0f) parts.Add($"{raidSeconds:0} more seconds in every raid");
+        return string.Join(", ", parts);
+    }
 }

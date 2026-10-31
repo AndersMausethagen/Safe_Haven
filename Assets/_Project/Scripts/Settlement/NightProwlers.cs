@@ -5,7 +5,7 @@ using UnityEngine.AI;
 /// <summary>
 /// Night at home (GDD §6.3): after the first ward breach has been won, creatures come out of the forest at night and
 /// prowl the dark outside the ward, more of them and worse (NightSettings) with every breach beaten back, stronger for
-/// the dark, and carrying the night's Cursed Essence. They never step into light (the ward, campfires, torches:
+/// the dark. They drop hide and bone but no Cursed Essence, which only raids give (GDD §13.5). They never step into light (the ward, campfires, torches:
 /// VisibilitySource.IsLit), so they can't see or follow anyone standing in it; whoever walks out into the dark is fair
 /// game. Every so often an idle prowler closes in: on the player in the dark, or to the edge of the light nearest it
 /// when the player stands in light. They appear out of sight, away from the player, and slink off at dawn. They are not saved. None come during a
@@ -178,6 +178,11 @@ public sealed class NightProwlers : MonoBehaviour
 
             GameObject prowler = Instantiate(prefab, hit.position, Quaternion.LookRotation(player - hit.position));
             NightSettings.Current.Strengthen(prowler, this);
+            foreach (LootOnDeath loot in prowler.GetComponentsInChildren<LootOnDeath>(true))
+            {
+                loot.WithholdsEssence = true;
+            }
+
             if (prowler.TryGetComponent(out MonsterAI ai))
             {
                 ai.AvoidArea = position => VisibilitySource.IsLit(position);

@@ -14,11 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::SoundDefinition
   displayName: Perfect Dodge
   clips:
-  - {fileID: 8300000, guid: b5540cefae54eac40a785b85284f8c49, type: 3}
+  - {fileID: 8300000, guid: c3546235535fb664cb1542ef0bc22b13, type: 3}
+  - {fileID: 8300000, guid: 4f651e465c8b2234fb3c308c6d8e4273, type: 3}
   channel: 2
-  volume: 0.7
+  volume: 0.77
   volumeVariation: 0.1
-  pitchRange: {x: 1.25, y: 1.4}
+  pitchRange: {x: 0.95, y: 1.05}
   positional: 0
   fullVolumeDistance: 3
   audibleDistance: 35

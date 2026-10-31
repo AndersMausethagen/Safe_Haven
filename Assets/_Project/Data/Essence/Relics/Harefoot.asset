@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: acb47e913a2759648a401929037aa9ea, type: 3}
+  m_Name: Harefoot
+  m_EditorClassIdentifier: SafeHaven::EnchantmentDefinition
+  id: relic.harefoot
+  displayName: Harefoot
+  description: Whoever wore this last never once stood and fought.
+  school: 2
+  targets: 2
+  cost: []
+  bonuses: []
+  effects:
+  - rid: 287758281410609418
+  references:
+    version: 2
+    RefIds:
+    - rid: 287758281410609418
+      type: {class: AfterDodgeSpeedEffect, ns: , asm: SafeHaven}
+      data:
+        speed: 0.4
+        seconds: 2

@@ -178,8 +178,17 @@ public sealed class Damageable : MonoBehaviour, IDamageable, ISaveable
             Debug.Log($"{attacker} hit {name} for {final:F1} {damage.Type} ({damage.Amount:F1} before defenses){(damage.IsCritical ? " CRIT" : "")}. Health {currentHealth:F0}/{MaxHealth:F0}{(killed ? " - killed" : "")}.", this);
         }
 
-        HealthChanged?.Invoke(currentHealth, MaxHealth);
-        Damaged?.Invoke(damage, result);
+        // A faulty listener must not cost the death below: the end of a raid and the loot hang on Died.
+        try
+        {
+            HealthChanged?.Invoke(currentHealth, MaxHealth);
+            Damaged?.Invoke(damage, result);
+        }
+        catch (Exception exception)
+        {
+            Debug.LogException(exception, this);
+        }
+
         try
         {
             AnyDamaged?.Invoke(this, damage, result);
@@ -191,7 +200,7 @@ public sealed class Damageable : MonoBehaviour, IDamageable, ISaveable
 
         if (killed)
         {
-            Died?.Invoke(this, damage);
+            RaiseDied(damage);
             try
             {
                 AnyDied?.Invoke(this, damage);
@@ -208,6 +217,28 @@ public sealed class Damageable : MonoBehaviour, IDamageable, ISaveable
         }
 
         return result;
+    }
+
+    // Each listener runs in isolation, so one failing can't stop the others hearing of the death.
+    private void RaiseDied(in DamageInfo damage)
+    {
+        Action<Damageable, DamageInfo> handlers = Died;
+        if (handlers == null)
+        {
+            return;
+        }
+
+        foreach (Delegate handler in handlers.GetInvocationList())
+        {
+            try
+            {
+                ((Action<Damageable, DamageInfo>)handler)(this, damage);
+            }
+            catch (Exception exception)
+            {
+                Debug.LogException(exception, this);
+            }
+        }
     }
 
     private void RaiseGuarded(in DamageInfo damage, GuardOutcome outcome)

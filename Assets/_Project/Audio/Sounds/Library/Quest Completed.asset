@@ -14,11 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::SoundDefinition
   displayName: Quest Completed
   clips:
-  - {fileID: 8300000, guid: a745a70fd0fabde4fb0d038b12dddaf4, type: 3}
+  - {fileID: 8300000, guid: 69de22832d8d56a4bb1001639beec80a, type: 3}
   channel: 2
-  volume: 0.6
+  volume: 0.62
   volumeVariation: 0.1
-  pitchRange: {x: 0.94, y: 1.06}
+  pitchRange: {x: 1, y: 1}
   positional: 0
   fullVolumeDistance: 3
   audibleDistance: 35

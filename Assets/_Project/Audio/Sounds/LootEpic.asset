@@ -14,12 +14,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SoundDefinition
   displayName: Loot Epic
   clips:
-  - {fileID: 8300000, guid: a28480f68c48fec4bb75dfdfaa903a74, type: 3}
+  - {fileID: 8300000, guid: cb6c2df86a51ed642839c1ff16b0f8de, type: 3}
   channel: 2
-  volume: 0.7
+  volume: 0.68
   volumeVariation: 0
   pitchRange: {x: 1, y: 1}
   positional: 0
   fullVolumeDistance: 3
   audibleDistance: 35
   maxAtOnce: 4
+  minimumGap: 0.03
+  priority: 1

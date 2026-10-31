@@ -14,16 +14,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::SoundDefinition
   displayName: Punch Hit
   clips:
-  - {fileID: 8300000, guid: cee1a0360d533cc42bb9cff55180c603, type: 3}
-  - {fileID: 8300000, guid: 1de296430027c134f9d4e249f1dd3cd1, type: 3}
-  - {fileID: 8300000, guid: 432096ac973fc964d97014a97ddcd0e4, type: 3}
-  - {fileID: 8300000, guid: dd01de3db84633e40bd286f665d195f6, type: 3}
-  - {fileID: 8300000, guid: 1f646ffc36b06524d8c07011c9c86629, type: 3}
+  - {fileID: 8300000, guid: 0d12aedbdc37fc148ac09c158449aa1c, type: 3}
+  - {fileID: 8300000, guid: 908b714a9742b4c4e8c6ebf607438f93, type: 3}
+  - {fileID: 8300000, guid: 7b23f6ebbe6a82444975b2401b5d662f, type: 3}
+  - {fileID: 8300000, guid: 2ac1ce9ff62450941b3f14930fb0a254, type: 3}
+  - {fileID: 8300000, guid: 19d24444a8d64ca4b9341d3f18dbac74, type: 3}
   channel: 2
-  volume: 0.8
+  volume: 0.75
   volumeVariation: 0.1
-  pitchRange: {x: 0.95, y: 1.1}
+  pitchRange: {x: 0.95, y: 1.05}
   positional: 1
   fullVolumeDistance: 3
   audibleDistance: 35
   maxAtOnce: 6
+  minimumGap: 0.03
+  priority: 1

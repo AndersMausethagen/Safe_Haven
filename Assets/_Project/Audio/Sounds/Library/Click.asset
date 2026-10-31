@@ -14,10 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::SoundDefinition
   displayName: Click
   clips:
-  - {fileID: 8300000, guid: 813792699cd8c58428a4e76d787193b8, type: 3}
-  - {fileID: 8300000, guid: a0c1340c6826cf542b218ce17c5e9542, type: 3}
+  - {fileID: 8300000, guid: e22c7399ca24bbd4d850f53c177d3193, type: 3}
+  - {fileID: 8300000, guid: 34f1147a134dd2247859548cdddbad46, type: 3}
+  - {fileID: 8300000, guid: 7a8bcce2a48098e49bb9ee376de900d5, type: 3}
   channel: 2
-  volume: 0.35
+  volume: 0.17
   volumeVariation: 0.1
   pitchRange: {x: 0.97, y: 1.03}
   positional: 0

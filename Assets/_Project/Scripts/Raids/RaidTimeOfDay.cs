@@ -26,6 +26,9 @@ public sealed class RaidTimeOfDay
 
     public string DisplayName => string.IsNullOrWhiteSpace(name) ? $"{hour:00}:00" : name;
 
+    /// <summary>True for the hours after the sun is low: dusk and night.</summary>
+    public bool IsDark => hour >= 18f || hour < 6f;
+
     /// <summary>The hour a run with this seed gets, or null when the raid has no times of day (the scene's own hour).</summary>
     public static RaidTimeOfDay For(RaidDefinition raid, int seed)
     {

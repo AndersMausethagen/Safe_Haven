@@ -82,6 +82,7 @@ MonoBehaviour:
   faction: 1
   baseStats: {fileID: 11400000, guid: 4ce37b840b31f7943a1a7e1c0bf696e5, type: 2}
   rules: {fileID: 0}
+  priorityTarget: 0
 --- !u!114 &5779955224618096036
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -142,6 +143,7 @@ MonoBehaviour:
       maxQuantity: 12
       probability: 1
   unlocksRecipes: []
+  relicChance: 1
 --- !u!114 &1291413385866200264
 MonoBehaviour:
   m_ObjectHideFlags: 0

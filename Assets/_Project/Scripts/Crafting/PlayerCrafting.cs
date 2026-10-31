@@ -84,6 +84,28 @@ public sealed class PlayerCrafting : MonoBehaviour
         EnsureInitialised();
     }
 
+    /// <summary>True when the player already knows everything an item would teach them.</summary>
+    public bool KnowsAll(ItemDefinition teacher)
+    {
+        foreach (BuildingDefinition building in teacher.TeachesBuildings)
+        {
+            if (building != null && !IsKnown(building))
+            {
+                return false;
+            }
+        }
+
+        foreach (RecipeDefinition recipe in teacher.TeachesRecipes)
+        {
+            if (recipe != null && !IsKnown(recipe))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public bool IsKnown(RecipeDefinition recipe)
     {
         EnsureInitialised();

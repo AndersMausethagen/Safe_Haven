@@ -3,6 +3,17 @@
 Open work and ideas. Tick items off (`[x]`) or delete them when done. Architecture notes for each system live in
 [ARCHITECTURE.md](../Assets/_Project/Scripts/ARCHITECTURE.md).
 
+## Reasons to raid (relics, rumours, people, finds)
+
+- [ ] Play them for feel: every number is a first estimate (relic powers, 2 rumours a run, job bonuses, 6% relics in caches).
+- [ ] Real art for the rumour sites: they are placeholder shapes (`Prefabs/Raids/Events/Sites`), as is the Elder Tree.
+- [ ] Icons for the plans and living things: the plans use the Forge Blueprint's, the others borrow from materials.
+- [ ] Give the expedition their own models: everyone is IngridModel, at home and in raids.
+- [ ] Bjarne has a job but no rumour: he is in Troll Valley (GDD §21.5), which is locked. Add his rumour when it opens.
+- [ ] Troll Valley needs its own Layout Rules and Raid Rumours when it opens.
+- [ ] A goat (or other animal) for the Haven: bees, seed and the Elder are in, a living animal isn't.
+- [ ] Relics in the raid report: they are named in "On the way", but the haul lists the plain item.
+
 ## Raid maps (Misty Woods forest terrain)
 
 ### Art
@@ -14,8 +25,6 @@ Open work and ideas. Tick items off (`[x]`) or delete them when done. Architectu
       site counts per group and a Bake button.
 
 ### Content
-- [ ] Paint a second layout for Misty Woods (new Height/Mask/Markers PNGs + `RaidMapDefinition`). With the four
-      rotations this gives eight variants.
 - [ ] More event-site variety (new prefab in `Prefabs/Raids/Events` + an entry in `MistyWoods_Events`).
 - [x] Dedicated wolf pack prefab for enemy camps (one howler + one or two packmates), with staggered attacks.
 

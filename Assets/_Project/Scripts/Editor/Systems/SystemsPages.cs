@@ -783,6 +783,31 @@ public sealed class EssencePage : SystemsPage
     }
 }
 
+/// <summary>Gear no one at home can make, found only in raids (GDD §13.6).</summary>
+public sealed class RelicsPage : SystemsPage
+{
+    public override string Title => "Relics";
+    public override string Group => "World";
+    public override string Help => "A relic is any listed gear with any power that fits it. A power is an enchantment of the Relic school, and what it does " +
+                                   "beyond numbers is its Effects. The altar can neither make nor replace one.";
+
+    public override void Draw()
+    {
+        var settings = Settings<RelicSettings>(RelicSettings.ResourceName);
+        if (settings == null)
+        {
+            return;
+        }
+
+        SettingsPanel(settings, "Finding them", "Resources/RelicSettings", "cacheChance", "tiersAboveRaid", "glow");
+        SettingsPanel(settings, "Powers and gear", null, "powers", "gear");
+        BeginDerived();
+        Derived("Powers", settings.Powers.Count.ToString());
+        Derived("Gear they can turn up on", settings.Gear.Count.ToString());
+        EndDerived();
+    }
+}
+
 /// <summary>Carts, barrows and boats: what they carry and what that costs in speed (GDD §8.5).</summary>
 public sealed class TransportPage : SystemsPage
 {

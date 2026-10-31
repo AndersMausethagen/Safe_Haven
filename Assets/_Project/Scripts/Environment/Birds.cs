@@ -6,11 +6,12 @@ using UnityEngine.AI;
 /// Small birds around the player, for mood and to keep a place from feeling the same twice (BirdProfile has the numbers). Flocks
 /// fly in from out of sight and land on ground the player has explored, peck about, and go up when the player comes too
 /// close: how close is how far they can be heard (PlayerNoise), so running sends them up early and sneaking gets near.
-/// Now and then a flock only passes over. They leave at dusk and in the rain as they would. All the birds are one particle
+/// Something really loud (WorldNoise), like a tree coming down, sends more up out of the trees around it. Now and then a
+/// flock only passes over. They leave at dusk and in the rain as they would. All the birds are one particle
 /// system, its particles placed by hand each frame: one draw, no objects, and a flipbook for the wings.
 /// <para>
-/// Where it belongs: the Birds prefab in a scene, with the place's profile. Purely visual: nothing in the game hears or sees
-/// them, and they change nothing.
+/// Where it belongs: the Birds prefab in a scene, with the place's profile. Purely visual: they listen, but nothing in the
+/// game hears or sees them, and they change nothing.
 /// </para>
 /// </summary>
 [DisallowMultipleComponent]
@@ -28,6 +29,8 @@ public sealed class Birds : MonoBehaviour
     private const float ShadowSize = 0.8f;
     private const float NightShade = 0.3f;
     private const float QuietSeconds = 6f;
+    private const float FlushGapSeconds = 20f;
+    private const float FlushSpread = 9f;
     private static readonly Color32 ShadowColour = new Color32(0, 0, 0, 56);
 
     [SerializeField] private BirdProfile profile;
@@ -38,6 +41,7 @@ public sealed class Birds : MonoBehaviour
     private float nextArrival;
     private float nextScan;
     private float nextDeparture;
+    private float nextFlush;
 
     /// <summary>The flocks about now.</summary>
     public IReadOnlyList<BirdFlock> Flocks => flocks;
@@ -74,6 +78,32 @@ public sealed class Birds : MonoBehaviour
 
     /// <summary>What a particle's remaining life has to be to show a picture of the sheet: the sheet plays over its life.</summary>
     public static float LifeForPicture(int picture) => 1f - (picture + 0.5f) / Pictures;
+
+    private void OnEnable() => WorldNoise.Emitted += OnNoise;
+
+    private void OnDisable() => WorldNoise.Emitted -= OnNoise;
+
+    private void OnNoise(Vector3 position, float radius)
+    {
+        Player player = Player.Current;
+        if (profile == null || player == null || !profile.FlushedBy(radius) || Time.time < nextFlush
+            || profile.FlocksFor(AtmosphereConditions.Night, AtmosphereConditions.WeatherRain) <= 0)
+        {
+            return;
+        }
+
+        nextFlush = Time.time + FlushGapSeconds;
+        for (int i = 0; i < profile.FlushFlocks; i++)
+        {
+            Vector2 aside = Random.insideUnitCircle * FlushSpread;
+            Vector3 centre = position + new Vector3(aside.x, profile.FlushHeight, aside.y);
+            int count = Random.Range(profile.FlockSizeMin, profile.FlockSizeMax + 1);
+            flocks.Add(BirdFlock.Flushed(profile, centre, position, count));
+            AudioManager.Play(profile.TakeOff, centre);
+        }
+
+        AudioManager.Play(profile.Call, position + Vector3.up * profile.FlushHeight);
+    }
 
     private void LateUpdate()
     {

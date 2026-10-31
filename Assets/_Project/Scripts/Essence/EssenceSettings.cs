@@ -96,7 +96,7 @@ public sealed class EssenceSettings : GameSettings<EssenceSettings>
             }
         }
 
-        return null;
+        return RelicSettings.Current.FindPower(id);
     }
 
     /// <summary>What a skill's rank gives; rank 0 is the skill as it was learned.</summary>

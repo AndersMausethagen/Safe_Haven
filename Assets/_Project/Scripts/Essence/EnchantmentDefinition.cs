@@ -9,6 +9,8 @@ public enum EssenceSchool
     Purified = 0,
     /// <summary>Raw: paid in Cursed Essence straight from the raid. Stronger, and always with a stated price.</summary>
     Cursed = 1,
+    /// <summary>A relic's power: found in raids only, never worked at the altar (RelicSettings).</summary>
+    Relic = 2,
 }
 
 /// <summary>What gear an enchantment can be worked into. Serialized as numbers, so never renumber.</summary>
@@ -41,6 +43,8 @@ public sealed class EnchantmentDefinition : ScriptableObject
     [SerializeField] private List<ResourceAmount> cost = new List<ResourceAmount>();
     [Tooltip("Added while the enchanted gear is worn and not broken. Negative values are its drawback.")]
     [SerializeField] private List<StatBonus> bonuses = new List<StatBonus>();
+    [Tooltip("Relics only: what it does beyond numbers while worn.")]
+    [SerializeReference] private List<RelicEffect> effects = new List<RelicEffect>();
 
     public string Id => string.IsNullOrWhiteSpace(id) ? name : id;
     public string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;
@@ -49,6 +53,8 @@ public sealed class EnchantmentDefinition : ScriptableObject
     public EnchantTarget Targets => targets;
     public IReadOnlyList<ResourceAmount> Cost => cost;
     public IReadOnlyList<StatBonus> Bonuses => bonuses;
+    public IReadOnlyList<RelicEffect> Effects => effects;
+    public bool IsRelic => school == EssenceSchool.Relic;
 
     public bool Fits(ItemDefinition item) => (TargetOf(item) & targets) != EnchantTarget.None;
 

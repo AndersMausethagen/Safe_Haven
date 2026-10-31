@@ -124,6 +124,25 @@ public sealed class BirdFlock
         return flock;
     }
 
+    /// <summary>A flock going up out of the trees around a point, frightened from the start.</summary>
+    public static BirdFlock Flushed(BirdProfile profile, Vector3 centre, Vector3 from, int count)
+    {
+        var flock = new BirdFlock(profile, count, centre);
+        for (int i = 0; i < count; i++)
+        {
+            flock.Birds[i] = new Bird
+            {
+                Position = centre + Vector3.Scale(Random.insideUnitSphere, new Vector3(3f, 1.5f, 3f)),
+                Colour = profile.RandomColour,
+                Size = profile.RandomSize,
+                Flap = Random.value,
+            };
+        }
+
+        flock.Startle(from);
+        return flock;
+    }
+
     /// <summary>A flock crossing the sky: it never lands, so nothing can startle it.</summary>
     public static BirdFlock Passing(BirdProfile profile, Vector3 from, Vector3 velocity, int count)
     {

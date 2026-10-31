@@ -99,6 +99,15 @@ public sealed class PlayerStamina : MonoBehaviour
         }
     }
 
+    /// <summary>Gives stamina back at once, such as from a relic. It doesn't change when regeneration resumes.</summary>
+    public void Restore(float amount)
+    {
+        if (pool.Regenerate(amount))
+        {
+            StaminaChanged?.Invoke(pool.Current, pool.Max);
+        }
+    }
+
     /// <summary>
     /// Scales the stamina pool and its regeneration, for conditions such as hunger (see PlayerNeeds). 1 and 1 is normal.
     /// </summary>

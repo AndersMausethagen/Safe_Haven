@@ -14,15 +14,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::SoundDefinition
   displayName: Dodge
   clips:
-  - {fileID: 8300000, guid: f535eab547779a749a1b5aa2668c6aa2, type: 3}
-  - {fileID: 8300000, guid: f678227f9ee531b48bd22c8afc34413c, type: 3}
-  - {fileID: 8300000, guid: f612d9884919107489988a98420a1554, type: 3}
-  - {fileID: 8300000, guid: 275045e1820a2dd45b964ede80eaf1bb, type: 3}
+  - {fileID: 8300000, guid: 05e27540e547cbb48ac4e0650424af10, type: 3}
+  - {fileID: 8300000, guid: 62751a1e0338f9a40a2601fd5e6a17c2, type: 3}
+  - {fileID: 8300000, guid: bd2afcf3f41cefe4da44e47e97d55115, type: 3}
+  - {fileID: 8300000, guid: 75247a9dd6fd6514493ceda9c0f44542, type: 3}
   channel: 2
-  volume: 0.6
+  volume: 0.39
   volumeVariation: 0.1
   pitchRange: {x: 0.94, y: 1.06}
   positional: 1
   fullVolumeDistance: 3
   audibleDistance: 15
   maxAtOnce: 4
+  minimumGap: 0.03
+  priority: 1

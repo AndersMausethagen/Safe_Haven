@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad044708340368842899cf78f08bfbfb, type: 3}
+  m_Name: Tracker
+  m_EditorClassIdentifier: SafeHaven::JobDefinition
+  id: job.tracker
+  displayName: Tracker
+  description: 'Goes out at dawn and reads the ground: one more rumour in every raid''s briefing.'
+  acceptLine: '"I''ll tell you what''s out there before you go."'
+  teachesBuildings: []
+  teachesRecipes: []
+  workplace: {fileID: 0}
+  assignedEvent: {fileID: 0}
+  extraRumours: 1
+  gearRepairDiscount: 0
+  buildingRepairDiscount: 0
+  wardHealth: 0
+  raidSeconds: 0

@@ -14,14 +14,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::SoundDefinition
   displayName: Crafted
   clips:
-  - {fileID: 8300000, guid: d8986afe928dce942ae7b01ef2f18398, type: 3}
-  - {fileID: 8300000, guid: 233ae3af1ef345d408e0514c209031e4, type: 3}
-  - {fileID: 8300000, guid: b45cf519408b2cc4eb0c3b5e9dfba2b9, type: 3}
+  - {fileID: 8300000, guid: 69dfa5876b1716f4d9a1551be1705dce, type: 3}
+  - {fileID: 8300000, guid: 38d87078740fa564ebd5acb187b582ea, type: 3}
+  - {fileID: 8300000, guid: a57921feeec36234c8712bf2853ffd89, type: 3}
   channel: 2
-  volume: 0.55
+  volume: 0.5
   volumeVariation: 0.1
   pitchRange: {x: 0.94, y: 1.06}
   positional: 0
   fullVolumeDistance: 3
   audibleDistance: 35
   maxAtOnce: 2
+  minimumGap: 0.03
+  priority: 1

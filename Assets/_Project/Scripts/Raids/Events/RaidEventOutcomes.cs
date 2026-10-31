@@ -282,3 +282,61 @@ public sealed class ChanceOutcome : RaidEventOutcome
         }
     }
 }
+
+/// <summary>A relic: found only out here, and lost like anything else if the player doesn't get it home (RelicSettings).</summary>
+[Serializable]
+public sealed class GiveRelicOutcome : RaidEventOutcome
+{
+    public override string DisplayName => "Give a Relic";
+
+    public override void Apply(RaidEventContext context)
+    {
+        ItemStack relic = RelicSettings.Grant(context.Player, context.Random, context.Session.Definition.Tier);
+        if (!relic.IsEmpty)
+        {
+            context.Session.RecordEvent($"Found {relic.DisplayName}");
+        }
+    }
+}
+
+/// <summary>Someone is freed and follows the player: they only come home if they reach an exit alive (RescuableTraveler).</summary>
+[Serializable]
+public sealed class RescueResidentOutcome : RaidEventOutcome
+{
+    [SerializeField] private ResidentDefinition resident;
+    [Tooltip("The generic stranded traveler.")]
+    [SerializeField] private RescuableTraveler traveler;
+
+    public override string DisplayName => "Rescue Someone";
+
+    public override void Apply(RaidEventContext context)
+    {
+        if (resident == null || traveler == null || GameSession.Settlement.HasResident(resident))
+        {
+            return;
+        }
+
+        Vector3 spot = context.Position + Vector3.right * 1.5f;
+        if (NavMesh.SamplePosition(spot, out NavMeshHit hit, 4f, NavMesh.AllAreas))
+        {
+            spot = hit.position;
+        }
+
+        RescuableTraveler freed = RescuableTraveler.Spawn(traveler, resident, spot, null);
+        context.Director?.PrepareSpawned(freed.gameObject, false);
+    }
+}
+
+/// <summary>A blow against what is behind the next ward breach: it comes shorter of fighters, and weaker.</summary>
+[Serializable]
+public sealed class WeakenBreachOutcome : RaidEventOutcome
+{
+    [Tooltip("Share taken off the next breach.")]
+    [SerializeField, Range(0f, 1f)] private float share = 0.3f;
+    [Tooltip("The most raids can take off one breach.")]
+    [SerializeField, Range(0f, 1f)] private float most = 0.6f;
+
+    public override string DisplayName => "Weaken the Next Breach";
+
+    public override void Apply(RaidEventContext context) => GameSession.Settlement.WeakenBreach(share, most);
+}

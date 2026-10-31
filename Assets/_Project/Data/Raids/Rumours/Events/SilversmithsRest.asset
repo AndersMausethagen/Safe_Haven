@@ -1,0 +1,55 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2f02987ee9197d4682f5db8cbc7a967, type: 3}
+  m_Name: SilversmithsRest
+  m_EditorClassIdentifier: SafeHaven::RaidEventDefinition
+  id: rumour.silversmithsrest
+  displayName: The Silversmith's Rest
+  weight: 0
+  earliestSeconds: 30
+  latestSecondsLeft: 60
+  minimumStage: 0
+  warning: 
+  warningSound: {fileID: 0}
+  sitePrefab: {fileID: 6905588731952710341, guid: 832a7dfcb0c2e764093883db5a87f61b, type: 3}
+  siteDistance: {x: 35, y: 70}
+  siteText: A bench, a bare skeleton in a good coat and a folio wrapped in oilcloth.
+  onStart: []
+  choices:
+  - label: Take the folio
+    detail: What guards it will know.
+    cost: []
+    result: The woods go quiet behind you.
+    outcomes:
+    - rid: 287758281410609442
+    - rid: 287758281410609443
+  references:
+    version: 2
+    RefIds:
+    - rid: 287758281410609442
+      type: {class: GiveLootOutcome, ns: , asm: SafeHaven}
+      data:
+        loot:
+          entries:
+          - item: {fileID: 11400000, guid: 3261ceaf538545146aa54b890bbff572, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 1
+            maxQuantity: 1
+            probability: 1
+    - rid: 287758281410609443
+      type: {class: SpawnCreaturesOutcome, ns: , asm: SafeHaven}
+      data:
+        prefabs:
+        - {fileID: 9066855856663566298, guid: 6e4b724e33048b246a0b54c712d80b6f, type: 3}
+        count: 1
+        radius: 12
+        hunt: 1

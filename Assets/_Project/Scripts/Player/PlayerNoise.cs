@@ -74,11 +74,14 @@ public sealed class PlayerNoise : MonoBehaviour
         }
     }
 
+    /// <summary>How far every sound the player makes carries, as a share of normal. Relics change it.</summary>
+    public float Reach { get; set; } = 1f;
+
     /// <summary>The player makes a sound of <paramref name="radius"/> metres at <paramref name="position"/>.</summary>
     public void Make(Vector3 position, float radius)
     {
         PerceptionSettings rules = PerceptionSettings.Current;
-        float muted = radius * PerceptionRules.RainNoiseScale(AtmosphereConditions.WeatherRain, rules);
+        float muted = radius * Reach * PerceptionRules.RainNoiseScale(AtmosphereConditions.WeatherRain, rules);
         WorldNoise.Emit(position, meter.Add(muted, rules));
     }
 

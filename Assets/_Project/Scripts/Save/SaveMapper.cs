@@ -163,6 +163,7 @@ public static class SaveMapper
         into.nextBreachAt = settlement.NextBreachAt;
         into.breachPendingSince = settlement.BreachPendingSince;
         into.wardStrain = settlement.WardStrain;
+        into.breachWeakening = settlement.BreachWeakening;
         into.purificationQueued = settlement.PurificationQueued;
         into.purificationProgress = settlement.PurificationProgress;
         into.purificationBonus = settlement.PurificationBonus;
@@ -211,7 +212,7 @@ public static class SaveMapper
         // Older saves never planned a second breach: it comes the usual distance from where the game stands.
         int nextBreachAt = saved.nextBreachAt > 0 || (BreachStatus)saved.breach != BreachStatus.Won
             ? saved.nextBreachAt : saved.successfulExtractions + WardBreachSettings.Current.RaidsBetween;
-        settlement.RestoreBreaches(saved.breachesWon, nextBreachAt, saved.breachPendingSince, saved.wardStrain);
+        settlement.RestoreBreaches(saved.breachesWon, nextBreachAt, saved.breachPendingSince, saved.wardStrain, saved.breachWeakening);
         settlement.ReachHavenRank(saved.havenRank);
         foreach (ResidentSaveData entry in saved.residents)
         {

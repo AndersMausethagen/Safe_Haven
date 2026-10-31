@@ -1,0 +1,53 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2f02987ee9197d4682f5db8cbc7a967, type: 3}
+  m_Name: BarrowHoard
+  m_EditorClassIdentifier: SafeHaven::RaidEventDefinition
+  id: rumour.barrowhoard
+  displayName: The Open Hoard
+  weight: 0
+  earliestSeconds: 30
+  latestSecondsLeft: 60
+  minimumStage: 0
+  warning: 
+  warningSound: {fileID: 0}
+  sitePrefab: {fileID: 4597593953432641151, guid: fe11d5f69a06ab44eb1617e580f1e3a5, type: 3}
+  siteDistance: {x: 35, y: 70}
+  siteText: Old grave goods under fallen stone. One of them looks back at you.
+  onStart: []
+  choices:
+  - label: Take it
+    detail: Its keepers will wake.
+    cost: []
+    result: Something under the stone begins to move.
+    outcomes:
+    - rid: 287758281410609435
+    - rid: 287758281410609436
+  - label: Leave it
+    detail: Walk away with what you came for.
+    cost: []
+    result: Some things are better left.
+    outcomes: []
+  references:
+    version: 2
+    RefIds:
+    - rid: 287758281410609435
+      type: {class: GiveRelicOutcome, ns: , asm: SafeHaven}
+      data: 
+    - rid: 287758281410609436
+      type: {class: SpawnCreaturesOutcome, ns: , asm: SafeHaven}
+      data:
+        prefabs:
+        - {fileID: 9066855856663566298, guid: 6e4b724e33048b246a0b54c712d80b6f, type: 3}
+        count: 1
+        radius: 10
+        hunt: 1

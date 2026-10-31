@@ -1,0 +1,49 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2f02987ee9197d4682f5db8cbc7a967, type: 3}
+  m_Name: NightCairn
+  m_EditorClassIdentifier: SafeHaven::RaidEventDefinition
+  id: rumour.nightcairn
+  displayName: The Night Cairn
+  weight: 0
+  earliestSeconds: 30
+  latestSecondsLeft: 60
+  minimumStage: 0
+  warning: 
+  warningSound: {fileID: 0}
+  sitePrefab: {fileID: 6647756069553415008, guid: f84bf22cafcedf44690fa2d84df5d2c7, type: 3}
+  siteDistance: {x: 35, y: 70}
+  siteText: Stones piled higher than a man, cold enough to hurt. There is something at the top, and it wants carrying.
+  onStart: []
+  choices:
+  - label: Climb and take it
+    detail: It takes a little of your strength for a while.
+    cost: []
+    result: It is much heavier than it looks.
+    outcomes:
+    - rid: 287758281410609437
+    - rid: 287758281410609438
+  references:
+    version: 2
+    RefIds:
+    - rid: 287758281410609437
+      type: {class: GiveRelicOutcome, ns: , asm: SafeHaven}
+      data: 
+    - rid: 287758281410609438
+      type: {class: GiveBoonOutcome, ns: , asm: SafeHaven}
+      data:
+        name: Cairn-Cold
+        bonuses:
+        - stat: 15
+          op: 0
+          value: -20
+        seconds: 180

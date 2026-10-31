@@ -5,9 +5,10 @@ using UnityEngine.SceneManagement;
 /// <summary>
 /// Lets the player fell terrain trees (painted trees, such as a raid map's forest), which are not objects of their own.
 /// Near the player each choppable tree (its prototype prefab has a ChoppableTree) gets an invisible stand-in from
-/// TreeChoppingSettings › Terrain Tree Proxy: the Tree gathering node, sized like the tree. Felling it shrinks the
-/// terrain tree away (scale 0, so it neither shows nor blocks) until the node's respawn time has passed, then it grows
-/// back. Felling works on a runtime copy of the terrain data, so the scene's terrain asset is never changed.
+/// TreeChoppingSettings › Terrain Tree Proxy: the Tree gathering node, sized like the tree. Felling it hides the terrain
+/// tree (scale 0, so it neither shows nor blocks) as a copy comes down in its place (FelledTree), until the node's respawn
+/// time has passed, then it grows back. Felling works on a runtime copy of the terrain data, so the scene's terrain asset
+/// is never changed.
 /// <para>
 /// Added by itself to every terrain with choppable tree prototypes when a scene loads; nothing to set up.
 /// </para>
@@ -20,7 +21,27 @@ public sealed class TerrainTreeFelling : MonoBehaviour
     private const float RefreshSeconds = 0.25f;
     private const string RuntimeSuffix = " (runtime)";
 
+    /// <summary>A painted tree a falling tree might meet.</summary>
+    public readonly struct Standing
+    {
+        public readonly int Index;
+        public readonly Vector3 Foot;
+        public readonly float Height;
+        public readonly float Radius;
+
+        public Standing(int index, Vector3 foot, float height, float radius)
+        {
+            Index = index;
+            Foot = foot;
+            Height = height;
+            Radius = radius;
+        }
+    }
+
+    private static readonly List<TerrainTreeFelling> active = new List<TerrainTreeFelling>();
+
     private readonly Dictionary<int, ChoppableTree> proxies = new Dictionary<int, ChoppableTree>();
+    private readonly Dictionary<int, (TreeInstance tree, GameObject copy)> swaying = new Dictionary<int, (TreeInstance, GameObject)>();
     private readonly Dictionary<int, (TreeInstance tree, float regrowAt)> felled = new Dictionary<int, (TreeInstance, float)>();
     private readonly List<int> scratch = new List<int>();
     private readonly List<Vector3> positions = new List<Vector3>();
@@ -34,6 +55,86 @@ public sealed class TerrainTreeFelling : MonoBehaviour
 
     /// <summary>Terrain trees felled and not yet grown back.</summary>
     public int FelledCount => felled.Count;
+
+    /// <summary>Every terrain with fellable trees.</summary>
+    public static IReadOnlyList<TerrainTreeFelling> Active => active;
+
+    private void OnEnable() => active.Add(this);
+
+    private void OnDisable() => active.Remove(this);
+
+    /// <summary>The fellable trees still standing within a distance of a point.</summary>
+    public List<Standing> StandingNear(Vector3 point, float distance)
+    {
+        var near = new List<Standing>();
+        if (terrain == null || terrain.terrainData == null)
+        {
+            return near;
+        }
+
+        Cache();
+        TerrainData data = terrain.terrainData;
+        for (int i = 0; i < positions.Count; i++)
+        {
+            Vector3 offset = positions[i] - point;
+            offset.y = 0f;
+            if (choppable[i] && !felled.ContainsKey(i) && offset.sqrMagnitude <= distance * distance && offset.sqrMagnitude > 0.25f)
+            {
+                TreeInstance tree = data.GetTreeInstance(i);
+                near.Add(new Standing(i, positions[i], prototypeHeight[tree.prototypeIndex] * Mathf.Max(0.1f, tree.heightScale),
+                    prototypeRadius[tree.prototypeIndex] * Mathf.Max(0.1f, tree.widthScale)));
+            }
+        }
+
+        return near;
+    }
+
+    /// <summary>
+    /// A falling tree has hit a painted one. A terrain tree can't lean, so a copy stands in its place for as long as it sways,
+    /// and the painted tree comes back upright when it stills. Returns its parts for the leaves it sheds.
+    /// </summary>
+    public TreeParts Knocked(int index, Vector3 direction, float degrees)
+    {
+        if (swaying.TryGetValue(index, out (TreeInstance tree, GameObject copy) already))
+        {
+            TreeSway.Knock(already.copy, direction, degrees, 0f);
+            return null;
+        }
+
+        TerrainData data = terrain.terrainData;
+        TreeInstance tree = data.GetTreeInstance(index);
+        GameObject prefab = data.treePrototypes[tree.prototypeIndex].prefab;
+        TreeParts parts = TreeParts.Of(prefab, positions[index], Quaternion.Euler(0f, tree.rotation * Mathf.Rad2Deg, 0f), new Vector3(tree.widthScale, tree.heightScale, tree.widthScale));
+        var copy = new GameObject("Swaying Tree");
+        copy.transform.position = positions[index];
+        parts.BuildModel(copy.transform);
+        OwnTheData();
+        swaying[index] = (tree, copy);
+        Hide(index, tree);
+        TreeSway.Knock(copy, direction, degrees, 0f, () => StandBackUp(index));
+        return parts;
+    }
+
+    private void StandBackUp(int index)
+    {
+        if (swaying.TryGetValue(index, out (TreeInstance tree, GameObject copy) stood))
+        {
+            swaying.Remove(index);
+            Destroy(stood.copy);
+            terrain.terrainData.SetTreeInstance(index, stood.tree);
+        }
+    }
+
+    private void Hide(int index, TreeInstance tree)
+    {
+        TreeInstance gone = tree;
+        gone.heightScale = 0f;
+        gone.widthScale = 0f;
+        terrain.terrainData.SetTreeInstance(index, gone);
+    }
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStatics() => active.Clear();
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     private static void Hook()
@@ -200,6 +301,11 @@ public sealed class TerrainTreeFelling : MonoBehaviour
 
         var choppableTree = proxy.GetComponent<ChoppableTree>();
         choppableTree.SetSize(TreeChoppingSettings.Current.SizeOf(prototypeHeight[tree.prototypeIndex] * scale));
+        Vector3 at = positions[index];
+        GameObject prefab = terrain.terrainData.treePrototypes[tree.prototypeIndex].prefab;
+        Quaternion turned = Quaternion.Euler(0f, tree.rotation * Mathf.Rad2Deg, 0f);
+        var sized = new Vector3(tree.widthScale, tree.heightScale, tree.widthScale);
+        choppableTree.SetStandIn(() => TreeParts.Of(prefab, at, turned, sized));
         var node = proxy.GetComponent<ResourceNode>();
         int felledIndex = index;
         node.Harvested += () => Fell(felledIndex);
@@ -221,12 +327,17 @@ public sealed class TerrainTreeFelling : MonoBehaviour
         OwnTheData();
         TerrainData data = terrain.terrainData;
         TreeInstance tree = data.GetTreeInstance(index);
+        // Felled while it sways: the real tree is the one put aside, and it is the copy that goes.
+        if (swaying.TryGetValue(index, out (TreeInstance tree, GameObject copy) moving))
+        {
+            tree = moving.tree;
+            swaying.Remove(index);
+            Destroy(moving.copy);
+        }
+
         float respawn = TreeChoppingSettings.Current.TerrainTreeRegrowSeconds;
         felled[index] = (tree, respawn > 0f ? Time.time + respawn : float.PositiveInfinity);
-        TreeInstance gone = tree;
-        gone.heightScale = 0f;
-        gone.widthScale = 0f;
-        data.SetTreeInstance(index, gone);
+        Hide(index, tree);
         Release(index);
     }
 

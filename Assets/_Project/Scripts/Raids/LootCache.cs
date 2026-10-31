@@ -23,6 +23,7 @@ public sealed class LootCache : MonoBehaviour, IInteractionVerb
 
     private readonly List<ItemAmount> contents = new List<ItemAmount>();
     private readonly List<ResourceAmount> resourceContents = new List<ResourceAmount>();
+    private bool holdsRelic;
     private Interactable interactable;
     private bool rolled;
     private bool unlocked;
@@ -80,6 +81,13 @@ public sealed class LootCache : MonoBehaviour, IInteractionVerb
             LiftLid(searcher);
         }
 
+        if (holdsRelic)
+        {
+            holdsRelic = false;
+            RaidDirector raid = RaidDirector.Current;
+            RelicSettings.Grant(searcher, new System.Random(Random.Range(0, int.MaxValue)), raid.Session.Definition.Tier);
+        }
+
         if (contents.Count == 0 && resourceContents.Count == 0)
         {
             GameMessages.Post("Nothing useful inside.");
@@ -134,6 +142,7 @@ public sealed class LootCache : MonoBehaviour, IInteractionVerb
     {
         rolled = true;
         float multiplier = RaidDirector.Current != null ? RaidDirector.Current.Parameters.LootMultiplier : 1f;
+        holdsRelic = RaidDirector.Current != null && Random.value < RelicSettings.Current.CacheChance * multiplier;
         foreach (ItemAmount drop in drops.Roll())
         {
             int amount = RaidParameters.ScaleAmount(drop.Amount, multiplier, Random.value);

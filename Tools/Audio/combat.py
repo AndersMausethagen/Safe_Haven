@@ -1,0 +1,193 @@
+"""Synthesises the sounds of a fight: blades through the air, into bodies and against each other.
+
+A blow is a chest-deep thump, the short crack of contact and the wet of what gave way, so its weight carries the attack's
+weight and a critical is more of the same rather than a louder sting. A parry has to cut through a brawl, so it stays the
+brightest thing here: two iron edges, sharp contact, long dark ring, a scrape as they slide apart. Hits vary in every
+variant, since these are the sounds a player hears thousands of times.
+
+Run from the project root: python Tools/Audio/combat.py
+"""
+import os
+import sys
+
+sys.path.insert(0, os.path.dirname(__file__))
+from foley import *  # noqa: E402,F403
+
+OUT = "Assets/_Project/Audio/SFX/Safe Haven Combat"
+
+
+def flesh(rng, weight=1.0, wet=1.0, seconds=0.5):
+    t = times(seconds)
+    body = thump(rng, seconds, 70, 200, 0.06 * weight) * weight * 0.8
+    crack = band(white(len(t), rng), 1400, 6000) * decay(t, 0.0035) * 0.6
+    meat = band(pink(len(t), rng), 260, 1500) * decay(t, 0.045 * weight) * 2.6
+    squelch = np.zeros(len(t))
+    for _ in range(rng.integers(3, 7)):
+        start = rng.uniform(0.006, 0.1)
+        centre = rng.uniform(450, 1900)
+        squelch += band(white(len(t), rng), centre * 0.75, centre * 1.3) * decay(t, rng.uniform(0.006, 0.02), start) * rng.uniform(0.4, 1)
+    return body + crack + meat + squelch * 1.3 * wet
+
+
+def bite_of_blade(rng, seconds=0.5):
+    t = times(seconds)
+    return sweep(white(len(t), rng), 1800 + 4700 * np.exp(-t / 0.012), 1.6) * bump(t, 0, 0.0012, 0.018)
+
+
+def swing(rng):
+    length = rng.uniform(0.3, 0.38)
+    air = whoosh(length, 400, 2600, 1.4, rng) + 0.6 * whoosh(length, 180, 520, 1.0, rng)
+    edge = whoosh(length, 3000, 4600, 9, rng, peak=0.5) * 0.12
+    return darken(air + edge)
+
+
+def heavy_swing(rng):
+    length = rng.uniform(0.56, 0.66)
+    air = whoosh(length, 120, 1100, 1.1, rng, peak=0.55, flutter=0.5, flutter_rate=32)
+    return darken(air + 0.8 * whoosh(length, 70, 240, 1.0, rng, peak=0.55), weight=2)
+
+
+def axe_swing(rng):
+    length = rng.uniform(0.46, 0.54)
+    air = whoosh(length, 140, 1500, 1.2, rng, peak=0.5, flutter=0.7, flutter_rate=22)
+    return darken(air + 0.6 * whoosh(length, 90, 300, 1.0, rng, peak=0.5), weight=2)
+
+
+def punch_swing(rng):
+    length = rng.uniform(0.2, 0.25)
+    return darken(whoosh(length, 300, 1300, 1.2, rng, peak=0.55) + 0.4 * cloth(length, rng, 1500))
+
+
+def dodge(rng):
+    length = rng.uniform(0.36, 0.44)
+    air = whoosh(length, 180, 900, 1.0, rng, peak=0.4)
+    t = times(length)
+    scuff = band(pink(len(t), rng), 200, 1400) * bump(t, length * 0.55, 0.02, 0.05) * 0.35
+    return darken(air * 0.8 + cloth(length, rng, 1300) * 0.9 + scuff)
+
+
+def perfect_dodge(rng):
+    """Time slips: the air drops out under a hollow fall, with a dark ring left behind."""
+    length = 1.0
+    t = times(length)
+    drop = thump(rng, length, 42, 200, 0.2, sweep_tau=0.09) * 0.6
+    pass_by = whoosh(0.45, 260, 2000, 1.3, rng, peak=0.3)
+    shimmer = lowpass(strike(iron(620, rng, hold=0.5), length, 0.0015, rng), 3200) * np.clip(t / 0.06, 0, 1) * 0.12
+    mix = place(place(blank(length), drop, 0), pass_by, 0, 0.8) + shimmer
+    pan = np.clip(t / 0.35, 0, 1)
+    return space(np.stack([mix * (1.2 - 0.4 * pan), mix * (0.8 + 0.4 * pan)], axis=1), FOREST, 0.5)
+
+
+def hit(rng):
+    return darken(drive(flesh(rng) + bite_of_blade(rng) * 0.3 + strike(wood(rng.uniform(600, 900), rng, damp=0.02), 0.5, 0.0007, rng) * 0.3, 1.9))
+
+
+def critical_hit(rng):
+    seconds = 0.8
+    crack = strike(wood(rng.uniform(380, 520), rng, damp=0.035, count=16), seconds, 0.0006, rng)
+    edge = strike(iron(rng.uniform(1300, 1700), rng, hold=0.16), seconds, 0.0004, rng) * 0.1
+    sub = thump(rng, seconds, 42, 120, 0.2, sweep_tau=0.05) * 0.6
+    return darken(drive(flesh(rng, 1.5, 1.2, seconds) + crack * 0.7 + edge + sub + bite_of_blade(rng, seconds) * 0.4, 2.2), weight=2)
+
+
+def axe_hit(rng):
+    seconds = 0.6
+    chop = strike(wood(rng.uniform(190, 270), rng, damp=0.07), seconds, 0.0012, rng)
+    return darken(drive(flesh(rng, 1.25, 0.9, seconds) + chop * 0.9 + bite_of_blade(rng, seconds) * 0.2, 1.8), weight=2)
+
+
+def punch_hit(rng):
+    t = times(0.4)
+    slap = band(pink(len(t), rng), 500, 2500) * decay(t, 0.012) * 0.8
+    return darken(drive(flesh(rng, 0.85, 0.2, 0.4) + slap, 2.0), weight=2)
+
+
+def glancing_blow(rng):
+    seconds = 0.34
+    skid = scrape(rng.uniform(0.14, 0.22), rng.uniform(1100, 1500), rng)
+    tick = strike(iron(rng.uniform(1500, 1900), rng, hold=0.08, count=14), seconds, 0.0004, rng)
+    return darken(place(blank(seconds), skid, 0.004, 0.8) + tick * 0.6 + thump(rng, seconds, 80, 170, 0.03) * 0.5, top=-3)
+
+
+def block(rng):
+    seconds = 0.7
+    t = times(seconds)
+    planks = strike(wood(rng.uniform(240, 330), rng, damp=0.05, count=16), seconds, 0.0007, rng)
+    shudder = band(pink(len(t), rng), 300, 2000) * decay(t, 0.03) * 1.1
+    rim = strike(iron(rng.uniform(1100, 1400), rng, hold=0.13), seconds, 0.0004, rng) * 0.6
+    return darken(drive(planks + shudder + rim + thump(rng, seconds, 70, 160, 0.05) * 0.6, 1.8), top=-3)
+
+
+def parry(rng):
+    seconds = 1.3
+    contact = strike(iron(rng.uniform(1250, 1550), rng, hold=0.8), seconds, 0.00025, rng)
+    weight = strike(iron(rng.uniform(380, 460), rng, hold=0.35, count=16), seconds, 0.0005, rng) * 0.7
+    slide = scrape(0.12, rng.uniform(1600, 2000), rng)
+    mix = place(contact + weight + thump(rng, seconds, 75, 170, 0.05) * 0.55, slide, 0.05, 0.3)
+    return darken(mix, top=-2, weight=2)
+
+
+def guard_break(rng):
+    seconds = 1.2
+    split = strike(wood(rng.uniform(150, 200), rng, damp=0.1, count=16), seconds, 0.0012, rng)
+    clang = strike(iron(rng.uniform(560, 720), rng, hold=0.32), seconds, 0.0005, rng) * 0.6
+    splinters = scatter(0.5, 24, lambda: chip(rng, 700, 2600), rng) * 0.6
+    sub = thump(rng, seconds, 44, 150, 0.16, sweep_tau=0.04) * 0.7
+    return darken(drive(place(split + clang + sub, splinters, 0.01), 2.4), top=-3, weight=2)
+
+
+def rattle(rng, seconds=0.4, count=9):
+    """A body's gear shaken: buckles and mail settling."""
+    return scatter(seconds, count, lambda: strike(iron(rng.uniform(1700, 3400), rng, hold=0.03, count=6), 0.05, 0.0002, rng), rng, early=1.3)
+
+
+def stagger(rng):
+    seconds = 0.8
+    gear = place(blank(seconds), rattle(rng, 0.45), 0.02, 0.2)
+    return darken(drive(flesh(rng, 1.4, 0.5, seconds) + gear, 1.6), weight=2)
+
+
+def player_hurt(rng):
+    """A blow landing on you, close, and the breath going out."""
+    seconds = 0.7
+    n = int(seconds * RATE)
+    gasp_length = rng.uniform(0.2, 0.28)
+    m = int(gasp_length * RATE)
+    t = times(gasp_length)
+    pitch = rng.uniform(105, 130) * np.exp(-t / 0.5)
+    tract = [(rng.uniform(480, 560), 5, 1.0), (rng.uniform(1000, 1200), 6, 0.6), (2400.0, 8, 0.2)]
+    gasp = fade_end(voice(pitch, tract, rng, rough=0.3, breath=0.9) * bump(t, 0, 0.018, gasp_length * 0.3), 0.3)
+    mix = flesh(rng, 1.15, 0.5, seconds) + band(pink(n, rng), 100, 400) * decay(times(seconds), 0.05) * 0.4
+    return space(darken(place(mix, gasp / max(1e-9, np.abs(gasp).max()) * 0.32, 0.025)), HUT, 0.25)
+
+
+def land(rng):
+    seconds = 0.45
+    t = times(seconds)
+    soil = band(pink(len(t), rng), 250, 1600) * bump(t, 0.002, 0.004, 0.045) * 0.5
+    gear = place(blank(seconds), rattle(rng, 0.2, 5), 0.015, 0.05)
+    return darken(thump(rng, seconds, 62, 130, 0.07) + soil + gear, weight=2)
+
+
+# Which recipe, how many variants and the file name's stem; anything played from a fixed point on screen stays stereo.
+SOUNDS = [
+    ("Swing", swing, 4, True), ("Heavy Swing", heavy_swing, 3, True), ("Axe Swing", axe_swing, 3, True), ("Punch Swing", punch_swing, 4, True),
+    ("Dodge", dodge, 4, True), ("Perfect Dodge", perfect_dodge, 2, False),
+    ("Hit", hit, 8, True), ("Critical Hit", critical_hit, 5, True), ("Axe Hit", axe_hit, 5, True), ("Punch Hit", punch_hit, 5, True), ("Glancing Blow", glancing_blow, 4, True),
+    ("Block", block, 5, True), ("Parry", parry, 5, True), ("Guard Break", guard_break, 4, True), ("Stagger", stagger, 4, True),
+    ("Player Hurt", player_hurt, 6, False), ("Land", land, 4, True),
+]
+
+
+def main():
+    for stem, recipe, count, positional in SOUNDS:
+        for i in range(1, count + 1):
+            name = f"{stem} {i}"
+            sound = recipe(seeded(name))
+            if positional:
+                sound = space(sound, FOREST, 0.1)
+            save(OUT, name, sound, mono=positional)
+
+
+if __name__ == "__main__":
+    main()

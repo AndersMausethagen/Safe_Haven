@@ -17,6 +17,7 @@ public static class GearGlow
         }
 
         Color glow = stack.Enchantment == null ? settings.EmpowerGlow
+            : stack.Enchantment.IsRelic ? RelicSettings.Current.Glow
             : stack.Enchantment.School == EssenceSchool.Cursed ? settings.CursedGlow : settings.PurifiedGlow;
         return glow * (1f + stack.Empower * settings.GlowPerLevel);
     }
@@ -27,6 +28,11 @@ public static class GearGlow
         if (stack.IsEmpty || stack.Enchantment == null)
         {
             return null;
+        }
+
+        if (stack.Enchantment.IsRelic)
+        {
+            return RelicSettings.Current.Glow;
         }
 
         return stack.Enchantment.School == EssenceSchool.Cursed ? style.Danger : style.Good;

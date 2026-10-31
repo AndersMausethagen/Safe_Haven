@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 55433f6de2238c643b7ddfb32e5977d0, type: 3}
+  m_Name: ElderTree
+  m_EditorClassIdentifier: SafeHaven::BuildingDefinition
+  id: eldertree
+  displayName: Elder Tree
+  description: Grown from a sapling brought through the portal. Nothing else here is this old.
+  icon: {fileID: 0}
+  faction: 0
+  combatStats: {fileID: 0}
+  prefab: {fileID: 185875747364697050, guid: 54e5975893a483049bdae52815fb17d4, type: 3}
+  constructionCost: []
+  constructionItems:
+  - item: {fileID: 11400000, guid: 183fddc5567e8b8479fcb1618e73496c, type: 2}
+    amount: 4
+  showInBuildMenu: 1
+  knownFromStart: 0
+  sortOrder: 910
+  yardDepth: 0
+  yardSide: 0
+  placeInLines: 0
+  station: 0
+  outputCapacity: 10
+  queueLength: 5
+  buildWork: 4
+  renown: 12
+  upgrades: []
+  deathSound: {fileID: 0}

@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2f02987ee9197d4682f5db8cbc7a967, type: 3}
+  m_Name: TorsShelter
+  m_EditorClassIdentifier: SafeHaven::RaidEventDefinition
+  id: rumour.torsshelter
+  displayName: A Shelter, Built Too Well
+  weight: 0
+  earliestSeconds: 30
+  latestSecondsLeft: 60
+  minimumStage: 0
+  warning: 
+  warningSound: {fileID: 0}
+  sitePrefab: {fileID: 7345240531865155924, guid: 1eba7bdc41134f94a844bfdfae426775, type: 3}
+  siteDistance: {x: 35, y: 70}
+  siteText: A lean-to of split logs, every joint square. A man sits under it with a broken leg, still measuring.
+  onStart: []
+  choices:
+  - label: Cut him out
+    detail: 45 seconds, and the sawing will carry.
+    cost: []
+    result: He hands you his rule before he lets you lift him.
+    outcomes:
+    - rid: 287758281410609422
+    - rid: 287758281410609423
+    - rid: 287758281410609424
+  references:
+    version: 2
+    RefIds:
+    - rid: 287758281410609422
+      type: {class: ChangeTimeOutcome, ns: , asm: SafeHaven}
+      data:
+        seconds: -45
+    - rid: 287758281410609423
+      type: {class: MakeNoiseOutcome, ns: , asm: SafeHaven}
+      data:
+        radius: 25
+    - rid: 287758281410609424
+      type: {class: RescueResidentOutcome, ns: , asm: SafeHaven}
+      data:
+        resident: {fileID: 11400000, guid: df34e8e1df8ff0241a216bfddf9b631c, type: 2}
+        traveler: {fileID: 4560087502640453408, guid: 34ab3b53d3ced634486fa4ab89e59887, type: 3}

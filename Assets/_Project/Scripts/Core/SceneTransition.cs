@@ -239,6 +239,7 @@ public static class SceneTransition
         private const float LoadShare = 0.85f;
 
         private LoadingScreen screen;
+        private PlayerInputHandler stoppedInput;
         private float setupProgress;
 
         private void Awake()
@@ -289,6 +290,7 @@ public static class SceneTransition
             {
                 Debug.LogError($"Could not load '{scene ?? buildIndex.ToString()}'. Is it in Build Settings?");
                 SceneLoader.CancelLeaving();
+                ResumePlayer();
                 yield return Fade(0f, settings.FadeInSeconds);
                 screen.Hide();
                 MarkReady(SceneManager.GetActiveScene());
@@ -408,11 +410,23 @@ public static class SceneTransition
         }
 
         // The player stays in the old scene until the new one is shown, so keep them still meanwhile.
-        private static void StopPlayer()
+        private void StopPlayer()
         {
-            if (Player.Current != null && Player.Current.TryGetComponent(out PlayerInputHandler input))
+            stoppedInput = null;
+            if (Player.Current != null && Player.Current.TryGetComponent(out PlayerInputHandler input) && input.enabled)
             {
                 input.enabled = false;
+                stoppedInput = input;
+            }
+        }
+
+        // Only what the transition stopped itself: a player stopped for a reason of its own, such as a raid ending, stays stopped.
+        private void ResumePlayer()
+        {
+            if (stoppedInput != null)
+            {
+                stoppedInput.enabled = true;
+                stoppedInput = null;
             }
         }
     }

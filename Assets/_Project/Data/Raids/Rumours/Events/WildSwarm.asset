@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2f02987ee9197d4682f5db8cbc7a967, type: 3}
+  m_Name: WildSwarm
+  m_EditorClassIdentifier: SafeHaven::RaidEventDefinition
+  id: rumour.wildswarm
+  displayName: The Wild Swarm
+  weight: 0
+  earliestSeconds: 30
+  latestSecondsLeft: 60
+  minimumStage: 0
+  warning: 
+  warningSound: {fileID: 0}
+  sitePrefab: {fileID: 852558878823289175, guid: 0c99e9713ece39a41bc74e652c5dddcf, type: 3}
+  siteDistance: {x: 35, y: 70}
+  siteText: A swarm the size of a man hangs from a dead limb, and the whole clearing hums.
+  onStart: []
+  choices:
+  - label: Take the swarm
+    detail: You will be stung, and it's heavy.
+    cost: []
+    result: It settles. Mostly.
+    outcomes:
+    - rid: 287758281410609444
+    - rid: 287758281410609445
+  references:
+    version: 2
+    RefIds:
+    - rid: 287758281410609444
+      type: {class: ChangeHealthOutcome, ns: , asm: SafeHaven}
+      data:
+        share: -0.15
+    - rid: 287758281410609445
+      type: {class: GiveLootOutcome, ns: , asm: SafeHaven}
+      data:
+        loot:
+          entries:
+          - item: {fileID: 11400000, guid: ac775252775532748a96c1e9158ab473, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 1
+            maxQuantity: 1
+            probability: 1

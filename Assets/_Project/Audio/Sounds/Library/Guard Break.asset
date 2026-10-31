@@ -14,15 +14,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::SoundDefinition
   displayName: Guard Break
   clips:
-  - {fileID: 8300000, guid: 3dc555443cfcd3841bd09c568601400c, type: 3}
-  - {fileID: 8300000, guid: d7602906ed6cee24a8b5abb2b06b4b25, type: 3}
-  - {fileID: 8300000, guid: 8ed92dfea9752ac459a1d65f7c09284b, type: 3}
-  - {fileID: 8300000, guid: 6656b830f52e7c543851992f2e08dcc3, type: 3}
-  - {fileID: 8300000, guid: 9dfc00196d3b99c4989215a1368ec41a, type: 3}
+  - {fileID: 8300000, guid: 4e0c2b32063434242b5772f86a5c6ac5, type: 3}
+  - {fileID: 8300000, guid: f0ac97e466782c241bb98ae5a81eca11, type: 3}
+  - {fileID: 8300000, guid: 0e939452d869278448150362ee752754, type: 3}
+  - {fileID: 8300000, guid: 501e1a89245124940af243b076392686, type: 3}
   channel: 2
-  volume: 0.9
+  volume: 0.55
   volumeVariation: 0.1
-  pitchRange: {x: 0.75, y: 0.85}
+  pitchRange: {x: 0.95, y: 1.05}
   positional: 1
   fullVolumeDistance: 3
   audibleDistance: 35

@@ -1,0 +1,46 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2f02987ee9197d4682f5db8cbc7a967, type: 3}
+  m_Name: SigridsHorn
+  m_EditorClassIdentifier: SafeHaven::RaidEventDefinition
+  id: rumour.sigridshorn
+  displayName: The Horn at Dusk
+  weight: 0
+  earliestSeconds: 30
+  latestSecondsLeft: 60
+  minimumStage: 0
+  warning: 
+  warningSound: {fileID: 0}
+  sitePrefab: {fileID: 6300785177508054535, guid: f6b55623a86789d4596845f67db2bf63, type: 3}
+  siteDistance: {x: 35, y: 70}
+  siteText: Sigrid leans on a broken spear, a horn in her other hand, hurt worse than she'll say.
+  onStart: []
+  choices:
+  - label: Take her weight
+    detail: 'It will cost you: you take a wound getting her up.'
+    cost: []
+    result: '"Who''s home?" is the first thing she says.'
+    outcomes:
+    - rid: 287758281410609433
+    - rid: 287758281410609434
+  references:
+    version: 2
+    RefIds:
+    - rid: 287758281410609433
+      type: {class: ChangeHealthOutcome, ns: , asm: SafeHaven}
+      data:
+        share: -0.25
+    - rid: 287758281410609434
+      type: {class: RescueResidentOutcome, ns: , asm: SafeHaven}
+      data:
+        resident: {fileID: 11400000, guid: b230d041259b863428e4e973c6ff0d86, type: 2}
+        traveler: {fileID: 4560087502640453408, guid: 34ab3b53d3ced634486fa4ab89e59887, type: 3}

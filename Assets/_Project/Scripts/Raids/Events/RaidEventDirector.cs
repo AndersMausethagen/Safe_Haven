@@ -13,6 +13,7 @@ public sealed class RaidEventDirector : MonoBehaviour
     private const float ThinkInterval = 1f;
 
     private readonly List<RaidEventSite> open = new List<RaidEventSite>();
+    private readonly List<RaidEventSite> pinned = new List<RaidEventSite>();
     private readonly HashSet<RaidEventDefinition> used = new HashSet<RaidEventDefinition>();
     private RaidEventSettings settings;
     private RaidDirector director;
@@ -24,6 +25,9 @@ public sealed class RaidEventDirector : MonoBehaviour
 
     /// <summary>Sites still waiting for the player, for the HUD.</summary>
     public IReadOnlyList<RaidEventSite> OpenSites => open;
+
+    /// <summary>The rumours' sites, for the HUD: they wait all raid and don't count against the raid's events.</summary>
+    public IReadOnlyList<RaidEventSite> PinnedSites => pinned;
 
     /// <summary>How many events have begun this raid.</summary>
     public int Happened => used.Count;
@@ -78,6 +82,19 @@ public sealed class RaidEventDirector : MonoBehaviour
             return false;
         }
 
+        Place(definition, position, open);
+        return true;
+    }
+
+    /// <summary>Stands an event at a given place for the whole raid: what a rumour promised.</summary>
+    public void BeginAt(RaidEventDefinition definition, Vector3 position)
+    {
+        random ??= new System.Random(director.Session.Seed ^ 0x52414944);
+        Place(definition, position, pinned);
+    }
+
+    private void Place(RaidEventDefinition definition, Vector3 position, List<RaidEventSite> sites)
+    {
         var context = new RaidEventContext
         {
             Session = director.Session,
@@ -94,7 +111,7 @@ public sealed class RaidEventDirector : MonoBehaviour
             if (placed.TryGetComponent(out RaidEventSite site))
             {
                 site.Bind(definition, context);
-                open.Add(site);
+                sites.Add(site);
             }
             else
             {
@@ -119,7 +136,6 @@ public sealed class RaidEventDirector : MonoBehaviour
 
         director.Session.RecordEvent(definition.DisplayName);
         GameEvents.Raise(new GameEvent(GameEventKind.RaidEvent, definition, 0, director.Player));
-        return true;
     }
 
     private Transform Container()

@@ -200,7 +200,13 @@ public sealed class RaidHudView : MonoBehaviour
             return;
         }
 
-        foreach (RaidEventSite site in events.OpenSites)
+        AppendSites(events.PinnedSites, position, "#FFD27A");
+        AppendSites(events.OpenSites, position, "#DCCBF2");
+    }
+
+    private void AppendSites(IReadOnlyList<RaidEventSite> sites, Vector3 position, string colour)
+    {
+        foreach (RaidEventSite site in sites)
         {
             if (site == null || site.IsResolved)
             {
@@ -209,7 +215,7 @@ public sealed class RaidHudView : MonoBehaviour
 
             Vector3 offset = site.transform.position - position;
             offset.y = 0f;
-            text.Append($"\n<color=#DCCBF2>{site.DisplayName}  {Mathf.RoundToInt(offset.magnitude)} m  {SideOf(offset)}</color>");
+            text.Append($"\n<color={colour}>{site.DisplayName}  {Mathf.RoundToInt(offset.magnitude)} m  {SideOf(offset)}</color>");
         }
     }
 

@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 29a4813b55e8bc543a181501cef14e82, type: 3}
+  m_Name: Tor
+  m_EditorClassIdentifier: SafeHaven::RaidRumourDefinition
+  id: rumour.tor
+  briefing: A saw was heard in the deep woods, where nobody saws.
+  site: {fileID: 11400000, guid: 52da5f229c32d26489ab9520410fa554, type: 2}
+  weight: 2
+  hour: 0
+  seeks: {fileID: 11400000, guid: df34e8e1df8ff0241a216bfddf9b631c, type: 2}
+  teaches: {fileID: 0}
+  breachComing: 0
+  afterExtractions: 1

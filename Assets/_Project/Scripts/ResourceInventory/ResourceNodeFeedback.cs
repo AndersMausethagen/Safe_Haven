@@ -1,6 +1,16 @@
 using UnityEngine;
 using UnityEngine.Events;
 
+/// <summary>A node that knows its own build better than its bounds do, such as a tree, whose bounds are its crown.</summary>
+public interface IHarvestBody
+{
+    /// <summary>Where a tool swung from this point lands.</summary>
+    Vector3 HitPoint(Vector3 from);
+
+    /// <summary>How big it is for its sounds (see AudioManager.Play). 1 is the size they were made for.</summary>
+    float HarvestSize { get; }
+}
+
 /// <summary>
 /// Plays a gathering node's feedback: sound, particles and a rock of the model on every swing, a shrink-and-sink break
 /// when it is harvested and a pop when it grows back. What plays comes from the node's HarvestFeedbackProfile (picked on
@@ -29,6 +39,7 @@ public sealed class ResourceNodeFeedback : MonoBehaviour
     [SerializeField] private UnityEvent onRegrown = new UnityEvent();
 
     private ResourceNode node;
+    private IHarvestBody body;
     private Renderer[] renderers;
     private Vector3 baseScale;
     private Vector3 basePosition;
@@ -116,6 +127,7 @@ public sealed class ResourceNodeFeedback : MonoBehaviour
 
         initialised = true;
         node = GetComponent<ResourceNode>();
+        body = GetComponent<IHarvestBody>();
         visualRoot = visualRoot != null ? visualRoot : FindVisualRoot();
         renderers = visualRoot != null ? visualRoot.GetComponentsInChildren<Renderer>(true) : new Renderer[0];
         if (visualRoot != null)
@@ -154,7 +166,7 @@ public sealed class ResourceNodeFeedback : MonoBehaviour
     private void OnSwung(SwingResult result, Vector3 from)
     {
         HarvestMoment moment = HarvestFeedbackProfile.MomentOf(result);
-        Vector3 point = HitPoint(from);
+        Vector3 point = body != null ? body.HitPoint(from) : HitPoint(from);
         Play(moment, point, from);
 
         HarvestFeedbackProfile profile = Profile;
@@ -180,6 +192,11 @@ public sealed class ResourceNodeFeedback : MonoBehaviour
     private void OnHarvested()
     {
         Vector3 centre = Bounds(out Bounds bounds) ? bounds.center : transform.position + Vector3.up;
+        if (body != null)
+        {
+            centre = body.HitPoint(transform.position - transform.forward);
+        }
+
         Play(HarvestMoment.Harvested, centre, centre - transform.forward);
         onHarvested.Invoke();
 
@@ -214,7 +231,7 @@ public sealed class ResourceNodeFeedback : MonoBehaviour
     {
         HarvestFeedbackProfile own = OwnProfile;
         HarvestFeedbackProfile fallback = DefaultProfile;
-        AudioManager.Play(HarvestFeedbackProfile.SoundFor(own, fallback, moment), point);
+        AudioManager.Play(HarvestFeedbackProfile.SoundFor(own, fallback, moment), point, body != null ? body.HarvestSize : 1f);
 
         GameObject effect = HarvestFeedbackProfile.EffectFor(own, fallback, moment);
         if (effect != null && Application.isPlaying)

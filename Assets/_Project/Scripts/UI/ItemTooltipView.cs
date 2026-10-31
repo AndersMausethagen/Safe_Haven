@@ -321,6 +321,19 @@ public sealed class ItemTooltipView : MonoBehaviour
         {
             builder.Append(bonus.value >= 0f ? "\n<color=#8BE08B>" : "\n<color=#FF7B6B>").Append(bonus.Describe()).Append("</color>");
         }
+
+        foreach (RelicEffect effect in stack.Enchantment.Effects)
+        {
+            if (effect != null)
+            {
+                builder.Append("\n<color=#FFD27A>").Append(effect.Describe()).Append("</color>");
+            }
+        }
+
+        if (stack.Enchantment.IsRelic)
+        {
+            builder.Append("\n<alpha=#AA>A relic. Nobody at home could make this.");
+        }
     }
 
     /// <summary>"+3 Strength, +15 Max Stamina".</summary>
