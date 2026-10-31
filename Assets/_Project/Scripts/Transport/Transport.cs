@@ -75,6 +75,7 @@ public sealed class Transport : MonoBehaviour, ISaveable
     }
 
     public TransportDefinition Definition => definition;
+    public Interactable Interactable => interactable;
     public ItemContainer Cargo { get; private set; }
     public Rigidbody Body { get; private set; }
     public ITransportDriver Driver { get; private set; }
@@ -211,6 +212,22 @@ public sealed class Transport : MonoBehaviour, ISaveable
         page.Add(new MenuAction("Open the cargo", "Move things between it and your bag", true, () => CargoWindow.Create().Open(this, user), closesMenu: true));
         page.Add(new MenuAction("Pack it up", empty ? "Back into your bag as a kit" : "Empty it first", empty, () => PackUp(user), closesMenu: true));
         return page;
+    }
+
+    /// <summary>What everything in the cargo is worth.</summary>
+    public int CargoValue
+    {
+        get
+        {
+            int value = 0;
+            for (int i = 0; i < Cargo.SlotCount; i++)
+            {
+                ItemStack stack = Cargo.GetSlot(i);
+                value += stack.IsEmpty ? 0 : stack.Count * stack.Item.Value;
+            }
+
+            return value;
+        }
     }
 
     /// <summary>"120 / 200 weight, 15% slower".</summary>

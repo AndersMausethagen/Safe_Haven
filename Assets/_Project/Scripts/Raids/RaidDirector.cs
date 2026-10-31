@@ -337,7 +337,7 @@ public sealed class RaidDirector : MonoBehaviour
         Report = RaidReport.Create(Session, Session.Loadout, keeps, final, wear);
         if (PlayerTransport.Current != null)
         {
-            PlayerTransport.Current.LeaveRaid(extracted);
+            PlayerTransport.Current.LeaveRaid(Report, extracted);
         }
 
         GameSession.EndRaid(Report);

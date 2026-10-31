@@ -193,11 +193,9 @@ public sealed class PlayerTransport : MonoBehaviour
         }
 
         Transport transport = Using;
-        string name = transport.Definition.DisplayName;
         GameSession.CarryTransport(new GameSession.CarriedTransport(transport.Definition, transport.CaptureState()));
         transport.Driver.LetGo();
         transport.Remove();
-        GameMessages.Post($"The {name} comes with you. Lose the raid, or leave it behind, and it is gone.", MessageKind.Warning);
     }
 
     /// <summary>The cart that would come home if the raid ended now: the nearest to the player. Null with none.</summary>
@@ -229,7 +227,7 @@ public sealed class PlayerTransport : MonoBehaviour
     }
 
     /// <summary>The raid is over. On extraction the cart nearest the player comes home; the rest of the forest keeps.</summary>
-    public void LeaveRaid(bool extracted)
+    public void LeaveRaid(RaidReport report, bool extracted)
     {
         Transport nearest = RaidCart(out float distance);
         if (nearest == null)
@@ -237,15 +235,42 @@ public sealed class PlayerTransport : MonoBehaviour
             return;
         }
 
-        if (extracted && distance <= TransportSettings.Current.ExtractionRange)
+        bool home = extracted && distance <= TransportSettings.Current.ExtractionRange;
+        if (home)
         {
             GameSession.CarryTransport(new GameSession.CarriedTransport(nearest.Definition, nearest.CaptureState()));
-            GameMessages.Post($"The {nearest.Definition.DisplayName} comes home with you.", MessageKind.Gain);
         }
-        else
+
+        if (report != null)
         {
-            GameMessages.Post($"The {nearest.Definition.DisplayName} and what is in it stay behind.", MessageKind.Warning);
+            report.TransportHome = home;
+            report.TransportLine = RaidEnding(nearest.Definition.DisplayName, nearest.Cargo.CountItems(), home);
         }
+    }
+
+    /// <summary>"The Handcart came home with 30 items." for the report on a raid.</summary>
+    public static string RaidEnding(string name, int items, bool home)
+    {
+        string load = $"{items} item{(items == 1 ? "" : "s")}";
+        if (home)
+        {
+            return items > 0 ? $"The {name} came home with {load}." : $"The {name} came home.";
+        }
+
+        return items > 0 ? $"The {name} stayed behind, and {load} with it." : $"The {name} stayed behind.";
+    }
+
+    /// <summary>What the portal's briefing says about the cart in the hands. Empty without one.</summary>
+    public string RaidWarning()
+    {
+        if (Using == null || !(Using.Driver is Haulable))
+        {
+            return "";
+        }
+
+        int items = Using.Cargo.CountItems();
+        string load = items > 0 ? $", with {items} item{(items == 1 ? "" : "s")} in it," : "";
+        return $"The {Using.Definition.DisplayName}{load} comes with you. Fail, or leave it more than {TransportSettings.Current.ExtractionRange:0} m away when you extract, and it is lost.";
     }
 
     private void Arrive(GameSession.CarriedTransport carried)

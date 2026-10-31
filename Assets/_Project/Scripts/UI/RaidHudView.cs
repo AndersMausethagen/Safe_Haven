@@ -234,12 +234,19 @@ public sealed class RaidHudView : MonoBehaviour
         }
 
         RaidRisk risk = RaidRisk.Of(PlayerSnapshot.Capture(player), director.Session.Loadout);
-        if (risk.IsEmpty)
+        Transport cart = PlayerTransport.Current != null ? PlayerTransport.Current.RaidCart(out _) : null;
+        if (cart != null)
+        {
+            risk = risk.WithCargo(cart.Cargo.CountItems(), cart.CargoValue);
+        }
+
+        if (risk.IsEmpty && cart == null)
         {
             return "<color=#D9D2C4>Nothing at risk yet</color>";
         }
 
-        return $"At risk: <color=#F0BC6C>{risk.Items} items ({risk.Value} value)  ·  {risk.Resources} materials</color>";
+        string carted = cart != null ? $"  ·  the {cart.Definition.DisplayName}" : "";
+        return $"At risk: <color=#F0BC6C>{risk.Items} items ({risk.Value} value)  ·  {risk.Resources} materials{carted}</color>";
     }
 
     private Color TimerColor(RaidSession session)

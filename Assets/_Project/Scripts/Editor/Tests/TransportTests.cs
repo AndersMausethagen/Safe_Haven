@@ -156,6 +156,24 @@ public sealed class TransportTests
     }
 
     [Test]
+    public void TheRaidReport_SaysWhatBecameOfTheCart()
+    {
+        Assert.AreEqual("The Handcart came home with 30 items.", PlayerTransport.RaidEnding("Handcart", 30, true));
+        Assert.AreEqual("The Handcart came home.", PlayerTransport.RaidEnding("Handcart", 0, true));
+        Assert.AreEqual("The Wheelbarrow stayed behind, and 1 item with it.", PlayerTransport.RaidEnding("Wheelbarrow", 1, false));
+        Assert.AreEqual("The Handcart stayed behind.", PlayerTransport.RaidEnding("Handcart", 0, false));
+    }
+
+    [Test]
+    public void ACartsLoad_CountsAsAtRisk()
+    {
+        RaidRisk risk = new RaidRisk(2, 10, 5).WithCargo(30, 60);
+        Assert.AreEqual(32, risk.Items);
+        Assert.AreEqual(70, risk.Value);
+        Assert.AreEqual(5, risk.Resources, "essences don't ride in the cart");
+    }
+
+    [Test]
     public void AuthoredTransports_AreWiredUp()
     {
         var content = Resources.Load<ContentDatabase>(ContentDatabase.ResourceName);

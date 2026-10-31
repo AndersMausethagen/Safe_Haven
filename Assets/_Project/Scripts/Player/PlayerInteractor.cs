@@ -18,6 +18,7 @@ public sealed class PlayerInteractor : MonoBehaviour
     private PlayerMovement movement;
     private PlayerStateMachine stateMachine;
     private Damageable health;
+    private PlayerTransport transportUser;
     private Interactable current;
     private bool isInteracting;
 
@@ -33,6 +34,7 @@ public sealed class PlayerInteractor : MonoBehaviour
         movement = GetComponent<PlayerMovement>();
         stateMachine = GetComponent<PlayerStateMachine>();
         health = GetComponent<Damageable>();
+        transportUser = GetComponent<PlayerTransport>();
     }
 
     private void OnEnable()
@@ -190,12 +192,13 @@ public sealed class PlayerInteractor : MonoBehaviour
         Interactable nearest = null;
         float nearestDistance = float.MaxValue;
         bool nearestInReach = false;
+        Interactable held = transportUser != null && transportUser.Using != null ? transportUser.Using.Interactable : null;
 
         IReadOnlyList<Interactable> candidates = Interactable.Active;
         for (int i = 0; i < candidates.Count; i++)
         {
             Interactable candidate = candidates[i];
-            if (candidate == null || !candidate.IsAvailable)
+            if (candidate == null || candidate == held || !candidate.IsAvailable)
             {
                 continue;
             }
@@ -221,6 +224,8 @@ public sealed class PlayerInteractor : MonoBehaviour
             }
         }
 
-        return nearest;
+        // What is in the hands is always nearest, so it only answers when nothing else in reach does: a cart can be
+        // wheeled up to a chest or the portal and used without dropping it.
+        return held != null && !nearestInReach ? held : nearest;
     }
 }

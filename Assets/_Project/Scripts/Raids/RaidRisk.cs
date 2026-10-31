@@ -19,6 +19,9 @@ public readonly struct RaidRisk
 
     public bool IsEmpty => Items == 0 && Resources == 0;
 
+    /// <summary>The same risk with a cart's load on top: all of it is lost with the cart.</summary>
+    public RaidRisk WithCargo(int items, int value) => new RaidRisk(Items + items, Value + value, Resources);
+
     /// <param name="carried">What the player holds now.</param>
     /// <param name="loadout">What the player carried into the raid, which decides the equipment that is kept.</param>
     public static RaidRisk Of(PlayerSnapshot carried, PlayerSnapshot loadout)

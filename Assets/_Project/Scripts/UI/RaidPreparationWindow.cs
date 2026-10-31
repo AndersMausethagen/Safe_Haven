@@ -400,7 +400,8 @@ public sealed class RaidPreparationWindow : MonoBehaviour
         string carrying = items == 0 && resources == 0
             ? "You carry nothing that can be lost."
             : $"You carry {items} item{(items == 1 ? "" : "s")} and {resources} resource{(resources == 1 ? "" : "s")}. Leave what you can't risk in storage.";
-        return $"<color={Warning}>{lossRules}</color>\n{carrying}";
+        string cart = PlayerTransport.Current != null ? PlayerTransport.Current.RaidWarning() : "";
+        return $"<color={Warning}>{lossRules}</color>\n{carrying}" + (cart.Length > 0 ? $"\n<color={Warning}>{cart}</color>" : "");
     }
 
     private void Enter()

@@ -62,6 +62,11 @@ public static class RaidReportText
             builder.Append($"<b><color={Gain}>{rescued.DisplayName} came home with you.</color></b>\n<i>\"{rescued.ArrivalLine}\"</i>\n\n");
         }
 
+        if (!string.IsNullOrEmpty(report.TransportLine))
+        {
+            builder.Append($"<b><color={(report.TransportHome ? Gain : Loss)}>{report.TransportLine}</color></b>\n\n");
+        }
+
         bool gainedAny = report.ItemsGained.Count > 0 || report.ResourcesGained.Count > 0;
         bool lostAny = report.ItemsLost.Count > 0 || report.ResourcesLost.Count > 0;
         if (report.Extracted)
@@ -85,8 +90,16 @@ public static class RaidReportText
                 builder.Append($"<size=22><b>Value lost: <color={Loss}>{report.ValueLost}</color></b></size>\n\n");
             }
 
-            builder.Append("<b>Lost</b>\n");
-            builder.Append(lostAny ? List(report.ItemsLost, report.ResourcesLost, "-", Loss) : $"<color={Muted}>You carried nothing, so nothing was lost.</color>");
+            // A lost cart was just reported above: "nothing was lost" right under it would be wrong.
+            bool cartLost = !string.IsNullOrEmpty(report.TransportLine) && !report.TransportHome;
+            if (lostAny)
+            {
+                builder.Append("<b>Lost</b>\n").Append(List(report.ItemsLost, report.ResourcesLost, "-", Loss));
+            }
+            else if (!cartLost)
+            {
+                builder.Append($"<b>Lost</b>\n<color={Muted}>You carried nothing, so nothing was lost.</color>");
+            }
 
             // Shown apart from the losses (GDD §8.3): this gear came home, only worn.
             if (report.EquipmentDamaged.Count > 0)

@@ -55,6 +55,9 @@ public sealed class RaidReport
     public IReadOnlyList<RaidModifierDefinition> Modifiers { get; }
     public int SparksUsed { get; }
     public bool Extracted => Outcome == RaidOutcome.Extracted;
+    /// <summary>What became of a cart in the raid, in a sentence. Empty when there was none.</summary>
+    public string TransportLine { get; set; } = "";
+    public bool TransportHome { get; set; }
     /// <summary>Residents brought home by this raid.</summary>
     public List<ResidentDefinition> Rescued { get; } = new List<ResidentDefinition>();
 
