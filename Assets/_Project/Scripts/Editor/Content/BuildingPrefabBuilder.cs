@@ -52,7 +52,12 @@ public static class BuildingPrefabBuilder
         PrefabBuildUtility.AddIfMissing<Damageable>(prefab, problems);
         PrefabBuildUtility.AddIfMissing<DamageNumberSpawner>(prefab, problems);
         PrefabBuildUtility.AddIfMissing<BuildingObject>(prefab, problems);
-        PrefabBuildUtility.AddIfMissing<NavMeshObstacle>(prefab, problems);
+        // Creatures have to walk onto a trap, so it is the one building that must not be an obstacle.
+        if (prefab.GetComponent<SpikeTrap>() == null)
+        {
+            PrefabBuildUtility.AddIfMissing<NavMeshObstacle>(prefab, problems);
+        }
+
         PrefabBuildUtility.AddIfMissing<SaveableEntity>(prefab, problems);
         if (prefab.GetComponentInChildren<WorldHealthBar>(true) == null)
         {
@@ -118,13 +123,16 @@ public static class BuildingPrefabBuilder
         PrefabBuildUtility.EnsureDamageNumbers(root, bounds);
         PrefabBuildUtility.EnsureHealthBar(root, bounds);
 
-        NavMeshObstacle obstacle = PrefabBuildUtility.GetOrAdd<NavMeshObstacle>(root, out bool obstacleAdded);
-        if (obstacleAdded)
+        if (root.GetComponent<SpikeTrap>() == null)
         {
-            obstacle.shape = NavMeshObstacleShape.Box;
-            obstacle.center = bounds.center;
-            obstacle.size = bounds.size;
-            obstacle.carving = true;
+            NavMeshObstacle obstacle = PrefabBuildUtility.GetOrAdd<NavMeshObstacle>(root, out bool obstacleAdded);
+            if (obstacleAdded)
+            {
+                obstacle.shape = NavMeshObstacleShape.Box;
+                obstacle.center = bounds.center;
+                obstacle.size = bounds.size;
+                obstacle.carving = true;
+            }
         }
 
         PrefabBuildUtility.Configure(PrefabBuildUtility.GetOrAdd<BuildingObject>(root),

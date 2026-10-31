@@ -20,7 +20,7 @@ MonoBehaviour:
   rarity: 0
   value: 26
   icon: {fileID: 21300000, guid: e0118325b4bfd384393b45d6acd9965a, type: 3}
-  prefab: {fileID: 6110183848089232465, guid: 4c3ce09430823714eb4149ec62a42420, type: 3}
+  prefab: {fileID: 9051892270028649301, guid: 17c10cfba70153f4d8191da9475940d3, type: 3}
   heldModel: {fileID: 545387659491642180, guid: 5d2272118913a8645abff37ca706485d, type: 3}
   heldPosition: {x: 0, y: 0, z: 0}
   heldRotation: {x: 0, y: 0, z: 0}
@@ -46,4 +46,5 @@ MonoBehaviour:
   teachesBuildings: []
   teachesRecipes: []
   experience: 0
+  transport: {fileID: 0}
   raidModifier: {fileID: 0}

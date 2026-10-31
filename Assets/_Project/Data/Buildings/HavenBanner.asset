@@ -17,7 +17,7 @@ MonoBehaviour:
   description: Safe Haven's colours, raised for all the forest to see.
   icon: {fileID: 0}
   faction: 0
-  combatStats: {fileID: 0}
+  combatStats: {fileID: 11400000, guid: 01155c9e2dd7c27468c1a359f747e1a1, type: 2}
   prefab: {fileID: 812568838218764070, guid: d8acdce49e03fa844b47d38b4111b3e7, type: 3}
   constructionCost: []
   constructionItems:

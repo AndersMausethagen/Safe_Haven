@@ -20,7 +20,7 @@ MonoBehaviour:
   rarity: 0
   value: 1
   icon: {fileID: 5268473884595868589, guid: 8b547e4c633892741a6ace87dc343aa3, type: 3}
-  prefab: {fileID: 6110183848089232465, guid: 4c3ce09430823714eb4149ec62a42420, type: 3}
+  prefab: {fileID: 4444845414810717596, guid: de22b1e9f2d54ee44866220ed672eb9b, type: 3}
   heldModel: {fileID: 7846407346015277191, guid: b6bdf9d23d7be7f4db12fe220db8c0ee, type: 3}
   heldPosition: {x: 0, y: 0, z: 0}
   heldRotation: {x: 0, y: 0, z: 0}
@@ -35,6 +35,10 @@ MonoBehaviour:
   healAmount: 0
   hungerRestore: 0
   thirstRestore: 0
+  boonBonuses: []
+  boonSeconds: 300
+  tonic: 0
+  cures: []
   carryCapacityBonus: 0
   bagSlotBonus: 0
   armorSlot: 0
@@ -42,4 +46,5 @@ MonoBehaviour:
   teachesBuildings: []
   teachesRecipes: []
   experience: 0
+  transport: {fileID: 0}
   raidModifier: {fileID: 0}

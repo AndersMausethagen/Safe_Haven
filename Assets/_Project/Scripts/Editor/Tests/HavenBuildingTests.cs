@@ -102,6 +102,31 @@ public sealed class HavenBuildingTests
     }
 
     [Test]
+    public void ATrap_StaysWalkable_AndTheHealthCheckAgrees()
+    {
+        var trap = AssetDatabase.LoadAssetAtPath<BuildingDefinition>("Assets/_Project/Data/Buildings/SpikeTrap.asset");
+        Assert.IsNull(trap.Prefab.GetComponent<UnityEngine.AI.NavMeshObstacle>(), "creatures have to walk onto it");
+        CollectionAssert.DoesNotContain(BuildingPrefabBuilder.FindProblems(trap.Prefab, trap).Select(p => p.ToLowerInvariant().Contains("obstacle")), true);
+    }
+
+    [Test]
+    public void EveryItem_HasAWorldPrefabOfItsOwn()
+    {
+        var seen = new System.Collections.Generic.Dictionary<GameObject, string>();
+        foreach (string guid in AssetDatabase.FindAssets("t:ItemDefinition"))
+        {
+            var item = AssetDatabase.LoadAssetAtPath<ItemDefinition>(AssetDatabase.GUIDToAssetPath(guid));
+            if (item.Prefab == null)
+            {
+                continue;
+            }
+
+            Assert.IsFalse(seen.ContainsKey(item.Prefab), $"{item.name} and {(seen.TryGetValue(item.Prefab, out string other) ? other : "")} share a prefab, which only drops as one of them");
+            seen[item.Prefab] = item.name;
+        }
+    }
+
+    [Test]
     public void HavenRanks_ClimbWithRenown_AndTheWardOnlyGrows()
     {
         HavenSettings settings = HavenSettings.Current;

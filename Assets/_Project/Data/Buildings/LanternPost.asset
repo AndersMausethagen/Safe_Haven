@@ -17,7 +17,7 @@ MonoBehaviour:
   description: A warm light on a post. Lanterns along a path make a village.
   icon: {fileID: 0}
   faction: 0
-  combatStats: {fileID: 0}
+  combatStats: {fileID: 11400000, guid: 01155c9e2dd7c27468c1a359f747e1a1, type: 2}
   prefab: {fileID: 4319486437776359844, guid: 0986c1eae76493f4cb97ec9a48f0a156, type: 3}
   constructionCost: []
   constructionItems:
