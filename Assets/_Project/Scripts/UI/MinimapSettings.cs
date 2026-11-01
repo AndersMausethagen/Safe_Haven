@@ -11,7 +11,7 @@ public sealed class MinimapSettings : GameSettings<MinimapSettings>
     [Tooltip("The map's size on screen, in UI units.")]
     [SerializeField, Min(80f)] private float size = 236f;
     [Tooltip("Metres from the player to the edge, close in.")]
-    [SerializeField, Min(10f)] private float nearReach = 42f;
+    [SerializeField, Min(10f)] private float nearReach = 28f;
     [Tooltip("Metres from the player to the edge, zoomed out.")]
     [SerializeField, Min(10f)] private float farReach = 105f;
     [Tooltip("How far off a creature shows by day, in metres. Breach attackers always show.")]

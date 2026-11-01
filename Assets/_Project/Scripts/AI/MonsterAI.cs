@@ -110,7 +110,7 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject, IStaggerable
     {
         foreach (MonsterAI monster in active)
         {
-            if (monster.targetComponent != null && monster.IsEngaging(monster.target) && monster.target.Faction.IsPlayerSide())
+            if (monster.IsHuntingPlayerSide)
             {
                 return true;
             }
@@ -118,6 +118,9 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject, IStaggerable
 
         return false;
     }
+
+    /// <summary>True while this monster chases or attacks the player or someone on their side.</summary>
+    public bool IsHuntingPlayerSide => targetComponent != null && IsEngaging(target) && target.Faction.IsPlayerSide();
 
     /// <summary>True while chasing or attacking the given target.</summary>
     public bool IsEngaging(IDamageable candidate)

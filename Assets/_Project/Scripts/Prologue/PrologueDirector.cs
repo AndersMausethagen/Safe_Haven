@@ -318,7 +318,8 @@ public sealed class PrologueDirector : MonoBehaviour, IBuildArea
             box.Closed += finish;
         }
 
-        box.Say(new DialogueSpeaker(speaker.Resident.DisplayName, speaker.transform, null, definition.DialogueCameraDistance), text, finish);
+        box.Say(new DialogueSpeaker(speaker.Resident.DisplayName, speaker.transform, null, definition.DialogueCameraDistance),
+            text, finish, subtitleTimeMultiplier: 1.8f);
     }
 
     private void OnGameEvent(GameEvent gameEvent)

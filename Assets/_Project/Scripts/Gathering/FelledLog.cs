@@ -45,7 +45,9 @@ public sealed class FelledLog : MonoBehaviour, IHarvestBody
 
     public float HarvestSize => size;
 
-    private Material Bark => parts.Bark != null ? parts.Bark : TreeChoppingSettings.Current.LogBark;
+    private Material Bark => TreeChoppingSettings.Current.LogBark != null
+        ? TreeChoppingSettings.Current.LogBark
+        : parts.Bark;
 
     private void Awake()
     {

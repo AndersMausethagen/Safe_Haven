@@ -139,11 +139,13 @@ public readonly struct MusicChoice
 {
     public readonly MusicPlaylist Playlist;
     public readonly string Reason;
+    public readonly bool IsCombat;
 
-    public MusicChoice(MusicPlaylist playlist, string reason)
+    public MusicChoice(MusicPlaylist playlist, string reason, bool isCombat = false)
     {
         Playlist = playlist;
         Reason = reason;
+        IsCombat = isCombat;
     }
 }
 
@@ -171,12 +173,12 @@ public static class MusicRules
         {
             if (scene != null && scene.Combat.HasTracks)
             {
-                return new MusicChoice(scene.Combat, "Scene: combat");
+                return new MusicChoice(scene.Combat, "Scene: combat", true);
             }
 
             if (defaults != null && defaults.DefaultCombat.HasTracks)
             {
-                return new MusicChoice(defaults.DefaultCombat, "Default: combat");
+                return new MusicChoice(defaults.DefaultCombat, "Default: combat", true);
             }
         }
 
@@ -195,4 +197,8 @@ public static class MusicRules
 
         return new MusicChoice(null, "No music set");
     }
+
+    /// <summary>Whether a new fight is far enough from the previous one to restart its soundtrack.</summary>
+    public static bool ShouldRestartCombat(float now, float lastCombatEndedAt) =>
+        !float.IsNegativeInfinity(lastCombatEndedAt) && now - lastCombatEndedAt >= 60f;
 }

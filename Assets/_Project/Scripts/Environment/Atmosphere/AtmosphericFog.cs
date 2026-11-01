@@ -31,10 +31,14 @@ public sealed class AtmosphericFog : VolumeComponent
     public ColorParameter ambient = new ColorParameter(new Color(0.25f, 0.28f, 0.3f), true, false, true);
     [Tooltip("How strongly the sun or moon lights the fog, through its shadows.")]
     public ClampedFloatParameter mainLight = new ClampedFloatParameter(1f, 0f, 8f);
-    [Tooltip("Extra airborne particles for sun/moon shafts, independent of the existing fog density. Zero preserves the original fog. Requires shadow-casting branches and a directional light.")]
+    [Tooltip("Light-only airborne particles for sun/moon shafts, independent of fog extinction. Shafts enrich surface colours without a pale veil. Zero preserves the original fog. Requires shadow-casting branches and a directional light.")]
     public ClampedFloatParameter shaftDensity = new ClampedFloatParameter(0f, 0f, 0.03f);
-    [Tooltip("Brightness of the extra shadowed sun/moon scattering, independent of the fog's ambient light.")]
+    [Tooltip("Strength of colour-preserving sun/moon shaft lighting. Follows the directional light's colour, with bounded gain instead of white additive haze.")]
     public ClampedFloatParameter shaftIntensity = new ClampedFloatParameter(2f, 0f, 12f);
+    [Tooltip("Tint multiplied with the sun/moon colour inside the beams. Keep it near white: shafts are light in the air and never recolour surfaces.")]
+    public ColorParameter shaftColor = new ColorParameter(new Color(1f, 0.95f, 0.86f), false, false, true);
+    [Tooltip("Visible brightness of the beams in the air (soft screen blend below foliage). 0 hides the beams.")]
+    public ClampedFloatParameter shaftGlow = new ClampedFloatParameter(0.5f, 0f, 1f);
     [Tooltip("Shaft particles thin above this height relative to the terrain (or the base height without Fog Ground).")]
     public ClampedFloatParameter shaftHeight = new ClampedFloatParameter(18f, 1f, 100f);
     [Tooltip("Forward scattering: above 0 the fog glows toward the light (sun shafts), below 0 away from it.")]

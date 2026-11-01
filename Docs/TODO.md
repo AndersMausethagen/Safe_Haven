@@ -5,6 +5,20 @@ Open work and ideas. Tick items off (`[x]`) or delete them when done. Architectu
 
 ## Reasons to raid (relics, rumours, people, finds)
 
+- [ ] **Biggest next step: authored set-pieces in the generated maps (GDD §9.1, §9.2).** The layouts vary, but a clearing is
+      still open ground with things scattered on it, and a rumour's reward is a prop you walk up to and press E on. Roguelikes
+      feel new because generated maps join authored rooms, so do the same:
+      - A set-piece is a data asset: a prefab, the clearing size it needs, the moods and shapes it suits, and what it can
+        hold (a rumour, a camp, the exit). Start with 6–8: a ruined watchtower, a troll bridge over a ravine, a flooded
+        hollow, standing stones, a wolf den, a burnt farmstead. `Prefabs/Raids/Events` has four to build on.
+      - `RaidLayoutPlanner` picks one for each suitable clearing, and `RaidMapGenerator` flattens the ground and places it.
+      - A rumour names the kind of set-piece it needs, so its reward stands inside a place with something guarding it
+        or a small problem to solve: a fight, a stealth route, a choice. That is what turns "walk to the beacon" into a raid.
+      - Landmarks also give each run a memory ("the bridge past the wolf den") and the player something to steer by.
+      - Rumours can then stop giving exact distance on the HUD: name the set-piece and a rough direction, so finding it is
+        part of the raid.
+      - First decide the raid's length: Misty Woods runs at 5 minutes, and set-pieces need more time than that, with its
+        stages written for 12 (GDD §26.2).
 - [ ] Play them for feel: every number is a first estimate (relic powers, 2 rumours a run, job bonuses, 6% relics in caches).
 - [ ] Real art for the rumour sites: they are placeholder shapes (`Prefabs/Raids/Events/Sites`), as is the Elder Tree.
 - [ ] Icons for the plans and living things: the plans use the Forge Blueprint's, the others borrow from materials.

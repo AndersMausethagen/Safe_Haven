@@ -82,6 +82,14 @@ public sealed class SoundtrackMusicTests
     }
 
     [Test]
+    public void CombatMusic_RestartsOnlyAfterSixtySecondsOutOfCombat()
+    {
+        Assert.IsFalse(MusicRules.ShouldRestartCombat(159.99f, 100f));
+        Assert.IsTrue(MusicRules.ShouldRestartCombat(160f, 100f));
+        Assert.IsFalse(MusicRules.ShouldRestartCombat(10f, float.NegativeInfinity));
+    }
+
+    [Test]
     public void Playlist_InOrderWrapsAndSkipsEmptyRows()
     {
         var playlist = new MusicPlaylist { order = PlaylistOrder.InOrder };

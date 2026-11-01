@@ -4,9 +4,10 @@ using UnityEngine.UI;
 using TMPro;
 
 /// <summary>
-/// Short messages near the bottom of the screen: what was gathered or looted ("+3 Oak Wood"), newly found resources, and
-/// anything posted through GameMessages ("Needs a Tier II Pickaxe"). Each line fades out after a few seconds; the newest
-/// is at the bottom. While the dialogue box is open the lines move up above it.
+/// Short messages beside the player: what was gathered or looted ("+3 Oak Wood"), newly found resources, and anything posted
+/// through GameMessages ("Needs a Tier II Pickaxe"). They follow the player on screen, so the eye stays on the character;
+/// without a player in view they rest where the prefab put them. Each line fades out after a few seconds; the newest is at
+/// the bottom. While the dialogue box is open resting lines move up above it.
 /// </summary>
 public sealed class MessageFeedView : MonoBehaviour
 {
@@ -26,12 +27,25 @@ public sealed class MessageFeedView : MonoBehaviour
     [SerializeField] private Color warningColor = new Color(1f, 0.7f, 0.35f);
     [Tooltip("How far the lines move up while the dialogue box is open, so they don't cover what is said.")]
     [SerializeField, Min(0f)] private float liftWhileTalking = 230f;
+    [Tooltip("Keep the lines beside the player on screen rather than at their resting place.")]
+    [SerializeField] private bool followPlayer = true;
+    [Tooltip("The point on the player the lines start from, in metres above their feet.")]
+    [SerializeField, Min(0f)] private float followHeight = 1.1f;
+    [Tooltip("Where the lines' lower left corner sits from that point, in canvas units: to the right of the character.")]
+    [SerializeField] private Vector2 followOffset = new Vector2(70f, -10f);
+    [Tooltip("How quickly the lines catch up with the player on screen.")]
+    [SerializeField, Min(0.1f)] private float followSharpness = 14f;
 
     private readonly List<Line> lines = new List<Line>();
     private ResourceInventory resources;
     private ItemInventory items;
     private RectTransform area;
+    private RectTransform areaParent;
+    private Canvas canvas;
     private Vector2 restingPosition;
+    private Vector2 restingPivot;
+    private TextAnchor restingAlignment;
+    private bool following;
 
     private void Awake()
     {
@@ -39,6 +53,10 @@ public sealed class MessageFeedView : MonoBehaviour
         if (area != null)
         {
             restingPosition = area.anchoredPosition;
+            restingPivot = area.pivot;
+            restingAlignment = area.TryGetComponent(out VerticalLayoutGroup layout) ? layout.childAlignment : TextAnchor.LowerRight;
+            areaParent = area.parent as RectTransform;
+            canvas = area.GetComponentInParent<Canvas>();
         }
     }
 
@@ -104,10 +122,7 @@ public sealed class MessageFeedView : MonoBehaviour
 
     private void Update()
     {
-        if (area != null)
-        {
-            area.anchoredPosition = restingPosition + (DialogueBox.IsOpen ? Vector2.up * liftWhileTalking : Vector2.zero);
-        }
+        PlaceArea();
 
         for (int i = lines.Count - 1; i >= 0; i--)
         {
@@ -137,9 +152,87 @@ public sealed class MessageFeedView : MonoBehaviour
         TMP_Text label = Instantiate(lineTemplate, lineTemplate.transform.parent);
         label.gameObject.SetActive(true);
         label.text = text;
+        label.alignment = following ? TextAlignmentOptions.Left : lineTemplate.alignment;
         label.color = kind == MessageKind.Gain ? gainColor : kind == MessageKind.Warning ? warningColor : infoColor;
         label.transform.SetAsLastSibling();
         lines.Add(new Line { Label = label, ShownAt = Time.unscaledTime });
+    }
+
+    // Beside the player while they are on screen; at the resting place (lifted above an open dialogue box) otherwise.
+    private void PlaceArea()
+    {
+        if (area == null)
+        {
+            return;
+        }
+
+        Vector2 target = default;
+        bool follow = followPlayer && TryPlayerPoint(out target);
+        if (follow != following)
+        {
+            SetFollowing(follow);
+            if (follow)
+            {
+                area.anchoredPosition = target;
+            }
+        }
+
+        if (!follow)
+        {
+            area.anchoredPosition = restingPosition + (DialogueBox.IsOpen ? Vector2.up * liftWhileTalking : Vector2.zero);
+            return;
+        }
+
+        float blend = 1f - Mathf.Exp(-followSharpness * Time.unscaledDeltaTime);
+        area.anchoredPosition = Vector2.Lerp(area.anchoredPosition, target, blend);
+    }
+
+    // The anchored position that puts the lines' lower left corner beside the player, kept inside the screen.
+    private bool TryPlayerPoint(out Vector2 anchored)
+    {
+        anchored = default;
+        Player player = Player.Current;
+        Camera view = Camera.main;
+        if (player == null || view == null || areaParent == null || canvas == null)
+        {
+            return false;
+        }
+
+        Vector3 screen = view.WorldToScreenPoint(player.transform.position + Vector3.up * followHeight);
+        if (screen.z <= 0f || screen.x < 0f || screen.y < 0f || screen.x > Screen.width || screen.y > Screen.height)
+        {
+            return false;
+        }
+
+        Camera canvasCamera = canvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : canvas.worldCamera;
+        if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(areaParent, screen, canvasCamera, out Vector2 local))
+        {
+            return false;
+        }
+
+        Rect bounds = areaParent.rect;
+        Vector2 size = area.rect.size;
+        local += followOffset;
+        local.x = Mathf.Clamp(local.x, bounds.xMin, bounds.xMax - size.x);
+        local.y = Mathf.Clamp(local.y, bounds.yMin, bounds.yMax - size.y);
+        Vector2 anchor = bounds.min + Vector2.Scale(bounds.size, (area.anchorMin + area.anchorMax) * 0.5f);
+        anchored = local - anchor;
+        return true;
+    }
+
+    private void SetFollowing(bool follow)
+    {
+        following = follow;
+        area.pivot = follow ? Vector2.zero : restingPivot;
+        if (area.TryGetComponent(out VerticalLayoutGroup layout))
+        {
+            layout.childAlignment = follow ? TextAnchor.LowerLeft : restingAlignment;
+        }
+
+        foreach (Line line in lines)
+        {
+            line.Label.alignment = follow ? TextAlignmentOptions.Left : lineTemplate.alignment;
+        }
     }
 
     private void OnResourceChanged(ResourceChange change)

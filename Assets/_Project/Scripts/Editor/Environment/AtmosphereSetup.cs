@@ -23,6 +23,19 @@ public static class AtmosphereSetup
     private const string Renderer = "Assets/_Project/Settings/Rendering/PC_Renderer.asset";
     private const string AtmosphereObject = "Atmosphere";
 
+    [MenuItem("GameObject/Safe Haven/World/Mist Volume", false, 12)]
+    private static void AddMistVolume()
+    {
+        EnsureSceneDefaults(EditorSceneManager.GetActiveScene());
+        var go = new GameObject("Mist Volume");
+        Undo.RegisterCreatedObjectUndo(go, "Add Mist Volume");
+        Undo.AddComponent<MistVolume>(go);
+        if (SceneView.lastActiveSceneView != null)
+            go.transform.position = SceneView.lastActiveSceneView.pivot;
+        Selection.activeGameObject = go;
+        Debug.Log("Mist Volume added. Adjust Size, Density and flow in Inspector; preview in Game view. Scene remains unsaved.");
+    }
+
     public enum Preset
     {
         Clear,

@@ -13,13 +13,14 @@ sys.path.insert(0, os.path.dirname(__file__))
 from foley import *  # noqa: E402,F403
 
 OUT = "Assets/_Project/Audio/SFX/Safe Haven Interface"
-D2, A2, D3, A3, D4 = 73.42, 110.0, 146.83, 220.0, 293.66
+D1, D2, A2, D3, A3, D4 = 36.71, 73.42, 110.0, 146.83, 220.0, 293.66
 
 
 def click(rng):
     seconds = 0.12
     tap = strike(wood(rng.uniform(1000, 1300), rng, damp=0.009, count=8), seconds, 0.0005, rng)
-    return darken(tap + thump(rng, seconds, 130, 210, 0.012) * 0.3, top=-3, weight=1)
+    body = thump(rng, seconds, 48, 76, 0.028) * 0.5
+    return darken(tap + body + thump(rng, seconds, 130, 210, 0.012) * 0.3, top=-3, weight=2)
 
 
 def window_open(rng):
@@ -59,9 +60,10 @@ def out_of_stamina(rng):
 
 def quest_started(rng):
     seconds = 2.6
-    string = bowed(D2, seconds, rng) * 0.8 + bowed(A2, seconds, rng) + bowed(D3, seconds, rng) * 0.8 + bowed(A3, seconds, rng) * 0.4
+    string = bowed(D1, seconds, rng) * 0.22 + bowed(D2, seconds, rng) * 0.8 + bowed(A2, seconds, rng) + bowed(D3, seconds, rng) * 0.8 + bowed(A3, seconds, rng) * 0.4
     beat = place(place(blank(seconds), drum(A2, 1.4, rng), 0), drum(A2, 1.4, rng), 0.21, 0.6)
-    return darken(place(beat * 0.6, string / np.abs(string).max(), 0, 0.9), weight=0)
+    low_beat = place(place(blank(seconds), thump(rng, 1.4, 42, 72, 0.12, 0.025), 0.02), thump(rng, 1.4, 42, 72, 0.12, 0.025), 0.21, 0.55)
+    return darken(place(beat * 0.6 + low_beat, string / np.abs(string).max(), 0, 0.9), weight=2)
 
 
 def quest_completed(rng):
@@ -72,6 +74,7 @@ def quest_completed(rng):
     held = bowed(D2, seconds, rng) + bowed(A2, seconds, rng) * 0.6
     tolled = bell(D3, seconds, rng, hold=0.8)
     mix = place(place(strum / np.abs(strum).max(), held / np.abs(held).max(), 0, 0.3), drum(D2, 1.6, rng), 0, 1.0)
+    mix += thump(rng, seconds, 42, 70, 0.14, 0.025) * 0.3
     return darken(place(mix, tolled / np.abs(tolled).max(), 0.05, 0.28), weight=2)
 
 

@@ -20,6 +20,7 @@ public sealed class PlayerInputHandler : MonoBehaviour
 
     private PlayerStealth stealth;
     private PlayerEquipment equipment;
+    private CommandWheel commandWheel;
     // The skill actions' callbacks, one per slot, kept so they can be unsubscribed.
     private readonly System.Action<InputAction.CallbackContext>[] skillCallbacks = new System.Action<InputAction.CallbackContext>[SkillLoadout.SlotCount];
 
@@ -47,6 +48,17 @@ public sealed class PlayerInputHandler : MonoBehaviour
             return;
         }
 
+        commandWheel = GetComponent<CommandWheel>();
+        if (commandWheel == null)
+        {
+            commandWheel = gameObject.AddComponent<CommandWheel>();
+        }
+
+        if (!TryGetComponent(out EnemyVisibility _))
+        {
+            gameObject.AddComponent<EnemyVisibility>();
+        }
+
         for (int i = 0; i < skillCallbacks.Length; i++)
         {
             int slot = i;
@@ -66,6 +78,7 @@ public sealed class PlayerInputHandler : MonoBehaviour
 
     private void OnDisable()
     {
+        commandWheel?.Cancel();
         GamePause.Changed -= OnPauseChanged;
         BackHandlers.Unregister(CancelInteraction);
         Subscribe(false);
@@ -80,6 +93,11 @@ public sealed class PlayerInputHandler : MonoBehaviour
     // The whole Player map goes off while paused (or without a player), so no gameplay key acts behind the menu.
     private void SetActionsEnabled(bool enable)
     {
+        if (!enable)
+        {
+            commandWheel?.Cancel();
+        }
+
         InputActionMap map = GameInput.PlayerMap;
         if (map != null)
         {
@@ -205,7 +223,9 @@ public sealed class PlayerInputHandler : MonoBehaviour
         Hook(GameInput.SwapWeapon, OnSwapWeapon, on);
         Hook(GameInput.Talents, OnTalents, on);
         Hook(GameInput.Haven, OnHaven, on);
-        Hook(GameInput.Minimap, OnMinimap, on);
+        Hook(GameInput.WorldMap, OnWorldMap, on);
+        Hook(GameInput.CommandWheel, OnCommandWheel, on);
+        Hook(GameInput.CommandWheel, OnCommandWheelReleased, on, performed: false, canceled: true);
         for (int i = 0; i < skillCallbacks.Length; i++)
         {
             Hook(GameInput.Skill(i), skillCallbacks[i], on);
@@ -270,13 +290,14 @@ public sealed class PlayerInputHandler : MonoBehaviour
 
     private void OnHaven(InputAction.CallbackContext context) => RequestWindow(UIWindowId.Haven);
 
-    private void OnMinimap(InputAction.CallbackContext context)
+    private void OnWorldMap(InputAction.CallbackContext context)
     {
-        if (MinimapHud.Current != null)
-        {
-            MinimapHud.Current.CycleZoom();
-        }
+        WorldMapHud.Toggle();
     }
+
+    private void OnCommandWheel(InputAction.CallbackContext context) => commandWheel?.Open();
+
+    private void OnCommandWheelReleased(InputAction.CallbackContext context) => commandWheel?.CloseAndExecute();
 
     private void OnDodge(InputAction.CallbackContext context)
     {
@@ -414,7 +435,7 @@ public sealed class PlayerInputHandler : MonoBehaviour
 
         bool overUI = EventSystem.current != null && EventSystem.current.IsPointerOverGameObject();
         // While placing a building the mouse buttons place and cancel instead of attacking.
-        if (!overUI && !BuildPlacer.IsBusy)
+        if (!overUI && !DialogueBox.ClaimsClick && !BuildPlacer.IsBusy)
         {
             if (mouseAttackPending)
             {

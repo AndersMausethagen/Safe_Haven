@@ -113,7 +113,7 @@ public sealed class AtmosphereTests
             var storm = AssetDatabase.LoadAssetAtPath<WeatherDefinition>(WeatherSetup.WeatherFolder + "/Storm.asset");
             Assert.IsNotNull(mistWeather);
             Assert.IsNotNull(storm);
-            Assert.AreEqual(new Vector2(1.75f, 0.625f), mist.Wind);
+            Assert.AreEqual(new Vector2(2.45f, 0.875f), mist.Wind);
             Assert.AreEqual(3.5f, mist.FlowStretch);
             system.SetWeather(mistWeather, 0f);
             float calmSpeed = mist.Wind.magnitude * AtmosphereConditions.WeatherWind;
@@ -582,6 +582,247 @@ public sealed class AtmosphereTests
         finally
         {
             Object.DestroyImmediate(go);
+        }
+    }
+
+    [Test]
+    public void MistVolume_PrefabIsIndependentConfigurableAndRespectsTransformedBounds()
+    {
+        var prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Project/Prefabs/Systems/Mist Volume.prefab");
+        Assert.IsNotNull(prefab);
+        var go = Object.Instantiate(prefab);
+        float previousMist = AtmosphereConditions.WeatherMist;
+        try
+        {
+            var volume = go.GetComponent<MistVolume>();
+            Assert.IsNotNull(volume);
+            Assert.IsNull(go.GetComponent<Terrain>());
+            Assert.Contains(volume, MistVolume.Active.ToArray());
+            AtmosphereConditions.WeatherMist = 0f;
+            float density = volume.EffectiveDensity;
+            Assert.GreaterOrEqual(density, 0.2f, "Placed mist is dense and visible independently of Clear weather.");
+            var settings = new SerializedObject(volume);
+            settings.FindProperty("followsWeather").boolValue = true;
+            settings.ApplyModifiedPropertiesWithoutUndo();
+            Assert.AreEqual(0f, volume.EffectiveDensity);
+            AtmosphereConditions.WeatherMist = 0.5f;
+            Assert.AreEqual(density * 0.5f, volume.EffectiveDensity, 0.0001f);
+            settings.FindProperty("driftSpeed").floatValue = 0f;
+            settings.ApplyModifiedPropertiesWithoutUndo();
+            Assert.AreEqual(Vector2.zero, volume.Wind);
+            Assert.AreEqual(0f, volume.Waves.z);
+            go.transform.SetPositionAndRotation(new Vector3(50f, 10f, -20f), Quaternion.Euler(0f, 45f, 0f));
+            go.transform.localScale = new Vector3(2f, 1f, 3f);
+            Assert.AreEqual(0f, volume.DistanceSquared(go.transform.position));
+            Vector3 outside = go.transform.TransformPoint(new Vector3(volume.Size.x * 0.5f + 1f, 0f, 0f));
+            Assert.AreEqual(4f, volume.DistanceSquared(outside), 0.001f);
+            volume.enabled = false;
+            Assert.IsFalse(MistVolume.Active.Contains(volume));
+        }
+        finally
+        {
+            AtmosphereConditions.WeatherMist = previousMist;
+            Object.DestroyImmediate(go);
+        }
+    }
+
+    [Test]
+    public void MistVolume_RendersBoundedFlowingCloudsWithoutTerrainAndClearsAroundTorches()
+    {
+        var material = new Material(Shader.Find("Hidden/Safe Haven/Atmosphere"));
+        var target = new RenderTexture(16, 16, 0, RenderTextureFormat.ARGBFloat);
+        var pixels = new Texture2D(16, 16, TextureFormat.RGBAFloat, false, true);
+        RenderTexture previous = RenderTexture.active;
+        Texture depth = Shader.GetGlobalTexture("_CameraDepthTexture");
+        Vector4 camera = Shader.GetGlobalVector("_WorldSpaceCameraPos");
+        Matrix4x4 inverse = Shader.GetGlobalMatrix("unity_MatrixInvVP");
+        Vector4 time = Shader.GetGlobalVector("_Time");
+        try
+        {
+            Shader.SetGlobalTexture("_CameraDepthTexture", SystemInfo.usesReversedZBuffer ? Texture2D.blackTexture : Texture2D.whiteTexture);
+            Shader.SetGlobalVector("_WorldSpaceCameraPos", new Vector4(0f, 8.8f, 0f, 0f));
+            Shader.SetGlobalMatrix("unity_MatrixInvVP",
+                Matrix4x4.TRS(new Vector3(0f, 8.8f, 0f), Quaternion.identity, new Vector3(12f, 0f, 1f)));
+            Shader.SetGlobalVector("_Time", new Vector4(0.05f, 1f, 2f, 3f));
+            material.SetVector("_BlitScaleBias", new Vector4(1f, 1f, 0f, 0f));
+            material.SetVector("_FogParams0", Vector4.zero);
+            material.SetVector("_FogParams1", Vector4.zero);
+            material.SetVector("_FogParams2", new Vector4(20f, 48f, 0f, 0f));
+            material.SetInt("_MistVolumeCount", 1);
+            var matrices = new Matrix4x4[AtmosphereFeature.MaxMistVolumes];
+            matrices[0] = Matrix4x4.Translate(new Vector3(0f, -8f, 0f));
+            var sizes = new Vector4[AtmosphereFeature.MaxMistVolumes];
+            sizes[0] = new Vector4(40f, 4f, 40f, 0f);
+            var shapes = new Vector4[AtmosphereFeature.MaxMistVolumes];
+            shapes[0] = new Vector4(0.025f, 0f, 4f, 1f);
+            var clouds = new Vector4[AtmosphereFeature.MaxMistVolumes];
+            clouds[0] = new Vector4(0.125f, 0.8f, 0.3f, 3.5f);
+            var winds = new Vector4[AtmosphereFeature.MaxMistVolumes];
+            winds[0] = new Vector4(2.45f, 0.875f, 0f, 0f);
+            var tints = new Vector4[AtmosphereFeature.MaxMistVolumes];
+            tints[0] = new Vector4(0.8f, 0.9f, 1f, 0.2f);
+            var waves = new Vector4[AtmosphereFeature.MaxMistVolumes];
+            waves[0] = new Vector4(0.8f, 12f, 0.9f, 0f);
+            material.SetMatrixArray("_MistVolumeWorldToLocal", matrices);
+            material.SetVectorArray("_MistVolumeSizes", sizes);
+            material.SetVectorArray("_MistVolumeShapes", shapes);
+            material.SetVectorArray("_MistVolumeClouds", clouds);
+            material.SetVectorArray("_MistVolumeWinds", winds);
+            material.SetVectorArray("_MistVolumeTints", tints);
+            material.SetVectorArray("_MistVolumeWaves", waves);
+            Graphics.Blit(Texture2D.blackTexture, target, material, 0);
+            RenderTexture.active = target;
+            pixels.ReadPixels(new Rect(0, 0, 16, 16), 0, 0);
+            Color[] before = pixels.GetPixels();
+            float opacity = before.Average(c => 1f - c.a);
+            Assert.Greater(opacity, 0.05f, "Local mist must render without terrain or a ground map.");
+            shapes[0].x *= 2f;
+            material.SetVectorArray("_MistVolumeShapes", shapes);
+            Graphics.Blit(Texture2D.blackTexture, target, material, 0);
+            pixels.ReadPixels(new Rect(0, 0, 16, 16), 0, 0);
+            Assert.Greater(pixels.GetPixels().Average(c => 1f - c.a), opacity + 0.01f, "Density must visibly change opacity.");
+            shapes[0].x *= 0.5f;
+            material.SetVectorArray("_MistVolumeShapes", shapes);
+            winds[0].z = 8f;
+            material.SetVectorArray("_MistVolumeWinds", winds);
+            Graphics.Blit(Texture2D.blackTexture, target, material, 0);
+            pixels.ReadPixels(new Rect(0, 0, 16, 16), 0, 0);
+            Color[] after = pixels.GetPixels();
+            Assert.Greater(before.Select((c, i) => Mathf.Abs(c.a - after[i].a)).Average(), 0.005f, "Clouds must visibly flow over time.");
+            matrices[0] = Matrix4x4.Translate(new Vector3(-100f, -8f, 0f));
+            material.SetMatrixArray("_MistVolumeWorldToLocal", matrices);
+            Graphics.Blit(Texture2D.blackTexture, target, material, 0);
+            pixels.ReadPixels(new Rect(0, 0, 16, 16), 0, 0);
+            Assert.IsTrue(pixels.GetPixels().All(c => Mathf.Abs(1f - c.a) < 0.002f), "No mist outside the placed box.");
+            matrices[0] = Matrix4x4.Translate(new Vector3(0f, -8f, 0f));
+            material.SetMatrixArray("_MistVolumeWorldToLocal", matrices);
+            material.SetFloat("_FogLightCount", 1f);
+            material.SetVectorArray("_FogLightPositions", new Vector4[AtmosphereFeature.MaxLights]);
+            var clearings = new Vector4[AtmosphereFeature.MaxLights];
+            clearings[0] = new Vector4(100f, 1f, 0.6f, 0f);
+            material.SetVectorArray("_FogLightClearings", clearings);
+            Graphics.Blit(Texture2D.blackTexture, target, material, 0);
+            pixels.ReadPixels(new Rect(0, 0, 16, 16), 0, 0);
+            Assert.IsTrue(pixels.GetPixels().All(c => Mathf.Abs(1f - c.a) < 0.002f && c.r < 0.002f),
+                "Torches must clear local mist's extinction and glow.");
+        }
+        finally
+        {
+            Shader.SetGlobalTexture("_CameraDepthTexture", depth);
+            Shader.SetGlobalVector("_WorldSpaceCameraPos", camera);
+            Shader.SetGlobalMatrix("unity_MatrixInvVP", inverse);
+            Shader.SetGlobalVector("_Time", time);
+            RenderTexture.active = previous;
+            target.Release();
+            Object.DestroyImmediate(target);
+            Object.DestroyImmediate(pixels);
+            Object.DestroyImmediate(material);
+        }
+    }
+
+    [Test]
+    public void ShaftComposite_PreservesSaturatedSurfacesBlacksAndRealFog()
+    {
+        var material = new Material(Shader.Find("Hidden/Safe Haven/Atmosphere"));
+        var scene = new Texture2D(1, 1, TextureFormat.RGBAFloat, false, true);
+        var fog = new Texture2D(1, 1, TextureFormat.RGBAFloat, false, true);
+        var shafts = new Texture2D(1, 1, TextureFormat.RGBAFloat, false, true);
+        var target = new RenderTexture(16, 16, 0, RenderTextureFormat.ARGBFloat);
+        var pixels = new Texture2D(16, 16, TextureFormat.RGBAFloat, false, true);
+        RenderTexture previous = RenderTexture.active;
+        try
+        {
+            Color surface = new Color(0.08f, 0.35f, 0.02f, 1f);
+            scene.SetPixel(0, 0, surface);
+            scene.Apply();
+            fog.SetPixel(0, 0, new Color(0f, 0f, 0f, 1f));
+            fog.Apply();
+            material.SetTexture("_BlitTexture", scene);
+            material.SetTexture("_AtmosphereFog", fog);
+            material.SetTexture("_AtmosphereShafts", shafts);
+            material.SetVector("_BlitScaleBias", new Vector4(1f, 1f, 0f, 0f));
+            material.SetVector("_WarParams", Vector4.zero);
+            material.SetVector("_ShaftParams", Vector4.zero);
+            foreach (float strength in new[] { 0f, 1f, 100f })
+            {
+                Color energy = new Color(0.8f, 0.3f, 0.08f) * strength;
+                shafts.SetPixel(0, 0, energy);
+                shafts.Apply();
+                Graphics.Blit(scene, target, material, 1);
+                RenderTexture.active = target;
+                pixels.ReadPixels(new Rect(0, 0, 16, 16), 0, 0);
+                Color result = pixels.GetPixel(8, 8);
+                Assert.AreEqual(surface.r, result.r, 0.001f, "Shafts never tint or brighten surfaces themselves.");
+                Assert.AreEqual(surface.g, result.g, 0.001f);
+                Assert.AreEqual(surface.b, result.b, 0.001f);
+            }
+
+            scene.SetPixel(0, 0, Color.black);
+            scene.Apply();
+            Graphics.Blit(scene, target, material, 1);
+            pixels.ReadPixels(new Rect(0, 0, 16, 16), 0, 0);
+            Assert.AreEqual(0f, pixels.GetPixel(8, 8).maxColorComponent, 0.001f, "No white veil over blacks.");
+
+            // Visible beams: soft, mostly neutral light in the air, even from strongly coloured shaft energy.
+            material.SetVector("_ShaftParams", new Vector4(0.006f, 5f, 18f, 0.5f));
+            Color warm = new Color(0.6f, 0.4f, 0.15f);
+            shafts.SetPixel(0, 0, warm);
+            shafts.Apply();
+            Graphics.Blit(scene, target, material, 1);
+            pixels.ReadPixels(new Rect(0, 0, 16, 16), 0, 0);
+            Color beam = pixels.GetPixel(8, 8);
+            Assert.Greater(beam.r, 0.05f, "Glow makes the beam visible in the air.");
+            Assert.GreaterOrEqual(beam.r, beam.b);
+            Assert.Greater(beam.b, beam.r * 0.5f, "The beam is near-neutral light, not a yellow tint.");
+            scene.SetPixel(0, 0, Color.white);
+            scene.Apply();
+            Graphics.Blit(scene, target, material, 1);
+            pixels.ReadPixels(new Rect(0, 0, 16, 16), 0, 0);
+            Assert.LessOrEqual(pixels.GetPixel(8, 8).b, 1.2f, "Glow fades out over bright surfaces instead of clipping.");
+            material.SetVector("_ShaftParams", Vector4.zero);
+
+            scene.SetPixel(0, 0, surface);
+            scene.Apply();
+            shafts.SetPixel(0, 0, Color.clear);
+            shafts.Apply();
+            Color realFog = new Color(0.04f, 0.05f, 0.06f, 0.4f);
+            fog.SetPixel(0, 0, realFog);
+            fog.Apply();
+            Graphics.Blit(scene, target, material, 1);
+            pixels.ReadPixels(new Rect(0, 0, 16, 16), 0, 0);
+            Color fogged = pixels.GetPixel(8, 8);
+            Assert.AreEqual(surface.r * realFog.a + realFog.r, fogged.r, 0.001f);
+            Assert.AreEqual(surface.g * realFog.a + realFog.g, fogged.g, 0.001f);
+            Assert.AreEqual(surface.b * realFog.a + realFog.b, fogged.b, 0.001f);
+        }
+        finally
+        {
+            RenderTexture.active = previous;
+            target.Release();
+            Object.DestroyImmediate(target);
+            Object.DestroyImmediate(pixels);
+            Object.DestroyImmediate(scene);
+            Object.DestroyImmediate(fog);
+            Object.DestroyImmediate(shafts);
+            Object.DestroyImmediate(material);
+        }
+    }
+
+    [Test]
+    public void DayVolumes_EnableSoftNeutralShafts()
+    {
+        foreach (string name in new[] { "SafeHaven_Volume", "MistyWoods_Volume" })
+        {
+            var profile = AssetDatabase.LoadAssetAtPath<UnityEngine.Rendering.VolumeProfile>(
+                "Assets/_Project/Settings/Rendering/Volumes/" + name + ".asset");
+            Assert.IsNotNull(profile, name);
+            Assert.IsTrue(profile.TryGet(out AtmosphericFog fog), name);
+            Assert.IsTrue(fog.shaftDensity.overrideState && fog.shaftDensity.value > 0f, name + " shafts on");
+            Assert.IsTrue(fog.shaftColor.overrideState, name + " shaft colour set");
+            Color c = fog.shaftColor.value;
+            Assert.IsTrue(c.r >= c.g && c.g >= c.b, name + " shafts are slightly warm");
+            Assert.Greater(c.b, 0.75f, name + " shafts are near-white, not yellow");
+            Assert.Greater(fog.shaftGlow.value, 0f, name + " beams glow in the air");
         }
     }
 

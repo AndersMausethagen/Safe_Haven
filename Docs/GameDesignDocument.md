@@ -666,6 +666,8 @@ A relic is any piece of gear of up to one tier above the raid with any power tha
 
 Place buildings within valid safe plots using a ghost preview, snapping rules where appropriate, collision checks, and clear material requirements. Allow repositioning or refunds under defined rules to encourage creativity. Buildings can require prerequisite blueprints, foundations, terrain conditions, or staffing. Defensive structures must declare health, valid placements, attack arcs or trigger zones, repair rules, and persistence behavior.
 
+**The build menu (G)** is a panel docked along the bottom of the screen, so the home stays in view above it. Tabs sort what the player knows how to build into Crafting Stations, Walls & Fences, Structures and Manage (upgrade, repair or move what stands). Each building is a card with its picture, name and cost; cards the player can't afford yet are dimmed with their cost in red. Pointing at a card shows its description, what it brings (renown, levels, a yard to keep clear, built in lines) and each material it needs against what the player has. Clicking a card starts placing it.
+
 ### 14.2 Suggested structures
 
 | **Structure**        | **Function**                                           | **Progression tier** |

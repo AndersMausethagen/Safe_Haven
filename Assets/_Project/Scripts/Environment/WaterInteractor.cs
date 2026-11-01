@@ -88,6 +88,21 @@ public sealed class WaterInteractor : MonoBehaviour
     /// <summary>Foam spots sent to the shader by the last <see cref="UpdateAll"/>.</summary>
     public static int SpotCount { get; private set; }
 
+    /// <summary>Shows a splash and adds a ripple when a grounded foot lands on this water surface.</summary>
+    public bool SplashFootstep(Vector3 point)
+    {
+        if (!Application.isPlaying || kind != Kind.Moving ||
+            !WaterSurface.TryFind(point + Vector3.up * 0.1f, 0.3f, out float height))
+        {
+            return false;
+        }
+
+        Vector3 at = new Vector3(point.x, height, point.z);
+        WaterRipples.AddStamp(at, Mathf.Max(radius * 0.75f, 0.15f), 0.24f * ripples);
+        SpawnSplash(at);
+        return true;
+    }
+
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetStatics()
     {

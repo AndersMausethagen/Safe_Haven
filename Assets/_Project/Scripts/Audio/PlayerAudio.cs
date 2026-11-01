@@ -25,6 +25,7 @@ public sealed class PlayerAudio : MonoBehaviour
 
     private PlayerMovement movement;
     private PlayerSwimming swimming;
+    private WaterInteractor water;
     private PlayerAnimationController animationController;
     private Animator animator;
     private float lastEventStep = float.NegativeInfinity;
@@ -50,6 +51,7 @@ public sealed class PlayerAudio : MonoBehaviour
     {
         movement = GetComponent<PlayerMovement>();
         swimming = GetComponent<PlayerSwimming>();
+        water = GetComponent<WaterInteractor>();
         animationController = GetComponent<PlayerAnimationController>();
         animator = GetComponentInChildren<Animator>();
         if (animator != null && animator.isHuman)
@@ -176,13 +178,14 @@ public sealed class PlayerAudio : MonoBehaviour
     private void Step(Transform foot = null)
     {
         lastStep = Time.time;
-        AudioManager.Play(SurfaceSound(transform.position), transform.position);
+        Vector3 position = foot != null ? foot.position : transform.position;
+        AudioManager.Play(SurfaceSound(position), position);
+        water?.SplashFootstep(position);
         if (movement != null && movement.IsGrounded && !movement.IsDashing && movement.HorizontalSpeed >= MinimumMovingSpeed)
         {
             fallbackLeft = !fallbackLeft;
-            Vector3 position = foot != null ? foot.position
-                : transform.position + transform.right * (fallbackLeft ? -0.1f : 0.1f);
-            FootPlanted?.Invoke(position, transform.forward);
+            Vector3 plantedAt = foot != null ? position : position + transform.right * (fallbackLeft ? -0.1f : 0.1f);
+            FootPlanted?.Invoke(plantedAt, transform.forward);
         }
     }
 

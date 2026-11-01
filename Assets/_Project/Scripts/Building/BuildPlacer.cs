@@ -6,7 +6,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
 /// <summary>
-/// The player's building (GDD §14.1): G opens the build menu with every known structure and its cost; choosing one shows
+/// The player's building (GDD §14.1): G opens the build menu (BuildMenuWindow) with every known structure and its cost; choosing one shows
 /// a ghost under the mouse that is green where it may stand and red elsewhere. Left-click builds it there instantly,
 /// paying the cost from what is carried and stored; right-click or Esc cancels. "Move a building" picks up a placed
 /// building and puts it down somewhere else for free.
@@ -83,7 +83,8 @@ public sealed class BuildPlacer : MonoBehaviour
 
     private BuildingDefinition Kind => placing != null ? placing : moving != null ? moving.Definition : null;
     private static IBuildArea Area => BuildArea.Current;
-    private static bool HasBuildArea => Area != null && Area.WhyClosed == null;
+    /// <summary>True inside an open build area (Safe Haven's ward), where the build menu works.</summary>
+    public static bool HasBuildArea => Area != null && Area.WhyClosed == null;
     private Bounds LocalBounds => ghost.LocalBounds;
 
     private void Awake()
@@ -113,13 +114,19 @@ public sealed class BuildPlacer : MonoBehaviour
         return true;
     }
 
-    /// <summary>Opens or closes the build menu. Only works in an open build area.</summary>
+    /// <summary>Opens or closes the build menu (BuildMenuWindow). Only works in an open build area.</summary>
     public void ToggleMenu()
     {
-        ActionMenuWindow menu = ActionMenuWindow.Current;
         if (IsBusy)
         {
             Cancel();
+            return;
+        }
+
+        BuildMenuWindow menu = BuildMenuWindow.Current;
+        if (menu != null && menu.IsOpen)
+        {
+            menu.Close();
             return;
         }
 
@@ -129,36 +136,25 @@ public sealed class BuildPlacer : MonoBehaviour
             return;
         }
 
-        if (menu == null)
-        {
-            return;
-        }
-
-        if (menu.IsOpen)
-        {
-            menu.Close();
-            return;
-        }
-
-        menu.Open(BuildPage, gameObject);
+        BuildMenuWindow.Create().Open(this);
     }
 
-    private MenuPage BuildPage()
-    {
-        var page = new MenuPage
-        {
-            Title = "Build",
-            Body = Area.Guidance + "Left-click to place, mouse wheel to turn "
-                + "(Shift for small steps), hold Alt to place freely without snapping. Walls are drawn by dragging. Right-click or Esc cancels.",
-        };
+    /// <summary>The build area's opening line: where and what to build.</summary>
+    public string Guidance => HasBuildArea ? Area.Guidance : "";
 
+    /// <summary>True when buildings may be moved, upgraded and repaired here.</summary>
+    public bool AllowsChanges => HasBuildArea && Area.AllowsChanges;
+
+    /// <summary>What can be built here now, in display order. Empty outside an open build area.</summary>
+    public List<BuildingDefinition> Buildable()
+    {
+        var buildings = new List<BuildingDefinition>();
         var crafting = GetComponent<PlayerCrafting>();
-        if (crafting == null)
+        if (!HasBuildArea || crafting == null)
         {
-            return page;
+            return buildings;
         }
 
-        var buildings = new List<BuildingDefinition>();
         foreach (BuildingDefinition building in Area.Buildable(crafting))
         {
             if (building != null && building.Prefab != null)
@@ -168,33 +164,25 @@ public sealed class BuildPlacer : MonoBehaviour
         }
 
         buildings.Sort(RecipeBook.CompareForDisplay);
-        MaterialPool pool = MaterialPool.For(gameObject);
-        foreach (BuildingDefinition building in buildings)
-        {
-            bool affordable = pool.CanAfford(building.ConstructionCost, building.ConstructionItems, out string missing);
-            string cost = DescribeCost(building) + (building.PlaceInLines ? " each" : "");
-            page.Add(new MenuAction(building.DisplayName, affordable ? cost : $"{cost}   <color=#FF7B6B>{missing}</color>", affordable,
-                () => BeginPlacing(building), closesMenu: true));
-        }
-
-        if (Area.AllowsChanges)
-        {
-            page.Add(new MenuAction("Upgrade or repair a building", "Make something you built better, or bring a ruin back", true,
-                () => BeginPicking(true), closesMenu: true));
-            page.Add(new MenuAction("Move a building", "Pick up something you built and place it again, for free", true, () => BeginPicking(false), closesMenu: true));
-        }
-        return page;
+        return buildings;
     }
 
-    private static string DescribeCost(BuildingDefinition building)
+    /// <summary>Starts placing <paramref name="building"/>: a ghost follows the pointer until it is built or cancelled.</summary>
+    public void Place(BuildingDefinition building)
     {
-        var builder = new StringBuilder(AmountText.Describe(building.ConstructionCost));
-        if (building.ConstructionItems.Count > 0)
+        if (building != null && building.Prefab != null && HasBuildArea)
         {
-            builder.Append(builder.Length > 0 ? ", " : "").Append(AmountText.Describe(building.ConstructionItems));
+            BeginPlacing(building);
         }
+    }
 
-        return builder.Length > 0 ? builder.ToString() : "free";
+    /// <summary>Lets the player click a building they built, to upgrade or repair it (true) or to move it (false).</summary>
+    public void PickBuilding(bool toUpgrade)
+    {
+        if (AllowsChanges)
+        {
+            BeginPicking(toUpgrade);
+        }
     }
 
     private void BeginPlacing(BuildingDefinition building)

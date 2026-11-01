@@ -22,7 +22,7 @@ using UnityEngine.SceneManagement;
 /// <para>
 /// Extending: to make another kind of game event audible (quest completed, item obtained), handle its kind in
 /// OnGameEvent and give Audio Settings a SoundDefinition field for it. To change what counts as combat, edit
-/// UpdateMood and add a toggle to Audio Settings.
+/// UpdateMood and its combat cues.
 /// </para>
 /// </summary>
 [DisallowMultipleComponent]
@@ -103,6 +103,17 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
             }
         }
 
+        public void Restart()
+        {
+            if (Playlist == null || index < 0)
+            {
+                return;
+            }
+
+            targets[current] = 0f;
+            StartTrack(0f);
+        }
+
         private void StartTrack(float from)
         {
             MusicTrack track = Playlist.tracks[index];
@@ -169,7 +180,9 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
     private Damageable player;
     private float lastDamageTime = float.NegativeInfinity;
     private float combatUntil = float.NegativeInfinity;
+    private float lastCombatEndedAt = float.NegativeInfinity;
     private float nextCombatCheck;
+    private bool restartCombatMusic;
     private bool enemyChasing;
 
     public static AudioManager Instance => instance;
@@ -326,6 +339,8 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
         sceneAudio = FindAnyObjectByType<SceneAudio>();
         combatUntil = float.NegativeInfinity;
         lastDamageTime = float.NegativeInfinity;
+        lastCombatEndedAt = float.NegativeInfinity;
+        restartCombatMusic = false;
         enemyChasing = false;
         music.Forget();
         ambience.Forget();
@@ -351,6 +366,12 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
             MusicChoice choice = MusicRules.Choose(sceneAudio, settings, Mood, raidTimeLeft);
             MusicReason = choice.Reason;
             music.Switch(choice.Playlist);
+            if (restartCombatMusic && choice.IsCombat)
+            {
+                music.Restart();
+            }
+
+            restartCombatMusic = false;
             ambience.Switch(sceneAudio != null ? sceneAudio.Ambience : null);
         }
 
@@ -409,14 +430,25 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
         }
 
         bool fighting = enemyChasing
-            || (settings.WeaponDrawnIsCombat && GameStateManager.InCombat)
             || (settings.RecentDamageSeconds > 0f && Time.unscaledTime - lastDamageTime < settings.RecentDamageSeconds);
         if (fighting)
         {
             combatUntil = Time.unscaledTime + settings.CombatLingerSeconds;
         }
 
-        Mood = player != null && player.IsAlive && Time.unscaledTime < combatUntil ? AudioMood.Combat : AudioMood.Exploring;
+        AudioMood nextMood = player != null && player.IsAlive && Time.unscaledTime < combatUntil
+            ? AudioMood.Combat
+            : AudioMood.Exploring;
+        if (Mood == AudioMood.Combat && nextMood != AudioMood.Combat)
+        {
+            lastCombatEndedAt = Time.unscaledTime;
+        }
+        else if (Mood != AudioMood.Combat && nextMood == AudioMood.Combat)
+        {
+            restartCombatMusic = MusicRules.ShouldRestartCombat(Time.unscaledTime, lastCombatEndedAt);
+        }
+
+        Mood = nextMood;
     }
 
     private bool IsEnemyChasingPlayer()
@@ -459,7 +491,13 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
         }
     }
 
-    private void OnPlayerDamaged(DamageInfo damage, DamageResult result) => lastDamageTime = Time.unscaledTime;
+    private void OnPlayerDamaged(DamageInfo damage, DamageResult result)
+    {
+        if (damage.Source != null && damage.Source.Faction.WillAttack(Faction.Player))
+        {
+            lastDamageTime = Time.unscaledTime;
+        }
+    }
 
     // Breaking training dummies or walls isn't a fight; only hits on creatures that fight back count.
     private void OnPlayerDealtDamage(IDamageable target, DamageInfo damage, DamageResult result)

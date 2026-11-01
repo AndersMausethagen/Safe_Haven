@@ -15,7 +15,7 @@ MonoBehaviour:
   id: palisade
   displayName: Palisade
   description: A wall of sharpened stakes. Wolves have to go around it.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: c530984fec1a6404382b58152f4ecc36, type: 3}
   faction: 0
   combatStats: {fileID: 11400000, guid: 01155c9e2dd7c27468c1a359f747e1a1, type: 2}
   prefab: {fileID: 5723684251509998500, guid: f7a797a68b1dea144a312c31d1de2024, type: 3}

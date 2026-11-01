@@ -120,7 +120,7 @@ public sealed class FelledTree : MonoBehaviour
 
         log.Prepare(parts, size, parts.BuildModel(transform));
         TreeChoppingSettings rules = TreeChoppingSettings.Current;
-        Material bark = parts.Bark != null ? parts.Bark : rules.LogBark;
+        Material bark = rules.LogBark != null ? rules.LogBark : parts.Bark;
         TimberPiece.Stump(parts, bark, rules.CutFace);
 
         float length = Mathf.Max(1f, parts.TrunkLength - CutHeight);
@@ -256,7 +256,7 @@ public sealed class FelledTree : MonoBehaviour
     private void ThrowBranches()
     {
         TreeChoppingSettings rules = TreeChoppingSettings.Current;
-        Material bark = parts.Bark != null ? parts.Bark : rules.LogBark;
+        Material bark = rules.LogBark != null ? rules.LogBark : parts.Bark;
         int count = Mathf.Min(MaxBranches, Mathf.RoundToInt(2f + size * 2f));
         Bounds crown = parts.Crown;
         for (int i = 0; i < count; i++)

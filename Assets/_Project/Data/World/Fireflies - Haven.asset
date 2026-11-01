@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Fireflies - Haven
   m_EditorClassIdentifier: SafeHaven::FireflyProfile
   colour: {r: 0.55, g: 1, b: 0.3, a: 1}
-  nightCount: 260
+  nightCount: 130
   dayCount: 8
   radius: 26
   height: {x: 0.4, y: 2.8}

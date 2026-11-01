@@ -316,10 +316,16 @@ MonoBehaviour:
     m_Value: 1.2
   shaftDensity:
     m_OverrideState: 1
-    m_Value: 0.004
+    m_Value: 0.006
   shaftIntensity:
     m_OverrideState: 1
-    m_Value: 4
+    m_Value: 4.28
+  shaftColor:
+    m_OverrideState: 1
+    m_Value: {r: 1, g: 0.95, b: 0.86, a: 1}
+  shaftGlow:
+    m_OverrideState: 1
+    m_Value: 0.35
   shaftHeight:
     m_OverrideState: 1
     m_Value: 18

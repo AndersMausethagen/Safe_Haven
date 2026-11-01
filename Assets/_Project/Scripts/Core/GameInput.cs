@@ -40,7 +40,8 @@ public static class GameInput
     public static InputAction Build => Find("Player/Build");
     public static InputAction Talents => Find("Player/Talents");
     public static InputAction Haven => Find("Player/Haven");
-    public static InputAction Minimap => Find("Player/Minimap");
+    public static InputAction WorldMap => Find("Player/WorldMap");
+    public static InputAction CommandWheel => Find("Player/CommandWheel");
 
     /// <summary>The action that casts skill bar slot <paramref name="slot"/> (0-based).</summary>
     public static InputAction Skill(int slot) => Find(SkillPaths[slot]);

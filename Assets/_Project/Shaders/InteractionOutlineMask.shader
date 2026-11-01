@@ -1,5 +1,10 @@
 Shader "Safe Haven/Interaction Outline Mask"
 {
+    Properties
+    {
+        [Enum(UnityEngine.Rendering.CompareFunction)] _ZTest ("Depth Test", Float) = 4
+    }
+
     SubShader
     {
         Tags { "RenderPipeline" = "UniversalPipeline" "RenderType" = "Transparent" "Queue" = "Transparent-2" }
@@ -8,7 +13,7 @@ Shader "Safe Haven/Interaction Outline Mask"
             Tags { "LightMode" = "SRPDefaultUnlit" }
             Cull Off
             ZWrite Off
-            ZTest LEqual
+            ZTest [_ZTest]
             ColorMask 0
             Stencil
             {

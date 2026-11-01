@@ -225,7 +225,6 @@ public sealed class SoundEditorWindow : EditorWindow
         EditorGUILayout.Space(6f);
         EditorGUILayout.LabelField("How music behaves", EditorStyles.boldLabel);
         Field(data, "crossfadeSeconds");
-        Field(data, "weaponDrawn", "Weapon drawn = combat");
         Field(data, "enemyChasingPlayer", "Enemy chasing = combat");
         Field(data, "recentDamageSeconds", "Recent hit = combat (s)");
         Field(data, "combatLingerSeconds", "Combat music lingers (s)");

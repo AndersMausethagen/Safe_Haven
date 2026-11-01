@@ -159,9 +159,14 @@ public static class OptionsWidgets
     {
         RectTransform control = LabelledRow(content, option.Label, option.Help, showHelp);
         TMP_Text label = null;
-        Button button = Button("Toggle", control, "", 22f, () => option.Value = option.On ? 0f : 1f, out label);
+        Image image = null;
+        Button button = Button("Toggle", control, "", 22f, () =>
+        {
+            option.Value = option.On ? 0f : 1f;
+            Refresh();
+        }, out label);
         Stretch((RectTransform)button.transform);
-        Image image = button.GetComponent<Image>();
+        image = button.GetComponent<Image>();
         void Refresh()
         {
             label.text = option.ValueText;
@@ -184,6 +189,7 @@ public static class OptionsWidgets
             if (all.Length > 0)
             {
                 set((get() + by + all.Length) % all.Length);
+                Refresh();
             }
         }
 

@@ -22,17 +22,20 @@ weather, gathers in fog areas (hollows, marshes) and makes monsters see less far
 
 - **`AtmosphereFeature`** (renderer feature on `Settings/Rendering/PC_Renderer`, shader `Shaders/Atmosphere.shader`).
   Game cameras only; the Scene view stays clear. Two Render Graph passes before post-processing:
-  1. *March* at half resolution: each view ray is sampled (`steps`) up to the scene depth or `maxDistance`; density =
+  1. *March* at half resolution, with separate fog and shaft targets: each view ray is sampled (`steps`) up to the scene depth or `maxDistance`; density =
      `density` × e^(−height above `baseHeight` × `heightFalloff`) × drifting value noise, thinned by `clearing` inside
      visibility sources; light = ambient + sun/moon × its shadow cascades × Henyey-Greenstein phase + the nearest 8
-     `AtmosphereLight`s. Output: in-scattered light and transmittance.
-  2. *Composite*: scene × transmittance + fog light, then the night veil (× `_SafeHavenNight` from `DayNightCycle`)
+     `AtmosphereLight`s. Output: in-scattered fog light and transmittance, plus light-only shaft energy.
+  2. *Composite*: shafts add a soft, near-neutral glow in the air without tinting surfaces; actual fog
+     still uses scene × transmittance + fog light. Then the night veil (× `_SafeHavenNight` from `DayNightCycle`)
      outside every `VisibilitySource`, then the unexplored fog from the `ExplorationMap` texture. The fog of war is
      laid on the ground the player stands on: a pixel of something tall near the camera takes the ground behind it.
 - **Volume overrides** (Add Override › Safe Haven): **Atmospheric Fog** and **Fog of War**. Set in `SafeHaven_Volume`
   (thin mist, fog of war), `SafeHaven_Night` (denser, darker mist, stronger moon and fire in the fog) and
   `MistyWoods_Volume` (thick mist, fog of war). Because they are volume components, weather or event volumes can
   change them too.
+- Safe Haven's weather volume uses `SafeHaven_HomeOvercast`, a home-specific, less desaturated grade. Its terrain mist
+  is lighter than the forest preset and remains driven by the current weather; Clear weather disables it.
 - **`VisibilitySource`**: the player (`PlayerArmature`: sight 12 m, reveals 20 m, not a light), the Heart Tree (follows
   the ward radius + 4 m), campfires (10 m) and torches (9 m), a lit extraction beacon. `IsLight` sources count as light
   for night creatures (`VisibilitySource.IsLit`).
@@ -133,7 +136,7 @@ Preview in **Game view**, not Scene view.
 | Cloud Size / Coverage | Cloud width in metres / fraction covered; lower coverage leaves clear gaps |
 | Erosion | Small billows break up cloud edges rather than making an even grey blanket |
 | Flow Stretch | Elongates cloud pockets along the wind into flowing veils; default 3.5, 1 gives round pockets |
-| Wind / Drift Speed | World X/Z direction and base speed, multiplied by Drift Speed (default 2.5) and Weather Wind Influence |
+| Wind / Drift Speed | World X/Z direction and base speed, multiplied by Drift Speed (default 3.5) and Weather Wind Influence |
 | Edge Fade | Soft perimeter on the terrain tile, in metres |
 
 #### Existing weather and day/night integration
@@ -155,14 +158,33 @@ On **Terrain Mist**, under **Weather and time of day**:
   **Weather Wind Influence** if **Drift Speed** is explicitly raised above 0.
   Storm's default Wind **2.8** makes terrain mist move 2.8 times its authored speed; Mist's **0.4** moves slowly.
   Drift is integrated, so a weather transition changes speed without teleporting the cloud pattern.
-  Terrain Mist also multiplies its authored Wind by **Drift Speed**: the default (0.7, 0.25) and 2.5
-  give about **0.74 m/s in Mist weather** and **5.2 m/s in Storm**. Flow Stretch makes long terrain-following
+  Terrain Mist also multiplies its authored Wind by **Drift Speed**: the default (0.7, 0.25) and 3.5
+  give about **1.04 m/s in Mist weather** and **7.28 m/s in Storm**. Flow Stretch makes long terrain-following
   veils; smaller wisps shear and billow within them rather than translating a frozen cloud pattern.
 
 **Fog and Mist have different roles:** Fog is a dense, broad, stationary airborne veil (new-scene
 authored density 0.025/m, height falloff 0.08/m, low noise). Mist has denser, separated flowing
 cores close to the terrain, with rapidly fading tops. They can coexist without sharing motion.
 Light shafts and torch clearing work with both.
+
+### Placeable mist over water or selected areas
+
+Drag **`Assets/_Project/Prefabs/Systems/Mist Volume.prefab`** into the scene, or use
+**GameObject > Safe Haven > World > Mist Volume**. It uses the same billowing cloud shader as terrain mist,
+but needs neither a Terrain nor a ground/water bake. Its local box follows the object's position, rotation and scale.
+Selected gizmos show its bounds; **Size** controls width, height and depth.
+
+- The pivot is the **bottom centre** of the box: place it on the ground or water surface and the mist rises **Size.y** above it.
+- **Density** (default 0.22/m), **Coverage**, **Cloud Size**, **Erosion** and **Edge Fade** control thickness and shape.
+- **Wind**, **Drift Speed**, **Flow Stretch** and the wave settings control flowing wisps and rolling crests.
+  Drift Speed 0 freezes local mist. Tint and Sky Light control its scattering, not the scene's colour grade.
+- **Follows Weather** defaults off: a placed lake/hollow cloud remains visible in Clear weather.
+  Enable it to follow the current weather's independent Mist amount; Weather Wind Influence is separately adjustable.
+- The nearest four local volumes are rendered, in addition to up to four terrain mist layers.
+  Torches clear local clouds as well as terrain mist; fog of war still obscures unexplored ground.
+
+Authored terrain mist in Safe Haven and Prologue Misty Woods is denser, deeper and more mobile, without changing
+Clear weather's zero-mist rule. New terrain layers use density 0.2/m, coverage 0.78 and larger rolling crests.
 
 The existing **Mist / Rain / Storm** assets use independent Mist amounts **1 / 0.25 / 0.4**. Clear and Breezy use 0.
 Prologue's terrain is configured with Base Amount 0, Weather Amount 1, Golden Hour Amount 1.
@@ -178,7 +200,7 @@ Mist is visual only: it does not change monster sight, navigation or collision.
 #### Rolling waves, hollows and water
 
 Terrain Mist now has slow, broad crests rather than only translating cloud noise:
-**Wave Amplitude** (default 0.5 m), **Wave Length** (12 m) and **Wave Speed** (0.6 m/s before
+**Wave Amplitude** (default 0.8 m), **Wave Length** (12 m) and **Wave Speed** (0.9 m/s before
 weather influence). Crests gently bend the ribbons sideways, thicken them and raise their tops;
 they never lift the entire layer off the ground. Set amplitude to 0 to disable these waves.
 Fronts use warped noise at different scales and directions, not evenly spaced sine waves.
@@ -216,9 +238,21 @@ shadow-tested propagation through walls. Sun/moon lights do not clear all the mi
 
 ### Sun and moon shafts through branches
 
-In the scene's **Atmospheric Fog** volume override, enable **Shaft Density** (start at **0.004**),
-**Shaft Intensity** (**4**) and **Shaft Height** (**18 m**). Set these in the night profile too if it overrides fog.
-These particles scatter only directional light, independently of base fog/ambient. Zero Shaft Density restores
+In the scene's **Atmospheric Fog** volume override, enable **Shaft Density** (Safe Haven day: **0.006**),
+**Shaft Intensity** (**5**), **Shaft Height** (**18 m**), **Shaft Color** and **Shaft Glow**. Set these in the night
+profile too if it overrides fog (night profiles use a cool moon tint and lower glow).
+These particles gather only directional light, independently of base fog/ambient, and do not add extinction, so
+they never dim or grey the scene. They are **light in the air only**: surfaces are never tinted or brightened by them.
+
+- **Shaft Glow** (default 0.5, Safe Haven 0.35): brightness of the visible beam, a soft, mostly neutral screen blend
+  (65 % luminance, 35 % **Shaft Color**). It fades out over bright surfaces, so it never clips or bleaches.
+- **Shaft Color**: keep near white (Safe Haven day 1, 0.95, 0.86; night a pale moon blue). It is multiplied with the
+  sun's colour; strong tints make the beams look like coloured shadows.
+
+Only air **below foliage** forms beams: a sample contributes once its view ray has already passed through leaf shadow.
+Air above the canopy and over open clearings stays clear, so shadows are never overlaid with a glow.
+Shafts use a gentler phase than fog, so they stay readable from the downward-looking gameplay camera.
+Actual weather fog and terrain mist retain their extinction and scattering. Zero Shaft Density restores
 the original base fog; turning off Terrain Mist also removes the independent ground clouds.
 
 The renderer samples the **directional shadow atlas at every air sample**, including when URP uses screen-space

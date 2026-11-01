@@ -4,6 +4,7 @@ Shader "Safe Haven/Interaction Outline"
     {
         _OutlineColor ("Colour", Color) = (1, 0.72, 0.25, 1)
         _OutlinePixels ("Width (pixels)", Range(1, 6)) = 3
+        [Enum(UnityEngine.Rendering.CompareFunction)] _ZTest ("Depth Test", Float) = 4
     }
     SubShader
     {
@@ -14,7 +15,7 @@ Shader "Safe Haven/Interaction Outline"
             Tags { "LightMode" = "SRPDefaultUnlit" }
             Cull Off
             ZWrite Off
-            ZTest LEqual
+            ZTest [_ZTest]
             Stencil
             {
                 Ref 1

@@ -9,12 +9,12 @@ using UnityEngine.UI;
 /// nothing; it turns with the camera, so up on the map is up on the screen, and what hasn't been explored stays in the fog of
 /// war (ExplorationMap). Over it go the player, what they have found (buildings, carts, dropped items, portals, exits), their
 /// companions, the quest they are on, creatures close enough to be seen, and a ward breach's lanes and attackers, which stay
-/// pinned to the rim when out of reach. M changes the zoom and hides it. Only reads the game. Made for every scene with a player
+/// pinned to the rim when out of reach. M opens the full world map. Only reads the game. Made for every scene with a player
 /// (ExperienceTracker).
 /// </summary>
 public sealed class MinimapHud : MonoBehaviour
 {
-    private const string ZoomKey = "Minimap.Zoom";
+    private const string ZoomKey = "Minimap.Zoom.v2";
     private const float Margin = 26f;
     private const float RefreshSeconds = 0.25f;
     private const float ZoomSpeed = 8f;
@@ -65,6 +65,9 @@ public sealed class MinimapHud : MonoBehaviour
 
     public static MinimapHud Current { get; private set; }
 
+    /// <summary>This scene's painted ground, or null until it is painted. Owned by the minimap; the world map only shows it.</summary>
+    public Texture2D PaintedMap => painted ? map : null;
+
     /// <summary>Makes the map for this scene, unless it has one or there is no ground to map.</summary>
     public static MinimapHud Create()
     {
@@ -76,7 +79,7 @@ public sealed class MinimapHud : MonoBehaviour
         var root = new GameObject("Minimap");
         var canvas = root.AddComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-        canvas.sortingOrder = 85;
+        canvas.sortingOrder = 70;
         UIRoot.ConfigureScaler(root.AddComponent<CanvasScaler>());
         var hud = root.AddComponent<MinimapHud>();
         hud.area = found;
@@ -200,7 +203,7 @@ public sealed class MinimapHud : MonoBehaviour
     {
         Player player = Player.Current;
         bool windows = UIStateManager.Instance != null && UIStateManager.Instance.IsAnyWindowOpen;
-        bool shown = painted && player != null && zoom != Hidden && !windows && !GamePause.IsPaused;
+        bool shown = painted && player != null && zoom != Hidden && !windows && !WorldMapHud.IsOpen && !GamePause.IsPaused;
         group.alpha = shown ? 1f : 0f;
         if (!shown)
         {

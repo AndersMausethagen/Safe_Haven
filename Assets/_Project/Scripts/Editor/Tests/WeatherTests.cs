@@ -24,7 +24,7 @@ public sealed class WeatherTests
         var profile = ScriptableObject.CreateInstance<FireflyProfile>();
 
         Assert.AreEqual(8, profile.CountFor(0f, 0f));
-        Assert.AreEqual(260, profile.CountFor(1f, 0f));
+        Assert.AreEqual(130, profile.CountFor(1f, 0f));
         Assert.Less(profile.CountFor(1f, 1f), profile.CountFor(1f, 0f) / 4);
         Object.DestroyImmediate(profile);
     }

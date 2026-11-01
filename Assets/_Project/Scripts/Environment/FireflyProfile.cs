@@ -10,7 +10,7 @@ public sealed class FireflyProfile : ScriptableObject
     [ColorUsage(false)]
     [SerializeField] private Color colour = new Color(0.55f, 1f, 0.3f);
     [Tooltip("How many fly around the camera at full night.")]
-    [SerializeField, Min(0)] private int nightCount = 260;
+    [SerializeField, Min(0)] private int nightCount = 130;
     [Tooltip("How many stay out in full daylight.")]
     [SerializeField, Min(0)] private int dayCount = 8;
     [Tooltip("Metres around the middle of the view that they appear in.")]

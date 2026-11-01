@@ -57729,7 +57729,7 @@ MonoBehaviour:
   priority: 2
   blendDistance: 0
   weight: 0
-  sharedProfile: {fileID: 11400000, guid: e75e5085506ad04459ca417fb58c45f8, type: 2}
+  sharedProfile: {fileID: 11400000, guid: a541fb930f6b5a3488aeac090866fc17, type: 2}
 --- !u!4 &779228787
 Transform:
   m_ObjectHideFlags: 0
@@ -70058,20 +70058,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 13b1172324ca34649930e22adcd62eef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: SafeHaven::TerrainMist
-  density: 0.12
+  density: 0.16
   tint: {r: 0.8, g: 0.87, b: 0.94, a: 1}
   skyLight: 0.2
   bottom: 0.15
-  thickness: 3.5
+  thickness: 4.375
   cloudSize: 18
-  coverage: 0.65
+  coverage: 0.78
   erosion: 0.35
   flowStretch: 3.5
   wind: {x: 0.7, y: 0.25}
-  driftSpeed: 2.5
-  waveAmplitude: 0.5
+  driftSpeed: 3.5
+  waveAmplitude: 0.8
   waveLength: 12
-  waveSpeed: 0.6
+  waveSpeed: 0.9
   lowlandBoost: 1.5
   poolingDepth: 2
   waterBoost: 2

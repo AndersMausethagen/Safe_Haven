@@ -15,7 +15,7 @@ MonoBehaviour:
   material: {fileID: 2100000, guid: 48b04bbd30f08d240943d61ebb8579f0, type: 2}
   mapSize: 512
   size: 236
-  nearReach: 42
+  nearReach: 28
   farReach: 105
   creatureSight: 24
   creatureSightAtNight: 11

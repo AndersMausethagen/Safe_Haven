@@ -447,7 +447,6 @@ public sealed class ItemInventoryWindow : MonoBehaviour, IItemSlotHandler
 
         var byHand = new List<RecipeDefinition>();
         var atStations = new List<RecipeDefinition>();
-        int locked = 0;
         foreach (RecipeDefinition recipe in crafting.Recipes)
         {
             if (recipe == null)
@@ -457,13 +456,14 @@ public sealed class ItemInventoryWindow : MonoBehaviour, IItemSlotHandler
 
             if (!crafting.IsKnown(recipe))
             {
-                locked++;
+                continue;
             }
-            else if (recipe.IsHandcrafted)
+
+            if (recipe.IsHandcrafted)
             {
                 byHand.Add(recipe);
             }
-            else
+            else if (crafting.IsNearStation(recipe.Station))
             {
                 atStations.Add(recipe);
             }
@@ -472,7 +472,7 @@ public sealed class ItemInventoryWindow : MonoBehaviour, IItemSlotHandler
         byHand.Sort(RecipeBook.CompareForDisplay);
         atStations.Sort(RecipeBook.CompareForDisplay);
         recipes.Show(new HandMaker(crafting), byHand, atStations);
-        SetFooter("Buildings come from the build menu (G)." + (locked > 0 ? $"  {locked} recipes still to discover." : ""));
+        SetFooter("Buildings come from the build menu (G).");
         recipesDirty = true;
     }
 

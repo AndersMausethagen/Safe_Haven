@@ -80,9 +80,9 @@ public sealed class DialogueBox : MonoBehaviour
     private const float AnswerRowHeight = 46f;
     private const float AnswerRowStep = 52f;
     // A subtitle stays for its reading time: a second plus letters at this pace, within these bounds.
-    private const float SubtitleLettersPerSecond = 18f;
-    private const float SubtitleMinSeconds = 2.5f;
-    private const float SubtitleMaxSeconds = 8f;
+    private const float SubtitleLettersPerSecond = 14f;
+    private const float SubtitleMinSeconds = 4f;
+    private const float SubtitleMaxSeconds = 12f;
     private const float FightCheckInterval = 0.25f;
 
     private static Color Panel => UIStyle.Current.Panel;
@@ -122,6 +122,7 @@ public sealed class DialogueBox : MonoBehaviour
     private Action subtitleDone;
     private float subtitleEnds = -1f;
     private float nextFightCheck;
+    private float subtitleTimeMultiplier = 1f;
     private bool demoting;
 
     /// <summary>The dialogue box of the loaded scene, made on first use.</summary>
@@ -144,12 +145,19 @@ public sealed class DialogueBox : MonoBehaviour
     /// <summary>True while anyone is talking: a line in the box or a subtitle.</summary>
     public static bool IsSpeaking => IsOpen || (current != null && current.IsSubtitling);
 
+    private static int clickFrame = -1;
+
+    /// <summary>True while a click belongs to the conversation: a line is shown, or the click that closed it this frame.
+    /// The player's attack ignores such clicks, so reading on never draws the bow.</summary>
+    public static bool ClaimsClick => IsOpen || clickFrame == Time.frameCount;
+
     /// <summary>Raised when the box closes (moved on past the last line, walked away or closed).</summary>
     public event Action Closed;
 
     /// <summary>Shows a line; <paramref name="done"/> runs when the player moves on. Without a follow-up the box closes.</summary>
-    public void Say(DialogueSpeaker speaker, string line, Action done = null)
+    public void Say(DialogueSpeaker speaker, string line, Action done = null, float subtitleTimeMultiplier = 1f)
     {
+        this.subtitleTimeMultiplier = Mathf.Clamp(subtitleTimeMultiplier, 1f, 2f);
         if (!IsOpen && MonsterAI.AnyHuntingPlayerSide())
         {
             Subtitle(speaker.Name, line, done);
@@ -301,6 +309,11 @@ public sealed class DialogueBox : MonoBehaviour
         if (!window.IsOpen)
         {
             return;
+        }
+
+        if (GameInput.Click.WasPressedThisFrame())
+        {
+            clickFrame = Time.frameCount;
         }
 
         bool asking = choices != null && choices.Count > 0;
@@ -455,7 +468,7 @@ public sealed class DialogueBox : MonoBehaviour
         subtitle.text = string.IsNullOrWhiteSpace(speakerName) ? line : $"<color=#E8C46A>{speakerName}:</color> {line}";
         subtitleStrip.SetActive(true);
         float seconds = (1f + (line ?? "").Length / SubtitleLettersPerSecond) * GameOptions.SubtitleHold;
-        subtitleEnds = Time.time + Mathf.Clamp(seconds, SubtitleMinSeconds, SubtitleMaxSeconds);
+        subtitleEnds = Time.time + Mathf.Clamp(seconds, SubtitleMinSeconds, SubtitleMaxSeconds) * subtitleTimeMultiplier;
     }
 
     // The line on screen when the fight started goes on as a subtitle, with whatever was to follow it.

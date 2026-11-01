@@ -11,7 +11,7 @@ public sealed class TerrainMist : MonoBehaviour
     private Terrain terrain;
 
     [Tooltip("Extinction per metre inside the mist clouds. Zero disables this layer without changing the scene fog.")]
-    [SerializeField, Range(0f, 0.3f)] private float density = 0.12f;
+    [SerializeField, Range(0f, 0.3f)] private float density = 0.2f;
     [Tooltip("Cloud scattering colour, independent of global fog colour.")]
     [SerializeField] private Color tint = new Color(0.8f, 0.87f, 0.94f);
     [Tooltip("Soft sky fill inside the clouds. Lower at night; higher makes the mist readable under dense trees.")]
@@ -19,11 +19,11 @@ public sealed class TerrainMist : MonoBehaviour
     [Tooltip("Height of the bottom of the cloud layer above the terrain, in metres.")]
     [SerializeField, Min(0f)] private float bottom = 0.03f;
     [Tooltip("Maximum layer depth in metres. The thick core stays near the ground and thins rapidly upward.")]
-    [SerializeField, Min(0.25f)] private float thickness = 2f;
+    [SerializeField, Min(0.25f)] private float thickness = 3f;
     [Tooltip("Horizontal size of the drifting clouds, in metres.")]
     [SerializeField, Min(1f)] private float cloudSize = 18f;
     [Tooltip("Share covered by clouds. Lower values leave larger completely clear gaps.")]
-    [SerializeField, Range(0.05f, 1f)] private float coverage = 0.65f;
+    [SerializeField, Range(0.05f, 1f)] private float coverage = 0.78f;
     [Tooltip("Breaks up cloud edges with smaller billows.")]
     [SerializeField, Range(0f, 1f)] private float erosion = 0.35f;
     [Tooltip("Stretches clouds along their drift into terrain-hugging veils. 1 keeps round cloud pockets.")]
@@ -31,14 +31,14 @@ public sealed class TerrainMist : MonoBehaviour
     [Tooltip("World X/Z drift speed in metres per second before Weather Wind Influence.")]
     [SerializeField] private Vector2 wind = new Vector2(0.7f, 0.25f);
     [Tooltip("Multiplies drift and internal billowing. Raise this for more visible movement without changing direction.")]
-    [SerializeField, Min(0f)] private float driftSpeed = 2.5f;
+    [SerializeField, Min(0f)] private float driftSpeed = 3.5f;
     [Header("Rolling waves and pooling")]
     [Tooltip("Height of calm rolling crests in metres. Zero disables the additional wave motion.")]
-    [SerializeField, Min(0f)] private float waveAmplitude = 0.5f;
+    [SerializeField, Min(0f)] private float waveAmplitude = 0.8f;
     [Tooltip("Distance between broad mist waves in metres.")]
     [SerializeField, Min(1f)] private float waveLength = 12f;
     [Tooltip("Wave travel in metres per second before weather influence.")]
-    [SerializeField, Min(0f)] private float waveSpeed = 0.6f;
+    [SerializeField, Min(0f)] private float waveSpeed = 0.9f;
     [Tooltip("Extra mist in hollows relative to surrounding terrain within 12 metres. Zero disables pooling.")]
     [SerializeField, Range(0f, 4f)] private float lowlandBoost = 1.5f;
     [Tooltip("Depression depth in metres that receives the full lowland boost.")]

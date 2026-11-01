@@ -15,7 +15,7 @@ MonoBehaviour:
   id: herbplanter
   displayName: Herb Planter
   description: A box of herbs and flowers. Something growing on purpose.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: b19b3aeb7ebb65c44aeaef268da71223, type: 3}
   faction: 0
   combatStats: {fileID: 11400000, guid: 01155c9e2dd7c27468c1a359f747e1a1, type: 2}
   prefab: {fileID: 7033340267357530629, guid: 7c8adaf3f8ee36a4b8b30d0f98dfe3af, type: 3}

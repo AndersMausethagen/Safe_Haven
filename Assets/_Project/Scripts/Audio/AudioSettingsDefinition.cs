@@ -30,8 +30,7 @@ public sealed class AudioSettingsDefinition : ScriptableObject
     [SerializeField, Range(0f, 1f)] private float effectsVolume = 0.9f;
 
     [Header("What Counts as Combat")]
-    [Tooltip("The player has drawn their weapon (Tab).")]
-    [SerializeField] private bool weaponDrawn = true;
+    [HideInInspector, SerializeField] private bool weaponDrawn = true;
     [Tooltip("An enemy is chasing or attacking the player.")]
     [SerializeField] private bool enemyChasingPlayer = true;
     [Tooltip("The player hit something or was hit within this many seconds. 0 turns this off.")]
@@ -213,7 +212,6 @@ public sealed class AudioSettingsDefinition : ScriptableObject
     public MusicPlaylist DefaultCombat => defaultCombat;
     public float CrossfadeSeconds => crossfadeSeconds;
     public float MasterVolume => masterVolume;
-    public bool WeaponDrawnIsCombat => weaponDrawn;
     public bool EnemyChasingIsCombat => enemyChasingPlayer;
     public float RecentDamageSeconds => recentDamageSeconds;
     public float CombatLingerSeconds => combatLingerSeconds;

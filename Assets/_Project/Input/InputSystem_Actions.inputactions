@@ -214,9 +214,18 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Minimap",
+                    "name": "WorldMap",
                     "type": "Button",
                     "id": "6d0f3f6e-9a53-4d0e-b6c7-2f6f0e3a71c4",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "CommandWheel",
+                    "type": "Button",
+                    "id": "9a7cc4f4-8938-4d5e-86bc-08e173d6d3f0",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -814,7 +823,18 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
-                    "action": "Minimap",
+                    "action": "WorldMap",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "4815d03a-53e7-48f8-a9f1-5a8298de5710",
+                    "path": "<Keyboard>/leftAlt",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "CommandWheel",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

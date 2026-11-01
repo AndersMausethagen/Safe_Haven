@@ -107,6 +107,26 @@ public static class OutlineCopies
         }
     }
 
+    /// <summary>Gives every outline copy this material instead, e.g. to recolour it.</summary>
+    public static void SetOutlineMaterial(List<Entry> entries, Material material)
+    {
+        foreach (Entry entry in entries)
+        {
+            if (entry.Outline == null)
+            {
+                continue;
+            }
+
+            Material[] materials = entry.Outline.sharedMaterials;
+            for (int i = 0; i < materials.Length; i++)
+            {
+                materials[i] = material;
+            }
+
+            entry.Outline.sharedMaterials = materials;
+        }
+    }
+
     public static void Destroy(List<Entry> entries)
     {
         foreach (Entry entry in entries)
