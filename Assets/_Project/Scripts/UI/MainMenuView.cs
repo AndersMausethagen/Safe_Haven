@@ -96,9 +96,12 @@ public sealed class MainMenuView : MonoBehaviour
         }
     }
 
-    private void NewGame()
+    // A new game starts by making its character.
+    private void NewGame() => CharacterCreationScreen.Open(StartNewGame);
+
+    private void StartNewGame(CharacterAppearance look)
     {
-        if (SaveGameService.TryStartNewGame(newGameScene, out string problem))
+        if (SaveGameService.TryStartNewGame(newGameScene, look, out string problem))
         {
             SetButtons(false);
         }

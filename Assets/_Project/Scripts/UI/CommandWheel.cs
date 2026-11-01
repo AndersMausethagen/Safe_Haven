@@ -4,7 +4,8 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-/// <summary>Hold Alt to issue one shared order to the companions or use a carried consumable.</summary>
+/// <summary>Hold Alt to issue one shared order to the companions, use a carried consumable, or (hovering Emotes) make a
+/// gesture.</summary>
 [DisallowMultipleComponent]
 public sealed class CommandWheel : MonoBehaviour
 {
@@ -24,13 +25,19 @@ public sealed class CommandWheel : MonoBehaviour
     {
         public readonly string Label;
         public readonly Action Select;
+        /// <summary>Hovered for a moment, it turns the wheel to another page instead of being chosen on release.</summary>
+        public readonly Action Opens;
 
-        public Choice(string label, Action select)
+        public Choice(string label, Action select, Action opens = null)
         {
             Label = label;
             Select = select;
+            Opens = opens;
         }
     }
+
+    private const float HoverToOpen = 0.3f;
+    private const int MaxChoices = 8;
 
     private readonly List<Choice> choices = new List<Choice>();
     private readonly List<Image> slots = new List<Image>();
@@ -40,6 +47,8 @@ public sealed class CommandWheel : MonoBehaviour
     private TMP_Text centreLabel;
     private Sprite circle;
     private int selected = -1;
+    private float hoveredSince;
+    private string title = "Choose";
 
     public bool IsOpen => group != null && group.alpha > 0f;
 
@@ -73,16 +82,24 @@ public sealed class CommandWheel : MonoBehaviour
         }
 
         BuildChoices();
+        ShowPage("Choose");
+    }
+
+    // Lays out the choices just built as a fresh page of the open wheel.
+    private void ShowPage(string pageTitle)
+    {
         if (choices.Count == 0)
         {
+            Cancel();
             return;
         }
 
         EnsureSlots();
         selected = -1;
+        title = pageTitle;
         root.SetActive(true);
         group.alpha = 1f;
-        centreLabel.text = "Choose";
+        centreLabel.text = title;
         UpdateSelection();
     }
 
@@ -120,6 +137,10 @@ public sealed class CommandWheel : MonoBehaviour
         }
 
         UpdateSelection();
+        if (selected >= 0 && choices[selected].Opens != null && Time.unscaledTime - hoveredSince >= HoverToOpen)
+        {
+            choices[selected].Opens();
+        }
     }
 
     private void BuildChoices()
@@ -160,6 +181,11 @@ public sealed class CommandWheel : MonoBehaviour
         }
 
         Player player = Player.Current;
+        if (player != null && player.TryGetComponent(out CharacterEmotes emotes) && WheelEmotes().Count > 0)
+        {
+            choices.Add(new Choice("Emotes", null, () => OpenEmotes(emotes)));
+        }
+
         ItemInventory inventory = player != null ? player.Bag : null;
         if (inventory == null)
         {
@@ -170,6 +196,32 @@ public sealed class CommandWheel : MonoBehaviour
         AddConsumables(inventory, inventory.SafePocket);
     }
 
+    private static List<EmoteDefinition> WheelEmotes()
+    {
+        var onWheel = new List<EmoteDefinition>();
+        foreach (EmoteDefinition emote in CharacterCatalog.Current.Emotes)
+        {
+            if (emote != null && emote.OnWheel && onWheel.Count < MaxChoices)
+            {
+                onWheel.Add(emote);
+            }
+        }
+
+        return onWheel;
+    }
+
+    private void OpenEmotes(CharacterEmotes emotes)
+    {
+        choices.Clear();
+        foreach (EmoteDefinition emote in WheelEmotes())
+        {
+            EmoteDefinition chosen = emote;
+            choices.Add(new Choice(chosen.DisplayName, () => emotes.Play(chosen)));
+        }
+
+        ShowPage("Emotes");
+    }
+
     private void AddConsumables(ItemInventory inventory, ItemContainer container)
     {
         if (container == null)
@@ -177,7 +229,7 @@ public sealed class CommandWheel : MonoBehaviour
             return;
         }
 
-        for (int i = 0; i < container.UnlockedSlots && choices.Count < 8; i++)
+        for (int i = 0; i < container.UnlockedSlots && choices.Count < MaxChoices; i++)
         {
             ItemStack stack = container.GetSlot(i);
             if (stack.IsEmpty || stack.Item.Category != ItemCategory.Consumable || !stack.Item.IsConsumable)
@@ -267,6 +319,7 @@ public sealed class CommandWheel : MonoBehaviour
             return;
         }
 
+        int previous = selected;
         selected = -1;
         if (pointer.magnitude >= CentreDeadZone)
         {
@@ -279,6 +332,11 @@ public sealed class CommandWheel : MonoBehaviour
             selected = Mathf.RoundToInt(angle / 360f * choices.Count) % choices.Count;
         }
 
+        if (selected != previous)
+        {
+            hoveredSince = Time.unscaledTime;
+        }
+
         UIStyle style = UIStyle.Current;
         for (int i = 0; i < choices.Count; i++)
         {
@@ -288,7 +346,7 @@ public sealed class CommandWheel : MonoBehaviour
             slots[i].transform.localScale = Vector3.one * (active ? 1.12f : 1f);
         }
 
-        centreLabel.text = selected >= 0 ? choices[selected].Label : "Choose";
+        centreLabel.text = selected >= 0 ? choices[selected].Label : title;
     }
 
     private static string OrderLabel(CompanionOrder order)

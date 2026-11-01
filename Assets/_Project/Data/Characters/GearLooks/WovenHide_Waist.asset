@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0bd5de173f8b0034e9693a7839275431, type: 3}
+  m_Name: WovenHide_Waist
+  m_EditorClassIdentifier: SafeHaven::GearLookDefinition
+  male:
+  - prefab: {fileID: 1404301419128427600, guid: b6bedd7ca7fc4957927fcf372d4fabcb, type: 3}
+    covers: 0
+    skinOverlay: {fileID: 0}
+  female:
+  - prefab: {fileID: 6145711717651544659, guid: 2ccff5b71e8e49819206f8489d680f05, type: 3}
+    covers: 0
+    skinOverlay: {fileID: 0}

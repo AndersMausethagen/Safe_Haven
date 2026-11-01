@@ -18,6 +18,9 @@ public sealed class PlayerMovementSettings : ScriptableObject
     [SerializeField] private float gravity = -15.81f;
     [SerializeField] private float groundedVerticalVelocity = -2f;
     [SerializeField, Min(0f)] private float turnSpeed = 720f;
+    [Tooltip("Speed, as a share of normal, moving straight away from where the player faces (cursor-facing combat, aiming). " +
+             "Full speed up to sideways, easing to this by 45° behind. The backpedal animation is a short-stepped one.")]
+    [SerializeField, Range(0.3f, 1f)] private float backpedalSpeed = 0.7f;
 
     [Header("Dodge (Space)")]
     [Tooltip("Meters covered by one dodge.")]
@@ -40,6 +43,10 @@ public sealed class PlayerMovementSettings : ScriptableObject
     public float Gravity => gravity;
     public float GroundedVerticalVelocity => groundedVerticalVelocity;
     public float TurnSpeed => turnSpeed;
+
+    /// <summary>Speed share for moving at <paramref name="angle"/> degrees off the facing: 1 up to 90°, easing to
+    /// Backpedal Speed at 135° and beyond.</summary>
+    public float BackpedalShare(float angle) => Mathf.Lerp(1f, backpedalSpeed, Mathf.InverseLerp(90f, 135f, angle));
     [Header("Equipment load (armor, rings and weapon weight)")]
     [Tooltip("At or below this load the dodge is a quickstep; at or above Heavy Load it is a heavy roll that barges.")]
     [SerializeField, Min(0f)] private float lightLoad = 6f;

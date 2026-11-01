@@ -65,7 +65,7 @@ of the GDD, **Not started** = design only. Update this table when a system is ad
 | §12 Resources, inventory | Done | Materials are items (`Data/Items/Materials`, each with a weight, bag capped at 150 by `ItemContainer`'s weight budget). Essences only in `ResourceInventory/*` (weightless bars). `GatheringNodeDefinition` + `ResourceSource`/`ResourceNode`, `MaterialPool`, `ItemInventory`, `BackpackCapacity` (slots + carry bonus), `Gathering/*` (axe/pickaxe/sickle timing minigame, raid noise, Forest Annoyance, raid summary stats). Every tree can be felled with an axe: tree prefabs carry the shared Tree node and `ChoppableTree` (logs by axe tier and tree size, a chance of Hardwood/Elderwood: `TreeChoppingSettings`, Systems Editor › Tree Chopping); painted terrain trees get invisible stand-ins near the player and shrink away when felled (`TerrainTreeFelling`, added to terrains by itself, on a runtime copy of the terrain data). Oak Wood is shown as Wood | |
 | §13 Crafting, refining | Partial | `RecipeDefinition`, `RecipeBook`, `PlayerCrafting` (hand recipes only), `CraftingStation` + `StationQueue`/`WorkshopState`/`StationCrafting`/`StationWindow` (timed station queues; `StationMenu` is the text fallback), `Durability/*` (repairs), `PurificationAltar` | Stone → Copper → Iron ladder, station queues (pay on queue, keep working during raids, resources to storage first, output slot), repairs and purification work. Gear runs Stone → Copper → Iron → Moonsilver, with jewellery, shields and meals (`AgentScripts/BuildGear.cs`, `BuildFood.cs`). New stations: Kitchen, Tanning Rack, Farm Plot and Beehive; a crop is a recipe with long Craft Seconds. Essence uses: see "Essence" |
 | §14 Base building | Partial | Torch (light against the night: `VisibilitySource`, `AtmosphereLight`), `BuildPlacer` (G: preview inside the ward radius; buildings with Build Work become a `Construction` scaffold the player hammers up (E), the rest stand at once; "Upgrade or repair a building"; move for free; wheel/Shift+wheel rotate, grid + flush-beside-neighbour snapping, Alt = free; entrance yards kept clear; walls dragged in lines), `BuildPlacement` (footprint geometry), `BuildingDefinition` (Build Work, Renown, Upgrades: `BuildingLevel` cost/work/craft speed/queue/output/storage/renown), `BuildingObject`, `Construction` (level, scaffold, rising model, generated level dressing, saved), `SaveableEntity`; Safe Haven starts overgrown (`Overgrowth` on never-regrowing gathering nodes) with a ruined shed; `HavenRenown`/`HavenSettings`/`HavenProgress` (renown, ranks that widen the ward), `HavenHud`, the Haven window (`HavenWindow` drawing a `HavenOverview`; H, or ask the Heart Tree); decorations Lantern Post, Haven Banner, Herb Planter | Building damage; real art for level dressing and the new buildings (generated from primitives now). Added by `AgentScripts/BuildFood.cs`: Kitchen, Tanning Rack, Farm Plot, Beehive (stations), Well (`WaterSource`), Sauna (`BoonSource`), Watch Post, Spike Trap (`SpikeTrap`), Cottage |
-| §15 NPCs, companions | Partial | `RescuableTraveler` → `ResidentDefinition`, `JobDefinition`, `ResidentNpc`, `ResidentSpawner`; `Companions/*` (`Companion`, `CompanionDefinition`, `CompanionOrder`, `CompanionTactics`) | One recruit (Ingrid) and one job (Alchemist). Companions fight beside the player with orders (follow, stay, defend, retreat, attack my target) given in conversation; the prologue expedition uses them. Knocked down, they get up after a while: no player revive, permanent death or raid deployment yet. No needs or relationships |
+| §15 NPCs, companions | Partial | `RescuableTraveler` → `ResidentDefinition`, `JobDefinition`, `ResidentNpc`, `ResidentSpawner`; `Companions/*` (`Companion`, `CompanionDefinition`, `CompanionOrder`, `CompanionTactics`) | One recruit (Ingrid) and one job (Alchemist). Companions fight beside the player with orders (follow, stay, defend, retreat, attack my target) given in conversation; the prologue expedition uses them. Knocked down, they get up after a while: no player revive, permanent death or raid deployment yet. No needs or relationships. People are modular humans with emotes and talking gestures, and the player is made on a character creation screen (see "Characters") |
 | §16 Skills, levels, bosses | Partial | `SkillDefinition`, `SkillSchool`, `SkillLoadout`, `PlayerSkills`, `SkillWindow`; levels and talents in `Progression/*` (`CharacterProgress` in `GameSession.Progress`, `ExperienceTracker`, `PlayerTalents`, `TalentDefinition` × 20 in four free-mix trees, `LevelingSettings`, `ExperienceStone`), `TalentWindow` (N), `ExperienceHud`, the Rune Book; skill ranks bought with Purified Essence (see "Essence") | Bosses |
 | §17 Quests, trade | Partial | `Quests/*`, `Events/*`, story graphs (`Story/*`: `StoryScript` in the scene with `[SerializeReference]` `StoryNode`s and links, edited in `Editor/Story/StoryGraphWindow` (GraphView); see [story graphs](../../../Docs/StoryGraphs.md)); chains "The First Days" and "The Lost Expedition" (why the haven is built: GDD §4.1; rebuilt by `AgentScripts/BuildHomeStory.cs`, moments under Home Moments in SafeHaven) | No trade/bargain or reactive world |
 | §18 UI, accessibility | Partial | `UI/*` (TMP), `DialogueBox` (conversations at the bottom of the screen: live `DialoguePortrait` of the speaker, name, typed-out line, answers 1-4; QuestGiver, companions and story graphs talk through it), `ActionMenuWindow` (world menus), `UIStateManager`, `UITheme` | Options screen with key rebinding, UI and text size, reduced shake and flashes (see "Options"). Colour-independent signals and audio cues are still open |
@@ -536,7 +536,7 @@ Objects in persistent scenes save themselves through `SaveableEntity` and `ISave
 
 **Saved games:** a game can have any number of saves, each its own file (a slot; `SaveStorage.ListSlots` finds them, so a
 copied-in `.json` shows up too). The game being played writes to `SaveGameService.CurrentSlot`: the slot it was loaded from, or
-a new one (`journey_<date>`, named "Journey N") the first time it saves, so a new game never touches another. Save, F5 and the
+a new one (`journey_<date>`, named "Journey N", or "<Name>'s Journey" when the character was given a name) the first time it saves, so a new game never touches another. Save, F5 and the
 prologue's checkpoints all go there. `SaveData.displayName` is the name; `SaveSlotInfo` is one row of a list, read from the file
 without loading it, and a file that can't be read still gets a row so it can be deleted. `UI/Options/SavesScreen.cs` lists them,
 from the main menu and the Escape menu: load, overwrite and Save as New while playing, rename, delete. The old `save.json` is
@@ -848,11 +848,19 @@ The player is no super soldier: combat is about reading the enemy and committing
   (`PlayerAnimationController.OnSwingStarted`, `ActionSpeed` parameter), so the animation starts with the gameplay swing.
   Swings and dodges play on the **Combat Full Body** layer (legs included): a swing plants the feet from its start until
   the blow lands (`WindupMoveSpeed`, 0; `PlayerCombat.ReleaseFeet`) and `PlayerMovement.FacingLocked` holds the body on the
-  blow, so only the attack's Lunge moves it. Once it has landed the player moves at `SwingMoveSpeed` / `HeavyMoveSpeed`, and
+  blow, so only the attack's Lunge moves it. Once it has landed the player moves at `SwingMoveSpeed` / `HeavyMoveSpeed`
+  (both 0: planted and facing the blow until the swing ends, since arms swinging over running legs looked wrong). Above 0,
   walking off hands the rest of the swing to Attack Arms from the same moment (`PlayerAnimationController.WalkOutOfSwing`).
   The swing's timer runs on, so walking off doesn't bring the next attack sooner; every way out goes through `EndSwing`,
   which frees the feet. The wind-up plays at Animation Speed and, from the hit, the strike at Follow Through Speed.
-  The player's body is Kevin Iglesias' HumanM (`PlayerBodySetup`, Safe Haven › Characters › Use Human Body for Player).
+  The player's body is the N-hance modular human (`ModularCharacter` + `PlayerLook`, see "Characters"); the clips the
+  states play are swapped for the pack's where it has them (`CharacterAnimatorBuilder`).
+  Locomotion and Combat Locomotion pick a run set by `WeaponStance` (unarmed `Run_*`, `Run_1H_*`, `Run_2H_*`,
+  `Run_2HL_*` + `Walk_2HL_*` for polearms, `Run_Bow_*`), so a held weapon is carried rather than pumped with the arms.
+  Thresholds are the clips' measured ground speeds (walk 1.6, run 4.8, backward runs 2.1 m/s); `MotionSpeed` scales the
+  clip to the actual speed (capped at Max Motion Speed) so the feet don't slide. Rebuild with **Safe Haven › Characters ›
+  Build Player Locomotion**. Moving away from the facing direction (cursor-facing in combat, or a locked facing) costs
+  speed: `PlayerMovementSettings` › Backpedal Speed (0.7 = 70% straight backwards).
   States and timings come from **Safe Haven › Characters › Set Up Combat Animations** (`CombatAnimationSetup`: imports
   the Quaternius UAL1/UAL2 clips, adds the states to `PlayerAnimator` and a Stagger state to `MonsterHumanoid`, measures
   each clip's contact moment from the weapon hand's speed and writes Hit Delay / Recovery, builds the weapons' chains).
@@ -1004,6 +1012,34 @@ checks saved assets and runs isolated live combat probes without loading a playe
   (`equippedSlot` is legacy). `PlayerSnapshot` carries the gear across scenes. A failed raid keeps gear that was worn
   at raid start, with durability loss, and loses gear looted during the raid.
 - Worn gear is repairable at the `RepairBench` and counts toward collect-item quests. Tests: `Editor/Tests/GearTests.cs`.
+
+## Characters: modular humans, character creation and emotes
+
+People are built from the N-hance Stylized Modular Human packs (`Assets/StylizedCharacter`; runtime code never references
+the pack's scripts, only `SafeHaven.Editor` does).
+
+- **Data**: `CharacterBodyDefinition` (one per gender, `Data/Characters`: model, avatar, skins, faces, eyes, underclothes,
+  hair/brows/beards in each hair colour, the female clip swaps), `GearLookDefinition` (worn meshes and skin overlays per
+  gender, and the body parts they hide), `EmoteDefinition` (clip, optional begin/end, held or one-shot, on the wheel) and
+  `CharacterCatalog` (`Resources/CharacterCatalog`: both bodies, the starting look, the name dice lists, the emotes and
+  the speaking / quest-taken / sit-at-fire gestures, the plain clothes and shoes). `CharacterAppearance` is the plain,
+  saved choice of indices plus the name (`GameSession.Appearance`, `SaveData`).
+- **`ModularCharacter`** builds a body from an appearance and an outfit (a list of gear looks), rebinding meshes to one
+  skeleton and swapping in the female clips; it only rebuilds what changed. `PlayerLook` dresses the player from
+  `GameSession.Appearance` and the worn gear's `ItemDefinition` › Worn Look; with nothing in Body or Feet the chosen plain
+  clothes / plain shoes are worn. NPCs keep the outfit authored on their prefab.
+- **Character creation**: New Game opens `UI/Options/CharacterCreationScreen` (name with a random-name dice, body, skin,
+  face, hair, hair colour, brows, beard, eyes, clothes; Randomise) over a `CharacterPreviewStage` (a RenderTexture studio
+  far below the scene, drag to turn). Confirm calls `SaveGameService.TryStartNewGame(scene, look)`. The name is used in
+  dialogue (`DialogueSpeaker.Player`) and save names.
+- **Emotes**: `CharacterEmotes` plays them on the controllers' **Emote** layer (weight only while one plays; held poses
+  end when the character moves). The command wheel (Alt) has an Emotes slot: hover it to open the emote page.
+  `CharacterGestures` adds the incidental ones: talking gestures on each dialogue line, a gesture from giver and player
+  when a quest is taken, and sitting down when cooking at a campfire.
+- **Builders** (Safe Haven › Characters): `CharacterLibraryBuilder` (bodies, emotes, catalog, armour and plain-clothes
+  looks), `CharacterAnimatorBuilder` (player and Villager controllers, clip swaps, Emote layers), `PlayerBodySetup`
+  (player prefab, grips via `HeldItemGrips`), `PeopleSetup` (people prefabs, residents, the traveler and the prologue
+  expedition, including their expedition torches).
 
 ## UI root, pause and the Escape menu
 

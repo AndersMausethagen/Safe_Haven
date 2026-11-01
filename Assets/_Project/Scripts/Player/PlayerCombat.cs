@@ -584,12 +584,13 @@ public sealed class PlayerCombat : MonoBehaviour
         }
     }
 
-    // The blow has landed: the rest is follow-through the player can walk out of. The swing itself goes on, so walking off
-    // doesn't make the next attack come any sooner.
+    // The blow has landed: the rest is follow-through, walked out of at the rules' speed. At 0 the player stays planted
+    // and facing the blow until the swing ends. The swing itself goes on, so walking off doesn't bring the next attack sooner.
     private void ReleaseFeet()
     {
-        movement.FacingLocked = false;
-        movement.SetSpeedScale(this, activeKind == SwingKind.Heavy ? Rules.HeavyMoveSpeed : Rules.SwingMoveSpeed);
+        float speed = activeKind == SwingKind.Heavy ? Rules.HeavyMoveSpeed : Rules.SwingMoveSpeed;
+        movement.FacingLocked = speed <= 0f;
+        movement.SetSpeedScale(this, speed);
     }
 
     private void EndSwing()

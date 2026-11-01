@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0bd5de173f8b0034e9693a7839275431, type: 3}
+  m_Name: CopperScale_Head
+  m_EditorClassIdentifier: SafeHaven::GearLookDefinition
+  male:
+  - prefab: {fileID: 5736829633416801981, guid: 0bf1267561cd43d1b3c184b79e024235, type: 3}
+    covers: 64
+    skinOverlay: {fileID: 0}
+  female:
+  - prefab: {fileID: 6810695642684086929, guid: 285f239a0d374d8a950406f083b3d85c, type: 3}
+    covers: 64
+    skinOverlay: {fileID: 0}

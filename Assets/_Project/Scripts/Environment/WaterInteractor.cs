@@ -30,6 +30,9 @@ public sealed class WaterInteractor : MonoBehaviour
     [SerializeField, Range(0f, 2f)] private float foam = 0.5f;
     [Tooltip("Spawned where it drops into the water fast enough (e.g. Art/Generated/Water/Water Splash).")]
     [SerializeField] private GameObject splash;
+    [Tooltip("Spawned under each planted foot in water or a rain puddle (e.g. Art/Generated/Water/Footstep Splash). " +
+             "Falls back to Splash when empty.")]
+    [SerializeField] private GameObject footstepSplash;
     [Tooltip("Downward speed (m/s) at which entering the water splashes.")]
     [SerializeField, Min(0f)] private float splashSpeed = 2.5f;
 
@@ -75,6 +78,12 @@ public sealed class WaterInteractor : MonoBehaviour
         set => splash = value;
     }
 
+    public GameObject FootstepSplash
+    {
+        get => footstepSplash;
+        set => footstepSplash = value;
+    }
+
     public Vector3 Offset
     {
         get => offset;
@@ -88,18 +97,26 @@ public sealed class WaterInteractor : MonoBehaviour
     /// <summary>Foam spots sent to the shader by the last <see cref="UpdateAll"/>.</summary>
     public static int SpotCount { get; private set; }
 
-    /// <summary>Shows a splash and adds a ripple when a grounded foot lands on this water surface.</summary>
+    /// <summary>Splashes on water or a terrain rain puddle; pond and river contacts also add a ripple.</summary>
     public bool SplashFootstep(Vector3 point)
     {
-        if (!Application.isPlaying || kind != Kind.Moving ||
-            !WaterSurface.TryFind(point + Vector3.up * 0.1f, 0.3f, out float height))
+        if (!Application.isPlaying || kind != Kind.Moving)
+        {
+            return false;
+        }
+
+        bool surfaceWater = WaterSurface.TryFind(point + Vector3.up * 0.1f, 0.3f, out float height);
+        if (!surfaceWater && !TerrainPuddles.TryFind(point, out height))
         {
             return false;
         }
 
         Vector3 at = new Vector3(point.x, height, point.z);
-        WaterRipples.AddStamp(at, Mathf.Max(radius * 0.75f, 0.15f), 0.24f * ripples);
-        SpawnSplash(at);
+        if (surfaceWater)
+        {
+            WaterRipples.AddStamp(at, Mathf.Max(radius * 0.75f, 0.15f), 0.24f * ripples);
+        }
+        SpawnSplash(at, footstepSplash != null ? footstepSplash : splash);
         return true;
     }
 
@@ -244,11 +261,13 @@ public sealed class WaterInteractor : MonoBehaviour
         spotStrength = kind == Kind.Constant ? foam : foam * Mathf.Clamp01(horizontal / 3f);
     }
 
-    private void SpawnSplash(Vector3 at)
+    private void SpawnSplash(Vector3 at) => SpawnSplash(at, splash);
+
+    private static void SpawnSplash(Vector3 at, GameObject prefab)
     {
-        if (splash != null && Application.isPlaying)
+        if (prefab != null && Application.isPlaying)
         {
-            Instantiate(splash, at, Quaternion.identity);
+            Instantiate(prefab, at, Quaternion.identity);
         }
     }
 

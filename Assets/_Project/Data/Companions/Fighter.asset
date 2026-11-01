@@ -23,10 +23,10 @@ MonoBehaviour:
   strikeDelay: 0
   weapon: {fileID: 11400000, guid: 5b62859d111deea49b045373b4d1ae83, type: 2}
   animations: {fileID: 0}
-  gripPosition: {x: -0.005311981, y: 0.081857964, z: 0.019505477}
-  gripRotation: {x: 356.0683, y: 0.7642652, z: 80.988785}
-  offHandGripPosition: {x: 0.0053115385, y: 0.08185808, z: 0.019505434}
-  offHandGripRotation: {x: 3.9317157, y: 179.23506, z: 80.988556}
+  gripPosition: {x: 0.06770403, y: -0.022614287, z: 0.016522978}
+  gripRotation: {x: 73.37317, y: 156.66853, z: 144.34685}
+  offHandGripPosition: {x: -0.0677242, y: 0.02196317, z: -0.017299345}
+  offHandGripRotation: {x: 72.89409, y: 154.42847, z: 322.7776}
   engageRadius: 9
   defendRadius: 3.5
   holdRadius: 12

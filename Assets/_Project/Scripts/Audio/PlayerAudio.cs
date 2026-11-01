@@ -207,6 +207,11 @@ public sealed class PlayerAudio : MonoBehaviour
         {
             if (hit.collider is TerrainCollider && hit.collider.TryGetComponent(out Terrain terrain))
             {
+                if (sounds.FootstepWater != null && TerrainPuddles.Contains(terrain, hit.point))
+                {
+                    return sounds.FootstepWater;
+                }
+
                 if (sounds.FootstepGrass != null && GrassUnder(terrain, hit.point) >= sounds.GrassForGrassSteps)
                 {
                     return sounds.FootstepGrass;

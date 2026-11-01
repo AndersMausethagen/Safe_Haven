@@ -1,4 +1,4 @@
-﻿{
+{
     "name": "SafeHaven.Editor",
     "rootNamespace": "",
     "references": [
@@ -21,7 +21,8 @@
         "Unity.Pipeline.Attributes",
         "Unity.Pipeline.Editor",
         "AmplifyShaderEditor",
-        "glTFast"
+        "glTFast",
+        "NHance.StylizedCharacter"
     ],
     "includePlatforms": ["Editor"],
     "excludePlatforms": [],

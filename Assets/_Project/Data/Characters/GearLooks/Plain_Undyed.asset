@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0bd5de173f8b0034e9693a7839275431, type: 3}
+  m_Name: Plain_Undyed
+  m_EditorClassIdentifier: SafeHaven::GearLookDefinition
+  male:
+  - prefab: {fileID: 2183243961120918177, guid: b6ec19c5c3284e06800054956b63e1c1, type: 3}
+    covers: 1
+    skinOverlay: {fileID: 0}
+  - prefab: {fileID: 0}
+    covers: 0
+    skinOverlay: {fileID: 2100000, guid: 31dc174c184e46078b98e03fcefa7e27, type: 2}
+  female:
+  - prefab: {fileID: 7868426961185551054, guid: 40238cdd624f432099b28c606ae27c98, type: 3}
+    covers: 1
+    skinOverlay: {fileID: 0}
+  - prefab: {fileID: 0}
+    covers: 0
+    skinOverlay: {fileID: 2100000, guid: 31dc174c184e46078b98e03fcefa7e27, type: 2}

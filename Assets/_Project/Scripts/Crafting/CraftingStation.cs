@@ -237,6 +237,12 @@ public sealed class CraftingStation : MonoBehaviour
             return;
         }
 
+        // Cooking at a fire is done sitting by it; walking away stands them up.
+        if (type == CraftingStationType.Campfire)
+        {
+            CharacterGestures.Play(user.transform, CharacterCatalog.Current.SitAtFire);
+        }
+
         StationWindow stationWindow = UIStateManager.Instance != null ? UIStateManager.Instance.Find<StationWindow>(UIWindowId.Station) : null;
         if (stationWindow != null)
         {

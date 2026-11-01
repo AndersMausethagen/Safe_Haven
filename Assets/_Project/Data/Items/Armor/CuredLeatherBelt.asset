@@ -42,6 +42,7 @@ MonoBehaviour:
   carryCapacityBonus: 0
   bagSlotBonus: 0
   armorSlot: 8
+  wornLook: {fileID: 11400000, guid: de2804750281bbc4b90e2c2068831720, type: 2}
   statBonuses:
   - stat: 7
     op: 0
@@ -55,4 +56,6 @@ MonoBehaviour:
   teachesBuildings: []
   teachesRecipes: []
   experience: 0
+  learnedAtHome: 0
+  transport: {fileID: 0}
   raidModifier: {fileID: 0}

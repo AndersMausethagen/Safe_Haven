@@ -23,7 +23,7 @@ MonoBehaviour:
   likelyItems:
   - {fileID: 11400000, guid: fcf0552d231ec8b40a3de2796f1bc4c3, type: 2}
   likelyResources: []
-  durationSeconds: 300
+  durationSeconds: 1000
   extractionSeconds: 35
   lootMultiplier: 1
   enemyHealthMultiplier: 1
@@ -33,17 +33,21 @@ MonoBehaviour:
     hour: 11
     chance: 55
     lootMultiplier: 1
+    enemyDensity: 1
     briefing: Mist hangs in the valleys; the forest sees you coming.
   - name: Dusk
     hour: 19.2
     chance: 25
     lootMultiplier: 1.15
+    enemyDensity: 1
     briefing: Long shadows and failing light. Things wake.
   - name: Night
     hour: 23.5
     chance: 20
     lootMultiplier: 1.4
+    enemyDensity: 1
     briefing: Grey dark beyond arm's reach. You see little, and so do they; they hear as well as ever.
+  layoutRules: {fileID: 0}
   enemyDensity: 1
   overrideBands: 0
   nearDistance: 60

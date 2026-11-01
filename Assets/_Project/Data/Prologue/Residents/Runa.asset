@@ -19,6 +19,6 @@ MonoBehaviour:
   arrivalLine: This place can be found. Good. So can everything else, by the same road.
   welcomeLine: 
   fallenLine: I know the way. Go on. I'll catch you up.
-  model: {fileID: 4143811845303264333, guid: 98a5e3726f2d59d45b0da93e8ea043b5, type: 3}
+  model: {fileID: 4704275745086199601, guid: eece4adebb5d1a04d820228f6b254479, type: 3}
   jobs:
   - {fileID: 11400000, guid: 6af8ca180b22423448d6e1e307037eb6, type: 2}

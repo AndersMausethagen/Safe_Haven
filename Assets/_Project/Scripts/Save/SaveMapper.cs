@@ -13,6 +13,8 @@ public sealed class LoadedGame
     public SettlementState Settlement { get; set; } = new SettlementState();
     /// <summary>The playtest run the save belongs to; null for older saves, which then start a new run.</summary>
     public PlaytestRun Playtest { get; set; }
+    /// <summary>How the player looks and their name.</summary>
+    public CharacterAppearance Appearance { get; set; }
     public string Scene { get; set; }
     public PlayerPose? Pose { get; set; }
     /// <summary>Ids in the file that no longer match any content; their entries were skipped.</summary>
@@ -464,6 +466,7 @@ public static class SaveMapper
             loaded.Playtest = new PlaytestRun(data.playtest.runId, data.playtest.playedSeconds, data.playtest.sessions);
         }
 
+        loaded.Appearance = data.appearance;
         return loaded;
     }
 

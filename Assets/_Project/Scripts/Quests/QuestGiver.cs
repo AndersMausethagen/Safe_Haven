@@ -211,6 +211,9 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
         string line = offer != null ? offer.Text : greeting;
         if (QuestManager.Instance.TryStartQuest(Quest, out string reason))
         {
+            EmoteDefinition taken = CharacterCatalog.Current.QuestTaken;
+            CharacterGestures.Play(transform, taken);
+            if (Player.Current != null) CharacterGestures.Play(Player.Current.transform, taken);
             if (talkable == null) Say(line);
         }
         else

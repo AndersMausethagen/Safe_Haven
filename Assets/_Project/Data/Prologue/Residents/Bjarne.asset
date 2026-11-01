@@ -19,6 +19,6 @@ MonoBehaviour:
   arrivalLine: Where's the anvil? No, don't tell me. I'll find it.
   welcomeLine: 
   fallenLine: Tell Sigrid I kept it lit.
-  model: {fileID: 4143811845303264333, guid: 98a5e3726f2d59d45b0da93e8ea043b5, type: 3}
+  model: {fileID: 4545198816639002052, guid: d1bff4db31900154b9550b8dd8a37606, type: 3}
   jobs:
   - {fileID: 11400000, guid: be5a576d696f9f6459c1667a3521f7b8, type: 2}

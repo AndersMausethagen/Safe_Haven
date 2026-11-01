@@ -1,0 +1,170 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 230270e61f99f404793cd4d21ba7a7ec, type: 3}
+  m_Name: CharacterBody_Male
+  m_EditorClassIdentifier: SafeHaven::CharacterBodyDefinition
+  gender: 0
+  model: {fileID: 919132149155446097, guid: b8e1729aa66c4542b0dfb77c151371ff, type: 3}
+  avatar: {fileID: 9000000, guid: b8e1729aa66c4542b0dfb77c151371ff, type: 3}
+  skins:
+  - label: Tone 1
+    material: {fileID: 2100000, guid: 9c0d686ffb5b424097c303685ee3d27e, type: 2}
+  - label: Tone 2
+    material: {fileID: 2100000, guid: 18397306d96f420c843f4f348f9c9e5e, type: 2}
+  - label: Tone 3
+    material: {fileID: 2100000, guid: e2e9d311630547f59dc11d9fd64f9920, type: 2}
+  - label: Tone 4
+    material: {fileID: 2100000, guid: eda035b6f9f64a62b45284ffda0fdb66, type: 2}
+  - label: Tone 5
+    material: {fileID: 2100000, guid: 682dc6e2462e4a70b76064612a5c97d2, type: 2}
+  faces:
+  - label: Face 1
+    material: {fileID: 2100000, guid: 6905d4104d4a4ce5a2c359c6c8ffc237, type: 2}
+  - label: Face 2
+    material: {fileID: 2100000, guid: e5ef3a879d08408b899c4db2feec4d68, type: 2}
+  - label: Face 3
+    material: {fileID: 2100000, guid: fcb1be3aa6b241aa81e722312ac8c9ad, type: 2}
+  - label: Face 4
+    material: {fileID: 2100000, guid: ad0a114125d24116ab19245ba869b7b6, type: 2}
+  - label: Face 5
+    material: {fileID: 2100000, guid: 265f10f1a627493eb7ee748cfc6aa25d, type: 2}
+  eyes:
+  - label: Blue
+    material: {fileID: 2100000, guid: 0845abed288c40a8a8ad15199052c715, type: 2}
+  - label: Brown
+    material: {fileID: 2100000, guid: 308b82eadd6a4b08bdd755d643a4d746, type: 2}
+  - label: Green
+    material: {fileID: 2100000, guid: 5a1b98f2b83846ac9feae91c0feb5e8b, type: 2}
+  - label: Pale
+    material: {fileID: 2100000, guid: 96f73f587316491683d93b8d52e272fc, type: 2}
+  underclothes:
+  - label: Linen
+    material: {fileID: 2100000, guid: 5ea433bf705a4ef3a7436345efdf58a7, type: 2}
+  - label: Wool
+    material: {fileID: 2100000, guid: 102267a4a43a453dbb9a07a9219fd37d, type: 2}
+  - label: Russet
+    material: {fileID: 2100000, guid: e76af1aaaad845688b34d9384b90a012, type: 2}
+  - label: Moss
+    material: {fileID: 2100000, guid: 8217e3bc557c43f69d7d931690b03b83, type: 2}
+  - label: Ash
+    material: {fileID: 2100000, guid: 47918528928844c784a94c76d75f660b, type: 2}
+  bodyPlaceholder: {fileID: 2100000, guid: 2960a142167d49daa3fd0331806fb00b, type: 2}
+  headPlaceholder: {fileID: 2100000, guid: 773c4a16111e4699bad380cbf762cdb3, type: 2}
+  hairColours:
+  - Blond
+  - Black
+  - Brown
+  - Grey
+  stubble:
+  - {fileID: 2100000, guid: 752ac37a485747db9c20c7f07b59e5be, type: 2}
+  - {fileID: 2100000, guid: 1914595e22e748b3ab4dc1ded2e25dfd, type: 2}
+  - {fileID: 2100000, guid: c2c7464724ce4dec829ac0d9d66c6c6b, type: 2}
+  - {fileID: 2100000, guid: 860ca9d57515473b815d7002a1b42955, type: 2}
+  hairStyles:
+  - label: Style 1
+    byColour:
+    - {fileID: 8701522385806266507, guid: 25b56bf302a54a6287898b2787e97d8a, type: 3}
+    - {fileID: 55977455742725249, guid: b248126112a141c188ca21dca910b85c, type: 3}
+    - {fileID: 8497146281600621452, guid: bc4daf52e62a4372941a5ff5da277208, type: 3}
+    - {fileID: 1057455692784568684, guid: 4826dae87f8448159436e58ecca46d17, type: 3}
+  - label: Style 2
+    byColour:
+    - {fileID: 7254997150968073232, guid: 1ff86b16623d4513802099fe6eb97259, type: 3}
+    - {fileID: 3965005935301477601, guid: 3b265ca1ff8c4e40a8e0463433576cbf, type: 3}
+    - {fileID: 5681166682808921592, guid: 768103082a0f4476899a335cefee43dd, type: 3}
+    - {fileID: 5219961787745286706, guid: 37dfbc96982549f6a03c60d7a9045ec3, type: 3}
+  - label: Style 3
+    byColour:
+    - {fileID: 6615288294909448802, guid: 11fce4bd9c03412a9dcc5d76d7ef19e2, type: 3}
+    - {fileID: 8490042645243190321, guid: 2a2a3b90a98f45368f479cccc34dcf5c, type: 3}
+    - {fileID: 8944762330918703804, guid: 70b8e10891f141a4989f705a4c4c7aac, type: 3}
+    - {fileID: 7318243744394312903, guid: baadc45c2927493fb3476efad5112748, type: 3}
+  - label: Style 4
+    byColour:
+    - {fileID: 8880717266229400793, guid: 32eca6e65ff14af1a9348f39821d33ad, type: 3}
+    - {fileID: 679199121769058768, guid: 17aad5e125d94d3386303962802e9876, type: 3}
+    - {fileID: 4428145060349713904, guid: 222445a9af274b8eb796532ca3aea14a, type: 3}
+    - {fileID: 7244676182270100210, guid: d545a4c57e754196956d550948c9f5a7, type: 3}
+  - label: Style 5
+    byColour:
+    - {fileID: 629090128057344682, guid: ed9bef947a474bef8221241880588a6e, type: 3}
+    - {fileID: 9041684768833601284, guid: a3974051006e44d397f8f4aa148b34cc, type: 3}
+    - {fileID: 8996456702637957269, guid: c118e6606ef14af699053eb388375d64, type: 3}
+    - {fileID: 1293416742261814930, guid: 6fb0cae002e94678a65d8f76774d331f, type: 3}
+  - label: Shaved
+    byColour: []
+  brows:
+  - label: Brows 1
+    byColour:
+    - {fileID: 487497993972438861, guid: 8d3166607d1e430db334f6f61886713a, type: 3}
+    - {fileID: 7916839139008716013, guid: f71e94f94fc043499dabcc3721d3ff7b, type: 3}
+    - {fileID: 2639692269084711211, guid: f4e0c8a6584e4a6a946f30395ab94f17, type: 3}
+    - {fileID: 1289726844739464056, guid: 5a9ffcb62cb248fcb289d18c8162fcfc, type: 3}
+  - label: Brows 2
+    byColour:
+    - {fileID: 6909007004777280245, guid: 99aa79b7296f4129b1ea4a1ee527c2b9, type: 3}
+    - {fileID: 458359086717771631, guid: 97ff77e73ccb429f91706619dcd2a6c0, type: 3}
+    - {fileID: 3729405659883125736, guid: 6c6ab9a8ac8241bbb671000c98cd3975, type: 3}
+    - {fileID: 4206346960633095491, guid: 19244485c51f4754b5e93e12f75826af, type: 3}
+  - label: Brows 3
+    byColour:
+    - {fileID: 776954654932720672, guid: 8b1053df6527455d840e81f208a95740, type: 3}
+    - {fileID: 1877578872319852157, guid: 929229473d704be8a3283287c7750835, type: 3}
+    - {fileID: 7363059843733849767, guid: 5b1b5d6fbc044836995485eecaa49df1, type: 3}
+    - {fileID: 8843012941874193659, guid: 104a55f8c98141458e938ec6f895e12c, type: 3}
+  - label: Brows 4
+    byColour:
+    - {fileID: 8427398370153371143, guid: 5ab845cc1ced43748bef10e09460dd21, type: 3}
+    - {fileID: 8231839381162878051, guid: b044359fb5e040be98be9792ed4969cb, type: 3}
+    - {fileID: 2794578330271407149, guid: 99ae5b1a1b54486a83e302ee3d1a4a59, type: 3}
+    - {fileID: 4858996066155094538, guid: a8ed979e51ad41ce9774f08be15418df, type: 3}
+  browTints: []
+  beards:
+  - label: None
+    byColour: []
+  - label: Beard 1
+    byColour:
+    - {fileID: 8671206952939059668, guid: 11f61890a9da4f2f8040da79f0e756c9, type: 3}
+    - {fileID: 8723901391223630298, guid: 03334e30d1a7454484751f0d1352b373, type: 3}
+    - {fileID: 9166290978945938287, guid: 89b3dec3323f4ffeb84af9d981e0a2d5, type: 3}
+    - {fileID: 4536189294821633174, guid: 0d311e8e8d1e4212a8d05e9e12afd8ec, type: 3}
+  - label: Beard 2
+    byColour:
+    - {fileID: 5406461315869088139, guid: 1e9843dc51b248bc8a6cccf5c2b372ac, type: 3}
+    - {fileID: 1499012737533277060, guid: 04a5be5136294e4d931a2db88161857a, type: 3}
+    - {fileID: 4534377375851835531, guid: 6096c6d20a384f73bd8cdb965a89fbc8, type: 3}
+    - {fileID: 5044422929432315692, guid: 167646ac51fa442b95cf9325e4c466bc, type: 3}
+  - label: Beard 3
+    byColour:
+    - {fileID: 8535327916281194333, guid: 908d9b77a6b740ce88c987cec62027fa, type: 3}
+    - {fileID: 1948102603107177018, guid: fa1a67fcff7846aba927eeaa67a07170, type: 3}
+    - {fileID: 6240272447844400118, guid: e554d22c94c8457b87795c12f67687b3, type: 3}
+    - {fileID: 382260753770394539, guid: 35c5d7d8e916477080fafc31524b4a61, type: 3}
+  - label: Beard 4
+    byColour:
+    - {fileID: 3860458765915228373, guid: 8f054df746fe4daeab6016cc8ff5ef56, type: 3}
+    - {fileID: 5898004263227738079, guid: 9eeceb9abf11487c9e57460a24fa5e25, type: 3}
+    - {fileID: 1408133851317731854, guid: 6bfa029756ba499a84d114acee83c89b, type: 3}
+    - {fileID: 6739308363659225106, guid: c37275468a02404bac2886f522f4b04a, type: 3}
+  - label: Beard 5
+    byColour:
+    - {fileID: 530082457180069803, guid: 47f40b8f33e549269563ca4b79976171, type: 3}
+    - {fileID: 9053872339894476996, guid: 5c1d0b73d9da46549990c06d5f64219f, type: 3}
+    - {fileID: 3022199833635213072, guid: c47701100d344f948e4b767c18cf444c, type: 3}
+    - {fileID: 6936706452495761345, guid: a69071f371154a3eb0897a76ee2b164a, type: 3}
+  - label: Beard 6
+    byColour:
+    - {fileID: 8854524112338539725, guid: b2d832cf8bd248dca947832e6a3604ba, type: 3}
+    - {fileID: 3839828481009757864, guid: 65668867ba624e72b9102c19fcfeabf0, type: 3}
+    - {fileID: 8187391227452978771, guid: 07768de762bd461aa2570ed8256b33fd, type: 3}
+    - {fileID: 340526434135400378, guid: f0ac352400214b92b99410077a20880b, type: 3}
+  animationSwaps: []

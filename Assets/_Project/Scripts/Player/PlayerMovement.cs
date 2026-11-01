@@ -298,7 +298,8 @@ public sealed class PlayerMovement : MonoBehaviour
 
         // Cursor-facing states keep aiming at the cursor even while standing still; otherwise (and swimming) face the
         // travel direction.
-        if (settings.FacesCursor(currentGameState) && hasAimDirection && !floating)
+        bool facingAim = settings.FacesCursor(currentGameState) && hasAimDirection && !floating;
+        if (facingAim)
         {
             FaceDirection(aimDirection);
         }
@@ -309,6 +310,11 @@ public sealed class PlayerMovement : MonoBehaviour
 
         float bonus = combatant != null ? Mathf.Max(-0.5f, combatant.Stats.Get(StatType.MoveSpeed)) : 0f;
         float speed = settings.MoveSpeed * settings.GetSpeedMultiplier(currentGameState) * speedScale * (1f + bonus);
+        if ((facingAim || FacingLocked) && direction.sqrMagnitude > 0.0001f)
+        {
+            speed *= settings.BackpedalShare(Vector3.Angle(transform.forward, direction));
+        }
+
         horizontalVelocity = direction * speed;
         if (lungeUntil >= 0f)
         {

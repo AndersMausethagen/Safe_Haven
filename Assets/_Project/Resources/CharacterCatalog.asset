@@ -1,0 +1,99 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 283727aa4dc9edf47bc7c39b78463bbf, type: 3}
+  m_Name: CharacterCatalog
+  m_EditorClassIdentifier: SafeHaven::CharacterCatalog
+  male: {fileID: 11400000, guid: e8c99325ed8836e4b94ead58eaa5f840, type: 2}
+  female: {fileID: 11400000, guid: a9b898a55051cad489c7195671d270fc, type: 2}
+  startingLook:
+    name: 
+    gender: 0
+    skin: 1
+    face: 0
+    hair: 0
+    hairColour: 2
+    brows: 0
+    beard: 2
+    eyes: 1
+    underclothes: 0
+    clothes: 0
+  maleNames:
+  - Halvar
+  - Torvald
+  - Einar
+  - Leif
+  - Ragnar
+  - Sigurd
+  - Asmund
+  - Bjorn
+  - Gunnar
+  - Ivar
+  - Ketil
+  - Ulf
+  - Orm
+  - Vidar
+  - Hakon
+  femaleNames:
+  - Astrid
+  - Freydis
+  - Gudrun
+  - Hilde
+  - Sigrun
+  - Solveig
+  - Ylva
+  - Thora
+  - Ragna
+  - Ase
+  - Embla
+  - Gyda
+  - Tove
+  - Ingeborg
+  - Valdis
+  previewAnimations: {fileID: 9100000, guid: b2bc88abeb026e347a50e8a1c9be5058, type: 2}
+  plainClothes:
+  - label: Undyed
+    look: {fileID: 11400000, guid: e6d590dd1ddfb96468666cf6002e83ca, type: 2}
+  - label: Blue
+    look: {fileID: 11400000, guid: 50236b911a33d0543a8cef9f78da3eb5, type: 2}
+  - label: Red
+    look: {fileID: 11400000, guid: dbce34cc2eaeaa04ab211e539100ffef, type: 2}
+  plainShoes: {fileID: 11400000, guid: d53b0469f38029941ac6b2abf37722e7, type: 2}
+  emotes:
+  - {fileID: 11400000, guid: cfa16afe9bb410142b5460b28ee7536e, type: 2}
+  - {fileID: 11400000, guid: 41fc1acddf7361e43a2451f84daca958, type: 2}
+  - {fileID: 11400000, guid: 586cf3768c4e1674aa7e58747d6d5294, type: 2}
+  - {fileID: 11400000, guid: e1b9a45ea95e74449815efcc5c8b9483, type: 2}
+  - {fileID: 11400000, guid: 2ae818dab43006946b2d6c29207a6ffb, type: 2}
+  - {fileID: 11400000, guid: 2892186149be0ed48a7e34373f42e2a9, type: 2}
+  - {fileID: 11400000, guid: 4502e1aa384270f43ba3b32319cf4b17, type: 2}
+  - {fileID: 11400000, guid: a89ff44b122c46544b76d15a6dddc77b, type: 2}
+  - {fileID: 11400000, guid: a65861bef6f3916458258ba98155b655, type: 2}
+  - {fileID: 11400000, guid: 38bc1d7409bcaf247a0354360b9d8a42, type: 2}
+  - {fileID: 11400000, guid: befa690f3a033144da5dc52883dbdb0f, type: 2}
+  - {fileID: 11400000, guid: ccb0173529f74494eb8f77bc820da962, type: 2}
+  - {fileID: 11400000, guid: 1ec4a5e51fc209344a827112c43c6e9e, type: 2}
+  - {fileID: 11400000, guid: 46b1b4f7175bfa749974f1b7ed099575, type: 2}
+  - {fileID: 11400000, guid: 7d017e93dbcea6b4596f382a1722bae5, type: 2}
+  - {fileID: 11400000, guid: 737ebe7a30f61ba4c9eeecb74332517a, type: 2}
+  - {fileID: 11400000, guid: 33824a69b098b9846853dbbfa1f684d4, type: 2}
+  - {fileID: 11400000, guid: 659c540336a300747a485a63be42a66d, type: 2}
+  - {fileID: 11400000, guid: 2f1cb88c8248f6441833785d33cf5d09, type: 2}
+  - {fileID: 11400000, guid: b1c56523b0af6fd4ebe99cd806eb27ff, type: 2}
+  - {fileID: 11400000, guid: 7c9176c17f7f8644085abfda4ecc4cac, type: 2}
+  - {fileID: 11400000, guid: 8e94db9e6609beb419853cd309fcecd4, type: 2}
+  speaking:
+  - {fileID: 11400000, guid: 1ec4a5e51fc209344a827112c43c6e9e, type: 2}
+  - {fileID: 11400000, guid: 7d017e93dbcea6b4596f382a1722bae5, type: 2}
+  - {fileID: 11400000, guid: 737ebe7a30f61ba4c9eeecb74332517a, type: 2}
+  - {fileID: 11400000, guid: 46b1b4f7175bfa749974f1b7ed099575, type: 2}
+  questTaken: {fileID: 11400000, guid: 33824a69b098b9846853dbbfa1f684d4, type: 2}
+  sitAtFire: {fileID: 11400000, guid: 4502e1aa384270f43ba3b32319cf4b17, type: 2}

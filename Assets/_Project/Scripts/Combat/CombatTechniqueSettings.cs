@@ -33,9 +33,10 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
              "on the run plays on the arms over the running legs.")]
     [SerializeField, Range(0f, 1f)] private float windupMoveSpeed;
     [Tooltip("Movement speed once the blow has landed, for the rest of the swing, and the same after a heavy swing, as a share of normal. " +
-             "Walking off lets the arms finish the swing over the legs; the next attack still waits for the swing's recovery.")]
-    [SerializeField, Range(0f, 1f)] private float swingMoveSpeed = 0.4f;
-    [SerializeField, Range(0f, 1f)] private float heavyMoveSpeed = 0.15f;
+             "0 keeps the player planted and facing the blow until the swing ends. Above 0, walking off lets the arms finish the swing " +
+             "over the legs; the next attack still waits for the swing's recovery.")]
+    [SerializeField, Range(0f, 1f)] private float swingMoveSpeed;
+    [SerializeField, Range(0f, 1f)] private float heavyMoveSpeed;
     [Tooltip("A hit that gets through (not blocked) worth at least this share of the player's max health makes them flinch: a swing " +
              "still winding up is lost and they can't act for a moment. 0 = every hit.")]
     [SerializeField, Range(0f, 1f)] private float flinchShare = 0.05f;

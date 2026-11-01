@@ -79,8 +79,12 @@ public sealed class PlayerAnimationController : MonoBehaviour
     [SerializeField, Min(0f)] private float speedDampTime = 0.08f;
     [SerializeField, Min(0f)] private float turnDampTime = 0.1f;
     [SerializeField, Min(0f)] private float fallDelay = 0.12f;
-    [Tooltip("Speed in m/s the Run and StrafeRun clips were authored at. Above it the combat locomotion plays faster so the feet don't slide.")]
-    [SerializeField, Min(0.1f)] private float runClipSpeed = 3.8f;
+    [Tooltip("Speed in m/s the forward and sideways run clips were authored at (their feet's ground speed). Above it the locomotion plays faster so the feet don't slide.")]
+    [SerializeField, Min(0.1f)] private float runClipSpeed = 4.8f;
+    [Tooltip("Speed in m/s of the backpedal run clips, which take shorter steps.")]
+    [SerializeField, Min(0.1f)] private float backRunClipSpeed = 2.1f;
+    [Tooltip("Fastest the locomotion plays to keep up. Beyond it the feet slide a little rather than spin.")]
+    [SerializeField, Min(1f)] private float maxMotionSpeed = 1.6f;
 
     [Header("Equipment")]
     [Tooltip("The stance when no weapon is equipped. An equipped weapon sets its own.")]
@@ -300,10 +304,11 @@ public sealed class PlayerAnimationController : MonoBehaviour
     }
 
     // A blow that has landed gives the legs back: when the player walks off, the arms finish the swing over them from
-    // where the body had got to, instead of a whole-body swing skating along the ground.
+    // where the body had got to, instead of a whole-body swing skating along the ground. That includes a swing whose
+    // gameplay has ended but whose animation tail is still on the whole body.
     private void WalkOutOfSwing()
     {
-        if (combat == null || !combat.IsAttacking || combat.IsWindingUp || movement.HorizontalSpeed <= ArmsOnlySpeed
+        if (combat == null || combat.IsWindingUp || movement.HorizontalSpeed <= ArmsOnlySpeed
             || fullBodyLayer < 0 || attackArmsLayer < 0 || animator.IsInTransition(fullBodyLayer))
         {
             return;
@@ -315,7 +320,14 @@ public sealed class PlayerAnimationController : MonoBehaviour
             return;
         }
 
-        if (animator.HasState(attackArmsLayer, swing.shortNameHash))
+        // Swings are the full-body states the arms layer also has; dodges and hit reactions are left alone.
+        bool isSwing = animator.HasState(attackArmsLayer, swing.shortNameHash);
+        if (!isSwing && !combat.IsAttacking)
+        {
+            return;
+        }
+
+        if (isSwing)
         {
             animator.CrossFadeInFixedTime(swing.shortNameHash, WalkOutFade, attackArmsLayer, swing.normalizedTime * swing.length);
         }
@@ -537,7 +549,7 @@ public sealed class PlayerAnimationController : MonoBehaviour
         SetFloat(MoveXHash, local.x, speedDampTime, deltaTime);
         SetFloat(MoveZHash, local.z, speedDampTime, deltaTime);
 
-        SetFloat(MotionSpeedHash, Mathf.Max(1f, movement.HorizontalSpeed / runClipSpeed));
+        SetFloat(MotionSpeedHash, MotionSpeed(local));
         SetBool(HasMoveInputHash, !swim && movement.InputMagnitude > MoveInputThreshold);
         // Off in the air, in the water and in death, where Base's own poses have to show.
         bool alive = health == null || health.IsAlive;
@@ -545,6 +557,21 @@ public sealed class PlayerAnimationController : MonoBehaviour
     }
 
     private bool IsSwimming => swimming != null && swimming.IsSwimming;
+
+    // Playback rate that makes the run clip for this direction cover the ground actually moved: the clips run at
+    // runClipSpeed up to sideways and at backRunClipSpeed from 45° behind, as the blend trees place them.
+    private float MotionSpeed(Vector3 local)
+    {
+        float speed = new Vector2(local.x, local.z).magnitude;
+        if (speed < 0.01f)
+        {
+            return 1f;
+        }
+
+        float angle = Mathf.Abs(Mathf.Atan2(local.x, local.z) * Mathf.Rad2Deg);
+        float clipSpeed = Mathf.Lerp(runClipSpeed, backRunClipSpeed, Mathf.InverseLerp(90f, 135f, angle));
+        return Mathf.Clamp(speed / clipSpeed, 1f, maxMotionSpeed);
+    }
 
     private void UpdateTurn(float deltaTime)
     {

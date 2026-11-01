@@ -20,8 +20,8 @@ public static class WaterSetup
 
     public sealed class Set
     {
-        public Material Still, River, Fall, Spray;
-        public GameObject Splash, Plunge;
+        public Material Still, River, Fall, Spray, FootstepSpray, FootstepRing;
+        public GameObject Splash, FootstepSplash, Plunge;
     }
 
     [MenuItem("Safe Haven/World/Water/Create Pond")]
@@ -150,7 +150,7 @@ public static class WaterSetup
 
     private static void LogPlayer(Set set)
     {
-        if (EnsurePlayerInteractor(PlayerPrefab, set.Splash))
+        if (EnsurePlayerInteractor(PlayerPrefab, set.Splash, set.FootstepSplash))
         {
             Debug.Log("Water: the player makes ripples, wake foam and splashes (Water Interactor on PlayerArmature).");
         }
@@ -185,6 +185,11 @@ public static class WaterSetup
             importer.alphaIsTransparency = true;
             importer.wrapMode = TextureWrapMode.Clamp;
         });
+        Texture2D ring = EnsureTexture("Water Ring.png", () => RingPixels(128), importer =>
+        {
+            importer.alphaIsTransparency = true;
+            importer.wrapMode = TextureWrapMode.Clamp;
+        });
 
         var set = new Set
         {
@@ -210,8 +215,23 @@ public static class WaterSetup
                 material.SetFloat("_ShoreFoam", 0.2f);
             }),
             Spray = EnsureMaterial("Water Spray", SprayShaderName, material => material.SetTexture("_BaseMap", droplet)),
+            // Lies on the puddle, so it must not fade out where it meets the ground as the spray does; brighter than
+            // the spray so it still reads against grey, sky-reflecting puddles under rain clouds.
+            FootstepSpray = EnsureMaterial("Footstep Spray", SprayShaderName, material =>
+            {
+                material.SetTexture("_BaseMap", droplet);
+                material.SetColor("_BaseColor", new Color(1.15f, 1.18f, 1.2f, 1f));
+                material.SetFloat("_Softness", 0.01f);
+            }),
+            FootstepRing = EnsureMaterial("Footstep Ring", SprayShaderName, material =>
+            {
+                material.SetTexture("_BaseMap", ring);
+                material.SetColor("_BaseColor", new Color(1.2f, 1.22f, 1.25f, 1f));
+                material.SetFloat("_Softness", 0.01f);
+            }),
         };
         set.Splash = EnsurePrefab("Water Splash", () => BuildSplash(set.Spray));
+        set.FootstepSplash = EnsurePrefab("Footstep Splash", () => BuildFootstepSplash(set.FootstepRing, set.FootstepSpray));
         set.Plunge = EnsurePrefab("Waterfall Plunge", () => BuildPlunge(set.Spray));
         return set;
     }
@@ -375,7 +395,7 @@ public static class WaterSetup
         }
     }
 
-    public static bool EnsurePlayerInteractor(string prefabPath, GameObject splash)
+    public static bool EnsurePlayerInteractor(string prefabPath, GameObject splash, GameObject footstepSplash = null)
     {
         if (AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath) == null)
         {
@@ -392,6 +412,12 @@ public static class WaterSetup
                 interactor.Offset = new Vector3(0f, 0.15f, 0f);
                 interactor.Foam = 0.6f;
                 interactor.Splash = splash;
+                interactor.FootstepSplash = footstepSplash;
+                PrefabUtility.SaveAsPrefabAsset(contents, prefabPath);
+            }
+            else if (footstepSplash != null && contents.GetComponent<WaterInteractor>().FootstepSplash == null)
+            {
+                contents.GetComponent<WaterInteractor>().FootstepSplash = footstepSplash;
                 PrefabUtility.SaveAsPrefabAsset(contents, prefabPath);
             }
         }
@@ -599,6 +625,38 @@ public static class WaterSetup
         dropsMain.duration = 0.3f;
         Burst(drops, 30);
         Shape(drops, ParticleSystemShapeType.Cone, 0.15f, 25f);
+        return root;
+    }
+
+    // A foot coming down in shallow water: a flat ring spreading over the surface, which reads from the high game
+    // camera, and a short crown of droplets. The ring lives longest, so it is the root.
+    private static GameObject BuildFootstepSplash(Material ringMaterial, Material spray)
+    {
+        var root = new GameObject("Footstep Splash");
+        ParticleSystem ring = AddParticles(root, ringMaterial, loop: false, lifetime: (0.6f, 0.7f), speed: (0f, 0f),
+            size: (0.3f, 0.36f), gravity: 0f, alpha: 0.45f, max: 3, grow: false);
+        ParticleSystem.MainModule main = ring.main;
+        main.duration = 0.2f;
+        main.stopAction = ParticleSystemStopAction.Destroy;
+        ParticleSystem.SizeOverLifetimeModule spread = ring.sizeOverLifetime;
+        spread.enabled = true;
+        spread.size = new ParticleSystem.MinMaxCurve(1f, new AnimationCurve(new Keyframe(0f, 0.3f, 6f, 6f),
+            new Keyframe(1f, 1.8f, 0.6f, 0.6f)));
+        // A second, later ring inside the first reads as a ripple rather than a flash.
+        ParticleSystem.EmissionModule rings = ring.emission;
+        rings.SetBursts(new[] { new ParticleSystem.Burst(0f, 1), new ParticleSystem.Burst(0.14f, 1) });
+        ParticleSystem.ShapeModule ringShape = ring.shape;
+        ringShape.enabled = false;
+        ring.GetComponent<ParticleSystemRenderer>().renderMode = ParticleSystemRenderMode.HorizontalBillboard;
+
+        var droplets = new GameObject("Droplets");
+        droplets.transform.SetParent(root.transform, false);
+        ParticleSystem drops = AddParticles(droplets, spray, loop: false, lifetime: (0.25f, 0.4f), speed: (0.9f, 1.6f),
+            size: (0.04f, 0.08f), gravity: 1.2f, alpha: 0.6f, max: 12, grow: false);
+        ParticleSystem.MainModule dropsMain = drops.main;
+        dropsMain.duration = 0.1f;
+        Burst(drops, 7);
+        Shape(drops, ParticleSystemShapeType.Cone, 0.12f, 35f);
         return root;
     }
 
@@ -810,6 +868,27 @@ public static class WaterSetup
             {
                 float r = new Vector2((x + 0.5f) / size - 0.5f, (y + 0.5f) / size - 0.5f).magnitude * 2f;
                 pixels[y * size + x] = new Color(1f, 1f, 1f, Mathf.Pow(Mathf.Clamp01(1f - r), 1.5f));
+            }
+        }
+
+        texture.SetPixels(pixels);
+        texture.Apply();
+        return texture;
+    }
+
+    /// <summary>A thin bright ripple ring with a faint fill, for footsteps in shallow water.</summary>
+    public static Texture2D RingPixels(int size)
+    {
+        var texture = new Texture2D(size, size, TextureFormat.RGBA32, false);
+        var pixels = new Color[size * size];
+        for (int y = 0; y < size; y++)
+        {
+            for (int x = 0; x < size; x++)
+            {
+                float r = new Vector2((x + 0.5f) / size - 0.5f, (y + 0.5f) / size - 0.5f).magnitude * 2f;
+                float ring = Mathf.Exp(-Mathf.Pow((r - 0.8f) / 0.07f, 2f));
+                float fill = r < 0.8f ? 0.06f * r / 0.8f : 0f;
+                pixels[y * size + x] = new Color(1f, 1f, 1f, Mathf.Clamp01(ring + fill) * (r < 1f ? 1f : 0f));
             }
         }
 

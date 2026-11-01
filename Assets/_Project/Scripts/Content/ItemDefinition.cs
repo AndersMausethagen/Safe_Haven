@@ -110,6 +110,8 @@ public sealed class ItemDefinition : ScriptableObject, IStackDefinition
     [Tooltip("Makes this item armor or jewelry worn in that slot of the character screen (C). None for other items. " +
              "Weapons, backpacks and tools find their own slots.")]
     [SerializeField] private ArmorSlot armorSlot;
+    [Tooltip("What it looks like on the character while worn. Optional: without one it can't be seen.")]
+    [SerializeField] private GearLookDefinition wornLook;
     [Tooltip("Stats added while this item is equipped and not broken: Armor, Max Health, Strength, resistances...")]
     [SerializeField] private List<StatBonus> statBonuses = new List<StatBonus>();
 
@@ -177,6 +179,7 @@ public sealed class ItemDefinition : ScriptableObject, IStackDefinition
     public bool IsBackpack => carryCapacityBonus > 0 || bagSlotBonus > 0;
     public ArmorSlot ArmorSlot => armorSlot;
     public bool IsArmor => armorSlot != ArmorSlot.None;
+    public GearLookDefinition WornLook => wornLook;
     /// <summary>True for anything that goes into a gear slot: armor, jewelry, weapons, backpacks and tools.</summary>
     public bool IsEquippable => IsArmor || IsWeapon || IsBackpack || IsTool;
     public IReadOnlyList<StatBonus> StatBonuses => statBonuses;

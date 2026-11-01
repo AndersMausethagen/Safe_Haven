@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -147,6 +147,7 @@ public static class SaveGameService
         SaveData data = SaveMapper.ToSaveData(player.Capture(), GameSession.Stash, SceneManager.GetActiveScene().name, player.Pose, DateTime.UtcNow,
             GameSession.World, GameSession.Quests, GameSession.Settlement, GameSession.Playtest, GameSession.Progress);
         data.displayName = name;
+        data.appearance = GameSession.Appearance.Clone();
         try
         {
             Storage.Write(slot, data);
@@ -226,13 +227,26 @@ public static class SaveGameService
         return true;
     }
 
-    /// <summary>The first free "Journey N".</summary>
+    /// <summary>The first free "Journey N", or "Name's Journey (N)" for a character with a chosen name.</summary>
     private static string NextName()
     {
         var used = new HashSet<string>();
         foreach (SaveSlotInfo save in ListSaves())
         {
             used.Add(save.Name);
+        }
+
+        string chosen = GameSession.Appearance.name;
+        if (!string.IsNullOrWhiteSpace(chosen))
+        {
+            string journey = $"{CharacterAppearance.CleanName(chosen)}'s Journey";
+            int count = 1;
+            while (used.Contains(count == 1 ? journey : $"{journey} {count}"))
+            {
+                count++;
+            }
+
+            return count == 1 ? journey : $"{journey} {count}";
         }
 
         int number = used.Count + 1;
@@ -329,7 +343,10 @@ public static class SaveGameService
     }
 
     /// <summary>Forgets the current game and starts over in the given scene. Every save stays: the new game makes its own.</summary>
-    public static bool TryStartNewGame(string scene, out string problem)
+    public static bool TryStartNewGame(string scene, out string problem) => TryStartNewGame(scene, null, out problem);
+
+    /// <summary>Starts over in the given scene as the character made on the character creation screen.</summary>
+    public static bool TryStartNewGame(string scene, CharacterAppearance look, out string problem)
     {
         problem = loading ? "The game is already loading." : !CanLoad(scene) ? $"The scene '{scene}' isn't in the build." : null;
         if (problem != null)
@@ -337,7 +354,7 @@ public static class SaveGameService
             return false;
         }
 
-        GameSession.StartNewGame();
+        GameSession.StartNewGame(look);
         CurrentSlot = null;
         CurrentName = null;
         Go(scene, null, "A new journey begins");

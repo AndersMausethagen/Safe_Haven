@@ -20,8 +20,9 @@ MonoBehaviour:
   rhythmSpeedPerStack: 0
   earlyPressFumbles: 0
   dodgeCancelsWindup: 1
-  swingMoveSpeed: 0.4
-  heavyMoveSpeed: 0.15
+  windupMoveSpeed: 0
+  swingMoveSpeed: 0
+  heavyMoveSpeed: 0
   flinchShare: 0.05
   flinchSeconds: 0.45
   showComboHud: 0

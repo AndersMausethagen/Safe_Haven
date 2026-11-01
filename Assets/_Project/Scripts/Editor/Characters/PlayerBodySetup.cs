@@ -1,62 +1,40 @@
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
 /// <summary>
-/// Gives the player a human body (Safe Haven › Characters › Use Human Body for Player): Kevin Iglesias' HumanM model,
-/// the body the locomotion, work and gathering clips were made for, which also takes the Quaternius combat clips
-/// cleanly. Replaces the Starter Assets robot's mesh and skeleton under the player prefab, switches the Animator's avatar,
-/// gives it a plain linen material (placeholder, readable on dark ground and grass) and refits the held-item grip to the
-/// new hand. Running it again rebuilds the body.
+/// Gives the player the modular human body (Safe Haven › Characters › Use Modular Body for Player): ModularCharacter
+/// builds it from the CharacterCatalog, PlayerLook dresses it in the game's look and gear, CharacterEmotes plays its
+/// emotes. Removes the old body under the player prefab (the Starter Assets robot's or Kevin Iglesias' HumanM), shows the
+/// catalog's starting look in the prefab, and refits the held-item grip to the new hand. Running it again rebuilds the
+/// body.
 /// </summary>
 public static class PlayerBodySetup
 {
-    public const string ModelPath = "Assets/Kevin Iglesias/Human Animations/Models/HumanM_Model.fbx";
-    public const string MaterialPath = "Assets/_Project/Art/Characters/Survivor.mat";
-    // Children of the player root that make up its body: the old robot's and this model's.
-    private static readonly string[] BodyParts = { "Geometry", "Skeleton", "HumanM_BodyMesh", "Rig" };
+    // Children of the player root that made up its older bodies.
+    private static readonly string[] OldBodyParts = { "Skeleton", "HumanM_BodyMesh", "Rig" };
 
-    [MenuItem("Safe Haven/Characters/Use Human Body for Player")]
-    public static void UseHumanBodyMenu() => Debug.Log(UseHumanBody());
+    [MenuItem("Safe Haven/Characters/Use Modular Body for Player")]
+    public static void UseModularBodyMenu() => Debug.Log(UseModularBody());
 
-    public static string UseHumanBody()
+    public static string UseModularBody()
     {
-        var model = AssetDatabase.LoadAssetAtPath<GameObject>(ModelPath);
-        Avatar avatar = model != null ? model.GetComponent<Animator>()?.avatar : null;
-        if (avatar == null)
-        {
-            return $"Player body: no humanoid model at {ModelPath}.";
-        }
-
-        Material material = EnsureMaterial();
         GameObject root = PrefabUtility.LoadPrefabContents(CombatAnimationSetup.PlayerPrefabPath);
+        string result;
         try
         {
-            foreach (string part in BodyParts)
+            var old = OldBodyParts.Select(part => root.transform.Find(part)).Where(part => part != null).ToList();
+            // The robot's "Geometry" is only old when no modular body owns it.
+            Transform geometry = root.transform.Find("Geometry");
+            if (geometry != null && root.GetComponent<ModularCharacter>() == null)
             {
-                Transform old = root.transform.Find(part);
-                if (old != null)
-                {
-                    Object.DestroyImmediate(old.gameObject);
-                }
+                old.Add(geometry);
             }
 
-            // The model's children go straight under the player root, so the avatar's bone paths still match.
-            GameObject body = Object.Instantiate(model);
-            while (body.transform.childCount > 0)
+            result = ModularBodySetup.Apply(root, CharacterCatalog.Current.StartingLook, null, old);
+            if (root.GetComponent<PlayerLook>() == null)
             {
-                Transform child = body.transform.GetChild(0);
-                child.SetParent(root.transform, false);
-                child.SetSiblingIndex(1);
-            }
-
-            Object.DestroyImmediate(body);
-            var animator = root.GetComponent<Animator>();
-            animator.avatar = avatar;
-            foreach (SkinnedMeshRenderer mesh in root.GetComponentsInChildren<SkinnedMeshRenderer>(true))
-            {
-                mesh.sharedMaterial = material;
-                mesh.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
-                mesh.updateWhenOffscreen = false;
+                root.AddComponent<PlayerLook>();
             }
 
             PrefabUtility.SaveAsPrefabAsset(root, CombatAnimationSetup.PlayerPrefabPath);
@@ -66,25 +44,7 @@ public static class PlayerBodySetup
             PrefabUtility.UnloadPrefabContents(root);
         }
 
-        string grip = HeldItemGrips.FitPlayerGrip();
-        return $"Player body: {model.name} with {material.name}. {grip}";
-    }
-
-    private static Material EnsureMaterial()
-    {
-        var material = AssetDatabase.LoadAssetAtPath<Material>(MaterialPath);
-        if (material != null)
-        {
-            return material;
-        }
-
-        System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(MaterialPath));
-        AssetDatabase.Refresh();
-        material = new Material(Shader.Find("Universal Render Pipeline/Lit")) { name = "Survivor" };
-        // Undyed linen: light enough to read against the dark forest floor, warm enough not to look like a robot.
-        material.SetColor("_BaseColor", new Color(0.74f, 0.68f, 0.58f));
-        material.SetFloat("_Smoothness", 0.18f);
-        AssetDatabase.CreateAsset(material, MaterialPath);
-        return material;
+        string grip = HeldItemGrips.FitPlayerGrip() + " " + HeldItemGrips.FitCompanionGrips();
+        return $"Player body: {result} {grip}";
     }
 }

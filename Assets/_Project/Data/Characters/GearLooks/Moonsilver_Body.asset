@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0bd5de173f8b0034e9693a7839275431, type: 3}
+  m_Name: Moonsilver_Body
+  m_EditorClassIdentifier: SafeHaven::GearLookDefinition
+  male:
+  - prefab: {fileID: 8858532974608991127, guid: 347920ff539c4d91afc3320f47eb574a, type: 3}
+    covers: 1
+    skinOverlay: {fileID: 0}
+  - prefab: {fileID: 0}
+    covers: 0
+    skinOverlay: {fileID: 2100000, guid: e383432d09974cca9d64755409765bb3, type: 2}
+  - prefab: {fileID: 3461303244412834956, guid: 3a919d158c964345aeeecd72c2b8135b, type: 3}
+    covers: 0
+    skinOverlay: {fileID: 0}
+  female:
+  - prefab: {fileID: 6921354123086752840, guid: 33c24fbe173a4e8cbfa2074642db187b, type: 3}
+    covers: 1
+    skinOverlay: {fileID: 0}
+  - prefab: {fileID: 0}
+    covers: 0
+    skinOverlay: {fileID: 2100000, guid: e383432d09974cca9d64755409765bb3, type: 2}
+  - prefab: {fileID: 8907420784636093976, guid: 1451fe5a614c43d6a391f140cf2cbbe8, type: 3}
+    covers: 0
+    skinOverlay: {fileID: 0}

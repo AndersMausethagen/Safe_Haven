@@ -21,6 +21,7 @@ public static class GameSession
     private static CharacterProgress progress;
     private static SettlementState settlement;
     private static PlaytestRun playtest;
+    private static CharacterAppearance appearance;
     private static string pendingArrivalPoint;
     private static PlayerSnapshot pendingPlayerState;
     private static PlayerPose? pendingPose;
@@ -47,6 +48,13 @@ public static class GameSession
 
     /// <summary>The playthrough being logged for playtests. A new game starts a new run; a load continues the saved one.</summary>
     public static PlaytestRun Playtest => playtest ??= PlaytestRun.StartNew();
+
+    /// <summary>How the player looks and what they are called, chosen when the game was made. Saved with the game.</summary>
+    public static CharacterAppearance Appearance
+    {
+        get => appearance ??= CharacterCatalog.Current.StartingLook;
+        set => appearance = value != null ? value.Clone() : null;
+    }
 
     /// <summary>
     /// Asks the next scene to place the player at the PlayerArrivalPoint with this id (such as "HeartTree" after a failed
@@ -150,9 +158,10 @@ public static class GameSession
     }
 
     /// <summary>Forgets everything: the next scene starts with the player's authored starting contents and an empty stash.</summary>
-    public static void StartNewGame()
+    public static void StartNewGame(CharacterAppearance look = null)
     {
         Reset();
+        Appearance = look;
     }
 
     /// <summary>Replaces everything with a loaded game. The player takes it on arriving in the next scene.</summary>
@@ -165,6 +174,7 @@ public static class GameSession
         progress = game.Progress;
         settlement = game.Settlement;
         playtest = game.Playtest;
+        Appearance = game.Appearance;
         pendingPlayerState = game.Player;
         pendingPose = game.Pose;
     }
@@ -179,6 +189,7 @@ public static class GameSession
         progress = null;
         settlement = null;
         playtest = null;
+        appearance = null;
         pendingArrivalPoint = null;
         pendingPlayerState = null;
         pendingPose = null;

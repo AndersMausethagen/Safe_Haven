@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e4f40df6d2184a942bf2be2a7d2ef75f, type: 3}
+  m_Name: SitChair
+  m_EditorClassIdentifier: SafeHaven::EmoteDefinition
+  displayName: Sit on a Seat
+  clip: {fileID: 3310429995446509332, guid: 527ecefb0b0347d88279120243ee1895, type: 3}
+  begin: {fileID: 7378027334118320702, guid: 527ecefb0b0347d88279120243ee1895, type: 3}
+  end: {fileID: 757357237698865461, guid: 527ecefb0b0347d88279120243ee1895, type: 3}
+  held: 1
+  onWheel: 0

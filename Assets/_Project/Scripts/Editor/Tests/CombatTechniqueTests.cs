@@ -154,7 +154,7 @@ public sealed class CombatTechniqueTests
         var player = AssetDatabase.LoadAssetAtPath<GameObject>(CombatAnimationSetup.PlayerPrefabPath);
         var animator = player.GetComponent<Animator>();
         Assert.IsTrue(animator.avatar.isHuman);
-        Assert.AreEqual("HumanM_ModelAvatar", animator.avatar.name);
+        Assert.AreEqual("SK_Hu_M_FullBodyAvatar", animator.avatar.name);
         Assert.IsNotNull(player.GetComponent<PlayerFocus>());
         Assert.IsNotNull(player.GetComponent<PlayerEating>());
         Assert.IsNotNull(player.GetComponent<PlayerGuard>());
@@ -183,9 +183,8 @@ public sealed class CombatTechniqueTests
     {
         CombatTechniqueSettings rules = Resources.Load<CombatTechniqueSettings>(CombatTechniqueSettings.ResourceName);
         Assert.AreEqual(0f, rules.WindupMoveSpeed, "any speed here and the whole-body swing skates over the ground");
-        Assert.Greater(rules.SwingMoveSpeed, 0f, "the follow-through can be walked out of");
-        Assert.Greater(rules.HeavyMoveSpeed, 0f);
-        Assert.LessOrEqual(rules.HeavyMoveSpeed, rules.SwingMoveSpeed, "heavy swings commit the player for longer");
+        Assert.AreEqual(0f, rules.SwingMoveSpeed, "the player stays planted until the swing ends; arms over moving legs look wrong");
+        Assert.AreEqual(0f, rules.HeavyMoveSpeed);
 
         // Walking out hands the swing from the whole body to the arms, so every swing has to be on both.
         var controller = AssetDatabase.LoadAssetAtPath<UnityEditor.Animations.AnimatorController>(CombatAnimationSetup.PlayerControllerPath);

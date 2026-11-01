@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0bd5de173f8b0034e9693a7839275431, type: 3}
+  m_Name: CopperScale_Body
+  m_EditorClassIdentifier: SafeHaven::GearLookDefinition
+  male:
+  - prefab: {fileID: 7295597026706675692, guid: baae747e167ebd4478d2bc2defbb6347, type: 3}
+    covers: 1
+    skinOverlay: {fileID: 0}
+  - prefab: {fileID: 0}
+    covers: 0
+    skinOverlay: {fileID: 2100000, guid: 71a18661fe5d4d28a872d600688f561a, type: 2}
+  - prefab: {fileID: 7222593802702176012, guid: 098ce466d503476a97469fe93892739d, type: 3}
+    covers: 0
+    skinOverlay: {fileID: 0}
+  female:
+  - prefab: {fileID: 6701707255111790588, guid: e5e344351b2f56e46ac40cb47c78820a, type: 3}
+    covers: 1
+    skinOverlay: {fileID: 0}
+  - prefab: {fileID: 0}
+    covers: 0
+    skinOverlay: {fileID: 2100000, guid: 71a18661fe5d4d28a872d600688f561a, type: 2}
+  - prefab: {fileID: 2561204889524460307, guid: 778ed13a5d4f4c7680fa726fe2b17f3c, type: 3}
+    covers: 0
+    skinOverlay: {fileID: 0}

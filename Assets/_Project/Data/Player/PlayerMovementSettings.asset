@@ -16,13 +16,14 @@ MonoBehaviour:
   gravity: -9.81
   groundedVerticalVelocity: -2
   turnSpeed: 720
+  backpedalSpeed: 0.7
   dodgeDistance: 4
   dodgeDuration: 0.5
   dodgeInvulnerability: 0.3
   dodgeCooldown: 2
   stateModifiers:
   - state: 0
-    speedMultiplier: 1.2
+    speedMultiplier: 1
     turnSpeedMultiplier: 1
     faceCursor: 0
   - state: 1

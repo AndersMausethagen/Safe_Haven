@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -33,6 +33,8 @@ public sealed class SaveData
     public ProgressSaveData progress = new ProgressSaveData();
     /// <summary>What the player calls this save. Missing in older saves, which then go by their file.</summary>
     public string displayName;
+    /// <summary>How the player looks and their name. Missing in older saves, which then get the starting look.</summary>
+    public CharacterAppearance appearance = new CharacterAppearance();
 }
 
 /// <summary>A PlaytestRun.</summary>

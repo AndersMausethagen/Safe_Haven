@@ -21,6 +21,12 @@ public sealed class CompanionBody
         if (animator != null && definition != null && definition.Animations != null)
         {
             animator.runtimeAnimatorController = definition.Animations;
+            // A modular woman's body puts her own clips back over the male ones of the new controller.
+            ModularCharacter body = animator.GetComponent<ModularCharacter>();
+            if (body != null)
+            {
+                body.ApplyAnimationSwaps();
+            }
         }
 
         if (animator == null || animator.runtimeAnimatorController == null)

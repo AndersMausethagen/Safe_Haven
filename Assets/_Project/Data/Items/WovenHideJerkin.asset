@@ -35,9 +35,14 @@ MonoBehaviour:
   healAmount: 0
   hungerRestore: 0
   thirstRestore: 0
+  boonBonuses: []
+  boonSeconds: 300
+  tonic: 0
+  cures: []
   carryCapacityBonus: 0
   bagSlotBonus: 0
   armorSlot: 5
+  wornLook: {fileID: 11400000, guid: 1f7293c0bfb4bdd43b5d2cf8d82e510d, type: 2}
   statBonuses:
   - stat: 7
     op: 0
@@ -53,4 +58,7 @@ MonoBehaviour:
     value: 0.05
   teachesBuildings: []
   teachesRecipes: []
+  experience: 0
+  learnedAtHome: 0
+  transport: {fileID: 0}
   raidModifier: {fileID: 0}

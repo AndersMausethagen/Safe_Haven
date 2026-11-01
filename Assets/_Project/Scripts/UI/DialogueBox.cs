@@ -25,9 +25,10 @@ public readonly struct DialogueSpeaker
         CameraDistance = cameraDistance;
     }
 
-    /// <summary>The player, by the name given (or "You").</summary>
+    /// <summary>The player, by the name given, else the name they chose for their character (or "You").</summary>
     public static DialogueSpeaker Player(string name = null) =>
-        new DialogueSpeaker(string.IsNullOrWhiteSpace(name) ? "You" : name, global::Player.Current != null ? global::Player.Current.transform : null);
+        new DialogueSpeaker(!string.IsNullOrWhiteSpace(name) ? name : !string.IsNullOrWhiteSpace(GameSession.Appearance.name) ? GameSession.Appearance.DisplayName : "You",
+            global::Player.Current != null ? global::Player.Current.transform : null);
 }
 
 /// <summary>One answer the player can give in the dialogue box.</summary>
@@ -255,6 +256,10 @@ public sealed class DialogueBox : MonoBehaviour
         portraitCamera.Show(live ? speaker.Model : null);
         LayOutFor(live || speaker.Portrait != null);
         Frame(speaker.Model, speaker.CameraDistance);
+        if (!string.IsNullOrWhiteSpace(line))
+        {
+            CharacterGestures.Speak(speaker.Model);
+        }
         // Walking away ends a conversation with someone standing beside the player, not a shout from afar.
         bool beside = speaker.Model != null && global::Player.Current != null && speaker.Model != global::Player.Current.transform &&
                       (speaker.Model.position - global::Player.Current.transform.position).sqrMagnitude <= WalkAwayDistance * WalkAwayDistance;

@@ -145,6 +145,35 @@ public sealed class HeldItemGrips : EditorWindow
         return $"Held items: player grip set to {grip.position:F3} / {grip.rotation.eulerAngles:F1} (relative to the right hand).";
     }
 
+    /// <summary>Fits every companion's grips to the modular body's hands (the player's body: both share the pack's
+    /// skeleton). Returns a summary.</summary>
+    public static string FitCompanionGrips(string playerPath = PlayerPrefab)
+    {
+        var playerAsset = AssetDatabase.LoadAssetAtPath<GameObject>(playerPath);
+        if (playerAsset == null)
+        {
+            return "Companion grips: the player prefab is missing.";
+        }
+
+        Pose grip = ComputeGrip(playerAsset);
+        Pose leftGrip = ComputeGrip(playerAsset, true);
+        int fitted = 0;
+        foreach (string guid in AssetDatabase.FindAssets("t:" + nameof(CompanionDefinition)))
+        {
+            var definition = AssetDatabase.LoadAssetAtPath<CompanionDefinition>(AssetDatabase.GUIDToAssetPath(guid));
+            var data = new SerializedObject(definition);
+            data.FindProperty("gripPosition").vector3Value = grip.position;
+            data.FindProperty("gripRotation").vector3Value = grip.rotation.eulerAngles;
+            data.FindProperty("offHandGripPosition").vector3Value = leftGrip.position;
+            data.FindProperty("offHandGripRotation").vector3Value = leftGrip.rotation.eulerAngles;
+            data.ApplyModifiedPropertiesWithoutUndo();
+            fitted++;
+        }
+
+        AssetDatabase.SaveAssets();
+        return $"Companion grips: {fitted} fitted.";
+    }
+
     /// <summary>A fist grip on a humanoid's right hand: the held model's up (+Y, the handle towards the head or blade)
     /// runs across the palm from the little finger past the index finger, its +X (the edge, the axe head) faces the way
     /// the knuckles point, and the grip point sits in the palm. Relative to the hand bone, so it holds in every animation.
