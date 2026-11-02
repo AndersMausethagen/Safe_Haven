@@ -431,7 +431,7 @@ Use responsive, isometric/top-down 3D movement and directional attacks, broadly 
 | Move               | WASD / left stick   | 360-degree traversal                |
 | Aim                | Mouse / right stick | Attack and ability direction        |
 | Basic attack       | Left mouse          | Main weapon sequence                |
-| Weapon special     | Right mouse         | Weapon-specific identity            |
+| Weapon art         | Middle mouse        | Weapon-specific identity, paid with Focus (right mouse is the guard) |
 | Dodge              | Space               | Timed avoidance with cooldown       |
 | Active skills      | Q, E, R             | Equipped abilities and boss rewards |
 | Interact / harvest | F                   | Gather, speak, rescue, activate     |
@@ -439,7 +439,7 @@ Use responsive, isometric/top-down 3D movement and directional attacks, broadly 
 
 ### 10.3 Combat feel
 
-Combat should be driven by positioning and readable telegraphs. Enemies have distinguishable anticipation, active hit, and recovery windows. Hit detection must be dependable. Moving while aiming is generally allowed, while heavy weapons commit the player for longer. A swing plants the feet from its wind-up until the blow lands, with only the attack's own lunge carrying the player in, and the body stays facing the blow; once it has landed the player can walk out of the follow-through, though the next attack still waits for the swing to finish, and a dodge can always break off a wind-up. Dodge has a short invulnerability window and cannot be used without a meaningful cooldown. **Prototype dodge target:** approximately **0.35 seconds** duration, with an approximately **2–3-second** cooldown; adjust after enemy timings and animations are playable.
+Combat should be driven by positioning and readable telegraphs. Enemies have distinguishable anticipation, active hit, and recovery windows. Hit detection must be dependable. Moving while aiming is generally allowed, while heavy weapons commit the player for longer. A swing plants the feet from its wind-up until the blow lands, with only the attack's own lunge carrying the player in, and the body stays facing the blow; once it has landed the player can walk out of the follow-through, though the next attack still waits for the swing to finish, and a dodge can always break off a wind-up. Dodge has a short invulnerability window and cannot be used without a meaningful cooldown. **Prototype dodge target:** approximately **0.35 seconds** duration, with a **0.9-second** cooldown in the build, stamina being what really limits dodging (the prototype target was 2–3 seconds); adjust after enemy timings and animations are playable.
 
 ### 10.4 Weapon families
 
@@ -489,6 +489,7 @@ These values remain editable prototyping defaults pending encounter playtesting.
 
 - **Marsh Light:** a hovering light that keeps its distance, slows with cold bolts and flees when hurt (the §10.5 archetype, without illusions yet).
 - **Draug:** a slow armoured dead warrior, hard to stagger, that chills on a hit and lunges from afar. Fire hurts it more; frost less.
+- **Barrow Shieldbearer:** a Draug with a shield, slow to turn. Nothing much gets through from the front, so it has to be flanked, caught striking or broken with something heavy.
 - **Bog Spitter:** spits poison from range and is weak up close.
 - **Blight Boar:** leaves the player alone at a distance, charges inside its ground, then stands open.
 - **Rootling:** small, fast and in swarms; a grasp can hold the feet.

@@ -22,16 +22,21 @@ MonoBehaviour:
   range: 1.8
   arc: 100
   maxTargets: 2
-  hitDelay: 0.2777778
-  recoveryTime: 0.5777778
+  hitDelay: 0.29629633
+  recoveryTime: 0.5962963
   poiseDamage: 30
+  impact: 1.1
   lunge: 0.8
   staminaCost: -1
+  appliesStatus: {fileID: 0}
+  statusChance: 1
   animationState: Shield Bash
-  animationSpeed: 0.9
+  animationSpeed: 0.76935476
+  strikeSpeed: 1.35
+  strikeLead: 0.06666667
   followThroughSpeed: 1
   swingSound: {fileID: 0}
   hitSound: {fileID: 0}
   slashColor: {r: 1, g: 0.95, b: 0.85, a: 0.8}
   slashSweep: 1
-  slashTilt: 6.970955
+  slashTilt: 2.380261

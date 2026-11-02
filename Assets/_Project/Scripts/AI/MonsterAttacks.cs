@@ -61,6 +61,25 @@ public sealed class MonsterAttacks
     /// <summary>The highest-priority action usable at <paramref name="distance"/> now, or -1.</summary>
     public int ChooseAction(float distance, bool isLeader) => SelectAttack(definition.Attacks, readyAt, distance, Time.time, isLeader, RaidTier);
 
+    /// <summary>The strike that reaches <paramref name="distance"/>, spent or not, or -1: what it wheels round into when it answers a
+    /// backstab. The blow it was knocked out of has just gone on cooldown, and that mustn't leave it with nothing to answer with.</summary>
+    public int ChooseAnswer(float distance)
+    {
+        IReadOnlyList<MonsterAttack> actions = definition.Attacks;
+        int chosen = -1;
+        for (int i = 0; i < actions.Count; i++)
+        {
+            MonsterAttack candidate = actions[i];
+            if (candidate != null && candidate.Strikes && candidate.KnownAt(RaidTier) && distance >= candidate.minimumRange && distance <= candidate.maximumRange
+                && (chosen < 0 || candidate.priority > actions[chosen].priority))
+            {
+                chosen = i;
+            }
+        }
+
+        return chosen;
+    }
+
     // Read each time, as a creature can outlive a raid's start but never changes raids.
     private static int RaidTier => GameSession.ActiveRaid != null ? GameSession.ActiveRaid.Tier : 0;
 

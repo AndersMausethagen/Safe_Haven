@@ -19,7 +19,12 @@ public sealed class WorldHealthBar : MonoBehaviour
     [SerializeField, Min(0.0001f)] private float unitSize = 0.01f;
     [SerializeField, Min(0f)] private float visibleSeconds = 5f;
     [SerializeField, Min(0.01f)] private float fadeSeconds = 0.4f;
+    [Tooltip("Height of the poise bar under a monster's health, in canvas units.")]
+    [SerializeField, Min(1f)] private float poiseHeight = 5f;
 
+    private MonsterAI monster;
+    private RectTransform poiseFill;
+    private GameObject poiseBar;
     private Camera viewCamera;
     private float lastChangeTime = float.NegativeInfinity;
     private bool dead;
@@ -56,8 +61,46 @@ public sealed class WorldHealthBar : MonoBehaviour
         if (target != null)
         {
             SetFill(target.HealthFraction);
+            monster = target.GetComponent<MonsterAI>();
+            if (monster != null)
+            {
+                BuildPoiseBar();
+            }
         }
     }
+
+    // A thin strip under the health bar made of copies of its own parts, so every monster has one without touching its prefab.
+    private void BuildPoiseBar()
+    {
+        var strip = new GameObject("Poise Bar", typeof(RectTransform));
+        var rect = (RectTransform)strip.transform;
+        rect.SetParent(transform, false);
+        rect.anchorMin = Vector2.zero;
+        rect.anchorMax = Vector2.right;
+        rect.pivot = new Vector2(0.5f, 1f);
+        rect.sizeDelta = new Vector2(0f, poiseHeight);
+        rect.anchoredPosition = Vector2.down * PoiseGap;
+        foreach (Transform part in fill.parent)
+        {
+            // The parts in place: everything but this strip, stretched over it as they stretch over the health bar.
+            if (part != rect && part.TryGetComponent(out UnityEngine.UI.Graphic _))
+            {
+                Instantiate(part.gameObject, rect, false).name = part.name;
+            }
+        }
+
+        poiseFill = rect.Find(fill.name) as RectTransform;
+        poiseBar = strip;
+        if (poiseFill == null)
+        {
+            Destroy(strip);
+            return;
+        }
+
+        poiseFill.GetComponent<UnityEngine.UI.Graphic>().color = UIStyle.Current.Accent;
+    }
+
+    private const float PoiseGap = 3f;
 
     private void OnDisable()
     {
@@ -89,6 +132,26 @@ public sealed class WorldHealthBar : MonoBehaviour
         float sinceChange = Time.time - lastChangeTime;
         float fade = Mathf.Clamp01((visibleSeconds + fadeSeconds - sinceChange) / fadeSeconds);
         group.alpha = dead ? 0f : fade;
+        UpdatePoise();
+    }
+
+    private void UpdatePoise()
+    {
+        if (poiseBar == null || monster == null)
+        {
+            return;
+        }
+
+        bool shown = GameOptions.PoiseBars.On && monster.Poise != null;
+        if (poiseBar.activeSelf != shown)
+        {
+            poiseBar.SetActive(shown);
+        }
+
+        if (shown && poiseFill != null)
+        {
+            poiseFill.anchorMax = new Vector2(monster.Poise.Fraction, 1f);
+        }
     }
 
     // Canvas units are pixels; this keeps the bar its intended size in meters whatever the parent's scale.

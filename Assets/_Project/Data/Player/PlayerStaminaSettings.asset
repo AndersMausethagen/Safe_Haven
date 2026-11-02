@@ -17,5 +17,5 @@ MonoBehaviour:
   regenDelay: 0.9
   attackCost: 12
   shieldBashCost: 18
-  dodgeCost: 20
+  dodgeCost: 25
   swimCostPerSecond: 7

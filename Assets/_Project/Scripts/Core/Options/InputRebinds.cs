@@ -46,7 +46,7 @@ public static class InputRebinds
         new RebindRow("Combat", "Draw Weapon", "Player/ToggleCombat"),
         new RebindRow("Combat", "Swap Weapons", "Player/SwapWeapon"),
         new RebindRow("Combat", "Torch", "Player/ToggleTorch"),
-        new RebindRow("Combat", "Next Arrow", "Player/CycleArrows"),
+        new RebindRow("Combat", "Weapon Art / Next Arrow", "Player/CycleArrows"),
         new RebindRow("Combat", "Skill 1", "Player/Skill1"),
         new RebindRow("Combat", "Skill 2", "Player/Skill2"),
         new RebindRow("Combat", "Skill 3", "Player/Skill3"),

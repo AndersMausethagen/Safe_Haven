@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 31defd31d2768f544b15eb0b92109574, type: 3}
   m_Name: CombatFeel
   m_EditorClassIdentifier: Assembly-CSharp::CombatFeelSettings
-  hitStopOnHit: 0.04
-  hitStopOnCrit: 0.08
-  hitStopOnKill: 0.12
-  hitStopWhenHurt: 0.06
+  hitStopOnHit: 0.07
+  hitStopOnCrit: 0.1
+  hitStopOnKill: 0.13
+  hitStopWhenHurt: 0.07
   hitStopTimeScale: 0.05
   shakeOnHit: 0.15
   shakeOnCrit: 0.3
@@ -92,6 +92,45 @@ MonoBehaviour:
   slashHeight: 1.05
   slashBrightness: 2.5
   swingSoundLead: 0.12
+  slashArcs: 0
+  trailSeconds: 0.16
+  trailBrightness: 0.8
+  trailBladeShare: 0.72
+  arrowTrailSeconds: 0.16
+  arrowTrailWidth: 0.055
+  arrowTrailColor: {r: 0.95, g: 0.95, b: 0.88, a: 0.55}
+  arrowTrailPerfectColor: {r: 1, g: 0.78, b: 0.32, a: 0.95}
+  shotKickMin: 0.02
+  shotKickMax: 0.1
+  hitHeardWithin: 12
+  focusMarkerMaterial: {fileID: 2100000, guid: e0072ab2fc0cebf4fba9a5994a6bcbae, type: 2}
+  focusMarkerColor: {r: 1, g: 0.72, b: 0.3, a: 0.75}
+  backstabMarkerColor: {r: 1, g: 0.92, b: 0.75, a: 0.3}
+  backstabMarkerWaryColor: {r: 1, g: 0.32, b: 0.12, a: 0.42}
+  backstabSound: {fileID: 11400000, guid: 289c3c38a842c5542ba156e09cfee336, type: 2}
+  backstabSlowSeconds: 0.16
+  bloodEffects: {fileID: 2867790097296657788, guid: 57724097d311ac3438df6b0c7281ca88, type: 3}
+  bloodKillSound: {fileID: 11400000, guid: c5e5c87f217b2ff44b3f65cb17a3ab25, type: 2}
+  bloodSpeedMin: 2.5
+  bloodSpeedMax: 10
+  bloodDropletsMin: 14
+  bloodDropletsMax: 60
+  bloodStainsMin: 2
+  bloodStainsMax: 12
+  bloodReach: 3.2
+  bloodStainSeconds: 30
+  bloodSpurtSpeed: 6
+  bloodSpurtReach: 2.6
+  corpseBleedSeconds: 5
+  corpseSpurtFirst: 0.16
+  corpseSpurtLast: 0.7
+  bloodPoolSeconds: 45
+  corpseThrowMin: 1.5
+  corpseThrowMax: 5.5
+  corpseLift: 0.45
+  corpseSettleSeconds: 4
+  corpseSeconds: 14
+  corpseLimit: 14
   hurtColor: {r: 0.65, g: 0.05, b: 0.02, a: 0.55}
   hurtSeconds: 0.45
   lowHealthBelow: 0.3

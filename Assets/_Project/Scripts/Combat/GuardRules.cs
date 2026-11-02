@@ -51,4 +51,17 @@ public static class GuardRules
 
         return stamina >= staminaCost ? GuardOutcome.Blocked : GuardOutcome.GuardBroken;
     }
+
+    /// <summary>A shield held up all the time, with no stamina or parry to it: it takes what comes from the front, unless the blow is
+    /// heavy enough to go through. Its poise still pays for what it takes, so it can be worn down too.</summary>
+    public static GuardOutcome ResolveShield(float arc, Vector3 facing, Vector3 hitDirection, HitTechnique technique)
+    {
+        const HitTechnique goesThrough = HitTechnique.Heavy | HitTechnique.WeaponArt | HitTechnique.ShieldBash | HitTechnique.OverTime;
+        if (arc <= 0f || (technique & goesThrough) != 0)
+        {
+            return GuardOutcome.None;
+        }
+
+        return Resolve(true, 1f, facing, hitDirection, arc, 0f, 0f, 0f);
+    }
 }

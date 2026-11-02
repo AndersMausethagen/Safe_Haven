@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>What kind of swing an attack is.</summary>
@@ -8,6 +9,10 @@ public enum SwingKind
     Light,
     Heavy,
     ShieldBash,
+    /// <summary>A weapon art, paid for with Focus.</summary>
+    Art,
+    /// <summary>A quick lunge out of a dodge or on the run.</summary>
+    Rush,
 }
 
 /// <summary>Everything about a swing as it starts, for animation, sounds and the combo display.</summary>
@@ -44,10 +49,15 @@ public readonly struct SwingInfo
 /// Runs the player's attacks. Light swings walk through the weapon's combo chain when pressed in time (see
 /// <see cref="ComboRules"/>: a press right as a swing recovers builds rhythm, mashing fumbles the chain back to the
 /// first swing); the light swing starts on the press, and holding the button on turns it into the heavy attack while it
-/// is still winding up; attacking while guarding with a shield is the shield bash. A
-/// parry or a perfect dodge readies a counter: the next swing that lands soon after is a critical one. Swings snap
-/// toward a target near the aim and step into it. One press is buffered while a swing or a dodge is still going. It also
-/// keeps the global mode in step: attacking enters GameState.Combat, a stretch without fighting returns to Exploration.
+/// is still winding up, which waits at the top of its wind-up and charges for as long as it is held; attacking while guarding
+/// with a shield is the shield bash. Focus pays for the weapon's art (the middle button, or attacking while guarding without
+/// a shield). A parry or a perfect dodge readies a counter: the next swing that lands soon after is a critical one. Swings
+/// snap toward a target near the aim, follow the focused enemy (<see cref="PlayerFocusTarget"/>) while they wind up and step
+/// into the blow as it lands; a wide swing strikes its targets in the order the blade reaches them, and a staggered target
+/// struck from behind is backstabbed. A press during or just after a dodge, or on the run, is the weapon's rush attack, a quick
+/// lunge that carries the movement into the blow. One press is buffered while a swing or a dodge is still going. It also keeps the
+/// global mode in step: attacking or being attacked enters GameState.Combat, and only a stretch with no blows and no enemy after the
+/// player returns to Exploration.
 /// <para>
 /// Animation listens to <see cref="SwingStarted"/>; feedback to <see cref="SwingLanded"/>, <see cref="ChainJudged"/>,
 /// <see cref="CounterReady"/> and <see cref="PerfectDodge"/>; damage numbers, audio and loot listen to the targets and
@@ -89,6 +99,24 @@ public sealed class PlayerCombat : MonoBehaviour
 
     private static readonly Collider[] Nearby = new Collider[32];
 
+    // One target of a swing, waiting for the blade to reach it.
+    private struct PendingHit
+    {
+        public HitDetector.Hit Hit;
+        public float At;
+        public AttackDefinition Attack;
+        public float WeaponDamage;
+        public Vector3 Origin;
+        public Vector3 Direction;
+        public float Damage;
+        public float Poise;
+        public HitTechnique Technique;
+        public bool Critical;
+    }
+
+    private readonly List<PendingHit> pendingHits = new List<PendingHit>(8);
+    private readonly List<HitDetector.Hit> foundHits = new List<HitDetector.Hit>(8);
+
     private PlayerStateMachine stateMachine;
     private PlayerMovement movement;
     private Combatant combatant;
@@ -97,6 +125,8 @@ public sealed class PlayerCombat : MonoBehaviour
     private PlayerStamina stamina;
     private PlayerGuard guard;
     private PlayerEating eating;
+    private PlayerFocus focus;
+    private PlayerFocusTarget focusTarget;
     private GameStateManager gameState;
     private float lastActivityTime;
     private WeaponDefinition announcedWeapon;
@@ -113,6 +143,16 @@ public sealed class PlayerCombat : MonoBehaviour
     private float activePoiseMultiplier = 1f;
     private HitTechnique activeTechnique;
     private bool activeForceCritical;
+    // Still to step into the blow, a moment before it lands.
+    private bool stepPending;
+    // How long a heavy swing has waited at the top of its wind-up; the swing's clock stands still meanwhile.
+    private float chargeHeld;
+    private bool charging;
+    private bool attackHeld;
+    // How long the player has been running, for the running attack.
+    private float runningFor;
+    private float nextHuntCheck;
+    private bool hunted;
 
     // The swing before, for judging the next press.
     private float lastStartTime = float.NegativeInfinity;
@@ -163,6 +203,26 @@ public sealed class PlayerCombat : MonoBehaviour
 
     /// <summary>True while the swing in progress hasn't landed yet (it can still be lost or turned into another).</summary>
     public bool IsWindingUp => activeKind != SwingKind.None && hitPending;
+
+    /// <summary>The attack of the swing in progress, or null.</summary>
+    public AttackDefinition ActiveAttack => activeAttack;
+
+    /// <summary>Seconds until the swing in progress lands; meaningful while <see cref="IsWindingUp"/>.</summary>
+    public float TimeToHit => HitAt(activeAttack, activeSpeed) - ActiveElapsed;
+
+    /// <summary>True while a heavy swing waits at the top of its wind-up, charging.</summary>
+    public bool IsCharging => charging;
+
+    /// <summary>How far a charging or charged heavy swing has got, from 0 to 1.</summary>
+    public float Charge => Rules.HeavyChargeSeconds > 0f ? Mathf.Clamp01(chargeHeld / Rules.HeavyChargeSeconds) : 0f;
+
+    /// <summary>Raised once when a held heavy swing is fully charged.</summary>
+    public event Action ChargeFull;
+
+    /// <summary>Raised when a blow lands from behind on a staggering target.</summary>
+    public event Action<IDamageable> Backstabbed;
+
+    private float ActiveElapsed => Time.time - activeStartTime - chargeHeld;
 
     /// <summary>The guard can go up when no swing is going or the current one has already landed, and not while flinching.</summary>
     public bool CanGuard => !IsFlinching && (activeKind == SwingKind.None || !hitPending);
@@ -220,6 +280,8 @@ public sealed class PlayerCombat : MonoBehaviour
         stamina = GetComponent<PlayerStamina>();
         guard = GetComponent<PlayerGuard>();
         eating = GetComponent<PlayerEating>();
+        focus = GetComponent<PlayerFocus>();
+        focusTarget = GetComponent<PlayerFocusTarget>();
         announcedWeapon = weapon;
     }
 
@@ -228,6 +290,7 @@ public sealed class PlayerCombat : MonoBehaviour
         stateMachine.AttackRequested += OnAttackPressed;
         stateMachine.AttackReleased += OnAttackReleased;
         stateMachine.ShieldBashRequested += OnShieldBashRequested;
+        stateMachine.ArrowCycleRequested += OnArtRequested;
         combatant.DamageDealt += OnDamageDealt;
         if (dodge != null)
         {
@@ -238,6 +301,7 @@ public sealed class PlayerCombat : MonoBehaviour
         {
             health.Evaded += OnEvaded;
             health.Damaged += OnHurt;
+            health.Guarded += OnGuarded;
         }
 
         gameState = GameStateManager.Instance;
@@ -256,6 +320,7 @@ public sealed class PlayerCombat : MonoBehaviour
         stateMachine.AttackRequested -= OnAttackPressed;
         stateMachine.AttackReleased -= OnAttackReleased;
         stateMachine.ShieldBashRequested -= OnShieldBashRequested;
+        stateMachine.ArrowCycleRequested -= OnArtRequested;
         combatant.DamageDealt -= OnDamageDealt;
         if (dodge != null)
         {
@@ -266,6 +331,7 @@ public sealed class PlayerCombat : MonoBehaviour
         {
             health.Evaded -= OnEvaded;
             health.Damaged -= OnHurt;
+            health.Guarded -= OnGuarded;
         }
 
         if (gameState != null)
@@ -275,8 +341,10 @@ public sealed class PlayerCombat : MonoBehaviour
         }
 
         EndSwing();
+        pendingHits.Clear();
         queuedKind = SwingKind.None;
         pressTime = -1f;
+        attackHeld = false;
         movement.SetSpeedScale(this, 1f);
     }
 
@@ -297,16 +365,48 @@ public sealed class PlayerCombat : MonoBehaviour
             movement.SetSpeedScale(Flinch, 1f);
         }
 
+        UpdateRunning();
         UpdateHeldPress();
         UpdateSwing();
+        ApplyPendingHits();
 
-        if (gameState != null
-            && combatTimeout > 0f
-            && gameState.CurrentState == GameState.Combat
-            && Time.time - lastActivityTime >= combatTimeout)
+        if (gameState != null && gameState.CurrentState == GameState.Combat
+            && StrikeRules.FightIsOver(Time.time - lastActivityTime, combatTimeout, IsHunted()))
         {
             gameState.TrySetState(GameState.Exploration);
         }
+    }
+
+    private void UpdateRunning()
+    {
+        PlayerMovementSettings settings = movement.Settings;
+        bool running = activeKind == SwingKind.None && !movement.IsDashing && settings != null
+            && movement.HorizontalSpeed >= settings.MoveSpeed * Rules.RushRunShare;
+        runningFor = running ? runningFor + Time.deltaTime : 0f;
+    }
+
+    // Looked at a few times a second, only while the fight's timeout could end it.
+    private bool IsHunted()
+    {
+        if (Time.time < nextHuntCheck)
+        {
+            return hunted;
+        }
+
+        nextHuntCheck = Time.time + 0.25f;
+        hunted = false;
+        float range = Rules.FightHoldRange;
+        foreach (MonsterAI monster in MonsterAI.Active)
+        {
+            if (monster != null && health != null && monster.IsEngaging(health)
+                && (monster.transform.position - transform.position).sqrMagnitude <= range * range)
+            {
+                hunted = true;
+                break;
+            }
+        }
+
+        return hunted;
     }
 
     // ----- Input -----
@@ -326,8 +426,22 @@ public sealed class PlayerCombat : MonoBehaviour
                 return;
             }
 
-            // Without a shield, attacking drops the guard and swings (a ready counter is spent here).
+            // Without a shield, attacking drops the guard: into the weapon art if Focus pays for it, else into a swing (a
+            // ready counter is spent here).
             guard.Lower();
+            if (CanAffordArt)
+            {
+                Request(SwingKind.Art, ChainPress.Late);
+                return;
+            }
+        }
+
+        attackHeld = true;
+        if (WantsRush())
+        {
+            pressTime = -1f;
+            Request(SwingKind.Rush, ChainPress.Late);
+            return;
         }
 
         pressJudge = JudgePress();
@@ -348,12 +462,54 @@ public sealed class PlayerCombat : MonoBehaviour
 
     private void OnAttackReleased()
     {
+        attackHeld = false;
         if (pressTime < 0f || weapon != null && weapon.TakesAttackInput)
         {
             return;
         }
 
         pressTime = -1f;
+    }
+
+    // An attack out of a dodge, or on the run toward where it aims, is the weapon's rush attack.
+    private bool WantsRush()
+    {
+        if (weapon == null || weapon.RushAttack == null || activeKind != SwingKind.None)
+        {
+            return false;
+        }
+
+        if (dodge != null && (dodge.IsDodging || dodge.JustDodged(Rules.RushAfterDodgeSeconds)))
+        {
+            return true;
+        }
+
+        return StrikeRules.IsRunningAttack(runningFor, Rules.RushRunSeconds, Vector3.Angle(movement.HorizontalVelocity, movement.AimDirection), Rules.RushRunAngle);
+    }
+
+    private bool CanAffordArt => weapon != null && weapon.WeaponArt != null && !weapon.TakesAttackInput
+        && focus != null && focus.CanSpend(weapon.WeaponArtFocus);
+
+    // The middle button: the next arrow with a bow (PlayerArchery), the weapon's art with anything else.
+    private void OnArtRequested()
+    {
+        if (weapon == null || weapon.TakesAttackInput || weapon.WeaponArt == null)
+        {
+            return;
+        }
+
+        if (focus != null && !focus.CanSpend(weapon.WeaponArtFocus))
+        {
+            focus.TrySpend(weapon.WeaponArtFocus); // refused: lets the HUD say so
+            return;
+        }
+
+        if (guard != null && guard.IsGuarding)
+        {
+            guard.Lower();
+        }
+
+        Request(SwingKind.Art, ChainPress.Late);
     }
 
     private void UpdateHeldPress()
@@ -407,7 +563,7 @@ public sealed class PlayerCombat : MonoBehaviour
     {
         if (activeKind != SwingKind.None)
         {
-            return ComboRules.Judge(Time.time - activeStartTime, HitAt(activeAttack, activeSpeed), RecoverAt(activeAttack, activeSpeed), Rules);
+            return ComboRules.Judge(ActiveElapsed, HitAt(activeAttack, activeSpeed), RecoverAt(activeAttack, activeSpeed), Rules);
         }
 
         return ComboRules.Judge(Time.time - lastStartTime, lastHitAt, lastRecoverAt, Rules);
@@ -451,6 +607,25 @@ public sealed class PlayerCombat : MonoBehaviour
                 attack = shieldBash;
                 technique |= HitTechnique.ShieldBash;
                 break;
+            case SwingKind.Art:
+                attack = weapon != null ? weapon.WeaponArt : null;
+                technique |= HitTechnique.WeaponArt;
+                // Focus may have run out while it waited in the buffer.
+                if (attack == null || (focus != null && !focus.TrySpend(weapon.WeaponArtFocus)))
+                {
+                    return;
+                }
+
+                break;
+            case SwingKind.Rush:
+                // Out of a perfect dodge the counter is the better blow; a rush leads on into the chain's second swing.
+                attack = CounterIsReady && weapon != null && weapon.CounterAttack != null ? weapon.CounterAttack : weapon != null ? weapon.RushAttack : null;
+                if (dodge != null)
+                {
+                    dodge.CutShort();
+                }
+
+                break;
             default:
                 step = ComboRules.NextStep(lastStep, chain, judge, fumbled);
                 attack = weapon != null ? weapon.ComboStep(step) : null;
@@ -472,7 +647,7 @@ public sealed class PlayerCombat : MonoBehaviour
         fumbled = false;
         rhythm = kind == SwingKind.Light && step > 0 ? ComboRules.NextRhythm(rhythm, judge, Rules) : 0;
         bool finisher = kind == SwingKind.Light && chain > 1 && step == chain - 1;
-        lastStep = kind == SwingKind.Light && !finisher ? step : -1;
+        lastStep = kind == SwingKind.Rush ? 0 : kind == SwingKind.Light && !finisher ? step : -1;
 
         activeKind = kind;
         activeAttack = attack;
@@ -503,15 +678,18 @@ public sealed class PlayerCombat : MonoBehaviour
 
         activeTechnique = technique;
         activeStartTime = Time.time;
+        chargeHeld = 0f;
+        charging = false;
         hitPending = attack != null;
-        // The direction is locked in when the swing starts: toward the aim, or the target it snaps to.
-        activeDirection = AimAssist(movement.AimDirection, attack, out float targetDistance);
-        movement.SnapFacing(activeDirection);
-        if (attack != null && attack.Lunge > 0f)
+        stepPending = attack != null && attack.Lunge > 0f;
+        // Toward the aim, or the target it snaps to; while it winds up it may still follow the focused enemy.
+        if (focusTarget != null)
         {
-            float distance = targetDistance >= 0f ? Mathf.Clamp(targetDistance - LungeStandOff, 0f, attack.Lunge) : attack.Lunge * 0.5f;
-            movement.Lunge(activeDirection * (distance / LungeSeconds), LungeSeconds);
+            focusTarget.Refresh();
         }
+
+        activeDirection = AimAssist(movement.AimDirection, attack, out _);
+        movement.SnapFacing(activeDirection);
 
         // Planted, facing the blow, until it lands: legs running under a swing and a body skating through one both look wrong.
         movement.FacingLocked = true;
@@ -519,6 +697,11 @@ public sealed class PlayerCombat : MonoBehaviour
         if (!hitPending)
         {
             ReleaseFeet();
+        }
+        else if (kind == SwingKind.Rush && stepPending)
+        {
+            // A rush carries the movement it came with: the lunge runs for the whole wind-up instead of waiting for the strike.
+            StepIntoBlow(HitAt(attack, activeSpeed));
         }
 
         EnterCombat();
@@ -537,7 +720,7 @@ public sealed class PlayerCombat : MonoBehaviour
 
     private float CostOf(SwingKind kind, AttackDefinition attack)
     {
-        if (stamina == null)
+        if (stamina == null || kind == SwingKind.Art)
         {
             return 0f;
         }
@@ -554,7 +737,8 @@ public sealed class PlayerCombat : MonoBehaviour
     {
         if (activeKind == SwingKind.None)
         {
-            if (queuedKind != SwingKind.None && !IsFlinching && (dodge == null || !dodge.IsDodging) && (guard == null || !guard.IsStunned))
+            bool dodgeInTheWay = dodge != null && dodge.IsDodging && !(queuedKind == SwingKind.Rush && dodge.CanBeCutShort);
+            if (queuedKind != SwingKind.None && !IsFlinching && !dodgeInTheWay && (guard == null || !guard.IsStunned))
             {
                 Begin(queuedKind, queuedJudge);
             }
@@ -562,12 +746,26 @@ public sealed class PlayerCombat : MonoBehaviour
             return;
         }
 
-        float elapsed = Time.time - activeStartTime;
-        if (hitPending && elapsed >= HitAt(activeAttack, activeSpeed))
+        float hitAt = HitAt(activeAttack, activeSpeed);
+        if (UpdateCharge(hitAt))
+        {
+            return;
+        }
+
+        float elapsed = ActiveElapsed;
+        if (hitPending && elapsed < hitAt - LungeSeconds)
+        {
+            TrackFocus();
+        }
+        else if (hitPending && stepPending)
+        {
+            StepIntoBlow(hitAt - elapsed);
+        }
+
+        if (hitPending && elapsed >= hitAt)
         {
             hitPending = false;
-            int hits = AttackResolver.Execute(combatant, activeAttack, activeWeaponDamage, transform.position, activeDirection, hitLayers,
-                activeDamageMultiplier, activePoiseMultiplier, activeTechnique, activeForceCritical);
+            int hits = LandSwing();
             ReleaseFeet();
             SwingLanded?.Invoke(current, hits);
         }
@@ -584,6 +782,149 @@ public sealed class PlayerCombat : MonoBehaviour
         }
     }
 
+    // A heavy swing held on waits at the top of its wind-up, where its strike would begin, and everything about it stands
+    // still until the button is let go or the charge is full. True while it waits.
+    private bool UpdateCharge(float hitAt)
+    {
+        float most = Rules.HeavyChargeSeconds;
+        bool waits = activeKind == SwingKind.Heavy && hitPending && attackHeld && most > 0f && chargeHeld < most
+            && ActiveElapsed >= hitAt - Mathf.Max(activeAttack.StrikeLead, LungeSeconds);
+        if (!waits)
+        {
+            charging = false;
+            return false;
+        }
+
+        charging = true;
+        chargeHeld = Mathf.Min(most, chargeHeld + Time.deltaTime);
+        TrackFocus();
+        if (chargeHeld >= most)
+        {
+            charging = false;
+            ChargeFull?.Invoke();
+        }
+
+        return charging;
+    }
+
+    // Until it steps into the blow, a swing keeps turning toward the enemy it is focused on.
+    private void TrackFocus()
+    {
+        if (focusTarget == null || !focusTarget.HasFocus || Rules.SwingTracking <= 0f)
+        {
+            return;
+        }
+
+        Vector3 to = focusTarget.DirectionToTarget;
+        activeDirection = Vector3.RotateTowards(activeDirection, to, Rules.SwingTracking * Mathf.Deg2Rad * Time.deltaTime, 0f);
+        movement.SnapFacing(activeDirection);
+    }
+
+    // The last moment before the blow: the body travels with the strike, as far as the target (or half way with none), so the
+    // step ends as it lands instead of sliding at the start and then standing still through the swing.
+    private void StepIntoBlow(float secondsLeft)
+    {
+        stepPending = false;
+        activeDirection = AimAssist(activeDirection, activeAttack, out float targetDistance);
+        movement.SnapFacing(activeDirection);
+        float distance = targetDistance >= 0f ? Mathf.Clamp(targetDistance - LungeStandOff, 0f, activeAttack.Lunge) : activeAttack.Lunge * 0.5f;
+        float seconds = Mathf.Max(0.05f, secondsLeft);
+        movement.Lunge(activeDirection * (distance / seconds), seconds);
+    }
+
+    private int LandSwing()
+    {
+        if (activeAttack == null)
+        {
+            return 0;
+        }
+
+        float charge = activeKind == SwingKind.Heavy ? Charge : 0f;
+        float damage = activeDamageMultiplier * Mathf.Lerp(1f, Rules.HeavyChargeDamage, charge);
+        float poise = activePoiseMultiplier * Mathf.Lerp(1f, Rules.HeavyChargePoise, charge);
+        Vector3 origin = transform.position;
+        HitDetector.FindTargets(origin, activeDirection, activeAttack, combatant.Faction, hitLayers, foundHits);
+
+        float first = float.MaxValue;
+        float sweep = StrikeRules.SweepSeconds(activeAttack.Arc, Rules.SweepSeconds);
+        foreach (HitDetector.Hit hit in foundHits)
+        {
+            first = Mathf.Min(first, StrikeRules.SweepPosition(activeDirection, hit.Point - origin, activeAttack.Arc, activeAttack.SlashSweep));
+        }
+
+        foreach (HitDetector.Hit hit in foundHits)
+        {
+            float through = StrikeRules.SweepPosition(activeDirection, hit.Point - origin, activeAttack.Arc, activeAttack.SlashSweep);
+            pendingHits.Add(new PendingHit
+            {
+                Hit = hit,
+                At = Time.time + (through - first) * sweep,
+                Attack = activeAttack,
+                WeaponDamage = activeWeaponDamage,
+                Origin = origin,
+                Direction = activeDirection,
+                Damage = damage,
+                Poise = poise,
+                Technique = activeTechnique,
+                Critical = activeForceCritical,
+            });
+        }
+
+        ApplyPendingHits();
+        return foundHits.Count;
+    }
+
+    private void ApplyPendingHits()
+    {
+        for (int i = pendingHits.Count - 1; i >= 0; i--)
+        {
+            PendingHit pending = pendingHits[i];
+            if (Time.time < pending.At)
+            {
+                continue;
+            }
+
+            pendingHits.RemoveAt(i);
+            Strike(pending);
+        }
+    }
+
+    private void Strike(in PendingHit pending)
+    {
+        IDamageable target = pending.Hit.Target;
+        // It may have died, or gone, in the moment the blade took to reach it.
+        if (target == null || (target is UnityEngine.Object living && living == null) || !target.IsAlive)
+        {
+            return;
+        }
+
+        float damage = pending.Damage;
+        HitTechnique technique = pending.Technique;
+        bool critical = pending.Critical;
+        bool backstab = IsBackstab(target, out MonsterAI backstabbed);
+        if (backstab)
+        {
+            // A stagger is earned, and pays most; catching it mid-strike pays less, and no sure critical.
+            damage *= backstabbed.IsStaggered ? Rules.BackstabDamage : Rules.BackstabOnStrikeDamage;
+            technique |= HitTechnique.Backstab;
+            critical |= backstabbed.IsStaggered;
+        }
+
+        AttackResolver.Apply(combatant, pending.Attack, pending.WeaponDamage, pending.Hit, pending.Origin, pending.Direction, damage,
+            pending.Poise, technique, critical);
+        if (backstab)
+        {
+            Backstabbed?.Invoke(target);
+        }
+    }
+
+    private bool IsBackstab(IDamageable target, out MonsterAI monster)
+    {
+        monster = null;
+        return target is Component body && body.TryGetComponent(out monster) && monster.IsOpenToBackstab
+            && StrikeRules.IsBehind(body.transform.position, body.transform.forward, transform.position, Rules.BackstabArc);
+    }
+
     // The blow has landed: the rest is follow-through, walked out of at the rules' speed. At 0 the player stays planted
     // and facing the blow until the swing ends. The swing itself goes on, so walking off doesn't bring the next attack sooner.
     private void ReleaseFeet()
@@ -597,7 +938,7 @@ public sealed class PlayerCombat : MonoBehaviour
     {
         if (activeKind != SwingKind.None)
         {
-            lastStartTime = activeStartTime;
+            lastStartTime = activeStartTime + chargeHeld;
             lastHitAt = HitAt(activeAttack, activeSpeed);
             lastRecoverAt = RecoverAt(activeAttack, activeSpeed);
         }
@@ -605,6 +946,9 @@ public sealed class PlayerCombat : MonoBehaviour
         activeKind = SwingKind.None;
         activeAttack = null;
         hitPending = false;
+        stepPending = false;
+        charging = false;
+        chargeHeld = 0f;
         movement.FacingLocked = false;
         movement.SetSpeedScale(this, 1f);
     }
@@ -688,6 +1032,12 @@ public sealed class PlayerCombat : MonoBehaviour
     // is lost. Trading blows loses; read the telegraph, guard or get out of the way.
     private void OnHurt(DamageInfo damage, DamageResult result)
     {
+        // Being attacked is a fight, whether or not the player hits back.
+        if (!damage.IsOverTime && damage.Source != null)
+        {
+            EnterCombat();
+        }
+
         if (result.Blocked || result.Killed || damage.IsOverTime || health == null || result.Damage < health.MaxHealth * Rules.FlinchShare)
         {
             return;
@@ -706,12 +1056,29 @@ public sealed class PlayerCombat : MonoBehaviour
         Flinched?.Invoke(Rules.FlinchSeconds, lostSwing);
     }
 
+    /// <summary>Thrown back by a monster's parry of the blow that just landed. The swing has already been spent, so it plays out.</summary>
+    public void Rebuff(float seconds)
+    {
+        queuedKind = SwingKind.None;
+        pressTime = -1f;
+        flinchUntil = Time.time + seconds;
+        movement.SetSpeedScale(Flinch, 0.25f);
+        Flinched?.Invoke(seconds, false);
+    }
+
     // Key for the flinch's slowdown, separate from the swing's own.
     private static readonly object Flinch = new object();
 
     // A hit evaded during the dodge's invulnerability is a perfect dodge: it readies a counter.
+    private void OnGuarded(DamageInfo damage, GuardOutcome outcome) => EnterCombat();
+
     private void OnEvaded(DamageInfo damage)
     {
+        if (damage.Source != null)
+        {
+            EnterCombat();
+        }
+
         if (dodge != null && dodge.IsDodging && damage.Source != null)
         {
             GrantCounter();

@@ -47,6 +47,7 @@ MonoBehaviour:
   animatorController: {fileID: 9100000, guid: 51388376d31e4294bb24b0004412608d, type: 2}
   prefab: {fileID: 9066855856663566298, guid: 6e4b724e33048b246a0b54c712d80b6f, type: 3}
   experience: 0
+  neverElite: 0
   attack: {fileID: 11400000, guid: c866deecfbabf0a459e469b04f3856f7, type: 2}
   attackDamage: 38
   attackCooldown: 1.6
@@ -146,6 +147,13 @@ MonoBehaviour:
   defensiveRadius: 8
   hoverHeight: 0
   poise: 0
+  openWhileStriking: 0
+  parriesBackstabs: 0
+  shieldArc: 0
+  shieldLetsThrough: 0.25
+  bleeds: 1
+  bloodColor: {r: 0.16, g: 0.2, b: 0.05, a: 0.95}
+  ragdollOnDeath: 1
   deathSound: {fileID: 0}
   hurtSound: {fileID: 0}
   attackSound: {fileID: 0}

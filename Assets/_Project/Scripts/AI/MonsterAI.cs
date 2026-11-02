@@ -14,14 +14,19 @@ using UnityEngine.AI;
 /// <para>
 /// Its parts: MonsterSenses (what it notices), MonsterTargeting (whom it may hunt), MonsterMovement (the NavMesh),
 /// MonsterAttacks (carrying out a strike) and MonsterPose (body language). This class is the state machine that decides
-/// between them: idle, investigating, chasing, attacking, staggered, returning, dead.
+/// between them: idle, investigating, chasing, attacking, staggered, hopping, returning, dead.
+/// </para>
+/// <para>
+/// Backstabs: it answers one with a strike or a hop, and remembers it (BackstabMemory), as do others of its side who saw. One that
+/// remembers may see the next swing coming from behind while it strikes, and break off to hop aside or parry. It is also the guard
+/// on its own Damageable, for that parry and the shield its definition may give it.
 /// </para>
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Combatant))]
 [RequireComponent(typeof(Damageable))]
 [RequireComponent(typeof(NavMeshAgent))]
-public sealed class MonsterAI : MonoBehaviour, IEventSubject, IStaggerable
+public sealed class MonsterAI : MonoBehaviour, IEventSubject, IStaggerable, IHitGuard
 {
     public enum State
     {
@@ -34,6 +39,8 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject, IStaggerable
         Staggered,
         /// <summary>Going to look at something it half-noticed (a glimpse, a sound, a target it lost), then searching there.</summary>
         Investigating,
+        /// <summary>Hopping out of reach of a backstab, or after one. Blows don't touch it meanwhile.</summary>
+        Hopping,
     }
 
     // Matches HitDetector, so the monster measures reach the same way its attack does.
@@ -94,6 +101,15 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject, IStaggerable
     private Vector3 glanceHeading = Vector3.forward;
     private float nextGlanceAt;
 
+    private readonly BackstabMemory backstabs = new BackstabMemory();
+    // When it answers the last backstab; below 0: it has nothing to answer.
+    private float answerAt = -1f;
+    // Its parry of a swing it saw coming stays up until then.
+    private float parryUntil = -1f;
+    private float lastSwingWatched = -1f;
+    private float hopEndsAt;
+    private Vector3 hopDirection;
+
     private static readonly System.Collections.Generic.List<MonsterAI> active = new System.Collections.Generic.List<MonsterAI>();
     private static readonly System.Collections.Generic.List<MonsterAI> all = new System.Collections.Generic.List<MonsterAI>();
 
@@ -127,7 +143,7 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject, IStaggerable
     public bool IsEngaging(IDamageable candidate)
     {
         return candidate != null && target == candidate
-            && (CurrentState == State.Chasing || CurrentState == State.Attacking || CurrentState == State.Staggered);
+            && (CurrentState == State.Chasing || CurrentState == State.Attacking || CurrentState == State.Staggered || CurrentState == State.Hopping);
     }
 
     /// <summary>Its poise right now (null before it has woken).</summary>
@@ -140,6 +156,25 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject, IStaggerable
     public bool IsSearchingLostTarget => CurrentState == State.Investigating && searchingLostTarget;
 
     public bool IsStaggered => CurrentState == State.Staggered;
+
+    /// <summary>True while a blow from behind is a backstab: it staggers, or is committed to a strike and can't turn to face it. Great beasts
+    /// and elites aren't caught out by their own strikes, so only a stagger opens them.</summary>
+    public bool IsOpenToBackstab => CurrentState == State.Staggered || (CurrentState == State.Attacking && OpenWhileStriking);
+
+    private bool OpenWhileStriking => definition != null && definition.OpenWhileStriking && !IsElite;
+
+    /// <summary>Set when a raid makes it an elite.</summary>
+    public bool IsElite { get; set; }
+
+    /// <summary>The chance it sees the next backstab coming, from what it remembers (0 until it has learned).</summary>
+    public float BackstabReadChance
+    {
+        get
+        {
+            CombatTechniqueSettings rules = CombatTechniqueSettings.Current;
+            return BackstabMemory.ReadChance(backstabs.Remembered(Time.time, rules.BackstabForgotAfter), rules.ReadChancePerBackstab, rules.ReadChanceMost);
+        }
+    }
 
     /// <summary>Raised when it starts staggering, with how long it lasts.</summary>
     public event Action<float> Staggered;
@@ -326,6 +361,7 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject, IStaggerable
         active.Remove(this);
         damageable.Damaged -= OnDamaged;
         damageable.Died -= OnDied;
+        damageable.RemoveInvulnerability(this);
     }
 
     private void Update()
@@ -342,10 +378,36 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject, IStaggerable
             return;
         }
 
+        if (CurrentState == State.Hopping)
+        {
+            UpdateHop();
+            return;
+        }
+
         if (CurrentState == State.Attacking)
         {
-            UpdateAttack();
+            if (!SeesBackstabComing())
+            {
+                UpdateAttack();
+            }
+
             return;
+        }
+
+        if (Time.time < parryUntil && CanTarget(target))
+        {
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(FlatToTarget()),
+                CombatTechniqueSettings.Current.ReadTurnSpeed * Time.deltaTime);
+            return;
+        }
+
+        if (answerAt >= 0f && Time.time >= answerAt)
+        {
+            answerAt = -1f;
+            if (AnswerBackstab())
+            {
+                return;
+            }
         }
 
         if (CurrentState == State.Investigating)
@@ -1006,6 +1068,11 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject, IStaggerable
             SetState(State.Chasing);
         }
 
+        if ((damage.Technique & HitTechnique.Backstab) != 0)
+        {
+            OnBackstabbed(result.Killed);
+        }
+
         if (poise != null && CurrentState != State.Staggered && CurrentState != State.Dead && !result.Killed
             && poise.Hit(damage.Poise, Time.time))
         {
@@ -1028,6 +1095,178 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject, IStaggerable
         {
             SetTarget(attackerTarget, null);
         }
+    }
+
+    // ----- Backstabs -----
+
+    // It remembers, and so do those who saw; if it lives the blow has knocked it out of its strike, and it will answer.
+    private void OnBackstabbed(bool killed)
+    {
+        CombatTechniqueSettings rules = CombatTechniqueSettings.Current;
+        backstabs.Learn(Time.time, rules.BackstabForgotAfter);
+        foreach (MonsterAI other in active)
+        {
+            if (other != this && other.combatant.Faction == combatant.Faction
+                && (other.transform.position - transform.position).sqrMagnitude <= rules.BackstabSeenWithin * rules.BackstabSeenWithin)
+            {
+                other.backstabs.Learn(Time.time, rules.BackstabForgotAfter);
+            }
+        }
+
+        if (killed)
+        {
+            return;
+        }
+
+        if (CurrentState == State.Attacking)
+        {
+            attacks.Cancel();
+            pose?.CancelAttack();
+            SetState(State.Chasing);
+        }
+
+        answerAt = Time.time + rules.AnswerDelay;
+    }
+
+    // A strike at once, with its wind-up as usual, so it can still be read and dodged; attacks turn it as they wind up. Without a strike
+    // that reaches, or some of the time anyway, it hops back. False when there is nobody near enough to answer.
+    private bool AnswerBackstab()
+    {
+        if (!CanTarget(target))
+        {
+            return false;
+        }
+
+        Vector3 toTarget = FlatToTarget();
+        float distance = DistanceToTarget();
+        if (distance > CombatTechniqueSettings.Current.ReadRange)
+        {
+            return false;
+        }
+
+        int action = definition.Attacks.Count > 0 ? attacks.ChooseAnswer(distance) : -1;
+        bool canStrike = definition.Attacks.Count > 0 ? action >= 0 : definition.Attack != null && distance <= definition.Attack.Range;
+        if (canStrike && UnityEngine.Random.value < CombatTechniqueSettings.Current.AnswerStrikeChance)
+        {
+            movement.Stop();
+            BeginAttack(action, toTarget);
+            return true;
+        }
+
+        BeginHop(toTarget.sqrMagnitude > 0.001f ? -toTarget.normalized : -transform.forward);
+        return true;
+    }
+
+    // One that remembers watches for a swing from behind while it strikes. Each swing gets one chance to be seen, and what it sees it
+    // breaks off for. True when it did. Being staggered ends this, so a parry stays the sure way in.
+    private bool SeesBackstabComing()
+    {
+        float chance = BackstabReadChance;
+        if (chance <= 0f || !OpenWhileStriking || global::Player.Current == null
+            || !global::Player.Current.TryGetComponent(out PlayerCombat swinger) || !swinger.IsWindingUp
+            || Mathf.Approximately(swinger.SwingStartTime, lastSwingWatched))
+        {
+            return false;
+        }
+
+        CombatTechniqueSettings rules = CombatTechniqueSettings.Current;
+        Vector3 position = swinger.transform.position;
+        if (HorizontalDistance(position) > rules.ReadRange || !StrikeRules.IsBehind(transform.position, transform.forward, position, rules.BackstabArc))
+        {
+            return false;
+        }
+
+        lastSwingWatched = swinger.SwingStartTime;
+        if (UnityEngine.Random.value >= chance)
+        {
+            return false;
+        }
+
+        attacks.Cancel();
+        pose?.CancelAttack();
+        SetState(State.Chasing);
+        EnsureIndicator()?.ShowSpotted();
+        AudioManager.Play(PerceptionSettings.Current.SpottedSound, transform.position);
+        if (definition.ParriesBackstabs && UnityEngine.Random.value < rules.ReadParryChance)
+        {
+            movement.Stop();
+            parryUntil = Time.time + rules.ReadParrySeconds;
+            return true;
+        }
+
+        // Off to one side of the way the blow is coming.
+        Vector3 away = transform.position - position;
+        away.y = 0f;
+        away = away.sqrMagnitude > 0.001f ? away.normalized : transform.forward;
+        BeginHop((away + Vector3.Cross(Vector3.up, away) * (UnityEngine.Random.value < 0.5f ? -1f : 1f)).normalized);
+        return true;
+    }
+
+    private void BeginHop(Vector3 direction)
+    {
+        CombatTechniqueSettings rules = CombatTechniqueSettings.Current;
+        movement.Stop();
+        hopDirection = direction;
+        hopEndsAt = Time.time + rules.HopSeconds;
+        damageable.AddInvulnerability(this);
+        pose?.Hit(direction, 0.6f, Time.time);
+        SetState(State.Hopping);
+    }
+
+    private void UpdateHop()
+    {
+        CombatTechniqueSettings rules = CombatTechniqueSettings.Current;
+        if (targetComponent != null)
+        {
+            movement.TurnTowards(FlatToTarget());
+        }
+
+        if (!movement.EnsureOnNavMesh() || Time.time >= hopEndsAt
+            || movement.Rush(hopDirection, rules.HopDistance / rules.HopSeconds * Time.deltaTime))
+        {
+            damageable.RemoveInvulnerability(this);
+            attacks.Delay(0.2f);
+            SetState(State.Chasing);
+        }
+    }
+
+    private Vector3 FlatToTarget()
+    {
+        Vector3 toTarget = TargetPoint() - transform.position;
+        toTarget.y = 0f;
+        return toTarget.sqrMagnitude > 0.0001f ? toTarget : transform.forward;
+    }
+
+    /// <summary>Damageable asks before every hit: a parry of a swing it saw coming, or its shield while it hunts.</summary>
+    public GuardOutcome Guard(in DamageInfo damage, out float letThrough)
+    {
+        letThrough = 1f;
+        if (definition == null || damage.IsOverTime)
+        {
+            return GuardOutcome.None;
+        }
+
+        if (Time.time < parryUntil)
+        {
+            CombatTechniqueSettings rules = CombatTechniqueSettings.Current;
+            parryUntil = -1f;
+            answerAt = Time.time + rules.AnswerDelay;
+            if (damage.Source != null && damage.Source.TryGetComponent(out PlayerCombat swinger) && HorizontalDistance(swinger.transform.position) <= rules.ReadRange)
+            {
+                swinger.Rebuff(rules.ParriedFlinchSeconds);
+            }
+
+            letThrough = 0f;
+            return GuardOutcome.Parried;
+        }
+
+        if (CurrentState != State.Chasing || GuardRules.ResolveShield(definition.ShieldArc, transform.forward, damage.Direction, damage.Technique) != GuardOutcome.Blocked)
+        {
+            return GuardOutcome.None;
+        }
+
+        letThrough = definition.ShieldLetsThrough;
+        return GuardOutcome.Blocked;
     }
 
     private void OnDied(Damageable victim, DamageInfo killingBlow)

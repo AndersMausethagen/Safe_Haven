@@ -248,6 +248,12 @@ MonoBehaviour:
       minPerGroup: 1
       fromTier: 3
       toTier: 0
+    - prefab: {fileID: 7112812444035070341, guid: e6646a32ac93d664c950e5e95fd45e0e, type: 3}
+      weight: 2
+      maxPerGroup: 2
+      minPerGroup: 1
+      fromTier: 3
+      toTier: 0
     - prefab: {fileID: 3643037256157110189, guid: 8af413a8c10dbdc4f89f0537152651dc, type: 3}
       weight: 2
       maxPerGroup: 1
@@ -483,6 +489,12 @@ MonoBehaviour:
       toTier: 0
     - prefab: {fileID: 9066855856663566298, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
       weight: 10
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 4
+      toTier: 0
+    - prefab: {fileID: 7112812444035070341, guid: e6646a32ac93d664c950e5e95fd45e0e, type: 3}
+      weight: 5
       maxPerGroup: 0
       minPerGroup: 0
       fromTier: 4

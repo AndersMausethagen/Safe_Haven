@@ -25,13 +25,18 @@ MonoBehaviour:
   hitDelay: 0.40650415
   recoveryTime: 0.85650414
   poiseDamage: 22
+  impact: 1.05
   lunge: 1.6
   staminaCost: -1
-  animationState: Sword Counter
-  animationSpeed: 0.82
-  followThroughSpeed: 1
+  appliesStatus: {fileID: 0}
+  statusChance: 1
+  animationState: Pole Lunge
+  animationSpeed: 0.8269421
+  strikeSpeed: 1.5
+  strikeLead: 0.08
+  followThroughSpeed: 1.6518472
   swingSound: {fileID: 0}
   hitSound: {fileID: 0}
   slashColor: {r: 1, g: 0.8, b: 0.45, a: 0.9}
-  slashSweep: 0
-  slashTilt: 24.106356
+  slashSweep: 1
+  slashTilt: 42.758606

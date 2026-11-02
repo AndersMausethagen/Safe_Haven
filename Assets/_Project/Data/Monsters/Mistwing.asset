@@ -32,6 +32,8 @@ MonoBehaviour:
   unlocksRecipes: []
   animatorController: {fileID: 9100000, guid: 51388376d31e4294bb24b0004412608d, type: 2}
   prefab: {fileID: 4830014356063024607, guid: a8600aa8041d7044c9a3afddd7102a7b, type: 3}
+  experience: 0
+  neverElite: 0
   attack: {fileID: 0}
   attackDamage: 8
   attackCooldown: 0.6
@@ -52,6 +54,7 @@ MonoBehaviour:
     priority: 10
     cooldown: 3
     interruptible: 0
+    fromTier: 0
     projectilePrefab: {fileID: 0}
     burstCount: 1
     burstInterval: 0.2
@@ -60,10 +63,15 @@ MonoBehaviour:
     chargeSpeed: 13
     chargeDistance: 8
     exposedSeconds: 2
+    leapHeight: 0
     buffRadius: 10
     buffSeconds: 8
     damageBonus: 0.05
     packLeaderOnly: 0
+    summonPrefab: {fileID: 0}
+    summonCount: 2
+    summonRadius: 3
+    summonLimit: 4
   movementTactic: 1
   temperament: 1
   preferredDistance: 6
@@ -73,6 +81,9 @@ MonoBehaviour:
   defensiveRadius: 8
   hoverHeight: 0.65
   poise: 0
+  bleeds: 1
+  bloodColor: {r: 0.45, g: 0.45, b: 0.55, a: 0.8}
+  ragdollOnDeath: 1
   deathSound: {fileID: 0}
   hurtSound: {fileID: 0}
   attackSound: {fileID: 0}

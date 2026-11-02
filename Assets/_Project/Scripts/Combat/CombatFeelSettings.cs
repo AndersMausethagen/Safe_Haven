@@ -115,6 +115,84 @@ public sealed class CombatFeelSettings : ScriptableObject
     [Tooltip("Seconds before a swing lands that its whoosh plays: as the weapon moves, not as the wind-up starts (an " +
              "axe's whoosh used to come over half a second early).")]
     [SerializeField, Min(0f)] private float swingSoundLead = 0.12f;
+    [Tooltip("Draws the flat arc as well as the blade's trail. Off, the trail alone shows the swing.")]
+    [SerializeField] private bool slashArcs;
+
+    [Header("Weapon trail (the ribbon following the blade)")]
+    [Tooltip("Seconds the ribbon takes to fade behind the blade. 0 draws none.")]
+    [SerializeField, Min(0f)] private float trailSeconds = 0.16f;
+    [Tooltip("Multiplies the attacks' Slash Color, as Slash Brightness does for the arc.")]
+    [SerializeField, Min(0f)] private float trailBrightness = 0.8f;
+    [Tooltip("How much of the weapon's length the ribbon covers, from the tip back. 1 goes all the way to the end in the hand.")]
+    [SerializeField, Range(0.1f, 1f)] private float trailBladeShare = 0.72f;
+
+    [Header("Arrows")]
+    [Tooltip("Seconds the trail behind an arrow lasts. It is what shows a shot from the high camera. 0 draws none.")]
+    [SerializeField, Min(0f)] private float arrowTrailSeconds = 0.16f;
+    [SerializeField, Min(0f)] private float arrowTrailWidth = 0.055f;
+    [SerializeField] private Color arrowTrailColor = new Color(0.95f, 0.95f, 0.88f, 0.55f);
+    [Tooltip("The trail of a perfect release.")]
+    [SerializeField] private Color arrowTrailPerfectColor = new Color(1f, 0.78f, 0.32f, 0.95f);
+    [Tooltip("How hard the camera kicks as a bow is loosed, from a bare draw to a full one.")]
+    [SerializeField, Range(0f, 1f)] private float shotKickMin = 0.02f;
+    [SerializeField, Range(0f, 1f)] private float shotKickMax = 0.1f;
+    [Tooltip("A blow further from the player than this is heard as if from here, in metres: an arrow's hit still has to reach the shooter.")]
+    [SerializeField, Min(0f)] private float hitHeardWithin = 12f;
+
+    [Header("Markers")]
+    [Tooltip("Ring on the ground under the enemy in focus. Empty draws none.")]
+    [SerializeField] private Material focusMarkerMaterial;
+    [SerializeField] private Color focusMarkerColor = new Color(1f, 0.72f, 0.3f, 0.75f);
+    [Tooltip("The wedge behind a staggering enemy: where a backstab lands.")]
+    [SerializeField] private Color backstabMarkerColor = new Color(1f, 0.92f, 0.75f, 0.3f);
+    [Tooltip("What that wedge warms toward as the enemy learns to see backstabs coming.")]
+    [SerializeField] private Color backstabMarkerWaryColor = new Color(1f, 0.32f, 0.12f, 0.42f);
+    [Tooltip("Plays with a backstab, over the weapon's own hit.")]
+    [SerializeField] private SoundDefinition backstabSound;
+    [Tooltip("Seconds the game slows for a backstab, on top of its hit stop.")]
+    [SerializeField, Min(0f)] private float backstabSlowSeconds = 0.16f;
+
+    [Header("Blood")]
+    [Tooltip("One copy per scene sprays it (BloodEffects). Empty: no blood.")]
+    [SerializeField] private BloodEffects bloodEffects;
+    [Tooltip("Plays with a killing blow on what bleeds.")]
+    [SerializeField] private SoundDefinition bloodKillSound;
+    [Tooltip("Metres per second of the fastest droplets from the weakest blow, and from the strongest.")]
+    [SerializeField, Min(0f)] private float bloodSpeedMin = 2.5f;
+    [SerializeField, Min(0f)] private float bloodSpeedMax = 10f;
+    [Tooltip("Droplets from the weakest blow, and from the strongest.")]
+    [SerializeField, Min(0)] private int bloodDropletsMin = 14;
+    [SerializeField, Min(0)] private int bloodDropletsMax = 60;
+    [Tooltip("Stains on the ground from the weakest blow, and from the strongest.")]
+    [SerializeField, Min(0)] private int bloodStainsMin = 2;
+    [SerializeField, Min(0)] private int bloodStainsMax = 12;
+    [Tooltip("Metres from the blow the furthest stain lands, for the strongest blow.")]
+    [SerializeField, Min(0f)] private float bloodReach = 3.2f;
+    [Tooltip("Seconds a stain stays on the ground. Set the stain system's Max Particles in the prefab with this in mind.")]
+    [SerializeField, Min(1f)] private float bloodStainSeconds = 30f;
+    [Tooltip("Metres per second of the strongest jet from a corpse's wound, and how far it reaches on the ground.")]
+    [SerializeField, Min(0f)] private float bloodSpurtSpeed = 6f;
+    [SerializeField, Min(0f)] private float bloodSpurtReach = 2.6f;
+    [Tooltip("Seconds a killed body goes on pumping blood from its wound. 0: it doesn't.")]
+    [SerializeField, Min(0f)] private float corpseBleedSeconds = 5f;
+    [Tooltip("Seconds between pulses, as the bleeding starts and as it runs out.")]
+    [SerializeField, Min(0.05f)] private float corpseSpurtFirst = 0.16f;
+    [SerializeField, Min(0.05f)] private float corpseSpurtLast = 0.7f;
+    [Tooltip("Seconds a pool of blood stays on the ground. It spreads through the first part of that, as the pool system's Size Over Lifetime says.")]
+    [SerializeField, Min(1f)] private float bloodPoolSeconds = 45f;
+
+    [Header("Corpses")]
+    [Tooltip("Metres per second a killed body is thrown by the weakest blow, and by the strongest.")]
+    [SerializeField, Min(0f)] private float corpseThrowMin = 1.5f;
+    [SerializeField, Min(0f)] private float corpseThrowMax = 5.5f;
+    [Tooltip("How much of the throw goes upward: 0 is flat along the ground.")]
+    [SerializeField, Range(0f, 2f)] private float corpseLift = 0.45f;
+    [Tooltip("Seconds of physics before a corpse is left lying still, which costs nothing.")]
+    [SerializeField, Min(0.5f)] private float corpseSettleSeconds = 4f;
+    [Tooltip("Seconds a corpse lies before it sinks into the ground and is gone.")]
+    [SerializeField, Min(1f)] private float corpseSeconds = 14f;
+    [Tooltip("The most corpses at once; beyond it the oldest goes.")]
+    [SerializeField, Min(1)] private int corpseLimit = 14;
 
     [Header("Hurt vignette")]
     [Tooltip("Screen edges flash this color when the player is hurt. Alpha is the strength.")]
@@ -198,6 +276,45 @@ public sealed class CombatFeelSettings : ScriptableObject
     public float SlashHeight => slashHeight;
     public float SlashBrightness => slashBrightness;
     public float SwingSoundLead => swingSoundLead;
+    public bool SlashArcs => slashArcs;
+    public float TrailSeconds => trailSeconds;
+    public float TrailBrightness => trailBrightness;
+    public float TrailBladeShare => trailBladeShare;
+    public float ArrowTrailSeconds => arrowTrailSeconds;
+    public float ArrowTrailWidth => arrowTrailWidth;
+    public Color ArrowTrailColor => arrowTrailColor;
+    public Color ArrowTrailPerfectColor => arrowTrailPerfectColor;
+    public float ShotKickMin => shotKickMin;
+    public float ShotKickMax => shotKickMax;
+    public float HitHeardWithin => hitHeardWithin;
+    public Material FocusMarkerMaterial => focusMarkerMaterial;
+    public Color FocusMarkerColor => focusMarkerColor;
+    public Color BackstabMarkerColor => backstabMarkerColor;
+    public Color BackstabMarkerWaryColor => backstabMarkerWaryColor;
+    public SoundDefinition BackstabSound => backstabSound;
+    public float BackstabSlowSeconds => backstabSlowSeconds;
+    public BloodEffects BloodEffects => bloodEffects;
+    public SoundDefinition BloodKillSound => bloodKillSound;
+    public float BloodSpeedMin => bloodSpeedMin;
+    public float BloodSpeedMax => bloodSpeedMax;
+    public int BloodDropletsMin => bloodDropletsMin;
+    public int BloodDropletsMax => bloodDropletsMax;
+    public int BloodStainsMin => bloodStainsMin;
+    public int BloodStainsMax => bloodStainsMax;
+    public float BloodReach => bloodReach;
+    public float BloodStainSeconds => bloodStainSeconds;
+    public float BloodSpurtSpeed => bloodSpurtSpeed;
+    public float BloodSpurtReach => bloodSpurtReach;
+    public float CorpseBleedSeconds => corpseBleedSeconds;
+    public float CorpseSpurtFirst => corpseSpurtFirst;
+    public float CorpseSpurtLast => corpseSpurtLast;
+    public float BloodPoolSeconds => bloodPoolSeconds;
+    public float CorpseThrowMin => corpseThrowMin;
+    public float CorpseThrowMax => corpseThrowMax;
+    public float CorpseLift => corpseLift;
+    public float CorpseSettleSeconds => corpseSettleSeconds;
+    public float CorpseSeconds => corpseSeconds;
+    public int CorpseLimit => corpseLimit;
     public Color HurtColor => hurtColor;
     public float HurtSeconds => hurtSeconds;
     public float LowHealthBelow => lowHealthBelow;

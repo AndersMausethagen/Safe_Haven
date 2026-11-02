@@ -612,9 +612,11 @@ filled in when it is saved (`SaveableEntityTools`). Safe Haven > Save > Assign M
 | Add a gatherable node (tree, ore, herb patch) | Content Editor > Gathering Nodes: a `GatheringNodeDefinition` (tool, tier, seconds, yields, respawn) and its generated prefab |
 | Change how many bag slots the player starts with | `ItemInventory.baseUnlockedSlots` on the PlayerArmature prefab; backpacks add `bagSlotBonus` |
 | Change the safe pocket size | `ItemInventory.safePocketSlots` on the PlayerArmature prefab |
-| Tune hit stop, shake, hit flash, knockback, telegraph colors, effects, slash arcs, the hurt vignette | `Resources/CombatFeel` (Systems Editor › Movement & Combat). No code. |
-| Tune combo timing, parry window, guard, flinch, poise and stagger | `Resources/CombatTechniqueSettings` (Systems Editor › Movement & Combat). No code. |
-| Give a weapon a longer chain, a heavy attack or a counter | Content Editor › Weapons: **Combo**, **Heavy Attack**, **Counter Attack**. Each attack names its **Animation State**; rerun Safe Haven › Characters › Set Up Combat Animations to retime the built-in ones from their clips |
+| Tune hit stop, shake, hit flash, knockback, telegraph colors, effects, the weapon trail, blood, corpses, the hurt vignette | `Resources/CombatFeel` (Systems Editor › Movement & Combat). No code. |
+| Tune combo timing, charging, focus on an enemy, backstabs, parry window, guard, flinch, poise and stagger | `Resources/CombatTechniqueSettings` (Systems Editor › Movement & Combat). No code. |
+| Give a weapon a longer chain, a heavy attack, a counter or a weapon art | Content Editor › Weapons: **Combo**, **Heavy Attack**, **Counter Attack**, **Weapon Art**. Each attack names its **Animation State**; rerun Safe Haven › Characters › Set Up Combat Animations to retime the built-in ones from their clips |
+| Give a weapon family a different swing | Its `Swing(...)` line in `Editor/Characters/CombatMovesets.cs` (add a clip to `StylizedStates` if it is new), then Set Up Combat Animations. Its damage and cadence come from the attack in `From`, so they don't move |
+| Change what a monster bleeds, or stop it ragdolling | Content Editor › Monsters › Body |
 | Make a monster harder to stagger | Content Editor › Monsters › **Poise** (0 = the game-wide default) |
 | Change how far or wide a monster sees, how well it hears, how quickly it spots you | Content Editor › Monsters › **Detection Range** (sight) and **Senses** (Sight Angle, Close Sense Range, Hearing, Alertness). All monsters side by side: Systems Editor › World › Senses & Stealth |
 | Change how long the game waits between quests and after fights | `Resources/StoryPacingSettings` (Systems Editor › World › Story Pacing); one quest: its **Start Delay**. No code. |
@@ -623,7 +625,7 @@ filled in when it is saved (`SaveableEntityTools`). Safe Haven > Save > Assign M
 | Tune lockpicking: the bar, slips, each press's noise and sounds | `Resources/LockpickingSettings` (Systems Editor › World › Lockpicking). Pins are on each Loot Cache. No code. |
 | Change a combat, footstep, world or weather sound | Sound Editor › Sound Effects › Game-wide effects (or the weapon's, attack's or monster's own sound fields) |
 | Remake a made sound, or make a new one | Its recipe in `Tools/Audio` (`combat.py`, `interface.py`, `world.py`, `moments.py`) on the models in `foley.py`; run the script from the project root. Each sound seeds itself from its name, so the others stay identical. The import normalizes every clip's peak, so judge loudness at the Sound Definition's volume. Synthesis first; the local Stable Audio 3 model only for what it can't do |
-| Tune the dodge (distance, speed, i-frames, cooldown) | `PlayerMovementSettings` asset, Dodge header. No code. |
+| Tune the dodge (distance, speed, i-frames, cooldown) | `PlayerMovementSettings` asset, Dodge header. How it goes around an enemy: Combat Technique › Dodging around an enemy. No code. |
 | Give a monster a longer attack warning | Raise its attack's **Hit Delay** (the telegraph lasts exactly that long) |
 | Make one target react differently (a boss that can't be pushed) | Add `HitReaction` to its prefab and change its fields |
 | React to the player dodging (sound, stamina) | Listen to `PlayerDodge.Dodged` |
@@ -849,6 +851,56 @@ The player is no super soldier: combat is about reading the enemy and committing
   the finisher (more damage and poise). The light swing starts on the press; held for `HeavyHoldSeconds` while it still
   winds up, it turns into the **heavy attack** (`heavyAttack`, paying only the stamina difference); a ready counter
   uses `counterAttack`.
+- **Poise bar:** `WorldHealthBar` copies its own parts into a thin strip under a monster's health at runtime and reads `MonsterAI.Poise`
+  (Options › Gameplay › Poise Bars), so no prefab needs it.
+- **Landing a swing** (`PlayerCombat`, arithmetic in `StrikeRules`, tested): `AttackDefinition` plays a build-up (`AnimationSpeed`), a
+  strike (`StrikeSpeed` for the last `StrikeLead` seconds) and a follow-through; `PlayerAnimationController.UpdateSwingSpeed` drives them
+  through `ActionSpeed`. The lunge (`StepIntoBlow`) runs in the last `LungeSeconds`, ending at contact. A held heavy swing waits at the top
+  of its wind-up (`IsCharging`, `Charge`, `ChargeFull`) with its clock stopped by `chargeHeld`. `LandSwing` finds targets, orders them by
+  `StrikeRules.SweepPosition` and queues each as a `PendingHit`, applied through `AttackResolver.Apply`, so a sweep strikes in the order the
+  blade reaches them. `AttackDefinition.Impact` scales hit stop, shake, blood and the corpse's throw; it changes no damage. Monsters still
+  use `AttackResolver.Execute`, one frame for all.
+- **Dodging around** (`PlayerDodge.SteerAround`, rules in `DodgeRules`, tested): with `PlayerFocusTarget.HasFocus`, steered toward or past the target,
+  the dash turns each frame (`PlayerMovement.SteerDash`) toward `DodgeRules.SpotBehind`, along the circle while the straight way is blocked, and ends on
+  arrival. `CanBeCutShort` holds a rush back until then. Any dodge ignores collision with nearby monsters' bodies while it lasts (`PassThroughBodies`).
+  `MonsterAI.IsOpenToBackstab` is staggering, or `State.Attacking` for a definition with `OpenWhileStriking` that isn't `IsElite`. `PlayerDodge` refunds
+  part of the dodge on `PlayerCombat.Backstabbed`.
+- **Enemies answering backstabs** (all in `MonsterAI`, numbers in Combat Technique): `OnDamaged` sees `HitTechnique.Backstab`, breaks off the strike and sets
+  `answerAt`; `AnswerBackstab` starts a strike (`MonsterAttacks.ChooseAnswer`, ignores cooldowns) or a hop (`State.Hopping`, invulnerable). `BackstabMemory`
+  (plain, tested) is per instance; those of its side nearby learn too. While striking, `SeesBackstabComing` polls the player's wind-up, one roll per swing.
+- **`MonsterAI` is an `IHitGuard`** on its own `Damageable`: `parryUntil` for a parry it saw coming (`PlayerCombat.Rebuff` throws the player back), and the
+  definition's shield (`GuardRules.ResolveShield`) while `Chasing`. A blocked blow still pays poise through `OnDamaged`. New shield-bearers need only a
+  `ShieldArc` and a slow `turnSpeed` on the prefab.
+- **Archery feel:** `ArrowProjectile.Strike` parents the arrow to the nearest bone or rigid part (`NearestBodyPart`, found before the blow, so a kill's corpse
+  takes it along) and `ReturnToPool` takes it back out; its trail is made in code. Body sounds come from `CombatFeedback` (the bow's Hit Sound), `arrow.HitSound` is
+  scenery only, and `HeardAt` brings the player's far blows within earshot. `PlayerFocus` earns from `Combatant.DamageDealt` on the bow's shot.
+- **Rush attacks** (`SwingKind.Rush`, `WeaponDefinition.RushAttack`): `PlayerCombat.WantsRush` turns a press during or just after a dodge, or on
+  the run (`StrikeRules.IsRunningAttack`), into a rush; a queued rush begins once `PlayerDodge.CanBeCutShort`, and `CutShort` ends the dash. Its lunge
+  runs for the whole wind-up. **The fight:** `StrikeRules.FightIsOver` keeps `GameState.Combat` while `IsHunted` (a monster within `FightHoldRange` is
+  `IsEngaging` the player); being struck, blocking or evading enters it.
+- **Planted heavy swings** (`PlayerAnimationController.plantedSwing`): a heavy swing plays on Upper Body until its strike, then `StrikeWithWholeBody`
+  crossfades the same clip on Combat Full Body at the same clip time. **Left hand:** `TwoHandGrip` (`[DefaultExecutionOrder(100)]`, after the animator)
+  solves the left arm with `ArmSolver` onto a point along `HeldWeaponShape`'s handle.
+- **Focus on an enemy** (`PlayerFocusTarget`, rules in `TargetRules`, tested): reads `MonsterAI.Active` five times a second while in
+  `GameState.Combat` with a melee weapon, and calls `PlayerMovement.SetFocusDirection`. `AimDirection` then means "toward the focused enemy",
+  so swings, skills and facing follow it with no change of their own; `RawAimDirection` is still the cursor. It stands aside while the aim
+  points past `FocusFreeAimAngle`. `PlayerCombat.TrackFocus` keeps a winding swing turning toward it. Ring: `Graphics.RenderMesh`.
+- **Weapon arts and backstabs:** `WeaponDefinition.WeaponArt` / `WeaponArtFocus`, `SwingKind.Art`, `HitTechnique.WeaponArt`. Input is the
+  CycleArrows action (the bow ignores melee, and melee ignores the bow) or attacking while guarding without a shield. Focus pays and `CostOf`
+  charges no stamina; arts earn no Focus. A hit on a `MonsterAI.IsOpenToBackstab` from within `BackstabArc` behind it is `HitTechnique.Backstab`
+  (`PlayerCombat.IsBackstab`); `BackstabMarker` draws the wedge, added by `CombatFeedback` on `AnyStaggered`, warming with `BackstabReadChance`.
+- **Blood and corpses** (made in `CombatFeedback.OnAnyDamaged`): `BloodEffects` is one scene-wide prefab of three world-space particle systems
+  that emits each particle itself with its own velocity (`StrikeRules.HitForce`, `SprayDirection`); stains raycast the ground and lie along its
+  normal. `DeathRagdoll` takes the monster's `Model` (or, without one, its non-UI children) out of it into a new corpse object at the
+  moment of the blow, so `Damageable`'s own death, loot and removal carry on untouched; `MonsterPose` notices its visual has left and stops.
+  Colliders are on Ignore Raycast and ignore the player's controller. `MonsterDefinition`: `Bleeds`, `BloodColor`, `RagdollOnDeath`. The corpse
+  pumps `BloodEffects.Spurt` from the struck body and starts `PoolUnder` once its heaviest body is still; pools are a fourth particle system whose
+  Size Over Lifetime is the spreading (built by Build Blood and Markers).
+- **Weapon trail** (`WeaponTrail`): a ribbon between the held model's tip and a point along its longest axis, recorded in `LateUpdate`, smoothed
+  with Catmull-Rom and drawn with the slash material. `CombatFeel.SlashArcs` keeps the old flat arc available.
+- **Movesets** (`CombatMovesets.cs`, part of Set Up Combat Animations): `AttackSpec.From` names the attack a swing takes its numbers and cadence
+  from, so swapping a clip changes no damage per second. `CombatMovesetTests` guards states and shape. Humanoid monsters: `MonsterAnimationDriver`
+  crossfades `AttackDefinition.AnimationState` at `AnimationSpeed` (fitted to `HitDelay`) and flinches through a `Hit` state.
 - **Getting out and flinch:** a dodge cuts a swing short, during the wind-up too (`DodgeCancelsWindup`; the swing is
   lost); the player moves slowly while swinging; a hit that gets through while winding up loses the swing and staggers
   the player (`Flinched`).

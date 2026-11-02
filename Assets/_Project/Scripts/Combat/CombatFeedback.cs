@@ -28,6 +28,7 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
     private PlayerCombat playerCombat;
     private PlayerDodge playerDodge;
     private PlayerStamina playerStamina;
+    private PlayerArchery playerArchery;
     private CombatScreenEffects screen;
     private ComboHud comboHud;
     // The player's swing whoosh, waiting for the moment the weapon moves (Combat Feel › Swing Sound Lead).
@@ -118,6 +119,12 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
             return;
         }
 
+        // A heavy swing held at the top of its wind-up: the whoosh waits for the strike.
+        if (playerCombat != null && playerCombat.IsCharging && Mathf.Approximately(playerCombat.SwingStartTime, pendingSwingStart))
+        {
+            return;
+        }
+
         if (playerCombat != null && playerCombat.IsWindingUp && Mathf.Approximately(playerCombat.SwingStartTime, pendingSwingStart))
         {
             AudioManager.Play(pendingSwingSound, playerCombat.transform.position + Vector3.up);
@@ -154,17 +161,44 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
 
         HitReaction.For(victim).Play(damage, result);
         bool structure = victim.Category == TargetCategory.Structure;
-        bool strong = result.IsCritical || (damage.Technique & (HitTechnique.Heavy | HitTechnique.Finisher | HitTechnique.Counter)) != 0;
+        bool strong = result.IsCritical
+            || (damage.Technique & (HitTechnique.Heavy | HitTechnique.Finisher | HitTechnique.Counter | HitTechnique.Backstab | HitTechnique.WeaponArt)) != 0;
+        float impact = damage.Attack != null ? damage.Attack.Impact : 1f;
+        float force = StrikeRules.HitForce(result.Damage / victim.MaxHealth, impact, strong, result.Killed);
         if (!result.Blocked)
         {
+            bool bled = Bleed(victim, damage, result, force);
+            if (result.Killed && DeathRagdoll.Play(victim, damage, force) == null && bled && victim.TryGetComponent(out MonsterAI fallen))
+            {
+                // Nothing left lying (no ragdoll), but it still bled out where it fell.
+                BloodEffects.PoolUnder(victim.transform.position, 1.6f, fallen.Definition != null ? fallen.Definition.BloodColor : DefaultBlood);
+            }
+
+            // Steel on flesh throws blood, not sparks; only a strong blow keeps its flash. A weapon's own effect (a fist's puff) stays.
             GameObject weaponEffect = PlayerWeaponHitEffect(damage);
             GameObject effect = structure ? feel.StructureHitEffect : strong ? feel.CriticalHitEffect
-                : weaponEffect != null ? weaponEffect : feel.HitEffect;
+                : weaponEffect != null ? weaponEffect : bled ? null : feel.HitEffect;
             Spawn(effect, damage.HitPoint, damage.Direction);
-            AudioManager.Play(HitSoundFor(damage, structure), damage.HitPoint);
+            Vector3 heardAt = HeardAt(damage);
+            AudioManager.Play(HitSoundFor(damage, structure), heardAt);
             if (strong && !structure)
             {
-                AudioManager.Play(Sounds != null ? Sounds.CriticalHit : null, damage.HitPoint);
+                AudioManager.Play(Sounds != null ? Sounds.CriticalHit : null, heardAt);
+            }
+
+            if (bled && result.Killed)
+            {
+                AudioManager.Play(feel.BloodKillSound, heardAt);
+            }
+
+            if ((damage.Technique & HitTechnique.Backstab) != 0)
+            {
+                AudioManager.Play(feel.BackstabSound, heardAt);
+                SlowTime(CombatTechniqueSettings.Current.SlowMotionScale, feel.BackstabSlowSeconds);
+                if (screen != null)
+                {
+                    screen.Flash(feel.TechniqueFlashColor, 0.6f);
+                }
             }
 
             if (victim.TryGetComponent(out IEventSubject known) && known.EventSubject is ICombatSounds sounds)
@@ -187,11 +221,70 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
 
         if (damage.Source != null && Player.IsPlayer(damage.Source.gameObject))
         {
-            float extra = (damage.Technique & (HitTechnique.Heavy | HitTechnique.Counter)) != 0 ? 1.5f
+            float extra = (damage.Technique & (HitTechnique.Backstab | HitTechnique.WeaponArt)) != 0 ? 1.75f
+                : (damage.Technique & (HitTechnique.Heavy | HitTechnique.Counter)) != 0 ? 1.5f
                 : (damage.Technique & HitTechnique.Finisher) != 0 ? 1.25f : 1f;
+            // A dagger's nick and a warhammer's blow don't land alike; the attack's Impact says how they differ.
+            extra *= impact;
             HitStop((result.Killed ? feel.HitStopOnKill : strong ? feel.HitStopOnCrit : feel.HitStopOnHit) * extra);
             CameraShake.Add((result.Killed ? feel.ShakeOnKill : strong ? feel.ShakeOnCrit : feel.ShakeOnHit) * extra);
         }
+    }
+
+    // What bleeds sprays the way the blow went and the way the blade was sweeping, as hard as it struck. Structures don't, nor
+    // what its definition says has no blood in it.
+    private static bool Bleed(Damageable victim, in DamageInfo damage, in DamageResult result, float force)
+    {
+        if (victim.Category != TargetCategory.Creature || !GameOptions.Blood.On)
+        {
+            return false;
+        }
+
+        Color blood = DefaultBlood;
+        if (victim.TryGetComponent(out MonsterAI monster) && monster.Definition != null)
+        {
+            if (!monster.Definition.Bleeds)
+            {
+                return false;
+            }
+
+            blood = monster.Definition.BloodColor;
+        }
+
+        AttackDefinition attack = damage.Attack;
+        Vector3 way = StrikeRules.SprayDirection(damage.Direction, attack != null ? attack.Arc : 0f, attack != null ? attack.SlashSweep : SlashSweep.RightToLeft, 0.3f);
+        BloodEffects.Spray(damage.HitPoint, way, force, blood);
+        if ((damage.Technique & HitTechnique.Backstab) != 0 && !result.Killed)
+        {
+            // Run through: as much again, out the front.
+            BloodEffects.Spray(damage.HitPoint, way, 1f, blood);
+        }
+
+        if (result.Killed)
+        {
+            // A killing blow opens it up: as hard as blood can fly, whatever the blow, and a splash where it stood.
+            BloodEffects.Spray(damage.HitPoint, way, 1f, blood);
+            BloodEffects.Pool(victim.transform.position, 1.1f, blood);
+        }
+
+        return true;
+    }
+
+    private static readonly Color DefaultBlood = new Color(0.32f, 0.015f, 0.02f, 0.95f);
+
+    // Where the player's own blow is heard from: a hit past the range of the sound would tell the shooter nothing, so a far arrow is
+    // brought near enough to hear. Everyone else's blows stay where they are.
+    private Vector3 HeardAt(in DamageInfo damage)
+    {
+        float within = feel.HitHeardWithin;
+        if (within <= 0f || playerCombat == null || damage.Source == null || damage.Source.gameObject != playerCombat.gameObject)
+        {
+            return damage.HitPoint;
+        }
+
+        Vector3 from = playerCombat.transform.position;
+        Vector3 offset = damage.HitPoint - from;
+        return offset.sqrMagnitude <= within * within ? damage.HitPoint : from + offset.normalized * within;
     }
 
     // The player's weapon's own hit effect, when the hit is the player's.
@@ -236,7 +329,8 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
                 SlowTime(rules.SlowMotionScale, rules.SlowMotionSeconds);
                 CameraShake.Add(feel.ShakeOnCrit);
                 Callout(victim, feel.ParryText);
-                if (screen != null)
+                // The flash is the player's reward; a monster's parry is the player's bad luck.
+                if (screen != null && Player.Current != null && victim == Player.Current.Health)
                 {
                     screen.Flash(feel.TechniqueFlashColor, 1f);
                 }
@@ -255,7 +349,13 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
         Spawn(feel.StaggerEffect, monster.transform.position + Vector3.up * 0.05f, monster.transform.forward);
         AudioManager.Play(Sounds != null ? Sounds.Stagger : null, monster.transform.position);
         Callout(monster, feel.StaggerText);
+        if (Player.Current != null && (monster.transform.position - Player.Current.transform.position).sqrMagnitude < BackstabMarkerRange * BackstabMarkerRange)
+        {
+            BackstabMarker.Show(monster);
+        }
     }
+
+    private const float BackstabMarkerRange = 12f;
 
     // ----- The player -----
 
@@ -272,6 +372,7 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
             playerCombat.SwingLanded -= OnSwingLanded;
             playerCombat.PerfectDodge -= OnPerfectDodge;
             playerCombat.CounterReady -= OnCounterReady;
+            playerCombat.ChargeFull -= OnChargeFull;
         }
 
         if (playerDodge != null)
@@ -284,10 +385,22 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
             playerStamina.SpendRefused -= OnStaminaRefused;
         }
 
+        if (playerArchery != null)
+        {
+            playerArchery.FullDraw -= OnFullDraw;
+            playerArchery.Shot -= OnArrowLoosed;
+        }
+
         watchedPlayer = player != null ? player.Health : null;
         playerCombat = player != null ? player.GetComponent<PlayerCombat>() : null;
         playerDodge = player != null ? player.GetComponent<PlayerDodge>() : null;
         playerStamina = player != null ? player.Stamina : null;
+        playerArchery = player != null ? player.GetComponent<PlayerArchery>() : null;
+        if (playerArchery != null)
+        {
+            playerArchery.FullDraw += OnFullDraw;
+            playerArchery.Shot += OnArrowLoosed;
+        }
 
         if (watchedPlayer != null)
         {
@@ -300,6 +413,7 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
             playerCombat.SwingLanded += OnSwingLanded;
             playerCombat.PerfectDodge += OnPerfectDodge;
             playerCombat.CounterReady += OnCounterReady;
+            playerCombat.ChargeFull += OnChargeFull;
         }
 
         if (playerDodge != null)
@@ -354,7 +468,7 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
     private void OnSwingLanded(SwingInfo swing, int hits)
     {
         AttackDefinition attack = swing.Attack;
-        if (attack == null || swing.Kind == SwingKind.ShieldBash || feel.SlashMaterial == null)
+        if (!feel.SlashArcs || attack == null || swing.Kind == SwingKind.ShieldBash || feel.SlashMaterial == null)
         {
             return;
         }
@@ -389,6 +503,37 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
 
     private void OnCounterReady()
     {
+        AudioManager.Play(Sounds != null ? Sounds.CounterReady : null, playerCombat.transform.position);
+    }
+
+    // The creak and glint that say the draw is full: now, for a perfect release.
+    private void OnFullDraw()
+    {
+        WeaponDefinition bow = playerCombat != null ? playerCombat.Weapon : null;
+        Vector3 at = playerArchery.transform.position + Vector3.up * 1.4f;
+        Spawn(feel.ParryCueEffect, at + playerArchery.transform.forward * 0.3f, Vector3.forward);
+        AudioManager.Play(bow != null ? bow.FullDrawSound : null, at);
+    }
+
+    // A loosed bow kicks with the strength of its draw; a perfect release also gives a beat of weight, as a parry does.
+    private void OnArrowLoosed(ArrowShot shot)
+    {
+        CameraShake.Add(Mathf.Lerp(feel.ShotKickMin, feel.ShotKickMax, shot.Draw));
+        if (shot.Perfect)
+        {
+            CombatTechniqueSettings rules = CombatTechniqueSettings.Current;
+            SlowTime(rules.SlowMotionScale, rules.SlowMotionSeconds);
+            if (screen != null)
+            {
+                screen.Flash(feel.TechniqueFlashColor, 0.5f);
+            }
+        }
+    }
+
+    // The glint and chime that say a held heavy swing can go no further.
+    private void OnChargeFull()
+    {
+        Spawn(feel.ParryCueEffect, playerCombat.transform.position + Vector3.up * 1.5f, Vector3.forward);
         AudioManager.Play(Sounds != null ? Sounds.CounterReady : null, playerCombat.transform.position);
     }
 

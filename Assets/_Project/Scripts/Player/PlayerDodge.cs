@@ -1,10 +1,14 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
 /// The player's dodge (Space / gamepad South): a quick dash in the direction being moved, or toward the cursor when
 /// standing still, that ignores hits for a moment and leaves a trail. It cancels a swing in progress, so the player can
-/// always get out of trouble, then waits out a cooldown. Read an enemy's telegraph, dodge out of it.
+/// always get out of trouble, then waits out a cooldown. Read an enemy's telegraph, dodge out of it. With an enemy in focus
+/// (<see cref="PlayerFocusTarget"/>) it can be steered: toward or past the enemy it curves around to the spot behind (rules in
+/// <see cref="DodgeRules"/>), from where an attack is a backstab if the enemy is open; with no direction held it steps straight
+/// back. Nothing alive blocks a dodge: it passes through bodies.
 /// <para>
 /// Where it belongs: Player, on the PlayerArmature prefab. Distance, timing, invulnerability and cooldown are in
 /// PlayerMovementSettings (Dodge); the trail's look is in Resources/CombatFeel. Animation, audio or a stamina cost can
@@ -57,6 +61,43 @@ public sealed class PlayerDodge : MonoBehaviour
     private const float DodgeBuffer = 0.35f;
     private float bufferedUntil = -1f;
 
+    private float dashEndsAt = float.NegativeInfinity;
+
+    // A dodge going around the enemy in focus: who, how fast and which way it is going now.
+    private Damageable rounding;
+    private float roundingRadius;
+    private float dashSpeed;
+    private Vector3 dashDirection;
+    private PlayerFocusTarget focus;
+    private CharacterController body;
+    // Monsters' bodies a dodge is passing through, given back when it ends.
+    private readonly List<Collider> passedThrough = new List<Collider>();
+    private const float PassThroughRange = 7f;
+
+    private PlayerCombat combat;
+    // What the last dodge cost, for a backstab straight out of it to give part back; once only.
+    private float paidForDodge;
+
+    /// <summary>True when the dodge has done its job and an attack may cut the rest short: its invulnerability and barge are over, and it
+    /// isn't still on its way around an enemy (it ends by itself as it gets there).</summary>
+    public bool CanBeCutShort => IsDodging && invulnerableUntil < 0f && bargeAt < 0f && rounding == null;
+
+    /// <summary>How fast this dodge's animation plays, as a share of its shape's speed: under 1 when it has been given longer to go around.</summary>
+    public float AnimationPace { get; private set; } = 1f;
+
+    /// <summary>True for <paramref name="seconds"/> after a dodge ended.</summary>
+    public bool JustDodged(float seconds) => !IsDodging && Time.time - dashEndsAt <= seconds;
+
+    /// <summary>Ends the dodge here (a rush attack takes over).</summary>
+    public void CutShort()
+    {
+        if (IsDodging)
+        {
+            movement.EndDash();
+            dashEndsAt = Time.time;
+        }
+    }
+
     private void Awake()
     {
         movement = GetComponent<PlayerMovement>();
@@ -64,21 +105,47 @@ public sealed class PlayerDodge : MonoBehaviour
         health = GetComponent<Damageable>();
         stamina = GetComponent<PlayerStamina>();
         equipment = GetComponent<PlayerEquipment>();
+        focus = GetComponent<PlayerFocusTarget>();
+        body = GetComponent<CharacterController>();
+        combat = GetComponent<PlayerCombat>();
     }
 
     private void OnEnable()
     {
         stateMachine.DodgeRequested += OnDodgeRequested;
+        if (combat != null)
+        {
+            combat.Backstabbed += OnBackstabbed;
+        }
     }
 
     private void OnDisable()
     {
         stateMachine.DodgeRequested -= OnDodgeRequested;
+        if (combat != null)
+        {
+            combat.Backstabbed -= OnBackstabbed;
+        }
+
         EndInvulnerability();
         SetTrail(false);
+        rounding = null;
+        GiveBodiesBack();
     }
 
     private void OnDodgeRequested() => TryDodge();
+
+    // A dodge that earned its backstab pays back part of what it cost.
+    private void OnBackstabbed(IDamageable target)
+    {
+        CombatTechniqueSettings rules = CombatTechniqueSettings.Current;
+        if (stamina != null && paidForDodge > 0f && Time.time - dashEndsAt <= rules.BackstabRefundWithin)
+        {
+            stamina.Restore(paidForDodge * rules.BackstabRefund);
+        }
+
+        paidForDodge = 0f;
+    }
 
     /// <summary>Dodges if alive, free to move, off cooldown and able to pay the full stamina cost. Returns true when the dodge started.</summary>
     public bool TryDodge()
@@ -90,7 +157,6 @@ public sealed class PlayerDodge : MonoBehaviour
         }
 
         // A swing is a commitment until it lands, and a flinching player can't throw themselves clear.
-        PlayerCombat combat = GetComponent<PlayerCombat>();
         if (combat != null && !combat.CanDodge)
         {
             bufferedUntil = Time.time + DodgeBuffer; // it goes the moment the swing lands
@@ -106,10 +172,34 @@ public sealed class PlayerDodge : MonoBehaviour
             return false;
         }
 
+        paidForDodge = stamina != null ? stamina.DodgeCost * shape.stamina : 0f;
+
         float distance = settings.DodgeDistance * shape.distance;
         float duration = settings.DodgeDuration * shape.duration;
-        Vector3 direction = movement.MovementInput.sqrMagnitude > 0.01f ? movement.MovementInput.normalized : movement.AimDirection;
-        movement.Dash(direction * (distance / duration), duration);
+        Damageable enemy = focus != null && focus.HasFocus ? focus.Target : null;
+        Vector3 toEnemy = enemy != null ? enemy.transform.position - transform.position : Vector3.zero;
+        toEnemy.y = 0f;
+        Vector3 direction = DodgeRules.StartDirection(movement.MovementInput, movement.AimDirection, toEnemy);
+
+        // A heavy roll is a shoulder charge: it goes straight in. The others can go around.
+        CombatTechniqueSettings rules = CombatTechniqueSettings.Current;
+        rounding = enemy != null && style != DodgeStyle.HeavyRoll && toEnemy.magnitude <= rules.DodgeAroundRange
+                   && DodgeRules.GoesAround(movement.MovementInput, toEnemy) ? enemy : null;
+        roundingRadius = 0.5f;
+        if (rounding != null && rounding.TryGetComponent(out Collider enemyBody))
+        {
+            Vector3 extents = enemyBody.bounds.extents;
+            roundingRadius = Mathf.Max(extents.x, extents.z);
+        }
+
+        dashDirection = direction;
+        dashSpeed = distance / duration * (rounding != null ? rules.DodgeAroundSpeed : 1f);
+        // Going around takes longer than going straight, so it gets the time, and its animation is spread over it.
+        float lasts = rounding != null ? Mathf.Max(duration, rules.DodgeAroundSeconds) : duration;
+        AnimationPace = duration / lasts;
+        movement.Dash(direction * dashSpeed, lasts);
+        PassThroughBodies();
+        dashEndsAt = Time.time + lasts;
         cooldownLength = settings.DodgeCooldown * shape.cooldown;
         readyAt = Time.time + cooldownLength;
 
@@ -132,8 +222,72 @@ public sealed class PlayerDodge : MonoBehaviour
         return true;
     }
 
+    // Steered every frame, toward the spot behind whichever way the enemy has turned.
+    private void SteerAround()
+    {
+        if (rounding == null || !rounding.IsAlive || !movement.IsDashing)
+        {
+            rounding = null;
+            return;
+        }
+
+        CombatTechniqueSettings rules = CombatTechniqueSettings.Current;
+        Vector3 enemy = rounding.transform.position;
+        Vector3 spot = DodgeRules.SpotBehind(enemy, rounding.transform.forward, roundingRadius + rules.DodgeBehindDistance);
+        if (DodgeRules.HasArrived(transform.position, spot))
+        {
+            // There: no sliding on past it. Turned to face the enemy, ready to strike.
+            CutShort();
+            Vector3 toEnemy = enemy - transform.position;
+            movement.SnapFacing(toEnemy);
+            rounding = null;
+            return;
+        }
+
+        Vector3 heading = DodgeRules.Heading(transform.position, enemy, spot, movement.MovementInput, roundingRadius + rules.DodgeClearance);
+        dashDirection = Vector3.RotateTowards(dashDirection, heading, rules.DodgeAroundTurn * Mathf.Deg2Rad * Time.deltaTime, 0f);
+        movement.SteerDash(dashDirection * dashSpeed);
+    }
+
+    private void PassThroughBodies()
+    {
+        if (body == null)
+        {
+            return;
+        }
+
+        foreach (MonsterAI monster in MonsterAI.Active)
+        {
+            if (monster != null && (monster.transform.position - transform.position).sqrMagnitude <= PassThroughRange * PassThroughRange
+                && monster.TryGetComponent(out Collider solid) && solid.enabled)
+            {
+                Physics.IgnoreCollision(body, solid, true);
+                passedThrough.Add(solid);
+            }
+        }
+    }
+
+    private void GiveBodiesBack()
+    {
+        foreach (Collider solid in passedThrough)
+        {
+            if (solid != null && body != null)
+            {
+                Physics.IgnoreCollision(body, solid, false);
+            }
+        }
+
+        passedThrough.Clear();
+    }
+
     private void Update()
     {
+        SteerAround();
+        if (passedThrough.Count > 0 && !IsDodging)
+        {
+            GiveBodiesBack();
+        }
+
         // The heavy roll ends in a shoulder barge into whatever it reached.
         if (bargeAt >= 0f && Time.time >= bargeAt)
         {

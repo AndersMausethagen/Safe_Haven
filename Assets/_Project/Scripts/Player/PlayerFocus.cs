@@ -12,6 +12,7 @@ public sealed class PlayerFocus : MonoBehaviour
 {
     private PlayerCombat combat;
     private PlayerGuard guard;
+    private Combatant combatant;
     private float lastGain = float.NegativeInfinity;
 
     public float Current { get; private set; }
@@ -30,12 +31,28 @@ public sealed class PlayerFocus : MonoBehaviour
     {
         combat = GetComponent<PlayerCombat>();
         guard = GetComponent<PlayerGuard>();
+        combatant = GetComponent<Combatant>();
+    }
+
+    // An arrow that strikes earns as a swing does, and a perfect release as a finisher: an archer has skills to pay for too.
+    private void OnDamageDealt(IDamageable target, DamageInfo damage, DamageResult result)
+    {
+        WeaponDefinition weapon = combat.Weapon;
+        if (weapon != null && weapon.IsBow && damage.Attack == weapon.ShotAttack && result.Damage > 0f && !damage.IsOverTime)
+        {
+            Gain(Rules.FocusPerHit * (result.IsCritical ? 2f : 1f));
+        }
     }
 
     private void OnEnable()
     {
         combat.SwingLanded += OnSwingLanded;
         combat.PerfectDodge += OnPerfectDodge;
+        if (combatant != null)
+        {
+            combatant.DamageDealt += OnDamageDealt;
+        }
+
         if (guard != null)
         {
             guard.Parried += OnParried;
@@ -47,6 +64,11 @@ public sealed class PlayerFocus : MonoBehaviour
     {
         combat.SwingLanded -= OnSwingLanded;
         combat.PerfectDodge -= OnPerfectDodge;
+        if (combatant != null)
+        {
+            combatant.DamageDealt -= OnDamageDealt;
+        }
+
         if (guard != null)
         {
             guard.Parried -= OnParried;
@@ -65,7 +87,7 @@ public sealed class PlayerFocus : MonoBehaviour
     /// <summary>Focus a swing earns: per target hit (two at most), more for finishers, heavy swings and counters.</summary>
     public static float ForSwing(SwingInfo swing, int hits, CombatTechniqueSettings rules)
     {
-        if (hits <= 0 || swing.Kind == SwingKind.ShieldBash)
+        if (hits <= 0 || swing.Kind == SwingKind.ShieldBash || swing.Kind == SwingKind.Art)
         {
             return 0f;
         }

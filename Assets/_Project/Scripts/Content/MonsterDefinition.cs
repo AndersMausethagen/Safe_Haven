@@ -78,6 +78,24 @@ public sealed class MonsterDefinition : ScriptableObject, ICombatSounds
              "a very high value makes it unstoppable.")]
     [SerializeField, Min(0f)] private float poise;
 
+    [Header("Backstabs and guarding")]
+    [Tooltip("A blow from behind in the middle of its strike is a backstab. Off for great beasts and bosses: they have to be staggered first. Elites never are, whatever this says.")]
+    [SerializeField] private bool openWhileStriking = true;
+    [Tooltip("Once it has learned, it can parry a backstab it sees coming, not only hop aside. For what has the hands for it.")]
+    [SerializeField] private bool parriesBackstabs;
+    [Tooltip("Width in degrees of the shield it holds in front of it while it hunts. 0: none. Heavy blows and arts go through; its strike lets it drop.")]
+    [SerializeField, Range(0f, 240f)] private float shieldArc;
+    [Tooltip("Share of a blow that gets past the shield.")]
+    [SerializeField, Range(0f, 1f)] private float shieldLetsThrough = 0.25f;
+
+    [Header("Body")]
+    [Tooltip("Blows draw blood. Off for what has none in it (a Marsh Light).")]
+    [SerializeField] private bool bleeds = true;
+    [Tooltip("What flies from a blow and stains the ground: red for the living, sap for what grows, black for the dead.")]
+    [SerializeField] private Color bloodColor = new Color(0.32f, 0.015f, 0.02f, 0.95f);
+    [Tooltip("Its body drops and is thrown by the killing blow. Off for what has no body to speak of.")]
+    [SerializeField] private bool ragdollOnDeath = true;
+
     [Header("Sound")]
     [Tooltip("Plays when it is killed. Empty uses the creature default from Audio Settings.")]
     [SerializeField] private SoundDefinition deathSound;
@@ -113,6 +131,13 @@ public sealed class MonsterDefinition : ScriptableObject, ICombatSounds
     public SoundDefinition AttackSound => attackSound;
     /// <summary>Its poise, or 0 when it uses the game-wide default.</summary>
     public float Poise => poise;
+    public bool OpenWhileStriking => openWhileStriking;
+    public bool ParriesBackstabs => parriesBackstabs;
+    public float ShieldArc => shieldArc;
+    public float ShieldLetsThrough => shieldLetsThrough;
+    public bool Bleeds => bleeds;
+    public Color BloodColor => bloodColor;
+    public bool RagdollOnDeath => ragdollOnDeath;
     public IReadOnlyList<MonsterAttack> Attacks => attacks;
     public MonsterMovementTactic MovementTactic => movementTactic;
     public MonsterTemperament Temperament => temperament;

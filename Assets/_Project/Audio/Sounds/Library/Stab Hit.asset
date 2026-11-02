@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0de871765cd6fce4c8fed103ef0082e3, type: 3}
+  m_Name: Stab Hit
+  m_EditorClassIdentifier: SafeHaven::SoundDefinition
+  displayName: Stab Hit
+  clips:
+  - {fileID: 8300000, guid: c642514e9d4b68e43922b3a93700d35f, type: 3}
+  - {fileID: 8300000, guid: eb19c8eee76077d478cfc14b0eb7ea35, type: 3}
+  - {fileID: 8300000, guid: 4baaad9e04841af468161b288b3f84ae, type: 3}
+  - {fileID: 8300000, guid: c7351b05de489844fb8438aee652970b, type: 3}
+  - {fileID: 8300000, guid: a3032b22d90a56045a43b353c9fe19fe, type: 3}
+  channel: 2
+  volume: 0.72
+  volumeVariation: 0.1
+  pitchRange: {x: 0.95, y: 1.05}
+  positional: 1
+  fullVolumeDistance: 3
+  audibleDistance: 35
+  maxAtOnce: 6
+  minimumGap: 0.03
+  priority: 1

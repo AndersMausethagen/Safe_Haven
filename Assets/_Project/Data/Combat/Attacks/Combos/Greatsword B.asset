@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c5517319b40a047489a8fdcb2b152b82, type: 3}
+  m_Name: Greatsword B
+  m_EditorClassIdentifier: Assembly-CSharp::AttackDefinition
+  displayName: Greatsword B
+  damageType: 0
+  baseDamage: 0
+  weaponDamageRatio: 1.6
+  powerScaling: 1
+  structureDamageMultiplier: 1
+  canCrit: 1
+  range: 2.7
+  arc: 200
+  maxTargets: 3
+  hitDelay: 0.64
+  recoveryTime: 1.4166667
+  poiseDamage: 28
+  impact: 1.4
+  lunge: 0.6
+  staminaCost: -1
+  appliesStatus: {fileID: 0}
+  statusChance: 1
+  animationState: 2H Wide
+  animationSpeed: 0.78431404
+  strikeSpeed: 1.6
+  strikeLead: 0.0875
+  followThroughSpeed: 0.72102714
+  swingSound: {fileID: 0}
+  hitSound: {fileID: 0}
+  slashColor: {r: 1, g: 0.8, b: 0.45, a: 0.9}
+  slashSweep: 1
+  slashTilt: 50.56645

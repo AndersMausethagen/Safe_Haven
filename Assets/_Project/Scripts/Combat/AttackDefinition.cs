@@ -43,7 +43,10 @@ public sealed class AttackDefinition : ScriptableObject
     [Header("Weight")]
     [Tooltip("How much a hit wears down the target's poise. Enough of it in a short time staggers the target.")]
     [SerializeField, Min(0f)] private float poiseDamage = 10f;
-    [Tooltip("Metres the attacker steps forward as the swing starts (toward a target within reach).")]
+    [Tooltip("How much the blow weighs: multiplies its hit stop and camera shake, the blood it draws and how far a killed target " +
+             "flies. 1 is a sword, below 1 a dagger, above 1 an axe or a hammer. It changes no damage.")]
+    [SerializeField, Range(0.25f, 3f)] private float impact = 1f;
+    [Tooltip("Metres the attacker steps forward into the blow, ending as it lands (toward a target within reach).")]
     [SerializeField, Min(0f)] private float lunge;
     [Tooltip("Stamina the player pays for it. Below 0 uses the player's normal attack cost.")]
     [SerializeField] private float staminaCost = -1f;
@@ -58,10 +61,15 @@ public sealed class AttackDefinition : ScriptableObject
     [Tooltip("Animator state the swing plays, by name (Safe Haven › Characters › Set Up Combat Animations makes them). " +
              "Empty uses the weapon stance's old attack animation.")]
     [SerializeField] private string animationState;
-    [Tooltip("Playback speed of the wind-up, up to the moment it hits (Hit Delay follows it). Below 1 the wind-up reads more " +
-             "clearly: you see the blow coming.")]
-    [SerializeField, Range(0.25f, 3f)] private float animationSpeed = 1f;
-    [Tooltip("Playback speed from the hit on: the strike and its follow-through. 1 keeps the clip's own snap.")]
+    [Tooltip("Playback speed of the build-up, until the strike takes over. Below 1 it reads more clearly: you see the blow coming. " +
+             "Set Up Combat Animations works it out so the swing still lands at its Hit Delay.")]
+    [SerializeField, Range(0.05f, 3f)] private float animationSpeed = 1f;
+    [Tooltip("Playback speed of the strike, the last moment before the blow lands. Faster than the build-up is what makes it snap.")]
+    [SerializeField, Range(0.25f, 4f)] private float strikeSpeed = 1f;
+    [Tooltip("Seconds before the blow lands that the strike takes over. 0 plays the whole wind-up at Animation Speed. A held heavy " +
+             "swing waits here while it charges.")]
+    [SerializeField, Min(0f)] private float strikeLead;
+    [Tooltip("Playback speed from the hit on: the follow-through. 1 keeps the clip's own snap.")]
     [SerializeField, Range(0.25f, 3f)] private float followThroughSpeed = 1f;
 
     [Header("Sound and Effects")]
@@ -91,12 +99,15 @@ public sealed class AttackDefinition : ScriptableObject
     public float HitDelay => hitDelay;
     public float RecoveryTime => recoveryTime;
     public float PoiseDamage => poiseDamage;
+    public float Impact => impact;
     public float Lunge => lunge;
     public float StaminaCost => staminaCost;
     public StatusEffectDefinition AppliesStatus => appliesStatus;
     public float StatusChance => statusChance;
     public string AnimationState => animationState;
     public float AnimationSpeed => animationSpeed;
+    public float StrikeSpeed => strikeSpeed;
+    public float StrikeLead => strikeLead;
     public float FollowThroughSpeed => followThroughSpeed;
     public SoundDefinition SwingSound => swingSound;
     public SoundDefinition HitSound => hitSound;
@@ -112,6 +123,14 @@ public sealed class AttackDefinition : ScriptableObject
         poiseDamage = poise;
         lunge = lungeDistance;
         slashColor = slash;
+    }
+
+    /// <summary>Sets how the wind-up plays (editor setup and tests).</summary>
+    public void ConfigureStrike(float buildUpSpeed, float speed, float lead)
+    {
+        animationSpeed = buildUpSpeed;
+        strikeSpeed = speed;
+        strikeLead = lead;
     }
 
     /// <summary>Sets the damage, reach and timing (editor setup and tests).</summary>

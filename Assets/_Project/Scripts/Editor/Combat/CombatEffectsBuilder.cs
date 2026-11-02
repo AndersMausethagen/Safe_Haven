@@ -91,8 +91,225 @@ public static class CombatEffectsBuilder
         }
 
         BuildWeaponEffects();
+        BuildBloodAndMarkers();
         AssetDatabase.SaveAssets();
         Debug.Log($"Combat effects built in {PrefabFolder} and set in Combat Feel.");
+    }
+
+    /// <summary>The blood prefab (three world-space particle systems, sprayed by BloodEffects) and the ring under the enemy in
+    /// focus, set in Combat Feel. Build Combat Effects runs it too.</summary>
+    [MenuItem("Safe Haven/Combat/Build Blood and Markers")]
+    public static void BuildBloodAndMarkers()
+    {
+        Directory.CreateDirectory(ArtFolder);
+        Directory.CreateDirectory(PrefabFolder);
+        AssetDatabase.Refresh();
+
+        Material dropMaterial = BlendedMaterial("Blood Drop", BloodDropPixels, 64);
+        Material mistMaterial = BlendedMaterial("Blood Mist", BloodMistPixels, 64);
+        Material stainMaterial = BlendedMaterial("Blood Stain", StainPixels, 512);
+        Material poolMaterial = BlendedMaterial("Blood Pool", PoolPixels, 512);
+        Material ringMaterial = BlendedMaterial("Focus Ring", FocusRingPixels, 128);
+
+        var root = new GameObject("Blood Effects");
+        GameObject prefab;
+        try
+        {
+            ParticleSystem drops = BloodSystem(root, "Droplets", dropMaterial, 1500);
+            ParticleSystem.MainModule dropMain = drops.main;
+            dropMain.gravityModifier = 1.5f;
+            var dropRenderer = drops.GetComponent<ParticleSystemRenderer>();
+            dropRenderer.renderMode = ParticleSystemRenderMode.Stretch;
+            dropRenderer.lengthScale = 1.6f;
+            dropRenderer.velocityScale = 0.03f;
+            ParticleSystem.LimitVelocityOverLifetimeModule air = drops.limitVelocityOverLifetime;
+            air.enabled = true;
+            air.drag = 0.8f;
+            BloodFade(drops, new GradientAlphaKey(1f, 0f), new GradientAlphaKey(1f, 0.75f), new GradientAlphaKey(0f, 1f));
+
+            ParticleSystem haze = BloodSystem(root, "Mist", mistMaterial, 120);
+            ParticleSystem.MainModule hazeMain = haze.main;
+            hazeMain.gravityModifier = 0.15f;
+            BloodFade(haze, new GradientAlphaKey(1f, 0f), new GradientAlphaKey(0.6f, 0.4f), new GradientAlphaKey(0f, 1f));
+            ParticleSystem.SizeOverLifetimeModule hazeGrows = haze.sizeOverLifetime;
+            hazeGrows.enabled = true;
+            hazeGrows.size = new ParticleSystem.MinMaxCurve(1f, AnimationCurve.EaseInOut(0f, 0.6f, 1f, 1.5f));
+
+            ParticleSystem stains = BloodSystem(root, "Stains", stainMaterial, 1000);
+            ParticleSystem.MainModule stainMain = stains.main;
+            stainMain.startRotation3D = true;
+            var stainRenderer = stains.GetComponent<ParticleSystemRenderer>();
+            stainRenderer.alignment = ParticleSystemRenderSpace.Local;
+            stainRenderer.sortingFudge = 40f;
+            // A stain appears as its drops land, about a third of a second in out of half a minute, and fades at the end.
+            BloodFade(stains, new GradientAlphaKey(0f, 0f), new GradientAlphaKey(0f, 0.008f), new GradientAlphaKey(1f, 0.016f), new GradientAlphaKey(1f, 0.8f), new GradientAlphaKey(0f, 1f));
+            ParticleSystem.TextureSheetAnimationModule sheet = stains.textureSheetAnimation;
+            sheet.enabled = true;
+            sheet.numTilesX = 2;
+            sheet.numTilesY = 2;
+            sheet.frameOverTime = new ParticleSystem.MinMaxCurve(0f);
+            sheet.startFrame = new ParticleSystem.MinMaxCurve(0f, 1f);
+
+            // Pools: spreading is the size over lifetime, quick at first and slowing, in the first fifth of the pool's life (9 of 45 seconds).
+            ParticleSystem spreading = BloodSystem(root, "Pools", poolMaterial, 120);
+            ParticleSystem.MainModule poolMain = spreading.main;
+            poolMain.startRotation3D = true;
+            var poolRenderer = spreading.GetComponent<ParticleSystemRenderer>();
+            poolRenderer.alignment = ParticleSystemRenderSpace.Local;
+            poolRenderer.sortingFudge = 60f;
+            BloodFade(spreading, new GradientAlphaKey(0f, 0f), new GradientAlphaKey(1f, 0.01f), new GradientAlphaKey(1f, 0.82f), new GradientAlphaKey(0f, 1f));
+            ParticleSystem.SizeOverLifetimeModule spreads = spreading.sizeOverLifetime;
+            spreads.enabled = true;
+            spreads.size = new ParticleSystem.MinMaxCurve(1f, new AnimationCurve(new Keyframe(0f, 0.08f, 0f, 14f), new Keyframe(0.07f, 0.68f, 3f, 3f), new Keyframe(0.2f, 1f, 0f, 0f), new Keyframe(1f, 1f)));
+            ParticleSystem.TextureSheetAnimationModule poolSheet = spreading.textureSheetAnimation;
+            poolSheet.enabled = true;
+            poolSheet.numTilesX = 2;
+            poolSheet.numTilesY = 2;
+            poolSheet.frameOverTime = new ParticleSystem.MinMaxCurve(0f);
+            poolSheet.startFrame = new ParticleSystem.MinMaxCurve(0f, 1f);
+
+            root.AddComponent<BloodEffects>().Configure(drops, haze, stains, spreading);
+            prefab = PrefabUtility.SaveAsPrefabAsset(root, $"{PrefabFolder}/Blood Effects.prefab");
+        }
+        finally
+        {
+            Object.DestroyImmediate(root);
+        }
+
+        var feel = AssetDatabase.LoadAssetAtPath<CombatFeelSettings>(FeelPath);
+        if (feel != null)
+        {
+            var data = new SerializedObject(feel);
+            data.FindProperty("bloodEffects").objectReferenceValue = prefab.GetComponent<BloodEffects>();
+            data.FindProperty("focusMarkerMaterial").objectReferenceValue = ringMaterial;
+            data.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        AssetDatabase.SaveAssets();
+    }
+
+    // Always playing with nothing emitting: BloodEffects emits each particle itself, with its own velocity.
+    private static ParticleSystem BloodSystem(GameObject root, string name, Material material, int capacity)
+    {
+        var go = new GameObject(name);
+        go.transform.SetParent(root.transform, false);
+        var system = go.AddComponent<ParticleSystem>();
+        system.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+        ParticleSystem.MainModule main = system.main;
+        main.duration = 5f;
+        main.loop = true;
+        main.playOnAwake = true;
+        main.startSpeed = 0f;
+        main.simulationSpace = ParticleSystemSimulationSpace.World;
+        main.scalingMode = ParticleSystemScalingMode.Hierarchy;
+        main.maxParticles = capacity;
+        ParticleSystem.EmissionModule emission = system.emission;
+        emission.enabled = false;
+        ParticleSystem.ShapeModule shape = system.shape;
+        shape.enabled = false;
+        var renderer = go.GetComponent<ParticleSystemRenderer>();
+        renderer.sharedMaterial = material;
+        renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+        renderer.receiveShadows = false;
+        return system;
+    }
+
+    private static void BloodFade(ParticleSystem system, params GradientAlphaKey[] alpha)
+    {
+        ParticleSystem.ColorOverLifetimeModule colour = system.colorOverLifetime;
+        colour.enabled = true;
+        var gradient = new Gradient();
+        gradient.SetKeys(new[] { new GradientColorKey(Color.white, 0f), new GradientColorKey(Color.white, 1f) }, alpha);
+        colour.color = gradient;
+    }
+
+    private static Material BlendedMaterial(string name, System.Func<float, float, float> pixels, int size)
+    {
+        Texture2D texture = Texture(name, pixels, size);
+        string path = $"{ArtFolder}/Combat {name}.mat";
+        var material = AssetDatabase.LoadAssetAtPath<Material>(path);
+        if (material == null)
+        {
+            material = new Material(Shader.Find("Safe Haven/Effect Particle"));
+            AssetDatabase.CreateAsset(material, path);
+        }
+
+        material.shader = Shader.Find("Safe Haven/Effect Particle");
+        material.SetTexture("_MainTex", texture);
+        material.SetColor("_TintColor", Color.white);
+        material.SetFloat("_SrcBlend", (float)UnityEngine.Rendering.BlendMode.SrcAlpha);
+        material.SetFloat("_DstBlend", (float)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+        EditorUtility.SetDirty(material);
+        return material;
+    }
+
+    // A round drop with a firm edge; stretched along its flight.
+    private static float BloodDropPixels(float u, float v)
+    {
+        float d = Mathf.Sqrt(u * u + v * v);
+        return Mathf.Clamp01((1f - d) * 5f);
+    }
+
+    private static float BloodMistPixels(float u, float v)
+    {
+        float d = Mathf.Sqrt(u * u + v * v);
+        float grain = Mathf.PerlinNoise(u * 3.1f + 7f, v * 3.1f + 3f);
+        return Mathf.Pow(Mathf.Clamp01(1f - d), 1.6f) * Mathf.Lerp(0.55f, 1f, grain);
+    }
+
+    // Four different splats in a 2 x 2 sheet: a blob with a torn edge and flung specks around it.
+    private static float StainPixels(float u, float v)
+    {
+        float x = (u + 1f) * 0.5f * 2f, y = (v + 1f) * 0.5f * 2f;
+        int tile = (int)Mathf.Min(x, 1.999f) + (int)Mathf.Min(y, 1.999f) * 2;
+        float tu = (x - Mathf.Floor(Mathf.Min(x, 1.999f))) * 2f - 1f, tv = (y - Mathf.Floor(Mathf.Min(y, 1.999f))) * 2f - 1f;
+        float seed = 11.3f + tile * 37.7f;
+        float d = Mathf.Sqrt(tu * tu + tv * tv);
+        float angle = Mathf.Atan2(tv, tu);
+        float torn = Mathf.PerlinNoise(Mathf.Cos(angle) * 2.2f + seed, Mathf.Sin(angle) * 2.2f + seed) * 0.42f
+                     + Mathf.PerlinNoise(Mathf.Cos(angle) * 7f + seed, Mathf.Sin(angle) * 7f + seed * 2f) * 0.16f;
+        float blob = Mathf.Clamp01((0.24f + torn - d) * 30f);
+        float specks = 0f;
+        for (int i = 0; i < 14; i++)
+        {
+            float a = Mathf.PerlinNoise(seed + i * 3.7f, 0.5f) * Mathf.PI * 6f;
+            float r = 0.42f + Mathf.PerlinNoise(seed * 2f, i * 2.3f + 0.5f) * 0.5f;
+            float size = 0.012f + Mathf.PerlinNoise(i * 5.1f + 0.5f, seed) * 0.05f;
+            float dx = tu - Mathf.Cos(a) * r, dy = tv - Mathf.Sin(a) * r;
+            specks = Mathf.Max(specks, Mathf.Clamp01((size - Mathf.Sqrt(dx * dx + dy * dy)) * 60f));
+        }
+
+        // Thin at the rim of the tile, so no edge ever shows.
+        float rim = Mathf.Clamp01((1f - d) * 8f);
+        float wet = Mathf.Lerp(0.72f, 1f, Mathf.PerlinNoise(tu * 4f + seed, tv * 4f + seed));
+        return Mathf.Max(blob * wet, specks * 0.9f) * rim;
+    }
+
+    // Four pools in a 2 x 2 sheet: solid through the middle with a smooth, slowly wandering edge, as blood lies on the ground.
+    private static float PoolPixels(float u, float v)
+    {
+        float x = (u + 1f) * 0.5f * 2f, y = (v + 1f) * 0.5f * 2f;
+        int tile = (int)Mathf.Min(x, 1.999f) + (int)Mathf.Min(y, 1.999f) * 2;
+        float tu = (x - Mathf.Floor(Mathf.Min(x, 1.999f))) * 2f - 1f, tv = (y - Mathf.Floor(Mathf.Min(y, 1.999f))) * 2f - 1f;
+        float seed = 23.7f + tile * 41.3f;
+        float d = Mathf.Sqrt(tu * tu + tv * tv);
+        float angle = Mathf.Atan2(tv, tu);
+        float edge = 0.5f + Mathf.PerlinNoise(Mathf.Cos(angle) * 1.4f + seed, Mathf.Sin(angle) * 1.4f + seed) * 0.32f
+                     + Mathf.PerlinNoise(Mathf.Cos(angle) * 3.6f + seed, Mathf.Sin(angle) * 3.6f + seed * 2f) * 0.1f;
+        float body = Mathf.Clamp01((edge - d) * 22f);
+        // Thicker toward the middle, thinner where it has only just reached.
+        return body * Mathf.Lerp(0.82f, 1f, Mathf.Clamp01((edge - d) * 3f)) * Mathf.Clamp01((1f - d) * 10f);
+    }
+
+    private static float FocusRingPixels(float u, float v)
+    {
+        float d = Mathf.Sqrt(u * u + v * v);
+        float angle = Mathf.Atan2(v, u);
+        // A broken ring: four arcs, soft inside so it sits on the ground rather than floating over it.
+        float arcs = Mathf.Clamp01((Mathf.Abs(Mathf.Sin(angle * 2f)) - 0.18f) * 8f);
+        float band = Mathf.Clamp01(1f - Mathf.Abs(d - 0.86f) / 0.09f);
+        float glow = Mathf.Clamp01(1f - Mathf.Abs(d - 0.8f) / 0.28f) * 0.18f;
+        return (band * arcs + glow) * (d < 1f ? 1f : 0f);
     }
 
     /// <summary>Hit effects of a weapon's own, set where the weapon has none: fists land with a soft flash, a quick shock
@@ -308,9 +525,8 @@ public static class CombatEffectsBuilder
         return material;
     }
 
-    private static Texture2D Texture(string name, System.Func<float, float, float> alpha)
+    private static Texture2D Texture(string name, System.Func<float, float, float> alpha, int size = 64)
     {
-        const int size = 64;
         string path = $"{ArtFolder}/Combat {name}.png";
         var texture = new Texture2D(size, size, TextureFormat.RGBA32, false);
         var pixels = new Color32[size * size];

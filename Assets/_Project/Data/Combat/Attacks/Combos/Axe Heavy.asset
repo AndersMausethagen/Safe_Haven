@@ -25,13 +25,18 @@ MonoBehaviour:
   hitDelay: 0.66666687
   recoveryTime: 1.2166669
   poiseDamage: 50
+  impact: 1.5
   lunge: 0.45
   staminaCost: -1
-  animationState: Sword Heavy
-  animationSpeed: 0.6
-  followThroughSpeed: 1
+  appliesStatus: {fileID: 0}
+  statusChance: 1
+  animationState: 2H Overhead
+  animationSpeed: 0.46857136
+  strikeSpeed: 1.8
+  strikeLead: 0.083333336
+  followThroughSpeed: 1.290919
   swingSound: {fileID: 0}
   hitSound: {fileID: 0}
   slashColor: {r: 1, g: 0.55, b: 0.25, a: 0.95}
-  slashSweep: 0
-  slashTilt: 24.00475
+  slashSweep: 1
+  slashTilt: 10.367406

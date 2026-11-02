@@ -37,6 +37,8 @@ MonoBehaviour:
   unlocksRecipes: []
   animatorController: {fileID: 9100000, guid: 51388376d31e4294bb24b0004412608d, type: 2}
   prefab: {fileID: 1361258407523271697, guid: 280a30c33cf4c3444a326b93e937de36, type: 3}
+  experience: 0
+  neverElite: 0
   attack: {fileID: 11400000, guid: ea84f5e69338fbd449215ef3ad11f3c3, type: 2}
   attackDamage: 14
   attackCooldown: 1.1
@@ -58,6 +60,13 @@ MonoBehaviour:
   defensiveRadius: 8
   hoverHeight: 0
   poise: 0
+  openWhileStriking: 0
+  parriesBackstabs: 0
+  shieldArc: 0
+  shieldLetsThrough: 0.25
+  bleeds: 1
+  bloodColor: {r: 0.32, g: 0.015, b: 0.02, a: 0.95}
+  ragdollOnDeath: 1
   deathSound: {fileID: 0}
   hurtSound: {fileID: 0}
   attackSound: {fileID: 0}

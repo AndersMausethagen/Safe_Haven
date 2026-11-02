@@ -25,11 +25,18 @@ MonoBehaviour:
   hitDelay: 0.3
   recoveryTime: 0.6
   poiseDamage: 8
+  impact: 0.7
   lunge: 0
   staminaCost: 4
+  appliesStatus: {fileID: 0}
+  statusChance: 1
   animationState: 
   animationSpeed: 1
+  strikeSpeed: 1
+  strikeLead: 0
   followThroughSpeed: 1
   swingSound: {fileID: 0}
   hitSound: {fileID: 11400000, guid: e152a28919b1d86439cf0f9a67a56b76, type: 2}
   slashColor: {r: 1, g: 0.95, b: 0.85, a: 0.8}
+  slashSweep: 1
+  slashTilt: 0

@@ -1,0 +1,3 @@
+Stems for Tools/Audio/combat.py, decoded from the clips in Assets/_Project/Audio/SFX:
+impact*, knifeSlice*, chop: Kenney (www.kenney.nl), Creative Commons Zero (CC0).
+sfx100v2_*: "100 CC0 SFX 2" from OpenGameArt, Creative Commons Zero (CC0).

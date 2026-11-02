@@ -39,6 +39,18 @@ public sealed class WeaponDefinition : ScriptableObject
     [Tooltip("The swing a ready counter (after a parry or perfect dodge) performs. Empty: the next chain swing, as a counter.")]
     [SerializeField] private AttackDefinition counterAttack;
 
+    [Tooltip("The quick lunge an attack becomes out of a dodge or on the run. Empty: those are ordinary swings.")]
+    [SerializeField] private AttackDefinition rushAttack;
+    [Tooltip("Two-handed weapons: metres along the handle from the right hand to the left.")]
+    [SerializeField, Min(0.05f)] private float secondHandDistance = 0.24f;
+
+    [Header("Weapon art")]
+    [Tooltip("The special attack this weapon knows: paid for with Focus, not stamina (middle mouse, or attack while guarding " +
+             "without a shield). Empty: none.")]
+    [SerializeField] private AttackDefinition weaponArt;
+    [Tooltip("Focus the weapon art costs.")]
+    [SerializeField, Min(0f)] private float weaponArtFocus = 30f;
+
     [Header("Guard")]
     [Tooltip("Share of a blocked hit that still gets through with this weapon (a shield blocks better).")]
     [SerializeField, Range(0f, 1f)] private float guardLetThrough = 0.35f;
@@ -67,6 +79,8 @@ public sealed class WeaponDefinition : ScriptableObject
     [Tooltip("Damage type, power scaling, crit and poise of a shot. Its damage comes from the arrow.")]
     [SerializeField] private AttackDefinition shotAttack;
     [SerializeField] private SoundDefinition drawSound;
+    [Tooltip("Plays as the draw comes full: the perfect release window has opened.")]
+    [SerializeField] private SoundDefinition fullDrawSound;
 
     [Header("Sound and Effects")]
     [SerializeField] private SoundDefinition swingSound;
@@ -94,6 +108,7 @@ public sealed class WeaponDefinition : ScriptableObject
     public float CounterShotDamage => counterShotDamage;
     public AttackDefinition ShotAttack => shotAttack;
     public SoundDefinition DrawSound => drawSound;
+    public SoundDefinition FullDrawSound => fullDrawSound;
     public bool RequiresBothHands => stance == WeaponStance.TwoHanded || stance == WeaponStance.Polearm || stance == WeaponStance.Bow;
     public bool CanUseOffHand => (kind == WeaponKind.Torch || kind == WeaponKind.Shield) && !RequiresBothHands;
     public bool IsShield => kind == WeaponKind.Shield;
@@ -101,6 +116,10 @@ public sealed class WeaponDefinition : ScriptableObject
     public AttackDefinition BasicAttack => basicAttack;
     public AttackDefinition HeavyAttack => heavyAttack;
     public AttackDefinition CounterAttack => counterAttack;
+    public AttackDefinition RushAttack => rushAttack;
+    public float SecondHandDistance => secondHandDistance;
+    public AttackDefinition WeaponArt => weaponArt;
+    public float WeaponArtFocus => weaponArtFocus;
     public float GuardLetThrough => guardLetThrough;
     public SoundDefinition SwingSound => swingSound;
     public SoundDefinition HitSound => hitSound;
@@ -122,6 +141,13 @@ public sealed class WeaponDefinition : ScriptableObject
     }
 
     public IReadOnlyList<AttackDefinition> Combo => combo;
+
+    /// <summary>Sets the weapon art (editor setup and tests).</summary>
+    public void ConfigureArt(AttackDefinition art, float focus)
+    {
+        weaponArt = art;
+        weaponArtFocus = focus;
+    }
 
     /// <summary>Sets the chain and heavy attack (editor setup and tests).</summary>
     public void ConfigureAttacks(List<AttackDefinition> chain, AttackDefinition heavy, AttackDefinition counter)

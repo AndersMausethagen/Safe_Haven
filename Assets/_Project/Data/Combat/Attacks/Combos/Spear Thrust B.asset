@@ -22,13 +22,18 @@ MonoBehaviour:
   range: 3.2
   arc: 40
   maxTargets: 2
-  hitDelay: 0.42592606
-  recoveryTime: 0.77592605
+  hitDelay: 0.4444446
+  recoveryTime: 0.79444456
   poiseDamage: 10
+  impact: 0.9
   lunge: 0.6
   staminaCost: -1
+  appliesStatus: {fileID: 0}
+  statusChance: 1
   animationState: Attack Polearm
-  animationSpeed: 0.9
+  animationSpeed: 0.82058823
+  strikeSpeed: 1.35
+  strikeLead: 0.06666667
   followThroughSpeed: 1
   swingSound: {fileID: 0}
   hitSound: {fileID: 0}

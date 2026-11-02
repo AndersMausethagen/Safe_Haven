@@ -81,6 +81,9 @@ MonoBehaviour:
   defensiveRadius: 8
   hoverHeight: 0
   poise: 10
+  bleeds: 1
+  bloodColor: {r: 0.16, g: 0.2, b: 0.05, a: 0.95}
+  ragdollOnDeath: 1
   deathSound: {fileID: 0}
   hurtSound: {fileID: 0}
   attackSound: {fileID: 0}

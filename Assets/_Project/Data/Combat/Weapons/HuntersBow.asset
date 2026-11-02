@@ -20,6 +20,10 @@ MonoBehaviour:
   combo: []
   heavyAttack: {fileID: 0}
   counterAttack: {fileID: 0}
+  rushAttack: {fileID: 0}
+  secondHandDistance: 0.24
+  weaponArt: {fileID: 0}
+  weaponArtFocus: 30
   guardLetThrough: 0.6
   drawSeconds: 0.85
   reloadSeconds: 0.5
@@ -33,5 +37,7 @@ MonoBehaviour:
   counterShotDamage: 0.6
   shotAttack: {fileID: 11400000, guid: ce3c793cb6a27644ea3474e6fe877fd9, type: 2}
   drawSound: {fileID: 0}
+  fullDrawSound: {fileID: 11400000, guid: 290b844870bb0a744bce8f5e40f2e1c8, type: 2}
   swingSound: {fileID: 11400000, guid: e3702f94155b6bc42b71a0d0872c141d, type: 2}
-  hitSound: {fileID: 0}
+  hitSound: {fileID: 11400000, guid: cd11aa3a19c156848aeeb768f7bf8023, type: 2}
+  hitEffect: {fileID: 0}

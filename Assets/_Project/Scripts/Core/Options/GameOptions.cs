@@ -14,8 +14,12 @@ public static class GameOptions
     public static readonly GameOption AutoGather = GameOption.Toggle("AutoGather", "Auto-Gather",
         "Tools swing by themselves instead of the timing bar. No critical swings, but no glancing blows.", false);
     public static readonly GameOption ToggleSneak = GameOption.Toggle("ToggleSneak", "Toggle Sneak", "Press once to sneak and again to stop, instead of holding the key.", false);
+    public static readonly GameOption FocusTarget = GameOption.Toggle("FocusTarget", "Focus on Enemy",
+        "In a melee fight you face the enemy you are fighting and your swings follow it. Off, you always face the cursor.", true);
+    public static readonly GameOption PoiseBars = GameOption.Toggle("PoiseBars", "Poise Bars", "A thin bar under an enemy's health: when it runs out, the enemy staggers.", true);
+    public static readonly GameOption Blood = GameOption.Toggle("Blood", "Blood", "Blood from blows, and the stains it leaves.", true);
 
-    public static readonly IReadOnlyList<GameOption> Gameplay = new[] { DamageNumbers, AutoGather, ToggleSneak };
+    public static readonly IReadOnlyList<GameOption> Gameplay = new[] { DamageNumbers, AutoGather, ToggleSneak, FocusTarget, PoiseBars, Blood };
 
     // ----- Graphics: picture -----
 

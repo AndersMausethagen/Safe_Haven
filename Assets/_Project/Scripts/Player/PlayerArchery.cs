@@ -361,7 +361,9 @@ public sealed class PlayerArchery : MonoBehaviour
         }
 
         State = Phase.Drawing;
-        drawStartedAt = Time.time;
+        // Coming out of a dodge the arrow is already part of the way up: rolling into a shot is how an archer fights.
+        bool outOfDodge = dodge != null && dodge.JustDodged(CombatTechniqueSettings.Current.RushAfterDodgeSeconds);
+        drawStartedAt = Time.time - (outOfDodge ? DrawTime(bow) * CombatTechniqueSettings.Current.DrawAfterDodge : 0f);
         fullDrawAnnounced = false;
         if (combat != null)
         {

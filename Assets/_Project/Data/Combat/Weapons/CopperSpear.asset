@@ -23,6 +23,10 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 50b93447d7d0fae4fb24833b43b4f2d4, type: 2}
   heavyAttack: {fileID: 11400000, guid: 9941ba148405a124d89edd31f0a36564, type: 2}
   counterAttack: {fileID: 0}
+  rushAttack: {fileID: 11400000, guid: 4f6f80fd67a166342abbcaa8e128466a, type: 2}
+  secondHandDistance: 0.45
+  weaponArt: {fileID: 11400000, guid: 1f3c95b1382243441a87d964b6a28d43, type: 2}
+  weaponArtFocus: 30
   guardLetThrough: 0.4
   drawSeconds: 1
   reloadSeconds: 0.6
@@ -36,6 +40,7 @@ MonoBehaviour:
   counterShotDamage: 0.6
   shotAttack: {fileID: 0}
   drawSound: {fileID: 0}
+  fullDrawSound: {fileID: 0}
   swingSound: {fileID: 0}
-  hitSound: {fileID: 0}
+  hitSound: {fileID: 11400000, guid: cd11aa3a19c156848aeeb768f7bf8023, type: 2}
   hitEffect: {fileID: 0}

@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::CheatSettings
   inReleaseBuilds: 1
   creatures:
+  - {fileID: 11400000, guid: 6831da450ee487246b0f7f72b7e0272f, type: 2}
   - {fileID: 11400000, guid: e646ff37405b36e43a4fa710a23060e2, type: 2}
   - {fileID: 11400000, guid: 780dd3de177d4ca41b12a65f95fa709b, type: 2}
   - {fileID: 11400000, guid: 18c8362f09cf64a468e9ae4ae6d4422b, type: 2}

@@ -16,12 +16,16 @@ MonoBehaviour:
   stance: 2
   kind: 0
   damage: 40
-  basicAttack: {fileID: 11400000, guid: 67e0694526eb1a84f99f28f0ddcd76db, type: 2}
+  basicAttack: {fileID: 11400000, guid: 1b77eb34ce9a9d046872d336c401e61b, type: 2}
   combo:
-  - {fileID: 11400000, guid: 67e0694526eb1a84f99f28f0ddcd76db, type: 2}
-  - {fileID: 11400000, guid: 5194566a9a4ce58459aa7b2ec6105d10, type: 2}
+  - {fileID: 11400000, guid: 1b77eb34ce9a9d046872d336c401e61b, type: 2}
+  - {fileID: 11400000, guid: 9e02ace2e97fd3f478bf6f510fbb30ae, type: 2}
   heavyAttack: {fileID: 11400000, guid: 8b601bffdeba5cd459307f6bf4231fbb, type: 2}
   counterAttack: {fileID: 0}
+  rushAttack: {fileID: 11400000, guid: 1101a366a500355439a81bb13a3b0f6c, type: 2}
+  secondHandDistance: 0.34
+  weaponArt: {fileID: 11400000, guid: 906d6736688abce4aae52f5bd7fa40ad, type: 2}
+  weaponArtFocus: 40
   guardLetThrough: 0.4
   drawSeconds: 1
   reloadSeconds: 0.6
@@ -36,5 +40,5 @@ MonoBehaviour:
   shotAttack: {fileID: 0}
   drawSound: {fileID: 0}
   swingSound: {fileID: 11400000, guid: 51662adc6a4b3a3438d04910bf5892fc, type: 2}
-  hitSound: {fileID: 11400000, guid: 8c50981295a2e3344b69d44400417b5c, type: 2}
+  hitSound: {fileID: 11400000, guid: d35929fdaefdd164d8047ffebb5d331d, type: 2}
   hitEffect: {fileID: 0}

@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0de871765cd6fce4c8fed103ef0082e3, type: 3}
+  m_Name: Gore Splash
+  m_EditorClassIdentifier: SafeHaven::SoundDefinition
+  displayName: Gore Splash
+  clips:
+  - {fileID: 8300000, guid: 327ea95c0016e694f82aee2ee7a75e0c, type: 3}
+  channel: 2
+  volume: 0.6
+  volumeVariation: 0.1
+  pitchRange: {x: 0.92, y: 1.08}
+  positional: 1
+  fullVolumeDistance: 3
+  audibleDistance: 35
+  maxAtOnce: 3
+  minimumGap: 0.03
+  priority: 1

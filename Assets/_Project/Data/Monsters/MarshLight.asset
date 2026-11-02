@@ -33,6 +33,7 @@ MonoBehaviour:
   animatorController: {fileID: 0}
   prefab: {fileID: 5318185529198269020, guid: d281dc652b3e50445a465365ff40b433, type: 3}
   experience: 0
+  neverElite: 0
   attack: {fileID: 11400000, guid: 1a8ce5e4a858b50499cd9b8a27946517, type: 2}
   attackDamage: 8
   attackCooldown: 0.6
@@ -106,6 +107,9 @@ MonoBehaviour:
   defensiveRadius: 8
   hoverHeight: 1.1
   poise: 15
+  bleeds: 0
+  bloodColor: {r: 0, g: 0, b: 0, a: 0}
+  ragdollOnDeath: 0
   deathSound: {fileID: 0}
   hurtSound: {fileID: 0}
   attackSound: {fileID: 0}

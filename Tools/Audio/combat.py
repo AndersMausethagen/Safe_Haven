@@ -1,7 +1,8 @@
 """Synthesises the sounds of a fight: blades through the air, into bodies and against each other.
 
-A blow is a chest-deep thump, the short crack of contact and the wet of what gave way, so its weight carries the attack's
-weight and a critical is more of the same rather than a louder sting. A parry has to cut through a brawl, so it stays the
+A blow into a body is mixed from recordings (Tools/Audio/Recorded, CC0: Kenney's punches and knife, OpenGameArt's hits and wet steps) because
+synthesis never sounded like flesh: a real thump, a real blade and a real squelch, their attacks lined up, varied in every variant. A critical is
+more of the same rather than a louder sting. The rest is synthesised. A parry has to cut through a brawl, so it stays the
 brightest thing here: two iron edges, sharp contact, long dark ring, a scrape as they slide apart. Hits vary in every
 variant, since these are the sounds a player hears thousands of times.
 
@@ -78,28 +79,92 @@ def perfect_dodge(rng):
     return space(np.stack([mix * (1.2 - 0.4 * pan), mix * (0.8 + 0.4 * pan)], axis=1), FOREST, 0.5)
 
 
+def recording(name, rng, pitch=(0.92, 1.08), seconds=None):
+    """A recorded stem from Tools/Audio/Recorded (Kenney and OpenGameArt, CC0): at full level, its attack at the very start,
+    pitched a little differently each time and, if asked, cut short with a quick fade."""
+    rate, data = wavfile.read(os.path.join(os.path.dirname(__file__), "Recorded", name + ".wav"))
+    signal = data.astype(np.float64) / 32768
+    signal = signal[max(0, np.argmax(np.abs(signal) > np.abs(signal).max() * 0.1) - 16):]
+    step = rate / RATE * rng.uniform(*pitch)
+    signal = np.interp(np.arange(0, len(signal) - 1, step), np.arange(len(signal)), signal)
+    if seconds is not None:
+        signal = signal[:int(seconds * RATE)]
+        fade = min(len(signal) // 2, int(0.04 * RATE))
+        signal[-fade:] *= np.linspace(1, 0, fade) ** 2
+    return signal / max(1e-9, np.abs(signal).max())
+
+
+def one_of(rng, *names):
+    return names[rng.integers(len(names))]
+
+
+def thud(rng, heavy=False):
+    """The body taking the blow."""
+    size = "heavy" if heavy else "medium"
+    return recording(f"impactPunch_{size}_00{rng.integers(5)}", rng)
+
+
+def meat(rng):
+    """The flesh of it, with some mid-range for it to sit in."""
+    return recording(one_of(rng, "sfx100v2_hit_01", "sfx100v2_hit_02"), rng)
+
+
+def wet(rng, seconds=0.2):
+    """What gives way: a real squelch, cut short."""
+    return recording(f"sfx100v2_footstep_wet_0{rng.integers(1, 4)}", rng, (0.8, 1.05), seconds)
+
+
+def blade(rng, seconds=0.14, pitch=(0.9, 1.1)):
+    """Steel going through: the first moments of a knife's slice."""
+    return recording(one_of(rng, "knifeSlice", "knifeSlice2"), rng, pitch, seconds)
+
+
+def tick(rng):
+    """The steel itself, barely there: a blade doesn't ring once it is buried in something soft."""
+    return lowpass(recording(f"impactMetal_light_00{rng.integers(5)}", rng, (0.9, 1.1), 0.07), 5000)
+
+
+def layers(seconds, *parts):
+    """Each part as (sound, level, milliseconds after the contact). The small delays make it a blow rather than a stack of samples."""
+    mix = blank(seconds)
+    for sound, level, later in parts:
+        mix = place(mix, sound, later / 1000, level)
+    return mix
+
+
+def finish(mix, amount=1.5):
+    """Holds it together and takes the peak off, so the weight still reads under the attack's transient."""
+    return drive(mix / max(1e-9, np.abs(mix).max()), amount)
+
+
 def hit(rng):
-    return darken(drive(flesh(rng) + bite_of_blade(rng) * 0.3 + strike(wood(rng.uniform(600, 900), rng, damp=0.02), 0.5, 0.0007, rng) * 0.3, 1.9))
+    """A blade into a body: the steel touches, it slices, the flesh takes the weight, the wet follows."""
+    return finish(layers(0.5, (blade(rng), 0.42, 0), (tick(rng), 0.05, 0), (thud(rng), 0.85, 3), (meat(rng), 0.5, 2), (wet(rng), 0.5, 12)))
 
 
 def critical_hit(rng):
-    seconds = 0.8
-    crack = strike(wood(rng.uniform(380, 520), rng, damp=0.035, count=16), seconds, 0.0006, rng)
-    edge = strike(iron(rng.uniform(1300, 1700), rng, hold=0.16), seconds, 0.0004, rng) * 0.1
-    sub = thump(rng, seconds, 42, 120, 0.2, sweep_tau=0.05) * 0.6
-    return darken(drive(flesh(rng, 1.5, 1.2, seconds) + crack * 0.7 + edge + sub + bite_of_blade(rng, seconds) * 0.4, 2.2), weight=2)
+    """The same, deeper and harder, with something breaking."""
+    return finish(layers(0.8, (blade(rng, 0.2, (0.8, 0.95)), 0.55, 0), (tick(rng), 0.06, 0), (thud(rng, True), 0.7, 2), (recording("chop", rng, (0.8, 0.95)), 0.6, 6),
+                         (meat(rng), 0.8, 3), (wet(rng, 0.3), 0.7, 14)), 1.8)
 
 
 def axe_hit(rng):
-    seconds = 0.6
-    chop = strike(wood(rng.uniform(190, 270), rng, damp=0.07), seconds, 0.0012, rng)
-    return darken(drive(flesh(rng, 1.25, 0.9, seconds) + chop * 0.9 + bite_of_blade(rng, seconds) * 0.2, 1.8), weight=2)
+    """A heavy edge biting deep: more of the body and the bite than of the blade."""
+    return finish(layers(0.6, (recording("chop", rng, (0.72, 0.92)), 0.85, 0), (thud(rng, True), 0.65, 2), (meat(rng), 0.8, 3), (blade(rng, 0.09, (0.7, 0.85)), 0.25, 0), (wet(rng, 0.26), 0.6, 16)), 1.7)
+
+
+def stab_hit(rng):
+    """A point going in: quick and narrow, little weight, and a lot of wet."""
+    return finish(layers(0.4, (blade(rng, 0.09, (1, 1.2)), 0.42, 0), (recording("sfx100v2_hit_03", rng), 0.28, 1), (thud(rng), 0.55, 3), (wet(rng, 0.26), 0.75, 8)))
+
+
+def blunt_hit(rng):
+    """A hammer or a club: no edge to it at all, all weight."""
+    return finish(layers(0.7, (thud(rng, True), 0.7, 0), (recording(f"impactSoft_heavy_00{rng.integers(5)}", rng), 0.4, 0), (meat(rng), 1, 1), (recording("chop", rng, (0.55, 0.7)), 0.3, 2), (wet(rng, 0.18), 0.35, 14)), 1.8)
 
 
 def punch_hit(rng):
-    t = times(0.4)
-    slap = band(pink(len(t), rng), 500, 2500) * decay(t, 0.012) * 0.8
-    return darken(drive(flesh(rng, 0.85, 0.2, 0.4) + slap, 2.0), weight=2)
+    return finish(layers(0.4, (thud(rng), 1, 0), (meat(rng), 0.45, 1), (wet(rng, 0.1), 0.12, 8)))
 
 
 def glancing_blow(rng):
@@ -173,7 +238,7 @@ def land(rng):
 SOUNDS = [
     ("Swing", swing, 4, True), ("Heavy Swing", heavy_swing, 3, True), ("Axe Swing", axe_swing, 3, True), ("Punch Swing", punch_swing, 4, True),
     ("Dodge", dodge, 4, True), ("Perfect Dodge", perfect_dodge, 2, False),
-    ("Hit", hit, 8, True), ("Critical Hit", critical_hit, 5, True), ("Axe Hit", axe_hit, 5, True), ("Punch Hit", punch_hit, 5, True), ("Glancing Blow", glancing_blow, 4, True),
+    ("Hit", hit, 8, True), ("Critical Hit", critical_hit, 5, True), ("Axe Hit", axe_hit, 5, True), ("Stab Hit", stab_hit, 5, True), ("Blunt Hit", blunt_hit, 5, True), ("Punch Hit", punch_hit, 5, True), ("Glancing Blow", glancing_blow, 4, True),
     ("Block", block, 5, True), ("Parry", parry, 5, True), ("Guard Break", guard_break, 4, True), ("Stagger", stagger, 4, True),
     ("Player Hurt", player_hurt, 6, False), ("Land", land, 4, True),
 ]

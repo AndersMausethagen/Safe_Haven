@@ -50,6 +50,13 @@ public sealed class PlayerAnimationController : MonoBehaviour
     private static readonly int GuardBreakStateHash = Animator.StringToHash("Guard Break");
     private static readonly int KnockbackStateHash = Animator.StringToHash("Knockback");
     private const float ActionFade = 0.06f;
+    // A heavy swing grows out of the light one its press began, so that blend is long enough not to read as a restart.
+    private const float HeavyFade = 0.16f;
+    // Out of a dodge the body is already moving, so a rush attack needn't snap into its first frame.
+    private const float RushFade = 0.1f;
+    // How long before it lands a planted heavy swing brings the legs in, and how fast.
+    private const float PlantedStrikeLead = 0.12f;
+    private const float PlantedStrikeFade = 0.07f;
     // Moving faster than this, a swing belongs on the arms only, so the legs can walk.
     private const float ArmsOnlySpeed = 0.5f;
     private const float WalkOutFade = 0.12f;
@@ -117,6 +124,9 @@ public sealed class PlayerAnimationController : MonoBehaviour
     private float lastYaw;
     // Starts at 1 so the first attack uses index 0.
     private int attackIndex = 1;
+    private float swingSpeed = 1f;
+    // The heavy swing winding up on the upper body, by state; 0 when none is.
+    private int plantedSwing;
 
     public WeaponStance WeaponStance
     {
@@ -300,7 +310,68 @@ public sealed class PlayerAnimationController : MonoBehaviour
         UpdateLocomotion(deltaTime);
         UpdateTurn(deltaTime);
         UpdateAirborne(deltaTime);
+        UpdateSwingSpeed();
         WalkOutOfSwing();
+    }
+
+    // A swing's shape: a slow build-up, a fast strike, and it stands at the top of its wind-up while a heavy swing charges.
+    private void UpdateSwingSpeed()
+    {
+        if (combat == null || !combat.IsWindingUp)
+        {
+            ReleasePlantedSwing();
+            return;
+        }
+
+        AttackDefinition attack = combat.ActiveAttack;
+        if (attack == null || string.IsNullOrEmpty(attack.AnimationState))
+        {
+            return;
+        }
+
+        float speed = combat.IsCharging ? 0f : combat.TimeToHit <= attack.StrikeLead ? attack.StrikeSpeed : attack.AnimationSpeed;
+        SetFloat(ActionSpeedHash, speed * swingSpeed);
+        if (plantedSwing != 0 && !combat.IsCharging && combat.TimeToHit <= Mathf.Max(attack.StrikeLead, PlantedStrikeLead))
+        {
+            StrikeWithWholeBody();
+        }
+    }
+
+    // A heavy swing winds up and charges on the upper body, with the feet planted on the ground: its clip may stride or leap, and
+    // holding a pose like that for as long as the button is held leaves the player hanging in the air. The legs join in for the strike.
+    private void StrikeWithWholeBody()
+    {
+        int upper = upperBodyLayer;
+        AnimatorStateInfo state = animator.IsInTransition(upper) && animator.GetNextAnimatorStateInfo(upper).shortNameHash == plantedSwing
+            ? animator.GetNextAnimatorStateInfo(upper) : animator.GetCurrentAnimatorStateInfo(upper);
+        AnimatorClipInfo[] clips = animator.IsInTransition(upper) ? animator.GetNextAnimatorClipInfo(upper) : animator.GetCurrentAnimatorClipInfo(upper);
+        float clipTime = clips.Length > 0 ? state.normalizedTime * clips[0].clip.length : 0f;
+        if (fullBodyLayer >= 0 && animator.HasState(fullBodyLayer, plantedSwing))
+        {
+            animator.CrossFadeInFixedTime(plantedSwing, PlantedStrikeFade, fullBodyLayer, clipTime);
+            animator.CrossFadeInFixedTime(EmptyStateHash, PlantedStrikeFade, upper);
+        }
+
+        plantedSwing = 0;
+    }
+
+    // A heavy swing lost before it struck (a flinch): the arms mustn't stay standing at the top of its wind-up.
+    private void ReleasePlantedSwing()
+    {
+        if (plantedSwing == 0)
+        {
+            return;
+        }
+
+        plantedSwing = 0;
+        if (dodge == null || !dodge.IsDodging)
+        {
+            SetFloat(ActionSpeedHash, 1f);
+            if (animator.GetCurrentAnimatorStateInfo(upperBodyLayer).shortNameHash != KnockbackStateHash)
+            {
+                animator.CrossFadeInFixedTime(EmptyStateHash, HeavyFade, upperBodyLayer);
+            }
+        }
     }
 
     // A blow that has landed gives the legs back: when the player walks off, the arms finish the swing over them from
@@ -373,6 +444,13 @@ public sealed class PlayerAnimationController : MonoBehaviour
         bool onTheRun = CombatTechniqueSettings.Current.WindupMoveSpeed > 0f && movement.HorizontalSpeed > ArmsOnlySpeed;
         int layer = onTheRun && attackArmsLayer >= 0 ? attackArmsLayer : standing;
         int hash = string.IsNullOrEmpty(stateName) ? 0 : Animator.StringToHash(stateName);
+        plantedSwing = 0;
+        if (swing.Kind == SwingKind.Heavy && hash != 0 && upperBodyLayer >= 0 && animator.HasState(upperBodyLayer, hash))
+        {
+            layer = upperBodyLayer;
+            plantedSwing = hash;
+        }
+
         if (hash == 0 || layer < 0 || !animator.HasState(layer, hash))
         {
             if (swing.Kind == SwingKind.ShieldBash)
@@ -387,13 +465,15 @@ public sealed class PlayerAnimationController : MonoBehaviour
             return;
         }
 
+        swingSpeed = swing.Speed;
         SetFloat(ActionSpeedHash, swing.Attack.AnimationSpeed * swing.Speed);
-        animator.CrossFadeInFixedTime(hash, ActionFade, layer, 0f);
+        float fade = swing.Kind == SwingKind.Heavy ? HeavyFade : swing.Kind == SwingKind.Rush ? RushFade : ActionFade;
+        animator.CrossFadeInFixedTime(hash, fade, layer, 0f);
         foreach (int other in new[] { upperBodyLayer, attackArmsLayer, fullBodyLayer })
         {
             if (other >= 0 && other != layer && animator.HasState(other, EmptyStateHash))
             {
-                animator.CrossFadeInFixedTime(EmptyStateHash, ActionFade, other);
+                animator.CrossFadeInFixedTime(EmptyStateHash, fade, other);
             }
         }
     }
@@ -436,7 +516,7 @@ public sealed class PlayerAnimationController : MonoBehaviour
             return;
         }
 
-        SetFloat(ActionSpeedHash, shape.animationSpeed);
+        SetFloat(ActionSpeedHash, shape.animationSpeed * (dodge != null ? dodge.AnimationPace : 1f));
         animator.CrossFadeInFixedTime(hash, 0.04f, fullBodyLayer, 0f);
         foreach (int other in new[] { upperBodyLayer, attackArmsLayer })
         {

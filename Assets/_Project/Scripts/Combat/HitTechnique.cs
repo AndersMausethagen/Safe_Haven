@@ -13,4 +13,8 @@ public enum HitTechnique
     ShieldBash = 16,
     /// <summary>A tick of damage over time (burning, poison): no hit stop, shake, sparks, flinch, guard or dodge.</summary>
     OverTime = 32,
+    /// <summary>Struck from behind while the target staggers or is in the middle of a strike.</summary>
+    Backstab = 64,
+    /// <summary>A weapon art, paid for with Focus.</summary>
+    WeaponArt = 128,
 }

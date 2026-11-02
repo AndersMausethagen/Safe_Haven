@@ -159,6 +159,13 @@ MonoBehaviour:
   defensiveRadius: 8
   hoverHeight: 0
   poise: 450
+  openWhileStriking: 0
+  parriesBackstabs: 0
+  shieldArc: 0
+  shieldLetsThrough: 0.25
+  bleeds: 1
+  bloodColor: {r: 0.32, g: 0.015, b: 0.02, a: 0.95}
+  ragdollOnDeath: 1
   deathSound: {fileID: 0}
   hurtSound: {fileID: 0}
   attackSound: {fileID: 0}

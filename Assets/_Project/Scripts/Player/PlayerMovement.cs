@@ -27,6 +27,8 @@ public sealed class PlayerMovement : MonoBehaviour
     private Vector3 movementInput;
     private Vector3 aimDirection;
     private bool hasAimDirection;
+    private Vector3 focusDirection;
+    private bool hasFocus;
     private Vector3 horizontalVelocity;
     private Vector3 dashVelocity;
     private float dashUntil = -1f;
@@ -67,19 +69,36 @@ public sealed class PlayerMovement : MonoBehaviour
     /// <summary>Analog magnitude (0-1) of the requested movement, before any gating.</summary>
     public float InputMagnitude => movementInput.magnitude;
 
-    /// <summary>The horizontal direction toward the aim point (the cursor), or the way the character faces when there is none.</summary>
+    /// <summary>The way the cursor or crosshair points, whatever the focus says; the way the character faces when there is none.</summary>
+    public Vector3 RawAimDirection => hasAimDirection ? aimDirection : FacingDirection;
+
+    private Vector3 FacingDirection
+    {
+        get
+        {
+            Vector3 forward = transform.forward;
+            forward.y = 0f;
+            return forward.sqrMagnitude > 0.0001f ? forward.normalized : Vector3.forward;
+        }
+    }
+
+    /// <summary>The horizontal direction the character means to act in: toward the enemy it is focused on (PlayerFocusTarget), else
+    /// toward the aim point (the cursor), or the way it faces when there is none.</summary>
     public Vector3 AimDirection
     {
         get
         {
+            if (hasFocus)
+            {
+                return focusDirection;
+            }
+
             if (hasAimDirection)
             {
                 return aimDirection;
             }
 
-            Vector3 forward = transform.forward;
-            forward.y = 0f;
-            return forward.sqrMagnitude > 0.0001f ? forward.normalized : Vector3.forward;
+            return FacingDirection;
         }
     }
 
@@ -119,6 +138,7 @@ public sealed class PlayerMovement : MonoBehaviour
 
         horizontalVelocity = Vector3.zero;
         hasAimDirection = false;
+        hasFocus = false;
         dashUntil = -1f;
         lungeUntil = -1f;
         speedScales.Clear();
@@ -162,6 +182,20 @@ public sealed class PlayerMovement : MonoBehaviour
         dashVelocity = velocity;
         dashUntil = Time.time + duration;
         transform.rotation = Quaternion.LookRotation(velocity.normalized, Vector3.up);
+    }
+
+    /// <summary>Ends a dash early (an attack cutting the end of a dodge short).</summary>
+    public void EndDash() => dashUntil = -1f;
+
+    /// <summary>Turns a dash in progress (a dodge curving around an enemy), facing the way it now goes.</summary>
+    public void SteerDash(Vector3 velocity)
+    {
+        velocity.y = 0f;
+        if (velocity.sqrMagnitude > 0.0001f)
+        {
+            dashVelocity = velocity;
+            transform.rotation = Quaternion.LookRotation(velocity.normalized, Vector3.up);
+        }
     }
 
     /// <summary>
@@ -255,6 +289,16 @@ public sealed class PlayerMovement : MonoBehaviour
         aimDirection = Vector3.zero;
     }
 
+    /// <summary>Faces and acts toward an enemy rather than the cursor, until cleared (PlayerFocusTarget).</summary>
+    public void SetFocusDirection(Vector3 direction)
+    {
+        direction.y = 0f;
+        hasFocus = direction.sqrMagnitude > 0.0001f;
+        focusDirection = hasFocus ? direction.normalized : Vector3.zero;
+    }
+
+    public void ClearFocusDirection() => hasFocus = false;
+
     public void FaceDirection(Vector3 direction)
     {
         if (!stateMachine.CanMove || FacingLocked)
@@ -304,10 +348,10 @@ public sealed class PlayerMovement : MonoBehaviour
 
         // Cursor-facing states keep aiming at the cursor even while standing still; otherwise (and swimming) face the
         // travel direction.
-        bool facingAim = settings.FacesCursor(currentGameState) && hasAimDirection && !floating;
+        bool facingAim = settings.FacesCursor(currentGameState) && (hasAimDirection || hasFocus) && !floating;
         if (facingAim)
         {
-            FaceDirection(aimDirection);
+            FaceDirection(hasFocus ? focusDirection : aimDirection);
         }
         else if (direction.sqrMagnitude > 0.0001f)
         {

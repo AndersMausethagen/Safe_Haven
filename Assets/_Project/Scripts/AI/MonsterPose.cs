@@ -9,6 +9,7 @@ using UnityEngine;
 public sealed class MonsterPose
 {
     private readonly Transform visual;
+    private readonly Transform home;
     private readonly Vector3 homePosition;
     private readonly Quaternion homeRotation;
     private readonly Vector3 homeScale;
@@ -27,6 +28,7 @@ public sealed class MonsterPose
     public MonsterPose(Transform visual)
     {
         this.visual = visual;
+        home = visual.parent;
         homePosition = visual.localPosition;
         homeRotation = visual.localRotation;
         homeScale = visual.localScale;
@@ -76,6 +78,12 @@ public sealed class MonsterPose
     /// <param name="leap">How high a leaping charge has the body, in metres.</param>
     public void Update(float hoverHeight, bool dead, bool charging, float leap = 0f)
     {
+        // The body has gone to physics (DeathRagdoll).
+        if (visual == null || visual.parent != home)
+        {
+            return;
+        }
+
         float targetHover = hoverHeight <= 0f ? 0f : hoverHeight + Mathf.Sin(Time.time * 3f) * 0.08f;
         hover = Mathf.Lerp(hover, targetHover, Time.deltaTime * 10f);
 

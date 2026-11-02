@@ -9003,6 +9003,15 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 4416926081852918481, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1049563878042439975}
+    - targetCorrespondingSourceObject: {fileID: 4416926081852918481, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3937360401057780179}
+    - targetCorrespondingSourceObject: {fileID: 4416926081852918481, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1003666376663904046}
+    - targetCorrespondingSourceObject: {fileID: 4416926081852918481, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2155323829209363776}
   m_SourcePrefab: {fileID: 100100000, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
 --- !u!1 &5943822763764690748 stripped
 GameObject:
@@ -9567,10 +9576,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: SafeHaven::ArcheryTrajectoryView
   lineMaterial: {fileID: 2100000, guid: f8acc04d258c58546ad41828b8d43aaa, type: 2}
-  color: {r: 1, g: 0.95, b: 0.8, a: 0.35}
-  width: 0.03
-  fadeInFrom: 10
-  fullAt: 18
+  color: {r: 1, g: 0.95, b: 0.8, a: 0.6}
+  perfectColor: {r: 1, g: 0.78, b: 0.32, a: 0.95}
+  landingRadius: 0.4
+  width: 0.045
+  fadeInFrom: 1.5
+  fullAt: 4
 --- !u!114 &3284753492103805021
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9704,7 +9715,6 @@ MonoBehaviour:
     name: 
     gender: 0
     skin: 1
-    face: 0
     hair: 0
     hairColour: 2
     brows: 0
@@ -9745,6 +9755,42 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a11d1d07591a7464c9a73c9df5378337, type: 3}
   m_Name: 
   m_EditorClassIdentifier: SafeHaven::PlayerLook
+--- !u!114 &3937360401057780179
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5943822763764690748}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9de92aa4c509efe4d8275c9f8e0934d1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::PlayerFocusTarget
+--- !u!114 &1003666376663904046
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5943822763764690748}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65f0620487e77154d92cca3315324e7e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::WeaponTrail
+--- !u!114 &2155323829209363776
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5943822763764690748}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80c00f87e39a36d48a94b12c118b26c9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::TwoHandGrip
 --- !u!4 &6428716820787852678 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3893294197879345259, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}

@@ -47,6 +47,103 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
     [Tooltip("Holding attack this long turns the light swing the press started into the heavy attack. Keep it shorter " +
              "than the quickest light swing's Hit Delay (about 0.28 s), or holding gives a light swing and then a heavy one.")]
     [SerializeField, Range(0.1f, 1f)] private float heavyHoldSeconds = 0.22f;
+    [Tooltip("Held on past that, the heavy swing waits at the top of its wind-up and charges, for at most this long; letting go " +
+             "strikes. 0 turns charging off.")]
+    [SerializeField, Min(0f)] private float heavyChargeSeconds = 0.9f;
+    [Tooltip("Damage of a fully charged heavy swing, as a multiplier.")]
+    [SerializeField, Min(1f)] private float heavyChargeDamage = 1.4f;
+    [Tooltip("Poise damage of a fully charged heavy swing, as a multiplier.")]
+    [SerializeField, Min(1f)] private float heavyChargePoise = 1.5f;
+
+    [Header("Rush attack (out of a dodge, or on the run)")]
+    [Tooltip("An attack pressed during a dodge, or this many seconds after it, is the weapon's quick rush attack: it cuts the end of " +
+             "the dodge short once its invulnerability is over.")]
+    [SerializeField, Min(0f)] private float rushAfterDodgeSeconds = 0.3f;
+    [Tooltip("Share of full running speed that counts as running, for how long, and how far the aim may point from the way you run.")]
+    [SerializeField, Range(0.1f, 1f)] private float rushRunShare = 0.7f;
+    [SerializeField, Min(0f)] private float rushRunSeconds = 0.2f;
+    [SerializeField, Range(10f, 180f)] private float rushRunAngle = 70f;
+
+    [Header("Dodging around an enemy (while it is in focus)")]
+    [Tooltip("Steering a dodge toward or past the enemy in focus, within this many metres, curves it around to the spot behind.")]
+    [SerializeField, Min(0f)] private float dodgeAroundRange = 6f;
+    [Tooltip("How much faster a dodge going around is: the way round is longer than the way straight.")]
+    [SerializeField, Min(1f)] private float dodgeAroundSpeed = 1.3f;
+    [Tooltip("At the longest, seconds a dodge going around lasts: a light quickstep needs longer than usual to get all the way round. It " +
+             "ends as soon as it gets there.")]
+    [SerializeField, Min(0.1f)] private float dodgeAroundSeconds = 0.62f;
+    [Tooltip("How fast it can turn, in degrees per second.")]
+    [SerializeField, Min(0f)] private float dodgeAroundTurn = 720f;
+    [Tooltip("How far beyond the enemy's body the spot behind it is, and how wide of its body the curve keeps, in metres.")]
+    [SerializeField, Min(0f)] private float dodgeBehindDistance = 1f;
+    [SerializeField, Min(0f)] private float dodgeClearance = 0.55f;
+    [Tooltip("A bow drawn out of a dodge starts this share of the way to a full draw: coming out of a roll with the arrow already half up.")]
+    [SerializeField, Range(0f, 0.9f)] private float drawAfterDodge = 0.35f;
+
+    [Header("Staying in the fight")]
+    [Tooltip("While an enemy within this many metres is after the player, the game stays in Combat however long since a blow was traded.")]
+    [SerializeField, Min(0f)] private float fightHoldRange = 14f;
+
+    [Header("Landing a swing")]
+    [Tooltip("Seconds a swing takes to sweep a half circle: targets are struck in the order the blade reaches them, not all on one " +
+             "frame. Narrow swings take less. 0 strikes them together.")]
+    [SerializeField, Min(0f)] private float sweepSeconds = 0.09f;
+    [Tooltip("Degrees per second a swing still winding up turns to follow the focused enemy, until it steps into the blow. 0 aims " +
+             "only as it starts.")]
+    [SerializeField, Min(0f)] private float swingTracking = 240f;
+
+    [Header("Focus on an enemy")]
+    [Tooltip("An enemy can be taken up as the focus within this many metres.")]
+    [SerializeField, Min(1f)] private float focusAcquireRange = 6f;
+    [Tooltip("Width of the cone around the aim in which an enemy can be taken up, in degrees either side.")]
+    [SerializeField, Range(10f, 180f)] private float focusAcquireCone = 70f;
+    [Tooltip("The focus lets go of an enemy further away than this.")]
+    [SerializeField, Min(1f)] private float focusKeepRange = 9f;
+    [Tooltip("How much better another enemy's score must be before the focus moves to it (see TargetRules).")]
+    [SerializeField, Min(0f)] private float focusSwitchMargin = 0.35f;
+    [Tooltip("While the aim points further than this from the focused enemy, in degrees, the player looks and swings where the aim " +
+             "points instead.")]
+    [SerializeField, Range(30f, 180f)] private float focusFreeAimAngle = 100f;
+
+    [Header("Backstab (struck from behind while staggering or striking)")]
+    [Tooltip("Width of the area behind an enemy that counts, in degrees.")]
+    [SerializeField, Range(30f, 240f)] private float backstabArc = 130f;
+    [Tooltip("Damage of a backstab on a staggering enemy, as a multiplier on top of the staggered bonus. Always a critical hit.")]
+    [SerializeField, Min(1f)] private float backstabDamage = 1.75f;
+    [Tooltip("Damage of a backstab on an enemy in the middle of a strike. Less than the above, and not always critical: a parry and then a backstab should pay best.")]
+    [SerializeField, Min(1f)] private float backstabOnStrikeDamage = 1.35f;
+    [Tooltip("Share of a dodge's stamina a backstab straight out of it gives back.")]
+    [SerializeField, Range(0f, 1f)] private float backstabRefund = 0.5f;
+    [Tooltip("Seconds after a dodge ends that a backstab still gets the refund.")]
+    [SerializeField, Min(0f)] private float backstabRefundWithin = 1.5f;
+
+    [Header("How enemies answer a backstab, and learn from it")]
+    [Tooltip("Seconds after a backstab before the enemy answers it, or after its stagger if that is longer.")]
+    [SerializeField, Min(0f)] private float answerDelay = 0.3f;
+    [Tooltip("Chance it answers by turning into a strike at once, wind-up as usual. Otherwise, or with no strike to use, it hops back.")]
+    [SerializeField, Range(0f, 1f)] private float answerStrikeChance = 0.65f;
+    [Tooltip("How far its hop goes, in metres.")]
+    [SerializeField, Min(0f)] private float hopDistance = 3f;
+    [Tooltip("Seconds its hop takes. Blows don't touch it meanwhile.")]
+    [SerializeField, Min(0.05f)] private float hopSeconds = 0.3f;
+    [Tooltip("Chance per backstab it remembers that it sees the next one coming, and breaks off its strike to meet it.")]
+    [SerializeField, Range(0f, 1f)] private float readChancePerBackstab = 0.35f;
+    [Tooltip("The chance never goes above this. A staggering enemy never sees it coming, so a parry stays the sure way in.")]
+    [SerializeField, Range(0f, 1f)] private float readChanceMost = 0.9f;
+    [Tooltip("Seconds until it forgets one backstab.")]
+    [SerializeField, Min(1f)] private float backstabForgotAfter = 20f;
+    [Tooltip("Others of its side this close saw it and learn as well, in metres. 0: only the one struck.")]
+    [SerializeField, Min(0f)] private float backstabSeenWithin = 8f;
+    [Tooltip("It only sees a swing coming from this close, in metres.")]
+    [SerializeField, Min(0f)] private float readRange = 4f;
+    [Tooltip("Chance that one which can parry (its definition) parries what it sees coming, rather than hopping aside.")]
+    [SerializeField, Range(0f, 1f)] private float readParryChance = 0.5f;
+    [Tooltip("Seconds its parry stays up.")]
+    [SerializeField, Min(0f)] private float readParrySeconds = 0.6f;
+    [Tooltip("Degrees per second it whips round to parry.")]
+    [SerializeField, Min(0f)] private float readTurnSpeed = 1440f;
+    [Tooltip("Seconds the player reels from a parried backstab.")]
+    [SerializeField, Min(0f)] private float parriedFlinchSeconds = 0.55f;
 
     [Header("Guard and parry (hold the guard button)")]
     [Tooltip("Width in degrees in front of the player that the guard covers.")]
@@ -120,6 +217,46 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
     public float FlinchSeconds => flinchSeconds;
     public bool ShowComboHud => showComboHud;
     public float HeavyHoldSeconds => heavyHoldSeconds;
+    public float HeavyChargeSeconds => heavyChargeSeconds;
+    public float HeavyChargeDamage => heavyChargeDamage;
+    public float HeavyChargePoise => heavyChargePoise;
+    public float RushAfterDodgeSeconds => rushAfterDodgeSeconds;
+    public float RushRunShare => rushRunShare;
+    public float RushRunSeconds => rushRunSeconds;
+    public float RushRunAngle => rushRunAngle;
+    public float DodgeAroundRange => dodgeAroundRange;
+    public float DodgeAroundSpeed => dodgeAroundSpeed;
+    public float DodgeAroundSeconds => dodgeAroundSeconds;
+    public float DodgeAroundTurn => dodgeAroundTurn;
+    public float DodgeBehindDistance => dodgeBehindDistance;
+    public float DodgeClearance => dodgeClearance;
+    public float DrawAfterDodge => drawAfterDodge;
+    public float FightHoldRange => fightHoldRange;
+    public float SweepSeconds => sweepSeconds;
+    public float SwingTracking => swingTracking;
+    public float FocusAcquireRange => focusAcquireRange;
+    public float FocusAcquireCone => focusAcquireCone;
+    public float FocusKeepRange => focusKeepRange;
+    public float FocusSwitchMargin => focusSwitchMargin;
+    public float FocusFreeAimAngle => focusFreeAimAngle;
+    public float BackstabArc => backstabArc;
+    public float BackstabDamage => backstabDamage;
+    public float BackstabOnStrikeDamage => backstabOnStrikeDamage;
+    public float BackstabRefund => backstabRefund;
+    public float BackstabRefundWithin => backstabRefundWithin;
+    public float AnswerDelay => answerDelay;
+    public float AnswerStrikeChance => answerStrikeChance;
+    public float HopDistance => hopDistance;
+    public float HopSeconds => hopSeconds;
+    public float ReadChancePerBackstab => readChancePerBackstab;
+    public float ReadChanceMost => readChanceMost;
+    public float BackstabForgotAfter => backstabForgotAfter;
+    public float BackstabSeenWithin => backstabSeenWithin;
+    public float ReadRange => readRange;
+    public float ReadParryChance => readParryChance;
+    public float ReadParrySeconds => readParrySeconds;
+    public float ReadTurnSpeed => readTurnSpeed;
+    public float ParriedFlinchSeconds => parriedFlinchSeconds;
     public float BlockArc => blockArc;
     public float ParryWindow => parryWindow;
     public float GuardRelock => guardRelock;

@@ -19,7 +19,15 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
     [Tooltip("Trigger parameter fired when the monster staggers (broken poise, a parried attack).")]
     [SerializeField] private string staggerParameter = "Stagger";
     [SerializeField, Min(0f)] private float speedDampTime = 0.1f;
+    [Tooltip("A blow worth this share of its health makes a humanoid body flinch, when it isn't busy striking or staggering.")]
+    [SerializeField, Range(0f, 1f)] private float flinchShare = 0.04f;
 
+    private const float StrikeFade = 0.1f;
+    private const float FlinchFade = 0.06f;
+    private static readonly int ActionSpeedHash = Animator.StringToHash("ActionSpeed");
+    private static readonly int HitStateHash = Animator.StringToHash("Hit");
+
+    private Damageable health;
     private MonsterAI ai;
     private int speedHash;
     private int attackHash;
@@ -33,6 +41,7 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
     private void Awake()
     {
         ai = GetComponent<MonsterAI>();
+        health = GetComponent<Damageable>();
         animator = animator != null ? animator : GetComponentInChildren<Animator>();
         CacheParameters();
     }
@@ -42,6 +51,10 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
         ai.AttackStarted += OnAttackStarted;
         ai.StateChanged += OnStateChanged;
         ai.Staggered += OnStaggered;
+        if (health != null)
+        {
+            health.Damaged += OnDamaged;
+        }
     }
 
     private void OnDisable()
@@ -49,6 +62,10 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
         ai.AttackStarted -= OnAttackStarted;
         ai.StateChanged -= OnStateChanged;
         ai.Staggered -= OnStaggered;
+        if (health != null)
+        {
+            health.Damaged -= OnDamaged;
+        }
     }
 
     private void Update()
@@ -81,11 +98,37 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
         }
     }
 
+    // A strike with a state of its own plays it, fitted so the blow lands at its Hit Delay (Set Up Combat Animations works the speed
+    // out); any other plays the controller's one Attack state.
     private void OnAttackStarted()
     {
+        AttackDefinition attack = ai.CurrentAttack;
+        if (animator != null && animator.isHuman && attack != null && !string.IsNullOrEmpty(attack.AnimationState))
+        {
+            int state = Animator.StringToHash(attack.AnimationState);
+            if (animator.HasState(0, state))
+            {
+                animator.SetFloat(ActionSpeedHash, attack.AnimationSpeed);
+                animator.CrossFadeInFixedTime(state, StrikeFade, 0, 0f);
+                return;
+            }
+        }
+
         if (hasAttack)
         {
+            animator.SetFloat(ActionSpeedHash, 1f);
             animator.SetTrigger(attackHash);
+        }
+    }
+
+    private void OnDamaged(DamageInfo damage, DamageResult result)
+    {
+        bool flinches = animator != null && animator.isHuman && animator.enabled && result.Damage > 0f && !result.Killed && !result.Blocked
+            && !damage.IsOverTime && result.Damage >= health.MaxHealth * flinchShare
+            && ai.CurrentState != MonsterAI.State.Attacking && ai.CurrentState != MonsterAI.State.Staggered;
+        if (flinches && animator.HasState(0, HitStateHash))
+        {
+            animator.CrossFadeInFixedTime(HitStateHash, FlinchFade, 0, 0f);
         }
     }
 

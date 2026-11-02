@@ -25,12 +25,15 @@ MonoBehaviour:
   hitDelay: 0.9
   recoveryTime: 1.4
   poiseDamage: 10
+  impact: 1
   lunge: 0
   staminaCost: -1
   appliesStatus: {fileID: 0}
   statusChance: 1
-  animationState: 
-  animationSpeed: 1
+  animationState: Roar
+  animationSpeed: 0.72222906
+  strikeSpeed: 1
+  strikeLead: 0
   followThroughSpeed: 1
   swingSound: {fileID: 0}
   hitSound: {fileID: 0}

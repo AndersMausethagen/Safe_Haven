@@ -3,9 +3,11 @@ using UnityEngine;
 /// <summary>
 /// A loosed arrow: it flies on a falling arc, swept each frame so it can't skip through thin things, and turns along its
 /// path. A hostile target takes the hit (DamageCalculator with the bow's shot attack and the arrow's damage; a fire arrow
-/// also sets it burning); scenery keeps the arrow stuck in it for a while, and some of those (the arrow's Recover Chance)
-/// can be picked up again by walking over them. Either way the strike is heard (WorldNoise), so a stray shot can lure
-/// monsters. Copies come from and return to <see cref="PrefabPool"/>, so Launch resets everything a flight uses.
+/// also sets it burning) and keeps the arrow in its body for a while, going where that part of the body goes, into a corpse too,
+/// and when that body dies some of them (the arrow's Recover Chance) go back in the bag with the rest of what it leaves; scenery
+/// keeps the arrow stuck in it for a while, and as many of those can be picked up again by walking over them. Either way the strike is heard (WorldNoise), so a stray shot can lure monsters. A trail shows its flight from
+/// the high camera, gold for a perfect release (Combat Feel › Arrows). Copies come from and return to <see cref="PrefabPool"/>, so
+/// Launch resets everything a flight uses.
 /// </summary>
 public sealed class ArrowProjectile : MonoBehaviour
 {
@@ -21,6 +23,18 @@ public sealed class ArrowProjectile : MonoBehaviour
     [SerializeField, Min(0f)] private float stuckSeconds = 12f;
     [Tooltip("Shown only while flying (a trail or glint). Optional.")]
     [SerializeField] private GameObject flightOnly;
+
+    // How much further into a body the tip goes than into a tree: it has to read as buried from above.
+    private const float BodyEmbed = 0.22f;
+    private static readonly HumanBodyBones[] BodyBones =
+    {
+        HumanBodyBones.Hips, HumanBodyBones.Spine, HumanBodyBones.Chest, HumanBodyBones.Head, HumanBodyBones.LeftUpperArm, HumanBodyBones.RightUpperArm,
+        HumanBodyBones.LeftUpperLeg, HumanBodyBones.RightUpperLeg,
+    };
+
+    private TrailRenderer trail;
+    private Vector3 restScale;
+    private Damageable host;
 
     private readonly RaycastHit[] hits = new RaycastHit[16];
     private Combatant owner;
@@ -45,11 +59,104 @@ public sealed class ArrowProjectile : MonoBehaviour
     /// <summary>True while stuck and waiting to be picked up again.</summary>
     public bool Recoverable { get; private set; }
 
+    // Made here rather than in each arrow's prefab: every arrow flies the same.
+    private void StartTrail(bool perfect)
+    {
+        CombatFeelSettings feel = CombatFeelSettings.Current;
+        if (feel.ArrowTrailSeconds <= 0f || feel.TelegraphMaterial == null)
+        {
+            return;
+        }
+
+        if (trail == null)
+        {
+            var holder = new GameObject("Arrow Trail");
+            holder.transform.SetParent(transform, false);
+            trail = holder.AddComponent<TrailRenderer>();
+            trail.sharedMaterial = feel.TelegraphMaterial;
+            trail.widthMultiplier = feel.ArrowTrailWidth;
+            trail.widthCurve = AnimationCurve.Linear(0f, 1f, 1f, 0f);
+            trail.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            trail.receiveShadows = false;
+            trail.minVertexDistance = 0.1f;
+        }
+
+        Color color = perfect ? feel.ArrowTrailPerfectColor : feel.ArrowTrailColor;
+        trail.time = feel.ArrowTrailSeconds * (perfect ? 1.5f : 1f);
+        trail.startColor = color;
+        trail.endColor = new Color(color.r, color.g, color.b, 0f);
+        trail.Clear();
+        trail.emitting = true;
+    }
+
+    private void StopTrail()
+    {
+        if (trail != null)
+        {
+            trail.emitting = false;
+        }
+    }
+
+    // Stuck in a body: when that dies, the arrow may be recovered with what it leaves.
+    private void AwaitDeathOf(IDamageable victim)
+    {
+        if (!canBeRecovered || item == null || arrow == null || !(victim is Damageable body))
+        {
+            return;
+        }
+
+        if (!body.IsAlive)
+        {
+            Recover();
+            return;
+        }
+
+        host = body;
+        host.Died += OnHostDied;
+    }
+
+    private void OnHostDied(Damageable body, DamageInfo killingBlow)
+    {
+        StopAwaitingHost();
+        Recover();
+    }
+
+    private void StopAwaitingHost()
+    {
+        if (host != null)
+        {
+            host.Died -= OnHostDied;
+        }
+
+        host = null;
+    }
+
+    private void Recover()
+    {
+        Player player = Player.Current;
+        if (player != null && player.Bag != null && Random.value < arrow.RecoverChance)
+        {
+            player.Bag.Give(item, 1);
+        }
+    }
+
+    private void OnDestroy() => StopAwaitingHost();
+
+    private void ReturnToPool()
+    {
+        StopAwaitingHost();
+        // Out of whatever body it was stuck in, or the next flight would start from there.
+        transform.SetParent(null, true);
+        transform.localScale = restScale != Vector3.zero ? restScale : transform.localScale;
+        PrefabPool.Release(gameObject);
+    }
+
     /// <summary>Starts a flight from where the copy stands. <paramref name="arrowItem"/>'s Arrow sets the drop, burning and
     /// recovery; <paramref name="forceCritical"/> makes the hit critical (a perfect release).</summary>
     public void Launch(Combatant source, AttackDefinition shot, ItemDefinition arrowItem, float shotDamage, Vector3 launchVelocity,
         HitTechnique hitTechnique = HitTechnique.None, bool forceCritical = false, bool recoverable = false)
     {
+        restScale = restScale != Vector3.zero ? restScale : transform.localScale;
         owner = source;
         attack = shot;
         item = arrowItem;
@@ -73,6 +180,8 @@ public sealed class ArrowProjectile : MonoBehaviour
         {
             flightOnly.SetActive(true);
         }
+
+        StartTrail(forceCritical);
     }
 
     private void Update()
@@ -81,7 +190,7 @@ public sealed class ArrowProjectile : MonoBehaviour
         {
             if (Time.time >= releaseAt || Recoverable && TryPickUp())
             {
-                PrefabPool.Release(gameObject);
+                ReturnToPool();
             }
 
             return;
@@ -89,7 +198,7 @@ public sealed class ArrowProjectile : MonoBehaviour
 
         if (owner == null || Time.time >= flightEnds)
         {
-            PrefabPool.Release(gameObject);
+            ReturnToPool();
             return;
         }
 
@@ -137,8 +246,14 @@ public sealed class ArrowProjectile : MonoBehaviour
     private void Strike(RaycastHit hit, Vector3 direction)
     {
         IDamageable victim = hit.collider.GetComponentInParent<IDamageable>();
+        bool struckBody = false;
+        Transform bodyPart = null;
         if (victim != null && victim.IsAlive && owner != null && owner.Faction.WillAttack(victim.Faction) && attack != null)
         {
+            // Found before the blow: if it kills, the body goes off to become a corpse and takes this part with it.
+            struckBody = victim.Category == TargetCategory.Creature;
+            bodyPart = struckBody ? NearestBodyPart(victim, hit.point) : null;
+
             DamageInfo info = DamageCalculator.Build(owner, attack, damage, victim.Category, hit.point, direction, critical ? 0f : Random.value);
             if (technique != HitTechnique.None || critical)
             {
@@ -155,17 +270,41 @@ public sealed class ArrowProjectile : MonoBehaviour
 
         if (arrow != null)
         {
-            AudioManager.Play(arrow.HitSound, hit.point);
+            // A body has its own sound, played with the blow (CombatFeedback); this is the sound of wood and earth.
+            if (!struckBody)
+            {
+                AudioManager.Play(arrow.HitSound, hit.point);
+            }
+
             WorldNoise.Emit(hit.point, arrow.ImpactNoise);
         }
 
-        // Creatures move and die: the arrow is spent. Scenery keeps it, tip buried, for a while.
-        if (victim != null || hit.rigidbody != null || stuckSeconds <= 0f)
+        // In a body it goes where that part goes, into the corpse too, for a while.
+        if (bodyPart != null && stuckSeconds > 0f)
         {
-            PrefabPool.Release(gameObject);
+            StopTrail();
+            transform.SetPositionAndRotation(hit.point + direction * BodyEmbed - direction * TipOffset, Quaternion.LookRotation(direction));
+            transform.SetParent(bodyPart, true);
+            AwaitDeathOf(victim);
+            Recoverable = false;
+            releaseAt = Time.time + stuckSeconds;
+            velocity = Vector3.zero;
+            if (flightOnly != null)
+            {
+                flightOnly.SetActive(false);
+            }
+
             return;
         }
 
+        // Scenery keeps it, tip buried, for a while.
+        if (victim != null || hit.rigidbody != null || stuckSeconds <= 0f)
+        {
+            ReturnToPool();
+            return;
+        }
+
+        StopTrail();
         transform.SetPositionAndRotation(hit.point + direction * Embed - direction * TipOffset, Quaternion.LookRotation(direction));
         // The shooter decides: the player's arrows can be picked up again; a companion's never run out.
         Recoverable = canBeRecovered && item != null && arrow != null && Random.value < arrow.RecoverChance;
@@ -175,6 +314,47 @@ public sealed class ArrowProjectile : MonoBehaviour
         {
             flightOnly.SetActive(false);
         }
+    }
+
+    // The bone or rigid part of the body nearest the point, or null for something with no body to hold an arrow.
+    private static Transform NearestBodyPart(IDamageable victim, Vector3 point)
+    {
+        if (!(victim is Component target))
+        {
+            return null;
+        }
+
+        Transform nearest = null;
+        float best = float.MaxValue;
+        void Consider(Transform part)
+        {
+            if (part != null && (part.position - point).sqrMagnitude < best)
+            {
+                best = (part.position - point).sqrMagnitude;
+                nearest = part;
+            }
+        }
+
+        Animator animator = target.GetComponentInChildren<Animator>();
+        if (animator != null && animator.isHuman)
+        {
+            foreach (HumanBodyBones bone in BodyBones)
+            {
+                Consider(animator.GetBoneTransform(bone));
+            }
+
+            return nearest;
+        }
+
+        foreach (MeshRenderer part in target.GetComponentsInChildren<MeshRenderer>())
+        {
+            if (!OutlineCopies.IsCopy(part) && part.GetComponentInParent<ArrowProjectile>() == null)
+            {
+                Consider(part.transform);
+            }
+        }
+
+        return nearest;
     }
 
     private bool TryPickUp()

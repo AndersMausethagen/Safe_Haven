@@ -31,28 +31,45 @@ public static class AttackResolver
 
         foreach (HitDetector.Hit hit in hits)
         {
-            Vector3 hitDirection = hit.Point - origin;
-            hitDirection.y = 0f;
-            hitDirection = hitDirection.sqrMagnitude > 0.0001f ? hitDirection.normalized : direction;
-
-            DamageInfo damage = DamageCalculator.Build(
-                attacker,
-                attack,
-                weaponDamage,
-                hit.Target.Category,
-                hit.Point,
-                hitDirection,
-                forceCritical ? 0f : Random.value);
-            if (damageMultiplier != 1f || poiseMultiplier != 1f || technique != HitTechnique.None || forceCritical)
-            {
-                damage = damage.Scaled(damageMultiplier, poiseMultiplier, technique, forceCritical && attack.CanCrit);
-            }
-
-            DamageResult result = hit.Target.ApplyDamage(damage);
-            attacker.ReportDamageDealt(hit.Target, damage, result);
-            StatusEffects.AfterHit(attack, hit.Target, attacker, result);
+            Apply(attacker, attack, weaponDamage, hit, origin, direction, damageMultiplier, poiseMultiplier, technique, forceCritical);
         }
 
         return hits.Count;
+    }
+
+    /// <summary>Lands the attack on one target already found. The player's swing strikes its targets one after another with this.</summary>
+    public static DamageResult Apply(
+        Combatant attacker,
+        AttackDefinition attack,
+        float weaponDamage,
+        in HitDetector.Hit hit,
+        Vector3 origin,
+        Vector3 direction,
+        float damageMultiplier = 1f,
+        float poiseMultiplier = 1f,
+        HitTechnique technique = HitTechnique.None,
+        bool forceCritical = false)
+    {
+        Vector3 hitDirection = hit.Point - origin;
+        hitDirection.y = 0f;
+        hitDirection = hitDirection.sqrMagnitude > 0.0001f ? hitDirection.normalized : direction;
+
+        DamageInfo damage = DamageCalculator.Build(
+            attacker,
+            attack,
+            weaponDamage,
+            hit.Target.Category,
+            hit.Point,
+            hitDirection,
+            forceCritical ? 0f : Random.value);
+        if (damageMultiplier != 1f || poiseMultiplier != 1f || technique != HitTechnique.None || forceCritical)
+        {
+            damage = damage.Scaled(damageMultiplier, poiseMultiplier, technique, forceCritical && attack.CanCrit);
+        }
+
+        DamageResult result = hit.Target.ApplyDamage(damage);
+        attacker.ReportDamageDealt(hit.Target, damage, result);
+        StatusEffects.AfterHit(attack, hit.Target, attacker, result);
+        return result;
     }
 }

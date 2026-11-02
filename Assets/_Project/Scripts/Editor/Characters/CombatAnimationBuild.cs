@@ -38,7 +38,12 @@ public static partial class CombatAnimationSetup
         AddHeavyClip();
         BuildPlayerController();
         Debug.Log(BuildBowLayer());
-        BuildSneakLayer();
+        // Only when missing: Build Character Animators has since put the modular pack's stealth clips in it.
+        if (!AssetDatabase.LoadAssetAtPath<AnimatorController>(PlayerControllerPath).layers.Any(layer => layer.name == "Sneak"))
+        {
+            BuildSneakLayer();
+        }
+
         BuildMonsterController();
         int attacks = BuildAttacksAndWeapons();
         EnsureSettings();
@@ -82,19 +87,22 @@ public static partial class CombatAnimationSetup
         public readonly string State;
         public readonly Motion Clip;
         public readonly string Then;
+        // Times through the clip before it flows on: above 1 for a clip that loops (a whirlwind's spin).
+        public readonly float ExitTime;
 
-        public Action(string state, Motion clip, string then = "Empty")
+        public Action(string state, Motion clip, string then = "Empty", float exitTime = 1f)
         {
             State = state;
             Clip = clip;
             Then = then;
+            ExitTime = exitTime;
         }
     }
 
     private static List<Action> PlayerActions()
     {
         Dictionary<string, AnimationClip> ual = Clips();
-        return new List<Action>
+        var actions = new List<Action>
         {
             new Action("Sword A", ual["Sword_Regular_A"], "Sword A Recover"),
             new Action("Sword A Recover", ual["Sword_Regular_A_Rec"]),
@@ -111,6 +119,8 @@ public static partial class CombatAnimationSetup
             new Action("Attack Polearm", StateClip("Attack Polearm")),
             new Action("Shield Bash", StateClip("Shield Bash")),
         };
+        actions.AddRange(StylizedActions());
+        return actions;
     }
 
     public const string FullBodyLayer = "Combat Full Body";
@@ -174,7 +184,7 @@ public static partial class CombatAnimationSetup
                 ClearTransitions(state);
                 Action then = actions.FirstOrDefault(a => a.State == action.Then);
                 float offset = then.Clip is AnimationClip recover && action.Clip is AnimationClip swing ? RecoverOffset(swing, recover) : 0f;
-                AnimatorStateTransition exit = Exit(state, Find(machine, action.Then), 1f, 0.12f);
+                AnimatorStateTransition exit = Exit(state, Find(machine, action.Then), action.ExitTime, 0.12f);
                 if (exit != null)
                 {
                     exit.offset = offset;
@@ -264,6 +274,7 @@ public static partial class CombatAnimationSetup
             any.canTransitionToSelf = false;
         }
 
+        BuildMonsterStates(controller);
         EditorUtility.SetDirty(controller);
     }
 
@@ -359,6 +370,24 @@ public static partial class CombatAnimationSetup
         public float Lunge = 0.6f;
         public Color Slash = LightSlash;
         public HumanBodyBones Hand = HumanBodyBones.RightHand;
+        // The attack whose numbers and cadence this one takes over (it may be itself): it lands and recovers exactly when that one
+        // did, and the clip is fitted to that, so swapping a clip changes no damage per second.
+        public string From;
+        // Or when it lands and recovers, in seconds (a weapon art, which has no attack before it).
+        public float LandsAt;
+        public float RecoversAt;
+        // The strike: the last seconds of the clip before contact, and how fast they play. Below 0: chosen from the contact.
+        public float StrikeClip = -1f;
+        public float StrikeSpeed = 1.35f;
+        // How much the blow weighs (AttackDefinition.Impact).
+        public float Impact = 1f;
+        // Seconds after the hand's drive that the weapon itself arrives.
+        public float ContactLag;
+        // A clip that loops for the whole swing (a whirlwind): it plays at its own speed, with no build-up.
+        public bool Looped;
+        // At the latest, seconds after it starts that the blow lands, however late the attack it takes its cadence from: the time saved
+        // goes to the follow-through, so a finisher answers sooner and the chain still takes as long.
+        public float LandsBy;
     }
 
     private static Motion StateClip(string state) =>
@@ -380,15 +409,12 @@ public static partial class CombatAnimationSetup
         ["Quickstep"] = 0.9f, ["Roll"] = 0.6f, ["Heavy Roll"] = 0.5f,
     };
 
-    /// <summary>Fits the dodge animations to the dodges (speed so the clip's dodge part lasts the dash), and makes the dodge
-    /// itself a deliberate roll rather than a blink. Returns a line per style.</summary>
+    /// <summary>Fits the dodge animations to the dodges (speed so the clip's dodge part lasts the dash). Returns a line per style.</summary>
     public static string FitDodges()
     {
         var settings = AssetDatabase.LoadAssetAtPath<PlayerMovementSettings>("Assets/_Project/Data/Player/PlayerMovementSettings.asset");
         var data = new SerializedObject(settings);
-        data.FindProperty("dodgeDistance").floatValue = 3.2f;
-        data.FindProperty("dodgeDuration").floatValue = DodgeSeconds;
-        data.FindProperty("dodgeInvulnerability").floatValue = 0.3f;
+        // How far and how long a dodge goes are designers' numbers: only its animation is fitted here.
         var report = new List<string>();
         foreach ((string state, AnimationClip clip) in DodgeClips())
         {
@@ -436,49 +462,107 @@ public static partial class CombatAnimationSetup
             new AttackSpec { Asset = ComboFolder + "/Spear Heavy.asset", Template = "SpearThrust", State = "Sword Heavy", Clip = ual[HeavyClip], Speed = 0.7f, RecoverAfterContact = 0.5f, Ratio = 2.1f, Range = 3f, Arc = 90f, Targets = 3, Poise = 40f, Lunge = 0.4f, Slash = HeavySlash },
         };
 
+        // A spec that goes on to get a clip of its own in the movesets below isn't made here, so it never has its timing set twice.
+        List<AttackSpec> movesets = MovesetSpecs();
+        specs.RemoveAll(spec => movesets.Any(other => other.Asset == spec.Asset));
+        specs.AddRange(movesets);
         var made = new Dictionary<string, AttackDefinition>();
         foreach (AttackSpec spec in specs)
         {
-            made[System.IO.Path.GetFileNameWithoutExtension(spec.Asset)] = MakeAttack(spec);
+            made[System.IO.Path.GetFileNameWithoutExtension(spec.Asset)] = MakeAttack(spec, made);
         }
 
-        Weapon("IronSword", new[] { "SwordSlash", "Sword Slash B", "Sword Finisher" }, "Sword Heavy", "Sword Counter", 0.35f, made);
-        Weapon("Fists", new[] { "FistsStrike", "Fists Cross", "Fists Hook" }, null, null, 0.6f, made);
-        Weapon("StoneAxe", new[] { "GreataxeSweep", "Axe Finisher" }, "Axe Heavy", null, 0.4f, made);
-        Weapon("Greataxe", new[] { "GreataxeSweep", "Axe Finisher" }, "Axe Heavy", null, 0.4f, made);
-        Weapon("Spear", new[] { "SpearThrust", "Spear Thrust B", "Spear Lunge" }, "Spear Heavy", null, 0.4f, made);
+        ShapeExistingAttacks(made);
+        AssignMovesets(made);
+        SetMonsterBodies();
         return made.Count;
     }
 
-    private static AttackDefinition MakeAttack(AttackSpec spec)
+    // Finds an attack by asset name: one made in this run, else in the combos folder, else in the attacks folder.
+    private static AttackDefinition NamedAttack(string name, Dictionary<string, AttackDefinition> made)
+    {
+        if (made.TryGetValue(name, out AttackDefinition known))
+        {
+            return known;
+        }
+
+        AttackDefinition combo = AssetDatabase.LoadAssetAtPath<AttackDefinition>($"{ComboFolder}/{name}.asset");
+        return combo != null ? combo : AssetDatabase.LoadAssetAtPath<AttackDefinition>($"{AttackFolder}/{name}.asset");
+    }
+
+    private static AttackDefinition MakeAttack(AttackSpec spec, Dictionary<string, AttackDefinition> made)
     {
         var attack = AssetDatabase.LoadAssetAtPath<AttackDefinition>(spec.Asset);
         bool created = attack == null;
+        AttackDefinition source = spec.From != null ? NamedAttack(spec.From, made) : null;
+        if (spec.From != null && source == null)
+        {
+            Debug.LogError($"Combat animations: {spec.Asset} takes its numbers from {spec.From}, which doesn't exist.");
+        }
+
         if (created)
         {
-            var template = AssetDatabase.LoadAssetAtPath<AttackDefinition>($"{AttackFolder}/{spec.Template}.asset");
+            AttackDefinition template = source != null ? source : AssetDatabase.LoadAssetAtPath<AttackDefinition>($"{AttackFolder}/{spec.Template}.asset");
             attack = template != null ? Object.Instantiate(template) : ScriptableObject.CreateInstance<AttackDefinition>();
             AssetDatabase.CreateAsset(attack, spec.Asset);
         }
 
-        // Timing always follows the clip; damage, reach and weight are only set on new attacks (designers own them after).
+        // Timing follows the clip, unless the cadence is the point (see From); damage, reach and weight are only set on new attacks
+        // (designers own them after).
         var clip = spec.Clip as AnimationClip;
-        float contact = clip != null ? ContactTimes(clip, spec.Hand).DefaultIfEmpty(0.3f).First() : 0.3f;
+        // A clip fitted to a cadence is a big swing from the Stylized pack; the rest set their timing from their own hand's top speed.
+        bool fitted = source != null || spec.LandsAt > 0f;
         float length = clip != null ? clip.length : 0.6f;
-        // The wind-up plays at the attack's speed, the strike after the hit at its own (FollowThrough).
-        float hitDelay = contact / spec.Speed;
-        float recovery = spec.RecoverAfterContact >= 0f ? hitDelay + spec.RecoverAfterContact : hitDelay + (length - contact) / spec.FollowThrough;
+        float contact = clip == null ? 0.3f : fitted ? Mathf.Min(DrivenContact(clip, spec.Hand) + spec.ContactLag, length) : Contact(clip, spec.Hand);
+        // Nothing about a leap is slowed: a slow build-up in the air is a player hanging there.
+        bool leaps = fitted && !spec.Looped && Leaps(clip, out _);
+        float hitDelay, recovery, followThrough;
+        if (fitted)
+        {
+            hitDelay = source != null ? source.HitDelay : spec.LandsAt;
+            hitDelay = spec.LandsBy > 0f ? Mathf.Min(hitDelay, spec.LandsBy) : hitDelay;
+            recovery = source != null ? source.RecoveryTime : spec.RecoversAt;
+            // What is left of the clip is played out in the time the swing has left.
+            followThrough = Mathf.Clamp((length - contact) / Mathf.Max(0.05f, recovery - hitDelay), 0.7f, 1.8f);
+        }
+        else
+        {
+            // The wind-up plays at the attack's speed, the strike after the hit at its own (FollowThrough).
+            hitDelay = contact / spec.Speed;
+            recovery = spec.RecoverAfterContact >= 0f ? hitDelay + spec.RecoverAfterContact : hitDelay + (length - contact) / spec.FollowThrough;
+            followThrough = spec.FollowThrough;
+        }
+
+        // A slow build-up and a fast strike, in the same time as before.
+        float strikeClip = spec.StrikeClip >= 0f ? spec.StrikeClip : Mathf.Min(0.09f, contact * 0.4f);
+        float strikeSpeed = spec.StrikeSpeed;
+        float buildUp = StrikeRules.WindupSpeed(contact, hitDelay, strikeClip, strikeSpeed);
+        // A swing too quick for a build-up (a dagger's stab) or one that loops plays at one speed.
+        if (spec.Looped || leaps || buildUp >= strikeSpeed)
+        {
+            buildUp = strikeSpeed = spec.Looped ? 1f : contact / Mathf.Max(0.01f, hitDelay);
+            strikeClip = 0f;
+            followThrough = spec.Looped ? 1f : followThrough;
+        }
+
         var data = new SerializedObject(attack);
         data.FindProperty("hitDelay").floatValue = hitDelay;
         data.FindProperty("recoveryTime").floatValue = Mathf.Max(recovery, hitDelay + 0.05f);
         data.FindProperty("animationState").stringValue = spec.State;
-        data.FindProperty("animationSpeed").floatValue = spec.Speed;
-        data.FindProperty("followThroughSpeed").floatValue = spec.FollowThrough;
+        data.FindProperty("animationSpeed").floatValue = buildUp;
+        data.FindProperty("strikeSpeed").floatValue = strikeSpeed;
+        data.FindProperty("strikeLead").floatValue = strikeClip / strikeSpeed;
+        data.FindProperty("followThroughSpeed").floatValue = followThrough;
+        if (spec.Impact != 1f && data.FindProperty("impact").floatValue == 1f)
+        {
+            data.FindProperty("impact").floatValue = spec.Impact;
+        }
+
         // The slash arc runs the way the weapon hand moves at the contact.
         (SlashSweep sweep, float tilt) = SlashFor(clip != null ? HandVelocity(clip, contact, spec.Hand) : Vector3.zero);
         data.FindProperty("slashSweep").enumValueIndex = (int)sweep;
         data.FindProperty("slashTilt").floatValue = tilt;
-        if (created || data.FindProperty("poiseDamage").floatValue == 10f && spec.Poise != 10f)
+        if (source == null && (created || data.FindProperty("poiseDamage").floatValue == 10f && spec.Poise != 10f))
         {
             data.FindProperty("poiseDamage").floatValue = spec.Poise;
         }
@@ -486,6 +570,10 @@ public static partial class CombatAnimationSetup
         if (created)
         {
             data.FindProperty("displayName").stringValue = System.IO.Path.GetFileNameWithoutExtension(spec.Asset);
+        }
+
+        if (created && source == null)
+        {
             data.FindProperty("weaponDamageRatio").floatValue = spec.Ratio;
             data.FindProperty("range").floatValue = spec.Range;
             data.FindProperty("arc").floatValue = spec.Arc;
@@ -493,7 +581,7 @@ public static partial class CombatAnimationSetup
             data.FindProperty("lunge").floatValue = spec.Lunge;
             data.FindProperty("slashColor").colorValue = spec.Slash;
         }
-        else if (data.FindProperty("lunge").floatValue <= 0f)
+        else if (data.FindProperty("lunge").floatValue <= 0f && source == null)
         {
             data.FindProperty("lunge").floatValue = spec.Lunge;
         }
@@ -502,7 +590,8 @@ public static partial class CombatAnimationSetup
         return attack;
     }
 
-    private static void Weapon(string asset, string[] chain, string heavy, string counter, float letThrough, Dictionary<string, AttackDefinition> made)
+    // A null let-through leaves how well the weapon guards as it is.
+    private static void Weapon(string asset, string[] chain, string heavy, string counter, float? letThrough, Dictionary<string, AttackDefinition> made)
     {
         var weapon = AssetDatabase.LoadAssetAtPath<WeaponDefinition>($"{WeaponFolder}/{asset}.asset");
         if (weapon == null)
@@ -522,7 +611,11 @@ public static partial class CombatAnimationSetup
         data.FindProperty("basicAttack").objectReferenceValue = made[chain[0]];
         data.FindProperty("heavyAttack").objectReferenceValue = heavy != null ? made[heavy] : null;
         data.FindProperty("counterAttack").objectReferenceValue = counter != null ? made[counter] : null;
-        data.FindProperty("guardLetThrough").floatValue = letThrough;
+        if (letThrough.HasValue)
+        {
+            data.FindProperty("guardLetThrough").floatValue = letThrough.Value;
+        }
+
         data.ApplyModifiedPropertiesWithoutUndo();
     }
 
@@ -619,6 +712,24 @@ public static partial class CombatAnimationSetup
             if (root.GetComponent<PlayerEating>() == null)
             {
                 root.AddComponent<PlayerEating>();
+                changed = true;
+            }
+
+            if (root.GetComponent<PlayerFocusTarget>() == null)
+            {
+                root.AddComponent<PlayerFocusTarget>();
+                changed = true;
+            }
+
+            if (root.GetComponent<WeaponTrail>() == null)
+            {
+                root.AddComponent<WeaponTrail>();
+                changed = true;
+            }
+
+            if (root.GetComponent<TwoHandGrip>() == null)
+            {
+                root.AddComponent<TwoHandGrip>();
                 changed = true;
             }
 

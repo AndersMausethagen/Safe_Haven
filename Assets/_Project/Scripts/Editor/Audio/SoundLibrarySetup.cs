@@ -39,9 +39,14 @@ public static class SoundLibrarySetup
     private static string[] Synth(string kind) => Enumerable.Range(1, 8).Select(i => $"{Sfx}Safe Haven Footsteps/Footstep {kind} {i}.wav").ToArray();
 
     /// <summary>Sounds made for the game by Tools/Audio. They are made to play near their own pitch, so their ranges stay small.</summary>
-    private static string[] Made(string folder, string stem, int count) => count == 1
-        ? new[] { $"{Sfx}Safe Haven {folder}/{stem}.wav" }
-        : Enumerable.Range(1, count).Select(i => $"{Sfx}Safe Haven {folder}/{stem} {i}.wav").ToArray();
+    private static string[] Made(string folder, string stem, int count)
+    {
+        // Our own folders are named for what they hold; others go by their whole name.
+        string path = folder == MixkitBlades ? folder : $"Safe Haven {folder}";
+        return count == 1
+            ? new[] { $"{Sfx}{path}/{stem}.wav" }
+            : Enumerable.Range(1, count).Select(i => $"{Sfx}{path}/{stem} {i}.wav").ToArray();
+    }
 
     /// <summary>Set to rewrite the footstep surface list with the defaults on the next run (it is kept otherwise).</summary>
     public static bool ResetFootstepSurfaces;
@@ -130,7 +135,71 @@ public static class SoundLibrarySetup
         AssignWeapon("StoneAxe", axeSwing, axeHit);
         AssignWeapon("WoodsmansAxe", axeSwing, axeHit);
         AssignWeapon("Greataxe", axeSwing, axeHit);
+
+        // What each kind of weapon sounds like going in: an edge cleaves, a point punctures, a weight crushes. Swords use the game-wide Hit.
+        Sound(new Spec { Name = "Stab Hit", Clips = Made(combat, "Stab Hit", 5), Volume = 0.72f, Pitch = new Vector2(0.95f, 1.05f), MaxAtOnce = 6 });
+        SoundDefinition bluntHit = Sound(new Spec { Name = "Blunt Hit", Clips = Made(combat, "Blunt Hit", 5), Volume = 0.82f, Pitch = new Vector2(0.95f, 1.05f), MaxAtOnce = 6 });
+        foreach (string weapon in new[] { "IronWarhammer", "TrollstoneMaul", "KnottedClub", "RoundShield", "CopperBoundShield", "IronKiteShield", "WickerShield" })
+        {
+            SetHitSound(weapon, bluntHit);
+        }
+
+        // Blades: Mixkit's recordings of steel going into flesh (Tools/Audio/blades.py). Stab Hit and Axe Hit stay as they are for whatever
+        // else names them.
+        SoundDefinition bladeHit = Sound(new Spec { Name = "Blade Hit", Clips = Made(MixkitBlades, "Blade Hit", 4), Volume = 0.74f, Pitch = new Vector2(0.95f, 1.05f), MaxAtOnce = 6 });
+        SoundDefinition cleaveHit = Sound(new Spec { Name = "Cleave Hit", Clips = Made(MixkitBlades, "Cleave Hit", 4), Volume = 0.82f, Pitch = new Vector2(0.95f, 1.05f), MaxAtOnce = 6 });
+        SoundDefinition pierceHit = Sound(new Spec { Name = "Pierce Hit", Clips = Made(MixkitBlades, "Pierce Hit", 3), Volume = 0.72f, Pitch = new Vector2(0.94f, 1.06f), MaxAtOnce = 6 });
+        SoundDefinition goreSplash = Sound(new Spec { Name = "Gore Splash", Clips = new[] { $"{Sfx}{MixkitBlades}/Gore Splash.wav" }, Volume = 0.6f, Pitch = new Vector2(0.92f, 1.08f), MaxAtOnce = 3 });
+        foreach (string weapon in new[] { "IronSword", "CopperSword", "GraveBlade", "MoonsilverBlade" })
+        {
+            SetHitSound(weapon, bladeHit);
+        }
+
+        foreach (string weapon in new[] { "StoneAxe", "WoodsmansAxe", "CopperHandAxe", "Greataxe", "IronGreatsword" })
+        {
+            SetHitSound(weapon, cleaveHit);
+        }
+
+        foreach (string weapon in new[] { "Spear", "CopperSpear", "FireHardenedSpear", "FangDagger", "CrudeWoodenBow", "HuntersBow", "ElderwoodLongbow" })
+        {
+            SetHitSound(weapon, pierceHit);
+        }
+
+        var feel = new SerializedObject(AssetDatabase.LoadAssetAtPath<CombatFeelSettings>("Assets/_Project/Resources/CombatFeel.asset"));
+        feel.FindProperty("bloodKillSound").objectReferenceValue = goreSplash;
+        feel.FindProperty("backstabSound").objectReferenceValue = Sound(new Spec { Name = "Backstab Hit", Clips = Made(MixkitBlades, "Backstab Hit", 2), Volume = 0.85f, Pitch = new Vector2(0.97f, 1.03f), MaxAtOnce = 2 });
+        feel.ApplyModifiedPropertiesWithoutUndo();
+
+        // A bow's leather creaking as the draw comes full.
+        SoundDefinition fullDraw = Sound(new Spec
+        {
+            Name = "Bow Full Draw", Clips = new[] { $"{Sfx}Kenney RPG/handleSmallLeather.ogg", $"{Sfx}Kenney RPG/handleSmallLeather2.ogg" }, Volume = 0.5f, Pitch = new Vector2(0.96f, 1.04f), Audible = 12f, MaxAtOnce = 1,
+        });
+        foreach (string weapon in new[] { "CrudeWoodenBow", "HuntersBow", "ElderwoodLongbow" })
+        {
+            var asset = AssetDatabase.LoadAssetAtPath<WeaponDefinition>($"{CombatAnimationSetup.WeaponFolder}/{weapon}.asset");
+            if (asset != null)
+            {
+                var data = new SerializedObject(asset);
+                data.FindProperty("fullDrawSound").objectReferenceValue = fullDraw;
+                data.ApplyModifiedPropertiesWithoutUndo();
+            }
+        }
+
         AssetDatabase.SaveAssets();
+    }
+
+    private const string MixkitBlades = "Mixkit Blades";
+
+    private static void SetHitSound(string weapon, SoundDefinition hit)
+    {
+        var asset = AssetDatabase.LoadAssetAtPath<WeaponDefinition>($"{CombatAnimationSetup.WeaponFolder}/{weapon}.asset");
+        if (asset != null)
+        {
+            var data = new SerializedObject(asset);
+            data.FindProperty("hitSound").objectReferenceValue = hit;
+            data.ApplyModifiedPropertiesWithoutUndo();
+        }
     }
 
     private static void AssignWeapon(string weapon, SoundDefinition swing, SoundDefinition hit)

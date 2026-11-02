@@ -51,6 +51,7 @@ public sealed class EliteCreature : MonoBehaviour
     private void Apply(MonsterAI ai, IReadOnlyList<EliteAffixDefinition> chosen, RaidDifficulty tier, float healthScale, float powerScale)
     {
         Ai = ai;
+        ai.IsElite = true;
         Combatant = ai.GetComponent<Combatant>();
         Health = ai.GetComponent<Damageable>();
         difficulty = tier;
