@@ -11,8 +11,9 @@ using TMPro;
 /// <list type="bullet">
 /// <item>A RecipeBrowser over the station's known recipes, to choose and queue them.</item>
 /// <item>The queue, with a progress bar for the craft being worked on.</item>
-/// <item>The output slot as its own grid. Clicking it collects.</item>
-/// <item>The station's extra actions (IStationMenuExtension: "Repair gear…", "Plan a raid") as buttons.</item>
+/// <item>The output slot, which holds one kind at a time. Clicking it collects.</item>
+/// <item>The station's tier, who works here and what waits for a higher tier.</item>
+/// <item>The station's extra actions (IStationMenuExtension: "Upgrade…", "Repair gear…", "Plan a raid") as buttons.</item>
 /// </list>
 /// Hovering a queued craft or the output shows its stats and description in the tooltip.
 /// <para>
@@ -90,6 +91,8 @@ public sealed class StationWindow : MonoBehaviour
         }
     }
 
+    private const float OutputGap = 14f;
+
     private static readonly Color PlainTint = new Color(0.3f, 0.31f, 0.36f, 1f);
 
     [SerializeField] private UIWindow window;
@@ -100,6 +103,8 @@ public sealed class StationWindow : MonoBehaviour
     [SerializeField] private RecipeBrowser recipes;
 
     [Header("Queue")]
+    [Tooltip("The queue's heading: how full it is and when it will all be done.")]
+    [SerializeField] private TMP_Text queueLabel;
     [Tooltip("Parent for the queued crafts. Should have a GridLayoutGroup.")]
     [SerializeField] private RectTransform queueGrid;
     [Tooltip("The bar's fill; its right anchor follows the craft's progress.")]
@@ -108,11 +113,17 @@ public sealed class StationWindow : MonoBehaviour
     [SerializeField] private Button cancelButton;
 
     [Header("Output")]
+    [Tooltip("Heading, cells and button together. Sits under the queue's last row, however many rows it has.")]
+    [SerializeField] private RectTransform outputGroup;
     [Tooltip("Parent for the output cells. Should have a GridLayoutGroup.")]
     [SerializeField] private RectTransform outputGrid;
-    [SerializeField, Min(1)] private int outputCells = 4;
+    [SerializeField, Min(1)] private int outputCells = 1;
     [SerializeField] private TMP_Text outputLabel;
     [SerializeField] private Button collectButton;
+
+    [Header("This station")]
+    [Tooltip("The station's tier, who works here and what waits for a higher tier.")]
+    [SerializeField] private TMP_Text stationLabel;
 
     [Header("Station actions")]
     [Tooltip("Parent for the station's extra actions (Repair gear, Plan a raid). Should have a horizontal layout group.")]
@@ -138,6 +149,8 @@ public sealed class StationWindow : MonoBehaviour
     private int[] outputAmounts = new int[0];
     private Image progressImage;
     private TMP_Text collectLabel;
+    private UIRole collectRole;
+    private bool anyoneCouldWorkHere;
 
     private void Awake()
     {
@@ -145,6 +158,7 @@ public sealed class StationWindow : MonoBehaviour
         output = new SlotGrid(outputGrid, slotPrefab, (index, data) => Collect(), OnHovered, OnUnhovered);
         progressImage = progressFill.GetComponent<Image>();
         collectLabel = collectButton.GetComponentInChildren<TMP_Text>();
+        collectRole = collectButton.GetComponent<UIRole>();
         actionTemplate.gameObject.SetActive(false);
         closeButton.onClick.AddListener(Close);
         cancelButton.onClick.AddListener(CancelLast);
@@ -169,6 +183,7 @@ public sealed class StationWindow : MonoBehaviour
         crafting = viewer != null ? viewer.GetComponent<PlayerCrafting>() : null;
         range = maxDistance;
         titleLabel.text = source.Type.DisplayName();
+        anyoneCouldWorkHere = HasAJob(source);
         knownCount = -1;
         hoveredGrid = null;
         tooltip.Hide();
@@ -246,6 +261,7 @@ public sealed class StationWindow : MonoBehaviour
 
         RefreshQueue(queue);
         RefreshOutput(queue);
+        stationLabel.text = DescribeStation(known);
         RefreshActions();
         RefreshTooltip();
     }
@@ -270,21 +286,32 @@ public sealed class StationWindow : MonoBehaviour
             }
         }
 
+        queueLabel.text = queue.Current == null
+            ? $"Queue  <color=#{Muted}>empty (holds {queue.MaxQueued})</color>"
+            : $"Queue  <color=#{Muted}>{queue.QueuedCount}/{queue.MaxQueued}, {ItemTooltipView.FormatSeconds(queue.TotalRemaining)} in all</color>";
         if (queue.Current == null)
         {
             progressLabel.text = "Idle: queue a recipe";
         }
         else if (queue.Blocked)
         {
-            progressLabel.text = $"<b>{queue.Current.DisplayName}</b> is done but the output is full – collect it";
+            progressLabel.text = $"<b>{queue.Current.DisplayName}</b> waits: {queue.WaitingFor}";
         }
         else
         {
-            progressLabel.text = $"<b>{queue.Current.DisplayName}</b>  ·  {ItemTooltipView.FormatSeconds(queue.CurrentRemaining)} left"
-                + $"  ({queue.QueuedCount}/{queue.MaxQueued} queued)";
+            progressLabel.text = $"<b>{queue.Current.DisplayName}</b>  ·  {ItemTooltipView.FormatSeconds(queue.CurrentRemaining)} left";
         }
 
         cancelButton.interactable = queue.CanCancelLast;
+        PlaceOutputUnderQueue();
+    }
+
+    private void PlaceOutputUnderQueue()
+    {
+        var layout = queueGrid.GetComponent<GridLayoutGroup>();
+        int rows = Mathf.CeilToInt(queued.Views.Count / (float)Mathf.Max(1, layout.constraintCount));
+        float height = rows * layout.cellSize.y + Mathf.Max(0, rows - 1) * layout.spacing.y;
+        outputGroup.anchoredPosition = new Vector2(outputGroup.anchoredPosition.x, queueGrid.anchoredPosition.y - height - OutputGap);
     }
 
     private void CancelLast()
@@ -326,7 +353,86 @@ public sealed class StationWindow : MonoBehaviour
             ? $"Output  <color=#{Muted}>{queue.OutputAmount}/{queue.Capacity} {name}</color>"
             : $"Output  <color=#{Muted}>empty (holds {queue.Capacity})</color>";
         collectButton.interactable = thing != null;
-        collectLabel.text = thing != null ? $"Collect {queue.OutputAmount} {name}" : "Collect";
+        collectLabel.text = thing != null ? $"Collect {queue.OutputAmount} {name}" : "Nothing to collect";
+        // While it holds the queue up, collecting is the one thing to do.
+        UIRole.Kind role = queue.Blocked ? UIRole.Kind.PrimaryButton : UIRole.Kind.Button;
+        if (collectRole != null && collectRole.Role != role)
+        {
+            collectRole.Set(role);
+            // Blending in Linear thins dark text on a light button.
+            collectLabel.fontStyle = queue.Blocked ? FontStyles.Bold : FontStyles.Normal;
+        }
+    }
+
+    // ----- This station -----
+
+    private string DescribeStation(List<RecipeDefinition> known)
+    {
+        var lines = new List<string>();
+        int tier = station.Tier;
+        if (station.TryGetComponent(out Construction construction) && construction.Definition.MaxLevel > 1)
+        {
+            lines.Add($"Tier {Tiers.ToRoman(tier)} of {Tiers.ToRoman(construction.Definition.MaxLevel)}");
+        }
+
+        int higher = 0;
+        foreach (RecipeDefinition recipe in known)
+        {
+            if (recipe.RequiredStationTier > tier)
+            {
+                higher++;
+            }
+        }
+
+        if (higher > 0)
+        {
+            lines.Add(higher == 1 ? "1 recipe you know needs a higher tier." : $"{higher} recipes you know need a higher tier.");
+        }
+
+        ResidentRecord worker = station.Worker;
+        if (worker != null)
+        {
+            lines.Add($"{worker.Resident.DisplayName} works here.");
+        }
+        else if (anyoneCouldWorkHere)
+        {
+            lines.Add($"Nobody works here yet. Residents get their jobs in {GameInput.KeyLabel(GameInput.Haven)}.");
+        }
+
+        if (station.Speed > 1f)
+        {
+            lines.Add($"Works {Mathf.RoundToInt((station.Speed - 1f) * 100f)}% faster.");
+        }
+
+        return string.Join("\n", lines);
+    }
+
+    // Whether any resident in the game has a job here, so the window doesn't suggest a worker where none can come.
+    private static bool HasAJob(CraftingStation source)
+    {
+        var database = Resources.Load<ContentDatabase>(ContentDatabase.ResourceName);
+        if (database == null || !source.TryGetComponent(out BuildingObject building) || building.Definition == null)
+        {
+            return false;
+        }
+
+        foreach (ResidentDefinition resident in database.Residents)
+        {
+            if (resident == null)
+            {
+                continue;
+            }
+
+            foreach (JobDefinition job in resident.Jobs)
+            {
+                if (job != null && job.Workplace == building.Definition)
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     private void Collect()

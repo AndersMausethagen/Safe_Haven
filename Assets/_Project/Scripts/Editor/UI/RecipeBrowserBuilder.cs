@@ -50,6 +50,10 @@ public static class RecipeBrowserBuilder
             icon.raycastTarget = false;
 
             TMP_Text name = Line("Name", root.transform, 15f, style.Text, -7f, 22f);
+            // "Crude Stone Arrows ×5" should still read whole in the bag's narrow list.
+            name.fontSizeMax = 15f;
+            name.fontSizeMin = 12f;
+            name.enableAutoSizing = true;
             TMP_Text status = Line("Status", root.transform, 13f, style.Muted, -29f, 18f);
             status.rectTransform.offsetMax = new Vector2(-8f, status.rectTransform.offsetMax.y);
             TMP_Text tier = StationWindowBuilder.Text("Tier", root.transform, "I", 13f, style.Muted);
@@ -184,7 +188,7 @@ public static class RecipeBrowserBuilder
         problem.overflowMode = TextOverflowModes.Ellipsis;
 
         float buttonWidth = (inner - 8f) / 2f;
-        Button makeAll = StationWindowBuilder.MakeButton("Make All Button", selected, "Craft 2", 15f);
+        Button makeAll = StationWindowBuilder.MakeButton("Make All Button", selected, "Craft all", 15f);
         StationWindowBuilder.Place((RectTransform)makeAll.transform, Vector2.zero, new Vector2(12f, 12f), new Vector2(buttonWidth, 40f));
         Button make = StationWindowBuilder.MakeButton("Make Button", selected, "Craft", 16f, UIRole.Kind.PrimaryButton);
         StationWindowBuilder.Place((RectTransform)make.transform, new Vector2(1f, 0f), new Vector2(-12f, 12f), new Vector2(buttonWidth, 40f));
@@ -288,11 +292,11 @@ public static class RecipeBrowserBuilder
                 }
             }
 
-            RecipeBrowser browser = Add(panel, 604f, -116f, 532f, 482f, 246f);
+            RecipeBrowser browser = Add(panel, 604f, -116f, 532f, 558f, 246f);
             // The tooltip and the dragged icon draw over everything, so they stay last.
             browser.transform.SetSiblingIndex(panel.Find("Tooltip").GetSiblingIndex());
             RectTransform footer = (RectTransform)panel.Find("Recipe Footer");
-            footer.anchoredPosition = new Vector2(604f, -602f);
+            footer.anchoredPosition = new Vector2(604f, -678f);
             footer.sizeDelta = new Vector2(532f, 22f);
             var footerLabel = footer.GetComponent<TMP_Text>();
             footerLabel.fontSize = 13f;

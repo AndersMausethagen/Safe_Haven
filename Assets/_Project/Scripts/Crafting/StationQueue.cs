@@ -15,6 +15,8 @@ using Object = UnityEngine.Object;
 /// </summary>
 public sealed class StationQueue
 {
+    private const float MinSpeed = 0.01f;
+
     /// <summary>A recipe waiting in the queue, Count times.</summary>
     public sealed class Job
     {
@@ -70,7 +72,56 @@ public sealed class StationQueue
     public int FreeQueueSlots => Mathf.Max(0, MaxQueued - QueuedCount);
 
     /// <summary>Seconds left on the craft in progress.</summary>
-    public float CurrentRemaining => Current != null ? Mathf.Max(0f, Current.CraftSeconds - Progress) : 0f;
+    public float CurrentRemaining => Current != null ? Mathf.Max(0f, Current.CraftSeconds - Progress) / Mathf.Max(MinSpeed, SpeedMultiplier) : 0f;
+
+    /// <summary>Real seconds until everything in the queue is made, at the station's speed.</summary>
+    public float TotalRemaining
+    {
+        get
+        {
+            float work = -Progress;
+            foreach (Job job in jobs)
+            {
+                work += job.Recipe.CraftSeconds * job.Count;
+            }
+
+            return Mathf.Max(0f, work) / Mathf.Max(MinSpeed, SpeedMultiplier);
+        }
+    }
+
+    /// <summary>How many crafts of a recipe are waiting or being made.</summary>
+    public int CountOf(RecipeDefinition recipe)
+    {
+        int count = 0;
+        foreach (Job job in jobs)
+        {
+            if (job.Recipe == recipe)
+            {
+                count += job.Count;
+            }
+        }
+
+        return count;
+    }
+
+    /// <summary>
+    /// What a finished craft is waiting for, in words for the player, or null when nothing holds it up. The slot takes one
+    /// kind at a time, so it can stop with room to spare: "full" would be wrong then.
+    /// </summary>
+    public string WaitingFor
+    {
+        get
+        {
+            if (!Blocked || Current == null)
+            {
+                return null;
+            }
+
+            return Output != null && Output != Current.OutputDefinition && Output is IDisplayName other
+                ? $"collect the {other.DisplayName} first"
+                : "the output is full, collect it";
+        }
+    }
 
     /// <summary>Applies the station's current output size and queue length (they come from its building definition).</summary>
     public void Configure(int capacity, int maxQueued)

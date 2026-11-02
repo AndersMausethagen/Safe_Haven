@@ -81,7 +81,7 @@ public sealed class SettlementSystem : MonoBehaviour, IGameSystem
         }
     }
 
-    /// <summary>Warns once when a station stops because its output slot is full.</summary>
+    /// <summary>Warns once when a station stops because a finished craft can't go in its output slot.</summary>
     private void LateUpdate()
     {
         foreach (StationQueue station in GameSession.Settlement.Workshops.Queues)
@@ -89,7 +89,7 @@ public sealed class SettlementSystem : MonoBehaviour, IGameSystem
             bool blocked = station.Blocked;
             if (blocked && !blockedStations.Contains(station.StationId))
             {
-                GameMessages.Post($"The {station.Type.DisplayName()} has stopped: its output is full.", MessageKind.Warning);
+                GameMessages.Post($"The {station.Type.DisplayName()} has stopped: {station.WaitingFor}.", MessageKind.Warning);
             }
 
             if (blocked)

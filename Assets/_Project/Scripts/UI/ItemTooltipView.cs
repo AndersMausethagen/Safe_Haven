@@ -201,7 +201,8 @@ public sealed class ItemTooltipView : MonoBehaviour
         panel.anchoredPosition = position;
     }
 
-    // Without a stack (a recipe's output) it describes the item as it comes out new: no wear, stack size or use hints.
+    // Without a stack (a recipe's output) it describes the item as it comes out new, for someone deciding whether to make
+    // it: what it is for comes before its numbers, and there is no wear, stack size, price or use hint.
     private static string Describe(ItemDefinition item, ItemStack? stack)
     {
         bool held = stack.HasValue;
@@ -219,6 +220,13 @@ public sealed class ItemTooltipView : MonoBehaviour
             }
         }
 
+        bool describedFirst = !held && !string.IsNullOrWhiteSpace(item.Description);
+        if (describedFirst)
+        {
+            builder.Append("\n\n").Append(item.Description);
+        }
+
+        int numbersStart = builder.Length;
         foreach (StatBonus bonus in item.StatBonuses)
         {
             builder.Append("\n<color=#8BE08B>").Append(bonus.Describe()).Append("</color>");
@@ -242,7 +250,7 @@ public sealed class ItemTooltipView : MonoBehaviour
             builder.Append($"\n<color=#AAB0BC>Weight {item.Weight:0.##}{(count > 1 ? $"  ({item.Weight * count:0.#} for the stack)" : "")}</color>");
         }
 
-        if (item.Value > 0)
+        if (item.Value > 0 && held)
         {
             builder.Append($"\n<color=#E8C46A>Value {item.Value}{(count > 1 ? $"  ({item.Value * count} for the stack)" : "")}</color>");
         }
@@ -306,15 +314,20 @@ public sealed class ItemTooltipView : MonoBehaviour
             builder.Append("\n<color=#AAB0BC>Right-click to equip or unequip (C opens the character screen).</color>");
         }
 
-        if (!string.IsNullOrWhiteSpace(item.Description))
+        if (held && !string.IsNullOrWhiteSpace(item.Description))
         {
             builder.Append("\n\n").Append(item.Description);
         }
 
-        if (item.Stackable)
+        if (held && item.Stackable)
         {
-            builder.Append(held ? $"\n\n<color=#AAB0BC>{count} / {item.MaximumStack} in this stack</color>"
-                : $"\n\n<color=#AAB0BC>Stacks to {item.MaximumStack}</color>");
+            builder.Append($"\n\n<color=#AAB0BC>{count} / {item.MaximumStack} in this stack</color>");
+        }
+
+        // A blank line between the words and the numbers that follow them.
+        if (describedFirst && builder.Length > numbersStart)
+        {
+            builder.Insert(numbersStart, "\n");
         }
 
         return builder.ToString();

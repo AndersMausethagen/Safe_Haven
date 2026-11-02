@@ -472,7 +472,7 @@ public sealed class ItemInventoryWindow : MonoBehaviour, IItemSlotHandler
         byHand.Sort(RecipeBook.CompareForDisplay);
         atStations.Sort(RecipeBook.CompareForDisplay);
         recipes.Show(new HandMaker(crafting), byHand, atStations);
-        SetFooter("Buildings come from the build menu (G).");
+        SetFooter($"Double-click or right-click a recipe to craft one. Buildings: build menu ({GameInput.KeyLabel(GameInput.Build)}).");
         recipesDirty = true;
     }
 

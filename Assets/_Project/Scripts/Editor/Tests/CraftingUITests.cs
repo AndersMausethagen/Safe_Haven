@@ -90,6 +90,48 @@ public sealed class CraftingUITests
     }
 
     [Test]
+    public void Shortfall_NamesAllThatIsMissingAndOnlyThat()
+    {
+        ItemDefinition stick = Item("Sticks", ItemCategory.Material);
+        ItemDefinition stone = Item("Grey Stone", ItemCategory.Material);
+        ResourceDefinition essence = Create<ResourceDefinition>("Essence");
+        RecipeDefinition recipe = Recipe("axe", Item("Axe", ItemCategory.Tool), null);
+        var data = new SerializedObject(recipe);
+        SerializedProperty resources = data.FindProperty("resourceCost");
+        resources.arraySize = 1;
+        resources.GetArrayElementAtIndex(0).FindPropertyRelative("resource").objectReferenceValue = essence;
+        resources.GetArrayElementAtIndex(0).FindPropertyRelative("amount").intValue = 5;
+        SerializedProperty items = data.FindProperty("itemCost");
+        items.arraySize = 2;
+        items.GetArrayElementAtIndex(0).FindPropertyRelative("item").objectReferenceValue = stick;
+        items.GetArrayElementAtIndex(0).FindPropertyRelative("amount").intValue = 2;
+        items.GetArrayElementAtIndex(1).FindPropertyRelative("item").objectReferenceValue = stone;
+        items.GetArrayElementAtIndex(1).FindPropertyRelative("amount").intValue = 4;
+        data.ApplyModifiedPropertiesWithoutUndo();
+
+        Assert.AreEqual("Need 3 Essence, 1 Sticks, 3 Grey Stone", RecipeMaking.Shortfall(recipe, _ => 2, _ => 1));
+        Assert.AreEqual("Need 1 Sticks", RecipeMaking.Shortfall(recipe, _ => 5, item => item == stone ? 4 : 1));
+        Assert.IsNull(RecipeMaking.Shortfall(recipe, _ => 5, _ => 4));
+    }
+
+    [Test]
+    public void DescribeOutput_PutsWhatItIsForBeforeItsNumbersAndLeavesOutPriceAndStacks()
+    {
+        ItemDefinition block = Item("Stone Block", ItemCategory.Material);
+        var data = new SerializedObject(block);
+        data.FindProperty("description").stringValue = "For sturdy construction.";
+        data.FindProperty("weight").floatValue = 2f;
+        data.FindProperty("value").intValue = 9;
+        data.ApplyModifiedPropertiesWithoutUndo();
+
+        string text = ItemTooltipView.DescribeOutput(Recipe("block", block, null));
+
+        Assert.Less(text.IndexOf("For sturdy construction."), text.IndexOf("Weight"));
+        StringAssert.DoesNotContain("Value", text);
+        StringAssert.DoesNotContain("Stacks to", text);
+    }
+
+    [Test]
     public void DescribeRecipe_ShowsOutputStatsCostsStationTimeAndProblem()
     {
         ItemDefinition axe = Item("Axe", ItemCategory.Tool);

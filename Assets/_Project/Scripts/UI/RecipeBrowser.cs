@@ -8,8 +8,10 @@ using TMPro;
 /// <summary>
 /// Choosing and making recipes, the same in the bag (B) and at every station: tabs by what recipes make and a Can Make
 /// filter over a list of named rows, and beside it the selected recipe with what it does, each material against what is
-/// held, and the buttons to make one or as many as possible. A right-click or double-click on a row makes one straight
-/// away. It reads and makes through an IRecipeMaker; the rules stay in PlayerCrafting and StationCrafting.
+/// held, how many the player already owns, and the buttons to make one or as many as possible. A right-click or
+/// double-click on a row makes one straight away. A shortage of materials is the everyday state of most of a list, so it
+/// stays quiet and what can be made stands out. It reads and makes through an IRecipeMaker; the rules stay in
+/// PlayerCrafting and StationCrafting.
 /// Built by Safe Haven › UI › Build Recipe Browsers.
 /// </summary>
 public sealed class RecipeBrowser : MonoBehaviour
@@ -38,6 +40,7 @@ public sealed class RecipeBrowser : MonoBehaviour
     [Tooltip("Parent for the material rows. Should have a vertical layout group.")]
     [SerializeField] private RectTransform costList;
     [SerializeField] private RecipeCostRow costTemplate;
+    [Tooltip("What stands in the way of the recipe, or else how many the player already owns.")]
     [SerializeField] private TMP_Text problemLabel;
     [SerializeField] private Button makeButton;
     [SerializeField] private Button makeAllButton;
@@ -68,6 +71,7 @@ public sealed class RecipeBrowser : MonoBehaviour
     {
         Wire();
         maker = source;
+        described = null;
         here.Clear();
         here.AddRange(recipes);
         elsewhere.Clear();
@@ -241,17 +245,18 @@ public sealed class RecipeBrowser : MonoBehaviour
             if (used)
             {
                 RecipeDefinition recipe = shown[i];
-                int count = elsewhere.Contains(recipe) ? 0 : maker.HowMany(recipe);
+                bool away = elsewhere.Contains(recipe);
+                int count = away ? 0 : maker.HowMany(recipe);
+                bool materials = false;
+                string problem = away ? recipe.Station.DisplayName() : count > 0 ? null : RecipeMaking.Problem(maker, recipe, out materials);
                 rows[i].name = recipe.DisplayName;
-                rows[i].Show(recipe, count, count > 0 ? null : WhereOrWhyNot(recipe), recipe == selected, elsewhere.Contains(recipe));
+                rows[i].Show(recipe, count, problem, recipe == selected, away || materials, away ? 0 : maker.Waiting(recipe));
             }
         }
 
         emptyLabel.gameObject.SetActive(shown.Count == 0);
         emptyLabel.text = tabs.Count == 0 ? emptyText : "Nothing here can be made right now. Clear the Can Make filter to see what is missing.";
     }
-
-    private string WhereOrWhyNot(RecipeDefinition recipe) => elsewhere.Contains(recipe) ? recipe.Station.DisplayName() : maker.WhyNot(recipe);
 
     private void OnRowClicked(RecipeRowView row, PointerEventData eventData)
     {
@@ -284,22 +289,36 @@ public sealed class RecipeBrowser : MonoBehaviour
             icon.enabled = icon.sprite != null;
             nameLabel.text = selected.OutputAmount > 1 ? $"{selected.DisplayName} ×{selected.OutputAmount}" : selected.DisplayName;
             nameLabel.color = selected.Output != null ? Rarity.ColorOf(selected.Output.Rarity) : UIStyle.Current.Accent;
-            infoLabel.text = selected.IsHandcrafted ? "By hand" : $"{selected.Station.DisplayName()}  ·  {ItemTooltipView.FormatSeconds(selected.CraftSeconds)}";
+            float seconds = elsewhere.Contains(selected) ? selected.CraftSeconds : maker.Seconds(selected);
+            infoLabel.text = selected.IsHandcrafted ? "By hand" : $"{selected.Station.DisplayName()}  ·  {ItemTooltipView.FormatSeconds(seconds)}";
             descriptionLabel.text = ItemTooltipView.DescribeOutput(selected);
             descriptionLabel.rectTransform.anchoredPosition = Vector2.zero;
         }
 
         RefreshCosts();
         bool here = !elsewhere.Contains(selected);
-        string problem = maker.WhyNot(selected);
         int count = here ? maker.HowMany(selected) : 0;
-        problemLabel.text = problem ?? "";
-        problemLabel.color = here ? UIStyle.Current.Danger : UIStyle.Current.Muted;
+        // A shortage shows in the Needs list right above, so this line only speaks up for what that can't say.
+        bool materials = false;
+        string problem = here ? RecipeMaking.Problem(maker, selected, out materials) : null;
+        bool blocked = problem != null && !materials;
+        problemLabel.text = blocked ? problem : Owned(selected, here);
+        problemLabel.color = blocked ? UIStyle.Current.Warning : UIStyle.Current.Muted;
         makeButton.gameObject.SetActive(here);
         makeButton.interactable = count > 0;
         makeButton.GetComponentInChildren<TMP_Text>().text = maker.Verb;
-        makeAllButton.gameObject.SetActive(here && count > 1);
-        makeAllButton.GetComponentInChildren<TMP_Text>().text = $"{maker.Verb} {count}";
+        makeAllButton.gameObject.SetActive(here);
+        makeAllButton.interactable = count > 1;
+        makeAllButton.GetComponentInChildren<TMP_Text>().text = count > 1 ? $"{maker.Verb} ×{count}" : $"{maker.Verb} all";
+    }
+
+    private string Owned(RecipeDefinition recipe, bool here)
+    {
+        int owned = RecipeMaking.Owned(maker, recipe);
+        int waiting = here ? maker.Waiting(recipe) : 0;
+        string have = owned > 0 ? $"You have {owned}" : "";
+        string queued = waiting > 0 ? $"{waiting} queued" : "";
+        return have.Length > 0 && queued.Length > 0 ? $"{have}  ·  {queued}" : have + queued;
     }
 
     private void RefreshCosts()

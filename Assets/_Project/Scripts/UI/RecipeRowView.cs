@@ -10,7 +10,7 @@ using TMPro;
 /// </summary>
 public sealed class RecipeRowView : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
 {
-    private static readonly Color DimIcon = new Color(1f, 1f, 1f, 0.45f);
+    private static readonly Color DimIcon = new Color(1f, 1f, 1f, 0.7f);
 
     [SerializeField] private Image background;
     [Tooltip("The thin line that marks the selected row.")]
@@ -43,8 +43,9 @@ public sealed class RecipeRowView : MonoBehaviour, IPointerClickHandler, IPointe
     }
 
     /// <summary>Shows the recipe. A count above zero says how many can be made; otherwise the problem does.</summary>
-    /// <param name="muted">The problem isn't something to fix here, such as a recipe made at another station.</param>
-    public void Show(RecipeDefinition recipe, int count, string problem, bool selected, bool muted)
+    /// <param name="muted">The ordinary state of a list: materials still to gather, or a recipe made at another station. What can be made should stand out, not this.</param>
+    /// <param name="waiting">How many are already on their way.</param>
+    public void Show(RecipeDefinition recipe, int count, string problem, bool selected, bool muted, int waiting)
     {
         Recipe = recipe;
         isSelected = selected;
@@ -58,8 +59,9 @@ public sealed class RecipeRowView : MonoBehaviour, IPointerClickHandler, IPointe
         nameLabel.color = canMake ? style.Text : style.Muted;
         tierLabel.text = Tiers.ToRoman(recipe.Tier);
         tierLabel.color = Tiers.ColorOf(recipe.Tier);
-        statusLabel.text = canMake ? $"Can make {count}" : problem;
-        statusLabel.color = canMake ? style.Good : muted ? style.Muted : style.Danger;
+        string status = canMake ? $"Can make {count}" : problem;
+        statusLabel.text = waiting > 0 ? $"{waiting} queued  ·  {status}" : status;
+        statusLabel.color = canMake ? style.Good : muted ? style.Muted : style.Warning;
         Paint();
     }
 

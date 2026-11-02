@@ -211,8 +211,8 @@ public sealed class BuildPlacer : MonoBehaviour
         GameMessages.Post(toUpgrade ? "Click a building to upgrade or repair it. Right-click to cancel." : "Click a building to move it. Right-click to cancel.");
     }
 
-    // The next level of a building: what it costs and brings, and a button to order it (the scaffold goes up).
-    private void ShowUpgrade(BuildingObject building)
+    /// <summary>The next level of a building: what it costs and brings, and a button to order it (the scaffold goes up).</summary>
+    public void ShowUpgrade(BuildingObject building)
     {
         if (!building.TryGetComponent(out Construction construction))
         {
@@ -245,16 +245,11 @@ public sealed class BuildPlacer : MonoBehaviour
 
     private MenuPage UpgradePage(BuildingObject building, Construction construction, BuildingLevel next)
     {
-        var bonuses = new List<string>();
-        if (next.craftSpeed > 0f) bonuses.Add($"works {next.craftSpeed * 100f:0}% faster");
-        if (next.extraQueue > 0) bonuses.Add($"+{next.extraQueue} queue");
-        if (next.extraOutput > 0) bonuses.Add($"+{next.extraOutput} output");
-        if (next.extraStorage > 0) bonuses.Add($"+{next.extraStorage} storage slots");
-        bonuses.Add($"+{next.renown} renown");
         var page = new MenuPage
         {
             Title = $"{next.title} {building.Definition.DisplayName}",
-            Body = $"Level {construction.Level + 1} of {building.Definition.MaxLevel}. {next.description}\n<color=#8BE08B>{string.Join(", ", bonuses)}</color>",
+            Body = $"Level {construction.Level + 1} of {building.Definition.MaxLevel}.\n"
+                + HavenBuildings.WhatTierBrings(building.Definition, construction.Level + 1, next, GetComponent<PlayerCrafting>()),
         };
         bool affordable = MaterialPool.For(gameObject).CanAfford(next.essence, next.cost, out string missing);
         string cost = next.CostText;

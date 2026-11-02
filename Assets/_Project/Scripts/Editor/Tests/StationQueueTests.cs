@@ -111,6 +111,47 @@ public sealed class StationQueueTests
     }
 
     [Test]
+    public void WaitingFor_NamesTheOtherKindWhenTheSlotHasRoomAndFullWhenItHasNone()
+    {
+        ItemDefinition bandage = Create<ItemDefinition>("Bandage");
+        ItemDefinition club = Create<ItemDefinition>("Club");
+        RecipeDefinition bandages = Recipe("bandage_recipe", bandage, null, 1, 1f);
+        RecipeDefinition clubs = Recipe("club_recipe", club, null, 1, 1f);
+
+        var otherKind = new StationQueue("forge", CraftingStationType.Anvil, 10, 5);
+        Assert.IsNull(otherKind.WaitingFor);
+        otherKind.Enqueue(bandages);
+        otherKind.Enqueue(clubs);
+        otherKind.Tick(10f, null);
+        Assert.AreEqual(9, otherKind.SlotRoomFor(bandage), "there is room, just not for a club");
+        Assert.AreEqual("collect the Bandage first", otherKind.WaitingFor);
+
+        var full = new StationQueue("forge", CraftingStationType.Anvil, 1, 5);
+        full.Enqueue(bandages, 2);
+        full.Tick(10f, null);
+        Assert.AreEqual("the output is full, collect it", full.WaitingFor);
+    }
+
+    [Test]
+    public void Remaining_IsInRealSecondsAtTheStationsSpeed()
+    {
+        RecipeDefinition slow = Recipe("slow_recipe", Create<ItemDefinition>("slow"), null, 1, 10f);
+        RecipeDefinition quick = Recipe("quick_recipe", Create<ItemDefinition>("quick"), null, 1, 4f);
+        var queue = new StationQueue("forge", CraftingStationType.Anvil, 10, 5) { SpeedMultiplier = 2f };
+        Assert.AreEqual(0f, queue.TotalRemaining);
+
+        queue.Enqueue(slow);
+        queue.Enqueue(quick, 2);
+        Assert.AreEqual(5f, queue.CurrentRemaining, 0.001f);
+        Assert.AreEqual(9f, queue.TotalRemaining, 0.001f);
+        Assert.AreEqual(2, queue.CountOf(quick));
+
+        queue.Tick(1f, null);
+        Assert.AreEqual(4f, queue.CurrentRemaining, 0.001f);
+        Assert.AreEqual(8f, queue.TotalRemaining, 0.001f);
+    }
+
+    [Test]
     public void Enqueue_RespectsQueueLength()
     {
         RecipeDefinition recipe = Recipe("axe_recipe", Create<ItemDefinition>("axe"), null, 1, 1f);

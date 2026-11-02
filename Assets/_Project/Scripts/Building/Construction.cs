@@ -19,7 +19,7 @@ using UnityEngine;
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(BuildingObject))]
-public sealed class Construction : MonoBehaviour, ISaveable
+public sealed class Construction : MonoBehaviour, ISaveable, IStationMenuExtension
 {
     private const string Dressing = "Dressing Level ";
     private const string TierPart = "Tier ";
@@ -109,6 +109,16 @@ public sealed class Construction : MonoBehaviour, ISaveable
         BuildingLevel level = Definition.UpgradeTo(next);
         resources = level != null ? level.essence : (IReadOnlyList<ResourceAmount>)Array.Empty<ResourceAmount>();
         items = level != null ? level.cost : new List<ItemAmount>();
+    }
+
+    /// <summary>A station's window is where the player sees what a higher tier would make, so the way up starts there too.</summary>
+    public void AddActions(MenuPage page, GameObject user)
+    {
+        if (CanUpgrade && user != null && user.TryGetComponent(out BuildPlacer builder) && builder.AllowsChanges)
+        {
+            page.Add(new MenuAction($"Upgrade to Tier {Tiers.ToRoman(Level + 1)}…", "What the next tier costs and brings", true,
+                () => builder.ShowUpgrade(GetComponent<BuildingObject>())));
+        }
     }
 
     /// <summary>Pays for the next level and puts the scaffold up. False (with a message) when it can't.</summary>

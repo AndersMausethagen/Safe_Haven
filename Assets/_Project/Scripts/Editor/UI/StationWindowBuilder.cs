@@ -60,7 +60,8 @@ public static class StationWindowBuilder
             RecipeBrowser browser = RecipeBrowserBuilder.Add(panel, 24f, -62f, 724f, 554f, 378f);
 
             // Right: the queue and its progress bar.
-            At(Text("Queue Title", panel, "Queue", 16f, style.Accent), Right, -62f, 200f, 26f);
+            TMP_Text queueLabel = At(Text("Queue Title", panel, "Queue", 16f, style.Accent), Right, -62f, RightWidth - 128f, 26f);
+            queueLabel.textWrappingMode = TextWrappingModes.NoWrap;
             Button cancel = MakeButton("Cancel Button", panel, "Cancel last", 14f);
             Place((RectTransform)cancel.transform, new Vector2(0f, 1f), new Vector2(Right + RightWidth - 120f, -60f), new Vector2(120f, 28f), new Vector2(0f, 1f));
             RectTransform bar = TopLeft(Right, -96f, RightWidth, 26f, "Progress Bar", panel);
@@ -73,21 +74,31 @@ public static class StationWindowBuilder
             Stretch(progressLabel.rectTransform, 6f);
             progressLabel.alignment = TextAlignmentOptions.Center;
             progressLabel.enableAutoSizing = true;
-            progressLabel.fontSizeMin = 9f;
+            progressLabel.fontSizeMin = 11f;
             progressLabel.fontSizeMax = 13f;
             progressLabel.textWrappingMode = TextWrappingModes.NoWrap;
 
             RectTransform queueGrid = TopLeft(Right, -130f, RightWidth, 118f, "Queue Grid", panel);
             Grid(queueGrid, 56f, 5, 0);
 
-            // Right: what is waiting to be collected. One kind at a time, so four cells show any amount.
-            TMP_Text outputLabel = At(Text("Output Title", panel, "Output", 16f, style.Accent), Right, -262f, RightWidth, 26f);
-            RectTransform outputGrid = TopLeft(Right, -294f, RightWidth, 56f, "Output Grid", panel);
-            Grid(outputGrid, 56f, 4, 0);
-            Button collect = MakeButton("Collect Button", panel, "Collect", 16f);
-            Place((RectTransform)collect.transform, new Vector2(0f, 1f), new Vector2(Right, -358f), new Vector2(RightWidth, 40f), new Vector2(0f, 1f));
-            At(Text("Hint", panel, "Right-click or double-click a recipe to queue one.\nStations keep working while you are away.", 13f, style.Muted),
-                Right, -566f, RightWidth, 50f);
+            // Right: what is waiting to be collected. The slot holds one kind at a time, so it is one cell: more would look like room for another kind.
+            // The window moves this group up to sit under the queue's last row.
+            RectTransform outputGroup = TopLeft(Right, -200f, RightWidth, 90f, "Output Group", panel);
+            TMP_Text outputLabel = At(Text("Output Title", outputGroup, "Output", 16f, style.Accent), 0f, 0f, RightWidth, 26f);
+            RectTransform outputGrid = TopLeft(0f, -30f, 56f, 56f, "Output Grid", outputGroup);
+            Grid(outputGrid, 56f, 1, 0);
+            Button collect = MakeButton("Collect Button", outputGroup, "Collect", 16f);
+            Place((RectTransform)collect.transform, new Vector2(0f, 1f), new Vector2(64f, -30f), new Vector2(RightWidth - 64f, 56f), new Vector2(0f, 1f));
+            TMP_Text collectLabel = collect.GetComponentInChildren<TMP_Text>();
+            collectLabel.fontSizeMax = 16f;
+            collectLabel.fontSizeMin = 12f;
+            collectLabel.enableAutoSizing = true;
+
+            // Right, at the bottom: the station itself, and how the window works.
+            At(Text("Station Title", panel, "This station", 16f, style.Accent), Right, -404f, RightWidth, 26f);
+            TMP_Text stationLabel = At(Text("Station Info", panel, "", 14f, style.Text), Right, -432f, RightWidth, 112f);
+            At(Text("Hint", panel, "Right-click or double-click a recipe to queue one. The output holds one kind at a time. Stations keep working while you are away.", 13f, style.Muted),
+                Right, -552f, RightWidth, 64f);
 
             // The tooltip goes last so it draws over everything.
             RectTransform tip = Rect("Tooltip", panel, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, 1f), Vector2.zero, new Vector2(320f, 100f));
@@ -114,6 +125,7 @@ public static class StationWindowBuilder
             Wire(view,
                 ("window", uiWindow), ("titleLabel", title), ("closeButton", close), ("tooltip", tooltip), ("slotPrefab", slotPrefab), ("recipes", browser),
                 ("queueGrid", queueGrid), ("progressFill", fill), ("progressLabel", progressLabel), ("cancelButton", cancel),
+                ("queueLabel", queueLabel), ("outputGroup", outputGroup), ("stationLabel", stationLabel),
                 ("outputGrid", outputGrid), ("outputLabel", outputLabel), ("collectButton", collect),
                 ("actionBar", actionBar), ("actionTemplate", actionTemplate));
 
@@ -218,6 +230,8 @@ public static class StationWindowBuilder
         Stretch(label.rectTransform);
         label.alignment = TextAlignmentOptions.Center;
         label.textWrappingMode = TextWrappingModes.NoWrap;
+        // Blending in Linear thins dark text on a light button.
+        label.fontStyle = role == UIRole.Kind.PrimaryButton ? FontStyles.Bold : FontStyles.Normal;
         rect.gameObject.AddComponent<UIRole>().Set(role);
         return button;
     }

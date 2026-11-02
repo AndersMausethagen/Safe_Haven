@@ -152,24 +152,27 @@ public sealed class CraftingStation : MonoBehaviour
     public const float WorkerSpeedBonus = 0.5f;
 
     /// <summary>True when a resident's job has this building as its workplace.</summary>
-    public bool HasWorker
+    public bool HasWorker => Worker != null;
+
+    /// <summary>The resident whose job has this building as its workplace, or null.</summary>
+    public ResidentRecord Worker
     {
         get
         {
             if (building == null || building.Definition == null)
             {
-                return false;
+                return null;
             }
 
             foreach (ResidentRecord resident in GameSession.Settlement.Residents)
             {
                 if (resident.Job != null && resident.Job.Workplace == building.Definition)
                 {
-                    return true;
+                    return resident;
                 }
             }
 
-            return false;
+            return null;
         }
     }
 

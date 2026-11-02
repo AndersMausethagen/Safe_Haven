@@ -66,7 +66,7 @@ public static class StationMenu
         {
             RecipeDefinition current = queue.Current;
             body.Append(queue.Blocked
-                ? $"<color={ProblemColor}>Stopped: the output is full. Collect it to continue.</color>"
+                ? $"<color={ProblemColor}>Stopped: {queue.WaitingFor}.</color>"
                 : $"Making {Makes(current)}: {queue.CurrentRemaining:0}s left ({queue.Progress / current.CraftSeconds:P0})");
             body.Append($"\nQueue: {queue.QueuedCount}/{queue.MaxQueued}");
             if (queue.Jobs.Count > 1 || queue.Jobs[0].Count > 1)

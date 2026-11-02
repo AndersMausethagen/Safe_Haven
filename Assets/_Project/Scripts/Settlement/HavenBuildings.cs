@@ -320,8 +320,8 @@ public static class HavenBuildings
         return string.Join("\n", levels);
     }
 
-    // What the next tier makes and opens comes first: that is why anyone would build it.
-    private static string WhatTierBrings(BuildingDefinition building, int tier, BuildingLevel level, PlayerCrafting crafting)
+    /// <summary>What a tier makes and opens comes first: that is why anyone would build it. Then its other bonuses.</summary>
+    public static string WhatTierBrings(BuildingDefinition building, int tier, BuildingLevel level, PlayerCrafting crafting)
     {
         var parts = new List<string>();
         if (crafting != null)
