@@ -16,6 +16,10 @@ MonoBehaviour:
   displayName: Shelter from the Storm
   description: Our expedition came to investigate rumours of a bewitched forest. Trolls and witches wander freely, and its creatures have become aggressive and unpredictable. First, find dry shelter along the old road.
   chain: Prologue - The Unquiet Forest
+  availableObjective: Speak to Sigrid about the next step.
+  announceStart: 1
+  announceCompletion: 0
+  showTimerInHud: 0
   prerequisites: []
   start: 2
   startEvent: {fileID: 11400000, guid: 8eb5d1eaca7f351419207cf31f6401cf, type: 2}
@@ -36,8 +40,8 @@ MonoBehaviour:
     withinMinutes: 0
     questEvent: {fileID: 11400000, guid: 3e4af787a3ca3d241a28d20824384e0f, type: 2}
     countAlreadyOwned: 0
-  turnInToGiver: 0
-  turnInTo: 
+  turnInToGiver: 1
+  turnInTo: Sigrid
   rewardItems: []
   rewardResources: []
   rewardRecipes: []

@@ -28,6 +28,14 @@ public sealed class QuestDefinition : ScriptableObject
     [SerializeField, TextArea(2, 5)] private string description;
     [Tooltip("Groups quests in the editor, e.g. \"Main Story\" or \"Smithing Chain\".")]
     [SerializeField] private string chain;
+    [Tooltip("Shown in the tracker once prerequisites are met, before accepting or starting this quest. Empty hides it until it starts.")]
+    [SerializeField] private string availableObjective;
+    [Tooltip("Announce a new quest and play its sound. Turn off for intermediate stages of a larger quest chain.")]
+    [SerializeField] private bool announceStart = true;
+    [Tooltip("Announce completion and play its sound. Turn off until the whole quest chain is finished.")]
+    [SerializeField] private bool announceCompletion = true;
+    [Tooltip("Show this quest's registered timer in the main countdown HUD as well as the tracker.")]
+    [SerializeField] private bool showTimerInHud;
 
     [Header("Starting")]
     [Tooltip("Quests that must be completed first. This is how chains are made.")]
@@ -68,6 +76,10 @@ public sealed class QuestDefinition : ScriptableObject
     public string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;
     public string Description => description;
     public string Chain => chain;
+    public string AvailableObjective => availableObjective;
+    public bool AnnounceStart => announceStart;
+    public bool AnnounceCompletion => announceCompletion;
+    public bool ShowTimerInHud => showTimerInHud;
     public IReadOnlyList<QuestDefinition> Prerequisites => prerequisites;
     public QuestStart Start => start;
     public GameEventDefinition StartEvent => startEvent;

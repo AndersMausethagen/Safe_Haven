@@ -125,6 +125,60 @@ public sealed class StoryTests
     }
 
     [Test]
+    public void ScriptedMovement_ScalesAnimationAndRestoresItWhenStopped()
+    {
+        holder = new GameObject("Scripted walker");
+        var animator = holder.AddComponent<Animator>();
+        animator.runtimeAnimatorController = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>(
+            "Assets/_Project/Animation/Controllers/MonsterHumanoid.controller");
+        animator.Rebind();
+        animator.speed = 0.8f;
+        var destination = new GameObject("Destination").transform;
+        destination.SetParent(holder.transform);
+        destination.position = Vector3.forward * 10f;
+        var node = new MoveObjectNode
+        {
+            target = holder.transform, destination = destination, seconds = 12f,
+            animationSpeed = 0.5f, waitUntilArrived = true,
+        };
+        var outer = node.Run(new StoryContext(null));
+        Assert.IsTrue(outer.MoveNext());
+        var moving = (System.Collections.IEnumerator)outer.Current;
+        try
+        {
+            Assert.IsTrue(moving.MoveNext());
+            Assert.AreEqual(0.4f, animator.speed, 0.001f);
+        }
+        finally { ((IDisposable)moving).Dispose(); }
+        Assert.AreEqual(0.8f, animator.speed, 0.001f);
+        Assert.AreEqual(0f, animator.GetFloat("Speed"));
+        node.animationSpeed = 0f;
+        StringAssert.Contains("positive", node.FindProblem());
+    }
+
+    [Test]
+    public void Footfalls_CountRealMovementEvenWhenAiIsDisabled_AndIgnoreWarps()
+    {
+        holder = new GameObject("Scripted heavy creature");
+        var footfalls = holder.AddComponent<CreatureFootfalls>();
+        holder.GetComponent<MonsterAI>().enabled = false;
+        var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic;
+        typeof(CreatureFootfalls).GetMethod("Awake", flags).Invoke(footfalls, null);
+        typeof(CreatureFootfalls).GetMethod("OnEnable", flags).Invoke(footfalls, null);
+        var update = typeof(CreatureFootfalls).GetMethod("Update", flags);
+        var travelled = typeof(CreatureFootfalls).GetField("travelled", flags);
+        holder.transform.position += Vector3.forward;
+        update.Invoke(footfalls, null);
+        Assert.AreEqual(1f, (float)travelled.GetValue(footfalls), 0.001f);
+        holder.transform.position += Vector3.forward * 1.5f;
+        update.Invoke(footfalls, null);
+        Assert.AreEqual(0.1f, (float)travelled.GetValue(footfalls), 0.001f, "A stride produces its footfall and keeps the remainder.");
+        holder.transform.position += Vector3.forward * 100f;
+        update.Invoke(footfalls, null);
+        Assert.AreEqual(0f, (float)travelled.GetValue(footfalls), "A teleport must not become a stomp.");
+    }
+
+    [Test]
     public void TheIntroMomentsAreCompleteStories()
     {
         var scene = EditorSceneManager.OpenPreviewScene("Assets/_Project/Scenes/Prologue_MistyWoods.unity");

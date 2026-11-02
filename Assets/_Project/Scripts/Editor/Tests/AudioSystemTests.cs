@@ -110,6 +110,36 @@ public sealed class AudioSystemTests
     }
 
     [Test]
+    public void QuestSounds_RespectLifecycleAnnouncements_NotProgressUpdates()
+    {
+        var host = new GameObject("Quest audio rules");
+        var quest = ScriptableObject.CreateInstance<QuestDefinition>();
+        var settings = Resources.Load<AudioSettingsDefinition>(AudioSettingsDefinition.ResourceName);
+        var audio = host.AddComponent<AudioManager>();
+        var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic;
+        typeof(AudioManager).GetField("settings", flags).SetValue(audio, settings);
+        var method = typeof(AudioManager).GetMethod("MomentSound", flags);
+        SoundDefinition SoundFor(GameEventKind kind) => (SoundDefinition)method.Invoke(audio, new object[] { new GameEvent(kind, quest) });
+        try
+        {
+            Assert.AreSame(settings.QuestStarted, SoundFor(GameEventKind.QuestStarted));
+            Assert.AreSame(settings.QuestCompleted, SoundFor(GameEventKind.QuestCompleted));
+            var data = new SerializedObject(quest);
+            data.FindProperty("announceStart").boolValue = false;
+            data.FindProperty("announceCompletion").boolValue = false;
+            data.ApplyModifiedPropertiesWithoutUndo();
+            Assert.IsNull(SoundFor(GameEventKind.QuestStarted));
+            Assert.IsNull(SoundFor(GameEventKind.QuestCompleted));
+            Assert.IsNull(SoundFor(GameEventKind.Custom));
+        }
+        finally
+        {
+            Object.DestroyImmediate(host);
+            Object.DestroyImmediate(quest);
+        }
+    }
+
+    [Test]
     public void EveryMoment_HasASound()
     {
         var settings = Resources.Load<AudioSettingsDefinition>(AudioSettingsDefinition.ResourceName);

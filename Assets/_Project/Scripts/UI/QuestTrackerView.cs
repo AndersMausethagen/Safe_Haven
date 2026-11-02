@@ -7,7 +7,8 @@ using TMPro;
 /// <summary>
 /// The quest tracker on screen: every active quest with its objectives and progress, done objectives in green, and
 /// "Return to ..." for quests waiting to be handed in, and the time left on timed quests (QuestTimers). It only reads the
-/// QuestLog, refreshing when quests change (and every second while a timer runs). It also makes the waypoint arrow
+/// QuestLog, plus authored Available Objective instructions before acceptance. It refreshes when quests or registered
+/// timers change (and every second while a timer runs). It also makes the waypoint arrow
 /// that points the way to the active quest (QuestWaypointHud).
 /// </summary>
 public sealed class QuestTrackerView : MonoBehaviour
@@ -25,6 +26,7 @@ public sealed class QuestTrackerView : MonoBehaviour
     private void OnEnable()
     {
         QuestManager.Changed += Refresh;
+        QuestTimers.Changed += Refresh;
         Refresh();
         if (waypoints == null && Application.isPlaying)
         {
@@ -35,6 +37,7 @@ public sealed class QuestTrackerView : MonoBehaviour
     private void OnDisable()
     {
         QuestManager.Changed -= Refresh;
+        QuestTimers.Changed -= Refresh;
     }
 
     private float nextTick;
@@ -60,8 +63,17 @@ public sealed class QuestTrackerView : MonoBehaviour
             }
         }
 
+        var available = new List<QuestDefinition>();
+        QuestManager manager = QuestManager.Instance;
+        if (manager != null)
+            foreach (QuestDefinition quest in manager.Quests)
+                if (quest != null && !string.IsNullOrWhiteSpace(quest.AvailableObjective) &&
+                    GameSession.Quests.StatusOf(quest) == QuestStatus.NotStarted && GameSession.Quests.PrerequisitesMet(quest))
+                    available.Add(quest);
+
         active.Sort((a, b) => string.CompareOrdinal(a.Quest.DisplayName, b.Quest.DisplayName));
-        panel.SetActive(active.Count > 0);
+        available.Sort((a, b) => string.CompareOrdinal(a.DisplayName, b.DisplayName));
+        panel.SetActive(active.Count + available.Count > 0);
         var builder = new StringBuilder();
         timed = false;
         for (int q = 0; q < active.Count && q < maxQuests; q++)
@@ -97,9 +109,22 @@ public sealed class QuestTrackerView : MonoBehaviour
             }
         }
 
-        if (active.Count > maxQuests)
+        int shown = Mathf.Min(active.Count, maxQuests);
+        foreach (QuestDefinition quest in available)
         {
-            builder.Append($"\n\n<color={Muted}>+{active.Count - maxQuests} more</color>");
+            if (shown >= maxQuests) break;
+            bool waiting = manager.IsWaiting(quest);
+            string instruction = waiting && DialogueBox.IsSpeaking
+                ? "Finish the conversation to continue." : quest.AvailableObjective;
+            builder.Append(shown > 0 ? "\n\n" : "").Append("<b>").Append(quest.DisplayName).Append("</b>")
+                .Append("\n• ").Append(instruction);
+            timed |= waiting;
+            shown++;
+        }
+
+        if (active.Count + available.Count > maxQuests)
+        {
+            builder.Append($"\n\n<color={Muted}>+{active.Count + available.Count - maxQuests} more</color>");
         }
 
         label.text = builder.ToString();

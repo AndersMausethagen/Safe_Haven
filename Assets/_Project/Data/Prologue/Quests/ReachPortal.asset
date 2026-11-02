@@ -16,6 +16,10 @@ MonoBehaviour:
   displayName: Something Is Coming
   description: Something much larger is approaching. Leave the camp and follow the old road to the standing stones.
   chain: Prologue - The Unquiet Forest
+  availableObjective: Stay alert. The expedition is moving on.
+  announceStart: 0
+  announceCompletion: 0
+  showTimerInHud: 0
   prerequisites:
   - {fileID: 11400000, guid: 2f76858ea1c6b6043bdee39be76ef0b1, type: 2}
   start: 0
@@ -37,8 +41,8 @@ MonoBehaviour:
     withinMinutes: 0
     questEvent: {fileID: 11400000, guid: e7d3f1e76eaac0c4093ec068db341d61, type: 2}
     countAlreadyOwned: 0
-  turnInToGiver: 0
-  turnInTo: 
+  turnInToGiver: 1
+  turnInTo: Sigrid
   rewardItems: []
   rewardResources: []
   rewardRecipes: []

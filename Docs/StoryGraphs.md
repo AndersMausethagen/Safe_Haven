@@ -23,7 +23,7 @@ draw it as nodes in **Safe Haven › Quests › Story Graph** instead of wiring 
 | Talk | Say (a line in the dialogue box: the player or someone in the scene, with their live portrait), Choice (a line with answers; each answer has its own output; Must Answer asks again if the box is closed) |
 | Flow | Wait, Wait For Quiet, Wait Until Enemies Are Defeated, Has It Happened? (Yes / No: a Quest Event raised in this game, saved), Check Quest (Not Started / Active / Completed) |
 | Quest | Raise Quest Event (completes objectives waiting for it, starts quests and other stories), Start Quest, Give Items (Equip puts it on at once; a two-handed weapon puts the torch away) |
-| World | Spawn Enemies (a Mob Spawn Zone, optionally waiting until they are dead), Show / Hide Object, Move Object (walks something to a point over a few seconds), Make Usable / Stop Being Usable, Start / Stop Glowing (a light fades in at an object and lifts the dark around it), Wither / Restore Ground (the grass dies brown around a point), Change Weather, Do Something (any component's method, picked in the Inspector) |
+| World | Spawn Enemies (a Mob Spawn Zone, optionally waiting until they are dead), Show / Hide Object, Move Object (walks something to a point over a few seconds; Animation Speed controls gait independently), Make Usable / Stop Being Usable, Start / Stop Glowing (a light fades in at an object and lifts the dark around it), Wither / Restore Ground (the grass dies brown around a point), Change Weather, Do Something (any component's method, picked in the Inspector) |
 | Camera & Sound | Shake Camera, Focus Camera (the view turns to something for a few seconds, lifting the dark around it so it is seen at night), Lightning, Play Sound, Play / Silence / Resume Music |
 
 ## Quests and stories
@@ -64,7 +64,8 @@ The intro (`Prologue_MistyWoods`, under **Intro Moments**, built by `AgentScript
   When Enemies Are Defeated › Say (Runa).
 - **The Old Troll:** When Quest Starts (Something Is Coming) › Show Object (the troll) › Shake Camera + Play Sound +
   Lightning + Start Glowing + Move Object (it walks towards the fire) + Focus Camera › Say (Sigrid, Runa, Sigrid);
-  then footsteps and smaller shakes every ten seconds.
+  its `CreatureFootfalls` produces sound and smaller shakes as it actually walks. Move Object's Animation Speed slows its
+  gait, and the disabled AI's animation driver does not overwrite the story movement.
 
 The home quest line (`SafeHaven`, under **Home Moments**, built by `AgentScripts/BuildHomeStory.cs`):
 

@@ -16,6 +16,10 @@ MonoBehaviour:
   displayName: A Fire of Our Own
   description: Use the build menu (G) to place a Campfire beside the shelter. Construction uses four Sticks and six Small Rocks.
   chain: Prologue - The Unquiet Forest
+  availableObjective: Speak to Sigrid about the next step.
+  announceStart: 0
+  announceCompletion: 0
+  showTimerInHud: 0
   prerequisites:
   - {fileID: 11400000, guid: 4f625534621489e4183de610d93d4f36, type: 2}
   start: 2

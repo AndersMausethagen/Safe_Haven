@@ -14,6 +14,8 @@ public sealed class CompanionBody
     private readonly bool hasSpeed;
     private readonly bool hasAttack;
     private readonly bool hasDead;
+    private GameObject weaponModel;
+    private bool wasVisible;
 
     public CompanionBody(Animator animator, CompanionDefinition definition)
     {
@@ -43,6 +45,20 @@ public sealed class CompanionBody
     }
 
     public bool IsArmed { get; private set; }
+    public bool IsSheathed { get; private set; }
+
+    public void SetSheathed(bool sheathed)
+    {
+        if (IsSheathed == sheathed) return;
+        IsSheathed = sheathed;
+        if (weaponModel == null) return;
+        if (sheathed)
+        {
+            wasVisible = weaponModel.activeSelf;
+            weaponModel.SetActive(false);
+        }
+        else weaponModel.SetActive(wasVisible);
+    }
 
     public void SetSpeed(float speed)
     {
@@ -95,6 +111,11 @@ public sealed class CompanionBody
         var grip = new GameObject("Weapon Grip").transform;
         grip.SetParent(hand, false);
         grip.SetLocalPositionAndRotation(pose.position, pose.rotation);
-        HeldItemView.CreateModel(weapon, grip);
+        weaponModel = HeldItemView.CreateModel(weapon, grip);
+        if (weaponModel != null && IsSheathed)
+        {
+            wasVisible = weaponModel.activeSelf;
+            weaponModel.SetActive(false);
+        }
     }
 }

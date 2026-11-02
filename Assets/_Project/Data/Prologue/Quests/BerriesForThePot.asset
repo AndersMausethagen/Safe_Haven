@@ -16,6 +16,10 @@ MonoBehaviour:
   displayName: Berries for the Pot
   description: Eirik says nobody fights well on an empty stomach. Pick berries in the clearing west of the shelter and stew them over the campfire in his waterskin.
   chain: Prologue - The Unquiet Forest
+  availableObjective: Stay alert. The expedition is moving on.
+  announceStart: 0
+  announceCompletion: 0
+  showTimerInHud: 0
   prerequisites:
   - {fileID: 11400000, guid: 2ba326763b19a9e46be36507850aed82, type: 2}
   start: 0
@@ -50,8 +54,8 @@ MonoBehaviour:
     withinMinutes: 0
     questEvent: {fileID: 0}
     countAlreadyOwned: 0
-  turnInToGiver: 0
-  turnInTo: 
+  turnInToGiver: 1
+  turnInTo: Sigrid
   rewardItems: []
   rewardResources: []
   rewardRecipes: []

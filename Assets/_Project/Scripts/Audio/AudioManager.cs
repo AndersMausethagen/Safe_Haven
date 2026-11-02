@@ -540,9 +540,9 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
         switch (gameEvent.Kind)
         {
             case GameEventKind.QuestStarted:
-                return settings.QuestStarted;
+                return gameEvent.Subject is QuestDefinition started && started.AnnounceStart ? settings.QuestStarted : null;
             case GameEventKind.QuestCompleted:
-                return settings.QuestCompleted;
+                return gameEvent.Subject is QuestDefinition completed && completed.AnnounceCompletion ? settings.QuestCompleted : null;
             case GameEventKind.Crafted:
                 return gameEvent.ByPlayer ? settings.Crafted : null;
             case GameEventKind.Built:

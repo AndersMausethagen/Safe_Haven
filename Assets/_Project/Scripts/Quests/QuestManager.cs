@@ -141,6 +141,7 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
         else
         {
             waiting.Add(new WaitingQuest(quest, readyAt));
+            RaiseChanged();
         }
     }
 
@@ -308,7 +309,8 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
 
     private void OnQuestStarted(QuestDefinition quest)
     {
-        GameMessages.Post("New quest: " + quest.DisplayName, MessageKind.Info);
+        if (quest.AnnounceStart)
+            GameMessages.Post("New quest: " + quest.DisplayName, MessageKind.Info);
         GameEvents.Raise(new GameEvent(GameEventKind.QuestStarted, quest));
         RaiseAuthoredEvents(quest.OnStarted, quest);
         CountOwned(quest);
@@ -348,7 +350,10 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
             rewards = GiveRewards(quest);
         }
 
-        GameMessages.Post($"Quest complete: {quest.DisplayName}" + (rewards.Length > 0 ? $"  ({rewards})" : ""), MessageKind.Gain);
+        if (quest.AnnounceCompletion)
+            GameMessages.Post($"Quest complete: {quest.DisplayName}" + (rewards.Length > 0 ? $"  ({rewards})" : ""), MessageKind.Gain);
+        else if (rewards.Length > 0)
+            GameMessages.Post($"Rewards for {quest.DisplayName}: {rewards}", MessageKind.Gain);
         GameEvents.Raise(new GameEvent(GameEventKind.QuestCompleted, quest));
         if (quest.CompletionEvent != null)
         {

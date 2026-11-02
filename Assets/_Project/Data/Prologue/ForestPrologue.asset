@@ -43,7 +43,7 @@ MonoBehaviour:
     enemies: []
   - quest: {fileID: 11400000, guid: b2306560eba5c594886d38a592bdb05d, type: 2}
     behaviour: 3
-    arrivalText: A fire at last. Stay close for a moment and catch your breath. Speak with the others; each of them has seen something different in these woods.
+    arrivalText: A fire and a warm meal. Rest for 35 seconds while we gather our strength. Talking with the others is optional; the countdown in your quest tracker shows the time left. When it ends, finish your conversation and we will move on.
     statusText: 'A MOMENT OF WARMTH
 
       Talk to your companions, or catch your breath.'

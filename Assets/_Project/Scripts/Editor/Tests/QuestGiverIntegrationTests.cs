@@ -161,6 +161,75 @@ public sealed class QuestGiverIntegrationTests
     }
 
     [Test]
+    public void ConnectedOffers_KeepTheReturnObjectiveUntilTheNextBriefingIsAccepted()
+    {
+        var first = Quest();
+        var next = Quest(prerequisite: first);
+        Edit(first, d => d.FindProperty("turnInToGiver").boolValue = true);
+        Manager(first, next);
+        var giver = Giver(first, next);
+        giver.BuildDialoguePage().Actions.Single().Chosen();
+        manager.Log.AddProgress(first, 0, 1000);
+        var page = giver.BuildDialoguePage();
+        Assert.AreEqual("Authored briefing 1", page.Body);
+        Assert.AreEqual("Accept 1", page.Actions.Single().Label);
+        Assert.AreEqual(QuestStatus.ReadyToTurnIn, manager.Log.StatusOf(first), "Reading or leaving must not drop the current quest.");
+        Assert.AreEqual(QuestStatus.NotStarted, manager.Log.StatusOf(next));
+        page.Actions.Single().Chosen();
+        Assert.AreEqual(QuestStatus.Completed, manager.Log.StatusOf(first));
+        Assert.AreEqual(QuestStatus.Active, manager.Log.StatusOf(next));
+        page.Actions.Single().Chosen();
+        Assert.AreEqual(QuestStatus.Active, manager.Log.StatusOf(next), "A stale handoff is harmless.");
+    }
+
+    [Test]
+    public void Tracker_ShowsAvailableInstructions_AndRefreshesWhenATimerIsRegisteredAfterQuestStart()
+    {
+        var first = Quest();
+        var next = Quest(prerequisite: first);
+        Edit(next, d => {
+            d.FindProperty("availableObjective").stringValue = "Speak to the smith about the next step.";
+            d.FindProperty("start").enumValueIndex = (int)QuestStart.Automatically;
+            d.FindProperty("startDelay").floatValue = 60f;
+        });
+        Manager(first, next);
+        var root = new GameObject("Tracker test", typeof(RectTransform));
+        root.SetActive(false);
+        var panel = new GameObject("Panel", typeof(RectTransform));
+        panel.transform.SetParent(root.transform, false);
+        var label = panel.AddComponent<TMPro.TextMeshProUGUI>();
+        var tracker = root.AddComponent<QuestTrackerView>();
+        Edit(tracker, d => {
+            d.FindProperty("label").objectReferenceValue = label;
+            d.FindProperty("panel").objectReferenceValue = panel;
+        });
+        var flags = BindingFlags.Instance | BindingFlags.NonPublic;
+        try
+        {
+            typeof(QuestTrackerView).GetMethod("OnEnable", flags).Invoke(tracker, null);
+            Assert.IsFalse(panel.activeSelf);
+            manager.Log.ForceComplete(first);
+            StringAssert.Contains("Speak to the smith", label.text);
+            Assert.IsTrue(panel.activeSelf);
+            Assert.IsTrue(manager.IsWaiting(next));
+            Assert.IsTrue((bool)typeof(QuestTrackerView).GetField("timed", flags).GetValue(tracker),
+                "Queueing a paced quest must notify the tracker so conversation guidance keeps refreshing.");
+            manager.Log.TryStart(next);
+            StringAssert.DoesNotContain("Speak to the smith", label.text);
+            QuestTimers.Set(next, 35f);
+            StringAssert.Contains("0:35", label.text, "The timer is set after the quest's Changed event.");
+            QuestTimers.Clear(next);
+            StringAssert.DoesNotContain("0:35", label.text);
+        }
+        finally
+        {
+            typeof(QuestTrackerView).GetMethod("OnDisable", flags).Invoke(tracker, null);
+            QuestTimers.Clear(next);
+            Object.DestroyImmediate(root);
+        }
+    }
+
+    [Test]
     public void LegacySingleGiver_StillStartsImmediately_AndTurnsInNormally()
     {
         var quest = Quest();
@@ -183,6 +252,8 @@ public sealed class QuestGiverIntegrationTests
         var started = Create<GameEventDefinition>();
         var finished = Create<GameEventDefinition>();
         Edit(quest, data => {
+            data.FindProperty("announceStart").boolValue = false;
+            data.FindProperty("announceCompletion").boolValue = false;
             data.FindProperty("onStarted").arraySize = 1;
             data.FindProperty("onStarted").GetArrayElementAtIndex(0).objectReferenceValue = started;
             data.FindProperty("onCompleted").arraySize = 1;
@@ -226,11 +297,13 @@ public sealed class QuestGiverIntegrationTests
             var giver = leader.GetComponent<QuestGiver>();
             Assert.NotNull(giver, "Saved scene, not an indirect director binding, must contain the giver.");
             var briefings = definition.Chapters.Where(c => c.Quest.Start == QuestStart.ByQuestGiver).ToArray();
-            CollectionAssert.AreEqual(briefings.Select(c => c.Quest), giver.Offers.Select(o => o.Quest));
-            CollectionAssert.AreEqual(briefings.Select(c => c.ArrivalText), giver.Offers.Select(o => o.Text));
+            CollectionAssert.AreEqual(definition.Chapters.Where(c => c.Quest.Start == QuestStart.ByQuestGiver || c.Quest.TurnInToGiver)
+                .Select(c => c.Quest), giver.Offers.Select(o => o.Quest));
+            var acceptedOffers = giver.Offers.Where(o => o.Quest.Start == QuestStart.ByQuestGiver).ToArray();
+            CollectionAssert.AreEqual(briefings.Select(c => c.ArrivalText), acceptedOffers.Select(o => o.Text));
             CollectionAssert.AreEqual(new[] { "I will find us shelter.", "I will gather the supplies.",
                 "I will build the campfire.", "Let us catch our breath.", "I will try the waystones." },
-                giver.Offers.Select(o => o.AcceptText));
+                acceptedOffers.Select(o => o.AcceptText));
             var talkable = leader.GetComponent<Talkable>();
             Assert.NotNull(talkable, "The leader's offers are taken in a conversation.");
             Assert.AreEqual(definition.DialogueCameraDistance, new SerializedObject(talkable).FindProperty("cameraDistance").floatValue);
@@ -264,7 +337,8 @@ public sealed class QuestGiverIntegrationTests
                         goal.Type == ObjectiveType.CraftItem ? GameEventKind.Crafted : GameEventKind.ItemObtained,
                         goal.Type == ObjectiveType.QuestEvent ? (Object)goal.QuestEvent :
                         goal.Type == ObjectiveType.BuildStructure ? (Object)goal.Building : goal.Item, goal.Amount));
-                Assert.AreEqual(QuestStatus.Completed, manager.Log.StatusOf(chapter.Quest), chapter.Quest.name);
+                Assert.AreEqual(chapter.Quest.TurnInToGiver ? QuestStatus.ReadyToTurnIn : QuestStatus.Completed,
+                    manager.Log.StatusOf(chapter.Quest), chapter.Quest.name);
             }
             Assert.IsTrue(manager.Log.HasHappened(definition.FinishedEvent));
             Assert.AreEqual(before, EditorJsonUtility.ToJson(definition), "Shared authored data must stay immutable.");

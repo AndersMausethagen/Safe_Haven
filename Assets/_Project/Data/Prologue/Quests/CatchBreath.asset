@@ -14,8 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::QuestDefinition
   id: prologue.catchbreath
   displayName: A Moment of Warmth
-  description: Warm yourself by the fire. Speak to your companions to learn why they joined the expedition. Conversations are optional.
+  description: Rest for 35 seconds. Conversations with the expedition are optional. When the countdown ends, finish any conversation to continue.
   chain: Prologue - The Unquiet Forest
+  availableObjective: Speak to Sigrid beside the campfire to begin the rest.
+  announceStart: 0
+  announceCompletion: 0
+  showTimerInHud: 0
   prerequisites:
   - {fileID: 11400000, guid: 83fc380c709c01a4383dfa7c9300d48a, type: 2}
   start: 2
@@ -25,7 +29,7 @@ MonoBehaviour:
   objectivesInOrder: 0
   objectives:
   - type: 6
-    description: Catch your breath; conversations are optional
+    description: Wait for the rest countdown; companion conversations are optional
     amount: 1
     item: {fileID: 0}
     resource: {fileID: 0}

@@ -130,12 +130,23 @@ public sealed class Companion : MonoBehaviour, IConversationTopics
         active.Remove(this);
         health.Died -= OnKnockedDown;
         leader.Follow(null);
+        body?.SetSheathed(false);
     }
 
     private void Update()
     {
         leader.Follow(Player.Current);
         body.Arm(definition);
+        bool talking = !IsDowned && ((talkable != null && talkable.IsTalking) || DialogueBox.IsTalkingTo(transform)) &&
+            !MonsterAI.AnyHuntingPlayerSide();
+        body.SetSheathed(talking);
+        if (talking)
+        {
+            weapon.Cancel();
+            Halt();
+            body.SetSpeed(0f);
+            return;
+        }
 
         if (IsDowned)
         {

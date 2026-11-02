@@ -561,6 +561,8 @@ public sealed class MoveObjectNode : StoryNode
     [Tooltip("Where it goes; it turns to face the way it is going.")]
     public Transform destination;
     [Min(0f)] public float seconds = 4f;
+    [Tooltip("Animation playback multiplier while moving. Lower values give large creatures a slower, heavier gait.")]
+    [Min(0.05f)] public float animationSpeed = 1f;
     [Tooltip("Carry on only once it has arrived.")]
     public bool waitUntilArrived;
 
@@ -576,7 +578,7 @@ public sealed class MoveObjectNode : StoryNode
             yield break;
         }
 
-        IEnumerator moving = Move(target, destination.position, seconds);
+        IEnumerator moving = Move(target, destination.position, seconds, animationSpeed);
         if (waitUntilArrived)
         {
             yield return moving;
@@ -587,7 +589,7 @@ public sealed class MoveObjectNode : StoryNode
         }
     }
 
-    private static IEnumerator Move(Transform mover, Vector3 to, float seconds)
+    private static IEnumerator Move(Transform mover, Vector3 to, float seconds, float animationSpeed)
     {
         Vector3 from = mover.position;
         Vector3 flat = new Vector3(to.x - from.x, 0f, to.z - from.z);
@@ -598,27 +600,27 @@ public sealed class MoveObjectNode : StoryNode
 
         Animator animator = mover.GetComponentInChildren<Animator>();
         bool walks = animator != null && HasSpeed(animator);
+        float previousSpeed = animator != null ? animator.speed : 1f;
         float speed = seconds > 0f ? Vector3.Distance(from, to) / seconds : 0f;
-        for (float t = 0f; t < seconds && mover != null; t += Time.deltaTime)
+        try
         {
-            mover.position = Vector3.Lerp(from, to, t / seconds);
-            if (walks)
+            if (walks) animator.speed = previousSpeed * animationSpeed;
+            for (float t = 0f; t < seconds && mover != null; t += Time.deltaTime)
             {
-                animator.SetFloat(Speed, speed);
+                mover.position = Vector3.Lerp(from, to, t / seconds);
+                if (walks) animator.SetFloat(Speed, speed);
+
+                yield return null;
             }
-
-            yield return null;
+            if (mover != null) mover.position = to;
         }
-
-        if (mover == null)
+        finally
         {
-            yield break;
-        }
-
-        mover.position = to;
-        if (walks)
-        {
-            animator.SetFloat(Speed, 0f);
+            if (walks && animator != null)
+            {
+                animator.SetFloat(Speed, 0f);
+                animator.speed = previousSpeed;
+            }
         }
     }
 
@@ -635,7 +637,8 @@ public sealed class MoveObjectNode : StoryNode
         return false;
     }
 
-    public override string FindProblem() => target == null ? "choose what moves" : destination == null ? "choose where it goes" : null;
+    public override string FindProblem() => target == null ? "choose what moves" : destination == null ? "choose where it goes" :
+        animationSpeed <= 0f ? "animation speed must be positive" : null;
 }
 
 [Serializable]

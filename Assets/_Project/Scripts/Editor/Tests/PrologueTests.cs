@@ -34,14 +34,14 @@ public sealed class PrologueTests
         foreach (var chapter in Definition.Chapters)
         {
             var givers = QuestSceneIndex.UsesOf(chapter.Quest).Where(u => u.Role == QuestSceneRole.Gives).ToArray();
-            if (chapter.Quest.Start == QuestStart.ByQuestGiver)
+            if (chapter.Quest.Start == QuestStart.ByQuestGiver || chapter.Quest.TurnInToGiver)
             {
                 Assert.IsTrue(givers.Any(u => u.AssetPath == "Assets/_Project/Scenes/Prologue_MistyWoods.unity" &&
                     u.ObjectName.Contains("Sigrid") && u.ObjectFileId != 0), chapter.Quest.name);
                 Assert.IsFalse(QuestSection.FindSceneProblems(chapter.Quest, Definition.Chapters.Select(c => c.Quest))
                     .Any(p => p.Contains("no scene or prefab")), chapter.Quest.name);
             }
-            else Assert.IsEmpty(givers, "Automatic emergency chapters are not leader briefings.");
+            else Assert.IsEmpty(givers, "Automatic emergency chapters without a return objective need no giver.");
         }
         var unassigned = ScriptableObject.CreateInstance<QuestDefinition>();
         try
@@ -84,6 +84,11 @@ public sealed class PrologueTests
                     objective.Type == ObjectiveType.CraftItem ? GameEventKind.Crafted : GameEventKind.ItemObtained,
                     objective.Type == ObjectiveType.QuestEvent ? (UnityEngine.Object)objective.QuestEvent :
                     objective.Type == ObjectiveType.BuildStructure ? (UnityEngine.Object)objective.Building : objective.Item, objective.Amount));
+            if (chapter.Quest.TurnInToGiver)
+            {
+                Assert.AreEqual(QuestStatus.ReadyToTurnIn, log.StatusOf(chapter.Quest));
+                Assert.IsTrue(log.TryTurnIn(chapter.Quest));
+            }
             Assert.AreEqual(QuestStatus.Completed, log.StatusOf(chapter.Quest));
         }
         Assert.IsNull(Definition.Chapter(log));
@@ -98,18 +103,38 @@ public sealed class PrologueTests
     }
 
     [Test]
-    public void PeacefulChapters_NeedLeaderAcceptanceButEmergenciesRemainAutomatic()
+    public void PeacefulChapters_KeepTheirReturnObjectiveUntilTheNextBriefing()
     {
         // The leader's briefings wait to be accepted; what a companion calls out ("Eirik: ...", "Runa: Wolves!") or a
         // story tells starts at once.
-        foreach (var chapter in Definition.Chapters)
+        for (int i = 0; i < Definition.Chapters.Length; i++)
         {
+            var chapter = Definition.Chapters[i];
             int colon = chapter.ArrivalText.IndexOf(':');
             bool spokenByCompanion = colon > 0 && colon < 16;
             bool briefing = !string.IsNullOrWhiteSpace(chapter.ArrivalText) && !spokenByCompanion;
             Assert.AreEqual(briefing ? QuestStart.ByQuestGiver : QuestStart.Automatically, chapter.Quest.Start, chapter.Quest.name);
-            Assert.IsFalse(chapter.Quest.TurnInToGiver, "The next briefing is the handoff; avoid two separate leader interactions.");
+            bool nextBriefing = i + 1 < Definition.Chapters.Length && Definition.Chapters[i + 1].Quest.Start == QuestStart.ByQuestGiver;
+            Assert.AreEqual(nextBriefing, chapter.Quest.TurnInToGiver,
+                "The next briefing hands this quest in and accepts its successor in one interaction.");
+            if (nextBriefing) Assert.AreEqual("Sigrid", chapter.Quest.TurnInTo);
         }
+    }
+
+    [Test]
+    public void Chain_AnnouncesOnlyItsBeginningAndEnd_AndMakesTimedInstructionsExplicit()
+    {
+        for (int i = 0; i < Definition.Chapters.Length; i++)
+        {
+            var quest = Definition.Chapters[i].Quest;
+            Assert.AreEqual(i == 0, quest.AnnounceStart, quest.name);
+            Assert.AreEqual(i == Definition.Chapters.Length - 1, quest.AnnounceCompletion, quest.name);
+            Assert.IsFalse(string.IsNullOrWhiteSpace(quest.AvailableObjective), quest.name);
+        }
+        var rest = Definition.Chapters.Single(c => c.Behaviour == PrologueStep.CatchBreath);
+        StringAssert.Contains("35", rest.ArrivalText);
+        StringAssert.Contains("optional", rest.Quest.Objectives[0].Describe());
+        Assert.IsTrue(Definition.Chapters.Single(c => c.Behaviour == PrologueStep.HoldPortal).Quest.ShowTimerInHud);
     }
 
     [Test]
@@ -254,12 +279,47 @@ public sealed class PrologueTests
     }
 
     [Test]
+    public void Lights_DoNotSitInsideACharactersHead()
+    {
+        // Point-light falloff is inverse-square: a light a hand's width from a face blows it out with a hard edge.
+        // Areas that only need sight around a character use a VisibilitySource, not a Light.
+        const string path = "Assets/_Project/Scenes/Prologue_MistyWoods.unity";
+        const float minDistance = 0.5f;
+        Scene scene = SceneManager.GetSceneByPath(path);
+        bool opened = !scene.isLoaded;
+        if (opened) scene = EditorSceneManager.OpenScene(path, OpenSceneMode.Additive);
+        try
+        {
+            var roots = scene.GetRootGameObjects();
+            var heads = roots.SelectMany(r => r.GetComponentsInChildren<Animator>(true))
+                .Where(a => a.isHuman && a.GetBoneTransform(HumanBodyBones.Head) != null)
+                .ToArray();
+            Assert.IsNotEmpty(heads);
+            foreach (var light in roots.SelectMany(r => r.GetComponentsInChildren<Light>(true)).Where(l => l.type != LightType.Directional))
+            {
+                foreach (var character in heads)
+                {
+                    Vector3 head = character.GetBoneTransform(HumanBodyBones.Head).position;
+                    Assert.Greater(Vector3.Distance(light.transform.position, head), minDistance,
+                        light.name + " sits inside " + character.name + "'s head.");
+                }
+            }
+        }
+        finally
+        {
+            if (opened) EditorSceneManager.CloseScene(scene, true);
+        }
+    }
+
+    [Test]
     public void Definitions_AreNotChangedByQuestProgress()
     {
         string before = EditorJsonUtility.ToJson(Definition);
         var log = new QuestLog();
         log.TryStart(Definition.Chapters[0].Quest);
         log.Handle(new GameEvent(GameEventKind.Custom, Definition.ShelterEvent));
+        Assert.AreSame(Definition.Chapters[0], Definition.Chapter(log), "The return objective is still part of the current chapter.");
+        Assert.IsTrue(log.TryTurnIn(Definition.Chapters[0].Quest));
         Assert.AreEqual(before, EditorJsonUtility.ToJson(Definition));
         Assert.AreSame(Definition.Chapters[1], Definition.Chapter(log));
     }

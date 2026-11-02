@@ -5,12 +5,14 @@ using UnityEngine.UI;
 using TMPro;
 
 /// <summary>
-/// The raid's heads-up display: the time left, turning orange and then pulsing red as it runs low; the danger stage; how
+/// The countdown HUD for raids and quests whose timers are marked Show Timer In Hud. With no timer it hides its Canvas,
+/// not its GameObject, so it can notice the next one. In a raid: the time left, turning orange and then pulsing red; the danger stage; how
 /// far the nearest open extraction is and which way (or how long an extraction under way still takes); every exit and
 /// whether it is open, opens later, has gone dark or has a cost; what would be lost if the raid failed now; and a banner
 /// with the outcome when the raid ends. Everything shown comes from the RaidDirector and the extraction points, so it
 /// only reads.
 /// </summary>
+[RequireComponent(typeof(Canvas))]
 public sealed class RaidHudView : MonoBehaviour
 {
     [SerializeField] private TMP_Text raidNameLabel;
@@ -44,10 +46,12 @@ public sealed class RaidHudView : MonoBehaviour
     private float nextRiskRefresh;
     private float nextExitsRefresh;
     private float timerSize;
+    private Canvas canvas;
 
     private void OnEnable()
     {
         timerSize = timerLabel.fontSize;
+        canvas = GetComponent<Canvas>();
         if (banner != null)
         {
             banner.SetActive(false);
@@ -77,18 +81,32 @@ public sealed class RaidHudView : MonoBehaviour
 
         if (director == null)
         {
-            timerLabel.text = "-:--";
-            extractionLabel.text = "";
+            bool show = QuestTimers.TryGetHudTimer(out QuestDefinition quest, out float remaining, out float duration);
+            canvas.enabled = show;
+            if (!show) return;
+            raidNameLabel.text = quest.DisplayName.ToUpperInvariant();
+            ShowTime(remaining, Mathf.Min(warningTime, duration * 0.5f), Mathf.Min(criticalTime, duration * 0.2f));
+            QuestLog.Entry entry = GameSession.Quests.Get(quest);
+            string objective = "";
+            for (int i = 0; i < entry.Counts.Length; i++)
+                if (entry.IsObjectiveOpen(i))
+                {
+                    objective = quest.Objectives[i].Describe();
+                    break;
+                }
+            extractionLabel.text = objective;
             SetText(exitsLabel, "");
             SetText(riskLabel, "");
             PointArrowAt(null);
+            if (banner != null) banner.SetActive(false);
             return;
         }
 
+        canvas.enabled = true;
         RaidSession session = director.Session;
-        timerLabel.fontSize = GameOptions.LargeTimer.On ? timerSize * 1.6f : timerSize;
-        timerLabel.text = RaidStats.FormatTime(session.TimeRemaining);
-        timerLabel.color = TimerColor(session);
+        ShowTime(session.TimeRemaining, warningTime, criticalTime);
+        if (session.IsOver)
+            timerLabel.color = session.Outcome == RaidOutcome.Extracted ? extractedColor : criticalColor;
         ExtractionPoint target = null;
         extractionLabel.text = session.IsOver ? "" : DescribeExtraction(out target);
         PointArrowAt(target);
@@ -255,21 +273,19 @@ public sealed class RaidHudView : MonoBehaviour
         return $"At risk: <color=#F0BC6C>{risk.Items} items ({risk.Value} value)  ·  {risk.Resources} materials{carted}</color>";
     }
 
-    private Color TimerColor(RaidSession session)
+    private void ShowTime(float remaining, float warning, float critical)
     {
-        if (session.IsOver)
-        {
-            return session.Outcome == RaidOutcome.Extracted ? extractedColor : criticalColor;
-        }
-
-        float remaining = session.TimeRemaining;
-        if (remaining <= criticalTime)
+        timerLabel.fontSize = GameOptions.LargeTimer.On ? timerSize * 1.6f : timerSize;
+        timerLabel.text = RaidStats.FormatTime(remaining);
+        if (remaining <= critical)
         {
             float pulse = 0.5f + 0.5f * Mathf.Sin(Time.unscaledTime * 8f);
-            return Color.Lerp(criticalColor, Color.white, pulse * 0.35f);
+            timerLabel.color = Color.Lerp(criticalColor, Color.white, pulse * 0.35f);
         }
-
-        return remaining <= warningTime ? warningColor : normalColor;
+        else
+        {
+            timerLabel.color = remaining <= warning ? warningColor : normalColor;
+        }
     }
 
     private string DescribeExtraction(out ExtractionPoint nearest)

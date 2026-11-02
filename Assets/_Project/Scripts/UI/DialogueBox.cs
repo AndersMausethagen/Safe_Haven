@@ -146,6 +146,9 @@ public sealed class DialogueBox : MonoBehaviour
     /// <summary>True while anyone is talking: a line in the box or a subtitle.</summary>
     public static bool IsSpeaking => IsOpen || (current != null && current.IsSubtitling);
 
+    /// <summary>Whether this character is speaking in the conversation window, rather than a combat subtitle.</summary>
+    public static bool IsTalkingTo(Transform speaker) => speaker != null && IsOpen && current.framed == speaker;
+
     private static int clickFrame = -1;
 
     /// <summary>True while a click belongs to the conversation: a line is shown, or the click that closed it this frame.

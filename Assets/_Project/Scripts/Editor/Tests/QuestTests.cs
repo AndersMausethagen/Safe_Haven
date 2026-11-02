@@ -611,6 +611,117 @@ public sealed class QuestTests
         }
     }
 
+    [Test]
+    public void Waypoints_SupportAvailableAndReturnToGiverStages_WithoutPrematureAcceptance()
+    {
+        var quest = Quest("Return", QuestObjective.Create(ObjectiveType.CollectItem, 1, Create<ItemDefinition>("ore")));
+        SetField(quest, "turnInToGiver", true);
+        var log = new QuestLog();
+        var host = Created(new GameObject("Quest waypoint"));
+        var waypoint = host.AddComponent<QuestWaypoint>();
+        waypoint.Configure(quest, 0, "The smith", QuestWaypointWhen.Available);
+        Assert.IsTrue(waypoint.IsWanted(log));
+        log.TryStart(quest);
+        Assert.IsFalse(waypoint.IsWanted(log));
+        waypoint.Configure(quest, 0, "The smith", QuestWaypointWhen.ReadyToTurnIn);
+        Assert.IsFalse(waypoint.IsWanted(log));
+        log.AddProgress(quest, 0, 1);
+        Assert.IsTrue(waypoint.IsWanted(log));
+        log.TryTurnIn(quest);
+        Assert.IsFalse(waypoint.IsWanted(log));
+    }
+
+    [Test]
+    public void Timers_ChooseTheSoonestActiveProminentQuest_AndNotifyViewsOnSetAndClear()
+    {
+        var first = Quest("Later", QuestObjective.Create(ObjectiveType.QuestEvent, 1, Create<GameEventDefinition>("later")));
+        var next = Quest("Sooner", QuestObjective.Create(ObjectiveType.QuestEvent, 1, Create<GameEventDefinition>("sooner")));
+        SetField(first, "showTimerInHud", true);
+        SetField(next, "showTimerInHud", true);
+        GameSession.StartNewGame();
+        int changes = 0;
+        Action changed = () => changes++;
+        QuestTimers.Changed += changed;
+        try
+        {
+            QuestTimers.Set(first, 120f);
+            Assert.IsFalse(QuestTimers.TryGetHudTimer(out _, out _, out _), "Unaccepted quests do not display a countdown.");
+            GameSession.Quests.TryStart(first);
+            GameSession.Quests.TryStart(next);
+            QuestTimers.Set(next, 30f);
+            Assert.IsTrue(QuestTimers.TryGetHudTimer(out var selected, out float left, out float duration));
+            Assert.AreSame(next, selected);
+            Assert.AreEqual(30f, left, 0.1f);
+            Assert.AreEqual(30f, duration);
+            GameSession.Quests.ForceComplete(next);
+            Assert.IsTrue(QuestTimers.TryGetHudTimer(out selected, out _, out _));
+            Assert.AreSame(first, selected);
+            QuestTimers.Clear(first);
+            Assert.IsFalse(QuestTimers.TryGetHudTimer(out _, out _, out _));
+            Assert.AreEqual(3, changes);
+            QuestTimers.Clear(first);
+            Assert.AreEqual(3, changes, "Clearing a missing timer doesn't notify again.");
+        }
+        finally
+        {
+            QuestTimers.Changed -= changed;
+            QuestTimers.Clear(first);
+            QuestTimers.Clear(next);
+            GameSession.StartNewGame();
+        }
+    }
+
+    [Test]
+    public void CountdownHud_ShowsRegisteredQuestTimersWithoutARaid_AndHidesWhenTheyFinish()
+    {
+        var goal = Create<GameEventDefinition>("connection");
+        var quest = Quest("A timed quest", QuestObjective.Create(ObjectiveType.QuestEvent, 1, goal));
+        SetField(quest, "showTimerInHud", true);
+        GameSession.StartNewGame();
+        var root = new GameObject("Countdown HUD test", typeof(RectTransform), typeof(Canvas));
+        root.SetActive(false);
+        TMPro.TextMeshProUGUI Label(string name)
+        {
+            var child = new GameObject(name, typeof(RectTransform));
+            child.transform.SetParent(root.transform, false);
+            return child.AddComponent<TMPro.TextMeshProUGUI>();
+        }
+        var title = Label("Title");
+        var timer = Label("Timer");
+        var objective = Label("Objective");
+        var view = root.AddComponent<RaidHudView>();
+        SetField(view, "raidNameLabel", title);
+        SetField(view, "timerLabel", timer);
+        SetField(view, "extractionLabel", objective);
+        var flags = BindingFlags.Instance | BindingFlags.NonPublic;
+        var update = typeof(RaidHudView).GetMethod("Update", flags);
+        try
+        {
+            typeof(RaidHudView).GetMethod("OnEnable", flags).Invoke(view, null);
+            update.Invoke(view, null);
+            Assert.IsFalse(root.GetComponent<Canvas>().enabled);
+            GameSession.Quests.TryStart(quest);
+            QuestTimers.Set(quest, 60f);
+            update.Invoke(view, null);
+            Assert.IsTrue(root.GetComponent<Canvas>().enabled);
+            Assert.AreEqual("A TIMED QUEST", title.text);
+            Assert.AreEqual("1:00", timer.text);
+            Assert.AreEqual(quest.Objectives[0].Describe(), objective.text);
+            QuestTimers.Set(quest, 12f);
+            update.Invoke(view, null);
+            Assert.AreEqual("0:12", timer.text);
+            GameSession.Quests.ForceComplete(quest);
+            update.Invoke(view, null);
+            Assert.IsFalse(root.GetComponent<Canvas>().enabled);
+        }
+        finally
+        {
+            QuestTimers.Clear(quest);
+            Object.DestroyImmediate(root);
+            GameSession.StartNewGame();
+        }
+    }
+
     // ----- Helpers -----
 
     private sealed class Lookup : IContentLookup

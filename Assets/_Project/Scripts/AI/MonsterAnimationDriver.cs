@@ -53,7 +53,8 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
 
     private void Update()
     {
-        if (hasSpeed)
+        // Story movement owns locomotion while the AI is disabled.
+        if (ai.enabled && hasSpeed)
         {
             animator.SetFloat(speedHash, ai.Speed, speedDampTime, Time.deltaTime);
         }

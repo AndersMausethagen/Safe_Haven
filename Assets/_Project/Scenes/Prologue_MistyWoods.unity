@@ -2266,6 +2266,7 @@ MonoBehaviour:
   quest: {fileID: 11400000, guid: 0279feb93b7c8b74e9fd8683d9d10fd3, type: 2}
   objective: 0
   label: Shelter
+  when: 0
 --- !u!1 &358074018
 GameObject:
   m_ObjectHideFlags: 0
@@ -2324,9 +2325,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 358154448}
-  - component: {fileID: 358154450}
   - component: {fileID: 358154449}
-  - component: {fileID: 358154451}
   m_Layer: 0
   m_Name: Expedition Lantern
   m_TagString: Untagged
@@ -2367,100 +2366,6 @@ MonoBehaviour:
   revealRadius: 18
   followsWard: 0
   isLight: 1
---- !u!108 &358154450
-Light:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 358154447}
-  m_Enabled: 1
-  serializedVersion: 13
-  m_Type: 2
-  m_Color: {r: 1, g: 0.7, b: 0.4, a: 1}
-  m_Intensity: 4
-  m_Range: 16
-  m_SpotAngle: 30
-  m_InnerSpotAngle: 21.80208
-  m_CookieSize2D: {x: 0.5, y: 0.5}
-  m_Shadows:
-    m_Type: 0
-    m_Resolution: -1
-    m_CustomResolution: -1
-    m_Strength: 1
-    m_Bias: 0.05
-    m_NormalBias: 0.4
-    m_NearPlane: 0.2
-    m_CullingMatrixOverride:
-      e00: 1
-      e01: 0
-      e02: 0
-      e03: 0
-      e10: 0
-      e11: 1
-      e12: 0
-      e13: 0
-      e20: 0
-      e21: 0
-      e22: 1
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 1
-    m_UseCullingMatrixOverride: 0
-  m_Cookie: {fileID: 0}
-  m_DrawHalo: 0
-  m_Flare: {fileID: 0}
-  m_RenderMode: 0
-  m_CullingMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_RenderingLayerMask: 1
-  m_Lightmapping: 4
-  m_LightShadowCasterMode: 0
-  m_AreaSize: {x: 1, y: 1}
-  m_BounceIntensity: 1
-  m_ColorTemperature: 6570
-  m_UseColorTemperature: 0
-  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
-  m_UseBoundingSphereOverride: 0
-  m_UseViewFrustumForShadowCasterCull: 1
-  m_ForceVisible: 0
-  m_ShapeRadius: 0.025
-  m_ShadowAngle: 0
-  m_LightUnit: 1
-  m_LuxAtDistance: 1
-  m_EnableSpotReflector: 1
---- !u!114 &358154451
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 358154447}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.UniversalAdditionalLightData
-  m_UsePipelineSettings: 1
-  m_AdditionalLightsShadowResolutionTier: 2
-  m_CustomShadowLayers: 0
-  m_LightCookieSize: {x: 1, y: 1}
-  m_LightCookieOffset: {x: 0, y: 0}
-  m_SoftShadowQuality: 0
-  m_RenderingLayersMask:
-    serializedVersion: 0
-    m_Bits: 1
-  m_ShadowRenderingLayersMask:
-    serializedVersion: 0
-    m_Bits: 1
-  m_Version: 4
-  m_LightLayerMask: 1
-  m_ShadowLayerMask: 1
-  m_RenderingLayers: 1
-  m_ShadowRenderingLayers: 1
 --- !u!1 &372467326
 GameObject:
   m_ObjectHideFlags: 0
@@ -4292,15 +4197,6 @@ MonoBehaviour:
   - rid: 287758218191175977
   - rid: 287758218191175978
   - rid: 287758218191175979
-  - rid: 287758218191175980
-  - rid: 287758218191175981
-  - rid: 287758218191175982
-  - rid: 287758218191175983
-  - rid: 287758218191175984
-  - rid: 287758218191175985
-  - rid: 287758218191175986
-  - rid: 287758218191175987
-  - rid: 287758218191175988
   links:
   - from: df8fdfbec14f4fdbbcaa0be43bc4b643
     output: 0
@@ -4341,33 +4237,6 @@ MonoBehaviour:
   - from: d846e196665147669e5fb0466ecd4dc2
     output: 0
     to: 5637c00fa3e64e4eb5619bd0817c537c
-  - from: 5637c00fa3e64e4eb5619bd0817c537c
-    output: 0
-    to: d9a99b371830439cbf527b0d5a9059e3
-  - from: d9a99b371830439cbf527b0d5a9059e3
-    output: 0
-    to: cba223b86c654836957684e14b53b0c6
-  - from: d9a99b371830439cbf527b0d5a9059e3
-    output: 0
-    to: 64556c1a95d64dd79d889b7bb644ebec
-  - from: d9a99b371830439cbf527b0d5a9059e3
-    output: 0
-    to: 7450ed7ba6b04e11970cfe72416dde18
-  - from: 7450ed7ba6b04e11970cfe72416dde18
-    output: 0
-    to: a339be4854c8476886c20d48120916a8
-  - from: 7450ed7ba6b04e11970cfe72416dde18
-    output: 0
-    to: 78e0c739f37d40c0833f0b580e02ead0
-  - from: 7450ed7ba6b04e11970cfe72416dde18
-    output: 0
-    to: c7b77f4db4a74725aadc3cc99af972e9
-  - from: c7b77f4db4a74725aadc3cc99af972e9
-    output: 0
-    to: 8b79938097884123935bf4e5c2fce1ec
-  - from: c7b77f4db4a74725aadc3cc99af972e9
-    output: 0
-    to: 3ca461f4de99414b980fcf919c7829a9
   logSteps: 0
   references:
     version: 2
@@ -4407,7 +4276,8 @@ MonoBehaviour:
         position: {x: 640, y: 400}
         target: {fileID: 1803281364}
         destination: {fileID: 864501000}
-        seconds: 9
+        seconds: 12
+        animationSpeed: 0.5
         waitUntilArrived: 0
     - rid: 287758218191175971
       type: {class: FocusCameraNode, ns: , asm: SafeHaven}
@@ -4487,63 +4357,6 @@ MonoBehaviour:
           portrait: {fileID: 0}
         line: Leave the fire! Follow the old road north, to the standing stones. Now!
         afterFightPause: 1
-    - rid: 287758218191175980
-      type: {class: WaitNode, ns: , asm: SafeHaven}
-      data:
-        id: d9a99b371830439cbf527b0d5a9059e3
-        position: {x: 340, y: 60}
-        seconds: 10
-    - rid: 287758218191175981
-      type: {class: ShakeCameraNode, ns: , asm: SafeHaven}
-      data:
-        id: cba223b86c654836957684e14b53b0c6
-        position: {x: 640, y: 60}
-        strength: 0.35
-    - rid: 287758218191175982
-      type: {class: PlaySoundNode, ns: , asm: SafeHaven}
-      data:
-        id: 64556c1a95d64dd79d889b7bb644ebec
-        position: {x: 640, y: 230}
-        sound: {fileID: 11400000, guid: ad5c451edd0edde49967af502c90ec94, type: 2}
-        at: {fileID: 1803281364}
-    - rid: 287758218191175983
-      type: {class: WaitNode, ns: , asm: SafeHaven}
-      data:
-        id: 7450ed7ba6b04e11970cfe72416dde18
-        position: {x: 340, y: 60}
-        seconds: 10
-    - rid: 287758218191175984
-      type: {class: ShakeCameraNode, ns: , asm: SafeHaven}
-      data:
-        id: a339be4854c8476886c20d48120916a8
-        position: {x: 640, y: 60}
-        strength: 0.45
-    - rid: 287758218191175985
-      type: {class: PlaySoundNode, ns: , asm: SafeHaven}
-      data:
-        id: 78e0c739f37d40c0833f0b580e02ead0
-        position: {x: 640, y: 230}
-        sound: {fileID: 11400000, guid: ad5c451edd0edde49967af502c90ec94, type: 2}
-        at: {fileID: 1803281364}
-    - rid: 287758218191175986
-      type: {class: WaitNode, ns: , asm: SafeHaven}
-      data:
-        id: c7b77f4db4a74725aadc3cc99af972e9
-        position: {x: 340, y: 60}
-        seconds: 10
-    - rid: 287758218191175987
-      type: {class: ShakeCameraNode, ns: , asm: SafeHaven}
-      data:
-        id: 8b79938097884123935bf4e5c2fce1ec
-        position: {x: 640, y: 60}
-        strength: 0.55
-    - rid: 287758218191175988
-      type: {class: PlaySoundNode, ns: , asm: SafeHaven}
-      data:
-        id: 3ca461f4de99414b980fcf919c7829a9
-        position: {x: 640, y: 230}
-        sound: {fileID: 11400000, guid: ad5c451edd0edde49967af502c90ec94, type: 2}
-        at: {fileID: 1803281364}
 --- !u!114 &716558348
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7092,6 +6905,15 @@ GameObject:
   - component: {fileID: 983162866}
   - component: {fileID: 983162865}
   - component: {fileID: 983162868}
+  - component: {fileID: 983162877}
+  - component: {fileID: 983162876}
+  - component: {fileID: 983162875}
+  - component: {fileID: 983162874}
+  - component: {fileID: 983162873}
+  - component: {fileID: 983162872}
+  - component: {fileID: 983162871}
+  - component: {fileID: 983162870}
+  - component: {fileID: 983162869}
   m_Layer: 0
   m_Name: Sigrid - Expedition
   m_TagString: Untagged
@@ -7241,23 +7063,31 @@ MonoBehaviour:
   - quest: {fileID: 11400000, guid: 0279feb93b7c8b74e9fd8683d9d10fd3, type: 2}
     text: 'The villages sent us to investigate the rumours: trolls leaving their crags, witches walking the roads, even wolves attacking without warning. Something has bewitched these woods. We cannot find the cause in this storm. Keep your torch up and follow the old road. Find dry shelter; we will follow you.'
     acceptText: I will find us shelter.
-    waitingText: We came to learn why this forest has become bewitched. First, we need shelter. Follow the old road.
+    waitingText: Follow the old road to the rock shelter, then come back to me.
   - quest: {fileID: 11400000, guid: 4f625534621489e4183de610d93d4f36, type: 2}
     text: Dry stone overhead. Good work. We need warmth before anyone can think clearly. Gather four Sticks and six Small Rocks nearby; there is loose fuel on the forest floor.
     acceptText: I will gather the supplies.
-    waitingText: The villages sent us because livestock vanished and people saw witches on the road. Now trolls leave their hills, and even wolves attack without hunger. We find the cause, then we go home together.
+    waitingText: Gather four Sticks and six Small Rocks nearby, then return to me.
   - quest: {fileID: 11400000, guid: 2ba326763b19a9e46be36507850aed82, type: 2}
     text: That is enough. Let us put your building skills to use. Press G to open Build, choose Campfire and place it on open ground beside the shelter. The supplies you collected will pay for it.
     acceptText: I will build the campfire.
-    waitingText: The villages sent us because livestock vanished and people saw witches on the road. Now trolls leave their hills, and even wolves attack without hunger. We find the cause, then we go home together.
+    waitingText: Press G, choose Campfire and place it on open ground beside the shelter.
+  - quest: {fileID: 11400000, guid: 83fc380c709c01a4383dfa7c9300d48a, type: 2}
+    text: 'Eirik: Warm hands, empty bellies. There are berry bushes in the clearing west of the shelter. Pick five and stew them over the fire; take my waterskin for the pot.'
+    acceptText: It's done.
+    waitingText: Pick five berries west of the shelter, stew them at the campfire, then return to me.
   - quest: {fileID: 11400000, guid: b2306560eba5c594886d38a592bdb05d, type: 2}
-    text: A fire at last. Stay close for a moment and catch your breath. Speak with the others; each of them has seen something different in these woods.
+    text: A fire and a warm meal. Rest for 35 seconds while we gather our strength. Talking with the others is optional; the countdown in your quest tracker shows the time left. When it ends, finish your conversation and we will move on.
     acceptText: Let us catch our breath.
-    waitingText: The villages sent us because livestock vanished and people saw witches on the road. Now trolls leave their hills, and even wolves attack without hunger. We find the cause, then we go home together.
+    waitingText: The rest countdown is in your quest tracker. Talking is optional; finish your conversation when it ends.
+  - quest: {fileID: 11400000, guid: cd536373f8f639f4db60c8810e546ebf, type: 2}
+    text: 
+    acceptText: It's done.
+    waitingText: Keep to the old road north until you reach the ancient waystones, then speak to me.
   - quest: {fileID: 11400000, guid: 5699d07d5ceee6144855cc88c1a5f255, type: 2}
     text: These markings are older than the road. Sigrid says they may be a way out, and does not say how she knows. Touch the waystones and see if they still answer. We will hold the clearing.
     acceptText: I will try the waystones.
-    waitingText: Hold together! Nobody gets left behind. We will find each other, whatever happens.
+    waitingText: Touch the centre waystone to start the connection. We will defend the clearing.
   speakerName: Sigrid
   portrait: {fileID: 0}
   dialogueCameraDistance: 0.65
@@ -7327,6 +7157,150 @@ MonoBehaviour:
   cameraDistance: 0.65
   followUpLine: Anything else?
   talkedEvent: {fileID: 11400000, guid: 3943805714479a044b6e4e23704963cd, type: 2}
+--- !u!114 &983162869
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 983162858}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b33558da32530e547ac0e3c72d87df24, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::QuestWaypoint
+  quest: {fileID: 11400000, guid: 5699d07d5ceee6144855cc88c1a5f255, type: 2}
+  objective: 0
+  label: Sigrid
+  when: 2
+--- !u!114 &983162870
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 983162858}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b33558da32530e547ac0e3c72d87df24, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::QuestWaypoint
+  quest: {fileID: 11400000, guid: cd536373f8f639f4db60c8810e546ebf, type: 2}
+  objective: 0
+  label: Sigrid
+  when: 1
+--- !u!114 &983162871
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 983162858}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b33558da32530e547ac0e3c72d87df24, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::QuestWaypoint
+  quest: {fileID: 11400000, guid: b2306560eba5c594886d38a592bdb05d, type: 2}
+  objective: 0
+  label: Sigrid
+  when: 2
+--- !u!114 &983162872
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 983162858}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b33558da32530e547ac0e3c72d87df24, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::QuestWaypoint
+  quest: {fileID: 11400000, guid: 83fc380c709c01a4383dfa7c9300d48a, type: 2}
+  objective: 0
+  label: Sigrid
+  when: 1
+--- !u!114 &983162873
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 983162858}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b33558da32530e547ac0e3c72d87df24, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::QuestWaypoint
+  quest: {fileID: 11400000, guid: 2ba326763b19a9e46be36507850aed82, type: 2}
+  objective: 0
+  label: Sigrid
+  when: 2
+--- !u!114 &983162874
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 983162858}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b33558da32530e547ac0e3c72d87df24, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::QuestWaypoint
+  quest: {fileID: 11400000, guid: 4f625534621489e4183de610d93d4f36, type: 2}
+  objective: 0
+  label: Sigrid
+  when: 1
+--- !u!114 &983162875
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 983162858}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b33558da32530e547ac0e3c72d87df24, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::QuestWaypoint
+  quest: {fileID: 11400000, guid: 4f625534621489e4183de610d93d4f36, type: 2}
+  objective: 0
+  label: Sigrid
+  when: 2
+--- !u!114 &983162876
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 983162858}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b33558da32530e547ac0e3c72d87df24, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::QuestWaypoint
+  quest: {fileID: 11400000, guid: 0279feb93b7c8b74e9fd8683d9d10fd3, type: 2}
+  objective: 0
+  label: Sigrid
+  when: 1
+--- !u!114 &983162877
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 983162858}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b33558da32530e547ac0e3c72d87df24, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::QuestWaypoint
+  quest: {fileID: 11400000, guid: 0279feb93b7c8b74e9fd8683d9d10fd3, type: 2}
+  objective: 0
+  label: Sigrid
+  when: 2
 --- !u!1 &985677805
 GameObject:
   m_ObjectHideFlags: 0
@@ -8827,6 +8801,7 @@ MonoBehaviour:
   quest: {fileID: 11400000, guid: cd536373f8f639f4db60c8810e546ebf, type: 2}
   objective: 0
   label: Waystones
+  when: 0
 --- !u!1 &1177029864
 GameObject:
   m_ObjectHideFlags: 0
@@ -12435,6 +12410,7 @@ MonoBehaviour:
   quest: {fileID: 11400000, guid: 83fc380c709c01a4383dfa7c9300d48a, type: 2}
   objective: 1
   label: Berries
+  when: 0
 --- !u!1001 &1327233164
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -13056,6 +13032,7 @@ MonoBehaviour:
   quest: {fileID: 11400000, guid: 5699d07d5ceee6144855cc88c1a5f255, type: 2}
   objective: 0
   label: Waystones
+  when: 0
 --- !u!1 &1447795150
 GameObject:
   m_ObjectHideFlags: 0
@@ -13272,7 +13249,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 971411571882043134, guid: 307a8db55c34d34428751a9b42bebc4b, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1202321943283897558, guid: 307a8db55c34d34428751a9b42bebc4b, type: 3}
       propertyPath: m_fontColor32.rgba
@@ -13515,6 +13492,7 @@ MonoBehaviour:
   quest: {fileID: 11400000, guid: 2ba326763b19a9e46be36507850aed82, type: 2}
   objective: 0
   label: Campfire
+  when: 0
 --- !u!1 &1484475287
 GameObject:
   m_ObjectHideFlags: 0
@@ -15839,6 +15817,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3370676028731196403, guid: c62686ef298686e40ae6736dc586a03f, type: 3}
+      propertyPath: shake
+      value: 0.65
+      objectReference: {fileID: 0}
+    - target: {fileID: 3370676028731196403, guid: c62686ef298686e40ae6736dc586a03f, type: 3}
+      propertyPath: feltDistance
+      value: 110
+      objectReference: {fileID: 0}
+    - target: {fileID: 3370676028731196403, guid: c62686ef298686e40ae6736dc586a03f, type: 3}
+      propertyPath: strideMeters
+      value: 1.4
+      objectReference: {fileID: 0}
     - target: {fileID: 3468862131618844974, guid: c62686ef298686e40ae6736dc586a03f, type: 3}
       propertyPath: id
       value: 7410715367ce434c9fb065069e43fbb2
@@ -16810,6 +16800,7 @@ MonoBehaviour:
   quest: {fileID: 11400000, guid: 83fc380c709c01a4383dfa7c9300d48a, type: 2}
   objective: 2
   label: Campfire
+  when: 0
 --- !u!1001 &1915190750
 PrefabInstance:
   m_ObjectHideFlags: 0

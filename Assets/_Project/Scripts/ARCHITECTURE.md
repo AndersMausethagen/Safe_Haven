@@ -114,9 +114,11 @@ created before the split carries `[MovedFrom(sourceAssembly: "Assembly-CSharp")]
 
 `Data/Prologue/ForestPrologue.asset` owns the ordered `PrologueChapter` list: quest, behaviour, automatic-entry
 messages, HUD text, duration and initial enemy count. Sigrid's ordinary `QuestGiver` component owns the ordered
-**Offers** for peaceful chapters: quest reference, briefing text, acceptance label and waiting text.
+**Offers** for briefings and return objectives: quest reference, briefing text, acceptance label and waiting text.
 Her `Talkable` makes the offers a conversation (close-camera framing, walk-away close); reading or closing it does not
 accept anything. Set a chapter quest's Start to **By Quest Giver**, then author its offer on the giver.
+Before another briefing, the previous quest uses **Turn In To Giver** so "Return to Sigrid" stays tracked.
+The standard ordered-offer handoff accepts the next briefing and hands in the previous quest together.
 Acceptance uses `QuestGiver → QuestManager → QuestLog`; there is no director acceptance API or leader flag.
 The director does not run an unaccepted chapter's timer/encounter.
 Automatically-started emergency chapters need no conversation; once its quest starts (it waits its turn, see "Story
@@ -141,7 +143,8 @@ offer before the camp chatter), and every part adds its answers (`IConversationT
 The intro's other moments are story graphs under **Intro Moments** in the scene (`Docs/StoryGraphs.md`): the choice of
 bow or axe, Eirik's waterskin for the cooking chapter (**Berries for the Pot**, started automatically after the fire),
 the small trolls' ambush in the berry clearing, and the old troll walking towards the fire when the wolves are beaten.
-Escorts stay put until the first briefing is accepted, and each stops walking while the player talks to them (`Talkable.IsTalking`).
+Escorts stay put until the first briefing is accepted. All companions stop and stow their held weapon during peaceful
+conversations, restoring its prior visibility afterward; combat retains armed behaviour. Separate torch props remain lit.
 Hand-mounted `ExpeditionTorch` objects keep their authored lit models upright during animation; their Light and
 LightFlicker components are scene-editable. Scene `GameEventTrigger`s control discovery zones;
 `PrologueInteraction` handles portal activation, with editable before/after-step prompts. `PrologueDirector` derives its
@@ -210,6 +213,28 @@ quest without skipping locked prerequisites or required turn-in; old single-ques
 immediate-interaction behavior. **Select All Uses in Open Scenes** finds the same serialized references,
 including unsaved edits. `QuestLog` owns progress; `QuestManager` alone dispatches lifecycle and authored
 start/completion events through `GameEvents`, feeding them back into the log and designer reactions.
+
+### Quest handoffs, tracking and countdowns
+
+These are shared quest-system features, not prologue rules:
+
+- **Turn In To Giver** retains the current quest after its task is done. If the next ordered offer directly depends on
+  it and its other prerequisites are met, the giver presents the next briefing; accepting it hands in the old quest
+  and starts the next. Reading, closing or replaying an obsolete choice cannot accept another quest.
+- **Available Objective** is optional tracker text shown once prerequisites are complete, before acceptance. Use it
+  for instructions such as "Speak to the Smith". `QuestWaypoint` can point to an **Available**, **Active** or
+  **Ready To Turn In** quest, so task locations and return-to-giver locations are separate authored waypoints.
+- **Announce Start** and **Announce Completion** control messages and quest sounds. Intermediate chain stages can
+  be silent while preserving their progress, rewards, lifecycle events, scene reactions and story pacing.
+- `QuestTimers.Set/Clear` raises `Changed`, so registering a clock after a quest starts updates the tracker immediately.
+  **Show Timer In Hud** also uses `RaidHudView`'s existing countdown display, with Large Timer and urgency colours.
+  Raids take priority; otherwise the soonest active prominent quest timer is shown. Keep the HUD GameObject active
+  in gameplay scenes: the view hides its Canvas, rather than disabling itself, when there is no clock.
+
+`MoveObjectNode` has an **Animation Speed** multiplier for a slower or faster gait without changing its travel duration.
+It restores playback speed when movement ends or is cancelled. `MonsterAnimationDriver` yields locomotion control while
+AI is disabled, and `CreatureFootfalls` counts real horizontal movement, including story-driven motion, ignoring warps.
+Each authored stride produces the same sound and distance-attenuated camera feedback; no timed imitation stomps are needed.
 
 ### Hearthline: one style for all the UI
 

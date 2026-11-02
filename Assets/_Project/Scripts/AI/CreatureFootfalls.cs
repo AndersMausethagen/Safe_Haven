@@ -19,26 +19,39 @@ public sealed class CreatureFootfalls : MonoBehaviour
 
     private MonsterAI monster;
     private float travelled;
+    private Vector3 previousPosition;
 
     private void Awake()
     {
         monster = GetComponent<MonsterAI>();
     }
 
+    private void OnEnable()
+    {
+        previousPosition = transform.position;
+        travelled = 0f;
+    }
+
     private void Update()
     {
-        if (!monster.enabled || monster.CurrentState == MonsterAI.State.Dead)
+        Vector3 movement = transform.position - previousPosition;
+        previousPosition = transform.position;
+        movement.y = 0f;
+        float distance = movement.magnitude;
+        // Warps and checkpoint restores are not footsteps.
+        if (monster.CurrentState == MonsterAI.State.Dead || distance > strideMeters * 2f)
         {
+            travelled = 0f;
             return;
         }
 
-        travelled += monster.Speed * Time.deltaTime;
+        travelled += distance;
         if (travelled < strideMeters)
         {
             return;
         }
 
-        travelled = 0f;
+        travelled %= strideMeters;
         AudioManager.Play(stepSound, transform.position);
         Player player = Player.Current;
         if (player == null || shake <= 0f)
@@ -46,8 +59,8 @@ public sealed class CreatureFootfalls : MonoBehaviour
             return;
         }
 
-        float distance = Vector3.Distance(player.transform.position, transform.position);
-        float felt = 1f - Mathf.Clamp01(distance / feltDistance);
+        float playerDistance = Vector3.Distance(player.transform.position, transform.position);
+        float felt = 1f - Mathf.Clamp01(playerDistance / feltDistance);
         if (felt > 0f)
         {
             CameraShake.Add(shake * felt * felt);

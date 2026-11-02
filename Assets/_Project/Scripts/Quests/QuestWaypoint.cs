@@ -1,11 +1,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum QuestWaypointWhen
+{
+    Active,
+    ReadyToTurnIn,
+    Available,
+}
+
 /// <summary>
 /// Marks where a quest is going on (the shelter, the waystones, the stone in the clearing): while its quest is active
 /// (and, with an objective chosen, while that objective is still open), the quest tracker points the way to it with an
 /// arrow at the edge of the screen and the distance (QuestWaypointHud). Quick setup: GameObject › Safe Haven › Quest
-/// Waypoint, then pick the quest.
+/// Waypoint, then pick the quest. Available and Ready To Turn In waypoints can lead to its giver before and after the task.
 /// </summary>
 [AddComponentMenu("Safe Haven/Quests/Quest Waypoint")]
 public sealed class QuestWaypoint : MonoBehaviour
@@ -17,6 +24,7 @@ public sealed class QuestWaypoint : MonoBehaviour
     [SerializeField, Min(0)] private int objective;
     [Tooltip("Shown under the arrow, e.g. \"Shelter\". Empty: the quest's name.")]
     [SerializeField] private string label;
+    [SerializeField] private QuestWaypointWhen when;
 
     public static IReadOnlyList<QuestWaypoint> Active => active;
 
@@ -24,11 +32,12 @@ public sealed class QuestWaypoint : MonoBehaviour
     public string Label => string.IsNullOrWhiteSpace(label) && quest != null ? quest.DisplayName : label;
 
     /// <summary>Sets the waypoint up (editor tools).</summary>
-    public void Configure(QuestDefinition target, int objectiveNumber, string text)
+    public void Configure(QuestDefinition target, int objectiveNumber, string text, QuestWaypointWhen showWhen = QuestWaypointWhen.Active)
     {
         quest = target;
         objective = objectiveNumber;
         label = text;
+        when = showWhen;
     }
 
     private void OnEnable() => active.Add(this);
@@ -44,6 +53,10 @@ public sealed class QuestWaypoint : MonoBehaviour
         }
 
         QuestLog.Entry entry = log.Get(quest);
+        if (when == QuestWaypointWhen.Available)
+            return log.StatusOf(quest) == QuestStatus.NotStarted && log.PrerequisitesMet(quest);
+        if (when == QuestWaypointWhen.ReadyToTurnIn)
+            return entry != null && entry.Status == QuestStatus.ReadyToTurnIn;
         if (entry == null || entry.Status != QuestStatus.Active)
         {
             return false;

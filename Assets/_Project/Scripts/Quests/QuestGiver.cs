@@ -295,11 +295,21 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
         }
         else if (state == QuestGiverState.ReadyToTurnIn)
         {
-            page.Body = turnInText;
-            page.Add(new MenuAction("It's done.", offeredQuest.DisplayName, true, () => {
-                Refresh();
-                if (Quest == offeredQuest && state == QuestGiverState.ReadyToTurnIn) TurnIn();
-            }, closesMenu: true));
+            QuestOffer next = FollowingOffer();
+            if (next != null)
+            {
+                page.Body = string.IsNullOrWhiteSpace(turnInText) ? next.Text : turnInText + "\n\n" + next.Text;
+                page.Add(new MenuAction(next.AcceptText, next.Quest.DisplayName, true,
+                    () => ContinueOffer(offeredQuest, next.Quest), closesMenu: true));
+            }
+            else
+            {
+                page.Body = turnInText;
+                page.Add(new MenuAction("It's done.", offeredQuest.DisplayName, true, () => {
+                    Refresh();
+                    if (Quest == offeredQuest && state == QuestGiverState.ReadyToTurnIn) TurnIn();
+                }, closesMenu: true));
+            }
         }
         else if (state != QuestGiverState.None)
         {
@@ -308,6 +318,48 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
                 waitingLines.HasAny ? Line(waitingLines) : DefaultWaitingText;
         }
         return page;
+    }
+
+    private QuestOffer FollowingOffer()
+    {
+        QuestLog log = QuestManager.Instance != null ? QuestManager.Instance.Log : GameSession.Quests;
+        bool found = false;
+        foreach (QuestOffer candidate in offers)
+        {
+            if (candidate?.Quest == null) continue;
+            if (!found)
+            {
+                found = candidate.Quest == Quest;
+                continue;
+            }
+
+            QuestDefinition next = candidate.Quest;
+            if (next.Start != QuestStart.ByQuestGiver || log.StatusOf(next) != QuestStatus.NotStarted) return null;
+            bool follows = false;
+            foreach (QuestDefinition prerequisite in next.Prerequisites)
+            {
+                if (prerequisite == Quest) follows = true;
+                else if (prerequisite != null && log.StatusOf(prerequisite) != QuestStatus.Completed) return null;
+            }
+            return follows ? candidate : null;
+        }
+        return null;
+    }
+
+    private void ContinueOffer(QuestDefinition finished, QuestDefinition next)
+    {
+        Refresh();
+        if (Quest != finished || state != QuestGiverState.ReadyToTurnIn || QuestManager.Instance == null) return;
+        if (!QuestManager.Instance.TryTurnIn(finished, out string reason))
+        {
+            GameMessages.Post(reason, MessageKind.Warning);
+            return;
+        }
+
+        Refresh();
+        if (Quest == next && state == QuestGiverState.Available) StartQuest();
+        else if (QuestManager.Instance.Log.StatusOf(next) == QuestStatus.NotStarted)
+            GameMessages.Post("The next quest is no longer available. Speak to the quest giver again.", MessageKind.Warning);
     }
 
     private void AcceptOffer(QuestDefinition expected)

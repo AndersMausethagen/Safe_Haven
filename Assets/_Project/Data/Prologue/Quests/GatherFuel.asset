@@ -16,6 +16,10 @@ MonoBehaviour:
   displayName: A Spark in the Dark
   description: Gather four Sticks and six Small Rocks from the forest floor, then speak to Sigrid.
   chain: Prologue - The Unquiet Forest
+  availableObjective: Speak to Sigrid about the next step.
+  announceStart: 0
+  announceCompletion: 0
+  showTimerInHud: 0
   prerequisites:
   - {fileID: 11400000, guid: 0279feb93b7c8b74e9fd8683d9d10fd3, type: 2}
   start: 2
@@ -50,8 +54,8 @@ MonoBehaviour:
     withinMinutes: 0
     questEvent: {fileID: 0}
     countAlreadyOwned: 1
-  turnInToGiver: 0
-  turnInTo: 
+  turnInToGiver: 1
+  turnInTo: Sigrid
   rewardItems: []
   rewardResources: []
   rewardRecipes: []

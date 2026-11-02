@@ -944,14 +944,19 @@ content. Ingrid reuses the existing recruit identity; the other professions' ful
    The torch is a normal craftable weapon (two Sticks, by hand), with a brighter flickering light. An occupied off hand
    rejects two-handed weapons; the player must put the torch away first.
    Speak with Sigrid and accept her briefing before the expedition follows or the shelter quest begins.
-2. Find a dry rock shelter, then speak with Sigrid to receive the gathering task: four Sticks and six Small Rocks.
+2. Find a dry rock shelter; "Return to Sigrid" remains part of that quest until the next briefing is accepted.
+   Speak with Sigrid to receive the gathering task: four Sticks and six Small Rocks.
    Return for her building instructions and use the normal build menu (G) to place a campfire beside the shelter.
    Construction pays this cost once; there is no prebuilt fire or additional fuel payment.
-3. Speak with Sigrid again to begin a 35-second rest by default, with optional companion conversations.
+3. After cooking, return to Sigrid to begin a 35-second rest by default. The tracker explicitly shows the countdown;
+   companion conversations are optional. Once it ends, finish any conversation to continue.
    Conversations bring the camera closer and frame the player and speaker; closing or leaving restores the view.
+   Companions stow their weapons for peaceful conversations and restore their previous state afterward.
 4. Defend the camp against two wolves. The encounter counts regardless of who lands the killing blow.
-5. A rumbling, approaching presence forces the group onward to ancient waystones.
-6. Speak with Sigrid at the waystones, then touch them to start a visible three-minute connection countdown. Music starts here,
+5. A rumbling, approaching presence forces the group onward to ancient waystones. The giant's gait is slow and heavy;
+   its walking footfalls produce subtle, distance-attenuated camera shake.
+6. Return to Sigrid at the waystones, then touch them to start a visible connection countdown (one minute in the current build),
+   using the shared raid/quest countdown HUD. Music starts here,
    not during the opening or camp defence; wind/rain ambience remains throughout. Increasing enemy waves pressure the group;
    the soldier offers limited nearby support and the Alchemist tends the player's wounds.
 7. Reaching zero opens the connection as a vast impact separates the expedition. Falling during this final defence
@@ -970,6 +975,9 @@ entry/status text, acceptance choices, timed-phase duration, initial enemy count
 starting armor, dialogue camera distance and companion support settings are designer-editable. Sigrid uses the same
 Quest Giver component as other NPCs: ordered offers own briefing text, acceptance choices and waiting lines, and
 confirmation starts the quest through the normal Quest Manager. There are no prologue-specific giver rules.
+The shared quest system keeps return objectives active until the next briefing is accepted, supports pre-acceptance
+tracker guidance, and lets intermediate chain stages suppress announcements without suppressing lifecycle events.
+This chain plays the new-quest sound at its initial acceptance and the completion sound only at its conclusion.
 Peaceful next objectives
 wait for the leader's briefing; attacks, the escape alarm and countdown remain automatic.
 The quest/event designer exposes scene-owned reactions for music, weather transitions, object activation and parameter

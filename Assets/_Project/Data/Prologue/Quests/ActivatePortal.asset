@@ -16,6 +16,10 @@ MonoBehaviour:
   displayName: Wake the Waystones
   description: Sigrid recognises a passage in the ancient waystones. Touch the centre stone to wake the connection.
   chain: Prologue - The Unquiet Forest
+  availableObjective: Speak to Sigrid about the next step.
+  announceStart: 0
+  announceCompletion: 0
+  showTimerInHud: 0
   prerequisites:
   - {fileID: 11400000, guid: cd536373f8f639f4db60c8810e546ebf, type: 2}
   start: 2

@@ -146,6 +146,28 @@ public sealed class CompanionTests
         }
     }
 
+    [TestCase(true)]
+    [TestCase(false)]
+    public void Sheathing_RestoresTheWeaponsPreviousVisibility(bool initiallyVisible)
+    {
+        var model = new GameObject("Held weapon");
+        model.SetActive(initiallyVisible);
+        try
+        {
+            var body = new CompanionBody(null, null);
+            typeof(CompanionBody).GetField("weaponModel", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)
+                .SetValue(body, model);
+            body.SetSheathed(true);
+            body.SetSheathed(true);
+            Assert.IsTrue(body.IsSheathed);
+            Assert.IsFalse(model.activeSelf);
+            body.SetSheathed(false);
+            Assert.IsFalse(body.IsSheathed);
+            Assert.AreEqual(initiallyVisible, model.activeSelf);
+        }
+        finally { Object.DestroyImmediate(model); }
+    }
+
     [Test]
     public void ThePlayerIsThePriorityTarget_CompanionsAreNot()
     {
