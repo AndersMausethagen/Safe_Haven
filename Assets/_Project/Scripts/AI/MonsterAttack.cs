@@ -24,6 +24,8 @@ public sealed class MonsterAttack
     public int priority;
     [Min(0f)] public float cooldown = 1f;
     public bool interruptible;
+    [Tooltip("The raid tier it learns this at: a tier II wolf pounces, a tier I wolf doesn't. 0: always. Above 0 it is only used in raids of that tier or higher.")]
+    [Range(0, Tiers.Max)] public int fromTier;
     [Header("Projectiles")]
     public GameObject projectilePrefab;
     [Min(1)] public int burstCount = 1;
@@ -34,6 +36,8 @@ public sealed class MonsterAttack
     [Min(0.1f)] public float chargeSpeed = 12f;
     [Min(0.1f)] public float chargeDistance = 8f;
     [Min(0f)] public float exposedSeconds = 2f;
+    [Tooltip("How high the body arcs through a charge, in metres: a pounce rather than a rush. Only its look: it can still be hit, and still hits, on the ground.")]
+    [Min(0f)] public float leapHeight;
     [Header("Howl")]
     [Min(0.1f)] public float buffRadius = 10f;
     [Min(0.1f)] public float buffSeconds = 8f;
@@ -47,9 +51,15 @@ public sealed class MonsterAttack
     [Tooltip("The most of its summons alive at once.")]
     [Min(1)] public int summonLimit = 4;
 
-    public bool IsAvailable(float distance, float now, float readyAt, bool isLeader)
+    public bool IsAvailable(float distance, float now, float readyAt, bool isLeader, int tier = 0)
     {
-        return attack != null && distance >= minimumRange && distance <= maximumRange
+        return attack != null && KnownAt(tier) && distance >= minimumRange && distance <= maximumRange
             && now >= readyAt && (!packLeaderOnly || isLeader);
     }
+
+    /// <summary>Whether a creature in a raid of this tier can use it (0: not in a raid).</summary>
+    public bool KnownAt(int tier) => tier >= fromTier;
+
+    /// <summary>True for an action that lands a blow, unlike a howl or a summon.</summary>
+    public bool Strikes => attack != null && kind != MonsterAttackKind.Howl && kind != MonsterAttackKind.Summon;
 }

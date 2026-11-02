@@ -45,6 +45,8 @@ public sealed class ItemDefinition : ScriptableObject, IStackDefinition
     [SerializeField] private ItemRarity rarity = ItemRarity.Common;
     [Tooltip("What one of these is worth. Adds up to the haul value shown after a raid.")]
     [SerializeField, Min(0)] private int value = 1;
+    [Tooltip("This piece's gear score, for what the rules get wrong (a torch or a fishing rod is no weapon). 0: worked out from its tier, slot and rarity.")]
+    [SerializeField, Min(0)] private int gearScoreOverride;
 
     [Header("Appearance")]
     [Tooltip("Picture shown in inventories and tooltips.")]
@@ -140,6 +142,7 @@ public sealed class ItemDefinition : ScriptableObject, IStackDefinition
     public int Tier => tier;
     public ItemRarity Rarity => rarity;
     public int Value => value;
+    public int GearScoreOverride => gearScoreOverride;
     public Sprite Icon => icon;
     public GameObject Prefab => prefab;
     /// <summary>Model shown in the hand (the held model, else the world prefab); null when the item has none.</summary>

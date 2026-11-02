@@ -25,6 +25,12 @@ public sealed class RaidMapDefinition : ScriptableObject
         [Min(0f)] public float weight = 1f;
         [Tooltip("Smallest and largest size, picked at random for each one placed.")]
         public Vector2 scale = new Vector2(0.85f, 1.2f);
+        [Tooltip("The lowest raid tier it grows at, on a generated map. 0: any.")]
+        [Range(0, Tiers.Max)] public int fromTier;
+        [Tooltip("The highest raid tier it grows at, on a generated map. 0: any.")]
+        [Range(0, Tiers.Max)] public int toTier;
+
+        public bool AppearsAt(int tier) => tier <= 0 || ((fromTier <= 0 || tier >= fromTier) && (toTier <= 0 || tier <= toTier));
     }
 
     [Serializable]
@@ -79,6 +85,8 @@ public sealed class RaidMapDefinition : ScriptableObject
     [Header("Growth")]
     [Tooltip("Grass, bushes and plants on each painted layer, grown on every map when a raid loads.")]
     [SerializeField] private List<TerrainGrowth.Ground> growth = new List<TerrainGrowth.Ground>();
+    [Tooltip("The plants grown in patches over that ground: ferns, berries, flowers, glowing mushrooms. Empty: the standard forest floor.")]
+    [SerializeField] private List<TerrainGrowth.Plant> plants = new List<TerrainGrowth.Plant>();
 
     [Header("Trees")]
     [SerializeField] private List<Scatter> trees = new List<Scatter>();
@@ -123,6 +131,7 @@ public sealed class RaidMapDefinition : ScriptableObject
     public TerrainLayer CliffLayer => cliffLayer;
     public Vector2 CliffSlope => cliffSlope;
     public IReadOnlyList<TerrainGrowth.Ground> Growth => growth;
+    public IReadOnlyList<TerrainGrowth.Plant> Plants => plants.Count > 0 ? plants : TerrainGrowth.DefaultPlants;
     public IReadOnlyList<Scatter> Trees => trees;
     public float TreeSpacing => treeSpacing;
     public float MaxTreeSlope => maxTreeSlope;
@@ -213,10 +222,10 @@ public sealed class RaidMapDefinition : ScriptableObject
     }
 
     /// <summary>
-    /// Makes this copy of a map paint from generated zones, in the forest of the given mood. Only ever for a copy made at
-    /// runtime (Instantiate): the asset itself never changes while playing.
+    /// Makes this copy of a map paint from generated zones, in the forest of the given mood and raid tier. Only ever for a copy
+    /// made at runtime (Instantiate): the asset itself never changes while playing.
     /// </summary>
-    public void UseGenerated(int resolution, byte[] path, byte[] forest, byte[] clearing, RaidMapMood mood, int seed)
+    public void UseGenerated(int resolution, byte[] path, byte[] forest, byte[] clearing, RaidMapMood mood, int seed, int tier = 0)
     {
         zoneResolution = resolution;
         zones.Clear();
@@ -232,6 +241,23 @@ public sealed class RaidMapDefinition : ScriptableObject
             if (trees[i] != null)
             {
                 trees[i].weight = mood.treeWeights[i];
+            }
+        }
+
+        // After the mood, which can favour a tree this tier has none of.
+        foreach (Scatter scatter in trees)
+        {
+            if (scatter != null && !scatter.AppearsAt(tier))
+            {
+                scatter.weight = 0f;
+            }
+        }
+
+        foreach (Scatter scatter in rocks)
+        {
+            if (scatter != null && !scatter.AppearsAt(tier))
+            {
+                scatter.weight = 0f;
             }
         }
     }

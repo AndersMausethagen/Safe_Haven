@@ -48,6 +48,11 @@ public sealed class GiveLootOutcome : RaidEventOutcome
         ItemInventory bag = context.Player.GetComponent<ItemInventory>();
         foreach (ItemAmount drop in loot.Roll())
         {
+            if (!context.Session.Allows(drop.Item))
+            {
+                continue;
+            }
+
             int amount = RaidParameters.ScaleAmount(drop.Amount, multiplier, (float)context.Random.NextDouble());
             int given = amount > 0 && bag != null ? bag.Give(drop.Item, amount) : 0;
             if (given < amount)
@@ -291,7 +296,7 @@ public sealed class GiveRelicOutcome : RaidEventOutcome
 
     public override void Apply(RaidEventContext context)
     {
-        ItemStack relic = RelicSettings.Grant(context.Player, context.Random, context.Session.Definition.Tier);
+        ItemStack relic = RelicSettings.Grant(context.Player, context.Random, context.Session.Tier);
         if (!relic.IsEmpty)
         {
             context.Session.RecordEvent($"Found {relic.DisplayName}");

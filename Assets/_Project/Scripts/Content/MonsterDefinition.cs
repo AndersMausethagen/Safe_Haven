@@ -31,6 +31,8 @@ public sealed class MonsterDefinition : ScriptableObject, ICombatSounds
     [SerializeField] private GameObject prefab;
     [Tooltip("Experience for killing it. 0: worked out from its health (LevelingSettings).")]
     [SerializeField, Min(0)] private int experience;
+    [Tooltip("Never made an elite: a raid's great beast is strong enough, and a summoned swarm isn't worth it.")]
+    [SerializeField] private bool neverElite;
 
     [Header("Behaviour")]
     [Tooltip("What the monster does when it attacks.")]
@@ -84,6 +86,7 @@ public sealed class MonsterDefinition : ScriptableObject, ICombatSounds
     [Tooltip("Plays as it winds up an attack, so the player hears it coming. Empty: none.")]
     [SerializeField] private SoundDefinition attackSound;
 
+    public bool NeverElite => neverElite;
     public string Id => string.IsNullOrWhiteSpace(id) ? name : id;
     public string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;
     public string Description => description;

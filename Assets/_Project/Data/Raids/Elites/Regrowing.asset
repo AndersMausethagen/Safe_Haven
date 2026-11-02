@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6fa13c1beb2cebb46a3a8766d365a936, type: 3}
+  m_Name: Regrowing
+  m_EditorClassIdentifier: SafeHaven::EliteAffixDefinition
+  displayName: Regrowing
+  description: 'Grows back once it goes unhit for a moment. Answer: stay on it and don''t back off to rest.'
+  colour: {r: 0.4, g: 0.95, b: 0.4, a: 1}
+  fromTier: 2
+  weight: 1
+  health: 1.4
+  damage: 1
+  speed: 1
+  cooldowns: 1
+  armor: 0
+  size: 1
+  behaviours:
+  - rid: 2623125818519847022
+  references:
+    version: 2
+    RefIds:
+    - rid: 2623125818519847022
+      type: {class: RegrowthBehaviour, ns: , asm: SafeHaven}
+      data:
+        perSecond: 0.03
+        afterHit: 3.5

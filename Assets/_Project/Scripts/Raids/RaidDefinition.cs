@@ -46,6 +46,13 @@ public sealed class RaidDefinition : ScriptableObject
     [Tooltip("Multiplier on enemies' physical and spell power. 1 is normal.")]
     [SerializeField, Min(0f)] private float enemyPowerMultiplier = 1f;
 
+    [Header("Difficulty Tiers")]
+    [Tooltip("The tiers this raid can be entered at, lowest first, picked at the portal. Empty: it plays at its one Tier above, with nothing scaled.")]
+    [SerializeField] private List<RaidDifficulty> difficulties = new List<RaidDifficulty>();
+
+    [Tooltip("What can make a creature an elite in this raid. Each tier says how many elites and how many affixes each.")]
+    [SerializeField] private List<EliteAffixDefinition> eliteAffixes = new List<EliteAffixDefinition>();
+
     [Header("Time of Day")]
     [Tooltip("The hours this raid can take place at, rolled from each run's seed (shown in the briefing). Empty: the " +
              "scene's own hour. Night is darker for the player and the monsters alike, and should pay more.")]
@@ -104,6 +111,59 @@ public sealed class RaidDefinition : ScriptableObject
     public IReadOnlyList<RaidStage> Stages => stages;
     public IReadOnlyList<RaidTimeOfDay> TimesOfDay => timesOfDay;
     public RaidLayoutRules LayoutRules => layoutRules;
+    public IReadOnlyList<RaidDifficulty> Difficulties => difficulties;
+    public IReadOnlyList<EliteAffixDefinition> EliteAffixes => eliteAffixes;
+
+    /// <summary>The lowest difficulty, what a raid is entered at unless the player picks another; null for a raid without tiers.</summary>
+    public RaidDifficulty LowestDifficulty => difficulties.Count > 0 ? difficulties[0] : null;
+
+    /// <summary>
+    /// Whether the briefing should name a creature at a tier: false when the spawn lists hold it, but not at this tier. Creatures no list
+    /// holds (placed in the scene, or by an event) can be met at any tier.
+    /// </summary>
+    public bool CanMeet(MonsterDefinition monster, int tier)
+    {
+        bool listed = false;
+        foreach (RaidSpawnList list in spawnLists)
+        {
+            foreach (SpawnTable.Entry entry in list.entries)
+            {
+                if (entry.prefab == null)
+                {
+                    continue;
+                }
+
+                foreach (MonsterAI creature in entry.prefab.GetComponentsInChildren<MonsterAI>(true))
+                {
+                    if (creature.Definition == monster)
+                    {
+                        listed = true;
+                        if (entry.AppearsAt(tier))
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+
+        return !listed;
+    }
+
+    /// <summary>The highest tier the player's gear is ready for, so the portal starts on a sensible choice; the lowest if none is.</summary>
+    public RaidDifficulty DifficultyFor(int gearScore)
+    {
+        RaidDifficulty best = LowestDifficulty;
+        foreach (RaidDifficulty difficulty in difficulties)
+        {
+            if (gearScore >= difficulty.recommendedGearScore)
+            {
+                best = difficulty;
+            }
+        }
+
+        return best;
+    }
 
     public float EnemyDensity => enemyDensity;
     /// <summary>This raid's enemy density times the global one (RaidGlobalSettings).</summary>
@@ -137,7 +197,7 @@ public sealed class RaidDefinition : ScriptableObject
     public SpawnRules GetSpawnRules(Vector3? entry)
     {
         RaidGlobalSettings global = RaidGlobalSettings.Current;
-        float density = EffectiveEnemyDensity * (GameSession.ActiveRaid?.TimeOfDay?.enemyDensity ?? 1f);
+        float density = EffectiveEnemyDensity * (GameSession.ActiveRaid?.TimeOfDay?.enemyDensity ?? 1f) * (GameSession.ActiveRaid?.Difficulty?.enemyDensity ?? 1f);
         return overrideBands ? new SpawnRules(density, entry, nearDistance, farDistance)
             : new SpawnRules(density, entry, global.NearDistance, global.FarDistance);
     }

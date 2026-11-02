@@ -63,6 +63,40 @@ public sealed class ResourceNode : MonoBehaviour, IInteractionCondition, ISaveab
         }
     }
 
+    // A raid tier holds nothing it can't hand over, whatever placed it there (an event's ore vein, say). In Start, as an object can't
+    // be switched off while it is still being switched on.
+    private void Start()
+    {
+        if (GameSession.ActiveRaid != null && !RaidAllows(node, GameSession.ActiveRaid.Difficulty))
+        {
+            gameObject.SetActive(false);
+        }
+    }
+
+    /// <summary>False when a raid tier allows nothing this node gives: an iron vein in a tier I raid.</summary>
+    public static bool RaidAllows(GatheringNodeDefinition definition, RaidDifficulty tier)
+    {
+        if (definition == null || tier == null)
+        {
+            return true;
+        }
+
+        bool anyItem = false;
+        foreach (ItemDropEntry entry in definition.Yields.Entries)
+        {
+            if (entry.Item != null)
+            {
+                anyItem = true;
+                if (tier.Allows(entry.Item))
+                {
+                    return true;
+                }
+            }
+        }
+
+        return !anyItem;
+    }
+
     private void Awake()
     {
         interactable = GetComponent<Interactable>();

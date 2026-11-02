@@ -78,6 +78,8 @@ Numbers measured by launching real raids, as a raid's spawn lists decide what it
 | Runes could only be learned from Liv, found by chance | The Watch Post teaches them too |
 | 20 of 26 buildings were open from the first minute | 4 are; the rest open through the chain |
 
+**Since raid tiers ([gear score and raid tiers](GearScoreAndRaidTiers.md)):** the counts below were measured before raids had difficulty tiers, when one raid held every ore. Each ore now comes from its tier: copper from tier I, iron from II, moonsilver from III. The node counts per raid stay about the same, but the goals below now need the right tier as well.
+
 ### Expected pace (calculated from real counts, not yet playtested)
 
 Three ore make an ingot, and what limits a trip is time and the weight of the bag (150, and ore weighs 2). A careful player reaching about 60% of the nodes:

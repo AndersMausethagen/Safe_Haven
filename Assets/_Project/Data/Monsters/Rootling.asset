@@ -33,6 +33,7 @@ MonoBehaviour:
   animatorController: {fileID: 0}
   prefab: {fileID: 3085881180223279310, guid: 049004d8140885f4db2790503b4ab12d, type: 3}
   experience: 0
+  neverElite: 1
   attack: {fileID: 11400000, guid: 81ed434fa664f074b97a71d4b1e4fe40, type: 2}
   attackDamage: 8
   attackCooldown: 0.6
@@ -53,6 +54,7 @@ MonoBehaviour:
     priority: 10
     cooldown: 1.8
     interruptible: 0
+    fromTier: 0
     projectilePrefab: {fileID: 0}
     burstCount: 1
     burstInterval: 0.2
@@ -61,6 +63,7 @@ MonoBehaviour:
     chargeSpeed: 12
     chargeDistance: 8
     exposedSeconds: 2
+    leapHeight: 0
     buffRadius: 10
     buffSeconds: 8
     damageBonus: 0.05

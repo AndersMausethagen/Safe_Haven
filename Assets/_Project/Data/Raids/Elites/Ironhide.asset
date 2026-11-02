@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6fa13c1beb2cebb46a3a8766d365a936, type: 3}
+  m_Name: Ironhide
+  m_EditorClassIdentifier: SafeHaven::EliteAffixDefinition
+  displayName: Ironhide
+  description: 'Big, slow and hard to hurt. Answer: use the slowness: keep moving and hit it when it has swung.'
+  colour: {r: 0.72, g: 0.78, b: 0.9, a: 1}
+  fromTier: 1
+  weight: 1
+  health: 1.8
+  damage: 1
+  speed: 0.9
+  cooldowns: 1
+  armor: 30
+  size: 1.2
+  behaviours: []
+  references:
+    version: 2
+    RefIds: []

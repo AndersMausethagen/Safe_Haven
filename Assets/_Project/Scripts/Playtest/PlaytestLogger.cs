@@ -61,6 +61,13 @@ public sealed class PlaytestLogger : MonoBehaviour, IGameSystem
         }
 
         bool raid = gameEvent.Kind == GameEventKind.RaidFinished;
+        RaidSession session = raid && RaidDirector.Current != null ? RaidDirector.Current.Session : null;
+        if (session != null && session.Difficulty != null)
+        {
+            Write(PlaytestLog.RaidTier, NameOf(gameEvent.Subject), session.Tier,
+                PlaytestLog.TierDetail(session.GearScoreAtEntry, session.Difficulty.recommendedGearScore, session.TimeOfDay != null ? session.TimeOfDay.DisplayName : "scene hour"));
+        }
+
         Write(gameEvent.Kind.ToString(), NameOf(gameEvent.Subject),
             raid ? Mathf.RoundToInt(gameEvent.Seconds) : gameEvent.Amount,
             raid ? gameEvent.Outcome.ToString() : "");

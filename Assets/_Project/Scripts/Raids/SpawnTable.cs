@@ -19,6 +19,13 @@ public sealed class SpawnTable : ScriptableObject
         [Min(0)] public int maxPerGroup;
         [Tooltip("At least this many are placed in every raid, before the weighted picks, so a quest resource is always there.")]
         [Min(0)] public int minPerGroup;
+        [Tooltip("The lowest raid tier this can appear at. 0: any.")]
+        [Range(0, Tiers.Max)] public int fromTier;
+        [Tooltip("The highest raid tier this can appear at. 0: any.")]
+        [Range(0, Tiers.Max)] public int toTier;
+
+        /// <summary>Whether this can appear at a raid tier.</summary>
+        public bool AppearsAt(int tier) => (fromTier <= 0 || tier >= fromTier) && (toTier <= 0 || tier <= toTier);
     }
 
     [SerializeField] private List<Entry> entries = new List<Entry>();
@@ -33,6 +40,17 @@ public sealed class SpawnTable : ScriptableObject
 
     /// <summary>Picks a prefab, skipping entries that hit their cap in counts (prefab to placed so far). Null when none can.</summary>
     public GameObject Pick(System.Random random, Dictionary<GameObject, int> counts) => Pick(entries, random, counts);
+
+    /// <summary>Picks a prefab among what can appear at a raid tier; among everything when there is no raid (tier 0).</summary>
+    public GameObject PickAt(System.Random random, int tier)
+    {
+        if (tier <= 0)
+        {
+            return Pick(entries, random, null);
+        }
+
+        return Pick(entries.FindAll(entry => entry.AppearsAt(tier)), random, null);
+    }
 
     /// <summary>Roll for any list of entries (a spawn table's or a raid's spawn list).</summary>
     public static List<GameObject> Roll(IReadOnlyList<Entry> entries, System.Random random, int amount)

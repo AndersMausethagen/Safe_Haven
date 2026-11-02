@@ -87,7 +87,7 @@ public sealed class LootCache : MonoBehaviour, IInteractionVerb
         {
             holdsRelic = false;
             RaidDirector raid = RaidDirector.Current;
-            RelicSettings.Grant(searcher, new System.Random(Random.Range(0, int.MaxValue)), raid.Session.Definition.Tier);
+            RelicSettings.Grant(searcher, new System.Random(Random.Range(0, int.MaxValue)), raid.Session.Tier);
         }
 
         if (contents.Count == 0 && resourceContents.Count == 0)
@@ -147,7 +147,7 @@ public sealed class LootCache : MonoBehaviour, IInteractionVerb
         holdsRelic = RaidDirector.Current != null && Random.value < RelicSettings.Current.CacheChance * multiplier;
         foreach (ItemAmount drop in drops.Roll())
         {
-            if (RaidDirector.Current != null && IsAboveThePlayer(drop.Item))
+            if (RaidDirector.Current != null && (IsAboveThePlayer(drop.Item) || !RaidDirector.Current.Session.Allows(drop.Item)))
             {
                 continue;
             }

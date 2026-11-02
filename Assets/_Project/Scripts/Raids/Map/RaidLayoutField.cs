@@ -17,6 +17,12 @@ public sealed class RaidLayoutField
     private const float RidgeVariety = 0.55f;
     private const float RidgeVarietyScale = 46f;
     private const float SpurWidth = 0.6f;
+    private const float PondShore = 5f;
+    private const float PondBank = 3.5f;
+    private const float PondBelowRim = 0.12f;
+    private const float PondRimBeyond = 2f;
+    private const int PondRimSamples = 24;
+    private const float PondSoil = 2.4f;
 
     private readonly RaidLayoutPlan plan;
     private readonly RaidLayoutRules rules;
@@ -70,7 +76,31 @@ public sealed class RaidLayoutField
             field.openDistance[i] = Mathf.Min(field.trailDistance[i], field.clearDistance[i]);
         }
 
+        // Ponds lie on open ground: the ridges keep back and the forest thins, though only trails and clearings are soil.
+        foreach (RaidLayoutPond pond in plan.Ponds)
+        {
+            field.Stamp(pond.Position, pond.Position, pond.Reach + PondShore, field.openDistance);
+        }
+
+        foreach (RaidLayoutPond pond in plan.Ponds)
+        {
+            pond.Level = field.PondLevel(pond);
+        }
+
         return field;
+    }
+
+    // Just below the lowest ground around it, so the water never stands above its own banks.
+    private float PondLevel(RaidLayoutPond pond)
+    {
+        float lowest = float.MaxValue;
+        for (int i = 0; i < PondRimSamples; i++)
+        {
+            Vector2 rim = pond.Rim(i * Mathf.PI * 2f / PondRimSamples, PondRimBeyond);
+            lowest = Mathf.Min(lowest, GroundAt(rim.x / plan.Size, rim.y / plan.Size));
+        }
+
+        return lowest - PondBelowRim;
     }
 
     private float[] Filled(float value)
@@ -140,6 +170,47 @@ public sealed class RaidLayoutField
     /// <summary>The ground's height at (u, v), in metres above the map's lowest point.</summary>
     public float HeightAt(float u, float v)
     {
+        float height = GroundAt(u, v);
+        if (plan.Ponds.Count == 0)
+        {
+            return height;
+        }
+
+        var point = new Vector2(u * plan.Size, v * plan.Size);
+        foreach (RaidLayoutPond pond in plan.Ponds)
+        {
+            height = Basin(pond, point, height);
+        }
+
+        return height;
+    }
+
+    // The bed sinks from the shore to the pond's depth; the bank leads back up to the ground around it.
+    private static float Basin(RaidLayoutPond pond, Vector2 point, float ground)
+    {
+        float far = pond.Reach + PondBank;
+        if ((point - pond.Position).sqrMagnitude >= far * far)
+        {
+            return ground;
+        }
+
+        float edge = pond.Edge(point);
+        if (edge >= PondBank)
+        {
+            return ground;
+        }
+
+        if (edge >= 0f)
+        {
+            return Mathf.Lerp(pond.Level, ground, Mathf.SmoothStep(0f, 1f, edge / PondBank));
+        }
+
+        float slope = Mathf.Min(Mathf.Min(pond.Radii.x, pond.Radii.y) * 0.8f, 3.5f);
+        return pond.Level - pond.Depth * Mathf.SmoothStep(0f, 1f, -edge / slope);
+    }
+
+    private float GroundAt(float u, float v)
+    {
         float x = u * plan.Size;
         float y = v * plan.Size;
         float open = Mathf.Max(0f, OpenDistance(u, v));
@@ -188,6 +259,24 @@ public sealed class RaidLayoutField
                 path[index] = Byte(1f - Mathf.SmoothStep(0f, 1f, (trailDistance[index] + SoilEdge) / (SoilEdge * 2f)));
                 clearing[index] = Byte(1f - Mathf.SmoothStep(0f, 1f, (clearDistance[index] + wobble + SoilEdge) / (SoilEdge * 2f)));
                 forest[index] = Byte(density * patches * Mathf.SmoothStep(0f, 1f, (openDistance[index] + wobble) / ForestEdge));
+            }
+        }
+
+        // A bed of bare soil under the water and along the shore: trees, rocks and plants keep off it as they do off a trail.
+        foreach (RaidLayoutPond pond in plan.Ponds)
+        {
+            float far = pond.Reach + PondSoil;
+            int xMin = Mathf.Max(0, Mathf.FloorToInt((pond.Position.x - far) / cell));
+            int xMax = Mathf.Min(resolution - 1, Mathf.CeilToInt((pond.Position.x + far) / cell));
+            int yMin = Mathf.Max(0, Mathf.FloorToInt((pond.Position.y - far) / cell));
+            int yMax = Mathf.Min(resolution - 1, Mathf.CeilToInt((pond.Position.y + far) / cell));
+            for (int y = yMin; y <= yMax; y++)
+            {
+                for (int x = xMin; x <= xMax; x++)
+                {
+                    float soil = 1f - Mathf.SmoothStep(0f, 1f, pond.Edge(new Vector2(x * cell, y * cell)) / PondSoil);
+                    path[y * resolution + x] = (byte)Mathf.Max(path[y * resolution + x], Byte(soil));
+                }
             }
         }
     }

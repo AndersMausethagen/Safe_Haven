@@ -41,7 +41,7 @@ public sealed class HearthlineTests
     [Test]
     public void CodeBuiltWindows_TakeTheirColoursFromTheStyle()
     {
-        foreach (string file in new[] { "UI/TalentWindow.cs", "UI/HavenWindow.cs", "UI/AltarWindow.cs", "UI/CargoWindow.cs", "Settlement/HeartTree.cs" })
+        foreach (string file in new[] { "UI/TalentWindow.cs", "UI/HavenWindow.cs", "UI/AltarWindow.cs", "UI/CargoWindow.cs", "UI/RaidPreparationWindow.cs", "Settlement/HeartTree.cs" })
         {
             string source = File.ReadAllText("Assets/_Project/Scripts/" + file);
             Assert.IsFalse(Regex.IsMatch(source, "<color=#[0-9A-Fa-f]{6}"), $"{file}: changing a colour in UIStyle has to change the game");
@@ -68,6 +68,17 @@ public sealed class HearthlineTests
         CollectionAssert.Contains(Prefab("ItemSlot").GetComponentsInChildren<UIRole>(true).Select(r => r.Role).ToList(), UIRole.Kind.Slot);
         CollectionAssert.Contains(roles, UIRole.Kind.PrimaryButton, "the Craft button");
         CollectionAssert.Contains(Prefab("StationWindow").GetComponentsInChildren<UIRole>(true).Select(r => r.Role).ToList(), UIRole.Kind.PrimaryButton, "the Queue button");
+    }
+
+    [Test]
+    public void TheRaidPlanner_IsAnEmptyShellItBuildsItselfIn()
+    {
+        var planner = new SerializedObject(Prefab("RaidPreparationWindow").GetComponent<RaidPreparationWindow>());
+        var content = (RectTransform)planner.FindProperty("content").objectReferenceValue;
+        Assert.IsNotNull(content, "what the window builds itself in");
+        Assert.AreEqual(0, content.childCount, "old children would show under the built window");
+        Assert.AreEqual(content.gameObject, new SerializedObject(planner.FindProperty("window").objectReferenceValue).FindProperty("content").objectReferenceValue, "the UIWindow shows and hides the same object");
+        StringAssert.Contains("lost", planner.FindProperty("lossSummary").stringValue, "GDD §18.6: what can be lost is said before the raid");
     }
 
     [Test]

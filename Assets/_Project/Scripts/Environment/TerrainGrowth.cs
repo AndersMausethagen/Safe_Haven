@@ -25,27 +25,67 @@ public static class TerrainGrowth
         public Color colour;
     }
 
+    /// <summary>One kind of plant grown in patches of its own, over whatever ground grows plants (Ground.plants).</summary>
+    [Serializable]
+    public sealed class Plant
+    {
+        [Tooltip("The detail prototype on the terrain, by name.")]
+        public string prototype;
+        [Tooltip("Off: none of this plant grows.")]
+        public bool enabled = true;
+        [Tooltip("How wide its patches are, in metres.")]
+        [Min(1f)] public float patchSize = 7f;
+        [Tooltip("How rare the patches are: 0.5 covers much of the ground, 0.8 only a few spots.")]
+        [Range(0.3f, 0.95f)] public float rarity = 0.68f;
+        [Tooltip("How thickly it grows inside a patch.")]
+        [Range(0f, 1f)] public float thickness = 0.5f;
+        [Tooltip("How many cells around it it clears of grass, so it isn't drowned in the lawn.")]
+        [Range(0, 3)] public int clearing;
+        [Tooltip("How much it loves the wet: towards water and in damp ground its patches spread and thicken. 0: it doesn't care.")]
+        [Range(0f, 1f)] public float loveOfWet;
+
+        public Plant()
+        {
+        }
+
+        public Plant(string prototype, float patchSize, float rarity, float thickness, int clearing, float loveOfWet = 0f)
+        {
+            this.prototype = prototype;
+            this.patchSize = patchSize;
+            this.rarity = rarity;
+            this.thickness = thickness;
+            this.clearing = clearing;
+            this.loveOfWet = loveOfWet;
+        }
+    }
+
     private const int SeedRange = 10007;
     private const float BareFrom = 0.7f;
+    private const float StrayChance = 0.0015f;
+    private const float WetSpread = 0.3f;
+    private const float WetThickening = 2.5f;
 
-    /// <summary>The plants grown in patches: name, patch noise scale (1/m), how rare the patches are (noise threshold), how
-    /// thickly they grow inside one. The plant clears grass this many cells around it, so it is not drowned in the lawn.</summary>
-    private static readonly (string Name, float Scale, float Threshold, float Thickness, int Clearing)[] Plants =
+    /// <summary>What a terrain grows when it says nothing else (the World tool's Fill), and what a new raid map starts from.
+    /// Glowing plants aren't among them: they are painted by hand here, or named in a raid map's own list.</summary>
+    public static readonly IReadOnlyList<Plant> DefaultPlants = new[]
     {
-        ("Fern", 0.11f, 0.64f, 0.5f, 1),
-        ("Blueberry", 0.15f, 0.66f, 0.6f, 1),
-        ("Lingonberry", 0.17f, 0.7f, 0.55f, 1),
-        ("Heather", 0.13f, 0.64f, 0.7f, 0),
-        ("White Flowers", 0.22f, 0.68f, 0.35f, 0),
-        ("Yellow Flowers", 0.2f, 0.74f, 0.3f, 0),
+        new Plant("Fern", 1f / 0.11f, 0.64f, 0.5f, 1),
+        new Plant("Blueberry", 1f / 0.15f, 0.66f, 0.6f, 1),
+        new Plant("Lingonberry", 1f / 0.17f, 0.7f, 0.55f, 1),
+        new Plant("Heather", 1f / 0.13f, 0.64f, 0.7f, 0),
+        new Plant("White Flowers", 1f / 0.22f, 0.68f, 0.35f, 0),
+        new Plant("Yellow Flowers", 1f / 0.2f, 0.74f, 0.3f, 0),
     };
 
     /// <summary>
-    /// Replaces the grass, bush and plant layers with growth by ground layer. Other details (glowing plants) are kept. Nothing
-    /// grows where <paramref name="blocked"/> says so. Returns the number of cells with growth; 0 when the prototypes are missing.
+    /// Replaces the grass, bush and listed plant layers with growth by ground layer. Other details are kept. Nothing grows where
+    /// <paramref name="blocked"/> says so. <paramref name="plants"/> defaults to <see cref="DefaultPlants"/>; <paramref name="wetness"/>
+    /// (0 to 1) thickens the plants that love the wet. Returns the number of cells with growth; 0 when the prototypes are missing.
     /// </summary>
-    public static int Fill(Terrain terrain, IReadOnlyList<Ground> fills, int seed, Func<Vector3, bool> blocked = null)
+    public static int Fill(Terrain terrain, IReadOnlyList<Ground> fills, int seed, Func<Vector3, bool> blocked = null,
+        IReadOnlyList<Plant> plants = null, Func<Vector3, float> wetness = null)
     {
+        plants ??= DefaultPlants;
         TerrainData data = terrain.terrainData;
         DetailPrototype[] prototypes = data.detailPrototypes;
         int Layer(string name) => Array.FindIndex(prototypes, p => p.prototype != null && p.prototype.name == name);
@@ -68,12 +108,14 @@ public static class TerrainGrowth
             }
         }
 
-        var plantLayers = new int[Plants.Length];
-        var plantCells = new int[Plants.Length][,];
-        for (int k = 0; k < Plants.Length; k++)
+        var plantLayers = new int[plants.Count];
+        var plantCells = new int[plants.Count][,];
+        bool anyLoveWet = false;
+        for (int k = 0; k < plants.Count; k++)
         {
-            plantLayers[k] = Layer(Plants[k].Name);
+            plantLayers[k] = Layer(plants[k].prototype);
             plantCells[k] = new int[resolution, resolution];
+            anyLoveWet |= plants[k].enabled && plants[k].loveOfWet > 0f;
         }
 
         var shortCells = new int[resolution, resolution];
@@ -126,25 +168,36 @@ public static class TerrainGrowth
                 shortCells[z, x] = Mathf.FloorToInt(2f * shortAmount * Mathf.Lerp(0.45f, 1f, lawn) + jitter);
                 tallCells[z, x] = Mathf.FloorToInt(tallAmount * Mathf.SmoothStep(0f, 1f, (tall - 0.5f) * 3.5f) + jitter);
                 bushCells[z, x] = bush > 1f - 0.12f * bushAmount && jitter < 0.15f ? 1 : 0;
-                for (int k = 0; k < Plants.Length; k++)
+                float wet = anyLoveWet && wetness != null ? wetness(point) : 0f;
+                for (int k = 0; k < plants.Count; k++)
                 {
-                    // Each plant grows in its own patches (noise), thinly, and a few strays scatter everywhere.
-                    var plant = Plants[k];
-                    float patch = Mathf.PerlinNoise(point.x * plant.Scale + 31.7f * (k + 1) + offset, point.z * plant.Scale - 17.3f * (k + 1));
+                    Plant plant = plants[k];
+                    if (!plant.enabled)
+                    {
+                        continue;
+                    }
+
+                    // Each plant grows in its own patches (noise), thinly, and a few strays scatter everywhere. Wet ground
+                    // spreads the patches and thickens them, for the plants that love it.
+                    float scale = 1f / plant.patchSize;
+                    float patch = Mathf.PerlinNoise(point.x * scale + 31.7f * (k + 1) + offset, point.z * scale - 17.3f * (k + 1));
                     float roll = Mathf.Repeat(Mathf.Sin(x * 12.9898f + z * 78.233f + (k + 1) * 3.17f) * 43758.547f, 1f);
-                    bool inPatch = patch > plant.Threshold && roll < plant.Thickness * plantAmount * Mathf.InverseLerp(plant.Threshold, plant.Threshold + 0.12f, patch);
-                    plantCells[k][z, x] = inPatch || roll < 0.0015f * plantAmount ? 1 : 0;
+                    float love = plant.loveOfWet * wet;
+                    float threshold = plant.rarity - love * WetSpread;
+                    float thickness = plant.thickness * (1f + love * WetThickening);
+                    bool inPatch = patch > threshold && roll < thickness * plantAmount * Mathf.InverseLerp(threshold, threshold + 0.12f, patch);
+                    plantCells[k][z, x] = inPatch || roll < StrayChance * plantAmount ? 1 : 0;
                 }
 
                 grown++;
             }
         }
 
-        ClearGrassAroundPlants(plantCells, shortCells, tallCells, resolution);
+        ClearGrassAroundPlants(plants, plantCells, shortCells, tallCells, resolution);
         data.SetDetailLayer(0, 0, shortLayer, shortCells);
         data.SetDetailLayer(0, 0, tallLayer, tallCells);
         data.SetDetailLayer(0, 0, bushLayer, bushCells);
-        for (int k = 0; k < Plants.Length; k++)
+        for (int k = 0; k < plants.Count; k++)
         {
             if (plantLayers[k] >= 0)
             {
@@ -155,11 +208,11 @@ public static class TerrainGrowth
         return grown;
     }
 
-    private static void ClearGrassAroundPlants(int[][,] plantCells, int[,] shortCells, int[,] tallCells, int resolution)
+    private static void ClearGrassAroundPlants(IReadOnlyList<Plant> plants, int[][,] plantCells, int[,] shortCells, int[,] tallCells, int resolution)
     {
-        for (int k = 0; k < Plants.Length; k++)
+        for (int k = 0; k < plants.Count; k++)
         {
-            int clearing = Plants[k].Clearing;
+            int clearing = plants[k].clearing;
             for (int z = 0; z < resolution; z++)
             {
                 for (int x = 0; x < resolution; x++)

@@ -633,6 +633,14 @@ public sealed class ItemSection : PrefabContentSection
     public override void DrawExtras(Object asset)
     {
         var item = (ItemDefinition)asset;
+        if (GearScore.Counts(item))
+        {
+            ContentUtility.BeginPanel("Gear score", "What this piece adds to the wearer's gear score, which raid tiers are tuned to (Raids › Rules). Worked out from its tier, slot and rarity, unless Gear Score Override says otherwise.");
+            EditorGUILayout.LabelField("As it comes", GearScore.Of(item).ToString());
+            EditorGUILayout.LabelField("Empowered to +3", GearScore.Of(new ItemStack(item, 1).WithEmpower(3)).ToString());
+            ContentUtility.EndPanel();
+        }
+
         DrawIconPanel(asset, PlaceholderIconPainter.Guess(item.DisplayName, item.Category.ToString(), item.ToolType,
             item.IsConsumable || item.IsBlueprint, item.IsBackpack, item.ArmorSlot));
         DrawPrefabPanel(asset);

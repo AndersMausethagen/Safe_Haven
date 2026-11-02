@@ -37,6 +37,8 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
     [SerializeField, Range(-1, 3)] private int fixedQuarterTurns = -1;
 
     private readonly List<Vector3> rumourSpots = new List<Vector3>();
+    private readonly List<Mesh> pondMeshes = new List<Mesh>();
+    private RaidLayoutRules generatedBy;
     private TerrainData turnedData;
     private Mesh generatedTrunks;
     private Texture2D generatedColour;
@@ -84,6 +86,7 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
         if (rules != null && definition != null && terrain != null && content != null)
         {
             List<NavMeshAgent> paused = PauseAgents();
+            generatedBy = rules;
             yield return Generate(rules, seed);
             Dress(seed);
             ResumeAgents(paused);
@@ -125,6 +128,7 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
         TerrainData source = terrain.terrainData;
         turnedData = Instantiate(source);
         turnedData.name = source.name + " (generated)";
+        ApplyGroundLook(turnedData);
         terrain.terrainData = turnedData;
         if (terrain.TryGetComponent(out TerrainCollider ground))
         {
@@ -135,12 +139,13 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
         {
             Layout = RaidLayoutPlanner.Plan(rules, definition.Size, seed, attempt);
             yield return null;
-            RaidMapGenerator.ShapeGround(definition, turnedData, Layout, rules);
+            RaidMapGenerator.ShapeGround(definition, turnedData, Layout, rules, GameSession.ActiveRaid != null ? GameSession.ActiveRaid.Tier : 0);
             terrain.Flush();
             yield return null;
             RebuildTrunks();
             rumourSpots.Clear();
             rumourSpots.AddRange(RaidMapGenerator.PlaceContent(this, Layout, rules));
+            RaidMapGenerator.PlacePonds(this, Layout, rules, pondMeshes);
             if (terrain.TryGetComponent(out TerrainMoss moss))
             {
                 moss.Rebuild();
@@ -151,7 +156,7 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
             if (RaidMapGenerator.ExitsReachable(this, Layout))
             {
                 Debug.Log($"Raid map generated from seed {seed}: {Layout.Shape.shape}, {Layout.Mood.name}, {Layout.Rooms.Count} clearings, " +
-                          $"{Layout.Links.Count} trails, {turnedData.treeInstanceCount} trees, attempt {attempt + 1}, {clock.ElapsedMilliseconds} ms.", this);
+                          $"{Layout.Links.Count} trails, {Layout.Ponds.Count} ponds, {turnedData.treeInstanceCount} trees, attempt {attempt + 1}, {clock.ElapsedMilliseconds} ms.", this);
                 yield break;
             }
 
@@ -159,6 +164,24 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
         }
 
         Debug.LogError($"Raid map from seed {seed}: no attempt gave a way to every exit. The player can still walk the trails.", this);
+    }
+
+    // The ground the definition asks for, so a designer's change to it needs no rebake. Painting relies on this order of layers.
+    private void ApplyGroundLook(TerrainData data)
+    {
+        if (definition.ForestLayer != null && definition.PathLayer != null && definition.CliffLayer != null)
+        {
+            data.terrainLayers = new[] { definition.ForestLayer, definition.PathLayer, definition.CliffLayer };
+            if (terrain.TryGetComponent(out TerrainMoss moss))
+            {
+                moss.MossLayer = definition.ForestLayer;
+            }
+        }
+
+        if (definition.TerrainMaterial != null)
+        {
+            terrain.materialTemplate = definition.TerrainMaterial;
+        }
     }
 
     // What this run's ground looks like, from what it was painted with. Done once, on the map that was kept: grass and plants,
@@ -171,7 +194,19 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
         }
 
         var clock = System.Diagnostics.Stopwatch.StartNew();
-        TerrainGrowth.Fill(terrain, definition.Growth, seed, TerrainGrowth.UnderTrees(terrain));
+        System.Func<Vector3, bool> blocked = TerrainGrowth.UnderTrees(terrain);
+        System.Func<Vector3, float> wetness = null;
+        if (generatedBy != null && Layout != null)
+        {
+            Vector3 origin = terrain.transform.position;
+            RaidLayoutPlan plan = Layout;
+            RaidLayoutRules rules = generatedBy;
+            System.Func<Vector3, bool> underTrees = blocked;
+            blocked = point => underTrees(point) || plan.InWater(new Vector2(point.x - origin.x, point.z - origin.z));
+            wetness = point => plan.Wetness(new Vector2(point.x - origin.x, point.z - origin.z), rules.WetReach, rules.DampGround);
+        }
+
+        TerrainGrowth.Fill(terrain, definition.Growth, seed, blocked, definition.Plants, wetness);
         if (terrain.TryGetComponent(out GrassTerrainColour colour))
         {
             generatedColour = TerrainGrowth.BakeColour(terrain, definition.Growth);
@@ -341,6 +376,11 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
         if (generatedColour != null)
         {
             Destroy(generatedColour);
+        }
+
+        foreach (Mesh mesh in pondMeshes)
+        {
+            Destroy(mesh);
         }
     }
 

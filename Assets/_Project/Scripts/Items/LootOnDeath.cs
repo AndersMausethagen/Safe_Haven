@@ -57,7 +57,13 @@ public sealed class LootOnDeath : MonoBehaviour
         var inventory = killingBlow.Source.GetComponentInParent<ItemInventory>();
         if (inventory != null)
         {
-            ItemGrantResult result = inventory.Give(drops.Roll());
+            List<ItemAmount> items = drops.Roll();
+            if (GameSession.ActiveRaid != null)
+            {
+                items.RemoveAll(drop => !GameSession.ActiveRaid.Allows(drop.Item));
+            }
+
+            ItemGrantResult result = inventory.Give(items);
             if (result.HasOverflow)
             {
                 GameMessages.Post("Bag full, left behind: " + AmountText.Describe(result.Overflow), MessageKind.Warning);
@@ -82,7 +88,7 @@ public sealed class LootOnDeath : MonoBehaviour
         RaidDirector raid = RaidDirector.Current;
         if (raid != null && relicChance > 0f && inventory != null && Random.value < relicChance)
         {
-            RelicSettings.Grant(inventory.gameObject, new System.Random(Random.Range(0, int.MaxValue)), raid.Session.Definition.Tier);
+            RelicSettings.Grant(inventory.gameObject, new System.Random(Random.Range(0, int.MaxValue)), raid.Session.Tier);
         }
 
         var crafting = killingBlow.Source.GetComponentInParent<PlayerCrafting>();

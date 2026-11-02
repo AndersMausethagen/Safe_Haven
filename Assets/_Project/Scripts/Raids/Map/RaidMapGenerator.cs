@@ -10,11 +10,16 @@ using UnityEngine.AI;
 /// </summary>
 public static class RaidMapGenerator
 {
+    public const string PondsName = "Ponds";
+
     private const float RockClearing = 3f;
     private const float ReachSample = 8f;
+    private const float PondMeshBeyond = 1.5f;
+    private const int PondMeshPoints = 48;
+    private const float PondDrinkSeconds = 1.5f;
 
     /// <summary>Gives the terrain the plan's heights, paint, trees and rocks. <paramref name="data"/> must be a runtime copy.</summary>
-    public static void ShapeGround(RaidMapDefinition definition, TerrainData data, RaidLayoutPlan plan, RaidLayoutRules rules)
+    public static void ShapeGround(RaidMapDefinition definition, TerrainData data, RaidLayoutPlan plan, RaidLayoutRules rules, int tier = 0)
     {
         RaidLayoutField field = RaidLayoutField.Build(plan, rules);
         data.SetHeights(0, 0, field.Heights(data.heightmapResolution, data.size.y));
@@ -22,7 +27,7 @@ public static class RaidMapGenerator
         // The map's own painting and scattering, on a copy that paints from the generated zones.
         field.Zones(out byte[] path, out byte[] forest, out byte[] clearing);
         RaidMapDefinition working = Object.Instantiate(definition);
-        working.UseGenerated(field.Resolution, path, forest, clearing, plan.Mood, plan.Seed);
+        working.UseGenerated(field.Resolution, path, forest, clearing, plan.Mood, plan.Seed, tier);
         RaidMapSurface.Paint(data, working);
         var clearings = new List<RaidMapSurface.Clearing>(plan.Sites.Count);
         foreach (RaidSite site in plan.Sites)
@@ -217,6 +222,100 @@ public static class RaidMapGenerator
             FogArea area = i < areas.Length ? areas[i] : Object.Instantiate(areas[0], areas[0].transform.parent);
             area.transform.position = world(rooms[order[i]].Position / plan.Size);
         }
+    }
+
+    /// <summary>
+    /// Lays the plan's ponds on the map, in place of an earlier attempt's. Kept out of the map's Content, which is snapped to the
+    /// ground. <paramref name="meshes"/> holds the meshes made, for whoever owns the map to destroy.
+    /// </summary>
+    public static void PlacePonds(RaidMap map, RaidLayoutPlan plan, RaidLayoutRules rules, List<Mesh> meshes)
+    {
+        Transform old = map.transform.Find(PondsName);
+        if (old != null)
+        {
+            // Detached first, as it lives on to the end of the frame and the name must be free for the new ones.
+            old.SetParent(null);
+            Object.Destroy(old.gameObject);
+        }
+
+        foreach (Mesh mesh in meshes)
+        {
+            Object.Destroy(mesh);
+        }
+
+        meshes.Clear();
+        if (plan.Ponds.Count == 0)
+        {
+            return;
+        }
+
+        if (rules.PondMaterial == null)
+        {
+            Debug.LogWarning($"{rules.name} wants ponds but has no Pond Material, so there is only an empty hollow.", rules);
+            return;
+        }
+
+        var holder = new GameObject(PondsName).transform;
+        holder.SetParent(map.transform, false);
+        Vector3 origin = map.Terrain.transform.position;
+        for (int i = 0; i < plan.Ponds.Count; i++)
+        {
+            RaidLayoutPond pond = plan.Ponds[i];
+            var water = new GameObject($"Pond {i + 1}");
+            water.transform.SetParent(holder, false);
+            water.transform.position = origin + new Vector3(pond.Position.x, pond.Level, pond.Position.y);
+            Mesh mesh = PondMesh(pond);
+            meshes.Add(mesh);
+            water.AddComponent<MeshFilter>().sharedMesh = mesh;
+            var renderer = water.AddComponent<MeshRenderer>();
+            renderer.sharedMaterial = rules.PondMaterial;
+            renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            water.AddComponent<WaterSurface>().IsStill = true;
+            if (rules.PondDrink > 0f || rules.PondFillItem != null)
+            {
+                AddDrinkingPlace(water.transform, pond, rules, origin);
+            }
+        }
+    }
+
+    // Its own object, as a hovered Interactable outlines every renderer under it and the water should not light up.
+    private static void AddDrinkingPlace(Transform water, RaidLayoutPond pond, RaidLayoutRules rules, Vector3 origin)
+    {
+        var place = new GameObject("Drinking Place");
+        place.transform.SetParent(water, false);
+        place.AddComponent<RaidPondShore>().Configure(pond, origin);
+        var source = place.AddComponent<WaterSource>();
+        source.Configure("Pond", rules.PondDrink, rules.PondFillItem, rules.PondFillUpTo);
+        place.GetComponent<Interactable>().Configure(InteractionAnimation.GatherLow, PondDrinkSeconds, rules.PondReach, false);
+    }
+
+    // A disc running a little past the shore, under the banks: the terrain draws the waterline.
+    private static Mesh PondMesh(RaidLayoutPond pond)
+    {
+        var vertices = new Vector3[PondMeshPoints + 1];
+        var normals = new Vector3[vertices.Length];
+        var uvs = new Vector2[vertices.Length];
+        var triangles = new int[PondMeshPoints * 3];
+        normals[0] = Vector3.up;
+        uvs[0] = new Vector2(0.5f, 0.5f);
+        for (int i = 0; i < PondMeshPoints; i++)
+        {
+            Vector2 rim = pond.Rim(i * Mathf.PI * 2f / PondMeshPoints, PondMeshBeyond) - pond.Position;
+            vertices[i + 1] = new Vector3(rim.x, 0f, rim.y);
+            normals[i + 1] = Vector3.up;
+            uvs[i + 1] = new Vector2(0.5f + rim.x * 0.5f / pond.Reach, 0.5f + rim.y * 0.5f / pond.Reach);
+            triangles[i * 3] = 0;
+            triangles[i * 3 + 1] = (i + 1) % PondMeshPoints + 1;
+            triangles[i * 3 + 2] = i + 1;
+        }
+
+        var mesh = new Mesh { name = "Pond" };
+        mesh.SetVertices(vertices);
+        mesh.SetNormals(normals);
+        mesh.SetUVs(0, uvs);
+        mesh.SetTriangles(triangles, 0);
+        mesh.RecalculateBounds();
+        return mesh;
     }
 
     /// <summary>True when the navmesh leads from the start to every exit (GDD §7.6: a reachable extraction must always exist).</summary>

@@ -61,7 +61,12 @@ public sealed class TerrainMoss : MonoBehaviour
     private Material tuftMaterial;
     [NonSerialized] private bool rebuildRequested;
 
-    public TerrainLayer MossLayer => mossLayer;
+    public TerrainLayer MossLayer
+    {
+        get => mossLayer;
+        set => mossLayer = value;
+    }
+
     public int TuftCount { get; private set; }
     public string LastError { get; private set; }
 

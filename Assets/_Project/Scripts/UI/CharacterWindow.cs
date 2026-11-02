@@ -322,6 +322,7 @@ public sealed class CharacterWindow : MonoBehaviour, IItemSlotHandler
         float armor = stats.Get(StatType.Armor);
         var text = new StringBuilder();
         text.Append("<color=#E8C46A><b>Attributes</b></color>\n");
+        text.Append(Line("Gear Score", GearScore.Of(combatant.gameObject).ToString()));
         if (health != null)
         {
             text.Append(Line("Health", $"{Mathf.CeilToInt(health.CurrentHealth)} / {Mathf.RoundToInt(health.MaxHealth)}"));

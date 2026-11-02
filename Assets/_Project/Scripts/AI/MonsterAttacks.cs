@@ -40,6 +40,9 @@ public sealed class MonsterAttacks
         readyAt = new float[definition.Attacks.Count];
     }
 
+    /// <summary>Multiplies how long it waits between strikes (a frenzied elite). Wind-ups stay as they are, so they can still be read.</summary>
+    public float CooldownScale { get; set; } = 1f;
+
     /// <summary>The action of the current strike, or null for the definition's plain attack.</summary>
     public MonsterAttack Action => action;
 
@@ -56,15 +59,18 @@ public sealed class MonsterAttacks
     public bool IsReady => Time.time >= nextAttackTime;
 
     /// <summary>The highest-priority action usable at <paramref name="distance"/> now, or -1.</summary>
-    public int ChooseAction(float distance, bool isLeader) => SelectAttack(definition.Attacks, readyAt, distance, Time.time, isLeader);
+    public int ChooseAction(float distance, bool isLeader) => SelectAttack(definition.Attacks, readyAt, distance, Time.time, isLeader, RaidTier);
 
-    public static int SelectAttack(IReadOnlyList<MonsterAttack> attacks, float[] cooldowns, float distance, float now, bool isLeader)
+    // Read each time, as a creature can outlive a raid's start but never changes raids.
+    private static int RaidTier => GameSession.ActiveRaid != null ? GameSession.ActiveRaid.Tier : 0;
+
+    public static int SelectAttack(IReadOnlyList<MonsterAttack> attacks, float[] cooldowns, float distance, float now, bool isLeader, int tier = 0)
     {
         int chosen = -1;
         for (int i = 0; i < attacks.Count; i++)
         {
             MonsterAttack candidate = attacks[i];
-            if (candidate != null && candidate.IsAvailable(distance, now, cooldowns[i], isLeader)
+            if (candidate != null && candidate.IsAvailable(distance, now, cooldowns[i], isLeader, tier)
                 && (chosen < 0 || candidate.priority > attacks[chosen].priority))
             {
                 chosen = i;
@@ -73,19 +79,63 @@ public sealed class MonsterAttacks
         return chosen;
     }
 
-    /// <summary>True when one of its actions that strikes (not a howl) reaches <paramref name="distance"/>.</summary>
+    /// <summary>True when one of its actions that strikes (not a howl) reaches <paramref name="distance"/>, so it can hold its ground.</summary>
     public bool AnyStrikeReaches(float distance)
     {
-        foreach (MonsterAttack candidate in definition.Attacks)
+        return HoldsGround(definition.Attacks, readyAt, distance, Time.time, RaidTier);
+    }
+
+    /// <summary>
+    /// Whether a creature stops here rather than closing in: a strike is ready to use from here, or it is already within reach of its
+    /// everyday strike, so it doesn't crowd its target between bites. What it can't use yet is no reason to wait: a wolf whose pounce is spent
+    /// runs in to bite, and a Guardian whose wide slam is spent walks up to use its own. A creature whose only strike is on a long
+    /// cooldown, such as a Mistwing's dive, has nothing to walk up with, so it keeps its distance until that is ready.
+    /// </summary>
+    public static bool HoldsGround(IReadOnlyList<MonsterAttack> attacks, float[] cooldowns, float distance, float now, int tier)
+    {
+        float everyday = 0f;
+        bool any = false, charges = false;
+        for (int i = 0; i < attacks.Count; i++)
         {
-            if (candidate != null && candidate.attack != null && candidate.kind != MonsterAttackKind.Howl && candidate.kind != MonsterAttackKind.Summon
-                && distance >= candidate.minimumRange && distance <= candidate.maximumRange)
+            MonsterAttack candidate = attacks[i];
+            if (candidate == null || !candidate.Strikes || !candidate.KnownAt(tier))
+            {
+                continue;
+            }
+
+            bool inRange = distance >= candidate.minimumRange && distance <= candidate.maximumRange;
+            if (inRange && now >= cooldowns[i])
             {
                 return true;
             }
+
+            if (candidate.kind == MonsterAttackKind.Charge)
+            {
+                charges |= inRange;
+            }
+            else if (!any || candidate.maximumRange < everyday)
+            {
+                any = true;
+                everyday = candidate.maximumRange;
+            }
         }
 
-        return false;
+        return any ? distance <= everyday : charges;
+    }
+
+    /// <summary>How high a leaping charge has the body right now, in metres: it rises and falls over the length of the charge.</summary>
+    public float LeapHeight
+    {
+        get
+        {
+            if (action == null || action.kind != MonsterAttackKind.Charge || action.leapHeight <= 0f || exposedAt >= 0f || chargeLength <= 0f)
+            {
+                return 0f;
+            }
+
+            float through = Mathf.Clamp01(chargeTravelled / chargeLength);
+            return action.leapHeight * 4f * through * (1f - through);
+        }
     }
 
     /// <summary>Starts a strike toward <paramref name="toTarget"/>: action <paramref name="index"/>, or -1 for the plain
@@ -129,7 +179,7 @@ public sealed class MonsterAttacks
 
         if (elapsed >= attack.RecoveryTime)
         {
-            nextAttackTime = Time.time + definition.AttackCooldown;
+            nextAttackTime = Time.time + definition.AttackCooldown * CooldownScale;
             return false;
         }
 
@@ -141,7 +191,7 @@ public sealed class MonsterAttacks
     {
         if (action != null && actionIndex >= 0)
         {
-            readyAt[actionIndex] = Time.time + action.cooldown;
+            readyAt[actionIndex] = Time.time + action.cooldown * CooldownScale;
         }
 
         action = null;
@@ -292,7 +342,7 @@ public sealed class MonsterAttacks
             called++;
             if (RaidDirector.Current != null)
             {
-                RaidDirector.Current.PrepareSpawned(root, true);
+                RaidDirector.Current.PrepareSpawned(root, true, false);
             }
             else if (player != null)
             {
@@ -352,7 +402,7 @@ public sealed class MonsterAttacks
     // The action is over: its cooldown starts and the next strike may follow shortly. Always false (the strike ended).
     private bool Finish()
     {
-        readyAt[actionIndex] = Time.time + action.cooldown;
+        readyAt[actionIndex] = Time.time + action.cooldown * CooldownScale;
         nextAttackTime = Time.time + 0.15f;
         action = null;
         actionIndex = -1;

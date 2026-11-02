@@ -234,7 +234,7 @@ public sealed class RoamingSpawner : MonoBehaviour
             }
 
             SpawnTable source = table != null ? table : settings.Table;
-            GameObject prefab = source != null ? source.Pick(random, null) : null;
+            GameObject prefab = source != null ? source.PickAt(random, GameSession.ActiveRaid != null ? GameSession.ActiveRaid.Tier : 0) : null;
             if (prefab == null)
             {
                 return false;

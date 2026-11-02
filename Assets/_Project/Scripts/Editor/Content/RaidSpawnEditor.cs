@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -67,6 +68,91 @@ internal sealed class RaidSceneContext
         return points;
     }
 
+    /// <summary>
+    /// How many points a group has on a generated map: its share of the sites of its kind, each making the map's points per site.
+    /// Null when the raid plays its painted map or the group isn't placed by a kind of site, where the scene's points are the real ones.
+    /// </summary>
+    public int? GeneratedPoints(RaidDefinition raid, string groupName)
+    {
+        RaidLayoutRules rules = raid.LayoutRules;
+        var map = RaidWorldEditor.FromScene<RaidMapDefinition>(ScenePath);
+        if (rules == null || map == null || !Groups.TryGetValue(groupName, out SpawnGroup group))
+        {
+            return null;
+        }
+
+        RaidSiteKind kind = KindOf(rules, group);
+        if (kind == RaidSiteKind.None)
+        {
+            return null;
+        }
+
+        int sites = 0;
+        foreach (RaidSiteQuota quota in rules.Sites)
+        {
+            sites += quota != null && quota.kind == kind ? quota.count : 0;
+        }
+
+        // Whole sites go to the groups of a kind in turn, by name, as RaidMapGenerator.PlaceGroups gives them out.
+        var sharing = new List<string>();
+        foreach (KeyValuePair<string, SpawnGroup> other in Groups)
+        {
+            if (KindOf(rules, other.Value) == kind)
+            {
+                sharing.Add(other.Key);
+            }
+        }
+
+        sharing.Sort(string.CompareOrdinal);
+        int own = sharing.IndexOf(groupName);
+        int owned = 0;
+        foreach (int owner in RaidMapMarkers.ShareOut(sites, sharing.Count))
+        {
+            owned += owner == own ? 1 : 0;
+        }
+
+        return owned * map.RuleFor(kind).pointsPerSite;
+    }
+
+    private static RaidSiteKind KindOf(RaidLayoutRules rules, SpawnGroup group)
+    {
+        RaidSiteKind kind = group.Site;
+        foreach (RaidGroupRule rule in rules.Groups)
+        {
+            if (rule != null && rule.group == group.name)
+            {
+                kind = rule.site;
+            }
+        }
+
+        return kind;
+    }
+
+    /// <summary>What a list has to fill: the generated map's points where it has them, else the scene's, in its entry band.</summary>
+    public int PointCount(RaidDefinition raid, RaidSpawnList list, SpawnRules rules)
+    {
+        int count = 0;
+        foreach (string name in list.pointGroups)
+        {
+            if (name == null)
+            {
+                continue;
+            }
+
+            int? generated = GeneratedPoints(raid, name);
+            if (generated.HasValue)
+            {
+                count += generated.Value;
+            }
+            else if (Groups.TryGetValue(name, out SpawnGroup group))
+            {
+                count += group.PointsFor(rules, list.entryBand).Count;
+            }
+        }
+
+        return count;
+    }
+
     /// <summary>The list that already uses a group, so each group serves one list (as in play).</summary>
     public static RaidSpawnList OwnerOf(RaidDefinition raid, string group)
     {
@@ -132,6 +218,8 @@ internal static class RaidSpawnListEditor
     private const float ShareWidth = 64f;
     private const float CountWidth = 44f;
     private const float RemoveWidth = 22f;
+    private const float IconSize = 20f;
+    private const float TierWidth = 32f;
 
     private static readonly HashSet<string> Collapsed = new HashSet<string>();
 
@@ -219,7 +307,7 @@ internal static class RaidSpawnListEditor
         string key = AssetDatabase.GetAssetPath(raid) + ":" + index;
         bool open = !Collapsed.Contains(key);
         Vector2Int scaled = list.CountFor(rules);
-        int points = scene.Loaded ? scene.PointsOf(list, rules).Count : -1;
+        int points = scene.Loaded ? scene.PointCount(raid, list, rules) : -1;
 
         EditorGUILayout.Space(4f);
         using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
@@ -330,9 +418,14 @@ internal static class RaidSpawnListEditor
                 using (new EditorGUILayout.HorizontalScope())
                 {
                     string info;
+                    int? generated = name != null && scene.Loaded ? scene.GeneratedPoints(raid, name) : null;
                     if (!scene.Loaded)
                     {
                         info = "";
+                    }
+                    else if (generated.HasValue)
+                    {
+                        info = $"{generated.Value} points on a generated map";
                     }
                     else if (name != null && scene.Groups.TryGetValue(name, out SpawnGroup group))
                     {
@@ -457,14 +550,17 @@ internal static class RaidSpawnListEditor
     {
         EditorGUILayout.LabelField("What", EditorStyles.miniBoldLabel);
         List<SpawnTable.Entry> entries = list.entries;
+        DrawShareBar(entries);
         using (new EditorGUILayout.HorizontalScope())
         {
-            GUILayout.Space(15f);
+            GUILayout.Space(15f + IconSize + 3f);
             GUILayout.Label("Prefab", EditorStyles.miniLabel);
-            GUILayout.Label(new GUIContent("Share %", "Share of each pick. Changing one rescales the others so the list adds up to 100%."),
+            GUILayout.Label(new GUIContent("Share %", "Share of each pick over all tiers. Changing one rescales the others so the list adds up to 100%. Rows that don't appear at a tier drop out, and those left share their picks."),
                 EditorStyles.miniLabel, GUILayout.Width(ShareWidth));
             GUILayout.Label(new GUIContent("Min", "At least this many every raid, placed before the shared picks."), EditorStyles.miniLabel, GUILayout.Width(CountWidth));
             GUILayout.Label(new GUIContent("Max", "At most this many per raid. 0 = no limit."), EditorStyles.miniLabel, GUILayout.Width(CountWidth));
+            GUILayout.Label(new GUIContent("From", "The lowest raid tier this appears at. 0 = any."), EditorStyles.miniLabel, GUILayout.Width(TierWidth));
+            GUILayout.Label(new GUIContent("To", "The highest raid tier this appears at. 0 = any."), EditorStyles.miniLabel, GUILayout.Width(TierWidth));
             GUILayout.Space(RemoveWidth + 4f);
         }
 
@@ -475,6 +571,7 @@ internal static class RaidSpawnListEditor
             using (new EditorGUILayout.HorizontalScope())
             {
                 GUILayout.Space(15f);
+                DrawIcon(entry.prefab, ShareColour(i));
                 entry.prefab = (GameObject)EditorGUILayout.ObjectField(entry.prefab, typeof(GameObject), false);
                 float share = total > 0f && entry.prefab != null ? entry.weight / total * 100f : 0f;
                 EditorGUI.BeginChangeCheck();
@@ -486,6 +583,8 @@ internal static class RaidSpawnListEditor
 
                 entry.minPerGroup = Mathf.Max(0, EditorGUILayout.IntField(entry.minPerGroup, GUILayout.Width(CountWidth)));
                 entry.maxPerGroup = Mathf.Max(0, EditorGUILayout.IntField(entry.maxPerGroup, GUILayout.Width(CountWidth)));
+                entry.fromTier = Mathf.Clamp(EditorGUILayout.IntField(entry.fromTier, GUILayout.Width(TierWidth)), 0, Tiers.Max);
+                entry.toTier = Mathf.Clamp(EditorGUILayout.IntField(entry.toTier, GUILayout.Width(TierWidth)), 0, Tiers.Max);
                 if (GUILayout.Button(new GUIContent("×", "Remove"), EditorStyles.miniButton, GUILayout.Width(RemoveWidth)))
                 {
                     entries.RemoveAt(i);
@@ -501,6 +600,7 @@ internal static class RaidSpawnListEditor
             }
         }
 
+        DropPrefabs(entries);
         using (new EditorGUILayout.HorizontalScope())
         {
             GUILayout.Space(15f);
@@ -527,6 +627,89 @@ internal static class RaidSpawnListEditor
         }
     }
 
+    // One colour per entry, matching the swatch under its icon, so a list's mix can be read at a glance.
+    private static void DrawShareBar(List<SpawnTable.Entry> entries)
+    {
+        float total = RaidSpawnList.TotalWeight(entries);
+        if (total <= 0f)
+        {
+            return;
+        }
+
+        using (new EditorGUILayout.HorizontalScope())
+        {
+            GUILayout.Space(15f);
+            Rect bar = GUILayoutUtility.GetRect(0f, 8f, GUILayout.ExpandWidth(true));
+            float x = bar.x;
+            for (int i = 0; i < entries.Count; i++)
+            {
+                if (entries[i].prefab == null)
+                {
+                    continue;
+                }
+
+                float width = bar.width * entries[i].weight / total;
+                EditorGUI.DrawRect(new Rect(x, bar.y, Mathf.Max(0f, width - 1f), bar.height), ShareColour(i));
+                x += width;
+            }
+        }
+
+        EditorGUILayout.Space(2f);
+    }
+
+    private static Color ShareColour(int index) => Color.HSVToRGB(Mathf.Repeat(0.09f + index * 0.17f, 1f), 0.55f, 0.85f);
+
+    private static void DrawIcon(GameObject prefab, Color swatch)
+    {
+        Rect icon = GUILayoutUtility.GetRect(IconSize, IconSize, GUILayout.Width(IconSize), GUILayout.Height(IconSize));
+        EditorGUI.DrawRect(new Rect(icon.x, icon.yMax - 2f, icon.width, 2f), swatch);
+        if (prefab == null)
+        {
+            return;
+        }
+
+        Texture2D preview = AssetPreview.GetAssetPreview(prefab);
+        if (preview != null)
+        {
+            GUI.DrawTexture(icon, preview, ScaleMode.ScaleToFit);
+        }
+        else if (AssetPreview.IsLoadingAssetPreviews())
+        {
+            HandleUtility.Repaint();
+        }
+    }
+
+    // Dropping prefabs anywhere on the row below the table adds them, with an even share each.
+    private static void DropPrefabs(List<SpawnTable.Entry> entries)
+    {
+        Rect zone = GUILayoutUtility.GetRect(0f, 18f, GUILayout.ExpandWidth(true));
+        zone.xMin += 15f;
+        GUI.Box(zone, "+ Drop prefabs here", EditorStyles.helpBox);
+        Event current = Event.current;
+        if (!zone.Contains(current.mousePosition) || (current.type != EventType.DragUpdated && current.type != EventType.DragPerform))
+        {
+            return;
+        }
+
+        DragAndDrop.visualMode = DragAndDropVisualMode.Copy;
+        if (current.type == EventType.DragPerform)
+        {
+            DragAndDrop.AcceptDrag();
+            foreach (Object dropped in DragAndDrop.objectReferences)
+            {
+                if (dropped is GameObject prefab && PrefabUtility.IsPartOfPrefabAsset(prefab))
+                {
+                    entries.Add(new SpawnTable.Entry { prefab = prefab, weight = 0f });
+                    RaidSpawnList.SetShare(entries, entries.Count - 1, 100f / entries.Count);
+                }
+            }
+
+            GUI.changed = true;
+        }
+
+        current.Use();
+    }
+
     public static string Range(Vector2Int range) => range.x == range.y ? range.x.ToString() : $"{range.x}-{range.y}";
 }
 
@@ -537,6 +720,7 @@ internal static class RaidSpawnListEditor
 internal static class RaidSpawnPreview
 {
     private const int SimulatedRaids = 50;
+    private static int previewTier;
 
     private sealed class Row
     {
@@ -569,9 +753,21 @@ internal static class RaidSpawnPreview
             EditorGUILayout.HelpBox("The scene has no RaidMap with a player start, so distances from the start are ignored.", MessageType.Warning);
         }
 
+        if (raid.Difficulties.Count > 0)
+        {
+            string[] names = raid.Difficulties.Select(tier => "Tier " + Tiers.ToRoman(tier.tier)).ToArray();
+            previewTier = Mathf.Clamp(GUILayout.Toolbar(previewTier, names, EditorStyles.miniButton), 0, names.Length - 1);
+        }
+
         if (GUILayout.Button($"Simulate {SimulatedRaids} Raids", GUILayout.Height(26f)))
         {
-            Simulations[raid] = Simulate(raid, scene);
+            Simulations[raid] = Simulate(raid, scene, raid.Difficulties.Count > 0 ? raid.Difficulties[previewTier] : null);
+        }
+
+        if (raid.LayoutRules != null)
+        {
+            EditorGUILayout.HelpBox("This raid generates its map, but the simulation rolls on the points painted in the scene. The mix of what spawns " +
+                                    "is right; for how many points a generated map offers, see each list's Where.", MessageType.Info);
         }
 
         if (!Simulations.TryGetValue(raid, out Simulation simulation))
@@ -600,7 +796,7 @@ internal static class RaidSpawnPreview
         ContentUtility.EndPanel();
     }
 
-    private static Simulation Simulate(RaidDefinition raid, RaidSceneContext scene)
+    private static Simulation Simulate(RaidDefinition raid, RaidSceneContext scene, RaidDifficulty tier)
     {
         var simulation = new Simulation();
         SpawnRules rules = raid.GetSpawnRules(scene.Entry);
@@ -626,7 +822,7 @@ internal static class RaidSpawnPreview
             {
                 // Same seed key as RaidGenerator.SpawnList, so the preview matches play.
                 var listRandom = new System.Random(RaidLayout.SeedFor(seed, "List:" + list.name));
-                Add(simulation, row, SpawnGroup.Plan(listRandom, list.CountFor(rules), points, list.separation, list.entries));
+                Add(simulation, row, SpawnGroup.Plan(listRandom, list.CountFor(rules), points, list.separation, tier != null ? list.EntriesFor(tier.tier) : list.entries));
             }
 
             Finish(simulation, row, list.trigger);

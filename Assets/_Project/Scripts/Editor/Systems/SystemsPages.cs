@@ -926,6 +926,34 @@ public sealed class WardBreachPage : SystemsPage
     }
 }
 
+/// <summary>How gear adds up to a gear score, and what a full kit of each tier comes to.</summary>
+public sealed class GearScorePage : SystemsPage
+{
+    public override string Title => "Gear Score";
+    public override string Group => "Settings";
+    public override string Help => "How gear adds up to a gear score, the number raid tiers are tuned to. The tiers themselves are in the Content Editor (Raids › Rules).";
+
+    public override void Draw()
+    {
+        GearScoreSettings settings = Settings<GearScoreSettings>(GearScoreSettings.ResourceName);
+        SettingsPanel(settings, "Gear score", "Resources/GearScoreSettings");
+        if (settings != null && !Mathf.Approximately(settings.TotalShare, 1f))
+        {
+            EditorGUILayout.HelpBox($"The slots' shares add up to {settings.TotalShare:0.##}, not 1, so a full kit won't come to Points Per Tier x tier.", MessageType.Warning);
+        }
+
+        var gear = GearBalance.AllGear();
+        ContentUtility.BeginPanel("A full kit of each tier", "The best of each tier in every slot, as the game's assets stand now. If a higher tier is not clearly stronger than the one below, the gear needs tuning.");
+        for (int tier = 1; tier <= Tiers.Max; tier++)
+        {
+            GearBalance.Kit kit = GearBalance.KitOf(tier, gear);
+            EditorGUILayout.LabelField($"Tier {Tiers.ToRoman(tier)}", $"score {kit.Score}, damage {kit.Damage:0.#}, armor {kit.Armor:0} ({kit.Reduction:P0}), health {kit.Health:0}, toughness {kit.Toughness:0}");
+        }
+
+        ContentUtility.EndPanel();
+    }
+}
+
 /// <summary>Rarity colors, names and pickup sounds.</summary>
 public sealed class LootAndRarityPage : SystemsPage
 {

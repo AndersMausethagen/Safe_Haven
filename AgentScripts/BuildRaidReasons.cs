@@ -656,7 +656,13 @@ public static class BuildRaidReasons
         GameObject contents = PrefabUtility.LoadPrefabContents(path);
         try
         {
+            // The planner builds itself in code now (BuildRaidPlanner), so there is nothing here to make room in.
             Transform panel = contents.transform.Find("Panel");
+            if (panel == null)
+            {
+                return;
+            }
+
             void Place(string child, float top, float height = -1f)
             {
                 var rect = (RectTransform)panel.Find(child);

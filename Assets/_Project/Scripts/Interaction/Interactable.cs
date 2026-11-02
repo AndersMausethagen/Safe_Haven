@@ -35,6 +35,7 @@ public sealed class Interactable : MonoBehaviour
     [SerializeField] private UnityEvent cancelled = new UnityEvent();
 
     private Collider[] colliders;
+    private IInteractionShape shape;
     private IInteractionCondition[] conditions = System.Array.Empty<IInteractionCondition>();
     private GameObject interactor;
     private float elapsed;
@@ -77,6 +78,7 @@ public sealed class Interactable : MonoBehaviour
     private void Awake()
     {
         colliders = GetComponentsInChildren<Collider>();
+        shape = GetComponent<IInteractionShape>();
         conditions = GetComponents<IInteractionCondition>();
     }
 
@@ -88,6 +90,7 @@ public sealed class Interactable : MonoBehaviour
         range = Mathf.Max(0f, reach);
         deactivateOnComplete = deactivateWhenComplete;
         colliders = GetComponentsInChildren<Collider>();
+        shape = GetComponent<IInteractionShape>();
         conditions = GetComponents<IInteractionCondition>();
     }
 
@@ -115,6 +118,11 @@ public sealed class Interactable : MonoBehaviour
     /// </summary>
     public bool MightBeWithin(Vector3 point, float distance)
     {
+        if (shape != null)
+        {
+            return DistanceFrom(point) <= distance;
+        }
+
         float reach = distance * distance;
         bool anyCollider = false;
         for (int i = 0; i < colliders.Length; i++)
@@ -251,6 +259,11 @@ public sealed class Interactable : MonoBehaviour
 
     private Vector3 ClosestPoint(Vector3 point)
     {
+        if (shape != null)
+        {
+            return shape.ClosestPoint(point);
+        }
+
         Vector3 closest = transform.position;
         float closestSqrDistance = float.MaxValue;
 

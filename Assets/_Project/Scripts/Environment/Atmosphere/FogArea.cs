@@ -32,6 +32,15 @@ public sealed class FogArea : MonoBehaviour
     public float Softness => softness;
     public bool FollowsWeather => followsWeather;
 
+    /// <summary>Sets it up from code: a cloak of fog around an elite, say. It doesn't follow the weather, as it isn't the weather.</summary>
+    public void Configure(float fogDensity, float fogRadius, float fogHeight)
+    {
+        density = fogDensity;
+        radius = fogRadius;
+        height = fogHeight;
+        followsWeather = false;
+    }
+
     private void OnEnable()
     {
         active.Add(this);

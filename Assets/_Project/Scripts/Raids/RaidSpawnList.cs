@@ -53,6 +53,9 @@ public sealed class RaidSpawnList
         return SpawnsEnemies ? new Vector2Int(rules.Scale(MinCount), rules.Scale(MaxCount)) : new Vector2Int(MinCount, MaxCount);
     }
 
+    /// <summary>What can spawn at a raid tier. Weights are relative, so those left share the picks.</summary>
+    public List<SpawnTable.Entry> EntriesFor(int tier) => entries.FindAll(entry => entry.AppearsAt(tier));
+
     /// <summary>The entry's share of a single pick, 0 to 1, before caps.</summary>
     public float ChanceOf(SpawnTable.Entry entry)
     {

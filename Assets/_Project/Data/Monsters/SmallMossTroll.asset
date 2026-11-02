@@ -32,6 +32,7 @@ MonoBehaviour:
   unlocksRecipes: []
   animatorController: {fileID: 9100000, guid: 51388376d31e4294bb24b0004412608d, type: 2}
   prefab: {fileID: 6267209934607442583, guid: bb37a42ef72f5274d807155e3d054529, type: 3}
+  experience: 0
   attack: {fileID: 0}
   attackDamage: 7
   attackCooldown: 0.6
@@ -52,6 +53,7 @@ MonoBehaviour:
     priority: 20
     cooldown: 1.8
     interruptible: 0
+    fromTier: 0
     projectilePrefab: {fileID: 0}
     burstCount: 1
     burstInterval: 0.2
@@ -60,10 +62,15 @@ MonoBehaviour:
     chargeSpeed: 12
     chargeDistance: 8
     exposedSeconds: 2
+    leapHeight: 0
     buffRadius: 10
     buffSeconds: 8
     damageBonus: 0.05
     packLeaderOnly: 0
+    summonPrefab: {fileID: 0}
+    summonCount: 2
+    summonRadius: 3
+    summonLimit: 4
   - attack: {fileID: 11400000, guid: f92e43931c0ea274ca43f4e5bfabe6ae, type: 2}
     kind: 1
     damage: 7
@@ -72,6 +79,7 @@ MonoBehaviour:
     priority: 10
     cooldown: 1.3
     interruptible: 0
+    fromTier: 0
     projectilePrefab: {fileID: 4774033439812504928, guid: f88eca45a0f3397429ff4fa29af1b9ae, type: 3}
     burstCount: 3
     burstInterval: 0.22
@@ -80,10 +88,41 @@ MonoBehaviour:
     chargeSpeed: 12
     chargeDistance: 8
     exposedSeconds: 2
+    leapHeight: 0
     buffRadius: 10
     buffSeconds: 8
     damageBonus: 0.05
     packLeaderOnly: 0
+    summonPrefab: {fileID: 0}
+    summonCount: 2
+    summonRadius: 3
+    summonLimit: 4
+  - attack: {fileID: 11400000, guid: a1f2950858e70c143848ff252264e62c, type: 2}
+    kind: 2
+    damage: 12
+    minimumRange: 3
+    maximumRange: 8
+    priority: 15
+    cooldown: 9
+    interruptible: 0
+    fromTier: 3
+    projectilePrefab: {fileID: 4774033439812504928, guid: f88eca45a0f3397429ff4fa29af1b9ae, type: 3}
+    burstCount: 1
+    burstInterval: 0.22
+    projectileSpeed: 13
+    projectileRadius: 0.15
+    chargeSpeed: 10
+    chargeDistance: 8
+    exposedSeconds: 1.4
+    leapHeight: 0
+    buffRadius: 10
+    buffSeconds: 8
+    damageBonus: 0.05
+    packLeaderOnly: 0
+    summonPrefab: {fileID: 0}
+    summonCount: 2
+    summonRadius: 3
+    summonLimit: 4
   movementTactic: 1
   temperament: 1
   preferredDistance: 7

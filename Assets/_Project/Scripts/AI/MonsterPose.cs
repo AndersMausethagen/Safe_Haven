@@ -73,7 +73,8 @@ public sealed class MonsterPose
 
     /// <param name="hoverHeight">How high it floats now (0 on the ground: not a flyer, exposed or dead).</param>
     /// <param name="charging">Its attack is a charge, which moves the whole body after the wind-up, so it only coils.</param>
-    public void Update(float hoverHeight, bool dead, bool charging)
+    /// <param name="leap">How high a leaping charge has the body, in metres.</param>
+    public void Update(float hoverHeight, bool dead, bool charging, float leap = 0f)
     {
         float targetHover = hoverHeight <= 0f ? 0f : hoverHeight + Mathf.Sin(Time.time * 3f) * 0.08f;
         hover = Mathf.Lerp(hover, targetHover, Time.deltaTime * 10f);
@@ -121,7 +122,7 @@ public sealed class MonsterPose
         float squash = recoil != 0f ? recoil * settings.PunchAmount : 0f;
 
         float width = 1f / Mathf.Sqrt(Mathf.Max(0.5f, pose.Height));
-        visual.localPosition = homePosition + Vector3.up * hover + Vector3.forward * pose.Shift + shove;
+        visual.localPosition = homePosition + Vector3.up * (hover + leap) + Vector3.forward * pose.Shift + shove;
         visual.localRotation = tip * Quaternion.Euler(-pose.Lean, 0f, pose.Sway) * homeRotation;
         visual.localScale = Vector3.Scale(homeScale, new Vector3(width * (1f + squash), pose.Height * (1f - squash), width * (1f + squash)));
     }

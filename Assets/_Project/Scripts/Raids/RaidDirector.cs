@@ -147,6 +147,8 @@ public sealed class RaidDirector : MonoBehaviour
 
         running = true;
         StrengthenEnemies(true);
+        Transform start = FindAnyObjectByType<RaidMap>()?.PlayerStart;
+        RaidElites.PromoteAtStart(Session, start != null ? start.position : (Vector3?)null, HealthMultiplier, PowerMultiplier);
         if (NightSettings.IsDark)
         {
             GameMessages.Post(NightSettings.Current.NightRaidText, MessageKind.Warning);
@@ -276,7 +278,8 @@ public sealed class RaidDirector : MonoBehaviour
     /// Gives creatures spawned mid-raid (a pack root and all its members included) the raid's and the current stage's
     /// strength at full health, and when <paramref name="huntPlayer"/> is set sends them straight at the player.
     /// </summary>
-    public void PrepareSpawned(GameObject root, bool huntPlayer)
+    /// <param name="mayBeElite">Off for what a creature summons: a swarm of elites would be no fun, and no reward.</param>
+    public void PrepareSpawned(GameObject root, bool huntPlayer, bool mayBeElite = true)
     {
         if (root == null)
         {
@@ -289,6 +292,11 @@ public sealed class RaidDirector : MonoBehaviour
             {
                 Strengthen(combatant, true);
             }
+        }
+
+        if (huntPlayer && mayBeElite)
+        {
+            RaidElites.RollHunter(Session, root, HealthMultiplier, PowerMultiplier);
         }
 
         if (!huntPlayer || playerHealth == null)
@@ -420,8 +428,10 @@ public sealed class RaidDirector : MonoBehaviour
     }
 
     // The raid's enemy multipliers times the current stage's bonus and what the hour adds.
-    private float HealthMultiplier => Parameters.EnemyHealthMultiplier * (1f + (CurrentStage?.EnemyHealthBonus ?? 0f)) * NightSettings.Current.HealthAt(NightSettings.Darkness);
-    private float PowerMultiplier => Parameters.EnemyPowerMultiplier * (1f + (CurrentStage?.EnemyPowerBonus ?? 0f)) * NightSettings.Current.PowerAt(NightSettings.Darkness);
+    /// <summary>The raid's enemy health multiplier right now.</summary>
+    public float HealthMultiplier => Parameters.EnemyHealthMultiplier * (1f + (CurrentStage?.EnemyHealthBonus ?? 0f)) * NightSettings.Current.HealthAt(NightSettings.Darkness);
+    /// <summary>The raid's enemy damage multiplier right now.</summary>
+    public float PowerMultiplier => Parameters.EnemyPowerMultiplier * (1f + (CurrentStage?.EnemyPowerBonus ?? 0f)) * NightSettings.Current.PowerAt(NightSettings.Darkness);
 
     /// <param name="fillHealth">
     /// At the start, living enemies are topped up to their new maximum. When a stage strengthens them mid-fight, they only

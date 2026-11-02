@@ -31,6 +31,15 @@ public sealed class WaterSource : MonoBehaviour, IInteractionName
         interactable = GetComponent<Interactable>();
     }
 
+    /// <summary>Sets it up from code (water made while playing, such as a generated map's ponds).</summary>
+    public void Configure(string name, float drink, ItemDefinition item, int upTo)
+    {
+        sourceName = name;
+        drinkAmount = Mathf.Max(0f, drink);
+        fillItem = item;
+        fillUpTo = Mathf.Max(0, upTo);
+    }
+
     private void OnEnable()
     {
         interactable.Completed.AddListener(OnUsed);

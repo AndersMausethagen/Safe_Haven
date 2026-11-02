@@ -242,22 +242,89 @@ MonoBehaviour:
     plants: 0
     bareAt: 0.45
     colour: {r: 0.27122262, g: 0.29232028, b: 0.2651938, a: 1}
+  plants:
+  - prototype: Fern
+    enabled: 1
+    patchSize: 9.1
+    rarity: 0.64
+    thickness: 0.5
+    clearing: 1
+    loveOfWet: 0
+  - prototype: Blueberry
+    enabled: 1
+    patchSize: 6.7
+    rarity: 0.66
+    thickness: 0.6
+    clearing: 1
+    loveOfWet: 0
+  - prototype: Lingonberry
+    enabled: 1
+    patchSize: 5.9
+    rarity: 0.7
+    thickness: 0.55
+    clearing: 1
+    loveOfWet: 0
+  - prototype: Heather
+    enabled: 1
+    patchSize: 7.7
+    rarity: 0.64
+    thickness: 0.7
+    clearing: 0
+    loveOfWet: 0
+  - prototype: White Flowers
+    enabled: 1
+    patchSize: 4.5
+    rarity: 0.68
+    thickness: 0.35
+    clearing: 0
+    loveOfWet: 0
+  - prototype: Yellow Flowers
+    enabled: 1
+    patchSize: 5
+    rarity: 0.74
+    thickness: 0.3
+    clearing: 0
+    loveOfWet: 0
+  - prototype: Glow Flowers
+    enabled: 1
+    patchSize: 6
+    rarity: 0.72
+    thickness: 0.2
+    clearing: 0
+    loveOfWet: 0.3
+  - prototype: Glow Mushrooms
+    enabled: 1
+    patchSize: 5
+    rarity: 0.74
+    thickness: 0.22
+    clearing: 0
+    loveOfWet: 1
   trees:
   - prefab: {fileID: 342216150029137331, guid: 05d9be943be862447a1933d69a8e3cc7, type: 3}
     weight: 3
     scale: {x: 0.8, y: 1.2}
+    fromTier: 0
+    toTier: 0
   - prefab: {fileID: 87484893306219694, guid: a1e41dbe35e29ab46b0bc155e2511fbb, type: 3}
     weight: 3
     scale: {x: 0.8, y: 1.2}
+    fromTier: 0
+    toTier: 0
   - prefab: {fileID: 1466856639027214656, guid: 3e91ef7ed802f4d489644612f6999826, type: 3}
     weight: 2
     scale: {x: 0.85, y: 1.25}
+    fromTier: 0
+    toTier: 0
   - prefab: {fileID: 5505034768409955292, guid: 826eb366a51f8f84cb3b4dd5a40e7a31, type: 3}
     weight: 1.5
     scale: {x: 0.85, y: 1.15}
+    fromTier: 0
+    toTier: 0
   - prefab: {fileID: 4457990635928993247, guid: ff5c49f4d9add5542ba8093c08005c92, type: 3}
     weight: 0.5
     scale: {x: 0.8, y: 1.1}
+    fromTier: 2
+    toTier: 0
   treeSpacing: 2.6
   maxTreeSlope: 32
   clearAroundSites: 5
@@ -265,12 +332,18 @@ MonoBehaviour:
   - prefab: {fileID: 8199957052141789985, guid: 01ca3b1c0ef0b7e4e9e9b16e7e61f4a7, type: 3}
     weight: 2
     scale: {x: 0.7, y: 1.6}
+    fromTier: 0
+    toTier: 0
   - prefab: {fileID: 2092790579494660312, guid: d3977b45936dd414da4c48819d011ee3, type: 3}
     weight: 2
     scale: {x: 0.7, y: 1.5}
+    fromTier: 0
+    toTier: 0
   - prefab: {fileID: 1837494934203422482, guid: 10ee0a94545bc4446a0bde7f3e1cdb47, type: 3}
     weight: 1
     scale: {x: 0.8, y: 1.2}
+    fromTier: 0
+    toTier: 0
   rockSpacing: 7
   rocksAtCliffs: 0.5
   rocksInForest: 0.12

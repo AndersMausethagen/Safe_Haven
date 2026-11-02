@@ -232,7 +232,9 @@ public sealed class RaidGenerator : MonoBehaviour, ISceneSetup
         }
 
         var random = new System.Random(RaidLayout.SeedFor(Seed, "List:" + list.name));
-        foreach ((int index, GameObject prefab) in SpawnGroup.Plan(random, list.CountFor(Rules), transforms, list.separation, list.entries))
+        // At a raid without a session (a scene played on its own) every entry can appear.
+        IReadOnlyList<SpawnTable.Entry> entries = GameSession.ActiveRaid != null ? list.EntriesFor(GameSession.ActiveRaid.Tier) : list.entries;
+        foreach ((int index, GameObject prefab) in SpawnGroup.Plan(random, list.CountFor(Rules), transforms, list.separation, entries))
         {
             placed.Add(points[index].group.PlaceAt(points[index].point, prefab, random));
         }

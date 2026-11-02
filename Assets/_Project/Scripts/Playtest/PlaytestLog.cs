@@ -32,6 +32,11 @@ public sealed class PlaytestRunSummary
     public int Deaths;
     public int Raids;
     public int Extractions;
+    /// <summary>Raids played and extracted at each tier, by tier number.</summary>
+    public readonly int[] TierRaids = new int[Tiers.Max + 1];
+    public readonly int[] TierExtractions = new int[Tiers.Max + 1];
+    /// <summary>Sum, per tier, of how far above the recommended gear score the player went in, to read off an average.</summary>
+    public readonly int[] TierScoreMargin = new int[Tiers.Max + 1];
     /// <summary>Played minutes at which each milestone was first reached, in the settings' order; null when it wasn't.</summary>
     public float?[] MilestoneMinutes;
 }
@@ -43,6 +48,8 @@ public sealed class PlaytestRunSummary
 public static class PlaytestLog
 {
     public const string Header = "played_min,utc,session,scene,event,subject,amount,detail";
+    /// <summary>The tier a raid was played at and the gear taken in. Written just before its RaidFinished row.</summary>
+    public const string RaidTier = "RaidTier";
     public const string SessionStart = "SessionStart";
     public const string Cheat = "Cheat";
     public const string SessionEnd = "SessionEnd";
@@ -125,6 +132,8 @@ public static class PlaytestLog
     public static PlaytestRunSummary Summarise(string runId, IReadOnlyList<PlaytestEntry> entries, IReadOnlyList<PlaytestMilestone> milestones)
     {
         var summary = new PlaytestRunSummary { RunId = runId, MilestoneMinutes = new float?[milestones.Count] };
+        int tier = -1;
+        int margin = 0;
         foreach (PlaytestEntry entry in entries)
         {
             float minutes = entry.PlayedSeconds / 60f;
@@ -134,13 +143,28 @@ public static class PlaytestLog
             {
                 summary.Deaths++;
             }
+            else if (entry.Event == RaidTier)
+            {
+                tier = entry.Amount;
+                margin = ReadMargin(entry.Detail);
+            }
             else if (entry.Event == nameof(GameEventKind.RaidFinished))
             {
                 summary.Raids++;
-                if (entry.Detail == nameof(RaidOutcome.Extracted))
+                bool extracted = entry.Detail == nameof(RaidOutcome.Extracted);
+                if (extracted)
                 {
                     summary.Extractions++;
                 }
+
+                if (tier >= 0 && tier <= Tiers.Max)
+                {
+                    summary.TierRaids[tier]++;
+                    summary.TierExtractions[tier] += extracted ? 1 : 0;
+                    summary.TierScoreMargin[tier] += margin;
+                }
+
+                tier = -1;
             }
 
             for (int i = 0; i < milestones.Count; i++)
@@ -153,6 +177,28 @@ public static class PlaytestLog
         }
 
         return summary;
+    }
+
+    /// <summary>The Detail of a RaidTier row, which goes just before its RaidFinished row.</summary>
+    public static string TierDetail(int gearScore, int recommended, string hour) => $"gear {gearScore}, recommended {recommended}, {hour}";
+
+    private static int ReadMargin(string detail)
+    {
+        string[] parts = detail != null ? detail.Split(' ', ',') : new string[0];
+        int gear = 0, recommended = 0;
+        for (int i = 0; i + 1 < parts.Length; i++)
+        {
+            if (parts[i] == "gear")
+            {
+                int.TryParse(parts[i + 1], out gear);
+            }
+            else if (parts[i] == "recommended")
+            {
+                int.TryParse(parts[i + 1], out recommended);
+            }
+        }
+
+        return gear - recommended;
     }
 
     private static string Escape(string value)

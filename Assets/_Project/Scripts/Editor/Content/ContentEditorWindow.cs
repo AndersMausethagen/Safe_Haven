@@ -84,6 +84,17 @@ public sealed class ContentEditorWindow : EditorWindow, IContentEditorHost
         return window;
     }
 
+    /// <summary>Opens the editor on one asset of a kind of content.</summary>
+    public static void OpenOn(Type sectionType, Object asset)
+    {
+        ContentEditorWindow window = Open(sectionType);
+        ContentSection section = window.sections.Find(candidate => candidate.GetType() == sectionType);
+        if (section != null)
+        {
+            window.Select(section, asset);
+        }
+    }
+
     public void RefreshList()
     {
         listDirty = true;
@@ -221,6 +232,7 @@ public sealed class ContentEditorWindow : EditorWindow, IContentEditorHost
             new RaidSection(),
             new RaidEventSection(),
             new RaidModifierSection(),
+            new EliteAffixSection(),
             new ResidentSection(),
             new JobSection(),
             new WardBreachSection(),

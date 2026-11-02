@@ -12,7 +12,8 @@ using Object = UnityEngine.Object;
 /// Brings the raid up to the world's graphical standard (`unity command script run --file AgentScripts/BuildRaidLook.cs --entry BuildRaidLook.Apply`):
 /// the tessellated forest material, wind-animated trees, grass and plants grown on every generated map, terrain mist, moss, footprints
 /// and the wind that moves it all. Takes what the prologue forest already tuned (same three ground layers, same size) and Haven's
-/// moss and wind. Run from SafeHaven with nothing unsaved; it stays open. Safe to run again.
+/// moss and wind. Run from SafeHaven with nothing unsaved; it stays open. Safe to run again, but it takes the prologue's mist back:
+/// run BuildRaidWater after it.
 /// </summary>
 public static class BuildRaidLook
 {

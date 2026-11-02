@@ -33,7 +33,8 @@ public sealed class RaidSession
         PlayerSnapshot loadout,
         string returnScene,
         int sparksUsed = 0,
-        int? seed = null)
+        int? seed = null,
+        RaidDifficulty difficulty = null)
     {
         Seed = seed ?? NewSeed();
         Definition = definition != null ? definition : throw new ArgumentNullException(nameof(definition));
@@ -43,7 +44,20 @@ public sealed class RaidSession
         ReturnScene = returnScene;
         SparksUsed = Math.Max(0, sparksUsed);
         TimeOfDay = RaidTimeOfDay.For(definition, Seed);
+        Difficulty = difficulty ?? definition.LowestDifficulty;
     }
+
+    /// <summary>The difficulty this run was entered at, or null for a raid without tiers.</summary>
+    public RaidDifficulty Difficulty { get; }
+
+    /// <summary>The gear score the player set out with, for the playtest log.</summary>
+    public int GearScoreAtEntry { get; set; }
+
+    /// <summary>The tier this run is played at.</summary>
+    public int Tier => Difficulty != null ? Difficulty.tier : Definition.Tier;
+
+    /// <summary>Whether this run's tier can hand over the item.</summary>
+    public bool Allows(ItemDefinition item) => Difficulty == null || Difficulty.Allows(item);
 
     /// <summary>The hour this run takes place at (rolled from the seed), or null for the scene's own hour.</summary>
     public RaidTimeOfDay TimeOfDay { get; }

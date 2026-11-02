@@ -62,6 +62,7 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject, IStaggerable
     private Damageable damageable;
     private MonsterMovement movement;
     private MonsterAttacks attacks;
+    private float speedScale = 1f;
     private MonsterPose pose;
 
     private IDamageable target;
@@ -182,6 +183,31 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject, IStaggerable
 
     public State CurrentState { get; private set; } = State.Idle;
     public MonsterDefinition Definition => definition;
+    public LayerMask TargetLayers => targetLayers;
+
+    /// <summary>Multiplies how fast it moves (a frenzied elite).</summary>
+    public float SpeedScale
+    {
+        get => speedScale;
+        set
+        {
+            speedScale = Mathf.Max(0.1f, value);
+            ApplySpeed();
+        }
+    }
+
+    /// <summary>Multiplies how long it waits between strikes.</summary>
+    public float CooldownScale
+    {
+        get => attacks != null ? attacks.CooldownScale : 1f;
+        set
+        {
+            if (attacks != null)
+            {
+                attacks.CooldownScale = Mathf.Max(0.1f, value);
+            }
+        }
+    }
     UnityEngine.Object IEventSubject.EventSubject => definition;
     public IDamageable Target => target;
     public Vector3 Home => home;
@@ -686,7 +712,7 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject, IStaggerable
         bool dead = CurrentState == State.Dead;
         float hoverHeight = IsExposed || dead ? 0f : definition.HoverHeight;
         MonsterAttack current = attacks.Action;
-        pose.Update(hoverHeight, dead, current != null && current.kind == MonsterAttackKind.Charge);
+        pose.Update(hoverHeight, dead, current != null && current.kind == MonsterAttackKind.Charge, attacks.LeapHeight);
     }
 
     private void Engage()
@@ -1036,7 +1062,7 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject, IStaggerable
         float scale = CurrentState == State.Investigating ? PerceptionSettings.Current.InvestigateSpeedScale
             : CurrentState == State.Returning && roaming ? roamSpeedScale
             : 1f;
-        movement.SetSpeed(definition.MoveSpeed * scale);
+        movement.SetSpeed(definition.MoveSpeed * scale * speedScale);
     }
 
     // Entering play mode doesn't reload scripts in this project, so the shared sound timer is reset here.

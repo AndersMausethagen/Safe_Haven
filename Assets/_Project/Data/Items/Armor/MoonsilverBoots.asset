@@ -19,6 +19,7 @@ MonoBehaviour:
   tier: 4
   rarity: 2
   value: 110
+  gearScoreOverride: 0
   icon: {fileID: 21300000, guid: 298cee461260b8749aeda7e53d142e20, type: 3}
   prefab: {fileID: 0}
   heldModel: {fileID: 0}
@@ -46,7 +47,7 @@ MonoBehaviour:
   statBonuses:
   - stat: 7
     op: 0
-    value: 12
+    value: 26
   - stat: 0
     op: 0
     value: 20

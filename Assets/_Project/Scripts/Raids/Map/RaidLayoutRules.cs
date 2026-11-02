@@ -147,6 +147,30 @@ public sealed class RaidLayoutRules : ScriptableObject
     [Tooltip("Cells across the zones and the ground plan. Higher is finer but slower to load.")]
     [SerializeField, Range(64, 512)] private int fieldResolution = 200;
 
+    [Header("Water")]
+    [Tooltip("How many ponds a map gets, least and most, rolled each run.")]
+    [SerializeField] private Vector2Int ponds = Vector2Int.zero;
+    [Tooltip("Longest radius of a pond in metres, smallest and largest. A run's ponds are spread over this range.")]
+    [SerializeField] private Vector2 pondRadius = new Vector2(3.5f, 11f);
+    [Tooltip("How deep a pond is at its middle, in metres: the smallest pond's and the largest pond's. The player swims from the Swim Depth in Player Movement Settings.")]
+    [SerializeField] private Vector2 pondDepth = new Vector2(0.7f, 1.6f);
+    [Tooltip("How long a pond can be for its width. 1 keeps them round.")]
+    [SerializeField, Range(1f, 2.5f)] private float pondStretch = 1.6f;
+    [Tooltip("What the ponds' surface is drawn with.")]
+    [SerializeField] private Material pondMaterial;
+    [Tooltip("Thirst a drink from a pond restores. 0, with no Pond Fill Item either: the ponds can't be used.")]
+    [SerializeField, Min(0f)] private float pondDrink;
+    [Tooltip("The water container a pond fills, such as a Waterskin. Empty: only for drinking.")]
+    [SerializeField] private ItemDefinition pondFillItem;
+    [Tooltip("The bag is topped up to this many of the fill item.")]
+    [SerializeField, Min(0)] private int pondFillUpTo = 3;
+    [Tooltip("How far from the shore the player can use a pond, in metres.")]
+    [SerializeField, Min(0.5f)] private float pondReach = 1.5f;
+    [Tooltip("How far from the water the ground counts as wet, in metres. Plants that love the wet thicken towards the water.")]
+    [SerializeField, Min(0f)] private float wetReach = 12f;
+    [Tooltip("How wet the forest's damp patches are, away from any water. 0: only the ponds' shores are wet.")]
+    [SerializeField, Range(0f, 1f)] private float dampGround = 0.45f;
+
     [Header("What can come up")]
     [SerializeField] private List<RaidShapeRule> shapes = new List<RaidShapeRule>();
     [SerializeField] private List<RaidMapMood> moods = new List<RaidMapMood>();
@@ -176,6 +200,17 @@ public sealed class RaidLayoutRules : ScriptableObject
     public float ForestDensity => forestDensity;
     public float ForestPatches => forestPatches;
     public int FieldResolution => fieldResolution;
+    public Vector2Int Ponds => ponds;
+    public Vector2 PondRadius => pondRadius;
+    public Vector2 PondDepth => pondDepth;
+    public float PondStretch => pondStretch;
+    public Material PondMaterial => pondMaterial;
+    public float PondDrink => pondDrink;
+    public ItemDefinition PondFillItem => pondFillItem;
+    public int PondFillUpTo => pondFillUpTo;
+    public float PondReach => pondReach;
+    public float WetReach => wetReach;
+    public float DampGround => dampGround;
     public IReadOnlyList<RaidShapeRule> Shapes => shapes;
     public IReadOnlyList<RaidMapMood> Moods => moods;
     public IReadOnlyList<RaidSiteQuota> Sites => sites;
@@ -190,5 +225,23 @@ public sealed class RaidLayoutRules : ScriptableObject
         sites = new List<RaidSiteQuota>(siteRules);
         groups = new List<RaidGroupRule>(groupRules);
     }
+
+    /// <summary>Sets up the ponds (builders and tests).</summary>
+    public void ConfigureWater(Vector2Int count, Vector2 radius, Material material)
+    {
+        ponds = count;
+        pondRadius = radius;
+        pondMaterial = material;
+    }
 #endif
+
+    private void OnValidate()
+    {
+        ponds.x = Mathf.Max(0, ponds.x);
+        ponds.y = Mathf.Max(ponds.x, ponds.y);
+        pondRadius.x = Mathf.Max(1f, pondRadius.x);
+        pondRadius.y = Mathf.Max(pondRadius.x, pondRadius.y);
+        pondDepth.x = Mathf.Max(0.1f, pondDepth.x);
+        pondDepth.y = Mathf.Max(pondDepth.x, pondDepth.y);
+    }
 }

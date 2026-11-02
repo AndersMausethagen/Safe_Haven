@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3cb26aa02b503414f809b4bb6bcb0805, type: 3}
+  m_Name: GearScoreSettings
+  m_EditorClassIdentifier: SafeHaven::GearScoreSettings
+  pointsPerTier: 20
+  mainHand: 0.3
+  offHand: 0.08
+  chest: 0.2
+  head: 0.08
+  hands: 0.06
+  waist: 0.05
+  feet: 0.07
+  neck: 0.06
+  finger: 0.05
+  rarity:
+  - 1
+  - 1.05
+  - 1.1
+  - 1.2
+  - 1.3
+  perEmpowerLevel: 0.1
+  perEnchantment: 0.1

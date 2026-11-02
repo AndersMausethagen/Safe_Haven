@@ -32,6 +32,8 @@ MonoBehaviour:
   unlocksRecipes: []
   animatorController: {fileID: 9100000, guid: 51388376d31e4294bb24b0004412608d, type: 2}
   prefab: {fileID: 9066855856663566298, guid: c62686ef298686e40ae6736dc586a03f, type: 3}
+  experience: 0
+  neverElite: 1
   attack: {fileID: 11400000, guid: 76995dcb3b55a3c489221f337a8f9b8d, type: 2}
   attackDamage: 70
   attackCooldown: 1.2
@@ -52,6 +54,7 @@ MonoBehaviour:
     priority: 1
     cooldown: 1.2
     interruptible: 0
+    fromTier: 0
     projectilePrefab: {fileID: 0}
     burstCount: 0
     burstInterval: 0
@@ -60,10 +63,15 @@ MonoBehaviour:
     chargeSpeed: 0
     chargeDistance: 0
     exposedSeconds: 0
+    leapHeight: 0
     buffRadius: 0
     buffSeconds: 0
     damageBonus: 0
     packLeaderOnly: 0
+    summonPrefab: {fileID: 0}
+    summonCount: 2
+    summonRadius: 3
+    summonLimit: 4
   - attack: {fileID: 11400000, guid: 366b223e4e5df8548802df8a32de601e, type: 2}
     kind: 0
     damage: 95
@@ -72,6 +80,7 @@ MonoBehaviour:
     priority: 2
     cooldown: 7
     interruptible: 0
+    fromTier: 0
     projectilePrefab: {fileID: 0}
     burstCount: 0
     burstInterval: 0
@@ -80,10 +89,67 @@ MonoBehaviour:
     chargeSpeed: 0
     chargeDistance: 0
     exposedSeconds: 0
+    leapHeight: 0
     buffRadius: 0
     buffSeconds: 0
     damageBonus: 0
     packLeaderOnly: 0
+    summonPrefab: {fileID: 0}
+    summonCount: 2
+    summonRadius: 3
+    summonLimit: 4
+  - attack: {fileID: 11400000, guid: fb33c009bef9aad4fa946599b4db060b, type: 2}
+    kind: 2
+    damage: 80
+    minimumRange: 4
+    maximumRange: 11
+    priority: 15
+    cooldown: 13
+    interruptible: 0
+    fromTier: 3
+    projectilePrefab: {fileID: 0}
+    burstCount: 1
+    burstInterval: 0
+    projectileSpeed: 0
+    projectileRadius: 0
+    chargeSpeed: 11
+    chargeDistance: 11
+    exposedSeconds: 2.5
+    leapHeight: 0
+    buffRadius: 0
+    buffSeconds: 0
+    damageBonus: 0
+    packLeaderOnly: 0
+    summonPrefab: {fileID: 0}
+    summonCount: 2
+    summonRadius: 3
+    summonLimit: 4
+  - attack: {fileID: 11400000, guid: 6768ede71e21aad4dbc250cd735cdbba, type: 2}
+    kind: 4
+    damage: 0
+    minimumRange: 0
+    maximumRange: 14
+    priority: 25
+    cooldown: 32
+    interruptible: 0
+    fromTier: 4
+    projectilePrefab: {fileID: 0}
+    burstCount: 1
+    burstInterval: 0
+    projectileSpeed: 0
+    projectileRadius: 0
+    chargeSpeed: 11
+    chargeDistance: 11
+    exposedSeconds: 2.5
+    leapHeight: 0
+    buffRadius: 0
+    buffSeconds: 0
+    damageBonus: 0
+    packLeaderOnly: 0
+    summonPrefab: {fileID: 6267209934607442583, guid: bb37a42ef72f5274d807155e3d054529, type: 3}
+    summonCount: 2
+    summonRadius: 4
+    summonLimit: 3
   movementTactic: 0
   temperament: 1
   preferredDistance: 7

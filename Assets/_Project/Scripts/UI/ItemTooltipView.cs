@@ -18,6 +18,14 @@ public sealed class ItemTooltipView : MonoBehaviour
 
     private RectTransform area;
 
+    /// <summary>Sets up a tooltip made in code. Call it while its object is still inactive (before Awake).</summary>
+    public void Configure(RectTransform tipPanel, TMP_Text title, TMP_Text body)
+    {
+        panel = tipPanel;
+        titleLabel = title;
+        bodyLabel = body;
+    }
+
     private void Awake()
     {
         area = (RectTransform)panel.parent;
@@ -168,7 +176,11 @@ public sealed class ItemTooltipView : MonoBehaviour
 
     public void Hide()
     {
-        panel.gameObject.SetActive(false);
+        // A window built in code can call this as its parts are torn down with the scene.
+        if (panel != null)
+        {
+            panel.gameObject.SetActive(false);
+        }
     }
 
     public void Follow(Vector2 screenPosition)
@@ -201,6 +213,10 @@ public sealed class ItemTooltipView : MonoBehaviour
         if (gearSlot.Length > 0)
         {
             builder.Append("\n<color=#AAB0BC>").Append(gearSlot).Append("</color>");
+            if (GearScore.Counts(item))
+            {
+                builder.Append($"\n<color=#E8C46A>Gear Score {(stack.HasValue ? GearScore.Of(stack.Value) : GearScore.Of(item))}</color>");
+            }
         }
 
         foreach (StatBonus bonus in item.StatBonuses)

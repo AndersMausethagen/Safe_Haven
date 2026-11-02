@@ -597,7 +597,7 @@ public static class GrassSetup
     }
 
     /// <summary>Average colour of a terrain layer's texture (times its colour tint); readable or not.</summary>
-    private static Color AverageColour(TerrainLayer layer)
+    public static Color AverageColour(TerrainLayer layer)
     {
         Texture2D source = layer != null ? layer.diffuseTexture : null;
         if (source == null)

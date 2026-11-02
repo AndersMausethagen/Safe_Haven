@@ -41,7 +41,7 @@ public sealed class RaidParameters
 
     /// <summary>The rules with the modifiers applied, plus extra seconds bought with Portal Sparks (GDD §7.3).</summary>
     public static RaidParameters Calculate(RaidDefinition raid, IEnumerable<RaidModifierDefinition> modifiers, float extraSeconds,
-        RaidTimeOfDay timeOfDay = null)
+        RaidTimeOfDay timeOfDay = null, RaidDifficulty difficulty = null)
     {
         var effects = new List<RaidStatModifier>();
         if (modifiers != null)
@@ -64,6 +64,14 @@ public sealed class RaidParameters
         if (timeOfDay != null && !Mathf.Approximately(timeOfDay.lootMultiplier, 1f))
         {
             effects.Add(new RaidStatModifier(RaidStat.LootQuantity, StatModifierOp.Percent, timeOfDay.lootMultiplier - 1f));
+        }
+
+        // So does the tier's.
+        if (difficulty != null)
+        {
+            effects.Add(new RaidStatModifier(RaidStat.EnemyHealth, StatModifierOp.Percent, difficulty.enemyHealth - 1f));
+            effects.Add(new RaidStatModifier(RaidStat.EnemyPower, StatModifierOp.Percent, difficulty.enemyPower - 1f));
+            effects.Add(new RaidStatModifier(RaidStat.LootQuantity, StatModifierOp.Percent, difficulty.loot - 1f));
         }
 
         return Calculate(raid, effects);

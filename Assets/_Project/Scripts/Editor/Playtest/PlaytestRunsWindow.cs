@@ -52,6 +52,27 @@ public sealed class PlaytestRunsWindow : EditorWindow
         }
     }
 
+    // Over all the runs listed: whether each tier is as hard as its numbers say, and whether players come in with the gear it expects.
+    private void DrawTiers()
+    {
+        for (int tier = 1; tier <= Tiers.Max; tier++)
+        {
+            int played = 0, extracted = 0, margin = 0;
+            foreach (PlaytestRunSummary run in runs)
+            {
+                played += run.TierRaids[tier];
+                extracted += run.TierExtractions[tier];
+                margin += run.TierScoreMargin[tier];
+            }
+
+            if (played > 0)
+            {
+                EditorGUILayout.LabelField($"Raid tier {Tiers.ToRoman(tier)}",
+                    $"{extracted} of {played} extracted ({(float)extracted / played:P0}), gear score {(float)margin / played:+0;-0;0} against recommended on average");
+            }
+        }
+    }
+
     private void OnGUI()
     {
         using (new EditorGUILayout.HorizontalScope(EditorStyles.toolbar))
@@ -124,6 +145,7 @@ public sealed class PlaytestRunsWindow : EditorWindow
         }
 
         EditorGUILayout.EndScrollView();
+        DrawTiers();
         EditorGUILayout.HelpBox("Raids are extractions/total. Click a run to open its log. Times are played minutes, pauses excluded.", MessageType.None);
     }
 

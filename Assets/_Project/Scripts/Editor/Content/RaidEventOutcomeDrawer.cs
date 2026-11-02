@@ -89,6 +89,14 @@ public sealed class RaidEventOutcomeDrawer : KindMenuDrawer<RaidEventOutcome>
     protected override string EmptyText => "Choose what happens…";
 }
 
+/// <summary>The kind menu on an elite affix's behaviours.</summary>
+[CustomPropertyDrawer(typeof(EliteBehaviour), true)]
+public sealed class EliteBehaviourDrawer : KindMenuDrawer<EliteBehaviour>
+{
+    protected override string NameOf(EliteBehaviour value) => value.DisplayName;
+    protected override string EmptyText => "Choose what it does…";
+}
+
 /// <summary>The kind menu on a relic's effects.</summary>
 [CustomPropertyDrawer(typeof(RelicEffect), true)]
 public sealed class RelicEffectDrawer : KindMenuDrawer<RelicEffect>

@@ -24,6 +24,62 @@ public sealed class RaidLayoutRoom
     public int Links;
 }
 
+/// <summary>A pond on a generated map, in metres from the map's south-west corner: a slightly uneven oval.</summary>
+public sealed class RaidLayoutPond
+{
+    public Vector2 Position;
+    /// <summary>Half its length and half its width.</summary>
+    public Vector2 Radii;
+    /// <summary>Which way it lies, in radians.</summary>
+    public float Turn;
+    /// <summary>How deep it is at its middle, in metres.</summary>
+    public float Depth;
+    /// <summary>The height of its surface above the map's lowest point. RaidLayoutField works it out from the ground around it.</summary>
+    public float Level;
+
+    /// <summary>The longest way from its middle to its shore.</summary>
+    public float Reach => Mathf.Max(Radii.x, Radii.y) * MaxWobble;
+
+    private const float MaxWobble = 1.11f;
+
+    private float Wobble(float angle) => 1f + 0.07f * Mathf.Sin(angle * 3f + Turn) + 0.04f * Mathf.Sin(angle * 7f - Turn);
+
+    /// <summary>Metres from the point to the shore: below zero it is in the water.</summary>
+    public float Edge(Vector2 point)
+    {
+        Vector2 offset = point - Position;
+        float cos = Mathf.Cos(Turn), sin = Mathf.Sin(Turn);
+        float along = (offset.x * cos + offset.y * sin) / Radii.x;
+        float across = (offset.y * cos - offset.x * sin) / Radii.y;
+        return (Mathf.Sqrt(along * along + across * across) / Wobble(Mathf.Atan2(across, along)) - 1f) * Mathf.Min(Radii.x, Radii.y);
+    }
+
+    /// <summary>The shore straight out from its middle towards the point, or the point itself when it is in the water.</summary>
+    public Vector2 Shore(Vector2 point)
+    {
+        if (Edge(point) <= 0f)
+        {
+            return point;
+        }
+
+        Vector2 offset = point - Position;
+        float cos = Mathf.Cos(Turn), sin = Mathf.Sin(Turn);
+        float along = (offset.x * cos + offset.y * sin) / Radii.x;
+        float across = (offset.y * cos - offset.x * sin) / Radii.y;
+        return Rim(Mathf.Atan2(across, along), 0f);
+    }
+
+    /// <summary>The point <paramref name="beyond"/> metres out from the shore, in a direction from its middle.</summary>
+    public Vector2 Rim(float angle, float beyond)
+    {
+        float wobble = Wobble(angle);
+        float along = Mathf.Cos(angle) * (Radii.x * wobble + beyond);
+        float across = Mathf.Sin(angle) * (Radii.y * wobble + beyond);
+        float cos = Mathf.Cos(Turn), sin = Mathf.Sin(Turn);
+        return Position + new Vector2(along * cos - across * sin, along * sin + across * cos);
+    }
+}
+
 /// <summary>
 /// One generated map, as data: its clearings, the trails between them and the sites along them. Made by RaidLayoutPlanner
 /// and turned into ground by RaidLayoutField and RaidMapGenerator.
@@ -47,11 +103,51 @@ public sealed class RaidLayoutPlan
     public readonly List<(Vector2 centre, float radius)> Pockets = new List<(Vector2, float)>();
     /// <summary>Sites, 0–1 across the map, like a painted map's markers.</summary>
     public readonly List<RaidSite> Sites = new List<RaidSite>();
+    /// <summary>The ponds, placed once everything else has its spot.</summary>
+    public readonly List<RaidLayoutPond> Ponds = new List<RaidLayoutPond>();
 
     public RaidLayoutRoom Start => Rooms[0];
 
     /// <summary>The sites of one kind, in the order they were placed (the best spots first).</summary>
     public List<RaidSite> SitesOf(RaidSiteKind kind) => Sites.FindAll(site => site.Kind == kind);
+
+    private const float DampPatchSize = 34f;
+
+    /// <summary>True when the point, in metres from the map's corner, lies in a pond.</summary>
+    public bool InWater(Vector2 point)
+    {
+        foreach (RaidLayoutPond pond in Ponds)
+        {
+            if ((point - pond.Position).sqrMagnitude < pond.Reach * pond.Reach && pond.Edge(point) < 0f)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>How wet the ground is at a point, 0 to 1: full at the water's edge, fading with distance, with damp patches in the forest.</summary>
+    public float Wetness(Vector2 point, float reach, float damp)
+    {
+        float wet = 0f;
+        if (damp > 0f)
+        {
+            float patch = Mathf.PerlinNoise((point.x + NoiseOffset.x + 211f) / DampPatchSize, (point.y + NoiseOffset.y - 211f) / DampPatchSize);
+            wet = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.55f, 0.8f, patch)) * damp;
+        }
+
+        foreach (RaidLayoutPond pond in Ponds)
+        {
+            float far = pond.Reach + reach;
+            if (reach > 0f && (point - pond.Position).sqrMagnitude < far * far)
+            {
+                wet = Mathf.Max(wet, 1f - Mathf.Clamp01(pond.Edge(point) / reach));
+            }
+        }
+
+        return wet;
+    }
 }
 
 /// <summary>
@@ -70,6 +166,12 @@ public static class RaidLayoutPlanner
     private const int RoomTries = 28;
     private const int SiteTries = 60;
     private const int WanderLevels = 3;
+    private const int PondTries = 90;
+    private const float PondShrink = 0.86f;
+    private const float PondFromTrail = 1.5f;
+    private const float PondFromSite = 5f;
+    private const float PondFromStart = 18f;
+    private const float PondFromPond = 10f;
 
     /// <summary>The shape and mood of a run: fixed by its seed, whichever attempt at the map is used.</summary>
     public static (RaidShapeRule shape, RaidMapMood mood) Choose(RaidLayoutRules rules, int seed)
@@ -127,7 +229,132 @@ public static class RaidLayoutPlanner
         }
 
         RaidMapMarkers.Sort(plan.Sites);
+        PlacePonds(plan, rules, attempt);
         return plan;
+    }
+
+    // From their own stream, so adding water never moves a site. They go last and give way to everything already on the map:
+    // beside a trail or at the edge of a clearing, so the player comes across them, and never where a trail would run through.
+    private static void PlacePonds(RaidLayoutPlan plan, RaidLayoutRules rules, int attempt)
+    {
+        if (rules.Ponds.y <= 0)
+        {
+            return;
+        }
+
+        var random = new System.Random(RaidLayout.SeedFor(plan.Seed, "Ponds " + attempt));
+        int wanted = random.Next(rules.Ponds.x, rules.Ponds.y + 1);
+
+        // One draw from each slice of the size range, in random order, so a run's ponds never all come out alike.
+        List<int> slices = RaidLayout.PickIndices(random, wanted, wanted);
+        foreach (int slice in slices)
+        {
+            float share = (slice + (float)random.NextDouble()) / wanted;
+            float radius = Mathf.Lerp(rules.PondRadius.x, rules.PondRadius.y, share);
+            float stretch = Range(random, 1f, rules.PondStretch);
+            float turn = Range(random, 0f, Mathf.PI * 2f);
+            for (int tries = 0; tries < PondTries; tries++)
+            {
+                // A large pond that finds no room comes out smaller, down to the smallest size.
+                if (tries > 0 && tries % 15 == 0)
+                {
+                    radius = Mathf.Max(rules.PondRadius.x, radius * PondShrink);
+                }
+
+                float depth = Mathf.Lerp(rules.PondDepth.x, rules.PondDepth.y, Mathf.InverseLerp(rules.PondRadius.x, rules.PondRadius.y, radius));
+                var pond = new RaidLayoutPond { Radii = new Vector2(radius, radius / stretch), Turn = turn, Depth = depth };
+                pond.Position = PondSpot(plan, rules, pond, random);
+                if (PondFits(plan, rules, pond))
+                {
+                    plan.Ponds.Add(pond);
+                    break;
+                }
+            }
+        }
+    }
+
+    private static Vector2 PondSpot(RaidLayoutPlan plan, RaidLayoutRules rules, RaidLayoutPond pond, System.Random random)
+    {
+        if (plan.Trails.Count > 0 && random.Next(2) == 0)
+        {
+            List<Vector2> trail = plan.Trails[random.Next(plan.Trails.Count)];
+            int at = random.Next(trail.Count - 1);
+            Vector2 point = Vector2.Lerp(trail[at], trail[at + 1], (float)random.NextDouble());
+            Vector2 side = Vector2.Perpendicular((trail[at + 1] - trail[at]).normalized) * (random.Next(2) == 0 ? -1f : 1f);
+            return point + side * (rules.TrailHalfWidth * plan.Mood.trails + pond.Reach + Range(random, PondFromTrail, PondFromTrail + 5f));
+        }
+
+        RaidLayoutRoom room = plan.Rooms[random.Next(plan.Rooms.Count)];
+        return room.Position + Direction(Range(random, 0f, 360f)) * (room.Radius + pond.Reach * Range(random, 0.2f, 0.9f));
+    }
+
+    private static bool PondFits(RaidLayoutPlan plan, RaidLayoutRules rules, RaidLayoutPond pond)
+    {
+        Vector2 spot = pond.Position;
+        float reach = pond.Reach;
+        float margin = rules.EdgeMargin + reach;
+        if (spot.x < margin || spot.y < margin || spot.x > plan.Size - margin || spot.y > plan.Size - margin
+            || Vector2.Distance(spot, plan.Start.Position) < reach + PondFromStart)
+        {
+            return false;
+        }
+
+        foreach (RaidLayoutRoom room in plan.Rooms)
+        {
+            // It may lie at the edge of an ordinary clearing, but leaves the ones with a purpose whole.
+            float keep = room.Role == RaidRoomRole.Plain ? room.Radius * 0.35f : room.Radius + 1f;
+            if (Vector2.Distance(spot, room.Position) < reach + keep)
+            {
+                return false;
+            }
+        }
+
+        foreach (RaidSite site in plan.Sites)
+        {
+            if (Vector2.Distance(site.Position * plan.Size, spot) < reach + PondFromSite)
+            {
+                return false;
+            }
+        }
+
+        foreach ((Vector2 centre, float radius) in plan.Pockets)
+        {
+            if (Vector2.Distance(centre, spot) < reach + radius)
+            {
+                return false;
+            }
+        }
+
+        foreach (RaidLayoutPond other in plan.Ponds)
+        {
+            if (Vector2.Distance(other.Position, spot) < reach + other.Reach + PondFromPond)
+            {
+                return false;
+            }
+        }
+
+        float halfWidth = rules.TrailHalfWidth * plan.Mood.trails;
+        return !LineWithin(plan.Trails, spot, reach + halfWidth + PondFromTrail)
+            && !LineWithin(plan.Spurs, spot, reach + halfWidth + PondFromTrail);
+    }
+
+    private static bool LineWithin(List<List<Vector2>> lines, Vector2 point, float distance)
+    {
+        float squared = distance * distance;
+        foreach (List<Vector2> line in lines)
+        {
+            for (int i = 0; i + 1 < line.Count; i++)
+            {
+                Vector2 along = line[i + 1] - line[i];
+                float t = Mathf.Clamp01(Vector2.Dot(point - line[i], along) / Mathf.Max(0.0001f, along.sqrMagnitude));
+                if ((line[i] + along * t - point).sqrMagnitude < squared)
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     private static float Range(System.Random random, float min, float max) => min + (float)random.NextDouble() * (max - min);

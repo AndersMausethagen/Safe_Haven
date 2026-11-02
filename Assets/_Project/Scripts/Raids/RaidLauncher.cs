@@ -42,6 +42,20 @@ public static class RaidLauncher
         return null;
     }
 
+    /// <summary>Why the player's gear keeps them out of a tier, or null when it doesn't.</summary>
+    public static string CheckGear(RaidDifficulty difficulty, GameObject player)
+    {
+        if (difficulty == null || Cheats.NoRequirements)
+        {
+            return null;
+        }
+
+        int score = GearScore.Of(player);
+        return score >= difficulty.minimumGearScore
+            ? null
+            : $"Tier {Tiers.ToRoman(difficulty.tier)} needs a gear score of at least {difficulty.minimumGearScore}. Yours is {score}.";
+    }
+
     /// <summary>Why the player can't spend this many Portal Sparks, or null when they can.</summary>
     public static string CheckSparks(GameObject player, int sparks)
     {
@@ -81,9 +95,11 @@ public static class RaidLauncher
     /// Returns false, with a reason for the player, when it can't.
     /// </summary>
     public static bool TryLaunch(RaidDefinition raid, GameObject player, IEnumerable<ItemDefinition> modifierItems, out string problem,
-        int sparks = 0, int? seed = null)
+        int sparks = 0, int? seed = null, RaidDifficulty difficulty = null)
     {
         problem = CheckLaunch(raid);
+        difficulty ??= raid != null ? raid.LowestDifficulty : null;
+        problem ??= CheckGear(difficulty, player);
         ItemInventory inventory = player != null ? player.GetComponent<ItemInventory>() : null;
         if (problem == null && inventory == null)
         {
@@ -134,14 +150,18 @@ public static class RaidLauncher
 
         // The seed is usually rolled when the briefing opens, so the hour it shows is the hour the raid gets.
         int runSeed = seed ?? RaidSession.NewSeed();
-        RaidParameters parameters = RaidParameters.Calculate(raid, modifiers, ExtraSeconds(sparks), RaidTimeOfDay.For(raid, runSeed));
+        RaidParameters parameters = RaidParameters.Calculate(raid, modifiers, ExtraSeconds(sparks), RaidTimeOfDay.For(raid, runSeed), difficulty);
         if (player.TryGetComponent(out PlayerTransport transport))
         {
             transport.LeaveForRaid();
         }
 
         PlayerSnapshot loadout = PlayerSnapshot.Capture(player);
-        GameSession.BeginRaid(new RaidSession(raid, modifiers, parameters, loadout, SceneManager.GetActiveScene().name, sparks, runSeed));
+        var session = new RaidSession(raid, modifiers, parameters, loadout, SceneManager.GetActiveScene().name, sparks, runSeed, difficulty)
+        {
+            GearScoreAtEntry = GearScore.Of(player),
+        };
+        GameSession.BeginRaid(session);
         GameSession.CarryPlayerState(loadout);
 
         // The player stays in this scene until the raid scene has loaded, so keep them from wandering off meanwhile.

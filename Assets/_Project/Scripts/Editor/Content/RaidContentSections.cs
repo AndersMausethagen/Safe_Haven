@@ -8,13 +8,14 @@ using Object = UnityEngine.Object;
 
 /// <summary>
 /// Raids in the Content Editor, one tab per part of the raid: Overview (name, scene, briefing), Rules (time, strength,
-/// density), Enemies / Resources / Loot &amp; Events / Escalation (spawn lists: where, how many and what, in percent),
-/// Systems (optional systems such as roaming spawns, edited in the Systems Editor) and Preview (simulated layouts).
+/// density), World (what the map is made of: layout, materials, trees, plants, water, mist; see RaidWorldEditor), Enemies /
+/// Resources / Loot &amp; Events / Escalation (spawn lists: where, how many and what, in percent), Systems (optional systems
+/// such as roaming spawns, edited in the Systems Editor) and Preview (simulated layouts).
 /// Rules shared by every raid live in the Systems Editor (Raids > Global Rules).
 /// </summary>
 public sealed class RaidSection : ContentSection
 {
-    private static readonly string[] Tabs = { "Overview", "Rules", "Enemies", "Resources", "Loot & Events", "Escalation", "Systems", "Preview" };
+    private static readonly string[] Tabs = { "Overview", "Rules", "World", "Enemies", "Resources", "Loot & Events", "Escalation", "Systems", "Preview" };
     private const string TabKey = "SafeHaven.ContentEditor.RaidTab";
 
     private static readonly string[] Hidden = { "spawnLists", "systems", "roaming", "stages" };
@@ -42,11 +43,63 @@ public sealed class RaidSection : ContentSection
 
     public override int? ListTier(Object asset) => ((RaidDefinition)asset).Tier;
 
+    /// <summary>Opens the Content Editor on a raid's World tab.</summary>
+    public static void ShowWorld(RaidDefinition raid)
+    {
+        Tab = Array.IndexOf(Tabs, "World");
+        ContentEditorWindow.OpenOn(typeof(RaidSection), raid);
+    }
+
+    private static IEnumerable<RaidDefinition> AllRaids()
+    {
+        foreach (string guid in AssetDatabase.FindAssets("t:RaidDefinition"))
+        {
+            var raid = AssetDatabase.LoadAssetAtPath<RaidDefinition>(AssetDatabase.GUIDToAssetPath(guid));
+            if (raid != null)
+            {
+                yield return raid;
+            }
+        }
+    }
+
+    /// <summary>The raid played in a scene, or null.</summary>
+    public static RaidDefinition RaidPlaying(string sceneName) => AllRaids().FirstOrDefault(raid => raid.SceneName == sceneName);
+
+    /// <summary>A raid generating its maps from these rules, or null.</summary>
+    public static RaidDefinition RaidUsing(RaidLayoutRules rules) => AllRaids().FirstOrDefault(raid => raid.LayoutRules == rules);
+
+    /// <summary>A raid whose scene holds this map, or null.</summary>
+    public static RaidDefinition RaidOfMap(RaidMapDefinition map) =>
+        AllRaids().FirstOrDefault(raid => RaidWorldEditor.FromScene<RaidMapDefinition>(FindScenePath(raid.SceneName)) == map);
+
     public override List<string> FindProblems(Object asset, IList<Object> all)
     {
         List<string> problems = base.FindProblems(asset, all);
         var raid = (RaidDefinition)asset;
         string path = FindScenePath(raid.SceneName);
+        RaidWorldEditor.FindProblems(raid, path, problems);
+        var seenTiers = new HashSet<int>();
+        int lastScore = -1;
+        foreach (RaidDifficulty tier in raid.Difficulties)
+        {
+            if (!seenTiers.Add(tier.tier))
+            {
+                problems.Add($"Tier {Tiers.ToRoman(tier.tier)} is listed twice.");
+            }
+
+            if (tier.recommendedGearScore <= lastScore)
+            {
+                problems.Add($"Tier {Tiers.ToRoman(tier.tier)} recommends a gear score no higher than the tier before it. List tiers lowest first.");
+            }
+
+            if (tier.minimumGearScore > tier.recommendedGearScore)
+            {
+                problems.Add($"Tier {Tiers.ToRoman(tier.tier)} refuses players at its own recommended gear score.");
+            }
+
+            lastScore = tier.recommendedGearScore;
+        }
+
         if (string.IsNullOrWhiteSpace(raid.SceneName))
         {
             problems.Add("No scene, so a portal can't send anyone there.");
@@ -140,6 +193,9 @@ public sealed class RaidSection : ContentSection
                 break;
             case "Rules":
                 DrawRules(raid, scene);
+                break;
+            case "World":
+                RaidWorldEditor.Draw(raid, serialized, scene);
                 break;
             case "Enemies":
                 DrawSpawnTab(raid, SpawnCategory.Enemies, scene);
@@ -238,12 +294,16 @@ public sealed class RaidSection : ContentSection
             EditorGUILayout.LabelField(RaidSpawnListEditor.Label(category), lists == 1 ? "1 spawn list" : $"{lists} spawn lists");
         }
 
+        EditorGUILayout.LabelField("Map", raid.LayoutRules != null
+            ? $"Generated every run from {raid.LayoutRules.name}: see the World tab"
+            : "The scene's painted map");
         EditorGUILayout.LabelField("Systems", SystemsSummary(raid));
         ContentUtility.EndPanel();
     }
 
     private void DrawRules(RaidDefinition raid, RaidSceneContext scene)
     {
+        RaidTierEditor.Draw(raid, serialized);
         ContentUtility.BeginPanel("Time", "How long the raid lasts and how long extracting takes.");
         Field("durationSeconds");
         Field("extractionSeconds");
@@ -411,6 +471,32 @@ public sealed class RaidEventSection : ContentSection
 }
 
 /// <summary>Raid modifiers in the Content Editor: what they change and which items let the player use them.</summary>
+public sealed class EliteAffixSection : ContentSection
+{
+    public override string Title => "Elite Affixes";
+    public override string Noun => "Elite Affix";
+    public override string SidebarGroup => "Raids";
+    public override Type AssetType => typeof(EliteAffixDefinition);
+    public override string Folder => "Assets/_Project/Data/Raids/Elites";
+    public override string Help =>
+        "What can make a creature an elite: its name, its colour, what it changes in numbers and what it makes the creature do. A raid lists which it can use, and " +
+        "each tier says how many elites and how many affixes each (Raids › Rules). Give each one an answer the player can learn.";
+
+    public override List<string> FindProblems(Object asset, IList<Object> all)
+    {
+        List<string> problems = base.FindProblems(asset, all);
+        var affix = (EliteAffixDefinition)asset;
+        bool numbers = !Mathf.Approximately(affix.Damage, 1f) || !Mathf.Approximately(affix.Speed, 1f) || !Mathf.Approximately(affix.Cooldowns, 1f) || affix.Armor > 0f;
+        if (!numbers && affix.Behaviours.Count == 0)
+        {
+            problems.Add("Only more health, and nothing to read or answer: it wouldn't feel like anything.");
+        }
+
+        return problems;
+    }
+}
+
+/// <summary>Raid modifiers in the Content Editor.</summary>
 public sealed class RaidModifierSection : ContentSection
 {
     public override string Title => "Raid Modifiers";
