@@ -38,11 +38,16 @@ public sealed class RaidRumourDefinition : ScriptableObject
     [SerializeField] private bool breachComing;
     [Tooltip("Not before this many raids have been survived.")]
     [SerializeField, Min(0)] private int afterExtractions;
+    [Tooltip("Only once this building stands at home: a craftsman is sought when there is somewhere for them to work.")]
+    [SerializeField] private BuildingDefinition needsBuilding;
+    [Tooltip("Comes up ahead of any chosen at random, as soon as it can.")]
+    [SerializeField] private bool urgent;
 
     public string Id => string.IsNullOrWhiteSpace(id) ? name : id;
     public string Briefing => briefing;
     public RaidEventDefinition Site => site;
     public float Weight => weight;
+    public bool Urgent => urgent;
 
     /// <summary>Whether it can come up for this hour and this state of the game.</summary>
     public bool CanComeUp(RaidTimeOfDay timeOfDay, SettlementState settlement, PlayerCrafting crafting)
@@ -58,6 +63,11 @@ public sealed class RaidRumourDefinition : ScriptableObject
         }
 
         if (seeks != null && settlement.HasResident(seeks))
+        {
+            return false;
+        }
+
+        if (needsBuilding != null && settlement.BuiltTier(needsBuilding) < 1)
         {
             return false;
         }
@@ -95,7 +105,17 @@ public static class RaidRumours
         }
 
         var random = new System.Random(RaidLayout.SeedFor(seed, "Rumours"));
-        int wanted = system.Count + settlement.JobBonus(job => job.ExtraRumours);
+        int wanted = system.Count + settlement.JobBonus(job => job.ExtraRumours) + HavenReadiness.ExtraRumours;
+        for (int i = candidates.Count - 1; i >= 0 && picked.Count < wanted; i--)
+        {
+            if (candidates[i].Urgent)
+            {
+                picked.Add(candidates[i]);
+                candidates.RemoveAt(i);
+                weights.RemoveAt(i);
+            }
+        }
+
         while (picked.Count < wanted && candidates.Count > 0)
         {
             int index = RaidLayout.PickWeighted(random, weights);

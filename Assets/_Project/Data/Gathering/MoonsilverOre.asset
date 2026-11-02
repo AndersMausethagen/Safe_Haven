@@ -14,13 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GatheringNodeDefinition
   id: 
   displayName: Moonsilver Ore
-  tier: 3
+  tier: 4
   yields:
     entries:
     - item: {fileID: 11400000, guid: fdf61b2bcc4fcfb47b96885b254e02e6, type: 2}
       resource: {fileID: 0}
-      minQuantity: 1
-      maxQuantity: 3
+      minQuantity: 3
+      maxQuantity: 5
       probability: 1
   gatherTool: 2
   requiredToolTier: 3
@@ -34,3 +34,5 @@ MonoBehaviour:
   feedback: {fileID: 11400000, guid: b1c449ba20565574596c83020c468036, type: 2}
   worldModelPrefab: {fileID: 749796442003423963, guid: 5f571437686281e4a874d06ffd299c4b, type: 3}
   worldPrefab: {fileID: 4483799220086940710, guid: d30b058cde685564ca6d1e997f261196, type: 3}
+  modelVariants: []
+  variantScale: {x: 0.9, y: 1.1}

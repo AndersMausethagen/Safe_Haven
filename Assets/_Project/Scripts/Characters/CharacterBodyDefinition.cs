@@ -45,7 +45,7 @@ public sealed class CharacterBodyDefinition : ScriptableObject
     [Header("Skin")]
     [Tooltip("Body skin tones, put on every naked body part.")]
     [SerializeField] private List<NamedMaterial> skins = new List<NamedMaterial>();
-    [Tooltip("Faces: head and ears.")]
+    [Tooltip("Head and ears, one per skin tone and in the same order, so a face always matches its body.")]
     [SerializeField] private List<NamedMaterial> faces = new List<NamedMaterial>();
     [SerializeField] private List<NamedMaterial> eyes = new List<NamedMaterial>();
     [Tooltip("Painted over the body skin under the gear. Their own layer, so never left naked.")]

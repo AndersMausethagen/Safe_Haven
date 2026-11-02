@@ -15,27 +15,28 @@ MonoBehaviour:
   enabled: 1
   profiles:
   - tool: 1
-    cycleSeconds: 2
-    normalZoneWidth: 0.35
-    criticalZoneWidth: 0.08
+    riseSeconds: 2.2
+    normalZoneWidth: 0.4
+    criticalZoneWidth: 0.14
     loudness: 1
   - tool: 2
-    cycleSeconds: 2
-    normalZoneWidth: 0.3
-    criticalZoneWidth: 0.07
+    riseSeconds: 2.4
+    normalZoneWidth: 0.4
+    criticalZoneWidth: 0.13
     loudness: 1.1
   - tool: 3
-    cycleSeconds: 2
-    normalZoneWidth: 0.35
-    criticalZoneWidth: 0.07
+    riseSeconds: 1.5
+    normalZoneWidth: 0.4
+    criticalZoneWidth: 0.18
     loudness: 0.35
   wallSwingContact: 0.36666676
   groundSwingContact: 0.40000013
   swingWindUp: 0.15
+  sweetSpot: 0.8
   criticalWidthPerTier: 0.03
   criticalWidthPerCombo: 0.02
   maxCombo: 3
-  zoneJitter: 0.15
+  zoneJitter: 0
   bonusPerCritical: 1
   criticalHitStop: 0.06
   interruptOnHit: 1

@@ -39,6 +39,11 @@ MonoBehaviour:
       minQuantity: 1
       maxQuantity: 1
       probability: 0.5
+    - item: {fileID: 11400000, guid: 4f80b5d6098abc64b903316903de5b64, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 2
+      probability: 0.6
   unlocksRecipes: []
   animatorController: {fileID: 0}
   prefab: {fileID: 8653230728158633359, guid: a661dc05d2e43f943a476376f636ef9a, type: 3}

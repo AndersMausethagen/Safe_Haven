@@ -51,7 +51,7 @@ public static class ItemDrag
 
         if (moving.Item != null && moving.Item.HasDurability && moving.IsBroken && target.SlotRule != null)
         {
-            GameMessages.Post($"{moving.Item.DisplayName} is broken. Repair it at a Construction Table first.", MessageKind.Warning);
+            GameMessages.Post($"{moving.Item.DisplayName} is broken. Repair it at a Workshop first.", MessageKind.Warning);
             return false;
         }
 

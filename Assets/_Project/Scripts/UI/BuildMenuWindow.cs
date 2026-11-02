@@ -512,28 +512,9 @@ public sealed class BuildMenuWindow : MonoBehaviour
 
     private void BuildTab(BuildCategory category, float x, UIStyle style)
     {
-        RectTransform rect = At(category + " Tab", panel, x, 12f, TabWidth, 44f);
-        var image = rect.gameObject.AddComponent<Image>();
-        image.color = new Color(1f, 1f, 1f, 0f);
-        var button = rect.gameObject.AddComponent<Button>();
-        button.targetGraphic = image;
-        ColorBlock colors = button.colors;
-        colors.normalColor = new Color(1f, 1f, 1f, 0f);
-        colors.highlightedColor = new Color(1f, 1f, 1f, 0.08f);
-        colors.selectedColor = new Color(1f, 1f, 1f, 0.04f);
-        colors.pressedColor = new Color(1f, 1f, 1f, 0.12f);
-        button.colors = colors;
+        Button button = AddTab(category.ToString(), panel, x, 12f, TabWidth, 44f, style, out TMP_Text label, out Image underline);
         button.onClick.AddListener(() => ShowTab(category));
-        var tab = new Tab
-        {
-            Category = category,
-            Root = rect.gameObject,
-            Label = Label("Label", rect, 0f, 0f, TabWidth, 44f, 19f, style.Text, TextAlignmentOptions.Center),
-        };
-        tab.Underline = At("Underline", rect, 24f, 40f, TabWidth - 48f, 3f).gameObject.AddComponent<Image>();
-        tab.Underline.color = style.Accent;
-        tab.Underline.raycastTarget = false;
-        tabs.Add(tab);
+        tabs.Add(new Tab { Category = category, Root = button.gameObject, Label = label, Underline = underline });
     }
 
     private void BuildGrid(UIStyle style)

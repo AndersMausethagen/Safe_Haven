@@ -396,13 +396,13 @@ MonoBehaviour:
     - item: {fileID: 11400000, guid: 8cf878eb4a61eb943917a1f9421bb40a, type: 2}
       resource: {fileID: 0}
       minQuantity: 1
-      maxQuantity: 3
-      probability: 0.5
+      maxQuantity: 2
+      probability: 0.3
     - item: {fileID: 11400000, guid: f243c15300698e044a98d785099354c6, type: 2}
       resource: {fileID: 0}
       minQuantity: 1
       maxQuantity: 2
-      probability: 0.35
+      probability: 0.2
     - item: {fileID: 11400000, guid: 32fed522ebae2fc4d85b1847b30aa530, type: 2}
       resource: {fileID: 0}
       minQuantity: 1
@@ -533,6 +533,7 @@ MonoBehaviour:
       minQuantity: 1
       maxQuantity: 1
       probability: 0.05
+  lockPins: 3
   fullVisual: {fileID: 7691639898665871457}
   emptyVisual: {fileID: 2452368823239758751}
 --- !u!1 &6165068319856631502

@@ -88,7 +88,7 @@ public sealed class InputActionsTests : InputTestFixture
             (Key.I, GameInput.Inventory), (Key.B, GameInput.Items), (Key.K, GameInput.Skills), (Key.C, GameInput.Character),
             (Key.G, GameInput.Build), (Key.N, GameInput.Talents), (Key.H, GameInput.Haven), (Key.M, GameInput.WorldMap),
             (Key.V, GameInput.CameraToggleStyle), (Key.LeftShift, GameInput.BuildFineRotate), (Key.LeftAlt, GameInput.BuildFreePlace),
-            (Key.Escape, GameInput.Pause), (Key.F5, GameInput.QuickSave), (Key.F6, GameInput.QuickLoad),
+            (Key.Escape, GameInput.Pause), (Key.F5, GameInput.QuickSave), (Key.F6, GameInput.QuickLoad), (Key.F1, GameInput.CheatMenu),
             (Key.E, GameInput.Advance), (Key.Enter, GameInput.Advance), (Key.Digit3, GameInput.Answer(2)),
             (Key.LeftShift, GameInput.SplitModifier), (Key.LeftCtrl, GameInput.DiscardModifier),
         };

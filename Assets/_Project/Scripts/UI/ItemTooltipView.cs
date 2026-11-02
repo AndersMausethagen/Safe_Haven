@@ -218,7 +218,7 @@ public sealed class ItemTooltipView : MonoBehaviour
             ItemStack worn = stack.Value;
             int percent = Mathf.RoundToInt(worn.Durability * 100f);
             string color = worn.IsBroken ? "#FF7B6B" : worn.IsDamaged ? "#E8C46A" : "#8BE08B";
-            builder.Append($"\n<color={color}>Durability {percent}%{(worn.IsBroken ? " – broken, repair it at a Construction Table" : "")}</color>");
+            builder.Append($"\n<color={color}>Durability {percent}%{(worn.IsBroken ? " – broken, repair it at a Workshop" : "")}</color>");
         }
 
         if (item.Weight > 0f)

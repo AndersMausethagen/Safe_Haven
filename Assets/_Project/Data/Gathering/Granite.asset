@@ -19,8 +19,8 @@ MonoBehaviour:
     entries:
     - item: {fileID: 11400000, guid: 4c7e3b0b4de138843be249872ebf3393, type: 2}
       resource: {fileID: 0}
-      minQuantity: 2
-      maxQuantity: 4
+      minQuantity: 3
+      maxQuantity: 5
       probability: 1
   gatherTool: 2
   requiredToolTier: 2
@@ -34,3 +34,5 @@ MonoBehaviour:
   feedback: {fileID: 11400000, guid: 99cfc3df29073df4385f6c1fe48d873e, type: 2}
   worldModelPrefab: {fileID: 5793180339307704168, guid: 5071af9b640519241a01695d2bd29b1d, type: 3}
   worldPrefab: {fileID: 8682228126172116304, guid: 3e31e979ada082348a0ae00bacfea168, type: 3}
+  modelVariants: []
+  variantScale: {x: 0.9, y: 1.1}

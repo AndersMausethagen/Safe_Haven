@@ -28,6 +28,9 @@ MonoBehaviour:
   showInBuildMenu: 1
   knownFromStart: 1
   sortOrder: 7
+  requires:
+  - building: {fileID: 11400000, guid: 27159a7266bda614cbc6774955749e0e, type: 2}
+    tier: 1
   yardDepth: 1.5
   yardSide: 0
   placeInLines: 0
@@ -44,12 +47,18 @@ MonoBehaviour:
       amount: 6
     - item: {fileID: 11400000, guid: 4df650debd4ce21459e04a0c92ffa207, type: 2}
       amount: 4
+    essence: []
     work: 8
     renown: 4
     craftSpeed: 0.3
     extraQueue: 0
     extraOutput: 0
     extraStorage: 0
+    raidSeconds: 0
+    extraRumours: 0
+    comfort: 0
+    extraLogs: 0
+    teachesRecipes: []
   - title: Master's
     description: A loom fit for a jarl's hall.
     cost:
@@ -57,10 +66,18 @@ MonoBehaviour:
       amount: 10
     - item: {fileID: 11400000, guid: 616026fe07c265041bdcd10e32bcd168, type: 2}
       amount: 4
+    essence: []
     work: 9
     renown: 6
     craftSpeed: 0.3
     extraQueue: 2
     extraOutput: 0
     extraStorage: 0
+    raidSeconds: 0
+    extraRumours: 0
+    comfort: 0
+    extraLogs: 0
+    teachesRecipes: []
+  comfort: 0
+  teachesRecipes: []
   deathSound: {fileID: 0}

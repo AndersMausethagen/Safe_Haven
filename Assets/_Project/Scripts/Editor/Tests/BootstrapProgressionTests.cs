@@ -66,12 +66,14 @@ public sealed class BootstrapProgressionTests
     }
 
     [Test]
-    public void StoneHatchetStopsAtTierOneButPickaxeKeepsCopperEntry()
+    public void StoneToolsAreTierOne_AndThePickaxeStillReachesCopper()
     {
         var hatchet = AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Project/Data/Items/StoneHatchet.asset");
         var pickaxe = AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Project/Data/Items/StonePickaxe.asset");
         Assert.AreEqual(1, hatchet.ToolTier);
-        Assert.AreEqual(2, pickaxe.ToolTier);
+        Assert.AreEqual(1, pickaxe.ToolTier);
+        var copper = AssetDatabase.LoadAssetAtPath<GatheringNodeDefinition>(AssetDatabase.GUIDToAssetPath(AssetDatabase.FindAssets("t:GatheringNodeDefinition CopperOre")[0]));
+        Assert.LessOrEqual(copper.RequiredToolTier, pickaxe.ToolTier);
     }
 
     [TestCase("OakWood", ToolType.Axe)]

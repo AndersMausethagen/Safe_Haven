@@ -16,6 +16,8 @@ public sealed class SettlementSettings : GameSettings<SettlementSettings>
         public List<ResourceAmount> cost = new List<ResourceAmount>();
         [Tooltip("Meters added to the buildable radius at this level.")]
         [Min(0f)] public float extraRadius = 6f;
+        [Tooltip("Seconds added to every raid: a stronger Heart Tree holds the way home open for longer.")]
+        [Min(0f)] public float raidSeconds = 90f;
     }
 
     [Header("Portal")]

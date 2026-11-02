@@ -52,6 +52,12 @@ public sealed class CommandWheel : MonoBehaviour
 
     public bool IsOpen => group != null && group.alpha > 0f;
 
+    /// <summary>True while any wheel is held open: the camera lets go of the cursor, so the mouse can pick a choice.</summary>
+    public static bool IsHeld { get; private set; }
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStatics() => IsHeld = false;
+
     private void Awake()
     {
         BuildView();
@@ -99,6 +105,7 @@ public sealed class CommandWheel : MonoBehaviour
         title = pageTitle;
         root.SetActive(true);
         group.alpha = 1f;
+        IsHeld = true;
         centreLabel.text = title;
         UpdateSelection();
     }
@@ -112,6 +119,7 @@ public sealed class CommandWheel : MonoBehaviour
 
     public void Cancel()
     {
+        IsHeld = false;
         if (group != null)
         {
             group.alpha = 0f;
@@ -283,7 +291,9 @@ public sealed class CommandWheel : MonoBehaviour
             Image image = rect.gameObject.AddComponent<Image>();
             image.sprite = circle;
             image.raycastTarget = false;
-            TMP_Text text = rect.gameObject.AddComponent<TextMeshProUGUI>();
+            // On a child: an object can only hold one graphic, and adding a second gives null.
+            RectTransform label = Rect("Label", rect, SlotSize - 8f, SlotSize - 8f, Vector2.zero);
+            TMP_Text text = label.gameObject.AddComponent<TextMeshProUGUI>();
             text.fontSize = 16f;
             text.enableAutoSizing = true;
             text.fontSizeMin = 9f;

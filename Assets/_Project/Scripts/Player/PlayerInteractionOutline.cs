@@ -24,12 +24,14 @@ public sealed class PlayerInteractionOutline : MonoBehaviour
     private readonly RaycastHit[] hits = new RaycastHit[64];
     private readonly List<Interactable> removed = new List<Interactable>();
     private PlayerInteractor interactor;
+    private PlayerStateMachine stateMachine;
     private Damageable health;
     private Camera viewCamera;
 
     private void Awake()
     {
         interactor = GetComponent<PlayerInteractor>();
+        stateMachine = GetComponent<PlayerStateMachine>();
         health = GetComponent<Damageable>();
         if (outlineMaterial == null || maskMaterial == null)
         {
@@ -40,7 +42,9 @@ public sealed class PlayerInteractionOutline : MonoBehaviour
 
     private void LateUpdate()
     {
+        // Not at the oars or at work on something, like the prompt (WorldInteractionIndicator).
         bool visible = interactor.isActiveAndEnabled && (health == null || health.IsAlive)
+            && interactor.Current == null && (stateMachine == null || !stateMachine.IsAboard)
             && !GamePause.IsPaused && (UIStateManager.Instance == null || !UIStateManager.Instance.IsAnyWindowOpen);
         Interactable hovered = visible ? FindHovered() : null;
         if (visible && hovered != null && hovered.IsAvailable && !outlines.ContainsKey(hovered))

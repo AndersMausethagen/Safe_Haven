@@ -30,6 +30,9 @@ MonoBehaviour:
   showInBuildMenu: 1
   knownFromStart: 1
   sortOrder: 3
+  requires:
+  - building: {fileID: 11400000, guid: 1fe15b30940bf7049a4e4966e9954e1b, type: 2}
+    tier: 1
   yardDepth: 1.5
   yardSide: 1
   placeInLines: 0
@@ -46,12 +49,18 @@ MonoBehaviour:
       amount: 8
     - item: {fileID: 11400000, guid: b5567f7d75200bd46befbd1dab298f36, type: 2}
       amount: 6
+    essence: []
     work: 8
     renown: 4
     craftSpeed: 0
     extraQueue: 0
     extraOutput: 0
     extraStorage: 6
+    raidSeconds: 0
+    extraRumours: 0
+    comfort: 0
+    extraLogs: 0
+    teachesRecipes: []
   - title: Grand
     description: A loft for everything that doesn't fit.
     cost:
@@ -59,10 +68,18 @@ MonoBehaviour:
       amount: 14
     - item: {fileID: 11400000, guid: 59d371b7b63e8e24bb946051d808bc9b, type: 2}
       amount: 4
+    essence: []
     work: 9
     renown: 6
     craftSpeed: 0
     extraQueue: 0
     extraOutput: 0
     extraStorage: 10
+    raidSeconds: 0
+    extraRumours: 0
+    comfort: 0
+    extraLogs: 0
+    teachesRecipes: []
+  comfort: 0
+  teachesRecipes: []
   deathSound: {fileID: 0}

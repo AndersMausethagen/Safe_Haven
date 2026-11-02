@@ -28,6 +28,7 @@ MonoBehaviour:
   showInBuildMenu: 1
   knownFromStart: 1
   sortOrder: 0
+  requires: []
   yardDepth: 0
   yardSide: 0
   placeInLines: 0
@@ -42,10 +43,18 @@ MonoBehaviour:
     cost:
     - item: {fileID: 11400000, guid: b5567f7d75200bd46befbd1dab298f36, type: 2}
       amount: 6
+    essence: []
     work: 7.5
     renown: 3
     craftSpeed: 0.25
     extraQueue: 0
     extraOutput: 0
     extraStorage: 0
+    raidSeconds: 0
+    extraRumours: 0
+    comfort: 0
+    extraLogs: 0
+    teachesRecipes: []
+  comfort: 1
+  teachesRecipes: []
   deathSound: {fileID: 0}

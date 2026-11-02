@@ -63,6 +63,19 @@ MonoBehaviour:
     withinMinutes: 0
     questEvent: {fileID: 0}
     countAlreadyOwned: 0
+  - type: 4
+    description: Make a Knotted Club at the Workshop
+    amount: 1
+    item: {fileID: 11400000, guid: 4ca32159a9749ec43b3e7cd7b16436b2, type: 2}
+    resource: {fileID: 0}
+    monster: {fileID: 0}
+    faction: 1
+    building: {fileID: 0}
+    raid: {fileID: 0}
+    mustExtract: 1
+    withinMinutes: 0
+    questEvent: {fileID: 0}
+    countAlreadyOwned: 1
   turnInToGiver: 0
   turnInTo: 
   rewardItems:

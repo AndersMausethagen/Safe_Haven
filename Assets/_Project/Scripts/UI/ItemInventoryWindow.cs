@@ -7,7 +7,7 @@ using UnityEngine.UI;
 using TMPro;
 
 /// <summary>
-/// The bag window (B): the grid of item slots on one side and a RecipeBrowser on the other. Drag a stack to move it
+/// The bag window (B or I): the grid of item slots and the carried essences (CarriedEssencesView) on one side and a RecipeBrowser on the other. Drag a stack to move it
 /// (onto the same item to merge, onto another item to swap, into the safe pocket to protect it), Shift-click to split a
 /// stack in half, right-click to use a consumable or equip gear and Ctrl+right-click to drop a stack. Stacks can also be
 /// dragged to and from the character screen's gear slots (see ItemDrag). Locked slots (past what the

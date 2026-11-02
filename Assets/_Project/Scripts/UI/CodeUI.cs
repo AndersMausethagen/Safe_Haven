@@ -66,6 +66,27 @@ public static class CodeUI
         return heading;
     }
 
+    /// <summary>A tab: words on nothing that light up when pointed at, with an underline to switch on for the one shown.</summary>
+    public static Button AddTab(string name, Transform parent, float x, float y, float width, float height, UIStyle style, out TMP_Text label, out Image underline)
+    {
+        RectTransform rect = At(name + " Tab", parent, x, y, width, height);
+        var image = rect.gameObject.AddComponent<Image>();
+        image.color = new Color(1f, 1f, 1f, 0f);
+        var button = rect.gameObject.AddComponent<Button>();
+        button.targetGraphic = image;
+        ColorBlock colors = button.colors;
+        colors.normalColor = new Color(1f, 1f, 1f, 0f);
+        colors.highlightedColor = new Color(1f, 1f, 1f, 0.08f);
+        colors.selectedColor = new Color(1f, 1f, 1f, 0.04f);
+        colors.pressedColor = new Color(1f, 1f, 1f, 0.12f);
+        button.colors = colors;
+        label = Label("Label", rect, 0f, 0f, width, height, 19f, style.Text, TextAlignmentOptions.Center);
+        underline = At("Underline", rect, 24f, height - 4f, width - 48f, 3f).gameObject.AddComponent<Image>();
+        underline.color = style.Accent;
+        underline.raycastTarget = false;
+        return button;
+    }
+
     public static TMP_Text AddButton(string name, Transform parent, float x, float y, float width, UIRole.Kind role,
         UnityEngine.Events.UnityAction onClick, out Button button)
     {

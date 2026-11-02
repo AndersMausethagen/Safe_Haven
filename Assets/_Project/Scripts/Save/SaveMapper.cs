@@ -171,7 +171,7 @@ public static class SaveMapper
         into.purificationBonus = settlement.PurificationBonus;
         foreach (ResidentRecord record in settlement.Residents)
         {
-            into.residents.Add(new ResidentSaveData { id = record.Resident.Id, job = record.Job != null ? record.Job.Id : "" });
+            into.residents.Add(new ResidentSaveData { id = record.Resident.Id, workPaused = record.WorkPaused, job = record.Job != null ? record.Job.Id : "" });
         }
 
         foreach (StationQueue queue in settlement.Workshops.Queues)
@@ -223,6 +223,7 @@ public static class SaveMapper
             {
                 JobDefinition job = string.IsNullOrEmpty(entry.job) ? null : Resolve(content.FindJob(entry.job), "job", entry.job, missing);
                 settlement.AddResident(resident, job);
+                settlement.Find(resident).WorkPaused = entry.workPaused;
             }
         }
 

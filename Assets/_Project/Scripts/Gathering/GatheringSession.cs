@@ -4,9 +4,9 @@ using UnityEngine;
 /// <summary>How well a gathering swing was timed.</summary>
 public enum SwingResult
 {
-    /// <summary>Pressed outside the zones, or not pressed in a whole bar cycle. Loud, wears the tool.</summary>
+    /// <summary>Pressed well before the zones. Loud, wears the tool.</summary>
     Glancing = 0,
-    /// <summary>Pressed in the yellow zone: the normal yield.</summary>
+    /// <summary>Pressed in the yellow zone, or left to swing by itself: the normal yield.</summary>
     Normal = 1,
     /// <summary>Pressed in the critical zone: one extra of the main yield, and quiet.</summary>
     Critical = 2,
@@ -41,14 +41,16 @@ public readonly struct SwingZones
 }
 
 /// <summary>
-/// The timing minigame of one gather, as plain logic: a marker runs up and down a bar and the player presses once per
-/// swing. Each swing gets fresh zones (their centre jitters so it can't be done by rhythm alone); a run of critical swings
-/// widens the critical zone up to a cap, any other result resets it. A whole up-and-down cycle without a press is a
-/// glancing blow, so leaving the game alone still finishes the node, just badly. Driven by PlayerGathering.
+/// The timing minigame of one gather, as plain logic: a marker rises up the bar as the tool is raised, and comes down by itself at
+/// the top as a plain swing, so leaving it alone finishes the node at a steady pace with nothing lost. Pressing as it crosses the
+/// sweet spot makes the swing a critical; a run of them widens the spot up to a cap, any other result resets it. The spot stays
+/// put, so it can be felt as a rhythm, like an active reload. Only a press well before the zones goes wrong. Driven by
+/// PlayerGathering.
 /// </summary>
 public sealed class GatheringSession : ITimingBar
 {
-    private readonly float cycleSeconds;
+    private readonly float riseSeconds;
+    private readonly float sweetSpot;
     private readonly float normalWidth;
     private readonly float criticalWidth;
     private readonly float criticalPerCombo;
@@ -58,17 +60,19 @@ public sealed class GatheringSession : ITimingBar
     private float phase;
 
     /// <param name="swings">Swings needed to finish the gather.</param>
-    /// <param name="cycleSeconds">Seconds for the marker to go up and back down.</param>
+    /// <param name="riseSeconds">Seconds for the marker to rise from the bottom to the top.</param>
+    /// <param name="sweetSpot">Where the zones are centred (0-1 up the bar).</param>
     /// <param name="normalWidth">Width of the yellow zone (0-1 of the bar).</param>
     /// <param name="criticalWidth">Width of the critical zone before combo, tool tier included.</param>
     /// <param name="criticalPerCombo">Critical width added per consecutive critical swing.</param>
     /// <param name="maxCombo">Consecutive criticals that still widen the zone.</param>
-    /// <param name="jitter">How far the zones' centre may move from the middle of the bar each swing.</param>
-    public GatheringSession(int swings, float cycleSeconds, float normalWidth, float criticalWidth, float criticalPerCombo,
+    /// <param name="jitter">How far the zones' centre may move from the sweet spot each swing.</param>
+    public GatheringSession(int swings, float riseSeconds, float sweetSpot, float normalWidth, float criticalWidth, float criticalPerCombo,
         int maxCombo, float jitter, System.Random random)
     {
         SwingsRequired = Mathf.Max(1, swings);
-        this.cycleSeconds = Mathf.Max(0.1f, cycleSeconds);
+        this.riseSeconds = Mathf.Max(0.1f, riseSeconds);
+        this.sweetSpot = sweetSpot;
         this.normalWidth = normalWidth;
         this.criticalWidth = criticalWidth;
         this.criticalPerCombo = Mathf.Max(0f, criticalPerCombo);
@@ -89,13 +93,13 @@ public sealed class GatheringSession : ITimingBar
     public bool IsComplete => SwingsDone >= SwingsRequired;
 
     /// <summary>The marker's place on the bar, 0 (bottom) to 1 (top).</summary>
-    public float Position => phase < 0.5f ? phase * 2f : 2f - phase * 2f;
+    public float Position => phase;
 
     public SwingZones Zones { get; private set; }
 
     public string Counter => $"{Mathf.Min(SwingsDone + 1, SwingsRequired)}/{SwingsRequired}{(Combo > 1 ? $"  x{Combo}" : "")}";
 
-    /// <summary>Moves the marker. When a whole cycle passes without a press the swing resolves as a glancing blow.</summary>
+    /// <summary>Moves the marker. At the top of the bar, with no press, the swing comes down by itself as a normal one.</summary>
     /// <returns>True when this tick timed a swing out.</returns>
     public bool Tick(float deltaTime)
     {
@@ -104,13 +108,13 @@ public sealed class GatheringSession : ITimingBar
             return false;
         }
 
-        phase += deltaTime / cycleSeconds;
+        phase += deltaTime / riseSeconds;
         if (phase < 1f)
         {
             return false;
         }
 
-        Resolve(SwingResult.Glancing);
+        Resolve(SwingResult.Normal);
         return true;
     }
 
@@ -157,7 +161,7 @@ public sealed class GatheringSession : ITimingBar
 
     private void NewZones()
     {
-        float center = 0.5f + ((float)random.NextDouble() * 2f - 1f) * jitter;
+        float center = sweetSpot + ((float)random.NextDouble() * 2f - 1f) * jitter;
         Zones = new SwingZones(center, normalWidth, CriticalWidthFor(criticalWidth, criticalPerCombo, Combo, maxCombo));
     }
 }

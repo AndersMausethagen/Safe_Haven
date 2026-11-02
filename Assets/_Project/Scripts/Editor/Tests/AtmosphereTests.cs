@@ -820,7 +820,15 @@ public sealed class AtmosphereTests
             Assert.IsTrue(fog.shaftDensity.overrideState && fog.shaftDensity.value > 0f, name + " shafts on");
             Assert.IsTrue(fog.shaftColor.overrideState, name + " shaft colour set");
             Color c = fog.shaftColor.value;
-            Assert.IsTrue(c.r >= c.g && c.g >= c.b, name + " shafts are slightly warm");
+            if (name == "SafeHaven_Volume")
+            {
+                Assert.IsTrue(c.r >= c.g && c.g >= c.b, name + " shafts are slightly warm");
+            }
+            else
+            {
+                Assert.IsTrue(c.b >= c.g && c.g >= c.r, name + " shafts are cold: these woods aren't Haven");
+            }
+
             Assert.Greater(c.b, 0.75f, name + " shafts are near-white, not yellow");
             Assert.Greater(fog.shaftGlow.value, 0f, name + " beams glow in the air");
         }

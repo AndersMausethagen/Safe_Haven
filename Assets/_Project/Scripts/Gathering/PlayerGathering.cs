@@ -24,7 +24,7 @@ public readonly struct GatheringSwing
 /// <summary>
 /// Runs the gathering timing minigame on the player. When an interaction starts on a ResourceNode whose tool uses the
 /// minigame (GatheringMinigameSettings), it holds the interaction open and runs a GatheringSession: each Interact or
-/// Attack press is a swing; a whole bar cycle without one is a glancing blow. How good a swing was is settled by the press,
+/// Attack press is a swing; with no press the tool comes down by itself. How good a swing was is settled by the press,
 /// so timing stays fair, but the tool then has to come down: the blow itself, with its sound, chips and everything that
 /// follows, happens when it lands. Glancing blows wear the tool. When the last swing lands the node completes as usual and
 /// every critical adds a bonus of its main yield. Taking damage can
@@ -132,7 +132,7 @@ public sealed class PlayerGathering : MonoBehaviour
             {
                 autoTimer = 0f;
                 Session.Resolve(SwingResult.Normal);
-                Swing(SwingResult.Normal);
+                Swing(SwingResult.Normal, pressed: false);
             }
 
             return;
@@ -140,7 +140,7 @@ public sealed class PlayerGathering : MonoBehaviour
 
         if (Session.Tick(Time.deltaTime))
         {
-            Swing(SwingResult.Glancing);
+            Swing(SwingResult.Normal, pressed: false);
         }
     }
 
@@ -173,7 +173,8 @@ public sealed class PlayerGathering : MonoBehaviour
         int toolTier = ItemInventory.GatheringTier(gameObject, definition.GatherTool);
         Session = new GatheringSession(
             definition.Swings,
-            profile.CycleSeconds / Mathf.Max(0.1f, definition.SwingSpeed),
+            profile.RiseSeconds / Mathf.Max(0.1f, definition.SwingSpeed),
+            settings.SweetSpot,
             profile.NormalZoneWidth,
             settings.CriticalWidthFor(profile, toolTier, definition.RequiredToolTier),
             settings.CriticalWidthPerCombo,
@@ -225,11 +226,12 @@ public sealed class PlayerGathering : MonoBehaviour
     }
 
     // The player sees at once how the swing went; the blow itself waits for the tool to land.
-    private void Swing(SwingResult result)
+    private void Swing(SwingResult result, bool pressed = true)
     {
-        if (barView != null)
+        // A swing left to itself is the steady work: only what the player did is worth a word.
+        if (barView != null && pressed)
         {
-            barView.Flash(result == SwingResult.Critical ? "Critical!" : result == SwingResult.Normal ? "Good" : "Glancing", result);
+            barView.Flash(result == SwingResult.Critical ? Session.Combo > 1 ? $"Clean cut! x{Session.Combo}" : "Clean cut!" : result == SwingResult.Normal ? "Good" : "Too early", result);
         }
 
         if (blowComing)

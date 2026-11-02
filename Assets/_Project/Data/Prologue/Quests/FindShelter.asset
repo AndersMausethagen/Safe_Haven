@@ -19,6 +19,8 @@ MonoBehaviour:
   prerequisites: []
   start: 2
   startEvent: {fileID: 11400000, guid: 8eb5d1eaca7f351419207cf31f6401cf, type: 2}
+  startDelay: 0
+  onStarted: []
   objectivesInOrder: 0
   objectives:
   - type: 6
@@ -27,6 +29,7 @@ MonoBehaviour:
     item: {fileID: 0}
     resource: {fileID: 0}
     monster: {fileID: 0}
+    faction: 1
     building: {fileID: 0}
     raid: {fileID: 0}
     mustExtract: 0
@@ -38,4 +41,6 @@ MonoBehaviour:
   rewardItems: []
   rewardResources: []
   rewardRecipes: []
+  experience: 0
   completionEvent: {fileID: 0}
+  onCompleted: []

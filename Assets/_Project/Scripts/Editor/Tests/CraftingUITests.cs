@@ -112,7 +112,7 @@ public sealed class CraftingUITests
         StringAssert.Contains("Tool", text);
         StringAssert.Contains("Chops trees.", text);
         StringAssert.Contains("3 Wood", text);
-        StringAssert.Contains("Forge  ·  1 m 30 s", text);
+        StringAssert.Contains("Smithy  ·  1 m 30 s", text);
         StringAssert.Contains("The queue is full.", text);
         StringAssert.DoesNotContain("Right-click", text);
     }

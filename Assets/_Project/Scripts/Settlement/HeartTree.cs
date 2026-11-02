@@ -77,7 +77,7 @@ public sealed class HeartTree : MonoBehaviour, IArea, IBuildArea
     {
         foreach (BuildingDefinition building in crafting.Buildings)
         {
-            if (building != null && building.ShowInBuildMenu && crafting.IsKnown(building))
+            if (building != null && building.ShowInBuildMenu && crafting.IsKnown(building) && BuildingUnlocks.IsOpen(building))
             {
                 yield return building;
             }

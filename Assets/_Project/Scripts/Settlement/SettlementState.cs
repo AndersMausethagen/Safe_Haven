@@ -23,6 +23,8 @@ public sealed class ResidentRecord
 
     public ResidentDefinition Resident { get; }
     public JobDefinition Job { get; set; }
+    /// <summary>The player asked them to stop working through their job's orders.</summary>
+    public bool WorkPaused { get; set; }
 }
 
 /// <summary>
@@ -37,6 +39,7 @@ public sealed class ResidentRecord
 /// </summary>
 public sealed class SettlementState
 {
+    private readonly Dictionary<BuildingDefinition, int> builtTiers = new Dictionary<BuildingDefinition, int>();
     private readonly List<ResidentRecord> residents = new List<ResidentRecord>();
 
     public bool PortalRepaired { get; private set; }
@@ -66,6 +69,55 @@ public sealed class SettlementState
     public bool BreachIsNear => Breach == BreachStatus.Pending || (BreachesWon > 0 && SuccessfulExtractions + 1 >= NextBreachAt);
 
     public IReadOnlyList<ResidentRecord> Residents => residents;
+
+    /// <summary>The Smithy's tier as last seen at home: 0 before there is one. What raids and workers go by, where no building is loaded.</summary>
+    public int SmithyTier => BuiltTier(CraftingStationType.Anvil);
+
+    /// <summary>What workers have made since the player last heard about it.</summary>
+    public Dictionary<IStackDefinition, int> MadeByWorkers { get; } = new Dictionary<IStackDefinition, int>();
+
+    /// <summary>The best tier standing of a kind of building, as last seen at home.</summary>
+    public int BuiltTier(BuildingDefinition building) => building != null && builtTiers.TryGetValue(building, out int tier) ? tier : 0;
+
+    public int BuiltTier(CraftingStationType station)
+    {
+        int best = 0;
+        foreach (KeyValuePair<BuildingDefinition, int> built in builtTiers)
+        {
+            if (built.Key.Station == station)
+            {
+                best = UnityEngine.Mathf.Max(best, built.Value);
+            }
+        }
+
+        return best;
+    }
+
+    /// <summary>Remembers what stands at home, since a raid can't look. Read again by HavenProgress; not saved, as loading a game lands at home.</summary>
+    public void NoteBuildings(IEnumerable<BuildingObject> standing)
+    {
+        builtTiers.Clear();
+        foreach (BuildingObject building in standing)
+        {
+            if (building.Definition == null)
+            {
+                continue;
+            }
+
+            NoteBuilt(building.Definition, building.TryGetComponent(out Construction construction) ? construction.Level : 1);
+        }
+    }
+
+    public void NoteBuilt(BuildingDefinition building, int tier)
+    {
+        builtTiers[building] = UnityEngine.Mathf.Max(BuiltTier(building), tier);
+    }
+
+    public void NoteMadeByWorker(IStackDefinition made, int amount)
+    {
+        MadeByWorkers.TryGetValue(made, out int known);
+        MadeByWorkers[made] = known + amount;
+    }
     /// <summary>Purification batches waiting, including the one in progress.</summary>
     public int PurificationQueued { get; private set; }
     /// <summary>Seconds spent on the batch in progress.</summary>

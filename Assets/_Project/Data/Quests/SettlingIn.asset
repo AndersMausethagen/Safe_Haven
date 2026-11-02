@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::QuestDefinition
   id: settling_in
   displayName: Gifts of the Clearing
-  description: A hearth starts small. Gather the fallen branches and loose stones the clearing offers, by hand; watch your resource bars (I) fill.
+  description: 'A hearth starts small. Craft a stone hatchet and pickaxe from your bag (B), then gather what the clearing offers: enough for a fire and a workshop.'
   chain: The First Days
   prerequisites:
   - {fileID: 11400000, guid: 00e21ff059394a4459d8cec92bc2d489, type: 2}
@@ -26,7 +26,7 @@ MonoBehaviour:
   objectives:
   - type: 1
     description: 
-    amount: 8
+    amount: 12
     item: {fileID: 11400000, guid: 8ae2883815327b74fa7975309c803f92, type: 2}
     resource: {fileID: 0}
     monster: {fileID: 0}
@@ -39,8 +39,21 @@ MonoBehaviour:
     countAlreadyOwned: 1
   - type: 1
     description: 
-    amount: 8
+    amount: 6
     item: {fileID: 11400000, guid: b5567f7d75200bd46befbd1dab298f36, type: 2}
+    resource: {fileID: 0}
+    monster: {fileID: 0}
+    faction: 1
+    building: {fileID: 0}
+    raid: {fileID: 0}
+    mustExtract: 1
+    withinMinutes: 0
+    questEvent: {fileID: 0}
+    countAlreadyOwned: 1
+  - type: 1
+    description: 
+    amount: 6
+    item: {fileID: 11400000, guid: e8bb5d2fbded52b42a179a47cce32d53, type: 2}
     resource: {fileID: 0}
     monster: {fileID: 0}
     faction: 1

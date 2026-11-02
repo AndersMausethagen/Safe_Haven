@@ -28,6 +28,9 @@ MonoBehaviour:
   showInBuildMenu: 1
   knownFromStart: 1
   sortOrder: 14
+  requires:
+  - building: {fileID: 11400000, guid: cfa8f019a4062c84f8e9b8cd432080e0, type: 2}
+    tier: 1
   yardDepth: 0
   yardSide: 0
   placeInLines: 0
@@ -44,10 +47,18 @@ MonoBehaviour:
       amount: 6
     - item: {fileID: 11400000, guid: e8bb5d2fbded52b42a179a47cce32d53, type: 2}
       amount: 6
+    essence: []
     work: 7
     renown: 2
     craftSpeed: 0.3
     extraQueue: 1
     extraOutput: 0
     extraStorage: 0
+    raidSeconds: 0
+    extraRumours: 0
+    comfort: 0
+    extraLogs: 0
+    teachesRecipes: []
+  comfort: 0
+  teachesRecipes: []
   deathSound: {fileID: 0}

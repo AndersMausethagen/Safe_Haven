@@ -125,6 +125,12 @@ public sealed class StationQueue
     /// <summary>How fast it works: 1 is normal. Set by its CraftingStation from upgrades and a worker; not saved.</summary>
     public float SpeedMultiplier { get; set; } = 1f;
 
+    /// <summary>The tier of the station working this queue, kept up by the station. Stations that aren't buildings have no limit.</summary>
+    public int Tier { get; set; } = Tiers.Max;
+
+    /// <summary>How many crafts in the queue a worker started, so they aren't announced one by one. Not saved: at worst one is announced.</summary>
+    public int WorkerCrafts { get; set; }
+
     /// <summary>
     /// Works for the given seconds, delivering every craft that finishes. Resources go to storage first (may be null).
     /// Calls finished once per delivered craft. Returns how many crafts were delivered.

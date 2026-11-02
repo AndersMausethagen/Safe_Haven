@@ -28,6 +28,9 @@ MonoBehaviour:
   showInBuildMenu: 1
   knownFromStart: 1
   sortOrder: 5
+  requires:
+  - building: {fileID: 11400000, guid: 1fe15b30940bf7049a4e4966e9954e1b, type: 2}
+    tier: 1
   yardDepth: 1.5
   yardSide: 2
   placeInLines: 0
@@ -51,6 +54,11 @@ MonoBehaviour:
     extraQueue: 0
     extraOutput: 0
     extraStorage: 0
+    raidSeconds: 0
+    extraRumours: 0
+    comfort: 0
+    extraLogs: 0
+    teachesRecipes: []
   - title: Master's
     description: A cook's shelf of spices from far away.
     cost:
@@ -67,4 +75,11 @@ MonoBehaviour:
     extraQueue: 2
     extraOutput: 0
     extraStorage: 0
+    raidSeconds: 0
+    extraRumours: 0
+    comfort: 0
+    extraLogs: 0
+    teachesRecipes: []
+  comfort: 0
+  teachesRecipes: []
   deathSound: {fileID: 0}

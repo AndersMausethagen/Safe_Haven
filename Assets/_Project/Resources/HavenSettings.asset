@@ -26,6 +26,14 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 33e7204287863854f8c6ad025490f531, type: 2}
   - {fileID: 11400000, guid: 4260d606f7c62c042b848adc806c44d3, type: 2}
   - {fileID: 11400000, guid: 8adfc30233928ec499c01587419eabaa, type: 2}
+  restedBonuses:
+  - stat: 15
+    op: 0
+    value: 20
+  - stat: 0
+    op: 0
+    value: 15
+  restedSecondsPerComfort: 60
   ranks:
   - name: Overgrown Camp
     renown: 0

@@ -28,6 +28,9 @@ MonoBehaviour:
   showInBuildMenu: 1
   knownFromStart: 1
   sortOrder: 19
+  requires:
+  - building: {fileID: 11400000, guid: cfa8f019a4062c84f8e9b8cd432080e0, type: 2}
+    tier: 1
   yardDepth: 0
   yardSide: 0
   placeInLines: 0
@@ -37,4 +40,6 @@ MonoBehaviour:
   buildWork: 0
   renown: 1
   upgrades: []
+  comfort: 0
+  teachesRecipes: []
   deathSound: {fileID: 0}

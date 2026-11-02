@@ -107,7 +107,10 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics
         }
     }
 
-    private void Assign(JobDefinition job, GameObject user)
+    private void Assign(JobDefinition job, GameObject user) => GiveJob(resident, job, user);
+
+    /// <summary>Gives someone a job, in conversation or from the Haven window: records it and teaches the player what the job knows.</summary>
+    public static void GiveJob(ResidentDefinition resident, JobDefinition job, GameObject user)
     {
         GameSession.Settlement.AssignJob(resident, job);
         var crafting = user != null ? user.GetComponent<PlayerCrafting>() : null;

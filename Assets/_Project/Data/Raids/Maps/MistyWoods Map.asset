@@ -215,25 +215,47 @@ MonoBehaviour:
   heightmapResolution: 513
   paintResolution: 512
   smoothing: 1
-  terrainMaterial: {fileID: 2100000, guid: a8286b09a6780e54faab5ac0e4ecd549, type: 2}
+  terrainMaterial: {fileID: 2100000, guid: beee5b8d39dee7c4ca2454003cef872e, type: 2}
   forestLayer: {fileID: 8574412962073106934, guid: ecc08845117d8ff4292ef94943f24cac, type: 2}
   pathLayer: {fileID: 8574412962073106934, guid: 3826170dd2ea2f44fa5843b55848d635, type: 2}
   cliffLayer: {fileID: 8574412962073106934, guid: 5eff5eab3949c934fa43287f1e9b7170, type: 2}
   cliffSlope: {x: 30, y: 42}
+  growth:
+  - layer: {fileID: 8574412962073106934, guid: ecc08845117d8ff4292ef94943f24cac, type: 2}
+    shortGrass: 0.8
+    tallGrass: 0.4
+    bushes: 0.35
+    plants: 0.85
+    bareAt: 0
+    colour: {r: 0.20417777, g: 0.2602722, b: 0.080274634, a: 1}
+  - layer: {fileID: 8574412962073106934, guid: 3826170dd2ea2f44fa5843b55848d635, type: 2}
+    shortGrass: 0
+    tallGrass: 0
+    bushes: 0
+    plants: 0
+    bareAt: 0.8
+    colour: {r: 0.20600533, g: 0.15090886, b: 0.09056545, a: 1}
+  - layer: {fileID: 8574412962073106934, guid: 5eff5eab3949c934fa43287f1e9b7170, type: 2}
+    shortGrass: 0
+    tallGrass: 0
+    bushes: 0
+    plants: 0
+    bareAt: 0.45
+    colour: {r: 0.27122262, g: 0.29232028, b: 0.2651938, a: 1}
   trees:
-  - prefab: {fileID: 9018092729994154052, guid: cbf6b224eae263a4fa0da9382fc0378e, type: 3}
+  - prefab: {fileID: 342216150029137331, guid: 05d9be943be862447a1933d69a8e3cc7, type: 3}
     weight: 3
     scale: {x: 0.8, y: 1.2}
-  - prefab: {fileID: 3842251888249152184, guid: 2a40a933c2bca86468ea2d582e91b1d4, type: 3}
+  - prefab: {fileID: 87484893306219694, guid: a1e41dbe35e29ab46b0bc155e2511fbb, type: 3}
     weight: 3
     scale: {x: 0.8, y: 1.2}
-  - prefab: {fileID: 392566255979189769, guid: 001a5ac1ad512f84bade5542eef701c4, type: 3}
+  - prefab: {fileID: 1466856639027214656, guid: 3e91ef7ed802f4d489644612f6999826, type: 3}
     weight: 2
     scale: {x: 0.85, y: 1.25}
-  - prefab: {fileID: 1666386914703650363, guid: 541018515c094c040b18fd701beafa98, type: 3}
+  - prefab: {fileID: 5505034768409955292, guid: 826eb366a51f8f84cb3b4dd5a40e7a31, type: 3}
     weight: 1.5
     scale: {x: 0.85, y: 1.15}
-  - prefab: {fileID: 6115765233837260235, guid: 5af76f63208fa8341b16d39bc62e6117, type: 3}
+  - prefab: {fileID: 4457990635928993247, guid: ff5c49f4d9add5542ba8093c08005c92, type: 3}
     weight: 0.5
     scale: {x: 0.8, y: 1.1}
   treeSpacing: 2.6
@@ -251,7 +273,7 @@ MonoBehaviour:
     scale: {x: 0.8, y: 1.2}
   rockSpacing: 7
   rocksAtCliffs: 0.5
-  rocksInForest: 0.05
+  rocksInForest: 0.12
   siteRules:
   - kind: 3
     pointsPerSite: 3

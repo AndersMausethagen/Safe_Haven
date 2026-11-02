@@ -24,6 +24,7 @@ public sealed class PlaytestLogger : MonoBehaviour, IGameSystem
     public void Initialise(PlaytestSettings settings)
     {
         logging = settings.LogRuns;
+        Cheats.Used += OnCheat;
         if (logging)
         {
             GameEvents.Raised += OnGameEvent;
@@ -165,8 +166,12 @@ public sealed class PlaytestLogger : MonoBehaviour, IGameSystem
         }
     }
 
+    // A run helped along says so, so it isn't read as how the game plays.
+    private void OnCheat(string cheat) => Write(PlaytestLog.Cheat, cheat);
+
     private void OnDestroy()
     {
+        Cheats.Used -= OnCheat;
         GameEvents.Raised -= OnGameEvent;
         EndSession();
     }

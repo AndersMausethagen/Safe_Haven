@@ -30,6 +30,9 @@ MonoBehaviour:
   showInBuildMenu: 1
   knownFromStart: 1
   sortOrder: 12
+  requires:
+  - building: {fileID: 11400000, guid: 25c95a1289ab72b4ea0bb96e2ec3f020, type: 2}
+    tier: 1
   yardDepth: 2
   yardSide: 0
   placeInLines: 0
@@ -46,12 +49,18 @@ MonoBehaviour:
       amount: 6
     - item: {fileID: 11400000, guid: b5567f7d75200bd46befbd1dab298f36, type: 2}
       amount: 6
+    essence: []
     work: 8
     renown: 4
     craftSpeed: 0.3
     extraQueue: 1
     extraOutput: 0
     extraStorage: 0
+    raidSeconds: 0
+    extraRumours: 0
+    comfort: 0
+    extraLogs: 0
+    teachesRecipes: []
   - title: Master's
     description: Smoke hooks, a salt box and a cook's patience.
     cost:
@@ -59,10 +68,18 @@ MonoBehaviour:
       amount: 8
     - item: {fileID: 11400000, guid: f243c15300698e044a98d785099354c6, type: 2}
       amount: 2
+    essence: []
     work: 9
     renown: 6
     craftSpeed: 0.3
     extraQueue: 2
     extraOutput: 0
     extraStorage: 0
+    raidSeconds: 0
+    extraRumours: 0
+    comfort: 0
+    extraLogs: 0
+    teachesRecipes: []
+  comfort: 2
+  teachesRecipes: []
   deathSound: {fileID: 0}

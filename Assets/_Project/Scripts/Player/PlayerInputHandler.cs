@@ -123,6 +123,7 @@ public sealed class PlayerInputHandler : MonoBehaviour
         stateMachine.ReleaseAttack();
         stateMachine.RequestGuard(false);
         movement.SetMovementInput(Vector3.zero);
+        movement.SetMoveKeys(Vector2.zero);
         movement.ClearAimDirection();
         if (stealth != null)
         {
@@ -143,6 +144,7 @@ public sealed class PlayerInputHandler : MonoBehaviour
         Vector3 cameraRight = Vector3.ProjectOnPlane(movementCamera.transform.right, Vector3.up).normalized;
         Vector3 direction = cameraRight * moveInput.x + cameraForward * moveInput.y;
         movement.SetMovementInput(Vector3.ClampMagnitude(direction, 1f));
+        movement.SetMoveKeys(moveInput);
         UpdateAimDirection();
     }
 
@@ -381,7 +383,8 @@ public sealed class PlayerInputHandler : MonoBehaviour
 
     private void OnInventoryToggle(InputAction.CallbackContext context)
     {
-        RequestWindow(UIWindowId.Resources);
+        // Essences are shown in the bag now, so both keys open it.
+        RequestWindow(UIWindowId.Items);
     }
 
     private void OnItemsToggle(InputAction.CallbackContext context)

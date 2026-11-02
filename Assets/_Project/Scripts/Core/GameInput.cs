@@ -63,6 +63,7 @@ public static class GameInput
     public static InputAction Pause => Find("System/Pause");
     public static InputAction QuickSave => Find("System/QuickSave");
     public static InputAction QuickLoad => Find("System/QuickLoad");
+    public static InputAction CheatMenu => Find("System/CheatMenu");
 
     // UI
     public static InputAction Point => Find("UI/Point");

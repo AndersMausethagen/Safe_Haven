@@ -45,19 +45,6 @@ public static class GrassSetup
         ("Yellow Flowers", Shape.WildFlowers, 6, 0.24f, 0.36f),
     };
 
-    /// <summary>The Nordic plants FillByGround grows in patches: name, patch noise scale (1/m), how rare the patches
-    /// are (noise threshold), and how thickly they grow inside one.</summary>
-    /// The plant clears grass this many cells around it, so it is not drowned in the lawn.
-    private static readonly (string Name, float Scale, float Threshold, float Thickness, int Clearing)[] Plants =
-    {
-        ("Fern", 0.11f, 0.64f, 0.5f, 1),
-        ("Blueberry", 0.15f, 0.66f, 0.6f, 1),
-        ("Lingonberry", 0.17f, 0.7f, 0.55f, 1),
-        ("Heather", 0.13f, 0.64f, 0.7f, 0),
-        ("White Flowers", 0.22f, 0.68f, 0.35f, 0),
-        ("Yellow Flowers", 0.2f, 0.74f, 0.3f, 0),
-    };
-
     public static int KindCount => Kinds.Length;
 
     /// <summary>Night glow of the glowing plants (HDR, light blue); vertex colour B marks the parts that glow.</summary>
@@ -575,117 +562,17 @@ public static class GrassSetup
 
         Undo.RegisterCompleteObjectUndo(data, "Fill Terrain With Grass");
         UseInstanceCounts(data);
-        int resolution = data.detailResolution;
-        int alphaWidth = data.alphamapWidth, alphaHeight = data.alphamapHeight;
-        float[,,] weights = data.GetAlphamaps(0, 0, alphaWidth, alphaHeight);
-        var amounts = new GroundFill[data.terrainLayers.Length];
-        foreach (GroundFill fill in fills)
-        {
-            int index = System.Array.IndexOf(data.terrainLayers, fill.layer);
-            if (index >= 0)
-            {
-                amounts[index] = fill;
-            }
-        }
-
-        int[] plantLayers = Plants.Select(plant => Layer(plant.Name)).ToArray();
-        int[][,] plantCells = plantLayers.Select(_ => new int[resolution, resolution]).ToArray();
-        var shortCells = new int[resolution, resolution];
-        var tallCells = new int[resolution, resolution];
-        var bushCells = new int[resolution, resolution];
         WaterSurface[] water = Object.FindObjectsByType<WaterSurface>();
         Physics.SyncTransforms();
-        Vector3 origin = terrain.transform.position;
-        float offset = seed * 17.31f;
-        int grown = 0;
-        for (int z = 0; z < resolution; z++)
+        var growth = fills.Select(fill => new TerrainGrowth.Ground
         {
-            for (int x = 0; x < resolution; x++)
-            {
-                float u = (x + 0.5f) / resolution, v = (z + 0.5f) / resolution;
-                int ax = Mathf.Min((int)(u * alphaWidth), alphaWidth - 1), az = Mathf.Min((int)(v * alphaHeight), alphaHeight - 1);
-                float shortAmount = 0f, tallAmount = 0f, bushAmount = 0f, plantAmount = 0f;
-                for (int l = 0; l < amounts.Length; l++)
-                {
-                    float w = weights[az, ax, l];
-                    shortAmount += w * amounts[l].shortGrass;
-                    tallAmount += w * amounts[l].tallGrass;
-                    bushAmount += w * amounts[l].bushes;
-                    plantAmount += w * amounts[l].plants;
-                }
-
-                if (shortAmount + tallAmount + bushAmount + plantAmount <= 0.01f)
-                {
-                    continue;
-                }
-
-                Vector3 point = new Vector3(origin.x + u * data.size.x, 0f, origin.z + v * data.size.z);
-                if (UnderWater(terrain, point, water) || Covered(terrain, point))
-                {
-                    continue;
-                }
-
-                // Patches: broad noise thins the lawn, a second noise gathers tall grass, rare spots grow bushes.
-                float lawn = Mathf.PerlinNoise(point.x * 0.09f + offset, point.z * 0.09f);
-                float tall = Mathf.PerlinNoise(point.x * 0.16f - offset, point.z * 0.16f + 3.7f);
-                float bush = Mathf.PerlinNoise(point.x * 0.35f + 9.1f, point.z * 0.35f - offset);
-                // Counts per cell, rounded with a little jitter so fractions still grow some clumps.
-                float jitter = Mathf.Repeat(Mathf.Sin(x * 12.9898f + z * 78.233f) * 43758.547f, 1f);
-                shortCells[z, x] = Mathf.FloorToInt(2f * shortAmount * Mathf.Lerp(0.45f, 1f, lawn) + jitter);
-                tallCells[z, x] = Mathf.FloorToInt(tallAmount * Mathf.SmoothStep(0f, 1f, (tall - 0.5f) * 3.5f) + jitter * 0.999f);
-                bushCells[z, x] = bush > 1f - 0.12f * bushAmount && jitter < 0.15f ? 1 : 0;
-                for (int k = 0; k < Plants.Length; k++)
-                {
-                    // Each plant grows in its own patches (noise), thinly, and a few strays scatter everywhere.
-                    var plant = Plants[k];
-                    float patch = Mathf.PerlinNoise(point.x * plant.Scale + 31.7f * (k + 1) + offset, point.z * plant.Scale - 17.3f * (k + 1));
-                    float roll = Mathf.Repeat(Mathf.Sin(x * 12.9898f + z * 78.233f + (k + 1) * 3.17f) * 43758.547f, 1f);
-                    bool inPatch = patch > plant.Threshold && roll < plant.Thickness * plantAmount * Mathf.InverseLerp(plant.Threshold, 1f, patch) * 2f;
-                    plantCells[k][z, x] = inPatch || roll < 0.0015f * plantAmount ? 1 : 0;
-                }
-                grown++;
-            }
-        }
-
-        // Plants push the grass aside around them.
-        for (int k = 0; k < Plants.Length; k++)
-        {
-            int clearing = Plants[k].Clearing;
-            for (int z = 0; z < resolution; z++)
-            {
-                for (int x = 0; x < resolution; x++)
-                {
-                    if (plantCells[k][z, x] == 0)
-                    {
-                        continue;
-                    }
-
-                    for (int dz = -clearing; dz <= clearing; dz++)
-                    {
-                        for (int dx = -clearing; dx <= clearing; dx++)
-                        {
-                            int cz = z + dz, cx = x + dx;
-                            if (cz >= 0 && cx >= 0 && cz < resolution && cx < resolution)
-                            {
-                                shortCells[cz, cx] = 0;
-                                tallCells[cz, cx] = 0;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        data.SetDetailLayer(0, 0, shortLayer, shortCells);
-        data.SetDetailLayer(0, 0, tallLayer, tallCells);
-        data.SetDetailLayer(0, 0, bushLayer, bushCells);
-        for (int k = 0; k < Plants.Length; k++)
-        {
-            if (plantLayers[k] >= 0)
-            {
-                data.SetDetailLayer(0, 0, plantLayers[k], plantCells[k]);
-            }
-        }
+            layer = fill.layer,
+            shortGrass = fill.shortGrass,
+            tallGrass = fill.tallGrass,
+            bushes = fill.bushes,
+            plants = fill.plants,
+        }).ToArray();
+        int grown = TerrainGrowth.Fill(terrain, growth, seed, point => UnderWater(terrain, point, water) || Covered(terrain, point));
         EditorUtility.SetDirty(data);
         terrain.Flush();
         BakeGroundColour(terrain);

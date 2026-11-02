@@ -289,7 +289,7 @@ public sealed class GatheringMinigamePage : SystemsPage
             float maxCrit = GatheringSession.CriticalWidthFor(profile.CriticalZoneWidth, settings.CriticalWidthPerCombo, settings.MaxCombo, settings.MaxCombo);
             Derived($"{profile.Tool}: critical zone (base / max combo)", $"{profile.CriticalZoneWidth:P0} / {maxCrit:P0} of the bar");
             Derived($"{profile.Tool}: critical window / normal noise",
-                $"{profile.CycleSeconds * 0.5f * profile.CriticalZoneWidth:0.00} s per pass / {settings.NoiseRadius(SwingResult.Normal) * profile.Loudness:0} m");
+                $"{profile.RiseSeconds * profile.CriticalZoneWidth:0.00} s per swing / {settings.NoiseRadius(SwingResult.Normal) * profile.Loudness:0} m");
         }
 
         Derived("Glancing blows until a new tool breaks", wear > 0f ? Mathf.CeilToInt(1f / wear).ToString() : "never");

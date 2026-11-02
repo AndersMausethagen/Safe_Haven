@@ -40,6 +40,8 @@ public sealed class HavenProgress : MonoBehaviour
     {
         HavenHud.Create();
         HavenWindow.Create();
+        KeepTrackOfBuildings();
+        TellWhatWorkersMade();
         clearedQuarter = Mathf.FloorToInt(Overgrowth.ClearedShare * 4f + 0.001f);
         Count(false);
     }
@@ -72,6 +74,7 @@ public sealed class HavenProgress : MonoBehaviour
     public void Count(bool announce)
     {
         nextCount = Time.time + RecountSeconds;
+        KeepTrackOfBuildings();
         int now = HavenRenown.Compute();
         if (announce && renown >= 0 && now > renown)
         {
@@ -98,6 +101,40 @@ public sealed class HavenProgress : MonoBehaviour
         }
 
         RaiseRankEvents(settings);
+    }
+
+    // Raids can't see the base, so what they go by is noted here; touching a staffed station's queue keeps its tier and speed
+    // current, and creates it, so its worker can start.
+    private static void KeepTrackOfBuildings()
+    {
+        GameSession.Settlement.NoteBuildings(System.Linq.Enumerable.Where(BuildingObject.Active, IsStanding));
+        foreach (CraftingStation station in CraftingStation.Active)
+        {
+            if (station.HasWorker && station.Usable)
+            {
+                _ = station.Queue;
+            }
+        }
+    }
+
+    private static bool IsStanding(BuildingObject building) => !building.TryGetComponent(out Construction construction) || construction.IsStanding;
+
+    private static void TellWhatWorkersMade()
+    {
+        var made = GameSession.Settlement.MadeByWorkers;
+        if (made.Count == 0)
+        {
+            return;
+        }
+
+        var lines = new System.Collections.Generic.List<string>();
+        foreach (var entry in made)
+        {
+            lines.Add($"{entry.Value} {entry.Key.DisplayName}");
+        }
+
+        made.Clear();
+        GameMessages.Post($"While you were gone your people made {string.Join(", ", lines)}.", MessageKind.Gain);
     }
 
     // Every rank reached counts, so a quest about a rank also finishes for a haven that got there before the event existed.

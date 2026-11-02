@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::GatheringNodeDefinition
   id: overgrowth_greatboulder
   displayName: Great Boulder
-  tier: 3
+  tier: 2
   yields:
     entries:
     - item: {fileID: 11400000, guid: b5567f7d75200bd46befbd1dab298f36, type: 2}
@@ -28,7 +28,7 @@ MonoBehaviour:
       maxQuantity: 2
       probability: 1
   gatherTool: 2
-  requiredToolTier: 3
+  requiredToolTier: 2
   gatherAnimation: 5
   gatherSeconds: 4
   swings: 5

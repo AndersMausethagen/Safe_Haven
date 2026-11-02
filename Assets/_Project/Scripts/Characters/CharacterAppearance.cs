@@ -19,10 +19,8 @@ public sealed class CharacterAppearance
 
     public string name = "";
     public CharacterGender gender;
-    /// <summary>Skin tone of the body.</summary>
+    /// <summary>Skin tone of the body and the face alike.</summary>
     public int skin;
-    /// <summary>The face (head texture).</summary>
-    public int face;
     public int hair;
     public int hairColour;
     public int brows;
@@ -40,7 +38,7 @@ public sealed class CharacterAppearance
     public CharacterAppearance Clone() => (CharacterAppearance)MemberwiseClone();
 
     /// <summary>Changes to the name only don't need the body rebuilt, so it isn't part of the key.</summary>
-    public string LookKey => $"{(int)gender}.{skin}.{face}.{hair}.{hairColour}.{brows}.{beard}.{eyes}.{underclothes}";
+    public string LookKey => $"{(int)gender}.{skin}.{hair}.{hairColour}.{brows}.{beard}.{eyes}.{underclothes}";
 
     /// <summary>Keeps the name to the allowed length and without surrounding spaces.</summary>
     public static string CleanName(string value)

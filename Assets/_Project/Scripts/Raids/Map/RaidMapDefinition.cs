@@ -76,6 +76,10 @@ public sealed class RaidMapDefinition : ScriptableObject
     [Tooltip("Slopes (degrees) where rock starts to show, and where it covers everything.")]
     [SerializeField] private Vector2 cliffSlope = new Vector2(30f, 42f);
 
+    [Header("Growth")]
+    [Tooltip("Grass, bushes and plants on each painted layer, grown on every map when a raid loads.")]
+    [SerializeField] private List<TerrainGrowth.Ground> growth = new List<TerrainGrowth.Ground>();
+
     [Header("Trees")]
     [SerializeField] private List<Scatter> trees = new List<Scatter>();
     [Tooltip("Metres between trees where the forest is densest (green = white).")]
@@ -118,6 +122,7 @@ public sealed class RaidMapDefinition : ScriptableObject
     public TerrainLayer PathLayer => pathLayer;
     public TerrainLayer CliffLayer => cliffLayer;
     public Vector2 CliffSlope => cliffSlope;
+    public IReadOnlyList<TerrainGrowth.Ground> Growth => growth;
     public IReadOnlyList<Scatter> Trees => trees;
     public float TreeSpacing => treeSpacing;
     public float MaxTreeSlope => maxTreeSlope;

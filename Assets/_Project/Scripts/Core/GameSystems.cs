@@ -71,6 +71,7 @@ public sealed class GameSystems : MonoBehaviour
 
         Add<ExperienceTracker>(experience => experience.Initialise(LevelingSettings.Current));
         Add<OptionsSystem>(options => options.Initialise());
+        Add<CheatSystem>(cheats => cheats.Initialise());
 
         SceneManager.sceneLoaded += OnSceneLoaded;
     }

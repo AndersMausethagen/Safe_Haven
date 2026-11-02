@@ -13,24 +13,27 @@ MonoBehaviour:
   m_Name: Forge
   m_EditorClassIdentifier: Assembly-CSharp::BuildingDefinition
   id: iron_anvil
-  displayName: Forge
-  description: A smith's forge for metal tools and weapons. Its heart must be made of Trollstone.
-  icon: {fileID: 21300000, guid: 1196489d6a65ec044ac0dfeea2682b29, type: 3}
+  displayName: Smithy
+  description: Smelts ore into ingots and works metal into tools, weapons and armor. A tier smelts what its next upgrade costs.
+  icon: {fileID: 21300000, guid: 3b03e52c07c63ff4b97286a6cce0b91c, type: 3}
   faction: 0
   combatStats: {fileID: 11400000, guid: ba3ea0b2c76aa9442945e1ff65be154a, type: 2}
-  prefab: {fileID: 3088187126403450786, guid: 0d738d283d4eac84fa081c39bb7f3fcd, type: 3}
+  prefab: {fileID: 7100604914703576133, guid: 16de969be02def24faf332b37dfa353e, type: 3}
   constructionCost: []
   constructionItems:
-  - item: {fileID: 11400000, guid: fcf0552d231ec8b40a3de2796f1bc4c3, type: 2}
-    amount: 3
+  - item: {fileID: 11400000, guid: b5567f7d75200bd46befbd1dab298f36, type: 2}
+    amount: 12
   - item: {fileID: 11400000, guid: 59d371b7b63e8e24bb946051d808bc9b, type: 2}
-    amount: 8
-  - item: {fileID: 11400000, guid: f243c15300698e044a98d785099354c6, type: 2}
-    amount: 6
+    amount: 4
+  - item: {fileID: 11400000, guid: a370187223419a048b6cebe8f7e345a3, type: 2}
+    amount: 4
   showInBuildMenu: 1
-  knownFromStart: 0
+  knownFromStart: 1
   sortOrder: 6
-  yardDepth: 1.5
+  requires:
+  - building: {fileID: 11400000, guid: 1fe15b30940bf7049a4e4966e9954e1b, type: 2}
+    tier: 1
+  yardDepth: 2
   yardSide: 0
   placeInLines: 0
   station: 3
@@ -39,32 +42,94 @@ MonoBehaviour:
   buildWork: 10
   renown: 10
   upgrades:
-  - title: Sturdy
-    description: An anvil that rings true.
+  - title: Copper Fire
+    description: 'A hotter fire and a first real anvil: copper tools and gear.'
     cost:
-    - item: {fileID: 11400000, guid: f243c15300698e044a98d785099354c6, type: 2}
-      amount: 3
-    - item: {fileID: 11400000, guid: 59d371b7b63e8e24bb946051d808bc9b, type: 2}
+    - item: {fileID: 11400000, guid: 8cf878eb4a61eb943917a1f9421bb40a, type: 2}
       amount: 6
+    - item: {fileID: 11400000, guid: 59d371b7b63e8e24bb946051d808bc9b, type: 2}
+      amount: 4
+    - item: {fileID: 11400000, guid: a370187223419a048b6cebe8f7e345a3, type: 2}
+      amount: 4
     essence: []
     work: 9
     renown: 6
+    craftSpeed: 0.15
+    extraQueue: 1
+    extraOutput: 0
+    extraStorage: 0
+    raidSeconds: 0
+    extraRumours: 0
+    comfort: 0
+    extraLogs: 0
+    teachesRecipes: []
+  - title: Iron Fire
+    description: 'Bellows that breathe on their own: iron tools and gear.'
+    cost:
+    - item: {fileID: 11400000, guid: f243c15300698e044a98d785099354c6, type: 2}
+      amount: 8
+    - item: {fileID: 11400000, guid: 3b6626518ea9eb040b7d45591fac015b, type: 2}
+      amount: 6
+    - item: {fileID: 11400000, guid: 8865a285b55516842a98bac1e1e53ef6, type: 2}
+      amount: 4
+    essence: []
+    work: 11
+    renown: 8
+    craftSpeed: 0.15
+    extraQueue: 0
+    extraOutput: 0
+    extraStorage: 0
+    raidSeconds: 0
+    extraRumours: 0
+    comfort: 0
+    extraLogs: 0
+    teachesRecipes: []
+  - title: Moon Fire
+    description: 'A fire that burns white: moonsilver gear.'
+    cost:
+    - item: {fileID: 11400000, guid: 32fed522ebae2fc4d85b1847b30aa530, type: 2}
+      amount: 6
+    - item: {fileID: 11400000, guid: 3b6626518ea9eb040b7d45591fac015b, type: 2}
+      amount: 4
+    - item: {fileID: 11400000, guid: 03656529f70038c47baa4a9103025a81, type: 2}
+      amount: 2
+    - item: {fileID: 11400000, guid: 4af99768b5986d94e8882065ffe24693, type: 2}
+      amount: 1
+    essence:
+    - resource: {fileID: 11400000, guid: e991fd5ccf0ce314cafafff8badfe173, type: 2}
+      amount: 8
+    work: 13
+    renown: 10
+    craftSpeed: 0.2
+    extraQueue: 1
+    extraOutput: 5
+    extraStorage: 0
+    raidSeconds: 0
+    extraRumours: 0
+    comfort: 0
+    extraLogs: 0
+    teachesRecipes: []
+  - title: Trollfire
+    description: An anvil of trollstone, and nothing out there it can't work.
+    cost:
+    - item: {fileID: 11400000, guid: 32fed522ebae2fc4d85b1847b30aa530, type: 2}
+      amount: 6
+    - item: {fileID: 11400000, guid: fcf0552d231ec8b40a3de2796f1bc4c3, type: 2}
+      amount: 3
+    essence:
+    - resource: {fileID: 11400000, guid: e991fd5ccf0ce314cafafff8badfe173, type: 2}
+      amount: 20
+    work: 15
+    renown: 14
     craftSpeed: 0.25
     extraQueue: 1
     extraOutput: 0
     extraStorage: 0
-  - title: Master's
-    description: Hammers for every metal.
-    cost:
-    - item: {fileID: 11400000, guid: f243c15300698e044a98d785099354c6, type: 2}
-      amount: 6
-    - item: {fileID: 11400000, guid: 3b6626518ea9eb040b7d45591fac015b, type: 2}
-      amount: 4
-    essence: []
-    work: 10
-    renown: 8
-    craftSpeed: 0.25
-    extraQueue: 0
-    extraOutput: 5
-    extraStorage: 0
+    raidSeconds: 0
+    extraRumours: 0
+    comfort: 0
+    extraLogs: 0
+    teachesRecipes: []
+  comfort: 0
+  teachesRecipes: []
   deathSound: {fileID: 0}

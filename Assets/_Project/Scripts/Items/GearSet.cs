@@ -69,7 +69,7 @@ public sealed class GearSet
 
         if (stack.IsBroken)
         {
-            reason = $"{stack.Item.DisplayName} is broken. Repair it at a Construction Table first.";
+            reason = $"{stack.Item.DisplayName} is broken. Repair it at a Workshop first.";
             return false;
         }
 

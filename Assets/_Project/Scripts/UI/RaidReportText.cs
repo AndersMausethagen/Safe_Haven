@@ -111,7 +111,7 @@ public static class RaidReportText
                     builder.Append($"\n{Rarity.Rich(wear.Item.DisplayName, wear.Item.Rarity)}  {wear.Before:P0} → {state}");
                 }
 
-                builder.Append($"\n<color={Muted}>Repair it at a Construction Table.</color>");
+                builder.Append($"\n<color={Muted}>Repair it at a Workshop.</color>");
             }
 
             if (gainedAny)

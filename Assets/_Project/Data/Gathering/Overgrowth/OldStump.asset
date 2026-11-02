@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::GatheringNodeDefinition
   id: overgrowth_oldstump
   displayName: Old Stump
-  tier: 3
+  tier: 2
   yields:
     entries:
     - item: {fileID: 11400000, guid: 8ae2883815327b74fa7975309c803f92, type: 2}
@@ -33,7 +33,7 @@ MonoBehaviour:
       maxQuantity: 3
       probability: 0.8
   gatherTool: 1
-  requiredToolTier: 3
+  requiredToolTier: 2
   gatherAnimation: 5
   gatherSeconds: 4
   swings: 4

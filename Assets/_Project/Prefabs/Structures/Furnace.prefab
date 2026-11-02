@@ -79,6 +79,7 @@ MonoBehaviour:
   faction: 0
   baseStats: {fileID: 11400000, guid: 01155c9e2dd7c27468c1a359f747e1a1, type: 2}
   rules: {fileID: 0}
+  priorityTarget: 0
 --- !u!114 &7748985253648028094
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -151,7 +152,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63c0fee7024160d478352a9a921306b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CraftingStation
-  type: 2
+  type: 3
   stationId: 
   menuRange: 6
 --- !u!114 &5889234996334875079

@@ -144,10 +144,10 @@ public sealed class ArcheryTests
     }
 
     [Test]
-    public void TheHuntersBowIsMadeAtTheConstructionTable()
+    public void TheHuntersBowIsMadeAtTheWoodcuttersLodge()
     {
         RecipeDefinition recipe = RecipeFor("HuntersBow");
-        Assert.AreEqual(CraftingStationType.Workbench, recipe.Station);
+        Assert.AreEqual(CraftingStationType.Sawbench, recipe.Station);
         Assert.IsTrue(recipe.KnownFromStart);
     }
 

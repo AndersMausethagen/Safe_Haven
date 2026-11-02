@@ -48,7 +48,7 @@ public sealed class PlayerPersistence : MonoBehaviour
     public PlayerPose Pose => PlayerPose.Of(transform);
 
     // A CharacterController keeps its own idea of where it is, so it is switched off while the player is moved.
-    private void MoveTo(PlayerPose pose)
+    public void MoveTo(PlayerPose pose)
     {
         var body = GetComponent<CharacterController>();
         bool wasEnabled = body != null && body.enabled;

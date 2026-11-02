@@ -20,6 +20,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: cd536373f8f639f4db60c8810e546ebf, type: 2}
   start: 2
   startEvent: {fileID: 0}
+  startDelay: 0
   onStarted: []
   objectivesInOrder: 0
   objectives:
@@ -29,6 +30,7 @@ MonoBehaviour:
     item: {fileID: 0}
     resource: {fileID: 0}
     monster: {fileID: 0}
+    faction: 1
     building: {fileID: 0}
     raid: {fileID: 0}
     mustExtract: 0
@@ -40,5 +42,6 @@ MonoBehaviour:
   rewardItems: []
   rewardResources: []
   rewardRecipes: []
+  experience: 0
   completionEvent: {fileID: 0}
   onCompleted: []

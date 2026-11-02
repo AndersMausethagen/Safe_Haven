@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::QuestDefinition
   id: firstcamp
   displayName: A Light in the Wood
-  description: The forest cannot forget a hearth that someone tends. Light one inside the Heart Tree's ward so your people can see it through the mist, and set a table beside it to work at. Open the build menu with G.
+  description: The forest cannot forget a hearth that someone tends. Light one inside the Heart Tree's ward so your people can see it through the mist, and raise a workshop beside it to work at. Open the build menu with G.
   chain: The First Days
   prerequisites:
   - {fileID: 11400000, guid: 09a9774284d0e6c44a03b94ad09483f7, type: 2}

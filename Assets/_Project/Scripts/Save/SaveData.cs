@@ -105,6 +105,8 @@ public sealed class ResidentSaveData
     public string id;
     /// <summary>The job's id, or empty while unassigned.</summary>
     public string job;
+    /// <summary>The player has paused their work orders.</summary>
+    public bool workPaused;
 }
 
 [Serializable]

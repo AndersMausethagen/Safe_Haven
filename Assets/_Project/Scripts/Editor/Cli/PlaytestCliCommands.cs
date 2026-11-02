@@ -349,16 +349,9 @@ public static class PlaytestCliCommands
         }
 
         var spawned = new List<string>();
-        for (int i = 0; i < Mathf.Max(1, count); i++)
+        foreach (GameObject instance in Cheats.Spawn(monster.Prefab, count, distance))
         {
-            float angle = (i - (count - 1) * 0.5f) * 25f;
-            Vector3 position = player.transform.position + Quaternion.Euler(0f, angle, 0f) * player.transform.forward * distance;
-            if (NavMesh.SamplePosition(position, out NavMeshHit hit, 5f, NavMesh.AllAreas))
-            {
-                position = hit.position;
-            }
-
-            GameObject instance = Object.Instantiate(monster.Prefab, position, Quaternion.LookRotation(player.transform.position - position));
+            Vector3 position = instance.transform.position;
             spawned.Add($"{instance.name} at {position.x:F0},{position.y:F0},{position.z:F0}");
         }
 

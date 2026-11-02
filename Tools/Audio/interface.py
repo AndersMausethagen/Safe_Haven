@@ -75,7 +75,7 @@ def quest_completed(rng):
     tolled = bell(D3, seconds, rng, hold=0.8)
     mix = place(place(strum / np.abs(strum).max(), held / np.abs(held).max(), 0, 0.3), drum(D2, 1.6, rng), 0, 1.0)
     mix += thump(rng, seconds, 42, 70, 0.14, 0.025) * 0.3
-    return darken(place(mix, tolled / np.abs(tolled).max(), 0.05, 0.28), weight=2)
+    return darken(place(mix, tolled / np.abs(tolled).max(), 0.05, 0.28), weight=-2)
 
 
 def crafted(rng):
@@ -128,11 +128,16 @@ SOUNDS = [
 ]
 
 
+# Quests have to carry over the music at full volume, and their opening drum spends all the headroom: saturating lifts what follows it.
+FORWARD = {"Quest Started": 3.0, "Quest Completed": 3.0}
+
+
 def main():
     for stem, recipe, count, room, wet in SOUNDS:
         for i in range(1, count + 1):
             name = stem if count == 1 else f"{stem} {i}"
-            save(OUT, name, space(recipe(seeded(name)), room, wet))
+            signal = space(recipe(seeded(name)), room, wet)
+            save(OUT, name, drive(signal, FORWARD[stem]) if stem in FORWARD else signal)
 
 
 if __name__ == "__main__":

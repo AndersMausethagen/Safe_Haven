@@ -10,20 +10,20 @@ public enum CraftingStationType
 {
     /// <summary>Crafted anywhere, by hand.</summary>
     [InspectorName("By Hand")] None = 0,
-    /// <summary>Basic tools, weapons and building materials; repairs gear (GDD Construction Table).</summary>
-    [InspectorName("Construction Table")] Workbench = 1,
-    /// <summary>Melts ore into ingots (GDD Furnace).</summary>
-    [InspectorName("Furnace")] Smelter = 2,
-    /// <summary>Metal tools and weapons (GDD Forge).</summary>
-    [InspectorName("Forge")] Anvil = 3,
+    /// <summary>Basic gear, utilities and stone work; repairs gear.</summary>
+    [InspectorName("Workshop")] Workbench = 1,
+    /// <summary>The old Furnace. Nothing is made here now: ingots are smelted at the Smithy.</summary>
+    [InspectorName("Furnace (old)")] Smelter = 2,
+    /// <summary>Smelts ore into ingots and works metal into tools, weapons and armor.</summary>
+    [InspectorName("Smithy")] Anvil = 3,
     /// <summary>Potions and brews (GDD Kitchen / Cauldron).</summary>
     [InspectorName("Cauldron")] AlchemyTable = 4,
     /// <summary>Cloth and leather goods.</summary>
     [InspectorName("Loom")] Loom = 5,
     /// <summary>Simple cooking: berries and water into meals (GDD Campfire).</summary>
     [InspectorName("Campfire")] Campfire = 6,
-    /// <summary>Wood into planks (GDD Sawbench).</summary>
-    [InspectorName("Sawbench")] Sawbench = 7,
+    /// <summary>Wood into planks, shields and bows.</summary>
+    [InspectorName("Woodcutter's Lodge")] Sawbench = 7,
     /// <summary>The repaired portal: Portal Sparks from Life Orbs.</summary>
     [InspectorName("Portal")] Portal = 8,
     /// <summary>Proper cooking: meals with lasting bonuses (GDD Kitchen / Cauldron).</summary>
@@ -46,11 +46,11 @@ public static class CraftingStationTypes
             case CraftingStationType.None:
                 return "By hand";
             case CraftingStationType.Workbench:
-                return "Construction Table";
+                return "Workshop";
             case CraftingStationType.Smelter:
-                return "Furnace";
+                return "Smithy";
             case CraftingStationType.Anvil:
-                return "Forge";
+                return "Smithy";
             case CraftingStationType.AlchemyTable:
                 return "Cauldron";
             case CraftingStationType.Tannery:
@@ -182,11 +182,15 @@ public sealed class CraftingStation : MonoBehaviour
             if (queue != null)
             {
                 queue.SpeedMultiplier = Speed;
+                queue.Tier = Tier;
             }
 
             return queue;
         }
     }
+
+    /// <summary>What it can make: its building's level, or no limit for a station that isn't one.</summary>
+    public int Tier => TryGetComponent(out Construction construction) ? Mathf.Max(1, construction.Level) : Tiers.Max;
 
     private float Upgrades(System.Func<BuildingLevel, float> bonus) =>
         TryGetComponent(out Construction construction) ? construction.Sum(bonus) : 0f;

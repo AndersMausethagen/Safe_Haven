@@ -253,7 +253,7 @@ public static class CharacterLibraryBuilder
     {
         EmoteDefinition Find(string name) => emotes.First(e => e.name == name);
         var catalog = LoadOrCreate<CharacterCatalog>(CatalogPath);
-        var start = new CharacterAppearance { gender = CharacterGender.Male, skin = 1, face = 0, hair = 0, hairColour = 2, brows = 0, beard = 2, eyes = 1 };
+        var start = new CharacterAppearance { gender = CharacterGender.Male, skin = 1, hair = 0, hairColour = 2, brows = 0, beard = 2, eyes = 1 };
         var maleNames = new List<string>
         {
             "Halvar", "Torvald", "Einar", "Leif", "Ragnar", "Sigurd", "Asmund", "Bjorn", "Gunnar", "Ivar", "Ketil", "Ulf", "Orm", "Vidar", "Hakon",

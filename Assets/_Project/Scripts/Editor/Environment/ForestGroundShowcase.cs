@@ -209,6 +209,17 @@ public static class ForestGroundShowcase
             }
         var mesh = new Mesh { name = "Weathered granite " + seed, vertices = vertices, uv = uv, triangles = triangles };
         mesh.RecalculateNormals();
+        // The pole's triangles have no area, which leaves it without a normal: a vertex like that lights as NaN.
+        Vector3[] normals = mesh.normals;
+        for (int n = 0; n < normals.Length; n++)
+        {
+            if (normals[n].sqrMagnitude < 0.5f)
+            {
+                normals[n] = vertices[n].normalized;
+            }
+        }
+
+        mesh.normals = normals;
         mesh.RecalculateTangents();
         mesh.RecalculateBounds();
         return mesh;

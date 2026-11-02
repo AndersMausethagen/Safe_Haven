@@ -37,6 +37,11 @@ public sealed class HavenSettings : GameSettings<HavenSettings>
     [SerializeField] private SoundDefinition rankSound;
     [Tooltip("The people lost with the player. The Haven window shows who is home and who is still out there.")]
     [SerializeField] private List<ResidentDefinition> expedition = new List<ResidentDefinition>();
+    [Header("Well Rested")]
+    [Tooltip("What a comfortable home gives the player when they set out on a raid.")]
+    [SerializeField] private List<StatBonus> restedBonuses = new List<StatBonus>();
+    [Tooltip("How long Well Rested lasts, per point of comfort.")]
+    [SerializeField, Min(1f)] private float restedSecondsPerComfort = 60f;
     [SerializeField] private List<Rank> ranks = new List<Rank>
     {
         new Rank { name = "Overgrown Camp", renown = 0, line = "A fire and a tree, and the forest pressing in." },
@@ -54,6 +59,8 @@ public sealed class HavenSettings : GameSettings<HavenSettings>
     public SoundDefinition RankSound => rankSound;
     public IReadOnlyList<Rank> Ranks => ranks;
     public IReadOnlyList<ResidentDefinition> Expedition => expedition;
+    public IReadOnlyList<StatBonus> RestedBonuses => restedBonuses;
+    public float RestedSecondsPerComfort => restedSecondsPerComfort;
 
     /// <summary>The highest rank this much renown reaches (0 is the first).</summary>
     public int RankFor(int renown)

@@ -11,7 +11,10 @@ using UnityEngine.SceneManagement;
 /// </summary>
 public sealed class SettlementSystem : MonoBehaviour, IGameSystem
 {
+    private const float WorkerLookSeconds = 1f;
+
     private readonly HashSet<string> blockedStations = new HashSet<string>();
+    private float nextWorkerLook;
     private SettlementSettings settings;
 
     public void Initialise(SettlementSettings settlementSettings)
@@ -41,6 +44,12 @@ public sealed class SettlementSystem : MonoBehaviour, IGameSystem
     {
         SettlementState settlement = GameSession.Settlement;
         settlement.Workshops.Tick(Time.deltaTime, GameSession.Stash.Resources, OnCrafted);
+        if (Time.unscaledTime >= nextWorkerLook)
+        {
+            nextWorkerLook = Time.unscaledTime + WorkerLookSeconds;
+            WorkerProduction.Work(settlement, GameSession.Stash);
+        }
+
         if (settings == null || settlement.PurificationQueued <= 0 || !settlement.HasWorker(settings.PurifierJob))
         {
             return;
@@ -58,7 +67,15 @@ public sealed class SettlementSystem : MonoBehaviour, IGameSystem
     private static void OnCrafted(StationQueue station, RecipeDefinition recipe)
     {
         GameEvents.Raise(new GameEvent(GameEventKind.Crafted, recipe.OutputDefinition, recipe.OutputAmount));
-        if (station.IsIdle)
+        if (station.WorkerCrafts > 0)
+        {
+            station.WorkerCrafts--;
+            if (recipe.OutputDefinition is IStackDefinition made)
+            {
+                GameSession.Settlement.NoteMadeByWorker(made, recipe.OutputAmount);
+            }
+        }
+        else if (station.IsIdle)
         {
             GameMessages.Post($"The {station.Type.DisplayName()} finished {recipe.DisplayName}.", MessageKind.Gain);
         }

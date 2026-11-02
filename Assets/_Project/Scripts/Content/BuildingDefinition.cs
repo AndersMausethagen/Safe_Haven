@@ -27,6 +27,18 @@ public sealed class BuildingLevel
     [Tooltip("Extra stash slots for storage (chests, sheds).")]
     [Min(0)] public int extraStorage;
 
+    [Header("What it does for raids")]
+    [Tooltip("Seconds added to the clock of every raid. The best building of a kind counts, not each one.")]
+    [Min(0f)] public float raidSeconds;
+    [Tooltip("More rumours in the raid briefing. The best building of a kind counts.")]
+    [Min(0)] public int extraRumours;
+    [Tooltip("More comfort: a longer Well Rested before a raid. The best building of a kind counts.")]
+    [Min(0)] public int comfort;
+    [Tooltip("Extra logs from each section of a tree cut at home.")]
+    [Min(0)] public int extraLogs;
+    [Tooltip("Recipes the player learns when this level is finished: Watch Post levels teach the raid runes.")]
+    public List<RecipeDefinition> teachesRecipes = new List<RecipeDefinition>();
+
     /// <summary>"12 Oak Plank, 8 Purified Essence".</summary>
     public string CostText
     {
@@ -36,6 +48,20 @@ public sealed class BuildingLevel
             string magic = AmountText.Describe(essence);
             return items.Length > 0 && magic.Length > 0 ? items + ", " + magic : items + magic;
         }
+    }
+}
+
+/// <summary>A building that must stand, at a tier at least this high, before another can be built.</summary>
+[Serializable]
+public struct BuildingRequirement
+{
+    public BuildingDefinition building;
+    [Range(1, Tiers.Max)] public int tier;
+
+    public BuildingRequirement(BuildingDefinition building, int tier)
+    {
+        this.building = building;
+        this.tier = tier;
     }
 }
 
@@ -77,6 +103,8 @@ public sealed class BuildingDefinition : ScriptableObject, ICombatSounds
     [SerializeField] private bool knownFromStart = true;
     [Tooltip("Buildings with lower values are listed first in the build menu.")]
     [SerializeField] private int sortOrder;
+    [Tooltip("What must stand first. Each building opens the next, so the base grows one new thing at a time.")]
+    [SerializeField] private List<BuildingRequirement> requires = new List<BuildingRequirement>();
 
     [Header("Placement")]
     [Tooltip("Meters of open ground kept clear on the entrance side so the building can be reached and used. Nothing may be built there. 0 = no yard.")]
@@ -101,6 +129,10 @@ public sealed class BuildingDefinition : ScriptableObject, ICombatSounds
     [SerializeField, Min(0)] private int renown = 5;
     [Tooltip("Upgrades, in order: level 2, level 3, ...")]
     [SerializeField] private List<BuildingLevel> upgrades = new List<BuildingLevel>();
+    [Tooltip("Comfort it gives once built: a longer Well Rested before a raid. Each kind of building counts once.")]
+    [SerializeField, Min(0)] private int comfort;
+    [Tooltip("Recipes the player learns when it is first built.")]
+    [SerializeField] private List<RecipeDefinition> teachesRecipes = new List<RecipeDefinition>();
 
     [Header("Sound")]
     [Tooltip("Plays when it is destroyed. Empty uses the structure default from Audio Settings.")]
@@ -118,6 +150,9 @@ public sealed class BuildingDefinition : ScriptableObject, ICombatSounds
     public bool ShowInBuildMenu => showInBuildMenu;
     public bool KnownFromStart => knownFromStart;
     public int SortOrder => sortOrder;
+    public IReadOnlyList<BuildingRequirement> Requires => requires;
+    public int Comfort => comfort;
+    public IReadOnlyList<RecipeDefinition> TeachesRecipes => teachesRecipes;
     public float YardDepth => yardDepth;
     public YardSide YardSide => yardSide;
     public bool PlaceInLines => placeInLines;

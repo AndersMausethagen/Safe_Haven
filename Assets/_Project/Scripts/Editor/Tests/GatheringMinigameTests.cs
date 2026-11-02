@@ -124,13 +124,13 @@ public sealed class GatheringMinigameTests
     }
 
     [Test]
-    public void AFullCycleWithoutAPressIsAGlancingBlow()
+    public void LeftAlone_TheToolComesDownAsANormalSwing_WithNothingLost()
     {
         var session = Session(swings: 2, jitter: 0f);
         Assert.IsFalse(session.Tick(0.9f));
         Assert.IsTrue(session.Tick(0.2f));
         Assert.AreEqual(1, session.SwingsDone);
-        Assert.AreEqual(1, session.Glancing);
+        Assert.AreEqual(0, session.Glancing);
         Assert.AreEqual(0f, session.Position, 1e-5f);
     }
 
@@ -138,7 +138,7 @@ public sealed class GatheringMinigameTests
     public void PressAtTheTopOfTheBarCentreIsCritical()
     {
         var session = Session(swings: 3, jitter: 0f);
-        session.Tick(0.25f); // marker at 0.5, the zone centre
+        session.Tick(0.5f); // marker at 0.5, the zone centre
         Assert.AreEqual(SwingResult.Critical, session.Press());
         Assert.AreEqual(1, session.Criticals);
         Assert.AreEqual(1, session.Combo);
@@ -193,7 +193,7 @@ public sealed class GatheringMinigameTests
         GatheringToolProfile sickle = settings.Profile(ToolType.Sickle);
         GatheringToolProfile axe = settings.Profile(ToolType.Axe);
         Assert.IsNotNull(sickle);
-        Assert.Less(sickle.CycleSeconds, axe.CycleSeconds);
+        Assert.Less(sickle.RiseSeconds, axe.RiseSeconds);
         Assert.Less(sickle.Loudness, axe.Loudness);
         Assert.IsNull(settings.Profile(ToolType.None));
         Assert.IsFalse(settings.UsesMinigame(ToolType.None));
@@ -311,7 +311,7 @@ public sealed class GatheringMinigameTests
 
     private static GatheringSession Session(int swings, float jitter, float criticalWidth = 0.1f, float perCombo = 0f, int maxCombo = 0)
     {
-        return new GatheringSession(swings, 1f, 0.4f, criticalWidth, perCombo, maxCombo, jitter, new System.Random(1));
+        return new GatheringSession(swings, 1f, 0.5f, 0.4f, criticalWidth, perCombo, maxCombo, jitter, new System.Random(1));
     }
 
     private ItemDefinition Tool(ToolType type, int tier)

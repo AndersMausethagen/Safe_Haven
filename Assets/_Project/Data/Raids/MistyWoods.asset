@@ -125,49 +125,97 @@ MonoBehaviour:
     - Timber
     - Herbs and Fibres
     - Life Wells
-    count: {x: 100, y: 116}
+    count: {x: 124, y: 140}
     entryBand: 0
     separation: 0
     trigger: 0
     stage: 1
     huntPlayer: 0
     entries:
-    - prefab: {fileID: 8046387889879202812, guid: 262f869a4b8db6440b65cd5554060fce, type: 3}
-      weight: 22.886112
-      maxPerGroup: 0
-      minPerGroup: 1
-    - prefab: {fileID: 6288032578105571644, guid: dd1ab12d09fe61049b4f79441821d70a, type: 3}
-      weight: 4.738568
-      maxPerGroup: 0
-      minPerGroup: 1
-    - prefab: {fileID: 1158895183621609222, guid: e010c7c1cd96e8a4cb11aa834ca0a563, type: 3}
-      weight: 4.2
-      maxPerGroup: 0
-      minPerGroup: 1
-    - prefab: {fileID: 3616788768692720460, guid: 7bbc1b4511da00c4e81fb9d948fe6784, type: 3}
-      weight: 9.9809065
-      maxPerGroup: 0
-      minPerGroup: 1
     - prefab: {fileID: 948381022197778722, guid: 15b33c21de24fb7418664d30fe242c26, type: 3}
-      weight: 42.194412
+      weight: 30
       maxPerGroup: 0
-      minPerGroup: 1
-    - prefab: {fileID: 5701181132641860389, guid: 5e2206bd114732e4da8f8e504471a110, type: 3}
+      minPerGroup: 0
+    - prefab: {fileID: 8046387889879202812, guid: 262f869a4b8db6440b65cd5554060fce, type: 3}
+      weight: 10
+      maxPerGroup: 0
+      minPerGroup: 0
+    - prefab: {fileID: 297312215928108013, guid: 7b176e5facb909c44a2893050cbcc64a, type: 3}
+      weight: 6
+      maxPerGroup: 0
+      minPerGroup: 0
+    - prefab: {fileID: 8682228126172116304, guid: 3e31e979ada082348a0ae00bacfea168, type: 3}
+      weight: 4
+      maxPerGroup: 0
+      minPerGroup: 0
+    - prefab: {fileID: 2009929089532973240, guid: e4175e4dc8cc5b847b691d128a9786aa, type: 3}
+      weight: 8
+      maxPerGroup: 0
+      minPerGroup: 0
+    - prefab: {fileID: 4564521982437816396, guid: dd15144a20b00e2408502e401ea88a06, type: 3}
+      weight: 6
+      maxPerGroup: 0
+      minPerGroup: 0
+    - prefab: {fileID: 4483799220086940710, guid: d30b058cde685564ca6d1e997f261196, type: 3}
+      weight: 2
+      maxPerGroup: 3
+      minPerGroup: 0
+    - prefab: {fileID: 8886612018720869940, guid: 072aecd2c58a7024bb867d70e6bc410d, type: 3}
+      weight: 1
+      maxPerGroup: 2
+      minPerGroup: 0
+    - prefab: {fileID: 6821748221057059875, guid: 363571da353f0c9429cec15d631d1da9, type: 3}
+      weight: 1
+      maxPerGroup: 2
+      minPerGroup: 0
+    - prefab: {fileID: 6865268627933171699, guid: 879636884ea876843960148e835a6af2, type: 3}
+      weight: 1
+      maxPerGroup: 2
+      minPerGroup: 0
+    - prefab: {fileID: 7857519288705744795, guid: e8f5ac7427646e942aaf261bf18f6768, type: 3}
+      weight: 6
+      maxPerGroup: 0
+      minPerGroup: 0
+    - prefab: {fileID: 9111748613750876259, guid: 4cff8733c679b964f97f5aa116eda933, type: 3}
+      weight: 6
+      maxPerGroup: 0
+      minPerGroup: 0
+    - prefab: {fileID: 8775155884352199117, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      weight: 4
+      maxPerGroup: 0
+      minPerGroup: 0
+    - prefab: {fileID: 5392347885279070540, guid: bf3e16d3faa3743469e7a3d035690749, type: 3}
+      weight: 8
+      maxPerGroup: 0
+      minPerGroup: 0
+    - prefab: {fileID: 6288032578105571644, guid: dd1ab12d09fe61049b4f79441821d70a, type: 3}
       weight: 7
       maxPerGroup: 0
-      minPerGroup: 1
+      minPerGroup: 0
+    - prefab: {fileID: 1158895183621609222, guid: e010c7c1cd96e8a4cb11aa834ca0a563, type: 3}
+      weight: 4
+      maxPerGroup: 0
+      minPerGroup: 0
+    - prefab: {fileID: 3616788768692720460, guid: 7bbc1b4511da00c4e81fb9d948fe6784, type: 3}
+      weight: 8
+      maxPerGroup: 0
+      minPerGroup: 0
+    - prefab: {fileID: 5701181132641860389, guid: 5e2206bd114732e4da8f8e504471a110, type: 3}
+      weight: 6
+      maxPerGroup: 0
+      minPerGroup: 0
     - prefab: {fileID: 7806843326714637814, guid: 94dc1085a97345342b8f74fa9c096025, type: 3}
       weight: 4
       maxPerGroup: 0
-      minPerGroup: 1
+      minPerGroup: 0
     - prefab: {fileID: 1699181372466110288, guid: f6d8bfacb080b84408ebd7afcb7fa627, type: 3}
       weight: 4
       maxPerGroup: 0
-      minPerGroup: 1
+      minPerGroup: 0
     - prefab: {fileID: 7424242661901594498, guid: 415fc92bb3a4e3c4892211c08f38f779, type: 3}
-      weight: 1
-      maxPerGroup: 3
-      minPerGroup: 1
+      weight: 2
+      maxPerGroup: 0
+      minPerGroup: 0
   - name: Supply Caches
     category: 2
     pointGroups:
@@ -388,4 +436,5 @@ MonoBehaviour:
         - {fileID: 11400000, guid: 7142359f944d1c74c94de742af777d96, type: 2}
         - {fileID: 11400000, guid: 22c617519cf0b6d44a7d47dddda2e47b, type: 2}
         - {fileID: 11400000, guid: e4f11f1cb84c80a469c77bad4e763eb5, type: 2}
+        - {fileID: 11400000, guid: 43dd06446f4342e4f8f840d218d23a32, type: 2}
         count: 2

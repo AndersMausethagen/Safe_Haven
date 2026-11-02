@@ -24,12 +24,14 @@ MonoBehaviour:
     - resource: {fileID: 11400000, guid: e991fd5ccf0ce314cafafff8badfe173, type: 2}
       amount: 6
     extraRadius: 6
+    raidSeconds: 90
   - cost:
     - resource: {fileID: 11400000, guid: e991fd5ccf0ce314cafafff8badfe173, type: 2}
       amount: 12
     - resource: {fileID: 11400000, guid: a86ac9a152512464ab08e0446c161e61, type: 2}
       amount: 4
     extraRadius: 6
+    raidSeconds: 90
   cursedEssence: {fileID: 11400000, guid: c0e409a7cd38400498ff1c7037737b96, type: 2}
   purifiedEssence: {fileID: 11400000, guid: e991fd5ccf0ce314cafafff8badfe173, type: 2}
   cursedPerBatch: 2

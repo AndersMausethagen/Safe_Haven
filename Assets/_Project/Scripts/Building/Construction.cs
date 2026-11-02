@@ -22,12 +22,14 @@ using UnityEngine;
 public sealed class Construction : MonoBehaviour, ISaveable
 {
     private const string Dressing = "Dressing Level ";
+    private const string TierPart = "Tier ";
 
     [Tooltip("A ruin waiting to be repaired: dark, sunken and tilted until the player pays its cost and hammers it up.")]
     [SerializeField] private bool startsRuined;
 
     private readonly List<(Transform part, Vector3 position, Quaternion rotation)> model = new List<(Transform, Vector3, Quaternion)>();
     private readonly List<Renderer> modelRenderers = new List<Renderer>();
+    private readonly Dictionary<int, Transform> tierParts = new Dictionary<int, Transform>();
     private BuildingObject building;
     private Damageable health;
     private bool shownBroken;
@@ -176,6 +178,14 @@ public sealed class Construction : MonoBehaviour, ISaveable
             model.Add((child, child.localPosition, child.localRotation));
         }
 
+        foreach (Transform part in GetComponentsInChildren<Transform>(true))
+        {
+            if (part.name.StartsWith(TierPart) && int.TryParse(part.name.Substring(TierPart.Length), out int tier))
+            {
+                tierParts[tier] = part;
+            }
+        }
+
         foreach (Renderer renderer in GetComponentsInChildren<Renderer>(true))
         {
             if (!(renderer is ParticleSystemRenderer))
@@ -283,12 +293,22 @@ public sealed class Construction : MonoBehaviour, ISaveable
         CameraShake.Add(ConstructionSettings.Current.FinishShake);
         AudioManager.Play(ConstructionSettings.Current.FinishSound, transform.position);
         GameMessages.Post(first ? $"The {Definition.DisplayName} stands!" : $"The {Title} is finished!", MessageKind.Gain);
+        Teach(by, first ? Definition.TeachesRecipes : Definition.UpgradeTo(Level)?.teachesRecipes);
         if (first)
         {
             GameEvents.Raise(new GameEvent(GameEventKind.Built, Definition, 1, by != null ? by : Player.Current != null ? Player.Current.gameObject : null));
         }
 
         Finished?.Invoke(this);
+    }
+
+    private static void Teach(GameObject by, IEnumerable<RecipeDefinition> recipes)
+    {
+        GameObject learner = by != null ? by : Player.Current != null ? Player.Current.gameObject : null;
+        if (recipes != null && learner != null && learner.TryGetComponent(out PlayerCrafting crafting))
+        {
+            crafting.Unlock(recipes);
+        }
     }
 
     private void Blow()
@@ -360,6 +380,13 @@ public sealed class Construction : MonoBehaviour, ISaveable
 
         for (int level = 2; level <= Mathf.Max(Definition.MaxLevel, 3); level++)
         {
+            // A model made for its tiers shows them itself: the parts of each tier are switched on as it is reached.
+            if (tierParts.TryGetValue(level, out Transform authored))
+            {
+                authored.gameObject.SetActive(Level >= level);
+                continue;
+            }
+
             Transform dressing = transform.Find(Dressing + level);
             if (Level >= level && dressing == null && built)
             {

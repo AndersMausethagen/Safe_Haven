@@ -2,9 +2,9 @@ using UnityEngine;
 
 /// <summary>
 /// A small boat. It floats by real buoyancy: each float point is pushed up by how deep it is under the water, so a loaded
-/// boat sits lower, and rocks on what bumps it. The player sits at the oars and steers the way they would walk: the bow
-/// turns that way and each stroke drives it forward, so a heavy boat is slow to get going and slow to stop. It only rows
-/// while it is in the water. Getting out needs ground in reach; a swimmer can climb back in (PlayerTransport).
+/// boat sits lower, and rocks on what bumps it. The player sits at the oars: forward and back drive it along its length, left
+/// and right turn the bow, wherever the camera looks. Each stroke pushes, so a heavy boat is slow to get going and slow to stop.
+/// It only rows while it is in the water. Getting out needs ground in reach; a swimmer can climb back in (PlayerTransport).
 /// <para>
 /// A river carries it: drag acts against the water, not the ground, so it drifts with the current and rowing upstream is
 /// slower than down. Only with someone aboard: left alone it is tied up, and stays where it was left.
@@ -16,9 +16,10 @@ public sealed class Rowboat : MonoBehaviour, ITransportDriver
 {
     private const float RowerMass = 80f;
     private const float WaterReach = 1.5f;
-    private const float TurnSpring = 5f;
-    private const float TurnDamping = 3f;
+    private const float TurnSpeed = 0.9f;
+    private const float TurnResponse = 3f;
     private const float MaxTurnAcceleration = 4f;
+    private const float BackingShare = 0.6f;
     private const float StrokesPerSecond = 0.9f;
     private const float OarSwing = 28f;
 
@@ -44,6 +45,7 @@ public sealed class Rowboat : MonoBehaviour, ITransportDriver
     private PlayerTransport rower;
     private Quaternion[] oarRest;
     private bool afloat;
+    private static bool taught;
 
     public bool InUse => rower != null;
 
@@ -58,6 +60,9 @@ public sealed class Rowboat : MonoBehaviour, ITransportDriver
     public Vector3 SeatOffset => seatOffset;
 
     public bool IsHeldBy(GameObject user) => rower != null && rower.gameObject == user;
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStatics() => taught = false;
 
     private void Awake()
     {
@@ -89,6 +94,11 @@ public sealed class Rowboat : MonoBehaviour, ITransportDriver
         transport.Wake();
         player.Began(transport);
         player.SitAt(seat, seatOffset);
+        if (!taught)
+        {
+            taught = true;
+            GameMessages.Post($"W and S row, A and D turn. {GameInput.KeyLabel(GameInput.Interact)} gets you out.");
+        }
     }
 
     /// <summary>Gets out onto the nearest ground in reach. Refused, with a word, when there is none.</summary>
@@ -212,23 +222,22 @@ public sealed class Rowboat : MonoBehaviour, ITransportDriver
 
     private void Row(Rigidbody body)
     {
-        Vector3 wish = rower.Movement.MovementInput;
-        wish.y = 0f;
-        if (wish.sqrMagnitude < 0.01f)
+        Vector2 keys = rower.Movement.MoveKeys;
+        if (keys.sqrMagnitude < 0.01f)
         {
             Stroke = Mathf.MoveTowards(Stroke, 0f, Time.fixedDeltaTime * 2f);
             return;
         }
 
-        Vector3 ahead = Vector3.ProjectOnPlane(transform.forward, Vector3.up).normalized;
-        float turn = Vector3.SignedAngle(ahead, wish, Vector3.up) * Mathf.Deg2Rad;
-        float yaw = Mathf.Clamp(turn * TurnSpring - body.angularVelocity.y * TurnDamping, -MaxTurnAcceleration, MaxTurnAcceleration);
+        float yaw = Mathf.Clamp((keys.x * TurnSpeed - body.angularVelocity.y) * TurnResponse, -MaxTurnAcceleration, MaxTurnAcceleration);
         body.AddTorque(Vector3.up * yaw, ForceMode.Acceleration);
 
         Stroke = Mathf.Sin(Time.time * StrokesPerSecond * Mathf.PI * 2f);
         float power = 0.55f + 0.45f * Stroke;
-        float facing = Mathf.Max(0f, Vector3.Dot(ahead, wish.normalized));
-        body.AddForce(ahead * (rowForce * wish.magnitude * facing * power * transport.SpeedScale * rower.EffortScale));
+        // Backing water is weaker than pulling.
+        float drive = keys.y >= 0f ? keys.y : keys.y * BackingShare;
+        Vector3 ahead = Vector3.ProjectOnPlane(transform.forward, Vector3.up).normalized;
+        body.AddForce(ahead * (rowForce * drive * power * transport.SpeedScale * rower.EffortScale));
         rower.PayForRowing(Time.fixedDeltaTime);
     }
 

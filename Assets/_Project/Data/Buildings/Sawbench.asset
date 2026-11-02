@@ -13,22 +13,25 @@ MonoBehaviour:
   m_Name: Sawbench
   m_EditorClassIdentifier: Assembly-CSharp::BuildingDefinition
   id: sawbench
-  displayName: Sawbench
-  description: Saws wood into planks.
-  icon: {fileID: 21300000, guid: b6a3ce62cd9066a48924f125ef5fe25f, type: 3}
+  displayName: Woodcutter's Lodge
+  description: Turns logs into planks, and planks into shields and bows. Woodcutters know how to get more from a tree.
+  icon: {fileID: 21300000, guid: 36cc5f84ddaf06441bc5454e529e6d4d, type: 3}
   faction: 0
   combatStats: {fileID: 11400000, guid: 01155c9e2dd7c27468c1a359f747e1a1, type: 2}
   prefab: {fileID: 2057275120005155185, guid: 0e3a4700e42e2354582ad1b220af74d3, type: 3}
   constructionCost: []
   constructionItems:
+  - item: {fileID: 11400000, guid: 8ae2883815327b74fa7975309c803f92, type: 2}
+    amount: 10
   - item: {fileID: 11400000, guid: b5567f7d75200bd46befbd1dab298f36, type: 2}
     amount: 4
-  - item: {fileID: 11400000, guid: 8ae2883815327b74fa7975309c803f92, type: 2}
-    amount: 8
   showInBuildMenu: 1
   knownFromStart: 1
   sortOrder: 2
-  yardDepth: 1.5
+  requires:
+  - building: {fileID: 11400000, guid: cfa8f019a4062c84f8e9b8cd432080e0, type: 2}
+    tier: 1
+  yardDepth: 2
   yardSide: 0
   placeInLines: 0
   station: 7
@@ -37,30 +40,88 @@ MonoBehaviour:
   buildWork: 6
   renown: 6
   upgrades:
-  - title: Sturdy
+  - title: Sharpened
     description: A heavier blade that bites deeper.
-    cost:
-    - item: {fileID: 11400000, guid: 8ae2883815327b74fa7975309c803f92, type: 2}
-      amount: 8
-    - item: {fileID: 11400000, guid: b5567f7d75200bd46befbd1dab298f36, type: 2}
-      amount: 4
-    work: 8
-    renown: 4
-    craftSpeed: 0.3
-    extraQueue: 1
-    extraOutput: 0
-    extraStorage: 0
-  - title: Master's
-    description: A treadle saw that never tires.
     cost:
     - item: {fileID: 11400000, guid: a370187223419a048b6cebe8f7e345a3, type: 2}
       amount: 8
+    - item: {fileID: 11400000, guid: 8865a285b55516842a98bac1e1e53ef6, type: 2}
+      amount: 4
+    essence: []
+    work: 8
+    renown: 4
+    craftSpeed: 0.2
+    extraQueue: 1
+    extraOutput: 0
+    extraStorage: 0
+    raidSeconds: 0
+    extraRumours: 0
+    comfort: 0
+    extraLogs: 0
+    teachesRecipes: []
+  - title: Treadle
+    description: A treadle saw, and every tree at home gives more.
+    cost:
+    - item: {fileID: 11400000, guid: 8865a285b55516842a98bac1e1e53ef6, type: 2}
+      amount: 6
     - item: {fileID: 11400000, guid: f243c15300698e044a98d785099354c6, type: 2}
-      amount: 2
+      amount: 3
+    - item: {fileID: 11400000, guid: 4df650debd4ce21459e04a0c92ffa207, type: 2}
+      amount: 4
+    essence: []
     work: 9
     renown: 6
-    craftSpeed: 0.3
+    craftSpeed: 0.2
+    extraQueue: 0
+    extraOutput: 0
+    extraStorage: 0
+    raidSeconds: 0
+    extraRumours: 0
+    comfort: 0
+    extraLogs: 1
+    teachesRecipes: []
+  - title: Waterwheel
+    description: A wheel that never tires.
+    cost:
+    - item: {fileID: 11400000, guid: 50d6dfa982b3a264980eaec31b4aae11, type: 2}
+      amount: 6
+    - item: {fileID: 11400000, guid: 32fed522ebae2fc4d85b1847b30aa530, type: 2}
+      amount: 2
+    - item: {fileID: 11400000, guid: 4af99768b5986d94e8882065ffe24693, type: 2}
+      amount: 1
+    essence: []
+    work: 11
+    renown: 7
+    craftSpeed: 0.2
     extraQueue: 0
     extraOutput: 5
     extraStorage: 0
+    raidSeconds: 0
+    extraRumours: 0
+    comfort: 0
+    extraLogs: 0
+    teachesRecipes: []
+  - title: Haven's Own
+    description: No log leaves this yard wasted.
+    cost:
+    - item: {fileID: 11400000, guid: 50d6dfa982b3a264980eaec31b4aae11, type: 2}
+      amount: 6
+    - item: {fileID: 11400000, guid: fcf0552d231ec8b40a3de2796f1bc4c3, type: 2}
+      amount: 1
+    essence:
+    - resource: {fileID: 11400000, guid: e991fd5ccf0ce314cafafff8badfe173, type: 2}
+      amount: 10
+    work: 13
+    renown: 10
+    craftSpeed: 0.25
+    extraQueue: 0
+    extraOutput: 0
+    extraStorage: 0
+    raidSeconds: 0
+    extraRumours: 0
+    comfort: 0
+    extraLogs: 1
+    teachesRecipes: []
+  comfort: 0
+  teachesRecipes: []
   deathSound: {fileID: 0}

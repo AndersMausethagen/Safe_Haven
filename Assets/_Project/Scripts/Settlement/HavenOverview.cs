@@ -191,7 +191,7 @@ public sealed class HavenOverview
         if (crafting != null)
         {
             var standing = new HashSet<BuildingDefinition>(BuildingObject.Active.Select(building => building.Definition));
-            string[] missing = crafting.Buildings.Where(b => b != null && b.ShowInBuildMenu && crafting.IsKnown(b) && !standing.Contains(b) && b.Renown > 0)
+            string[] missing = crafting.Buildings.Where(b => b != null && b.ShowInBuildMenu && crafting.IsKnown(b) && BuildingUnlocks.IsOpen(b) && !standing.Contains(b) && b.Renown > 0)
                 .OrderByDescending(b => b.Renown).Take(MostNewBuildings).Select(b => $"{b.DisplayName} +{b.Renown}").ToArray();
             if (missing.Length > 0)
             {

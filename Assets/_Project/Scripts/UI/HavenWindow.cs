@@ -5,17 +5,22 @@ using UnityEngine.UI;
 using static CodeUI;
 
 /// <summary>
-/// The overview of Safe Haven (H, or asking the Heart Tree): its rank and the climb ahead as a ladder of stops, the numbers at
-/// a glance, then what to do next, what the renown is made of and who of the expedition is home. Built in code by
-/// HavenProgress, so it exists at home only; it draws a HavenOverview, read again every second while it is open.
+/// Where Safe Haven is run from (H, or asking the Heart Tree). The Overview tab has its rank and the climb ahead as a ladder of
+/// stops, the numbers at a glance, then what to do next, what the renown is made of and who of the expedition is home. Stores,
+/// Buildings and People are HavenListPages: everything in camp, every building and every person, each with what can be done about
+/// it from here, including going straight there. Built in code by HavenProgress, so it exists at home only; everything is read
+/// again every second while it is open.
 /// </summary>
 public sealed class HavenWindow : MonoBehaviour
 {
     private const float Width = 1240f;
-    private const float Height = 776f;
+    private const float TabBarHeight = 56f;
+    private const float TabWidth = 190f;
+    private const float Height = 776f + TabBarHeight;
     private const float Margin = 44f;
     private const float ColumnsTop = 314f;
     private const float ColumnsBottom = 680f;
+    private const float PageHeight = ColumnsBottom + 10f;
     private const float StepHeight = 64f;
     private const float PartHeight = 34f;
     private const float PersonHeight = 46f;
@@ -27,6 +32,25 @@ public sealed class HavenWindow : MonoBehaviour
     private const float RiseUnits = 12f;
     private const float ClimbSeconds = 0.7f;
     private const float ScreenMargin = 24f;
+
+    private enum Tab
+    {
+        Overview,
+        Stores,
+        Buildings,
+        People,
+        Raids,
+    }
+
+    private static readonly Tab[] Tabs = { Tab.Overview, Tab.Stores, Tab.Buildings, Tab.People, Tab.Raids };
+    private static Tab lastTab = Tab.Overview;
+
+    private sealed class TabView
+    {
+        public Tab Tab;
+        public TMP_Text Label;
+        public Image Underline;
+    }
 
     private sealed class StepRow
     {
@@ -65,6 +89,13 @@ public sealed class HavenWindow : MonoBehaviour
     private UIWindow window;
     private CanvasGroup fade;
     private RectTransform panel;
+    private RectTransform overviewPage;
+    private HavenListPage storesPage;
+    private HavenListPage buildingsPage;
+    private HavenListPage peoplePage;
+    private HavenListPage raidsPage;
+    private readonly List<TabView> tabViews = new List<TabView>();
+    private Tab shown = Tab.Overview;
     private TMP_Text rankName;
     private TMP_Text rankLine;
     private TMP_Text renownValue;
@@ -156,7 +187,36 @@ public sealed class HavenWindow : MonoBehaviour
         openedAt = Time.unscaledTime;
         fade.alpha = 0f;
         climbFill.anchorMax = new Vector2(0f, 1f);
+        Show(lastTab);
+    }
+
+    private void Show(Tab tab)
+    {
+        shown = tab;
+        lastTab = tab;
+        overviewPage.gameObject.SetActive(tab == Tab.Overview);
+        storesPage.SetVisible(tab == Tab.Stores);
+        buildingsPage.SetVisible(tab == Tab.Buildings);
+        peoplePage.SetVisible(tab == Tab.People);
+        raidsPage.SetVisible(tab == Tab.Raids);
+        storesPage.ScrollToTop();
+        buildingsPage.ScrollToTop();
+        peoplePage.ScrollToTop();
         Read();
+    }
+
+    private void RunAction(HavenAction action)
+    {
+        if (action.ClosesWindow)
+        {
+            window.Close();
+        }
+
+        action.Run();
+        if (window.IsOpen)
+        {
+            Read();
+        }
     }
 
     // At the largest UI and Text Size setting the screen is 720 units tall, less than the window.
@@ -171,14 +231,114 @@ public sealed class HavenWindow : MonoBehaviour
     {
         nextRead = Time.unscaledTime + ReadSeconds;
         FitTheScreen();
-        HavenOverview overview = HavenOverview.Read(Player.Current != null ? Player.Current.gameObject : null);
+        GameObject user = Player.Current != null ? Player.Current.gameObject : null;
+        HavenOverview overview = HavenOverview.Read(user);
         climb = overview.Climb;
-        DrawStanding(overview);
-        DrawSteps(overview);
-        DrawParts(overview);
-        DrawPeople(overview);
+        if (shown == Tab.Overview)
+        {
+            DrawStanding(overview);
+            DrawSteps(overview);
+            DrawParts(overview);
+            DrawPeople(overview);
+        }
+
+        // Every list is read, not only the one shown: the tabs say which of them wants the player.
+        List<HavenShelf> stores = HavenStores.Read();
+        List<HavenShelf> buildings = HavenBuildings.Read(user != null ? user.GetComponent<PlayerCrafting>() : null, user != null ? MaterialPool.For(user) : null,
+            Resources.Load<ContentDatabase>(ContentDatabase.ResourceName), user != null ? user.GetComponent<BuildPlacer>() : null);
+        List<HavenShelf> residents = HavenPeople.Read();
+        DrawTabs(buildings, residents);
+        switch (shown)
+        {
+            case Tab.Stores:
+                storesPage.Draw(stores, StoresSummary(stores));
+                break;
+            case Tab.Buildings:
+                buildingsPage.Draw(buildings, BuildingsSummary(buildings));
+                break;
+            case Tab.People:
+                peoplePage.Draw(residents, PeopleSummary(residents));
+                break;
+            case Tab.Raids:
+                raidsPage.Draw(HavenReadiness.Read(), "What the base does for you out there.");
+                break;
+        }
+
         buildLabel.text = $"Build  ({GameInput.KeyLabel(GameInput.Build)})";
     }
+
+    private void DrawTabs(List<HavenShelf> buildings, List<HavenShelf> residents)
+    {
+        UIStyle style = UIStyle.Current;
+        foreach (TabView view in tabViews)
+        {
+            bool on = view.Tab == shown;
+            int wanted = view.Tab == Tab.Buildings ? WantingAttention(buildings) : view.Tab == Tab.People ? WantingAttention(residents) : 0;
+            view.Label.text = wanted > 0 ? $"{view.Tab}  <color={UIStyle.Hex(style.Warning)}>{wanted}</color>" : view.Tab.ToString();
+            view.Label.color = on ? style.Accent : style.Text;
+            view.Underline.enabled = on;
+        }
+    }
+
+    private static int WantingAttention(List<HavenShelf> shelves)
+    {
+        int wanted = 0;
+        foreach (HavenShelf shelf in shelves)
+        {
+            foreach (HavenEntry entry in shelf.Entries)
+            {
+                if (entry.State == HavenEntryState.Attention)
+                {
+                    wanted++;
+                }
+            }
+        }
+
+        return wanted;
+    }
+
+    private static int EntryCount(List<HavenShelf> shelves)
+    {
+        int count = 0;
+        foreach (HavenShelf shelf in shelves)
+        {
+            count += shelf.Entries.Count;
+        }
+
+        return count;
+    }
+
+    private static int ShelfCount(List<HavenShelf> shelves, string title)
+    {
+        HavenShelf shelf = shelves.Find(one => one.Title == title);
+        return shelf != null ? shelf.Entries.Count : 0;
+    }
+
+    private static string StoresSummary(List<HavenShelf> stores)
+    {
+        if (StashChest.SlotsStanding() < 0)
+        {
+            return "No chest stands yet: without one the stash can't be opened.";
+        }
+
+        ItemContainer stash = GameSession.Stash.Items;
+        int used = 0;
+        for (int i = 0; i < stash.UnlockedSlots; i++)
+        {
+            if (!stash.GetSlot(i).IsEmpty)
+            {
+                used++;
+            }
+        }
+
+        return $"{EntryCount(stores)} kinds in camp. Stash {used} of {stash.UnlockedSlots} slots. What you carry is in your bag.";
+    }
+
+    private static string BuildingsSummary(List<HavenShelf> buildings) =>
+        $"{ShelfCount(buildings, HavenBuildings.StandingShelf)} standing, {ShelfCount(buildings, HavenBuildings.ReadyShelf)} ready to build, {ShelfCount(buildings, HavenBuildings.LockedShelf)} to unlock.";
+
+    private static string PeopleSummary(List<HavenShelf> residents) =>
+        $"{ShelfCount(residents, HavenPeople.HomeShelf)} home, {ShelfCount(residents, HavenPeople.AwayShelf)} still out there.";
 
     private void DrawStanding(HavenOverview overview)
     {
@@ -304,29 +464,49 @@ public sealed class HavenWindow : MonoBehaviour
         panel.gameObject.AddComponent<Outline>().effectDistance = new Vector2(1f, -1f);
         panel.gameObject.AddComponent<UIRole>().Set(UIRole.Kind.Window);
 
+        BuildTabs(style);
+        RectTransform body = At("Body", panel, 0f, TabBarHeight, Width, Height - TabBarHeight);
+        overviewPage = At("Overview", body, 0f, 0f, Width, PageHeight);
         BuildHeader(style);
         BuildLadder(style);
-        Hairline(panel, Margin, 296f, Width - Margin * 2f, 1f, style);
+        Hairline(overviewPage, Margin, 296f, Width - Margin * 2f, 1f, style);
         BuildSteps(style);
-        Hairline(panel, 624f, ColumnsTop, 1f, ColumnsBottom - ColumnsTop, style);
+        Hairline(overviewPage, 624f, ColumnsTop, 1f, ColumnsBottom - ColumnsTop, style);
         BuildParts(style);
-        Hairline(panel, 954f, ColumnsTop, 1f, ColumnsBottom - ColumnsTop, style);
+        Hairline(overviewPage, 954f, ColumnsTop, 1f, ColumnsBottom - ColumnsTop, style);
         BuildPeople(style);
-        BuildFooter(style);
+        storesPage = new HavenListPage(body, "Stores", Width, PageHeight, 2, "Nothing is stored in camp yet. Build a chest and bring something home.", RunAction);
+        buildingsPage = new HavenListPage(body, "Buildings", Width, PageHeight, 2, "Nothing to show yet.", RunAction);
+        peoplePage = new HavenListPage(body, "People", Width, PageHeight, 1, "Nobody has come home yet.", RunAction);
+        raidsPage = new HavenListPage(body, "Raids", Width, PageHeight, 1, "", RunAction);
+        BuildFooter(body, style);
 
         window = root.gameObject.AddComponent<UIWindow>();
         window.Configure(UIWindowId.Haven, content.gameObject);
         window.OpenChanged += OnOpenChanged;
     }
 
+    private void BuildTabs(UIStyle style)
+    {
+        for (int i = 0; i < Tabs.Length; i++)
+        {
+            Tab tab = Tabs[i];
+            Button button = AddTab(tab.ToString(), panel, Margin + i * (TabWidth + 8f), 8f, TabWidth, 44f, style, out TMP_Text label, out Image underline);
+            button.onClick.AddListener(() => Show(tab));
+            tabViews.Add(new TabView { Tab = tab, Label = label, Underline = underline });
+        }
+
+        Hairline(panel, Margin, TabBarHeight, Width - Margin * 2f, 1f, style);
+    }
+
     private void BuildHeader(UIStyle style)
     {
-        TMP_Text kicker = Label("Kicker", panel, Margin, 34f, 500f, 24f, 17f, style.Accent);
+        TMP_Text kicker = Label("Kicker", overviewPage, Margin, 34f, 500f, 24f, 17f, style.Accent);
         kicker.text = "SAFE HAVEN";
         kicker.characterSpacing = 12f;
-        rankName = Label("Rank", panel, Margin, 58f, 620f, 62f, 46f, style.Text);
+        rankName = Label("Rank", overviewPage, Margin, 58f, 620f, 62f, 46f, style.Text);
         style.Title(rankName);
-        rankLine = Label("Line", panel, Margin, 122f, 620f, 32f, 21f, style.Muted);
+        rankLine = Label("Line", overviewPage, Margin, 122f, 620f, 32f, 21f, style.Muted);
         style.Title(rankLine);
         rankLine.color = style.Muted;
 
@@ -338,9 +518,9 @@ public sealed class HavenWindow : MonoBehaviour
 
     private TMP_Text Figure(string label, float x, float width, Color colour, UIStyle style)
     {
-        Hairline(panel, x - 20f, 50f, 1f, 76f, style);
-        TMP_Text value = Label(label + " Value", panel, x, 44f, width - 20f, 50f, 36f, colour);
-        Label(label + " Label", panel, x, 96f, width - 20f, 24f, 17f, style.Muted).text = label;
+        Hairline(overviewPage, x - 20f, 50f, 1f, 76f, style);
+        TMP_Text value = Label(label + " Value", overviewPage, x, 44f, width - 20f, 50f, 36f, colour);
+        Label(label + " Label", overviewPage, x, 96f, width - 20f, 24f, 17f, style.Muted).text = label;
         return value;
     }
 
@@ -350,7 +530,7 @@ public sealed class HavenWindow : MonoBehaviour
         const float inset = 92f;
         float left = Margin + inset;
         float width = Width - (Margin + inset) * 2f;
-        RectTransform track = At("Climb", panel, left, top - 1f, width, 3f);
+        RectTransform track = At("Climb", overviewPage, left, top - 1f, width, 3f);
         track.gameObject.AddComponent<Image>().color = style.ControlLit;
         climbFill = Box("Fill", track, Vector2.zero, Vector2.zero, Vector2.zero);
         climbFill.anchorMax = new Vector2(0f, 1f);
@@ -361,33 +541,33 @@ public sealed class HavenWindow : MonoBehaviour
         for (int i = 0; i < ranks.Count; i++)
         {
             float x = left + (ranks.Count > 1 ? width * i / (ranks.Count - 1) : 0f);
-            var stop = new Stop { Mark = Box(ranks[i].name, panel, new Vector2(0f, 1f), Vector2.one * 14f, new Vector2(x, -top)) };
+            var stop = new Stop { Mark = Box(ranks[i].name, overviewPage, new Vector2(0f, 1f), Vector2.one * 14f, new Vector2(x, -top)) };
             stop.Mark.localRotation = Quaternion.Euler(0f, 0f, 45f);
             stop.Mark.gameObject.AddComponent<Image>().color = style.ControlLit;
             RectTransform fill = Stretch("Fill", stop.Mark);
             fill.offsetMin = new Vector2(2f, 2f);
             fill.offsetMax = new Vector2(-2f, -2f);
             stop.Fill = fill.gameObject.AddComponent<Image>();
-            stop.Name = Label("Name", panel, x - inset, top + 18f, inset * 2f, 28f, 19f, style.Muted, TextAlignmentOptions.Center);
+            stop.Name = Label("Name", overviewPage, x - inset, top + 18f, inset * 2f, 28f, 19f, style.Muted, TextAlignmentOptions.Center);
             stop.Name.text = ranks[i].name;
-            stop.Renown = Label("Renown", panel, x - inset, top + 44f, inset * 2f, 24f, 17f, style.Muted, TextAlignmentOptions.Center);
+            stop.Renown = Label("Renown", overviewPage, x - inset, top + 44f, inset * 2f, 24f, 17f, style.Muted, TextAlignmentOptions.Center);
             stop.Renown.text = ranks[i].renown.ToString();
             stops.Add(stop);
         }
 
-        nextLine = Label("Next", panel, Margin, 252f, Width - Margin * 2f, 30f, 20f, style.Text, TextAlignmentOptions.Center);
+        nextLine = Label("Next", overviewPage, Margin, 252f, Width - Margin * 2f, 30f, 20f, style.Text, TextAlignmentOptions.Center);
     }
 
     private void BuildSteps(UIStyle style)
     {
         const float x = Margin;
         const float width = 560f;
-        Heading("What next", panel, x, ColumnsTop, width, style);
-        noSteps = Label("Nothing", panel, x, ColumnsTop + 40f, width, 30f, 20f, style.Muted);
+        Heading("What next", overviewPage, x, ColumnsTop, width, style);
+        noSteps = Label("Nothing", overviewPage, x, ColumnsTop + 40f, width, 30f, 20f, style.Muted);
         noSteps.text = "Nothing pressing. Safe Haven can breathe.";
         for (int i = 0; i < MostSteps; i++)
         {
-            var row = new StepRow { Root = At($"Step {i}", panel, x, ColumnsTop + 36f + i * StepHeight, width, StepHeight).gameObject };
+            var row = new StepRow { Root = At($"Step {i}", overviewPage, x, ColumnsTop + 36f + i * StepHeight, width, StepHeight).gameObject };
             Transform parent = row.Root.transform;
             RectTransform cap = At("Key", parent, 0f, 10f, 40f, 40f);
             cap.gameObject.AddComponent<Image>();
@@ -409,19 +589,19 @@ public sealed class HavenWindow : MonoBehaviour
     {
         const float x = 644f;
         const float width = 290f;
-        Heading("Renown", panel, x, ColumnsTop, width, style);
-        noParts = Label("Nothing", panel, x, ColumnsTop + 40f, width, 60f, 18f, style.Muted);
+        Heading("Renown", overviewPage, x, ColumnsTop, width, style);
+        noParts = Label("Nothing", overviewPage, x, ColumnsTop + 40f, width, 60f, 18f, style.Muted);
         noParts.textWrappingMode = TextWrappingModes.Normal;
         noParts.text = "Nothing yet. Every building and every cleared stump counts.";
         for (int i = 0; i < MostParts; i++)
         {
-            var row = new PartRow { Root = At($"Part {i}", panel, x, ColumnsTop + 36f + i * PartHeight, width, PartHeight).gameObject };
+            var row = new PartRow { Root = At($"Part {i}", overviewPage, x, ColumnsTop + 36f + i * PartHeight, width, PartHeight).gameObject };
             row.Label = Label("Label", row.Root.transform, 0f, 0f, width - 50f, PartHeight, 19f, style.Text);
             row.Renown = Label("Renown", row.Root.transform, width - 50f, 0f, 50f, PartHeight, 20f, style.Accent, TextAlignmentOptions.Right);
             parts.Add(row);
         }
 
-        partsNote = Label("Note", panel, x, ColumnsBottom - 44f, width, 44f, 16f, style.Muted, TextAlignmentOptions.BottomLeft);
+        partsNote = Label("Note", overviewPage, x, ColumnsBottom - 44f, width, 44f, 16f, style.Muted, TextAlignmentOptions.BottomLeft);
         partsNote.textWrappingMode = TextWrappingModes.Normal;
     }
 
@@ -429,11 +609,11 @@ public sealed class HavenWindow : MonoBehaviour
     {
         const float x = 974f;
         const float width = 222f;
-        Heading("Expedition", panel, x, ColumnsTop, width, style);
-        peopleHome = Label("Home", panel, x, ColumnsTop, width, 26f, 17f, style.Muted, TextAlignmentOptions.Right);
+        Heading("Expedition", overviewPage, x, ColumnsTop, width, style);
+        peopleHome = Label("Home", overviewPage, x, ColumnsTop, width, 26f, 17f, style.Muted, TextAlignmentOptions.Right);
         for (int i = 0; i < MostPeople; i++)
         {
-            var row = new PersonRow { Root = At($"Person {i}", panel, x, ColumnsTop + 36f + i * PersonHeight, width, PersonHeight).gameObject };
+            var row = new PersonRow { Root = At($"Person {i}", overviewPage, x, ColumnsTop + 36f + i * PersonHeight, width, PersonHeight).gameObject };
             RectTransform mark = Box("Mark", row.Root.transform, new Vector2(0f, 1f), Vector2.one * 11f, new Vector2(7f, -PersonHeight * 0.5f));
             mark.localRotation = Quaternion.Euler(0f, 0f, 45f);
             mark.gameObject.AddComponent<Image>().color = style.ControlLit;
@@ -447,12 +627,12 @@ public sealed class HavenWindow : MonoBehaviour
         }
     }
 
-    private void BuildFooter(UIStyle style)
+    private void BuildFooter(RectTransform body, UIStyle style)
     {
-        Hairline(panel, Margin, ColumnsBottom + 10f, Width - Margin * 2f, 1f, style);
+        Hairline(body, Margin, ColumnsBottom + 10f, Width - Margin * 2f, 1f, style);
         const float y = 708f;
-        buildLabel = AddButton("Build", panel, Width - Margin - 366f, y, 186f, UIRole.Kind.PrimaryButton, StartBuilding, out _);
-        AddButton("Close", panel, Width - Margin - 170f, y, 170f, UIRole.Kind.Button, () => window.Close(), out _).text = "Close";
+        buildLabel = AddButton("Build", body, Width - Margin - 366f, y, 186f, UIRole.Kind.PrimaryButton, StartBuilding, out _);
+        AddButton("Close", body, Width - Margin - 170f, y, 170f, UIRole.Kind.Button, () => window.Close(), out _).text = "Close";
     }
 
     // Most of what the window suggests starts in the build menu.

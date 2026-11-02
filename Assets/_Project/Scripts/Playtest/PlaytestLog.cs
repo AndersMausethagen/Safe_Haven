@@ -44,6 +44,7 @@ public static class PlaytestLog
 {
     public const string Header = "played_min,utc,session,scene,event,subject,amount,detail";
     public const string SessionStart = "SessionStart";
+    public const string Cheat = "Cheat";
     public const string SessionEnd = "SessionEnd";
     public const string SceneEntered = "SceneEntered";
     public const string PlayerDied = "PlayerDied";

@@ -491,6 +491,14 @@ public static class BuildTransport
     // ----- The hull -----
 
     // A loft: cross sections along the boat, faceted so the planks show, every other strake a darker submesh.
+    /// <summary>Rebuilds the hull's mesh and nothing else.</summary>
+    public static string RebuildHull()
+    {
+        Mesh mesh = HullMesh();
+        AssetDatabase.SaveAssets();
+        return $"{mesh.name}: {mesh.vertexCount} vertices";
+    }
+
     private static Mesh HullMesh()
     {
         const int along = 16;
@@ -502,7 +510,9 @@ public static class BuildTransport
         void Quad(Vector3 a, Vector3 b, Vector3 c, Vector3 d, int strake)
         {
             int start = vertices.Count;
-            Vector3 normal = Vector3.Cross(b - a, c - a).normalized;
+            // From the diagonals: a quad that narrows to a point has no normal along its short edge, and a vertex without one
+            // lights as NaN, which bloom spreads over the whole screen.
+            Vector3 normal = Vector3.Cross(c - a, d - b).normalized;
             vertices.AddRange(new[] { a, b, c, d });
             normals.AddRange(new[] { normal, normal, normal, normal });
             triangles[strake].AddRange(new[] { start, start + 1, start + 2, start, start + 2, start + 3 });

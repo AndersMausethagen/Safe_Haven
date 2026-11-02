@@ -4,7 +4,7 @@
 /// </summary>
 public enum UIWindowId
 {
-    /// <summary>The raw resource bars (I).</summary>
+    /// <summary>The old raw resource bars. Nothing opens them now: essences are shown in the bag.</summary>
     Resources = 0,
     /// <summary>The item bag and crafting (B).</summary>
     Items = 1,
@@ -36,4 +36,6 @@ public enum UIWindowId
     Cargo = 14,
     /// <summary>The build menu (G): every known building as a picture card, by category.</summary>
     Build = 15,
+    /// <summary>The cheat menu for playtesting (F1).</summary>
+    Cheats = 16,
 }

@@ -28,6 +28,7 @@ MonoBehaviour:
   showInBuildMenu: 1
   knownFromStart: 0
   sortOrder: 17
+  requires: []
   yardDepth: 1.5
   yardSide: 0
   placeInLines: 0
@@ -37,4 +38,6 @@ MonoBehaviour:
   buildWork: 8
   renown: 8
   upgrades: []
+  comfort: 3
+  teachesRecipes: []
   deathSound: {fileID: 0}

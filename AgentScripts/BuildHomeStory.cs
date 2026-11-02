@@ -48,13 +48,13 @@ public static class BuildHomeStory
     {
         Text("Awakening", null, "You wake beneath a great tree in a quiet clearing, and you wake alone. Its bark is warm, and something in it seems to be waiting for you.");
         Text("SettlingIn", null, "A hearth starts small. Gather the fallen branches and loose stones the clearing offers, by hand; watch your resource bars (I) fill.");
-        Text("FirstCamp", "A Light in the Wood", "The forest cannot forget a hearth that someone tends. Light one inside the Heart Tree's ward so your people can see it through the mist, and set a table beside it to work at. Open the build menu with G.");
+        Text("FirstCamp", "A Light in the Wood", "The forest cannot forget a hearth that someone tends. Light one inside the Heart Tree's ward so your people can see it through the mist, and raise a workshop beside it to work at. Open the build menu with G.");
         Text("FoodAndWater", "Strength for the Road", "Eirik was right: nobody fights well on an empty stomach, and you will be walking people home through the Misty Woods. Pick berries, fetch water from the stream and stew a meal at the campfire.");
         Text("RootboundStones", null, "The door to the Misty Woods needs the Heart Tree's light, and cursed roots have reached inside the ward to choke it. Three stones around the clearing still hold that light. Free their Life Orbs.");
         Text("AwakeningThePortal", null, "Across the stream stand the stones that dropped you here. Feed them the Life Orbs and the way back to your people opens.");
         Text("ThroughThePortal", null, "Your people are past the door, and the Misty Woods won't wait. Craft stone tools by hand from your bag (B), then step through. Bring home hardwood and iron ore for the haven, and get back to an extraction point before the portal closes. Carried things are lost if you fall; your tools and weapon come back damaged.");
         Text("KnowYourEnemy", null, "Forest-Bitten Wolves hunt the Misty Woods, on the same paths your people must walk home. Thin their numbers before they grow bolder.");
-        Text("AGrowingHome", null, "Ingrid was the first. When the others come through that door they will need more than a fire: Tor will ask for a sawbench before he asks for supper, Bjarne for a furnace, and everyone for somewhere dry to set down what they carried. Build them.");
+        Text("AGrowingHome", null, "Ingrid was the first. When the others come through that door they will need more than a fire: Tor will ask for a woodcutter's lodge before supper, Bjarne for a smithy, and everyone for somewhere dry to set down what they carried. Build them.");
         Text("TheWeakeningWard", null, "The light that called Ingrid home was seen by other things too. Something is testing the ward. Prepare, then speak to the Heart Tree when you are ready.");
         Text("SmithsRequest", null, "An old note on the board, in the last smith's hand: this hearth wants copper, and proof you can work it.");
     }

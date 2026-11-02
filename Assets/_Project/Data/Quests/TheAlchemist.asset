@@ -20,6 +20,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: f7e615034e347bc438f7fdf1f08bd615, type: 2}
   start: 0
   startEvent: {fileID: 0}
+  startDelay: 0
+  onStarted: []
   objectivesInOrder: 0
   objectives:
   - type: 6
@@ -28,6 +30,7 @@ MonoBehaviour:
     item: {fileID: 0}
     resource: {fileID: 0}
     monster: {fileID: 0}
+    faction: 1
     building: {fileID: 0}
     raid: {fileID: 0}
     mustExtract: 1
@@ -40,15 +43,20 @@ MonoBehaviour:
     item: {fileID: 0}
     resource: {fileID: 0}
     monster: {fileID: 0}
+    faction: 1
     building: {fileID: 11400000, guid: dd9792482f40fc243a8d7294434f1ee9, type: 2}
     raid: {fileID: 0}
     mustExtract: 1
     withinMinutes: 0
     questEvent: {fileID: 0}
     countAlreadyOwned: 0
+  turnInToGiver: 0
+  turnInTo: 
   rewardItems: []
   rewardResources:
   - resource: {fileID: 11400000, guid: c0e409a7cd38400498ff1c7037737b96, type: 2}
     amount: 4
   rewardRecipes: []
+  experience: 0
   completionEvent: {fileID: 0}
+  onCompleted: []

@@ -78,6 +78,12 @@ public sealed class MaterialPool
     /// <summary>True when every cost can be paid. Otherwise names the first thing missing, for the player.</summary>
     public bool CanAfford(IEnumerable<ResourceAmount> resources, IEnumerable<ItemAmount> items, out string missing)
     {
+        if (Cheats.FreeCosts)
+        {
+            missing = null;
+            return true;
+        }
+
         if (resources != null)
         {
             foreach (ResourceAmount cost in resources)
@@ -120,6 +126,11 @@ public sealed class MaterialPool
         if (!CanAfford(resources, items))
         {
             return false;
+        }
+
+        if (Cheats.FreeCosts)
+        {
+            return true;
         }
 
         if (resources != null)

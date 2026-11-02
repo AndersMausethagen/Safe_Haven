@@ -30,6 +30,9 @@ MonoBehaviour:
   showInBuildMenu: 1
   knownFromStart: 1
   sortOrder: 18
+  requires:
+  - building: {fileID: 11400000, guid: 1fe15b30940bf7049a4e4966e9954e1b, type: 2}
+    tier: 1
   yardDepth: 0
   yardSide: 0
   placeInLines: 0
@@ -38,5 +41,49 @@ MonoBehaviour:
   queueLength: 5
   buildWork: 6
   renown: 5
-  upgrades: []
+  upgrades:
+  - title: Lookout
+    description: Someone up there at dusk and dawn. It hears what moves, and the runes of a safer road.
+    cost:
+    - item: {fileID: 11400000, guid: a370187223419a048b6cebe8f7e345a3, type: 2}
+      amount: 8
+    - item: {fileID: 11400000, guid: 8cf878eb4a61eb943917a1f9421bb40a, type: 2}
+      amount: 2
+    essence: []
+    work: 8
+    renown: 4
+    craftSpeed: 0
+    extraQueue: 0
+    extraOutput: 0
+    extraStorage: 0
+    raidSeconds: 0
+    extraRumours: 1
+    comfort: 0
+    extraLogs: 0
+    teachesRecipes:
+    - {fileID: 11400000, guid: 2c54f248ace478c47956005abf31c7f7, type: 2}
+    - {fileID: 11400000, guid: cd5beafe5776a2a4caf027c38e5b9cef, type: 2}
+  - title: Beacon
+    description: A fire you can see from the woods. Now you can choose to go in harder, for more.
+    cost:
+    - item: {fileID: 11400000, guid: 8865a285b55516842a98bac1e1e53ef6, type: 2}
+      amount: 6
+    - item: {fileID: 11400000, guid: f243c15300698e044a98d785099354c6, type: 2}
+      amount: 3
+    essence: []
+    work: 10
+    renown: 6
+    craftSpeed: 0
+    extraQueue: 0
+    extraOutput: 0
+    extraStorage: 0
+    raidSeconds: 0
+    extraRumours: 1
+    comfort: 0
+    extraLogs: 0
+    teachesRecipes:
+    - {fileID: 11400000, guid: 12aee824706af854c80fe6ad0c4025bd, type: 2}
+  comfort: 0
+  teachesRecipes:
+  - {fileID: 11400000, guid: ed6668c1234762246a1666fc7a136fbe, type: 2}
   deathSound: {fileID: 0}

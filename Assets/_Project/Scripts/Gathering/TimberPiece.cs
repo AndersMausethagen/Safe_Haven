@@ -8,8 +8,9 @@ using UnityEngine;
 [DisallowMultipleComponent]
 public sealed class TimberPiece : MonoBehaviour
 {
-    private const float BranchSeconds = 8f;
-    private const float LogSeconds = 14f;
+    private const float BranchSeconds = 4f;
+    // Long enough to see it roll free. Its wood is already in the bag, so it doesn't stay to clutter the ground.
+    private const float LogSeconds = 3.5f;
     private const float FadeSeconds = 0.8f;
     private const float KnockImpulsePerKilogram = 0.5f;
     private const float KnockGap = 0.2f;

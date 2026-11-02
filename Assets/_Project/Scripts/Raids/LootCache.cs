@@ -21,6 +21,8 @@ public sealed class LootCache : MonoBehaviour, IInteractionVerb
     [Tooltip("Shown once the cache is empty, such as an open lid. Optional.")]
     [SerializeField] private GameObject emptyVisual;
 
+    private const int MostEarlyTier = 2;
+
     private readonly List<ItemAmount> contents = new List<ItemAmount>();
     private readonly List<ResourceAmount> resourceContents = new List<ResourceAmount>();
     private bool holdsRelic;
@@ -145,6 +147,11 @@ public sealed class LootCache : MonoBehaviour, IInteractionVerb
         holdsRelic = RaidDirector.Current != null && Random.value < RelicSettings.Current.CacheChance * multiplier;
         foreach (ItemAmount drop in drops.Roll())
         {
+            if (RaidDirector.Current != null && IsAboveThePlayer(drop.Item))
+            {
+                continue;
+            }
+
             int amount = RaidParameters.ScaleAmount(drop.Amount, multiplier, Random.value);
             if (amount > 0)
             {
@@ -160,6 +167,13 @@ public sealed class LootCache : MonoBehaviour, IInteractionVerb
                 resourceContents.Add(new ResourceAmount(drop.Resource, amount));
             }
         }
+    }
+
+    // A cache can't hand over what the Smithy is tiers away from using: metal and gear come at most a tier ahead of it.
+    private static bool IsAboveThePlayer(ItemDefinition item)
+    {
+        bool ladder = item.Category == ItemCategory.Material || item.Category == ItemCategory.Equipment || item.Category == ItemCategory.Tool;
+        return ladder && item.Tier > Mathf.Max(MostEarlyTier, GameSession.Settlement.SmithyTier + 1);
     }
 
     private void ShowState()

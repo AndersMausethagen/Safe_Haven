@@ -9,7 +9,7 @@ using UnityEngine;
 /// Loading a save uses it to turn the ids on disk back into definitions.
 /// </summary>
 [CreateAssetMenu(fileName = "ContentDatabase", menuName = "Safe Haven/Save/Content Database")]
-public sealed class ContentDatabase : ScriptableObject, IContentLookup
+public sealed class ContentDatabase : ScriptableObject, IContentLookup, IContentTeachers
 {
     /// <summary>The name systems load it by, from a Resources folder.</summary>
     public const string ResourceName = "ContentDatabase";

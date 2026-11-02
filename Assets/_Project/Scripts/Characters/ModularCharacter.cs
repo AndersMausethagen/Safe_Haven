@@ -306,7 +306,7 @@ public sealed class ModularCharacter : MonoBehaviour
         }
 
         headMaterials.Clear();
-        Add(headMaterials, body.Face(appearance.face));
+        Add(headMaterials, body.Face(appearance.skin));
         Add(headMaterials, body.Stubble(appearance.hairColour));
         Material eye = body.Eye(appearance.eyes);
         Material brow = body.BrowTint(appearance.hairColour);

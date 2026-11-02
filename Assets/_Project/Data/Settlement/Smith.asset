@@ -14,11 +14,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::JobDefinition
   id: job.smith
   displayName: Smith
-  description: 'Works the forge: repairs to gear cost half, and the forge goes faster.'
+  description: 'Runs the Smithy: keeps ore turning into ingots while you are away, the work goes faster, and repairs to gear cost half.'
   acceptLine: '"Bring me iron. I don''t care how."'
   teachesBuildings: []
   teachesRecipes: []
   workplace: {fileID: 11400000, guid: 25c95a1289ab72b4ea0bb96e2ec3f020, type: 2}
+  workOrders:
+  - recipe: {fileID: 11400000, guid: ee90fc968a1216241885cd9ee9937962, type: 2}
+    stockTarget: 20
+    keepInput: 5
+  - recipe: {fileID: 11400000, guid: 16c776310de495a4a9ccc8f9e07ee96f, type: 2}
+    stockTarget: 30
+    keepInput: 5
   assignedEvent: {fileID: 0}
   extraRumours: 0
   gearRepairDiscount: 0.5

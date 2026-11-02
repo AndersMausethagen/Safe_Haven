@@ -274,7 +274,9 @@ public static class RaidMapSurface
         }
     }
 
-    private static bool IsFolder(Transform node) => node.childCount > 0 && node.GetComponents<Component>().Length == 1;
+    // The generator only holds the spawn groups: moving it would lift every point inside, after they were put on the ground.
+    private static bool IsFolder(Transform node) => node.childCount > 0
+        && (node.GetComponents<Component>().Length == 1 || node.TryGetComponent(out RaidGenerator _));
 
     private static void Snap(Transform target, Terrain terrain, Action<Transform> beforeMoving)
     {

@@ -18,7 +18,7 @@ public static class RaidLauncher
             return "This portal doesn't lead anywhere.";
         }
 
-        if (raid.IsLocked)
+        if (raid.IsLocked && !Cheats.NoRequirements)
         {
             return raid.LockedText;
         }
@@ -61,7 +61,7 @@ public static class RaidLauncher
 
     /// <summary>The seconds a raid gets on top of its rules: Portal Sparks, and what residents' jobs add.</summary>
     public static float ExtraSeconds(int sparks) =>
-        sparks * SettlementSettings.Current.SecondsPerSpark + GameSession.Settlement.JobBonus(job => job.RaidSeconds);
+        sparks * SettlementSettings.Current.SecondsPerSpark + GameSession.Settlement.JobBonus(job => job.RaidSeconds) + HavenReadiness.RaidSeconds;
 
     /// <summary>What a number of Portal Sparks costs, as resources.</summary>
     public static List<ResourceAmount> SparkCost(int sparks)
@@ -122,6 +122,8 @@ public static class RaidLauncher
             problem = "Not enough Portal Sparks.";
             return false;
         }
+
+        HavenReadiness.GiveRest(player);
 
         var modifiers = new List<RaidModifierDefinition>();
         foreach (ItemDefinition item in chosen)

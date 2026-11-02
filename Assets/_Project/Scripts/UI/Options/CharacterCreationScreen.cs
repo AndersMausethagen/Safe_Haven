@@ -184,8 +184,7 @@ public sealed class CharacterCreationScreen : MonoBehaviour
 
         BuildNameRow(list);
         Choice(list, "Body", "A man or a woman.", () => new[] { "Man", "Woman" }, () => (int)look.gender, i => look.gender = (CharacterGender)i);
-        Choice(list, "Skin", "Skin tone.", () => Labels(Body.Skins), () => look.skin, i => look.skin = i);
-        Choice(list, "Face", "The shape of the face.", () => Labels(Body.Faces), () => look.face, i => look.face = i);
+        Choice(list, "Skin", "Skin tone, of the face and body alike.", () => Labels(Body.Skins), () => look.skin, i => look.skin = i);
         Choice(list, "Hair", "Hair style.", () => Labels(Body.HairStyles), () => look.hair, i => look.hair = i);
         Choice(list, "Hair Colour", "Colours the hair, brows and beard alike.", () => Body.HairColours.ToArray(), () => look.hairColour, i => look.hairColour = i);
         Choice(list, "Brows", "Brow shape.", () => Labels(Body.Brows), () => look.brows, i => look.brows = i);
@@ -258,7 +257,6 @@ public sealed class CharacterCreationScreen : MonoBehaviour
     {
         CharacterBodyDefinition body = Body;
         look.skin = Fit(look.skin, body.Skins.Count);
-        look.face = Fit(look.face, body.Faces.Count);
         look.hair = Fit(look.hair, body.HairStyles.Count);
         look.hairColour = Fit(look.hairColour, body.HairColours.Count);
         look.brows = Fit(look.brows, body.Brows.Count);
@@ -284,7 +282,6 @@ public sealed class CharacterCreationScreen : MonoBehaviour
         look.gender = UnityEngine.Random.value < 0.5f ? CharacterGender.Male : CharacterGender.Female;
         CharacterBodyDefinition body = Body;
         look.skin = UnityEngine.Random.Range(0, Mathf.Max(1, body.Skins.Count));
-        look.face = UnityEngine.Random.Range(0, Mathf.Max(1, body.Faces.Count));
         look.hair = UnityEngine.Random.Range(0, Mathf.Max(1, body.HairStyles.Count));
         look.hairColour = UnityEngine.Random.Range(0, Mathf.Max(1, body.HairColours.Count));
         look.brows = UnityEngine.Random.Range(0, Mathf.Max(1, body.Brows.Count));

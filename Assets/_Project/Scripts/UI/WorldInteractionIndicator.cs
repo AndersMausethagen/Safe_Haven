@@ -31,6 +31,7 @@ public sealed class WorldInteractionIndicator : MonoBehaviour
     [SerializeField, Range(0.5f, 1f)] private float appearScale = 0.85f;
 
     private PlayerInteractor interactor;
+    private PlayerStateMachine stateMachine;
     private Damageable health;
     private Camera viewCamera;
     private Vector3 localAnchor;
@@ -44,6 +45,7 @@ public sealed class WorldInteractionIndicator : MonoBehaviour
     private void Awake()
     {
         interactor = GetComponentInParent<PlayerInteractor>();
+        stateMachine = GetComponentInParent<PlayerStateMachine>();
         health = GetComponentInParent<Damageable>();
     }
 
@@ -67,7 +69,7 @@ public sealed class WorldInteractionIndicator : MonoBehaviour
     private void LateUpdate()
     {
         viewCamera = viewCamera != null && viewCamera.isActiveAndEnabled ? viewCamera : Camera.main;
-        if (interactor == null || !interactor.isActiveAndEnabled || (health != null && !health.IsAlive)
+        if (interactor == null || !interactor.isActiveAndEnabled || (health != null && !health.IsAlive) || IsOccupied
             || (UIStateManager.Instance != null && UIStateManager.Instance.IsAnyWindowOpen) || viewCamera == null)
         {
             Hide();
@@ -107,6 +109,9 @@ public sealed class WorldInteractionIndicator : MonoBehaviour
         ApplyScale(Mathf.Lerp(appearScale, 1f, Mathf.SmoothStep(0f, 1f, fade)));
         SetFade(viewCamera.WorldToViewportPoint(transform.position).z > 0f ? fade : 0f);
     }
+
+    // At the oars, or at work on something: the player already knows what they are doing.
+    private bool IsOccupied => interactor.Current != null || (stateMachine != null && stateMachine.IsAboard);
 
     private void SetFade(float value)
     {

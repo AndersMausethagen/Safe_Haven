@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 29a4813b55e8bc543a181501cef14e82, type: 3}
+  m_Name: Bjarne
+  m_EditorClassIdentifier: SafeHaven::RaidRumourDefinition
+  id: rumour.bjarne
+  briefing: A hammer rings in the deep woods at dusk, slow and unevenly, as if the smith is one-armed.
+  site: {fileID: 11400000, guid: a1a6844116d0c1241a3f4794309a579d, type: 2}
+  weight: 2
+  hour: 0
+  seeks: {fileID: 11400000, guid: de521ad7beeb20b49878a9b40c96bced, type: 2}
+  teaches: {fileID: 0}
+  breachComing: 0
+  afterExtractions: 1
+  needsBuilding: {fileID: 11400000, guid: 25c95a1289ab72b4ea0bb96e2ec3f020, type: 2}
+  urgent: 1

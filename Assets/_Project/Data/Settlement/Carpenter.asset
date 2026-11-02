@@ -14,11 +14,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::JobDefinition
   id: job.carpenter
   displayName: Carpenter
-  description: 'Sees to what the forest breaks: mending buildings after a breach costs half, and work at the sawbench goes faster.'
+  description: 'Runs the Woodcutter''s Lodge: keeps logs turning into planks while you are away, the work goes faster, and mending buildings after a breach costs half.'
   acceptLine: '"I''ll have that lot square by morning."'
   teachesBuildings: []
   teachesRecipes: []
   workplace: {fileID: 11400000, guid: 1fe15b30940bf7049a4e4966e9954e1b, type: 2}
+  workOrders:
+  - recipe: {fileID: 11400000, guid: b12ef1fb9c1ac464ba5831fc8f3c7ac6, type: 2}
+    stockTarget: 40
+    keepInput: 10
+  - recipe: {fileID: 11400000, guid: 70b48a7ea0eea624b98f1a500113451b, type: 2}
+    stockTarget: 20
+    keepInput: 4
   assignedEvent: {fileID: 0}
   extraRumours: 0
   gearRepairDiscount: 0

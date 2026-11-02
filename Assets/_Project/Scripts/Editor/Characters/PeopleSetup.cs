@@ -28,33 +28,33 @@ public static class PeopleSetup
         public string[] Outfit;
     }
 
-    private static CharacterAppearance Woman(int skin, int face, int hair, int colour, int eyes, int underclothes) => new CharacterAppearance
+    private static CharacterAppearance Woman(int skin, int hair, int colour, int eyes, int underclothes) => new CharacterAppearance
     {
-        gender = CharacterGender.Female, skin = skin, face = face, hair = hair, hairColour = colour, eyes = eyes, underclothes = underclothes,
+        gender = CharacterGender.Female, skin = skin, hair = hair, hairColour = colour, eyes = eyes, underclothes = underclothes,
     };
 
-    private static CharacterAppearance Man(int skin, int face, int hair, int colour, int brows, int beard, int eyes, int underclothes) => new CharacterAppearance
+    private static CharacterAppearance Man(int skin, int hair, int colour, int brows, int beard, int eyes, int underclothes) => new CharacterAppearance
     {
-        gender = CharacterGender.Male, skin = skin, face = face, hair = hair, hairColour = colour, brows = brows, beard = beard, eyes = eyes,
+        gender = CharacterGender.Male, skin = skin, hair = hair, hairColour = colour, brows = brows, beard = beard, eyes = eyes,
         underclothes = underclothes,
     };
 
     // Hair colours: 0 blond, 1 black, 2 brown, 3 grey. Eyes: 0 blue, 1 brown, 2 green, 3 pale.
     private static readonly Person[] People =
     {
-        new Person { Name = "Sigrid", Resident = "Prologue/Residents/Sigrid", Look = Woman(1, 2, 1, 3, 0, 2),
+        new Person { Name = "Sigrid", Resident = "Prologue/Residents/Sigrid", Look = Woman(1, 1, 3, 0, 2),
             Outfit = new[] { "CuredLeather_Body", "CuredLeather_Waist", "CuredLeather_Feet", "CuredLeather_Hands" } },
-        new Person { Name = "Ingrid", Resident = "Settlement/Ingrid", Look = Woman(0, 0, 0, 0, 0, 0),
+        new Person { Name = "Ingrid", Resident = "Settlement/Ingrid", Look = Woman(0, 0, 0, 0, 0),
             Outfit = new[] { "WovenHide_Body", "WovenHide_Feet" } },
-        new Person { Name = "Runa", Resident = "Prologue/Residents/Runa", Look = Woman(2, 3, 4, 2, 2, 3),
+        new Person { Name = "Runa", Resident = "Prologue/Residents/Runa", Look = Woman(2, 4, 2, 2, 3),
             Outfit = new[] { "WovenHide_Body", "WovenHide_Waist", "WovenHide_Feet" } },
-        new Person { Name = "Liv", Resident = "Prologue/Residents/Liv", Look = Woman(1, 1, 5, 1, 1, 4),
+        new Person { Name = "Liv", Resident = "Prologue/Residents/Liv", Look = Woman(1, 5, 1, 1, 4),
             Outfit = new[] { "CuredLeather_Body", "WovenHide_Feet", "WovenHide_Hands" } },
-        new Person { Name = "Bjarne", Resident = "Prologue/Residents/Bjarne", Look = Man(3, 2, 5, 2, 1, 1, 1, 1),
+        new Person { Name = "Bjarne", Resident = "Prologue/Residents/Bjarne", Look = Man(3, 5, 2, 1, 1, 1, 1),
             Outfit = new[] { "CopperScale_Body", "CuredLeather_Waist", "CuredLeather_Feet" } },
-        new Person { Name = "Tor", Resident = "Prologue/Residents/Tor", Look = Man(1, 1, 1, 0, 0, 3, 0, 0),
+        new Person { Name = "Tor", Resident = "Prologue/Residents/Tor", Look = Man(1, 1, 0, 0, 3, 0, 0),
             Outfit = new[] { "WovenHide_Body", "WovenHide_Feet", "WovenHide_Hands" } },
-        new Person { Name = "Eirik", Resident = "Prologue/Residents/Eirik", Look = Man(4, 4, 2, 1, 2, 0, 2, 2),
+        new Person { Name = "Eirik", Resident = "Prologue/Residents/Eirik", Look = Man(4, 2, 1, 2, 0, 2, 2),
             Outfit = new[] { "CuredLeather_Body", "CuredLeather_Feet", "WovenHide_Waist" } },
     };
 

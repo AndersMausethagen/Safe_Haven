@@ -30,6 +30,11 @@ public static class StationCrafting
             return "Not learned yet.";
         }
 
+        if (recipe.RequiredStationTier > queue.Tier && !Cheats.NoRequirements)
+        {
+            return $"Needs {queue.Type.DisplayName()} Tier {Tiers.ToRoman(recipe.RequiredStationTier)}.";
+        }
+
         if (queue.FreeQueueSlots <= 0)
         {
             return "The queue is full.";

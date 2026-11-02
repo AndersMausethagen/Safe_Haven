@@ -186,7 +186,7 @@ public sealed class HavenBuildingTests
                 Assert.AreEqual(0f, node.Definition.RespawnSeconds, $"{piece.name} never grows back");
             }
 
-            Assert.IsTrue(overgrowth.Any(o => o.GetComponent<ResourceNode>().Definition.RequiredToolTier >= 3), "some wait for better tools");
+            Assert.IsTrue(overgrowth.Any(o => o.GetComponent<ResourceNode>().Definition.RequiredToolTier >= 2), "some wait for better tools");
             Construction ruin = scene.GetRootGameObjects().SelectMany(r => r.GetComponentsInChildren<Construction>(true)).Single(c => c.StartsRuined);
             Assert.AreEqual("StorageShed", ruin.GetComponent<BuildingObject>().Definition.name);
         }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 /// <summary>
 /// How one swinging tool feels in the gathering minigame: how fast the marker runs, how wide the zones are and how loud
@@ -10,8 +11,9 @@ using UnityEngine;
 public sealed class GatheringToolProfile
 {
     [SerializeField] private ToolType tool = ToolType.Axe;
-    [Tooltip("Seconds for the marker to go up and back down at node swing speed 1. A whole cycle without a press is a glancing blow.")]
-    [SerializeField, Range(0.3f, 4f)] private float cycleSeconds = 1.4f;
+    [Tooltip("Seconds for the marker to rise to the top at node swing speed 1. There, with no press, the tool comes down as a normal swing.")]
+    [FormerlySerializedAs("cycleSeconds")]
+    [SerializeField, Range(0.3f, 4f)] private float riseSeconds = 2.2f;
     [Tooltip("Width of the yellow (normal) zone, as a share of the bar.")]
     [SerializeField, Range(0.05f, 1f)] private float normalZoneWidth = 0.35f;
     [Tooltip("Width of the critical zone with a tool of exactly the node's required tier.")]
@@ -23,26 +25,27 @@ public sealed class GatheringToolProfile
     {
     }
 
-    public GatheringToolProfile(ToolType tool, float cycleSeconds, float normalZoneWidth, float criticalZoneWidth, float loudness)
+    public GatheringToolProfile(ToolType tool, float riseSeconds, float normalZoneWidth, float criticalZoneWidth, float loudness)
     {
         this.tool = tool;
-        this.cycleSeconds = cycleSeconds;
+        this.riseSeconds = riseSeconds;
         this.normalZoneWidth = normalZoneWidth;
         this.criticalZoneWidth = criticalZoneWidth;
         this.loudness = loudness;
     }
 
     public ToolType Tool => tool;
-    public float CycleSeconds => cycleSeconds;
+    public float RiseSeconds => riseSeconds;
     public float NormalZoneWidth => normalZoneWidth;
     public float CriticalZoneWidth => criticalZoneWidth;
     public float Loudness => loudness;
 }
 
 /// <summary>
-/// Rules of the gathering timing minigame (axe, pickaxe and sickle): a marker runs up and down a bar and each press is a swing.
-/// A press in the critical (centre) zone gives one extra of the node's main yield and is quiet; the yellow zone is a
-/// normal swing; a miss or no press in a whole cycle is a glancing blow that wears the tool and is loud. In raids each
+/// Rules of the gathering timing minigame (axe, pickaxe and sickle): a marker rises up a bar and the tool comes down at the top by
+/// itself as a normal swing, so timing is a reward and never a chore. A press in the critical zone gives one extra of the node's
+/// main yield and is quiet; the yellow zone is a normal swing; a press well before it is a glancing blow that wears the tool and
+/// is loud. In raids each
 /// swing makes noise that wakes and draws nearby creatures (GatheringNoise) and annoys the forest (ForestAnnoyanceSystem).
 /// How many swings a node takes is set per node (GatheringNodeDefinition.Swings); how each tool's bar feels is set by
 /// its tool profile. Read by PlayerGathering.
@@ -55,9 +58,9 @@ public sealed class GatheringMinigameSettings : GameSettings<GatheringMinigameSe
     [Tooltip("Tools whose nodes use the minigame, and how each one's bar feels. Other nodes keep the timed gather.")]
     [SerializeField] private List<GatheringToolProfile> profiles = new List<GatheringToolProfile>
     {
-        new GatheringToolProfile(ToolType.Axe, 1.4f, 0.35f, 0.08f, 1f),
-        new GatheringToolProfile(ToolType.Pickaxe, 1.6f, 0.3f, 0.07f, 1.1f),
-        new GatheringToolProfile(ToolType.Sickle, 0.7f, 0.25f, 0.07f, 0.35f),
+        new GatheringToolProfile(ToolType.Axe, 2.2f, 0.4f, 0.14f, 1f),
+        new GatheringToolProfile(ToolType.Pickaxe, 2.4f, 0.4f, 0.13f, 1.1f),
+        new GatheringToolProfile(ToolType.Sickle, 1.5f, 0.4f, 0.18f, 0.35f),
     };
 
     [Header("The swing")]
@@ -69,14 +72,16 @@ public sealed class GatheringMinigameSettings : GameSettings<GatheringMinigameSe
     [SerializeField, Range(0.02f, 0.4f)] private float swingWindUp = 0.15f;
 
     [Header("Bar")]
+    [Tooltip("Where the zones sit up the bar. High, so the swing has time to build, and a press in time comes just before the blow would.")]
+    [SerializeField, Range(0.2f, 0.9f)] private float sweetSpot = 0.8f;
     [Tooltip("Critical width added per tool tier above the node's required tier.")]
     [SerializeField, Range(0f, 0.2f)] private float criticalWidthPerTier = 0.03f;
     [Tooltip("Critical width added per critical swing in a row (the combo). Any other result resets it.")]
     [SerializeField, Range(0f, 0.2f)] private float criticalWidthPerCombo = 0.02f;
     [Tooltip("Criticals in a row that still widen the zone.")]
     [SerializeField, Range(0, 10)] private int maxCombo = 3;
-    [Tooltip("How far the zones may move from the middle of the bar each swing, so it can't be done by rhythm alone.")]
-    [SerializeField, Range(0f, 0.4f)] private float zoneJitter = 0.15f;
+    [Tooltip("How far the zones may move from the sweet spot each swing. Zero lets the player feel it as a rhythm.")]
+    [SerializeField, Range(0f, 0.4f)] private float zoneJitter;
 
     [Header("Rewards")]
     [Tooltip("Extra of the node's main yield each critical swing gives.")]
@@ -112,6 +117,7 @@ public sealed class GatheringMinigameSettings : GameSettings<GatheringMinigameSe
     public float CriticalWidthPerTier => criticalWidthPerTier;
     public float CriticalWidthPerCombo => criticalWidthPerCombo;
     public int MaxCombo => maxCombo;
+    public float SweetSpot => sweetSpot;
     public float ZoneJitter => zoneJitter;
     public int BonusPerCritical => bonusPerCritical;
     public float CriticalHitStop => criticalHitStop;

@@ -53,7 +53,7 @@ public static class InputRebinds
         new RebindRow("Combat", "Skill 4", "Player/Skill4"),
         new RebindRow("Combat", "Skill 5", "Player/Skill5"),
 
-        new RebindRow("Windows", "Resources", "Player/Inventory"),
+        new RebindRow("Windows", "Bag (second key)", "Player/Inventory"),
         new RebindRow("Windows", "Bag", "Player/Items"),
         new RebindRow("Windows", "Skills", "Player/Skills"),
         new RebindRow("Windows", "Character", "Player/Character"),

@@ -50,6 +50,12 @@ public sealed class PlayerMovement : MonoBehaviour
     public bool FacingLocked { get; set; }
     /// <summary>The requested movement direction (camera-relative, 0-1 long), before any gating.</summary>
     public Vector3 MovementInput => movementInput;
+
+    /// <summary>The move keys or stick as pressed: x is left and right, y is forward and back. For what is steered from its own
+    /// seat (a boat), where the camera has no say in which way is forward.</summary>
+    public Vector2 MoveKeys { get; private set; }
+
+    public void SetMoveKeys(Vector2 keys) => MoveKeys = keys;
     public Vector3 HorizontalVelocity => horizontalVelocity;
     public float HorizontalSpeed => horizontalVelocity.magnitude;
     /// <summary>Horizontal velocity relative to the character's facing (x = strafe, z = forward), for strafe blend trees.</summary>

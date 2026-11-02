@@ -1,6 +1,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>Something a worker keeps making from the stash, on their own, until there is plenty.</summary>
+[System.Serializable]
+public sealed class WorkOrder
+{
+    public RecipeDefinition recipe;
+    [Tooltip("They stop once the stash holds this many of what it makes.")]
+    [Min(1)] public int stockTarget = 30;
+    [Tooltip("They leave this much of each thing it costs in the stash, so the player can still build.")]
+    [Min(0)] public int keepInput = 10;
+}
+
 /// <summary>
 /// A job a resident can hold in Safe Haven (GDD §15.3), such as Alchemist. Giving the job teaches the player what the
 /// resident knows (buildings and recipes), and systems that need a worker look for a resident with their job: the
@@ -26,6 +37,8 @@ public sealed class JobDefinition : ScriptableObject
     [SerializeField] private List<RecipeDefinition> teachesRecipes = new List<RecipeDefinition>();
     [Tooltip("Where someone with this job works: they stand by a placed building of this kind when there is one.")]
     [SerializeField] private BuildingDefinition workplace;
+    [Tooltip("What they keep making on their own at their workplace, first that can be made first, while the player is away too.")]
+    [SerializeField] private List<WorkOrder> workOrders = new List<WorkOrder>();
     [Tooltip("Raised when someone takes the job, for quests such as \"Find work for the traveler\".")]
     [SerializeField, RaisedByGame] private GameEventDefinition assignedEvent;
 
@@ -48,6 +61,7 @@ public sealed class JobDefinition : ScriptableObject
     public IReadOnlyList<BuildingDefinition> TeachesBuildings => teachesBuildings;
     public IReadOnlyList<RecipeDefinition> TeachesRecipes => teachesRecipes;
     public BuildingDefinition Workplace => workplace;
+    public IReadOnlyList<WorkOrder> WorkOrders => workOrders;
     public GameEventDefinition AssignedEvent => assignedEvent;
     public int ExtraRumours => extraRumours;
     public float GearRepairDiscount => gearRepairDiscount;

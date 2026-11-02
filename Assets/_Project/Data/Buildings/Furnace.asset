@@ -27,13 +27,14 @@ MonoBehaviour:
     amount: 4
   - item: {fileID: 11400000, guid: b5567f7d75200bd46befbd1dab298f36, type: 2}
     amount: 12
-  showInBuildMenu: 1
+  showInBuildMenu: 0
   knownFromStart: 1
   sortOrder: 4
+  requires: []
   yardDepth: 1.5
   yardSide: 0
   placeInLines: 0
-  station: 2
+  station: 3
   outputCapacity: 10
   queueLength: 5
   buildWork: 8
@@ -46,12 +47,18 @@ MonoBehaviour:
       amount: 10
     - item: {fileID: 11400000, guid: 59d371b7b63e8e24bb946051d808bc9b, type: 2}
       amount: 2
+    essence: []
     work: 8.5
     renown: 5
     craftSpeed: 0.25
     extraQueue: 0
     extraOutput: 0
     extraStorage: 0
+    raidSeconds: 0
+    extraRumours: 0
+    comfort: 0
+    extraLogs: 0
+    teachesRecipes: []
   - title: Master's
     description: A bellows that breathes on its own.
     cost:
@@ -59,10 +66,18 @@ MonoBehaviour:
       amount: 6
     - item: {fileID: 11400000, guid: 3b6626518ea9eb040b7d45591fac015b, type: 2}
       amount: 2
+    essence: []
     work: 9.5
     renown: 7
     craftSpeed: 0.25
     extraQueue: 2
     extraOutput: 0
     extraStorage: 0
+    raidSeconds: 0
+    extraRumours: 0
+    comfort: 0
+    extraLogs: 0
+    teachesRecipes: []
+  comfort: 0
+  teachesRecipes: []
   deathSound: {fileID: 0}

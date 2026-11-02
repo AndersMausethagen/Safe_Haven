@@ -68,4 +68,18 @@ public sealed class RecipeDefinition : ScriptableObject
     public bool KnownFromStart => knownFromStart;
     public int SortOrder => sortOrder;
     public int Tier => output != null ? output.Tier : outputResource != null ? outputResource.Tier : 1;
+
+    /// <summary>
+    /// The tier its station must have. Gear and tools are made at their own tier. What is used up (materials, food, potions)
+    /// comes one tier earlier, so a station can refine what its own next upgrade costs: a Tier I Smithy smelts the copper that
+    /// raises it to Tier II, where copper gear is made.
+    /// </summary>
+    public int RequiredStationTier
+    {
+        get
+        {
+            bool isGear = output != null && (output.Category == ItemCategory.Equipment || output.Category == ItemCategory.Tool);
+            return Mathf.Clamp(isGear ? Tier : Tier - 1, 1, Tiers.Max);
+        }
+    }
 }

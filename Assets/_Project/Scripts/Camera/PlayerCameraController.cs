@@ -215,7 +215,7 @@ public sealed class PlayerCameraController : MonoBehaviour
         ApplyToCinemachine();
     }
 
-    private bool IsUIOpen => uiState != null && uiState.IsAnyWindowOpen;
+    private bool IsUIOpen => (uiState != null && uiState.IsAnyWindowOpen) || CommandWheel.IsHeld;
 
     private CameraSituation CurrentSituation()
     {

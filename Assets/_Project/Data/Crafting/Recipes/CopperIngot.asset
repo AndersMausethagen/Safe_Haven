@@ -19,11 +19,11 @@ MonoBehaviour:
   outputAmount: 1
   resourceCost: []
   itemCost:
-  - item: {fileID: 11400000, guid: 8ae2883815327b74fa7975309c803f92, type: 2}
-    amount: 1
   - item: {fileID: 11400000, guid: a9f806359436036488427616ef8b8c44, type: 2}
     amount: 3
-  station: 2
+  - item: {fileID: 11400000, guid: 8ae2883815327b74fa7975309c803f92, type: 2}
+    amount: 1
+  station: 3
   craftSeconds: 6
   knownFromStart: 1
   sortOrder: 8

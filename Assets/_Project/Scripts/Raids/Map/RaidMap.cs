@@ -39,6 +39,7 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
     private readonly List<Vector3> rumourSpots = new List<Vector3>();
     private TerrainData turnedData;
     private Mesh generatedTrunks;
+    private Texture2D generatedColour;
 
     public RaidMapDefinition Definition => definition;
     public Terrain Terrain => terrain;
@@ -84,6 +85,7 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
         {
             List<NavMeshAgent> paused = PauseAgents();
             yield return Generate(rules, seed);
+            Dress(seed);
             ResumeAgents(paused);
             MovePlayerToStart();
             yield break;
@@ -110,6 +112,7 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
             ResumeAgents(agents);
         }
 
+        Dress(seed);
         MovePlayerToStart();
         Debug.Log($"Raid map turned {MapRotation.Yaw(QuarterTurns):0}° from seed {seed}.", this);
     }
@@ -156,6 +159,32 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
         }
 
         Debug.LogError($"Raid map from seed {seed}: no attempt gave a way to every exit. The player can still walk the trails.", this);
+    }
+
+    // What this run's ground looks like, from what it was painted with. Done once, on the map that was kept: grass and plants,
+    // the colour grass takes from the ground, and the surface shader's view of the new paint.
+    private void Dress(int seed)
+    {
+        if (terrain == null || definition == null)
+        {
+            return;
+        }
+
+        var clock = System.Diagnostics.Stopwatch.StartNew();
+        TerrainGrowth.Fill(terrain, definition.Growth, seed, TerrainGrowth.UnderTrees(terrain));
+        if (terrain.TryGetComponent(out GrassTerrainColour colour))
+        {
+            generatedColour = TerrainGrowth.BakeColour(terrain, definition.Growth);
+            colour.ColourMap = generatedColour;
+        }
+
+        if (terrain.TryGetComponent(out TerrainSurface surface))
+        {
+            surface.Apply();
+        }
+
+        terrain.Flush();
+        Debug.Log($"Raid map dressed in {clock.ElapsedMilliseconds} ms.", this);
     }
 
     private void RebuildTrunks()
@@ -307,6 +336,11 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
         if (generatedTrunks != null)
         {
             Destroy(generatedTrunks);
+        }
+
+        if (generatedColour != null)
+        {
+            Destroy(generatedColour);
         }
     }
 
