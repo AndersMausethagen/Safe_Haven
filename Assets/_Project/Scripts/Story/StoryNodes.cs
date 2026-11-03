@@ -222,9 +222,13 @@ public sealed class StorySpeaker
     public Transform model;
     [Tooltip("A picture instead of the live portrait. Optional.")]
     public Sprite portrait;
+    [Tooltip("Heard as each of their lines starts. Optional: most people are only read.")]
+    public SoundDefinition voice;
+    [Tooltip("Where that voice comes from, when they have no model here: the portal, say.")]
+    public Transform voiceFrom;
 
     public DialogueSpeaker ToSpeaker() =>
-        player ? DialogueSpeaker.Player(name) : new DialogueSpeaker(string.IsNullOrWhiteSpace(name) && model != null ? model.name : name, model, portrait);
+        player ? DialogueSpeaker.Player(name) : new DialogueSpeaker(string.IsNullOrWhiteSpace(name) && model != null ? model.name : name, model, portrait, 0f, voice, voiceFrom);
 
     public string Describe() => player ? "Player" : string.IsNullOrWhiteSpace(name) ? model != null ? model.name : "?" : name;
 }

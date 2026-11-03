@@ -237,7 +237,7 @@ The Construction Table, Sawbench, Furnace and Forge are replaced by whole buildi
 
 **Second pass (November 3, 2026).** The Loom is now the Tailor's Shop and the Tanning Rack the Hunter's Lodge, both whole buildings. No upgrade is speed alone. Later tiers ask for other buildings, and new buildings open past copper: Stone Wall, Iron Trap, Runic Ward Totem, Trading Post. Ward levels open raid tiers, the portal can be improved, ranks bring settlers. Beds give a bonus and never gate anyone.
 
-**The portal at the heart (November 3, 2026).** The Heart Tree is gone, as it blocked the view of the base. The portal stands at the centre of Safe Haven and does everything the tree did: it speaks, holds the ward, wakes the fallen, and opens one menu for raids, the ward, Portal Sparks and repairs. Asleep it is a frame of dark stone. The story is the same: the stones that dropped the player here are what caught them.
+**The portal at the heart (November 3, 2026).** The Heart Tree is gone, as it blocked the view of the base. The portal stands at the centre of Safe Haven and does everything the tree did: it speaks, holds the ward, wakes the fallen, and opens one menu for raids, the ward, Portal Sparks and repairs. Asleep it is a frame of dark stone. The story is the same: the stones that dropped the player here are what caught them. As it speaks, a wordless murmur comes from the arch (`Tools/Audio/portal.py`): the player reads the words, the sound says something is speaking.
 
 ### 6.5 Architectural progression
 

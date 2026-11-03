@@ -40,6 +40,8 @@ public sealed class HomePortal : MonoBehaviour, IArea, IBuildArea
     };
     [Tooltip("Raised when the player finishes at the portal (the menu closes), for quests such as \"Listen to the portal\".")]
     [SerializeField, RaisedByGame] private GameEventDefinition talkedEvent;
+    [Tooltip("What is heard when it speaks: its whispers here, and the same sound on its lines in story graphs. Optional.")]
+    [SerializeField] private SoundDefinition voice;
     [Tooltip("Draws the edge of the ward. Optional.")]
     [SerializeField] private LineRenderer wardRing;
     [SerializeField, Min(8)] private int ringSegments = 96;
@@ -151,6 +153,7 @@ public sealed class HomePortal : MonoBehaviour, IArea, IBuildArea
             return;
         }
 
+        AudioManager.Play(voice, transform.position);
         // Raised when the conversation ends, so the next quest doesn't appear while the portal is still speaking.
         ActionMenuWindow.Current.Open(() => BuildPage(user), user, transform, menuRange, () => RaiseTalked(user));
     }
@@ -246,7 +249,11 @@ public sealed class HomePortal : MonoBehaviour, IArea, IBuildArea
 
         if (questLine == null && whispers.Length > 1)
         {
-            page.Add(new MenuAction("Listen", null, true, () => whisperIndex = (whisperIndex + 1) % whispers.Length));
+            page.Add(new MenuAction("Listen", null, true, () =>
+            {
+                whisperIndex = (whisperIndex + 1) % whispers.Length;
+                AudioManager.Play(voice, transform.position);
+            }));
         }
 
         int level = settlement.WardLevel;

@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0de871765cd6fce4c8fed103ef0082e3, type: 3}
+  m_Name: Portal Voice
+  m_EditorClassIdentifier: SafeHaven::SoundDefinition
+  displayName: Portal Voice
+  clips:
+  - {fileID: 8300000, guid: d73e99cbe2236404baa3eae5c58dd327, type: 3}
+  - {fileID: 8300000, guid: 75e354487d312ef47bc0f58304b21466, type: 3}
+  - {fileID: 8300000, guid: 495e8ffbae65bfe44a2532d190bc6e98, type: 3}
+  - {fileID: 8300000, guid: 4671f7638f6f9a8418a7a58e827c5758, type: 3}
+  - {fileID: 8300000, guid: a37bc9f33929c5b4d953170b8cb7670e, type: 3}
+  - {fileID: 8300000, guid: b32a51bc4abc5ce4ab476bf4241b1373, type: 3}
+  channel: 2
+  volume: 0.85
+  volumeVariation: 0.05
+  pitchRange: {x: 0.96, y: 1.03}
+  positional: 1
+  fullVolumeDistance: 35
+  audibleDistance: 120
+  maxAtOnce: 1
+  minimumGap: 0.2
+  priority: 2
+  takesTheMix: 1

@@ -25255,6 +25255,8 @@ MonoBehaviour:
           name: The Portal
           model: {fileID: 0}
           portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
         line: <i>There. A hearth beside my stones, after a hundred winters.</i>
         afterFightPause: 1
     - rid: 287758281410609322
@@ -25267,6 +25269,8 @@ MonoBehaviour:
           name: The Portal
           model: {fileID: 0}
           portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
         line: <i>Do you feel that? The ward has remembered what it is for. And far out in the mist, little one, someone has stopped walking and turned to look.</i>
         afterFightPause: 1
     - rid: 287758281410609323
@@ -30698,6 +30702,8 @@ MonoBehaviour:
           name: The Portal
           model: {fileID: 0}
           portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
         line: <i>Listen. Far to the north, past the troll country, a hammer on stone. Three beats and a rest, over and over. Someone out there has seen your light and is answering it.</i>
         afterFightPause: 1
     - rid: 287758281410609310
@@ -30710,6 +30716,8 @@ MonoBehaviour:
           name: 
           model: {fileID: 0}
           portrait: {fileID: 0}
+          voice: {fileID: 0}
+          voiceFrom: {fileID: 0}
         line: That's Bjarne.
         afterFightPause: 1
     - rid: 287758281410609311
@@ -30722,6 +30730,8 @@ MonoBehaviour:
           name: The Portal
           model: {fileID: 0}
           portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
         line: <i>Then he is still himself. The way north is not open yet. Grow strong, little one, and keep this fire high. He can hold on a long while now.</i>
         afterFightPause: 1
 --- !u!114 &377451007
@@ -78085,6 +78095,7 @@ MonoBehaviour:
   - <i>I listen for your people every night. Some nights I hear them.</i>
   - <i>A hundred winters I kept this clearing alone. I had forgotten how loud a home is. Do not stop.</i>
   talkedEvent: {fileID: 11400000, guid: c06332984c04ae244b8513b7d0e6178c, type: 2}
+  voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
   wardRing: {fileID: 313313493}
   ringSegments: 96
   menuRange: 8
@@ -120307,6 +120318,8 @@ MonoBehaviour:
           name: Sigrid
           model: {fileID: 0}
           portrait: {fileID: 0}
+          voice: {fileID: 0}
+          voiceFrom: {fileID: 0}
         line: <i>...can anyone hear... Ingrid was right behind me when the stones broke. She's hurt. Find her first. Do you hear me? Find her first...</i>
         afterFightPause: 1
     - rid: 287758281410609316
@@ -120319,6 +120332,8 @@ MonoBehaviour:
           name: The Portal
           model: {fileID: 0}
           portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
         line: <i>My stones have gone quiet, but she is right. One spark burns close, just beyond me, hiding from the wolves. Make yourself tools, and go.</i>
         afterFightPause: 1
 --- !u!114 &1577933051
@@ -146197,6 +146212,8 @@ MonoBehaviour:
           name: The Portal
           model: {fileID: 0}
           portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
         line: Warmth stirs in the old stone. <i>Little one. You fell out of the dark with the whole forest at your heels, and I caught you. I could only catch one.</i>
         answers:
         - Where are the others?
@@ -146213,6 +146230,8 @@ MonoBehaviour:
           name: The Portal
           model: {fileID: 0}
           portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
         line: <i>Seven sparks, scattered through the Misty Woods. They are alive. I hear them when the wind is right. But the forest does not kill the lost, little one. It forgets them.</i>
         afterFightPause: 1
     - rid: 287758281410609327
@@ -146225,6 +146244,8 @@ MonoBehaviour:
           name: The Portal
           model: {fileID: 0}
           portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
         line: <i>The last of an old promise. I keep the dark from this clearing. But that is not what you need to know.</i>
         afterFightPause: 1
     - rid: 287758281410609328
@@ -146237,6 +146258,8 @@ MonoBehaviour:
           name: The Portal
           model: {fileID: 0}
           portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
         line: <i>First the way home. Then their names. Then there is no one left to find.</i>
         answers:
         - How do I reach them?
@@ -146253,6 +146276,8 @@ MonoBehaviour:
           name: The Portal
           model: {fileID: 0}
           portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
         line: <i>I am a door, little one, and I have gone to sleep. I am too thin to wake myself. Long ago people kept a hearth beside these stones, and I kept the night from their door. That was the pact. No fire has burned here in a hundred winters.</i>
         afterFightPause: 1
     - rid: 287758281410609330
@@ -146265,6 +146290,8 @@ MonoBehaviour:
           name: The Portal
           model: {fileID: 0}
           portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
         line: <i>With what? You have nothing but your hands, and I cannot open.</i>
         afterFightPause: 1
     - rid: 287758281410609331
@@ -146277,6 +146304,8 @@ MonoBehaviour:
           name: The Portal
           model: {fileID: 0}
           portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
         line: <i>So light one. The forest cannot forget a hearth that someone tends. It will feed my ward, and out in the mist your people will see it and know which way is home.</i>
         afterFightPause: 1
     - rid: 287758281410609332
@@ -146289,6 +146318,8 @@ MonoBehaviour:
           name: The Portal
           model: {fileID: 0}
           portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
         line: <i>A fire first. Then a home worth coming back to. Then we go and fetch them. And one day, little one, you will tell me why these old stones woke for your hand.</i>
         afterFightPause: 1
     - rid: 287758281410609333

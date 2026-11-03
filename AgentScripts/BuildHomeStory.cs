@@ -11,6 +11,7 @@ using UnityEngine.SceneManagement;
 /// the seven are found and brought back. Rewrites the home quests around that, turns "A Stranger in the Mist" into the
 /// search for Ingrid, adds "A Light They Can See" (raise the haven to a Hamlet), and builds the moments as story graphs in
 /// SafeHaven under Home Moments. Replaces what it built before. Reopens SafeHaven.
+/// Run BuildPortalVoice after it, which gives the rebuilt graphs the portal's voice again.
 /// </summary>
 public static class BuildHomeStory
 {

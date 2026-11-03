@@ -25,3 +25,4 @@ MonoBehaviour:
   maxAtOnce: 1
   minimumGap: 0.03
   priority: 2
+  takesTheMix: 1

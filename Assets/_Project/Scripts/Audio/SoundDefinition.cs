@@ -58,6 +58,8 @@ public sealed class SoundDefinition : ScriptableObject
     [SerializeField, Range(0f, 0.5f)] private float minimumGap = 0.03f;
     [Tooltip("What gives way when too many sounds play at once.")]
     [SerializeField] private SoundPriority priority = SoundPriority.Normal;
+    [Tooltip("A big moment: while it plays, music and background sounds dip to make room (Audio Settings › Making Room). Quests, ranks, warnings, a voice. Keep it to what the player must not miss.")]
+    [SerializeField] private bool takesTheMix;
 
     public string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;
     public IReadOnlyList<AudioClip> Clips => clips;
@@ -69,6 +71,7 @@ public sealed class SoundDefinition : ScriptableObject
     public int MaxAtOnce => maxAtOnce;
     public float MinimumGap => minimumGap;
     public SoundPriority Priority => priority;
+    public bool TakesTheMix => takesTheMix;
     public bool HasClips => clips.Exists(clip => clip != null);
 
     /// <summary>A random clip, or null when there are none. With a choice, never <paramref name="last"/>: a repeat is what gives a sound away.</summary>

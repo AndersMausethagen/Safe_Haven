@@ -29,6 +29,18 @@ public sealed class AudioSettingsDefinition : ScriptableObject
     [SerializeField, Range(0f, 1f)] private float ambienceVolume = 0.7f;
     [SerializeField, Range(0f, 1f)] private float effectsVolume = 0.9f;
 
+    [Header("Making Room (music and background dip while someone talks or a big moment is heard)")]
+    [Tooltip("What the music's volume is multiplied by while someone talks. 0.35 is a clear dip without the music going away.")]
+    [SerializeField, Range(0f, 1f)] private float musicWhileSpeaking = 0.35f;
+    [Tooltip("The same for ambience: weather, water, the forest. It dips less, so the world doesn't go silent.")]
+    [SerializeField, Range(0f, 1f)] private float ambienceWhileSpeaking = 0.55f;
+    [Tooltip("The same for Background sounds starting meanwhile: footsteps, birds, creaks.")]
+    [SerializeField, Range(0f, 1f)] private float backgroundWhileSpeaking = 0.5f;
+    [Tooltip("Seconds to dip. Quick, so the first word is clear.")]
+    [SerializeField, Min(0f)] private float dipSeconds = 0.3f;
+    [Tooltip("Seconds to come back. Slow, or the music audibly pumps between lines.")]
+    [SerializeField, Min(0f)] private float returnSeconds = 1.4f;
+
     [Header("What Counts as Combat")]
     [HideInInspector, SerializeField] private bool weaponDrawn = true;
     [Tooltip("An enemy is chasing or attacking the player.")]
@@ -173,6 +185,11 @@ public sealed class AudioSettingsDefinition : ScriptableObject
     public SoundDefinition FootstepWater => footstepWater;
     public SoundDefinition Land => land;
     public float StrideLength => strideLength;
+    public float MusicWhileSpeaking => musicWhileSpeaking;
+    public float AmbienceWhileSpeaking => ambienceWhileSpeaking;
+    public float BackgroundWhileSpeaking => backgroundWhileSpeaking;
+    public float DipSeconds => dipSeconds;
+    public float ReturnSeconds => returnSeconds;
     public SoundDefinition QuestStarted => questStarted;
     public SoundDefinition QuestCompleted => questCompleted;
     public SoundDefinition Crafted => crafted;

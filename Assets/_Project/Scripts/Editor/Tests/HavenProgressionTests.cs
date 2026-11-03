@@ -258,6 +258,62 @@ public sealed class HavenProgressionTests
     }
 
     [Test]
+    public void ThePortalsVoice_HasTakes_AndIsHeardAcrossTheBase()
+    {
+        var voice = AssetDatabase.LoadAssetAtPath<SoundDefinition>("Assets/_Project/Audio/Sounds/Library/Portal Voice.asset");
+        Assert.NotNull(voice);
+        Assert.IsTrue(voice.HasClips);
+        Assert.AreEqual(1, voice.MaxAtOnce, "takes must never pile up when lines are skipped");
+        Assert.GreaterOrEqual(voice.AudibleDistance, 60f, "it speaks wherever the player is in the ward");
+    }
+
+    [Test]
+    public void ASpeaker_CarriesTheirVoice_ToTheBox()
+    {
+        var voice = ScriptableObject.CreateInstance<SoundDefinition>();
+        try
+        {
+            var from = new StorySpeaker { name = "The Portal", voice = voice }.ToSpeaker();
+            Assert.AreEqual(voice, from.Voice);
+            Assert.IsNull(new StorySpeaker { name = "Sigrid" }.ToSpeaker().Voice, "people are only read");
+        }
+        finally
+        {
+            Object.DestroyImmediate(voice);
+        }
+    }
+
+    [Test]
+    public void TheMix_DipsQuickly_AndComesBackSlowly()
+    {
+        float level = AudioDucking.Step(0f, true, 0.3f, 1.4f, 0.15f);
+        Assert.AreEqual(0.5f, level, 0.001f);
+        Assert.AreEqual(1f, AudioDucking.Step(level, true, 0.3f, 1.4f, 1f), "it stays down while wanted, no further");
+        Assert.AreEqual(1f - 0.7f / 1.4f, AudioDucking.Step(1f, false, 0.3f, 1.4f, 0.7f), 0.001f);
+        Assert.AreEqual(1f, AudioDucking.Step(0.5f, true, 0f, 0f, 0.01f), "no fade time means at once");
+        Assert.AreEqual(1f, AudioDucking.Scale(0f, 0.35f), "undipped, nothing changes");
+        Assert.AreEqual(0.35f, AudioDucking.Scale(1f, 0.35f), 0.001f);
+    }
+
+    [Test]
+    public void BigMoments_TakeTheMix_AndAreNotCrowdedOut()
+    {
+        AudioSettingsDefinition sounds = AssetDatabase.FindAssets("t:AudioSettingsDefinition").Select(AssetDatabase.GUIDToAssetPath)
+            .Select(AssetDatabase.LoadAssetAtPath<AudioSettingsDefinition>).First();
+        foreach (SoundDefinition moment in new[] { sounds.QuestStarted, sounds.QuestCompleted, sounds.BreachWarning, sounds.BreachWon, sounds.BreachLost, HavenSettings.Current.RankSound,
+                     AssetDatabase.LoadAssetAtPath<SoundDefinition>("Assets/_Project/Audio/Sounds/Library/Portal Voice.asset") })
+        {
+            Assert.NotNull(moment);
+            Assert.IsTrue(moment.TakesTheMix, moment.name);
+            Assert.AreEqual(SoundPriority.Important, moment.Priority, moment.name);
+        }
+
+        Assert.Less(sounds.MusicWhileSpeaking, sounds.AmbienceWhileSpeaking, "music gives way first, so the world doesn't go silent");
+        Assert.Less(sounds.DipSeconds, sounds.ReturnSeconds, "a slow return keeps the music from pumping");
+        Assert.Greater(sounds.MusicWhileSpeaking, 0f, "the music dips, it doesn't stop");
+    }
+
+    [Test]
     public void TheNewNames_AreWhatThePlayerSees()
     {
         Assert.AreEqual("Hunter's Lodge", CraftingStationType.Tannery.DisplayName());

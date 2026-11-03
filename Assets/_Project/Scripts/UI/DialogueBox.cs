@@ -16,13 +16,19 @@ public readonly struct DialogueSpeaker
     public readonly Sprite Portrait;
     /// <summary>How close the camera comes while they talk (PlayerCameraController.BeginDialogue); 0 for the usual.</summary>
     public readonly float CameraDistance;
+    /// <summary>What is heard as each of their lines starts. Optional: most people are only read.</summary>
+    public readonly SoundDefinition Voice;
+    /// <summary>Where the voice comes from, when that isn't the model: the portal has no face to frame, but it has a place.</summary>
+    public readonly Transform VoiceFrom;
 
-    public DialogueSpeaker(string name, Transform model = null, Sprite portrait = null, float cameraDistance = 0f)
+    public DialogueSpeaker(string name, Transform model = null, Sprite portrait = null, float cameraDistance = 0f, SoundDefinition voice = null, Transform voiceFrom = null)
     {
         Name = name;
         Model = model;
         Portrait = portrait;
         CameraDistance = cameraDistance;
+        Voice = voice;
+        VoiceFrom = voiceFrom;
     }
 
     /// <summary>The player, by the name given, else the name they chose for their character (or "You").</summary>
@@ -164,6 +170,7 @@ public sealed class DialogueBox : MonoBehaviour
         this.subtitleTimeMultiplier = Mathf.Clamp(subtitleTimeMultiplier, 1f, 2f);
         if (!IsOpen && MonsterAI.AnyHuntingPlayerSide())
         {
+            Speak(speaker, line);
             Subtitle(speaker.Name, line, done);
             return;
         }
@@ -263,6 +270,8 @@ public sealed class DialogueBox : MonoBehaviour
         {
             CharacterGestures.Speak(speaker.Model);
         }
+
+        Speak(speaker, line);
         // Walking away ends a conversation with someone standing beside the player, not a shout from afar.
         bool beside = speaker.Model != null && global::Player.Current != null && speaker.Model != global::Player.Current.transform &&
                       (speaker.Model.position - global::Player.Current.transform.position).sqrMagnitude <= WalkAwayDistance * WalkAwayDistance;
@@ -293,6 +302,17 @@ public sealed class DialogueBox : MonoBehaviour
         }
 
         UpdateHint();
+    }
+
+    private static void Speak(DialogueSpeaker speaker, string line)
+    {
+        if (speaker.Voice == null || string.IsNullOrWhiteSpace(line))
+        {
+            return;
+        }
+
+        Transform from = speaker.VoiceFrom != null ? speaker.VoiceFrom : speaker.Model;
+        AudioManager.Play(speaker.Voice, from != null ? from.position : AudioManager.EarPosition);
     }
 
     // The portal and a voice through its stones have no face to show, so their words take its place.

@@ -92,6 +92,7 @@ Raid events, gear, food, buildings and creatures are in, built by `AgentScripts/
 - [ ] Defender roles for ward breaches (the Runic Ward Totem and the Watch Post's archer are in).
 - [ ] Settlers (Hild, Asa, Gunnar, Yrsa) borrow expedition models: give them their own, and icons for the Boar Pie, Trout in Cream, Haven Feast and Moon Broth, which show the stew's for now.
 - [ ] Trollstone armor copies the moonsilver worn look: give it one of its own.
+- [ ] Listen to the portal's voice in the game: its takes were measured, never heard. `Tools/Audio/portal.py`, level on Audio/Sounds/Library/Portal Voice.
 - [ ] Playtest the base progression pace: raids per tier, Purified Essence against ward, altar and upgrade costs, Trading Post prices.
 
 ## Code quality: SOLID refactor (analysis 2026-10-29)

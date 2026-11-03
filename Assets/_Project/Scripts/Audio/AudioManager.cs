@@ -166,6 +166,8 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
     private static AudioManager instance;
     private static readonly Dictionary<AudioChannel, float> volumes = new Dictionary<AudioChannel, float>();
     private static float masterVolume = 1f;
+    private static float dipLevel;
+    private float roomHeldUntil;
 
     private readonly List<AudioSource> pool = new List<AudioSource>();
     private readonly Dictionary<AudioSource, SoundDefinition> playing = new Dictionary<AudioSource, SoundDefinition>();
@@ -206,7 +208,26 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
     /// <summary>The player's volume for a channel, from 0 to 1, including the master volume.</summary>
     public static float ChannelVolume(AudioChannel channel)
     {
-        return masterVolume * (volumes.TryGetValue(channel, out float volume) ? volume : 1f);
+        return masterVolume * (volumes.TryGetValue(channel, out float volume) ? volume : 1f) * RoomMade(channel);
+    }
+
+    /// <summary>How far music and ambience are dipped right now to make room: 1 is not at all. Effects carry what the player has to hear, so they stay.</summary>
+    private static float RoomMade(AudioChannel channel)
+    {
+        if (instance == null)
+        {
+            return 1f;
+        }
+
+        switch (channel)
+        {
+            case AudioChannel.Music:
+                return AudioDucking.Scale(dipLevel, instance.settings.MusicWhileSpeaking);
+            case AudioChannel.Ambience:
+                return AudioDucking.Scale(dipLevel, instance.settings.AmbienceWhileSpeaking);
+            default:
+                return 1f;
+        }
     }
 
     /// <summary>The player's own volume for a channel, without the master volume.</summary>
@@ -291,7 +312,9 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
     public static void Configure(AudioSource source, SoundDefinition sound)
     {
         float world = sound.Positional && instance != null ? instance.settings.WorldSoundsLevel : 1f;
-        source.volume = sound.PickVolume() * ChannelVolume(sound.Channel) * world;
+        // Birds and footsteps give way too, as they start: a sound already under way is too short to be worth following.
+        float room = sound.Priority == SoundPriority.Background && instance != null ? AudioDucking.Scale(dipLevel, instance.settings.BackgroundWhileSpeaking) : 1f;
+        source.volume = sound.PickVolume() * ChannelVolume(sound.Channel) * world * room;
         source.pitch = sound.PickPitch();
         source.spatialBlend = sound.Positional ? 1f : 0f;
         // Sounds with a place are in the world, and stop when it does. The rest are the interface and warnings.
@@ -307,6 +330,7 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
     {
         instance = this;
         settings = loaded;
+        dipLevel = 0f;
         masterVolume = PlayerPrefs.GetFloat(VolumeKey + "Master", settings.MasterVolume);
         foreach (AudioChannel channel in System.Enum.GetValues(typeof(AudioChannel)))
         {
@@ -376,6 +400,7 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
         }
 
         AudioListener.pause = GamePause.IsPaused;
+        dipLevel = AudioDucking.Step(dipLevel, DialogueBox.IsSpeaking || Time.unscaledTime < roomHeldUntil, settings.DipSeconds, settings.ReturnSeconds, Time.unscaledDeltaTime);
         float fadeStep = FadeStep(settings.CrossfadeSeconds);
         music.Update(Mood == AudioMood.Combat ? FadeStep(settings.CombatFadeSeconds) : fadeStep);
         ambience.Update(fadeStep);
@@ -604,6 +629,10 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
         source.volume *= VolumeForSize(size);
         source.clip = clip;
         source.Play();
+        if (sound.TakesTheMix && clip != null)
+        {
+            roomHeldUntil = Mathf.Max(roomHeldUntil, Time.unscaledTime + clip.length / Mathf.Max(0.1f, Mathf.Abs(source.pitch)));
+        }
     }
 
     private bool TooSoon(SoundDefinition sound) =>
