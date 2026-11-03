@@ -233,6 +233,9 @@ public sealed class PlayerCombat : MonoBehaviour
     /// <summary>True for a moment after a hit got through: the player reels and can't act.</summary>
     public bool IsFlinching => Time.time < flinchUntil;
 
+    /// <summary>True in the wind-up of a heavy swing with a weapon heavy enough to trade blows: hits hurt less and don't knock it out.</summary>
+    public bool IsPushingThrough => activeKind == SwingKind.Heavy && hitPending && Weapon != null && Weapon.HeavySwingArmor > 0f;
+
     /// <summary>Raised when a hit makes the player flinch, with how long; true when it cost them a swing.</summary>
     public event Action<float, bool> Flinched;
 
@@ -359,6 +362,11 @@ public sealed class PlayerCombat : MonoBehaviour
 
     private void Update()
     {
+        if (health != null)
+        {
+            health.DamageTakenMultiplier = IsPushingThrough ? 1f - Weapon.HeavySwingArmor : 1f;
+        }
+
         if (flinchUntil > 0f && !IsFlinching)
         {
             flinchUntil = 0f;
@@ -1038,7 +1046,7 @@ public sealed class PlayerCombat : MonoBehaviour
             EnterCombat();
         }
 
-        if (result.Blocked || result.Killed || damage.IsOverTime || health == null || result.Damage < health.MaxHealth * Rules.FlinchShare)
+        if (result.Blocked || result.Killed || damage.IsOverTime || health == null || result.Damage < health.MaxHealth * Rules.FlinchShare || IsPushingThrough)
         {
             return;
         }

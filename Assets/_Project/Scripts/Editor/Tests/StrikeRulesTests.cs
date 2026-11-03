@@ -159,6 +159,35 @@ public sealed class StrikeRulesTests
     }
 
     [Test]
+    public void AttackTurns_LetTwoCloseIn_AndSpaceTheirStarts()
+    {
+        Assert.AreEqual(AttackTurn.Strike, AttackTurns.Decide(0, 2, 5f, 4f));
+        Assert.AreEqual(AttackTurn.Strike, AttackTurns.Decide(1, 2, 5f, 4f));
+        Assert.AreEqual(AttackTurn.StandReady, AttackTurns.Decide(1, 2, 5f, 5.2f), "one has only just started");
+        Assert.AreEqual(AttackTurn.Circle, AttackTurns.Decide(2, 2, 5f, 4f), "enough are closing in");
+        Assert.AreEqual(AttackTurn.Circle, AttackTurns.Decide(1, 0, 5f, 4f), "a setting of 0 still lets one in at a time");
+    }
+
+    [TestCase(1f)]
+    [TestCase(-1f)]
+    public void AttackTurns_CircleAround_AtTheDistanceItWaits(float side)
+    {
+        Vector3 target = Vector3.zero;
+        Vector3 position = new Vector3(1.5f, 0f, 0f);
+        float travelled = 0f;
+        for (int i = 0; i < 12; i++)
+        {
+            Vector3 spot = AttackTurns.CircleSpot(position, target - position, side, 3.5f);
+            Vector3 step = Vector3.ClampMagnitude(spot - position, 0.5f);
+            position += step;
+            travelled += step.magnitude;
+        }
+
+        Assert.AreEqual(3.5f, position.magnitude, 0.6f, "it backed off to the ring");
+        Assert.Greater(Vector3.Angle(Vector3.right, position), 30f, "and went around, not just away");
+    }
+
+    [Test]
     public void BackstabMemory_LearnsOneAtATime_AndForgetsThem()
     {
         var memory = new BackstabMemory();

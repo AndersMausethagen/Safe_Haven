@@ -26,6 +26,19 @@ public sealed class MonsterAttack
     public bool interruptible;
     [Tooltip("The raid tier it learns this at: a tier II wolf pounces, a tier I wolf doesn't. 0: always. Above 0 it is only used in raids of that tier or higher.")]
     [Range(0, Tiers.Max)] public int fromTier;
+    [Header("Melee: combos and held blows")]
+    [Tooltip("Strikes that can follow this one, in order. Each is aimed anew, with its own wind-up and warning.")]
+    public AttackDefinition[] followUps;
+    [Tooltip("Chance it goes on into its follow-ups.")]
+    [Range(0f, 1f)] public float comboChance = 0.5f;
+    [Tooltip("Seconds after a blow lands before the next winds up.")]
+    [Min(0f)] public float comboGap = 0.2f;
+    [Tooltip("The raid tier it learns the follow-ups at. 0: always. Above 0 they are only used in raids of that tier and up.")]
+    [Range(0, Tiers.Max)] public int comboFromTier;
+    [Tooltip("Chance it holds the wind-up before letting the blow go, tracking its target meanwhile: a roll on reflex comes too soon.")]
+    [Range(0f, 1f)] public float holdChance;
+    [Tooltip("Seconds it holds for. Its warning stops filling as long.")]
+    [Min(0f)] public float holdSeconds = 0.45f;
     [Header("Projectiles")]
     public GameObject projectilePrefab;
     [Min(1)] public int burstCount = 1;

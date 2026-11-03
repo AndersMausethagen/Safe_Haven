@@ -213,6 +213,12 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
             {
                 HitStop(feel.HitStopWhenHurt);
                 CameraShake.Add(feel.ShakeWhenHurt);
+                if (playerCombat != null && playerCombat.IsPushingThrough)
+                {
+                    // Taken on the swing: it goes on.
+                    Spawn(feel.BlockEffect, damage.HitPoint, -damage.Direction);
+                }
+
                 AudioManager.Play(Sounds != null ? Sounds.PlayerHurt : null, victim.transform.position);
             }
 

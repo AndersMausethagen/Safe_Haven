@@ -99,6 +99,11 @@ public sealed class AttackTelegraph : MonoBehaviour
         }
 
         Place();
+        if (ai.IsHoldingStrike)
+        {
+            startTime += Time.deltaTime;
+        }
+
         float elapsed = Time.time - startTime;
         if (hideAt < 0f && elapsed >= attack.HitDelay)
         {

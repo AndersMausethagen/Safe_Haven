@@ -117,6 +117,18 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
     [Tooltip("Seconds after a dodge ends that a backstab still gets the refund.")]
     [SerializeField, Min(0f)] private float backstabRefundWithin = 1.5f;
 
+    [Header("Taking turns at the player")]
+    [Tooltip("How many can be closing in on the player with a strike at once. Others circle. Great beasts, elites and ranged attacks don't wait.")]
+    [SerializeField, Min(1)] private int attackersAtOnce = 2;
+    [Tooltip("Seconds between one close strike at the player starting and the next.")]
+    [SerializeField, Min(0f)] private float attackTurnSpacing = 0.35f;
+    [Tooltip("Seconds one circles before it tries again, least and most.")]
+    [SerializeField] private Vector2 circleSeconds = new Vector2(0.8f, 1.6f);
+    [Tooltip("Metres from the player it circles at.")]
+    [SerializeField, Min(0f)] private float circleDistance = 3.5f;
+    [Tooltip("Share of its speed it circles at.")]
+    [SerializeField, Range(0.1f, 1f)] private float circleSpeed = 0.6f;
+
     [Header("How enemies answer a backstab, and learn from it")]
     [Tooltip("Seconds after a backstab before the enemy answers it, or after its stagger if that is longer.")]
     [SerializeField, Min(0f)] private float answerDelay = 0.3f;
@@ -244,6 +256,11 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
     public float BackstabOnStrikeDamage => backstabOnStrikeDamage;
     public float BackstabRefund => backstabRefund;
     public float BackstabRefundWithin => backstabRefundWithin;
+    public int AttackersAtOnce => attackersAtOnce;
+    public float AttackTurnSpacing => attackTurnSpacing;
+    public Vector2 CircleSeconds => circleSeconds;
+    public float CircleDistance => circleDistance;
+    public float CircleSpeed => circleSpeed;
     public float AnswerDelay => answerDelay;
     public float AnswerStrikeChance => answerStrikeChance;
     public float HopDistance => hopDistance;

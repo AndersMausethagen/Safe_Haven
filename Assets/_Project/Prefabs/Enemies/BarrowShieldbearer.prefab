@@ -78,13 +78,35 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 4901221413759620481, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
       insertIndex: -1
       addedObject: {fileID: 7149905526001807631}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 9066855856663566298, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3710070978727052554}
   m_SourcePrefab: {fileID: 100100000, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
 --- !u!4 &6584995544039701470 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4901221413759620481, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
   m_PrefabInstance: {fileID: 2262557875931590239}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &7112812444035070341 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 9066855856663566298, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
+  m_PrefabInstance: {fileID: 2262557875931590239}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &3710070978727052554
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7112812444035070341}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fea4a75b4a0ac7d458506a37d9735885, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::MonsterShieldPose
+  shield: {fileID: 7149905526001807631}
+  handFromShoulder: {x: 0.36, y: -0.02, z: -0.12}
 --- !u!1001 &7308436964284767290
 PrefabInstance:
   m_ObjectHideFlags: 0

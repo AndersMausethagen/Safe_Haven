@@ -61,7 +61,8 @@ by motion, sound and weight rather than on-screen text.
   and its stamina is spent. You move slowly while swinging and hardly at all during a heavy swing. (Combat Technique ›
   Dodge Cancels Windup off makes every swing a commitment again: no dodging until it lands.)
 - **Flinch.** A hit that gets through (not blocked) while you wind up loses the swing, and you reel for a moment
-  (no attacking, guarding or dodging). Trading blows with a monster is a losing game.
+  (no attacking, guarding or dodging). Trading blows with a monster is a losing game, unless the weapon is heavy enough: the wind-up of a
+  heavy swing pushes through hits with a hammer or maul (40% less damage) and a greatsword or two-handed axe (30% less). Lighter weapons dodge instead.
 - **Guard.** Blocks hits from the front. Part of each hit still gets through (60% with fists, 35–40% with a weapon,
   10% with a shield) and each block costs stamina. Run out and the guard **breaks**: you reel for over a second.
 - **Parry.** Raise the guard within 0.15 s before a hit lands: no damage, no stamina, the attacker staggers and your
@@ -99,6 +100,13 @@ for the torch and back. Each shield has its own Guard Let Through: Round Shield 
 ones add more to the equipment load, which decides the dodge.
 
 ## Creatures
+
+Only two can be closing in on the player with a strike at once, and those strikes start at least 0.35 s apart: the rest circle at about 3.5 m, facing
+you, until their next try (0.8 to 1.6 s). Ranged attacks, howls and summons don't wait, and neither do great beasts and elites, though they count.
+
+Some melee strikes go on into a follow-up, aimed anew with its own wind-up and warning, or hold the wind-up for 0.45 s while tracking you, its warning
+stopped part-filled, so a roll on reflex comes too soon. Draug and Barrow Shieldbearer chain a cleave into a backswing, and hold a cleave 30% of the time;
+Small Moss Trolls chain their shove from Tier II, and hold it 25% of the time.
 
 | Creature | Reads as | How to beat it |
 |---|---|---|

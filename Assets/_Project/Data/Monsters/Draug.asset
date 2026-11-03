@@ -60,6 +60,13 @@ MonoBehaviour:
     cooldown: 1
     interruptible: 0
     fromTier: 0
+    followUps:
+    - {fileID: 11400000, guid: a10375394108bdb429cfd7e30282c60b, type: 2}
+    comboChance: 0.5
+    comboGap: 0.2
+    comboFromTier: 0
+    holdChance: 0.3
+    holdSeconds: 0.45
     projectilePrefab: {fileID: 0}
     burstCount: 1
     burstInterval: 0.2
@@ -86,6 +93,12 @@ MonoBehaviour:
     cooldown: 9
     interruptible: 0
     fromTier: 0
+    followUps: []
+    comboChance: 0.5
+    comboGap: 0.2
+    comboFromTier: 0
+    holdChance: 0
+    holdSeconds: 0.45
     projectilePrefab: {fileID: 0}
     burstCount: 1
     burstInterval: 0.2
@@ -112,6 +125,12 @@ MonoBehaviour:
     cooldown: 22
     interruptible: 1
     fromTier: 4
+    followUps: []
+    comboChance: 0.5
+    comboGap: 0.2
+    comboFromTier: 0
+    holdChance: 0
+    holdSeconds: 0.45
     projectilePrefab: {fileID: 0}
     burstCount: 1
     burstInterval: 0.2

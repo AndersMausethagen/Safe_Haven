@@ -43,6 +43,8 @@ public sealed class WeaponDefinition : ScriptableObject
     [SerializeField] private AttackDefinition rushAttack;
     [Tooltip("Two-handed weapons: metres along the handle from the right hand to the left.")]
     [SerializeField, Min(0.05f)] private float secondHandDistance = 0.24f;
+    [Tooltip("Share of a blow's damage shrugged off during a heavy swing's wind-up. Above 0 the swing also pushes through hits instead of being knocked out: for what is heavy enough to trade blows.")]
+    [SerializeField, Range(0f, 0.9f)] private float heavySwingArmor;
 
     [Header("Weapon art")]
     [Tooltip("The special attack this weapon knows: paid for with Focus, not stamina (middle mouse, or attack while guarding " +
@@ -118,6 +120,7 @@ public sealed class WeaponDefinition : ScriptableObject
     public AttackDefinition CounterAttack => counterAttack;
     public AttackDefinition RushAttack => rushAttack;
     public float SecondHandDistance => secondHandDistance;
+    public float HeavySwingArmor => heavySwingArmor;
     public AttackDefinition WeaponArt => weaponArt;
     public float WeaponArtFocus => weaponArtFocus;
     public float GuardLetThrough => guardLetThrough;

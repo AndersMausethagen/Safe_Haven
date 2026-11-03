@@ -110,6 +110,16 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject, IStaggerable, IHit
     private float hopEndsAt;
     private Vector3 hopDirection;
 
+    // How high a hop lifts the body at its middle, in metres.
+    private const float HopHeight = 0.3f;
+
+    // Waiting its turn at the player: until when, and which way round it goes.
+    private bool circling;
+    private float circlingUntil;
+    private float circleSide = 1f;
+    // Close strikes at the player don't start together: shared by every monster.
+    private static float nextTurnAt;
+
     private static readonly System.Collections.Generic.List<MonsterAI> active = new System.Collections.Generic.List<MonsterAI>();
     private static readonly System.Collections.Generic.List<MonsterAI> all = new System.Collections.Generic.List<MonsterAI>();
 
@@ -165,6 +175,12 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject, IStaggerable, IHit
 
     /// <summary>Set when a raid makes it an elite.</summary>
     public bool IsElite { get; set; }
+
+    /// <summary>True while its shield is up: hunting, not striking, staggering or hopping.</summary>
+    public bool ShieldIsUp => definition != null && definition.ShieldArc > 0f && CurrentState == State.Chasing;
+
+    /// <summary>True while it holds a wind-up before letting the blow go: the same clock stops for its body and its warning.</summary>
+    public bool IsHoldingStrike => CurrentState == State.Attacking && attacks.IsHolding;
 
     /// <summary>The chance it sees the next backstab coming, from what it remembers (0 until it has learned).</summary>
     public float BackstabReadChance
@@ -774,7 +790,22 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject, IStaggerable, IHit
         bool dead = CurrentState == State.Dead;
         float hoverHeight = IsExposed || dead ? 0f : definition.HoverHeight;
         MonsterAttack current = attacks.Action;
-        pose.Update(hoverHeight, dead, current != null && current.kind == MonsterAttackKind.Charge, attacks.LeapHeight);
+        if (IsHoldingStrike)
+        {
+            pose.HoldAttack(Time.deltaTime);
+        }
+
+        pose.Update(hoverHeight, dead, current != null && current.kind == MonsterAttackKind.Charge, CurrentState == State.Hopping ? HopLift : attacks.LeapHeight);
+    }
+
+    // It rises and falls over the length of the hop.
+    private float HopLift
+    {
+        get
+        {
+            float through = 1f - Mathf.Clamp01((hopEndsAt - Time.time) / CombatTechniqueSettings.Current.HopSeconds);
+            return HopHeight * 4f * through * (1f - through);
+        }
     }
 
     private void Engage()
@@ -782,6 +813,18 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject, IStaggerable, IHit
         Vector3 toTarget = TargetPoint() - transform.position;
         toTarget.y = 0f;
         float distance = toTarget.magnitude;
+        if (circling)
+        {
+            if (Time.time < circlingUntil)
+            {
+                Circle(toTarget, distance);
+                return;
+            }
+
+            circling = false;
+            ApplySpeed();
+        }
+
         if (!Relentless && definition.HasTemperament(MonsterTemperament.Defensive)
             && (HorizontalDistance(home) > definition.DefensiveRadius
                 || Vector3.Distance(home, targetComponent.transform.position) > definition.DefensiveRadius))
@@ -807,6 +850,11 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject, IStaggerable, IHit
             int chosen = attacks.ChooseAction(distance, IsHowler);
             if (chosen >= 0 && attacks.IsReady)
             {
+                if (HoldsBack(definition.Attacks[chosen].kind, toTarget, distance))
+                {
+                    return;
+                }
+
                 movement.Stop();
                 SetState(State.Chasing);
                 if (movement.TurnTowards(toTarget) && (pack == null || pack.TryAttack()))
@@ -850,6 +898,11 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject, IStaggerable, IHit
 
         if (attack != null && toTarget.magnitude <= attack.Range * AttackReachFactor)
         {
+            if (attacks.IsReady && HoldsBack(MonsterAttackKind.Melee, toTarget, distance))
+            {
+                return;
+            }
+
             movement.Stop();
             SetState(State.Chasing);
             bool facing = movement.TurnTowards(toTarget);
@@ -868,7 +921,13 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject, IStaggerable, IHit
     // Action index, or -1 for the definition's plain attack.
     private void BeginAttack(int action, Vector3 toTarget)
     {
+        circling = false;
         attacks.Begin(action, toTarget);
+        if (IsAtThePlayer)
+        {
+            nextTurnAt = Time.time + CombatTechniqueSettings.Current.AttackTurnSpacing;
+        }
+
         SetState(State.Attacking);
         pose?.Attack(CurrentAttack, Time.time);
         AttackStarted?.Invoke();
@@ -876,9 +935,75 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject, IStaggerable, IHit
 
     private void UpdateAttack()
     {
+        int blow = attacks.Blow;
         if (!attacks.Update(CanTarget(target) ? targetComponent.transform.position : (Vector3?)null))
         {
             SetState(State.Chasing);
+            return;
+        }
+
+        // The next blow of a combo: a body and a warning of its own, as a strike has.
+        if (attacks.Blow != blow)
+        {
+            pose?.Attack(CurrentAttack, Time.time);
+            AttackStarted?.Invoke();
+        }
+    }
+
+    private bool IsAtThePlayer => targetComponent != null && global::Player.IsPlayer(targetComponent.gameObject);
+
+    // Only so many close in on the player at once, so a crowd can be read: one crowded out circles until its next try, and one that only
+    // has to let another's blow start first stands ready. Ranged and calling actions don't wait, nor do great beasts and elites, though
+    // they are counted. True when it held back.
+    private bool HoldsBack(MonsterAttackKind kind, Vector3 toTarget, float distance)
+    {
+        if ((kind != MonsterAttackKind.Melee && kind != MonsterAttackKind.Charge) || !OpenWhileStriking || !IsAtThePlayer)
+        {
+            return false;
+        }
+
+        CombatTechniqueSettings rules = CombatTechniqueSettings.Current;
+        int closingIn = 0;
+        foreach (MonsterAI other in active)
+        {
+            if (other != this && other.target == target && other.CurrentState == State.Attacking && other.attacks.IsClosingIn)
+            {
+                closingIn++;
+            }
+        }
+
+        switch (AttackTurns.Decide(closingIn, rules.AttackersAtOnce, Time.time, nextTurnAt))
+        {
+            case AttackTurn.Circle:
+                circling = true;
+                circlingUntil = Time.time + UnityEngine.Random.Range(rules.CircleSeconds.x, Mathf.Max(rules.CircleSeconds.x, rules.CircleSeconds.y));
+                circleSide = UnityEngine.Random.value < 0.5f ? -1f : 1f;
+                ApplySpeed();
+                Circle(toTarget, distance);
+                return true;
+            case AttackTurn.StandReady:
+                movement.Stop();
+                SetState(State.Chasing);
+                movement.TurnTowards(toTarget);
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    // Sideways around the target, eyes on it, drifting to the distance it waits at.
+    private void Circle(Vector3 toTarget, float distance)
+    {
+        SetState(State.Chasing);
+        Vector3 spot = AttackTurns.CircleSpot(transform.position, toTarget, circleSide, CombatTechniqueSettings.Current.CircleDistance);
+        if (movement.TryFindGround(spot, 1.5f, out Vector3 ground))
+        {
+            movement.Strafe(ground, toTarget);
+        }
+        else
+        {
+            movement.Stop();
+            movement.TurnTowards(toTarget);
         }
     }
 
@@ -1300,6 +1425,7 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject, IStaggerable, IHit
 
         float scale = CurrentState == State.Investigating ? PerceptionSettings.Current.InvestigateSpeedScale
             : CurrentState == State.Returning && roaming ? roamSpeedScale
+            : circling ? CombatTechniqueSettings.Current.CircleSpeed
             : 1f;
         movement.SetSpeed(definition.MoveSpeed * scale * speedScale);
     }
@@ -1309,6 +1435,7 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject, IStaggerable, IHit
     private static void ResetForNewPlaySession()
     {
         nextSpottedSoundAt = 0f;
+        nextTurnAt = 0f;
     }
 
     private void OnDrawGizmosSelected()

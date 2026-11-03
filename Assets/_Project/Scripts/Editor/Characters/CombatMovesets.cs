@@ -182,12 +182,13 @@ public static partial class CombatAnimationSetup
         ("Strike Lunge", "Combat_1H_Attack02"),
         ("Strike Claw", "Combat_Unarmed_Attack"),
         ("Roar", "Emote_Roar"),
+        ("Hop", "Combat_1H_Dodge"),
     };
 
     // Attack -> the state it plays on a humanoid body. Monsters built from rigid parts use none of them: their pose is procedural.
     private static readonly Dictionary<string, string> MonsterAttackStates = new Dictionary<string, string>
     {
-        ["DraugCleave"] = "Strike Chop", ["DraugLunge"] = "Strike Lunge", ["DraugWarCry"] = "Roar",
+        ["DraugCleave"] = "Strike Chop", ["DraugBackswing"] = "Strike Wide", ["DraugLunge"] = "Strike Lunge", ["DraugWarCry"] = "Roar",
         ["GuardianSlam"] = "Strike Chop", ["GuardianGroundSlam"] = "Strike Overhead", ["GuardianCallRoots"] = "Roar",
         ["TrollSweep"] = "Strike Wide", ["TrollStomp"] = "Strike Overhead", ["OldTrollCharge"] = "Strike Lunge", ["OldTrollCallKin"] = "Roar",
         ["MonsterStrike"] = "Strike Claw",

@@ -869,8 +869,15 @@ The player is no super soldier: combat is about reading the enemy and committing
   `answerAt`; `AnswerBackstab` starts a strike (`MonsterAttacks.ChooseAnswer`, ignores cooldowns) or a hop (`State.Hopping`, invulnerable). `BackstabMemory`
   (plain, tested) is per instance; those of its side nearby learn too. While striking, `SeesBackstabComing` polls the player's wind-up, one roll per swing.
 - **`MonsterAI` is an `IHitGuard`** on its own `Damageable`: `parryUntil` for a parry it saw coming (`PlayerCombat.Rebuff` throws the player back), and the
-  definition's shield (`GuardRules.ResolveShield`) while `Chasing`. A blocked blow still pays poise through `OnDamaged`. New shield-bearers need only a
-  `ShieldArc` and a slow `turnSpeed` on the prefab.
+  definition's shield (`GuardRules.ResolveShield`) while `Chasing`. A blocked blow still pays poise through `OnDamaged`. New shield-bearers need a
+  `ShieldArc`, a slow `turnSpeed` and a `MonsterShieldPose` on the prefab, which raises the arm over the animation.
+- **Taking turns at the player:** `MonsterAI.HoldsBack` counts others with `MonsterAttacks.IsClosingIn` each time one is ready to strike (no tokens to leak),
+  and `AttackTurns` (plain, tested) says strike, stand ready or circle. Monsters targeting anything but the player don't take part.
+- **Combos and held blows** are data on `MonsterAttack` (`followUps`, `holdChance`), melee only. `MonsterAttacks.Blow` moves on and `MonsterAI.UpdateAttack`
+  raises `AttackStarted` again, so the animation, pose and telegraph treat each blow as a strike. A hold stops the strike's clock: `IsHolding` is what
+  `AttackTelegraph`, `MonsterPose` and `MonsterAnimationDriver` also stop for. New follow-ups on a humanoid need a line in `CombatMovesets.MonsterAttackStates`.
+- **Heavy swings that push through:** `WeaponDefinition.HeavySwingArmor`, read by `PlayerCombat.IsPushingThrough`, which sets the player's `DamageTakenMultiplier`
+  and skips the flinch. The player's multiplier belongs to `PlayerCombat`.
 - **Archery feel:** `ArrowProjectile.Strike` parents the arrow to the nearest bone or rigid part (`NearestBodyPart`, found before the blow, so a kill's corpse
   takes it along) and `ReturnToPool` takes it back out; its trail is made in code. Body sounds come from `CombatFeedback` (the bow's Hit Sound), `arrow.HitSound` is
   scenery only, and `HeardAt` brings the player's far blows within earshot. `PlayerFocus` earns from `Combatant.DamageDealt` on the bow's shot.

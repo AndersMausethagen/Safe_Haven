@@ -3,6 +3,12 @@
 Open work and ideas. Tick items off (`[x]`) or delete them when done. Architecture notes for each system live in
 [ARCHITECTURE.md](../Assets/_Project/Scripts/ARCHITECTURE.md).
 
+## Combat
+
+- [ ] **A real finishing move on staggered enemies.** A backstab on a staggered enemy still plays the normal swing. Give it a short dedicated
+      stab, with both bodies locked together for a moment, so it is the highlight of a fight. Humanoid enemies first (Draug, Barrow Shieldbearer):
+      each pairing of bodies has to line up, so it is the biggest piece of combat work left. Damage stays as it is (`PlayerCombat.Strike`).
+
 ## Reasons to raid (relics, rumours, people, finds)
 
 - [ ] **Biggest next step: authored set-pieces in the generated maps (GDD §9.1, §9.2).** The layouts vary, but a clearing is

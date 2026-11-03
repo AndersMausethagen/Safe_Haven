@@ -79,6 +79,14 @@ public sealed class MonsterMovement
         return agent.SetDestination(destination);
     }
 
+    /// <summary>Walks toward <paramref name="destination"/> looking along <paramref name="facing"/> instead of where it goes.</summary>
+    public void Strafe(Vector3 destination, Vector3 facing)
+    {
+        MoveTo(destination);
+        agent.updateRotation = false;
+        TurnTowards(facing);
+    }
+
     public void Stop()
     {
         agent.updateRotation = false;

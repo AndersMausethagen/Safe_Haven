@@ -24,8 +24,13 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
 
     private const float StrikeFade = 0.1f;
     private const float FlinchFade = 0.06f;
+    private const float HopFade = 0.05f;
+    private const float HopPlayback = 1.5f;
+    // A held wind-up all but stops the clip, without it looking frozen.
+    private const float HeldPlayback = 0.04f;
     private static readonly int ActionSpeedHash = Animator.StringToHash("ActionSpeed");
     private static readonly int HitStateHash = Animator.StringToHash("Hit");
+    private static readonly int HopStateHash = Animator.StringToHash("Hop");
 
     private Damageable health;
     private MonsterAI ai;
@@ -37,6 +42,7 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
     private bool hasSpeed;
     private bool hasAttack;
     private bool hasDead;
+    private bool holding;
 
     private void Awake()
     {
@@ -74,6 +80,12 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
         if (ai.enabled && hasSpeed)
         {
             animator.SetFloat(speedHash, ai.Speed, speedDampTime, Time.deltaTime);
+        }
+
+        if (animator != null && ai.IsHoldingStrike != holding)
+        {
+            holding = !holding;
+            animator.speed = holding ? HeldPlayback : 1f;
         }
     }
 
@@ -146,6 +158,12 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
         if (current == MonsterAI.State.Dead && hasDead)
         {
             animator.SetBool(deadHash, true);
+        }
+
+        if (current == MonsterAI.State.Hopping && animator != null && animator.isHuman && animator.HasState(0, HopStateHash))
+        {
+            animator.SetFloat(ActionSpeedHash, HopPlayback);
+            animator.CrossFadeInFixedTime(HopStateHash, HopFade, 0, 0f);
         }
     }
 }

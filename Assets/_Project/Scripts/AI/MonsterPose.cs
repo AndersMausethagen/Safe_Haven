@@ -40,6 +40,12 @@ public sealed class MonsterPose
         posedAttackStart = start;
     }
 
+    /// <summary>The attack's wind-up stands still for <paramref name="seconds"/> more.</summary>
+    public void HoldAttack(float seconds)
+    {
+        posedAttackStart += seconds;
+    }
+
     /// <summary>An attack broken off before it struck: no follow-through.</summary>
     public void CancelAttack()
     {

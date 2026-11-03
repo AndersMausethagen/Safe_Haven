@@ -6,7 +6,7 @@ using UnityEngine.AI;
 /// How a monster carries out a strike once it has chosen to: aimed when it starts (so a target can still dodge), landing
 /// through AttackResolver at the attack's Hit Delay, then recovering. The definition's actions (MonsterAttack) add
 /// projectile bursts, charges that leave it exposed, howls that rally its side and summons that call in others, each with
-/// its own cooldown. Plain C#, owned by a MonsterAI, which decides when to strike and what to do after.
+/// its own cooldown; a melee action can go on into more blows, or hold its wind-up. Plain C#, owned by a MonsterAI, which decides when to strike and what to do after.
 /// </summary>
 public sealed class MonsterAttacks
 {
@@ -29,6 +29,11 @@ public sealed class MonsterAttacks
     private float chargeLength;
     private float exposedAt = -1f;
     private bool chargeHit;
+    private int blowsLeft;
+    private float holdFrom;
+    private float holdLeft;
+    // A held wind-up stops here in its fill, before the end, so the blow is plainly still to come.
+    private const float HoldAtShare = 0.6f;
 
     public MonsterAttacks(Transform self, MonsterDefinition definition, Combatant combatant, MonsterMovement movement, LayerMask targetLayers)
     {
@@ -47,7 +52,17 @@ public sealed class MonsterAttacks
     public MonsterAttack Action => action;
 
     /// <summary>The attack of the current strike. Its Hit Delay is the wind-up before the hit.</summary>
-    public AttackDefinition Attack => action != null ? action.attack : definition.Attack;
+    public AttackDefinition Attack => action == null ? definition.Attack : Blow > 0 ? action.followUps[Blow - 1] : action.attack;
+
+    /// <summary>Which blow of a combo it is on: 0 for the first.</summary>
+    public int Blow { get; private set; }
+
+    /// <summary>True while it holds its wind-up: the strike's clock has stopped.</summary>
+    public bool IsHolding { get; private set; }
+
+    /// <summary>True while it is still coming at its target with a close strike, rather than spending a far one or recovering.</summary>
+    public bool IsClosingIn => action == null || action.kind == MonsterAttackKind.Melee ? hitPending || blowsLeft > 0
+        : action.kind == MonsterAttackKind.Charge && exposedAt < 0f;
 
     /// <summary>Where the current strike was aimed when it started; it doesn't follow the target.</summary>
     public Vector3 Direction => direction;
@@ -171,6 +186,11 @@ public sealed class MonsterAttacks
         chargeLength = action != null ? Mathf.Min(action.chargeDistance, toTarget.magnitude + 0.7f) : 0f;
         exposedAt = -1f;
         chargeHit = false;
+        Blow = 0;
+        bool melee = action != null && action.kind == MonsterAttackKind.Melee;
+        blowsLeft = melee && action.followUps != null && RaidTier >= action.comboFromTier && Random.value < action.comboChance ? action.followUps.Length : 0;
+        holdLeft = melee && Random.value < action.holdChance ? action.holdSeconds : 0f;
+        holdFrom = action != null && action.attack != null ? action.attack.HitDelay * HoldAtShare : 0f;
     }
 
     /// <summary>Carries the strike on. False once it is over, so the owner goes back to the chase.</summary>
@@ -181,6 +201,15 @@ public sealed class MonsterAttacks
         if (attack == null)
         {
             return false;
+        }
+
+        // Set here and not worked out from the clock, which this moves back: whoever else reads it this frame must see the same answer.
+        IsHolding = holdLeft > 0f && Time.time - startTime >= holdFrom;
+        if (IsHolding)
+        {
+            holdLeft -= Time.deltaTime;
+            startTime += Time.deltaTime;
+            Aim(aimPoint);
         }
 
         movement.TurnTowards(direction);
@@ -217,12 +246,31 @@ public sealed class MonsterAttacks
         actionIndex = -1;
         hitPending = false;
         exposedAt = -1f;
+        EndBlows();
+    }
+
+    private void EndBlows()
+    {
+        Blow = 0;
+        blowsLeft = 0;
+        holdLeft = 0f;
+        IsHolding = false;
+    }
+
+    private void Aim(Vector3? aimPoint)
+    {
+        if (aimPoint.HasValue)
+        {
+            Vector3 toAim = aimPoint.Value - self.position;
+            toAim.y = 0f;
+            direction = toAim.sqrMagnitude > 0.0001f ? toAim.normalized : direction;
+        }
     }
 
     /// <summary>Ends an interruptible action hit during its wind-up. True when that happened.</summary>
     public bool TryInterrupt(float healthLost)
     {
-        if (action == null || !action.interruptible || healthLost <= 0f || Time.time - startTime >= action.attack.HitDelay)
+        if (action == null || !action.interruptible || healthLost <= 0f || Time.time - startTime >= Attack.HitDelay)
         {
             return false;
         }
@@ -280,6 +328,17 @@ public sealed class MonsterAttacks
                     hitPending = false;
                     AttackResolver.Execute(combatant, attack, action.damage, self.position, direction, targetLayers);
                 }
+
+                if (blowsLeft > 0 && elapsed >= attack.HitDelay + action.comboGap)
+                {
+                    blowsLeft--;
+                    Blow++;
+                    Aim(aimPoint);
+                    startTime = Time.time;
+                    hitPending = true;
+                    return true;
+                }
+
                 return elapsed < attack.RecoveryTime || Finish();
         }
     }
@@ -426,6 +485,7 @@ public sealed class MonsterAttacks
         action = null;
         actionIndex = -1;
         exposedAt = -1f;
+        EndBlows();
         return false;
     }
 }

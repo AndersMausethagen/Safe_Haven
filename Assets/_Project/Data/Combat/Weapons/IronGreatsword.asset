@@ -24,6 +24,7 @@ MonoBehaviour:
   counterAttack: {fileID: 0}
   rushAttack: {fileID: 11400000, guid: 2ed922a7de7b1494aa275048fa34b5b3, type: 2}
   secondHandDistance: 0.17
+  heavySwingArmor: 0.3
   weaponArt: {fileID: 11400000, guid: 54b1444be62bf60438b43419ffd4e51e, type: 2}
   weaponArtFocus: 35
   guardLetThrough: 0.4
