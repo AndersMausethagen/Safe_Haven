@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Awakening
   description: You wake on the grass of a quiet clearing, and you wake alone. At its heart stand cracked old stones, warm to the touch, and something in them seems to be waiting for you.
   chain: The First Days
+  rank: 0
   availableObjective: 
   announceStart: 1
   announceCompletion: 1
@@ -23,6 +24,7 @@ MonoBehaviour:
   prerequisites: []
   start: 1
   startEvent: {fileID: 11400000, guid: d34acdcfc02a80243b371e93f882cd0c, type: 2}
+  closedBy: {fileID: 0}
   startDelay: 0
   onStarted: []
   objectivesInOrder: 0

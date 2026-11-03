@@ -14,15 +14,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::QuestDefinition
   id: prologue.findshelter
   displayName: Shelter from the Storm
-  description: Our expedition came to investigate rumours of a bewitched forest. Trolls and witches wander freely, and its creatures have become aggressive and unpredictable. First, find dry shelter along the old road.
+  description: The expedition came for four of its own and to look into rumours of a bewitched forest, and the forest has already put out the sun. Follow the old road in and find dry shelter.
   chain: Prologue - The Unquiet Forest
+  rank: 0
   availableObjective: Speak to Sigrid about the next step.
-  announceStart: 1
+  announceStart: 0
   announceCompletion: 0
   showTimerInHud: 0
-  prerequisites: []
+  prerequisites:
+  - {fileID: 11400000, guid: 7782d364f6bf30b4ba50ba576e7be27f, type: 2}
   start: 2
-  startEvent: {fileID: 11400000, guid: 8eb5d1eaca7f351419207cf31f6401cf, type: 2}
+  startEvent: {fileID: 0}
+  closedBy: {fileID: 0}
   startDelay: 0
   onStarted: []
   objectivesInOrder: 0

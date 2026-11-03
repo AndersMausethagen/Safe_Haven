@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: They Are Still Out There
   description: You heard Sigrid through the dormant stones. Your companions may still be alive. Inspect the portal, establish a foothold around it, and use Life Orbs to restore the connection.
   chain: The Lost Expedition
+  rank: 0
   availableObjective: 
   announceStart: 1
   announceCompletion: 1
@@ -24,6 +25,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: a089752e48d75934fb5e34dbeec0b389, type: 2}
   start: 1
   startEvent: {fileID: 11400000, guid: 6f84424e4c227b4449220dab22e7e824, type: 2}
+  closedBy: {fileID: 0}
   startDelay: 0
   onStarted: []
   objectivesInOrder: 0

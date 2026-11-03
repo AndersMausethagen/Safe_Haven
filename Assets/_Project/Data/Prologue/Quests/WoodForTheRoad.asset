@@ -1,0 +1,54 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 702d2e93d0a019a40b6339daf41e2c2f, type: 3}
+  m_Name: WoodForTheRoad
+  m_EditorClassIdentifier: SafeHaven::QuestDefinition
+  id: prologue.wood_for_the_road
+  displayName: Wood for the Road
+  description: The expedition never has enough firewood. Eirik gave you an axe. Fell a tree on the slope north of the road and bring six logs.
+  chain: Prologue - Before the Road
+  rank: 2
+  availableObjective: 
+  announceStart: 1
+  announceCompletion: 1
+  showTimerInHud: 0
+  prerequisites: []
+  start: 2
+  startEvent: {fileID: 0}
+  closedBy: {fileID: 11400000, guid: 2f630af2f0eaf434a97dc64ffe2d130c, type: 2}
+  startDelay: 0
+  onStarted: []
+  objectivesInOrder: 0
+  objectives:
+  - type: 1
+    description: Gather six logs on the slope north of the road
+    amount: 6
+    item: {fileID: 11400000, guid: 8ae2883815327b74fa7975309c803f92, type: 2}
+    resource: {fileID: 0}
+    monster: {fileID: 0}
+    faction: 0
+    building: {fileID: 0}
+    raid: {fileID: 0}
+    mustExtract: 0
+    withinMinutes: 0
+    questEvent: {fileID: 0}
+    countAlreadyOwned: 0
+  turnInToGiver: 1
+  turnInTo: Eirik
+  rewardItems:
+  - item: {fileID: 11400000, guid: e8bb5d2fbded52b42a179a47cce32d53, type: 2}
+    amount: 4
+  rewardResources: []
+  rewardRecipes: []
+  experience: 0
+  completionEvent: {fileID: 0}
+  onCompleted: []

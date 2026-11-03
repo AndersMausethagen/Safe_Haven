@@ -71,15 +71,16 @@ public sealed class QuestTrackerView : MonoBehaviour
                     GameSession.Quests.StatusOf(quest) == QuestStatus.NotStarted && GameSession.Quests.PrerequisitesMet(quest))
                     available.Add(quest);
 
-        active.Sort((a, b) => string.CompareOrdinal(a.Quest.DisplayName, b.Quest.DisplayName));
-        available.Sort((a, b) => string.CompareOrdinal(a.DisplayName, b.DisplayName));
+        // The main story on top, then side quests, then errands.
+        active.Sort((a, b) => a.Quest.Rank != b.Quest.Rank ? a.Quest.Rank.CompareTo(b.Quest.Rank) : string.CompareOrdinal(a.Quest.DisplayName, b.Quest.DisplayName));
+        available.Sort((a, b) => a.Rank != b.Rank ? a.Rank.CompareTo(b.Rank) : string.CompareOrdinal(a.DisplayName, b.DisplayName));
         panel.SetActive(active.Count + available.Count > 0);
         var builder = new StringBuilder();
         timed = false;
         for (int q = 0; q < active.Count && q < maxQuests; q++)
         {
             QuestLog.Entry entry = active[q];
-            builder.Append(q > 0 ? "\n\n" : "").Append("<b>").Append(entry.Quest.DisplayName).Append("</b>");
+            builder.Append(q > 0 ? "\n\n" : "").Append(Title(entry.Quest));
             if (QuestTimers.TryGet(entry.Quest, out float left))
             {
                 timed = true;
@@ -116,7 +117,7 @@ public sealed class QuestTrackerView : MonoBehaviour
             bool waiting = manager.IsWaiting(quest);
             string instruction = waiting && DialogueBox.IsSpeaking
                 ? "Finish the conversation to continue." : quest.AvailableObjective;
-            builder.Append(shown > 0 ? "\n\n" : "").Append("<b>").Append(quest.DisplayName).Append("</b>")
+            builder.Append(shown > 0 ? "\n\n" : "").Append(Title(quest))
                 .Append("\n• ").Append(instruction);
             timed |= waiting;
             shown++;
@@ -128,5 +129,11 @@ public sealed class QuestTrackerView : MonoBehaviour
         }
 
         label.text = builder.ToString();
+    }
+
+    private static string Title(QuestDefinition quest)
+    {
+        string name = $"<b><color={QuestMarkerSettings.Current.RankHex(quest.Rank)}>{quest.DisplayName}</color></b>";
+        return quest.Rank == QuestRank.MainStory ? name : $"{name}  <size=75%><color={Muted}>{QuestMarkerSettings.RankName(quest.Rank)}</color></size>";
     }
 }

@@ -939,15 +939,26 @@ Use readable finite-state behavior for enemies; companions require follow, hold,
 
 ### 21.0 Prologue: the Unquiet Forest
 
-New Game begins in a dedicated, hand-authored variant of Misty Woods, before the home progression below.
+New Game begins in a green meadow west of the forest, on a sunny early morning, then walks into a dedicated, hand-authored
+variant of Misty Woods, before the home progression below.
 The expedition is investigating reports of a bewitched forest: trolls and witches are roaming beyond their old
 territories, while normally predictable creatures have become aggressive and erratic. The cause remains unknown.
 
-The player travels with seven future recruits: Sigrid (expedition leader), Ingrid (Alchemist), Bjarne (Smith),
-Tor (Carpenter), Eirik (Soldier), Runa (Tracker), and Liv (Rune Scholar). Names and dialogue are provisional authored
-content. Ingrid reuses the existing recruit identity; the other professions' full settlement effects remain future work.
+**The morning (before the numbered journey below).** The player wakes at the expedition's fire in the north-west of the meadow, with
+armour but no weapon. Nothing starts until they speak to Sigrid; then she, Eirik and Runa say who they are. Until the player tells Sigrid they are ready there is time for optional
+errands (bronze marks: gold is the main story, silver side quests), each from whoever would ask: Runa's hunt for blight boar with her spare bow, Eirik's firewood with an axe and his fishing in the
+lake with a rod. The tools are the player's to keep; errands left unfinished lapse when the expedition sets out. Then the three walk the old
+road east at a steady pace, waiting if the player falls behind and talking on the way. As they near the forest the day runs out, hours too
+early, and they notice. They light torches and give the player one. Crossing the tree line the look turns to the raid's own, mist comes in with
+rain, and the storm breaks when the wolves reach the camp. They stop just inside the trees, Sigrid has the player choose a Tier I weapon (sword,
+axe, spear, club or bow) and sends them on to find shelter; wolves lie in wait on the road. The numbered journey below goes on from there. The
+journey no longer starts with a fixed axe and torch, and the old road now runs west to east through the forest, with a path north to the stones.
 
-1. Start with a one-handed Woodsman's Axe, an off-hand lit torch and a complete set of Woven Hide armor. All seven companions carry torches.
+The player travels with three of seven future recruits: Sigrid (expedition leader), Eirik (Soldier) and Runa (Tracker). Ingrid (Alchemist), Bjarne
+(Smith), Tor (Carpenter) and Liv (Rune Scholar) went ahead two days earlier and have not come back, which is why the expedition goes in. Their
+tipped handcart lies on the road. Names and dialogue are provisional authored content. Ingrid reuses the existing recruit identity; the other professions' full settlement effects remain future work.
+
+1. A complete set of Woven Hide armor from the start; the torch comes on the road and the chosen weapon at the tree line. The companions carry torches too.
    The torch is a normal craftable weapon (two Sticks, by hand), with a brighter flickering light. An occupied off hand
    rejects two-handed weapons; the player must put the torch away first.
    Speak with Sigrid and accept her briefing before the expedition follows or the shelter quest begins.
@@ -955,18 +966,18 @@ content. Ingrid reuses the existing recruit identity; the other professions' ful
    Speak with Sigrid to receive the gathering task: four Sticks and six Small Rocks.
    Return for her building instructions and use the normal build menu (G) to place a campfire beside the shelter.
    Construction pays this cost once; there is no prebuilt fire or additional fuel payment.
-3. After cooking, return to Sigrid to begin a 35-second rest by default. The tracker explicitly shows the countdown;
-   companion conversations are optional. Once it ends, finish any conversation to continue.
+3. After cooking, return to Sigrid to rest by the fire. There is no countdown: talk to the others, and the wolves cut the conversation short
+   (or come after 45 seconds if the player talks to nobody). Companions remember the errands and why the player came.
    Conversations bring the camera closer and frame the player and speaker; closing or leaving restores the view.
    Companions stow their weapons for peaceful conversations and restore their previous state afterward.
-4. Defend the camp against two wolves. The encounter counts regardless of who lands the killing blow.
+4. Defend the camp against two wolves, as the storm breaks. (On the road in, rootlings ambush the party, and Eirik offers a short optional lesson at the tree line: a dummy, a dodge, a parry or a dodge through a blow, and a rootling.) The encounter counts regardless of who lands the killing blow.
 5. A rumbling, approaching presence forces the group onward to ancient waystones. The giant's gait is slow and heavy;
    its walking footfalls produce subtle, distance-attenuated camera shake.
 6. Return to Sigrid at the waystones, then touch them to start a visible connection countdown (one minute in the current build),
    using the shared raid/quest countdown HUD. Music starts here,
    not during the opening or camp defence; wind/rain ambience remains throughout. Increasing enemy waves pressure the group;
    the soldier offers limited nearby support and the Alchemist tends the player's wounds.
-7. Reaching zero opens the connection as a vast impact separates the expedition. Falling during this final defence
+7. The old troll walks out of the trees towards the stones in the last twenty seconds. Reaching zero opens the connection as its blow lands and separates the expedition. Falling during this final defence
    gives an abbreviated version of the same narrative transition, not an ordinary raid failure.
 8. Wake alive at the portal, without a raid report or durability penalty. The expedition supplies do not carry
    into the settlement. Inspect the dormant portal and restore it to begin searching for the companions.

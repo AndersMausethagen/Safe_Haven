@@ -50,7 +50,7 @@ public sealed class GameEventListener : MonoBehaviour
         if (!respondedSinceEnabled && respondIfAlreadyHappened && AlreadyHappened())
         {
             UnityEvent onLoad = alreadyHappenedResponse.GetPersistentEventCount() > 0 ? alreadyHappenedResponse : response;
-            ExecuteActions();
+            ExecuteActions(true);
             onLoad.Invoke();
         }
     }
@@ -80,17 +80,17 @@ public sealed class GameEventListener : MonoBehaviour
         if (matches)
         {
             respondedSinceEnabled = true;
-            ExecuteActions();
+            ExecuteActions(false);
             response.Invoke();
         }
     }
 
-    private void ExecuteActions()
+    private void ExecuteActions(bool atOnce)
     {
         foreach (var action in actions)
         {
             if (action == null) Debug.LogError("Quest scene reaction contains an empty action.", this);
-            else action.Execute(this);
+            else action.Execute(this, atOnce);
         }
     }
 }

@@ -13,6 +13,8 @@ public sealed class SceneEventActionDrawer : PropertyDrawer
             case SceneEventActionKind.ResumeMusic: return new[] { "sceneAudio" };
             case SceneEventActionKind.ChangeWeather: return new[] { "weatherSystem", "weather", "transitionSeconds" };
             case SceneEventActionKind.SetObjectActive: return new[] { "target", "active" };
+            case SceneEventActionKind.ChangeTimeOfDay: return new[] { "dayNight", "hour", "transitionSeconds" };
+            case SceneEventActionKind.ChangeLook: return new[] { "look", "lookAmount", "transitionSeconds" };
             default: return new[] { "parameters" };
         }
     }

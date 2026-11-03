@@ -21,6 +21,8 @@ public enum ObjectiveType
     QuestEvent = 6,
     /// <summary>Build X of a structure (or any structure) with the build menu.</summary>
     BuildStructure = 7,
+    /// <summary>Land X fish with a rod: of one kind, or any fish.</summary>
+    CatchFish = 8,
 }
 
 /// <summary>
@@ -106,6 +108,8 @@ public sealed class QuestObjective
                 return new[] { nameof(questEvent), nameof(countAlreadyOwned) };
             case ObjectiveType.BuildStructure:
                 return new[] { nameof(building), nameof(countAlreadyOwned) };
+            case ObjectiveType.CatchFish:
+                return new[] { nameof(item) };
             default:
                 return Array.Empty<string>();
         }
@@ -145,6 +149,9 @@ public sealed class QuestObjective
                 return gameEvent.Kind == GameEventKind.Built && Is(building, gameEvent.Subject, false) ? gameEvent.Amount : 0;
             case ObjectiveType.QuestEvent:
                 return gameEvent.Kind == GameEventKind.Custom && questEvent != null && gameEvent.Subject == questEvent ? gameEvent.Amount : 0;
+            case ObjectiveType.CatchFish:
+                // An empty item counts any fish.
+                return gameEvent.Kind == GameEventKind.FishCaught && Is(item, gameEvent.Subject, false) ? gameEvent.Amount : 0;
             default:
                 return 0;
         }
@@ -211,6 +218,8 @@ public sealed class QuestObjective
             case ObjectiveType.QuestEvent:
                 string text = questEvent != null ? questEvent.ObjectiveText : "(no quest event)";
                 return Amount > 1 ? $"{text} ({count} times)" : text;
+            case ObjectiveType.CatchFish:
+                return $"Catch {count} {(item != null ? Name(item) : "fish")}";
             default:
                 return type.ToString();
         }

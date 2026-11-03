@@ -32,6 +32,16 @@ public sealed class PlayerCameraSettings : ScriptableObject
     [SerializeField, Min(0.01f)] private float transitionTime = 0.6f;
     [SerializeField, Min(0.01f)] private float zoomSmoothTime = 0.15f;
     [SerializeField, Min(0.01f)] private float lookAheadSmoothTime = 0.25f;
+    [Tooltip("Seconds the view takes to settle on a conversation and to return from it.")]
+    [SerializeField, Min(0.01f)] private float dialogueBlendTime = 1.6f;
+    [Tooltip("Seconds the view stays framed after a line ends, so it doesn't pull out and back in between lines.")]
+    [SerializeField, Min(0f)] private float dialogueHoldTime = 1.2f;
+    [Tooltip("How gently the view glides when the speaker changes, or a story turns it to something else (seconds, about).")]
+    [SerializeField, Min(0.01f)] private float dialogueTargetSmoothTime = 0.9f;
+    [Tooltip("The furthest a conversation pulls the view from the player, in metres: someone far off is only leaned towards.")]
+    [SerializeField, Min(0f)] private float dialogueMaxLean = 4f;
+    [Tooltip("Seconds the view takes to turn to something a story points at (Focus Camera) and back.")]
+    [SerializeField, Min(0.01f)] private float focusBlendTime = 1.5f;
 
     [Header("Input")]
     [Tooltip("Zoom change (0-1 of the state's range) per mouse wheel notch.")]
@@ -85,6 +95,11 @@ public sealed class PlayerCameraSettings : ScriptableObject
         },
     };
 
+    public float DialogueBlendTime => dialogueBlendTime;
+    public float DialogueHoldTime => dialogueHoldTime;
+    public float DialogueTargetSmoothTime => dialogueTargetSmoothTime;
+    public float DialogueMaxLean => dialogueMaxLean;
+    public float FocusBlendTime => focusBlendTime;
     public float TransitionTime => transitionTime;
     public float ZoomSmoothTime => zoomSmoothTime;
     public float LookAheadSmoothTime => lookAheadSmoothTime;

@@ -112,8 +112,16 @@ created before the split carries `[MovedFrom(sourceAssembly: "Assembly-CSharp")]
 
 ### Designer-authored prologue
 
+The game starts in the sun: a meadow west of the walled forest (second terrain, *Meadow Terrain*, sharing the forest's west
+edge), then the walk down the old road into the forest. Built by `AgentScripts/BuildPrologueMeadow.cs` (`Data`, `Land`,
+`Moments`), but made entirely of the designer pieces below, so all of it can be edited in the Content Editor, Quest Map and
+Story Graph. A chapter's whole setup is on its quest's Content Editor page (**Story Chapter** panel, `PrologueChapterPanel`).
+
 `Data/Prologue/ForestPrologue.asset` owns the ordered `PrologueChapter` list: quest, behaviour, automatic-entry
-messages, HUD text, duration and initial enemy count. Sigrid's ordinary `QuestGiver` component owns the ordered
+messages, HUD text, duration and initial enemy count. A chapter with behaviour **Story** has no mechanic of its own: story
+graphs and scene reactions make its moments, and the chapter only says where it is (**Site**: where a checkpoint goes back to,
+what the companions talk about), what the companions do (**Stand Still**, **Wait At Site**, **Follow**, **Story Leads**) and
+whether there is **Time To Talk** (their topics). A new step of the story that needs no new mechanic is a Story chapter. Sigrid's ordinary `QuestGiver` component owns the ordered
 **Offers** for briefings and return objectives: quest reference, briefing text, acceptance label and waiting text.
 Her `Talkable` makes the offers a conversation (close-camera framing, walk-away close); reading or closing it does not
 accept anything. Set a chapter quest's Start to **By Quest Giver**, then author its offer on the giver.
@@ -140,10 +148,10 @@ the alchemist's healing amount/interval; the speaker's name, camera distance and
 and it stands still until the expedition sets out.
 When an NPC also has a `QuestGiver`, keep it above the `PrologueCompanion`: the first part with a line speaks it (the
 offer before the camp chatter), and every part adds its answers (`IConversationTopics`).
-The intro's other moments are story graphs under **Intro Moments** in the scene (`Docs/StoryGraphs.md`): the choice of
-bow or axe, Eirik's waterskin for the cooking chapter (**Berries for the Pot**, started automatically after the fire),
+The morning's moments are story graphs under **Prologue Meadow › Morning Moments**, the forest's under **Intro Moments** (both
+in `Docs/StoryGraphs.md`): Eirik's waterskin for the cooking chapter (**Berries for the Pot**, started automatically after the fire),
 the small trolls' ambush in the berry clearing, and the old troll walking towards the fire when the wolves are beaten.
-Escorts stay put until the first briefing is accepted. All companions stop and stow their held weapon during peaceful
+By the morning fire the companions stand still (chapter **Stand Still**, `PrologueDirector.CompanionsHeld`). All companions stop and stow their held weapon during peaceful
 conversations, restoring its prior visibility afterward; combat retains armed behaviour. Separate torch props remain lit.
 Hand-mounted `ExpeditionTorch` objects keep their authored lit models upright during animation; their Light and
 LightFlicker components are scene-editable. Scene `GameEventTrigger`s control discovery zones;
@@ -161,10 +169,10 @@ Its ground is the director's TerrainCollider (height resampled after snapping), 
 corners differ by more than 0.2 m from the base; the portal's ward is a flat plane.
 `PersistentScene` and the campfire's registered prefab preserve the player's placement and resource depletion.
 The expedition wolf prefab has no SaveableEntity: encounters intentionally restart at checkpoints.
-Off-hand torch and armor are granted and auto-equipped once from the prologue definition, before the saved
+Armor is granted and auto-equipped once from the prologue definition (Starting Torch is empty: the story hands one out on the road), before the saved
 Started event is raised; loading never grants duplicates. The forest player's inventory defaults are empty.
-The definition's Starting Weapon is empty: the player picks the one-handed Woodsman's Axe or the Crude Wooden Bow (with
-arrows) in the **Bow or Axe** story. L (`PlayerEquipment.ToggleTorch`) swaps the torch and a two-handed weapon. Z (`PlayerEquipment.SwapWeapon`) swaps the weapon in hand for the one held before it (or puts the only one away). Torches are normal
+The definition's Starting Weapon is empty: at the tree line the player picks a Tier I sword, axe, spear, club or bow (with
+arrows) in the **Choose a Weapon** story. L (`PlayerEquipment.ToggleTorch`) swaps the torch and a two-handed weapon. Z (`PlayerEquipment.SwapWeapon`) swaps the weapon in hand for the one held before it (or puts the only one away). Torches are normal
 `WeaponDefinition` / `ItemDefinition` / `RecipeDefinition` assets, crafted by hand for two Sticks. `WeaponKind.Torch`
 allows the appended `GearSlot.OffHand` (17); existing saved slot indices stay unchanged. `GearSet` enforces hand
 occupancy in its container rule as well as equip commands, so drag/drop and auto-equip cannot pair an occupied off
@@ -218,6 +226,20 @@ start/completion events through `GameEvents`, feeding them back into the log and
 
 These are shared quest-system features, not prologue rules:
 
+- **Closed By** (`QuestDefinition`) makes a quest optional for as long as a later one hasn't begun. Once that quest starts it
+  is no longer offered; if it is under way it lapses (`QuestStatus.Lapsed`: off the tracker, no rewards, saved) and if it only
+  waits to be handed in it is handed in by itself (`QuestManager.CloseQuestsEndedBy`).
+- **Side Offers** (`QuestGiver`) are optional quests beside the ordered **Offers**: each is its own answer in conversation
+  (**Ask Text**, **Thanks Text**), in any order and at the same time as the others, and doesn't hold up the main sequence. The
+  floating mark shows the most pressing one. They need a `Talkable`.
+- **Rank** (`QuestDefinition`): Main Story (gold), Side Quest (silver), Optional (bronze). The colours are in `QuestMarkerSettings`
+  (Systems Editor) and reach the giver's mark, the tracker (main story first), the waypoint arrow, both maps, dialogue answers and
+  the Quest Map's strip.
+- Answers that do something to a quest say so in its rank's colour (`DialogueChoice.QuestTag`: "Starts optional quest: ...",
+  "Hands in: ..."). Quest givers set it through `MenuAction`; a story's Choice sets it when an answer leads straight to Start Quest.
+- **Catch Fish** objectives count `GameEventKind.FishCaught`, raised by `PlayerFishing` for a landed fish: of one kind, or any
+  when the item is empty.
+
 - **Turn In To Giver** retains the current quest after its task is done. If the next ordered offer directly depends on
   it and its other prerequisites are met, the giver presents the next briefing; accepting it hands in the old quest
   and starts the next. Reading, closing or replaying an obsolete choice cannot accept another quest.
@@ -235,6 +257,38 @@ These are shared quest-system features, not prologue rules:
 It restores playback speed when movement ends or is cancelled. `MonsterAnimationDriver` yields locomotion control while
 AI is disabled, and `CreatureFootfalls` counts real horizontal movement, including story-driven motion, ignoring warps.
 Each authored stride produces the same sound and distance-attenuated camera feedback; no timed imitation stomps are needed.
+
+### Walking the party, and a scene with two looks
+
+**Walk The Party** (`WalkPartyNode`, moved by plain C# `PartyWalk`) walks companions along a route (an object whose children
+are its points) at one pace: they keep their formation, turned with the road, and stride towards a spot a little ahead so they
+don't catch up and stop. The walk waits for a conversation, a fight, a companion left behind, or a player too far behind.
+**Wait Until The Walk Reaches** and **Change Time of Day** (Follow Walk) follow `PartyWalk.Current`, so talk and sunset belong
+to places on the road and wait along with the party. A load restarts the walk from the chapter's site (**Also After Loading**).
+
+`SceneLook` (on Sky and Weather) gives one scene a second look: pairs of volumes, and optionally a second `DayNightProfile`. The
+sky rig goes on driving the first volume of each pair and `SceneLook` splits that weight by how far the fade has come, so the
+second look follows the hour and the weather as well. The prologue's first look is the Haven's, its second the raid's own
+(`MistyWoods_Raid_*`, Misty Woods Day Night). Change it with the story's **Change Look** or the scene reaction **Change Look**.
+Scene reactions also have **Change Time of Day**. A reaction replayed on loading skips its transition (`SceneEventAction.Execute`
+`atOnce`), so what stays changed belongs in a reaction with **Respond If Already Happened**, and the moment itself in a story.
+
+The forest's second day and night profile is `Data/Prologue/Prologue Forest Night` (more moon and night ambient than the raid's, which it
+copies), and its global volume is `Data/Prologue/Prologue Forest Look` (the raid's, with a thinner night veil): change the forest's moonlight
+there, as the raid's own assets are left alone. A `CompanionTopic` can raise a Quest Event when asked.
+A chapter's companions can **Watch Only**: they wait at the site and leave enemies to the player (`Companion.HoldFire`). An attack that starts a
+fighting chapter closes any conversation (`PrologueDirector.RefreshStep`).
+
+The player stands still in a conversation (`PlayerInputHandler.IsListening`; in a fight the feet stay free). The camera glides between
+speakers and leans at most **Dialogue Max Lean** towards someone far off (`PlayerCameraSettings`). `ViewBounds` in a scene stops the
+top-down view at the edge of its terrains, while the Boundary walls keep the player well inside them.
+
+Any `WaterSurface` can be **Drinkable** (a World Builder river always is): it makes a `WaterSource` reached across
+its whole edge (`WaterShore`) while playing. **Oval** makes a disc mesh's outline the oval, not its bounding box.
+
+Scenes can have several terrains: `Terrains.Under(point)` is the one holding a point (`Terrain.activeTerrain` is only one of
+them), and the World Builder gives terrains that touch one height along their shared edge (`WorldBuilder.ShareEdges`). A terrain
+may sit below y = 0 once the builder has made room for a river bed: compare terrains in world heights.
 
 ### Hearthline: one style for all the UI
 
@@ -592,6 +646,10 @@ filled in when it is saved (`SaveableEntityTools`). Safe Haven > Save > Assign M
 | Make something react when a quest completes or a zone is entered | Add a `GameEventListener` / `GameEventTrigger` in the scene (Add Component › Safe Haven › Quests › Quest Event Listener / Trigger). No code. |
 | Make a one-off world event (e.g. "after the first raid, entering the ward blooms moss") | GameObject › Safe Haven › World Event (Zone + Response) or Ward Moss Bloom. The trigger has **When** (zone / interact / manually / `PlayerInsideArea`: inside any `IArea` set as its **Area**, such as the portal's ward), **Requires** (a `QuestCondition`: quest Started/Completed) and **Repeat** (`EveryTime` / `OncePerSceneLoad` / `OncePerGame`). OncePerGame events are remembered in `QuestLog.HappenedEventIds` (saved); the listener's **On Load (Already Happened)** response restores the world state, e.g. `TerrainMossBloom.BloomInstantly`. New reactions = a small component with a public method, wired in the listener |
 | Place a quest giver, inspect point, quest zone or listener | GameObject › Safe Haven › Quest Giver / Quest Inspect Point / Quest Zone / Quest Event Listener (pre-wired Interactable and trigger). Create a missing Quest Event with **New** next to any Quest Event field |
+| Give an NPC optional quests, offered side by side | `QuestGiver` › **Side Offers** (Ask Text, Text, Accept Text, Waiting Text, Thanks Text); needs a `Talkable`. End them when the story moves on: quest › **Closed By**. No code. |
+| Add a step to the prologue | New quest in the chain (prerequisite: the step before), then its page's **Story Chapter** panel: **Add As The Last Chapter**, **Earlier** / **Later**. Behaviour **Story** needs no code: moments are story graphs and scene reactions. No code. |
+| Make the party walk somewhere | An empty object with the route's points as children, then Story Graph › **Walk The Party**. Talk on the way: **Wait Until The Walk Reaches** › **Say** with **Aside** on. No code. |
+| Turn day to night, or change a scene's whole look, as the story moves on | Story Graph › **Change Time of Day**, **Change Look** (a scene's `SceneLook`), **Change Weather**; for what must stay after loading, the same in the quest or event's **Scene Reactions**. No code. |
 | Make a quest be handed back to its giver | Quest › **Turn In To Giver** (Content Editor). The quest waits in `ReadyToTurnIn` until `QuestGiver` (or `sh_quest --action turnin`) hands it in; rewards come then |
 | Change the floating !, … and ? over quest givers | Systems Editor › World › Quest Markers (`Resources/QuestMarkerSettings`). No code. |
 | Find where a quest or Quest Event is used in scenes | Content Editor quest/event page: **In the Scenes** (read from saved scene/prefab files by `QuestSceneIndex`; click to open). Warnings flag givers missing and events nothing raises. **Select All Uses in Open Scenes** selects every object in the loaded scenes that references it (includes unsaved edits) |

@@ -9,6 +9,8 @@ public sealed class CompanionTopic
 {
     public string question;
     [TextArea(2, 5)] public string answer;
+    [Tooltip("Raised when the player asks it, for a story to remember. Optional.")]
+    public GameEventDefinition raises;
 }
 
 /// <summary>
@@ -22,11 +24,15 @@ public sealed class CompanionTopic
 public sealed class PrologueCompanion : MonoBehaviour, IConversationTopics
 {
     [SerializeField] private ResidentDefinition resident;
+    [Tooltip("Their line by the morning fire in the meadow, and on the road to the forest.")]
+    [SerializeField, TextArea] private string meadowLine;
     [SerializeField, TextArea] private string forestLine;
     [SerializeField, TextArea] private string campLine;
     [SerializeField, TextArea] private string portalLine;
     [Tooltip("Asked around the camp (from gathering fuel until the wolves come), each once per visit to the scene.")]
     [SerializeField] private CompanionTopic[] campTopics = new CompanionTopic[0];
+    [Tooltip("Asked by the morning fire: who they are and what they make of the mission, each once per visit to the scene.")]
+    [SerializeField] private CompanionTopic[] morningTopics = new CompanionTopic[0];
     [Tooltip("Heals the player by Support Amount every Support Interval during a fight, when within 10 m.")]
     [SerializeField] private bool alchemist;
     [SerializeField, Min(1f)] private float supportInterval = 6f;
@@ -35,7 +41,7 @@ public sealed class PrologueCompanion : MonoBehaviour, IConversationTopics
     private NavMeshAgent agent;
     private Companion companion;
     private float nextSupport;
-    private readonly HashSet<int> asked = new HashSet<int>();
+    private readonly HashSet<CompanionTopic> asked = new HashSet<CompanionTopic>();
 
     public ResidentDefinition Resident => resident;
 
@@ -65,7 +71,12 @@ public sealed class PrologueCompanion : MonoBehaviour, IConversationTopics
     private void Update()
     {
         PrologueDirector expedition = PrologueDirector.Current;
-        if (companion != null) companion.Paused = expedition == null || !expedition.ExpeditionStarted;
+        if (companion != null)
+        {
+            companion.Paused = expedition == null || expedition.CompanionsHeld;
+            companion.HoldFire = expedition != null && expedition.CompanionsHoldFire;
+        }
+
         if (!alchemist || Player.Current == null || expedition == null || !expedition.IsFighting || Time.time < nextSupport) return;
         nextSupport = Time.time + supportInterval;
         if ((companion == null || !companion.IsDowned) &&
@@ -76,21 +87,23 @@ public sealed class PrologueCompanion : MonoBehaviour, IConversationTopics
     /// <summary>Their line for this part of the night (when nothing before it spoke) and the camp topics not asked yet.</summary>
     public void AddTopics(MenuPage page, DialogueSpeaker speaker, Action afterAnswer)
     {
-        PrologueStep step = PrologueDirector.Current != null ? PrologueDirector.Current.Step : PrologueStep.Finished;
+        PrologueDirector expedition = PrologueDirector.Current;
+        PrologueSite talk = expedition != null ? expedition.TalkSite : PrologueSite.Portal;
         if (string.IsNullOrWhiteSpace(page.Body))
         {
-            PrologueSite talk = step.Talk();
-            page.Body = talk == PrologueSite.Portal ? portalLine : talk == PrologueSite.Camp ? campLine : forestLine;
+            page.Body = talk == PrologueSite.Portal ? portalLine : talk == PrologueSite.Camp ? campLine :
+                talk == PrologueSite.Meadow ? meadowLine : forestLine;
         }
-        if (!step.AtRest()) return;
-        for (int i = 0; i < campTopics.Length; i++)
+        if (expedition == null || !expedition.AtRest) return;
+        foreach (CompanionTopic topic in talk == PrologueSite.Meadow ? morningTopics : campTopics)
         {
-            int topic = i;
-            if (asked.Contains(topic) || string.IsNullOrWhiteSpace(campTopics[topic].question)) continue;
-            page.Add(new MenuAction(campTopics[topic].question, null, true, () =>
+            if (asked.Contains(topic) || string.IsNullOrWhiteSpace(topic.question)) continue;
+            CompanionTopic chosen = topic;
+            page.Add(new MenuAction(chosen.question, null, true, () =>
             {
-                asked.Add(topic);
-                DialogueBox.Current.Say(speaker, campTopics[topic].answer, afterAnswer);
+                asked.Add(chosen);
+                if (chosen.raises != null) GameEvents.Raise(chosen.raises);
+                DialogueBox.Current.Say(speaker, chosen.answer, afterAnswer);
             }));
         }
     }

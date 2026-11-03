@@ -16,10 +16,16 @@ MonoBehaviour:
   displayName: Gifts of the Clearing
   description: 'A hearth starts small. Craft a stone hatchet and pickaxe from your bag (B), then gather what the clearing offers: enough for a fire and a workshop.'
   chain: The First Days
+  rank: 0
+  availableObjective: 
+  announceStart: 1
+  announceCompletion: 1
+  showTimerInHud: 0
   prerequisites:
   - {fileID: 11400000, guid: 00e21ff059394a4459d8cec92bc2d489, type: 2}
   start: 0
   startEvent: {fileID: 0}
+  closedBy: {fileID: 0}
   startDelay: 0
   onStarted: []
   objectivesInOrder: 0

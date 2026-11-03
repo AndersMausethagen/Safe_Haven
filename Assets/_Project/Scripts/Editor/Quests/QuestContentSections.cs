@@ -87,6 +87,7 @@ public sealed class QuestSection : ContentSection
     {
         var quest = (QuestDefinition)asset;
         ContentUtility.BeginPanel("In the Game", "How this quest fits with the others and what the player sees.");
+        EditorGUILayout.LabelField("Rank", QuestMarkerSettings.RankName(quest.Rank), ContentUtility.WrappedMiniLabel);
         EditorGUILayout.LabelField("Starts", DescribeStart(quest), ContentUtility.WrappedMiniLabel);
         EditorGUILayout.LabelField("Objectives", ContentUtility.WrappedMiniLabel);
         for (int i = 0; i < quest.Objectives.Count; i++)
@@ -99,6 +100,10 @@ public sealed class QuestSection : ContentSection
         EditorGUILayout.LabelField("Finishes", quest.TurnInToGiver
             ? $"When the player returns to {quest.TurnInTo} (a Quest Giver for it); rewards are given then."
             : "As soon as every objective is done.", ContentUtility.WrappedMiniLabel);
+        if (quest.ClosedBy != null)
+        {
+            EditorGUILayout.LabelField("Closes", $"Optional: when \"{quest.ClosedBy.DisplayName}\" starts it is no longer offered, and if it is under way it is left undone.", ContentUtility.WrappedMiniLabel);
+        }
 
         EditorGUILayout.Space(4f);
         EditorGUILayout.LabelField("Comes after", EditorStyles.miniBoldLabel);
@@ -114,6 +119,7 @@ public sealed class QuestSection : ContentSection
         ContentUtility.EndPanel();
 
         QuestReactionEditor.Draw(quest);
+        PrologueChapterPanel.Draw(quest);
         if (GUILayout.Button("Open Quest Map"))
         {
             QuestMapWindow.Open();

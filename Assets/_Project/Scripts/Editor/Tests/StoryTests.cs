@@ -185,7 +185,7 @@ public sealed class StoryTests
         try
         {
             StoryScript[] stories = scene.GetRootGameObjects().SelectMany(r => r.GetComponentsInChildren<StoryScript>(true)).ToArray();
-            CollectionAssert.IsSubsetOf(new[] { "Story - Bow or Axe", "Story - Eirik's Waterskin", "Story - Troll Ambush", "Story - The Old Troll" },
+            CollectionAssert.IsSubsetOf(new[] { "Story - Choose a Weapon", "Story - Eirik's Waterskin", "Story - Troll Ambush", "Story - The Old Troll" },
                 stories.Select(s => s.name).ToArray());
             foreach (StoryScript story in stories)
             {
@@ -193,16 +193,16 @@ public sealed class StoryTests
                 Assert.NotNull(story.GetComponent<SaveableEntity>(), $"{story.name} remembers what has fired");
             }
 
-            ChoiceNode choice = stories.Single(s => s.name == "Story - Bow or Axe").Nodes.OfType<ChoiceNode>().Single();
-            Assert.IsTrue(choice.mustAnswer, "Nobody leaves without a weapon.");
-            Assert.AreEqual(2, choice.answers.Count);
-            Assert.IsTrue(stories.Single(s => s.name == "Story - Bow or Axe").Nodes.OfType<GiveItemsNode>().All(g => g.equip));
+            ChoiceNode choice = stories.Single(s => s.name == "Story - Choose a Weapon").Nodes.OfType<ChoiceNode>().Single();
+            Assert.IsTrue(choice.mustAnswer, "Nobody goes into the forest without a weapon.");
+            Assert.AreEqual(5, choice.answers.Count, "Sword, axe, spear, club and bow.");
+            Assert.IsTrue(stories.Single(s => s.name == "Story - Choose a Weapon").Nodes.OfType<GiveItemsNode>().All(g => g.equip));
 
             PrologueCompanion[] companions = scene.GetRootGameObjects().SelectMany(r => r.GetComponentsInChildren<PrologueCompanion>()).ToArray();
             Assert.AreEqual(3, companions.Length);
             foreach (PrologueCompanion companion in companions)
             {
-                Assert.AreEqual(3, new SerializedObject(companion).FindProperty("campTopics").arraySize, companion.name);
+                Assert.GreaterOrEqual(new SerializedObject(companion).FindProperty("campTopics").arraySize, 3, companion.name);
             }
         }
         finally

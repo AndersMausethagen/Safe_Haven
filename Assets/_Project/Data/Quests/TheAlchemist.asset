@@ -16,10 +16,16 @@ MonoBehaviour:
   displayName: The Alchemist
   description: Ingrid knows the old ways of cleansing cursed things. Give her work, and build what she teaches you.
   chain: The First Days
+  rank: 0
+  availableObjective: 
+  announceStart: 1
+  announceCompletion: 1
+  showTimerInHud: 0
   prerequisites:
   - {fileID: 11400000, guid: f7e615034e347bc438f7fdf1f08bd615, type: 2}
   start: 0
   startEvent: {fileID: 0}
+  closedBy: {fileID: 0}
   startDelay: 0
   onStarted: []
   objectivesInOrder: 0

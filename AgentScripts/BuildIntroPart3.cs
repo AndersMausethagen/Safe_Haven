@@ -14,6 +14,8 @@ using UnityEngine.SceneManagement;
 /// it walks towards the fire); questions to ask each companion by the fire; companions' names turned to the camera. All
 /// moments are story graphs in the scene.
 /// Replaces what it built before. Reopens the scene that was open.
+/// History: BuildPrologueMeadow.cs has since moved the start to the meadow and replaced the bow or axe; don't run this again
+/// on the current scene.
 /// </summary>
 public static class BuildIntroPart3
 {

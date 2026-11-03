@@ -8,6 +8,8 @@ public enum QuestStatus
     Completed = 2,
     /// <summary>Every objective is done; the quest waits to be handed in at a Quest Giver (Turn In To Giver).</summary>
     ReadyToTurnIn = 3,
+    /// <summary>The story moved on while it was under way (QuestDefinition.ClosedBy): over, without its rewards.</summary>
+    Lapsed = 4,
 }
 
 /// <summary>
@@ -103,6 +105,8 @@ public sealed class QuestLog
     /// <summary>Raised when a Turn In To Giver quest has every objective done and waits to be handed in.</summary>
     public event Action<QuestDefinition> ReadyToTurnIn;
     public event Action<QuestDefinition> Completed;
+    /// <summary>Raised when a quest under way lapses because the story moved on.</summary>
+    public event Action<QuestDefinition> Lapsed;
 
     public QuestStatus StatusOf(QuestDefinition quest)
     {
@@ -127,10 +131,14 @@ public sealed class QuestLog
         return true;
     }
 
-    /// <summary>Starts the quest if it hasn't started and its prerequisites are done. Returns true when it started.</summary>
+    /// <summary>True once the quest that closes this one has started: an optional quest is no longer offered then.</summary>
+    public bool IsClosed(QuestDefinition quest) =>
+        quest != null && quest.ClosedBy != null && StatusOf(quest.ClosedBy) != QuestStatus.NotStarted;
+
+    /// <summary>Starts the quest if it hasn't started, its prerequisites are done and it isn't closed. Returns true when it started.</summary>
     public bool TryStart(QuestDefinition quest)
     {
-        if (quest == null || StatusOf(quest) != QuestStatus.NotStarted || !PrerequisitesMet(quest))
+        if (quest == null || StatusOf(quest) != QuestStatus.NotStarted || !PrerequisitesMet(quest) || IsClosed(quest))
         {
             return false;
         }
@@ -195,6 +203,20 @@ public sealed class QuestLog
         }
 
         Complete(entry);
+        return true;
+    }
+
+    /// <summary>Ends a quest under way without its rewards, because the story moved on. Returns true when it lapsed.</summary>
+    public bool TryLapse(QuestDefinition quest)
+    {
+        Entry entry = Get(quest);
+        if (entry == null || entry.Status != QuestStatus.Active)
+        {
+            return false;
+        }
+
+        entry.Status = QuestStatus.Lapsed;
+        Lapsed?.Invoke(quest);
         return true;
     }
 

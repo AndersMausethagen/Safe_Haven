@@ -1,0 +1,84 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 234431ceb48ad804d9a1e714df639046, type: 3}
+  m_Name: Prologue Meadow Terrain Surface Profile
+  m_EditorClassIdentifier: SafeHaven::TerrainSurfaceProfile
+  resolution: 1024
+  layers:
+  - terrainLayer: {fileID: 8574412962073106934, guid: 2fb57ea72bc32794bb6fd218883deb3f, type: 2}
+    heightMap: {fileID: 0}
+    channel: 0
+    amplitude: 1
+    midpoint: 0.5
+    contrast: 1
+    footprintResponse: 0.6
+  - terrainLayer: {fileID: 8574412962073106934, guid: 5effec8d888e03644876d67aaa777011, type: 2}
+    heightMap: {fileID: 0}
+    channel: 0
+    amplitude: 1
+    midpoint: 0.5
+    contrast: 1
+    footprintResponse: 0.6
+  - terrainLayer: {fileID: 8574412962073106934, guid: cc81bbd57ab7305418529d6986853e31, type: 2}
+    heightMap: {fileID: 0}
+    channel: 0
+    amplitude: 1
+    midpoint: 0.5
+    contrast: 1
+    footprintResponse: 0.6
+  - terrainLayer: {fileID: 8574412962073106934, guid: d3d80bbe2f1ec7e48871ba51335e1a84, type: 2}
+    heightMap: {fileID: 0}
+    channel: 0
+    amplitude: 1
+    midpoint: 0.5
+    contrast: 1
+    footprintResponse: 0.6
+  - terrainLayer: {fileID: 8574412962073106934, guid: a400704fa4dd8ab429ab87933ed8a2bc, type: 2}
+    heightMap: {fileID: 0}
+    channel: 0
+    amplitude: 1
+    midpoint: 0.5
+    contrast: 1
+    footprintResponse: 0.6
+  - terrainLayer: {fileID: 8574412962073106934, guid: 089cfd9135814f84a888e75dd12911b5, type: 2}
+    heightMap: {fileID: 2800000, guid: 973e206d6ed07dd48bf505aa90c9c28e, type: 3}
+    channel: 0
+    amplitude: 1
+    midpoint: 0.5
+    contrast: 1
+    footprintResponse: 0.6
+  - terrainLayer: {fileID: 8574412962073106934, guid: 3826170dd2ea2f44fa5843b55848d635, type: 2}
+    heightMap: {fileID: 0}
+    channel: 0
+    amplitude: 1
+    midpoint: 0.5
+    contrast: 1
+    footprintResponse: 0.6
+  - terrainLayer: {fileID: 8574412962073106934, guid: 89a3ba6919e572f4588c50d066b5a88a, type: 2}
+    heightMap: {fileID: 0}
+    channel: 0
+    amplitude: 1
+    midpoint: 0.5
+    contrast: 1
+    footprintResponse: 0.6
+  footprints: 1
+  footprintLifetime: 30
+  footprintDepth: 0.025
+  footprintFlattening: 0.75
+  footprintNormalFlattening: 0.65
+  footprintDarkening: 0.4
+  footprintGrassFlattening: 0.95
+  bootWidth: 0.13
+  bootLength: 0.3
+  bootMask: {fileID: 0}
+  footprintArea: 24
+  footprintResolution: 2048

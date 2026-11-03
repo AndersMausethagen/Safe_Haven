@@ -122,7 +122,7 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
         }
     }
 
-    private bool CanBegin(QuestDefinition quest) => Log.StatusOf(quest) == QuestStatus.NotStarted && Log.PrerequisitesMet(quest);
+    private bool CanBegin(QuestDefinition quest) => Log.StatusOf(quest) == QuestStatus.NotStarted && Log.PrerequisitesMet(quest) && !Log.IsClosed(quest);
 
     // Starts it now if nothing is in the way, or else keeps it until something isn't.
     private void Begin(QuestDefinition quest)
@@ -168,6 +168,10 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
         else if (status == QuestStatus.Completed)
         {
             reason = $"\"{quest.DisplayName}\" is already done.";
+        }
+        else if (status == QuestStatus.Lapsed || Log.IsClosed(quest))
+        {
+            reason = $"\"{quest.DisplayName}\" can't be done any more.";
         }
         else if (!Log.PrerequisitesMet(quest))
         {
@@ -233,6 +237,7 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
         log.Progressed += OnQuestProgressed;
         log.ReadyToTurnIn += OnQuestReadyToTurnIn;
         log.Completed += OnQuestCompleted;
+        log.Lapsed += OnQuestLapsed;
         RaiseChanged();
     }
 
@@ -247,6 +252,7 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
         log.Progressed -= OnQuestProgressed;
         log.ReadyToTurnIn -= OnQuestReadyToTurnIn;
         log.Completed -= OnQuestCompleted;
+        log.Lapsed -= OnQuestLapsed;
         log = null;
     }
 
@@ -310,10 +316,38 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
     private void OnQuestStarted(QuestDefinition quest)
     {
         if (quest.AnnounceStart)
-            GameMessages.Post("New quest: " + quest.DisplayName, MessageKind.Info);
+            GameMessages.Post($"New {(quest.Rank == QuestRank.MainStory ? "" : QuestMarkerSettings.RankName(quest.Rank).Split(' ')[0].ToLowerInvariant() + " ")}quest: {quest.DisplayName}", MessageKind.Info);
         GameEvents.Raise(new GameEvent(GameEventKind.QuestStarted, quest));
         RaiseAuthoredEvents(quest.OnStarted, quest);
         CountOwned(quest);
+        CloseQuestsEndedBy(quest);
+        RaiseChanged();
+    }
+
+    // Optional quests this one closes: what is finished is handed in, what is under way is left behind.
+    private void CloseQuestsEndedBy(QuestDefinition started)
+    {
+        foreach (QuestDefinition quest in Quests)
+        {
+            if (quest == null || quest.ClosedBy != started)
+            {
+                continue;
+            }
+
+            if (log.StatusOf(quest) == QuestStatus.ReadyToTurnIn)
+            {
+                log.TryTurnIn(quest);
+            }
+            else
+            {
+                log.TryLapse(quest);
+            }
+        }
+    }
+
+    private void OnQuestLapsed(QuestDefinition quest)
+    {
+        GameMessages.Post($"Left undone: {quest.DisplayName}", MessageKind.Info);
         RaiseChanged();
     }
 

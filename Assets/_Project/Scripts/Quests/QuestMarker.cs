@@ -52,11 +52,11 @@ public sealed class QuestMarker : MonoBehaviour
         Show(QuestGiverState.None);
     }
 
-    public void Show(QuestGiverState next)
+    public void Show(QuestGiverState next, QuestRank rank = QuestRank.MainStory)
     {
         state = next;
         QuestMarkerSettings settings = QuestMarkerSettings.Current;
-        bool visible = settings.TryGetLook(next, out string symbol, out Color color);
+        bool visible = settings.TryGetLook(next, rank, out string symbol, out Color color);
         text.enabled = visible;
         if (visible)
         {

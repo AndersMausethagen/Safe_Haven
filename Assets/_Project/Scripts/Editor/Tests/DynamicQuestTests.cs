@@ -197,12 +197,11 @@ public sealed class DynamicQuestTests
     [Test]
     public void AuthoredPrologue_UsesRegisteredCraftableTorchAndOneHandedAxe()
     {
-        var definition = AssetDatabase.LoadAssetAtPath<PrologueDefinition>("Assets/_Project/Data/Prologue/ForestPrologue.asset");
-        // The weapon is chosen in the scene's story: the axe leaves a hand for the torch, the bow does not (L swaps them).
+        // The weapon and the torch come in the scene's story at the forest's edge: the axe leaves a hand for the torch, the bow does not (L swaps them).
         var axe = AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Project/Data/Items/WoodsmansAxe.asset");
         Assert.AreEqual(WeaponStance.OneHanded, axe.Weapon.Stance);
         Assert.IsTrue(AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Project/Data/Items/CrudeWoodenBow.asset").Weapon.RequiresBothHands);
-        var torch = definition.StartingTorch;
+        var torch = AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Project/Data/Items/HandTorch.asset");
         Assert.AreEqual(WeaponKind.Torch, torch.Weapon.Kind);
         Assert.IsTrue(torch.Weapon.CanUseOffHand);
         Assert.IsEmpty(ItemPrefabBuilder.FindProblems(torch.Prefab, torch));
@@ -231,12 +230,11 @@ public sealed class DynamicQuestTests
             Assert.IsTrue(new SerializedObject(audio).FindProperty("startSilent").boolValue);
             Assert.AreEqual(7, components.OfType<ExpeditionTorch>().Count());
             Assert.IsFalse(components.OfType<Player>().Single().GetComponentsInChildren<ExpeditionTorch>(true).Any());
-            var reaction = components.OfType<GameEventListener>().Single(l =>
-                new SerializedObject(l).FindProperty("actions").arraySize > 0);
-            var data = new SerializedObject(reaction);
             var definition = AssetDatabase.LoadAssetAtPath<PrologueDefinition>("Assets/_Project/Data/Prologue/ForestPrologue.asset");
-            Assert.AreSame(definition.Chapters.Single(c => c.Behaviour == PrologueStep.HoldPortal).Quest,
-                data.FindProperty("quest").objectReferenceValue);
+            var hold = definition.Chapters.Single(c => c.Behaviour == PrologueStep.HoldPortal).Quest;
+            var reaction = components.OfType<GameEventListener>().Single(l =>
+                new SerializedObject(l).FindProperty("actions").arraySize > 0 && new SerializedObject(l).FindProperty("quest").objectReferenceValue == hold);
+            var data = new SerializedObject(reaction);
             Assert.IsTrue(data.FindProperty("respondIfAlreadyHappened").boolValue, "Restore countdown music on checkpoint loads.");
             Assert.AreEqual((int)ListenFor.QuestStarted, data.FindProperty("listenFor").enumValueIndex);
             var action = data.FindProperty("actions").GetArrayElementAtIndex(0);

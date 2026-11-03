@@ -1,0 +1,54 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 702d2e93d0a019a40b6339daf41e2c2f, type: 3}
+  m_Name: HuntForThePot
+  m_EditorClassIdentifier: SafeHaven::QuestDefinition
+  id: prologue.hunt_for_the_pot
+  displayName: Meat for the Road
+  description: Runa has seen blight boar out on the meadow north-east of the camp, where they have no business being. She lent you her spare bow. Bring two down.
+  chain: Prologue - Before the Road
+  rank: 2
+  availableObjective: 
+  announceStart: 1
+  announceCompletion: 1
+  showTimerInHud: 0
+  prerequisites: []
+  start: 2
+  startEvent: {fileID: 0}
+  closedBy: {fileID: 11400000, guid: 2f630af2f0eaf434a97dc64ffe2d130c, type: 2}
+  startDelay: 0
+  onStarted: []
+  objectivesInOrder: 0
+  objectives:
+  - type: 2
+    description: Bring down two blight boar on the north meadow
+    amount: 2
+    item: {fileID: 0}
+    resource: {fileID: 0}
+    monster: {fileID: 11400000, guid: e646ff37405b36e43a4fa710a23060e2, type: 2}
+    faction: 0
+    building: {fileID: 0}
+    raid: {fileID: 0}
+    mustExtract: 0
+    withinMinutes: 0
+    questEvent: {fileID: 0}
+    countAlreadyOwned: 0
+  turnInToGiver: 1
+  turnInTo: Runa
+  rewardItems:
+  - item: {fileID: 11400000, guid: 14b1c5230b317074b8251810d5264494, type: 2}
+    amount: 20
+  rewardResources: []
+  rewardRecipes: []
+  experience: 0
+  completionEvent: {fileID: 0}
+  onCompleted: []

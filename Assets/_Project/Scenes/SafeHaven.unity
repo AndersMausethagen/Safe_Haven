@@ -25259,6 +25259,7 @@ MonoBehaviour:
           voiceFrom: {fileID: 1038728947}
         line: <i>There. A hearth beside my stones, after a hundred winters.</i>
         afterFightPause: 1
+        aside: 0
     - rid: 287758281410609322
       type: {class: SayNode, ns: , asm: SafeHaven}
       data:
@@ -25273,6 +25274,7 @@ MonoBehaviour:
           voiceFrom: {fileID: 1038728947}
         line: <i>Do you feel that? The ward has remembered what it is for. And far out in the mist, little one, someone has stopped walking and turned to look.</i>
         afterFightPause: 1
+        aside: 0
     - rid: 287758281410609323
       type: {class: GlowNode, ns: , asm: SafeHaven}
       data:
@@ -30686,6 +30688,7 @@ MonoBehaviour:
         once: 1
         quest: {fileID: 11400000, guid: 95972d06dba0fda4bb5e87bc047956d1, type: 2}
         when: 1
+        alsoAfterLoading: 0
     - rid: 287758281410609308
       type: {class: WaitNode, ns: , asm: SafeHaven}
       data:
@@ -30706,6 +30709,7 @@ MonoBehaviour:
           voiceFrom: {fileID: 1038728947}
         line: <i>Listen. Far to the north, past the troll country, a hammer on stone. Three beats and a rest, over and over. Someone out there has seen your light and is answering it.</i>
         afterFightPause: 1
+        aside: 0
     - rid: 287758281410609310
       type: {class: SayNode, ns: , asm: SafeHaven}
       data:
@@ -30720,6 +30724,7 @@ MonoBehaviour:
           voiceFrom: {fileID: 0}
         line: That's Bjarne.
         afterFightPause: 1
+        aside: 0
     - rid: 287758281410609311
       type: {class: SayNode, ns: , asm: SafeHaven}
       data:
@@ -30734,6 +30739,7 @@ MonoBehaviour:
           voiceFrom: {fileID: 1038728947}
         line: <i>Then he is still himself. The way north is not open yet. Grow strong, little one, and keep this fire high. He can hold on a long while now.</i>
         afterFightPause: 1
+        aside: 0
 --- !u!114 &377451007
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -93869,6 +93875,180 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5503805453922757238, guid: 8068e63c19e557943b162b67081918e2, type: 3}
   m_PrefabInstance: {fileID: 1255663339}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1256035999
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1256036000}
+  - component: {fileID: 1256036002}
+  - component: {fileID: 1256036001}
+  m_Layer: 0
+  m_Name: Story - Why You Came
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1256036000
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1256035999}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1258665220}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1256036001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1256035999}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7585b9b1e2e24704186225f4b6f8d69a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::StoryScript
+  nodes:
+  - rid: 2623125856685130591
+  - rid: 2623125856685130592
+  - rid: 2623125856685130593
+  - rid: 2623125856685130594
+  - rid: 2623125856685130595
+  - rid: 2623125856685130596
+  - rid: 2623125856685130597
+  - rid: 2623125856685130598
+  links:
+  - from: 0513db6b431b4e9bb4a7b9824799a910
+    output: 0
+    to: 5fbf5bcdd29a4013b0c460a824666158
+  - from: 5fbf5bcdd29a4013b0c460a824666158
+    output: 0
+    to: c77e9e63672e4cbc9932967c7545224e
+  - from: c77e9e63672e4cbc9932967c7545224e
+    output: 0
+    to: c549c18fff42458caadee0a95b4d9441
+  - from: 5fbf5bcdd29a4013b0c460a824666158
+    output: 0
+    to: 965f2260c3e64d2899f22f5f6759e1be
+  - from: 965f2260c3e64d2899f22f5f6759e1be
+    output: 0
+    to: e38cec3cb11e4f7ab85c0dda920efc80
+  - from: 5fbf5bcdd29a4013b0c460a824666158
+    output: 0
+    to: fdc0d0c975ca4262bd2df5ce587f8da6
+  - from: fdc0d0c975ca4262bd2df5ce587f8da6
+    output: 0
+    to: a40dbe4c209c433dab018dfc1fe54bcf
+  logSteps: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 2623125856685130591
+      type: {class: WhenQuestEvent, ns: , asm: SafeHaven}
+      data:
+        id: 0513db6b431b4e9bb4a7b9824799a910
+        position: {x: 40, y: 60}
+        once: 1
+        questEvent: {fileID: 11400000, guid: c06332984c04ae244b8513b7d0e6178c, type: 2}
+    - rid: 2623125856685130592
+      type: {class: WaitNode, ns: , asm: SafeHaven}
+      data:
+        id: 5fbf5bcdd29a4013b0c460a824666158
+        position: {x: 340, y: 60}
+        seconds: 2
+    - rid: 2623125856685130593
+      type: {class: HasHappenedNode, ns: , asm: SafeHaven}
+      data:
+        id: c77e9e63672e4cbc9932967c7545224e
+        position: {x: 640, y: 60}
+        questEvent: {fileID: 11400000, guid: 052e1548b0a161348bb7cf591b4333f7, type: 2}
+    - rid: 2623125856685130594
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: c549c18fff42458caadee0a95b4d9441
+        position: {x: 940, y: 60}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: <i>You came for coin. There is none here. Stay anyway. They need you to.</i>
+        afterFightPause: 1
+        aside: 0
+    - rid: 2623125856685130595
+      type: {class: HasHappenedNode, ns: , asm: SafeHaven}
+      data:
+        id: 965f2260c3e64d2899f22f5f6759e1be
+        position: {x: 640, y: 230}
+        questEvent: {fileID: 11400000, guid: f1a0301acf429304ba7ad3d189da48bb, type: 2}
+    - rid: 2623125856685130596
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: e38cec3cb11e4f7ab85c0dda920efc80
+        position: {x: 940, y: 230}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: <i>You came looking for someone. Now there are others looking for you. Let them find a light.</i>
+        afterFightPause: 1
+        aside: 0
+    - rid: 2623125856685130597
+      type: {class: HasHappenedNode, ns: , asm: SafeHaven}
+      data:
+        id: fdc0d0c975ca4262bd2df5ce587f8da6
+        position: {x: 640, y: 400}
+        questEvent: {fileID: 11400000, guid: 1426971087cd5fb408c55293cb5e4e12, type: 2}
+    - rid: 2623125856685130598
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: a40dbe4c209c433dab018dfc1fe54bcf
+        position: {x: 940, y: 400}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: <i>You came to see whether the stories were true. Now you are one of them.</i>
+        afterFightPause: 1
+        aside: 0
+--- !u!114 &1256036002
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1256035999}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aecdc764a0346784e9958a956dddd948, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::SaveableEntity
+  id: 0186665ce0ac4367bdc886036b3ebe6c
+  prefabId: 
+  saveTransform: 1
+  saveActiveState: 1
+  rememberDestruction: 1
+  saveComponents: 1
 --- !u!1001 &1256769039
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -94034,6 +94214,7 @@ Transform:
   - {fileID: 304989521}
   - {fileID: 1577933049}
   - {fileID: 377451005}
+  - {fileID: 1256036000}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1259464237
@@ -99091,6 +99272,12 @@ MonoBehaviour:
   - {x: 48.316788, y: -4.572173, z: -197.0739, w: 2.2}
   - {x: 48.149616, y: -4.572173, z: -197.53612, w: 2.2}
   - {x: 48, y: -4.572173, z: -198, w: 2.2}
+  oval: 0
+  drinkable: 0
+  drinkName: 
+  drinkAmount: 40
+  fillItem: {fileID: 0}
+  fillUpTo: 3
 --- !u!23 &1311517566
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -118449,6 +118636,12 @@ MonoBehaviour:
   depth: 2
   flowSpeed: 1.4
   centreline: []
+  oval: 0
+  drinkable: 0
+  drinkName: 
+  drinkAmount: 40
+  fillItem: {fileID: 0}
+  fillUpTo: 3
 --- !u!23 &1556087136
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -120294,6 +120487,7 @@ MonoBehaviour:
         once: 1
         quest: {fileID: 11400000, guid: 2614c1d189f3a034691f98f3d3efeee0, type: 2}
         when: 1
+        alsoAfterLoading: 0
     - rid: 287758281410609313
       type: {class: WaitNode, ns: , asm: SafeHaven}
       data:
@@ -120322,6 +120516,7 @@ MonoBehaviour:
           voiceFrom: {fileID: 0}
         line: <i>...can anyone hear... Ingrid was right behind me when the stones broke. She's hurt. Find her first. Do you hear me? Find her first...</i>
         afterFightPause: 1
+        aside: 0
     - rid: 287758281410609316
       type: {class: SayNode, ns: , asm: SafeHaven}
       data:
@@ -120336,6 +120531,7 @@ MonoBehaviour:
           voiceFrom: {fileID: 1038728947}
         line: <i>My stones have gone quiet, but she is right. One spark burns close, just beyond me, hiding from the wolves. Make yourself tools, and go.</i>
         afterFightPause: 1
+        aside: 0
 --- !u!114 &1577933051
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -121763,6 +121959,7 @@ MonoBehaviour:
     order: 0
   showMarker: 1
   offers: []
+  sideOffers: []
   speakerName: 
   portrait: {fileID: 0}
   dialogueCameraDistance: 0.65
@@ -146234,6 +146431,7 @@ MonoBehaviour:
           voiceFrom: {fileID: 1038728947}
         line: <i>Seven sparks, scattered through the Misty Woods. They are alive. I hear them when the wind is right. But the forest does not kill the lost, little one. It forgets them.</i>
         afterFightPause: 1
+        aside: 0
     - rid: 287758281410609327
       type: {class: SayNode, ns: , asm: SafeHaven}
       data:
@@ -146248,6 +146446,7 @@ MonoBehaviour:
           voiceFrom: {fileID: 1038728947}
         line: <i>The last of an old promise. I keep the dark from this clearing. But that is not what you need to know.</i>
         afterFightPause: 1
+        aside: 0
     - rid: 287758281410609328
       type: {class: ChoiceNode, ns: , asm: SafeHaven}
       data:
@@ -146280,6 +146479,7 @@ MonoBehaviour:
           voiceFrom: {fileID: 1038728947}
         line: <i>I am a door, little one, and I have gone to sleep. I am too thin to wake myself. Long ago people kept a hearth beside these stones, and I kept the night from their door. That was the pact. No fire has burned here in a hundred winters.</i>
         afterFightPause: 1
+        aside: 0
     - rid: 287758281410609330
       type: {class: SayNode, ns: , asm: SafeHaven}
       data:
@@ -146294,6 +146494,7 @@ MonoBehaviour:
           voiceFrom: {fileID: 1038728947}
         line: <i>With what? You have nothing but your hands, and I cannot open.</i>
         afterFightPause: 1
+        aside: 0
     - rid: 287758281410609331
       type: {class: SayNode, ns: , asm: SafeHaven}
       data:
@@ -146308,6 +146509,7 @@ MonoBehaviour:
           voiceFrom: {fileID: 1038728947}
         line: <i>So light one. The forest cannot forget a hearth that someone tends. It will feed my ward, and out in the mist your people will see it and know which way is home.</i>
         afterFightPause: 1
+        aside: 0
     - rid: 287758281410609332
       type: {class: SayNode, ns: , asm: SafeHaven}
       data:
@@ -146322,6 +146524,7 @@ MonoBehaviour:
           voiceFrom: {fileID: 1038728947}
         line: <i>A fire first. Then a home worth coming back to. Then we go and fetch them. And one day, little one, you will tell me why these old stones woke for your hand.</i>
         afterFightPause: 1
+        aside: 0
     - rid: 287758281410609333
       type: {class: RaiseQuestEventNode, ns: , asm: SafeHaven}
       data:

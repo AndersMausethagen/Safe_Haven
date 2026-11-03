@@ -16,9 +16,15 @@ MonoBehaviour:
   displayName: Echoes in the Wilds
   description: Something calls from deeper in the Wilds. Fight your way to the western beacon.
   chain: Side Quests
+  rank: 1
+  availableObjective: 
+  announceStart: 1
+  announceCompletion: 1
+  showTimerInHud: 0
   prerequisites: []
   start: 1
   startEvent: {fileID: 11400000, guid: 85043c09728f72640a4a8dba469a35bc, type: 2}
+  closedBy: {fileID: 0}
   startDelay: 0
   onStarted: []
   objectivesInOrder: 0

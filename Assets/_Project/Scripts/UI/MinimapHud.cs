@@ -326,8 +326,18 @@ public sealed class MinimapHud : MonoBehaviour
         {
             if (waypoint != null && waypoint.IsWanted(log))
             {
-                Marker marker = Add(waypoint.transform, null, style.Accent, 10f, pinned: true);
+                Color colour = waypoint.Quest != null ? QuestMarkerSettings.Current.RankColor(waypoint.Quest.Rank) : style.Accent;
+                Marker marker = Add(waypoint.transform, null, colour, 10f, pinned: true);
                 marker.Rect.localRotation = Quaternion.Euler(0f, 0f, 45f);
+            }
+        }
+
+        // Whoever has a quest to give or to take back.
+        foreach (QuestGiver giver in QuestGiver.Active)
+        {
+            if (giver != null && giver.ShownQuest != null && (giver.ShownState == QuestGiverState.Available || giver.ShownState == QuestGiverState.ReadyToTurnIn))
+            {
+                Add(giver.transform, dot, QuestMarkerSettings.Current.RankColor(giver.ShownQuest.Rank), 8f);
             }
         }
     }

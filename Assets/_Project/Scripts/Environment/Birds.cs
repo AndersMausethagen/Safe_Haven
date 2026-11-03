@@ -281,7 +281,6 @@ public sealed class Birds : MonoBehaviour
         Vector3 right = view.transform.right;
         Vector3 up = view.transform.up;
         float night = Mathf.Lerp(1f, NightShade, Mathf.Clamp01(AtmosphereConditions.Night));
-        Terrain terrain = Terrain.activeTerrain;
         ExplorationMap explored = ExplorationMap.Current;
         int count = 0;
         foreach (BirdFlock flock in flocks)
@@ -306,6 +305,7 @@ public sealed class Birds : MonoBehaviour
                 Color colour = bird.Colour * night;
                 colour.a = opacity;
                 particles[count++] = Particle(bird.Position, bird.Size, colour, angle, picture);
+                Terrain terrain = Terrains.Under(bird.Position);
                 if (bird.State != BirdState.Perched && terrain != null)
                 {
                     Vector3 ground = bird.Position;

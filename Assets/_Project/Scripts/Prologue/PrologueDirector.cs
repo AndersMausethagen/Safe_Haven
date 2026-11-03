@@ -13,7 +13,10 @@ using UnityEngine.AI;
 public sealed class PrologueDirector : MonoBehaviour, IBuildArea
 {
     [SerializeField] private PrologueDefinition definition;
+    [Tooltip("The forest's edge, where the expedition stops inside the trees (PrologueSite.Forest).")]
     [SerializeField] private Transform startPoint;
+    [Tooltip("The morning fire in the meadow, where the game starts (PrologueSite.Meadow).")]
+    [SerializeField] private Transform meadowPoint;
     [SerializeField] private Transform campPoint;
     [SerializeField] private Transform portalPoint;
     [SerializeField] private Terrain buildTerrain;
@@ -44,8 +47,14 @@ public sealed class PrologueDirector : MonoBehaviour, IBuildArea
     public bool CanSave => ready && !ending && !reviving && !IsFighting;
     public bool IsFighting => chapterActive && !ending && (step == PrologueStep.DefendCamp || step == PrologueStep.HoldPortal);
     public IReadOnlyList<Damageable> Enemies => enemies;
-    public bool ExpeditionStarted => definition != null && definition.Chapters.Length > 0 &&
-        GameSession.Quests.StatusOf(definition.Chapters[0].Quest) != QuestStatus.NotStarted;
+    /// <summary>True while the companions stand still and take no orders: before the game has begun and around the morning fire.</summary>
+    public bool CompanionsHeld => !ready || chapter == null || chapter.Companions == PrologueCompanions.StandStill;
+    /// <summary>True while the companions leave enemies to the player.</summary>
+    public bool CompanionsHoldFire => chapter != null && chapter.Companions == PrologueCompanions.WatchOnly;
+    /// <summary>The place the companions talk about now.</summary>
+    public PrologueSite TalkSite => chapter != null ? chapter.Talk : PrologueSite.Portal;
+    /// <summary>True while there is time to talk (the companions' topics).</summary>
+    public bool AtRest => chapter != null && chapter.AtRest;
     public bool HasAcceptedChapter => ready && chapterActive && !ending;
     public bool CanBuild => ready && !ending && chapterActive && step == PrologueStep.LightFire &&
         definition.Campfire != null && BuildingObject.Find(definition.Campfire) == null;
@@ -132,7 +141,7 @@ public sealed class PrologueDirector : MonoBehaviour, IBuildArea
     private void Start()
     {
         string problem = definition != null ? definition.FindProblem() : "No prologue definition.";
-        if (problem == null && (startPoint == null || campPoint == null || portalPoint == null ||
+        if (problem == null && (startPoint == null || meadowPoint == null || campPoint == null || portalPoint == null ||
             campSpawns.Length == 0 || portalSpawns.Length == 0 || portalVisual == null ||
             buildTerrain == null || buildTerrain.GetComponent<TerrainCollider>() == null))
             problem = "Prologue scene references are incomplete.";
@@ -242,13 +251,20 @@ public sealed class PrologueDirector : MonoBehaviour, IBuildArea
         nextRumble = 12f;
         wave = 0;
         if (IsFighting && ActionMenuWindow.Current != null) ActionMenuWindow.Current.Close();
+        // An attack cuts a conversation short, answers and all: it is the point of being attacked.
+        if (IsFighting && !restoring && DialogueBox.IsOpen) DialogueBox.Current.Close();
         portalVisual.SetActive(step.PortalOpen());
-        PrologueSite? waitAt = step.Rally();
-        Transform rally = waitAt.HasValue ? PointAt(waitAt.Value) : null;
-        foreach (PrologueCompanion companion in companions)
-            if (companion != null) companion.RallyAt(rally, restoring);
+        // A story leads them once it gets going; until then they wait at the chapter's place like anyone.
+        PrologueCompanions orders = chapter != null ? chapter.Companions : PrologueCompanions.WaitAtSite;
+        if (orders != PrologueCompanions.StandStill && (orders != PrologueCompanions.StoryLeads || restoring))
+        {
+            Transform rally = orders == PrologueCompanions.Follow ? null : PointAt(chapter != null ? chapter.RallySite : PrologueSite.Portal);
+            foreach (PrologueCompanion companion in companions)
+                if (companion != null) companion.RallyAt(rally, restoring);
+        }
+
         if (restoring)
-            MovePlayer(PointAt(step.Checkpoint()));
+            MovePlayer(PointAt(chapter != null ? chapter.Checkpoint : step.Checkpoint()));
         if (step == PrologueStep.Finished)
         {
             BeginEnding(false);
@@ -267,7 +283,8 @@ public sealed class PrologueDirector : MonoBehaviour, IBuildArea
     }
 
     private Transform PointAt(PrologueSite site) =>
-        site == PrologueSite.Portal ? portalPoint : site == PrologueSite.Camp ? campPoint : startPoint;
+        site == PrologueSite.Portal ? portalPoint : site == PrologueSite.Camp ? campPoint :
+        site == PrologueSite.Meadow ? meadowPoint : startPoint;
 
     // The chapter's clock and arrivals: wolves, the portal's rumble.
     private void StartChapter()

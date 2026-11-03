@@ -72,8 +72,15 @@ public sealed class PlayerCameraController : MonoBehaviour
     private bool lockedCursor;
     private Transform dialogueTarget;
     private float dialogueDistance = 1f;
+    private float dialogueDistanceNow = 1f;
+    private float dialogueDistanceVelocity;
     private float dialogueWeight;
     private Vector3 dialoguePoint;
+    private Vector3 dialoguePointVelocity;
+    private bool dialoguePointSet;
+    private float dialogueHoldUntil;
+    private Vector3 focusPointVelocity;
+    private bool focusPointSet;
     private bool aiming;
     private float aimWeight;
     private Transform focusTarget;
@@ -101,7 +108,11 @@ public sealed class PlayerCameraController : MonoBehaviour
 
     public void EndDialogue(Transform speaker)
     {
-        if (dialogueTarget == speaker) dialogueTarget = null;
+        if (dialogueTarget == speaker)
+        {
+            dialogueTarget = null;
+            dialogueHoldUntil = Time.unscaledTime + settings.DialogueHoldTime;
+        }
     }
 
     private void Awake()
@@ -186,8 +197,10 @@ public sealed class PlayerCameraController : MonoBehaviour
         CameraPointer.UsesScreenCenter = false;
         dialogueTarget = null;
         dialogueWeight = 0f;
+        dialoguePointSet = false;
         focusTarget = null;
         focusWeight = 0f;
+        focusPointSet = false;
         ReleaseCursor();
     }
 
@@ -209,8 +222,10 @@ public sealed class PlayerCameraController : MonoBehaviour
         UpdateStyle();
         ReadInput();
         BlendTowardProfile();
-        dialogueWeight = Mathf.MoveTowards(dialogueWeight, dialogueTarget != null ? 1f : 0f, Time.unscaledDeltaTime / 0.4f);
-        focusWeight = Mathf.MoveTowards(focusWeight, focusTarget != null ? 1f : 0f, Time.unscaledDeltaTime / 0.6f);
+        // It stays framed through the short gaps between one line and the next, rather than pulling out and back in each time.
+        bool framing = dialogueTarget != null || Time.unscaledTime < dialogueHoldUntil;
+        dialogueWeight = Mathf.MoveTowards(dialogueWeight, framing ? 1f : 0f, Time.unscaledDeltaTime / settings.DialogueBlendTime);
+        focusWeight = Mathf.MoveTowards(focusWeight, focusTarget != null ? 1f : 0f, Time.unscaledDeltaTime / settings.FocusBlendTime);
         UpdateFocus();
         ApplyToCinemachine();
     }
@@ -381,12 +396,60 @@ public sealed class PlayerCameraController : MonoBehaviour
         Vector3 shoulder = Quaternion.Euler(0f, yaw, 0f) * Vector3.right * settings.ActionShoulderOffset;
         Vector3 actionOffset = (shoulder + Vector3.up * settings.ActionLookHeight) * actionWeight;
         focus.position = target.position + lookAheadOffset + actionOffset;
+        // Glides from one speaker to the next rather than jumping when the speaker changes, and only leans a little way
+        // towards someone far off, so a shout from across the meadow doesn't throw the view after them.
         if (dialogueTarget != null)
-            dialoguePoint = (target.position + dialogueTarget.position + Vector3.up) * 0.5f;
-        focus.position = Vector3.Lerp(focus.position, dialoguePoint, dialogueWeight);
+        {
+            Vector3 lean = Vector3.ClampMagnitude((dialogueTarget.position + Vector3.up - target.position) * 0.5f, settings.DialogueMaxLean);
+            dialoguePoint = Glide(dialoguePoint, target.position + lean, ref dialoguePointVelocity, ref dialoguePointSet);
+        }
+        else if (dialogueWeight <= 0f)
+        {
+            dialoguePointSet = false;
+        }
+
+        focus.position = Vector3.Lerp(focus.position, dialoguePoint, Mathf.SmoothStep(0f, 1f, dialogueWeight));
         if (focusTarget != null)
-            focusPoint = focusTarget.position + Vector3.up;
+        {
+            focusPoint = Glide(focusPoint, focusTarget.position + Vector3.up, ref focusPointVelocity, ref focusPointSet);
+        }
+        else if (focusWeight <= 0f)
+        {
+            focusPointSet = false;
+        }
+
         focus.position = Vector3.Lerp(focus.position, focusPoint, Mathf.SmoothStep(0f, 1f, focusWeight));
+        KeepViewInBounds();
+    }
+
+    // A new look-at starts where it is (the weight blends the view over from the player); only changes after that glide.
+    private Vector3 Glide(Vector3 from, Vector3 to, ref Vector3 velocity, ref bool started)
+    {
+        if (!started)
+        {
+            started = true;
+            velocity = Vector3.zero;
+            return to;
+        }
+
+        return Vector3.SmoothDamp(from, to, ref velocity, settings.DialogueTargetSmoothTime, Mathf.Infinity, Time.unscaledDeltaTime);
+    }
+
+    // Top-down only: the action camera looks at the horizon, where the world's edge is a matter for the map itself.
+    private void KeepViewInBounds()
+    {
+        ViewBounds bounds = ViewBounds.Current;
+        if (bounds == null || actionWeight >= 1f)
+        {
+            return;
+        }
+
+        outputCamera = outputCamera != null ? outputCamera : Camera.main;
+        if (outputCamera != null)
+        {
+            Vector3 kept = bounds.Keep(focus.position, follow.FollowOffset, cinemachineCamera.Lens.FieldOfView, outputCamera.aspect);
+            focus.position = Vector3.Lerp(kept, focus.position, actionWeight);
+        }
     }
 
     private Vector3 GetCursorOffset()
@@ -430,7 +493,8 @@ public sealed class PlayerCameraController : MonoBehaviour
             Mathf.Lerp(settings.ActionMinDistance, settings.ActionMaxDistance, zoom),
             w);
         float viewPitch = Mathf.Lerp(pitch, actionPitch, w);
-        distance *= Mathf.Lerp(1f, dialogueDistance, dialogueWeight);
+        dialogueDistanceNow = Mathf.SmoothDamp(dialogueDistanceNow, dialogueDistance, ref dialogueDistanceVelocity, settings.DialogueTargetSmoothTime, Mathf.Infinity, Time.unscaledDeltaTime);
+        distance *= Mathf.Lerp(1f, dialogueDistanceNow, Mathf.SmoothStep(0f, 1f, dialogueWeight));
         Vector3 back = Quaternion.Euler(viewPitch, yaw, 0f) * Vector3.back;
 
         // The action camera orbits the point the composer looks at, not the focus below it.

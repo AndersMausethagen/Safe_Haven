@@ -93,7 +93,7 @@ public sealed class Fireflies : MonoBehaviour
 
     private static float GroundHeight(Vector3 point, float fallback)
     {
-        Terrain terrain = Terrain.activeTerrain;
+        Terrain terrain = Terrains.Under(point);
         return terrain != null && terrain.terrainData != null ? terrain.transform.position.y + terrain.SampleHeight(point) : fallback;
     }
 }

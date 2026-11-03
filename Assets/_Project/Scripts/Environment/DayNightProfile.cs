@@ -160,4 +160,26 @@ public struct DayNightState
     public float FogDensity, Reflection, Night, GoldenHour;
     /// <summary>The light's shadow strength in clear weather.</summary>
     public float ShadowStrength;
+
+    public static DayNightState Lerp(in DayNightState a, in DayNightState b, float t)
+    {
+        return new DayNightState
+        {
+            Hour = a.Hour,
+            LightRotation = Quaternion.Slerp(a.LightRotation, b.LightRotation, t),
+            LightColour = Color.Lerp(a.LightColour, b.LightColour, t),
+            LightIntensity = Mathf.Lerp(a.LightIntensity, b.LightIntensity, t),
+            IsMoon = t < 0.5f ? a.IsMoon : b.IsMoon,
+            Daylight = Mathf.Lerp(a.Daylight, b.Daylight, t),
+            AmbientSky = Color.Lerp(a.AmbientSky, b.AmbientSky, t),
+            AmbientEquator = Color.Lerp(a.AmbientEquator, b.AmbientEquator, t),
+            AmbientGround = Color.Lerp(a.AmbientGround, b.AmbientGround, t),
+            FogColour = Color.Lerp(a.FogColour, b.FogColour, t),
+            FogDensity = Mathf.Lerp(a.FogDensity, b.FogDensity, t),
+            Reflection = Mathf.Lerp(a.Reflection, b.Reflection, t),
+            Night = Mathf.Lerp(a.Night, b.Night, t),
+            GoldenHour = Mathf.Lerp(a.GoldenHour, b.GoldenHour, t),
+            ShadowStrength = Mathf.Lerp(a.ShadowStrength, b.ShadowStrength, t),
+        };
+    }
 }

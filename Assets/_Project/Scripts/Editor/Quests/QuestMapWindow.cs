@@ -324,6 +324,7 @@ public sealed class QuestMapWindow : EditorWindow
     private void DrawBox(Box box)
     {
         GUI.Box(box.Rect, GUIContent.none, EditorStyles.helpBox);
+        EditorGUI.DrawRect(new Rect(box.Rect.x, box.Rect.y, 4f, box.Rect.height), QuestMarkerSettings.Current.RankColor(box.Node.Quest.Rank));
         var titleRect = new Rect(box.Rect.x + 6f, box.Rect.y + 4f, box.Rect.width - 12f, LineHeight + 2f);
         if (GUI.Button(titleRect, box.Node.Quest.DisplayName, titleStyle))
         {

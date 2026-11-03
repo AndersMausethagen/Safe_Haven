@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::GameEventDefinition
   id: prologue.weapon_chosen
   displayName: 
-  objectiveText: 
+  objectiveText: Choose a weapon
   notes: 

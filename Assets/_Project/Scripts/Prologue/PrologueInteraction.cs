@@ -30,7 +30,7 @@ public sealed class PrologueInteraction : MonoBehaviour, IInteractionCondition
             ? PrologueStep.LightFire : PrologueStep.ActivatePortal;
         bool correctStep = director.Step == required && director.HasAcceptedChapter;
         reason = correctStep ? null : director.Step == required && !director.HasAcceptedChapter
-            ? director.Definition.WaitingForLeaderText : director.Step > required ? afterStepText : beforeStepText;
+            ? director.Definition.WaitingForLeaderText : director.Step > required && director.Step != PrologueStep.Story ? afterStepText : beforeStepText;
         return correctStep;
     }
 

@@ -10,11 +10,17 @@ public sealed class QuestOffer
     [SerializeField, TextArea(2, 6)] private string text;
     [SerializeField] private string acceptText = "I'll do it.";
     [SerializeField, TextArea] private string waitingText;
+    [Tooltip("Side offers: the question the player asks to hear about it. Empty: \"Anything I can do?\"")]
+    [SerializeField] private string askText;
+    [Tooltip("Side offers: what the giver says when it is handed in.")]
+    [SerializeField, TextArea] private string thanksText;
 
     public QuestDefinition Quest => quest;
     public string Text => text;
     public string AcceptText => acceptText;
     public string WaitingText => waitingText;
+    public string AskText => string.IsNullOrWhiteSpace(askText) ? "Anything I can do?" : askText;
+    public string ThanksText => thanksText;
 }
 
 /// <summary>What a Quest Giver currently offers the player, which decides its marker and whether it can be used.</summary>
@@ -68,6 +74,8 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
     [SerializeField] private bool showMarker = true;
     [Tooltip("Optional ordered offers, replacing the single Quest above. The first unfinished offer is selected; prerequisites still apply.")]
     [SerializeField] private QuestOffer[] offers = Array.Empty<QuestOffer>();
+    [Tooltip("Optional quests this giver also has, each on its own: the player asks about them in conversation (needs a Talkable), in any order, beside the ordered offers. Give them Closed By to end them when the story moves on.")]
+    [SerializeField] private QuestOffer[] sideOffers = Array.Empty<QuestOffer>();
     [Tooltip("Who says the lines when there is no Talkable (which then names the speaker). Empty: the object's name.")]
     [SerializeField] private string speakerName;
     [Tooltip("Shown in the dialogue box instead of a live portrait of this object. Optional; without a Talkable.")]
@@ -80,8 +88,18 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
     private float lastAsked = float.NegativeInfinity;
     private QuestOffer offer;
     private Talkable talkable;
+    private static readonly List<QuestGiver> active = new List<QuestGiver>();
+
+    /// <summary>Every enabled giver, for the maps.</summary>
+    public static IReadOnlyList<QuestGiver> Active => active;
+    /// <summary>What the giver's floating mark shows now, and for which quest (null: its own).</summary>
+    public QuestGiverState ShownState { get; private set; } = QuestGiverState.None;
+    public QuestDefinition ShownQuest { get; private set; }
+    /// <summary>Who the player would talk to.</summary>
+    public string DisplayName => talkable != null ? talkable.SpeakerName : SpeakerName;
 
     public IReadOnlyList<QuestOffer> Offers => offers;
+    public IReadOnlyList<QuestOffer> SideOffers => sideOffers;
     public QuestDefinition Quest => offer != null ? offer.Quest : quest;
     public QuestGiverState State => state;
     public bool IsNote => talkable == null && (state == QuestGiverState.InProgress || state == QuestGiverState.Done);
@@ -100,6 +118,7 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
             interactable.Completed.AddListener(Interact);
         }
 
+        active.Add(this);
         QuestManager.Changed += Refresh;
         Refresh();
     }
@@ -111,6 +130,7 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
             interactable.Completed.RemoveListener(Interact);
         }
 
+        active.Remove(this);
         QuestManager.Changed -= Refresh;
     }
 
@@ -143,8 +163,10 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
                 return quest.TurnInToGiver ? QuestGiverState.ReadyToTurnIn : QuestGiverState.InProgress;
             case QuestStatus.Active:
                 return QuestGiverState.InProgress;
+            case QuestStatus.Lapsed:
+                return QuestGiverState.None;
             default:
-                if (quest.Start != QuestStart.ByQuestGiver)
+                if (quest.Start != QuestStart.ByQuestGiver || log.IsClosed(quest))
                 {
                     return QuestGiverState.None;
                 }
@@ -270,6 +292,8 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
             interactable.enabled = !(state == QuestGiverState.Done && !afterLines.HasAny) && state != QuestGiverState.None;
         }
 
+        ShownState = MarkerState(log, out QuestDefinition shownQuest);
+        ShownQuest = shownQuest;
         if (showMarker && Application.isPlaying)
         {
             if (marker == null)
@@ -277,8 +301,28 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
                 marker = QuestMarker.CreateFor(transform);
             }
 
-            marker.Show(state);
+            marker.Show(ShownState, shownQuest != null ? shownQuest.Rank : QuestRank.MainStory);
         }
+    }
+
+    // What the floating mark shows: something to hand in first, then something to take, then what the ordered offer says.
+    // The ordered offer goes first among equals, as it is the giver's main business.
+    private QuestGiverState MarkerState(QuestLog log, out QuestDefinition shownQuest)
+    {
+        QuestGiverState shown = state;
+        shownQuest = Quest;
+        foreach (QuestOffer side in sideOffers)
+        {
+            QuestGiverState own = StateFor(side?.Quest, log);
+            if (own == QuestGiverState.ReadyToTurnIn && shown != QuestGiverState.ReadyToTurnIn || own == QuestGiverState.Available && shown != QuestGiverState.ReadyToTurnIn && shown != QuestGiverState.Available
+                || own == QuestGiverState.InProgress && (shown == QuestGiverState.None || shown == QuestGiverState.Done))
+            {
+                shown = own;
+                shownQuest = side.Quest;
+            }
+        }
+
+        return shown;
     }
 
     /// <summary>What the giver says in a conversation and the answers that take or hand in the quest.</summary>
@@ -291,7 +335,7 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
         {
             page.Body = offer != null ? offer.Text : greeting;
             page.Add(new MenuAction(offer != null ? offer.AcceptText : "I'll do it.", offeredQuest.DisplayName, true,
-                () => AcceptOffer(offeredQuest), closesMenu: true));
+                () => AcceptOffer(offeredQuest), closesMenu: true, quest: offeredQuest, does: QuestAnswer.Starts));
         }
         else if (state == QuestGiverState.ReadyToTurnIn)
         {
@@ -300,7 +344,7 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
             {
                 page.Body = string.IsNullOrWhiteSpace(turnInText) ? next.Text : turnInText + "\n\n" + next.Text;
                 page.Add(new MenuAction(next.AcceptText, next.Quest.DisplayName, true,
-                    () => ContinueOffer(offeredQuest, next.Quest), closesMenu: true));
+                    () => ContinueOffer(offeredQuest, next.Quest), closesMenu: true, quest: next.Quest, does: QuestAnswer.Starts));
             }
             else
             {
@@ -308,7 +352,7 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
                 page.Add(new MenuAction("It's done.", offeredQuest.DisplayName, true, () => {
                     Refresh();
                     if (Quest == offeredQuest && state == QuestGiverState.ReadyToTurnIn) TurnIn();
-                }, closesMenu: true));
+                }, closesMenu: true, quest: offeredQuest, does: QuestAnswer.HandsIn));
             }
         }
         else if (state != QuestGiverState.None)
@@ -381,6 +425,58 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
         foreach (MenuAction action in mine.Actions)
         {
             page.Add(action);
+        }
+
+        AddSideOffers(page, speaker, afterAnswer);
+    }
+
+    // Each optional quest as its own answer: ask about it, take it, or hand it in.
+    private void AddSideOffers(MenuPage page, DialogueSpeaker speaker, Action afterAnswer)
+    {
+        QuestLog log = QuestManager.Instance != null ? QuestManager.Instance.Log : GameSession.Quests;
+        foreach (QuestOffer side in sideOffers)
+        {
+            if (side?.Quest == null) continue;
+            QuestOffer chosen = side;
+            switch (StateFor(side.Quest, log))
+            {
+                case QuestGiverState.Available:
+                    page.Add(new MenuAction(side.AskText, side.Quest.DisplayName, true, () => DialogueBox.Current.Ask(speaker, chosen.Text,
+                        new[] { new DialogueChoice(chosen.AcceptText, null, true, chosen.Quest, QuestAnswer.Starts), new DialogueChoice("Not now.") }, answer =>
+                        {
+                            if (answer == 0) TakeSideOffer(chosen);
+                            afterAnswer?.Invoke();
+                        }), quest: side.Quest, does: QuestAnswer.AsksAbout));
+                    break;
+                case QuestGiverState.ReadyToTurnIn:
+                    page.Add(new MenuAction("It's done.", side.Quest.DisplayName, true, () =>
+                    {
+                        if (QuestManager.Instance != null && QuestManager.Instance.TryTurnIn(chosen.Quest, out string reason))
+                        {
+                            if (string.IsNullOrWhiteSpace(chosen.ThanksText)) afterAnswer?.Invoke();
+                            else DialogueBox.Current.Say(speaker, chosen.ThanksText, afterAnswer);
+                        }
+                    }, quest: side.Quest, does: QuestAnswer.HandsIn));
+                    break;
+                case QuestGiverState.InProgress:
+                    if (string.IsNullOrWhiteSpace(page.Body)) page.Body = side.WaitingText;
+                    break;
+            }
+        }
+    }
+
+    private void TakeSideOffer(QuestOffer side)
+    {
+        if (QuestManager.Instance == null) return;
+        if (QuestManager.Instance.TryStartQuest(side.Quest, out string reason))
+        {
+            EmoteDefinition taken = CharacterCatalog.Current.QuestTaken;
+            CharacterGestures.Play(transform, taken);
+            if (Player.Current != null) CharacterGestures.Play(Player.Current.transform, taken);
+        }
+        else
+        {
+            GameMessages.Post(reason, MessageKind.Warning);
         }
     }
 }

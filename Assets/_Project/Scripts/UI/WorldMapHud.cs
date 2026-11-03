@@ -4,11 +4,13 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
-/// <summary>Shows the whole painted and explored world map. M opens and closes it; Escape also returns to play.</summary>
+/// <summary>Shows the whole painted and explored world map, with where the player's quests are and who has quests for them, each
+/// in the colour of its quest's rank. M opens and closes it; Escape also returns to play.</summary>
 public sealed class WorldMapHud : MonoBehaviour
 {
     private static readonly int ExploredId = Shader.PropertyToID("_Explored");
     private static readonly int FogId = Shader.PropertyToID("_Fog");
+    private const float LabelCrowd = 60f;
 
     private Rect area;
     private RectTransform canvasRect;
@@ -19,6 +21,16 @@ public sealed class WorldMapHud : MonoBehaviour
     private bool ownsMap;
     private TMP_Text playerMarker;
     private bool suspendedGameplay;
+
+    private sealed class QuestMark
+    {
+        public RectTransform Root;
+        public Image Diamond;
+        public TMP_Text Label;
+    }
+
+    private readonly System.Collections.Generic.List<QuestMark> questMarks = new System.Collections.Generic.List<QuestMark>();
+    private readonly System.Collections.Generic.List<Vector3> marked = new System.Collections.Generic.List<Vector3>();
 
     public static WorldMapHud Current { get; private set; }
     public static bool IsOpen => Current != null;
@@ -115,10 +127,10 @@ public sealed class WorldMapHud : MonoBehaviour
         title.color = UIStyle.Current.Accent;
         title.raycastTarget = false;
 
-        RectTransform helpRect = Rect("Help", transform, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(640f, 34f), new Vector2(0f, 34f));
+        RectTransform helpRect = Rect("Help", transform, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(1100f, 34f), new Vector2(0f, 34f));
         TMP_Text help = helpRect.gameObject.AddComponent<TextMeshProUGUI>();
         string mapKey = GameInput.KeyLabel(GameInput.WorldMap);
-        help.text = "Unexplored areas remain hidden  •  " + (string.IsNullOrEmpty(mapKey) ? "" : mapKey + " or ") + "Esc to return";
+        help.text = "Quests in gold (main), silver (side) and bronze (optional)  •  Unexplored areas remain hidden  •  " + (string.IsNullOrEmpty(mapKey) ? "" : mapKey + " or ") + "Esc to return";
         help.fontSize = 18f;
         help.alignment = TextAlignmentOptions.Center;
         help.color = UIStyle.Current.Muted;
@@ -206,6 +218,7 @@ public sealed class WorldMapHud : MonoBehaviour
 
         ExplorationMap exploration = ExplorationMap.Current;
         material.SetTexture(ExploredId, exploration != null ? exploration.Texture : Texture2D.whiteTexture);
+        PlaceQuestMarks(width, height);
 
         Player player = Player.Current;
         if (player == null)
@@ -220,6 +233,79 @@ public sealed class WorldMapHud : MonoBehaviour
         playerMarker.rectTransform.anchoredPosition = new Vector2((uv.x - 0.5f) * width, (uv.y - 0.5f) * height);
         playerMarker.rectTransform.localRotation = Quaternion.Euler(0f, 0f, -player.transform.eulerAngles.y);
         playerMarker.gameObject.SetActive(true);
+    }
+
+    // Where the quests want the player, then who else has a quest for them, unless a waypoint already marks them.
+    private void PlaceQuestMarks(float width, float height)
+    {
+        QuestLog log = QuestManager.Instance != null ? QuestManager.Instance.Log : GameSession.Quests;
+        QuestMarkerSettings settings = QuestMarkerSettings.Current;
+        int used = 0;
+        marked.Clear();
+        foreach (QuestWaypoint waypoint in QuestWaypoint.Active)
+        {
+            if (waypoint != null && waypoint.Quest != null && waypoint.IsWanted(log))
+            {
+                marked.Add(waypoint.transform.position);
+                ShowMark(used++, waypoint.transform.position, settings.RankColor(waypoint.Quest.Rank), waypoint.Label, width, height);
+            }
+        }
+
+        foreach (QuestGiver giver in QuestGiver.Active)
+        {
+            if (giver == null || giver.ShownQuest == null || marked.Exists(p => (p - giver.transform.position).sqrMagnitude < 9f)
+                || (giver.ShownState != QuestGiverState.Available && giver.ShownState != QuestGiverState.ReadyToTurnIn))
+            {
+                continue;
+            }
+
+            ShowMark(used++, giver.transform.position, settings.RankColor(giver.ShownQuest.Rank), giver.DisplayName, width, height);
+        }
+
+        for (int i = used; i < questMarks.Count; i++)
+        {
+            questMarks[i].Root.gameObject.SetActive(false);
+        }
+    }
+
+    private void ShowMark(int index, Vector3 position, Color colour, string label, float width, float height)
+    {
+        if (index == questMarks.Count)
+        {
+            RectTransform root = Rect("Quest Mark", mapRect, Vector2.one * 0.5f, Vector2.one * 0.5f, Vector2.zero, Vector2.zero);
+            RectTransform shape = Rect("Diamond", root, Vector2.one * 0.5f, Vector2.one * 0.5f, new Vector2(16f, 16f), Vector2.zero);
+            shape.localRotation = Quaternion.Euler(0f, 0f, 45f);
+            var image = shape.gameObject.AddComponent<Image>();
+            image.raycastTarget = false;
+            RectTransform words = Rect("Label", root, Vector2.one * 0.5f, Vector2.one * 0.5f, new Vector2(260f, 28f), new Vector2(0f, -24f));
+            var text = words.gameObject.AddComponent<TextMeshProUGUI>();
+            text.fontSize = 18f;
+            text.alignment = TextAlignmentOptions.Center;
+            text.textWrappingMode = TextWrappingModes.NoWrap;
+            text.raycastTarget = false;
+            questMarks.Add(new QuestMark { Root = root, Diamond = image, Label = text });
+            playerMarker.transform.SetAsLastSibling();
+        }
+
+        QuestMark mark = questMarks[index];
+        mark.Root.gameObject.SetActive(true);
+        mark.Root.anchoredPosition = new Vector2(
+            (Mathf.Clamp01((position.x - area.xMin) / area.width) - 0.5f) * width,
+            (Mathf.Clamp01((position.z - area.yMin) / area.height) - 0.5f) * height);
+        mark.Diamond.color = colour;
+        mark.Label.color = colour;
+        mark.Label.text = label;
+        // People standing together: their names stack rather than print over each other.
+        int under = 0;
+        for (int i = 0; i < index; i++)
+        {
+            if ((questMarks[i].Root.anchoredPosition - mark.Root.anchoredPosition).sqrMagnitude < LabelCrowd * LabelCrowd)
+            {
+                under++;
+            }
+        }
+
+        mark.Label.rectTransform.anchoredPosition = new Vector2(0f, -24f - under * 20f);
     }
 
     private void OnCancel(InputAction.CallbackContext context) => Close();

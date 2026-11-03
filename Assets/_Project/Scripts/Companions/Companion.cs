@@ -56,6 +56,7 @@ public sealed class Companion : MonoBehaviour, IConversationTopics
     private float nextThink;
     private float getUpAt = -1f;
     private CompanionRevive revive;
+    private float ownSpeed = -1f;
 
     /// <summary>Every enabled companion, for systems that give orders or show them.</summary>
     public static IReadOnlyList<Companion> Active => active;
@@ -68,6 +69,9 @@ public sealed class Companion : MonoBehaviour, IConversationTopics
     /// <summary>Stands still and stays out of fights while set (a story moment: before the expedition sets out).</summary>
     public bool Paused { get; set; }
 
+    /// <summary>They go where they are told but leave enemies to the player (a lesson: nobody kills the practice target).</summary>
+    public bool HoldFire { get; set; }
+
     public Vector3 FormationOffset
     {
         get => formationOffset;
@@ -75,6 +79,17 @@ public sealed class Companion : MonoBehaviour, IConversationTopics
     }
 
     public event Action<CompanionOrder> OrderChanged;
+
+    /// <summary>Walks at this many metres a second (a party keeping one pace), or their own speed again when 0 or less.</summary>
+    public void SetPace(float metresPerSecond)
+    {
+        if (ownSpeed < 0f)
+        {
+            ownSpeed = agent.speed;
+        }
+
+        agent.speed = metresPerSecond > 0f ? metresPerSecond : ownSpeed;
+    }
 
     /// <summary>Gives an order; Stay holds where they stand now.</summary>
     public void Command(CompanionOrder order) => Command(order, transform.position);
@@ -183,6 +198,12 @@ public sealed class Companion : MonoBehaviour, IConversationTopics
     private void Think()
     {
         GatherThreats();
+        if (HoldFire)
+        {
+            threats.Clear();
+            threatMonsters.Clear();
+        }
+
         MonsterAI leaderTarget = leader.Target;
         var situation = new CompanionSituation
         {

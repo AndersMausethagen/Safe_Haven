@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: A Light They Can See
   description: The brighter Safe Haven burns, the further its light carries through the mist, and six of your people are still out there. Build, clear the overgrowth and raise the haven to a Hamlet. The Haven page (H) shows what counts.
   chain: The Lost Expedition
+  rank: 0
   availableObjective: 
   announceStart: 1
   announceCompletion: 1
@@ -25,6 +26,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: b95103f99c217d3489eb46bd97d706d8, type: 2}
   start: 0
   startEvent: {fileID: 0}
+  closedBy: {fileID: 0}
   startDelay: 0
   onStarted: []
   objectivesInOrder: 0

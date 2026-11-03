@@ -7,13 +7,15 @@ using TMPro;
 /// <summary>One choice in an ActionMenuWindow: a label, a detail such as a cost, whether it can be chosen, and what it does.</summary>
 public sealed class MenuAction
 {
-    public MenuAction(string label, string detail, bool enabled, Action chosen, bool closesMenu = false)
+    public MenuAction(string label, string detail, bool enabled, Action chosen, bool closesMenu = false, QuestDefinition quest = null, QuestAnswer does = QuestAnswer.None)
     {
         Label = label;
         Detail = detail;
         Enabled = enabled;
         Chosen = chosen;
         ClosesMenu = closesMenu;
+        Quest = quest;
+        Does = does;
     }
 
     public string Label { get; }
@@ -21,6 +23,9 @@ public sealed class MenuAction
     public bool Enabled { get; }
     public Action Chosen { get; }
     public bool ClosesMenu { get; }
+    /// <summary>The quest this answer is about, when spoken in a conversation (DialogueBox shows it in its rank's colour).</summary>
+    public QuestDefinition Quest { get; }
+    public QuestAnswer Does { get; }
 }
 
 /// <summary>What an ActionMenuWindow shows: a title, a rich-text body and a list of choices.</summary>

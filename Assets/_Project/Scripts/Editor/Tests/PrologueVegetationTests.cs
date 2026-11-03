@@ -10,16 +10,15 @@ public sealed class PrologueVegetationTests
     private TerrainData Terrain => AssetDatabase.LoadAssetAtPath<TerrainData>(Root + "/Prologue Forest Terrain.asset");
 
     [Test]
-    public void PrologueTerrain_PreservesRaidHeightsAndPlacementsWithoutSharingItsData()
+    public void PrologueTerrain_StartsFromTheRaidsForestWithoutSharingItsData()
     {
+        // The road, the river and the pass in the west wall change this copy; the raid's map stays as it is.
         var source = AssetDatabase.LoadAssetAtPath<TerrainData>("Assets/_Project/Data/Raids/Maps/MistyWoods Map Terrain.asset");
         Assert.AreNotSame(source, Terrain);
-        Assert.AreEqual(source.treeInstanceCount, Terrain.treeInstanceCount);
         Assert.AreEqual(source.treePrototypes.Length, Terrain.treePrototypes.Length);
-        Assert.AreEqual(source.size, Terrain.size);
-        CollectionAssert.AreEqual(source.GetHeights(0, 0, source.heightmapResolution, source.heightmapResolution),
-            Terrain.GetHeights(0, 0, Terrain.heightmapResolution, Terrain.heightmapResolution));
-        CollectionAssert.AreEqual(source.treeInstances, Terrain.treeInstances);
+        // Only sideways: the World Builder gave it more height to fit the river's bed, without moving the ground.
+        Assert.AreEqual(source.size.x, Terrain.size.x);
+        Assert.AreEqual(source.size.z, Terrain.size.z);
     }
 
     [Test]

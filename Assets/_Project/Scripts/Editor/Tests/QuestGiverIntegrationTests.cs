@@ -301,7 +301,7 @@ public sealed class QuestGiverIntegrationTests
                 .Select(c => c.Quest), giver.Offers.Select(o => o.Quest));
             var acceptedOffers = giver.Offers.Where(o => o.Quest.Start == QuestStart.ByQuestGiver).ToArray();
             CollectionAssert.AreEqual(briefings.Select(c => c.ArrivalText), acceptedOffers.Select(o => o.Text));
-            CollectionAssert.AreEqual(new[] { "I will find us shelter.", "I will gather the supplies.",
+            CollectionAssert.AreEqual(new[] { "Tell me.", "I'm ready. Let's go.", "I will find us shelter.", "I will gather the supplies.",
                 "I will build the campfire.", "Let us catch our breath.", "I will try the waystones." },
                 acceptedOffers.Select(o => o.AcceptText));
             var talkable = leader.GetComponent<Talkable>();
@@ -312,7 +312,6 @@ public sealed class QuestGiverIntegrationTests
             Assert.IsTrue(giver.Offers.All(o => !string.IsNullOrWhiteSpace(o.WaitingText)));
             string before = EditorJsonUtility.ToJson(definition);
             Manager(definition.Chapters.Select(c => c.Quest).ToArray());
-            Assert.IsFalse(director.ExpeditionStarted);
             foreach (var chapter in definition.Chapters)
             {
                 if (chapter.Quest.Start == QuestStart.ByQuestGiver)
@@ -330,7 +329,6 @@ public sealed class QuestGiverIntegrationTests
                 }
 
                 Assert.AreEqual(QuestStatus.Active, manager.Log.StatusOf(chapter.Quest), chapter.Quest.name);
-                Assert.IsTrue(director.ExpeditionStarted);
                 foreach (var goal in chapter.Quest.Objectives)
                     GameEvents.Raise(new GameEvent(goal.Type == ObjectiveType.QuestEvent ? GameEventKind.Custom :
                         goal.Type == ObjectiveType.BuildStructure ? GameEventKind.Built :

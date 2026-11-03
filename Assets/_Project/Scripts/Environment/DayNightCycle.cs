@@ -36,6 +36,12 @@ public sealed class DayNightCycle : MonoBehaviour, ISaveable
     private static readonly int NightId = Shader.PropertyToID("_SafeHavenNight");
     private float hour;
     private Material skybox;
+    private DayNightProfile blendedProfile;
+    private float blendAmount;
+    private float goingFrom;
+    private float goingTo;
+    private float goingFor;
+    private float goingElapsed = -1f;
 
     /// <summary>The time of day in hours (0..24). Setting it jumps the clock (sleeping, a scripted dawn).</summary>
     public float Hour
@@ -43,9 +49,40 @@ public sealed class DayNightCycle : MonoBehaviour, ISaveable
         get => hour;
         set
         {
+            goingElapsed = -1f;
             hour = Mathf.Repeat(value, 24f);
             Apply();
         }
+    }
+
+    /// <summary>Moves the clock forward to <paramref name="target"/> over <paramref name="seconds"/> (at once when 0). The sun goes
+    /// the long way round if it has to: from morning to night by way of the afternoon, never backwards.</summary>
+    public void GoToHour(float target, float seconds)
+    {
+        if (seconds <= 0f)
+        {
+            Hour = target;
+            return;
+        }
+
+        goingFrom = hour;
+        goingTo = ForwardTo(hour, target);
+        goingFor = seconds;
+        goingElapsed = 0f;
+    }
+
+    /// <summary>The same hour as <paramref name="target"/>, on or after <paramref name="from"/>, for moving forward between them.</summary>
+    public static float ForwardTo(float from, float target)
+    {
+        target = Mathf.Repeat(target, 24f);
+        return target < from ? target + 24f : target;
+    }
+
+    /// <summary>Lights the scene part-way to a second profile (SceneLook). Empty, or 0: its own profile alone.</summary>
+    public void BlendProfile(DayNightProfile other, float amount)
+    {
+        blendedProfile = other;
+        blendAmount = Mathf.Clamp01(amount);
     }
 
     public bool ClockRuns
@@ -120,7 +157,17 @@ public sealed class DayNightCycle : MonoBehaviour, ISaveable
 
     private void LateUpdate()
     {
-        if (Application.isPlaying && clockRuns && profile != null)
+        if (Application.isPlaying && goingElapsed >= 0f)
+        {
+            goingElapsed += Time.deltaTime;
+            float along = Mathf.Clamp01(goingElapsed / goingFor);
+            hour = Mathf.Repeat(Mathf.Lerp(goingFrom, goingTo, along), 24f);
+            if (along >= 1f)
+            {
+                goingElapsed = -1f;
+            }
+        }
+        else if (Application.isPlaying && clockRuns && profile != null)
         {
             hour = Mathf.Repeat(hour + Time.deltaTime * ClockSpeed * 24f / (profile.DayLengthMinutes * 60f), 24f);
         }
@@ -136,6 +183,11 @@ public sealed class DayNightCycle : MonoBehaviour, ISaveable
         }
 
         DayNightState state = profile.Evaluate(hour);
+        if (blendedProfile != null && blendAmount > 0f)
+        {
+            state = DayNightState.Lerp(state, blendedProfile.Evaluate(hour), blendAmount);
+        }
+
         State = state;
         bool hasWeather = weather != null && weather.isActiveAndEnabled;
         WeatherState sky = hasWeather ? weather.Current : WeatherState.Clear;

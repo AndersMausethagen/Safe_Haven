@@ -22,6 +22,12 @@ public sealed class QuestMarkerSettings : GameSettings<QuestMarkerSettings>
     [SerializeField] private string readySymbol = "?";
     [SerializeField] private Color readyColor = new Color(1f, 0.84f, 0.2f, 1f);
 
+    [Header("Quest ranks")]
+    [Tooltip("The main story's marks, on givers, the tracker, the maps and dialogue answers.")]
+    [SerializeField] private Color mainStoryColor = new Color(1f, 0.82f, 0.25f, 1f);
+    [SerializeField] private Color sideQuestColor = new Color(0.82f, 0.87f, 0.94f, 1f);
+    [SerializeField] private Color optionalColor = new Color(0.86f, 0.55f, 0.27f, 1f);
+
     [Header("Look")]
     [Tooltip("Meters above the giver's pivot.")]
     [SerializeField, Min(0f)] private float height = 2.4f;
@@ -42,6 +48,27 @@ public sealed class QuestMarkerSettings : GameSettings<QuestMarkerSettings>
     public float BobSpeed => bobSpeed;
     public TMP_FontAsset Font => font;
     public Material FontMaterial => fontMaterial;
+
+    public Color RankColor(QuestRank rank) => rank == QuestRank.SideQuest ? sideQuestColor : rank == QuestRank.Optional ? optionalColor : mainStoryColor;
+
+    /// <summary>The rank's colour for rich text: "#FFD140".</summary>
+    public string RankHex(QuestRank rank) => "#" + ColorUtility.ToHtmlStringRGB(RankColor(rank));
+
+    /// <summary>The rank in words, for the player: "Main quest".</summary>
+    public static string RankName(QuestRank rank) => rank == QuestRank.SideQuest ? "Side quest" : rank == QuestRank.Optional ? "Optional quest" : "Main quest";
+
+    /// <summary>The symbol and color for a giver state, in the colour of the quest's rank when it has something for the player;
+    /// false when that state shows no marker.</summary>
+    public bool TryGetLook(QuestGiverState state, QuestRank rank, out string symbol, out Color color)
+    {
+        bool visible = TryGetLook(state, out symbol, out color);
+        if (visible && state != QuestGiverState.InProgress)
+        {
+            color = RankColor(rank);
+        }
+
+        return visible;
+    }
 
     /// <summary>The symbol and color for a giver state; false when that state shows no marker.</summary>
     public bool TryGetLook(QuestGiverState state, out string symbol, out Color color)

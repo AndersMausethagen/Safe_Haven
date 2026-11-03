@@ -1,0 +1,52 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 702d2e93d0a019a40b6339daf41e2c2f, type: 3}
+  m_Name: MorningCamp
+  m_EditorClassIdentifier: SafeHaven::QuestDefinition
+  id: prologue.morning_camp
+  displayName: A Morning by the Fire
+  description: Four of the expedition went into the forest two days ago and should have been back by now. It is early, the sun is out and the porridge is on. Hear the others out by the fire.
+  chain: Prologue - The Unquiet Forest
+  rank: 0
+  availableObjective: Speak to Sigrid by the fire.
+  announceStart: 1
+  announceCompletion: 0
+  showTimerInHud: 0
+  prerequisites: []
+  start: 2
+  startEvent: {fileID: 0}
+  closedBy: {fileID: 0}
+  startDelay: 0
+  onStarted: []
+  objectivesInOrder: 0
+  objectives:
+  - type: 6
+    description: Hear the others out by the fire
+    amount: 1
+    item: {fileID: 0}
+    resource: {fileID: 0}
+    monster: {fileID: 0}
+    faction: 0
+    building: {fileID: 0}
+    raid: {fileID: 0}
+    mustExtract: 0
+    withinMinutes: 0
+    questEvent: {fileID: 11400000, guid: 367a938ebe0a9f847806fbc01218a5e2, type: 2}
+    countAlreadyOwned: 0
+  turnInToGiver: 1
+  turnInTo: Sigrid
+  rewardItems: []
+  rewardResources: []
+  rewardRecipes: []
+  experience: 0
+  completionEvent: {fileID: 0}
+  onCompleted: []

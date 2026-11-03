@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// Points the way to the nearest wanted QuestWaypoint: a gold marker over it with the distance while it is on screen,
+/// Points the way to the nearest wanted QuestWaypoint: a marker in the colour of its quest's rank over it with the distance while it is on screen,
 /// an arrow at the edge of the screen pointing towards it when it isn't. Hidden when no quest has a waypoint to show,
 /// while a window is open, and within a few metres of the spot. Made by the QuestTrackerView; it only reads the
 /// waypoints and the QuestLog.
@@ -12,12 +12,13 @@ public sealed class QuestWaypointHud : MonoBehaviour
 {
     private const float EdgeMargin = 70f;
     private const float HideWithin = 4f;
-    private static readonly Color Gold = new Color(1f, 0.82f, 0.4f, 1f);
 
     private RectTransform root;
     private RectTransform marker;
     private RectTransform arrow;
     private TMP_Text text;
+    private Image diamond;
+    private TMP_Text arrowMark;
     private Camera view;
 
     public static QuestWaypointHud Create()
@@ -34,24 +35,22 @@ public sealed class QuestWaypointHud : MonoBehaviour
         hud.marker.SetParent(go.transform, false);
         hud.marker.sizeDelta = new Vector2(30f, 30f);
 
-        var diamond = new GameObject("Diamond", typeof(RectTransform)).GetComponent<RectTransform>();
-        diamond.SetParent(hud.marker, false);
-        diamond.sizeDelta = new Vector2(16f, 16f);
-        diamond.localRotation = Quaternion.Euler(0f, 0f, 45f);
-        var image = diamond.gameObject.AddComponent<Image>();
-        image.color = Gold;
-        image.raycastTarget = false;
+        var diamondRect = new GameObject("Diamond", typeof(RectTransform)).GetComponent<RectTransform>();
+        diamondRect.SetParent(hud.marker, false);
+        diamondRect.sizeDelta = new Vector2(16f, 16f);
+        diamondRect.localRotation = Quaternion.Euler(0f, 0f, 45f);
+        hud.diamond = diamondRect.gameObject.AddComponent<Image>();
+        hud.diamond.raycastTarget = false;
 
         hud.arrow = new GameObject("Arrow", typeof(RectTransform)).GetComponent<RectTransform>();
         hud.arrow.SetParent(hud.marker, false);
         hud.arrow.sizeDelta = new Vector2(34f, 34f);
-        var arrowText = hud.arrow.gameObject.AddComponent<TextMeshProUGUI>();
-        arrowText.text = ">";
-        arrowText.fontStyle = FontStyles.Bold;
-        arrowText.fontSize = 30f;
-        arrowText.color = Gold;
-        arrowText.alignment = TextAlignmentOptions.Center;
-        arrowText.raycastTarget = false;
+        hud.arrowMark = hud.arrow.gameObject.AddComponent<TextMeshProUGUI>();
+        hud.arrowMark.text = ">";
+        hud.arrowMark.fontStyle = FontStyles.Bold;
+        hud.arrowMark.fontSize = 30f;
+        hud.arrowMark.alignment = TextAlignmentOptions.Center;
+        hud.arrowMark.raycastTarget = false;
 
         var label = new GameObject("Distance", typeof(RectTransform)).GetComponent<RectTransform>();
         label.SetParent(hud.marker, false);
@@ -59,7 +58,6 @@ public sealed class QuestWaypointHud : MonoBehaviour
         label.anchoredPosition = new Vector2(0f, -34f);
         hud.text = label.gameObject.AddComponent<TextMeshProUGUI>();
         hud.text.fontSize = 18f;
-        hud.text.color = Gold;
         hud.text.alignment = TextAlignmentOptions.Center;
         hud.text.raycastTarget = false;
         hud.text.textWrappingMode = TextWrappingModes.NoWrap;
@@ -103,6 +101,10 @@ public sealed class QuestWaypointHud : MonoBehaviour
             local *= push;
         }
 
+        Color colour = target.Quest != null ? QuestMarkerSettings.Current.RankColor(target.Quest.Rank) : QuestMarkerSettings.Current.RankColor(QuestRank.MainStory);
+        diamond.color = colour;
+        arrowMark.color = colour;
+        text.color = colour;
         marker.anchoredPosition = local;
         arrow.gameObject.SetActive(!onScreen);
         arrow.localRotation = Quaternion.Euler(0f, 0f, Mathf.Atan2(local.y, local.x) * Mathf.Rad2Deg);

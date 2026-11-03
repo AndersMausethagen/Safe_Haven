@@ -13,6 +13,17 @@ public enum QuestStart
     ByQuestGiver = 2,
 }
 
+/// <summary>How much a quest matters to the story: the colour of its marks everywhere (QuestMarkerSettings). Saved by number.</summary>
+public enum QuestRank
+{
+    /// <summary>The main story: gold.</summary>
+    MainStory = 0,
+    /// <summary>A story of its own beside the main one: silver.</summary>
+    SideQuest = 1,
+    /// <summary>A small errand that can be left undone: bronze.</summary>
+    Optional = 2,
+}
+
 /// <summary>
 /// A quest: what the player is asked to do (objectives), what has to come first (prerequisites, which make chains), how
 /// it begins, whether it is handed in at a Quest Giver and what it rewards. Everything is authored data; the QuestLog keeps
@@ -28,6 +39,8 @@ public sealed class QuestDefinition : ScriptableObject
     [SerializeField, TextArea(2, 5)] private string description;
     [Tooltip("Groups quests in the editor, e.g. \"Main Story\" or \"Smithing Chain\".")]
     [SerializeField] private string chain;
+    [Tooltip("Main Story (gold), Side Quest (silver) or Optional (bronze): the colour of its marks on givers, the tracker, the maps and dialogue answers.")]
+    [SerializeField] private QuestRank rank;
     [Tooltip("Shown in the tracker once prerequisites are met, before accepting or starting this quest. Empty hides it until it starts.")]
     [SerializeField] private string availableObjective;
     [Tooltip("Announce a new quest and play its sound. Turn off for intermediate stages of a larger quest chain.")]
@@ -43,6 +56,8 @@ public sealed class QuestDefinition : ScriptableObject
     [SerializeField] private QuestStart start = QuestStart.Automatically;
     [Tooltip("For On Quest Event: the event that starts the quest.")]
     [SerializeField] private GameEventDefinition startEvent;
+    [Tooltip("For an optional quest: once this quest starts, it is no longer offered. If it is under way it lapses and leaves the tracker; if it only waits to be handed in, it is handed in by itself.")]
+    [SerializeField] private QuestDefinition closedBy;
     [Tooltip("Automatically and On Quest Event: seconds to wait once it is ready, for a beat of its own (a breather before a big moment). " +
              "0 uses Between Quests (Systems Editor › World › Story Pacing). Either way it also waits out a fight and anyone talking.")]
     [SerializeField, Min(0f)] private float startDelay;
@@ -76,6 +91,7 @@ public sealed class QuestDefinition : ScriptableObject
     public string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;
     public string Description => description;
     public string Chain => chain;
+    public QuestRank Rank => rank;
     public string AvailableObjective => availableObjective;
     public bool AnnounceStart => announceStart;
     public bool AnnounceCompletion => announceCompletion;
@@ -83,6 +99,7 @@ public sealed class QuestDefinition : ScriptableObject
     public IReadOnlyList<QuestDefinition> Prerequisites => prerequisites;
     public QuestStart Start => start;
     public GameEventDefinition StartEvent => startEvent;
+    public QuestDefinition ClosedBy => closedBy;
     public float StartDelay => startDelay;
     public IReadOnlyList<GameEventDefinition> OnStarted => onStarted;
     public IReadOnlyList<GameEventDefinition> OnCompleted => onCompleted;
@@ -139,6 +156,15 @@ public sealed class QuestDefinition : ScriptableObject
         if (start == QuestStart.ByQuestGiver && startDelay > 0f)
         {
             problems.Add("Has a Start Delay, but it starts when someone asks, so the delay is never used.");
+        }
+
+        if (closedBy == this)
+        {
+            problems.Add("Is closed by itself, so it lapses the moment it starts.");
+        }
+        else if (closedBy != null && prerequisites.Contains(closedBy))
+        {
+            problems.Add("Comes after the quest that closes it, so it can never start.");
         }
 
         if (prerequisites.Contains(this))

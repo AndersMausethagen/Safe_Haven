@@ -1,0 +1,64 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &5390190230505645642
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 3450196518145842443, guid: a661dc05d2e43f943a476376f636ef9a, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3450196518145842443, guid: a661dc05d2e43f943a476376f636ef9a, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3450196518145842443, guid: a661dc05d2e43f943a476376f636ef9a, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3450196518145842443, guid: a661dc05d2e43f943a476376f636ef9a, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3450196518145842443, guid: a661dc05d2e43f943a476376f636ef9a, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3450196518145842443, guid: a661dc05d2e43f943a476376f636ef9a, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3450196518145842443, guid: a661dc05d2e43f943a476376f636ef9a, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3450196518145842443, guid: a661dc05d2e43f943a476376f636ef9a, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3450196518145842443, guid: a661dc05d2e43f943a476376f636ef9a, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3450196518145842443, guid: a661dc05d2e43f943a476376f636ef9a, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7217363731442406552, guid: a661dc05d2e43f943a476376f636ef9a, type: 3}
+      propertyPath: id
+      value: 27b84a4600834b64a55187adaf26d41a
+      objectReference: {fileID: 0}
+    - target: {fileID: 8653230728158633359, guid: a661dc05d2e43f943a476376f636ef9a, type: 3}
+      propertyPath: m_Name
+      value: ExpeditionBoar
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 7217363731442406552, guid: a661dc05d2e43f943a476376f636ef9a, type: 3}
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: a661dc05d2e43f943a476376f636ef9a, type: 3}

@@ -11,15 +11,34 @@ public enum PrologueStep
     ReachPortal,
     ActivatePortal,
     HoldPortal,
-    Finished
+    Finished,
+    /// <summary>No mechanic of its own: story graphs make the moments. The chapter says where it is and what the companions do.</summary>
+    Story,
 }
 
-/// <summary>A place of the night: the forest where it starts, the camp by the shelter, the portal.</summary>
+/// <summary>A place of the journey: the forest's edge, the camp by the shelter, the portal, the morning camp in the meadow.
+/// Saved by position in chapters: add new places at the end.</summary>
 public enum PrologueSite
 {
     Forest,
     Camp,
     Portal,
+    Meadow,
+}
+
+/// <summary>What the companions do in a Story chapter.</summary>
+public enum PrologueCompanions
+{
+    /// <summary>They stay as they stand in the scene and take no orders (around the morning fire).</summary>
+    StandStill,
+    /// <summary>They wait at the chapter's place.</summary>
+    WaitAtSite,
+    /// <summary>They follow the player.</summary>
+    Follow,
+    /// <summary>A story moves them (Walk The Party), so the chapter gives them no order; they wait at the place until it does.</summary>
+    StoryLeads,
+    /// <summary>They wait at the chapter's place and leave any enemies to the player (a lesson).</summary>
+    WatchOnly,
 }
 
 /// <summary>
@@ -40,6 +59,8 @@ public static class PrologueSteps
             case PrologueStep.HoldPortal:
             case PrologueStep.Finished:
                 return PrologueSite.Portal;
+            case PrologueStep.Story:
+                return PrologueSite.Meadow;
             default:
                 return PrologueSite.Camp;
         }
@@ -53,6 +74,8 @@ public static class PrologueSteps
             case PrologueStep.FindShelter:
             case PrologueStep.ReachPortal:
                 return null;
+            case PrologueStep.Story:
+                return PrologueSite.Meadow;
             case PrologueStep.ActivatePortal:
             case PrologueStep.HoldPortal:
             case PrologueStep.Finished:
@@ -69,6 +92,8 @@ public static class PrologueSteps
         {
             case PrologueStep.FindShelter:
                 return PrologueSite.Forest;
+            case PrologueStep.Story:
+                return PrologueSite.Meadow;
             case PrologueStep.ReachPortal:
             case PrologueStep.ActivatePortal:
             case PrologueStep.HoldPortal:
@@ -98,6 +123,13 @@ public sealed class PrologueChapter
     [SerializeField, Min(0)] private int initialEnemies;
     [Tooltip("Who comes in this chapter's fight (camp defence, portal hold), picked at random by weight.")]
     [SerializeField] private PrologueWaveEnemy[] enemies = new PrologueWaveEnemy[0];
+    [Header("Story chapters")]
+    [Tooltip("Story behaviour: where it takes place: where a checkpoint puts the player back and what the companions talk about.")]
+    [SerializeField] private PrologueSite site = PrologueSite.Meadow;
+    [Tooltip("Story behaviour: what the companions do.")]
+    [SerializeField] private PrologueCompanions companions = PrologueCompanions.WaitAtSite;
+    [Tooltip("Story behaviour: there is time to talk, so the player can ask the companions their topics.")]
+    [SerializeField] private bool timeToTalk;
 
     public QuestDefinition Quest => quest;
     public PrologueStep Behaviour => behaviour;
@@ -106,6 +138,17 @@ public sealed class PrologueChapter
     public float Duration => duration;
     public int InitialEnemies => initialEnemies;
     public PrologueWaveEnemy[] Enemies => enemies;
+    public PrologueCompanions Companions => behaviour == PrologueStep.Story ? companions
+        : behaviour.Rally().HasValue ? PrologueCompanions.WaitAtSite : PrologueCompanions.Follow;
+
+    /// <summary>Where a checkpoint in this chapter puts the player back.</summary>
+    public PrologueSite Checkpoint => behaviour == PrologueStep.Story ? site : behaviour.Checkpoint();
+    /// <summary>Where the companions wait in this chapter.</summary>
+    public PrologueSite RallySite => behaviour == PrologueStep.Story ? site : behaviour.Rally() ?? PrologueSite.Forest;
+    /// <summary>The place the companions talk about.</summary>
+    public PrologueSite Talk => behaviour == PrologueStep.Story ? site : behaviour.Talk();
+    /// <summary>True while there is time to sit and talk (the companions' topics).</summary>
+    public bool AtRest => behaviour == PrologueStep.Story ? timeToTalk : behaviour.AtRest();
 
     /// <summary>The enemy for one spawn: picked by weight among those allowed in this wave, with <paramref name="roll"/>
     /// in [0, 1); null when there are none.</summary>

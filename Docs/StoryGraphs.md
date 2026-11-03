@@ -19,11 +19,11 @@ draw it as nodes in **Safe Haven › Quests › Story Graph** instead of wiring 
 
 | Group | Nodes |
 |---|---|
-| Triggers | When Scene Starts, When Quest Event, When Quest Starts / Is Completed, When Structure Is Built, When Object Is Used, When Player Comes Near, When Enemies Are Defeated (each fires once unless Once is off) |
-| Talk | Say (a line in the dialogue box: the player or someone in the scene, with their live portrait), Choice (a line with answers; each answer has its own output; Must Answer asks again if the box is closed) |
-| Flow | Wait, Wait For Quiet, Wait Until Enemies Are Defeated, Has It Happened? (Yes / No: a Quest Event raised in this game, saved), Check Quest (Not Started / Active / Completed) |
-| Quest | Raise Quest Event (completes objectives waiting for it, starts quests and other stories), Start Quest, Give Items (Equip puts it on at once; a two-handed weapon puts the torch away) |
-| World | Spawn Enemies (a Mob Spawn Zone, optionally waiting until they are dead), Show / Hide Object, Move Object (walks something to a point over a few seconds; Animation Speed controls gait independently), Make Usable / Stop Being Usable, Start / Stop Glowing (a light fades in at an object and lifts the dark around it), Wither / Restore Ground (the grass dies brown around a point), Change Weather, Do Something (any component's method, picked in the Inspector) |
+| Triggers | When Scene Starts, When Quest Event, When Quest Starts / Is Completed, When Structure Is Built, When Object Is Used, When Object Is Hit, When Player Does (dodge, parry, dodge through a blow), When Player Comes Near, When Enemies Are Defeated (each fires once unless Once is off) |
+| Talk | Say (a line in the dialogue box: the player or someone in the scene, with their live portrait; with **Aside** on it is talk in passing, a subtitle that leaves the controls and the camera to the player), Choice (a line with answers; each answer has its own output; Must Answer asks again if the box is closed) |
+| Flow | Wait, Wait For Quiet, Wait Until Enemies Are Defeated, Wait Until The Walk Reaches (a share of the party's walk: talk that belongs to a place on the road), Wait For Quest Event (or a set time, so nothing optional can hold the story up), Has It Happened? (Yes / No: a Quest Event raised in this game, saved), Check Quest (Not Started / Active / Completed; a quest that lapsed counts as Not Started) |
+| Quest | Raise Quest Event (completes objectives waiting for it, starts quests and other stories), Start Quest, Add Quest Progress (something done earlier makes a quest shorter), Give Items (Equip puts it on at once; a two-handed weapon puts the torch away) |
+| World | Spawn Enemies (a Mob Spawn Zone, optionally waiting until they are dead), Remove Enemies (what a zone spawned goes away, and it stops respawning), Show / Hide Object, Move Object (walks something to a point over a few seconds; Animation Speed controls gait independently), Make Usable / Stop Being Usable, Start / Stop Glowing (a light fades in at an object and lifts the dark around it), Wither / Restore Ground (the grass dies brown around a point), Change Weather, Change Time of Day (the clock moves forward to an hour, over Seconds or following the party's walk), Change Look (fades the scene's Scene Look: a second set of post-processing and lighting), Reveal Ground (lifts the fog of war around a point, as if the player had been there), Walk The Party (companions walk a route at a steady pace and wait for the player), Do Something (any component's method, picked in the Inspector) |
 | Camera & Sound | Shake Camera, Focus Camera (the view turns to something for a few seconds, lifting the dark around it so it is seen at night), Lightning, Play Sound, Play / Silence / Resume Music |
 
 ## Quests and stories
@@ -34,6 +34,10 @@ Quests stay data (objectives, rewards, chains); stories make the moments around 
 Editor's **Scene Reactions** panel has **+ Story When It Starts** and **+ Story When It Completes** (Quest Events: **+ Story
 When Raised**), which make the story in the open scene with its trigger already set, and the quest's **In the Scenes** panel
 then lists it. Save the scene to keep it.
+
+A story that the game can't go on without has to survive loading: a once-only trigger stays spent, so the walk or the talk
+would never finish. Give **When Quest Starts** the option **Also After Loading**, turn **Once** off and check with **Has It
+Happened?** that the moment hasn't passed (see The Morning Fire below).
 
 ## Timing
 
@@ -54,11 +58,36 @@ Delay**).
   Say "The grass... it's dying." › Spawn Enemies (wait until defeated) › Stop Glowing › Stop Being Usable › Raise
   Quest Event (the quest's objective: it completes and rewards).
 
-The intro (`Prologue_MistyWoods`, under **Intro Moments**, built by `AgentScripts/BuildIntroPart3.cs`):
+The morning in the meadow (`Prologue_MistyWoods`, under **Prologue Meadow › Morning Moments**, built by
+`AgentScripts/BuildPrologueMeadow.cs`):
 
-- **Bow or Axe:** When Quest Event (Started, every time) › Has It Happened? (Weapon Chosen) › No › Wait › Choice (Sigrid,
-  must answer) › Give Items (bow and arrows, or the axe; equipped) › Raise Quest Event (Weapon Chosen) › Say (Runa or
-  Eirik). Asking only while the event hasn't happened makes it safe to quit before answering.
+- **The Morning Fire:** the player takes the quest from Sigrid, then When Quest Starts (A Morning by the Fire, Also After Loading) › Has It Happened? (Met the Expedition)
+  › No › Wait › Say (Sigrid, Eirik, Runa, Sigrid) › Raise Quest Event (Met the Expedition). Everyone says who they are.
+- **Talk by the Fire:** When Quest Event (Met the Expedition) › Wait › Say Aside, four times.
+- **The Road East:** When Quest Starts (The Road East, Also After Loading) › side by side: Walk The Party to the handcart; Change
+  Time of Day (follows the walk); talk (Wait Until The Walk Reaches › Say Aside). At the cart: Say Aside › Wait For Quest Event (Looked
+  Over the Cart, or 25 s) › Say Aside › Walk The Party on to the trees › Raise Quest Event (Entered the Forest), with the day running
+  out, boar running past (Show, Move, Hide Object), the birds gone, torches, and the grass dying (Wither Ground) along the way.
+- **The Road Behind:** the player a little way inside the trees › Raise Quest Event (The Road Behind Is Gone), whose Scene Reaction turns
+  on a wall and a Fog Area, so nobody walks back to the meadow. **A Lesson from Eirik** counts a dummy's hits and the player's moves
+  (When Object Is Hit, When Player Does) towards the bronze quest. **A Moment of Warmth** ends the rest 9 s after the player talks to
+  someone (or after 45 s) with Start Quest, so the wolves cut the conversation short. **They Remember** has the companions mention the
+  errands and why the player came, and shortens later quests. **What Sigrid Knows** answers at the stones what was asked by the fire.
+  **The Old Troll Returns** walks it to the stones during the portal hold, its blow landing as the minute ends (40 s wait, 19 s walk, 0.8 s swing). Change its Waits with the
+  hold's length.
+- **The Forest Closes In:** When Quest Event (Entered the Forest) › Lightning, Shake Camera, Play Sound, Say Aside. What stays
+  changed (the look, the mist and rain, the night, the torches, the open way in) is not here but in the event's **Scene
+  Reaction**, so it comes back at once after loading.
+- **Choose a Weapon:** When Quest Starts (Where the Sun Went, Also After Loading) › Has It Happened? (Weapon Chosen) › No › Wait ›
+  Say › Choice (Sigrid, must answer: sword, axe, spear, club, bow) › Give Items (equipped) › Raise Quest Event › Say.
+- **Wolves on the Road:** When Player Comes Near (every time) › Has It Happened? › Check Quest (Shelter from the Storm) › Active
+  › Raise Quest Event + Spawn Enemies + Say. When Enemies Are Defeated › Say.
+- **The Storm Breaks:** When Quest Starts (Eyes Between the Trees) › Change Weather. When Scene Starts › Wait › Check Quest ›
+  Active or Completed › Change Weather at once, for loading. **Morning Music**, **Not Without Us** and the three that hand
+  over the errands' tools are one or two nodes each.
+
+The intro in the forest (under **Intro Moments**, built by `AgentScripts/BuildIntroPart3.cs`; don't run it on the current scene):
+
 - **Troll Ambush:** When Player Comes Near (the berry clearing, every time) › Has It Happened? (Troll Ambush) › No ›
   Check Quest (Berries for the Pot) › Active › Raise Quest Event (Troll Ambush) › Wait › Say (Runa) + Spawn Enemies.
   When Enemies Are Defeated › Say (Runa).

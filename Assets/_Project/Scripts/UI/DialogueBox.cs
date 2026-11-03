@@ -44,13 +44,44 @@ public sealed class DialogueChoice
     /// <summary>Shown smaller after the label, e.g. the quest it takes.</summary>
     public readonly string Detail;
     public readonly bool Enabled;
+    /// <summary>The quest this answer is about, in the colour of its rank.</summary>
+    public readonly QuestDefinition Quest;
+    public readonly QuestAnswer Does;
 
-    public DialogueChoice(string label, string detail = null, bool enabled = true)
+    public DialogueChoice(string label, string detail = null, bool enabled = true, QuestDefinition quest = null, QuestAnswer does = QuestAnswer.None)
     {
         Label = label;
         Detail = detail;
         Enabled = enabled;
+        Quest = quest;
+        Does = quest != null ? does : QuestAnswer.None;
     }
+
+    /// <summary>What the answer's tag says: the quest it starts or hands in, in its rank's colour. Null for an ordinary answer.</summary>
+    public string QuestTag()
+    {
+        if (Does == QuestAnswer.None)
+        {
+            return null;
+        }
+
+        string text = Does == QuestAnswer.Starts ? $"! Starts {QuestMarkerSettings.RankName(Quest.Rank).ToLowerInvariant()}: {Quest.DisplayName}"
+            : Does == QuestAnswer.HandsIn ? $"? Hands in: {Quest.DisplayName}"
+            : $"! {QuestMarkerSettings.RankName(Quest.Rank)}: {Quest.DisplayName}";
+        return $"<color={QuestMarkerSettings.Current.RankHex(Quest.Rank)}>{text}</color>";
+    }
+}
+
+/// <summary>What choosing an answer does to its quest.</summary>
+public enum QuestAnswer
+{
+    None,
+    /// <summary>Choosing it takes the quest on.</summary>
+    Starts,
+    /// <summary>Choosing it hands the quest in.</summary>
+    HandsIn,
+    /// <summary>Choosing it asks about a quest on offer, which can still be turned down.</summary>
+    AsksAbout,
 }
 
 /// <summary>
@@ -179,6 +210,15 @@ public sealed class DialogueBox : MonoBehaviour
         onContinue = done;
     }
 
+    /// <summary>A line spoken aside, on the road or by the fire: a subtitle whatever is going on, leaving the controls and the
+    /// camera to the player. <paramref name="done"/> runs when it has been read.</summary>
+    public void Aside(DialogueSpeaker speaker, string line, Action done = null)
+    {
+        subtitleTimeMultiplier = 1f;
+        Speak(speaker, line);
+        Subtitle(speaker.Name, line, done);
+    }
+
     /// <summary>True while a subtitle is shown.</summary>
     public bool IsSubtitling => subtitleEnds >= 0f;
 
@@ -203,7 +243,7 @@ public sealed class DialogueBox : MonoBehaviour
         var answers = new List<DialogueChoice>();
         foreach (MenuAction action in page.Actions)
         {
-            answers.Add(new DialogueChoice(action.Label, action.Detail, action.Enabled));
+            answers.Add(new DialogueChoice(action.Label, action.Detail, action.Enabled, action.Quest, action.Does));
         }
 
         answers.Add(new DialogueChoice("Goodbye."));
@@ -296,8 +336,10 @@ public sealed class DialogueBox : MonoBehaviour
                 DialogueChoice choice = answers[i];
                 buttons[i].interactable = choice.Enabled;
                 buttons[i].image.color = choice.Enabled ? ButtonColour : ButtonOff;
+                string tag = choice.QuestTag();
                 buttonLabels[i].text = $"<color=#C9A86A>{i + 1}.</color> {choice.Label}" +
-                                       (string.IsNullOrWhiteSpace(choice.Detail) ? "" : $"  <size=75%><alpha=#99>{choice.Detail}</size>");
+                                       (tag != null ? $"\n<size=75%>{tag}</size>" :
+                                       string.IsNullOrWhiteSpace(choice.Detail) ? "" : $"  <size=75%><alpha=#99>{choice.Detail}</size>");
             }
         }
 

@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: A Light in the Wood
   description: The forest cannot forget a hearth that someone tends. Light one inside the portal's ward so your people can see it through the mist, and raise a workshop beside it to work at. Open the build menu with G.
   chain: The First Days
+  rank: 0
   availableObjective: 
   announceStart: 1
   announceCompletion: 1
@@ -24,6 +25,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 09a9774284d0e6c44a03b94ad09483f7, type: 2}
   start: 0
   startEvent: {fileID: 0}
+  closedBy: {fileID: 0}
   startDelay: 0
   onStarted: []
   objectivesInOrder: 0

@@ -16,10 +16,16 @@ MonoBehaviour:
   displayName: Bring Ingrid Home
   description: 'Sigrid''s voice came through the stones: Ingrid was right behind her when they broke, and she is hurt. Find her in the Misty Woods, keep her close, and bring her through an extraction point with you. If she falls she will wait where you found her.'
   chain: The Lost Expedition
+  rank: 0
+  availableObjective: 
+  announceStart: 1
+  announceCompletion: 1
+  showTimerInHud: 0
   prerequisites:
   - {fileID: 11400000, guid: 2614c1d189f3a034691f98f3d3efeee0, type: 2}
   start: 0
   startEvent: {fileID: 0}
+  closedBy: {fileID: 0}
   startDelay: 0
   onStarted: []
   objectivesInOrder: 1

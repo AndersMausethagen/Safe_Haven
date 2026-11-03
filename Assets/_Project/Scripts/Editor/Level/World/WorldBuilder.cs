@@ -321,10 +321,14 @@ public static class WorldBuilder
 
             foreach (HeightLayer layer in layers)
             {
-                WorldTerrain world = layer.Terrain.GetComponent<WorldTerrain>();
-                MakeRoom(layer, world.Stash);
+                MakeRoom(layer, layer.Terrain.GetComponent<WorldTerrain>().Stash);
+            }
+
+            ShareEdges(layers);
+            foreach (HeightLayer layer in layers)
+            {
                 glue.Record(layer);
-                WriteHeights(layer, world.Stash);
+                WriteHeights(layer, layer.Terrain.GetComponent<WorldTerrain>().Stash);
             }
 
             // Paint, grass and trees.
@@ -551,6 +555,56 @@ public static class WorldBuilder
         terrain.transform.position = new Vector3(terrain.transform.position.x, newBottom, terrain.transform.position.z);
         data.SetHeights(0, 0, all);
         Debug.Log($"World Builder: {terrain.name} now reaches {newBottom:0.#} to {newTop:0.#} m (was {bottom:0.#} to {top:0.#}) to fit the features; the ground did not move.");
+    }
+
+    /// <summary>Where two terrains being built touch, the cells on their shared edge take one height: each samples a feature on
+    /// its own grid, so a road or river crossing the edge would otherwise leave a small step there. In the working values, so
+    /// the stash remembers it as the builder's own work and the next build doesn't take it for a hand edit.</summary>
+    private static void ShareEdges(List<HeightLayer> layers)
+    {
+        foreach (HeightLayer a in layers)
+        {
+            foreach (HeightLayer b in layers)
+            {
+                if (a == b || a.Rect.width == 0 || b.Rect.width == 0)
+                {
+                    continue;
+                }
+
+                int last = a.Terrain.terrainData.heightmapResolution - 1;
+                Vector2 east = a.Grid.World(last, last), west = b.Grid.World(0, last);
+                if (Mathf.Abs(east.x - west.x) < 0.01f && Mathf.Abs(east.y - west.y) < 0.01f && a.Rect.xMax > last && b.Rect.xMin == 0)
+                {
+                    for (int y = Mathf.Max(a.Rect.yMin, b.Rect.yMin); y < Mathf.Min(a.Rect.yMax, b.Rect.yMax); y++)
+                    {
+                        ShareCell(a, last, y, b, 0, y);
+                    }
+                }
+
+                Vector2 north = a.Grid.World(last, last), south = b.Grid.World(last, 0);
+                if (Mathf.Abs(north.x - south.x) < 0.01f && Mathf.Abs(north.y - south.y) < 0.01f && a.Rect.yMax > last && b.Rect.yMin == 0)
+                {
+                    for (int x = Mathf.Max(a.Rect.xMin, b.Rect.xMin); x < Mathf.Min(a.Rect.xMax, b.Rect.xMax); x++)
+                    {
+                        ShareCell(a, x, last, b, x, 0);
+                    }
+                }
+            }
+        }
+    }
+
+    // What a feature shaped wins over bare ground; where both were shaped they meet halfway.
+    private static void ShareCell(HeightLayer a, int ax, int ay, HeightLayer b, int bx, int by)
+    {
+        bool shapedA = a.Touched[a.IndexOf(ax, ay)], shapedB = b.Touched[b.IndexOf(bx, by)];
+        if (!shapedA && !shapedB)
+        {
+            return;
+        }
+
+        float height = shapedA && shapedB ? (a.Get(ax, ay) + b.Get(bx, by)) * 0.5f : shapedA ? a.Get(ax, ay) : b.Get(bx, by);
+        a.Set(ax, ay, height);
+        b.Set(bx, by, height);
     }
 
     private static void WriteHeights(HeightLayer layer, WorldTerrainStash stash)

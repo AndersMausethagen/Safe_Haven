@@ -1,0 +1,53 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 702d2e93d0a019a40b6339daf41e2c2f, type: 3}
+  m_Name: RoadToForest
+  m_EditorClassIdentifier: SafeHaven::QuestDefinition
+  id: prologue.road_to_forest
+  displayName: The Road East
+  description: Sigrid wants to reach the forest by noon and find out what became of the four who went ahead. Walk the old road with the others; they keep a steady pace and wait for you if you fall behind.
+  chain: Prologue - The Unquiet Forest
+  rank: 0
+  availableObjective: Speak to Sigrid when you are ready to set out.
+  announceStart: 0
+  announceCompletion: 0
+  showTimerInHud: 0
+  prerequisites:
+  - {fileID: 11400000, guid: 3514f440e604ac048bb77179757dee9b, type: 2}
+  start: 2
+  startEvent: {fileID: 0}
+  closedBy: {fileID: 0}
+  startDelay: 0
+  onStarted: []
+  objectivesInOrder: 0
+  objectives:
+  - type: 6
+    description: Walk with the expedition to the forest
+    amount: 1
+    item: {fileID: 0}
+    resource: {fileID: 0}
+    monster: {fileID: 0}
+    faction: 0
+    building: {fileID: 0}
+    raid: {fileID: 0}
+    mustExtract: 0
+    withinMinutes: 0
+    questEvent: {fileID: 11400000, guid: a1b82639a507326489860f9686ef2fb4, type: 2}
+    countAlreadyOwned: 0
+  turnInToGiver: 0
+  turnInTo: 
+  rewardItems: []
+  rewardResources: []
+  rewardRecipes: []
+  experience: 0
+  completionEvent: {fileID: 0}
+  onCompleted: []

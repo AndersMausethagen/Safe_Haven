@@ -308,7 +308,7 @@ public static class QuestSceneIndex
             bool topLevel = reference.Groups[1].Value.Length == 2;
             // A list's first member can be on the "- quest:" line or indented below another member.
             bool orderedOffer = type == typeof(QuestGiver) && reference.Groups[2].Value == "quest" &&
-                RootFieldAt(document, reference.Index) == "offers";
+                (RootFieldAt(document, reference.Index) == "offers" || RootFieldAt(document, reference.Index) == "sideOffers");
             QuestSceneRole role = type == typeof(StoryScript) ? RoleOfStoryNode(NodeAt(document, reference.Index))
                 : topLevel || orderedOffer ? RoleOf(type, reference.Groups[2].Value) : QuestSceneRole.Other;
             uses.Add(new QuestSceneUse

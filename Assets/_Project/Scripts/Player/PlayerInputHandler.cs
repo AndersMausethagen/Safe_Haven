@@ -131,6 +131,9 @@ public sealed class PlayerInputHandler : MonoBehaviour
         }
     }
 
+    // The player stands and listens to a conversation; in a fight the feet stay free, whatever is being asked.
+    private static bool IsListening => DialogueBox.IsOpen && !MonsterAI.AnyHuntingPlayerSide();
+
     private void Update()
     {
         if (GamePause.IsPaused)
@@ -142,9 +145,10 @@ public sealed class PlayerInputHandler : MonoBehaviour
 
         Vector3 cameraForward = Vector3.ProjectOnPlane(movementCamera.transform.forward, Vector3.up).normalized;
         Vector3 cameraRight = Vector3.ProjectOnPlane(movementCamera.transform.right, Vector3.up).normalized;
-        Vector3 direction = cameraRight * moveInput.x + cameraForward * moveInput.y;
+        Vector2 walk = IsListening ? Vector2.zero : moveInput;
+        Vector3 direction = cameraRight * walk.x + cameraForward * walk.y;
         movement.SetMovementInput(Vector3.ClampMagnitude(direction, 1f));
-        movement.SetMoveKeys(moveInput);
+        movement.SetMoveKeys(walk);
         UpdateAimDirection();
     }
 
@@ -303,6 +307,11 @@ public sealed class PlayerInputHandler : MonoBehaviour
 
     private void OnDodge(InputAction.CallbackContext context)
     {
+        if (IsListening)
+        {
+            return;
+        }
+
         stateMachine.RequestDodge();
     }
 

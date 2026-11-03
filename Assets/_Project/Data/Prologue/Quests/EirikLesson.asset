@@ -1,0 +1,94 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 702d2e93d0a019a40b6339daf41e2c2f, type: 3}
+  m_Name: EirikLesson
+  m_EditorClassIdentifier: SafeHaven::QuestDefinition
+  id: prologue.eirik_lesson
+  displayName: A Lesson from Eirik
+  description: Eirik would rather you learned on a dummy and a rootling than on whatever waits down the road. He is right, and it will only take a moment.
+  chain: Prologue - Before the Road
+  rank: 2
+  availableObjective: 
+  announceStart: 1
+  announceCompletion: 1
+  showTimerInHud: 0
+  prerequisites:
+  - {fileID: 11400000, guid: 2f630af2f0eaf434a97dc64ffe2d130c, type: 2}
+  start: 2
+  startEvent: {fileID: 0}
+  closedBy: {fileID: 11400000, guid: 0279feb93b7c8b74e9fd8683d9d10fd3, type: 2}
+  startDelay: 0
+  onStarted: []
+  objectivesInOrder: 1
+  objectives:
+  - type: 6
+    description: Strike the dummy three times (left mouse)
+    amount: 3
+    item: {fileID: 0}
+    resource: {fileID: 0}
+    monster: {fileID: 0}
+    faction: 0
+    building: {fileID: 0}
+    raid: {fileID: 0}
+    mustExtract: 0
+    withinMinutes: 0
+    questEvent: {fileID: 11400000, guid: 2ef887948d56a194dab8b9f1f4cc879f, type: 2}
+    countAlreadyOwned: 0
+  - type: 6
+    description: Dodge (Space)
+    amount: 1
+    item: {fileID: 0}
+    resource: {fileID: 0}
+    monster: {fileID: 0}
+    faction: 0
+    building: {fileID: 0}
+    raid: {fileID: 0}
+    mustExtract: 0
+    withinMinutes: 0
+    questEvent: {fileID: 11400000, guid: 7d0d71c3831a90141bcf44deab963ec0, type: 2}
+    countAlreadyOwned: 0
+  - type: 6
+    description: 'Parry the rootling: hold the right mouse just before it strikes, or dodge through the blow'
+    amount: 1
+    item: {fileID: 0}
+    resource: {fileID: 0}
+    monster: {fileID: 0}
+    faction: 0
+    building: {fileID: 0}
+    raid: {fileID: 0}
+    mustExtract: 0
+    withinMinutes: 0
+    questEvent: {fileID: 11400000, guid: 81603cd61f5800f4690ce89ffab396b1, type: 2}
+    countAlreadyOwned: 0
+  - type: 6
+    description: Bring it down. Staggered and struck from behind, it takes the most
+    amount: 1
+    item: {fileID: 0}
+    resource: {fileID: 0}
+    monster: {fileID: 0}
+    faction: 0
+    building: {fileID: 0}
+    raid: {fileID: 0}
+    mustExtract: 0
+    withinMinutes: 0
+    questEvent: {fileID: 11400000, guid: ba7681990b5907e4fb1b74ec9d211f19, type: 2}
+    countAlreadyOwned: 0
+  turnInToGiver: 1
+  turnInTo: Eirik
+  rewardItems:
+  - item: {fileID: 11400000, guid: 7a7fe539c225ffa48a608e7af98d39e4, type: 2}
+    amount: 2
+  rewardResources: []
+  rewardRecipes: []
+  experience: 0
+  completionEvent: {fileID: 0}
+  onCompleted: []

@@ -87,7 +87,7 @@ public sealed class RainEffect : MonoBehaviour
     public static Vector3 GroundInView(Camera camera)
     {
         Transform view = camera.transform;
-        Terrain terrain = Terrain.activeTerrain;
+        Terrain terrain = Terrains.Under(view.position);
         if (terrain != null && terrain.terrainData == null)
         {
             terrain = null;

@@ -23,11 +23,38 @@ public sealed class WaterSurface : MonoBehaviour
     [Tooltip("Spline rivers (written by the World Builder): the surface's centre line in local space, xyz = a point on " +
              "the surface, w = half the width there. Empty: the top of the mesh bounds is the water.")]
     [SerializeField, HideInInspector] private Vector4[] centreline = System.Array.Empty<Vector4>();
+    [Tooltip("An oval pond: its outline is the oval inside the mesh's bounds (the mesh is a disc), not the whole box.")]
+    [SerializeField] private bool oval;
+    [Header("Drinking")]
+    [Tooltip("The player can drink anywhere along its edge, or wading in. A spline river always can.")]
+    [SerializeField] private bool drinkable;
+    [Tooltip("What the prompt calls it. Empty: River, or Lake for still water.")]
+    [SerializeField] private string drinkName;
+    [SerializeField, Min(0f)] private float drinkAmount = 40f;
+    [Tooltip("Optional: a water container it fills too, such as a Waterskin.")]
+    [SerializeField] private ItemDefinition fillItem;
+    [SerializeField, Min(0)] private int fillUpTo = 3;
 
     private static readonly List<WaterSurface> All = new List<WaterSurface>();
     private const string SimpleKeyword = "SAFE_HAVEN_WATER_SIMPLE";
     private static bool hooked;
     private MeshFilter filter;
+
+    private const float DrinkSeconds = 1.5f;
+    private const float DrinkReach = 2.5f;
+
+    public bool Oval
+    {
+        get => oval;
+        set => oval = value;
+    }
+
+    // Rivers need no setting of their own: a new field on a river's feature would make every scene with one rebuild it on opening.
+    public bool Drinkable
+    {
+        get => drinkable || HasCentreline;
+        set => drinkable = value;
+    }
 
     public bool TakesRipples
     {
@@ -83,8 +110,32 @@ public sealed class WaterSurface : MonoBehaviour
 
         Bounds bounds = mesh.bounds;
         Vector3 local = transform.InverseTransformPoint(point);
+        if (oval)
+        {
+            // In the oval's own units, as its bounds are a circle in the mesh and the transform stretches it.
+            var fromMiddle = new Vector2(local.x - bounds.center.x, local.z - bounds.center.z);
+            fromMiddle = Vector2.ClampMagnitude(fromMiddle, bounds.extents.x);
+            return transform.TransformPoint(new Vector3(bounds.center.x + fromMiddle.x, bounds.max.y, bounds.center.z + fromMiddle.y));
+        }
+
         local = new Vector3(Mathf.Clamp(local.x, bounds.min.x, bounds.max.x), bounds.max.y, Mathf.Clamp(local.z, bounds.min.z, bounds.max.z));
         return transform.TransformPoint(local);
+    }
+
+    // Its own object, as a hovered Interactable outlines every renderer under it and the water should not light up.
+    private void AddDrinkingPlace()
+    {
+        if (!Drinkable || !Application.isPlaying || transform.Find("Drinking Place") != null)
+        {
+            return;
+        }
+
+        var place = new GameObject("Drinking Place");
+        place.transform.SetParent(transform, false);
+        place.AddComponent<WaterShore>().Configure(this);
+        var source = place.AddComponent<WaterSource>();
+        source.Configure(string.IsNullOrWhiteSpace(drinkName) ? (still ? "Lake" : "River") : drinkName, drinkAmount, fillItem, fillUpTo);
+        place.GetComponent<Interactable>().Configure(InteractionAnimation.GatherLow, DrinkSeconds, DrinkReach, false);
     }
 
     /// <summary>Every enabled water surface.</summary>
@@ -231,6 +282,8 @@ public sealed class WaterSurface : MonoBehaviour
             }
         }
     }
+
+    private void Start() => AddDrinkingPlace();
 
     private void OnEnable()
     {

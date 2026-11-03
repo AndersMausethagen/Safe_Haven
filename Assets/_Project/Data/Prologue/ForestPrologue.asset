@@ -13,13 +13,46 @@ MonoBehaviour:
   m_Name: ForestPrologue
   m_EditorClassIdentifier: SafeHaven::PrologueDefinition
   chapters:
-  - quest: {fileID: 11400000, guid: 0279feb93b7c8b74e9fd8683d9d10fd3, type: 2}
-    behaviour: 0
-    arrivalText: 'The villages sent us to investigate the rumours: trolls leaving their crags, witches walking the roads, even wolves attacking without warning. Something has bewitched these woods. We cannot find the cause in this storm. Keep your torch up and follow the old road. Find dry shelter; we will follow you.'
+  - quest: {fileID: 11400000, guid: 3514f440e604ac048bb77179757dee9b, type: 2}
+    behaviour: 9
+    arrivalText: There you are. Come and stand by the fire with the rest of us. You should know who you are walking with before we set out.
     statusText: 
     duration: 0
     initialEnemies: 0
     enemies: []
+    site: 3
+    companions: 0
+    timeToTalk: 1
+  - quest: {fileID: 11400000, guid: 2f630af2f0eaf434a97dc64ffe2d130c, type: 2}
+    behaviour: 9
+    arrivalText: 'The packs are tied and the fire is nearly out. Ingrid''s party should have been back yesterday, and the forest is half a morning down the road. If you have anything left to do here, do it now: once we set out, we do not come back for it. Are you ready?'
+    statusText: 
+    duration: 0
+    initialEnemies: 0
+    enemies: []
+    site: 3
+    companions: 3
+    timeToTalk: 0
+  - quest: {fileID: 11400000, guid: 7782d364f6bf30b4ba50ba576e7be27f, type: 2}
+    behaviour: 9
+    arrivalText: 
+    statusText: 
+    duration: 0
+    initialEnemies: 0
+    enemies: []
+    site: 0
+    companions: 4
+    timeToTalk: 0
+  - quest: {fileID: 11400000, guid: 0279feb93b7c8b74e9fd8683d9d10fd3, type: 2}
+    behaviour: 0
+    arrivalText: That was no weather. The sun went down hours early and this storm came out of a clear sky. Ingrid, Bjarne, Tor and Liv walked into this two days ago, so we go on, not back. Keep your torch up and follow the old road into the trees. Find us dry shelter; we will follow you.
+    statusText: 
+    duration: 0
+    initialEnemies: 0
+    enemies: []
+    site: 3
+    companions: 1
+    timeToTalk: 0
   - quest: {fileID: 11400000, guid: 4f625534621489e4183de610d93d4f36, type: 2}
     behaviour: 1
     arrivalText: Dry stone overhead. Good work. We need warmth before anyone can think clearly. Gather four Sticks and six Small Rocks nearby; there is loose fuel on the forest floor.
@@ -27,6 +60,9 @@ MonoBehaviour:
     duration: 0
     initialEnemies: 0
     enemies: []
+    site: 3
+    companions: 1
+    timeToTalk: 0
   - quest: {fileID: 11400000, guid: 2ba326763b19a9e46be36507850aed82, type: 2}
     behaviour: 2
     arrivalText: That is enough. Let us put your building skills to use. Press G to open Build, choose Campfire and place it on open ground beside the shelter. The supplies you collected will pay for it.
@@ -34,6 +70,9 @@ MonoBehaviour:
     duration: 0
     initialEnemies: 0
     enemies: []
+    site: 3
+    companions: 1
+    timeToTalk: 0
   - quest: {fileID: 11400000, guid: 83fc380c709c01a4383dfa7c9300d48a, type: 2}
     behaviour: 1
     arrivalText: 'Eirik: Warm hands, empty bellies. There are berry bushes in the clearing west of the shelter. Pick five and stew them over the fire; take my waterskin for the pot.'
@@ -41,15 +80,21 @@ MonoBehaviour:
     duration: 0
     initialEnemies: 0
     enemies: []
+    site: 3
+    companions: 1
+    timeToTalk: 0
   - quest: {fileID: 11400000, guid: b2306560eba5c594886d38a592bdb05d, type: 2}
-    behaviour: 3
-    arrivalText: A fire and a warm meal. Rest for 35 seconds while we gather our strength. Talking with the others is optional; the countdown in your quest tracker shows the time left. When it ends, finish your conversation and we will move on.
+    behaviour: 9
+    arrivalText: A fire and a warm meal. Sit, talk to the others, get your breath back. Whatever is out there will still be there when we are done.
     statusText: 'A MOMENT OF WARMTH
 
       Talk to your companions, or catch your breath.'
-    duration: 35
+    duration: 0
     initialEnemies: 0
     enemies: []
+    site: 1
+    companions: 1
+    timeToTalk: 1
   - quest: {fileID: 11400000, guid: 2f76858ea1c6b6043bdee39be76ef0b1, type: 2}
     behaviour: 4
     arrivalText: 'Runa: Wolves! They are not hunting; something is driving them towards us. Protect the camp!'
@@ -60,6 +105,9 @@ MonoBehaviour:
     - prefab: {fileID: 4509420567327699722, guid: 133e61ca36473ab4999a603e504581a7, type: 3}
       weight: 1
       fromWave: 1
+    site: 3
+    companions: 1
+    timeToTalk: 0
   - quest: {fileID: 11400000, guid: cd536373f8f639f4db60c8810e546ebf, type: 2}
     behaviour: 5
     arrivalText: 
@@ -69,6 +117,9 @@ MonoBehaviour:
     duration: 0
     initialEnemies: 0
     enemies: []
+    site: 3
+    companions: 1
+    timeToTalk: 0
   - quest: {fileID: 11400000, guid: 5699d07d5ceee6144855cc88c1a5f255, type: 2}
     behaviour: 6
     arrivalText: These markings are older than the road. Sigrid says they may be a way out, and does not say how she knows. Touch the waystones and see if they still answer. We will hold the clearing.
@@ -76,6 +127,9 @@ MonoBehaviour:
     duration: 0
     initialEnemies: 0
     enemies: []
+    site: 3
+    companions: 1
+    timeToTalk: 0
   - quest: {fileID: 11400000, guid: a089752e48d75934fb5e34dbeec0b389, type: 2}
     behaviour: 7
     arrivalText: 'Sigrid: The stones are drawing power! Hold them off until the connection forms!'
@@ -94,6 +148,9 @@ MonoBehaviour:
     - prefab: {fileID: 8277675663346761700, guid: 80e5c084eeb0c7d4d9a3027eabb4a2a8, type: 3}
       weight: 1.5
       fromWave: 2
+    site: 3
+    companions: 1
+    timeToTalk: 0
   startedEvent: {fileID: 11400000, guid: 8eb5d1eaca7f351419207cf31f6401cf, type: 2}
   shelterEvent: {fileID: 11400000, guid: 3e4af787a3ca3d241a28d20824384e0f, type: 2}
   fireEvent: {fileID: 11400000, guid: c717e4480417eb34ba75f12df32acda0, type: 2}
@@ -105,7 +162,7 @@ MonoBehaviour:
   sticks: {fileID: 11400000, guid: e8bb5d2fbded52b42a179a47cce32d53, type: 2}
   stones: {fileID: 11400000, guid: 9f085f39a2da68c45b58d2db986835f4, type: 2}
   startingWeapon: {fileID: 0}
-  startingTorch: {fileID: 11400000, guid: 3ed1b8336d9f73749968dc70e483ba5d, type: 2}
+  startingTorch: {fileID: 0}
   startingArmor:
   - {fileID: 11400000, guid: 04c42d35a9586f14c8712e4d62a6209f, type: 2}
   - {fileID: 11400000, guid: b5086eda803a21340a00ddc09a8ce499, type: 2}
@@ -123,7 +180,7 @@ MonoBehaviour:
   maximumEnemies: 16
   rumble: {fileID: 11400000, guid: 6510718f5af764e4aa78349c4b3f7cdf, type: 2}
   homeScene: SafeHaven
-  survivedText: 'Sigrid: It is open! Everyone, through! Something vast strikes the stones. You reach for the others... and the forest disappears.'
+  survivedText: 'Sigrid: It is open! Everyone, through! The old troll''s fist comes down on the stones. You reach for the others... and the forest disappears.'
   overwhelmedText: 'Sigrid: I cannot hold it! Take my hand! A white light tears through the dark...'
   endingStatus: 'THE CONNECTION BREAKS
 

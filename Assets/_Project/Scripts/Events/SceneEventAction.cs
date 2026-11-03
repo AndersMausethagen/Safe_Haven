@@ -2,7 +2,8 @@ using System;
 using UnityEngine;
 using UnityEngine.Events;
 
-public enum SceneEventActionKind { PlayMusic, SilenceMusic, ResumeMusic, ChangeWeather, SetObjectActive, Parameters }
+// Saved by position: add new kinds at the end.
+public enum SceneEventActionKind { PlayMusic, SilenceMusic, ResumeMusic, ChangeWeather, SetObjectActive, Parameters, ChangeTimeOfDay, ChangeLook }
 
 /// <summary>Scene-owned responses; definitions and quests never hold references into a scene.</summary>
 [Serializable]
@@ -19,6 +20,12 @@ public sealed class SceneEventAction
     [Tooltip("Use the standard property/method picker for float, int, bool, string or object arguments. " +
         "Examples: Light.intensity, Animator.SetTrigger, AudioSource.volume, component.enabled.")]
     [SerializeField] private UnityEvent parameters = new UnityEvent();
+    [SerializeField] private DayNightCycle dayNight;
+    [Tooltip("The hour the clock moves forward to (7.5 is early morning, 19 sunset, 23 night).")]
+    [SerializeField, Range(0f, 24f)] private float hour = 21f;
+    [SerializeField] private SceneLook look;
+    [Tooltip("0: the scene's first look, 1: the second.")]
+    [SerializeField, Range(0f, 1f)] private float lookAmount = 1f;
 
     public string FindProblem()
     {
@@ -41,11 +48,19 @@ public sealed class SceneEventAction
             case SceneEventActionKind.Parameters:
                 if (parameters.GetPersistentEventCount() == 0) return "Parameter action has no configured property or method.";
                 break;
+            case SceneEventActionKind.ChangeTimeOfDay:
+                if (dayNight == null) return "Time of day action needs this scene's DayNightCycle.";
+                break;
+            case SceneEventActionKind.ChangeLook:
+                if (look == null) return "Look action needs this scene's Scene Look.";
+                break;
         }
         return null;
     }
 
-    public void Execute(UnityEngine.Object context)
+    /// <summary>Carries out the reaction. <paramref name="atOnce"/> skips its transition: the scene is loading into a state that
+    /// came about earlier, so the storm is simply there.</summary>
+    public void Execute(UnityEngine.Object context, bool atOnce = false)
     {
         string problem = FindProblem();
         if (problem != null)
@@ -58,9 +73,11 @@ public sealed class SceneEventAction
             case SceneEventActionKind.PlayMusic: sceneAudio.PlayEventMusic(music); break;
             case SceneEventActionKind.SilenceMusic: sceneAudio.SilenceMusic(); break;
             case SceneEventActionKind.ResumeMusic: sceneAudio.ResumeMusic(); break;
-            case SceneEventActionKind.ChangeWeather: weatherSystem.SetWeather(weather, transitionSeconds); break;
+            case SceneEventActionKind.ChangeWeather: weatherSystem.SetWeather(weather, atOnce ? 0f : transitionSeconds); break;
             case SceneEventActionKind.SetObjectActive: target.SetActive(active); break;
             case SceneEventActionKind.Parameters: parameters.Invoke(); break;
+            case SceneEventActionKind.ChangeTimeOfDay: dayNight.GoToHour(hour, atOnce ? 0f : transitionSeconds); break;
+            case SceneEventActionKind.ChangeLook: look.FadeTo(lookAmount, atOnce ? 0f : transitionSeconds); break;
         }
     }
 }

@@ -16,10 +16,16 @@ MonoBehaviour:
   displayName: Know Your Enemy
   description: Forest-Bitten Wolves hunt the Misty Woods, on the same paths your people must walk home. Thin their numbers before they grow bolder.
   chain: The First Days
+  rank: 0
+  availableObjective: 
+  announceStart: 1
+  announceCompletion: 1
+  showTimerInHud: 0
   prerequisites:
   - {fileID: 11400000, guid: 2614c1d189f3a034691f98f3d3efeee0, type: 2}
   start: 0
   startEvent: {fileID: 0}
+  closedBy: {fileID: 0}
   startDelay: 0
   onStarted: []
   objectivesInOrder: 0
