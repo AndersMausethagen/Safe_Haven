@@ -55,6 +55,20 @@ public sealed class PlayerMovementSettings : ScriptableObject
     [SerializeField] private DodgeShape roll = new DodgeShape(1f, 1f, 1f, 1f, 1f, 1f, "Roll");
     [SerializeField] private DodgeShape heavyRoll = new DodgeShape(0.85f, 1.35f, 0.9f, 1.4f, 1.25f, 0.9f, "Heavy Roll");
 
+    [Header("Carrying (what is in the bag)")]
+    [Tooltip("Share of the bag's weight budget where it starts to tell.")]
+    [SerializeField, Range(0.1f, 1f)] private float heavyFromShare = 0.8f;
+    [Tooltip("Speed with the bag full, as a share of normal. It eases in from Heavy From Share.")]
+    [SerializeField, Range(0.3f, 1f)] private float speedAtFullBag = 0.8f;
+    [Tooltip("What stamina costs with the bag full, times normal.")]
+    [SerializeField, Range(1f, 3f)] private float staminaAtFullBag = 1.4f;
+    [Tooltip("How far footsteps carry with the bag full, times normal.")]
+    [SerializeField, Range(1f, 3f)] private float noiseAtFullBag = 1.35f;
+
+    public float HeavyFromShare => heavyFromShare;
+    public float SpeedAtFullBag => speedAtFullBag;
+    public float StaminaAtFullBag => staminaAtFullBag;
+    public float NoiseAtFullBag => noiseAtFullBag;
     public float LightLoad => lightLoad;
     public float HeavyLoad => heavyLoad;
 

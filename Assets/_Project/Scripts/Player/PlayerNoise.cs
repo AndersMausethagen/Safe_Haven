@@ -39,6 +39,7 @@ public sealed class PlayerNoise : MonoBehaviour
         dodge = GetComponent<PlayerDodge>();
         swimming = GetComponent<PlayerSwimming>();
         equipment = GetComponent<PlayerEquipment>();
+        burden = GetComponent<PlayerBurden>();
         health = GetComponent<Damageable>();
         combatant = GetComponent<Combatant>();
     }
@@ -78,6 +79,8 @@ public sealed class PlayerNoise : MonoBehaviour
     public float Reach { get; set; } = 1f;
 
     /// <summary>The player makes a sound of <paramref name="radius"/> metres at <paramref name="position"/>.</summary>
+    private PlayerBurden burden;
+
     public void Make(Vector3 position, float radius)
     {
         PerceptionSettings rules = PerceptionSettings.Current;
@@ -103,7 +106,7 @@ public sealed class PlayerNoise : MonoBehaviour
         else if (movement.IsGrounded)
         {
             nextStepAt = Time.time + rules.FootstepInterval;
-            Make(transform.position, (IsSneaking ? rules.SneakingFootstepNoise : rules.FootstepNoise) * GearScale(rules));
+            Make(transform.position, (IsSneaking ? rules.SneakingFootstepNoise : rules.FootstepNoise) * GearScale(rules) + (burden != null ? burden.StepNoise(IsSneaking) : 0f));
         }
     }
 
@@ -127,7 +130,8 @@ public sealed class PlayerNoise : MonoBehaviour
     private float GearScale(PerceptionSettings rules)
     {
         PlayerMovementSettings settings = movement.Settings;
-        return equipment != null ? PerceptionRules.GearNoiseScale(equipment.EquipLoad, settings.LightLoad, settings.HeavyLoad, rules) : 1f;
+        float bag = burden != null ? burden.NoiseScale : 1f;
+        return bag * (equipment != null ? PerceptionRules.GearNoiseScale(equipment.EquipLoad, settings.LightLoad, settings.HeavyLoad, rules) : 1f);
     }
 
     private void OnDodgeStarted(DodgeStyle style, DodgeShape shape)

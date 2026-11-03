@@ -430,6 +430,10 @@ public sealed class ItemInventoryWindow : MonoBehaviour, IItemSlotHandler
             float budget = container.WeightCapacity;
             string weightColor = weight >= budget - 0.01f ? "#FF7B6B" : weight >= budget * 0.8f ? "#E8C46A" : "#AAB0BC";
             builder.Append($"     <color={weightColor}>Weight {weight:0.#}/{budget:0}</color>");
+            if (Player.Current != null && Player.Current.TryGetComponent(out PlayerBurden burden) && burden.IsHeavy)
+            {
+                builder.Append("  <color=#E8C46A>Heavy: slower, tires faster</color>");
+            }
         }
 
         gatheringLabel.text = builder.ToString();

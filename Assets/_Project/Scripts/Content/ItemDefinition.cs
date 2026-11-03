@@ -111,6 +111,12 @@ public sealed class ItemDefinition : ScriptableObject, IStackDefinition
     [SerializeField, Min(0)] private int carryCapacityBonus;
     [Tooltip("Extra bag slots unlocked while this backpack is in the bag. Only the best backpack counts.")]
     [SerializeField, Min(0)] private int bagSlotBonus;
+    [Tooltip("A pack that rattles: how many metres further every step carries while it is worn, half that while sneaking.")]
+    [SerializeField, Min(0f)] private float carryNoise;
+    [Tooltip("Speed while it is worn, as a share of normal. 1 for an ordinary pack.")]
+    [SerializeField, Range(0.3f, 1f)] private float carrySpeedScale = 1f;
+    [Tooltip("Heard with each step, for a pack that rattles.")]
+    [SerializeField] private SoundDefinition carrySound;
 
     [Header("Gear")]
     [Tooltip("Makes this item armor or jewelry worn in that slot of the character screen (C). None for other items. " +
@@ -184,6 +190,9 @@ public sealed class ItemDefinition : ScriptableObject, IStackDefinition
     public bool IsUsable => IsConsumable || IsEquippable || IsBlueprint || experience > 0 || transport != null;
     public TransportDefinition Transport => transport;
     public int CarryCapacityBonus => carryCapacityBonus;
+    public float CarryNoise => carryNoise;
+    public float CarrySpeedScale => carrySpeedScale;
+    public SoundDefinition CarrySound => carrySound;
     public int BagSlotBonus => bagSlotBonus;
     public bool IsBackpack => carryCapacityBonus > 0 || bagSlotBonus > 0;
     public ArmorSlot ArmorSlot => armorSlot;

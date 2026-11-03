@@ -296,6 +296,15 @@ public sealed class ItemTooltipView : MonoBehaviour
             if (item.CarryCapacityBonus > 0)
             {
                 builder.Append($"\n<color=#8BC4FF>+{item.CarryCapacityBonus} carry weight while worn.</color>");
+                if (item.CarryNoise > 0f)
+                {
+                    builder.Append($"\n<color=#E8C46A>Rattles: every step carries {item.CarryNoise:0.#} m further.</color>");
+                }
+
+                if (item.CarrySpeedScale < 1f)
+                {
+                    builder.Append($"\n<color=#E8C46A>{Mathf.RoundToInt((1f - item.CarrySpeedScale) * 100f)}% slower while worn.</color>");
+                }
             }
 
             if (item.BagSlotBonus > 0)

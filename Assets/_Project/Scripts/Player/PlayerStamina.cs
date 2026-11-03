@@ -38,6 +38,9 @@ public sealed class PlayerStamina : MonoBehaviour
     /// <summary>Raised when an action was refused because stamina is insufficient.</summary>
     public event Action SpendRefused;
 
+    /// <summary>What every action costs, times normal: a heavy bag tires faster (PlayerBurden).</summary>
+    public float CostScale { get; set; } = 1f;
+
     private void Awake()
     {
         health = GetComponent<Damageable>();
@@ -73,6 +76,7 @@ public sealed class PlayerStamina : MonoBehaviour
     /// <summary>Pays the full action cost. Returns false when stamina is insufficient, and the action must not happen.</summary>
     public bool TrySpend(float cost)
     {
+        cost *= CostScale;
         if (!pool.TrySpend(cost))
         {
             SpendRefused?.Invoke();
