@@ -161,6 +161,16 @@ public struct DayNightState
     /// <summary>The light's shadow strength in clear weather.</summary>
     public float ShadowStrength;
 
+    /// <summary>From one look to another without the sun sweeping across the sky: colours and light blend all the way, while
+    /// the shadows fade out, the light turns while there are none, and they fade back in where they now belong.</summary>
+    public static DayNightState Crossfade(in DayNightState a, in DayNightState b, float t)
+    {
+        DayNightState state = Lerp(a, b, t);
+        state.LightRotation = Quaternion.Slerp(a.LightRotation, b.LightRotation, Mathf.SmoothStep(0f, 1f, (t - 0.35f) / 0.3f));
+        state.ShadowStrength *= Mathf.Clamp01((Mathf.Abs(t - 0.5f) - 0.15f) / 0.35f);
+        return state;
+    }
+
     public static DayNightState Lerp(in DayNightState a, in DayNightState b, float t)
     {
         return new DayNightState

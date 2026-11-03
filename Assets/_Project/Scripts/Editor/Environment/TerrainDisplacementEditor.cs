@@ -71,7 +71,14 @@ public static class TerrainDisplacementEditor
         foreach (TerrainLayer layer in layers)
         {
             if (profile.Find(layer) != null) continue;
+            TerrainSurfaceProfile.Layer known = StandardProfile != null ? StandardProfile.Find(layer) : null;
             var entry = new TerrainSurfaceProfile.Layer { terrainLayer = layer };
+            if (known != null)
+            {
+                entry.footprintResponse = known.footprintResponse;
+                entry.amplitude = known.amplitude;
+            }
+
             string layerPathOnDisk = AssetDatabase.GetAssetPath(layer);
             string sourcePath = Path.GetDirectoryName(layerPathOnDisk).Replace('\\', '/') + "/" + layer.name + "_Height.png";
             Texture2D sourceHeight = AssetDatabase.LoadAssetAtPath<Texture2D>(sourcePath);
@@ -149,9 +156,7 @@ public static class TerrainDisplacementEditor
             material = terrain.materialTemplate != null ? new Material(terrain.materialTemplate) : new Material(shader);
             material.name = data.name + " Displacement";
             material.shader = shader;
-            if ((terrain.materialTemplate == null || terrain.materialTemplate.shader.name != ShaderName) &&
-                material.GetFloat("_DisplacementStrength") <= 0)
-                material.SetFloat("_DisplacementStrength", 0.1f);
+            UseStandardDisplacement(material);
             AssetDatabase.CreateAsset(material, materialPath);
         }
         else if (terrain.materialTemplate != null && terrain.materialTemplate != material)
@@ -159,6 +164,7 @@ public static class TerrainDisplacementEditor
             Undo.RecordObject(material, "Refresh Terrain Displacement Material");
             material.CopyPropertiesFromMaterial(terrain.materialTemplate);
             material.shader = shader;
+            UseStandardDisplacement(material);
         }
         material.SetTexture("_DisplacementMasks", savedMasks);
         material.SetTexture("_DisplacementLayers", savedLayers);
@@ -181,6 +187,49 @@ public static class TerrainDisplacementEditor
         EditorSceneManager.MarkSceneDirty(terrain.gameObject.scene);
         terrain.Flush();
         return material;
+    }
+
+    // The Haven's terrain is the standard: footprints read the same on every terrain only if the ground around them is shaped alike.
+    private const string StandardProfilePath = "Assets/_Project/Art/Terrain/SafeHaven/Haven World Terrain Surface Profile.asset";
+    private const string StandardMaterialPath = "Assets/_Project/Art/Terrain/SafeHaven/Haven World Terrain Displacement.mat";
+    private static readonly string[] DisplacementShape =
+        { "_DisplacementStrength", "_DisplacementNear", "_DisplacementFar", "_TessellationFactor", "_TessellationEdgeLength", "_TessellationPixels" };
+
+    private static TerrainSurfaceProfile StandardProfile => AssetDatabase.LoadAssetAtPath<TerrainSurfaceProfile>(StandardProfilePath);
+
+    /// <summary>Gives a material the standard's displacement and tessellation (the Haven's own is left as it is).</summary>
+    public static void UseStandardDisplacement(Material material)
+    {
+        Material standard = AssetDatabase.LoadAssetAtPath<Material>(StandardMaterialPath);
+        if (standard == null || standard == material)
+        {
+            return;
+        }
+
+        foreach (string property in DisplacementShape)
+        {
+            if (material.HasProperty(property) && standard.HasProperty(property))
+            {
+                material.SetFloat(property, standard.GetFloat(property));
+            }
+        }
+    }
+
+    /// <summary>Makes a terrain's footprints the standard's, and rebuilds its surface data with them.</summary>
+    public static void UseStandardFootprints(Terrain terrain)
+    {
+        TerrainSurfaceProfile profile = terrain.GetComponent<TerrainSurface>().Profile;
+        if (profile != StandardProfile)
+        {
+            profile.UseFootprintsOf(StandardProfile);
+            EditorUtility.SetDirty(profile);
+        }
+
+        Apply(terrain);
+        UseStandardDisplacement(terrain.materialTemplate);
+        EditorUtility.SetDirty(terrain.materialTemplate);
+        AssetDatabase.SaveAssetIfDirty(terrain.materialTemplate);
+        terrain.GetComponent<TerrainSurface>().Apply();
     }
 
     private static T SaveResource<T>(T resource, string path) where T : UnityEngine.Object

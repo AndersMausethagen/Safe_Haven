@@ -328,6 +328,7 @@ public sealed class WhenZoneCleared : StoryTrigger
 [Serializable]
 public sealed class StorySpeaker
 {
+    // Nobody set: the narrator. No name and no face, and the box gives the words the room (write them in <i>italics</i>).
     [Tooltip("The player speaks (their name below, or \"You\").")]
     public bool player;
     public string name;
@@ -343,7 +344,7 @@ public sealed class StorySpeaker
     public DialogueSpeaker ToSpeaker() =>
         player ? DialogueSpeaker.Player(name) : new DialogueSpeaker(string.IsNullOrWhiteSpace(name) && model != null ? model.name : name, model, portrait, 0f, voice, voiceFrom);
 
-    public string Describe() => player ? "Player" : string.IsNullOrWhiteSpace(name) ? model != null ? model.name : "?" : name;
+    public string Describe() => !player && string.IsNullOrWhiteSpace(name) && model == null && portrait == null ? "Narrator" : player ? "Player" : string.IsNullOrWhiteSpace(name) ? model != null ? model.name : "?" : name;
 }
 
 [Serializable]
@@ -1042,6 +1043,8 @@ public sealed class ChangeTimeOfDayNode : StoryNode
     [Min(0f)] public float seconds = 20f;
     [Tooltip("Instead of Seconds, it follows the party's walk (Walk The Party): the hour arrives as they do, and the sun waits when they wait.")]
     public bool followWalk;
+    [Tooltip("Blends straight to that hour's look over Seconds, rather than running the clock there, so shadows don't race over the ground. Several of these along a walk make a day go by.")]
+    public bool fadeStraightThere;
 
     public override string Title => "Change Time of Day";
     public override string Category => "World";
@@ -1052,6 +1055,12 @@ public sealed class ChangeTimeOfDayNode : StoryNode
         if (cycle == null)
         {
             Debug.LogWarning("Change Time of Day: the scene has no DayNightCycle (World Tools › Sky & Weather).", context.Script);
+            yield break;
+        }
+
+        if (fadeStraightThere)
+        {
+            cycle.FadeToHour(hour, seconds);
             yield break;
         }
 

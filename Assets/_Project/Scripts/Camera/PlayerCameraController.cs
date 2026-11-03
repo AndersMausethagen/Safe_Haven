@@ -23,10 +23,6 @@ using UnityEngine.InputSystem;
 public sealed class PlayerCameraController : MonoBehaviour
 {
     private const float MinClipDistance = 0.4f;
-    // While aiming a bow: the view narrows by this share and the top-down cursor lean reaches this much further.
-    private const float AimFieldOfView = 0.85f;
-    private const float AimLookAhead = 1.5f;
-    private const float AimBlendSpeed = 4f;
 
     [SerializeField] private PlayerCameraSettings settings;
 
@@ -82,7 +78,7 @@ public sealed class PlayerCameraController : MonoBehaviour
     private Vector3 focusPointVelocity;
     private bool focusPointSet;
     private bool aiming;
-    private float aimWeight;
+    private bool bowInHand;
     private Transform focusTarget;
     private float focusWeight;
     private Vector3 focusPoint;
@@ -96,9 +92,18 @@ public sealed class PlayerCameraController : MonoBehaviour
         if (focusTarget == target) focusTarget = null;
     }
 
-    /// <summary>Aiming a bow (ArcheryCameraAim): the view narrows a little and, top-down, leans further toward the
-    /// cursor, so long shots can be seen.</summary>
+    /// <summary>Aiming or drawing a bow (ArcheryCameraAim): the right button doesn't turn the view under the aim.</summary>
     public void SetAiming(bool aim) => aiming = aim;
+
+    /// <summary>A bow in hand (ArcheryCameraAim): the framing stays as it is out of a fight, so starting to draw doesn't zoom
+    /// and tilt the view, and it doesn't lean with the cursor, which moved the ground under the aim.</summary>
+    public void SetBowInHand(bool bow)
+    {
+        bowInHand = bow;
+        profile = settings.GetProfile(FramingState);
+    }
+
+    private GameState FramingState => bowInHand || gameState == null ? GameState.Exploration : gameState.CurrentState;
 
     public void BeginDialogue(Transform speaker, float distanceScale)
     {
@@ -240,7 +245,7 @@ public sealed class PlayerCameraController : MonoBehaviour
 
     private void OnGameStateChanged(GameState previous, GameState current)
     {
-        profile = settings.GetProfile(current);
+        profile = settings.GetProfile(FramingState);
     }
 
     private void SnapToProfile(PlayerCameraSettings.Profile newProfile)
@@ -376,7 +381,6 @@ public sealed class PlayerCameraController : MonoBehaviour
         maxLookAhead = Mathf.Lerp(maxLookAhead, profile.maxLookAhead, t);
 
         zoom = Mathf.Lerp(zoom, zoomTarget, Blend(settings.ZoomSmoothTime, dt));
-        aimWeight = Mathf.MoveTowards(aimWeight, aiming ? 1f : 0f, AimBlendSpeed * dt);
     }
 
     private void UpdateFocus()
@@ -479,10 +483,9 @@ public sealed class PlayerCameraController : MonoBehaviour
             return Vector3.zero;
         }
 
-        float reach = Mathf.Lerp(1f, AimLookAhead, aimWeight);
-        Vector3 offset = (cursorRay.GetPoint(cursorDistance) - centreRay.GetPoint(centreDistance)) * (lookAheadFraction * reach);
+        Vector3 offset = (cursorRay.GetPoint(cursorDistance) - centreRay.GetPoint(centreDistance)) * lookAheadFraction;
         offset.y = 0f;
-        return Vector3.ClampMagnitude(offset, maxLookAhead * reach);
+        return Vector3.ClampMagnitude(offset, maxLookAhead);
     }
 
     private void ApplyToCinemachine()
@@ -517,7 +520,7 @@ public sealed class PlayerCameraController : MonoBehaviour
         }
 
         LensSettings lens = cinemachineCamera.Lens;
-        lens.FieldOfView = Mathf.Lerp(fieldOfView, settings.ActionFieldOfView, w) * Mathf.Lerp(1f, AimFieldOfView, aimWeight);
+        lens.FieldOfView = Mathf.Lerp(fieldOfView, settings.ActionFieldOfView, w);
         cinemachineCamera.Lens = lens;
     }
 

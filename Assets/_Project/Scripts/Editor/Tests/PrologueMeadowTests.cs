@@ -308,6 +308,115 @@ public sealed class PrologueMeadowTests
         }
     }
 
+    // ----- The playtest's fixes -----
+
+    [Test]
+    public void Footprints_OnEveryTerrain_AreTheHavens()
+    {
+        var haven = AssetDatabase.LoadAssetAtPath<TerrainSurfaceProfile>("Assets/_Project/Art/Terrain/SafeHaven/Haven World Terrain Surface Profile.asset");
+        var brandNew = ScriptableObject.CreateInstance<TerrainSurfaceProfile>();
+        try
+        {
+            foreach (TerrainSurfaceProfile profile in new[] { brandNew,
+                AssetDatabase.LoadAssetAtPath<TerrainSurfaceProfile>(Root + "Vegetation/Prologue Meadow Terrain Surface Profile.asset"),
+                AssetDatabase.LoadAssetAtPath<TerrainSurfaceProfile>(Root + "Vegetation/Prologue Forest Terrain Surface Profile.asset") })
+            {
+                Assert.AreEqual(haven.footprintDepth, profile.footprintDepth, 0.0001f);
+                Assert.AreEqual(haven.footprintFlattening, profile.footprintFlattening, 0.0001f);
+                Assert.AreEqual(haven.footprintNormalFlattening, profile.footprintNormalFlattening, 0.0001f);
+                Assert.AreEqual(haven.footprintDarkening, profile.footprintDarkening, 0.0001f);
+                Assert.AreEqual(haven.footprintGrassFlattening, profile.footprintGrassFlattening, 0.0001f);
+                foreach (TerrainSurfaceProfile.Layer layer in profile.layers)
+                {
+                    TerrainSurfaceProfile.Layer same = haven.Find(layer.terrainLayer);
+                    if (same != null) Assert.AreEqual(same.footprintResponse, layer.footprintResponse, 0.0001f, layer.terrainLayer.name);
+                }
+            }
+        }
+        finally
+        {
+            Object.DestroyImmediate(brandNew);
+        }
+
+        var havenGround = AssetDatabase.LoadAssetAtPath<Material>("Assets/_Project/Art/Terrain/SafeHaven/Haven World Terrain Displacement.mat");
+        foreach (string ground in new[] { "Meadow", "Forest" })
+        {
+            var material = AssetDatabase.LoadAssetAtPath<Material>(Root + "Vegetation/Prologue " + ground + " Terrain Displacement.mat");
+            foreach (string property in new[] { "_DisplacementStrength", "_DisplacementNear", "_DisplacementFar", "_TessellationFactor", "_TessellationEdgeLength" })
+                Assert.AreEqual(havenGround.GetFloat(property), material.GetFloat(property), 0.0001f, ground + " " + property);
+        }
+    }
+
+    [Test]
+    public void ThePlayer_StartsWithAGoodBackpack()
+    {
+        ItemDefinition pack = Definition.StartingBackpack;
+        Assert.NotNull(pack);
+        Assert.IsTrue(pack.IsBackpack);
+        Assert.GreaterOrEqual(pack.BagSlotBonus, 16);
+    }
+
+    [Test]
+    public void WoodQuest_GivesATool_AndTheFightingAxeDoesNotPretend()
+    {
+        var hatchet = AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Project/Data/Items/StoneHatchet.asset");
+        Assert.AreEqual(ToolType.Axe, hatchet.ToolType);
+        Assert.GreaterOrEqual(hatchet.ToolTier, 1);
+        var axe = AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Project/Data/Items/WoodsmansAxe.asset");
+        Assert.AreEqual("Hand Axe", axe.DisplayName);
+        Assert.AreEqual("woodsmans_axe", axe.Id, "Saves know it by this.");
+    }
+
+    [Test]
+    public void Bow_AimsWhereTheCursorPassesAtTheArrowsHeight()
+    {
+        var ray = new Ray(new Vector3(0f, 20f, -20f), new Vector3(0f, -1f, 1f).normalized);
+        Vector3 atBow = ArcheryRules.PointAtHeight(ray, 1.5f, Vector3.zero);
+        Assert.AreEqual(1.5f, atBow.y, 0.001f);
+        Assert.AreEqual(-1.5f, atBow.z, 0.001f, "Nearer the camera than the spot on the ground the ray reaches.");
+        Assert.AreEqual(Vector3.one, ArcheryRules.PointAtHeight(new Ray(Vector3.zero, Vector3.up), 1.5f, Vector3.one), "A ray that never gets there.");
+    }
+
+    [Test]
+    public void TimeFade_ShadowsAreGoneWhileTheLightTurns()
+    {
+        var early = new DayNightState { LightRotation = Quaternion.Euler(30f, 0f, 0f), ShadowStrength = 1f };
+        var late = new DayNightState { LightRotation = Quaternion.Euler(30f, 120f, 0f), ShadowStrength = 1f };
+        Assert.AreEqual(1f, DayNightState.Crossfade(early, late, 0f).ShadowStrength, 0.001f);
+        Assert.AreEqual(0f, DayNightState.Crossfade(early, late, 0.5f).ShadowStrength, 0.001f);
+        Assert.AreEqual(1f, DayNightState.Crossfade(early, late, 1f).ShadowStrength, 0.001f);
+        Assert.Less(Quaternion.Angle(DayNightState.Crossfade(early, late, 0.3f).LightRotation, early.LightRotation), 0.01f, "Still where it was while its shadows can be seen.");
+        Assert.Less(Quaternion.Angle(DayNightState.Crossfade(early, late, 0.7f).LightRotation, late.LightRotation), 0.01f);
+    }
+
+    [Test]
+    public void RiverMouth_WidensTowardsTheShore()
+    {
+        Assert.AreEqual(0f, RiverBuilder.MouthShare(float.PositiveInfinity, 10f));
+        Assert.AreEqual(0f, RiverBuilder.MouthShare(10f, 10f), 0.001f);
+        Assert.AreEqual(1f, RiverBuilder.MouthShare(0f, 10f), 0.001f);
+        Assert.AreEqual(1f, RiverBuilder.MouthShare(-3f, 10f), 0.001f, "In the pond itself.");
+        Assert.Greater(RiverBuilder.MouthShare(3f, 10f), RiverBuilder.MouthShare(7f, 10f));
+    }
+
+    [Test]
+    public void Shore_IsTheCarvedOutline()
+    {
+        var pond = GameObject.CreatePrimitive(PrimitiveType.Plane);
+        try
+        {
+            pond.transform.localScale = new Vector3(3f, 1f, 2f);
+            Bounds local = pond.GetComponent<MeshFilter>().sharedMesh.bounds;
+            Assert.Less(WaterSetup.ShoreDistance(pond.transform, local, true, 0f, 0f), -5f, "The middle.");
+            Assert.Greater(WaterSetup.ShoreDistance(pond.transform, local, true, 40f, 0f), 5f, "Far outside.");
+            Assert.AreEqual(5f, WaterSetup.ShoreDistance(pond.transform, local, false, 20f, 0f), 0.01f, "A box pond: 5 m past its 15 m half width.");
+        }
+        finally
+        {
+            Object.DestroyImmediate(pond);
+        }
+    }
+
     // ----- The second telling -----
 
     [Test]
@@ -383,6 +492,12 @@ public sealed class PrologueMeadowTests
             Assert.IsFalse(behind.gameObject.activeSelf, "The way back only closes once the player is inside.");
             MobSpawnZone road = roots.SelectMany(r => r.GetComponentsInChildren<MobSpawnZone>(true)).Single(z => z.name == "Rootlings on the Road");
             Assert.AreEqual("ExpeditionRootling", road.Entries[0].prefab.name, "Not wolves again: the camp has those.");
+            foreach (string found in new[] { "Story - The Stone by the Lake", "Story - The Handcart" })
+            {
+                SayNode reading = stories.Single(s => s.name == found).Nodes.OfType<SayNode>().First();
+                Assert.AreEqual("Narrator", reading.speaker.Describe(), "What the player finds isn't the player talking: " + found);
+            }
+
             StringAssert.DoesNotContain("35", roots.SelectMany(r => r.GetComponentsInChildren<PrologueCompanion>(true)).Single(c => c.Resident.DisplayName == "Sigrid")
                 .GetComponent<QuestGiver>().Offers.Single(o => o.Quest == Quest("CatchBreath")).Text, "The rest has no countdown any more.");
         }

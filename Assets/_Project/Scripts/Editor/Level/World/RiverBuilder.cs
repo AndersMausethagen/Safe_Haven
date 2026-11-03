@@ -4,16 +4,22 @@ using UnityEngine.Rendering;
 
 /// <summary>Builds a <see cref="RiverFeature"/>: a water surface that only runs downhill, a bed dug below it with
 /// sloping banks, bed and bank paint, cleared grass and trees, a water mesh whose flow follows the bends, plunge pools
-/// under steep drops, and stones and bank objects.</summary>
+/// under steep drops, and stones and bank objects. An end drawn into a pond joins it: see <see cref="MouthShare"/>.</summary>
 public sealed class RiverBuilder : FeatureBuilder
 {
     private const float BankLip = 0.12f;     // banks meet the water this far above it, so the edge stays hidden
     private const float MeshOverlap = 0.6f;  // the water mesh reaches this far under the banks
+    private const float ChannelInPond = 1.5f; // the channel runs this far past the shore, where the pond's own bed has dropped below it
+    private const float WaterEndsFromShore = 0.4f; // the river's water stops here, just over the pond's own
+    private const float ShorePaintFade = 2f;  // its bed and bank paint give way over the last of the way to the shore
     private readonly RiverFeature river;
     private float[] halfWidth;
     private float[] depth;
     private float[] surface;
     private float maxHalfWidth;
+    private readonly System.Collections.Generic.List<(Transform water, Bounds local, bool oval)> ponds = new System.Collections.Generic.List<(Transform, Bounds, bool)>();
+    private float[] toPond;
+    private float mouthLength;
 
     public RiverBuilder(RiverFeature river) : base(river)
     {
@@ -41,18 +47,84 @@ public sealed class RiverBuilder : FeatureBuilder
         depth = new float[n];
         var raw = new float[n];
         maxHalfWidth = 0f;
+        float level = FindPonds();
+        mouthLength = Mathf.Max(10f, river.Width * 2f);
+        toPond = new float[n];
         for (int i = 0; i < n; i++)
         {
-            halfWidth[i] = river.Width * 0.5f * river.WidthAtKnots.Evaluate(Line.KnotT[i], Line.KnotCount, Line.Closed);
-            depth[i] = river.Depth * river.DepthAtKnots.Evaluate(Line.KnotT[i], Line.KnotCount, Line.Closed);
+            toPond[i] = ShoreAt(SplineLine.Flat(Line.Points[i]));
+            float mouth = MouthShare(toPond[i], mouthLength);
+            halfWidth[i] = river.Width * 0.5f * river.WidthAtKnots.Evaluate(Line.KnotT[i], Line.KnotCount, Line.Closed) * Mathf.Lerp(1f, RiverFeature.MouthFlare, mouth);
+            depth[i] = river.Depth * river.DepthAtKnots.Evaluate(Line.KnotT[i], Line.KnotCount, Line.Closed) * Mathf.Lerp(1f, 0.35f, mouth);
             maxHalfWidth = Mathf.Max(maxHalfWidth, halfWidth[i]);
             raw[i] = river.Surface == RiverFeature.SurfaceMode.SplineHeight
                 ? Line.Points[i].y
                 : ground.Height(SplineLine.Flat(Line.Points[i])) - river.SurfaceBelowGround;
+            raw[i] = Mathf.Lerp(raw[i], level, mouth);
         }
 
         surface = Downhill(raw);
+        // Running into a pond, it never lies below the pond.
+        if (ponds.Count > 0 && toPond[n - 1] < 0f)
+        {
+            for (int i = 0; i < n; i++)
+            {
+                surface[i] = Mathf.Max(surface[i], level);
+            }
+        }
     }
+
+    /// <summary>How far along a river's mouth a point is, from 0 up the river to 1 at a pond's shore (and in the pond):
+    /// <paramref name="shore"/> metres from the shore on a mouth this long.</summary>
+    public static float MouthShare(float shore, float length) =>
+        float.IsPositiveInfinity(shore) ? 0f : 1f - Mathf.SmoothStep(0f, 1f, shore / Mathf.Max(length, 0.01f));
+
+    // The still water this river's ends lie in. Returns its level (the last, should it have one at each end).
+    private float FindPonds()
+    {
+        ponds.Clear();
+        float level = 0f;
+        if (Line.Count == 0)
+        {
+            return level;
+        }
+
+        Vector2 first = SplineLine.Flat(Line.Points[0]), last = SplineLine.Flat(Line.Points[Line.Count - 1]);
+        foreach (WaterSurface water in Object.FindObjectsByType<WaterSurface>(FindObjectsInactive.Exclude))
+        {
+            var filter = water.GetComponent<MeshFilter>();
+            if (!water.IsStill || filter == null || filter.sharedMesh == null)
+            {
+                continue;
+            }
+
+            Bounds local = filter.sharedMesh.bounds;
+            if (WaterSetup.ShoreDistance(water.transform, local, water.Oval, first.x, first.y) < 0f
+                || WaterSetup.ShoreDistance(water.transform, local, water.Oval, last.x, last.y) < 0f)
+            {
+                ponds.Add((water.transform, local, water.Oval));
+                level = water.transform.TransformPoint(new Vector3(local.center.x, local.max.y, local.center.z)).y;
+            }
+        }
+
+        return level;
+    }
+
+    // Metres from the shore of the pond it joins (negative in the water); infinity where it joins none.
+    private float ShoreAt(Vector2 xz)
+    {
+        float nearest = float.PositiveInfinity;
+        foreach ((Transform water, Bounds local, bool oval) in ponds)
+        {
+            nearest = Mathf.Min(nearest, WaterSetup.ShoreDistance(water, local, oval, xz.x, xz.y));
+        }
+
+        return nearest;
+    }
+
+    // Only near a pond is it worth working out, cell by cell.
+    private float ShoreNear(int segment, Vector2 xz) =>
+        toPond[segment] < mouthLength + maxHalfWidth + river.BankWidth + river.BankPaint ? ShoreAt(xz) : float.PositiveInfinity;
 
     /// <summary>Never uphill: each sample is at most as high as the one before; lightly smoothed, which keeps the
     /// order (an average of a falling run still falls).</summary>
@@ -90,6 +162,11 @@ public sealed class RiverBuilder : FeatureBuilder
         float bank = river.BankWidth;
         ForField(layer.Grid, layer.Rect, maxHalfWidth + bank, (x, y, d, s, f, side) =>
         {
+            if (ShoreNear(s, layer.Grid.World(x, y)) < -ChannelInPond)
+            {
+                return; // the pond's own bed
+            }
+
             float h = Profile(d, Line.Lerp(halfWidth, s, f), Line.Lerp(depth, s, f), bank, Line.Lerp(surface, s, f), layer.Get(x, y));
             if (!float.IsNaN(h))
             {
@@ -106,18 +183,25 @@ public sealed class RiverBuilder : FeatureBuilder
         ForField(layer.Grid, layer.Rect, reach, (x, y, d, s, f, side) =>
         {
             Vector2 p = layer.Grid.World(x, y);
+            float shore = ShoreNear(s, p);
+            if (shore <= 0f)
+            {
+                return;
+            }
+
+            float nearShore = WorldNoise2D.Smooth(shore / ShorePaintFade);
             float noise = WorldNoise2D.Fbm(p.x * 0.35f, p.y * 0.35f, Feature.Seed);
             float w = Line.Lerp(halfWidth, s, f);
             float bankEdge = w + river.BankPaint * (0.5f + noise);
             if (banks >= 0 && d < bankEdge)
             {
-                layer.Paint(x, y, banks, 1f - WorldNoise2D.Smooth((d - (bankEdge - 1.2f)) / 1.2f));
+                layer.Paint(x, y, banks, (1f - WorldNoise2D.Smooth((d - (bankEdge - 1.2f)) / 1.2f)) * nearShore);
             }
 
             float bedEdge = w + 0.3f + (noise - 0.5f) * 0.8f;
             if (bed >= 0 && d < bedEdge + 0.6f)
             {
-                layer.Paint(x, y, bed, 1f - WorldNoise2D.Smooth((d - bedEdge) / 0.6f));
+                layer.Paint(x, y, bed, (1f - WorldNoise2D.Smooth((d - bedEdge) / 0.6f)) * nearShore);
             }
         });
     }
@@ -161,7 +245,7 @@ public sealed class RiverBuilder : FeatureBuilder
         BuildWaterfalls(root);
         ScatterAlong(river.Stones, river.StonesPer10m, root, context,
                      (s, f) => ((float)Random.NextDouble() * 2f - 1f) * Line.Lerp(halfWidth, s, f) * 0.8f,
-                     null, 0.1f);
+                     ground => ShoreAt(SplineLine.Flat(ground)) > 0f, 0.1f);
         ScatterAlong(river.BankScatter, river.BankScatterPer10m, root, context,
                      (s, f) =>
                      {
@@ -169,7 +253,7 @@ public sealed class RiverBuilder : FeatureBuilder
                          float d = w + 0.2f + (float)Random.NextDouble() * river.BankWidth * 0.9f;
                          return Random.NextDouble() < 0.5 ? d : -d;
                      },
-                     ground => ground.y > LowestSurface(ground) + 0.05f);
+                     ground => ground.y > LowestSurface(ground) + 0.05f && ShoreAt(SplineLine.Flat(ground)) > 0f);
     }
 
     private float LowestSurface(Vector3 point)
@@ -184,33 +268,44 @@ public sealed class RiverBuilder : FeatureBuilder
         go.transform.SetParent(root, false);
         Transform t = go.transform;
         const int across = 7;
-        int rows = Line.Count;
+        // Only the river's own water: where it joins a pond, the pond's surface takes over at the shore.
+        int from = 0, to = Line.Count - 1;
+        while (from < to && toPond[from] < WaterEndsFromShore) from++;
+        while (to > from && toPond[to] < WaterEndsFromShore) to--;
+        int rows = to - from + 1;
+        if (rows < 2)
+        {
+            Object.DestroyImmediate(go);
+            return;
+        }
+
         var vertices = new Vector3[rows * across];
         var uv = new Vector2[rows * across];
         var flow = new Vector2[rows * across];
         var centreline = new Vector4[rows];
         float meanHalfWidth = 0f;
-        foreach (float w in halfWidth)
+        for (int i = from; i <= to; i++)
         {
-            meanHalfWidth += w / rows;
+            meanHalfWidth += halfWidth[i] / rows;
         }
 
         float v = 0f;
         for (int i = 0; i < rows; i++)
         {
-            Vector3 centre = new Vector3(Line.Points[i].x, surface[i], Line.Points[i].z);
+            int sample = from + i;
+            Vector3 centre = new Vector3(Line.Points[sample].x, surface[sample], Line.Points[sample].z);
             if (i > 0)
             {
-                Vector3 previous = new Vector3(Line.Points[i - 1].x, surface[i - 1], Line.Points[i - 1].z);
+                Vector3 previous = new Vector3(Line.Points[sample - 1].x, surface[sample - 1], Line.Points[sample - 1].z);
                 v += Vector3.Distance(previous, centre);
             }
 
-            Vector2 direction = Line.Directions[i];
+            Vector2 direction = Line.Directions[sample];
             Vector3 right = new Vector3(direction.y, 0f, -direction.x);
-            float extent = halfWidth[i] + MeshOverlap;
+            float extent = halfWidth[sample] + MeshOverlap;
             Vector3 flowLocal = t.InverseTransformDirection(new Vector3(direction.x, 0f, direction.y));
             // The material's Flow Speed is 1: each vertex carries this river's speed, faster where it narrows.
-            float speed = river.FlowSpeed * Mathf.Clamp(meanHalfWidth / Mathf.Max(halfWidth[i], 0.1f), 0.6f, 1.8f);
+            float speed = river.FlowSpeed * Mathf.Clamp(meanHalfWidth / Mathf.Max(halfWidth[sample], 0.1f), 0.6f, 1.8f);
             for (int k = 0; k < across; k++)
             {
                 float u = k / (float)(across - 1) * 2f - 1f;
@@ -221,7 +316,7 @@ public sealed class RiverBuilder : FeatureBuilder
             }
 
             Vector3 local = t.InverseTransformPoint(centre);
-            centreline[i] = new Vector4(local.x, local.y, local.z, halfWidth[i] + 0.2f);
+            centreline[i] = new Vector4(local.x, local.y, local.z, halfWidth[sample] + 0.2f);
         }
 
         var triangles = new int[(rows - 1) * (across - 1) * 6];

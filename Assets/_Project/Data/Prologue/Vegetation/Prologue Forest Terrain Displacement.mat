@@ -136,9 +136,9 @@ Material:
     - _DisplacementFar: 35
     - _DisplacementLayerCount: 8
     - _DisplacementMip: 0
-    - _DisplacementNear: 8
+    - _DisplacementNear: 30.4
     - _DisplacementNormalStrength: 1
-    - _DisplacementStrength: 0.1
+    - _DisplacementStrength: 0.202
     - _EnableHeightBlend: 1
     - _EnableInstancedPerPixelNormal: 1
     - _FootprintDarkening: 0

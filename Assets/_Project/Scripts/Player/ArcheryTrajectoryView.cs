@@ -4,7 +4,7 @@ using UnityEngine;
 /// A line along the arc a drawn arrow would fly (PlayerArchery.TryGetShotPreview), with a ring where it would come down on the
 /// ground: the high camera makes a shot hard to judge otherwise. It fades in between <see cref="fadeInFrom"/> and
 /// <see cref="fullAt"/> metres to the aim point and brightens with the draw, and turns gold while letting go would be a perfect
-/// release. A partial draw's arc falls short, as the shot would. Shots stray a little, so it is a guide, not a promise.
+/// release. A partial draw's arc falls short, as the shot would, and it shows the stray too: let go now and this is the flight.
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(PlayerArchery))]

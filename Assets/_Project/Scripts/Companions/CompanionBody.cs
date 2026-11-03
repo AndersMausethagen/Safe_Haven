@@ -9,6 +9,9 @@ public sealed class CompanionBody
     private static readonly int SpeedHash = Animator.StringToHash("Speed");
     private static readonly int AttackHash = Animator.StringToHash("Attack");
     private static readonly int DeadHash = Animator.StringToHash("Dead");
+    // Where the walk sits on the controllers' Speed blend, and how fast it covers ground. Beyond it the blend mixes in the
+    // run: its lean, and a stride that doesn't fit the ground.
+    private const float WalkOnBlend = 1.5f;
 
     private readonly Animator animator;
     private readonly bool hasSpeed;
@@ -60,12 +63,25 @@ public sealed class CompanionBody
         else weaponModel.SetActive(wasVisible);
     }
 
-    public void SetSpeed(float speed)
+    /// <summary>How fast it moves. With a <paramref name="walkingPace"/> (a party keeping step) it stays upright in the walk,
+    /// which plays as fast as that pace needs, instead of blending towards a run.</summary>
+    public void SetSpeed(float speed, float walkingPace = 0f)
     {
-        if (hasSpeed)
+        if (!hasSpeed)
         {
-            animator.SetFloat(SpeedHash, speed, 0.15f, Time.deltaTime);
+            return;
         }
+
+        if (walkingPace > 0f)
+        {
+            float moving = Mathf.Clamp01(speed / walkingPace);
+            animator.SetFloat(SpeedHash, moving * WalkOnBlend, 0.15f, Time.deltaTime);
+            animator.speed = Mathf.Lerp(1f, walkingPace / WalkOnBlend, moving);
+            return;
+        }
+
+        animator.speed = 1f;
+        animator.SetFloat(SpeedHash, speed, 0.15f, Time.deltaTime);
     }
 
     public void PlayAttack()

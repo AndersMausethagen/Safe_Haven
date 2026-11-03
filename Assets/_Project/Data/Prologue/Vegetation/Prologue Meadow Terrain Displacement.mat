@@ -41,11 +41,11 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _DisplacementControl0:
-        m_Texture: {fileID: 2772056052547991846, guid: 3baf45675025e624da846e3db178b88b, type: 2}
+        m_Texture: {fileID: -2521052924930947106, guid: 3baf45675025e624da846e3db178b88b, type: 2}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _DisplacementControl1:
-        m_Texture: {fileID: 7393745095805875459, guid: 3baf45675025e624da846e3db178b88b, type: 2}
+        m_Texture: {fileID: 4076970588936306222, guid: 3baf45675025e624da846e3db178b88b, type: 2}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _DisplacementControl2:
@@ -136,9 +136,9 @@ Material:
     - _DisplacementFar: 35
     - _DisplacementLayerCount: 8
     - _DisplacementMip: 0
-    - _DisplacementNear: 8
+    - _DisplacementNear: 30.4
     - _DisplacementNormalStrength: 1
-    - _DisplacementStrength: 0
+    - _DisplacementStrength: 0.202
     - _EnableHeightBlend: 1
     - _EnableInstancedPerPixelNormal: 1
     - _FootprintDarkening: 0
@@ -157,8 +157,8 @@ Material:
     - _SurfaceDebug: 0
     - _SurfaceOcclusion: 1
     - _SurfaceSmoothness: 1
-    - _TessellationEdgeLength: 0.08
-    - _TessellationFactor: 8
+    - _TessellationEdgeLength: 0.02
+    - _TessellationFactor: 64
     - _TessellationPixels: 4
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}

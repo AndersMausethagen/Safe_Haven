@@ -42,6 +42,9 @@ public sealed class DayNightCycle : MonoBehaviour, ISaveable
     private float goingTo;
     private float goingFor;
     private float goingElapsed = -1f;
+    private float fadeTo;
+    private float fadeFor;
+    private float fadeElapsed = -1f;
 
     /// <summary>The time of day in hours (0..24). Setting it jumps the clock (sleeping, a scripted dawn).</summary>
     public float Hour
@@ -50,6 +53,7 @@ public sealed class DayNightCycle : MonoBehaviour, ISaveable
         set
         {
             goingElapsed = -1f;
+            fadeElapsed = -1f;
             hour = Mathf.Repeat(value, 24f);
             Apply();
         }
@@ -65,10 +69,27 @@ public sealed class DayNightCycle : MonoBehaviour, ISaveable
             return;
         }
 
+        fadeElapsed = -1f;
         goingFrom = hour;
         goingTo = ForwardTo(hour, target);
         goingFor = seconds;
         goingElapsed = 0f;
+    }
+
+    /// <summary>Changes straight to the look of <paramref name="target"/> over <paramref name="seconds"/>, rather than running the
+    /// clock there: shadows don't race over the ground. The hour changes when it is done.</summary>
+    public void FadeToHour(float target, float seconds)
+    {
+        if (seconds <= 0f)
+        {
+            Hour = target;
+            return;
+        }
+
+        goingElapsed = -1f;
+        fadeTo = Mathf.Repeat(target, 24f);
+        fadeFor = seconds;
+        fadeElapsed = 0f;
     }
 
     /// <summary>The same hour as <paramref name="target"/>, on or after <paramref name="from"/>, for moving forward between them.</summary>
@@ -104,7 +125,7 @@ public sealed class DayNightCycle : MonoBehaviour, ISaveable
     public string SaveKey => "clock";
 
     public string CaptureState() =>
-        string.Join("|", hour.ToString("R", CultureInfo.InvariantCulture), Run,
+        string.Join("|", (fadeElapsed >= 0f ? fadeTo : hour).ToString("R", CultureInfo.InvariantCulture), Run,
             Time.realtimeSinceStartupAsDouble.ToString("R", CultureInfo.InvariantCulture));
 
     public void RestoreState(string state)
@@ -157,7 +178,16 @@ public sealed class DayNightCycle : MonoBehaviour, ISaveable
 
     private void LateUpdate()
     {
-        if (Application.isPlaying && goingElapsed >= 0f)
+        if (Application.isPlaying && fadeElapsed >= 0f)
+        {
+            fadeElapsed += Time.deltaTime;
+            if (fadeElapsed >= fadeFor)
+            {
+                hour = fadeTo;
+                fadeElapsed = -1f;
+            }
+        }
+        else if (Application.isPlaying && goingElapsed >= 0f)
         {
             goingElapsed += Time.deltaTime;
             float along = Mathf.Clamp01(goingElapsed / goingFor);
@@ -182,10 +212,10 @@ public sealed class DayNightCycle : MonoBehaviour, ISaveable
             return;
         }
 
-        DayNightState state = profile.Evaluate(hour);
-        if (blendedProfile != null && blendAmount > 0f)
+        DayNightState state = LookAt(hour);
+        if (fadeElapsed >= 0f)
         {
-            state = DayNightState.Lerp(state, blendedProfile.Evaluate(hour), blendAmount);
+            state = DayNightState.Crossfade(state, LookAt(fadeTo), Mathf.SmoothStep(0f, 1f, fadeElapsed / fadeFor));
         }
 
         State = state;
@@ -245,6 +275,12 @@ public sealed class DayNightCycle : MonoBehaviour, ISaveable
 
             skybox.SetFloat(ExposureId, Mathf.Lerp(0.12f, 1.3f, state.Daylight) * (1f - 0.5f * sky.Clouds));
         }
+    }
+
+    private DayNightState LookAt(float atHour)
+    {
+        DayNightState state = profile.Evaluate(atHour);
+        return blendedProfile != null && blendAmount > 0f ? DayNightState.Lerp(state, blendedProfile.Evaluate(atHour), blendAmount) : state;
     }
 
     /// <summary>Ambient probe for a sky / horizon / ground gradient, as Unity builds it for Trilight ambient: the

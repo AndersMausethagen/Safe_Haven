@@ -205,6 +205,8 @@ public sealed class PrologueDefinition : ScriptableObject
     [Header("Starting Equipment")]
     [SerializeField] private ItemDefinition startingWeapon;
     [SerializeField] private ItemDefinition startingTorch;
+    [Tooltip("On their back from the first moment, which gives the bag its room.")]
+    [SerializeField] private ItemDefinition startingBackpack;
     [Tooltip("Granted and equipped once for a fresh expedition. Loading keeps the saved gear instead.")]
     [SerializeField] private ItemDefinition[] startingArmor = new ItemDefinition[0];
     [Header("Field Construction and Conversations")]
@@ -245,6 +247,7 @@ public sealed class PrologueDefinition : ScriptableObject
     public ItemDefinition Stones => stones;
     public ItemDefinition StartingWeapon => startingWeapon;
     public ItemDefinition StartingTorch => startingTorch;
+    public ItemDefinition StartingBackpack => startingBackpack;
     public ItemDefinition[] StartingArmor => startingArmor;
     public BuildingDefinition Campfire => campfire;
     public float BuildRadius => buildRadius;

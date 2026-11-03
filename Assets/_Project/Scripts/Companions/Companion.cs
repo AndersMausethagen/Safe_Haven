@@ -57,6 +57,7 @@ public sealed class Companion : MonoBehaviour, IConversationTopics
     private float getUpAt = -1f;
     private CompanionRevive revive;
     private float ownSpeed = -1f;
+    private float walkingPace;
 
     /// <summary>Every enabled companion, for systems that give orders or show them.</summary>
     public static IReadOnlyList<Companion> Active => active;
@@ -89,6 +90,7 @@ public sealed class Companion : MonoBehaviour, IConversationTopics
         }
 
         agent.speed = metresPerSecond > 0f ? metresPerSecond : ownSpeed;
+        walkingPace = Mathf.Max(0f, metresPerSecond);
     }
 
     /// <summary>Gives an order; Stay holds where they stand now.</summary>
@@ -190,7 +192,7 @@ public sealed class Companion : MonoBehaviour, IConversationTopics
         weapon.Fight(engaged);
         // Stops to listen while the player talks to them, unless there is fighting to do.
         agent.isStopped = threats.Count == 0 && talkable != null && talkable.IsTalking;
-        body.SetSpeed(agent.isStopped ? 0f : agent.velocity.magnitude);
+        body.SetSpeed(agent.isStopped ? 0f : agent.velocity.magnitude, engaged == null ? walkingPace : 0f);
     }
 
     // ----- Deciding -----

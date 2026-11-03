@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8bc49664ac533524f8d9a2bfd443f4fa, type: 3}
   m_Name: WoodsmansAxe
   m_EditorClassIdentifier: Assembly-CSharp::WeaponDefinition
-  displayName: Woodsman's Axe
+  displayName: Hand Axe
   stance: 1
   kind: 0
   damage: 12
@@ -25,6 +25,7 @@ MonoBehaviour:
   counterAttack: {fileID: 11400000, guid: 46f9dbd915280b241b67edb6b238f24f, type: 2}
   rushAttack: {fileID: 11400000, guid: d9740238ef4f0bf41afa3aa4fe467b0c, type: 2}
   secondHandDistance: 0.24
+  heavySwingArmor: 0
   weaponArt: {fileID: 11400000, guid: 2469662c3166a71459278163a6dc0f3a, type: 2}
   weaponArtFocus: 30
   guardLetThrough: 0.35

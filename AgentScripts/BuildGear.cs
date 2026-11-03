@@ -269,7 +269,7 @@ public static class BuildGear
         CraftingStationType forge = CraftingStationType.Anvil;
         Melee("CopperSword", "Copper Sword", "Soft metal, sharp edge. Keep it honed and it does the work.", sword, "IronSword", 2, ItemRarity.Common, 26, 3f, 15f, Copper, table, 16f,
             new[] { ("CopperIngot", 3), ("OakPlank", 1), ("NettleCord", 1) });
-        Melee("CopperHandAxe", "Copper Hand Axe", "A woodsman's axe that grew up. It bites deeper than the sword and reaches less.", axe, "WoodsmansAxe", 2, ItemRarity.Common, 26, 2.6f, 16f, Copper, table, 16f,
+        Melee("CopperHandAxe", "Copper Hand Axe", "A hand axe that grew up. It bites deeper than the sword and reaches less.", axe, "WoodsmansAxe", 2, ItemRarity.Common, 26, 2.6f, 16f, Copper, table, 16f,
             new[] { ("CopperIngot", 3), ("OakPlank", 2) });
         Melee("CopperSpear", "Copper Spear", "A long oak shaft with a leaf of copper. Keeps wolves at arm's length, and then some.", spear, "Spear", 2, ItemRarity.Common, 24, 2.8f, 14f, Copper, table, 16f,
             new[] { ("CopperIngot", 2), ("OakPlank", 3) });

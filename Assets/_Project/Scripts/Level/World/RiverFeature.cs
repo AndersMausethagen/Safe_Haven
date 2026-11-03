@@ -6,9 +6,14 @@ using UnityEngine;
 /// water runs from the first knot to the last and never flows uphill. The World Builder digs the bed with sloping
 /// banks, lays the water surface (its ripples follow the bends), paints the bed and banks, clears grass and trees in
 /// the way, sets stones in the water and plants on the banks, and turns steep drops into waterfalls with a plunge pool.
+/// An end drawn into a pond (still water in the scene, there when it builds) joins it: the river widens into a shallow mouth at
+/// the pond's level, and stops at its shore.
 /// </summary>
 public sealed class RiverFeature : WorldFeature
 {
+    /// <summary>How much wider a river is where it meets a pond.</summary>
+    public const float MouthFlare = 2.2f;
+
     public enum SurfaceMode
     {
         [Tooltip("The water lies a little below the ground along the line and only ever runs downhill.")]
@@ -80,7 +85,7 @@ public sealed class RiverFeature : WorldFeature
     public ScatterPalette BankScatter => bankScatter;
     public float BankScatterPer10m => bankScatterPer10m;
 
-    public override float Reach => width * MaxOf(widthAtKnots) * 0.5f + bankWidth + bankPaint;
+    public override float Reach => width * MaxOf(widthAtKnots) * 0.5f * MouthFlare + bankWidth + bankPaint;
 
     public override IEnumerable<KnotValues> PerKnot
     {

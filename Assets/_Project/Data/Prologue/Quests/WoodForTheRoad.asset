@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::QuestDefinition
   id: prologue.wood_for_the_road
   displayName: Wood for the Road
-  description: The expedition never has enough firewood. Eirik gave you an axe. Fell a tree on the slope north of the road and bring six logs.
+  description: The expedition never has enough firewood. Eirik gave you a hatchet. Fell a tree on the slope north of the road and bring six logs.
   chain: Prologue - Before the Road
   rank: 2
   availableObjective: 

@@ -492,13 +492,13 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject, IStaggerable, IHit
             return;
         }
 
-        if (!Relentless && (DistanceToTarget() > definition.ChaseRange || IsAvoided(targetComponent.transform.position)))
+        if (!Relentless && ((!IsProvoked && DistanceToTarget() > definition.ChaseRange) || IsAvoided(targetComponent.transform.position)))
         {
             LoseTrack();
             return;
         }
 
-        if (!Relentless && IsBeyondLeash())
+        if (!Relentless && !IsProvoked && IsBeyondLeash())
         {
             ClearTarget();
             BeginReturn();
@@ -601,7 +601,8 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject, IStaggerable, IHit
 
     private void TrackTarget()
     {
-        if (senses.CanSee(targetComponent.transform, definition.ChaseRange))
+        // Whoever just hit it can't hide by standing far off: it knows where the blow came from.
+        if (IsProvoked || senses.CanSee(targetComponent.transform, definition.ChaseRange))
         {
             lastSeenTargetAt = Time.time;
             lastKnownTargetPosition = targetComponent.transform.position;
@@ -825,7 +826,8 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject, IStaggerable, IHit
             ApplySpeed();
         }
 
-        if (!Relentless && definition.HasTemperament(MonsterTemperament.Defensive)
+        // Defending its ground ends where its ground does, but not while it answers a blow.
+        if (!Relentless && !IsProvoked && definition.HasTemperament(MonsterTemperament.Defensive)
             && (HorizontalDistance(home) > definition.DefensiveRadius
                 || Vector3.Distance(home, targetComponent.transform.position) > definition.DefensiveRadius))
         {
@@ -1070,6 +1072,8 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject, IStaggerable, IHit
 
     private bool CanTarget(IDamageable candidate) => targeting.CanTarget(candidate);
 
+    private float provokedUntil = float.NegativeInfinity;
+
     /// <summary>
     /// When set, the monster only targets the player, leaving buildings and residents alone (ward-breach attackers,
     /// design decision for the first breach).
@@ -1176,7 +1180,10 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject, IStaggerable, IHit
         return offset.magnitude;
     }
 
-    // Being hit by something it would fight makes the monster fight back, even from outside its detection range.
+    private bool IsProvoked => Time.time < provokedUntil;
+
+    // Being hit by something it would fight makes the monster fight back, even from outside its detection range: without
+    // this, an arrow from beyond its chase range was forgotten the next moment.
     private void OnDamaged(DamageInfo damage, DamageResult result)
     {
         // Burning ticks don't jolt the body; strong blows rock it hardest.
@@ -1204,21 +1211,26 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject, IStaggerable, IHit
             Stagger(CombatTechniqueSettings.Current.StaggerSeconds);
         }
 
-        if (definition == null || CurrentState == State.Dead || (CurrentState == State.Returning && !roaming) || CanTarget(target))
-        {
-            return;
-        }
-
         Combatant attacker = damage.Source;
-        if (attacker == null)
+        if (definition == null || CurrentState == State.Dead || attacker == null)
         {
             return;
         }
 
         IDamageable attackerTarget = attacker.GetComponent<IDamageable>();
-        if (CanTarget(attackerTarget))
+        if (!CanTarget(attackerTarget))
+        {
+            return;
+        }
+
+        if (!CanTarget(target))
         {
             SetTarget(attackerTarget, null);
+        }
+
+        if (target == attackerTarget)
+        {
+            provokedUntil = Time.time + PerceptionSettings.Current.ProvokedSeconds;
         }
     }
 

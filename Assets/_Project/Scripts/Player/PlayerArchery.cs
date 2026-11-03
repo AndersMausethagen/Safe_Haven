@@ -36,16 +36,18 @@ public readonly struct ArrowShot
 /// enters GameState.Combat, which strafes); a dodge, a staggering hit or eating puts the arrow back.
 /// <para>
 /// Technique: letting go within the bow's Perfect Release window after the draw fills is a <b>perfect release</b>: a
-/// critical hit that flies true and hits harder. The guard button <b>aims</b> instead of guarding: slower, steadier
-/// (the bow's Aim Spread) and the camera looks further ahead (ArcheryCameraAim). After a perfect dodge (the counter
-/// PlayerCombat readies) the next press looses an <b>instant shot</b> at the bow's Counter Shot Damage, even mid-reload.
+/// critical hit that flies true and hits harder. In a fight or while drawing, the guard button <b>aims</b> instead of
+/// guarding: slower and steadier (the bow's Aim Spread); outside a fight it is free to turn the camera. After a perfect
+/// dodge (the counter PlayerCombat readies) the next press looses an <b>instant shot</b> at the bow's Counter Shot Damage,
+/// even mid-reload.
 /// </para>
 /// <para>
 /// Aim: the hostile monster nearest the cursor or crosshair (within <see cref="aimAssistAngle"/> with the action camera,
 /// or <see cref="aimAssistRadius"/> of the cursor's spot top-down) that the bow can see is the <see cref="Target"/>,
-/// outlined in red (ArcheryTargetOutline); arrows are loosed on the arc that lands on it. Without one they fly to the
-/// cursor's spot at chest height, or to what the crosshair points at. Partial draws are slower, weaker and less accurate
-/// (ArcheryRules); the arrow sets the damage, the bow's shot attack its type, scaling and poise.
+/// outlined in red (ArcheryTargetOutline); arrows are loosed on the arc that lands on it. Without one they fly under the
+/// cursor at the height they leave the bow, or to what the crosshair points at. Partial draws are slower, weaker and less
+/// accurate (ArcheryRules); the arrow sets the damage, the bow's shot attack its type, scaling and poise. A draw's stray is
+/// rolled as it starts, so the trajectory preview shows the flight the arrow will really take.
 /// </para>
 /// </summary>
 [DisallowMultipleComponent]
@@ -100,6 +102,8 @@ public sealed class PlayerArchery : MonoBehaviour
     private float reloadEndsAt;
     private float noArrowsMessageAt = float.NegativeInfinity;
     private ItemDefinition chosen;
+    private float strayAngle;
+    private float strayRadius;
 
     public Phase State { get; private set; }
 
@@ -108,8 +112,8 @@ public sealed class PlayerArchery : MonoBehaviour
 
     public bool IsDrawing => State == Phase.Drawing;
 
-    /// <summary>True while the guard button is held with a bow: steadier, slower, the camera looks ahead.</summary>
-    public bool IsAiming => aimHeld && Bow != null && CanDraw();
+    /// <summary>True while the guard button steadies the bow: in a fight or drawing. Outside a fight that button turns the camera.</summary>
+    public bool IsAiming => aimHeld && Bow != null && CanDraw() && (IsDrawing || GameStateManager.InCombat);
 
     /// <summary>Share of a full draw right now (0 when not drawing).</summary>
     /// <summary>Seconds to full draw with this bow: its Draw Seconds, shortened by Draw Speed (talents).</summary>
@@ -312,8 +316,22 @@ public sealed class PlayerArchery : MonoBehaviour
         float heldFor = Time.time - drawStartedAt;
         float draw = ArcheryRules.DrawShare(heldFor, DrawTime(bow));
         bool perfect = IsPerfect(bow, heldFor);
-        float spread = perfect ? 0f : ArcheryRules.SpreadDegrees(bow.Spread, draw, heldFor, DrawTime(bow)) * (IsAiming ? bow.AimSpread : 1f);
-        Loose(bow, draw, spread, perfect ? bow.PerfectReleaseDamage : 1f, perfect, false);
+        Loose(bow, draw, SpreadNow(bow), perfect ? bow.PerfectReleaseDamage : 1f, perfect, false);
+    }
+
+    // How far the shot would stray if let go now.
+    private float SpreadNow(WeaponDefinition bow)
+    {
+        float heldFor = Time.time - drawStartedAt;
+        return IsPerfect(bow, heldFor)
+            ? 0f
+            : ArcheryRules.SpreadDegrees(bow.Spread, ArcheryRules.DrawShare(heldFor, DrawTime(bow)), heldFor, DrawTime(bow)) * (IsAiming ? bow.AimSpread : 1f);
+    }
+
+    private void RollStray()
+    {
+        strayAngle = UnityEngine.Random.value;
+        strayRadius = UnityEngine.Random.value;
     }
 
     private void OnGuardRequested(bool raised) => aimHeld = raised;
@@ -361,6 +379,7 @@ public sealed class PlayerArchery : MonoBehaviour
         }
 
         State = Phase.Drawing;
+        RollStray();
         // Coming out of a dodge the arrow is already part of the way up: rolling into a shot is how an archer fights.
         bool outOfDodge = dodge != null && dodge.JustDodged(CombatTechniqueSettings.Current.RushAfterDodgeSeconds);
         drawStartedAt = Time.time - (outOfDodge ? DrawTime(bow) * CombatTechniqueSettings.Current.DrawAfterDodge : 0f);
@@ -393,6 +412,7 @@ public sealed class PlayerArchery : MonoBehaviour
         }
 
         combat.SpendCounter();
+        RollStray();
         Loose(bow, 1f, bow.Spread * (IsAiming ? bow.AimSpread : 1f), bow.CounterShotDamage, false, true);
     }
 
@@ -409,7 +429,7 @@ public sealed class PlayerArchery : MonoBehaviour
         Vector3 origin = Origin;
         float speed = LaunchSpeed(bow, arrow, draw);
         Vector3 direction = ArcheryRules.LaunchDirection(origin, AimPoint, speed, Gravity(arrow));
-        direction = ArcheryRules.Stray(direction, spread, UnityEngine.Random.value, UnityEngine.Random.value);
+        direction = ArcheryRules.Stray(direction, spread, strayAngle, strayRadius);
 
         ArrowProjectile projectile = PrefabPool.Spawn(arrow.Projectile, origin, Quaternion.LookRotation(direction));
         float damage = arrow.Damage * ArcheryRules.DamageShare(draw) * damageMultiplier;
@@ -437,7 +457,7 @@ public sealed class PlayerArchery : MonoBehaviour
 
     private static float Gravity(ArrowDefinition arrow) => Physics.gravity.magnitude * arrow.GravityScale;
 
-    /// <summary>The flight a shot loosed now would take, before any stray: for the trajectory preview. False when not
+    /// <summary>The flight a shot loosed now would take, stray included: for the trajectory preview. False when not
     /// drawing.</summary>
     public bool TryGetShotPreview(out Vector3 origin, out Vector3 velocity, out float gravity)
     {
@@ -453,7 +473,7 @@ public sealed class PlayerArchery : MonoBehaviour
 
         float speed = LaunchSpeed(bow, arrowItem.Arrow, Mathf.Max(Draw, bow.MinimumDraw));
         gravity = Gravity(arrowItem.Arrow);
-        velocity = ArcheryRules.LaunchDirection(origin, AimPoint, speed, gravity) * speed;
+        velocity = ArcheryRules.Stray(ArcheryRules.LaunchDirection(origin, AimPoint, speed, gravity), SpreadNow(bow), strayAngle, strayRadius) * speed;
         return true;
     }
 
@@ -577,7 +597,8 @@ public sealed class PlayerArchery : MonoBehaviour
                 }
                 else
                 {
-                    Vector3 offset = centre - spot;
+                    // Where the cursor's ray passes at the height of the body, which is what the player sees it point at.
+                    Vector3 offset = centre - ArcheryRules.PointAtHeight(ray, centre.y, spot);
                     offset.y = 0f;
                     score = offset.magnitude;
                     if (score > aimAssistRadius)
@@ -602,8 +623,10 @@ public sealed class PlayerArchery : MonoBehaviour
         }
         else
         {
-            // Top-down, the cursor's spot is on the ground: shoot level at chest height toward it instead of into the dirt.
-            AimPoint = crosshair ? spot : spot + Vector3.up * (origin.y - transform.position.y);
+            // Top-down, an arrow at chest height shows on screen above the ground it flies over, so it aims where the
+            // cursor's ray passes at that height: on screen, it goes through the cursor. Aimed over the cursor's spot on
+            // the ground, it read as flying high.
+            AimPoint = crosshair ? spot : ArcheryRules.PointAtHeight(ray, origin.y, spot + Vector3.up * (origin.y - transform.position.y));
         }
     }
 

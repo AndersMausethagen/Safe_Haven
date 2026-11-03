@@ -70,6 +70,18 @@ public static class ArcheryRules
         return flat * Mathf.Cos(angle) + Vector3.up * Mathf.Sin(angle);
     }
 
+    /// <summary>Where <paramref name="ray"/>, looking down, passes at this height; <paramref name="otherwise"/> when it never does.</summary>
+    public static Vector3 PointAtHeight(Ray ray, float height, Vector3 otherwise)
+    {
+        if (ray.direction.y > -0.01f)
+        {
+            return otherwise;
+        }
+
+        float along = (height - ray.origin.y) / ray.direction.y;
+        return along > 0f ? ray.GetPoint(along) : otherwise;
+    }
+
     /// <summary>Turns <paramref name="direction"/> by up to <paramref name="degrees"/>, using two random values from 0 to 1
     /// (the square root spreads shots evenly over the cone rather than bunching them in the middle).</summary>
     public static Vector3 Stray(Vector3 direction, float degrees, float randomAngle, float randomRadius)

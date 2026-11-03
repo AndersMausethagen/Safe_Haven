@@ -141,7 +141,7 @@ public sealed class WaterSurface : MonoBehaviour
     /// <summary>Every enabled water surface.</summary>
     public static IReadOnlyList<WaterSurface> Surfaces => All;
 
-    /// <summary>Still water (a pond, a tarn) rather than a river.</summary>
+    /// <summary>Still water (a pond, a tarn) rather than a river. A river drawn into it joins it (RiverBuilder).</summary>
     public bool IsStill
     {
         get => still;

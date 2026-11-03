@@ -9,6 +9,8 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "PerceptionSettings", menuName = "Safe Haven/Settings/Perception Settings")]
 public sealed class PerceptionSettings : GameSettings<PerceptionSettings>
 {
+    public float ProvokedSeconds => provokedSeconds;
+
     [Header("Noticing")]
     [Tooltip("Awareness (0–1) at which a monster becomes suspicious: it shows '?' and goes to look. At 1 it has spotted you.")]
     [SerializeField, Range(0.05f, 0.95f)] private float suspiciousAt = 0.35f;
@@ -30,6 +32,9 @@ public sealed class PerceptionSettings : GameSettings<PerceptionSettings>
     [SerializeField, Min(0f)] private float headAboveTarget = 0.6f;
     [Tooltip("What blocks sight: terrain, trees, rocks and buildings. Characters never block it.")]
     [SerializeField] private LayerMask sightBlockers = 1;
+
+    [Tooltip("Seconds a monster that has been hit keeps after whoever hit it, however far off they stand or far from home it gets. Each hit starts it again.")]
+    [SerializeField, Min(0f)] private float provokedSeconds = 12f;
 
     [Header("Fog and Dark")]
     [Tooltip("Volumetric fog density (Atmospheric Fog, weather included) counted as dense fog.")]

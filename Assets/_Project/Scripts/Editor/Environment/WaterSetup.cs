@@ -437,6 +437,27 @@ public static class WaterSetup
     /// banks. With <paramref name="oval"/> the bed is a slightly uneven oval inside the bounds (a natural pond or tarn:
     /// lay the water a little below the ground and only the oval shows). Undoable. Returns the number of height samples
     /// changed.</summary>
+    /// <summary>How far an oval pond's shore lies out from its plain oval, at this angle: the shore isn't a perfect oval.</summary>
+    public static float ShoreWobble(float angle) => 1f + 0.07f * Mathf.Sin(angle * 3f + 1.3f) + 0.04f * Mathf.Sin(angle * 7f);
+
+    /// <summary>Distance in metres from a pond's shore as <see cref="Carve"/> digs it: negative in the water.
+    /// <paramref name="local"/> is its mesh's bounds.</summary>
+    public static float ShoreDistance(Transform water, Bounds local, bool oval, float worldX, float worldZ)
+    {
+        Vector3 scale = water.lossyScale;
+        Vector3 p = water.InverseTransformPoint(new Vector3(worldX, water.position.y, worldZ)) - local.center;
+        if (oval)
+        {
+            float ex = local.extents.x * Mathf.Abs(scale.x), ez = local.extents.z * Mathf.Abs(scale.z);
+            float nx = p.x * Mathf.Abs(scale.x) / ex, nz = p.z * Mathf.Abs(scale.z) / ez;
+            return (Mathf.Sqrt(nx * nx + nz * nz) / ShoreWobble(Mathf.Atan2(nz, nx)) - 1f) * Mathf.Min(ex, ez);
+        }
+
+        float dx = (Mathf.Abs(p.x) - local.extents.x) * Mathf.Abs(scale.x);
+        float dz = (Mathf.Abs(p.z) - local.extents.z) * Mathf.Abs(scale.z);
+        return new Vector2(Mathf.Max(dx, 0f), Mathf.Max(dz, 0f)).magnitude + Mathf.Min(Mathf.Max(dx, dz), 0f);
+    }
+
     public static int Carve(Terrain terrain, Transform water, float depth, float bank, TerrainLayer bedLayer = null, bool oval = false)
     {
         var filter = water.GetComponent<MeshFilter>();
@@ -476,23 +497,7 @@ public static class WaterSetup
         }
 
         // Distance from the water's edge in metres: negative inside, and 0..1 up the bank (0 = the deep middle).
-        Vector3 centre = local.center;
-        float Signed(float worldX, float worldZ)
-        {
-            Vector3 p = water.InverseTransformPoint(new Vector3(worldX, top, worldZ)) - centre;
-            if (oval)
-            {
-                float ex = local.extents.x * Mathf.Abs(scale.x), ez = local.extents.z * Mathf.Abs(scale.z);
-                float nx = p.x * Mathf.Abs(scale.x) / ex, nz = p.z * Mathf.Abs(scale.z) / ez;
-                float angle = Mathf.Atan2(nz, nx);
-                float wobble = 1f + 0.07f * Mathf.Sin(angle * 3f + 1.3f) + 0.04f * Mathf.Sin(angle * 7f);
-                return (Mathf.Sqrt(nx * nx + nz * nz) / wobble - 1f) * Mathf.Min(ex, ez);
-            }
-
-            float dx = (Mathf.Abs(p.x) - local.extents.x) * Mathf.Abs(scale.x);
-            float dz = (Mathf.Abs(p.z) - local.extents.z) * Mathf.Abs(scale.z);
-            return new Vector2(Mathf.Max(dx, 0f), Mathf.Max(dz, 0f)).magnitude + Mathf.Min(Mathf.Max(dx, dz), 0f);
-        }
+        float Signed(float worldX, float worldZ) => ShoreDistance(water, local, oval, worldX, worldZ);
 
         float Bank(float signed) => Mathf.SmoothStep(0f, 1f, Mathf.Clamp01((signed + inner) / inner));
 

@@ -136,9 +136,9 @@ public static class BuildPrologueMeadow
         Edit(Quest("HuntForThePot"), so =>
         {
             Basics(so, "prologue.hunt_for_the_pot", "Meat for the Road", SideChain,
-                "Runa has seen blight boar out on the meadow north-east of the camp, where they have no business being. She lent you her spare bow. Bring two down.", "");
+                "Runa has seen blight boar on the grass north of the road, east of the camp, where they have no business being. She lent you her spare bow. Bring two down.", "");
             Side(so, road);
-            Objectives(so, false, (ObjectiveType.KillMonster, "Bring down two blight boar on the north meadow", 2,
+            Objectives(so, false, (ObjectiveType.KillMonster, "Bring down two blight boar on the grass north of the road", 2,
                 Load<MonsterDefinition>("Assets/_Project/Data/Monsters/BlightBoar.asset")));
             Rewards(so, (Item("CrudeStoneArrow"), 20));
         });
@@ -153,7 +153,7 @@ public static class BuildPrologueMeadow
         Edit(Quest("WoodForTheRoad"), so =>
         {
             Basics(so, "prologue.wood_for_the_road", "Wood for the Road", SideChain,
-                "The expedition never has enough firewood. Eirik gave you an axe. Fell a tree on the slope north of the road and bring six logs.", "");
+                "The expedition never has enough firewood. Eirik gave you a hatchet. Fell a tree on the slope north of the road and bring six logs.", "");
             Side(so, road);
             Objectives(so, false, (ObjectiveType.GatherResource, "Gather six logs on the slope north of the road", 6, Item("Materials/OakWood")));
             // Kindling for the fire to come: "A Spark in the Dark" counts what the player already carries.
@@ -185,6 +185,11 @@ public static class BuildPrologueMeadow
             so.FindProperty("objectives").GetArrayElementAtIndex(0).FindPropertyRelative("description").stringValue = "Rest by the fire, and talk with the others";
         });
 
+        AxeNames();
+        var chapterData = new SerializedObject(Load<PrologueDefinition>(Prologue + "ForestPrologue.asset"));
+        chapterData.FindProperty("startingBackpack").objectReferenceValue = Item("HideRucksack");
+        chapterData.ApplyModifiedPropertiesWithoutUndo();
+        EditorUtility.SetDirty(chapterData.targetObject);
         string ranks = Ranks();
         string sword = WornSword();
         string boar = UnsavedCopy("Assets/_Project/Prefabs/Enemies/BlightBoar.prefab", Prologue + "ExpeditionBoar.prefab");
@@ -294,6 +299,26 @@ public static class BuildPrologueMeadow
         so.ApplyModifiedPropertiesWithoutUndo();
         EditorUtility.SetDirty(item);
         return "worn sword";
+    }
+
+    // "Woodsman's Axe" promised a tool, and it is a fighting axe: the hatchets fell trees. Its asset and id stay, for saves and recipes.
+    private static void AxeNames()
+    {
+        var item = Load<ItemDefinition>("Assets/_Project/Data/Items/WoodsmansAxe.asset");
+        var so = new SerializedObject(item);
+        so.FindProperty("displayName").stringValue = "Hand Axe";
+        so.FindProperty("description").stringValue = "A compact one-handed fighting axe carried by forest expeditions. No use on a tree. Leaves a hand free for a torch.";
+        so.ApplyModifiedPropertiesWithoutUndo();
+        EditorUtility.SetDirty(item);
+        var weapon = new SerializedObject(Load<WeaponDefinition>("Assets/_Project/Data/Combat/Weapons/WoodsmansAxe.asset"));
+        weapon.FindProperty("displayName").stringValue = "Hand Axe";
+        weapon.ApplyModifiedPropertiesWithoutUndo();
+        EditorUtility.SetDirty(weapon.targetObject);
+        var copper = Load<ItemDefinition>("Assets/_Project/Data/Items/Weapons/CopperHandAxe.asset");
+        var copperData = new SerializedObject(copper);
+        copperData.FindProperty("description").stringValue = "A hand axe that grew up. It bites deeper than the sword and reaches less.";
+        copperData.ApplyModifiedPropertiesWithoutUndo();
+        EditorUtility.SetDirty(copper);
     }
 
     // More moon than the raid's night, on a copy so the raid keeps its own: the forest should be dark, not unreadable.
@@ -530,12 +555,13 @@ public static class BuildPrologueMeadow
         if (old != null) Object.DestroyImmediate(old.gameObject);
         var world = new GameObject("World").transform;
         world.SetParent(land, false);
+        WaterSurface lake = PlaceLake(meadow);
         Features(world, forest);
         WorldBuilder.BuildChanged(true);
         string report = WorldBuilder.LastReport;
 
         StitchSeam(forest, meadow);
-        WaterSurface lake = MakeLake(meadow);
+        DigLake(meadow, lake);
         StitchSeam(forest, meadow);
         Grass(meadow);
         GrassSetup.ClearUnderWater(forest);
@@ -569,6 +595,8 @@ public static class BuildPrologueMeadow
         int resolution = data.heightmapResolution;
         float[,] heights = data.GetHeights(0, 0, resolution, resolution);
         float height = data.size.y;
+        // World heights: the World Builder lowers this terrain to make room, and a run after that would otherwise dig deeper.
+        float lowered = forest.transform.position.y;
         for (int row = 0; row < resolution; row++)
         {
             float z = row / (resolution - 1f) * Depth - Depth * 0.5f;
@@ -580,9 +608,13 @@ public static class BuildPrologueMeadow
                 float x = column / (resolution - 1f) * Depth - Depth * 0.5f;
                 if (x > -56f) break;
                 float into = 1f - Smooth((x + 66f) / 10f);
-                float wanted = Mathf.Lerp(notch, 4.6f, Smooth((x - Seam) / 34f));
+                float wanted = Mathf.Lerp(notch, 4.6f, Smooth((x - Seam) / 34f)) - lowered;
                 float old = heights[row, column] * height;
-                heights[row, column] = Mathf.Lerp(old, Mathf.Min(old, wanted), across * into) / height;
+                float opened = Mathf.Lerp(old, Mathf.Min(old, wanted), across * into);
+                // On the road's own line it is built up too: the old wall fell eleven metres in twelve, with gullies either side that
+                // carried whoever walked it off the road and down to the river.
+                float road = 1f - Smooth((Mathf.Abs(z - RoadZ(x)) - 6f) / 8f);
+                heights[row, column] = Mathf.Lerp(opened, wanted, road * into) / height;
             }
         }
 
@@ -590,6 +622,8 @@ public static class BuildPrologueMeadow
         data.SetTreeInstances(data.treeInstances, true);
         EditorUtility.SetDirty(data);
     }
+
+    private static float RoadZ(float x) => Mathf.Lerp(-10.5f, -14f, Mathf.InverseLerp(Seam, -50f, x));
 
     // The pass at the seam: the river's bed at z = -24, the road a little higher at z = -10.
     private static float PassFloor(float z) => z <= -24f
@@ -601,6 +635,7 @@ public static class BuildPrologueMeadow
         Transform oldTerrain = parent.Find("Meadow Terrain");
         if (oldTerrain != null) Object.DestroyImmediate(oldTerrain.gameObject);
         AssetDatabase.DeleteAsset(MeadowData);
+        AssetDatabase.DeleteAsset(Prologue + "Vegetation/Prologue Meadow Terrain World.asset");
 
         const int resolution = 513;
         float width = Seam - MeadowWest;
@@ -615,7 +650,7 @@ public static class BuildPrologueMeadow
         for (int row = 0; row < resolution; row++)
         {
             float z = row / (resolution - 1f) * Depth - Depth * 0.5f;
-            float edge = rim[row, 0] * forestData.size.y;
+            float edge = rim[row, 0] * forestData.size.y + forest.transform.position.y;
             for (int column = 0; column < resolution; column++)
             {
                 float x = MeadowWest + column / (resolution - 1f) * width;
@@ -756,18 +791,59 @@ public static class BuildPrologueMeadow
         }
     }
 
-    private static WaterSurface MakeLake(Terrain meadow)
+    private static WaterSurface PlaceLake(Terrain meadow)
     {
+        Transform old = meadow.transform.parent.Find("Morning Lake");
+        if (old != null) Object.DestroyImmediate(old.gameObject);
         WaterSetup.Set set = WaterSetup.EnsureAssets();
         var at = new Vector3(LakeCentre.x, LakeSurface, LakeCentre.y);
         GameObject water = WaterSetup.CreateWater("Morning Lake", set.Still, at, new Vector3(LakeRadius.x / 5f, 1f, LakeRadius.y / 5f));
         water.transform.SetParent(meadow.transform.parent, true);
         WaterSurface surface = water.GetComponent<WaterSurface>();
         surface.IsStill = true;
-        WaterSetup.Carve(meadow, water.transform, 2.6f, 4f, null, true);
-        GrassSetup.ClearUnderWater(meadow);
-        LakeSurfaceLook(water);
+        surface.Oval = true;
         return surface;
+    }
+
+    private static void DigLake(Terrain meadow, WaterSurface lake)
+    {
+        WaterSetup.Carve(meadow, lake.transform, 2.6f, 4f, null, true);
+        GrassSetup.ClearUnderWater(meadow);
+        LakeSurfaceLook(lake.gameObject);
+    }
+
+    /// <summary>The Haven's footprints and ground shape on both terrains (`--entry BuildPrologueMeadow.Footprints`). Land keeps them.</summary>
+    public static string Footprints()
+    {
+        Scene scene = OpenPrologue(out string refused);
+        if (refused != null) return refused;
+        Terrain[] terrains = Object.FindObjectsByType<Terrain>(FindObjectsInactive.Include);
+        foreach (Terrain terrain in terrains) TerrainDisplacementEditor.UseStandardFootprints(terrain);
+        // Grounds the Haven doesn't have, by what they are most like there: litter, moss and humus.
+        foreach (Terrain terrain in terrains)
+        {
+            TerrainSurfaceProfile profile = terrain.GetComponent<TerrainSurface>().Profile;
+            foreach (TerrainSurfaceProfile.Layer layer in profile.layers)
+            {
+                switch (layer.terrainLayer.name)
+                {
+                    case "Pine Needle Floor": layer.footprintResponse = 0.8f; break;
+                    case "Mossy Forest Floor": layer.footprintResponse = 1f; break;
+                    case "Forest Soil": layer.footprintResponse = 0.9f; break;
+                    case "Weathered Stone": layer.footprintResponse = 0f; break;
+                    // As gentle as the Haven's grass, now that the ground is shaped as strongly as the Haven's.
+                    case "Meadow Grass": case "Lush Grass": layer.amplitude = 0.6f; break;
+                }
+            }
+
+            EditorUtility.SetDirty(profile);
+            TerrainDisplacementEditor.UseStandardFootprints(terrain);
+        }
+
+        EditorSceneManager.MarkSceneDirty(scene);
+        EditorSceneManager.SaveScene(scene);
+        AssetDatabase.SaveAssets();
+        return $"{terrains.Length} terrains on the standard; dirty {scene.isDirty}";
     }
 
     /// <summary>Only the lake's look, on the open scene (`--entry BuildPrologueMeadow.LakeLook`).</summary>
@@ -789,7 +865,7 @@ public static class BuildPrologueMeadow
         const string meshPath = Prologue + "Vegetation/Morning Lake Surface.asset";
         const string materialPath = "Assets/_Project/Art/Generated/Water/Water Lake (Meadow).mat";
         const int segments = 96;
-        const float radius = 5.2f; // the plane's half size is 5, and the shore lies just beyond the carved oval
+        const float radius = 5f, overShore = 0.15f; // the plane's half size is 5, and it follows the carved shore just beyond it
         var vertices = new Vector3[segments + 1];
         var normals = new Vector3[segments + 1];
         var tangents = new Vector4[segments + 1];
@@ -801,7 +877,8 @@ public static class BuildPrologueMeadow
         for (int i = 0; i < segments; i++)
         {
             float angle = i / (float)segments * Mathf.PI * 2f;
-            var at = new Vector3(Mathf.Cos(angle) * radius, 0f, Mathf.Sin(angle) * radius);
+            float reach = radius * WaterSetup.ShoreWobble(angle) + overShore;
+            var at = new Vector3(Mathf.Cos(angle) * reach, 0f, Mathf.Sin(angle) * reach);
             vertices[i + 1] = at;
             normals[i + 1] = Vector3.up;
             tangents[i + 1] = new Vector4(1f, 0f, 0f, -1f);
@@ -1155,18 +1232,18 @@ public static class BuildPrologueMeadow
         SideGiver(runa, new[]
         {
             ("HuntForThePot", "Anything I can help with?",
-                "As it happens. There are blight boar out on the meadow north-east of the camp, which is wrong all by itself, and we could use the meat. Take my spare bow: hold the left button to draw, let go to shoot. Bring down two.",
+                "As it happens. There are blight boar on the grass north of the road, east of the camp, which is wrong all by itself, and we could use the meat. Take my spare bow: hold the left button to draw, let go to shoot. Bring down two.",
                 "I'll hunt them.",
-                "Two boar, out on the meadow north-east of the camp. Hold the left button to draw.",
+                "Two boar, on the grass north of the road, east of the camp. Hold the left button to draw.",
                 "Clean enough. Keep the bow; you've earned it, and I was tired of carrying it."),
         });
         SideGiver(eirik, new[]
         {
             ("WoodForTheRoad", "Do you need firewood?",
-                "We always need firewood. Take this axe; there are good trees on the slope north of the road. Six logs will do us. It splits other things too, in case you need it to.",
+                "We always need firewood. Take this hatchet; there are good trees on the slope north of the road. Six logs will do us.",
                 "I'll bring wood.",
-                "Six logs from the slope north of the road. Walk up to a tree with the axe in hand and get chopping.",
-                "That will keep us warm. Keep the axe."),
+                "Six logs from the slope north of the road. Walk up to a tree and get chopping.",
+                "That will keep us warm. Keep the hatchet."),
             ("FishForBreakfast", "Shall I catch us some fish?",
                 "Now that is a fine idea. Anything but this porridge. Here is a rod and a handful of grubs, and the lake is just south of the road. Two fish, and I'll owe you.",
                 "I'll go fishing.",
@@ -1616,7 +1693,7 @@ public static class BuildPrologueMeadow
         Link(rod, (fish, 0, giveRod));
         var axe = Story(moments, "Story - Eirik's Axe");
         var wood = new WhenQuest { quest = Existing("WoodForTheRoad"), when = WhenQuest.Moment.Starts };
-        var giveAxe = new GiveItemsNode { equip = true, items = { new ItemAmount(Item("WoodsmansAxe"), 1) } };
+        var giveAxe = new GiveItemsNode { equip = true, items = { new ItemAmount(Item("StoneHatchet"), 1) } };
         Link(axe, (wood, 0, giveAxe));
 
         // ----- Too keen -----
@@ -1832,9 +1909,15 @@ public static class BuildPrologueMeadow
         // ----- The road, with a stop at the cart -----
         var walkStory = Story(moments, "Story - The Road East");
         var setOut = new WhenQuest { quest = road, when = WhenQuest.Moment.Starts, once = false, alsoAfterLoading = true };
-        var walk = new WalkPartyNode { route = route, pace = 2.6f, waitForPlayer = 22f, waitUntilArrived = true };
-        var morning = new ChangeTimeOfDayNode { hour = 15f, followWalk = true };
-        Link(walkStory, (setOut, 0, walk), (setOut, 0, morning));
+        const float Pace = 2f, Fade = 8f;
+        var walk = new WalkPartyNode { route = route, pace = Pace, waitForPlayer = 22f, waitUntilArrived = true };
+        Link(walkStory, (setOut, 0, walk));
+        foreach ((float reaches, float hour) in new[] { (0.4f, 11.5f), (0.78f, 15f) })
+        {
+            var wait = new WaitForWalkNode { reaches = reaches };
+            Link(walkStory, (setOut, 0, wait), (wait, 0, new ChangeTimeOfDayNode { hour = hour, seconds = Fade, fadeStraightThere = true }));
+        }
+
         foreach ((float reaches, StorySpeaker who, string line) in new[]
         {
             (0.05f, E(), "Steady now. It is a fine morning to walk into something stupid."),
@@ -1851,11 +1934,16 @@ public static class BuildPrologueMeadow
         var looked = new WaitForEventNode { questEvent = Ev("CartInspected"), orAfterSeconds = 25f };
         var moveOn = Aside(S(), "Whatever happened here, it was quick, and it was not here that it ended. We go on.");
         Link(walkStory, (walk, 0, sighted), (sighted, 0, looked), (looked, 0, moveOn));
-        var walkOn = new WalkPartyNode { route = routeOn, pace = 2.6f, waitForPlayer = 22f, waitUntilArrived = true };
-        var dusk = new ChangeTimeOfDayNode { hour = 22.5f, followWalk = true };
+        var walkOn = new WalkPartyNode { route = routeOn, pace = Pace, waitForPlayer = 22f, waitUntilArrived = true };
+        foreach ((float reaches, float hour) in new[] { (0.15f, 17f), (0.36f, 19f), (0.58f, 20.5f), (0.8f, 22.5f) })
+        {
+            var wait = new WaitForWalkNode { reaches = reaches };
+            Link(walkStory, (moveOn, 0, wait), (wait, 0, new ChangeTimeOfDayNode { hour = hour, seconds = Fade, fadeStraightThere = true }));
+        }
+
         var crossed = new RaiseQuestEventNode { questEvent = Ev("ForestEntered") };
         var stoneWakes = new GlowNode { target = lakeStone.transform, colour = new Color(0.55f, 0.8f, 1f), intensity = 5f, range = 9f, fadeSeconds = 6f };
-        Link(walkStory, (moveOn, 0, walkOn), (moveOn, 0, dusk), (moveOn, 0, stoneWakes), (walkOn, 0, crossed));
+        Link(walkStory, (moveOn, 0, walkOn), (moveOn, 0, stoneWakes), (walkOn, 0, crossed));
         foreach ((float reaches, StorySpeaker who, string line) in new[]
         {
             (0.05f, R(), "The shadows are wrong. They were behind us when we crossed the stream."),
@@ -1902,13 +1990,13 @@ public static class BuildPrologueMeadow
         var cartStory = Story(moments, "Story - The Handcart");
         var usedCart = new WhenUsed { target = cartProp, once = false };
         var seenCart = new HasHappenedNode { questEvent = Ev("CartInspected") };
-        var satchel = new SayNode { speaker = new StorySpeaker { player = true }, line = "Ingrid's satchel, still strapped on. Her notes stop in the middle of a word. Nobody leaves bandages behind unless they run." };
+        var satchel = new SayNode { speaker = new StorySpeaker(), line = "<i>Ingrid's satchel, still strapped on. Her notes stop in the middle of a word. Nobody leaves bandages behind unless they run.</i>" };
         var bandages = new GiveItemsNode { items = { new ItemAmount(Item("Bandage"), 2) } };
         var markCart = new RaiseQuestEventNode { questEvent = Ev("CartInspected") };
         Link(cartStory, (usedCart, 0, seenCart), (seenCart, 1, bandages), (seenCart, 1, satchel), (satchel, 0, markCart));
         var stoneStory = Story(moments, "Story - The Stone by the Lake");
         var usedStone = new WhenUsed { target = lakeStone, once = false };
-        var hums = new SayNode { speaker = new StorySpeaker { player = true }, line = "It is warm, on a cold morning, and it hums under your hand. The marks on it are older than the road." };
+        var hums = new SayNode { speaker = new StorySpeaker(), line = "<i>The stone is warm, though the morning is not, and it hums under your hand. The marks on it are older than the road.</i>" };
         var markStone = new RaiseQuestEventNode { questEvent = Ev("TouchedLakeStone") };
         Link(stoneStory, (usedStone, 0, hums), (hums, 0, markStone));
 
@@ -2032,7 +2120,7 @@ public static class BuildPrologueMeadow
         var owns = new SayNode { speaker = S(), line = "You asked me by the fire, so here it is. I have seen stones like these wake once. It took everyone who stood too near, and it put them somewhere else. Ingrid knew that when she came. Now you do." };
         var silent = new SayNode { speaker = S(), line = "Whatever you see, do not let go of the stone. There are things I should have told you, and there is no time left to tell them." };
         var sawOne = new HasHappenedNode { questEvent = Ev("TouchedLakeStone") };
-        var same = new SayNode { speaker = new StorySpeaker { player = true }, line = "The same marks as the stone by the lake, and the same warmth. It was already awake this morning." };
+        var same = new SayNode { speaker = new StorySpeaker(), line = "<i>The same marks as the stone by the lake, and the same warmth. It was already awake this morning.</i>" };
         Link(stones, (touching, 0, pause), (pause, 0, asked), (asked, 0, owns), (asked, 1, silent), (owns, 0, sawOne), (silent, 0, sawOne), (sawOne, 0, same));
 
         // ----- The old troll comes for the stones -----

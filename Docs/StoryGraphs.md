@@ -64,8 +64,9 @@ The morning in the meadow (`Prologue_MistyWoods`, under **Prologue Meadow › Mo
 - **The Morning Fire:** the player takes the quest from Sigrid, then When Quest Starts (A Morning by the Fire, Also After Loading) › Has It Happened? (Met the Expedition)
   › No › Wait › Say (Sigrid, Eirik, Runa, Sigrid) › Raise Quest Event (Met the Expedition). Everyone says who they are.
 - **Talk by the Fire:** When Quest Event (Met the Expedition) › Wait › Say Aside, four times.
-- **The Road East:** When Quest Starts (The Road East, Also After Loading) › side by side: Walk The Party to the handcart; Change
-  Time of Day (follows the walk); talk (Wait Until The Walk Reaches › Say Aside). At the cart: Say Aside › Wait For Quest Event (Looked
+- **The Road East:** When Quest Starts (The Road East, Also After Loading) › side by side: Walk The Party to the handcart; the day
+  going by (Wait Until The Walk Reaches › Change Time of Day with Fade Straight There, so shadows don't race over the ground); talk
+  (Wait Until The Walk Reaches › Say Aside). A Say with no speaker set is the narrator: no name or face, for what the player finds. At the cart: Say Aside › Wait For Quest Event (Looked
   Over the Cart, or 25 s) › Say Aside › Walk The Party on to the trees › Raise Quest Event (Entered the Forest), with the day running
   out, boar running past (Show, Move, Hide Object), the birds gone, torches, and the grass dying (Wither Ground) along the way.
 - **The Road Behind:** the player a little way inside the trees › Raise Quest Event (The Road Behind Is Gone), whose Scene Reaction turns

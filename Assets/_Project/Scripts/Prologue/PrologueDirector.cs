@@ -163,6 +163,10 @@ public sealed class PrologueDirector : MonoBehaviour, IBuildArea
         ready = true;
         if (!GameSession.Quests.HasHappened(definition.StartedEvent))
         {
+            // First, and on at once: the room it gives is what the rest goes into.
+            if (!GiveStartingItem(definition.StartingBackpack)) return;
+            if (definition.StartingBackpack != null && Player.Current.Equipment != null)
+                Player.Current.Equipment.AutoEquip(definition.StartingBackpack);
             if (!GiveStartingItem(definition.StartingWeapon)) return;
             if (!GiveStartingItem(definition.StartingTorch)) return;
             foreach (var armor in definition.StartingArmor)

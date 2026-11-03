@@ -30,6 +30,7 @@ settings; `TerrainSurface` owns per-terrain runtime quality overrides through Ma
 options hook). `Editor/Environment/TerrainSurfaceWindow` is the unified setup/tuning UI. The generated
 `Shaders/Terrain/WorldTerrain*` passes share distance-adaptive tessellation/displacement and height-derived lighting
 normals across all painted layers; colliders and NavMesh are unchanged.
+The Haven's terrain is the standard for footprints and ground shape: a new `TerrainSurfaceProfile` starts from its values and `TerrainDisplacementEditor.UseStandardFootprints` brings an existing terrain in line.
 `TerrainFootprints` owns a bounded, rolling RFloat GPU impression field per terrain; its stamp shader draws recovering
 boot tread without changing source assets. `PlayerAudio.FootPlanted` shares animation/bone-based contacts with
 `PlayerTerrainFootprints`, which raycasts the actual surface before stamping (not through bridges or water).
@@ -994,7 +995,7 @@ The player is no super soldier: combat is about reading the enemy and committing
   emits `WorldNoise`. Presentation: `PlayerArcheryAnimation` (the animator's "Bow" layer, under "Upper Body"; it also
   turns the spine after animation so the draw line points at the aim, since the archer clips stand sideways) and
   `HeldBowView` (string between the bow rig's tips, pulled to the right hand, and the nocked arrow),
-  `ArcheryCameraAim` (`PlayerCameraController.SetAiming`), `ArcheryTrajectoryView` (arc preview for long shots) and
+  `ArcheryCameraAim` (`PlayerCameraController.SetAiming`, `SetBowInHand`: a bow holds the framing still, and the right button turns the view out of a fight), `ArcheryTrajectoryView` (arc preview for long shots, stray included: it is rolled as the draw starts) and
   `QuiverHud` (made by `CombatFeedback`: arrows, draw bar, quick shot). Technique: perfect release
   (`ArcheryRules.IsPerfectRelease`, forced crit), guard button aims with a bow (`PlayerGuard` ignores it then),
   the counter a perfect dodge readies looses an instant shot (`PlayerCombat.SpendCounter`), Z cycles arrow kinds
