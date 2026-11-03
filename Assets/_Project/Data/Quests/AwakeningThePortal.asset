@@ -14,8 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::QuestDefinition
   id: awakeningtheportal
   displayName: Awakening the Portal
-  description: Across the stream stand the stones that dropped you here. Feed them the Life Orbs and the way back to your people opens.
+  description: At the heart of the clearing stand the stones that dropped you here. Feed them the Life Orbs and the way back to your people opens.
   chain: The First Days
+  availableObjective: 
+  announceStart: 1
+  announceCompletion: 1
+  showTimerInHud: 0
   prerequisites:
   - {fileID: 11400000, guid: 8fd8f4db8a0b4d74cb71c5b4837010ac, type: 2}
   start: 0

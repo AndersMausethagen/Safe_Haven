@@ -41,7 +41,7 @@ public sealed class HearthlineTests
     [Test]
     public void CodeBuiltWindows_TakeTheirColoursFromTheStyle()
     {
-        foreach (string file in new[] { "UI/TalentWindow.cs", "UI/HavenWindow.cs", "UI/AltarWindow.cs", "UI/CargoWindow.cs", "UI/RaidPreparationWindow.cs", "Settlement/HeartTree.cs" })
+        foreach (string file in new[] { "UI/TalentWindow.cs", "UI/HavenWindow.cs", "UI/AltarWindow.cs", "UI/CargoWindow.cs", "UI/RaidPreparationWindow.cs", "Settlement/HomePortal.cs" })
         {
             string source = File.ReadAllText("Assets/_Project/Scripts/" + file);
             Assert.IsFalse(Regex.IsMatch(source, "<color=#[0-9A-Fa-f]{6}"), $"{file}: changing a colour in UIStyle has to change the game");

@@ -81,8 +81,8 @@ public static class QuestObjectPresets
     }
 
     /// <summary>
-    /// A world event that blooms terrain moss across the Heart Tree's ward the first time the player stands in it:
-    /// a once-per-game trigger on the scene's Heart Tree, a listener (Bloom when raised, Bloom Instantly on load) and a particle child.
+    /// A world event that blooms terrain moss across the portal's ward the first time the player stands in it:
+    /// a once-per-game trigger on the scene's Portal, a listener (Bloom when raised, Bloom Instantly on load) and a particle child.
     /// Pick the Quest Event (used by both trigger and listener) and, optionally, the quest it waits for.
     /// </summary>
     public static GameObject BuildWardMossBloom(GameEventDefinition gameEvent, QuestDefinition requiredQuest)
@@ -91,7 +91,7 @@ public static class QuestObjectPresets
         var trigger = new SerializedObject(root.AddComponent<GameEventTrigger>());
         trigger.FindProperty("gameEvent").objectReferenceValue = gameEvent;
         trigger.FindProperty("when").intValue = (int)TriggerWhen.PlayerInsideArea;
-        trigger.FindProperty("area").objectReferenceValue = Object.FindAnyObjectByType<HeartTree>();
+        trigger.FindProperty("area").objectReferenceValue = Object.FindAnyObjectByType<HomePortal>();
         trigger.FindProperty("repeat").intValue = (int)TriggerRepeat.OncePerGame;
         trigger.FindProperty("requires.quest").objectReferenceValue = requiredQuest;
         trigger.FindProperty("requires.requirement").intValue = (int)QuestGate.Requirement.Completed;

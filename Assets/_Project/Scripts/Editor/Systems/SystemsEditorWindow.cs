@@ -58,7 +58,7 @@ public sealed class SystemsEditorWindow : EditorWindow
             new SensesAndStealthPage(),
             new LockpickingPage(),
             new RaidsAndPortalPage(),
-            new HeartTreeAndBuildingPage(),
+            new HomePortalAndBuildingPage(),
             new CraftingPage(),
             new ResidentsAndPurificationPage(),
             new EssencePage(),

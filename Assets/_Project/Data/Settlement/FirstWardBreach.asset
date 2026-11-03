@@ -13,12 +13,15 @@ MonoBehaviour:
   m_Name: FirstWardBreach
   m_EditorClassIdentifier: Assembly-CSharp::WardBreachDefinition
   displayName: The Weakening Ward
-  warningText: 'The Heart Tree''s light flickers. Your fire has been seen by more than your friends: something is testing the ward along the old path. Prepare, then speak to the tree.'
+  warningText: 'The portal''s light flickers. Your fire has been seen by more than your friends: something is testing the ward along the old path. Prepare, then speak to the portal.'
   pendingText: The ward is weakening. When you are ready, I will open it and let them come to you.
   startHint: Wolves will come along the marked path
-  wonText: The last wolf falls. The Heart Tree's light steadies and the ward closes again. The home you built held.
+  wonText: The last wolf falls. The portal's light steadies and the ward closes again. The home you built held.
   failedText: The wolves slink back into the dark. The ward still flickers; try again when you are ready.
   availableAfterExtractions: 1
+  threatensHome: 0
+  laneCount: 0
+  waves: []
   enemyPrefab: {fileID: 7477446688404098989, guid: 237fc76d161bb114aa2049a864298943, type: 3}
   enemyCount: 3
   secondsBetweenEnemies: 2.5

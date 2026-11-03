@@ -513,7 +513,7 @@ public sealed class AltarWindow : MonoBehaviour
         Hairline(page, 624f, BodyTop, 1f, BodyBottom - BodyTop, style);
         Heading("What essence buys", page, 644f, BodyTop, 552f, style);
         Paragraph("Purified", page, 644f, BodyTop + 36f, 552f, 190f, 19f, style.Text).text =
-            "<b>Purified Essence</b>\nEmpowers gear and deepens skills. Works enchantments with no drawback, strengthens the Heart Tree's ward, " +
+            "<b>Purified Essence</b>\nEmpowers gear and deepens skills. Works enchantments with no drawback, strengthens the portal's ward, " +
             "raises the greatest building tiers and brews the Purified Draught at a Cauldron. Stored at home, it is safe.";
         Paragraph("Cursed", page, 644f, BodyTop + 236f, 552f, 190f, 19f, style.Text).text =
             "<b>Cursed Essence</b>\nUsed raw, it works stronger enchantments, each with a stated price, and brews the Cursed Draught. " +

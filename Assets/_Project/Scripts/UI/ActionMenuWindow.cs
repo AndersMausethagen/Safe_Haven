@@ -38,7 +38,7 @@ public sealed class MenuPage
 }
 
 /// <summary>
-/// A small reusable window for talking to things in the world: the Heart Tree, the portal, the Purification
+/// A small reusable window for talking to things in the world: the portal, the portal, the Purification
 /// Altar, the repair bench and the build menu all use it. The caller hands over a function that builds a MenuPage; the
 /// window shows it, rebuilds it every half second (so costs and progress stay current) and after every choice, and
 /// closes when the player walks away from the object it was opened at.

@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using static CodeUI;
 
 /// <summary>
-/// Where Safe Haven is run from (H, or asking the Heart Tree). The Overview tab has its rank and the climb ahead as a ladder of
+/// Where Safe Haven is run from (H, or asking the portal). The Overview tab has its rank and the climb ahead as a ladder of
 /// stops, the numbers at a glance, then what to do next, what the renown is made of and who of the expedition is home. Stores,
 /// Buildings and People are HavenListPages: everything in camp, every building and every person, each with what can be done about
 /// it from here, including going straight there. Built in code by HavenProgress, so it exists at home only; everything is read
@@ -178,7 +178,7 @@ public sealed class HavenWindow : MonoBehaviour
             return;
         }
 
-        // It takes the screen's centre, and the Heart Tree's menu is how the player often gets here.
+        // It takes the screen's centre, and the portal's menu is how the player often gets here.
         if (ActionMenuWindow.Current != null && ActionMenuWindow.Current.IsOpen)
         {
             ActionMenuWindow.Current.Close();

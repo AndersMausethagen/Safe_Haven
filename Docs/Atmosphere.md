@@ -36,7 +36,7 @@ weather, gathers in fog areas (hollows, marshes) and makes monsters see less far
   change them too.
 - Safe Haven's weather volume uses `SafeHaven_HomeOvercast`, a home-specific, less desaturated grade. Its terrain mist
   is lighter than the forest preset and remains driven by the current weather; Clear weather disables it.
-- **`VisibilitySource`**: the player (`PlayerArmature`: sight 12 m, reveals 20 m, not a light), the Heart Tree (follows
+- **`VisibilitySource`**: the player (`PlayerArmature`: sight 12 m, reveals 20 m, not a light), the portal (follows
   the ward radius + 4 m), campfires (10 m) and torches (9 m), a lit extraction beacon. `IsLight` sources count as light
   for night creatures (`VisibilitySource.IsLit`).
 - **`AtmosphereLight`** on a `Light`: it glows in the fog with the light's own colour, intensity and range (flicker

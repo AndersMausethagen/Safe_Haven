@@ -56,12 +56,12 @@ public static class RaidLauncher
             : $"Tier {Tiers.ToRoman(difficulty.tier)} needs a gear score of at least {difficulty.minimumGearScore}. Yours is {score}.";
     }
 
-    /// <summary>Why the Heart Tree can't yet hold the way open to a tier, or null when it can.</summary>
+    /// <summary>Why the portal can't yet hold the way open to a tier, or null when it can.</summary>
     public static string CheckWard(RaidDifficulty difficulty)
     {
         return difficulty == null || Cheats.NoRequirements || GameSession.Settlement.WardLevel >= difficulty.wardLevelNeeded
             ? null
-            : $"The ward isn't strong enough to hold the way open to tier {Tiers.ToRoman(difficulty.tier)}. Strengthen it at the Heart Tree.";
+            : $"The ward isn't strong enough to hold the way open to tier {Tiers.ToRoman(difficulty.tier)}. Strengthen it at the portal.";
     }
 
     /// <summary>Share off the extraction time, from what has been done to the portal.</summary>

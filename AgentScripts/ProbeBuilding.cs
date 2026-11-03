@@ -77,6 +77,6 @@ public static class ProbeBuilding
     {
         Construction site = Last;
         string building = site == null ? "no sawbench" : $"{site.Title} L{site.Level}→{site.Target} work {site.Work:0.0}/{site.WorkNeeded:0} paid {site.Paid}";
-        return $"{building}; renown {HavenRenown.Compute()} rank {GameSession.Settlement.HavenRank} ward {HeartTree.Current?.WardRadius:0}; overgrowth {Overgrowth.ClearedShare * 100f:0}% of {Overgrowth.All.Count}; level {GameSession.Progress.Level}";
+        return $"{building}; renown {HavenRenown.Compute()} rank {GameSession.Settlement.HavenRank} ward {HomePortal.Current?.WardRadius:0}; overgrowth {Overgrowth.ClearedShare * 100f:0}% of {Overgrowth.All.Count}; level {GameSession.Progress.Level}";
     }
 }

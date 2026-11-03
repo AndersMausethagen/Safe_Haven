@@ -230,6 +230,34 @@ public sealed class HavenProgressionTests
     }
 
     [Test]
+    public void NoStoryText_StillSpeaksOfTheHeartTree()
+    {
+        foreach (string folder in new[] { "Quests", "Settlement", "ResourceInventory", "Prologue" })
+        {
+            foreach (string guid in AssetDatabase.FindAssets("t:ScriptableObject", new[] { "Assets/_Project/Data/" + folder }))
+            {
+                string path = AssetDatabase.GUIDToAssetPath(guid);
+                SerializedProperty it = new SerializedObject(AssetDatabase.LoadMainAssetAtPath(path)).GetIterator();
+                while (it.NextVisible(true))
+                {
+                    if (it.propertyType == SerializedPropertyType.String)
+                    {
+                        StringAssert.DoesNotContain("Heart Tree", it.stringValue, path);
+                    }
+                }
+            }
+        }
+    }
+
+    [Test]
+    public void SavedQuestEvents_KeepTheirIds()
+    {
+        var talked = AssetDatabase.LoadAssetAtPath<GameEventDefinition>("Assets/_Project/Data/Quests/Events/TalkedToPortal.asset");
+        Assert.NotNull(talked);
+        Assert.AreEqual("talkedtohearttree", talked.Id, "saves remember this id");
+    }
+
+    [Test]
     public void TheNewNames_AreWhatThePlayerSees()
     {
         Assert.AreEqual("Hunter's Lodge", CraftingStationType.Tannery.DisplayName());

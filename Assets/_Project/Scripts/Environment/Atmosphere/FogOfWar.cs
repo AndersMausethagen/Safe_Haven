@@ -6,7 +6,7 @@ using UnityEngine.Rendering.Universal;
 /// <summary>
 /// How what the player has not seen, and what is far from any light at night, looks (Add Override › Safe Haven › Fog
 /// of War). Unexplored ground (ExplorationMap) sinks into dark, drifting fog at any hour. At night, everything outside
-/// every visibility source's radius (the player's sight, torches, the Heart Tree's ward) gets a grey, colourless veil,
+/// every visibility source's radius (the player's sight, torches, the portal's ward) gets a grey, colourless veil,
 /// in the way of Gord: by day all that was explored is plain to see. Drawn by AtmosphereFeature.
 /// </summary>
 [Serializable]

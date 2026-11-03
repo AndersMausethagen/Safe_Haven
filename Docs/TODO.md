@@ -130,13 +130,13 @@ Same review for Quests/ and Events/. Work top to bottom.
 3. [x] **Death subject without type checks.** Done: `IEventSubject` (MonsterAI, BuildingObject); the kind comes from
        the Damageable's category. `GameEvents.OnAnyDied` asks for MonsterAI, then BuildingObject; give the
        dying object a small interface for its definition (like `IInteractionName`).
-4. [x] **No Heart Tree inside the generic trigger.** Done: `TriggerWhen.PlayerInsideArea` watches any `IArea`
-       (HeartTree is one); the SafeHaven scene's Heart Tree Bloom points at the tree. `GameEventTrigger`'s PlayerInsideWard polls `HeartTree.Current`;
+4. [x] **No Portal inside the generic trigger.** Done: `TriggerWhen.PlayerInsideArea` watches any `IArea`
+       (HomePortal is one); the SafeHaven scene's Portal Bloom points at the tree. `GameEventTrigger`'s PlayerInsideWard polls `HomePortal.Current`;
        an area interface (or a ward trigger component) keeps the trigger generic.
 5. [x] Smaller. Done: `IDisplayName` (ItemDefinition, ResourceDefinition) replaces the type switches in
        QuestObjective, StationMenu and StationWindow. Kept on purpose: `QuestGiver.CanInteract` advancing its waiting
        lines only happens for givers without a Talkable (notice boards), whose prompt is the line; a clean fix needs a
-       "focused" hook on Interactable. HeartTree's talked event is raised when its menu (ward, breach) closes, not on
+       "focused" hook on Interactable. HomePortal's talked event is raised when its menu (ward, breach) closes, not on
        talk, so it is not Talkable's.
 
 ## Code quality: other systems (analysis 2026-10-30)
@@ -172,7 +172,7 @@ Same review for the rest of the runtime code (SOLID, Unity practice, no special-
        playing that wasn't spawned through `SaveableEntity.Spawn` is simply not persistent (no warning, nothing to
        strip).
 6. [x] **BuildPlacer (981 lines)** Done (763 left): `BuildGhost` for the preview, and `IBuildArea` replaces the
-       nine "prologue or Heart Tree?" branches (HeartTree and PrologueDirector are build areas). Was: holds the build menu pages, the placement rules (grid, snap, lines, CheckSpot)
+       nine "prologue or Portal?" branches (HomePortal and PrologueDirector are build areas). Was: holds the build menu pages, the placement rules (grid, snap, lines, CheckSpot)
        and the ghost visuals. Split the menu and the ghost out; the rules become testable without a scene.
 
 Fine as they are: the six `Instance` singletons (AudioManager, CombatFeedback, GameStateManager, UIStateManager,

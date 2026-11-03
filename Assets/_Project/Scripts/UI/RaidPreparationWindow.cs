@@ -122,7 +122,7 @@ public sealed class RaidPreparationWindow : MonoBehaviour
     [Tooltip("The loss rules in one line, stated before every raid (GDD §21.3).")]
     [SerializeField] private string lossSummary = "Fall or run out of time: materials, food and finds are lost. Gear returns damaged.";
     [Tooltip("The loss rules in full, shown on hover over the summary.")]
-    [SerializeField, TextArea] private string lossRules = "If you fall or time runs out, you wake at the Heart Tree. What you carry is lost: materials, food and anything found in the raid. The tools, weapons and packs you bring return damaged and can be repaired at home. Your home remains safe.";
+    [SerializeField, TextArea] private string lossRules = "If you fall or time runs out, you wake at the portal. What you carry is lost: materials, food and anything found in the raid. The tools, weapons and packs you bring return damaged and can be repaired at home. Your home remains safe.";
 
     private readonly HashSet<ItemDefinition> picked = new HashSet<ItemDefinition>();
     private readonly List<Tab> tabs = new List<Tab>();

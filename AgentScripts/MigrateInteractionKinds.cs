@@ -17,7 +17,7 @@ public static class MigrateInteractionKinds
     // Components whose interaction is a press, not work.
     private static readonly Type[] UseOwners =
     {
-        typeof(QuestGiver), typeof(PrologueCompanion), typeof(ResidentNpc), typeof(HeartTree), typeof(CraftingStation),
+        typeof(QuestGiver), typeof(PrologueCompanion), typeof(ResidentNpc), typeof(HomePortal), typeof(CraftingStation),
         typeof(StashChest), typeof(RaidPortal), typeof(PurificationAltar), typeof(RepairBench), typeof(ExtractionPoint),
     };
 

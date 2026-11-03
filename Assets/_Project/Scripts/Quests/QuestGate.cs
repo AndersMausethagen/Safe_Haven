@@ -25,7 +25,7 @@ public sealed class QuestGate : MonoBehaviour, IInteractionCondition
     [SerializeField] private QuestDefinition quest;
     [SerializeField] private Requirement requirement = Requirement.Started;
     [Tooltip("Shown on the interaction prompt while locked.")]
-    [SerializeField] private string lockedText = "Not yet. Listen to the Heart Tree.";
+    [SerializeField] private string lockedText = "Not yet. Listen to the portal.";
 
     public QuestDefinition Quest => quest;
 

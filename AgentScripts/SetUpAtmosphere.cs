@@ -130,7 +130,7 @@ public static class SetUpAtmosphere
         return $"player sight: radius {saved.Radius}, reveals {saved.RevealRadius}, light {saved.IsLight}";
     }
 
-    /// <summary>In the open SafeHaven scene: the Heart Tree's ward sight and the saved exploration map. Saves the scene.</summary>
+    /// <summary>In the open SafeHaven scene: the portal's ward sight and the saved exploration map. Saves the scene.</summary>
     public static string HomeScene()
     {
         var scene = EditorSceneManager.GetActiveScene();
@@ -144,7 +144,7 @@ public static class SetUpAtmosphere
             return "SafeHaven has unsaved changes; not touching it";
         }
 
-        HeartTree tree = Object.FindAnyObjectByType<HeartTree>();
+        HomePortal tree = Object.FindAnyObjectByType<HomePortal>();
         var ward = tree.GetComponent<VisibilitySource>() ?? Undo.AddComponent<VisibilitySource>(tree.gameObject);
         var so = new SerializedObject(ward);
         so.FindProperty("radius").floatValue = 4f;

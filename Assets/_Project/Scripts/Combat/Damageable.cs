@@ -273,7 +273,7 @@ public sealed class Damageable : MonoBehaviour, IDamageable, ISaveable
     }
 
     /// <summary>
-    /// Brings a dead object back with a share of its health, such as the player waking at the Heart Tree. Only for objects
+    /// Brings a dead object back with a share of its health, such as the player waking at the portal. Only for objects
     /// that aren't destroyed on death.
     /// </summary>
     public void Revive(float healthFraction = 1f)

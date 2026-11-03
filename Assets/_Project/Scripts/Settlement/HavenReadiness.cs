@@ -81,13 +81,13 @@ public static class HavenReadiness
             Badge = total > 0f ? $"+{RaidStats.FormatTime(total)}" : "",
             State = total > 0f ? HavenEntryState.Good : HavenEntryState.Ready,
             Status = total > 0f ? $"Every raid lasts {RaidStats.FormatTime(total)} longer." : "Raids run on their own clock.",
-            Description = "The stronger the Heart Tree, the longer it holds the way home open. People with the right job add to it, and Portal Sparks buy more for one raid.",
+            Description = "The stronger the portal, the longer it holds the way home open. People with the right job add to it, and Portal Sparks buy more for one raid.",
         };
         entry.Details.Add(new HavenDetail("From the ward", $"{RaidStats.FormatTime(WardSeconds)}"));
         if (level < settings.WardLevels.Count)
         {
             string opens = settings.WardLevels[level].opens;
-            entry.Details.Add(new HavenDetail("Next", $"Strengthen the ward at the Heart Tree: {RaidStats.FormatTime(settings.WardLevels[level].raidSeconds)} more.{(string.IsNullOrEmpty(opens) ? "" : " " + opens)}"));
+            entry.Details.Add(new HavenDetail("Next", $"Strengthen the ward at the portal: {RaidStats.FormatTime(settings.WardLevels[level].raidSeconds)} more.{(string.IsNullOrEmpty(opens) ? "" : " " + opens)}"));
         }
 
         return entry;

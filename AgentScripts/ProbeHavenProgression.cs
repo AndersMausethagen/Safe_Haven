@@ -184,7 +184,7 @@ public static class ProbeHavenProgression
     public static string BreachStart()
     {
         Player player = Player.Current;
-        Vector3 at = HeartTree.Current.transform.position + new Vector3(10f, 0f, 0f);
+        Vector3 at = HomePortal.Current.transform.position + new Vector3(10f, 0f, 0f);
         Raise("WatchPost", at, 3);
         var totem = Raise("WardTotem", at + new Vector3(4f, 0f, 4f), 1);
         GameSession.Settlement.WarnOfBreach();

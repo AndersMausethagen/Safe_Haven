@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: HungryDarkBreach
   m_EditorClassIdentifier: SafeHaven::WardBreachDefinition
   displayName: The Hungry Dark
-  warningText: The Heart Tree shudders. They have learned where the warmth is, and they are coming for more than you. Mend what you can and set your traps; the marked roads show where they will walk.
+  warningText: The portal shudders. They have learned where the warmth is, and they are coming for more than you. Mend what you can and set your traps; the marked roads show where they will walk.
   pendingText: They are gathering beyond the ward. When you are ready, I will open it and we will meet them here.
   startHint: Wolves and rootlings will come
   wonText: The last of them falls. The ward knits itself closed, and the home stands.

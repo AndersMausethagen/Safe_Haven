@@ -14,8 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::QuestDefinition
   id: awakening
   displayName: Awakening
-  description: You wake beneath a great tree in a quiet clearing, and you wake alone. Its bark is warm, and something in it seems to be waiting for you.
+  description: You wake on the grass of a quiet clearing, and you wake alone. At its heart stand cracked old stones, warm to the touch, and something in them seems to be waiting for you.
   chain: The First Days
+  availableObjective: 
+  announceStart: 1
+  announceCompletion: 1
+  showTimerInHud: 0
   prerequisites: []
   start: 1
   startEvent: {fileID: 11400000, guid: d34acdcfc02a80243b371e93f882cd0c, type: 2}
@@ -24,7 +28,7 @@ MonoBehaviour:
   objectivesInOrder: 0
   objectives:
   - type: 6
-    description: Listen to the Heart Tree (E)
+    description: Listen to the portal (E)
     amount: 1
     item: {fileID: 0}
     resource: {fileID: 0}

@@ -14,8 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::QuestDefinition
   id: theweakeningward
   displayName: The Weakening Ward
-  description: The light that called Ingrid home was seen by other things too. Something is testing the ward. Prepare, then speak to the Heart Tree when you are ready.
+  description: The light that called Ingrid home was seen by other things too. Something is testing the ward. Prepare, then speak to the portal when you are ready.
   chain: The First Days
+  availableObjective: 
+  announceStart: 1
+  announceCompletion: 1
+  showTimerInHud: 0
   prerequisites:
   - {fileID: 11400000, guid: 08ed06b5fb8d1854c86788aa2a00156f, type: 2}
   start: 0

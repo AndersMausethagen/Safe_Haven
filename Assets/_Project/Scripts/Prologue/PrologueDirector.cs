@@ -424,9 +424,9 @@ public sealed class PrologueDirector : MonoBehaviour, IBuildArea
         if (statusLabel != null) statusLabel.text = definition.EndingStatus;
         yield return new WaitForSeconds(definition.EndingSeconds);
         GameEvents.Raise(definition.FinishedEvent);
-        GameSession.SetArrivalPoint(PlayerArrivalPoint.HeartTree);
+        GameSession.SetArrivalPoint(PlayerArrivalPoint.HomePortal);
         // The expedition's supplies are not the settlement's starting inventory. No raid loss or durability penalty.
-        if (!SceneLoader.Load(definition.HomeScene, "Beneath the Heart Tree"))
+        if (!SceneLoader.Load(definition.HomeScene, "Beside the old portal"))
         {
             Debug.LogError("The prologue could not start its home transition.", this);
             GameMessages.Post("The return to Safe Haven failed. Reload the last checkpoint.", MessageKind.Warning);

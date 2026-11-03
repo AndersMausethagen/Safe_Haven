@@ -70,7 +70,7 @@ There is no raid tier V yet: tier V gear is what masters tier IV. A raid of tier
 
 | | Source | Effect |
 |---|---|---|
-| Depth | Heart Tree ward levels | Ward I opens raid tier II, II opens III, III opens IV (`RaidDifficulty.wardLevelNeeded`), on top of the gear floor. It costs Purified Essence, so the essence loop is part of going deeper |
+| Depth | Portal ward levels | Ward I opens raid tier II, II opens III, III opens IV (`RaidDifficulty.wardLevelNeeded`), on top of the gear floor. It costs Purified Essence, so the essence loop is part of going deeper |
 | Reach | Ward levels; Sigrid | 90 s more on every raid, per level; 2 minutes more with a Leader |
 | The way home | Portal improvements, made at the portal | Steadied: a second safe pocket. Bound: extraction 20% faster. Moonlit: a third pocket, and 20% faster again |
 | Endurance | Comfort: Cottage 4 (+2 upgraded), Sauna 3, Kitchen 2, Hut 1 (+1), Well, Campfire, Lantern Post, Banner, Planter 1 each, and 1 per resident with a bed | Well Rested on setting out: +15% stamina, +10% health, for 60 s per point. Percentages, so it keeps its worth as gear improves. Each kind counts once |

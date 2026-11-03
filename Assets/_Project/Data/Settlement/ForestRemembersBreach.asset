@@ -13,10 +13,10 @@ MonoBehaviour:
   m_Name: ForestRemembersBreach
   m_EditorClassIdentifier: SafeHaven::WardBreachDefinition
   displayName: The Forest Remembers
-  warningText: Every root in the clearing turns toward the Heart Tree. The forest has not forgotten what was taken from it. This will come again and again, each time harder. Prepare.
+  warningText: Every root in the clearing turns toward the portal. The forest has not forgotten what was taken from it. This will come again and again, each time harder. Prepare.
   pendingText: The forest remembers us. It will not stop. Stand with me when you are ready.
   startHint: All the forest's anger will come
-  wonText: It draws back, as a tide does. The Heart Tree burns bright in the quiet.
+  wonText: It draws back, as a tide does. The portal burns bright in the quiet.
   failedText: The ward falls dark. The forest takes its due and withdraws to wait.
   availableAfterExtractions: 1
   threatensHome: 1

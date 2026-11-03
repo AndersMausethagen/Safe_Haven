@@ -80,7 +80,7 @@ public sealed class RaidResultsScreen : MonoBehaviour
         Sprite own = report.Definition != null ? report.Definition.ResultArtwork(extracted) : null;
         SetArtwork(own != null ? own : extracted ? extractedArtwork : failedArtwork);
         destination = CanLoad(report.ReturnScene) ? report.ReturnScene : fallbackScene;
-        continueLabel.text = extracted ? "Return to Safe Haven" : "Wake at the Heart Tree";
+        continueLabel.text = extracted ? "Return to Safe Haven" : "Wake at the portal";
     }
 
     private void ShowEmpty()
@@ -135,7 +135,7 @@ public sealed class RaidResultsScreen : MonoBehaviour
 
     private void Continue()
     {
-        if (SceneLoader.Load(destination, extracted ? "Home to Safe Haven" : "Waking at the Heart Tree"))
+        if (SceneLoader.Load(destination, extracted ? "Home to Safe Haven" : "Waking at the portal"))
         {
             continueButton.interactable = false;
         }

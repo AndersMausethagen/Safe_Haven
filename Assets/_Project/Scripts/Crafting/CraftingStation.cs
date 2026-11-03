@@ -110,6 +110,8 @@ public sealed class CraftingStation : MonoBehaviour
     [SerializeField] private string stationId;
     [Tooltip("The menu closes when the player walks further than this from the station, in meters.")]
     [SerializeField, Min(1f)] private float menuRange = 6f;
+    [Tooltip("Using it opens its window. Off when something beside it owns the interaction and calls Open Menu itself (the portal at home).")]
+    [SerializeField] private bool opensWhenUsed = true;
 
     private Collider[] colliders;
     private Interactable interactable;
@@ -225,7 +227,7 @@ public sealed class CraftingStation : MonoBehaviour
     private void OnEnable()
     {
         active.Add(this);
-        if (interactable != null)
+        if (interactable != null && opensWhenUsed)
         {
             interactable.Completed.AddListener(OnUsed);
         }
@@ -244,7 +246,7 @@ public sealed class CraftingStation : MonoBehaviour
     {
         if (IsBroken)
         {
-            GameMessages.Post("It's broken. Mend the clearing at the Heart Tree.", MessageKind.Warning);
+            GameMessages.Post("It's broken. Mend the clearing at the portal.", MessageKind.Warning);
         }
         else if (Usable)
         {

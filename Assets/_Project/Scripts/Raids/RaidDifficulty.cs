@@ -16,7 +16,7 @@ public sealed class RaidDifficulty
     [Min(0)] public int recommendedGearScore = 10;
     [Tooltip("The portal refuses anyone below this score, so nobody strips down and runs for the top tier's loot. 0: anyone may go.")]
     [Min(0)] public int minimumGearScore;
-    [Tooltip("How strong the Heart Tree's ward must be: its light is what holds the way open to the deeper woods. 0: any ward.")]
+    [Tooltip("How strong the portal's ward must be: its light is what holds the way open to the deeper woods. 0: any ward.")]
     [Min(0)] public int wardLevelNeeded;
     [Tooltip("Multiplies the enemies' health. Set so that the time to kill stays the same at the recommended score: the Rules tab's table shows it.")]
     [Min(0.1f)] public float enemyHealth = 1f;

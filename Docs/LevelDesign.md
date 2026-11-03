@@ -38,7 +38,7 @@ into one you can press Play in:
   so it is always the current setup: the player rig (player, cameras, HUD and windows, game state, sun, sky, weather and
   fog, copied together so they stay connected, replacing the scene's own camera and sun), the NavMesh surface, save keys
   and scene audio. A home also gets its wind, persistence, the raid portal and a wake-up point (Player Arrival Point
-  "HeartTree"); a raid gets its director (with a raid to test with), a Raid Layout with the Raid Generator (put spawn
+  "HomePortal"); a raid gets its director (with a raid to test with), a Raid Layout with the Raid Generator (put spawn
   groups under it) and an extraction point 30 m ahead (move it where it belongs).
 - It stands the player on the ground at the wake-up point or the middle of the Scene view, bakes the NavMesh and adds the
   scene to Build Settings. One undo step; save the scene to keep it.
@@ -46,7 +46,7 @@ into one you can press Play in:
   fixes them: no player, camera, game state or HUD, nothing to stand on, an unbaked NavMesh or a player off it, not in
   Build Settings, two suns or audio listeners; for a raid no director, raid, generator, exit or spawn groups, or no raid
   that uses the scene (**Make a Raid for This Scene** copies one and points it here); for a home no persistence,
-  wake-up point, portal or Heart Tree. It also counts what Level Check finds.
+  wake-up point, portal or Portal. It also counts what Level Check finds.
 
 A home scene saves into the save file like the real Haven does when you play it.
 
@@ -370,7 +370,7 @@ All CC0 (free for any use, no credit needed; see `Models/PolyHaven/LICENSE.md`),
 
 Safe Haven › World › **Set Up World Assets** remakes anything missing (existing assets are kept).
 
-**Safe Haven** is made with it too (`AgentScripts/BuildHavenWorld.cs`): one 400 m terrain round the Heart Tree in the
+**Safe Haven** is made with it too (`AgentScripts/BuildHavenWorld.cs`): one 400 m terrain round the portal in the
 Haven look, a flat clearing, hills rolling outward and the land rising north to a crag (*North Crag*), a Haven river
 past the east of the base (the drinking spot on its bank), two Haven paths (up the slope from the portal, east over a
 ford) and four Haven groves round the clearing. Edit them under **World** in the scene. After changing the ground,

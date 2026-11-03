@@ -14,8 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::QuestDefinition
   id: a_light_they_can_see
   displayName: A Light They Can See
-  description: The brighter Safe Haven burns, the further its light carries through the mist, and six of your people are still out there. Build, clear the overgrowth and raise the haven to a Hamlet. The Heart Tree's Haven page (H) shows what counts.
+  description: The brighter Safe Haven burns, the further its light carries through the mist, and six of your people are still out there. Build, clear the overgrowth and raise the haven to a Hamlet. The Haven page (H) shows what counts.
   chain: The Lost Expedition
+  availableObjective: 
+  announceStart: 1
+  announceCompletion: 1
+  showTimerInHud: 0
   prerequisites:
   - {fileID: 11400000, guid: fea0201f13773f04a96efbcb5b364ea9, type: 2}
   - {fileID: 11400000, guid: b95103f99c217d3489eb46bd97d706d8, type: 2}

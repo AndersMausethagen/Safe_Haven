@@ -56,7 +56,7 @@ resources, portal, arrival points and building placement remain aligned.
 
 The independent Terrain Data, terrain material, three paint layers and rebaked NavMesh are in
 `Assets/_Project/Art/Terrain/SafeHaven`. Paint **Forest Soil**, **Forest Moss**, or **Weathered Stone**
-with Terrain's Paint Texture tool. Broad irregular patches, fine edge variation, soil around the Heart Tree,
+with Terrain's Paint Texture tool. Broad irregular patches, fine edge variation, soil around the portal,
 and a soil route toward the portal provide the starting blend; stone is concentrated around existing rootbound stones
 and occasional exposed patches. These are saved paint weights, not a runtime generator.
 

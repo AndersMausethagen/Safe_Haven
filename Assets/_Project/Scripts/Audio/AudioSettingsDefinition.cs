@@ -90,7 +90,7 @@ public sealed class AudioSettingsDefinition : ScriptableObject
     [SerializeField] private SoundDefinition consumed;
     [Tooltip("A stack dropped from the bag landing on the ground.")]
     [SerializeField] private SoundDefinition itemDropped;
-    [Tooltip("The clearing mended at the Heart Tree.")]
+    [Tooltip("The clearing mended at the portal.")]
     [SerializeField] private SoundDefinition repaired;
 
     [Header("Ward Breaches (heard everywhere: they are warnings)")]

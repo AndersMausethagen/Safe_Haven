@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// Mending what a breach broke (GDD §6.9: limited repair costs): all of it at once, at the Heart Tree, for a share of what the
+/// Mending what a breach broke (GDD §6.9: limited repair costs): all of it at once, at the portal, for a share of what the
 /// damaged part of each building cost to build. So one bad night can't leave a home that can't be rebuilt.
 /// </summary>
 public static class BuildingRepairs

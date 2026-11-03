@@ -1,7 +1,7 @@
 using UnityEngine;
 
 /// <summary>
-/// A named place where the player appears when entering a scene for a reason: "HeartTree" (waking up, reviving after a
+/// A named place where the player appears when entering a scene for a reason: "HomePortal" (waking up, reviving after a
 /// failed raid, GDD §8.3) or "Portal" (coming home from a raid). Whoever changes scene asks for one with
 /// GameSession.SetArrivalPoint; PlayerPersistence moves the player here on arrival. A scene without the requested point
 /// keeps the player where the scene put them.
@@ -11,11 +11,11 @@ using UnityEngine;
 /// </summary>
 public sealed class PlayerArrivalPoint : MonoBehaviour
 {
-    public const string HeartTree = "HeartTree";
+    public const string HomePortal = "HomePortal";
     public const string Portal = "Portal";
 
-    [Tooltip("The name scene changes ask for, such as HeartTree or Portal.")]
-    [SerializeField] private string id = HeartTree;
+    [Tooltip("The name scene changes ask for, such as HomePortal or Portal.")]
+    [SerializeField] private string id = HomePortal;
 
     public string Id => id;
 

@@ -19,7 +19,7 @@ using UnityEngine.InputSystem;
 /// fit and can be paid for are built. Geometry lives in BuildPlacement; what the player sees while placing in BuildGhost.
 /// </para>
 /// <para>
-/// Where and what may be built is the current build area's (<see cref="IBuildArea"/>: the Heart Tree's ward at home,
+/// Where and what may be built is the current build area's (<see cref="IBuildArea"/>: the portal's ward at home,
 /// the expedition's camp in the prologue), so this class knows neither.
 /// </para>
 /// <para>
@@ -132,7 +132,7 @@ public sealed class BuildPlacer : MonoBehaviour
 
         if (!HasBuildArea)
         {
-            GameMessages.Post(Area != null ? Area.WhyClosed : "You can only build in Safe Haven, inside the Heart Tree's ward.", MessageKind.Warning);
+            GameMessages.Post(Area != null ? Area.WhyClosed : "You can only build in Safe Haven, inside the portal's ward.", MessageKind.Warning);
             return;
         }
 
@@ -697,7 +697,7 @@ public sealed class BuildPlacer : MonoBehaviour
     // be paid for.
     private GameObject Build(BuildingDefinition building, Vector3 position, Quaternion rotation)
     {
-        string refused = Area != null ? Area.CheckBuilding(building) : "You can only build in Safe Haven, inside the Heart Tree's ward.";
+        string refused = Area != null ? Area.CheckBuilding(building) : "You can only build in Safe Haven, inside the portal's ward.";
         if (refused != null)
         {
             GameMessages.Post(refused, MessageKind.Warning);

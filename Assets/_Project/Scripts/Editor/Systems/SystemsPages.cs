@@ -630,12 +630,12 @@ public sealed class RaidsAndPortalPage : SystemsPage
     }
 }
 
-/// <summary>The Heart Tree's ward, its upgrades and what buildings cost (GDD §6.4, §14).</summary>
-public sealed class HeartTreeAndBuildingPage : SystemsPage
+/// <summary>The portal's ward, its upgrades and what buildings cost (GDD §6.4, §14).</summary>
+public sealed class HomePortalAndBuildingPage : SystemsPage
 {
-    public override string Title => "Heart Tree & Building";
+    public override string Title => "Portal & Building";
     public override string Group => "World";
-    public override string Help => "The ward is the area around the Heart Tree where the player may build; Purified Essence grows it. Building " +
+    public override string Help => "The ward is the area around the portal where the player may build; Purified Essence grows it. Building " +
                                    "costs are paid when a building is placed. Change costs and models in the Content Editor (Buildings).";
 
     public override void Draw()
@@ -676,7 +676,7 @@ public sealed class CraftingPage : SystemsPage
     public override string Group => "World";
     public override string Help => "By Hand recipes are instant from the bag window; keep them few and basic. Every other recipe is queued at its " +
                                    "station, paid when queued, and takes Seconds per craft, also while the player is raiding. Output size and " +
-                                   "queue length per station are on the Heart Tree & Building page. Change costs and results in the Content Editor (Recipes).";
+                                   "queue length per station are on the portal & Building page. Change costs and results in the Content Editor (Recipes).";
 
     public override void Draw()
     {

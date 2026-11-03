@@ -65,7 +65,7 @@ public sealed class HavenOverview
         overview.Renown = HavenRenown.Compute(parts);
         overview.Rank = Mathf.Max(GameSession.Settlement.HavenRank, settings.RankFor(overview.Renown));
         overview.Climb = ClimbOf(settings.Ranks, overview.Rank, overview.Renown);
-        overview.WardRadius = HeartTree.Current != null ? HeartTree.Current.WardRadius : 0f;
+        overview.WardRadius = HomePortal.Current != null ? HomePortal.Current.WardRadius : 0f;
         overview.ClearedShare = Overgrowth.ClearedShare;
         overview.Buildings = BuildingObject.Active.Count(IsStandingBuilding);
         overview.Parts.AddRange(Grouped(parts));
@@ -142,13 +142,13 @@ public sealed class HavenOverview
         WardBreachDirector breach = WardBreachDirector.Current;
         if (breach != null && breach.IsPending)
         {
-            Steps.Add(new Step(breach.Definition.DisplayName, $"{breach.Hint}. Prepare, then begin the defense at the Heart Tree.", use, 0));
+            Steps.Add(new Step(breach.Definition.DisplayName, $"{breach.Hint}. Prepare, then begin the defense at the portal.", use, 0));
         }
 
         int hurt = BuildingRepairs.Damaged().Count;
         if (hurt > 0)
         {
-            Steps.Add(new Step("Mend the clearing", $"{hurt} building{(hurt == 1 ? " is" : "s are")} damaged. Pay for repairs at the Heart Tree.", use, 0));
+            Steps.Add(new Step("Mend the clearing", $"{hurt} building{(hurt == 1 ? " is" : "s are")} damaged. Pay for repairs at the portal.", use, 0));
         }
 
         int left = Overgrowth.All.Count(piece => !piece.IsCleared);

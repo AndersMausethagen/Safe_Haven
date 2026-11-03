@@ -3,14 +3,14 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-/// <summary>What stands in Safe Haven (`--entry ProbeHaven.Report`): the Heart Tree, buildings, nodes and roots. Opens the scene, reports, reopens the previous one.</summary>
+/// <summary>What stands in Safe Haven (`--entry ProbeHaven.Report`): the portal, buildings, nodes and roots. Opens the scene, reports, reopens the previous one.</summary>
 public static class ProbeHaven
 {
     public static string Report()
     {
         string previous = SceneManager.GetActiveScene().path;
         EditorSceneManager.OpenScene("Assets/_Project/Scenes/SafeHaven.unity");
-        HeartTree tree = Object.FindAnyObjectByType<HeartTree>(FindObjectsInactive.Include);
+        HomePortal tree = Object.FindAnyObjectByType<HomePortal>(FindObjectsInactive.Include);
         string buildings = string.Join(", ", Object.FindObjectsByType<BuildingObject>(FindObjectsInactive.Include).Select(b => $"{b.name}{b.transform.position:F0}"));
         string nodes = string.Join(", ", Object.FindObjectsByType<ResourceNode>(FindObjectsInactive.Include).GroupBy(n => n.Definition != null ? n.Definition.name : "?").Select(g => $"{g.Key}×{g.Count()}"));
         string roots = string.Join(", ", SceneManager.GetActiveScene().GetRootGameObjects().Select(g => g.name));

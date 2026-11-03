@@ -16,7 +16,7 @@ public enum UIWindowId
     Stash = 4,
     /// <summary>The skill book and skill bar loadout (K).</summary>
     Skills = 5,
-    /// <summary>The shared menu for the Heart Tree, portal, residents, altar, repairs and building upgrades.</summary>
+    /// <summary>The shared menu for the portal, portal, residents, altar, repairs and building upgrades.</summary>
     ActionMenu = 6,
     /// <summary>The character screen: worn gear and stats (C).</summary>
     Character = 7,

@@ -14,8 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::QuestDefinition
   id: prologue.find_the_expedition
   displayName: They Are Still Out There
-  description: You heard Sigrid through the dormant stones. Your companions may still be alive. Inspect the portal, establish a foothold beneath the Heart Tree, and use Life Orbs to restore the connection.
+  description: You heard Sigrid through the dormant stones. Your companions may still be alive. Inspect the portal, establish a foothold around it, and use Life Orbs to restore the connection.
   chain: The Lost Expedition
+  availableObjective: 
+  announceStart: 1
+  announceCompletion: 1
+  showTimerInHud: 0
   prerequisites:
   - {fileID: 11400000, guid: a089752e48d75934fb5e34dbeec0b389, type: 2}
   start: 1

@@ -7,7 +7,7 @@ public enum BreachStatus
 {
     /// <summary>The ward holds; nothing threatens the clearing yet.</summary>
     Dormant = 0,
-    /// <summary>The ward is weakening: the player has been warned and can start the defense at the Heart Tree.</summary>
+    /// <summary>The ward is weakening: the player has been warned and can start the defense at the portal.</summary>
     Pending = 1,
     /// <summary>The last breach was beaten back.</summary>
     Won = 2,
@@ -30,11 +30,11 @@ public sealed class ResidentRecord
 
 /// <summary>
 /// The state of Safe Haven as a place, beyond what lies in its scene: whether the portal is repaired, how strong the
-/// Heart Tree's ward is, how many raids the player has come home from, the first ward breach, who lives there with which
+/// Portal's ward is, how many raids the player has come home from, the first ward breach, who lives there with which
 /// job, and the Purification Altar's queue. Plain data owned by GameSession (wiped by New Game, replaced by Load) and
 /// written to saves by SaveMapper.
 /// <para>
-/// Systems change it through the methods here so Changed is raised; UI and scene objects (the portal, the Heart Tree,
+/// Systems change it through the methods here so Changed is raised; UI and scene objects (the portal, the portal,
 /// residents) listen to Changed to update themselves.
 /// </para>
 /// </summary>

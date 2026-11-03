@@ -3,41 +3,42 @@ using System.Text;
 using UnityEngine;
 
 /// <summary>
-/// The Heart Tree (GDD §1.1, §6.1): the ancient protector of the clearing. The player wakes and revives beside it (put a
-/// PlayerArrivalPoint "HeartTree" next to it), its ward is the area where the player may build (BuildPlacer asks
-/// Contains), and talking to it opens a menu to listen to it (it speaks the line for the active First Days quest, so it
-/// guides the player one step at a time), strengthen the ward with Purified Essence (GDD §6.4) and,
-/// when the ward is weakening, begin the defense against a breach (GDD §6.6).
+/// The portal at the heart of Safe Haven (GDD §1.1, §6.1): the old stones that dropped the player here, and what protects the clearing.
+/// The player wakes and revives beside it (put a PlayerArrivalPoint "HomePortal" next to it), its ward is the area where the player may
+/// build (BuildPlacer asks Contains), and using it opens the one menu for all of it: what it says (the line for the active First Days
+/// quest, so it guides the player one step at a time), planning a raid and everything else RaidPortal offers, strengthening the ward with
+/// Purified Essence (GDD §6.4), Portal Sparks at its CraftingStation and, when the ward is weakening, the defense against a breach (GDD §6.6).
 /// <para>
-/// Where it belongs: on the Heart Tree in Safe Haven, next to an Interactable that doesn't deactivate on completion. The
-/// ward radius and upgrade costs live in SettlementSettings; the ward level in SettlementState; the ring shows the ward.
+/// Where it belongs: on the portal in Safe Haven, beside its RaidPortal and a CraftingStation with Opens When Used off, next to an
+/// Interactable that doesn't deactivate on completion. The ward radius and upgrade costs live in SettlementSettings; the ward level in
+/// SettlementState; the ring shows the ward.
 /// </para>
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Interactable))]
-public sealed class HeartTree : MonoBehaviour, IArea, IBuildArea
+public sealed class HomePortal : MonoBehaviour, IArea, IBuildArea
 {
-    /// <summary>What the tree says while a quest is active, so it points the way one step at a time.</summary>
+    /// <summary>What the portal says while a quest is active, so it points the way one step at a time.</summary>
     [System.Serializable]
     public struct QuestWhisper
     {
         public QuestDefinition quest;
         [TextArea(2, 5)] public string text;
-        [Tooltip("Optional: the first time the player talks to the tree during this quest, this Quest Event is raised instead of the menu opening. A Story Script listens for it (When Quest Event) and has the conversation; it raises Talked Event if a quest waits for that.")]
+        [Tooltip("Optional: the first time the player uses the portal during this quest, this Quest Event is raised instead of the menu opening. A Story Script listens for it (When Quest Event) and has the conversation; it raises Talked Event if a quest waits for that.")]
         public GameEventDefinition moment;
     }
 
-    [Tooltip("What the tree says while each quest is active. The last active one in the list wins. When none is active, it whispers the lines below.")]
+    [Tooltip("What the portal says while each quest is active. The last active one in the list wins. When none is active, it whispers the lines below.")]
     [SerializeField] private QuestWhisper[] questWhispers = System.Array.Empty<QuestWhisper>();
-    [Tooltip("What the tree whispers when no quest whisper applies, one line per listen, in order.")]
+    [Tooltip("What the portal whispers when no quest whisper applies, one line per listen, in order.")]
     [SerializeField, TextArea(2, 5)] private string[] whispers =
     {
-        "Warmth stirs in the old bark. <i>Little one... you are safe here, inside my roots. But my strength is thin.</i>",
+        "Warmth stirs in the old stone. <i>Little one... you are safe here, inside my light. But my strength is thin.</i>",
         "<i>Gather what the clearing offers. Wood, stone, berries, water. Build a fire, and a table to work at.</i>",
-        "<i>Three stones still hold my light, choked by cursed roots. Free them, and the old portal may wake.</i>",
-        "<i>Beyond the portal the forest is sick. Go, take what you need, and come home before it closes.</i>",
+        "<i>Three stones still hold my light, choked by cursed roots. Free them, and I may wake.</i>",
+        "<i>Beyond me the forest is sick. Go, take what you need, and come home before the way closes.</i>",
     };
-    [Tooltip("Raised when the player finishes talking to the tree (the menu closes), for quests such as \"Listen to the Heart Tree\".")]
+    [Tooltip("Raised when the player finishes at the portal (the menu closes), for quests such as \"Listen to the portal\".")]
     [SerializeField, RaisedByGame] private GameEventDefinition talkedEvent;
     [Tooltip("Draws the edge of the ward. Optional.")]
     [SerializeField] private LineRenderer wardRing;
@@ -46,12 +47,14 @@ public sealed class HeartTree : MonoBehaviour, IArea, IBuildArea
     [SerializeField, Min(1f)] private float menuRange = 7f;
 
     private Interactable interactable;
+    private RaidPortal raid;
+    private CraftingStation station;
     private int whisperIndex;
 
-    /// <summary>The Heart Tree in the loaded scene, or null outside Safe Haven.</summary>
-    public static HeartTree Current { get; private set; }
+    /// <summary>The portal in the loaded scene, or null outside Safe Haven.</summary>
+    public static HomePortal Current { get; private set; }
 
-    /// <summary>How far from the tree the player may build, at the current ward level.</summary>
+    /// <summary>How far from the portal the player may build, at the current ward level.</summary>
     public float WardRadius => SettlementSettings.Current.WardRadiusAt(GameSession.Settlement.WardLevel)
         + HavenSettings.Current.WardBonusAt(GameSession.Settlement.HavenRank)
         - (GameSession.Settlement.WardStrain > 0 ? WardBreachSettings.Current.StrainRadius : 0f);
@@ -69,7 +72,7 @@ public sealed class HeartTree : MonoBehaviour, IArea, IBuildArea
     // ----- Building (IBuildArea): the ward is where the player builds what they know -----
 
     string IBuildArea.WhyClosed => null;
-    string IBuildArea.Guidance => $"Build inside the Heart Tree's ward ({WardRadius:0} m). ";
+    string IBuildArea.Guidance => $"Build inside the portal's ward ({WardRadius:0} m). ";
     bool IBuildArea.AllowsChanges => true;
     float IBuildArea.GroundHeight => transform.position.y;
 
@@ -91,7 +94,7 @@ public sealed class HeartTree : MonoBehaviour, IArea, IBuildArea
 
     string IBuildArea.CheckSpot(FootprintRect footprint, Vector3 point) =>
         Contains(footprint.WorldCenter(point.y), Mathf.Max(footprint.HalfSize.x, footprint.HalfSize.y))
-            ? null : "Outside the Heart Tree's ward. Build closer to the tree.";
+            ? null : "Outside the portal's ward. Build closer to it.";
 
     string IBuildArea.CheckBuilding(BuildingDefinition building) => null;
 
@@ -103,6 +106,8 @@ public sealed class HeartTree : MonoBehaviour, IArea, IBuildArea
         }
 
         interactable = GetComponent<Interactable>();
+        raid = GetComponent<RaidPortal>();
+        station = GetComponent<CraftingStation>();
         Current = this;
         BuildArea.Enter(this);
     }
@@ -141,12 +146,12 @@ public sealed class HeartTree : MonoBehaviour, IArea, IBuildArea
 
         if (ActionMenuWindow.Current == null)
         {
-            Debug.LogError("The Heart Tree found no ActionMenuWindow in the scene.", this);
+            Debug.LogError("The portal found no ActionMenuWindow in the scene.", this);
             RaiseTalked(user);
             return;
         }
 
-        // Raised when the conversation ends, so the next quest doesn't appear while the tree is still speaking.
+        // Raised when the conversation ends, so the next quest doesn't appear while the portal is still speaking.
         ActionMenuWindow.Current.Open(() => BuildPage(user), user, transform, menuRange, () => RaiseTalked(user));
     }
 
@@ -158,7 +163,7 @@ public sealed class HeartTree : MonoBehaviour, IArea, IBuildArea
         }
     }
 
-    /// <summary>The story moment waiting for the player to talk to the tree, or null. It plays once.</summary>
+    /// <summary>The story moment waiting for the player to use the portal, or null. It plays once.</summary>
     private GameEventDefinition PendingMoment()
     {
         for (int i = questWhispers.Length - 1; i >= 0; i--)
@@ -174,7 +179,7 @@ public sealed class HeartTree : MonoBehaviour, IArea, IBuildArea
         return null;
     }
 
-    /// <summary>The tree's line for the current step of the story, or null when no quest whisper applies.</summary>
+    /// <summary>The portal's line for the current step of the story, or null when no quest whisper applies.</summary>
     private string QuestLine()
     {
         for (int i = questWhispers.Length - 1; i >= 0; i--)
@@ -213,7 +218,7 @@ public sealed class HeartTree : MonoBehaviour, IArea, IBuildArea
         }
 
         UIStyle style = UIStyle.Current;
-        body.Append($"<color={UIStyle.Hex(style.Accent)}>The ward shelters {WardRadius:0} m around the tree. You can build inside it.</color>");
+        body.Append($"<color={UIStyle.Hex(style.Accent)}>The ward shelters {WardRadius:0} m around the portal. You can build inside it.</color>");
         WardBreachDirector breach = WardBreachDirector.Current;
         if (breach != null && breach.IsPending)
         {
@@ -226,7 +231,19 @@ public sealed class HeartTree : MonoBehaviour, IArea, IBuildArea
             body.Append($"\n\n<color={UIStyle.Hex(style.Warning)}>The ward is strained. It will mend after {raids} more successful raid{(raids == 1 ? "" : "s")}.</color>");
         }
 
-        var page = new MenuPage { Title = "The Heart Tree", Body = body.ToString() };
+        if (raid != null && !raid.IsRepaired)
+        {
+            body.Append("\n\n").Append(raid.RuinText);
+        }
+
+        var page = new MenuPage { Title = raid != null && !raid.IsRepaired ? "The Sleeping Portal" : "The Portal", Body = body.ToString() };
+        // What most visits are for comes first: going through it.
+        raid?.AddActions(page, user);
+        if (station != null && station.Usable)
+        {
+            page.Add(new MenuAction("Make Portal Sparks", "Queue them at the portal's own fire", true, () => station.OpenMenu(user), closesMenu: true));
+        }
+
         if (questLine == null && whispers.Length > 1)
         {
             page.Add(new MenuAction("Listen", null, true, () => whisperIndex = (whisperIndex + 1) % whispers.Length));
@@ -269,7 +286,7 @@ public sealed class HeartTree : MonoBehaviour, IArea, IBuildArea
 
         GameSession.Settlement.RaiseWardLevel();
         string opens = settings.WardLevels[level].opens;
-        GameMessages.Post($"The Heart Tree glows brighter. The ward now reaches {WardRadius:0} m.{(string.IsNullOrEmpty(opens) ? "" : " " + opens)}", MessageKind.Gain);
+        GameMessages.Post($"The portal glows brighter. The ward now reaches {WardRadius:0} m.{(string.IsNullOrEmpty(opens) ? "" : " " + opens)}", MessageKind.Gain);
     }
 
     private void DrawWard()

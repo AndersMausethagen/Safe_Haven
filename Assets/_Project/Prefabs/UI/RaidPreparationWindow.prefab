@@ -186,4 +186,4 @@ MonoBehaviour:
   window: {fileID: 1361525038458886817}
   content: {fileID: 2957262971053815022}
   lossSummary: 'Fall or run out of time: materials, food and finds are lost. Gear returns damaged.'
-  lossRules: 'If you fall or time runs out, you wake at the Heart Tree. What you carry is lost: materials, food and anything found in the raid. The tools, weapons and packs you bring return damaged and can be repaired at home. Your home remains safe.'
+  lossRules: 'If you fall or time runs out, you wake at the portal. What you carry is lost: materials, food and anything found in the raid. The tools, weapons and packs you bring return damaged and can be repaired at home. Your home remains safe.'

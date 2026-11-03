@@ -20,7 +20,7 @@ public static class BuildBreaches
     {
         var first = AssetDatabase.LoadAssetAtPath<WardBreachDefinition>(Data + "FirstWardBreach.asset");
         WardBreachDefinition hungry = Breach("HungryDarkBreach", "The Hungry Dark",
-            "The Heart Tree shudders. They have learned where the warmth is, and they are coming for more than you. Mend what you can and set your traps; the marked roads show where they will walk.",
+            "The portal shudders. They have learned where the warmth is, and they are coming for more than you. Mend what you can and set your traps; the marked roads show where they will walk.",
             "They are gathering beyond the ward. When you are ready, I will open it and we will meet them here.",
             "Wolves and rootlings will come",
             "The last of them falls. The ward knits itself closed, and the home stands.",
@@ -41,10 +41,10 @@ public static class BuildBreaches
                 new[] { ("BlightBoar", 2), ("Draug", 2) },
             });
         WardBreachDefinition grudge = Breach("ForestRemembersBreach", "The Forest Remembers",
-            "Every root in the clearing turns toward the Heart Tree. The forest has not forgotten what was taken from it. This will come again and again, each time harder. Prepare.",
+            "Every root in the clearing turns toward the portal. The forest has not forgotten what was taken from it. This will come again and again, each time harder. Prepare.",
             "The forest remembers us. It will not stop. Stand with me when you are ready.",
             "All the forest's anger will come",
-            "It draws back, as a tide does. The Heart Tree burns bright in the quiet.",
+            "It draws back, as a tide does. The portal burns bright in the quiet.",
             "The ward falls dark. The forest takes its due and withdraws to wait.",
             3, 1f, 1f, 6,
             new[]

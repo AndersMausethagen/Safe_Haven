@@ -119,7 +119,7 @@ public static class RaidReportText
                 builder.Append("\n\n<b>Saved in your safe pocket</b>\n").Append(List(report.ItemsGained, report.ResourcesGained, "+", Gain));
             }
 
-            builder.Append($"\n\n<color={Muted}>You woke at the Heart Tree. Your safe pocket, recipes and discoveries are kept. Your storage is untouched.</color>");
+            builder.Append($"\n\n<color={Muted}>You woke at the portal. Your safe pocket, recipes and discoveries are kept. Your storage is untouched.</color>");
         }
 
         return builder.ToString();

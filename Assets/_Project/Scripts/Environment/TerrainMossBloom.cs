@@ -5,7 +5,7 @@ using UnityEngine;
 /// <summary>
 /// Paints the Terrain Moss layer in a circle around this object: <see cref="Bloom"/> spreads it outward with a sound
 /// and particles, <see cref="BloomInstantly"/> jumps to the end state (use it as a listener's on-load response). By
-/// default the circle follows the Heart Tree's ward and grows again when the ward levels up. In Play mode it paints a
+/// default the circle follows the portal's ward and grows again when the ward levels up. In Play mode it paints a
 /// runtime copy of the terrain data, so the terrain asset on disk is never changed and the moss is rebuilt each load.
 /// </summary>
 [AddComponentMenu("Safe Haven/Environment/Terrain Moss Bloom")]
@@ -16,7 +16,7 @@ public sealed class TerrainMossBloom : MonoBehaviour
 
     [Tooltip("Leave empty to use the first Terrain Moss in the scene.")]
     [SerializeField] private TerrainMoss moss;
-    [Tooltip("Use the Heart Tree's ward radius (and grow when the ward levels up) instead of the fixed radius.")]
+    [Tooltip("Use the portal's ward radius (and grow when the ward levels up) instead of the fixed radius.")]
     [SerializeField] private bool followWardRadius = true;
     [SerializeField, Min(0.5f)] private float radius = 12f;
     [Tooltip("Width of the soft fade at the circle's edge, in metres.")]
@@ -42,7 +42,7 @@ public sealed class TerrainMossBloom : MonoBehaviour
     public float PaintedRadius => paintedRadius;
 
     /// <summary>The circle's full radius right now.</summary>
-    public float TargetRadius => followWardRadius && HeartTree.Current != null ? HeartTree.Current.WardRadius : radius;
+    public float TargetRadius => followWardRadius && HomePortal.Current != null ? HomePortal.Current.WardRadius : radius;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetStatics()

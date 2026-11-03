@@ -10,7 +10,7 @@ using UnityEngine.Splines;
 
 /// <summary>
 /// Safe Haven's ground made again with the World Builder (`unity command run_script --file AgentScripts/BuildHavenWorld.cs
-/// --entry BuildHavenWorld.Apply`): one 400 m terrain round the Heart Tree in the Haven look (meadow paint rules, rock on
+/// --entry BuildHavenWorld.Apply`): one 400 m terrain round the portal in the Haven look (meadow paint rules, rock on
 /// steep ground, grass). The clearing stays flat; gentle hills roll outward and the land rises to the north into a
 /// terrace with a crag. A Haven river runs past the east of the base (the drinking spot on its bank), two Haven paths
 /// lead out (north-west up the slope from the portal, east over a ford), and Haven groves ring the clearing. Everything
@@ -80,7 +80,7 @@ public static class BuildHavenWorld
         string[] skip = { "Clearing", "Directional Light", "Global Volume", "Main Camera", "Player Cinemachine Camera", "GameStateManager", "NavMesh",
             "SaveHotkeys", "Persistent Scene", "Scene Audio", "UI Root", "Sky and Weather", "Atmosphere", "Night Prowlers", "Prologue Homecoming",
             "Forest Wind", "World", "Stream" };
-        string[] groups = { "Portal", "Gathering", "Tier 0 Forage", "Overgrowth", "Residents", "Ward Breach", "Clearing", "Heart Tree Bloom" };
+        string[] groups = { "Portal", "Gathering", "Tier 0 Forage", "Overgrowth", "Residents", "Ward Breach", "Clearing", "Portal Bloom" };
         var targets = new List<Transform>();
         foreach (GameObject root in scene.GetRootGameObjects())
         {

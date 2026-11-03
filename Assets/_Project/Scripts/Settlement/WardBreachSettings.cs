@@ -23,7 +23,7 @@ public sealed class WardBreachSettings : GameSettings<WardBreachSettings>
     [Header("The defense")]
     [Tooltip("Where attackers set out from, in metres beyond the edge of the ward.")]
     [SerializeField, Min(1f)] private float laneDistance = 16f;
-    [Tooltip("The Heart Tree's ward in a fight: what the attackers wear down. It needs a Damageable that isn't destroyed on death.")]
+    [Tooltip("The portal's ward in a fight: what the attackers wear down. It needs a Damageable that isn't destroyed on death.")]
     [SerializeField] private Damageable wardAnchor;
     [Tooltip("Share more health the ward has in a fight for each ward level.")]
     [SerializeField, Min(0f)] private float wardHealthPerLevel = 0.15f;

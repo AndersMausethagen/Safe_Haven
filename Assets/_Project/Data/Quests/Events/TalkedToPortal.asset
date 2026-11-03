@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 93223f1186c87c843a8dc266465485b0, type: 3}
-  m_Name: TalkedToHeartTree
+  m_Name: TalkedToPortal
   m_EditorClassIdentifier: Assembly-CSharp::GameEventDefinition
   id: talkedtohearttree
-  displayName: Talked to the Heart Tree
-  objectiveText: Listen to the Heart Tree
-  notes: Raised by the HeartTree every time the player talks to it.
+  displayName: Talked to the portal
+  objectiveText: Listen to the portal
+  notes: Raised by the HomePortal every time the player talks to it.

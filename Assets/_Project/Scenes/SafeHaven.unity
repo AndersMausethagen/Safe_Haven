@@ -3633,96 +3633,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5503805453922757238, guid: 8068e63c19e557943b162b67081918e2, type: 3}
   m_PrefabInstance: {fileID: 57500131}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &57793253
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 57793254}
-  - component: {fileID: 57793256}
-  - component: {fileID: 57793255}
-  m_Layer: 0
-  m_Name: Canopy 3
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &57793254
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 57793253}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2, y: 8.1, z: -1.2}
-  m_LocalScale: {x: 5.2, y: 3.8, z: 5.2}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1522981859}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!23 &57793255
-MeshRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 57793253}
-  m_Enabled: 1
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
-  m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_ForceMeshLod: -1
-  m_MeshLodSelectionBias: 0
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 2100000, guid: 08c1ceb1f4dc81f4290dce975a59f015, type: 2}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 1
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_MaskInteraction: 0
-  m_AdditionalVertexStreams: {fileID: 0}
---- !u!33 &57793256
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 57793253}
-  m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1001 &58624529
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -9356,96 +9266,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1773906585484158302, guid: e8fceb51496e6f54d9b907469336cdd4, type: 3}
   m_PrefabInstance: {fileID: 133530732}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &133887460
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 133887461}
-  - component: {fileID: 133887463}
-  - component: {fileID: 133887462}
-  m_Layer: 0
-  m_Name: Canopy
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &133887461
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 133887460}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 8.8, z: 0}
-  m_LocalScale: {x: 8, y: 5, z: 8}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1522981859}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!23 &133887462
-MeshRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 133887460}
-  m_Enabled: 1
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
-  m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_ForceMeshLod: -1
-  m_MeshLodSelectionBias: 0
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 2100000, guid: 08c1ceb1f4dc81f4290dce975a59f015, type: 2}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 1
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_MaskInteraction: 0
-  m_AdditionalVertexStreams: {fileID: 0}
---- !u!33 &133887463
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 133887460}
-  m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &134795278
 GameObject:
   m_ObjectHideFlags: 0
@@ -12557,6 +12377,11 @@ PrefabInstance:
 Transform:
   m_CorrespondingSourceObject: {fileID: 6823508709237617683, guid: fcb7e142faedd2343a8c660c974b209c, type: 3}
   m_PrefabInstance: {fileID: 141425316}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &141881884 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6354168354907805660, guid: 83e508b71ba177149a0f08689ff8aea4, type: 3}
+  m_PrefabInstance: {fileID: 1038728946}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &142358996
 PrefabInstance:
@@ -19020,6 +18845,118 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5503805453922757238, guid: 8068e63c19e557943b162b67081918e2, type: 3}
   m_PrefabInstance: {fileID: 215330874}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &218794452
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 218794453}
+  - component: {fileID: 218794456}
+  - component: {fileID: 218794455}
+  - component: {fileID: 218794454}
+  m_Layer: 0
+  m_Name: Sleeping Stones
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &218794453
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 218794452}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1.7148225, y: 1.5743551, z: 1.3042458}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 141881884}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &218794454
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 218794452}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.8419111, y: 1.9731362, z: 0.7572737}
+  m_Center: {x: 0, y: 0.9865681, z: 0}
+--- !u!23 &218794455
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 218794452}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 8f8508aee76b0ae40b81b14024b2fe2e, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &218794456
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 218794452}
+  m_Mesh: {fileID: -780830572462372624, guid: a7ed8451c774159429f5d83eb83c8d4f, type: 3}
 --- !u!1001 &219965509
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -23986,96 +23923,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6823508709237617683, guid: fcb7e142faedd2343a8c660c974b209c, type: 3}
   m_PrefabInstance: {fileID: 285025906}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &286615495
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 286615496}
-  - component: {fileID: 286615498}
-  - component: {fileID: 286615497}
-  m_Layer: 0
-  m_Name: Root 0
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &286615496
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 286615495}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0.4055798, y: 0.579228, z: -0.4055798, w: 0.579228}
-  m_LocalPosition: {x: 1.4, y: 0.3, z: 0}
-  m_LocalScale: {x: 0.55, y: 0.9, z: 0.55}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1522981859}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!23 &286615497
-MeshRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 286615495}
-  m_Enabled: 1
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
-  m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_ForceMeshLod: -1
-  m_MeshLodSelectionBias: 0
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 2100000, guid: 96cfef7a8a055d54fb877c59de29abad, type: 2}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 1
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_MaskInteraction: 0
-  m_AdditionalVertexStreams: {fileID: 0}
---- !u!33 &286615498
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 286615495}
-  m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1001 &288711125
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -25385,7 +25232,7 @@ MonoBehaviour:
       data:
         id: 6d7a22b23e4f448bb7ddf0dbcc2ce2cb
         position: {x: 640, y: 60}
-        target: {fileID: 1522981859}
+        target: {fileID: 1038728947}
         glow: 1
         colour: {r: 1, g: 0.72, b: 0.38, a: 1}
         intensity: 8
@@ -25397,7 +25244,7 @@ MonoBehaviour:
         id: ef8e024577384f1d84b33ee992c6614e
         position: {x: 640, y: 230}
         sound: {fileID: 11400000, guid: c08cfff61a51d7442a93c4dae8255955, type: 2}
-        at: {fileID: 1522981859}
+        at: {fileID: 1038728947}
     - rid: 287758281410609321
       type: {class: SayNode, ns: , asm: SafeHaven}
       data:
@@ -25405,10 +25252,10 @@ MonoBehaviour:
         position: {x: 640, y: 400}
         speaker:
           player: 0
-          name: The Heart Tree
+          name: The Portal
           model: {fileID: 0}
           portrait: {fileID: 0}
-        line: <i>There. A hearth under my branches, after a hundred winters.</i>
+        line: <i>There. A hearth beside my stones, after a hundred winters.</i>
         afterFightPause: 1
     - rid: 287758281410609322
       type: {class: SayNode, ns: , asm: SafeHaven}
@@ -25417,7 +25264,7 @@ MonoBehaviour:
         position: {x: 940, y: 60}
         speaker:
           player: 0
-          name: The Heart Tree
+          name: The Portal
           model: {fileID: 0}
           portrait: {fileID: 0}
         line: <i>Do you feel that? The ward has remembered what it is for. And far out in the mist, little one, someone has stopped walking and turned to look.</i>
@@ -25427,7 +25274,7 @@ MonoBehaviour:
       data:
         id: 5f82fa4167454b06b08f5a438e7ddf24
         position: {x: 1240, y: 60}
-        target: {fileID: 1522981859}
+        target: {fileID: 1038728947}
         glow: 0
         colour: {r: 0.55, g: 0.85, b: 1, a: 1}
         intensity: 4
@@ -26400,12 +26247,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 313313492}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: 0, y: -1, z: -0, w: -0.00000004371139}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.6666667, y: 0.6666667, z: 0.6666667}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1522981859}
+  m_Father: {fileID: 1038728947}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &313680368
 PrefabInstance:
@@ -30848,7 +30695,7 @@ MonoBehaviour:
         position: {x: 640, y: 60}
         speaker:
           player: 0
-          name: The Heart Tree
+          name: The Portal
           model: {fileID: 0}
           portrait: {fileID: 0}
         line: <i>Listen. Far to the north, past the troll country, a hammer on stone. Three beats and a rest, over and over. Someone out there has seen your light and is answering it.</i>
@@ -30872,7 +30719,7 @@ MonoBehaviour:
         position: {x: 1240, y: 60}
         speaker:
           player: 0
-          name: The Heart Tree
+          name: The Portal
           model: {fileID: 0}
           portrait: {fileID: 0}
         line: <i>Then he is still himself. The way north is not open yet. Grow strong, little one, and keep this fire high. He can hold on a long while now.</i>
@@ -31569,6 +31416,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 499903846}
     m_Modifications:
+    - target: {fileID: 89642033151183284, guid: 0fe564bf746ab6a4981ab527c459bf3a, type: 3}
+      propertyPath: lockedText
+      value: Cursed roots hold it fast. The portal may know a way.
+      objectReference: {fileID: 0}
     - target: {fileID: 459348204992816425, guid: 0fe564bf746ab6a4981ab527c459bf3a, type: 3}
       propertyPath: m_LocalPosition.x
       value: 4
@@ -32644,96 +32495,6 @@ Transform:
   - {fileID: 99752927}
   m_Father: {fileID: 1572364281}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &399880314
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 399880315}
-  - component: {fileID: 399880317}
-  - component: {fileID: 399880316}
-  m_Layer: 0
-  m_Name: Root 1
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &399880315
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 399880314}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0.5664862, y: 0.1284013, z: -0.08990756, w: 0.80902606}
-  m_LocalPosition: {x: 0.43347186, y: 0.3, z: 1.3312032}
-  m_LocalScale: {x: 0.55, y: 0.9, z: 0.55}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1522981859}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!23 &399880316
-MeshRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 399880314}
-  m_Enabled: 1
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
-  m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_ForceMeshLod: -1
-  m_MeshLodSelectionBias: 0
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 2100000, guid: 96cfef7a8a055d54fb877c59de29abad, type: 2}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 1
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_MaskInteraction: 0
-  m_AdditionalVertexStreams: {fileID: 0}
---- !u!33 &399880317
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 399880314}
-  m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1001 &404465028
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -44498,6 +44259,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 499903846}
     m_Modifications:
+    - target: {fileID: 89642033151183284, guid: 0fe564bf746ab6a4981ab527c459bf3a, type: 3}
+      propertyPath: lockedText
+      value: Cursed roots hold it fast. The portal may know a way.
+      objectReference: {fileID: 0}
     - target: {fileID: 459348204992816425, guid: 0fe564bf746ab6a4981ab527c459bf3a, type: 3}
       propertyPath: m_LocalPosition.x
       value: 24
@@ -78048,16 +77813,28 @@ PrefabInstance:
     m_TransformParent: {fileID: 1313309936}
     m_Modifications:
     - target: {fileID: 557135111737939404, guid: 83e508b71ba177149a0f08689ff8aea4, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 557135111737939404, guid: 83e508b71ba177149a0f08689ff8aea4, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 557135111737939404, guid: 83e508b71ba177149a0f08689ff8aea4, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 557135111737939404, guid: 83e508b71ba177149a0f08689ff8aea4, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -12
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 557135111737939404, guid: 83e508b71ba177149a0f08689ff8aea4, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.030076385
+      value: -0.007980704
       objectReference: {fileID: 0}
     - target: {fileID: 557135111737939404, guid: 83e508b71ba177149a0f08689ff8aea4, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 29
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 557135111737939404, guid: 83e508b71ba177149a0f08689ff8aea4, type: 3}
       propertyPath: m_LocalRotation.w
@@ -78087,13 +77864,29 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 585206471751092122, guid: 83e508b71ba177149a0f08689ff8aea4, type: 3}
+      propertyPath: menuRange
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 585206471751092122, guid: 83e508b71ba177149a0f08689ff8aea4, type: 3}
+      propertyPath: opensWhenUsed
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2714268442062469964, guid: 83e508b71ba177149a0f08689ff8aea4, type: 3}
+      propertyPath: range
+      value: 2.2
+      objectReference: {fileID: 0}
     - target: {fileID: 3995415526987974039, guid: 83e508b71ba177149a0f08689ff8aea4, type: 3}
       propertyPath: ruinText
       value: The stones that dropped you here, cracked and cold. A faint hum lingers in them, and under it a voice you know. Life Orbs might wake them.
       objectReference: {fileID: 0}
     - target: {fileID: 3995415526987974039, guid: 83e508b71ba177149a0f08689ff8aea4, type: 3}
+      propertyPath: windowRange
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 3995415526987974039, guid: 83e508b71ba177149a0f08689ff8aea4, type: 3}
       propertyPath: repairLockedText
-      value: Cold, silent stones. Free the Heart Tree's light first.
+      value: Cold, silent stones. They need their light back first.
       objectReference: {fileID: 0}
     - target: {fileID: 3995415526987974039, guid: 83e508b71ba177149a0f08689ff8aea4, type: 3}
       propertyPath: preparationWindow
@@ -78114,10 +77907,31 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 557135111737939404, guid: 83e508b71ba177149a0f08689ff8aea4, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1433688874}
+    - targetCorrespondingSourceObject: {fileID: 557135111737939404, guid: 83e508b71ba177149a0f08689ff8aea4, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1871047932}
+    - targetCorrespondingSourceObject: {fileID: 557135111737939404, guid: 83e508b71ba177149a0f08689ff8aea4, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 313313494}
+    - targetCorrespondingSourceObject: {fileID: 557135111737939404, guid: 83e508b71ba177149a0f08689ff8aea4, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1079383657}
+    - targetCorrespondingSourceObject: {fileID: 6354168354907805660, guid: 83e508b71ba177149a0f08689ff8aea4, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 218794453}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 9200326555112114397, guid: 83e508b71ba177149a0f08689ff8aea4, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1038728951}
+    - targetCorrespondingSourceObject: {fileID: 9200326555112114397, guid: 83e508b71ba177149a0f08689ff8aea4, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1038728954}
+    - targetCorrespondingSourceObject: {fileID: 9200326555112114397, guid: 83e508b71ba177149a0f08689ff8aea4, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1038728953}
+    - targetCorrespondingSourceObject: {fileID: 9200326555112114397, guid: 83e508b71ba177149a0f08689ff8aea4, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1038728952}
     - targetCorrespondingSourceObject: {fileID: 2631579319318482730, guid: 83e508b71ba177149a0f08689ff8aea4, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1038728949}
@@ -78186,6 +78000,94 @@ MonoBehaviour:
   requires:
     quest: {fileID: 0}
     requirement: 0
+--- !u!114 &1038728952
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1038728950}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6501044ae7c61614e92b98909fef8e09, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::VisibilitySource
+  radius: 4
+  softness: 0.3
+  reveals: 1
+  revealRadius: 20
+  followsWard: 1
+  isLight: 1
+--- !u!114 &1038728953
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1038728950}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a3c62a4f63f17bc4f8fd561f98026def, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HomeRevival
+  delay: 3
+  healthOnWaking: 1
+  fallenText: You fall... and the portal's light pulls you back home.
+--- !u!114 &1038728954
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1038728950}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15a260b2b7c4f264f890791a63a9db9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HeartTree
+  questWhispers:
+  - quest: {fileID: 11400000, guid: 00e21ff059394a4459d8cec92bc2d489, type: 2}
+    text: <i>Listen, little one. Rest your hand on the stone.</i>
+    moment: {fileID: 11400000, guid: 3795709c84a5d1f4fa37ecf3e7b170a1, type: 2}
+  - quest: {fileID: 11400000, guid: 09a9774284d0e6c44a03b94ad09483f7, type: 2}
+    text: <i>Start with what the clearing gives. Fallen branches, loose stones, your own two hands. That is how every hearth began. Your resource bars (I) will fill.</i>
+    moment: {fileID: 0}
+  - quest: {fileID: 11400000, guid: f89173a9aeb790c4f9aeb1cc56e0e655, type: 2}
+    text: <i>Build your fire inside my ward, and a table to work at beside it. Open the build menu (G). The sooner it burns, the sooner they can see it.</i>
+    moment: {fileID: 0}
+  - quest: {fileID: 11400000, guid: 9ffed2822f546824fa97d9d34216d5d5, type: 2}
+    text: <i>Now feed yourself. Berries, water from the stream, a stew over your fire. You will be walking people home.</i>
+    moment: {fileID: 0}
+  - quest: {fileID: 11400000, guid: 8fd8f4db8a0b4d74cb71c5b4837010ac, type: 2}
+    text: <i>The forest has put its roots in even here. Three stones around the clearing still hold my light, choked and cold. Free them, and bring the Life Orbs back.</i>
+    moment: {fileID: 0}
+  - quest: {fileID: 11400000, guid: 2614c1d189f3a034691f98f3d3efeee0, type: 2}
+    text: <i>Now bring me what you freed. Feed me that light and I will open for you, as I did in the dark.</i>
+    moment: {fileID: 0}
+  - quest: {fileID: 11400000, guid: 08ed06b5fb8d1854c86788aa2a00156f, type: 2}
+    text: <i>Make yourself tools and go. Take what the woods will give you, and come home before the way closes. It will not wait, and neither will the wolves.</i>
+    moment: {fileID: 0}
+  - quest: {fileID: 11400000, guid: f7e615034e347bc438f7fdf1f08bd615, type: 2}
+    text: <i>She is close, little one. Just beyond me, off the path, hiding. Find her, keep her near you, and bring her through.</i>
+    moment: {fileID: 0}
+  - quest: {fileID: 11400000, guid: b95103f99c217d3489eb46bd97d706d8, type: 2}
+    text: '<i>One fire brought Ingrid home. The others will want more than a fire: a bench, a furnace, a dry place to set down what they carry. Build what they will need.</i>'
+    moment: {fileID: 0}
+  - quest: {fileID: 11400000, guid: fea0201f13773f04a96efbcb5b364ea9, type: 2}
+    text: <i>The light that reached her reached other things as well. They are on the old path now, testing me. Prepare yourself. When you are ready, tell me, and I will let them come.</i>
+    moment: {fileID: 0}
+  - quest: {fileID: 11400000, guid: 95972d06dba0fda4bb5e87bc047956d1, type: 2}
+    text: <i>The brighter this place burns, the further it can be seen. Build. Clear the old growth. Give them something worth walking towards.</i>
+    moment: {fileID: 0}
+  whispers:
+  - <i>Every hearth in my light is a little more of the old pact kept.</i>
+  - <i>The forest cannot forget a place that someone tends.</i>
+  - <i>I listen for your people every night. Some nights I hear them.</i>
+  - <i>A hundred winters I kept this clearing alone. I had forgotten how loud a home is. Do not stop.</i>
+  talkedEvent: {fileID: 11400000, guid: c06332984c04ae244b8513b7d0e6178c, type: 2}
+  wardRing: {fileID: 313313493}
+  ringSegments: 96
+  menuRange: 8
 --- !u!1001 &1039001615
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -80581,7 +80483,7 @@ GameObject:
   - component: {fileID: 1079383657}
   - component: {fileID: 1079383658}
   m_Layer: 0
-  m_Name: 'Arrival: Heart Tree'
+  m_Name: 'Arrival: Home Portal'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -80595,12 +80497,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1079383656}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: 1, z: -0, w: -0.00000004371139}
-  m_LocalPosition: {x: 0, y: 0, z: -3.6}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.00000020981467, y: 0, z: 2.4}
+  m_LocalScale: {x: 0.6666667, y: 0.6666667, z: 0.6666667}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1522981859}
+  m_Father: {fileID: 1038728947}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1079383658
 MonoBehaviour:
@@ -80614,7 +80516,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed082aaa20097cb4aa50eed96ec7dbed, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerArrivalPoint
-  id: HeartTree
+  id: HomePortal
 --- !u!1001 &1079394648
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -80993,6 +80895,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 499903846}
     m_Modifications:
+    - target: {fileID: 89642033151183284, guid: 0fe564bf746ab6a4981ab527c459bf3a, type: 3}
+      propertyPath: lockedText
+      value: Cursed roots hold it fast. The portal may know a way.
+      objectReference: {fileID: 0}
     - target: {fileID: 459348204992816425, guid: 0fe564bf746ab6a4981ab527c459bf3a, type: 3}
       propertyPath: m_LocalPosition.x
       value: -22
@@ -81276,96 +81182,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3037297742660676365, guid: 44f27b25762228b4fb447f248a34b0ed, type: 3}
   m_PrefabInstance: {fileID: 1086203120}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1087262834
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1087262835}
-  - component: {fileID: 1087262837}
-  - component: {fileID: 1087262836}
-  m_Layer: 0
-  m_Name: Trunk
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1087262835
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1087262834}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 3.5, z: 0}
-  m_LocalScale: {x: 2.2, y: 3.5, z: 2.2}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1522981859}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!23 &1087262836
-MeshRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1087262834}
-  m_Enabled: 1
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
-  m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_ForceMeshLod: -1
-  m_MeshLodSelectionBias: 0
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 2100000, guid: 96cfef7a8a055d54fb877c59de29abad, type: 2}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 1
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_MaskInteraction: 0
-  m_AdditionalVertexStreams: {fileID: 0}
---- !u!33 &1087262837
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1087262834}
-  m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1001 &1087637063
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -89510,96 +89326,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5503805453922757238, guid: 8068e63c19e557943b162b67081918e2, type: 3}
   m_PrefabInstance: {fileID: 1203908148}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1204828337
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1204828338}
-  - component: {fileID: 1204828340}
-  - component: {fileID: 1204828339}
-  m_Layer: 0
-  m_Name: Root 2
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1204828338
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1204828337}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0.5112261, y: -0.37142223, z: 0.26007265, w: 0.7301066}
-  m_LocalPosition: {x: -1.1315744, y: 0.3, z: 0.8243417}
-  m_LocalScale: {x: 0.55, y: 0.9, z: 0.55}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1522981859}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!23 &1204828339
-MeshRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1204828337}
-  m_Enabled: 1
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
-  m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_ForceMeshLod: -1
-  m_MeshLodSelectionBias: 0
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 2100000, guid: 96cfef7a8a055d54fb877c59de29abad, type: 2}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 1
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_MaskInteraction: 0
-  m_AdditionalVertexStreams: {fileID: 0}
---- !u!33 &1204828340
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1204828337}
-  m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1001 &1205093193
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -89674,96 +89400,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7898658948651923031, guid: e1c93886323fbc949bd6686622f45f6b, type: 3}
   m_PrefabInstance: {fileID: 1205093193}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1205351380
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1205351381}
-  - component: {fileID: 1205351383}
-  - component: {fileID: 1205351382}
-  m_Layer: 0
-  m_Name: Root 4
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1205351381
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1205351380}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0.08900525, y: -0.80922955, z: 0.56662863, w: -0.12711267}
-  m_LocalPosition: {x: 0.42922965, y: 0.3, z: -1.3325771}
-  m_LocalScale: {x: 0.55, y: 0.9, z: 0.55}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1522981859}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!23 &1205351382
-MeshRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1205351380}
-  m_Enabled: 1
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
-  m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_ForceMeshLod: -1
-  m_MeshLodSelectionBias: 0
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 2100000, guid: 96cfef7a8a055d54fb877c59de29abad, type: 2}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 1
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_MaskInteraction: 0
-  m_AdditionalVertexStreams: {fileID: 0}
---- !u!33 &1205351383
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1205351380}
-  m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1001 &1207007535
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -94288,96 +93924,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5136407152241708498, guid: c7daa8f2fb6ef9c4a945c9f5c8b89e3b, type: 3}
   m_PrefabInstance: {fileID: 1256769039}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1257467704
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1257467705}
-  - component: {fileID: 1257467707}
-  - component: {fileID: 1257467706}
-  m_Layer: 0
-  m_Name: Root 3
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1257467705
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1257467704}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0.26088646, y: -0.7295141, z: 0.5108113, w: 0.37258446}
-  m_LocalPosition: {x: -1.1341944, y: 0.3, z: -0.8207333}
-  m_LocalScale: {x: 0.55, y: 0.9, z: 0.55}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1522981859}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!23 &1257467706
-MeshRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1257467704}
-  m_Enabled: 1
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
-  m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_ForceMeshLod: -1
-  m_MeshLodSelectionBias: 0
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 2100000, guid: 96cfef7a8a055d54fb877c59de29abad, type: 2}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 1
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_MaskInteraction: 0
-  m_AdditionalVertexStreams: {fileID: 0}
---- !u!33 &1257467707
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1257467704}
-  m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1001 &1258379224
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -109032,6 +108578,7 @@ MonoBehaviour:
   quest: {fileID: 11400000, guid: 84d6a79cd30dba342ae6ae24a0109f98, type: 2}
   objective: 0
   label: Portal
+  when: 0
 --- !u!1001 &1433749567
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -116299,208 +115846,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4758368246941869453, guid: beb9b14454a02834e9de5e490fde784c, type: 3}
   m_PrefabInstance: {fileID: 1522659716}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1522981853
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1522981859}
-  - component: {fileID: 1522981858}
-  - component: {fileID: 1522981857}
-  - component: {fileID: 1522981856}
-  - component: {fileID: 1522981855}
-  - component: {fileID: 1522981854}
-  - component: {fileID: 1522981860}
-  m_Layer: 0
-  m_Name: Heart Tree
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!208 &1522981854
-NavMeshObstacle:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1522981853}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Shape: 0
-  m_Extents: {x: 1.4, y: 2.5, z: 1.4}
-  m_MoveThreshold: 0.1
-  m_Carve: 1
-  m_CarveOnlyStationary: 1
-  m_Center: {x: 0, y: 2.5, z: 0}
-  m_TimeToStationary: 0.5
---- !u!114 &1522981855
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1522981853}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a3c62a4f63f17bc4f8fd561f98026def, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::HomeRevival
-  delay: 3
-  healthOnWaking: 1
-  fallenText: You fall... and the Heart Tree's light pulls you back home.
---- !u!114 &1522981856
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1522981853}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 15a260b2b7c4f264f890791a63a9db9b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::HeartTree
-  questWhispers:
-  - quest: {fileID: 11400000, guid: 00e21ff059394a4459d8cec92bc2d489, type: 2}
-    text: <i>Listen, little one. Rest your hand on the bark.</i>
-    moment: {fileID: 11400000, guid: 3795709c84a5d1f4fa37ecf3e7b170a1, type: 2}
-  - quest: {fileID: 11400000, guid: 09a9774284d0e6c44a03b94ad09483f7, type: 2}
-    text: <i>Start with what the clearing gives. Fallen branches, loose stones, your own two hands. That is how every hearth began. Your resource bars (I) will fill.</i>
-    moment: {fileID: 0}
-  - quest: {fileID: 11400000, guid: f89173a9aeb790c4f9aeb1cc56e0e655, type: 2}
-    text: <i>Build your fire inside my ward, and a table to work at beside it. Open the build menu (G). The sooner it burns, the sooner they can see it.</i>
-    moment: {fileID: 0}
-  - quest: {fileID: 11400000, guid: 9ffed2822f546824fa97d9d34216d5d5, type: 2}
-    text: <i>Now feed yourself. Berries, water from the stream, a stew over your fire. You will be walking people home.</i>
-    moment: {fileID: 0}
-  - quest: {fileID: 11400000, guid: 8fd8f4db8a0b4d74cb71c5b4837010ac, type: 2}
-    text: <i>The forest has put its roots in even here. Three stones around the clearing still hold my light, choked and cold. Free them, and bring the Life Orbs back.</i>
-    moment: {fileID: 0}
-  - quest: {fileID: 11400000, guid: 2614c1d189f3a034691f98f3d3efeee0, type: 2}
-    text: <i>Now the door, across the stream. Feed it my light and it will open for you, as it did in the dark.</i>
-    moment: {fileID: 0}
-  - quest: {fileID: 11400000, guid: 08ed06b5fb8d1854c86788aa2a00156f, type: 2}
-    text: <i>Make yourself tools and go. Take what the woods will give you, and come home before the door closes. It will not wait, and neither will the wolves.</i>
-    moment: {fileID: 0}
-  - quest: {fileID: 11400000, guid: f7e615034e347bc438f7fdf1f08bd615, type: 2}
-    text: <i>She is close, little one. Just past the door, off the path, hiding. Find her, keep her near you, and bring her through.</i>
-    moment: {fileID: 0}
-  - quest: {fileID: 11400000, guid: b95103f99c217d3489eb46bd97d706d8, type: 2}
-    text: '<i>One fire brought Ingrid home. The others will want more than a fire: a bench, a furnace, a dry place to set down what they carry. Build what they will need.</i>'
-    moment: {fileID: 0}
-  - quest: {fileID: 11400000, guid: fea0201f13773f04a96efbcb5b364ea9, type: 2}
-    text: <i>The light that reached her reached other things as well. They are on the old path now, testing me. Prepare yourself. When you are ready, tell me, and I will let them come.</i>
-    moment: {fileID: 0}
-  - quest: {fileID: 11400000, guid: 95972d06dba0fda4bb5e87bc047956d1, type: 2}
-    text: <i>The brighter this place burns, the further it can be seen. Build. Clear the old growth. Give them something worth walking towards.</i>
-    moment: {fileID: 0}
-  whispers:
-  - <i>Every hearth under my branches is a little more of the old pact kept.</i>
-  - <i>The forest cannot forget a place that someone tends.</i>
-  - <i>I listen for your people every night. Some nights I hear them.</i>
-  - <i>A hundred winters I kept this clearing alone. I had forgotten how loud a home is. Do not stop.</i>
-  talkedEvent: {fileID: 11400000, guid: c06332984c04ae244b8513b7d0e6178c, type: 2}
-  wardRing: {fileID: 313313493}
-  ringSegments: 96
-  menuRange: 7
---- !u!114 &1522981857
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1522981853}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f655434a56283ac419a02d53bb587f9e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Interactable
-  animationType: 0
-  duration: 0.3
-  range: 1.8
-  deactivateOnComplete: 0
-  kind: 1
-  started:
-    m_PersistentCalls:
-      m_Calls: []
-  completed:
-    m_PersistentCalls:
-      m_Calls: []
-  cancelled:
-    m_PersistentCalls:
-      m_Calls: []
---- !u!136 &1522981858
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1522981853}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 1.3
-  m_Height: 7
-  m_Direction: 1
-  m_Center: {x: 0, y: 3.5, z: 0}
---- !u!4 &1522981859
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1522981853}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.007980704, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1087262835}
-  - {fileID: 286615496}
-  - {fileID: 399880315}
-  - {fileID: 1204828338}
-  - {fileID: 1257467705}
-  - {fileID: 1205351381}
-  - {fileID: 133887461}
-  - {fileID: 2003785784}
-  - {fileID: 57793254}
-  - {fileID: 1871047932}
-  - {fileID: 313313494}
-  - {fileID: 1079383657}
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1522981860
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1522981853}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6501044ae7c61614e92b98909fef8e09, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: SafeHaven::VisibilitySource
-  radius: 4
-  softness: 0.3
-  reveals: 1
-  revealRadius: 20
-  followsWard: 1
-  isLight: 1
 --- !u!1001 &1523951224
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -117180,7 +116525,7 @@ GameObject:
   - component: {fileID: 1532415261}
   - component: {fileID: 1532415260}
   m_Layer: 0
-  m_Name: Heart Tree Bloom
+  m_Name: Portal Bloom
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -117268,7 +116613,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::GameEventTrigger
   gameEvent: {fileID: 11400000, guid: 1f41472694654b946a93bec725e2174e, type: 2}
   when: 3
-  area: {fileID: 1522981856}
+  area: {fileID: 1038728954}
   repeat: 2
   onlyDuringQuest: {fileID: 0}
   requires:
@@ -120971,10 +120316,10 @@ MonoBehaviour:
         position: {x: 940, y: 60}
         speaker:
           player: 0
-          name: The Heart Tree
+          name: The Portal
           model: {fileID: 0}
           portrait: {fileID: 0}
-        line: <i>The stones have gone quiet, but she is right. One spark burns close, just past the door, hiding from the wolves. Make yourself tools, and go.</i>
+        line: <i>My stones have gone quiet, but she is right. One spark burns close, just beyond me, hiding from the wolves. Make yourself tools, and go.</i>
         afterFightPause: 1
 --- !u!114 &1577933051
 MonoBehaviour:
@@ -141315,7 +140660,7 @@ GameObject:
   - component: {fileID: 1871047933}
   - component: {fileID: 1871047934}
   m_Layer: 0
-  m_Name: Heart Glow
+  m_Name: Portal Glow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -141329,12 +140674,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1871047931}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 4.5, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: 0, y: -1, z: -0, w: -0.00000004371139}
+  m_LocalPosition: {x: 0, y: 2.266667, z: 0}
+  m_LocalScale: {x: 0.6666667, y: 0.6666667, z: 0.6666667}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1522981859}
+  m_Father: {fileID: 1038728947}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!108 &1871047933
 Light:
@@ -146849,10 +146194,10 @@ MonoBehaviour:
         position: {x: 340, y: 60}
         speaker:
           player: 0
-          name: The Heart Tree
+          name: The Portal
           model: {fileID: 0}
           portrait: {fileID: 0}
-        line: Warmth stirs in the old bark. <i>Little one. You fell out of the dark with the whole forest at your heels, and I caught you. I could only catch one.</i>
+        line: Warmth stirs in the old stone. <i>Little one. You fell out of the dark with the whole forest at your heels, and I caught you. I could only catch one.</i>
         answers:
         - Where are the others?
         - What are you?
@@ -146865,7 +146210,7 @@ MonoBehaviour:
         position: {x: 640, y: 60}
         speaker:
           player: 0
-          name: The Heart Tree
+          name: The Portal
           model: {fileID: 0}
           portrait: {fileID: 0}
         line: <i>Seven sparks, scattered through the Misty Woods. They are alive. I hear them when the wind is right. But the forest does not kill the lost, little one. It forgets them.</i>
@@ -146877,7 +146222,7 @@ MonoBehaviour:
         position: {x: 640, y: 230}
         speaker:
           player: 0
-          name: The Heart Tree
+          name: The Portal
           model: {fileID: 0}
           portrait: {fileID: 0}
         line: <i>The last of an old promise. I keep the dark from this clearing. But that is not what you need to know.</i>
@@ -146889,13 +146234,13 @@ MonoBehaviour:
         position: {x: 940, y: 60}
         speaker:
           player: 0
-          name: The Heart Tree
+          name: The Portal
           model: {fileID: 0}
           portrait: {fileID: 0}
         line: <i>First the way home. Then their names. Then there is no one left to find.</i>
         answers:
         - How do I reach them?
-        - Open the door. I'll go now.
+        - Open the way. I'll go now.
         mustAnswer: 1
         afterFightPause: 1
     - rid: 287758281410609329
@@ -146905,10 +146250,10 @@ MonoBehaviour:
         position: {x: 1240, y: 60}
         speaker:
           player: 0
-          name: The Heart Tree
+          name: The Portal
           model: {fileID: 0}
           portrait: {fileID: 0}
-        line: <i>The door across the stream sleeps, and I am too thin to wake it. Long ago people kept a hearth beneath my branches, and I kept the night from their door. That was the pact. No fire has burned here in a hundred winters.</i>
+        line: <i>I am a door, little one, and I have gone to sleep. I am too thin to wake myself. Long ago people kept a hearth beside these stones, and I kept the night from their door. That was the pact. No fire has burned here in a hundred winters.</i>
         afterFightPause: 1
     - rid: 287758281410609330
       type: {class: SayNode, ns: , asm: SafeHaven}
@@ -146917,10 +146262,10 @@ MonoBehaviour:
         position: {x: 1240, y: 230}
         speaker:
           player: 0
-          name: The Heart Tree
+          name: The Portal
           model: {fileID: 0}
           portrait: {fileID: 0}
-        line: <i>With what? You have nothing but your hands, and I cannot open it.</i>
+        line: <i>With what? You have nothing but your hands, and I cannot open.</i>
         afterFightPause: 1
     - rid: 287758281410609331
       type: {class: SayNode, ns: , asm: SafeHaven}
@@ -146929,7 +146274,7 @@ MonoBehaviour:
         position: {x: 1540, y: 60}
         speaker:
           player: 0
-          name: The Heart Tree
+          name: The Portal
           model: {fileID: 0}
           portrait: {fileID: 0}
         line: <i>So light one. The forest cannot forget a hearth that someone tends. It will feed my ward, and out in the mist your people will see it and know which way is home.</i>
@@ -146941,10 +146286,10 @@ MonoBehaviour:
         position: {x: 1840, y: 60}
         speaker:
           player: 0
-          name: The Heart Tree
+          name: The Portal
           model: {fileID: 0}
           portrait: {fileID: 0}
-        line: <i>A fire first. Then a home worth coming back to. Then we go and fetch them. And one day, little one, you will tell me why those old stones woke for your hand.</i>
+        line: <i>A fire first. Then a home worth coming back to. Then we go and fetch them. And one day, little one, you will tell me why these old stones woke for your hand.</i>
         afterFightPause: 1
     - rid: 287758281410609333
       type: {class: RaiseQuestEventNode, ns: , asm: SafeHaven}
@@ -148565,6 +147910,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4229943222479513622, guid: ade2f4ded7516a74c84edd9ad7342e8f, type: 3}
+      propertyPath: lossRules
+      value: 'If you fall or time runs out, you wake at the portal. What you carry is lost: materials, food and anything found in the raid. The tools, weapons and packs you bring return damaged and can be repaired at home. Your home remains safe.'
+      objectReference: {fileID: 0}
     - target: {fileID: 8753692619327535766, guid: ade2f4ded7516a74c84edd9ad7342e8f, type: 3}
       propertyPath: m_Name
       value: RaidPreparationWindow
@@ -150070,96 +149419,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1837906944649145521, guid: 3ac95055c8744764db9b5006303284fb, type: 3}
   m_PrefabInstance: {fileID: 1999928457}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &2003785783
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2003785784}
-  - component: {fileID: 2003785786}
-  - component: {fileID: 2003785785}
-  m_Layer: 0
-  m_Name: Canopy 2
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &2003785784
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2003785783}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.2, y: 7.9, z: 1}
-  m_LocalScale: {x: 5, y: 3.6, z: 5}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1522981859}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!23 &2003785785
-MeshRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2003785783}
-  m_Enabled: 1
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
-  m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_ForceMeshLod: -1
-  m_MeshLodSelectionBias: 0
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 2100000, guid: 08c1ceb1f4dc81f4290dce975a59f015, type: 2}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 1
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_MaskInteraction: 0
-  m_AdditionalVertexStreams: {fileID: 0}
---- !u!33 &2003785786
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2003785783}
-  m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1001 &2004834519
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -153940,7 +153199,7 @@ Transform:
   m_GameObject: {fileID: 2084193013}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: 1, z: -0, w: -0.00000004371139}
-  m_LocalPosition: {x: -12, y: 0.014299035, z: 25.5}
+  m_LocalPosition: {x: 1.4, y: -0.007980704, z: -3.4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -158643,7 +157902,6 @@ SceneRoots:
   - {fileID: 2029280124}
   - {fileID: 1963846609}
   - {fileID: 102624619}
-  - {fileID: 1522981859}
   - {fileID: 1927287394}
   - {fileID: 296734079}
   - {fileID: 686589032}

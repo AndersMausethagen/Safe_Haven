@@ -69,7 +69,7 @@ The intro (`Prologue_MistyWoods`, under **Intro Moments**, built by `AgentScript
 
 The home quest line (`SafeHaven`, under **Home Moments**, built by `AgentScripts/BuildHomeStory.cs`):
 
-- **The Waking:** When Quest Event (the Heart Tree's Moment) › Choice › Say › Choice › Say › Raise Quest Event (Talked To Heart Tree). Why the player builds a haven.
+- **The Waking:** When Quest Event (the portal's Moment) › Choice › Say › Choice › Say › Raise Quest Event (Talked To Portal). Why the player builds a haven.
 - **First Fire:** When Structure Is Built (Campfire) › Wait › Start Glowing + Play Sound + Say › Say › Stop Glowing.
 - **The Door Wakes:** When Quest Is Completed (Awakening the Portal) › Wait › Focus Camera + Say (Sigrid, through the stones) › Say.
 - **Bjarne's Hammer:** When Quest Is Completed (A Light They Can See) › Wait › Say › Say (the player) › Say.

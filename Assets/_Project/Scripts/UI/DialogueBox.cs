@@ -295,7 +295,7 @@ public sealed class DialogueBox : MonoBehaviour
         UpdateHint();
     }
 
-    // The tree and a voice through the stones have no face to show, so their words take its place.
+    // The portal and a voice through its stones have no face to show, so their words take its place.
     private void LayOutFor(bool hasFace)
     {
         float freed = hasFace ? 0f : FaceWidth;

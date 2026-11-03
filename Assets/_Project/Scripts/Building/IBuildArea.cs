@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// Where the player may build, and what: the Heart Tree's ward at home, the expedition's camp in the prologue. BuildPlacer
+/// Where the player may build, and what: the portal's ward at home, the expedition's camp in the prologue. BuildPlacer
 /// asks the current one (<see cref="BuildArea.Current"/>) instead of knowing either; an area enters and leaves through
 /// BuildArea.
 /// </summary>

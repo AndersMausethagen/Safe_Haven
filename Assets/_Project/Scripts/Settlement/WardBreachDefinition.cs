@@ -21,7 +21,7 @@ public sealed class BreachWave
 /// <summary>
 /// One ward breach encounter (GDD §6.6–6.9): when it becomes possible, what the player is told, which enemies come, how
 /// strong they are and what winning gives. The first breach follows the decisions of the first-90-minutes pass: it is
-/// offered after the first successful extraction, the player starts it at the Heart Tree, a few weak Forest-Bitten Wolves
+/// offered after the first successful extraction, the player starts it at the portal, a few weak Forest-Bitten Wolves
 /// come along one marked path and attack only the player, and winning gives 2 Life Orbs. Later ones threaten the home
 /// itself, in waves down several lanes.
 /// <para>
@@ -34,12 +34,12 @@ public sealed class WardBreachDefinition : ScriptableObject
     [Header("Text")]
     [SerializeField] private string displayName = "The Weakening Ward";
     [Tooltip("Shown when the breach becomes possible (GDD: a visible warning before any attack).")]
-    [SerializeField, TextArea] private string warningText = "The Heart Tree's light flickers. Something is testing the ward along the old path. Prepare, then speak to the tree.";
-    [Tooltip("Shown at the Heart Tree while the breach waits for the player.")]
+    [SerializeField, TextArea] private string warningText = "The portal's light flickers. Something is testing the ward along the old path. Prepare, then speak to the portal.";
+    [Tooltip("Shown at the portal while the breach waits for the player.")]
     [SerializeField, TextArea] private string pendingText = "The ward is weakening. When you are ready, I will open it and let them come to you.";
-    [Tooltip("The detail line of the Heart Tree's \"Begin the defense\" choice.")]
+    [Tooltip("The detail line of the portal's \"Begin the defense\" choice.")]
     [SerializeField] private string startHint = "Wolves will come along the marked path";
-    [SerializeField, TextArea] private string wonText = "The last wolf falls. The Heart Tree's light steadies, and the ward closes again.";
+    [SerializeField, TextArea] private string wonText = "The last wolf falls. The portal's light steadies, and the ward closes again.";
     [SerializeField, TextArea] private string failedText = "The wolves slink back into the dark. The ward still flickers; try again when you are ready.";
 
     [Header("When")]

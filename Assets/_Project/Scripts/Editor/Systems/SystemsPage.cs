@@ -5,7 +5,7 @@ using UnityEngine;
 using Object = UnityEngine.Object;
 
 /// <summary>
-/// One page of the Systems Editor: a game system's rules (survival, carrying, raids, the Heart Tree...) shown as the
+/// One page of the Systems Editor: a game system's rules (survival, carrying, raids, the portal...) shown as the
 /// settings that tune it plus the numbers they lead to ("a full belly lasts 40 minutes at home"), and tables for
 /// balancing many assets side by side.
 /// <para>

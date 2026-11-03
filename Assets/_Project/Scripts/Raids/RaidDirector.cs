@@ -9,7 +9,7 @@ using UnityEngine.SceneManagement;
 /// modifiers say so, warns as time runs low, and ends the raid when the player extracts (see ExtractionPoint), dies or
 /// runs out of time. Extracting takes everything the player carries back home. Failing (dying or running out of time)
 /// keeps knowledge, the safe pocket and the deployed equipment with durability damage, and loses everything else (GDD
-/// §8.3, PlayerSnapshot.AfterFailedRaid); the player then wakes at the Heart Tree. After a short pause the player is taken
+/// §8.3, PlayerSnapshot.AfterFailedRaid); the player then wakes at the portal. After a short pause the player is taken
 /// to the full-screen results (RaidResultsScreen) and from there home. The clock only starts once the scene is generated
 /// and the loading screen lifts (SceneTransition.WhenReady). A scene played straight from the
 /// editor runs a test raid from the fallback definition. Systems in the raid read its rules through <see cref="Current"/>.
@@ -356,13 +356,13 @@ public sealed class RaidDirector : MonoBehaviour
         GameSession.EndRaid(Report);
         GameEvents.Raise(new GameEvent(GameEventKind.RaidFinished, Session.Definition, 1, null, Session.Outcome, Session.Elapsed));
         GameSession.CarryPlayerState(keeps);
-        // Coming home through the portal, or waking at the Heart Tree after a failure.
-        GameSession.SetArrivalPoint(extracted ? PlayerArrivalPoint.Portal : PlayerArrivalPoint.HeartTree);
+        // Coming home through the portal, or waking at the portal after a failure.
+        GameSession.SetArrivalPoint(extracted ? PlayerArrivalPoint.Portal : PlayerArrivalPoint.HomePortal);
 
         StopPlayer();
         GameMessages.Post(extracted
                 ? "Extracted! Heading back with everything you carry."
-                : "The raid is lost. You'll wake at the Heart Tree with your gear, but everything else you carried is gone.",
+                : "The raid is lost. You'll wake at the portal with your gear, but everything else you carried is gone.",
             extracted ? MessageKind.Gain : MessageKind.Warning);
         // Started before listeners run, so a faulty one can't leave the player stranded in the raid.
         StartCoroutine(ReturnAfterDelay());

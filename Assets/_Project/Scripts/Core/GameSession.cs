@@ -57,7 +57,7 @@ public static class GameSession
     }
 
     /// <summary>
-    /// Asks the next scene to place the player at the PlayerArrivalPoint with this id (such as "HeartTree" after a failed
+    /// Asks the next scene to place the player at the PlayerArrivalPoint with this id (such as "HomePortal" after a failed
     /// raid, "Portal" after an extraction). A saved pose, when loading, takes precedence.
     /// </summary>
     public static void SetArrivalPoint(string id)

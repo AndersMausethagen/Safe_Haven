@@ -3,11 +3,11 @@ using UnityEngine;
 
 /// <summary>
 /// In Safe Haven the player can't die for good (GDD §6.3, §6.9): after falling, they lie still for a moment and then wake
-/// at the Heart Tree with their health restored. Nothing is lost; a breach in progress simply ends (WardBreachDirector).
+/// at the portal with their health restored. Nothing is lost; a breach in progress simply ends (WardBreachDirector).
 /// Raids handle death themselves (RaidDirector), so this belongs only in home scenes.
 /// <para>
-/// Where it belongs: on a scene object in Safe Haven (the Heart Tree is a good place), with a PlayerArrivalPoint
-/// "HeartTree" nearby.
+/// Where it belongs: on a scene object in Safe Haven (the portal is a good place), with a PlayerArrivalPoint
+/// "HomePortal" nearby.
 /// </para>
 /// </summary>
 [DisallowMultipleComponent]
@@ -17,7 +17,7 @@ public sealed class HomeRevival : MonoBehaviour
     [SerializeField, Min(0f)] private float delay = 3f;
     [Tooltip("Share of health the player wakes with.")]
     [SerializeField, Range(0.1f, 1f)] private float healthOnWaking = 1f;
-    [SerializeField, TextArea] private string fallenText = "You fall... and the Heart Tree's light pulls you back home.";
+    [SerializeField, TextArea] private string fallenText = "You fall... and the portal's light pulls you back home.";
 
     private Damageable health;
 
@@ -59,7 +59,7 @@ public sealed class HomeRevival : MonoBehaviour
         GameMessages.Post(fallenText, MessageKind.Warning);
         yield return new WaitForSeconds(delay);
 
-        PlayerArrivalPoint point = PlayerArrivalPoint.Find(PlayerArrivalPoint.HeartTree);
+        PlayerArrivalPoint point = PlayerArrivalPoint.Find(PlayerArrivalPoint.HomePortal);
         if (point != null)
         {
             var body = player.GetComponent<CharacterController>();

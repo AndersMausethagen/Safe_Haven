@@ -4,9 +4,10 @@ using UnityEngine;
 /// <summary>
 /// The way into raids from Safe Haven (GDD §6.1, §21.3). It starts as a ruin: using it offers a repair that costs Life
 /// Orbs (SettlementSettings.PortalRepairCost). Once repaired (saved in SettlementState) it glows and works as the Portal
-/// crafting station (Portal Sparks are queued here); using it opens the station menu with "Plan a raid" first, which
-/// opens the raid planner (RaidPreparationWindow) for its destinations. Locked destinations (Troll Valley) are shown but
-/// can't be entered yet. Without a CraftingStation, using the repaired portal opens the planner directly.
+/// crafting station (Portal Sparks are queued here), and "Plan a raid" opens the raid planner (RaidPreparationWindow) for its
+/// destinations. Locked destinations (Troll Valley) are shown but can't be entered yet. On the portal at the heart of Safe Haven a
+/// HomePortal beside it owns using it, and shows these actions in its one menu; a portal without one acts for itself: its station
+/// menu, or the planner directly when it has no CraftingStation.
 /// <para>
 /// Where it belongs: on the portal in Safe Haven, next to an Interactable that doesn't deactivate on completion and a
 /// CraftingStation of type Portal. The dormant and active looks are child objects switched on and off.
@@ -36,11 +37,12 @@ public sealed class RaidPortal : MonoBehaviour, IStationMenuExtension, IInteract
     [SerializeField, RaisedByGame] private GameEventDefinition repairedEvent;
     [Tooltip("Optional progression requirement for repairs only. Inspecting the dormant portal remains possible.")]
     [SerializeField] private QuestCondition repairRequires;
-    [SerializeField] private string repairLockedText = "Free the Heart Tree's light first.";
+    [SerializeField] private string repairLockedText = "Cold, silent stones. They need their light back first.";
     [SerializeField, TextArea] private string ruinText = "Ancient standing stones, cracked and cold. A faint hum lingers in them, as if they remember being a door. Life Orbs might wake them.";
 
     private Interactable interactable;
     private CraftingStation station;
+    private bool hasHomeMenu;
 
     /// <summary>The first destination.</summary>
     public RaidDefinition Raid => raid;
@@ -69,17 +71,23 @@ public sealed class RaidPortal : MonoBehaviour, IStationMenuExtension, IInteract
     }
 
     public bool IsRepaired => !needsRepair || GameSession.Settlement.PortalRepaired;
-    public string InteractionName => IsRepaired ? "Portal" : "Ruined Portal";
+    public string InteractionName => IsRepaired ? "Portal" : "Sleeping Portal";
+    public string RuinText => ruinText;
 
     private void Awake()
     {
         interactable = GetComponent<Interactable>();
         station = GetComponent<CraftingStation>();
+        hasHomeMenu = TryGetComponent(out HomePortal _);
     }
 
     private void OnEnable()
     {
-        interactable.Completed.AddListener(OnUsed);
+        if (!hasHomeMenu)
+        {
+            interactable.Completed.AddListener(OnUsed);
+        }
+
         GameSession.Settlement.Changed += ShowState;
         ShowState();
     }
@@ -142,6 +150,10 @@ public sealed class RaidPortal : MonoBehaviour, IStationMenuExtension, IInteract
             page.Add(new MenuAction("Plan a raid", "Choose a destination, supplies and modifiers", true, () => OpenPlanner(user), closesMenu: true));
             AddImprovement(page, user);
         }
+        else if (hasHomeMenu)
+        {
+            AddRepair(page, user);
+        }
     }
 
     private static void AddImprovement(MenuPage page, GameObject user)
@@ -195,14 +207,19 @@ public sealed class RaidPortal : MonoBehaviour, IStationMenuExtension, IInteract
 
     private MenuPage RuinPage(GameObject user)
     {
+        var page = new MenuPage { Title = "The Sleeping Portal", Body = ruinText };
+        AddRepair(page, user);
+        return page;
+    }
+
+    private void AddRepair(MenuPage page, GameObject user)
+    {
         IReadOnlyList<ResourceAmount> cost = SettlementSettings.Current.PortalRepairCost;
         bool affordable = MaterialPool.For(user).CanAfford(cost, null, out string missing);
         bool unlocked = repairRequires.IsMet;
-        var page = new MenuPage { Title = "Ruined Portal", Body = ruinText };
-        page.Add(new MenuAction("Repair the portal", !unlocked ? repairLockedText
+        page.Add(new MenuAction("Wake the portal", !unlocked ? repairLockedText
             : AmountText.Describe(cost) + (affordable ? "" : $"   <color=#FF7B6B>{missing}</color>"), unlocked && affordable,
             () => Repair(user), closesMenu: true));
-        return page;
     }
 
     private void Repair(GameObject user)

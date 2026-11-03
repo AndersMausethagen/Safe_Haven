@@ -509,7 +509,7 @@ public static class BuildHaven
     private static string PlaceInHaven(Dictionary<string, GameObject> kinds)
     {
         Scene scene = EditorSceneManager.OpenScene(Haven);
-        HeartTree tree = Object.FindAnyObjectByType<HeartTree>(FindObjectsInactive.Include);
+        HomePortal tree = Object.FindAnyObjectByType<HomePortal>(FindObjectsInactive.Include);
         Vector3 centre = tree.transform.position;
         GameObject old = GameObject.Find("Overgrowth");
         if (old != null) Object.DestroyImmediate(old);

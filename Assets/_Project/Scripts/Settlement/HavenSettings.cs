@@ -4,7 +4,7 @@ using UnityEngine;
 
 /// <summary>
 /// Safe Haven's renown and ranks (HavenRenown): what each part of the settlement is worth and the ranks it climbs
-/// through, from a camp in an overgrown clearing to a haven. Each rank reached widens the Heart Tree's ward (more room
+/// through, from a camp in an overgrown clearing to a haven. Each rank reached widens the portal's ward (more room
 /// to build, the moss spreading out to the new edge) and is celebrated once. Lives at Resources/HavenSettings;
 /// built-in defaults apply when the asset is missing.
 /// </summary>

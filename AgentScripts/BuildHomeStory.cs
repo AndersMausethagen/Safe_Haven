@@ -46,16 +46,16 @@ public static class BuildHomeStory
 
     private static void QuestTexts()
     {
-        Text("Awakening", null, "You wake beneath a great tree in a quiet clearing, and you wake alone. Its bark is warm, and something in it seems to be waiting for you.");
+        Text("Awakening", null, "You wake on the grass of a quiet clearing, and you wake alone. At its heart stand cracked old stones, warm to the touch, and something in them seems to be waiting for you.");
         Text("SettlingIn", null, "A hearth starts small. Gather the fallen branches and loose stones the clearing offers, by hand; watch your resource bars (I) fill.");
-        Text("FirstCamp", "A Light in the Wood", "The forest cannot forget a hearth that someone tends. Light one inside the Heart Tree's ward so your people can see it through the mist, and raise a workshop beside it to work at. Open the build menu with G.");
+        Text("FirstCamp", "A Light in the Wood", "The forest cannot forget a hearth that someone tends. Light one inside the portal's ward so your people can see it through the mist, and raise a workshop beside it to work at. Open the build menu with G.");
         Text("FoodAndWater", "Strength for the Road", "Eirik was right: nobody fights well on an empty stomach, and you will be walking people home through the Misty Woods. Pick berries, fetch water from the stream and stew a meal at the campfire.");
-        Text("RootboundStones", null, "The door to the Misty Woods needs the Heart Tree's light, and cursed roots have reached inside the ward to choke it. Three stones around the clearing still hold that light. Free their Life Orbs.");
-        Text("AwakeningThePortal", null, "Across the stream stand the stones that dropped you here. Feed them the Life Orbs and the way back to your people opens.");
+        Text("RootboundStones", null, "The portal needs its light back, and cursed roots have reached inside the ward to choke it. Three stones around the clearing still hold that light. Free their Life Orbs.");
+        Text("AwakeningThePortal", null, "At the heart of the clearing stand the stones that dropped you here. Feed them the Life Orbs and the way back to your people opens.");
         Text("ThroughThePortal", null, "Your people are past the door, and the Misty Woods won't wait. Craft stone tools by hand from your bag (B), then step through. Bring home hardwood and iron ore for the haven, and get back to an extraction point before the portal closes. Carried things are lost if you fall; your tools and weapon come back damaged.");
         Text("KnowYourEnemy", null, "Forest-Bitten Wolves hunt the Misty Woods, on the same paths your people must walk home. Thin their numbers before they grow bolder.");
         Text("AGrowingHome", null, "Ingrid was the first. When the others come through that door they will need more than a fire: Tor will ask for a woodcutter's lodge before supper, Bjarne for a smithy, and everyone for somewhere dry to set down what they carried. Build them.");
-        Text("TheWeakeningWard", null, "The light that called Ingrid home was seen by other things too. Something is testing the ward. Prepare, then speak to the Heart Tree when you are ready.");
+        Text("TheWeakeningWard", null, "The light that called Ingrid home was seen by other things too. Something is testing the ward. Prepare, then speak to the portal when you are ready.");
         Text("SmithsRequest", null, "An old note on the board, in the last smith's hand: this hearth wants copper, and proof you can work it.");
     }
 
@@ -104,7 +104,7 @@ public static class BuildHomeStory
         var so = new SerializedObject(quest);
         so.FindProperty("id").stringValue = "a_light_they_can_see";
         so.FindProperty("displayName").stringValue = "A Light They Can See";
-        so.FindProperty("description").stringValue = "The brighter Safe Haven burns, the further its light carries through the mist, and six of your people are still out there. Build, clear the overgrowth and raise the haven to a Hamlet. The Heart Tree's Haven page (H) shows what counts.";
+        so.FindProperty("description").stringValue = "The brighter Safe Haven burns, the further its light carries through the mist, and six of your people are still out there. Build, clear the overgrowth and raise the haven to a Hamlet. The Haven page (H) shows what counts.";
         so.FindProperty("chain").stringValue = TheLostExpedition;
         so.FindProperty("start").intValue = (int)QuestStart.Automatically;
         SerializedProperty prerequisites = so.FindProperty("prerequisites");
@@ -171,8 +171,8 @@ public static class BuildHomeStory
     {
         var breach = Load<WardBreachDefinition>("Assets/_Project/Data/Settlement/FirstWardBreach.asset");
         var so = new SerializedObject(breach);
-        so.FindProperty("warningText").stringValue = "The Heart Tree's light flickers. Your fire has been seen by more than your friends: something is testing the ward along the old path. Prepare, then speak to the tree.";
-        so.FindProperty("wonText").stringValue = "The last wolf falls. The Heart Tree's light steadies and the ward closes again. The home you built held.";
+        so.FindProperty("warningText").stringValue = "The portal's light flickers. Your fire has been seen by more than your friends: something is testing the ward along the old path. Prepare, then speak to the portal.";
+        so.FindProperty("wonText").stringValue = "The last wolf falls. The portal's light steadies and the ward closes again. The home you built held.";
         so.ApplyModifiedPropertiesWithoutUndo();
         EditorUtility.SetDirty(breach);
     }
@@ -224,8 +224,8 @@ public static class BuildHomeStory
     {
         Scene scene = EditorSceneManager.OpenScene(HomeScene);
         var waking = Load<GameEventDefinition>(Quests + "Events/TheWaking.asset");
-        var talked = Load<GameEventDefinition>(Quests + "Events/TalkedToHeartTree.asset");
-        HeartTree tree = Object.FindAnyObjectByType<HeartTree>(FindObjectsInactive.Include);
+        var talked = Load<GameEventDefinition>(Quests + "Events/TalkedToPortal.asset");
+        HomePortal tree = Object.FindAnyObjectByType<HomePortal>(FindObjectsInactive.Include);
         RaidPortal portal = Object.FindAnyObjectByType<RaidPortal>(FindObjectsInactive.Include);
 
         GameObject old = GameObject.Find(Root);
@@ -256,7 +256,7 @@ public static class BuildHomeStory
         var caught = new ChoiceNode
         {
             speaker = Tree(),
-            line = "Warmth stirs in the old bark. <i>Little one. You fell out of the dark with the whole forest at your heels, and I caught you. I could only catch one.</i>",
+            line = "Warmth stirs in the old stone. <i>Little one. You fell out of the dark with the whole forest at your heels, and I caught you. I could only catch one.</i>",
             answers = new List<string> { "Where are the others?", "What are you?" },
             mustAnswer = true,
         };
@@ -266,13 +266,13 @@ public static class BuildHomeStory
         {
             speaker = Tree(),
             line = "<i>First the way home. Then their names. Then there is no one left to find.</i>",
-            answers = new List<string> { "How do I reach them?", "Open the door. I'll go now." },
+            answers = new List<string> { "How do I reach them?", "Open the way. I'll go now." },
             mustAnswer = true,
         };
-        var nothing = Say("<i>With what? You have nothing but your hands, and I cannot open it.</i>");
-        var pact = Say("<i>The door across the stream sleeps, and I am too thin to wake it. Long ago people kept a hearth beneath my branches, and I kept the night from their door. That was the pact. No fire has burned here in a hundred winters.</i>");
+        var nothing = Say("<i>With what? You have nothing but your hands, and I cannot open.</i>");
+        var pact = Say("<i>I am a door, little one, and I have gone to sleep. I am too thin to wake myself. Long ago people kept a hearth beside these stones, and I kept the night from their door. That was the pact. No fire has burned here in a hundred winters.</i>");
         var hearth = Say("<i>So light one. The forest cannot forget a hearth that someone tends. It will feed my ward, and out in the mist your people will see it and know which way is home.</i>");
-        var plan = Say("<i>A fire first. Then a home worth coming back to. Then we go and fetch them. And one day, little one, you will tell me why those old stones woke for your hand.</i>");
+        var plan = Say("<i>A fire first. Then a home worth coming back to. Then we go and fetch them. And one day, little one, you will tell me why these old stones woke for your hand.</i>");
         var done = new RaiseQuestEventNode { questEvent = talked };
         Link(story, (heard, 0, caught), (caught, 0, alive), (caught, 1, whatAreYou), (whatAreYou, 0, alive), (alive, 0, forgets),
             (forgets, 0, pact), (forgets, 1, nothing), (nothing, 0, pact), (pact, 0, hearth), (hearth, 0, plan), (plan, 0, done));
@@ -285,7 +285,7 @@ public static class BuildHomeStory
         var wait = new WaitNode { seconds = 1.2f };
         var glow = new GlowNode { target = tree, colour = new Color(1f, 0.72f, 0.38f), intensity = 8f, range = 16f, fadeSeconds = 2f };
         var sound = new PlaySoundNode { sound = Load<HavenSettings>("Assets/_Project/Resources/HavenSettings.asset").RankSound, at = tree };
-        var first = Say("<i>There. A hearth under my branches, after a hundred winters.</i>");
+        var first = Say("<i>There. A hearth beside my stones, after a hundred winters.</i>");
         var second = Say("<i>Do you feel that? The ward has remembered what it is for. And far out in the mist, little one, someone has stopped walking and turned to look.</i>");
         var fade = new GlowNode { target = tree, glow = false, fadeSeconds = 3f };
         Link(story, (built, 0, wait), (wait, 0, glow), (wait, 0, sound), (wait, 0, first), (first, 0, second), (second, 0, fade));
@@ -298,7 +298,7 @@ public static class BuildHomeStory
         var wait = new WaitNode { seconds = 1f };
         var focus = new FocusCameraNode { target = portal, seconds = 7f };
         var sigrid = new SayNode { speaker = new StorySpeaker { name = "Sigrid" }, line = "<i>...can anyone hear... Ingrid was right behind me when the stones broke. She's hurt. Find her first. Do you hear me? Find her first...</i>" };
-        var tree = Say("<i>The stones have gone quiet, but she is right. One spark burns close, just past the door, hiding from the wolves. Make yourself tools, and go.</i>");
+        var tree = Say("<i>My stones have gone quiet, but she is right. One spark burns close, just beyond me, hiding from the wolves. Make yourself tools, and go.</i>");
         Link(story, (repaired, 0, wait), (wait, 0, focus), (wait, 0, sigrid), (sigrid, 0, tree));
     }
 
@@ -313,18 +313,18 @@ public static class BuildHomeStory
         Link(story, (reached, 0, wait), (wait, 0, hammer), (hammer, 0, bjarne), (bjarne, 0, north));
     }
 
-    private static void Whispers(HeartTree tree, GameEventDefinition waking)
+    private static void Whispers(HomePortal tree, GameEventDefinition waking)
     {
         (string quest, string text, GameEventDefinition moment)[] lines =
         {
-            ("Awakening", "<i>Listen, little one. Rest your hand on the bark.</i>", waking),
+            ("Awakening", "<i>Listen, little one. Rest your hand on the stone.</i>", waking),
             ("SettlingIn", "<i>Start with what the clearing gives. Fallen branches, loose stones, your own two hands. That is how every hearth began. Your resource bars (I) will fill.</i>", null),
             ("FirstCamp", "<i>Build your fire inside my ward, and a table to work at beside it. Open the build menu (G). The sooner it burns, the sooner they can see it.</i>", null),
             ("FoodAndWater", "<i>Now feed yourself. Berries, water from the stream, a stew over your fire. You will be walking people home.</i>", null),
             ("RootboundStones", "<i>The forest has put its roots in even here. Three stones around the clearing still hold my light, choked and cold. Free them, and bring the Life Orbs back.</i>", null),
-            ("AwakeningThePortal", "<i>Now the door, across the stream. Feed it my light and it will open for you, as it did in the dark.</i>", null),
-            ("ThroughThePortal", "<i>Make yourself tools and go. Take what the woods will give you, and come home before the door closes. It will not wait, and neither will the wolves.</i>", null),
-            ("AStrangerInTheMist", "<i>She is close, little one. Just past the door, off the path, hiding. Find her, keep her near you, and bring her through.</i>", null),
+            ("AwakeningThePortal", "<i>Now bring me what you freed. Feed me that light and I will open for you, as I did in the dark.</i>", null),
+            ("ThroughThePortal", "<i>Make yourself tools and go. Take what the woods will give you, and come home before the way closes. It will not wait, and neither will the wolves.</i>", null),
+            ("AStrangerInTheMist", "<i>She is close, little one. Just beyond me, off the path, hiding. Find her, keep her near you, and bring her through.</i>", null),
             ("AGrowingHome", "<i>One fire brought Ingrid home. The others will want more than a fire: a bench, a furnace, a dry place to set down what they carry. Build what they will need.</i>", null),
             ("TheWeakeningWard", "<i>The light that reached her reached other things as well. They are on the old path now, testing me. Prepare yourself. When you are ready, tell me, and I will let them come.</i>", null),
             ("ALightTheyCanSee", "<i>The brighter this place burns, the further it can be seen. Build. Clear the old growth. Give them something worth walking towards.</i>", null),
@@ -343,7 +343,7 @@ public static class BuildHomeStory
 
         string[] idle =
         {
-            "<i>Every hearth under my branches is a little more of the old pact kept.</i>",
+            "<i>Every hearth in my light is a little more of the old pact kept.</i>",
             "<i>The forest cannot forget a place that someone tends.</i>",
             "<i>I listen for your people every night. Some nights I hear them.</i>",
             "<i>A hundred winters I kept this clearing alone. I had forgotten how loud a home is. Do not stop.</i>",
@@ -360,7 +360,7 @@ public static class BuildHomeStory
 
     // ----- Helpers -----
 
-    private static StorySpeaker Tree() => new StorySpeaker { name = "The Heart Tree" };
+    private static StorySpeaker Tree() => new StorySpeaker { name = "The Portal" };
 
     private static SayNode Say(string line) => new SayNode { speaker = Tree(), line = line };
 

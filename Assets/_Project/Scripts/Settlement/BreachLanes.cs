@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-/// <summary>One way into the clearing: where attackers set out from, the road they take to the tree and its direction in words.</summary>
+/// <summary>One way into the clearing: where attackers set out from, the road they take to the portal and its direction in words.</summary>
 public readonly struct BreachLane
 {
     public readonly Vector3 Start;
@@ -18,8 +18,8 @@ public readonly struct BreachLane
 }
 
 /// <summary>
-/// Finds the ways a breach comes in (GDD §6.9: clearly marked lanes, predictable pathing): spread around the Heart Tree beyond
-/// the ward, each with a road that really reaches the tree. A lane is found again from its seed after a load, and it moves
+/// Finds the ways a breach comes in (GDD §6.9: clearly marked lanes, predictable pathing): spread around the portal beyond
+/// the ward, each with a road that really reaches the portal. A lane is found again from its seed after a load, and it moves
 /// out as the ward grows, so a bigger home is attacked from further off.
 /// </summary>
 public static class BreachLanes

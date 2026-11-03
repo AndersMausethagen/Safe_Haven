@@ -6,7 +6,7 @@ using UnityEngine.UI;
 /// <summary>
 /// The talent screen (N): the player's level, experience and unspent talent points above the four trees (Ranger,
 /// Soldier, Runemaster, Tinkerer) side by side. Each talent shows its rank and what it gives; click to buy a rank. Rows
-/// open as points go into their tree. Talents can be reset for free at home (beside the Heart Tree). Built in code for
+/// open as points go into their tree. Talents can be reset for free at home (beside the portal). Built in code for
 /// every scene with a player (ExperienceTracker); it only reads and changes GameSession.Progress.
 /// </summary>
 public sealed class TalentWindow : MonoBehaviour
@@ -171,7 +171,7 @@ public sealed class TalentWindow : MonoBehaviour
     {
         if (!CanReset)
         {
-            GameMessages.Post("Talents can only be reset at home, beside the Heart Tree.", MessageKind.Warning);
+            GameMessages.Post("Talents can only be reset at home, beside the portal.", MessageKind.Warning);
             return;
         }
 
@@ -180,7 +180,7 @@ public sealed class TalentWindow : MonoBehaviour
     }
 
     // Free, but only at home: a change of mind needs a quiet place.
-    private static bool CanReset => HeartTree.Current != null;
+    private static bool CanReset => HomePortal.Current != null;
 
     private void Refresh()
     {

@@ -71,7 +71,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aecdc764a0346784e9958a956dddd948, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SaveableEntity
-  id: 
+  id: 170d787bd5904b6d8a9336751ced191d
   prefabId: 0fe564bf746ab6a4981ab527c459bf3a
   saveTransform: 1
   saveActiveState: 1
@@ -93,6 +93,7 @@ MonoBehaviour:
   duration: 3.5
   range: 1.6
   deactivateOnComplete: 0
+  kind: 0
   started:
     m_PersistentCalls:
       m_Calls: []
@@ -149,7 +150,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::QuestGate
   quest: {fileID: 11400000, guid: 8fd8f4db8a0b4d74cb71c5b4837010ac, type: 2}
   requirement: 0
-  lockedText: Cursed roots hold it fast. The Heart Tree may know a way.
+  lockedText: Cursed roots hold it fast. The portal may know a way.
 --- !u!1001 &3399635615446565665
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// Something that lets the player see around it: the player's own sight, a torch, the Heart Tree's ward. Inside its
+/// Something that lets the player see around it: the player's own sight, a torch, the portal's ward. Inside its
 /// radius the night veil lifts and the atmospheric fog thins; with Reveals, the ground it covers becomes explored
 /// (ExplorationMap). Night creatures stay out of lit ground (<see cref="IsLit"/>). Drawn by AtmosphereFeature.
 /// </summary>
@@ -19,7 +19,7 @@ public sealed class VisibilitySource : MonoBehaviour
     [Tooltip("Marks the ground within Reveal Radius as explored.")]
     [SerializeField] private bool reveals = true;
     [SerializeField, Min(0f)] private float revealRadius = 16f;
-    [Tooltip("On the Heart Tree: the radius follows the ward (plus Radius as a margin).")]
+    [Tooltip("On the portal: the radius follows the ward (plus Radius as a margin).")]
     [SerializeField] private bool followsWard;
     [Tooltip("Counts as light for night creatures, which won't step into it (torches, the ward). The player's own sight doesn't.")]
     [SerializeField] private bool isLight = true;
@@ -31,9 +31,9 @@ public sealed class VisibilitySource : MonoBehaviour
     {
         get
         {
-            if (followsWard && Application.isPlaying && HeartTree.Current != null)
+            if (followsWard && Application.isPlaying && HomePortal.Current != null)
             {
-                return HeartTree.Current.WardRadius + radius;
+                return HomePortal.Current.WardRadius + radius;
             }
 
             return radius + ExtraRadius;

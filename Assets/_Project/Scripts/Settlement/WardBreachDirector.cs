@@ -6,14 +6,14 @@ using UnityEngine.AI;
 /// <summary>
 /// Plays ward breaches in Safe Haven (GDD §6.6–6.9): warning → preparation → defense → recovery. Coming home from enough
 /// successful raids turns the next breach (WardBreachSettings) Pending: the player is warned and its lanes appear. They
-/// prepare and start the defense at the Heart Tree, or the ward gives way by itself at a nightfall once it has been put off too
+/// prepare and start the defense at the portal, or the ward gives way by itself at a nightfall once it has been put off too
 /// long.
 /// <para>
 /// The first breach is scripted and forgiving: enemies come along one marked path, hunt only the player, buildings are
 /// shielded and falling just ends it. Later ones (Threatens Home) come in waves down several lanes and go for the home:
 /// half for the ward, half for the nearest building, turning on anyone who gets close and giving up on anyone who runs
 /// too far. Buildings can be broken but never lost (Damageable.HealthFloor). The player falling doesn't end it, as they
-/// wake at the tree and can go on. It ends when every attacker is dead, or when the ward falls: the attackers leave,
+/// wake at the portal and can go on. It ends when every attacker is dead, or when the ward falls: the attackers leave,
 /// the ward is strained for a while and the breach can be tried again.
 /// </para>
 /// <para>
@@ -95,7 +95,7 @@ public sealed class WardBreachDirector : MonoBehaviour
         }
     }
 
-    /// <summary>How the coming breach is described at the Heart Tree: what comes and from where.</summary>
+    /// <summary>How the coming breach is described at the portal: what comes and from where.</summary>
     public string Hint
     {
         get
@@ -190,7 +190,7 @@ public sealed class WardBreachDirector : MonoBehaviour
 
         if (IsOverdue)
         {
-            GameMessages.Post("The Heart Tree can't hold much longer. At nightfall the ward will give way.", MessageKind.Warning);
+            GameMessages.Post("The portal can't hold much longer. At nightfall the ward will give way.", MessageKind.Warning);
             AudioManager.Play(AudioManager.Sounds?.BreachWarning, transform.position);
         }
     }
@@ -227,7 +227,7 @@ public sealed class WardBreachDirector : MonoBehaviour
         Begin();
     }
 
-    /// <summary>Starts the defense. Called from the Heart Tree's menu, or at nightfall when it has been put off too long.</summary>
+    /// <summary>Starts the defense. Called from the portal's menu, or at nightfall when it has been put off too long.</summary>
     public void Begin()
     {
         WardBreachDefinition breach = Definition;
@@ -260,13 +260,13 @@ public sealed class WardBreachDirector : MonoBehaviour
     private void RaiseWard()
     {
         Damageable prefab = WardBreachSettings.Current.WardAnchor;
-        if (prefab == null || HeartTree.Current == null)
+        if (prefab == null || HomePortal.Current == null)
         {
             Debug.LogWarning("WardBreachSettings has no ward anchor, so this breach can't be lost.", this);
             return;
         }
 
-        ward = Instantiate(prefab, HeartTree.Current.transform.position, Quaternion.identity);
+        ward = Instantiate(prefab, HomePortal.Current.transform.position, Quaternion.identity);
         float stronger = GameSession.Settlement.WardLevel * WardBreachSettings.Current.WardHealthPerLevel
                          + GameSession.Settlement.JobBonus(job => job.WardHealth);
         ward.GetComponent<Combatant>().Stats.AddModifier(new StatModifier(StatType.MaxHealth, StatModifierOp.Percent, stronger, this));
@@ -318,9 +318,9 @@ public sealed class WardBreachDirector : MonoBehaviour
         {
             BreachLane lane = lanes[nextLane++ % lanes.Count];
             origin = lane.Start;
-            if (HeartTree.Current != null)
+            if (HomePortal.Current != null)
             {
-                facing = Quaternion.LookRotation(HeartTree.Current.transform.position - origin);
+                facing = Quaternion.LookRotation(HomePortal.Current.transform.position - origin);
             }
         }
 
@@ -436,7 +436,7 @@ public sealed class WardBreachDirector : MonoBehaviour
 
     private bool CanWalkTo(Vector3 from, Vector3 to)
     {
-        // The tree stands on a hole in the NavMesh: anywhere beside it will do.
+        // The portal stands on a hole in the NavMesh: anywhere beside it will do.
         return NavMesh.SamplePosition(to, out NavMeshHit near, 5f, NavMesh.AllAreas)
             && NavMesh.CalculatePath(from, near.position, NavMesh.AllAreas, road) && road.status == NavMeshPathStatus.PathComplete;
     }
@@ -504,7 +504,7 @@ public sealed class WardBreachDirector : MonoBehaviour
             return;
         }
 
-        // At a real breach the player wakes at the tree and goes on (HomeRevival); the fight is the ward's to lose.
+        // At a real breach the player wakes at the portal and goes on (HomeRevival); the fight is the ward's to lose.
         if (running.ThreatensHome)
         {
             return;
@@ -649,7 +649,7 @@ public sealed class WardBreachDirector : MonoBehaviour
 
     private void FindLanes(WardBreachDefinition breach, int breachNumber)
     {
-        HeartTree tree = HeartTree.Current;
+        HomePortal tree = HomePortal.Current;
         if (tree == null)
         {
             return;

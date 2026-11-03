@@ -63,7 +63,7 @@ public sealed class AtmosphericFog : VolumeComponent
     public ClampedFloatParameter bankSpeed = new ClampedFloatParameter(0.5f, 0f, 4f);
     [Tooltip("Partial weather control when Weather Only Atmosphere is off. When enabled, weather fully controls fog: Clear and Mist 0, Fog and Storm more.")]
     public ClampedFloatParameter weatherInfluence = new ClampedFloatParameter(0.5f, 0f, 1f);
-    [Tooltip("How much a visibility source (the player, a torch, the Heart Tree) clears the fog inside its radius.")]
+    [Tooltip("How much a visibility source (the player, a torch, the portal) clears the fog inside its radius.")]
     public ClampedFloatParameter clearing = new ClampedFloatParameter(0.5f, 0f, 1f);
     [Tooltip("Fog is gathered up to this distance from the camera.")]
     public ClampedFloatParameter maxDistance = new ClampedFloatParameter(90f, 10f, 400f);

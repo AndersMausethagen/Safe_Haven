@@ -92,7 +92,7 @@ public static class ScenePlayability
             return Kind.Raid;
         }
 
-        if (Find<PersistentScene>(scene).Any() || Find<HeartTree>(scene).Any() || Find<RaidPortal>(scene).Any())
+        if (Find<PersistentScene>(scene).Any() || Find<HomePortal>(scene).Any() || Find<RaidPortal>(scene).Any())
         {
             return Kind.SafeHaven;
         }
@@ -257,10 +257,10 @@ public static class ScenePlayability
             add(Severity.Warning, "No Persistent Scene: buildings and changes are not kept when the player leaves.", null, "Make Playable", make);
         }
 
-        if (!Find<PlayerArrivalPoint>(scene).Any(p => p.Id == PlayerArrivalPoint.HeartTree))
+        if (!Find<PlayerArrivalPoint>(scene).Any(p => p.Id == PlayerArrivalPoint.HomePortal))
         {
-            add(Severity.Warning, "No wake-up point (Player Arrival Point \"HeartTree\"): waking and reviving keep the player wherever they were.",
-                null, "Add at the Player", () => AddArrival(scene, PlayerArrivalPoint.HeartTree));
+            add(Severity.Warning, "No wake-up point (Player Arrival Point \"HomePortal\"): waking and reviving keep the player wherever they were.",
+                null, "Add at the Player", () => AddArrival(scene, PlayerArrivalPoint.HomePortal));
         }
 
         if (!Find<RaidPortal>(scene).Any())
@@ -268,9 +268,9 @@ public static class ScenePlayability
             add(Severity.Warning, "No raid portal: the player cannot go raiding from here.", null, "Make Playable", make);
         }
 
-        if (!Find<HeartTree>(scene).Any())
+        if (!Find<HomePortal>(scene).Any())
         {
-            add(Severity.Info, "No Heart Tree: no ward, home revival or building area.", null, null, null);
+            add(Severity.Info, "No Portal: no ward, home revival or building area.", null, null, null);
         }
     }
 
@@ -305,9 +305,9 @@ public static class ScenePlayability
         Player player = Find<Player>(scene).FirstOrDefault();
         if (player != null && needsRig)
         {
-            // A home wakes the player at the Heart Tree (not at the portal, which comes along from the template).
+            // A home wakes the player at the portal (not at the portal, which comes along from the template).
             PlayerArrivalPoint arrival = Find<PlayerArrivalPoint>(scene)
-                .FirstOrDefault(p => kind == Kind.Raid || p.Id == PlayerArrivalPoint.HeartTree);
+                .FirstOrDefault(p => kind == Kind.Raid || p.Id == PlayerArrivalPoint.HomePortal);
             Vector3 start = arrival != null ? arrival.transform.position : SceneCentre();
             StandOnGround(player.transform, start);
             done.Add($"player at {player.transform.position:F1}");
@@ -334,9 +334,9 @@ public static class ScenePlayability
             }
         }
 
-        if (kind == Kind.SafeHaven && !Find<PlayerArrivalPoint>(scene).Any(p => p.Id == PlayerArrivalPoint.HeartTree))
+        if (kind == Kind.SafeHaven && !Find<PlayerArrivalPoint>(scene).Any(p => p.Id == PlayerArrivalPoint.HomePortal))
         {
-            done.Add(AddArrival(scene, PlayerArrivalPoint.HeartTree));
+            done.Add(AddArrival(scene, PlayerArrivalPoint.HomePortal));
         }
 
         if (kind == Kind.Raid)

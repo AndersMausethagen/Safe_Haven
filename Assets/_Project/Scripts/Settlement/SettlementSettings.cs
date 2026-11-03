@@ -3,7 +3,7 @@ using UnityEngine;
 
 /// <summary>
 /// Tuning for Safe Haven as a place (GDD §6, §7.3, §13.5): repairing the portal, Portal Spark time extensions, the Heart
-/// Tree's ward and its upgrades, and the Purification Altar. Read by RaidPortal, RaidPreparationWindow, HeartTree,
+/// Tree's ward and its upgrades, and the Purification Altar. Read by RaidPortal, RaidPreparationWindow, HomePortal,
 /// BuildPlacer and SettlementSystem. Edit it on the Settlement page of the Systems Editor.
 /// </summary>
 [CreateAssetMenu(fileName = "SettlementSettings", menuName = "Safe Haven/Settings/Settlement Settings")]
@@ -16,7 +16,7 @@ public sealed class SettlementSettings : GameSettings<SettlementSettings>
         public List<ResourceAmount> cost = new List<ResourceAmount>();
         [Tooltip("Meters added to the buildable radius at this level.")]
         [Min(0f)] public float extraRadius = 6f;
-        [Tooltip("Seconds added to every raid: a stronger Heart Tree holds the way home open for longer.")]
+        [Tooltip("Seconds added to every raid: a stronger Portal holds the way home open for longer.")]
         [Min(0f)] public float raidSeconds = 90f;
         [Tooltip("What it opens, for the player: \"Opens tier II raids.\" Which tier a level opens is set on the raid's difficulties.")]
         public string opens;
@@ -49,10 +49,10 @@ public sealed class SettlementSettings : GameSettings<SettlementSettings>
     [Tooltip("Improvements made at the portal, in order.")]
     [SerializeField] private List<PortalLevel> portalLevels = new List<PortalLevel>();
 
-    [Header("Heart Tree ward")]
-    [Tooltip("Radius around the Heart Tree, in meters, where the player may build before any upgrade.")]
+    [Header("Portal ward")]
+    [Tooltip("Radius around the portal, in meters, where the player may build before any upgrade.")]
     [SerializeField, Min(1f)] private float baseWardRadius = 16f;
-    [Tooltip("Upgrades bought at the Heart Tree, in order. Each grows the buildable area (GDD §6.4).")]
+    [Tooltip("Upgrades bought at the portal, in order. Each grows the buildable area (GDD §6.4).")]
     [SerializeField] private List<WardLevel> wardLevels = new List<WardLevel>();
 
     [Header("Purification (GDD §13.5)")]

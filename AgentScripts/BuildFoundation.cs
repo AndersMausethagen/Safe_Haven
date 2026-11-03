@@ -549,7 +549,7 @@ public static class BuildFoundation
         }
 
         root = new GameObject("Wild Forage");
-        Vector3 centre = Object.FindAnyObjectByType<HeartTree>().transform.position;
+        Vector3 centre = Object.FindAnyObjectByType<HomePortal>().transform.position;
         var random = new System.Random(4711);
         int placed = 0;
         foreach ((string prefab, int count) in new[] { ("WildBarleyNode", 5), ("WildTurnipsNode", 4), ("ChanterellesNode", 5) })

@@ -52,7 +52,7 @@ All numerical values, recipe costs, encounter cadences, and content counts are i
 
 This document defines the game fantasy, player promises, gameplay loops, rule sets, content direction, technical foundations, and an achievable initial production scope. It is intended both as a creative north star and as an implementation reference in Unity. All numerical values, names, recipes, and content quantities are **proposed prototyping defaults, not final balancing decisions**. Validate them through playtesting before locking production requirements.
 
-**Version 0.2 design changes:** Cursed Essence and Purified Essence now form a shared magical progression economy; players unlock skills through milestones, develop talents through leveling, and improve magic using Essence. Safe Haven remains peaceful most of the time, but the Heart Tree ward can be breached during controlled, announced defense events. Defense structures and NPC defenders now have meaningful roles.
+**Version 0.2 design changes:** Cursed Essence and Purified Essence now form a shared magical progression economy; players unlock skills through milestones, develop talents through leveling, and improve magic using Essence. Safe Haven remains peaceful most of the time, but the portal ward can be breached during controlled, announced defense events. Defense structures and NPC defenders now have meaningful roles.
 
 **Version 0.3 design changes:** The decisions behind the first-90-minutes prototype are recorded in §26.1: a one-slot safe pocket that is never lost, durability rules for deployed equipment, Portal Sparks, hunger and thirst that always drain but never kill, the carry budget, free building inside the ward, the first recruit, and the first scripted ward breach.
 
@@ -62,11 +62,11 @@ This document defines the game fantasy, player promises, gameplay loops, rule se
 
 ### 1.1 Elevator pitch
 
-The player awakens alone in a peaceful clearing deep inside a cursed forest. An ancient magical tree protects this last refuge against the forest's darkness. Their first steps are humble: gather stone and wood, light a campfire, and construct a workbench. Before long, they discover a dormant portal, which can be awakened using Life Orbs recovered from the remaining fragments of forest magic.
+The player awakens alone in a peaceful clearing deep inside a cursed forest. At its heart stands a dormant magical portal, the old stones that dropped them here, and its last strength protects this refuge against the forest's darkness. Their first steps are humble: gather stone and wood, light a campfire, and construct a workbench. Before long, they can wake the portal using Life Orbs recovered from the remaining fragments of forest magic.
 
 The portal opens time-limited expeditions—**raids**—into unsafe parts of the world. There, the player fights, harvests resources, discovers strange beings, rescues travelers, and makes difficult decisions: collect more iron, investigate a mysterious cry, or return before the portal closes? Riches mean little if nobody survives the journey home.
 
-Recovered resources expand Safe Haven with workshops, farms, crafted equipment, defensive structures, and a gradually growing community. Cursed Essence collected from hostile creatures and raid victories can be purified at home to empower gear, buildings, and magic. Greater advances open more dangerous biomes, powerful trolls and spirits, and knowledge sealed away by the broken enchantment. The settlement is usually tranquil, but the weakened Heart Tree ward can sometimes be penetrated during foreseeable, player-facing incidents.
+Recovered resources expand Safe Haven with workshops, farms, crafted equipment, defensive structures, and a gradually growing community. Cursed Essence collected from hostile creatures and raid victories can be purified at home to empower gear, buildings, and magic. Greater advances open more dangerous biomes, powerful trolls and spirits, and knowledge sealed away by the broken enchantment. The settlement is usually tranquil, but the weakened Portal ward can sometimes be penetrated during foreseeable, player-facing incidents.
 
 ### 1.2 Core fantasy
 
@@ -101,7 +101,7 @@ Recovered resources expand Safe Haven with workshops, farms, crafted equipment, 
 
 ### 2.1 Pillar A: Safe Haven is worth protecting
 
-The contrast between **home** and **outside** remains central. In Safe Haven, the player normally builds, farms, cooks, socializes, and plans without a raid clock or constant enemies. The **Heart Tree's magical ward** makes the settlement largely peaceful, but it is not invulnerable: rare, controlled breaches create opportunities to defend the home the player has built. Attacks are announced in advance, gated behind clear progression milestones, and resolve only while the player is actively present. Buildings may take repairable damage; the entire settlement, permanent unlocks, and critical progression cannot be arbitrarily erased. Safe Haven must feel like home first and a defense arena second.
+The contrast between **home** and **outside** remains central. In Safe Haven, the player normally builds, farms, cooks, socializes, and plans without a raid clock or constant enemies. The **Portal's magical ward** makes the settlement largely peaceful, but it is not invulnerable: rare, controlled breaches create opportunities to defend the home the player has built. Attacks are announced in advance, gated behind clear progression milestones, and resolve only while the player is actively present. Buildings may take repairable damage; the entire settlement, permanent unlocks, and critical progression cannot be arbitrarily erased. Safe Haven must feel like home first and a defense arena second.
 
 ### 2.2 Pillar B: Every raid is a small fairy tale
 
@@ -148,11 +148,11 @@ A typical raid should take roughly 10–20 minutes, plus settlement preparation.
 
 ### 4.1 Premise: The forgotten pact
 
-Long ago, people promised to leave the forest enough room to live, while its guardians promised to keep ancient hungering forces at bay. The pact was broken—or perhaps forgotten. Trails disappeared, villages vanished, and the shadowed forest started consuming memories, wildlife, and people. At the center survives the **Heart Tree**, an ancient being whose protective ward still shelters one clearing. The ward is strong enough for daily peace, yet fractures in the old pact permit occasional, foreseeable intrusions.
+Long ago, people promised to leave the forest enough room to live, while its guardians promised to keep ancient hungering forces at bay. The pact was broken—or perhaps forgotten. Trails disappeared, villages vanished, and the shadowed forest started consuming memories, wildlife, and people. At the center survives the **Portal**, an ancient being whose protective ward still shelters one clearing. The ward is strong enough for daily peace, yet fractures in the old pact permit occasional, foreseeable intrusions.
 
 The protagonist wakes beside its roots with no clear memory of arriving there. Portal runes respond to their touch. Tiny lights guide them toward stones where the first Life Orbs can be released. The protagonist gradually learns that they are connected to the old pact and may influence the terms of a new one.
 
-**Why a haven.** The forest does not kill the lost: it forgets them. First the way home, then their names, then there is no one left to find. A hearth that someone tends is the one thing it cannot forget. That was the old pact: people kept a hearth beneath the Heart Tree and the tree kept the night from their door, and no fire has burned there in a hundred winters. So the player, the one survivor the tree could catch, doesn't build a base for its own sake. Each fire feeds the ward and carries further through the mist, the seven lost companions can see it and know which way is home, and a home is what there is to bring them back to. The game keeps this true in its rules: renown widens the ward (§6.4), and the Heart Tree's Haven page counts who is home and names who is still out there.
+**Why a haven.** The forest does not kill the lost: it forgets them. First the way home, then their names, then there is no one left to find. A hearth that someone tends is the one thing it cannot forget. That was the old pact: people kept a hearth beside the portal and the portal kept the night from their door, and no fire has burned there in a hundred winters. So the player, the one survivor the portal could catch, doesn't build a base for its own sake. Each fire feeds the ward and carries further through the mist, the seven lost companions can see it and know which way is home, and a home is what there is to bring them back to. The game keeps this true in its rules: renown widens the ward (§6.4), and the portal's Haven page counts who is home and names who is still out there.
 
 ### 4.2 Narrative tone rules
 
@@ -160,11 +160,11 @@ Take inspiration from Askeladden: humble beginnings, courage, wit, unexpected he
 
 ### 4.3 Regions and biomes
 
-Start in the protected Heart Tree Clearing. Early raids explore the **Misty Woods** with wolves, root guardians, abandoned camps, and hidden runestones. Later regions include **Moss Marsh**, where visibility and poisonous creatures challenge preparation; **Troll Valley**, with stony passes, bridges, and powerful guardians; and **Frost Peaks**, where exposure, rare ores, and ancient shrines demand specialized gear. The names, precise ordering, and biome count are provisional.
+Start in the protected Portal Clearing. Early raids explore the **Misty Woods** with wolves, root guardians, abandoned camps, and hidden runestones. Later regions include **Moss Marsh**, where visibility and poisonous creatures challenge preparation; **Troll Valley**, with stony passes, bridges, and powerful guardians; and **Frost Peaks**, where exposure, rare ores, and ancient shrines demand specialized gear. The names, precise ordering, and biome count are provisional.
 
 ### 4.4 Narrative arcs
 
-**Act I – Find a home:** awaken, build shelter, restore the portal, and learn to return. **Act II – Gather a community:** recruit survivors, investigate the lost villages, and learn what fractured the pact. **Act III – Face the old powers:** defeat or negotiate with mythical guardians, recover the history of the Heart Tree, and confront the force consuming the forest. End-state choices can affect the relationship between settlers and spirits without turning every raid into a branching cinematic narrative.
+**Act I – Find a home:** awaken, build shelter, restore the portal, and learn to return. **Act II – Gather a community:** recruit survivors, investigate the lost villages, and learn what fractured the pact. **Act III – Face the old powers:** defeat or negotiate with mythical guardians, recover the history of the portal, and confront the force consuming the forest. End-state choices can affect the relationship between settlers and spirits without turning every raid into a branching cinematic narrative.
 
 ### 4.5 Storytelling channels
 
@@ -186,7 +186,7 @@ Environmental clues, NPC conversations, songs, short myths, event choices, landm
 
 6.  Purify extracted Cursed Essence and convert rewards into gear, magical skills, building tiers, defenses, and NPC jobs.
 
-7.  Maintain the Heart Tree ward and prepare the settlement for rare, signposted breaches.
+7.  Maintain the portal ward and prepare the settlement for rare, signposted breaches.
 
 8.  Unlock more dangerous destinations and repeat with new objectives.
 
@@ -208,7 +208,7 @@ Separate permanent progression (base, blueprints, levels, talents, learned abili
 
 ### 6.1 Starting area
 
-The initial clearing has the Heart Tree, a stream, fallen branches, loose stones, berries, and a ruined portal. Resource nodes in this region replenish slowly enough to support recovery after failure. Early construction locations are visible and reachable without combat.
+The initial clearing has the sleeping portal at its centre, a stream, fallen branches, loose stones and berries. Resource nodes in this region replenish slowly enough to support recovery after failure. Early construction locations are visible and reachable without combat.
 
 ### 6.2 At-home activities
 
@@ -216,7 +216,7 @@ Gather basics; place structures; cook and fill water; craft and refine; tend cro
 
 ### 6.3 Safety is a design promise, not absolute invulnerability
 
-The default state of Safe Haven is peaceful. No enemies spawn arbitrarily while the player is farming or crafting, and no attacks are simulated while the player is inside a Raid, offline, loading, or absent from the settlement. The Heart Tree ward may be breached **only during discrete, communicated defense events**. Before a breach, show its trigger, likely approach, and preparation state. If the player fails, apply bounded, repairable consequences instead of deleting all buildings, permanent unlocks, or irreplaceable NPCs. The Heart Tree may be strained but must never be permanently destroyed.
+The default state of Safe Haven is peaceful. No enemies spawn arbitrarily while the player is farming or crafting, and no attacks are simulated while the player is inside a Raid, offline, loading, or absent from the settlement. The portal ward may be breached **only during discrete, communicated defense events**. Before a breach, show its trigger, likely approach, and preparation state. If the player fails, apply bounded, repairable consequences instead of deleting all buildings, permanent unlocks, or irreplaceable NPCs. The portal may be strained but must never be permanently destroyed.
 
 **Night at home (amended October 27, 2026).** Once the first breach has been won, the night outside the ward is no
 longer empty. A few weak creatures prowl the dark beyond the ward and the light of campfires and torches. They never
@@ -229,13 +229,15 @@ the dark back: this is how the home grows into the night (see Docs/Atmosphere.md
 
 ### 6.4 Extending the clearing
 
-The player may expand buildable space through runes, Heart Tree upgrades, specific resources, or story milestones. Expansion should produce a visible change to the settlement and unlock meaningful placement options, rather than simply adding empty ground.
+The player may expand buildable space through runes, Portal upgrades, specific resources, or story milestones. Expansion should produce a visible change to the settlement and unlock meaningful placement options, rather than simply adding empty ground.
 
 ### 6.4.1 Base progression (November 2, 2026)
 
 The Construction Table, Sawbench, Furnace and Forge are replaced by whole buildings with five tiers that match resource tiers: the Workshop, the Woodcutter's Lodge and the Smithy. Each building opens the next, and what the base gives feeds raids through time, Well Rested and knowledge. See [base progression](BaseProgression.md); it overrides older station names in this document.
 
 **Second pass (November 3, 2026).** The Loom is now the Tailor's Shop and the Tanning Rack the Hunter's Lodge, both whole buildings. No upgrade is speed alone. Later tiers ask for other buildings, and new buildings open past copper: Stone Wall, Iron Trap, Runic Ward Totem, Trading Post. Ward levels open raid tiers, the portal can be improved, ranks bring settlers. Beds give a bonus and never gate anyone.
+
+**The portal at the heart (November 3, 2026).** The Heart Tree is gone, as it blocked the view of the base. The portal stands at the centre of Safe Haven and does everything the tree did: it speaks, holds the ward, wakes the fallen, and opens one menu for raids, the ward, Portal Sparks and repairs. Asleep it is a frame of dark stone. The story is the same: the stones that dropped the player here are what caught them.
 
 ### 6.5 Architectural progression
 
@@ -245,7 +247,7 @@ The visual progression should move from campfire and rough timber to huts, works
 
 A ward breach is an **occasional settlement event**, not a random raid against an unloaded base. Candidate triggers include a story milestone, a deliberate ward expansion, or an announced increase in magical pressure following significant progression. When a threat is pending, the player receives a visible warning and a defined preparation opportunity. The first encounter should be scripted and forgiving; later encounters may vary in direction, enemy composition, and special objectives. Avoid punishing players immediately after a failed expedition.
 
-**Proposed cadence for testing:** the first breach only after core building, crafting, and extraction have been learned; later events no more frequently than roughly every three to five successful raids or an equivalent amount of active progress. This is a pacing target, not an automatic raid counter. A readiness interaction at the Heart Tree can start a pending breach after the player finishes preparing; define a bounded postponement rule if pacing requires it. Never trigger an event during save/load or scene transitions.
+**Proposed cadence for testing:** the first breach only after core building, crafting, and extraction have been learned; later events no more frequently than roughly every three to five successful raids or an equivalent amount of active progress. This is a pacing target, not an automatic raid counter. A readiness interaction at the portal can start a pending breach after the player finishes preparing; define a bounded postponement rule if pacing requires it. Never trigger an event during save/load or scene transitions.
 
 ### 6.7 Defense gameplay
 
@@ -259,7 +261,7 @@ Start with **palisades/barricades** (routing and cover), **traps** (limited char
 
 Protect player agency with clearly marked spawn lanes, predictable pathing, visible structure health, a chance to recover, and limited repair costs. Early failure might damage a wall or temporarily disable a workstation; it should not destroy major progression buildings or permanently kill foundational residents without a separately agreed, clearly warned rule. The ward can weaken temporarily, motivating repairs or an expedition, but must not create a downward spiral where failure makes rebuilding impossible. Save persistent defense structures, damage, ward state, and event resolution. Resolve each defense reward/failure exactly once.
 
-**Implemented (October 31, 2026).** Four breaches in order, the last repeating 20% stronger each time; the next is due three successful raids after a win. A warned breach can be put off for two more raids, then the ward gives way at the next nightfall the player is home. Later breaches come in two or three waves down two or three lanes. Half the attackers go for the ward, half for the nearest building, and they turn on anyone close. Buildings are never destroyed: worn down, they are broken and out of use until mended, for 30% of the damage's build cost, all at once at the Heart Tree. The player falling doesn't end the defense. If the ward falls, the attackers leave, the ward draws in by 4 m until two more raids have been won, and the breach can be tried again.
+**Implemented (October 31, 2026).** Four breaches in order, the last repeating 20% stronger each time; the next is due three successful raids after a win. A warned breach can be put off for two more raids, then the ward gives way at the next nightfall the player is home. Later breaches come in two or three waves down two or three lanes. Half the attackers go for the ward, half for the nearest building, and they turn on anyone close. Buildings are never destroyed: worn down, they are broken and out of use until mended, for 30% of the damage's build cost, all at once at the portal. The player falling doesn't end the defense. If the ward falls, the attackers leave, the ward draws in by 4 m until two more raids have been won, and the breach can be tried again.
 
 ## 7. Raids: the central system
 
@@ -326,7 +328,7 @@ Gathered materials, newly looted gear, carried unique items, and Cursed Essence 
 
 ### 8.3 Death and anti-frustration
 
-On raid death, the player revives at the Heart Tree. The base, known recipes, levels, boss unlocks, and story progress remain intact. Carried inventory is lost, including gathered materials, unextracted Cursed Essence, unused consumables, and newly looted items. Equipment committed in the departure loadout is retained, takes durability damage, and can be repaired at home.
+On raid death, the player revives at the portal. The base, known recipes, levels, boss unlocks, and story progress remain intact. Carried inventory is lost, including gathered materials, unextracted Cursed Essence, unused consumables, and newly looted items. Equipment committed in the departure loadout is retained, takes durability damage, and can be repaired at home.
 
 **Death does not require equipment insurance or a Memory Token. Show inventory losses and equipment damage separately in the debrief, and make home repairs accessible with modest material costs so repeated failed raids do not prevent the player from returning to play.**
 
@@ -574,7 +576,7 @@ Simple food refills meters; cooked dishes additionally grant time-limited bonuse
 
 **Physical materials are items.** Grey Stone, Oak Wood, Iron Ore, planks, ingots, hides, berries and herbs stack in the bag grid like any other item. Every item has a **weight**, so materials compete with weapons, loot and supplies for both slots and carrying capacity. This is the core extraction decision: *what do I leave behind?*
 
-**Essences are metered bars.** Life Orbs, Life Motes, Portal Sparks, Cursed and Purified Essence are magical, weightless and shown as bars (e.g. **Life Orb 12/100**). They feed the Heart Tree, the portal, purification and special recipes. They have per-essence caps but no weight.
+**Essences are metered bars.** Life Orbs, Life Motes, Portal Sparks, Cursed and Purified Essence are magical, weightless and shown as bars (e.g. **Life Orb 12/100**). They feed the portal, the portal, purification and special recipes. They have per-essence caps but no weight.
 
 Equipment, weapons, potions and unique quest items remain items with their own slots and quick-access bar.
 
@@ -645,7 +647,7 @@ Essence has three main sinks: **equipment tier upgrades/enchantments**, **select
 | **Enchant** gear, one per item | Purified Essence | A safe bonus, with no drawback |
 | **Enchant** gear, one per item | Cursed Essence, raw | A stronger bonus with a stated price: *Bloodletting* +15% damage, -15 health. Replacing an enchantment costs the new one in full |
 | **Deepen** a skill, ranks I to III | Purified Essence | More power (damage, healing, buffs) and a shorter cooldown |
-| **Ward and great building tiers** | Purified Essence | Heart Tree ward levels; the top tier of the altar, Cauldron and Construction Table |
+| **Ward and great building tiers** | Purified Essence | Portal ward levels; the top tier of the altar, Cauldron and Construction Table |
 | **Draughts** at a Cauldron | Purified or Cursed Essence, and herbs | Repeatable tonics, so essence still matters once everything is upgraded |
 
 Empowering and enchanting belong to the one item, survive a failed raid with it and are shown in its name: *Gravebound Iron Mail Hauberk +1*. In a slot the level stands beside the tier and an enchantment colours the frame and adds a mark; in the hand a weapon sheds motes in its school's colour, stronger the more it has been empowered. Raw Cursed work happens at once, while purifying waits in the queue, which is part of the choice. Two enchantments feed the loop back: *Reaping* finds more Cursed Essence, *Hollow* drains life from what it hits. Upgrading the altar makes it purify faster. All of this happens in one window at the Purification Altar: Purify, Empower, Enchant and Skills.
@@ -846,7 +848,7 @@ At a station the queue and output stand beside the browser. The queue's heading 
 
 ### 18.9 The Haven window
 
-Pressing **H** at home, or asking the Heart Tree, answers "how is my home doing, and what now?" at a glance. The rank stands large with its line, beside four figures: renown, ward, cleared and buildings. Below it the ranks run as a ladder of stops, each an equal step apart, filled up to where Safe Haven stands, with the renown still needed and what the next rank brings in words. Three columns follow: **What next**, each step with the key that starts it and the renown it brings; **Renown**, largest first with a kind on one line; and the **Expedition**, everyone by name, home or still out there. A Build button goes straight to the build menu, as most of what the window suggests starts there.
+Pressing **H** at home, or asking the portal, answers "how is my home doing, and what now?" at a glance. The rank stands large with its line, beside four figures: renown, ward, cleared and buildings. Below it the ranks run as a ladder of stops, each an equal step apart, filled up to where Safe Haven stands, with the renown still needed and what the next rank brings in words. Three columns follow: **What next**, each step with the key that starts it and the renown it brings; **Renown**, largest first with a kind on one line; and the **Expedition**, everyone by name, home or still out there. A Build button goes straight to the build menu, as most of what the window suggests starts there.
 
 ### 18.6 First-use comprehension
 
@@ -966,7 +968,7 @@ content. Ingrid reuses the existing recruit identity; the other professions' ful
    the soldier offers limited nearby support and the Alchemist tends the player's wounds.
 7. Reaching zero opens the connection as a vast impact separates the expedition. Falling during this final defence
    gives an abbreviated version of the same narrative transition, not an ordinary raid failure.
-8. Wake alive at the Heart Tree, without a raid report or durability penalty. The expedition supplies do not carry
+8. Wake alive at the portal, without a raid report or durability penalty. The expedition supplies do not carry
    into the settlement. Inspect the dormant portal and restore it to begin searching for the companions.
 
 Before the final defence, falling returns the player to the current phase's checkpoint with health restored.
@@ -993,11 +995,11 @@ Construction Table needed for home crafting. Times in §21.1–21.5 describe the
 
 ### 21.1 Minutes 0–10: awakening
 
-The player wakes at the Heart Tree after losing contact with the expedition. A sunny clearing contains a stream, loose Small Rocks, fallen Sticks, and Berries, all gathered by hand at Tier 0. A short conversation with the tree gives the reason to build instead of a long opening cutscene: it caught only one, the other seven are alive, the forest is forgetting them, and a tended hearth is what they can see (§4.1). Reinforce the prologue's movement and interaction lessons while introducing permanent equipment and home crafting, then harvest Tier I Grey Stone and Oak Wood. Never require wood or Grey Stone to make the tool that first unlocks it.
+The player wakes at the portal after losing contact with the expedition. A sunny clearing contains a stream, loose Small Rocks, fallen Sticks, and Berries, all gathered by hand at Tier 0. A short conversation with the portal gives the reason to build instead of a long opening cutscene: it caught only one, the other seven are alive, the forest is forgetting them, and a tended hearth is what they can see (§4.1). Reinforce the prologue's movement and interaction lessons while introducing permanent equipment and home crafting, then harvest Tier I Grey Stone and Oak Wood. Never require wood or Grey Stone to make the tool that first unlocks it.
 
 ### 21.2 Minutes 10–25: first camp
 
-Build a campfire and construction table, prepare simple berry food, and fill water. The first fire is the first reward: the tree lights up, the ward wakes, and far out in the mist someone has turned to look. Demonstrate manageable hunger and thirst. Three nearby glowing stones are bound by enchanted roots; clearing them through simple interaction or puzzles releases the first Life Orbs.
+Build a campfire and construction table, prepare simple berry food, and fill water. The first fire is the first reward: the portal lights up, the ward wakes, and far out in the mist someone has turned to look. Demonstrate manageable hunger and thirst. Three nearby glowing stones are bound by enchanted roots; clearing them through simple interaction or puzzles releases the first Life Orbs.
 
 ### 21.3 Minutes 25–40: awakening the portal
 
@@ -1131,17 +1133,17 @@ Track raid completion rate, average duration, extraction timing, death and loss 
 These decisions cover §21 and the first ward breach. All numbers are tuning defaults that can be changed in Unity's Systems Editor (Safe Haven > Systems Editor) without code.
 
 - **Scope:** §21, plus the first scripted ward breach, Cursed and Purified Essence through the Alchemist, and the first ward upgrade. Bow, bosses, and talents come later.
-- **Death and time-out:** the player revives at the Heart Tree. Carried materials, consumables, and raid loot are lost. Deployed equipment (tools, weapons, and backpacks carried through the portal) is kept and loses 25% durability per failed raid. At 0% it is broken: kept, but unusable until repaired. Durability is lost only this way, never through use. Running out of time counts as a failed raid.
+- **Death and time-out:** the player revives at the portal. Carried materials, consumables, and raid loot are lost. Deployed equipment (tools, weapons, and backpacks carried through the portal) is kept and loses 25% durability per failed raid. At 0% it is broken: kept, but unusable until repaired. Durability is lost only this way, never through use. Running out of time counts as a failed raid.
 - **Repairs:** done at the Construction Table. A repair costs 50% of the item's recipe × the share of durability missing, with at least 1 of each material.
 - **Safe pocket:** one protected slot that is never lost (§8.3).
 - **Raid timer:** 12 minutes. A Portal Spark adds 3 minutes; at most 2 per raid, paid once at departure. Sparks are crafted at the portal from Life Orbs.
 - **Hunger and thirst:** they always drain, slowly at home and 2.5× faster in raids, and they are never lethal. Empty hunger lowers maximum stamina and slows its regeneration; empty thirst slows stamina regeneration in combat. Sources: berries, stewed berries (campfire), the stream, and waterskins.
 - **Resources and carrying:** materials are resource bars in four categories (Raw, Refined, Organic, Magical). Each resource holds up to 100, within a 150 weight budget. At home, crafting, building, and repairs also draw from storage.
-- **Building:** complete structures are placed freely, with a preview, inside the Heart Tree's ward radius. Building is instant, and structures can be moved for free.
+- **Building:** complete structures are placed freely, with a preview, inside the portal's ward radius. Building is instant, and structures can be moved for free.
 - **Tools and weapons:** weapons are crafted, equippable items (the Stone Axe first). The tool ladder is Stone → Copper → Iron, each gathering one tier further. Hardwood and iron ore need only stone tools. Copper and iron gear are made at the Forge.
 - **First recruit:** Ingrid, stranded on a side path in the Misty Woods. Enemies can attack her; if she falls, she stays behind for that raid. If she is extracted with the player, she becomes a resident. Her first job, Alchemist, teaches the Purification Altar: 2 Cursed Essence become 1 Purified Essence, in a queue that keeps working while she holds the job.
-- **First Essence upgrade:** strengthening the Heart Tree's ward grows the buildable area.
-- **First ward breach:** offered after the first successful extraction, with a warning; the player starts it at the Heart Tree. A few weak Forest-Bitten Wolves come along one marked path and attack only the player; buildings can't be damaged. The Palisade is the first defense. Winning gives 2 Life Orbs. If the player falls, they revive at the Heart Tree and can try again.
+- **First Essence upgrade:** strengthening the portal's ward grows the buildable area.
+- **First ward breach:** offered after the first successful extraction, with a warning; the player starts it at the portal. A few weak Forest-Bitten Wolves come along one marked path and attack only the player; buildings can't be damaged. The Palisade is the first defense. Winning gives 2 Life Orbs. If the player falls, they revive at the portal and can try again.
 - **Next destination:** Troll Valley is shown but locked. A Forge Blueprint is found in the Misty Woods; building the Forge needs Trollstone.
 - **Legacy prototype content** (extra ores, woods, fibers, the loom, valuables, sigils, the human enemy) is kept and renamed to fit the theme.
 
@@ -1208,7 +1210,7 @@ Resolve these through targeted prototypes and documented decisions, not untested
 
 ## 27. Glossary and content rules
 
-**Safe Haven:** the largely peaceful, ward-protected, permanently evolving settlement that can face controlled breaches. **Ward Breach:** a progression-gated, announced settlement-defense encounter while the player is present. **Purification Altar:** workstation that converts extracted Cursed Essence to Purified Essence. **Cursed Essence:** high-value, normally unextracted magical raid loot obtained from enemies and raid successes. **Purified Essence:** stable magical upgrade material processed in Safe Haven. **Heart Tree:** ancient protector of the clearing. **Raid:** a time-limited portal expedition to unsafe territory. **Extraction:** successfully returning through an authorized exit. **Life Orb:** magical resource associated with the portal and forest magic. **Portal Spark:** crafted at the portal from Life Orbs; each adds 3 minutes to a raid (at most 2, paid at departure). **Safe Pocket:** a small protected inventory slot whose contents are never lost. **Resource Bar:** the non-grid material inventory display. **Carry Budget:** weight-based limit in addition to per-resource capacities. **Companion:** an NPC deployed into a dangerous raid. **RaidDirector:** system assembling and supervising individual raids. **Vertical Slice:** short, polished example that reflects final experience quality.
+**Safe Haven:** the largely peaceful, ward-protected, permanently evolving settlement that can face controlled breaches. **Ward Breach:** a progression-gated, announced settlement-defense encounter while the player is present. **Purification Altar:** workstation that converts extracted Cursed Essence to Purified Essence. **Cursed Essence:** high-value, normally unextracted magical raid loot obtained from enemies and raid successes. **Purified Essence:** stable magical upgrade material processed in Safe Haven. **Portal:** ancient protector of the clearing. **Raid:** a time-limited portal expedition to unsafe territory. **Extraction:** successfully returning through an authorized exit. **Life Orb:** magical resource associated with the portal and forest magic. **Portal Spark:** crafted at the portal from Life Orbs; each adds 3 minutes to a raid (at most 2, paid at departure). **Safe Pocket:** a small protected inventory slot whose contents are never lost. **Resource Bar:** the non-grid material inventory display. **Carry Budget:** weight-based limit in addition to per-resource capacities. **Companion:** an NPC deployed into a dangerous raid. **RaidDirector:** system assembling and supervising individual raids. **Vertical Slice:** short, polished example that reflects final experience quality.
 
 ### 27.1 Criteria for new ideas
 

@@ -4,7 +4,7 @@ using UnityEngine;
 /// Watches Safe Haven grow: adds up its renown (HavenRenown) whenever something is built, upgraded or cleared, shows
 /// the gain, and celebrates each new rank once: a banner, a sound, experience, and the ward widening (HavenSettings), so
 /// the moss spreads out to the new edge and there is new ground to build on. Clearing a quarter, half, three quarters
-/// and all of the overgrowth is announced too. Added to the Heart Tree when the scene starts; makes the Haven HUD and the
+/// and all of the overgrowth is announced too. Added to the portal when the scene starts; makes the Haven HUD and the
 /// Haven window (H).
 /// </summary>
 [DisallowMultipleComponent]
@@ -97,7 +97,7 @@ public sealed class HavenProgress : MonoBehaviour
             AudioManager.Play(settings.RankSound, transform.position);
             CameraShake.Add(0.15f);
             ExperienceTracker.Grant(settings.RankExperience);
-            GameMessages.Post($"Safe Haven is now a {reached.name}! The ward reaches {(HeartTree.Current != null ? HeartTree.Current.WardRadius : 0f):0} m.", MessageKind.Gain);
+            GameMessages.Post($"Safe Haven is now a {reached.name}! The ward reaches {(HomePortal.Current != null ? HomePortal.Current.WardRadius : 0f):0} m.", MessageKind.Gain);
         }
 
         RaiseRankEvents(settings);

@@ -224,7 +224,7 @@ public sealed class MinimapHud : MonoBehaviour
         material.SetVector(CentreId, new Vector4((centre.x - area.xMin) / area.width, (centre.z - area.yMin) / area.height, 0f, 0f));
         material.SetVector(SpanId, new Vector4(reach / area.width, reach / area.height, 0f, 0f));
         material.SetFloat(TurnId, turn);
-        HeartTree tree = HeartTree.Current;
+        HomePortal tree = HomePortal.Current;
         material.SetFloat(RingRadiusId, tree != null ? tree.WardRadius : 0f);
         if (tree != null)
         {

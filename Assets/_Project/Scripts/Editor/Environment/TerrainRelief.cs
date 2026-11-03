@@ -9,7 +9,7 @@ using UnityEngine;
 /// dips (noise, a few tens of centimetres) so sunlight and shadow vary across the ground instead of lying flat. Only
 /// level ground changes: sculpted or carved areas (stream beds) keep their shape, and the ground stays level within a
 /// clearance of anything standing on it (buildings, rocks, trees, water), so nothing floats or sinks. Optionally keeps
-/// the Heart Tree's ward (where the player builds) level. Undoable; rebake the NavMesh afterwards.</summary>
+/// the portal's ward (where the player builds) level. Undoable; rebake the NavMesh afterwards.</summary>
 public static class TerrainRelief
 {
     [MenuItem("Safe Haven/World/Terrain/Add Gentle Relief...")]
@@ -23,7 +23,7 @@ public static class TerrainRelief
         [Min(2f)] public float scale = 14f;
         [Tooltip("The ground stays level within this distance of objects and water (metres).")]
         [Min(0f)] public float clearance = 1.5f;
-        [Tooltip("Keep the ground inside the Heart Tree's ward level, where buildings are placed.")]
+        [Tooltip("Keep the ground inside the portal's ward level, where buildings are placed.")]
         public bool keepWardLevel = true;
         public int seed = 1;
         [Tooltip("Rebake the scene's NavMesh Surfaces so monsters and NPCs walk on the new ground.")]
@@ -96,7 +96,7 @@ public static class TerrainRelief
     }
 
     /// <summary>Samples that must stay as they are: not level ground (carved, sculpted), under or beside objects
-    /// standing on the ground, under water, or (optionally) inside the Heart Tree's ward.</summary>
+    /// standing on the ground, under water, or (optionally) inside the portal's ward.</summary>
     private static bool[,] Blocked(Terrain terrain, float[,] heights, float level, bool keepWardLevel)
     {
         TerrainData data = terrain.terrainData;
@@ -135,10 +135,10 @@ public static class TerrainRelief
             }
         }
 
-        if (keepWardLevel && HeartTree.Current != null)
+        if (keepWardLevel && HomePortal.Current != null)
         {
-            Vector3 centre = HeartTree.Current.transform.position;
-            float radius = HeartTree.Current.WardRadius + 2f;
+            Vector3 centre = HomePortal.Current.transform.position;
+            float radius = HomePortal.Current.WardRadius + 2f;
             for (int z = 0; z < n; z++)
             {
                 for (int x = 0; x < n; x++)

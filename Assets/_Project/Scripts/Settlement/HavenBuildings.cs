@@ -235,7 +235,7 @@ public static class HavenBuildings
         entry.Actions.Add(new HavenAction(affordable ? label : "Not enough materials", () => builder.Place(building), affordable));
     }
 
-    // The ward isn't a building of its own: it grows at the Heart Tree, and that is an upgrade like any other.
+    // The ward isn't a building of its own: it grows at the portal, and that is an upgrade like any other.
     private static HavenEntry WardEntry(MaterialPool pool)
     {
         SettlementSettings settings = SettlementSettings.Current;
@@ -246,20 +246,20 @@ public static class HavenBuildings
 
         int level = GameSession.Settlement.WardLevel;
         int most = settings.WardLevels.Count;
-        string radius = HeartTree.Current != null ? $"{HeartTree.Current.WardRadius:0} m" : $"{settings.WardRadiusAt(level):0} m";
+        string radius = HomePortal.Current != null ? $"{HomePortal.Current.WardRadius:0} m" : $"{settings.WardRadiusAt(level):0} m";
         var entry = new HavenEntry
         {
             Key = settings,
-            Name = "Heart Tree ward",
+            Name = "Portal ward",
             Line = $"Level {level + 1} of {most + 1}, {radius}",
             Badge = $"{level + 1}/{most + 1}",
             State = HavenEntryState.Good,
             Status = $"The ward reaches {radius}.",
-            Description = "Everything in Safe Haven is built inside the Heart Tree's ward. Renown and strengthening it at the tree both widen it.",
+            Description = "Everything in Safe Haven is built inside the portal's ward. Renown and strengthening it at the portal both widen it.",
         };
-        if (HeartTree.Current != null)
+        if (HomePortal.Current != null)
         {
-            HavenTravel.AddGoTo(entry, HeartTree.Current.transform);
+            HavenTravel.AddGoTo(entry, HomePortal.Current.transform);
         }
 
         if (level < most)
@@ -274,11 +274,11 @@ public static class HavenBuildings
                 }
             }
 
-            entry.Details.Add(new HavenDetail("Next", $"{next.extraRadius:0} m wider. Strengthen it at the Heart Tree.", costs));
+            entry.Details.Add(new HavenDetail("Next", $"{next.extraRadius:0} m wider. Strengthen it at the portal.", costs));
         }
         else
         {
-            entry.Details.Add(new HavenDetail("Next", "The ward is as strong as the Heart Tree can make it."));
+            entry.Details.Add(new HavenDetail("Next", "The ward is as strong as the portal can make it."));
         }
 
         return entry;
