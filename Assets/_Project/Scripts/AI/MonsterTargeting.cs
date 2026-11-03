@@ -70,6 +70,11 @@ public sealed class MonsterTargeting
             return false;
         }
 
+        if (candidate is Component body && Companion.IsHidden(body))
+        {
+            return false;
+        }
+
         return relentless || !definition.HasTemperament(MonsterTemperament.Defensive)
             || Vector3.Distance(home, candidateCollider.transform.position) <= definition.DefensiveRadius;
     }

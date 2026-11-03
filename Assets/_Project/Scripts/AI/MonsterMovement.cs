@@ -10,6 +10,7 @@ public sealed class MonsterMovement
 {
     private const float FacingTolerance = 20f;
     private const float NavMeshSnapDistance = 2f;
+    private const float CutOffGap = 1.5f;
 
     private readonly Transform self;
     private readonly NavMeshAgent agent;
@@ -18,6 +19,8 @@ public sealed class MonsterMovement
 
     private float nextRepathTime;
     private bool warnedOffNavMesh;
+    private Vector3 asked;
+    private bool hasAsked;
 
     public MonsterMovement(Transform self, NavMeshAgent agent, float repathInterval, float turnSpeed)
     {
@@ -42,6 +45,12 @@ public sealed class MonsterMovement
             return velocity.magnitude;
         }
     }
+
+    /// <summary>True when it has gone as far as the NavMesh lets it, and that isn't where it was going: its target stands somewhere it can't reach.</summary>
+    public bool IsCutOff => hasAsked && agent.isActiveAndEnabled && agent.isOnNavMesh && agent.remainingDistance < 0.8f
+        // Not the path status: at the end of a path it can't finish, that reads complete with no distance left, and the search for
+        // a way that isn't there is pending nearly all the time. It is simply still far off.
+        && (self.position - asked).sqrMagnitude > CutOffGap * CutOffGap;
 
     public void SetSpeed(float metresPerSecond)
     {
@@ -69,6 +78,8 @@ public sealed class MonsterMovement
         }
 
         agent.updateRotation = true;
+        asked = destination;
+        hasAsked = true;
         // Re-requesting the same spot while the last search is still running would restart it and, on a long path,
         // keep it from ever finishing.
         if (agent.pathPending && (agent.destination - destination).sqrMagnitude < 0.25f)
@@ -91,6 +102,7 @@ public sealed class MonsterMovement
     {
         agent.updateRotation = false;
         nextRepathTime = 0f;
+        hasAsked = false;
         if (agent.isActiveAndEnabled && agent.isOnNavMesh && (agent.hasPath || agent.pathPending))
         {
             agent.ResetPath();

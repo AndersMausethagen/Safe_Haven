@@ -15,6 +15,8 @@ using UnityEngine.AI;
 /// player in conversation, as answers its CompanionDefinition lists. "Attack my target" is whatever the leader (the
 /// player) last hit. Enemies see it as Player faction, but they go for the player first while they can reach them
 /// (MonsterAI). How it fights is the CompanionDefinition; health and armour are its Combatant's stats.
+/// It keeps a place in formation turned with the way the leader goes, leaves enemies another has, steps out of blows it sees
+/// coming, keeps low while the player sneaks, catches up if it falls behind, and speaks up in a fight (CompanionBarks).
 /// </para>
 /// <para>
 /// Where it belongs: on a character with a NavMeshAgent, a Combatant of the Player faction, a Damageable that isn't
@@ -34,7 +36,7 @@ public sealed class Companion : MonoBehaviour, IConversationTopics
     [Tooltip("Who they are: the name used when they are knocked down.")]
     [SerializeField] private ResidentDefinition resident;
     [SerializeField] private CompanionOrder startingOrder = CompanionOrder.Follow;
-    [Tooltip("Their place while following, from the leader (world axes): (2, 0, -3) walks right of and behind them.")]
+    [Tooltip("Their place while following, turned with the way the leader is heading: (2, 0, -3) walks right of and behind them.")]
     [SerializeField] private Vector3 formationOffset;
     [Tooltip("Offer the definition's orders when the player talks to them.")]
     [SerializeField] private bool ordersInConversation = true;
@@ -58,6 +60,27 @@ public sealed class Companion : MonoBehaviour, IConversationTopics
     private CompanionRevive revive;
     private float ownSpeed = -1f;
     private float walkingPace;
+    private readonly CompanionBarks barks = new CompanionBarks();
+    // The way the leader is heading, for its place in the formation. It keeps the last while they stand.
+    private Vector3 heading = Vector3.forward;
+    private Vector3 leaderWasAt;
+    private float hurry = 1f;
+    private float stuckSince = -1f;
+    // Stepping out of a blow until then, and whose blow it last looked at, so it doesn't keep rolling for the same one.
+    private float dodgingUntil = -1f;
+    private MonsterAI watching;
+    private float watchAgainAt;
+    private bool shotBlocked;
+    private float archerSide = 1f;
+    private float nextArcherSideAt;
+
+    private const float LeaderMovesFaster = 0.8f;
+    private const float DodgeSeconds = 0.7f;
+    private const float DodgeSpeed = 1.6f;
+    private const float ChargeArc = 40f;
+    private const float StuckLimit = 5f;
+    private const float BehindArc = 110f;
+    private const float WarnWithin = 7f;
 
     /// <summary>Every enabled companion, for systems that give orders or show them.</summary>
     public static IReadOnlyList<Companion> Active => active;
@@ -73,6 +96,9 @@ public sealed class Companion : MonoBehaviour, IConversationTopics
     /// <summary>They go where they are told but leave enemies to the player (a lesson: nobody kills the practice target).</summary>
     public bool HoldFire { get; set; }
 
+    /// <summary>True while the player sneaks and nothing has noticed yet: they keep low with them, start nothing, and don't give them away.</summary>
+    public bool IsKeepingLow { get; private set; }
+
     public Vector3 FormationOffset
     {
         get => formationOffset;
@@ -84,13 +110,8 @@ public sealed class Companion : MonoBehaviour, IConversationTopics
     /// <summary>Walks at this many metres a second (a party keeping one pace), or their own speed again when 0 or less.</summary>
     public void SetPace(float metresPerSecond)
     {
-        if (ownSpeed < 0f)
-        {
-            ownSpeed = agent.speed;
-        }
-
-        agent.speed = metresPerSecond > 0f ? metresPerSecond : ownSpeed;
         walkingPace = Mathf.Max(0f, metresPerSecond);
+        ApplySpeed();
     }
 
     /// <summary>Gives an order; Stay holds where they stand now.</summary>
@@ -113,6 +134,7 @@ public sealed class Companion : MonoBehaviour, IConversationTopics
     private void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
+        ownSpeed = agent.speed;
         combatant = GetComponent<Combatant>();
         health = GetComponent<Damageable>();
         interactable = GetComponent<Interactable>();
@@ -189,7 +211,7 @@ public sealed class Companion : MonoBehaviour, IConversationTopics
             Think();
         }
 
-        weapon.Fight(engaged);
+        weapon.Fight(engaged, Time.time < dodgingUntil || shotBlocked);
         // Stops to listen while the player talks to them, unless there is fighting to do.
         agent.isStopped = threats.Count == 0 && talkable != null && talkable.IsTalking;
         body.SetSpeed(agent.isStopped ? 0f : agent.velocity.magnitude, engaged == null ? walkingPace : 0f);
@@ -199,11 +221,20 @@ public sealed class Companion : MonoBehaviour, IConversationTopics
 
     private void Think()
     {
+        WatchLeader();
+        PlayerStealth stealth = leader.Player.Stealth;
+        IsKeepingLow = stealth != null && stealth.IsSneaking && !MonsterAI.AnyHuntingPlayerSide();
         GatherThreats();
-        if (HoldFire)
+        if (HoldFire || IsKeepingLow)
         {
             threats.Clear();
             threatMonsters.Clear();
+        }
+
+        Speak();
+        if (GetsOutOfTheWay())
+        {
+            return;
         }
 
         MonsterAI leaderTarget = leader.Target;
@@ -212,7 +243,7 @@ public sealed class Companion : MonoBehaviour, IConversationTopics
             Order = Order,
             Self = transform.position,
             Leader = leader.Player.transform.position,
-            FollowPoint = leader.Player.transform.position + formationOffset,
+            FollowPoint = CompanionTactics.FormationPoint(leader.Player.transform.position, heading, formationOffset),
             HoldPoint = holdPoint,
             LeaderTarget = leaderTarget != null ? threatMonsters.IndexOf(leaderTarget) : -1,
             Threats = threats,
@@ -220,13 +251,21 @@ public sealed class Companion : MonoBehaviour, IConversationTopics
 
         intent = CompanionTactics.Decide(situation, definition.Ranges);
         engaged = intent.Action == CompanionAction.Attack ? threatMonsters[intent.Target] : null;
+        shotBlocked = false;
+        // An archer keeps its eyes on what it shoots while it moves about.
+        agent.updateRotation = !(definition.IsRanged && engaged != null);
+        KeepUp();
         switch (intent.Action)
         {
             case CompanionAction.Move:
                 MoveTo(intent.Point);
                 break;
             case CompanionAction.Attack:
-                if (Flat(engaged.transform.position - transform.position) > definition.ReachFor(0.5f))
+                if (definition.IsRanged)
+                {
+                    Shoot();
+                }
+                else if (Flat(engaged.transform.position - transform.position) > definition.ReachFor(0.5f))
                 {
                     MoveTo(engaged.transform.position);
                 }
@@ -240,6 +279,190 @@ public sealed class Companion : MonoBehaviour, IConversationTopics
                 Halt();
                 break;
         }
+    }
+
+    private void Shoot()
+    {
+        shotBlocked = !weapon.HasClearShot(engaged);
+        if (Time.time >= nextArcherSideAt)
+        {
+            nextArcherSideAt = Time.time + 3f;
+            archerSide = UnityEngine.Random.value < 0.5f ? -1f : 1f;
+        }
+
+        Vector3? step = CompanionTactics.ArcherStep(transform.position, engaged.transform.position, definition.KeepAway, definition.ReachFor(0.5f), !shotBlocked, archerSide);
+        if (step.HasValue)
+        {
+            MoveTo(step.Value);
+        }
+        else
+        {
+            Halt();
+        }
+    }
+
+    // Which way the leader is going. Standing or turning on the spot, the formation stays as it is: it doesn't spin round them.
+    private void WatchLeader()
+    {
+        Vector3 at = leader.Player.transform.position;
+        Vector3 moved = (at - leaderWasAt) / ThinkInterval;
+        moved.y = 0f;
+        leaderWasAt = at;
+        if (moved.magnitude >= LeaderMovesFaster && moved.magnitude < 30f)
+        {
+            heading = Vector3.Slerp(heading, moved.normalized, 0.5f);
+        }
+    }
+
+    private void ApplySpeed()
+    {
+        float speed = walkingPace > 0f ? walkingPace : ownSpeed * (IsKeepingLow ? definition.SneakSpeed : 1f) * hurry;
+        agent.speed = Time.time < dodgingUntil ? speed * DodgeSpeed : speed;
+    }
+
+    // Falling behind: it hurries, and if that won't do, it comes up from behind the leader by other ways, where nobody sees it arrive. Only when
+    // it is meant to be with them, and not on a walk or at a post.
+    private void KeepUp()
+    {
+        hurry = 1f;
+        bool following = walkingPace <= 0f && Order != CompanionOrder.Stay && threats.Count == 0;
+        if (following)
+        {
+            float distance = Flat(leader.Player.transform.position - transform.position);
+            bool moving = agent.velocity.sqrMagnitude > 0.04f || distance <= definition.Ranges.Slack * 2f;
+            stuckSince = moving ? -1f : stuckSince >= 0f ? stuckSince : Time.time;
+            CompanionTactics.CatchUp need = CompanionTactics.HowToCatchUp(distance, definition.HurryFrom, definition.WarpFrom,
+                stuckSince >= 0f ? Time.time - stuckSince : 0f, StuckLimit);
+            if (need == CompanionTactics.CatchUp.Hurrying)
+            {
+                hurry = definition.HurrySpeed;
+            }
+            else if (need == CompanionTactics.CatchUp.Warp)
+            {
+                Vector3 behind = leader.Player.transform.position - heading * (definition.HurryFrom + 4f);
+                if (NavMesh.SamplePosition(behind, out NavMeshHit hit, 8f, agent.areaMask))
+                {
+                    agent.Warp(hit.position);
+                    stuckSince = -1f;
+                }
+            }
+        }
+
+        ApplySpeed();
+    }
+
+    // A blow is coming that would reach it, and it may see it in time. True while it gets out of the way, which comes before anything else.
+    private bool GetsOutOfTheWay()
+    {
+        if (Time.time < dodgingUntil)
+        {
+            return true;
+        }
+
+        bool wasDodging = dodgingUntil >= 0f;
+        dodgingUntil = -1f;
+        if (wasDodging)
+        {
+            ApplySpeed();
+        }
+
+        foreach (MonsterAI monster in threatMonsters)
+        {
+            AttackDefinition attack = monster.CurrentAttack;
+            if (attack == null || !monster.IsClosingIn)
+            {
+                continue;
+            }
+
+            MonsterAttack action = monster.ActiveAction;
+            bool charge = action != null && action.kind == MonsterAttackKind.Charge;
+            float reach = charge ? action.chargeDistance : attack.Range + 0.4f;
+            if (!CompanionTactics.InTheWay(transform.position, monster.transform.position, monster.AttackDirection, reach, charge ? ChargeArc : attack.Arc))
+            {
+                continue;
+            }
+
+            if (monster == watching && Time.time < watchAgainAt)
+            {
+                continue;
+            }
+
+            watching = monster;
+            watchAgainAt = Time.time + attack.HitDelay + 0.5f;
+            if (UnityEngine.Random.value >= definition.ReadsAttacks)
+            {
+                continue;
+            }
+
+            dodgingUntil = Time.time + DodgeSeconds;
+            ApplySpeed();
+            MoveTo(CompanionTactics.StepOutOfTheWay(transform.position, monster.transform.position, monster.AttackDirection));
+            return true;
+        }
+
+        return false;
+    }
+
+    private void Speak()
+    {
+        bool hunted = false;
+        foreach (CompanionThreat threat in threats)
+        {
+            hunted |= threat.HuntsLeader || threat.HuntsSelf;
+        }
+
+        CompanionBarks.Moment moment = barks.Think(hunted, BlowFromBehindTheLeader(), health.HealthFraction, Time.time);
+        if (DialogueBox.Current == null || !CompanionBarks.MaySpeak(moment, Time.time, DialogueBox.IsSpeaking))
+        {
+            return;
+        }
+
+        string[] lines = CompanionBarks.LinesFor(moment, resident != null ? resident.FightLines : null, definition.FightLines);
+        if (lines == null || lines.Length == 0)
+        {
+            return;
+        }
+
+        CompanionBarks.Spoke(moment, Time.time);
+        DialogueBox.Current.Aside(talkable != null ? talkable.Speaker : new DialogueSpeaker(DisplayName, transform), lines[UnityEngine.Random.Range(0, lines.Length)]);
+    }
+
+    private bool BlowFromBehindTheLeader()
+    {
+        Transform player = leader.Player.transform;
+        foreach (MonsterAI monster in threatMonsters)
+        {
+            if (!monster.IsClosingIn || !monster.IsEngaging(leader.Player.Health))
+            {
+                continue;
+            }
+
+            Vector3 to = monster.transform.position - player.position;
+            to.y = 0f;
+            if (to.sqrMagnitude <= WarnWithin * WarnWithin && Vector3.Angle(player.forward, to) >= BehindArc)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>The monsters' senses pass over this one while it keeps low.</summary>
+    public static bool IsHidden(Component candidate) => candidate.TryGetComponent(out Companion companion) && companion.IsKeepingLow;
+
+    private int TakenBy(MonsterAI monster)
+    {
+        int taken = 0;
+        foreach (Companion other in active)
+        {
+            if (other != this && other.engaged == monster)
+            {
+                taken++;
+            }
+        }
+
+        return taken;
     }
 
     // Enemies near it or its leader, and the leader's own target wherever it is.
@@ -266,7 +489,7 @@ public sealed class Companion : MonoBehaviour, IConversationTopics
             }
 
             threatMonsters.Add(monster);
-            threats.Add(new CompanionThreat(position, monster.IsEngaging(leaderBody), monster.IsEngaging(health)));
+            threats.Add(new CompanionThreat(position, monster.IsEngaging(leaderBody), monster.IsEngaging(health), TakenBy(monster)));
         }
     }
 

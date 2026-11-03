@@ -19,6 +19,7 @@ MonoBehaviour:
   teachesBuildings: []
   teachesRecipes: []
   workplace: {fileID: 11400000, guid: cfa8f019a4062c84f8e9b8cd432080e0, type: 2}
+  workGesture: {fileID: 11400000, guid: befa690f3a033144da5dc52883dbdb0f, type: 2}
   workOrders:
   - recipe: {fileID: 11400000, guid: 75c88139bb66ec24e942221821b20985, type: 2}
     stockTarget: 30

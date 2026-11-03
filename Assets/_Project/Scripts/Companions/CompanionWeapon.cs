@@ -10,6 +10,7 @@ public sealed class CompanionWeapon
 {
     private const float TurnSpeed = 540f;
     private const float ShotHeight = 1.4f;
+    private static readonly RaycastHit[] ShotHits = new RaycastHit[16];
 
     private readonly Transform self;
     private readonly Combatant combatant;
@@ -39,8 +40,40 @@ public sealed class CompanionWeapon
         }
     }
 
-    /// <summary>Faces <paramref name="engaged"/> when within reach and starts the next attack when it is ready.</summary>
-    public void Fight(MonsterAI engaged)
+    /// <summary>True when nothing but creatures stands between it and <paramref name="target"/>: arrows pass its friends, not the trees.</summary>
+    public bool HasClearShot(MonsterAI target)
+    {
+        Vector3 origin = self.position + Vector3.up * ShotHeight;
+        Vector3 aim = target.TryGetComponent(out Collider targetBody) ? targetBody.bounds.center : target.transform.position + Vector3.up * 0.5f;
+        Vector3 line = aim - origin;
+        float length = line.magnitude;
+        if (length < 0.01f)
+        {
+            return true;
+        }
+
+        int count = Physics.RaycastNonAlloc(origin, line / length, ShotHits, length, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore);
+        for (int i = 0; i < count; i++)
+        {
+            Transform hit = ShotHits[i].collider.transform;
+            if (hit.IsChildOf(self) || hit.IsChildOf(target.transform))
+            {
+                continue;
+            }
+
+            Damageable body = ShotHits[i].collider.GetComponentInParent<Damageable>();
+            if (body == null || body.Category != TargetCategory.Creature)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /// <summary>Faces <paramref name="engaged"/> when within reach and starts the next attack when it is ready, unless it is
+    /// <paramref name="busy"/> (getting out of the way, or looking for a line).</summary>
+    public void Fight(MonsterAI engaged, bool busy = false)
     {
         if (engaged == null || !isFoe(engaged))
         {
@@ -59,7 +92,7 @@ public sealed class CompanionWeapon
             self.rotation = Quaternion.RotateTowards(self.rotation, Quaternion.LookRotation(toTarget), TurnSpeed * Time.deltaTime);
         }
 
-        if (Time.time >= nextAttack && strikeAt < 0f)
+        if (!busy && Time.time >= nextAttack && strikeAt < 0f)
         {
             nextAttack = Time.time + definition.AttackInterval;
             strikeAt = Time.time + definition.StrikeDelay;

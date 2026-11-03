@@ -12,6 +12,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e3af07ed91cc3840b0c8a2e011411d2, type: 3}
   m_Name: SettlementSettings
   m_EditorClassIdentifier: Assembly-CSharp::SettlementSettings
+  residentWakeHour: 6.5
+  residentWorkFromHour: 8
+  residentMealFromHour: 12
+  residentMealUntilHour: 13
+  residentWorkUntilHour: 18
+  residentSleepFromHour: 22
+  residentGatheringPlace: {fileID: 11400000, guid: 95f7d6e0cc6f5144fa85269777959d65, type: 2}
+  residentWalkSpeed: 1.6
+  residentRunSpeed: 3.8
+  residentDangerRadius: 9
+  residentMealGesture: {fileID: 11400000, guid: 4502e1aa384270f43ba3b32319cf4b17, type: 2}
+  residentSleepGesture: {fileID: 11400000, guid: 2f1cb88c8248f6441833785d33cf5d09, type: 2}
+  residentFireGestures:
+  - {fileID: 11400000, guid: 4502e1aa384270f43ba3b32319cf4b17, type: 2}
+  - {fileID: 11400000, guid: 1ec4a5e51fc209344a827112c43c6e9e, type: 2}
+  - {fileID: 11400000, guid: 586cf3768c4e1674aa7e58747d6d5294, type: 2}
+  - {fileID: 11400000, guid: 737ebe7a30f61ba4c9eeecb74332517a, type: 2}
   portalRepairCost:
   - resource: {fileID: 11400000, guid: a86ac9a152512464ab08e0446c161e61, type: 2}
     amount: 3

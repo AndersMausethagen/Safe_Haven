@@ -17,6 +17,10 @@ using UnityEngine.AI;
 /// between them: idle, investigating, chasing, attacking, staggered, hopping, returning, dead.
 /// </para>
 /// <para>
+/// With nothing going on it lives a little (MonsterIdleLife). In a fight it spreads out around its target with others (AttackTurns.FlankSpot),
+/// won't loose a shot it has no clear line for, walks off once its target stands where it can't be reached, and flees when its pack breaks.
+/// </para>
+/// <para>
 /// Backstabs: it answers one with a strike or a hop, and remembers it (BackstabMemory), as do others of its side who saw. One that
 /// remembers may see the next swing coming from behind while it strikes, and break off to hop aside or parry. It is also the guard
 /// on its own Damageable, for that parry and the shield its definition may give it.
@@ -120,6 +124,28 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject, IStaggerable, IHit
     // Close strikes at the player don't start together: shared by every monster.
     private static float nextTurnAt;
 
+    private MonsterIdleLife idleLife;
+    // Fleeing from a broken pack until then.
+    private float routedUntil = float.NegativeInfinity;
+    // Its target stands where it can't be reached: since when, and until when it doesn't try again.
+    private float cutOffSince = -1f;
+    private float ignoresTargetsUntil = float.NegativeInfinity;
+    // It has a shot ready, but something in the way: checked now and then, and which way it steps to find a line.
+    private bool shotIsClear = true;
+    private float nextShotCheckAt;
+    private float shotSide = 1f;
+    private float nextShotSideAt;
+    // How its target is moving, worked out from where it has been.
+    private Vector3 targetWasAt;
+    private Vector3 targetVelocity;
+    private readonly System.Collections.Generic.List<Vector3> flankers = new System.Collections.Generic.List<Vector3>();
+    private Vector3 chaseSpot;
+    private float nextChaseSpotAt;
+
+    private const float FlankStartsWithin = 12f;
+    private const float FlankStandOff = 2.2f;
+    private const float FlankRefreshSeconds = 0.3f;
+
     private static readonly System.Collections.Generic.List<MonsterAI> active = new System.Collections.Generic.List<MonsterAI>();
     private static readonly System.Collections.Generic.List<MonsterAI> all = new System.Collections.Generic.List<MonsterAI>();
 
@@ -145,6 +171,9 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject, IStaggerable, IHit
 
         return false;
     }
+
+    /// <summary>True while it is coming at its target with a close strike: what a companion steps out of the way of.</summary>
+    public bool IsClosingIn => CurrentState == State.Attacking && attacks.IsClosingIn;
 
     /// <summary>True while this monster chases or attacks the player or someone on their side.</summary>
     public bool IsHuntingPlayerSide => targetComponent != null && IsEngaging(target) && target.Faction.IsPlayerSide();
@@ -305,6 +334,8 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject, IStaggerable, IHit
         }
 
         movement.SetSpeed(definition.MoveSpeed);
+        idleLife = new MonsterIdleLife(definition);
+        idleLife.Reset();
         senses = new MonsterSenses(transform, definition, targetLayers,
             (candidate, collider) => targeting.IsSenseCandidate(candidate, collider, home, Relentless));
         attacks = new MonsterAttacks(transform, definition, combatant, movement, targetLayers);
@@ -388,6 +419,7 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject, IStaggerable, IHit
         }
 
         poise?.Tick(Time.time, Time.deltaTime);
+        TrackTargetMovement();
         if (CurrentState == State.Staggered)
         {
             UpdateStagger();
@@ -484,6 +516,12 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject, IStaggerable, IHit
                 senses.Awareness.Calm();
                 RefreshAmbush();
             }
+
+            if (UpdateIdleLife())
+            {
+                return;
+            }
+
             GoHomeOrIdle();
             if (CurrentState == State.Idle)
             {
@@ -505,7 +543,216 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject, IStaggerable, IHit
             return;
         }
 
+        if (WalksOffCutOff())
+        {
+            return;
+        }
+
         Engage();
+    }
+
+    // ----- Idle life -----
+
+    private bool UpdateIdleLife()
+    {
+        if (CurrentState != State.Idle || idleLife == null || !idleLife.IsOn || KeepAwake || Relentless || roaming)
+        {
+            return false;
+        }
+
+        MonsterIdleLife.Doing before = idleLife.Now;
+        if (idleLife.Now == MonsterIdleLife.Doing.Walking)
+        {
+            if (idleLife.HasArrived(transform.position))
+            {
+                movement.Stop();
+                idleLife.Settle();
+            }
+        }
+        else if (Time.time >= idleLife.Until)
+        {
+            Vector3 point = MonsterIdleLife.WanderPoint(home, definition.IdleWanderRadius, UnityEngine.Random.value, UnityEngine.Random.value);
+            if (definition.IdleWanderRadius > 0f && movement.TryFindGround(point, 2f, out Vector3 ground))
+            {
+                idleLife.Walk(ground);
+                movement.RepathNow();
+                movement.MoveTo(ground);
+            }
+            else
+            {
+                idleLife.Settle();
+            }
+        }
+
+        if (idleLife.Now != before)
+        {
+            ShowIdleLife();
+        }
+
+        if (idleLife.Now == MonsterIdleLife.Doing.Standing)
+        {
+            UpdateIdleGaze();
+        }
+
+        return true;
+    }
+
+    private void ShowIdleLife()
+    {
+        senses.Attention = idleLife.Attention;
+        if (pose != null)
+        {
+            pose.Rest = idleLife.Now == MonsterIdleLife.Doing.Sleeping ? 1f : idleLife.Now == MonsterIdleLife.Doing.Grazing ? 0.5f : 0f;
+        }
+
+        ApplySpeed();
+    }
+
+    // ----- In a fight -----
+
+    private void TrackTargetMovement()
+    {
+        if (targetComponent == null || attacks == null || Time.deltaTime <= 0f)
+        {
+            return;
+        }
+
+        Vector3 at = targetComponent.transform.position;
+        Vector3 moved = (at - targetWasAt) / Time.deltaTime;
+        moved.y = 0f;
+        targetWasAt = at;
+        // A teleport isn't a speed.
+        targetVelocity = Vector3.Lerp(targetVelocity, Vector3.ClampMagnitude(moved, 12f), 0.2f);
+        attacks.TargetVelocity = targetVelocity;
+    }
+
+    // It can do nothing here and knows it: it gives up for a while, unless it can shoot from where it stands.
+    private bool WalksOffCutOff()
+    {
+        if (Relentless || !movement.IsCutOff)
+        {
+            cutOffSince = -1f;
+            return false;
+        }
+
+        if (cutOffSince < 0f)
+        {
+            cutOffSince = Time.time;
+        }
+
+        PerceptionSettings rules = PerceptionSettings.Current;
+        if (Time.time - cutOffSince < rules.CutOffSeconds || CanShoot)
+        {
+            return false;
+        }
+
+        // The spot it was walking to may be what's out of reach (a flank in a wall), not the target.
+        cutOffSince = -1f;
+        if (targeting.CanReach(targetComponent.transform.position))
+        {
+            return false;
+        }
+
+        ignoresTargetsUntil = Time.time + rules.CutOffForgetSeconds;
+        ClearTarget();
+        BeginReturn();
+        return true;
+    }
+
+    private bool CanShoot
+    {
+        get
+        {
+            foreach (MonsterAttack action in definition.Attacks)
+            {
+                if (action != null && action.kind == MonsterAttackKind.Projectile)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+    }
+
+    /// <summary>A broken pack: it runs from its target for this long, and doesn't strike. Elites and those sent on a mission stand.</summary>
+    public void Rout(float seconds)
+    {
+        if (seconds <= 0f || IsElite || Relentless || CurrentState == State.Dead)
+        {
+            return;
+        }
+
+        routedUntil = Time.time + seconds;
+        circling = false;
+        if (CurrentState == State.Attacking)
+        {
+            attacks.Cancel();
+            pose?.CancelAttack();
+            SetState(State.Chasing);
+        }
+    }
+
+    private bool IsRouted => Time.time < routedUntil;
+
+    private bool ShotIsClear()
+    {
+        if (Time.time >= nextShotCheckAt)
+        {
+            nextShotCheckAt = Time.time + 0.25f;
+            shotIsClear = senses.HasClearPathTo(targetComponent.transform.position);
+        }
+
+        return shotIsClear;
+    }
+
+    // Round to where there is a line, and a little closer, instead of shooting the trees.
+    private void FindALine(Vector3 toTarget, float distance)
+    {
+        SetState(State.Chasing);
+        if (Time.time >= nextShotSideAt)
+        {
+            nextShotSideAt = Time.time + 2.5f;
+            shotSide = UnityEngine.Random.value < 0.5f ? -1f : 1f;
+        }
+
+        Vector3 spot = AttackTurns.CircleSpot(transform.position, toTarget, shotSide, distance * 0.85f);
+        if (movement.TryFindGround(spot, 2f, out Vector3 ground))
+        {
+            movement.MoveTo(ground);
+        }
+        else
+        {
+            movement.MoveTo(targetComponent.transform.position);
+        }
+    }
+
+    // Straight at its target, until it is near enough and others are coming too: then round to its own side of it.
+    private Vector3 ChaseSpot(float distance)
+    {
+        Vector3 at = targetComponent.transform.position;
+        float spread = definition.FlankSpread;
+        if (spread <= 0f || distance > FlankStartsWithin || distance <= FlankStandOff + 1f || !IsAtThePlayer)
+        {
+            return at;
+        }
+
+        if (Time.time >= nextChaseSpotAt)
+        {
+            nextChaseSpotAt = Time.time + FlankRefreshSeconds;
+            flankers.Clear();
+            foreach (MonsterAI other in active)
+            {
+                if (other != this && other.target == target && (other.CurrentState == State.Chasing || other.CurrentState == State.Attacking))
+                {
+                    flankers.Add(other.transform.position);
+                }
+            }
+
+            chaseSpot = AttackTurns.FlankSpot(transform.position, at, flankers, spread, FlankStandOff);
+        }
+
+        return flankers.Count > 0 ? chaseSpot : at;
     }
 
     // Monsters that start fights look and listen for targets; retaliation-only ones only react to being hit.
@@ -579,6 +826,11 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject, IStaggerable, IHit
     {
         float elapsed = Mathf.Min(Time.time - lastSenseTime, 1f);
         lastSenseTime = Time.time;
+        if (Time.time < ignoresTargetsUntil && !CanTarget(target))
+        {
+            return;
+        }
+
         if (CanTarget(target))
         {
             TrackTarget();
@@ -814,6 +1066,13 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject, IStaggerable, IHit
         Vector3 toTarget = TargetPoint() - transform.position;
         toTarget.y = 0f;
         float distance = toTarget.magnitude;
+        if (IsRouted)
+        {
+            SetState(State.Chasing);
+            Retreat(toTarget, definition.FleeDistance);
+            return;
+        }
+
         if (circling)
         {
             if (Time.time < circlingUntil)
@@ -857,6 +1116,12 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject, IStaggerable, IHit
                     return;
                 }
 
+                if (definition.Attacks[chosen].kind == MonsterAttackKind.Projectile && !ShotIsClear())
+                {
+                    FindALine(toTarget, distance);
+                    return;
+                }
+
                 movement.Stop();
                 SetState(State.Chasing);
                 if (movement.TurnTowards(toTarget) && (pack == null || pack.TryAttack()))
@@ -891,7 +1156,7 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject, IStaggerable, IHit
                 }
                 else
                 {
-                    movement.MoveTo(targetComponent.transform.position);
+                    movement.MoveTo(ChaseSpot(distance));
                 }
             }
             return;
@@ -917,7 +1182,7 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject, IStaggerable, IHit
         }
 
         SetState(State.Chasing);
-        movement.MoveTo(targetComponent.transform.position);
+        movement.MoveTo(ChaseSpot(distance));
     }
 
     // Action index, or -1 for the definition's plain attack.
@@ -1014,7 +1279,7 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject, IStaggerable, IHit
         Vector3 away = toTarget.sqrMagnitude > 0.001f ? -toTarget.normalized : -transform.forward;
         Vector3 destination = transform.position + away * Mathf.Max(2f, distance);
         if (movement.TryFindGround(destination, 2f, out Vector3 ground)
-            && (Relentless || definition.LeashRange <= 0f || Vector3.Distance(home, ground) <= definition.LeashRange))
+            && (Relentless || IsRouted || definition.LeashRange <= 0f || Vector3.Distance(home, ground) <= definition.LeashRange))
         {
             movement.MoveTo(ground);
         }
@@ -1412,6 +1677,7 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject, IStaggerable, IHit
         ClearTarget();
         movement.Halt();
         SetState(State.Dead);
+        pack?.MemberFell(this);
     }
 
     private void SetState(State next)
@@ -1423,6 +1689,12 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject, IStaggerable, IHit
 
         State previous = CurrentState;
         CurrentState = next;
+        if (previous == State.Idle && idleLife != null)
+        {
+            idleLife.Reset();
+            ShowIdleLife();
+        }
+
         ApplySpeed();
         StateChanged?.Invoke(previous, next);
     }
@@ -1435,7 +1707,8 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject, IStaggerable, IHit
             return;
         }
 
-        float scale = CurrentState == State.Investigating ? PerceptionSettings.Current.InvestigateSpeedScale
+        float scale = CurrentState == State.Idle && idleLife != null && idleLife.Now == MonsterIdleLife.Doing.Walking ? definition.IdleWalkSpeed
+            : CurrentState == State.Investigating ? PerceptionSettings.Current.InvestigateSpeedScale
             : CurrentState == State.Returning && roaming ? roamSpeedScale
             : circling ? CombatTechniqueSettings.Current.CircleSpeed
             : 1f;

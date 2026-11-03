@@ -45,6 +45,9 @@ public sealed class MonsterAttacks
         readyAt = new float[definition.Attacks.Count];
     }
 
+    /// <summary>How its target is moving, flat, for actions that aim ahead of it (Lead Target).</summary>
+    public Vector3 TargetVelocity { get; set; }
+
     /// <summary>Multiplies how long it waits between strikes (a frenzied elite). Wind-ups stay as they are, so they can still be read.</summary>
     public float CooldownScale { get; set; } = 1f;
 
@@ -178,6 +181,11 @@ public sealed class MonsterAttacks
     {
         actionIndex = index;
         action = index >= 0 ? definition.Attacks[index] : null;
+        if (action != null && action.kind == MonsterAttackKind.Charge && action.leadTarget > 0f)
+        {
+            toTarget += TargetVelocity * (toTarget.magnitude / Mathf.Max(action.chargeSpeed, 0.1f) * action.leadTarget);
+        }
+
         direction = toTarget.sqrMagnitude > 0.0001f ? toTarget.normalized : self.forward;
         startTime = Time.time;
         hitPending = true;
@@ -465,6 +473,11 @@ public sealed class MonsterAttacks
 
         Vector3 origin = self.position + Vector3.up;
         Vector3 aim = aimPoint.HasValue ? aimPoint.Value + Vector3.up - origin : direction;
+        if (aimPoint.HasValue && action.leadTarget > 0f)
+        {
+            aim += TargetVelocity * (aim.magnitude / Mathf.Max(action.projectileSpeed, 0.1f) * action.leadTarget);
+        }
+
         GameObject projectile = PrefabPool.Spawn(action.projectilePrefab, origin + aim.normalized * 0.7f, Quaternion.LookRotation(aim));
         MonsterProjectile flight = projectile.GetComponent<MonsterProjectile>();
         if (flight == null)

@@ -19,6 +19,17 @@ MonoBehaviour:
   arrivalLine: Show me the wall. Then show me where it's weakest.
   welcomeLine: 
   fallenLine: Go. I've held worse.
+  fightLines:
+    spotted:
+    - Finally, something I can hit.
+    - Stay behind my shield, if you can find it.
+    behindYou:
+    - Behind you, you fool!
+    hurt:
+    - Twenty winters, and it still hurts.
+    won:
+    - Is that all? I was only warming up.
+    - Clean your blade. It's a bad habit to forget.
   model: {fileID: 7203023521572123092, guid: e9086faa98b6d46469582090adb9f0e3, type: 3}
   jobs:
   - {fileID: 11400000, guid: f918ba89b7b235448905310320940c70, type: 2}

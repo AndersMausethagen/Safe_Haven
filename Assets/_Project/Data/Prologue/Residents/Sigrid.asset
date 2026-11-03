@@ -19,6 +19,17 @@ MonoBehaviour:
   arrivalLine: Seven went in. Tell me who's home.
   welcomeLine: 
   fallenLine: Don't you stop for me. That's an order.
+  fightLines:
+    spotted:
+    - Stand together! Nobody runs!
+    - Form up on me!
+    behindYou:
+    - Behind you! Move!
+    hurt:
+    - Still standing. Barely.
+    won:
+    - Count heads. Everyone still here?
+    - Good. Move before more come.
   model: {fileID: 1441834787134571619, guid: e398fdb177c2d5b4b84f05ca6a27d2cf, type: 3}
   jobs:
   - {fileID: 11400000, guid: 4c4fcc29299e0dd4b9ba5cfd68e28c5b, type: 2}

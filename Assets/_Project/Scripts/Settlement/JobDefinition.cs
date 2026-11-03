@@ -24,6 +24,8 @@ public sealed class WorkOrder
 [CreateAssetMenu(fileName = "NewJob", menuName = "Safe Haven/Settlement/Job")]
 public sealed class JobDefinition : ScriptableObject
 {
+    public EmoteDefinition WorkGesture => workGesture;
+
     [Tooltip("Stable unique identifier, used for saves.")]
     [SerializeField] private string id;
     [SerializeField] private string displayName;
@@ -37,6 +39,8 @@ public sealed class JobDefinition : ScriptableObject
     [SerializeField] private List<RecipeDefinition> teachesRecipes = new List<RecipeDefinition>();
     [Tooltip("Where someone with this job works: they stand by a placed building of this kind when there is one.")]
     [SerializeField] private BuildingDefinition workplace;
+    [Tooltip("What they do with their hands there: forging, reading. Empty: they just stand by it.")]
+    [SerializeField] private EmoteDefinition workGesture;
     [Tooltip("What they keep making on their own at their workplace, first that can be made first, while the player is away too.")]
     [SerializeField] private List<WorkOrder> workOrders = new List<WorkOrder>();
     [Tooltip("Raised when someone takes the job, for quests such as \"Find work for the traveler\".")]

@@ -19,6 +19,17 @@ MonoBehaviour:
   arrivalLine: This place can be found. Good. So can everything else, by the same road.
   welcomeLine: 
   fallenLine: I know the way. Go on. I'll catch you up.
+  fightLines:
+    spotted:
+    - There! In the trees!
+    - I see them. Take the near ones.
+    behindYou:
+    - Behind you! Turn around!
+    hurt:
+    - Too close, too close!
+    won:
+    - Nothing else on the wind.
+    - That's all of them. I think.
   model: {fileID: 4704275745086199601, guid: eece4adebb5d1a04d820228f6b254479, type: 3}
   jobs:
   - {fileID: 11400000, guid: 6af8ca180b22423448d6e1e307037eb6, type: 2}

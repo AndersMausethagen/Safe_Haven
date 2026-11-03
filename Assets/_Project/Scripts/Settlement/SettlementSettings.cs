@@ -36,6 +36,37 @@ public sealed class SettlementSettings : GameSettings<SettlementSettings>
         [Range(0f, 0.9f)] public float extractionCut;
     }
 
+    [Header("Daily Life")]
+    [Tooltip("The hour residents get up.")]
+    [SerializeField, Range(0f, 24f)] private float residentWakeHour = 6.5f;
+    [Tooltip("The hour they go to their workplace. Before that, and with no workplace, they are at the fire.")]
+    [SerializeField, Range(0f, 24f)] private float residentWorkFromHour = 8f;
+    [SerializeField, Range(0f, 24f)] private float residentMealFromHour = 12f;
+    [SerializeField, Range(0f, 24f)] private float residentMealUntilHour = 13f;
+    [SerializeField, Range(0f, 24f)] private float residentWorkUntilHour = 18f;
+    [Tooltip("The hour they go to their own spot to sleep.")]
+    [SerializeField, Range(0f, 24f)] private float residentSleepFromHour = 22f;
+    [Tooltip("Where they eat and sit of an evening. Without one built: the portal.")]
+    [SerializeField] private BuildingDefinition residentGatheringPlace;
+    [SerializeField, Min(0.1f)] private float residentWalkSpeed = 1.6f;
+    [Tooltip("Their speed when they run for the portal.")]
+    [SerializeField, Min(0.1f)] private float residentRunSpeed = 3.8f;
+    [Tooltip("They run for the portal when something hunting is this close, in metres, or while a breach is on.")]
+    [SerializeField, Min(0f)] private float residentDangerRadius = 9f;
+    [SerializeField] private EmoteDefinition residentMealGesture;
+    [SerializeField] private EmoteDefinition residentSleepGesture;
+    [Tooltip("What they do at the fire, one after another at random.")]
+    [SerializeField] private EmoteDefinition[] residentFireGestures = new EmoteDefinition[0];
+
+    public ResidentHours ResidentHours => new ResidentHours(residentWakeHour, residentWorkFromHour, residentMealFromHour, residentMealUntilHour, residentWorkUntilHour, residentSleepFromHour);
+    public BuildingDefinition ResidentGatheringPlace => residentGatheringPlace;
+    public float ResidentWalkSpeed => residentWalkSpeed;
+    public float ResidentRunSpeed => residentRunSpeed;
+    public float ResidentDangerRadius => residentDangerRadius;
+    public EmoteDefinition ResidentMealGesture => residentMealGesture;
+    public EmoteDefinition ResidentSleepGesture => residentSleepGesture;
+    public EmoteDefinition[] ResidentFireGestures => residentFireGestures;
+
     [Header("Portal")]
     [Tooltip("What repairing the ruined portal costs (GDD §14.3: Life Orbs from the clearing).")]
     [SerializeField] private List<ResourceAmount> portalRepairCost = new List<ResourceAmount>();

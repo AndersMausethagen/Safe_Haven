@@ -79,6 +79,24 @@ public sealed class CompanionDefinition : ScriptableObject
         new CompanionOrderOption(CompanionOrder.AttackTarget, "Attack what I attack.", "Point the way."),
     };
 
+    [Header("Fighting well")]
+    [Tooltip("Chance it sees a blow coming at it and steps out of the way. 0: it stands and takes them all. Below 1, so the player stays the better fighter.")]
+    [SerializeField, Range(0f, 1f)] private float readsAttacks = 0.6f;
+    [Tooltip("An archer backs off from an enemy closer than this, in metres.")]
+    [SerializeField, Min(0f)] private float keepAway = 5f;
+    [Tooltip("What this kind says in a fight, for anyone whose ResidentDefinition has no line for it.")]
+    [SerializeField] private FightLines fightLines = new FightLines();
+
+    [Header("Keeping up")]
+    [Tooltip("It hurries once this far from the leader, in metres.")]
+    [SerializeField, Min(2f)] private float hurryFrom = 14f;
+    [Tooltip("Its speed while hurrying, as a multiple of its own.")]
+    [SerializeField, Range(1f, 3f)] private float hurrySpeed = 1.5f;
+    [Tooltip("It comes up from behind by other ways once this far from the leader, in metres, or when stuck: nobody gets lost.")]
+    [SerializeField, Min(5f)] private float warpFrom = 45f;
+    [Tooltip("Share of its speed while the player sneaks.")]
+    [SerializeField, Range(0.1f, 1f)] private float sneakSpeed = 0.55f;
+
     [Header("Downed")]
     [Tooltip("Knocked down at no health, it gets up by itself after this many seconds.")]
     [SerializeField, Min(1f)] private float downedSeconds = 12f;
@@ -104,6 +122,13 @@ public sealed class CompanionDefinition : ScriptableObject
     public Pose GripPose => new Pose(gripPosition, Quaternion.Euler(gripRotation));
     public Pose OffHandGripPose => new Pose(offHandGripPosition, Quaternion.Euler(offHandGripRotation));
     public float Awareness => awareness;
+    public float ReadsAttacks => readsAttacks;
+    public float KeepAway => keepAway;
+    public FightLines FightLines => fightLines;
+    public float HurryFrom => hurryFrom;
+    public float HurrySpeed => hurrySpeed;
+    public float WarpFrom => warpFrom;
+    public float SneakSpeed => sneakSpeed;
     public CompanionOrderOption[] Orders => orders;
     public float DownedSeconds => downedSeconds;
     public float GetUpHealth => getUpHealth;

@@ -25,6 +25,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 46a7c6f142ead3e4aa6399b7c8a228a3, type: 2}
   - {fileID: 11400000, guid: 1cfe514dde62f1d448a946755d940c7c, type: 2}
   workplace: {fileID: 11400000, guid: a10bf06ba7306584f8632f492a16fdac, type: 2}
+  workGesture: {fileID: 11400000, guid: b1c56523b0af6fd4ebe99cd806eb27ff, type: 2}
   workOrders: []
   assignedEvent: {fileID: 0}
   extraRumours: 0

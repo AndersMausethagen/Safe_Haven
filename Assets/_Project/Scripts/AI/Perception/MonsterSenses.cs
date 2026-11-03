@@ -13,6 +13,10 @@ public sealed class MonsterSenses
     private static readonly Collider[] Overlaps = new Collider[64];
     private static readonly RaycastHit[] Hits = new RaycastHit[16];
 
+    /// <summary>How much of what it sees gets through: less while it sleeps.</summary>
+    public float Attention { get; set; } = 1f;
+
+
     private readonly Transform self;
     private readonly MonsterDefinition definition;
     private readonly LayerMask targetLayers;
@@ -44,6 +48,7 @@ public sealed class MonsterSenses
     /// </summary>
     public bool Look(float elapsed)
     {
+        elapsed *= Attention;
         PerceptionSettings rules = PerceptionSettings.Current;
         SenseProfile senses = SenseProfile.Of(definition);
         float environment = AtmosphereConditions.SightScale(rules);

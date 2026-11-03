@@ -20,4 +20,11 @@ MonoBehaviour:
   - {fileID: 11400000, guid: dd9792482f40fc243a8d7294434f1ee9, type: 2}
   teachesRecipes: []
   workplace: {fileID: 11400000, guid: dd9792482f40fc243a8d7294434f1ee9, type: 2}
+  workGesture: {fileID: 11400000, guid: 7c9176c17f7f8644085abfda4ecc4cac, type: 2}
+  workOrders: []
   assignedEvent: {fileID: 11400000, guid: da5d7d1abc8282c40a98b65eea37ba76, type: 2}
+  extraRumours: 0
+  gearRepairDiscount: 0
+  buildingRepairDiscount: 0
+  wardHealth: 0
+  raidSeconds: 0

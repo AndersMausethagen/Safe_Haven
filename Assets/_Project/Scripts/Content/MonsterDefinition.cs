@@ -73,6 +73,24 @@ public sealed class MonsterDefinition : ScriptableObject, ICombatSounds
     [Tooltip("Offsets the visual only, never the collider or navigation agent. Charge recovery lands the visual.")]
     [SerializeField, Min(0f)] private float hoverHeight;
 
+    [Header("Idle Life")]
+    [Tooltip("How far around home it wanders while nothing is going on, in metres. 0: it stays where it is.")]
+    [SerializeField, Min(0f)] private float idleWanderRadius;
+    [Tooltip("Seconds it stays put between walks, least and most.")]
+    [SerializeField] private Vector2 idlePauseSeconds = new Vector2(3f, 8f);
+    [Tooltip("Its speed while wandering, as a share of its full speed.")]
+    [SerializeField, Range(0.1f, 1f)] private float idleWalkSpeed = 0.4f;
+    [Tooltip("Chance it settles down to graze (head down) after a walk.")]
+    [SerializeField, Range(0f, 1f)] private float idleGrazeChance;
+    [Tooltip("Chance it settles down to sleep after a walk.")]
+    [SerializeField, Range(0f, 1f)] private float idleSleepChance;
+    [Tooltip("How much of what it sees a sleeper notices. Low enough to creep past.")]
+    [SerializeField, Range(0f, 1f)] private float idleSleepAttention = 0.3f;
+
+    [Header("In a Fight")]
+    [Tooltip("How much it spreads out around its target with others of its side, so a group surrounds rather than clumps. 0: straight at it. 1: the widest flank.")]
+    [SerializeField, Range(0f, 1f)] private float flankSpread;
+
     [Header("Poise")]
     [Tooltip("How much it takes before it staggers (attacks' Poise Damage wears it down). 0 uses the game-wide default; " +
              "a very high value makes it unstoppable.")]
@@ -146,6 +164,13 @@ public sealed class MonsterDefinition : ScriptableObject, ICombatSounds
     public float FleeHealthFraction => fleeHealthFraction;
     public float FleeDistance => fleeDistance;
     public float DefensiveRadius => defensiveRadius;
+    public float IdleWanderRadius => idleWanderRadius;
+    public Vector2 IdlePauseSeconds => idlePauseSeconds;
+    public float IdleWalkSpeed => idleWalkSpeed;
+    public float IdleGrazeChance => idleGrazeChance;
+    public float IdleSleepChance => idleSleepChance;
+    public float IdleSleepAttention => idleSleepAttention;
+    public float FlankSpread => flankSpread;
     public float HoverHeight => hoverHeight;
     public bool HasTemperament(MonsterTemperament value) => (temperament & value) != 0;
 

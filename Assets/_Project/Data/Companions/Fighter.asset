@@ -49,6 +49,25 @@ MonoBehaviour:
   - order: 4
     ask: Attack what I attack.
     reply: Point the way.
+  readsAttacks: 0.6
+  keepAway: 5
+  fightLines:
+    spotted:
+    - Here they come!
+    - Weapons up!
+    behindYou:
+    - Behind you!
+    - Watch your back!
+    hurt:
+    - I can't take much more of this.
+    - I'm hurt!
+    won:
+    - That's the last of them.
+    - Clear. Get your breath.
+  hurryFrom: 14
+  hurrySpeed: 1.5
+  warpFrom: 45
+  sneakSpeed: 0.55
   downedSeconds: 12
   getUpHealth: 0.4
   reviveSeconds: 3

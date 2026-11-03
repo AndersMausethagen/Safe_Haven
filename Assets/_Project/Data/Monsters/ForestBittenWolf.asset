@@ -43,6 +43,7 @@ MonoBehaviour:
   animatorController: {fileID: 0}
   prefab: {fileID: 7477446688404098989, guid: 237fc76d161bb114aa2049a864298943, type: 3}
   experience: 0
+  neverElite: 0
   attack: {fileID: 11400000, guid: ea84f5e69338fbd449215ef3ad11f3c3, type: 2}
   attackDamage: 15
   attackCooldown: 1
@@ -63,7 +64,14 @@ MonoBehaviour:
     priority: 20
     cooldown: 14
     interruptible: 1
+    leadTarget: 0
     fromTier: 0
+    followUps: []
+    comboChance: 0.5
+    comboGap: 0.2
+    comboFromTier: 0
+    holdChance: 0
+    holdSeconds: 0.45
     projectilePrefab: {fileID: 0}
     burstCount: 1
     burstInterval: 0.2
@@ -89,7 +97,14 @@ MonoBehaviour:
     priority: 10
     cooldown: 1
     interruptible: 0
+    leadTarget: 0
     fromTier: 0
+    followUps: []
+    comboChance: 0.5
+    comboGap: 0.2
+    comboFromTier: 0
+    holdChance: 0
+    holdSeconds: 0.45
     projectilePrefab: {fileID: 0}
     burstCount: 1
     burstInterval: 0.2
@@ -115,7 +130,14 @@ MonoBehaviour:
     priority: 15
     cooldown: 7
     interruptible: 0
+    leadTarget: 0.35
     fromTier: 2
+    followUps: []
+    comboChance: 0.5
+    comboGap: 0.2
+    comboFromTier: 0
+    holdChance: 0
+    holdSeconds: 0.45
     projectilePrefab: {fileID: 0}
     burstCount: 1
     burstInterval: 0.2
@@ -141,7 +163,21 @@ MonoBehaviour:
   fleeDistance: 10
   defensiveRadius: 8
   hoverHeight: 0
+  idleWanderRadius: 10
+  idlePauseSeconds: {x: 3, y: 8}
+  idleWalkSpeed: 0.45
+  idleGrazeChance: 0
+  idleSleepChance: 0.3
+  idleSleepAttention: 0.3
+  flankSpread: 1
   poise: 0
+  openWhileStriking: 1
+  parriesBackstabs: 0
+  shieldArc: 0
+  shieldLetsThrough: 0.25
+  bleeds: 1
+  bloodColor: {r: 0.32, g: 0.015, b: 0.02, a: 0.95}
+  ragdollOnDeath: 1
   deathSound: {fileID: 0}
   hurtSound: {fileID: 0}
   attackSound: {fileID: 0}

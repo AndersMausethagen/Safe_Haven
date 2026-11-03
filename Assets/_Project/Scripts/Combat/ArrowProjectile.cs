@@ -228,6 +228,13 @@ public sealed class ArrowProjectile : MonoBehaviour
                 continue;
             }
 
+            // A friend in the way doesn't stop it: an arrow that vanished on a companion's back was a shot wasted for nothing.
+            if (owner != null && hits[i].collider.GetComponentInParent<Damageable>() is Damageable body && body.IsAlive
+                && body.Category == TargetCategory.Creature && !owner.Faction.WillAttack(body.Faction))
+            {
+                continue;
+            }
+
             if (nearest < 0 || hits[i].distance < hits[nearest].distance)
             {
                 nearest = i;

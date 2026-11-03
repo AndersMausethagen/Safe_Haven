@@ -18,15 +18,21 @@ public static class ProloguePreview
         EditorApplication.playModeStateChanged += OnPlayModeChanged;
     }
 
+    /// <summary>The Haven on the same throwaway saves, for trying its people out without touching the real save.</summary>
+    [MenuItem("Safe Haven/Quests/Play Haven (Isolated Saves)")]
+    public static void PlayHaven() => Play("Assets/_Project/Scenes/SafeHaven.unity");
+
     [MenuItem("Safe Haven/Quests/Play Prologue (Isolated Saves)")]
-    public static void Play()
+    public static void Play() => Play(ScenePath);
+
+    private static void Play(string path)
     {
         if (EditorApplication.isPlayingOrWillChangePlaymode)
         {
             Debug.LogWarning("Stop Play mode before starting a prologue preview.");
             return;
         }
-        var scene = AssetDatabase.LoadAssetAtPath<SceneAsset>(ScenePath);
+        var scene = AssetDatabase.LoadAssetAtPath<SceneAsset>(path);
         if (scene == null)
         {
             Debug.LogError("The authored prologue scene is missing.");

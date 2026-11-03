@@ -54,7 +54,14 @@ MonoBehaviour:
     priority: 10
     cooldown: 1.8
     interruptible: 0
+    leadTarget: 0
     fromTier: 0
+    followUps: []
+    comboChance: 0.5
+    comboGap: 0.2
+    comboFromTier: 0
+    holdChance: 0
+    holdSeconds: 0.45
     projectilePrefab: {fileID: 0}
     burstCount: 1
     burstInterval: 0.2
@@ -80,7 +87,18 @@ MonoBehaviour:
   fleeDistance: 10
   defensiveRadius: 8
   hoverHeight: 0
+  idleWanderRadius: 3
+  idlePauseSeconds: {x: 3, y: 8}
+  idleWalkSpeed: 0.5
+  idleGrazeChance: 0
+  idleSleepChance: 0.5
+  idleSleepAttention: 0.3
+  flankSpread: 0.7
   poise: 10
+  openWhileStriking: 1
+  parriesBackstabs: 0
+  shieldArc: 0
+  shieldLetsThrough: 0.25
   bleeds: 1
   bloodColor: {r: 0.16, g: 0.2, b: 0.05, a: 0.95}
   ragdollOnDeath: 1

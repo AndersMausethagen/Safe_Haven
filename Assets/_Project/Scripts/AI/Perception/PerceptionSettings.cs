@@ -10,6 +10,8 @@ using UnityEngine;
 public sealed class PerceptionSettings : GameSettings<PerceptionSettings>
 {
     public float ProvokedSeconds => provokedSeconds;
+    public float CutOffSeconds => cutOffSeconds;
+    public float CutOffForgetSeconds => cutOffForgetSeconds;
 
     [Header("Noticing")]
     [Tooltip("Awareness (0–1) at which a monster becomes suspicious: it shows '?' and goes to look. At 1 it has spotted you.")]
@@ -35,6 +37,11 @@ public sealed class PerceptionSettings : GameSettings<PerceptionSettings>
 
     [Tooltip("Seconds a monster that has been hit keeps after whoever hit it, however far off they stand or far from home it gets. Each hit starts it again.")]
     [SerializeField, Min(0f)] private float provokedSeconds = 12f;
+
+    [Tooltip("Seconds a monster stands at the end of its path, with its target somewhere it can't reach, before it gives up and walks home. Those that can shoot stay.")]
+    [SerializeField, Min(0f)] private float cutOffSeconds = 4f;
+    [Tooltip("Seconds after that it notices nothing new, so it doesn't come straight back.")]
+    [SerializeField, Min(0f)] private float cutOffForgetSeconds = 10f;
 
     [Header("Fog and Dark")]
     [Tooltip("Volumetric fog density (Atmospheric Fog, weather included) counted as dense fog.")]

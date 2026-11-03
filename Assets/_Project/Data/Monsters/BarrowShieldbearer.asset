@@ -59,6 +59,7 @@ MonoBehaviour:
     priority: 10
     cooldown: 1
     interruptible: 0
+    leadTarget: 0
     fromTier: 0
     followUps:
     - {fileID: 11400000, guid: a10375394108bdb429cfd7e30282c60b, type: 2}
@@ -92,6 +93,7 @@ MonoBehaviour:
     priority: 20
     cooldown: 9
     interruptible: 0
+    leadTarget: 0
     fromTier: 0
     followUps: []
     comboChance: 0.5
@@ -124,6 +126,13 @@ MonoBehaviour:
   fleeDistance: 10
   defensiveRadius: 8
   hoverHeight: 0
+  idleWanderRadius: 5
+  idlePauseSeconds: {x: 3, y: 8}
+  idleWalkSpeed: 0.4
+  idleGrazeChance: 0
+  idleSleepChance: 0
+  idleSleepAttention: 0.3
+  flankSpread: 0.4
   poise: 110
   openWhileStriking: 1
   parriesBackstabs: 1

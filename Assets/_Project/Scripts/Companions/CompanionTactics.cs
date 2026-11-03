@@ -9,12 +9,15 @@ public readonly struct CompanionThreat
     public readonly bool HuntsLeader;
     /// <summary>It is chasing or attacking the companion itself.</summary>
     public readonly bool HuntsSelf;
+    /// <summary>How many other companions are already on it.</summary>
+    public readonly int TakenBy;
 
-    public CompanionThreat(Vector3 position, bool huntsLeader, bool huntsSelf)
+    public CompanionThreat(Vector3 position, bool huntsLeader, bool huntsSelf, int takenBy = 0)
     {
         Position = position;
         HuntsLeader = huntsLeader;
         HuntsSelf = huntsSelf;
+        TakenBy = takenBy;
     }
 }
 
@@ -90,10 +93,82 @@ public readonly struct CompanionIntent
 /// walk somewhere, or attack one enemy). Plain C# so every order can be tested without a scene (CompanionTacticsTests);
 /// the Companion component carries the intent out (pathing, swinging, shooting). A new order is a new case here.
 /// Among enemies it may fight it picks those hunting itself first, then those hunting the leader, then the nearest to
-/// the leader.
+/// the leader, and leaves one someone else already has if there is another about.
 /// </summary>
 public static class CompanionTactics
 {
+    // An enemy someone else is on counts as this many metres further off.
+    private const float TakenPenalty = 7f;
+    private const float StepAside = 2.8f;
+    private const float StepRound = 3f;
+
+    public enum CatchUp
+    {
+        Keeping,
+        Hurrying,
+        Warp,
+    }
+
+    /// <summary>Its place while following: <paramref name="offset"/> (x to their right, z ahead) turned to the way the leader is heading, so
+    /// the one meant to walk behind them walks behind them whichever way they go.</summary>
+    public static Vector3 FormationPoint(Vector3 leader, Vector3 heading, Vector3 offset)
+    {
+        heading.y = 0f;
+        return heading.sqrMagnitude > 0.0001f ? leader + Quaternion.LookRotation(heading) * offset : leader + offset;
+    }
+
+    /// <summary>How far behind it has fallen calls for what: to hurry, or (out of sight, or stuck) to come up from behind by other ways.</summary>
+    public static CatchUp HowToCatchUp(float distance, float hurryFrom, float warpFrom, float stuckSeconds, float stuckLimit)
+    {
+        if (distance >= warpFrom || (stuckSeconds >= stuckLimit && distance >= hurryFrom * 0.5f))
+        {
+            return CatchUp.Warp;
+        }
+
+        return distance >= hurryFrom ? CatchUp.Hurrying : CatchUp.Keeping;
+    }
+
+    /// <summary>True when a blow from <paramref name="from"/>, aimed along <paramref name="aim"/>, would reach <paramref name="self"/>.</summary>
+    public static bool InTheWay(Vector3 self, Vector3 from, Vector3 aim, float reach, float arc)
+    {
+        Vector3 to = self - from;
+        to.y = 0f;
+        aim.y = 0f;
+        return to.magnitude <= reach && (to.sqrMagnitude < 0.01f || Vector3.Angle(aim, to) <= arc * 0.5f);
+    }
+
+    /// <summary>Where to step to get out of that blow: sideways, the short way out of its line.</summary>
+    public static Vector3 StepOutOfTheWay(Vector3 self, Vector3 from, Vector3 aim)
+    {
+        aim.y = 0f;
+        aim = aim.sqrMagnitude > 0.0001f ? aim.normalized : Vector3.forward;
+        Vector3 across = Vector3.Cross(Vector3.up, aim);
+        Vector3 to = self - from;
+        float side = Vector3.Dot(to, across) >= 0f ? 1f : -1f;
+        return self + across * (side * StepAside);
+    }
+
+    /// <summary>Where an archer goes to shoot <paramref name="enemy"/>: back if it is too close, round to where the line is clear, in if it is out
+    /// of range. Null: it stands and shoots.</summary>
+    public static Vector3? ArcherStep(Vector3 self, Vector3 enemy, float keepAway, float reach, bool clearShot, float side)
+    {
+        Vector3 to = enemy - self;
+        to.y = 0f;
+        float distance = to.magnitude;
+        Vector3 toward = distance > 0.01f ? to / distance : Vector3.forward;
+        if (distance < keepAway)
+        {
+            return self - toward * (keepAway - distance + 1.5f);
+        }
+
+        if (!clearShot)
+        {
+            return self + Vector3.Cross(Vector3.up, toward) * (side * StepRound) + toward * 0.5f;
+        }
+
+        return distance > reach ? enemy : (Vector3?)null;
+    }
+
     public static CompanionIntent Decide(in CompanionSituation situation, in CompanionRanges ranges)
     {
         switch (situation.Order)
@@ -185,11 +260,12 @@ public static class CompanionTactics
             }
 
             int rank = threat.HuntsSelf ? 0 : threat.HuntsLeader ? 1 : 2;
-            if (rank < bestRank || (rank == bestRank && distance < bestDistance))
+            float score = distance + threat.TakenBy * TakenPenalty;
+            if (rank < bestRank || (rank == bestRank && score < bestDistance))
             {
                 best = i;
                 bestRank = rank;
-                bestDistance = distance;
+                bestDistance = score;
             }
         }
 

@@ -1,11 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 
 /// <summary>
 /// A resident living in Safe Haven (GDD §15.3–15.4). In their conversation (their Talkable) they tell who they are, and
 /// the jobs they can take are answers; giving a job records it in SettlementState and teaches the player what the job knows (the Alchemist teaches the
-/// Purification Altar). When their job has a workplace that has been built, they stand by it, so hiring someone visibly
+/// Purification Altar). Their day (ResidentLife) takes them to their workplace once it has been built, so hiring someone visibly
 /// changes the settlement.
 /// <para>
 /// Created by ResidentSpawner for every resident in SettlementState; it needs a Talkable whose Interactable doesn't
@@ -17,10 +18,12 @@ using UnityEngine;
 public sealed class ResidentNpc : MonoBehaviour, IConversationTopics
 {
     private const string DefaultAcceptLine = "I'll get to it.";
+    private const float WorkSpotClearance = 1f;
 
     private ResidentDefinition resident;
     private Vector3 homePosition;
     private Quaternion homeRotation;
+    private ResidentLife life;
 
     public ResidentDefinition Resident => resident;
 
@@ -43,7 +46,26 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics
         homePosition = transform.position;
         homeRotation = transform.rotation;
         name = who.DisplayName;
-        GoToWork();
+        if (!TryGetComponent(out life))
+        {
+            life = gameObject.AddComponent<ResidentLife>();
+        }
+
+        life.Settle(homePosition, homeRotation, GameSession.Settlement.Find(who) is ResidentRecord record ? IndexOf(record) : 0);
+    }
+
+    private static int IndexOf(ResidentRecord record)
+    {
+        IReadOnlyList<ResidentRecord> residents = GameSession.Settlement.Residents;
+        for (int i = 0; i < residents.Count; i++)
+        {
+            if (residents[i] == record)
+            {
+                return i;
+            }
+        }
+
+        return 0;
     }
 
     private void OnGameEvent(GameEvent gameEvent)
@@ -54,24 +76,45 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics
         }
     }
 
-    // Stands next to their workplace if one has been built; otherwise at home.
     private void GoToWork()
     {
-        JobDefinition job = resident != null ? GameSession.Settlement.Find(resident)?.Job : null;
-        if (job != null && job.Workplace != null)
+        if (life != null)
         {
-            BuildingObject building = BuildingObject.Find(job.Workplace);
-            if (building != null)
-            {
-                Vector3 offset = building.transform.right * 1.8f;
-                transform.position = building.transform.position + offset;
-                transform.rotation = Quaternion.LookRotation(-offset.normalized, Vector3.up);
-                return;
-            }
+            life.Refresh();
+        }
+    }
+
+    /// <summary>Where they stand to work, when their job has a workplace that has been built.</summary>
+    public bool TryGetWorkplace(out Vector3 spot, out Quaternion facing)
+    {
+        spot = homePosition;
+        facing = homeRotation;
+        JobDefinition job = resident != null ? GameSession.Settlement.Find(resident)?.Job : null;
+        BuildingObject building = job != null && job.Workplace != null ? BuildingObject.Find(job.Workplace) : null;
+        if (building == null)
+        {
+            return false;
         }
 
-        transform.SetPositionAndRotation(homePosition, homeRotation);
+        // Outside the walls, which are carved out of the NavMesh: in its yard when it has one, else just off its side.
+        Vector3 centre = building.transform.position;
+        if (building.TryGetYard(out FootprintRect yard))
+        {
+            spot = yard.WorldCenter(centre.y);
+        }
+        else
+        {
+            spot = centre + building.transform.right * (building.Footprint.HalfSize.x + WorkSpotClearance);
+        }
+
+        Vector3 toBuilding = centre - spot;
+        toBuilding.y = 0f;
+        facing = toBuilding.sqrMagnitude > 0.01f ? Quaternion.LookRotation(toBuilding) : homeRotation;
+        return true;
     }
+
+    /// <summary>What they do with their hands at work.</summary>
+    public EmoteDefinition WorkGesture => resident != null ? GameSession.Settlement.Find(resident)?.Job?.WorkGesture : null;
 
     /// <summary>Who they are and what they do (when nothing before it spoke), and the jobs they can take as answers.</summary>
     public void AddTopics(MenuPage page, DialogueSpeaker speaker, Action afterAnswer)

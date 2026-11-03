@@ -50,6 +50,9 @@ MonoBehaviour:
   leader: {fileID: 808963327064308743}
   optionalMember: {fileID: 4754518043818268731}
   attackSpacing: 0.65
+  breaksWithItsLeader: 1
+  breaksAtLosses: 0.6
+  fleeSeconds: 8
 --- !u!1001 &585674966616920368
 PrefabInstance:
   m_ObjectHideFlags: 0

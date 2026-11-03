@@ -49,6 +49,25 @@ MonoBehaviour:
   - order: 4
     ask: Attack what I attack.
     reply: Point the way.
+  readsAttacks: 0.6
+  keepAway: 5
+  fightLines:
+    spotted:
+    - Contact! I've got the range.
+    - Moving, there!
+    behindYou:
+    - Behind you! Turn!
+    - On your back!
+    hurt:
+    - They're too close, I need room!
+    - I'm bleeding!
+    won:
+    - Nothing else moving.
+    - All clear.
+  hurryFrom: 14
+  hurrySpeed: 1.5
+  warpFrom: 45
+  sneakSpeed: 0.55
   downedSeconds: 12
   getUpHealth: 0.4
   reviveSeconds: 3

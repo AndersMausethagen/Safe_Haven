@@ -25,6 +25,9 @@ public sealed class ResidentDefinition : ScriptableObject
     [Tooltip("Said when they fall in a raid and are left behind.")]
     [SerializeField, TextArea] private string fallenLine = "I can't go on... come back for me.";
 
+    [Tooltip("What they say in a fight, when they go along as a companion. A moment left empty uses what their kind of companion says.")]
+    [SerializeField] private FightLines fightLines = new FightLines();
+
     [Header("World")]
     [Tooltip("The character model used in raids and at home.")]
     [SerializeField] private GameObject model;
@@ -40,6 +43,7 @@ public sealed class ResidentDefinition : ScriptableObject
     public string ArrivalLine => arrivalLine;
     public string WelcomeLine => welcomeLine;
     public string FallenLine => fallenLine;
+    public FightLines FightLines => fightLines;
     public GameObject Model => model;
     public JobDefinition[] Jobs => jobs;
 }

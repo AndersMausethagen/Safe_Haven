@@ -19,6 +19,7 @@ MonoBehaviour:
   teachesBuildings: []
   teachesRecipes: []
   workplace: {fileID: 11400000, guid: b7c331e0fe28cf24a82f9fff7bc38e44, type: 2}
+  workGesture: {fileID: 11400000, guid: 1ec4a5e51fc209344a827112c43c6e9e, type: 2}
   workOrders: []
   assignedEvent: {fileID: 0}
   extraRumours: 0
