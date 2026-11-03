@@ -64,6 +64,10 @@ MonoBehaviour:
     won:
     - Nothing else moving.
     - All clear.
+    helpedUp:
+    - Thank you. I thought that was it.
+    - I owe you one.
+    - Still here. Still here.
   hurryFrom: 14
   hurrySpeed: 1.5
   warpFrom: 45
@@ -72,3 +76,4 @@ MonoBehaviour:
   getUpHealth: 0.4
   reviveSeconds: 3
   reviveHealth: 0.6
+  bleedOutSeconds: 45

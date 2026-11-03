@@ -86,8 +86,15 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
         if (rules != null && definition != null && terrain != null && content != null)
         {
             List<NavMeshAgent> paused = PauseAgents();
+            float width = GameSession.ActiveRaid != null ? GameSession.ActiveRaid.WidthScale : 1f;
+            if (width > 1f)
+            {
+                rules = rules.ScaledBy(width);
+                definition = definition.ScaledBy(width);
+            }
+
             generatedBy = rules;
-            yield return Generate(rules, seed);
+            yield return Generate(rules, seed, width);
             Dress(seed);
             ResumeAgents(paused);
             MovePlayerToStart();
@@ -122,17 +129,36 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
 
     // Each attempt is a new map from the same seed, in the same shape and mood. The trails make every exit reachable by
     // design; the navmesh has the last word, because a raid without a way out is the one thing that must never happen.
-    private IEnumerator Generate(RaidLayoutRules rules, int seed)
+    private IEnumerator Generate(RaidLayoutRules rules, int seed, float width)
     {
         var clock = System.Diagnostics.Stopwatch.StartNew();
         TerrainData source = terrain.terrainData;
         turnedData = Instantiate(source);
         turnedData.name = source.name + " (generated)";
+        if (width > 1f)
+        {
+            GrowTerrain(turnedData, width);
+        }
+
         ApplyGroundLook(turnedData);
         terrain.terrainData = turnedData;
+        if (width > 1f)
+        {
+            FitBoundary(width);
+            if (FindAnyObjectByType<ExplorationMap>() is ExplorationMap explored)
+            {
+                explored.Refit();
+            }
+        }
+
         if (terrain.TryGetComponent(out TerrainCollider ground))
         {
             ground.terrainData = turnedData;
+        }
+
+        if (width > 1f && GameSession.ActiveRaid != null)
+        {
+            RaidMapGenerator.AddExits(this, GameSession.ActiveRaid.Definition.LargeRaid.extraExits);
         }
 
         for (int attempt = 0; attempt < rules.Attempts; attempt++)
@@ -165,6 +191,53 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
 
         Debug.LogError($"Raid map from seed {seed}: no attempt gave a way to every exit. The player can still walk the trails.", this);
     }
+
+    // Wider, and as much detail per metre as ever: more heights, paint and grass over more ground. Resolutions come in fixed steps, so sizes are powers of two.
+    private void GrowTerrain(TerrainData data, float width)
+    {
+        Vector3 size = data.size;
+        int steps = Mathf.RoundToInt(width);
+        data.heightmapResolution = Mathf.Min(MaxHeightResolution, (data.heightmapResolution - 1) * steps) + 1;
+        data.alphamapResolution = Mathf.Min(MaxPaintResolution, data.alphamapResolution * steps);
+        data.baseMapResolution = Mathf.Min(MaxPaintResolution, data.baseMapResolution * steps);
+        data.SetDetailResolution(Mathf.Min(MaxDetailResolution, data.detailResolution * steps), data.detailResolutionPerPatch);
+        data.size = new Vector3(size.x * width, size.y, size.z * width);
+    }
+
+    // The walls round the map stand where it used to end: out to the new edge, and long enough to meet.
+    private void FitBoundary(float width)
+    {
+        GameObject boundary = GameObject.Find(BoundaryName);
+        if (boundary == null)
+        {
+            return;
+        }
+
+        Vector3 size = terrain.terrainData.size;
+        Vector3 origin = terrain.transform.position;
+        foreach (BoxCollider wall in boundary.GetComponentsInChildren<BoxCollider>())
+        {
+            Transform part = wall.transform;
+            Bounds was = wall.bounds;
+            bool runsAlongZ = was.size.z > was.size.x;
+            bool low = runsAlongZ ? was.center.x < origin.x + size.x / width * 0.5f : was.center.z < origin.z + size.z / width * 0.5f;
+            Vector3 scale = part.localScale;
+            scale[runsAlongZ ? 2 : 0] *= width;
+            part.localScale = scale;
+            float beyond = runsAlongZ ? was.size.x * 0.5f - 1f : was.size.z * 0.5f - 1f;
+            Vector3 centre = runsAlongZ
+                ? new Vector3(low ? origin.x - beyond : origin.x + size.x + beyond, was.center.y, origin.z + size.z * 0.5f)
+                : new Vector3(origin.x + size.x * 0.5f, was.center.y, low ? origin.z - beyond : origin.z + size.z + beyond);
+            part.position += centre - was.center;
+        }
+
+        Physics.SyncTransforms();
+    }
+
+    private const string BoundaryName = "Boundary";
+    private const int MaxHeightResolution = 2048;
+    private const int MaxPaintResolution = 2048;
+    private const int MaxDetailResolution = 4032;
 
     // The ground the definition asks for, so a designer's change to it needs no rebake. Painting relies on this order of layers.
     private void ApplyGroundLook(TerrainData data)

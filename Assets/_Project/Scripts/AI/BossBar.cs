@@ -11,6 +11,8 @@ public sealed class BossBar : MonoBehaviour
 
     private RectTransform fill;
     private TMP_Text number;
+    private string title;
+    private string subtitle;
 
     public static BossBar Show(BossDefinition boss)
     {
@@ -30,6 +32,8 @@ public sealed class BossBar : MonoBehaviour
     private void Build(BossDefinition boss)
     {
         UIStyle style = UIStyle.Current;
+        title = boss.DisplayName;
+        subtitle = boss.Title;
         RectTransform track = Rect("Track", transform, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, FromBottom), new Vector2(Width, Height));
         track.gameObject.AddComponent<Image>().color = new Color(0f, 0f, 0f, 0.65f);
         fill = Rect("Fill", track, Vector2.zero, Vector2.up, Vector2.zero, new Vector2(Width, 0f));
@@ -42,6 +46,33 @@ public sealed class BossBar : MonoBehaviour
         }
 
         number = Label("", track, TextAlignmentOptions.BottomRight, 22f, new Vector2(Width, 30f), new Vector2(0f, 8f), false, style);
+    }
+
+    /// <summary>Its name across the middle of the screen for a moment, as it wakes.</summary>
+    public void ShowCard(float seconds)
+    {
+        StartCoroutine(Card(seconds));
+    }
+
+    private System.Collections.IEnumerator Card(float seconds)
+    {
+        UIStyle style = UIStyle.Current;
+        RectTransform box = Rect("Card", transform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, 150f), new Vector2(1400f, 140f));
+        var name = box.gameObject.AddComponent<TextMeshProUGUI>();
+        style.OnWorld(name, true);
+        name.text = $"{title}\n<size=38%>{subtitle}</size>";
+        name.fontSize = 76f;
+        name.alignment = TextAlignmentOptions.Center;
+        name.raycastTarget = false;
+        for (float t = 0f; t < seconds; t += Time.unscaledDeltaTime)
+        {
+            float rise = Mathf.Clamp01(t / 0.5f);
+            float fall = Mathf.Clamp01((seconds - t) / 0.7f);
+            name.alpha = Mathf.Min(rise, fall);
+            yield return null;
+        }
+
+        Destroy(box.gameObject);
     }
 
     public void Set(float share)

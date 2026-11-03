@@ -27,4 +27,17 @@ MonoBehaviour:
     damageBonus: 0.2
     sound: {fileID: 11400000, guid: 7a7933cc7f7f0ad4aaf1e1190ea7248a, type: 2}
   rewardSkill: {fileID: 11400000, guid: ea2ebfef3d35eae42a29237e4b273b5d, type: 2}
-  defeatLine: 'The Heartroot lies still. What it knew of the forest''s hold is yours now: you have learned Heartroot''s Grasp.'
+  defeatLine: 'The Heartroot lies still. What it knew of the forest''s hold is yours now: you have learned Heartroot''s Grasp. And something has opened: the portal can reach Troll Valley.'
+  wakeSeconds: 3.2
+  wakeSound: {fileID: 11400000, guid: 117e6f9038657034bbb7373e39bbd293, type: 2}
+  music:
+    tracks:
+    - clip: {fileID: 8300000, guid: a42d8fa1e22662d4d83591c4bdfb0f30, type: 3}
+      volume: 0
+    order: 0
+  trophy: {fileID: 4208037901244437991, guid: ab8e47ca6036d17419c93050c9a123a9, type: 3}
+  homeLines:
+  - They say it's dead. The Heartroot. I felt the ground go quiet, and I don't know if I like it quiet.
+  - You killed it? Truly? Then what else is out there that we were told couldn't be?
+  - I'd have said nobody could. I'll say it about something else next time, and you can prove me wrong again.
+  - Whatever you carried back from that hollow, keep it away from the fire. Please.

@@ -37,12 +37,30 @@ public sealed class BossDefinition : ScriptableObject
     [Tooltip("Written on the screen when it falls.")]
     [SerializeField, TextArea] private string defeatLine;
 
+    [Header("Waking")]
+    [Tooltip("Seconds it takes to rise, while its name is shown. Nothing can hurt it, and it hurts nothing.")]
+    [SerializeField, Min(0f)] private float wakeSeconds = 3.2f;
+    [SerializeField] private SoundDefinition wakeSound;
+    [Tooltip("Plays from its waking until it falls, in place of the scene's music.")]
+    [SerializeField] private MusicPlaylist music = new MusicPlaylist();
+
+    [Header("At Home")]
+    [Tooltip("Stands near the portal once it has been beaten.")]
+    [SerializeField] private BossTrophy trophy;
+    [Tooltip("What those at home say of it for a while. One is kept per person.")]
+    [SerializeField, TextArea] private string[] homeLines = new string[0];
+
     public string Id => string.IsNullOrWhiteSpace(id) ? name : id;
     public string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;
     public string Title => title;
     public BossPhase[] Phases => phases;
     public SkillDefinition RewardSkill => rewardSkill;
     public string DefeatLine => defeatLine;
+    public float WakeSeconds => wakeSeconds;
+    public SoundDefinition WakeSound => wakeSound;
+    public MusicPlaylist Music => music;
+    public BossTrophy Trophy => trophy;
+    public string[] HomeLines => homeLines;
 
     /// <summary>The stage of the fight at this share of health: 0 at the start, one more past each phase's mark.</summary>
     public static int PhaseAt(float healthShare, BossPhase[] phases)

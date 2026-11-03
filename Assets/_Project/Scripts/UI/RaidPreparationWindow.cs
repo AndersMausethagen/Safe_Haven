@@ -17,7 +17,7 @@ using static CodeUI;
 public sealed class RaidPreparationWindow : MonoBehaviour
 {
     private const float Width = 1240f;
-    private const float Height = 776f;
+    private const float Height = 868f;
     private const float Margin = 44f;
     private const float ScreenMargin = 24f;
     // Up a little from the middle: at 1080p it then clears the health bars and the hotbar below it.
@@ -25,9 +25,9 @@ public sealed class RaidPreparationWindow : MonoBehaviour
     private const float ColumnWidth = 556f;
     private const float RightColumn = 640f;
     private const float BodyTop = 172f;
-    private const float BodyBottom = 610f;
-    private const float StatsTop = 618f;
-    private const float FooterTop = 702f;
+    private const float BodyBottom = 702f;
+    private const float StatsTop = 710f;
+    private const float FooterTop = 794f;
     private const float HeadingHeight = 30f;
     private const float SectionGap = 16f;
     private const float RowHeight = 56f;
@@ -166,11 +166,18 @@ public sealed class RaidPreparationWindow : MonoBehaviour
     private TMP_Text sparksOwned;
     private Button fewerSparks;
     private Button moreSparks;
+    private TMP_Text sizeHeading;
+    private GameObject sizeRow;
+    private RectTransform sizeRowRect;
+    private TMP_Text sizeName;
+    private TMP_Text sizeDetail;
+    private bool large;
     private TMP_Text companionHeading;
     private GameObject companionRow;
     private RectTransform companionRowRect;
     private TMP_Text companionName;
     private TMP_Text companionRisk;
+    private TMP_Text companionBond;
     private readonly List<ResidentDefinition> companions = new List<ResidentDefinition>();
     private ResidentDefinition companion;
     private TMP_Text modifiersHeading;
@@ -227,6 +234,7 @@ public sealed class RaidPreparationWindow : MonoBehaviour
         difficulty = null;
         sparks = 0;
         companion = null;
+        large = false;
         // Rolled now, so the briefing shows the hour (and layout) the raid will really have.
         pendingSeed = RaidSession.NewSeed();
         Watch(user != null ? user.GetComponentInParent<ItemInventory>() : null);
@@ -356,6 +364,31 @@ public sealed class RaidPreparationWindow : MonoBehaviour
         Refresh();
     }
 
+    private void ToggleSize()
+    {
+        large = !large;
+        Refresh();
+    }
+
+    private float DrawSize(RaidDefinition raid, float y)
+    {
+        bool can = raid.CanBeLarge;
+        sizeHeading.gameObject.SetActive(can);
+        sizeRow.SetActive(can);
+        if (!can)
+        {
+            large = false;
+            return y;
+        }
+
+        y = Stack(sizeHeading, y, HeadingHeight);
+        sizeName.text = large ? "Large" : "Normal";
+        RaidSizeOption option = raid.LargeRaid;
+        float area = option.widthScale * option.widthScale;
+        sizeDetail.text = large ? $"{area:0} times the ground and what is on it, {RaidStats.FormatTime(option.extraSeconds)} more time" : "The usual forest";
+        return Stack(sizeRowRect, y, 46f, SectionGap);
+    }
+
     private void StepCompanion(int step)
     {
         // Going alone is one of the places in the list.
@@ -395,8 +428,16 @@ public sealed class RaidPreparationWindow : MonoBehaviour
         y = Stack(companionHeading, y, HeadingHeight);
         y = Stack(companionRowRect, y, 46f);
         companionName.text = companion != null ? companion.DisplayName : "Going alone";
+        companionBond.text = "";
+        if (companion != null)
+        {
+            int raids = GameSession.Settlement.Find(companion)?.RaidsAlong ?? 0;
+            string rank = CompanionBond.RankFor(raids, SettlementSettings.Current.BondRanks)?.name;
+            companionBond.text = raids == 0 ? "No raids together yet" : $"{(string.IsNullOrEmpty(rank) ? "" : rank + ", ")}{raids} raid{(raids == 1 ? "" : "s")} together";
+        }
+
         companionRisk.text = companion == null ? "One person can go with you."
-            : $"Help them up within {companion.RaidCompanion.BleedOutSeconds:0} seconds if they fall, or {companion.DisplayName} is gone for good.";
+            : $"Help them up within {companion.RaidCompanion.BleedOutSeconds:0} seconds if they fall, or the forest has {companion.DisplayName}, and they will forget you.";
         return Stack(companionRisk, y, 26f, SectionGap);
     }
 
@@ -522,8 +563,9 @@ public sealed class RaidPreparationWindow : MonoBehaviour
 
         y = anyChip ? chips + 44f : chips;
 
-        List<RaidRumourDefinition> rumours = closed ? new List<RaidRumourDefinition>() : RaidRumours.For(raid, pendingSeed, GameSession.Settlement, player != null ? player.GetComponent<PlayerCrafting>() : null);
-        while (rumourLines.Count < rumours.Count)
+        List<RaidEventDefinition> foretold = closed ? new List<RaidEventDefinition>() : RaidForecast.For(raid, pendingSeed, HavenReadiness.ForetoldEvents);
+        List<RaidRumourDefinition> rumours = closed ? new List<RaidRumourDefinition>() : RaidRumours.For(raid, pendingSeed, GameSession.Settlement, player != null ? player.GetComponent<PlayerCrafting>() : null, large ? raid.LargeRaid.widthScale : 1f);
+        while (rumourLines.Count < rumours.Count + foretold.Count)
         {
             rumourLines.Add(AddRumourLine());
         }
@@ -531,10 +573,10 @@ public sealed class RaidPreparationWindow : MonoBehaviour
         for (int i = 0; i < rumourLines.Count; i++)
         {
             RumourLine line = rumourLines[i];
-            line.Rect.gameObject.SetActive(i < rumours.Count);
-            if (i < rumours.Count)
+            line.Rect.gameObject.SetActive(i < rumours.Count + foretold.Count);
+            if (i < rumours.Count + foretold.Count)
             {
-                line.Label.text = rumours[i].Briefing;
+                line.Label.text = i < rumours.Count ? rumours[i].BriefingFor(GameSession.Settlement) : $"Seen from the Watch Post: {foretold[i - rumours.Count].DisplayName}.";
                 float height = Measure(line.Label, ColumnWidth - 16f);
                 line.Label.rectTransform.sizeDelta = new Vector2(ColumnWidth - 16f, height);
                 y = Stack(line.Rect, y, height, 6f);
@@ -643,6 +685,7 @@ public sealed class RaidPreparationWindow : MonoBehaviour
             DrawSparks();
         }
 
+        y = DrawSize(raid, y);
         y = DrawCompanion(y);
         bool any = modifierContent.sizeDelta.y > 0f;
         Stack(modifiersHeading, y, HeadingHeight);
@@ -720,7 +763,7 @@ public sealed class RaidPreparationWindow : MonoBehaviour
             modifiers.Add(item.RaidModifier);
         }
 
-        RaidParameters rules = RaidParameters.Calculate(raid, modifiers, RaidLauncher.ExtraSeconds(sparks), timeOfDay, difficulty, RaidLauncher.ExtractionCut);
+        RaidParameters rules = RaidParameters.Calculate(raid, modifiers, RaidLauncher.ExtraSeconds(sparks) + (large && raid.CanBeLarge ? raid.LargeRaid.extraSeconds : 0f), timeOfDay, difficulty, RaidLauncher.ExtractionCut);
         ShowFigure(Figure.Time, RaidStats.FormatTime(rules.Duration), raid, rules, RaidStat.Duration, true);
         ShowFigure(Figure.Extraction, $"{rules.ExtractionTime:0.#}s", raid, rules, RaidStat.ExtractionTime, false);
         ShowFigure(Figure.Loot, $"×{rules.LootMultiplier:0.##}", raid, rules, RaidStat.LootQuantity, true);
@@ -799,7 +842,7 @@ public sealed class RaidPreparationWindow : MonoBehaviour
             return;
         }
 
-        if (RaidLauncher.TryLaunch(Destination, player, picked, out string problem, sparks, pendingSeed, difficulty))
+        if (RaidLauncher.TryLaunch(Destination, player, picked, out string problem, sparks, pendingSeed, difficulty, companion, large))
         {
             Close();
         }
@@ -875,12 +918,20 @@ public sealed class RaidPreparationWindow : MonoBehaviour
         sparksOwned = Label("Label", owned, 38f, 0f, 172f, 46f, 18f, style.Text);
         Hover(owned.gameObject, () => tooltip.ShowDefinition(SettlementSettings.Current.PortalSpark));
 
+        sizeHeading = Heading("Size", part, RightColumn, 0f, ColumnWidth, style);
+        sizeRowRect = At("Size", part, RightColumn, 0f, ColumnWidth, 46f);
+        sizeRow = sizeRowRect.gameObject;
+        AddButton("Change", sizeRowRect, 0f, 0f, 150f, UIRole.Kind.Button, ToggleSize, out Button sizeButton);
+        sizeName = sizeButton.GetComponentInChildren<TMP_Text>();
+        sizeDetail = Label("Detail", sizeRowRect, 164f, 0f, ColumnWidth - 164f, 46f, 16f, style.Muted);
+
         companionHeading = Heading("Companion", part, RightColumn, 0f, ColumnWidth, style);
         companionRowRect = At("Companion", part, RightColumn, 0f, ColumnWidth, 46f);
         companionRow = companionRowRect.gameObject;
         AddButton("Previous", companionRowRect, 0f, 0f, 46f, UIRole.Kind.Button, () => StepCompanion(-1), out Button previous).text = "<";
         companionName = Label("Name", companionRowRect, 50f, 0f, 230f, 46f, 20f, style.Text, TextAlignmentOptions.Center);
         AddButton("Next", companionRowRect, 284f, 0f, 46f, UIRole.Kind.Button, () => StepCompanion(1), out Button next).text = ">";
+        companionBond = Label("Bond", companionRowRect, 340f, 0f, 216f, 46f, 17f, style.Muted, TextAlignmentOptions.MidlineRight);
         companionRisk = Paragraph("Risk", part, RightColumn, 0f, ColumnWidth, 26f, 15f, style.Muted);
 
         modifiersHeading = Heading("Raid modifiers", part, RightColumn, 0f, ColumnWidth, style);

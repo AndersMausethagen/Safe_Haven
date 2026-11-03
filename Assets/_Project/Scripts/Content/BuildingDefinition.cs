@@ -32,6 +32,8 @@ public sealed class BuildingLevel
     [Min(0f)] public float raidSeconds;
     [Tooltip("More rumours in the raid briefing. The best building of a kind counts.")]
     [Min(0)] public int extraRumours;
+    [Tooltip("How many of a raid's coming events the briefing names beforehand. The best building of a kind counts.")]
+    [Min(0)] public int foretoldEvents;
     [Tooltip("More comfort: a longer Well Rested before a raid. The best building of a kind counts.")]
     [Min(0)] public int comfort;
     [Tooltip("Extra logs from each section of a tree cut at home.")]

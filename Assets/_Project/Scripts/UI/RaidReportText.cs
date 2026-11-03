@@ -60,8 +60,18 @@ public static class RaidReportText
         if (report.Companion != null)
         {
             builder.Append(report.CompanionLost
-                ? $"<b><color={Loss}>{report.Companion.DisplayName} did not come home.</color></b>\n<i>\"{report.Companion.FallenLine}\"</i>\n\n"
-                : $"<b><color={Gain}>{report.Companion.DisplayName} made it home.</color></b>\n\n");
+                ? $"<b><color={Loss}>{report.Companion.DisplayName} did not come home.</color></b>\n<i>\"{report.Companion.FallenLine}\"</i>\n{SettlementSettings.Current.LostReportLine}\n\n"
+                : $"<b><color={Gain}>{report.Companion.DisplayName} made it home{(report.CompanionNewRank != null ? $", and is {report.CompanionNewRank} now" : "")}.</color></b>\n\n");
+        }
+
+        if (report.FoundAgain != null)
+        {
+            builder.Append($"<b><color={Gain}>{string.Format(SettlementSettings.Current.FoundReportLine, report.FoundAgain.DisplayName)}</color></b>\n\n");
+        }
+
+        if (report.LeftBehind != null)
+        {
+            builder.Append($"<b><color={Loss}>{string.Format(SettlementSettings.Current.LeftBehindLine, report.LeftBehind.DisplayName)}</color></b>\n\n");
         }
 
         foreach (ResidentDefinition rescued in report.Rescued)

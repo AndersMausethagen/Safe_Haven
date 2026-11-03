@@ -16,4 +16,20 @@ public sealed class StashStorage
 
     public ItemContainer Items { get; }
     public ResourceStorage Resources { get; }
+
+    /// <summary>Moves every material in the bag here, leaving food, tools and gear. Returns how many arrived; what doesn't fit stays in the bag.</summary>
+    public int StoreMaterials(ItemContainer bag)
+    {
+        int moved = 0;
+        for (int i = 0; bag != null && i < bag.SlotCount; i++)
+        {
+            ItemStack stack = bag.GetSlot(i);
+            if (!stack.IsEmpty && stack.Item.Category == ItemCategory.Material)
+            {
+                moved += bag.TransferTo(i, Items);
+            }
+        }
+
+        return moved;
+    }
 }

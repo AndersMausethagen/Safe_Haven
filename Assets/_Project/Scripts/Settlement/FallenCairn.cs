@@ -1,8 +1,8 @@
 using UnityEngine;
 
 /// <summary>
-/// A cairn near the portal for someone who went along on a raid and didn't come home (GDD §15.6). It says who it is for and where they
-/// fell. Raised by ResidentSpawner from SettlementState.Fallen, so it needs no saving of its own. Press E to remember them.
+/// A cairn near the portal for someone who went along on a raid and hasn't come home (GDD §15.6). It says who it is for and where they
+/// were lost, and it stands until they are found. Raised by ResidentSpawner from SettlementState.Fallen, so it needs no saving of its own. Press E to remember them.
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Interactable))]
@@ -22,12 +22,15 @@ public sealed class FallenCairn : MonoBehaviour, IInteractionName, IInteractionV
     public string Verb => "Remember";
 
     /// <summary>Where the nth cairn stands: round the portal and apart, on the ground, clear of what has been built there.</summary>
-    public static Vector3 SpotFor(Vector3 centre, int index)
+    public static Vector3 SpotFor(Vector3 centre, int index) => SpotFor(centre, index, FirstRing, 40f);
+
+    /// <summary>The same for something else raised round the portal, on a ring of its own.</summary>
+    public static Vector3 SpotFor(Vector3 centre, int index, float ring, float startAngle)
     {
         Vector3 spot = centre;
         for (int turn = 0; turn < Tries; turn++)
         {
-            spot = centre + Quaternion.Euler(0f, 40f + index * GoldenAngle + turn * TryAngle, 0f) * Vector3.forward * (FirstRing + index * RingStep);
+            spot = centre + Quaternion.Euler(0f, startAngle + index * GoldenAngle + turn * TryAngle, 0f) * Vector3.forward * (ring + index * RingStep);
             Terrain terrain = Terrains.Under(spot);
             spot.y = terrain != null ? terrain.SampleHeight(spot) + terrain.transform.position.y : centre.y;
             if (IsClear(spot))
@@ -68,7 +71,8 @@ public sealed class FallenCairn : MonoBehaviour, IInteractionName, IInteractionV
     {
         if (record != null)
         {
-            GameMessages.Post($"{record.Resident.DisplayName}. Fell in {record.Where}, and did not come home.");
+            string along = record.RaidsAlong > 0 ? $" {record.RaidsAlong} raid{(record.RaidsAlong == 1 ? "" : "s")} at your side." : "";
+            GameMessages.Post($"{record.Resident.DisplayName}. Lost in {record.Where}, and still out there.{along}");
         }
     }
 }

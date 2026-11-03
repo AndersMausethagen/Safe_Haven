@@ -146,6 +146,7 @@ public sealed class StashWindow : MonoBehaviour
         bag = new Grid(this, bagGrid);
         stash = new Grid(this, stashGrid);
         storeResourcesButton.onClick.AddListener(StoreResources);
+        storeResourcesButton.GetComponentInChildren<TMP_Text>().text = "Store all materials";
         takeResourcesButton.onClick.AddListener(TakeResources);
         closeButton.onClick.AddListener(Close);
         window.OpenChanged += OnOpenChanged;
@@ -280,8 +281,8 @@ public sealed class StashWindow : MonoBehaviour
     private void StoreResources()
     {
         int moved = carried != null ? carried.TransferAllTo(GameSession.Stash.Resources) : 0;
-        GameMessages.Post(moved > 0 ? $"Stored {moved} resources in the shed." : "You carry no resources.",
-            moved > 0 ? MessageKind.Info : MessageKind.Warning);
+        moved += GameSession.Stash.StoreMaterials(bag.Container);
+        GameMessages.Post(moved > 0 ? $"Stored {moved} materials." : "You carry no materials.", moved > 0 ? MessageKind.Info : MessageKind.Warning);
     }
 
     private void TakeResources()

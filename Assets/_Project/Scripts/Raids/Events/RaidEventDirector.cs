@@ -61,7 +61,9 @@ public sealed class RaidEventDirector : MonoBehaviour
             return;
         }
 
-        RaidEventDefinition next = RaidEventPicker.Pick(settings.pool, random, session.Elapsed, session.TimeRemaining, director.StageIndex, used);
+        // What the briefing named comes first, so it comes true.
+        RaidEventDefinition next = RaidEventPicker.Pick(session.Foretold, random, session.Elapsed, session.TimeRemaining, director.StageIndex, used)
+            ?? RaidEventPicker.Pick(settings.pool, random, session.Elapsed, session.TimeRemaining, director.StageIndex, used);
         // A failed placement tries again on the next think, with the player somewhere else.
         if (next != null && Begin(next))
         {

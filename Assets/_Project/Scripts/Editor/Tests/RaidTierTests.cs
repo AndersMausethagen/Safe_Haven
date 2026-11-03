@@ -355,7 +355,9 @@ public sealed class RaidTierTests
         Assert.IsNotEmpty(hunters);
         foreach (RaidSpawnList list in hunters)
         {
-            CollectionAssert.AreEquivalent(new[] { "ForestBittenWolf" }, list.EntriesFor(1).Select(entry => entry.prefab.name).ToArray(), $"{list.name}: tier I is wolves");
+            Assert.IsTrue(list.EntriesFor(1).Any(entry => entry.prefab.name == "ForestBittenWolf"), $"{list.name}: tier I still has wolves");
+            Assert.IsTrue(list.EntriesFor(1).Any(entry => entry.prefab.name != "ForestBittenWolf"), $"{list.name}: and more than wolves");
+            Assert.IsFalse(list.EntriesFor(1).Any(entry => entry.prefab.name == "Draug" || entry.prefab.name == "RootGuardian"), $"{list.name}: nothing of a higher tier");
             Assert.IsTrue(list.EntriesFor(2).Any(entry => entry.prefab.name != "ForestBittenWolf"), $"{list.name}: tier II brings another");
             Assert.IsFalse(list.EntriesFor(4).Any(entry => entry.prefab.name == "ForestBittenWolf"), $"{list.name}: tier IV has no plain wolves");
             Assert.IsTrue(list.EntriesFor(4).Any(entry => entry.prefab.name == "Draug"), $"{list.name}: tier IV sends the dead");

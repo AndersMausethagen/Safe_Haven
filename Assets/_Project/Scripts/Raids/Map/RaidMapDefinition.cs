@@ -121,6 +121,14 @@ public sealed class RaidMapDefinition : ScriptableObject
     public Texture2D MaskMap => maskMap;
     public Texture2D MarkerMap => markerMap;
     public float Size => size;
+
+    /// <summary>A copy for a map this many times wider, at the same detail per metre. Made at runtime; the asset never changes.</summary>
+    public RaidMapDefinition ScaledBy(float width)
+    {
+        RaidMapDefinition copy = Instantiate(this);
+        copy.size = size * width;
+        return copy;
+    }
     public float Height => height;
     public int HeightmapResolution => heightmapResolution;
     public int PaintResolution => paintResolution;

@@ -84,7 +84,7 @@ A higher tier changes what creatures do, as well as how hard they hit. Each abil
 
 ### Who comes for you
 
-The hunters sent late in a raid and on alarms, and the roamers, also follow the tier: wolves at I, then boars and Guardians, then Draugs at IV. Tier I's wolf packs have half the share
+The hunters sent late in a raid and on alarms, and the roamers, also follow the tier: wolves, boars, swarms and mistwings at I (Playtests had wolves as 38 of 50 raid kills when they came alone), then boars and Guardians, then Draugs at IV. Tier I's wolf packs have half the share
 of the higher tiers. Over 400 simulated seeds, wolves were 47% of tier I's creatures once the stronger ones were gone from it, and 31% now.
 
 | Tier | Creatures at the start of a raid, on average | Of those, wolves |

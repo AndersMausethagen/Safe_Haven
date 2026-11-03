@@ -336,7 +336,9 @@ On raid death, the player revives at the portal. The base, known recipes, levels
 
 ### 8.4 Companion risk
 
-Companions can be downed and given a clear revival window—**45 seconds**, as built (November 3, 2026). If not revived, they die permanently, as they do if still down when the raid ends; alive but elsewhere, they find their own way home. Their job then stays open to anyone, so a casualty blocks nothing. Some explicitly signposted events may instead result in capture and unlock a rescue raid. Capture must not retroactively replace a random death outcome. Named casualties should prompt reactions at home, but cannot permanently block critical crafting because replacement specialists must be discoverable.
+Companions can be downed and given a clear revival window—**45 seconds**, as built (November 3, 2026). If not revived, the forest has them, as it does if they are still down when the raid ends; alive but elsewhere, they find their own way home. Their job then stays open to anyone, so a casualty blocks nothing. Named casualties prompt reactions at home, and cannot permanently block critical crafting because replacement specialists must be discoverable.
+
+**The forest forgets the lost (decided November 3, 2026).** Nobody dies for good: "the forest does not kill the lost: it forgets them." From the next raid the briefing says they have been seen, and they stand somewhere out there, the rumour's rough mark on the map. The player has to find them, walk them to an exit and bring them out alive; if not, they stay out there and the rumour comes up again. They come home as a stranger: no bond, no job, no memory of the player. The cost is the rank and the raid it takes to get them back, not the person, and it can be paid every time. What they have forgotten comes back one memory at a time as the bond regrows, the biggest thing last. A hardcore option with permanent death could come later.
 
 ### 8.5 Carts and heavy transport
 
@@ -420,7 +422,7 @@ Reveal local maps as the player travels: ground never seen lies in dark fog unti
 (the fog of war; remembered at home, fresh every raid). At night, everything beyond the reach of sight and light lies
 under a grey, colourless veil. Keep major biome discoveries and portal landmarks persistent; vary minor loot and hazards between runs. A recruited scout may reveal a useful point of interest or safe path before departure.
 
-**The minimap (added October 31, 2026).** A round map in the corner shows what has been explored and nothing more: ground still in the fog of war stays dark, at home and on every raid. It turns with the camera. Over it go the player, buildings, carts, dropped items, exits and companions once found, the quest in hand, and creatures close enough to be seen, a much shorter way off at night. A ward breach shows its lanes and every attacker, so the player can see where to go. M zooms out and hides it.
+**The minimap (added October 31, 2026).** A round map in the corner shows what has been explored and nothing more: ground still in the fog of war stays dark, at home and on every raid. It turns with the camera. Over it go the player, buildings, carts and dropped items once found, companions, the quest in hand, and creatures close enough to be seen, a much shorter way off at night. In a raid it also shows every exit, open events and, roughly, what rumours point to, as the raid's list of exits always told the player they were there. A ward breach shows its lanes and every attacker, so the player can see where to go. M zooms out and hides it.
 
 ## 10. Movement, combat, and enemies
 
@@ -738,7 +740,7 @@ Start with lightweight differentiation: name, portrait, profession, preferred ho
 
 ### 15.5 Companions
 
-Suggested launch prototype: **one active companion** per raid. Command options can begin with follow, hold, and context-sensitive interact/revive. A companion's utility must justify the genuine risk of permanent loss. Build readable pathfinding and safe-zone behavior before implementing complex companion combat tactics.
+Suggested launch prototype: **one active companion** per raid. Command options can begin with follow, hold, and context-sensitive interact/revive. A companion's utility must justify the genuine risk of losing them to the forest, and what it costs to get them back. Build readable pathfinding and safe-zone behavior before implementing complex companion combat tactics.
 
 ### 15.6 Consequences and memory
 
@@ -825,6 +827,8 @@ Compact health/survival indicators; hotbar; contextual interact prompts; expanda
 ### 18.3 Raid HUD
 
 Prominent but nonintrusive clock; threat or danger-phase alert; objective tracker; distance/direction to extraction; load weight and capacity; quick consumables; clear companion/downed status. Warnings must trigger early enough for informed choices.
+
+**Text says when and which way; the maps say where (November 3, 2026).** At the top: the clock, one line with an arrow to the nearest open exit, and one line of news at a time when something changes. Every exit, rumour and open event is pinned to the minimap's rim and named on the world map, where direction can be read at a glance. The companion and what is at risk sit above the vitals, with long messages above them; pickups stay beside the character. The quest tracker shows only what can be done on this raid, and says how many wait at home.
 
 ### 18.4 Example resource row
 
@@ -1183,7 +1187,7 @@ These decisions cover §21 and the first ward breach. All numbers are tuning def
 
 ### 26.2 Still open
 
-- How long should a raid be? The design says 12 minutes; Misty Woods now runs at 16:40 (1000 s), with its danger stages and exits written for 12. No 12-minute raid has been played yet, so its pacing with events is untested.
+- How long should a raid be? The design says 12 minutes; Misty Woods now runs at 16:40 (1000 s), with its danger stages and exits written for 12, and a large raid (four times the ground, chosen in the planner) at 29:10. No 12-minute raid has been played yet, so its pacing with events is untested.
 
 - How strong should the new gear, creatures and meals be? Their numbers are first estimates and none have been playtested.
 

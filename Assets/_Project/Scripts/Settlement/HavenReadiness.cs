@@ -18,6 +18,9 @@ public static class HavenReadiness
 
     public static int ExtraRumours => Mathf.RoundToInt(BestOfEachKind(level => level.extraRumours));
 
+    /// <summary>How many of a raid's coming events are known before setting out.</summary>
+    public static int ForetoldEvents => Mathf.RoundToInt(BestOfEachKind(level => level.foretoldEvents));
+
     public static int ExtraLogs => Mathf.RoundToInt(BestOfEachKind(level => level.extraLogs));
 
     /// <summary>Comfort at home: what each kind of building gives once, plus what its upgrades add, and everyone with a bed.</summary>
@@ -132,6 +135,7 @@ public static class HavenReadiness
             Status = rumours > 0 ? "You know more of what is out there." : "You go in blind.",
             Description = "A Watch Post hears what moves in the woods, and teaches the raid runes: some make a raid harder and pay for it in loot. You choose them at the portal.",
         };
+        entry.Details.Add(new HavenDetail("Seen coming", ForetoldEvents > 0 ? $"The briefing names {ForetoldEvents} of the raid's events beforehand." : "Later Watch Post levels name a raid's events beforehand."));
         entry.Details.Add(new HavenDetail("Harder raids", "Watch Post levels teach the runes that change a raid's rules. Make them at the Cauldron, then pick them at the portal."));
         if (post != null)
         {

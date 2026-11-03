@@ -30,7 +30,23 @@ MonoBehaviour:
     won:
     - Nothing else on the wind.
     - That's all of them. I think.
+    helpedUp:
+    - Bow's still good. So am I.
+    - Move. I've got your back.
   model: {fileID: 4704275745086199601, guid: eece4adebb5d1a04d820228f6b254479, type: 3}
   raidCompanion: {fileID: 11400000, guid: bfeda7cc0c77ea24dac614548220c4eb, type: 2}
+  memoryLines:
+  - kind: 6
+    lines:
+    - I've tracked things my whole life, and never one that big. It left nothing behind but quiet. I don't trust the quiet.
+  - kind: 5
+    lines:
+    - You crossed open ground to reach me. Stupid. Don't stop.
+  - kind: 3
+    lines:
+    - I counted our steps to the exit. I'd rather not count that close again.
+  - kind: 1
+    lines:
+    - The forest doesn't hate us. It doesn't notice us. That's worse. Next time I pick the way.
   jobs:
   - {fileID: 11400000, guid: 6af8ca180b22423448d6e1e307037eb6, type: 2}

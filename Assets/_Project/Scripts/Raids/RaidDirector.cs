@@ -149,7 +149,7 @@ public sealed class RaidDirector : MonoBehaviour
         StrengthenEnemies(true);
         BringCompanion();
         var pieceRandom = new System.Random(RaidLayout.SeedFor(Session.Seed, "Set Piece Guards"));
-        foreach (RaidSetPieceSite site in FindObjectsByType<RaidSetPieceSite>(FindObjectsSortMode.InstanceID))
+        foreach (RaidSetPieceSite site in FindObjectsByType<RaidSetPieceSite>(FindObjectsInactive.Exclude))
         {
             site.BringGuards(this, pieceRandom);
         }
@@ -182,11 +182,72 @@ public sealed class RaidDirector : MonoBehaviour
 
         Companion = Companion.SpawnForRaid(prefab, Session.Companion, hit.position);
         Companion.FormationOffset = new Vector3(2f, 0f, -3f);
-        StatSheet stats = Companion.GetComponent<Combatant>().Stats;
-        stats.AddModifier(new StatModifier(StatType.MaxHealth, StatModifierOp.Percent, PowerMultiplier - 1f, this));
-        stats.AddModifier(new StatModifier(StatType.DamageBonus, StatModifierOp.Flat, HealthMultiplier - 1f, this));
-        Damageable body = Companion.GetComponent<Damageable>();
+        ResidentRecord record = GameSession.Settlement.Find(Session.Companion);
+        Toughen(Companion, record != null ? CompanionBond.RankFor(record.RaidsAlong, SettlementSettings.Current.BondRanks) : null);
+    }
+
+    private void Toughen(Companion who, CompanionBondRank rank)
+    {
+        StatSheet stats = who.GetComponent<Combatant>().Stats;
+        float tougher = rank != null ? rank.healthBonus : 0f;
+        float harder = rank != null ? rank.damageBonus : 0f;
+        stats.AddModifier(new StatModifier(StatType.MaxHealth, StatModifierOp.Percent, PowerMultiplier * (1f + tougher) - 1f, this));
+        stats.AddModifier(new StatModifier(StatType.DamageBonus, StatModifierOp.Flat, HealthMultiplier * (1f + harder) - 1f, this));
+        Damageable body = who.GetComponent<Damageable>();
         body.Heal(body.MaxHealth);
+    }
+
+    /// <summary>Whoever is lost longest stands here, waiting, as a rumour said they would.</summary>
+    public void StandLostAt(Vector3 position)
+    {
+        FallenRecord lost = GameSession.Settlement.LostToFind;
+        Companion prefab = SettlementSettings.Current.RaidCompanionPrefab;
+        if (lost == null || prefab == null || LostOne != null)
+        {
+            return;
+        }
+
+        Vector3 beside = position + Vector3.right * 2f;
+        if (!UnityEngine.AI.NavMesh.SamplePosition(beside, out UnityEngine.AI.NavMeshHit hit, 8f, UnityEngine.AI.NavMesh.AllAreas))
+        {
+            Debug.LogWarning($"Nowhere for {lost.Resident.DisplayName} to stand; they weren't found this raid.", this);
+            return;
+        }
+
+        LostOne = Companion.SpawnForRaid(prefab, lost.Resident, hit.position);
+        LostOne.FormationOffset = new Vector3(-2f, 0f, -3f);
+        Toughen(LostOne, null);
+        LostOne.StandLost();
+    }
+
+    /// <summary>The player has found them. They follow without knowing why.</summary>
+    public void LeadLostHome()
+    {
+        if (LostOne != null)
+        {
+            LostOneFollows = true;
+            LostOne.FollowWhoFoundThem();
+            GameMessages.Post(string.Format(SettlementSettings.Current.FoundFollowLine, LostOne.DisplayName), MessageKind.Gain);
+        }
+    }
+
+    // Home only with the player, alive and close by: they don't know the way. Never found, nothing has changed.
+    private void SettleTheLost(bool extracted)
+    {
+        if (LostOne == null || !LostOneFollows)
+        {
+            return;
+        }
+
+        bool close = player != null && Vector3.Distance(player.transform.position, LostOne.transform.position) <= SettlementSettings.Current.FoundComesHomeWithin;
+        if (extracted && close && !LostOne.IsLost && !LostOne.IsDowned && GameSession.Settlement.FindAgain(LostOne.Resident))
+        {
+            Report.FoundAgain = LostOne.Resident;
+        }
+        else
+        {
+            Report.LeftBehind = LostOne.Resident;
+        }
     }
 
     private void OnDestroy()
@@ -394,8 +455,16 @@ public sealed class RaidDirector : MonoBehaviour
             {
                 GameSession.Settlement.LoseResident(Session.Companion, Session.Definition.DisplayName);
             }
+            else if (Companion != null)
+            {
+                bool rose = GameSession.Settlement.RecordRaidAlong(Session.Companion, SettlementSettings.Current.BondRanks, extracted, Session.BossesBeaten,
+                    Companion.TimesHelpedUp, Session.TimeRemaining, Companion.Kills, SettlementSettings.Current.MemoryReturnsEvery);
+                ResidentRecord record = GameSession.Settlement.Find(Session.Companion);
+                Report.CompanionNewRank = rose ? CompanionBond.RankFor(record.RaidsAlong, SettlementSettings.Current.BondRanks)?.name : null;
+            }
         }
 
+        SettleTheLost(extracted);
         GameSession.EndRaid(Report);
         SaveGameService.SaveOnceHome();
         GameEvents.Raise(new GameEvent(GameEventKind.RaidFinished, Session.Definition, 1, null, Session.Outcome, Session.Elapsed));
@@ -475,6 +544,12 @@ public sealed class RaidDirector : MonoBehaviour
     /// <summary>The raid's enemy health multiplier right now.</summary>
     /// <summary>Who came along on this raid, once they have walked in.</summary>
     public Companion Companion { get; private set; }
+
+    /// <summary>Someone lost on an earlier raid, standing where a rumour said. Null when nobody is out there or they had nowhere to stand.</summary>
+    public Companion LostOne { get; private set; }
+
+    /// <summary>The player has found them, and they are coming along.</summary>
+    public bool LostOneFollows { get; private set; }
 
     public float HealthMultiplier => Parameters.EnemyHealthMultiplier * (1f + (CurrentStage?.EnemyHealthBonus ?? 0f)) * NightSettings.Current.HealthAt(NightSettings.Darkness);
     /// <summary>The raid's enemy damage multiplier right now.</summary>

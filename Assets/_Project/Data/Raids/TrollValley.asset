@@ -16,18 +16,129 @@ MonoBehaviour:
   displayName: Troll Valley
   description: A valley of old stone bridges where the trolls still collect their tolls. Trollstone is found only here.
   tier: 2
-  sceneName: 
+  sceneName: Raid_MistyWoods
   locked: 1
-  lockedText: The way to Troll Valley lies beyond the Misty Woods. The portal can't reach that far yet.
-  knownEnemies: []
+  unlockedBy: {fileID: 11400000, guid: 9b7313d497a67e54b8b12e51990184bb, type: 2}
+  largeRaid:
+    widthScale: 2
+    extraSeconds: 750
+    extraExits:
+    - Rockfall Gap
+    - Goat Stair
+    - Cold Ford
+  lockedText: The way to Troll Valley lies beyond the Misty Woods. Something old in the deep woods holds it shut.
+  knownEnemies:
+  - {fileID: 11400000, guid: 1fc74e15f41da234fb9eeedcfe1067f0, type: 2}
+  - {fileID: 11400000, guid: 18c8362f09cf64a468e9ae4ae6d4422b, type: 2}
+  - {fileID: 11400000, guid: 6831da450ee487246b0f7f72b7e0272f, type: 2}
+  - {fileID: 11400000, guid: 2f66a8d86463697438ce75621f51e12d, type: 2}
+  - {fileID: 11400000, guid: 916ab17a0415c3041aec1267259d1567, type: 2}
   likelyItems:
-  - {fileID: 11400000, guid: fcf0552d231ec8b40a3de2796f1bc4c3, type: 2}
-  likelyResources: []
+  - {fileID: 11400000, guid: 7e57bf86766de2341bd9c47b5830cf76, type: 2}
+  - {fileID: 11400000, guid: a9f806359436036488427616ef8b8c44, type: 2}
+  - {fileID: 11400000, guid: 8ae2883815327b74fa7975309c803f92, type: 2}
+  - {fileID: 11400000, guid: d799dc8161ff2854dae1eedf4b74fb09, type: 2}
+  - {fileID: 11400000, guid: 3790e5e25892e2a49adf1a7cb473a699, type: 2}
+  likelyResources:
+  - {fileID: 11400000, guid: a86ac9a152512464ab08e0446c161e61, type: 2}
+  - {fileID: 11400000, guid: c0e409a7cd38400498ff1c7037737b96, type: 2}
   durationSeconds: 1000
-  extractionSeconds: 35
+  extractionSeconds: 30
   lootMultiplier: 1
   enemyHealthMultiplier: 1
   enemyPowerMultiplier: 1
+  difficulties:
+  - tier: 2
+    recommendedGearScore: 30
+    minimumGearScore: 15
+    wardLevelNeeded: 1
+    enemyHealth: 1.4
+    enemyPower: 1.35
+    enemyDensity: 1.15
+    loot: 1.1
+    dropsUpToTier: 0
+    briefing: Wolves pounce from a distance and bog things spit in volleys. Root Guardians wake, Moss Shamans call them on. Iron, deepstone and elderwood lie deeper in.
+    eliteCount: {x: 1, y: 2}
+    eliteAffixes: 1
+    hunterEliteChance: 0
+    eliteRelicChance: 0.05
+    eliteLoot:
+      entries:
+      - item: {fileID: 11400000, guid: ec438ce757d5e9e43bbd93390e7a2728, type: 2}
+        resource: {fileID: 0}
+        minQuantity: 3
+        maxQuantity: 5
+        probability: 1
+      - item: {fileID: 0}
+        resource: {fileID: 11400000, guid: c0e409a7cd38400498ff1c7037737b96, type: 2}
+        minQuantity: 3
+        maxQuantity: 4
+        probability: 1
+  - tier: 3
+    recommendedGearScore: 50
+    minimumGearScore: 30
+    wardLevelNeeded: 2
+    enemyHealth: 2.1
+    enemyPower: 2.6
+    enemyDensity: 1.3
+    loot: 1.2
+    dropsUpToTier: 0
+    briefing: 'The dead walk: Draugs among the trees. Boars trample, Guardians slam the ground and the great troll charges. Moonsilver can be found here.'
+    eliteCount: {x: 2, y: 3}
+    eliteAffixes: 1
+    hunterEliteChance: 0.15
+    eliteRelicChance: 0.1
+    eliteLoot:
+      entries:
+      - item: {fileID: 11400000, guid: fdf61b2bcc4fcfb47b96885b254e02e6, type: 2}
+        resource: {fileID: 0}
+        minQuantity: 2
+        maxQuantity: 4
+        probability: 1
+      - item: {fileID: 0}
+        resource: {fileID: 11400000, guid: c0e409a7cd38400498ff1c7037737b96, type: 2}
+        minQuantity: 4
+        maxQuantity: 6
+        probability: 1
+  - tier: 4
+    recommendedGearScore: 70
+    minimumGearScore: 45
+    wardLevelNeeded: 3
+    enemyHealth: 2.6
+    enemyPower: 3.4
+    enemyDensity: 1.45
+    loot: 1.35
+    dropsUpToTier: 0
+    briefing: The woods at their worst. Draugs rally with a war cry, Guardians call up roots and the great troll calls its kin. Its Trollstone is worth taking.
+    eliteCount: {x: 3, y: 4}
+    eliteAffixes: 2
+    hunterEliteChance: 0.25
+    eliteRelicChance: 0.15
+    eliteLoot:
+      entries:
+      - item: {fileID: 11400000, guid: fdf61b2bcc4fcfb47b96885b254e02e6, type: 2}
+        resource: {fileID: 0}
+        minQuantity: 3
+        maxQuantity: 5
+        probability: 1
+      - item: {fileID: 11400000, guid: fcf0552d231ec8b40a3de2796f1bc4c3, type: 2}
+        resource: {fileID: 0}
+        minQuantity: 1
+        maxQuantity: 1
+        probability: 0.25
+      - item: {fileID: 0}
+        resource: {fileID: 11400000, guid: c0e409a7cd38400498ff1c7037737b96, type: 2}
+        minQuantity: 6
+        maxQuantity: 8
+        probability: 1
+  eliteAffixes:
+  - {fileID: 11400000, guid: d036cc7f16338cf4db6914042a96d47d, type: 2}
+  - {fileID: 11400000, guid: ed7b957a7b9f7034aad0fbfeeaa94edc, type: 2}
+  - {fileID: 11400000, guid: 520af21933d01a643a52cf7f7640310f, type: 2}
+  - {fileID: 11400000, guid: caa853b23129c8b41a07ed7428d908a5, type: 2}
+  - {fileID: 11400000, guid: 20158eb0ae9165e478d19e1d76a9d553, type: 2}
+  - {fileID: 11400000, guid: 4872bd8eac9ec8c4695c4f8d544d05fe, type: 2}
+  - {fileID: 11400000, guid: 64d24d4180baec546ae6b6b280ffea7c, type: 2}
   timesOfDay:
   - name: Day
     hour: 11
@@ -39,24 +150,487 @@ MonoBehaviour:
     hour: 19.2
     chance: 25
     lootMultiplier: 1.15
-    enemyDensity: 1
+    enemyDensity: 1.15
     briefing: Long shadows and failing light. Things wake.
   - name: Night
     hour: 23.5
     chance: 20
     lootMultiplier: 1.4
-    enemyDensity: 1
-    briefing: Grey dark beyond arm's reach. You see little, and so do they; they hear as well as ever.
-  layoutRules: {fileID: 0}
-  enemyDensity: 1
+    enemyDensity: 1.3
+    briefing: Grey dark beyond arm's reach. More of them are out, and stronger; they see no better than you, but they hear as well as ever. They carry twice the Cursed Essence.
+  layoutRules: {fileID: 11400000, guid: 430236b94db6775498e5bac61accc380, type: 2}
+  enemyDensity: 1.5
   overrideBands: 0
-  nearDistance: 60
+  nearDistance: 25
   farDistance: 110
-  spawnLists: []
+  spawnLists:
+  - name: Creatures
+    category: 0
+    pointGroups:
+    - Wolf Packs
+    - Root Guardians
+    - Moss Trolls
+    - Mistwings
+    count: {x: 7, y: 10}
+    entryBand: 0
+    separation: 12
+    trigger: 0
+    stage: 1
+    huntPlayer: 0
+    entries:
+    - prefab: {fileID: 4584692032328657812, guid: 64cf9de042e1bc142907212054f70f50, type: 3}
+      weight: 6
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 1
+      toTier: 1
+    - prefab: {fileID: 9066855856663566298, guid: 6e4b724e33048b246a0b54c712d80b6f, type: 3}
+      weight: 14
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 2
+      toTier: 0
+    - prefab: {fileID: 6267209934607442583, guid: bb37a42ef72f5274d807155e3d054529, type: 3}
+      weight: 34
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+    - prefab: {fileID: 4830014356063024607, guid: a8600aa8041d7044c9a3afddd7102a7b, type: 3}
+      weight: 4
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+    - prefab: {fileID: 6176781864247096722, guid: a8ac1434006f7a44fb55b3c510633858, type: 3}
+      weight: 2
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+    - prefab: {fileID: 8653230728158633359, guid: a661dc05d2e43f943a476376f636ef9a, type: 3}
+      weight: 4
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+    - prefab: {fileID: 4999243170976522981, guid: 07a704aacccfef242886f2875ff4fcdf, type: 3}
+      weight: 3
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+    - prefab: {fileID: 5318185529198269020, guid: d281dc652b3e50445a465365ff40b433, type: 3}
+      weight: 2
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+    - prefab: {fileID: 9066855856663566298, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
+      weight: 16
+      maxPerGroup: 2
+      minPerGroup: 1
+      fromTier: 3
+      toTier: 0
+    - prefab: {fileID: 7112812444035070341, guid: e6646a32ac93d664c950e5e95fd45e0e, type: 3}
+      weight: 12
+      maxPerGroup: 2
+      minPerGroup: 1
+      fromTier: 3
+      toTier: 0
+    - prefab: {fileID: 3643037256157110189, guid: 8af413a8c10dbdc4f89f0537152651dc, type: 3}
+      weight: 8
+      maxPerGroup: 1
+      minPerGroup: 1
+      fromTier: 2
+      toTier: 0
+    - prefab: {fileID: 4584692032328657812, guid: 64cf9de042e1bc142907212054f70f50, type: 3}
+      weight: 6
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 2
+      toTier: 0
+  - name: Resources
+    category: 1
+    pointGroups:
+    - Ore Veins
+    - Timber
+    - Herbs and Fibres
+    - Life Wells
+    count: {x: 124, y: 140}
+    entryBand: 0
+    separation: 0
+    trigger: 0
+    stage: 1
+    huntPlayer: 0
+    entries:
+    - prefab: {fileID: 948381022197778722, guid: 15b33c21de24fb7418664d30fe242c26, type: 3}
+      weight: 30
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+    - prefab: {fileID: 8046387889879202812, guid: 262f869a4b8db6440b65cd5554060fce, type: 3}
+      weight: 10
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 3
+    - prefab: {fileID: 297312215928108013, guid: 7b176e5facb909c44a2893050cbcc64a, type: 3}
+      weight: 6
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 2
+      toTier: 0
+    - prefab: {fileID: 8682228126172116304, guid: 3e31e979ada082348a0ae00bacfea168, type: 3}
+      weight: 4
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+    - prefab: {fileID: 2009929089532973240, guid: e4175e4dc8cc5b847b691d128a9786aa, type: 3}
+      weight: 8
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+    - prefab: {fileID: 4564521982437816396, guid: dd15144a20b00e2408502e401ea88a06, type: 3}
+      weight: 6
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+    - prefab: {fileID: 4483799220086940710, guid: d30b058cde685564ca6d1e997f261196, type: 3}
+      weight: 2
+      maxPerGroup: 3
+      minPerGroup: 0
+      fromTier: 3
+      toTier: 0
+    - prefab: {fileID: 8886612018720869940, guid: 072aecd2c58a7024bb867d70e6bc410d, type: 3}
+      weight: 1
+      maxPerGroup: 2
+      minPerGroup: 0
+      fromTier: 2
+      toTier: 0
+    - prefab: {fileID: 6821748221057059875, guid: 363571da353f0c9429cec15d631d1da9, type: 3}
+      weight: 1
+      maxPerGroup: 2
+      minPerGroup: 0
+      fromTier: 2
+      toTier: 0
+    - prefab: {fileID: 6865268627933171699, guid: 879636884ea876843960148e835a6af2, type: 3}
+      weight: 1
+      maxPerGroup: 2
+      minPerGroup: 0
+      fromTier: 2
+      toTier: 0
+    - prefab: {fileID: 7857519288705744795, guid: e8f5ac7427646e942aaf261bf18f6768, type: 3}
+      weight: 6
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+    - prefab: {fileID: 9111748613750876259, guid: 4cff8733c679b964f97f5aa116eda933, type: 3}
+      weight: 6
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+    - prefab: {fileID: 8775155884352199117, guid: a9997326276cfce4fa8853b4de82eab1, type: 3}
+      weight: 4
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+    - prefab: {fileID: 5392347885279070540, guid: bf3e16d3faa3743469e7a3d035690749, type: 3}
+      weight: 8
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+    - prefab: {fileID: 6288032578105571644, guid: dd1ab12d09fe61049b4f79441821d70a, type: 3}
+      weight: 7
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+    - prefab: {fileID: 1158895183621609222, guid: e010c7c1cd96e8a4cb11aa834ca0a563, type: 3}
+      weight: 4
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+    - prefab: {fileID: 3616788768692720460, guid: 7bbc1b4511da00c4e81fb9d948fe6784, type: 3}
+      weight: 8
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+    - prefab: {fileID: 5701181132641860389, guid: 5e2206bd114732e4da8f8e504471a110, type: 3}
+      weight: 6
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+    - prefab: {fileID: 7806843326714637814, guid: 94dc1085a97345342b8f74fa9c096025, type: 3}
+      weight: 4
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+    - prefab: {fileID: 1699181372466110288, guid: f6d8bfacb080b84408ebd7afcb7fa627, type: 3}
+      weight: 4
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+    - prefab: {fileID: 7424242661901594498, guid: 415fc92bb3a4e3c4892211c08f38f779, type: 3}
+      weight: 2
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+  - name: Supply Caches
+    category: 2
+    pointGroups:
+    - Supply Caches
+    count: {x: 1, y: 3}
+    entryBand: 0
+    separation: 0
+    trigger: 0
+    stage: 1
+    huntPlayer: 0
+    entries:
+    - prefab: {fileID: 4812547136345430722, guid: ba6f34ca967a1d043bcee3331d85f1a1, type: 3}
+      weight: 100
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+  - name: Event Sites
+    category: 2
+    pointGroups:
+    - Event Sites
+    count: {x: 3, y: 4}
+    entryBand: 0
+    separation: 0
+    trigger: 0
+    stage: 1
+    huntPlayer: 0
+    entries:
+    - prefab: {fileID: 6552391252369855886, guid: 1d252d78608fdb1418d14fbb401b04e9, type: 3}
+      weight: 25
+      maxPerGroup: 2
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+    - prefab: {fileID: 4438480868590446949, guid: 692cc71abea731f41bfdced13178f974, type: 3}
+      weight: 25
+      maxPerGroup: 2
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+    - prefab: {fileID: 3285891926514676715, guid: c4de1540097fc0849803d24d39735751, type: 3}
+      weight: 25
+      maxPerGroup: 2
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+    - prefab: {fileID: 6328468425548948482, guid: f68eee4888e0624488d803cca7ceac64, type: 3}
+      weight: 25
+      maxPerGroup: 2
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+  - name: Stirring Prowlers
+    category: 3
+    pointGroups:
+    - Stirring Prowlers
+    count: {x: 2, y: 2}
+    entryBand: 0
+    separation: 0
+    trigger: 1
+    stage: 1
+    huntPlayer: 0
+    entries:
+    - prefab: {fileID: 7477446688404098989, guid: 237fc76d161bb114aa2049a864298943, type: 3}
+      weight: 40
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 2
+    - prefab: {fileID: 8653230728158633359, guid: a661dc05d2e43f943a476376f636ef9a, type: 3}
+      weight: 30
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 2
+      toTier: 3
+    - prefab: {fileID: 9066855856663566298, guid: 6e4b724e33048b246a0b54c712d80b6f, type: 3}
+      weight: 20
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 3
+      toTier: 0
+    - prefab: {fileID: 9066855856663566298, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
+      weight: 10
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 4
+      toTier: 0
+    - prefab: {fileID: 7112812444035070341, guid: e6646a32ac93d664c950e5e95fd45e0e, type: 3}
+      weight: 5
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 4
+      toTier: 0
+    - prefab: {fileID: 8653230728158633359, guid: a661dc05d2e43f943a476376f636ef9a, type: 3}
+      weight: 30
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 1
+      toTier: 1
+    - prefab: {fileID: 6176781864247096722, guid: a8ac1434006f7a44fb55b3c510633858, type: 3}
+      weight: 25
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 1
+      toTier: 2
+  - name: Hunters
+    category: 3
+    pointGroups:
+    - Hunters
+    count: {x: 1, y: 2}
+    entryBand: 0
+    separation: 0
+    trigger: 1
+    stage: 2
+    huntPlayer: 1
+    entries:
+    - prefab: {fileID: 7477446688404098989, guid: 237fc76d161bb114aa2049a864298943, type: 3}
+      weight: 50
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 3
+    - prefab: {fileID: 9066855856663566298, guid: 6e4b724e33048b246a0b54c712d80b6f, type: 3}
+      weight: 25
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 2
+      toTier: 2
+    - prefab: {fileID: 9066855856663566298, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
+      weight: 25
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 3
+      toTier: 0
+    - prefab: {fileID: 8653230728158633359, guid: a661dc05d2e43f943a476376f636ef9a, type: 3}
+      weight: 30
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 1
+      toTier: 1
+    - prefab: {fileID: 4830014356063024607, guid: a8600aa8041d7044c9a3afddd7102a7b, type: 3}
+      weight: 20
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 1
+      toTier: 2
+  - name: Collapse Hunters
+    category: 3
+    pointGroups:
+    - Collapse Hunters
+    count: {x: 2, y: 2}
+    entryBand: 0
+    separation: 0
+    trigger: 1
+    stage: 3
+    huntPlayer: 1
+    entries:
+    - prefab: {fileID: 7477446688404098989, guid: 237fc76d161bb114aa2049a864298943, type: 3}
+      weight: 40
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 2
+    - prefab: {fileID: 9066855856663566298, guid: 6e4b724e33048b246a0b54c712d80b6f, type: 3}
+      weight: 30
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 2
+      toTier: 3
+    - prefab: {fileID: 9066855856663566298, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
+      weight: 30
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 3
+      toTier: 0
+    - prefab: {fileID: 6176781864247096722, guid: a8ac1434006f7a44fb55b3c510633858, type: 3}
+      weight: 30
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 1
+      toTier: 2
+    - prefab: {fileID: 8653230728158633359, guid: a661dc05d2e43f943a476376f636ef9a, type: 3}
+      weight: 25
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 1
+      toTier: 1
+  - name: East Beacon Alarm
+    category: 3
+    pointGroups:
+    - East Beacon Alarm
+    count: {x: 2, y: 2}
+    entryBand: 0
+    separation: 0
+    trigger: 2
+    stage: 1
+    huntPlayer: 1
+    entries:
+    - prefab: {fileID: 7477446688404098989, guid: 237fc76d161bb114aa2049a864298943, type: 3}
+      weight: 40
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 3
+    - prefab: {fileID: 8653230728158633359, guid: a661dc05d2e43f943a476376f636ef9a, type: 3}
+      weight: 20
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 2
+      toTier: 2
+    - prefab: {fileID: 9066855856663566298, guid: 6e4b724e33048b246a0b54c712d80b6f, type: 3}
+      weight: 20
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 3
+      toTier: 0
+    - prefab: {fileID: 9066855856663566298, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
+      weight: 20
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 4
+      toTier: 0
+    - prefab: {fileID: 8653230728158633359, guid: a661dc05d2e43f943a476376f636ef9a, type: 3}
+      weight: 30
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 1
+      toTier: 1
+    - prefab: {fileID: 4830014356063024607, guid: a8600aa8041d7044c9a3afddd7102a7b, type: 3}
+      weight: 15
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 1
+      toTier: 2
   systems:
-  - rid: 287757967972106341
+  - rid: 287757967972106337
+  - rid: 287757967972106340
+  - rid: 287758281410609305
+  - rid: 287758281410609374
   roaming:
-    table: {fileID: 0}
+    table: {fileID: 11400000, guid: 55a919693f726634aa952bc05b8ac3a3, type: 2}
     firstDelay: 60
     interval: 20
     baseAlive: 2
@@ -69,29 +643,105 @@ MonoBehaviour:
     despawnDistance: 90
     campClearance: 20
     huntSpread: 15
-  stages: []
+  stages:
+  - displayName: The Mist Stirs
+    startsAtSecondsLeft: 480
+    message: The mist thickens. Something out there has caught your scent.
+    enemyHealthBonus: 0.1
+    enemyPowerBonus: 0.1
+  - displayName: The Hunt
+    startsAtSecondsLeft: 240
+    message: Howls echo through the trees. The hunt has begun!
+    enemyHealthBonus: 0.2
+    enemyPowerBonus: 0.2
+  - displayName: Collapse
+    startsAtSecondsLeft: 60
+    message: The woods are collapsing! Get out now!
+    enemyHealthBonus: 0.35
+    enemyPowerBonus: 0.35
   extractedArtwork: {fileID: 0}
   failedArtwork: {fileID: 0}
   references:
     version: 2
     RefIds:
-    - rid: 287757967972106341
+    - rid: 287757967972106337
+      type: {class: RoamingSpawnsSystem, ns: , asm: SafeHaven}
+      data:
+        enabled: 1
+        settings:
+          table: {fileID: 11400000, guid: 55a919693f726634aa952bc05b8ac3a3, type: 2}
+          firstDelay: 60
+          interval: 20
+          baseAlive: 2
+          perStage: 1
+          perAlarm: 2
+          maxAlive: 8
+          totalLimit: 12
+          minDistance: 35
+          maxDistance: 60
+          despawnDistance: 90
+          campClearance: 20
+          huntSpread: 15
+    - rid: 287757967972106340
       type: {class: ForestAnnoyanceSystem, ns: , asm: SafeHaven}
       data:
         enabled: 1
         settings:
-          perCritical: 4
-          perNormal: 13
-          perGlancing: 20
-          quietDelay: 8
-          decayPerSecond: 0.3
-          stirringAt: 25
-          angryAt: 50
-          wrathAt: 85
+          perCritical: 2.5
+          perNormal: 7
+          perGlancing: 11
+          quietDelay: 4
+          decayPerSecond: 1.2
+          stirringAt: 30
+          angryAt: 60
+          wrathAt: 100
           stirringExtraRoamers: 2
           stirringIntervalScale: 0.6
           huntInterval: 20
           huntRadius: 60
           wrathGroups: 3
-          wrathTable: {fileID: 0}
+          wrathTable: {fileID: 11400000, guid: 14f76a7cd21202c4f9876929a83f6ca9, type: 2}
           maxWraths: 1
+    - rid: 287758281410609305
+      type: {class: RaidEventsSystem, ns: , asm: SafeHaven}
+      data:
+        enabled: 1
+        settings:
+          pool:
+          - {fileID: 11400000, guid: c741611bae9900b4da4b5f0226efdfe1, type: 2}
+          - {fileID: 11400000, guid: 99222c7a39ea478488c1567cd06e9ca6, type: 2}
+          - {fileID: 11400000, guid: eac64687f931d7c4784a86ae8f83b987, type: 2}
+          - {fileID: 11400000, guid: 1f5a45a9b02364c46a8f908efeb0de22, type: 2}
+          - {fileID: 11400000, guid: 96cb078123957d84a8fb85a77ce918bf, type: 2}
+          - {fileID: 11400000, guid: 0d4d797da4e8c0d4387a4cca400ce33a, type: 2}
+          - {fileID: 11400000, guid: ab909f1e102c2d446b08c2c49295dcb2, type: 2}
+          - {fileID: 11400000, guid: ef827d0bb7f46d447b0d6be2e2c6783c, type: 2}
+          - {fileID: 11400000, guid: e8fa9dbe99dd2df4a800731b224f1dfd, type: 2}
+          - {fileID: 11400000, guid: a3cb2529bab49724cb72ddb15212b062, type: 2}
+          firstDelay: 45
+          interval: 110
+          intervalSpread: 35
+          maxPerRaid: 4
+          maxOpenSites: 2
+    - rid: 287758281410609374
+      type: {class: RaidRumoursSystem, ns: , asm: SafeHaven}
+      data:
+        enabled: 1
+        pool:
+        - {fileID: 11400000, guid: 6687458ccdb8cda4f99dd732ac5c7771, type: 2}
+        - {fileID: 11400000, guid: 708a254e7ee8ac44a8a1e638c8e5010f, type: 2}
+        - {fileID: 11400000, guid: 41e1053407fbbfc479b924896108ef07, type: 2}
+        - {fileID: 11400000, guid: b710b538657bbd54c840e6e609c651eb, type: 2}
+        - {fileID: 11400000, guid: 15373f05f33835345be5bf8ffae686a6, type: 2}
+        - {fileID: 11400000, guid: 2c13833fea8c2864ba3482ca88853155, type: 2}
+        - {fileID: 11400000, guid: a46ac6d53cb567a44a39eebbde9b2003, type: 2}
+        - {fileID: 11400000, guid: 4db1a8b60e1233c41932d1e79c395c2a, type: 2}
+        - {fileID: 11400000, guid: fd3d2ac60a7f8054996f51a53d337f9b, type: 2}
+        - {fileID: 11400000, guid: 0e4687401d3ae5748bbb81157720ec5d, type: 2}
+        - {fileID: 11400000, guid: 54554a67a69b1624daabf915c7bd19ca, type: 2}
+        - {fileID: 11400000, guid: 7142359f944d1c74c94de742af777d96, type: 2}
+        - {fileID: 11400000, guid: 22c617519cf0b6d44a7d47dddda2e47b, type: 2}
+        - {fileID: 11400000, guid: e4f11f1cb84c80a469c77bad4e763eb5, type: 2}
+        - {fileID: 11400000, guid: 43dd06446f4342e4f8f840d218d23a32, type: 2}
+        - {fileID: 11400000, guid: 808a7382a9be2604c94b30f4f300696b, type: 2}
+        count: 2

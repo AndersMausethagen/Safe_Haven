@@ -11,6 +11,9 @@ public sealed class WorldMapHud : MonoBehaviour
     private static readonly int ExploredId = Shader.PropertyToID("_Explored");
     private static readonly int FogId = Shader.PropertyToID("_Fog");
     private const float LabelCrowd = 60f;
+    private const float LabelWide = 300f;
+
+    private const string UsedOnARaidKey = "WorldMap.UsedOnARaid";
 
     private Rect area;
     private RectTransform canvasRect;
@@ -20,6 +23,7 @@ public sealed class WorldMapHud : MonoBehaviour
     private Texture2D map;
     private bool ownsMap;
     private TMP_Text playerMarker;
+    private TMP_Text titleLabel;
     private bool suspendedGameplay;
 
     private sealed class QuestMark
@@ -34,6 +38,9 @@ public sealed class WorldMapHud : MonoBehaviour
 
     public static WorldMapHud Current { get; private set; }
     public static bool IsOpen => Current != null;
+
+    /// <summary>The player has opened the map on a raid, so the HUD needn't tell them what is on it. Remembered between sessions.</summary>
+    public static bool UsedOnARaid => PlayerPrefs.GetInt(UsedOnARaidKey, 0) == 1;
 
     public static void Toggle()
     {
@@ -116,7 +123,7 @@ public sealed class WorldMapHud : MonoBehaviour
 
         RectTransform backdrop = Rect("Backdrop", transform, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
         Image backing = backdrop.gameObject.AddComponent<Image>();
-        backing.color = new Color(0.025f, 0.022f, 0.02f, 0.94f);
+        backing.color = new Color(0.025f, 0.022f, 0.02f, 1f);
         backing.raycastTarget = true;
 
         RectTransform titleRect = Rect("Title", transform, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(420f, 48f), new Vector2(0f, -42f));
@@ -126,11 +133,12 @@ public sealed class WorldMapHud : MonoBehaviour
         title.alignment = TextAlignmentOptions.Center;
         title.color = UIStyle.Current.Accent;
         title.raycastTarget = false;
+        titleLabel = title;
 
         RectTransform helpRect = Rect("Help", transform, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(1100f, 34f), new Vector2(0f, 34f));
         TMP_Text help = helpRect.gameObject.AddComponent<TextMeshProUGUI>();
         string mapKey = GameInput.KeyLabel(GameInput.WorldMap);
-        help.text = "Quests in gold (main), silver (side) and bronze (optional)  •  Unexplored areas remain hidden  •  " + (string.IsNullOrEmpty(mapKey) ? "" : mapKey + " or ") + "Esc to return";
+        help.text = (RaidDirector.Current != null ? "Exits in green  •  Rumours in amber, only roughly where  •  " : "Quests in gold (main), silver (side) and bronze (optional)  •  ") + "Unexplored areas remain hidden  •  " + (string.IsNullOrEmpty(mapKey) ? "" : mapKey + " or ") + "Esc to return";
         help.fontSize = 18f;
         help.alignment = TextAlignmentOptions.Center;
         help.color = UIStyle.Current.Muted;
@@ -176,6 +184,18 @@ public sealed class WorldMapHud : MonoBehaviour
     private void Open()
     {
         gameObject.SetActive(true);
+        if (RaidDirector.Current != null)
+        {
+            try
+            {
+                PlayerPrefs.SetInt(UsedOnARaidKey, 1);
+            }
+            catch (PlayerPrefsException exception)
+            {
+                Debug.LogWarning(exception.Message);
+            }
+        }
+
         GameInput.SuspendGameplay();
         suspendedGameplay = true;
         // M stays live while the rest of play waits, so the key that opened the map also closes it.
@@ -215,6 +235,11 @@ public sealed class WorldMapHud : MonoBehaviour
         }
 
         mapRect.sizeDelta = new Vector2(width, height);
+        // The raid doesn't stop for the map, and the map covers the clock.
+        if (RaidDirector.Current != null)
+        {
+            titleLabel.text = $"World Map  ·  {RaidStats.FormatTime(RaidDirector.Current.Session.TimeRemaining)}";
+        }
 
         ExplorationMap exploration = ExplorationMap.Current;
         material.SetTexture(ExploredId, exploration != null ? exploration.Texture : Texture2D.whiteTexture);
@@ -240,7 +265,7 @@ public sealed class WorldMapHud : MonoBehaviour
     {
         QuestLog log = QuestManager.Instance != null ? QuestManager.Instance.Log : GameSession.Quests;
         QuestMarkerSettings settings = QuestMarkerSettings.Current;
-        int used = 0;
+        int used = PlaceRaidMarks(width, height);
         marked.Clear();
         foreach (QuestWaypoint waypoint in QuestWaypoint.Active)
         {
@@ -266,6 +291,50 @@ public sealed class WorldMapHud : MonoBehaviour
         {
             questMarks[i].Root.gameObject.SetActive(false);
         }
+    }
+
+    // Everything the HUD no longer lists: every exit and how it stands, what rumours point to (roughly) and open events.
+    private int PlaceRaidMarks(float width, float height)
+    {
+        RaidDirector director = RaidDirector.Current;
+        Player player = Player.Current;
+        if (director == null || player == null)
+        {
+            return 0;
+        }
+
+        UIStyle style = UIStyle.Current;
+        int used = 0;
+        foreach (ExtractionPoint exit in ExtractionPoint.Active)
+        {
+            ExtractionStatus status = exit.Status;
+            Color colour = status == ExtractionStatus.Open ? style.Good : status == ExtractionStatus.Closed ? style.Danger : style.Muted;
+            ShowMark(used++, exit.transform.position, colour, RaidHudText.MapLabel(exit.DisplayName, status, exit.SecondsUntilChange, exit.CostText), width, height);
+        }
+
+        if (!director.TryGetComponent(out RaidEventDirector events))
+        {
+            return used;
+        }
+
+        Vector3 from = player.transform.position;
+        foreach (RaidEventSite site in events.PinnedSites)
+        {
+            if (site != null && !site.IsResolved)
+            {
+                ShowMark(used++, site.MarkFrom(from), style.Accent, RaidHudText.RumourLabel(site.DisplayName, site.PlaceName), width, height);
+            }
+        }
+
+        foreach (RaidEventSite site in events.OpenSites)
+        {
+            if (site != null && !site.IsResolved)
+            {
+                ShowMark(used++, site.transform.position, style.Text, site.DisplayName, width, height);
+            }
+        }
+
+        return used;
     }
 
     private void ShowMark(int index, Vector3 position, Color colour, string label, float width, float height)
@@ -295,11 +364,12 @@ public sealed class WorldMapHud : MonoBehaviour
         mark.Diamond.color = colour;
         mark.Label.color = colour;
         mark.Label.text = label;
-        // People standing together: their names stack rather than print over each other.
+        // Names that would print over each other stack instead: they are wide and low.
         int under = 0;
         for (int i = 0; i < index; i++)
         {
-            if ((questMarks[i].Root.anchoredPosition - mark.Root.anchoredPosition).sqrMagnitude < LabelCrowd * LabelCrowd)
+            Vector2 apart = questMarks[i].Root.anchoredPosition - mark.Root.anchoredPosition;
+            if (Mathf.Abs(apart.x) < LabelWide && Mathf.Abs(apart.y) < LabelCrowd)
             {
                 under++;
             }

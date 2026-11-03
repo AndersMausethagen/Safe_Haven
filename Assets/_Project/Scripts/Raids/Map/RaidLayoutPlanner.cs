@@ -162,6 +162,7 @@ public static class RaidLayoutPlanner
 {
     private const float ExitSpread = 62f;
     private const float ExitJitter = 14f;
+    private const float ExitArc = 250f;
     private const float RingShare = 0.34f;
     private const float SpineShare = 0.12f;
     private const float MinimumFromOtherSites = 7f;
@@ -497,10 +498,13 @@ public static class RaidLayoutPlanner
         float startAngle = Range(random, 0f, 360f);
         AddRoom(plan, OnRim(startAngle, size, margin), rules.RoomRadius.x, RaidRoomRole.Start);
 
-        // The exits lie across the map from the start, one ahead and one to either side, so there is always a choice.
-        for (int i = -1; i <= 1; i++)
+        // The exits lie across the map from the start, one ahead and one to either side, so there is always a choice. More of them share
+        // a wide arc, which keeps clear of the start.
+        int exits = rules.ExitRooms;
+        float step = exits <= 3 ? ExitSpread : ExitArc / (exits - 1);
+        for (int i = 0; i < exits; i++)
         {
-            float angle = startAngle + 180f + i * ExitSpread + Range(random, -ExitJitter, ExitJitter);
+            float angle = startAngle + 180f + (i - (exits - 1) * 0.5f) * step + Range(random, -ExitJitter, ExitJitter);
             AddRoom(plan, OnRim(angle, size, margin), rules.RoomRadius.x, RaidRoomRole.Exit);
         }
 
@@ -530,7 +534,7 @@ public static class RaidLayoutPlanner
             case RaidLayoutShape.Spine:
                 // A zigzag from the start to the exit straight ahead.
                 Vector2 from = plan.Rooms[0].Position;
-                Vector2 to = plan.Rooms[2].Position;
+                Vector2 to = plan.Rooms[1 + rules.ExitRooms / 2].Position;
                 var side = Vector2.Perpendicular((to - from).normalized);
                 int stops = Mathf.Max(3, wanted / 2);
                 spine.Add(0);

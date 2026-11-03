@@ -18,6 +18,14 @@ MonoBehaviour:
   tier: 1
   sceneName: Raid_MistyWoods
   locked: 0
+  unlockedBy: {fileID: 0}
+  largeRaid:
+    widthScale: 2
+    extraSeconds: 750
+    extraExits:
+    - Split Birch
+    - Old Cairn
+    - Drowned Stones
   lockedText: The way there is not yet open.
   knownEnemies:
   - {fileID: 11400000, guid: afbf4a58442496641826a078787f7e2e, type: 2}
@@ -199,7 +207,7 @@ MonoBehaviour:
     huntPlayer: 0
     entries:
     - prefab: {fileID: 4584692032328657812, guid: 64cf9de042e1bc142907212054f70f50, type: 3}
-      weight: 11
+      weight: 7
       maxPerGroup: 0
       minPerGroup: 0
       fromTier: 1
@@ -503,6 +511,18 @@ MonoBehaviour:
       minPerGroup: 0
       fromTier: 4
       toTier: 0
+    - prefab: {fileID: 8653230728158633359, guid: a661dc05d2e43f943a476376f636ef9a, type: 3}
+      weight: 30
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 1
+      toTier: 1
+    - prefab: {fileID: 6176781864247096722, guid: a8ac1434006f7a44fb55b3c510633858, type: 3}
+      weight: 25
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 1
+      toTier: 2
   - name: Hunters
     category: 3
     pointGroups:
@@ -532,6 +552,18 @@ MonoBehaviour:
       minPerGroup: 0
       fromTier: 3
       toTier: 0
+    - prefab: {fileID: 8653230728158633359, guid: a661dc05d2e43f943a476376f636ef9a, type: 3}
+      weight: 30
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 1
+      toTier: 1
+    - prefab: {fileID: 4830014356063024607, guid: a8600aa8041d7044c9a3afddd7102a7b, type: 3}
+      weight: 20
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 1
+      toTier: 2
   - name: Collapse Hunters
     category: 3
     pointGroups:
@@ -561,6 +593,18 @@ MonoBehaviour:
       minPerGroup: 0
       fromTier: 3
       toTier: 0
+    - prefab: {fileID: 6176781864247096722, guid: a8ac1434006f7a44fb55b3c510633858, type: 3}
+      weight: 30
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 1
+      toTier: 2
+    - prefab: {fileID: 8653230728158633359, guid: a661dc05d2e43f943a476376f636ef9a, type: 3}
+      weight: 25
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 1
+      toTier: 1
   - name: East Beacon Alarm
     category: 3
     pointGroups:
@@ -596,6 +640,18 @@ MonoBehaviour:
       minPerGroup: 0
       fromTier: 4
       toTier: 0
+    - prefab: {fileID: 8653230728158633359, guid: a661dc05d2e43f943a476376f636ef9a, type: 3}
+      weight: 30
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 1
+      toTier: 1
+    - prefab: {fileID: 4830014356063024607, guid: a8600aa8041d7044c9a3afddd7102a7b, type: 3}
+      weight: 15
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 1
+      toTier: 2
   systems:
   - rid: 287757967972106337
   - rid: 287757967972106340
@@ -716,4 +772,5 @@ MonoBehaviour:
         - {fileID: 11400000, guid: e4f11f1cb84c80a469c77bad4e763eb5, type: 2}
         - {fileID: 11400000, guid: 43dd06446f4342e4f8f840d218d23a32, type: 2}
         - {fileID: 11400000, guid: 7758a38b52d47ac43a3b6d8004cb0661, type: 2}
+        - {fileID: 11400000, guid: 808a7382a9be2604c94b30f4f300696b, type: 2}
         count: 2

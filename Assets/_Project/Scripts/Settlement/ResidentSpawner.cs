@@ -18,6 +18,8 @@ public sealed class ResidentSpawner : MonoBehaviour
 
     private readonly Dictionary<ResidentDefinition, ResidentNpc> spawned = new Dictionary<ResidentDefinition, ResidentNpc>();
     private readonly HashSet<ResidentDefinition> cairns = new HashSet<ResidentDefinition>();
+    private const float TrophyRing = 6.5f;
+    private readonly HashSet<BossDefinition> trophies = new HashSet<BossDefinition>();
     private bool started;
 
     private void OnEnable()
@@ -52,6 +54,22 @@ public sealed class ResidentSpawner : MonoBehaviour
             {
                 cairns.Add(fallen[i].Resident);
                 Instantiate(prefab, FallenCairn.SpotFor(centre, i), Quaternion.Euler(0f, i * 73f, 0f), transform).Bind(fallen[i]);
+            }
+        }
+
+        RaiseTrophies(centre);
+    }
+
+    // What has been beaten stands near the portal, after the cairns.
+    private void RaiseTrophies(Vector3 centre)
+    {
+        IReadOnlyList<BossDefinition> bosses = SettlementSettings.Current.Bosses;
+        for (int i = 0; i < bosses.Count; i++)
+        {
+            BossDefinition boss = bosses[i];
+            if (boss != null && boss.Trophy != null && GameSession.Settlement.IsBossDefeated(boss.Id) && trophies.Add(boss))
+            {
+                Instantiate(boss.Trophy, FallenCairn.SpotFor(centre, i, TrophyRing, 200f), Quaternion.Euler(0f, i * 53f, 0f), transform).Bind(boss);
             }
         }
     }

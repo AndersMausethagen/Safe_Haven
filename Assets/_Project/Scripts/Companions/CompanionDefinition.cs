@@ -106,7 +106,7 @@ public sealed class CompanionDefinition : ScriptableObject
     [SerializeField, Min(0.2f)] private float reviveSeconds = 3f;
     [Tooltip("Share of its health it gets up with when the player helps it up.")]
     [SerializeField, Range(0.05f, 1f)] private float reviveHealth = 0.6f;
-    [Tooltip("On a raid they don't get up by themselves: seconds the player has to help them up before they are gone for good (GDD §8.4).")]
+    [Tooltip("On a raid they don't get up by themselves: seconds the player has to help them up before the forest has them (GDD §8.4).")]
     [SerializeField, Min(5f)] private float bleedOutSeconds = 45f;
 
     public AttackDefinition Attack => attack;

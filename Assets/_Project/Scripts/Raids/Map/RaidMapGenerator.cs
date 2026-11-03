@@ -107,6 +107,79 @@ public static class RaidMapGenerator
         }
     }
 
+    /// <summary>
+    /// Which of these sites, sorted west to east, the exits take, in that order. With sites to spare: both ends, then each time whichever is
+    /// furthest from those taken, so no two ways out stand side by side.
+    /// </summary>
+    public static int[] SpreadOver(IReadOnlyList<Vector2> sites, int exits)
+    {
+        int wanted = Mathf.Min(exits, sites.Count);
+        var taken = new List<int>(wanted);
+        if (wanted > 0)
+        {
+            taken.Add(0);
+        }
+
+        if (wanted > 1)
+        {
+            taken.Add(sites.Count - 1);
+        }
+
+        while (taken.Count < wanted)
+        {
+            int furthest = -1;
+            float best = -1f;
+            for (int i = 0; i < sites.Count; i++)
+            {
+                if (taken.Contains(i))
+                {
+                    continue;
+                }
+
+                float nearest = float.MaxValue;
+                foreach (int one in taken)
+                {
+                    nearest = Mathf.Min(nearest, (sites[i] - sites[one]).sqrMagnitude);
+                }
+
+                if (nearest > best)
+                {
+                    best = nearest;
+                    furthest = i;
+                }
+            }
+
+            taken.Add(furthest);
+        }
+
+        taken.Sort();
+        return taken.ToArray();
+    }
+
+    /// <summary>
+    /// A larger map's extra exits, copied from those the raid has. They go between the raid's own along the map, so what is called West
+    /// still stands furthest west. A copy with a quest's waypoint on it would finish that quest in the wrong place, so those aren't copied.
+    /// </summary>
+    public static void AddExits(RaidMap map, IReadOnlyList<string> names)
+    {
+        var own = new List<ExtractionPoint>(map.Content.GetComponentsInChildren<ExtractionPoint>(true));
+        own.Sort((a, b) => a.transform.position.x.CompareTo(b.transform.position.x));
+        List<ExtractionPoint> patterns = own.FindAll(exit => exit.GetComponentInChildren<QuestWaypoint>(true) == null && exit.name.IndexOf("West", System.StringComparison.OrdinalIgnoreCase) < 0);
+        if (patterns.Count == 0 || names == null)
+        {
+            return;
+        }
+
+        float gap = own.Count > 1 ? (own[own.Count - 1].transform.position.x - own[0].transform.position.x) / (names.Count + 1) : 1f;
+        for (int i = 0; i < names.Count; i++)
+        {
+            ExtractionPoint copy = patterns[i % patterns.Count].CopyAs(names[i]);
+            Vector3 place = copy.transform.position;
+            place.x = own[0].transform.position.x + gap * (i + 1) + 0.01f * i;
+            copy.transform.position = place;
+        }
+    }
+
     // West to east on the plan as in the scene, so a beacon called West stands in the west.
     private static void PlaceExits(RaidMap map, RaidLayoutPlan plan, Terrain terrain, System.Func<Vector2, Vector3> world)
     {
@@ -114,10 +187,11 @@ public static class RaidMapGenerator
         exits.Sort((a, b) => a.transform.position.x.CompareTo(b.transform.position.x));
         List<RaidSite> sites = plan.SitesOf(RaidSiteKind.Extraction);
         sites.Sort((a, b) => a.Position.x.CompareTo(b.Position.x));
-        for (int i = 0; i < exits.Count && i < sites.Count; i++)
+        int[] taken = SpreadOver(sites.ConvertAll(site => site.Position), exits.Count);
+        for (int i = 0; i < taken.Length; i++)
         {
             Transform exit = exits[i].transform;
-            Vector3 moved = world(sites[i].Position) - exit.position;
+            Vector3 moved = world(sites[taken[i]].Position) - exit.position;
             exit.position += moved;
             SpawnGroup alarm = exits[i].Alarm;
             if (alarm != null && !alarm.IsBakedFromMap)
@@ -354,22 +428,48 @@ public static class RaidMapGenerator
         Terrain terrain = map.Terrain;
         Vector3 origin = terrain.transform.position;
         Vector3 World(Vector2 position) => RaidMapSurface.Ground(terrain, origin + new Vector3(position.x * plan.Size, 0f, position.y * plan.Size));
-        if (!NavMesh.SamplePosition(World(plan.Start.Position / plan.Size), out NavMeshHit from, ReachSample, NavMesh.AllAreas))
-        {
-            return false;
-        }
-
         var path = new NavMeshPath();
-        foreach (RaidSite exit in plan.SitesOf(RaidSiteKind.Extraction))
+        bool Walkable(Vector2 from, Vector2 to) =>
+            NavMesh.SamplePosition(World(from / plan.Size), out NavMeshHit a, ReachSample, NavMesh.AllAreas)
+            && NavMesh.SamplePosition(World(to / plan.Size), out NavMeshHit b, ReachSample, NavMesh.AllAreas)
+            && NavMesh.CalculatePath(a.position, b.position, NavMesh.AllAreas, path)
+            && path.status == NavMeshPathStatus.PathComplete;
+
+        // Clearing to clearing along the trails, as the player goes. One long search runs out of nodes on a large map and reports a partial path even where the way is open.
+        bool[] reached = RoomsReached(plan, Walkable);
+        for (int i = 0; i < plan.Rooms.Count; i++)
         {
-            if (!NavMesh.SamplePosition(World(exit.Position), out NavMeshHit to, ReachSample, NavMesh.AllAreas)
-                || !NavMesh.CalculatePath(from.position, to.position, NavMesh.AllAreas, path)
-                || path.status != NavMeshPathStatus.PathComplete)
+            if (plan.Rooms[i].Role == RaidRoomRole.Exit && !reached[i])
             {
                 return false;
             }
         }
 
         return true;
+    }
+
+    /// <summary>Which clearings can be walked to from the start, given whether the way between two is open.</summary>
+    public static bool[] RoomsReached(RaidLayoutPlan plan, System.Func<Vector2, Vector2, bool> walkable)
+    {
+        var reached = new bool[plan.Rooms.Count];
+        var open = new Queue<int>();
+        int start = plan.Rooms.IndexOf(plan.Start);
+        reached[start] = true;
+        open.Enqueue(start);
+        while (open.Count > 0)
+        {
+            int room = open.Dequeue();
+            foreach ((int a, int b) in plan.Links)
+            {
+                int other = a == room ? b : b == room ? a : -1;
+                if (other >= 0 && !reached[other] && walkable(plan.Rooms[room].Position, plan.Rooms[other].Position))
+                {
+                    reached[other] = true;
+                    open.Enqueue(other);
+                }
+            }
+        }
+
+        return reached;
     }
 }

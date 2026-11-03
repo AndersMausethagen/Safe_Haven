@@ -55,7 +55,7 @@ public sealed class RaidCompanionTests
         Assert.IsNull(settlement.Find(sigrid), "They no longer live here");
         Assert.IsTrue(settlement.IsFallen(sigrid));
         Assert.IsTrue(settlement.HasResident(sigrid), "Raids treat them as accounted for, so they aren't found again");
-        Assert.IsFalse(settlement.AddResident(sigrid), "Nobody comes back from it");
+        Assert.IsFalse(settlement.AddResident(sigrid), "Only by being found: CompanionAmnesiaTests");
         Assert.AreEqual("The Misty Woods", settlement.Fallen[0].Where);
     }
 

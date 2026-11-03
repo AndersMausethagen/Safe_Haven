@@ -7,9 +7,10 @@ using UnityEngine.UI;
 /// <summary>
 /// The round map in the corner. The ground is painted once for the scene (MinimapMap) and moved by a shader, so it costs next to
 /// nothing; it turns with the camera, so up on the map is up on the screen, and what hasn't been explored stays in the fog of
-/// war (ExplorationMap). Over it go the player, what they have found (buildings, carts, dropped items, portals, exits), their
-/// companions, the quest they are on, creatures close enough to be seen, and a ward breach's lanes and attackers, which stay
-/// pinned to the rim when out of reach. M opens the full world map. Only reads the game. Made for every scene with a player
+/// war (ExplorationMap). Over it go the player, what they have found (buildings, carts, dropped items, portals), their
+/// companions, the quest they are on, creatures close enough to be seen, and a ward breach's lanes and attackers. In a raid
+/// also its exits (a large dot, dim until it opens), rumours (a ring, only roughly where) and open events (a diamond). What the
+/// player is looking for stays pinned to the rim when out of reach: this is what replaces lists of directions on the HUD. M opens the full world map. Only reads the game. Made for every scene with a player
 /// (ExperienceTracker).
 /// </summary>
 public sealed class MinimapHud : MonoBehaviour
@@ -55,6 +56,7 @@ public sealed class MinimapHud : MonoBehaviour
     private Texture2D map;
     private Sprite dot;
     private Sprite pointer;
+    private Sprite ring;
     private Rect area;
     private int used;
     private int zoom;
@@ -141,6 +143,12 @@ public sealed class MinimapHud : MonoBehaviour
             Destroy(pointer.texture);
             Destroy(pointer);
         }
+
+        if (ring != null)
+        {
+            Destroy(ring.texture);
+            Destroy(ring);
+        }
     }
 
     private void Build(Transform root)
@@ -151,6 +159,7 @@ public sealed class MinimapHud : MonoBehaviour
         reach = TargetReach;
         dot = MakeSprite(Round);
         pointer = MakeSprite(Arrowhead);
+        ring = MakeSprite(Ring);
 
         disc = CodeUI.Box("Disc", root, new Vector2(1f, 0f), Vector2.one * settings.Size, new Vector2(-Margin - settings.Size * 0.5f, Margin + settings.Size * 0.5f));
         ground = disc.gameObject.AddComponent<RawImage>();
@@ -297,23 +306,60 @@ public sealed class MinimapHud : MonoBehaviour
 
         foreach (ExtractionPoint exit in ExtractionPoint.Active)
         {
-            if (Found(exit.transform.position, explored))
+            ExtractionStatus status = exit.Status;
+            if (status != ExtractionStatus.Closed)
             {
-                Add(exit.transform, dot, style.Good, 11f);
+                bool open = status == ExtractionStatus.Open;
+                Add(exit.transform, dot, open ? style.Good : style.Muted, open ? 12f : 9f, pinned: true);
             }
         }
 
         foreach (Companion companion in Companion.Active)
         {
-            Add(companion.transform, dot, style.Good, 7f);
+            // Someone lost, not found yet: only roughly where, as the rumour says.
+            if (companion.Paused && RaidDirector.Current != null)
+            {
+                continue;
+            }
+
+            bool down = companion.IsDowned;
+            Add(companion.transform, dot, down ? style.Danger : style.Good, down ? 11f : 7f, pinned: down);
         }
 
+        ReadRaidSites(player, style);
         ReadQuest(style);
         ReadBreach(style);
         ReadCreatures(player, style);
         for (int i = used; i < markers.Count; i++)
         {
             markers[i].Rect.gameObject.SetActive(false);
+        }
+    }
+
+    private void ReadRaidSites(Player player, UIStyle style)
+    {
+        RaidDirector director = RaidDirector.Current;
+        if (director == null || !director.TryGetComponent(out RaidEventDirector events))
+        {
+            return;
+        }
+
+        Vector3 from = player.transform.position;
+        foreach (RaidEventSite site in events.PinnedSites)
+        {
+            if (site != null && !site.IsResolved)
+            {
+                Add(null, ring, style.Accent, 15f, pinned: true).Position = site.MarkFrom(from);
+            }
+        }
+
+        foreach (RaidEventSite site in events.OpenSites)
+        {
+            if (site != null && !site.IsResolved)
+            {
+                Marker marker = Add(site.transform, null, style.Text, 9f, pinned: true);
+                marker.Rect.localRotation = Quaternion.Euler(0f, 0f, 45f);
+            }
         }
     }
 
@@ -425,6 +471,8 @@ public sealed class MinimapHud : MonoBehaviour
 
     // How far inside the shape a point is, in the -1..1 square; negative outside.
     private static float Round(Vector2 point) => 0.9f - point.magnitude;
+
+    private static float Ring(Vector2 point) => Mathf.Min(0.9f - point.magnitude, point.magnitude - 0.58f);
 
     private static float Arrowhead(Vector2 point)
     {

@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2f02987ee9197d4682f5db8cbc7a967, type: 3}
+  m_Name: TheLost
+  m_EditorClassIdentifier: SafeHaven::RaidEventDefinition
+  id: rumour.thelost
+  displayName: Someone Wandering
+  weight: 0
+  earliestSeconds: 30
+  latestSecondsLeft: 60
+  minimumStage: 0
+  warning: 
+  warningSound: {fileID: 0}
+  sitePrefab: {fileID: 6300785177508054535, guid: f6b55623a86789d4596845f67db2bf63, type: 3}
+  siteDistance: {x: 35, y: 70}
+  siteText: Someone stands among the trees, turning a branch over in their hands. They look up at you the way you would look at a stranger, and hope you'll know what to do.
+  onStart:
+  - rid: 2623125869629800549
+  choices:
+  - label: Say their name
+    detail: They may follow you. They won't know why. Bring them to an exit alive, or they stay out here.
+    cost: []
+    result: It means nothing to them. But when you turn to go, they come too.
+    outcomes:
+    - rid: 2623125869629800550
+  references:
+    version: 2
+    RefIds:
+    - rid: 2623125869629800549
+      type: {class: StandTheLostOutcome, ns: , asm: SafeHaven}
+      data: 
+    - rid: 2623125869629800550
+      type: {class: LeadTheLostOutcome, ns: , asm: SafeHaven}
+      data: 

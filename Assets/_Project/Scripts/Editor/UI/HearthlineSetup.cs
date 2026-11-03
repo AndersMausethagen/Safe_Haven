@@ -542,7 +542,7 @@ public static class HearthlineSetup
             }
         }
 
-        foreach (string list in new[] { "Exits Panel/Exits", "Exits Panel/At Risk", "Timer Panel/Extraction" })
+        foreach (string list in new[] { "Exits Panel/Exits", "At Risk", "Companion", "Timer Panel/Extraction" })
         {
             root.transform.Find(list).GetComponent<TMP_Text>().fontSize = 17f;
         }

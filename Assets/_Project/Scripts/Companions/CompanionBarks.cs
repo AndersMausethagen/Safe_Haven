@@ -13,6 +13,8 @@ public sealed class FightLines
     [TextArea(1, 2)] public string[] hurt = new string[0];
     [Tooltip("The fight is over.")]
     [TextArea(1, 2)] public string[] won = new string[0];
+    [Tooltip("The player has just helped them up.")]
+    [TextArea(1, 2)] public string[] helpedUp = new string[0];
 }
 
 /// <summary>

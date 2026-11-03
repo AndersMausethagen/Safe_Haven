@@ -1,30 +1,37 @@
 ﻿using System.Collections.Generic;
-using System.Text;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 using TMPro;
 
 /// <summary>
 /// The countdown HUD for raids and quests whose timers are marked Show Timer In Hud. With no timer it hides its Canvas,
-/// not its GameObject, so it can notice the next one. In a raid: the time left, turning orange and then pulsing red; the danger stage; how
-/// far the nearest open extraction is and which way (or how long an extraction under way still takes); every exit and
-/// whether it is open, opens later, has gone dark or has a cost; what would be lost if the raid failed now; and a banner
-/// with the outcome when the raid ends. Everything shown comes from the RaidDirector and the extraction points, so it
-/// only reads.
+/// not its GameObject, so it can notice the next one. In a raid it answers two questions and leaves the rest to the maps: how long
+/// is left (turning orange and then pulsing red) and which way out (the nearest open exit and its arrow, or how an extraction under
+/// way is going). Under that, one line of news at a time, for what the message feed doesn't say. The danger stage stays once the raid's name has gone. Above the vitals:
+/// the companion's health and what would be lost if the raid failed now. Every exit, rumour and open event is on the minimap and
+/// the world map (MinimapHud, WorldMapHud). A banner gives the outcome when the raid ends. Everything shown comes from the
+/// RaidDirector and the extraction points, so it only reads.
 /// </summary>
 [RequireComponent(typeof(Canvas))]
 public sealed class RaidHudView : MonoBehaviour
 {
+    private const float NameSeconds = 8f;
+    private const float ArrowGap = 18f;
+    private const float RumourHintAfter = 3f;
+
     [SerializeField] private TMP_Text raidNameLabel;
     [SerializeField] private TMP_Text timerLabel;
     [SerializeField] private TMP_Text extractionLabel;
-    [Tooltip("Optional. Every exit in the raid: its distance and whether it is open, opens later, has gone dark or has a cost.")]
-    [SerializeField] private TMP_Text exitsLabel;
-    [Tooltip("Optional. What would be lost if the raid failed now: everything carried but the safe pocket and deployed gear.")]
+    [Tooltip("Optional. One line at a time of what the message feed doesn't say: where an event opened, a rumour's site found, how long a downed companion has left.")]
+    [SerializeField, FormerlySerializedAs("exitsLabel")] private TMP_Text alertLabel;
+    [Tooltip("Optional. What would be lost if the raid failed now: everything carried but the safe pocket and deployed gear. Empty when that is nothing.")]
     [SerializeField] private TMP_Text riskLabel;
+    [Tooltip("Optional. The companion on this raid and how they are.")]
+    [SerializeField] private TMP_Text companionLabel;
     [Tooltip("Seconds between recounts of what is at risk; counting snapshots the player's belongings.")]
     [SerializeField, Min(0.1f)] private float riskRefreshSeconds = 1f;
-    [Tooltip("Optional. Turned to point at the nearest open extraction as the player sees it; its graphic should point up.")]
+    [Tooltip("Optional. Turned to point at the nearest open extraction as the player sees it; its graphic should point up. Sits to the left of the way line.")]
     [SerializeField] private RectTransform extractionArrow;
     [Tooltip("Shown when the raid ends.")]
     [SerializeField] private GameObject banner;
@@ -40,12 +47,14 @@ public sealed class RaidHudView : MonoBehaviour
     [SerializeField] private Color extractedColor = new Color(0.55f, 0.92f, 0.55f);
     [SerializeField] private Color stageColor = new Color(1f, 0.6f, 0.3f);
 
-    private readonly List<ExtractionPoint> exits = new List<ExtractionPoint>();
-    private readonly StringBuilder text = new StringBuilder();
+    private readonly HashSet<RaidEventSite> announced = new HashSet<RaidEventSite>();
+    private RaidAlertLine alerts = new RaidAlertLine();
     private RaidDirector director;
     private float nextRiskRefresh;
-    private float nextExitsRefresh;
+    private float nextAlertsRefresh;
+    private float nameUntil;
     private float timerSize;
+    private bool rumoursHinted;
     private Canvas canvas;
 
     private void OnEnable()
@@ -76,7 +85,9 @@ public sealed class RaidHudView : MonoBehaviour
             director = RaidDirector.Current;
             director.Ended += OnRaidEnded;
             director.StageChanged += OnStageChanged;
-            ShowRaidName();
+            alerts = new RaidAlertLine();
+            announced.Clear();
+            rumoursHinted = false;
         }
 
         if (director == null)
@@ -95,8 +106,9 @@ public sealed class RaidHudView : MonoBehaviour
                     break;
                 }
             extractionLabel.text = objective;
-            SetText(exitsLabel, "");
+            SetText(alertLabel, "");
             SetText(riskLabel, "");
+            SetText(companionLabel, "");
             PointArrowAt(null);
             if (banner != null) banner.SetActive(false);
             return;
@@ -105,6 +117,7 @@ public sealed class RaidHudView : MonoBehaviour
         canvas.enabled = true;
         RaidSession session = director.Session;
         ShowTime(session.TimeRemaining, warningTime, criticalTime);
+        ShowRaidName();
         if (session.IsOver)
             timerLabel.color = session.Outcome == RaidOutcome.Extracted ? extractedColor : criticalColor;
         ExtractionPoint target = null;
@@ -112,12 +125,17 @@ public sealed class RaidHudView : MonoBehaviour
         PointArrowAt(target);
         if (session.IsOver)
         {
-            SetText(exitsLabel, "");
+            SetText(alertLabel, "");
+            SetText(companionLabel, "");
         }
-        else if (exitsLabel != null && Time.unscaledTime >= nextExitsRefresh)
+        else if (Time.unscaledTime >= nextAlertsRefresh)
         {
-            nextExitsRefresh = Time.unscaledTime + 0.2f;
-            SetText(exitsLabel, DescribeExits() + DescribeCompanion());
+            nextAlertsRefresh = Time.unscaledTime + 0.2f;
+            WatchForNews(session);
+            string down = DescribeCompanionDown();
+            string news = alerts.Current(Time.unscaledTime);
+            SetText(alertLabel, down.Length > 0 ? down : news);
+            SetText(companionLabel, DescribeCompanion());
         }
 
         if (session.IsOver)
@@ -133,15 +151,22 @@ public sealed class RaidHudView : MonoBehaviour
 
     private void OnStageChanged(int index, RaidStage stage)
     {
-        ShowRaidName();
+        nameUntil = Time.unscaledTime + NameSeconds;
     }
 
+    // The raid's name when the player arrives and when things change; after that only the stage, if there is one.
     private void ShowRaidName()
     {
-        string raid = director.Session.Definition.DisplayName.ToUpperInvariant();
         RaidStage stage = director.CurrentStage;
-        raidNameLabel.text = stage == null ? raid
-            : $"{raid}  ·  <color=#{ColorUtility.ToHtmlStringRGB(stageColor)}>{stage.DisplayName.ToUpperInvariant()}</color>";
+        string stageText = stage == null ? "" : $"<color=#{ColorUtility.ToHtmlStringRGB(stageColor)}>{stage.DisplayName.ToUpperInvariant()}</color>";
+        if (director.Session.Elapsed >= NameSeconds && Time.unscaledTime >= nameUntil)
+        {
+            SetText(raidNameLabel, stageText);
+            return;
+        }
+
+        string raid = director.Session.Definition.DisplayName.ToUpperInvariant();
+        SetText(raidNameLabel, stage == null ? raid : $"{raid}  ·  {stageText}");
     }
 
     private static void SetText(TMP_Text label, string value)
@@ -152,88 +177,48 @@ public sealed class RaidHudView : MonoBehaviour
         }
     }
 
-    // One line per exit, nearest first: "Hollow Oak  32 m  opens in 1:20".
-    private string DescribeExits()
+    private void WatchForNews(RaidSession session)
     {
         GameObject player = director.Player;
         if (player == null)
         {
-            return "";
+            return;
         }
 
         Vector3 position = player.transform.position;
-        exits.Clear();
-        exits.AddRange(ExtractionPoint.Active);
-        exits.Sort((a, b) => a.DistanceFrom(position).CompareTo(b.DistanceFrom(position)));
-        text.Clear();
-        foreach (ExtractionPoint exit in exits)
-        {
-            if (text.Length > 0)
-            {
-                text.Append('\n');
-            }
-
-            int distance = Mathf.RoundToInt(exit.DistanceFrom(position));
-            switch (exit.Status)
-            {
-                case ExtractionStatus.NotYetOpen:
-                    text.Append($"<color=#D9D2C4>{exit.DisplayName}  {distance} m  opens in {RaidStats.FormatTime(exit.SecondsUntilChange)}</color>");
-                    break;
-                case ExtractionStatus.Closed:
-                    text.Append($"<color=#E09A88><s>{exit.DisplayName}</s>  gone dark</color>");
-                    break;
-                default:
-                    float closesIn = exit.SecondsUntilChange;
-                    string color = closesIn >= 0f && closesIn <= 60f ? "#F0BC6C" : "#BFD8A5";
-                    text.Append($"<color={color}>{exit.DisplayName}  {distance} m");
-                    if (exit.IsLit)
-                    {
-                        text.Append($"  lit {Mathf.FloorToInt(exit.HoldFraction * 100f)}%");
-                    }
-
-                    if (closesIn >= 0f)
-                    {
-                        text.Append($"  closes in {RaidStats.FormatTime(closesIn)}");
-                    }
-
-                    text.Append("</color>");
-                    break;
-            }
-
-            if (exit.CostItem != null)
-            {
-                text.Append($"  <color=#EBD29A>needs {exit.CostText}</color>");
-            }
-        }
-
-        AppendEventSites(position);
-        return text.ToString();
-    }
-
-    // Raid events waiting to be reached, with which way they lie as the player sees it: "Overturned Wagon  45 m  ahead".
-    private void AppendEventSites(Vector3 position)
-    {
         if (!director.TryGetComponent(out RaidEventDirector events))
         {
             return;
         }
 
-        AppendSites(events.PinnedSites, position, "#FFD27A");
-        AppendSites(events.OpenSites, position, "#DCCBF2");
-    }
-
-    private void AppendSites(IReadOnlyList<RaidEventSite> sites, Vector3 position, string colour)
-    {
-        foreach (RaidEventSite site in sites)
+        if (!rumoursHinted && session.Elapsed >= RumourHintAfter)
         {
-            if (site == null || site.IsResolved)
+            rumoursHinted = true;
+            int rumours = events.PinnedSites.Count;
+            if (rumours > 0 && !WorldMapHud.UsedOnARaid)
             {
-                continue;
+                string key = GameInput.KeyLabel(GameInput.WorldMap);
+                string on = string.IsNullOrEmpty(key) ? "on your map" : $"on your map ({key})";
+                alerts.Post(rumours == 1 ? $"A rumour is marked {on}" : $"{rumours} rumours are marked {on}", 8f);
             }
+        }
 
-            Vector3 offset = site.transform.position - position;
-            offset.y = 0f;
-            text.Append($"\n<color={colour}>{site.DisplayName}  {Mathf.RoundToInt(offset.magnitude)} m  {SideOf(offset)}</color>");
+        foreach (RaidEventSite site in events.PinnedSites)
+        {
+            if (site != null && !site.IsResolved && site.IsFoundFrom(position) && announced.Add(site))
+            {
+                alerts.Post($"<color=#FFD27A>{site.DisplayName} is close by</color>");
+            }
+        }
+
+        foreach (RaidEventSite site in events.OpenSites)
+        {
+            if (site != null && !site.IsResolved && announced.Add(site))
+            {
+                Vector3 offset = site.transform.position - position;
+                offset.y = 0f;
+                alerts.Post($"<color=#DCCBF2>{site.DisplayName}  {Mathf.RoundToInt(offset.magnitude)} m  {SideOf(offset)}</color>");
+            }
         }
     }
 
@@ -266,7 +251,7 @@ public sealed class RaidHudView : MonoBehaviour
 
         if (risk.IsEmpty && cart == null)
         {
-            return "<color=#D9D2C4>Nothing at risk yet</color>";
+            return "";
         }
 
         string carted = cart != null ? $"  ·  the {cart.Definition.DisplayName}" : "";
@@ -320,24 +305,70 @@ public sealed class RaidHudView : MonoBehaviour
         }
 
         nearest = ExtractionPoint.FindNearest(player.transform.position, out float distance);
-        return nearest != null ? $"Nearest open: {nearest.DisplayName}  {Mathf.RoundToInt(distance)} m" : "<color=#F0917E>No open way out right now</color>";
+        if (nearest != null)
+        {
+            return RaidHudText.Way(nearest.DisplayName, distance, nearest.SecondsUntilChange, nearest.CostText);
+        }
+
+        nearest = NextToOpen();
+        return nearest != null ? $"<color=#F0917E>No way out yet:</color> {nearest.DisplayName} opens in {RaidStats.FormatTime(nearest.SecondsUntilChange)}"
+            : "<color=#F0917E>No open way out right now</color>";
     }
 
-    // Up on screen is the camera's forward along the ground, so the arrow turns by the angle from there to the target.
+    private static ExtractionPoint NextToOpen()
+    {
+        ExtractionPoint next = null;
+        foreach (ExtractionPoint exit in ExtractionPoint.Active)
+        {
+            if (exit.Status == ExtractionStatus.NotYetOpen && (next == null || exit.SecondsUntilChange < next.SecondsUntilChange))
+            {
+                next = exit;
+            }
+        }
+
+        return next;
+    }
+
     // A word and a number, so it doesn't rest on a colour.
     private string DescribeCompanion()
     {
-        Companion companion = director != null ? director.Companion : null;
+        string along = HowTheyAre(director != null ? director.Companion : null);
+        string found = director != null && director.LostOneFollows ? HowTheyAre(director.LostOne) : "";
+        return along.Length > 0 && found.Length > 0 ? $"{along}  ·  {found}" : along + found;
+    }
+
+    private static string HowTheyAre(Companion companion)
+    {
         if (companion == null)
         {
             return "";
         }
 
-        return companion.IsLost ? $"\n<color=#FF7B6B>{companion.DisplayName} is gone</color>"
-            : companion.IsDowned ? $"\n<color=#FF7B6B>{companion.DisplayName} is down: {companion.BleedOutLeft:0} s to help them up</color>"
-            : $"\n{companion.DisplayName}: {Mathf.RoundToInt(companion.HealthShare * 100f)}%";
+        return companion.IsLost ? $"<color=#FF7B6B>{companion.DisplayName} is gone</color>"
+            : companion.IsDowned ? $"<color=#FF7B6B>{companion.DisplayName} is down</color>"
+            : $"{companion.DisplayName}: {Mathf.RoundToInt(companion.HealthShare * 100f)}%";
     }
 
+    // The one thing that takes the news line from everything else: it is the only moment the player can still do something.
+    private string DescribeCompanionDown()
+    {
+        if (director == null)
+        {
+            return "";
+        }
+
+        string along = CountdownFor(director.Companion);
+        return along.Length > 0 || !director.LostOneFollows ? along : CountdownFor(director.LostOne);
+    }
+
+    private static string CountdownFor(Companion companion)
+    {
+        return companion != null && companion.IsDowned && !companion.IsLost
+            ? $"<color=#FF7B6B>{companion.DisplayName} is down: {companion.BleedOutLeft:0} s to help them up</color>"
+            : "";
+    }
+
+    // Up on screen is the camera's forward along the ground, so the arrow turns by the angle from there to the target.
     private void PointArrowAt(ExtractionPoint target)
     {
         if (extractionArrow == null)
@@ -358,6 +389,7 @@ public sealed class RaidHudView : MonoBehaviour
             Vector3 forward = Vector3.ProjectOnPlane(view.transform.forward, Vector3.up);
             Vector3 toTarget = Vector3.ProjectOnPlane(target.transform.position - player.transform.position, Vector3.up);
             extractionArrow.localEulerAngles = new Vector3(0f, 0f, -Vector3.SignedAngle(forward, toTarget, Vector3.up));
+            extractionArrow.anchoredPosition = new Vector2(-(extractionLabel.preferredWidth * 0.5f + ArrowGap), extractionArrow.anchoredPosition.y);
         }
     }
 

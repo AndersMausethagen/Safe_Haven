@@ -1,0 +1,151 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59f20d78bb4bfcc489c3cc1a088c0af5, type: 3}
+  m_Name: TrollValley Layout
+  m_EditorClassIdentifier: SafeHaven::RaidLayoutRules
+  rooms: {x: 9, y: 12}
+  roomSeparation: 34
+  roomRadius: {x: 8, y: 14}
+  edgeMargin: 14
+  attempts: 3
+  trailHalfWidth: 2.6
+  trailWander: 0.16
+  loopReach: 80
+  groundHeight: 7
+  hills: 4
+  hillScale: 70
+  ridgeHeight: 10.849999
+  ridgeWidth: 12.8
+  roughness: 1.2
+  rimHeight: 12.150001
+  rimWidth: 12
+  forestDensity: 0.49600002
+  forestPatches: 28
+  fieldResolution: 200
+  ponds: {x: 0, y: 1}
+  pondRadius: {x: 3.5, y: 11}
+  pondDepth: {x: 0.7, y: 1.6}
+  pondStretch: 1.6
+  pondMaterial: {fileID: 2100000, guid: 2e96d20980d31544abc72c4199c1fec0, type: 2}
+  pondDrink: 100
+  pondFillItem: {fileID: 11400000, guid: 79744f7a29634cb408f4829b51ec5918, type: 2}
+  pondFillUpTo: 3
+  pondReach: 1.5
+  wetReach: 12
+  dampGround: 0.45
+  shapes:
+  - shape: 0
+    weight: 1
+    loopChance: 0.12
+    briefing: The trails all meet at one great clearing.
+  - shape: 1
+    weight: 1
+    loopChance: 0.08
+    briefing: The trails run in a ring around wild ground nobody crosses.
+  - shape: 2
+    weight: 1
+    loopChance: 0.12
+    briefing: One long trail runs through it, with paths branching off.
+  - shape: 3
+    weight: 1
+    loopChance: 0.4
+    briefing: The trails tangle, and there is always another way round.
+  moods:
+  - name: Windthrow
+    briefing: 'A storm has been through: dead trunks and fallen logs, and long views.'
+    weight: 1
+    forest: 0.7
+    treeSpacing: 1
+    treeWeights:
+    - 1
+    - 1
+    - 0.5
+    - 0.5
+    - 4
+    ridges: 1
+    rooms: 1
+    trails: 1
+    rocks: 4
+    fogBanks: 0
+  - name: The Hollows
+    briefing: The land folds into steep hollows, and the mist lies in them.
+    weight: 1
+    forest: 0.9
+    treeSpacing: 1
+    treeWeights: []
+    ridges: 1.7
+    rooms: 1
+    trails: 0.9
+    rocks: 1
+    fogBanks: 3
+  sites:
+  - kind: 10
+    placement: 3
+    count: 3
+    separation: 45
+    fromStart: 65
+    offPath: {x: 12, y: 20}
+    clearing: 8
+  - kind: 8
+    placement: 3
+    count: 5
+    separation: 28
+    fromStart: 35
+    offPath: {x: 11, y: 18}
+    clearing: 6
+  - kind: 3
+    placement: 0
+    count: 9
+    separation: 24
+    fromStart: 42
+    offPath: {x: 10, y: 16}
+    clearing: 7
+  - kind: 6
+    placement: 0
+    count: 6
+    separation: 26
+    fromStart: 30
+    offPath: {x: 8, y: 12}
+    clearing: 5
+  - kind: 4
+    placement: 2
+    count: 14
+    separation: 17
+    fromStart: 14
+    offPath: {x: 9, y: 15}
+    clearing: 10
+  - kind: 5
+    placement: 2
+    count: 12
+    separation: 16
+    fromStart: 20
+    offPath: {x: 10, y: 17}
+    clearing: 4
+  - kind: 7
+    placement: 1
+    count: 10
+    separation: 20
+    fromStart: 45
+    offPath: {x: 9, y: 16}
+    clearing: 0
+  groups:
+  - group: Moss Trolls
+    site: 3
+  - group: Mistwings
+    site: 3
+  setPieces:
+  - {fileID: 11400000, guid: bffb9f981cdf88a49826d1a444e914fa, type: 2}
+  - {fileID: 11400000, guid: e7a15e046a003a348a556a72b6944648, type: 2}
+  - {fileID: 11400000, guid: e433b9e888e511d4c8743cc6a40c672a, type: 2}
+  - {fileID: 11400000, guid: ecc457a08ccf79d44ac808eccda7aea0, type: 2}
+  - {fileID: 11400000, guid: 597468cf871861d42a719da44dba108a, type: 2}
+  campPieces: {x: 1, y: 2}

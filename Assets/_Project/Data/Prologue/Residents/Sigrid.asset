@@ -30,7 +30,23 @@ MonoBehaviour:
     won:
     - Count heads. Everyone still here?
     - Good. Move before more come.
+    helpedUp:
+    - Good. On your feet. I mean, on mine.
+    - Back in line. Thank you.
   model: {fileID: 1441834787134571619, guid: e398fdb177c2d5b4b84f05ca6a27d2cf, type: 3}
   raidCompanion: {fileID: 11400000, guid: 60d284aaf3c06f24fba9e928940c43c5, type: 2}
+  memoryLines:
+  - kind: 6
+    lines:
+    - I've buried good people on less than what we just did. Write it down somewhere. It should outlast us.
+  - kind: 5
+    lines:
+    - I gave you an order once to leave me if it came to that. You didn't. We'll talk about discipline. Later.
+  - kind: 1
+    lines:
+    - A retreat is only a defeat if you learn nothing. What did we learn?
+  - kind: 4
+    lines:
+    - I've served under worse than you. Don't let it go to your head.
   jobs:
   - {fileID: 11400000, guid: 4c4fcc29299e0dd4b9ba5cfd68e28c5b, type: 2}

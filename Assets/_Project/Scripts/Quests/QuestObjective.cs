@@ -64,6 +64,9 @@ public sealed class QuestObjective
     [SerializeField] private bool countAlreadyOwned;
 
     public ObjectiveType Type => type;
+
+    /// <summary>Whether a raid can move this on whatever is out there. A Quest Event depends on the place: see what has a waypoint there.</summary>
+    public bool CanProgressOnARaid => type != ObjectiveType.CraftItem && type != ObjectiveType.BuildStructure && type != ObjectiveType.QuestEvent;
     public int Amount => Mathf.Max(1, amount);
     public bool CountAlreadyOwned => countAlreadyOwned && Array.IndexOf(FieldsOf(type), nameof(countAlreadyOwned)) >= 0;
     public ItemDefinition Item => item;

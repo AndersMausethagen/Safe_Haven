@@ -11,6 +11,9 @@ public sealed class BossEncounter : MonoBehaviour
     private Damageable health;
     private int phase;
     private BossBar bar;
+    private SceneAudio scene;
+    private bool playingMusic;
+    private static readonly int RoarState = Animator.StringToHash("Roar");
 
     public BossDefinition Definition => definition;
     public int Phase => phase;
@@ -32,6 +35,7 @@ public sealed class BossEncounter : MonoBehaviour
         health.HealthChanged -= OnHealthChanged;
         health.Died -= OnDied;
         HideBar();
+        StopMusic();
     }
 
     private void Start()
@@ -40,7 +44,53 @@ public sealed class BossEncounter : MonoBehaviour
         {
             bar = BossBar.Show(definition);
             bar.Set(health.HealthFraction);
+            StartCoroutine(Wake());
         }
+    }
+
+    // It rises before it fights: the ground shakes, its name goes up and it can't be hurt or do harm. Then it knows where the player is.
+    private System.Collections.IEnumerator Wake()
+    {
+        scene = FindAnyObjectByType<SceneAudio>();
+        if (scene != null && definition.Music != null && definition.Music.HasTracks)
+        {
+            scene.PlayEventMusic(definition.Music);
+            playingMusic = true;
+        }
+
+        if (definition.WakeSeconds <= 0f)
+        {
+            yield break;
+        }
+
+        health.AddInvulnerability(this);
+        ai.enabled = false;
+        AudioManager.Play(definition.WakeSound, transform.position);
+        CameraShake.Add(0.8f);
+        Animator animator = GetComponentInChildren<Animator>();
+        if (animator != null && animator.HasState(0, RoarState))
+        {
+            animator.CrossFadeInFixedTime(RoarState, 0.2f, 0);
+        }
+
+        bar.ShowCard(definition.WakeSeconds);
+        yield return new WaitForSeconds(definition.WakeSeconds);
+        health.RemoveInvulnerability(this);
+        ai.enabled = true;
+        if (Player.Current != null)
+        {
+            ai.Engage(Player.Current.Health);
+        }
+    }
+
+    private void StopMusic()
+    {
+        if (playingMusic && scene != null)
+        {
+            scene.ResumeMusic();
+        }
+
+        playingMusic = false;
     }
 
     private void OnHealthChanged(float current, float max)
@@ -83,6 +133,12 @@ public sealed class BossEncounter : MonoBehaviour
     private void OnDied(Damageable victim, DamageInfo hit)
     {
         HideBar();
+        StopMusic();
+        if (GameSession.ActiveRaid != null)
+        {
+            GameSession.ActiveRaid.BossesBeaten++;
+        }
+
         if (definition == null || !GameSession.Settlement.MarkBossDefeated(definition.Id))
         {
             return;

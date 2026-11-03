@@ -8,8 +8,8 @@ using TMPro;
 /// The quest tracker on screen: every active quest with its objectives and progress, done objectives in green, and
 /// "Return to ..." for quests waiting to be handed in, and the time left on timed quests (QuestTimers). It only reads the
 /// QuestLog, plus authored Available Objective instructions before acceptance. It refreshes when quests or registered
-/// timers change (and every second while a timer runs). It also makes the waypoint arrow
-/// that points the way to the active quest (QuestWaypointHud).
+/// timers change (and every second while a timer runs). On a raid it shows only what can be done there and says how many
+/// wait at home. It also makes the waypoint arrow that points the way to the active quest (QuestWaypointHud).
 /// </summary>
 public sealed class QuestTrackerView : MonoBehaviour
 {
@@ -42,9 +42,17 @@ public sealed class QuestTrackerView : MonoBehaviour
 
     private float nextTick;
     private bool timed;
+    private bool wasOnARaid;
 
     private void Update()
     {
+        bool onARaid = RaidDirector.Current != null;
+        if (onARaid != wasOnARaid)
+        {
+            wasOnARaid = onARaid;
+            Refresh();
+        }
+
         if (timed && Time.time >= nextTick)
         {
             nextTick = Time.time + 1f;
@@ -54,18 +62,27 @@ public sealed class QuestTrackerView : MonoBehaviour
 
     public void Refresh()
     {
+        bool onARaid = RaidDirector.Current != null;
+        int atHome = 0;
         var active = new List<QuestLog.Entry>();
         foreach (QuestLog.Entry entry in GameSession.Quests.Entries)
         {
             if (entry.Status == QuestStatus.Active || entry.Status == QuestStatus.ReadyToTurnIn)
             {
-                active.Add(entry);
+                if (onARaid && !CanBeDoneOnThisRaid(entry))
+                {
+                    atHome++;
+                }
+                else
+                {
+                    active.Add(entry);
+                }
             }
         }
 
         var available = new List<QuestDefinition>();
         QuestManager manager = QuestManager.Instance;
-        if (manager != null)
+        if (manager != null && !onARaid)
             foreach (QuestDefinition quest in manager.Quests)
                 if (quest != null && !string.IsNullOrWhiteSpace(quest.AvailableObjective) &&
                     GameSession.Quests.StatusOf(quest) == QuestStatus.NotStarted && GameSession.Quests.PrerequisitesMet(quest))
@@ -74,7 +91,7 @@ public sealed class QuestTrackerView : MonoBehaviour
         // The main story on top, then side quests, then errands.
         active.Sort((a, b) => a.Quest.Rank != b.Quest.Rank ? a.Quest.Rank.CompareTo(b.Quest.Rank) : string.CompareOrdinal(a.Quest.DisplayName, b.Quest.DisplayName));
         available.Sort((a, b) => a.Rank != b.Rank ? a.Rank.CompareTo(b.Rank) : string.CompareOrdinal(a.DisplayName, b.DisplayName));
-        panel.SetActive(active.Count + available.Count > 0);
+        panel.SetActive(active.Count + available.Count + atHome > 0);
         var builder = new StringBuilder();
         timed = false;
         for (int q = 0; q < active.Count && q < maxQuests; q++)
@@ -128,7 +145,50 @@ public sealed class QuestTrackerView : MonoBehaviour
             builder.Append($"\n\n<color={Muted}>+{active.Count + available.Count - maxQuests} more</color>");
         }
 
+        if (atHome > 0)
+        {
+            builder.Append(builder.Length > 0 ? "\n\n" : "").Append($"<color={Muted}>{atHome} more at home</color>");
+        }
+
         label.text = GameInput.WithRebinds(builder.ToString());
+    }
+
+    // Anything with a clock, and anything with an open step that can be done out here.
+    private static bool CanBeDoneOnThisRaid(QuestLog.Entry entry)
+    {
+        if (QuestTimers.TryGet(entry.Quest, out _))
+        {
+            return true;
+        }
+
+        if (entry.Status != QuestStatus.Active)
+        {
+            return false;
+        }
+
+        for (int i = 0; i < entry.Counts.Length; i++)
+        {
+            QuestObjective objective = entry.Quest.Objectives[i];
+            if (entry.IsObjectiveOpen(i) && (objective.CanProgressOnARaid || (objective.Type == ObjectiveType.QuestEvent && HasWaypointHere(entry.Quest))))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static bool HasWaypointHere(QuestDefinition quest)
+    {
+        foreach (QuestWaypoint waypoint in QuestWaypoint.Active)
+        {
+            if (waypoint != null && waypoint.Quest == quest)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static string Title(QuestDefinition quest)

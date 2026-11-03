@@ -13,6 +13,7 @@ public sealed class RaidRumourDirector : MonoBehaviour
 {
     private const float FarFrom = 60f;
     private const float FarTo = 130f;
+    private const float BeaconShowsWithin = 40f;
 
     private RaidDirector director;
     private RaidEventDirector events;
@@ -33,7 +34,7 @@ public sealed class RaidRumourDirector : MonoBehaviour
 
         placed = true;
         PlayerCrafting crafting = director.Player.GetComponent<PlayerCrafting>();
-        List<RaidRumourDefinition> rumours = RaidRumours.For(director.Session.Definition, director.Session.Seed, GameSession.Settlement, crafting);
+        List<RaidRumourDefinition> rumours = RaidRumours.For(director.Session.Definition, director.Session.Seed, GameSession.Settlement, crafting, director.Session.WidthScale);
         RaidMap map = FindAnyObjectByType<RaidMap>();
         IReadOnlyList<Vector3> spots = map != null ? map.RumourSpots : null;
         var random = new System.Random(RaidLayout.SeedFor(director.Session.Seed, "Rumour Spots"));
@@ -59,6 +60,12 @@ public sealed class RaidRumourDirector : MonoBehaviour
             }
 
             events.BeginAt(rumours[i].Site, spot);
+            RaidEventSite site = events.PinnedSites.Count > 0 ? events.PinnedSites[events.PinnedSites.Count - 1] : null;
+            if (site != null)
+            {
+                site.PlaceName = PieceAt(spot)?.DisplayName ?? "";
+                site.HideBeaconBeyond(BeaconShowsWithin);
+            }
         }
     }
 
@@ -83,7 +90,7 @@ public sealed class RaidRumourDirector : MonoBehaviour
 
     private static RaidSetPieceDefinition PieceAt(Vector3 spot)
     {
-        foreach (RaidSetPieceSite site in FindObjectsByType<RaidSetPieceSite>(FindObjectsSortMode.None))
+        foreach (RaidSetPieceSite site in FindObjectsByType<RaidSetPieceSite>(FindObjectsInactive.Exclude))
         {
             Vector3 between = site.transform.position - spot;
             between.y = 0f;

@@ -178,13 +178,15 @@ public static class SaveMapper
 
         foreach (ResidentRecord record in settlement.Residents)
         {
-            into.residents.Add(new ResidentSaveData { id = record.Resident.Id, workPaused = record.WorkPaused, job = record.Job != null ? record.Job.Id : "" });
+            into.residents.Add(new ResidentSaveData { id = record.Resident.Id, workPaused = record.WorkPaused, job = record.Job != null ? record.Job.Id : "", raidsAlong = record.RaidsAlong, killsAlong = record.KillsAlong, timesHelpedUp = record.TimesHelpedUp, memory = (int)record.Memory, remembers = ToSaved(record.Remembers), forgotten = ToSaved(record.Forgotten), stranger = record.IsStranger, comingBack = (int)record.ComingBack, allCameBack = record.AllCameBack });
         }
 
         into.defeatedBosses.AddRange(settlement.DefeatedBosses);
+        into.lastBossBeaten = settlement.LastBossBeaten;
+        into.lastBossBeatenAt = settlement.LastBossBeatenAt;
         foreach (FallenRecord record in settlement.Fallen)
         {
-            into.fallen.Add(new FallenSaveData { id = record.Resident.Id, where = record.Where, atExtraction = record.AtExtraction });
+            into.fallen.Add(new FallenSaveData { id = record.Resident.Id, where = record.Where, atExtraction = record.AtExtraction, raidsAlong = record.RaidsAlong, forgotten = ToSaved(record.Forgotten) });
         }
 
         foreach (JobDefinition job in settlement.VacantJobs)
@@ -251,7 +253,17 @@ public static class SaveMapper
             {
                 JobDefinition job = string.IsNullOrEmpty(entry.job) ? null : Resolve(content.FindJob(entry.job), "job", entry.job, missing);
                 settlement.AddResident(resident, job);
-                settlement.Find(resident).WorkPaused = entry.workPaused;
+                ResidentRecord restored = settlement.Find(resident);
+                restored.WorkPaused = entry.workPaused;
+                restored.RaidsAlong = entry.raidsAlong;
+                restored.KillsAlong = entry.killsAlong;
+                restored.TimesHelpedUp = entry.timesHelpedUp;
+                restored.Memory = (CompanionMemory)entry.memory;
+                restored.Remembers.AddRange(FromSaved(entry.remembers));
+                restored.Forgotten.AddRange(FromSaved(entry.forgotten));
+                restored.IsStranger = entry.stranger;
+                restored.ComingBack = (CompanionMemory)entry.comingBack;
+                restored.AllCameBack = entry.allCameBack;
             }
         }
 
@@ -260,9 +272,10 @@ public static class SaveMapper
             settlement.MarkBossDefeated(boss);
         }
 
+        settlement.RestoreLastBoss(saved.lastBossBeaten, saved.lastBossBeatenAt);
         foreach (FallenSaveData entry in saved.fallen ?? new List<FallenSaveData>())
         {
-            settlement.RestoreFallen(Resolve(content.FindResident(entry?.id), "resident", entry?.id, missing), entry?.where, entry != null ? entry.atExtraction : 0);
+            settlement.RestoreFallen(Resolve(content.FindResident(entry?.id), "resident", entry?.id, missing), entry?.where, entry != null ? entry.atExtraction : 0, entry != null ? entry.raidsAlong : 0, FromSaved(entry?.forgotten));
         }
 
         foreach (string job in saved.vacantJobs ?? new List<string>())
@@ -424,6 +437,10 @@ public static class SaveMapper
 
         return world;
     }
+
+    private static List<int> ToSaved(List<CompanionMemory> memories) => memories.ConvertAll(memory => (int)memory);
+
+    private static List<CompanionMemory> FromSaved(List<int> memories) => memories == null ? new List<CompanionMemory>() : memories.ConvertAll(memory => (CompanionMemory)memory);
 
     /// <summary>Rebuilds the in-memory state from a save. Entries whose content no longer exists are skipped and listed.</summary>
     public static LoadedGame FromSaveData(SaveData data, IContentLookup content)

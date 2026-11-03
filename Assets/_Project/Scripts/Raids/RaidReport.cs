@@ -61,6 +61,12 @@ public sealed class RaidReport
     /// <summary>Who went along, or null.</summary>
     public ResidentDefinition Companion { get; set; }
     public bool CompanionLost { get; set; }
+    /// <summary>The bond they reached on this raid, or null when it didn't change.</summary>
+    public string CompanionNewRank { get; set; }
+    /// <summary>Someone lost before, brought home by this raid. They don't know the player.</summary>
+    public ResidentDefinition FoundAgain { get; set; }
+    /// <summary>Someone lost before, found on this raid and left out there again.</summary>
+    public ResidentDefinition LeftBehind { get; set; }
     /// <summary>Residents brought home by this raid.</summary>
     public List<ResidentDefinition> Rescued { get; } = new List<ResidentDefinition>();
 

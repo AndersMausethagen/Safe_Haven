@@ -70,6 +70,18 @@ public sealed class SettlementSettings : GameSettings<SettlementSettings>
     public FallenCairn FallenCairn => fallenCairn;
     public string[] GriefLines => griefLines;
     public int GriefRaids => griefRaids;
+    public IReadOnlyList<BossDefinition> Bosses => bosses;
+    public IReadOnlyList<CompanionBondRank> BondRanks => bondRanks;
+    public IReadOnlyList<CompanionMemoryLines> MemoryLines => memoryLines;
+    public int MemoryReturnsEvery => memoryReturnsEvery;
+    public float FoundComesHomeWithin => foundComesHomeWithin;
+    public string LostReportLine => lostReportLine;
+    public string FoundFollowLine => foundFollowLine;
+    public string FoundReportLine => foundReportLine;
+    public string LeftBehindLine => leftBehindLine;
+    public string[] StrangerLines => strangerLines;
+    public IReadOnlyList<CompanionMemoryLines> ReturningLines => returningLines;
+    public string AllBackLine => allBackLine;
     public EmoteDefinition ResidentMealGesture => residentMealGesture;
     public EmoteDefinition ResidentSleepGesture => residentSleepGesture;
     public EmoteDefinition[] ResidentFireGestures => residentFireGestures;
@@ -84,6 +96,32 @@ public sealed class SettlementSettings : GameSettings<SettlementSettings>
     [SerializeField, TextArea] private string[] griefLines = new string[0];
     [Tooltip("For how many raids after a loss they still speak of it.")]
     [SerializeField, Min(0)] private int griefRaids = 2;
+    [Tooltip("The bosses of the game, for what stands at home and what is said of them.")]
+    [SerializeField] private List<BossDefinition> bosses = new List<BossDefinition>();
+    [Tooltip("How a bond grows with raids together, lowest first.")]
+    [SerializeField] private List<CompanionBondRank> bondRanks = new List<CompanionBondRank>();
+    [Tooltip("What anyone says of a raid just gone, unless they have their own line for it.")]
+    [SerializeField] private List<CompanionMemoryLines> memoryLines = new List<CompanionMemoryLines>();
+
+    [Header("The lost")]
+    [Tooltip("After being found again, one forgotten memory comes back for every this many raids together.")]
+    [SerializeField, Min(1)] private int memoryReturnsEvery = 2;
+    [Tooltip("Someone found comes home if the player extracts with them this close, in metres. They don't know the way by themselves.")]
+    [SerializeField, Min(1f)] private float foundComesHomeWithin = 20f;
+    [Tooltip("Under a companion's last words in the raid report, when the forest has them.")]
+    [SerializeField, TextArea] private string lostReportLine;
+    [Tooltip("When the player finds someone lost and they follow. {0} is their name.")]
+    [SerializeField, TextArea] private string foundFollowLine;
+    [Tooltip("In the raid report when they make it home. {0} is their name.")]
+    [SerializeField, TextArea] private string foundReportLine;
+    [Tooltip("In the raid report when they were found and didn't make it. {0} is their name.")]
+    [SerializeField, TextArea] private string leftBehindLine;
+    [Tooltip("What someone found again says the first time they are spoken to. Each person keeps to one.")]
+    [SerializeField, TextArea] private string[] strangerLines = new string[0];
+    [Tooltip("What anyone says when a forgotten memory comes back, unless they have their own line for it.")]
+    [SerializeField] private List<CompanionMemoryLines> returningLines = new List<CompanionMemoryLines>();
+    [Tooltip("Added to the last memory to come back.")]
+    [SerializeField, TextArea] private string allBackLine;
 
     [Header("Portal")]
     [Tooltip("What repairing the ruined portal costs (GDD §14.3: Life Orbs from the clearing).")]

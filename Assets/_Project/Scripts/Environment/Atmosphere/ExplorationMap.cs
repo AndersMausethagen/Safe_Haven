@@ -49,7 +49,20 @@ public sealed class ExplorationMap : MonoBehaviour, ISaveable
     /// <summary>0–1 how explored the ground under a position is.</summary>
     public float ExploredAt(Vector3 position) => grid != null ? grid.At(new Vector2(position.x, position.z)) : 1f;
 
-    private void Awake()
+    private void Awake() => Build();
+
+    /// <summary>Measures the ground again, for a map grown after this woke (a large raid). Nothing has been explored yet.</summary>
+    public void Refit()
+    {
+        if (texture != null)
+        {
+            Destroy(texture);
+        }
+
+        Build();
+    }
+
+    private void Build()
     {
         Rect area = AreaFromTerrain();
         grid = new ExplorationGrid(area, cellSize);

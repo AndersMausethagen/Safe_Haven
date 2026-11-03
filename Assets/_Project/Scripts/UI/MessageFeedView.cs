@@ -4,9 +4,9 @@ using UnityEngine.UI;
 using TMPro;
 
 /// <summary>
-/// Short messages beside the player: what was gathered or looted ("+3 Oak Wood"), newly found resources, and anything posted
-/// through GameMessages ("Needs a Tier II Pickaxe"). They follow the player on screen, so the eye stays on the character;
-/// without a player in view they rest where the prefab put them. Each line fades out after a few seconds; the newest is at
+/// Short messages. One feed shows the player's pickups ("+3 Oak Wood", newly found resources) following them on screen, so the eye
+/// stays on the character; another rests apart with anything longer posted through GameMessages ("Needs a Tier II Pickaxe"), so
+/// that sentences don't cover the fight. Without a player in view a following feed rests where the prefab put it. Each line fades out after a few seconds; the newest is at
 /// the bottom. While the dialogue box is open resting lines move up above it.
 /// </summary>
 public sealed class MessageFeedView : MonoBehaviour
@@ -19,6 +19,10 @@ public sealed class MessageFeedView : MonoBehaviour
 
     [Tooltip("Text used as a template for each line. It is hidden itself.")]
     [SerializeField] private TMP_Text lineTemplate;
+    [Tooltip("Show what is posted through GameMessages: warnings, what the raid is doing, who said what.")]
+    [SerializeField] private bool showPosted = true;
+    [Tooltip("Show what the player picks up.")]
+    [SerializeField] private bool showPickups = true;
     [SerializeField, Min(1)] private int maxLines = 5;
     [SerializeField, Min(0.5f)] private float visibleSeconds = 3.5f;
     [SerializeField, Min(0.05f)] private float fadeSeconds = 0.6f;
@@ -63,7 +67,11 @@ public sealed class MessageFeedView : MonoBehaviour
     private void OnEnable()
     {
         lineTemplate.gameObject.SetActive(false);
-        GameMessages.Posted += Show;
+        if (showPosted)
+        {
+            GameMessages.Posted += Show;
+        }
+
         // The player's own pickups, from the player now or once they arrive.
         Player.Spawned += Bind;
         Bind(Player.Current);
@@ -78,6 +86,11 @@ public sealed class MessageFeedView : MonoBehaviour
 
     private void Bind(Player player)
     {
+        if (!showPickups)
+        {
+            return;
+        }
+
         if (player != null && player.Resources == resources && player.Bag == items)
         {
             return;

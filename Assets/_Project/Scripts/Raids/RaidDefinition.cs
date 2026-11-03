@@ -1,6 +1,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>What a large raid is, on a raid with generated maps: a wider map with as much on every square metre, and more time to cross it.</summary>
+[System.Serializable]
+public sealed class RaidSizeOption
+{
+    [Tooltip("How many times wider the map is. 2 is four times the ground, and four times what is on it.")]
+    [Min(1f)] public float widthScale = 2f;
+    [Tooltip("Seconds added to the clock: the same danger stages and exit windows, with more calm before them.")]
+    [Min(0f)] public float extraSeconds = 750f;
+    [Tooltip("Exits only a large map has, by name. Each copies one of the raid's own (its hours, what it costs), without its alarm.")]
+    public string[] extraExits = new string[0];
+}
+
 /// <summary>
 /// Authored data for one raid destination: its name, the scene it plays in and its base rules (time limit, extraction
 /// time, loot and enemy strength). Raid portals point at one. Modifiers change these values for a single run through
@@ -23,6 +35,10 @@ public sealed class RaidDefinition : ScriptableObject
     [SerializeField] private string sceneName;
     [Tooltip("Shown in the raid planner but can't be entered yet: a destination for later (GDD §21.5 \"a harder expedition\").")]
     [SerializeField] private bool locked;
+    [Tooltip("Locked until this boss has been beaten. Empty: it stays locked.")]
+    [SerializeField] private BossDefinition unlockedBy;
+    [Tooltip("What choosing a large raid does here. A raid without generated maps has no large version.")]
+    [SerializeField] private RaidSizeOption largeRaid = new RaidSizeOption();
     [Tooltip("Why a locked destination can't be entered, shown in the planner.")]
     [SerializeField, TextArea] private string lockedText = "The way there is not yet open.";
 
@@ -102,8 +118,10 @@ public sealed class RaidDefinition : ScriptableObject
     public string Description => description;
     public int Tier => tier;
     public string SceneName => sceneName;
-    public bool IsLocked => locked;
+    public bool IsLocked => locked && (unlockedBy == null || !GameSession.Settlement.IsBossDefeated(unlockedBy.Id));
     public string LockedText => lockedText;
+    public RaidSizeOption LargeRaid => largeRaid;
+    public bool CanBeLarge => layoutRules != null && largeRaid != null && largeRaid.widthScale > 1f;
     public MonsterDefinition[] KnownEnemies => knownEnemies;
     public ItemDefinition[] LikelyItems => likelyItems;
     public ResourceDefinition[] LikelyResources => likelyResources;
@@ -198,8 +216,9 @@ public sealed class RaidDefinition : ScriptableObject
     {
         RaidGlobalSettings global = RaidGlobalSettings.Current;
         float density = EffectiveEnemyDensity * (GameSession.ActiveRaid?.TimeOfDay?.enemyDensity ?? 1f) * (GameSession.ActiveRaid?.Difficulty?.enemyDensity ?? 1f);
-        return overrideBands ? new SpawnRules(density, entry, nearDistance, farDistance)
-            : new SpawnRules(density, entry, global.NearDistance, global.FarDistance);
+        float area = GameSession.ActiveRaid != null ? GameSession.ActiveRaid.AreaScale : 1f;
+        return overrideBands ? new SpawnRules(density, entry, nearDistance, farDistance, area)
+            : new SpawnRules(density, entry, global.NearDistance, global.FarDistance, area);
     }
 
     private void OnValidate()

@@ -14,7 +14,7 @@ Open work and ideas. Tick items off (`[x]`) or delete them when done. Architectu
 - [ ] Real art for the rumour sites: they are placeholder shapes (`Prefabs/Raids/Events/Sites`), as is the Elder Tree.
 - [ ] Icons for the plans and living things: the plans use the Forge Blueprint's, the others borrow from materials.
 - [ ] Give the expedition their own models: everyone is IngridModel, at home and in raids.
-- [ ] Troll Valley needs its own Layout Rules and Raid Rumours when it opens.
+- [x] Troll Valley has its own Layout Rules, creatures, tiers and rumour pool, opened by beating the Heartroot. Still the Woods' scene and art: it needs a look, its bridges and its boss (GDD §10.7).
 - [ ] A goat (or other animal) for the Haven: bees, seed and the Elder are in, a living animal isn't.
 - [ ] Relics in the raid report: they are named in "On the way", but the haul lists the plain item.
 
@@ -44,6 +44,7 @@ Open work and ideas. Tick items off (`[x]`) or delete them when done. Architectu
 
 - [ ] The Heartroot and its stump: it is the Root Guardian's mannequin at 1.55 times the size. A boss should look like one.
 - [ ] Heartroot's Grasp has Frost Rune's icon and effect, with roots on the hit.
+- [ ] Heartroot Fight is a synthesised drum loop (`Tools/Audio/boss.py`), 33 s and never heard by whoever made it: listen to it, and a composed track may be better.
 - [ ] Haul Sack has the Hide Rucksack's icon.
 - [ ] Set-pieces are the forest kit and primitives. The Old Barrow's mound most of all: from the gameplay camera it is a smooth green shape.
 - [ ] Finished goods at a workplace, growing as residents make them: tools and sounds are in, the goods are not.
@@ -56,6 +57,15 @@ Everything below was driven by scripts, not played by hand: the numbers are firs
 - [ ] Companion strength per tier, and whether 45 seconds is fair in a real fight.
 - [ ] Guards: two killed a first breach wave with the player standing still.
 - [ ] Whether set-piece guards are too much on top of the raid's own camps, as every rumour now has some.
+- [ ] Large raids: is 29:10 right for four times the ground? Are 12 set-pieces and 533 resource nodes too much or too little to find, and is the walk to an exit fair?
+- [ ] Companion ranks: does +30% health and +20% damage at Sworn take too much of the fight?
+- [ ] Whether a rumour's rough direction is enough to find it by, on a normal raid and a large one.
+- [ ] A Day raid (11:00, sun 1.36) reads as deep blue night on screen. Kept as it is for now (your call, 3 November); come back to it after playtests. The fog of war is not the cause.
+- [ ] Raid HUD: does one way line, the maps and M give enough, or do you miss seeing every exit at a glance? (`RaidHudView`; the old list is in git.)
+- [ ] A large raid has six exits, spread out (nearest 283 m from the start on the seed tried). Is the walk fair? `Large Raid › Extra Exits` is a list of names.
+- [ ] Long messages moved beside the vitals, pickups stayed by the character (1 Nov playtest fix). Is that the right split?
+- [ ] Amnesia: is one memory back every 2 raids right, and does a lost companion turning up on the very next raid make losing them cost too little? `Memory Returns Every`; a wait would be a rule on the rumour.
+- [ ] Someone lost stands still until found. An idle or wandering animation, and their own lines (`ResidentDefinition › Returning Lines`, only general ones are written).
 - [ ] Heavy bag: 80% speed at a full bag, and whether the Haul Sack's noise is a real price.
 
 ## Materials as items (weight and carrying)
@@ -63,7 +73,7 @@ Everything below was driven by scripts, not played by hand: the numbers are firs
 - [x] Soft encumbrance: past 80% of the bag's budget speed, stamina and noise ease toward their full-bag values (`PlayerBurden`).
 - [x] Haul Sack: more weight, fewer slots, slower and loud. Still open: a pack animal or wheelbarrow (GDD §12.4).
 - [ ] Refine at home pays off: tune item value per weight so ingots/planks/blocks are clearly better to carry than raw ore/logs.
-- [ ] Quick-deposit: "Deposit all materials" button at the stash, and stations pulling from storage (already via MaterialPool).
+- [x] Store all materials in one press at the stash (`StashStorage.StoreMaterials`), with stations still pulling from storage.
 - [ ] Decide essence loss on a failed raid (e.g. lose the essences gathered this raid, keep banked ones).
 - [ ] Ground drop prefabs for materials (a generic sack/bundle prefab) so dropping a material spawns something to pick up.
 - [ ] Per-material stack size tuning after playtest (hides 20, trollstone 10, the rest 50).
@@ -91,7 +101,7 @@ Raid events, gear, food, buildings and creatures are in, built by `AgentScripts/
 - [ ] Real models and icons: new creatures, buildings and event sites are placeholder shapes.
 - [ ] Fit shields and new weapons in the hand (Safe Haven › Characters › Held Item Grips): grips are copied from similar items.
 - [ ] Status icons: conditions show as words above the vitals (GDD §10.6 asks for icons).
-- [ ] Scout Post (GDD §14.2): show the raid's coming events as rumours in the briefing.
+- [x] Watch Post upgrades name a raid's coming events in the briefing, in place of a separate Scout Post (`RaidForecast`). Decide if the GDD's Scout Post should still be its own building.
 - [x] Defender roles for ward breaches: Warden and Hunter stand guard (`ResidentDefender`). Check it doesn't take the fight from the player: two guards killed a first wave unaided.
 - [ ] Settlers (Hild, Asa, Gunnar, Yrsa) borrow expedition models: give them their own, and icons for the Boar Pie, Trout in Cream, Haven Feast and Moon Broth, which show the stew's for now.
 - [ ] Trollstone armor copies the moonsilver worn look: give it one of its own.

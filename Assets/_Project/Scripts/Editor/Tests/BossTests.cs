@@ -35,6 +35,49 @@ public sealed class BossTests
         Object.DestroyImmediate(later.attack);
     }
 
+    private static RaidDefinition Valley => AssetDatabase.LoadAssetAtPath<RaidDefinition>("Assets/_Project/Data/Raids/TrollValley.asset");
+
+    [Test]
+    public void TrollValleyIsARaidOfItsOwn()
+    {
+        var misty = AssetDatabase.LoadAssetAtPath<RaidDefinition>("Assets/_Project/Data/Raids/MistyWoods.asset");
+        Assert.AreEqual("troll_valley", Valley.Id);
+        Assert.AreEqual("wildlands", misty.Id, "The Woods keep their own id");
+        Assert.IsFalse(string.IsNullOrEmpty(Valley.SceneName));
+        Assert.AreNotEqual(misty.LayoutRules, Valley.LayoutRules);
+        Assert.GreaterOrEqual(Valley.LowestDifficulty.tier, 2, "It is for those past the first tier");
+        Assert.IsFalse(System.Linq.Enumerable.Contains(Valley.GetSystem<RaidRumoursSystem>().Pool, Rumour), "The Heartroot sleeps in the Woods");
+        Assert.IsTrue(System.Linq.Enumerable.Contains(misty.GetSystem<RaidRumoursSystem>().Pool, Rumour), "Its rumour must not have gone from them");
+    }
+
+    [Test]
+    public void BeatingTheHeartrootOpensTrollValley()
+    {
+        var saved = GameSession.Settlement;
+        Assert.IsTrue(saved.IsBossDefeated(Boss.Id) || Valley.IsLocked, "Shut until then");
+    }
+
+    [Test]
+    public void ItRisesAndHasMusicAndATrophy()
+    {
+        Assert.Greater(Boss.WakeSeconds, 0f);
+        Assert.IsNotNull(Boss.WakeSound);
+        Assert.IsTrue(Boss.Music.HasTracks);
+        Assert.IsNotNull(Boss.Trophy);
+        Assert.IsNotEmpty(Boss.HomeLines);
+        CollectionAssert.Contains(SettlementSettings.Current.Bosses, Boss);
+    }
+
+    [Test]
+    public void TheBossIsRememberedAcrossASave()
+    {
+        var settlement = new SettlementState();
+        settlement.RecordExtraction();
+        settlement.MarkBossDefeated("x");
+        Assert.AreEqual("x", settlement.LastBossBeaten);
+        Assert.AreEqual(1, settlement.LastBossBeatenAt);
+    }
+
     [Test]
     public void BeatingItIsGivenOnce()
     {

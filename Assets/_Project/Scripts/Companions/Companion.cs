@@ -91,8 +91,13 @@ public sealed class Companion : MonoBehaviour, IConversationTopics
     public CompanionOrder Order { get; private set; }
     public bool IsDowned => getUpAt >= 0f;
     public string DisplayName => resident != null ? resident.DisplayName : name;
+    public ResidentDefinition Resident => resident;
 
-    /// <summary>On a raid: they were down too long and are gone for good.</summary>
+    /// <summary>What this raid has been for them, kept for when they get home.</summary>
+    public int TimesHelpedUp { get; private set; }
+    public int Kills { get; private set; }
+
+    /// <summary>On a raid: they were down too long and the forest has them (SettlementState.LoseResident).</summary>
     public bool IsLost { get; private set; }
 
     /// <summary>Seconds left to help them up, while they are down on a raid.</summary>
@@ -130,6 +135,22 @@ public sealed class Companion : MonoBehaviour, IConversationTopics
 
     /// <summary>Stands still and stays out of fights while set (a story moment: before the expedition sets out).</summary>
     public bool Paused { get; set; }
+
+    /// <summary>Someone lost, standing where a rumour said: they wait, nothing touches them, and there is no talking to them until they are found.</summary>
+    public void StandLost()
+    {
+        Paused = true;
+        health.AddInvulnerability(this);
+        interactable.enabled = false;
+    }
+
+    /// <summary>They follow, as anyone would on a raid: they can fall, and can be helped up.</summary>
+    public void FollowWhoFoundThem()
+    {
+        Paused = false;
+        health.RemoveInvulnerability(this);
+        interactable.enabled = true;
+    }
 
     /// <summary>They go where they are told but leave enemies to the player (a lesson: nobody kills the practice target).</summary>
     public bool HoldFire { get; set; }
@@ -200,12 +221,14 @@ public sealed class Companion : MonoBehaviour, IConversationTopics
     {
         active.Add(this);
         health.Died += OnKnockedDown;
+        Damageable.AnyDamaged += CountKill;
     }
 
     private void OnDisable()
     {
         active.Remove(this);
         health.Died -= OnKnockedDown;
+        Damageable.AnyDamaged -= CountKill;
         leader.Follow(null);
         body?.SetSheathed(false);
     }
@@ -544,6 +567,14 @@ public sealed class Companion : MonoBehaviour, IConversationTopics
 
     // ----- Knocked down -----
 
+    private void CountKill(Damageable victim, DamageInfo damage, DamageResult result)
+    {
+        if (result.Killed && damage.Source == combatant)
+        {
+            Kills++;
+        }
+    }
+
     private void OnKnockedDown(Damageable victim, DamageInfo hit)
     {
         getUpAt = bleedsOut ? float.PositiveInfinity : Time.time + definition.DownedSeconds;
@@ -591,7 +622,13 @@ public sealed class Companion : MonoBehaviour, IConversationTopics
         }
 
         GetUp(definition.ReviveHealth);
+        TimesHelpedUp++;
         GameMessages.Post($"{DisplayName} is back on their feet.", MessageKind.Gain);
+        string[] thanks = resident != null && resident.FightLines.helpedUp.Length > 0 ? resident.FightLines.helpedUp : definition.FightLines?.helpedUp;
+        if (thanks != null && thanks.Length > 0 && DialogueBox.Current != null)
+        {
+            DialogueBox.Current.Aside(talkable != null ? talkable.Speaker : new DialogueSpeaker(DisplayName, transform), thanks[UnityEngine.Random.Range(0, thanks.Length)]);
+        }
     }
 
     private void GetUp(float healthShare)

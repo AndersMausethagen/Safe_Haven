@@ -26,22 +26,48 @@ public sealed class ResidentRecord
     public JobDefinition Job { get; set; }
     /// <summary>The player asked them to stop working through their job's orders.</summary>
     public bool WorkPaused { get; set; }
+    /// <summary>Raids they have gone on with the player and come back from.</summary>
+    public int RaidsAlong { get; set; }
+    public int KillsAlong { get; set; }
+    public int TimesHelpedUp { get; set; }
+    /// <summary>What they will bring up next time they are spoken to.</summary>
+    public CompanionMemory Memory { get; set; }
+    /// <summary>What has happened with the player, as far as they know.</summary>
+    public List<CompanionMemory> Remembers { get; } = new List<CompanionMemory>();
+    /// <summary>What the forest took from them and raids together haven't yet brought back, next to return first.</summary>
+    public List<CompanionMemory> Forgotten { get; } = new List<CompanionMemory>();
+    /// <summary>Found again and not yet spoken to: they don't know the player.</summary>
+    public bool IsStranger { get; set; }
+    /// <summary>A memory that has just come back, to say when next spoken to.</summary>
+    public CompanionMemory ComingBack { get; set; }
+    /// <summary>That was the last of them.</summary>
+    public bool AllCameBack { get; set; }
 }
 
-/// <summary>Someone who went along on a raid and never came home.</summary>
+/// <summary>Someone who went along on a raid and didn't come home. The forest has them: they can be found again, and won't know the player.</summary>
 public sealed class FallenRecord
 {
-    public FallenRecord(ResidentDefinition resident, string where, int atExtraction)
+    public FallenRecord(ResidentDefinition resident, string where, int atExtraction, int raidsAlong = 0, IEnumerable<CompanionMemory> forgotten = null)
     {
         Resident = resident;
         Where = where;
         AtExtraction = atExtraction;
+        RaidsAlong = raidsAlong;
+        if (forgotten != null)
+        {
+            Forgotten.AddRange(forgotten);
+        }
     }
+
+    /// <summary>What they will have to get back.</summary>
+    public List<CompanionMemory> Forgotten { get; } = new List<CompanionMemory>();
 
     public ResidentDefinition Resident { get; }
     public string Where { get; }
     /// <summary>How many raids had come home when it happened, so talk of it fades with time.</summary>
     public int AtExtraction { get; }
+    /// <summary>Raids they had come back from with the player.</summary>
+    public int RaidsAlong { get; }
 }
 
 /// <summary>
@@ -272,7 +298,7 @@ public sealed class SettlementState
         return resident == null ? null : residents.Find(record => record.Resident == resident);
     }
 
-    /// <summary>True for anyone who lives here, or did and was lost: neither can be found out in a raid any more.</summary>
+    /// <summary>True for anyone who lives here, or did and was lost: neither is sought as a new face (the lost have a way back: FindAgain).</summary>
     public bool HasResident(ResidentDefinition resident) => Find(resident) != null || IsFallen(resident);
 
     /// <summary>Ids of the bosses beaten. Kept whatever became of the raid it happened in.</summary>
@@ -288,12 +314,27 @@ public sealed class SettlementState
             return false;
         }
 
+        LastBossBeaten = id;
+        LastBossBeatenAt = SuccessfulExtractions;
         Changed?.Invoke();
         return true;
     }
 
-    /// <summary>Those who went along on a raid and never came home.</summary>
+    /// <summary>The boss beaten most recently and how many raids had come home by then, so talk of it fades.</summary>
+    public string LastBossBeaten { get; private set; }
+    public int LastBossBeatenAt { get; private set; }
+
+    public void RestoreLastBoss(string id, int atExtraction)
+    {
+        LastBossBeaten = id;
+        LastBossBeatenAt = atExtraction;
+    }
+
+    /// <summary>Those who went along on a raid and haven't come home.</summary>
     public IReadOnlyList<FallenRecord> Fallen => fallen;
+
+    /// <summary>Who a raid's rumour can lead to next: the one lost longest ago who can walk a raid at all. Null with nobody to find.</summary>
+    public FallenRecord LostToFind => fallen.Find(record => record.Resident != null && record.Resident.RaidCompanion != null);
 
     public bool IsFallen(ResidentDefinition resident) => resident != null && fallen.Exists(record => record.Resident == resident);
 
@@ -329,7 +370,43 @@ public sealed class SettlementState
         return jobs;
     }
 
-    /// <summary>Someone went along on a raid and is gone for good.</summary>
+    /// <summary>They came home from a raid with the player: the bond grows, and it leaves them something to say. True when they rose in rank.</summary>
+    public bool RecordRaidAlong(ResidentDefinition resident, IReadOnlyList<CompanionBondRank> ranks, bool extracted, int bossesBeaten, int timesHelpedUp, float secondsLeft, int kills, int memoryReturnsEvery = 0)
+    {
+        ResidentRecord record = Find(resident);
+        if (record == null)
+        {
+            return false;
+        }
+
+        CompanionBondRank before = CompanionBond.RankFor(record.RaidsAlong, ranks);
+        record.RaidsAlong++;
+        record.KillsAlong += kills;
+        record.TimesHelpedUp += timesHelpedUp;
+        bool rose = CompanionBond.RankFor(record.RaidsAlong, ranks) != before;
+        record.Memory = CompanionBond.Remember(extracted, bossesBeaten, timesHelpedUp, rose, secondsLeft, kills);
+        Keep(record, record.Memory);
+        // One at a time, and not over one they haven't had the chance to say.
+        if (record.ComingBack == CompanionMemory.None && CompanionBond.MemoryComesBack(record.RaidsAlong, memoryReturnsEvery, record.Forgotten.Count))
+        {
+            record.ComingBack = record.Forgotten[0];
+            record.Forgotten.RemoveAt(0);
+            record.AllCameBack = record.Forgotten.Count == 0;
+            Keep(record, record.ComingBack);
+        }
+
+        return rose;
+    }
+
+    private static void Keep(ResidentRecord record, CompanionMemory memory)
+    {
+        if (memory != CompanionMemory.None && !record.Remembers.Contains(memory))
+        {
+            record.Remembers.Add(memory);
+        }
+    }
+
+    /// <summary>Someone went along on a raid and the forest has them. They can be found again, on a later raid, with all of it gone.</summary>
     public void LoseResident(ResidentDefinition resident, string where)
     {
         ResidentRecord record = Find(resident);
@@ -339,7 +416,7 @@ public sealed class SettlementState
         }
 
         residents.Remove(record);
-        fallen.Add(new FallenRecord(resident, where, SuccessfulExtractions));
+        fallen.Add(new FallenRecord(resident, where, SuccessfulExtractions, record.RaidsAlong, CompanionBond.WhatIsForgotten(record.Remembers, record.Forgotten)));
         if (record.Job != null && !vacantJobs.Contains(record.Job) && !IsHeld(record.Job))
         {
             vacantJobs.Add(record.Job);
@@ -348,12 +425,32 @@ public sealed class SettlementState
         Changed?.Invoke();
     }
 
+    /// <summary>
+    /// Someone lost has been brought out of a raid. They live here again as a stranger: no bond, no job, none of what they knew, which raids
+    /// together bring back. False unless they were lost.
+    /// </summary>
+    public bool FindAgain(ResidentDefinition resident)
+    {
+        FallenRecord lost = fallen.Find(record => record.Resident == resident);
+        if (resident == null || lost == null)
+        {
+            return false;
+        }
+
+        fallen.Remove(lost);
+        var found = new ResidentRecord(resident) { IsStranger = true };
+        found.Forgotten.AddRange(lost.Forgotten);
+        residents.Add(found);
+        Changed?.Invoke();
+        return true;
+    }
+
     /// <summary>Puts someone lost back on the list when loading a save.</summary>
-    public void RestoreFallen(ResidentDefinition resident, string where, int atExtraction)
+    public void RestoreFallen(ResidentDefinition resident, string where, int atExtraction, int raidsAlong = 0, IEnumerable<CompanionMemory> forgotten = null)
     {
         if (resident != null && !IsFallen(resident))
         {
-            fallen.Add(new FallenRecord(resident, where, atExtraction));
+            fallen.Add(new FallenRecord(resident, where, atExtraction, raidsAlong, forgotten));
         }
     }
 

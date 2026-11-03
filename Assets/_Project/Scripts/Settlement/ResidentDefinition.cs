@@ -35,6 +35,10 @@ public sealed class ResidentDefinition : ScriptableObject
     [Header("Raids")]
     [Tooltip("How they fight when they go along on a raid. Empty: they stay at home.")]
     [SerializeField] private CompanionDefinition raidCompanion;
+    [Tooltip("What they say of a raid just gone, in their own words. A kind left out uses Settlement Settings' general lines.")]
+    [SerializeField] private System.Collections.Generic.List<CompanionMemoryLines> memoryLines = new System.Collections.Generic.List<CompanionMemoryLines>();
+    [Tooltip("What they say when a memory the forest took comes back, in their own words. A kind left out uses Settlement Settings' general lines.")]
+    [SerializeField] private System.Collections.Generic.List<CompanionMemoryLines> returningLines = new System.Collections.Generic.List<CompanionMemoryLines>();
 
     [Header("Jobs")]
     [Tooltip("Jobs they can be given at home. The first is suggested.")]
@@ -50,5 +54,7 @@ public sealed class ResidentDefinition : ScriptableObject
     public FightLines FightLines => fightLines;
     public GameObject Model => model;
     public CompanionDefinition RaidCompanion => raidCompanion;
+    public System.Collections.Generic.IReadOnlyList<CompanionMemoryLines> MemoryLines => memoryLines;
+    public System.Collections.Generic.IReadOnlyList<CompanionMemoryLines> ReturningLines => returningLines;
     public JobDefinition[] Jobs => jobs;
 }

@@ -21,14 +21,17 @@ public readonly struct SpawnRules
     /// <summary>Normal density, no entry known (so every band accepts every point).</summary>
     public static SpawnRules Default => new SpawnRules(1f, null, DefaultNearDistance, DefaultFarDistance);
 
-    public SpawnRules(float enemyDensity, Vector3? entry, float nearDistance, float farDistance)
+    public SpawnRules(float enemyDensity, Vector3? entry, float nearDistance, float farDistance, float areaScale = 1f)
     {
+        AreaScale = Mathf.Max(0.01f, areaScale);
         EnemyDensity = Mathf.Max(0f, enemyDensity);
         Entry = entry;
         NearDistance = Mathf.Max(0f, nearDistance);
         FarDistance = Mathf.Max(NearDistance, farDistance);
     }
 
+    /// <summary>How many times more ground this map has than the raid's normal one, and so how much more of what fills it.</summary>
+    public float AreaScale { get; }
     /// <summary>Multiplier on the counts of groups that spawn enemies. 1 is as authored.</summary>
     public float EnemyDensity { get; }
     /// <summary>Where the player enters the raid; null ignores the bands.</summary>
@@ -38,7 +41,7 @@ public readonly struct SpawnRules
     /// <summary>Points farther than this are far; between Near and Far is the middle.</summary>
     public float FarDistance { get; }
 
-    public SpawnRules WithEntry(Vector3? entry) => new SpawnRules(EnemyDensity, entry, NearDistance, FarDistance);
+    public SpawnRules WithEntry(Vector3? entry) => new SpawnRules(EnemyDensity, entry, NearDistance, FarDistance, AreaScale);
 
     /// <summary>The band a point lies in, or Any when the entry is unknown.</summary>
     public EntryBand BandOf(Vector3 point)

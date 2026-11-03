@@ -50,7 +50,10 @@ public sealed class RaidSpawnList
     /// <summary>The count range after the raid's enemy density, before limiting to the points.</summary>
     public Vector2Int CountFor(SpawnRules rules)
     {
-        return SpawnsEnemies ? new Vector2Int(rules.Scale(MinCount), rules.Scale(MaxCount)) : new Vector2Int(MinCount, MaxCount);
+        // A large raid has as much on every square metre. Escalations are where the player is, so they stay as many.
+        float area = category == SpawnCategory.Escalation ? 1f : rules.AreaScale;
+        Vector2Int range = SpawnsEnemies ? new Vector2Int(rules.Scale(MinCount), rules.Scale(MaxCount)) : new Vector2Int(MinCount, MaxCount);
+        return new Vector2Int(Mathf.RoundToInt(range.x * area), Mathf.RoundToInt(range.y * area));
     }
 
     /// <summary>What can spawn at a raid tier. Weights are relative, so those left share the picks.</summary>

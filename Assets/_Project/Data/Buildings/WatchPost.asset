@@ -59,6 +59,7 @@ MonoBehaviour:
     extraStorage: 0
     raidSeconds: 0
     extraRumours: 1
+    foretoldEvents: 1
     comfort: 0
     extraLogs: 0
     teachesRecipes:
@@ -86,6 +87,7 @@ MonoBehaviour:
     extraStorage: 0
     raidSeconds: 0
     extraRumours: 1
+    foretoldEvents: 2
     comfort: 0
     extraLogs: 0
     teachesRecipes:

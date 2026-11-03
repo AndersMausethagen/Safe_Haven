@@ -134,8 +134,16 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics
             body.Append("\n\n").Append(current != null
                 ? $"<color=#E8C46A>Works as the {current.DisplayName}.</color> {current.Description}"
                 : "<color=#E8C46A>Has no job yet.</color>");
-            string grief = Grief();
-            page.Body = grief != null ? grief + "\n\n" + body : body.ToString();
+            string said = Remembered();
+            foreach (string more in new[] { Grief(), said == null ? BossTalk() : null })
+            {
+                if (more != null)
+                {
+                    said = said != null ? said + "\n\n" + more : more;
+                }
+            }
+
+            page.Body = said != null ? said + "\n\n" + body : body.ToString();
         }
 
         foreach (JobDefinition job in GameSession.Settlement.JobsOpenTo(resident))
@@ -154,6 +162,45 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics
         }
     }
 
+    // What they have to say of the last raid they went on, once.
+    private string Remembered()
+    {
+        ResidentRecord record = GameSession.Settlement.Find(resident);
+        if (record == null)
+        {
+            return null;
+        }
+
+        SettlementSettings settings = SettlementSettings.Current;
+        if (record.IsStranger)
+        {
+            record.IsStranger = false;
+            return settings.StrangerLines.Length > 0 ? settings.StrangerLines[CompanionBond.StableIndex(resident.Id, settings.StrangerLines.Length)] : null;
+        }
+
+        if (record.ComingBack != CompanionMemory.None)
+        {
+            string back = CompanionBond.LineFor(record.ComingBack, resident.Id, resident.ReturningLines, settings.ReturningLines);
+            if (record.AllCameBack && !string.IsNullOrWhiteSpace(settings.AllBackLine))
+            {
+                back = back != null ? back + "\n\n" + settings.AllBackLine : settings.AllBackLine;
+            }
+
+            record.ComingBack = CompanionMemory.None;
+            record.AllCameBack = false;
+            return back;
+        }
+
+        if (record.Memory == CompanionMemory.None)
+        {
+            return null;
+        }
+
+        string line = CompanionBond.LineFor(record.Memory, resident.Id, resident.MemoryLines, settings.MemoryLines);
+        record.Memory = CompanionMemory.None;
+        return line;
+    }
+
     // They speak of whoever was lost for a while, each in the same words.
     private string Grief()
     {
@@ -164,8 +211,29 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics
             return null;
         }
 
-        int line = Mathf.Abs(resident.Id.GetHashCode()) % settings.GriefLines.Length;
+        int line = CompanionBond.StableIndex(resident.Id, settings.GriefLines.Length);
         return string.Format(settings.GriefLines[line], loss.Resident.DisplayName);
+    }
+
+    // For a while after a boss falls, it is what people talk about.
+    private string BossTalk()
+    {
+        SettlementState settlement = GameSession.Settlement;
+        SettlementSettings settings = SettlementSettings.Current;
+        if (string.IsNullOrEmpty(settlement.LastBossBeaten) || settlement.SuccessfulExtractions - settlement.LastBossBeatenAt > settings.GriefRaids)
+        {
+            return null;
+        }
+
+        foreach (BossDefinition boss in settings.Bosses)
+        {
+            if (boss != null && boss.Id == settlement.LastBossBeaten && boss.HomeLines.Length > 0)
+            {
+                return boss.HomeLines[CompanionBond.StableIndex(resident.Id, boss.HomeLines.Length)];
+            }
+        }
+
+        return null;
     }
 
     private void Assign(JobDefinition job, GameObject user) => GiveJob(resident, job, user);

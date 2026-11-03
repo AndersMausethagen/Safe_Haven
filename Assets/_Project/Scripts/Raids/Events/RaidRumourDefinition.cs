@@ -48,9 +48,19 @@ public sealed class RaidRumourDefinition : ScriptableObject
     [SerializeField] private BossDefinition untilBeaten;
     [Tooltip("Comes up ahead of any chosen at random, as soon as it can.")]
     [SerializeField] private bool urgent;
+    [Tooltip("Only while someone lost on a raid is still out there. {0} in the briefing is their name.")]
+    [SerializeField] private bool seeksLost;
 
     public string Id => string.IsNullOrWhiteSpace(id) ? name : id;
     public string Briefing => briefing;
+    public bool SeeksLost => seeksLost;
+
+    /// <summary>The line in the briefing as this game has it: the name of whoever it leads to.</summary>
+    public string BriefingFor(SettlementState settlement)
+    {
+        FallenRecord lost = seeksLost ? settlement.LostToFind : null;
+        return lost != null ? string.Format(briefing, lost.Resident.DisplayName) : briefing;
+    }
     public RaidEventDefinition Site => site;
     public RaidSetPieceDefinition SetPiece => setPiece;
     public float Weight => weight;
@@ -65,6 +75,11 @@ public sealed class RaidRumourDefinition : ScriptableObject
         }
 
         if (hour == RumourHour.Dark && (timeOfDay == null || !timeOfDay.IsDark))
+        {
+            return false;
+        }
+
+        if (seeksLost && settlement.LostToFind == null)
         {
             return false;
         }
@@ -95,7 +110,7 @@ public static class RaidRumours
     /// The rumours of a run: as many as the raid's Raid Rumours system asks for, plus what a resident's job adds. Empty for a
     /// raid without one.
     /// </summary>
-    public static List<RaidRumourDefinition> For(RaidDefinition raid, int seed, SettlementState settlement, PlayerCrafting crafting)
+    public static List<RaidRumourDefinition> For(RaidDefinition raid, int seed, SettlementState settlement, PlayerCrafting crafting, float rumourScale = 1f)
     {
         var picked = new List<RaidRumourDefinition>();
         RaidRumoursSystem system = raid != null ? raid.GetSystem<RaidRumoursSystem>() : null;
@@ -117,7 +132,7 @@ public static class RaidRumours
         }
 
         var random = new System.Random(RaidLayout.SeedFor(seed, "Rumours"));
-        int wanted = system.Count + settlement.JobBonus(job => job.ExtraRumours) + HavenReadiness.ExtraRumours;
+        int wanted = Mathf.RoundToInt(system.Count * rumourScale) + settlement.JobBonus(job => job.ExtraRumours) + HavenReadiness.ExtraRumours;
         for (int i = candidates.Count - 1; i >= 0 && picked.Count < wanted; i--)
         {
             if (candidates[i].Urgent)

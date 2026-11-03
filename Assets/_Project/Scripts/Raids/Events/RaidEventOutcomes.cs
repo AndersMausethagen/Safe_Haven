@@ -332,6 +332,24 @@ public sealed class RescueResidentOutcome : RaidEventOutcome
     }
 }
 
+/// <summary>Whoever is lost longest stands here, lost, from the raid's start (SettlementState.LostToFind). Goes in an event's On Start.</summary>
+[Serializable]
+public sealed class StandTheLostOutcome : RaidEventOutcome
+{
+    public override string DisplayName => "The Lost Stand Here";
+
+    public override void Apply(RaidEventContext context) => context.Director?.StandLostAt(context.Position);
+}
+
+/// <summary>Whoever stands here follows the player: they come home only if they reach an exit alive with them. The rest stays as it was.</summary>
+[Serializable]
+public sealed class LeadTheLostOutcome : RaidEventOutcome
+{
+    public override string DisplayName => "Lead the Lost Home";
+
+    public override void Apply(RaidEventContext context) => context.Director?.LeadLostHome();
+}
+
 /// <summary>A blow against what is behind the next ward breach: it comes shorter of fighters, and weaker.</summary>
 [Serializable]
 public sealed class WeakenBreachOutcome : RaidEventOutcome

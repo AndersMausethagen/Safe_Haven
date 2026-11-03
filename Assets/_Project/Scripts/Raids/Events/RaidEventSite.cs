@@ -17,6 +17,24 @@ public sealed class RaidEventSite : MonoBehaviour, IInteractionName, IInteractio
     private RaidEventDefinition definition;
     private RaidEventContext context;
     private Interactable interactable;
+    private float beaconShowsWithin = -1f;
+
+    /// <summary>The place it stands in, when a rumour put it in a set-piece. Empty otherwise.</summary>
+    public string PlaceName { get; set; } = "";
+
+    /// <summary>The beacon stays out until the player is this close: what a rumour points to has to be found.</summary>
+    public void HideBeaconBeyond(float metres) => beaconShowsWithin = metres;
+
+    /// <summary>True when the player here has found it: at once, unless a rumour hid its beacon.</summary>
+    public bool IsFoundFrom(Vector3 position)
+    {
+        Vector3 offset = transform.position - position;
+        offset.y = 0f;
+        return beaconShowsWithin < 0f || offset.sqrMagnitude <= beaconShowsWithin * beaconShowsWithin;
+    }
+
+    /// <summary>Where a map marks it from there: roughly, until it has been found.</summary>
+    public Vector3 MarkFrom(Vector3 position) => IsFoundFrom(position) ? transform.position : RumourWay.RoughSpot(transform.position);
 
     public bool IsResolved { get; private set; }
     public string DisplayName => definition != null ? definition.DisplayName : name;
@@ -50,8 +68,23 @@ public sealed class RaidEventSite : MonoBehaviour, IInteractionName, IInteractio
         context = eventContext;
     }
 
+    private void ShowBeaconByDistance()
+    {
+        if (beacon == null || beaconShowsWithin < 0f || IsResolved || context?.Player == null)
+        {
+            return;
+        }
+
+        bool close = (context.Player.transform.position - transform.position).sqrMagnitude <= beaconShowsWithin * beaconShowsWithin;
+        if (beacon.activeSelf != close)
+        {
+            beacon.SetActive(close);
+        }
+    }
+
     private void Update()
     {
+        ShowBeaconByDistance();
         if (IsResolved || definition == null || definition.Choices.Count > 0 || context.Player == null)
         {
             return;

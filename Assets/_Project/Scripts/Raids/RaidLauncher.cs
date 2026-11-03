@@ -110,7 +110,7 @@ public static class RaidLauncher
         person != null && person.RaidCompanion != null && GameSession.Settlement.Find(person) != null;
 
     public static bool TryLaunch(RaidDefinition raid, GameObject player, IEnumerable<ItemDefinition> modifierItems, out string problem,
-        int sparks = 0, int? seed = null, RaidDifficulty difficulty = null, ResidentDefinition companion = null)
+        int sparks = 0, int? seed = null, RaidDifficulty difficulty = null, ResidentDefinition companion = null, bool large = false)
     {
         problem = CheckLaunch(raid);
         difficulty ??= raid != null ? raid.LowestDifficulty : null;
@@ -168,7 +168,7 @@ public static class RaidLauncher
 
         // The seed is usually rolled when the briefing opens, so the hour it shows is the hour the raid gets.
         int runSeed = seed ?? RaidSession.NewSeed();
-        RaidParameters parameters = RaidParameters.Calculate(raid, modifiers, ExtraSeconds(sparks), RaidTimeOfDay.For(raid, runSeed), difficulty, ExtractionCut);
+        RaidParameters parameters = RaidParameters.Calculate(raid, modifiers, ExtraSeconds(sparks) + (large && raid.CanBeLarge ? raid.LargeRaid.extraSeconds : 0f), RaidTimeOfDay.For(raid, runSeed), difficulty, ExtractionCut);
         if (player.TryGetComponent(out PlayerTransport transport))
         {
             transport.LeaveForRaid();
@@ -179,6 +179,8 @@ public static class RaidLauncher
         {
             GearScoreAtEntry = GearScore.Of(player),
             Companion = CanGoAlong(companion) ? companion : null,
+            IsLarge = large && raid.CanBeLarge,
+            Foretold = RaidForecast.For(raid, runSeed, HavenReadiness.ForetoldEvents),
         };
         GameSession.BeginRaid(session);
         GameSession.CarryPlayerState(loadout);

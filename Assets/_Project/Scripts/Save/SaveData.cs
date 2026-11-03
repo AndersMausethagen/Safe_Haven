@@ -77,6 +77,8 @@ public sealed class SettlementSaveData
     public List<ResidentSaveData> residents = new List<ResidentSaveData>();
     /// <summary>Ids of the bosses beaten. Missing in older saves.</summary>
     public List<string> defeatedBosses = new List<string>();
+    public string lastBossBeaten;
+    public int lastBossBeatenAt;
     /// <summary>Those lost on raids. Missing in older saves.</summary>
     public List<FallenSaveData> fallen = new List<FallenSaveData>();
     /// <summary>Ids of the jobs they left. Missing in older saves.</summary>
@@ -126,6 +128,9 @@ public sealed class FallenSaveData
     public string id;
     public string where;
     public int atExtraction;
+    public int raidsAlong;
+    /// <summary>What they will have to get back, as CompanionMemory. Missing in older saves: nothing to come back.</summary>
+    public List<int> forgotten = new List<int>();
 }
 
 [Serializable]
@@ -136,6 +141,17 @@ public sealed class ResidentSaveData
     public string job;
     /// <summary>The player has paused their work orders.</summary>
     public bool workPaused;
+    /// <summary>Going along on raids. Missing in older saves, which start them at none.</summary>
+    public int raidsAlong;
+    public int killsAlong;
+    public int timesHelpedUp;
+    public int memory;
+    /// <summary>Having been lost and found: what they remember and what they have yet to, as CompanionMemory.</summary>
+    public List<int> remembers = new List<int>();
+    public List<int> forgotten = new List<int>();
+    public bool stranger;
+    public int comingBack;
+    public bool allCameBack;
 }
 
 [Serializable]

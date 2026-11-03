@@ -63,6 +63,17 @@ public sealed class ExtractionPoint : MonoBehaviour, IInteractionCondition, IInt
     public float AvailabilityChance => availabilityChance;
     public ItemDefinition CostItem => costItem;
     public int CostAmount => costItem != null ? costAmount : 0;
+    /// <summary>Another way out like this one, under another name, for a larger map. An alarm belongs to one place, so it stays here.</summary>
+    public ExtractionPoint CopyAs(string newName)
+    {
+        ExtractionPoint copy = Instantiate(this, transform.parent);
+        copy.name = newName;
+        copy.displayName = newName;
+        copy.alarm = null;
+        copy.gameObject.SetActive(true);
+        return copy;
+    }
+
     public bool HasAlarm => alarm != null;
     public SpawnGroup Alarm => alarm;
     public float HoldRadius => holdRadius;

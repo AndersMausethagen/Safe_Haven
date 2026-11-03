@@ -38,7 +38,74 @@ MonoBehaviour:
   - You came back. {0} didn't. I know how it goes out there. I still don't like it.
   - We put up stones for {0}. It isn't much.
   - Nobody here says it, but we all count who comes back through that portal. {0}... well.
+  - Someone saw {0} out there, walking in circles. Walking. Do you understand? Go and look.
   griefRaids: 2
+  bosses:
+  - {fileID: 11400000, guid: 9b7313d497a67e54b8b12e51990184bb, type: 2}
+  bondRanks:
+  - name: Trusted
+    raids: 3
+    healthBonus: 0.15
+    damageBonus: 0.1
+  - name: Sworn
+    raids: 8
+    healthBonus: 0.3
+    damageBonus: 0.2
+  memoryLines:
+  - kind: 6
+    lines:
+    - I keep hearing it fall. I think I always will. Good. It should be remembered that it can be done.
+    - We killed it. You and me. I didn't think I'd ever say that about anything out there.
+  - kind: 5
+    lines:
+    - You came back for me. Out there, with all of that around you. I won't forget it.
+    - I was on the ground and I heard you coming. That's the only reason I'm talking to you now.
+  - kind: 1
+    lines:
+    - We should never have gone that deep. I'm glad you're breathing.
+    - It went badly. It goes badly sometimes. We go again when you're ready.
+  - kind: 4
+    lines:
+    - I've stopped checking whether you're behind me. You always are.
+    - You know how I fight now, and I know how you do. That's worth more than a good sword.
+  - kind: 3
+    lines:
+    - Another minute out there and we'd both be part of that forest.
+    - I felt that portal close behind us. Let's not do that again.
+  - kind: 2
+    lines:
+    - My arms are still shaking. We gave them something to think about.
+    - That was a lot of them. We were better.
+  memoryReturnsEvery: 2
+  foundComesHomeWithin: 20
+  lostReportLine: The forest doesn't kill the lost. It forgets them, and they forget everything else. They are out there, and they won't know you.
+  foundFollowLine: '{0} doesn''t know you, or their own name. They follow anyway. Get them to an exit alive.'
+  foundReportLine: '{0} came home with you, and remembers none of it.'
+  leftBehindLine: You found {0}, and left them out there. They will still be walking.
+  strangerLines:
+  - You keep looking at me as if I should know you. I'm sorry. I don't. They tell me you came back for me. Thank you, whoever you are.
+  - They say this is home. They say you brought me back to it. I believe them, I suppose. I don't remember the fire. I don't remember you.
+  - I know how to hold a blade and not where I learned it. Everyone here calls me by a name. I've started answering to it.
+  returningLines:
+  - kind: 1
+    lines:
+    - We ran from something, didn't we? You and I, with nothing to show for it. I woke up remembering how it felt.
+  - kind: 2
+    lines:
+    - There was a fight. A bad one, back to back. I can still feel it in my arm. That was you beside me. That was you.
+  - kind: 3
+    lines:
+    - I dreamed of a beacon and a clock running out, and you shouting at me to move. That wasn't a dream, was it?
+  - kind: 4
+    lines:
+    - Something came back to me last night. The day I decided you could be trusted. I don't know how I ever stopped.
+  - kind: 5
+    lines:
+    - I was on the ground once, bleeding, and someone hauled me up. Your hands. I remember your hands.
+  - kind: 6
+    lines:
+    - That great rotten thing in the hollow. We killed it, you and me. How does a person forget a thing like that?
+  allBackLine: That's the last of it, I think. Every raid, every road, you. Whatever the forest took, it didn't get to keep it.
   portalRepairCost:
   - resource: {fileID: 11400000, guid: a86ac9a152512464ab08e0446c161e61, type: 2}
     amount: 3

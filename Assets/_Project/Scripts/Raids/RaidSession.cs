@@ -23,6 +23,21 @@ public sealed class RaidSession
 {
     private const float MinimumSecondsLeft = 15f;
 
+    /// <summary>What the briefing said would happen on this raid. These are drawn first, so it comes true.</summary>
+    public IReadOnlyList<RaidEventDefinition> Foretold { get; set; } = Array.Empty<RaidEventDefinition>();
+
+    /// <summary>How many bosses fell on this raid, for what those who went along remember.</summary>
+    public int BossesBeaten { get; set; }
+
+    /// <summary>The player chose a large raid: a bigger map with more on it (RaidDefinition › Large Raid).</summary>
+    public bool IsLarge { get; set; }
+
+    /// <summary>How many times wider the map is than the raid's normal one.</summary>
+    public float WidthScale => IsLarge ? Definition.LargeRaid.widthScale : 1f;
+
+    /// <summary>How many times more ground there is, and so how much more of what fills it.</summary>
+    public float AreaScale => WidthScale * WidthScale;
+
     /// <summary>Who goes along on this raid, or null.</summary>
     public ResidentDefinition Companion { get; set; }
 

@@ -104,6 +104,9 @@ public sealed class RaidLayoutRules : ScriptableObject
     [Header("Clearings")]
     [Tooltip("How many clearings between the start and the exits, least and most.")]
     [SerializeField] private Vector2Int rooms = new Vector2Int(9, 12);
+    [Tooltip("How many clearings hold a way out, across the map from the start. A larger map grows them with its width, not its ground, so the walk grows but stays a walk.")]
+    [SerializeField, Min(1)] private int exitRooms = 3;
+    private const int MaxFieldResolution = 1024;
     [Tooltip("Metres kept between the middles of two clearings.")]
     [SerializeField, Min(8f)] private float roomSeparation = 34f;
     [Tooltip("Radius of a clearing in metres, smallest and largest.")]
@@ -145,7 +148,7 @@ public sealed class RaidLayoutRules : ScriptableObject
     [Tooltip("Metres across a patch of denser or thinner forest.")]
     [SerializeField, Min(1f)] private float forestPatches = 28f;
     [Tooltip("Cells across the zones and the ground plan. Higher is finer but slower to load.")]
-    [SerializeField, Range(64, 512)] private int fieldResolution = 200;
+    [SerializeField, Range(64, MaxFieldResolution)] private int fieldResolution = 200;
 
     [Header("Water")]
     [Tooltip("How many ponds a map gets, least and most, rolled each run.")]
@@ -187,10 +190,47 @@ public sealed class RaidLayoutRules : ScriptableObject
     [Tooltip("How many of the map's camps are one, least and most.")]
     [SerializeField] private Vector2Int campPieces = new Vector2Int(1, 2);
 
+    /// <summary>
+    /// A copy of these rules for a map this many times wider: as much on each square metre, so four times as many clearings and sites on
+    /// twice the width. Rumour sites only double, as they are the run's few great finds. Made at runtime; the asset never changes.
+    /// </summary>
+    public RaidLayoutRules ScaledBy(float width)
+    {
+        RaidLayoutRules copy = Instantiate(this);
+        float area = width * width;
+        copy.rooms = new Vector2Int(Mathf.RoundToInt(rooms.x * area), Mathf.RoundToInt(rooms.y * area));
+        copy.ponds = new Vector2Int(Mathf.RoundToInt(ponds.x * area), Mathf.RoundToInt(ponds.y * area));
+        copy.campPieces = new Vector2Int(Mathf.RoundToInt(campPieces.x * area), Mathf.RoundToInt(campPieces.y * area));
+        copy.exitRooms = Mathf.RoundToInt(exitRooms * width);
+        copy.fieldResolution = Mathf.Min(MaxFieldResolution, Mathf.RoundToInt(fieldResolution * width));
+        copy.sites = new List<RaidSiteQuota>(sites.Count);
+        foreach (RaidSiteQuota quota in sites)
+        {
+            if (quota == null)
+            {
+                continue;
+            }
+
+            copy.sites.Add(new RaidSiteQuota
+            {
+                kind = quota.kind,
+                placement = quota.placement,
+                count = Mathf.RoundToInt(quota.count * (quota.kind == RaidSiteKind.Rumour ? width : area)),
+                separation = quota.separation,
+                fromStart = quota.fromStart,
+                offPath = quota.offPath,
+                clearing = quota.clearing,
+            });
+        }
+
+        return copy;
+    }
+
     public IReadOnlyList<RaidSetPieceDefinition> SetPieces => setPieces;
     public Vector2Int CampPieces => campPieces;
 
     public Vector2Int Rooms => rooms;
+    public int ExitRooms => exitRooms;
     public float RoomSeparation => roomSeparation;
     public Vector2 RoomRadius => roomRadius;
     public float EdgeMargin => edgeMargin;
