@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Spotted
   m_EditorClassIdentifier: SafeHaven::SoundDefinition
   displayName: Spotted
+  caption: Something has seen you
   clips:
   - {fileID: 8300000, guid: 7296e989e2e615949ba6f3b263eece75, type: 3}
   - {fileID: 8300000, guid: 788a5ccd3d4e8c9429234040161ca70b, type: 3}
@@ -27,3 +28,4 @@ MonoBehaviour:
   maxAtOnce: 1
   minimumGap: 0.03
   priority: 1
+  takesTheMix: 0

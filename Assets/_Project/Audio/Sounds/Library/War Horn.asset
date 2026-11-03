@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: War Horn
   m_EditorClassIdentifier: SafeHaven::SoundDefinition
   displayName: 
+  caption: A war horn
   clips:
   - {fileID: 8300000, guid: a8b00eecb8a30224797337e155eaec90, type: 3}
   channel: 2

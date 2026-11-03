@@ -124,7 +124,25 @@ public static class GameOptions
     public static readonly GameOption AlwaysShowVitals = GameOption.Toggle("AlwaysShowVitals", "Always Show Vitals",
         "Keeps health, stamina, hunger and thirst fully lit. Off, they dim while everything is full.", false);
 
-    public static readonly IReadOnlyList<GameOption> Accessibility = new[] { UiScale, ScreenShake, HitStop, ScreenFlash, TextSpeed, LargeTimer, AlwaysShowVitals };
+    public static readonly GameOption SoundCaptions = GameOption.Toggle("SoundCaptions", "Sound Captions",
+        "Writes important sounds on the screen, and the side they came from: a creature that has seen you, a horn, a tree coming down.", false);
+    public static readonly GameOption RarityLetters = GameOption.Toggle("RarityLetters", "Rarity Letters",
+        "Adds a letter to item slots for how rare the item is, so it doesn't rest on the colour of the frame.", false);
+    public static readonly GameOption DamageTaken = GameOption.Choice("DamageTaken", "Damage Taken",
+        "How much of a blow reaches you. Raids still end, and what you lose in them is still lost.", 0, "Normal", "75%", "50%");
+    public static readonly GameOption TimingHelp = GameOption.Choice("TimingHelp", "Parry and Dodge Timing",
+        "How long the moment to parry lasts, and how long a dodge carries you through a blow.", 0, "Normal", "Longer", "Much Longer");
+
+    public static readonly IReadOnlyList<GameOption> Accessibility = new[] { UiScale, ScreenShake, HitStop, ScreenFlash, TextSpeed, LargeTimer, AlwaysShowVitals, SoundCaptions, RarityLetters, DamageTaken, TimingHelp };
+
+    /// <summary>The share of a blow that reaches the player.</summary>
+    public static float DamageTakenShare => DamageTaken.Index == 2 ? 0.5f : DamageTaken.Index == 1 ? 0.75f : 1f;
+
+    /// <summary>How many times longer the parry window and a dodge's protection last.</summary>
+    public static float TimingShare => TimingHelp.Index == 2 ? 2f : TimingHelp.Index == 1 ? 1.5f : 1f;
+
+    /// <summary>The assists in use, in words for the playtest log. Empty with none.</summary>
+    public static string AssistsInUse => DamageTaken.Index == 0 && TimingHelp.Index == 0 ? "" : $"damage taken {DamageTakenShare:0.##}, timing {TimingShare:0.##}";
 
     /// <summary>Letters per second for dialogue, from a base speed. Infinity shows lines at once.</summary>
     public static float DialogueLettersPerSecond(float normal)

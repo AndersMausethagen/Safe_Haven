@@ -52,6 +52,7 @@ public static class PlaytestLog
     public const string RaidTier = "RaidTier";
     public const string SessionStart = "SessionStart";
     public const string Cheat = "Cheat";
+    public const string Assist = "Assist";
     public const string SessionEnd = "SessionEnd";
     public const string SceneEntered = "SceneEntered";
     public const string PlayerDied = "PlayerDied";

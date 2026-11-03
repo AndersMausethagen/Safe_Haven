@@ -77,7 +77,7 @@ public sealed class ExperienceHud : MonoBehaviour
         float share = progress.IsMaxLevel(settings) ? 1f : progress.Experience / (float)settings.ExperienceToNext(progress.Level);
         fill.anchorMax = new Vector2(Mathf.Clamp01(share), 1f);
         int points = progress.UnspentPoints(settings);
-        level.text = points > 0 ? $"Lv {progress.Level}  <color=#8BE08B>+{points} (N)</color>" : $"Lv {progress.Level}";
+        level.text = points > 0 ? GameInput.WithRebinds($"Lv {progress.Level}  <color=#8BE08B>+{points} (N)</color>") : $"Lv {progress.Level}";
 
         float age = Time.unscaledTime - gainAt;
         gain.gameObject.SetActive(age < GainSeconds);

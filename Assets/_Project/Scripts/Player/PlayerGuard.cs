@@ -163,7 +163,7 @@ public sealed class PlayerGuard : MonoBehaviour, IHitGuard
 
         float cost = damage.Amount * Rules.BlockStaminaPerDamage;
         GuardOutcome outcome = GuardRules.Resolve(IsGuarding, Time.time - raisedAt, transform.forward, damage.Direction,
-            Rules.BlockArc, Rules.ParryWindow, stamina != null ? stamina.Current : float.PositiveInfinity, cost);
+            Rules.BlockArc, Rules.ParryWindow * GameOptions.TimingShare, stamina != null ? stamina.Current : float.PositiveInfinity, cost);
         switch (outcome)
         {
             case GuardOutcome.Parried:

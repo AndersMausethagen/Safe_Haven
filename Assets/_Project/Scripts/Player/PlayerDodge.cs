@@ -206,7 +206,7 @@ public sealed class PlayerDodge : MonoBehaviour
         if (settings.DodgeInvulnerability * shape.invulnerability > 0f)
         {
             health.AddInvulnerability(this);
-            invulnerableUntil = Time.time + settings.DodgeInvulnerability * shape.invulnerability;
+            invulnerableUntil = Time.time + settings.DodgeInvulnerability * shape.invulnerability * GameOptions.TimingShare;
         }
 
         if (style == DodgeStyle.HeavyRoll && shoulderBarge != null)

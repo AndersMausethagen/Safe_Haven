@@ -16,7 +16,7 @@ using TMPro;
 public sealed class ResourceInventoryPanel : MonoBehaviour
 {
     private const string EmptyMessage = "Nothing gathered here yet.";
-    private const string NothingFoundMessage = "Nothing gathered yet. Press E next to a tree, rock or plant to gather it.";
+    private static string NothingFoundMessage => $"Nothing gathered yet. Press {GameInput.KeyLabel(GameInput.Interact)} next to a tree, rock or plant to gather it.";
 
     [Tooltip("Left empty, the first ResourceInventory in the scene is used.")]
     [SerializeField] private ResourceInventory inventory;

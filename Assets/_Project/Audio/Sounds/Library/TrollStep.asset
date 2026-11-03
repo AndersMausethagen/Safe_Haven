@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: TrollStep
   m_EditorClassIdentifier: SafeHaven::SoundDefinition
   displayName: Troll Step
+  caption: Heavy footsteps
   clips:
   - {fileID: 8300000, guid: 79596768e555ce44c8c5abf4338f6a80, type: 3}
   - {fileID: 8300000, guid: 76c400206ba8e454ebe3149e4d2a7a66, type: 3}
@@ -29,3 +30,4 @@ MonoBehaviour:
   maxAtOnce: 2
   minimumGap: 0.03
   priority: 1
+  takesTheMix: 0

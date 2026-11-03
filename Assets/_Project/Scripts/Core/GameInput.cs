@@ -114,6 +114,38 @@ public static class GameInput
     /// <summary>Where the pointer (mouse, pen, touch) is on the screen.</summary>
     public static Vector2 PointerPosition => Point.ReadValue<Vector2>();
 
+    /// <summary>
+    /// Text with a key written in it ("Open your bag (B)", "[E] Interact") as it is for this player: a key they have rebound shows
+    /// as the new one. Text and quests are written with the default keys, so nothing has to mark them. Costs nothing without a rebind.
+    /// </summary>
+    public static string WithRebinds(string text)
+    {
+        if (string.IsNullOrEmpty(text) || (text.IndexOf('(') < 0 && text.IndexOf('[') < 0))
+        {
+            return text;
+        }
+
+        // Through a stand-in, as two keys can swap: E to Q must not then go on to Q's new key.
+        InputBinding group = InputBinding.MaskByGroup(KeyboardMouse);
+        foreach (InputAction action in PlayerMap.actions)
+        {
+            for (int i = 0; i < action.bindings.Count; i++)
+            {
+                InputBinding binding = action.bindings[i];
+                if (string.IsNullOrEmpty(binding.overridePath) || binding.isComposite || binding.isPartOfComposite || !group.Matches(binding))
+                {
+                    continue;
+                }
+
+                string was = InputControlPath.ToHumanReadableString(binding.path, InputControlPath.HumanReadableStringOptions.OmitDevice);
+                string now = action.GetBindingDisplayString(i, InputBinding.DisplayStringOptions.DontIncludeInteractions);
+                text = text.Replace($"({was})", $"(\u0001{now})").Replace($"[{was}]", $"[\u0001{now}]");
+            }
+        }
+
+        return text.Replace("\u0001", "");
+    }
+
     /// <summary>The key or button that triggers <paramref name="action"/> for keyboard and mouse, as shown to the player
     /// ("Q", "MMB"): its first binding in that scheme, so it follows a rebinding. Empty when there is none.</summary>
     public static string KeyLabel(InputAction action)

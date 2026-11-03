@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Crow Wings
   m_EditorClassIdentifier: SafeHaven::SoundDefinition
   displayName: 
+  caption: Crows take flight
   clips:
   - {fileID: 8300000, guid: a97de50bd73fb7b4f801552e8f4fe8fe, type: 3}
   - {fileID: 8300000, guid: 746bf3965e114fd4e92ed128be4328d5, type: 3}
@@ -27,3 +28,4 @@ MonoBehaviour:
   maxAtOnce: 2
   minimumGap: 0.03
   priority: 0
+  takesTheMix: 0

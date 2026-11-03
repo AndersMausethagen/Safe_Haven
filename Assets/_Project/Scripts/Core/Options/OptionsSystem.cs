@@ -30,11 +30,13 @@ public sealed class OptionsSystem : MonoBehaviour, IGameSystem
         GraphicsOptions.Apply();
         ApplyLook();
         GameOption.AnyChanged += OnChanged;
+        Player.Spawned += ApplyAssists;
     }
 
     private void OnDestroy()
     {
         GameOption.AnyChanged -= OnChanged;
+        Player.Spawned -= ApplyAssists;
         if (lookProfile != null)
         {
             Destroy(lookProfile);
@@ -52,6 +54,8 @@ public sealed class OptionsSystem : MonoBehaviour, IGameSystem
         AudioListener.volume = !focused && GameOptions.MuteUnfocused.On ? 0f : 1f;
     }
 
+    private static void ApplyAssists(Player player) => player.Health.DamageTakenMultiplier = GameOptions.DamageTakenShare;
+
     private void OnChanged(GameOption option)
     {
         if (option == GameOptions.Preset)
@@ -63,7 +67,11 @@ public sealed class OptionsSystem : MonoBehaviour, IGameSystem
             GameOptions.Preset.Value = GameOptions.MatchingPreset();
         }
 
-        if (option == GameOptions.UiScale)
+        if (option == GameOptions.DamageTaken && Player.Current != null)
+        {
+            ApplyAssists(Player.Current);
+        }
+        else if (option == GameOptions.UiScale)
         {
             UIRoot.ApplyScaleEverywhere();
         }

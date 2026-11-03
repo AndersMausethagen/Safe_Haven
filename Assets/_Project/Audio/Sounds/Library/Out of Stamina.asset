@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Out of Stamina
   m_EditorClassIdentifier: SafeHaven::SoundDefinition
   displayName: Out of Stamina
+  caption: Out of breath
   clips:
   - {fileID: 8300000, guid: ee92e2ab68d1c43468a011b9a0e685b7, type: 3}
   - {fileID: 8300000, guid: d6b5ca97e3d68e941872883b172a8c87, type: 3}
@@ -26,3 +27,4 @@ MonoBehaviour:
   maxAtOnce: 1
   minimumGap: 0.03
   priority: 1
+  takesTheMix: 0

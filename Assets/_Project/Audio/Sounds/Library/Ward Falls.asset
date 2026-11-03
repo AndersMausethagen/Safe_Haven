@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Ward Falls
   m_EditorClassIdentifier: SafeHaven::SoundDefinition
   displayName: 
+  caption: The ward falls
   clips:
   - {fileID: 8300000, guid: d73f30e980ced8046bbbbacc6d0676a1, type: 3}
   channel: 2

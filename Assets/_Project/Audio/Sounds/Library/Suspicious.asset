@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Suspicious
   m_EditorClassIdentifier: SafeHaven::SoundDefinition
   displayName: Suspicious
+  caption: Something is listening
   clips:
   - {fileID: 8300000, guid: 0808e4bff5ac51947b1ec9126d1e994c, type: 3}
   - {fileID: 8300000, guid: f3f23b60649da3d4bb40eec9841c3b91, type: 3}
@@ -27,3 +28,4 @@ MonoBehaviour:
   maxAtOnce: 2
   minimumGap: 0.03
   priority: 1
+  takesTheMix: 0

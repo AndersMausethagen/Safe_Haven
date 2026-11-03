@@ -629,6 +629,7 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
         source.volume *= VolumeForSize(size);
         source.clip = clip;
         source.Play();
+        SoundCaptions.Heard(sound, position);
         if (sound.TakesTheMix && clip != null)
         {
             roomHeldUntil = Mathf.Max(roomHeldUntil, Time.unscaledTime + clip.length / Mathf.Max(0.1f, Mathf.Abs(source.pitch)));

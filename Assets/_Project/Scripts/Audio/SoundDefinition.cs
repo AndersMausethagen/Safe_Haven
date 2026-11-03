@@ -31,6 +31,8 @@ public sealed class SoundDefinition : ScriptableObject
 {
     [Tooltip("Shown in the editor. Falls back to the asset name when empty.")]
     [SerializeField] private string displayName;
+    [Tooltip("Written on the screen when it plays, if the player has Sound Captions on: \"Something has seen you\". Empty for all but sounds worth knowing about.")]
+    [SerializeField] private string caption;
     [Tooltip("One is picked at random each time the sound plays.")]
     [SerializeField] private List<AudioClip> clips = new List<AudioClip>();
     [Tooltip("Which volume setting controls it.")]
@@ -66,6 +68,7 @@ public sealed class SoundDefinition : ScriptableObject
     public AudioChannel Channel => channel;
     public float Volume => volume;
     public bool Positional => positional;
+    public string Caption => caption;
     public float FullVolumeDistance => fullVolumeDistance;
     public float AudibleDistance => Mathf.Max(audibleDistance, fullVolumeDistance + 0.1f);
     public int MaxAtOnce => maxAtOnce;

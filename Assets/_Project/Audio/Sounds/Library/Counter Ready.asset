@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Counter Ready
   m_EditorClassIdentifier: SafeHaven::SoundDefinition
   displayName: Counter Ready
+  caption: Counter ready
   clips:
   - {fileID: 8300000, guid: 1af65f8d23a569348ae1ab3adf4f3a65, type: 3}
   - {fileID: 8300000, guid: 518f3ff21486fd9419268dd6b8ff271c, type: 3}
@@ -26,3 +27,4 @@ MonoBehaviour:
   maxAtOnce: 1
   minimumGap: 0.03
   priority: 1
+  takesTheMix: 0

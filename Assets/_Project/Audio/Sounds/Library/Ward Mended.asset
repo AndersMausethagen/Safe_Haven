@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Ward Mended
   m_EditorClassIdentifier: SafeHaven::SoundDefinition
   displayName: 
+  caption: The ward is whole again
   clips:
   - {fileID: 8300000, guid: 49e337a5622782b458c0e5b5212176ef, type: 3}
   channel: 2

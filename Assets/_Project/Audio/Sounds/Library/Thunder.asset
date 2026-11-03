@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Thunder
   m_EditorClassIdentifier: SafeHaven::SoundDefinition
   displayName: Thunder
+  caption: Thunder
   clips:
   - {fileID: 8300000, guid: 690509d21637ef94696e407628ea908d, type: 3}
   channel: 2
@@ -23,3 +24,6 @@ MonoBehaviour:
   fullVolumeDistance: 3
   audibleDistance: 35
   maxAtOnce: 2
+  minimumGap: 0.03
+  priority: 1
+  takesTheMix: 0

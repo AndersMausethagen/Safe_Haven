@@ -81,7 +81,8 @@ public sealed class ItemSlotView : MonoBehaviour,
             : "";
         if (tierLabel != null)
         {
-            tierLabel.text = GearGlow.CornerText(stack);
+            string rare = filled && GameOptions.RarityLetters.On && stack.Item.Rarity != ItemRarity.Common ? Rarity.NameOf(stack.Item.Rarity).Substring(0, 1) : "";
+            tierLabel.text = rare.Length > 0 ? $"{GearGlow.CornerText(stack)} {rare}" : GearGlow.CornerText(stack);
             tierLabel.color = filled ? Tiers.ColorOf(stack.Item.Tier) : Color.clear;
         }
 

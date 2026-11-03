@@ -34,6 +34,10 @@ public sealed class PlaytestLogger : MonoBehaviour, IGameSystem
     public void OnSceneEntered(Scene scene)
     {
         Write(PlaytestLog.SceneEntered, scene.name);
+        if (!string.IsNullOrEmpty(GameOptions.AssistsInUse))
+        {
+            Write(PlaytestLog.Assist, GameOptions.AssistsInUse);
+        }
     }
 
     private void Update()

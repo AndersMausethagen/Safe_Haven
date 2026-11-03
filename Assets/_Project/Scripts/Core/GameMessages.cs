@@ -25,7 +25,7 @@ public static class GameMessages
     {
         if (!string.IsNullOrEmpty(text))
         {
-            Posted?.Invoke(text, kind);
+            Posted?.Invoke(GameInput.WithRebinds(text), kind);
         }
     }
 }

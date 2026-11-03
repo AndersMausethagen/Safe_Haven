@@ -123,7 +123,7 @@ public sealed class AttackTelegraph : MonoBehaviour
     // The last moment before the hit is the time to raise the guard: the fill turns the parry color and the attacker glints.
     private void UpdateParryCue(float elapsed)
     {
-        float window = CombatTechniqueSettings.Current.ParryWindow;
+        float window = CombatTechniqueSettings.Current.ParryWindow * GameOptions.TimingShare;
         if (cued || window <= 0f || attack.HitDelay <= window || elapsed < attack.HitDelay - window || elapsed >= attack.HitDelay)
         {
             return;
@@ -150,7 +150,7 @@ public sealed class AttackTelegraph : MonoBehaviour
         progress = Mathf.Clamp01(progress);
         fill.localScale = new Vector3(progress, 1f, progress);
         Color color = CombatFeelSettings.Current.TelegraphFillColor;
-        float window = CombatTechniqueSettings.Current.ParryWindow;
+        float window = CombatTechniqueSettings.Current.ParryWindow * GameOptions.TimingShare;
         if (attack != null && attack.HitDelay > window && progress >= 1f - window / attack.HitDelay && progress < 1f)
         {
             color = CombatFeelSettings.Current.ParryCueColor;

@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Guard Break
   m_EditorClassIdentifier: SafeHaven::SoundDefinition
   displayName: Guard Break
+  caption: Your guard breaks
   clips:
   - {fileID: 8300000, guid: 4e0c2b32063434242b5772f86a5c6ac5, type: 3}
   - {fileID: 8300000, guid: f0ac97e466782c241bb98ae5a81eca11, type: 3}
@@ -28,3 +29,4 @@ MonoBehaviour:
   maxAtOnce: 2
   minimumGap: 0.03
   priority: 2
+  takesTheMix: 0

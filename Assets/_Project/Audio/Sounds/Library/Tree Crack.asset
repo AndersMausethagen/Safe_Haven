@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Tree Crack
   m_EditorClassIdentifier: SafeHaven::SoundDefinition
   displayName: Tree Crack
+  caption: A tree is coming down
   clips:
   - {fileID: 8300000, guid: e96946f9fb11ff74db641a3620f91bef, type: 3}
   - {fileID: 8300000, guid: 0a0873dfe622b2248bca443f6653be6e, type: 3}
@@ -27,3 +28,4 @@ MonoBehaviour:
   maxAtOnce: 2
   minimumGap: 0.03
   priority: 1
+  takesTheMix: 0

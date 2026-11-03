@@ -128,7 +128,7 @@ public sealed class QuestTrackerView : MonoBehaviour
             builder.Append($"\n\n<color={Muted}>+{active.Count + available.Count - maxQuests} more</color>");
         }
 
-        label.text = builder.ToString();
+        label.text = GameInput.WithRebinds(builder.ToString());
     }
 
     private static string Title(QuestDefinition quest)

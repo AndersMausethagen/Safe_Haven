@@ -198,6 +198,7 @@ public sealed class DialogueBox : MonoBehaviour
     /// <summary>Shows a line; <paramref name="done"/> runs when the player moves on. Without a follow-up the box closes.</summary>
     public void Say(DialogueSpeaker speaker, string line, Action done = null, float subtitleTimeMultiplier = 1f)
     {
+        line = GameInput.WithRebinds(line);
         this.subtitleTimeMultiplier = Mathf.Clamp(subtitleTimeMultiplier, 1f, 2f);
         if (!IsOpen && MonsterAI.AnyHuntingPlayerSide())
         {
