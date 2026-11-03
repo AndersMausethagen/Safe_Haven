@@ -114,7 +114,10 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics
     }
 
     /// <summary>What they do with their hands at work.</summary>
-    public EmoteDefinition WorkGesture => resident != null ? GameSession.Settlement.Find(resident)?.Job?.WorkGesture : null;
+    public EmoteDefinition WorkGesture => Job?.WorkGesture;
+
+    /// <summary>The job they hold now, or null.</summary>
+    public JobDefinition Job => resident != null ? GameSession.Settlement.Find(resident)?.Job : null;
 
     /// <summary>Who they are and what they do (when nothing before it spoke), and the jobs they can take as answers.</summary>
     public void AddTopics(MenuPage page, DialogueSpeaker speaker, Action afterAnswer)
@@ -131,10 +134,11 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics
             body.Append("\n\n").Append(current != null
                 ? $"<color=#E8C46A>Works as the {current.DisplayName}.</color> {current.Description}"
                 : "<color=#E8C46A>Has no job yet.</color>");
-            page.Body = body.ToString();
+            string grief = Grief();
+            page.Body = grief != null ? grief + "\n\n" + body : body.ToString();
         }
 
-        foreach (JobDefinition job in resident.Jobs)
+        foreach (JobDefinition job in GameSession.Settlement.JobsOpenTo(resident))
         {
             if (job == null)
             {
@@ -148,6 +152,20 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics
                 DialogueBox.Current.Say(speaker, string.IsNullOrWhiteSpace(job.AcceptLine) ? DefaultAcceptLine : job.AcceptLine, afterAnswer);
             }));
         }
+    }
+
+    // They speak of whoever was lost for a while, each in the same words.
+    private string Grief()
+    {
+        SettlementSettings settings = SettlementSettings.Current;
+        FallenRecord loss = GameSession.Settlement.RecentLoss(settings.GriefRaids);
+        if (loss == null || settings.GriefLines.Length == 0)
+        {
+            return null;
+        }
+
+        int line = Mathf.Abs(resident.Id.GetHashCode()) % settings.GriefLines.Length;
+        return string.Format(settings.GriefLines[line], loss.Resident.DisplayName);
     }
 
     private void Assign(JobDefinition job, GameObject user) => GiveJob(resident, job, user);

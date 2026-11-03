@@ -180,3 +180,11 @@ MonoBehaviour:
     site: 3
   - group: Mistwings
     site: 3
+  setPieces:
+  - {fileID: 11400000, guid: bffb9f981cdf88a49826d1a444e914fa, type: 2}
+  - {fileID: 11400000, guid: e7a15e046a003a348a556a72b6944648, type: 2}
+  - {fileID: 11400000, guid: e433b9e888e511d4c8743cc6a40c672a, type: 2}
+  - {fileID: 11400000, guid: ecc457a08ccf79d44ac808eccda7aea0, type: 2}
+  - {fileID: 11400000, guid: 597468cf871861d42a719da44dba108a, type: 2}
+  - {fileID: 11400000, guid: ea87a51a33af07646be878c32e34697e, type: 2}
+  campPieces: {x: 1, y: 2}

@@ -105,8 +105,12 @@ public static class RaidLauncher
     /// Sends the player into the raid with the chosen modifier items (each kind once, one of it used up) and Portal Sparks.
     /// Returns false, with a reason for the player, when it can't.
     /// </summary>
+    /// <summary>True for someone who lives in the Haven and knows how to fight on a raid.</summary>
+    public static bool CanGoAlong(ResidentDefinition person) =>
+        person != null && person.RaidCompanion != null && GameSession.Settlement.Find(person) != null;
+
     public static bool TryLaunch(RaidDefinition raid, GameObject player, IEnumerable<ItemDefinition> modifierItems, out string problem,
-        int sparks = 0, int? seed = null, RaidDifficulty difficulty = null)
+        int sparks = 0, int? seed = null, RaidDifficulty difficulty = null, ResidentDefinition companion = null)
     {
         problem = CheckLaunch(raid);
         difficulty ??= raid != null ? raid.LowestDifficulty : null;
@@ -160,6 +164,8 @@ public static class RaidLauncher
             modifiers.Add(item.RaidModifier);
         }
 
+        SaveGameService.SaveBeforeRaid(raid);
+
         // The seed is usually rolled when the briefing opens, so the hour it shows is the hour the raid gets.
         int runSeed = seed ?? RaidSession.NewSeed();
         RaidParameters parameters = RaidParameters.Calculate(raid, modifiers, ExtraSeconds(sparks), RaidTimeOfDay.For(raid, runSeed), difficulty, ExtractionCut);
@@ -172,6 +178,7 @@ public static class RaidLauncher
         var session = new RaidSession(raid, modifiers, parameters, loadout, SceneManager.GetActiveScene().name, sparks, runSeed, difficulty)
         {
             GearScoreAtEntry = GearScore.Of(player),
+            Companion = CanGoAlong(companion) ? companion : null,
         };
         GameSession.BeginRaid(session);
         GameSession.CarryPlayerState(loadout);

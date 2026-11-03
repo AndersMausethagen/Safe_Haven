@@ -11,6 +11,7 @@ using UnityEngine.AI;
 public static class RaidMapGenerator
 {
     public const string PondsName = "Ponds";
+    public const string PiecesName = "Set Pieces";
 
     private const float RockClearing = 3f;
     private const float ReachSample = 8f;
@@ -52,6 +53,7 @@ public static class RaidMapGenerator
         PlaceAnchors(plan, terrain, World);
         PlaceFog(map, plan, World);
         RaidMapSurface.SnapToGround(map.Content, terrain);
+        PlacePieces(map, plan, terrain, position => World(position));
 
         var rumours = new List<Vector3>();
         foreach (RaidSite site in plan.SitesOf(RaidSiteKind.Rumour))
@@ -60,6 +62,34 @@ public static class RaidMapGenerator
         }
 
         return rumours;
+    }
+
+    // Each part of a set-piece stands on the ground by itself, so a ruin sits into the hill and doesn't hang off it. Laid out anew, it starts over.
+    private static void PlacePieces(RaidMap map, RaidLayoutPlan plan, Terrain terrain, System.Func<Vector2, Vector3> world)
+    {
+        Transform old = map.transform.Find(PiecesName);
+        if (old != null)
+        {
+            old.SetParent(null);
+            Object.Destroy(old.gameObject);
+        }
+
+        var holder = new GameObject(PiecesName).transform;
+        holder.SetParent(map.transform, false);
+        foreach (RaidLayoutPiece piece in plan.Pieces)
+        {
+            Vector3 at = world(piece.Position / plan.Size);
+            GameObject made = Object.Instantiate(piece.Definition.Prefab, at, Quaternion.Euler(0f, piece.Turn, 0f), holder);
+            made.name = piece.Definition.DisplayName;
+            foreach (Transform part in made.transform)
+            {
+                Vector3 position = part.position;
+                position.y = terrain.SampleHeight(position) + terrain.transform.position.y + part.localPosition.y;
+                part.position = position;
+            }
+
+            made.AddComponent<RaidSetPieceSite>().Bind(piece.Definition);
+        }
     }
 
     private static void PlaceStart(RaidMap map, RaidLayoutPlan plan, System.Func<Vector2, Vector3> world)

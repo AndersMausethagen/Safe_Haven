@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 29829ad09c7ec8b4a88f9fd809bb3633, type: 3}
+  m_Name: Burnt Farmstead
+  m_EditorClassIdentifier: SafeHaven::RaidSetPieceDefinition
+  id: burnt_farmstead
+  displayName: Burnt Farmstead
+  prefab: {fileID: 6129885625216382527, guid: d549f8510f79ec8498b5133f630e19d5, type: 3}
+  radius: 11
+  weight: 1
+  holdsRumours: 1
+  alwaysThere: 0
+  moods: []
+  guards:
+  - prefab: {fileID: 8653230728158633359, guid: a661dc05d2e43f943a476376f636ef9a, type: 3}
+    count: 2
+    fromTier: 1
+  - prefab: {fileID: 9066855856663566298, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
+    count: 2
+    fromTier: 2

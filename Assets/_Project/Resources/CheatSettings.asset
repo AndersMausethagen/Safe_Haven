@@ -27,6 +27,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 2f66a8d86463697438ce75621f51e12d, type: 2}
   - {fileID: 11400000, guid: 20c7f11cbb9bb214f95fc0f2a51db9d9, type: 2}
   - {fileID: 11400000, guid: 1fc74e15f41da234fb9eeedcfe1067f0, type: 2}
+  - {fileID: 11400000, guid: d0d3ffee305a6ca489fca58781bf31c1, type: 2}
   raids:
   - {fileID: 11400000, guid: 4c3002f5090022648994d853c2583c8b, type: 2}
   - {fileID: 11400000, guid: cf0ccb14a6b57b643943133b2b29878a, type: 2}

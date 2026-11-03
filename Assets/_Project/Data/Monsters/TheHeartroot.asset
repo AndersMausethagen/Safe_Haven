@@ -1,0 +1,225 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42e5c6da77934e8439571a13e158376a, type: 3}
+  m_Name: TheHeartroot
+  m_EditorClassIdentifier: Assembly-CSharp::MonsterDefinition
+  id: the_heartroot
+  displayName: The Heartroot
+  description: The first of the guardians, grown old and vast under its hollow. It was set here to keep the forest. Nobody has told it the forest is gone.
+  combatStats: {fileID: 11400000, guid: 8cdd8f1bebd24cf4ba228b9984956e44, type: 2}
+  faction: 1
+  drops:
+    entries:
+    - item: {fileID: 11400000, guid: 4af99768b5986d94e8882065ffe24693, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 1
+    - item: {fileID: 11400000, guid: 183fddc5567e8b8479fcb1618e73496c, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 2
+      maxQuantity: 4
+      probability: 1
+    - item: {fileID: 11400000, guid: 8f121a970bae6f54dbcc8ff5e2c2a48e, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 2
+      probability: 0.5
+    - item: {fileID: 0}
+      resource: {fileID: 11400000, guid: c0e409a7cd38400498ff1c7037737b96, type: 2}
+      minQuantity: 3
+      maxQuantity: 4
+      probability: 1
+  unlocksRecipes:
+  - {fileID: 11400000, guid: 30fe3ac3f65358e44863a3525d085df8, type: 2}
+  - {fileID: 11400000, guid: c6287ae55a5d905479e912ccf2302294, type: 2}
+  - {fileID: 11400000, guid: 3f7803232b50e354a8dc761eb093ddde, type: 2}
+  - {fileID: 11400000, guid: 78d155ea180e0304ebc63416e467734c, type: 2}
+  animatorController: {fileID: 9100000, guid: 51388376d31e4294bb24b0004412608d, type: 2}
+  prefab: {fileID: 9066855856663566298, guid: cb1948ff0636dbc47a1c17a2ab2c8d6b, type: 3}
+  experience: 400
+  neverElite: 1
+  attack: {fileID: 11400000, guid: c866deecfbabf0a459e469b04f3856f7, type: 2}
+  attackDamage: 38
+  attackCooldown: 1.6
+  moveSpeed: 3.2
+  detectionRange: 40
+  chaseRange: 70
+  leashRange: 70
+  sightAngle: 100
+  closeSenseRange: 2.5
+  hearing: 0.7
+  alertness: 0.7
+  attacks:
+  - attack: {fileID: 11400000, guid: c866deecfbabf0a459e469b04f3856f7, type: 2}
+    kind: 0
+    damage: 46
+    minimumRange: 0
+    maximumRange: 2.0400002
+    priority: 12
+    cooldown: 1.1
+    interruptible: 0
+    leadTarget: 0
+    fromTier: 0
+    fromPhase: 2
+    followUps: []
+    comboChance: 0.5
+    comboGap: 0.2
+    comboFromTier: 0
+    holdChance: 0
+    holdSeconds: 0.45
+    projectilePrefab: {fileID: 0}
+    burstCount: 1
+    burstInterval: 0
+    projectileSpeed: 0
+    projectileRadius: 0
+    chargeSpeed: 0
+    chargeDistance: 0
+    exposedSeconds: 0
+    leapHeight: 0
+    buffRadius: 0
+    buffSeconds: 0
+    damageBonus: 0
+    packLeaderOnly: 0
+    summonPrefab: {fileID: 0}
+    summonCount: 0
+    summonRadius: 0
+    summonLimit: 0
+  - attack: {fileID: 11400000, guid: c866deecfbabf0a459e469b04f3856f7, type: 2}
+    kind: 0
+    damage: 40
+    minimumRange: 0
+    maximumRange: 2.0400002
+    priority: 10
+    cooldown: 1.8
+    interruptible: 0
+    leadTarget: 0
+    fromTier: 0
+    fromPhase: 0
+    followUps: []
+    comboChance: 0.5
+    comboGap: 0.2
+    comboFromTier: 0
+    holdChance: 0
+    holdSeconds: 0.45
+    projectilePrefab: {fileID: 0}
+    burstCount: 1
+    burstInterval: 0
+    projectileSpeed: 0
+    projectileRadius: 0
+    chargeSpeed: 0
+    chargeDistance: 0
+    exposedSeconds: 0
+    leapHeight: 0
+    buffRadius: 0
+    buffSeconds: 0
+    damageBonus: 0
+    packLeaderOnly: 0
+    summonPrefab: {fileID: 0}
+    summonCount: 0
+    summonRadius: 0
+    summonLimit: 0
+  - attack: {fileID: 11400000, guid: 1f6c9861d61de264185ac536010f1378, type: 2}
+    kind: 0
+    damage: 54
+    minimumRange: 0
+    maximumRange: 3.6
+    priority: 15
+    cooldown: 7
+    interruptible: 0
+    leadTarget: 0
+    fromTier: 0
+    fromPhase: 1
+    followUps: []
+    comboChance: 0.5
+    comboGap: 0.2
+    comboFromTier: 0
+    holdChance: 0
+    holdSeconds: 0.45
+    projectilePrefab: {fileID: 0}
+    burstCount: 1
+    burstInterval: 0
+    projectileSpeed: 0
+    projectileRadius: 0
+    chargeSpeed: 0
+    chargeDistance: 0
+    exposedSeconds: 0
+    leapHeight: 0
+    buffRadius: 0
+    buffSeconds: 0
+    damageBonus: 0
+    packLeaderOnly: 0
+    summonPrefab: {fileID: 0}
+    summonCount: 0
+    summonRadius: 0
+    summonLimit: 0
+  - attack: {fileID: 11400000, guid: 45c1f4c4e91021a40ba94d2eb49722ff, type: 2}
+    kind: 4
+    damage: 0
+    minimumRange: 2
+    maximumRange: 11
+    priority: 22
+    cooldown: 16
+    interruptible: 1
+    leadTarget: 0
+    fromTier: 0
+    fromPhase: 1
+    followUps: []
+    comboChance: 0.5
+    comboGap: 0.2
+    comboFromTier: 0
+    holdChance: 0
+    holdSeconds: 0.45
+    projectilePrefab: {fileID: 0}
+    burstCount: 1
+    burstInterval: 0
+    projectileSpeed: 0
+    projectileRadius: 0
+    chargeSpeed: 0
+    chargeDistance: 0
+    exposedSeconds: 0
+    leapHeight: 0
+    buffRadius: 0
+    buffSeconds: 0
+    damageBonus: 0
+    packLeaderOnly: 0
+    summonPrefab: {fileID: 3085881180223279310, guid: 049004d8140885f4db2790503b4ab12d, type: 3}
+    summonCount: 2
+    summonRadius: 3
+    summonLimit: 4
+  movementTactic: 0
+  temperament: 1
+  preferredDistance: 7
+  distanceTolerance: 1.5
+  fleeHealthFraction: 0.25
+  fleeDistance: 10
+  defensiveRadius: 8
+  hoverHeight: 0
+  idleWanderRadius: 0
+  idlePauseSeconds: {x: 3, y: 8}
+  idleWalkSpeed: 0.4
+  idleGrazeChance: 0
+  idleSleepChance: 0
+  idleSleepAttention: 0.3
+  canBeFinished: 0
+  flankSpread: 0
+  poise: 320
+  openWhileStriking: 0
+  parriesBackstabs: 0
+  shieldArc: 0
+  shieldLetsThrough: 0.25
+  bleeds: 1
+  bloodColor: {r: 0.16, g: 0.2, b: 0.05, a: 0.95}
+  ragdollOnDeath: 1
+  deathSound: {fileID: 0}
+  hurtSound: {fileID: 0}
+  attackSound: {fileID: 0}

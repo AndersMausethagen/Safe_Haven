@@ -166,6 +166,13 @@ public sealed class RaidPreparationWindow : MonoBehaviour
     private TMP_Text sparksOwned;
     private Button fewerSparks;
     private Button moreSparks;
+    private TMP_Text companionHeading;
+    private GameObject companionRow;
+    private RectTransform companionRowRect;
+    private TMP_Text companionName;
+    private TMP_Text companionRisk;
+    private readonly List<ResidentDefinition> companions = new List<ResidentDefinition>();
+    private ResidentDefinition companion;
     private TMP_Text modifiersHeading;
     private TMP_Text modifiersNote;
     private TMP_Text noModifiers;
@@ -219,6 +226,7 @@ public sealed class RaidPreparationWindow : MonoBehaviour
         destinationIndex = 0;
         difficulty = null;
         sparks = 0;
+        companion = null;
         // Rolled now, so the briefing shows the hour (and layout) the raid will really have.
         pendingSeed = RaidSession.NewSeed();
         Watch(user != null ? user.GetComponentInParent<ItemInventory>() : null);
@@ -346,6 +354,50 @@ public sealed class RaidPreparationWindow : MonoBehaviour
     {
         difficulty = tier;
         Refresh();
+    }
+
+    private void StepCompanion(int step)
+    {
+        // Going alone is one of the places in the list.
+        int at = companions.IndexOf(companion);
+        int count = companions.Count + 1;
+        at = (at + 1 + step + count) % count;
+        companion = at == 0 ? null : companions[at - 1];
+        Refresh();
+    }
+
+    private float DrawCompanion(float y)
+    {
+        companions.Clear();
+        foreach (ResidentRecord record in GameSession.Settlement.Residents)
+        {
+            if (RaidLauncher.CanGoAlong(record.Resident))
+            {
+                companions.Add(record.Resident);
+            }
+        }
+
+        bool any = companions.Count > 0;
+        companionHeading.gameObject.SetActive(any);
+        companionRow.SetActive(any);
+        companionRisk.gameObject.SetActive(any);
+        if (!any)
+        {
+            companion = null;
+            return y;
+        }
+
+        if (!companions.Contains(companion))
+        {
+            companion = null;
+        }
+
+        y = Stack(companionHeading, y, HeadingHeight);
+        y = Stack(companionRowRect, y, 46f);
+        companionName.text = companion != null ? companion.DisplayName : "Going alone";
+        companionRisk.text = companion == null ? "One person can go with you."
+            : $"Help them up within {companion.RaidCompanion.BleedOutSeconds:0} seconds if they fall, or {companion.DisplayName} is gone for good.";
+        return Stack(companionRisk, y, 26f, SectionGap);
     }
 
     private void StepSparks(int step)
@@ -591,6 +643,7 @@ public sealed class RaidPreparationWindow : MonoBehaviour
             DrawSparks();
         }
 
+        y = DrawCompanion(y);
         bool any = modifierContent.sizeDelta.y > 0f;
         Stack(modifiersHeading, y, HeadingHeight);
         Stack(modifiersNote, y + 2f, 26f);
@@ -821,6 +874,14 @@ public sealed class RaidPreparationWindow : MonoBehaviour
         sparksIcon.raycastTarget = false;
         sparksOwned = Label("Label", owned, 38f, 0f, 172f, 46f, 18f, style.Text);
         Hover(owned.gameObject, () => tooltip.ShowDefinition(SettlementSettings.Current.PortalSpark));
+
+        companionHeading = Heading("Companion", part, RightColumn, 0f, ColumnWidth, style);
+        companionRowRect = At("Companion", part, RightColumn, 0f, ColumnWidth, 46f);
+        companionRow = companionRowRect.gameObject;
+        AddButton("Previous", companionRowRect, 0f, 0f, 46f, UIRole.Kind.Button, () => StepCompanion(-1), out Button previous).text = "<";
+        companionName = Label("Name", companionRowRect, 50f, 0f, 230f, 46f, 20f, style.Text, TextAlignmentOptions.Center);
+        AddButton("Next", companionRowRect, 284f, 0f, 46f, UIRole.Kind.Button, () => StepCompanion(1), out Button next).text = ">";
+        companionRisk = Paragraph("Risk", part, RightColumn, 0f, ColumnWidth, 26f, 15f, style.Muted);
 
         modifiersHeading = Heading("Raid modifiers", part, RightColumn, 0f, ColumnWidth, style);
         modifiersNote = Label("Note", part, RightColumn, 0f, ColumnWidth, 26f, 16f, style.Muted, TextAlignmentOptions.MidlineRight);

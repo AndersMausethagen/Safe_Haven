@@ -86,7 +86,8 @@ public sealed class MainMenuView : MonoBehaviour
         loadGameButton.interactable = latest != null;
         if (latest != null)
         {
-            saveInfoLabel.text = $"{latest.Name}, last saved {latest.SavedAt.ToString("d MMM yyyy, HH:mm", CultureInfo.InvariantCulture)}";
+            saveInfoLabel.text = !string.IsNullOrEmpty(latest.RaidCutShort) ? $"{latest.Name}: a raid into {latest.RaidCutShort} was cut short. Continue goes back to the portal."
+                : $"{latest.Name}, last saved {latest.SavedAt.ToString("d MMM yyyy, HH:mm", CultureInfo.InvariantCulture)}";
         }
         else
         {

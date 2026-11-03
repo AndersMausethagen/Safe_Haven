@@ -105,6 +105,8 @@ public sealed class RaidLayoutPlan
     public readonly List<RaidSite> Sites = new List<RaidSite>();
     /// <summary>The ponds, placed once everything else has its spot.</summary>
     public readonly List<RaidLayoutPond> Ponds = new List<RaidLayoutPond>();
+    /// <summary>The authored places on this map.</summary>
+    public readonly List<RaidLayoutPiece> Pieces = new List<RaidLayoutPiece>();
 
     public RaidLayoutRoom Start => Rooms[0];
 
@@ -229,12 +231,103 @@ public static class RaidLayoutPlanner
         }
 
         RaidMapMarkers.Sort(plan.Sites);
+        PlaceSetPieces(plan, rules, seed, attempt);
         PlacePonds(plan, rules, attempt);
         return plan;
     }
 
     // From their own stream, so adding water never moves a site. They go last and give way to everything already on the map:
     // beside a trail or at the edge of a clearing, so the player comes across them, and never where a trail would run through.
+    // From their own stream, so a set-piece added to the rules never moves a site. Rumours first: a reward should stand somewhere.
+    private static void PlaceSetPieces(RaidLayoutPlan plan, RaidLayoutRules rules, int seed, int attempt)
+    {
+        if (rules.SetPieces.Count == 0)
+        {
+            return;
+        }
+
+        var random = new System.Random(RaidLayout.SeedFor(seed, "Set Pieces " + attempt));
+        var used = new List<RaidSetPieceDefinition>();
+        // What is always there goes farthest from the apex: a boss's hollow shouldn't be on the great troll's round.
+        List<RaidSite> rumours = plan.SitesOf(RaidSiteKind.Rumour);
+        List<RaidSite> apex = plan.SitesOf(RaidSiteKind.Apex);
+        if (apex.Count > 0)
+        {
+            Vector2 from = apex[0].Position;
+            rumours.Sort((a, b) => Vector2.Distance(b.Position, from).CompareTo(Vector2.Distance(a.Position, from)));
+        }
+
+        foreach (RaidSite site in rumours)
+        {
+            AddPiece(plan, rules, site, true, used, random);
+        }
+
+        List<RaidSite> camps = plan.SitesOf(RaidSiteKind.EnemyCamp);
+        int wanted = random.Next(rules.CampPieces.x, rules.CampPieces.y + 1);
+        foreach (int index in RaidLayout.PickIndices(random, camps.Count, Mathf.Min(wanted, camps.Count)))
+        {
+            AddPiece(plan, rules, camps[index], false, used, random);
+        }
+    }
+
+    private static void AddPiece(RaidLayoutPlan plan, RaidLayoutRules rules, RaidSite site, bool forRumour, List<RaidSetPieceDefinition> used, System.Random random)
+    {
+        RaidSetPieceDefinition piece = PickPiece(rules, plan.Mood != null ? plan.Mood.name : "", forRumour, used, random);
+        if (piece == null)
+        {
+            return;
+        }
+
+        used.Add(piece);
+        Vector2 spot = site.Position * plan.Size;
+        plan.Pieces.Add(new RaidLayoutPiece { Definition = piece, Position = spot, Turn = Range(random, 0f, 360f) });
+        plan.Pockets.Add((spot, piece.Radius));
+    }
+
+    // By weight, and one not seen on this map yet while there is one.
+    private static RaidSetPieceDefinition PickPiece(RaidLayoutRules rules, string mood, bool forRumour, List<RaidSetPieceDefinition> used, System.Random random)
+    {
+        var fresh = new List<RaidSetPieceDefinition>();
+        var any = new List<RaidSetPieceDefinition>();
+        foreach (RaidSetPieceDefinition piece in rules.SetPieces)
+        {
+            if (piece == null || piece.Prefab == null || piece.Weight <= 0f || !piece.Suits(mood) || (forRumour && !piece.HoldsRumours))
+            {
+                continue;
+            }
+
+            if (forRumour && piece.AlwaysThere && !used.Contains(piece))
+            {
+                return piece;
+            }
+
+            any.Add(piece);
+            if (!used.Contains(piece))
+            {
+                fresh.Add(piece);
+            }
+        }
+
+        List<RaidSetPieceDefinition> from = fresh.Count > 0 ? fresh : any;
+        float total = 0f;
+        foreach (RaidSetPieceDefinition piece in from)
+        {
+            total += piece.Weight;
+        }
+
+        float roll = (float)random.NextDouble() * total;
+        foreach (RaidSetPieceDefinition piece in from)
+        {
+            roll -= piece.Weight;
+            if (roll <= 0f)
+            {
+                return piece;
+            }
+        }
+
+        return from.Count > 0 ? from[from.Count - 1] : null;
+    }
+
     private static void PlacePonds(RaidLayoutPlan plan, RaidLayoutRules rules, int attempt)
     {
         if (rules.Ponds.y <= 0)

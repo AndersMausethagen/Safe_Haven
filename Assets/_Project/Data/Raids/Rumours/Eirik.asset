@@ -15,9 +15,14 @@ MonoBehaviour:
   id: rumour.eirik
   briefing: Someone has been holding a clearing against wolves for days. Nobody knows how.
   site: {fileID: 11400000, guid: 2ade094cdbd301d46a2ef828beb12599, type: 2}
+  setPiece: {fileID: 11400000, guid: bffb9f981cdf88a49826d1a444e914fa, type: 2}
   weight: 2
   hour: 0
   seeks: {fileID: 11400000, guid: 33e7204287863854f8c6ad025490f531, type: 2}
   teaches: {fileID: 0}
   breachComing: 0
   afterExtractions: 1
+  needsBuilding: {fileID: 0}
+  needsTier: 1
+  untilBeaten: {fileID: 0}
+  urgent: 0

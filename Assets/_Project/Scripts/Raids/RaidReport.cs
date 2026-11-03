@@ -58,6 +58,9 @@ public sealed class RaidReport
     /// <summary>What became of a cart in the raid, in a sentence. Empty when there was none.</summary>
     public string TransportLine { get; set; } = "";
     public bool TransportHome { get; set; }
+    /// <summary>Who went along, or null.</summary>
+    public ResidentDefinition Companion { get; set; }
+    public bool CompanionLost { get; set; }
     /// <summary>Residents brought home by this raid.</summary>
     public List<ResidentDefinition> Rescued { get; } = new List<ResidentDefinition>();
 

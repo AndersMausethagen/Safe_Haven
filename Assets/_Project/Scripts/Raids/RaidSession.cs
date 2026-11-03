@@ -23,6 +23,10 @@ public sealed class RaidSession
 {
     private const float MinimumSecondsLeft = 15f;
 
+    /// <summary>Who goes along on this raid, or null.</summary>
+    public ResidentDefinition Companion { get; set; }
+
+
     private readonly List<string> eventLog = new List<string>();
     private float bonusSeconds;
 

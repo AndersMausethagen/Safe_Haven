@@ -147,6 +147,13 @@ public sealed class RaidDirector : MonoBehaviour
 
         running = true;
         StrengthenEnemies(true);
+        BringCompanion();
+        var pieceRandom = new System.Random(RaidLayout.SeedFor(Session.Seed, "Set Piece Guards"));
+        foreach (RaidSetPieceSite site in FindObjectsByType<RaidSetPieceSite>(FindObjectsSortMode.InstanceID))
+        {
+            site.BringGuards(this, pieceRandom);
+        }
+
         Transform start = FindAnyObjectByType<RaidMap>()?.PlayerStart;
         RaidElites.PromoteAtStart(Session, start != null ? start.position : (Vector3?)null, HealthMultiplier, PowerMultiplier);
         if (NightSettings.IsDark)
@@ -155,6 +162,31 @@ public sealed class RaidDirector : MonoBehaviour
         }
 
         GameMessages.Post($"{Session.Definition.DisplayName}: grab what you can and reach an extraction within {RaidStats.FormatTime(Session.TimeRemaining)}.");
+    }
+
+    // They walk in beside the player. Fights grow with the raid's tier and so do they, so they stay as much help as they are in the first.
+    private void BringCompanion()
+    {
+        Companion prefab = SettlementSettings.Current.RaidCompanionPrefab;
+        if (Session.Companion == null || Session.Companion.RaidCompanion == null || prefab == null || player == null)
+        {
+            return;
+        }
+
+        Vector3 beside = player.transform.position - player.transform.forward * 2f + player.transform.right * 1.5f;
+        if (!UnityEngine.AI.NavMesh.SamplePosition(beside, out UnityEngine.AI.NavMeshHit hit, 8f, UnityEngine.AI.NavMesh.AllAreas))
+        {
+            Debug.LogWarning($"Nowhere for {Session.Companion.DisplayName} to stand; they stayed at home.", this);
+            return;
+        }
+
+        Companion = Companion.SpawnForRaid(prefab, Session.Companion, hit.position);
+        Companion.FormationOffset = new Vector3(2f, 0f, -3f);
+        StatSheet stats = Companion.GetComponent<Combatant>().Stats;
+        stats.AddModifier(new StatModifier(StatType.MaxHealth, StatModifierOp.Percent, PowerMultiplier - 1f, this));
+        stats.AddModifier(new StatModifier(StatType.DamageBonus, StatModifierOp.Flat, HealthMultiplier - 1f, this));
+        Damageable body = Companion.GetComponent<Damageable>();
+        body.Heal(body.MaxHealth);
     }
 
     private void OnDestroy()
@@ -353,7 +385,19 @@ public sealed class RaidDirector : MonoBehaviour
             PlayerTransport.Current.LeaveRaid(Report, extracted);
         }
 
+        if (Session.Companion != null)
+        {
+            Report.Companion = Session.Companion;
+            // Down when the raid ends is as lost as bleeding out: nobody went back for them.
+            Report.CompanionLost = Companion != null && (Companion.IsLost || Companion.IsDowned);
+            if (Report.CompanionLost)
+            {
+                GameSession.Settlement.LoseResident(Session.Companion, Session.Definition.DisplayName);
+            }
+        }
+
         GameSession.EndRaid(Report);
+        SaveGameService.SaveOnceHome();
         GameEvents.Raise(new GameEvent(GameEventKind.RaidFinished, Session.Definition, 1, null, Session.Outcome, Session.Elapsed));
         GameSession.CarryPlayerState(keeps);
         // Coming home through the portal, or waking at the portal after a failure.
@@ -429,6 +473,9 @@ public sealed class RaidDirector : MonoBehaviour
 
     // The raid's enemy multipliers times the current stage's bonus and what the hour adds.
     /// <summary>The raid's enemy health multiplier right now.</summary>
+    /// <summary>Who came along on this raid, once they have walked in.</summary>
+    public Companion Companion { get; private set; }
+
     public float HealthMultiplier => Parameters.EnemyHealthMultiplier * (1f + (CurrentStage?.EnemyHealthBonus ?? 0f)) * NightSettings.Current.HealthAt(NightSettings.Darkness);
     /// <summary>The raid's enemy damage multiplier right now.</summary>
     public float PowerMultiplier => Parameters.EnemyPowerMultiplier * (1f + (CurrentStage?.EnemyPowerBonus ?? 0f)) * NightSettings.Current.PowerAt(NightSettings.Darkness);

@@ -19,6 +19,12 @@ MonoBehaviour:
   arrivalLine: You've been frightening my deer. Least you can do is give me a roof.
   welcomeLine: 
   fallenLine: I can't go on... come back for me.
+  fightLines:
+    spotted: []
+    behindYou: []
+    hurt: []
+    won: []
   model: {fileID: 4545198816639002052, guid: d1bff4db31900154b9550b8dd8a37606, type: 3}
+  raidCompanion: {fileID: 11400000, guid: 60d284aaf3c06f24fba9e928940c43c5, type: 2}
   jobs:
   - {fileID: 11400000, guid: 9d8e9d72cc07d544c975b891d5c740e6, type: 2}

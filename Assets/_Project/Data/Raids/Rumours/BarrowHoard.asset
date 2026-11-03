@@ -15,9 +15,14 @@ MonoBehaviour:
   id: rumour.barrowhoard
   briefing: There's a barrow open that wasn't open yesterday, and something shining in it.
   site: {fileID: 11400000, guid: 6303439a4ae312140b0c6d7a3d411ecc, type: 2}
+  setPiece: {fileID: 11400000, guid: 597468cf871861d42a719da44dba108a, type: 2}
   weight: 1.5
   hour: 0
   seeks: {fileID: 0}
   teaches: {fileID: 0}
   breachComing: 0
   afterExtractions: 0
+  needsBuilding: {fileID: 0}
+  needsTier: 1
+  untilBeaten: {fileID: 0}
+  urgent: 0

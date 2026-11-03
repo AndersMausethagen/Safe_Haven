@@ -29,6 +29,16 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 1ec4a5e51fc209344a827112c43c6e9e, type: 2}
   - {fileID: 11400000, guid: 586cf3768c4e1674aa7e58747d6d5294, type: 2}
   - {fileID: 11400000, guid: 737ebe7a30f61ba4c9eeecb74332517a, type: 2}
+  residentToolGripPosition: {x: 0.06770403, y: -0.022614287, z: 0.016522978}
+  residentToolGripRotation: {x: 73.37317, y: 156.66853, z: 144.34685}
+  raidCompanionPrefab: {fileID: 501627851856651127, guid: b04a25972c834ee49bce6496610ae069, type: 3}
+  fallenCairn: {fileID: 8505107523154037745, guid: 329b897876476034a9b2c97b975cae6b, type: 3}
+  griefLines:
+  - I keep looking for {0} at the fire.
+  - You came back. {0} didn't. I know how it goes out there. I still don't like it.
+  - We put up stones for {0}. It isn't much.
+  - Nobody here says it, but we all count who comes back through that portal. {0}... well.
+  griefRaids: 2
   portalRepairCost:
   - resource: {fileID: 11400000, guid: a86ac9a152512464ab08e0446c161e61, type: 2}
     amount: 3

@@ -20,6 +20,11 @@ MonoBehaviour:
   teachesRecipes: []
   workplace: {fileID: 11400000, guid: cfa8f019a4062c84f8e9b8cd432080e0, type: 2}
   workGesture: {fileID: 11400000, guid: befa690f3a033144da5dc52883dbdb0f, type: 2}
+  workTool: {fileID: 11400000, guid: ba562466b4b1c4244be6b239b426c671, type: 2}
+  workToolScale: 1
+  workSound: {fileID: 11400000, guid: 682d967d0e6f12f4c9a53167c65ae104, type: 2}
+  workSoundDelay: 1.0666656
+  workSoundEvery: {x: 1.5, y: 4}
   workOrders:
   - recipe: {fileID: 11400000, guid: 75c88139bb66ec24e942221821b20985, type: 2}
     stockTarget: 30

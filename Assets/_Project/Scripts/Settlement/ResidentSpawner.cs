@@ -17,6 +17,7 @@ public sealed class ResidentSpawner : MonoBehaviour
     [SerializeField] private Transform[] homeSpots = new Transform[0];
 
     private readonly Dictionary<ResidentDefinition, ResidentNpc> spawned = new Dictionary<ResidentDefinition, ResidentNpc>();
+    private readonly HashSet<ResidentDefinition> cairns = new HashSet<ResidentDefinition>();
     private bool started;
 
     private void OnEnable()
@@ -37,6 +38,22 @@ public sealed class ResidentSpawner : MonoBehaviour
     {
         started = true;
         Sync();
+    }
+
+    // A cairn near the portal for everyone who didn't come home.
+    private void RaiseCairns()
+    {
+        FallenCairn prefab = SettlementSettings.Current.FallenCairn;
+        IReadOnlyList<FallenRecord> fallen = GameSession.Settlement.Fallen;
+        Vector3 centre = HomePortal.Current != null ? HomePortal.Current.transform.position : transform.position;
+        for (int i = 0; prefab != null && i < fallen.Count; i++)
+        {
+            if (!cairns.Contains(fallen[i].Resident))
+            {
+                cairns.Add(fallen[i].Resident);
+                Instantiate(prefab, FallenCairn.SpotFor(centre, i), Quaternion.Euler(0f, i * 73f, 0f), transform).Bind(fallen[i]);
+            }
+        }
     }
 
     private void Sync()
@@ -65,5 +82,7 @@ public sealed class ResidentSpawner : MonoBehaviour
             npc.Bind(resident);
             spawned[resident] = npc;
         }
+
+        RaiseCairns();
     }
 }

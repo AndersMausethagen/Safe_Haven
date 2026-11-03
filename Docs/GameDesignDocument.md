@@ -336,7 +336,7 @@ On raid death, the player revives at the portal. The base, known recipes, levels
 
 ### 8.4 Companion risk
 
-Companions can be downed and given a clear revival window—**45 seconds** is a prototype candidate. If not revived, they can die permanently. Some explicitly signposted events may instead result in capture and unlock a rescue raid. Capture must not retroactively replace a random death outcome. Named casualties should prompt reactions at home, but cannot permanently block critical crafting because replacement specialists must be discoverable.
+Companions can be downed and given a clear revival window—**45 seconds**, as built (November 3, 2026). If not revived, they die permanently, as they do if still down when the raid ends; alive but elsewhere, they find their own way home. Their job then stays open to anyone, so a casualty blocks nothing. Some explicitly signposted events may instead result in capture and unlock a rescue raid. Capture must not retroactively replace a random death outcome. Named casualties should prompt reactions at home, but cannot permanently block critical crafting because replacement specialists must be discoverable.
 
 ### 8.5 Carts and heavy transport
 
@@ -834,6 +834,8 @@ Prominent but nonintrusive clock; threat or danger-phase alert; objective tracke
 
 Rebindable input, controller support, readable text scaling, color-independent signals, subtitle and audio cue options, clear interaction highlights, reduced screen-shake choices, and settings for timer readability. Consider combat difficulty assists that do not invalidate the extraction system.
 
+**Added (November 3, 2026):** sound captions with the side a sound came from, rarity letters on item slots, and two assists that leave the extraction system alone (damage taken, parry and dodge timing). Helped runs are marked in the playtest log. Key prompts in text now follow a rebind.
+
 **Implemented (October 30, 2026):** the Options screen, from the main menu and the Escape menu, has Gameplay, Graphics, Audio, Controls and Accessibility tabs. It covers rebindable keys for keyboard and gamepad, UI and text size, screen shake, hit stop and screen flashes, dialogue speed, a large raid timer, toggle sneak and auto-gather. Graphics default to the game as made; lowering quality is the player's choice. Still open: color-independent signals, audio cue options and difficulty assists.
 
 ### 18.7 Hearthline: the look of the UI
@@ -928,6 +930,8 @@ RaidDirector chooses a seed, assembles compatible room modules and points of int
 Autosave in Safe Haven after major actions and upon returning from raids. At deployment, persist a transaction-like snapshot of committed equipment, companions, and the raid seed. A crash must not duplicate gear or corrupt the settlement. For MVP, interrupted raids may deliberately reset to the pre-raid snapshot, as long as the policy is explicit and tested. Before release, decide and test interrupted-raid recovery, save scumming, item duplication, and save version migration.
 
 **New persistent fields:** include purification queues, permanent Essence balances, provisional Raid Essence, learned skills/ranks, Talent Points, defense placements and health, ward status, upcoming breach state, and resolved defense-event IDs. Extraction commits Essence exactly once, and breach rewards/consequences must also be idempotent. A new game or recovery save must not spawn duplicated defenders or resurrect destroyed defensive objects.
+
+**As built (November 3, 2026):** the game saves as a raid sets out and when the player is home again. An interrupted raid resets to the save it set out from, and the player is told. Its haul is lost and nothing is doubled.
 
 **Saved games (October 30, 2026):** a game can have any number of saves, each its own file, named by the player. A new game gets its own save the first time it saves, so it can never overwrite another. Saving, quick save and prologue checkpoints write to the game being played. The Saved Games screen loads, overwrites, renames and deletes, and Save as New copies the game in hand. Continue loads the newest. Saving and loading during a raid are both refused; quitting to the menu ends the raid, and what the player carried in it stays behind.
 
@@ -1179,7 +1183,7 @@ These decisions cover §21 and the first ward breach. All numbers are tuning def
 
 ### 26.2 Still open
 
-- How long should a raid be? The design says 12 minutes, but Misty Woods runs at 5 for now while its danger stages and exits are written for 12. No 12-minute raid has been played yet, so its pacing with events is untested.
+- How long should a raid be? The design says 12 minutes; Misty Woods now runs at 16:40 (1000 s), with its danger stages and exits written for 12. No 12-minute raid has been played yet, so its pacing with events is untested.
 
 - How strong should the new gear, creatures and meals be? Their numbers are first estimates and none have been playtested.
 

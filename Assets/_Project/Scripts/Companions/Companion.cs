@@ -73,6 +73,8 @@ public sealed class Companion : MonoBehaviour, IConversationTopics
     private bool shotBlocked;
     private float archerSide = 1f;
     private float nextArcherSideAt;
+    private bool bleedsOut;
+    private float bleedOutAt;
 
     private const float LeaderMovesFaster = 0.8f;
     private const float DodgeSeconds = 0.7f;
@@ -89,6 +91,42 @@ public sealed class Companion : MonoBehaviour, IConversationTopics
     public CompanionOrder Order { get; private set; }
     public bool IsDowned => getUpAt >= 0f;
     public string DisplayName => resident != null ? resident.DisplayName : name;
+
+    /// <summary>On a raid: they were down too long and are gone for good.</summary>
+    public bool IsLost { get; private set; }
+
+    /// <summary>Seconds left to help them up, while they are down on a raid.</summary>
+    public float BleedOutLeft => bleedsOut && IsDowned && !IsLost ? Mathf.Max(0f, bleedOutAt - Time.time) : 0f;
+
+    public float HealthShare => health != null ? health.HealthFraction : 0f;
+
+    /// <summary>
+    /// Brings someone along on a raid, as their ResidentDefinition says. The copy wakes outside an inactive holder, so that it wakes
+    /// as this person, with their model, not as the prefab. On a raid they don't get up by themselves.
+    /// </summary>
+    public static Companion SpawnForRaid(Companion prefab, ResidentDefinition who, Vector3 position) =>
+        SpawnAs(prefab, who, who.RaidCompanion, position, true, true);
+
+    /// <summary>Brings someone out as a companion who fights as <paramref name="how"/> says. Those who bleed out don't get up by themselves.</summary>
+    public static Companion SpawnAs(Companion prefab, ResidentDefinition who, CompanionDefinition how, Vector3 position, bool bleedsOut, bool takesOrders)
+    {
+        var holder = new GameObject("Companion");
+        holder.SetActive(false);
+        Companion made = Instantiate(prefab, position, Quaternion.identity, holder.transform);
+        made.resident = who;
+        made.definition = how;
+        made.bleedsOut = bleedsOut;
+        made.ordersInConversation = takesOrders;
+        made.name = who.DisplayName;
+        if (who.Model != null)
+        {
+            Instantiate(who.Model, made.transform, false);
+        }
+
+        made.transform.SetParent(null, true);
+        Destroy(holder);
+        return made;
+    }
 
     /// <summary>Stands still and stays out of fights while set (a story moment: before the expedition sets out).</summary>
     public bool Paused { get; set; }
@@ -189,7 +227,11 @@ public sealed class Companion : MonoBehaviour, IConversationTopics
 
         if (IsDowned)
         {
-            if (Time.time >= getUpAt)
+            if (bleedsOut && Time.time >= bleedOutAt)
+            {
+                Lose();
+            }
+            else if (Time.time >= getUpAt)
             {
                 GetUp(definition.GetUpHealth);
             }
@@ -504,7 +546,8 @@ public sealed class Companion : MonoBehaviour, IConversationTopics
 
     private void OnKnockedDown(Damageable victim, DamageInfo hit)
     {
-        getUpAt = Time.time + definition.DownedSeconds;
+        getUpAt = bleedsOut ? float.PositiveInfinity : Time.time + definition.DownedSeconds;
+        bleedOutAt = Time.time + definition.BleedOutSeconds;
         weapon.Cancel();
         engaged = null;
         Halt();
@@ -517,7 +560,26 @@ public sealed class Companion : MonoBehaviour, IConversationTopics
         }
 
         revive.SetAvailable(true);
-        GameMessages.Post($"{DisplayName} is down! Hold E beside them to help them up.", MessageKind.Warning);
+        GameMessages.Post(bleedsOut ? $"{DisplayName} is down! Hold E beside them within {definition.BleedOutSeconds:0} seconds, or they are lost."
+            : $"{DisplayName} is down! Hold E beside them to help them up.", MessageKind.Warning);
+    }
+
+    private void Lose()
+    {
+        IsLost = true;
+        revive.SetAvailable(false);
+        GameMessages.Post($"{DisplayName} is gone.", MessageKind.Warning);
+        if (resident != null && !string.IsNullOrWhiteSpace(resident.FallenLine))
+        {
+            GameMessages.Post($"{DisplayName}: \"{resident.FallenLine}\"", MessageKind.Warning);
+        }
+
+        if (agent != null)
+        {
+            agent.enabled = false;
+        }
+
+        enabled = false;
     }
 
     /// <summary>The player helped them up (CompanionRevive): sooner, and with more health than getting up alone.</summary>

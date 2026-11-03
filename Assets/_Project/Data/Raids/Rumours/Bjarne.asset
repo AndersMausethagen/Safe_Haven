@@ -15,6 +15,7 @@ MonoBehaviour:
   id: rumour.bjarne
   briefing: A hammer rings in the deep woods at dusk, slow and unevenly, as if the smith is one-armed.
   site: {fileID: 11400000, guid: a1a6844116d0c1241a3f4794309a579d, type: 2}
+  setPiece: {fileID: 11400000, guid: e433b9e888e511d4c8743cc6a40c672a, type: 2}
   weight: 2
   hour: 0
   seeks: {fileID: 11400000, guid: de521ad7beeb20b49878a9b40c96bced, type: 2}
@@ -22,4 +23,6 @@ MonoBehaviour:
   breachComing: 0
   afterExtractions: 1
   needsBuilding: {fileID: 11400000, guid: 25c95a1289ab72b4ea0bb96e2ec3f020, type: 2}
+  needsTier: 1
+  untilBeaten: {fileID: 0}
   urgent: 1

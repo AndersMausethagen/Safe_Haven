@@ -15,9 +15,14 @@ MonoBehaviour:
   id: rumour.sigrid
   briefing: A horn has been heard at dusk, calling the expedition's signal.
   site: {fileID: 11400000, guid: 0ce0116775346f545b9a9e579313dd58, type: 2}
+  setPiece: {fileID: 11400000, guid: bffb9f981cdf88a49826d1a444e914fa, type: 2}
   weight: 2
   hour: 0
   seeks: {fileID: 11400000, guid: b230d041259b863428e4e973c6ff0d86, type: 2}
   teaches: {fileID: 0}
   breachComing: 0
   afterExtractions: 3
+  needsBuilding: {fileID: 0}
+  needsTier: 1
+  untilBeaten: {fileID: 0}
+  urgent: 0

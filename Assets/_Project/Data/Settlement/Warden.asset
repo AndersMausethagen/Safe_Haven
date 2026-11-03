@@ -20,10 +20,16 @@ MonoBehaviour:
   teachesRecipes: []
   workplace: {fileID: 11400000, guid: 3019dc5f891f4c24f90723c22b1cde97, type: 2}
   workGesture: {fileID: 11400000, guid: 46b1b4f7175bfa749974f1b7ed099575, type: 2}
+  workTool: {fileID: 0}
+  workToolScale: 1
+  workSound: {fileID: 0}
+  workSoundDelay: 0.4
+  workSoundEvery: {x: 1.5, y: 4}
   workOrders: []
   assignedEvent: {fileID: 0}
   extraRumours: 0
   gearRepairDiscount: 0
   buildingRepairDiscount: 0
+  defendsAs: {fileID: 11400000, guid: 60d284aaf3c06f24fba9e928940c43c5, type: 2}
   wardHealth: 0.5
   raidSeconds: 0

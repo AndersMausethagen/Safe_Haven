@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2462b67111854f46a3ada8872bdc8f6, type: 3}
+  m_Name: Boss The Heartroot
+  m_EditorClassIdentifier: SafeHaven::BossDefinition
+  id: boss_heartroot
+  displayName: The Heartroot
+  title: Guardian of the Hollow
+  phases:
+  - belowHealth: 0.66
+    line: The ground shakes. Roots begin to tear free.
+    reelSeconds: 1.8
+    damageBonus: 0.1
+    sound: {fileID: 11400000, guid: 7a7933cc7f7f0ad4aaf1e1190ea7248a, type: 2}
+  - belowHealth: 0.33
+    line: The old heart splits, and what is in it is angry.
+    reelSeconds: 2.2
+    damageBonus: 0.2
+    sound: {fileID: 11400000, guid: 7a7933cc7f7f0ad4aaf1e1190ea7248a, type: 2}
+  rewardSkill: {fileID: 11400000, guid: ea2ebfef3d35eae42a29237e4b273b5d, type: 2}
+  defeatLine: 'The Heartroot lies still. What it knew of the forest''s hold is yours now: you have learned Heartroot''s Grasp.'

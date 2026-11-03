@@ -31,5 +31,6 @@ MonoBehaviour:
     - Nothing else on the wind.
     - That's all of them. I think.
   model: {fileID: 4704275745086199601, guid: eece4adebb5d1a04d820228f6b254479, type: 3}
+  raidCompanion: {fileID: 11400000, guid: bfeda7cc0c77ea24dac614548220c4eb, type: 2}
   jobs:
   - {fileID: 11400000, guid: 6af8ca180b22423448d6e1e307037eb6, type: 2}

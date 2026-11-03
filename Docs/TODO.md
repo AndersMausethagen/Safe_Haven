@@ -5,26 +5,11 @@ Open work and ideas. Tick items off (`[x]`) or delete them when done. Architectu
 
 ## Combat
 
-- [ ] **A real finishing move on staggered enemies.** A backstab on a staggered enemy still plays the normal swing. Give it a short dedicated
-      stab, with both bodies locked together for a moment, so it is the highlight of a fight. Humanoid enemies first (Draug, Barrow Shieldbearer):
-      each pairing of bodies has to line up, so it is the biggest piece of combat work left. Damage stays as it is (`PlayerCombat.Strike`).
+- [x] **A finishing blow on staggered enemies**: Draug and Barrow Shieldbearer. More person-shaped creatures are a tick on Can Be Finished.
 
 ## Reasons to raid (relics, rumours, people, finds)
 
-- [ ] **Biggest next step: authored set-pieces in the generated maps (GDD §9.1, §9.2).** The layouts vary, but a clearing is
-      still open ground with things scattered on it, and a rumour's reward is a prop you walk up to and press E on. Roguelikes
-      feel new because generated maps join authored rooms, so do the same:
-      - A set-piece is a data asset: a prefab, the clearing size it needs, the moods and shapes it suits, and what it can
-        hold (a rumour, a camp, the exit). Start with 6–8: a ruined watchtower, a troll bridge over a ravine, a flooded
-        hollow, standing stones, a wolf den, a burnt farmstead. `Prefabs/Raids/Events` has four to build on.
-      - `RaidLayoutPlanner` picks one for each suitable clearing, and `RaidMapGenerator` flattens the ground and places it.
-      - A rumour names the kind of set-piece it needs, so its reward stands inside a place with something guarding it
-        or a small problem to solve: a fight, a stealth route, a choice. That is what turns "walk to the beacon" into a raid.
-      - Landmarks also give each run a memory ("the bridge past the wolf den") and the player something to steer by.
-      - Rumours can then stop giving exact distance on the HUD: name the set-piece and a rough direction, so finding it is
-        part of the raid.
-      - First decide the raid's length: Misty Woods runs at 5 minutes, and set-pieces need more time than that, with its
-        stages written for 12 (GDD §26.2).
+- [x] **Authored set-pieces in the generated maps (GDD §9.1, §9.2)**: six so far, on every rumour site and a few camps. Still open: a troll bridge over a ravine and a flooded hollow, which need the ground shaped for them, and rumours that name a place and a direction instead of an exact distance on the HUD.
 - [ ] Play them for feel: every number is a first estimate (relic powers, 2 rumours a run, job bonuses, 6% relics in caches).
 - [ ] Real art for the rumour sites: they are placeholder shapes (`Prefabs/Raids/Events/Sites`), as is the Elder Tree.
 - [ ] Icons for the plans and living things: the plans use the Forge Blueprint's, the others borrow from materials.
@@ -55,10 +40,28 @@ Open work and ideas. Tick items off (`[x]`) or delete them when done. Architectu
 - [ ] Play-test the 180° and 270° map rotations (only 0° in the editor and 90° in play mode are verified).
 - [ ] Play a full raid from the Safe Haven portal through the loading screen into the rotated map and back.
 
+## Art still owed by the new systems (2026-11-03)
+
+- [ ] The Heartroot and its stump: it is the Root Guardian's mannequin at 1.55 times the size. A boss should look like one.
+- [ ] Heartroot's Grasp has Frost Rune's icon and effect, with roots on the hit.
+- [ ] Haul Sack has the Hide Rucksack's icon.
+- [ ] Set-pieces are the forest kit and primitives. The Old Barrow's mound most of all: from the gameplay camera it is a smooth green shape.
+- [ ] Finished goods at a workplace, growing as residents make them: tools and sounds are in, the goods are not.
+
+## Play these (2026-11-03)
+
+Everything below was driven by scripts, not played by hand: the numbers are first estimates.
+
+- [ ] The Heartroot's 1100 health, 320 poise and damage, against kits a third raid really has.
+- [ ] Companion strength per tier, and whether 45 seconds is fair in a real fight.
+- [ ] Guards: two killed a first breach wave with the player standing still.
+- [ ] Whether set-piece guards are too much on top of the raid's own camps, as every rumour now has some.
+- [ ] Heavy bag: 80% speed at a full bag, and whether the Haul Sack's noise is a real price.
+
 ## Materials as items (weight and carrying)
 
-- [ ] Soft encumbrance: above ~80% carry weight slow movement and raise stamina cost, instead of only a hard cap at 100%.
-- [ ] Haul options for raids: a haul sack (extra weight, but slows you or makes noise), and later a pack animal, cart or wheelbarrow (GDD §12.4).
+- [x] Soft encumbrance: past 80% of the bag's budget speed, stamina and noise ease toward their full-bag values (`PlayerBurden`).
+- [x] Haul Sack: more weight, fewer slots, slower and loud. Still open: a pack animal or wheelbarrow (GDD §12.4).
 - [ ] Refine at home pays off: tune item value per weight so ingots/planks/blocks are clearly better to carry than raw ore/logs.
 - [ ] Quick-deposit: "Deposit all materials" button at the stash, and stations pulling from storage (already via MaterialPool).
 - [ ] Decide essence loss on a failed raid (e.g. lose the essences gathered this raid, keep banked ones).
@@ -74,8 +77,8 @@ Open work and ideas. Tick items off (`[x]`) or delete them when done. Architectu
 
 ## Options (2026-10-30)
 
-- [ ] Key prompts written into text ("[E]" in `WorldInteractionIndicator`, "(N)", "(H)") should use `GameInput.KeyLabel`, so they follow a rebind.
-- [ ] Still missing from GDD §18.5: colour-independent signals and audio cues, and combat difficulty assists.
+- [x] Key prompts in text follow a rebind (`GameInput.WithRebinds`).
+- [x] Sound captions, rarity letters, damage and timing assists. Still open from GDD §18.5: full controller support for prompts.
 
 ## New content (2026-10-30)
 
@@ -83,13 +86,13 @@ Raid events, gear, food, buildings and creatures are in, built by `AgentScripts/
 `BuildCreatures.cs` and `BuildRaidEvents.cs` (run them in that order). Open:
 
 - [ ] Balance everything by playing: numbers are first guesses against the existing gear and monsters.
-- [ ] Decide the raid length. `MistyWoods.asset` has `durationSeconds: 300` while its stages and exits are written for 720.
+- [ ] Play the raid length: `MistyWoods.asset` is at 1000 s (16:40) while its stages and exits are written for 720.
       Event windows are in seconds, so they fit either way, but fewer events fit in 300 s.
 - [ ] Real models and icons: new creatures, buildings and event sites are placeholder shapes.
 - [ ] Fit shields and new weapons in the hand (Safe Haven › Characters › Held Item Grips): grips are copied from similar items.
 - [ ] Status icons: conditions show as words above the vitals (GDD §10.6 asks for icons).
 - [ ] Scout Post (GDD §14.2): show the raid's coming events as rumours in the briefing.
-- [ ] Defender roles for ward breaches (the Runic Ward Totem and the Watch Post's archer are in).
+- [x] Defender roles for ward breaches: Warden and Hunter stand guard (`ResidentDefender`). Check it doesn't take the fight from the player: two guards killed a first wave unaided.
 - [ ] Settlers (Hild, Asa, Gunnar, Yrsa) borrow expedition models: give them their own, and icons for the Boar Pie, Trout in Cream, Haven Feast and Moon Broth, which show the stew's for now.
 - [ ] Trollstone armor copies the moonsilver worn look: give it one of its own.
 - [ ] Listen to the portal's voice in the game: its takes were measured, never heard. `Tools/Audio/portal.py`, level on Audio/Sounds/Library/Portal Voice.

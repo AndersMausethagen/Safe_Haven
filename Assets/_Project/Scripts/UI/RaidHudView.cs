@@ -117,7 +117,7 @@ public sealed class RaidHudView : MonoBehaviour
         else if (exitsLabel != null && Time.unscaledTime >= nextExitsRefresh)
         {
             nextExitsRefresh = Time.unscaledTime + 0.2f;
-            SetText(exitsLabel, DescribeExits());
+            SetText(exitsLabel, DescribeExits() + DescribeCompanion());
         }
 
         if (session.IsOver)
@@ -324,6 +324,20 @@ public sealed class RaidHudView : MonoBehaviour
     }
 
     // Up on screen is the camera's forward along the ground, so the arrow turns by the angle from there to the target.
+    // A word and a number, so it doesn't rest on a colour.
+    private string DescribeCompanion()
+    {
+        Companion companion = director != null ? director.Companion : null;
+        if (companion == null)
+        {
+            return "";
+        }
+
+        return companion.IsLost ? $"\n<color=#FF7B6B>{companion.DisplayName} is gone</color>"
+            : companion.IsDowned ? $"\n<color=#FF7B6B>{companion.DisplayName} is down: {companion.BleedOutLeft:0} s to help them up</color>"
+            : $"\n{companion.DisplayName}: {Mathf.RoundToInt(companion.HealthShare * 100f)}%";
+    }
+
     private void PointArrowAt(ExtractionPoint target)
     {
         if (extractionArrow == null)

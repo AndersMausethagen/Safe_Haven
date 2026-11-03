@@ -39,7 +39,7 @@ public static class HavenPeople
     private static HavenEntry HomeEntry(ResidentDefinition person, ResidentRecord record, SettlementState settlement)
     {
         JobDefinition job = record.Job;
-        bool canWork = person.Jobs.Any(one => one != null);
+        bool canWork = GameSession.Settlement.JobsOpenTo(person).Count > 0;
         var entry = new HavenEntry
         {
             Key = person,
@@ -64,7 +64,7 @@ public static class HavenPeople
             ? $"In a bed of their own: their work goes {CraftingStation.BedSpeedBonus * 100f:0}% faster, and home is that bit more comfortable."
             : "By the fire. They manage, but a Hut or Cottage would help."));
         AddWork(entry, record, settlement);
-        List<JobDefinition> others = person.Jobs.Where(one => one != null && one != job).ToList();
+        List<JobDefinition> others = GameSession.Settlement.JobsOpenTo(person).Where(one => one != null && one != job).ToList();
         if (others.Count > 0)
         {
             entry.Details.Add(new HavenDetail(job != null ? "Could also work as" : "Could work as",
@@ -141,7 +141,7 @@ public static class HavenPeople
             Description = person.Description,
         };
 
-        List<JobDefinition> jobs = person.Jobs.Where(one => one != null).ToList();
+        List<JobDefinition> jobs = GameSession.Settlement.JobsOpenTo(person).Where(one => one != null).ToList();
         if (jobs.Count > 0)
         {
             entry.Details.Add(new HavenDetail("What they would bring",

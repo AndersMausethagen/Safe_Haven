@@ -15,9 +15,14 @@ MonoBehaviour:
   id: rumour.runa
   briefing: Marks have been cut on the trees, but they can only be seen at night.
   site: {fileID: 11400000, guid: 45f4f795b2e28ba48940d9912a062d2e, type: 2}
+  setPiece: {fileID: 11400000, guid: bffb9f981cdf88a49826d1a444e914fa, type: 2}
   weight: 2
   hour: 1
   seeks: {fileID: 11400000, guid: 4260d606f7c62c042b848adc806c44d3, type: 2}
   teaches: {fileID: 0}
   breachComing: 0
   afterExtractions: 1
+  needsBuilding: {fileID: 0}
+  needsTier: 1
+  untilBeaten: {fileID: 0}
+  urgent: 0

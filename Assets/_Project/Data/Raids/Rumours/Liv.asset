@@ -15,9 +15,14 @@ MonoBehaviour:
   id: rumour.liv
   briefing: A ring of old stones is said to be humming. There is someone inside it.
   site: {fileID: 11400000, guid: 6750433c24e26b64fae46bc6a86848a6, type: 2}
+  setPiece: {fileID: 11400000, guid: e7a15e046a003a348a556a72b6944648, type: 2}
   weight: 2
   hour: 0
   seeks: {fileID: 11400000, guid: 8adfc30233928ec499c01587419eabaa, type: 2}
   teaches: {fileID: 0}
   breachComing: 0
   afterExtractions: 1
+  needsBuilding: {fileID: 0}
+  needsTier: 1
+  untilBeaten: {fileID: 0}
+  urgent: 0

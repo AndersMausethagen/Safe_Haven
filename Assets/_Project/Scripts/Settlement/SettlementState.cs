@@ -28,6 +28,22 @@ public sealed class ResidentRecord
     public bool WorkPaused { get; set; }
 }
 
+/// <summary>Someone who went along on a raid and never came home.</summary>
+public sealed class FallenRecord
+{
+    public FallenRecord(ResidentDefinition resident, string where, int atExtraction)
+    {
+        Resident = resident;
+        Where = where;
+        AtExtraction = atExtraction;
+    }
+
+    public ResidentDefinition Resident { get; }
+    public string Where { get; }
+    /// <summary>How many raids had come home when it happened, so talk of it fades with time.</summary>
+    public int AtExtraction { get; }
+}
+
 /// <summary>
 /// The state of Safe Haven as a place, beyond what lies in its scene: whether the portal is repaired, how strong the
 /// Portal's ward is, how many raids the player has come home from, the first ward breach, who lives there with which
@@ -42,6 +58,9 @@ public sealed class SettlementState
 {
     private readonly Dictionary<BuildingDefinition, int> builtTiers = new Dictionary<BuildingDefinition, int>();
     private readonly List<ResidentRecord> residents = new List<ResidentRecord>();
+    private readonly List<FallenRecord> fallen = new List<FallenRecord>();
+    private readonly HashSet<string> defeatedBosses = new HashSet<string>();
+    private readonly List<JobDefinition> vacantJobs = new List<JobDefinition>();
     private readonly Dictionary<string, int> tradeBought = new Dictionary<string, int>();
     private float purifiedRemainder;
 
@@ -253,7 +272,112 @@ public sealed class SettlementState
         return resident == null ? null : residents.Find(record => record.Resident == resident);
     }
 
-    public bool HasResident(ResidentDefinition resident) => Find(resident) != null;
+    /// <summary>True for anyone who lives here, or did and was lost: neither can be found out in a raid any more.</summary>
+    public bool HasResident(ResidentDefinition resident) => Find(resident) != null || IsFallen(resident);
+
+    /// <summary>Ids of the bosses beaten. Kept whatever became of the raid it happened in.</summary>
+    public IReadOnlyCollection<string> DefeatedBosses => defeatedBosses;
+
+    public bool IsBossDefeated(string id) => id != null && defeatedBosses.Contains(id);
+
+    /// <summary>A boss has fallen. False when it had already been beaten before, so what it gives is given once.</summary>
+    public bool MarkBossDefeated(string id)
+    {
+        if (string.IsNullOrEmpty(id) || !defeatedBosses.Add(id))
+        {
+            return false;
+        }
+
+        Changed?.Invoke();
+        return true;
+    }
+
+    /// <summary>Those who went along on a raid and never came home.</summary>
+    public IReadOnlyList<FallenRecord> Fallen => fallen;
+
+    public bool IsFallen(ResidentDefinition resident) => resident != null && fallen.Exists(record => record.Resident == resident);
+
+    /// <summary>
+    /// Jobs left by those who were lost. Anyone can take one (GDD §7: a casualty mustn't block crafting for good), so no job a
+    /// resident could hold is ever out of reach because the only one who could hold it is gone.
+    /// </summary>
+    public IReadOnlyList<JobDefinition> VacantJobs => vacantJobs;
+
+    /// <summary>The jobs someone could take: their own, and any left vacant.</summary>
+    public List<JobDefinition> JobsOpenTo(ResidentDefinition resident)
+    {
+        var jobs = new List<JobDefinition>();
+        if (resident != null)
+        {
+            foreach (JobDefinition job in resident.Jobs)
+            {
+                if (job != null && !jobs.Contains(job))
+                {
+                    jobs.Add(job);
+                }
+            }
+        }
+
+        foreach (JobDefinition job in vacantJobs)
+        {
+            if (job != null && !jobs.Contains(job))
+            {
+                jobs.Add(job);
+            }
+        }
+
+        return jobs;
+    }
+
+    /// <summary>Someone went along on a raid and is gone for good.</summary>
+    public void LoseResident(ResidentDefinition resident, string where)
+    {
+        ResidentRecord record = Find(resident);
+        if (record == null)
+        {
+            return;
+        }
+
+        residents.Remove(record);
+        fallen.Add(new FallenRecord(resident, where, SuccessfulExtractions));
+        if (record.Job != null && !vacantJobs.Contains(record.Job) && !IsHeld(record.Job))
+        {
+            vacantJobs.Add(record.Job);
+        }
+
+        Changed?.Invoke();
+    }
+
+    /// <summary>Puts someone lost back on the list when loading a save.</summary>
+    public void RestoreFallen(ResidentDefinition resident, string where, int atExtraction)
+    {
+        if (resident != null && !IsFallen(resident))
+        {
+            fallen.Add(new FallenRecord(resident, where, atExtraction));
+        }
+    }
+
+    public void RestoreVacantJob(JobDefinition job)
+    {
+        if (job != null && !vacantJobs.Contains(job))
+        {
+            vacantJobs.Add(job);
+        }
+    }
+
+    /// <summary>The loss still spoken of, for a resident to mention, or null when it has been long enough.</summary>
+    public FallenRecord RecentLoss(int raidsItLasts)
+    {
+        if (fallen.Count == 0)
+        {
+            return null;
+        }
+
+        FallenRecord last = fallen[fallen.Count - 1];
+        return SuccessfulExtractions - last.AtExtraction <= raidsItLasts ? last : null;
+    }
+
+    private bool IsHeld(JobDefinition job) => residents.Exists(record => record.Job == job);
 
     /// <summary>Moves someone into Safe Haven. Returns false when they already live here.</summary>
     public bool AddResident(ResidentDefinition resident, JobDefinition job = null)
@@ -274,6 +398,7 @@ public sealed class SettlementState
         if (record != null && record.Job != job)
         {
             record.Job = job;
+            vacantJobs.Remove(job);
             Changed?.Invoke();
         }
     }

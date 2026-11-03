@@ -17,6 +17,7 @@ public sealed class ResidentLife : MonoBehaviour
     private const float TalkTurnSpeed = 240f;
     private const float RingRadius = 2.4f;
     private const float WorkmateGap = 1.2f;
+    private const float GuardRadius = 6f;
     private static readonly int SpeedHash = Animator.StringToHash("Speed");
 
     private ResidentNpc npc;
@@ -37,6 +38,10 @@ public sealed class ResidentLife : MonoBehaviour
     private float nextGestureAt;
     private float ringAngle;
     private float workShift;
+    private GameObject tool;
+    private ItemDefinition toolItem;
+    private float workSoundAt = float.PositiveInfinity;
+    private ResidentDefender defender;
 
     /// <summary>What they are about right now.</summary>
     public ResidentActivity Activity => activity;
@@ -105,6 +110,11 @@ public sealed class ResidentLife : MonoBehaviour
             return;
         }
 
+        if (KeepsGuard())
+        {
+            return;
+        }
+
         if (talkable != null && talkable.IsTalking)
         {
             Listen();
@@ -137,6 +147,47 @@ public sealed class ResidentLife : MonoBehaviour
             animator.SetFloat(SpeedHash, agent != null && agent.isOnNavMesh ? agent.velocity.magnitude : 0f, 0.15f, Time.deltaTime);
         }
     }
+
+    // A breach is on and their job defends the Haven: they are on guard until it is over, and the guard is who the player sees.
+    private bool KeepsGuard()
+    {
+        bool breach = WardBreachDirector.Current != null && WardBreachDirector.Current.IsActive;
+        CompanionDefinition how = breach ? npc.Job?.DefendsAs : null;
+        defender ??= new ResidentDefender(transform, animator, agent);
+        if (how != null && !defender.IsOnGuard)
+        {
+            if (emotes != null && emotes.IsPlaying)
+            {
+                emotes.Stop();
+            }
+
+            defender.Stand(npc.Resident, how, GuardPost());
+        }
+        else if (how == null && defender.IsOnGuard)
+        {
+            defender.StandDown();
+            Decide(false, true);
+        }
+
+        return defender.IsOnGuard;
+    }
+
+    // Up on the Watch Post if that is where their job is; otherwise a ring out from the portal, between it and what comes.
+    private Vector3 GuardPost()
+    {
+        BuildingDefinition workplace = npc.Job?.Workplace;
+        BuildingObject post = workplace != null ? BuildingObject.Find(workplace) : null;
+        if (post != null && post.GetComponent<WatchPostArcher>() != null && npc.TryGetWorkplace(out Vector3 spot, out _))
+        {
+            return spot;
+        }
+
+        Vector3 round = Quaternion.Euler(0f, ringAngle, 0f) * Vector3.forward;
+        return (HomePortal.Current != null ? HomePortal.Current.transform.position : home) + round * GuardRadius;
+    }
+
+    /// <summary>The guard they have become in a breach, or null.</summary>
+    public Companion Guard => defender?.Guard;
 
     private void Listen()
     {
@@ -208,6 +259,8 @@ public sealed class ResidentLife : MonoBehaviour
 
         arrived = false;
         stuckSince = -1f;
+        workSoundAt = float.PositiveInfinity;
+        ShowTool(null, 1f);
         if (atOnce || agent == null || !agent.isOnNavMesh)
         {
             PutThere();
@@ -310,11 +363,64 @@ public sealed class ResidentLife : MonoBehaviour
         }
 
         nextGestureAt = 0f;
+        JobDefinition job = activity == ResidentActivity.Work ? npc.Job : null;
+        if (job != null)
+        {
+            ShowTool(job.WorkTool, job.WorkToolScale);
+        }
+    }
+
+    // Comes out when they get to work and goes away when they stop.
+    private void ShowTool(ItemDefinition item, float scale)
+    {
+        if (item == toolItem)
+        {
+            return;
+        }
+
+        if (tool != null)
+        {
+            Destroy(tool);
+        }
+
+        toolItem = item;
+        tool = null;
+        Transform hand = item != null && animator != null && animator.isHuman ? animator.GetBoneTransform(HumanBodyBones.RightHand) : null;
+        if (hand == null)
+        {
+            return;
+        }
+
+        tool = HeldItemView.CreateModel(item, hand);
+        if (tool != null)
+        {
+            Pose grip = SettlementSettings.Current.ResidentToolGrip;
+            tool.transform.SetLocalPositionAndRotation(grip.position + grip.rotation * item.HeldPose.position, grip.rotation * item.HeldPose.rotation);
+            tool.transform.localScale *= scale;
+        }
+    }
+
+    private void MakeWorkSound(JobDefinition job)
+    {
+        if (Time.time < workSoundAt)
+        {
+            return;
+        }
+
+        bool repeats = job.WorkGesture != null && job.WorkGesture.IsHeld;
+        workSoundAt = repeats ? Time.time + Random.Range(job.WorkSoundEvery.x, job.WorkSoundEvery.y) : float.PositiveInfinity;
+        AudioManager.Play(job.WorkSound, transform.position + Vector3.up);
     }
 
     private void GetOnWithIt()
     {
         transform.rotation = Quaternion.RotateTowards(transform.rotation, facing, TalkTurnSpeed * Time.deltaTime);
+        JobDefinition job = activity == ResidentActivity.Work ? npc.Job : null;
+        if (job != null && job.WorkSound != null)
+        {
+            MakeWorkSound(job);
+        }
+
         if (emotes == null || Time.time < nextGestureAt)
         {
             return;
@@ -342,6 +448,10 @@ public sealed class ResidentLife : MonoBehaviour
             if (emotes.Current != gesture)
             {
                 emotes.Play(gesture);
+                if (job != null && float.IsPositiveInfinity(workSoundAt))
+                {
+                    workSoundAt = Time.time + Random.Range(0.3f, job.WorkSoundEvery.y);
+                }
             }
 
             nextGestureAt = activity == ResidentActivity.Fire ? Time.time + Random.Range(18f, 40f) : Time.time + 5f;
@@ -350,6 +460,11 @@ public sealed class ResidentLife : MonoBehaviour
         {
             // Work keeps a rhythm, with a breath now and then; at the fire a gesture is only now and then.
             emotes.Play(gesture);
+            if (job != null)
+            {
+                workSoundAt = Time.time + job.WorkSoundDelay;
+            }
+
             nextGestureAt = activity != ResidentActivity.Work ? Time.time + Random.Range(18f, 40f)
                 : Random.value < 0.2f ? Time.time + Random.Range(2f, 4f) : Time.time + Random.Range(0.1f, 0.5f);
         }

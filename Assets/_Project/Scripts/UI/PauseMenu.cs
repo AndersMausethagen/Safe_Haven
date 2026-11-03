@@ -255,7 +255,8 @@ public sealed class PauseMenu : MonoBehaviour
 
     private void AskQuit()
     {
-        Confirm("Quit the game?\nProgress since your last save will be lost.", "Main Menu", QuitToMainMenu, "Desktop", QuitToDesktop);
+        Confirm(GameSession.ActiveRaid != null ? "Quit the game?\nThis raid ends here, and nothing from it comes home. You will be back at the portal as you set out."
+            : "Quit the game?\nProgress since your last save will be lost.", "Main Menu", QuitToMainMenu, "Desktop", QuitToDesktop);
     }
 
     private void QuitToMainMenu()

@@ -57,15 +57,33 @@ public sealed class SettlementSettings : GameSettings<SettlementSettings>
     [SerializeField] private EmoteDefinition residentSleepGesture;
     [Tooltip("What they do at the fire, one after another at random.")]
     [SerializeField] private EmoteDefinition[] residentFireGestures = new EmoteDefinition[0];
+    [Tooltip("Where a resident's right hand holds a work tool, in the hand's own space.")]
+    [SerializeField] private Vector3 residentToolGripPosition;
+    [SerializeField] private Vector3 residentToolGripRotation;
 
     public ResidentHours ResidentHours => new ResidentHours(residentWakeHour, residentWorkFromHour, residentMealFromHour, residentMealUntilHour, residentWorkUntilHour, residentSleepFromHour);
     public BuildingDefinition ResidentGatheringPlace => residentGatheringPlace;
     public float ResidentWalkSpeed => residentWalkSpeed;
     public float ResidentRunSpeed => residentRunSpeed;
     public float ResidentDangerRadius => residentDangerRadius;
+    public Companion RaidCompanionPrefab => raidCompanionPrefab;
+    public FallenCairn FallenCairn => fallenCairn;
+    public string[] GriefLines => griefLines;
+    public int GriefRaids => griefRaids;
     public EmoteDefinition ResidentMealGesture => residentMealGesture;
     public EmoteDefinition ResidentSleepGesture => residentSleepGesture;
     public EmoteDefinition[] ResidentFireGestures => residentFireGestures;
+    public Pose ResidentToolGrip => new Pose(residentToolGripPosition, Quaternion.Euler(residentToolGripRotation));
+
+    [Header("Going Along on Raids")]
+    [Tooltip("The body of someone who goes along on a raid: collider, agent, Combatant, Damageable, Companion and Talkable. Their model and how they fight come from their ResidentDefinition.")]
+    [SerializeField] private Companion raidCompanionPrefab;
+    [Tooltip("Raised near the portal for each person who didn't come home.")]
+    [SerializeField] private FallenCairn fallenCairn;
+    [Tooltip("What those at home say about someone lost, with {0} for the name. One is kept per person, so they stay in character.")]
+    [SerializeField, TextArea] private string[] griefLines = new string[0];
+    [Tooltip("For how many raids after a loss they still speak of it.")]
+    [SerializeField, Min(0)] private int griefRaids = 2;
 
     [Header("Portal")]
     [Tooltip("What repairing the ruined portal costs (GDD §14.3: Life Orbs from the clearing).")]

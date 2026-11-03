@@ -19,6 +19,7 @@ public sealed class SaveSlotInfo
         }
 
         Place = PlaceName(data.scene);
+        RaidCutShort = data.raidUnderWay;
         Level = data.progress != null ? Math.Max(1, data.progress.level) : 1;
         PlayedSeconds = data.playtest != null ? data.playtest.playedSeconds : 0f;
         if (DateTime.TryParse(data.savedAtUtc, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out DateTime saved))
@@ -29,6 +30,10 @@ public sealed class SaveSlotInfo
 
     /// <summary>The file's name without its extension. What SaveGameService calls a slot.</summary>
     public string Slot { get; }
+
+    /// <summary>The raid this save never came home from, or empty.</summary>
+    public string RaidCutShort { get; }
+
     public string Name { get; }
     public string Place { get; }
     public int Level { get; }

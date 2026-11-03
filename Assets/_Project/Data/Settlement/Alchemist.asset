@@ -21,6 +21,11 @@ MonoBehaviour:
   teachesRecipes: []
   workplace: {fileID: 11400000, guid: dd9792482f40fc243a8d7294434f1ee9, type: 2}
   workGesture: {fileID: 11400000, guid: 7c9176c17f7f8644085abfda4ecc4cac, type: 2}
+  workTool: {fileID: 0}
+  workToolScale: 1
+  workSound: {fileID: 11400000, guid: 438dae6b29d5c904d8f2781b3524f0a0, type: 2}
+  workSoundDelay: 0.4
+  workSoundEvery: {x: 3, y: 8}
   workOrders: []
   assignedEvent: {fileID: 11400000, guid: da5d7d1abc8282c40a98b65eea37ba76, type: 2}
   extraRumours: 0

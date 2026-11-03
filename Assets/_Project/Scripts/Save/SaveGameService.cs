@@ -49,6 +49,8 @@ public static class SaveGameService
     /// <summary>The save the game being played belongs to. Null until a new game first saves.</summary>
     public static string CurrentSlot { get; private set; }
 
+    private static string raidUnderWay;
+
     /// <summary>The name of the save being played, or null before it has one.</summary>
     public static string CurrentName { get; private set; }
 
@@ -114,6 +116,66 @@ public static class SaveGameService
         return GameSession.ActiveRaid != null ? RaidRefusal : null;
     }
 
+    /// <summary>
+    /// The save a raid sets out from (GDD §20.6), so a crash has something to go back to: the sparks and runes are paid, the gear is
+    /// in the bag and the player is at the portal. Nothing is saved during the raid, so a raid that never comes home simply didn't
+    /// happen: its haul is gone and nothing can be doubled. That is the policy, and the player is told when they next load.
+    /// </summary>
+    public static void SaveBeforeRaid(RaidDefinition raid)
+    {
+        if (!ShouldAutosave)
+        {
+            return;
+        }
+
+        raidUnderWay = raid.DisplayName;
+        if (!TrySave(out string problem))
+        {
+            Debug.LogWarning("Couldn't save before the raid: " + problem);
+        }
+
+        raidUnderWay = null;
+    }
+
+    /// <summary>Saves as soon as the player stands somewhere that can be saved: home from a raid, past its results screen.</summary>
+    public static void SaveOnceHome()
+    {
+        if (!ShouldAutosave)
+        {
+            return;
+        }
+
+        void OnReady(Scene scene)
+        {
+            if (CheckSave() != null)
+            {
+                return;
+            }
+
+            SceneTransition.SceneReady -= OnReady;
+            if (!TrySave(out string problem))
+            {
+                Debug.LogWarning("Couldn't save on coming home: " + problem);
+            }
+        }
+
+        SceneTransition.SceneReady += OnReady;
+    }
+
+    // A test session in the Editor, playing a scene with no game loaded, doesn't leave saves behind for Continue to find.
+    private static bool ShouldAutosave => Application.isPlaying && (CurrentSlot != null || !Application.isEditor);
+
+    /// <summary>What the player is told on loading a save, in words for them.</summary>
+    public static string NoticeFor(SaveData data, int missing)
+    {
+        if (!string.IsNullOrEmpty(data.raidUnderWay))
+        {
+            return $"Your raid into {data.raidUnderWay} was cut short. You are back at the portal with what you took in. Nothing from that raid came home.";
+        }
+
+        return missing > 0 ? $"Game loaded. {missing} saved entries no longer exist and were skipped." : "Game loaded.";
+    }
+
     /// <summary>Saves the game being played to its own save, making one if it has none yet.</summary>
     public static bool TrySave(out string problem)
     {
@@ -148,6 +210,7 @@ public static class SaveGameService
             GameSession.World, GameSession.Quests, GameSession.Settlement, GameSession.Playtest, GameSession.Progress);
         data.displayName = name;
         data.appearance = GameSession.Appearance.Clone();
+        data.raidUnderWay = raidUnderWay;
         try
         {
             Storage.Write(slot, data);
@@ -322,11 +385,10 @@ public static class SaveGameService
             return false;
         }
 
-        string notice = "Game loaded.";
+        string notice = NoticeFor(data, game.MissingContent.Count);
         if (game.MissingContent.Count > 0)
         {
             Debug.LogWarning("The save mentions content that no longer exists and was skipped: " + string.Join(", ", game.MissingContent));
-            notice = $"Game loaded. {game.MissingContent.Count} saved entries no longer exist and were skipped.";
         }
 
         // A position only makes sense in the scene it was saved in.
@@ -339,6 +401,12 @@ public static class SaveGameService
         CurrentSlot = slot;
         CurrentName = SaveSlotInfo.NameFor(slot, data);
         Go(scene, notice, "Returning to your journey");
+        if (!string.IsNullOrEmpty(data.raidUnderWay))
+        {
+            // Once told, the save stops saying so.
+            SaveOnceHome();
+        }
+
         return true;
     }
 

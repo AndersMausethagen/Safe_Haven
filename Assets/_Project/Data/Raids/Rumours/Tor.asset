@@ -15,6 +15,7 @@ MonoBehaviour:
   id: rumour.tor
   briefing: A saw was heard in the deep woods, where nobody saws.
   site: {fileID: 11400000, guid: 52da5f229c32d26489ab9520410fa554, type: 2}
+  setPiece: {fileID: 11400000, guid: e433b9e888e511d4c8743cc6a40c672a, type: 2}
   weight: 2
   hour: 0
   seeks: {fileID: 11400000, guid: df34e8e1df8ff0241a216bfddf9b631c, type: 2}
@@ -22,4 +23,6 @@ MonoBehaviour:
   breachComing: 0
   afterExtractions: 1
   needsBuilding: {fileID: 11400000, guid: 1fe15b30940bf7049a4e4966e9954e1b, type: 2}
+  needsTier: 1
+  untilBeaten: {fileID: 0}
   urgent: 1

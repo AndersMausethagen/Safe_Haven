@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 29829ad09c7ec8b4a88f9fd809bb3633, type: 3}
+  m_Name: Wolf Den
+  m_EditorClassIdentifier: SafeHaven::RaidSetPieceDefinition
+  id: wolf_den
+  displayName: Wolf Den
+  prefab: {fileID: 1188941405601281374, guid: a1c672ed8d66fd641983fc204e5d0fba, type: 3}
+  radius: 10
+  weight: 1
+  holdsRumours: 0
+  alwaysThere: 0
+  moods: []
+  guards:
+  - prefab: {fileID: 4584692032328657812, guid: 64cf9de042e1bc142907212054f70f50, type: 3}
+    count: 1
+    fromTier: 1
+  - prefab: {fileID: 7477446688404098989, guid: 237fc76d161bb114aa2049a864298943, type: 3}
+    count: 2
+    fromTier: 3

@@ -19,6 +19,12 @@ MonoBehaviour:
   arrivalLine: It's built crooked, you know. All of it. Give me a week.
   welcomeLine: 
   fallenLine: My tools. Leave them, if you have to. Not me.
+  fightLines:
+    spotted: []
+    behindYou: []
+    hurt: []
+    won: []
   model: {fileID: 8788668705461976432, guid: 16fd07cae11001b428f7eb54b6857a7b, type: 3}
+  raidCompanion: {fileID: 11400000, guid: 60d284aaf3c06f24fba9e928940c43c5, type: 2}
   jobs:
   - {fileID: 11400000, guid: b33d365bf7bdfe74793c6d3f0f4b33a5, type: 2}

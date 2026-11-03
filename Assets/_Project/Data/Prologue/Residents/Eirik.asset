@@ -31,5 +31,6 @@ MonoBehaviour:
     - Is that all? I was only warming up.
     - Clean your blade. It's a bad habit to forget.
   model: {fileID: 7203023521572123092, guid: e9086faa98b6d46469582090adb9f0e3, type: 3}
+  raidCompanion: {fileID: 11400000, guid: 60d284aaf3c06f24fba9e928940c43c5, type: 2}
   jobs:
   - {fileID: 11400000, guid: f918ba89b7b235448905310320940c70, type: 2}

@@ -25,6 +25,8 @@ public sealed class RaidRumourDefinition : ScriptableObject
     [SerializeField, TextArea] private string briefing;
     [Tooltip("What stands there. Its site, choices and outcomes are the rumour's reward.")]
     [SerializeField] private RaidEventDefinition site;
+    [Tooltip("The kind of place it wants to stand in, if the map has one. Empty: whatever is there.")]
+    [SerializeField] private RaidSetPieceDefinition setPiece;
     [Tooltip("Relative chance against the other rumours that could come up.")]
     [SerializeField, Min(0f)] private float weight = 1f;
 
@@ -42,12 +44,15 @@ public sealed class RaidRumourDefinition : ScriptableObject
     [SerializeField] private BuildingDefinition needsBuilding;
     [Tooltip("The tier that building must stand at.")]
     [SerializeField, Min(1)] private int needsTier = 1;
+    [Tooltip("Only until this boss has been beaten.")]
+    [SerializeField] private BossDefinition untilBeaten;
     [Tooltip("Comes up ahead of any chosen at random, as soon as it can.")]
     [SerializeField] private bool urgent;
 
     public string Id => string.IsNullOrWhiteSpace(id) ? name : id;
     public string Briefing => briefing;
     public RaidEventDefinition Site => site;
+    public RaidSetPieceDefinition SetPiece => setPiece;
     public float Weight => weight;
     public bool Urgent => urgent;
 
@@ -65,6 +70,11 @@ public sealed class RaidRumourDefinition : ScriptableObject
         }
 
         if (seeks != null && settlement.HasResident(seeks))
+        {
+            return false;
+        }
+
+        if (untilBeaten != null && settlement.IsBossDefeated(untilBeaten.Id))
         {
             return false;
         }

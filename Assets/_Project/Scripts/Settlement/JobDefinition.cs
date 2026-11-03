@@ -25,6 +25,11 @@ public sealed class WorkOrder
 public sealed class JobDefinition : ScriptableObject
 {
     public EmoteDefinition WorkGesture => workGesture;
+    public ItemDefinition WorkTool => workTool;
+    public float WorkToolScale => workToolScale;
+    public SoundDefinition WorkSound => workSound;
+    public float WorkSoundDelay => workSoundDelay;
+    public Vector2 WorkSoundEvery => workSoundEvery;
 
     [Tooltip("Stable unique identifier, used for saves.")]
     [SerializeField] private string id;
@@ -41,6 +46,16 @@ public sealed class JobDefinition : ScriptableObject
     [SerializeField] private BuildingDefinition workplace;
     [Tooltip("What they do with their hands there: forging, reading. Empty: they just stand by it.")]
     [SerializeField] private EmoteDefinition workGesture;
+    [Tooltip("What they hold while they work. Empty: bare hands.")]
+    [SerializeField] private ItemDefinition workTool;
+    [Tooltip("Times the size the tool has as an item: a warhammer is rather less at the anvil.")]
+    [SerializeField, Min(0.05f)] private float workToolScale = 1f;
+    [Tooltip("What their work sounds like. Empty: nothing.")]
+    [SerializeField] private SoundDefinition workSound;
+    [Tooltip("Seconds into each work gesture that the sound lands: when the hammer comes down.")]
+    [SerializeField, Min(0f)] private float workSoundDelay = 0.4f;
+    [Tooltip("With a gesture that is held rather than repeated, how often the sound comes, in seconds.")]
+    [SerializeField] private Vector2 workSoundEvery = new Vector2(1.5f, 4f);
     [Tooltip("What they keep making on their own at their workplace, first that can be made first, while the player is away too.")]
     [SerializeField] private List<WorkOrder> workOrders = new List<WorkOrder>();
     [Tooltip("Raised when someone takes the job, for quests such as \"Find work for the traveler\".")]
@@ -53,6 +68,8 @@ public sealed class JobDefinition : ScriptableObject
     [SerializeField, Range(0f, 1f)] private float gearRepairDiscount;
     [Tooltip("Share off the cost of mending buildings after a breach.")]
     [SerializeField, Range(0f, 1f)] private float buildingRepairDiscount;
+    [Tooltip("They stand guard in a ward breach, fighting like this instead of running for the portal. Empty: they shelter with the rest.")]
+    [SerializeField] private CompanionDefinition defendsAs;
     [Tooltip("Share more health for the ward during a breach.")]
     [SerializeField, Min(0f)] private float wardHealth;
     [Tooltip("Seconds added to the clock of every raid.")]
@@ -71,6 +88,7 @@ public sealed class JobDefinition : ScriptableObject
     public float GearRepairDiscount => gearRepairDiscount;
     public float BuildingRepairDiscount => buildingRepairDiscount;
     public float WardHealth => wardHealth;
+    public CompanionDefinition DefendsAs => defendsAs;
     public float RaidSeconds => raidSeconds;
 
     /// <summary>What the job does for the haven, in a line for the player. Empty when it does none of these.</summary>
@@ -80,6 +98,7 @@ public sealed class JobDefinition : ScriptableObject
         if (extraRumours > 0) parts.Add($"{extraRumours} more rumour{(extraRumours == 1 ? "" : "s")} before each raid");
         if (gearRepairDiscount > 0f) parts.Add($"gear repairs cost {Mathf.RoundToInt(gearRepairDiscount * 100f)}% less");
         if (buildingRepairDiscount > 0f) parts.Add($"mending buildings costs {Mathf.RoundToInt(buildingRepairDiscount * 100f)}% less");
+        if (defendsAs != null) parts.Add("stands guard in a breach");
         if (wardHealth > 0f) parts.Add($"the ward holds {Mathf.RoundToInt(wardHealth * 100f)}% longer in a breach");
         if (raidSeconds > 0f) parts.Add($"{raidSeconds:0} more seconds in every raid");
         return string.Join(", ", parts);

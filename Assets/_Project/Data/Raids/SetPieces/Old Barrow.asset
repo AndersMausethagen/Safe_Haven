@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 29829ad09c7ec8b4a88f9fd809bb3633, type: 3}
+  m_Name: Old Barrow
+  m_EditorClassIdentifier: SafeHaven::RaidSetPieceDefinition
+  id: old_barrow
+  displayName: Old Barrow
+  prefab: {fileID: 1795259351188993423, guid: 9c6e4c351415c1444b0b73c5e60ebed3, type: 3}
+  radius: 11
+  weight: 1
+  holdsRumours: 1
+  alwaysThere: 0
+  moods: []
+  guards:
+  - prefab: {fileID: 3085881180223279310, guid: 049004d8140885f4db2790503b4ab12d, type: 3}
+    count: 2
+    fromTier: 1
+  - prefab: {fileID: 9066855856663566298, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
+    count: 2
+    fromTier: 2
+  - prefab: {fileID: 7112812444035070341, guid: e6646a32ac93d664c950e5e95fd45e0e, type: 3}
+    count: 1
+    fromTier: 2

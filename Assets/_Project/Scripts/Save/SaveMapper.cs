@@ -181,6 +181,17 @@ public static class SaveMapper
             into.residents.Add(new ResidentSaveData { id = record.Resident.Id, workPaused = record.WorkPaused, job = record.Job != null ? record.Job.Id : "" });
         }
 
+        into.defeatedBosses.AddRange(settlement.DefeatedBosses);
+        foreach (FallenRecord record in settlement.Fallen)
+        {
+            into.fallen.Add(new FallenSaveData { id = record.Resident.Id, where = record.Where, atExtraction = record.AtExtraction });
+        }
+
+        foreach (JobDefinition job in settlement.VacantJobs)
+        {
+            into.vacantJobs.Add(job.Id);
+        }
+
         foreach (StationQueue queue in settlement.Workshops.Queues)
         {
             if (queue.IsIdle && queue.Output == null)
@@ -242,6 +253,21 @@ public static class SaveMapper
                 settlement.AddResident(resident, job);
                 settlement.Find(resident).WorkPaused = entry.workPaused;
             }
+        }
+
+        foreach (string boss in saved.defeatedBosses ?? new List<string>())
+        {
+            settlement.MarkBossDefeated(boss);
+        }
+
+        foreach (FallenSaveData entry in saved.fallen ?? new List<FallenSaveData>())
+        {
+            settlement.RestoreFallen(Resolve(content.FindResident(entry?.id), "resident", entry?.id, missing), entry?.where, entry != null ? entry.atExtraction : 0);
+        }
+
+        foreach (string job in saved.vacantJobs ?? new List<string>())
+        {
+            settlement.RestoreVacantJob(Resolve(content.FindJob(job), "job", job, missing));
         }
 
         ReadStations(saved.stations, settlement.Workshops, content, missing);

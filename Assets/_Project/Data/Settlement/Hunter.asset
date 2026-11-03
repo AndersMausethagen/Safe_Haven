@@ -20,6 +20,11 @@ MonoBehaviour:
   teachesRecipes: []
   workplace: {fileID: 11400000, guid: 27159a7266bda614cbc6774955749e0e, type: 2}
   workGesture: {fileID: 11400000, guid: 7c9176c17f7f8644085abfda4ecc4cac, type: 2}
+  workTool: {fileID: 11400000, guid: bf7fa9175281dfe4999bcc00b25b610f, type: 2}
+  workToolScale: 1
+  workSound: {fileID: 11400000, guid: 6c51bd6dae1dacb458d998653dd0680e, type: 2}
+  workSoundDelay: 0.4
+  workSoundEvery: {x: 1.5, y: 3.5}
   workOrders:
   - recipe: {fileID: 11400000, guid: 13ff623e6c98b8d4d9d3aa528e45b09a, type: 2}
     stockTarget: 24
@@ -31,5 +36,6 @@ MonoBehaviour:
   extraRumours: 0
   gearRepairDiscount: 0
   buildingRepairDiscount: 0
+  defendsAs: {fileID: 11400000, guid: bfeda7cc0c77ea24dac614548220c4eb, type: 2}
   wardHealth: 0
   raidSeconds: 0

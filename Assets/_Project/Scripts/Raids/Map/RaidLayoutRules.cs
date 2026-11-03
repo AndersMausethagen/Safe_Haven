@@ -181,6 +181,15 @@ public sealed class RaidLayoutRules : ScriptableObject
     [Tooltip("Spawn groups placed by hand on the painted map, and the kind of site that takes them here.")]
     [SerializeField] private List<RaidGroupRule> groups = new List<RaidGroupRule>();
 
+    [Header("Set Pieces")]
+    [Tooltip("The authored places a run can have. Every rumour site that has room gets one, as do a few camps.")]
+    [SerializeField] private List<RaidSetPieceDefinition> setPieces = new List<RaidSetPieceDefinition>();
+    [Tooltip("How many of the map's camps are one, least and most.")]
+    [SerializeField] private Vector2Int campPieces = new Vector2Int(1, 2);
+
+    public IReadOnlyList<RaidSetPieceDefinition> SetPieces => setPieces;
+    public Vector2Int CampPieces => campPieces;
+
     public Vector2Int Rooms => rooms;
     public float RoomSeparation => roomSeparation;
     public Vector2 RoomRadius => roomRadius;

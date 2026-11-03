@@ -35,6 +35,8 @@ public sealed class SaveData
     public string displayName;
     /// <summary>How the player looks and their name. Missing in older saves, which then get the starting look.</summary>
     public CharacterAppearance appearance = new CharacterAppearance();
+    /// <summary>The raid this save was made on the way into, by name. Loaded with this still set, that raid never came home. Empty in other saves.</summary>
+    public string raidUnderWay;
 }
 
 /// <summary>A PlaytestRun.</summary>
@@ -73,6 +75,12 @@ public sealed class SettlementSaveData
     /// <summary>Share taken off the next breach. Missing in older saves.</summary>
     public float breachWeakening;
     public List<ResidentSaveData> residents = new List<ResidentSaveData>();
+    /// <summary>Ids of the bosses beaten. Missing in older saves.</summary>
+    public List<string> defeatedBosses = new List<string>();
+    /// <summary>Those lost on raids. Missing in older saves.</summary>
+    public List<FallenSaveData> fallen = new List<FallenSaveData>();
+    /// <summary>Ids of the jobs they left. Missing in older saves.</summary>
+    public List<string> vacantJobs = new List<string>();
     public int purificationQueued;
     public float purificationProgress;
     /// <summary>Share faster the altar works for its upgrades. Missing in older saves; the altar sets it again at home.</summary>
@@ -110,6 +118,14 @@ public sealed class StationJobSaveData
     /// <summary>The recipe's id.</summary>
     public string recipe;
     public int count;
+}
+
+[Serializable]
+public sealed class FallenSaveData
+{
+    public string id;
+    public string where;
+    public int atExtraction;
 }
 
 [Serializable]

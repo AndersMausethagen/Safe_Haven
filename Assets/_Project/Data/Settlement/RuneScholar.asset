@@ -26,6 +26,11 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 1cfe514dde62f1d448a946755d940c7c, type: 2}
   workplace: {fileID: 11400000, guid: a10bf06ba7306584f8632f492a16fdac, type: 2}
   workGesture: {fileID: 11400000, guid: b1c56523b0af6fd4ebe99cd806eb27ff, type: 2}
+  workTool: {fileID: 0}
+  workToolScale: 1
+  workSound: {fileID: 11400000, guid: 6d448bf06812b4f489e22415000e1426, type: 2}
+  workSoundDelay: 0.4
+  workSoundEvery: {x: 7, y: 16}
   workOrders: []
   assignedEvent: {fileID: 0}
   extraRumours: 0

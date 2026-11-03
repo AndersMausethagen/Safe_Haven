@@ -32,6 +32,10 @@ public sealed class ResidentDefinition : ScriptableObject
     [Tooltip("The character model used in raids and at home.")]
     [SerializeField] private GameObject model;
 
+    [Header("Raids")]
+    [Tooltip("How they fight when they go along on a raid. Empty: they stay at home.")]
+    [SerializeField] private CompanionDefinition raidCompanion;
+
     [Header("Jobs")]
     [Tooltip("Jobs they can be given at home. The first is suggested.")]
     [SerializeField] private JobDefinition[] jobs = new JobDefinition[0];
@@ -45,5 +49,6 @@ public sealed class ResidentDefinition : ScriptableObject
     public string FallenLine => fallenLine;
     public FightLines FightLines => fightLines;
     public GameObject Model => model;
+    public CompanionDefinition RaidCompanion => raidCompanion;
     public JobDefinition[] Jobs => jobs;
 }

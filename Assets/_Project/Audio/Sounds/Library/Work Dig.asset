@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0de871765cd6fce4c8fed103ef0082e3, type: 3}
+  m_Name: Work Dig
+  m_EditorClassIdentifier: SafeHaven::SoundDefinition
+  displayName: Work Dig
+  clips:
+  - {fileID: 8300000, guid: 7303846827e5aa742a83964e2fae71da, type: 3}
+  - {fileID: 8300000, guid: c786f077713721f4e87d74d258c5c578, type: 3}
+  - {fileID: 8300000, guid: d91cebc6c8b2896478de0be0893c8e58, type: 3}
+  - {fileID: 8300000, guid: ca2ca1ea023f00540998101878726db5, type: 3}
+  channel: 2
+  volume: 0.42
+  volumeVariation: 0.1
+  pitchRange: {x: 0.94, y: 1.06}
+  positional: 1
+  fullVolumeDistance: 2.5
+  audibleDistance: 18
+  maxAtOnce: 2
+  minimumGap: 0.03
+  priority: 1
+  takesTheMix: 0

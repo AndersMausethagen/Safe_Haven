@@ -631,6 +631,8 @@ without loading it, and a file that can't be read still gets a row so it can be 
 from the main menu and the Escape menu: load, overwrite and Save as New while playing, rename, delete. The old `save.json` is
 just the first slot ("Journey 1"). F6 loads the current save, or the newest. Continue on the main menu loads the newest.
 
+**Autosave and crashes (GDD §20.6):** `SaveGameService.SaveBeforeRaid` saves when a raid sets out, with the sparks and runes paid and `SaveData.raidUnderWay` set, and `SaveOnceHome` saves once the player stands at home again, past the results screen. Nothing is saved in a raid, so a raid that never comes home simply didn't happen: its haul is gone and nothing can be doubled. Loading a save with the mark tells the player so (`NoticeFor`), then saves it away. Quitting a raid to the menu goes the same way. It costs the raid's haul and spares a failed raid's wear, a fair price for a crash and little gain from pulling the plug. An Editor session playing a scene with no game loaded doesn't autosave, so it leaves nothing for Continue to find.
+
 What the file holds besides the bag, stash and quests: the settlement (`SaveData.settlement`: portal, ward level,
 breach, residents with jobs, purification queue), each item's wear (`SlotSaveData.wear`, so saves from before durability
 load undamaged), hunger, thirst and the equipped slot, and the buildings the player knows.
@@ -1172,6 +1174,22 @@ Rules are plain C# and tested in `Editor/Tests/LivingWorldTests.cs`; every numbe
 - Danger is a ward breach, or a monster hunting the player's side within Danger Radius of that person. They run for the portal.
 - To see it: **Safe Haven › Quests › Play Haven (Isolated Saves)** plays the Haven without touching the real save.
 
+## Going along, set-pieces and bosses
+
+**Raid companions (GDD §8.4, §15.5).** `ResidentDefinition` › Raid Companion says how someone fights; the raid planner offers everyone who has one and lives in the Haven, one per raid (`RaidLauncher.CanGoAlong`, `RaidSession.Companion`). `RaidDirector.BringCompanion` spawns them beside the player from `SettlementSettings` › Raid Companion Prefab with their own model (`Companion.SpawnAs`), scaled by the raid's multipliers the other way round: enemy power makes them tougher and enemy health makes them hit harder, so they stay as much help at any tier. On a raid they don't get up by themselves: `CompanionDefinition` › Bleed Out Seconds (45) to help them up, or they are gone. Down when the raid ends counts the same, because nobody went back. Alive but elsewhere, they find their own way home. `SettlementState.LoseResident` takes them off the list for good: raids treat them as accounted for (`HasResident`), so they can't be rescued again. A `FallenCairn` goes up near the portal, `ResidentNpc` speaks of it for `GriefRaids` raids, and their job goes on `VacantJobs`, open to anyone (`JobsOpenTo`), so a death never blocks crafting (GDD §7). A crash brings them back, like everything else in a raid that never came home.
+
+**Guards.** `JobDefinition` › Defends As: through a ward breach that resident is on guard (`ResidentDefender`, held by `ResidentLife`): they step out and a Companion with their model holds a post, the Watch Post if that is their workplace, else a ring round the portal. A guard gets up by itself, so nobody dies of a breach. The rest shelter. Warden and Hunter do this now.
+
+**Set-pieces (GDD §9.2).** `RaidSetPieceDefinition` is an authored place: a prefab built round a clear middle, the room it needs, the moods it suits, its guards by tier. `RaidLayoutPlanner.PlaceSetPieces` gives one to every rumour site and to a few camps, from its own random stream so it never moves a site, and adds a pocket of level ground. `RaidMapGenerator.PlacePieces` stands them, each direct child on the ground by itself. Guards come out in `RaidDirector.BeginRaid` (`RaidSetPieceSite.BringGuards`), strengthened like any spawn. A rumour can name the place it wants (`RaidRumourDefinition` › Set Piece, `RaidRumourDirector.TakeSpot`); if the map lacks it, it takes what is there. A new place is an asset and a prefab in Layout Rules › Set Pieces: `AgentScripts/BuildSetPieces.cs` makes the first six from the forest kit.
+
+**Bosses (GDD §16.5).** `BossDefinition` holds the name, phases and reward; `BossEncounter` on the prefab moves the fight on as health falls, opens attacks by `MonsterAttack` › From Phase, and shows `BossBar`. Each phase can make it reel, and hit harder. The reward is learned at once and kept even if the player falls before getting home (`SettlementState.MarkBossDefeated`, given once); drops are ordinary drops and have to be carried out. The Heartroot (`AgentScripts/BuildFirstBoss.cs`) is reached through the rumour system: `TheHeartroot` is urgent from the third raid and stops once it is beaten, the HUD points to it, and the player chooses to wake it at a stump in Guardian's Hollow. That set-piece is Always There, on the rumour site farthest from the apex, so the great troll's round doesn't cross the fight. A phase gate has two sides: `SelectAttack` for what it may use and `HoldsGround` for where it stops, or it waits at the range of an attack it hasn't learned.
+
+**Finishing blow.** A press close behind a staggered creature that Can Be Finished (person-shaped: Draug, Barrow Shieldbearer) locks the two bodies for the stab (`PlayerCombat.BeginFinish`, `StrikeRules.CanFinish`, `CombatTechniqueSettings` › Finishing Blow). The numbers and timing are the weapon's own rush, and only the look is `Finish Stab`, a clip whose reach peaks at the 0.28 s where every rush lands, so it can't change the balance. `MonsterAI.HoldForFinish` keeps it reeling and stands it up to take the blow.
+
+**A heavy bag (GDD §12.4).** `PlayerBurden`, on the player, reads the bag's weight: past Player Movement Settings › Carrying › Heavy From Share (80%) speed, stamina costs and footstep noise ease toward their Full Bag values (rule: `CarryLoad`). 100% is still a hard cap. A backpack can have a cost of its own: `ItemDefinition` › Carry Noise, Carry Speed Scale, Carry Sound. The Haul Sack carries 90 to the Hide Rucksack's 40, with half its slots, 8% slower, and every step 5 m louder.
+
+**Work.** `JobDefinition` › Work Tool, Work Tool Scale, Work Sound, Work Sound Delay: `ResidentLife` shows the tool only while working. A repeated gesture sounds at its moment of contact (read off the clip by `AgentScripts/BuildHavenWork.cs`), and a held one every so often.
+
 ## Loot: rarity, carry space and the safe pocket
 
 - **Rarity and value** live on `ItemDefinition` (Loot header). `Rarity` (in `Items/ItemRarity.cs`) turns a rarity into a
@@ -1357,7 +1375,11 @@ menu. Tabs: Gameplay, Graphics, Audio, Controls, Accessibility. It only draws se
   The Editor's Game view keeps its own size, so none of that shows there.
 - **Controls** (`InputRebinds`): `Rows` lists what can be rebound; overrides go on the Input Actions asset and into PlayerPrefs,
   so `GameInput.KeyLabel` follows them. A key in use swaps with the other row. Escape is the game's own. While waiting for a
-  key every map but UI is off. Prompts with a key written in the text ("[E]", "(N)") don't follow a rebind yet.
+  key every map but UI is off. Text is written with the default keys ("[E]", "(N)", quests' "(B)"), and `GameInput.WithRebinds` puts in the
+  new key wherever it is shown (quest tracker, dialogue, messages, prompts). It costs nothing without a rebind.
+- **Accessibility:** Sound Captions (`SoundCaptions`, a persistent system: `SoundDefinition` › Caption, with the side it came from), Rarity
+  Letters on item slots, Damage Taken and Parry and Dodge Timing (`GameOptions.DamageTakenShare`, `TimingShare`). An assist in use is written to
+  the playtest log as an `Assist` row, so a helped run can be told from another.
 - **Not in here:** audio volumes stay in `AudioManager`, camera styles in `CameraPreferences`; the screen uses them directly.
 
 ## Conventions
