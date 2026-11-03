@@ -130,6 +130,13 @@ public sealed class Construction : MonoBehaviour, ISaveable, IStationMenuExtensi
             return false;
         }
 
+        BuildingLevel wanted = Definition.UpgradeTo(Level + 1);
+        if (!BuildingUnlocks.IsOpen(wanted))
+        {
+            GameMessages.Post(BuildingUnlocks.Missing(wanted), MessageKind.Warning);
+            return false;
+        }
+
         Cost(out IReadOnlyList<ResourceAmount> resources, out IReadOnlyList<ItemAmount> items);
         if (!MaterialPool.For(payer).TrySpend(resources, items))
         {
@@ -378,6 +385,11 @@ public sealed class Construction : MonoBehaviour, ISaveable, IStationMenuExtensi
         if (TryGetComponent(out CraftingStation station))
         {
             station.Usable = IsStanding;
+        }
+
+        foreach (VisibilitySource light in GetComponentsInChildren<VisibilitySource>(true))
+        {
+            light.ExtraRadius = Sum(level => level.extraLight);
         }
 
         ShowRise();

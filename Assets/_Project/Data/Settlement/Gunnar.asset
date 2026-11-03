@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 761f1ee1822cb4844a3034bb7c1d4011, type: 3}
+  m_Name: Gunnar
+  m_EditorClassIdentifier: SafeHaven::ResidentDefinition
+  id: settler.gunnar
+  displayName: Gunnar
+  description: A hunter who has been walking these woods for years, alone by choice, until the choice ran out.
+  rescueLine: Thank you! Get me out of here and I'll follow you anywhere.
+  arrivalLine: You've been frightening my deer. Least you can do is give me a roof.
+  welcomeLine: 
+  fallenLine: I can't go on... come back for me.
+  model: {fileID: 4545198816639002052, guid: d1bff4db31900154b9550b8dd8a37606, type: 3}
+  jobs:
+  - {fileID: 11400000, guid: 9d8e9d72cc07d544c975b891d5c740e6, type: 2}

@@ -20,8 +20,8 @@ public static class HavenReadiness
 
     public static int ExtraLogs => Mathf.RoundToInt(BestOfEachKind(level => level.extraLogs));
 
-    /// <summary>Comfort at home: what each kind of building gives once, plus what its upgrades add.</summary>
-    public static int Comfort => Standing().Select(ComfortOf).GroupBy(entry => entry.Building).Sum(kind => kind.Max(entry => entry.Comfort));
+    /// <summary>Comfort at home: what each kind of building gives once, plus what its upgrades add, and everyone with a bed.</summary>
+    public static int Comfort => Standing().Select(ComfortOf).GroupBy(entry => entry.Building).Sum(kind => kind.Max(entry => entry.Comfort)) + GameSession.Settlement.Housed;
 
     public static float RestedSeconds => Comfort * HavenSettings.Current.RestedSecondsPerComfort;
 
@@ -86,7 +86,8 @@ public static class HavenReadiness
         entry.Details.Add(new HavenDetail("From the ward", $"{RaidStats.FormatTime(WardSeconds)}"));
         if (level < settings.WardLevels.Count)
         {
-            entry.Details.Add(new HavenDetail("Next", $"Strengthen the ward at the Heart Tree: {RaidStats.FormatTime(settings.WardLevels[level].raidSeconds)} more."));
+            string opens = settings.WardLevels[level].opens;
+            entry.Details.Add(new HavenDetail("Next", $"Strengthen the ward at the Heart Tree: {RaidStats.FormatTime(settings.WardLevels[level].raidSeconds)} more.{(string.IsNullOrEmpty(opens) ? "" : " " + opens)}"));
         }
 
         return entry;
@@ -107,7 +108,13 @@ public static class HavenReadiness
         };
         var sources = Standing().Select(ComfortOf).Where(one => one.Comfort > 0).GroupBy(one => one.Building)
             .Select(kind => $"{kind.Key.DisplayName}: {kind.Max(one => one.Comfort)}").ToList();
-        entry.Details.Add(new HavenDetail("Comfort from", sources.Count > 0 ? string.Join("\n", sources) : "Nothing yet. A Cottage is the best start."));
+        int housed = GameSession.Settlement.Housed;
+        if (housed > 0)
+        {
+            sources.Add($"People with a bed: {housed}");
+        }
+
+        entry.Details.Add(new HavenDetail("Comfort from", sources.Count > 0 ? string.Join("\n", sources) : "Nothing yet. A Hut is the best start."));
         return entry;
     }
 

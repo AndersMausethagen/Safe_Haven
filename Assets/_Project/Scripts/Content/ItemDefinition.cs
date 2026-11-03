@@ -101,6 +101,10 @@ public sealed class ItemDefinition : ScriptableObject, IStackDefinition
     [SerializeField] private bool tonic;
     [Tooltip("Status effects it takes away: an antidote cures Poison.")]
     [SerializeField] private List<StatusEffectDefinition> cures = new List<StatusEffectDefinition>();
+    [Tooltip("A repair kit: share of full durability every worn piece gets back. 0.3 means 30%.")]
+    [SerializeField, Range(0f, 1f)] private float gearRepair;
+    [Tooltip("A field kit: what it sets down where the player stands, in a raid only (a camp, a way out).")]
+    [SerializeField] private GameObject placesInRaid;
 
     [Header("Backpack")]
     [Tooltip("Extra carry weight for the bag while this backpack is worn. 0 means it isn't a backpack.")]
@@ -173,7 +177,9 @@ public sealed class ItemDefinition : ScriptableObject, IStackDefinition
     /// <summary>True when eating it gives timed bonuses.</summary>
     public bool HasBoon => boonBonuses.Count > 0 && boonSeconds > 0f;
     /// <summary>True for consumables: something restores health, hunger or thirst, gives a boon or cures when used.</summary>
-    public bool IsConsumable => healAmount > 0f || hungerRestore > 0f || thirstRestore > 0f || HasBoon || cures.Count > 0;
+    public bool IsConsumable => healAmount > 0f || hungerRestore > 0f || thirstRestore > 0f || HasBoon || cures.Count > 0 || gearRepair > 0f || placesInRaid != null;
+    public float GearRepair => gearRepair;
+    public GameObject PlacesInRaid => placesInRaid;
     /// <summary>True when right-clicking does something: eat, drink, heal, equip or read.</summary>
     public bool IsUsable => IsConsumable || IsEquippable || IsBlueprint || experience > 0 || transport != null;
     public TransportDefinition Transport => transport;

@@ -45,6 +45,7 @@ MonoBehaviour:
   - tier: 1
     recommendedGearScore: 10
     minimumGearScore: 0
+    wardLevelNeeded: 0
     enemyHealth: 1
     enemyPower: 1
     enemyDensity: 1
@@ -70,6 +71,7 @@ MonoBehaviour:
   - tier: 2
     recommendedGearScore: 30
     minimumGearScore: 15
+    wardLevelNeeded: 1
     enemyHealth: 1.4
     enemyPower: 1.35
     enemyDensity: 1.15
@@ -95,6 +97,7 @@ MonoBehaviour:
   - tier: 3
     recommendedGearScore: 50
     minimumGearScore: 30
+    wardLevelNeeded: 2
     enemyHealth: 2.1
     enemyPower: 2.6
     enemyDensity: 1.3
@@ -120,6 +123,7 @@ MonoBehaviour:
   - tier: 4
     recommendedGearScore: 70
     minimumGearScore: 45
+    wardLevelNeeded: 3
     enemyHealth: 2.6
     enemyPower: 3.4
     enemyDensity: 1.45

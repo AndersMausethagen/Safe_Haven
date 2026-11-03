@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 /// <summary>Where the current ward breach stands (GDD §6.6). Values are saved as numbers: add new ones at the end.</summary>
 public enum BreachStatus
@@ -41,6 +42,8 @@ public sealed class SettlementState
 {
     private readonly Dictionary<BuildingDefinition, int> builtTiers = new Dictionary<BuildingDefinition, int>();
     private readonly List<ResidentRecord> residents = new List<ResidentRecord>();
+    private readonly Dictionary<string, int> tradeBought = new Dictionary<string, int>();
+    private float purifiedRemainder;
 
     public bool PortalRepaired { get; private set; }
     public int WardLevel { get; private set; }
@@ -70,6 +73,38 @@ public sealed class SettlementState
 
     public IReadOnlyList<ResidentRecord> Residents => residents;
 
+    /// <summary>Beds standing at home, as last seen there. Nobody needs one; whoever has one works faster and adds comfort.</summary>
+    public int Beds { get; private set; }
+
+    /// <summary>How many residents have a bed.</summary>
+    public int Housed => Math.Min(Beds, residents.Count);
+
+    /// <summary>Whether this resident has a bed. They are shared out in order of arrival.</summary>
+    public bool HasBed(ResidentRecord record)
+    {
+        int index = residents.IndexOf(record);
+        return index >= 0 && index < Beds;
+    }
+
+    /// <summary>How far the portal has been improved (SettlementSettings.PortalLevels).</summary>
+    public int PortalLevel { get; private set; }
+
+    /// <summary>What every kind of building's reached upgrades add up to, as last seen at home, where raids can't look.</summary>
+    public int UpgradeBonus(Func<BuildingLevel, int> bonus)
+    {
+        int total = 0;
+        foreach (KeyValuePair<BuildingDefinition, int> built in builtTiers)
+        {
+            for (int level = 2; level <= built.Value; level++)
+            {
+                BuildingLevel upgrade = built.Key.UpgradeTo(level);
+                total += upgrade != null ? bonus(upgrade) : 0;
+            }
+        }
+
+        return total;
+    }
+
     /// <summary>The Smithy's tier as last seen at home: 0 before there is one. What raids and workers go by, where no building is loaded.</summary>
     public int SmithyTier => BuiltTier(CraftingStationType.Anvil);
 
@@ -97,6 +132,7 @@ public sealed class SettlementState
     public void NoteBuildings(IEnumerable<BuildingObject> standing)
     {
         builtTiers.Clear();
+        int beds = 0;
         foreach (BuildingObject building in standing)
         {
             if (building.Definition == null)
@@ -104,8 +140,12 @@ public sealed class SettlementState
                 continue;
             }
 
-            NoteBuilt(building.Definition, building.TryGetComponent(out Construction construction) ? construction.Level : 1);
+            bool upgrades = building.TryGetComponent(out Construction construction);
+            NoteBuilt(building.Definition, upgrades ? construction.Level : 1);
+            beds += building.Definition.Beds + (upgrades ? Mathf.RoundToInt(construction.Sum(level => level.beds)) : 0);
         }
+
+        Beds = beds;
     }
 
     public void NoteBuilt(BuildingDefinition building, int tier)
@@ -128,6 +168,9 @@ public sealed class SettlementState
     /// <summary>Share faster the altar works for its upgrades. Set by the altar; kept here as batches finish during raids.</summary>
     public float PurificationBonus { get; private set; }
 
+    /// <summary>Share more Purified Essence from each batch for the altar's upgrades. Set by the altar, like the speed.</summary>
+    public float PurificationYield { get; private set; }
+
     /// <summary>Raised after anything here changes (but not on every purification tick).</summary>
     public event Action Changed;
 
@@ -146,10 +189,20 @@ public sealed class SettlementState
         Changed?.Invoke();
     }
 
+    public void ImprovePortal()
+    {
+        PortalLevel++;
+        Changed?.Invoke();
+    }
+
+    /// <summary>Puts back how far the portal was improved. Used by SaveMapper only.</summary>
+    public void RestorePortal(int level) => PortalLevel = Math.Max(0, level);
+
     public void RecordExtraction()
     {
         SuccessfulExtractions++;
         WardStrain = Math.Max(0, WardStrain - 1);
+        tradeBought.Clear();
         Changed?.Invoke();
     }
 
@@ -272,6 +325,35 @@ public sealed class SettlementState
     {
         PurificationBonus = Math.Max(0f, bonus);
     }
+
+    public void SetPurificationYield(float share)
+    {
+        PurificationYield = Math.Max(0f, share);
+    }
+
+    /// <summary>What a number of finished batches come to with the altar's yield. A fraction waits for the next batch.</summary>
+    public int PurifiedFrom(int made)
+    {
+        float exact = made * (1f + PurificationYield) + purifiedRemainder;
+        int whole = Mathf.FloorToInt(exact);
+        purifiedRemainder = exact - whole;
+        return whole;
+    }
+
+    // ----- The Trading Post: what the caravan has left. It comes round again after each raid survived. -----
+
+    public int BoughtSinceLastRaid(string offer) => tradeBought.TryGetValue(offer, out int bought) ? bought : 0;
+
+    public void NoteBought(string offer)
+    {
+        tradeBought[offer] = BoughtSinceLastRaid(offer) + 1;
+        Changed?.Invoke();
+    }
+
+    public IEnumerable<KeyValuePair<string, int>> TradeBought => tradeBought;
+
+    /// <summary>Puts back what was bought. Used by SaveMapper only.</summary>
+    public void RestoreBought(string offer, int count) => tradeBought[offer] = count;
 
     /// <summary>Advances the batch in progress. Returns how many batches finished.</summary>
     public int TickPurification(float seconds, float secondsPerBatch)

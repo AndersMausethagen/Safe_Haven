@@ -20,6 +20,9 @@ MonoBehaviour:
   teachesRecipes: []
   workplace: {fileID: 11400000, guid: 25c95a1289ab72b4ea0bb96e2ec3f020, type: 2}
   workOrders:
+  - recipe: {fileID: 11400000, guid: fa581af5d2eb80a45a110cd420c1a74e, type: 2}
+    stockTarget: 16
+    keepInput: 3
   - recipe: {fileID: 11400000, guid: ee90fc968a1216241885cd9ee9937962, type: 2}
     stockTarget: 20
     keepInput: 5

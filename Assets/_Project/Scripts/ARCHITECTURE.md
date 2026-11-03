@@ -322,7 +322,7 @@ adds generated dressing (stone plinth and lanterns, then banners and a flower bo
 `StashChest` (slots). Looks and sounds: `Resources/ConstructionSettings`. `HavenRenown` adds up renown (every standing
 building and its levels, a second of a kind counts half, cleared overgrowth, residents); `HavenProgress` (added to the
 Heart Tree) celebrates each `HavenSettings` rank once and records it in `SettlementState.HavenRank`, which widens the
-ward (`HeartTree.WardRadius`; the moss spreads out to the new edge). Content is built by `AgentScripts/BuildHaven.cs`.
+ward (`HeartTree.WardRadius`; the moss spreads out to the new edge). Content is built by `AgentScripts/BuildHaven.cs`. A level can ask for other buildings (`BuildingLevel.requires`), a building for a rank (`requiredRank`); `BuildingUnlocks` answers both. Ranks can bring a settler (`HavenSettings.Rank.settler`). Beds are counted in `SettlementState.NoteBuildings` and never gate anyone. What every reached upgrade adds, where raids can't look at the scene, comes from `SettlementState.UpgradeBonus`. The Trading Post is `TradingPost` + `TradeSettings`; `WatchPostArcher` and `WardTotem` act only in a breach; `FieldCamp` and any other `ItemDefinition.placesInRaid` kit are set down by `ItemInventory`. See [base progression](../../../Docs/BaseProgression.md).
 
 ### Fishing and the Nøkken
 

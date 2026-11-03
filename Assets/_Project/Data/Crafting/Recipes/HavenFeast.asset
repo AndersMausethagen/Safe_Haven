@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e984d5700951ee48b9215d668e8218a, type: 3}
+  m_Name: HavenFeast
+  m_EditorClassIdentifier: SafeHaven::RecipeDefinition
+  id: havenfeast
+  displayName: 
+  output: {fileID: 11400000, guid: 56a0e5655b6fb6c4099c00e32a30e717, type: 2}
+  outputResource: {fileID: 0}
+  outputAmount: 1
+  resourceCost: []
+  itemCost:
+  - item: {fileID: 11400000, guid: 8dbb4db9361b13f4d9df890da55ab723, type: 2}
+    amount: 3
+  - item: {fileID: 11400000, guid: 05a3b8e12c05cb548b40065962d3b860, type: 2}
+    amount: 2
+  - item: {fileID: 11400000, guid: 1dd65120c9bb0304c8a45a8012af934c, type: 2}
+    amount: 2
+  - item: {fileID: 11400000, guid: e562a89aa50aaad4e8e01141f4286a98, type: 2}
+    amount: 2
+  station: 9
+  craftSeconds: 30
+  knownFromStart: 1
+  minimumStationTier: 0
+  sortOrder: 140

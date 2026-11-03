@@ -29,6 +29,7 @@ MonoBehaviour:
   knownFromStart: 1
   sortOrder: 0
   requires: []
+  requiredRank: 0
   yardDepth: 0
   yardSide: 0
   placeInLines: 0
@@ -39,7 +40,7 @@ MonoBehaviour:
   renown: 3
   upgrades:
   - title: Stone Hearth
-    description: A ring of stones that holds the heat.
+    description: A ring of stones that holds the heat, and the light reaches further into the dark.
     cost:
     - item: {fileID: 11400000, guid: b5567f7d75200bd46befbd1dab298f36, type: 2}
       amount: 6
@@ -55,6 +56,13 @@ MonoBehaviour:
     comfort: 0
     extraLogs: 0
     teachesRecipes: []
+    requires: []
+    beds: 0
+    purifyYield: 0
+    extraMealSlots: 0
+    extraGame: 0
+    extraLight: 4
   comfort: 1
+  beds: 0
   teachesRecipes: []
   deathSound: {fileID: 0}

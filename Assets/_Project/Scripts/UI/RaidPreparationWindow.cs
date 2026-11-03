@@ -376,6 +376,7 @@ public sealed class RaidPreparationWindow : MonoBehaviour
             sparks = 0;
         }
 
+        problem ??= RaidLauncher.CheckWard(difficulty);
         problem ??= RaidLauncher.CheckGear(difficulty, player);
         problem ??= RaidLauncher.CheckSparks(player, sparks);
         enterButton.interactable = problem == null;
@@ -622,7 +623,7 @@ public sealed class RaidPreparationWindow : MonoBehaviour
             Color dim = style.Muted;
             dim.a = 0.5f;
             button.Label.text = Tiers.ToRoman(tier.tier);
-            button.Label.color = shown ? Tiers.ColorOf(tier.tier) : score >= tier.minimumGearScore || Cheats.NoRequirements ? style.Text : dim;
+            button.Label.color = shown ? Tiers.ColorOf(tier.tier) : (score >= tier.minimumGearScore && RaidLauncher.CheckWard(tier) == null) || Cheats.NoRequirements ? style.Text : dim;
             button.Mark.SetActive(shown);
             var rect = (RectTransform)button.Button.transform;
             rect.anchoredPosition = new Vector2(rect.anchoredPosition.x, -y);
@@ -666,7 +667,7 @@ public sealed class RaidPreparationWindow : MonoBehaviour
             modifiers.Add(item.RaidModifier);
         }
 
-        RaidParameters rules = RaidParameters.Calculate(raid, modifiers, RaidLauncher.ExtraSeconds(sparks), timeOfDay, difficulty);
+        RaidParameters rules = RaidParameters.Calculate(raid, modifiers, RaidLauncher.ExtraSeconds(sparks), timeOfDay, difficulty, RaidLauncher.ExtractionCut);
         ShowFigure(Figure.Time, RaidStats.FormatTime(rules.Duration), raid, rules, RaidStat.Duration, true);
         ShowFigure(Figure.Extraction, $"{rules.ExtractionTime:0.#}s", raid, rules, RaidStat.ExtractionTime, false);
         ShowFigure(Figure.Loot, $"×{rules.LootMultiplier:0.##}", raid, rules, RaidStat.LootQuantity, true);
@@ -942,9 +943,9 @@ public sealed class RaidPreparationWindow : MonoBehaviour
     }
 
     private static string DescribeTierNeeds(RaidDifficulty tier) =>
-        tier.minimumGearScore > 0
+        (RaidLauncher.CheckWard(tier) is string ward ? ward + " " : "") + (tier.minimumGearScore > 0
             ? $"Needs a gear score of {tier.minimumGearScore}. {tier.recommendedGearScore} is recommended."
-            : $"Open to anyone. A gear score of {tier.recommendedGearScore} is recommended.";
+            : $"Open to anyone. A gear score of {tier.recommendedGearScore} is recommended.");
 
     private RumourLine AddRumourLine()
     {

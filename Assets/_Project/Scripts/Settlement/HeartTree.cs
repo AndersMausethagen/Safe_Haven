@@ -238,7 +238,8 @@ public sealed class HeartTree : MonoBehaviour, IArea, IBuildArea
             SettlementSettings.WardLevel next = settings.WardLevels[level];
             MaterialPool pool = MaterialPool.For(user);
             bool affordable = pool.CanAfford(next.cost, null, out string missing);
-            string detail = $"{AmountText.Describe(next.cost)}  →  ward {settings.WardRadiusAt(level + 1):0} m" + (affordable ? "" : $"   <color={UIStyle.Hex(style.Danger)}>{missing}</color>");
+            string opens = string.IsNullOrEmpty(next.opens) ? "" : $". {next.opens}";
+            string detail = $"{AmountText.Describe(next.cost)}  →  ward {settings.WardRadiusAt(level + 1):0} m{opens}" + (affordable ? "" : $"   <color={UIStyle.Hex(style.Danger)}>{missing}</color>");
             page.Add(new MenuAction("Strengthen the ward", detail, affordable, () => Strengthen(user)));
         }
 
@@ -267,7 +268,8 @@ public sealed class HeartTree : MonoBehaviour, IArea, IBuildArea
         }
 
         GameSession.Settlement.RaiseWardLevel();
-        GameMessages.Post($"The Heart Tree glows brighter. The ward now reaches {WardRadius:0} m.", MessageKind.Gain);
+        string opens = settings.WardLevels[level].opens;
+        GameMessages.Post($"The Heart Tree glows brighter. The ward now reaches {WardRadius:0} m.{(string.IsNullOrEmpty(opens) ? "" : " " + opens)}", MessageKind.Gain);
     }
 
     private void DrawWard()

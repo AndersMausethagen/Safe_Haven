@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad044708340368842899cf78f08bfbfb, type: 3}
+  m_Name: Cook
+  m_EditorClassIdentifier: SafeHaven::JobDefinition
+  id: job.cook
+  displayName: Cook
+  description: 'Runs the Kitchen: keeps bread and stew in the stash for you to take on the road, and the work goes faster.'
+  acceptLine: '"Sit. Eat. Then you can go and get yourself killed."'
+  teachesBuildings: []
+  teachesRecipes: []
+  workplace: {fileID: 11400000, guid: 5fc659bb8c8927248a51373740a3a65e, type: 2}
+  workOrders:
+  - recipe: {fileID: 11400000, guid: 58b513c4d8022af429c2e5b06edda2c4, type: 2}
+    stockTarget: 10
+    keepInput: 4
+  - recipe: {fileID: 11400000, guid: 3c9586a23b1ea394b9f71d0a5739d13c, type: 2}
+    stockTarget: 6
+    keepInput: 2
+  assignedEvent: {fileID: 0}
+  extraRumours: 0
+  gearRepairDiscount: 0
+  buildingRepairDiscount: 0
+  wardHealth: 0
+  raidSeconds: 0

@@ -323,8 +323,8 @@ public sealed class AltarWindow : MonoBehaviour
 
         float seconds = settings.SecondsPerBatch / (1f + settlement.PurificationBonus);
         rateLine.text = $"{settings.CursedPerBatch} Cursed become {settings.PurifiedPerBatch} Purified every {seconds:0.#} seconds.";
-        speedLine.text = settlement.PurificationBonus > 0f ? $"Upgrades make this altar work {settlement.PurificationBonus * 100f:0}% faster." : "Upgrading the altar makes it work faster.";
-        speedLine.color = settlement.PurificationBonus > 0f ? style.Good : style.Muted;
+        speedLine.text = settlement.PurificationYield > 0f ? $"Upgrades give {settlement.PurificationYield * 100f:0}% more Purified, {settlement.PurificationBonus * 100f:0}% faster." : "Upgrading the altar gives more Purified for the same Cursed.";
+        speedLine.color = settlement.PurificationYield > 0f ? style.Good : style.Muted;
         int queued = settlement.PurificationQueued;
         queueLine.text = queued > 0 ? $"{queued} batch{(queued == 1 ? "" : "es")} waiting" : "Nothing in the queue";
 

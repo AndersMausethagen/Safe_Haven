@@ -156,7 +156,7 @@ public sealed class RaidDefinition : ScriptableObject
         RaidDifficulty best = LowestDifficulty;
         foreach (RaidDifficulty difficulty in difficulties)
         {
-            if (gearScore >= difficulty.recommendedGearScore)
+            if (gearScore >= difficulty.recommendedGearScore && RaidLauncher.CheckWard(difficulty) == null)
             {
                 best = difficulty;
             }

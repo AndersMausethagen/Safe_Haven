@@ -17,6 +17,7 @@ GameObject:
   - component: {fileID: 2932750636888937088}
   - component: {fileID: 8800099656965360338}
   - component: {fileID: 7343136329380360024}
+  - component: {fileID: 6300375667026975060}
   m_Layer: 0
   m_Name: WatchPost
   m_TagString: Untagged
@@ -169,6 +170,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: SafeHaven::Construction
   startsRuined: 0
+--- !u!114 &6300375667026975060
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2388963709380002363}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7b27b8e8b99c344784660b5acbdce20, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::WatchPostArcher
+  reach: 18
+  damagePerTier: 8
+  secondsBetweenShots: 3
+  wardenSpeedUp: 0.35
 --- !u!1001 &2363775950076871110
 PrefabInstance:
   m_ObjectHideFlags: 0

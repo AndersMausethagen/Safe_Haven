@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BuildingDefinition
   id: sawbench
   displayName: Woodcutter's Lodge
-  description: Turns logs into planks, and planks into shields and bows. Woodcutters know how to get more from a tree.
+  description: Turns logs into planks, and planks into shields. Woodcutters know how to get more from a tree.
   icon: {fileID: 21300000, guid: 36cc5f84ddaf06441bc5454e529e6d4d, type: 3}
   faction: 0
   combatStats: {fileID: 11400000, guid: 01155c9e2dd7c27468c1a359f747e1a1, type: 2}
@@ -31,6 +31,7 @@ MonoBehaviour:
   requires:
   - building: {fileID: 11400000, guid: cfa8f019a4062c84f8e9b8cd432080e0, type: 2}
     tier: 1
+  requiredRank: 0
   yardDepth: 2
   yardSide: 0
   placeInLines: 0
@@ -59,6 +60,12 @@ MonoBehaviour:
     comfort: 0
     extraLogs: 0
     teachesRecipes: []
+    requires: []
+    beds: 0
+    purifyYield: 0
+    extraMealSlots: 0
+    extraGame: 0
+    extraLight: 0
   - title: Treadle
     description: A treadle saw, and every tree at home gives more.
     cost:
@@ -80,6 +87,12 @@ MonoBehaviour:
     comfort: 0
     extraLogs: 1
     teachesRecipes: []
+    requires: []
+    beds: 0
+    purifyYield: 0
+    extraMealSlots: 0
+    extraGame: 0
+    extraLight: 0
   - title: Waterwheel
     description: A wheel that never tires.
     cost:
@@ -101,6 +114,14 @@ MonoBehaviour:
     comfort: 0
     extraLogs: 0
     teachesRecipes: []
+    requires:
+    - building: {fileID: 11400000, guid: 25c95a1289ab72b4ea0bb96e2ec3f020, type: 2}
+      tier: 3
+    beds: 0
+    purifyYield: 0
+    extraMealSlots: 0
+    extraGame: 0
+    extraLight: 0
   - title: Haven's Own
     description: No log leaves this yard wasted.
     cost:
@@ -122,6 +143,15 @@ MonoBehaviour:
     comfort: 0
     extraLogs: 1
     teachesRecipes: []
+    requires:
+    - building: {fileID: 11400000, guid: 25c95a1289ab72b4ea0bb96e2ec3f020, type: 2}
+      tier: 4
+    beds: 0
+    purifyYield: 0
+    extraMealSlots: 0
+    extraGame: 0
+    extraLight: 0
   comfort: 0
+  beds: 0
   teachesRecipes: []
   deathSound: {fileID: 0}

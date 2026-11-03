@@ -13,40 +13,45 @@ MonoBehaviour:
   m_Name: Loom
   m_EditorClassIdentifier: Assembly-CSharp::BuildingDefinition
   id: loom
-  displayName: Loom
-  description: A weaving loom for linen, satchels and packs.
-  icon: {fileID: 21300000, guid: 0852e18fb71e141428c2317aed416a78, type: 3}
+  displayName: Tailor's Shop
+  description: Linen, leather goods and packs. Everything that goes on your back, and what lets you carry more on it.
+  icon: {fileID: 21300000, guid: 50d4b46dda882b14aba750034df42a71, type: 3}
   faction: 0
   combatStats: {fileID: 11400000, guid: 01155c9e2dd7c27468c1a359f747e1a1, type: 2}
   prefab: {fileID: 305096193401096821, guid: 5e0e5cf5159514a44899db49bbc3f78b, type: 3}
   constructionCost: []
   constructionItems:
-  - item: {fileID: 11400000, guid: 4df650debd4ce21459e04a0c92ffa207, type: 2}
-    amount: 4
   - item: {fileID: 11400000, guid: a370187223419a048b6cebe8f7e345a3, type: 2}
+    amount: 10
+  - item: {fileID: 11400000, guid: 4df650debd4ce21459e04a0c92ffa207, type: 2}
     amount: 6
+  - item: {fileID: 11400000, guid: 8ae2883815327b74fa7975309c803f92, type: 2}
+    amount: 4
   showInBuildMenu: 1
   knownFromStart: 1
   sortOrder: 7
   requires:
   - building: {fileID: 11400000, guid: 27159a7266bda614cbc6774955749e0e, type: 2}
     tier: 1
-  yardDepth: 1.5
+  requiredRank: 0
+  yardDepth: 2
   yardSide: 0
   placeInLines: 0
   station: 5
   outputCapacity: 10
   queueLength: 5
-  buildWork: 6
-  renown: 6
+  buildWork: 8
+  renown: 8
   upgrades:
-  - title: Sturdy
-    description: Tight threads, steady frame.
+  - title: Cutting Table
+    description: 'A proper table and good shears: the leather set, and the Hide Rucksack.'
     cost:
     - item: {fileID: 11400000, guid: a370187223419a048b6cebe8f7e345a3, type: 2}
       amount: 6
     - item: {fileID: 11400000, guid: 4df650debd4ce21459e04a0c92ffa207, type: 2}
       amount: 4
+    - item: {fileID: 11400000, guid: 616026fe07c265041bdcd10e32bcd168, type: 2}
+      amount: 2
     essence: []
     work: 8
     renown: 4
@@ -59,13 +64,21 @@ MonoBehaviour:
     comfort: 0
     extraLogs: 0
     teachesRecipes: []
-  - title: Master's
-    description: A loom fit for a jarl's hall.
+    requires: []
+    beds: 0
+    purifyYield: 0
+    extraMealSlots: 0
+    extraGame: 0
+    extraLight: 0
+  - title: Pattern Wall
+    description: 'Patterns for what goes on a long road: the Traveller''s Pack.'
     cost:
-    - item: {fileID: 11400000, guid: a370187223419a048b6cebe8f7e345a3, type: 2}
-      amount: 10
+    - item: {fileID: 11400000, guid: 8865a285b55516842a98bac1e1e53ef6, type: 2}
+      amount: 6
     - item: {fileID: 11400000, guid: 616026fe07c265041bdcd10e32bcd168, type: 2}
       amount: 4
+    - item: {fileID: 11400000, guid: 8f121a970bae6f54dbcc8ff5e2c2a48e, type: 2}
+      amount: 2
     essence: []
     work: 9
     renown: 6
@@ -78,6 +91,42 @@ MonoBehaviour:
     comfort: 0
     extraLogs: 0
     teachesRecipes: []
+    requires: []
+    beds: 0
+    purifyYield: 0
+    extraMealSlots: 0
+    extraGame: 0
+    extraLight: 0
+  - title: Silk Frames
+    description: 'Frames fine enough for huldra silk: the Wayfarer''s Frame.'
+    cost:
+    - item: {fileID: 11400000, guid: 1b426c80d20dbcd4ea2e82901b9dbfb9, type: 2}
+      amount: 4
+    - item: {fileID: 11400000, guid: 32fed522ebae2fc4d85b1847b30aa530, type: 2}
+      amount: 2
+    - item: {fileID: 11400000, guid: 616026fe07c265041bdcd10e32bcd168, type: 2}
+      amount: 6
+    essence: []
+    work: 11
+    renown: 8
+    craftSpeed: 0.3
+    extraQueue: 0
+    extraOutput: 0
+    extraStorage: 0
+    raidSeconds: 0
+    extraRumours: 0
+    comfort: 0
+    extraLogs: 0
+    teachesRecipes: []
+    requires:
+    - building: {fileID: 11400000, guid: 25c95a1289ab72b4ea0bb96e2ec3f020, type: 2}
+      tier: 3
+    beds: 0
+    purifyYield: 0
+    extraMealSlots: 0
+    extraGame: 0
+    extraLight: 0
   comfort: 0
+  beds: 0
   teachesRecipes: []
   deathSound: {fileID: 0}

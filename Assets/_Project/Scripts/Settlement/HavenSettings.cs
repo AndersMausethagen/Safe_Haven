@@ -22,6 +22,8 @@ public sealed class HavenSettings : GameSettings<HavenSettings>
         [TextArea(1, 3)] public string line;
         [Tooltip("Raised once when Safe Haven reaches this rank, for quests (a Quest Event objective with Count Already Owned) and stories. Optional.")]
         public GameEventDefinition reachedEvent;
+        [Tooltip("Someone drawn by the name this rank has made: they come to live here and take up their first job. Optional.")]
+        public ResidentDefinition settler;
     }
 
     [Tooltip("Each more building of a kind already standing brings this share of its renown: variety is worth more.")]

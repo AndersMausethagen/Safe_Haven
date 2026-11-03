@@ -29,7 +29,6 @@ Open work and ideas. Tick items off (`[x]`) or delete them when done. Architectu
 - [ ] Real art for the rumour sites: they are placeholder shapes (`Prefabs/Raids/Events/Sites`), as is the Elder Tree.
 - [ ] Icons for the plans and living things: the plans use the Forge Blueprint's, the others borrow from materials.
 - [ ] Give the expedition their own models: everyone is IngridModel, at home and in raids.
-- [ ] Bjarne has a job but no rumour: he is in Troll Valley (GDD §21.5), which is locked. Add his rumour when it opens.
 - [ ] Troll Valley needs its own Layout Rules and Raid Rumours when it opens.
 - [ ] A goat (or other animal) for the Haven: bees, seed and the Elder are in, a living animal isn't.
 - [ ] Relics in the raid report: they are named in "On the way", but the haul lists the plain item.
@@ -90,7 +89,10 @@ Raid events, gear, food, buildings and creatures are in, built by `AgentScripts/
 - [ ] Fit shields and new weapons in the hand (Safe Haven › Characters › Held Item Grips): grips are copied from similar items.
 - [ ] Status icons: conditions show as words above the vitals (GDD §10.6 asks for icons).
 - [ ] Scout Post (GDD §14.2): show the raid's coming events as rumours in the briefing.
-- [ ] Runic Ward Totem and defender roles for ward breaches.
+- [ ] Defender roles for ward breaches (the Runic Ward Totem and the Watch Post's archer are in).
+- [ ] Settlers (Hild, Asa, Gunnar, Yrsa) borrow expedition models: give them their own, and icons for the Boar Pie, Trout in Cream, Haven Feast and Moon Broth, which show the stew's for now.
+- [ ] Trollstone armor copies the moonsilver worn look: give it one of its own.
+- [ ] Playtest the base progression pace: raids per tier, Purified Essence against ward, altar and upgrade costs, Trading Post prices.
 
 ## Code quality: SOLID refactor (analysis 2026-10-29)
 

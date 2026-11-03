@@ -58,7 +58,7 @@ public sealed class SettlementSystem : MonoBehaviour, IGameSystem
         int finished = settlement.TickPurification(Time.deltaTime * (1f + settlement.PurificationBonus), settings.SecondsPerBatch);
         if (finished > 0 && settings.PurifiedEssence != null)
         {
-            int made = GameSession.Stash.Resources.Add(settings.PurifiedEssence, finished * settings.PurifiedPerBatch);
+            int made = GameSession.Stash.Resources.Add(settings.PurifiedEssence, settlement.PurifiedFrom(finished * settings.PurifiedPerBatch));
             GameMessages.Post($"The altar purified {made} {settings.PurifiedEssence.DisplayName} into storage.", MessageKind.Gain);
         }
     }

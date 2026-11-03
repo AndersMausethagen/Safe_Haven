@@ -39,6 +39,20 @@ public sealed class BuildingLevel
     [Tooltip("Recipes the player learns when this level is finished: Watch Post levels teach the raid runes.")]
     public List<RecipeDefinition> teachesRecipes = new List<RecipeDefinition>();
 
+    [Header("What it does for the haven")]
+    [Tooltip("What must stand before this level can be ordered, besides the level below it.")]
+    public List<BuildingRequirement> requires = new List<BuildingRequirement>();
+    [Tooltip("More beds. A resident with a bed works faster and adds comfort; nobody needs one to live or work here.")]
+    [Min(0)] public int beds;
+    [Tooltip("Share more Purified Essence from each batch at the altar. 0.25 means 25% more.")]
+    [Min(0f)] public float purifyYield;
+    [Tooltip("More meals the player can have in them at once.")]
+    [Min(0)] public int extraMealSlots;
+    [Tooltip("More game roaming outside the light at home.")]
+    [Min(0)] public int extraGame;
+    [Tooltip("Metres more light around it, pushing the night back.")]
+    [Min(0f)] public float extraLight;
+
     /// <summary>"12 Oak Plank, 8 Purified Essence".</summary>
     public string CostText
     {
@@ -105,6 +119,8 @@ public sealed class BuildingDefinition : ScriptableObject, ICombatSounds
     [SerializeField] private int sortOrder;
     [Tooltip("What must stand first. Each building opens the next, so the base grows one new thing at a time.")]
     [SerializeField] private List<BuildingRequirement> requires = new List<BuildingRequirement>();
+    [Tooltip("The Haven rank needed before it can be built (HavenSettings: 0 is the first). What only a known settlement can draw.")]
+    [SerializeField, Min(0)] private int requiredRank;
 
     [Header("Placement")]
     [Tooltip("Meters of open ground kept clear on the entrance side so the building can be reached and used. Nothing may be built there. 0 = no yard.")]
@@ -131,6 +147,8 @@ public sealed class BuildingDefinition : ScriptableObject, ICombatSounds
     [SerializeField] private List<BuildingLevel> upgrades = new List<BuildingLevel>();
     [Tooltip("Comfort it gives once built: a longer Well Rested before a raid. Each kind of building counts once.")]
     [SerializeField, Min(0)] private int comfort;
+    [Tooltip("Beds it gives. A resident with a bed works faster and adds comfort; nobody needs one to live or work here.")]
+    [SerializeField, Min(0)] private int beds;
     [Tooltip("Recipes the player learns when it is first built.")]
     [SerializeField] private List<RecipeDefinition> teachesRecipes = new List<RecipeDefinition>();
 
@@ -152,6 +170,8 @@ public sealed class BuildingDefinition : ScriptableObject, ICombatSounds
     public int SortOrder => sortOrder;
     public IReadOnlyList<BuildingRequirement> Requires => requires;
     public int Comfort => comfort;
+    public int Beds => beds;
+    public int RequiredRank => requiredRank;
     public IReadOnlyList<RecipeDefinition> TeachesRecipes => teachesRecipes;
     public float YardDepth => yardDepth;
     public YardSide YardSide => yardSide;

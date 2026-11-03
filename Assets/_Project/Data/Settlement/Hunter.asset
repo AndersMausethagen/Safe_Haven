@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad044708340368842899cf78f08bfbfb, type: 3}
+  m_Name: Hunter
+  m_EditorClassIdentifier: SafeHaven::JobDefinition
+  id: job.hunter
+  displayName: Hunter
+  description: 'Runs the Hunter''s Lodge: keeps hides turning into leather while you are away, and the work goes faster.'
+  acceptLine: '"You bring the hides. I''ll bring the patience."'
+  teachesBuildings: []
+  teachesRecipes: []
+  workplace: {fileID: 11400000, guid: 27159a7266bda614cbc6774955749e0e, type: 2}
+  workOrders:
+  - recipe: {fileID: 11400000, guid: 13ff623e6c98b8d4d9d3aa528e45b09a, type: 2}
+    stockTarget: 24
+    keepInput: 2
+  - recipe: {fileID: 11400000, guid: dfd3ceba2bc929a41889890428ab0a68, type: 2}
+    stockTarget: 24
+    keepInput: 1
+  assignedEvent: {fileID: 0}
+  extraRumours: 0
+  gearRepairDiscount: 0
+  buildingRepairDiscount: 0
+  wardHealth: 0
+  raidSeconds: 0

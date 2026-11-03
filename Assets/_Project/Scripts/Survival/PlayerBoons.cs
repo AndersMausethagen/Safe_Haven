@@ -146,7 +146,7 @@ public sealed class PlayerBoons : MonoBehaviour
             }
         }
 
-        if (meals >= SurvivalSettings.Current.MealSlots && shortest >= 0)
+        if (meals >= SurvivalSettings.Current.MealSlots + GameSession.Settlement.UpgradeBonus(level => level.extraMealSlots) && shortest >= 0)
         {
             GameMessages.Post($"{active[shortest].Name} gives way to the new meal.");
             Stop(shortest);

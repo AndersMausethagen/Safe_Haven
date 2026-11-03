@@ -36,9 +36,12 @@ public sealed class VisibilitySource : MonoBehaviour
                 return HeartTree.Current.WardRadius + radius;
             }
 
-            return radius;
+            return radius + ExtraRadius;
         }
     }
+
+    /// <summary>Metres its building's upgrades add. Set by Construction.</summary>
+    public float ExtraRadius { get; set; }
 
     public float Softness => softness;
     public bool Reveals => reveals;

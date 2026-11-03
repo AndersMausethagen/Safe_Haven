@@ -1,0 +1,58 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c76fa069e85f784a9c1abb8f78fae26, type: 3}
+  m_Name: TrollwallShield
+  m_EditorClassIdentifier: Assembly-CSharp::ItemDefinition
+  id: trollwallshield
+  displayName: Trollwall Shield
+  description: A slab of trollstone in an elderwood frame. It stops what would have stopped you.
+  category: 0
+  tier: 5
+  rarity: 3
+  value: 260
+  gearScoreOverride: 0
+  icon: {fileID: 21300000, guid: 33abf682aff14224f9b837e4634aa63e, type: 3}
+  prefab: {fileID: 0}
+  heldModel: {fileID: 5168764943570953831, guid: eb1a7607ce46a46419c3391c47aad835, type: 3}
+  heldPosition: {x: 0, y: 0, z: 0}
+  heldRotation: {x: 0, y: 0, z: 0}
+  heldScale: 1
+  stackable: 0
+  maximumStack: 99
+  weight: 6.5
+  toolType: 0
+  toolTier: 0
+  weapon: {fileID: 11400000, guid: ed5e195e33c26a345868c04a44fc278b, type: 2}
+  arrow: {fileID: 0}
+  healAmount: 0
+  hungerRestore: 0
+  thirstRestore: 0
+  boonBonuses: []
+  boonSeconds: 300
+  tonic: 0
+  cures: []
+  gearRepair: 0
+  placesInRaid: {fileID: 0}
+  carryCapacityBonus: 0
+  bagSlotBonus: 0
+  armorSlot: 0
+  wornLook: {fileID: 0}
+  statBonuses:
+  - stat: 7
+    op: 0
+    value: 18
+  teachesBuildings: []
+  teachesRecipes: []
+  experience: 0
+  learnedAtHome: 0
+  transport: {fileID: 0}
+  raidModifier: {fileID: 0}

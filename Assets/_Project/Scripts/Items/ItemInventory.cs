@@ -60,11 +60,20 @@ public sealed class ItemInventory : MonoBehaviour
         {
             if (safePocket == null && safePocketSlots > 0)
             {
-                safePocket = new ItemContainer(safePocketSlots, 1);
+                // Laid out at its full size, so improving the portal only has to unlock slots.
+                int most = safePocketSlots + SettlementSettings.Current.ExtraPocketSlotsAt(int.MaxValue);
+                safePocket = new ItemContainer(most, 1);
+                safePocket.SetUnlockedSlots(safePocketSlots + SettlementSettings.Current.ExtraPocketSlotsAt(GameSession.Settlement.PortalLevel));
             }
 
             return safePocket;
         }
+    }
+
+    /// <summary>Opens the slots the portal's improvements have earned since the pocket was made.</summary>
+    public void RefreshPocket()
+    {
+        SafePocket?.SetUnlockedSlots(safePocketSlots + SettlementSettings.Current.ExtraPocketSlotsAt(GameSession.Settlement.PortalLevel));
     }
 
     public float CarryWeight => carryWeight;
@@ -205,6 +214,16 @@ public sealed class ItemInventory : MonoBehaviour
 
     private bool Consume(ItemContainer from, int slot, ItemDefinition item)
     {
+        if (item.GearRepair > 0f)
+        {
+            return MendWorn(from, slot, item);
+        }
+
+        if (item.PlacesInRaid != null)
+        {
+            return PlaceInRaid(from, slot, item);
+        }
+
         var needs = GetComponent<PlayerNeeds>();
         bool heals = item.HealAmount > 0f && health.CurrentHealth < health.MaxHealth;
         bool feeds = needs != null && ((item.HungerRestore > 0f && !needs.Hunger.IsFull) || (item.ThirstRestore > 0f && !needs.Thirst.IsFull));
@@ -242,6 +261,50 @@ public sealed class ItemInventory : MonoBehaviour
             needs.TryConsume(item.DisplayName, item.HungerRestore, item.ThirstRestore);
         }
 
+        GameEvents.Raise(new GameEvent(GameEventKind.Consumed, item, 1, gameObject));
+        return true;
+    }
+
+    // A repair kit: every worn piece gets its share back, broken or not. Refused while nothing worn needs it, so it isn't wasted.
+    private bool MendWorn(ItemContainer from, int slot, ItemDefinition item)
+    {
+        var equipment = GetComponent<PlayerEquipment>();
+        ItemContainer worn = equipment != null ? equipment.Gear.Slots : null;
+        int mended = 0;
+        for (int i = 0; worn != null && i < worn.SlotCount; i++)
+        {
+            ItemStack stack = worn.GetSlot(i);
+            if (stack.IsDamaged)
+            {
+                worn.SetDurability(i, stack.Durability + item.GearRepair);
+                mended++;
+            }
+        }
+
+        if (mended == 0)
+        {
+            GameMessages.Post("Nothing you wear needs mending.", MessageKind.Warning);
+            return false;
+        }
+
+        from.RemoveAt(slot, 1);
+        GameMessages.Post($"{item.DisplayName}: {mended} piece{(mended == 1 ? "" : "s")} mended.", MessageKind.Gain);
+        GameEvents.Raise(new GameEvent(GameEventKind.Consumed, item, 1, gameObject));
+        return true;
+    }
+
+    // A field kit: set down where the player stands. Only out there, where it is worth carrying.
+    private bool PlaceInRaid(ItemContainer from, int slot, ItemDefinition item)
+    {
+        if (RaidDirector.Current == null)
+        {
+            GameMessages.Post($"{item.DisplayName} is for the woods. You won't need it at home.", MessageKind.Warning);
+            return false;
+        }
+
+        from.RemoveAt(slot, 1);
+        Instantiate(item.PlacesInRaid, transform.position, transform.rotation);
+        GameMessages.Post($"{item.DisplayName} is set.", MessageKind.Gain);
         GameEvents.Raise(new GameEvent(GameEventKind.Consumed, item, 1, gameObject));
         return true;
     }

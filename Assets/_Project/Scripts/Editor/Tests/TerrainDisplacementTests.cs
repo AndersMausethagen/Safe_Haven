@@ -347,6 +347,8 @@ public sealed class TerrainDisplacementTests
             {
                 commands.SetRenderTarget(target);
                 commands.ClearRenderTarget(true, true, Color.clear);
+                // The shader shrinks blades far from the camera, and this global otherwise holds wherever the last camera rendered.
+                commands.SetGlobalVector("_WorldSpaceCameraPos", new Vector4(0, 0.25f, -2, 0));
                 commands.SetViewProjectionMatrices(view, GL.GetGPUProjectionMatrix(Matrix4x4.Ortho(-0.5f, 0.5f, -0.5f, 0.5f, 0.1f, 10), false));
                 commands.DrawMesh(mesh, Matrix4x4.identity, material, 0, material.FindPass("ForwardLit"));
                 Graphics.ExecuteCommandBuffer(commands);

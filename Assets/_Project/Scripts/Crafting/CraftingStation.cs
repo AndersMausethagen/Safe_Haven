@@ -18,8 +18,8 @@ public enum CraftingStationType
     [InspectorName("Smithy")] Anvil = 3,
     /// <summary>Potions and brews (GDD Kitchen / Cauldron).</summary>
     [InspectorName("Cauldron")] AlchemyTable = 4,
-    /// <summary>Cloth and leather goods.</summary>
-    [InspectorName("Loom")] Loom = 5,
+    /// <summary>The Tailor's Shop: cloth, leather goods and packs. The identifier is kept from the old loom.</summary>
+    [InspectorName("Tailor's Shop")] Loom = 5,
     /// <summary>Simple cooking: berries and water into meals (GDD Campfire).</summary>
     [InspectorName("Campfire")] Campfire = 6,
     /// <summary>Wood into planks, shields and bows.</summary>
@@ -28,8 +28,8 @@ public enum CraftingStationType
     [InspectorName("Portal")] Portal = 8,
     /// <summary>Proper cooking: meals with lasting bonuses (GDD Kitchen / Cauldron).</summary>
     [InspectorName("Kitchen")] Kitchen = 9,
-    /// <summary>Hides into cured leather.</summary>
-    [InspectorName("Tanning Rack")] Tannery = 10,
+    /// <summary>The Hunter's Lodge: hides into leather, bows and arrows. The identifier is kept from the old tanning rack.</summary>
+    [InspectorName("Hunter's Lodge")] Tannery = 10,
     /// <summary>Crops: a seed crop goes in, grows on its own, even during raids, and waits to be harvested (GDD Farm Plot).</summary>
     [InspectorName("Farm Plot")] Farm = 11,
     /// <summary>Bees turn flowers and berries into honey.</summary>
@@ -54,7 +54,11 @@ public static class CraftingStationTypes
             case CraftingStationType.AlchemyTable:
                 return "Cauldron";
             case CraftingStationType.Tannery:
-                return "Tanning Rack";
+                return "Hunter's Lodge";
+            case CraftingStationType.Loom:
+                return "Tailor's Shop";
+            case CraftingStationType.Sawbench:
+                return "Woodcutter's Lodge";
             case CraftingStationType.Farm:
                 return "Farm Plot";
             case CraftingStationType.Wainwright:
@@ -146,10 +150,21 @@ public sealed class CraftingStation : MonoBehaviour
         + Mathf.RoundToInt(Upgrades(level => level.extraQueue));
 
     /// <summary>How fast it works: upgrades, plus a resident whose job works here (WorkerSpeedBonus).</summary>
-    public float Speed => 1f + Upgrades(level => level.craftSpeed) + (HasWorker ? WorkerSpeedBonus : 0f);
+    public float Speed
+    {
+        get
+        {
+            ResidentRecord worker = Worker;
+            float staffed = worker == null ? 0f : WorkerSpeedBonus + (GameSession.Settlement.HasBed(worker) ? BedSpeedBonus : 0f);
+            return 1f + Upgrades(level => level.craftSpeed) + staffed;
+        }
+    }
 
     /// <summary>A resident working here makes the station this much faster.</summary>
     public const float WorkerSpeedBonus = 0.5f;
+
+    /// <summary>And this much more when they have a bed of their own. They work without one.</summary>
+    public const float BedSpeedBonus = 0.25f;
 
     /// <summary>True when a resident's job has this building as its workplace.</summary>
     public bool HasWorker => Worker != null;

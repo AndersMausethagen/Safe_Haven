@@ -101,6 +101,27 @@ public sealed class HavenProgress : MonoBehaviour
         }
 
         RaiseRankEvents(settings);
+        WelcomeSettlers(settings);
+    }
+
+    // Every rank reached counts, so a haven that got there before this settler existed still gets them. Beds help, but nobody waits for one.
+    private static void WelcomeSettlers(HavenSettings settings)
+    {
+        SettlementState settlement = GameSession.Settlement;
+        for (int i = 0; i <= settlement.HavenRank && i < settings.Ranks.Count; i++)
+        {
+            ResidentDefinition settler = settings.Ranks[i].settler;
+            if (settler == null || !settlement.AddResident(settler))
+            {
+                continue;
+            }
+
+            GameMessages.Post($"{settler.DisplayName} has come to live in Safe Haven. \"{settler.ArrivalLine}\"", MessageKind.Gain);
+            if (settler.Jobs.Length > 0 && settler.Jobs[0] != null)
+            {
+                ResidentNpc.GiveJob(settler, settler.Jobs[0], Player.Current != null ? Player.Current.gameObject : null);
+            }
+        }
     }
 
     // Raids can't see the base, so what they go by is noted here; touching a staffed station's queue keeps its tier and speed

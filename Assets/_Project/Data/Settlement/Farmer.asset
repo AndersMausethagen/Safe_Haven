@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad044708340368842899cf78f08bfbfb, type: 3}
+  m_Name: Farmer
+  m_EditorClassIdentifier: SafeHaven::JobDefinition
+  id: job.farmer
+  displayName: Farmer
+  description: 'Tends the Farm Plot: keeps what you have planted growing from the stash''s seed, and it grows faster.'
+  acceptLine: '"Leave me the seed. The rest takes care of itself, with a bit of shouting."'
+  teachesBuildings: []
+  teachesRecipes: []
+  workplace: {fileID: 11400000, guid: 1b4e0a9fa52cb7d41b48c5e1bfae2ebc, type: 2}
+  workOrders:
+  - recipe: {fileID: 11400000, guid: ae0af55f6c50f174a9bc095ab2588807, type: 2}
+    stockTarget: 30
+    keepInput: 2
+  - recipe: {fileID: 11400000, guid: 47d159d676771d7469540fea9f9013ab, type: 2}
+    stockTarget: 30
+    keepInput: 2
+  - recipe: {fileID: 11400000, guid: 99095c7d08ca13b4190fe94e1fd84e3a, type: 2}
+    stockTarget: 20
+    keepInput: 2
+  - recipe: {fileID: 11400000, guid: 19ab29d4a0af458499dfc09c9b8b369d, type: 2}
+    stockTarget: 20
+    keepInput: 2
+  assignedEvent: {fileID: 0}
+  extraRumours: 0
+  gearRepairDiscount: 0
+  buildingRepairDiscount: 0
+  wardHealth: 0
+  raidSeconds: 0

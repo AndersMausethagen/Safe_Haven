@@ -13,44 +13,49 @@ MonoBehaviour:
   m_Name: TanningRack
   m_EditorClassIdentifier: SafeHaven::BuildingDefinition
   id: tanningrack
-  displayName: Tanning Rack
-  description: A frame for stretching hides. Rough hide goes in, Cured Leather comes out.
-  icon: {fileID: 21300000, guid: 54f88e28debc466409af0a673bda2a72, type: 3}
+  displayName: Hunter's Lodge
+  description: Where hides are cured and bows are strung. Hunters know how to make more of a kill, and where to find the next.
+  icon: {fileID: 21300000, guid: 19944e81ab793f040b6d581ffccee3b9, type: 3}
   faction: 0
   combatStats: {fileID: 11400000, guid: 01155c9e2dd7c27468c1a359f747e1a1, type: 2}
   prefab: {fileID: 1270501120119166811, guid: 8657147f0778d1a44aa4437fbadd3a63, type: 3}
   constructionCost: []
   constructionItems:
   - item: {fileID: 11400000, guid: 8ae2883815327b74fa7975309c803f92, type: 2}
-    amount: 6
+    amount: 12
   - item: {fileID: 11400000, guid: 4df650debd4ce21459e04a0c92ffa207, type: 2}
     amount: 4
+  - item: {fileID: 11400000, guid: 5022422f3d793b34dab4ad85e9581321, type: 2}
+    amount: 2
   showInBuildMenu: 1
   knownFromStart: 1
   sortOrder: 13
   requires:
   - building: {fileID: 11400000, guid: cfa8f019a4062c84f8e9b8cd432080e0, type: 2}
     tier: 1
-  yardDepth: 1.5
+  requiredRank: 0
+  yardDepth: 2
   yardSide: 0
   placeInLines: 0
   station: 10
   outputCapacity: 10
   queueLength: 5
-  buildWork: 4
-  renown: 4
+  buildWork: 8
+  renown: 8
   upgrades:
-  - title: Sturdy
-    description: Better pegs, tighter stretch.
+  - title: Drying Racks
+    description: 'Racks in the yard and a place to hang a bow: Hunter''s Bows, better leather from the same hide, and more game at home.'
     cost:
     - item: {fileID: 11400000, guid: a370187223419a048b6cebe8f7e345a3, type: 2}
+      amount: 8
+    - item: {fileID: 11400000, guid: 5022422f3d793b34dab4ad85e9581321, type: 2}
       amount: 4
-    - item: {fileID: 11400000, guid: 4df650debd4ce21459e04a0c92ffa207, type: 2}
+    - item: {fileID: 11400000, guid: 8cf878eb4a61eb943917a1f9421bb40a, type: 2}
       amount: 2
     essence: []
-    work: 7.5
-    renown: 3
-    craftSpeed: 0.3
+    work: 8
+    renown: 4
+    craftSpeed: 0.2
     extraQueue: 1
     extraOutput: 0
     extraStorage: 0
@@ -59,6 +64,98 @@ MonoBehaviour:
     comfort: 0
     extraLogs: 0
     teachesRecipes: []
+    requires: []
+    beds: 0
+    purifyYield: 0
+    extraMealSlots: 0
+    extraGame: 1
+    extraLight: 0
+  - title: Smokehouse
+    description: 'It keeps the flies off and the deer coming: Elderwood Longbows and more leather from thick hide.'
+    cost:
+    - item: {fileID: 11400000, guid: 8865a285b55516842a98bac1e1e53ef6, type: 2}
+      amount: 6
+    - item: {fileID: 11400000, guid: f243c15300698e044a98d785099354c6, type: 2}
+      amount: 3
+    - item: {fileID: 11400000, guid: 8f121a970bae6f54dbcc8ff5e2c2a48e, type: 2}
+      amount: 2
+    essence: []
+    work: 10
+    renown: 6
+    craftSpeed: 0.2
+    extraQueue: 0
+    extraOutput: 0
+    extraStorage: 0
+    raidSeconds: 0
+    extraRumours: 0
+    comfort: 0
+    extraLogs: 0
+    teachesRecipes: []
+    requires: []
+    beds: 0
+    purifyYield: 0
+    extraMealSlots: 0
+    extraGame: 0
+    extraLight: 0
+  - title: Moon Racks
+    description: 'Moonsilver wire on the racks: Moonstrung Bows, and game wanders close.'
+    cost:
+    - item: {fileID: 11400000, guid: 50d6dfa982b3a264980eaec31b4aae11, type: 2}
+      amount: 6
+    - item: {fileID: 11400000, guid: 32fed522ebae2fc4d85b1847b30aa530, type: 2}
+      amount: 3
+    - item: {fileID: 11400000, guid: 1b426c80d20dbcd4ea2e82901b9dbfb9, type: 2}
+      amount: 2
+    essence: []
+    work: 12
+    renown: 8
+    craftSpeed: 0.2
+    extraQueue: 0
+    extraOutput: 0
+    extraStorage: 0
+    raidSeconds: 0
+    extraRumours: 0
+    comfort: 0
+    extraLogs: 0
+    teachesRecipes: []
+    requires:
+    - building: {fileID: 11400000, guid: 25c95a1289ab72b4ea0bb96e2ec3f020, type: 2}
+      tier: 3
+    beds: 0
+    purifyYield: 0
+    extraMealSlots: 0
+    extraGame: 1
+    extraLight: 0
+  - title: Troll Hall
+    description: 'Horn over the door, and nothing here is afraid any more: Trollhorn Bows.'
+    cost:
+    - item: {fileID: 11400000, guid: 50d6dfa982b3a264980eaec31b4aae11, type: 2}
+      amount: 4
+    - item: {fileID: 11400000, guid: fcf0552d231ec8b40a3de2796f1bc4c3, type: 2}
+      amount: 2
+    essence:
+    - resource: {fileID: 11400000, guid: e991fd5ccf0ce314cafafff8badfe173, type: 2}
+      amount: 10
+    work: 14
+    renown: 12
+    craftSpeed: 0.25
+    extraQueue: 0
+    extraOutput: 0
+    extraStorage: 0
+    raidSeconds: 0
+    extraRumours: 0
+    comfort: 0
+    extraLogs: 0
+    teachesRecipes: []
+    requires:
+    - building: {fileID: 11400000, guid: 25c95a1289ab72b4ea0bb96e2ec3f020, type: 2}
+      tier: 4
+    beds: 0
+    purifyYield: 0
+    extraMealSlots: 0
+    extraGame: 0
+    extraLight: 0
   comfort: 0
+  beds: 0
   teachesRecipes: []
   deathSound: {fileID: 0}

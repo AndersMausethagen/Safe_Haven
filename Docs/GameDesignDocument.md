@@ -235,6 +235,8 @@ The player may expand buildable space through runes, Heart Tree upgrades, specif
 
 The Construction Table, Sawbench, Furnace and Forge are replaced by whole buildings with five tiers that match resource tiers: the Workshop, the Woodcutter's Lodge and the Smithy. Each building opens the next, and what the base gives feeds raids through time, Well Rested and knowledge. See [base progression](BaseProgression.md); it overrides older station names in this document.
 
+**Second pass (November 3, 2026).** The Loom is now the Tailor's Shop and the Tanning Rack the Hunter's Lodge, both whole buildings. No upgrade is speed alone. Later tiers ask for other buildings, and new buildings open past copper: Stone Wall, Iron Trap, Runic Ward Totem, Trading Post. Ward levels open raid tiers, the portal can be improved, ranks bring settlers. Beds give a bonus and never gate anyone.
+
 ### 6.5 Architectural progression
 
 The visual progression should move from campfire and rough timber to huts, workshops, paths, gardens, palisades, protective runestones, and a lively fairy-tale village. Defenses should visually communicate that residents are protecting a valued home, without turning every square into a fortress. Decoration is valuable, but initially subordinate to functional construction.

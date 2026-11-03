@@ -41,9 +41,14 @@ public sealed class RaidParameters
 
     /// <summary>The rules with the modifiers applied, plus extra seconds bought with Portal Sparks (GDD §7.3).</summary>
     public static RaidParameters Calculate(RaidDefinition raid, IEnumerable<RaidModifierDefinition> modifiers, float extraSeconds,
-        RaidTimeOfDay timeOfDay = null, RaidDifficulty difficulty = null)
+        RaidTimeOfDay timeOfDay = null, RaidDifficulty difficulty = null, float extractionCut = 0f)
     {
         var effects = new List<RaidStatModifier>();
+        if (extractionCut > 0f)
+        {
+            effects.Add(new RaidStatModifier(RaidStat.ExtractionTime, StatModifierOp.Percent, -extractionCut));
+        }
+
         if (modifiers != null)
         {
             foreach (RaidModifierDefinition modifier in modifiers)

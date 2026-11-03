@@ -31,22 +31,38 @@ public static class BuildingUnlocks
             return true;
         }
 
-        foreach (BuildingRequirement requirement in building.Requires)
-        {
-            if (requirement.building != null && HighestTier(requirement.building) < requirement.tier)
-            {
-                return false;
-            }
-        }
-
-        return true;
+        return GameSession.Settlement.HavenRank >= building.RequiredRank && AllStand(building.Requires);
     }
+
+    /// <summary>Whether what an upgrade asks for stands. The level below it is the upgrade's own business.</summary>
+    public static bool IsOpen(BuildingLevel level) => Cheats.NoRequirements || level == null || AllStand(level.requires);
 
     /// <summary>What still has to stand, for the player: "Needs a Smithy." or "Needs a Workshop at Tier II." Empty when open.</summary>
     public static string Missing(BuildingDefinition building)
     {
+        List<string> missing = Unmet(building.Requires);
+        IReadOnlyList<HavenSettings.Rank> ranks = HavenSettings.Current.Ranks;
+        if (GameSession.Settlement.HavenRank < building.RequiredRank && building.RequiredRank < ranks.Count)
+        {
+            missing.Insert(0, $"Safe Haven to be a {ranks[building.RequiredRank].name}");
+        }
+
+        return missing.Count > 0 ? $"Needs {string.Join(" and ", missing)}." : "";
+    }
+
+    /// <summary>What an upgrade still waits for, for the player. Empty when open.</summary>
+    public static string Missing(BuildingLevel level)
+    {
+        List<string> missing = level != null ? Unmet(level.requires) : new List<string>();
+        return missing.Count > 0 ? $"Needs {string.Join(" and ", missing)}." : "";
+    }
+
+    private static bool AllStand(IEnumerable<BuildingRequirement> requirements) => Unmet(requirements).Count == 0;
+
+    private static List<string> Unmet(IEnumerable<BuildingRequirement> requirements)
+    {
         var missing = new List<string>();
-        foreach (BuildingRequirement requirement in building.Requires)
+        foreach (BuildingRequirement requirement in requirements)
         {
             if (requirement.building != null && HighestTier(requirement.building) < requirement.tier)
             {
@@ -54,7 +70,7 @@ public static class BuildingUnlocks
             }
         }
 
-        return missing.Count > 0 ? $"Needs {string.Join(" and ", missing)}." : "";
+        return missing;
     }
 
     /// <summary>"a Workshop" at tier 1, "a Workshop at Tier II" above it.</summary>

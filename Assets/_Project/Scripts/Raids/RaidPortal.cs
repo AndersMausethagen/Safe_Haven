@@ -140,7 +140,41 @@ public sealed class RaidPortal : MonoBehaviour, IStationMenuExtension, IInteract
         if (IsRepaired)
         {
             page.Add(new MenuAction("Plan a raid", "Choose a destination, supplies and modifiers", true, () => OpenPlanner(user), closesMenu: true));
+            AddImprovement(page, user);
         }
+    }
+
+    private static void AddImprovement(MenuPage page, GameObject user)
+    {
+        SettlementSettings settings = SettlementSettings.Current;
+        int level = GameSession.Settlement.PortalLevel;
+        if (level >= settings.PortalLevels.Count)
+        {
+            return;
+        }
+
+        SettlementSettings.PortalLevel next = settings.PortalLevels[level];
+        bool affordable = MaterialPool.For(user).CanAfford(next.cost, next.items, out string missing);
+        string cost = AmountText.Describe(next.items) + (next.items.Count > 0 && next.cost.Count > 0 ? ", " : "") + AmountText.Describe(next.cost);
+        page.Add(new MenuAction($"Improve the portal: {next.title}", $"{next.description}\n{cost}" + (affordable ? "" : $"   <color=#FF7B6B>{missing}</color>"), affordable, () => Improve(user)));
+    }
+
+    private static void Improve(GameObject user)
+    {
+        SettlementSettings settings = SettlementSettings.Current;
+        int level = GameSession.Settlement.PortalLevel;
+        if (level >= settings.PortalLevels.Count || !MaterialPool.For(user).TrySpend(settings.PortalLevels[level].cost, settings.PortalLevels[level].items))
+        {
+            return;
+        }
+
+        GameSession.Settlement.ImprovePortal();
+        if (user.TryGetComponent(out ItemInventory inventory))
+        {
+            inventory.RefreshPocket();
+        }
+
+        GameMessages.Post($"The stones settle: {settings.PortalLevels[level].description}", MessageKind.Gain);
     }
 
     private void OpenPlanner(GameObject user)

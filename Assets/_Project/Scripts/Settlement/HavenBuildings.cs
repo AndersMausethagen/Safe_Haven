@@ -130,7 +130,8 @@ public static class HavenBuildings
             Construction chosen = next;
             next.Cost(out IReadOnlyList<ResourceAmount> resources, out IReadOnlyList<ItemAmount> items);
             bool affordable = pool == null || pool.CanAfford(resources, items);
-            entry.Actions.Add(new HavenAction(affordable ? "Upgrade" : "Not enough materials", () => chosen.TryOrderUpgrade(player), affordable, closesWindow: false));
+            bool open = BuildingUnlocks.IsOpen(building.UpgradeTo(next.Level + 1));
+            entry.Actions.Add(new HavenAction(!open ? "Not open yet" : affordable ? "Upgrade" : "Not enough materials", () => chosen.TryOrderUpgrade(player), open && affordable, closesWindow: false));
         }
         else if (builder != null && crafting != null && crafting.IsKnown(building))
         {
@@ -342,6 +343,7 @@ public static class HavenBuildings
         }
 
         parts.Add(WhatItBrings(level));
+        parts.Add(BuildingUnlocks.Missing(level));
         return string.Join("\n", parts.Where(part => part.Length > 0));
     }
 
@@ -356,6 +358,11 @@ public static class HavenBuildings
         if (level.extraRumours > 0) parts.Add($"{level.extraRumours} more rumours");
         if (level.comfort > 0) parts.Add($"{level.comfort} more comfort");
         if (level.extraLogs > 0) parts.Add($"{level.extraLogs} more logs per cut at home");
+        if (level.beds > 0) parts.Add($"{level.beds} more beds");
+        if (level.purifyYield > 0f) parts.Add($"{Mathf.RoundToInt(level.purifyYield * 100f)}% more Purified Essence");
+        if (level.extraMealSlots > 0) parts.Add($"{level.extraMealSlots} more meal at once");
+        if (level.extraGame > 0) parts.Add($"{level.extraGame} more game at home");
+        if (level.extraLight > 0f) parts.Add($"{level.extraLight:0} m more light");
         foreach (RecipeDefinition recipe in level.teachesRecipes)
         {
             if (recipe != null) parts.Add($"teaches {recipe.DisplayName}");

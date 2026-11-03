@@ -18,6 +18,45 @@ MonoBehaviour:
   portalSpark: {fileID: 11400000, guid: 7c3265a359bc4024c824268926942039, type: 2}
   secondsPerSpark: 180
   maxSparksPerRaid: 2
+  portalLevels:
+  - title: Steadied
+    description: 'A second safe pocket: what you put there comes home even from a lost raid.'
+    cost:
+    - resource: {fileID: 11400000, guid: a86ac9a152512464ab08e0446c161e61, type: 2}
+      amount: 4
+    items:
+    - item: {fileID: 11400000, guid: 8cf878eb4a61eb943917a1f9421bb40a, type: 2}
+      amount: 4
+    - item: {fileID: 11400000, guid: 59d371b7b63e8e24bb946051d808bc9b, type: 2}
+      amount: 4
+    extraPocketSlots: 1
+    extractionCut: 0
+  - title: Bound
+    description: 'Iron ties in the stones: every way home opens 20% faster.'
+    cost:
+    - resource: {fileID: 11400000, guid: a86ac9a152512464ab08e0446c161e61, type: 2}
+      amount: 6
+    items:
+    - item: {fileID: 11400000, guid: f243c15300698e044a98d785099354c6, type: 2}
+      amount: 4
+    - item: {fileID: 11400000, guid: 3b6626518ea9eb040b7d45591fac015b, type: 2}
+      amount: 4
+    extraPocketSlots: 0
+    extractionCut: 0.2
+  - title: Moonlit
+    description: A third safe pocket, and the way home opens faster again.
+    cost:
+    - resource: {fileID: 11400000, guid: a86ac9a152512464ab08e0446c161e61, type: 2}
+      amount: 8
+    - resource: {fileID: 11400000, guid: e991fd5ccf0ce314cafafff8badfe173, type: 2}
+      amount: 10
+    items:
+    - item: {fileID: 11400000, guid: 32fed522ebae2fc4d85b1847b30aa530, type: 2}
+      amount: 4
+    - item: {fileID: 11400000, guid: 03656529f70038c47baa4a9103025a81, type: 2}
+      amount: 2
+    extraPocketSlots: 1
+    extractionCut: 0.2
   baseWardRadius: 16
   wardLevels:
   - cost:
@@ -25,6 +64,7 @@ MonoBehaviour:
       amount: 6
     extraRadius: 6
     raidSeconds: 90
+    opens: Opens tier II raids.
   - cost:
     - resource: {fileID: 11400000, guid: e991fd5ccf0ce314cafafff8badfe173, type: 2}
       amount: 12
@@ -32,6 +72,15 @@ MonoBehaviour:
       amount: 4
     extraRadius: 6
     raidSeconds: 90
+    opens: Opens tier III raids.
+  - cost:
+    - resource: {fileID: 11400000, guid: e991fd5ccf0ce314cafafff8badfe173, type: 2}
+      amount: 20
+    - resource: {fileID: 11400000, guid: a86ac9a152512464ab08e0446c161e61, type: 2}
+      amount: 6
+    extraRadius: 6
+    raidSeconds: 90
+    opens: Opens tier IV raids.
   cursedEssence: {fileID: 11400000, guid: c0e409a7cd38400498ff1c7037737b96, type: 2}
   purifiedEssence: {fileID: 11400000, guid: e991fd5ccf0ce314cafafff8badfe173, type: 2}
   cursedPerBatch: 2

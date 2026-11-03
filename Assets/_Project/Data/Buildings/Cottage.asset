@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::BuildingDefinition
   id: cottage
   displayName: Cottage
-  description: A real roof over someone's head. It makes Safe Haven a village, and its Renown shows.
+  description: A real roof over someone's head, and room for four. It makes Safe Haven a village, and its people work the better for it.
   icon: {fileID: 21300000, guid: 6db9d267db9e8964db1fdd0221a6e8fc, type: 3}
   faction: 0
   combatStats: {fileID: 11400000, guid: 01155c9e2dd7c27468c1a359f747e1a1, type: 2}
@@ -33,6 +33,7 @@ MonoBehaviour:
   requires:
   - building: {fileID: 11400000, guid: cfa8f019a4062c84f8e9b8cd432080e0, type: 2}
     tier: 2
+  requiredRank: 0
   yardDepth: 1
   yardSide: 0
   placeInLines: 0
@@ -43,7 +44,7 @@ MonoBehaviour:
   renown: 12
   upgrades:
   - title: Whitewashed
-    description: Lime on the walls and smoke from the chimney.
+    description: Lime on the walls, smoke from the chimney and two more beds.
     cost:
     - item: {fileID: 11400000, guid: 59d371b7b63e8e24bb946051d808bc9b, type: 2}
       amount: 4
@@ -61,6 +62,13 @@ MonoBehaviour:
     comfort: 2
     extraLogs: 0
     teachesRecipes: []
+    requires: []
+    beds: 2
+    purifyYield: 0
+    extraMealSlots: 0
+    extraGame: 0
+    extraLight: 0
   comfort: 4
+  beds: 4
   teachesRecipes: []
   deathSound: {fileID: 0}

@@ -194,10 +194,24 @@ public sealed class RaidTierTests
     [Test]
     public void ThePortal_StartsOnTheTierTheGearIsReadyFor()
     {
-        Assert.AreEqual(1, Raid.DifficultyFor(0).tier);
-        Assert.AreEqual(2, Raid.DifficultyFor(30).tier);
-        Assert.AreEqual(2, Raid.DifficultyFor(49).tier);
-        Assert.AreEqual(4, Raid.DifficultyFor(500).tier);
+        GameSession.StartNewGame();
+        try
+        {
+            Assert.AreEqual(1, Raid.DifficultyFor(500).tier, "the ward holds the way open: no tier above it, whatever the gear");
+            for (int level = 0; level < 3; level++)
+            {
+                GameSession.Settlement.RaiseWardLevel();
+            }
+
+            Assert.AreEqual(1, Raid.DifficultyFor(0).tier);
+            Assert.AreEqual(2, Raid.DifficultyFor(30).tier);
+            Assert.AreEqual(2, Raid.DifficultyFor(49).tier);
+            Assert.AreEqual(4, Raid.DifficultyFor(500).tier);
+        }
+        finally
+        {
+            GameSession.StartNewGame();
+        }
     }
 
     [Test]

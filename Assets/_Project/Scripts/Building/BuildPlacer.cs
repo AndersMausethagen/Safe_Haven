@@ -253,7 +253,7 @@ public sealed class BuildPlacer : MonoBehaviour
         };
         bool affordable = MaterialPool.For(gameObject).CanAfford(next.essence, next.cost, out string missing);
         string cost = next.CostText;
-        page.Add(new MenuAction("Upgrade", affordable ? cost : $"{cost}   <color=#FF7B6B>{missing}</color>", affordable,
+        page.Add(new MenuAction("Upgrade", affordable ? cost : $"{cost}   <color=#FF7B6B>{missing}</color>", affordable && BuildingUnlocks.IsOpen(next),
             () => construction.TryOrderUpgrade(gameObject), closesMenu: true));
         return page;
     }

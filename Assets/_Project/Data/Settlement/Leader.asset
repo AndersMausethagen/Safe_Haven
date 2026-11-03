@@ -14,14 +14,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::JobDefinition
   id: job.leader
   displayName: Leader
-  description: 'Keeps the portal''s watch: 30 more seconds in every raid, and everyone knows where they stand.'
+  description: 'Keeps the portal''s watch: two more minutes in every raid, and everyone knows where they stand.'
   acceptLine: '"We go out together, and we come back together."'
   teachesBuildings: []
   teachesRecipes: []
   workplace: {fileID: 11400000, guid: b7c331e0fe28cf24a82f9fff7bc38e44, type: 2}
+  workOrders: []
   assignedEvent: {fileID: 0}
   extraRumours: 0
   gearRepairDiscount: 0
   buildingRepairDiscount: 0
   wardHealth: 0
-  raidSeconds: 30
+  raidSeconds: 120

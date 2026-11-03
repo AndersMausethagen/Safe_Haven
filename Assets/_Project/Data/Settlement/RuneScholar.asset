@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::JobDefinition
   id: job.runescholar
   displayName: Rune Scholar
-  description: 'Knows the old marks: she teaches the raid runes, and work at the cauldron goes faster.'
+  description: 'Knows the old marks: she teaches runes nobody else can, Hush and the Deep Rune, along with the rest, and work at the cauldron goes faster.'
   acceptLine: '"These aren''t spells. They''re promises, and the forest keeps them."'
   teachesBuildings: []
   teachesRecipes:
@@ -22,7 +22,10 @@ MonoBehaviour:
   - {fileID: 11400000, guid: ed6668c1234762246a1666fc7a136fbe, type: 2}
   - {fileID: 11400000, guid: 12aee824706af854c80fe6ad0c4025bd, type: 2}
   - {fileID: 11400000, guid: cd5beafe5776a2a4caf027c38e5b9cef, type: 2}
+  - {fileID: 11400000, guid: 46a7c6f142ead3e4aa6399b7c8a228a3, type: 2}
+  - {fileID: 11400000, guid: 1cfe514dde62f1d448a946755d940c7c, type: 2}
   workplace: {fileID: 11400000, guid: a10bf06ba7306584f8632f492a16fdac, type: 2}
+  workOrders: []
   assignedEvent: {fileID: 0}
   extraRumours: 0
   gearRepairDiscount: 0

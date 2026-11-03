@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 55433f6de2238c643b7ddfb32e5977d0, type: 3}
+  m_Name: StoneWall
+  m_EditorClassIdentifier: Assembly-CSharp::BuildingDefinition
+  id: stonewall
+  displayName: Stone Wall
+  description: Coursed stone, chest high. Attackers have to go round it or spend a long time trying.
+  icon: {fileID: 21300000, guid: c530984fec1a6404382b58152f4ecc36, type: 3}
+  faction: 0
+  combatStats: {fileID: 11400000, guid: 580d8570bac878947a179988c2d0d936, type: 2}
+  prefab: {fileID: 5723684251509998500, guid: ffc81db44bfa3ea4cabad56e209a5c89, type: 3}
+  constructionCost: []
+  constructionItems:
+  - item: {fileID: 11400000, guid: 59d371b7b63e8e24bb946051d808bc9b, type: 2}
+    amount: 4
+  - item: {fileID: 11400000, guid: 3b6626518ea9eb040b7d45591fac015b, type: 2}
+    amount: 1
+  showInBuildMenu: 1
+  knownFromStart: 1
+  sortOrder: 8
+  requires:
+  - building: {fileID: 11400000, guid: cfa8f019a4062c84f8e9b8cd432080e0, type: 2}
+    tier: 3
+  requiredRank: 0
+  yardDepth: 0
+  yardSide: 0
+  placeInLines: 1
+  station: 0
+  outputCapacity: 10
+  queueLength: 5
+  buildWork: 0
+  renown: 8
+  upgrades: []
+  comfort: 0
+  beds: 0
+  teachesRecipes: []
+  deathSound: {fileID: 0}

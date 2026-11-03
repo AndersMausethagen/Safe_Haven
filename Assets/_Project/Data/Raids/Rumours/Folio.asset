@@ -20,4 +20,7 @@ MonoBehaviour:
   seeks: {fileID: 0}
   teaches: {fileID: 11400000, guid: 3261ceaf538545146aa54b890bbff572, type: 2}
   breachComing: 0
-  afterExtractions: 4
+  afterExtractions: 0
+  needsBuilding: {fileID: 11400000, guid: 25c95a1289ab72b4ea0bb96e2ec3f020, type: 2}
+  needsTier: 3
+  urgent: 1

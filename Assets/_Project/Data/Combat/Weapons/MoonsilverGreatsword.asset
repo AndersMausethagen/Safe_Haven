@@ -1,0 +1,46 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8bc49664ac533524f8d9a2bfd443f4fa, type: 3}
+  m_Name: MoonsilverGreatsword
+  m_EditorClassIdentifier: Assembly-CSharp::WeaponDefinition
+  displayName: Moonsilver Greatsword
+  stance: 2
+  kind: 0
+  damage: 45
+  basicAttack: {fileID: 11400000, guid: 2d64ac21946bd1e4abf07ed1449499f2, type: 2}
+  combo:
+  - {fileID: 11400000, guid: 2d64ac21946bd1e4abf07ed1449499f2, type: 2}
+  - {fileID: 11400000, guid: 55293a90ef0148d4e933667257b3a8de, type: 2}
+  heavyAttack: {fileID: 11400000, guid: 85aaa385c6cde3c46b6814c436ac7c52, type: 2}
+  counterAttack: {fileID: 0}
+  rushAttack: {fileID: 11400000, guid: 2ed922a7de7b1494aa275048fa34b5b3, type: 2}
+  secondHandDistance: 0.17
+  heavySwingArmor: 0.3
+  weaponArt: {fileID: 11400000, guid: 54b1444be62bf60438b43419ffd4e51e, type: 2}
+  weaponArtFocus: 35
+  guardLetThrough: 0.4
+  drawSeconds: 1
+  reloadSeconds: 0.6
+  arrowSpeed: 32
+  spread: 1.5
+  minimumDraw: 0.25
+  drawMoveSpeed: 0.55
+  perfectReleaseSeconds: 0.2
+  perfectReleaseDamage: 1.25
+  aimSpread: 0.5
+  counterShotDamage: 0.6
+  shotAttack: {fileID: 0}
+  drawSound: {fileID: 0}
+  fullDrawSound: {fileID: 0}
+  swingSound: {fileID: 11400000, guid: 51662adc6a4b3a3438d04910bf5892fc, type: 2}
+  hitSound: {fileID: 11400000, guid: d453962799b34654ba05896de3576849, type: 2}
+  hitEffect: {fileID: 0}

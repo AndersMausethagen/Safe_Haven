@@ -1,0 +1,74 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 55433f6de2238c643b7ddfb32e5977d0, type: 3}
+  m_Name: Hut
+  m_EditorClassIdentifier: SafeHaven::BuildingDefinition
+  id: hut
+  displayName: Hut
+  description: A low roof, two bunks and a door that shuts. Nobody needs one to live here, but people work better for a night's sleep.
+  icon: {fileID: 21300000, guid: 795bd3e59bc39a04993609dace1e686d, type: 3}
+  faction: 0
+  combatStats: {fileID: 11400000, guid: 01155c9e2dd7c27468c1a359f747e1a1, type: 2}
+  prefab: {fileID: 2957072163683116273, guid: 659321929d7c3e04abd6aeba1f1b1b8f, type: 3}
+  constructionCost: []
+  constructionItems:
+  - item: {fileID: 11400000, guid: 8ae2883815327b74fa7975309c803f92, type: 2}
+    amount: 8
+  - item: {fileID: 11400000, guid: e8bb5d2fbded52b42a179a47cce32d53, type: 2}
+    amount: 6
+  - item: {fileID: 11400000, guid: 3790e5e25892e2a49adf1a7cb473a699, type: 2}
+    amount: 4
+  showInBuildMenu: 1
+  knownFromStart: 1
+  sortOrder: 12
+  requires:
+  - building: {fileID: 11400000, guid: cfa8f019a4062c84f8e9b8cd432080e0, type: 2}
+    tier: 1
+  requiredRank: 0
+  yardDepth: 1.5
+  yardSide: 0
+  placeInLines: 0
+  station: 0
+  outputCapacity: 10
+  queueLength: 5
+  buildWork: 6
+  renown: 4
+  upgrades:
+  - title: Thatched
+    description: A proper roof, and a third bunk.
+    cost:
+    - item: {fileID: 11400000, guid: a370187223419a048b6cebe8f7e345a3, type: 2}
+      amount: 6
+    - item: {fileID: 11400000, guid: 4df650debd4ce21459e04a0c92ffa207, type: 2}
+      amount: 4
+    essence: []
+    work: 6
+    renown: 2
+    craftSpeed: 0
+    extraQueue: 0
+    extraOutput: 0
+    extraStorage: 0
+    raidSeconds: 0
+    extraRumours: 0
+    comfort: 1
+    extraLogs: 0
+    teachesRecipes: []
+    requires: []
+    beds: 1
+    purifyYield: 0
+    extraMealSlots: 0
+    extraGame: 0
+    extraLight: 0
+  comfort: 1
+  beds: 2
+  teachesRecipes: []
+  deathSound: {fileID: 0}

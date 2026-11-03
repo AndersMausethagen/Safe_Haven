@@ -40,6 +40,8 @@ public sealed class RaidRumourDefinition : ScriptableObject
     [SerializeField, Min(0)] private int afterExtractions;
     [Tooltip("Only once this building stands at home: a craftsman is sought when there is somewhere for them to work.")]
     [SerializeField] private BuildingDefinition needsBuilding;
+    [Tooltip("The tier that building must stand at.")]
+    [SerializeField, Min(1)] private int needsTier = 1;
     [Tooltip("Comes up ahead of any chosen at random, as soon as it can.")]
     [SerializeField] private bool urgent;
 
@@ -67,7 +69,7 @@ public sealed class RaidRumourDefinition : ScriptableObject
             return false;
         }
 
-        if (needsBuilding != null && settlement.BuiltTier(needsBuilding) < 1)
+        if (needsBuilding != null && settlement.BuiltTier(needsBuilding) < needsTier)
         {
             return false;
         }

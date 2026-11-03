@@ -44,6 +44,8 @@ public sealed class RecipeDefinition : ScriptableObject
     [SerializeField, Min(0.1f)] private float craftSeconds = 5f;
     [Tooltip("Known from the start. Otherwise something has to teach it: a blueprint, a resident or a boss.")]
     [SerializeField] private bool knownFromStart = true;
+    [Tooltip("Asks for at least this station tier, for what a tier opens beyond its materials: a better yield, a field kit. 0 goes by the rule alone.")]
+    [SerializeField, Range(0, Tiers.Max)] private int minimumStationTier;
     [Tooltip("Recipes with lower values are listed first.")]
     [SerializeField] private int sortOrder;
 
@@ -79,7 +81,7 @@ public sealed class RecipeDefinition : ScriptableObject
         get
         {
             bool isGear = output != null && (output.Category == ItemCategory.Equipment || output.Category == ItemCategory.Tool);
-            return Mathf.Clamp(isGear ? Tier : Tier - 1, 1, Tiers.Max);
+            return Mathf.Clamp(Mathf.Max(isGear ? Tier : Tier - 1, minimumStationTier), 1, Tiers.Max);
         }
     }
 }

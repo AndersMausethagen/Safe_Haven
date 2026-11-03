@@ -28,6 +28,8 @@ MonoBehaviour:
   showInBuildMenu: 1
   knownFromStart: 0
   sortOrder: 9
+  requires: []
+  requiredRank: 0
   yardDepth: 1.5
   yardSide: 0
   placeInLines: 0
@@ -38,11 +40,11 @@ MonoBehaviour:
   renown: 10
   upgrades:
   - title: Carved
-    description: Runes cut deep around the basin.
+    description: 'Runes cut deep around the basin: a quarter more Purified Essence from the same curse.'
     cost:
-    - item: {fileID: 11400000, guid: b5567f7d75200bd46befbd1dab298f36, type: 2}
-      amount: 12
     - item: {fileID: 11400000, guid: 59d371b7b63e8e24bb946051d808bc9b, type: 2}
+      amount: 12
+    - item: {fileID: 11400000, guid: 3b6626518ea9eb040b7d45591fac015b, type: 2}
       amount: 2
     essence: []
     work: 9
@@ -51,12 +53,23 @@ MonoBehaviour:
     extraQueue: 0
     extraOutput: 0
     extraStorage: 0
+    raidSeconds: 0
+    extraRumours: 0
+    comfort: 0
+    extraLogs: 0
+    teachesRecipes: []
+    requires: []
+    beds: 0
+    purifyYield: 0.25
+    extraMealSlots: 0
+    extraGame: 0
+    extraLight: 0
   - title: Radiant
-    description: It hums softly at night.
+    description: It hums softly at night, and hardly anything is wasted.
     cost:
-    - item: {fileID: 11400000, guid: 59d371b7b63e8e24bb946051d808bc9b, type: 2}
-      amount: 6
     - item: {fileID: 11400000, guid: 3b6626518ea9eb040b7d45591fac015b, type: 2}
+      amount: 6
+    - item: {fileID: 11400000, guid: 8865a285b55516842a98bac1e1e53ef6, type: 2}
       amount: 3
     essence:
     - resource: {fileID: 11400000, guid: e991fd5ccf0ce314cafafff8badfe173, type: 2}
@@ -67,4 +80,18 @@ MonoBehaviour:
     extraQueue: 0
     extraOutput: 0
     extraStorage: 0
+    raidSeconds: 0
+    extraRumours: 0
+    comfort: 0
+    extraLogs: 0
+    teachesRecipes: []
+    requires: []
+    beds: 0
+    purifyYield: 0.25
+    extraMealSlots: 0
+    extraGame: 0
+    extraLight: 0
+  comfort: 0
+  beds: 0
+  teachesRecipes: []
   deathSound: {fileID: 0}

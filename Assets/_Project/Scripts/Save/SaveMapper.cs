@@ -169,6 +169,13 @@ public static class SaveMapper
         into.purificationQueued = settlement.PurificationQueued;
         into.purificationProgress = settlement.PurificationProgress;
         into.purificationBonus = settlement.PurificationBonus;
+        into.purificationYield = settlement.PurificationYield;
+        into.portalLevel = settlement.PortalLevel;
+        foreach (KeyValuePair<string, int> bought in settlement.TradeBought)
+        {
+            into.tradeBought.Add(new TradeSaveData { offer = bought.Key, count = bought.Value });
+        }
+
         foreach (ResidentRecord record in settlement.Residents)
         {
             into.residents.Add(new ResidentSaveData { id = record.Resident.Id, workPaused = record.WorkPaused, job = record.Job != null ? record.Job.Id : "" });
@@ -211,6 +218,16 @@ public static class SaveMapper
 
         settlement.Restore(saved.portalRepaired, saved.wardLevel, saved.successfulExtractions, (BreachStatus)saved.breach,
             saved.purificationQueued, saved.purificationProgress, saved.purificationBonus);
+        settlement.SetPurificationYield(saved.purificationYield);
+        settlement.RestorePortal(saved.portalLevel);
+        if (saved.tradeBought != null)
+        {
+            foreach (TradeSaveData bought in saved.tradeBought)
+            {
+                settlement.RestoreBought(bought.offer, bought.count);
+            }
+        }
+
         // Older saves never planned a second breach: it comes the usual distance from where the game stands.
         int nextBreachAt = saved.nextBreachAt > 0 || (BreachStatus)saved.breach != BreachStatus.Won
             ? saved.nextBreachAt : saved.successfulExtractions + WardBreachSettings.Current.RaidsBetween;

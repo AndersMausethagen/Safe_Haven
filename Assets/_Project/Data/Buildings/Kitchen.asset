@@ -33,6 +33,7 @@ MonoBehaviour:
   requires:
   - building: {fileID: 11400000, guid: 25c95a1289ab72b4ea0bb96e2ec3f020, type: 2}
     tier: 1
+  requiredRank: 0
   yardDepth: 2
   yardSide: 0
   placeInLines: 0
@@ -42,13 +43,15 @@ MonoBehaviour:
   buildWork: 8
   renown: 8
   upgrades:
-  - title: Sturdy
-    description: Shelves for what you've learned to keep.
+  - title: Stocked Larder
+    description: 'Shelves for what you''ve learned to keep: Boar Pie and Trout in Cream, meals that scale with you.'
     cost:
     - item: {fileID: 11400000, guid: a370187223419a048b6cebe8f7e345a3, type: 2}
-      amount: 6
-    - item: {fileID: 11400000, guid: b5567f7d75200bd46befbd1dab298f36, type: 2}
-      amount: 6
+      amount: 8
+    - item: {fileID: 11400000, guid: 59d371b7b63e8e24bb946051d808bc9b, type: 2}
+      amount: 4
+    - item: {fileID: 11400000, guid: 8cf878eb4a61eb943917a1f9421bb40a, type: 2}
+      amount: 2
     essence: []
     work: 8
     renown: 4
@@ -61,15 +64,25 @@ MonoBehaviour:
     comfort: 0
     extraLogs: 0
     teachesRecipes: []
-  - title: Master's
-    description: Smoke hooks, a salt box and a cook's patience.
+    requires:
+    - building: {fileID: 11400000, guid: 1b4e0a9fa52cb7d41b48c5e1bfae2ebc, type: 2}
+      tier: 1
+    beds: 0
+    purifyYield: 0
+    extraMealSlots: 0
+    extraGame: 0
+    extraLight: 0
+  - title: The Long Table
+    description: 'Everyone eats together: the Haven Feast and Moon Broth, and you can carry one more meal into the woods.'
     cost:
-    - item: {fileID: 11400000, guid: a370187223419a048b6cebe8f7e345a3, type: 2}
-      amount: 8
+    - item: {fileID: 11400000, guid: 8865a285b55516842a98bac1e1e53ef6, type: 2}
+      amount: 6
     - item: {fileID: 11400000, guid: f243c15300698e044a98d785099354c6, type: 2}
+      amount: 4
+    - item: {fileID: 11400000, guid: 32fed522ebae2fc4d85b1847b30aa530, type: 2}
       amount: 2
     essence: []
-    work: 9
+    work: 10
     renown: 6
     craftSpeed: 0.3
     extraQueue: 2
@@ -80,6 +93,15 @@ MonoBehaviour:
     comfort: 0
     extraLogs: 0
     teachesRecipes: []
+    requires:
+    - building: {fileID: 11400000, guid: 27159a7266bda614cbc6774955749e0e, type: 2}
+      tier: 3
+    beds: 0
+    purifyYield: 0
+    extraMealSlots: 1
+    extraGame: 0
+    extraLight: 0
   comfort: 2
+  beds: 0
   teachesRecipes: []
   deathSound: {fileID: 0}

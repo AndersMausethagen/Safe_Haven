@@ -47,6 +47,13 @@ public sealed class PlaytestSaveData
 }
 
 [Serializable]
+public sealed class TradeSaveData
+{
+    public string offer;
+    public int count;
+}
+
+[Serializable]
 public sealed class SettlementSaveData
 {
     public bool portalRepaired;
@@ -70,6 +77,12 @@ public sealed class SettlementSaveData
     public float purificationProgress;
     /// <summary>Share faster the altar works for its upgrades. Missing in older saves; the altar sets it again at home.</summary>
     public float purificationBonus;
+    /// <summary>Share more Purified from each batch. Missing in older saves; the altar sets it again at home.</summary>
+    public float purificationYield;
+    /// <summary>How far the portal has been improved. Missing in older saves.</summary>
+    public int portalLevel;
+    /// <summary>What was bought at the Trading Post since the last raid survived. Missing in older saves.</summary>
+    public List<TradeSaveData> tradeBought = new List<TradeSaveData>();
     /// <summary>Every crafting station's queue and output slot. Missing in older saves.</summary>
     public List<StationSaveData> stations = new List<StationSaveData>();
 }

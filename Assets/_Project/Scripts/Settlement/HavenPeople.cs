@@ -60,6 +60,9 @@ public static class HavenPeople
             }
         }
 
+        entry.Details.Add(new HavenDetail("Where they sleep", settlement.HasBed(record)
+            ? $"In a bed of their own: their work goes {CraftingStation.BedSpeedBonus * 100f:0}% faster, and home is that bit more comfortable."
+            : "By the fire. They manage, but a Hut or Cottage would help."));
         AddWork(entry, record, settlement);
         List<JobDefinition> others = person.Jobs.Where(one => one != null && one != job).ToList();
         if (others.Count > 0)

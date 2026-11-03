@@ -56,6 +56,17 @@ public static class RaidLauncher
             : $"Tier {Tiers.ToRoman(difficulty.tier)} needs a gear score of at least {difficulty.minimumGearScore}. Yours is {score}.";
     }
 
+    /// <summary>Why the Heart Tree can't yet hold the way open to a tier, or null when it can.</summary>
+    public static string CheckWard(RaidDifficulty difficulty)
+    {
+        return difficulty == null || Cheats.NoRequirements || GameSession.Settlement.WardLevel >= difficulty.wardLevelNeeded
+            ? null
+            : $"The ward isn't strong enough to hold the way open to tier {Tiers.ToRoman(difficulty.tier)}. Strengthen it at the Heart Tree.";
+    }
+
+    /// <summary>Share off the extraction time, from what has been done to the portal.</summary>
+    public static float ExtractionCut => SettlementSettings.Current.ExtractionCutAt(GameSession.Settlement.PortalLevel);
+
     /// <summary>Why the player can't spend this many Portal Sparks, or null when they can.</summary>
     public static string CheckSparks(GameObject player, int sparks)
     {
@@ -99,6 +110,7 @@ public static class RaidLauncher
     {
         problem = CheckLaunch(raid);
         difficulty ??= raid != null ? raid.LowestDifficulty : null;
+        problem ??= CheckWard(difficulty);
         problem ??= CheckGear(difficulty, player);
         ItemInventory inventory = player != null ? player.GetComponent<ItemInventory>() : null;
         if (problem == null && inventory == null)
@@ -150,7 +162,7 @@ public static class RaidLauncher
 
         // The seed is usually rolled when the briefing opens, so the hour it shows is the hour the raid gets.
         int runSeed = seed ?? RaidSession.NewSeed();
-        RaidParameters parameters = RaidParameters.Calculate(raid, modifiers, ExtraSeconds(sparks), RaidTimeOfDay.For(raid, runSeed), difficulty);
+        RaidParameters parameters = RaidParameters.Calculate(raid, modifiers, ExtraSeconds(sparks), RaidTimeOfDay.For(raid, runSeed), difficulty, ExtractionCut);
         if (player.TryGetComponent(out PlayerTransport transport))
         {
             transport.LeaveForRaid();
