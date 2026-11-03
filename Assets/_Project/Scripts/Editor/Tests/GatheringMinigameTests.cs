@@ -6,6 +6,156 @@ using Object = UnityEngine.Object;
 
 public sealed class GatheringMinigameTests
 {
+    [Test]
+    public void MinedNodes_BreakApart_AndGiveMoreOfWhatTheyHold_AndSmallRocks()
+    {
+        var rocks = AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Project/Data/Items/Materials/SmallRocks.asset");
+        foreach (string guid in AssetDatabase.FindAssets("t:GatheringNodeDefinition"))
+        {
+            var node = AssetDatabase.LoadAssetAtPath<GatheringNodeDefinition>(AssetDatabase.GUIDToAssetPath(guid));
+            if (node.GatherTool != ToolType.Pickaxe)
+            {
+                Assert.AreEqual(0, node.BurstPieces, node.name + " isn't mined.");
+                continue;
+            }
+
+            Assert.Greater(node.BurstPieces, 0, node.name);
+            Assert.AreSame(node.Yields.Entries[0].Item, node.BurstYields.Entries[0].Item, node.name);
+            Assert.AreSame(rocks, node.BurstYields.Entries[1].Item, node.name);
+            Assert.LessOrEqual(node.BurstYields.Entries[0].MaxQuantity, 2, node.name + ": a few extra, not a second yield.");
+            Assert.Greater(node.Feedback.BurstSpeed, 0f, node.name);
+            Assert.NotNull(node.Feedback.PieceKnock, node.name);
+        }
+    }
+
+    [Test]
+    public void NodePrefabs_GiveWhatTheirDefinitionSays()
+    {
+        foreach (string guid in AssetDatabase.FindAssets("t:GatheringNodeDefinition"))
+        {
+            var node = AssetDatabase.LoadAssetAtPath<GatheringNodeDefinition>(AssetDatabase.GUIDToAssetPath(guid));
+            if (node.WorldPrefab == null || !node.WorldPrefab.TryGetComponent(out ResourceSource source)) continue;
+            Assert.AreEqual(node.Yields.Entries.Count, source.Drops.Entries.Count, node.name);
+            for (int i = 0; i < node.Yields.Entries.Count; i++)
+            {
+                Assert.AreSame(node.Yields.Entries[i].Drop, source.Drops.Entries[i].Drop, node.name);
+                Assert.AreEqual(node.Yields.Entries[i].MinQuantity, source.Drops.Entries[i].MinQuantity, node.name);
+                Assert.AreEqual(node.Yields.Entries[i].MaxQuantity, source.Drops.Entries[i].MaxQuantity, node.name);
+            }
+        }
+    }
+
+    // Closed if an edge is met once from each side; the volume of a closed mesh is the sum of tetrahedra from any point.
+    private static float Volume(Mesh mesh, Vector3 from, out int openEdges)
+    {
+        Vector3[] points = mesh.vertices;
+        var edges = new Dictionary<(Vector3Int, Vector3Int), int>();
+        Vector3Int Key(Vector3 p) => new Vector3Int(Mathf.RoundToInt(p.x * 2000f), Mathf.RoundToInt(p.y * 2000f), Mathf.RoundToInt(p.z * 2000f));
+        float volume = 0f;
+        for (int sub = 0; sub < mesh.subMeshCount; sub++)
+        {
+            int[] triangles = mesh.GetTriangles(sub);
+            for (int i = 0; i < triangles.Length; i += 3)
+            {
+                Vector3 a = points[triangles[i]], b = points[triangles[i + 1]], c = points[triangles[i + 2]];
+                volume += Vector3.Dot(a - from, Vector3.Cross(b - from, c - from)) / 6f;
+                foreach ((Vector3 p, Vector3 q) in new[] { (a, b), (b, c), (c, a) })
+                {
+                    Vector3Int kp = Key(p), kq = Key(q);
+                    if (kp == kq) continue;
+                    edges.TryGetValue((kq, kp), out int back);
+                    if (back > 0) edges[(kq, kp)] = back - 1;
+                    else { edges.TryGetValue((kp, kq), out int here); edges[(kp, kq)] = here + 1; }
+                }
+            }
+        }
+
+        openEdges = 0;
+        foreach (int left in edges.Values) openEdges += left;
+        return Mathf.Abs(volume);
+    }
+
+    [TestCase(PrimitiveType.Sphere, 5)]
+    [TestCase(PrimitiveType.Cube, 3)]
+    public void MeshCracker_MakesSolidPieces_ThatAddUpToTheWhole(PrimitiveType shape, int count)
+    {
+        GameObject primitive = GameObject.CreatePrimitive(shape);
+        Mesh source = primitive.GetComponent<MeshFilter>().sharedMesh;
+        float whole = Volume(source, Vector3.zero, out _);
+        List<Mesh> pieces = MeshCracker.Crack(source, count, 12345);
+        try
+        {
+            Assert.AreEqual(count, pieces.Count);
+            float total = 0f;
+            foreach (Mesh piece in pieces)
+            {
+                float here = Volume(piece, Vector3.zero, out int open);
+                Assert.AreEqual(here, Volume(piece, new Vector3(3f, -2f, 5f), out _), here * 0.02f + 0.001f, "Only a closed shape has one volume from everywhere.");
+                Assert.AreEqual(0, open, "A piece has no holes.");
+                Assert.AreEqual(2, piece.subMeshCount, "Surface and broken faces.");
+                Assert.Greater(piece.GetTriangles(1).Length, 0, "It has broken faces.");
+                Assert.Greater(here, whole * 0.02f, "A real piece, not a sliver.");
+                total += here;
+            }
+
+            Assert.AreEqual(whole, total, whole * 0.12f, "Together they are the whole.");
+        }
+        finally
+        {
+            foreach (Mesh piece in pieces) Object.DestroyImmediate(piece);
+            Object.DestroyImmediate(primitive);
+        }
+    }
+
+    [Test]
+    public void MinedNodes_HaveTheirModelsCracked()
+    {
+        foreach (string file in new[] { "GreyStone", "IronOre", "Overgrowth/GreatBoulder" })
+        {
+            var node = AssetDatabase.LoadAssetAtPath<GatheringNodeDefinition>("Assets/_Project/Data/Gathering/" + file + ".asset");
+            Assert.NotNull(node.Fracture, file);
+            int cracked = 0;
+            foreach (MeshRenderer part in NodeFracture.DrawnParts(node.WorldPrefab.transform))
+            {
+                Mesh[] pieces = node.Fracture.PiecesOf(part.GetComponent<MeshFilter>().sharedMesh);
+                if (pieces != null) cracked += pieces.Length;
+            }
+
+            Assert.GreaterOrEqual(cracked, 3, file + ": the main rock comes apart.");
+            foreach (GameObject variant in node.ModelVariants)
+            {
+                bool any = false;
+                foreach (MeshRenderer part in NodeFracture.DrawnParts(variant.transform))
+                    any |= node.Fracture.PiecesOf(part.GetComponent<MeshFilter>().sharedMesh) != null;
+                Assert.IsTrue(any, file + " " + variant.name);
+            }
+        }
+    }
+
+    [Test]
+    public void GrantExtra_GivesTheTable_AndNothingWithoutOne()
+    {
+        var rocks = AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Project/Data/Items/Materials/SmallRocks.asset");
+        var grey = AssetDatabase.LoadAssetAtPath<GatheringNodeDefinition>("Assets/_Project/Data/Gathering/GreyStone.asset");
+        var user = new GameObject("Miner");
+        var rock = new GameObject("Rock");
+        try
+        {
+            ItemInventory bag = user.AddComponent<ItemInventory>();
+            ResourceSource source = rock.AddComponent<ResourceSource>();
+            Assert.IsTrue(source.GrantExtra(user, grey.BurstYields));
+            Assert.GreaterOrEqual(bag.Container.Count(rocks), 2);
+            Assert.GreaterOrEqual(bag.Container.Count(grey.Yields.Entries[0].Item), 1);
+            Assert.IsFalse(source.GrantExtra(user, new ItemDropTable()));
+            Assert.IsFalse(source.GrantExtra(null, grey.BurstYields));
+        }
+        finally
+        {
+            Object.DestroyImmediate(user);
+            Object.DestroyImmediate(rock);
+        }
+    }
+
     private readonly List<Object> created = new List<Object>();
 
     [TearDown]

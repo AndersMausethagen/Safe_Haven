@@ -98,6 +98,21 @@ public sealed class ResourceSource : MonoBehaviour
         return true;
     }
 
+    /// <summary>Rolls another table on top of the yield (a mined node's burst), with the same overflow handling. It isn't another
+    /// harvest: no experience, no talent's extra. Returns false when there is nothing to give or nobody to give it to.</summary>
+    public bool GrantExtra(GameObject recipient, ItemDropTable extra)
+    {
+        if (recipient == null || extra == null || extra.Entries.Count == 0)
+        {
+            return false;
+        }
+
+        var leftBehind = new List<string>();
+        Give(recipient.GetComponentInParent<ItemInventory>(), recipient, extra.Roll(), extra.RollResources(), leftBehind);
+        ReportLeftBehind(leftBehind);
+        return true;
+    }
+
     /// <summary>
     /// Gives extra units of the main yield (the first drop entry): the bonus for well-timed gathering swings. Returns
     /// false when there is no main yield or nobody to give it to.

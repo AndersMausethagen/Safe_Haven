@@ -45,6 +45,14 @@ public sealed class GatheringNodeDefinition : ScriptableObject
     [Tooltip("Seconds until a gathered node grows back. 0 means it never comes back.")]
     [SerializeField, Min(0f)] private float respawnSeconds = 180f;
 
+    [Header("Break Apart")]
+    [Tooltip("When gathered it cracks into about this many tumbling pieces of its own model, instead of shrinking away. 0: it doesn't. How they fly is in its Feel profile (Harvest Feedback). After changing this or its models: Safe Haven › Resources › Crack Mined Nodes.")]
+    [SerializeField, Range(0, 16)] private int burstPieces;
+    [Tooltip("Its models, cracked ahead of time. Made by Safe Haven › Resources › Crack Mined Nodes.")]
+    [SerializeField] private NodeFracture fracture;
+    [Tooltip("What the burst gives on top of the yield: a few more of what it holds, and the small rocks that break off.")]
+    [SerializeField] private ItemDropTable burstYields = new ItemDropTable();
+
     [Header("Feel")]
     [Tooltip("Sounds, particles and shake for swings and the break when gathered, shared by a family of nodes " +
              "(Wood, Stone, Ore, Fibre). Empty uses the Default profile in Systems › Gathering Minigame.")]
@@ -74,6 +82,9 @@ public sealed class GatheringNodeDefinition : ScriptableObject
     public float GatherRange => gatherRange;
     public bool DepleteOnGather => depleteOnGather;
     public float RespawnSeconds => respawnSeconds;
+    public int BurstPieces => burstPieces;
+    public NodeFracture Fracture => fracture;
+    public ItemDropTable BurstYields => burstYields;
     public HarvestFeedbackProfile Feedback => feedback;
     public GameObject WorldModelPrefab => worldModelPrefab;
     public GameObject WorldPrefab => worldPrefab;
@@ -86,6 +97,7 @@ public sealed class GatheringNodeDefinition : ScriptableObject
     private void OnValidate()
     {
         yields.Validate();
+        burstYields.Validate();
     }
 
     private static string MakeId(string source)

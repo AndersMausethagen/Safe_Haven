@@ -52,6 +52,7 @@ MonoBehaviour:
   duration: 4.5
   range: 1.6
   deactivateOnComplete: 0
+  kind: 0
   started:
     m_PersistentCalls:
       m_Calls: []
@@ -77,8 +78,8 @@ MonoBehaviour:
     entries:
     - item: {fileID: 11400000, guid: fdf61b2bcc4fcfb47b96885b254e02e6, type: 2}
       resource: {fileID: 0}
-      minQuantity: 1
-      maxQuantity: 3
+      minQuantity: 3
+      maxQuantity: 5
       probability: 1
   grantOnInteractionComplete: 1
 --- !u!114 &1129214205577264154

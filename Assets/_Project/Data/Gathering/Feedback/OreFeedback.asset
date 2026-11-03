@@ -25,8 +25,13 @@ MonoBehaviour:
     effect: {fileID: 1800097642604793677, guid: aa3cec24f3dda2240a1beaa511aacb72, type: 3}
     shakeDegrees: 1
   harvested:
-    sound: {fileID: 11400000, guid: 10f67b83128cc194c8187151a24531c4, type: 2}
+    sound: {fileID: 11400000, guid: 3be1c854dc37e3040be6dc4b7b109321, type: 2}
     effect: {fileID: 2357714975733934300, guid: edb20836c07f8ab4c85c791ec1186052, type: 3}
     shakeDegrees: 0
   breakSeconds: 0.35
   regrowSeconds: 0.4
+  burstSpeed: 4.8
+  pieceSeconds: 4.5
+  burstShake: 0.22
+  pieceKnock: {fileID: 11400000, guid: 5b9cecb5c9522644f9494e63bbc96cfd, type: 2}
+  pieceInterior: {fileID: 2100000, guid: 4bba13f2e8ffa0145a8bbacb3deff360, type: 2}

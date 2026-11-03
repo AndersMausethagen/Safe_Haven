@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -13,7 +14,8 @@ public interface IHarvestBody
 
 /// <summary>
 /// Plays a gathering node's feedback: sound, particles and a rock of the model on every swing, a shrink-and-sink break
-/// when it is harvested and a pop when it grows back. What plays comes from the node's HarvestFeedbackProfile (picked on
+/// when it is harvested (or, with Break Apart pieces, it cracks into RockChunks) and a pop when it grows back. What plays comes
+/// from the node's HarvestFeedbackProfile (picked on
 /// its GatheringNodeDefinition), falling back to the Default profile in Gathering Minigame settings.
 /// <para>
 /// Where it belongs: Gathering presentation. ResourceNode adds it on the fly, so no setup is needed. Add it to a node
@@ -66,7 +68,9 @@ public sealed class ResourceNodeFeedback : MonoBehaviour
     }
 
     /// <summary>Seconds the node keeps showing while it breaks, before ResourceNode hides it.</summary>
-    public float BreakSeconds => visualRoot != null && Profile != null ? Profile.BreakSeconds : 0f;
+    public float BreakSeconds => visualRoot != null && Profile != null && !Bursts ? Profile.BreakSeconds : 0f;
+
+    private bool Bursts => node != null && node.Definition != null && node.Definition.BurstPieces > 0;
 
     private HarvestFeedbackProfile OwnProfile => node != null && node.Definition != null ? node.Definition.Feedback : null;
     private static HarvestFeedbackProfile DefaultProfile => GatheringMinigameSettings.Current.DefaultFeedback;
@@ -199,6 +203,10 @@ public sealed class ResourceNodeFeedback : MonoBehaviour
 
         Play(HarvestMoment.Harvested, centre, centre - transform.forward);
         onHarvested.Invoke();
+        if (Bursts && Application.isPlaying)
+        {
+            Burst();
+        }
 
         if (node.Definition != null && node.Definition.DepleteOnGather && BreakSeconds > 0f)
         {
@@ -210,6 +218,22 @@ public sealed class ResourceNodeFeedback : MonoBehaviour
             breakStart = Time.time;
             enabled = true;
         }
+    }
+
+    private void Burst()
+    {
+        HarvestFeedbackProfile feel = Profile;
+        if (feel == null || visualRoot == null || !Bounds(out Bounds whole))
+        {
+            return;
+        }
+
+        List<MeshRenderer> parts = NodeFracture.DrawnParts(visualRoot);
+        parts.RemoveAll(part => OutlineCopies.IsCopy(part) || !part.gameObject.activeInHierarchy);
+        GameObject worker = node.TryGetComponent(out Interactable interaction) ? interaction.Interactor : null;
+        Vector3 from = worker != null ? worker.transform.position : whole.center;
+        RockChunk.Burst(parts, whole, node.Definition.Fracture, feel, from);
+        CameraShake.Add(feel.BurstShake);
     }
 
     private void OnRegrown()

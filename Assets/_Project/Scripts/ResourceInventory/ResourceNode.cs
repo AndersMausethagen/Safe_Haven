@@ -6,7 +6,8 @@ using UnityEngine;
 /// <summary>
 /// A gathering node in the world, such as a tree, a rock or an ore vein, configured by a GatheringNodeDefinition. Before
 /// the player starts it checks for the right tool (a Tier II node needs a Tier II tool of its kind), and once gathered it
-/// disappears and grows back after the node's respawn time. The yield itself is granted by the ResourceSource beside it.
+/// disappears and grows back after the node's respawn time. The yield itself is granted by the ResourceSource beside it,
+/// and what a node that breaks apart gives on top (its definition's Burst Yields) along with it.
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Interactable), typeof(ResourceSource))]
@@ -250,6 +251,11 @@ public sealed class ResourceNode : MonoBehaviour, IInteractionCondition, ISaveab
 
     private void OnGathered()
     {
+        if (node != null && TryGetComponent(out ResourceSource source))
+        {
+            source.GrantExtra(interactable.Interactor, node.BurstYields);
+        }
+
         Harvested?.Invoke();
         if (node == null || !node.DepleteOnGather)
         {

@@ -59,6 +59,23 @@ public sealed class HarvestFeedbackProfile : ScriptableObject
     [Tooltip("Seconds of the pop when the node grows back. 0 = it just appears.")]
     [SerializeField, Range(0f, 2f)] private float regrowSeconds = 0.4f;
 
+    [Header("Burst (nodes with Break Apart pieces)")]
+    [Tooltip("How fast the pieces fly out, in metres a second. The small ones fly faster than the big ones.")]
+    [SerializeField, Min(0f)] private float burstSpeed = 4.5f;
+    [Tooltip("Seconds the pieces lie around before they shrink away.")]
+    [SerializeField, Min(0f)] private float pieceSeconds = 4.5f;
+    [Tooltip("How much the camera shakes as it goes (as Shake Camera in a story). 0: not at all.")]
+    [SerializeField, Range(0f, 1f)] private float burstShake = 0.2f;
+    [Tooltip("Played when a piece lands or knocks as it rolls. Optional.")]
+    [SerializeField] private SoundDefinition pieceKnock;
+    [Tooltip("The inside of the rock, on the faces where it broke. Empty: the model's own material.")]
+    [SerializeField] private Material pieceInterior;
+
+    public float BurstSpeed => burstSpeed;
+    public float PieceSeconds => pieceSeconds;
+    public float BurstShake => burstShake;
+    public SoundDefinition PieceKnock => pieceKnock;
+    public Material PieceInterior => pieceInterior;
     public float BreakSeconds => breakSeconds;
     public float RegrowSeconds => regrowSeconds;
 

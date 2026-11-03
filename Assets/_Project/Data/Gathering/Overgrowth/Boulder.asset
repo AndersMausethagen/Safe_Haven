@@ -36,6 +36,20 @@ MonoBehaviour:
   gatherRange: 1.8
   depleteOnGather: 1
   respawnSeconds: 0
+  burstPieces: 8
+  fracture: {fileID: 11400000, guid: 916b7c5c542767249a162a9ba75ab1b4, type: 2}
+  burstYields:
+    entries:
+    - item: {fileID: 11400000, guid: b5567f7d75200bd46befbd1dab298f36, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 2
+      probability: 1
+    - item: {fileID: 11400000, guid: 9f085f39a2da68c45b58d2db986835f4, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 2
+      maxQuantity: 4
+      probability: 1
   feedback: {fileID: 11400000, guid: 99cfc3df29073df4385f6c1fe48d873e, type: 2}
   worldModelPrefab: {fileID: 2470783685879844320, guid: ea2e596f9ba483c40a5e2f3ee217c9f8, type: 3}
   worldPrefab: {fileID: 4764116472793924735, guid: 7d72b03acb11eb940b67a5ae4063d53c, type: 3}

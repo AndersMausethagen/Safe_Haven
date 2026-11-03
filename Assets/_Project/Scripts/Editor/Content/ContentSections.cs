@@ -351,6 +351,11 @@ public sealed class GatheringNodeSection : PrefabContentSection
             }
         }
 
+        if (node.BurstPieces > 0 && node.Fracture == null)
+        {
+            problems.Add("It breaks apart, but its models aren't cracked yet: Safe Haven › Resources › Crack Mined Nodes.");
+        }
+
         if (node.GatherTool != ToolType.None && !ToolExists(node.GatherTool, node.RequiredToolTier))
         {
             problems.Add($"No item is a Tier {Tiers.ToRoman(node.RequiredToolTier)} {node.GatherTool} or better, so nobody can gather it.");
