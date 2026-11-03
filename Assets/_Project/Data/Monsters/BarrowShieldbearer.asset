@@ -132,6 +132,7 @@ MonoBehaviour:
   idleGrazeChance: 0
   idleSleepChance: 0
   idleSleepAttention: 0.3
+  canBeFinished: 1
   flankSpread: 0.4
   poise: 110
   openWhileStriking: 1

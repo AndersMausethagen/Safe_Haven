@@ -34,6 +34,8 @@ by motion, sound and weight rather than on-screen text.
   middle of a strike, it takes 1.35 times, with no sure critical, and the strike is broken off. Great beasts (Old Moss Troll, Root Guardian, Huldra)
   and elites are only ever open while staggered. A backstab has its own heavy sound, a beat of slow time, a flash and blood out the front.
   One straight out of a dodge (within 1.5 s) gives back half of what the dodge cost.
+- **Finishing blow.** Behind a staggered person-shaped creature (Draug, Barrow Shieldbearer), a press locks the two of you together for a stab. It is the
+  weapon's own rush in numbers and time, so it pays what a staggered backstab pays. What changes is that nothing can knock you out of it before the blade lands.
 - **Enemies answer, and learn.** A backstabbed enemy that lives turns on you 0.3 s later, or as its stagger ends: usually a strike, wind-up as
   usual so you can dodge it, otherwise a hop back. It also remembers. Each backstab it took, or saw within 8 m, gives it a 35% chance (at most 90%) of
   seeing the next swing from behind coming while it strikes; it forgets one every 20 s. What it sees it breaks off for: a "!" and a hop aside, untouchable while

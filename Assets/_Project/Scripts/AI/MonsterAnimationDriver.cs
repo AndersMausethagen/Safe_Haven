@@ -28,6 +28,9 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
     private const float HopPlayback = 1.5f;
     // A held wind-up all but stops the clip, without it looking frozen.
     private const float HeldPlayback = 0.04f;
+    private const float FinishFade = 0.14f;
+    private float holdEndsAt = -1f;
+    private float holdSlowsAt;
     private static readonly int ActionSpeedHash = Animator.StringToHash("ActionSpeed");
     private static readonly int HitStateHash = Animator.StringToHash("Hit");
     private static readonly int HopStateHash = Animator.StringToHash("Hop");
@@ -57,6 +60,7 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
         ai.AttackStarted += OnAttackStarted;
         ai.StateChanged += OnStateChanged;
         ai.Staggered += OnStaggered;
+        ai.HeldForFinish += OnHeldForFinish;
         if (health != null)
         {
             health.Damaged += OnDamaged;
@@ -68,6 +72,7 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
         ai.AttackStarted -= OnAttackStarted;
         ai.StateChanged -= OnStateChanged;
         ai.Staggered -= OnStaggered;
+        ai.HeldForFinish -= OnHeldForFinish;
         if (health != null)
         {
             health.Damaged -= OnDamaged;
@@ -80,6 +85,13 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
         if (ai.enabled && hasSpeed)
         {
             animator.SetFloat(speedHash, ai.Speed, speedDampTime, Time.deltaTime);
+        }
+
+        if (holdEndsAt >= 0f)
+        {
+            bool over = Time.time >= holdEndsAt;
+            animator.speed = over || Time.time < holdSlowsAt ? 1f : HeldPlayback;
+            holdEndsAt = over ? -1f : holdEndsAt;
         }
 
         if (animator != null && ai.IsHoldingStrike != holding)
@@ -141,6 +153,18 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
         if (flinches && animator.HasState(0, HitStateHash))
         {
             animator.CrossFadeInFixedTime(HitStateHash, FlinchFade, 0, 0f);
+        }
+    }
+
+    // Up off the ground and at the start of its hit, barely moving, so the blade finds a body standing where it should; then it plays out.
+    private void OnHeldForFinish(float bladeIn)
+    {
+        if (animator != null && animator.isHuman && animator.HasState(0, HitStateHash))
+        {
+            animator.CrossFadeInFixedTime(HitStateHash, FinishFade, 0, 0f);
+            animator.speed = 1f;
+            holdSlowsAt = Time.time + FinishFade;
+            holdEndsAt = Time.time + bladeIn;
         }
     }
 

@@ -275,6 +275,23 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
     public float ReadTurnSpeed => readTurnSpeed;
     public float ParriedFlinchSeconds => parriedFlinchSeconds;
     public float BlockArc => blockArc;
+    [Header("Finishing blow")]
+    [Tooltip("How the stab looks. Only its animation is used: the numbers and timing are the weapon's own rush, so a finishing blow doesn't change the balance.")]
+    [SerializeField] private AttackDefinition finishStab;
+    [Tooltip("A press this close behind a staggered creature that can take one is a finishing blow, in metres.")]
+    [SerializeField, Min(0.5f)] private float finishReach = 2.6f;
+    [Tooltip("How far behind the creature the two bodies lock together, in metres.")]
+    [SerializeField, Min(0.2f)] private float finishGap = 0.95f;
+    [Tooltip("Seconds to close that distance: the snap into the hold.")]
+    [SerializeField, Min(0.02f)] private float finishCloseSeconds = 0.14f;
+    [Tooltip("Seconds the two stay locked after the blade lands.")]
+    [SerializeField, Min(0f)] private float finishHoldSeconds = 0.3f;
+
+    public AttackDefinition FinishStab => finishStab;
+    public float FinishReach => finishReach;
+    public float FinishGap => finishGap;
+    public float FinishCloseSeconds => finishCloseSeconds;
+    public float FinishHoldSeconds => finishHoldSeconds;
     public float ParryWindow => parryWindow;
     public float GuardRelock => guardRelock;
     public float BlockStaminaPerDamage => blockStaminaPerDamage;

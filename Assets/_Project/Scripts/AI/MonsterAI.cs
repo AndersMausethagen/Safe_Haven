@@ -249,6 +249,27 @@ public sealed class MonsterAI : MonoBehaviour, IEventSubject, IStaggerable, IHit
         AnyStaggered?.Invoke(this, seconds);
     }
 
+    /// <summary>A finishing blow has it: it reels on, facing away, until the blow is done whatever its stagger had left.</summary>
+    public void HoldForFinish(float seconds, float bladeIn)
+    {
+        if (CurrentState != State.Staggered)
+        {
+            return;
+        }
+
+        staggerUntil = Mathf.Max(staggerUntil, Time.time + seconds);
+        pose?.Stagger(Time.time, seconds);
+        HeldForFinish?.Invoke(bladeIn);
+    }
+
+    /// <summary>A finishing blow has it, and lands in this many seconds. Whatever animates it stands it up to take it.</summary>
+    public event Action<float> HeldForFinish;
+
+    public bool CanBeFinished => definition != null && definition.CanBeFinished;
+
+    /// <summary>The fight has reached this stage, and it knows the attacks that go with it (BossEncounter).</summary>
+    public void SetPhase(int phase) => attacks.Phase = phase;
+
     private void UpdateStagger()
     {
         if (Time.time < staggerUntil)

@@ -88,6 +88,8 @@ public sealed class MonsterDefinition : ScriptableObject, ICombatSounds
     [SerializeField, Range(0f, 1f)] private float idleSleepAttention = 0.3f;
 
     [Header("In a Fight")]
+    [Tooltip("A person-shaped creature, whom a finishing blow can line up with: a press close behind it while it staggers locks the two together for the stab.")]
+    [SerializeField] private bool canBeFinished;
     [Tooltip("How much it spreads out around its target with others of its side, so a group surrounds rather than clumps. 0: straight at it. 1: the widest flank.")]
     [SerializeField, Range(0f, 1f)] private float flankSpread;
 
@@ -171,6 +173,7 @@ public sealed class MonsterDefinition : ScriptableObject, ICombatSounds
     public float IdleSleepChance => idleSleepChance;
     public float IdleSleepAttention => idleSleepAttention;
     public float FlankSpread => flankSpread;
+    public bool CanBeFinished => canBeFinished;
     public float HoverHeight => hoverHeight;
     public bool HasTemperament(MonsterTemperament value) => (temperament & value) != 0;
 

@@ -35,6 +35,9 @@ public sealed class MonsterAttacks
     // A held wind-up stops here in its fill, before the end, so the blow is plainly still to come.
     private const float HoldAtShare = 0.6f;
 
+    /// <summary>The stage of a boss's fight: what it knows so far.</summary>
+    public int Phase { get; set; }
+
     public MonsterAttacks(Transform self, MonsterDefinition definition, Combatant combatant, MonsterMovement movement, LayerMask targetLayers)
     {
         this.self = self;
@@ -77,7 +80,7 @@ public sealed class MonsterAttacks
     public bool IsReady => Time.time >= nextAttackTime;
 
     /// <summary>The highest-priority action usable at <paramref name="distance"/> now, or -1.</summary>
-    public int ChooseAction(float distance, bool isLeader) => SelectAttack(definition.Attacks, readyAt, distance, Time.time, isLeader, RaidTier);
+    public int ChooseAction(float distance, bool isLeader) => SelectAttack(definition.Attacks, readyAt, distance, Time.time, isLeader, RaidTier, Phase);
 
     /// <summary>The strike that reaches <paramref name="distance"/>, spent or not, or -1: what it wheels round into when it answers a
     /// backstab. The blow it was knocked out of has just gone on cooldown, and that mustn't leave it with nothing to answer with.</summary>
@@ -88,7 +91,7 @@ public sealed class MonsterAttacks
         for (int i = 0; i < actions.Count; i++)
         {
             MonsterAttack candidate = actions[i];
-            if (candidate != null && candidate.Strikes && candidate.KnownAt(RaidTier) && distance >= candidate.minimumRange && distance <= candidate.maximumRange
+            if (candidate != null && candidate.Strikes && candidate.fromPhase <= Phase && candidate.KnownAt(RaidTier) && distance >= candidate.minimumRange && distance <= candidate.maximumRange
                 && (chosen < 0 || candidate.priority > actions[chosen].priority))
             {
                 chosen = i;
@@ -101,13 +104,13 @@ public sealed class MonsterAttacks
     // Read each time, as a creature can outlive a raid's start but never changes raids.
     private static int RaidTier => GameSession.ActiveRaid != null ? GameSession.ActiveRaid.Tier : 0;
 
-    public static int SelectAttack(IReadOnlyList<MonsterAttack> attacks, float[] cooldowns, float distance, float now, bool isLeader, int tier = 0)
+    public static int SelectAttack(IReadOnlyList<MonsterAttack> attacks, float[] cooldowns, float distance, float now, bool isLeader, int tier = 0, int phase = 0)
     {
         int chosen = -1;
         for (int i = 0; i < attacks.Count; i++)
         {
             MonsterAttack candidate = attacks[i];
-            if (candidate != null && candidate.IsAvailable(distance, now, cooldowns[i], isLeader, tier)
+            if (candidate != null && candidate.IsAvailable(distance, now, cooldowns[i], isLeader, tier, phase)
                 && (chosen < 0 || candidate.priority > attacks[chosen].priority))
             {
                 chosen = i;
@@ -119,7 +122,7 @@ public sealed class MonsterAttacks
     /// <summary>True when one of its actions that strikes (not a howl) reaches <paramref name="distance"/>, so it can hold its ground.</summary>
     public bool AnyStrikeReaches(float distance)
     {
-        return HoldsGround(definition.Attacks, readyAt, distance, Time.time, RaidTier);
+        return HoldsGround(definition.Attacks, readyAt, distance, Time.time, RaidTier, Phase);
     }
 
     /// <summary>
@@ -128,14 +131,14 @@ public sealed class MonsterAttacks
     /// runs in to bite, and a Guardian whose wide slam is spent walks up to use its own. A creature whose only strike is on a long
     /// cooldown, such as a Mistwing's dive, has nothing to walk up with, so it keeps its distance until that is ready.
     /// </summary>
-    public static bool HoldsGround(IReadOnlyList<MonsterAttack> attacks, float[] cooldowns, float distance, float now, int tier)
+    public static bool HoldsGround(IReadOnlyList<MonsterAttack> attacks, float[] cooldowns, float distance, float now, int tier, int phase = 0)
     {
         float everyday = 0f;
         bool any = false, charges = false;
         for (int i = 0; i < attacks.Count; i++)
         {
             MonsterAttack candidate = attacks[i];
-            if (candidate == null || !candidate.Strikes || !candidate.KnownAt(tier))
+            if (candidate == null || !candidate.Strikes || candidate.fromPhase > phase || !candidate.KnownAt(tier))
             {
                 continue;
             }

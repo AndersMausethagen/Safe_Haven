@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c5517319b40a047489a8fdcb2b152b82, type: 3}
+  m_Name: Finishing Stab
+  m_EditorClassIdentifier: Assembly-CSharp::AttackDefinition
+  displayName: Sword Rush
+  damageType: 0
+  baseDamage: 0
+  weaponDamageRatio: 1.2
+  powerScaling: 1
+  structureDamageMultiplier: 1
+  canCrit: 1
+  range: 2.3
+  arc: 90
+  maxTargets: 2
+  hitDelay: 0.28
+  recoveryTime: 0.62
+  poiseDamage: 14
+  impact: 1.05
+  lunge: 2
+  staminaCost: -1
+  appliesStatus: {fileID: 0}
+  statusChance: 1
+  animationState: 1H Stab
+  animationSpeed: 1
+  strikeSpeed: 1.5
+  strikeLead: 0.05333333
+  followThroughSpeed: 1
+  swingSound: {fileID: 0}
+  hitSound: {fileID: 0}
+  slashColor: {r: 1, g: 0.95, b: 0.85, a: 0.75}
+  slashSweep: 0
+  slashTilt: 4.44679

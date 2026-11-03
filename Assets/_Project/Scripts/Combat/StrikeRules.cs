@@ -38,6 +38,22 @@ public static class StrikeRules
     public static float SweepSeconds(float arc, float halfCircleSeconds) => Mathf.Clamp01(arc / 180f) * Mathf.Max(0f, halfCircleSeconds);
 
     /// <summary>True when <paramref name="attacker"/> stands within <paramref name="arc"/> degrees of straight behind the target.</summary>
+    /// <summary>A finishing blow is on: it staggers, it can take one, and the player is close behind it.</summary>
+    public static bool CanFinish(bool staggered, bool canBeFinished, Vector3 target, Vector3 targetForward, Vector3 attacker, float behindArc, float reach)
+    {
+        Vector3 between = target - attacker;
+        between.y = 0f;
+        return staggered && canBeFinished && between.magnitude <= reach && IsBehind(target, targetForward, attacker, behindArc);
+    }
+
+    /// <summary>Where the attacker stands for a finishing blow: straight behind the target, this far off.</summary>
+    public static Vector3 FinishSpot(Vector3 target, Vector3 targetForward, float gap)
+    {
+        targetForward.y = 0f;
+        targetForward = targetForward.sqrMagnitude > 0.0001f ? targetForward.normalized : Vector3.forward;
+        return target - targetForward * gap;
+    }
+
     public static bool IsBehind(Vector3 target, Vector3 targetForward, Vector3 attacker, float arc)
     {
         Vector3 toAttacker = attacker - target;

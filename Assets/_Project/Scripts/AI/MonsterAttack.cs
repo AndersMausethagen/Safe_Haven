@@ -28,6 +28,8 @@ public sealed class MonsterAttack
     [Range(0f, 1f)] public float leadTarget;
     [Tooltip("The raid tier it learns this at: a tier II wolf pounces, a tier I wolf doesn't. 0: always. Above 0 it is only used in raids of that tier or higher.")]
     [Range(0, Tiers.Max)] public int fromTier;
+    [Tooltip("For a boss: only from this stage of its fight on. 0 is from the start.")]
+    [Min(0)] public int fromPhase;
     [Header("Melee: combos and held blows")]
     [Tooltip("Strikes that can follow this one, in order. Each is aimed anew, with its own wind-up and warning.")]
     public AttackDefinition[] followUps;
@@ -66,9 +68,9 @@ public sealed class MonsterAttack
     [Tooltip("The most of its summons alive at once.")]
     [Min(1)] public int summonLimit = 4;
 
-    public bool IsAvailable(float distance, float now, float readyAt, bool isLeader, int tier = 0)
+    public bool IsAvailable(float distance, float now, float readyAt, bool isLeader, int tier = 0, int phase = 0)
     {
-        return attack != null && KnownAt(tier) && distance >= minimumRange && distance <= maximumRange
+        return attack != null && KnownAt(tier) && fromPhase <= phase && distance >= minimumRange && distance <= maximumRange
             && now >= readyAt && (!packLeaderOnly || isLeader);
     }
 

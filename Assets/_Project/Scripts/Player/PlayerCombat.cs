@@ -222,6 +222,12 @@ public sealed class PlayerCombat : MonoBehaviour
     /// <summary>Raised when a blow lands from behind on a staggering target.</summary>
     public event Action<IDamageable> Backstabbed;
 
+    private MonsterAI finishing;
+    private Vector3 finishFrom;
+    private float finishEndsAt;
+    private Collider finishingCollider;
+    private CharacterController controller;
+
     private float ActiveElapsed => Time.time - activeStartTime - chargeHeld;
 
     /// <summary>The guard can go up when no swing is going or the current one has already landed, and not while flinching.</summary>
@@ -275,6 +281,7 @@ public sealed class PlayerCombat : MonoBehaviour
 
     private void Awake()
     {
+        controller = GetComponent<CharacterController>();
         stateMachine = GetComponent<PlayerStateMachine>();
         movement = GetComponent<PlayerMovement>();
         combatant = GetComponent<Combatant>();
@@ -320,6 +327,7 @@ public sealed class PlayerCombat : MonoBehaviour
 
     private void OnDisable()
     {
+        EndFinish();
         stateMachine.AttackRequested -= OnAttackPressed;
         stateMachine.AttackReleased -= OnAttackReleased;
         stateMachine.ShieldBashRequested -= OnShieldBashRequested;
@@ -646,6 +654,15 @@ public sealed class PlayerCombat : MonoBehaviour
                 break;
         }
 
+        MonsterAI toFinish = kind == SwingKind.Light || kind == SwingKind.Rush ? FindFinishable() : null;
+        if (toFinish != null)
+        {
+            // The weapon's own rush: same numbers and time as any, so a finishing blow changes the moment and not the balance.
+            kind = SwingKind.Rush;
+            attack = weapon.RushAttack;
+            step = 0;
+        }
+
         // Pay the full cost when the swing actually starts, rechecking affordability for buffered swings.
         if (stamina != null && !stamina.TrySpend(Mathf.Max(0f, CostOf(kind, attack) - heavyCredit)))
         {
@@ -696,8 +713,13 @@ public sealed class PlayerCombat : MonoBehaviour
             focusTarget.Refresh();
         }
 
-        activeDirection = AimAssist(movement.AimDirection, attack, out _);
+        activeDirection = toFinish != null ? toFinish.transform.forward : AimAssist(movement.AimDirection, attack, out _);
         movement.SnapFacing(activeDirection);
+        if (toFinish != null)
+        {
+            stepPending = false;
+            BeginFinish(toFinish, HitAt(attack, activeSpeed));
+        }
 
         // Planted, facing the blow, until it lands: legs running under a swing and a body skating through one both look wrong.
         movement.FacingLocked = true;
@@ -714,7 +736,8 @@ public sealed class PlayerCombat : MonoBehaviour
 
         EnterCombat();
 
-        current = new SwingInfo(kind, attack, step, chain, rhythm, activeSpeed, technique, activeDirection);
+        AttackDefinition looks = toFinish != null && Rules.FinishStab != null ? Rules.FinishStab : attack;
+        current = new SwingInfo(kind, looks, step, chain, rhythm, activeSpeed, technique, activeDirection);
         SwingStarted?.Invoke(current);
         if (kind == SwingKind.ShieldBash)
         {
@@ -741,8 +764,114 @@ public sealed class PlayerCombat : MonoBehaviour
         return kind == SwingKind.ShieldBash ? stamina.ShieldBashCost : kind == SwingKind.Heavy ? stamina.AttackCost * 2f : stamina.AttackCost;
     }
 
+    // ----- A finishing blow -----
+
+    private MonsterAI FindFinishable()
+    {
+        if (weapon == null || weapon.RushAttack == null)
+        {
+            return null;
+        }
+
+        CombatTechniqueSettings rules = Rules;
+        MonsterAI best = null;
+        float bestDistance = float.MaxValue;
+        foreach (MonsterAI monster in MonsterAI.Active)
+        {
+            if (monster == null)
+            {
+                continue;
+            }
+
+            Vector3 at = monster.transform.position;
+            if (!StrikeRules.CanFinish(monster.IsStaggered, monster.CanBeFinished, at, monster.transform.forward, transform.position, rules.BackstabArc, rules.FinishReach))
+            {
+                continue;
+            }
+
+            float distance = (at - transform.position).sqrMagnitude;
+            if (distance < bestDistance)
+            {
+                bestDistance = distance;
+                best = monster;
+            }
+        }
+
+        return best;
+    }
+
+    private void BeginFinish(MonsterAI target, float hitAt)
+    {
+        finishing = target;
+        finishFrom = transform.position;
+        finishEndsAt = Time.time + hitAt + Rules.FinishHoldSeconds;
+        // Past each other's bodies for the stab, and not to be knocked out of it before the blade lands.
+        finishingCollider = target.GetComponentInChildren<Collider>();
+        if (finishingCollider != null && controller != null)
+        {
+            Physics.IgnoreCollision(controller, finishingCollider, true);
+        }
+
+        if (health != null)
+        {
+            health.AddInvulnerability(this);
+        }
+
+        target.HoldForFinish(hitAt + Rules.FinishHoldSeconds + Rules.FinishCloseSeconds, hitAt);
+        FinishStarted?.Invoke(target);
+    }
+
+    private void UpdateFinish()
+    {
+        if (finishing == null)
+        {
+            return;
+        }
+
+        if (Time.time >= finishEndsAt)
+        {
+            EndFinish();
+            return;
+        }
+
+        CombatTechniqueSettings rules = Rules;
+        Vector3 spot = StrikeRules.FinishSpot(finishing.transform.position, finishing.transform.forward, rules.FinishGap);
+        float share = Mathf.Clamp01((Time.time - activeStartTime) / rules.FinishCloseSeconds);
+        Vector3 wanted = Vector3.Lerp(finishFrom, spot, share * share * (3f - 2f * share));
+        Vector3 move = wanted - transform.position;
+        move.y = 0f;
+        if (controller != null && controller.enabled)
+        {
+            controller.Move(move);
+        }
+
+        movement.SnapFacing(finishing.transform.forward);
+    }
+
+    private void EndFinish()
+    {
+        if (finishingCollider != null && controller != null)
+        {
+            Physics.IgnoreCollision(controller, finishingCollider, false);
+        }
+
+        finishingCollider = null;
+        finishing = null;
+        if (health != null)
+        {
+            health.RemoveInvulnerability(this);
+        }
+    }
+
+    /// <summary>True while the two bodies are locked together.</summary>
+    public bool IsFinishing => finishing != null;
+
+    /// <summary>A finishing blow has begun on this creature.</summary>
+    public event Action<MonsterAI> FinishStarted;
+
     private void UpdateSwing()
     {
+        UpdateFinish();
         if (activeKind == SwingKind.None)
         {
             bool dodgeInTheWay = dodge != null && dodge.IsDodging && !(queuedKind == SwingKind.Rush && dodge.CanBeCutShort);
@@ -944,6 +1073,7 @@ public sealed class PlayerCombat : MonoBehaviour
 
     private void EndSwing()
     {
+        EndFinish();
         if (activeKind != SwingKind.None)
         {
             lastStartTime = activeStartTime + chargeHeld;
