@@ -68,7 +68,16 @@ MonoBehaviour:
     priority: 10
     cooldown: 1.6
     interruptible: 0
+    sound: {fileID: 0}
+    leadTarget: 0
     fromTier: 0
+    fromPhase: 0
+    followUps: []
+    comboChance: 0.5
+    comboGap: 0.2
+    comboFromTier: 0
+    holdChance: 0
+    holdSeconds: 0.45
     projectilePrefab: {fileID: 0}
     burstCount: 1
     burstInterval: 0
@@ -94,7 +103,16 @@ MonoBehaviour:
     priority: 15
     cooldown: 11
     interruptible: 0
+    sound: {fileID: 0}
+    leadTarget: 0
     fromTier: 3
+    fromPhase: 0
+    followUps: []
+    comboChance: 0.5
+    comboGap: 0.2
+    comboFromTier: 0
+    holdChance: 0
+    holdSeconds: 0.45
     projectilePrefab: {fileID: 0}
     burstCount: 1
     burstInterval: 0
@@ -120,7 +138,16 @@ MonoBehaviour:
     priority: 22
     cooldown: 20
     interruptible: 1
+    sound: {fileID: 11400000, guid: bbe5bd23a0a96294e96af60814084525, type: 2}
+    leadTarget: 0
     fromTier: 4
+    fromPhase: 0
+    followUps: []
+    comboChance: 0.5
+    comboGap: 0.2
+    comboFromTier: 0
+    holdChance: 0
+    holdSeconds: 0.45
     projectilePrefab: {fileID: 0}
     burstCount: 1
     burstInterval: 0
@@ -146,6 +173,14 @@ MonoBehaviour:
   fleeDistance: 10
   defensiveRadius: 8
   hoverHeight: 0
+  idleWanderRadius: 0
+  idlePauseSeconds: {x: 3, y: 8}
+  idleWalkSpeed: 0.4
+  idleGrazeChance: 0
+  idleSleepChance: 0
+  idleSleepAttention: 0.3
+  canBeFinished: 0
+  flankSpread: 0
   poise: 0
   openWhileStriking: 0
   parriesBackstabs: 0
@@ -154,6 +189,6 @@ MonoBehaviour:
   bleeds: 1
   bloodColor: {r: 0.16, g: 0.2, b: 0.05, a: 0.95}
   ragdollOnDeath: 1
-  deathSound: {fileID: 0}
-  hurtSound: {fileID: 0}
-  attackSound: {fileID: 0}
+  deathSound: {fileID: 11400000, guid: ac8daf818ca69d644ae290c06628c323, type: 2}
+  hurtSound: {fileID: 11400000, guid: 07ed88785f822964da383c24e0299069, type: 2}
+  attackSound: {fileID: 11400000, guid: f358d925a0c63004fb3d22aa8f4e9325, type: 2}

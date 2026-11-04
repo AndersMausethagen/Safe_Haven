@@ -24,6 +24,8 @@ public sealed class MonsterAttack
     public int priority;
     [Min(0f)] public float cooldown = 1f;
     public bool interruptible;
+    [Tooltip("Plays as this action starts, instead of the creature's Attack Sound: a howl, a call to the ground. Empty: the creature's own.")]
+    public SoundDefinition sound;
     [Tooltip("How much a shot or a charge aims ahead of a moving target. 0: where it stands, so walking sideways is safe. 1: fully ahead. Keep it low: a dodge must still work.")]
     [Range(0f, 1f)] public float leadTarget;
     [Tooltip("The raid tier it learns this at: a tier II wolf pounces, a tier I wolf doesn't. 0: always. Above 0 it is only used in raids of that tier or higher.")]

@@ -21,6 +21,7 @@ GameObject:
   - component: {fileID: 3468862131618844974}
   - component: {fileID: 4589184919865568081}
   - component: {fileID: 6258324416515589398}
+  - component: {fileID: 3305753248923052305}
   m_Layer: 0
   m_Name: TheHeartroot
   m_TagString: Untagged
@@ -279,6 +280,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: SafeHaven::BossEncounter
   definition: {fileID: 11400000, guid: 9b7313d497a67e54b8b12e51990184bb, type: 2}
+--- !u!114 &3305753248923052305
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9066855856663566298}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1150baf131665e34885ce93035661be1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::CreatureFootfalls
+  stepSound: {fileID: 11400000, guid: d43c379eb08eb024f813d3609a9fea34, type: 2}
+  strideMeters: 3
+  shake: 0.22
+  feltDistance: 28
 --- !u!1001 &3442147299399129348
 PrefabInstance:
   m_ObjectHideFlags: 0

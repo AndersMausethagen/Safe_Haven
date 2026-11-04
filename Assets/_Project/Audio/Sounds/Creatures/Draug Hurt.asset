@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0de871765cd6fce4c8fed103ef0082e3, type: 3}
+  m_Name: Draug Hurt
+  m_EditorClassIdentifier: SafeHaven::SoundDefinition
+  displayName: Draug Hurt
+  caption: 
+  clips:
+  - {fileID: 8300000, guid: 0bc4b14f14e26194e9a57900ec6c67e2, type: 3}
+  - {fileID: 8300000, guid: 0fda978fa4ad7024dbd565a43bbba079, type: 3}
+  - {fileID: 8300000, guid: 60ff875ffa75b1d4bbb1917dae8dd644, type: 3}
+  - {fileID: 8300000, guid: 5e11acab30cc3604489dabf41311019d, type: 3}
+  channel: 2
+  volume: 0.7
+  volumeVariation: 0.1
+  pitchRange: {x: 0.95, y: 1.05}
+  positional: 1
+  fullVolumeDistance: 4
+  audibleDistance: 26
+  maxAtOnce: 2
+  minimumGap: 0.22
+  priority: 1
+  takesTheMix: 0

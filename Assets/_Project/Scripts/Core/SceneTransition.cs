@@ -260,7 +260,7 @@ public static class SceneTransition
         private IEnumerator FirstScene(Scene scene, List<ISceneSetup> steps)
         {
             SceneTransitionSettings settings = SceneTransitionSettings.Current;
-            screen.Show(null, settings);
+            screen.Show(null, scene.name, settings);
             screen.Alpha = 1f;
             yield return RunSetups(steps);
             MarkReady(scene);
@@ -272,7 +272,8 @@ public static class SceneTransition
         {
             SceneTransitionSettings settings = SceneTransitionSettings.Current;
             StopPlayer();
-            screen.Show(caption, settings);
+            string destination = scene ?? System.IO.Path.GetFileNameWithoutExtension(SceneUtility.GetScenePathByBuildIndex(buildIndex));
+            screen.Show(caption, destination, settings);
             screen.Progress = 0f;
             yield return Fade(1f, settings.FadeOutSeconds);
             float shownAt = Time.realtimeSinceStartup;
@@ -438,8 +439,10 @@ public static class SceneTransition
         private CanvasGroup group;
         private Image background;
         private Image art;
+        private Image shade;
         private TMP_Text caption;
         private TMP_Text tip;
+        private string lastTip;
         private RectTransform barFill;
         private Image barFillImage;
 
@@ -462,22 +465,42 @@ public static class SceneTransition
             return screen;
         }
 
-        public void Show(string text, SceneTransitionSettings settings)
+        public void Show(string text, string destination, SceneTransitionSettings settings)
         {
             background.color = settings.BackgroundColor;
-            art.sprite = settings.BackgroundArt;
-            art.enabled = settings.BackgroundArt != null;
+            Sprite picture = settings.ArtFor(destination);
+            art.sprite = picture;
+            art.enabled = picture != null;
+            shade.enabled = picture != null;
+            shade.color = settings.BackgroundColor;
             if (art.enabled)
             {
-                art.GetComponent<AspectRatioFitter>().aspectRatio = settings.BackgroundArt.rect.width / Mathf.Max(1f, settings.BackgroundArt.rect.height);
+                art.GetComponent<AspectRatioFitter>().aspectRatio = picture.rect.width / Mathf.Max(1f, picture.rect.height);
             }
 
             barFillImage.color = settings.AccentColor;
             caption.text = string.IsNullOrEmpty(text) ? "Loading" : text;
-            string[] tips = settings.Tips;
-            tip.text = tips != null && tips.Length > 0 ? tips[UnityEngine.Random.Range(0, tips.Length)] : "";
+            tip.text = GameInput.WithRebinds(PickTip(settings.TipsFor(destination)));
             group.alpha = 0f;
             root.SetActive(true);
+        }
+
+        // Never the same one twice running, when there is another to say.
+        private string PickTip(string[] tips)
+        {
+            if (tips == null || tips.Length == 0)
+            {
+                return "";
+            }
+
+            int index = UnityEngine.Random.Range(0, tips.Length);
+            if (tips[index] == lastTip && tips.Length > 1)
+            {
+                index = (index + 1) % tips.Length;
+            }
+
+            lastTip = tips[index];
+            return lastTip;
         }
 
         public void Hide()
@@ -504,9 +527,20 @@ public static class SceneTransition
             art.raycastTarget = false;
             artObject.GetComponent<AspectRatioFitter>().aspectMode = AspectRatioFitter.AspectMode.EnvelopeParent;
 
-            caption = Text("Caption", root.transform, 44f, FontStyles.Bold | FontStyles.SmallCaps, new Vector2(120f, 150f), TextAlignmentOptions.BottomLeft);
-            tip = Text("Tip", root.transform, 24f, FontStyles.Italic, new Vector2(120f, 100f), TextAlignmentOptions.BottomLeft);
-            tip.color = new Color(0.78f, 0.8f, 0.84f, 0.9f);
+            // The picture sinks into the background colour at the bottom, where the words have to be read.
+            GameObject shadeObject = Stretch(new GameObject("Shade", typeof(RectTransform), typeof(Image)), root.transform);
+            shade = shadeObject.GetComponent<Image>();
+            shade.raycastTarget = false;
+            shade.sprite = RisingFade();
+            ((RectTransform)shadeObject.transform).anchorMax = new Vector2(1f, ShadeHeight);
+
+            UIStyle style = UIStyle.Current;
+            caption = Text("Caption", root.transform, 44f, FontStyles.SmallCaps, new Vector2(120f, 150f), TextAlignmentOptions.BottomLeft);
+            style.OnWorld(caption, true);
+            caption.color = style.Text;
+            tip = Text("Tip", root.transform, 24f, FontStyles.Normal, new Vector2(120f, 100f), TextAlignmentOptions.BottomLeft);
+            style.OnWorld(tip);
+            tip.color = style.Text * new Color(1f, 1f, 1f, 0.85f);
 
             var bar = new GameObject("Bar", typeof(RectTransform), typeof(Image));
             bar.transform.SetParent(root.transform, false);
@@ -525,6 +559,25 @@ public static class SceneTransition
             barFill.offsetMin = Vector2.zero;
             barFill.offsetMax = Vector2.zero;
             barFillImage = fill.GetComponent<Image>();
+        }
+
+        private const float ShadeHeight = 0.55f;
+
+        // White, solid at the bottom edge and gone at the top, for an Image to tint.
+        private static Sprite RisingFade()
+        {
+            const int Height = 64;
+            var texture = new Texture2D(1, Height, TextureFormat.RGBA32, false) { wrapMode = TextureWrapMode.Clamp, filterMode = FilterMode.Bilinear };
+            for (int y = 0; y < Height; y++)
+            {
+                float up = y / (Height - 1f);
+                // Solid behind the words, then gone by the top.
+                float gone = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.22f, 1f, up));
+                texture.SetPixel(0, y, new Color(1f, 1f, 1f, 0.96f * (1f - gone)));
+            }
+
+            texture.Apply(false, true);
+            return Sprite.Create(texture, new Rect(0f, 0f, 1f, Height), new Vector2(0.5f, 0.5f));
         }
 
         private static GameObject Stretch(GameObject child, Transform parent)

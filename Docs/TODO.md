@@ -67,6 +67,15 @@ Everything below was driven by scripts, not played by hand: the numbers are firs
 - [ ] Amnesia: is one memory back every 2 raids right, and does a lost companion turning up on the very next raid make losing them cost too little? `Memory Returns Every`; a wait would be a rule on the rumour.
 - [ ] Someone lost stands still until found. An idle or wandering animation, and their own lines (`ResidentDefinition › Returning Lines`, only general ones are written).
 - [ ] Heavy bag: 80% speed at a full bag, and whether the Haul Sack's noise is a real price.
+- [ ] Listen to the creature voices (`Tools/Audio/creatures.py`; 2026-11-04): measured and seen on spectrograms, never heard. Wolves and boars are the likeliest to want real recordings. Levels and reach are in `AgentScripts/BuildCreatureVoices.cs`.
+- [ ] Whether a voice on every wind-up, and on each blow of a combo, is too much in a large fight, and whether the treads get in the way.
+- [ ] Time the window fade (0.12 s, `UIStyle`) by hand: Inventory and Character get opened constantly, so it mustn't feel slow.
+
+## Loading screens (2026-11-04)
+
+- [ ] The art (`Art/UI/Loading`, from LocalSpawn's Safe Haven styles) shows places the game doesn't look like yet: the Haven's picture has a finished village and a rougher stone arch than the portal. Regenerate when the Haven has its look, or if it promises too much.
+- [ ] Raid Results and the main menu use the general picture. Give the raid results one of its own, ideally different for a haul and a loss.
+- [ ] Troll Valley shares the Misty Woods' scene, so its picture and tips too.
 
 ## Materials as items (weight and carrying)
 

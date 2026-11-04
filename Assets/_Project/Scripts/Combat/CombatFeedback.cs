@@ -201,7 +201,8 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
                 }
             }
 
-            if (victim.TryGetComponent(out IEventSubject known) && known.EventSubject is ICombatSounds sounds)
+            // The killing blow has its death cry instead.
+            if (!result.Killed && victim.TryGetComponent(out IEventSubject known) && known.EventSubject is ICombatSounds sounds)
             {
                 AudioManager.Play(sounds.HurtSound, victim.transform.position);
             }

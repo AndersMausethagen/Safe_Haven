@@ -68,6 +68,7 @@ MonoBehaviour:
     priority: 12
     cooldown: 1.1
     interruptible: 0
+    sound: {fileID: 0}
     leadTarget: 0
     fromTier: 0
     fromPhase: 2
@@ -102,6 +103,7 @@ MonoBehaviour:
     priority: 10
     cooldown: 1.8
     interruptible: 0
+    sound: {fileID: 0}
     leadTarget: 0
     fromTier: 0
     fromPhase: 0
@@ -136,6 +138,7 @@ MonoBehaviour:
     priority: 15
     cooldown: 7
     interruptible: 0
+    sound: {fileID: 0}
     leadTarget: 0
     fromTier: 0
     fromPhase: 1
@@ -170,6 +173,7 @@ MonoBehaviour:
     priority: 22
     cooldown: 16
     interruptible: 1
+    sound: {fileID: 11400000, guid: d56aff94114ed014e9497a0af503bc0f, type: 2}
     leadTarget: 0
     fromTier: 0
     fromPhase: 1
@@ -220,6 +224,6 @@ MonoBehaviour:
   bleeds: 1
   bloodColor: {r: 0.16, g: 0.2, b: 0.05, a: 0.95}
   ragdollOnDeath: 1
-  deathSound: {fileID: 0}
-  hurtSound: {fileID: 0}
-  attackSound: {fileID: 0}
+  deathSound: {fileID: 11400000, guid: c1b20528b0c96cd42914b3230c77041e, type: 2}
+  hurtSound: {fileID: 11400000, guid: c2c6467082ef4c84b8dcbb61353674f9, type: 2}
+  attackSound: {fileID: 11400000, guid: e28f048c72bcd724e9742aede8b1ad94, type: 2}

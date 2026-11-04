@@ -54,8 +54,10 @@ MonoBehaviour:
     priority: 10
     cooldown: 3
     interruptible: 0
+    sound: {fileID: 0}
     leadTarget: 0.25
     fromTier: 0
+    fromPhase: 0
     followUps: []
     comboChance: 0.5
     comboGap: 0.2
@@ -93,6 +95,7 @@ MonoBehaviour:
   idleGrazeChance: 0
   idleSleepChance: 0
   idleSleepAttention: 0.3
+  canBeFinished: 0
   flankSpread: 0
   poise: 0
   openWhileStriking: 1
@@ -102,6 +105,6 @@ MonoBehaviour:
   bleeds: 1
   bloodColor: {r: 0.45, g: 0.45, b: 0.55, a: 0.8}
   ragdollOnDeath: 1
-  deathSound: {fileID: 0}
-  hurtSound: {fileID: 0}
-  attackSound: {fileID: 0}
+  deathSound: {fileID: 11400000, guid: f8c14c4607011c0488026009fd017f8b, type: 2}
+  hurtSound: {fileID: 11400000, guid: 336e8b0906973b44190799a2b3dda839, type: 2}
+  attackSound: {fileID: 11400000, guid: 2f44333fd7ec676449064f9d58723f40, type: 2}

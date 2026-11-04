@@ -68,6 +68,10 @@ PrefabInstance:
       propertyPath: m_Speed
       value: 2.4
       objectReference: {fileID: 0}
+    - target: {fileID: 8939987690615947197, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
+      propertyPath: strideMeters
+      value: 1.2
+      objectReference: {fileID: 0}
     - target: {fileID: 9066855856663566298, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
       propertyPath: m_Name
       value: BarrowShieldbearer

@@ -20,6 +20,7 @@ GameObject:
   - component: {fileID: 2187170637791338093}
   - component: {fileID: 4099889347190760533}
   - component: {fileID: 5765013537241549279}
+  - component: {fileID: 7450998585201606891}
   m_Layer: 0
   m_Name: MossShaman
   m_TagString: Untagged
@@ -188,6 +189,7 @@ MonoBehaviour:
       maxQuantity: 4
       probability: 1
   unlocksRecipes: []
+  relicChance: 0
 --- !u!114 &6003715547336990356
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -221,6 +223,7 @@ MonoBehaviour:
   deadParameter: Dead
   staggerParameter: Stagger
   speedDampTime: 0.1
+  flinchShare: 0.04
 --- !u!114 &4099889347190760533
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -254,6 +257,22 @@ MonoBehaviour:
   m_IgnoreFromBuild: 1
   m_ApplyToChildren: 1
   m_AffectedAgents: ffffffffi
+--- !u!114 &7450998585201606891
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3643037256157110189}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1150baf131665e34885ce93035661be1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::CreatureFootfalls
+  stepSound: {fileID: 11400000, guid: 0285b2f9f05a01c44a9801e257e27945, type: 2}
+  strideMeters: 1.7
+  shake: 0
+  feltDistance: 28
 --- !u!1001 &3193925058245157717
 PrefabInstance:
   m_ObjectHideFlags: 0

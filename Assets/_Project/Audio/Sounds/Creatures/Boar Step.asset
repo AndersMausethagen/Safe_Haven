@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0de871765cd6fce4c8fed103ef0082e3, type: 3}
+  m_Name: Boar Step
+  m_EditorClassIdentifier: SafeHaven::SoundDefinition
+  displayName: Boar Step
+  caption: 
+  clips:
+  - {fileID: 8300000, guid: ca8575c14e07dfa44ad9cb4363252a90, type: 3}
+  - {fileID: 8300000, guid: 21c08a659edef3843b3535c5d0e4028d, type: 3}
+  - {fileID: 8300000, guid: 69960915c1c774742b8356e0f76e68c6, type: 3}
+  - {fileID: 8300000, guid: 22ef9d8fd6e13ab4c9aeed695308bf62, type: 3}
+  channel: 2
+  volume: 0.55
+  volumeVariation: 0.1
+  pitchRange: {x: 0.703, y: 0.77699995}
+  positional: 1
+  fullVolumeDistance: 3
+  audibleDistance: 18
+  maxAtOnce: 2
+  minimumGap: 0.06
+  priority: 0
+  takesTheMix: 0

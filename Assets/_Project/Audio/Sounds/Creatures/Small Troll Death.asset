@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0de871765cd6fce4c8fed103ef0082e3, type: 3}
+  m_Name: Small Troll Death
+  m_EditorClassIdentifier: SafeHaven::SoundDefinition
+  displayName: Small Troll Death
+  caption: 
+  clips:
+  - {fileID: 8300000, guid: b102711e170fdd2448590071dee1bf4a, type: 3}
+  - {fileID: 8300000, guid: e1df7766759b6d242a0339faed9b8b99, type: 3}
+  - {fileID: 8300000, guid: 9ead1cac433b65b4880249240c6c81b6, type: 3}
+  channel: 2
+  volume: 0.7225
+  volumeVariation: 0.1
+  pitchRange: {x: 1.2540001, y: 1.386}
+  positional: 1
+  fullVolumeDistance: 5
+  audibleDistance: 38
+  maxAtOnce: 3
+  minimumGap: 0.05
+  priority: 1
+  takesTheMix: 0

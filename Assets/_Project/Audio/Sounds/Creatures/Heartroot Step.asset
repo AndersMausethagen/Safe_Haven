@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0de871765cd6fce4c8fed103ef0082e3, type: 3}
+  m_Name: Heartroot Step
+  m_EditorClassIdentifier: SafeHaven::SoundDefinition
+  displayName: Heartroot Step
+  caption: 
+  clips:
+  - {fileID: 8300000, guid: 79596768e555ce44c8c5abf4338f6a80, type: 3}
+  - {fileID: 8300000, guid: 76c400206ba8e454ebe3149e4d2a7a66, type: 3}
+  - {fileID: 8300000, guid: 01e4165542b61af4ea2fdf57cbb20af1, type: 3}
+  - {fileID: 8300000, guid: 7d279377b25c0c84ebe3cbd45c2c5ab6, type: 3}
+  - {fileID: 8300000, guid: c993bd4c83f1c4544b20dfebc4171241, type: 3}
+  channel: 2
+  volume: 0.85
+  volumeVariation: 0.1
+  pitchRange: {x: 0.85499996, y: 0.94499993}
+  positional: 1
+  fullVolumeDistance: 8
+  audibleDistance: 50
+  maxAtOnce: 2
+  minimumGap: 0.1
+  priority: 1
+  takesTheMix: 0

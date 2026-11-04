@@ -4,10 +4,15 @@ using UnityEngine;
 /// <summary>
 /// Shows and hides one UI window and reports its open state to the UIStateManager. Put it on an object that stays
 /// active (such as the canvas) and point <see cref="content"/> at the part that is shown and hidden. Hiding the content
-/// deactivates it, so anything inside rebuilds itself when the window opens again.
+/// deactivates it, so anything inside rebuilds itself when the window opens again. A window fades in as it opens
+/// (UIStyle › Window Fade Seconds) and closes at once, so nothing behind a closed window is left waiting on a fade.
 /// </summary>
 public sealed class UIWindow : MonoBehaviour
 {
+    // The next line of a conversation or a step through a menu closes and opens the same window: that isn't one arriving.
+    private const float ReopenSeconds = 0.1f;
+    private const float LongestFadeStep = 1f / 30f;
+
     [SerializeField] private UIWindowId id;
     [Tooltip("The object that is shown and hidden. Must be a different object from the one this component is on.")]
     [SerializeField] private GameObject content;
@@ -15,6 +20,9 @@ public sealed class UIWindow : MonoBehaviour
 
     private UIStateManager uiState;
     private bool initialised;
+    private CanvasGroup fade;
+    private float fadeShown = -1f;
+    private float closedAt = float.NegativeInfinity;
 
     public UIWindowId Id => id;
     public bool IsOpen { get; private set; }
@@ -53,8 +61,26 @@ public sealed class UIWindow : MonoBehaviour
         initialised = true;
     }
 
+    private void Update()
+    {
+        if (fadeShown < 0f)
+        {
+            return;
+        }
+
+        // By the step, with a limit: filling a big window can take a long first frame, and the fade would be over before it is seen.
+        float seconds = UIStyle.Current.WindowFadeSeconds;
+        fadeShown = seconds > 0f ? Mathf.Min(1f, fadeShown + Mathf.Min(Time.unscaledDeltaTime, LongestFadeStep) / seconds) : 1f;
+        fade.alpha = fadeShown;
+        if (fadeShown >= 1f)
+        {
+            fadeShown = -1f;
+        }
+    }
+
     private void OnDisable()
     {
+        EndFade();
         if (uiState != null)
         {
             uiState.WindowToggleRequested -= OnToggleRequested;
@@ -73,10 +99,22 @@ public sealed class UIWindow : MonoBehaviour
 
     public void SetOpen(bool open)
     {
-        if (open != IsOpen)
+        if (open == IsOpen)
         {
-            Apply(open);
+            return;
         }
+
+        if (open)
+        {
+            BeginFade();
+        }
+        else
+        {
+            EndFade();
+            closedAt = Time.unscaledTime;
+        }
+
+        Apply(open);
     }
 
     private void Apply(bool open)
@@ -85,6 +123,32 @@ public sealed class UIWindow : MonoBehaviour
         content.SetActive(open);
         uiState?.SetWindowOpen(this, open);
         OpenChanged?.Invoke(open);
+    }
+
+    private void BeginFade()
+    {
+        if (UIStyle.Current.WindowFadeSeconds <= 0f || Time.unscaledTime - closedAt < ReopenSeconds)
+        {
+            return;
+        }
+
+        if (fade == null && !content.TryGetComponent(out fade))
+        {
+            fade = content.AddComponent<CanvasGroup>();
+        }
+
+        fade.alpha = 0f;
+        fadeShown = 0f;
+    }
+
+    private void EndFade()
+    {
+        if (fadeShown >= 0f && fade != null)
+        {
+            fade.alpha = 1f;
+        }
+
+        fadeShown = -1f;
     }
 
     private void OnToggleRequested(UIWindowId requested)

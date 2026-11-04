@@ -28,7 +28,7 @@ public sealed class HavenWindow : MonoBehaviour
     private const int MostParts = 8;
     private const int MostPeople = 7;
     private const float ReadSeconds = 1f;
-    private const float FadeSeconds = 0.16f;
+    private const float RiseSeconds = 0.16f;
     private const float RiseUnits = 12f;
     private const float ClimbSeconds = 0.7f;
     private const float ScreenMargin = 24f;
@@ -87,7 +87,6 @@ public sealed class HavenWindow : MonoBehaviour
     }
 
     private UIWindow window;
-    private CanvasGroup fade;
     private RectTransform panel;
     private RectTransform overviewPage;
     private HavenListPage storesPage;
@@ -160,8 +159,7 @@ public sealed class HavenWindow : MonoBehaviour
         }
 
         float age = Time.unscaledTime - openedAt;
-        float shown = Mathf.Clamp01(age / FadeSeconds);
-        fade.alpha = shown;
+        float shown = Mathf.Clamp01(age / RiseSeconds);
         panel.anchoredPosition = new Vector2(0f, (1f - shown) * (1f - shown) * -RiseUnits);
         float climbed = Mathf.Clamp01(age / ClimbSeconds);
         climbFill.anchorMax = new Vector2(climb * (1f - (1f - climbed) * (1f - climbed)), 1f);
@@ -185,7 +183,6 @@ public sealed class HavenWindow : MonoBehaviour
         }
 
         openedAt = Time.unscaledTime;
-        fade.alpha = 0f;
         climbFill.anchorMax = new Vector2(0f, 1f);
         Show(lastTab);
     }
@@ -457,7 +454,6 @@ public sealed class HavenWindow : MonoBehaviour
         UIStyle style = UIStyle.Current;
         RectTransform content = Stretch("Content", root);
         content.gameObject.AddComponent<Image>().color = new Color(0f, 0f, 0f, 0.5f);
-        fade = content.gameObject.AddComponent<CanvasGroup>();
 
         panel = Box("Panel", content, new Vector2(0.5f, 0.5f), new Vector2(Width, Height), Vector2.zero);
         panel.gameObject.AddComponent<Image>();

@@ -20,6 +20,7 @@ GameObject:
   - component: {fileID: 165592971757474411}
   - component: {fileID: 3468862131618844974}
   - component: {fileID: 4589184919865568081}
+  - component: {fileID: 8448139072452409907}
   m_Layer: 0
   m_Name: RootGuardian
   m_TagString: Untagged
@@ -104,6 +105,7 @@ MonoBehaviour:
   faction: 1
   baseStats: {fileID: 11400000, guid: 914cdb9a79f83a942afeee2028e157bc, type: 2}
   rules: {fileID: 0}
+  priorityTarget: 0
 --- !u!114 &5779955224618096036
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -178,6 +180,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: c6287ae55a5d905479e912ccf2302294, type: 2}
   - {fileID: 11400000, guid: 3f7803232b50e354a8dc761eb093ddde, type: 2}
   - {fileID: 11400000, guid: 78d155ea180e0304ebc63416e467734c, type: 2}
+  relicChance: 0
 --- !u!114 &1291413385866200264
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -209,7 +212,9 @@ MonoBehaviour:
   speedParameter: Speed
   attackParameter: Attack
   deadParameter: Dead
+  staggerParameter: Stagger
   speedDampTime: 0.1
+  flinchShare: 0.04
 --- !u!114 &165592971757474411
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -261,6 +266,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AttackTelegraph
   groundOffset: 0.06
+--- !u!114 &8448139072452409907
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9066855856663566298}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1150baf131665e34885ce93035661be1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::CreatureFootfalls
+  stepSound: {fileID: 11400000, guid: 52a4ff7288811de48bb2bf5b3e1ee81e, type: 2}
+  strideMeters: 1.9
+  shake: 0.06
+  feltDistance: 28
 --- !u!1001 &3442147299399129348
 PrefabInstance:
   m_ObjectHideFlags: 0

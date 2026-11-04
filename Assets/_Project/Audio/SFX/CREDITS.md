@@ -20,6 +20,7 @@ use, credit not required. Credited here anyway.
 | Safe Haven Interface | Menus, quests, loot, crafting, the breath and the blade's cue | Made for the game (synthesised by `Tools/Audio/interface.py`), CC0 |
 | Safe Haven World | Creatures dying and scenting you, troll steps, things breaking | Made for the game (synthesised by `Tools/Audio/world.py`), CC0 |
 | Safe Haven Woodcutting | A tree creaking, cracking, rushing down and landing; branches and logs | Made for the game (synthesised by `Tools/Audio/woodcutting.py`), CC0 |
+| Safe Haven Creatures | Each creature's wind-up, hurt and death, a howl, a shaman's call, paws and mail | Made for the game (synthesised by `Tools/Audio/creatures.py`), CC0 |
 
 Every made sound is modelled in `Tools/Audio` and shares `foley.py`. The wind in `Audio/Placeholder` (`Ambience_WildsWind`, `Ambience_HavenBreeze`) comes from `world.py` too, despite the folder.
 

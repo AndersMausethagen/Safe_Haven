@@ -54,7 +54,16 @@ MonoBehaviour:
     priority: 1
     cooldown: 1.2
     interruptible: 0
+    sound: {fileID: 0}
+    leadTarget: 0
     fromTier: 0
+    fromPhase: 0
+    followUps: []
+    comboChance: 0.5
+    comboGap: 0.2
+    comboFromTier: 0
+    holdChance: 0
+    holdSeconds: 0.45
     projectilePrefab: {fileID: 0}
     burstCount: 0
     burstInterval: 0
@@ -80,7 +89,16 @@ MonoBehaviour:
     priority: 2
     cooldown: 7
     interruptible: 0
+    sound: {fileID: 0}
+    leadTarget: 0
     fromTier: 0
+    fromPhase: 0
+    followUps: []
+    comboChance: 0.5
+    comboGap: 0.2
+    comboFromTier: 0
+    holdChance: 0
+    holdSeconds: 0.45
     projectilePrefab: {fileID: 0}
     burstCount: 0
     burstInterval: 0
@@ -106,7 +124,16 @@ MonoBehaviour:
     priority: 15
     cooldown: 13
     interruptible: 0
+    sound: {fileID: 0}
+    leadTarget: 0
     fromTier: 3
+    fromPhase: 0
+    followUps: []
+    comboChance: 0.5
+    comboGap: 0.2
+    comboFromTier: 0
+    holdChance: 0
+    holdSeconds: 0.45
     projectilePrefab: {fileID: 0}
     burstCount: 1
     burstInterval: 0
@@ -132,7 +159,16 @@ MonoBehaviour:
     priority: 25
     cooldown: 32
     interruptible: 0
+    sound: {fileID: 11400000, guid: ca60a941079fed04bad550318182d713, type: 2}
+    leadTarget: 0
     fromTier: 4
+    fromPhase: 0
+    followUps: []
+    comboChance: 0.5
+    comboGap: 0.2
+    comboFromTier: 0
+    holdChance: 0
+    holdSeconds: 0.45
     projectilePrefab: {fileID: 0}
     burstCount: 1
     burstInterval: 0
@@ -158,6 +194,14 @@ MonoBehaviour:
   fleeDistance: 10
   defensiveRadius: 8
   hoverHeight: 0
+  idleWanderRadius: 0
+  idlePauseSeconds: {x: 3, y: 8}
+  idleWalkSpeed: 0.4
+  idleGrazeChance: 0
+  idleSleepChance: 0
+  idleSleepAttention: 0.3
+  canBeFinished: 0
+  flankSpread: 0
   poise: 450
   openWhileStriking: 0
   parriesBackstabs: 0
@@ -166,6 +210,6 @@ MonoBehaviour:
   bleeds: 1
   bloodColor: {r: 0.32, g: 0.015, b: 0.02, a: 0.95}
   ragdollOnDeath: 1
-  deathSound: {fileID: 0}
-  hurtSound: {fileID: 0}
-  attackSound: {fileID: 0}
+  deathSound: {fileID: 11400000, guid: a540cb0eee3423e41a5a77294fb8408a, type: 2}
+  hurtSound: {fileID: 11400000, guid: 76d36c0978eeaf04592af855858824db, type: 2}
+  attackSound: {fileID: 11400000, guid: 86c151585ec25ef499099a8e1a09b185, type: 2}

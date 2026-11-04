@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0de871765cd6fce4c8fed103ef0082e3, type: 3}
+  m_Name: Mistwing Attack
+  m_EditorClassIdentifier: SafeHaven::SoundDefinition
+  displayName: Mistwing Attack
+  caption: A mistwing shrieks
+  clips:
+  - {fileID: 8300000, guid: 8a642ea2bc02d3b40b90c927ed4a9ff6, type: 3}
+  - {fileID: 8300000, guid: 89628c462e3be20419662ac1e41cd958, type: 3}
+  - {fileID: 8300000, guid: 40c5eae95b81b424dba898cbabd42078, type: 3}
+  - {fileID: 8300000, guid: 7d63dc85f542694498b9eab979981af9, type: 3}
+  channel: 2
+  volume: 0.68
+  volumeVariation: 0.1
+  pitchRange: {x: 0.95, y: 1.05}
+  positional: 1
+  fullVolumeDistance: 5
+  audibleDistance: 32
+  maxAtOnce: 2
+  minimumGap: 0.12
+  priority: 2
+  takesTheMix: 0

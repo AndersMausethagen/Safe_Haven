@@ -949,7 +949,15 @@ public sealed partial class MonsterAI : MonoBehaviour, IEventSubject, IStaggerab
         }
 
         SetState(State.Attacking);
+        AnnounceStrike();
+    }
+
+    // A strike's warning, to the eye and the ear, and the body going into it.
+    private void AnnounceStrike()
+    {
         pose?.Attack(CurrentAttack, Time.time);
+        MonsterAttack action = attacks.Action;
+        AudioManager.Play(action != null && action.sound != null ? action.sound : Definition.AttackSound, transform.position);
         AttackStarted?.Invoke();
     }
 
@@ -965,8 +973,7 @@ public sealed partial class MonsterAI : MonoBehaviour, IEventSubject, IStaggerab
         // The next blow of a combo: a body and a warning of its own, as a strike has.
         if (attacks.Blow != blow)
         {
-            pose?.Attack(CurrentAttack, Time.time);
-            AttackStarted?.Invoke();
+            AnnounceStrike();
         }
     }
 

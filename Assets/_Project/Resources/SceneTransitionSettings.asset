@@ -16,10 +16,42 @@ MonoBehaviour:
   fadeInSeconds: 0.6
   minimumLoadingSeconds: 0.75
   backgroundColor: {r: 0.04, g: 0.05, b: 0.06, a: 1}
-  backgroundArt: {fileID: 0}
-  accentColor: {r: 0.62, g: 0.86, b: 0.62, a: 1}
+  backgroundArt: {fileID: 21300000, guid: af7982fe9be5f2345b90dbf393a6e428, type: 3}
+  accentColor: {r: 0.85, g: 0.655, b: 0.353, a: 1}
   tips:
   - Whatever you carry out of a raid is yours. Whatever you carry when it collapses is not.
   - Your safe pocket keeps what's in it, even when a raid goes wrong.
   - Raid modifiers are crafted at home. Bring one to change what waits on the other side.
   - The woods shift between visits. Caches and creatures are rarely where you left them.
+  destinations:
+  - scene: Raid_MistyWoods
+    art: {fileID: 21300000, guid: 39b3f070ceb162144a176a8ff6f9008f, type: 3}
+    tips:
+    - Whatever you carry out of a raid is yours. Whatever you carry when it collapses is not.
+    - Your safe pocket keeps what's in it, even when a raid goes wrong.
+    - The woods shift between visits. Caches and creatures are rarely where you left them.
+    - Listen. Most creatures give themselves away before the blow lands.
+    - When a warning on the ground turns pale, raise your guard. That is a parry.
+    - Parry, roll behind it, strike. There is no better blow, but a creature learns a trick it sees too often.
+    - A heavy bag slows you, tires you and is heard from far off.
+    - Picking a lock is loud. See to whatever is close first.
+    - Feel the ground shake? The old troll walks its round. Best let it pass.
+    - An exit has to be lit, then held. Light one with time to spare.
+  - scene: SafeHaven
+    art: {fileID: 21300000, guid: d2b678a6222f9854aaff042948eef105, type: 3}
+    tips:
+    - Stations keep working while you are away. Fill their queues before you leave.
+    - Crops grow while you raid. Plant before you go.
+    - Give someone a job and they earn their keep while you are gone.
+    - Press (H) to run the Haven from anywhere in it.
+    - Purified Essence empowers gear and buys skill ranks at the altar.
+    - A good meal goes through the portal with you.
+    - After dark, wolves prowl just beyond the light. Keep your fires lit.
+    - When the bell tolls, a breach is coming. Mend what you can and stand ready.
+  - scene: Prologue_MistyWoods
+    art: {fileID: 21300000, guid: 723003f4fc14723478de8ae61dbb39d2, type: 3}
+    tips:
+    - 'Raise your guard just before a blow lands and it is a parry: no damage, and the attacker staggers.'
+    - A warning on the ground fills as a blow winds up. When it is full, the blow lands.
+    - Roll through a blow at the last moment and you are owed a counter.
+    - 'Talk to a companion to give them orders: follow, stay, defend or fall back.'

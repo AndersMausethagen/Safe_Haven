@@ -64,8 +64,10 @@ MonoBehaviour:
     priority: 20
     cooldown: 14
     interruptible: 1
+    sound: {fileID: 11400000, guid: d2b68a9637836884a89327fada25cb8c, type: 2}
     leadTarget: 0
     fromTier: 0
+    fromPhase: 0
     followUps: []
     comboChance: 0.5
     comboGap: 0.2
@@ -97,8 +99,10 @@ MonoBehaviour:
     priority: 10
     cooldown: 1
     interruptible: 0
+    sound: {fileID: 0}
     leadTarget: 0
     fromTier: 0
+    fromPhase: 0
     followUps: []
     comboChance: 0.5
     comboGap: 0.2
@@ -130,8 +134,10 @@ MonoBehaviour:
     priority: 15
     cooldown: 7
     interruptible: 0
+    sound: {fileID: 0}
     leadTarget: 0.35
     fromTier: 2
+    fromPhase: 0
     followUps: []
     comboChance: 0.5
     comboGap: 0.2
@@ -169,6 +175,7 @@ MonoBehaviour:
   idleGrazeChance: 0
   idleSleepChance: 0.3
   idleSleepAttention: 0.3
+  canBeFinished: 0
   flankSpread: 1
   poise: 0
   openWhileStriking: 1
@@ -178,6 +185,6 @@ MonoBehaviour:
   bleeds: 1
   bloodColor: {r: 0.32, g: 0.015, b: 0.02, a: 0.95}
   ragdollOnDeath: 1
-  deathSound: {fileID: 0}
-  hurtSound: {fileID: 0}
-  attackSound: {fileID: 0}
+  deathSound: {fileID: 11400000, guid: 32f397f6c4f79ca459a23ff2f1b6bb8e, type: 2}
+  hurtSound: {fileID: 11400000, guid: e57999aa2bfc8524b98a2a03ae588f69, type: 2}
+  attackSound: {fileID: 11400000, guid: d6475ceec23a7f8409dbb26eeaf1085a, type: 2}

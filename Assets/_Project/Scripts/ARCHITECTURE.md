@@ -300,7 +300,10 @@ whole game with nothing to re-run; code-built UI reads the style directly. `UISt
 its shadowed material. **Safe Haven › UI › Apply Hearthline** (`HearthlineSetup`) is idempotent: it puts roles on new UI prefabs and
 lays out the frameless HUD. Keep window colours solid: this project blends in Linear, so a faint light overlay on a dark panel comes
 out far brighter than its alpha. Fonts are in `UI/Fonts` with their licences (OFL), which must ship with the game. Text that must draw
-over the world needs a material from its own font: TextMesh Pro silently drops one made for another atlas.
+over the world needs a material from its own font: TextMesh Pro silently drops one made for another atlas. Every `UIWindow` fades in as it
+opens (`UIStyle` › Window Fade Seconds, `CanvasGroup` on its content, added if it has none) and closes at once, so a window's own open
+animation should only move things, not touch the alpha. The fade advances by a capped step, so a slow first frame can't use it up, and a window
+that reopens within a tenth of a second (the next line of a conversation) doesn't fade again.
 
 ### Story pacing: room between beats
 
@@ -428,6 +431,7 @@ play mode). Use `SceneLoader.Load` for gameplay scene changes so saveable object
 
 ## Scene changes, raid results and raid layouts
 
+- **What the loading screen shows:** `SceneTransitionSettings` › Destinations gives a scene its own picture and tips (`Art/UI/Loading`; `AgentScripts/BuildLoadingScreens.cs`); what a destination leaves empty comes from the general ones. Keys in tips follow a rebind.
 - **Async transitions:** `SceneLoader.Load(scene, caption)` → `SceneTransition` fades to a loading screen, records saveable
   objects, loads the scene with `LoadSceneAsync` (activation held until the bar is full and a minimum time has passed),
   then runs every `ISceneSetup` in the new scene (by `SetupOrder`, spread over frames) *after Awake and before Start*,
@@ -1354,6 +1358,7 @@ Anywhere the sky is dark, `Resources/NightSettings` applies, scaled by `Atmosphe
 - **Voices:** `MaxSimultaneousEffects` is the limit. A sound nobody can hear takes no voice, nor does a repeat within `SoundDefinition.MinimumGap`. When they run out the lowest `Priority` gives way, the oldest first; `Background` (birds, footsteps) never takes a voice from anything, and `Important` (being hurt, a parry, warnings) only from its own kind.
 - **Music:** `MusicMemory` keeps where a playlist was left for two minutes, so a short fight doesn't send it back to the first bar. Fights change the music in `CombatFadeSeconds`, the rest in `CrossfadeSeconds`, and crossfades are equal-power.
 - **Pausing:** `AudioListener.pause` follows `GamePause`. `Configure` makes positional sounds obey it; music, ambience, weather, water and 2D sounds ignore it, so menus still click.
+- **Creatures:** each `MonsterDefinition` has an Attack Sound (played by `MonsterAI.AnnounceStrike` as every blow winds up: a warning, so `Important`, with a caption), a Hurt Sound (not on the killing blow) and a Death Sound. `MonsterAttack` › Sound replaces the Attack Sound for one action (a howl, a call to the ground). Size is pitch: kin share clips from `Tools/Audio/creatures.py` (`Audio/SFX/Safe Haven Creatures`), and `AgentScripts/BuildCreatureVoices.cs` sets them up, with a `CreatureFootfalls` on what has a tread. `PresentationPolishTests` holds a new creature to all of this.
 - **Importing:** clips of 60 s or more stream, those of 8 s or more stay compressed in memory (streaming can gap at a loop), the rest decompress. `AgentScripts/BuildAudio.cs` applies it and `AudioSystemTests` holds it. A new loop that follows the sliders should use `AudioManager.SteadyVolume`.
 
 ## Essence

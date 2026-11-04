@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0de871765cd6fce4c8fed103ef0082e3, type: 3}
+  m_Name: Bog Spitter Hurt
+  m_EditorClassIdentifier: SafeHaven::SoundDefinition
+  displayName: Bog Spitter Hurt
+  caption: 
+  clips:
+  - {fileID: 8300000, guid: 42345838a3ce51448a9c33dd6b27ba9a, type: 3}
+  - {fileID: 8300000, guid: 46b244fdcf4cace428ae74b3e1570961, type: 3}
+  - {fileID: 8300000, guid: 076329bfd0d5c4440bbcdc7d5b1c4a7e, type: 3}
+  - {fileID: 8300000, guid: 43b770a45e7062148bd5a91bf917f3d7, type: 3}
+  channel: 2
+  volume: 0.7
+  volumeVariation: 0.1
+  pitchRange: {x: 0.95, y: 1.05}
+  positional: 1
+  fullVolumeDistance: 4
+  audibleDistance: 26
+  maxAtOnce: 2
+  minimumGap: 0.22
+  priority: 1
+  takesTheMix: 0

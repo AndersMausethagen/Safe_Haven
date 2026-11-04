@@ -29,7 +29,6 @@ public sealed class AltarWindow : MonoBehaviour
     private const float BodyBottom = 690f;
     private const float RowHeight = 62f;
     private const float ReadSeconds = 0.5f;
-    private const float FadeSeconds = 0.16f;
     private const float ScreenMargin = 24f;
 
     private static readonly string[] PageNames = { "Purify", "Empower", "Enchant", "Skills" };
@@ -135,7 +134,6 @@ public sealed class AltarWindow : MonoBehaviour
     }
 
     private UIWindow window;
-    private CanvasGroup fade;
     private RectTransform panel;
     private TMP_Text pageTitle;
     private TMP_Text pageLine;
@@ -170,7 +168,6 @@ public sealed class AltarWindow : MonoBehaviour
     private GameObject viewer;
     private Transform anchor;
     private float range;
-    private float openedAt;
     private float nextRead;
     private Page page;
     private int subjectIndex;
@@ -235,8 +232,6 @@ public sealed class AltarWindow : MonoBehaviour
             return;
         }
 
-        float shown = Mathf.Clamp01((Time.unscaledTime - openedAt) / FadeSeconds);
-        fade.alpha = shown;
         if (Time.unscaledTime >= nextRead)
         {
             Read();
@@ -260,8 +255,6 @@ public sealed class AltarWindow : MonoBehaviour
             return;
         }
 
-        openedAt = Time.unscaledTime;
-        fade.alpha = 0f;
         Show(page);
     }
 
@@ -438,7 +431,6 @@ public sealed class AltarWindow : MonoBehaviour
         UIStyle style = UIStyle.Current;
         RectTransform content = Stretch("Content", root);
         content.gameObject.AddComponent<Image>().color = new Color(0f, 0f, 0f, 0.5f);
-        fade = content.gameObject.AddComponent<CanvasGroup>();
         panel = Box("Panel", content, new Vector2(0.5f, 0.5f), new Vector2(Width, Height), Vector2.zero);
         panel.gameObject.AddComponent<Image>();
         panel.gameObject.AddComponent<Outline>().effectDistance = new Vector2(1f, -1f);

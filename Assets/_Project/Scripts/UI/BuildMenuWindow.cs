@@ -26,7 +26,7 @@ public sealed class BuildMenuWindow : MonoBehaviour
     private const float CardGap = 12f;
     private const float DetailLeft = 1040f;
     private const float DetailWidth = Width - DetailLeft - Margin;
-    private const float FadeSeconds = 0.12f;
+    private const float RiseSeconds = 0.12f;
     private const float RiseUnits = 30f;
     private const float ReadSeconds = 0.5f;
 
@@ -56,7 +56,6 @@ public sealed class BuildMenuWindow : MonoBehaviour
     }
 
     private UIWindow window;
-    private CanvasGroup fade;
     private RectTransform panel;
     private RectTransform grid;
     private ScrollRect scroll;
@@ -136,8 +135,7 @@ public sealed class BuildMenuWindow : MonoBehaviour
             return;
         }
 
-        float shownShare = Mathf.Clamp01((Time.unscaledTime - openedAt) / FadeSeconds);
-        fade.alpha = shownShare;
+        float shownShare = Mathf.Clamp01((Time.unscaledTime - openedAt) / RiseSeconds);
         panel.anchoredPosition = new Vector2(0f, BottomGap - (1f - shownShare) * (1f - shownShare) * RiseUnits);
         if (Time.unscaledTime >= nextRead)
         {
@@ -158,7 +156,6 @@ public sealed class BuildMenuWindow : MonoBehaviour
         }
 
         openedAt = Time.unscaledTime;
-        fade.alpha = 0f;
         FitTheScreen();
         hint.text = $"Click a building to place it  \u2022  Mouse wheel turns it, Shift for small steps  \u2022  Hold Alt to place freely  \u2022  "
             + $"Right-click cancels  \u2022  {GameInput.KeyLabel(GameInput.Build)} or Esc closes";
@@ -483,7 +480,6 @@ public sealed class BuildMenuWindow : MonoBehaviour
     {
         UIStyle style = UIStyle.Current;
         RectTransform content = Stretch("Content", root);
-        fade = content.gameObject.AddComponent<CanvasGroup>();
 
         panel = Box("Panel", content, new Vector2(0.5f, 0f), new Vector2(Width, Height), new Vector2(0f, BottomGap));
         panel.pivot = new Vector2(0.5f, 0f);
