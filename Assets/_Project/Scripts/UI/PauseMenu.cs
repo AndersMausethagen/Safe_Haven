@@ -30,6 +30,7 @@ public sealed class PauseMenu : MonoBehaviour
     [SerializeField] private Button saveButton;
     [SerializeField] private Button loadButton;
     [SerializeField] private Button optionsButton;
+    private Button journalButton;
     [SerializeField] private Button quitButton;
     [Tooltip("Explains why Save or Load is unavailable, and reports how they went.")]
     [SerializeField] private TMP_Text statusLabel;
@@ -70,6 +71,7 @@ public sealed class PauseMenu : MonoBehaviour
         saveButton.onClick.AddListener(Save);
         loadButton.onClick.AddListener(ShowSaves);
         optionsButton.onClick.AddListener(ShowOptions);
+        AddJournalButton();
         quitButton.onClick.AddListener(AskQuit);
         confirmPrimaryButton.onClick.AddListener(OnConfirmPrimary);
         confirmSecondaryButton.onClick.AddListener(OnConfirmSecondary);
@@ -164,6 +166,38 @@ public sealed class PauseMenu : MonoBehaviour
     {
         ShowPage(mainPage);
         Refresh();
+    }
+
+    // Beside Options, in its look: from here a controller can reach it too, and anyone who hasn't learned J can find it.
+    private void AddJournalButton()
+    {
+        if (journalButton != null || !JournalWindowExists)
+        {
+            return;
+        }
+
+        journalButton = Instantiate(optionsButton, optionsButton.transform.parent);
+        journalButton.name = "Journal Button";
+        journalButton.transform.SetSiblingIndex(optionsButton.transform.GetSiblingIndex());
+        journalButton.onClick = new Button.ButtonClickedEvent();
+        journalButton.onClick.AddListener(OpenJournal);
+        TMPro.TMP_Text label = journalButton.GetComponentInChildren<TMPro.TMP_Text>();
+        if (label != null)
+        {
+            label.text = "Journal";
+        }
+    }
+
+    private static bool JournalWindowExists => Player.Current != null;
+
+    private void OpenJournal()
+    {
+        Close();
+        JournalWindow.Create();
+        if (UIStateManager.Instance != null)
+        {
+            UIStateManager.Instance.RequestToggle(UIWindowId.Journal);
+        }
     }
 
     private void ShowOptions()

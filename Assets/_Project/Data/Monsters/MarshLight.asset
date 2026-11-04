@@ -140,6 +140,14 @@ MonoBehaviour:
   bleeds: 0
   bloodColor: {r: 0, g: 0, b: 0, a: 0}
   ragdollOnDeath: 0
+  fallsByAnimation: 0
+  sizeVariation: 0
+  shadeVariation: 0
+  portrait: {fileID: 21300000, guid: 10fb75a7ceeb39b48a12f403b0dc3cf8, type: 3}
+  journalLore: A pale light drifting over wet ground. Every marsh story has one, and in all of them somebody follows it. Nobody knows what they are, and it doesn't seem to have a body to find out with.
+  journalAdvice: Follow it and it leads you off the path. Get close and it runs. Its cold bolts slow you down for whatever else is waiting, so deal with it quickly, carry a Warming Brew, and don't chase it into anything.
+  journalHabitat: Wet ground and fog banks, more often the later it gets
+  journalKillsToKnow: 3
   deathSound: {fileID: 11400000, guid: b633b11901431314faf13c709f1c62fa, type: 2}
   hurtSound: {fileID: 11400000, guid: f472d8c48b29a7c4587e5ff286dbad2d, type: 2}
   attackSound: {fileID: 11400000, guid: 8b0088b3dcb2ecd4892dbdeaaa5af7db, type: 2}

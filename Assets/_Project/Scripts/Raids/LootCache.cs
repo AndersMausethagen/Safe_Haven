@@ -144,6 +144,11 @@ public sealed class LootCache : MonoBehaviour, IInteractionVerb
     {
         rolled = true;
         float multiplier = RaidDirector.Current != null ? RaidDirector.Current.Parameters.LootMultiplier : 1f;
+        if (RaidDirector.Current != null)
+        {
+            JournalNotices.RollForFind();
+        }
+
         holdsRelic = RaidDirector.Current != null && Random.value < RelicSettings.Current.CacheChance * multiplier;
         foreach (ItemAmount drop in drops.Roll())
         {

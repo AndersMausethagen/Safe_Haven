@@ -68,11 +68,13 @@ public sealed class HavenAction
 
 /// <summary>
 /// A line in one of the Haven window's lists, and what is shown when it is chosen: a stored item, a building, a person. Plain
-/// data read fresh from the game, so the page only draws it. Key is the definition behind it, which keeps the choice across reads.
+/// data read fresh from the game, so the page only draws it. Key is what it stands for (a definition, a page's title), which keeps the choice across reads.
 /// </summary>
 public sealed class HavenEntry
 {
-    public UnityEngine.Object Key { get; set; }
+    public object Key { get; set; }
+    /// <summary>What marks it as read when it is chosen, for a page that keeps count. Empty: nothing does.</summary>
+    public string ReadKey { get; set; }
     public string Name { get; set; }
     public string Line { get; set; }
     public string Badge { get; set; }

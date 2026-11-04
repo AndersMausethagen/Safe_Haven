@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Meat for the Road
   description: Runa has seen blight boar on the grass north of the road, east of the camp, where they have no business being. She lent you her spare bow. Bring two down.
   chain: Prologue - Before the Road
+  journalNotes: Runa doesn't like it. Boar don't come this far onto open grass, and they don't look like that. She hasn't said what she thinks it means, but she has stopped lending out arrows without counting them.
   rank: 2
   availableObjective: 
   announceStart: 1

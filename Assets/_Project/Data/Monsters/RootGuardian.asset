@@ -189,6 +189,14 @@ MonoBehaviour:
   bleeds: 1
   bloodColor: {r: 0.16, g: 0.2, b: 0.05, a: 0.95}
   ragdollOnDeath: 1
+  fallsByAnimation: 1
+  sizeVariation: 0.06
+  shadeVariation: 0.1
+  portrait: {fileID: 21300000, guid: ff45e9013988a2f4b85d59864380a536, type: 3}
+  journalLore: Old guardians of the forest, set there to keep it. They are still keeping it. They just no longer know what from.
+  journalAdvice: Slow and heavy, and its sweeping blows are telegraphed long before they land, so there is time to read them. It can call roots from the ground. Only open to a backstab while staggered, so wear down its poise first.
+  journalHabitat: The old root paths, standing where it was told to stand
+  journalKillsToKnow: 3
   deathSound: {fileID: 11400000, guid: ac8daf818ca69d644ae290c06628c323, type: 2}
   hurtSound: {fileID: 11400000, guid: 07ed88785f822964da383c24e0299069, type: 2}
   attackSound: {fileID: 11400000, guid: f358d925a0c63004fb3d22aa8f4e9325, type: 2}

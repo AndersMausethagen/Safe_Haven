@@ -56,6 +56,8 @@ public sealed class RaidReport
     public int SparksUsed { get; }
     public bool Extracted => Outcome == RaidOutcome.Extracted;
     /// <summary>What became of a cart in the raid, in a sentence. Empty when there was none.</summary>
+    /// <summary>What killed the player, when something did.</summary>
+    public string BroughtDownBy { get; set; }
     public string TransportLine { get; set; } = "";
     public bool TransportHome { get; set; }
     /// <summary>Who went along, or null.</summary>

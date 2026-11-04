@@ -59,6 +59,7 @@ public static class InputRebinds
         new RebindRow("Windows", "Character", "Player/Character"),
         new RebindRow("Windows", "Build", "Player/Build"),
         new RebindRow("Windows", "Talents", "Player/Talents"),
+        new RebindRow("Windows", "Journal", "Player/Journal"),
         new RebindRow("Windows", "Haven", "Player/Haven"),
         new RebindRow("Windows", "World Map", "Player/WorldMap"),
         new RebindRow("Windows", "Command Wheel", "Player/CommandWheel"),

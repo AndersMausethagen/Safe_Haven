@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Into the Misty Woods
   description: Your people are past the door, and the Misty Woods won't wait. Craft stone tools by hand from your bag (B), then step through. Bring home hardwood and iron ore for the haven, and get back to an extraction point before the portal closes. Carried things are lost if you fall; your tools and weapon come back damaged.
   chain: The First Days
+  journalNotes: Your first raid. Bring tools you can afford to see damaged, put anything precious in your safe pocket, and turn back earlier than feels necessary.
   rank: 0
   availableObjective: 
   announceStart: 1

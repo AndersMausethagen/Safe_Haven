@@ -13,6 +13,8 @@ public sealed class BossPhase
     [Min(0f)] public float reelSeconds = 1.6f;
     [Tooltip("Its blows hit this much harder from now on: 0.15 is 15%.")]
     [Min(0f)] public float damageBonus;
+    [Tooltip("How its body glows from now on, as far as its material has an emission map. Black: no change.")]
+    [ColorUsage(false, true)] public Color glow = Color.black;
     [SerializeField] private SoundDefinition sound;
 
     public SoundDefinition Sound => sound;

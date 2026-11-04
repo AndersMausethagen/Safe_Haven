@@ -1,4 +1,4 @@
-﻿# Safe Haven – TODO
+# Safe Haven – TODO
 
 Open work and ideas. Tick items off (`[x]`) or delete them when done. Architecture notes for each system live in
 [ARCHITECTURE.md](../Assets/_Project/Scripts/ARCHITECTURE.md).
@@ -42,7 +42,7 @@ Open work and ideas. Tick items off (`[x]`) or delete them when done. Architectu
 
 ## Art still owed by the new systems (2026-11-03)
 
-- [ ] The Heartroot and its stump: it is the Root Guardian's mannequin at 1.55 times the size. A boss should look like one.
+- [ ] The Heartroot has a body of its own now (Treant 2, 2026-11-04), but a treant shaped like the Root Guardian's. Its stump is still a placeholder.
 - [ ] Heartroot's Grasp has Frost Rune's icon and effect, with roots on the hit.
 - [ ] Heartroot Fight is a synthesised drum loop (`Tools/Audio/boss.py`), 33 s and never heard by whoever made it: listen to it, and a composed track may be better.
 - [ ] Haul Sack has the Hide Rucksack's icon.
@@ -70,6 +70,25 @@ Everything below was driven by scripts, not played by hand: the numbers are firs
 - [ ] Listen to the creature voices (`Tools/Audio/creatures.py`; 2026-11-04): measured and seen on spectrograms, never heard. Wolves and boars are the likeliest to want real recordings. Levels and reach are in `AgentScripts/BuildCreatureVoices.cs`.
 - [ ] Whether a voice on every wind-up, and on each blow of a combo, is too much in a large fight, and whether the treads get in the way.
 - [ ] Time the window fade (0.12 s, `UIStyle`) by hand: Inventory and Character get opened constantly, so it mustn't feel slow.
+
+## Creature bodies (2026-11-04)
+
+Bodies came from CC0 packs: see `Art/Enemies/Downloaded/CREDITS.md` and "Creature bodies" in the architecture notes.
+
+- [ ] Play them: retargeted clips were checked as still frames and in a short spawned fight, not over a full raid. Look for feet sliding, the Draug's blade in its hand and the shield held up.
+- [ ] Marsh Light stays a glowing orb on purpose: check that it still looks right beside the rest.
+- [ ] The Wolf (Quaternius, now with a run, an attack and hit reactions) is still flat low-poly, and the Boar is 284 polygons, beside painted Kelgar models. Look for painted CC0 ones if they stand out in play.
+- [ ] The Forest Monster and Goblin came with clips of their own, but on IK feet that Humanoid can't use, so they keep the shared ones. Bringing them over means baking them in Blender.
+- [ ] Judge in play, none of it has been played by hand: the Huldra's hollow back and the Draug's mail are rigid and may cut through in big swings; the mail read blue in a preview scene; the Draug's shamble; the Heartroot's vein glow at each stage; a resting creature's crouch; how the wolf's stride matches its speed; elite tints. Body variation and collision sizes are guesses from renders: check the Heartroot's reach still lands now its capsule fits it.
+- [ ] Draug's blade and shield keep the old primitive-looking items.
+
+## Journal (2026-11-04)
+
+- [ ] Read the words in the game: all of it is first draft, in particular the backstory pages and which creature opens which.
+- [ ] Read the new pages too: the people, the ten found in raids, the notes people leave on creatures. Some claim things about characters (Bjarne's bargain with a troll, who knew what) that the story doesn't say yet: keep or cut them.
+- [ ] People's notes cover only some creatures, and Bjarne has just one: add more as their voices settle.
+- [ ] Moving through the journal with a controller is built but untested, as none was connected. Try it with one.
+- [ ] Mechanics pages are hand-written from `Docs/Combat.md`: keep them in step when rules change.
 
 ## Loading screens (2026-11-04)
 

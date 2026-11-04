@@ -89,7 +89,8 @@ public sealed class QuestTrackerView : MonoBehaviour
                     available.Add(quest);
 
         // The main story on top, then side quests, then errands.
-        active.Sort((a, b) => a.Quest.Rank != b.Quest.Rank ? a.Quest.Rank.CompareTo(b.Quest.Rank) : string.CompareOrdinal(a.Quest.DisplayName, b.Quest.DisplayName));
+        string pinned = GameSession.Progress.Journal.PinnedQuest;
+        active.Sort((a, b) => (a.Quest.Id == pinned) != (b.Quest.Id == pinned) ? (a.Quest.Id == pinned ? -1 : 1) : a.Quest.Rank != b.Quest.Rank ? a.Quest.Rank.CompareTo(b.Quest.Rank) : string.CompareOrdinal(a.Quest.DisplayName, b.Quest.DisplayName));
         available.Sort((a, b) => a.Rank != b.Rank ? a.Rank.CompareTo(b.Rank) : string.CompareOrdinal(a.DisplayName, b.DisplayName));
         panel.SetActive(active.Count + available.Count + atHome > 0);
         var builder = new StringBuilder();

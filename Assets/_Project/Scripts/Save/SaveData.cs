@@ -164,6 +164,32 @@ public sealed class ProgressSaveData
     public List<AmountSaveData> skillRanks = new List<AmountSaveData>();
     public List<string> crafted = new List<string>();
     public List<string> stones = new List<string>();
+    /// <summary>Creatures met, by id, with how many were slain: the journal's record. Missing in older saves.</summary>
+    public List<AmountSaveData> creatures = new List<AmountSaveData>();
+    /// <summary>The rest of the journal's record. Missing in older saves.</summary>
+    public JournalSaveData journal = new JournalSaveData();
+}
+
+[Serializable]
+public sealed class JournalSaveData
+{
+    public List<string> read = new List<string>();
+    public List<string> announced = new List<string>();
+    public List<string> found = new List<string>();
+    public List<string> killedBy = new List<string>();
+    public string pinned = "";
+    public List<RaidRecordSaveData> raids = new List<RaidRecordSaveData>();
+}
+
+[Serializable]
+public sealed class RaidRecordSaveData
+{
+    public string raid;
+    public string outcome;
+    public int seconds;
+    public int value;
+    public string broughtDownBy;
+    public List<string> lines = new List<string>();
 }
 
 [Serializable]

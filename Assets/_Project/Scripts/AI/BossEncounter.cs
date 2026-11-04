@@ -119,6 +119,12 @@ public sealed class BossEncounter : MonoBehaviour
 
         AudioManager.Play(next.Sound, transform.position);
         CameraShake.Add(0.6f);
+        if (next.glow.maxColorComponent > 0f)
+        {
+            CreatureLook.Glow(gameObject, next.glow);
+            CreatureLook.SetEyes(gameObject, next.glow * 2f);
+        }
+
         if (next.damageBonus > 0f && TryGetComponent(out Combatant combatant))
         {
             combatant.Stats.AddModifier(new StatModifier(StatType.DamageBonus, StatModifierOp.Flat, next.damageBonus, this));

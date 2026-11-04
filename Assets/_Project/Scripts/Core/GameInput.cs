@@ -39,6 +39,7 @@ public static class GameInput
     public static InputAction Character => Find("Player/Character");
     public static InputAction Build => Find("Player/Build");
     public static InputAction Talents => Find("Player/Talents");
+    public static InputAction Journal => Find("Player/Journal");
     public static InputAction Haven => Find("Player/Haven");
     public static InputAction WorldMap => Find("Player/WorldMap");
     public static InputAction CommandWheel => Find("Player/CommandWheel");

@@ -41,6 +41,7 @@ public static class BuildLoadingScreens
         "Crops grow while you raid. Plant before you go.",
         "Give someone a job and they earn their keep while you are gone.",
         "Press (H) to run the Haven from anywhere in it.",
+        "Your journal (J) holds the old stories, your quests, what you know of each creature and how things work.",
         "Purified Essence empowers gear and buys skill ranks at the altar.",
         "A good meal goes through the portal with you.",
         "After dark, wolves prowl just beyond the light. Keep your fires lit.",

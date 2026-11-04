@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: The Smith's Request
   description: 'An old note on the board, in the last smith''s hand: this hearth wants copper, and proof you can work it.'
   chain: Side Quests
+  journalNotes: There was a smith here before, and the note is older than it looks. Nobody knows who wrote it, or who they thought would read it.
   rank: 1
   availableObjective: 
   announceStart: 1

@@ -28,6 +28,8 @@ public sealed class DeathRagdoll : MonoBehaviour
     private static readonly List<DeathRagdoll> Corpses = new List<DeathRagdoll>();
 
     private readonly List<Rigidbody> bodies = new List<Rigidbody>();
+    private readonly List<Mesh> bakedMeshes = new List<Mesh>();
+    private static readonly int DeathState = Animator.StringToHash("Death");
     private float settleAt;
     private float sinkAt;
     private bool settled;
@@ -57,7 +59,8 @@ public sealed class DeathRagdoll : MonoBehaviour
         var corpse = new GameObject($"{victim.name} (corpse)").AddComponent<DeathRagdoll>();
         corpse.transform.SetPositionAndRotation(victim.transform.position, victim.transform.rotation);
 
-        if (animator != null)
+        bool byAnimation = monster.Definition.FallsByAnimation && animator != null && animator.HasState(0, DeathState);
+        if (animator != null && !byAnimation)
         {
             animator.enabled = false;
         }
@@ -68,7 +71,14 @@ public sealed class DeathRagdoll : MonoBehaviour
         }
 
         corpse.TakeBody(victim.transform);
-        if (humanoid)
+        CreatureLook.CloseEyes(corpse.gameObject);
+        if (byAnimation)
+        {
+            // Nothing goes loose: it keeps its Animator, plays its fall and is left where it lands.
+            animator.applyRootMotion = false;
+            animator.CrossFadeInFixedTime(DeathState, 0.1f, 0);
+        }
+        else if (humanoid)
         {
             corpse.BuildHumanoid(animator);
         }
@@ -284,8 +294,31 @@ public sealed class DeathRagdoll : MonoBehaviour
 
     // ----- A monster built from rigid parts -----
 
+    // A skinned animal has no parts to go loose, and no ragdoll rig: its last pose becomes one body that falls.
+    private void BakeSkins()
+    {
+        foreach (SkinnedMeshRenderer skin in GetComponentsInChildren<SkinnedMeshRenderer>())
+        {
+            if (skin.sharedMesh == null || OutlineCopies.IsCopy(skin))
+            {
+                continue;
+            }
+
+            var baked = new Mesh { name = skin.sharedMesh.name + " (corpse)" };
+            skin.BakeMesh(baked, true);
+            bakedMeshes.Add(baked);
+            var piece = new GameObject(skin.name, typeof(MeshFilter), typeof(MeshRenderer));
+            piece.transform.SetParent(skin.transform.parent, false);
+            piece.transform.SetPositionAndRotation(skin.transform.position, skin.transform.rotation);
+            piece.GetComponent<MeshFilter>().sharedMesh = baked;
+            piece.GetComponent<MeshRenderer>().sharedMaterials = skin.sharedMaterials;
+            skin.enabled = false;
+        }
+    }
+
     private void BuildFromParts()
     {
+        BakeSkins();
         var parts = new List<MeshRenderer>(GetComponentsInChildren<MeshRenderer>());
         // Neither the outline's copies nor the arrows stuck in it are parts of the body.
         parts.RemoveAll(part => OutlineCopies.IsCopy(part) || part.GetComponentInParent<ArrowProjectile>() != null);
@@ -448,7 +481,14 @@ public sealed class DeathRagdoll : MonoBehaviour
         }
     }
 
-    private void OnDestroy() => Corpses.Remove(this);
+    private void OnDestroy()
+    {
+        Corpses.Remove(this);
+        foreach (Mesh baked in bakedMeshes)
+        {
+            Destroy(baked);
+        }
+    }
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetForNewPlaySession() => Corpses.Clear();

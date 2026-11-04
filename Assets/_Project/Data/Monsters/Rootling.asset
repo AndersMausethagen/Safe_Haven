@@ -105,6 +105,14 @@ MonoBehaviour:
   bleeds: 1
   bloodColor: {r: 0.16, g: 0.2, b: 0.05, a: 0.95}
   ragdollOnDeath: 1
+  fallsByAnimation: 1
+  sizeVariation: 0.16
+  shadeVariation: 0.16
+  portrait: {fileID: 21300000, guid: bc2f009a33a97184fac391b7bcc732a3, type: 3}
+  journalLore: A knee-high scrap of root and moss that has learned to walk. They are not very clever, and Liv thinks there may be only one of them, in a sense.
+  journalAdvice: One is nothing, but they are never one. Don't let them gather around you, and if something is calling them up, go for it first.
+  journalHabitat: Anywhere the roots are near the surface, usually several at once
+  journalKillsToKnow: 5
   deathSound: {fileID: 11400000, guid: b085b6ce9288e8c4b94b486e801895f9, type: 2}
   hurtSound: {fileID: 11400000, guid: a2a90f0b82c195f43b07f6f894aa8d6d, type: 2}
   attackSound: {fileID: 11400000, guid: 04da4d32a721d33468985239ab598d05, type: 2}

@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: A Spark in the Dark
   description: Gather four Sticks and six Small Rocks from the forest floor, then speak to Sigrid.
   chain: Prologue - The Unquiet Forest
+  journalNotes: Sticks and small rocks lie about on the forest floor, and you can pick them up as you walk. This is how every fire you ever build starts.
   rank: 0
   availableObjective: Speak to Sigrid about the next step.
   announceStart: 0

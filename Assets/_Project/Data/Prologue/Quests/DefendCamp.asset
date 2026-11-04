@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Eyes Between the Trees
   description: Wolves have found the camp. Defend the group; Eirik will help and Ingrid can tend your wounds.
   chain: Prologue - The Unquiet Forest
+  journalNotes: Wolves in a pack take turns at you. Watch for the lunge, and don't let yourself be surrounded. The rest of the expedition will fight beside you.
   rank: 0
   availableObjective: Stay alert. The expedition is moving on.
   announceStart: 0

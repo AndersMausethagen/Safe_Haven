@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: The Road East
   description: Sigrid wants to reach the forest by noon and find out what became of the four who went ahead. Walk the old road with the others; they keep a steady pace and wait for you if you fall behind.
   chain: Prologue - The Unquiet Forest
+  journalNotes: The old road runs straight at the trees. Somebody built it to go somewhere, and nobody at the camp knows where.
   rank: 0
   availableObjective: Speak to Sigrid when you are ready to set out.
   announceStart: 0

@@ -16,6 +16,10 @@ MonoBehaviour:
   displayName: Where the Sun Went
   description: It should be noon, and it is the middle of the night. The expedition has stopped just inside the trees. Sigrid wants you armed before anyone goes further.
   chain: Prologue - The Unquiet Forest
+  journalNotes: 'It really is noon. Everyone agrees on that and no one can explain the stars.
+
+
+    Choose your weapon by how you want to fight rather than by its numbers. You will be making others soon enough.'
   rank: 0
   availableObjective: Stay alert. The expedition is moving on.
   announceStart: 0

@@ -228,6 +228,7 @@ public sealed class PlayerInputHandler : MonoBehaviour
         Hook(GameInput.ToggleTorch, OnToggleTorch, on);
         Hook(GameInput.SwapWeapon, OnSwapWeapon, on);
         Hook(GameInput.Talents, OnTalents, on);
+        Hook(GameInput.Journal, OnJournal, on);
         Hook(GameInput.Haven, OnHaven, on);
         Hook(GameInput.WorldMap, OnWorldMap, on);
         Hook(GameInput.CommandWheel, OnCommandWheel, on);
@@ -293,6 +294,7 @@ public sealed class PlayerInputHandler : MonoBehaviour
     }
 
     private void OnTalents(InputAction.CallbackContext context) => RequestWindow(UIWindowId.Talents);
+    private void OnJournal(InputAction.CallbackContext context) => RequestWindow(UIWindowId.Journal);
 
     private void OnHaven(InputAction.CallbackContext context) => RequestWindow(UIWindowId.Haven);
 

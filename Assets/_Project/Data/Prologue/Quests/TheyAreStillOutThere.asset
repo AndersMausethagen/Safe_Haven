@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: They Are Still Out There
   description: You heard Sigrid through the dormant stones. Your companions may still be alive. Inspect the portal, establish a foothold around it, and use Life Orbs to restore the connection.
   chain: The Lost Expedition
+  journalNotes: You heard Sigrid's voice in the stones, and you are sure of it. That means at least one person is alive, and perhaps others who could hear you too if you could be louder.
   rank: 0
   availableObjective: 
   announceStart: 1

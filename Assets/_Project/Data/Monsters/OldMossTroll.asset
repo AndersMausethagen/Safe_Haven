@@ -210,6 +210,14 @@ MonoBehaviour:
   bleeds: 1
   bloodColor: {r: 0.32, g: 0.015, b: 0.02, a: 0.95}
   ragdollOnDeath: 1
+  fallsByAnimation: 0
+  sizeVariation: 0
+  shadeVariation: 0
+  portrait: {fileID: 21300000, guid: c83dc226c90a6fc49b9a7188291c7e91, type: 3}
+  journalLore: A troll as old as the hills, walking its round through Troll Valley with moss on its back and a tree on its shoulders. Its eyes are weak, but it smells you long before it sees you and hears every step.
+  journalAdvice: Best avoided. You can feel it coming through the ground, so step off its round and let it pass. If you must fight, expect wide sweeps and a stomp that reaches all around it, and only hit it from behind once it is staggered. Being heard calling its kin is a good reason to leave.
+  journalHabitat: Troll Valley, on the same round it has always walked
+  journalKillsToKnow: 1
   deathSound: {fileID: 11400000, guid: a540cb0eee3423e41a5a77294fb8408a, type: 2}
   hurtSound: {fileID: 11400000, guid: 76d36c0978eeaf04592af855858824db, type: 2}
   attackSound: {fileID: 11400000, guid: 86c151585ec25ef499099a8e1a09b185, type: 2}

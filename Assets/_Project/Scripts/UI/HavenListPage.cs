@@ -16,7 +16,7 @@ public sealed class HavenListPage
     private const float Margin = 44f;
     private const float TitleTop = 20f;
     private const float ListTop = 88f;
-    private const float DetailWidth = 400f;
+    private const float DefaultDetailWidth = 400f;
     private const float DetailGap = 40f;
     private const float RowHeight = 62f;
     private const float RowGap = 8f;
@@ -24,8 +24,7 @@ public sealed class HavenListPage
     private const float HeadingHeight = 34f;
     private const float ShelfGap = 14f;
     private const float IconSize = 46f;
-    private const float DetailIconSize = 84f;
-    private const float DetailBodyTop = DetailIconSize + 16f;
+    private const float DefaultIconSize = 84f;
     private const float ActionHeight = 46f;
     private const float ActionGap = 8f;
     private const int MostActions = 4;
@@ -73,15 +72,22 @@ public sealed class HavenListPage
     private float detailHeight;
     private readonly List<ActionButton> actions = new List<ActionButton>();
     private HavenEntry selectedEntry;
-    private UnityEngine.Object selectedKey;
+    private object selectedKey;
+    private readonly float detailWidth;
+    private readonly float detailIconSize;
+    private readonly float detailBodyTop;
 
     /// <param name="runAction">Runs an entry's button; the window decides what else that means (closing, reading again).</param>
-    public HavenListPage(RectTransform parent, string title, float width, float height, int columns, string emptyText, Action<HavenAction> runAction)
+    public HavenListPage(RectTransform parent, string title, float width, float height, int columns, string emptyText, Action<HavenAction> runAction,
+        float detailWidth = DefaultDetailWidth, float detailIconSize = DefaultIconSize)
     {
+        this.detailWidth = detailWidth;
+        this.detailIconSize = detailIconSize;
+        detailBodyTop = detailIconSize + 16f;
         this.columns = Mathf.Max(1, columns);
         this.height = height;
         this.runAction = runAction;
-        listWidth = width - Margin * 2f - DetailWidth - DetailGap;
+        listWidth = width - Margin * 2f - detailWidth - DetailGap;
         UIStyle style = UIStyle.Current;
         root = At(title, parent, 0f, 0f, width, height);
         TMP_Text heading = Label("Title", root, Margin, TitleTop, listWidth, 48f, 34f, style.Text);
@@ -92,6 +98,9 @@ public sealed class HavenListPage
         Hairline(root, Margin + listWidth + DetailGap * 0.5f, TitleTop, 1f, height - TitleTop - 10f, style);
         BuildDetail(style, Margin + listWidth + DetailGap);
     }
+
+    /// <summary>Raised when an entry is shown in the detail pane, by choosing it or by being the one a draw falls on.</summary>
+    public event Action<HavenEntry> Chosen;
 
     public void SetVisible(bool visible) => root.gameObject.SetActive(visible);
 
@@ -125,7 +134,7 @@ public sealed class HavenListPage
             {
                 HavenEntry entry = shelf.Entries[i];
                 first ??= entry;
-                if (entry.Key == selectedKey)
+                if (entry.Key != null && Equals(entry.Key, selectedKey))
                 {
                     selectedEntry = entry;
                 }
@@ -164,6 +173,24 @@ public sealed class HavenListPage
         }
 
         DrawDetail(style);
+        RaiseChosen();
+    }
+
+    private void RaiseChosen()
+    {
+        if (selectedEntry == null)
+        {
+            return;
+        }
+
+        Chosen?.Invoke(selectedEntry);
+        foreach (Row row in rows)
+        {
+            if (row.Entry == selectedEntry)
+            {
+                row.Badge.text = selectedEntry.Badge;
+            }
+        }
     }
 
     private void DrawRow(Row row, HavenEntry entry, float width, UIStyle style)
@@ -229,6 +256,27 @@ public sealed class HavenListPage
 
         DrawDetail(style);
         detailScroll.verticalNormalizedPosition = 1f;
+        RaiseChosen();
+    }
+
+    // A stick moving down a long list has to be able to see where it has got to.
+    private void Reveal(Row row)
+    {
+        var rect = (RectTransform)row.Root.transform;
+        float top = -rect.anchoredPosition.y;
+        float bottom = top + RowHeight;
+        float viewHeight = ((RectTransform)scroll.transform).rect.height;
+        Vector2 at = content.anchoredPosition;
+        if (top < at.y)
+        {
+            at.y = top;
+        }
+        else if (bottom > at.y + viewHeight)
+        {
+            at.y = bottom - viewHeight;
+        }
+
+        content.anchoredPosition = at;
     }
 
     private void DrawDetail(UIStyle style)
@@ -277,8 +325,8 @@ public sealed class HavenListPage
             ((RectTransform)button.Root.transform).anchoredPosition = new Vector2(0f, -y);
         }
 
-        float bodyHeight = detailHeight - DetailBodyTop - shown * (ActionHeight + ActionGap) - 4f;
-        ((RectTransform)detailScroll.transform).sizeDelta = new Vector2(DetailWidth, bodyHeight);
+        float bodyHeight = detailHeight - detailBodyTop - shown * (ActionHeight + ActionGap) - 4f;
+        ((RectTransform)detailScroll.transform).sizeDelta = new Vector2(detailWidth, bodyHeight);
     }
 
     private static string DetailText(HavenEntry entry, UIStyle style)
@@ -347,6 +395,11 @@ public sealed class HavenListPage
         button.targetGraphic = row.Frame;
         button.transition = Selectable.Transition.None;
         button.onClick.AddListener(() => Choose(row));
+        rect.gameObject.AddComponent<UISelectHook>().Selected = () =>
+        {
+            Choose(row);
+            Reveal(row);
+        };
 
         float iconTop = (RowHeight - IconSize) * 0.5f;
         row.Icon = At("Icon", rect, 10f, iconTop, IconSize, IconSize).gameObject.AddComponent<Image>();
@@ -378,29 +431,29 @@ public sealed class HavenListPage
 
     private void BuildDetail(UIStyle style, float x)
     {
-        RectTransform rect = At("Detail", root, x, TitleTop, DetailWidth, height - TitleTop - 10f);
+        RectTransform rect = At("Detail", root, x, TitleTop, detailWidth, height - TitleTop - 10f);
         detail = rect.gameObject;
-        detailIcon = At("Icon", rect, 0f, 0f, DetailIconSize, DetailIconSize).gameObject.AddComponent<Image>();
+        detailIcon = At("Icon", rect, 0f, 0f, detailIconSize, detailIconSize).gameObject.AddComponent<Image>();
         detailIcon.preserveAspect = true;
         detailIcon.raycastTarget = false;
-        detailGlyph = Label("Glyph", rect, 0f, 0f, DetailIconSize, DetailIconSize, 52f, style.Accent, TextAlignmentOptions.Center);
-        float textLeft = DetailIconSize + 16f;
-        detailName = Label("Name", rect, textLeft, 2f, DetailWidth - textLeft, 44f, 30f, style.Text);
+        detailGlyph = Label("Glyph", rect, 0f, 0f, detailIconSize, detailIconSize, 52f, style.Accent, TextAlignmentOptions.Center);
+        float textLeft = detailIconSize + 16f;
+        detailName = Label("Name", rect, textLeft, 2f, detailWidth - textLeft, 44f, 30f, style.Text);
         style.Title(detailName);
         detailName.fontSizeMax = detailName.fontSize;
         detailName.fontSizeMin = 18f;
         detailName.enableAutoSizing = true;
-        detailStatus = Paragraph("Status", rect, textLeft, 46f, DetailWidth - textLeft, 44f, 17f, style.Muted);
+        detailStatus = Paragraph("Status", rect, textLeft, 46f, detailWidth - textLeft, 44f, 17f, style.Muted);
 
         detailHeight = rect.sizeDelta.y;
-        RectTransform area = At("Body", rect, 0f, DetailBodyTop, DetailWidth, detailHeight - DetailBodyTop);
+        RectTransform area = At("Body", rect, 0f, detailBodyTop, detailWidth, detailHeight - detailBodyTop);
         detailScroll = area.gameObject.AddComponent<ScrollRect>();
         detailScroll.horizontal = false;
         detailScroll.movementType = ScrollRect.MovementType.Clamped;
         detailScroll.scrollSensitivity = 40f;
         area.gameObject.AddComponent<RectMask2D>();
         area.gameObject.AddComponent<Image>().color = new Color(0f, 0f, 0f, 0f);
-        detailBody = Paragraph("Text", area, 0f, 0f, DetailWidth, 0f, 18f, style.Text);
+        detailBody = Paragraph("Text", area, 0f, 0f, detailWidth, 0f, 18f, style.Text);
         detailBody.overflowMode = TextOverflowModes.Overflow;
         detailBody.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
         detailScroll.content = detailBody.rectTransform;
@@ -409,7 +462,7 @@ public sealed class HavenListPage
         for (int i = 0; i < MostActions; i++)
         {
             var slot = new ActionButton();
-            slot.Label = AddButton($"Action {i}", rect, 0f, 0f, DetailWidth, UIRole.Kind.Button, () => Run(slot.Action), out slot.Button);
+            slot.Label = AddButton($"Action {i}", rect, 0f, 0f, detailWidth, UIRole.Kind.Button, () => Run(slot.Action), out slot.Button);
             slot.Root = slot.Button.gameObject;
             slot.Role = slot.Root.GetComponent<UIRole>();
             slot.Root.SetActive(false);

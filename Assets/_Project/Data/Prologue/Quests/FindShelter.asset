@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Shelter from the Storm
   description: The expedition came for four of its own and to look into rumours of a bewitched forest, and the forest has already put out the sun. Follow the old road in and find dry shelter.
   chain: Prologue - The Unquiet Forest
+  journalNotes: A storm with no sun over it, and the road is getting harder to follow. Runa says the forest has moved since the others came through, which is not something forests do.
   rank: 0
   availableObjective: Speak to Sigrid about the next step.
   announceStart: 0

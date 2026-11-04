@@ -133,6 +133,14 @@ public sealed class EliteCreature : MonoBehaviour
             AddMark(RingMesh(), radius + i * RingThickness * 1.6f, affix.Colour);
         }
 
+        // On the body too: the rings are on the ground, and easily lost in a fight.
+        if (affixes.Count > 0)
+        {
+            Color mark = affixes[0].Colour;
+            CreatureLook.Tint(gameObject, Color.Lerp(Color.white, mark, 0.3f));
+            CreatureLook.SetEyes(gameObject, mark * 3f);
+        }
+
         Title = plain + Ai.Definition.DisplayName;
         var holder = new GameObject("Elite Label");
         holder.transform.SetParent(transform, false);

@@ -21,6 +21,16 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
     [SerializeField, Min(0f)] private float speedDampTime = 0.1f;
     [Tooltip("A blow worth this share of its health makes a humanoid body flinch, when it isn't busy striking or staggering.")]
     [SerializeField, Range(0f, 1f)] private float flinchShare = 0.04f;
+    [Tooltip("For a body with one stride clip: the speed in m/s its feet keep up with at normal playback. Faster or slower plays it faster or slower, so the feet don't slide. Used when the controller has a StrideRate parameter.")]
+    [SerializeField, Min(0.1f)] private float strideSpeed = 2f;
+
+    /// <summary>The bool a controller has when it has a clip for grazing and sleeping.</summary>
+    public const string RestingParameter = "Resting";
+
+    private static readonly int RestingHash = Animator.StringToHash(RestingParameter);
+    private static readonly int StrideRateHash = Animator.StringToHash("StrideRate");
+    private bool hasResting;
+    private bool hasStride;
 
     private const float StrikeFade = 0.1f;
     private const float FlinchFade = 0.06f;
@@ -87,6 +97,16 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
             animator.SetFloat(speedHash, ai.Speed, speedDampTime, Time.deltaTime);
         }
 
+        if (hasStride && ai.enabled)
+        {
+            animator.SetFloat(StrideRateHash, ai.Speed > 0.2f ? Mathf.Clamp(ai.Speed / strideSpeed, 0.5f, 2.5f) : 1f);
+        }
+
+        if (hasResting)
+        {
+            animator.SetBool(RestingHash, ai.IsResting);
+        }
+
         if (holdEndsAt >= 0f)
         {
             bool over = Time.time >= holdEndsAt;
@@ -119,6 +139,8 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
             hasAttack |= parameter.nameHash == attackHash && parameter.type == AnimatorControllerParameterType.Trigger;
             hasDead |= parameter.nameHash == deadHash && parameter.type == AnimatorControllerParameterType.Bool;
             hasStagger |= parameter.nameHash == staggerHash && parameter.type == AnimatorControllerParameterType.Trigger;
+            hasResting |= parameter.nameHash == RestingHash && parameter.type == AnimatorControllerParameterType.Bool;
+            hasStride |= parameter.nameHash == StrideRateHash && parameter.type == AnimatorControllerParameterType.Float;
         }
     }
 

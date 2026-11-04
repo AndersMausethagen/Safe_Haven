@@ -51,6 +51,9 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
     /// <summary>Raised whenever any quest starts, progresses or completes, for UI such as the quest tracker.</summary>
     public static event Action Changed;
 
+    /// <summary>Something the quest displays read has changed without a quest changing (a pin).</summary>
+    public static void NotifyChanged() => Changed?.Invoke();
+
     /// <summary>Every quest in the game.</summary>
     public IReadOnlyList<QuestDefinition> Quests => content != null ? content.Quests : (IReadOnlyList<QuestDefinition>)Array.Empty<QuestDefinition>();
 

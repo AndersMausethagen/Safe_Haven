@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Berries for the Pot
   description: Eirik says nobody fights well on an empty stomach. Pick berries in the clearing west of the shelter and stew them over the campfire in his waterskin.
   chain: Prologue - The Unquiet Forest
+  journalNotes: 'Eirik is right about this, annoyingly. Hunger won''t kill you, but it will wear you down. A cooked meal does more than fill you: it gives you a bonus for a while.'
   rank: 0
   availableObjective: Stay alert. The expedition is moving on.
   announceStart: 0

@@ -185,6 +185,14 @@ MonoBehaviour:
   bleeds: 1
   bloodColor: {r: 0.32, g: 0.015, b: 0.02, a: 0.95}
   ragdollOnDeath: 1
+  fallsByAnimation: 0
+  sizeVariation: 0.08
+  shadeVariation: 0.14
+  portrait: {fileID: 21300000, guid: 3d1695c02a14ecf4bb127f270293a6cc, type: 3}
+  journalLore: Runa says these were ordinary wolves once. The curse got into them through the prey they ate, and they kept the pack and lost the fear of fire. They hunt the same paths your people must walk home.
+  journalAdvice: They come in packs and take turns at you, so keep them in front of you and watch for the lunge. A tier II wolf learns to pounce. Parry the bite, and don't chase one that backs away, as that is how the others get behind you.
+  journalHabitat: The paths of the Misty Woods and Troll Valley, in packs
+  journalKillsToKnow: 3
   deathSound: {fileID: 11400000, guid: 32f397f6c4f79ca459a23ff2f1b6bb8e, type: 2}
   hurtSound: {fileID: 11400000, guid: e57999aa2bfc8524b98a2a03ae588f69, type: 2}
   attackSound: {fileID: 11400000, guid: d6475ceec23a7f8409dbb26eeaf1085a, type: 2}

@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: A Light in the Wood
   description: The forest cannot forget a hearth that someone tends. Light one inside the portal's ward so your people can see it through the mist, and raise a workshop beside it to work at. Open the build menu with G.
   chain: The First Days
+  journalNotes: This is the old bargain, though you are only starting to understand it. A fire inside the ward feeds the ward. It also shows, a long way off, to anyone who is looking for it.
   rank: 0
   availableObjective: 
   announceStart: 1

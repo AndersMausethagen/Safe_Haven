@@ -39,6 +39,8 @@ public sealed class QuestDefinition : ScriptableObject
     [SerializeField, TextArea(2, 5)] private string description;
     [Tooltip("Groups quests in the editor, e.g. \"Main Story\" or \"Smithing Chain\".")]
     [SerializeField] private string chain;
+    [Tooltip("More than the description has room for, for the journal: why it matters, what people say about it. Keys written as [E] or (N) follow a rebind.")]
+    [SerializeField, TextArea(3, 12)] private string journalNotes;
     [Tooltip("Main Story (gold), Side Quest (silver) or Optional (bronze): the colour of its marks on givers, the tracker, the maps and dialogue answers.")]
     [SerializeField] private QuestRank rank;
     [Tooltip("Shown in the tracker once prerequisites are met, before accepting or starting this quest. Empty hides it until it starts.")]
@@ -91,6 +93,7 @@ public sealed class QuestDefinition : ScriptableObject
     public string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;
     public string Description => description;
     public string Chain => chain;
+    public string JournalNotes => journalNotes;
     public QuestRank Rank => rank;
     public string AvailableObjective => availableObjective;
     public bool AnnounceStart => announceStart;

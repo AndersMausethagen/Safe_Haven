@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Something Is Coming
   description: Something much larger is approaching. Leave the camp and take the old path north to the standing stones.
   chain: Prologue - The Unquiet Forest
+  journalNotes: Whatever it is, the trees are moving out of its way. Don't stop to look.
   rank: 0
   availableObjective: Stay alert. The expedition is moving on.
   announceStart: 0

@@ -175,6 +175,14 @@ MonoBehaviour:
   bleeds: 1
   bloodColor: {r: 0.3, g: 0.33, b: 0.05, a: 0.95}
   ragdollOnDeath: 1
+  fallsByAnimation: 0
+  sizeVariation: 0.12
+  shadeVariation: 0.14
+  portrait: {fileID: 21300000, guid: c74c9bd89c7b1c243ae2583b4f070b12, type: 3}
+  journalLore: A bloated thing the size of a calf, squatting where the ground is wet. It has been there a long time and is in no hurry at all.
+  journalAdvice: It spits venom that keeps working long after it lands. Stay out of the line, close the distance, and carry an Antidote.
+  journalHabitat: Squatting in standing water, and it doesn't move for you
+  journalKillsToKnow: 3
   deathSound: {fileID: 11400000, guid: a2e9644f7543c8d4a80e011c4bda70a9, type: 2}
   hurtSound: {fileID: 11400000, guid: f168dfe9ef7d97c468696be6a71d236a, type: 2}
   attackSound: {fileID: 11400000, guid: f8d504595ea15fc44aeefd7bd127dfc5, type: 2}

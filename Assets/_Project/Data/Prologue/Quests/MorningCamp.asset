@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: A Morning by the Fire
   description: Four of the expedition went into the forest two days ago and should have been back by now. It is early, the sun is out and the porridge is on. Hear the others out by the fire.
   chain: Prologue - The Unquiet Forest
+  journalNotes: Bjarne, Tor, Liv and Ingrid went on ahead two days ago to see what they could of the forest. Nobody here will say they are worried. Everybody has found a reason to stay near Sigrid this morning.
   rank: 0
   availableObjective: Speak to Sigrid by the fire.
   announceStart: 1

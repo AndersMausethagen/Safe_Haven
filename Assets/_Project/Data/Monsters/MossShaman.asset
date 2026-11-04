@@ -250,6 +250,14 @@ MonoBehaviour:
   bleeds: 1
   bloodColor: {r: 0.14, g: 0.18, b: 0.05, a: 0.95}
   ragdollOnDeath: 1
+  fallsByAnimation: 0
+  sizeVariation: 0.05
+  shadeVariation: 0.08
+  portrait: {fileID: 21300000, guid: 4732eee119f22d84cbb751b8016a7e05, type: 3}
+  journalLore: An old troll with a staff of living wood. It doesn't want to fight you. It wants the ground to.
+  journalAdvice: Rootlings rise wherever it points, and it would rather stand back and throw stones while they work. Kill it first, if you can reach it. It will run when badly hurt, so don't let it go and start over.
+  journalHabitat: At the back, with whatever it has called up
+  journalKillsToKnow: 3
   deathSound: {fileID: 11400000, guid: 201034bce08e01645af54626573919a2, type: 2}
   hurtSound: {fileID: 11400000, guid: edf9a8b417ec32e4e913f2aa6f79111a, type: 2}
   attackSound: {fileID: 11400000, guid: 5b105067691d27646b16ebcebf7e5ba4, type: 2}

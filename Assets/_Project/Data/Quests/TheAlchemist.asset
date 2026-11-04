@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: The Alchemist
   description: Ingrid knows the old ways of cleansing cursed things. Give her work, and build what she teaches you.
   chain: The First Days
+  journalNotes: Ingrid knows the old ways of cleansing cursed things and is cagey about where she learned them. Give her a job from the H window. Cursed Essence is useless raw; the altar is where it starts to pay.
   rank: 0
   availableObjective: 
   announceStart: 1

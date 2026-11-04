@@ -42,6 +42,9 @@ public sealed class MonsterPose
     /// <summary>How it holds itself at rest: 0 standing, 0.5 head down to graze, 1 settled to sleep. It eases there.</summary>
     public float Rest { get; set; }
 
+    /// <summary>The body has a clip for resting, so the whole of it isn't tipped and pressed down as well.</summary>
+    public bool RestsByAnimation { get; set; }
+
     public void Attack(AttackDefinition attack, float start)
     {
         posedAttack = attack;
@@ -144,8 +147,8 @@ public sealed class MonsterPose
         float squash = recoil != 0f ? recoil * settings.PunchAmount : 0f;
 
         restNow = Mathf.MoveTowards(restNow, dead ? 0f : Rest, RestEaseSpeed * Time.deltaTime);
-        float restLean = Mathf.Sin(Mathf.Clamp01(restNow) * Mathf.PI) * GrazeLean;
-        float height = pose.Height * Mathf.Lerp(1f, SleepHeight, Mathf.InverseLerp(0.5f, 1f, restNow));
+        float restLean = RestsByAnimation ? 0f : Mathf.Sin(Mathf.Clamp01(restNow) * Mathf.PI) * GrazeLean;
+        float height = RestsByAnimation ? pose.Height : pose.Height * Mathf.Lerp(1f, SleepHeight, Mathf.InverseLerp(0.5f, 1f, restNow));
         float width = 1f / Mathf.Sqrt(Mathf.Max(0.5f, height));
         visual.localPosition = homePosition + Vector3.up * (hover + leap) + Vector3.forward * pose.Shift + shove;
         visual.localRotation = tip * Quaternion.Euler(-pose.Lean + restLean, 0f, pose.Sway) * homeRotation;

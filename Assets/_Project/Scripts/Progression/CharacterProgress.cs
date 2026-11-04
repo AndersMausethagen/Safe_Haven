@@ -13,6 +13,8 @@ public sealed class CharacterProgress
     private readonly Dictionary<string, int> skillRanks = new Dictionary<string, int>();
     private readonly HashSet<string> crafted = new HashSet<string>();
     private readonly HashSet<string> stones = new HashSet<string>();
+    // Creatures met, by id, with how many the player's side has slain: the journal's record.
+    private readonly Dictionary<string, int> creatures = new Dictionary<string, int>();
 
     public int Level { get; private set; } = 1;
 
@@ -145,6 +147,41 @@ public sealed class CharacterProgress
     }
 
     /// <summary>Gives back every talent point (respec).</summary>
+    /// <summary>The rest of what the journal keeps.</summary>
+    public JournalRecord Journal { get; } = new JournalRecord();
+
+    public IReadOnlyDictionary<string, int> Creatures => creatures;
+
+    public bool HasMet(string creatureId) => creatureId != null && creatures.ContainsKey(creatureId);
+
+    public int TimesSlain(string creatureId) => creatureId != null && creatures.TryGetValue(creatureId, out int slain) ? slain : 0;
+
+    public void NoteMet(string creatureId)
+    {
+        if (!string.IsNullOrEmpty(creatureId) && !creatures.ContainsKey(creatureId))
+        {
+            creatures[creatureId] = 0;
+        }
+    }
+
+    public void NoteSlain(string creatureId)
+    {
+        if (!string.IsNullOrEmpty(creatureId))
+        {
+            creatures[creatureId] = TimesSlain(creatureId) + 1;
+        }
+    }
+
+    /// <summary>The record as a save holds it. Kept apart from Restore, as older saves have none.</summary>
+    public void RestoreCreatures(IEnumerable<KeyValuePair<string, int>> saved)
+    {
+        creatures.Clear();
+        foreach (KeyValuePair<string, int> creature in saved)
+        {
+            creatures[creature.Key] = creature.Value;
+        }
+    }
+
     public void ResetTalents()
     {
         if (ranks.Count == 0)

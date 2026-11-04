@@ -75,6 +75,14 @@ MonoBehaviour:
   bleeds: 1
   bloodColor: {r: 0.32, g: 0.015, b: 0.02, a: 0.95}
   ragdollOnDeath: 1
+  fallsByAnimation: 0
+  sizeVariation: 0
+  shadeVariation: 0
+  portrait: {fileID: 21300000, guid: e262214f43c6c3f469ac99aa734ab016, type: 3}
+  journalLore: A forest spirit in the shape of a beautiful woman, with a hollow back like a rotten tree. Every valley has a story of someone who followed her, and they all end the same way.
+  journalAdvice: Never follow her into the trees. She is only ever open to a backstab while staggered, so wear her down and watch for the claws.
+  journalHabitat: The deep woods, alone, where you weren't going
+  journalKillsToKnow: 1
   deathSound: {fileID: 11400000, guid: 5dbbae9b13ddf374e85422718aab1a71, type: 2}
   hurtSound: {fileID: 11400000, guid: 7b9be96ed36821c499bb088f1590ebe2, type: 2}
   attackSound: {fileID: 11400000, guid: 61d77f25341383744afbc7cae568f3b1, type: 2}

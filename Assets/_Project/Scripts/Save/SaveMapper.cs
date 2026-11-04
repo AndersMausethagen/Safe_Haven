@@ -552,6 +552,21 @@ public static class SaveMapper
 
         into.crafted.AddRange(progress.CraftedItems);
         into.stones.AddRange(progress.UsedStones);
+        foreach (KeyValuePair<string, int> creature in progress.Creatures)
+        {
+            into.creatures.Add(new AmountSaveData { id = creature.Key, amount = creature.Value });
+        }
+
+        JournalRecord journal = progress.Journal;
+        into.journal = new JournalSaveData { pinned = journal.PinnedQuest ?? "" };
+        into.journal.read.AddRange(journal.Read);
+        into.journal.announced.AddRange(journal.Announced);
+        into.journal.found.AddRange(journal.Found);
+        into.journal.killedBy.AddRange(journal.KilledBy);
+        foreach (RaidRecord raid in journal.Raids)
+        {
+            into.journal.raids.Add(new RaidRecordSaveData { raid = raid.Raid, outcome = raid.Outcome, seconds = raid.Seconds, value = raid.Value, broughtDownBy = raid.BroughtDownBy ?? "", lines = new List<string>(raid.Lines) });
+        }
     }
 
     // Talents that no longer exist give their points back.
@@ -582,6 +597,21 @@ public static class SaveMapper
         }
 
         progress.Restore(saved.level, saved.experience, ranks, saved.crafted, saved.stones, skillRanks);
+        var creatures = new List<KeyValuePair<string, int>>();
+        foreach (AmountSaveData creature in saved.creatures ?? new List<AmountSaveData>())
+        {
+            creatures.Add(new KeyValuePair<string, int>(creature.id, creature.amount));
+        }
+
+        progress.RestoreCreatures(creatures);
+        JournalSaveData journal = saved.journal ?? new JournalSaveData();
+        var raids = new List<RaidRecord>();
+        foreach (RaidRecordSaveData raid in journal.raids ?? new List<RaidRecordSaveData>())
+        {
+            raids.Add(new RaidRecord { Raid = raid.raid, Outcome = raid.outcome, Seconds = raid.seconds, Value = raid.value, BroughtDownBy = string.IsNullOrEmpty(raid.broughtDownBy) ? null : raid.broughtDownBy, Lines = raid.lines ?? new List<string>() });
+        }
+
+        progress.Journal.Restore(journal.read ?? new List<string>(), journal.announced ?? new List<string>(), journal.found ?? new List<string>(), journal.killedBy ?? new List<string>(), raids, string.IsNullOrEmpty(journal.pinned) ? null : journal.pinned);
         return progress;
     }
 

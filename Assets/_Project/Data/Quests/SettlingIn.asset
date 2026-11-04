@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Gifts of the Clearing
   description: 'A hearth starts small. Craft a stone hatchet and pickaxe from your bag (B), then gather what the clearing offers: enough for a fire and a workshop.'
   chain: The First Days
+  journalNotes: Stone tools are made from your bag (B), with no station needed. Everything in the clearing that can be picked up, chopped or broken will be useful to you sooner or later.
   rank: 0
   availableObjective: 
   announceStart: 1

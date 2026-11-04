@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: A Growing Home
   description: 'Ingrid was the first. When the others come through that door they will need more than a fire: Tor will ask for a woodcutter''s lodge before supper, Bjarne for a smithy, and everyone for somewhere dry to set down what they carried. Build them.'
   chain: The First Days
+  journalNotes: Tor will say your hearth was built crooked, Bjarne will want an anvil, and both will be right. Each building here opens the next, so the H window is the place to plan from.
   rank: 0
   availableObjective: 
   announceStart: 1

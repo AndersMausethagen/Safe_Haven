@@ -24,6 +24,11 @@ public static class RaidReportText
     public static string Describe(RaidReport report)
     {
         var builder = new StringBuilder();
+        if (!string.IsNullOrEmpty(report.BroughtDownBy))
+        {
+            builder.Append($"<b><color={Loss}>Brought down by a {report.BroughtDownBy}.</color></b>\n\n");
+        }
+
         if (report.Modifiers.Count > 0)
         {
             var names = new List<string>();

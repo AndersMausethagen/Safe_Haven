@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: The Last Connection
   description: Keep the creatures back while the portal wakes. If you fall, the unstable connection is your last hope.
   chain: Prologue - The Unquiet Forest
+  journalNotes: Keep moving and keep them off the stones. Falling here isn't the end of it, as the connection will take you whether you are ready or not.
   rank: 0
   availableObjective: Stay alert. The expedition is moving on.
   announceStart: 0

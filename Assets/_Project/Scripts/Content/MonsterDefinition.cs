@@ -115,6 +115,24 @@ public sealed class MonsterDefinition : ScriptableObject, ICombatSounds
     [SerializeField] private Color bloodColor = new Color(0.32f, 0.015f, 0.02f, 0.95f);
     [Tooltip("Its body drops and is thrown by the killing blow. Off for what has no body to speak of.")]
     [SerializeField] private bool ragdollOnDeath = true;
+    [Tooltip("With Ragdoll On Death: it falls by its Death animation instead of going loose, as a tree should. Off, the body is thrown by the blow.")]
+    [SerializeField] private bool fallsByAnimation;
+    [Tooltip("How much bigger or smaller each one is than the model, as a share. 0.08 is up to 8% either way. Leave a one-off at 0.")]
+    [SerializeField, Range(0f, 0.3f)] private float sizeVariation;
+    [Tooltip("How much lighter, darker, warmer or colder each one is, as a share, so a pack isn't one creature several times over.")]
+    [SerializeField, Range(0f, 0.3f)] private float shadeVariation;
+
+    [Header("Journal")]
+    [Tooltip("Its picture in the journal.")]
+    [SerializeField] private Sprite portrait;
+    [Tooltip("What people tell of it: the story, not the fight.")]
+    [SerializeField, TextArea(2, 8)] private string journalLore;
+    [Tooltip("How to fight it, or to keep away from it.")]
+    [SerializeField, TextArea(2, 8)] private string journalAdvice;
+    [Tooltip("Where it is found, in a line.")]
+    [SerializeField] private string journalHabitat;
+    [Tooltip("How many have to fall before the journal knows how to fight it. Twice this and it knows what is told of it; at 1, the first is enough for both. Being killed by one also teaches the fight.")]
+    [SerializeField, Min(1)] private int journalKillsToKnow = 3;
 
     [Header("Sound")]
     [Tooltip("Plays when it is killed. Empty uses the creature default from Audio Settings.")]
@@ -146,6 +164,14 @@ public sealed class MonsterDefinition : ScriptableObject, ICombatSounds
     public float CloseSenseRange => closeSenseRange;
     public float Hearing => hearing;
     public float Alertness => alertness;
+    public Sprite Portrait => portrait;
+    public string JournalLore => journalLore;
+    public string JournalAdvice => journalAdvice;
+    public string JournalHabitat => journalHabitat;
+    public int JournalKillsToKnow => Mathf.Max(1, journalKillsToKnow);
+    public bool FallsByAnimation => fallsByAnimation;
+    public float SizeVariation => sizeVariation;
+    public float ShadeVariation => shadeVariation;
     public SoundDefinition DeathSound => deathSound;
     public SoundDefinition HurtSound => hurtSound;
     public SoundDefinition AttackSound => attackSound;

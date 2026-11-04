@@ -1,0 +1,732 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad7235ffe8a815c4eb369fe572eb183f, type: 3}
+  m_Name: JournalSettings
+  m_EditorClassIdentifier: SafeHaven::JournalSettings
+  backstory:
+  - group: The old world
+    title: The Pact
+    line: What people and forest once promised
+    body: 'Long ago, people promised to leave the forest enough room to live. Its guardians promised in return to keep older, hungrier things at bay.
+
+
+      Nobody living can say when that ended. Some say the pact was broken. Others say it was only forgotten, which may be worse. The trails went first, then the villages, and the forest began to take memories along with the wildlife and the people.'
+    unlockedByQuest: {fileID: 0}
+    unlockedByCreature: {fileID: 0}
+    unlockedByResident: {fileID: 0}
+    foundInRaids: 0
+  - group: The old world
+    title: What the Forest Does
+    line: It doesn't kill the lost
+    body: 'The forest does not kill the lost. It forgets them.
+
+
+      First the way home goes, then their names, and then there is nobody left to find. People who come back from deep in the trees talk about it the way you talk about a dream going as you wake. Ingrid kept herself by saying one word over and over so it couldn''t be taken.'
+    unlockedByQuest: {fileID: 11400000, guid: 00e21ff059394a4459d8cec92bc2d489, type: 2}
+    unlockedByCreature: {fileID: 0}
+    unlockedByResident: {fileID: 0}
+    foundInRaids: 0
+  - group: The old world
+    title: The Hearth
+    line: The one thing it cannot forget
+    body: 'A hearth that someone tends is the one thing the forest cannot forget.
+
+
+      That was the old bargain, as far as anyone can make it out. People kept a fire beside the portal and the portal kept the night from their door. No fire had burned there in a hundred winters when you woke beside those stones.
+
+
+      So this is not a base for its own sake. Each fire feeds the ward and carries further through the mist. The lost can see it and know which way is home.'
+    unlockedByQuest: {fileID: 11400000, guid: f89173a9aeb790c4f9aeb1cc56e0e655, type: 2}
+    unlockedByCreature: {fileID: 0}
+    unlockedByResident: {fileID: 0}
+    foundInRaids: 0
+  - group: The old world
+    title: The Portal
+    line: An old thing, and awake
+    body: 'At the heart of the clearing stand cracked old stones, warm to the touch. They are not quite a door and not quite a person.
+
+
+      The portal''s ward still shelters one clearing, strong enough for daily peace and not much more. Where the old pact has cracked, things can push through, and you will usually hear about it first. It speaks when it has something to say. It is worth listening, and worth remembering that it has its own reasons for wanting a fire lit.'
+    unlockedByQuest: {fileID: 11400000, guid: 00e21ff059394a4459d8cec92bc2d489, type: 2}
+    unlockedByCreature: {fileID: 0}
+    unlockedByResident: {fileID: 0}
+    foundInRaids: 0
+  - group: The expedition
+    title: Seven Went In
+    line: Why anyone came here
+    body: 'The expedition came for four of its own, and to look into rumours of a bewitched forest.
+
+
+      Sigrid led it. Eirik carried a soldier''s sense of where a wall is weakest and Runa could read a trail two days old. Ahead of them had gone Ingrid the alchemist, Bjarne the smith, Tor the carpenter and Liv, who reads runes and would rather be right than safe.
+
+
+      You walked with them. By noon it was the middle of the night.'
+    unlockedByQuest: {fileID: 0}
+    unlockedByCreature: {fileID: 0}
+    unlockedByResident: {fileID: 0}
+    foundInRaids: 0
+  - group: The expedition
+    title: The Day the Stones Broke
+    line: How you came to be alone
+    body: 'Something very large came through the trees, and the only way left was the old waystones. Sigrid knew the passage. You held the creatures back while the connection woke, and it opened badly.
+
+
+      When the stones broke they threw everyone in a different direction. You were the one the portal caught, and you woke on quiet grass with nobody beside you.
+
+
+      Liv says the stones broke along a line, and that this matters. Nobody has yet got her to say why.'
+    unlockedByQuest: {fileID: 11400000, guid: a089752e48d75934fb5e34dbeec0b389, type: 2}
+    unlockedByCreature: {fileID: 0}
+    unlockedByResident: {fileID: 0}
+    foundInRaids: 0
+  - group: The expedition
+    title: Ingrid's Word
+    line: The first to come home
+    body: 'She lay under a root for three nights watching your fire and saying the word so the forest couldn''t have it. Fire. Fire. Fire.
+
+
+      Ingrid knows more about the curse than she lets on. She saw Bjarne thrown north when the stones broke, towards the troll country. The rest she couldn''t see.'
+    unlockedByQuest: {fileID: 11400000, guid: f7e615034e347bc438f7fdf1f08bd615, type: 2}
+    unlockedByCreature: {fileID: 0}
+    unlockedByResident: {fileID: 0}
+    foundInRaids: 0
+  - group: The forest's own
+    title: The Guardians
+    line: What was set to keep the woods
+    body: 'The Root Guardians were not always hostile. They were set to keep the forest, on the forest''s side of the old promise, and they are still doing it. Whatever twisted them did not tell them to stop.
+
+
+      That is the uncomfortable part. Nothing you meet on the root paths thinks it has done anything wrong.'
+    unlockedByQuest: {fileID: 0}
+    unlockedByCreature: {fileID: 11400000, guid: 2f66a8d86463697438ce75621f51e12d, type: 2}
+    unlockedByResident: {fileID: 0}
+    foundInRaids: 0
+  - group: The forest's own
+    title: The First of Them
+    line: Grown vast under its hollow
+    body: 'The Heartroot was the first of the guardians. It has grown old and enormous under its hollow, keeping a forest that is no longer there to be kept.
+
+
+      Nobody has told it. It is not at all clear that it could be told.'
+    unlockedByQuest: {fileID: 0}
+    unlockedByCreature: {fileID: 11400000, guid: d0d3ffee305a6ca489fca58781bf31c1, type: 2}
+    unlockedByResident: {fileID: 0}
+    foundInRaids: 0
+  - group: The forest's own
+    title: Troll Country
+    line: North, where the valleys start
+    body: 'Trolls are older than the road and pay it no attention. The small ones throw stones and hold grudges. The old ones walk the same round for longer than anyone has kept count, with moss and whole trees growing on their shoulders, and they smell you long before they see you.
+
+
+      Stories say a troll can be bargained with, if you have something it wants and the nerve to stand still. This journal does not recommend finding out.'
+    unlockedByQuest: {fileID: 0}
+    unlockedByCreature: {fileID: 11400000, guid: 916ab17a0415c3041aec1267259d1567, type: 2}
+    unlockedByResident: {fileID: 0}
+    foundInRaids: 0
+  - group: The forest's own
+    title: The Barrow Dead
+    line: Still in their mail
+    body: 'Whoever lies in the barrows was buried with honour once, and in good iron. The draugar don''t remember the honour. They remember the iron, and the wall they stood in, and they go on standing in it.
+
+
+      They are slow and patient and hard to stop. The old stories say fire ends them.'
+    unlockedByQuest: {fileID: 0}
+    unlockedByCreature: {fileID: 11400000, guid: 18c8362f09cf64a468e9ae4ae6d4422b, type: 2}
+    unlockedByResident: {fileID: 0}
+    foundInRaids: 0
+  - group: The people
+    title: Sigrid
+    line: Leader of the expedition
+    body: 'Sigrid has led people through worse country than most of them know about, and it shows mostly in what Sigrid doesn''t say. It was her voice in the stones. She knew the old passage before any of you reached it, and she has not said how.
+
+
+      She was carried out of the woods with a wound she treats as a scheduling problem. Ask her about the expedition and you get the facts in order. Ask who taught her to read waystones and the subject changes.
+
+
+      While she is home a raid gives you half a minute more: she has told you plainly how long you really have, and you believe her.'
+    unlockedByQuest: {fileID: 0}
+    unlockedByCreature: {fileID: 0}
+    unlockedByResident: {fileID: 11400000, guid: b230d041259b863428e4e973c6ff0d86, type: 2}
+    foundInRaids: 0
+  - group: The people
+    title: Eirik
+    line: Soldier and warden
+    body: 'Eirik was a soldier and has never entirely stopped. The first thing asked on seeing the Haven was where the wall was weakest, which at the time was all of it.
+
+
+      You found Eirik fighting, and it took a moment to tell whether help was wanted. Don''t expect thanks. Expect to be told about your footwork.
+
+
+      With Eirik on the wall the ward holds half as long again in a breach. No one has explained how a person can make a ward stubborn, and Eirik sees no need to.'
+    unlockedByQuest: {fileID: 0}
+    unlockedByCreature: {fileID: 0}
+    unlockedByResident: {fileID: 11400000, guid: 33e7204287863854f8c6ad025490f531, type: 2}
+    foundInRaids: 0
+  - group: The people
+    title: Runa
+    line: Tracker
+    body: 'Runa reads a trail two days old and counts her arrows when she lends them. She left marks in the woods that only show after dark, for people she wasn''t sure were still coming, and she followed them home herself when you came.
+
+
+      She doesn''t like how the forest has started moving. She doesn''t like how the boar looked that first morning either, and has never said what she thinks it meant.
+
+
+      With Runa at home every briefing has one more rumour in it. She hears them from somewhere. It''s better not to ask how far she walks at night.'
+    unlockedByQuest: {fileID: 0}
+    unlockedByCreature: {fileID: 0}
+    unlockedByResident: {fileID: 11400000, guid: 4260d606f7c62c042b848adc806c44d3, type: 2}
+    foundInRaids: 0
+  - group: The people
+    title: Bjarne
+    line: Smith
+    body: 'The stones threw Bjarne north, into troll country, and he stayed alive there by being too much trouble to eat. He has a low opinion of your anvil. He''d have a low opinion of any anvil he hadn''t made.
+
+
+      He talks about the trolls with more respect than he talks about most people. He says he struck a bargain with one and won''t say what it was for.
+
+
+      With Bjarne home the forge works faster and repairs cost half. He hates seeing a good edge go to waste, and he hates it loudly.'
+    unlockedByQuest: {fileID: 0}
+    unlockedByCreature: {fileID: 0}
+    unlockedByResident: {fileID: 11400000, guid: de521ad7beeb20b49878a9b40c96bced, type: 2}
+    foundInRaids: 0
+  - group: The people
+    title: Tor
+    line: Carpenter
+    body: 'Tor had to be cut out of the roots, and came out asking who had built your hearth, because it was crooked. It was. Tor went and fixed it before sitting down.
+
+
+      Tor doesn''t say much about the time in the roots, except that they are very slow and very patient, and that wood remembers being a tree for longer than you would like.
+
+
+      With Tor home the sawbench works faster, and mending the Haven after a breach costs half.'
+    unlockedByQuest: {fileID: 0}
+    unlockedByCreature: {fileID: 0}
+    unlockedByResident: {fileID: 11400000, guid: df34e8e1df8ff0241a216bfddf9b631c, type: 2}
+    foundInRaids: 0
+  - group: The people
+    title: Liv
+    line: Rune scholar
+    body: 'Liv reads runes, and would rather be right than safe. You found her in a ring of stones she had laid herself, still taking notes. She had not eaten for some time and was annoyed at being interrupted.
+
+
+      She says the stones broke along a line and that this matters. She has told you why three times now, and you are nearly sure each explanation was different. She doesn''t seem to think that''s a problem.
+
+
+      Liv is the only one who knows the raid runes, and with her home the cauldron works faster too.'
+    unlockedByQuest: {fileID: 0}
+    unlockedByCreature: {fileID: 0}
+    unlockedByResident: {fileID: 11400000, guid: 8adfc30233928ec499c01587419eabaa, type: 2}
+    foundInRaids: 0
+  - group: Found in the woods
+    title: A Letter, Unsent
+    line: Folded small, in a dry tin
+    body: 'Dear Sister. They say the road is good as far as the second ford, and that I shall be home before the barley. The people here are kind, though they keep asking me what I am called.
+
+
+      I told them. I am sure I told them.
+
+
+      The rest of it is the same three lines, written over and over in a hand that gets worse.'
+    unlockedByQuest: {fileID: 0}
+    unlockedByCreature: {fileID: 0}
+    unlockedByResident: {fileID: 0}
+    foundInRaids: 1
+  - group: Found in the woods
+    title: Liv's Notes on the Stones
+    line: Her hand, and three different inks
+    body: 'Waystones broke along a line, not at random. Line runs from the portal to the third barrow to somewhere north I can''t get to.
+
+
+      If I am right, the stones were never meant to carry people. They carry the promise, and people are what falls off.
+
+
+      Sigrid will ask if that helps. It does not help. It is still true.
+
+
+      Later, and shakier: Stay in the ring. Stay in the ring until someone comes, and do not answer anything that uses your name.'
+    unlockedByQuest: {fileID: 0}
+    unlockedByCreature: {fileID: 0}
+    unlockedByResident: {fileID: 0}
+    foundInRaids: 1
+  - group: Found in the woods
+    title: The Last Smith's Note
+    line: Scratched on a rusted plate
+    body: 'To the next one at this anvil. Keep the fire in. I don''t mean the forge. I mean the one by the stones, the one that matters. I let it go out one winter because I had work on and I thought a night wouldn''t hurt.
+
+
+      I can''t now remember what it was I was making.
+
+
+      The iron from the barrows is good. Don''t take it from anyone who is still using it.'
+    unlockedByQuest: {fileID: 0}
+    unlockedByCreature: {fileID: 0}
+    unlockedByResident: {fileID: 0}
+    foundInRaids: 1
+  - group: Found in the woods
+    title: A Waystone Rubbing
+    line: Charcoal on birch bark
+    body: 'Someone pressed bark against a stone and rubbed it with charcoal until the marks came up. Beside it, in a careful hand, is a guess at the meaning.
+
+
+      We keep the fire. You keep the dark.
+
+      We leave the old trees. You leave the door.
+
+      Whoever forgets first owes the other everything.
+
+
+      The guess has been crossed out, and under it someone has written: not a guess.'
+    unlockedByQuest: {fileID: 0}
+    unlockedByCreature: {fileID: 0}
+    unlockedByResident: {fileID: 0}
+    foundInRaids: 1
+  - group: Found in the woods
+    title: The Lost Man's Song
+    line: A children's counting song, on a torn page
+    body: 'One for the road and two for the ford,
+
+      Three for the wolf and four for the lord,
+
+      Five for the name that you gave at the door,
+
+      Six for the one who won''t ask any more.
+
+
+      Seven''s the fire. Don''t say what it''s for.
+
+      Seven''s the fire. Say it once more.
+
+
+      Every village south of the river knows this one, and nobody there can tell you where it comes from.'
+    unlockedByQuest: {fileID: 0}
+    unlockedByCreature: {fileID: 0}
+    unlockedByResident: {fileID: 0}
+    foundInRaids: 1
+  - group: Found in the woods
+    title: The Troll Toll
+    line: A trader's list, much handled
+    body: 'What the old one on the north road will take, as far as I have found:
+
+
+      A whole cheese: no.
+
+      A good knife: looked at it and gave it back.
+
+      A song: stayed to hear the end, then hit the cart.
+
+      A stone, carried from a long way off, and told where it came from: let us by.
+
+
+      They say it collects them. I say it misses somewhere. Don''t run, and don''t lie about the stone.'
+    unlockedByQuest: {fileID: 0}
+    unlockedByCreature: {fileID: 0}
+    unlockedByResident: {fileID: 0}
+    foundInRaids: 1
+  - group: Found in the woods
+    title: Barrow Inscription
+    line: Copied from a door lintel
+    body: 'HERE STOOD THE WALL AT THE NORTH GATE. THEY DID NOT GIVE WAY.
+
+
+      Below it, in smaller and much later letters:
+
+
+      Nobody has told them it is over. We tried. Bring fire and don''t stand where they are looking.'
+    unlockedByQuest: {fileID: 0}
+    unlockedByCreature: {fileID: 0}
+    unlockedByResident: {fileID: 0}
+    foundInRaids: 1
+  - group: Found in the woods
+    title: The Hearth Law
+    line: A page from an old rule of the house
+    body: 'Let the hearth be tended by whoever is nearest, and let no one say it was another''s turn.
+
+
+      Let no one be turned away from it, for you do not know whose name they have lost.
+
+
+      Let the fire be fed before the household, in hard winters and in good ones, and let it be told each night who is home and who is not, so that it may go on looking for them.'
+    unlockedByQuest: {fileID: 0}
+    unlockedByCreature: {fileID: 0}
+    unlockedByResident: {fileID: 0}
+    foundInRaids: 1
+  - group: Found in the woods
+    title: A Tally on Bark
+    line: Notches, and one word
+    body: 'A long strip of bark, cut with neat rows of notches in fives. Whoever kept it counted days for a long time. The rows get crooked about two thirds of the way along, and after that the notches stop being in fives.
+
+
+      At the very end, cut deep: FIRE.'
+    unlockedByQuest: {fileID: 0}
+    unlockedByCreature: {fileID: 0}
+    unlockedByResident: {fileID: 0}
+    foundInRaids: 1
+  - group: Found in the woods
+    title: Something Runa Left
+    line: Tied to a branch with a bit of red cord
+    body: 'A scrap with marks on it that only make sense after dark, when you can see which way the moss glows. Runa''s way of leaving a trail for someone she expected to come after her.
+
+
+      There''s a line at the bottom, in plain letters, as if she had thought better of being clever.
+
+
+      If you''re reading this and you aren''t one of mine, take the left fork anyway. The right one isn''t there in the morning.'
+    unlockedByQuest: {fileID: 0}
+    unlockedByCreature: {fileID: 0}
+    unlockedByResident: {fileID: 0}
+    foundInRaids: 1
+  mechanics:
+  - group: Getting about
+    title: Your Windows
+    line: What each key opens
+    body: '(B) your bag and what you can make by hand
+
+      (C) your character and what you wear
+
+      (K) skills
+
+      (N) level and talents
+
+      (H) the Haven, from anywhere in it
+
+      (G) the build menu
+
+      (M) the map
+
+      (J) this journal
+
+      [E] use whatever is in front of you
+
+
+      Any of these can be changed under Options, Controls, and this page will follow.'
+    unlockedByQuest: {fileID: 0}
+    unlockedByCreature: {fileID: 0}
+    unlockedByResident: {fileID: 0}
+    foundInRaids: 0
+  - group: Getting about
+    title: Your Journal
+    line: It fills in as you go
+    body: 'A dot marks anything you haven''t read yet, and a tab''s count shows how many of them it holds.
+
+
+      A creature''s page starts with little more than its name. It fills in as they fall: first how it fights and what it leaves, then how to live through it (being killed by one teaches you that too), and last what is told of it. People you bring home add what they know.
+
+
+      Searching caches in a raid can turn up lost pages, which go in Backstory. Raids keeps a record of how each one ended.
+
+
+      On Quests you can pin a quest to the top of your tracker and, at home, go straight to where it wants you.'
+    unlockedByQuest: {fileID: 0}
+    unlockedByCreature: {fileID: 0}
+    unlockedByResident: {fileID: 0}
+    foundInRaids: 0
+  - group: Getting about
+    title: Sneaking
+    line: Quiet, slow and worth it
+    body: 'Hold Left Ctrl to sneak: half speed, quiet and hard to see. A hit on a creature that hasn''t noticed you is an ambush, worth half again as much.
+
+
+      Creatures notice you three ways. They see in a cone in front of them, and cover blocks it. They sense what is very close. And they hear, so running, fighting, chopping and picking locks all carry. Rain muffles you. A heavy bag doesn''t.'
+    unlockedByQuest: {fileID: 0}
+    unlockedByCreature: {fileID: 0}
+    unlockedByResident: {fileID: 0}
+    foundInRaids: 0
+  - group: Combat
+    title: Swings and Chains
+    line: Patience beats clicking
+    body: 'Tap the left mouse button for a light swing. Press again after it has landed and you go on to the next swing of the weapon''s chain, and the last one is a finisher: wider, harder and better at breaking poise.
+
+
+      Pressing right as a swing recovers is on the rhythm, a small edge in damage. Swings never get faster, so mashing gains nothing.
+
+
+      Hold the button and the swing turns heavy: slow, nearly rooted, and hard enough to break poise. Keep holding to charge it, then let go to strike.'
+    unlockedByQuest: {fileID: 0}
+    unlockedByCreature: {fileID: 0}
+    unlockedByResident: {fileID: 0}
+    foundInRaids: 0
+  - group: Combat
+    title: Guard and Parry
+    line: Part of a blow, or none of it
+    body: 'Hold the right mouse button to guard. It stops blows from the front, but part of each still gets through (a lot with bare fists, much less with a shield) and each block costs stamina. Run out and your guard breaks, and you reel for over a second.
+
+
+      Raise the guard just before a blow lands and it is a parry: no damage, no stamina, the attacker staggers and your next swing is a sure critical. A creature''s warning on the ground turns pale and the creature glints at exactly that moment.
+
+
+      Lowering your guard locks it for a moment, so tapping it is no free parry.'
+    unlockedByQuest: {fileID: 0}
+    unlockedByCreature: {fileID: 0}
+    unlockedByResident: {fileID: 0}
+    foundInRaids: 0
+  - group: Combat
+    title: Dodging
+    line: Your way out of almost anything
+    body: 'Space dodges. A dodge can cut a swing short at any time, though during the wind-up that swing is lost and its stamina spent.
+
+
+      Dodging through a blow as it lands is a perfect dodge, and readies a counter. With an enemy in focus, a dodge steered towards or past it curves around to the spot behind it.
+
+
+      What you wear decides how you dodge. Light gear gives a short, cheap quickstep, normal gear a roll, and heavy gear a slow shoulder charge that barges enemies at the end.'
+    unlockedByQuest: {fileID: 0}
+    unlockedByCreature: {fileID: 0}
+    unlockedByResident: {fileID: 0}
+    foundInRaids: 0
+  - group: Combat
+    title: Stamina and Focus
+    line: One holds you up, the other pays for skills
+    body: 'Stamina runs everything physical and comes back quickly once you stop spending it. Watch it: an empty bar in the middle of a fight is how most people die.
+
+
+      Focus, the gold bar, is earned by fighting well. Every hit adds some, a perfect dodge more and a parry most of all. It holds for ten seconds after your last gain, then drains. Skills and weapon arts cost Focus, so they are what good fighting buys and not what opens a fight.'
+    unlockedByQuest: {fileID: 0}
+    unlockedByCreature: {fileID: 0}
+    unlockedByResident: {fileID: 0}
+    foundInRaids: 0
+  - group: Combat
+    title: Poise and Stagger
+    line: The thin amber bar
+    body: 'Every hit wears down a creature''s poise, the thin amber bar under its health. Heavy swings, finishers and counters wear it most. At zero it staggers: its attack is cancelled, it reels, and it takes more damage. A parry staggers it too.
+
+
+      Poise comes back after a couple of seconds without being hit, so keep at it.'
+    unlockedByQuest: {fileID: 0}
+    unlockedByCreature: {fileID: 0}
+    unlockedByResident: {fileID: 0}
+    foundInRaids: 0
+  - group: Combat
+    title: Backstabs and Finishing Blows
+    line: The best blow there is
+    body: 'A pale wedge on the ground shows the spot behind an enemy. A staggered enemy struck from there takes a sure critical at far more damage: that is the best blow in the game. So parry, roll behind, strike.
+
+
+      A backstab straight out of a dodge gives back half of what the dodge cost.
+
+
+      Behind a staggered person-shaped creature, such as a draug, a press locks you together for a finishing blow, and nothing can knock you out of it before the blade lands.
+
+
+      Enemies learn. One that has taken a backstab, or seen one nearby, starts to see the next coming, and the wedge warms from pale to red as it does. It forgets given time. Great beasts and elites are only ever open while staggered.'
+    unlockedByQuest: {fileID: 0}
+    unlockedByCreature: {fileID: 0}
+    unlockedByResident: {fileID: 0}
+    foundInRaids: 0
+  - group: Combat
+    title: Getting Hit
+    line: Don't trade blows
+    body: 'A hit that gets through while you wind up costs you the swing and leaves you reeling. Trading blows with a monster is a losing game, unless you are swinging something heavy: the wind-up of a heavy swing pushes through hits with a hammer, maul, greatsword or two-handed axe.
+
+
+      Some attacks leave something behind if they get through. Poison drains your health and an Antidote cures it. Chill slows you and a Warming Brew cures it. Roots hold you in place, though you can still fight.'
+    unlockedByQuest: {fileID: 0}
+    unlockedByCreature: {fileID: 0}
+    unlockedByResident: {fileID: 0}
+    foundInRaids: 0
+  - group: Raids
+    title: Setting Out
+    line: What you decide at the portal
+    body: 'The portal''s planner shows where you can go and what you will meet. You choose a destination and a tier, and can pay Portal Sparks for more time (three minutes each, up to two) and carry runes that change what waits on the other side.
+
+
+      Each raid has a reason, usually a rumour pointing you at something worth finding. The woods are laid out anew every time, so nothing is where you left it.'
+    unlockedByQuest: {fileID: 11400000, guid: 2614c1d189f3a034691f98f3d3efeee0, type: 2}
+    unlockedByCreature: {fileID: 0}
+    unlockedByResident: {fileID: 0}
+    foundInRaids: 0
+  - group: Raids
+    title: The Clock and the Way Out
+    line: Leave before it closes
+    body: 'A raid runs on a clock. As it runs down the woods grow more dangerous in stages, and the way home narrows.
+
+
+      To leave you have to reach an exit, light it and hold it until it opens. Holding takes time and can draw attention, so light one with time to spare.
+
+
+      The map (M) and the way line show you where to go.'
+    unlockedByQuest: {fileID: 11400000, guid: 2614c1d189f3a034691f98f3d3efeee0, type: 2}
+    unlockedByCreature: {fileID: 0}
+    unlockedByResident: {fileID: 0}
+    foundInRaids: 0
+  - group: Raids
+    title: What You Can Lose
+    line: Before you find out the hard way
+    body: 'If you fall or time runs out, you wake at the portal. What you carry is lost: materials, food and anything found in the raid.
+
+
+      The tools, weapons and packs you bring come back damaged, and can be repaired at home.
+
+
+      Your safe pocket keeps what is in it no matter what, so put the one thing you can''t bear to lose there. Your home, your storage, your recipes and what you have learned are never at risk from a raid.'
+    unlockedByQuest: {fileID: 11400000, guid: 2614c1d189f3a034691f98f3d3efeee0, type: 2}
+    unlockedByCreature: {fileID: 0}
+    unlockedByResident: {fileID: 0}
+    foundInRaids: 0
+  - group: Raids
+    title: Carrying It Home
+    line: Greed has a weight
+    body: 'Materials are items with weight. Past most of your bag''s limit you slow down, tire faster and make more noise, and it gets worse the fuller it is. A Haul Sack carries more, but it is slower and louder still.
+
+
+      Carts carry far more than you can, and can come through the portal with you, but creatures will raid one left alone.'
+    unlockedByQuest: {fileID: 11400000, guid: 2614c1d189f3a034691f98f3d3efeee0, type: 2}
+    unlockedByCreature: {fileID: 0}
+    unlockedByResident: {fileID: 0}
+    foundInRaids: 0
+  - group: Raids
+    title: Companions
+    line: Company has a price
+    body: 'You can take someone with you. They fight beside you and take orders in conversation: follow, stay, defend, retreat or attack your target.
+
+
+      If they fall, they may be lost to the forest, and it will start to forget them. You can find them again, but it takes a rumour and a raid to do it, and they may not remember everything when they come home.'
+    unlockedByQuest: {fileID: 11400000, guid: 08ed06b5fb8d1854c86788aa2a00156f, type: 2}
+    unlockedByCreature: {fileID: 0}
+    unlockedByResident: {fileID: 0}
+    foundInRaids: 0
+  - group: Safe Haven
+    title: The Ward and Renown
+    line: Why a bigger home is a safer one
+    body: 'The portal''s ward is what keeps the clearing peaceful. Everything you build and clear adds renown, and renown raises the Haven''s rank, which widens the ward and lights the way a little further for anyone still out there.
+
+
+      The Haven window (H) shows what counts, what to do next and how far along you are.'
+    unlockedByQuest: {fileID: 11400000, guid: f89173a9aeb790c4f9aeb1cc56e0e655, type: 2}
+    unlockedByCreature: {fileID: 0}
+    unlockedByResident: {fileID: 0}
+    foundInRaids: 0
+  - group: Safe Haven
+    title: Building
+    line: Each thing opens the next
+    body: 'Press (G) to build inside the ward. Most buildings go up as a scaffold you hammer with [E]. Each one opens the next, and every tier of a building opens something new to make, takes a chore off your hands or answers a problem you will meet in the woods.
+
+
+      Recipes you can''t make yet still show at the station, with what they need, so you can see what to aim for.'
+    unlockedByQuest: {fileID: 11400000, guid: 2ba326763b19a9e46be36507850aed82, type: 2}
+    unlockedByCreature: {fileID: 0}
+    unlockedByResident: {fileID: 0}
+    foundInRaids: 0
+  - group: Safe Haven
+    title: Stations and Work
+    line: It goes on without you
+    body: 'Stations keep working while you are away. Pay on queuing, leave for a raid, and come back to a finished output slot. Crops on a Farm Plot grow the same way.
+
+
+      Give someone a job from the Haven window and they make things from what is in your stash while you are gone. People want somewhere to sleep, and beds help them, but beds are never what stops you from growing.'
+    unlockedByQuest: {fileID: 11400000, guid: f89173a9aeb790c4f9aeb1cc56e0e655, type: 2}
+    unlockedByCreature: {fileID: 0}
+    unlockedByResident: {fileID: 0}
+    foundInRaids: 0
+  - group: Safe Haven
+    title: Nights and Breaches
+    line: Safe, but not perfectly
+    body: 'After the first breach is won, weak creatures prowl just outside the light at night, so keep your fires lit. Cursed Essence is richer after dark too, if you want to go looking.
+
+
+      Now and then something tests the ward. A breach is always announced ahead of time: you get a warning, time to prepare, the defence itself and a chance to recover. It only happens while you are there, and it can''t wipe out the home you have built. Damaged buildings can be repaired.'
+    unlockedByQuest: {fileID: 11400000, guid: fea0201f13773f04a96efbcb5b364ea9, type: 2}
+    unlockedByCreature: {fileID: 0}
+    unlockedByResident: {fileID: 0}
+    foundInRaids: 0
+  - group: Keeping going
+    title: Hunger and Thirst
+    line: They won't kill you
+    body: 'Hunger and thirst wear down what you can do, but they never kill you. Berries and a stream will do to start with.
+
+
+      Cooked meals give timed bonuses on top of what they restore. You can have two at once, and a third pushes out the one closest to ending. Tonics from the Cauldron take no meal slot. Both go through the portal with you, so the meal before a raid counts, but a failed raid loses them.
+
+
+      Eating stops you for a moment, and a hit that gets through interrupts it, though the food is kept. Its healing arrives over several seconds.'
+    unlockedByQuest: {fileID: 0}
+    unlockedByCreature: {fileID: 0}
+    unlockedByResident: {fileID: 0}
+    foundInRaids: 0
+  - group: Keeping going
+    title: Levels and Talents
+    line: Getting better at it
+    body: Experience comes from fighting, working and finishing things. Each level gives talent points to spend in four trees at (N), freely mixed. Talents can be reset for free, beside the portal.
+    unlockedByQuest: {fileID: 0}
+    unlockedByCreature: {fileID: 0}
+    unlockedByResident: {fileID: 0}
+    foundInRaids: 0
+  - group: Keeping going
+    title: Essence
+    line: What the forest leaves behind
+    body: 'Cursed Essence comes from the forest and its creatures. Purify it at the altar and Purified Essence will empower your gear, enchant it and deepen your skills.
+
+
+      Every offer at the altar says what it costs and what it does, and none of them can fail or waste your essence. Where there is a risk, it is a stated price.'
+    unlockedByQuest: {fileID: 11400000, guid: e9a34a9ca91ab4946b93ffe90aebd8c1, type: 2}
+    unlockedByCreature: {fileID: 0}
+    unlockedByResident: {fileID: 0}
+    foundInRaids: 0
+  creatures:
+  - {fileID: 11400000, guid: afbf4a58442496641826a078787f7e2e, type: 2}
+  - {fileID: 11400000, guid: e646ff37405b36e43a4fa710a23060e2, type: 2}
+  - {fileID: 11400000, guid: 20c7f11cbb9bb214f95fc0f2a51db9d9, type: 2}
+  - {fileID: 11400000, guid: abf292b6af701c64eb533aad22ee47c6, type: 2}
+  - {fileID: 11400000, guid: 1fc74e15f41da234fb9eeedcfe1067f0, type: 2}
+  - {fileID: 11400000, guid: 2f66a8d86463697438ce75621f51e12d, type: 2}
+  - {fileID: 11400000, guid: e1b3879bd0caf9a43892f7b5aff2bfee, type: 2}
+  - {fileID: 11400000, guid: 780dd3de177d4ca41b12a65f95fa709b, type: 2}
+  - {fileID: 11400000, guid: 18c8362f09cf64a468e9ae4ae6d4422b, type: 2}
+  - {fileID: 11400000, guid: 6831da450ee487246b0f7f72b7e0272f, type: 2}
+  - {fileID: 11400000, guid: 26c3027c5ca1de044a5a8f75d3b93dcb, type: 2}
+  - {fileID: 11400000, guid: 489a951193635d0419115cdcc5775d51, type: 2}
+  - {fileID: 11400000, guid: 916ab17a0415c3041aec1267259d1567, type: 2}
+  - {fileID: 11400000, guid: d0d3ffee305a6ca489fca58781bf31c1, type: 2}
+  residentNotes:
+  - who: {fileID: 11400000, guid: 4260d606f7c62c042b848adc806c44d3, type: 2}
+    about: {fileID: 11400000, guid: afbf4a58442496641826a078787f7e2e, type: 2}
+    text: The pack circles to the side you favour. Stand with a tree behind your weak hand and they run out of places to come from.
+  - who: {fileID: 11400000, guid: 33e7204287863854f8c6ad025490f531, type: 2}
+    about: {fileID: 11400000, guid: afbf4a58442496641826a078787f7e2e, type: 2}
+    text: Kill the one that's biting. Everyone wants to go for the big one.
+  - who: {fileID: 11400000, guid: 4260d606f7c62c042b848adc806c44d3, type: 2}
+    about: {fileID: 11400000, guid: e646ff37405b36e43a4fa710a23060e2, type: 2}
+    text: It only knows straight lines. I've watched one miss me and carry on through a fence.
+  - who: {fileID: 11400000, guid: de521ad7beeb20b49878a9b40c96bced, type: 2}
+    about: {fileID: 11400000, guid: 916ab17a0415c3041aec1267259d1567, type: 2}
+    text: Don't run. It's worse if you run. I stood still for most of a day once, and it only sniffed me.
+  - who: {fileID: 11400000, guid: df34e8e1df8ff0241a216bfddf9b631c, type: 2}
+    about: {fileID: 11400000, guid: 2f66a8d86463697438ce75621f51e12d, type: 2}
+    text: Good timber, once. That's what makes it sad. Go for where the limbs join, same as you would with any bad joint.
+  - who: {fileID: 11400000, guid: df34e8e1df8ff0241a216bfddf9b631c, type: 2}
+    about: {fileID: 11400000, guid: 20c7f11cbb9bb214f95fc0f2a51db9d9, type: 2}
+    text: They come apart if you hit them along the grain. I don't know why you would be sorry about it, but you are, a bit.
+  - who: {fileID: 11400000, guid: 8adfc30233928ec499c01587419eabaa, type: 2}
+    about: {fileID: 11400000, guid: e1b3879bd0caf9a43892f7b5aff2bfee, type: 2}
+    text: It isn't lost. It isn't leading you anywhere either. As far as I can tell it's just looking for someone, and you'll do.
+  - who: {fileID: 11400000, guid: 33e7204287863854f8c6ad025490f531, type: 2}
+    about: {fileID: 11400000, guid: 18c8362f09cf64a468e9ae4ae6d4422b, type: 2}
+    text: I knew what they were before anyone told me. They hold the line better than anyone I ever served with. Don't stand in front of it.
+  - who: {fileID: 11400000, guid: 33e7204287863854f8c6ad025490f531, type: 2}
+    about: {fileID: 11400000, guid: 6831da450ee487246b0f7f72b7e0272f, type: 2}
+    text: Same as any shield wall, and it's a wall of one. Go round.
+  - who: {fileID: 11400000, guid: 8adfc30233928ec499c01587419eabaa, type: 2}
+    about: {fileID: 11400000, guid: 18c8362f09cf64a468e9ae4ae6d4422b, type: 2}
+    text: The mail is older than the barrow. I would like to know who they were buried by.
+  - who: {fileID: 11400000, guid: b230d041259b863428e4e973c6ff0d86, type: 2}
+    about: {fileID: 11400000, guid: 489a951193635d0419115cdcc5775d51, type: 2}
+    text: If she knows your name, you have already stayed too long. Keep walking and don't look at her back.
+  - who: {fileID: 11400000, guid: 272895da9ba7e784b8a97bcd2be637c8, type: 2}
+    about: {fileID: 11400000, guid: 780dd3de177d4ca41b12a65f95fa709b, type: 2}
+    text: The venom keeps very well, if you can bear to carry it. So do I, as it turns out.
+  - who: {fileID: 11400000, guid: 272895da9ba7e784b8a97bcd2be637c8, type: 2}
+    about: {fileID: 11400000, guid: 26c3027c5ca1de044a5a8f75d3b93dcb, type: 2}
+    text: Whatever it's saying to the ground, the ground is listening. Reach it first or you will be fighting all afternoon.
+  - who: {fileID: 11400000, guid: b230d041259b863428e4e973c6ff0d86, type: 2}
+    about: {fileID: 11400000, guid: d0d3ffee305a6ca489fca58781bf31c1, type: 2}
+    text: I've met people like it. It would be easier if it were cruel.
+  findChance: 0.2

@@ -47,6 +47,8 @@ public sealed class ExperienceTracker : MonoBehaviour, IGameSystem
         {
             ExperienceHud.Create();
             TalentWindow.Create();
+            JournalWindow.Create();
+            JournalNotices.CheckPages();
             MinimapHud.Create();
         }
     }

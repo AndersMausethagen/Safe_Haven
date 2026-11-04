@@ -146,6 +146,14 @@ MonoBehaviour:
   bleeds: 1
   bloodColor: {r: 0.03, g: 0.025, b: 0.03, a: 0.95}
   ragdollOnDeath: 1
+  fallsByAnimation: 0
+  sizeVariation: 0
+  shadeVariation: 0
+  portrait: {fileID: 21300000, guid: 7f709feef0127764d96cab70ec00d2a2, type: 3}
+  journalLore: A draug that still remembers its shield wall. Whoever it was standing beside has been gone for centuries, and it has not noticed.
+  journalAdvice: Nothing gets through from the front. Get behind it, wait for it to strike, or break its guard with something heavy. Once staggered it can be finished like any draug.
+  journalHabitat: Barrows, usually near other draugar
+  journalKillsToKnow: 3
   deathSound: {fileID: 11400000, guid: c8b7123b6caa1c14e935baba896b65c4, type: 2}
   hurtSound: {fileID: 11400000, guid: c7af8f8fda6cc8c459862c2e1b8f45d5, type: 2}
   attackSound: {fileID: 11400000, guid: 7e51bc362b9491a4a925a4713f0aace1, type: 2}

@@ -181,6 +181,14 @@ MonoBehaviour:
   bleeds: 1
   bloodColor: {r: 0.03, g: 0.025, b: 0.03, a: 0.95}
   ragdollOnDeath: 1
+  fallsByAnimation: 0
+  sizeVariation: 0.05
+  shadeVariation: 0.08
+  portrait: {fileID: 21300000, guid: 8d3f77f369f27ae4181654ccdf07ff80, type: 3}
+  journalLore: The dead of the barrows, still in their mail. They were buried with honour and in good iron, and they remember only the iron. Old stories say fire ends them.
+  journalAdvice: Slow, patient and hard to stop, and its touch is grave-cold. It will raise a war cry to rally others. Staggered and struck from behind it can be finished outright, but it has hands enough to parry what it sees coming.
+  journalHabitat: The old barrows and the ground around them
+  journalKillsToKnow: 3
   deathSound: {fileID: 11400000, guid: bcd71f943ff486449a5096064ea50c03, type: 2}
   hurtSound: {fileID: 11400000, guid: 98120c428fb09cc46a6ef3c5133e921e, type: 2}
   attackSound: {fileID: 11400000, guid: e5b4ec0e77fbe874bbcab6134ff131df, type: 2}

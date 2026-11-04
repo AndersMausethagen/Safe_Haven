@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Anything But Porridge
   description: Eirik would give a lot for something other than porridge. He handed you a rod and a handful of grubs. Catch two fish in the lake south of the road.
   chain: Prologue - Before the Road
+  journalNotes: Nobody has ever been talked out of porridge on an expedition, but Eirik keeps trying.
   rank: 2
   availableObjective: 
   announceStart: 1

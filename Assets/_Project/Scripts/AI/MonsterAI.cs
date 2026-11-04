@@ -329,7 +329,8 @@ public sealed partial class MonsterAI : MonoBehaviour, IEventSubject, IStaggerab
         pack = GetComponentInParent<MonsterPack>();
         targeting.Bind(transform, definition, combatant, damageable, agent, targetLayers);
         Transform visual = transform.Find("Model");
-        pose = visual != null ? new MonsterPose(visual) : null;
+        CreatureLook.Vary(visual, definition);
+        pose = visual != null ? new MonsterPose(visual) { RestsByAnimation = HasRestClip(visual) } : null;
         if (pose != null && damageable != null)
         {
             // The pose recoils from blows and owns the model's scale, so the generic squash would fight it.
@@ -776,6 +777,11 @@ public sealed partial class MonsterAI : MonoBehaviour, IEventSubject, IStaggerab
         {
             spotted.ShowSpotted();
         }
+        if (global::Player.IsPlayer(targetComponent.gameObject))
+        {
+            CreatureRecords.NoteMet(definition);
+        }
+
         if (global::Player.IsPlayer(targetComponent.gameObject) && Time.time >= nextSpottedSoundAt)
         {
             nextSpottedSoundAt = Time.time + SpottedSoundSpacing;
@@ -784,6 +790,28 @@ public sealed partial class MonsterAI : MonoBehaviour, IEventSubject, IStaggerab
 
         WorldNoise.Emit(transform.position, rules.SpottedCallRadius);
     }
+
+    // A body with a clip to rest in uses it, rather than being tipped and pressed down whole.
+    private static bool HasRestClip(Transform visual)
+    {
+        if (!visual.TryGetComponent(out Animator animator) || animator.runtimeAnimatorController == null)
+        {
+            return false;
+        }
+
+        foreach (AnimatorControllerParameter parameter in animator.parameters)
+        {
+            if (parameter.name == MonsterAnimationDriver.RestingParameter)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>True while it grazes or sleeps.</summary>
+    public bool IsResting => pose != null && pose.Rest > 0.25f;
 
     // Body language (MonsterPose) after movement, so it shows this frame's attack and stagger.
     private void LateUpdate()

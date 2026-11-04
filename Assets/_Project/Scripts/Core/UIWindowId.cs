@@ -38,4 +38,6 @@ public enum UIWindowId
     Build = 15,
     /// <summary>The cheat menu for playtesting (F1).</summary>
     Cheats = 16,
+    /// <summary>The journal (J): backstory, quests, creatures and how things work.</summary>
+    Journal = 17,
 }

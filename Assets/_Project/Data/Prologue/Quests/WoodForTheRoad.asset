@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Wood for the Road
   description: The expedition never has enough firewood. Eirik gave you a hatchet. Fell a tree on the slope north of the road and bring six logs.
   chain: Prologue - Before the Road
+  journalNotes: Any tree can be felled with an axe. Bigger trees give more logs, and now and then something better than plain wood.
   rank: 2
   availableObjective: 
   announceStart: 1

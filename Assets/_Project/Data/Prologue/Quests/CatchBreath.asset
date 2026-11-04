@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: A Moment of Warmth
   description: A fire and a warm meal at last. Sit a while and talk to the others. It won't last.
   chain: Prologue - The Unquiet Forest
+  journalNotes: If you have anything to ask anyone, this is when to do it. They are more honest around a fire.
   rank: 0
   availableObjective: Speak to Sigrid beside the campfire to begin the rest.
   announceStart: 0

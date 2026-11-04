@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Strength for the Road
   description: 'Eirik was right: nobody fights well on an empty stomach, and you will be walking people home through the Misty Woods. Pick berries, fetch water from the stream and stew a meal at the campfire.'
   chain: The First Days
+  journalNotes: You'll be walking people home through bad country, and the meal before a raid goes through the portal with you. Get in the habit of it.
   rank: 0
   availableObjective: 
   announceStart: 1

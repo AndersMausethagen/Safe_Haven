@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: A Lesson from Eirik
   description: Eirik would rather you learned on a dummy and a rootling than on whatever waits down the road. He is right, and it will only take a moment.
   chain: Prologue - Before the Road
+  journalNotes: 'Eirik was a soldier before this and teaches the way soldiers do: briefly, and assuming you''ll need it by nightfall. What he is really showing you is that a staggered enemy struck from behind takes the most. The Mechanics tab has the rest.'
   rank: 2
   availableObjective: 
   announceStart: 1
