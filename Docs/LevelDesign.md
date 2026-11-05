@@ -10,9 +10,9 @@ terrain paint. Raid maps have their own painted workflow (the Map Painter on "Ra
 
 | Tab | What is there |
 |---|---|
-| **Place** | Every level prefab as a picture, in groups (Rocks & Cliffs, Trees, Forest Floor, Resources, Buildings, Raid, Creatures, Other) with a search box. Click one, then click in the Scene view: a preview follows the mouse and sits on the ground (or on a rock); each click places one, with a new random turn and size. **R** turns the next one (Shift+R back), **[ ]** size, **Esc** or right-click stops. Or drag a picture into the Scene view. Placed objects go under "Level Props" (in a raid map, under its Map Content, so they turn with the map). Also the Scatter Brush and Drop to Ground |
-| **Terrain** | Sculpt & Paint (selects the terrain in view, whose Inspector has Unity's brushes), the Terrain Toolbox, Gentle Relief, the World Builder's rivers, paths, cliffs and forests, Build Now, the Dark Forest or Haven look, Auto-Paint, moss, Rebake NavMesh |
-| **Water & Plants** | Ponds, straight rivers, waterfalls, making a mesh water, carving a bed; grass and plants |
+| **Place** | Every level prefab as a picture, in groups (Rocks & Cliffs, Trees, Forest Floor, Plants & Grass, Resources, Buildings, Raid, Creatures, Other) and by set (**Forest Lake**, **Mossy Forest**, **Original**; see "The two looks" below), with a search box. Click one, then click in the Scene view: a preview follows the mouse and sits on the ground (or on a rock); each click places one, with a new random turn and size. **R** turns the next one (Shift+R back), **[ ]** size, **Esc** or right-click stops. Or drag a picture into the Scene view. Placed objects go under "Level Props" (in a raid map, under its Map Content, so they turn with the map). Also the Scatter Brush and Drop to Ground |
+| **Terrain** | Sculpt & Paint (selects the terrain in view, whose Inspector has Unity's brushes), the Terrain Toolbox, Gentle Relief, the World Builder's rivers, paths, cliffs and forests, Build Now, the Dark Forest (Mossy Forest) or Haven (Forest Lake) look, Auto-Paint, moss, **Paint ground (tessellated)**, Rebake NavMesh |
+| **Water & Plants** | Ponds, straight rivers, waterfalls, making a mesh water, carving a bed; grass and plants, and **Add Forest Lake / Mossy Forest Plants** (the look's grass, moss, ferns and flowers as terrain details for Paint Details) |
 | **Sky & Weather** | The Sky Controller, the day/night and weather rig, shared wind, fog set-up, fog presets and fog areas |
 | **Scene** | Make Playable (as Safe Haven or as a Raid) and what is missing |
 
@@ -49,6 +49,20 @@ into one you can press Play in:
   wake-up point, portal or Portal. It also counts what Level Check finds.
 
 A home scene saves into the save file like the real Haven does when you play it.
+
+### Scene hierarchy (folders)
+
+Every gameplay scene keeps its top level in numbered folders: **00 Systems** (game state, save keys, persistence, scene
+audio, NavMesh, view bounds), **01 Player & Cameras**, **02 Lighting & Atmosphere** (sun, volumes, Sky and Weather,
+Atmosphere, wind), **03 UI**, **04 World** (terrain, the World Builder's **World**, water, raid map, hand-placed trees,
+overgrowth), **05 Gameplay** (portal, gathering, forage, residents, raids, spawns, test areas), **06 Story & Events**
+(story scripts, moments, event reactions) and **07 Ambience** (fireflies, birds, canopy debris, insect sounds). Folders
+are empty objects at the origin, so filing an object changes nothing in play. **Safe Haven › Scene › Tidy Hierarchy**
+files loose objects (and re-files misplaced ones) by what they are; Make Playable does it too, and the World Builder,
+Scatter Brush, Place tool, sky and atmosphere set-up put new top-level objects in the right folder and find theirs
+inside one (`SceneFolders`). A Prologue-style NavMesh that bakes only its children holds the level, so it is filed under
+World with its children. Scenes of five objects or fewer (main menu, results) are left as they are; GameplayTestScene
+keeps its own numbered layout.
 
 ## Mob Spawn Zones and Random Resource Nodes
 
@@ -90,11 +104,11 @@ alongside it.
 
 | Menu | Makes |
 |---|---|
-| **River** / **River (Haven)** | A river with a gravel bed and muddy (or, in the Haven, earthy) banks, stones in the water and ferns on the banks |
-| **Path (Forest)** / **Path (Haven)** | A trodden path (mud in the forest, a grassy track in the Haven) |
-| **Cliff** | A cliff or crag of scanned rock faces with rubble at its foot |
-| **Dark Forest Area** | Dense, clumped spruce with dead trees, stumps, logs, ferns and mossy boulders (the Gord-like raid forest) |
-| **Haven Grove Area** | Open oak groves, a few pines, mossy boulders and ferns by the water (the light, green Haven) |
+| **River** / **River (Haven)** | A river with a rocky bed and earthy banks, stones in the water and ferns on the banks: the Mossy Forest's (cedar rock and soil, mossy stones) or the Forest Lake's (lake rock and banks, lake stones and ferns) |
+| **Path (Forest)** / **Path (Haven)** | A trodden path (bare cedar soil in the forest, the Haven's path ground) |
+| **Cliff** / **Cliff (Haven)** | A cliff or crag of tessellated rock with rubble at its foot: the Mossy Forest's cliff boulders, slabs and outcrops, or the Forest Lake's lake crags |
+| **Dark Forest Area** | The Mossy Forest: dense, clumped cedars, young cedars, mossy logs and stumps, ferns and shrubs, mossy boulders (the raids' forest) |
+| **Haven Grove Area** | The Forest Lake: open groves of sugar maples and a few cedars, saplings, logs and stumps, lake boulders, ferns by the water (the light, green Haven) |
 
 The new feature goes under a **World** object in the scene and starts in **Draw** mode: click points on the ground,
 **Backspace** removes the last, **Enter** or **Esc** finishes. Areas close their loop when you finish.
@@ -140,11 +154,12 @@ Draw where the face should stand; the **high side** is on the left of the drawin
   **Cut** digs the low side down (a ravine or quarry wall); **Rocks Only** leaves the terrain and only stands rocks.
   A wide plateau makes a terrace; a narrow one a ridge (a river cuts through a ridge but falls over a terrace).
 - **Face Depth** is the horizontal depth of the face (smaller is steeper); **Raggedness** breaks its line.
-- **Kit** (a Cliff Kit, default *Rock Faces*: scanned rock faces and a crag) stands pieces along the face. Each is
+- **Kit** (a Cliff Kit: *Mossy Forest Crags* or *Haven Lake Crags*; the older *Rock Faces* of scanned rock faces still
+  works) stands pieces along the face. Each is
   sized to the face's height (stacked in rows on tall faces), turned with its finished side out and stood upright
   (scans often lean), its top set on the rim and the bulk of its face on the cliff face; the rest is buried. **Inset**
   moves the face back into the slope (0 covers the whole face), **Overlap** closes the gaps, **Size Variation** varies them.
-- **Rubble** (default *Cliff Rubble*) gathers at the foot; **Rock Layer** (default *Gravel*) paints the scree.
+- **Rubble** (default: the look's *Rubble*) gathers at the foot; **Rock Layer** (default: the look's rock ground) paints the scree.
 - A Cliff Kit (Create › Safe Haven › World › Cliff Kit) lists pieces with a weight. **Measure Pieces** works out each
   piece's facing, lean and size from its mesh; correct **Face Yaw** / **Face Tilt** by hand if a piece faces wrong.
 
@@ -165,10 +180,13 @@ uses: steepness, height, hollows, patches), fading in over **Edge Fade** metres 
 It builds before paths and rivers (order 5), so they paint over it, and a forest area grows on top of it. Point
 **Rules** at any Paint Rules asset (Create › Safe Haven › World › Terrain Paint Rules) for your own look.
 
-- *Haven Meadow*: meadow grass, lush patches, trodden earth in hollows.
-- *Old-Growth Forest* (Norwegian old growth, round the Haven): Forest Moss (a dark moss carpet), Muddy Bank (moss on
-  mud) and Forest Litter in patches, Dark Humus (near-black soil) in hollows. Under Safe Haven's groves.
-- *Dark Forest* (raids): pine-needle floor, mossy floor, muddy banks.
+- *Haven Meadow* (*Haven Lake Paint - Haven Meadow*): Haven meadow, lush moss patches, the Haven path in hollows.
+- *Old-Growth Forest* (*Haven Lake Paint - Old-Growth Forest*, round the Haven): old moss, banks and litter in patches,
+  humus in hollows. Under Safe Haven's groves.
+- *Dark Forest* (*Mossy Forest Paint - Dark Forest*, raids): cedar litter, cedar moss patches, cedar soil in hollows.
+
+The menus use the looks' rule sets; the original sets (*Paint Rules - …* in Data/World, on the PolyHaven ground layers)
+are still there for scenes that use them.
 
 The forest floor layers come with every map: colour, OpenGL normal, a mask (occlusion, height, smoothness) and the
 height (displacement), occlusion and roughness on their own. The terrain blends layers by height (Enable Height-based
@@ -183,10 +201,13 @@ keeps the ground under the features). Its Inspector:
 - **Keep Objects On Ground**: props, nodes and buildings standing on the ground move up or down with it when a feature
   reshapes the ground under them.
 - **Rebake NavMesh After Build** (off: slow) or **Rebake NavMesh** when you are done.
-- **Dark Forest Look** / **Haven Look**: the world terrain material and the matching paint rules.
-- **Auto-Paint with Rules** paints the whole terrain by its shape from **Paint Rules** (*Paint Rules - Dark Forest*:
-  pine-needle floor, moss patches, mud in hollows; *Paint Rules - Haven Meadow*: meadow grass, lush patches, trodden
-  earth in hollows). Each rule paints a layer by steepness, height, hollow or ridge, broken into patches; later rules
+- **Dark Forest Look** / **Haven Look**: the Mossy Forest or Forest Lake look. The terrain gets its own copy of the
+  look's tessellated material (its rock on steep ground, anti-tiling, colour variation and displacement settings, via
+  Enable or Refresh Displacement), the look's paint-rule grounds are added to its layers, and its **Paint Rules** are
+  set. The TerrainData must be saved as an asset.
+- **Auto-Paint with Rules** paints the whole terrain by its shape from **Paint Rules** (*Mossy Forest Paint - Dark
+  Forest*: cedar litter, moss patches, soil in hollows; *Haven Lake Paint - Haven Meadow*: meadow, lush moss patches,
+  path ground in hollows). Each rule paints a layer by steepness, height, hollow or ridge, broken into patches; later rules
   paint over earlier ones. Features paint over the result; hand painting afterwards is kept.
 - A feature that needs more room (a deep bed, a tall cliff) moves and stretches the terrain to fit, without moving the
   ground.
@@ -202,8 +223,52 @@ takes back both. Opening a scene never rebuilds or dirties it.
 ground turns to a rock texture projected from three sides (no stretching on cliffs or steep banks), fully rock at
 **Fully Rock At**, with a **Ragged Edge**. Rock Colour / Normal / Mask (default: Cliff Rock, mossy lichen rock), Size,
 Tint and Normal Strength are on the material (*World Terrain (Dark Forest)* and *(Haven)* in Art/Terrain/World). It is
-generated from URP's shader by `AgentScripts/GenerateWorldTerrainShader.py`: run it again after a URP upgrade. It works
+generated from URP's shader by `AgentScripts/GenerateWorldTerrainShader.py`: run it again after a URP upgrade (give it
+a folder to write a copy there instead, to compare with the shader in use). The generator also writes the layers'
+**Hide Repetition** (each layer sampled a second time, turned and scaled, picked by slow noise), **Large Colour
+Variation** (kept at or below white: brighter albedo made the lighting blow up into flashing black and white blocks
+under bloom) and the skipping of layers with no weight at a pixel. `WorldTerrainDisplacement.hlsl` and
+`WorldTerrainDomain.hlsl` are written by hand. It works
 best with up to 4 ground layers per terrain (above 4 URP draws the terrain twice and the rock blends less).
+
+The rock is **tessellated** too: **Rock Relief** pushes it out along the slope by the rock
+mask's height (blue channel), projected from three sides like its colour, so cliffs and steep banks have real relief
+where the ground's own displacement fades out (calibrated to span 8 cm, see below). **Rock Relief Midpoint** is the rock's average height, measured from the
+mask by Enable or Refresh Displacement.
+
+There are two rocks: **rocky ground** (the Rock textures: the look's Haven Rock or Cedar Rock) on steep slopes, and
+**Cliff Rock** (the Cliff Rock textures) on the steepest drops. With **Rock From Painted Layers** on (Haven and the
+Prologue), they are *paint*: wherever a ground marked **Rocky** or **Cliff** in the terrain's Surface Profile is painted,
+that rock is drawn from three sides with its relief, and painting any other ground over it replaces it. World Tools ›
+Terrain › **Rock on Steep Ground** (and the Look buttons) paints them by slope over what is there: rocky ground past the
+material's **Rock Starts At** (Haven 42°), Cliff Rock past **Cliff Rock Starts At** (56°), with ragged edges. Paint
+Haven Rock / Cliff Rock (Paint ground › Forest Lake / Original) to add rock by hand. Faces steeper than **Always Rock
+Above** (50°) are rock whatever is painted: paint is laid from above, so past about 50° any ground stretches (by
+1/cos of the slope), and a short wall only one height cell wide never reads steeper than about 60° to the shader (its
+normals are averaged with the flat ground above and below), so a higher threshold missed exactly those walls. What is
+painted near such a face still picks Haven Rock or Cliff Rock; with nothing rocky painted it is Cliff Rock. Without
+painted rock (generated raid maps), both rocks follow the slope.
+
+#### Where the relief comes from, and how big it is
+
+Each ground's displacement is its height map: the Surface Profile's own height texture for a layer, or else the blue
+channel of the layer's mask. Ground converted from the packs (`VegetationPackConverter.Ground`) gets the pack's real
+height map in that blue channel, found by the colour texture's name (Mountain Lake keeps its height maps apart from its
+terrain layers), read straight from the file (packs import height maps as sRGB colour, and that gamma curve flattens
+hollows and sharpens peaks), uncompressed (block compression steps the height). The packs' mask height remap is HDRP's
+height *amplitude and base* for blending between layers (HDRP terrain never displaces), not a range to stretch heights
+to: reading it as one clipped 43% of Haven Rock flat at the top, which is what made it spiky.
+
+Heights come normalised to 0-1 over whatever range each scan had, so one amplitude cannot suit them all. **Safe Haven ›
+World › Terrain › Calibrate Ground Relief** (`GroundRelief`) sets, for every ground of every terrain profile, the
+midpoint to the height map's own average (the ground stays level on average) and the amplitude so its 1st-99th
+percentile spans a real height: **2 cm** for moss, grass and litter, **3 cm** for soil, paths and banks, **6 cm** for
+stones and rock; and the steep rock's **Rock Relief** so it spans **8 cm**, all at **Relief ×1**. **World Tools ›
+Terrain › Ground relief › Relief ×** is the live dial: it scales every ground and the steep rock together, keeping
+their proportions, by setting the material's displacement strength (×1 = strength 0.1, `GroundRelief.ReferenceStrength`)
+and rock relief; the line under it shows the resulting centimetres. All terrains start at ×3. It rebuilds every
+terrain's displacement on a stand-in terrain, so no open scene changes. **Recalibrate Grounds** (or the menu item) after
+adding a ground or changing a height map; it keeps each terrain's Relief ×.
 
 #### True terrain displacement
 
@@ -222,8 +287,11 @@ Detail fades smoothly with distance and on steep cliffs.
 Forward, deferred, shadow, depth, depth-normal, selection and distant base-map passes share the displaced surface.
 The existing mesh-only *Forest Ground ASE* shader is not used for this: it does not preserve the terrain's painted layers.
 
-Painting existing layers updates displacement immediately. Run the command again after changing the layer list, tiling,
-height remaps or source mask textures, or after switching between Haven / Dark Forest looks. Refresh keeps the material's
+Painting existing layers updates displacement immediately. Adding, removing or reordering layers (Unity's Paint
+Texture tool, a layer palette, World Tools) rebuilds the displacement data by itself a moment later
+(`TerrainLayerWatcher`, for terrains already set up); run the command again after changing tiling,
+height remaps or source mask textures. A new layer takes its height settings from a terrain where it is already tuned
+(the Haven's first). Refresh keeps the material's
 displacement tuning. Height copies now use linear **RHalf** textures (16-bit floating point), at 512, 1024 or 2048 per layer;
 source textures and TerrainData are not modified. Higher precision preserves available input detail; it cannot recover
 detail already lost in a compressed/low-resolution source map.
@@ -369,6 +437,32 @@ All CC0 (free for any use, no credit needed; see `Models/PolyHaven/LICENSE.md`),
 - **Data/World**: the Rock Faces cliff kit and the two paint rule sets.
 
 Safe Haven › World › **Set Up World Assets** remakes anything missing (existing assets are kept).
+
+### The two looks (converted packs)
+
+The world is now built from two packs converted to the project's shaders by `VegetationPackConverter` (trees on Tree
+Wind and fellable, rocks, logs and stumps on the tessellated Mesh Surface with their height maps, ground layers with
+height in the mask). `WorldLook` describes each, and World Tools uses them everywhere:
+
+| | **Forest Lake** (Mountain Lake: the Haven, the Prologue meadow) | **Mossy Forest** (Mossy Cedrus: the raids, the Prologue forest) |
+|---|---|---|
+| Prefabs | Art/Vegetation/Safe Haven (sugar maples and saplings, lake boulders, stones and crags, ferns, grass and flowers) | Art/Vegetation/Misty Woods (cedars, young cedars, cliff boulders, slabs, outcrops, mossy logs and stumps, shrubs, ferns, moss, grass) |
+| Ground layers | 9 in Art/Vegetation/Safe Haven/Ground (Haven Meadow, Lush Moss, Path, Mossy Ground, Rock, Old Moss, Bank, Litter, Humus) | 4 in Art/Vegetation/Misty Woods/Ground (Cedar Litter, Moss, Soil, Rock) |
+| Data (Data/World/…) | Safe Haven: *Haven Lake* Trees, Young Trees, Forest Floor, Boulders, Ferns, River Stones, Riverbank, Rubble, Crags, two paint rule sets | Mossy Forest: *Mossy Forest* Trees, Young Trees, Forest Floor, Undergrowth, Boulders, River Stones, Riverbank, Rubble, Crags, Dark Forest paint rules |
+| Terrain material | Haven World Terrain Displacement | MistyWoods Map Terrain Displacement |
+| Layer palette | *Forest Lake Ground* | *Mossy Forest Ground* |
+
+Set Up World Assets makes the Mossy Forest's data where missing (its palettes start as copies of the Prologue forest's).
+The raw packs (Assets/SeedMesh, Assets/VIVID_Arts) are not offered: their own shaders don't match the game's look.
+
+#### Painting the ground (tessellated)
+
+World Tools › Terrain › **Paint ground (tessellated)** shows every ground of a set as a picture. Click one: it joins
+the terrain in view if missing (up to 16), the terrain's displacement is rebuilt so the new ground has its relief at
+once, and Unity's Paint Texture brush opens on it (best effort: if Unity changes its terrain inspector, pick the brush
+by hand). **Refresh Relief** rebuilds the displacement by hand; **Layer Palettes** makes a Terrain Tools layer palette
+per look, so Paint Texture › Layer Palette adds a whole look at once. Terrains not yet on the tessellated shader get it
+from a Look first.
 
 **Safe Haven** is made with it too (`AgentScripts/BuildHavenWorld.cs`): one 400 m terrain round the portal in the
 Haven look, a flat clearing, hills rolling outward and the land rising north to a crag (*North Crag*), a Haven river

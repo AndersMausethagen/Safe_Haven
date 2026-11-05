@@ -29,6 +29,8 @@ public sealed class RaidMapDefinition : ScriptableObject
         [Range(0, Tiers.Max)] public int fromTier;
         [Tooltip("The highest raid tier it grows at, on a generated map. 0: any.")]
         [Range(0, Tiers.Max)] public int toTier;
+        [Tooltip("Where it belongs: slope, forest density, wet or dry ground, edges, closeness to trunks, groves and room.")]
+        public RaidScatterHabitat habitat = new RaidScatterHabitat();
 
         public bool AppearsAt(int tier) => tier <= 0 || ((fromTier <= 0 || tier >= fromTier) && (toTier <= 0 || tier <= toTier));
     }
@@ -81,6 +83,10 @@ public sealed class RaidMapDefinition : ScriptableObject
     [SerializeField] private TerrainLayer cliffLayer;
     [Tooltip("Slopes (degrees) where rock starts to show, and where it covers everything.")]
     [SerializeField] private Vector2 cliffSlope = new Vector2(30f, 42f);
+    [Tooltip("Optional fourth layer: needles and leaves under the densest canopy, in patches, never on wet ground. Empty: three layers.")]
+    [SerializeField] private TerrainLayer litterLayer;
+    [Tooltip("How much of the deep forest's floor the litter covers (0 none, 1 all of it).")]
+    [SerializeField, Range(0f, 1f)] private float litter = 0.6f;
 
     [Header("Growth")]
     [Tooltip("Grass, bushes and plants on each painted layer, grown on every map when a raid loads.")]
@@ -104,6 +110,13 @@ public sealed class RaidMapDefinition : ScriptableObject
     [SerializeField, Range(0f, 1f)] private float rocksAtCliffs = 0.5f;
     [Tooltip("Chance of a rock or log in each spot of open forest.")]
     [SerializeField, Range(0f, 1f)] private float rocksInForest = 0.05f;
+
+    [Header("Undergrowth")]
+    [Tooltip("Saplings, shrubs and forest-floor clutter, placed after the trees in the gaps and edges their habitat favours.")]
+    [SerializeField] private List<Scatter> undergrowth = new List<Scatter>();
+    [SerializeField, Min(0.5f)] private float undergrowthSpacing = 2.5f;
+    [Tooltip("Chance of undergrowth in each spot that suits something.")]
+    [SerializeField, Range(0f, 1f)] private float undergrowthChance = 0.5f;
 
     [Header("Sites")]
     [SerializeField] private List<SiteRule> siteRules = new List<SiteRule>();
@@ -138,6 +151,13 @@ public sealed class RaidMapDefinition : ScriptableObject
     public TerrainLayer PathLayer => pathLayer;
     public TerrainLayer CliffLayer => cliffLayer;
     public Vector2 CliffSlope => cliffSlope;
+    public TerrainLayer LitterLayer => litterLayer;
+    public float Litter => litter;
+
+    /// <summary>The terrain layers in paint order: forest, path, cliff, then litter when the map has one.</summary>
+    public TerrainLayer[] Layers => litterLayer != null
+        ? new[] { forestLayer, pathLayer, cliffLayer, litterLayer }
+        : new[] { forestLayer, pathLayer, cliffLayer };
     public IReadOnlyList<TerrainGrowth.Ground> Growth => growth;
     public IReadOnlyList<TerrainGrowth.Plant> Plants => plants.Count > 0 ? plants : TerrainGrowth.DefaultPlants;
     public IReadOnlyList<Scatter> Trees => trees;
@@ -148,6 +168,9 @@ public sealed class RaidMapDefinition : ScriptableObject
     public float RockSpacing => rockSpacing;
     public float RocksAtCliffs => rocksAtCliffs;
     public float RocksInForest => rocksInForest;
+    public IReadOnlyList<Scatter> Undergrowth => undergrowth;
+    public float UndergrowthSpacing => undergrowthSpacing;
+    public float UndergrowthChance => undergrowthChance;
     public int ScatterSeed => scatterSeed;
 
     /// <summary>The rule for a kind of site; one point exactly on the marker when there is none.</summary>
@@ -262,6 +285,14 @@ public sealed class RaidMapDefinition : ScriptableObject
         }
 
         foreach (Scatter scatter in rocks)
+        {
+            if (scatter != null && !scatter.AppearsAt(tier))
+            {
+                scatter.weight = 0f;
+            }
+        }
+
+        foreach (Scatter scatter in undergrowth)
         {
             if (scatter != null && !scatter.AppearsAt(tier))
             {

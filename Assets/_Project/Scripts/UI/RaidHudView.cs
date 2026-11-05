@@ -83,6 +83,7 @@ public sealed class RaidHudView : MonoBehaviour
         if (director == null && RaidDirector.Current != null)
         {
             director = RaidDirector.Current;
+            raidNameLabel.color = UIStyle.Current.AccentFor(true);
             director.Ended += OnRaidEnded;
             director.StageChanged += OnStageChanged;
             alerts = new RaidAlertLine();

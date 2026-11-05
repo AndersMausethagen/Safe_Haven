@@ -61,6 +61,8 @@ public sealed class TreeImpacts : MonoBehaviour
     private void FindNeighbours()
     {
         float reach = parts.Height + 3f;
+        // Trees drawn without scripts (NodeStreaming) in its way are given their live selves first, so they can sway.
+        NodeStreaming.WakeNear(parts.Base, reach);
         foreach (Collider other in Physics.OverlapSphere(parts.Base, reach, ~0, QueryTriggerInteraction.Ignore))
         {
             ChoppableTree tree = other.GetComponentInParent<ChoppableTree>();
@@ -119,7 +121,7 @@ public sealed class TreeImpacts : MonoBehaviour
         TreeParts struck = other.Tree != null ? other.Tree.Knocked(velocity, degrees) : other.Terrain.Knocked(other.Index, velocity, degrees);
         if (struck != null && struck.HasFoliage)
         {
-            TreeEffects.Play(rules.LeafFall, struck.Base + struck.Crown.center, Quaternion.identity, struck.Crown.size, struck.LeafTint, Mathf.RoundToInt(10f + degrees * 8f));
+            TreeEffects.Play(struck.LeafFall != null ? struck.LeafFall : rules.LeafFall, struck.Base + struck.Crown.center, Quaternion.identity, struck.Crown.size, struck.LeafTint, Mathf.RoundToInt(10f + degrees * 8f));
         }
 
         // All of its motion, not only its spin: on the hinge, whatever speed is left in its middle would turn straight back into spin.

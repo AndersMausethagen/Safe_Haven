@@ -42,7 +42,8 @@ public sealed class GroundPaintTests
         {
             GroundPaintArea[] floors = scene.GetRootGameObjects().SelectMany(r => r.GetComponentsInChildren<GroundPaintArea>(true)).ToArray();
             Assert.AreEqual(4, floors.Length);
-            Assert.IsTrue(floors.All(f => f.Rules == WorldAssets.PaintRules("Old-Growth Forest") && f.IsArea && f.Spline.Closed));
+            Assert.IsTrue(floors.All(f => f.Rules == WorldLook.ForestLake.Rules("Old-Growth Forest") && f.IsArea && f.Spline.Closed),
+                          "the Forest Lake's old-growth floor");
         }
         finally
         {

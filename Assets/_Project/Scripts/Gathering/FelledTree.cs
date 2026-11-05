@@ -92,7 +92,7 @@ public sealed class FelledTree : MonoBehaviour
         float clear = reach;
         foreach (RaycastHit hit in Physics.RaycastAll(parts.Base + Vector3.up * 2f, direction, reach, ~0, QueryTriggerInteraction.Ignore))
         {
-            if (hit.collider.GetComponentInParent<ChoppableTree>() == null && hit.collider.attachedRigidbody == null)
+            if (hit.collider.GetComponentInParent<ChoppableTree>() == null && !NodeStreaming.IsDormantTree(hit.collider) && hit.collider.attachedRigidbody == null)
             {
                 clear = Mathf.Min(clear, hit.distance);
             }
@@ -243,7 +243,7 @@ public sealed class FelledTree : MonoBehaviour
 
         if (parts.HasFoliage)
         {
-            TreeEffects.Play(rules.LeafFall, crown, transform.rotation, parts.Crown.size, parts.LeafTint, Mathf.RoundToInt(60f * size));
+            TreeEffects.Play(parts.LeafFall != null ? parts.LeafFall : rules.LeafFall, crown, transform.rotation, parts.Crown.size, parts.LeafTint, Mathf.RoundToInt(60f * size));
         }
 
         float length = trunk.height;

@@ -307,12 +307,12 @@ public sealed class WorldTerrainEditor : Editor
 
         using (new EditorGUILayout.HorizontalScope())
         {
-            if (GUILayout.Button(new GUIContent("Dark Forest Look", "World terrain material (rock on steep ground) and the dark forest paint rules")))
+            if (GUILayout.Button(new GUIContent("Dark Forest Look", "The Mossy Forest: tessellated terrain material with its rock, its grounds and paint rules")))
             {
                 UseLook(world, terrain, false);
             }
 
-            if (GUILayout.Button(new GUIContent("Haven Look", "World terrain material, lighter, and the green meadow paint rules")))
+            if (GUILayout.Button(new GUIContent("Haven Look", "The Forest Lake: tessellated terrain material with its rock, its grounds and meadow paint rules")))
             {
                 UseLook(world, terrain, true);
             }
@@ -331,15 +331,48 @@ public sealed class WorldTerrainEditor : Editor
         }
     }
 
-    /// <summary>The world terrain material (rock on steep ground) and the matching paint rules: the dark raid forest's or
-    /// the light, green Haven's.</summary>
-    public static void UseLook(WorldTerrain world, Terrain terrain, bool haven)
+    /// <summary>The look's terrain material (tessellated, with its rock on steep ground), its ground layers and its paint
+    /// rules: the Mossy Forest of the raids, or the Haven's Forest Lake.</summary>
+    public static void UseLook(WorldTerrain world, Terrain terrain, bool haven) =>
+        UseLook(world, terrain, haven ? WorldLook.ForestLake : WorldLook.MossyForest);
+
+    public static void UseLook(WorldTerrain world, Terrain terrain, WorldLook look)
     {
         WorldAssets.EnsureAll();
-        Undo.RecordObjects(new Object[] { world, terrain }, "World Terrain Look");
-        terrain.materialTemplate = WorldAssets.TerrainMaterial(haven);
+        TerrainData data = terrain.terrainData;
+        Undo.RecordObjects(new Object[] { world, terrain, data }, "World Terrain Look");
+        TerrainPaintRules rules = look.Rules(look.PaintLooks[0]);
+        world.PaintRules = rules;
+        if (rules != null)
+        {
+            // The rules' grounds join the terrain's layers, so the rules (and the brush) can paint them.
+            var layers = data.terrainLayers.ToList();
+            foreach (TerrainPaintRules.Rule rule in rules.Rules)
+            {
+                if (rule.layer != null && !layers.Contains(rule.layer) && layers.Count < 16)
+                {
+                    layers.Add(rule.layer);
+                }
+            }
+
+            data.terrainLayers = layers.ToArray();
+        }
+
         terrain.basemapDistance = Mathf.Max(terrain.basemapDistance, 1000f);
-        world.PaintRules = WorldAssets.PaintRules(haven);
+        Material template = look.TerrainTemplate;
+        if (template != null && !string.IsNullOrEmpty(AssetDatabase.GetAssetPath(data)))
+        {
+            // The terrain gets its own tessellated material from the look (TerrainDisplacementEditor copies it in).
+            terrain.materialTemplate = template;
+            TerrainDisplacementEditor.Apply(terrain);
+            Debug.Log($"{terrain.name}: {look.Name} look; rock: {TerrainRock.PaintSteepGround(terrain, look)}.", terrain);
+        }
+        else
+        {
+            terrain.materialTemplate = WorldAssets.TerrainMaterial(look == WorldLook.ForestLake);
+            Debug.LogWarning("World Terrain: save the terrain's TerrainData as an asset to give it tessellation.", terrain);
+        }
+
         EditorUtility.SetDirty(terrain);
     }
 }

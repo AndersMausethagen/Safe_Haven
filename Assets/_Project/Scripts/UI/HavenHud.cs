@@ -13,7 +13,7 @@ public sealed class HavenHud : MonoBehaviour
     private static Color Body => UIStyle.Current.Text;
     private const float GainSeconds = 2f;
     private const float BannerSeconds = 5f;
-    private const float BadgeWidth = 340f;
+    private const float BadgeWidth = 390f;
     private const float GainY = -14f;
     private const float StandingSeconds = 0.5f;
 
@@ -55,7 +55,11 @@ public sealed class HavenHud : MonoBehaviour
     {
         // Top left, under the vitals' margin: the day and weather panel has the top centre.
         RectTransform top = Rect("Badge", root, new Vector2(0f, 1f), new Vector2(BadgeWidth, 52f), new Vector2(30f + BadgeWidth * 0.5f, -40f));
-        badge = Label(top, "Rank", new Vector2(0f, 1f), new Vector2(BadgeWidth, 32f), new Vector2(BadgeWidth * 0.5f, -18f), 24f, Gold, TextAlignmentOptions.Left, true);
+        const float markSpace = 38f;
+        HearthlineArt.AddIcon(top, "Hearthmark", UIStyle.Current.Hearthmark, new Vector2(0f, 1f), Vector2.one * 30f,
+            new Vector2(15f, -18f), Gold, true);
+        badge = Label(top, "Rank", new Vector2(0f, 1f), new Vector2(BadgeWidth - markSpace, 32f),
+            new Vector2((BadgeWidth + markSpace) * 0.5f, -18f), 24f, Gold, TextAlignmentOptions.Left, true);
         standing = Label(top, "Standing", new Vector2(1f, 1f), new Vector2(BadgeWidth, 32f), new Vector2(BadgeWidth * -0.5f, -20f), 17f, Body, TextAlignmentOptions.Right);
         RectTransform bar = Rect("Bar", top, new Vector2(0.5f, 0f), new Vector2(BadgeWidth, 2f), new Vector2(0f, 12f));
         bar.gameObject.AddComponent<Image>().color = UIStyle.Current.Track;
@@ -69,6 +73,8 @@ public sealed class HavenHud : MonoBehaviour
         RectTransform plate = Rect("Rank Banner", root, new Vector2(0.5f, 0.5f), new Vector2(1100f, 190f), new Vector2(0f, 190f));
         banner = plate.gameObject.AddComponent<CanvasGroup>();
         banner.alpha = 0f;
+        HearthlineArt.AddIcon(plate, "Hearthmark", UIStyle.Current.Hearthmark, new Vector2(0.5f, 1f), Vector2.one * 34f,
+            Vector2.zero, Gold, true);
         TMP_Text kicker = Label(plate, "Kicker", new Vector2(0.5f, 1f), new Vector2(1000f, 30f), new Vector2(0f, -30f), 20f, Body);
         kicker.text = "SAFE HAVEN HAS GROWN";
         kicker.characterSpacing = 12f;

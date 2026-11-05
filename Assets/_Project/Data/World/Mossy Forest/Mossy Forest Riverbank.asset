@@ -1,0 +1,52 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b302529a90cd5d4eb925e50af633cad, type: 3}
+  m_Name: Mossy Forest Riverbank
+  m_EditorClassIdentifier: SafeHaven::ScatterPalette
+  entries:
+  - prefab: {fileID: 5380173840899507260, guid: 32b9d0e7c65bdab4281e29e754061d5c, type: 3}
+    weight: 1
+    scale: {x: 0.8, y: 1.25}
+    alignToSlope: 0.6
+    sink: 0.05
+    randomYaw: 1
+  - prefab: {fileID: 5800759485683808543, guid: ffa4f17950aca554ebe87335d7127e1c, type: 3}
+    weight: 1
+    scale: {x: 0.8, y: 1.25}
+    alignToSlope: 0.6
+    sink: 0.05
+    randomYaw: 1
+  - prefab: {fileID: 1540985237908984661, guid: e79ccac8489c27b4786e1a0a8b24093b, type: 3}
+    weight: 0.6
+    scale: {x: 0.8, y: 1.25}
+    alignToSlope: 0.6
+    sink: 0.05
+    randomYaw: 1
+  - prefab: {fileID: 8915668155572190552, guid: 726c347b106dd8c4ebe51bcfba1ac23d, type: 3}
+    weight: 0.6
+    scale: {x: 0.8, y: 1.25}
+    alignToSlope: 0.6
+    sink: 0.05
+    randomYaw: 1
+  - prefab: {fileID: 8202738798707269545, guid: ae5c35a4d0f61344791c2df137245efd, type: 3}
+    weight: 0.4
+    scale: {x: 0.8, y: 1.25}
+    alignToSlope: 0.6
+    sink: 0.05
+    randomYaw: 1
+  - prefab: {fileID: 6738502702539548217, guid: 16ad38b0dd7488f4bb2214d4b77cb4a7, type: 3}
+    weight: 0.4
+    scale: {x: 0.8, y: 1.25}
+    alignToSlope: 0.6
+    sink: 0.05
+    randomYaw: 1
+  spacing: 1.6

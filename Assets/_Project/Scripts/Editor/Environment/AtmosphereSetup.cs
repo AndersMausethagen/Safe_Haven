@@ -97,6 +97,7 @@ public static class AtmosphereSetup
             {
                 atmosphere = new GameObject(AtmosphereObject);
                 Undo.RegisterCreatedObjectUndo(atmosphere, "Add default atmosphere");
+                SceneFolders.Place(atmosphere);
             }
             if (atmosphere.GetComponent<FogGround>() == null)
                 Undo.AddComponent<FogGround>(atmosphere);
@@ -229,10 +230,11 @@ public static class AtmosphereSetup
         else
         {
             // In a raid, fog areas live under Map Content so they turn with the map.
-            GameObject content = GameObject.Find("Raid Map/Map Content");
+            RaidMap map = Object.FindAnyObjectByType<RaidMap>(FindObjectsInactive.Include);
+            Transform content = map != null ? map.transform.Find("Map Content") : null;
             if (content != null)
             {
-                area.transform.SetParent(content.transform, false);
+                area.transform.SetParent(content, false);
             }
 
             if (SceneView.lastActiveSceneView != null)
@@ -510,16 +512,5 @@ public static class AtmosphereSetup
         return "• Added the Atmosphere renderer feature to PC_Renderer.";
     }
 
-    private static GameObject FindRoot(UnityEngine.SceneManagement.Scene scene, string name)
-    {
-        foreach (GameObject root in scene.GetRootGameObjects())
-        {
-            if (root.name == name)
-            {
-                return root;
-            }
-        }
-
-        return null;
-    }
+    private static GameObject FindRoot(UnityEngine.SceneManagement.Scene scene, string name) => SceneFolders.Find(scene, name);
 }

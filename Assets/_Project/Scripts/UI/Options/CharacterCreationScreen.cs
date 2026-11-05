@@ -155,8 +155,9 @@ public sealed class CharacterCreationScreen : MonoBehaviour
         RectTransform panel = OptionsWidgets.Place(OptionsWidgets.Rect("Panel", dim), new Vector2(0.5f, 0.5f), new Vector2(1400f, 940f), Vector2.zero);
         panel.gameObject.AddComponent<Image>().color = OptionsWidgets.Panel;
         var rim = panel.gameObject.AddComponent<Outline>();
-        rim.effectColor = OptionsWidgets.Rim;
+        rim.effectColor = OptionsWidgets.WindowRim;
         rim.effectDistance = new Vector2(2f, -2f);
+        HearthlineArt.AddFrame(panel, UIStyle.Current, RaidDirector.Current != null);
 
         TMP_Text title = OptionsWidgets.Text("Title", panel, "Who Are You?", 38f, OptionsWidgets.Title);
         OptionsWidgets.Place((RectTransform)title.transform, new Vector2(0f, 1f), new Vector2(700f, 56f), new Vector2(36f, -22f));

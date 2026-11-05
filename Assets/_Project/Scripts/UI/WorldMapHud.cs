@@ -24,12 +24,13 @@ public sealed class WorldMapHud : MonoBehaviour
     private bool ownsMap;
     private TMP_Text playerMarker;
     private TMP_Text titleLabel;
+    private RectTransform titleMark;
     private bool suspendedGameplay;
 
     private sealed class QuestMark
     {
         public RectTransform Root;
-        public Image Diamond;
+        public Image Icon;
         public TMP_Text Label;
     }
 
@@ -131,14 +132,21 @@ public sealed class WorldMapHud : MonoBehaviour
         title.text = "World Map";
         title.fontSize = 32f;
         title.alignment = TextAlignmentOptions.Center;
-        title.color = UIStyle.Current.Accent;
+        UIStyle.Current.Title(title);
+        title.color = UIStyle.Current.AccentFor(RaidDirector.Current != null);
         title.raycastTarget = false;
         titleLabel = title;
+        Image hearthmark = HearthlineArt.AddIcon(transform, "Hearthmark", UIStyle.Current.Hearthmark, new Vector2(0.5f, 1f),
+            Vector2.one * 34f, new Vector2(-115f, -42f), title.color);
+        if (hearthmark != null)
+        {
+            titleMark = hearthmark.rectTransform;
+        }
 
         RectTransform helpRect = Rect("Help", transform, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(1100f, 34f), new Vector2(0f, 34f));
         TMP_Text help = helpRect.gameObject.AddComponent<TextMeshProUGUI>();
         string mapKey = GameInput.KeyLabel(GameInput.WorldMap);
-        help.text = (RaidDirector.Current != null ? "Exits in green  •  Rumours in amber, only roughly where  •  " : "Quests in gold (main), silver (side) and bronze (optional)  •  ") + "Unexplored areas remain hidden  •  " + (string.IsNullOrEmpty(mapKey) ? "" : mapKey + " or ") + "Esc to return";
+        help.text = (RaidDirector.Current != null ? "Doorways: exits  •  Rings: rough rumours  •  Stars: open events  •  " : "Quest names include their rank  •  ") + "Unexplored areas remain hidden  •  " + (string.IsNullOrEmpty(mapKey) ? "" : mapKey + " or ") + "Esc to return";
         help.fontSize = 18f;
         help.alignment = TextAlignmentOptions.Center;
         help.color = UIStyle.Current.Muted;
@@ -241,6 +249,13 @@ public sealed class WorldMapHud : MonoBehaviour
             titleLabel.text = $"World Map  ·  {RaidStats.FormatTime(RaidDirector.Current.Session.TimeRemaining)}";
         }
 
+        if (titleMark != null)
+        {
+            Vector2 position = titleMark.anchoredPosition;
+            position.x = -(titleLabel.preferredWidth + titleMark.rect.width) * 0.5f - 18f;
+            titleMark.anchoredPosition = position;
+        }
+
         ExplorationMap exploration = ExplorationMap.Current;
         material.SetTexture(ExploredId, exploration != null ? exploration.Texture : Texture2D.whiteTexture);
         PlaceQuestMarks(width, height);
@@ -272,7 +287,8 @@ public sealed class WorldMapHud : MonoBehaviour
             if (waypoint != null && waypoint.Quest != null && waypoint.IsWanted(log))
             {
                 marked.Add(waypoint.transform.position);
-                ShowMark(used++, waypoint.transform.position, settings.RankColor(waypoint.Quest.Rank), waypoint.Label, width, height);
+                ShowMark(used++, waypoint.transform.position, settings.RankColor(waypoint.Quest.Rank), UIStyle.Current.QuestMark,
+                    QuestLabel(waypoint.Label, waypoint.Quest.Rank), width, height);
             }
         }
 
@@ -284,7 +300,8 @@ public sealed class WorldMapHud : MonoBehaviour
                 continue;
             }
 
-            ShowMark(used++, giver.transform.position, settings.RankColor(giver.ShownQuest.Rank), giver.DisplayName, width, height);
+            ShowMark(used++, giver.transform.position, settings.RankColor(giver.ShownQuest.Rank), UIStyle.Current.QuestMark,
+                QuestLabel(giver.DisplayName, giver.ShownQuest.Rank), width, height);
         }
 
         for (int i = used; i < questMarks.Count; i++)
@@ -309,7 +326,8 @@ public sealed class WorldMapHud : MonoBehaviour
         {
             ExtractionStatus status = exit.Status;
             Color colour = status == ExtractionStatus.Open ? style.Good : status == ExtractionStatus.Closed ? style.Danger : style.Muted;
-            ShowMark(used++, exit.transform.position, colour, RaidHudText.MapLabel(exit.DisplayName, status, exit.SecondsUntilChange, exit.CostText), width, height);
+            ShowMark(used++, exit.transform.position, colour, style.ExitMark,
+                RaidHudText.MapLabel(exit.DisplayName, status, exit.SecondsUntilChange, exit.CostText), width, height);
         }
 
         if (!director.TryGetComponent(out RaidEventDirector events))
@@ -322,7 +340,8 @@ public sealed class WorldMapHud : MonoBehaviour
         {
             if (site != null && !site.IsResolved)
             {
-                ShowMark(used++, site.MarkFrom(from), style.Accent, RaidHudText.RumourLabel(site.DisplayName, site.PlaceName), width, height);
+                ShowMark(used++, site.MarkFrom(from), style.Accent, style.RumourMark,
+                    RaidHudText.RumourLabel(site.DisplayName, site.PlaceName), width, height);
             }
         }
 
@@ -330,29 +349,34 @@ public sealed class WorldMapHud : MonoBehaviour
         {
             if (site != null && !site.IsResolved)
             {
-                ShowMark(used++, site.transform.position, style.Text, site.DisplayName, width, height);
+                ShowMark(used++, site.transform.position, style.Text, style.EventMark, site.DisplayName, width, height);
             }
         }
 
         return used;
     }
 
-    private void ShowMark(int index, Vector3 position, Color colour, string label, float width, float height)
+    public static string QuestLabel(string label, QuestRank rank) => $"{label} ({QuestMarkerSettings.RankName(rank)})";
+
+    private void ShowMark(int index, Vector3 position, Color colour, Sprite sprite, string label, float width, float height)
     {
         if (index == questMarks.Count)
         {
-            RectTransform root = Rect("Quest Mark", mapRect, Vector2.one * 0.5f, Vector2.one * 0.5f, Vector2.zero, Vector2.zero);
-            RectTransform shape = Rect("Diamond", root, Vector2.one * 0.5f, Vector2.one * 0.5f, new Vector2(16f, 16f), Vector2.zero);
-            shape.localRotation = Quaternion.Euler(0f, 0f, 45f);
+            RectTransform root = Rect("Map Mark", mapRect, Vector2.one * 0.5f, Vector2.one * 0.5f, Vector2.zero, Vector2.zero);
+            RectTransform shape = Rect("Icon", root, Vector2.one * 0.5f, Vector2.one * 0.5f, new Vector2(22f, 22f), Vector2.zero);
             var image = shape.gameObject.AddComponent<Image>();
             image.raycastTarget = false;
-            RectTransform words = Rect("Label", root, Vector2.one * 0.5f, Vector2.one * 0.5f, new Vector2(260f, 28f), new Vector2(0f, -24f));
+            var outline = shape.gameObject.AddComponent<Outline>();
+            outline.effectColor = new Color(0f, 0f, 0f, 0.85f);
+            outline.effectDistance = new Vector2(1f, -1f);
+            RectTransform words = Rect("Label", root, Vector2.one * 0.5f, Vector2.one * 0.5f, new Vector2(300f, 28f), new Vector2(0f, -24f));
             var text = words.gameObject.AddComponent<TextMeshProUGUI>();
+            UIStyle.Current.OnWorld(text);
             text.fontSize = 18f;
             text.alignment = TextAlignmentOptions.Center;
             text.textWrappingMode = TextWrappingModes.NoWrap;
             text.raycastTarget = false;
-            questMarks.Add(new QuestMark { Root = root, Diamond = image, Label = text });
+            questMarks.Add(new QuestMark { Root = root, Icon = image, Label = text });
             playerMarker.transform.SetAsLastSibling();
         }
 
@@ -361,7 +385,8 @@ public sealed class WorldMapHud : MonoBehaviour
         mark.Root.anchoredPosition = new Vector2(
             (Mathf.Clamp01((position.x - area.xMin) / area.width) - 0.5f) * width,
             (Mathf.Clamp01((position.z - area.yMin) / area.height) - 0.5f) * height);
-        mark.Diamond.color = colour;
+        mark.Icon.sprite = sprite;
+        mark.Icon.color = colour;
         mark.Label.color = colour;
         mark.Label.text = label;
         // Names that would print over each other stack instead: they are wide and low.

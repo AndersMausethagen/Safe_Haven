@@ -21,6 +21,11 @@ public sealed class ResourceNode : MonoBehaviour, IInteractionCondition, ISaveab
     }
 
     [SerializeField] private GatheringNodeDefinition node;
+    [Tooltip("Keep this prefab's own model, size and facing instead of the definition's variants: a rock painted on a terrain " +
+             "must look exactly like the painted one it stands in for.")]
+    [SerializeField] private bool keepOwnModel;
+
+    public bool KeepsOwnModel => keepOwnModel;
 
     private Interactable interactable;
     private ResourceNodeFeedback feedback;
@@ -171,7 +176,7 @@ public sealed class ResourceNode : MonoBehaviour, IInteractionCondition, ISaveab
     {
         Transform model = transform.Find("Model");
         Renderer first = GetComponentsInChildren<Renderer>(true).FirstOrDefault(r => !(r is ParticleSystemRenderer));
-        if (node == null || first == null)
+        if (node == null || first == null || keepOwnModel)
         {
             return;
         }
@@ -186,6 +191,11 @@ public sealed class ResourceNode : MonoBehaviour, IInteractionCondition, ISaveab
             Bounds original = BoundsOf(look);
             foreach (Renderer part in look.GetComponentsInChildren<Renderer>(true))
             {
+                if (part.TryGetComponent(out MeshSurface surface))
+                {
+                    DestroyImmediate(surface);
+                }
+
                 if (part.TryGetComponent(out MeshFilter filter))
                 {
                     DestroyImmediate(filter);

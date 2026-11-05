@@ -136,6 +136,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ResourceNode
   node: {fileID: 11400000, guid: 5182aff1ad3931d4997a7a780b6ec0e8, type: 2}
+  keepOwnModel: 0
 --- !u!114 &89642033151183284
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -162,6 +163,14 @@ PrefabInstance:
     - target: {fileID: 1030935960086813256, guid: 2d121f09e9140574292d8ff145017f62, type: 3}
       propertyPath: m_Name
       value: Model
+      objectReference: {fileID: 0}
+    - target: {fileID: 2855042597209173598, guid: 2d121f09e9140574292d8ff145017f62, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2855042597209173598, guid: 2d121f09e9140574292d8ff145017f62, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.95
       objectReference: {fileID: 0}
     - target: {fileID: 4855576670713403270, guid: 2d121f09e9140574292d8ff145017f62, type: 3}
       propertyPath: m_LocalPosition.x

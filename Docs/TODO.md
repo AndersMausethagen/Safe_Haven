@@ -3,6 +3,71 @@
 Open work and ideas. Tick items off (`[x]`) or delete them when done. Architecture notes for each system live in
 [ARCHITECTURE.md](../Assets/_Project/Scripts/ARCHITECTURE.md).
 
+## Improvements found in review (2026-11-04)
+
+From reading the code, data and playtest logs, not from playing. Nothing here is built. The logs in `LocalLow/.../Playtests` mix real runs with test runs, so treat their counts as a hint. Most important first within each group.
+
+### First: play it
+
+- [ ] **Make a build and play one full raid without cheats.** `D:\Builds` is from 30 October, so everything since (companions on raids, the boss, bodies, journal and more) has never run in a build. Check there that the Heartroot's vein glow survives shader stripping and doesn't flash cyan. In the logs since 27 October, no raid without cheats lasted longer than 175 s, against a 16:40 clock.
+
+### Small faults
+
+- [ ] "Brought down by a The Heartroot" and "a Old Moss Troll": the words are fixed in `RaidReportText.cs:29` and `JournalContent.cs:156`. One helper for the article, shared with `JournalNotices.CreatureWritten`.
+- [ ] Death recap can be blank: `CreatureRecords` ignores damage with no source, so a death by poison or the like names nothing. 4 of the 8 raid deaths logged since 28 October have no killer in the log either. Remember who applied the poison, or say what it was.
+- [ ] Raids tab shows the number twice ("2  2. Misty Woods"): the row's letter comes from its name.
+- [ ] Journal lines in the middle of a fight: three "New in your journal" stood in the feed while being attacked in a test raid. Hold them until the fight is over, or show one quiet mark on the HUD.
+- [ ] Check the 20% find chance per cache against how many caches a raid really opens: the ten found pages could run out within a few raids, which would waste them as a reason to raid.
+- [ ] Two tests have been failing for a while. `AudioSystemTests.LongClips_AreNotHeldDecompressedInMemory`: Heartroot Fight.wav is 5.8 MB on Decompress On Load, so run `AgentScripts/BuildAudio.cs`. `HearthlineTests.VitalsCanBeKeptLit` reads the Editor's own Always Show Vitals option: the test should set it and put it back.
+- [ ] The status table in ARCHITECTURE.md is out of date: it still says "No companions in raids", "One recruit (Ingrid) and one job", a 300 s raid, and that M4 companions come next.
+
+### Knowing how it runs
+
+- [ ] **Unity Editor handle leak.** The Editor's Windows handle count keeps growing until it can no longer open dialogs or windows ("DialogBoxParamW failed … Window Manager objects" in Editor.log); then it freezes on the next dialog (a test run's "save modified scenes" prompt locked it on 2026-11-05 at ~530,000 handles and needed a restart, which also briefly left the terrain without tessellation). Seen: ~26,000 handles right after a restart, ~46,000 three minutes after another restart with nothing run, ~78,000 after an afternoon of Editor commands, renders and tests. Find the source by measuring the handle count (Task Manager › Details › Handles column, or `Get-Process Unity`) around one kind of operation at a time: idle, opening the terrain inspector, World Tools open, a Scene view paint stroke, a CLI command, a test run, entering Play mode. Suspects: an editor window or overlay repainting (World Tools' ground pictures, Terrain Tools overlay, which also throws a NullReferenceException in `BrushSizeVariator.OnEnterToolMode`), the Unity Pipeline/MCP bridges, `TerrainLayerWatcher` (polls every second). Until found, restart the Editor every few hours of heavy use.
+- [ ] Log frame rate and hitches per scene in `PlaytestLogger`. Nothing records them, so nobody knows how a large raid runs on real hardware. Do this before spending anything on the items below.
+- [ ] Record who made each kill in `Killed` rows, and write creatures by name (`ExpeditionWolf(Clone)`, `Packmate1`). Thin out `LessonDefended`: 895 of 4,998 rows since 1 November.
+- [ ] Mark runs started by agents or the Editor in the log, so real play can be picked out without guessing from file times.
+- [ ] The memory freeze on full test runs: find what the suite leaks, so all of it can be run again. Only chosen classes have been run since, so a break elsewhere can go unnoticed.
+
+### Creature performance (only if the frame rate says so)
+
+- [ ] No creature has an LOD, and the camera is usually 19 m away. Measured triangles: Mistwing 7,732 (the most of any, for a 0.75 m bat), Heartroot 7,340, Old Troll 6,570, Root Guardian and Rootling 5,438 each (a knee-high Rootling shares the 2.9 m body's mesh), Bog Spitter 4,368.
+- [ ] Small Moss Troll and Moss Shaman are 7 skinned meshes each (329 bones between them, 2 meshes hidden): merge them in Blender or delete the hidden ones.
+- [ ] Every varied spawn makes its own copies of its materials (`CreatureLook`), which last until the scene ends. Count them after a large raid. A property block is the alternative, but `HitReaction` clears those, so it would have to learn to put the look back.
+- [ ] `Treant1Clips.fbx` and `Treant2Clips.fbx` carry a whole mesh just for their clips: strip them to the skeleton.
+
+### Distant gathering objects (only if the frame rate says so)
+
+Placed trees use `NodeStreaming` for now: far from the player each is a bare mesh with no scripts, and a live copy is made (`Instantiate`) within 10 m or when hovered, then destroyed past 14 m. Not measured yet. If creating copies shows up as hitches, or the work around it becomes a burden, try instead:
+
+- [ ] **Turn scripts off rather than remove them.** Keep every tree whole, switch its gathering components off (`enabled = false`) when far and on when near. No objects made or destroyed, no garbage, and save ids, quest links and references stay valid, so trees with their own saved state could join in. Costs a little memory (a few KB for ~1,100 trees) and the components' load time.
+- [ ] **Reuse a pool of live copies.** Keep the bare meshes, but move a small pool of ready live trees into place instead of making and destroying them. Removes the `Instantiate`/`Destroy` cost, keeps the low memory.
+- [ ] Either way, cover rocks and other nodes too (now only trees with no saved state and no model variants are streamed).
+
+### Creature looks
+
+- [ ] The Huldra, Mistwing and Bog Spitter have no eyes in the dark, and the Huldra is the one that should unsettle most. Her eyes could light only as she turns on you.
+- [ ] Eyes shine the same at noon as at midnight. Dim them by `DayNightCycle`, so that night is when they mean something.
+- [ ] The Heartroot's veins are patches from a mask, not lines: paint a proper vein map when it gets its own look, and make the last stage split the bark as its line says.
+
+### The loop between raids and home
+
+- [ ] **A fuller homecoming.** "While you were gone your people made..." covers only residents' work (`HavenProgress.cs:158`). Add finished station queues, ripe crops and what the haul now lets you build, so a raid pays off the moment you are home.
+- [ ] **A village that remembers.** Nobody at home reacts to a rescue, a lost companion or a boss, though the GDD asks for it. Mostly writing on what exists: a line each, and an empty workplace while someone is lost.
+- [ ] **The first fight.** Nearly half the deaths logged since 27 October are in the prologue, to the wolves and small trolls (11 of 23). Falling there costs little, but it's the first impression: see in play whether the wolves are too much for someone who hasn't learned to dodge yet.
+- [ ] **Dying at home.** Logs show three deaths in the Haven early in a run, to wolves and a blight boar (1 and 3 November). Decide if something called a safe haven should kill a new player, and what it costs them.
+- [ ] **A ladder of bosses.** There is one boss, and beating it opens a Troll Valley with the Woods' scene and no boss of its own. The Old Moss Troll is the natural second. Look at similar games first.
+
+### Ideas from the journal
+
+- [ ] **Bargain with a troll.** The journal now says a troll can be bargained with, and "The Troll Toll" says what it takes: a stone carried from far off, and don't run. The GDD lists bargains as unbuilt, and standing still in front of something that size would be a memorable, very folkloric moment.
+- [ ] Let some found pages lead somewhere: "Something Runa Left" could mark a rumour, and "The Last Smith's Note" a cache of barrow iron. Today a find is only something to read.
+- [ ] A Rumours shelf on the Quests tab, for what is known and where, as these are only on the map during a raid.
+
+### To decide
+
+- [ ] Controller support: bindings exist and the journal can be moved through, but on-screen prompts name keys and there is no rumble. A big job, and only worth it if the game will ship with it.
+
 ## Combat
 
 - [x] **A finishing blow on staggered enemies**: Draug and Barrow Shieldbearer. More person-shaped creatures are a tick on Can Be Finished.

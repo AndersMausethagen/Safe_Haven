@@ -23,7 +23,18 @@ Shader "Safe Haven/Tree Wind"
         _Cutoff ("Alpha Cutoff", Range(0, 1)) = 0.5
         [Enum(UnityEngine.Rendering.CullMode)] _Cull ("Cull", Float) = 2
         [Toggle(_FAST_LEAF_LIGHTING)] _FastLeafLighting ("Fast Leaf Lighting (per vertex, no specular)", Float) = 0
-        _Translucency ("Light Through Leaves (fast lighting)", Range(0, 1)) = 0.5
+        _Translucency ("Light Through Leaves", Range(0, 1)) = 0.5
+        [Toggle(_MASK_HDRP)] _MaskHDRP ("Mask Is HDRP Layout (metallic R, occlusion G, smoothness A)", Float) = 0
+        _Smoothness ("Smoothness (HDRP mask)", Range(0, 1)) = 1
+        [Header(Moss Covering)]
+        [Toggle(_MOSS_COVER)] _MossCover ("Moss on Upward Surfaces", Float) = 0
+        [NoScaleOffset] _MossMap ("Moss Colour", 2D) = "white" {}
+        [Normal][NoScaleOffset] _MossNormal ("Moss Normal", 2D) = "bump" {}
+        [NoScaleOffset] _MossMask ("Moss Mask (HDRP layout)", 2D) = "white" {}
+        _MossColor ("Moss Tint", Color) = (0.75, 0.75, 0.75, 1)
+        _MossTiling ("Moss Tiling (UV0)", Float) = 4
+        _MossAmount ("Moss Amount", Range(0, 1)) = 1
+        _MossRemap ("Moss Starts / Full (surface facing up, -1..1)", Vector) = (0, 0.5, 0, 0)
         [Header(Wind)]
         _WindStrength ("Wind Strength", Range(0, 2)) = 1
         _TreeHeight ("Tree Height (object units)", Float) = 10
@@ -40,11 +51,17 @@ Shader "Safe Haven/Tree Wind"
         TEXTURE2D(_BaseMap); SAMPLER(sampler_BaseMap);
         TEXTURE2D(_BumpMap); SAMPLER(sampler_BumpMap);
         TEXTURE2D(_ORMMap); SAMPLER(sampler_ORMMap);
+        TEXTURE2D(_MossMap); SAMPLER(sampler_MossMap);
+        TEXTURE2D(_MossNormal);
+        TEXTURE2D(_MossMask);
         CBUFFER_START(UnityPerMaterial)
             float4 _BaseMap_ST;
             half4 _BaseColor;
             half _BumpScale, _OcclusionStrength, _Roughness, _Metallic, _Cutoff, _Translucency;
             float _WindStrength, _TreeHeight;
+            half4 _MossColor;
+            float4 _MossRemap;
+            float _MossTiling, _MossAmount, _Smoothness;
         CBUFFER_END
         float4 _SafeHavenWind; // horizontal direction XZ (world), moss displacement, moss speed
         float _SafeHavenTreeWind; // tree strength (WindZone Main), 0 = still; time is real seconds like the preview
@@ -115,7 +132,8 @@ Shader "Safe Haven/Tree Wind"
             #endif
             return color;
         }
-        half3 SurfaceNormal(Varyings input, half faceSign)
+        // A tangent-space normal (already unpacked) on this pixel's surface.
+        half3 ToWorldNormal(Varyings input, half faceSign, half3 mapped)
         {
             half3 normal = normalize(input.normalWS) * faceSign;
             half3 tangent = input.tangentWS.xyz;
@@ -125,8 +143,11 @@ Shader "Safe Haven/Tree Wind"
             }
             tangent = normalize(tangent - normal * dot(normal, tangent));
             half3 bitangent = cross(normal, tangent) * input.tangentWS.w;
-            half3 mapped = UnpackNormalScale(SAMPLE_TEXTURE2D(_BumpMap, sampler_BumpMap, input.uv), _BumpScale);
             return normalize(tangent * mapped.x + bitangent * mapped.y + normal * mapped.z);
+        }
+        half3 SurfaceNormal(Varyings input, half faceSign)
+        {
+            return ToWorldNormal(input, faceSign, UnpackNormalScale(SAMPLE_TEXTURE2D(_BumpMap, sampler_BumpMap, input.uv), _BumpScale));
         }
         half3 FastLeafLighting(Varyings input, half faceSign)
         {
@@ -172,11 +193,12 @@ Shader "Safe Haven/Tree Wind"
                 half3 leaf = baseColor.rgb * FastLeafLighting(input, IS_FRONT_VFACE(face, 1.0, -1.0));
                 return half4(MixFog(leaf, input.fog), 1);
             #endif
-            half3 orm = SAMPLE_TEXTURE2D(_ORMMap, sampler_ORMMap, input.uv).rgb;
+            half4 mask = SAMPLE_TEXTURE2D(_ORMMap, sampler_ORMMap, input.uv);
+            half faceSign = IS_FRONT_VFACE(face, 1.0, -1.0);
             InputData lighting = (InputData)0;
             lighting.positionWS = input.positionWS;
             lighting.positionCS = input.positionCS;
-            lighting.normalWS = SurfaceNormal(input, IS_FRONT_VFACE(face, 1.0, -1.0));
+            lighting.normalWS = SurfaceNormal(input, faceSign);
             lighting.viewDirectionWS = GetWorldSpaceNormalizeViewDir(input.positionWS);
             #if defined(_MAIN_LIGHT_SHADOWS_SCREEN)
                 lighting.shadowCoord = ComputeScreenPos(input.positionCS);
@@ -190,11 +212,39 @@ Shader "Safe Haven/Tree Wind"
             SurfaceData surface = (SurfaceData)0;
             surface.albedo = baseColor.rgb;
             surface.alpha = 1;
-            surface.metallic = orm.b * _Metallic;
-            surface.smoothness = 1.0 - orm.g * _Roughness;
-            surface.occlusion = lerp(1.0, orm.r, _OcclusionStrength);
+            #if defined(_MASK_HDRP)
+                surface.metallic = mask.r * _Metallic;
+                surface.smoothness = mask.a * _Smoothness;
+                surface.occlusion = lerp(1.0, mask.g, _OcclusionStrength);
+            #else
+                surface.metallic = mask.b * _Metallic;
+                surface.smoothness = 1.0 - mask.g * _Roughness;
+                surface.occlusion = lerp(1.0, mask.r, _OcclusionStrength);
+            #endif
+            #if defined(_MOSS_COVER)
+                // Moss on whatever faces up (the tops of branches and the upper side of a leaning trunk), with a ragged
+                // edge from the moss's own occlusion: the covering the SeedMesh shaders give these trees.
+                float2 mossUV = input.uv * _MossTiling;
+                half4 moss = SAMPLE_TEXTURE2D(_MossMap, sampler_MossMap, mossUV) * _MossColor;
+                half4 mossMask = SAMPLE_TEXTURE2D(_MossMask, sampler_MossMap, mossUV);
+                half up = normalize(input.normalWS).y * faceSign;
+                half reach = smoothstep(_MossRemap.x, max(_MossRemap.y, _MossRemap.x + 0.01), up) * _MossAmount;
+                half cover = smoothstep(0.35, 0.65, reach * (0.55 + 0.9 * mossMask.g));
+                half3 mossNormal = ToWorldNormal(input, faceSign, UnpackNormal(SAMPLE_TEXTURE2D(_MossNormal, sampler_MossMap, mossUV)));
+                lighting.normalWS = normalize(lerp(lighting.normalWS, mossNormal, cover));
+                surface.albedo = lerp(surface.albedo, moss.rgb, cover);
+                surface.metallic *= 1.0 - cover;
+                surface.smoothness = lerp(surface.smoothness, mossMask.a * 0.5, cover);
+                surface.occlusion = lerp(surface.occlusion, mossMask.g, cover);
+            #endif
             surface.normalTS = half3(0, 0, 1);
             half4 color = UniversalFragmentPBR(lighting, surface);
+            #if defined(_ALPHATEST_ON)
+                // Sunlight through the leaf from behind, as the SeedMesh foliage's transmission does.
+                Light sun = GetMainLight(lighting.shadowCoord);
+                half back = saturate(dot(-lighting.normalWS, sun.direction));
+                color.rgb += surface.albedo * sun.color * back * sun.shadowAttenuation * _Translucency;
+            #endif
             color.rgb = MixFog(color.rgb, input.fog);
             return half4(color.rgb, 1);
         }
@@ -245,6 +295,8 @@ Shader "Safe Haven/Tree Wind"
             #pragma fragment TreeFragment
             #pragma shader_feature_local _ALPHATEST_ON
             #pragma shader_feature_local _FAST_LEAF_LIGHTING
+            #pragma shader_feature_local_fragment _MASK_HDRP
+            #pragma shader_feature_local_fragment _MOSS_COVER
             #pragma multi_compile_instancing
             #include_with_pragmas "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DOTS.hlsl"
             #pragma multi_compile_fog

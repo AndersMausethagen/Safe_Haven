@@ -318,7 +318,7 @@ public static class ScenePlayability
             // Copied pieces of the home or the raid stand where they stood in the template: bring them near the player.
             foreach (string root in new[] { "Portal", "Raid" }.Where(roots.Contains))
             {
-                GameObject moved = scene.GetRootGameObjects().FirstOrDefault(g => g.name == root);
+                GameObject moved = SceneFolders.Find(scene, root);
                 if (moved != null)
                 {
                     Vector3 spot = player.transform.position + player.transform.forward * 10f + player.transform.right * 4f;
@@ -360,6 +360,7 @@ public static class ScenePlayability
 
         AtmosphereSetup.EnsureSceneDefaults(scene);
         SaveableEntityTools.AssignSceneIds(scene);
+        SceneFolders.Tidy(scene);
         Undo.CollapseUndoOperations(group);
         EditorSceneManager.MarkSceneDirty(scene);
         done.Add(AddToBuild(scene));
@@ -380,13 +381,13 @@ public static class ScenePlayability
         Scene template = EditorSceneManager.OpenScene(templatePath, OpenSceneMode.Additive);
         try
         {
-            GameObject[] originals = template.GetRootGameObjects().Where(r => roots.Contains(r.name)).ToArray();
+            GameObject[] originals = SceneFolders.TopLevel(template).Where(r => roots.Contains(r.name)).ToArray();
             if (rig)
             {
                 EditorSceneManager.SetActiveScene(template);
                 var sky = new SkySettings();
                 EditorSceneManager.SetActiveScene(scene);
-                foreach (GameObject old in scene.GetRootGameObjects().Where(r =>
+                foreach (GameObject old in SceneFolders.TopLevel(scene).Where(r =>
                              r.GetComponent<Camera>() != null || r.GetComponent<Player>() != null || r.GetComponent<CinemachineCamera>() != null ||
                              r.TryGetComponent(out Light l) && l.type == LightType.Directional ||
                              r.TryGetComponent(out Volume v) && v.isGlobal).ToArray())
@@ -408,8 +409,10 @@ public static class ScenePlayability
                     copy.name = original.name; // drop the " (1)"
                 }
 
+                copy.transform.SetParent(null, true); // out of the template's folder, so it can change scenes
                 SceneManager.MoveGameObjectToScene(copy, scene);
                 Undo.RegisterCreatedObjectUndo(copy, "Make Playable");
+                SceneFolders.Place(copy);
             }
 
             EditorSceneManager.SetActiveScene(scene);

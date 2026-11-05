@@ -14,6 +14,7 @@ using UnityEngine;
 public sealed class ChoppableTree : MonoBehaviour, IHarvestBody
 {
     private const float ChopHeight = 1.1f;
+    private static readonly List<ChoppableTree> enabledTrees = new List<ChoppableTree>();
 
     private readonly List<ItemAmount> logs = new List<ItemAmount>();
     private Interactable interactable;
@@ -44,8 +45,18 @@ public sealed class ChoppableTree : MonoBehaviour, IHarvestBody
             bottom = Mathf.Min(bottom, part.bounds.min.y);
         }
 
-        Size = TreeChoppingSettings.Current.SizeOf(top > bottom ? top - bottom : 0f);
+        Height = top > bottom ? top - bottom : 0f;
+        Size = TreeChoppingSettings.Current.SizeOf(Height);
     }
+
+    /// <summary>Every tree in a loaded scene that is enabled, stand-ins included.</summary>
+    public static IReadOnlyList<ChoppableTree> Enabled => enabledTrees;
+
+    /// <summary>How tall the model stands (metres), measured once.</summary>
+    public float Height { get; private set; }
+
+    /// <summary>False while felled and not yet grown back.</summary>
+    public bool IsStanding => node == null || !node.IsDepleted;
 
     /// <summary>Sets the size for a stand-in without a model of its own (a terrain tree's, see TerrainTreeFelling).</summary>
     public void SetSize(float size) => Size = size;
@@ -70,6 +81,7 @@ public sealed class ChoppableTree : MonoBehaviour, IHarvestBody
 
     private void OnEnable()
     {
+        enabledTrees.Add(this);
         interactable.Started.AddListener(OnStarted);
         interactable.Completed.AddListener(OnFelled);
         node.Swung += OnSwung;
@@ -77,6 +89,7 @@ public sealed class ChoppableTree : MonoBehaviour, IHarvestBody
 
     private void OnDisable()
     {
+        enabledTrees.Remove(this);
         interactable.Started.RemoveListener(OnStarted);
         interactable.Completed.RemoveListener(OnFelled);
         node.Swung -= OnSwung;
@@ -93,7 +106,7 @@ public sealed class ChoppableTree : MonoBehaviour, IHarvestBody
         if (tree.HasFoliage)
         {
             int leaves = result == SwingResult.Critical ? 18 : result == SwingResult.Normal ? 10 : 3;
-            TreeEffects.Play(rules.LeafFall, tree.Base + tree.Crown.center, Quaternion.identity, tree.Crown.size, tree.LeafTint, leaves);
+            TreeEffects.Play(tree.LeafFall != null ? tree.LeafFall : rules.LeafFall, tree.Base + tree.Crown.center, Quaternion.identity, tree.Crown.size, tree.LeafTint, leaves);
         }
 
         int swings = node.Definition != null ? node.Definition.Swings : 0;

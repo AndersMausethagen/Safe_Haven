@@ -119,7 +119,7 @@ void DepthNormalOnlyFragment(
     #if defined(_WRITE_SMOOTHNESS)
         half4 hasMask = half4(_LayerHasMask0, _LayerHasMask1, _LayerHasMask2, _LayerHasMask3);
         half4 masks[4];
-        ComputeMasks(masks, hasMask, IN.uvSplat01, IN.uvSplat23);
+        ComputeMasks(masks, hasMask, IN.uvSplat01, IN.uvSplat23, splatControl);
 
         half weight;
         half4 mixedDiffuse;

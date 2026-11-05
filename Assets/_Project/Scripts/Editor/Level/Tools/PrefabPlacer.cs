@@ -246,7 +246,7 @@ public static class PrefabPlacer
     {
         RaidMap map = Object.FindAnyObjectByType<RaidMap>();
         Transform root = map != null && map.gameObject.scene == scene && map.Content != null ? map.Content : null;
-        Transform props = root != null ? root.Find("Props") : scene.GetRootGameObjects().FirstOrDefault(g => g.name == PropsRoot)?.transform;
+        Transform props = root != null ? root.Find("Props") : SceneFolders.Find(scene, PropsRoot)?.transform;
         if (props != null)
         {
             return props;
@@ -258,6 +258,10 @@ public static class PrefabPlacer
         if (root != null)
         {
             created.transform.SetParent(root, false);
+        }
+        else
+        {
+            SceneFolders.Place(created);
         }
 
         return created.transform;

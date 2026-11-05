@@ -20,6 +20,20 @@ public sealed class TerrainSurfaceProfile : ScriptableObject
         [Range(0.1f, 4)] public float contrast = 1;
         [Tooltip("How much this painted layer retains footprints. Zero for hard rock; one for soft moss or mud. Rebuild after changing.")]
         [Range(0, 1)] public float footprintResponse = 1;
+        [Tooltip("Rock layers are drawn as the material's rock, projected from three sides with its relief, so cliffs never " +
+                 "stretch: Rocky uses the material's Rock textures, Cliff its Cliff Rock textures. Rebuild after changing.")]
+        public RockKind rock = RockKind.None;
+    }
+
+    public enum RockKind { None = 0, Rocky = 1, Cliff = 2 }
+
+    /// <summary>The rock kind a ground layer stands for, from its name: Cliff Rock, or a rock or stone ground.</summary>
+    public static RockKind RockOf(TerrainLayer layer)
+    {
+        if (layer == null) return RockKind.None;
+        string name = layer.name;
+        if (name.Contains("Cliff")) return RockKind.Cliff;
+        return name.EndsWith(" Rock") || name.Contains("Weathered Stone") ? RockKind.Rocky : RockKind.None;
     }
 
     [Tooltip("RHalf height array resolution per layer. Original textures are never overwritten.")]

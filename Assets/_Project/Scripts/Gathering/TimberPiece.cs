@@ -52,8 +52,9 @@ public sealed class TimberPiece : MonoBehaviour
     /// <summary>What is left of a tree where it stood. It lasts as long as the tree takes to grow back.</summary>
     public static void Stump(TreeParts parts, Material bark, Material face)
     {
-        float radius = Mathf.Max(0.27f, parts.TrunkRadius * 1.2f);
-        Mesh mesh = LogMesh.Build(radius * 1.15f, radius, FelledTree.CutHeight, 0f, Random.Range(0, 1000), 1);
+        // Hugs the trunk with a slight flare at the foot: wider than the tree read as a different, older stump.
+        float radius = Mathf.Max(0.07f, parts.TrunkRadius * 1.05f);
+        Mesh mesh = LogMesh.Build(radius * 1.12f, radius, FelledTree.CutHeight, 0f, Random.Range(0, 1000), 1);
         var stump = new GameObject("Stump");
         stump.transform.position = parts.Base;
         stump.AddComponent<MeshFilter>().sharedMesh = mesh;

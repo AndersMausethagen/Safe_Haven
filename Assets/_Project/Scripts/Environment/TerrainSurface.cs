@@ -65,7 +65,20 @@ public sealed class TerrainSurface : MonoBehaviour
 
     private void OnTextureChanged(Terrain changed, string textureName, RectInt region, bool synched)
     {
-        if (changed == terrain) Apply();
+        // A brush stroke paints into the same control textures; only a new set of them (a layer added past 4, 8, 12)
+        // needs re-binding. Re-applying on every stroke made the terrain reload while painting.
+        if (changed != terrain || !synched || block == null) return;
+        Texture2D[] controls = terrain.terrainData.alphamapTextures;
+        for (int i = 0; i < 4; i++)
+        {
+            Texture bound = block.GetTexture("_DisplacementControl" + i);
+            Texture wanted = i < controls.Length ? controls[i] : Texture2D.blackTexture;
+            if (bound != wanted)
+            {
+                Apply();
+                return;
+            }
+        }
     }
 
     public void Apply()
@@ -90,7 +103,7 @@ public sealed class TerrainSurface : MonoBehaviour
             float detailHeight = terrain.materialTemplate.GetFloat("_DisplacementStrength");
             if (profile != null && profile.footprints) detailHeight += profile.footprintDepth;
             bounds.y = Mathf.Max(bounds.y, 1 + detailHeight * 4);
-            terrain.patchBoundsMultiplier = bounds;
+            if (bounds != terrain.patchBoundsMultiplier) terrain.patchBoundsMultiplier = bounds; // setting it rebuilds the terrain
         }
     }
 }

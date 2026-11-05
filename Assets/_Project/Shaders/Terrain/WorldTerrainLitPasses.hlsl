@@ -120,11 +120,7 @@ void InitializeInputData(Varyings IN, half3 normalTS, out InputData inputData)
 }
 
 // ---- Safe Haven: rock on steep ground -------------------------------------------------------------------------------
-TEXTURE2D(_CliffAlbedo); SAMPLER(sampler_CliffAlbedo);
-TEXTURE2D(_CliffNormal);
-TEXTURE2D(_CliffMask);
-float _CliffStrength, _CliffSlopeStart, _CliffSlopeEnd, _CliffBreakup, _CliffTiling, _CliffNormalStrength;
-half4 _CliffTint;
+// Its textures and settings are declared in WorldTerrainDisplacement.hlsl: the domain stage pushes the rock out too.
 
 // The terrain's own surface normal (without the layers' normal maps), for the slope.
 half3 WorldGeometricNormal(Varyings IN)
@@ -157,8 +153,93 @@ float WorldCliffNoise(float3 p)
                      lerp(WorldCliffHash(i + float3(0, 1, 1)), WorldCliffHash(i + float3(1, 1, 1)), f.x), f.y), f.z);
 }
 
-// Past _CliffSlopeStart degrees the ground turns to rock projected from three sides (no stretching on cliffs), fully
-// rock at _CliffSlopeEnd, with a noisy edge. Normals blend with the "whiteout" method.
+// ---- Safe Haven: hiding the layers' repetition ----------------------------------------------------------------------
+// Each layer is sampled twice: as painted, and turned and scaled. Slow noise in that layer's own UVs picks between them,
+// so no tile repeats the same way twice, and a broader noise shifts its brightness the way real ground varies.
+float _AntiTiling, _AntiTilingScale, _MacroVariation;
+static half4 worldAntiTileBlend;
+static const float2x2 WorldAntiTileTurn = float2x2(0.4536, -0.8912, 0.8912, 0.4536); // 63 degrees
+
+float2 WorldAntiTileUV(float2 uv) { return mul(WorldAntiTileTurn, uv) * _AntiTilingScale + float2(0.37, 0.71); }
+
+half WorldAntiTileWeight(float2 uv)
+{
+    if (_AntiTiling <= 0) return 0;
+    float n = WorldCliffNoise(float3(uv * 0.23, 3.1)) * 0.7 + WorldCliffNoise(float3(uv * 0.61, 9.7)) * 0.3;
+    return smoothstep(0.3, 0.7, n) * _AntiTiling;
+}
+
+half WorldMacroShade(float2 uv)
+{
+    return 1.0 + (WorldCliffNoise(float3(uv * 0.07, 17.3)) - 0.5) * 2.0 * _MacroVariation;
+}
+
+// Layers with no weight at a pixel are skipped entirely: no texture reads, no noise. Their contribution is multiplied by
+// that zero weight anyway, so the image is unchanged. Derivatives are taken before branching, as dynamic branches can't
+// give implicit ones.
+half4 WorldAntiTiledAlbedo(TEXTURE2D_PARAM(tex, smp), float2 uv, half blend, half weight)
+{
+    float2 dx = ddx(uv), dy = ddy(uv);
+    [branch] if (weight <= 0) return 0;
+    half4 a = SAMPLE_TEXTURE2D_GRAD(tex, smp, uv, dx, dy);
+    [branch] if (blend <= 0.001) return a;
+    float2x2 turn = WorldAntiTileTurn * _AntiTilingScale;
+    return lerp(a, SAMPLE_TEXTURE2D_GRAD(tex, smp, WorldAntiTileUV(uv), mul(turn, dx), mul(turn, dy)), blend);
+}
+
+half3 WorldAntiTiledNormal(TEXTURE2D_PARAM(tex, smp), float2 uv, half scale, half blend, half weight)
+{
+    float2 dx = ddx(uv), dy = ddy(uv);
+    [branch] if (weight <= 0) return 0;
+    half3 a = UnpackNormalScale(SAMPLE_TEXTURE2D_GRAD(tex, smp, uv, dx, dy), scale);
+    [branch] if (blend <= 0.001) return a;
+    float2x2 turn = WorldAntiTileTurn * _AntiTilingScale;
+    half3 b = UnpackNormalScale(SAMPLE_TEXTURE2D_GRAD(tex, smp, WorldAntiTileUV(uv), mul(turn, dx), mul(turn, dy)), scale);
+    b.xy = mul(transpose(WorldAntiTileTurn), b.xy); // back into the terrain's tangent frame
+    // Not normalized here (two opposed samples could mix to zero length, and normalize(0) is NaN): NormalMapMix
+    // normalizes the layers' sum, with its own guard.
+    return lerp(a, b, blend);
+}
+
+half WorldAntiTileWeightIf(float2 uv, half weight)
+{
+    [branch] if (weight <= 0) return 0;
+    return WorldAntiTileWeight(uv);
+}
+
+half WorldMacroShadeIf(float2 uv, half weight)
+{
+    [branch] if (weight <= 0) return 1;
+    return WorldMacroShade(uv);
+}
+
+// Rock projected from three sides (no stretching on cliffs). Normals blend with the "whiteout" method.
+void WorldTriplanarRock(TEXTURE2D_PARAM(colourMap, smp), TEXTURE2D_PARAM(normalMap, normalSmp), TEXTURE2D_PARAM(maskMap, maskSmp),
+                        float3 p, half3 n, half3 blend, float tiling, half3 tint, half normalStrength,
+                        out half3 colour, out half4 mask, out half3 normal)
+{
+    float3 q = p / max(tiling, 0.01);
+    float2 uvX = q.zy;
+    float2 uvY = q.xz;
+    float2 uvZ = q.xy;
+    colour = (SAMPLE_TEXTURE2D(colourMap, smp, uvX).rgb * blend.x +
+              SAMPLE_TEXTURE2D(colourMap, smp, uvY).rgb * blend.y +
+              SAMPLE_TEXTURE2D(colourMap, smp, uvZ).rgb * blend.z) * tint;
+    mask = SAMPLE_TEXTURE2D(maskMap, maskSmp, uvX) * blend.x +
+           SAMPLE_TEXTURE2D(maskMap, maskSmp, uvY) * blend.y +
+           SAMPLE_TEXTURE2D(maskMap, maskSmp, uvZ) * blend.z;
+    half3 tX = UnpackNormalScale(SAMPLE_TEXTURE2D(normalMap, normalSmp, uvX), normalStrength);
+    half3 tY = UnpackNormalScale(SAMPLE_TEXTURE2D(normalMap, normalSmp, uvY), normalStrength);
+    half3 tZ = UnpackNormalScale(SAMPLE_TEXTURE2D(normalMap, normalSmp, uvZ), normalStrength);
+    tX = half3(tX.xy + n.zy, abs(tX.z) * n.x);
+    tY = half3(tY.xy + n.xz, abs(tY.z) * n.y);
+    tZ = half3(tZ.xy + n.xy, abs(tZ.z) * n.z);
+    normal = normalize(tX.zyx * blend.x + tY.xzy * blend.y + tZ.xyz * blend.z);
+}
+
+// Rock on steep ground: rocky ground (the Rock textures) and, on the steepest, cliff rock (the Cliff Rock textures).
+// Where it goes comes from WorldRock: the painted Rocky and Cliff layers (Rock From Painted Layers, so painting another
+// ground over them replaces them), or the slope, with a noisy edge either way.
 void WorldCliffs(Varyings IN, inout InputData inputData, inout half3 albedo, inout half smoothness, inout half metallic, inout half occlusion)
 {
     if (_CliffStrength <= 0)
@@ -170,31 +251,44 @@ void WorldCliffs(Varyings IN, inout InputData inputData, inout half3 albedo, ino
     float slope = degrees(acos(saturate(n.y)));
     float3 p = IN.positionWS;
     float noise = WorldCliffNoise(p * 0.35) * 0.65 + WorldCliffNoise(p * 1.1 + 7.3) * 0.35 - 0.5;
-    half w = smoothstep(_CliffSlopeStart, max(_CliffSlopeEnd, _CliffSlopeStart + 0.1), slope + noise * _CliffBreakup * 26.0) * _CliffStrength;
+    float2 rock = WorldRock(IN.uvMainAndLM.xy, slope + noise * _CliffBreakup * 26.0);
+    half w = rock.x;
+    if (_RockFromLayers > 0.5)
+    {
+        w = saturate(w + noise * _CliffBreakup * 2.0 * w * (1.0 - w)); // a ragged edge where the paint fades
+    }
+
     if (w <= 0.001)
     {
         return;
     }
 
-    float3 q = p / max(_CliffTiling, 0.01);
     half3 blend = pow(abs(n), 4.0);
     blend /= max(dot(blend, 1.0), 1e-4);
-    float2 uvX = q.zy;
-    float2 uvY = q.xz;
-    float2 uvZ = q.xy;
-    half3 colour = (SAMPLE_TEXTURE2D(_CliffAlbedo, sampler_CliffAlbedo, uvX).rgb * blend.x +
-                    SAMPLE_TEXTURE2D(_CliffAlbedo, sampler_CliffAlbedo, uvY).rgb * blend.y +
-                    SAMPLE_TEXTURE2D(_CliffAlbedo, sampler_CliffAlbedo, uvZ).rgb * blend.z) * _CliffTint.rgb;
-    half4 mask = SAMPLE_TEXTURE2D(_CliffMask, sampler_CliffAlbedo, uvX) * blend.x +
-                 SAMPLE_TEXTURE2D(_CliffMask, sampler_CliffAlbedo, uvY) * blend.y +
-                 SAMPLE_TEXTURE2D(_CliffMask, sampler_CliffAlbedo, uvZ) * blend.z;
-    half3 tX = UnpackNormalScale(SAMPLE_TEXTURE2D(_CliffNormal, sampler_CliffAlbedo, uvX), _CliffNormalStrength);
-    half3 tY = UnpackNormalScale(SAMPLE_TEXTURE2D(_CliffNormal, sampler_CliffAlbedo, uvY), _CliffNormalStrength);
-    half3 tZ = UnpackNormalScale(SAMPLE_TEXTURE2D(_CliffNormal, sampler_CliffAlbedo, uvZ), _CliffNormalStrength);
-    tX = half3(tX.xy + n.zy, abs(tX.z) * n.x);
-    tY = half3(tY.xy + n.xz, abs(tY.z) * n.y);
-    tZ = half3(tZ.xy + n.xy, abs(tZ.z) * n.z);
-    half3 rockNormal = normalize(tX.zyx * blend.x + tY.xzy * blend.y + tZ.xyz * blend.z);
+    half steep = rock.y;
+    half3 colour = 0;
+    half4 mask = 0;
+    half3 rockNormal = n;
+    if (steep < 0.999)
+    {
+        WorldTriplanarRock(TEXTURE2D_ARGS(_CliffAlbedo, sampler_CliffAlbedo), TEXTURE2D_ARGS(_CliffNormal, sampler_CliffAlbedo),
+                           TEXTURE2D_ARGS(_CliffMask, sampler_CliffAlbedo), p, n, blend, _CliffTiling, _CliffTint.rgb,
+                           _CliffNormalStrength, colour, mask, rockNormal);
+    }
+
+    if (steep > 0.001)
+    {
+        half3 steepColour;
+        half4 steepMask;
+        half3 steepNormal;
+        WorldTriplanarRock(TEXTURE2D_ARGS(_SteepAlbedo, sampler_CliffAlbedo), TEXTURE2D_ARGS(_SteepNormal, sampler_CliffAlbedo),
+                           TEXTURE2D_ARGS(_SteepMask, sampler_CliffAlbedo), p, n, blend, _SteepTiling, _SteepTint.rgb,
+                           _SteepNormalStrength, steepColour, steepMask, steepNormal);
+        bool only = steep >= 0.999;
+        colour = only ? steepColour : lerp(colour, steepColour, steep);
+        mask = only ? steepMask : lerp(mask, steepMask, steep);
+        rockNormal = only ? steepNormal : normalize(lerp(rockNormal, steepNormal, steep));
+    }
 
     albedo = lerp(albedo, colour, w);
     metallic = lerp(metallic, mask.r, w);
@@ -307,10 +401,10 @@ void NormalMapMix(float4 uvSplat01, float4 uvSplat23, inout half4 splatControl, 
 {
     #if defined(_NORMALMAP)
         half3 nrm = half(0.0);
-        nrm += splatControl.r * UnpackNormalScale(SAMPLE_TEXTURE2D(_Normal0, sampler_Normal0, uvSplat01.xy), _NormalScale0);
-        nrm += splatControl.g * UnpackNormalScale(SAMPLE_TEXTURE2D(_Normal1, sampler_Normal0, uvSplat01.zw), _NormalScale1);
-        nrm += splatControl.b * UnpackNormalScale(SAMPLE_TEXTURE2D(_Normal2, sampler_Normal0, uvSplat23.xy), _NormalScale2);
-        nrm += splatControl.a * UnpackNormalScale(SAMPLE_TEXTURE2D(_Normal3, sampler_Normal0, uvSplat23.zw), _NormalScale3);
+        nrm += splatControl.r * WorldAntiTiledNormal(TEXTURE2D_ARGS(_Normal0, sampler_Normal0), uvSplat01.xy, _NormalScale0, worldAntiTileBlend.r, splatControl.r);
+        nrm += splatControl.g * WorldAntiTiledNormal(TEXTURE2D_ARGS(_Normal1, sampler_Normal0), uvSplat01.zw, _NormalScale1, worldAntiTileBlend.g, splatControl.g);
+        nrm += splatControl.b * WorldAntiTiledNormal(TEXTURE2D_ARGS(_Normal2, sampler_Normal0), uvSplat23.xy, _NormalScale2, worldAntiTileBlend.b, splatControl.b);
+        nrm += splatControl.a * WorldAntiTiledNormal(TEXTURE2D_ARGS(_Normal3, sampler_Normal0), uvSplat23.zw, _NormalScale3, worldAntiTileBlend.a, splatControl.a);
 
         // avoid risk of NaN when normalizing.
         #if !HALF_IS_FLOAT
@@ -328,10 +422,19 @@ void SplatmapMix(float4 uvMainAndLM, float4 uvSplat01, float4 uvSplat23, inout h
 {
     half4 diffAlbedo[4];
 
-    diffAlbedo[0] = SAMPLE_TEXTURE2D(_Splat0, sampler_Splat0, uvSplat01.xy);
-    diffAlbedo[1] = SAMPLE_TEXTURE2D(_Splat1, sampler_Splat0, uvSplat01.zw);
-    diffAlbedo[2] = SAMPLE_TEXTURE2D(_Splat2, sampler_Splat0, uvSplat23.xy);
-    diffAlbedo[3] = SAMPLE_TEXTURE2D(_Splat3, sampler_Splat0, uvSplat23.zw);
+    worldAntiTileBlend = half4(WorldAntiTileWeightIf(uvSplat01.xy, splatControl.r), WorldAntiTileWeightIf(uvSplat01.zw, splatControl.g), WorldAntiTileWeightIf(uvSplat23.xy, splatControl.b), WorldAntiTileWeightIf(uvSplat23.zw, splatControl.a));
+    diffAlbedo[0] = WorldAntiTiledAlbedo(TEXTURE2D_ARGS(_Splat0, sampler_Splat0), uvSplat01.xy, worldAntiTileBlend.r, splatControl.r);
+    diffAlbedo[1] = WorldAntiTiledAlbedo(TEXTURE2D_ARGS(_Splat1, sampler_Splat0), uvSplat01.zw, worldAntiTileBlend.g, splatControl.g);
+    diffAlbedo[2] = WorldAntiTiledAlbedo(TEXTURE2D_ARGS(_Splat2, sampler_Splat0), uvSplat23.xy, worldAntiTileBlend.b, splatControl.b);
+    diffAlbedo[3] = WorldAntiTiledAlbedo(TEXTURE2D_ARGS(_Splat3, sampler_Splat0), uvSplat23.zw, worldAntiTileBlend.a, splatControl.a);
+    if (_MacroVariation > 0)
+    {
+        // Kept within 0..1: albedo brighter than white makes the lighting blow up, which bloom spreads over the screen.
+        diffAlbedo[0].rgb = saturate(diffAlbedo[0].rgb * WorldMacroShadeIf(uvSplat01.xy, splatControl.r));
+        diffAlbedo[1].rgb = saturate(diffAlbedo[1].rgb * WorldMacroShadeIf(uvSplat01.zw, splatControl.g));
+        diffAlbedo[2].rgb = saturate(diffAlbedo[2].rgb * WorldMacroShadeIf(uvSplat23.xy, splatControl.b));
+        diffAlbedo[3].rgb = saturate(diffAlbedo[3].rgb * WorldMacroShadeIf(uvSplat23.zw, splatControl.a));
+    }
 
     half4 diffuseAlpha = half4(diffAlbedo[0].a, diffAlbedo[1].a, diffAlbedo[2].a, diffAlbedo[3].a);
     half4 smoothnessConstants = half4(_Smoothness0, _Smoothness1, _Smoothness2, _Smoothness3);
@@ -529,7 +632,7 @@ Varyings SplatmapVert(Attributes v)
     return o;
 }
 
-void ComputeMasks(out half4 masks[4], half4 hasMask, float4 uvSplat01, float4 uvSplat23)
+void ComputeMasks(out half4 masks[4], half4 hasMask, float4 uvSplat01, float4 uvSplat23, half4 splatControl)
 {
     masks[0] = 0.5h;
     masks[1] = 0.5h;
@@ -537,10 +640,12 @@ void ComputeMasks(out half4 masks[4], half4 hasMask, float4 uvSplat01, float4 uv
     masks[3] = 0.5h;
 
 #ifdef _MASKMAP
-    masks[0] = lerp(masks[0], SAMPLE_TEXTURE2D(_Mask0, sampler_Mask0, uvSplat01.xy), hasMask.x);
-    masks[1] = lerp(masks[1], SAMPLE_TEXTURE2D(_Mask1, sampler_Mask0, uvSplat01.zw), hasMask.y);
-    masks[2] = lerp(masks[2], SAMPLE_TEXTURE2D(_Mask2, sampler_Mask0, uvSplat23.xy), hasMask.z);
-    masks[3] = lerp(masks[3], SAMPLE_TEXTURE2D(_Mask3, sampler_Mask0, uvSplat23.zw), hasMask.w);
+    // A layer without weight here never shows its mask (every use is multiplied by its weight): skip the read.
+    float4 dx01 = ddx(uvSplat01), dy01 = ddy(uvSplat01), dx23 = ddx(uvSplat23), dy23 = ddy(uvSplat23);
+    [branch] if (splatControl.r > 0) masks[0] = lerp(masks[0], SAMPLE_TEXTURE2D_GRAD(_Mask0, sampler_Mask0, uvSplat01.xy, dx01.xy, dy01.xy), hasMask.x);
+    [branch] if (splatControl.g > 0) masks[1] = lerp(masks[1], SAMPLE_TEXTURE2D_GRAD(_Mask1, sampler_Mask0, uvSplat01.zw, dx01.zw, dy01.zw), hasMask.y);
+    [branch] if (splatControl.b > 0) masks[2] = lerp(masks[2], SAMPLE_TEXTURE2D_GRAD(_Mask2, sampler_Mask0, uvSplat23.xy, dx23.xy, dy23.xy), hasMask.z);
+    [branch] if (splatControl.a > 0) masks[3] = lerp(masks[3], SAMPLE_TEXTURE2D_GRAD(_Mask3, sampler_Mask0, uvSplat23.zw, dx23.zw, dy23.zw), hasMask.w);
 #endif
 
     masks[0] *= _MaskMapRemapScale0.rgba;
@@ -581,11 +686,10 @@ void SplatmapFragment(
 #else
 
     half4 hasMask = half4(_LayerHasMask0, _LayerHasMask1, _LayerHasMask2, _LayerHasMask3);
-    half4 masks[4];
-    ComputeMasks(masks, hasMask, IN.uvSplat01, IN.uvSplat23);
-
     float2 splatUV = (IN.uvMainAndLM.xy * (_Control_TexelSize.zw - 1.0f) + 0.5f) * _Control_TexelSize.xy;
     half4 splatControl = SAMPLE_TEXTURE2D(_Control, sampler_Control, splatUV);
+    half4 masks[4];
+    ComputeMasks(masks, hasMask, IN.uvSplat01, IN.uvSplat23, splatControl);
 
     half alpha = dot(splatControl, 1.0h);
 #ifdef _TERRAIN_BLEND_HEIGHT

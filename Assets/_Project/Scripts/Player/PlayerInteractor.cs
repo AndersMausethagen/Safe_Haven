@@ -15,6 +15,7 @@ public sealed class PlayerInteractor : MonoBehaviour
     [Tooltip("Nearby objects can be previewed before entering interaction reach.")]
     [SerializeField, Min(0f)] private float previewRange = 6f;
 
+    private readonly List<Interactable> nearby = new List<Interactable>();
     private PlayerMovement movement;
     private PlayerStateMachine stateMachine;
     private Damageable health;
@@ -194,7 +195,10 @@ public sealed class PlayerInteractor : MonoBehaviour
         bool nearestInReach = false;
         Interactable held = transportUser != null && transportUser.Using != null ? transportUser.Using.Interactable : null;
 
-        IReadOnlyList<Interactable> candidates = Interactable.Active;
+        // Only the Interactables filed near the player: the scene holds well over a thousand.
+        nearby.Clear();
+        InteractableGrid.Near(origin, Mathf.Max(previewRange, InteractableGrid.LongestRange), nearby);
+        List<Interactable> candidates = nearby;
         for (int i = 0; i < candidates.Count; i++)
         {
             Interactable candidate = candidates[i];

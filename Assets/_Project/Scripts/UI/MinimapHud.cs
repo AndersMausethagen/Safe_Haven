@@ -51,12 +51,12 @@ public sealed class MinimapHud : MonoBehaviour
     private RectTransform disc;
     private RectTransform arrow;
     private RectTransform north;
+    private TMP_Text northLabel;
     private RawImage ground;
     private Material material;
     private Texture2D map;
     private Sprite dot;
     private Sprite pointer;
-    private Sprite ring;
     private Rect area;
     private int used;
     private int zoom;
@@ -64,6 +64,7 @@ public sealed class MinimapHud : MonoBehaviour
     private float turn;
     private float nextRefresh;
     private bool painted;
+    private bool? raidTheme;
 
     public static MinimapHud Current { get; private set; }
 
@@ -144,11 +145,6 @@ public sealed class MinimapHud : MonoBehaviour
             Destroy(pointer);
         }
 
-        if (ring != null)
-        {
-            Destroy(ring.texture);
-            Destroy(ring);
-        }
     }
 
     private void Build(Transform root)
@@ -159,27 +155,26 @@ public sealed class MinimapHud : MonoBehaviour
         reach = TargetReach;
         dot = MakeSprite(Round);
         pointer = MakeSprite(Arrowhead);
-        ring = MakeSprite(Ring);
 
         disc = CodeUI.Box("Disc", root, new Vector2(1f, 0f), Vector2.one * settings.Size, new Vector2(-Margin - settings.Size * 0.5f, Margin + settings.Size * 0.5f));
         ground = disc.gameObject.AddComponent<RawImage>();
         ground.raycastTarget = false;
         material = new Material(settings.Material);
         material.SetColor(FogId, style.Panel);
-        material.SetColor(RimId, style.Rim);
+        material.SetColor(RimId, style.RimFor(RaidDirector.Current != null));
         material.SetColor(WardId, style.Accent);
         material.SetVector(AreaId, new Vector4(area.width, area.height, 0f, 0f));
         ground.material = material;
         ground.color = Color.white;
 
         RectTransform northRect = CodeUI.Box("North", disc, new Vector2(0.5f, 0.5f), new Vector2(26f, 22f), Vector2.zero);
-        TMP_Text letter = northRect.gameObject.AddComponent<TextMeshProUGUI>();
-        letter.text = "N";
-        letter.fontSize = 15f;
-        letter.alignment = TextAlignmentOptions.Center;
-        letter.raycastTarget = false;
-        letter.color = style.Accent;
-        style.OnWorld(letter, false);
+        northLabel = northRect.gameObject.AddComponent<TextMeshProUGUI>();
+        northLabel.text = "N";
+        northLabel.fontSize = 15f;
+        northLabel.alignment = TextAlignmentOptions.Center;
+        northLabel.raycastTarget = false;
+        northLabel.color = style.AccentFor(RaidDirector.Current != null);
+        style.OnWorld(northLabel, false);
         north = northRect;
 
         arrow = CodeUI.Box("Player", disc, new Vector2(0.5f, 0.5f), Vector2.one * 24f, Vector2.zero);
@@ -217,6 +212,15 @@ public sealed class MinimapHud : MonoBehaviour
         if (!shown)
         {
             return;
+        }
+
+        bool onRaid = RaidDirector.Current != null;
+        if (raidTheme != onRaid)
+        {
+            raidTheme = onRaid;
+            UIStyle style = UIStyle.Current;
+            material.SetColor(RimId, style.RimFor(onRaid));
+            northLabel.color = style.AccentFor(onRaid);
         }
 
         ExplorationMap explored = ExplorationMap.Current;
@@ -310,7 +314,7 @@ public sealed class MinimapHud : MonoBehaviour
             if (status != ExtractionStatus.Closed)
             {
                 bool open = status == ExtractionStatus.Open;
-                Add(exit.transform, dot, open ? style.Good : style.Muted, open ? 12f : 9f, pinned: true);
+                Add(exit.transform, style.ExitMark, open ? style.Good : style.Muted, open ? 17f : 14f, pinned: true);
             }
         }
 
@@ -323,7 +327,7 @@ public sealed class MinimapHud : MonoBehaviour
             }
 
             bool down = companion.IsDowned;
-            Add(companion.transform, dot, down ? style.Danger : style.Good, down ? 11f : 7f, pinned: down);
+            Add(companion.transform, style.CompanionMark, down ? style.Danger : style.Good, down ? 16f : 13f, pinned: down);
         }
 
         ReadRaidSites(player, style);
@@ -349,7 +353,7 @@ public sealed class MinimapHud : MonoBehaviour
         {
             if (site != null && !site.IsResolved)
             {
-                Add(null, ring, style.Accent, 15f, pinned: true).Position = site.MarkFrom(from);
+                Add(null, style.RumourMark, style.Accent, 16f, pinned: true).Position = site.MarkFrom(from);
             }
         }
 
@@ -357,8 +361,7 @@ public sealed class MinimapHud : MonoBehaviour
         {
             if (site != null && !site.IsResolved)
             {
-                Marker marker = Add(site.transform, null, style.Text, 9f, pinned: true);
-                marker.Rect.localRotation = Quaternion.Euler(0f, 0f, 45f);
+                Add(site.transform, style.EventMark, style.Text, 16f, pinned: true);
             }
         }
     }
@@ -373,8 +376,7 @@ public sealed class MinimapHud : MonoBehaviour
             if (waypoint != null && waypoint.IsWanted(log))
             {
                 Color colour = waypoint.Quest != null ? QuestMarkerSettings.Current.RankColor(waypoint.Quest.Rank) : style.Accent;
-                Marker marker = Add(waypoint.transform, null, colour, 10f, pinned: true);
-                marker.Rect.localRotation = Quaternion.Euler(0f, 0f, 45f);
+                Add(waypoint.transform, style.QuestMark, colour, 16f, pinned: true);
             }
         }
 
@@ -383,7 +385,7 @@ public sealed class MinimapHud : MonoBehaviour
         {
             if (giver != null && giver.ShownQuest != null && (giver.ShownState == QuestGiverState.Available || giver.ShownState == QuestGiverState.ReadyToTurnIn))
             {
-                Add(giver.transform, dot, QuestMarkerSettings.Current.RankColor(giver.ShownQuest.Rank), 8f);
+                Add(giver.transform, style.QuestMark, QuestMarkerSettings.Current.RankColor(giver.ShownQuest.Rank), 13f);
             }
         }
     }
@@ -435,6 +437,9 @@ public sealed class MinimapHud : MonoBehaviour
             RectTransform rect = CodeUI.Box("Marker", disc, new Vector2(0.5f, 0.5f), Vector2.one, Vector2.zero);
             var image = rect.gameObject.AddComponent<Image>();
             image.raycastTarget = false;
+            var outline = rect.gameObject.AddComponent<Outline>();
+            outline.effectColor = new Color(0f, 0f, 0f, 0.85f);
+            outline.effectDistance = new Vector2(1f, -1f);
             markers.Add(new Marker { Rect = rect, Image = image });
             arrow.SetAsLastSibling();
         }
@@ -471,8 +476,6 @@ public sealed class MinimapHud : MonoBehaviour
 
     // How far inside the shape a point is, in the -1..1 square; negative outside.
     private static float Round(Vector2 point) => 0.9f - point.magnitude;
-
-    private static float Ring(Vector2 point) => Mathf.Min(0.9f - point.magnitude, point.magnitude - 0.58f);
 
     private static float Arrowhead(Vector2 point)
     {

@@ -28,6 +28,8 @@ public sealed class UIRole : MonoBehaviour
     private Button button;
     private Color labelColor;
     private bool labelsDimmed;
+    private bool started;
+    private GameObject frame;
 
     public Kind Role => kind;
 
@@ -36,6 +38,10 @@ public sealed class UIRole : MonoBehaviour
     {
         kind = role;
         Apply();
+        if (started)
+        {
+            RefreshFrame();
+        }
     }
 
     private void Awake()
@@ -43,6 +49,16 @@ public sealed class UIRole : MonoBehaviour
         // Only buttons have anything to watch; PaintButton switches them back on.
         enabled = false;
         Apply();
+    }
+
+    private void Start()
+    {
+        started = true;
+        RefreshFrame();
+        if (button == null)
+        {
+            enabled = false;
+        }
     }
 
     // Selectable's tint reaches only the button's own graphic, so a disabled button's label is dimmed here. Without it
@@ -61,13 +77,23 @@ public sealed class UIRole : MonoBehaviour
     public void Apply()
     {
         UIStyle style = UIStyle.Current;
+        if (Application.isPlaying)
+        {
+            enabled = false;
+            button = null;
+        }
+
         var image = GetComponent<Image>();
         var line = GetComponent<Outline>();
         switch (kind)
         {
             case Kind.Window:
                 Paint(image, style.Panel);
-                Paint(line, style.Rim);
+                Paint(line, style.RimFor(RaidDirector.Current != null));
+                if (Application.isPlaying && !started)
+                {
+                    enabled = true;
+                }
                 break;
             case Kind.Inset:
                 Paint(image, style.Inset);
@@ -82,6 +108,26 @@ public sealed class UIRole : MonoBehaviour
             case Kind.PrimaryButton:
                 PaintButton(image, style.Accent, style.Accent * new Color(0.85f, 0.85f, 0.85f, 1f), style.OnAccent, style.Control);
                 break;
+        }
+    }
+
+    private void RefreshFrame()
+    {
+        if (!Application.isPlaying)
+        {
+            return;
+        }
+
+        if (kind == Kind.Window && transform is RectTransform panel)
+        {
+            UIStyle style = UIStyle.Current;
+            bool onRaid = RaidDirector.Current != null;
+            frame = HearthlineArt.AddFrame(panel, style, onRaid);
+            Paint(GetComponent<Outline>(), style.RimFor(onRaid));
+        }
+        else if (frame != null)
+        {
+            frame.SetActive(false);
         }
     }
 

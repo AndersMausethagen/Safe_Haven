@@ -830,6 +830,8 @@ Prominent but nonintrusive clock; threat or danger-phase alert; objective tracke
 
 **Text says when and which way; the maps say where (November 3, 2026).** At the top: the clock, one line with an arrow to the nearest open exit, and one line of news at a time when something changes. Every exit, rumour and open event is pinned to the minimap's rim and named on the world map, where direction can be read at a glance. The companion and what is at risk sit above the vitals, with long messages above them; pickups stay beside the character. The quest tracker shows only what can be done on this raid, and says how many wait at home.
 
+The map marks have distinct carved shapes: a doorway for an exit, a broken ring for a rough rumour, a star for an open event, a diamond for a quest and a person for a companion. The world map names each place and writes quest rank and exit status in words, so colour is not the only distinction.
+
 ### 18.4 Example resource row
 
 **Grey Stone** \[stone icon\] **43 / 100**, filled to 43%. A category heading groups rows such as Raw Resources, with expandable controls and optional sorting. Distinguish “per-resource cap” from “overall carry capacity” in both labels and visual presentation.
@@ -844,7 +846,9 @@ Rebindable input, controller support, readable text scaling, color-independent s
 
 ### 18.7 Hearthline: the look of the UI
 
-The main menu sets the style and the whole game follows it. Nothing frames the world: the HUD is type and thin lines held up by a soft shadow, with one amber accent, so the art carries the screen. Windows are solid dark panels with a single thin rim, readable over bright grass and dark forest alike. Gelasio sets titles and big numbers; Fira Sans sets everything read at a glance, chosen for lining numerals that stay clear at small sizes. Colour is never the only signal: a word or a value goes with it. Health and stamina dim while full and nothing is happening, and come back the moment anything changes, or stay lit with Always Show Vitals.
+The main menu sets the style and the whole game follows it. The **hearthmark** is a little flame sheltered inside a waystone: it appears in the menu, home badge, map and loading screen. Its companion marks and the fine carved corners of windows are original, simple linework, inspired by the world's timber and stone rather than decorative runes. The HUD remains mostly type and thin lines held up by a soft shadow, so the art carries the screen. Windows are solid dark panels with a single thin rim, readable over bright grass and dark forest alike. Amber ink is warm at home; decorative ink and rims turn a muted, colder blue-green on raids. Action, warning and danger colours keep their meanings.
+
+Gelasio sets titles and big numbers; Fira Sans sets everything read at a glance, chosen for lining numerals that stay clear at small sizes. The day and weather strip gives its smaller labels more room, and interaction words sit on a dark, almost opaque plate even against bright scenery. Colour is never the only signal: a word or a value goes with it. Health and stamina dim while full and nothing is happening, and come back the moment anything changes, or stay lit with Always Show Vitals.
 
 ### 18.8 Crafting windows
 

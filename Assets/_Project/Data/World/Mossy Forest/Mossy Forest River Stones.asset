@@ -1,0 +1,52 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b302529a90cd5d4eb925e50af633cad, type: 3}
+  m_Name: Mossy Forest River Stones
+  m_EditorClassIdentifier: SafeHaven::ScatterPalette
+  entries:
+  - prefab: {fileID: 215287014038029075, guid: c67c3f6cb76afa7468e2085a2c922228, type: 3}
+    weight: 1
+    scale: {x: 0.8, y: 1.25}
+    alignToSlope: 0.6
+    sink: 0.05
+    randomYaw: 1
+  - prefab: {fileID: 6413797731762803993, guid: cc15417ff40356a4d9383d3f1367deac, type: 3}
+    weight: 0.8
+    scale: {x: 0.8, y: 1.25}
+    alignToSlope: 0.6
+    sink: 0.05
+    randomYaw: 1
+  - prefab: {fileID: 7996790799419281867, guid: 47e918ea29b202f40932c8d13556ade7, type: 3}
+    weight: 0.6
+    scale: {x: 0.8, y: 1.25}
+    alignToSlope: 0.6
+    sink: 0.05
+    randomYaw: 1
+  - prefab: {fileID: 2862827438135405961, guid: 8b1a211e2606d99409ad613404e2949b, type: 3}
+    weight: 0.6
+    scale: {x: 0.8, y: 1.25}
+    alignToSlope: 0.6
+    sink: 0.05
+    randomYaw: 1
+  - prefab: {fileID: 8202738798707269545, guid: ae5c35a4d0f61344791c2df137245efd, type: 3}
+    weight: 1
+    scale: {x: 0.8, y: 1.25}
+    alignToSlope: 0.6
+    sink: 0.05
+    randomYaw: 1
+  - prefab: {fileID: 6563200714570699009, guid: f3eeafb7f177b2543a2a204613f75887, type: 3}
+    weight: 0.4
+    scale: {x: 0.8, y: 1.25}
+    alignToSlope: 0.6
+    sink: 0.05
+    randomYaw: 1
+  spacing: 1.4

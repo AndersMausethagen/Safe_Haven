@@ -46,7 +46,25 @@ Shader "Hidden/Safe Haven/Terrain/Add"
         _CliffTiling("Rock Size (metres)", Float) = 7
         _CliffTint("Rock Tint", Color) = (1, 1, 1, 1)
         _CliffNormalStrength("Rock Normal Strength", Range(0, 2)) = 1
+        _CliffDisplacement("Rock Relief (metres, tessellated)", Range(0, 1)) = 0.35
+        _CliffHeightMidpoint("Rock Relief Midpoint (set by Enable or Refresh Displacement)", Range(0, 1)) = 0.5
+        [ToggleUI] _RockFromLayers("Rock From Painted Layers (layers marked Rocky or Cliff in the surface profile)", Float) = 0
+        _RockAlwaysFrom("Always Rock Above (degrees, painted: paint from above stretches past ~50)", Range(30, 90)) = 50
+        [Header(Cliff rock on the steepest ground)]
+        _SteepSlopeStart("Cliff Rock Starts At (degrees, by slope)", Range(0, 90)) = 56
+        _SteepSlopeEnd("Fully Cliff Rock At (degrees, by slope)", Range(0, 90)) = 66
+        [NoScaleOffset] _SteepAlbedo("Cliff Rock Colour", 2D) = "grey" {}
+        [NoScaleOffset][Normal] _SteepNormal("Cliff Rock Normal", 2D) = "bump" {}
+        [NoScaleOffset] _SteepMask("Cliff Rock Mask (R metallic, G occlusion, B height, A smoothness)", 2D) = "white" {}
+        _SteepTiling("Cliff Rock Size (metres)", Float) = 7
+        _SteepTint("Cliff Rock Tint", Color) = (1, 1, 1, 1)
+        _SteepNormalStrength("Cliff Rock Normal Strength", Range(0, 2)) = 1
+        _SteepHeightMidpoint("Cliff Rock Relief Midpoint (set by Enable or Refresh Displacement)", Range(0, 1)) = 0.5
 
+        [Header(Breaking up tiling)]
+        _AntiTiling("Hide Repetition", Range(0, 1)) = 0
+        _AntiTilingScale("Second Sample Size", Range(0.2, 1)) = 0.57
+        _MacroVariation("Large Colour Variation", Range(0, 0.5)) = 0
 
         // Layer count is passed down to guide height-blend enable/disable, due
         // to the fact that heigh-based blend will be broken with multipass.

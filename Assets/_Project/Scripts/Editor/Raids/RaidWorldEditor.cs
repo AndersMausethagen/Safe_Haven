@@ -468,11 +468,13 @@ internal static class RaidWorldEditor
         Field(data.FindProperty("terrainMaterial"), new GUIContent("Material"));
         ContentUtility.EndPanel();
 
-        ContentUtility.BeginPanel("Ground layers", "The three grounds a map is painted with, and how much grows on each. Each slider is 0 to 1. " +
+        ContentUtility.BeginPanel("Ground layers", "The grounds a map is painted with, and how much grows on each. Each slider is 0 to 1. " +
                                                    "'Bare at' clears all growth once that much of the layer shows, which keeps paths and rock bare.");
-        DrawLayer(data, terrain, "forestLayer", "Forest floor", "Everywhere the forest grows; moss grows on it too.");
+        DrawLayer(data, terrain, "forestLayer", "Forest floor", "Everywhere the forest grows; moss grows on it too, and it takes over wet ground.");
         DrawLayer(data, terrain, "pathLayer", "Soil", "Trails, clearings and pond beds.");
         DrawLayer(data, terrain, "cliffLayer", "Rock", "Slopes too steep for anything else.");
+        DrawLayer(data, terrain, "litterLayer", "Litter (optional)", "Needles and leaves in patches under the densest canopy, where the ground is dry.");
+        EditorGUILayout.PropertyField(data.FindProperty("litter"), new GUIContent("Litter cover", "How much of the deep forest's floor the litter covers."));
         EditorGUILayout.PropertyField(data.FindProperty("cliffSlope"), new GUIContent("Rock from / full at (°)", "Slopes in degrees where rock starts to show, and where it covers everything."));
         EditorGUILayout.HelpBox("Swapped a layer? Its displacement masks are baked from the old one. Open the raid scene, select the terrain and run " +
                                 "Safe Haven › World › Terrain › Enable or Refresh Displacement.", MessageType.None);
@@ -586,9 +588,16 @@ internal static class RaidWorldEditor
         EditorGUILayout.PropertyField(map.FindProperty("rocksAtCliffs"), new GUIContent("Chance at slopes"));
         EditorGUILayout.PropertyField(map.FindProperty("rocksInForest"), new GUIContent("Chance in forest"));
         ContentUtility.EndPanel();
+
+        ContentUtility.BeginPanel("Undergrowth", "Saplings, shrubs and forest-floor clutter, placed after the trees in the gaps, edges and spots by trunks their habitat favours. They don't block the way.");
+        DrawScatter(map.FindProperty("undergrowth"), null, false, solid: false);
+        EditorGUILayout.Space(4f);
+        EditorGUILayout.PropertyField(map.FindProperty("undergrowthSpacing"), new GUIContent("Spacing (m)", "Metres between spots where one could grow."));
+        EditorGUILayout.PropertyField(map.FindProperty("undergrowthChance"), new GUIContent("Chance", "Chance of undergrowth in each spot that suits something."));
+        ContentUtility.EndPanel();
     }
 
-    private static void DrawScatter(SerializedProperty list, SerializedObject rules, bool trees)
+    private static void DrawScatter(SerializedProperty list, SerializedObject rules, bool trees, bool solid = true)
     {
         float total = 0f;
         for (int i = 0; i < list.arraySize; i++)
@@ -630,11 +639,14 @@ internal static class RaidWorldEditor
                         GUILayout.FlexibleSpace();
                     }
 
-                    string warning = ScatterWarning(prefab, trees);
+                    string warning = ScatterWarning(prefab, trees, solid);
                     if (warning != null)
                     {
                         EditorGUILayout.LabelField(warning, ContentUtility.WrappedMiniLabel);
                     }
+
+                    EditorGUILayout.PropertyField(entry.FindPropertyRelative("habitat"),
+                        new GUIContent("Where it belongs", "Slope, forest density, wet or dry ground, edges, closeness to trunks, groves and the room it needs."), true);
                 }
             }
         }
@@ -648,14 +660,14 @@ internal static class RaidWorldEditor
         DropZone(list);
     }
 
-    private static string ScatterWarning(GameObject prefab, bool tree)
+    private static string ScatterWarning(GameObject prefab, bool tree, bool solid)
     {
         if (prefab == null)
         {
             return "Pick a prefab; an empty row never grows.";
         }
 
-        if (prefab.GetComponent<CapsuleCollider>() == null)
+        if (solid && prefab.GetComponent<CapsuleCollider>() == null)
         {
             return "⚠ No Capsule Collider: the player and creatures walk through it.";
         }

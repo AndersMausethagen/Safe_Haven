@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: MistyWoods Layout
   m_EditorClassIdentifier: SafeHaven::RaidLayoutRules
   rooms: {x: 9, y: 12}
+  exitRooms: 3
   roomSeparation: 34
   roomRadius: {x: 8, y: 14}
   edgeMargin: 14
@@ -61,7 +62,7 @@ MonoBehaviour:
     briefing: The trails tangle, and there is always another way round.
   moods:
   - name: Old Growth
-    briefing: The spruce stand close and the light barely reaches the ground.
+    briefing: The old cedars stand close and the light barely reaches the ground.
     weight: 1.2
     forest: 1.15
     treeSpacing: 0.92
@@ -77,10 +78,17 @@ MonoBehaviour:
     forest: 0.7
     treeSpacing: 1
     treeWeights:
+    - 0.4
+    - 0.4
+    - 0.8
+    - 0.8
+    - 0.6
     - 1
     - 1
-    - 0.5
-    - 0.5
+    - 1
+    - 1
+    - 1
+    - 2
     - 4
     ridges: 1
     rooms: 1
@@ -109,17 +117,24 @@ MonoBehaviour:
     trails: 1.3
     rocks: 1
     fogBanks: 0
-  - name: Pinewood
-    briefing: Dry pines on rising ground, with rock breaking through.
+  - name: Cedar Ridge
+    briefing: Slender cedars on rising ground, with rock breaking through.
     weight: 1
     forest: 0.8
     treeSpacing: 1
     treeWeights:
-    - 0.5
-    - 0.5
-    - 0.5
-    - 5
     - 0.3
+    - 0.3
+    - 0.5
+    - 3
+    - 3
+    - 0.5
+    - 0.5
+    - 4
+    - 0.5
+    - 0.5
+    - 1
+    - 0.5
     ridges: 1.25
     rooms: 1
     trails: 1

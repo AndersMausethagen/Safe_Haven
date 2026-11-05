@@ -33,6 +33,8 @@ public sealed class TreeParts
     /// <summary>The colour of its falling leaves. Most leaves get their green from a texture and are untinted white, so
     /// those keep the leaf green here rather than fall as white petals.</summary>
     public Color LeafTint { get; private set; } = new Color(0.38f, 0.56f, 0.22f);
+    /// <summary>The tree's own leaf-fall effect (TreeLeafLook), or null for Tree Chopping Settings › Leaf Fall.</summary>
+    public GameObject LeafFall { get; private set; }
     /// <summary>The tree's own bark, or null when its bark is made for its model alone and won't wrap a log.</summary>
     public Material Bark { get; private set; }
 
@@ -110,12 +112,22 @@ public sealed class TreeParts
         parts.TrunkLength = parts.Height * 0.65f;
         if (source.TryGetComponent(out CapsuleCollider trunk))
         {
-            parts.TrunkRadius = Mathf.Max(0.16f, trunk.radius * Mathf.Max(Mathf.Abs(scale.x), Mathf.Abs(scale.z)));
+            parts.TrunkRadius = Mathf.Max(MinTrunkRadius, trunk.radius * Mathf.Max(Mathf.Abs(scale.x), Mathf.Abs(scale.z)));
             parts.TrunkLength = Mathf.Min(Mathf.Max(trunk.height * Mathf.Abs(scale.y), parts.Height * 0.5f), parts.Height * 0.8f);
+        }
+
+        // A tree can name its own falling leaves (needles from a cedar, not broad leaves) and their colour.
+        if (source.TryGetComponent(out TreeLeafLook look))
+        {
+            parts.LeafTint = look.Colour;
+            parts.LeafFall = look.LeafFall;
         }
 
         return parts;
     }
+
+    // Slender young trunks are real: a thicker floor made their stumps and logs wider than the tree.
+    private const float MinTrunkRadius = 0.07f;
 
     private static bool IsTinted(Color colour) => Mathf.Min(colour.r, Mathf.Min(colour.g, colour.b)) < UntintedAbove;
 

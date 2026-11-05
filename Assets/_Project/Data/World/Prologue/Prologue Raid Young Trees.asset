@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b302529a90cd5d4eb925e50af633cad, type: 3}
+  m_Name: Prologue Raid Young Trees
+  m_EditorClassIdentifier: SafeHaven::ScatterPalette
+  entries:
+  - prefab: {fileID: 6017839548146343879, guid: 2d40a8c3acc57954f88c5c77a63d9dfc, type: 3}
+    weight: 1
+    scale: {x: 0.8, y: 1.2}
+    alignToSlope: 0
+    sink: 0.30670744
+    randomYaw: 1
+  - prefab: {fileID: 377414857758038605, guid: be38ee3b6cde5bc44b1252a1873eb15d, type: 3}
+    weight: 1
+    scale: {x: 0.8, y: 1.2}
+    alignToSlope: 0
+    sink: 0.1624022
+    randomYaw: 1
+  - prefab: {fileID: 5124537417292197620, guid: 4c161aa370b351143b38c52fe75000e4, type: 3}
+    weight: 0.8
+    scale: {x: 0.8, y: 1.2}
+    alignToSlope: 0
+    sink: 0.0940991
+    randomYaw: 1
+  - prefab: {fileID: 4444697584306223501, guid: 04a9109d39536f744b86a9dfe80ea9fe, type: 3}
+    weight: 0.6
+    scale: {x: 0.8, y: 1.2}
+    alignToSlope: 0
+    sink: 0.15581779
+    randomYaw: 1
+  spacing: 2.5

@@ -3,8 +3,8 @@ using UnityEngine;
 
 /// <summary>
 /// The look of all the game's UI, in one place (Resources/UIStyle, Systems Editor › Settings › UI Style): Hearthline, taken
-/// from the main menu. Nothing frames the world: the HUD is type and thin lines, held up by a soft shadow, with one amber
-/// accent (GDD §18.7). Windows are solid, so they read over bright grass and dark forest alike.
+/// from the main menu. The HUD is type and thin lines, held up by a soft shadow. Carved marks carry the same identity
+/// from the hearth to the colder raid regions (GDD §18.7). Windows stay solid over bright grass and dark forest alike.
 /// <para>
 /// Prefabs and scenes carry a UIRole, which colours them from here when they wake; code-built UI asks for the colours
 /// directly. So changing a colour here changes the game, with nothing to re-run. Safe Haven › UI › Apply Hearthline puts the
@@ -49,6 +49,17 @@ public sealed class UIStyle : GameSettings<UIStyle>
     [SerializeField] private Color accent = new Color(0.85f, 0.655f, 0.353f, 1f);
     [Tooltip("Text on an Accent button.")]
     [SerializeField] private Color onAccent = new Color(0.075f, 0.066f, 0.055f, 1f);
+    [Tooltip("A colder decorative accent on raids. Action and warning colours do not change.")]
+    [SerializeField] private Color raidAccent = new Color(0.49f, 0.75f, 0.77f, 1f);
+
+    [Header("Carved artwork")]
+    [SerializeField] private Sprite hearthmark;
+    [SerializeField] private Sprite carvedCorner;
+    [SerializeField] private Sprite exitMark;
+    [SerializeField] private Sprite questMark;
+    [SerializeField] private Sprite companionMark;
+    [SerializeField] private Sprite eventMark;
+    [SerializeField] private Sprite rumourMark;
 
     [Header("Signals (never the only sign: a word or a value goes with them)")]
     [SerializeField] private Color good = new Color(0.525f, 0.627f, 0.435f, 1f);
@@ -74,10 +85,28 @@ public sealed class UIStyle : GameSettings<UIStyle>
     public Color Muted => muted;
     public Color Accent => accent;
     public Color OnAccent => onAccent;
+    public Color RaidAccent => raidAccent;
     public Color Good => good;
     public Color Warning => warning;
     public Color Danger => danger;
     public float WindowFadeSeconds => windowFadeSeconds;
+    public Sprite Hearthmark => hearthmark;
+    public Sprite CarvedCorner => carvedCorner;
+    public Sprite ExitMark => exitMark;
+    public Sprite QuestMark => questMark;
+    public Sprite CompanionMark => companionMark;
+    public Sprite EventMark => eventMark;
+    public Sprite RumourMark => rumourMark;
+
+    /// <summary>Only decorative ink changes with the place, not the colours of actions or warnings.</summary>
+    public Color AccentFor(bool onRaid) => onRaid ? raidAccent : accent;
+
+    public Color RimFor(bool onRaid)
+    {
+        Color colour = onRaid ? raidAccent : rim;
+        colour.a = rim.a;
+        return colour;
+    }
 
     /// <summary>A colour for rich text, with its #.</summary>
     public static string Hex(Color color) => "#" + ColorUtility.ToHtmlStringRGB(color);

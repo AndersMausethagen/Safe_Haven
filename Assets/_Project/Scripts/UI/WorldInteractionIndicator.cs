@@ -168,7 +168,7 @@ public sealed class WorldInteractionIndicator : MonoBehaviour
 
         if (status != null)
         {
-            status.color = color;
+            status.color = ReadableStatusColor(color, UIStyle.Current.Text);
             if (working && Target.HoldOpen)
             {
                 // A minigame runs on its own bar, so there is no share of the work to report.
@@ -188,6 +188,9 @@ public sealed class WorldInteractionIndicator : MonoBehaviour
             }
         }
     }
+
+    /// <summary>Keeps the state tint while making the words legible on the prompt's dark plate.</summary>
+    public static Color ReadableStatusColor(Color signal, Color text) => Color.Lerp(signal, text, 0.55f);
 
     private void Hide()
     {

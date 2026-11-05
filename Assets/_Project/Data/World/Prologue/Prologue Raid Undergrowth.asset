@@ -1,0 +1,52 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b302529a90cd5d4eb925e50af633cad, type: 3}
+  m_Name: Prologue Raid Undergrowth
+  m_EditorClassIdentifier: SafeHaven::ScatterPalette
+  entries:
+  - prefab: {fileID: 3506748076108523107, guid: 325b5fb486ccc734098a5bd35f6e7fec, type: 3}
+    weight: 1.2
+    scale: {x: 0.8, y: 1.2}
+    alignToSlope: 0.8
+    sink: 0.05
+    randomYaw: 1
+  - prefab: {fileID: 259393855304652138, guid: ece16692635794342acbcc56c3aac296, type: 3}
+    weight: 0.6
+    scale: {x: 0.8, y: 1.2}
+    alignToSlope: 0.8
+    sink: 0.05
+    randomYaw: 1
+  - prefab: {fileID: 5902797484319364536, guid: 30f3bb3fbf95cf641bfdb06b4a167fd0, type: 3}
+    weight: 0.8
+    scale: {x: 0.8, y: 1.2}
+    alignToSlope: 0.8
+    sink: 0.05
+    randomYaw: 1
+  - prefab: {fileID: 5598971686785774421, guid: 02d23ecdbbebb3540b69e5e57e7a2abb, type: 3}
+    weight: 0.8
+    scale: {x: 0.8, y: 1.2}
+    alignToSlope: 0.8
+    sink: 0.05
+    randomYaw: 1
+  - prefab: {fileID: 377414857758038605, guid: be38ee3b6cde5bc44b1252a1873eb15d, type: 3}
+    weight: 0.4
+    scale: {x: 0.8, y: 1.2}
+    alignToSlope: 0
+    sink: 0.1624022
+    randomYaw: 1
+  - prefab: {fileID: 5124537417292197620, guid: 4c161aa370b351143b38c52fe75000e4, type: 3}
+    weight: 0.4
+    scale: {x: 0.8, y: 1.2}
+    alignToSlope: 0
+    sink: 0.0940991
+    randomYaw: 1
+  spacing: 0.9

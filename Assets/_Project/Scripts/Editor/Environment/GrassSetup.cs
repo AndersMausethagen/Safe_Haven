@@ -625,27 +625,40 @@ public static class GrassSetup
         return new Color(average.r * tint.x, average.g * tint.y, average.b * tint.z, 1f);
     }
 
-    // Repainting a terrain that has a ground colour map rebakes it (once per editor tick).
+    // Repainting a terrain that has a ground colour map rebakes it once painting has paused (a bake per brush stroke
+    // made painting stutter).
+    private const double BakeAfterSeconds = 3.0;
+
     [InitializeOnLoadMethod]
     private static void WatchTerrainPaint()
     {
-        var pending = new HashSet<Terrain>();
+        var pending = new Dictionary<Terrain, double>();
         TerrainCallbacks.textureChanged += (terrain, textureName, region, synced) =>
         {
             if (textureName != TerrainData.AlphamapTextureName || !synced || terrain == null ||
-                terrain.GetComponent<GrassTerrainColour>() == null || !pending.Add(terrain))
+                terrain.GetComponent<GrassTerrainColour>() == null)
             {
                 return;
             }
 
-            EditorApplication.delayCall += () =>
+            pending[terrain] = EditorApplication.timeSinceStartup + BakeAfterSeconds;
+        };
+        EditorApplication.update += () =>
+        {
+            if (pending.Count == 0)
+            {
+                return;
+            }
+
+            double now = EditorApplication.timeSinceStartup;
+            foreach (Terrain terrain in pending.Where(p => p.Value <= now).Select(p => p.Key).ToList())
             {
                 pending.Remove(terrain);
                 if (terrain != null)
                 {
                     BakeGroundColour(terrain);
                 }
-            };
+            }
         };
     }
 

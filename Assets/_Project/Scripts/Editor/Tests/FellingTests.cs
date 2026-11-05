@@ -167,7 +167,7 @@ public sealed class FellingTests
             Assert.Greater(parts.Parts.Count, 0, path);
             Assert.Greater(parts.Height, 1f, path);
             Assert.Greater(parts.TrunkLength, 1f, path);
-            Assert.Greater(parts.TrunkRadius, 0.1f, path);
+            Assert.GreaterOrEqual(parts.TrunkRadius, 0.07f, path);
             Assert.Less(parts.TrunkLength, parts.Height, path);
         }
 

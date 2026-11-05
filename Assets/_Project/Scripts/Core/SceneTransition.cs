@@ -535,6 +535,8 @@ public static class SceneTransition
             ((RectTransform)shadeObject.transform).anchorMax = new Vector2(1f, ShadeHeight);
 
             UIStyle style = UIStyle.Current;
+            HearthlineArt.AddIcon(root.transform, "Hearthmark", style.Hearthmark, Vector2.zero, Vector2.one * 54f,
+                new Vector2(68f, 168f), style.Accent, true);
             caption = Text("Caption", root.transform, 44f, FontStyles.SmallCaps, new Vector2(120f, 150f), TextAlignmentOptions.BottomLeft);
             style.OnWorld(caption, true);
             caption.color = style.Text;

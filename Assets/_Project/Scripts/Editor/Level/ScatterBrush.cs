@@ -209,7 +209,7 @@ public sealed class ScatterBrush : EditorWindow
         Ray ray = HandleUtility.GUIPointToWorldRay(mouse);
         foreach (RaycastHit hit in Physics.RaycastAll(ray, 5000f, ~0, QueryTriggerInteraction.Ignore).OrderBy(h => h.distance))
         {
-            if (hit.collider is TerrainCollider || hit.transform.root.name != RootName)
+            if (hit.collider is TerrainCollider || !SceneFolders.IsUnder(hit.transform, RootName))
             {
                 point = hit.point;
                 normal = hit.normal;
@@ -231,6 +231,7 @@ public sealed class ScatterBrush : EditorWindow
             if (!create) return null;
             root = new GameObject(RootName);
             Undo.RegisterCreatedObjectUndo(root, "Scatter Paint");
+            SceneFolders.Place(root);
         }
 
         Transform folder = root.transform.Find(palette.name);

@@ -71,18 +71,22 @@ public static class TerrainDisplacementEditor
         foreach (TerrainLayer layer in layers)
         {
             if (profile.Find(layer) != null) continue;
-            TerrainSurfaceProfile.Layer known = StandardProfile != null ? StandardProfile.Find(layer) : null;
-            var entry = new TerrainSurfaceProfile.Layer { terrainLayer = layer };
+            TerrainSurfaceProfile.Layer known = KnownSettings(layer);
+            var entry = new TerrainSurfaceProfile.Layer { terrainLayer = layer, rock = TerrainSurfaceProfile.RockOf(layer) };
             if (known != null)
             {
                 entry.footprintResponse = known.footprintResponse;
                 entry.amplitude = known.amplitude;
+                entry.midpoint = known.midpoint;
+                entry.contrast = known.contrast;
+                entry.heightMap = known.heightMap;
+                entry.channel = known.channel;
             }
 
             string layerPathOnDisk = AssetDatabase.GetAssetPath(layer);
             string sourcePath = Path.GetDirectoryName(layerPathOnDisk).Replace('\\', '/') + "/" + layer.name + "_Height.png";
             Texture2D sourceHeight = AssetDatabase.LoadAssetAtPath<Texture2D>(sourcePath);
-            if (sourceHeight != null)
+            if (sourceHeight != null && entry.heightMap == null)
                 entry.heightMap = sourceHeight;
             profile.layers.Add(entry);
         }
@@ -136,7 +140,7 @@ public static class TerrainDisplacementEditor
                     ? new Color(entry.heightMap != null ? 1 : layer.maskMapRemapMax.z - layer.maskMapRemapMin.z,
                         entry.heightMap != null ? 0 : layer.maskMapRemapMin.z, entry.amplitude, entry.midpoint)
                     : new Color(0, entry.midpoint, 0, entry.midpoint));
-                layerData.SetPixel(i, 2, new Color(entry.footprintResponse, 0, 0, 0));
+                layerData.SetPixel(i, 2, new Color(entry.footprintResponse, (float)entry.rock, 0, 0));
             }
             masks.Apply(true, false);
             layerData.Apply(false, false);
@@ -171,6 +175,10 @@ public static class TerrainDisplacementEditor
         material.SetFloat("_DisplacementLayerCount", layers.Length);
         material.SetFloat("_DisplacementDataVersion", 2);
         material.SetVector("_DisplacementTerrainSize", new Vector4(data.size.x, data.size.z, 0.01f, 0));
+        if (material.HasProperty("_CliffHeightMidpoint"))
+            material.SetFloat("_CliffHeightMidpoint", MeanHeight(material.GetTexture("_CliffMask")));
+        if (material.HasProperty("_SteepHeightMidpoint"))
+            material.SetFloat("_SteepHeightMidpoint", MeanHeight(material.GetTexture("_SteepMask")));
         Texture2D[] controls = data.alphamapTextures;
         for (int i = 0; i < 4; i++)
             material.SetTexture("_DisplacementControl" + i, i < controls.Length ? controls[i] : Texture2D.blackTexture);
@@ -196,6 +204,46 @@ public static class TerrainDisplacementEditor
         { "_DisplacementStrength", "_DisplacementNear", "_DisplacementFar", "_TessellationFactor", "_TessellationEdgeLength", "_TessellationPixels" };
 
     private static TerrainSurfaceProfile StandardProfile => AssetDatabase.LoadAssetAtPath<TerrainSurfaceProfile>(StandardProfilePath);
+
+    /// <summary>How a ground is already set up on another terrain (the Haven's first), so a layer added to a terrain
+    /// displaces and takes footprints as it does where it was tuned.</summary>
+    private static TerrainSurfaceProfile.Layer KnownSettings(TerrainLayer layer)
+    {
+        TerrainSurfaceProfile.Layer known = StandardProfile != null ? StandardProfile.Find(layer) : null;
+        if (known != null) return known;
+        foreach (string guid in AssetDatabase.FindAssets("t:" + nameof(TerrainSurfaceProfile)))
+        {
+            var other = AssetDatabase.LoadAssetAtPath<TerrainSurfaceProfile>(AssetDatabase.GUIDToAssetPath(guid));
+            known = other != null ? other.Find(layer) : null;
+            if (known != null) return known;
+        }
+
+        return null;
+    }
+
+    /// <summary>The average of a mask's blue channel (its height): the level the rock's relief is pushed out and in from.</summary>
+    public static float MeanHeight(Texture texture)
+    {
+        if (texture == null) return 0.5f;
+        RenderTexture previous = RenderTexture.active;
+        RenderTexture small = RenderTexture.GetTemporary(64, 64, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Linear);
+        var read = new Texture2D(64, 64, TextureFormat.RGBA32, false, true);
+        try
+        {
+            Graphics.Blit(texture, small);
+            RenderTexture.active = small;
+            read.ReadPixels(new Rect(0, 0, 64, 64), 0, 0);
+            float sum = 0;
+            foreach (Color32 pixel in read.GetPixels32()) sum += pixel.b;
+            return sum / (64 * 64 * 255f);
+        }
+        finally
+        {
+            RenderTexture.active = previous;
+            RenderTexture.ReleaseTemporary(small);
+            UnityEngine.Object.DestroyImmediate(read);
+        }
+    }
 
     /// <summary>Gives a material the standard's displacement and tessellation (the Haven's own is left as it is).</summary>
     public static void UseStandardDisplacement(Material material)

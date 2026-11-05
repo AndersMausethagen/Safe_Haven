@@ -244,7 +244,7 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
     {
         if (definition.ForestLayer != null && definition.PathLayer != null && definition.CliffLayer != null)
         {
-            data.terrainLayers = new[] { definition.ForestLayer, definition.PathLayer, definition.CliffLayer };
+            data.terrainLayers = definition.Layers;
             if (terrain.TryGetComponent(out TerrainMoss moss))
             {
                 moss.MossLayer = definition.ForestLayer;

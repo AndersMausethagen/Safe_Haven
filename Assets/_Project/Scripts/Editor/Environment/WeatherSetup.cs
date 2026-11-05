@@ -109,15 +109,16 @@ public static class WeatherSetup
     public static GameObject AddToScene(Set set)
     {
         var scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
-        GameObject rig = Array.Find(scene.GetRootGameObjects(), root => root.name == RigName);
+        GameObject rig = SceneFolders.Find(scene, RigName);
         DayNightCycle cycle = Array.Find(Object.FindObjectsByType<DayNightCycle>(FindObjectsInactive.Include),
             candidate => candidate.gameObject.scene == scene);
         if (rig == null && cycle != null)
-            rig = cycle.transform.root.gameObject;
+            rig = SceneFolders.TopOf(cycle.transform).gameObject;
         if (rig == null)
         {
             rig = new GameObject(RigName);
             Undo.RegisterCreatedObjectUndo(rig, "Add Day, Night and Weather");
+            SceneFolders.Place(rig);
         }
 
         Volume night = EnsureVolume(rig.transform, "Night Volume", set.Night, 1f);

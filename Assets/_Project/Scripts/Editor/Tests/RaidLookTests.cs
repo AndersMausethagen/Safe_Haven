@@ -28,7 +28,7 @@ public sealed class RaidLookTests
         Material material = Map.TerrainMaterial;
         Assert.IsTrue(material.HasProperty("_DisplacementStrength"));
         Assert.Greater(material.GetFloat("_DisplacementStrength"), 0f);
-        Assert.AreEqual(3f, material.GetFloat("_DisplacementLayerCount"), "moss, soil and rock, as the map paints them");
+        Assert.AreEqual(Map.Layers.Length, material.GetFloat("_DisplacementLayerCount"), "moss, soil, rock and litter, as the map paints them");
         Assert.IsNotNull(material.GetTexture("_DisplacementMasks"));
     }
 
@@ -103,7 +103,7 @@ public sealed class RaidLookTests
     {
         var data = AssetDatabase.LoadAssetAtPath<TerrainData>("Assets/_Project/Data/Raids/Maps/MistyWoods Map Terrain.asset");
         string[] kinds = data.detailPrototypes.Select(prototype => prototype.prototype != null ? prototype.prototype.name : "").ToArray();
-        foreach (string kind in new[] { "Short Grass", "Tall Grass", "Bush", "Fern", "Blueberry", "Heather" })
+        foreach (string kind in new[] { "Short Grass", "Tall Grass", "Bush", "Common Fern", "Eagle Fern", "Glow Mushrooms" })
         {
             CollectionAssert.Contains(kinds, kind);
         }
@@ -115,7 +115,7 @@ public sealed class RaidLookTests
     [Test]
     public void GroundGrowth_CoversEveryLayerTheMapPaints_WithAColour()
     {
-        foreach (TerrainLayer layer in new[] { Map.ForestLayer, Map.PathLayer, Map.CliffLayer })
+        foreach (TerrainLayer layer in Map.Layers)
         {
             TerrainGrowth.Ground ground = Map.Growth.First(entry => entry.layer == layer);
             Assert.Greater(ground.colour.maxColorComponent, 0f, layer.name);

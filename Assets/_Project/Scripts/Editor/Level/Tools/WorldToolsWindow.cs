@@ -40,7 +40,8 @@ public sealed class WorldToolsWindow : EditorWindow
         "Safe Haven/World/Terrain/Add Gentle Relief...", "Safe Haven/World/Terrain/Add Moss to Selected Terrain",
         "Safe Haven/World/Terrain/Path Painter (paints once)",
         "GameObject/Safe Haven/World/River", "GameObject/Safe Haven/World/River (Haven)", "GameObject/Safe Haven/World/Path (Forest)",
-        "GameObject/Safe Haven/World/Path (Haven)", "GameObject/Safe Haven/World/Cliff", "GameObject/Safe Haven/World/Dark Forest Area",
+        "GameObject/Safe Haven/World/Path (Haven)", "GameObject/Safe Haven/World/Cliff", "GameObject/Safe Haven/World/Cliff (Haven)",
+        "GameObject/Safe Haven/World/Dark Forest Area",
         "GameObject/Safe Haven/World/Haven Grove Area",
         "Safe Haven/World/Build Now", "Safe Haven/World/Rebuild Everything", "Safe Haven/World/Set Up World Assets",
         "Safe Haven/World/Water/Create Pond", "Safe Haven/World/Water/Create River Section", "Safe Haven/World/Water/Create Waterfall...",
@@ -63,6 +64,9 @@ public sealed class WorldToolsWindow : EditorWindow
     private Tab tab;
     private string search = "";
     private string category = "All";
+    private string set = "All";
+    private static string groundSet = "Forest Lake";
+    private static Vector2 groundScroll;
     private Vector2 scroll;
     private ScenePlayability.Kind kind;
     private List<ScenePlayability.Issue> issues;
@@ -154,9 +158,14 @@ public sealed class WorldToolsWindow : EditorWindow
         int index = Mathf.Max(0, Array.IndexOf(categories, category));
         index = GUILayout.SelectionGrid(index, categories, 3, EditorStyles.miniButton);
         category = categories[index];
+        string[] sets = new[] { "All" }.Concat(PrefabCatalog.Sets).ToArray();
+        int setIndex = Mathf.Max(0, Array.IndexOf(sets, set));
+        setIndex = GUILayout.Toolbar(setIndex, sets, EditorStyles.miniButton);
+        set = sets[setIndex];
 
         List<PrefabCatalog.Entry> shown = PrefabCatalog.All
             .Where(e => category == "All" || e.Category == category)
+            .Where(e => set == "All" || e.Set == set)
             .Where(e => string.IsNullOrWhiteSpace(search) || e.Name.IndexOf(search, StringComparison.OrdinalIgnoreCase) >= 0)
             .ToList();
         EditorGUILayout.LabelField($"{shown.Count} prefab(s): click one, then click in the Scene view. Or drag it in.", EditorStyles.miniLabel);
@@ -291,21 +300,26 @@ public sealed class WorldToolsWindow : EditorWindow
         Section("World Builder (draw with splines; rebuilds as you edit)");
         using (new EditorGUILayout.HorizontalScope())
         {
-            MenuButton("River", "GameObject/Safe Haven/World/River", "A river in the dark forest: gravel bed, muddy banks");
-            MenuButton("River (Haven)", "GameObject/Safe Haven/World/River (Haven)", "A river in the Haven: gravel bed, earthy banks");
-            MenuButton("Cliff", "GameObject/Safe Haven/World/Cliff", "A cliff or outcrop of scanned rock faces");
+            MenuButton("River", "GameObject/Safe Haven/World/River", "A river in the Mossy Forest: rocky bed, earthy banks, mossy stones and ferns");
+            MenuButton("River (Haven)", "GameObject/Safe Haven/World/River (Haven)", "A river in the Forest Lake: rocky bed, banks, lake stones and ferns");
         }
 
         using (new EditorGUILayout.HorizontalScope())
         {
-            MenuButton("Path (Forest)", "GameObject/Safe Haven/World/Path (Forest)", "A muddy forest path");
-            MenuButton("Path (Haven)", "GameObject/Safe Haven/World/Path (Haven)", "A trodden, grassy track");
+            MenuButton("Cliff", "GameObject/Safe Haven/World/Cliff", "A Mossy Forest cliff of cliff boulders, slabs and outcrops (tessellated)");
+            MenuButton("Cliff (Haven)", "GameObject/Safe Haven/World/Cliff (Haven)", "A Forest Lake cliff of lake crags (tessellated)");
         }
 
         using (new EditorGUILayout.HorizontalScope())
         {
-            MenuButton("Dark Forest", "GameObject/Safe Haven/World/Dark Forest Area", "Spruce and pine, stumps, logs, ferns, boulders");
-            MenuButton("Haven Grove", "GameObject/Safe Haven/World/Haven Grove Area", "Open oak groves, a few conifers, ferns by the water");
+            MenuButton("Path (Forest)", "GameObject/Safe Haven/World/Path (Forest)", "A Mossy Forest path of bare soil");
+            MenuButton("Path (Haven)", "GameObject/Safe Haven/World/Path (Haven)", "A trodden Forest Lake track");
+        }
+
+        using (new EditorGUILayout.HorizontalScope())
+        {
+            MenuButton("Dark Forest", "GameObject/Safe Haven/World/Dark Forest Area", "Mossy Forest: dense cedars, young cedars, mossy logs and stumps, ferns and shrubs, boulders");
+            MenuButton("Haven Grove", "GameObject/Safe Haven/World/Haven Grove Area", "Forest Lake: open sugar maple groves, saplings, logs, lake boulders, ferns by the water");
         }
 
         using (new EditorGUILayout.HorizontalScope())
@@ -320,12 +334,12 @@ public sealed class WorldToolsWindow : EditorWindow
         using (new EditorGUI.DisabledScope(terrain == null))
         using (new EditorGUILayout.HorizontalScope())
         {
-            if (GUILayout.Button(new GUIContent("Dark Forest Look", "Rock on steep ground and the dark forest's paint rules")))
+            if (GUILayout.Button(new GUIContent("Dark Forest Look", "The Mossy Forest: tessellated terrain material with its rock on steep ground, its grounds and paint rules")))
             {
                 WorldTerrainEditor.UseLook(WorldTerrainOf(terrain), terrain, false);
             }
 
-            if (GUILayout.Button(new GUIContent("Haven Look", "Lighter rock and the green meadow's paint rules")))
+            if (GUILayout.Button(new GUIContent("Haven Look", "The Forest Lake: tessellated terrain material with its rock on steep ground, its grounds and meadow paint rules")))
             {
                 WorldTerrainEditor.UseLook(WorldTerrainOf(terrain), terrain, true);
             }
@@ -349,10 +363,110 @@ public sealed class WorldToolsWindow : EditorWindow
             MenuButton("Add Moss", "Safe Haven/World/Terrain/Add Moss to Selected Terrain", "Live moss on the terrain's moss layer");
         }
 
+        using (new EditorGUI.DisabledScope(terrain == null))
+        {
+            if (GUILayout.Button(new GUIContent("Rock on Steep Ground", "Paint the look's rocky ground on steep slopes and Cliff Rock on the steepest drops " +
+                                                                      "(over what is there; paint any ground over them to change them)")))
+            {
+                Debug.Log($"{terrain.name}: {TerrainRock.PaintSteepGround(terrain, WorldLook.Of(terrain))}.", terrain);
+            }
+        }
+
+        DrawGroundPainting(terrain);
+        DrawRelief(terrain);
+
         Section("Walking");
         if (GUILayout.Button(new GUIContent("Rebake NavMesh", "Monsters and residents walk the ground as it is now")))
         {
             Debug.Log("World Tools: " + WorldBuilder.RebakeNavMesh());
+        }
+    }
+
+    /// <summary>Every ground layer of a set as a picture: click one to add it to the terrain (tessellated) and paint with it.</summary>
+    private static void DrawGroundPainting(Terrain terrain)
+    {
+        Section("Paint ground (tessellated)");
+        int setIndex = Mathf.Max(0, Array.IndexOf(GroundLayerPainter.Sets, groundSet));
+        setIndex = GUILayout.Toolbar(setIndex, GroundLayerPainter.Sets, EditorStyles.miniButton);
+        groundSet = GroundLayerPainter.Sets[setIndex];
+        EditorGUILayout.LabelField("Click a ground: it joins the terrain if missing (with its relief) and the Paint Texture brush opens on it.",
+                                   EditorStyles.wordWrappedMiniLabel);
+        List<TerrainLayer> layers = GroundLayerPainter.Layers(groundSet).ToList();
+        const float tile = 64f;
+        int columns = Mathf.Max(1, Mathf.FloorToInt((EditorGUIUtility.currentViewWidth - 30f) / (tile + 6f)));
+        groundScroll = EditorGUILayout.BeginScrollView(groundScroll, GUILayout.Height(Mathf.Min(2, Mathf.CeilToInt(layers.Count / (float)columns)) * (tile + 22f) + 6f));
+        using (new EditorGUI.DisabledScope(terrain == null))
+        {
+            for (int i = 0; i < layers.Count; i += columns)
+            {
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    for (int c = 0; c < columns && i + c < layers.Count; c++)
+                    {
+                        TerrainLayer layer = layers[i + c];
+                        bool onTerrain = terrain != null && terrain.terrainData.terrainLayers.Contains(layer);
+                        using (new EditorGUILayout.VerticalScope(GUILayout.Width(tile)))
+                        {
+                            Texture picture = layer.diffuseTexture != null ? layer.diffuseTexture : AssetPreview.GetMiniThumbnail(layer);
+                            string tip = layer.name + (onTerrain ? " (on this terrain)" : " (click to add it and paint)");
+                            if (GUILayout.Button(new GUIContent(picture, tip), GUILayout.Width(tile), GUILayout.Height(tile)))
+                            {
+                                GroundLayerPainter.PaintWith(terrain, layer);
+                            }
+
+                            GUILayout.Label(new GUIContent((onTerrain ? "• " : "") + layer.name, tip), EditorStyles.centeredGreyMiniLabel, GUILayout.Width(tile));
+                        }
+                    }
+                }
+            }
+        }
+
+        EditorGUILayout.EndScrollView();
+        using (new EditorGUI.DisabledScope(terrain == null))
+        using (new EditorGUILayout.HorizontalScope())
+        {
+            if (GUILayout.Button(new GUIContent("Refresh Relief", "Rebuild the terrain's displacement from its ground layers (done by itself when layers change)")))
+            {
+                Debug.Log(GroundLayerPainter.RefreshDisplacement(terrain)
+                    ? $"{terrain.name}: displacement rebuilt for {terrain.terrainData.terrainLayers.Length} ground layer(s)."
+                    : $"{terrain.name}: not a tessellated world terrain; use a Look first.");
+            }
+
+            if (GUILayout.Button(new GUIContent("Layer Palettes", "Make Terrain Tools layer palettes for each look (Paint Texture › Layer Palette)")))
+            {
+                int made = GroundLayerPainter.EnsureLayerPalettes();
+                Debug.Log($"World Tools: {made} layer palette(s) made, in each look's Data/World folder.");
+            }
+        }
+    }
+
+    /// <summary>One live slider for how deep every ground and the steep rock are on the terrain in view.</summary>
+    private static void DrawRelief(Terrain terrain)
+    {
+        Section("Ground relief (tessellated)");
+        Material material = terrain != null ? terrain.materialTemplate : null;
+        if (material == null || material.shader.name != TerrainDisplacementEditor.ShaderName)
+        {
+            EditorGUILayout.LabelField("The terrain in view has no tessellated ground (use a Look first).", EditorStyles.miniLabel);
+            return;
+        }
+
+        float scale = GroundRelief.Scale(material);
+        EditorGUI.BeginChangeCheck();
+        scale = EditorGUILayout.Slider(new GUIContent("Relief ×", "Deepens every ground and the steep rock together, live. " +
+                                                                 "×1: moss 2 cm, soil 3 cm, rock 6 cm, cliffs 8 cm"), scale, 0f, 10f);
+        if (EditorGUI.EndChangeCheck())
+        {
+            Undo.RecordObject(material, "Ground Relief");
+            GroundRelief.SetScale(material, scale);
+            SceneView.RepaintAll();
+        }
+
+        EditorGUILayout.LabelField($"Moss {GroundRelief.SoftRelief * scale * 100:0.#} cm · soil {GroundRelief.SoilRelief * scale * 100:0.#} cm · " +
+                                   $"rock {GroundRelief.RockRelief * scale * 100:0.#} cm · cliffs {GroundRelief.CliffRelief * scale * 100:0.#} cm", EditorStyles.miniLabel);
+        if (GUILayout.Button(new GUIContent("Recalibrate Grounds", "After adding grounds or changing height maps: puts every ground back in proportion (keeps Relief ×)")))
+        {
+            Debug.Log("Ground relief: " + GroundRelief.CalibrateAll());
         }
     }
 
@@ -391,6 +505,19 @@ public sealed class WorldToolsWindow : EditorWindow
         }
 
         MenuButton("Selected Pushes Grass", "Safe Haven/World/Grass and Plants/Make Selected Push Grass", "The selected object bends grass as it moves");
+
+        Terrain terrain = FocusTerrain();
+        using (new EditorGUI.DisabledScope(terrain == null))
+        using (new EditorGUILayout.HorizontalScope())
+        {
+            foreach (WorldLook look in WorldLook.All)
+            {
+                if (GUILayout.Button(new GUIContent($"Add {look.Name} Plants", $"Give the terrain the {look.Name} grass, moss, ferns and flowers to paint (Paint Details)")))
+                {
+                    Debug.Log($"{terrain.name}: {GroundLayerPainter.AddDetails(terrain, look)} {look.Name} plant kind(s) added.");
+                }
+            }
+        }
     }
 
     private void DrawSky()

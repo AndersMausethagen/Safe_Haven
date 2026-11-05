@@ -1,0 +1,60 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 234431ceb48ad804d9a1e714df639046, type: 3}
+  m_Name: MistyWoods Map Terrain Surface Profile
+  m_EditorClassIdentifier: SafeHaven::TerrainSurfaceProfile
+  resolution: 1024
+  layers:
+  - terrainLayer: {fileID: 8574412962073106934, guid: c565454ffa18bd1429caa8979dcc7aec, type: 2}
+    heightMap: {fileID: 0}
+    channel: 0
+    amplitude: 0.49038455
+    midpoint: 0.3309674
+    contrast: 1
+    footprintResponse: 1
+    rock: 0
+  - terrainLayer: {fileID: 8574412962073106934, guid: f7c1b94bbb5ffbe4c8e8d1a7e37be29c, type: 2}
+    heightMap: {fileID: 0}
+    channel: 0
+    amplitude: 0.51689184
+    midpoint: 0.49318525
+    contrast: 1
+    footprintResponse: 1
+    rock: 0
+  - terrainLayer: {fileID: 8574412962073106934, guid: 8fe3afe6c11a95f4e9db5543ba8b7716, type: 2}
+    heightMap: {fileID: 0}
+    channel: 0
+    amplitude: 0.8793103
+    midpoint: 0.3386987
+    contrast: 1
+    footprintResponse: 1
+    rock: 0
+  - terrainLayer: {fileID: 8574412962073106934, guid: ac2687241cb9efd47a58dde51927c4de, type: 2}
+    heightMap: {fileID: 0}
+    channel: 0
+    amplitude: 0.44736838
+    midpoint: 0.43721274
+    contrast: 1
+    footprintResponse: 1
+    rock: 0
+  footprints: 1
+  footprintLifetime: 30
+  footprintDepth: 0.035
+  footprintFlattening: 1
+  footprintNormalFlattening: 1
+  footprintDarkening: 0.8
+  footprintGrassFlattening: 1
+  bootWidth: 0.13
+  bootLength: 0.3
+  bootMask: {fileID: 0}
+  footprintArea: 24
+  footprintResolution: 2048

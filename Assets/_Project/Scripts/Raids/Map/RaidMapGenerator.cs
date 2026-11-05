@@ -29,14 +29,15 @@ public static class RaidMapGenerator
         field.Zones(out byte[] path, out byte[] forest, out byte[] clearing);
         RaidMapDefinition working = Object.Instantiate(definition);
         working.UseGenerated(field.Resolution, path, forest, clearing, plan.Mood, plan.Seed, tier);
-        RaidMapSurface.Paint(data, working);
+        System.Func<Vector2, float> wetness = spot => plan.Wetness(spot, rules.WetReach, rules.DampGround);
+        RaidMapSurface.Paint(data, working, wetness);
         var clearings = new List<RaidMapSurface.Clearing>(plan.Sites.Count);
         foreach (RaidSite site in plan.Sites)
         {
             clearings.Add(new RaidMapSurface.Clearing(site.Position * plan.Size, working.ClearAroundSites, RockClearing));
         }
 
-        RaidMapSurface.Scatter(data, working, clearings, out _);
+        RaidMapSurface.Scatter(data, working, clearings, out _, wetness, plan.InWater);
         Object.Destroy(working);
     }
 

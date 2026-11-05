@@ -52,8 +52,10 @@ public static class WorldAssets
         RiverWater();
         TerrainMaterial(false);
         TerrainMaterial(true);
+        int looks = WorldLook.EnsureAll();
+        TerrainRock.EnsureSteepTextures();
         AssetDatabase.SaveAssets();
-        return $"{prefabs} prefab(s), {layers} ground layer(s), {palettes} palette(s) made; cliff kit has {kit.Pieces.Count} piece(s).";
+        return $"{prefabs} prefab(s), {layers} ground layer(s), {palettes} palette(s), {looks} Mossy Forest asset(s) made; cliff kit has {kit.Pieces.Count} piece(s).";
     }
 
     // ------------------------------------------------------------------ prefabs

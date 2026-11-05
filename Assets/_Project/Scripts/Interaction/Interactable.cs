@@ -92,16 +92,48 @@ public sealed class Interactable : MonoBehaviour
         colliders = GetComponentsInChildren<Collider>();
         shape = GetComponent<IInteractionShape>();
         conditions = GetComponents<IInteractionCondition>();
+        if (isActiveAndEnabled)
+        {
+            InteractableGrid.Remove(this);
+            InteractableGrid.Add(this);
+        }
     }
 
     private void OnEnable()
     {
         active.Add(this);
+        InteractableGrid.Add(this);
     }
 
     private void OnDisable()
     {
         active.Remove(this);
+        InteractableGrid.Remove(this);
+    }
+
+    // Kept by InteractableGrid: the cells it is filed under, and the last query that offered it.
+    internal RectInt FiledArea { get; set; }
+    internal bool IsFiled { get; set; }
+    internal int GridStamp { get; set; }
+    internal bool HasShape => shape != null;
+
+    /// <summary>What it covers, for filing it by place: its colliders in use, or its position when it has none.</summary>
+    internal Bounds FilingBounds()
+    {
+        var bounds = new Bounds(transform.position, Vector3.zero);
+        bool any = false;
+        if (colliders != null)
+        {
+            for (int i = 0; i < colliders.Length; i++)
+            {
+                if (!IsUsable(colliders[i])) continue;
+                if (any) bounds.Encapsulate(colliders[i].bounds);
+                else bounds = colliders[i].bounds;
+                any = true;
+            }
+        }
+
+        return bounds;
     }
 
     /// <summary>Horizontal distance from a point to the nearest point of this object.</summary>

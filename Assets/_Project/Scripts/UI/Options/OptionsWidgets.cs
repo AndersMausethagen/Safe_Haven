@@ -40,6 +40,7 @@ public static class OptionsWidgets
 
     public static Color Panel => UIStyle.Current.Panel;
     public static Color Rim => UIStyle.Current.Rim;
+    public static Color WindowRim => UIStyle.Current.RimFor(RaidDirector.Current != null);
     public static Color Title => UIStyle.Current.Text;
     public static Color Body => UIStyle.Current.Text;
     public static Color Muted => UIStyle.Current.Muted;

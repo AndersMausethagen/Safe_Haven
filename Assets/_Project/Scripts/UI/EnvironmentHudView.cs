@@ -29,17 +29,31 @@ public sealed class EnvironmentHudView : MonoBehaviour
     {
         if (cycle == null || cycle.Profile == null || weather == null || timeline == null ||
             weatherIcon == null || timeLabel == null || weatherLabel == null ||
-            phaseLabels == null || phaseLabels.Length != 5)
+            phaseLabels == null || phaseLabels.Length != 5 ||
+            System.Array.Exists(phaseLabels, label => label == null))
         {
             Debug.LogError("Environment HUD needs a scene clock, profile, weather and all display references.", this);
             enabled = false;
             return;
         }
 
+        ApplyTypography();
         Refresh();
     }
 
     private void LateUpdate() => Refresh();
+
+    private void ApplyTypography()
+    {
+        timeLabel.fontSize = Mathf.Max(timeLabel.fontSize, 18f);
+        weatherLabel.fontSize = Mathf.Max(weatherLabel.fontSize, 17f);
+        foreach (TMP_Text label in phaseLabels)
+        {
+            label.fontSize = Mathf.Max(label.fontSize, 15f);
+            Vector2 size = label.rectTransform.sizeDelta;
+            label.rectTransform.sizeDelta = new Vector2(Mathf.Max(size.x, 68f), Mathf.Max(size.y, 36f));
+        }
+    }
 
     public void Refresh()
     {

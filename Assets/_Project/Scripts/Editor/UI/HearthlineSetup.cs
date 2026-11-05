@@ -262,6 +262,16 @@ public static class HearthlineSetup
 
         foreach (Image image in root.GetComponentsInChildren<Image>(true))
         {
+            if (image.GetComponent<ActionCrosshair>() != null)
+            {
+                if (image.TryGetComponent(out UIRole misplacedRole))
+                {
+                    Object.DestroyImmediate(misplacedRole);
+                }
+
+                continue;
+            }
+
             if (image.GetComponent<Button>() != null || image.GetComponent<UIRole>() != null)
             {
                 continue;

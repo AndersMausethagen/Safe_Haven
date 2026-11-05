@@ -17,66 +17,171 @@ MonoBehaviour:
   - terrainLayer: {fileID: 8574412962073106934, guid: 2fb57ea72bc32794bb6fd218883deb3f, type: 2}
     heightMap: {fileID: 0}
     channel: 0
-    amplitude: 0.6
-    midpoint: 0.5
+    amplitude: 0.47663546
+    midpoint: 0.33598477
     contrast: 1
     footprintResponse: 1
+    rock: 0
   - terrainLayer: {fileID: 8574412962073106934, guid: 5effec8d888e03644876d67aaa777011, type: 2}
     heightMap: {fileID: 0}
     channel: 0
-    amplitude: 0.6
-    midpoint: 0.5
+    amplitude: 0.47663546
+    midpoint: 0.3487135
     contrast: 1
     footprintResponse: 1
+    rock: 0
   - terrainLayer: {fileID: 8574412962073106934, guid: cc81bbd57ab7305418529d6986853e31, type: 2}
     heightMap: {fileID: 0}
     channel: 0
-    amplitude: 1
-    midpoint: 0.5
+    amplitude: 0.72857136
+    midpoint: 0.31468543
     contrast: 1
     footprintResponse: 0.35
+    rock: 0
   - terrainLayer: {fileID: 8574412962073106934, guid: ecc08845117d8ff4292ef94943f24cac, type: 2}
     heightMap: {fileID: 0}
     channel: 0
-    amplitude: 1
-    midpoint: 0.5
+    amplitude: 0.45132738
+    midpoint: 0.4427112
     contrast: 1
     footprintResponse: 1
+    rock: 0
   - terrainLayer: {fileID: 8574412962073106934, guid: 89a3ba6919e572f4588c50d066b5a88a, type: 2}
     heightMap: {fileID: 0}
     channel: 0
-    amplitude: 1
-    midpoint: 0.5
+    amplitude: 1.3909091
+    midpoint: 0.46039185
     contrast: 1
     footprintResponse: 0.15
+    rock: 0
   - terrainLayer: {fileID: 8574412962073106934, guid: cda16ce99013541418dc6ff6e6012844, type: 2}
     heightMap: {fileID: 2800000, guid: cc43b8b5c9ef3bf4f8334f98203734ad, type: 3}
     channel: 0
-    amplitude: 1
-    midpoint: 0.5
+    amplitude: 0.41463414
+    midpoint: 0.7254538
     contrast: 1
     footprintResponse: 1
+    rock: 0
   - terrainLayer: {fileID: 8574412962073106934, guid: 089cfd9135814f84a888e75dd12911b5, type: 2}
     heightMap: {fileID: 2800000, guid: 973e206d6ed07dd48bf505aa90c9c28e, type: 3}
     channel: 0
-    amplitude: 1
-    midpoint: 0.5
+    amplitude: 1.1590909
+    midpoint: 0.28085545
     contrast: 1
     footprintResponse: 1
+    rock: 0
   - terrainLayer: {fileID: 8574412962073106934, guid: 691850a66ff1c59449393b030730fda9, type: 2}
     heightMap: {fileID: 2800000, guid: 9934753e905f6dd479e7f9906e752c53, type: 3}
     channel: 0
-    amplitude: 1
-    midpoint: 0.5
+    amplitude: 0.5930232
+    midpoint: 0.34061083
     contrast: 1
     footprintResponse: 0.8
+    rock: 0
   - terrainLayer: {fileID: 8574412962073106934, guid: 3b96c3a790a9fa042be3fc24ab00e8df, type: 2}
     heightMap: {fileID: 2800000, guid: 71e0adf7d1d3830449515bfb13d95d1e, type: 3}
     channel: 0
-    amplitude: 1
-    midpoint: 0.5
+    amplitude: 0.84999996
+    midpoint: 0.5753257
     contrast: 1
     footprintResponse: 0.9
+    rock: 0
+  - terrainLayer: {fileID: 8574412962073106934, guid: d5d68715002b4b1418404d8704dcb40a, type: 2}
+    heightMap: {fileID: 0}
+    channel: 0
+    amplitude: 0.3863636
+    midpoint: 0.4716031
+    contrast: 1
+    footprintResponse: 1
+    rock: 0
+  - terrainLayer: {fileID: 8574412962073106934, guid: 41b8a24d3605c4d4391595396ff1716e, type: 2}
+    heightMap: {fileID: 0}
+    channel: 0
+    amplitude: 0.49038455
+    midpoint: 0.3309674
+    contrast: 1
+    footprintResponse: 1
+    rock: 0
+  - terrainLayer: {fileID: 8574412962073106934, guid: 5dc6fe76479435e46af225728b371098, type: 2}
+    heightMap: {fileID: 0}
+    channel: 0
+    amplitude: 0.79687494
+    midpoint: 0.53699857
+    contrast: 1
+    footprintResponse: 1
+    rock: 0
+  - terrainLayer: {fileID: 8574412962073106934, guid: e9f094d5175673446a9502cbad5818ce, type: 2}
+    heightMap: {fileID: 0}
+    channel: 0
+    amplitude: 0.29310343
+    midpoint: 0.3386987
+    contrast: 1
+    footprintResponse: 1
+    rock: 0
+  - terrainLayer: {fileID: 8574412962073106934, guid: bc65bad0800ac7c459bfb48e695d1416, type: 2}
+    heightMap: {fileID: 0}
+    channel: 0
+    amplitude: 1.0337837
+    midpoint: 0.46468872
+    contrast: 1
+    footprintResponse: 1
+    rock: 1
+  - terrainLayer: {fileID: 8574412962073106934, guid: 84eded14798d7b945b98a1c1bf0822ad, type: 2}
+    heightMap: {fileID: 0}
+    channel: 0
+    amplitude: 0.49038455
+    midpoint: 0.3309674
+    contrast: 1
+    footprintResponse: 1
+    rock: 0
+  - terrainLayer: {fileID: 8574412962073106934, guid: 86f7fa99e216f4b4db7ca5cc7eeb426e, type: 2}
+    heightMap: {fileID: 0}
+    channel: 0
+    amplitude: 0.98076904
+    midpoint: 0.36030442
+    contrast: 1
+    footprintResponse: 1
+    rock: 0
+  - terrainLayer: {fileID: 8574412962073106934, guid: ab30436017b4bc0428e87ed68161d143, type: 2}
+    heightMap: {fileID: 0}
+    channel: 0
+    amplitude: 0.4146341
+    midpoint: 0.28656498
+    contrast: 1
+    footprintResponse: 1
+    rock: 0
+  - terrainLayer: {fileID: 8574412962073106934, guid: 0755c48c693f64540a8462cea49fc8f3, type: 2}
+    heightMap: {fileID: 0}
+    channel: 0
+    amplitude: 0.51689184
+    midpoint: 0.49318525
+    contrast: 1
+    footprintResponse: 1
+    rock: 0
+  - terrainLayer: {fileID: 8574412962073106934, guid: 7eaeb7ebb68372d4ab7073d49f2b140f, type: 2}
+    heightMap: {fileID: 0}
+    channel: 0
+    amplitude: 0.8052631
+    midpoint: 0.59926677
+    contrast: 1
+    footprintResponse: 1
+    rock: 2
+  - terrainLayer: {fileID: 8574412962073106934, guid: 194940660c55cb040a00eb46bac03bbb, type: 2}
+    heightMap: {fileID: 0}
+    channel: 0
+    amplitude: 0.8225805
+    midpoint: 0.36207104
+    contrast: 1
+    footprintResponse: 1
+    rock: 0
+  - terrainLayer: {fileID: 8574412962073106934, guid: c565454ffa18bd1429caa8979dcc7aec, type: 2}
+    heightMap: {fileID: 0}
+    channel: 0
+    amplitude: 0.49038455
+    midpoint: 0.3309674
+    contrast: 1
+    footprintResponse: 1
+    rock: 0
   footprints: 1
   footprintLifetime: 30
   footprintDepth: 0.035

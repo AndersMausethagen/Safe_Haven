@@ -100,13 +100,96 @@ float WorldDisplacementHeight(float2 uv) { return WorldDisplacementHeightLOD(uv,
 
 float WorldSlopeFade(float3 normalOS) { return smoothstep(0.35, 0.75, normalize(normalOS).y); }
 
+// ---- Rock on steep ground (shared with the fragment's triplanar rock in WorldTerrainLitPasses) -----------------------
+TEXTURE2D(_CliffAlbedo); SAMPLER(sampler_CliffAlbedo);
+TEXTURE2D(_CliffNormal);
+TEXTURE2D(_CliffMask); SAMPLER(sampler_CliffMask); // its own sampler: the domain stage reads the mask without the colour
+float _CliffStrength, _CliffSlopeStart, _CliffSlopeEnd, _CliffBreakup, _CliffTiling, _CliffNormalStrength;
+float _CliffDisplacement, _CliffHeightMidpoint;
+half4 _CliffTint;
+// The steepest ground's rock (Cliff Rock), over the rocky ground above.
+TEXTURE2D(_SteepAlbedo);
+TEXTURE2D(_SteepNormal);
+TEXTURE2D(_SteepMask); SAMPLER(sampler_SteepMask);
+float _SteepSlopeStart, _SteepSlopeEnd, _SteepTiling, _SteepNormalStrength, _SteepHeightMidpoint, _RockFromLayers, _RockAlwaysFrom;
+half4 _SteepTint;
+
+// How much rock lies here (x) and how much of it is cliff rock rather than rocky ground (y, 0-1). With Rock From Painted
+// Layers it is painted: layers marked Rocky or Cliff in the terrain's surface profile (row 2, green, of the layer data)
+// are drawn as these rocks, so painting any other ground over them replaces them. Otherwise it follows the slope.
+float2 WorldRock(float2 uv, float slope)
+{
+    if (_CliffStrength <= 0) return 0;
+    if (_RockFromLayers > 0.5)
+    {
+        float2 controlUV = (uv * (_DisplacementControl0_TexelSize.zw - 1.0) + 0.5) * _DisplacementControl0_TexelSize.xy;
+        float4 controls[4];
+        controls[0] = SAMPLE_TEXTURE2D_LOD(_DisplacementControl0, sampler_DisplacementControl0, controlUV, 0);
+        controls[1] = SAMPLE_TEXTURE2D_LOD(_DisplacementControl1, sampler_DisplacementControl0, controlUV, 0);
+        controls[2] = SAMPLE_TEXTURE2D_LOD(_DisplacementControl2, sampler_DisplacementControl0, controlUV, 0);
+        controls[3] = SAMPLE_TEXTURE2D_LOD(_DisplacementControl3, sampler_DisplacementControl0, controlUV, 0);
+        float rocky = 0, cliff = 0;
+        [loop]
+        for (uint layer = 0; layer < (uint)_DisplacementLayerCount; layer++)
+        {
+            float kind = LOAD_TEXTURE2D(_DisplacementLayers, int2(layer, 2)).g;
+            float weight = controls[layer >> 2][layer & 3];
+            rocky += kind > 0.5 && kind < 1.5 ? weight : 0;
+            cliff += kind > 1.5 ? weight : 0;
+        }
+        float amount = saturate(rocky + cliff);
+        // Walls are rock whatever is painted: paint is laid out from above, so a near-vertical face has almost no
+        // cells of its own and any ground would show stretched down it. What is painted near it still picks which rock
+        // (rocky ground where Rocky is painted, cliff rock otherwise).
+        float wall = smoothstep(_RockAlwaysFrom, _RockAlwaysFrom + 8.0, slope) * (1.0 - amount);
+        return float2(saturate(amount + wall) * _CliffStrength, (cliff + wall) / max(rocky + cliff + wall, 1e-4));
+    }
+
+    float rock = smoothstep(_CliffSlopeStart, max(_CliffSlopeEnd, _CliffSlopeStart + 0.1), slope);
+    float steep = smoothstep(_SteepSlopeStart, max(_SteepSlopeEnd, _SteepSlopeStart + 0.1), slope);
+    return float2(max(rock, steep) * _CliffStrength, steep);
+}
+
+float WorldTriplanarHeight(TEXTURE2D_PARAM(mask, smp), float3 q, float3 blend)
+{
+    return SAMPLE_TEXTURE2D_LOD(mask, smp, q.zy, _DisplacementMip).b * blend.x
+         + SAMPLE_TEXTURE2D_LOD(mask, smp, q.xz, _DisplacementMip).b * blend.y
+         + SAMPLE_TEXTURE2D_LOD(mask, smp, q.xy, _DisplacementMip).b * blend.z;
+}
+
+// The ground's own displacement fades out on steep ground (it only lifts straight up), so the rock is pushed out along
+// the slope instead, by its mask's height (blue, as terrain layer masks keep it), projected from three sides like its
+// colour so the relief matches what is drawn. Painted rock on level ground keeps the layer displacement instead.
+float WorldCliffOffset(float3 positionOS, float3 normalOS, float2 uv)
+{
+    if (_CliffDisplacement <= 0 || _CliffStrength <= 0) return 0;
+    float3 n = normalize(TransformObjectToWorldNormal(normalOS));
+    float slope = degrees(acos(saturate(n.y)));
+    float2 rock = WorldRock(uv, slope);
+    float w = rock.x * (_RockFromLayers > 0.5 ? 1.0 - WorldSlopeFade(normalOS) * 0.75 : 1.0);
+    if (w <= 0.001) return 0;
+    float3 world = TransformObjectToWorld(positionOS);
+    float3 blend = pow(abs(n), 4.0);
+    blend /= max(dot(blend, 1.0), 1e-4);
+    float h = rock.y < 0.999 ? WorldTriplanarHeight(TEXTURE2D_ARGS(_CliffMask, sampler_CliffMask), world / max(_CliffTiling, 0.01), blend) - _CliffHeightMidpoint : 0;
+    if (rock.y > 0.001)
+        h = lerp(h, WorldTriplanarHeight(TEXTURE2D_ARGS(_SteepMask, sampler_SteepMask), world / max(_SteepTiling, 0.01), blend) - _SteepHeightMidpoint, rock.y);
+    return h * _CliffDisplacement * w;
+}
+
 void WorldDisplace(inout float4 positionOS, float3 normalOS, float2 uv)
 {
     float fade = WorldDisplacementFade(positionOS.xyz);
-    if ((_DisplacementStrength <= 0 && _FootprintSettings.w <= 0) || _DisplacementLayerCount <= 0 || fade <= 0) return;
-    // Vertical detail tapers off on cliffs; their existing triplanar rock shading stays intact.
-    float slopeFade = WorldSlopeFade(normalOS);
-    positionOS.y += WorldSurfaceOffsetLOD(uv, _DisplacementMip, TransformObjectToWorld(positionOS.xyz).xz) * fade * slopeFade;
+    if (fade <= 0) return;
+    float3 original = positionOS.xyz;
+    if ((_DisplacementStrength > 0 || _FootprintSettings.w > 0) && _DisplacementLayerCount > 0)
+    {
+        // Vertical detail tapers off on cliffs, where the rock's own relief takes over.
+        float slopeFade = WorldSlopeFade(normalOS);
+        positionOS.y += WorldSurfaceOffsetLOD(uv, _DisplacementMip, TransformObjectToWorld(original).xz) * fade * slopeFade;
+    }
+
+    positionOS.xyz += normalize(normalOS) * WorldCliffOffset(original, normalOS, uv) * fade;
 }
 
 // Fragment-only helpers stay separate from the domain displacement so texture derivatives are valid.
@@ -199,7 +282,9 @@ float WorldEdgeFactor(float3 a, float3 b)
     float desired = edgeMetres / max(_TessellationEdgeLength, 0.005);
     if (_TessellationPixels > 0) desired = min(desired, projectedPixels / _TessellationPixels);
     float factor = clamp(desired, 1.0, max(_TessellationFactor * _TerrainDetailQuality.y, 1.0));
-    return lerp(1.0, factor, fade * max(step(0.0001, _DisplacementStrength), _FootprintSettings.w) * step(0.5, _DisplacementLayerCount));
+    float displaces = max(max(step(0.0001, _DisplacementStrength), _FootprintSettings.w) * step(0.5, _DisplacementLayerCount),
+                          step(0.0001, _CliffDisplacement * _CliffStrength));
+    return lerp(1.0, factor, fade * displaces);
 }
 
 WorldTessFactors WorldPatchConstants(InputPatch<WorldControlPoint, 3> patch)

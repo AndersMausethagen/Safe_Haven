@@ -2942,6 +2942,7 @@ MonoBehaviour:
   faction: 1
   baseStats: {fileID: 11400000, guid: 3960edaff7f5afb48ad2eaab6f6387e3, type: 2}
   rules: {fileID: 11400000, guid: ecf13ff1316037d4a9ea98becb5e16d4, type: 2}
+  priorityTarget: 0
 --- !u!114 &483815092
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9453,7 +9454,7 @@ MonoBehaviour:
     order: 0
   showMarker: 1
   offers: []
-  confirmInDialogue: 0
+  sideOffers: []
   speakerName: 
   portrait: {fileID: 0}
   dialogueCameraDistance: 0.65
@@ -13300,13 +13301,13 @@ RectTransform:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
-  - {fileID: 1841843884}
-  - {fileID: 1099268081}
-  - {fileID: 1665207891}
-  - {fileID: 206165356}
-  - {fileID: 1828508794}
-  - {fileID: 1313309936}
   - {fileID: 590733148}
   - {fileID: 1512537304}
   - {fileID: 2073753146}
+  - {fileID: 1313309936}
+  - {fileID: 1665207891}
+  - {fileID: 206165356}
+  - {fileID: 1099268081}
+  - {fileID: 1828508794}
+  - {fileID: 1841843884}
   - {fileID: 1311636100}

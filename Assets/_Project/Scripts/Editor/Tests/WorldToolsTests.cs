@@ -194,9 +194,65 @@ public sealed class WorldToolsTests
     [TestCase("Assets/_Project/Prefabs/Resources/GreyStoneNode.prefab", "GreyStoneNode", "Resources")]
     [TestCase("Assets/_Project/Prefabs/Raids/ExtractionPoint.prefab", "ExtractionPoint", "Raid")]
     [TestCase("Assets/_Project/Prefabs/Structures/Torch.prefab", "Torch", "Buildings")]
+    [TestCase("Assets/_Project/Art/Vegetation/Misty Woods/Trees/Cedar A.prefab", "Cedar A", "Trees")]
+    [TestCase("Assets/_Project/Art/Vegetation/Misty Woods/Rocks and Logs/Cliff Slab.prefab", "Cliff Slab", "Rocks & Cliffs")]
+    [TestCase("Assets/_Project/Art/Vegetation/Misty Woods/Rocks and Logs/Mossy Rotten Log.prefab", "Mossy Rotten Log", "Forest Floor")]
+    [TestCase("Assets/_Project/Art/Vegetation/Safe Haven/Plants/Lake Fern A.prefab", "Lake Fern A", "Plants & Grass")]
+    [TestCase("Assets/_Project/Art/Vegetation/Safe Haven/Rocks/Lake Crag A.prefab", "Lake Crag A", "Rocks & Cliffs")]
     public void PrefabsAreSortedIntoTheGroupsADesignerLooksFor(string path, string name, string expected)
     {
         Assert.AreEqual(expected, PrefabCatalog.CategoryOf(path, name));
+    }
+
+    [Test]
+    public void TidyHierarchySortsLooseObjectsIntoNumberedFolders()
+    {
+        Scene scene = TestScenes.StartClean();
+        Assume.That(string.IsNullOrEmpty(scene.path), "only ever in an untitled test scene");
+        var made = new System.Collections.Generic.List<GameObject>();
+        try
+        {
+            GameObject Make(string name, System.Type component = null)
+            {
+                var go = component != null ? new GameObject(name, component) : new GameObject(name);
+                SceneManager.MoveGameObjectToScene(go, scene);
+                made.Add(go);
+                return go;
+            }
+
+            Make("Directional Light", typeof(Light));
+            Make("Main Camera", typeof(Camera));
+            Make("Pond", typeof(WaterSurface));
+            Make("Gathering");
+            Make("Residents");
+            Make("World");
+            Assert.AreEqual(6, scene.GetRootGameObjects().Length);
+
+            SceneFolders.Tidy(scene);
+            Assert.IsTrue(scene.GetRootGameObjects().All(SceneFolders.IsFolder), "only folders are left at the top");
+            Assert.AreEqual(SceneFolders.Lighting, SceneFolders.Find(scene, "Directional Light").transform.parent.name);
+            Assert.AreEqual(SceneFolders.PlayerAndCameras, SceneFolders.Find(scene, "Main Camera").transform.parent.name);
+            Assert.AreEqual(SceneFolders.World, SceneFolders.Find(scene, "Pond").transform.parent.name);
+            Assert.AreEqual(SceneFolders.World, SceneFolders.Find(scene, "World").transform.parent.name, "the World Builder's root is found inside it");
+            Assert.AreEqual(SceneFolders.Gameplay, SceneFolders.Find(scene, "Gathering").transform.parent.name);
+            CollectionAssert.AreEqual(scene.GetRootGameObjects().Select(r => r.name).OrderBy(n => n, System.StringComparer.Ordinal).ToArray(),
+                                      scene.GetRootGameObjects().Select(r => r.name).ToArray(), "folders in their numbered order");
+            Assert.AreEqual("already tidy", SceneFolders.Tidy(scene));
+            Assert.IsTrue(SceneFolders.IsUnder(SceneFolders.Find(scene, "World").transform, "World"));
+        }
+        finally
+        {
+            // A test camera left behind in a scene that gets saved draws over the game's camera (it happened).
+            foreach (GameObject root in scene.GetRootGameObjects())
+            {
+                Object.DestroyImmediate(root);
+            }
+
+            foreach (GameObject go in made.Where(g => g != null))
+            {
+                Object.DestroyImmediate(go);
+            }
+        }
     }
 
     [Test]
@@ -206,6 +262,44 @@ public sealed class WorldToolsTests
         Assert.IsTrue(PrefabCatalog.All.Any(e => e.Category == "Rocks & Cliffs" && e.Name.Contains("Mossy Boulder")));
         Assert.IsTrue(PrefabCatalog.All.Any(e => e.Category == "Trees" && e.Name.Contains("Norway Spruce")));
         Assert.IsFalse(PrefabCatalog.All.Any(e => e.Path.Contains("_Leaves_Wind")), "tree parts are not offered on their own");
+        foreach (WorldLook look in WorldLook.All)
+        {
+            Assert.IsTrue(PrefabCatalog.All.Any(e => e.Set == look.Name && e.Category == "Trees"), $"{look.Name} trees are offered");
+            Assert.IsTrue(PrefabCatalog.All.Any(e => e.Set == look.Name && e.Category == "Rocks & Cliffs"), $"{look.Name} rocks are offered");
+        }
+
+        Assert.IsFalse(PrefabCatalog.All.Any(e => e.Path.Contains("/Art/Vegetation/") && e.Path.Contains("/Effects/")), "falling-needle effects are not level pieces");
+    }
+
+    [Test]
+    public void TheBiomesAndToolsUseTheNewLooks()
+    {
+        WorldAssets.EnsureAll();
+        foreach (BiomeArea.Layer layer in WorldMenus.DarkForestLayers().Concat(WorldMenus.HavenGroveLayers()))
+        {
+            Assert.IsNotNull(layer.palette, layer.name);
+            Assert.IsTrue(layer.palette.entries.All(e => e.prefab != null && AssetDatabase.GetAssetPath(e.prefab).Contains("/Art/Vegetation/")),
+                          $"{layer.palette.name} is built from the converted packs");
+        }
+
+        Assert.IsTrue(WorldMenus.DarkForestLayers().All(l => AssetDatabase.GetAssetPath(l.palette).StartsWith(WorldLook.MossyForest.DataFolder)));
+        Assert.IsTrue(WorldMenus.HavenGroveLayers().All(l => AssetDatabase.GetAssetPath(l.palette).StartsWith(WorldLook.ForestLake.DataFolder)));
+        foreach (WorldLook look in WorldLook.All)
+        {
+            Assert.IsNotNull(look.Crags, look.Name);
+            Assert.IsNotEmpty(look.Crags.Pieces);
+            Assert.IsTrue(look.Crags.Pieces.All(p => p.prefab.GetComponentsInChildren<MeshRenderer>().All(r => r.sharedMaterial.shader.name == MeshSurface.ShaderName)),
+                          $"{look.Name} cliffs are tessellated");
+            Assert.IsNotNull(look.PathGround);
+            Assert.IsNotNull(look.RiverBed);
+            Assert.IsNotNull(look.TerrainTemplate);
+            Assert.AreEqual(TerrainDisplacementEditor.ShaderName, look.TerrainTemplate.shader.name);
+            foreach (string rules in look.PaintLooks)
+            {
+                Assert.IsTrue(look.Rules(rules).Rules.All(r => r.layer != null && AssetDatabase.GetAssetPath(r.layer).StartsWith(look.GroundFolder)),
+                              $"{look.Name} {rules} paints its own grounds");
+            }
+        }
     }
 
     [Test]

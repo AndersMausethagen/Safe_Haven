@@ -48,10 +48,12 @@ public static class LevelCheck
             Count("Saveable objects", root.GetComponentsInChildren<SaveableEntity>(true).Length);
             Count("Lights", root.GetComponentsInChildren<Light>(true).Count(l => l.type != LightType.Directional));
             Count("Water surfaces", root.GetComponentsInChildren<WaterSurface>(true).Length);
-            if (root.name == ScatterBrush.RootName)
-                foreach (Transform folder in root.transform)
-                    Count("Scattered: " + folder.name, folder.childCount);
         }
+
+        GameObject scatter = SceneFolders.Find(scene, ScatterBrush.RootName);
+        if (scatter != null)
+            foreach (Transform folder in scatter.transform)
+                Count("Scattered: " + folder.name, folder.childCount);
 
         return counts;
     }
@@ -132,7 +134,7 @@ public static class LevelCheck
             {
                 issues.Add(Leftover(go, $"{go.name} is a terrain without terrain data."));
             }
-            else if (go.transform.parent == null && go.transform.position == Vector3.zero && go.transform.childCount == 0
+            else if ((go.transform.parent == null || SceneFolders.IsFolder(go.transform.parent.gameObject)) && go.transform.position == Vector3.zero && go.transform.childCount == 0
                      && (go.name == "Cube" || go.name == "Sphere" || go.name == "GameObject" || go.name == "New Game Object"))
             {
                 issues.Add(Leftover(go, $"{go.name} at the world origin looks like a leftover."));

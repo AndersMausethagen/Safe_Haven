@@ -5,6 +5,7 @@ using NUnit.Framework;
 using TMPro;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UI;
 
 /// <summary>The Hearthline UI: one style, licensed fonts, and the signals the frameless HUD must not lose.</summary>
 public sealed class HearthlineTests
@@ -61,6 +62,62 @@ public sealed class HearthlineTests
     }
 
     [Test]
+    public void CarvedArtwork_IsWiredAndUsesDifferentShapesForMapMeanings()
+    {
+        UIStyle style = UIStyle.Current;
+        Sprite[] artwork = { style.Hearthmark, style.CarvedCorner, style.ExitMark, style.QuestMark,
+            style.CompanionMark, style.EventMark, style.RumourMark };
+        Assert.IsTrue(artwork.All(sprite => sprite != null), "the authored artwork must ship with the style");
+        Assert.AreEqual(artwork.Length, artwork.Distinct().Count(), "each meaning needs its own shape");
+        Assert.AreNotEqual(style.AccentFor(false), style.AccentFor(true), "raids use colder decorative ink");
+        Assert.AreEqual(style.Rim.a, style.RimFor(true).a, "the decorative rim keeps its opacity");
+    }
+
+    [Test]
+    public void CarvedFrame_IsIdempotentAndDoesNotInterceptInputOrLayout()
+    {
+        var panel = new GameObject("Panel", typeof(RectTransform));
+        try
+        {
+            UIStyle style = UIStyle.Current;
+            GameObject frame = HearthlineArt.AddFrame((RectTransform)panel.transform, style, false);
+            Assert.AreSame(frame, HearthlineArt.AddFrame((RectTransform)panel.transform, style, true));
+            Assert.AreEqual(1, panel.transform.childCount);
+            Assert.IsTrue(frame.GetComponent<LayoutElement>().ignoreLayout);
+            Image[] corners = frame.GetComponentsInChildren<Image>();
+            Assert.AreEqual(4, corners.Length);
+            Assert.IsTrue(corners.All(corner => !corner.raycastTarget && corner.sprite == style.CarvedCorner));
+            Assert.IsTrue(corners.All(corner => Mathf.Approximately(corner.color.r, style.RaidAccent.r)));
+        }
+        finally
+        {
+            Object.DestroyImmediate(panel);
+        }
+    }
+
+    [Test]
+    public void ActionCrosshair_IsNeverDecoratedAsAWindow()
+    {
+        GameObject root = Object.Instantiate(Prefab("UIRoot"));
+        try
+        {
+            ActionCrosshair crosshair = root.GetComponentInChildren<ActionCrosshair>(true);
+            Assert.IsNotNull(crosshair);
+            Assert.IsNull(crosshair.GetComponent<UIRole>(), "the aiming indicator is not a window");
+
+            crosshair.gameObject.AddComponent<UIRole>().Set(UIRole.Kind.Window);
+            HearthlineSetup.Restyle(root);
+            Assert.IsNull(crosshair.GetComponent<UIRole>(), "restyling removes a legacy window role");
+            HearthlineSetup.Restyle(root);
+            Assert.IsNull(crosshair.GetComponent<UIRole>(), "restyling must not add the role back");
+        }
+        finally
+        {
+            Object.DestroyImmediate(root);
+        }
+    }
+
+    [Test]
     public void EveryWindowInTheBag_HasARole()
     {
         var roles = Prefab("ItemHUD").GetComponentsInChildren<UIRole>(true).Select(r => r.Role).ToList();
@@ -106,6 +163,34 @@ public sealed class HearthlineTests
             Assert.AreEqual(text.font.atlasTexture, text.fontSharedMaterial.mainTexture, "a material only suits its own font's atlas");
             Assert.AreEqual(FontStyles.Normal, text.fontStyle & FontStyles.Bold, "bold comes from another atlas, without the on-top material");
         }
+    }
+
+    [Test]
+    public void TheWorldPrompt_IsReadableEvenOverAWhiteSurface()
+    {
+        var player = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Project/Prefabs/Characters/PlayerArmature.prefab");
+        WorldInteractionIndicator prompt = player.GetComponentInChildren<WorldInteractionIndicator>(true);
+        var data = new SerializedObject(prompt);
+        var plate = prompt.transform.Find("Slate").GetComponent<Image>();
+        var status = (TMP_Text)data.FindProperty("status").objectReferenceValue;
+        Assert.GreaterOrEqual(plate.color.a, 0.96f);
+        Assert.GreaterOrEqual(status.fontSize, 18f);
+        StringAssert.Contains("Always On Top", plate.material.name);
+
+        Color background = plate.color.linear * plate.color.a + Color.white * (1f - plate.color.a);
+        Color foreground = WorldInteractionIndicator.ReadableStatusColor(
+            data.FindProperty("blockedColor").colorValue, UIStyle.Current.Text).linear;
+        Assert.GreaterOrEqual((Luminance(foreground) + 0.05f) / (Luminance(background) + 0.05f), 4.5f);
+    }
+
+    private static float Luminance(Color colour) => 0.2126f * colour.r + 0.7152f * colour.g + 0.0722f * colour.b;
+
+    [TestCase(QuestRank.MainStory, "Main quest")]
+    [TestCase(QuestRank.SideQuest, "Side quest")]
+    [TestCase(QuestRank.Optional, "Optional quest")]
+    public void MapQuestRank_IsAlsoWrittenInWords(QuestRank rank, string words)
+    {
+        StringAssert.Contains(words, WorldMapHud.QuestLabel("The old path", rank));
     }
 
     [Test]

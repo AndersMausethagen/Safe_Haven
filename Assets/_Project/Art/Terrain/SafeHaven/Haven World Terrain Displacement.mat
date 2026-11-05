@@ -25,15 +25,15 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _CliffAlbedo:
-        m_Texture: {fileID: 2800000, guid: 8cd7f139660ea214eba664817dcfcf9d, type: 3}
+        m_Texture: {fileID: 2800000, guid: 148b1f8522230ac4f9e657ecc9797dfd, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _CliffMask:
-        m_Texture: {fileID: 2800000, guid: b689bc2e0481aca429aa6b8853c43bf6, type: 3}
+        m_Texture: {fileID: 2800000, guid: 3b148317b4005774a9ad17627eb5b961, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _CliffNormal:
-        m_Texture: {fileID: 2800000, guid: b8343e0ed8a054146861c57a9c104f3d, type: 3}
+        m_Texture: {fileID: 2800000, guid: bce86b00a6a2a3d4397b7d359385be11, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Control:
@@ -53,7 +53,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _DisplacementControl3:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: -3648356475801389623, guid: 232e14177c0d56843bd183afdeb5b754, type: 2}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _DisplacementLayers:
@@ -120,52 +120,77 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _SteepAlbedo:
+        m_Texture: {fileID: 2800000, guid: 8cd7f139660ea214eba664817dcfcf9d, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SteepMask:
+        m_Texture: {fileID: 2800000, guid: b689bc2e0481aca429aa6b8853c43bf6, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SteepNormal:
+        m_Texture: {fileID: 2800000, guid: b8343e0ed8a054146861c57a9c104f3d, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _TerrainHolesTexture:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _CliffBreakup: 0.6
-    - _CliffNormalStrength: 1
-    - _CliffSlopeEnd: 56
-    - _CliffSlopeStart: 40
-    - _CliffStrength: 1
-    - _CliffTiling: 7
+    - _AntiTiling: 0.85
+    - _AntiTilingScale: 0.57
+    - _CliffBreakup: 0.65
+    - _CliffDisplacement: 0.32210526
+    - _CliffHeightMidpoint: 0.46464366
+    - _CliffNormalStrength: 0.568
+    - _CliffSlopeEnd: 54
+    - _CliffSlopeStart: 42
+    - _CliffStrength: 0.759
+    - _CliffTiling: 4
     - _DisplacementDataVersion: 2
     - _DisplacementFar: 35
-    - _DisplacementLayerCount: 9
+    - _DisplacementLayerCount: 15
     - _DisplacementMip: 0
     - _DisplacementNear: 30.4
     - _DisplacementNormalStrength: 1
-    - _DisplacementStrength: 0.202
+    - _DisplacementStrength: 0.553
     - _EnableHeightBlend: 1
     - _EnableInstancedPerPixelNormal: 1
     - _FootprintDarkening: 0
-    - _HeightBlendSharpness: 0
-    - _HeightTransition: 0.66
+    - _HeightBlendSharpness: 1.76
+    - _HeightTransition: 0.763
+    - _MacroVariation: 0.15
     - _Metallic0: 0
     - _Metallic1: 0
     - _Metallic2: 0
     - _Metallic3: 0
-    - _NormalMapStrength: 1
+    - _NormalMapStrength: 0.63
     - _NumLayersCount: 1
+    - _RockAlwaysFrom: 50
+    - _RockFromLayers: 1
     - _Smoothness0: 0.5
     - _Smoothness1: 0.5
     - _Smoothness2: 0.5
     - _Smoothness3: 0.5
+    - _SteepHeightMidpoint: 0.5993997
+    - _SteepNormalStrength: 1
+    - _SteepSlopeEnd: 66
+    - _SteepSlopeStart: 56
+    - _SteepTiling: 7
     - _SurfaceDebug: 0
     - _SurfaceOcclusion: 1
     - _SurfaceSmoothness: 1
     - _TessellationEdgeLength: 0.02
     - _TessellationFactor: 64
-    - _TessellationPixels: 4
+    - _TessellationPixels: 3.9
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
-    - _CliffTint: {r: 1.05, g: 1.02, b: 0.95, a: 1}
+    - _CliffTint: {r: 1, g: 1, b: 1, a: 1}
     - _DisplacementTerrainSize: {r: 400, g: 400, b: 0.01, a: 0}
     - _FootprintArea: {r: 0, g: 0, b: 1, a: 0}
     - _FootprintSettings: {r: 0, g: 0, b: 0, a: 0}
+    - _SteepTint: {r: 1, g: 1, b: 1, a: 1}
     - _TerrainDetailQuality: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

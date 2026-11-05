@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b302529a90cd5d4eb925e50af633cad, type: 3}
+  m_Name: Haven Lake Ferns
+  m_EditorClassIdentifier: SafeHaven::ScatterPalette
+  entries:
+  - prefab: {fileID: 4524226416875438628, guid: dfdf920b91fd95e45b5612400bb493c2, type: 3}
+    weight: 1
+    scale: {x: 0.63027006, y: 1.1905102}
+    alignToSlope: 0.5
+    sink: 0.02
+    randomYaw: 1
+  - prefab: {fileID: 3398821833554654059, guid: d10730ffaed10634284193da35a01564, type: 3}
+    weight: 1
+    scale: {x: 0.62576264, y: 1.1819961}
+    alignToSlope: 0.5
+    sink: 0.02
+    randomYaw: 1
+  - prefab: {fileID: 2765650739024952011, guid: f48ce462d6818454dbbedde5ee33ad5b, type: 3}
+    weight: 1
+    scale: {x: 0.7088509, y: 1.3389406}
+    alignToSlope: 0.5
+    sink: 0.02
+    randomYaw: 1
+  - prefab: {fileID: 3506748076108523107, guid: 325b5fb486ccc734098a5bd35f6e7fec, type: 3}
+    weight: 1
+    scale: {x: 0.5175629, y: 0.9776189}
+    alignToSlope: 0.5
+    sink: 0.02
+    randomYaw: 1
+  spacing: 0.9

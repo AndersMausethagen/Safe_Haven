@@ -13,7 +13,6 @@ GameObject:
   - component: {fileID: 4610005614519538558}
   - component: {fileID: 6465693077777467860}
   - component: {fileID: 1731748376202359333}
-  - component: {fileID: 4211278074414905690}
   m_Layer: 0
   m_Name: Action Crosshair
   m_TagString: Untagged
@@ -106,19 +105,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: SafeHaven::ActionCrosshair
   graphic: {fileID: 4610005614519538558}
---- !u!114 &4211278074414905690
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4416179300339369774}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8a96014eda549d241a626058dc63c7bf, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: SafeHaven::UIRole
-  kind: 0
 --- !u!1 &4827413398026438201
 GameObject:
   m_ObjectHideFlags: 0

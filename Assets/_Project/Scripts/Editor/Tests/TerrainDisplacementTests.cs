@@ -8,6 +8,42 @@ using UnityEngine.Rendering;
 
 public sealed class TerrainDisplacementTests
 {
+    [TestCase("Haven Rock", "rocks_ground_01_Height")]
+    [TestCase("Haven Path", "South Hills Forest Floor Height")]
+    [TestCase("Haven Meadow", "ML_Moss_Green_Ground_Height")]
+    [TestCase("Haven Bank", "red_mud_stones_Height")]
+    public void ConvertedGrounds_HaveTheirPacksHeightUnclipped(string ground, string heightMap)
+    {
+        var layer = AssetDatabase.LoadAssetAtPath<TerrainLayer>($"Assets/_Project/Art/Vegetation/Safe Haven/Ground/{ground}.terrainlayer");
+        Assert.IsNotNull(layer, ground);
+        (float low, float high, float _) = GroundRelief.Spread(layer.maskMapTexture, 2);
+        Assert.Greater(low, 0.02f, "no flat floor of clipped height (was 21% on Haven Path)");
+        Assert.Less(high, 0.98f, "no flat tops of clipped height (was 43% on Haven Rock)");
+        Assert.AreEqual(TextureImporterCompression.Uncompressed,
+            ((TextureImporter)AssetImporter.GetAtPath(AssetDatabase.GetAssetPath(layer.maskMapTexture))).textureCompression,
+            "block compression steps the height");
+    }
+
+    [Test]
+    public void GroundRelief_IsInRealUnits()
+    {
+        var profile = AssetDatabase.LoadAssetAtPath<TerrainSurfaceProfile>("Assets/_Project/Art/Terrain/SafeHaven/Haven World Terrain Surface Profile.asset");
+        var material = AssetDatabase.LoadAssetAtPath<Material>("Assets/_Project/Art/Terrain/SafeHaven/Haven World Terrain Displacement.mat");
+        float strength = material.GetFloat("_DisplacementStrength");
+        float scale = GroundRelief.Scale(material);
+        foreach (TerrainSurfaceProfile.Layer entry in profile.layers.Where(e => e.terrainLayer != null && e.heightMap == null &&
+                                                                             e.terrainLayer.maskMapTexture != null))
+        {
+            (float low, float high, float mean) = GroundRelief.Spread(entry.terrainLayer.maskMapTexture, 2);
+            float spread = (entry.terrainLayer.maskMapRemapMax.z - entry.terrainLayer.maskMapRemapMin.z);
+            float relief = (high - low) * spread * entry.amplitude * strength / scale;
+            Assert.AreEqual(GroundRelief.Relief(entry.terrainLayer), relief, 0.005f, entry.terrainLayer.name + " relief at ×1 (m)");
+            Assert.AreEqual(mean * spread + entry.terrainLayer.maskMapRemapMin.z, entry.midpoint, 0.02f, entry.terrainLayer.name + " sits level");
+        }
+
+        Assert.LessOrEqual(material.GetFloat("_CliffDisplacement") / scale, 0.2f, "steep rock relief at ×1 is centimetres, not decimetres");
+    }
+
     [TestCase("WorldTerrainLit.shader", 6)]
     [TestCase("WorldTerrainAdd.shader", 2)]
     [TestCase("WorldTerrainBase.shader", 5)]

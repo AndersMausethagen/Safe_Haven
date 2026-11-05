@@ -15,10 +15,13 @@ public sealed class PlayerInteractionOutline : MonoBehaviour
     // hovered object, are checked every frame.
     private const float RescanDistance = 0.25f;
     private const float RescanInterval = 0.2f;
+    private const float ReleaseSeconds = 10f;
 
     private Vector3 scannedAt;
     private float nextScan;
     private readonly HashSet<Interactable> shown = new HashSet<Interactable>();
+    private readonly Dictionary<Interactable, float> hiddenSince = new Dictionary<Interactable, float>();
+    private readonly List<Interactable> nearby = new List<Interactable>();
 
     private readonly Dictionary<Interactable, List<OutlineCopies.Entry>> outlines = new Dictionary<Interactable, List<OutlineCopies.Entry>>();
     private readonly RaycastHit[] hits = new RaycastHit[64];
@@ -57,7 +60,9 @@ public sealed class PlayerInteractionOutline : MonoBehaviour
         {
             scannedAt = transform.position;
             nextScan = Time.time + RescanInterval;
-            foreach (Interactable target in Interactable.Active)
+            nearby.Clear();
+            InteractableGrid.Near(transform.position, InteractableGrid.LongestRange, nearby);
+            foreach (Interactable target in nearby)
             {
                 if (target != null && !outlines.ContainsKey(target) && target.IsAvailable && InReach(target))
                 {
@@ -87,16 +92,28 @@ public sealed class PlayerInteractionOutline : MonoBehaviour
             if (show)
             {
                 shown.Add(target);
+                hiddenSince.Remove(target);
             }
             else
             {
                 shown.Remove(target);
+                if (!hiddenSince.TryGetValue(target, out float since))
+                {
+                    hiddenSince[target] = Time.time;
+                }
+                else if (Time.time - since > ReleaseSeconds)
+                {
+                    // Long out of reach: its copies go, so they don't pile up over every tree walked past.
+                    OutlineCopies.Destroy(pair.Value);
+                    removed.Add(target);
+                }
             }
         }
         foreach (Interactable target in removed)
         {
             outlines.Remove(target);
             shown.Remove(target);
+            hiddenSince.Remove(target);
         }
     }
 
@@ -133,13 +150,33 @@ public sealed class PlayerInteractionOutline : MonoBehaviour
             closest = hits[i].distance;
             hit = hits[i].collider;
         }
-        return hit != null ? hit.GetComponentInParent<Interactable>() : null;
+        if (hit == null) return null;
+        // A tree drawn without scripts (NodeStreaming) gets its live copy while it is pointed at.
+        Interactable found = hit.GetComponentInParent<Interactable>();
+        if (found == null) found = NodeStreaming.Wake(hit);
+        NodeStreaming.KeepAwake(found);
+        return found;
     }
 
+    // Only the level of detail it is drawn at up close: copies of every level would draw at once, all of them outlined.
     private static List<OutlineCopies.Entry> CreateOutlines(Interactable target, Material outline, Material mask)
     {
         return OutlineCopies.Create(target.transform, outline, mask, "Interaction Outline", "Interaction Mask",
-            source => source.GetComponentInParent<Interactable>() == target);
+            source => source.GetComponentInParent<Interactable>() == target && InNearestDetail(source));
+    }
+
+    private static bool InNearestDetail(Renderer source)
+    {
+        LODGroup group = source.GetComponentInParent<LODGroup>();
+        if (group == null || group.lodCount == 0) return true;
+        LOD[] lods = group.GetLODs();
+        if (System.Array.IndexOf(lods[0].renderers, source) >= 0) return true;
+        for (int i = 1; i < lods.Length; i++)
+        {
+            if (System.Array.IndexOf(lods[i].renderers, source) >= 0) return false;
+        }
+
+        return true;
     }
 
     private void OnDisable()

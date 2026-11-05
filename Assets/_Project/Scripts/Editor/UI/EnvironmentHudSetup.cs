@@ -55,7 +55,7 @@ public static class EnvironmentHudSetup
         Color parchment = new Color(0.93f, 0.89f, 0.8f);
         Color gold = new Color(0.91f, 0.77f, 0.42f);
         var view = root.gameObject.AddComponent<EnvironmentHudView>();
-        TMP_Text time = Text("Time", root, new Vector2(-84f, -20f), new Vector2(200f, 26f), 15f, gold);
+        TMP_Text time = Text("Time", root, new Vector2(-84f, -20f), new Vector2(200f, 26f), 18f, gold);
         time.alignment = TextAlignmentOptions.MidlineRight;
         RectTransform separator = Rect("Status Divider", root, new Vector2(0.5f, 1f),
             new Vector2(29f, -20f), new Vector2(1f, 14f));
@@ -67,7 +67,7 @@ public static class EnvironmentHudSetup
         var icon = iconRect.gameObject.AddComponent<WeatherIconGraphic>();
         icon.color = parchment;
         icon.raycastTarget = false;
-        TMP_Text weatherText = Text("Weather", root, new Vector2(146f, -20f), new Vector2(144f, 26f), 14f, parchment);
+        TMP_Text weatherText = Text("Weather", root, new Vector2(146f, -20f), new Vector2(144f, 26f), 17f, parchment);
         weatherText.alignment = TextAlignmentOptions.MidlineLeft;
 
         RectTransform track = Rect("Day Timeline", root, new Vector2(0.5f, 1f),
@@ -78,7 +78,7 @@ public static class EnvironmentHudSetup
         var labels = new TMP_Text[5];
         for (int i = 0; i < labels.Length; i++)
         {
-            labels[i] = Text("Phase " + i, track, new Vector2(0f, -13f), new Vector2(58f, 32f), 10.5f, parchment);
+            labels[i] = Text("Phase " + i, track, new Vector2(0f, -13f), new Vector2(68f, 36f), 15f, parchment);
             labels[i].rectTransform.pivot = new Vector2(0.5f, 1f);
             labels[i].alignment = TextAlignmentOptions.Top;
         }

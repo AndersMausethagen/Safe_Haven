@@ -212,7 +212,7 @@ public static class RaidMapBaker
         if (data.alphamapResolution != definition.PaintResolution) data.alphamapResolution = definition.PaintResolution;
         data.baseMapResolution = Mathf.Min(1024, definition.PaintResolution);
         data.size = new Vector3(definition.Size, definition.Height, definition.Size);
-        data.terrainLayers = new[] { definition.ForestLayer, definition.PathLayer, definition.CliffLayer };
+        data.terrainLayers = definition.Layers;
 
         terrain.terrainData = data;
         terrain.GetComponent<TerrainCollider>().terrainData = data;

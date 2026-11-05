@@ -1,5 +1,4 @@
 * text=auto
-
 *.fbx filter=lfs diff=lfs merge=lfs -text
 *.FBX filter=lfs diff=lfs merge=lfs -text
 *.blend filter=lfs diff=lfs merge=lfs -text
@@ -24,3 +23,4 @@
 # Terrain, NavMesh and lighting .asset files are binary; any EOL conversion corrupts them.
 *.asset -text
 *.meta text eol=lf
+*Displacement[[:space:]]Masks.asset filter=lfs diff=lfs merge=lfs -text

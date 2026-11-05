@@ -549,8 +549,8 @@ public sealed class RaidTierTests
         try
         {
             copy.UseGenerated(16, new byte[256], new byte[256], new byte[256], new RaidMapMood(), 1, 1);
-            Assert.AreEqual(0f, copy.Trees.First(tree => tree.prefab.name.StartsWith("Dead Spruce")).weight, "no dead spruce at tier I");
-            Assert.Greater(copy.Trees.First(tree => tree.prefab.name.StartsWith("Spruce A")).weight, 0f);
+            Assert.AreEqual(0f, copy.Trees.First(tree => tree.prefab.name.StartsWith("Dead Cedar")).weight, "no dead cedar at tier I");
+            Assert.Greater(copy.Trees.First(tree => tree.prefab.name.StartsWith("Cedar A")).weight, 0f);
         }
         finally
         {

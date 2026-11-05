@@ -127,7 +127,7 @@ public static class GroundStick
             var go = EditorUtility.EntityIdToObject(data.entityId) as GameObject;
             // Prefab objects only (what comes from the Project window or a duplicate), and not the Scatter Brush's:
             // it sets its own down.
-            if (go == null || !PrefabUtility.IsOutermostPrefabInstanceRoot(go) || go.transform.root.name == ScatterBrush.RootName)
+            if (go == null || !PrefabUtility.IsOutermostPrefabInstanceRoot(go) || SceneFolders.IsUnder(go.transform, ScatterBrush.RootName))
             {
                 continue;
             }

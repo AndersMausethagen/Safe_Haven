@@ -1,0 +1,52 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b302529a90cd5d4eb925e50af633cad, type: 3}
+  m_Name: Haven Lake Trees
+  m_EditorClassIdentifier: SafeHaven::ScatterPalette
+  entries:
+  - prefab: {fileID: 6610148649660625978, guid: 9252d88aee4260542a1d60e374da2d23, type: 3}
+    weight: 1
+    scale: {x: 0.8285273, y: 1.1696856}
+    alignToSlope: 0.05
+    sink: 0.44331545
+    randomYaw: 1
+  - prefab: {fileID: 5402517183627898201, guid: dfa75a2b8fc307b4da9fb76b2ce561a5, type: 3}
+    weight: 0.8
+    scale: {x: 0.8285273, y: 1.1696856}
+    alignToSlope: 0.05
+    sink: 0.41021442
+    randomYaw: 1
+  - prefab: {fileID: 6458957837254744421, guid: acd5c5c94ca76eb46a094084a2c07088, type: 3}
+    weight: 0.8
+    scale: {x: 0.8285273, y: 1.1696856}
+    alignToSlope: 0.05
+    sink: 0.47762755
+    randomYaw: 1
+  - prefab: {fileID: 6097064592462539807, guid: 1c4f114d58b927a4280890e1020dae98, type: 3}
+    weight: 0.6
+    scale: {x: 0.8285273, y: 1.1696856}
+    alignToSlope: 0.05
+    sink: 0.2624822
+    randomYaw: 1
+  - prefab: {fileID: 4664926423558582574, guid: 7a69d1e42a50043469c59a9b5e184d8b, type: 3}
+    weight: 0.3
+    scale: {x: 0.8285273, y: 1.1696856}
+    alignToSlope: 0.05
+    sink: 0.16230153
+    randomYaw: 1
+  - prefab: {fileID: 3226712138437348941, guid: 8c77f9772bf5c4d428ffde22612e5d28, type: 3}
+    weight: 0.2
+    scale: {x: 0.8285273, y: 1.1696856}
+    alignToSlope: 0.05
+    sink: 0.12309766
+    randomYaw: 1
+  spacing: 6

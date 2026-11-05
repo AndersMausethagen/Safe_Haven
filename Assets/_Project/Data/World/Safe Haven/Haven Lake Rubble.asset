@@ -1,0 +1,58 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b302529a90cd5d4eb925e50af633cad, type: 3}
+  m_Name: Haven Lake Rubble
+  m_EditorClassIdentifier: SafeHaven::ScatterPalette
+  entries:
+  - prefab: {fileID: 1404885824269638995, guid: 6684d39ca2e931146a85afd1c43af1d7, type: 3}
+    weight: 1
+    scale: {x: 1.8000001, y: 3.8999999}
+    alignToSlope: 0.6
+    sink: 0.15
+    randomYaw: 1
+  - prefab: {fileID: 6328348981546667030, guid: ed939970df0398342b77244b84d79e9f, type: 3}
+    weight: 1
+    scale: {x: 1.7506502, y: 3.793075}
+    alignToSlope: 0.6
+    sink: 0.15
+    randomYaw: 1
+  - prefab: {fileID: 6718270718539658451, guid: 5c797e0fd38f6ce4cb13dc45a043e98a, type: 3}
+    weight: 1
+    scale: {x: 1.8000001, y: 3.8999999}
+    alignToSlope: 0.6
+    sink: 0.15
+    randomYaw: 1
+  - prefab: {fileID: 8056757738587741231, guid: 71a7402c314163746a0caf6f09c6773a, type: 3}
+    weight: 1
+    scale: {x: 1.3539647, y: 2.93359}
+    alignToSlope: 0.6
+    sink: 0.15
+    randomYaw: 1
+  - prefab: {fileID: 441103227287321634, guid: 086b79f7b81849d498d19b715da656e1, type: 3}
+    weight: 1
+    scale: {x: 0.74442375, y: 1.612918}
+    alignToSlope: 0.6
+    sink: 0.15
+    randomYaw: 1
+  - prefab: {fileID: 8730277521983965954, guid: 933b567e87ebb924e8bef15c8ff7774f, type: 3}
+    weight: 1
+    scale: {x: 1.8000001, y: 3.8999999}
+    alignToSlope: 0.6
+    sink: 0.15
+    randomYaw: 1
+  - prefab: {fileID: 4049676935685193896, guid: 5bd3b2fa8509c2b42b641640ad6d1fb3, type: 3}
+    weight: 1
+    scale: {x: 0.5803257, y: 1.2573723}
+    alignToSlope: 0.6
+    sink: 0.15
+    randomYaw: 1
+  spacing: 2

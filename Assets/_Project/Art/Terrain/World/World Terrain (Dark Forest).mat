@@ -39,6 +39,34 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _DisplacementControl0:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DisplacementControl1:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DisplacementControl2:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DisplacementControl3:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DisplacementLayers:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DisplacementMasks:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _FootprintField:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _MainTex:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -91,32 +119,76 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _SteepAlbedo:
+        m_Texture: {fileID: 2800000, guid: 8cd7f139660ea214eba664817dcfcf9d, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SteepMask:
+        m_Texture: {fileID: 2800000, guid: b689bc2e0481aca429aa6b8853c43bf6, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SteepNormal:
+        m_Texture: {fileID: 2800000, guid: b8343e0ed8a054146861c57a9c104f3d, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _TerrainHolesTexture:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _AntiTiling: 0
+    - _AntiTilingScale: 0.57
     - _CliffBreakup: 0.6
+    - _CliffDisplacement: 0.35
+    - _CliffHeightMidpoint: 0.5
     - _CliffNormalStrength: 1
     - _CliffSlopeEnd: 52
     - _CliffSlopeStart: 36
     - _CliffStrength: 1
     - _CliffTiling: 7
+    - _DisplacementDataVersion: 0
+    - _DisplacementFar: 35
+    - _DisplacementLayerCount: 0
+    - _DisplacementMip: 0
+    - _DisplacementNear: 8
+    - _DisplacementNormalStrength: 1
+    - _DisplacementStrength: 0
     - _EnableHeightBlend: 0
     - _EnableInstancedPerPixelNormal: 1
+    - _FootprintDarkening: 0
+    - _HeightBlendSharpness: 0
     - _HeightTransition: 0
+    - _MacroVariation: 0
     - _Metallic0: 0
     - _Metallic1: 0
     - _Metallic2: 0
     - _Metallic3: 0
+    - _NormalMapStrength: 1
     - _NumLayersCount: 1
+    - _RockFromLayers: 0
     - _Smoothness0: 0.5
     - _Smoothness1: 0.5
     - _Smoothness2: 0.5
     - _Smoothness3: 0.5
+    - _SteepHeightMidpoint: 0.5993997
+    - _SteepNormalStrength: 1
+    - _SteepSlopeEnd: 66
+    - _SteepSlopeStart: 56
+    - _SteepTiling: 7
+    - _SurfaceDebug: 0
+    - _SurfaceOcclusion: 1
+    - _SurfaceSmoothness: 1
+    - _TessellationEdgeLength: 0.08
+    - _TessellationFactor: 8
+    - _TessellationPixels: 4
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _CliffTint: {r: 0.82, g: 0.86, b: 0.84, a: 1}
+    - _DisplacementTerrainSize: {r: 1, g: 1, b: 0.01, a: 0}
+    - _FootprintArea: {r: 0, g: 0, b: 1, a: 0}
+    - _FootprintSettings: {r: 0, g: 0, b: 0, a: 0}
+    - _SteepTint: {r: 1, g: 1, b: 1, a: 1}
+    - _TerrainDetailQuality: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

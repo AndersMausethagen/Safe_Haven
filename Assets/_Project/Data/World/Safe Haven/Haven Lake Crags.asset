@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68752630bad0a7e44b31fd2333073d9c, type: 3}
+  m_Name: Haven Lake Crags
+  m_EditorClassIdentifier: SafeHaven::CliffKit
+  pieces:
+  - prefab: {fileID: 8552193928366429793, guid: 2896720e4d8f8ab488e37c1dfdd98e0d, type: 3}
+    weight: 2
+    faceYaw: 0
+    faceTilt: 0
+    size: {x: 9.553603, y: 4.8771324, z: 8.273093}
+  - prefab: {fileID: 7662961186503689581, guid: a8c9a0c3839f3c6408611ef97c44012d, type: 3}
+    weight: 2
+    faceYaw: 0
+    faceTilt: 0
+    size: {x: 6.639434, y: 2.3423629, z: 3.3007283}
+  - prefab: {fileID: 6782434986763925728, guid: d4c37a1695dd4e9469be04cd1906225c, type: 3}
+    weight: 1.2
+    faceYaw: 0
+    faceTilt: 0
+    size: {x: 6.0577307, y: 1.873943, z: 3.5928125}
+  - prefab: {fileID: 2429965504870139084, guid: 3aef93e36f6ba2d47881b1e5a3973be6, type: 3}
+    weight: 1.2
+    faceYaw: 0
+    faceTilt: 0
+    size: {x: 7.48229, y: 1.6702402, z: 4.552168}

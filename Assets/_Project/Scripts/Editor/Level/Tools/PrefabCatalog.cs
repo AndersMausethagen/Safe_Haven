@@ -5,7 +5,8 @@ using UnityEditor;
 using UnityEngine;
 
 /// <summary>The prefabs the World Tools' Place tab offers, sorted into the groups a level designer looks for (rocks,
-/// trees, forest floor, resources, buildings, raid, creatures). Found by folder and name, so a new prefab in one of these
+/// trees, forest floor, plants, resources, buildings, raid, creatures) and by set (the Forest Lake and Mossy Forest packs,
+/// see <see cref="WorldLook"/>, or the original assets). Found by folder and name, so a new prefab in one of these
 /// folders shows up by itself.</summary>
 public static class PrefabCatalog
 {
@@ -14,18 +15,23 @@ public static class PrefabCatalog
         public GameObject Prefab;
         public string Name;
         public string Category;
+        public string Set;
         public string Path;
     }
 
     public static readonly string[] Categories =
     {
-        "Rocks & Cliffs", "Trees", "Forest Floor", "Resources", "Buildings", "Raid", "Creatures", "Other",
+        "Rocks & Cliffs", "Trees", "Forest Floor", "Plants & Grass", "Resources", "Buildings", "Raid", "Creatures", "Other",
     };
+
+    public const string OriginalSet = "Original";
+
+    public static readonly string[] Sets = WorldLook.All.Select(l => l.Name).Append(OriginalSet).ToArray();
 
     private static readonly string[] Folders =
     {
         "Assets/_Project/Prefabs", "Assets/_Project/Art/Forest/Prefabs", "Assets/_Project/Data/Prologue/Vegetation",
-        "Assets/_Project/Models/Generated/Vegetation",
+        "Assets/_Project/Models/Generated/Vegetation", "Assets/_Project/Art/Vegetation",
     };
 
     private static List<Entry> entries;
@@ -35,11 +41,24 @@ public static class PrefabCatalog
     /// <summary>Forgets the list (a prefab was added or removed).</summary>
     public static void Refresh() => entries = null;
 
+    /// <summary>The set a prefab comes from: a look's pack, or the original assets.</summary>
+    public static string SetOf(string path)
+    {
+        string folder = path.Replace('\\', '/');
+        WorldLook look = WorldLook.All.FirstOrDefault(l => folder.StartsWith(l.ArtFolder + "/"));
+        return look != null ? look.Name : OriginalSet;
+    }
+
     /// <summary>The group a prefab belongs in, from its folder and name.</summary>
     public static string CategoryOf(string path, string name)
     {
         string folder = path.Replace('\\', '/');
         string n = name.ToLowerInvariant();
+        if (folder.Contains("/Art/Vegetation/"))
+        {
+            return PackCategory(folder, n);
+        }
+
         if (folder.Contains("/Prefabs/Resources/"))
         {
             return "Resources";
@@ -79,6 +98,29 @@ public static class PrefabCatalog
         return "Other";
     }
 
+    // The converted packs are sorted by folder (Trees, Rocks and Logs, Undergrowth, Details, Plants, Rocks), then by name.
+    private static string PackCategory(string folder, string n)
+    {
+        bool young = n.Contains("sapling") || n.Contains("seedling") || n.StartsWith("young");
+        if (folder.Contains("/Trees/") || young)
+        {
+            return "Trees";
+        }
+
+        if (folder.Contains("/Details/") || folder.Contains("/Plants/") || n.Contains("shrub") || n.Contains("fern"))
+        {
+            return "Plants & Grass";
+        }
+
+        if (n.Contains("rock") || n.Contains("boulder") || n.Contains("stone") || n.Contains("crag") || n.Contains("cliff") ||
+            n.Contains("slab") || n.Contains("outcrop") || n.Contains("scree") || n.Contains("pebble"))
+        {
+            return "Rocks & Cliffs";
+        }
+
+        return "Forest Floor";
+    }
+
     private static List<Entry> Load()
     {
         var list = new List<Entry>();
@@ -94,7 +136,7 @@ public static class PrefabCatalog
             }
 
             if (path.Contains("/Prefabs/UI/") || path.Contains("/Prefabs/Systems/") || path.Contains("/Prefabs/Characters/") ||
-                path.Contains("/Prefabs/Effects/") || path.Contains("/Prefabs/Items/"))
+                path.Contains("/Prefabs/Effects/") || path.Contains("/Prefabs/Items/") || path.Contains("/Art/Vegetation/") && path.Contains("/Effects/"))
             {
                 continue; // not things a level is built from
             }
@@ -106,7 +148,14 @@ public static class PrefabCatalog
             }
 
             string name = ObjectNames.NicifyVariableName(file.Replace("_Wind", "").Replace('_', ' '));
-            list.Add(new Entry { Prefab = prefab, Name = name, Category = CategoryOf(path, file), Path = path });
+            string category = CategoryOf(path, file);
+            // Pack saplings and young trees that can't be felled are planting, not trees.
+            if (category == "Trees" && path.Contains("/Art/Vegetation/") && prefab.GetComponent<ChoppableTree>() == null && prefab.GetComponent<ResourceNode>() == null)
+            {
+                category = "Plants & Grass";
+            }
+
+            list.Add(new Entry { Prefab = prefab, Name = name, Category = category, Set = SetOf(path), Path = path });
         }
 
         return list.OrderBy(e => e.Name).ToList();

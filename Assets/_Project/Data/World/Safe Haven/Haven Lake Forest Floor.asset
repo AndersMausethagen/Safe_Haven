@@ -1,0 +1,58 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b302529a90cd5d4eb925e50af633cad, type: 3}
+  m_Name: Haven Lake Forest Floor
+  m_EditorClassIdentifier: SafeHaven::ScatterPalette
+  entries:
+  - prefab: {fileID: 4912269930610114677, guid: 4de1b90b93204584ea219bd2413b97ab, type: 3}
+    weight: 0.8
+    scale: {x: 0.85, y: 1.15}
+    alignToSlope: 0.8
+    sink: 0.15
+    randomYaw: 1
+  - prefab: {fileID: 1845610005960285128, guid: b336852fad9db5249b2dcd6343307974, type: 3}
+    weight: 0.6
+    scale: {x: 0.85, y: 1.15}
+    alignToSlope: 0.8
+    sink: 0.15
+    randomYaw: 1
+  - prefab: {fileID: 2152140131125151844, guid: 6b69a93ea92320c45a7db4917c7fb73c, type: 3}
+    weight: 0.7
+    scale: {x: 0.85, y: 1.15}
+    alignToSlope: 0.8
+    sink: 0.15
+    randomYaw: 1
+  - prefab: {fileID: 2177801862354212065, guid: 273c65066205a4b45b22abd81368e617, type: 3}
+    weight: 0.5
+    scale: {x: 0.85, y: 1.15}
+    alignToSlope: 0.8
+    sink: 0.15
+    randomYaw: 1
+  - prefab: {fileID: 5017457544455330745, guid: 9f38243f304f0fc4fb47b2c00b24c33b, type: 3}
+    weight: 0.6
+    scale: {x: 0.85, y: 1.15}
+    alignToSlope: 0.8
+    sink: 0.15
+    randomYaw: 1
+  - prefab: {fileID: 7562607395878701512, guid: aeaf73295f201aa4a8ed55fbc57b1ca1, type: 3}
+    weight: 1
+    scale: {x: 0.85, y: 1.15}
+    alignToSlope: 0.8
+    sink: 0.15
+    randomYaw: 1
+  - prefab: {fileID: 2442989021758159486, guid: 4d769df415f73634593100fa03bd9c51, type: 3}
+    weight: 1
+    scale: {x: 0.85, y: 1.15}
+    alignToSlope: 0.8
+    sink: 0.15
+    randomYaw: 1
+  spacing: 2.5
