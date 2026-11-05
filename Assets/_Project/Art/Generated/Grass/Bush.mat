@@ -35,8 +35,9 @@ Material:
     - _ClumpScale: 1.5
     - _Cutoff: 0.5
     - _DryAmount: 0.3
+    - _FacingBlades: 0
     - _FarDensity: 0.35
-    - _FarEnd: 50
+    - _FarEnd: 80
     - _FarStart: 25
     - _Flatten: 0.15
     - _Flutter: 0.3

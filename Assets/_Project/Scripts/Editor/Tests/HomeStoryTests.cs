@@ -59,4 +59,23 @@ public sealed class HomeStoryTests
             Assert.IsEmpty(Quest(file).FindProblems(), file);
         }
     }
+
+    // Playtest 2026-11-05: sticks and small rocks, then the stone tools, then the workshop's materials and the workshop,
+    // the woodcutter's lodge, then walls, before the rest of the first days.
+    [Test]
+    public void TheFirstDays_GoFromBareHandsToWalls_OneStepAtATime()
+    {
+        string[] order = { "Awakening", "SettlingIn", "PrimitiveTools", "FirstCamp", "WoodcuttersLodge", "RaiseTheWalls", "FoodAndWater" };
+        for (int i = 1; i < order.Length; i++)
+        {
+            QuestDefinition quest = Quest(order[i]);
+            Assert.NotNull(quest, order[i]);
+            Assert.AreEqual(QuestStart.Automatically, quest.Start, order[i]);
+            CollectionAssert.AreEqual(new[] { Quest(order[i - 1]) }, quest.Prerequisites, order[i] + " follows " + order[i - 1]);
+        }
+
+        Assert.IsTrue(Quest("PrimitiveTools").Objectives.All(o => o.Type == ObjectiveType.CraftItem), "the tools are made, not found");
+        Assert.AreEqual(4, Quest("RaiseTheWalls").Objectives.Single().Amount, "four lengths of palisade");
+        Assert.IsFalse(Quest("AGrowingHome").Objectives.Any(o => o.Building != null && o.Building.name == "Sawbench"), "the lodge is built earlier now");
+    }
 }

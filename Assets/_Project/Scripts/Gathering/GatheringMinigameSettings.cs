@@ -42,7 +42,8 @@ public sealed class GatheringToolProfile
 }
 
 /// <summary>
-/// Rules of the gathering timing minigame (axe, pickaxe and sickle): a marker rises up a bar and the tool comes down at the top by
+/// Rules of the gathering timing minigame (axe, pickaxe and sickle). By default the tool is raised by holding the button and swung by
+/// letting go (see Hold and release); the older mode below is still here with it switched off: a marker rises up a bar and the tool comes down at the top by
 /// itself as a normal swing, so timing is a reward and never a chore. A press in the critical zone gives one extra of the node's
 /// main yield and is quiet; the yellow zone is a normal swing; a press well before it is a glancing blow that wears the tool and
 /// is loud. In raids each
@@ -83,9 +84,29 @@ public sealed class GatheringMinigameSettings : GameSettings<GatheringMinigameSe
     [Tooltip("How far the zones may move from the sweet spot each swing. Zero lets the player feel it as a rhythm.")]
     [SerializeField, Range(0f, 0.4f)] private float zoneJitter;
 
+    [Header("Hold and release")]
+    [Tooltip("Hold the attack or interact button to raise the tool, release to swing. The best moment shows as a glint on " +
+             "the tool with a small sound; too early, or held all the way up, is a glancing blow. Off: the marker rises by " +
+             "itself and a press swings.")]
+    [SerializeField] private bool holdToRaise = true;
+    [Tooltip("Shows the timing bar while gathering. With hold to raise the glint on the tool is the cue, so it is off.")]
+    [SerializeField] private bool showTimingBar;
+    [Tooltip("Played at the tool when it reaches the critical moment.")]
+    [SerializeField] private SoundDefinition glintSound;
+    [SerializeField] private Color glintColour = Color.white;
+    [Tooltip("Brightness of the glint's light at its peak.")]
+    [SerializeField, Range(0f, 30f)] private float glintIntensity = 8f;
+    [SerializeField, Range(0.2f, 6f)] private float glintRange = 2.5f;
+    [Tooltip("Seconds the glint takes to flare and fade.")]
+    [SerializeField, Range(0.05f, 1f)] private float glintSeconds = 0.3f;
+
     [Header("Rewards")]
     [Tooltip("Extra of the node's main yield each critical swing gives.")]
     [SerializeField, Range(0, 5)] private int bonusPerCritical = 1;
+    [Tooltip("How much of a node's swings each result counts for: a critical cuts deeper, a glancing blow barely bites.")]
+    [SerializeField, Range(0f, 4f)] private float criticalProgress = 2f;
+    [SerializeField, Range(0f, 4f)] private float normalProgress = 1f;
+    [SerializeField, Range(0f, 4f)] private float glancingProgress = 0.5f;
 
     [Header("Critical feel")]
     [Tooltip("Seconds the game nearly freezes on a critical swing. The node itself shakes (see Harvest Feedback).")]
@@ -125,6 +146,24 @@ public sealed class GatheringMinigameSettings : GameSettings<GatheringMinigameSe
     public bool AutoGather => autoGather || GameOptions.AutoGather.On;
     public float AutoSwingSeconds => autoSwingSeconds;
     public HarvestFeedbackProfile DefaultFeedback => defaultFeedback;
+    public bool HoldToRaise => holdToRaise;
+    public bool ShowTimingBar => showTimingBar || !holdToRaise;
+    public SoundDefinition GlintSound => glintSound;
+    public Color GlintColour => glintColour;
+    public float GlintIntensity => glintIntensity;
+    public float GlintRange => glintRange;
+    public float GlintSeconds => glintSeconds;
+
+    /// <summary>How many of a node's swings a swing with this result counts for.</summary>
+    public float ProgressFor(SwingResult result)
+    {
+        switch (result)
+        {
+            case SwingResult.Critical: return criticalProgress;
+            case SwingResult.Normal: return normalProgress;
+            default: return glancingProgress;
+        }
+    }
 
     public bool UsesMinigame(ToolType tool)
     {

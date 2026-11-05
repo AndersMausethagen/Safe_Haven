@@ -119,6 +119,7 @@ MonoBehaviour:
   type: 1
   stationId: 
   menuRange: 6
+  opensWhenUsed: 1
 --- !u!114 &3511187837369876940
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -208,8 +209,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 6.4, y: 4.755, z: 5.35}
-  m_Center: {x: 0, y: 2.3725, z: 0}
+  m_Size: {x: 4.48, y: 3.3285, z: 3.745}
+  m_Center: {x: 0, y: 1.6607499, z: 0}
 --- !u!208 &3005199660752446460
 NavMeshObstacle:
   m_ObjectHideFlags: 0
@@ -220,11 +221,11 @@ NavMeshObstacle:
   m_Enabled: 1
   serializedVersion: 3
   m_Shape: 1
-  m_Extents: {x: 3.2, y: 2.3775, z: 2.675}
+  m_Extents: {x: 2.24, y: 1.66425, z: 1.8725}
   m_MoveThreshold: 0.1
   m_Carve: 1
   m_CarveOnlyStationary: 1
-  m_Center: {x: 0, y: 2.3725, z: 0}
+  m_Center: {x: 0, y: 1.6607499, z: 0}
   m_TimeToStationary: 0.5
 --- !u!1001 &6766277510499219947
 PrefabInstance:
@@ -343,6 +344,18 @@ PrefabInstance:
     - target: {fileID: 5914193434496173903, guid: a0ae597cfec1f8a41a8f92b8a1310e8a, type: 3}
       propertyPath: m_Name
       value: Workshop Model
+      objectReference: {fileID: 0}
+    - target: {fileID: 6774403823294289204, guid: a0ae597cfec1f8a41a8f92b8a1310e8a, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 6774403823294289204, guid: a0ae597cfec1f8a41a8f92b8a1310e8a, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 6774403823294289204, guid: a0ae597cfec1f8a41a8f92b8a1310e8a, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.7
       objectReference: {fileID: 0}
     - target: {fileID: 6774403823294289204, guid: a0ae597cfec1f8a41a8f92b8a1310e8a, type: 3}
       propertyPath: m_LocalPosition.x

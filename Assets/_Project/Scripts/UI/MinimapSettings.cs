@@ -6,6 +6,9 @@ public sealed class MinimapSettings : GameSettings<MinimapSettings>
 {
     [Tooltip("Safe Haven/UI/Minimap, which draws the round map.")]
     [SerializeField] private Material material;
+    [Tooltip("Safe Haven/UI/World Map, which draws the M map. Referenced here so builds keep it (Shader.Find alone lets " +
+             "the build strip it).")]
+    [SerializeField] private Shader worldMapShader;
     [Tooltip("Pixels of the painted map, per side. It is painted once per scene.")]
     [SerializeField, Range(128, 1024)] private int mapSize = 512;
     [Tooltip("The map's size on screen, in UI units.")]
@@ -23,6 +26,7 @@ public sealed class MinimapSettings : GameSettings<MinimapSettings>
     [SerializeField] private Color water = new Color(0.3f, 0.45f, 0.5f, 1f);
 
     public Material Material => material;
+    public Shader WorldMapShader => worldMapShader;
     public int MapSize => mapSize;
     public float Size => size;
     public float NearReach => nearReach;

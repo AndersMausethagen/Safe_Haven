@@ -21,7 +21,7 @@ MonoBehaviour:
   canCrit: 1
   range: 1.6
   arc: 90
-  maxTargets: 3
+  maxTargets: 1
   hitDelay: 0.2
   recoveryTime: 0.45
   poiseDamage: 8

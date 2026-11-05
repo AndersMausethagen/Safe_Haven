@@ -150,11 +150,11 @@ Material:
     - _CliffTiling: 4
     - _DisplacementDataVersion: 2
     - _DisplacementFar: 35
-    - _DisplacementLayerCount: 15
+    - _DisplacementLayerCount: 16
     - _DisplacementMip: 0
     - _DisplacementNear: 30.4
     - _DisplacementNormalStrength: 1
-    - _DisplacementStrength: 0.553
+    - _DisplacementStrength: 0.247
     - _EnableHeightBlend: 1
     - _EnableInstancedPerPixelNormal: 1
     - _FootprintDarkening: 0

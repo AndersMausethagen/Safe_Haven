@@ -18,7 +18,10 @@ public sealed class PlayerTerrainFootprints : MonoBehaviour
         if (footsteps != null) footsteps.FootPlanted -= OnFootPlanted;
     }
 
-    public static bool TryStamp(Vector3 position, Vector3 forward)
+    public static bool TryStamp(Vector3 position, Vector3 forward) => TryStamp(position, forward, true);
+
+    /// <param name="player">The player's prints move the footprint window with them; anyone else's only land inside it.</param>
+    public static bool TryStamp(Vector3 position, Vector3 forward, bool player)
     {
         if (!Physics.Raycast(position + Vector3.up * 0.4f, Vector3.down, out RaycastHit hit,
             0.8f, ~0, QueryTriggerInteraction.Ignore))
@@ -27,7 +30,8 @@ public sealed class PlayerTerrainFootprints : MonoBehaviour
             return false;
         if (WaterSurface.TryFind(hit.point + Vector3.up * 0.1f, 0.3f, out _))
             return false;
-        footprints.Stamp(hit.point, forward);
+        if (player) footprints.Stamp(hit.point, forward);
+        else footprints.StampInWindow(hit.point, forward);
         return true;
     }
 

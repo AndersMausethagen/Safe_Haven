@@ -192,6 +192,7 @@ public sealed class Companion : MonoBehaviour, IConversationTopics
 
     private void Awake()
     {
+        WalkerFootprints.AddTo(gameObject);
         agent = GetComponent<NavMeshAgent>();
         ownSpeed = agent.speed;
         combatant = GetComponent<Combatant>();

@@ -475,7 +475,7 @@ public static class SceneTransition
             shade.color = settings.BackgroundColor;
             if (art.enabled)
             {
-                art.GetComponent<AspectRatioFitter>().aspectRatio = picture.rect.width / Mathf.Max(1f, picture.rect.height);
+                art.GetComponent<ArtCover>().AspectRatio = picture.rect.width / Mathf.Max(1f, picture.rect.height);
             }
 
             barFillImage.color = settings.AccentColor;
@@ -522,10 +522,9 @@ public static class SceneTransition
 
             background = Stretch(new GameObject("Background", typeof(RectTransform), typeof(Image)), root.transform).GetComponent<Image>();
 
-            GameObject artObject = Stretch(new GameObject("Art", typeof(RectTransform), typeof(Image), typeof(AspectRatioFitter)), root.transform);
+            GameObject artObject = Stretch(new GameObject("Art", typeof(RectTransform), typeof(Image), typeof(ArtCover)), root.transform);
             art = artObject.GetComponent<Image>();
             art.raycastTarget = false;
-            artObject.GetComponent<AspectRatioFitter>().aspectMode = AspectRatioFitter.AspectMode.EnvelopeParent;
 
             // The picture sinks into the background colour at the bottom, where the words have to be read.
             GameObject shadeObject = Stretch(new GameObject("Shade", typeof(RectTransform), typeof(Image)), root.transform);

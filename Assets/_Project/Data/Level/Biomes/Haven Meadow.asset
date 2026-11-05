@@ -1,0 +1,57 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d244b3b692f85184bbe6d6ce0365cdbb, type: 3}
+  m_Name: Haven Meadow
+  m_EditorClassIdentifier: SafeHaven::BiomePreset
+  description: 'The Haven''s open ground: short grass with tall patches, flowers here and there, heather and lingonberry, a few stones and logs.'
+  ground: {fileID: 8574412962073106934, guid: d5d68715002b4b1418404d8704dcb40a, type: 2}
+  groundStrength: 0.5
+  groundSlope: {x: 0, y: 40}
+  details:
+  - prefab: {fileID: 1119721366509591281, guid: 6fa7885c79109394597bbc7edced6031, type: 3}
+    density: 0.75
+    slope: {x: 0, y: 35}
+    patchSize: 6
+    patchiness: 0.25
+  - prefab: {fileID: 4492498035373115910, guid: 1a15be874d373ba4ab68a5b420c3cbb7, type: 3}
+    density: 0.3
+    slope: {x: 0, y: 35}
+    patchSize: 5
+    patchiness: 0.6
+  - prefab: {fileID: 7421917674151405495, guid: 53bfa24e4a4bfd84781a3540ce32aa9d, type: 3}
+    density: 0.08
+    slope: {x: 0, y: 35}
+    patchSize: 3
+    patchiness: 0.7
+  - prefab: {fileID: 3524444526849522967, guid: 987b12ee53d0db644acfd4ca8c5ee93f, type: 3}
+    density: 0.08
+    slope: {x: 0, y: 35}
+    patchSize: 3
+    patchiness: 0.7
+  - prefab: {fileID: 3669016974438404277, guid: 7f5af68129742254d85e8ca040142359, type: 3}
+    density: 0.12
+    slope: {x: 0, y: 30}
+    patchSize: 4
+    patchiness: 0.7
+  - prefab: {fileID: 4440034203161137221, guid: 55f0e26652098054b9852dd97d38047c, type: 3}
+    density: 0.06
+    slope: {x: 0, y: 30}
+    patchSize: 3
+    patchiness: 0.75
+  props:
+  - palette: {fileID: 11400000, guid: fbc1c0cb4d2aca6439fa711161b5d9ba, type: 2}
+    tries: 1
+    slope: {x: 0, y: 40}
+  - palette: {fileID: 11400000, guid: d0f7a8ae406eb014fbb78c9a2f1006f6, type: 2}
+    tries: 1
+    slope: {x: 0, y: 40}
+  nearWater: 0

@@ -37,7 +37,17 @@ MonoBehaviour:
   criticalWidthPerCombo: 0.02
   maxCombo: 3
   zoneJitter: 0
+  holdToRaise: 1
+  showTimingBar: 0
+  glintSound: {fileID: 11400000, guid: ed42888011cf91c4ba3dda056ff34557, type: 2}
+  glintColour: {r: 1, g: 1, b: 1, a: 1}
+  glintIntensity: 8
+  glintRange: 2.5
+  glintSeconds: 0.3
   bonusPerCritical: 1
+  criticalProgress: 2
+  normalProgress: 1
+  glancingProgress: 0.5
   criticalHitStop: 0.06
   interruptOnHit: 1
   autoGather: 0

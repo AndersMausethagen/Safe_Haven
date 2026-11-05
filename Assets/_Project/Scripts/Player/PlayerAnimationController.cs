@@ -118,6 +118,9 @@ public sealed class PlayerAnimationController : MonoBehaviour
     private WorkPhase workPhase;
     private float workContact;
     private float workHold;
+    // Speed of the tool's rise to the raised point. 1 plays the clip as made; hold-to-raise gathering sets it from how
+    // long the button is held (0 keeps the tool down until the button is pressed).
+    private float workRaiseSpeed = 1f;
     private float workTime;
     private HashSet<int> parameters;
     private float airborneTime;
@@ -733,6 +736,20 @@ public sealed class PlayerAnimationController : MonoBehaviour
         workHold = Mathf.Max(0f, workContact - settings.SwingWindUp);
         workPhase = WorkPhase.Rising;
         workTime = 0f;
+        workRaiseSpeed = 1f;
+    }
+
+    /// <summary>Seconds of the swing clip from its start to the raised point (where the tool waits to strike).</summary>
+    public float WorkRaiseSeconds => workHold;
+
+    /// <summary>How fast the tool rises to the raised point (1 = as the clip was made, 0 = it waits where it is).</summary>
+    public void SetWorkRaise(float speed)
+    {
+        workRaiseSpeed = Mathf.Max(0f, speed);
+        if (workPhase == WorkPhase.Rising)
+        {
+            SetFloat(WorkSpeedHash, workRaiseSpeed);
+        }
     }
 
     /// <summary>Brings the tool down. Returns the seconds until it lands, or 0 when swings aren't being held.</summary>
@@ -786,6 +803,7 @@ public sealed class PlayerAnimationController : MonoBehaviour
         if (workPhase == WorkPhase.Following && time < workTime)
         {
             workPhase = WorkPhase.Rising;
+            SetFloat(WorkSpeedHash, workRaiseSpeed);
         }
 
         if (workPhase == WorkPhase.Rising && time >= workHold)

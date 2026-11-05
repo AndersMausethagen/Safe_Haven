@@ -32,7 +32,7 @@ public static class WorldBuilder
     private static int triggerGroup = -1; // the undo group of the edit that scheduled the build
     private static double ignoreTerrainUntil;
     private static readonly HashSet<Terrain> handEdited = new HashSet<Terrain>();
-    private static readonly List<Rect> handEditedAreas = new List<Rect>();
+    private static readonly List<(UnityEngine.SceneManagement.Scene scene, Rect area)> handEditedAreas = new List<(UnityEngine.SceneManagement.Scene, Rect)>();
 
     public static bool Building { get; private set; }
 
@@ -44,7 +44,10 @@ public static class WorldBuilder
         WorldFeature.Edited += _ => Schedule(Delay);
         Spline.Changed += OnSplineChanged;
         TerrainCallbacks.heightmapChanged += OnHeightmapChanged;
-        EditorApplication.hierarchyChanged += () => Schedule(Delay);
+        // Only changes to the world's features schedule a build: any hierarchy change anywhere used to, so a scene
+        // load, a test or a dragged-in prop set off a build (and left the scene asking to be saved).
+        EditorApplication.hierarchyChanged += OnHierarchyChanged;
+        ObjectChangeEvents.changesPublished += OnChangesPublished;
         EditorApplication.update += Tick;
         Undo.undoRedoPerformed += () => ignoreTerrainUntil = EditorApplication.timeSinceStartup + 1.0;
     }
@@ -125,6 +128,46 @@ public static class WorldBuilder
         }
     }
 
+    private static int featureSignature;
+
+    // A feature added, removed, switched on or off, or moved in the hierarchy schedules a build; nothing else does.
+    private static void OnHierarchyChanged()
+    {
+        int signature = 17;
+        foreach (WorldFeature feature in Object.FindObjectsByType<WorldFeature>())
+        {
+            signature = signature * 31 + feature.GetEntityId().GetHashCode();
+            signature = signature * 31 + feature.transform.localToWorldMatrix.GetHashCode();
+        }
+
+        if (signature != featureSignature)
+        {
+            featureSignature = signature;
+            Schedule(Delay);
+        }
+    }
+
+    // A world feature's settings or transform changed (in the Inspector, by a gizmo, by undo).
+    private static void OnChangesPublished(ref ObjectChangeEventStream stream)
+    {
+        for (int i = 0; i < stream.length; i++)
+        {
+            if (stream.GetEventType(i) != ObjectChangeKind.ChangeGameObjectOrComponentProperties)
+            {
+                continue;
+            }
+
+            stream.GetChangeGameObjectOrComponentPropertiesEvent(i, out ChangeGameObjectOrComponentPropertiesEventArgs change);
+            Object changed = EditorUtility.EntityIdToObject(change.entityId);
+            GameObject owner = changed is Component component ? component.gameObject : changed as GameObject;
+            if (owner != null && owner.GetComponent<WorldFeature>() != null)
+            {
+                Schedule(Delay);
+                return;
+            }
+        }
+    }
+
     private static void OnHeightmapChanged(Terrain terrain, RectInt region, bool synched)
     {
         if (Building || EditorApplication.timeSinceStartup < ignoreTerrainUntil || EditorApplication.isPlaying ||
@@ -136,7 +179,7 @@ public static class WorldBuilder
         TerrainGrid grid = TerrainGrid.Heights(terrain);
         Vector2 a = grid.World(region.xMin, region.yMin), b = grid.World(region.xMax, region.yMax);
         handEdited.Add(terrain);
-        handEditedAreas.Add(Rect.MinMaxRect(a.x, a.y, b.x, b.y));
+        handEditedAreas.Add((terrain.gameObject.scene, Rect.MinMaxRect(a.x, a.y, b.x, b.y)));
         Schedule(HandEditDelay);
     }
 
@@ -146,12 +189,39 @@ public static class WorldBuilder
     /// how many terrains were rebuilt.</summary>
     public static int BuildChanged(bool everything)
     {
-        List<WorldFeature> features = LiveFeatures();
+        // Scene by scene: scenes can lie on the same coordinates (the Haven and the prologue do), and one scene's
+        // features must never shape, paint or regrow another scene's terrains and forests.
+        int built = 0;
+        var scenes = new List<UnityEngine.SceneManagement.Scene>();
+        for (int i = 0; i < UnityEngine.SceneManagement.SceneManager.sceneCount; i++)
+        {
+            UnityEngine.SceneManagement.Scene scene = UnityEngine.SceneManagement.SceneManager.GetSceneAt(i);
+            if (scene.isLoaded) scenes.Add(scene);
+        }
+
+        foreach (UnityEngine.SceneManagement.Scene scene in scenes)
+        {
+            built += BuildChangedIn(scene, everything);
+        }
+
+        handEdited.Clear();
+        handEditedAreas.Clear();
+        return built;
+    }
+
+    private static int BuildChangedIn(UnityEngine.SceneManagement.Scene scene, bool everything)
+    {
+        List<WorldFeature> features = LiveFeatures().Where(f => f.gameObject.scene == scene).ToList();
         var terrainsToBuild = new List<Terrain>();
-        var changedAreas = new List<Rect>(handEditedAreas);
+        var changedAreas = handEditedAreas.Where(e => e.scene == scene).Select(e => e.area).ToList();
         var areasToBuild = new HashSet<BiomeArea>();
         foreach (Terrain terrain in Terrain.activeTerrains)
         {
+            if (terrain.gameObject.scene != scene)
+            {
+                continue;
+            }
+
             if (terrain.terrainData == null)
             {
                 continue;
@@ -230,8 +300,6 @@ public static class WorldBuilder
             }
         }
 
-        handEdited.Clear();
-        handEditedAreas.Clear();
         if (terrainsToBuild.Count == 0 && areasToBuild.Count == 0)
         {
             triggerGroup = -1;
@@ -245,7 +313,7 @@ public static class WorldBuilder
     /// <summary>Rebuilds one terrain with all its features and the areas on it (after Auto-Paint, for instance).</summary>
     public static void RebuildTerrain(Terrain terrain)
     {
-        List<WorldFeature> features = LiveFeatures();
+        List<WorldFeature> features = LiveFeatures().Where(f => f.gameObject.scene == terrain.gameObject.scene).ToList();
         Rect rect = FlatRect(terrain);
         List<BiomeArea> areas = features.OfType<BiomeArea>().Where(a => FlatRect(a.WorldBounds()).Overlaps(rect)).ToList();
         if (terrain.GetComponent<WorldTerrain>() == null)
@@ -263,6 +331,11 @@ public static class WorldBuilder
               .OrderBy(f => f.Order).ThenBy(PathOf, StringComparer.Ordinal).ToList();
 
     /// <summary>Changes whenever anything the build reads from the feature changes: its settings, spline and place.</summary>
+    /// <summary>
+    /// The feature's fingerprint: the settings that differ from its type's defaults, its spline and its placement. Only
+    /// what differs from the defaults counts, so giving a feature type a new setting later doesn't change every such
+    /// feature's fingerprint (which made the next automatic build rebuild all of them).
+    /// </summary>
     public static string Hash(WorldFeature feature)
     {
         if (feature == null)
@@ -270,8 +343,78 @@ public static class WorldBuilder
             return "";
         }
 
-        string text = EditorJsonUtility.ToJson(feature) + EditorJsonUtility.ToJson(feature.Container) + feature.transform.localToWorldMatrix;
-        return Hash128.Compute(text).ToString();
+        var text = new System.Text.StringBuilder();
+        var serialized = new SerializedObject(feature);
+        SerializedObject defaults = DefaultsOf(feature.GetType());
+        SerializedProperty property = serialized.GetIterator();
+        bool enter = true;
+        while (property.NextVisible(enter))
+        {
+            enter = false;
+            if (property.propertyPath == "m_Script")
+            {
+                continue;
+            }
+
+            SerializedProperty standard = defaults?.FindProperty(property.propertyPath);
+            if (standard != null && SerializedProperty.DataEquals(property, standard))
+            {
+                continue;
+            }
+
+            text.Append(property.propertyPath).Append('=');
+            AppendValue(text, property);
+            text.Append(';');
+        }
+
+        text.Append(EditorJsonUtility.ToJson(feature.Container)).Append(feature.transform.localToWorldMatrix);
+        return Hash128.Compute(text.ToString()).ToString();
+    }
+
+    private static readonly Dictionary<System.Type, SerializedObject> Defaults = new Dictionary<System.Type, SerializedObject>();
+
+    // A fresh, hidden instance of the feature type, read for its default settings.
+    private static SerializedObject DefaultsOf(System.Type type)
+    {
+        if (Defaults.TryGetValue(type, out SerializedObject known) && known.targetObject != null)
+        {
+            return known;
+        }
+
+        var holder = new GameObject("World Feature Defaults") { hideFlags = HideFlags.HideAndDontSave };
+        holder.SetActive(false);
+        Component instance = holder.AddComponent(type);
+        var serialized = new SerializedObject(instance);
+        Defaults[type] = serialized;
+        return serialized;
+    }
+
+    // Every leaf value under a property, in order, as text.
+    private static void AppendValue(System.Text.StringBuilder text, SerializedProperty property)
+    {
+        SerializedProperty walk = property.Copy();
+        SerializedProperty end = property.GetEndProperty();
+        bool first = true;
+        while (first || (walk.Next(true) && !SerializedProperty.EqualContents(walk, end)))
+        {
+            first = false;
+            switch (walk.propertyType)
+            {
+                case SerializedPropertyType.ObjectReference:
+                    text.Append(walk.objectReferenceValue != null
+                        ? AssetDatabase.GetAssetPath(walk.objectReferenceValue) + "#" + walk.objectReferenceValue.name : "null");
+                    break;
+                case SerializedPropertyType.Generic:
+                case SerializedPropertyType.ManagedReference:
+                    continue;
+                default:
+                    object value = walk.boxedValue;
+                    text.Append(value is float f ? f.ToString("R", System.Globalization.CultureInfo.InvariantCulture) : value?.ToString());
+                    break;
+            }
+
+            text.Append(',');
+        }
     }
 
     // ------------------------------------------------------------------ building
@@ -289,6 +432,14 @@ public static class WorldBuilder
             Undo.SetCurrentGroupName("Build World");
         }
         var report = new List<string>();
+        var phases = new List<string>();
+        var lap = System.Diagnostics.Stopwatch.StartNew();
+        void Lap(string phase)
+        {
+            if (lap.ElapsedMilliseconds >= 50) phases.Add($"{phase} {lap.ElapsedMilliseconds} ms");
+            lap.Restart();
+        }
+
         try
         {
             List<WorldFeature> shaping = all.Where(f => f.ShapesTerrain &&
@@ -308,6 +459,7 @@ public static class WorldBuilder
                                     terrain.terrainData.alphamapLayers, terrain.terrainData.detailResolution);
                 layers.Add(ReadHeights(terrain, world.Stash, shaping));
             }
+            Lap("record undo + read heights");
 
             var sampler = new WorldSampler(layers);
             foreach (FeatureBuilder builder in builders)
@@ -318,6 +470,7 @@ public static class WorldBuilder
                     builder.Heights(layer);
                 }
             }
+            Lap("feature heights");
 
             foreach (HeightLayer layer in layers)
             {
@@ -330,18 +483,26 @@ public static class WorldBuilder
                 glue.Record(layer);
                 WriteHeights(layer, layer.Terrain.GetComponent<WorldTerrain>().Stash);
             }
+            Lap("write heights");
 
             // Paint, grass and trees.
             foreach (Terrain terrain in terrains)
             {
                 WorldTerrainStash stash = terrain.GetComponent<WorldTerrain>().Stash;
+                PaintTimings.Clear();
                 Paint(terrain, stash, shaping, builders);
+                Lap("paint");
+                phases.AddRange(PaintTimings);
                 ClearDetails(terrain, stash, shaping, builders);
+                Lap("grass");
                 ClearTrees(terrain, stash, builders);
+                Lap("trees");
                 terrain.Flush();
+                Lap("flush");
             }
 
             glue.Apply(terrains);
+            Lap("ground glue");
 
             // Objects: the shaping features on the rebuilt terrains, then the areas.
             var context = new BuildContext();
@@ -350,6 +511,7 @@ public static class WorldBuilder
             {
                 RegenerateObjects(builder, context);
             }
+            Lap("feature objects");
 
             foreach (WorldFeature feature in all.Where(f => f.ShapesTerrain && !shaping.Contains(f)))
             {
@@ -365,6 +527,7 @@ public static class WorldBuilder
                 builder.Prepare(sampler);
                 RegenerateObjects(builder, context);
                 placedSaveables += area.GetComponentsInChildren<SaveableEntity>(true).Length;
+                Lap(area.name);
             }
 
             if (placedSaveables > 0)
@@ -376,11 +539,13 @@ public static class WorldBuilder
             }
 
             RecordBuilt(all, terrains, areas);
+            Lap("saveable ids + record");
             foreach (Terrain terrain in terrains)
             {
                 if (terrain.GetComponent<GrassTerrainColour>() != null)
                 {
                     GrassSetup.BakeGroundColour(terrain);
+                    Lap("grass colour map");
                 }
 
                 EditorUtility.SetDirty(terrain.terrainData);
@@ -393,7 +558,9 @@ public static class WorldBuilder
                 UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(area.gameObject.scene);
             }
 
-            report.Add($"{terrains.Count} terrain(s), {builders.Count} feature(s), {areas.Count} area(s) in {watch.ElapsedMilliseconds} ms");
+            Lap("mark dirty");
+            report.Add($"{terrains.Count} terrain(s), {builders.Count} feature(s), {areas.Count} area(s) in {watch.ElapsedMilliseconds} ms" +
+                       (phases.Count > 0 ? " (" + string.Join(", ", phases) + ")" : ""));
             if (terrains.Any(t => t.GetComponent<WorldTerrain>().RebakeNavMeshAfterBuild))
             {
                 report.Add(RebakeNavMesh());
@@ -426,17 +593,32 @@ public static class WorldBuilder
     /// the others (a terrain left for a manual build keeps its record, so its changes are still seen as pending).</summary>
     private static void RecordBuilt(List<WorldFeature> all, List<Terrain> terrains, List<BiomeArea> areas)
     {
+        // Only the scene being built: another scene's terrain on the same coordinates is none of its business.
+        UnityEngine.SceneManagement.Scene scene = terrains.Count > 0 ? terrains[0].gameObject.scene
+            : areas.Count > 0 ? areas[0].gameObject.scene : default;
         foreach (Terrain terrain in Terrain.activeTerrains)
         {
+            if (terrain.gameObject.scene != scene)
+            {
+                continue;
+            }
+
             var world = terrain.GetComponent<WorldTerrain>();
             if (world == null)
             {
                 continue;
             }
 
-            Undo.RecordObject(world, "Build World");
             Rect rect = FlatRect(terrain);
             bool rebuilt = terrains.Contains(terrain);
+            // Only terrains whose record changes are touched: recording the others for undo marked their scenes changed
+            // (a build in one scene left another asking to be saved).
+            if (!rebuilt && !areas.Any(area => FlatRect(area.WorldBounds()).Overlaps(rect)))
+            {
+                continue;
+            }
+
+            Undo.RecordObject(world, "Build World");
             if (rebuilt)
             {
                 world.BuiltFeatures.Clear();
@@ -675,6 +857,8 @@ public static class WorldBuilder
         }
     }
 
+    private static readonly List<string> PaintTimings = new List<string>();
+
     private static void Paint(Terrain terrain, WorldTerrainStash stash, List<WorldFeature> shaping, List<FeatureBuilder> builders)
     {
         TerrainData data = terrain.terrainData;
@@ -704,6 +888,12 @@ public static class WorldBuilder
                     handPainted |= Mathf.Abs(maps[y, x, l] - lastWeights[l]) > PaintTolerance;
                 }
 
+                // Painted by hand over a feature's paint: the hand paint stays, now and in every later build.
+                if (handPainted)
+                {
+                    stash.MarkHandPainted((rect.y + y) * resolution + rect.x + x);
+                }
+
                 for (int l = 0; l < layers; l++)
                 {
                     // Hand painting since the last build becomes the new ground under the feature.
@@ -716,7 +906,9 @@ public static class WorldBuilder
 
         foreach (FeatureBuilder builder in builders)
         {
+            var one = System.Diagnostics.Stopwatch.StartNew();
             builder.Paint(layer);
+            if (one.ElapsedMilliseconds >= 50) PaintTimings.Add($"{builder.Feature.name} paint {one.ElapsedMilliseconds} ms");
         }
 
         var released = new HashSet<int>();
@@ -727,9 +919,17 @@ public static class WorldBuilder
                 int index = y * rect.width + x;
                 int offset = index * layers;
                 int cell = (rect.y + y) * resolution + rect.x + x;
-                bool touched = layer.Touched[index];
+                bool hand = stash.IsHandPainted(cell);
+                bool touched = layer.Touched[index] && !hand;
                 for (int l = 0; l < layers; l++)
                 {
+                    if (hand)
+                    {
+                        // Exactly as painted: not the ground kept from before the feature, nor the feature's paint.
+                        baseWeights[l] = lastWeights[l] = maps[y, x, l];
+                        continue;
+                    }
+
                     baseWeights[l] = bases[offset + l];
                     lastWeights[l] = touched ? layer.Values[offset + l] : bases[offset + l];
                     maps[y, x, l] = lastWeights[l];

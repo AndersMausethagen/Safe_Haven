@@ -39,8 +39,8 @@ MonoBehaviour:
   felledTreePrefab: {fileID: 1000865458160168767, guid: 379892440832bc346aac859c194abf5f, type: 3}
   fallSpreadDegrees: 75
   landingNoiseRadius: 30
-  landingShake: 0.6
-  landingFeltDistance: 30
+  landingShake: 1
+  landingFeltDistance: 40
   timberSurface: {fileID: 13400000, guid: 8eb735b0983ec564da1dad17498794ed, type: 2}
   crushDamage: 90
   crushFromSpeed: 3

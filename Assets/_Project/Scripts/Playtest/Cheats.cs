@@ -466,6 +466,18 @@ public static class Cheats
         return Did("Bring home", $"{person.DisplayName} is home.");
     }
 
+    public static string BeginCorruption()
+    {
+        CorruptionNights corruption = CorruptionNights.Current;
+        if (corruption == null || corruption.IsActive)
+        {
+            return corruption == null ? "Corruption only reaches Safe Haven." : "The corruption is already coming.";
+        }
+
+        corruption.Begin(5f);
+        return Did("Corruption", "Corruption creeps in from the Misty Woods.");
+    }
+
     public static string BeginBreach()
     {
         WardBreachDirector breach = WardBreachDirector.Current;

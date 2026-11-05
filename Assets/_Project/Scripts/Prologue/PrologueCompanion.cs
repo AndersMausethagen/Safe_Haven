@@ -47,6 +47,7 @@ public sealed class PrologueCompanion : MonoBehaviour, IConversationTopics
 
     private void Awake()
     {
+        WalkerFootprints.AddTo(gameObject);
         agent = GetComponent<NavMeshAgent>();
         companion = GetComponent<Companion>();
         if (companion == null) Debug.LogError("An expedition member needs a Companion to walk and fight.", this);

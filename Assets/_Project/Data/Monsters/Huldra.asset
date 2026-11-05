@@ -40,7 +40,7 @@ MonoBehaviour:
   experience: 0
   neverElite: 0
   attack: {fileID: 11400000, guid: ea84f5e69338fbd449215ef3ad11f3c3, type: 2}
-  attackDamage: 14
+  attackDamage: 16.800001
   attackCooldown: 1.1
   moveSpeed: 3.5
   detectionRange: 12

@@ -323,7 +323,7 @@ public sealed class ItemContainer
     }
 
     /// <summary>
-    /// Puts a whole stack, durability included, into the first free unlocked slot, topping up equal stacks first when it
+    /// Puts a whole stack, durability (or a water container's level) included, into the first free unlocked slot, topping up equal stacks first when it
     /// stacks. Returns how many arrived. Use it to move existing gear; Add makes new items.
     /// </summary>
     public int AddStack(ItemStack stack)
@@ -333,7 +333,7 @@ public sealed class ItemContainer
             return 0;
         }
 
-        if (!stack.Item.HasDurability)
+        if (!stack.Item.KeepsCondition)
         {
             return Add(stack.Item, stack.Count);
         }
@@ -360,7 +360,7 @@ public sealed class ItemContainer
             return 0;
         }
 
-        int moved = stack.Item.HasDurability ? target.AddStack(stack) : target.Add(stack.Item, stack.Count);
+        int moved = stack.Item.KeepsCondition ? target.AddStack(stack) : target.Add(stack.Item, stack.Count);
         if (moved > 0)
         {
             RemoveAt(index, moved);

@@ -9515,8 +9515,8 @@ MonoBehaviour:
   bowHeight: 1.45
   bowForward: 0.35
   aimRange: 45
-  aimAssistAngle: 5
-  aimAssistRadius: 1.5
+  aimAssistAngle: 9
+  aimAssistRadius: 2.5
 --- !u!114 &1143076731806142729
 MonoBehaviour:
   m_ObjectHideFlags: 0

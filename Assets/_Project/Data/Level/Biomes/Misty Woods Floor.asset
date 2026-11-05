@@ -1,0 +1,57 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d244b3b692f85184bbe6d6ce0365cdbb, type: 3}
+  m_Name: Misty Woods Floor
+  m_EditorClassIdentifier: SafeHaven::BiomePreset
+  description: 'The Misty Woods'' floor: moss and forest grass, ferns in drifts, leaf litter, mushrooms, fallen debris and mossy boulders.'
+  ground: {fileID: 8574412962073106934, guid: c565454ffa18bd1429caa8979dcc7aec, type: 2}
+  groundStrength: 0.45
+  groundSlope: {x: 0, y: 40}
+  details:
+  - prefab: {fileID: 121585300179645095, guid: 4b16f5847dc31054e84d3aca00666c48, type: 3}
+    density: 0.45
+    slope: {x: 0, y: 35}
+    patchSize: 5
+    patchiness: 0.4
+  - prefab: {fileID: 5380173840899507260, guid: 32b9d0e7c65bdab4281e29e754061d5c, type: 3}
+    density: 0.25
+    slope: {x: 0, y: 40}
+    patchSize: 6
+    patchiness: 0.65
+  - prefab: {fileID: 1540985237908984661, guid: e79ccac8489c27b4786e1a0a8b24093b, type: 3}
+    density: 0.15
+    slope: {x: 0, y: 40}
+    patchSize: 5
+    patchiness: 0.65
+  - prefab: {fileID: 8915668155572190552, guid: 726c347b106dd8c4ebe51bcfba1ac23d, type: 3}
+    density: 0.2
+    slope: {x: 0, y: 45}
+    patchSize: 4
+    patchiness: 0.5
+  - prefab: {fileID: 3735512099709079395, guid: 1c869534bb54ee94e9149eb854a12619, type: 3}
+    density: 0.25
+    slope: {x: 0, y: 45}
+    patchSize: 5
+    patchiness: 0.4
+  - prefab: {fileID: 3361592500865844313, guid: ebcea31cb035ba14fa71d144884f8859, type: 3}
+    density: 0.05
+    slope: {x: 0, y: 35}
+    patchSize: 2
+    patchiness: 0.8
+  props:
+  - palette: {fileID: 11400000, guid: 373290c5cf218cb48836dc2ffaaa64a3, type: 2}
+    tries: 2
+    slope: {x: 0, y: 40}
+  - palette: {fileID: 11400000, guid: 6f397ef0845982c4388bde9b0b200e62, type: 2}
+    tries: 1
+    slope: {x: 0, y: 45}
+  nearWater: 0

@@ -219,4 +219,23 @@ public sealed class WorldBuilderTests
         Assert.AreEqual("Mossy Boulder 3", WorldAssets.PrefabName("rock_moss_set_01_03"));
         Assert.AreEqual("Fern 2", WorldAssets.PrefabName("fern_02_02"));
     }
+
+    // 2026-11-05: ravines and ledged walls for more verticality.
+    [Test]
+    public void WallProfile_ClimbsFromFootToTop_AndLedgesFlattenPartsOfIt()
+    {
+        Assert.AreEqual(0f, RavineBuilder.WallProfile(0f, 3, 0.8f), 1e-4f);
+        Assert.AreEqual(1f, RavineBuilder.WallProfile(1f, 3, 0.8f), 1e-4f);
+        Assert.AreEqual(0.4f, RavineBuilder.WallProfile(0.4f, 0, 1f), 1e-4f, "no ledges: an even face");
+        float last = 0f, flattest = float.MaxValue;
+        for (int i = 1; i <= 100; i++)
+        {
+            float v = RavineBuilder.WallProfile(i / 100f, 3, 0.8f);
+            Assert.GreaterOrEqual(v, last - 1e-5f, "never dips");
+            flattest = Mathf.Min(flattest, (v - last) * 100f);
+            last = v;
+        }
+
+        Assert.Less(flattest, 0.5f, "ledges: somewhere the face rises at less than half its average rate");
+    }
 }

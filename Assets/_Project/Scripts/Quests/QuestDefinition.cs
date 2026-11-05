@@ -55,6 +55,9 @@ public sealed class QuestDefinition : ScriptableObject
     [Header("Starting")]
     [Tooltip("Quests that must be completed first. This is how chains are made.")]
     [SerializeField] private List<QuestDefinition> prerequisites = new List<QuestDefinition>();
+    [Tooltip("Quests that only need to have been started (or finished): e.g. side quests offered once the leader has given " +
+             "the opening quest, without waiting for it to be done.")]
+    [SerializeField] private List<QuestDefinition> startedFirst = new List<QuestDefinition>();
     [SerializeField] private QuestStart start = QuestStart.Automatically;
     [Tooltip("For On Quest Event: the event that starts the quest.")]
     [SerializeField] private GameEventDefinition startEvent;
@@ -100,6 +103,7 @@ public sealed class QuestDefinition : ScriptableObject
     public bool AnnounceCompletion => announceCompletion;
     public bool ShowTimerInHud => showTimerInHud;
     public IReadOnlyList<QuestDefinition> Prerequisites => prerequisites;
+    public IReadOnlyList<QuestDefinition> StartedFirst => startedFirst;
     public QuestStart Start => start;
     public GameEventDefinition StartEvent => startEvent;
     public QuestDefinition ClosedBy => closedBy;

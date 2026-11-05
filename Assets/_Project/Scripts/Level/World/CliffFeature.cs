@@ -38,6 +38,12 @@ public sealed class CliffFeature : WorldFeature
     [SerializeField, Min(0.3f)] private float faceDepth = 1.5f;
     [Tooltip("How ragged the edge is along its length (0 = straight, 1 = broken).")]
     [SerializeField, Range(0f, 1f)] private float raggedness = 0.5f;
+    [Tooltip("Ledges across the face, like layered rock. 0: one smooth face.")]
+    [SerializeField, Range(0, 6)] private int ledges;
+    [Tooltip("How flat the ledges are: 0 barely shows them, 1 makes clear steps.")]
+    [SerializeField, Range(0f, 1f)] private float ledgeStrength = 0.5f;
+    [Tooltip("Bumps and hollows in the face itself, so it isn't a smooth ramp under the rocks.")]
+    [SerializeField, Range(0f, 1f)] private float faceNoise;
     [Tooltip("Per knot: height multiplier (the handles above each knot).")]
     [SerializeField] private KnotValues heightAtKnots = new KnotValues();
 
@@ -68,6 +74,9 @@ public sealed class CliffFeature : WorldFeature
     public float Plateau => plateau;
     public float FaceDepth => faceDepth;
     public float Raggedness => raggedness;
+    public int Ledges => ledges;
+    public float LedgeStrength => ledgeStrength;
+    public float FaceNoise => faceNoise;
     public KnotValues HeightAtKnots => heightAtKnots;
     public CliffKit Kit => kit;
     public float Overlap => overlap;

@@ -93,6 +93,9 @@ public sealed class ItemDefinition : ScriptableObject, IStackDefinition
     [SerializeField, Min(0f)] private float hungerRestore;
     [Tooltip("Thirst restored when the item is drunk.")]
     [SerializeField, Min(0f)] private float thirstRestore;
+    [Tooltip("A water container (a waterskin): the water it holds when full. Each one keeps its own level; drinking from " +
+             "it restores thirst from what is in it and keeps the container, and water sources fill it. 0 for anything else.")]
+    [SerializeField, Min(0f)] private float waterCapacity;
     [Tooltip("Bonuses for Boon Seconds after it is eaten or drunk (GDD §11.4): Strength, Max Stamina, Move Speed, Gather Yield...")]
     [SerializeField] private List<StatBonus> boonBonuses = new List<StatBonus>();
     [Tooltip("Seconds its bonuses last.")]
@@ -161,7 +164,7 @@ public sealed class ItemDefinition : ScriptableObject, IStackDefinition
     public Pose HeldPose => new Pose(heldPosition, Quaternion.Euler(heldRotation));
     public float HeldScale => heldScale;
     /// <summary>Items with durability never stack, so every one keeps its own wear.</summary>
-    public bool Stackable => stackable && !HasDurability;
+    public bool Stackable => stackable && !KeepsCondition;
     public int MaximumStack => Stackable ? Mathf.Max(1, maximumStack) : 1;
     int IStackDefinition.StackSize => MaximumStack;
     Color? IStackDefinition.SlotTint => rarity != ItemRarity.Common ? global::Rarity.ColorOf(rarity) : (Color?)null;
@@ -176,6 +179,11 @@ public sealed class ItemDefinition : ScriptableObject, IStackDefinition
     public float HealAmount => healAmount;
     public float HungerRestore => hungerRestore;
     public float ThirstRestore => thirstRestore;
+    public float WaterCapacity => waterCapacity;
+    public bool HoldsWater => waterCapacity > 0f;
+
+    /// <summary>Each stack keeps its own condition: durability for gear, the water level for a water container.</summary>
+    public bool KeepsCondition => HasDurability || HoldsWater;
     public IReadOnlyList<StatBonus> BoonBonuses => boonBonuses;
     public float BoonSeconds => boonSeconds;
     public bool IsTonic => tonic;
@@ -183,7 +191,7 @@ public sealed class ItemDefinition : ScriptableObject, IStackDefinition
     /// <summary>True when eating it gives timed bonuses.</summary>
     public bool HasBoon => boonBonuses.Count > 0 && boonSeconds > 0f;
     /// <summary>True for consumables: something restores health, hunger or thirst, gives a boon or cures when used.</summary>
-    public bool IsConsumable => healAmount > 0f || hungerRestore > 0f || thirstRestore > 0f || HasBoon || cures.Count > 0 || gearRepair > 0f || placesInRaid != null;
+    public bool IsConsumable => healAmount > 0f || hungerRestore > 0f || thirstRestore > 0f || waterCapacity > 0f || HasBoon || cures.Count > 0 || gearRepair > 0f || placesInRaid != null;
     public float GearRepair => gearRepair;
     public GameObject PlacesInRaid => placesInRaid;
     /// <summary>True when right-clicking does something: eat, drink, heal, equip or read.</summary>

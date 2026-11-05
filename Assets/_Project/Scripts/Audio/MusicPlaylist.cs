@@ -58,6 +58,8 @@ public sealed class MusicTrack
     public AudioClip clip;
     [Tooltip("Loudness of this track before the player's volume settings.")]
     [Range(0f, 1f)] public float volume = 0.8f;
+    [Tooltip("Seconds into the file where the track starts, to skip a slow intro (combat music has to be there at once).")]
+    [Min(0f)] public float startAt;
 
     public MusicTrack()
     {

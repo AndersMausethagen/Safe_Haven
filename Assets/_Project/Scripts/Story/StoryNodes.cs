@@ -799,6 +799,60 @@ public sealed class SetActiveNode : StoryNode
     public override string FindProblem() => target == null ? "choose the object" : null;
 }
 
+/// <summary>
+/// Wakes a creature placed as a story puppet (its MonsterAI and NavMeshAgent switched off) so it walks to a place by
+/// itself and fights whoever it meets there, with its usual chase and leash; or puts it back to sleep so Move Object
+/// can lead it again. E.g. the prologue's old troll heads for the camp fire.
+/// </summary>
+[Serializable]
+public sealed class CreatureHuntsNode : StoryNode
+{
+    [Tooltip("The creature (switched off in the scene while it is a puppet).")]
+    public MonsterAI creature;
+    [Tooltip("On: it wakes and walks here, fighting anyone on the way or there. Off: it goes back to being a puppet.")]
+    public bool hunt = true;
+    [Tooltip("Where it heads when it wakes.")]
+    public Transform towards;
+
+    public override string Title => hunt ? "Creature Hunts" : "Creature Stops Hunting";
+    public override string Category => "World";
+
+    public override IEnumerator Run(StoryContext context)
+    {
+        if (creature == null)
+        {
+            yield break;
+        }
+
+        UnityEngine.AI.NavMeshAgent agent = creature.GetComponent<UnityEngine.AI.NavMeshAgent>();
+        if (!hunt)
+        {
+            creature.enabled = false;
+            if (agent != null) agent.enabled = false;
+            yield break;
+        }
+
+        if (agent != null)
+        {
+            agent.enabled = true;
+            if (UnityEngine.AI.NavMesh.SamplePosition(creature.transform.position, out UnityEngine.AI.NavMeshHit ground, 6f, UnityEngine.AI.NavMesh.AllAreas))
+            {
+                agent.Warp(ground.position);
+            }
+        }
+
+        creature.enabled = true;
+        // A frame for the creature to set itself up before it is sent on its way.
+        yield return null;
+        if (towards != null)
+        {
+            creature.Roam(towards.position);
+        }
+    }
+
+    public override string FindProblem() => creature == null ? "choose the creature" : hunt && towards == null ? "choose where it heads" : null;
+}
+
 [Serializable]
 public sealed class MoveObjectNode : StoryNode
 {

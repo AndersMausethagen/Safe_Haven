@@ -44,7 +44,8 @@ public readonly struct ItemStack
         Item = empty ? null : item;
         Count = empty ? 0 : count;
         // Stored as wear so default(ItemStack) and stacks made without a durability count as undamaged.
-        wear = empty || !item.HasDurability ? 0f : 1f - Mathf.Clamp01(durability);
+        // Gear keeps its durability here; a water container keeps how full it is.
+        wear = empty || !item.KeepsCondition ? 0f : 1f - Mathf.Clamp01(durability);
         bool gear = !empty && item.HasDurability;
         Empower = gear ? Mathf.Max(0, empower) : 0;
         Enchantment = gear ? enchantment : null;
@@ -78,6 +79,13 @@ public readonly struct ItemStack
 
     /// <summary>The same stack with another durability.</summary>
     public ItemStack WithDurability(float durability) => new ItemStack(Item, Count, durability, Empower, Enchantment);
+
+    /// <summary>The water in a water container (ItemDefinition.WaterCapacity), 0 for anything else.</summary>
+    public float Water => IsEmpty || !Item.HoldsWater ? 0f : Durability * Item.WaterCapacity;
+
+    /// <summary>The same container holding <paramref name="water"/>.</summary>
+    public ItemStack WithWater(float water) =>
+        IsEmpty || !Item.HoldsWater ? this : WithDurability(Mathf.Clamp01(water / Item.WaterCapacity));
 
     /// <summary>The same stack empowered to a level.</summary>
     public ItemStack WithEmpower(int level) => new ItemStack(Item, Count, Durability, level, Enchantment);

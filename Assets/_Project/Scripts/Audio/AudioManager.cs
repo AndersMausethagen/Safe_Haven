@@ -127,6 +127,7 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
             next.pitch = 1f;
             next.volume = 0f;
             next.Play();
+            from = Mathf.Max(from, track.startAt);
             if (from > 0f && from < track.clip.length)
             {
                 next.time = from;

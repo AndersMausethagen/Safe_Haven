@@ -157,10 +157,11 @@ public sealed class WorldMapHud : MonoBehaviour
         mapImage.color = Color.white;
         mapImage.raycastTarget = false;
 
-        Shader shader = Shader.Find("Safe Haven/UI/World Map");
+        Shader shader = settings.WorldMapShader;
         if (shader == null)
         {
-            Debug.LogError("World Map shader is missing.", this);
+            Debug.LogError("MinimapSettings has no World Map shader: assign Safe Haven/UI/World Map.", this);
+            Destroy(gameObject);
             return;
         }
 
@@ -227,7 +228,7 @@ public sealed class WorldMapHud : MonoBehaviour
 
     private void LateUpdate()
     {
-        if (canvasRect == null || mapRect == null)
+        if (canvasRect == null || mapRect == null || material == null)
         {
             return;
         }

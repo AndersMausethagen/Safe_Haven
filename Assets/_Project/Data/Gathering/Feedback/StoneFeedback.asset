@@ -32,6 +32,6 @@ MonoBehaviour:
   regrowSeconds: 0.4
   burstSpeed: 4.2
   pieceSeconds: 4.5
-  burstShake: 0.22
+  burstShake: 0.45
   pieceKnock: {fileID: 11400000, guid: 5b9cecb5c9522644f9494e63bbc96cfd, type: 2}
   pieceInterior: {fileID: 2100000, guid: 2e6c78fa29dee8848bbad03ad64f3bb4, type: 2}

@@ -23,8 +23,9 @@ public readonly struct GatheringSwing
 
 /// <summary>
 /// Runs the gathering timing minigame on the player. When an interaction starts on a ResourceNode whose tool uses the
-/// minigame (GatheringMinigameSettings), it holds the interaction open and runs a GatheringSession: each Interact or
-/// Attack press is a swing; with no press the tool comes down by itself. How good a swing was is settled by the press,
+/// minigame (GatheringMinigameSettings), it holds the interaction open and runs a GatheringSession. With hold to raise (the
+/// default) holding Attack or Interact raises the tool, a glint and a ping mark the critical moment, and letting go swings;
+/// otherwise each press is a swing and with no press the tool comes down by itself. How good a swing was is settled by the press,
 /// so timing stays fair, but the tool then has to come down: the blow itself, with its sound, chips and everything that
 /// follows, happens when it lands. Glancing blows wear the tool. When the last swing lands the node completes as usual and
 /// every critical adds a bonus of its main yield. Taking damage can
@@ -48,6 +49,9 @@ public sealed class PlayerGathering : MonoBehaviour
     private GatheringToolProfile profile;
     private float autoTimer;
     private TimingBarView barView;
+    private HeldItemView held;
+    private float raiseSpeed;
+    private bool glinted;
     private readonly System.Random random = new System.Random();
 
     /// <summary>Raised after every swing by any player.</summary>
@@ -72,11 +76,13 @@ public sealed class PlayerGathering : MonoBehaviour
         health = GetComponent<Damageable>();
         equipment = GetComponent<PlayerEquipment>();
         animations = GetComponent<PlayerAnimationController>();
+        held = GetComponent<HeldItemView>();
     }
 
     private void Start()
     {
-        barView = TimingBarView.Attach(() => Session);
+        // With hold to raise the cue is the glint on the tool; the bar shows only if the settings ask for it.
+        barView = TimingBarView.Attach(() => GatheringMinigameSettings.Current.ShowTimingBar ? Session : null);
     }
 
     private void OnDestroy()
@@ -138,10 +144,116 @@ public sealed class PlayerGathering : MonoBehaviour
             return;
         }
 
+        if (settings.HoldToRaise)
+        {
+            UpdateHold();
+            return;
+        }
+
         if (Session.Tick(Time.deltaTime))
         {
             Swing(SwingResult.Normal, pressed: false);
         }
+    }
+
+    // Hold the attack or interact button to raise the tool; let go to swing. The tool rises with the hold, and glints once
+    // as it passes the critical moment.
+    private void UpdateHold()
+    {
+        bool down = IsHeld(GameInput.Attack) || IsHeld(GameInput.Interact);
+        SwingResult? swung = Session.Hold(Time.deltaTime, down, out bool late);
+        if (animations != null)
+        {
+            animations.SetWorkRaise(Session.IsRaising ? raiseSpeed : 0f);
+        }
+
+        if (Session.InCriticalZone && !glinted)
+        {
+            glinted = true;
+            Glint();
+        }
+        else if (!Session.IsRaising)
+        {
+            glinted = false;
+        }
+
+        if (swung.HasValue)
+        {
+            glinted = false;
+            Swing(swung.Value, pressed: true, late: late);
+        }
+    }
+
+    private static bool IsHeld(UnityEngine.InputSystem.InputAction action) => action != null && action.enabled && action.IsPressed();
+
+    // A flare of white light at the tool's head, and a small ping: the moment to let go.
+    private void Glint()
+    {
+        GatheringMinigameSettings settings = GatheringMinigameSettings.Current;
+        Vector3 at = ToolHead();
+        AudioManager.Play(settings.GlintSound, at);
+        if (settings.GlintIntensity <= 0f)
+        {
+            return;
+        }
+
+        var flare = new GameObject("Tool Glint");
+        flare.transform.position = at;
+        if (held != null && held.ShownModel != null)
+        {
+            flare.transform.SetParent(held.ShownModel.transform, true);
+        }
+
+        var light = flare.AddComponent<Light>();
+        light.type = LightType.Point;
+        light.color = settings.GlintColour;
+        light.range = settings.GlintRange;
+        light.intensity = 0f;
+        light.shadows = LightShadows.None;
+        StartCoroutine(Flare(light, settings.GlintIntensity, settings.GlintSeconds));
+    }
+
+    private static System.Collections.IEnumerator Flare(Light light, float peak, float seconds)
+    {
+        float t = 0f;
+        while (t < seconds && light != null)
+        {
+            t += Time.deltaTime;
+            float k = t / seconds;
+            // Up fast, down slowly: a glint, not a pulse.
+            light.intensity = peak * (k < 0.2f ? k / 0.2f : 1f - (k - 0.2f) / 0.8f);
+            yield return null;
+        }
+
+        if (light != null)
+        {
+            Destroy(light.gameObject);
+        }
+    }
+
+    // The end of the tool farthest from the hand: the axe head or pick point.
+    private Vector3 ToolHead()
+    {
+        if (held == null || held.ShownModel == null)
+        {
+            return transform.position + Vector3.up * 1.8f;
+        }
+
+        Renderer[] renderers = held.ShownModel.GetComponentsInChildren<Renderer>();
+        if (renderers.Length == 0)
+        {
+            return held.ShownModel.transform.position;
+        }
+
+        Bounds bounds = renderers[0].bounds;
+        for (int i = 1; i < renderers.Length; i++)
+        {
+            bounds.Encapsulate(renderers[i].bounds);
+        }
+
+        Vector3 hand = held.Grip != null ? held.Grip.position : held.ShownModel.transform.position;
+        Vector3 outward = bounds.center - hand;
+        return outward.sqrMagnitude > 1e-4f ? bounds.center + outward.normalized * bounds.extents.magnitude * 0.6f : bounds.center;
     }
 
     private void OnInteractionStarted(Interactable started)
@@ -165,6 +277,7 @@ public sealed class PlayerGathering : MonoBehaviour
         this.profile = profile;
         target.HoldOpen = true;
         autoTimer = 0f;
+        glinted = false;
         if (animations != null)
         {
             animations.HoldWorkSwings(started.AnimationType);
@@ -180,7 +293,20 @@ public sealed class PlayerGathering : MonoBehaviour
             settings.CriticalWidthPerCombo,
             settings.MaxCombo,
             settings.ZoneJitter,
-            random);
+            random,
+            settings.ProgressFor);
+
+        if (settings.HoldToRaise && !settings.AutoGather)
+        {
+            // The tool waits low until the button is held, and rises over exactly the swing's timing window.
+            Session.WaitForRelease();
+            float rise = profile.RiseSeconds / Mathf.Max(0.1f, definition.SwingSpeed);
+            raiseSpeed = animations != null && animations.WorkRaiseSeconds > 0f ? animations.WorkRaiseSeconds / rise : 1f;
+            if (animations != null)
+            {
+                animations.SetWorkRaise(0f);
+            }
+        }
     }
 
     private void OnInteractionEnded(Interactable ended, InteractionResult result)
@@ -208,7 +334,9 @@ public sealed class PlayerGathering : MonoBehaviour
 
     private void OnWorkPressed()
     {
-        if (Session == null || Session.IsComplete || GatheringMinigameSettings.Current.AutoGather)
+        GatheringMinigameSettings settings = GatheringMinigameSettings.Current;
+        // Hold to raise reads the held button every frame instead (UpdateHold).
+        if (Session == null || Session.IsComplete || settings.AutoGather || settings.HoldToRaise)
         {
             return;
         }
@@ -226,12 +354,12 @@ public sealed class PlayerGathering : MonoBehaviour
     }
 
     // The player sees at once how the swing went; the blow itself waits for the tool to land.
-    private void Swing(SwingResult result, bool pressed = true)
+    private void Swing(SwingResult result, bool pressed = true, bool late = false)
     {
         // A swing left to itself is the steady work: only what the player did is worth a word.
         if (barView != null && pressed)
         {
-            barView.Flash(result == SwingResult.Critical ? Session.Combo > 1 ? $"Clean cut! x{Session.Combo}" : "Clean cut!" : result == SwingResult.Normal ? "Good" : "Too early", result);
+            barView.Flash(result == SwingResult.Critical ? Session.Combo > 1 ? $"Clean cut! x{Session.Combo}" : "Clean cut!" : result == SwingResult.Normal ? "Good" : late ? "Too late" : "Too early", result);
         }
 
         if (blowComing)

@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: MinimapSettings
   m_EditorClassIdentifier: SafeHaven::MinimapSettings
   material: {fileID: 2100000, guid: 48b04bbd30f08d240943d61ebb8579f0, type: 2}
+  worldMapShader: {fileID: 4800000, guid: b324d54a322951e43935a543c705ee16, type: 3}
   mapSize: 512
   size: 236
   nearReach: 28

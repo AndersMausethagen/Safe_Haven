@@ -480,7 +480,8 @@ public sealed class Construction : MonoBehaviour, ISaveable, IStationMenuExtensi
         trigger.size = bounds.size + new Vector3(0.6f, 0f, 0.6f);
         site.AddComponent<ConstructionSite>().Owner = this;
         siteInteractable = site.AddComponent<Interactable>();
-        siteInteractable.Configure(InteractionAnimation.Hammer, 1f, 1.6f, false);
+        // Reach from the edge of the site's box (ConstructionSite is its interaction shape).
+        siteInteractable.Configure(InteractionAnimation.Hammer, 1f, 2.2f, false);
         siteInteractable.Started.AddListener(OnSiteStarted);
         siteInteractable.Completed.AddListener(OnSiteCompleted);
         site.SetActive(false);

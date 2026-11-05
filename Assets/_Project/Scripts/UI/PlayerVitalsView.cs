@@ -94,7 +94,15 @@ public sealed class PlayerVitalsView : MonoBehaviour
         }
 
         BuildDodgeGlow();
+        Canvas canvas = GetComponentInParent<Canvas>();
+        if (canvas != null)
+        {
+            OverheadVitalsView.Create(canvas, FillColour(health, new Color(0.78f, 0.22f, 0.2f, 1f)), FillColour(stamina, new Color(0.85f, 0.7f, 0.25f, 1f)));
+        }
     }
+
+    private static Color FillColour(Bar bar, Color fallback) =>
+        bar.fill != null && bar.fill.TryGetComponent(out Graphic graphic) ? graphic.color : fallback;
 
     // A soft red ring laid just behind the stamina bar's frame (or its bar, without a frame), reaching out past its edge.
     private void BuildDodgeGlow()

@@ -67,12 +67,18 @@ public sealed class WaterSource : MonoBehaviour, IInteractionName
 
         int filled = 0;
         ItemInventory bag = user.GetComponentInParent<ItemInventory>();
+        if (bag != null)
+        {
+            filled = Refill(bag.Container);
+        }
+
         if (bag != null && fillItem != null)
         {
+            // Hands out containers up to Fill Up To (a water container comes full).
             int missing = fillUpTo - bag.Container.Count(fillItem);
             if (missing > 0)
             {
-                filled = bag.Give(fillItem, missing);
+                filled += bag.Give(fillItem, missing);
             }
         }
 
@@ -80,5 +86,22 @@ public sealed class WaterSource : MonoBehaviour, IInteractionName
         {
             GameMessages.Post("You've had your fill, and your water containers are full.");
         }
+    }
+
+    /// <summary>Fills every water container (ItemDefinition.HoldsWater) in the bag that isn't full. Returns how many.</summary>
+    public static int Refill(ItemContainer container)
+    {
+        int filled = 0;
+        for (int i = 0; i < container.SlotCount; i++)
+        {
+            ItemStack stack = container.GetSlot(i);
+            if (!stack.IsEmpty && stack.Item.HoldsWater && stack.Durability < 0.999f)
+            {
+                container.SetDurability(i, 1f);
+                filled++;
+            }
+        }
+
+        return filled;
     }
 }

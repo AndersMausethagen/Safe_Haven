@@ -24,7 +24,7 @@ public sealed class ChoppableTree : MonoBehaviour, IHarvestBody
     private System.Func<TreeParts> standIn;
     private TreeParts parts;
     private TreeNotch notch;
-    private int blows;
+    private float blows; // swings' worth of cutting so far (a critical cuts deeper, a glancing blow barely bites)
 
     /// <summary>The tree's size for its yield (1 = a tree of the settings' reference height).</summary>
     public float Size { get; private set; } = 1f;
@@ -100,7 +100,7 @@ public sealed class ChoppableTree : MonoBehaviour, IHarvestBody
     // A hard blow shakes more down, and from halfway through the wood starts to complain.
     private void OnSwung(SwingResult result, Vector3 from)
     {
-        blows++;
+        blows += GatheringMinigameSettings.Current.ProgressFor(result);
         TreeChoppingSettings rules = TreeChoppingSettings.Current;
         TreeParts tree = Parts;
         if (tree.HasFoliage)
@@ -118,7 +118,7 @@ public sealed class ChoppableTree : MonoBehaviour, IHarvestBody
         if (swings > 0 && blows < swings)
         {
             notch ??= TreeNotch.Open(transform, TrunkCentre + Vector3.up * ChopHeight, TrunkRadius, rules.CutFace);
-            notch.Widen(blows / (float)swings, from);
+            notch.Widen(Mathf.Min(blows / swings, 1f), from);
         }
     }
 

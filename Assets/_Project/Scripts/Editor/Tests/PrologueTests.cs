@@ -373,4 +373,23 @@ public sealed class PrologueTests
         CollectionAssert.DoesNotContain(first, "ExpeditionMistwing", "Mistwings come from the second wave.");
         CollectionAssert.Contains(later, "ExpeditionMistwing");
     }
+
+    // Playtest 2026-11-05: nothing optional before the leader has spoken, and the optional quests come one at a time.
+    [Test]
+    public void OptionalQuests_OpenOnceTheLeaderHasSpoken_OneAtATime()
+    {
+        QuestDefinition Quest(string name) => AssetDatabase.LoadAssetAtPath<QuestDefinition>(Root + "/Quests/" + name + ".asset");
+        QuestDefinition morning = Definition.Chapters.First().Quest;
+        QuestDefinition wood = Quest("WoodForTheRoad"), fish = Quest("FishForBreakfast"), hunt = Quest("HuntForThePot");
+        Assert.AreEqual("MorningCamp", morning.name);
+
+        var log = new QuestLog();
+        Assert.IsFalse(log.PrerequisitesMet(wood), "nothing optional before Sigrid has given the morning");
+        Assert.IsTrue(log.TryStart(morning));
+        Assert.IsTrue(log.PrerequisitesMet(wood), "offered once the morning quest has begun, not when it is done");
+        Assert.IsFalse(log.PrerequisitesMet(fish));
+        Assert.IsFalse(log.PrerequisitesMet(hunt));
+        CollectionAssert.AreEqual(new[] { wood }, fish.Prerequisites);
+        CollectionAssert.AreEqual(new[] { fish }, hunt.Prerequisites);
+    }
 }

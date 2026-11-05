@@ -118,7 +118,9 @@ public sealed class TreeImpacts : MonoBehaviour
         TreeChoppingSettings rules = TreeChoppingSettings.Current;
         float standing = TreeContact.Mass(other.Radius, other.Height);
         float degrees = TreeContact.KnockDegrees(velocity.magnitude, weight, standing, rules.MostKnockDegrees, rules.CrushFullSpeed);
-        TreeParts struck = other.Tree != null ? other.Tree.Knocked(velocity, degrees) : other.Terrain.Knocked(other.Index, velocity, degrees);
+        // A neighbour tree felled or removed since the neighbours were gathered has neither a tree nor a terrain left.
+        TreeParts struck = other.Tree != null ? other.Tree.Knocked(velocity, degrees)
+            : other.Terrain != null ? other.Terrain.Knocked(other.Index, velocity, degrees) : null;
         if (struck != null && struck.HasFoliage)
         {
             TreeEffects.Play(struck.LeafFall != null ? struck.LeafFall : rules.LeafFall, struck.Base + struck.Crown.center, Quaternion.identity, struck.Crown.size, struck.LeafTint, Mathf.RoundToInt(10f + degrees * 8f));

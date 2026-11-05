@@ -24,6 +24,7 @@ public abstract class FeatureBuilder
         RiverFeature river => new RiverBuilder(river),
         PathFeature path => new PathBuilder(path),
         CliffFeature cliff => new CliffBuilder(cliff),
+        RavineFeature ravine => new RavineBuilder(ravine),
         BiomeArea area => new AreaBuilder(area),
         GroundPaintArea paint => new GroundPaintBuilder(paint),
         _ => null,

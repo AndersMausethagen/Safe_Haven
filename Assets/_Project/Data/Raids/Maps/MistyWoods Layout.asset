@@ -39,7 +39,7 @@ MonoBehaviour:
   pondMaterial: {fileID: 2100000, guid: 2e96d20980d31544abc72c4199c1fec0, type: 2}
   pondDrink: 100
   pondFillItem: {fileID: 11400000, guid: 79744f7a29634cb408f4829b51ec5918, type: 2}
-  pondFillUpTo: 3
+  pondFillUpTo: 1
   pondReach: 1.5
   wetReach: 12
   dampGround: 0.45

@@ -2,8 +2,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.SceneManagement;
 
 /// <summary>Sets up wind- and player-reactive grass for painting on a terrain: generates the grass and bush meshes
 /// (vertex colour R = bend weight, G = per-blade random), their "Safe Haven/Grass" materials and prefabs in
@@ -331,45 +333,25 @@ public static class GrassSetup
     // ---------- ground colour ----------
     /// <summary>Bakes the terrain's top-down colour (each painted layer's average colour, mixed by its paint weight)
     /// next to its TerrainData and hands it to the terrain's GrassTerrainColour (added when missing).</summary>
-    public static Texture2D BakeGroundColour(Terrain terrain)
+    public static Texture2D BakeGroundColour(Terrain terrain) => BakeGroundColour(terrain, null);
+
+    // dry: a water mask already built for this terrain's splat map (testing every pixel against the water takes seconds).
+    private static Texture2D BakeGroundColour(Terrain terrain, bool[] dry)
     {
         TerrainData data = terrain.terrainData;
-        TerrainLayer[] layers = data.terrainLayers;
-        if (layers.Length == 0)
+        if (data.terrainLayers.Length == 0)
         {
             return null;
         }
 
         int width = data.alphamapWidth, height = data.alphamapHeight;
-        float[,,] weights = data.GetAlphamaps(0, 0, width, height);
-        WaterSurface[] water = Object.FindObjectsByType<WaterSurface>();
-        Vector3 origin = terrain.transform.position;
-        var averages = new Color[layers.Length];
-        for (int i = 0; i < layers.Length; i++)
+        if (dry == null || dry.Length != width * height)
         {
-            averages[i] = AverageColour(layers[i]);
-        }
-
-        var pixels = new Color[width * height];
-        for (int y = 0; y < height; y++)
-        {
-            for (int x = 0; x < width; x++)
-            {
-                Color mixed = Color.black;
-                for (int i = 0; i < layers.Length; i++)
-                {
-                    mixed += averages[i] * weights[y, x, i];
-                }
-
-                // Alpha 0 under water: the grass shader grows nothing there, even if painted later.
-                Vector3 point = new Vector3(origin.x + (x + 0.5f) / width * data.size.x, 0f, origin.z + (y + 0.5f) / height * data.size.z);
-                mixed.a = UnderWater(terrain, point, water) ? 0f : 1f;
-                pixels[y * width + x] = mixed;
-            }
+            dry = DryMask(terrain);
         }
 
         var texture = new Texture2D(width, height, TextureFormat.RGBA32, false);
-        texture.SetPixels(pixels);
+        texture.SetPixels(GroundColourPixels(terrain, dry, AverageColours(data.terrainLayers)));
         texture.Apply();
         string path = ColourMapPath(data);
         File.WriteAllBytes(path, texture.EncodeToPNG());
@@ -393,6 +375,63 @@ public static class GrassSetup
         colour.ColourMap = map;
         EditorUtility.SetDirty(colour);
         return map;
+    }
+
+    private static Color[] AverageColours(TerrainLayer[] layers)
+    {
+        var averages = new Color[layers.Length];
+        for (int i = 0; i < layers.Length; i++)
+        {
+            averages[i] = AverageColour(layers[i]);
+        }
+
+        return averages;
+    }
+
+    /// <summary>Per splat-map pixel: false where the ground is under water (the grass grows nothing there).</summary>
+    private static bool[] DryMask(Terrain terrain)
+    {
+        TerrainData data = terrain.terrainData;
+        int width = data.alphamapWidth, height = data.alphamapHeight;
+        WaterSurface[] water = Object.FindObjectsByType<WaterSurface>();
+        Vector3 origin = terrain.transform.position;
+        var dry = new bool[width * height];
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                Vector3 point = new Vector3(origin.x + (x + 0.5f) / width * data.size.x, 0f, origin.z + (y + 0.5f) / height * data.size.z);
+                dry[y * width + x] = !UnderWater(terrain, point, water);
+            }
+        }
+
+        return dry;
+    }
+
+    private static Color[] GroundColourPixels(Terrain terrain, bool[] dry, Color[] averages)
+    {
+        TerrainData data = terrain.terrainData;
+        int width = data.alphamapWidth, height = data.alphamapHeight;
+        int layers = Mathf.Min(averages.Length, data.alphamapLayers);
+        float[,,] weights = data.GetAlphamaps(0, 0, width, height);
+        var pixels = new Color[width * height];
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                Color mixed = Color.black;
+                for (int i = 0; i < layers; i++)
+                {
+                    mixed += averages[i] * weights[y, x, i];
+                }
+
+                // Alpha 0 under water: the grass shader grows nothing there, even if painted later.
+                mixed.a = dry[y * width + x] ? 1f : 0f;
+                pixels[y * width + x] = mixed;
+            }
+        }
+
+        return pixels;
     }
 
     /// <summary>Most clumps a detail cell (about 25 cm) holds when fully painted: a dense lawn of short grass, single
@@ -625,14 +664,27 @@ public static class GrassSetup
         return new Color(average.r * tint.x, average.g * tint.y, average.b * tint.z, 1f);
     }
 
-    // Repainting a terrain that has a ground colour map rebakes it once painting has paused (a bake per brush stroke
-    // made painting stutter).
-    private const double BakeAfterSeconds = 3.0;
+    // Repainting a terrain that has a ground colour map updates the grass once painting has paused. The full bake wrote
+    // a PNG and reimported it (and tested every pixel against the water) after each stroke, which stalled the editor
+    // while painting. Now a stroke only refreshes an in-memory preview, reusing that terrain's water mask and layer
+    // colours; the PNG is written when the scene is saved, before scripts reload, and when the editor quits.
+    private const double PreviewAfterSeconds = 0.5;
+
+    private sealed class PaintPreview
+    {
+        public bool[] Dry;
+        public Color[] Averages;
+        public TerrainLayer[] Layers;
+        public Texture2D Texture;
+        public double DueAt = double.MaxValue;
+        public bool NeedsBake;
+    }
+
+    private static readonly Dictionary<Terrain, PaintPreview> Previews = new Dictionary<Terrain, PaintPreview>();
 
     [InitializeOnLoadMethod]
     private static void WatchTerrainPaint()
     {
-        var pending = new Dictionary<Terrain, double>();
         TerrainCallbacks.textureChanged += (terrain, textureName, region, synced) =>
         {
             if (textureName != TerrainData.AlphamapTextureName || !synced || terrain == null ||
@@ -641,25 +693,106 @@ public static class GrassSetup
                 return;
             }
 
-            pending[terrain] = EditorApplication.timeSinceStartup + BakeAfterSeconds;
-        };
-        EditorApplication.update += () =>
-        {
-            if (pending.Count == 0)
+            if (!Previews.TryGetValue(terrain, out PaintPreview preview))
             {
-                return;
+                Previews[terrain] = preview = new PaintPreview();
             }
 
-            double now = EditorApplication.timeSinceStartup;
-            foreach (Terrain terrain in pending.Where(p => p.Value <= now).Select(p => p.Key).ToList())
-            {
-                pending.Remove(terrain);
-                if (terrain != null)
-                {
-                    BakeGroundColour(terrain);
-                }
-            }
+            preview.DueAt = EditorApplication.timeSinceStartup + PreviewAfterSeconds;
+            preview.NeedsBake = true;
         };
+        EditorApplication.update += UpdatePreviews;
+        EditorSceneManager.sceneSaving += (scene, path) => BakePainted(scene);
+        AssemblyReloadEvents.beforeAssemblyReload += () => BakePainted(null);
+        EditorApplication.quitting += () => BakePainted(null);
+    }
+
+    private static void UpdatePreviews()
+    {
+        if (Previews.Count == 0)
+        {
+            return;
+        }
+
+        double now = EditorApplication.timeSinceStartup;
+        foreach (KeyValuePair<Terrain, PaintPreview> entry in Previews)
+        {
+            if (entry.Value.DueAt <= now && entry.Key != null)
+            {
+                entry.Value.DueAt = double.MaxValue;
+                RefreshPreview(entry.Key, entry.Value);
+            }
+        }
+    }
+
+    private static void RefreshPreview(Terrain terrain, PaintPreview preview)
+    {
+        TerrainData data = terrain.terrainData;
+        var colour = terrain.GetComponent<GrassTerrainColour>();
+        if (data == null || colour == null || data.terrainLayers.Length == 0)
+        {
+            return;
+        }
+
+        int width = data.alphamapWidth, height = data.alphamapHeight;
+        if (preview.Dry == null || preview.Dry.Length != width * height)
+        {
+            preview.Dry = DryMask(terrain);
+        }
+
+        if (preview.Layers == null || !preview.Layers.SequenceEqual(data.terrainLayers))
+        {
+            preview.Layers = data.terrainLayers;
+            preview.Averages = AverageColours(preview.Layers);
+        }
+
+        if (preview.Texture == null || preview.Texture.width != width || preview.Texture.height != height)
+        {
+            Object.DestroyImmediate(preview.Texture);
+            preview.Texture = new Texture2D(width, height, TextureFormat.RGBA32, false)
+            {
+                name = "Grass Colour (painting)",
+                hideFlags = HideFlags.HideAndDontSave,
+                wrapMode = TextureWrapMode.Clamp
+            };
+        }
+
+        preview.Texture.SetPixels(GroundColourPixels(terrain, preview.Dry, preview.Averages));
+        preview.Texture.Apply(false);
+        // Only the active ground colour feeds the grass; the serialized map keeps pointing at the PNG asset.
+        if (GrassTerrainColour.Current == colour || GrassTerrainColour.Current == null)
+        {
+            Shader.SetGlobalTexture("_GrassTerrainColor", preview.Texture);
+        }
+    }
+
+    /// <summary>Writes the colour maps of terrains painted since their last bake (in this scene, or all when null).
+    /// Each terrain keeps its water mask for the rest of the session, so later strokes and saves skip the water test;
+    /// moving water while painting is not picked up until scripts reload (or Bake Ground Colour is run).</summary>
+    private static void BakePainted(Scene? scene)
+    {
+        foreach (KeyValuePair<Terrain, PaintPreview> entry in Previews.ToList())
+        {
+            Terrain terrain = entry.Key;
+            if (terrain == null)
+            {
+                Object.DestroyImmediate(entry.Value.Texture);
+                Previews.Remove(terrain);
+                continue;
+            }
+
+            if ((scene.HasValue && terrain.gameObject.scene != scene.Value) || !entry.Value.NeedsBake)
+            {
+                continue;
+            }
+
+            entry.Value.NeedsBake = false;
+            entry.Value.DueAt = double.MaxValue;
+            if (terrain.terrainData != null)
+            {
+                BakeGroundColour(terrain, entry.Value.Dry);
+            }
+        }
     }
 
     // ---------- meshes ----------

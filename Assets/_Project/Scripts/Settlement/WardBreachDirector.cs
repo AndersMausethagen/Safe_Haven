@@ -416,21 +416,7 @@ public sealed class WardBreachDirector : MonoBehaviour
             return ward;
         }
 
-        Damageable nearest = null;
-        float nearestDistance = float.MaxValue;
-        foreach (BuildingObject building in BuildingObject.Active)
-        {
-            if (building.TryGetComponent(out Damageable health) && health.IsAlive && !health.IsBroken)
-            {
-                float distance = (building.transform.position - from).sqrMagnitude;
-                if (distance < nearestDistance)
-                {
-                    nearest = health;
-                    nearestDistance = distance;
-                }
-            }
-        }
-
+        Damageable nearest = HomeAssault.NearestBuilding(from);
         return nearest != null ? nearest : ward;
     }
 

@@ -41,11 +41,14 @@ public readonly struct SwingZones
 }
 
 /// <summary>
-/// The timing minigame of one gather, as plain logic: a marker rises up the bar as the tool is raised, and comes down by itself at
-/// the top as a plain swing, so leaving it alone finishes the node at a steady pace with nothing lost. Pressing as it crosses the
-/// sweet spot makes the swing a critical; a run of them widens the spot up to a cap, any other result resets it. The spot stays
-/// put, so it can be felt as a rhythm, like an active reload. Only a press well before the zones goes wrong. Driven by
-/// PlayerGathering.
+/// The timing minigame of one gather, as plain logic, in one of two ways.
+/// <para>Hold to raise (<see cref="Hold"/>): the tool rises only while the button is held, and the release is the swing.
+/// Released in the critical zone it is a critical, near it a normal swing, too early a glancing blow; held all the way to
+/// the top it comes down by itself as a glancing blow.</para>
+/// <para>Press (<see cref="Tick"/>, <see cref="Press"/>): the marker rises by itself and comes down at the top as a plain
+/// swing; a press as it crosses the sweet spot makes it a critical, a press well before the zones a glancing blow.</para>
+/// A run of criticals widens the spot up to a cap; any other result resets it. The spot stays put, so it can be felt as a
+/// rhythm. Each result counts for its own share of the node's swings (<see cref="Progress"/>). Driven by PlayerGathering.
 /// </summary>
 public sealed class GatheringSession : ITimingBar
 {
@@ -57,7 +60,10 @@ public sealed class GatheringSession : ITimingBar
     private readonly int maxCombo;
     private readonly float jitter;
     private readonly System.Random random;
+    private readonly Func<SwingResult, float> progressOf;
     private float phase;
+    private bool raising;
+    private bool waitForRelease;
 
     /// <param name="swings">Swings needed to finish the gather.</param>
     /// <param name="riseSeconds">Seconds for the marker to rise from the bottom to the top.</param>
@@ -67,9 +73,11 @@ public sealed class GatheringSession : ITimingBar
     /// <param name="criticalPerCombo">Critical width added per consecutive critical swing.</param>
     /// <param name="maxCombo">Consecutive criticals that still widen the zone.</param>
     /// <param name="jitter">How far the zones' centre may move from the sweet spot each swing.</param>
+    /// <param name="progressOf">How many swings a result counts for; null counts every swing as one.</param>
     public GatheringSession(int swings, float riseSeconds, float sweetSpot, float normalWidth, float criticalWidth, float criticalPerCombo,
-        int maxCombo, float jitter, System.Random random)
+        int maxCombo, float jitter, System.Random random, Func<SwingResult, float> progressOf = null)
     {
+        this.progressOf = progressOf;
         SwingsRequired = Mathf.Max(1, swings);
         this.riseSeconds = Mathf.Max(0.1f, riseSeconds);
         this.sweetSpot = sweetSpot;
@@ -84,20 +92,29 @@ public sealed class GatheringSession : ITimingBar
 
     public int SwingsRequired { get; }
     public int SwingsDone { get; private set; }
+
+    /// <summary>Swings' worth of work done: each result counts for its own share (a critical cuts deeper).</summary>
+    public float Progress { get; private set; }
     public int Criticals { get; private set; }
     public int Glancing { get; private set; }
 
     /// <summary>Critical swings in a row so far.</summary>
     public int Combo { get; private set; }
 
-    public bool IsComplete => SwingsDone >= SwingsRequired;
+    public bool IsComplete => Progress >= SwingsRequired - 0.001f;
+
+    /// <summary>Hold to raise: the tool is on its way up.</summary>
+    public bool IsRaising => raising;
+
+    /// <summary>Hold to raise: the tool is up in the critical zone right now (the moment to let go).</summary>
+    public bool InCriticalZone => raising && Mathf.Abs(phase - Zones.Center) <= Zones.CriticalWidth * 0.5f;
 
     /// <summary>The marker's place on the bar, 0 (bottom) to 1 (top).</summary>
     public float Position => phase;
 
     public SwingZones Zones { get; private set; }
 
-    public string Counter => $"{Mathf.Min(SwingsDone + 1, SwingsRequired)}/{SwingsRequired}{(Combo > 1 ? $"  x{Combo}" : "")}";
+    public string Counter => $"{Mathf.Min(Mathf.FloorToInt(Progress) + 1, SwingsRequired)}/{SwingsRequired}{(Combo > 1 ? $"  x{Combo}" : "")}";
 
     /// <summary>Moves the marker. At the top of the bar, with no press, the swing comes down by itself as a normal one.</summary>
     /// <returns>True when this tick timed a swing out.</returns>
@@ -118,6 +135,66 @@ public sealed class GatheringSession : ITimingBar
         return true;
     }
 
+    /// <summary>
+    /// Hold to raise, once a frame: while <paramref name="held"/> the tool rises; letting go swings it, judged where it is.
+    /// Held to the top it comes down by itself as a glancing blow, and the next rise waits for the button to be let go.
+    /// </summary>
+    /// <param name="late">True when the tool was past the sweet spot: let go late, or held all the way up.</param>
+    /// <returns>The swing settled this frame, or null.</returns>
+    public SwingResult? Hold(float deltaTime, bool held, out bool late)
+    {
+        late = false;
+        if (IsComplete)
+        {
+            return null;
+        }
+
+        if (!held)
+        {
+            waitForRelease = false;
+            if (!raising)
+            {
+                return null;
+            }
+
+            raising = false;
+            late = phase > Zones.Center;
+            SwingResult released = Zones.Evaluate(phase);
+            Resolve(released);
+            return released;
+        }
+
+        if (waitForRelease)
+        {
+            return null;
+        }
+
+        if (!raising)
+        {
+            raising = true;
+            phase = 0f;
+        }
+
+        phase += Mathf.Max(0f, deltaTime) / riseSeconds;
+        if (phase < 1f)
+        {
+            return null;
+        }
+
+        raising = false;
+        waitForRelease = true;
+        late = true;
+        Resolve(SwingResult.Glancing);
+        return SwingResult.Glancing;
+    }
+
+    /// <summary>Hold to raise: the next rise waits for the button to be let go first (the press that began the gather).</summary>
+    public void WaitForRelease()
+    {
+        raising = false;
+        waitForRelease = true;
+    }
+
     /// <summary>The player's press: judges the marker against the zones and resolves the swing.</summary>
     public SwingResult Press()
     {
@@ -135,6 +212,7 @@ public sealed class GatheringSession : ITimingBar
         }
 
         SwingsDone++;
+        Progress += progressOf != null ? Mathf.Max(0f, progressOf(result)) : 1f;
         if (result == SwingResult.Critical)
         {
             Criticals++;

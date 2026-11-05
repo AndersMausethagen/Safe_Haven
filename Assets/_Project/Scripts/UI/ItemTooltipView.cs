@@ -245,6 +245,13 @@ public sealed class ItemTooltipView : MonoBehaviour
             builder.Append($"\n<color={color}>Durability {percent}%{(worn.IsBroken ? " – broken, repair it at a Workshop" : "")}</color>");
         }
 
+        if (item.HoldsWater)
+        {
+            float water = held ? stack.Value.Water : item.WaterCapacity;
+            string color = water < 0.5f ? "#FF7B6B" : "#7FC4E8";
+            builder.Append($"\n<color={color}>Water {Mathf.RoundToInt(water)} / {Mathf.RoundToInt(item.WaterCapacity)}{(water < 0.5f ? " – fill it at a stream or a well" : "")}</color>");
+        }
+
         if (item.Weight > 0f)
         {
             builder.Append($"\n<color=#AAB0BC>Weight {item.Weight:0.##}{(count > 1 ? $"  ({item.Weight * count:0.#} for the stack)" : "")}</color>");

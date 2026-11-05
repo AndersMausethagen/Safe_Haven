@@ -16,11 +16,13 @@ MonoBehaviour:
     tracks:
     - clip: {fileID: 8300000, guid: 5f9814ed978936641aebd8c92a214139, type: 3}
       volume: 1
+      startAt: 0
     order: 0
   defaultCombat:
     tracks:
     - clip: {fileID: 8300000, guid: 506de2d37425fa747801c9cafb2f6161, type: 3}
       volume: 1
+      startAt: 15
     order: 0
   crossfadeSeconds: 2
   combatFadeSeconds: 0.9
@@ -28,6 +30,11 @@ MonoBehaviour:
   musicVolume: 0.6
   ambienceVolume: 0.7
   effectsVolume: 0.9
+  musicWhileSpeaking: 0.35
+  ambienceWhileSpeaking: 0.55
+  backgroundWhileSpeaking: 0.5
+  dipSeconds: 0.3
+  returnSeconds: 1.4
   weaponDrawn: 1
   enemyChasingPlayer: 1
   recentDamageSeconds: 6

@@ -39,6 +39,7 @@ public sealed class PrologueDirector : MonoBehaviour, IBuildArea
     private bool ending;
     private bool reviving;
     private bool chapterActive;
+    private bool wolvesComing; // the camp's warning line is up; its wolves spawn when it closes
 
     public static PrologueDirector Current { get; private set; }
     public PrologueDefinition Definition => definition;
@@ -218,7 +219,7 @@ public sealed class PrologueDirector : MonoBehaviour, IBuildArea
         enemies.RemoveAll(enemy => enemy == null || !enemy.IsAlive);
         if (step == PrologueStep.CatchBreath && elapsed >= chapter.Duration)
             GameEvents.Raise(definition.RestedEvent);
-        else if (step == PrologueStep.DefendCamp && enemies.Count == 0)
+        else if (step == PrologueStep.DefendCamp && enemies.Count == 0 && !wolvesComing)
             GameEvents.Raise(definition.CampDefendedEvent);
         else if (step == PrologueStep.HoldPortal)
         {
@@ -277,10 +278,27 @@ public sealed class PrologueDirector : MonoBehaviour, IBuildArea
 
         if (chapterActive)
         {
-            // In a fight the line becomes a subtitle once the enemies close in (DialogueBox), so nothing waits for it.
-            if (chapter.Quest.Start != QuestStart.ByQuestGiver && !string.IsNullOrWhiteSpace(chapter.ArrivalText))
-                Speak(chapter.ArrivalText, null);
-            StartChapter();
+            bool line = chapter.Quest.Start != QuestStart.ByQuestGiver && !string.IsNullOrWhiteSpace(chapter.ArrivalText);
+            if (line && step == PrologueStep.DefendCamp && !restoring)
+            {
+                // The camp's wolves come once the warning has been read. Spawned with it, they crossed the clearing
+                // while the camera was on the speaker, and the companions had them down before the player saw them.
+                wolvesComing = true;
+                Speak(chapter.ArrivalText, () =>
+                {
+                    if (!wolvesComing || !chapterActive || step != PrologueStep.DefendCamp) return;
+                    wolvesComing = false;
+                    StartChapter();
+                });
+            }
+            else
+            {
+                // In a fight the line becomes a subtitle once the enemies close in (DialogueBox), so nothing waits for it.
+                if (line)
+                    Speak(chapter.ArrivalText, null);
+                wolvesComing = false;
+                StartChapter();
+            }
         }
         if (CanSave && !SaveGameService.TrySave(out string problem))
             GameMessages.Post("Prologue checkpoint could not be saved: " + problem, MessageKind.Warning);

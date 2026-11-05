@@ -51,10 +51,20 @@ public sealed class WorldToolsOverlay : Overlay
             {
                 EditorApplication.ExecuteMenuItem("Safe Haven/World/Place/Drop and Align to Slope #_END");
             }
+
+            if (GUILayout.Button(new GUIContent("Physics", "Let them fall and settle naturally, then remove the physics (Ctrl+End)")))
+            {
+                EditorApplication.ExecuteMenuItem("Safe Haven/World/Place/Drop with Physics %_END");
+            }
         }
 
         using (new EditorGUILayout.HorizontalScope())
         {
+            if (GUILayout.Button(new GUIContent("Biome Brush", "Paint a biome's ground, plants and props at once (meadow, forest floor, riverbank)")))
+            {
+                BiomeBrush.Open();
+            }
+
             if (GUILayout.Button(new GUIContent("Sculpt", "Select the terrain in view: its Inspector has the sculpt and paint brushes")))
             {
                 WorldToolsWindow.SelectTerrain();

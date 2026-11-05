@@ -37,7 +37,7 @@ Material:
     - _DryAmount: 0.15
     - _FacingBlades: 0
     - _FarDensity: 0.35
-    - _FarEnd: 50
+    - _FarEnd: 80
     - _FarStart: 20
     - _Flatten: 0.35
     - _Flutter: 0.3

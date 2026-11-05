@@ -38,6 +38,15 @@ public static class WorldMenus
     private static void MakeCliff(WorldLook look) =>
         Create<CliffFeature>("Cliff").Configure(look.Crags, look.Palette("Rubble"), look.RiverBed);
 
+    [MenuItem("GameObject/Safe Haven/World/Ravine", false, 14)]
+    private static void Ravine() => MakeRavine(WorldLook.MossyForest);
+
+    [MenuItem("GameObject/Safe Haven/World/Ravine (Haven)", false, 14)]
+    private static void HavenRavine() => MakeRavine(WorldLook.ForestLake);
+
+    private static void MakeRavine(WorldLook look) =>
+        Create<RavineFeature>("Ravine").Configure(look.Crags, look.Palette("Rubble"), look.RockGround, look.Ground(look == WorldLook.ForestLake ? "Haven Rock" : "Cedar Soil"));
+
     [MenuItem("GameObject/Safe Haven/World/Dark Forest Area", false, 30)]
     private static void DarkForest() => Create<BiomeArea>("Dark Forest").Configure(DarkForestLayers());
 
@@ -62,6 +71,62 @@ public static class WorldMenus
 
     [MenuItem("Safe Haven/World/Rebuild Everything")]
     private static void RebuildAll() => WorldBuilder.BuildChanged(true);
+
+    /// <summary>Ground painted by hand over a feature's paint stays as painted through every build. This lets the
+    /// features paint it again: under the selected features, or on the whole terrain when none is selected.</summary>
+    [MenuItem("Safe Haven/World/Give Hand Paint Back to Features")]
+    private static void ReleaseHandPaint()
+    {
+        var features = new List<WorldFeature>();
+        foreach (GameObject selected in Selection.gameObjects)
+        {
+            features.AddRange(selected.GetComponentsInParent<WorldFeature>());
+        }
+
+        if (features.Count == 0 && !EditorUtility.DisplayDialog("Give hand paint back",
+                "No feature is selected. Let the features repaint all hand-painted ground on every terrain?", "Repaint all", "Cancel"))
+        {
+            return;
+        }
+
+        int released = 0;
+        foreach (Terrain terrain in Terrain.activeTerrains)
+        {
+            WorldTerrain world = terrain.GetComponent<WorldTerrain>();
+            if (world == null || world.Stash == null || world.Stash.HandPaintedCount == 0)
+            {
+                continue;
+            }
+
+            Undo.RecordObject(world.Stash, "Give Hand Paint Back");
+            int before = released;
+            if (features.Count == 0)
+            {
+                released += world.Stash.ReleaseHandPainted(null);
+            }
+            else
+            {
+                TerrainGrid grid = TerrainGrid.Alphas(terrain);
+                foreach (WorldFeature feature in features)
+                {
+                    Bounds bounds = feature.WorldBounds();
+                    Vector2 low = grid.GridPosition(new Vector2(bounds.min.x, bounds.min.z));
+                    Vector2 high = grid.GridPosition(new Vector2(bounds.max.x, bounds.max.z));
+                    var min = new Vector2Int(Mathf.FloorToInt(low.x), Mathf.FloorToInt(low.y));
+                    var max = new Vector2Int(Mathf.CeilToInt(high.x), Mathf.CeilToInt(high.y));
+                    released += world.Stash.ReleaseHandPainted(new RectInt(min, max - min + Vector2Int.one));
+                }
+            }
+
+            if (released > before)
+            {
+                EditorUtility.SetDirty(world.Stash);
+                WorldBuilder.RebuildTerrain(terrain);
+            }
+        }
+
+        Debug.Log($"World Builder: gave {released} hand-painted ground cell(s) back to the features.");
+    }
 
     public static T Create<T>(string name) where T : WorldFeature
     {

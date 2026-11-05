@@ -35,7 +35,7 @@ MonoBehaviour:
   experience: 0
   neverElite: 0
   attack: {fileID: 11400000, guid: afcd653bc45774044abc9bfc3b1ceb77, type: 2}
-  attackDamage: 8
+  attackDamage: 9.6
   attackCooldown: 0.6
   moveSpeed: 3
   detectionRange: 13
@@ -48,7 +48,7 @@ MonoBehaviour:
   attacks:
   - attack: {fileID: 11400000, guid: 8fa9cea5d6eb777488d2c9e3787f8e59, type: 2}
     kind: 0
-    damage: 6
+    damage: 7.2000003
     minimumRange: 0
     maximumRange: 2.2
     priority: 20
@@ -83,7 +83,7 @@ MonoBehaviour:
     summonLimit: 4
   - attack: {fileID: 11400000, guid: afcd653bc45774044abc9bfc3b1ceb77, type: 2}
     kind: 1
-    damage: 6
+    damage: 7.2000003
     minimumRange: 2.5
     maximumRange: 12
     priority: 10
@@ -118,7 +118,7 @@ MonoBehaviour:
     summonLimit: 4
   - attack: {fileID: 11400000, guid: afcd653bc45774044abc9bfc3b1ceb77, type: 2}
     kind: 1
-    damage: 5
+    damage: 6
     minimumRange: 2.5
     maximumRange: 12
     priority: 15

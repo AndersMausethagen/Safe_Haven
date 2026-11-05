@@ -132,6 +132,20 @@ Shader "Safe Haven/Tree Wind"
             #endif
             return color;
         }
+        // The colour pass's version (its Pass has AlphaToMask On): the cutout edge becomes a 0-1 ramp one pixel wide,
+        // which MSAA turns into partial sample coverage, so leaf edges are smoothed instead of stepping (they read as
+        // pixelated with a hard clip). Without MSAA it is the same cutoff as before. Alpha is 1 when not cut out.
+        half4 SampleBaseCoverage(float2 uv)
+        {
+            half4 color = SAMPLE_TEXTURE2D(_BaseMap, sampler_BaseMap, uv) * _BaseColor;
+            #if defined(_ALPHATEST_ON)
+                color.a = saturate((color.a - _Cutoff) / max(fwidth(color.a), 0.0001) + 0.5);
+                clip(color.a - 0.004);
+            #else
+                color.a = 1;
+            #endif
+            return color;
+        }
         // A tangent-space normal (already unpacked) on this pixel's surface.
         half3 ToWorldNormal(Varyings input, half faceSign, half3 mapped)
         {
@@ -188,10 +202,10 @@ Shader "Safe Haven/Tree Wind"
                 SeeThroughClip(input.positionCS);
             UNITY_SETUP_INSTANCE_ID(input);
             UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
-            half4 baseColor = SampleBase(input.uv);
+            half4 baseColor = SampleBaseCoverage(input.uv);
             #if defined(_FAST_LEAF_LIGHTING)
                 half3 leaf = baseColor.rgb * FastLeafLighting(input, IS_FRONT_VFACE(face, 1.0, -1.0));
-                return half4(MixFog(leaf, input.fog), 1);
+                return half4(MixFog(leaf, input.fog), baseColor.a);
             #endif
             half4 mask = SAMPLE_TEXTURE2D(_ORMMap, sampler_ORMMap, input.uv);
             half faceSign = IS_FRONT_VFACE(face, 1.0, -1.0);
@@ -246,7 +260,7 @@ Shader "Safe Haven/Tree Wind"
                 color.rgb += surface.albedo * sun.color * back * sun.shadowAttenuation * _Translucency;
             #endif
             color.rgb = MixFog(color.rgb, input.fog);
-            return half4(color.rgb, 1);
+            return half4(color.rgb, baseColor.a);
         }
         float4 ShadowVertex(Attributes input, out float2 uv : TEXCOORD0) : SV_POSITION
         {
@@ -289,6 +303,7 @@ Shader "Safe Haven/Tree Wind"
         {
             Name "ForwardLit"
             Tags { "LightMode" = "UniversalForwardOnly" }
+            AlphaToMask On
             HLSLPROGRAM
             #pragma target 3.5
             #pragma vertex TreeVertex

@@ -22,7 +22,9 @@ MonoBehaviour:
   announceStart: 1
   announceCompletion: 1
   showTimerInHud: 0
-  prerequisites: []
+  prerequisites:
+  - {fileID: 11400000, guid: 561a591e33a3afa43894a23c9a44579f, type: 2}
+  startedFirst: []
   start: 2
   startEvent: {fileID: 0}
   closedBy: {fileID: 11400000, guid: 2f630af2f0eaf434a97dc64ffe2d130c, type: 2}

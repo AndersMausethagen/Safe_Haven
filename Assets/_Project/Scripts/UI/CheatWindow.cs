@@ -552,6 +552,7 @@ public sealed class CheatWindow : MonoBehaviour
         Action(page, "Start a ward breach", right, y, wide, Cheats.BeginBreach, closes: true);
         y += RowStep;
         Action(page, "Complete the quests under way", Margin, y, wide, Cheats.CompleteActiveQuests);
+        Action(page, "Corruption creeps in", right, y, wide, Cheats.BeginCorruption, closes: true);
     }
 
     private static string BringEveryoneHome()

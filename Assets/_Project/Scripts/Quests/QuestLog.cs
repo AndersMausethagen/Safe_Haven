@@ -128,6 +128,14 @@ public sealed class QuestLog
             }
         }
 
+        foreach (QuestDefinition begun in quest.StartedFirst)
+        {
+            if (begun != null && StatusOf(begun) == QuestStatus.NotStarted)
+            {
+                return false;
+            }
+        }
+
         return true;
     }
 

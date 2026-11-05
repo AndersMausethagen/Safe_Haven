@@ -91,6 +91,40 @@ public sealed class SurvivalTests
         Assert.IsTrue(needs.TryConsume("Water", 0f, 10f), "Drinking still helps while thirsty.");
     }
 
+    // Playtest 2026-11-05: one waterskin holds up to 100 water, drunk from and refilled at any water.
+    [Test]
+    public void Waterskin_HoldsAHundredWater_EachOneItsOwn()
+    {
+        ItemDefinition skin = UnityEditor.AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Project/Data/Items/Waterskin.asset");
+        Assert.IsTrue(skin.HoldsWater);
+        Assert.AreEqual(100f, skin.WaterCapacity);
+        Assert.IsFalse(skin.Stackable, "each skin keeps its own level");
+        Assert.IsTrue(skin.IsUsable, "right-click drinks from it");
+
+        var full = new ItemStack(skin, 1);
+        Assert.AreEqual(100f, full.Water, 0.01f, "a new skin comes full");
+        ItemStack sipped = full.WithWater(40f);
+        Assert.AreEqual(40f, sipped.Water, 0.01f);
+        var reloaded = new ItemStack(skin, 1, sipped.Durability);
+        Assert.AreEqual(40f, reloaded.Water, 0.01f, "the level is kept the way saves and moves keep a stack");
+    }
+
+    [Test]
+    public void WaterSources_RefillEverySkinInTheBag()
+    {
+        ItemDefinition skin = UnityEditor.AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Project/Data/Items/Waterskin.asset");
+        var bag = new ItemContainer(4, 1);
+        bag.AddStack(new ItemStack(skin, 1).WithWater(10f));
+        bag.AddStack(new ItemStack(skin, 1).WithWater(100f));
+        ItemDefinition sticks = UnityEditor.AssetDatabase.LoadAssetAtPath<ItemDefinition>(UnityEditor.AssetDatabase.GUIDToAssetPath(UnityEditor.AssetDatabase.FindAssets("Sticks t:ItemDefinition")[0]));
+        bag.AddStack(new ItemStack(sticks, 3));
+
+        Assert.AreEqual(1, WaterSource.Refill(bag), "only the one that wasn't full");
+        Assert.AreEqual(100f, bag.GetSlot(0).Water, 0.01f);
+        Assert.AreEqual(100f, bag.GetSlot(1).Water, 0.01f);
+        Assert.AreEqual(3, bag.Count(sticks), "other things are left alone");
+    }
+
     private PlayerNeeds CreateNeeds()
     {
         var player = new GameObject("Player");

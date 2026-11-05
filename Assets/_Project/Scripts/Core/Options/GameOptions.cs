@@ -123,6 +123,8 @@ public static class GameOptions
     public static readonly GameOption LargeTimer = GameOption.Toggle("LargeTimer", "Large Raid Timer", "A bigger clock during raids.", false);
     public static readonly GameOption AlwaysShowVitals = GameOption.Toggle("AlwaysShowVitals", "Always Show Vitals",
         "Keeps health, stamina, hunger and thirst fully lit. Off, they dim while everything is full.", false);
+    public static readonly GameOption VitalsOverPlayer = GameOption.Toggle("VitalsOverPlayer", "Vitals Over Player",
+        "Shows small health and stamina bars above your character while you fight.", false);
 
     public static readonly GameOption SoundCaptions = GameOption.Toggle("SoundCaptions", "Sound Captions",
         "Writes important sounds on the screen, and the side they came from: a creature that has seen you, a horn, a tree coming down.", false);
@@ -133,7 +135,7 @@ public static class GameOptions
     public static readonly GameOption TimingHelp = GameOption.Choice("TimingHelp", "Parry and Dodge Timing",
         "How long the moment to parry lasts, and how long a dodge carries you through a blow.", 0, "Normal", "Longer", "Much Longer");
 
-    public static readonly IReadOnlyList<GameOption> Accessibility = new[] { UiScale, ScreenShake, HitStop, ScreenFlash, TextSpeed, LargeTimer, AlwaysShowVitals, SoundCaptions, RarityLetters, DamageTaken, TimingHelp };
+    public static readonly IReadOnlyList<GameOption> Accessibility = new[] { UiScale, ScreenShake, HitStop, ScreenFlash, TextSpeed, LargeTimer, AlwaysShowVitals, VitalsOverPlayer, SoundCaptions, RarityLetters, DamageTaken, TimingHelp };
 
     /// <summary>The share of a blow that reaches the player.</summary>
     public static float DamageTakenShare => DamageTaken.Index == 2 ? 0.5f : DamageTaken.Index == 1 ? 0.75f : 1f;

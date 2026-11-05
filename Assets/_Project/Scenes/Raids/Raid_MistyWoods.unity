@@ -3053,6 +3053,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 8933221789679875159, guid: 5b6b6a84034d49945b10b28c2c445dba, type: 3}
       insertIndex: -1
       addedObject: {fileID: 457076111}
+    - targetCorrespondingSourceObject: {fileID: 4352166826710475781, guid: 5b6b6a84034d49945b10b28c2c445dba, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 457076113}
   m_SourcePrefab: {fileID: 100100000, guid: 5b6b6a84034d49945b10b28c2c445dba, type: 3}
 --- !u!4 &457076109 stripped
 Transform:
@@ -3080,6 +3083,40 @@ MonoBehaviour:
   follows: {fileID: 0}
   ring: {fileID: 0}
   ringRadius: 0
+--- !u!1 &457076112 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4352166826710475781, guid: 5b6b6a84034d49945b10b28c2c445dba, type: 3}
+  m_PrefabInstance: {fileID: 457076108}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &457076113
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 457076112}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.UniversalAdditionalLightData
+  m_UsePipelineSettings: 1
+  m_AdditionalLightsShadowResolutionTier: 2
+  m_CustomShadowLayers: 0
+  m_LightCookieSize: {x: 1, y: 1}
+  m_LightCookieOffset: {x: 0, y: 0}
+  m_SoftShadowQuality: 0
+  m_RenderingLayersMask:
+    serializedVersion: 0
+    m_Bits: 1
+  m_ShadowRenderingLayersMask:
+    serializedVersion: 0
+    m_Bits: 1
+  m_Version: 4
+  m_LightLayerMask: 1
+  m_ShadowLayerMask: 1
+  m_RenderingLayers: 1
+  m_ShadowRenderingLayers: 1
 --- !u!1 &467460752
 GameObject:
   m_ObjectHideFlags: 0
@@ -5276,7 +5313,7 @@ MonoBehaviour:
   m_VoxelSize: 0.16666667
   m_MinRegionArea: 2
   m_NavMeshData: {fileID: 23800000, guid: 3a233dc2a97656240abc6e4e9500cd62, type: 2}
-  m_BuildHeightMesh: 0
+  m_BuildHeightMesh: 1
 --- !u!4 &768269224
 Transform:
   m_ObjectHideFlags: 0
@@ -12957,6 +12994,7 @@ MonoBehaviour:
     tracks:
     - clip: {fileID: 8300000, guid: 506de2d37425fa747801c9cafb2f6161, type: 3}
       volume: 1
+      startAt: 0
     order: 0
   combat:
     tracks: []
@@ -12965,11 +13003,13 @@ MonoBehaviour:
     tracks:
     - clip: {fileID: 8300000, guid: 13ce48cbd17a75f4b8c20ee839c27223, type: 3}
       volume: 1
+      startAt: 0
     order: 0
   ambience:
     tracks:
     - clip: {fileID: 8300000, guid: 6cda784223e6e1543bd05b9e323ebc7b, type: 3}
       volume: 0.55
+      startAt: 0
     order: 0
   combatMusic: 1
   startSilent: 0

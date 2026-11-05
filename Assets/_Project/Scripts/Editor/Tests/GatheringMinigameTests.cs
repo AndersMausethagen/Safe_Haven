@@ -459,6 +459,72 @@ public sealed class GatheringMinigameTests
         Assert.AreEqual(-1, container.BestToolIndex(ToolType.None));
     }
 
+    // Hold to raise, on Session(): rise 1 s, critical zone 0.45-0.55, normal zone 0.3-0.7.
+    [Test]
+    public void HoldToRaise_RisesOnlyWhileHeld_AndTheReleaseIsJudgedWhereTheToolIs()
+    {
+        GatheringSession session = Session(10, 0f);
+        Assert.IsNull(session.Hold(0.3f, false, out _), "nothing happens until the button is held");
+        Assert.IsFalse(session.IsRaising);
+
+        Assert.IsNull(session.Hold(0.5f, true, out _));
+        Assert.IsTrue(session.IsRaising);
+        Assert.IsTrue(session.InCriticalZone, "half way up is the glint");
+        Assert.AreEqual(SwingResult.Critical, session.Hold(0f, false, out bool late));
+        Assert.IsFalse(late);
+
+        session.Hold(0.35f, true, out _);
+        Assert.AreEqual(SwingResult.Normal, session.Hold(0f, false, out _), "near the glint is a normal swing");
+
+        session.Hold(0.1f, true, out _);
+        Assert.AreEqual(SwingResult.Glancing, session.Hold(0f, false, out late), "let go too soon");
+        Assert.IsFalse(late);
+    }
+
+    [Test]
+    public void HoldToRaise_HeldToTheTop_ComesDownGlancing_AndWaitsForTheButtonToBeLetGo()
+    {
+        GatheringSession session = Session(10, 0f);
+        session.Hold(0.6f, true, out _);
+        Assert.AreEqual(SwingResult.Glancing, session.Hold(0.5f, true, out bool late));
+        Assert.IsTrue(late, "held too long");
+        Assert.IsNull(session.Hold(0.5f, true, out _), "still held: no new rise");
+        Assert.IsFalse(session.IsRaising);
+        Assert.IsNull(session.Hold(0f, false, out _), "letting go after the top is not another swing");
+        session.Hold(0.5f, true, out _);
+        Assert.IsTrue(session.IsRaising);
+    }
+
+    [Test]
+    public void HoldToRaise_ThePressThatBeganTheGatherDoesNotRaiseTheTool()
+    {
+        GatheringSession session = Session(10, 0f);
+        session.WaitForRelease();
+        Assert.IsNull(session.Hold(0.5f, true, out _));
+        Assert.IsFalse(session.IsRaising);
+        session.Hold(0f, false, out _);
+        session.Hold(0.2f, true, out _);
+        Assert.IsTrue(session.IsRaising);
+    }
+
+    [Test]
+    public void ResultsCountForTheirShareOfTheNodesSwings()
+    {
+        var weights = new GatheringSession(4, 1f, 0.5f, 0.4f, 0.1f, 0f, 0, 0f, new System.Random(1),
+            r => r == SwingResult.Critical ? 2f : r == SwingResult.Normal ? 1f : 0.5f);
+        weights.Resolve(SwingResult.Critical);
+        Assert.AreEqual(2f, weights.Progress, 1e-4f);
+        weights.Resolve(SwingResult.Glancing);
+        Assert.AreEqual(2.5f, weights.Progress, 1e-4f);
+        Assert.IsFalse(weights.IsComplete);
+        weights.Resolve(SwingResult.Critical);
+        Assert.IsTrue(weights.IsComplete, "two criticals and a glancing blow finish a four-swing node");
+        Assert.AreEqual(3, weights.SwingsDone);
+
+        Assert.AreEqual(2f, GatheringMinigameSettings.Current.ProgressFor(SwingResult.Critical), 1e-4f, "playtest: a critical cuts twice as deep");
+        Assert.AreEqual(0.5f, GatheringMinigameSettings.Current.ProgressFor(SwingResult.Glancing), 1e-4f, "and a glancing blow half");
+    }
+
     private static GatheringSession Session(int swings, float jitter, float criticalWidth = 0.1f, float perCombo = 0f, int maxCombo = 0)
     {
         return new GatheringSession(swings, 1f, 0.5f, 0.4f, criticalWidth, perCombo, maxCombo, jitter, new System.Random(1));

@@ -50,6 +50,8 @@ public sealed class WorldTerrainStash : ScriptableObject
     [SerializeField] private List<int> alphaCells = new List<int>();
     [SerializeField] private List<byte> alphaBase = new List<byte>();
     [SerializeField] private List<byte> alphaLast = new List<byte>();
+    // Splat cells painted by hand where a feature paints: builds leave them as painted, until handed back.
+    [SerializeField] private List<int> handPaintedCells = new List<int>();
 
     [SerializeField] private int detailResolution;
     [SerializeField] private List<int> detailCells = new List<int>(); // layer * resolution² + cell
@@ -60,6 +62,7 @@ public sealed class WorldTerrainStash : ScriptableObject
     [NonSerialized] private Dictionary<int, int> heightIndex;
     [NonSerialized] private Dictionary<int, int> alphaIndex;
     [NonSerialized] private Dictionary<int, int> detailIndex;
+    [NonSerialized] private HashSet<int> handPainted;
 
     public int HeightCount => heightCells.Count;
     public int AlphaCount => alphaCells.Count;
@@ -88,6 +91,8 @@ public sealed class WorldTerrainStash : ScriptableObject
             alphaBase.Clear();
             alphaLast.Clear();
             alphaIndex = null;
+            handPaintedCells.Clear();
+            handPainted = null;
         }
 
         if (alphaLayers != layers)
@@ -159,6 +164,43 @@ public sealed class WorldTerrainStash : ScriptableObject
     // ------------------------------------------------------------------ paint
 
     public IEnumerable<int> AlphaCells => alphaCells;
+    public int HandPaintedCount => handPaintedCells.Count;
+
+    /// <summary>Whether this splat cell was painted by hand over a feature's paint (builds then leave it alone).</summary>
+    public bool IsHandPainted(int cell)
+    {
+        handPainted ??= new HashSet<int>(handPaintedCells);
+        return handPainted.Contains(cell);
+    }
+
+    public void MarkHandPainted(int cell)
+    {
+        handPainted ??= new HashSet<int>(handPaintedCells);
+        if (handPainted.Add(cell))
+        {
+            handPaintedCells.Add(cell);
+        }
+    }
+
+    /// <summary>Gives hand-painted cells back to the features: those inside <paramref name="area"/> (splat grid
+    /// cells, as x + y × resolution), or all when null. Returns how many.</summary>
+    public int ReleaseHandPainted(RectInt? area)
+    {
+        int before = handPaintedCells.Count;
+        if (area.HasValue)
+        {
+            RectInt rect = area.Value;
+            int resolution = Mathf.Max(1, alphaResolution);
+            handPaintedCells.RemoveAll(cell => rect.Contains(new Vector2Int(cell % resolution, cell / resolution)));
+        }
+        else
+        {
+            handPaintedCells.Clear();
+        }
+
+        handPainted = null;
+        return before - handPaintedCells.Count;
+    }
 
     public bool TryGetAlpha(int cell, float[] baseWeights, float[] lastWeights)
     {

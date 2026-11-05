@@ -182,7 +182,41 @@ public sealed class ItemInventory : MonoBehaviour
             return true;
         }
 
+        if (item.HoldsWater)
+        {
+            return DrinkFrom(from, slot, stack);
+        }
+
         return Consume(from, slot, item);
+    }
+
+    // A water container: drinks what thirst lacks, from what is in it, and keeps the container.
+    private bool DrinkFrom(ItemContainer from, int slot, ItemStack stack)
+    {
+        var needs = GetComponent<PlayerNeeds>();
+        if (needs == null)
+        {
+            return false;
+        }
+
+        float water = stack.Water;
+        if (water < 0.5f)
+        {
+            GameMessages.Post($"Your {stack.Item.DisplayName} is empty. Fill it at a stream or a well.", MessageKind.Warning);
+            return false;
+        }
+
+        float wanted = needs.Thirst.Max - needs.Thirst.Current;
+        if (wanted < 0.5f)
+        {
+            GameMessages.Post("You're not thirsty.", MessageKind.Warning);
+            return false;
+        }
+
+        float drunk = Mathf.Min(water, wanted);
+        needs.TryConsume(stack.Item.DisplayName, 0f, drunk);
+        from.SetDurability(slot, stack.WithWater(water - drunk).Durability);
+        return true;
     }
 
     private bool Study(ItemContainer from, int slot, ItemDefinition item)

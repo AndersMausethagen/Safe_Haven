@@ -93,6 +93,31 @@ public sealed class TerrainFootprints : MonoBehaviour
         Bind();
     }
 
+    /// <summary>
+    /// A print from someone other than the player (an NPC): stamped only inside the window the player's prints already
+    /// keep, and never moving it, so a walker far off cannot drag the window away and wipe the player's trail. Prints
+    /// outside it are not kept; nobody is near enough to see them.
+    /// </summary>
+    public void StampInWindow(Vector3 worldPosition, Vector3 forward)
+    {
+        if (!isActiveAndEnabled || field == null || Profile == null || !Profile.footprints)
+        {
+            return;
+        }
+
+        Vector2 uv = (new Vector2(worldPosition.x, worldPosition.z) - origin) / area;
+        if (uv.x < 0.02f || uv.y < 0.02f || uv.x > 0.98f || uv.y > 0.98f)
+        {
+            return;
+        }
+
+        Vector2 direction = new Vector2(forward.x, forward.z);
+        if (direction.sqrMagnitude < 0.0001f) direction = Vector2.up;
+        Render(Vector2.zero, 0, true, uv, direction.normalized);
+        remaining = 1;
+        Bind();
+    }
+
     private bool EnsureResources()
     {
         int resolution = (int)Profile.footprintResolution;

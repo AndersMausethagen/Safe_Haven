@@ -51,6 +51,7 @@ public sealed class ResidentLife : MonoBehaviour
 
     private void Awake()
     {
+        WalkerFootprints.AddTo(gameObject);
         npc = GetComponent<ResidentNpc>();
         talkable = GetComponent<Talkable>();
     }

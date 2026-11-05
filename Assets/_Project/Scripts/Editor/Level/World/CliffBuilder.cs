@@ -49,7 +49,9 @@ public sealed class CliffBuilder : FeatureBuilder
 
     /// <summary>The cliff's ground at signed distance <paramref name="u"/> from the face edge (+ on the high side), given
     /// the ground there now (<paramref name="h"/>), the rim reference and the face height; NaN where it does not change.</summary>
-    public static float Shape(float u, float h, float reference, float height, float faceDepth, float plateau, CliffFeature.Shaping shaping)
+    /// <param name="bump">Face noise at the cell (-0.5 to 0.5, already scaled); 0 for a smooth face.</param>
+    public static float Shape(float u, float h, float reference, float height, float faceDepth, float plateau, CliffFeature.Shaping shaping,
+                              int ledges = 0, float ledgeStrength = 0f, float bump = 0f)
     {
         bool raise = shaping == CliffFeature.Shaping.Raise;
         float top = raise ? reference + height : reference;
@@ -67,7 +69,7 @@ public sealed class CliffBuilder : FeatureBuilder
 
         if (u >= -faceDepth)
         {
-            float t = (u + faceDepth) / faceDepth;
+            float t = RavineBuilder.WallProfile((u + faceDepth) / faceDepth + bump, ledges, ledgeStrength);
             return raise ? Mathf.Lerp(h, Mathf.Max(h, top), t) : Mathf.Lerp(Mathf.Min(h, bottom), h, t);
         }
 
@@ -93,8 +95,10 @@ public sealed class CliffBuilder : FeatureBuilder
         ForField(layer.Grid, layer.Rect, cliff.Plateau + cliff.FaceDepth + 2f, (x, y, d, s, f, side) =>
         {
             float u = SignedU(d, side, s, f);
+            Vector2 p = layer.Grid.World(x, y);
+            float bump = cliff.FaceNoise > 0f ? (WorldNoise2D.Fbm(p.x / 3f, p.y / 3f, Feature.Seed + 7) - 0.5f) * cliff.FaceNoise * 0.6f : 0f;
             float h = Shape(u, layer.Get(x, y), Line.Lerp(reference, s, f), Line.Lerp(height, s, f),
-                            cliff.FaceDepth, cliff.Plateau, cliff.Shape);
+                            cliff.FaceDepth, cliff.Plateau, cliff.Shape, cliff.Ledges, cliff.LedgeStrength, bump);
             if (!float.IsNaN(h))
             {
                 layer.Set(x, y, h);
@@ -182,64 +186,24 @@ public sealed class CliffBuilder : FeatureBuilder
         }, null);
     }
 
-    /// <summary>Stands rock-face pieces along the face, each fitted exactly: sized to the face's height (stacked in
-    /// rows on tall faces), its finished side turned outwards, its front moved onto the face (Inset decides how far up
-    /// the slope) and its top onto the rim, the rest buried in the ground; neighbours overlap by the cliff's Overlap.</summary>
+    /// <summary>Stands rock-face pieces along the face (CragWall), its edge on the line.</summary>
     private void StandPieces(Transform root)
     {
-        var shapes = new Dictionary<GameObject, Vector3[]>();
-        float along = 0f;
-        int guard = 0;
-        while (along < Line.Length && guard++ < 4000)
+        CragWall.Stand(root, new CragWall.Face
         {
-            CliffKit.Piece piece = cliff.Kit.Pick(Random);
-            if (piece == null)
-            {
-                return;
-            }
-
-            int s = SegmentAt(along, out float f);
-            Vector2 high = HighNormal(s);
-            Vector2 centre = SplineLine.Flat(Line.PointAt(s, f));
-            float rag = Line.Lerp(ragged, s, f);
-            WorldGround.TryGround(centre + high * (-cliff.FaceDepth - 0.4f + rag), out Vector3 foot, out _);
-            float rim = Rim(s, f, centre);
-            float faceHeight = Mathf.Max(rim - foot.y, 0.5f);
-            float size = Mathf.Max(piece.size.y, 0.1f);
-            int rows = Mathf.Max(1, Mathf.CeilToInt(faceHeight / (size * 2.5f)));
-            float rowHeight = faceHeight / rows;
-            float variation = Mathf.Lerp(cliff.SizeVariation.x, cliff.SizeVariation.y, (float)Random.NextDouble());
-            float scale = Mathf.Clamp(rowHeight / size * variation, 0.3f, 4f);
-            float width = Mathf.Max(piece.size.x * scale, 0.5f);
-            along = Mathf.Min(along + width * 0.5f, Line.Length);
-            s = SegmentAt(along, out f);
-            high = HighNormal(s);
-            centre = SplineLine.Flat(Line.PointAt(s, f));
-            rag = Line.Lerp(ragged, s, f);
-            rim = Rim(s, f, centre);
-            Vector3 outward = new Vector3(-high.x, 0f, -high.y);
-            // Inset 0 puts the front just outside the foot of the slope, so the piece covers the whole face.
-            Vector2 front = centre + high * (-cliff.FaceDepth * (1f - cliff.Inset) - 0.15f + rag);
-            for (int row = 0; row < rows; row++)
-            {
-                float rowScale = row == 0 ? scale : scale * Mathf.Lerp(0.9f, 1.05f, (float)Random.NextDouble());
-                var instance = (GameObject)PrefabUtility.InstantiatePrefab(piece.prefab, root);
-                float yaw = ((float)Random.NextDouble() - 0.5f) * 14f;
-                float lean = 3f + (float)Random.NextDouble() * 5f; // a real crag leans back a little
-                instance.transform.SetPositionAndRotation(new Vector3(front.x, rim, front.y),
-                    Quaternion.LookRotation(outward) * Quaternion.Euler(-lean, yaw, 0f) * WorldAssets.StandUp(piece));
-                instance.transform.localScale = piece.prefab.transform.localScale * rowScale;
-                // Fit by the mesh itself: the bulk of its finished side onto the face (a few bumps and overhangs stick
-                // out further), its top onto the rim (lower rows lower).
-                Extent(instance, piece.prefab, shapes, outward, out float frontmost, out float top);
-                float wantedTop = rim + 0.15f - row * rowHeight * 0.9f;
-                float stepOut = row * 0.35f * cliff.FaceDepth; // lower rows stand a little further out
-                float wantedFront = Vector3.Dot(new Vector3(front.x, 0f, front.y), outward) + stepOut;
-                instance.transform.position += outward * (wantedFront - frontmost) + Vector3.up * (wantedTop - top);
-            }
-
-            along += width * (0.5f - cliff.Overlap); // to this piece's far end, back by the overlap
-        }
+            Line = Line,
+            Kit = cliff.Kit,
+            Random = Random,
+            SegmentAt = SegmentAt,
+            HighNormal = HighNormal,
+            Edge = (s, f) => SplineLine.Flat(Line.PointAt(s, f)),
+            Rag = (s, f) => Line.Lerp(ragged, s, f),
+            Rim = Rim,
+            FaceDepth = cliff.FaceDepth,
+            Inset = cliff.Inset,
+            Overlap = cliff.Overlap,
+            SizeVariation = cliff.SizeVariation,
+        });
     }
 
     /// <summary>Height of the cliff's rim at a sample: the raised top, the uncut edge, or (rocks only) the ground there
@@ -257,47 +221,5 @@ public sealed class CliffBuilder : FeatureBuilder
                 WorldGround.TryGround(centre, out Vector3 ground, out _);
                 return ground.y + reach;
         }
-    }
-
-    /// <summary>Where the placed piece's finished side stands (the 70th percentile of its points along
-    /// <paramref name="outward"/>, so a single overhang does not decide) and how high it reaches.</summary>
-    private static void Extent(GameObject instance, GameObject prefab, Dictionary<GameObject, Vector3[]> shapes, Vector3 outward,
-                               out float frontmost, out float top)
-    {
-        if (!shapes.TryGetValue(prefab, out Vector3[] points))
-        {
-            var list = new List<Vector3>();
-            foreach (MeshFilter filter in prefab.GetComponentsInChildren<MeshFilter>())
-            {
-                if (filter.sharedMesh == null || filter.GetComponent<MeshRenderer>() == null ||
-                    (filter.name.Contains("_LOD") && !filter.name.EndsWith("_LOD0")))
-                {
-                    continue;
-                }
-
-                Matrix4x4 toRoot = prefab.transform.worldToLocalMatrix * filter.transform.localToWorldMatrix;
-                Vector3[] vertices = filter.sharedMesh.vertices;
-                for (int i = 0; i < vertices.Length; i += 3)
-                {
-                    list.Add(toRoot.MultiplyPoint3x4(vertices[i]));
-                }
-            }
-
-            shapes[prefab] = points = list.ToArray();
-        }
-
-        // Points are in the prefab root's space; the instance root has the same hierarchy.
-        Matrix4x4 toWorld = instance.transform.localToWorldMatrix;
-        var along = new float[points.Length];
-        top = float.MinValue;
-        for (int i = 0; i < points.Length; i++)
-        {
-            Vector3 world = toWorld.MultiplyPoint3x4(points[i]);
-            along[i] = Vector3.Dot(world, outward);
-            top = Mathf.Max(top, world.y);
-        }
-
-        System.Array.Sort(along);
-        frontmost = along.Length > 0 ? along[Mathf.Min(along.Length - 1, (int)(along.Length * 0.7f))] : 0f;
     }
 }
