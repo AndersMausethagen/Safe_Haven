@@ -124,7 +124,7 @@ public static class GameOptions
     public static readonly GameOption AlwaysShowVitals = GameOption.Toggle("AlwaysShowVitals", "Always Show Vitals",
         "Keeps health, stamina, hunger and thirst fully lit. Off, they dim while everything is full.", false);
     public static readonly GameOption VitalsOverPlayer = GameOption.Toggle("VitalsOverPlayer", "Vitals Over Player",
-        "Shows small health and stamina bars above your character while you fight.", false);
+        "Shows small health and stamina bars above your character, and health above your companions, while you fight.", false);
 
     public static readonly GameOption SoundCaptions = GameOption.Toggle("SoundCaptions", "Sound Captions",
         "Writes important sounds on the screen, and the side they came from: a creature that has seen you, a horn, a tree coming down.", false);

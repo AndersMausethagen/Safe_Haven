@@ -28,6 +28,8 @@ public sealed class BiomeBrush : EditorWindow
     private readonly System.Random random = new System.Random();
     private List<BiomePreset> presets;
     private Vector2 scroll;
+    // Plants and props switched off for this session (the preset itself is left as it is).
+    private readonly HashSet<Object> switchedOff = new HashSet<Object>();
 
     [MenuItem("Safe Haven/World/Paint/Biome Brush")]
     public static void Open() => GetWindow<BiomeBrush>("Biome Brush");
@@ -86,6 +88,18 @@ public sealed class BiomeBrush : EditorWindow
 
         EditorGUILayout.Space();
         if (!string.IsNullOrWhiteSpace(preset.description)) EditorGUILayout.HelpBox(preset.description, MessageType.None);
+        EditorGUILayout.LabelField("Paint with", EditorStyles.boldLabel);
+        foreach (BiomePreset.Detail detail in preset.details)
+        {
+            if (detail.prefab != null) Toggle(detail.prefab, $"{detail.prefab.name}  ({Mathf.RoundToInt(detail.density * 100f)}%, up to {detail.slope.y:0}°)");
+        }
+
+        foreach (BiomePreset.Props props in preset.props)
+        {
+            if (props.palette != null) Toggle(props.palette, $"{props.palette.name}  (props, {props.tries} per dab)");
+        }
+
+        EditorGUILayout.Space();
         scroll = EditorGUILayout.BeginScrollView(scroll);
         var serialized = new SerializedObject(preset);
         SerializedProperty property = serialized.GetIterator();
@@ -97,6 +111,17 @@ public sealed class BiomeBrush : EditorWindow
 
         serialized.ApplyModifiedProperties();
         EditorGUILayout.EndScrollView();
+    }
+
+    private void Toggle(Object part, string label)
+    {
+        bool on = !switchedOff.Contains(part);
+        bool now = EditorGUILayout.ToggleLeft(label, on);
+        if (now != on)
+        {
+            if (now) switchedOff.Remove(part);
+            else switchedOff.Add(part);
+        }
     }
 
     /// <summary>A new empty preset in the biomes folder.</summary>
@@ -144,7 +169,7 @@ public sealed class BiomeBrush : EditorWindow
         Handles.DrawWireDisc(point, normal, radius);
         Handles.color = new Color(Handles.color.r, Handles.color.g, Handles.color.b, 0.08f);
         Handles.DrawSolidDisc(point, normal, radius);
-        Handles.Label(point + Vector3.up * 0.5f, erase ? "Erase " + preset.name : preset.name, EditorStyles.whiteMiniLabel);
+        Handles.Label(point + Vector3.up * 0.5f, erase ? "Erase " + preset.name : Preview(), EditorStyles.whiteMiniLabel);
         if (e.alt || e.button != 0)
         {
             return;
@@ -180,17 +205,47 @@ public sealed class BiomeBrush : EditorWindow
         if (e.type == EventType.MouseMove || e.type == EventType.MouseDrag) view.Repaint();
     }
 
+    // What a dab lays here, for the label under the brush: each plant switched on, with its share at this strength.
+    private string Preview()
+    {
+        var lines = new System.Text.StringBuilder(preset.name);
+        foreach (BiomePreset.Detail detail in preset.details)
+        {
+            if (detail.prefab != null && !switchedOff.Contains(detail.prefab))
+                lines.AppendLine().Append($"  {detail.prefab.name} {Mathf.RoundToInt(detail.density * strength * 100f)}%");
+        }
+
+        return lines.ToString();
+    }
+
     private void Dab(Terrain terrain, Vector3 point, bool erase)
     {
-        if (paintPlants) PaintPlants(terrain, preset, point, radius, erase ? 0f : strength, erase, random);
+        BiomePreset active = ActivePreset();
+        if (paintPlants) PaintPlants(terrain, active, point, radius, erase ? 0f : strength, erase, random);
         if (erase)
         {
-            if (paintProps) foreach (BiomePreset.Props props in preset.props) if (props.palette != null) ScatterBrush.Erase(ScatterBrush.Folder(props.palette, false), props.palette, point, radius);
+            if (paintProps) foreach (BiomePreset.Props props in active.props) if (props.palette != null) ScatterBrush.Erase(ScatterBrush.Folder(props.palette, false), props.palette, point, radius);
             return;
         }
 
-        if (paintGround) PaintGround(terrain, preset, point, radius, strength);
-        if (paintProps) PaintProps(terrain, preset, point, radius, strength, random);
+        if (paintGround)
+        {
+            PaintGround(terrain, active, point, radius, strength);
+            GrassSetup.GroundRepainted(terrain);
+        }
+
+        if (paintProps) PaintProps(terrain, active, point, radius, strength, random);
+    }
+
+    // The preset with the switched-off plants and props left out (a copy kept in memory for the stroke).
+    private BiomePreset ActivePreset()
+    {
+        if (switchedOff.Count == 0) return preset;
+        BiomePreset copy = Instantiate(preset);
+        copy.hideFlags = HideFlags.DontSave;
+        copy.details.RemoveAll(d => d.prefab != null && switchedOff.Contains(d.prefab));
+        copy.props.RemoveAll(p => p.palette != null && switchedOff.Contains(p.palette));
+        return copy;
     }
 
     // ------------------------------------------------------------------ painting (also used by tests)

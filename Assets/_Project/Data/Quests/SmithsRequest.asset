@@ -23,6 +23,7 @@ MonoBehaviour:
   announceCompletion: 1
   showTimerInHud: 0
   prerequisites: []
+  startedFirst: []
   start: 2
   startEvent: {fileID: 0}
   closedBy: {fileID: 0}
@@ -42,7 +43,7 @@ MonoBehaviour:
     mustExtract: 1
     withinMinutes: 0
     questEvent: {fileID: 0}
-    countAlreadyOwned: 1
+    countAlreadyOwned: 0
   - type: 4
     description: 
     amount: 1

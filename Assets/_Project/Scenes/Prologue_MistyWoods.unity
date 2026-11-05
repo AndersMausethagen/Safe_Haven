@@ -27442,7 +27442,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 3}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1206460637}
   m_Father: {fileID: 981106771}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &716558347
@@ -27472,6 +27473,7 @@ MonoBehaviour:
   - rid: 287758218191175977
   - rid: 287758218191175978
   - rid: 287758218191175979
+  - rid: 2623125911485546599
   links:
   - from: df8fdfbec14f4fdbbcaa0be43bc4b643
     output: 0
@@ -27512,6 +27514,9 @@ MonoBehaviour:
   - from: d846e196665147669e5fb0466ecd4dc2
     output: 0
     to: 5637c00fa3e64e4eb5619bd0817c537c
+  - from: 5637c00fa3e64e4eb5619bd0817c537c
+    output: 0
+    to: b4d6ee5fa954491d9c333589743623b6
   logSteps: 0
   references:
     version: 2
@@ -27640,6 +27645,14 @@ MonoBehaviour:
         creature: {fileID: 1803281365}
         hunt: 1
         towards: {fileID: 913407437}
+    - rid: 2623125911485546599
+      type: {class: FocusCameraNode, ns: , asm: SafeHaven}
+      data:
+        id: b4d6ee5fa954491d9c333589743623b6
+        position: {x: 0, y: 0}
+        target: {fileID: 1206460637}
+        seconds: 3.5
+        revealRadius: 18
 --- !u!114 &716558348
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -45734,6 +45747,37 @@ Transform:
   - {fileID: 1915190751}
   - {fileID: 1308209543}
   m_Father: {fileID: 981106771}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1206460636
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1206460637}
+  m_Layer: 0
+  m_Name: Old Path North (camera)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1206460637
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1206460636}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -4.6861353, y: 3.4614272, z: -13.976852}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 716558346}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1206681973
 PrefabInstance:

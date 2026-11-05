@@ -31,6 +31,8 @@ public static class CragWall
         public float Inset;
         public float Overlap;
         public Vector2 SizeVariation;
+        /// <summary>Share of pieces that get a second piece leaning out over the rim (an overhang). 0: none.</summary>
+        public float Overhangs;
     }
 
     public static void Stand(Transform root, Face face)
@@ -85,6 +87,22 @@ public static class CragWall
                 float stepOut = row * 0.35f * face.FaceDepth; // lower rows stand a little further out
                 float wantedFront = Vector3.Dot(new Vector3(front.x, 0f, front.y), outward) + stepOut;
                 instance.transform.position += outward * (wantedFront - frontmost) + Vector3.up * (wantedTop - top);
+            }
+
+            // Now and then a block leaning out over the rim: the overhang a heightmap can't make. (No random draw when
+            // overhangs are off, so faces built without them come out exactly as before.)
+            if (face.Overhangs > 0f && face.Random.NextDouble() < face.Overhangs)
+            {
+                var ledge = (GameObject)PrefabUtility.InstantiatePrefab(piece.prefab, root);
+                float tilt = 14f + (float)face.Random.NextDouble() * 16f;
+                ledge.transform.SetPositionAndRotation(new Vector3(front.x, rim, front.y),
+                    Quaternion.LookRotation(outward) * Quaternion.Euler(tilt, ((float)face.Random.NextDouble() - 0.5f) * 30f, 0f) * WorldAssets.StandUp(piece));
+                ledge.transform.localScale = piece.prefab.transform.localScale * scale * 0.7f;
+                Extent(ledge, piece.prefab, shapes, outward, out float ledgeFront, out float ledgeTop);
+                // Its top just above the rim, sticking out past the face by about a third of its size.
+                float reach = piece.size.x * scale * 0.7f * 0.35f;
+                float wantedLedgeFront = Vector3.Dot(new Vector3(front.x, 0f, front.y), outward) + reach;
+                ledge.transform.position += outward * (wantedLedgeFront - ledgeFront) + Vector3.up * (rim + 0.25f - ledgeTop);
             }
 
             along += width * (0.5f - face.Overlap); // to this piece's far end, back by the overlap

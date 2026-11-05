@@ -52,7 +52,7 @@ public sealed class WorldToolsOverlay : Overlay
                 EditorApplication.ExecuteMenuItem("Safe Haven/World/Place/Drop and Align to Slope #_END");
             }
 
-            if (GUILayout.Button(new GUIContent("Physics", "Let them fall and settle naturally, then remove the physics (Ctrl+End)")))
+            if (GUILayout.Button(new GUIContent("Physics", "Let them fall and settle naturally, then remove the physics (Ctrl+End; Ctrl+Shift+End keeps them upright). A selected folder drops everything in it")))
             {
                 EditorApplication.ExecuteMenuItem("Safe Haven/World/Place/Drop with Physics %_END");
             }

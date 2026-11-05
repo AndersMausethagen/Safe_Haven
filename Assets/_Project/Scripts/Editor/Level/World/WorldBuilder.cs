@@ -586,7 +586,10 @@ public static class WorldBuilder
     {
         var objects = new List<Object> { terrain.terrainData, world, world.Stash, terrain.transform };
         objects.AddRange(terrain.terrainData.alphamapTextures);
-        Undo.RegisterCompleteObjectUndo(objects.ToArray(), name);
+        // Only saved assets and objects of the terrain's own scene: Unity puts the undo record of a loose in-memory object
+        // (a new terrain's paint textures before they are saved) on the first open scene, which then asks to be saved.
+        Undo.RegisterCompleteObjectUndo(objects.Where(o => o != null && (EditorUtility.IsPersistent(o) ||
+            (o is Component part && part.gameObject.scene == terrain.gameObject.scene))).ToArray(), name);
     }
 
     /// <summary>Records what each terrain was built from: everything on the rebuilt terrains, and the rebuilt areas on

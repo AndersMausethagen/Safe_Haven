@@ -37,6 +37,8 @@ public sealed class RavineFeature : WorldFeature
     [Tooltip("How much neighbouring crag pieces overlap.")]
     [SerializeField, Range(0f, 0.8f)] private float overlap = 0.45f;
     [SerializeField] private Vector2 sizeVariation = new Vector2(0.95f, 1.15f);
+    [Tooltip("Share of crag pieces with a block leaning out over the rim above them (overhangs).")]
+    [SerializeField, Range(0f, 1f)] private float overhangs = 0.25f;
     [Tooltip("How far into the wall the crag pieces stand: 0 covers the whole face, 1 leaves it mostly showing.")]
     [SerializeField, Range(0f, 1f)] private float inset = 0.35f;
     [Tooltip("Stones and boulders on the floor.")]
@@ -45,6 +47,9 @@ public sealed class RavineFeature : WorldFeature
 
     [Header("Ground")]
     [SerializeField] private TerrainLayer wallLayer;
+    [Tooltip("Moss on the walls that face north (shaded). Empty: none.")]
+    [SerializeField] private TerrainLayer mossLayer;
+    [SerializeField, Range(0f, 1f)] private float northMoss = 0.6f;
     [Tooltip("The floor's ground (gravel, a stream bed). Empty: left as it is.")]
     [SerializeField] private TerrainLayer floorLayer;
     [SerializeField] private bool clearGrass = true;
@@ -62,6 +67,9 @@ public sealed class RavineFeature : WorldFeature
     public CliffKit Kit => kit;
     public float Overlap => overlap;
     public Vector2 SizeVariation => sizeVariation;
+    public float Overhangs => overhangs;
+    public TerrainLayer MossLayer => mossLayer;
+    public float NorthMoss => northMoss;
     public float Inset => inset;
     public ScatterPalette Rubble => rubble;
     public float RubblePer10m => rubblePer10m;
@@ -84,11 +92,12 @@ public sealed class RavineFeature : WorldFeature
     // After cliffs and ground paint (its rock walls paint over them), before paths and rivers (a river laid in it follows its floor).
     protected override int DefaultOrder => 8;
 
-    public void Configure(CliffKit crags, ScatterPalette floorRubble, TerrainLayer rock, TerrainLayer floor)
+    public void Configure(CliffKit crags, ScatterPalette floorRubble, TerrainLayer rock, TerrainLayer floor, TerrainLayer moss = null)
     {
         kit = crags;
         rubble = floorRubble;
         wallLayer = rock;
         floorLayer = floor;
+        mossLayer = moss;
     }
 }

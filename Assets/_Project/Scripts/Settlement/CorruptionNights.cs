@@ -25,6 +25,10 @@ public sealed class CorruptionNights : MonoBehaviour
     private float nextCheck;
     private float nextDirect;
     private bool fought;
+    private float bearing;
+    private int bandSize;
+    private WeatherSystem weatherSystem;
+    private WeatherDefinition weatherBefore;
 
     /// <summary>The corruption in the loaded scene, or null.</summary>
     public static CorruptionNights Current { get; private set; }
@@ -91,6 +95,41 @@ public sealed class CorruptionNights : MonoBehaviour
         GameMessages.Post(settings.Warning, MessageKind.Warning);
         comeAt = Time.time + (afterSeconds >= 0f ? afterSeconds : settings.Delay);
         fought = false;
+        // The night's direction is chosen now, so the warning comes from where the band will.
+        bearing = Random.Range(0f, 360f);
+        Vector3 edge = Centre() + Direction(bearing) * settings.Distance.x;
+        AudioManager.Play(settings.WarningSound, edge);
+        BringWeather(settings);
+    }
+
+    private Vector3 Centre() => HomePortal.Current != null ? HomePortal.Current.transform.position
+        : Player.Current != null ? Player.Current.transform.position : transform.position;
+
+    private static Vector3 Direction(float degrees) => new Vector3(Mathf.Sin(degrees * Mathf.Deg2Rad), 0f, Mathf.Cos(degrees * Mathf.Deg2Rad));
+
+    // The corruption brings the game's own fog; the weather before it comes back when it is beaten or at dawn.
+    private void BringWeather(CorruptionSettings settings)
+    {
+        WeatherSystem system = FindAnyObjectByType<WeatherSystem>();
+        if (system == null || settings.Weather == null || system.Weather == settings.Weather)
+        {
+            return;
+        }
+
+        weatherSystem = system;
+        weatherBefore = system.Weather;
+        system.SetWeather(settings.Weather, settings.WeatherSeconds);
+    }
+
+    private void ReturnWeather()
+    {
+        if (weatherSystem != null && weatherBefore != null)
+        {
+            weatherSystem.SetWeather(weatherBefore, CorruptionSettings.Current.WeatherSeconds);
+        }
+
+        weatherSystem = null;
+        weatherBefore = null;
     }
 
     private void Nightfall()
@@ -116,9 +155,7 @@ public sealed class CorruptionNights : MonoBehaviour
             return;
         }
 
-        Vector3 centre = HomePortal.Current != null ? HomePortal.Current.transform.position
-            : Player.Current != null ? Player.Current.transform.position : transform.position;
-        float bearing = Random.Range(0f, 360f);
+        Vector3 centre = Centre();
         int count = settings.CountAt(GameSession.Settlement.HavenRank);
         float chaseLimit = WardBreachSettings.Current.ChaseLimit;
         for (int i = 0; i < count; i++)
@@ -140,6 +177,7 @@ public sealed class CorruptionNights : MonoBehaviour
         }
 
         fought = attackers.Count > 0;
+        bandSize = attackers.Count;
         if (!fought)
         {
             Debug.LogWarning("Corruption night: no place found for its creatures.", this);
@@ -171,7 +209,14 @@ public sealed class CorruptionNights : MonoBehaviour
         {
             fought = false;
             leaveAt = -1f;
+            ReturnWeather();
             GameMessages.Post(CorruptionSettings.Current.Cleared, MessageKind.Gain);
+            int reward = CorruptionSettings.Current.ExperienceFor(bandSize);
+            if (reward > 0)
+            {
+                ExperienceTracker.Grant(reward);
+            }
+
             return;
         }
 
@@ -200,6 +245,7 @@ public sealed class CorruptionNights : MonoBehaviour
     private void Dawn()
     {
         comeAt = -1f;
+        ReturnWeather();
         if (attackers.Count == 0)
         {
             return;

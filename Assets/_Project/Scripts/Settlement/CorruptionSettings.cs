@@ -34,6 +34,20 @@ public sealed class CorruptionSettings : GameSettings<CorruptionSettings>
     [Tooltip("Seconds the survivors have at dawn to slink off before they are removed.")]
     [SerializeField, Min(1f)] private float dawnSeconds = 20f;
 
+    [Header("Warning")]
+    [Tooltip("Heard when the corruption begins, from the side it comes from (a howl in the woods).")]
+    [SerializeField] private SoundDefinition warningSound;
+    [Tooltip("The weather the corruption brings (the game's own fog and terrain mist), until the band is beaten or dawn; then the weather before it returns. Empty: the weather is left alone.")]
+    [SerializeField] private WeatherDefinition weather;
+    [Tooltip("Seconds the fog takes to roll in.")]
+    [SerializeField, Min(0f)] private float weatherSeconds = 10f;
+
+    [Header("Holding it off")]
+    [Tooltip("Experience for beating the whole band before dawn.")]
+    [SerializeField, Min(0)] private int experience = 40;
+    [Tooltip("Extra experience per creature in the band.")]
+    [SerializeField, Min(0)] private int experiencePerCreature = 10;
+
     [Header("Words")]
     [SerializeField] private string warning = "The mist thickens at the forest edge. Something from the Misty Woods is coming for the Haven.";
     [SerializeField] private string cleared = "The corruption is beaten back. The night is quiet again.";
@@ -45,6 +59,10 @@ public sealed class CorruptionSettings : GameSettings<CorruptionSettings>
     public float DawnSeconds => dawnSeconds;
     public string Warning => warning;
     public string Cleared => cleared;
+    public SoundDefinition WarningSound => warningSound;
+    public WeatherDefinition Weather => weather;
+    public float WeatherSeconds => weatherSeconds;
+    public int ExperienceFor(int creatures) => experience + experiencePerCreature * Mathf.Max(0, creatures);
 
     /// <summary>The chance of a corrupted night at a Haven rank (0 below the first rank).</summary>
     public float ChanceAt(int rank) => rank < fromRank ? 0f : Mathf.Min(mostChance, chance + chancePerRank * (rank - fromRank));

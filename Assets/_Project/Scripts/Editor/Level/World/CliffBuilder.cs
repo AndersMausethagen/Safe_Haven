@@ -203,6 +203,7 @@ public sealed class CliffBuilder : FeatureBuilder
             Inset = cliff.Inset,
             Overlap = cliff.Overlap,
             SizeVariation = cliff.SizeVariation,
+            Overhangs = cliff.Overhangs,
         });
     }
 

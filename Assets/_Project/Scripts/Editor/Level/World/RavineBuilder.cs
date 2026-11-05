@@ -22,6 +22,7 @@ public sealed class RavineBuilder : FeatureBuilder
         get
         {
             if (ravine.WallLayer != null) yield return ravine.WallLayer;
+            if (ravine.MossLayer != null) yield return ravine.MossLayer;
             if (ravine.FloorLayer != null) yield return ravine.FloorLayer;
         }
     }
@@ -124,6 +125,7 @@ public sealed class RavineBuilder : FeatureBuilder
     {
         int rock = layer.LayerIndex(ravine.WallLayer);
         int bed = layer.LayerIndex(ravine.FloorLayer);
+        int moss = layer.LayerIndex(ravine.MossLayer);
         if (rock < 0 && bed < 0)
         {
             return;
@@ -142,6 +144,13 @@ public sealed class RavineBuilder : FeatureBuilder
             else if (rock >= 0 && t < 1.1f + noise * 0.3f)
             {
                 layer.Paint(x, y, rock, t > 1f ? 1f - WorldNoise2D.Smooth((t - 1f) / 0.3f) : 1f);
+                // A wall faces back across the ravine; facing north it is shaded and mossy, in patches.
+                Vector2 facing = -Outward(s, side);
+                if (moss >= 0 && facing.y > 0.3f && t < 1f)
+                {
+                    float patch = WorldNoise2D.Fbm(p.x / 3f, p.y / 3f, Feature.Seed + 9);
+                    layer.Paint(x, y, moss, ravine.NorthMoss * Mathf.InverseLerp(0.3f, 0.9f, facing.y) * Mathf.Clamp01(patch * 1.6f - 0.3f));
+                }
             }
         });
     }
@@ -199,6 +208,7 @@ public sealed class RavineBuilder : FeatureBuilder
                     Inset = ravine.Inset,
                     Overlap = ravine.Overlap,
                     SizeVariation = ravine.SizeVariation,
+                    Overhangs = ravine.Overhangs,
                 });
             }
         }

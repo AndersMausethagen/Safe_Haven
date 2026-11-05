@@ -284,9 +284,10 @@ public sealed class PlayerGathering : MonoBehaviour
         }
 
         int toolTier = ItemInventory.GatheringTier(gameObject, definition.GatherTool);
+        float rise = settings.RiseSecondsFor(profile, toolTier, definition.RequiredToolTier) / Mathf.Max(0.1f, definition.SwingSpeed);
         Session = new GatheringSession(
             definition.Swings,
-            profile.RiseSeconds / Mathf.Max(0.1f, definition.SwingSpeed),
+            rise,
             settings.SweetSpot,
             profile.NormalZoneWidth,
             settings.CriticalWidthFor(profile, toolTier, definition.RequiredToolTier),
@@ -300,7 +301,6 @@ public sealed class PlayerGathering : MonoBehaviour
         {
             // The tool waits low until the button is held, and rises over exactly the swing's timing window.
             Session.WaitForRelease();
-            float rise = profile.RiseSeconds / Mathf.Max(0.1f, definition.SwingSpeed);
             raiseSpeed = animations != null && animations.WorkRaiseSeconds > 0f ? animations.WorkRaiseSeconds / rise : 1f;
             if (animations != null)
             {

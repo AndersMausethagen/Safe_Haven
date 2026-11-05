@@ -32,7 +32,7 @@ public sealed class SurvivalPage : SystemsPage
         Derived("Full thirst lasts in a raid", Minutes(SurvivalSettings.MinutesToEmpty(settings.MaxThirst, settings.ThirstPerMinute, settings.RaidMultiplier)));
         Derived("A new game wakes up hungry after", Minutes(SurvivalSettings.MinutesToEmpty(settings.MaxHunger * (settings.StartingHunger - settings.LowWarning), settings.HungerPerMinute)));
         Derived("Starving", $"max stamina ×{settings.StarvingMaxStamina:0.##}, regeneration ×{settings.StarvingRegeneration:0.##}");
-        Derived("Parched (in combat)", $"regeneration ×{settings.ParchedCombatRegeneration:0.##}");
+        Derived("Parched", $"regeneration ×{settings.ParchedRegeneration:0.##}, in combat ×{settings.ParchedRegeneration * settings.ParchedCombatRegeneration:0.##}");
         EndDerived();
 
         var foods = LoadAll<ItemDefinition>().FindAll(item => item.IsConsumable);

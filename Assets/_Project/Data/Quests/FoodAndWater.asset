@@ -83,7 +83,7 @@ MonoBehaviour:
     mustExtract: 1
     withinMinutes: 0
     questEvent: {fileID: 0}
-    countAlreadyOwned: 1
+    countAlreadyOwned: 0
   turnInToGiver: 0
   turnInTo: 
   rewardItems:

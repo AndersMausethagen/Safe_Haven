@@ -143,9 +143,13 @@ public sealed class PlayerNeeds : MonoBehaviour
 
         float max = Hunger.IsEmpty ? settings.StarvingMaxStamina : 1f;
         float regen = Hunger.IsEmpty ? settings.StarvingRegeneration : 1f;
-        if (Thirst.IsEmpty && GameStateManager.InCombat)
+        if (Thirst.IsEmpty)
         {
-            regen *= settings.ParchedCombatRegeneration;
+            regen *= settings.ParchedRegeneration;
+            if (GameStateManager.InCombat)
+            {
+                regen *= settings.ParchedCombatRegeneration;
+            }
         }
 
         if (!Mathf.Approximately(max, appliedMax) || !Mathf.Approximately(regen, appliedRegen))

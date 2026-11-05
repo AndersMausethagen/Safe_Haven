@@ -104,7 +104,7 @@ public sealed class QuestObjective
             case ObjectiveType.DestroyBuilding:
                 return new[] { nameof(building) };
             case ObjectiveType.CraftItem:
-                return new[] { nameof(item), nameof(resource) };
+                return new[] { nameof(item), nameof(resource), nameof(countAlreadyOwned) };
             case ObjectiveType.CompleteRaids:
                 return new[] { nameof(raid), nameof(mustExtract), nameof(withinMinutes) };
             case ObjectiveType.QuestEvent:
@@ -174,7 +174,8 @@ public sealed class QuestObjective
             case ObjectiveType.QuestEvent:
                 return log != null && log.HasHappened(questEvent) ? 1 : 0;
             case ObjectiveType.CollectItem:
-                return player.Bag.Container.Count(item) + (player.Equipment != null ? player.Equipment.Gear.Slots.Count(item) : 0);
+            case ObjectiveType.CraftItem: // made before the quest (an older save, a found tool): having it is enough
+                return item == null ? 0 : player.Bag.Container.Count(item) + (player.Equipment != null ? player.Equipment.Gear.Slots.Count(item) : 0);
             case ObjectiveType.BuildStructure:
                 return BuildingObject.Count(building);
             case ObjectiveType.GatherResource:

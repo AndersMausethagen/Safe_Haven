@@ -20,17 +20,40 @@ public static class PhysicsDrop
     private const float MostSeat = 0.5f;        // metres it may be lowered onto the ground after settling
 
     [MenuItem("Safe Haven/World/Place/Drop with Physics %_END")]
-    private static void DropMenu()
-    {
-        int settled = Drop(Selection.transforms.Where(t => !Selection.transforms.Any(other => other != t && t.IsChildOf(other))).ToArray());
-        Debug.Log($"Level: {settled} of {Selection.transforms.Length} object(s) settled with physics.");
-    }
+    private static void DropMenu() => DropSelection(false);
+
+    [MenuItem("Safe Haven/World/Place/Drop with Physics (Upright) %#_END")]
+    private static void DropUprightMenu() => DropSelection(true);
 
     [MenuItem("Safe Haven/World/Place/Drop with Physics %_END", true)]
+    [MenuItem("Safe Haven/World/Place/Drop with Physics (Upright) %#_END", true)]
     private static bool HasSelection() => Selection.transforms.Length > 0 && !EditorApplication.isPlaying;
 
+    private static void DropSelection(bool upright)
+    {
+        List<Transform> targets = Expand(Selection.transforms.Where(t => !Selection.transforms.Any(other => other != t && t.IsChildOf(other))));
+        int settled = Drop(targets, upright);
+        Debug.Log($"Level: {settled} of {targets.Count} object(s) settled with physics{(upright ? ", kept upright" : "")}.");
+    }
+
+    /// <summary>A selected folder (no mesh of its own, such as a scatter folder) stands for the objects in it.</summary>
+    public static List<Transform> Expand(IEnumerable<Transform> selected)
+    {
+        var targets = new List<Transform>();
+        foreach (Transform t in selected)
+        {
+            bool folder = t.GetComponent<Renderer>() == null && t.GetComponent<LODGroup>() == null && t.childCount > 0
+                          && !PrefabUtility.IsOutermostPrefabInstanceRoot(t.gameObject);
+            if (folder) foreach (Transform child in t) targets.Add(child);
+            else targets.Add(t);
+        }
+
+        return targets;
+    }
+
     /// <summary>Drops <paramref name="targets"/> with physics until they rest. Returns how many settled in time.</summary>
-    public static int Drop(IReadOnlyList<Transform> targets)
+    /// <param name="upright">Never tips over (trees, posts): it falls and slides but keeps its tilt.</param>
+    public static int Drop(IReadOnlyList<Transform> targets, bool upright = false)
     {
         if (targets.Count == 0 || EditorApplication.isPlaying)
         {
@@ -61,7 +84,9 @@ public static class PhysicsDrop
 
             foreach (Transform target in targets)
             {
-                bodies.Add(Prepare(target, added, switchedOff));
+                Rigidbody body = Prepare(target, added, switchedOff);
+                if (upright) body.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
+                bodies.Add(body);
             }
 
             Physics.simulationMode = SimulationMode.Script;

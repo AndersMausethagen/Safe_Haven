@@ -687,24 +687,33 @@ public static class GrassSetup
     {
         TerrainCallbacks.textureChanged += (terrain, textureName, region, synced) =>
         {
-            if (textureName != TerrainData.AlphamapTextureName || !synced || terrain == null ||
-                terrain.GetComponent<GrassTerrainColour>() == null)
+            if (textureName == TerrainData.AlphamapTextureName && synced)
             {
-                return;
+                GroundRepainted(terrain);
             }
-
-            if (!Previews.TryGetValue(terrain, out PaintPreview preview))
-            {
-                Previews[terrain] = preview = new PaintPreview();
-            }
-
-            preview.DueAt = EditorApplication.timeSinceStartup + PreviewAfterSeconds;
-            preview.NeedsBake = true;
         };
         EditorApplication.update += UpdatePreviews;
         EditorSceneManager.sceneSaving += (scene, path) => BakePainted(scene);
         AssemblyReloadEvents.beforeAssemblyReload += () => BakePainted(null);
         EditorApplication.quitting += () => BakePainted(null);
+    }
+
+    /// <summary>The terrain's ground paint changed (a brush, or tools that set the paint directly such as the Biome
+    /// Brush): its grass colour follows shortly, and is written when the scene is saved.</summary>
+    public static void GroundRepainted(Terrain terrain)
+    {
+        if (terrain == null || terrain.GetComponent<GrassTerrainColour>() == null)
+        {
+            return;
+        }
+
+        if (!Previews.TryGetValue(terrain, out PaintPreview preview))
+        {
+            Previews[terrain] = preview = new PaintPreview();
+        }
+
+        preview.DueAt = EditorApplication.timeSinceStartup + PreviewAfterSeconds;
+        preview.NeedsBake = true;
     }
 
     private static void UpdatePreviews()

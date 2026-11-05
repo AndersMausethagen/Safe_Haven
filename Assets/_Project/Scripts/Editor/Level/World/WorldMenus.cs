@@ -45,7 +45,8 @@ public static class WorldMenus
     private static void HavenRavine() => MakeRavine(WorldLook.ForestLake);
 
     private static void MakeRavine(WorldLook look) =>
-        Create<RavineFeature>("Ravine").Configure(look.Crags, look.Palette("Rubble"), look.RockGround, look.Ground(look == WorldLook.ForestLake ? "Haven Rock" : "Cedar Soil"));
+        Create<RavineFeature>("Ravine").Configure(look.Crags, look.Palette("Rubble"), look.RockGround, look.Ground(look == WorldLook.ForestLake ? "Haven Rock" : "Cedar Soil"),
+            look.Ground(look == WorldLook.ForestLake ? "Haven Lush Moss" : "Cedar Moss"));
 
     [MenuItem("GameObject/Safe Haven/World/Dark Forest Area", false, 30)]
     private static void DarkForest() => Create<BiomeArea>("Dark Forest").Configure(DarkForestLayers());

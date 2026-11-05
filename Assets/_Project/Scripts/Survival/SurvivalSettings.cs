@@ -33,7 +33,9 @@ public sealed class SurvivalSettings : GameSettings<SurvivalSettings>
     [SerializeField, Range(0f, 1f)] private float starvingRegeneration = 0.6f;
 
     [Header("When parched (thirst at 0)")]
-    [Tooltip("Stamina regeneration in combat is multiplied by this.")]
+    [Tooltip("Stamina regeneration is multiplied by this at all times, so running dry is felt between fights too and carrying water is worth it.")]
+    [SerializeField, Range(0f, 1f)] private float parchedRegeneration = 0.75f;
+    [Tooltip("Stamina regeneration in combat is multiplied by this as well.")]
     [SerializeField, Range(0f, 1f)] private float parchedCombatRegeneration = 0.5f;
 
     [Header("Meals")]
@@ -51,6 +53,7 @@ public sealed class SurvivalSettings : GameSettings<SurvivalSettings>
     public float StarvingMaxStamina => starvingMaxStamina;
     public float StarvingRegeneration => starvingRegeneration;
     public float ParchedCombatRegeneration => parchedCombatRegeneration;
+    public float ParchedRegeneration => parchedRegeneration;
     public int MealSlots => Mathf.Max(1, mealSlots);
 
     /// <summary>Minutes a full meter lasts at the given drain, for the Systems Editor. Infinity when it doesn't drain.</summary>

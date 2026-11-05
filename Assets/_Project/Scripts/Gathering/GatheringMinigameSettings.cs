@@ -77,6 +77,8 @@ public sealed class GatheringMinigameSettings : GameSettings<GatheringMinigameSe
     [SerializeField, Range(0.2f, 0.9f)] private float sweetSpot = 0.8f;
     [Tooltip("Critical width added per tool tier above the node's required tier.")]
     [SerializeField, Range(0f, 0.2f)] private float criticalWidthPerTier = 0.03f;
+    [Tooltip("How much quicker the tool rises per tool tier above the node's required tier (0.08: 8 % per tier), so a better tool is also a quicker rhythm.")]
+    [SerializeField, Range(0f, 0.3f)] private float riseSpeedPerTier = 0.08f;
     [Tooltip("Critical width added per critical swing in a row (the combo). Any other result resets it.")]
     [SerializeField, Range(0f, 0.2f)] private float criticalWidthPerCombo = 0.02f;
     [Tooltip("Criticals in a row that still widen the zone.")]
@@ -136,6 +138,10 @@ public sealed class GatheringMinigameSettings : GameSettings<GatheringMinigameSe
     public bool Enabled => enabled;
     public IReadOnlyList<GatheringToolProfile> Profiles => profiles;
     public float CriticalWidthPerTier => criticalWidthPerTier;
+
+    /// <summary>Seconds for the tool to rise with a tool tier on a node needing a tier, at node swing speed 1.</summary>
+    public float RiseSecondsFor(GatheringToolProfile profile, int toolTier, int requiredTier) =>
+        profile.RiseSeconds / (1f + riseSpeedPerTier * Mathf.Max(0, toolTier - requiredTier));
     public float CriticalWidthPerCombo => criticalWidthPerCombo;
     public int MaxCombo => maxCombo;
     public float SweetSpot => sweetSpot;

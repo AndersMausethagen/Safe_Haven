@@ -27,5 +27,10 @@ MonoBehaviour:
   spread: 35
   delay: 20
   dawnSeconds: 20
+  warningSound: {fileID: 11400000, guid: d2b68a9637836884a89327fada25cb8c, type: 2}
+  weather: {fileID: 11400000, guid: f42530a2c0060db4185f9e18da004943, type: 2}
+  weatherSeconds: 10
+  experience: 40
+  experiencePerCreature: 10
   warning: The mist thickens at the forest edge. Something from the Misty Woods is coming for the Haven.
   cleared: The corruption is beaten back. The night is quiet again.

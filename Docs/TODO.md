@@ -63,9 +63,9 @@ Built:
 
 Next:
 - [ ] Draw a real ravine in the Haven or a raid map and tune its defaults (5 m floor, 2.5 m wall run, 12 m deep) by eye; add a River on its line for a stream.
-- [ ] Biome Brush: show the preset's plants as a list with on/off toggles, and a preview of density under the brush. The grass colour map isn't refreshed by brush strokes until the scene is saved.
+- [x] Biome Brush: on/off toggles per plant and prop palette (for the session), the plants and their share at the current strength shown under the brush, and the grass colour follows brush strokes live.
 - [ ] Biome areas: a spline-outlined area painted with a biome preset by the World Builder (non-destructive, like Ground Paint Areas), for big regions.
-- [ ] Drop with Physics on a whole scatter folder at once, with an option to keep objects upright (lock tilt) for trees and posts.
+- [x] Drop with Physics on a selected folder drops everything in it; Drop with Physics (Upright), Ctrl+Shift+End, keeps their tilt.
 - [x] World Builder fingerprints count only settings that differ from the feature type's defaults, so a new setting no longer rebuilds every feature. (Switching to it rebuilt everything once: Haven and prologue rebuilt and saved on 2026-11-05.)
 - [x] The automatic build is scheduled only by world features being added, removed, moved or edited (and spline and terrain edits), not by any hierarchy change.
 - [x] Builds go scene by scene. The Haven and the prologue overlap in world space, and with both open the builder let Haven features (grove floors, paths, river) cut and paint into the prologue's terrains. Repaired by rebuilding the prologue with its own features: its ground matches the 13:27 commit in 99.9 % of cells. Check by eye: about 0.1 % still differs, up to 14 m, all along the prologue's Forest Floor at the Edge (the seam between its meadow and forest terrains). Backups of both scenes and all terrain files from before the repair: session scratchpad Backup_2106.
@@ -73,16 +73,16 @@ Next:
 ## Suggested improvements (2026-11-05)
 
 Gameplay:
-- [ ] Gathering: let the tool tier change how fast the tool rises, so a better axe is also a quicker rhythm, not only a wider critical window.
-- [ ] Waterskin: show its level on the slot (a thin bar), and make thirst matter more in raids so carrying water is a choice.
-- [ ] Corruption nights: a visible sign before the band arrives (mist rolling in from that side, the forest going quiet, a sound cue), and a small reward for holding it off (Cursed Essence or a rare plant at dawn).
-- [ ] Vitals Over Player: the same small bars over companions in a fight, so it's clear who needs help.
-- [ ] Old saves: the new Tools of the Clearing quest asks for tools to be crafted again; count tools already owned.
-- [ ] The prologue troll: a clear "run" cue (camera to the old path, the companions already moving) so fleeing reads as the answer, not as a fight to win.
+- [x] Gathering: each tool tier above the node's rises 8 % faster (Rise Speed Per Tier), as well as widening the critical window.
+- [x] Waterskin: its water shows in the slot's corner (blue; red when empty). Parched now slows stamina regeneration everywhere (×0.75, ×0.375 in combat), so running dry in a raid is felt.
+- [x] Corruption nights: a wolf howl from the side the band comes from and the game's own Fog weather rolling in (the weather before it returns once the band is beaten or at dawn); beating the whole band gives 40 + 10 per creature experience (Cursed Essence stays raid-only).
+- [x] Vitals Over Player also shows a health bar over each companion in the fight (dark red while downed).
+- [x] Crafting objectives can count items already owned; Tools of the Clearing does, so saves that already have the stone tools complete it at once (the two older crafting objectives with the flag set were switched off to keep their behaviour).
+- [x] The prologue troll: after "Leave the fire! Take the old path north…" the camera turns to the old path (a marker 16 m north of the camp) for 3.5 s.
 
 Look:
 - [ ] A CPU sampler of the tessellated terrain's height (the shader's displacement in C#), so Drop, footprints and character feet can sit on the drawn ground rather than the physics ground.
-- [ ] Ravines and cliffs: a few rock pieces leaning over the rim (overhang look the heightmap can't make), and moss and hanging roots on north-facing walls.
+- [x] Ravines and cliffs: Overhangs (rim blocks leaning out over the face; ravines 25 %, cliffs off) and moss on north-facing ravine walls. Tune the overhang tilt by eye (they read as slabs on the rim). Hanging roots wait for a root model.
 
 Tech:
 - [ ] Handle the Pipeline/MCP polling: each CLI call leaks ~14 Token handles; batch agent work into fewer calls until it's fixed upstream.

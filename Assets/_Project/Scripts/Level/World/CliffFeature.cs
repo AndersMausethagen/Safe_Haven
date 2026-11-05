@@ -44,6 +44,8 @@ public sealed class CliffFeature : WorldFeature
     [SerializeField, Range(0f, 1f)] private float ledgeStrength = 0.5f;
     [Tooltip("Bumps and hollows in the face itself, so it isn't a smooth ramp under the rocks.")]
     [SerializeField, Range(0f, 1f)] private float faceNoise;
+    [Tooltip("Share of crag pieces with a block leaning out over the rim above them (overhangs).")]
+    [SerializeField, Range(0f, 1f)] private float overhangs;
     [Tooltip("Per knot: height multiplier (the handles above each knot).")]
     [SerializeField] private KnotValues heightAtKnots = new KnotValues();
 
@@ -77,6 +79,7 @@ public sealed class CliffFeature : WorldFeature
     public int Ledges => ledges;
     public float LedgeStrength => ledgeStrength;
     public float FaceNoise => faceNoise;
+    public float Overhangs => overhangs;
     public KnotValues HeightAtKnots => heightAtKnots;
     public CliffKit Kit => kit;
     public float Overlap => overlap;

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -26,6 +27,13 @@ public sealed class OverheadVitalsView : MonoBehaviour
     private CanvasGroup group;
     private RectTransform healthFill;
     private RectTransform staminaFill;
+    // Companions get a health bar over their heads in the same fights (who needs help, at a glance).
+    private const float CompanionWidth = 70f;
+    private const float CompanionHeight = 5f;
+    private RectTransform companionLayer;
+    private CanvasGroup companionGroup;
+    private Color healthColour;
+    private readonly List<(RectTransform root, RectTransform fill, Image back)> companionBars = new List<(RectTransform, RectTransform, Image)>();
     private Damageable watched;
     private float lastHurt = float.NegativeInfinity;
     private float fightingUntil = float.NegativeInfinity;
@@ -57,6 +65,16 @@ public sealed class OverheadVitalsView : MonoBehaviour
         Color track = UIStyle.Current.Track;
         healthFill = Bar("Health", StaminaHeight + Gap, HealthHeight, track, health);
         staminaFill = Bar("Stamina", 0f, StaminaHeight, track, stamina);
+        healthColour = health;
+        var layer = new GameObject("Companion Vitals", typeof(RectTransform), typeof(CanvasGroup));
+        companionLayer = (RectTransform)layer.transform;
+        companionLayer.SetParent(canvas, false);
+        companionLayer.anchorMin = companionLayer.anchorMax = new Vector2(0.5f, 0.5f);
+        companionLayer.sizeDelta = Vector2.zero;
+        companionGroup = layer.GetComponent<CanvasGroup>();
+        companionGroup.alpha = 0f;
+        companionGroup.interactable = false;
+        companionGroup.blocksRaycasts = false;
     }
 
     // A track with a fill whose right edge is anchored to the value.
@@ -89,6 +107,50 @@ public sealed class OverheadVitalsView : MonoBehaviour
 
     private void OnDisable() => Watch(null);
 
+    private void OnDestroy()
+    {
+        if (companionLayer != null) Destroy(companionLayer.gameObject);
+    }
+
+    // Health bars over the companions with the player, shown and faded with the player's own.
+    private void PlaceCompanionBars(Camera view)
+    {
+        companionGroup.alpha = group.alpha;
+        int used = 0;
+        if (group.alpha > 0f && view != null)
+        {
+            foreach (Companion companion in Companion.Active)
+            {
+                if (companion == null || companion.IsLost || !companion.TryGetComponent(out Damageable life)) continue;
+                Vector3 screen = view.WorldToScreenPoint(companion.transform.position + Vector3.up * HeadHeight);
+                if (screen.z <= 0f || !RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect, screen, null, out Vector2 local)) continue;
+                if (used == companionBars.Count) companionBars.Add(CompanionBar());
+                var (root, fill, back) = companionBars[used++];
+                root.gameObject.SetActive(true);
+                root.anchoredPosition = local + Vector2.up * ScreenLift;
+                SetFill(fill, companion.IsDowned ? 0f : life.HealthFraction);
+                back.color = companion.IsDowned ? new Color(0.45f, 0.08f, 0.06f, 0.9f) : UIStyle.Current.Track;
+            }
+        }
+
+        for (int i = used; i < companionBars.Count; i++) companionBars[i].root.gameObject.SetActive(false);
+    }
+
+    private (RectTransform, RectTransform, Image) CompanionBar()
+    {
+        var holder = new GameObject("Companion", typeof(RectTransform));
+        var root = (RectTransform)holder.transform;
+        root.SetParent(companionLayer, false);
+        root.anchorMin = root.anchorMax = new Vector2(0.5f, 0.5f);
+        root.pivot = new Vector2(0.5f, 0f);
+        root.sizeDelta = new Vector2(CompanionWidth, CompanionHeight);
+        RectTransform saved = this.root;
+        this.root = root; // Bar() builds under root
+        RectTransform fill = Bar("Health", 0f, CompanionHeight, UIStyle.Current.Track, healthColour);
+        this.root = saved;
+        return (root, fill, fill.parent.GetComponent<Image>());
+    }
+
     private void LateUpdate()
     {
         Player player = Player.Current;
@@ -96,12 +158,13 @@ public sealed class OverheadVitalsView : MonoBehaviour
         bool wanted = GameOptions.VitalsOverPlayer.On && player != null && watched != null && watched.IsAlive && Fighting();
         float target = wanted ? 1f : 0f;
         group.alpha = Mathf.MoveTowards(group.alpha, target, FadePerSecond * Time.unscaledDeltaTime);
+        Camera view = Camera.main;
+        PlaceCompanionBars(view);
         if (group.alpha <= 0f)
         {
             return;
         }
 
-        Camera view = Camera.main;
         Vector3 head = player.transform.position + Vector3.up * HeadHeight;
         Vector3 screen = view != null ? view.WorldToScreenPoint(head) : Vector3.back;
         if (screen.z <= 0f || !RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect, screen, null, out Vector2 local))
