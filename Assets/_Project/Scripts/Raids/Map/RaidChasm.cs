@@ -30,6 +30,8 @@ public sealed class RaidChasm : MonoBehaviour
     private const float FallLift = 1.5f;
 
     private readonly HashSet<Damageable> falling = new HashSet<Damageable>();
+    private float lastHeight;
+    private bool hasLast;
 
     private RaidLayoutPlan plan;
     private Terrain terrain;
@@ -50,11 +52,16 @@ public sealed class RaidChasm : MonoBehaviour
     /// True when a body at this height, over this point (both relative to the map's corner, in metres), has fallen into a ravine: it is
     /// over a ravine's cut, well below its rim, and so is the ground under it, so a neck that carries a trail across never counts.
     /// </summary>
-    public static bool HasFallen(RaidLayoutPlan plan, Vector2 point, float height, float groundBelow)
+    /// <remarks>In a ravine with a way down, walking down to the floor is no fall: there only falling counts (<paramref name="fallSpeed"/>,
+    /// metres a second downwards).</remarks>
+    public static bool HasFallen(RaidLayoutPlan plan, Vector2 point, float height, float groundBelow, float fallSpeed = float.PositiveInfinity)
     {
-        return plan != null && plan.OverRavine(point, out _, out float rim, RaidLayoutRavine.RagReach)
-            && height < rim - FallDepth && groundBelow < rim - FallDepth;
+        return plan != null && plan.OverRavine(point, out RaidLayoutRavine ravine, out float rim, RaidLayoutRavine.RagReach)
+            && height < rim - FallDepth && groundBelow < rim - FallDepth && (!ravine.Descent || fallSpeed >= FallingFrom);
     }
+
+    /// <summary>Metres a second downwards from which a body is falling rather than walking down a slope.</summary>
+    public const float FallingFrom = 6f;
 
     private void OnEnable() => Damageable.AnyDamaged += OnAnyDamaged;
 
@@ -155,7 +162,10 @@ public sealed class RaidChasm : MonoBehaviour
         Vector3 at = player.transform.position;
         var point = new Vector2(at.x - origin.x, at.z - origin.z);
         float ground = terrain.SampleHeight(at);
-        if (!HasFallen(plan, point, at.y - origin.y, ground))
+        float fallSpeed = Time.deltaTime > 0f && hasLast ? (lastHeight - at.y) / Time.deltaTime : 0f;
+        lastHeight = at.y;
+        hasLast = true;
+        if (!HasFallen(plan, point, at.y - origin.y, ground, fallSpeed))
         {
             fallingFor = 0f;
             Remember(point, at, ground + origin.y);

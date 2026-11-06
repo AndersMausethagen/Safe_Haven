@@ -141,7 +141,7 @@ public static class RaidMapSurface
     /// <paramref name="wetness"/> and <paramref name="inWater"/> take metres from the map's south-west corner. Returns how many trees.
     /// </summary>
     public static int Scatter(TerrainData data, RaidMapDefinition definition, List<Clearing> clearings, out int rockCount,
-        Func<Vector2, float> wetness = null, Func<Vector2, bool> inWater = null)
+        Func<Vector2, float> wetness = null, Func<Vector2, bool> inWater = null, Func<Vector2, int, float> treeWeightAt = null)
     {
         var prototypes = new List<TreePrototype>();
         Kind[] trees = Kinds(definition.Trees, prototypes);
@@ -169,7 +169,7 @@ public static class RaidMapSurface
             if (Blocked(spot, clearings, forTrees: true) || (inWater != null && inWater(spot))) continue;
             if (random.NextDouble() > Mathf.Pow(definition.Strength(RaidZoneRole.Forest, u, v), 1.3f)) continue;
 
-            Place(trees, Read(spot, u, v), random, weights, trunks, placed, u, v, true);
+            Place(trees, Read(spot, u, v), random, weights, trunks, placed, u, v, true, treeWeightAt);
         }
 
         int treeCount = placed.Count;
@@ -228,11 +228,14 @@ public static class RaidMapSurface
     {
         public readonly int Prototype;
         public readonly RaidMapDefinition.Scatter Scatter;
+        /// <summary>Its place in the map's list (which skips entries without a prefab here).</summary>
+        public readonly int ListIndex;
 
-        public Kind(int prototype, RaidMapDefinition.Scatter scatter)
+        public Kind(int prototype, RaidMapDefinition.Scatter scatter, int listIndex)
         {
             Prototype = prototype;
             Scatter = scatter;
+            ListIndex = listIndex;
         }
 
         public float Room => Scatter.habitat != null ? Scatter.habitat.room : 0f;
@@ -241,10 +244,11 @@ public static class RaidMapSurface
     private static Kind[] Kinds(IReadOnlyList<RaidMapDefinition.Scatter> list, List<TreePrototype> prototypes)
     {
         var kinds = new List<Kind>();
-        foreach (RaidMapDefinition.Scatter scatter in list)
+        for (int i = 0; i < list.Count; i++)
         {
+            RaidMapDefinition.Scatter scatter = list[i];
             if (scatter?.prefab == null) continue;
-            kinds.Add(new Kind(prototypes.Count, scatter));
+            kinds.Add(new Kind(prototypes.Count, scatter, i));
             prototypes.Add(new TreePrototype { prefab = scatter.prefab });
         }
 
@@ -269,8 +273,9 @@ public static class RaidMapSurface
     }
 
     // Picks a kind by weight × suitability among those with room to stand here, and places it at its own random size.
+    // A tree's weight can come from where it stands (a large map's regions each favour their own trees), by its place in the map's list.
     private static void Place(Kind[] kinds, in RaidScatterHabitat.Spot spot, System.Random random, float[] weights, TrunkGrid trunks,
-        List<TreeInstance> placed, float u, float v, bool trunk)
+        List<TreeInstance> placed, float u, float v, bool trunk, Func<Vector2, int, float> weightAt = null)
     {
         float total = 0f;
         for (int i = 0; i < kinds.Length; i++)
@@ -278,7 +283,8 @@ public static class RaidMapSurface
             RaidMapDefinition.Scatter scatter = kinds[i].Scatter;
             float room = kinds[i].Room * (scatter.scale.x + scatter.scale.y) * 0.5f;
             bool fits = trunks.Fits(spot.Position, Mathf.Max(room, TrunkClearance));
-            weights[i] = fits && scatter.weight > 0f ? scatter.weight * (scatter.habitat != null ? scatter.habitat.Suitability(spot, kinds[i].Prototype) : 1f) : 0f;
+            float weight = weightAt != null && scatter.weight > 0f ? weightAt(spot.Position, kinds[i].ListIndex) : scatter.weight;
+            weights[i] = fits && weight > 0f ? weight * (scatter.habitat != null ? scatter.habitat.Suitability(spot, kinds[i].Prototype) : 1f) : 0f;
             total += weights[i];
         }
 

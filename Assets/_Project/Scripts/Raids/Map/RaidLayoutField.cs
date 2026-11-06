@@ -25,7 +25,18 @@ public sealed class RaidLayoutField
     private const float PondSoil = 2.4f;
     // Cliffs and ravines (moods with terraces, ravines or spires).
     private const float Far = 1e6f;
-    private const float LevelReach = 60f;
+    // Stamped this far; beyond, the nearest two places spread outward cell by cell (much cheaper than stamping the whole map).
+    private const float LevelReach = 26f;
+    private const float RiverBank = 3f;
+    private const float RiverFordFade = 4f;
+    private const float RiverFordBank = 3f;
+    private const float RiverFreeboard = 0.35f;
+    private const float RiverWaterline = 0.2f;
+    private const float RiverReachBeyond = 10f;
+    private const float RiverIntoBank = 0.5f;
+    private const float DescentLip = 0.3f;
+    private const float DescentSlope = 2.6f;
+    private const float DescentShortest = 25f;
     private const float LevelBlend = 9f;
     private const float CliffFrom = 2.5f;
     private const float CliffFull = 4.5f;
@@ -68,7 +79,15 @@ public sealed class RaidLayoutField
     private float[] ravineEdge;
     private float[] ravineHalf;
     private float[] ravineFloor;
+    private float[] riverEdge;
+    private float[] riverHalf;
+    private float[] riverLevel;
+    private float[] riverDepth;
     private float lift;
+    private readonly System.Text.StringBuilder timings = new System.Text.StringBuilder();
+
+    /// <summary>How long each part of building took, for the raid's generation log.</summary>
+    public string Timings => timings.ToString();
 
     // While the levels are worked out: the nearest two places with a height of their own, each with its distance, height and which it is.
     private float[] nearDistance, nearHeight, otherDistance, otherHeight;
@@ -87,6 +106,9 @@ public sealed class RaidLayoutField
     }
 
     public int Resolution => resolution;
+
+    /// <summary>The plan this field was built for.</summary>
+    public RaidLayoutPlan Plan => plan;
 
     /// <summary>Metres the whole map stands raised by, so the deepest ravine's floor stays above the map's lowest point.</summary>
     public float Lift => lift;
@@ -120,9 +142,11 @@ public sealed class RaidLayoutField
             field.openDistance[i] = Mathf.Min(field.trailDistance[i], field.clearDistance[i]);
         }
 
-        if (plan.Mood != null && plan.Mood.terraces > 1)
+        var clock = System.Diagnostics.Stopwatch.StartNew();
+        if (plan.HasTerraces)
         {
             field.BuildLevels(halfWidth);
+            field.timings.Append($"levels {clock.ElapsedMilliseconds} ms, ");
         }
 
         field.lift = LiftFor(plan, rules);
@@ -138,7 +162,10 @@ public sealed class RaidLayoutField
             pond.Level = field.PondLevel(pond);
         }
 
+        clock.Restart();
         field.BuildRavines();
+        field.BuildRivers();
+        field.timings.Append($"ravines and rivers {clock.ElapsedMilliseconds} ms");
         foreach (RaidLayoutSpire spire in plan.Spires)
         {
             spire.Top = field.GroundAt(spire.Position.x / plan.Size, spire.Position.y / plan.Size) + spire.Height;
@@ -177,7 +204,7 @@ public sealed class RaidLayoutField
             otherId[i] = -1;
         }
 
-        float step = plan.Mood.terraceHeight;
+        float step = plan.TerraceHeight;
         int id = 0;
         for (int i = 0; i < plan.Trails.Count && i < plan.Links.Count; i++, id++)
         {
@@ -303,7 +330,8 @@ public sealed class RaidLayoutField
         return Mathf.Lerp(otherHeight[index], nearHeight[index], near);
     }
 
-    // Ground beyond the reach of every place (deep in the wild) takes the height of the nearest cell that has one.
+    // Beyond the stamps' reach, the nearest two places spread outward cell by cell, a step's length further each time (diagonals 1.41),
+    // so deep wild ground still knows both and blends between them. Only shorter distances replace longer, so it settles.
     private void FillLevels()
     {
         var open = new Queue<int>();
@@ -315,27 +343,85 @@ public sealed class RaidLayoutField
             }
         }
 
+        float diagonal = cell * 1.41421f;
         while (open.Count > 0)
         {
             int index = open.Dequeue();
             int x = index % resolution, y = index / resolution;
-            for (int k = 0; k < 4; k++)
+            for (int dy = -1; dy <= 1; dy++)
             {
-                int nx = x + (k == 0 ? 1 : k == 1 ? -1 : 0), ny = y + (k == 2 ? 1 : k == 3 ? -1 : 0);
-                if (nx < 0 || ny < 0 || nx >= resolution || ny >= resolution)
+                for (int dx = -1; dx <= 1; dx++)
                 {
-                    continue;
-                }
+                    int nx = x + dx, ny = y + dy;
+                    if ((dx == 0 && dy == 0) || nx < 0 || ny < 0 || nx >= resolution || ny >= resolution)
+                    {
+                        continue;
+                    }
 
-                int next = ny * resolution + nx;
-                if (nearId[next] < 0)
-                {
-                    nearId[next] = nearId[index];
-                    nearHeight[next] = BlendedLevel(index);
-                    open.Enqueue(next);
+                    int next = ny * resolution + nx;
+                    float step = dx != 0 && dy != 0 ? diagonal : cell;
+                    bool changed = Offer(next, nearDistance[index] + step, nearHeight[index], nearId[index]);
+                    if (otherId[index] >= 0)
+                    {
+                        changed |= Offer(next, otherDistance[index] + step, otherHeight[index], otherId[index]);
+                    }
+
+                    if (changed)
+                    {
+                        open.Enqueue(next);
+                    }
                 }
             }
         }
+    }
+
+    // Keeps the nearest two different places at a cell; true when either changed.
+    private bool Offer(int index, float distance, float height, int id)
+    {
+        if (id == nearId[index])
+        {
+            if (distance < nearDistance[index] - 0.001f)
+            {
+                nearDistance[index] = distance;
+                nearHeight[index] = height;
+                return true;
+            }
+
+            return false;
+        }
+
+        if (distance < nearDistance[index])
+        {
+            otherDistance[index] = nearDistance[index];
+            otherHeight[index] = nearHeight[index];
+            otherId[index] = nearId[index];
+            nearDistance[index] = distance;
+            nearHeight[index] = height;
+            nearId[index] = id;
+            return true;
+        }
+
+        if (id == otherId[index])
+        {
+            if (distance < otherDistance[index] - 0.001f)
+            {
+                otherDistance[index] = distance;
+                otherHeight[index] = height;
+                return true;
+            }
+
+            return false;
+        }
+
+        if (distance < otherDistance[index])
+        {
+            otherDistance[index] = distance;
+            otherHeight[index] = height;
+            otherId[index] = id;
+            return true;
+        }
+
+        return false;
     }
 
     // A ravine's rim is the ground along its line before the cut. Its floor lies at least its depth below that and only ever falls, gently,
@@ -359,10 +445,12 @@ public sealed class RaidLayoutField
                 rim[i] = GroundAt(ravine.Line[i].x / plan.Size, ravine.Line[i].y / plan.Size);
             }
 
-            if (rim[0] < rim[count - 1])
+            // A river runs from the higher end; a ravine with a way down keeps its open end first, whatever the land does.
+            if (!ravine.Descent && rim[0] < rim[count - 1])
             {
                 ravine.Line.Reverse();
                 ravine.HalfWidths.Reverse();
+                ravine.Tapers.Reverse();
                 System.Array.Reverse(rim);
             }
 
@@ -395,6 +483,11 @@ public sealed class RaidLayoutField
                 floor[i] = Mathf.Max(RavineFloorLowest, floor[i]);
             }
 
+            if (ravine.Descent)
+            {
+                SlopeIn(ravine, rim, floor);
+            }
+
             ravine.Rim = rim;
             ravine.Floor = floor;
             for (int i = 0; i + 1 < count; i++)
@@ -402,6 +495,44 @@ public sealed class RaidLayoutField
                 StampRavine(ravine.Line[i], ravine.Line[i + 1], ravine.HalfWidths[i], ravine.HalfWidths[i + 1], floor[i], floor[i + 1]);
             }
         }
+    }
+
+    // The open end's floor rises to just under the rim, steady enough to walk (about 21 degrees), and the cascades there are gone.
+    private static void SlopeIn(RaidLayoutRavine ravine, float[] rim, float[] floor)
+    {
+        int count = floor.Length;
+        float total = 0f;
+        for (int i = 0; i + 1 < count; i++)
+        {
+            total += Vector2.Distance(ravine.Line[i], ravine.Line[i + 1]);
+        }
+
+        float top = rim[0] - DescentLip;
+        float run = 0f;
+        float length = Mathf.Clamp((top - floor[count / 2]) * DescentSlope, DescentShortest, total * 0.6f);
+        int foot = 0;
+        for (int i = 0; i < count && run < length; i++)
+        {
+            foot = i;
+            if (i > 0)
+            {
+                run += Vector2.Distance(ravine.Line[i - 1], ravine.Line[i]);
+            }
+        }
+
+        float bottom = floor[foot];
+        run = 0f;
+        for (int i = 0; i <= foot; i++)
+        {
+            if (i > 0)
+            {
+                run += Vector2.Distance(ravine.Line[i - 1], ravine.Line[i]);
+            }
+
+            floor[i] = Mathf.Max(floor[i], Mathf.Lerp(top, bottom, Mathf.SmoothStep(0f, 1f, run / Mathf.Max(0.01f, length))));
+        }
+
+        ravine.Cascades.RemoveAll(at => at < foot);
     }
 
     private void StampRavine(Vector2 from, Vector2 to, float halfFrom, float halfTo, float floorFrom, float floorTo)
@@ -432,6 +563,127 @@ public sealed class RaidLayoutField
         }
     }
 
+    // A river's surface lies just under the ground along it and both its banks, and only ever falls, from the higher end; where the land
+    // rises across its way it cuts a deeper bed through. Its channel is cut down from that surface (RiverCut).
+    private void BuildRivers()
+    {
+        if (plan.Rivers.Count == 0)
+        {
+            return;
+        }
+
+        riverEdge = Filled(Far);
+        riverHalf = new float[resolution * resolution];
+        riverLevel = new float[resolution * resolution];
+        riverDepth = new float[resolution * resolution];
+        foreach (RaidLayoutRiver river in plan.Rivers)
+        {
+            int count = river.Line.Count;
+            var surface = new float[count];
+            for (int i = 0; i < count; i++)
+            {
+                Vector2 point = river.Line[i];
+                Vector2 along = (river.Line[Mathf.Min(i + 1, count - 1)] - river.Line[Mathf.Max(i - 1, 0)]).normalized;
+                Vector2 side = new Vector2(-along.y, along.x) * (river.HalfWidths[i] + RiverBank * 0.5f);
+                float low = Mathf.Min(GroundAt(point.x / plan.Size, point.y / plan.Size),
+                    Mathf.Min(GroundAt((point.x + side.x) / plan.Size, (point.y + side.y) / plan.Size), GroundAt((point.x - side.x) / plan.Size, (point.y - side.y) / plan.Size)));
+                surface[i] = low - RiverFreeboard;
+            }
+
+            if (surface[0] < surface[count - 1])
+            {
+                river.Line.Reverse();
+                river.HalfWidths.Reverse();
+                System.Array.Reverse(surface);
+            }
+
+            for (int i = 1; i < count; i++)
+            {
+                surface[i] = Mathf.Max(RavineFloorLowest + river.Depth, Mathf.Min(surface[i], surface[i - 1]));
+            }
+
+            river.Level = surface;
+            for (int i = 0; i + 1 < count; i++)
+            {
+                StampRiver(river.Line[i], river.Line[i + 1], river.HalfWidths[i], river.HalfWidths[i + 1], surface[i], surface[i + 1], river.Depth);
+            }
+        }
+    }
+
+    private void StampRiver(Vector2 from, Vector2 to, float halfFrom, float halfTo, float levelFrom, float levelTo, float depth)
+    {
+        float extent = Mathf.Max(halfFrom, halfTo) + RiverReachBeyond;
+        int xMin = Mathf.Max(0, Mathf.FloorToInt((Mathf.Min(from.x, to.x) - extent) / cell));
+        int xMax = Mathf.Min(resolution - 1, Mathf.CeilToInt((Mathf.Max(from.x, to.x) + extent) / cell));
+        int yMin = Mathf.Max(0, Mathf.FloorToInt((Mathf.Min(from.y, to.y) - extent) / cell));
+        int yMax = Mathf.Min(resolution - 1, Mathf.CeilToInt((Mathf.Max(from.y, to.y) + extent) / cell));
+        Vector2 along = to - from;
+        float lengthSquared = Mathf.Max(0.0001f, along.sqrMagnitude);
+        for (int y = yMin; y <= yMax; y++)
+        {
+            for (int x = xMin; x <= xMax; x++)
+            {
+                var point = new Vector2(x * cell, y * cell);
+                float t = Mathf.Clamp01(Vector2.Dot(point - from, along) / lengthSquared);
+                float half = Mathf.Lerp(halfFrom, halfTo, t);
+                float edge = Vector2.Distance(point, from + along * t) - half;
+                int index = y * resolution + x;
+                if (edge < riverEdge[index])
+                {
+                    riverEdge[index] = edge;
+                    riverHalf[index] = half;
+                    riverLevel[index] = Mathf.Lerp(levelFrom, levelTo, t);
+                    riverDepth[index] = depth;
+                }
+            }
+        }
+    }
+
+    // A bed deepest in the middle, shallow at a ford where a trail crosses, and banks from the waterline up to the ground: gentle at a
+    // ford, so the trail walks down into the water.
+    private float RiverCut(float u, float v, float ground)
+    {
+        float edge = Sample(riverEdge, u, v);
+        if (edge >= RiverBank + RiverFordBank)
+        {
+            return ground;
+        }
+
+        float half = Mathf.Max(0.5f, Sample(riverHalf, u, v));
+        float level = Sample(riverLevel, u, v);
+        float ford = 1f - Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(Sample(trailDistance, u, v) / RiverFordFade));
+        float bank = RiverBank + RiverFordBank * ford;
+        if (edge >= bank)
+        {
+            return ground;
+        }
+
+        float height;
+        if (edge < 0f)
+        {
+            float across = Mathf.Clamp01((edge + half) / half);
+            float deep = Mathf.Lerp(Sample(riverDepth, u, v), rules.FordDepth, ford);
+            height = Mathf.Lerp(level - deep, level - RiverWaterline, across * across);
+        }
+        else
+        {
+            height = Mathf.Lerp(level - RiverWaterline, ground, Mathf.SmoothStep(0f, 1f, edge / bank));
+        }
+
+        return Mathf.Min(ground, height);
+    }
+
+    /// <summary>How wet the ground is by the rivers at a point (metres from the map's corner): 1 at the water, fading over <paramref name="reach"/>.</summary>
+    public float RiverWetness(Vector2 point, float reach)
+    {
+        if (riverEdge == null || reach <= 0f)
+        {
+            return 0f;
+        }
+
+        return 1f - Mathf.Clamp01(Sample(riverEdge, point.x / plan.Size, point.y / plan.Size) / reach);
+    }
+
     /// <summary>
     /// True where nothing may stand, in metres from the map's south-west corner: in a ravine or at its very edge, and on a spire. What grows
     /// or lies there could never be reached, so trees, rocks and resources keep off.
@@ -439,6 +691,11 @@ public sealed class RaidLayoutField
     public bool KeepsClear(Vector2 point)
     {
         if (ravineEdge != null && Sample(ravineEdge, point.x / plan.Size, point.y / plan.Size) < KeepClearBeyond + RaidLayoutRavine.RagReach)
+        {
+            return true;
+        }
+
+        if (riverEdge != null && Sample(riverEdge, point.x / plan.Size, point.y / plan.Size) < RiverIntoBank)
         {
             return true;
         }
@@ -596,7 +853,7 @@ public sealed class RaidLayoutField
     public float HeightAt(float u, float v)
     {
         float height = GroundAt(u, v);
-        if (plan.Ponds.Count == 0 && plan.Spires.Count == 0 && ravineEdge == null)
+        if (plan.Ponds.Count == 0 && plan.Spires.Count == 0 && ravineEdge == null && riverEdge == null)
         {
             return height;
         }
@@ -605,6 +862,11 @@ public sealed class RaidLayoutField
         foreach (RaidLayoutPond pond in plan.Ponds)
         {
             height = Basin(pond, point, height);
+        }
+
+        if (riverEdge != null)
+        {
+            height = RiverCut(u, v, height);
         }
 
         if (plan.Spires.Count > 0)
@@ -655,7 +917,8 @@ public sealed class RaidLayoutField
         }
 
         float variety = 1f + (Noise(x, y, RidgeVarietyScale, 31f) - 0.5f) * 2f * RidgeVariety;
-        float ridge = Mathf.SmoothStep(0f, 1f, open / rules.RidgeWidth) * rules.RidgeHeight * plan.Mood.ridges * variety;
+        float ridges = plan.Regions.Count > 1 ? plan.Blend(new Vector2(x, y), mood => mood.ridges) : plan.Mood.ridges;
+        float ridge = Mathf.SmoothStep(0f, 1f, open / rules.RidgeWidth) * rules.RidgeHeight * ridges * variety;
         float rough = (Noise(x, y, RoughnessScale, 67f) - 0.5f) * 2f * rules.Roughness * Mathf.Clamp01(open / RoughFrom);
         float edge = Mathf.Min(x, Mathf.Min(y, Mathf.Min(plan.Size - x, plan.Size - y)));
         float rim = Mathf.SmoothStep(0f, 1f, 1f - edge / rules.RimWidth) * rules.RimHeight;
@@ -670,16 +933,25 @@ public sealed class RaidLayoutField
     public float[,] Metres(int size, out float highest)
     {
         var heights = new float[size, size];
+        var rowHighest = new float[size];
         float last = size - 1f;
-        highest = 0f;
-        for (int row = 0; row < size; row++)
+        // Row by row on every core: HeightAt only reads what Build worked out.
+        System.Threading.Tasks.Parallel.For(0, size, row =>
         {
+            float top = 0f;
             for (int column = 0; column < size; column++)
             {
                 float height = HeightAt(column / last, row / last);
                 heights[row, column] = height;
-                highest = Mathf.Max(highest, height);
+                top = Mathf.Max(top, height);
             }
+
+            rowHighest[row] = top;
+        });
+        highest = 0f;
+        foreach (float top in rowHighest)
+        {
+            highest = Mathf.Max(highest, top);
         }
 
         return heights;
@@ -719,7 +991,8 @@ public sealed class RaidLayoutField
                 float patches = 0.55f + 0.9f * Noise(worldX, worldY, rules.ForestPatches, 113f);
                 path[index] = Byte(1f - Mathf.SmoothStep(0f, 1f, (trailDistance[index] + SoilEdge) / (SoilEdge * 2f)));
                 clearing[index] = Byte(1f - Mathf.SmoothStep(0f, 1f, (clearDistance[index] + wobble + SoilEdge) / (SoilEdge * 2f)));
-                forest[index] = Byte(density * patches * Mathf.SmoothStep(0f, 1f, (openDistance[index] + wobble) / ForestEdge));
+                float here = plan.Regions.Count > 1 ? rules.ForestDensity * plan.Blend(new Vector2(worldX, worldY), mood => mood.forest) : density;
+                forest[index] = Byte(here * patches * Mathf.SmoothStep(0f, 1f, (openDistance[index] + wobble) / ForestEdge));
                 if (ravineEdge != null && ravineEdge[index] < 0f)
                 {
                     // Gravel on a ravine's floor, which the walls' rock gives way to.

@@ -43,6 +43,24 @@ public sealed class RaidSiteQuota
     public Vector2 offPath = new Vector2(9f, 16f);
     [Tooltip("Radius of open, level ground kept around the site, in metres.")]
     [Min(0f)] public float clearing = 7f;
+    [Tooltip("Take the highest of the places it could go: a cache on a ledge, a reward up the hill.")]
+    public bool prefersHeight;
+    [Tooltip("On maps with terraces: first at the top of the ramps, looking down on the way up (archers love it).")]
+    public bool overlooksRamps;
+}
+
+/// <summary>A landmark a generated map can have: something tall to find the way by, on a hill top or in the wild ground.</summary>
+[Serializable]
+public sealed class RaidLandmarkRule
+{
+    public GameObject prefab;
+    [Min(0f)] public float weight = 1f;
+    [Tooltip("Scale, least and most.")]
+    public Vector2 scale = Vector2.one;
+    [Tooltip("Share of its height sunk into the ground.")]
+    [Range(0f, 0.5f)] public float sink = 0.05f;
+    [Tooltip("Strip what can be gathered, chopped or used from it, so it is only to see (and bump into).")]
+    public bool onlyToSee = true;
 }
 
 /// <summary>One plan a map can be laid out by, with how likely it is and what the briefing says of it.</summary>
@@ -85,6 +103,8 @@ public sealed class RaidMapMood
     [Min(0f)] public float hills = 1f;
     [Tooltip("Multiplies how many clusters of great boulders lie about (Rules › Boulders).")]
     [Min(0f)] public float boulders = 1f;
+    [Tooltip("Multiplies how many rivers cross the open land (Rules › Surface Rivers).")]
+    [Min(0f)] public float rivers = 1f;
 
     [Header("Cliffs and Ravines")]
     [Tooltip("The raid planner offers a run of this mood as a large raid first. The player can still pick Normal.")]
@@ -110,6 +130,9 @@ public sealed class RaidMapMood
     [Range(0f, 1f)] public float riverChance = 0.6f;
     [Tooltip("Mist lies along the floors of the ravines.")]
     public bool ravineMist = true;
+    [Tooltip("How many ravines, on a map of the normal size, have one end that slopes down to the floor: the one way in, to a find at " +
+             "the bottom (Rules › Descent Sites). Such a ravine has no river.")]
+    [Min(0)] public int ravineDescents;
     [Tooltip("Sheer rock spires in the wild ground, which nobody can climb: least and most on a map of the normal size.")]
     public Vector2Int spires = Vector2Int.zero;
     [Tooltip("How high a spire stands above the ground around it, in metres, least and most.")]
@@ -205,6 +228,48 @@ public sealed class RaidLayoutRules : ScriptableObject
     [Tooltip("Metres of the map a lookout reveals around it.")]
     [SerializeField, Min(10f)] private float lookoutReveal = 70f;
 
+    [Header("Regions (large maps)")]
+    [Tooltip("How many regions a large map is split into, least and most, each with a mood of its own; the start's region has the run's " +
+             "mood. A map of the normal size is one region.")]
+    [SerializeField] private Vector2Int largeRegions = new Vector2Int(1, 1);
+    [Tooltip("Metres over which one region's look gives way to the next.")]
+    [SerializeField, Min(1f)] private float regionBlend = 30f;
+    [NonSerialized] private bool scaledUp;
+
+    [Header("Routes")]
+    [Tooltip("Make sure two ways lead to the exit ahead, a short one and a longer one, adding a trail where the map has only one.")]
+    [SerializeField] private bool twoRoutes;
+    [Tooltip("Camps go first to the clearings on the short way, which makes it the dangerous one and the long way the quiet one.")]
+    [SerializeField] private bool campsOnShortRoute = true;
+
+    [Header("Surface Rivers")]
+    [Tooltip("How many rivers cross the open land, least and most, on a map of the normal size (times the mood's Rivers). A trail " +
+             "crosses one at a ford, shallow enough to wade; elsewhere it is deep enough to swim.")]
+    [SerializeField] private Vector2Int surfaceRivers = Vector2Int.zero;
+    [Tooltip("How wide a river is, in metres, least and most.")]
+    [SerializeField] private Vector2 surfaceRiverWidth = new Vector2(5f, 8f);
+    [Tooltip("How deep a river is in its middle, in metres, least and most. The player swims from the Swim Depth.")]
+    [SerializeField] private Vector2 surfaceRiverDepth = new Vector2(1.3f, 1.9f);
+    [Tooltip("How deep the water is at a ford, in metres.")]
+    [SerializeField, Min(0.1f)] private float fordDepth = 0.45f;
+    [Tooltip("How far a river runs, in metres, least and most (it may run on to the map's edge).")]
+    [SerializeField] private Vector2 surfaceRiverLength = new Vector2(120f, 260f);
+
+    [Header("Landmarks")]
+    [Tooltip("Tall things to find the way by: hill tops get them first.")]
+    [SerializeField] private List<RaidLandmarkRule> landmarks = new List<RaidLandmarkRule>();
+    [Tooltip("How many landmarks, least and most, on a map of the normal size.")]
+    [SerializeField] private Vector2Int landmarkCount = Vector2Int.zero;
+
+    [Header("Ravine Descents")]
+    [Tooltip("What waits on the floor of a ravine with a way down (the mood's Ravine Descents), one site of each.")]
+    [SerializeField] private List<RaidSiteKind> descentSites = new List<RaidSiteKind> { RaidSiteKind.ResourceSite, RaidSiteKind.SupplyCache };
+
+    [Header("Preparing Ahead")]
+    [Tooltip("Metres across the raid's map at its normal size, so the raid planner can lay out the run while the player gets ready. " +
+             "Must match the map's own size, or the run is laid out again on loading.")]
+    [SerializeField, Min(50f)] private float mapSize = 200f;
+
     [Header("Forest")]
     [Tooltip("How dense the forest grows, 0 to 1, before the mood.")]
     [SerializeField, Range(0f, 1f)] private float forestDensity = 0.8f;
@@ -276,12 +341,16 @@ public sealed class RaidLayoutRules : ScriptableObject
         copy.greatHills = new Vector2Int(Mathf.RoundToInt(greatHills.x * area), Mathf.RoundToInt(greatHills.y * area));
         copy.boulderClusters = new Vector2Int(Mathf.RoundToInt(boulderClusters.x * area), Mathf.RoundToInt(boulderClusters.y * area));
         copy.lookouts = Mathf.RoundToInt(lookouts * area);
+        copy.scaledUp = true;
+        copy.surfaceRivers = new Vector2Int(Mathf.RoundToInt(surfaceRivers.x * width), Mathf.RoundToInt(surfaceRivers.y * width));
+        copy.landmarkCount = new Vector2Int(Mathf.RoundToInt(landmarkCount.x * area), Mathf.RoundToInt(landmarkCount.y * area));
         copy.fieldResolution = Mathf.Min(MaxFieldResolution, Mathf.RoundToInt(fieldResolution * width));
         // Ravines and spires stand on the land like clearings do: as many on every square metre.
         foreach (RaidMapMood mood in copy.moods)
         {
             mood.ravines = new Vector2Int(Mathf.RoundToInt(mood.ravines.x * area), Mathf.RoundToInt(mood.ravines.y * area));
             mood.spires = new Vector2Int(Mathf.RoundToInt(mood.spires.x * area), Mathf.RoundToInt(mood.spires.y * area));
+            mood.ravineDescents = Mathf.RoundToInt(mood.ravineDescents * width);
         }
 
         copy.sites = new List<RaidSiteQuota>(sites.Count);
@@ -301,6 +370,8 @@ public sealed class RaidLayoutRules : ScriptableObject
                 fromStart = quota.fromStart,
                 offPath = quota.offPath,
                 clearing = quota.clearing,
+                prefersHeight = quota.prefersHeight,
+                overlooksRamps = quota.overlooksRamps,
             });
         }
 
@@ -340,6 +411,21 @@ public sealed class RaidLayoutRules : ScriptableObject
     public Material WaterfallMaterial => waterfallMaterial;
     public GameObject WaterfallPlunge => waterfallPlunge;
     public Vector2 HillVariance => hillVariance;
+    /// <summary>How many regions this map has, least and most: the large-map setting on a scaled copy, otherwise one.</summary>
+    public Vector2Int Regions => scaledUp ? largeRegions : Vector2Int.one;
+    public Vector2Int LargeRegions => largeRegions;
+    public float RegionBlend => regionBlend;
+    public bool TwoRoutes => twoRoutes;
+    public bool CampsOnShortRoute => campsOnShortRoute;
+    public Vector2Int SurfaceRivers => surfaceRivers;
+    public Vector2 SurfaceRiverWidth => surfaceRiverWidth;
+    public Vector2 SurfaceRiverDepth => surfaceRiverDepth;
+    public float FordDepth => fordDepth;
+    public Vector2 SurfaceRiverLength => surfaceRiverLength;
+    public IReadOnlyList<RaidLandmarkRule> Landmarks => landmarks;
+    public Vector2Int LandmarkCount => landmarkCount;
+    public IReadOnlyList<RaidSiteKind> DescentSites => descentSites;
+    public float MapSize => mapSize;
     public Vector2Int GreatHills => greatHills;
     public Vector2 GreatHillHeight => greatHillHeight;
     public Vector2 GreatHillRadius => greatHillRadius;
@@ -391,6 +477,33 @@ public sealed class RaidLayoutRules : ScriptableObject
         ravineCrags = crags;
         waterfallMaterial = falls;
         waterfallPlunge = plunge;
+    }
+
+    /// <summary>Sets up regions, routes, rivers and landmarks (builders and tests).</summary>
+    public void ConfigureVariety(Vector2Int regionCount, float blend, bool routes, Vector2Int rivers, Vector2 riverWidth, Vector2 riverDepth,
+        IEnumerable<RaidLandmarkRule> landmarkRules, Vector2Int landmarksWanted)
+    {
+        largeRegions = regionCount;
+        regionBlend = blend;
+        twoRoutes = routes;
+        surfaceRivers = rivers;
+        surfaceRiverWidth = riverWidth;
+        surfaceRiverDepth = riverDepth;
+        landmarks = new List<RaidLandmarkRule>(landmarkRules);
+        landmarkCount = landmarksWanted;
+    }
+
+    /// <summary>Sets how a site kind is placed by height (builders and tests).</summary>
+    public void ConfigureSiteHeights(RaidSiteKind kind, bool high, bool overRamps)
+    {
+        foreach (RaidSiteQuota quota in sites)
+        {
+            if (quota != null && quota.kind == kind)
+            {
+                quota.prefersHeight = high;
+                quota.overlooksRamps = overRamps;
+            }
+        }
     }
 
     /// <summary>Sets up hills, boulders and lookouts (builders and tests).</summary>

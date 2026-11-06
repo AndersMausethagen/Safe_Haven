@@ -657,6 +657,7 @@ MonoBehaviour:
   - rid: 287757967972106340
   - rid: 287758281410609305
   - rid: 287758281410609374
+  - rid: 2623125911485546600
   roaming:
     table: {fileID: 11400000, guid: 55a919693f726634aa952bc05b8ac3a3, type: 2}
     firstDelay: 60
@@ -774,3 +775,11 @@ MonoBehaviour:
         - {fileID: 11400000, guid: 7758a38b52d47ac43a3b6d8004cb0661, type: 2}
         - {fileID: 11400000, guid: 808a7382a9be2604c94b30f4f300696b, type: 2}
         count: 2
+    - rid: 2623125911485546600
+      type: {class: TerrainEventsSystem, ns: , asm: SafeHaven}
+      data:
+        enabled: 1
+        rockfallStage: 2
+        rockfalls: 1
+        mistStage: 3
+        mistThickens: 2

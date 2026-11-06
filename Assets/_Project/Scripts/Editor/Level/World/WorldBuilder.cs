@@ -1061,6 +1061,8 @@ public static class WorldBuilder
         stash.RemoveDetails(released);
     }
 
+    private const float TreeClearMargin = 6f;
+
     private static void ClearTrees(Terrain terrain, WorldTerrainStash stash, List<FeatureBuilder> builders)
     {
         TerrainData data = terrain.terrainData;
@@ -1072,7 +1074,29 @@ public static class WorldBuilder
         Vector3 origin = terrain.transform.position;
         Vector3 size = data.size;
         Vector2 World(Vector3 normalised) => new Vector2(origin.x + normalised.x * size.x, origin.z + normalised.z * size.z);
-        bool Cleared(Vector3 normalised) => builders.Any(b => b.ClearsTree(World(normalised)));
+        // A tree is only asked of the features whose footprint holds it: on a large terrain with many trees, asking every feature's line
+        // about every tree took minutes (150 000 trees, 46 features: 177 s).
+        var footprints = new List<(FeatureBuilder builder, Rect area)>(builders.Count);
+        foreach (FeatureBuilder builder in builders)
+        {
+            Rect area = FlatRect(builder.Feature.WorldBounds());
+            float margin = builder.Feature.Reach + TreeClearMargin;
+            footprints.Add((builder, Rect.MinMaxRect(area.xMin - margin, area.yMin - margin, area.xMax + margin, area.yMax + margin)));
+        }
+
+        bool Cleared(Vector3 normalised)
+        {
+            Vector2 point = World(normalised);
+            foreach ((FeatureBuilder builder, Rect area) in footprints)
+            {
+                if (area.Contains(point) && builder.ClearsTree(point))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
 
         var kept = new List<TreeInstance>();
         var stashed = new List<WorldTerrainStash.StashedTree>();

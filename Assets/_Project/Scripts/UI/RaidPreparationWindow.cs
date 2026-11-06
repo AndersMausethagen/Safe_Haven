@@ -236,8 +236,9 @@ public sealed class RaidPreparationWindow : MonoBehaviour
         companion = null;
         large = false;
         // Rolled now, so the briefing shows the hour (and layout) the raid will really have.
-        pendingSeed = RaidSession.NewSeed();
+        pendingSeed = FreshSeed(Destination);
         large = LargeByDefault(Destination);
+        RaidLayoutPrefetch.Prepare(Destination, pendingSeed, large);
         Watch(user != null ? user.GetComponentInParent<ItemInventory>() : null);
         // The text is measured to lay the columns out, and text can only be measured once its objects are awake.
         window.Open();
@@ -357,10 +358,64 @@ public sealed class RaidPreparationWindow : MonoBehaviour
         destinationIndex = index;
         difficulty = null;
         large = LargeByDefault(Destination);
+        RaidLayoutPrefetch.Prepare(Destination, pendingSeed, large);
         Refresh();
     }
 
+    // A run unlike the last one: a different mood or shape, where the raid has more than one.
+    private static int FreshSeed(RaidDefinition raid)
+    {
+        int seed = RaidSession.NewSeed();
+        if (raid == null || raid.LayoutRules == null || RaidLauncher.LastRun.raid != raid.Id)
+        {
+            return seed;
+        }
+
+        for (int tries = 0; tries < 20; tries++)
+        {
+            (RaidShapeRule shape, RaidMapMood mood) = RaidLayoutPlanner.Choose(raid.LayoutRules, seed);
+            if (mood.name != RaidLauncher.LastRun.mood || shape.shape != RaidLauncher.LastRun.shape)
+            {
+                return seed;
+            }
+
+            seed = RaidSession.NewSeed();
+        }
+
+        return seed;
+    }
+
     // A run whose mood is made for a large map (the ravine country) is offered large first; the player can still pick Normal.
+    // A large map's other regions, named after the run's own.
+    private string Beyond(RaidDefinition raid)
+    {
+        if (!large || !raid.CanBeLarge)
+        {
+            return "";
+        }
+
+        List<RaidMapMood> moods = RaidLayoutPlanner.RegionMoods(raid.LayoutRules, pendingSeed, raid.LayoutRules.LargeRegions);
+        if (moods.Count <= 1)
+        {
+            return "";
+        }
+
+        var others = new List<string>();
+        for (int i = 1; i < moods.Count; i++)
+        {
+            others.Add(moods[i].name);
+        }
+
+        return $" Further off: {string.Join(" and ", others)}.";
+    }
+
+    // Once the run is laid out ahead (RaidLayoutPrefetch), whether there is a long way round as well as the short one.
+    private string RoutesLine(RaidDefinition raid)
+    {
+        RaidLayoutPlan plan = RaidLayoutPrefetch.Peek(raid, pendingSeed);
+        return plan != null && plan.LongRoute.Count > 0 ? " Two ways lead to the beacon ahead: the short one is watched, the long one quieter." : "";
+    }
+
     private bool LargeByDefault(RaidDefinition raid)
     {
         if (raid == null || !raid.CanBeLarge || raid.LayoutRules == null)
@@ -381,6 +436,7 @@ public sealed class RaidPreparationWindow : MonoBehaviour
     private void ToggleSize()
     {
         large = !large;
+        RaidLayoutPrefetch.Prepare(Destination, pendingSeed, large);
         Refresh();
     }
 
@@ -571,7 +627,7 @@ public sealed class RaidPreparationWindow : MonoBehaviour
         {
             (RaidShapeRule shape, RaidMapMood mood) = RaidLayoutPlanner.Choose(raid.LayoutRules, pendingSeed);
             moodChip.Show(mood.name, x, chips);
-            moodDetail = $"{mood.briefing} {shape.briefing}";
+            moodDetail = $"{mood.briefing} {shape.briefing}{Beyond(raid)}{RoutesLine(raid)}";
             anyChip = true;
         }
 

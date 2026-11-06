@@ -109,6 +109,9 @@ public static class RaidLauncher
     public static bool CanGoAlong(ResidentDefinition person) =>
         person != null && person.RaidCompanion != null && GameSession.Settlement.Find(person) != null;
 
+    /// <summary>The raid, mood and shape of the last run started this session, so the next briefing can offer a different one.</summary>
+    public static (string raid, string mood, RaidLayoutShape shape) LastRun { get; private set; }
+
     public static bool TryLaunch(RaidDefinition raid, GameObject player, IEnumerable<ItemDefinition> modifierItems, out string problem,
         int sparks = 0, int? seed = null, RaidDifficulty difficulty = null, ResidentDefinition companion = null, bool large = false)
     {
@@ -182,6 +185,12 @@ public static class RaidLauncher
             IsLarge = large && raid.CanBeLarge,
             Foretold = RaidForecast.For(raid, runSeed, HavenReadiness.ForetoldEvents),
         };
+        if (raid.LayoutRules != null)
+        {
+            (RaidShapeRule shape, RaidMapMood mood) = RaidLayoutPlanner.Choose(raid.LayoutRules, runSeed);
+            LastRun = (raid.Id, mood.name, shape.shape);
+        }
+
         GameSession.BeginRaid(session);
         GameSession.CarryPlayerState(loadout);
 

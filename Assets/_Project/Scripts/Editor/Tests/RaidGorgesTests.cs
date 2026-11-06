@@ -71,7 +71,9 @@ public sealed class RaidGorgesTests
             AssertTrailsWalkable(plan, field, seed);
             foreach (RaidSite site in plan.Sites)
             {
-                Assert.IsFalse(field.KeepsClear(site.Position * Size), $"seed {seed}: {site} stands in a ravine or on a spire");
+                // The finds at the bottom of a ravine with a way down are meant to be there.
+                bool onDescentFloor = plan.OverRavine(site.Position * Size, out RaidLayoutRavine ravine, out _) && ravine.Descent;
+                Assert.IsTrue(onDescentFloor || !field.KeepsClear(site.Position * Size), $"seed {seed}: {site} stands in a ravine or on a spire");
             }
 
             foreach (RaidLayoutBoulder boulder in plan.Boulders)
@@ -106,6 +108,84 @@ public sealed class RaidGorgesTests
 
             AssertTrailsWalkable(plan, RaidLayoutField.Build(plan, Rules), seed);
         }
+    }
+
+    [Test]
+    public void EveryMap_HasTwoWaysToTheExitAhead()
+    {
+        foreach (bool gorges in new[] { false, true })
+        {
+            foreach (int seed in SeedsOf(Rules, gorges, 4))
+            {
+                RaidLayoutPlan plan = RaidLayoutPlanner.Plan(Rules, Size, seed);
+                Assert.GreaterOrEqual(plan.MainExit, 0, $"seed {seed}");
+                Assert.Greater(plan.ShortRoute.Count, 0, $"seed {seed}");
+                Assert.Greater(plan.LongRoute.Count, 0, $"seed {seed}: only one way to the exit ahead");
+            }
+        }
+    }
+
+    [Test]
+    public void LargeMaps_HaveRegionsOfTheirOwnMood_AndRunsAreRepeatable()
+    {
+        RaidLayoutRules large = Rules.ScaledBy(2f);
+        try
+        {
+            int seed = RaidLayoutPlanner.FindSeed(large, (shape, mood) => mood.name != Gorges, 77).Value;
+            RaidLayoutPlan plan = RaidLayoutPlanner.Plan(large, Size * 2f, seed);
+            Assert.GreaterOrEqual(plan.Regions.Count, 2);
+            Assert.AreEqual(plan.Mood.name, plan.MoodAt(plan.Start.Position).name, "The start lies in the run's own mood");
+            RaidLayoutPlan again = RaidLayoutPlanner.Plan(large, Size * 2f, seed);
+            Assert.AreEqual(plan.Rooms.Count, again.Rooms.Count);
+            Assert.AreEqual(plan.Rivers.Count, again.Rivers.Count);
+            Assert.AreEqual(plan.Landmarks.Count, again.Landmarks.Count);
+            Assert.AreEqual(plan.Regions[1].Mood.name, again.Regions[1].Mood.name);
+        }
+        finally
+        {
+            Object.DestroyImmediate(large);
+        }
+    }
+
+    [Test]
+    public void Rivers_KeepOffSites_AndRunDownhill()
+    {
+        int rivers = 0;
+        foreach (int seed in SeedsOf(Rules, false, 10))
+        {
+            RaidLayoutPlan plan = RaidLayoutPlanner.Plan(Rules, Size, seed);
+            RaidLayoutField.Build(plan, Rules);
+            foreach (RaidLayoutRiver river in plan.Rivers)
+            {
+                rivers++;
+                for (int i = 1; i < river.Level.Length; i++)
+                {
+                    Assert.LessOrEqual(river.Level[i], river.Level[i - 1] + 0.001f, $"seed {seed}: a river runs uphill");
+                }
+            }
+
+            foreach (RaidSite site in plan.Sites)
+            {
+                Assert.IsFalse(plan.InRiver(site.Position * Size), $"seed {seed}: {site} stands in a river");
+            }
+        }
+
+        Assert.Greater(rivers, 0, "Ten maps without a river");
+    }
+
+    [Test]
+    public void TheRaids_RunTerrainEvents()
+    {
+        var raid = AssetDatabase.LoadAssetAtPath<RaidDefinition>("Assets/_Project/Data/Raids/MistyWoods.asset");
+        var data = new SerializedObject(raid);
+        SerializedProperty systems = data.FindProperty("systems");
+        bool found = false;
+        for (int i = 0; i < systems.arraySize; i++)
+        {
+            found |= systems.GetArrayElementAtIndex(i).managedReferenceValue is TerrainEventsSystem;
+        }
+
+        Assert.IsTrue(found, "Run AgentScripts/BuildRaidGorges.cs");
     }
 
     [Test]
