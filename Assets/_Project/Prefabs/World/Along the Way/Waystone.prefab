@@ -9,6 +9,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3533223975579529669}
+  - component: {fileID: 3580142695841801848}
+  - component: {fileID: 1109816507980387951}
+  - component: {fileID: 3218063306415200141}
   m_Layer: 0
   m_Name: Waystone
   m_TagString: Untagged
@@ -36,6 +39,85 @@ Transform:
   - {fileID: 2266035866796598770}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3580142695841801848
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6253381937994354546}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f655434a56283ac419a02d53bb587f9e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::Interactable
+  animationType: 2
+  duration: 1.2
+  range: 2.4
+  deactivateOnComplete: 0
+  kind: 0
+  started:
+    m_PersistentCalls:
+      m_Calls: []
+  completed:
+    m_PersistentCalls:
+      m_Calls: []
+  cancelled:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!136 &1109816507980387951
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6253381937994354546}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.8
+  m_Height: 2.6
+  m_Direction: 1
+  m_Center: {x: 0, y: 1.2, z: 0}
+--- !u!114 &3218063306415200141
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6253381937994354546}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e5f5e9a3dd4c4b4ba679d4916e42c86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::OfferingStone
+  favourName: The Forest's Favour
+  verb: Leave an offering
+  bonuses:
+  - stat: 18
+    op: 1
+    value: 0.1
+  - stat: 16
+    op: 1
+    value: 0.05
+  seconds: 480
+  restSeconds: 1200
+  accepted: {fileID: 11400000, guid: 70e75b41d80488c45a90324315dbe262, type: 2}
+  acceptedLines:
+  - The wind turns in the trees, and the path seems easier.
+  - Something small takes it while you aren't looking.
+  - The moss on the stone is warm under your hand.
+  emptyHanded: The stone wants something to eat. You have nothing to leave.
+  alreadyGiven: Your last offering still lies on the stone.
 --- !u!1001 &3672842924143344
 PrefabInstance:
   m_ObjectHideFlags: 0

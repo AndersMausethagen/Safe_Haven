@@ -800,7 +800,7 @@ public static class HavenWorldGenerator
         Terrain terrain = Terrain.activeTerrain;
         HavenWorldPlan plan = HavenWorldPlan.Make(recipe);
         Transform content = ContentRoot();
-        foreach (string name in new[] { "Points of Interest", "Spawn Zones", "Resources", "Mountain Rocks", "Glades", "Along the Way" })
+        foreach (string name in new[] { "Points of Interest", "Spawn Zones", "Resources", "Mountain Rocks", "Glades", "Along the Way", "Wildlife" })
         {
             Transform old = content.Find(name);
             if (old != null)
@@ -958,6 +958,7 @@ public static class HavenWorldGenerator
         }
 
         int along = PlaceAlongTheWay(plan, terrain, content, Ground, footprints);
+        int herds = PlaceWildlife(plan, content, Ground);
         int cleared = ClearTreesUnder(terrain, footprints);
 
         // Felled trees in the woods are kept in the save (TerrainTreeMemory), on the terrain's own saveable entity.
@@ -982,7 +983,7 @@ public static class HavenWorldGenerator
         GrassSetup.BakeGroundColour(terrain);
         string navmesh = WorldBuilder.RebakeNavMesh();
         EditorSceneManager.MarkSceneDirty(terrain.gameObject.scene);
-        return $"Placed {plan.Pois.Count} places, {plan.Zones.Count} spawn zones, {plan.Nodes.Count} resource points, {marked} glade landmarks, {along} scenes, markers, dressing and rim stones, {plan.Rocks.Count} mountain rocks ({cleared} trees cleared from under them) in {placed} ms; moss, displacement, " +
+        return $"Placed {plan.Pois.Count} places, {plan.Zones.Count} spawn zones, {plan.Nodes.Count} resource points, {marked} glade landmarks, {along} scenes, markers, dressing and rim stones, {herds} wildlife herds, {plan.Rocks.Count} mountain rocks ({cleared} trees cleared from under them) in {placed} ms; moss, displacement, " +
                $"ground colour and navmesh ({navmesh}) in {clock.ElapsedMilliseconds - placed} ms.";
     }
 
@@ -1082,6 +1083,60 @@ public static class HavenWorldGenerator
         }
 
         return placed;
+    }
+
+    // Deer and stags graze the open glades and the Haven's groves at dawn and dusk; foxes keep to the rocky glades and lairs
+    // from dusk. Each herd only makes its animals while the player is near (WildlifeHerd).
+    private static int PlaceWildlife(HavenWorldPlan plan, Transform content, System.Func<Vector2, Vector3> ground)
+    {
+        HavenWorldRecipe recipe = plan.Recipe;
+        var root = new GameObject("Wildlife").transform;
+        root.SetParent(content, false);
+        var random = new System.Random(plan.Seed + 433);
+        var dawnAndDusk = new AnimationCurve(new Keyframe(0f, 0.15f), new Keyframe(4.5f, 0.6f), new Keyframe(6.5f, 1f), new Keyframe(9.5f, 0.5f),
+                                             new Keyframe(13f, 0.3f), new Keyframe(17f, 0.6f), new Keyframe(19.5f, 1f), new Keyframe(22f, 0.4f), new Keyframe(24f, 0.15f));
+        var night = new AnimationCurve(new Keyframe(0f, 1f), new Keyframe(5f, 0.8f), new Keyframe(7f, 0.1f), new Keyframe(17f, 0.1f),
+                                       new Keyframe(19f, 0.9f), new Keyframe(24f, 1f));
+        int made = 0;
+
+        void Herd(string name, List<Wildlife> kinds, Vector2 at, float radius, Vector2Int count, AnimationCurve hours)
+        {
+            if (kinds == null || kinds.Count == 0)
+            {
+                return;
+            }
+
+            var go = new GameObject(name);
+            go.transform.SetParent(root, false);
+            go.transform.position = ground(at);
+            go.AddComponent<WildlifeHerd>().Configure(kinds, count, radius, hours);
+            made++;
+        }
+
+        foreach (HavenWorldPlan.Glade glade in plan.Glades)
+        {
+            if (glade.Kind == HavenWorldPlan.GladeKind.Meadow || glade.Kind == HavenWorldPlan.GladeKind.Wet)
+            {
+                Herd($"Grazers ({glade.Kind} Glade)", recipe.grazers, glade.Centre, glade.Radius * 0.6f, new Vector2Int(2, 4), dawnAndDusk);
+            }
+            else if (random.NextDouble() < 0.5)
+            {
+                Herd($"Fox ({glade.Kind} Glade)", recipe.foxes, glade.Centre, glade.Radius * 0.6f, new Vector2Int(1, 1), night);
+            }
+        }
+
+        foreach (List<Vector2> grove in plan.Groves)
+        {
+            Vector2 centre = Vector2.zero;
+            foreach (Vector2 point in grove)
+            {
+                centre += point;
+            }
+
+            Herd("Grazers (Grove)", recipe.grazers, centre / Mathf.Max(1, grove.Count), 14f, new Vector2Int(1, 3), dawnAndDusk);
+        }
+
+        return made;
     }
 
     // Walks out from a ravine's floor to where the ground stops falling away: its lip.

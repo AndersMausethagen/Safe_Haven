@@ -55,6 +55,7 @@ Material:
     - _BumpScale: 1
     - _Cull: 0
     - _Cutoff: 0.3
+    - _Deciduous: 0
     - _FastLeafLighting: 0
     - _MaskHDRP: 0
     - _Metallic: 0

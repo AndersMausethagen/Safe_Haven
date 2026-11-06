@@ -52,6 +52,42 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics
         }
 
         life.Settle(homePosition, homeRotation, GameSession.Settlement.Find(who) is ResidentRecord record ? IndexOf(record) : 0);
+        // A lantern after dark, and a word in passing: the village lived in.
+        if (!TryGetComponent(out ResidentLantern _))
+        {
+            gameObject.AddComponent<ResidentLantern>();
+        }
+
+        if (!TryGetComponent(out ResidentAsides _))
+        {
+            gameObject.AddComponent<ResidentAsides>();
+        }
+    }
+
+    /// <summary>What there is to say of late, in passing (a loss, a boss beaten, someone home who doesn't know us), or null.</summary>
+    public string News()
+    {
+        if (resident == null)
+        {
+            return null;
+        }
+
+        string news = Grief() ?? BossTalk();
+        if (news != null)
+        {
+            return news;
+        }
+
+        SettlementSettings settings = SettlementSettings.Current;
+        foreach (ResidentRecord other in GameSession.Settlement.Residents)
+        {
+            if (other.Resident != resident && other.IsStranger && settings.HomecomingAsides.Length > 0)
+            {
+                return string.Format(settings.HomecomingAsides[CompanionBond.StableIndex(resident.Id, settings.HomecomingAsides.Length)], other.Resident.DisplayName);
+            }
+        }
+
+        return null;
     }
 
     private static int IndexOf(ResidentRecord record)

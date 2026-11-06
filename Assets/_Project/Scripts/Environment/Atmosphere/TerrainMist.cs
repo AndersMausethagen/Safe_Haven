@@ -54,6 +54,8 @@ public sealed class TerrainMist : MonoBehaviour
     [SerializeField, Range(0f, 1f)] private float weatherAmount = 1f;
     [Tooltip("Mist amount at dawn/dusk golden hour, reduced by cloud cover. Independent of global fog.")]
     [SerializeField, Range(0f, 1f)] private float goldenHourAmount = 1f;
+    [Tooltip("Mist amount in the morning: it pools in the hollows before dawn and burns off by mid-morning (AtmosphereConditions.Morning).")]
+    [SerializeField, Range(0f, 1f)] private float morningAmount = 0f;
     [Tooltip("0 keeps authored drift speed. 1 follows the blended weather's Wind multiplier (storm moves faster).")]
     [SerializeField, Range(0f, 1f)] private float weatherWindInfluence = 1f;
 
@@ -73,10 +75,14 @@ public sealed class TerrainMist : MonoBehaviour
     public Vector4 Pooling => new Vector4(lowlandBoost, Mathf.Max(0.1f, poolingDepth), waterBoost, 0f);
     public float EdgeFade => Mathf.Max(0.1f, edgeFade);
     public float WeatherWindInfluence => weatherWindInfluence;
-    public float EffectiveDensity => density * EvaluateAmount(
+    public float EffectiveDensity => density * Mathf.Max(EvaluateAmount(
         AtmosphereConditions.WeatherOnlyAtmosphere ? 0f : baseAmount, weatherAmount,
         AtmosphereConditions.WeatherOnlyAtmosphere ? 0f : goldenHourAmount,
-        AtmosphereConditions.WeatherMist, AtmosphereConditions.GoldenHour);
+        AtmosphereConditions.WeatherMist, AtmosphereConditions.GoldenHour),
+        AtmosphereConditions.WeatherOnlyAtmosphere ? 0f : morningAmount * AtmosphereConditions.Morning);
+
+    /// <summary>Sets how much morning mist this layer gathers (BuildLivingWorld).</summary>
+    public void SetMorningAmount(float amount) => morningAmount = Mathf.Clamp01(amount);
 
     public static float EvaluateAmount(float baseline, float weatherContribution, float goldenContribution,
         float weatherMist, float goldenHour) =>

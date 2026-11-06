@@ -15,6 +15,14 @@ public static class AtmosphereConditions
     /// <summary>How hard it rains, 0-1. Set by WeatherSystem; rain hides the player's noise.</summary>
     public static float WeatherRain { get; set; }
     public static float GoldenHour { get; set; }
+    /// <summary>The hour of the day (0-24) as the day-night cycle last drew it; 12 without one.</summary>
+    public static float Hour { get; set; } = 12f;
+    /// <summary>Morning mist, 0 to 1: rising before dawn, thickest about first light, burnt off by mid-morning (MorningAt).</summary>
+    public static float Morning { get; set; }
+
+    /// <summary>How much morning mist an hour has: pooling from 3, thickest 5:30 to 7, gone by 10.</summary>
+    public static float MorningAt(float hour) =>
+        hour < 3f || hour > 10f ? 0f : hour < 5.5f ? Mathf.SmoothStep(0f, 1f, (hour - 3f) / 2.5f) : hour < 7f ? 1f : 1f - Mathf.SmoothStep(0f, 1f, (hour - 7f) / 3f);
     public static bool WeatherOnlyAtmosphere { get; set; }
 
     public static float FogMultiplier(float influence) =>
@@ -39,6 +47,8 @@ public static class AtmosphereConditions
         WeatherMist = 0f;
         WeatherRain = 0f;
         GoldenHour = 0f;
+        Hour = 12f;
+        Morning = 0f;
         WeatherOnlyAtmosphere = false;
         FogDensity = 0f;
         Night = 0f;

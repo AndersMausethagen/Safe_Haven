@@ -248,6 +248,9 @@ public sealed class DayNightCycle : MonoBehaviour, ISaveable
         RenderSettings.fogDensity = state.FogDensity * sky.Fog;
         AtmosphereConditions.GoldenHour = state.GoldenHour * (1f - sky.Clouds);
         AtmosphereConditions.Night = state.Night;
+        AtmosphereConditions.Hour = Hour;
+        // Wind and rain stir the morning mist away; a still clear dawn keeps it.
+        AtmosphereConditions.Morning = AtmosphereConditions.MorningAt(Hour) * (1f - 0.6f * AtmosphereConditions.WeatherRain);
         RenderSettings.reflectionIntensity = state.Reflection * (1f - 0.4f * sky.Clouds);
 
         if (nightVolume != null)

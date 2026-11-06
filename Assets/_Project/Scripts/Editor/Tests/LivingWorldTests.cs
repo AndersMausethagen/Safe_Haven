@@ -3,7 +3,7 @@ using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;
 
-/// <summary>The rules behind how creatures live and close in, how companions fight and speak, and how residents spend the day.</summary>
+/// <summary>The rules behind how creatures live and close in, how companions fight and speak, how residents spend the day, and how the year and the morning turn.</summary>
 public sealed class LivingWorldTests
 {
     // ----- Creatures -----
@@ -205,5 +205,81 @@ public sealed class LivingWorldTests
         Assert.NotNull(SettlementSettings.Current.ResidentGatheringPlace);
         Assert.NotNull(SettlementSettings.Current.ResidentSleepGesture);
         Assert.Greater(SettlementSettings.Current.ResidentFireGestures.Length, 0);
+    }
+
+    // ----- The world round the Haven -----
+
+    [Test]
+    public void MorningMist_RisesBeforeDawnAndBurnsOffByMidMorning()
+    {
+        Assert.AreEqual(0f, AtmosphereConditions.MorningAt(1f), 0.001f, "No morning mist in the dead of night.");
+        Assert.AreEqual(1f, AtmosphereConditions.MorningAt(6f), 0.001f, "Thickest about first light.");
+        Assert.Greater(AtmosphereConditions.MorningAt(4.5f), 0f, "Rising before dawn.");
+        Assert.AreEqual(0f, AtmosphereConditions.MorningAt(11f), 0.001f, "Burnt off by mid-morning.");
+        Assert.AreEqual(0f, AtmosphereConditions.MorningAt(15f), 0.001f);
+    }
+
+    [Test]
+    public void SeasonCycle_HoldsEachSeasonThenTurnsIntoTheNextAndWrapsTheYear()
+    {
+        var cycle = ScriptableObject.CreateInstance<SeasonCycle>();
+        try
+        {
+            cycle.Configure(new List<SeasonCycle.Season>
+            {
+                new SeasonCycle.Season { name = "Summer", days = 10 },
+                new SeasonCycle.Season { name = "Autumn", days = 6, autumn = 1f, leafFall = 0.2f },
+                new SeasonCycle.Season { name = "Winter", days = 4, autumn = 1f, leafFall = 1f, frost = 1f },
+            }, 2);
+
+            cycle.At(3f, out SeasonCycle.Season season, out SeasonCycle.Season next, out float turned);
+            Assert.AreEqual("Summer", season.name);
+            Assert.AreEqual("Autumn", next.name);
+            Assert.AreEqual(0f, turned, 0.001f, "Mid-season does not turn yet.");
+            Assert.AreEqual(Vector3.zero, cycle.LookAt(3f));
+
+            Vector3 turning = cycle.LookAt(9f);
+            Assert.That(turning.x, Is.GreaterThan(0f).And.LessThan(1f), "The last days blend into the next season.");
+
+            Assert.AreEqual(new Vector3(1f, 0.2f, 0f), cycle.LookAt(12f));
+            cycle.At(17f, out season, out next, out _);
+            Assert.AreEqual("Winter", season.name);
+            Assert.AreEqual("Summer", next.name, "Winter turns back into summer.");
+            Assert.AreEqual(cycle.LookAt(3f), cycle.LookAt(23f), "The year wraps round after 20 days.");
+        }
+        finally
+        {
+            Object.DestroyImmediate(cycle);
+        }
+    }
+
+    [Test]
+    public void SeasonCycle_WithoutSeasonsLooksLikeSummer()
+    {
+        var cycle = ScriptableObject.CreateInstance<SeasonCycle>();
+        try
+        {
+            Assert.AreEqual(Vector3.zero, cycle.LookAt(5f));
+        }
+        finally
+        {
+            Object.DestroyImmediate(cycle);
+        }
+    }
+
+    [Test]
+    public void SeasonCycle_AssetRunsSummerAutumnWinterSpring()
+    {
+        var cycle = AssetDatabase.LoadAssetAtPath<SeasonCycle>("Assets/_Project/Data/World/Season Cycle.asset");
+        Assert.IsNotNull(cycle, "BuildLivingWorld makes the Season Cycle asset.");
+        Assert.GreaterOrEqual(cycle.Seasons.Count, 4);
+        Assert.AreEqual(0f, cycle.Seasons[0].frost, "The year begins in a frostless summer.");
+        float winter = 0f;
+        foreach (SeasonCycle.Season season in cycle.Seasons)
+        {
+            winter = Mathf.Max(winter, season.frost);
+        }
+
+        Assert.Greater(winter, 0.5f, "Some season frosts the leaves.");
     }
 }

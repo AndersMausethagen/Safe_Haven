@@ -19,6 +19,7 @@ GameObject:
   - component: {fileID: 5642312310732878528}
   - component: {fileID: 8250846377068209275}
   - component: {fileID: 3306141640346260197}
+  - component: {fileID: 3574627672694961564}
   m_Layer: 0
   m_Name: TradingPost
   m_TagString: Untagged
@@ -210,6 +211,28 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: SafeHaven::Construction
   startsRuined: 0
+--- !u!114 &3574627672694961564
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3794937291973253600}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2582949664537544eba4cb3754fc8eaa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::HearthSmoke
+  chimney: {x: 0.97999996, y: 3.7388344, z: -0.24280798}
+  puffs: 1.6
+  rise: 9
+  smoke: {fileID: 2100000, guid: e0dc5fdfe4f83b44294848291dbc9ed2, type: 2}
+  lightAt: {x: 0, y: 1.1, z: 3.3358452}
+  lightRange: 6
+  lightIntensity: 1.6
+  lightColour: {r: 1, g: 0.62, b: 0.3, a: 1}
+  drawnWithin: 70
+  livedIn: {fileID: 0}
 --- !u!1001 &5910580351166242188
 PrefabInstance:
   m_ObjectHideFlags: 0

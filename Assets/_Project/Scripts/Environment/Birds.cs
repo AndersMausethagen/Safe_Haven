@@ -79,9 +79,33 @@ public sealed class Birds : MonoBehaviour
     /// <summary>What a particle's remaining life has to be to show a picture of the sheet: the sheet plays over its life.</summary>
     public static float LifeForPicture(int picture) => 1f - (picture + 0.5f) / Pictures;
 
-    private void OnEnable() => WorldNoise.Emitted += OnNoise;
+    /// <summary>The scene's birds, if it has any (crows sent to a carcass, Aftermath).</summary>
+    public static Birds Current { get; private set; }
 
-    private void OnDisable() => WorldNoise.Emitted -= OnNoise;
+    private void OnEnable()
+    {
+        Current = this;
+        WorldNoise.Emitted += OnNoise;
+    }
+
+    private void OnDisable()
+    {
+        if (Current == this)
+        {
+            Current = null;
+        }
+
+        WorldNoise.Emitted -= OnNoise;
+    }
+
+    /// <summary>A flock comes down at a point (crows to a carcass), if it is ground they can stand on.</summary>
+    public void LandAt(Vector3 point)
+    {
+        if (profile != null && profile.FlocksFor(AtmosphereConditions.Night, AtmosphereConditions.WeatherRain) > 0)
+        {
+            Land(point, Random.insideUnitCircle.normalized);
+        }
+    }
 
     private void OnNoise(Vector3 position, float radius)
     {
@@ -174,8 +198,18 @@ public sealed class Birds : MonoBehaviour
         Vector2 way = Random.insideUnitCircle.normalized;
         Vector3 direction = new Vector3(way.x, 0f, way.y);
         Vector3 wanted = at + direction * Random.Range(profile.LandingDistance.x, Mathf.Max(profile.LandingDistance.x, profile.LandingDistance.y));
-        if (!NavMesh.SamplePosition(wanted, out NavMeshHit centre, SpotReach * 2f, NavMesh.AllAreas)
-            || (explored != null && explored.ExploredAt(centre.position) < 0.5f))
+        if (explored != null && NavMesh.SamplePosition(wanted, out NavMeshHit seen, SpotReach * 2f, NavMesh.AllAreas) && explored.ExploredAt(seen.position) < 0.5f)
+        {
+            return;
+        }
+
+        Land(wanted, way);
+    }
+
+    private void Land(Vector3 wanted, Vector2 way)
+    {
+        Vector3 direction = new Vector3(way.x, 0f, way.y);
+        if (!NavMesh.SamplePosition(wanted, out NavMeshHit centre, SpotReach * 2f, NavMesh.AllAreas))
         {
             return;
         }
@@ -226,6 +260,11 @@ public sealed class Birds : MonoBehaviour
             {
                 GoUp(flock, at);
             }
+            else if (flock.IsSettled && MonsterNear(flock.Centre, out Vector3 threat))
+            {
+                // Something coming through the trees: the birds go up ahead of it, which the player can see and hear.
+                GoUp(flock, threat);
+            }
         }
 
         if (Settled() > wanted && Time.time >= nextDeparture)
@@ -242,6 +281,30 @@ public sealed class Birds : MonoBehaviour
                 }
             }
         }
+    }
+
+    private const float MonsterStartle = 9f;
+
+    private static bool MonsterNear(Vector3 point, out Vector3 threat)
+    {
+        foreach (MonsterAI monster in MonsterAI.Active)
+        {
+            if (monster == null)
+            {
+                continue;
+            }
+
+            Vector3 offset = monster.transform.position - point;
+            offset.y = 0f;
+            if (offset.sqrMagnitude < MonsterStartle * MonsterStartle)
+            {
+                threat = monster.transform.position;
+                return true;
+            }
+        }
+
+        threat = default;
+        return false;
     }
 
     private void GoUp(BirdFlock flock, Vector3 from)

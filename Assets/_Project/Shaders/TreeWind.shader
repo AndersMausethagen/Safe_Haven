@@ -24,6 +24,7 @@ Shader "Safe Haven/Tree Wind"
         [Enum(UnityEngine.Rendering.CullMode)] _Cull ("Cull", Float) = 2
         [Toggle(_FAST_LEAF_LIGHTING)] _FastLeafLighting ("Fast Leaf Lighting (per vertex, no specular)", Float) = 0
         _Translucency ("Light Through Leaves", Range(0, 1)) = 0.5
+        [Toggle] _Deciduous ("Deciduous (turns and falls in autumn)", Float) = 0
         [Toggle(_MASK_HDRP)] _MaskHDRP ("Mask Is HDRP Layout (metallic R, occlusion G, smoothness A)", Float) = 0
         _Smoothness ("Smoothness (HDRP mask)", Range(0, 1)) = 1
         [Header(Moss Covering)]
@@ -57,7 +58,7 @@ Shader "Safe Haven/Tree Wind"
         CBUFFER_START(UnityPerMaterial)
             float4 _BaseMap_ST;
             half4 _BaseColor;
-            half _BumpScale, _OcclusionStrength, _Roughness, _Metallic, _Cutoff, _Translucency;
+            half _BumpScale, _OcclusionStrength, _Roughness, _Metallic, _Cutoff, _Translucency, _Deciduous;
             float _WindStrength, _TreeHeight;
             half4 _MossColor;
             float4 _MossRemap;
@@ -65,6 +66,30 @@ Shader "Safe Haven/Tree Wind"
         CBUFFER_END
         float4 _SafeHavenWind; // horizontal direction XZ (world), moss displacement, moss speed
         float _SafeHavenTreeWind; // tree strength (WindZone Main), 0 = still; time is real seconds like the preview
+        float4 _SafeHavenSeason; // Seasons: x autumn colour, y leaf fall, z frost (all 0 outside a season cycle)
+
+        // A tree's own number from where it stands, so each turns its own colour and drops its leaves in its own time.
+        float SeasonTreeHash()
+        {
+            float3 at = TransformObjectToWorld(float3(0, 0, 0));
+            return frac(sin(dot(floor(at.xz * 0.5), float2(12.9898, 78.233))) * 43758.5453);
+        }
+
+        // Autumn and frost on a leaf's colour; leaf fall thins the cover (only broadleaf leaves turn and fall).
+        half4 SeasonLeaf(half4 color, float2 uv)
+        {
+            float tree = SeasonTreeHash();
+            half autumn = saturate(_SafeHavenSeason.x * (0.75 + 0.5 * tree)) * _Deciduous;
+            half grey = dot(color.rgb, half3(0.3, 0.59, 0.11));
+            // Gold, orange or rust by tree, keeping the leaf's own shading.
+            half3 turned = lerp(half3(1.0, 0.7, 0.18), half3(0.9, 0.3, 0.08), tree) * (0.3 + grey * 1.9);
+            color.rgb = lerp(color.rgb, turned, autumn);
+            half fall = saturate(_SafeHavenSeason.y * (0.7 + 0.6 * tree)) * _Deciduous;
+            half spot = frac(sin(dot(floor(uv * 23.0), float2(41.3, 289.1))) * 15731.743);
+            color.a *= step(fall * 1.05, spot);
+            color.rgb = lerp(color.rgb, half3(0.8, 0.85, 0.9) * (0.45 + grey), _SafeHavenSeason.z * 0.28);
+            return color;
+        }
         float3 _LightDirection;
         float3 _LightPosition;
         struct Attributes
@@ -128,6 +153,7 @@ Shader "Safe Haven/Tree Wind"
         {
             half4 color = SAMPLE_TEXTURE2D(_BaseMap, sampler_BaseMap, uv) * _BaseColor;
             #if defined(_ALPHATEST_ON)
+                color = SeasonLeaf(color, uv);
                 clip(color.a - _Cutoff);
             #endif
             return color;
@@ -139,6 +165,7 @@ Shader "Safe Haven/Tree Wind"
         {
             half4 color = SAMPLE_TEXTURE2D(_BaseMap, sampler_BaseMap, uv) * _BaseColor;
             #if defined(_ALPHATEST_ON)
+                color = SeasonLeaf(color, uv);
                 color.a = saturate((color.a - _Cutoff) / max(fwidth(color.a), 0.0001) + 0.5);
                 clip(color.a - 0.004);
             #else

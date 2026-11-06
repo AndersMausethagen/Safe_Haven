@@ -19,6 +19,7 @@ GameObject:
   - component: {fileID: 7603510978974884310}
   - component: {fileID: 7149405379887787034}
   - component: {fileID: 9063012114996481204}
+  - component: {fileID: 1216436105421682365}
   m_Layer: 0
   m_Name: Sauna
   m_TagString: Untagged
@@ -219,6 +220,28 @@ MonoBehaviour:
     op: 0
     value: 0.1
   seconds: 600
+--- !u!114 &1216436105421682365
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4133242647791298842}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2582949664537544eba4cb3754fc8eaa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::HearthSmoke
+  chimney: {x: 0.525, y: 3.1, z: -0.325}
+  puffs: 1.6
+  rise: 9
+  smoke: {fileID: 2100000, guid: e0dc5fdfe4f83b44294848291dbc9ed2, type: 2}
+  lightAt: {x: 0, y: 1.1, z: 1.6999999}
+  lightRange: 6
+  lightIntensity: 1.6
+  lightColour: {r: 1, g: 0.62, b: 0.3, a: 1}
+  drawnWithin: 70
+  livedIn: {fileID: 0}
 --- !u!1001 &4029819512849758219
 PrefabInstance:
   m_ObjectHideFlags: 0

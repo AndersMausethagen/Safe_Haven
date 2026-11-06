@@ -80,6 +80,7 @@ Shader "Safe Haven/Grass"
         // Withered ground (WitherSpot, from story graphs): world XZ, radius, how withered (0-1).
         float4 _SafeHavenWither[4];
         float _SafeHavenWitherCount;
+        float4 _SafeHavenSeason; // Seasons: x autumn (the grass yellows), z frost
         float _GrassInteractorCount;
         TEXTURE2D(_GrassFootprint0); SAMPLER(sampler_GrassFootprint0);
         TEXTURE2D(_GrassFootprint1);
@@ -243,6 +244,10 @@ Shader "Safe Haven/Grass"
                 float near = 1.0 - smoothstep(spot.z * 0.55, spot.z, distance(rootWS.xz, spot.xy));
                 colour = lerp(colour, half3(0.33, 0.24, 0.12) * lerp(0.55, 1.0, tip), saturate(near * spot.w));
             }
+            // The year: autumn yellows it, in patches; frost whitens the tips.
+            half autumn = _SafeHavenSeason.x * smoothstep(0.2, 0.7, Noise(rootWS.xz / 6.0 + 31.0) + 0.25);
+            colour = lerp(colour, half3(0.62, 0.52, 0.26) * lerp(0.65, 1.0, tip), saturate(autumn * 0.7));
+            colour = lerp(colour, half3(0.8, 0.84, 0.88), saturate(_SafeHavenSeason.z * 0.6 * (0.4 + 0.6 * tip)));
             half clump = Noise(rootWS.xz / max(_ClumpScale, 0.05) + 17.0);
             colour *= 1 - GrassFootprint(rootWS.xz).y;
             return colour * (1.0 + (input.color.g - 0.5) * 2.0 * _BladeVariation) * lerp(0.85, 1.12, clump);

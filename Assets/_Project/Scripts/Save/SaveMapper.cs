@@ -160,6 +160,7 @@ public static class SaveMapper
         into.wardLevel = settlement.WardLevel;
         into.havenRank = settlement.HavenRank;
         into.successfulExtractions = settlement.SuccessfulExtractions;
+        into.daysPassed = settlement.DaysPassed;
         into.breach = (int)settlement.Breach;
         into.breachesWon = settlement.BreachesWon;
         into.nextBreachAt = settlement.NextBreachAt;
@@ -233,6 +234,7 @@ public static class SaveMapper
             saved.purificationQueued, saved.purificationProgress, saved.purificationBonus);
         settlement.SetPurificationYield(saved.purificationYield);
         settlement.RestorePortal(saved.portalLevel);
+        settlement.RestoreDays(saved.daysPassed);
         if (saved.tradeBought != null)
         {
             foreach (TradeSaveData bought in saved.tradeBought)

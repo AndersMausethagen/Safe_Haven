@@ -80,6 +80,20 @@ public sealed class SettlementSettings : GameSettings<SettlementSettings>
     public string FoundReportLine => foundReportLine;
     public string LeftBehindLine => leftBehindLine;
     public string[] StrangerLines => strangerLines;
+    public string[] HomecomingAsides => homecomingAsides;
+    public float AsideEvery => asideEvery;
+
+    /// <summary>The everyday lines for an hour of the day.</summary>
+    public string[] AsidesAt(float hour) => hour < 11f ? morningAsides : hour < 18f ? dayAsides : eveningAsides;
+
+    /// <summary>Sets the words said in passing (BuildLivingWorld).</summary>
+    public void ConfigureAsides(string[] homecoming, string[] morning, string[] day, string[] evening)
+    {
+        homecomingAsides = homecoming;
+        morningAsides = morning;
+        dayAsides = day;
+        eveningAsides = evening;
+    }
     public IReadOnlyList<CompanionMemoryLines> ReturningLines => returningLines;
     public string AllBackLine => allBackLine;
     public EmoteDefinition ResidentMealGesture => residentMealGesture;
@@ -118,6 +132,16 @@ public sealed class SettlementSettings : GameSettings<SettlementSettings>
     [SerializeField, TextArea] private string leftBehindLine;
     [Tooltip("What someone found again says the first time they are spoken to. Each person keeps to one.")]
     [SerializeField, TextArea] private string[] strangerLines = new string[0];
+    [Tooltip("What others say in passing while someone found again doesn't know them yet. {0} is that person's name.")]
+    [SerializeField, TextArea] private string[] homecomingAsides = new string[0];
+
+    [Header("In passing")]
+    [Tooltip("What residents say as the player walks by with nothing else to tell: morning (before 11), day, evening (from 18).")]
+    [SerializeField, TextArea] private string[] morningAsides = new string[0];
+    [SerializeField, TextArea] private string[] dayAsides = new string[0];
+    [SerializeField, TextArea] private string[] eveningAsides = new string[0];
+    [Tooltip("Seconds between one resident's words in passing (news is said once per homecoming).")]
+    [SerializeField, Min(10f)] private float asideEvery = 240f;
     [Tooltip("What anyone says when a forgotten memory comes back, unless they have their own line for it.")]
     [SerializeField] private List<CompanionMemoryLines> returningLines = new List<CompanionMemoryLines>();
     [Tooltip("Added to the last memory to come back.")]

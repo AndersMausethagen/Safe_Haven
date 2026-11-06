@@ -15,6 +15,9 @@ public sealed class AmbientOneShots : MonoBehaviour
     [SerializeField] private Vector2 distance = new Vector2(2f, 9f);
     [Tooltip("Chance of playing when due at night (0 never, 1 as by day).")]
     [SerializeField, Range(0f, 1f)] private float byNight = 0.2f;
+    [Tooltip("Optional: how likely a sound is at each hour (0-24 across, 0-1 up), as a dawn chorus or owls by night. " +
+             "Empty: By Night decides.")]
+    [SerializeField] private AnimationCurve byHour = new AnimationCurve();
 
     private float due;
 
@@ -28,6 +31,9 @@ public sealed class AmbientOneShots : MonoBehaviour
         byNight = night;
     }
 
+    /// <summary>Plays by the hour instead of by night (keys: hour, chance).</summary>
+    public void ConfigureHours(AnimationCurve hours) => byHour = hours ?? new AnimationCurve();
+
     private void OnEnable() => due = Time.time + Random.Range(every.x, every.y);
 
     private void Update()
@@ -39,7 +45,9 @@ public sealed class AmbientOneShots : MonoBehaviour
 
         due = Time.time + Random.Range(every.x, every.y);
         Transform listener = Player.Current != null ? Player.Current.transform : Camera.main != null ? Camera.main.transform : null;
-        if (listener == null || (AtmosphereConditions.Night > 0.5f && Random.value > byNight))
+        bool byTheHour = byHour != null && byHour.length > 0;
+        if (listener == null || (byTheHour ? Random.value > byHour.Evaluate(AtmosphereConditions.Hour)
+                                           : AtmosphereConditions.Night > 0.5f && Random.value > byNight))
         {
             return;
         }

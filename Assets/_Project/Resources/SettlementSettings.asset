@@ -86,6 +86,26 @@ MonoBehaviour:
   - You keep looking at me as if I should know you. I'm sorry. I don't. They tell me you came back for me. Thank you, whoever you are.
   - They say this is home. They say you brought me back to it. I believe them, I suppose. I don't remember the fire. I don't remember you.
   - I know how to hold a blade and not where I learned it. Everyone here calls me by a name. I've started answering to it.
+  homecomingAsides:
+  - '{0} is home. Looks at us like strangers, but home.'
+  - Don't push {0}. It'll come back to them, bit by bit.
+  - '{0} asked me my name this morning. Twice.'
+  morningAsides:
+  - Mist's thick in the hollows today. Mind your step.
+  - Heard the deer down by the trees at first light.
+  - Smoke's going straight up. Fair day, then.
+  - Up early? The portal hums louder before the sun.
+  dayAsides:
+  - Crows have been at something out past the groves.
+  - If you find any good cloth out there, I'll not say no.
+  - My grandmother left bread on the old stones. Never hurts.
+  - The woods are quiet today. I don't like it quiet.
+  eveningAsides:
+  - Keep to the light after dark. That's all I'll say.
+  - Something was singing down by the water last night.
+  - Fire's lit. Come and sit, if you've a moment.
+  - The owls are out. Means the night's begun proper.
+  asideEvery: 240
   returningLines:
   - kind: 1
     lines:

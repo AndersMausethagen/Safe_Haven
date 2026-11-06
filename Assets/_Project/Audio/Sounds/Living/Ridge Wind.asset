@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0de871765cd6fce4c8fed103ef0082e3, type: 3}
+  m_Name: Ridge Wind
+  m_EditorClassIdentifier: SafeHaven::SoundDefinition
+  displayName: Ridge Wind
+  caption: 
+  clips:
+  - {fileID: 8300000, guid: d7edd675652c3f94580f6818854cb56d, type: 3}
+  - {fileID: 8300000, guid: 1fd2bdb5275cb424eb677b439022149b, type: 3}
+  - {fileID: 8300000, guid: 66e0bc9faadc768418a422b8c60d4634, type: 3}
+  channel: 1
+  volume: 0.45
+  volumeVariation: 0.1
+  pitchRange: {x: 0.95, y: 1.05}
+  positional: 1
+  fullVolumeDistance: 8
+  audibleDistance: 60
+  maxAtOnce: 2
+  minimumGap: 0.03
+  priority: 1
+  takesTheMix: 0

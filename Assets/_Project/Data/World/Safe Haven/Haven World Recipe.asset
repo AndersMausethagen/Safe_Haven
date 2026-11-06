@@ -124,6 +124,11 @@ MonoBehaviour:
   - {fileID: 2316844624811504460, guid: 98dbed1ffc4531e4caecb17c290cb417, type: 3}
   - {fileID: 4912269930610114677, guid: 4de1b90b93204584ea219bd2413b97ab, type: 3}
   dressingPerGlade: {x: 5, y: 9}
+  grazers:
+  - {fileID: 5851466330643986908, guid: 1633212582ba20640bbbed1f293159c4, type: 3}
+  - {fileID: 1891235058169981651, guid: 530731b0216dffa40a52484a1666f75e, type: 3}
+  foxes:
+  - {fileID: 1081900227693273794, guid: 7b0b180b92953f3428ac6f04ea9b6b17, type: 3}
   pointsOfInterest:
   - name: Ruined Watchtower
     prefab: {fileID: 3890292879020267311, guid: 950d02f776d4a294fa75449c13c351ba, type: 3}

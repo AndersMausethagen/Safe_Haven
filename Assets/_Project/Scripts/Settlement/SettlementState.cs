@@ -96,6 +96,14 @@ public sealed class SettlementState
     /// <summary>The highest Haven rank reached (HavenSettings): it never drops, so the ward it grew stays grown.</summary>
     public int HavenRank { get; private set; }
     public int SuccessfulExtractions { get; private set; }
+
+    /// <summary>Days that have passed at home: the seasons (Seasons) follow them. Counted when the night turns to day.</summary>
+    public int DaysPassed { get; private set; }
+
+    /// <summary>A day has passed (dawn has come round).</summary>
+    public void PassDay() => DaysPassed++;
+
+    public void RestoreDays(int days) => DaysPassed = Math.Max(0, days);
     public BreachStatus Breach { get; private set; }
 
     /// <summary>How many ward breaches have been beaten back: which one comes next, and how hard.</summary>

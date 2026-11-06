@@ -19,6 +19,7 @@ GameObject:
   - component: {fileID: 8010288182126634454}
   - component: {fileID: 1029450620462174404}
   - component: {fileID: 4904992848839113070}
+  - component: {fileID: 1558642983331473577}
   m_Layer: 0
   m_Name: Kitchen
   m_TagString: Untagged
@@ -173,6 +174,7 @@ MonoBehaviour:
   type: 9
   stationId: 
   menuRange: 6
+  opensWhenUsed: 1
 --- !u!114 &1029450620462174404
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -212,6 +214,28 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: SafeHaven::Construction
   startsRuined: 0
+--- !u!114 &1558642983331473577
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3408785910151316199}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2582949664537544eba4cb3754fc8eaa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::HearthSmoke
+  chimney: {x: 0.40249997, y: 2.55, z: -0.15}
+  puffs: 1.6
+  rise: 9
+  smoke: {fileID: 2100000, guid: e0dc5fdfe4f83b44294848291dbc9ed2, type: 2}
+  lightAt: {x: 0, y: 1.1, z: 1}
+  lightRange: 0
+  lightIntensity: 1.6
+  lightColour: {r: 1, g: 0.62, b: 0.3, a: 1}
+  drawnWithin: 70
+  livedIn: {fileID: 0}
 --- !u!1001 &2495505220808996861
 PrefabInstance:
   m_ObjectHideFlags: 0

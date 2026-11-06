@@ -189,6 +189,12 @@ public sealed class HavenWorldRecipe : ScriptableObject
     public List<GameObject> wetDressing = new List<GameObject>();
     public Vector2Int dressingPerGlade = new Vector2Int(5, 9);
 
+    [Header("Wildlife")]
+    [Tooltip("Timid grazers (deer, stag) in the meadow and wet glades and the Haven's groves, about at dawn and dusk.")]
+    public List<Wildlife> grazers = new List<Wildlife>();
+    [Tooltip("Foxes, in some of the rocky glades and lairs, about from dusk to dawn.")]
+    public List<Wildlife> foxes = new List<Wildlife>();
+
     [Header("What Is Found There")]
     public List<HavenPointOfInterest> pointsOfInterest = new List<HavenPointOfInterest>();
     public List<HavenCreatureBand> creatures = new List<HavenCreatureBand>();

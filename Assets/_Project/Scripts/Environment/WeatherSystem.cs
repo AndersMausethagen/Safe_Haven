@@ -50,6 +50,12 @@ public sealed class WeatherSystem : MonoBehaviour
 
     public ClimateDefinition Climate => climate;
 
+    /// <summary>The scene's weather, if it has one (the seasons change its climate).</summary>
+    public static WeatherSystem Active { get; private set; }
+
+    /// <summary>Changes the climate the next weather is picked from (a season's); the weather now carries on until then.</summary>
+    public void SetClimate(ClimateDefinition next) => climate = next;
+
     /// <summary>Whether the climate picks the next weather when one has lasted its time (developer tools can pause it).</summary>
     public bool ChangesByItself
     {
@@ -77,6 +83,7 @@ public sealed class WeatherSystem : MonoBehaviour
 
     private void OnEnable()
     {
+        Active = this;
         Begin();
     }
 
@@ -90,6 +97,11 @@ public sealed class WeatherSystem : MonoBehaviour
 
     private void OnDisable()
     {
+        if (Active == this)
+        {
+            Active = null;
+        }
+
         AtmosphereConditions.WeatherOnlyAtmosphere = false;
         AtmosphereConditions.WeatherFog = 1f;
         AtmosphereConditions.WeatherWind = 1f;

@@ -63,6 +63,8 @@ public sealed class SettlementSaveData
     /// <summary>Highest Haven rank reached. 0 in older saves.</summary>
     public int havenRank;
     public int successfulExtractions;
+    /// <summary>Days that have passed at home (the seasons follow them). 0 in older saves.</summary>
+    public int daysPassed;
     /// <summary>A BreachStatus.</summary>
     public int breach;
     /// <summary>Ward breaches beaten back. Missing in older saves, where a Won breach counts as one.</summary>
