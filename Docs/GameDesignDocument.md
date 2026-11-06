@@ -285,7 +285,7 @@ arm's reach and monsters see less far too, but hear as well as ever. Night pays 
 +15%) so the choice to go in at night is a real one.
 
 **Night is dangerous, and worth it (amended October 31, 2026).** In the dark of night, in a raid or at home, creatures have
-30% more health and deal 25% more damage; dusk counts for a share of that. In a raid they also carry twice the Cursed Essence; at home they carry none (§6.3). A night
+10% more health and hit no harder (balance pass, November 6, 2026: it was 30% and 25%, which with a raid's last stage made a geared tier I player lose to a wolf pack); dusk counts for a share of that. In a raid they also carry twice the Cursed Essence; at home they carry none (§6.3). A night
 raid holds 30% more creatures, dusk 15%. Breach attackers carry no loot, so a defense is never the way to farm it.
 
 ### 7.4 Raid objectives

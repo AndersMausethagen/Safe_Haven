@@ -3,7 +3,7 @@ using UnityEditor;
 using UnityEngine;
 
 /// <summary>
-/// Gives the player the modular human body (Safe Haven › Characters › Use Modular Body for Player): ModularCharacter
+/// Gives the player the modular human body (Safe Haven › Setup › Characters › Use Modular Body for Player): ModularCharacter
 /// builds it from the CharacterCatalog, PlayerLook dresses it in the game's look and gear, CharacterEmotes plays its
 /// emotes. Removes the old body under the player prefab (the Starter Assets robot's or Kevin Iglesias' HumanM), shows the
 /// catalog's starting look in the prefab, and refits the held-item grip to the new hand. Running it again rebuilds the
@@ -14,7 +14,7 @@ public static class PlayerBodySetup
     // Children of the player root that made up its older bodies.
     private static readonly string[] OldBodyParts = { "Skeleton", "HumanM_BodyMesh", "Rig" };
 
-    [MenuItem("Safe Haven/Characters/Use Modular Body for Player")]
+    [MenuItem("Safe Haven/Setup/Characters/Use Modular Body for Player", false, 200)]
     public static void UseModularBodyMenu() => Debug.Log(UseModularBody());
 
     public static string UseModularBody()

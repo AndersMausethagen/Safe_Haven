@@ -13,7 +13,7 @@ public static class ForestGroundShowcase
     private const string RootName = "Forest Material Showcase";
     private const string Root = ForestGroundTextures.Root;
 
-    [MenuItem("Safe Haven/Art Pipeline/Upgrade Moss Preview Materials")]
+    [MenuItem("Safe Haven/Setup/Art Pipeline/Upgrade Moss Preview Materials", false, 200)]
     public static void Upgrade()
     {
         var scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();

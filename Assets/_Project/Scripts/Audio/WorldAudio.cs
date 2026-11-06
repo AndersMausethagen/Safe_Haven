@@ -139,6 +139,38 @@ public sealed class WorldAudio
         thunderAt.Add(Time.unscaledTime + Random.Range(0.6f, 2.8f));
     }
 
+    // True when no water is heard yet, one heard is gone, or there is water not heard.
+    private bool WaterChanged()
+    {
+        int live = 0;
+        foreach (WaterSurface surface in WaterSurface.Surfaces)
+        {
+            live += surface != null && surface.TakesRipples ? 1 : 0;
+        }
+
+        if (water.Count == 0)
+        {
+            nextWaterScan = Time.unscaledTime + 2f;
+            return live > 0;
+        }
+
+        foreach ((WaterSurface surface, AudioSource _) in water)
+        {
+            if (surface == null)
+            {
+                return true;
+            }
+        }
+
+        if (live != water.Count)
+        {
+            return true;
+        }
+
+        nextWaterScan = Time.unscaledTime + 2f;
+        return false;
+    }
+
     private void UpdateWater(SoundDefinition sound)
     {
         AudioClip clip = sound != null ? sound.PickClip() : null;
@@ -147,10 +179,19 @@ public sealed class WorldAudio
             return;
         }
 
-        if (water.Count == 0 && Time.unscaledTime >= nextWaterScan)
+        if (Time.unscaledTime >= nextWaterScan && WaterChanged())
         {
-            // Look again later for surfaces that wake up after the scene starts.
+            // Look again later for surfaces that wake up after the scene starts, or are laid anew (a raid map laid out a second time).
             nextWaterScan = Time.unscaledTime + 2f;
+            foreach ((WaterSurface _, AudioSource old) in water)
+            {
+                if (old != null)
+                {
+                    Object.Destroy(old.gameObject);
+                }
+            }
+
+            water.Clear();
             foreach (WaterSurface surface in WaterSurface.Surfaces)
             {
                 if (surface == null || !surface.TakesRipples)

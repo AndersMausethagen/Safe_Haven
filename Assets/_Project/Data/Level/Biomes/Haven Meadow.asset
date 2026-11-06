@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Haven Meadow
   m_EditorClassIdentifier: SafeHaven::BiomePreset
   description: 'The Haven''s open ground: short grass with tall patches, flowers here and there, heather and lingonberry, a few stones and logs.'
+  look: Forest Lake
   ground: {fileID: 8574412962073106934, guid: d5d68715002b4b1418404d8704dcb40a, type: 2}
   groundStrength: 0.5
   groundSlope: {x: 0, y: 40}
@@ -50,8 +51,10 @@ MonoBehaviour:
   props:
   - palette: {fileID: 11400000, guid: fbc1c0cb4d2aca6439fa711161b5d9ba, type: 2}
     tries: 1
+    perHundredSquareMetres: 1
     slope: {x: 0, y: 40}
   - palette: {fileID: 11400000, guid: d0f7a8ae406eb014fbb78c9a2f1006f6, type: 2}
     tries: 1
+    perHundredSquareMetres: 1
     slope: {x: 0, y: 40}
   nearWater: 0

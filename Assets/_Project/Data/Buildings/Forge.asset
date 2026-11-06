@@ -22,11 +22,11 @@ MonoBehaviour:
   constructionCost: []
   constructionItems:
   - item: {fileID: 11400000, guid: b5567f7d75200bd46befbd1dab298f36, type: 2}
-    amount: 12
+    amount: 24
   - item: {fileID: 11400000, guid: 59d371b7b63e8e24bb946051d808bc9b, type: 2}
-    amount: 4
+    amount: 8
   - item: {fileID: 11400000, guid: a370187223419a048b6cebe8f7e345a3, type: 2}
-    amount: 4
+    amount: 8
   showInBuildMenu: 1
   knownFromStart: 1
   sortOrder: 6
@@ -47,11 +47,11 @@ MonoBehaviour:
     description: 'A hotter fire and a first real anvil: copper tools and gear.'
     cost:
     - item: {fileID: 11400000, guid: 8cf878eb4a61eb943917a1f9421bb40a, type: 2}
-      amount: 6
+      amount: 12
     - item: {fileID: 11400000, guid: 59d371b7b63e8e24bb946051d808bc9b, type: 2}
-      amount: 4
+      amount: 8
     - item: {fileID: 11400000, guid: a370187223419a048b6cebe8f7e345a3, type: 2}
-      amount: 4
+      amount: 8
     essence: []
     work: 9
     renown: 6
@@ -61,6 +61,7 @@ MonoBehaviour:
     extraStorage: 0
     raidSeconds: 0
     extraRumours: 0
+    foretoldEvents: 0
     comfort: 0
     extraLogs: 0
     teachesRecipes: []
@@ -74,11 +75,11 @@ MonoBehaviour:
     description: 'Bellows that breathe on their own: iron tools and gear.'
     cost:
     - item: {fileID: 11400000, guid: f243c15300698e044a98d785099354c6, type: 2}
-      amount: 8
+      amount: 16
     - item: {fileID: 11400000, guid: 3b6626518ea9eb040b7d45591fac015b, type: 2}
-      amount: 6
+      amount: 12
     - item: {fileID: 11400000, guid: 8865a285b55516842a98bac1e1e53ef6, type: 2}
-      amount: 4
+      amount: 8
     essence: []
     work: 11
     renown: 8
@@ -88,6 +89,7 @@ MonoBehaviour:
     extraStorage: 0
     raidSeconds: 0
     extraRumours: 0
+    foretoldEvents: 0
     comfort: 0
     extraLogs: 0
     teachesRecipes: []
@@ -105,16 +107,16 @@ MonoBehaviour:
     description: 'A fire that burns white: moonsilver gear.'
     cost:
     - item: {fileID: 11400000, guid: 32fed522ebae2fc4d85b1847b30aa530, type: 2}
-      amount: 6
+      amount: 12
     - item: {fileID: 11400000, guid: 3b6626518ea9eb040b7d45591fac015b, type: 2}
-      amount: 4
+      amount: 8
     - item: {fileID: 11400000, guid: 03656529f70038c47baa4a9103025a81, type: 2}
-      amount: 2
+      amount: 4
     - item: {fileID: 11400000, guid: 4af99768b5986d94e8882065ffe24693, type: 2}
       amount: 1
     essence:
     - resource: {fileID: 11400000, guid: e991fd5ccf0ce314cafafff8badfe173, type: 2}
-      amount: 8
+      amount: 16
     work: 13
     renown: 10
     craftSpeed: 0.2
@@ -123,6 +125,7 @@ MonoBehaviour:
     extraStorage: 0
     raidSeconds: 0
     extraRumours: 0
+    foretoldEvents: 0
     comfort: 0
     extraLogs: 0
     teachesRecipes: []
@@ -138,12 +141,12 @@ MonoBehaviour:
     description: An anvil of trollstone, and nothing out there it can't work.
     cost:
     - item: {fileID: 11400000, guid: 32fed522ebae2fc4d85b1847b30aa530, type: 2}
-      amount: 6
+      amount: 12
     - item: {fileID: 11400000, guid: fcf0552d231ec8b40a3de2796f1bc4c3, type: 2}
       amount: 3
     essence:
     - resource: {fileID: 11400000, guid: e991fd5ccf0ce314cafafff8badfe173, type: 2}
-      amount: 20
+      amount: 40
     work: 15
     renown: 14
     craftSpeed: 0.25
@@ -152,6 +155,7 @@ MonoBehaviour:
     extraStorage: 0
     raidSeconds: 0
     extraRumours: 0
+    foretoldEvents: 0
     comfort: 0
     extraLogs: 0
     teachesRecipes: []

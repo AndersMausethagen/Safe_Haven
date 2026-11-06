@@ -46,22 +46,22 @@ public sealed class ContentEditorWindow : EditorWindow, IContentEditorHost
     public IReadOnlyList<ContentSection> Sections => sections;
     private ContentSection Current => sections[sectionIndex];
 
-    [MenuItem("Safe Haven/Content Editor", false, 0)]
+    [MenuItem("Safe Haven/Content Editor", false, 1)]
     public static void OpenWindow() => Open(null);
 
-    [MenuItem("Safe Haven/Resources/Resource Creator")]
+    [MenuItem("Safe Haven/Content/Resources", false, 4)]
     private static void OpenResources() => Open(typeof(ResourceSection));
 
-    [MenuItem("Safe Haven/Monsters/Monster Creator")]
+    [MenuItem("Safe Haven/Content/Monsters", false, 2)]
     private static void OpenMonsters() => Open(typeof(MonsterSection));
 
-    [MenuItem("Safe Haven/Buildings/Building Creator")]
+    [MenuItem("Safe Haven/Content/Buildings", false, 3)]
     private static void OpenBuildings() => Open(typeof(BuildingSection));
 
-    [MenuItem("Safe Haven/Items/Item Creator")]
+    [MenuItem("Safe Haven/Content/Items", false, 1)]
     private static void OpenItems() => Open(typeof(ItemSection));
 
-    [MenuItem("Safe Haven/Content/Prefab Browser")]
+    [MenuItem("Safe Haven/Content/Prefab Browser", false, 5)]
     private static void OpenPrefabs() => Open(typeof(PrefabBrowserSection));
 
     /// <summary>Opens the editor, optionally on one kind of content.</summary>

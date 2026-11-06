@@ -213,24 +213,38 @@ half WorldMacroShadeIf(float2 uv, half weight)
     return WorldMacroShade(uv);
 }
 
+// One projection of the rock: sampled as it is and, where WorldRockBlend says, turned (WorldTerrainDisplacement.hlsl).
+void WorldRockSample(TEXTURE2D_PARAM(colourMap, smp), TEXTURE2D_PARAM(normalMap, normalSmp), TEXTURE2D_PARAM(maskMap, maskSmp),
+                     float2 uv, half b, half normalStrength, out half3 colour, out half4 mask, out half3 normal)
+{
+    colour = SAMPLE_TEXTURE2D(colourMap, smp, uv).rgb;
+    mask = SAMPLE_TEXTURE2D(maskMap, maskSmp, uv);
+    normal = UnpackNormalScale(SAMPLE_TEXTURE2D(normalMap, normalSmp, uv), normalStrength);
+    [branch] if (b > 0.001)
+    {
+        float2 turned = WorldRockTurnedUV(uv);
+        half3 turnedNormal = UnpackNormalScale(SAMPLE_TEXTURE2D(normalMap, normalSmp, turned), normalStrength);
+        turnedNormal.xy = mul(transpose(WorldRockTurn), turnedNormal.xy); // back into this projection's frame
+        colour = lerp(colour, SAMPLE_TEXTURE2D(colourMap, smp, turned).rgb, b);
+        mask = lerp(mask, SAMPLE_TEXTURE2D(maskMap, maskSmp, turned), b);
+        normal = normalize(lerp(normal, turnedNormal, b));
+    }
+}
+
 // Rock projected from three sides (no stretching on cliffs). Normals blend with the "whiteout" method.
 void WorldTriplanarRock(TEXTURE2D_PARAM(colourMap, smp), TEXTURE2D_PARAM(normalMap, normalSmp), TEXTURE2D_PARAM(maskMap, maskSmp),
                         float3 p, half3 n, half3 blend, float tiling, half3 tint, half normalStrength,
                         out half3 colour, out half4 mask, out half3 normal)
 {
     float3 q = p / max(tiling, 0.01);
-    float2 uvX = q.zy;
-    float2 uvY = q.xz;
-    float2 uvZ = q.xy;
-    colour = (SAMPLE_TEXTURE2D(colourMap, smp, uvX).rgb * blend.x +
-              SAMPLE_TEXTURE2D(colourMap, smp, uvY).rgb * blend.y +
-              SAMPLE_TEXTURE2D(colourMap, smp, uvZ).rgb * blend.z) * tint;
-    mask = SAMPLE_TEXTURE2D(maskMap, maskSmp, uvX) * blend.x +
-           SAMPLE_TEXTURE2D(maskMap, maskSmp, uvY) * blend.y +
-           SAMPLE_TEXTURE2D(maskMap, maskSmp, uvZ) * blend.z;
-    half3 tX = UnpackNormalScale(SAMPLE_TEXTURE2D(normalMap, normalSmp, uvX), normalStrength);
-    half3 tY = UnpackNormalScale(SAMPLE_TEXTURE2D(normalMap, normalSmp, uvY), normalStrength);
-    half3 tZ = UnpackNormalScale(SAMPLE_TEXTURE2D(normalMap, normalSmp, uvZ), normalStrength);
+    half b = WorldRockBlend(q);
+    half3 cX, cY, cZ, tX, tY, tZ;
+    half4 mX, mY, mZ;
+    WorldRockSample(TEXTURE2D_ARGS(colourMap, smp), TEXTURE2D_ARGS(normalMap, normalSmp), TEXTURE2D_ARGS(maskMap, maskSmp), q.zy, b, normalStrength, cX, mX, tX);
+    WorldRockSample(TEXTURE2D_ARGS(colourMap, smp), TEXTURE2D_ARGS(normalMap, normalSmp), TEXTURE2D_ARGS(maskMap, maskSmp), q.xz, b, normalStrength, cY, mY, tY);
+    WorldRockSample(TEXTURE2D_ARGS(colourMap, smp), TEXTURE2D_ARGS(normalMap, normalSmp), TEXTURE2D_ARGS(maskMap, maskSmp), q.xy, b, normalStrength, cZ, mZ, tZ);
+    colour = (cX * blend.x + cY * blend.y + cZ * blend.z) * tint;
+    mask = mX * blend.x + mY * blend.y + mZ * blend.z;
     tX = half3(tX.xy + n.zy, abs(tX.z) * n.x);
     tY = half3(tY.xy + n.xz, abs(tY.z) * n.y);
     tZ = half3(tZ.xy + n.xy, abs(tZ.z) * n.z);

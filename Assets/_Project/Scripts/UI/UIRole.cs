@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 /// <summary>
 /// What a piece of UI is, so its colours come from UIStyle instead of being set on each prefab. Colours it once when it wakes;
-/// scripts can tint it after that. Put on by Safe Haven › UI › Apply Hearthline.
+/// scripts can tint it after that. Put on by Safe Haven › Setup › UI › Apply Hearthline.
 /// </summary>
 [DisallowMultipleComponent]
 public sealed class UIRole : MonoBehaviour

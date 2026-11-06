@@ -89,32 +89,6 @@ public sealed class LevelDesignTests
     }
 
     [Test]
-    public void PathCurve_PassesThroughItsPoints()
-    {
-        var points = new[] { Vector3.zero, new Vector3(4f, 0f, 1f), new Vector3(8f, 0f, -2f) };
-        List<Vector3> curve = PathPainter.Curve(points, 6);
-        Assert.AreEqual(2 * 6 + 1, curve.Count);
-        Assert.AreEqual(points[0], curve[0]);
-        Assert.Less(Vector3.Distance(points[1], curve[6]), 1e-4f);
-        Assert.AreEqual(points[2], curve[curve.Count - 1]);
-    }
-
-    [Test]
-    public void PathPainter_PaintsItsLayerAlongThePathOnly()
-    {
-        Terrain terrain = FlatTerrain(2);
-        TerrainData data = terrain.terrainData;
-        var points = new[] { Origin + new Vector3(5f, GroundHeight, 20f), Origin + new Vector3(35f, GroundHeight, 20f) };
-        int changed = PathPainter.Paint(terrain, points, new PathPainter.Settings { Layer = 1, Width = 4f, Softness = 1f, Strength = 1f, Smooth = 0.5f });
-        Assert.Greater(changed, 0);
-
-        float Path(float x, float z) => data.GetAlphamaps(Mathf.FloorToInt(x / 40f * 64), Mathf.FloorToInt(z / 40f * 64), 1, 1)[0, 0, 1];
-        Assert.Greater(Path(20f, 20f), 0.95f, "the middle of the path");
-        Assert.Less(Path(20f, 5f), 0.01f, "well away from it");
-        Assert.AreEqual(GroundHeight, terrain.SampleHeight(Origin + new Vector3(20f, 0f, 20f)), 0.01f, "smoothing flat ground keeps it flat");
-    }
-
-    [Test]
     public void LevelCheck_FindsFloatingObjectsAndLeftoverTerrains_AndFixesThem()
     {
         FlatTerrain();

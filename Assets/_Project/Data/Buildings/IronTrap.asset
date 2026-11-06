@@ -22,9 +22,9 @@ MonoBehaviour:
   constructionCost: []
   constructionItems:
   - item: {fileID: 11400000, guid: f243c15300698e044a98d785099354c6, type: 2}
-    amount: 2
+    amount: 4
   - item: {fileID: 11400000, guid: 8865a285b55516842a98bac1e1e53ef6, type: 2}
-    amount: 2
+    amount: 4
   showInBuildMenu: 1
   knownFromStart: 1
   sortOrder: 19

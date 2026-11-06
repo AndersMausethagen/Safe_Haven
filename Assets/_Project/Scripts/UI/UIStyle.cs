@@ -7,7 +7,7 @@ using UnityEngine;
 /// from the hearth to the colder raid regions (GDD §18.7). Windows stay solid over bright grass and dark forest alike.
 /// <para>
 /// Prefabs and scenes carry a UIRole, which colours them from here when they wake; code-built UI asks for the colours
-/// directly. So changing a colour here changes the game, with nothing to re-run. Safe Haven › UI › Apply Hearthline puts the
+/// directly. So changing a colour here changes the game, with nothing to re-run. Safe Haven › Setup › UI › Apply Hearthline puts the
 /// roles on new UI prefabs.
 /// </para>
 /// </summary>

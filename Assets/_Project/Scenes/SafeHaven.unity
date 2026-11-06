@@ -17636,6 +17636,7 @@ Transform:
   - {fileID: 1441794403}
   - {fileID: 1291630654}
   - {fileID: 1069182472}
+  - {fileID: 1418637147}
   m_Father: {fileID: 1479627722}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &176058546
@@ -82545,6 +82546,7 @@ MonoBehaviour:
   ledges: 0
   ledgeStrength: 0.5
   faceNoise: 0
+  overhangs: 0
   heightAtKnots:
     values:
     - 1
@@ -120107,6 +120109,166 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4469200688271695959, guid: 3f28a841568127248a5b6255c20111ef, type: 3}
   m_PrefabInstance: {fileID: 1418235740}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1418637146
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1418637147}
+  - component: {fileID: 1418637149}
+  - component: {fileID: 1418637148}
+  m_Layer: 0
+  m_Name: Dark Forest
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1418637147
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1418637146}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 506.9444, y: -407.42856, z: -356.60446}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 175952819}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1418637148
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1418637146}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4638a366fd4ce8644b008c6d9e0b36d1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::BiomeArea
+  order: 30
+  seed: 95211
+  freezeObjects: 0
+  layers:
+  - name: Trees
+    palette: {fileID: 11400000, guid: 7b4bf8ed389230540a3e136eccba7248, type: 2}
+    density: 5
+    slope: {x: 0, y: 35}
+    limitHeight: 0
+    height: {x: -1000, y: 1000}
+    onGround: []
+    groundAmount: 0.4
+    awayFromWater: 2
+    awayFromPaths: 1.5
+    awayFromCliffs: 2
+    clumping: 0.55
+    clumpSize: 22
+    edgeFade: 6
+  - name: Young trees
+    palette: {fileID: 11400000, guid: 9ef3d0f54a54f0b4a9e7ab71b3c57787, type: 2}
+    density: 1.5
+    slope: {x: 0, y: 32}
+    limitHeight: 0
+    height: {x: -1000, y: 1000}
+    onGround: []
+    groundAmount: 0.4
+    awayFromWater: 1.5
+    awayFromPaths: 1.2
+    awayFromCliffs: 1
+    clumping: 0.6
+    clumpSize: 14
+    edgeFade: 4
+  - name: Logs and stumps
+    palette: {fileID: 11400000, guid: dd482a42a8935684fad0185cdb84f7af, type: 2}
+    density: 1.2
+    slope: {x: 0, y: 30}
+    limitHeight: 0
+    height: {x: -1000, y: 1000}
+    onGround: []
+    groundAmount: 0.4
+    awayFromWater: 1
+    awayFromPaths: 1
+    awayFromCliffs: 1
+    clumping: 0.3
+    clumpSize: 15
+    edgeFade: 3
+  - name: Ferns and shrubs
+    palette: {fileID: 11400000, guid: 7a61b9bced68d74459deb76e12e2bfc5, type: 2}
+    density: 6
+    slope: {x: 0, y: 32}
+    limitHeight: 0
+    height: {x: -1000, y: 1000}
+    onGround: []
+    groundAmount: 0.4
+    awayFromWater: 0.6
+    awayFromPaths: 0.8
+    awayFromCliffs: 0.5
+    clumping: 0.7
+    clumpSize: 9
+    edgeFade: 2
+  - name: Boulders
+    palette: {fileID: 11400000, guid: a34ebec630c2fe34b92fc197a15b78a8, type: 2}
+    density: 0.4
+    slope: {x: 0, y: 40}
+    limitHeight: 0
+    height: {x: -1000, y: 1000}
+    onGround: []
+    groundAmount: 0.4
+    awayFromWater: 0.5
+    awayFromPaths: 1
+    awayFromCliffs: 0
+    clumping: 0.5
+    clumpSize: 20
+    edgeFade: 2
+  roomAroundObjects: 1
+--- !u!114 &1418637149
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1418637146}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dab5c7d4c32e743048dfca98e2d5914f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Splines::UnityEngine.Splines.SplineContainer
+  m_Spline:
+    m_EditModeType: 1
+    m_Knots: []
+    m_MetaData: []
+    m_Closed: 0
+    m_IntData:
+      m_Data: []
+    m_FloatData:
+      m_Data: []
+    m_Float4Data:
+      m_Data: []
+    m_ObjectData:
+      m_Data: []
+  m_Splines:
+  - m_EditModeType: 1
+    m_Knots: []
+    m_MetaData: []
+    m_Closed: 0
+    m_IntData:
+      m_Data: []
+    m_FloatData:
+      m_Data: []
+    m_Float4Data:
+      m_Data: []
+    m_ObjectData:
+      m_Data: []
+  m_Knots:
+    m_KnotsLink: []
 --- !u!1 &1419634091
 GameObject:
   m_ObjectHideFlags: 0

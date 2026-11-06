@@ -1,7 +1,7 @@
 # Story graphs
 
 A **Story Script** tells a little story in the scene: something starts it, then things happen one after another. You
-draw it as nodes in **Safe Haven › Quests › Story Graph** instead of wiring listeners and events by hand.
+draw it as nodes in **Safe Haven › Story Graph** instead of wiring listeners and events by hand.
 
 ## Making one
 

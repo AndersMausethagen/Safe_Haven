@@ -150,11 +150,55 @@ float2 WorldRock(float2 uv, float slope)
     return float2(max(rock, steep) * _CliffStrength, steep);
 }
 
+// ---- Safe Haven: hiding the rock's repetition -----------------------------------------------------------------------
+// The rock is projected from three sides at one size, so the same crack came back every few metres along a cliff. As
+// the ground layers do, each projection is sampled twice, as it is and turned 63 degrees and resized, and slow noise in
+// the rock's own space picks between them. The colour, normals and the tessellated relief all use the same choice.
+float _RockAntiTiling;
+static const float2x2 WorldRockTurn = float2x2(0.4536, -0.8912, 0.8912, 0.4536);
+
+float WorldRockHash(float3 p)
+{
+    p = frac(p * 0.3183099 + 0.1);
+    p *= 17.0;
+    return frac(p.x * p.y * p.z * (p.x + p.y + p.z));
+}
+
+float WorldRockNoise(float3 p)
+{
+    float3 i = floor(p);
+    float3 f = frac(p);
+    f = f * f * (3.0 - 2.0 * f);
+    return lerp(lerp(lerp(WorldRockHash(i), WorldRockHash(i + float3(1, 0, 0)), f.x),
+                     lerp(WorldRockHash(i + float3(0, 1, 0)), WorldRockHash(i + float3(1, 1, 0)), f.x), f.y),
+                lerp(lerp(WorldRockHash(i + float3(0, 0, 1)), WorldRockHash(i + float3(1, 0, 1)), f.x),
+                     lerp(WorldRockHash(i + float3(0, 1, 1)), WorldRockHash(i + float3(1, 1, 1)), f.x), f.y), f.z);
+}
+
+// The second sample's coordinates: turned and a little over half the size, offset so the two never line up.
+float2 WorldRockTurnedUV(float2 uv) { return mul(WorldRockTurn, uv) * 0.61 + float2(0.37, 0.71); }
+
+// How much of the turned sample to use at a point of the rock's tiled space (0: none, 1: only it).
+float WorldRockBlend(float3 q)
+{
+    if (_RockAntiTiling <= 0) return 0;
+    float n = WorldRockNoise(q * 0.31) * 0.7 + WorldRockNoise(q * 0.83 + 5.1) * 0.3;
+    return smoothstep(0.35, 0.65, n) * _RockAntiTiling;
+}
+
+float WorldRockHeightAt(TEXTURE2D_PARAM(mask, smp), float2 uv, float b)
+{
+    float a = SAMPLE_TEXTURE2D_LOD(mask, smp, uv, _DisplacementMip).b;
+    [branch] if (b <= 0.001) return a;
+    return lerp(a, SAMPLE_TEXTURE2D_LOD(mask, smp, WorldRockTurnedUV(uv), _DisplacementMip).b, b);
+}
+
 float WorldTriplanarHeight(TEXTURE2D_PARAM(mask, smp), float3 q, float3 blend)
 {
-    return SAMPLE_TEXTURE2D_LOD(mask, smp, q.zy, _DisplacementMip).b * blend.x
-         + SAMPLE_TEXTURE2D_LOD(mask, smp, q.xz, _DisplacementMip).b * blend.y
-         + SAMPLE_TEXTURE2D_LOD(mask, smp, q.xy, _DisplacementMip).b * blend.z;
+    float b = WorldRockBlend(q);
+    return WorldRockHeightAt(TEXTURE2D_ARGS(mask, smp), q.zy, b) * blend.x
+         + WorldRockHeightAt(TEXTURE2D_ARGS(mask, smp), q.xz, b) * blend.y
+         + WorldRockHeightAt(TEXTURE2D_ARGS(mask, smp), q.xy, b) * blend.z;
 }
 
 // The ground's own displacement fades out on steep ground (it only lifts straight up), so the rock is pushed out along

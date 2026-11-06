@@ -20,7 +20,7 @@ public sealed class SystemsEditorWindow : EditorWindow
     private Vector2 sidebarScroll;
     private Vector2 pageScroll;
 
-    [MenuItem("Safe Haven/Systems Editor", priority = 1)]
+    [MenuItem("Safe Haven/Systems Editor", false, 2)]
     public static void Open()
     {
         var window = GetWindow<SystemsEditorWindow>();

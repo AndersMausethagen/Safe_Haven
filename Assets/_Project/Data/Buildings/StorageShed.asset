@@ -22,17 +22,18 @@ MonoBehaviour:
   constructionCost: []
   constructionItems:
   - item: {fileID: 11400000, guid: b5567f7d75200bd46befbd1dab298f36, type: 2}
-    amount: 6
+    amount: 12
   - item: {fileID: 11400000, guid: 8ae2883815327b74fa7975309c803f92, type: 2}
-    amount: 4
+    amount: 8
   - item: {fileID: 11400000, guid: a370187223419a048b6cebe8f7e345a3, type: 2}
-    amount: 10
+    amount: 20
   showInBuildMenu: 1
   knownFromStart: 1
   sortOrder: 3
   requires:
   - building: {fileID: 11400000, guid: 1fe15b30940bf7049a4e4966e9954e1b, type: 2}
     tier: 1
+  requiredRank: 0
   yardDepth: 1.5
   yardSide: 1
   placeInLines: 0
@@ -46,9 +47,9 @@ MonoBehaviour:
     description: Shelves up to the rafters.
     cost:
     - item: {fileID: 11400000, guid: a370187223419a048b6cebe8f7e345a3, type: 2}
-      amount: 8
+      amount: 16
     - item: {fileID: 11400000, guid: b5567f7d75200bd46befbd1dab298f36, type: 2}
-      amount: 6
+      amount: 12
     essence: []
     work: 8
     renown: 4
@@ -58,16 +59,23 @@ MonoBehaviour:
     extraStorage: 6
     raidSeconds: 0
     extraRumours: 0
+    foretoldEvents: 0
     comfort: 0
     extraLogs: 0
     teachesRecipes: []
+    requires: []
+    beds: 0
+    purifyYield: 0
+    extraMealSlots: 0
+    extraGame: 0
+    extraLight: 0
   - title: Grand
     description: A loft for everything that doesn't fit.
     cost:
     - item: {fileID: 11400000, guid: a370187223419a048b6cebe8f7e345a3, type: 2}
-      amount: 14
+      amount: 28
     - item: {fileID: 11400000, guid: 59d371b7b63e8e24bb946051d808bc9b, type: 2}
-      amount: 4
+      amount: 8
     essence: []
     work: 9
     renown: 6
@@ -77,9 +85,17 @@ MonoBehaviour:
     extraStorage: 10
     raidSeconds: 0
     extraRumours: 0
+    foretoldEvents: 0
     comfort: 0
     extraLogs: 0
     teachesRecipes: []
+    requires: []
+    beds: 0
+    purifyYield: 0
+    extraMealSlots: 0
+    extraGame: 0
+    extraLight: 0
   comfort: 0
+  beds: 0
   teachesRecipes: []
   deathSound: {fileID: 0}

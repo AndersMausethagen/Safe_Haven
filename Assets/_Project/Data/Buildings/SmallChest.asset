@@ -22,15 +22,16 @@ MonoBehaviour:
   constructionCost: []
   constructionItems:
   - item: {fileID: 11400000, guid: 8ae2883815327b74fa7975309c803f92, type: 2}
-    amount: 4
+    amount: 8
   - item: {fileID: 11400000, guid: e8bb5d2fbded52b42a179a47cce32d53, type: 2}
-    amount: 6
+    amount: 12
   showInBuildMenu: 1
   knownFromStart: 1
   sortOrder: 1
   requires:
   - building: {fileID: 11400000, guid: cfa8f019a4062c84f8e9b8cd432080e0, type: 2}
     tier: 1
+  requiredRank: 0
   yardDepth: 0.5
   yardSide: 1
   placeInLines: 0
@@ -44,9 +45,9 @@ MonoBehaviour:
     description: Iron bands and a sturdier lid.
     cost:
     - item: {fileID: 11400000, guid: 8ae2883815327b74fa7975309c803f92, type: 2}
-      amount: 4
+      amount: 8
     - item: {fileID: 11400000, guid: 9f085f39a2da68c45b58d2db986835f4, type: 2}
-      amount: 4
+      amount: 8
     essence: []
     work: 7
     renown: 2
@@ -56,9 +57,17 @@ MonoBehaviour:
     extraStorage: 4
     raidSeconds: 0
     extraRumours: 0
+    foretoldEvents: 0
     comfort: 0
     extraLogs: 0
     teachesRecipes: []
+    requires: []
+    beds: 0
+    purifyYield: 0
+    extraMealSlots: 0
+    extraGame: 0
+    extraLight: 0
   comfort: 0
+  beds: 0
   teachesRecipes: []
   deathSound: {fileID: 0}

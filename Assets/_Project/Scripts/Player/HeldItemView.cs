@@ -8,7 +8,7 @@ using UnityEngine;
 /// (<see cref="ItemDefinition.HeldModel"/>, placed by its held pose) and sit in a grip under the hand bone; each is made
 /// once and reused. Held models are only visuals: their colliders, rigidbodies and scripts are removed.
 /// <para>Where it belongs: on the PlayerArmature prefab. The grip (relative to the hand bone) is fitted by
-/// Safe Haven > Characters > Held Item Grips, so models made for a standard hand prop bone sit right.</para>
+/// Safe Haven > Content > Held Item Grips, so models made for a standard hand prop bone sit right.</para>
 /// </summary>
 [DisallowMultipleComponent]
 public sealed class HeldItemView : MonoBehaviour

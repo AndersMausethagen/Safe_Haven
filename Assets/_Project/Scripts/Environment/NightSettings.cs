@@ -11,9 +11,9 @@ public sealed class NightSettings : GameSettings<NightSettings>
 {
     [Header("Danger")]
     [Tooltip("Creatures' health in the dark of night, as a multiple of their own.")]
-    [SerializeField, Min(1f)] private float creatureHealth = 1.3f;
+    [SerializeField, Min(1f)] private float creatureHealth = 1.1f;
     [Tooltip("Creatures' damage in the dark of night, as a multiple of their own.")]
-    [SerializeField, Min(1f)] private float creaturePower = 1.25f;
+    [SerializeField, Min(1f)] private float creaturePower = 1f;
 
     [Header("Reward")]
     [Tooltip("Cursed Essence from a kill in the dark of night, as a multiple. Essence Find on gear adds to it.")]

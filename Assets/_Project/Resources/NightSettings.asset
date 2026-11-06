@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 004b690e44dcd4c449f99851bfc56c37, type: 3}
   m_Name: NightSettings
   m_EditorClassIdentifier: SafeHaven::NightSettings
-  creatureHealth: 1.3
-  creaturePower: 1.25
+  creatureHealth: 1.1
+  creaturePower: 1
   cursedEssence: 2
   prowlersPerBreach: 1
   mostProwlers: 8

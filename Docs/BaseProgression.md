@@ -1,7 +1,7 @@
 # Base progression
 
 How Safe Haven grows, and why. The numbers live in the assets and are set by `AgentScripts/BuildBaseTiers.cs`,
-`AgentScripts/BuildFoundation.cs` and `AgentScripts/BuildHavenProgression.cs`; running them again, in that order, restores them. Rule: **the base shows progress, and everything it gives helps you in the woods.**
+`AgentScripts/BuildFoundation.cs`, `AgentScripts/BuildHavenProgression.cs` and `AgentScripts/BuildBalancePass.cs`; running them again, in that order, restores them. Rule: **the base shows progress, and everything it gives helps you in the woods.**
 
 ## The rules
 
@@ -116,7 +116,7 @@ Numbers measured by launching real raids, as a raid's spawn lists decide what it
 | Iron ore and ingots were tier II, moonsilver III, one behind their gear | Iron III, moonsilver IV, trollstone V |
 | The Forge cost Trollstone and iron, yet was the only place to make copper tools | The Smithy costs stone and planks, and comes third in the chain |
 | Caches gave about 1 copper and 0.5 iron ingot each from the first raid, and moonsilver now and then | Fewer, and a cache holds no gear or material more than a tier past the Smithy (at least tier II) |
-| Moonsilver smelted with Elderwood, itself rare | Hardwood fuels both iron and moonsilver |
+| Moonsilver smelted with Elderwood, itself rare | Hardwood fuels both iron and moonsilver (since 2026-11-06, charcoal fuels every ingot: see below) |
 | Grey stone gave 1-2 a node, and everything needs it | 2-3 |
 | Copper swords came from the Construction Table | Metal at the Smithy, wood at the Lodge, the rest at the Workshop |
 | Bjarne could not be found at all, so nobody could be the Smith | A rumour and a site of his own |
@@ -137,12 +137,41 @@ Three ore make an ingot, and what limits a trip is time and the weight of the ba
 
 | Goal | Ingots | Raids |
 |---|---|---|
-| Copper pickaxe, Smithy II and Workshop II: enough to reach iron | 11 copper | 1-2 |
+| Copper pickaxe, Smithy II and Workshop II: enough to reach iron | about 19 copper | 2 |
 | Full copper armor and a weapon | 15 copper | 2 more |
-| Every tier III upgrade and an iron pickaxe | 18 iron | 3-4 |
-| Every tier IV upgrade | 12 moonsilver | 3-4 |
+| Every tier III upgrade and an iron pickaxe | about 33 iron | 5-6 |
+| Every tier IV upgrade | about 22 moonsilver | 5-6 |
+
+These were 11, 18 and 12 ingots (1-2, 3-4 and 3-4 raids) before the balance pass below doubled building costs. Gear recipes kept their ingots.
 
 If this feels fast or slow, change the weights of the Resources list in `BuildFoundation.RaidResources` first; the bag and the clock keep a trip honest either way.
+
+### Wood and stone at home (balance pass, 2026-11-06, `BuildBalancePass`)
+
+Measured, not played: a small tree takes 4 swings to fell and 2 per section, and gives about 3 oak and 2 sticks with a stone axe, so about
+**13 oak a minute** with the walking. Building everything once took 444 oak (a plank is 2 oak), and a Cottage under two minutes of chopping.
+The real save at 40 minutes held 50 spare oak and 60 sticks with nothing to spend them on.
+
+**Every building and level now costs twice its original amount**, in every material: wood, stone, fiber, ingots, hide, linen and essence.
+Everything once takes **888 oak**. Only trophies from named creatures keep their count (Guardian Heartroot, Trollstone, Runestone Fragment), as
+doubling them would double the kills. A Light in the Wood gathers what the doubled Workshop costs (24 oak, 12 grey stone, 12 sticks).
+Gifts of the Clearing is unchanged: it gathers for the stone tools, which are recipes, not buildings.
+
+| Time to gather, at 13 oak a minute | Buildings |
+|---|---|
+| About a minute | Lantern Post, Banner, Planter, Small Chest, Farm Plot, Spike Trap, a Palisade section (12 oak), Hut (16), Woodcutter's Lodge (20) |
+| 2 minutes | Workshop (24 oak, 12 grey stone, 12 sticks), Hunter's Lodge (24), Watch Post (28), Smithy (16 oak and 24 grey stone) |
+| 3-5 minutes | Cottage (48 oak and 12 stone blocks), Storage Shed (48), Sauna (40), Kitchen (40), Tailor's Shop (48), Wainwright's Yard (56) |
+
+The Lodge's +1 log per cut at home (tier III and V) and a better axe's extra log per section are what speed this up later.
+
+### Charcoal: the wood sink
+
+Valheim and Enshrouded both make wood the fuel of metal: a kiln burns it to coal, and the smelter wants coal. Here the **Woodcutter's Lodge
+burns Charcoal** (3 oak for 2, or 10 sticks for 1, which gives the stick pile a use), and **every ingot takes charcoal** instead of a log: 2 for
+copper, 3 for iron, 4 for moonsilver (were 1 oak, 1 hardwood, 1 hardwood). So wood use grows with the metal: a raid's 9 copper ingots burn
+about 27 oak, and the ingots in every building upgrade about 770. Hardwood no longer fuels the Smithy; it still makes Hardwood Planks. Tor keeps
+40 charcoal in the stash after his planks, so Bjarne's smelting doesn't wait on the player. The item's icon is a placeholder lump.
 
 ## Where the ideas come from
 

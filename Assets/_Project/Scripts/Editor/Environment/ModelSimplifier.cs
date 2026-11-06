@@ -5,7 +5,7 @@ using UnityEngine;
 
 /// <summary>Lightens heavy models for the high top-down camera, where a 100k-triangle tree looks the same as a 5k one
 /// (Local Generator trees reach that, and a forest of them is what costs the frame rate). Select a model prefab and open
-/// Safe Haven › Art Pipeline › Simplify Model Meshes: each mesh gets a detail level from Unity's mesh LOD generator,
+/// Safe Haven › Setup › Art Pipeline › Simplify Model Meshes: each mesh gets a detail level from Unity's mesh LOD generator,
 /// baked into "Simplified/&lt;prefab&gt;_&lt;mesh&gt;.asset" beside the prefab, which the prefab's MeshFilters (and
 /// MeshColliders using the same mesh) then use. It is one lighter mesh, not an LOD chain.
 /// <para>
@@ -32,7 +32,7 @@ public sealed class ModelSimplifier : EditorWindow
     private readonly List<Entry> entries = new List<Entry>();
     private Vector2 scroll;
 
-    [MenuItem("Safe Haven/Art Pipeline/Simplify Model Meshes")]
+    [MenuItem("Safe Haven/Setup/Art Pipeline/Simplify Model Meshes", false, 200)]
     private static void Open()
     {
         var window = GetWindow<ModelSimplifier>("Simplify Model");

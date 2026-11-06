@@ -150,7 +150,7 @@ Material:
     - _CliffTiling: 4
     - _DisplacementDataVersion: 2
     - _DisplacementFar: 35
-    - _DisplacementLayerCount: 9
+    - _DisplacementLayerCount: 12
     - _DisplacementMip: 0
     - _DisplacementNear: 30.4
     - _DisplacementNormalStrength: 1

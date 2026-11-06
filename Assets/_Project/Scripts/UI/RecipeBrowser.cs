@@ -12,7 +12,7 @@ using TMPro;
 /// double-click on a row makes one straight away. A shortage of materials is the everyday state of most of a list, so it
 /// stays quiet and what can be made stands out. It reads and makes through an IRecipeMaker; the rules stay in
 /// PlayerCrafting and StationCrafting.
-/// Built by Safe Haven › UI › Build Recipe Browsers.
+/// Built by Safe Haven › Setup › UI › Build Recipe Browsers.
 /// </summary>
 public sealed class RecipeBrowser : MonoBehaviour
 {

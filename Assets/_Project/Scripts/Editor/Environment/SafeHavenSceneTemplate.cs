@@ -15,7 +15,7 @@ public static class SafeHavenSceneTemplate
     public const string TemplatePath = Folder + "/SafeHavenScene.scenetemplate";
 
     /// <summary>Makes the template and its scene, or completes them. Returns the template.</summary>
-    [MenuItem("Safe Haven/World/Create Scene Template", false, 40)]
+    [MenuItem("Safe Haven/Setup/World/Create Scene Template", false, 200)]
     public static SceneTemplateAsset Ensure()
     {
         if (!AssetDatabase.IsValidFolder(Folder))

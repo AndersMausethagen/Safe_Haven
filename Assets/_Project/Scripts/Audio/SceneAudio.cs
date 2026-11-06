@@ -3,7 +3,7 @@
 /// <summary>
 /// The music of one scene, set right here on the component: what plays while exploring, while fighting and in the last
 /// stretch of a raid, plus the ambience underneath. Empty music lists fall back to the game-wide defaults in Audio Settings.
-/// Add one to each scene (Safe Haven > Audio > Sound Editor lists them all). Object-specific sounds such as a monster's
+/// Add one to each scene (Safe Haven > Sound Editor lists them all). Object-specific sounds such as a monster's
 /// death don't belong here; they live on the monster's data or a DeathSound on its prefab.
 /// </summary>
 [DisallowMultipleComponent]

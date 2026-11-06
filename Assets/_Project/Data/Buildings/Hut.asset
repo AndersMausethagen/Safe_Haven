@@ -22,11 +22,11 @@ MonoBehaviour:
   constructionCost: []
   constructionItems:
   - item: {fileID: 11400000, guid: 8ae2883815327b74fa7975309c803f92, type: 2}
-    amount: 8
+    amount: 16
   - item: {fileID: 11400000, guid: e8bb5d2fbded52b42a179a47cce32d53, type: 2}
-    amount: 6
+    amount: 12
   - item: {fileID: 11400000, guid: 3790e5e25892e2a49adf1a7cb473a699, type: 2}
-    amount: 4
+    amount: 8
   showInBuildMenu: 1
   knownFromStart: 1
   sortOrder: 12
@@ -47,9 +47,9 @@ MonoBehaviour:
     description: A proper roof, and a third bunk.
     cost:
     - item: {fileID: 11400000, guid: a370187223419a048b6cebe8f7e345a3, type: 2}
-      amount: 6
+      amount: 12
     - item: {fileID: 11400000, guid: 4df650debd4ce21459e04a0c92ffa207, type: 2}
-      amount: 4
+      amount: 8
     essence: []
     work: 6
     renown: 2
@@ -59,6 +59,7 @@ MonoBehaviour:
     extraStorage: 0
     raidSeconds: 0
     extraRumours: 0
+    foretoldEvents: 0
     comfort: 1
     extraLogs: 0
     teachesRecipes: []

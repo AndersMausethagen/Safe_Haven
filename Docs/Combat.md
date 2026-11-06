@@ -237,7 +237,7 @@ avatar made after that), or every pose comes out rotated; Set Up Combat Animatio
 | A weapon's chain, heavy and counter attack, weapon art and its Focus, how well it guards, its sounds and Hit Effect | Content Editor › Weapons |
 | An attack's damage, reach, timing, poise damage, Impact, lunge, animation speeds (build-up, strike, follow-through) and slash colour, sweep and tilt | Content Editor › Attacks & Abilities |
 | A monster's poise, blood (whether, and its colour), ragdoll, hurt and wind-up sounds | Content Editor › Monsters |
-| Which clip each weapon family plays | `CombatMovesets.cs`, then Safe Haven › Characters › Set Up Combat Animations |
+| Which clip each weapon family plays | `CombatMovesets.cs`, then Safe Haven › Setup › Characters › Set Up Combat Animations |
 | Game-wide combat sounds | Sound Editor › Sound Effects › Game-wide effects |
 | Focus gains, how long it holds, eating time and heal-over-time | Combat technique (Focus, Eating and drinking) |
 | A skill's Focus cost | Content Editor › Skills › Focus Cost |
@@ -246,7 +246,7 @@ avatar made after that), or every pose comes out rotated; Set Up Combat Animatio
 | An arrow's damage, speed, drop, impact noise, recover chance, burning and what flies | Content Editor › Arrows, and the arrow item's Arrow field |
 
 **Animations** come from the Quaternius Universal Animation Libraries (CC0, `Assets/Quaternius`), the Kevin Iglesias packs and
-the Stylized Character pack (`Assets/StylizedCharacter`). **Safe Haven › Characters › Set Up Combat Animations** imports them, adds the
+the Stylized Character pack (`Assets/StylizedCharacter`). **Safe Haven › Setup › Characters › Set Up Combat Animations** imports them, adds the
 combat states to the player's and monsters' animator controllers, and fits every built-in attack to its clip: it finds the contact by
 playing the clip on the player's rig and watching the weapon hand. For the big Stylized swings the hand's top speed is often the weapon
 going up, so there it looks for the hand driving forward or down, and allows for the blade following the hand (`DrivenContact`,

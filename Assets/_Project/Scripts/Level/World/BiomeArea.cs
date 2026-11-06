@@ -8,6 +8,9 @@ using UnityEngine;
 /// layer underneath, distance from water, paths and cliffs), in clumps if wanted, thinning out towards the edge. The
 /// same seed always gives the same forest; it grows again around a river or path that moves through it. Objects
 /// already standing there (buildings, nodes, rocks with colliders) are left room.
+/// With a Biome (a BiomePreset, the Biome Brush's presets) it also paints the ground, grows its plants as terrain grass
+/// and scatters its props across the loop, fading in from the edge; paths and rivers still clear through it, and
+/// everything comes back when the area moves or is deleted.
 /// </summary>
 public sealed class BiomeArea : WorldFeature
 {
@@ -51,16 +54,30 @@ public sealed class BiomeArea : WorldFeature
     [Tooltip("Room left around objects already standing there with a collider (metres).")]
     [SerializeField, Min(0f)] private float roomAroundObjects = 1f;
 
+    [Header("Biome: ground, plants and props")]
+    [Tooltip("Paints this biome's ground, grows its plants and scatters its props over the whole loop (Data/Level/Biomes). " +
+             "Empty: only the layers above grow.")]
+    [SerializeField] private BiomePreset biome;
+    [Tooltip("Metres over which the biome fades in from the loop's edge (frayed by noise).")]
+    [SerializeField, Min(0f)] private float biomeEdgeFade = 6f;
+    [Tooltip("How much of the biome it lays in the middle (0-1): its ground, how thick its plants grow, how many props.")]
+    [SerializeField, Range(0f, 1f)] private float biomeStrength = 1f;
+
     public IReadOnlyList<Layer> Layers => layers;
     public float RoomAroundObjects => roomAroundObjects;
+    public BiomePreset Biome => biome;
+    public float BiomeEdgeFade => biomeEdgeFade;
+    public float BiomeStrength => biomeStrength;
 
     public override float Reach => 0f;
-    public override bool ShapesTerrain => false;
+    /// <summary>With a biome that has ground or plants, it paints the terrain (and is built with it).</summary>
+    public override bool ShapesTerrain => biome != null && (biome.ground != null || biome.details.Count > 0);
     public override bool IsArea => true;
     protected override int DefaultOrder => 30;
 
-    public void Configure(IEnumerable<Layer> defaults)
+    public void Configure(IEnumerable<Layer> defaults, BiomePreset paintWith = null)
     {
         layers = new List<Layer>(defaults);
+        biome = paintWith;
     }
 }

@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Riverbank
   m_EditorClassIdentifier: SafeHaven::BiomePreset
   description: 'Along rivers and lakes (within 8 m of the water): lake grass and ferns crowding the edge, tall grass behind, river stones and driftwood.'
+  look: 
   ground: {fileID: 8574412962073106934, guid: 86f7fa99e216f4b4db7ca5cc7eeb426e, type: 2}
   groundStrength: 0.55
   groundSlope: {x: 0, y: 40}
@@ -40,8 +41,10 @@ MonoBehaviour:
   props:
   - palette: {fileID: 11400000, guid: 7e9acf2acebc8184489c04c2409f321b, type: 2}
     tries: 2
+    perHundredSquareMetres: 1
     slope: {x: 0, y: 35}
   - palette: {fileID: 11400000, guid: 39c43d7fbf5765f47bf182672f494d69, type: 2}
     tries: 2
+    perHundredSquareMetres: 1
     slope: {x: 0, y: 35}
   nearWater: 8

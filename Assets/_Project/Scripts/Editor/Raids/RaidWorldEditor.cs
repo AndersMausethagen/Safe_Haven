@@ -386,7 +386,14 @@ internal static class RaidWorldEditor
 
                 if (open)
                 {
-                    foreach (string field in new[] { "name", "weight", "briefing", "forest", "treeSpacing", "ridges", "rooms", "trails", "rocks", "fogBanks" })
+                    foreach (string field in new[] { "name", "weight", "briefing", "forest", "treeSpacing", "ridges", "rooms", "trails", "rocks", "fogBanks", "hills", "boulders" })
+                    {
+                        EditorGUILayout.PropertyField(mood.FindPropertyRelative(field));
+                    }
+
+                    EditorGUILayout.LabelField("Cliffs and Ravines", EditorStyles.boldLabel);
+                    foreach (string field in new[] { "largeByDefault", "terraces", "terraceHeight", "terraceScale", "ravines", "ravineLength", "ravineWidth",
+                                 "ravineDepth", "riverChance", "ravineMist", "spires", "spireHeight", "spireRadius" })
                     {
                         EditorGUILayout.PropertyField(mood.FindPropertyRelative(field));
                     }
@@ -927,6 +934,15 @@ internal static class RaidWorldEditor
         EditorGUILayout.PropertyField(data.FindProperty("pondDepth"), new GUIContent("Depth (smallest, largest)", "Metres at the middle. The player swims from the Swim Depth in Player Movement Settings."));
         EditorGUILayout.PropertyField(data.FindProperty("pondStretch"), new GUIContent("Longest shape", "How long a pond can be for its width. 1 keeps them round."));
         EditorGUILayout.PropertyField(data.FindProperty("pondMaterial"), new GUIContent("Water material"));
+        EditorGUILayout.PropertyField(data.FindProperty("riverMaterial"), new GUIContent("Ravine river material", "What the rivers along the floors of ravines are drawn with (moods with ravines)."));
+        EditorGUILayout.PropertyField(data.FindProperty("ravineCrags"), new GUIContent("Ravine crags"));
+        EditorGUILayout.PropertyField(data.FindProperty("waterfallMaterial"), new GUIContent("Waterfall material"));
+        EditorGUILayout.PropertyField(data.FindProperty("waterfallPlunge"), new GUIContent("Waterfall plunge"));
+        EditorGUILayout.LabelField("Relief (every run)", EditorStyles.boldLabel);
+        foreach (string field in new[] { "hillVariance", "greatHills", "greatHillHeight", "greatHillRadius", "boulderKit", "boulderClusters", "boulderClusterSize", "boulderScale", "lookouts", "lookoutReveal" })
+        {
+            EditorGUILayout.PropertyField(data.FindProperty(field));
+        }
         if (data.FindProperty("ponds").vector2IntValue.y > 0 && data.FindProperty("pondMaterial").objectReferenceValue == null)
         {
             EditorGUILayout.HelpBox("Without a material there is only an empty hollow.", MessageType.Warning);

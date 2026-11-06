@@ -11,7 +11,7 @@ public static class NodeFractureBuilder
 {
     private const string Folder = "Assets/_Project/Data/Gathering/Fractures";
 
-    [MenuItem("Safe Haven/Resources/Crack Mined Nodes")]
+    [MenuItem("Safe Haven/Setup/Resources/Crack Mined Nodes", false, 200)]
     public static void CrackAll()
     {
         int cracked = 0;

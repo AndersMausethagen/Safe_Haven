@@ -5,7 +5,7 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 
 /// <summary>
-/// Held weapons and tools (Safe Haven > Characters > Held Item Grips): fits the player's hand grip, gives weapons and
+/// Held weapons and tools (Safe Haven > Content > Held Item Grips): fits the player's hand grip, gives weapons and
 /// tools without a held model a stand-in, and lists every weapon and tool with its held model and grip offset. In Play
 /// mode, picking an item puts it in the player's hand and the offsets update it live.
 /// <para>The grip is a fist on the player's own right hand (see <see cref="ComputeGrip"/>), so models made handle-up
@@ -21,7 +21,7 @@ public sealed class HeldItemGrips : EditorWindow
     private ItemDefinition selected;
     private Vector2 scroll;
 
-    [MenuItem("Safe Haven/Characters/Held Item Grips")]
+    [MenuItem("Safe Haven/Content/Held Item Grips", false, 20)]
     public static void Open() => GetWindow<HeldItemGrips>("Held Item Grips");
 
     private void OnEnable() => items = null;

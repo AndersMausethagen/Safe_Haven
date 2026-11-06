@@ -5,7 +5,7 @@ using UnityEngine;
 /// dissolve in a soft, dithered circle around the player. The shaders do the cutting (Shaders/SeeThrough/SeeThrough.hlsl
 /// in Tree Wind, Layered Lit and the See-Through copies of URP Lit and Unlit); this component, on the player, tells them
 /// where the player is every frame. Shadows stay whole, and nothing behind the player is touched. Materials that should
-/// dissolve use one of those shaders (Safe Haven › Rendering › Make Materials See-Through).
+/// dissolve use one of those shaders (Safe Haven › Setup › Rendering › Make Materials See-Through).
 /// </summary>
 [DisallowMultipleComponent]
 public sealed class SeeThrough : MonoBehaviour

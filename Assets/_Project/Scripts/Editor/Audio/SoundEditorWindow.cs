@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 using Object = UnityEngine.Object;
 
 /// <summary>
-/// Safe Haven > Audio > Sound Editor. One place for the game's audio:
+/// Safe Haven > Sound Editor. One place for the game's audio:
 /// <list type="bullet">
 /// <item>Music: the game-wide default music and every scene's own Scene Music (exploring, combat, raid final stretch,
 /// ambience), with a "what plays where" overview and a live "now playing" strip in Play mode;</item>
@@ -49,7 +49,7 @@ public sealed class SoundEditorWindow : EditorWindow
     private Editor soundEditor;
     private GUIStyle header, note, rowLabel;
 
-    [MenuItem("Safe Haven/Audio/Sound Editor", false, 0)]
+    [MenuItem("Safe Haven/Sound Editor", false, 3)]
     public static void Open() => Show(null);
 
     public static void OpenMusic() => Show(Tab.Music);
@@ -208,7 +208,7 @@ public sealed class SoundEditorWindow : EditorWindow
         AudioSettingsDefinition settings = AssetDatabase.LoadAssetAtPath<AudioSettingsDefinition>(SettingsPath);
         if (settings == null)
         {
-            EditorGUILayout.HelpBox("Audio Settings is missing from " + SettingsPath + ". Safe Haven > Audio > Generate Placeholder Sounds creates it.", MessageType.Error);
+            EditorGUILayout.HelpBox("Audio Settings is missing from " + SettingsPath + ". Safe Haven > Setup > Audio > Generate Placeholder Sounds creates it.", MessageType.Error);
             return;
         }
 
@@ -632,7 +632,7 @@ public sealed class SoundEditorWindow : EditorWindow
             data.ApplyModifiedProperties();
             EditorGUILayout.Space(4f);
             if (GUILayout.Button(new GUIContent("Fill Empty Slots from the Free Sound Library",
-                    "Safe Haven › Audio › Set Up Free Sound Library: CC0 sounds in Audio/SFX (see CREDITS.md). Slots already set are kept.")))
+                    "Safe Haven › Setup › Audio › Set Up Free Sound Library: CC0 sounds in Audio/SFX (see CREDITS.md). Slots already set are kept.")))
             {
                 SoundLibrarySetup.SetUp();
                 Reload();

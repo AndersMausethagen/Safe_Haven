@@ -34,6 +34,14 @@ public sealed class BiomeBrush : EditorWindow
     [MenuItem("Safe Haven/World/Paint/Biome Brush")]
     public static void Open() => GetWindow<BiomeBrush>("Biome Brush");
 
+    /// <summary>Opens the brush on a preset, ready to paint.</summary>
+    public static void Open(BiomePreset biome)
+    {
+        BiomeBrush brush = GetWindow<BiomeBrush>("Biome Brush");
+        brush.preset = biome;
+        brush.SetPainting(biome != null);
+    }
+
     private void OnDisable() => SetPainting(false);
 
     private void OnProjectChange() => presets = null;

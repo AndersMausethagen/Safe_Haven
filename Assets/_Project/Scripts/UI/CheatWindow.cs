@@ -34,6 +34,11 @@ public sealed class CheatWindow : MonoBehaviour
     private static int amount = 10;
     private static int spawnCount = 1;
     private static bool toStash;
+    // What the next raid started here is like: a mood by name (null: rolled), a shape (null: rolled), a size (null: the mood's own).
+    private static string raidMood;
+    private static RaidLayoutShape? raidShape;
+    private static bool? raidLarge;
+    private static readonly string[] ShapeNames = { "Hub", "Ring", "Spine", "Thicket" };
 
     private sealed class Flip
     {
@@ -159,7 +164,7 @@ public sealed class CheatWindow : MonoBehaviour
 
         RaidDirector director = RaidDirector.Current;
         raidState.text = director != null && director.IsRunning
-            ? $"In {director.Session.Definition.DisplayName}: {RaidStats.FormatTime(director.Session.TimeRemaining)} left."
+            ? $"In {director.Session.Definition.DisplayName}{RunKind(director.Session)}: {RaidStats.FormatTime(director.Session.TimeRemaining)} left."
             : "No raid is running.";
     }
 
@@ -434,6 +439,53 @@ public sealed class CheatWindow : MonoBehaviour
         raidState = Label("State", page, Margin, 8f, Width - Margin * 2f, 30f, 21f, style.Text);
         Title("Start", page, 48f, style);
         float y = 80f;
+
+        // The kind of run: every mood the raids' layout rules know, by name, and the shapes and sizes.
+        var moods = new List<string> { null };
+        foreach (RaidDefinition raid in CheatSettings.Current.Raids)
+        {
+            if (raid == null || raid.LayoutRules == null)
+            {
+                continue;
+            }
+
+            foreach (RaidMapMood mood in raid.LayoutRules.Moods)
+            {
+                if (mood != null && !moods.Contains(mood.name))
+                {
+                    moods.Add(mood.name);
+                }
+            }
+        }
+
+        if (moods.Count > 1)
+        {
+            const int perRow = 7;
+            int across = Mathf.Min(perRow, moods.Count);
+            float width = (Width - Margin * 2f - ButtonGap * (across - 1)) / across;
+            for (int i = 0; i < moods.Count; i++)
+            {
+                string name = moods[i];
+                Switch(page, name ?? "Any type", Margin + i % perRow * (width + ButtonGap), y + i / perRow * RowStep, width, () => raidMood == name, _ => raidMood = name, showsState: false);
+            }
+
+            y += Mathf.CeilToInt(moods.Count / (float)perRow) * RowStep;
+            const int choices = 8;
+            float narrow = (Width - Margin * 2f - ButtonGap * (choices - 1)) / choices;
+            Switch(page, "Any shape", Margin, y, narrow, () => raidShape == null, _ => raidShape = null, showsState: false);
+            for (int i = 0; i < ShapeNames.Length; i++)
+            {
+                var shape = (RaidLayoutShape)i;
+                Switch(page, ShapeNames[i], Margin + (i + 1) * (narrow + ButtonGap), y, narrow, () => raidShape == shape, _ => raidShape = shape, showsState: false);
+            }
+
+            Switch(page, "Type's size", Margin + 5 * (narrow + ButtonGap), y, narrow, () => raidLarge == null, _ => raidLarge = null, showsState: false);
+            Switch(page, "Normal", Margin + 6 * (narrow + ButtonGap), y, narrow, () => raidLarge == false, _ => raidLarge = false, showsState: false);
+            Switch(page, "Large", Margin + 7 * (narrow + ButtonGap), y, narrow, () => raidLarge == true, _ => raidLarge = true, showsState: false);
+            y += RowStep;
+        }
+
+        int column = 0;
         foreach (RaidDefinition raid in CheatSettings.Current.Raids)
         {
             // Those without a scene are planned, not yet there to go to.
@@ -443,10 +495,12 @@ public sealed class CheatWindow : MonoBehaviour
             }
 
             RaidDefinition chosen = raid;
-            AddButton(raid.name, page, Margin, y, wide, UIRole.Kind.Button, () => StartRaid(chosen), out _).text = $"Start {raid.DisplayName}";
-            y += RowStep;
+            AddButton(raid.name, page, column == 0 ? Margin : right, y, wide, UIRole.Kind.Button, () => StartRaid(chosen), out _).text = $"Start {raid.DisplayName}";
+            column = 1 - column;
+            y += column == 0 ? RowStep : 0f;
         }
 
+        y += column == 1 ? RowStep : 0f;
         y += 8f;
         Title("In a raid", page, y, style);
         y += 32f;
@@ -460,11 +514,24 @@ public sealed class CheatWindow : MonoBehaviour
         Action(page, "Go to the nearest exit", right, y, wide, GoToExit, closes: true);
     }
 
+    // The mood, shape, size and seed of the run under way, for a report of what was tested.
+    private static string RunKind(RaidSession session)
+    {
+        RaidLayoutRules rules = session.Definition.LayoutRules;
+        if (rules == null)
+        {
+            return "";
+        }
+
+        (RaidShapeRule shape, RaidMapMood mood) = RaidLayoutPlanner.Choose(rules, session.Seed);
+        return $" ({mood.name}, {shape.shape}, {(session.IsLarge ? "large" : "normal")}, seed {session.Seed})";
+    }
+
     private void StartRaid(RaidDefinition raid)
     {
         // Closed first: a raid loads a new scene, and this window goes with the old one.
         window.Close();
-        if (!Cheats.StartRaid(raid, out string result))
+        if (!Cheats.StartRaid(raid, out string result, raidMood, raidShape, raidLarge))
         {
             GameMessages.Post(result, MessageKind.Warning);
         }

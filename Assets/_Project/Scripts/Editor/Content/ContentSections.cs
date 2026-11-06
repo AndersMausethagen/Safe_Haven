@@ -353,7 +353,7 @@ public sealed class GatheringNodeSection : PrefabContentSection
 
         if (node.BurstPieces > 0 && node.Fracture == null)
         {
-            problems.Add("It breaks apart, but its models aren't cracked yet: Safe Haven › Resources › Crack Mined Nodes.");
+            problems.Add("It breaks apart, but its models aren't cracked yet: Safe Haven › Setup › Resources › Crack Mined Nodes.");
         }
 
         if (node.GatherTool != ToolType.None && !ToolExists(node.GatherTool, node.RequiredToolTier))
@@ -884,7 +884,7 @@ public sealed class WeaponSection : ContentSection
         "Kind = Bow (Bow stance, held in the left hand) draws and shoots instead of swinging: set the Bow header and a Shot Attack; " +
         "its arrows (Arrows page) set the damage. " +
         "Create its Item and Recipe in the usual Items / Crafting pages. Held torch models retain their Light and LightFlicker. " +
-        "Timings follow the animations (Safe Haven › Characters › Set Up Combat Animations).";
+        "Timings follow the animations (Safe Haven › Setup › Characters › Set Up Combat Animations).";
 
     public override string ListGroup(Object asset) => ObjectNames.NicifyVariableName(((WeaponDefinition)asset).Stance.ToString());
 

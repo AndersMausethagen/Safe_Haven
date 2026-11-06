@@ -17,7 +17,7 @@ public static class HearthlineArtworkBuilder
     private const string MenuPath = "Assets/_Project/Scenes/MainMenu.unity";
     private const int Size = 128;
 
-    [MenuItem("Safe Haven/UI/Regenerate Hearthline Artwork")]
+    [MenuItem("Safe Haven/Setup/UI/Regenerate Hearthline Artwork", false, 200)]
     public static void Install()
     {
         UIStyle style = AssetDatabase.LoadAssetAtPath<UIStyle>(StylePath);

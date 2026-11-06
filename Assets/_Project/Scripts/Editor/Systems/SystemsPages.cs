@@ -146,7 +146,7 @@ public sealed class UIStylePage : SystemsPage
     public override string Group => "Settings";
     public override string Help => "Hearthline: the look of every window and HUD. Nothing frames the world: the HUD is type and thin lines with a soft " +
                                    "shadow, and amber is the one accent. Windows are solid. Colours changed here reach the whole game when it next " +
-                                   "runs; new UI prefabs get their roles from Safe Haven › UI › Apply Hearthline.";
+                                   "runs; new UI prefabs get their roles from Safe Haven › Setup › UI › Apply Hearthline.";
 
     public override void Draw()
     {

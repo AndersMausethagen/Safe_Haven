@@ -78,7 +78,7 @@ Labels below each segment give its name and start time. The two night segments j
   the blended weather values, not filenames. During transitions the text says **To [weather]**, while the icon follows
   the conditions currently visible. There is no forecast.
 - The strip does not intercept clicks and sits below inventory/pause windows. It inherits Screen Canvas scaling.
-- **Safe Haven > UI > Add Environment HUD to Scene** adds it to another scene that already has a Screen Canvas and
+- **Safe Haven > Setup > UI > Add Environment HUD to Scene** adds it to another scene that already has a Screen Canvas and
   configured sky rig. Running it again returns the existing HUD without duplicating it or resetting sky settings.
 
 ## What each part does

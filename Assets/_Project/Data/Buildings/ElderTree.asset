@@ -22,10 +22,12 @@ MonoBehaviour:
   constructionCost: []
   constructionItems:
   - item: {fileID: 11400000, guid: 183fddc5567e8b8479fcb1618e73496c, type: 2}
-    amount: 4
+    amount: 8
   showInBuildMenu: 1
   knownFromStart: 0
   sortOrder: 910
+  requires: []
+  requiredRank: 0
   yardDepth: 0
   yardSide: 0
   placeInLines: 0
@@ -35,4 +37,7 @@ MonoBehaviour:
   buildWork: 4
   renown: 12
   upgrades: []
+  comfort: 0
+  beds: 0
+  teachesRecipes: []
   deathSound: {fileID: 0}

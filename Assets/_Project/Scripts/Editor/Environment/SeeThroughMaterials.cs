@@ -7,7 +7,7 @@ using UnityEngine;
 /// and the player (SeeThrough). URP Lit and Unlit materials swap to the project's See-Through copies, which keep every
 /// property and keyword, so they look the same. Tree Wind and Layered Lit materials already dissolve.
 /// <list type="bullet">
-/// <item>Safe Haven › Rendering › Make Materials See-Through › Selected: the materials (or the materials of the prefabs
+/// <item>Safe Haven › Setup › Rendering › Make Materials See-Through › Selected: the materials (or the materials of the prefabs
 /// and objects) selected.</item>
 /// <item>… › Environment: every URP Lit/Unlit material in the environment folders (trees, rocks, resource nodes,
 /// structures, forest kit), not characters, creatures, effects or UI.</item>
@@ -16,7 +16,7 @@ using UnityEngine;
 /// </summary>
 public static class SeeThroughMaterials
 {
-    private const string Menu = "Safe Haven/Rendering/Make Materials See-Through/";
+    private const string Menu = "Safe Haven/Setup/Rendering/Make Materials See-Through/";
     private const string Lit = "Universal Render Pipeline/Lit";
     private const string Unlit = "Universal Render Pipeline/Unlit";
     private const string SeeLit = "Safe Haven/Lit (See-Through)";

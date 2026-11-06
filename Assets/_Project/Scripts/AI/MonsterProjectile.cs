@@ -61,6 +61,7 @@ public sealed class MonsterProjectile : MonoBehaviour
             if (victim != null && victim.IsAlive && owner.Faction.WillAttack(victim.Faction))
             {
                 DamageInfo info = DamageCalculator.Build(owner, attack, damage, victim.Category, hit.point, direction, Random.value);
+                info = info.WithAmount(info.Amount * CombatFeelSettings.HighGroundFor(owner.transform.position, victim is Component struck ? struck.transform.position : hit.point));
                 DamageResult result = victim.ApplyDamage(info);
                 owner.ReportDamageDealt(victim, info, result);
                 StatusEffects.AfterHit(attack, victim, owner, result);

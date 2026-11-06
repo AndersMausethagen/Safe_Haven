@@ -1,71 +1,120 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.Splines;
 
-/// <summary>GameObject › Safe Haven › World: makes a river, path, cliff or area (in the Mossy Forest look of the raids'
-/// dark forest or the Forest Lake look of the Haven, see <see cref="WorldLook"/>) under the scene's "World" object and
-/// starts drawing it. Safe Haven › World › Build Now / Rebuild Everything build from the menu.</summary>
+/// <summary>GameObject › Safe Haven › World: makes a river, path, cliff, ravine or area (in the look of the terrain in
+/// view: the Mossy Forest of the raids' dark forest or the Forest Lake of the Haven, see <see cref="WorldLook"/>) under the
+/// scene's "World" object and starts drawing it. Safe Haven › World › Build Now / Rebuild Everything build from the menu.</summary>
 public static class WorldMenus
 {
     private const string RootName = "World";
 
+    // One item per feature, in the look of the terrain in the Scene view (World Tools › Build picks a look on purpose).
     [MenuItem("GameObject/Safe Haven/World/River", false, 10)]
-    private static void River() => MakeRiver(WorldLook.MossyForest);
+    private static void River() => MakeRiver(LookInView());
 
-    [MenuItem("GameObject/Safe Haven/World/River (Haven)", false, 10)]
-    private static void HavenRiver() => MakeRiver(WorldLook.ForestLake);
-
-    private static void MakeRiver(WorldLook look)
+    public static RiverFeature MakeRiver(WorldLook look)
     {
         var river = Create<RiverFeature>("River");
         river.Configure(WorldAssets.RiverWater(), look.RiverBed, look.RiverBank, look.Palette("River Stones"), look.Palette("Riverbank"));
+        return river;
     }
 
-    [MenuItem("GameObject/Safe Haven/World/Path (Forest)", false, 11)]
-    private static void ForestPath() => Create<PathFeature>("Path").Configure(WorldLook.MossyForest.PathGround, null);
+    [MenuItem("GameObject/Safe Haven/World/Path", false, 11)]
+    private static void PathMenu() => MakePath(LookInView());
 
-    [MenuItem("GameObject/Safe Haven/World/Path (Haven)", false, 12)]
-    private static void HavenPath() => Create<PathFeature>("Path").Configure(WorldLook.ForestLake.PathGround, null);
+    public static PathFeature MakePath(WorldLook look)
+    {
+        var path = Create<PathFeature>("Path");
+        path.Configure(look.PathGround, null);
+        return path;
+    }
 
-    [MenuItem("GameObject/Safe Haven/World/Cliff", false, 13)]
-    private static void Cliff() => MakeCliff(WorldLook.MossyForest);
+    [MenuItem("GameObject/Safe Haven/World/Cliff", false, 12)]
+    private static void Cliff() => MakeCliff(LookInView());
 
-    [MenuItem("GameObject/Safe Haven/World/Cliff (Haven)", false, 13)]
-    private static void HavenCliff() => MakeCliff(WorldLook.ForestLake);
+    public static CliffFeature MakeCliff(WorldLook look)
+    {
+        // No crag pieces by default: the kit's slabs stacked along a face looked placed, not grown, and took longer to
+        // fix by hand than they saved. The face is the shaped terrain in Cliff Rock (tessellated) with rubble at its foot;
+        // a Kit can still be set on the cliff for pieces.
+        var cliff = Create<CliffFeature>("Cliff");
+        cliff.Configure(null, look.Palette("Rubble"), TerrainRock.CliffRock != null ? TerrainRock.CliffRock : look.RiverBed);
+        return cliff;
+    }
 
-    private static void MakeCliff(WorldLook look) =>
-        Create<CliffFeature>("Cliff").Configure(look.Crags, look.Palette("Rubble"), look.RiverBed);
+    [MenuItem("GameObject/Safe Haven/World/Ravine", false, 13)]
+    private static void Ravine() => MakeRavine(LookInView());
 
-    [MenuItem("GameObject/Safe Haven/World/Ravine", false, 14)]
-    private static void Ravine() => MakeRavine(WorldLook.MossyForest);
-
-    [MenuItem("GameObject/Safe Haven/World/Ravine (Haven)", false, 14)]
-    private static void HavenRavine() => MakeRavine(WorldLook.ForestLake);
-
-    private static void MakeRavine(WorldLook look) =>
-        Create<RavineFeature>("Ravine").Configure(look.Crags, look.Palette("Rubble"), look.RockGround, look.Ground(look == WorldLook.ForestLake ? "Haven Rock" : "Cedar Soil"),
+    public static RavineFeature MakeRavine(WorldLook look)
+    {
+        var ravine = Create<RavineFeature>("Ravine");
+        ravine.Configure(null, look.Palette("Rubble"), TerrainRock.CliffRock != null ? TerrainRock.CliffRock : look.RockGround, // no crag pieces, as cliffs look.Ground(look == WorldLook.ForestLake ? "Haven Rock" : "Cedar Soil"),
             look.Ground(look == WorldLook.ForestLake ? "Haven Lush Moss" : "Cedar Moss"));
+        return ravine;
+    }
 
-    [MenuItem("GameObject/Safe Haven/World/Dark Forest Area", false, 30)]
-    private static void DarkForest() => Create<BiomeArea>("Dark Forest").Configure(DarkForestLayers());
+    [MenuItem("GameObject/Safe Haven/World/Forest Area", false, 30)]
+    private static void ForestMenu() => MakeForest(LookInView());
 
-    [MenuItem("GameObject/Safe Haven/World/Haven Grove Area", false, 31)]
-    private static void HavenGrove() => Create<BiomeArea>("Haven Grove").Configure(HavenGroveLayers());
+    /// <summary>The look's forest: the Mossy Forest's dark forest (its floor painted with the Misty Woods biome) or the
+    /// Haven's open grove.</summary>
+    public static BiomeArea MakeForest(WorldLook look)
+    {
+        bool haven = look == WorldLook.ForestLake;
+        var area = Create<BiomeArea>(haven ? "Haven Grove" : "Dark Forest");
+        area.Configure(haven ? HavenGroveLayers() : DarkForestLayers(), haven ? null : Biome("Misty Woods Floor"));
+        return area;
+    }
 
-    [MenuItem("GameObject/Safe Haven/World/Ground Paint (Haven Meadow)", false, 40)]
+    [MenuItem("GameObject/Safe Haven/World/Biome Area", false, 32)]
+    private static void BiomeAreaMenu() => MakeBiomeArea(BiomesFor(LookInView()).FirstOrDefault());
+
+    /// <summary>The look of the terrain under the middle of the Scene view (the Mossy Forest when there is none).</summary>
+    public static WorldLook LookInView()
+    {
+        SceneView view = SceneView.lastActiveSceneView;
+        return WorldLook.Of(view != null ? WorldGround.TerrainAt(new Vector2(view.pivot.x, view.pivot.z)) : null);
+    }
+
+    /// <summary>An area painted with a biome (ground, plants and props, no trees of its own): draw its loop on the ground.</summary>
+    public static BiomeArea MakeBiomeArea(BiomePreset biome)
+    {
+        var area = Create<BiomeArea>(biome != null ? biome.name : "Biome Area");
+        area.Configure(new List<BiomeArea.Layer>(), biome);
+        return area;
+    }
+
+    /// <summary>The biome presets of a look (and those for any look), by name.</summary>
+    public static List<BiomePreset> BiomesFor(WorldLook look) =>
+        AssetDatabase.FindAssets("t:" + nameof(BiomePreset))
+            .Select(g => AssetDatabase.LoadAssetAtPath<BiomePreset>(AssetDatabase.GUIDToAssetPath(g)))
+            .Where(b => b != null && (string.IsNullOrEmpty(b.look) || look == null || b.look == look.Name))
+            .OrderBy(b => b.name).ToList();
+
+    private static BiomePreset Biome(string name) => AssetDatabase.LoadAssetAtPath<BiomePreset>($"{BiomeBrush.Folder}/{name}.asset");
+
+    [MenuItem("GameObject/Safe Haven/World/Ground Paint/Haven Meadow", false, 40)]
     private static void PaintMeadow() => Paint(WorldLook.ForestLake, "Haven Meadow");
 
-    [MenuItem("GameObject/Safe Haven/World/Ground Paint (Haven Old-Growth)", false, 41)]
+    [MenuItem("GameObject/Safe Haven/World/Ground Paint/Haven Old-Growth", false, 41)]
     private static void PaintOldGrowth() => Paint(WorldLook.ForestLake, "Old-Growth Forest");
 
-    [MenuItem("GameObject/Safe Haven/World/Ground Paint (Raid Dark Forest)", false, 42)]
+    [MenuItem("GameObject/Safe Haven/World/Ground Paint/Raid Dark Forest", false, 42)]
     private static void PaintDarkForest() => Paint(WorldLook.MossyForest, "Dark Forest");
 
     /// <summary>A Ground Paint Area with a ready-made look; draw its loop on the ground.</summary>
-    private static void Paint(WorldLook look, string rules) =>
-        Create<GroundPaintArea>("Ground Paint (" + rules + ")").Configure(look.Rules(rules));
+    private static void Paint(WorldLook look, string rules) => MakeGroundPaint(look, rules);
+
+    public static GroundPaintArea MakeGroundPaint(WorldLook look, string rules)
+    {
+        var area = Create<GroundPaintArea>("Ground Paint (" + rules + ")");
+        area.Configure(look.Rules(rules));
+        return area;
+    }
 
     [MenuItem("Safe Haven/World/Build Now")]
     private static void BuildNow() => WorldBuilder.BuildChanged(false);
@@ -73,8 +122,8 @@ public static class WorldMenus
     [MenuItem("Safe Haven/World/Rebuild Everything")]
     private static void RebuildAll() => WorldBuilder.BuildChanged(true);
 
-    /// <summary>Ground painted by hand over a feature's paint stays as painted through every build. This lets the
-    /// features paint it again: under the selected features, or on the whole terrain when none is selected.</summary>
+    /// <summary>Ground painted (and grass grown or cleared) by hand over a feature's stays as it is through every build.
+    /// This lets the features paint it again: under the selected features, or on the whole terrain when none is selected.</summary>
     [MenuItem("Safe Haven/World/Give Hand Paint Back to Features")]
     private static void ReleaseHandPaint()
     {
@@ -94,7 +143,7 @@ public static class WorldMenus
         foreach (Terrain terrain in Terrain.activeTerrains)
         {
             WorldTerrain world = terrain.GetComponent<WorldTerrain>();
-            if (world == null || world.Stash == null || world.Stash.HandPaintedCount == 0)
+            if (world == null || world.Stash == null || (world.Stash.HandPaintedCount == 0 && world.Stash.HandKeptDetailCount == 0))
             {
                 continue;
             }
@@ -103,7 +152,7 @@ public static class WorldMenus
             int before = released;
             if (features.Count == 0)
             {
-                released += world.Stash.ReleaseHandPainted(null);
+                released += world.Stash.ReleaseHandPainted(null) + world.Stash.ReleaseHandKeptDetails(null);
             }
             else
             {
@@ -116,6 +165,12 @@ public static class WorldMenus
                     var min = new Vector2Int(Mathf.FloorToInt(low.x), Mathf.FloorToInt(low.y));
                     var max = new Vector2Int(Mathf.CeilToInt(high.x), Mathf.CeilToInt(high.y));
                     released += world.Stash.ReleaseHandPainted(new RectInt(min, max - min + Vector2Int.one));
+                    TerrainGrid details = TerrainGrid.Details(terrain);
+                    Vector2 dLow = details.GridPosition(new Vector2(bounds.min.x, bounds.min.z));
+                    Vector2 dHigh = details.GridPosition(new Vector2(bounds.max.x, bounds.max.z));
+                    var dMin = new Vector2Int(Mathf.FloorToInt(dLow.x), Mathf.FloorToInt(dLow.y));
+                    var dMax = new Vector2Int(Mathf.CeilToInt(dHigh.x), Mathf.CeilToInt(dHigh.y));
+                    released += world.Stash.ReleaseHandKeptDetails(new RectInt(dMin, dMax - dMin + Vector2Int.one));
                 }
             }
 
@@ -126,7 +181,7 @@ public static class WorldMenus
             }
         }
 
-        Debug.Log($"World Builder: gave {released} hand-painted ground cell(s) back to the features.");
+        Debug.Log($"World Builder: gave {released} hand-painted ground and grass cell(s) back to the features.");
     }
 
     public static T Create<T>(string name) where T : WorldFeature

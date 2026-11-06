@@ -22,6 +22,8 @@ internal sealed class RaidMapSheet
         ("Cache", RaidMapMarkers.ColorOf(RaidSiteKind.SupplyCache)),
         ("Rumour", RaidLayoutPreview.Marker(RaidSiteKind.Rumour)),
         ("Water", RaidLayoutPreview.WaterColour),
+        ("Ravine", RaidLayoutPreview.ChasmColour),
+        ("Ravine river", RaidLayoutPreview.RiverColour),
     };
 
     private readonly int count;
@@ -143,6 +145,8 @@ public sealed class RaidLayoutPreview : EditorWindow
 {
     internal const int MapPixels = 256;
     internal static readonly Color WaterColour = new Color(0.18f, 0.42f, 0.72f);
+    internal static readonly Color RiverColour = new Color(0.1f, 0.22f, 0.42f);
+    internal static readonly Color ChasmColour = new Color(0.06f, 0.06f, 0.07f);
     private const int Maps = 6;
 
     private readonly RaidMapSheet sheet = new RaidMapSheet(Maps);
@@ -150,7 +154,7 @@ public sealed class RaidLayoutPreview : EditorWindow
     private RaidLayoutRules rules;
     private Vector2 scroll;
 
-    [MenuItem("Safe Haven/Raids/Layout Preview")]
+    [MenuItem("Safe Haven/Content/Raid Layout Preview", false, 21)]
     private static void Open() => GetWindow<RaidLayoutPreview>("Raid Layouts");
 
     private void OnEnable()
@@ -231,9 +235,17 @@ public sealed class RaidLayoutPreview : EditorWindow
                 }
 
                 int cell = Mathf.Min(cells - 1, (int)(v * cells)) * cells + Mathf.Min(cells - 1, (int)(u * cells));
+                float height = field.HeightAt(u, v);
+                if (plan.Ravines.Count > 0 && plan.OverRavine(new Vector2(u * plan.Size, v * plan.Size), out RaidLayoutRavine ravine, out float rim)
+                    && height < rim - RaidChasm.FallDepth)
+                {
+                    colours[y * pixels + x] = ravine.River ? RiverColour : ChasmColour;
+                    continue;
+                }
+
                 Color colour = Color.Lerp(open, wild, forest[cell] / 255f);
                 colour = Color.Lerp(colour, soil, Mathf.Max(path[cell], clearing[cell]) / 255f);
-                float light = 0.75f + Mathf.Clamp01(field.HeightAt(u, v) / 26f) * 0.75f;
+                float light = 0.75f + Mathf.Clamp01((height - field.Lift) / 26f) * 0.75f;
                 colours[y * pixels + x] = new Color(colour.r * light, colour.g * light, colour.b * light, 1f);
             }
         }

@@ -6,7 +6,7 @@ These are authored procedural materials, not photogrammetry; scanned textures or
 
 ## Try it
 
-Choose **Safe Haven > Art Pipeline > Open Moss Preview**. This opens a separate, saved demonstration scene with
+Choose **Safe Haven > Setup > Art Pipeline > Open Moss Preview**. This opens a separate, saved demonstration scene with
 a moss-covered clearing and a bare winding path. It is not a gameplay scene and is not added to Build Settings.
 Enter Play mode to see the wind, or select **Forest Wind** and enable **Preview wind in Scene view**.
 The upgraded preview contains moss-covered granite, a leaf-litter path, and four labelled material samples.
@@ -40,7 +40,7 @@ Each 1024-square texture set (**Moss**, **Soil**, **Stone**) has:
 | TerrainMask | R metallic (0), G occlusion, B height, A smoothness | Linear |
 
 All maps repeat and include mipmaps. Replace them with compatible art without changing gameplay code.
-Use **Safe Haven > Art Pipeline > Regenerate Forest Ground Textures** to recreate the original maps;
+Use **Safe Haven > Setup > Art Pipeline > Regenerate Forest Ground Textures** to recreate the original maps;
 it confirms before overwriting them. Their deterministic source is `ForestGroundTextures.cs`.
 **Create Amplify Forest Shaders** creates missing graphs without overwriting populated graphs or designer edits.
 **Upgrade Moss Preview Materials** upgrades the saved preview once; it refuses duplicate showcase roots.

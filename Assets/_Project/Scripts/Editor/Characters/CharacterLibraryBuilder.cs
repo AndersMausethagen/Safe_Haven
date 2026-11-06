@@ -27,7 +27,7 @@ public static class CharacterLibraryBuilder
     private static Dictionary<string, GameObject> prefabs;
     private static Dictionary<string, Material> materials;
 
-    [MenuItem("Safe Haven/Characters/Build Character Library")]
+    [MenuItem("Safe Haven/Setup/Characters/Build Character Library", false, 200)]
     public static void BuildFromMenu() => Debug.Log(BuildAll());
 
     public static string BuildAll()

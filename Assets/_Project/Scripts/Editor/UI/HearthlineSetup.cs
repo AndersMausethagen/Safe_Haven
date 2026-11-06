@@ -9,7 +9,7 @@ using UnityEngine.UI;
 /// <summary>
 /// Puts the UI in the Hearthline style (UIStyle, GDD §18.7): the fonts and their shadowed versions, the roles on every
 /// window, button and slot in the UI prefabs, and the frameless HUD. Safe to run again: it sets positions and roles outright.
-/// Safe Haven › UI › Apply Hearthline.
+/// Safe Haven › Setup › UI › Apply Hearthline.
 /// </summary>
 public static class HearthlineSetup
 {
@@ -27,7 +27,7 @@ public static class HearthlineSetup
         "Assets/_Project/Scenes/SafeHaven.unity",
     };
 
-    [MenuItem("Safe Haven/UI/Apply Hearthline")]
+    [MenuItem("Safe Haven/Setup/UI/Apply Hearthline", false, 200)]
     public static void ApplyAll()
     {
         SetUpType();

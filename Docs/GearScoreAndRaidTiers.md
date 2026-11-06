@@ -153,6 +153,29 @@ than 20% from tier I, if the kit before stops hurting, or if a higher kit isn't 
 What this found on day one: **the Moonsilver set was weaker than Iron** (78 armor against 100), and so tier IV gear lowered a player's toughness.
 Its armor is now 170, keeping its spell power and resistances.
 
+### Tier I as played: an encounter model (2026-11-06)
+
+The table above uses one reference creature. For tier I the question is what a group leaves you with, so a small model (health left after
+killing a group one at a time, two striking at once) was run on the real numbers: creatures at +30% health and +20% damage since the playtest
+round, the Hand Axe or Worn Sword (12) for no gear, and the full woven kit (150 health, 32 armor). "Average" lets half the strikes land and
+swings 60% of the time; "good" lets a quarter land and swings 70%.
+
+| Health left after three wolves | Day, average | Day, good | Night, average | Night, good | Night's last minute, average |
+|---|---|---|---|---|---|
+| No armor | dies | 43% | dies | 37% | dies |
+| Club and jerkin | 10% | 62% | 1% | 58% | dies |
+| Full tier I kit | 36% | 72% | 29% | 70% | 4% |
+
+The day already did what tier I should: hard bare, easier geared, still a fight. **Night was the problem**: at 1.3x health and 1.25x damage,
+and +35% more in the last minute, a full tier I kit lost to a pack of three on average, and a run's hour is rolled by chance (55% day, 25% dusk,
+20% night). Night creatures now have **1.1x health and hit no harder** (`Resources/NightSettings`, set by `AgentScripts/BuildBalancePass.cs`),
+at the user's call: night fights last a little longer instead of ending sooner. Night is still harder (less sight, more creatures, the last stage
+on top) and still pays twice the essence. The figures in the table are after the change.
+
+The tier I weapons (Knotted Club, Hand Axe, Worn Sword at 12, the Fire-Hardened Spear at 10.2 for its reach) are also the prologue's starting
+choice, so at tier I gear is what keeps you standing, not what kills faster: a kit doubles toughness and adds 4% damage. Copper weapons are the first
+real damage step. Wolves caused most of the raid deaths in the playtest logs, and every logged tier run was at gear score 0, so a geared run is still unplayed.
+
 ## Gaps
 
 - **Tier V can't be offered yet:** the only tier V gear is the Trollstone Maul, so a full tier V kit doesn't exist. When armor is added, add a row

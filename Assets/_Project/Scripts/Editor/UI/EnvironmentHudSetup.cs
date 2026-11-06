@@ -10,7 +10,7 @@ using UnityEngine.UI;
 /// <summary>Adds a scene-bound, non-interactive environment HUD without changing authored sky settings.</summary>
 public static class EnvironmentHudSetup
 {
-    [MenuItem("Safe Haven/UI/Add Environment HUD to Scene")]
+    [MenuItem("Safe Haven/Setup/UI/Add Environment HUD to Scene", false, 200)]
     public static void AddFromMenu()
     {
         Selection.activeGameObject = AddToScene().gameObject;

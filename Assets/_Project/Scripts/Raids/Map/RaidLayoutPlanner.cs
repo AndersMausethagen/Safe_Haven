@@ -22,6 +22,135 @@ public sealed class RaidLayoutRoom
     public RaidRoomRole Role;
     /// <summary>How many trails lead here. One makes it a dead end.</summary>
     public int Links;
+    /// <summary>Which ground level it stands on, 0 the lowest, on a mood with terraces (RaidMapMood.terraces).</summary>
+    public int Level;
+}
+
+/// <summary>
+/// A ravine on a generated map, in metres from the map's south-west corner: a deep cut with sheer walls along a line. Where a trail
+/// crosses it, a neck of solid ground carries the trail over. Its floor only falls along the line, so a river on it runs from the
+/// first point to the last.
+/// </summary>
+public sealed class RaidLayoutRavine
+{
+    /// <summary>The middle of the cut.</summary>
+    public readonly List<Vector2> Line = new List<Vector2>();
+    /// <summary>Half the width from rim to rim at each point of the line.</summary>
+    public readonly List<float> HalfWidths = new List<float>();
+    /// <summary>The least depth below the rim.</summary>
+    public float Depth;
+    public bool River;
+    /// <summary>The ground's height at each point before the cut, above the map's lowest point. RaidLayoutField works it out.</summary>
+    public float[] Rim = System.Array.Empty<float>();
+    /// <summary>The floor's height at each point. RaidLayoutField works it out.</summary>
+    public float[] Floor = System.Array.Empty<float>();
+    /// <summary>The segments (from point i to i + 1) where the floor drops by a cliff and a river falls. RaidLayoutField works them out.</summary>
+    public readonly List<int> Cascades = new List<int>();
+
+    private const float MinWall = 1.3f;
+    private const float WallShare = 0.22f;
+
+    /// <summary>How far a wall's ragged edge wanders out past the half width, in metres.</summary>
+    public const float RagReach = 1.8f;
+
+    /// <summary>Metres over which a wall climbs from the floor to the rim: sheer.</summary>
+    public static float WallRun(float halfWidth) => Mathf.Max(MinWall, halfWidth * WallShare);
+
+    public float WidestHalf
+    {
+        get
+        {
+            float widest = 0f;
+            foreach (float half in HalfWidths)
+            {
+                widest = Mathf.Max(widest, half);
+            }
+
+            return widest;
+        }
+    }
+
+    /// <summary>The nearest point of the line: its segment, how far along it (0-1) and how far away, in metres.</summary>
+    public void Nearest(Vector2 point, out int segment, out float along, out float distance)
+    {
+        segment = 0;
+        along = 0f;
+        float best = float.MaxValue;
+        for (int i = 0; i + 1 < Line.Count; i++)
+        {
+            Vector2 step = Line[i + 1] - Line[i];
+            float t = Mathf.Clamp01(Vector2.Dot(point - Line[i], step) / Mathf.Max(0.0001f, step.sqrMagnitude));
+            float squared = (Line[i] + step * t - point).sqrMagnitude;
+            if (squared < best)
+            {
+                best = squared;
+                segment = i;
+                along = t;
+            }
+        }
+
+        distance = Mathf.Sqrt(best);
+    }
+
+    /// <summary>A value kept per point of the line (the widths, rim or floor), at a place along a segment.</summary>
+    public static float At(IReadOnlyList<float> values, int segment, float along) =>
+        values.Count == 0 ? 0f : Mathf.Lerp(values[Mathf.Min(segment, values.Count - 1)], values[Mathf.Min(segment + 1, values.Count - 1)], along);
+}
+
+/// <summary>A great hill on a generated map, in metres from the map's south-west corner: a broad rise with gentle flanks.</summary>
+public sealed class RaidLayoutHill
+{
+    public Vector2 Position;
+    public float Radius;
+    public float Height;
+
+    /// <summary>How much it raises the ground at a point: full at the top, easing out to nothing at its radius.</summary>
+    public float RiseAt(Vector2 point)
+    {
+        float squared = (point - Position).sqrMagnitude;
+        if (squared >= Radius * Radius)
+        {
+            return 0f;
+        }
+
+        return Height * Mathf.SmoothStep(0f, 1f, 1f - Mathf.Sqrt(squared) / Radius);
+    }
+}
+
+/// <summary>A great boulder on a generated map, in metres from the map's south-west corner.</summary>
+public sealed class RaidLayoutBoulder
+{
+    public Vector2 Position;
+    public float Scale;
+    /// <summary>Degrees about up.</summary>
+    public float Turn;
+    /// <summary>0-1: which piece of the kit, by weight.</summary>
+    public float Pick;
+}
+
+/// <summary>A sheer rock spire on a generated map, in metres from the map's south-west corner: too steep to climb, so nothing goes on it.</summary>
+public sealed class RaidLayoutSpire
+{
+    public Vector2 Position;
+    public float Radius;
+    public float Height;
+    /// <summary>Which way its uneven outline lies, in radians.</summary>
+    public float Turn;
+    /// <summary>The height of its top above the map's lowest point. RaidLayoutField works it out.</summary>
+    public float Top;
+
+    private const float MaxWobble = 1.22f;
+
+    public float Reach => Radius * MaxWobble;
+
+    /// <summary>Metres from the point to the spire's edge: below zero it is on the spire.</summary>
+    public float Edge(Vector2 point)
+    {
+        Vector2 offset = point - Position;
+        float angle = Mathf.Atan2(offset.y, offset.x);
+        float wobble = 1f + 0.14f * Mathf.Sin(angle * 3f + Turn) + 0.08f * Mathf.Sin(angle * 5f - Turn * 2f);
+        return offset.magnitude - Radius * wobble;
+    }
 }
 
 /// <summary>A pond on a generated map, in metres from the map's south-west corner: a slightly uneven oval.</summary>
@@ -107,6 +236,16 @@ public sealed class RaidLayoutPlan
     public readonly List<RaidLayoutPond> Ponds = new List<RaidLayoutPond>();
     /// <summary>The authored places on this map.</summary>
     public readonly List<RaidLayoutPiece> Pieces = new List<RaidLayoutPiece>();
+    /// <summary>The ravines, placed after the ponds, so they never move a site.</summary>
+    public readonly List<RaidLayoutRavine> Ravines = new List<RaidLayoutRavine>();
+    /// <summary>The rock spires nobody can climb, placed last.</summary>
+    public readonly List<RaidLayoutSpire> Spires = new List<RaidLayoutSpire>();
+    /// <summary>The great hills in the wild ground.</summary>
+    public readonly List<RaidLayoutHill> Hills = new List<RaidLayoutHill>();
+    /// <summary>The great boulders lying about.</summary>
+    public readonly List<RaidLayoutBoulder> Boulders = new List<RaidLayoutBoulder>();
+    /// <summary>How hilly this run is (Rules › Hill Variance): multiplies the rolling of the ground and the hills' height.</summary>
+    public float Hilliness = 1f;
 
     public RaidLayoutRoom Start => Rooms[0];
 
@@ -126,6 +265,28 @@ public sealed class RaidLayoutPlan
             }
         }
 
+        return false;
+    }
+
+    /// <summary>
+    /// The ravine whose cut the point lies over, in metres from the map's corner, with the height of its rim there. A neck that carries a
+    /// trail across lies within it too, as solid ground: the caller compares heights.
+    /// </summary>
+    public bool OverRavine(Vector2 point, out RaidLayoutRavine over, out float rim, float beyond = 0f)
+    {
+        foreach (RaidLayoutRavine ravine in Ravines)
+        {
+            ravine.Nearest(point, out int segment, out float along, out float distance);
+            if (distance < RaidLayoutRavine.At(ravine.HalfWidths, segment, along) + beyond)
+            {
+                over = ravine;
+                rim = RaidLayoutRavine.At(ravine.Rim, segment, along);
+                return true;
+            }
+        }
+
+        over = null;
+        rim = 0f;
         return false;
     }
 
@@ -212,6 +373,7 @@ public static class RaidLayoutPlanner
 
         PlaceRooms(plan, rules, random, out List<int> spine);
         JoinRooms(plan, rules, random, spine);
+        AssignLevels(plan, rules);
         foreach (RaidLayoutRoom room in plan.Rooms)
         {
             RaidSiteKind kind = room.Role == RaidRoomRole.Start ? RaidSiteKind.PlayerStart
@@ -234,8 +396,772 @@ public static class RaidLayoutPlanner
         RaidMapMarkers.Sort(plan.Sites);
         PlaceSetPieces(plan, rules, seed, attempt);
         PlacePonds(plan, rules, attempt);
+        PlaceRavines(plan, rules, attempt);
+        PlaceSpires(plan, rules, attempt);
+        PlaceHills(plan, rules, attempt);
+        PlaceBoulders(plan, rules, attempt);
         return plan;
     }
+
+    /// <summary>How hilly a run is: fixed by its seed, whichever attempt at the map is used.</summary>
+    public static float Hilliness(RaidLayoutRules rules, int seed)
+    {
+        var random = new System.Random(RaidLayout.SeedFor(seed, "Hilliness"));
+        return Range(random, rules.HillVariance.x, Mathf.Max(rules.HillVariance.x, rules.HillVariance.y));
+    }
+
+    private const float HillFromRoom = 0.55f;
+    private const float HillSteepest = 0.35f;
+    private const float HillFromRamp = 0.85f;
+    private const float HillFromTrail = 0.3f;
+    private const int HillTries = 40;
+    // From a boulder's middle: the largest is about 9 m across (RaidMapGenerator.BoulderWidest).
+    private const float BoulderFromTrail = 6.5f;
+    private const float BoulderFromRoom = 5.5f;
+    private const float BoulderFromSite = 9f;
+    private const float BoulderSpread = 6f;
+    private const int BoulderTries = 30;
+
+    // Their tops in the wild ground and off the clearings; trails may climb their outer flanks. From their own stream, so nothing else moves.
+    private static void PlaceHills(RaidLayoutPlan plan, RaidLayoutRules rules, int attempt)
+    {
+        plan.Hilliness = Hilliness(rules, plan.Seed);
+        float share = plan.Mood != null ? plan.Mood.hills : 1f;
+        if (rules.GreatHills.y <= 0 || share <= 0f)
+        {
+            return;
+        }
+
+        var random = new System.Random(RaidLayout.SeedFor(plan.Seed, "Hills " + attempt));
+        int wanted = Mathf.RoundToInt(random.Next(rules.GreatHills.x, rules.GreatHills.y + 1) * share);
+        float halfWidth = rules.TrailHalfWidth * plan.Mood.trails;
+        for (int i = 0; i < wanted; i++)
+        {
+            for (int tries = 0; tries < HillTries; tries++)
+            {
+                var hill = new RaidLayoutHill
+                {
+                    Radius = Range(random, rules.GreatHillRadius.x, rules.GreatHillRadius.y),
+                    Height = Range(random, rules.GreatHillHeight.x, rules.GreatHillHeight.y) * plan.Hilliness * Mathf.Max(1f, share),
+                };
+                // No steeper than a trail can climb over its flank (the steepest flank is 1.5 times height over radius).
+                hill.Height = Mathf.Min(hill.Height, hill.Radius * HillSteepest);
+                float margin = rules.EdgeMargin;
+                hill.Position = new Vector2(Range(random, margin, plan.Size - margin), Range(random, margin, plan.Size - margin));
+                if (HillFits(plan, hill, halfWidth))
+                {
+                    plan.Hills.Add(hill);
+                    break;
+                }
+            }
+        }
+    }
+
+    private static bool HillFits(RaidLayoutPlan plan, RaidLayoutHill hill, float halfWidth)
+    {
+        foreach (RaidLayoutRoom room in plan.Rooms)
+        {
+            if (Vector2.Distance(room.Position, hill.Position) < room.Radius + hill.Radius * HillFromRoom)
+            {
+                return false;
+            }
+        }
+
+        foreach (RaidSite site in plan.Sites)
+        {
+            if (Vector2.Distance(site.Position * plan.Size, hill.Position) < hill.Radius * HillFromRoom)
+            {
+                return false;
+            }
+        }
+
+        foreach (RaidLayoutHill other in plan.Hills)
+        {
+            if (Vector2.Distance(other.Position, hill.Position) < (other.Radius + hill.Radius) * 0.6f)
+            {
+                return false;
+            }
+        }
+
+        // A ramp already climbs: a hill's flank on it as well would make it too steep, so only its gentle outer edge may reach one.
+        for (int i = 0; i < plan.Links.Count && i < plan.Trails.Count; i++)
+        {
+            (int a, int b) = plan.Links[i];
+            if (plan.Rooms[a].Level != plan.Rooms[b].Level && NearLine(plan.Trails[i], hill.Position, halfWidth + hill.Radius * HillFromRamp))
+            {
+                return false;
+            }
+        }
+
+        return !LineWithin(plan.Trails, hill.Position, halfWidth + hill.Radius * HillFromTrail);
+    }
+
+    // Clusters of a few in the wild ground, never on a trail, clearing, site, pond, ravine or spire.
+    private static void PlaceBoulders(RaidLayoutPlan plan, RaidLayoutRules rules, int attempt)
+    {
+        float share = plan.Mood != null ? plan.Mood.boulders : 1f;
+        if (rules.BoulderClusters.y <= 0 || share <= 0f || rules.BoulderKit == null)
+        {
+            return;
+        }
+
+        var random = new System.Random(RaidLayout.SeedFor(plan.Seed, "Boulders " + attempt));
+        int clusters = Mathf.RoundToInt(random.Next(rules.BoulderClusters.x, rules.BoulderClusters.y + 1) * share);
+        float halfWidth = rules.TrailHalfWidth * plan.Mood.trails;
+        for (int i = 0; i < clusters; i++)
+        {
+            for (int tries = 0; tries < BoulderTries; tries++)
+            {
+                var centre = new Vector2(Range(random, rules.EdgeMargin, plan.Size - rules.EdgeMargin), Range(random, rules.EdgeMargin, plan.Size - rules.EdgeMargin));
+                if (!BoulderFits(plan, centre, halfWidth))
+                {
+                    continue;
+                }
+
+                int count = random.Next(rules.BoulderClusterSize.x, rules.BoulderClusterSize.y + 1);
+                for (int k = 0; k < count; k++)
+                {
+                    Vector2 spot = k == 0 ? centre : centre + Direction(Range(random, 0f, 360f)) * Range(random, 2f, BoulderSpread);
+                    if (k == 0 || BoulderFits(plan, spot, halfWidth))
+                    {
+                        plan.Boulders.Add(new RaidLayoutBoulder
+                        {
+                            Position = spot,
+                            Scale = Range(random, rules.BoulderScale.x, rules.BoulderScale.y) * (k == 0 ? 1f : 0.75f),
+                            Turn = Range(random, 0f, 360f),
+                            Pick = (float)random.NextDouble(),
+                        });
+                    }
+                }
+
+                break;
+            }
+        }
+    }
+
+    private static bool BoulderFits(RaidLayoutPlan plan, Vector2 spot, float halfWidth)
+    {
+        foreach (RaidLayoutRoom room in plan.Rooms)
+        {
+            if (Vector2.Distance(room.Position, spot) < room.Radius + BoulderFromRoom)
+            {
+                return false;
+            }
+        }
+
+        foreach (RaidSite site in plan.Sites)
+        {
+            if (Vector2.Distance(site.Position * plan.Size, spot) < BoulderFromSite)
+            {
+                return false;
+            }
+        }
+
+        foreach ((Vector2 centre, float radius) in plan.Pockets)
+        {
+            if (Vector2.Distance(centre, spot) < radius + BoulderFromRoom)
+            {
+                return false;
+            }
+        }
+
+        foreach (RaidLayoutPond pond in plan.Ponds)
+        {
+            if (pond.Edge(spot) < BoulderFromRoom + 1f)
+            {
+                return false;
+            }
+        }
+
+        foreach (RaidLayoutRavine ravine in plan.Ravines)
+        {
+            ravine.Nearest(spot, out _, out _, out float distance);
+            if (distance < ravine.WidestHalf + RaidLayoutRavine.RagReach + BoulderFromRoom)
+            {
+                return false;
+            }
+        }
+
+        foreach (RaidLayoutSpire spire in plan.Spires)
+        {
+            if (spire.Edge(spot) < BoulderFromRoom + 2f)
+            {
+                return false;
+            }
+        }
+
+        return !LineWithin(plan.Trails, spot, halfWidth + BoulderFromTrail) && !LineWithin(plan.Spurs, spot, halfWidth + BoulderFromTrail);
+    }
+
+    /// <summary>
+    /// A seed whose run passes <paramref name="wanted"/> (its shape and mood), tried from <paramref name="from"/> on: cheap, as only Choose
+    /// runs. Null when none of <paramref name="tries"/> does, as when the rules have no such mood. The cheat menu starts a raid of a chosen
+    /// kind this way, so the run is an ordinary one and its briefing, map and spawns all agree.
+    /// </summary>
+    public static int? FindSeed(RaidLayoutRules rules, System.Func<RaidShapeRule, RaidMapMood, bool> wanted, int from, int tries = 4000)
+    {
+        for (int i = 0; i < tries; i++)
+        {
+            int seed = unchecked(from + i * 7919);
+            (RaidShapeRule shape, RaidMapMood mood) = Choose(rules, seed);
+            if (wanted(shape, mood))
+            {
+                return seed;
+            }
+        }
+
+        return null;
+    }
+
+    // ----- Cliffs and ravines: only moods with terraces, ravines or spires run any of this -----
+
+    // A ramp eases in and out (smoothstep), so its steepest stretch is 1.5 times its mean slope; 0.53 is about 28 degrees.
+    private const float RampSteepest = 0.53f;
+    private const float RampSmoothSteepness = 1.5f;
+    private const float RavineStep = 4f;
+    private const float RavineTurn = 9f;
+    private const int RavineTries = 150;
+    private const float RavineFromRoom = 2.5f;
+    private const float RavineFromSite = 6f;
+    private const float RavineFromPocket = 2f;
+    private const float RavineFromPond = 4f;
+    private const float RavineFromRavine = 12f;
+    private const float RavineFromTrail = 1.5f;
+    // How squarely a ravine must cross a trail (the sine of the angle between them), so the neck over it stays short.
+    private const float RavineCrossing = 0.7f;
+    private const float RavineShortest = 0.5f;
+    private const float RavineWobble = 0.14f;
+    private static readonly float[] RavineSteers = { 0f, 15f, -15f, 30f, -30f, 45f, -45f };
+    private const float RavineTaper = 18f;
+    private const float RavineEndWidth = 0.45f;
+    private const float SpireFromTrail = 7f;
+    private const float SpireFromRoom = 6f;
+    private const float SpireFromSite = 8f;
+    private const float SpireFromRavine = 5f;
+    private const float SpireFromSpire = 10f;
+    private const int SpireTries = 120;
+    // Two trails this close (beyond their own sides), or a trail this close to a clearing it doesn't end at, share one level.
+    private const float LevelsApart = 4f;
+    private const float LevelSample = 2f;
+
+    // Each clearing's level comes from broad noise, so high and low ground lie in patches. Then a trail never climbs more than one level,
+    // nor more steeply than a walkable ramp, and what stands too close together to have a cliff between (a trail passing a clearing, two
+    // trails side by side) shares one level: each time, the higher end comes down. It only ever lowers, so it always settles.
+    private static void AssignLevels(RaidLayoutPlan plan, RaidLayoutRules rules)
+    {
+        RaidMapMood mood = plan.Mood;
+        if (mood == null || mood.terraces <= 1)
+        {
+            return;
+        }
+
+        foreach (RaidLayoutRoom room in plan.Rooms)
+        {
+            float noise = Mathf.PerlinNoise((room.Position.x + plan.NoiseOffset.x + 517f) / mood.terraceScale, (room.Position.y + plan.NoiseOffset.y - 517f) / mood.terraceScale);
+            room.Level = Mathf.Clamp(Mathf.FloorToInt(Mathf.InverseLerp(0.25f, 0.75f, noise) * mood.terraces), 0, mood.terraces - 1);
+        }
+
+        List<List<int>> together = SharedLevels(plan, rules.TrailHalfWidth * mood.trails);
+        bool changed = true;
+        while (changed)
+        {
+            changed = false;
+            for (int i = 0; i < plan.Links.Count; i++)
+            {
+                (int a, int b) = plan.Links[i];
+                RaidLayoutRoom first = plan.Rooms[a], second = plan.Rooms[b];
+                int climb = Mathf.Abs(first.Level - second.Level);
+                if (climb == 0)
+                {
+                    continue;
+                }
+
+                float walk = Length(plan.Trails[i]) - first.Radius - second.Radius;
+                if (climb > 1 || walk <= 0f || RampSmoothSteepness * mood.terraceHeight / walk > RampSteepest)
+                {
+                    (first.Level > second.Level ? first : second).Level--;
+                    changed = true;
+                }
+            }
+
+            foreach (List<int> group in together)
+            {
+                int lowest = int.MaxValue;
+                foreach (int room in group)
+                {
+                    lowest = Mathf.Min(lowest, plan.Rooms[room].Level);
+                }
+
+                foreach (int room in group)
+                {
+                    if (plan.Rooms[room].Level > lowest)
+                    {
+                        plan.Rooms[room].Level = lowest;
+                        changed = true;
+                    }
+                }
+            }
+        }
+    }
+
+    // The clearings that must stand on one level: a trail's two ends with any clearing it passes close by, and the ends of two trails
+    // that run close beside each other away from the clearings they start from.
+    private static List<List<int>> SharedLevels(RaidLayoutPlan plan, float halfWidth)
+    {
+        var groups = new List<List<int>>();
+        for (int i = 0; i < plan.Links.Count; i++)
+        {
+            (int a, int b) = plan.Links[i];
+            var trail = new List<List<Vector2>> { plan.Trails[i] };
+            for (int r = 0; r < plan.Rooms.Count; r++)
+            {
+                RaidLayoutRoom room = plan.Rooms[r];
+                if (r != a && r != b && LineWithin(trail, room.Position, room.Radius + halfWidth + LevelsApart))
+                {
+                    groups.Add(new List<int> { a, b, r });
+                }
+            }
+        }
+
+        float close = halfWidth * 2f + LevelsApart;
+        for (int i = 0; i < plan.Links.Count; i++)
+        {
+            (int a, int b) = plan.Links[i];
+            List<Vector2> trail = plan.Trails[i];
+            for (int j = i + 1; j < plan.Links.Count; j++)
+            {
+                (int c, int d) = plan.Links[j];
+                var other = new List<List<Vector2>> { plan.Trails[j] };
+                if (AnyClose(plan, trail, a, b, c, d, other, close))
+                {
+                    groups.Add(new List<int> { a, b, c, d });
+                }
+            }
+        }
+
+        return groups;
+    }
+
+    // Along the trail, outside every clearing either trail starts or ends at (where trails meet by design).
+    private static bool AnyClose(RaidLayoutPlan plan, List<Vector2> trail, int a, int b, int c, int d, List<List<Vector2>> other, float close)
+    {
+        for (int k = 0; k + 1 < trail.Count; k++)
+        {
+            float length = Vector2.Distance(trail[k], trail[k + 1]);
+            int steps = Mathf.Max(1, Mathf.CeilToInt(length / LevelSample));
+            for (int n = 0; n <= steps; n++)
+            {
+                Vector2 point = Vector2.Lerp(trail[k], trail[k + 1], n / (float)steps);
+                if (InRoom(plan, point, a) || InRoom(plan, point, b) || InRoom(plan, point, c) || InRoom(plan, point, d))
+                {
+                    continue;
+                }
+
+                if (LineWithin(other, point, close))
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private static bool InRoom(RaidLayoutPlan plan, Vector2 point, int room) =>
+        Vector2.Distance(point, plan.Rooms[room].Position) < plan.Rooms[room].Radius + LevelsApart;
+
+    // On a map with terraces, a site's level pocket keeps clear of ramps and of what stands on another level, or a cliff would cut it.
+    private static bool PocketFits(RaidLayoutPlan plan, RaidLayoutRules rules, Vector2 spot, float radius)
+    {
+        if (plan.Mood == null || plan.Mood.terraces <= 1 || radius <= 0f)
+        {
+            return true;
+        }
+
+        float halfWidth = rules.TrailHalfWidth * plan.Mood.trails;
+        int level = LevelAt(plan, spot);
+        for (int i = 0; i < plan.Trails.Count && i < plan.Links.Count; i++)
+        {
+            (int a, int b) = plan.Links[i];
+            if ((plan.Rooms[a].Level != level || plan.Rooms[b].Level != level) && NearLine(plan.Trails[i], spot, radius + halfWidth + LevelsApart))
+            {
+                return false;
+            }
+        }
+
+        foreach (RaidLayoutRoom room in plan.Rooms)
+        {
+            if (room.Level != level && Vector2.Distance(room.Position, spot) < room.Radius + radius + LevelsApart)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    // The level of the nearest clearing or level trail.
+    private static int LevelAt(RaidLayoutPlan plan, Vector2 spot)
+    {
+        int level = 0;
+        float nearest = float.MaxValue;
+        foreach (RaidLayoutRoom room in plan.Rooms)
+        {
+            float distance = Vector2.Distance(room.Position, spot) - room.Radius;
+            if (distance < nearest)
+            {
+                nearest = distance;
+                level = room.Level;
+            }
+        }
+
+        for (int i = 0; i < plan.Trails.Count && i < plan.Links.Count; i++)
+        {
+            (int a, int b) = plan.Links[i];
+            if (plan.Rooms[a].Level == plan.Rooms[b].Level && NearLine(plan.Trails[i], spot, nearest))
+            {
+                nearest = DistanceToLine(plan.Trails[i], spot);
+                level = plan.Rooms[a].Level;
+            }
+        }
+
+        return level;
+    }
+
+    private static bool NearLine(List<Vector2> line, Vector2 point, float distance) => DistanceToLine(line, point) < distance;
+
+    private static float DistanceToLine(List<Vector2> line, Vector2 point)
+    {
+        float best = float.MaxValue;
+        for (int i = 0; i + 1 < line.Count; i++)
+        {
+            Vector2 along = line[i + 1] - line[i];
+            float t = Mathf.Clamp01(Vector2.Dot(point - line[i], along) / Mathf.Max(0.0001f, along.sqrMagnitude));
+            best = Mathf.Min(best, (line[i] + along * t - point).sqrMagnitude);
+        }
+
+        return Mathf.Sqrt(best);
+    }
+
+    // On a map with terraces, a trail between two levels is all ramp: a site and its level pocket stand on level trails only.
+    private static bool OnRamp(RaidLayoutPlan plan, List<Vector2> trail)
+    {
+        if (plan.Mood == null || plan.Mood.terraces <= 1)
+        {
+            return false;
+        }
+
+        int index = plan.Trails.IndexOf(trail);
+        return index >= 0 && plan.Rooms[plan.Links[index].a].Level != plan.Rooms[plan.Links[index].b].Level;
+    }
+
+    private static float Length(List<Vector2> line)
+    {
+        float length = 0f;
+        for (int i = 0; i + 1 < line.Count; i++)
+        {
+            length += Vector2.Distance(line[i], line[i + 1]);
+        }
+
+        return length;
+    }
+
+    // From their own stream, after the ponds, so ravines never move a site. A map gets fewer when they can't find room.
+    private static void PlaceRavines(RaidLayoutPlan plan, RaidLayoutRules rules, int attempt)
+    {
+        RaidMapMood mood = plan.Mood;
+        if (mood == null || mood.ravines.y <= 0)
+        {
+            return;
+        }
+
+        var random = new System.Random(RaidLayout.SeedFor(plan.Seed, "Ravines " + attempt));
+        int wanted = random.Next(Mathf.Max(0, mood.ravines.x), mood.ravines.y + 1);
+        for (int i = 0; i < wanted; i++)
+        {
+            for (int tries = 0; tries < RavineTries; tries++)
+            {
+                RaidLayoutRavine ravine = GrowRavine(plan, rules, mood, random);
+                if (ravine != null)
+                {
+                    plan.Ravines.Add(ravine);
+                    break;
+                }
+            }
+        }
+    }
+
+    // From a spot in the wild ground both ways, turning a little at each step, until it is long enough or would cut what it must not: a
+    // clearing, a site, a pond, another ravine, the map's edge, or a trail it doesn't cross squarely (a crossing becomes a neck).
+    private static RaidLayoutRavine GrowRavine(RaidLayoutPlan plan, RaidLayoutRules rules, RaidMapMood mood, System.Random random)
+    {
+        float half = Range(random, mood.ravineWidth.x, mood.ravineWidth.y) * 0.5f;
+        float widest = half * (1f + RavineWobble);
+        float length = Range(random, mood.ravineLength.x, mood.ravineLength.y);
+        float margin = rules.EdgeMargin + widest;
+        var start = new Vector2(Range(random, margin, plan.Size - margin), Range(random, margin, plan.Size - margin));
+        float heading = Range(random, 0f, 360f);
+        if (!RavineCanPass(plan, rules, start, Direction(heading), widest))
+        {
+            return null;
+        }
+
+        var ahead = new List<Vector2>();
+        var behind = new List<Vector2>();
+        float grown = 0f;
+        float headingAhead = heading, headingBehind = heading + 180f;
+        float turnAhead = Range(random, -RavineTurn, RavineTurn), turnBehind = Range(random, -RavineTurn, RavineTurn);
+        bool openAhead = true, openBehind = true;
+        Vector2 tipAhead = start, tipBehind = start;
+        while (grown < length && (openAhead || openBehind))
+        {
+            if (openAhead)
+            {
+                openAhead = Step(ref tipAhead, ref headingAhead, ref turnAhead, ahead);
+            }
+
+            if (openBehind && grown < length)
+            {
+                openBehind = Step(ref tipBehind, ref headingBehind, ref turnBehind, behind);
+            }
+        }
+
+        if (grown < length * RavineShortest)
+        {
+            return null;
+        }
+
+        var ravine = new RaidLayoutRavine
+        {
+            Depth = Range(random, mood.ravineDepth.x, mood.ravineDepth.y),
+            River = random.NextDouble() < mood.riverChance,
+        };
+        for (int i = behind.Count - 1; i >= 0; i--)
+        {
+            ravine.Line.Add(behind[i]);
+        }
+
+        ravine.Line.Add(start);
+        ravine.Line.AddRange(ahead);
+        float noiseAt = Range(random, 0f, 500f);
+        float run = 0f;
+        float total = (ravine.Line.Count - 1) * RavineStep;
+        for (int i = 0; i < ravine.Line.Count; i++)
+        {
+            run += i > 0 ? Vector2.Distance(ravine.Line[i - 1], ravine.Line[i]) : 0f;
+            // Narrowing towards both ends, so a ravine closes up rather than stopping in a round pit.
+            float taper = Mathf.Lerp(RavineEndWidth, 1f, Mathf.SmoothStep(0f, 1f, Mathf.Min(run, total - run) / RavineTaper));
+            ravine.HalfWidths.Add(half * taper * (1f + (Mathf.PerlinNoise(noiseAt + run / 23f, noiseAt) - 0.5f) * 2f * RavineWobble));
+        }
+
+        return ravine;
+
+        // The turn itself drifts, so the ravine bends in long curves rather than zigzags; something in the way bends it further, up to
+        // a steer each way, before it stops.
+        bool Step(ref Vector2 tip, ref float facing, ref float turn, List<Vector2> into)
+        {
+            turn = Mathf.Clamp(turn + Range(random, -RavineTurn, RavineTurn) * 0.5f, -RavineTurn, RavineTurn);
+            float side = random.Next(2) == 0 ? 1f : -1f;
+            foreach (float steer in RavineSteers)
+            {
+                float heading = facing + turn + steer * side;
+                Vector2 next = tip + Direction(heading) * RavineStep;
+                if (RavineCanPass(plan, rules, next, Direction(heading), widest) && !NearOwnLine(next, into))
+                {
+                    facing = heading;
+                    into.Add(next);
+                    tip = next;
+                    grown += RavineStep;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        // A ravine bending back on itself would cut through its own walls.
+        bool NearOwnLine(Vector2 point, List<Vector2> line)
+        {
+            for (int i = 0; i < line.Count - 3; i++)
+            {
+                if ((line[i] - point).sqrMagnitude < widest * widest * 4f)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+    }
+
+    private static bool RavineCanPass(RaidLayoutPlan plan, RaidLayoutRules rules, Vector2 point, Vector2 heading, float half)
+    {
+        float margin = rules.EdgeMargin + half;
+        if (point.x < margin || point.y < margin || point.x > plan.Size - margin || point.y > plan.Size - margin)
+        {
+            return false;
+        }
+
+        foreach (RaidLayoutRoom room in plan.Rooms)
+        {
+            if (Vector2.Distance(room.Position, point) < room.Radius + half + RavineFromRoom)
+            {
+                return false;
+            }
+        }
+
+        foreach (RaidSite site in plan.Sites)
+        {
+            if (Vector2.Distance(site.Position * plan.Size, point) < half + RavineFromSite)
+            {
+                return false;
+            }
+        }
+
+        foreach ((Vector2 centre, float radius) in plan.Pockets)
+        {
+            if (Vector2.Distance(centre, point) < radius + half + RavineFromPocket)
+            {
+                return false;
+            }
+        }
+
+        foreach (RaidLayoutPond pond in plan.Ponds)
+        {
+            if (pond.Edge(point) < half + RavineFromPond)
+            {
+                return false;
+            }
+        }
+
+        foreach (RaidLayoutRavine other in plan.Ravines)
+        {
+            other.Nearest(point, out _, out _, out float distance);
+            if (distance < half + other.WidestHalf + RavineFromRavine)
+            {
+                return false;
+            }
+        }
+
+        // Near a trail only while crossing it squarely, so a neck stays short and no trail runs along an edge.
+        float keep = rules.TrailHalfWidth * plan.Mood.trails + half + RavineFromTrail;
+        return CrossesSquarely(plan.Trails, point, heading, keep) && CrossesSquarely(plan.Spurs, point, heading, keep);
+    }
+
+    private static bool CrossesSquarely(List<List<Vector2>> lines, Vector2 point, Vector2 heading, float keep)
+    {
+        float squared = keep * keep;
+        foreach (List<Vector2> line in lines)
+        {
+            for (int i = 0; i + 1 < line.Count; i++)
+            {
+                Vector2 along = line[i + 1] - line[i];
+                float t = Mathf.Clamp01(Vector2.Dot(point - line[i], along) / Mathf.Max(0.0001f, along.sqrMagnitude));
+                if ((line[i] + along * t - point).sqrMagnitude >= squared)
+                {
+                    continue;
+                }
+
+                Vector2 direction = along.normalized;
+                if (Mathf.Abs(heading.x * direction.y - heading.y * direction.x) < RavineCrossing)
+                {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    private static void PlaceSpires(RaidLayoutPlan plan, RaidLayoutRules rules, int attempt)
+    {
+        RaidMapMood mood = plan.Mood;
+        if (mood == null || mood.spires.y <= 0)
+        {
+            return;
+        }
+
+        var random = new System.Random(RaidLayout.SeedFor(plan.Seed, "Spires " + attempt));
+        int wanted = random.Next(Mathf.Max(0, mood.spires.x), mood.spires.y + 1);
+        for (int i = 0; i < wanted; i++)
+        {
+            for (int tries = 0; tries < SpireTries; tries++)
+            {
+                var spire = new RaidLayoutSpire
+                {
+                    Radius = Range(random, mood.spireRadius.x, mood.spireRadius.y),
+                    Height = Range(random, mood.spireHeight.x, mood.spireHeight.y),
+                    Turn = Range(random, 0f, Mathf.PI * 2f),
+                };
+                float margin = rules.EdgeMargin + rules.RimWidth + spire.Reach;
+                spire.Position = new Vector2(Range(random, margin, plan.Size - margin), Range(random, margin, plan.Size - margin));
+                if (SpireFits(plan, rules, spire))
+                {
+                    plan.Spires.Add(spire);
+                    break;
+                }
+            }
+        }
+    }
+
+    private static bool SpireFits(RaidLayoutPlan plan, RaidLayoutRules rules, RaidLayoutSpire spire)
+    {
+        Vector2 spot = spire.Position;
+        float reach = spire.Reach;
+        foreach (RaidLayoutRoom room in plan.Rooms)
+        {
+            if (Vector2.Distance(room.Position, spot) < room.Radius + reach + SpireFromRoom)
+            {
+                return false;
+            }
+        }
+
+        foreach (RaidSite site in plan.Sites)
+        {
+            if (Vector2.Distance(site.Position * plan.Size, spot) < reach + SpireFromSite)
+            {
+                return false;
+            }
+        }
+
+        foreach ((Vector2 centre, float radius) in plan.Pockets)
+        {
+            if (Vector2.Distance(centre, spot) < radius + reach + SpireFromRoom)
+            {
+                return false;
+            }
+        }
+
+        foreach (RaidLayoutPond pond in plan.Ponds)
+        {
+            if (pond.Edge(spot) < reach + SpireFromRoom)
+            {
+                return false;
+            }
+        }
+
+        foreach (RaidLayoutRavine ravine in plan.Ravines)
+        {
+            ravine.Nearest(spot, out _, out _, out float distance);
+            if (distance < ravine.WidestHalf + reach + SpireFromRavine)
+            {
+                return false;
+            }
+        }
+
+        foreach (RaidLayoutSpire other in plan.Spires)
+        {
+            if (Vector2.Distance(other.Position, spot) < other.Reach + reach + SpireFromSpire)
+            {
+                return false;
+            }
+        }
+
+        float halfWidth = rules.TrailHalfWidth * plan.Mood.trails;
+        return !LineWithin(plan.Trails, spot, reach + halfWidth + SpireFromTrail)
+            && !LineWithin(plan.Spurs, spot, reach + halfWidth + SpireFromTrail);
+    }
+
 
     // From their own stream, so adding water never moves a site. They go last and give way to everything already on the map:
     // beside a trail or at the edge of a clearing, so the player comes across them, and never where a trail would run through.
@@ -279,8 +1205,13 @@ public static class RaidLayoutPlanner
             return;
         }
 
-        used.Add(piece);
         Vector2 spot = site.Position * plan.Size;
+        if (!PocketFits(plan, rules, spot, piece.Radius))
+        {
+            return;
+        }
+
+        used.Add(piece);
         plan.Pieces.Add(new RaidLayoutPiece { Definition = piece, Position = spot, Turn = Range(random, 0f, 360f) });
         plan.Pockets.Add((spot, piece.Radius));
     }
@@ -784,7 +1715,7 @@ public static class RaidLayoutPlanner
 
             Vector2 spot = room.Position + Direction(Range(random, 0f, 360f)) * (room.Radius * Range(random, 0f, 0.5f));
             spot = Inside(spot, plan.Size, rules.EdgeMargin);
-            if (CanStand(plan, quota, spot))
+            if (CanStand(plan, quota, spot) && PocketFits(plan, rules, spot, quota.clearing))
             {
                 AddSite(plan, quota, spot);
             }
@@ -801,9 +1732,14 @@ public static class RaidLayoutPlanner
         List<Vector2> trail = plan.Trails[random.Next(plan.Trails.Count)];
         int at = random.Next(trail.Count - 1);
         Vector2 point = Vector2.Lerp(trail[at], trail[at + 1], (float)random.NextDouble());
+        if (OnRamp(plan, trail))
+        {
+            return;
+        }
+
         if (quota.placement == RaidSitePlacement.OnPath)
         {
-            if (CanStand(plan, quota, point))
+            if (CanStand(plan, quota, point) && PocketFits(plan, rules, point, quota.clearing))
             {
                 AddSite(plan, quota, point);
             }
@@ -814,7 +1750,7 @@ public static class RaidLayoutPlanner
         Vector2 side = Vector2.Perpendicular((trail[at + 1] - trail[at]).normalized) * (random.Next(2) == 0 ? -1f : 1f);
         Vector2 spot = point + side * Range(random, quota.offPath.x, quota.offPath.y);
         if (spot.x < rules.EdgeMargin || spot.y < rules.EdgeMargin || spot.x > plan.Size - rules.EdgeMargin || spot.y > plan.Size - rules.EdgeMargin
-            || !CanStand(plan, quota, spot))
+            || !CanStand(plan, quota, spot) || !PocketFits(plan, rules, spot, quota.clearing))
         {
             return;
         }

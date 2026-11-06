@@ -63,6 +63,14 @@ public sealed class CombatFeelSettings : ScriptableObject
     [SerializeField, Min(0f)] private float knockbackDistanceCrit = 0.8f;
     [SerializeField, Min(0.01f)] private float knockbackSeconds = 0.12f;
 
+    [Header("High ground (arrows and thrown missiles, for the player and creatures alike)")]
+    [Tooltip("Metres the shooter must stand above the target before a missile hits harder.")]
+    [SerializeField, Min(0f)] private float highGroundFrom = 1.5f;
+    [Tooltip("Extra damage for every metre above that, as a share (0.03 = 3 %).")]
+    [SerializeField, Min(0f)] private float highGroundPerMetre = 0.03f;
+    [Tooltip("The most extra damage high ground can give, as a share.")]
+    [SerializeField, Min(0f)] private float highGroundMost = 0.25f;
+
     [Header("Attack telegraphs")]
     [Tooltip("Transparent unlit material for the ground markers. Its color is replaced by the colors below.")]
     [SerializeField] private Material telegraphMaterial;
@@ -246,6 +254,12 @@ public sealed class CombatFeelSettings : ScriptableObject
     public float HitRecoilShove => hitRecoilShove;
     public float HitRecoilSeconds => hitRecoilSeconds;
     public float KnockbackDistance => knockbackDistance;
+
+    /// <summary>How much harder a missile hits from this many metres above its target: a damage multiplier, 1 or more.</summary>
+    public float HighGround(float above) => 1f + Mathf.Clamp((above - highGroundFrom) * highGroundPerMetre, 0f, highGroundMost);
+
+    /// <summary>The high ground multiplier for a missile from <paramref name="shooter"/> striking <paramref name="target"/> (1 without settings).</summary>
+    public static float HighGroundFor(Vector3 shooter, Vector3 target) => Current != null ? Current.HighGround(shooter.y - target.y) : 1f;
     public float KnockbackDistanceCrit => knockbackDistanceCrit;
     public float KnockbackSeconds => knockbackSeconds;
     public Material TelegraphMaterial => telegraphMaterial;

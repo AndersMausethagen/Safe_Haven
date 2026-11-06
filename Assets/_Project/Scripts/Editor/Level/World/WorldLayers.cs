@@ -37,17 +37,20 @@ public sealed class HeightLayer
         Touched[i] = true;
     }
 
-    /// <summary>Bilinear height (world metres) of the working values at a world point; false outside the rectangle.</summary>
+    /// <summary>Bilinear height (world metres) of the working values at a world point; false outside the rectangle.
+    /// The last row and column count as inside: a point on a terrain's far edge (where two terrains meet) must read the
+    /// working values, not fall back to the built terrain, or a feature ending there feeds on its own last build and
+    /// digs deeper every rebuild.</summary>
     public bool TrySample(Vector2 world, out float height)
     {
         Vector2 g = Grid.GridPosition(world);
-        int x0 = Mathf.FloorToInt(g.x), y0 = Mathf.FloorToInt(g.y);
-        if (x0 < Rect.xMin || y0 < Rect.yMin || x0 + 1 >= Rect.xMax || y0 + 1 >= Rect.yMax)
+        if (Rect.width < 2 || Rect.height < 2 || g.x < Rect.xMin || g.y < Rect.yMin || g.x > Rect.xMax - 1 || g.y > Rect.yMax - 1)
         {
             height = 0f;
             return false;
         }
 
+        int x0 = Mathf.Min(Mathf.FloorToInt(g.x), Rect.xMax - 2), y0 = Mathf.Min(Mathf.FloorToInt(g.y), Rect.yMax - 2);
         float fx = g.x - x0, fy = g.y - y0;
         float a = Get(x0, y0), b = Get(x0 + 1, y0), c = Get(x0, y0 + 1), d = Get(x0 + 1, y0 + 1);
         height = Mathf.Lerp(Mathf.Lerp(a, b, fx), Mathf.Lerp(c, d, fx), fy);
@@ -119,13 +122,17 @@ public sealed class PaintLayer
     }
 }
 
-/// <summary>Detail (grass) cells inside the rectangle a build works on that features want cleared.</summary>
+/// <summary>Detail (grass) cells inside the rectangle a build works on: those features want cleared (paths, rivers),
+/// and how much of a plant features want grown (biome areas). Clearing wins over growing.</summary>
 public sealed class ClearLayer
 {
     public readonly Terrain Terrain;
     public readonly TerrainGrid Grid;
     public readonly RectInt Rect;
     public readonly bool[] Clear;
+    public readonly int Prototypes;
+    private readonly DetailPrototype[] prototypes;
+    private int[] grow; // cell * Prototypes + prototype: the count wanted there, -1 where no feature grows it
 
     public ClearLayer(Terrain terrain, RectInt rect)
     {
@@ -133,9 +140,75 @@ public sealed class ClearLayer
         Grid = TerrainGrid.Details(terrain);
         Rect = rect;
         Clear = new bool[rect.width * rect.height];
+        prototypes = terrain.terrainData.detailPrototypes;
+        Prototypes = prototypes.Length;
     }
 
     public int IndexOf(int x, int y) => (y - Rect.y) * Rect.width + (x - Rect.x);
+
+    /// <summary>The terrain's detail index of a plant prefab (-1 when the terrain does not have it).</summary>
+    public int PrototypeIndex(GameObject prefab)
+    {
+        for (int i = 0; prefab != null && i < prototypes.Length; i++)
+        {
+            if (prototypes[i].prototype == prefab)
+            {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    /// <summary>Asks for at least <paramref name="count"/> of a plant in a cell (the most asked for wins).</summary>
+    public void Grow(int x, int y, int prototype, int count)
+    {
+        if (prototype < 0 || prototype >= Prototypes || count <= 0)
+        {
+            return;
+        }
+
+        if (grow == null)
+        {
+            grow = new int[Clear.Length * Prototypes];
+            System.Array.Fill(grow, -1);
+        }
+
+        int i = IndexOf(x, y) * Prototypes + prototype;
+        grow[i] = Mathf.Max(grow[i], count);
+    }
+
+    /// <summary>What features want of a plant in a cell (by its index in this rectangle): -1 when they have no say.</summary>
+    public int Wanted(int cell, int prototype) => grow == null ? -1 : grow[cell * Prototypes + prototype];
+
+    /// <summary>
+    /// What one detail cell becomes in a build, and what the stash keeps for it. <paramref name="kept"/>,
+    /// <paramref name="baseValue"/> and <paramref name="last"/> come from the stash; <paramref name="current"/> is on the
+    /// terrain now. Hand changes since the last build win: the cell is then left as it is (last = HandKept) until no
+    /// feature wants it any more. Otherwise a clear leaves nothing, a grow at least its count over the ground, and a cell
+    /// back at its ground is forgotten (release).
+    /// </summary>
+    public static int Decide(bool kept, int baseValue, int last, int current, bool clear, int wanted,
+                             out int keepBase, out int keepLast, out bool release)
+    {
+        bool featureHere = clear || wanted >= 0;
+        keepBase = kept ? baseValue : current;
+        keepLast = 0;
+        release = false;
+        if (kept && (last == WorldTerrainStash.HandKept || current != last))
+        {
+            // Changed by hand since the last build (or kept from before): it stays as it is.
+            keepBase = current;
+            keepLast = WorldTerrainStash.HandKept;
+            release = !featureHere;
+            return current;
+        }
+
+        int value = clear ? 0 : wanted >= 0 ? Mathf.Max(keepBase, wanted) : keepBase;
+        keepLast = value;
+        release = kept && value == keepBase;
+        return value;
+    }
 }
 
 /// <summary>Ground heights across every terrain of a build: the working (shaped so far) heights inside the build
@@ -166,8 +239,15 @@ public sealed class WorldSampler
 /// <summary>The actual terrain under a point after a build (height and normal).</summary>
 public static class WorldGround
 {
+    /// <summary>The scene whose terrains count while a build runs (the World Builder sets it). Scenes can lie on the
+    /// same coordinates (the Haven and the prologue do); without this a prologue build placed its trees and stones on the
+    /// Haven's ground when both were open. Outside a build the active scene's terrain is preferred.</summary>
+    public static UnityEngine.SceneManagement.Scene Scope;
+
     public static Terrain TerrainAt(Vector2 xz)
     {
+        UnityEngine.SceneManagement.Scene preferred = Scope.IsValid() ? Scope : UnityEngine.SceneManagement.SceneManager.GetActiveScene();
+        Terrain other = null;
         foreach (Terrain terrain in Terrain.activeTerrains)
         {
             TerrainData data = terrain.terrainData;
@@ -179,11 +259,17 @@ public static class WorldGround
             Vector3 local = new Vector3(xz.x, 0f, xz.y) - terrain.transform.position;
             if (local.x >= 0f && local.z >= 0f && local.x <= data.size.x && local.z <= data.size.z)
             {
-                return terrain;
+                if (terrain.gameObject.scene == preferred)
+                {
+                    return terrain;
+                }
+
+                other ??= terrain;
             }
         }
 
-        return null;
+        // Another scene's terrain only when not building (a build never reaches into another scene).
+        return Scope.IsValid() ? null : other;
     }
 
     public static bool TryGround(Vector2 xz, out Vector3 point, out Vector3 normal)

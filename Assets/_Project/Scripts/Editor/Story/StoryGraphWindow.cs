@@ -9,7 +9,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 /// <summary>
-/// Safe Haven › Quests › Story Graph: draws the selected Story Script as nodes and lets the designer build the story.
+/// Safe Haven › Story Graph: draws the selected Story Script as nodes and lets the designer build the story.
 /// Right-click (or Space) adds a node, grouped as Triggers, Talk, Flow, Quest, World and Camera & Sound; drag from an
 /// output (right) to an input (left) to say what comes next; Delete removes. Each node shows its settings, and a +
 /// button beside an empty scene field makes what it needs in the scene (a Mob Spawn Zone, an object to use, a point to
@@ -23,7 +23,7 @@ public sealed class StoryGraphWindow : EditorWindow
     private Label title;
     private Label problems;
 
-    [MenuItem("Safe Haven/Quests/Story Graph")]
+    [MenuItem("Safe Haven/Story Graph", false, 21)]
     public static void Open()
     {
         var window = GetWindow<StoryGraphWindow>("Story Graph");

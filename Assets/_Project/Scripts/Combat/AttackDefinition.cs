@@ -58,7 +58,7 @@ public sealed class AttackDefinition : ScriptableObject
     [SerializeField, Range(0f, 1f)] private float statusChance = 1f;
 
     [Header("Animation (player)")]
-    [Tooltip("Animator state the swing plays, by name (Safe Haven › Characters › Set Up Combat Animations makes them). " +
+    [Tooltip("Animator state the swing plays, by name (Safe Haven › Setup › Characters › Set Up Combat Animations makes them). " +
              "Empty uses the weapon stance's old attack animation.")]
     [SerializeField] private string animationState;
     [Tooltip("Playback speed of the build-up, until the strike takes over. Below 1 it reads more clearly: you see the blow coming. " +

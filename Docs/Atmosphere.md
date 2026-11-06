@@ -64,7 +64,7 @@ weather, gathers in fog areas (hollows, marshes) and makes monsters see less far
 
 **Default scene environment:** File › New Scene › **Safe Haven Scene** (the pinned template) makes a scene with a
 camera and a sun, then adds the weather/day-night rig, terrain ground sampler and volumetric sun/moon support. Other
-templates, and scenes made by code (tests, tools), are left as made; Safe Haven › World › Create Scene Template rebuilds it.
+templates, and scenes made by code (tests, tools), are left as made; Safe Haven › Setup › World › Create Scene Template rebuilds it.
 New terrains in scenes with weather and Fog Ground receive Terrain Mist automatically, including terrains added later.
 The Weather component's **Weather Only Atmosphere** defaults on: mist and global fog follow the climate's random
 weather, not a constant baseline or guaranteed golden-hour event. **Clear/Breezy** have Fog 0 and Mist 0;
@@ -292,7 +292,7 @@ the object and its shadow stay, and nothing behind the player is touched.
 - The cut is in the shaders (`Shaders/SeeThrough/SeeThrough.hlsl`): Tree Wind and Layered Lit have it, and URP Lit and
   Unlit materials use the project's copies **Safe Haven/Lit (See-Through)** and **Safe Haven/Unlit (See-Through)**,
   which keep every property and keyword (so a material looks the same). Shadow casters never cut.
-- **Safe Haven › Rendering › Make Materials See-Through › Environment** converts every URP Lit/Unlit material in the
+- **Safe Haven › Setup › Rendering › Make Materials See-Through › Environment** converts every URP Lit/Unlit material in the
   environment folders (forest kit, resource nodes, stations, Haven props, structures); **› Selected** converts the
   selected materials or prefabs (a new tree, a new building); **› Revert Selected** goes back. Characters, creatures,
   effects and UI are left alone.

@@ -12,18 +12,48 @@ public static class RaidMapGenerator
 {
     public const string PondsName = "Ponds";
     public const string PiecesName = "Set Pieces";
+    public const string RavinesName = "Ravines";
+    public const string BouldersName = "Boulders";
 
     private const float RockClearing = 3f;
     private const float ReachSample = 8f;
     private const float PondMeshBeyond = 1.5f;
     private const int PondMeshPoints = 48;
     private const float PondDrinkSeconds = 1.5f;
+    private const float TerrainHeadroom = 4f;
+    private const float RiverSurface = 0.15f;
+    private const float RiverIntoWall = 0.8f;
+    private const float RiverSpeed = 1.6f;
+    private const int RiverAcross = 5;
+    private const float MistEvery = 32f;
+    private const float MistAboveFloor = 1.5f;
+    private const float NeckClearance = 3.5f;
+    private const float RiverEndNarrows = 0.6f;
+    private const float BoulderSink = 0.2f;
+    /// <summary>The most metres across a boulder lying about may be, so it keeps off trails and clearings (RaidLayoutPlanner's clearances).</summary>
+    public const float BoulderWidest = 9f;
+    private const float LookoutWidest = 5f;
+    private const float LookoutFromMiddle = 0.85f;
+    private const float LookoutScale = 1.1f;
+    private const float LookoutSeconds = 1.2f;
+    private const float LookoutReach = 2.5f;
+    private const float FallLip = 0.5f;
+    private const float FallThrow = 1.1f;
+    private const float FallWidest = 2.6f;
+    private const float LipSearchStep = 0.25f;
 
     /// <summary>Gives the terrain the plan's heights, paint, trees and rocks. <paramref name="data"/> must be a runtime copy.</summary>
     public static void ShapeGround(RaidMapDefinition definition, TerrainData data, RaidLayoutPlan plan, RaidLayoutRules rules, int tier = 0)
     {
         RaidLayoutField field = RaidLayoutField.Build(plan, rules);
-        data.SetHeights(0, 0, field.Heights(data.heightmapResolution, data.size.y));
+        float[,] metres = field.Metres(data.heightmapResolution, out float highest);
+        // Hills, cliffs, ravines and spires can reach higher than the map was made for: the copy grows taller rather than cut them flat.
+        if (highest > data.size.y - TerrainHeadroom)
+        {
+            data.size = new Vector3(data.size.x, Mathf.Ceil(highest + TerrainHeadroom), data.size.z);
+        }
+
+        data.SetHeights(0, 0, RaidLayoutField.Scaled(metres, data.size.y));
 
         // The map's own painting and scattering, on a copy that paints from the generated zones.
         field.Zones(out byte[] path, out byte[] forest, out byte[] clearing);
@@ -37,7 +67,10 @@ public static class RaidMapGenerator
             clearings.Add(new RaidMapSurface.Clearing(site.Position * plan.Size, working.ClearAroundSites, RockClearing));
         }
 
-        RaidMapSurface.Scatter(data, working, clearings, out _, wetness, plan.InWater);
+        System.Func<Vector2, bool> keepClear = plan.Ravines.Count > 0 || plan.Spires.Count > 0
+            ? spot => plan.InWater(spot) || field.KeepsClear(spot)
+            : plan.InWater;
+        RaidMapSurface.Scatter(data, working, clearings, out _, wetness, keepClear);
         Object.Destroy(working);
     }
 
@@ -55,6 +88,7 @@ public static class RaidMapGenerator
         PlaceFog(map, plan, World);
         RaidMapSurface.SnapToGround(map.Content, terrain);
         PlacePieces(map, plan, terrain, position => World(position));
+        PlaceBoulders(map, plan, rules);
 
         var rumours = new List<Vector3>();
         foreach (RaidSite site in plan.SitesOf(RaidSiteKind.Rumour))
@@ -63,6 +97,117 @@ public static class RaidMapGenerator
         }
 
         return rumours;
+    }
+
+    // Solid boulders, set a little into the ground, and lookouts on the highest clearings. Kept out of Content, which is snapped to the ground.
+    private static void PlaceBoulders(RaidMap map, RaidLayoutPlan plan, RaidLayoutRules rules)
+    {
+        Transform old = map.transform.Find(BouldersName);
+        if (old != null)
+        {
+            old.SetParent(null);
+            Object.Destroy(old.gameObject);
+        }
+
+        CliffKit kit = rules.BoulderKit;
+        if (kit == null || kit.Pieces.Count == 0 || (plan.Boulders.Count == 0 && rules.Lookouts <= 0))
+        {
+            return;
+        }
+
+        var holder = new GameObject(BouldersName).transform;
+        holder.SetParent(map.transform, false);
+        Terrain terrain = map.Terrain;
+        Vector3 origin = terrain.transform.position;
+        var shapes = new Dictionary<GameObject, Vector3[]>();
+        foreach (RaidLayoutBoulder boulder in plan.Boulders)
+        {
+            CliffKit.Piece piece = PickByShare(kit, boulder.Pick);
+            if (piece != null)
+            {
+                Boulder(holder, piece, origin + new Vector3(boulder.Position.x, 0f, boulder.Position.y), boulder.Turn, Mathf.Min(boulder.Scale, Widest(piece, BoulderWidest)), terrain, shapes);
+            }
+        }
+
+        PlaceLookouts(holder, plan, rules, kit, terrain, shapes);
+    }
+
+    private static GameObject Boulder(Transform holder, CliffKit.Piece piece, Vector3 at, float turn, float scale, Terrain terrain, Dictionary<GameObject, Vector3[]> shapes)
+    {
+        at.y = terrain.SampleHeight(at) + terrain.transform.position.y;
+        GameObject made = Object.Instantiate(piece.prefab, holder);
+        made.name = piece.prefab.name;
+        made.transform.SetPositionAndRotation(at, Quaternion.Euler(0f, turn, 0f) * RaidRavineCrags.StandUp(piece));
+        made.transform.localScale = piece.prefab.transform.localScale * scale;
+        RaidRavineCrags.Extent(made, piece.prefab, shapes, Vector3.up, out _, out _, out _, out float bottom, out float top);
+        made.transform.position += Vector3.up * (at.y - bottom - (top - bottom) * BoulderSink);
+        return made;
+    }
+
+    // The scale at which the piece's footprint is this many metres across.
+    private static float Widest(CliffKit.Piece piece, float metres) => metres / Mathf.Max(0.5f, Mathf.Max(piece.size.x, piece.size.z));
+
+    private static CliffKit.Piece PickByShare(CliffKit kit, float share)
+    {
+        float total = 0f;
+        foreach (CliffKit.Piece piece in kit.Pieces)
+        {
+            total += piece.prefab != null ? piece.weight : 0f;
+        }
+
+        float roll = share * total;
+        foreach (CliffKit.Piece piece in kit.Pieces)
+        {
+            if (piece.prefab == null)
+            {
+                continue;
+            }
+
+            roll -= piece.weight;
+            if (roll <= 0f)
+            {
+                return piece;
+            }
+        }
+
+        return kit.Pick(new System.Random(0));
+    }
+
+    // The highest plain clearings, each with a great rock at its edge to look out from.
+    private static void PlaceLookouts(Transform holder, RaidLayoutPlan plan, RaidLayoutRules rules, CliffKit kit, Terrain terrain, Dictionary<GameObject, Vector3[]> shapes)
+    {
+        if (rules.Lookouts <= 0)
+        {
+            return;
+        }
+
+        Vector3 origin = terrain.transform.position;
+        var rooms = plan.Rooms.FindAll(room => room.Role == RaidRoomRole.Plain);
+        rooms.Sort((a, b) => terrain.SampleHeight(origin + new Vector3(b.Position.x, 0f, b.Position.y))
+            .CompareTo(terrain.SampleHeight(origin + new Vector3(a.Position.x, 0f, a.Position.y))));
+        var random = new System.Random(RaidLayout.SeedFor(plan.Seed, "Lookouts"));
+        for (int i = 0; i < rules.Lookouts && i < rooms.Count; i++)
+        {
+            RaidLayoutRoom room = rooms[i];
+            Vector2 away = (room.Position - new Vector2(plan.Size * 0.5f, plan.Size * 0.5f)).normalized;
+            if (away.sqrMagnitude < 0.01f)
+            {
+                away = Vector2.up;
+            }
+
+            Vector2 spot = room.Position + away * room.Radius * LookoutFromMiddle;
+            CliffKit.Piece piece = PickByShare(kit, (float)random.NextDouble());
+            GameObject rock = Boulder(holder, piece, origin + new Vector3(spot.x, 0f, spot.y), Mathf.Atan2(away.x, away.y) * Mathf.Rad2Deg,
+                Mathf.Min(LookoutScale, Widest(piece, LookoutWidest)), terrain, shapes);
+            rock.name = "Lookout Rock";
+            var lookout = new GameObject("Lookout");
+            lookout.transform.SetParent(rock.transform, true);
+            Vector3 foot = origin + new Vector3(room.Position.x + away.x * (room.Radius * LookoutFromMiddle - 3.5f), 0f, room.Position.y + away.y * (room.Radius * LookoutFromMiddle - 3.5f));
+            foot.y = terrain.SampleHeight(foot) + origin.y + 0.5f;
+            lookout.transform.position = foot;
+            lookout.AddComponent<Interactable>().Configure(InteractionAnimation.None, LookoutSeconds, LookoutReach, true);
+            lookout.AddComponent<RaidLookout>().Configure(rules.LookoutReveal);
+        }
     }
 
     // Each part of a set-piece stands on the ground by itself, so a ruin sits into the hill and doesn't hang off it. Laid out anew, it starts over.
@@ -421,6 +566,278 @@ public static class RaidMapGenerator
         mesh.SetTriangles(triangles, 0);
         mesh.RecalculateBounds();
         return mesh;
+    }
+
+    /// <summary>
+    /// Lays the plan's ravines on the map, in place of an earlier attempt's: a river along the floor of those that have one, mist lying
+    /// in them, and a RaidChasm that takes whoever falls in. Kept out of the map's Content, which is snapped to the ground.
+    /// <paramref name="meshes"/> holds the river meshes made, for whoever owns the map to destroy.
+    /// </summary>
+    public static void PlaceRavines(RaidMap map, RaidLayoutPlan plan, RaidLayoutRules rules, List<Mesh> meshes)
+    {
+        Transform old = map.transform.Find(RavinesName);
+        if (old != null)
+        {
+            old.SetParent(null);
+            Object.Destroy(old.gameObject);
+        }
+
+        if (plan.Ravines.Count == 0)
+        {
+            return;
+        }
+
+        var holder = new GameObject(RavinesName).transform;
+        holder.SetParent(map.transform, false);
+        Vector3 origin = map.Terrain.transform.position;
+        holder.position = origin;
+        holder.rotation = Quaternion.identity;
+        holder.gameObject.AddComponent<RaidChasm>().Bind(plan, map.Terrain);
+        float neck = rules.TrailHalfWidth * (plan.Mood != null ? plan.Mood.trails : 1f) + NeckClearance;
+        bool IsNeck(Vector2 point) => NearAny(plan.Trails, point, neck) || NearAny(plan.Spurs, point, neck);
+        var random = new System.Random(RaidLayout.SeedFor(plan.Seed, "Ravine Crags"));
+
+        FogArea[] areas = map.Content.GetComponentsInChildren<FogArea>(true);
+        FogArea mist = plan.Mood != null && plan.Mood.ravineMist && areas.Length > 0 ? areas[0] : null;
+        for (int i = 0; i < plan.Ravines.Count; i++)
+        {
+            RaidLayoutRavine ravine = plan.Ravines[i];
+            if (ravine.River)
+            {
+                if (rules.RiverMaterial == null)
+                {
+                    Debug.LogWarning($"{rules.name} has rivers in its ravines but no River Material, so their floors are dry.", rules);
+                }
+                else
+                {
+                    AddRiver(holder, ravine, rules.RiverMaterial, meshes, i);
+                }
+            }
+
+            if (mist != null)
+            {
+                AddMist(holder, ravine, mist, origin);
+            }
+
+            RaidRavineCrags.Dress(holder, ravine, rules.RavineCrags, map.Terrain, IsNeck, random);
+            if (ravine.River && rules.RiverMaterial != null)
+            {
+                AddFalls(holder, ravine, rules, map.Terrain);
+            }
+        }
+    }
+
+    // A waterfall pours over the ravine's closed head into the river, and foam churns at the foot of every drop along it.
+    private static void AddFalls(Transform holder, RaidLayoutRavine ravine, RaidLayoutRules rules, Terrain terrain)
+    {
+        Vector3 origin = terrain.transform.position;
+        if (rules.WaterfallMaterial != null)
+        {
+            Vector2 head = ravine.Line[0];
+            Vector2 down = (ravine.Line[1] - ravine.Line[0]).normalized;
+            float half = ravine.HalfWidths[0];
+            float floor = ravine.Floor[0] + origin.y + RiverSurface;
+            // Back from the head until the ground stands near the rim: that is the lip.
+            Vector3 lip = default;
+            bool found = false;
+            for (float back = 0f; back < half + RaidLayoutRavine.RagReach + 3f; back += LipSearchStep)
+            {
+                Vector3 at = origin + new Vector3(head.x - down.x * back, 0f, head.y - down.y * back);
+                at.y = terrain.SampleHeight(at) + origin.y;
+                if (at.y > ravine.Rim[0] + origin.y - 1f)
+                {
+                    lip = at;
+                    found = true;
+                    break;
+                }
+            }
+
+            float height = lip.y - floor;
+            if (found && height > 2f)
+            {
+                float width = Mathf.Min(FallWidest, (half - RaidLayoutRavine.WallRun(half)) * 1.4f);
+                var forward = new Vector3(down.x, 0f, down.y);
+                var fall = new GameObject("Waterfall", typeof(MeshFilter), typeof(MeshRenderer));
+                fall.transform.SetParent(holder, false);
+                fall.transform.SetPositionAndRotation(lip + forward * FallLip - Vector3.up * height, Quaternion.LookRotation(forward));
+                var renderer = fall.GetComponent<MeshRenderer>();
+                renderer.sharedMaterial = rules.WaterfallMaterial;
+                renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+                Waterfall sheet = fall.AddComponent<Waterfall>();
+                if (rules.WaterfallPlunge != null)
+                {
+                    GameObject plunge = Object.Instantiate(rules.WaterfallPlunge, fall.transform);
+                    sheet.Plunge = plunge.transform;
+                    FitPlunge(plunge, width);
+                }
+
+                sheet.Configure(width, height, FallLip, FallThrow);
+            }
+        }
+
+        if (rules.WaterfallPlunge == null)
+        {
+            return;
+        }
+
+        foreach (int at in ravine.Cascades)
+        {
+            if (at + 1 >= ravine.Line.Count)
+            {
+                continue;
+            }
+
+            Vector2 foot = ravine.Line[at + 1];
+            GameObject plunge = Object.Instantiate(rules.WaterfallPlunge, holder);
+            plunge.name = "Cascade Foam";
+            plunge.transform.position = origin + new Vector3(foot.x, ravine.Floor[at + 1] + RiverSurface, foot.y);
+            Vector2 down = (ravine.Line[at + 1] - ravine.Line[at]).normalized;
+            plunge.transform.rotation = Quaternion.LookRotation(new Vector3(down.x, 0f, down.y));
+            FitPlunge(plunge, Mathf.Min(FallWidest, ravine.HalfWidths[at + 1]));
+        }
+    }
+
+    // As WaterSetup.FitPlunge (editor): the churn, mist and spray sized to the falling water's width.
+    private static void FitPlunge(GameObject plunge, float width)
+    {
+        if (plunge.TryGetComponent(out WaterInteractor interactor))
+        {
+            interactor.Radius = Mathf.Max(width * 0.6f, 0.8f);
+        }
+
+        foreach (ParticleSystem system in plunge.GetComponentsInChildren<ParticleSystem>())
+        {
+            ParticleSystem.ShapeModule shape = system.shape;
+            shape.scale = new Vector3(width, shape.scale.y, shape.scale.z);
+            ParticleSystem.EmissionModule emission = system.emission;
+            emission.rateOverTimeMultiplier = system.name == "Mist" ? 4f * width : 14f * width;
+        }
+    }
+
+    private static bool NearAny(List<List<Vector2>> lines, Vector2 point, float distance)
+    {
+        float squared = distance * distance;
+        foreach (List<Vector2> line in lines)
+        {
+            for (int i = 0; i + 1 < line.Count; i++)
+            {
+                Vector2 along = line[i + 1] - line[i];
+                float t = Mathf.Clamp01(Vector2.Dot(point - line[i], along) / Mathf.Max(0.0001f, along.sqrMagnitude));
+                if ((line[i] + along * t - point).sqrMagnitude < squared)
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private static void AddRiver(Transform holder, RaidLayoutRavine ravine, Material material, List<Mesh> meshes, int index)
+    {
+        var water = new GameObject($"River {index + 1}");
+        water.transform.SetParent(holder, false);
+        Mesh mesh = RiverMesh(ravine, out Vector4[] centreline);
+        meshes.Add(mesh);
+        water.AddComponent<MeshFilter>().sharedMesh = mesh;
+        var renderer = water.AddComponent<MeshRenderer>();
+        renderer.sharedMaterial = material;
+        renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+        water.AddComponent<WaterSurface>().SetCentreline(centreline);
+    }
+
+    // As the World Builder lays a river: rows across the line, uv in metres, the flow in uv2 (the material reads it from the mesh). Its sides
+    // run into the foot of the walls, and under a neck it runs on hidden inside the ground.
+    // Each end runs on under the ravine's closing wall, so the terrain draws the waterline there rather than the mesh's straight edge.
+    private static Mesh RiverMesh(RaidLayoutRavine ravine, out Vector4[] centreline)
+    {
+        int count = ravine.Line.Count;
+        int rows = count + 2;
+        var vertices = new Vector3[rows * RiverAcross];
+        var uv = new Vector2[vertices.Length];
+        var flow = new Vector2[vertices.Length];
+        centreline = new Vector4[rows];
+        float run = 0f;
+        Vector2 previous = ravine.Line[0];
+        for (int i = 0; i < rows; i++)
+        {
+            int source = Mathf.Clamp(i - 1, 0, count - 1);
+            Vector2 direction = (ravine.Line[Mathf.Min(source + 1, count - 1)] - ravine.Line[Mathf.Max(source - 1, 0)]).normalized;
+            float halfWidth = ravine.HalfWidths[source];
+            Vector2 point = ravine.Line[source];
+            float narrows = 1f;
+            if (i == 0 || i == rows - 1)
+            {
+                point += direction * (i == 0 ? -halfWidth : halfWidth);
+                narrows = RiverEndNarrows;
+            }
+
+            run += Vector2.Distance(previous, point);
+            previous = point;
+            var right = new Vector3(direction.y, 0f, -direction.x);
+            float floorHalf = (halfWidth - RaidLayoutRavine.WallRun(halfWidth)) * narrows;
+            float extent = floorHalf + RiverIntoWall;
+            var centre = new Vector3(point.x, ravine.Floor[source] + RiverSurface, point.y);
+            for (int k = 0; k < RiverAcross; k++)
+            {
+                float across = k / (float)(RiverAcross - 1) * 2f - 1f;
+                int at = i * RiverAcross + k;
+                vertices[at] = centre + right * (across * extent);
+                uv[at] = new Vector2(across * extent, run);
+                flow[at] = direction * RiverSpeed;
+            }
+
+            centreline[i] = new Vector4(centre.x, centre.y, centre.z, floorHalf);
+        }
+
+        var triangles = new int[(rows - 1) * (RiverAcross - 1) * 6];
+        int next = 0;
+        for (int i = 0; i + 1 < rows; i++)
+        {
+            for (int k = 0; k + 1 < RiverAcross; k++)
+            {
+                int a = i * RiverAcross + k, b = a + 1, c = a + RiverAcross, d = c + 1;
+                triangles[next++] = a;
+                triangles[next++] = c;
+                triangles[next++] = b;
+                triangles[next++] = b;
+                triangles[next++] = c;
+                triangles[next++] = d;
+            }
+        }
+
+        var mesh = new Mesh { name = "Ravine River" };
+        mesh.vertices = vertices;
+        mesh.uv = uv;
+        mesh.uv2 = flow;
+        mesh.triangles = triangles;
+        mesh.RecalculateNormals();
+        mesh.RecalculateTangents();
+        mesh.RecalculateBounds();
+        return mesh;
+    }
+
+    // Copies of the scene's own fog bank, low along the floor: seen from the rim, the ravine fills with mist.
+    private static void AddMist(Transform holder, RaidLayoutRavine ravine, FogArea template, Vector3 origin)
+    {
+        float run = MistEvery * 0.5f;
+        float travelled = 0f;
+        for (int i = 0; i + 1 < ravine.Line.Count; i++)
+        {
+            float length = Vector2.Distance(ravine.Line[i], ravine.Line[i + 1]);
+            while (run <= travelled + length)
+            {
+                float t = (run - travelled) / Mathf.Max(0.0001f, length);
+                Vector2 point = Vector2.Lerp(ravine.Line[i], ravine.Line[i + 1], t);
+                float floor = Mathf.Lerp(ravine.Floor[i], ravine.Floor[i + 1], t);
+                FogArea area = Object.Instantiate(template, holder);
+                area.name = "Ravine Mist";
+                area.transform.position = origin + new Vector3(point.x, floor + MistAboveFloor, point.y);
+                run += MistEvery;
+            }
+
+            travelled += length;
+        }
     }
 
     /// <summary>True when the navmesh leads from the start to every exit (GDD §7.6: a reachable extraction must always exist).</summary>

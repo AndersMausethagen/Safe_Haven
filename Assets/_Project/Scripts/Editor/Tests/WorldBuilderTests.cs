@@ -238,4 +238,92 @@ public sealed class WorldBuilderTests
 
         Assert.Less(flattest, 0.5f, "ledges: somewhere the face rises at less than half its average rate");
     }
+
+    // ---------------------------------------------------------------- biome areas: the loop, grass, hand edits
+
+    [Test]
+    public void AreaMask_CoversTheInsideOfTheLoop_FadingInFromItsEdge()
+    {
+        // A 20 m square, closed, on a 1 m grid of cell centres from -5 to 25.
+        var corners = new[] { new Vector3(0f, 0f, 0f), new Vector3(20f, 0f, 0f), new Vector3(20f, 0f, 20f), new Vector3(0f, 0f, 20f), new Vector3(0f, 0f, 0f) };
+        var line = new SplineLine(corners, new[] { 0f, 1f, 2f, 3f, 4f }, true, 4);
+        var grid = new TerrainGrid(new Vector2(-5f, -5f), new Vector2(30f, 30f), 30, false);
+        var mask = new AreaMask(line, 4f, 7);
+        int inside = 0;
+        float middle = -1f, nearEdge = -1f;
+        mask.ForEachInside(grid, new RectInt(0, 0, 30, 30), (x, y, p, fade) =>
+        {
+            inside++;
+            Assert.That(p.x > 0f && p.x < 20f && p.y > 0f && p.y < 20f, $"{p} is outside the loop");
+            if (Mathf.Approximately(p.x, 10.5f) && Mathf.Approximately(p.y, 10.5f)) middle = fade;
+            if (Mathf.Approximately(p.x, 0.5f) && Mathf.Approximately(p.y, 10.5f)) nearEdge = fade;
+        });
+
+        Assert.LessOrEqual(inside, 400, "only cells inside the square");
+        Assert.Greater(inside, 250, "most of the square's 400 cells (the edge fades some out)");
+        Assert.AreEqual(1f, middle, 1e-5f, "full strength in the middle");
+        Assert.That(nearEdge < 0.6f, $"half a metre in, it is still fading in (was {nearEdge})");
+    }
+
+    [Test]
+    public void DetailDecision_GrowsOverTheGround_AndGivesItBackWhenTheFeatureLeaves()
+    {
+        // A biome grows 2 where there was nothing: kept, with what it wrote.
+        int value = ClearLayer.Decide(false, 0, 0, 0, false, 2, out int keepBase, out int keepLast, out bool release);
+        Assert.AreEqual((2, 0, 2, false), (value, keepBase, keepLast, release));
+
+        // It never thins the ground's own grass.
+        value = ClearLayer.Decide(false, 0, 0, 3, false, 1, out keepBase, out _, out _);
+        Assert.AreEqual((3, 3), (value, keepBase));
+
+        // The area is deleted: the ground's grass comes back and the cell is forgotten.
+        value = ClearLayer.Decide(true, 0, 2, 2, false, -1, out _, out _, out release);
+        Assert.AreEqual((0, true), (value, release));
+
+        // A path clears through it; clearing wins over growing.
+        value = ClearLayer.Decide(true, 1, 0, 0, true, 2, out keepBase, out keepLast, out release);
+        Assert.AreEqual((0, 1, 0, false), (value, keepBase, keepLast, release));
+    }
+
+    [Test]
+    public void DetailDecision_HandEditsWin_UntilNoFeatureWantsTheCell()
+    {
+        // Grass erased by hand inside a biome area (the build wrote 2, it is 0 now): it stays erased.
+        int value = ClearLayer.Decide(true, 0, 2, 0, false, 2, out int keepBase, out int keepLast, out bool release);
+        Assert.AreEqual((0, 0, WorldTerrainStash.HandKept, false), (value, keepBase, keepLast, release));
+
+        // Grass painted by hand on a path (the build wrote 0): it stays.
+        value = ClearLayer.Decide(true, 1, 0, 2, true, -1, out _, out keepLast, out _);
+        Assert.AreEqual((2, WorldTerrainStash.HandKept), (value, keepLast));
+
+        // Builds after that leave it alone, whatever the feature wants...
+        value = ClearLayer.Decide(true, 0, WorldTerrainStash.HandKept, 0, false, 2, out _, out _, out release);
+        Assert.AreEqual((0, false), (value, release));
+
+        // ...and forget it, as it is, once no feature is there.
+        value = ClearLayer.Decide(true, 0, WorldTerrainStash.HandKept, 0, false, -1, out _, out _, out release);
+        Assert.AreEqual((0, true), (value, release));
+    }
+
+    [Test]
+    public void Stash_GivesBackHandKeptGrass_OnlyInsideTheArea()
+    {
+        var stash = ScriptableObject.CreateInstance<WorldTerrainStash>();
+        try
+        {
+            stash.Prepare(2, 2, 1, 4);
+            stash.SetDetail(1 * 4 + 1, 0, WorldTerrainStash.HandKept); // cell (1, 1)
+            stash.SetDetail(3 * 4 + 3, 0, WorldTerrainStash.HandKept); // cell (3, 3)
+            stash.SetDetail(2 * 4 + 2, 1, 0);                          // cell (2, 2): a feature's, not hand-kept
+            Assert.AreEqual(1, stash.ReleaseHandKeptDetails(new RectInt(0, 0, 2, 2)));
+            Assert.AreEqual(1, stash.HandKeptDetailCount);
+            Assert.AreEqual(2, stash.DetailCount);
+            Assert.IsTrue(stash.TryGetDetail(2 * 4 + 2, out int baseValue, out int last));
+            Assert.AreEqual((1, 0), (baseValue, last));
+        }
+        finally
+        {
+            Object.DestroyImmediate(stash);
+        }
+    }
 }

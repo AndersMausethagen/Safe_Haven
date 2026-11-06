@@ -22,9 +22,9 @@ MonoBehaviour:
   constructionCost: []
   constructionItems:
   - item: {fileID: 11400000, guid: e8bb5d2fbded52b42a179a47cce32d53, type: 2}
-    amount: 4
+    amount: 8
   - item: {fileID: 11400000, guid: 9f085f39a2da68c45b58d2db986835f4, type: 2}
-    amount: 6
+    amount: 12
   showInBuildMenu: 1
   knownFromStart: 1
   sortOrder: 0
@@ -43,7 +43,7 @@ MonoBehaviour:
     description: A ring of stones that holds the heat, and the light reaches further into the dark.
     cost:
     - item: {fileID: 11400000, guid: b5567f7d75200bd46befbd1dab298f36, type: 2}
-      amount: 6
+      amount: 12
     essence: []
     work: 7.5
     renown: 3
@@ -53,6 +53,7 @@ MonoBehaviour:
     extraStorage: 0
     raidSeconds: 0
     extraRumours: 0
+    foretoldEvents: 0
     comfort: 0
     extraLogs: 0
     teachesRecipes: []

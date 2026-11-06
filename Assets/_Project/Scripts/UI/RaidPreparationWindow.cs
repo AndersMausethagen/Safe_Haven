@@ -237,6 +237,7 @@ public sealed class RaidPreparationWindow : MonoBehaviour
         large = false;
         // Rolled now, so the briefing shows the hour (and layout) the raid will really have.
         pendingSeed = RaidSession.NewSeed();
+        large = LargeByDefault(Destination);
         Watch(user != null ? user.GetComponentInParent<ItemInventory>() : null);
         // The text is measured to lay the columns out, and text can only be measured once its objects are awake.
         window.Open();
@@ -355,7 +356,20 @@ public sealed class RaidPreparationWindow : MonoBehaviour
     {
         destinationIndex = index;
         difficulty = null;
+        large = LargeByDefault(Destination);
         Refresh();
+    }
+
+    // A run whose mood is made for a large map (the ravine country) is offered large first; the player can still pick Normal.
+    private bool LargeByDefault(RaidDefinition raid)
+    {
+        if (raid == null || !raid.CanBeLarge || raid.LayoutRules == null)
+        {
+            return false;
+        }
+
+        (RaidShapeRule _, RaidMapMood mood) = RaidLayoutPlanner.Choose(raid.LayoutRules, pendingSeed);
+        return mood != null && mood.largeByDefault;
     }
 
     private void PickTier(RaidDifficulty tier)

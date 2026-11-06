@@ -19,7 +19,7 @@ public static partial class CombatAnimationSetup
     /// (arms, attacks, interactions) still plays over it. Sneaking fades it in and out. A blend tree on Speed goes from the
     /// crouched idle to the crouched walk, sped up to the player's sneaking speed. Idempotent.
     /// </summary>
-    [MenuItem("Safe Haven/Characters/Set Up Sneak Animation")]
+    [MenuItem("Safe Haven/Setup/Characters/Set Up Sneak Animation", false, 200)]
     public static void BuildSneakLayer()
     {
         var controller = AssetDatabase.LoadAssetAtPath<AnimatorController>(PlayerControllerPath);

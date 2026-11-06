@@ -4,7 +4,7 @@ using UnityEditor;
 using UnityEngine;
 
 /// <summary>
-/// Sets up the combat animations (Safe Haven › Characters › Set Up Combat Animations). Step one imports the Quaternius
+/// Sets up the combat animations (Safe Haven › Setup › Characters › Set Up Combat Animations). Step one imports the Quaternius
 /// Universal Animation Library 2 (CC0, Assets/Quaternius) as humanoid clips, in place, with readable names and looping
 /// where a clip is a loop.
 /// </summary>

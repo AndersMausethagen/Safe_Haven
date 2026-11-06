@@ -19,7 +19,7 @@ public sealed class PlaytestRunsWindow : EditorWindow
     private Vector2 scroll;
     private string problem;
 
-    [MenuItem("Safe Haven/Playtest/Run Comparison")]
+    [MenuItem("Safe Haven/Playtest Runs", false, 40)]
     public static void Open()
     {
         GetWindow<PlaytestRunsWindow>("Playtest Runs").Refresh();

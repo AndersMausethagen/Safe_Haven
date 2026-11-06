@@ -75,9 +75,10 @@ public static class WorldBuilder
             return;
         }
 
-        if (GUIUtility.hotControl != 0 || EditorApplication.isCompiling)
+        if (GUIUtility.hotControl != 0 || EditorApplication.isCompiling || WorldFeatureEditor.IsDrawing)
         {
-            dueAt = EditorApplication.timeSinceStartup + 0.2; // still dragging: wait for the mouse to let go
+            // Still dragging, or still drawing a feature (it builds when finished): wait.
+            dueAt = EditorApplication.timeSinceStartup + 0.2;
             return;
         }
 
@@ -152,6 +153,19 @@ public static class WorldBuilder
     {
         for (int i = 0; i < stream.length; i++)
         {
+            if (stream.GetEventType(i) == ObjectChangeKind.ChangeAssetObjectProperties)
+            {
+                // A biome preset edited in its Inspector: the areas painted with it build again (their hash includes it).
+                stream.GetChangeAssetObjectPropertiesEvent(i, out ChangeAssetObjectPropertiesEventArgs asset);
+                if (EditorUtility.EntityIdToObject(asset.entityId) is BiomePreset)
+                {
+                    Schedule(Delay);
+                    return;
+                }
+
+                continue;
+            }
+
             if (stream.GetEventType(i) != ObjectChangeKind.ChangeGameObjectOrComponentProperties)
             {
                 continue;
@@ -259,6 +273,8 @@ public static class WorldBuilder
                 if (built.feature is BiomeArea area && !gone)
                 {
                     areasToBuild.Add(area);
+                    // A painting area reshapes the terrain; so does one that stopped painting (its ground comes back).
+                    shape |= area.ShapesTerrain || built.paints;
                 }
                 else if (gone ? built.bounds.size != Vector3.zero : built.feature.ShapesTerrain)
                 {
@@ -277,6 +293,7 @@ public static class WorldBuilder
                 if (feature is BiomeArea area)
                 {
                     areasToBuild.Add(area);
+                    shape |= area.ShapesTerrain;
                 }
                 else
                 {
@@ -368,6 +385,11 @@ public static class WorldBuilder
         }
 
         text.Append(EditorJsonUtility.ToJson(feature.Container)).Append(feature.transform.localToWorldMatrix);
+        if (feature is BiomeArea area && area.Biome != null)
+        {
+            text.Append(EditorJsonUtility.ToJson(area.Biome)); // editing the preset regrows the areas painted with it
+        }
+
         return Hash128.Compute(text.ToString()).ToString();
     }
 
@@ -423,6 +445,7 @@ public static class WorldBuilder
     {
         var watch = System.Diagnostics.Stopwatch.StartNew();
         Building = true;
+        WorldGround.Scope = terrains.Count > 0 ? terrains[0].gameObject.scene : areas.Count > 0 ? areas[0].gameObject.scene : default;
         int group = triggerGroup;
         triggerGroup = -1;
         if (group < 0)
@@ -455,6 +478,7 @@ public static class WorldBuilder
                 EnsureStash(world);
                 Record(terrain, world, "Build World");
                 AddMissingLayers(terrain, builders);
+                AddMissingDetails(terrain, builders);
                 world.Stash.Prepare(terrain.terrainData.heightmapResolution, terrain.terrainData.alphamapResolution,
                                     terrain.terrainData.alphamapLayers, terrain.terrainData.detailResolution);
                 layers.Add(ReadHeights(terrain, world.Stash, shaping));
@@ -509,7 +533,10 @@ public static class WorldBuilder
             context.Builders.AddRange(builders);
             foreach (FeatureBuilder builder in builders)
             {
-                RegenerateObjects(builder, context);
+                if (!(builder.Feature is BiomeArea))
+                {
+                    RegenerateObjects(builder, context); // areas (painting ones too) grow theirs below, after every feature
+                }
             }
             Lap("feature objects");
 
@@ -542,11 +569,9 @@ public static class WorldBuilder
             Lap("saveable ids + record");
             foreach (Terrain terrain in terrains)
             {
-                if (terrain.GetComponent<GrassTerrainColour>() != null)
-                {
-                    GrassSetup.BakeGroundColour(terrain);
-                    Lap("grass colour map");
-                }
+                // The grass takes the new ground's colour from a quick in-memory preview; the full bake (seconds on a
+                // big terrain, every build) waits for the scene to be saved.
+                GrassSetup.GroundRepainted(terrain);
 
                 EditorUtility.SetDirty(terrain.terrainData);
                 EditorUtility.SetDirty(terrain.GetComponent<WorldTerrain>().Stash);
@@ -573,6 +598,7 @@ public static class WorldBuilder
         }
         finally
         {
+            WorldGround.Scope = default;
             Building = false;
             Undo.CollapseUndoOperations(group);
             ignoreTerrainUntil = EditorApplication.timeSinceStartup + 0.5;
@@ -635,7 +661,7 @@ public static class WorldBuilder
                 }
 
                 world.BuiltFeatures.RemoveAll(b => b.feature == feature);
-                world.BuiltFeatures.Add(new WorldTerrain.Built { feature = feature, hash = Hash(feature), bounds = feature.WorldBounds() });
+                world.BuiltFeatures.Add(new WorldTerrain.Built { feature = feature, hash = Hash(feature), bounds = feature.WorldBounds(), paints = feature.ShapesTerrain });
             }
         }
     }
@@ -837,6 +863,14 @@ public static class WorldBuilder
 
     // ------------------------------------------------------------------ paint
 
+    private static void AddMissingDetails(Terrain terrain, List<FeatureBuilder> builders)
+    {
+        foreach (GameObject plant in builders.SelectMany(b => b.DetailPrefabs).Where(p => p != null).Distinct())
+        {
+            BiomeBrush.EnsureDetail(terrain.terrainData, plant);
+        }
+    }
+
     private static void AddMissingLayers(Terrain terrain, List<FeatureBuilder> builders)
     {
         TerrainData data = terrain.terrainData;
@@ -989,25 +1023,31 @@ public static class WorldBuilder
                 for (int x = 0; x < rect.width; x++)
                 {
                     int key = prototype * square + (rect.y + y) * resolution + rect.x + x;
-                    bool kept = stash.TryGetDetail(key, out int value);
-                    if (clear.Clear[y * rect.width + x])
+                    int cell = y * rect.width + x;
+                    bool kept = stash.TryGetDetail(key, out int baseValue, out int last);
+                    bool clearHere = clear.Clear[cell];
+                    int wanted = clear.Wanted(cell, prototype);
+                    if (!kept && !clearHere && wanted < 0)
                     {
-                        if (cells[y, x] != 0)
-                        {
-                            stash.SetDetail(key, cells[y, x]); // planted (or painted since) here: keep it for later
-                            cells[y, x] = 0;
-                            changed = true;
-                        }
+                        continue; // no feature here and nothing kept: the common case, untouched
                     }
-                    else if (kept)
-                    {
-                        if (cells[y, x] == 0)
-                        {
-                            cells[y, x] = value; // the feature moved away: the grass grows back
-                            changed = true;
-                        }
 
+                    int current = cells[y, x];
+                    int value = ClearLayer.Decide(kept, baseValue, last, current, clearHere, wanted,
+                                                  out int keepBase, out int keepLast, out bool release);
+                    if (value != current)
+                    {
+                        cells[y, x] = value;
+                        changed = true;
+                    }
+
+                    if (release)
+                    {
                         released.Add(key);
+                    }
+                    else if (kept || value != keepBase)
+                    {
+                        stash.SetDetail(key, keepBase, keepLast);
                     }
                 }
             }

@@ -3,7 +3,10 @@ using UnityEngine;
 
 /// <summary>Builds a <see cref="RavineFeature"/>: a floor carved the depth below the ground along the line, steep walls on
 /// both sides rising to whatever ground is there (ragged in plan, noisy in face, optionally stepped in ledges), rock and
-/// floor paint, crag pieces along both walls (CragWall) and rubble on the floor. It only cuts down.</summary>
+/// floor paint, crag pieces along both walls (CragWall) and rubble on the floor. It only cuts down. As in the generated raid ravines
+/// (RaidLayoutField.Cut), the walls also vary in width along the line, the ledges come and go in patches, a second, finer wobble breaks
+/// the edge, talus and boulders lie along the foot of the walls, and an open line narrows towards its ends. All of it comes from the
+/// existing settings (Raggedness, Wall Noise, Ledges), so features that exist rebuild the same way and only look more natural.</summary>
 public sealed class RavineBuilder : FeatureBuilder
 {
     private readonly RavineFeature ravine;
@@ -11,6 +14,16 @@ public sealed class RavineBuilder : FeatureBuilder
     private float[] halfFloor;  // half the floor's width at each sample
     private float[] ragLeft;    // how far each wall wanders out (+) or in (-) at each sample
     private float[] ragRight;
+
+    private const float EndTaper = 18f;
+    private const float EndWidth = 0.45f;
+    private const float WallVariety = 0.6f;
+    private const float WallVarietyScale = 11f;
+    private const float StrataPatchScale = 17f;
+    private const float FineRagScale = 2.6f;
+    private const float FineRag = 0.25f;
+    private const float Talus = 0.7f;
+    private const float Boulders = 0.6f;
 
     public RavineBuilder(RavineFeature ravine) : base(ravine)
     {
@@ -41,8 +54,20 @@ public sealed class RavineBuilder : FeatureBuilder
             raw[i] = ground.Height(SplineLine.Flat(Line.Points[i]));
             halfFloor[i] = 0.5f * ravine.FloorWidth * ravine.WidthAtKnots.Evaluate(Line.KnotT[i], Line.KnotCount, Line.Closed);
             float wander = Mathf.Max(halfFloor[i], 1f) * 0.7f * ravine.Raggedness;
-            ragLeft[i] = (WorldNoise2D.Fbm(Line.Along[i] / 7f, 0.3f, Feature.Seed + 11) - 0.5f) * 2f * wander;
-            ragRight[i] = (WorldNoise2D.Fbm(Line.Along[i] / 7f, 0.7f, Feature.Seed + 23) - 0.5f) * 2f * wander;
+            ragLeft[i] = (WorldNoise2D.Fbm(Line.Along[i] / 7f, 0.3f, Feature.Seed + 11) - 0.5f) * 2f * wander
+                         + (WorldNoise2D.Fbm(Line.Along[i] / FineRagScale, 0.1f, Feature.Seed + 13) - 0.5f) * 2f * wander * FineRag;
+            ragRight[i] = (WorldNoise2D.Fbm(Line.Along[i] / 7f, 0.7f, Feature.Seed + 23) - 0.5f) * 2f * wander
+                          + (WorldNoise2D.Fbm(Line.Along[i] / FineRagScale, 0.9f, Feature.Seed + 29) - 0.5f) * 2f * wander * FineRag;
+            if (!Line.Closed)
+            {
+                // An open ravine closes up towards its ends rather than stopping in a round pit.
+                float taper = Mathf.Min(EndTaper, Line.Length * 0.25f);
+                float fromEnd = Mathf.Min(Line.Along[i], Line.Length - Line.Along[i]);
+                float narrow = Mathf.Lerp(EndWidth, 1f, Mathf.SmoothStep(0f, 1f, fromEnd / Mathf.Max(0.01f, taper)));
+                halfFloor[i] *= narrow;
+                ragLeft[i] *= narrow;
+                ragRight[i] *= narrow;
+            }
         }
 
         // The floor sits the depth below the ground along the line, smoothed so it runs on rather than bumping.
@@ -82,8 +107,16 @@ public sealed class RavineBuilder : FeatureBuilder
             most = Mathf.Max(most, halfFloor[i] + Mathf.Max(Mathf.Abs(ragLeft[i]), Mathf.Abs(ragRight[i])));
         }
 
-        return most + ravine.WallRun + 1f;
+        return most + ravine.WallRun * (1f + WallVariety) + 1f;
     }
+
+    // How far the wall at a point runs from the floor to the top: wider and narrower along the ravine, with its Raggedness.
+    private float WallRunAt(Vector2 p) =>
+        ravine.WallRun * (1f + (WorldNoise2D.Fbm(p.x / WallVarietyScale, p.y / WallVarietyScale, Feature.Seed + 31) - 0.5f) * 2f * WallVariety * ravine.Raggedness);
+
+    // The ledges show in patches, as layered rock does, rather than evenly all along.
+    private float LedgeStrengthAt(Vector2 p) =>
+        Mathf.Clamp01(ravine.LedgeStrength * 1.4f * Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.35f, 0.65f, WorldNoise2D.Fbm(p.x / StrataPatchScale, p.y / StrataPatchScale, Feature.Seed + 37))));
 
     public override void Heights(HeightLayer layer)
     {
@@ -96,20 +129,23 @@ public sealed class RavineBuilder : FeatureBuilder
             float target;
             if (d <= hf)
             {
-                // A floor, a little lower in the middle and uneven, as water and rockfall leave it.
+                // A floor, a little lower in the middle and uneven, as water and rockfall leave it: talus along the foot of the walls,
+                // a boulder here and there.
                 float dip = d / Mathf.Max(hf, 0.01f);
-                target = bottom + 0.3f * dip * dip + (WorldNoise2D.Fbm(p.x / 2.5f, p.y / 2.5f, Feature.Seed + 5) - 0.5f) * 0.3f;
+                float rubble = ravine.WallNoise * (Talus * dip * dip * dip
+                    + Mathf.Max(0f, WorldNoise2D.Fbm(p.x / 3.2f, p.y / 3.2f, Feature.Seed + 41) - 0.5f) * 2f * Boulders);
+                target = bottom + 0.3f * dip * dip + (WorldNoise2D.Fbm(p.x / 2.5f, p.y / 2.5f, Feature.Seed + 5) - 0.5f) * 0.3f + rubble;
             }
             else
             {
-                float t = (d - hf) / ravine.WallRun;
+                float t = (d - hf) / WallRunAt(p);
                 if (t >= 1f)
                 {
                     return;
                 }
 
                 float bumps = (WorldNoise2D.Fbm(p.x / 3f, p.y / 3f, Feature.Seed + 7) - 0.5f) * ravine.WallNoise * 0.6f;
-                float up = WallProfile(Mathf.Clamp01(t + bumps), ravine.Ledges, ravine.LedgeStrength);
+                float up = WallProfile(Mathf.Clamp01(t + bumps), ravine.Ledges, LedgeStrengthAt(p));
                 // The wall rises to the ground beside it, so the top meets the slope wherever it is.
                 target = Mathf.Lerp(bottom, h, up);
             }
@@ -136,7 +172,7 @@ public sealed class RavineBuilder : FeatureBuilder
             Vector2 p = layer.Grid.World(x, y);
             float noise = WorldNoise2D.Fbm(p.x / 2f, p.y / 2f, Feature.Seed + 3);
             float hf = HalfFloor(s, f, side);
-            float t = (d - hf) / ravine.WallRun;
+            float t = (d - hf) / WallRunAt(p);
             if (bed >= 0 && d <= hf + 0.4f * noise)
             {
                 layer.Paint(x, y, bed, 1f);
@@ -164,7 +200,7 @@ public sealed class RavineBuilder : FeatureBuilder
 
         ForField(layer.Grid, layer.Rect, MostReach(), (x, y, d, s, f, side) =>
         {
-            if (d < HalfFloor(s, f, side) + ravine.WallRun + 0.4f)
+            if (d < HalfFloor(s, f, side) + WallRunAt(layer.Grid.World(x, y)) + 0.4f)
             {
                 layer.Clear[layer.IndexOf(x, y)] = true;
             }
@@ -201,7 +237,11 @@ public sealed class RavineBuilder : FeatureBuilder
                     Random = Random,
                     SegmentAt = SegmentAt,
                     HighNormal = s => Outward(s, side),
-                    Edge = (s, f) => SplineLine.Flat(Line.PointAt(s, f)) + Outward(s, side) * (HalfFloor(s, f, side) + ravine.WallRun),
+                    Edge = (s, f) =>
+                    {
+                        Vector2 nominal = SplineLine.Flat(Line.PointAt(s, f)) + Outward(s, side) * (HalfFloor(s, f, side) + ravine.WallRun);
+                        return SplineLine.Flat(Line.PointAt(s, f)) + Outward(s, side) * (HalfFloor(s, f, side) + WallRunAt(nominal));
+                    },
                     Rag = (s, f) => 0f,
                     Rim = (s, f, edge) => WorldGround.TryGround(edge + Outward(s, side) * 0.3f, out Vector3 top, out _) ? top.y : Line.Lerp(floor, s, f) + ravine.Depth,
                     FaceDepth = ravine.WallRun,

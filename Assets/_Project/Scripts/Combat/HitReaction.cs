@@ -21,6 +21,9 @@ public sealed class HitReaction : MonoBehaviour
     [SerializeField] private bool punch = true;
     [Tooltip("Scales the knockback from the CombatFeel settings. 0 means this target can't be pushed.")]
     [SerializeField, Min(0f)] private float knockbackScale = 1f;
+
+    /// <summary>How far this target is pushed, as a share of the CombatFeel distances. 0: it can't be pushed.</summary>
+    public float KnockbackScale => knockbackScale;
     [Tooltip("The part that squashes. Left empty, the model under this object is used.")]
     [SerializeField] private Transform visualRoot;
 

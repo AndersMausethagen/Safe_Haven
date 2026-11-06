@@ -115,7 +115,7 @@ public static class TerrainMossTools
         return Undo.AddComponent<MossWind>(source);
     }
 
-    [MenuItem("Safe Haven/Art Pipeline/Open Moss Preview")]
+    [MenuItem("Safe Haven/Setup/Art Pipeline/Open Moss Preview", false, 200)]
     public static void OpenPreview()
     {
         if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;

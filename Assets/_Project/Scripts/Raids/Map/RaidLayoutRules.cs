@@ -81,6 +81,44 @@ public sealed class RaidMapMood
     [Min(0f)] public float rocks = 1f;
     [Tooltip("Banks of fog laid over clearings, on top of the ones the scene places.")]
     [Min(0)] public int fogBanks;
+    [Tooltip("Multiplies how many great hills rise on the map, and how high (Rules › Hills).")]
+    [Min(0f)] public float hills = 1f;
+    [Tooltip("Multiplies how many clusters of great boulders lie about (Rules › Boulders).")]
+    [Min(0f)] public float boulders = 1f;
+
+    [Header("Cliffs and Ravines")]
+    [Tooltip("The raid planner offers a run of this mood as a large raid first. The player can still pick Normal.")]
+    public bool largeByDefault;
+    [Tooltip("How many ground levels the clearings stand on. Where high ground meets low there is a cliff, and a trail between two " +
+             "levels climbs it as a ramp: the way up. 0 or 1: no cliffs.")]
+    [Min(0)] public int terraces;
+    [Tooltip("Metres between two levels: the height of a cliff.")]
+    [Min(0f)] public float terraceHeight = 7f;
+    [Tooltip("Metres across one patch of high or low ground.")]
+    [Min(10f)] public float terraceScale = 110f;
+    [Tooltip("How many ravines a map of the raid's normal size gets, least and most. A large map has as many on every square metre. " +
+             "A trail crossing one keeps a neck of solid ground; a fall into one kills.")]
+    public Vector2Int ravines = Vector2Int.zero;
+    [Tooltip("How far a ravine runs, in metres, least and most.")]
+    public Vector2 ravineLength = new Vector2(60f, 150f);
+    [Tooltip("How wide a ravine is from rim to rim, in metres, least and most.")]
+    public Vector2 ravineWidth = new Vector2(9f, 13f);
+    [Tooltip("How far a ravine's floor lies below its rim, at the least, in metres: least and most. Its floor only falls along it, " +
+             "so it is deeper where the land rises.")]
+    public Vector2 ravineDepth = new Vector2(14f, 20f);
+    [Tooltip("Chance that a ravine has a river along its floor.")]
+    [Range(0f, 1f)] public float riverChance = 0.6f;
+    [Tooltip("Mist lies along the floors of the ravines.")]
+    public bool ravineMist = true;
+    [Tooltip("Sheer rock spires in the wild ground, which nobody can climb: least and most on a map of the normal size.")]
+    public Vector2Int spires = Vector2Int.zero;
+    [Tooltip("How high a spire stands above the ground around it, in metres, least and most.")]
+    public Vector2 spireHeight = new Vector2(9f, 16f);
+    [Tooltip("Radius of a spire's top, in metres, least and most.")]
+    public Vector2 spireRadius = new Vector2(3f, 7f);
+
+    /// <summary>True when the mood shapes the ground with cliffs, ravines or spires.</summary>
+    public bool HasCliffs => terraces > 1 || ravines.y > 0 || spires.y > 0;
 }
 
 /// <summary>A spawn group the map doesn't place by its own Site, and the kind of site that takes its points.</summary>
@@ -142,6 +180,31 @@ public sealed class RaidLayoutRules : ScriptableObject
     [Tooltip("How far in from the edge it starts rising, in metres.")]
     [SerializeField, Min(1f)] private float rimWidth = 12f;
 
+    [Header("Hills")]
+    [Tooltip("How hilly a run is, least and most, rolled from its seed: multiplies the rolling of the ground and the height of the " +
+             "great hills. Some runs are flat, some steep.")]
+    [SerializeField] private Vector2 hillVariance = new Vector2(1f, 1f);
+    [Tooltip("How many great hills rise in the wild ground, least and most, on a map of the normal size (times the mood's Hills).")]
+    [SerializeField] private Vector2Int greatHills = Vector2Int.zero;
+    [Tooltip("How high a great hill stands, in metres, least and most (times the run's hilliness). Trails may cross their flanks.")]
+    [SerializeField] private Vector2 greatHillHeight = new Vector2(4f, 10f);
+    [Tooltip("Radius of a great hill, in metres, least and most. Its steepest flank is 1.5 times height over radius.")]
+    [SerializeField] private Vector2 greatHillRadius = new Vector2(24f, 45f);
+
+    [Header("Boulders and Lookouts")]
+    [Tooltip("The great boulders that lie about in the wild ground, solid to walk into (a Cliff Kit's pieces).")]
+    [SerializeField] private CliffKit boulderKit;
+    [Tooltip("How many clusters of great boulders, least and most, on a map of the normal size (times the mood's Boulders).")]
+    [SerializeField] private Vector2Int boulderClusters = Vector2Int.zero;
+    [Tooltip("How many boulders in a cluster, least and most.")]
+    [SerializeField] private Vector2Int boulderClusterSize = new Vector2Int(1, 3);
+    [Tooltip("Scale of a boulder, least and most.")]
+    [SerializeField] private Vector2 boulderScale = new Vector2(0.7f, 1.4f);
+    [Tooltip("How many of the highest clearings hold a lookout, on a map of the normal size. Looking out reveals the land around.")]
+    [SerializeField, Min(0)] private int lookouts;
+    [Tooltip("Metres of the map a lookout reveals around it.")]
+    [SerializeField, Min(10f)] private float lookoutReveal = 70f;
+
     [Header("Forest")]
     [Tooltip("How dense the forest grows, 0 to 1, before the mood.")]
     [SerializeField, Range(0f, 1f)] private float forestDensity = 0.8f;
@@ -161,6 +224,14 @@ public sealed class RaidLayoutRules : ScriptableObject
     [SerializeField, Range(1f, 2.5f)] private float pondStretch = 1.6f;
     [Tooltip("What the ponds' surface is drawn with.")]
     [SerializeField] private Material pondMaterial;
+    [Tooltip("What the rivers along the floors of ravines are drawn with: a river material that takes its flow from the mesh.")]
+    [SerializeField] private Material riverMaterial;
+    [Tooltip("The rock-face pieces that dress the walls of ravines (a Cliff Kit). Empty: the terrain's own rock.")]
+    [SerializeField] private CliffKit ravineCrags;
+    [Tooltip("What a waterfall into a ravine is drawn with (the waterfall material).")]
+    [SerializeField] private Material waterfallMaterial;
+    [Tooltip("The foam, ripples, mist and spray where a waterfall lands.")]
+    [SerializeField] private GameObject waterfallPlunge;
     [Tooltip("Thirst a drink from a pond restores. 0, with no Pond Fill Item either: the ponds can't be used.")]
     [SerializeField, Min(0f)] private float pondDrink;
     [Tooltip("The water container a pond fills, such as a Waterskin. Empty: only for drinking.")]
@@ -202,7 +273,17 @@ public sealed class RaidLayoutRules : ScriptableObject
         copy.ponds = new Vector2Int(Mathf.RoundToInt(ponds.x * area), Mathf.RoundToInt(ponds.y * area));
         copy.campPieces = new Vector2Int(Mathf.RoundToInt(campPieces.x * area), Mathf.RoundToInt(campPieces.y * area));
         copy.exitRooms = Mathf.RoundToInt(exitRooms * width);
+        copy.greatHills = new Vector2Int(Mathf.RoundToInt(greatHills.x * area), Mathf.RoundToInt(greatHills.y * area));
+        copy.boulderClusters = new Vector2Int(Mathf.RoundToInt(boulderClusters.x * area), Mathf.RoundToInt(boulderClusters.y * area));
+        copy.lookouts = Mathf.RoundToInt(lookouts * area);
         copy.fieldResolution = Mathf.Min(MaxFieldResolution, Mathf.RoundToInt(fieldResolution * width));
+        // Ravines and spires stand on the land like clearings do: as many on every square metre.
+        foreach (RaidMapMood mood in copy.moods)
+        {
+            mood.ravines = new Vector2Int(Mathf.RoundToInt(mood.ravines.x * area), Mathf.RoundToInt(mood.ravines.y * area));
+            mood.spires = new Vector2Int(Mathf.RoundToInt(mood.spires.x * area), Mathf.RoundToInt(mood.spires.y * area));
+        }
+
         copy.sites = new List<RaidSiteQuota>(sites.Count);
         foreach (RaidSiteQuota quota in sites)
         {
@@ -254,6 +335,20 @@ public sealed class RaidLayoutRules : ScriptableObject
     public Vector2 PondDepth => pondDepth;
     public float PondStretch => pondStretch;
     public Material PondMaterial => pondMaterial;
+    public Material RiverMaterial => riverMaterial;
+    public CliffKit RavineCrags => ravineCrags;
+    public Material WaterfallMaterial => waterfallMaterial;
+    public GameObject WaterfallPlunge => waterfallPlunge;
+    public Vector2 HillVariance => hillVariance;
+    public Vector2Int GreatHills => greatHills;
+    public Vector2 GreatHillHeight => greatHillHeight;
+    public Vector2 GreatHillRadius => greatHillRadius;
+    public CliffKit BoulderKit => boulderKit;
+    public Vector2Int BoulderClusters => boulderClusters;
+    public Vector2Int BoulderClusterSize => boulderClusterSize;
+    public Vector2 BoulderScale => boulderScale;
+    public int Lookouts => lookouts;
+    public float LookoutReveal => lookoutReveal;
     public float PondDrink => pondDrink;
     public ItemDefinition PondFillItem => pondFillItem;
     public int PondFillUpTo => pondFillUpTo;
@@ -273,6 +368,45 @@ public sealed class RaidLayoutRules : ScriptableObject
         moods = new List<RaidMapMood>(moodRules);
         sites = new List<RaidSiteQuota>(siteRules);
         groups = new List<RaidGroupRule>(groupRules);
+    }
+
+    /// <summary>Adds a mood, or replaces the one of the same name (builders and tests).</summary>
+    public void SetMood(RaidMapMood mood)
+    {
+        int at = moods.FindIndex(one => one != null && one.name == mood.name);
+        if (at >= 0)
+        {
+            moods[at] = mood;
+        }
+        else
+        {
+            moods.Add(mood);
+        }
+    }
+
+    /// <summary>Sets what the rivers in ravines are drawn with (builders and tests).</summary>
+    public void ConfigureRivers(Material material, CliffKit crags, Material falls, GameObject plunge)
+    {
+        riverMaterial = material;
+        ravineCrags = crags;
+        waterfallMaterial = falls;
+        waterfallPlunge = plunge;
+    }
+
+    /// <summary>Sets up hills, boulders and lookouts (builders and tests).</summary>
+    public void ConfigureRelief(Vector2 variance, Vector2Int hillCount, Vector2 hillHeight, Vector2 hillRadius, CliffKit kit, Vector2Int clusters,
+        Vector2Int clusterSize, Vector2 scale, int lookoutCount, float reveal)
+    {
+        hillVariance = variance;
+        greatHills = hillCount;
+        greatHillHeight = hillHeight;
+        greatHillRadius = hillRadius;
+        boulderKit = kit;
+        boulderClusters = clusters;
+        boulderClusterSize = clusterSize;
+        boulderScale = scale;
+        lookouts = lookoutCount;
+        lookoutReveal = reveal;
     }
 
     /// <summary>Sets up the ponds (builders and tests).</summary>

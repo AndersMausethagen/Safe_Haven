@@ -12,7 +12,59 @@ using UnityEngine.Splines;
 [CustomEditor(typeof(WorldFeature), true)]
 public sealed class WorldFeatureEditor : Editor
 {
-    private static WorldFeature drawing;
+    private static WorldFeature drawingFeature;
+
+    // Drawing runs from the Scene view itself (as the Biome Brush does), not from the Inspector's OnSceneGUI: that one
+    // did not get the click before Unity's own picking, so clicking the ground selected the terrain instead.
+    private static WorldFeature drawing
+    {
+        get => drawingFeature;
+        set
+        {
+            drawingFeature = value;
+            SceneView.duringSceneGui -= DuringSceneGui;
+            if (value != null)
+            {
+                SceneView.duringSceneGui += DuringSceneGui;
+            }
+
+            SceneView.RepaintAll();
+        }
+    }
+
+    /// <summary>A feature is being drawn: the World Builder waits until it is finished (Enter), so nothing is built
+    /// point by point.</summary>
+    public static bool IsDrawing => drawingFeature != null;
+
+    private static void DuringSceneGui(SceneView view)
+    {
+        WorldFeature feature = drawingFeature;
+        if (feature == null || feature.Spline == null)
+        {
+            drawing = null;
+            return;
+        }
+
+        // Selecting something else finishes the drawing (an area closes its loop) instead of leaving it open.
+        if (Selection.activeGameObject != feature.gameObject)
+        {
+            Finish(feature);
+            return;
+        }
+
+        DrawMode(feature);
+        if (Event.current.type == EventType.Repaint)
+        {
+            DrawOutline(feature);
+        }
+
+        if (feature.IsArea && feature.Spline.Count >= 3)
+        {
+            Vector3 first = feature.transform.TransformPoint((Vector3)feature.Spline[0].Position);
+            Handles.color = new Color(0.5f, 1f, 0.5f, 0.9f);
+            Handles.DrawSolidDisc(first, Vector3.up, HandleUtility.GetHandleSize(first) * 0.08f); // click it to close
+        }
+    }
 
     public static void StartDrawing(WorldFeature feature)
     {
@@ -77,7 +129,7 @@ public sealed class WorldFeatureEditor : Editor
 
         if (feature is CliffFeature cliff && cliff.Kit == null)
         {
-            EditorGUILayout.HelpBox("No cliff kit: only the terrain is shaped. The Rock Faces kit is in Data/World.", MessageType.None);
+            EditorGUILayout.HelpBox("No rock pieces: the face is the shaped terrain in its Rock Layer (Cliff Rock, tessellated), rubble at its foot. Set a Kit (the looks' Crags, Rock Faces in Data/World) to stand pieces along it.", MessageType.None);
         }
     }
 
@@ -88,7 +140,12 @@ public sealed class WorldFeatureEditor : Editor
         PathFeature _ => "Draw along the path. Drag the white dots beside the knots to vary its width.",
         CliffFeature _ => "Draw where the face should stand; the high side is on the left of the drawing direction (inside, " +
                           "for a closed loop). Drag the white dots above the knots to vary the height.",
-        BiomeArea _ => "Draw a loop around the area. It fills with the layers below, regrowing when a river or path moves through it.",
+        BiomeArea area when area.Biome != null => $"Draw a loop around the area. It is painted with {area.Biome.name} (ground, plants and props) " +
+                          "and fills with the layers below, regrowing when a river or path moves through it.",
+        BiomeArea _ => "Draw a loop around the area. It fills with the layers below, regrowing when a river or path moves through it. " +
+                       "Give it a Biome to paint its ground and grow its plants too.",
+        RavineFeature _ => "Draw along the floor of the ravine: it is cut the depth below the ground, with walls on both sides.",
+        GroundPaintArea _ => "Draw a loop around the ground to paint: its rules paint it by steepness, height and hollows.",
         _ => "",
     };
 
@@ -100,14 +157,9 @@ public sealed class WorldFeatureEditor : Editor
             return;
         }
 
-        if (drawing == feature)
-        {
-            DrawMode(feature);
-        }
-
-        DrawOutline(feature);
         if (drawing != feature)
         {
+            DrawOutline(feature); // while drawing, the Scene view hook draws it
             KnotHandles(feature);
         }
     }
@@ -120,8 +172,30 @@ public sealed class WorldFeatureEditor : Editor
         int id = GUIUtility.GetControlID(FocusType.Passive);
         HandleUtility.AddDefaultControl(id);
         Handles.BeginGUI();
-        GUI.Label(new Rect(10, 10, 520, 22), "Click to add points · Backspace removes the last · Enter or Esc finishes", EditorStyles.helpBox);
+        GUI.Label(new Rect(10, 10, 640, 22), feature.IsArea
+            ? "Click to add points · click the first point (or Enter) to close the loop and build · Backspace removes the last"
+            : "Click to add points · Backspace removes the last · Enter builds it (settings in the Inspector show as you change them)",
+            EditorStyles.helpBox);
         Handles.EndGUI();
+
+        // Where the next point would go: a line from the last point to the ground under the mouse.
+        Spline spline = feature.Spline;
+        if (spline.Count > 0 && e.type == EventType.Repaint && MouseGround(e.mousePosition, feature.gameObject.scene, out Vector3 hover))
+        {
+            Vector3 last = feature.transform.TransformPoint((Vector3)spline[spline.Count - 1].Position);
+            Handles.color = new Color(1f, 1f, 1f, 0.8f);
+            Handles.DrawDottedLine(last + Vector3.up * 0.3f, hover + Vector3.up * 0.3f, 4f);
+            if (feature.IsArea && spline.Count >= 2)
+            {
+                Vector3 first = feature.transform.TransformPoint((Vector3)spline[0].Position);
+                Handles.DrawDottedLine(hover + Vector3.up * 0.3f, first + Vector3.up * 0.3f, 2f);
+            }
+        }
+
+        if (e.type == EventType.MouseMove)
+        {
+            SceneView.RepaintAll();
+        }
 
         if (e.type == EventType.KeyDown && (e.keyCode == KeyCode.Escape || e.keyCode == KeyCode.Return || e.keyCode == KeyCode.KeypadEnter))
         {
@@ -138,8 +212,20 @@ public sealed class WorldFeatureEditor : Editor
             return;
         }
 
-        if (e.type == EventType.MouseDown && e.button == 0 && !e.alt && MouseGround(e.mousePosition, out Vector3 point))
+        if (e.type == EventType.MouseDown && e.button == 0 && !e.alt && MouseGround(e.mousePosition, feature.gameObject.scene, out Vector3 point))
         {
+            // Clicking the first point of an area closes its loop.
+            if (feature.IsArea && feature.Spline.Count >= 3)
+            {
+                Vector3 first = feature.transform.TransformPoint((Vector3)feature.Spline[0].Position);
+                if (HandleUtility.DistanceToCircle(first, HandleUtility.GetHandleSize(first) * 0.15f) <= 0f)
+                {
+                    Finish(feature);
+                    e.Use();
+                    return;
+                }
+            }
+
             Undo.RecordObject(feature.Container, "Add Point");
             Vector3 local = feature.transform.InverseTransformPoint(point);
             feature.Spline.Add(new BezierKnot(new float3(local.x, local.y, local.z)), TangentMode.AutoSmooth);
@@ -159,13 +245,139 @@ public sealed class WorldFeatureEditor : Editor
         WorldBuilder.Schedule(0.05);
     }
 
-    private static bool MouseGround(Vector2 mouse, out Vector3 point)
+    // ------------------------------------------------------------------ shape previews
+
+    // The side a sample's "left" points to, flat (left of the direction of travel).
+    private static Vector3 LeftOf(SplineLine line, int i)
+    {
+        Vector2 d = line.Directions[i];
+        return new Vector3(-d.y, 0f, d.x);
+    }
+
+    /// <summary>The cliff before (and after) it is built: its face as a see-through wall at its height along the line,
+    /// and the edge of its plateau on the high side (raised) or the foot of the cut on the low side.</summary>
+    private static void PreviewCliff(CliffFeature cliff, SplineLine line, Color colour)
+    {
+        int n = line.Count;
+        var foot = new Vector3[n];
+        var top = new Vector3[n];
+        var far = new Vector3[n];
+        for (int i = 0; i < n; i++)
+        {
+            Vector3 high = LeftOf(line, i) * (cliff.High == CliffFeature.HighSide.Left ? 1f : -1f);
+            float h = cliff.Height * cliff.HeightAtKnots.Evaluate(line.KnotT[i], line.KnotCount, line.Closed);
+            Vector3 p = line.Points[i];
+            if (cliff.Shape == CliffFeature.Shaping.Raise)
+            {
+                foot[i] = p - high * cliff.FaceDepth * 0.5f;
+                top[i] = p + high * cliff.FaceDepth * 0.5f + Vector3.up * h;
+                far[i] = top[i] + high * cliff.Plateau;
+            }
+            else
+            {
+                top[i] = p + high * cliff.FaceDepth * 0.5f;
+                foot[i] = p - high * cliff.FaceDepth * 0.5f - Vector3.up * h;
+                far[i] = foot[i] - high * 4f;
+            }
+        }
+
+        Wall(foot, top, colour);
+        Handles.color = new Color(colour.r, colour.g, colour.b, 0.55f);
+        Handles.DrawDottedLines(Pairs(top, far, 4), 3f);
+        Handles.DrawAAPolyLine(2f, far);
+        Label(top, $"{cliff.Height:0.#} m {(cliff.Shape == CliffFeature.Shaping.Raise ? "high" : "deep")}");
+    }
+
+    /// <summary>The ravine before (and after) it is built: both walls as see-through faces from the ground down to its
+    /// floor, and the floor's edges, at the depth and widths it is set to.</summary>
+    private static void PreviewRavine(RavineFeature ravine, SplineLine line, Color colour)
+    {
+        int n = line.Count;
+        var floorL = new Vector3[n];
+        var floorR = new Vector3[n];
+        var rimL = new Vector3[n];
+        var rimR = new Vector3[n];
+        for (int i = 0; i < n; i++)
+        {
+            Vector3 left = LeftOf(line, i);
+            float half = 0.5f * ravine.FloorWidth * ravine.WidthAtKnots.Evaluate(line.KnotT[i], line.KnotCount, line.Closed);
+            float depth = ravine.Depth * ravine.DepthAtKnots.Evaluate(line.KnotT[i], line.KnotCount, line.Closed);
+            Vector3 p = line.Points[i];
+            floorL[i] = p + left * half - Vector3.up * depth;
+            floorR[i] = p - left * half - Vector3.up * depth;
+            rimL[i] = p + left * (half + ravine.WallRun);
+            rimR[i] = p - left * (half + ravine.WallRun);
+        }
+
+        Wall(floorL, rimL, colour);
+        Wall(floorR, rimR, colour);
+        Handles.color = new Color(colour.r, colour.g, colour.b, 0.8f);
+        Handles.DrawAAPolyLine(2f, floorL);
+        Handles.DrawAAPolyLine(2f, floorR);
+        Label(floorL, $"{ravine.Depth:0.#} m deep, floor {ravine.FloorWidth:0.#} m");
+    }
+
+    // A see-through face between two lines, with its edges and a few uprights.
+    private static void Wall(Vector3[] lower, Vector3[] upper, Color colour)
+    {
+        Handles.color = new Color(colour.r, colour.g, colour.b, 0.18f);
+        for (int i = 0; i + 1 < lower.Length; i++)
+        {
+            Handles.DrawAAConvexPolygon(lower[i], lower[i + 1], upper[i + 1], upper[i]);
+        }
+
+        Handles.color = new Color(colour.r, colour.g, colour.b, 0.9f);
+        Handles.DrawAAPolyLine(2.5f, upper);
+        Handles.DrawAAPolyLine(1.5f, lower);
+        Handles.color = new Color(colour.r, colour.g, colour.b, 0.5f);
+        Handles.DrawLines(Pairs(lower, upper, 4));
+    }
+
+    // Line pairs from a to b at every step-th sample (and the last), for Handles.DrawLines.
+    private static Vector3[] Pairs(Vector3[] a, Vector3[] b, int step)
+    {
+        var pairs = new System.Collections.Generic.List<Vector3>();
+        for (int i = 0; i < a.Length; i += step)
+        {
+            pairs.Add(a[i]);
+            pairs.Add(b[i]);
+        }
+
+        pairs.Add(a[a.Length - 1]);
+        pairs.Add(b[b.Length - 1]);
+        return pairs.ToArray();
+    }
+
+    private static void Label(Vector3[] along, string text)
+    {
+        Handles.Label(along[along.Length / 2] + Vector3.up * 0.5f, text, EditorStyles.whiteMiniLabel);
+    }
+
+    /// <summary>The colour a feature is outlined in (and marked with in World Tools' list).</summary>
+    public static Color ColourOf(WorldFeature feature) => feature switch
+    {
+        RiverFeature _ => new Color(0.3f, 0.7f, 1f),
+        PathFeature _ => new Color(0.95f, 0.8f, 0.45f),
+        CliffFeature _ => new Color(1f, 0.55f, 0.35f),
+        RavineFeature _ => new Color(0.85f, 0.45f, 0.3f),
+        GroundPaintArea _ => new Color(0.8f, 0.7f, 1f),
+        _ => new Color(0.5f, 1f, 0.5f),
+    };
+
+    /// <summary>The ground under the mouse on the feature's own scene's terrains (another open scene can lie on the same
+    /// coordinates: the Haven and the prologue do).</summary>
+    private static bool MouseGround(Vector2 mouse, UnityEngine.SceneManagement.Scene scene, out Vector3 point)
     {
         Ray ray = HandleUtility.GUIPointToWorldRay(mouse);
         float best = float.MaxValue;
         point = Vector3.zero;
         foreach (Terrain terrain in Terrain.activeTerrains)
         {
+            if (terrain.gameObject.scene != scene)
+            {
+                continue;
+            }
+
             var collider = terrain.GetComponent<TerrainCollider>();
             if (collider != null && collider.Raycast(ray, out RaycastHit hit, 5000f) && hit.distance < best)
             {
@@ -187,15 +399,18 @@ public sealed class WorldFeatureEditor : Editor
         }
 
         SplineLine line = SplineLine.Sample(feature.Container, 1.5f);
-        Color colour = feature switch
-        {
-            RiverFeature _ => new Color(0.3f, 0.7f, 1f),
-            PathFeature _ => new Color(0.95f, 0.8f, 0.45f),
-            CliffFeature _ => new Color(1f, 0.55f, 0.35f),
-            _ => new Color(0.5f, 1f, 0.5f),
-        };
+        Color colour = ColourOf(feature);
         Handles.color = colour;
         Handles.DrawAAPolyLine(3f, line.Points.Select(p => p + Vector3.up * 0.3f).ToArray());
+        switch (feature)
+        {
+            case CliffFeature cliff:
+                PreviewCliff(cliff, line, colour);
+                return;
+            case RavineFeature ravine:
+                PreviewRavine(ravine, line, colour);
+                return;
+        }
         float half = feature switch
         {
             RiverFeature river => river.Width * 0.5f,

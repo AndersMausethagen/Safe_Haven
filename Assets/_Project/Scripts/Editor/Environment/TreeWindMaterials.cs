@@ -32,7 +32,7 @@ public sealed class TreeWindMaterials : AssetPostprocessor
         }
     }
 
-    [MenuItem("Safe Haven/Art Pipeline/Apply Tree Wind Materials")]
+    [MenuItem("Safe Haven/Setup/Art Pipeline/Apply Tree Wind Materials", false, 200)]
     public static void ApplyToSelection()
     {
         int assets = 0, instances = 0;
@@ -59,7 +59,7 @@ public sealed class TreeWindMaterials : AssetPostprocessor
         Debug.Log($"Tree Wind: updated {assets} tree GLB(s) and {instances} scene renderer(s).");
     }
 
-    [MenuItem("Safe Haven/Art Pipeline/Apply Tree Wind Materials", true)]
+    [MenuItem("Safe Haven/Setup/Art Pipeline/Apply Tree Wind Materials", true)]
     private static bool CanApplyToSelection() => Selection.objects.Length > 0;
 
     public static bool IsTreeGlb(string path) =>

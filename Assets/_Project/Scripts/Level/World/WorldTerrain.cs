@@ -17,6 +17,8 @@ public sealed class WorldTerrain : MonoBehaviour
         public WorldFeature feature;
         public string hash;
         public Bounds bounds;
+        // It changed the terrain when built (an area painting a biome): if it stops, the terrain is rebuilt to undo that.
+        public bool paints;
     }
 
     [Tooltip("The ground under the features (made next to the TerrainData by the World Builder).")]

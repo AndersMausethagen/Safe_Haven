@@ -8,7 +8,7 @@ using UnityEngine;
 /// Makes simple synthesized placeholder audio (music loops, ambience, death effects and rare-loot chimes), the effect
 /// Sound assets, Audio Settings (with placeholder default music where it has none) and Rarity Settings, so the audio system
 /// works before real audio exists. Scene music is set per scene in the Sound Editor. Existing assets and music already set
-/// are never overwritten, so it is safe to run again. Safe Haven > Audio > Generate Placeholder Sounds.
+/// are never overwritten, so it is safe to run again. Safe Haven > Setup > Audio > Generate Placeholder Sounds.
 /// </summary>
 public static class PlaceholderAudioGenerator
 {
@@ -19,7 +19,7 @@ public static class PlaceholderAudioGenerator
     private const string SettingsPath = "Assets/_Project/Resources/AudioSettings.asset";
     private const string RaritySettingsPath = "Assets/_Project/Resources/RaritySettings.asset";
 
-    [MenuItem("Safe Haven/Audio/Generate Placeholder Sounds")]
+    [MenuItem("Safe Haven/Setup/Audio/Generate Placeholder Sounds", false, 200)]
     public static void Generate()
     {
         PrefabBuildUtility.EnsureFolder(ClipFolder);

@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 /// <summary>
-/// Makes the people of the story modular humans (Safe Haven › Characters › Build People): a model prefab per person in
+/// Makes the people of the story modular humans (Safe Haven › Setup › Characters › Build People): a model prefab per person in
 /// Prefabs/Characters/People (their look, clothes, the Villager controller and emotes), set as the person's
 /// ResidentDefinition model, and put in place of the old stand-in model on the stranded traveler and the prologue's
 /// expedition. The looks below are the authored ones; edit them on the prefabs afterwards if you like, but running this
@@ -58,7 +58,7 @@ public static class PeopleSetup
             Outfit = new[] { "CuredLeather_Body", "CuredLeather_Feet", "WovenHide_Waist" } },
     };
 
-    [MenuItem("Safe Haven/Characters/Build People")]
+    [MenuItem("Safe Haven/Setup/Characters/Build People", false, 200)]
     public static void BuildFromMenu() => Debug.Log(BuildAll());
 
     /// <summary>Builds the prefabs, sets the residents' models and replaces the traveler's model. The prologue scene is

@@ -22,11 +22,11 @@ MonoBehaviour:
   constructionCost: []
   constructionItems:
   - item: {fileID: 11400000, guid: 8ae2883815327b74fa7975309c803f92, type: 2}
-    amount: 6
+    amount: 12
   - item: {fileID: 11400000, guid: a370187223419a048b6cebe8f7e345a3, type: 2}
-    amount: 4
+    amount: 8
   - item: {fileID: 11400000, guid: 4df650debd4ce21459e04a0c92ffa207, type: 2}
-    amount: 2
+    amount: 4
   showInBuildMenu: 1
   knownFromStart: 1
   sortOrder: 18
@@ -47,9 +47,9 @@ MonoBehaviour:
     description: Someone up there at dusk and dawn. It hears what moves, and the runes of a safer road.
     cost:
     - item: {fileID: 11400000, guid: a370187223419a048b6cebe8f7e345a3, type: 2}
-      amount: 8
+      amount: 16
     - item: {fileID: 11400000, guid: 8cf878eb4a61eb943917a1f9421bb40a, type: 2}
-      amount: 2
+      amount: 4
     essence: []
     work: 8
     renown: 4
@@ -75,9 +75,9 @@ MonoBehaviour:
     description: A fire you can see from the woods. Now you can choose to go in harder, for more.
     cost:
     - item: {fileID: 11400000, guid: 8865a285b55516842a98bac1e1e53ef6, type: 2}
-      amount: 6
+      amount: 12
     - item: {fileID: 11400000, guid: f243c15300698e044a98d785099354c6, type: 2}
-      amount: 3
+      amount: 6
     essence: []
     work: 10
     renown: 6

@@ -6,14 +6,14 @@ using UnityEngine;
 /// Keeps the resource catalog, the recipe book and the save system's content database in step with the project: when a
 /// Resource Definition, Resource Category, Recipe or Item is created or imported it is added, and entries whose asset
 /// was deleted are removed. Anything watching the catalog (the resource HUD, even while playing) then refreshes by itself.
-/// Safe Haven > Resources > Refresh Catalog runs the same scan by hand. With more than one resource catalog in the project
+/// Safe Haven > Setup > Resources > Refresh Catalog runs the same scan by hand. With more than one resource catalog in the project
 /// no resources are added automatically, since it can't tell which one is meant.
 /// </summary>
 public sealed class ResourceCatalogPostprocessor : AssetPostprocessor
 {
     private static bool syncScheduled;
 
-    [MenuItem("Safe Haven/Resources/Refresh Catalog")]
+    [MenuItem("Safe Haven/Setup/Resources/Refresh Catalog", false, 200)]
     public static void RefreshCatalogs()
     {
         int added = Sync();

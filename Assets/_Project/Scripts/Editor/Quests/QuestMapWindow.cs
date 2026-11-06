@@ -41,7 +41,7 @@ public sealed class QuestMapWindow : EditorWindow
     private GUIStyle lineStyle;
     private GUIStyle problemStyle;
 
-    [MenuItem("Safe Haven/Quests/Quest Map")]
+    [MenuItem("Safe Haven/Quest Map", false, 20)]
     public static void Open()
     {
         var window = GetWindow<QuestMapWindow>();

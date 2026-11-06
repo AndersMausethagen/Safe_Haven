@@ -98,6 +98,12 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
             Dress(seed);
             ResumeAgents(paused);
             MovePlayerToStart();
+            // The minimap may have measured the ground before it was laid out (and widened, on a large raid).
+            if (MinimapHud.Current != null)
+            {
+                MinimapHud.Current.Refit();
+            }
+
             yield break;
         }
 
@@ -172,6 +178,7 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
             rumourSpots.Clear();
             rumourSpots.AddRange(RaidMapGenerator.PlaceContent(this, Layout, rules));
             RaidMapGenerator.PlacePonds(this, Layout, rules, pondMeshes);
+            RaidMapGenerator.PlaceRavines(this, Layout, rules, pondMeshes);
             if (terrain.TryGetComponent(out TerrainMoss moss))
             {
                 moss.Rebuild();
@@ -182,7 +189,8 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
             if (RaidMapGenerator.ExitsReachable(this, Layout))
             {
                 Debug.Log($"Raid map generated from seed {seed}: {Layout.Shape.shape}, {Layout.Mood.name}, {Layout.Rooms.Count} clearings, " +
-                          $"{Layout.Links.Count} trails, {Layout.Ponds.Count} ponds, {turnedData.treeInstanceCount} trees, attempt {attempt + 1}, {clock.ElapsedMilliseconds} ms.", this);
+                          $"{Layout.Links.Count} trails, {Layout.Ponds.Count} ponds, {Layout.Ravines.Count} ravines, {Layout.Spires.Count} spires, " +
+                          $"{turnedData.treeInstanceCount} trees, attempt {attempt + 1}, {clock.ElapsedMilliseconds} ms.", this);
                 yield break;
             }
 

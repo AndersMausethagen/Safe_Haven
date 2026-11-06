@@ -3,7 +3,7 @@ using UnityEditor;
 using UnityEngine;
 
 /// <summary>
-/// Builds the combat effects (Safe Haven › Combat › Build Combat Effects): generated textures (soft dot, spark streak,
+/// Builds the combat effects (Safe Haven › Setup › Combat › Build Combat Effects): generated textures (soft dot, spark streak,
 /// ring, star), their additive materials ("Safe Haven/Effect Particle"), pooled particle prefabs for hits, critical
 /// hits, blocks, parries, staggers, perfect dodges and the parry cue, the slash arc material, and wires them all into
 /// Resources/CombatFeel. Running it again rebuilds them in place (prefab GUIDs are kept, so references survive).
@@ -17,7 +17,7 @@ public static class CombatEffectsBuilder
 
     private static Material dot, streak, ring, star;
 
-    [MenuItem("Safe Haven/Combat/Build Combat Effects")]
+    [MenuItem("Safe Haven/Setup/Combat/Build Combat Effects", false, 200)]
     public static void BuildAll()
     {
         Directory.CreateDirectory(ArtFolder);
@@ -98,7 +98,7 @@ public static class CombatEffectsBuilder
 
     /// <summary>The blood prefab (three world-space particle systems, sprayed by BloodEffects) and the ring under the enemy in
     /// focus, set in Combat Feel. Build Combat Effects runs it too.</summary>
-    [MenuItem("Safe Haven/Combat/Build Blood and Markers")]
+    [MenuItem("Safe Haven/Setup/Combat/Build Blood and Markers", false, 200)]
     public static void BuildBloodAndMarkers()
     {
         Directory.CreateDirectory(ArtFolder);
@@ -314,7 +314,7 @@ public static class CombatEffectsBuilder
 
     /// <summary>Hit effects of a weapon's own, set where the weapon has none: fists land with a soft flash, a quick shock
     /// ring and a puff of dust instead of a blade's sparks. Build Combat Effects runs it too.</summary>
-    [MenuItem("Safe Haven/Combat/Build Weapon Hit Effects")]
+    [MenuItem("Safe Haven/Setup/Combat/Build Weapon Hit Effects", false, 200)]
     public static void BuildWeaponEffects()
     {
         // Run on its own, it reuses the particle materials Build Combat Effects made.

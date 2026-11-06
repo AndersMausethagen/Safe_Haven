@@ -22,11 +22,11 @@ MonoBehaviour:
   constructionCost: []
   constructionItems:
   - item: {fileID: 11400000, guid: 8ae2883815327b74fa7975309c803f92, type: 2}
-    amount: 12
+    amount: 24
   - item: {fileID: 11400000, guid: b5567f7d75200bd46befbd1dab298f36, type: 2}
-    amount: 6
+    amount: 12
   - item: {fileID: 11400000, guid: e8bb5d2fbded52b42a179a47cce32d53, type: 2}
-    amount: 6
+    amount: 12
   showInBuildMenu: 1
   knownFromStart: 1
   sortOrder: 1
@@ -45,11 +45,11 @@ MonoBehaviour:
     description: Proper joints and a vice. It makes what tier II asks.
     cost:
     - item: {fileID: 11400000, guid: a370187223419a048b6cebe8f7e345a3, type: 2}
-      amount: 8
+      amount: 16
     - item: {fileID: 11400000, guid: 59d371b7b63e8e24bb946051d808bc9b, type: 2}
-      amount: 4
+      amount: 8
     - item: {fileID: 11400000, guid: 8cf878eb4a61eb943917a1f9421bb40a, type: 2}
-      amount: 2
+      amount: 4
     essence: []
     work: 8
     renown: 4
@@ -59,6 +59,7 @@ MonoBehaviour:
     extraStorage: 0
     raidSeconds: 0
     extraRumours: 0
+    foretoldEvents: 0
     comfort: 0
     extraLogs: 0
     teachesRecipes: []
@@ -72,11 +73,11 @@ MonoBehaviour:
     description: Iron straps, and every tool has its place on the wall.
     cost:
     - item: {fileID: 11400000, guid: 8865a285b55516842a98bac1e1e53ef6, type: 2}
-      amount: 6
+      amount: 12
     - item: {fileID: 11400000, guid: 3b6626518ea9eb040b7d45591fac015b, type: 2}
-      amount: 6
+      amount: 12
     - item: {fileID: 11400000, guid: f243c15300698e044a98d785099354c6, type: 2}
-      amount: 4
+      amount: 8
     essence: []
     work: 10
     renown: 6
@@ -86,6 +87,7 @@ MonoBehaviour:
     extraStorage: 0
     raidSeconds: 0
     extraRumours: 0
+    foretoldEvents: 0
     comfort: 0
     extraLogs: 0
     teachesRecipes: []
@@ -101,14 +103,14 @@ MonoBehaviour:
     description: 'Heartroot set in the bench: the work comes easier here.'
     cost:
     - item: {fileID: 11400000, guid: 8865a285b55516842a98bac1e1e53ef6, type: 2}
-      amount: 6
+      amount: 12
     - item: {fileID: 11400000, guid: 32fed522ebae2fc4d85b1847b30aa530, type: 2}
-      amount: 4
+      amount: 8
     - item: {fileID: 11400000, guid: 4af99768b5986d94e8882065ffe24693, type: 2}
       amount: 2
     essence:
     - resource: {fileID: 11400000, guid: e991fd5ccf0ce314cafafff8badfe173, type: 2}
-      amount: 8
+      amount: 16
     work: 12
     renown: 8
     craftSpeed: 0.2
@@ -117,6 +119,7 @@ MonoBehaviour:
     extraStorage: 0
     raidSeconds: 0
     extraRumours: 0
+    foretoldEvents: 0
     comfort: 0
     extraLogs: 0
     teachesRecipes: []
@@ -132,14 +135,14 @@ MonoBehaviour:
     description: The best-kept workshop this side of the portal.
     cost:
     - item: {fileID: 11400000, guid: 50d6dfa982b3a264980eaec31b4aae11, type: 2}
-      amount: 6
+      amount: 12
     - item: {fileID: 11400000, guid: 32fed522ebae2fc4d85b1847b30aa530, type: 2}
-      amount: 6
+      amount: 12
     - item: {fileID: 11400000, guid: fcf0552d231ec8b40a3de2796f1bc4c3, type: 2}
       amount: 2
     essence:
     - resource: {fileID: 11400000, guid: e991fd5ccf0ce314cafafff8badfe173, type: 2}
-      amount: 15
+      amount: 30
     work: 14
     renown: 12
     craftSpeed: 0.25
@@ -148,6 +151,7 @@ MonoBehaviour:
     extraStorage: 0
     raidSeconds: 0
     extraRumours: 0
+    foretoldEvents: 0
     comfort: 0
     extraLogs: 0
     teachesRecipes: []

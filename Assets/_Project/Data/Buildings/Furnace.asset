@@ -22,15 +22,16 @@ MonoBehaviour:
   constructionCost: []
   constructionItems:
   - item: {fileID: 11400000, guid: ec438ce757d5e9e43bbd93390e7a2728, type: 2}
-    amount: 4
+    amount: 8
   - item: {fileID: 11400000, guid: 59d371b7b63e8e24bb946051d808bc9b, type: 2}
-    amount: 4
+    amount: 8
   - item: {fileID: 11400000, guid: b5567f7d75200bd46befbd1dab298f36, type: 2}
-    amount: 12
+    amount: 24
   showInBuildMenu: 0
   knownFromStart: 1
   sortOrder: 4
   requires: []
+  requiredRank: 0
   yardDepth: 1.5
   yardSide: 0
   placeInLines: 0
@@ -44,9 +45,9 @@ MonoBehaviour:
     description: Thicker walls hold the fire in.
     cost:
     - item: {fileID: 11400000, guid: b5567f7d75200bd46befbd1dab298f36, type: 2}
-      amount: 10
+      amount: 20
     - item: {fileID: 11400000, guid: 59d371b7b63e8e24bb946051d808bc9b, type: 2}
-      amount: 2
+      amount: 4
     essence: []
     work: 8.5
     renown: 5
@@ -56,16 +57,23 @@ MonoBehaviour:
     extraStorage: 0
     raidSeconds: 0
     extraRumours: 0
+    foretoldEvents: 0
     comfort: 0
     extraLogs: 0
     teachesRecipes: []
+    requires: []
+    beds: 0
+    purifyYield: 0
+    extraMealSlots: 0
+    extraGame: 0
+    extraLight: 0
   - title: Master's
     description: A bellows that breathes on its own.
     cost:
     - item: {fileID: 11400000, guid: 59d371b7b63e8e24bb946051d808bc9b, type: 2}
-      amount: 6
+      amount: 12
     - item: {fileID: 11400000, guid: 3b6626518ea9eb040b7d45591fac015b, type: 2}
-      amount: 2
+      amount: 4
     essence: []
     work: 9.5
     renown: 7
@@ -75,9 +83,17 @@ MonoBehaviour:
     extraStorage: 0
     raidSeconds: 0
     extraRumours: 0
+    foretoldEvents: 0
     comfort: 0
     extraLogs: 0
     teachesRecipes: []
+    requires: []
+    beds: 0
+    purifyYield: 0
+    extraMealSlots: 0
+    extraGame: 0
+    extraLight: 0
   comfort: 0
+  beds: 0
   teachesRecipes: []
   deathSound: {fileID: 0}

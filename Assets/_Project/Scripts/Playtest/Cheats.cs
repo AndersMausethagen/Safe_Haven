@@ -263,8 +263,12 @@ public static class Cheats
 
     // ----- Raids -----
 
-    /// <summary>Starts a raid from anywhere at home. False, with a reason, when it can't.</summary>
-    public static bool StartRaid(RaidDefinition raid, out string result)
+    /// <summary>
+    /// Starts a raid from anywhere at home. On a raid with generated maps it can be of a chosen mood (by name) and shape, and large or
+    /// normal; left open, the run rolls them as usual and its size follows the mood (RaidMapMood.largeByDefault). The run is an ordinary
+    /// one, found by its seed, so its briefing, map and spawns all agree. False, with a reason, when it can't.
+    /// </summary>
+    public static bool StartRaid(RaidDefinition raid, out string result, string mood = null, RaidLayoutShape? shape = null, bool? large = null)
     {
         GameObject player = PlayerObject();
         if (player == null)
@@ -273,13 +277,31 @@ public static class Cheats
             return false;
         }
 
-        if (!RaidLauncher.TryLaunch(raid, player, Array.Empty<ItemDefinition>(), out string problem))
+        RaidLayoutRules rules = raid != null ? raid.LayoutRules : null;
+        int seed = RaidSession.NewSeed();
+        if (rules != null && (!string.IsNullOrEmpty(mood) || shape.HasValue))
+        {
+            int? found = RaidLayoutPlanner.FindSeed(rules, (rolledShape, rolledMood) =>
+                (string.IsNullOrEmpty(mood) || rolledMood.name == mood) && (!shape.HasValue || rolledShape.shape == shape.Value), seed);
+            if (found == null)
+            {
+                result = $"{raid.DisplayName} has no {(string.IsNullOrEmpty(mood) ? "" : mood + " ")}{(shape.HasValue ? shape.Value + " " : "")}maps.";
+                return false;
+            }
+
+            seed = found.Value;
+        }
+
+        (RaidShapeRule chosenShape, RaidMapMood chosenMood) = rules != null ? RaidLayoutPlanner.Choose(rules, seed) : (null, null);
+        bool goLarge = large ?? (chosenMood != null && chosenMood.largeByDefault);
+        if (!RaidLauncher.TryLaunch(raid, player, Array.Empty<ItemDefinition>(), out string problem, 0, seed, null, null, goLarge))
         {
             result = problem;
             return false;
         }
 
-        result = Did("Start raid", $"Into {raid.DisplayName}.");
+        string kind = chosenMood != null ? $": {chosenMood.name}, {chosenShape.shape}, {(goLarge && raid.CanBeLarge ? "large" : "normal")}, seed {seed}" : "";
+        result = Did("Start raid", $"Into {raid.DisplayName}{kind}.");
         return true;
     }
 

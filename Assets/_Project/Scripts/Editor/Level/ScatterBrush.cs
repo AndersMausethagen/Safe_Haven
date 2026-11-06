@@ -318,7 +318,7 @@ public sealed class ScatterBrush : EditorWindow
 
     // ---------------------------------------------------------------- default palettes
 
-    [MenuItem("Safe Haven/World/Place/Create Default Scatter Palettes")]
+    [MenuItem("Safe Haven/Setup/World/Create Default Scatter Palettes", false, 200)]
     private static void CreateDefaultsMenu() => Debug.Log($"Level: {EnsureDefaultPalettes()} scatter palette(s) created in {PaletteFolder}.");
 
     /// <summary>Forest trees, rocks and logs, wood and stone nodes and forage, from the project's own prefabs. Existing

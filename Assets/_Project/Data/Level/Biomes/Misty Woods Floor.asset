@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Misty Woods Floor
   m_EditorClassIdentifier: SafeHaven::BiomePreset
   description: 'The Misty Woods'' floor: moss and forest grass, ferns in drifts, leaf litter, mushrooms, fallen debris and mossy boulders.'
+  look: Mossy Forest
   ground: {fileID: 8574412962073106934, guid: c565454ffa18bd1429caa8979dcc7aec, type: 2}
   groundStrength: 0.45
   groundSlope: {x: 0, y: 40}
@@ -50,8 +51,10 @@ MonoBehaviour:
   props:
   - palette: {fileID: 11400000, guid: 373290c5cf218cb48836dc2ffaaa64a3, type: 2}
     tries: 2
+    perHundredSquareMetres: 1
     slope: {x: 0, y: 40}
   - palette: {fileID: 11400000, guid: 6f397ef0845982c4388bde9b0b200e62, type: 2}
     tries: 1
+    perHundredSquareMetres: 1
     slope: {x: 0, y: 45}
   nearWater: 0

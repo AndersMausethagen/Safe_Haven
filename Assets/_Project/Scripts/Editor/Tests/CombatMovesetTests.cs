@@ -118,8 +118,8 @@ public sealed class CombatMovesetTests
     public void BloodAndMarkersAreSetUp()
     {
         CombatFeelSettings feel = CombatFeelSettings.Current;
-        Assert.IsNotNull(feel.BloodEffects, "Combat Feel has no blood prefab: run Safe Haven › Combat › Build Blood and Markers");
-        Assert.IsTrue(feel.BloodEffects.HasPools, "the blood prefab has no pools: run Safe Haven › Combat › Build Blood and Markers");
+        Assert.IsNotNull(feel.BloodEffects, "Combat Feel has no blood prefab: run Safe Haven › Setup › Combat › Build Blood and Markers");
+        Assert.IsTrue(feel.BloodEffects.HasPools, "the blood prefab has no pools: run Safe Haven › Setup › Combat › Build Blood and Markers");
         Assert.Greater(feel.BloodPoolSeconds, feel.CorpseSeconds, "a pool should outlast the body lying in it");
         Assert.IsNotNull(feel.FocusMarkerMaterial);
         Assert.Greater(feel.CorpseSeconds, feel.CorpseSettleSeconds, "a corpse should come to rest before it sinks");

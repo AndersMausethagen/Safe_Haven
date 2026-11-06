@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 /// <summary>
@@ -56,6 +57,8 @@ public sealed class WorldTerrainStash : ScriptableObject
     [SerializeField] private int detailResolution;
     [SerializeField] private List<int> detailCells = new List<int>(); // layer * resolution² + cell
     [SerializeField] private List<int> detailBase = new List<int>();
+    // What the last build left in each kept cell (HandKept: touched by hand since, builds leave it as it is).
+    [SerializeField] private List<int> detailLast = new List<int>();
 
     [SerializeField] private List<StashedTree> trees = new List<StashedTree>();
 
@@ -105,7 +108,14 @@ public sealed class WorldTerrainStash : ScriptableObject
             detailResolution = details;
             detailCells.Clear();
             detailBase.Clear();
+            detailLast.Clear();
             detailIndex = null;
+        }
+
+        // Stashes from before grass was grown by features only cleared it: what they last left was always nothing.
+        while (detailLast.Count < detailCells.Count)
+        {
+            detailLast.Add(0);
         }
 
         return reset;
@@ -272,37 +282,65 @@ public sealed class WorldTerrainStash : ScriptableObject
     public IEnumerable<int> DetailCells => detailCells;
     public int DetailResolution => detailResolution;
 
-    public bool TryGetDetail(int key, out int value)
+    /// <summary>A detail cell's <see cref="TryGetDetail"/> "last" when it was changed by hand after a build: builds leave
+    /// it as it is (hand paint wins) until it is given back.</summary>
+    public const int HandKept = -1;
+
+    public bool TryGetDetail(int key, out int baseValue, out int last)
     {
         detailIndex ??= Index(detailCells);
         if (detailIndex.TryGetValue(key, out int i))
         {
-            value = detailBase[i];
+            baseValue = detailBase[i];
+            last = i < detailLast.Count ? detailLast[i] : 0;
             return true;
         }
 
-        value = 0;
+        baseValue = last = 0;
         return false;
     }
 
-    public void SetDetail(int key, int value)
+    public void SetDetail(int key, int baseValue, int last)
     {
         detailIndex ??= Index(detailCells);
         if (detailIndex.TryGetValue(key, out int i))
         {
-            detailBase[i] = value;
+            detailBase[i] = baseValue;
+            detailLast[i] = last;
             return;
         }
 
         detailIndex[key] = detailCells.Count;
         detailCells.Add(key);
-        detailBase.Add(value);
+        detailBase.Add(baseValue);
+        detailLast.Add(last);
     }
 
     public void RemoveDetails(ICollection<int> keys)
     {
-        RemoveWhere(detailCells, key => keys.Contains(key), detailBase);
+        RemoveWhere(detailCells, key => keys.Contains(key), detailBase, detailLast);
         detailIndex = null;
+    }
+
+    public int HandKeptDetailCount => detailLast.Count(l => l == HandKept);
+
+    /// <summary>Lets the features grow or clear the grass touched by hand again (inside <paramref name="area"/>, a detail
+    /// grid rectangle, or everywhere): what is there now becomes the ground they work on. Returns how many cells.</summary>
+    public int ReleaseHandKeptDetails(RectInt? area)
+    {
+        int square = detailResolution * detailResolution;
+        var released = new HashSet<int>();
+        for (int i = 0; i < detailCells.Count; i++)
+        {
+            if (i >= detailLast.Count || detailLast[i] != HandKept) continue;
+            int cell = square > 0 ? detailCells[i] % square : 0;
+            if (area.HasValue && !area.Value.Contains(new Vector2Int(cell % detailResolution, cell / detailResolution))) continue;
+            released.Add(detailCells[i]);
+        }
+
+        // Forgotten, so the next build takes the grass there now as the ground it works on.
+        RemoveDetails(released);
+        return released.Count;
     }
 
     // ------------------------------------------------------------------ helpers

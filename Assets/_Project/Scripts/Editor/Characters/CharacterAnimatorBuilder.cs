@@ -49,7 +49,7 @@ public static class CharacterAnimatorBuilder
         { "HumanM@Idle02", "Idle02" },
     };
 
-    [MenuItem("Safe Haven/Characters/Build Character Animators")]
+    [MenuItem("Safe Haven/Setup/Characters/Build Character Animators", false, 200)]
     public static void BuildFromMenu() => Debug.Log(BuildAll());
 
     public static string BuildAll()
@@ -220,7 +220,7 @@ public static class CharacterAnimatorBuilder
         "Forward", "ForwardRight", "Right", "BackwardRight", "Backwards", "BackwardLeft", "Left", "ForwardLeft",
     };
 
-    [MenuItem("Safe Haven/Characters/Build Player Locomotion")]
+    [MenuItem("Safe Haven/Setup/Characters/Build Player Locomotion", false, 200)]
     public static void BuildLocomotionFromMenu()
     {
         var player = AssetDatabase.LoadAssetAtPath<AnimatorController>(PlayerControllerPath);

@@ -19,10 +19,10 @@ public static class ProloguePreview
     }
 
     /// <summary>The Haven on the same throwaway saves, for trying its people out without touching the real save.</summary>
-    [MenuItem("Safe Haven/Quests/Play Haven (Isolated Saves)")]
+    [MenuItem("Safe Haven/Scene/Play Haven (Isolated Saves)")]
     public static void PlayHaven() => Play("Assets/_Project/Scenes/SafeHaven.unity");
 
-    [MenuItem("Safe Haven/Quests/Play Prologue (Isolated Saves)")]
+    [MenuItem("Safe Haven/Scene/Play Prologue (Isolated Saves)")]
     public static void Play() => Play(ScenePath);
 
     private static void Play(string path)
@@ -58,7 +58,7 @@ public static class ProloguePreview
         if (state == PlayModeStateChange.ExitingEditMode && HasConflictingScenes())
         {
             Debug.LogError("The prologue cannot run alongside other scenes: duplicate players and raid setup can move the player below terrain. " +
-                "Open Prologue_MistyWoods on its own, or use Safe Haven > Quests > Play Prologue (Isolated Saves).");
+                "Open Prologue_MistyWoods on its own, or use Safe Haven > Scene > Play Prologue (Isolated Saves).");
             EditorApplication.isPlaying = false;
             return;
         }

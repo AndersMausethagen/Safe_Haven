@@ -5,7 +5,7 @@ using UnityEditor;
 using UnityEngine;
 
 /// <summary>
-/// Safe Haven > Planner > Import Planner Data. Shows what the Progression Planner's manifest would create and change and
+/// Safe Haven > Content > Import Planner Data. Shows what the Progression Planner's manifest would create and change and
 /// applies it only after the user confirms. New and changed assets are listed with old and new values; nothing is deleted.
 /// </summary>
 public sealed class PlannerImportWindow : EditorWindow
@@ -17,7 +17,7 @@ public sealed class PlannerImportWindow : EditorWindow
     private string status;
     private Vector2 scroll;
 
-    [MenuItem("Safe Haven/Planner/Import Planner Data")]
+    [MenuItem("Safe Haven/Content/Import Planner Data", false, 40)]
     public static void Open()
     {
         GetWindow<PlannerImportWindow>("Planner Import").Show();

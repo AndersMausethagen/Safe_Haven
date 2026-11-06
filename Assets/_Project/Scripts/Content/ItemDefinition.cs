@@ -59,7 +59,7 @@ public sealed class ItemDefinition : ScriptableObject, IStackDefinition
              "the world prefab above.")]
     [SerializeField] private GameObject heldModel;
     [Tooltip("Where the held model sits in the hand's grip (metres): zero for models made for the grip; tune it for " +
-             "others in Safe Haven > Characters > Held Item Grips.")]
+             "others in Safe Haven > Content > Held Item Grips.")]
     [SerializeField] private Vector3 heldPosition;
     [SerializeField] private Vector3 heldRotation;
     [SerializeField, Min(0.01f)] private float heldScale = 1f;

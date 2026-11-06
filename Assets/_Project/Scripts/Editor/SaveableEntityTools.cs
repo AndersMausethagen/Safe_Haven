@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 
 /// <summary>
 /// Editor tools for saveable objects: gives prefabs their prefab id and scene objects a unique save id, and keeps the
-/// content database's list of spawnable prefabs current. Runs from Safe Haven > Save > Assign Missing Save Ids,
+/// content database's list of spawnable prefabs current. Runs from Safe Haven > Scene > Assign Missing Save Ids,
 /// whenever a prefab with a SaveableEntity is imported, and for every scene right before it is saved.
 /// </summary>
 public sealed class SaveableEntityTools : AssetPostprocessor
@@ -27,7 +27,7 @@ public sealed class SaveableEntityTools : AssetPostprocessor
         }
     }
 
-    [MenuItem("Safe Haven/Save/Assign Missing Save Ids")]
+    [MenuItem("Safe Haven/Scene/Assign Missing Save Ids")]
     public static void AssignMissingIds()
     {
         int prefabs = RefreshPrefabs();

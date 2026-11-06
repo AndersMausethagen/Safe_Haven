@@ -46,9 +46,9 @@ public sealed class GatheringNodeDefinition : ScriptableObject
     [SerializeField, Min(0f)] private float respawnSeconds = 180f;
 
     [Header("Break Apart")]
-    [Tooltip("When gathered it cracks into about this many tumbling pieces of its own model, instead of shrinking away. 0: it doesn't. How they fly is in its Feel profile (Harvest Feedback). After changing this or its models: Safe Haven › Resources › Crack Mined Nodes.")]
+    [Tooltip("When gathered it cracks into about this many tumbling pieces of its own model, instead of shrinking away. 0: it doesn't. How they fly is in its Feel profile (Harvest Feedback). After changing this or its models: Safe Haven › Setup › Resources › Crack Mined Nodes.")]
     [SerializeField, Range(0, 16)] private int burstPieces;
-    [Tooltip("Its models, cracked ahead of time. Made by Safe Haven › Resources › Crack Mined Nodes.")]
+    [Tooltip("Its models, cracked ahead of time. Made by Safe Haven › Setup › Resources › Crack Mined Nodes.")]
     [SerializeField] private NodeFracture fracture;
     [Tooltip("What the burst gives on top of the yield: a few more of what it holds, and the small rocks that break off.")]
     [SerializeField] private ItemDropTable burstYields = new ItemDropTable();

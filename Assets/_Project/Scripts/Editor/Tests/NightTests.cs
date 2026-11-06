@@ -15,8 +15,9 @@ public sealed class NightTests
         Assert.AreEqual(1f, settings.HealthAt(0f), 0.001f);
         Assert.AreEqual(1f, settings.PowerAt(0f), 0.001f);
         Assert.AreEqual(1f, settings.EssenceAt(0f), 0.001f);
-        Assert.Greater(settings.HealthAt(1f), 1f);
-        Assert.Greater(settings.PowerAt(1f), 1f);
+        Assert.Greater(settings.HealthAt(1f), 1f, "night creatures take longer to bring down");
+        Assert.LessOrEqual(settings.HealthAt(1f), 1.15f, "only a little: the hour is rolled by chance");
+        Assert.AreEqual(1f, settings.PowerAt(1f), 0.001f, "they hit no harder: night stacked with the last stage was the unfair spike (balance pass 2026-11-06)");
         Assert.GreaterOrEqual(settings.EssenceAt(1f), 2f, "night is worth the danger");
         Assert.Greater(settings.EssenceAt(0.5f), 1f, "dusk counts for a little");
         Assert.Less(settings.EssenceAt(0.5f), settings.EssenceAt(1f));

@@ -22,11 +22,11 @@ MonoBehaviour:
   constructionCost: []
   constructionItems:
   - item: {fileID: 11400000, guid: a370187223419a048b6cebe8f7e345a3, type: 2}
-    amount: 10
+    amount: 20
   - item: {fileID: 11400000, guid: 59d371b7b63e8e24bb946051d808bc9b, type: 2}
-    amount: 6
+    amount: 12
   - item: {fileID: 11400000, guid: 8cf878eb4a61eb943917a1f9421bb40a, type: 2}
-    amount: 2
+    amount: 4
   showInBuildMenu: 1
   knownFromStart: 1
   sortOrder: 12
@@ -47,11 +47,11 @@ MonoBehaviour:
     description: 'Shelves for what you''ve learned to keep: Boar Pie and Trout in Cream, meals that scale with you.'
     cost:
     - item: {fileID: 11400000, guid: a370187223419a048b6cebe8f7e345a3, type: 2}
-      amount: 8
+      amount: 16
     - item: {fileID: 11400000, guid: 59d371b7b63e8e24bb946051d808bc9b, type: 2}
-      amount: 4
+      amount: 8
     - item: {fileID: 11400000, guid: 8cf878eb4a61eb943917a1f9421bb40a, type: 2}
-      amount: 2
+      amount: 4
     essence: []
     work: 8
     renown: 4
@@ -61,6 +61,7 @@ MonoBehaviour:
     extraStorage: 0
     raidSeconds: 0
     extraRumours: 0
+    foretoldEvents: 0
     comfort: 0
     extraLogs: 0
     teachesRecipes: []
@@ -76,11 +77,11 @@ MonoBehaviour:
     description: 'Everyone eats together: the Haven Feast and Moon Broth, and you can carry one more meal into the woods.'
     cost:
     - item: {fileID: 11400000, guid: 8865a285b55516842a98bac1e1e53ef6, type: 2}
-      amount: 6
+      amount: 12
     - item: {fileID: 11400000, guid: f243c15300698e044a98d785099354c6, type: 2}
-      amount: 4
+      amount: 8
     - item: {fileID: 11400000, guid: 32fed522ebae2fc4d85b1847b30aa530, type: 2}
-      amount: 2
+      amount: 4
     essence: []
     work: 10
     renown: 6
@@ -90,6 +91,7 @@ MonoBehaviour:
     extraStorage: 0
     raidSeconds: 0
     extraRumours: 0
+    foretoldEvents: 0
     comfort: 0
     extraLogs: 0
     teachesRecipes: []

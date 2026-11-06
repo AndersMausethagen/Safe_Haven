@@ -8,7 +8,7 @@ using UnityEngine;
 /// The World Builder's default assets, made from the CC0 models and textures in Models/PolyHaven and Art/Terrain/World
 /// (see their LICENSE.md): rock and forest-floor prefabs, the Rock Faces cliff kit, palettes for the dark raid forests
 /// and the light, green Haven, ground layers, paint rules, the spline-river water and the world terrain materials.
-/// Existing assets are kept (so a designer's changes survive); Safe Haven › World › Set Up World Assets makes what is
+/// Existing assets are kept (so a designer's changes survive); Safe Haven › Setup › World › Set Up World Assets makes what is
 /// missing.
 /// </summary>
 public static class WorldAssets
@@ -38,7 +38,7 @@ public static class WorldAssets
         { "fern_02", "Fern" },
     };
 
-    [MenuItem("Safe Haven/World/Set Up World Assets")]
+    [MenuItem("Safe Haven/Setup/World/Set Up World Assets", false, 200)]
     private static void SetUpMenu() => Debug.Log("World Builder: " + EnsureAll());
 
     /// <summary>Makes every missing default asset; returns a summary.</summary>

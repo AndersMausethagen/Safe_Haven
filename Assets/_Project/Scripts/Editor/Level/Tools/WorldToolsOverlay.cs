@@ -13,7 +13,7 @@ public sealed class WorldToolsOverlay : Overlay
 
     public override VisualElement CreatePanelContent()
     {
-        var root = new VisualElement { style = { width = 200f } };
+        var root = new VisualElement { style = { width = 220f } };
         root.Add(new IMGUIContainer(OnGUI));
         return root;
     }
@@ -27,9 +27,9 @@ public sealed class WorldToolsOverlay : Overlay
                 WorldToolsWindow.Open(WorldToolsWindow.Tab.Place);
             }
 
-            if (GUILayout.Button(new GUIContent("Tools…", "All the world tools: terrain, water, plants, sky, scene")))
+            if (GUILayout.Button(new GUIContent("Tools…", "All the world tools: build (rivers, paths, cliffs, forests, biomes), ground, water, plants, sky, scene")))
             {
-                WorldToolsWindow.Open(WorldToolsWindow.Tab.Terrain);
+                WorldToolsWindow.Open(WorldToolsWindow.Tab.Build);
             }
         }
 
@@ -69,16 +69,19 @@ public sealed class WorldToolsOverlay : Overlay
             {
                 WorldToolsWindow.SelectTerrain();
             }
+        }
 
+        using (new EditorGUILayout.HorizontalScope())
+        {
             if (GUILayout.Button(new GUIContent("Build World", "Rebuild the rivers, paths, cliffs and forests that changed")))
             {
                 WorldBuilder.BuildChanged(false);
             }
-        }
 
-        if (GUILayout.Button(new GUIContent("Check Scene", "Make it playable as a home or a raid, and see what is missing")))
-        {
-            WorldToolsWindow.Open(WorldToolsWindow.Tab.Scene);
+            if (GUILayout.Button(new GUIContent("Check Scene", "Make it playable as a home or a raid, and see what is missing")))
+            {
+                WorldToolsWindow.Open(WorldToolsWindow.Tab.Scene);
+            }
         }
     }
 }

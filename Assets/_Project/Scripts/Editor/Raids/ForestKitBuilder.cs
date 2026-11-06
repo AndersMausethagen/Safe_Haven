@@ -14,7 +14,7 @@ public static class ForestKitBuilder
     public const string Root = "Assets/_Project/Art/Forest";
     private const string BoulderSource = "Assets/_Project/Art/Moss/Ground/Mossy Granite.mat";
 
-    [MenuItem("Safe Haven/Raids/Build Forest Kit")]
+    [MenuItem("Safe Haven/Setup/Raids/Build Forest Kit", false, 200)]
     private static void BuildFromMenu() => Debug.Log(Build());
 
     public static string Build()

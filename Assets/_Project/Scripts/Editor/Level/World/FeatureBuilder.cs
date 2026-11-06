@@ -36,6 +36,12 @@ public abstract class FeatureBuilder
         get { yield break; }
     }
 
+    /// <summary>Plant prefabs this feature grows as terrain details (the builder adds missing ones to the terrain first).</summary>
+    public virtual IEnumerable<GameObject> DetailPrefabs
+    {
+        get { yield break; }
+    }
+
     public virtual void Prepare(WorldSampler ground)
     {
         Line = SplineLine.Sample(Feature.Container, SampleStep);

@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// Adds the Focus bar to the vitals HUD (Safe Haven › UI › Add Focus Bar to Vitals HUD): a thin warm-gold copy of the
+/// Adds the Focus bar to the vitals HUD (Safe Haven › Setup › UI › Add Focus Bar to Vitals HUD): a thin warm-gold copy of the
 /// stamina bar with its label, under stamina, the panel grown to make room. Running it again does nothing once the bar
 /// is there.
 /// </summary>
@@ -16,7 +16,7 @@ public static class VitalsFocusBar
     private const float BarHeight = 9f;
     private static readonly Color FocusColor = new Color(0.93f, 0.74f, 0.33f, 1f);
 
-    [MenuItem("Safe Haven/UI/Add Focus Bar to Vitals HUD")]
+    [MenuItem("Safe Haven/Setup/UI/Add Focus Bar to Vitals HUD", false, 200)]
     public static void AddMenu() => Debug.Log(Add());
 
     public static string Add()

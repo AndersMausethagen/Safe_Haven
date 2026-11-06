@@ -31,7 +31,7 @@ public static partial class CombatAnimationSetup
     private static readonly Color HeavySlash = new Color(1f, 0.55f, 0.25f, 0.95f);
     private static readonly Color CounterSlash = new Color(0.55f, 0.85f, 1f, 0.95f);
 
-    [MenuItem("Safe Haven/Characters/Set Up Combat Animations")]
+    [MenuItem("Safe Haven/Setup/Characters/Set Up Combat Animations", false, 200)]
     public static void SetUpAll()
     {
         ConfigureImport();

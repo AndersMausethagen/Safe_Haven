@@ -189,12 +189,34 @@ public sealed class MinimapHud : MonoBehaviour
         StartCoroutine(Paint());
     }
 
+    /// <summary>
+    /// Measures the ground again and paints it anew, for a map laid out after this was made: a generated raid's, which a large raid also
+    /// widens. Measured too early, the map would show the old ground and read the fog of war at the wrong places (all black).
+    /// </summary>
+    public void Refit()
+    {
+        if (material == null || !MinimapMap.TryGetArea(out Rect found))
+        {
+            return;
+        }
+
+        area = found;
+        material.SetVector(AreaId, new Vector4(area.width, area.height, 0f, 0f));
+        StopAllCoroutines();
+        StartCoroutine(Paint());
+    }
+
     // A moment after the scene wakes: a raid lays itself out, and its NavMesh, during its first frames.
     private IEnumerator Paint()
     {
         yield return new WaitForSeconds(0.2f);
         yield return MinimapMap.Paint(area, settings, finished =>
         {
+            if (map != null && map != finished)
+            {
+                Destroy(map);
+            }
+
             map = finished;
             ground.texture = map;
             painted = true;

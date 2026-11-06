@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// A gathering node's models, cracked into pieces ahead of time (Safe Haven › Resources › Crack Mined Nodes): for each mesh, the
+/// A gathering node's models, cracked into pieces ahead of time (Safe Haven › Setup › Resources › Crack Mined Nodes): for each mesh, the
 /// pieces it comes apart into. Each piece keeps the model's own surface in the model's own space, so laid together they are the
 /// model exactly, plus a second submesh for the rough faces where it broke. Authored data, made by the builder.
 /// </summary>

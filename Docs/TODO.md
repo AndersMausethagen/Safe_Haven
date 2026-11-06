@@ -64,11 +64,50 @@ Built:
 Next:
 - [ ] Draw a real ravine in the Haven or a raid map and tune its defaults (5 m floor, 2.5 m wall run, 12 m deep) by eye; add a River on its line for a stream.
 - [x] Biome Brush: on/off toggles per plant and prop palette (for the session), the plants and their share at the current strength shown under the brush, and the grass colour follows brush strokes live.
-- [ ] Biome areas: a spline-outlined area painted with a biome preset by the World Builder (non-destructive, like Ground Paint Areas), for big regions.
+- [x] Biome areas: a Biome Area with a Biome (a BiomePreset) paints its ground, grows its plants as terrain grass and scatters its props over the loop, faded in from the edge, non-destructively: moving or deleting it gives the ground and grass back, paths and rivers still clear through it, editing the preset rebuilds the areas using it. World Tools › Build › Biomes › Draw Area, or GameObject › Safe Haven › World › Biome Area. New Dark Forest areas are painted with Misty Woods Floor.
 - [x] Drop with Physics on a selected folder drops everything in it; Drop with Physics (Upright), Ctrl+Shift+End, keeps their tilt.
 - [x] World Builder fingerprints count only settings that differ from the feature type's defaults, so a new setting no longer rebuilds every feature. (Switching to it rebuilt everything once: Haven and prologue rebuilt and saved on 2026-11-05.)
 - [x] The automatic build is scheduled only by world features being added, removed, moved or edited (and spline and terrain edits), not by any hierarchy change.
-- [x] Builds go scene by scene. The Haven and the prologue overlap in world space, and with both open the builder let Haven features (grove floors, paths, river) cut and paint into the prologue's terrains. Repaired by rebuilding the prologue with its own features: its ground matches the 13:27 commit in 99.9 % of cells. Check by eye: about 0.1 % still differs, up to 14 m, all along the prologue's Forest Floor at the Edge (the seam between its meadow and forest terrains). Backups of both scenes and all terrain files from before the repair: session scratchpad Backup_2106.
+- [x] Builds go scene by scene. The Haven and the prologue overlap in world space, and with both open the builder let Haven features (grove floors, paths, river) cut and paint into the prologue's terrains. Repaired by rebuilding the prologue with its own features: its ground matches the 13:27 commit in 99.9 % of cells. That 0.1 % was the road pit below. Backups of both scenes and all terrain files from before the repair: session scratchpad Backup_2106.
+
+## World Builder round 2 (2026-11-05)
+
+Fixed:
+- [x] Prologue: a pit 10–14 m deep where the Old Road crosses from the meadow terrain into the forest. A height layer refused points on its last row and column, so a feature ending on a terrain's edge read the built terrain instead, which held its own last build: every rebuild dug deeper. The edge counts as inside now; the prologue was rebuilt and a second rebuild leaves it unchanged.
+- [x] Prologue: 323 generated trees and stones stood under the ground. With the Haven open too, the builder found the Haven's terrain under them first (the scenes overlap). Ground lookups now stay in the scene being built (and prefer the active scene otherwise); drawing a feature only clicks on its own scene's terrain. Rebuilt; the Haven's generated objects checked and fine.
+- [x] Builds no longer bake the grass colour map every time (5.4 s of a 9.5 s prologue build): the grass follows the paint through the quick preview and the full bake waits for the scene to be saved.
+
+World Tools:
+- [x] Tabs Place · Build · Ground · Water & Plants · Sky · Scene. Build and Ground have a look tab each (Haven · Forest Lake, Dark Forest · Mossy Forest), so every feature has one button instead of a Haven and a forest copy.
+- [x] Build: Draw River, Path, Cliff, Ravine, Grove/Forest, Ground Paint ▾ (the look's paint rules); the look's biomes with Draw Area, Brush and Edit, New Biome; Build Now, Rebuild Everything, Build as I edit (per terrain), hand-painted cells with Give Back; the last build's report; every feature in the scene with its colour, an on/off toggle and Select.
+- [x] Ground: sculpt, Use the look, Auto-Paint, Rock on Steep Ground, Add Moss, the look's grounds to paint with, relief, NavMesh. (The old Path Painter stays in the menu only.)
+- [x] Drawing a feature: a dotted line from the last point to the mouse (and back to the first for areas), click the first point to close an area, and selecting something else finishes the drawing instead of leaving the loop open.
+- [x] Grass touched by hand where a feature grows or clears it stays as it is through builds (as ground paint does); Give Hand Paint Back releases it too.
+- [x] Drawing works from the Scene view itself (clicks used to select the terrain), nothing builds until the drawing is finished (Enter, or clicking an area's first point), and a cliff or ravine shows its face, height, plateau or floor and depth as a see-through preview while drawn and while selected, following the Inspector settings live.
+- [x] Cliffs and ravines no longer stand crag pieces by default (the lake crags' slabs lay stacked and hanging off the face): the face is the shaped terrain in Cliff Rock with rubble at the foot. A Kit can still be set per feature.
+- [x] Rock on steep ground and cliffs no longer repeats every 7 m: each of the three projections is sampled twice (as is and turned 63°, resized) and slow noise picks between them, for colour, normals and the tessellated relief alike (Hide Rock Repetition on the terrain material, on by default).
+
+Next:
+- [ ] A floor biome for the Haven's groves (old-growth litter, ferns, moss) so Grove areas paint their floor as Dark Forest areas do.
+- [ ] Biome areas regrow their props when a path moves through them, but their ground paint only fades by edge distance: a Keep Off Paths distance for the ground and plants would leave a cleaner verge.
+
+## Tools overview and UX pass (2026-11-05)
+
+Done (overview of every tool: Docs/EditorTools.md):
+- [x] Safe Haven menu: the hubs first (World Tools, Content Editor, Systems Editor, Sound Editor, Quest Map, Story Graph, Playtest Runs); the five "X Creator" menus became Content › Items / Monsters / Buildings / Resources / Prefab Browser (with Held Item Grips, Raid Layout Preview, Import Planner Data); Scene › gained Assign Missing Save Ids and Play Haven / Prologue (isolated saves); 37 run-once build and setup steps moved under Setup › (Art Pipeline, Characters, Combat, UI, Audio, Raids, Resources, World, Rendering). Docs and tooltips follow.
+- [x] GameObject › Safe Haven › World: one River, Path, Cliff, Ravine, Forest Area and Biome Area in the look of the terrain in view (was a Haven and a forest copy of each); Ground Paint is a submenu.
+- [x] The old Path Painter is gone (World Builder paths do it and stay editable).
+- [x] World Tools: Water & Plants shows the selected-object tools only with a selection, one Add Plants ▾ for every look, no Rebake (automatic now); Sky leads with the Sky Controller and fog presets, and folds the once-per-scene setup and its health checks into Scene setup (its title counts problems); Ground links Terrain Surface and Mesh Surface; Scene adds Tidy Hierarchy and Play with a test save. The Scene view panel's buttons no longer cut their labels.
+- [x] Every custom editor window opens and draws without errors (smoke test of all 22).
+
+Found, not tools (Content Editor › Needs Attention):
+- [ ] 17 raid events give the player no warning that they happened.
+- [ ] 3 monsters' Animator controllers differ from their data (Update From Data on each).
+- [ ] Elder Tree (building) has no combat stats; Awakening the Portal has a Quest Giver that neither starts nor takes it.
+
+Next:
+- [ ] Two prefab browsers: World Tools › Place (to place) and Content Editor › All Prefabs (to edit). One catalogue with both actions would be simpler.
+- [ ] Sky Controller, Terrain Surface and Mesh Surface are still windows of their own; they could become World Tools panels.
 
 ## Suggested improvements (2026-11-05)
 
@@ -275,10 +314,13 @@ Raid events, gear, food, buildings and creatures are in, built by `AgentScripts/
 `BuildCreatures.cs` and `BuildRaidEvents.cs` (run them in that order). Open:
 
 - [ ] Balance everything by playing: numbers are first guesses against the existing gear and monsters.
+- [x] Balance pass 2026-11-06 (`AgentScripts/BuildBalancePass.cs`, run last): every building and level costs twice its original amount (trophies excepted; 888 oak for everything once, was 444), A Light in the Wood gathers the doubled Workshop; charcoal at the Woodcutter's Lodge (3 oak for 2, 10 sticks for 1) fuels every ingot (2 / 3 / 4), Tor keeps 40; night creatures 1.1x health, no extra damage (were 1.3x / 1.25x). Calculated, not yet played. See BaseProgression and GearScoreAndRaidTiers.
+- [ ] Charcoal: a real icon and a dropped-item look of its own (it borrows grey stone's model); play the first smelt to see whether players find the Lodge recipe.
+- [ ] Wood sinks still open from the 2026-11-06 suggestions: hearth firewood for comfort (a worker refills it, empty only loses the bonus), Trading Post timber orders.
 - [ ] Play the raid length: `MistyWoods.asset` is at 1000 s (16:40) while its stages and exits are written for 720.
       Event windows are in seconds, so they fit either way, but fewer events fit in 300 s.
 - [ ] Real models and icons: new creatures, buildings and event sites are placeholder shapes.
-- [ ] Fit shields and new weapons in the hand (Safe Haven › Characters › Held Item Grips): grips are copied from similar items.
+- [ ] Fit shields and new weapons in the hand (Safe Haven › Content › Held Item Grips): grips are copied from similar items.
 - [ ] Status icons: conditions show as words above the vitals (GDD §10.6 asks for icons).
 - [x] Watch Post upgrades name a raid's coming events in the briefing, in place of a separate Scout Post (`RaidForecast`). Decide if the GDD's Scout Post should still be its own building.
 - [x] Defender roles for ward breaches: Warden and Hunter stand guard (`ResidentDefender`). Check it doesn't take the fight from the player: two guards killed a first wave unaided.

@@ -5,7 +5,7 @@ using UnityEngine;
 
 /// <summary>
 /// Turns the sound library in Audio/SFX (CC0; see Audio/SFX/CREDITS.md), free packs and the sounds made for the game by
-/// Tools/Audio, into the game's sounds (Safe Haven › Audio › Set Up Free Sound Library): one SoundDefinition per game moment in Audio/Sounds/Library, assigned to the game-wide
+/// Tools/Audio, into the game's sounds (Safe Haven › Setup › Audio › Set Up Free Sound Library): one SoundDefinition per game moment in Audio/Sounds/Library, assigned to the game-wide
 /// slots in Audio Settings (combat, footsteps, world, interface, weather and water) and to the gathering feedback
 /// profiles. Slots that already hold a sound are left alone, so designers' choices survive running it again; the sound
 /// assets it made are updated in place.
@@ -51,7 +51,7 @@ public static class SoundLibrarySetup
     /// <summary>Set to rewrite the footstep surface list with the defaults on the next run (it is kept otherwise).</summary>
     public static bool ResetFootstepSurfaces;
 
-    [MenuItem("Safe Haven/Audio/Set Up Free Sound Library")]
+    [MenuItem("Safe Haven/Setup/Audio/Set Up Free Sound Library", false, 200)]
     public static void SetUp()
     {
         if (!AssetDatabase.IsValidFolder(SoundFolder))
@@ -122,7 +122,7 @@ public static class SoundLibrarySetup
 
     /// <summary>Swing and hit sounds of their own for fists and axes (the game-wide swing has a blade's ring), set on
     /// those weapons where they have none. Set Up Free Sound Library runs it too.</summary>
-    [MenuItem("Safe Haven/Audio/Set Up Weapon Sounds")]
+    [MenuItem("Safe Haven/Setup/Audio/Set Up Weapon Sounds", false, 200)]
     public static void SetUpWeaponSounds()
     {
         const string combat = "Combat";

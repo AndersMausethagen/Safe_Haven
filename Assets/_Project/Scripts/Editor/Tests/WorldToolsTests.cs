@@ -107,7 +107,7 @@ public sealed class WorldToolsTests
     public void NewScenes_ComeFromTheSafeHavenTemplateNotFromEveryNewScene()
     {
         var template = AssetDatabase.LoadAssetAtPath<UnityEditor.SceneTemplate.SceneTemplateAsset>(SafeHavenSceneTemplate.TemplatePath);
-        Assert.IsNotNull(template, "Safe Haven › World › Create Scene Template makes it.");
+        Assert.IsNotNull(template, "Safe Haven › Setup › World › Create Scene Template makes it.");
         Assert.IsNotNull(template.templateScene);
         Assert.AreEqual(typeof(SafeHavenScenePipeline), template.templatePipeline.GetClass());
         Assert.IsTrue(template.addToDefaults, "Pinned in File › New Scene.");

@@ -57,7 +57,7 @@ public sealed class PlayerArcheryAnimation : MonoBehaviour
 
         if (layer < 0)
         {
-            Debug.LogWarning($"{name}: the animator has no \"{LayerName}\" layer; run Safe Haven > Characters > Set Up Combat Animations.", this);
+            Debug.LogWarning($"{name}: the animator has no \"{LayerName}\" layer; run Safe Haven > Setup > Characters > Set Up Combat Animations.", this);
         }
     }
 

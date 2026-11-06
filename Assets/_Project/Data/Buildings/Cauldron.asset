@@ -21,10 +21,10 @@ MonoBehaviour:
   prefab: {fileID: 1369298727066786845, guid: 28c5c55b382581244ac4ef1524423f73, type: 3}
   constructionCost:
   - resource: {fileID: 11400000, guid: 6d764d1847a8e4b4dade94e4406968b5, type: 2}
-    amount: 4
+    amount: 8
   constructionItems:
   - item: {fileID: 11400000, guid: a370187223419a048b6cebe8f7e345a3, type: 2}
-    amount: 4
+    amount: 8
   showInBuildMenu: 1
   knownFromStart: 1
   sortOrder: 5
@@ -45,9 +45,9 @@ MonoBehaviour:
     description: 'A hook to hang herbs to dry: Greater Healing Draughts and Swiftfoot Tonic.'
     cost:
     - item: {fileID: 11400000, guid: 8ae2883815327b74fa7975309c803f92, type: 2}
-      amount: 6
+      amount: 12
     - item: {fileID: 11400000, guid: b5567f7d75200bd46befbd1dab298f36, type: 2}
-      amount: 6
+      amount: 12
     essence: []
     work: 8
     renown: 4
@@ -57,6 +57,7 @@ MonoBehaviour:
     extraStorage: 0
     raidSeconds: 0
     extraRumours: 0
+    foretoldEvents: 0
     comfort: 0
     extraLogs: 0
     teachesRecipes: []
@@ -70,12 +71,12 @@ MonoBehaviour:
     description: 'What the deep woods ask for: Radiant Draught, Ironbark and Frostward.'
     cost:
     - item: {fileID: 11400000, guid: 8865a285b55516842a98bac1e1e53ef6, type: 2}
-      amount: 6
+      amount: 12
     - item: {fileID: 11400000, guid: f243c15300698e044a98d785099354c6, type: 2}
-      amount: 2
+      amount: 4
     essence:
     - resource: {fileID: 11400000, guid: e991fd5ccf0ce314cafafff8badfe173, type: 2}
-      amount: 8
+      amount: 16
     work: 9
     renown: 6
     craftSpeed: 0.3
@@ -84,6 +85,7 @@ MonoBehaviour:
     extraStorage: 0
     raidSeconds: 0
     extraRumours: 0
+    foretoldEvents: 0
     comfort: 0
     extraLogs: 0
     teachesRecipes: []

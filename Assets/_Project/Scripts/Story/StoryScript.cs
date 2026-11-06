@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// A story told in the scene, drawn as a graph of nodes (Safe Haven › Quests › Story Graph): triggers that start it (a
+/// A story told in the scene, drawn as a graph of nodes (Safe Haven › Story Graph): triggers that start it (a
 /// Quest Event, using an object, the player walking near, a zone cleared, the scene starting) and steps that follow,
 /// one after another along the links (a line, a wait, the rain coming, the camera turning to the troll, enemies pouring
 /// out, a reward). A node with several links out runs them side by side; a Choice leaves through the answer picked.

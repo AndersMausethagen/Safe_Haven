@@ -22,11 +22,11 @@ MonoBehaviour:
   constructionCost: []
   constructionItems:
   - item: {fileID: 11400000, guid: a370187223419a048b6cebe8f7e345a3, type: 2}
-    amount: 10
+    amount: 20
   - item: {fileID: 11400000, guid: 4df650debd4ce21459e04a0c92ffa207, type: 2}
-    amount: 6
+    amount: 12
   - item: {fileID: 11400000, guid: 8ae2883815327b74fa7975309c803f92, type: 2}
-    amount: 4
+    amount: 8
   showInBuildMenu: 1
   knownFromStart: 1
   sortOrder: 7
@@ -47,11 +47,11 @@ MonoBehaviour:
     description: 'A proper table and good shears: the leather set, and the Hide Rucksack.'
     cost:
     - item: {fileID: 11400000, guid: a370187223419a048b6cebe8f7e345a3, type: 2}
-      amount: 6
+      amount: 12
     - item: {fileID: 11400000, guid: 4df650debd4ce21459e04a0c92ffa207, type: 2}
-      amount: 4
+      amount: 8
     - item: {fileID: 11400000, guid: 616026fe07c265041bdcd10e32bcd168, type: 2}
-      amount: 2
+      amount: 4
     essence: []
     work: 8
     renown: 4
@@ -61,6 +61,7 @@ MonoBehaviour:
     extraStorage: 0
     raidSeconds: 0
     extraRumours: 0
+    foretoldEvents: 0
     comfort: 0
     extraLogs: 0
     teachesRecipes: []
@@ -74,11 +75,11 @@ MonoBehaviour:
     description: 'Patterns for what goes on a long road: the Traveller''s Pack.'
     cost:
     - item: {fileID: 11400000, guid: 8865a285b55516842a98bac1e1e53ef6, type: 2}
-      amount: 6
+      amount: 12
     - item: {fileID: 11400000, guid: 616026fe07c265041bdcd10e32bcd168, type: 2}
-      amount: 4
+      amount: 8
     - item: {fileID: 11400000, guid: 8f121a970bae6f54dbcc8ff5e2c2a48e, type: 2}
-      amount: 2
+      amount: 4
     essence: []
     work: 9
     renown: 6
@@ -88,6 +89,7 @@ MonoBehaviour:
     extraStorage: 0
     raidSeconds: 0
     extraRumours: 0
+    foretoldEvents: 0
     comfort: 0
     extraLogs: 0
     teachesRecipes: []
@@ -101,11 +103,11 @@ MonoBehaviour:
     description: 'Frames fine enough for huldra silk: the Wayfarer''s Frame.'
     cost:
     - item: {fileID: 11400000, guid: 1b426c80d20dbcd4ea2e82901b9dbfb9, type: 2}
-      amount: 4
+      amount: 8
     - item: {fileID: 11400000, guid: 32fed522ebae2fc4d85b1847b30aa530, type: 2}
-      amount: 2
+      amount: 4
     - item: {fileID: 11400000, guid: 616026fe07c265041bdcd10e32bcd168, type: 2}
-      amount: 6
+      amount: 12
     essence: []
     work: 11
     renown: 8
@@ -115,6 +117,7 @@ MonoBehaviour:
     extraStorage: 0
     raidSeconds: 0
     extraRumours: 0
+    foretoldEvents: 0
     comfort: 0
     extraLogs: 0
     teachesRecipes: []

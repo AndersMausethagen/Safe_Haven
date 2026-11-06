@@ -1,5 +1,7 @@
 # Level design tools
 
+All the editor tools at a glance, by what you want to do: [Editor tools](EditorTools.md).
+
 Tools for building the home world, raids and any hand-made scene in the Scene view. They are all in one window,
 **World Tools** (Safe Haven › World Tools, or the Scene view's **Safe Haven World** panel), and in the menus
 **Safe Haven › World** (place, terrain, water, grass and plants, sky and weather) and **Safe Haven › Scene** (make
@@ -100,15 +102,19 @@ alongside it.
 
 ### Making a feature
 
-**GameObject › Safe Haven › World** (or right-click in the Hierarchy):
+**World Tools › Build** (pick the look in its tabs: Haven · Forest Lake or Dark Forest · Mossy Forest), or
+**GameObject › Safe Haven › World** (or right-click in the Hierarchy), which uses the look of the terrain in view. Click
+points on the ground; nothing is built until you press Enter (a cliff or ravine shows a see-through preview of its face,
+height and depth meanwhile, following the Inspector):
 
 | Menu | Makes |
 |---|---|
-| **River** / **River (Haven)** | A river with a rocky bed and earthy banks, stones in the water and ferns on the banks: the Mossy Forest's (cedar rock and soil, mossy stones) or the Forest Lake's (lake rock and banks, lake stones and ferns) |
-| **Path (Forest)** / **Path (Haven)** | A trodden path (bare cedar soil in the forest, the Haven's path ground) |
-| **Cliff** / **Cliff (Haven)** | A cliff or crag of tessellated rock with rubble at its foot: the Mossy Forest's cliff boulders, slabs and outcrops, or the Forest Lake's lake crags |
-| **Dark Forest Area** | The Mossy Forest: dense, clumped cedars, young cedars, mossy logs and stumps, ferns and shrubs, mossy boulders (the raids' forest) |
-| **Haven Grove Area** | The Forest Lake: open groves of sugar maples and a few cedars, saplings, logs and stumps, lake boulders, ferns by the water (the light, green Haven) |
+| **River** | A river with a rocky bed and earthy banks, stones in the water and ferns on the banks: the Mossy Forest's (cedar rock and soil, mossy stones) or the Forest Lake's (lake rock and banks, lake stones and ferns) |
+| **Path** | A trodden path (bare cedar soil in the forest, the Haven's path ground) |
+| **Cliff** | A cliff or crag: the shaped terrain in tessellated Cliff Rock with rubble at its foot (set a Kit, e.g. the look's Crags, to stand rock pieces along it) |
+| **Ravine** | A cut with steep walls on both sides, optional ledges, moss on the shaded wall and rubble on the floor |
+| **Forest Area** | The Mossy Forest: dense, clumped cedars, young cedars, mossy logs and stumps, ferns and shrubs, mossy boulders, on the Misty Woods floor biome (the raids' forest). The Forest Lake: open groves of sugar maples and a few cedars, saplings, logs and stumps, lake boulders, ferns by the water (the light, green Haven) |
+| **Biome Area** | A loop painted with a Biome preset: its ground, plants (terrain grass) and props, faded in from the edge |
 
 The new feature goes under a **World** object in the scene and starts in **Draw** mode: click points on the ground,
 **Backspace** removes the last, **Enter** or **Esc** finishes. Areas close their loop when you finish.
@@ -174,7 +180,7 @@ same forest; it regrows when a river, path or cliff changes under it. Saveable o
 
 ### Ground Paint (a look for an area)
 
-**GameObject › Safe Haven › World › Ground Paint (Haven Meadow / Haven Old-Growth / Raid Dark Forest)**: draw a closed
+**GameObject › Safe Haven › World › Ground Paint › Haven Meadow / Haven Old-Growth / Raid Dark Forest** (or World Tools › Build › Ground Paint ▾): draw a closed
 loop and the ground inside it is painted with that look's **Paint Rules** (the same rules the terrain's auto-paint
 uses: steepness, height, hollows, patches), fading in over **Edge Fade** metres with a frayed edge, at **Strength**.
 It builds before paths and rivers (order 5), so they paint over it, and a forest area grows on top of it. Point
@@ -489,7 +495,7 @@ A demo: **Scenes/Demo/WorldBuilderDemo** (a river falling over a cliff, a ford, 
   a random scale range, how much each tilts with the slope (0 upright, 1 fully), how deep it sinks into the ground and
   whether it turns randomly. Its **spacing** is the smallest distance between two painted objects, so painting over
   the same spot again only fills the gaps.
-- Defaults in `Data/Level/Palettes` (made by Safe Haven › World › Place › Create Default Scatter Palettes, kept if they exist):
+- Defaults in `Data/Level/Palettes` (made by Safe Haven › Setup › World › Create Default Scatter Palettes, kept if they exist):
   **Forest Trees** (spruces, pine, the odd dead spruce, wind oak), **Rocks and Logs**, **Wood and Stone Nodes**
   (oak, grey stone, hardwood, granite) and **Forage** (berries, healing herb, flax, nettle).
 - Objects go under **Level Scatter › &lt;palette name&gt;** in the scene, so one palette's objects can be hidden,
@@ -497,19 +503,6 @@ A demo: **Scenes/Demo/WorldBuilderDemo** (a river falling over a cliff, a ford, 
 - Objects are set down by the bottom of their meshes, not their pivot.
 - **One prefab:** Content Editor › Prefabs › a prefab › **Paint with Scatter Brush** opens the brush with just that
   prefab (spacing from its size; the palette is not saved).
-
-## Path Painter
-
-For paths you may want to move later, use a World Builder **Path** instead: this one paints once.
-
-**Safe Haven › World › Terrain › Path Painter.** Press **Draw**, click points along the path in the Scene view (drag a point to
-move it, Backspace removes the last, Esc stops drawing), then **Paint Path**.
-
-- The path follows a smooth curve through the points. **Width** is the fully painted middle; **Soft edge** is how far
-  it fades out, frayed with noise so it does not look ruled.
-- **Ground layer** is any of the terrain's layers (a trodden path, gravel, a mossy strip).
-- **Clear grass and plants** removes terrain details along the middle; **Smooth the ground** evens out bumps under it.
-- The grass ground colour is rebaked afterwards, so grass beside the path takes its colour.
 
 ## Drop to Ground
 
@@ -557,7 +550,7 @@ camera only ever sees a small patch of the world.
   - Measure GPU time with the Profiler's GPU module (`RawFrameDataView.frameGpuTimeMs`) at 1080p. A small Game view
     hides most of the cost.
 - **What does cost the frame is triangles.** Check a new model with Level Check's census and the visible-triangle
-  count, then lighten it with **Safe Haven › Art Pipeline › Simplify Model Meshes** (`ModelSimplifier`). Make sure a
+  count, then lighten it with **Safe Haven › Setup › Art Pipeline › Simplify Model Meshes** (`ModelSimplifier`). Make sure a
   model's LOD levels really differ: `boulder_01.fbx` shipped three identical ones.
 
 ## Level Check

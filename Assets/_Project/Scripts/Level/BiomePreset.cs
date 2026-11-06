@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// What belongs together in one kind of place, painted at once by the Biome Brush (Safe Haven › World › Paint › Biome
-/// Brush): a ground layer, terrain details (grass, ferns, flowers) with their own density, slopes and patchiness, and
-/// prop palettes (stones, logs, debris). E.g. the Haven's meadow, the Misty Woods' floor, a riverbank. Level design
-/// data only: the game reads nothing from it.
+/// What belongs together in one kind of place: a ground layer, terrain details (grass, ferns, flowers) with their own
+/// density, slopes and patchiness, and prop palettes (stones, logs, debris). E.g. the Haven's meadow, the Misty Woods'
+/// floor, a riverbank. Painted by hand with the Biome Brush (Safe Haven › World › Paint › Biome Brush), or over a whole
+/// loop by a World Builder Biome Area that uses it (rebuilt whenever the preset changes). Level design data only: the
+/// game reads nothing from it.
 /// </summary>
 [CreateAssetMenu(fileName = "Biome", menuName = "Safe Haven/Level/Biome Preset")]
 public sealed class BiomePreset : ScriptableObject
@@ -33,11 +34,16 @@ public sealed class BiomePreset : ScriptableObject
         public ScatterPalette palette;
         [Tooltip("How many tries per dab, at full brush strength.")]
         [Range(0, 20)] public int tries = 2;
+        [Tooltip("Tries per 100 m² when a World Builder Biome Area paints with this biome.")]
+        [Min(0f)] public float perHundredSquareMetres = 1f;
         [Tooltip("Slopes they may stand on, in degrees.")]
         public Vector2 slope = new Vector2(0f, 40f);
     }
 
     [TextArea] public string description;
+    [Tooltip("The world look it belongs to, as World Tools groups it: Forest Lake (the Haven), Mossy Forest (the dark " +
+             "forest of the raids), or empty for any.")]
+    public string look = "";
 
     [Header("Ground")]
     [Tooltip("Ground painted under the brush. Empty: the ground is left as it is.")]

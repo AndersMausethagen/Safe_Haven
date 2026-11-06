@@ -21,10 +21,10 @@ MonoBehaviour:
   prefab: {fileID: 6037293471147771744, guid: 2139a483d64f51f4aace40f89b955510, type: 3}
   constructionCost:
   - resource: {fileID: 11400000, guid: a86ac9a152512464ab08e0446c161e61, type: 2}
-    amount: 3
+    amount: 6
   constructionItems:
   - item: {fileID: 11400000, guid: 59d371b7b63e8e24bb946051d808bc9b, type: 2}
-    amount: 8
+    amount: 16
   showInBuildMenu: 1
   knownFromStart: 0
   sortOrder: 9
@@ -43,9 +43,9 @@ MonoBehaviour:
     description: 'Runes cut deep around the basin: a quarter more Purified Essence from the same curse.'
     cost:
     - item: {fileID: 11400000, guid: 59d371b7b63e8e24bb946051d808bc9b, type: 2}
-      amount: 12
+      amount: 24
     - item: {fileID: 11400000, guid: 3b6626518ea9eb040b7d45591fac015b, type: 2}
-      amount: 2
+      amount: 4
     essence: []
     work: 9
     renown: 6
@@ -55,6 +55,7 @@ MonoBehaviour:
     extraStorage: 0
     raidSeconds: 0
     extraRumours: 0
+    foretoldEvents: 0
     comfort: 0
     extraLogs: 0
     teachesRecipes: []
@@ -68,12 +69,12 @@ MonoBehaviour:
     description: It hums softly at night, and hardly anything is wasted.
     cost:
     - item: {fileID: 11400000, guid: 3b6626518ea9eb040b7d45591fac015b, type: 2}
-      amount: 6
+      amount: 12
     - item: {fileID: 11400000, guid: 8865a285b55516842a98bac1e1e53ef6, type: 2}
-      amount: 3
+      amount: 6
     essence:
     - resource: {fileID: 11400000, guid: e991fd5ccf0ce314cafafff8badfe173, type: 2}
-      amount: 8
+      amount: 16
     work: 10
     renown: 8
     craftSpeed: 0.25
@@ -82,6 +83,7 @@ MonoBehaviour:
     extraStorage: 0
     raidSeconds: 0
     extraRumours: 0
+    foretoldEvents: 0
     comfort: 0
     extraLogs: 0
     teachesRecipes: []

@@ -5,7 +5,7 @@ using UnityEngine;
 /// Game-wide audio tuning: default volumes, how music changes, what counts as being in combat and which sound plays when
 /// something dies and nothing more specific is set. Each scene's own music lives on its SceneAudio component; the music
 /// here only plays where a scene sets none. Lives in a Resources folder so the AudioManager finds it by itself; edit it
-/// from Safe Haven > Audio > Sound Editor.
+/// from Safe Haven > Sound Editor.
 /// </summary>
 [CreateAssetMenu(fileName = "AudioSettings", menuName = "Safe Haven/Audio/Audio Settings")]
 public sealed class AudioSettingsDefinition : ScriptableObject

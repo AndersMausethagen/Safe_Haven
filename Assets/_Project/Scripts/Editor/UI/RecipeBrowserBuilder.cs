@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 /// <summary>
 /// Builds the RecipeBrowser the bag and the crafting stations share, in the Hearthline style, and the row prefab it lists
-/// (menu: Safe Haven > UI > Build Recipe Browsers). Safe to run again: the row keeps its GUID, the bag's browser is
+/// (menu: Safe Haven > Setup > UI > Build Recipe Browsers). Safe to run again: the row keeps its GUID, the bag's browser is
 /// replaced in ItemHUD, and the station window is rebuilt by StationWindowBuilder.
 /// </summary>
 public static class RecipeBrowserBuilder
@@ -19,7 +19,7 @@ public static class RecipeBrowserBuilder
     // What the fixed bottom of the selected recipe needs: the Needs heading, four materials, a problem line and the buttons.
     private const float FooterHeight = 214f;
 
-    [MenuItem("Safe Haven/UI/Build Recipe Browsers")]
+    [MenuItem("Safe Haven/Setup/UI/Build Recipe Browsers", false, 200)]
     public static void BuildAll()
     {
         BuildRow();

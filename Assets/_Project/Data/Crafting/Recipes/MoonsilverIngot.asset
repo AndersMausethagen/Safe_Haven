@@ -21,9 +21,10 @@ MonoBehaviour:
   itemCost:
   - item: {fileID: 11400000, guid: fdf61b2bcc4fcfb47b96885b254e02e6, type: 2}
     amount: 3
-  - item: {fileID: 11400000, guid: 183fddc5567e8b8479fcb1618e73496c, type: 2}
-    amount: 1
+  - item: {fileID: 11400000, guid: d4d2a84b7c6083a4dba750243db7aae9, type: 2}
+    amount: 4
   station: 3
   craftSeconds: 12
   knownFromStart: 0
+  minimumStationTier: 0
   sortOrder: 10
