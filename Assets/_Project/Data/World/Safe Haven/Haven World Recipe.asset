@@ -28,12 +28,20 @@ MonoBehaviour:
   lakeAt: {x: 100, y: 300}
   lakeSize: {x: 110, y: 75}
   lakeDepth: 6
+  landing: {fileID: 487751985083343027, guid: 603269ea89b74b04ab8120ba381b1231, type: 3}
   islands: {x: 2, y: 3}
   islandRadius: {x: 10, y: 22}
   mountainAt: {x: 315, y: 80}
   mountainFrom: 260
   mountainHeight: 60
   mountainCliffs: {x: 4, y: 6}
+  mountainRocks:
+  - {fileID: 2518022239375361439, guid: 836e25c3b8a921447b4a532902f9f11e, type: 3}
+  - {fileID: 4213716333530687708, guid: faf3c09d50b58154dbe3d230bf50d2b8, type: 3}
+  - {fileID: 5854959144239035422, guid: b3d14be63ee4bc4428239edfc029559e, type: 3}
+  - {fileID: 8754368635658585658, guid: b7599a01d63fcaf44a11df1a96e9bb39, type: 3}
+  mountainRockCount: {x: 40, y: 55}
+  mountainRockScale: {x: 0.7, y: 1.5}
   rivers: {x: 2, y: 2}
   ponds: {x: 2, y: 4}
   pondRadius: {x: 5, y: 12}
@@ -43,6 +51,22 @@ MonoBehaviour:
   ravineLength: {x: 70, y: 160}
   radialPaths: 6
   ringPath: 230
+  outerLoops: 1
+  roadWidth: 3
+  ringWidth: 2.6
+  spurWidth: 2.2
+  loopWidth: 2.2
+  trailWidth: 1.7
+  pathClearing: {x: 11, y: 7}
+  glades: {x: 16, y: 20}
+  gladeRadius: {x: 14, y: 28}
+  gladeLinks: 0.55
+  gladeLandmarks:
+  - {fileID: 8896246634900274262, guid: e7e112141c69cef4bbacdc428bbaf5ce, type: 3}
+  - {fileID: 2432845718604954315, guid: 59c9184e28e36c94daedba055f6d0418, type: 3}
+  - {fileID: 4397208832055064175, guid: 79e5700236bb6024eb0da41cc302ed71, type: 3}
+  - {fileID: 5402517183627898201, guid: dfa75a2b8fc307b4da9fb76b2ce561a5, type: 3}
+  gladeLandmarkChance: 0.4
   woods: {fileID: 11400000, guid: f8e72667c076c3349ab8ddaa5bb747a5, type: 2}
   woodsDensity: {x: 0.15, y: 0.95}
   groves: {x: 4, y: 5}
@@ -92,6 +116,14 @@ MonoBehaviour:
     distance: {x: 330, y: 460}
     count: 1
     clearing: 12
+    high: 0
+    onIsland: 0
+    path: 1
+  - name: Woodland Camp
+    prefab: {fileID: 2497257881728789026, guid: aad4d9e512db2d54a9843a73ec6a551a, type: 3}
+    distance: {x: 170, y: 330}
+    count: 2
+    clearing: 9
     high: 0
     onIsland: 0
     path: 1

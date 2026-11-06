@@ -1062,6 +1062,7 @@ public static class WorldBuilder
     }
 
     private const float TreeClearMargin = 6f;
+    private const float TreeCell = 32f;
 
     private static void ClearTrees(Terrain terrain, WorldTerrainStash stash, List<FeatureBuilder> builders)
     {
@@ -1074,59 +1075,117 @@ public static class WorldBuilder
         Vector3 origin = terrain.transform.position;
         Vector3 size = data.size;
         Vector2 World(Vector3 normalised) => new Vector2(origin.x + normalised.x * size.x, origin.z + normalised.z * size.z);
-        // A tree is only asked of the features whose footprint holds it: on a large terrain with many trees, asking every feature's line
-        // about every tree took minutes (150 000 trees, 46 features: 177 s).
-        var footprints = new List<(FeatureBuilder builder, Rect area)>(builders.Count);
+
+        // Every tree (standing, and kept in the stash) goes into a grid of cells; each feature then asks only the trees in the cells its
+        // footprint covers. Asking every feature about every tree took minutes on a large terrain (150 000 trees, 46 features: 177 s).
+        TreeInstance[] standing = data.treeInstances;
+        List<WorldTerrainStash.StashedTree> kept = stash.Trees;
+        int total = standing.Length + kept.Count;
+        var points = new Vector2[total];
+        for (int i = 0; i < standing.Length; i++)
+        {
+            points[i] = World(standing[i].position);
+        }
+
+        for (int i = 0; i < kept.Count; i++)
+        {
+            points[standing.Length + i] = World(kept[i].position);
+        }
+
+        int cells = Mathf.Max(1, Mathf.CeilToInt(Mathf.Max(size.x, size.z) / TreeCell));
+        var grid = new List<int>[cells * cells];
+        int CellOf(float value, float from, float extent) => Mathf.Clamp((int)((value - from) / Mathf.Max(0.001f, extent) * cells), 0, cells - 1);
+        for (int i = 0; i < total; i++)
+        {
+            int key = CellOf(points[i].y, origin.z, size.z) * cells + CellOf(points[i].x, origin.x, size.x);
+            (grid[key] ??= new List<int>()).Add(i);
+        }
+
+        var cleared = new bool[total];
+        var visit = new HashSet<int>();
         foreach (FeatureBuilder builder in builders)
         {
-            Rect area = FlatRect(builder.Feature.WorldBounds());
+            // An open line (path, river, ravine, cliff line) only near its own samples: a long, curving one has a bounding box covering much
+            // of the map. A loop (outcrop, area) by its box, as what lies inside it may count too.
+            visit.Clear();
             float margin = builder.Feature.Reach + TreeClearMargin;
-            footprints.Add((builder, Rect.MinMaxRect(area.xMin - margin, area.yMin - margin, area.xMax + margin, area.yMax + margin)));
-        }
-
-        bool Cleared(Vector3 normalised)
-        {
-            Vector2 point = World(normalised);
-            foreach ((FeatureBuilder builder, Rect area) in footprints)
+            SplineLine line = builder.Line;
+            if (line != null && !line.Closed && line.Count > 1)
             {
-                if (area.Contains(point) && builder.ClearsTree(point))
+                foreach (Vector3 sample in line.Points)
                 {
-                    return true;
+                    int x0 = CellOf(sample.x - margin, origin.x, size.x), x1 = CellOf(sample.x + margin, origin.x, size.x);
+                    int y0 = CellOf(sample.z - margin, origin.z, size.z), y1 = CellOf(sample.z + margin, origin.z, size.z);
+                    for (int y = y0; y <= y1; y++)
+                    {
+                        for (int x = x0; x <= x1; x++)
+                        {
+                            visit.Add(y * cells + x);
+                        }
+                    }
                 }
-            }
-
-            return false;
-        }
-
-        var kept = new List<TreeInstance>();
-        var stashed = new List<WorldTerrainStash.StashedTree>();
-        foreach (TreeInstance tree in data.treeInstances)
-        {
-            if (Cleared(tree.position))
-            {
-                stashed.Add(new WorldTerrainStash.StashedTree(tree));
             }
             else
             {
-                kept.Add(tree);
+                Rect area = FlatRect(builder.Feature.WorldBounds());
+                int x0 = CellOf(area.xMin - margin, origin.x, size.x), x1 = CellOf(area.xMax + margin, origin.x, size.x);
+                int y0 = CellOf(area.yMin - margin, origin.z, size.z), y1 = CellOf(area.yMax + margin, origin.z, size.z);
+                for (int y = y0; y <= y1; y++)
+                {
+                    for (int x = x0; x <= x1; x++)
+                    {
+                        visit.Add(y * cells + x);
+                    }
+                }
+            }
+
+            foreach (int key in visit)
+            {
+                List<int> here = grid[key];
+                if (here == null)
+                {
+                    continue;
+                }
+
+                foreach (int tree in here)
+                {
+                    if (!cleared[tree] && builder.ClearsTree(points[tree]))
+                    {
+                        cleared[tree] = true;
+                    }
+                }
             }
         }
 
-        foreach (WorldTerrainStash.StashedTree tree in stash.Trees)
+        var standingKept = new List<TreeInstance>(standing.Length);
+        var stashed = new List<WorldTerrainStash.StashedTree>();
+        for (int i = 0; i < standing.Length; i++)
         {
-            if (Cleared(tree.position))
+            if (cleared[i])
             {
-                stashed.Add(tree);
+                stashed.Add(new WorldTerrainStash.StashedTree(standing[i]));
             }
-            else if (tree.prototypeIndex < data.treePrototypes.Length)
+            else
             {
-                kept.Add(tree.ToTree()); // the feature moved away: the tree comes back
+                standingKept.Add(standing[i]);
+            }
+        }
+
+        for (int i = 0; i < kept.Count; i++)
+        {
+            if (cleared[standing.Length + i])
+            {
+                stashed.Add(kept[i]);
+            }
+            else if (kept[i].prototypeIndex < data.treePrototypes.Length)
+            {
+                standingKept.Add(kept[i].ToTree()); // the feature moved away: the tree comes back
             }
         }
 
         stash.Trees.Clear();
         stash.Trees.AddRange(stashed);
-        data.SetTreeInstances(kept.ToArray(), true);
+        data.SetTreeInstances(standingKept.ToArray(), true);
     }
 
     // ------------------------------------------------------------------ helpers

@@ -97,6 +97,8 @@ public sealed class HavenWorldRecipe : ScriptableObject
     [Tooltip("Half its length and half its width, in metres.")]
     public Vector2 lakeSize = new Vector2(110f, 75f);
     [Min(1f)] public float lakeDepth = 6f;
+    [Tooltip("A boat landing (a jetty running out along its +Z from the shore): one where the lake path meets the water, one on the island with a place.")]
+    public GameObject landing;
     [Tooltip("Islands, least and most, and their radius.")]
     public Vector2Int islands = new Vector2Int(2, 3);
     public Vector2 islandRadius = new Vector2(10f, 22f);
@@ -110,6 +112,12 @@ public sealed class HavenWorldRecipe : ScriptableObject
     [Min(0f)] public float mountainHeight = 60f;
     [Tooltip("Cliff lines across its flanks, least and most.")]
     public Vector2Int mountainCliffs = new Vector2Int(4, 6);
+    [Tooltip("Rock faces and boulders strewn over its flanks: each faces down the slope if its shape faces one way.")]
+    public List<GameObject> mountainRocks = new List<GameObject>();
+    [Tooltip("How many, least and most.")]
+    public Vector2Int mountainRockCount = new Vector2Int(40, 55);
+    [Tooltip("Their size, least and most (1 = as modelled).")]
+    public Vector2 mountainRockScale = new Vector2(0.7f, 1.5f);
 
     [Header("Water and Rock")]
     [Tooltip("Rivers, least and most: from the mountain or the edge down to the lake.")]
@@ -129,6 +137,26 @@ public sealed class HavenWorldRecipe : ScriptableObject
     [Min(0)] public int radialPaths = 6;
     [Tooltip("Metres from the portal of the path that rings the Haven, joining the others (0: none).")]
     [Min(0f)] public float ringPath = 230f;
+    [Tooltip("Trails looping between neighbouring paths deep in the woods, where nothing blocks them.")]
+    public bool outerLoops = true;
+    [Tooltip("Widths of the main paths, the ring, spurs to places, loops and woodland trails (metres).")]
+    public float roadWidth = 3f;
+    public float ringWidth = 2.6f;
+    public float spurWidth = 2.2f;
+    public float loopWidth = 2.2f;
+    public float trailWidth = 1.7f;
+    [Tooltip("How far each side of a main path (and of a trail) the woods thin out, past the tread (metres).")]
+    public Vector2 pathClearing = new Vector2(11f, 7f);
+
+    [Header("Glades")]
+    [Tooltip("Open glades in the woods, least and most: more of them further out. Each is joined to the paths by a trail.")]
+    public Vector2Int glades = new Vector2Int(16, 20);
+    public Vector2 gladeRadius = new Vector2(14f, 28f);
+    [Tooltip("Chance a glade gets a second trail, to another glade or path, so the woods are a network rather than dead ends.")]
+    [Range(0f, 1f)] public float gladeLinks = 0.55f;
+    [Tooltip("What can stand in a glade's middle, so it reads from above (an old tree, stones); one is picked per glade that gets one.")]
+    public List<GameObject> gladeLandmarks = new List<GameObject>();
+    [Range(0f, 1f)] public float gladeLandmarkChance = 0.4f;
 
     [Header("Forest")]
     [Tooltip("The raids' forest: its trees, undergrowth and mineable rocks are painted as terrain trees in the woods.")]

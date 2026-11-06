@@ -58,6 +58,10 @@ public sealed class MobSpawnZone : MonoBehaviour
     [SerializeField] private bool respawn;
     [Tooltip("...this many seconds later, when the player isn't within Wake Distance (so nothing appears in plain sight).")]
     [SerializeField, Min(0f)] private float respawnSeconds = 180f;
+    [Tooltip("Fill again only after dark: the home's woods stay quiet by day once cleared.")]
+    [SerializeField] private bool respawnAtNight;
+    [Tooltip("Stays empty while its middle is within this many metres of the home ward's edge, so a growing ward pushes it back. 0: no limit.")]
+    [SerializeField, Min(0f)] private float awayFromWard;
 
     [Header("Events")]
     [SerializeField] private UnityEvent onSpawned = new UnityEvent();
@@ -138,15 +142,33 @@ public sealed class MobSpawnZone : MonoBehaviour
             onCleared.Invoke();
         }
 
+        if (NearWard())
+        {
+            return;
+        }
+
         if (trigger == MobSpawnTrigger.PlayerNear && !hasSpawned && PlayerWithin(wakeDistance))
         {
             Spawn();
         }
-        else if (respawnAt >= 0f && Time.time >= respawnAt && !PlayerWithin(wakeDistance))
+        else if (respawnAt >= 0f && Time.time >= respawnAt && !PlayerWithin(wakeDistance) && (!respawnAtNight || NightSettings.IsDark))
         {
             respawnAt = -1f;
             Spawn();
         }
+    }
+
+    private bool NearWard()
+    {
+        HomePortal portal = awayFromWard > 0f ? HomePortal.Current : null;
+        return portal != null && Vector3.Distance(transform.position, portal.transform.position) < portal.WardRadius + awayFromWard;
+    }
+
+    /// <summary>Sets the home rules (generators and tests): refill only at night, and keep this far from the ward's edge.</summary>
+    public void ConfigureHome(bool atNight, float fromWard)
+    {
+        respawnAtNight = atNight;
+        awayFromWard = Mathf.Max(0f, fromWard);
     }
 
     /// <summary>Fills the zone now (again, if it was cleared). Returns how many creatures appeared.</summary>

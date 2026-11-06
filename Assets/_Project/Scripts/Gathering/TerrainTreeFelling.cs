@@ -56,6 +56,45 @@ public sealed class TerrainTreeFelling : MonoBehaviour
     /// <summary>Terrain trees felled and not yet grown back.</summary>
     public int FelledCount => felled.Count;
 
+    /// <summary>The trees down now, by index on the terrain, with the seconds until each grows back (infinity: never).</summary>
+    public List<(int index, float secondsLeft)> FelledNow()
+    {
+        var list = new List<(int, float)>(felled.Count);
+        foreach (var pair in felled)
+        {
+            list.Add((pair.Key, float.IsPositiveInfinity(pair.Value.regrowAt) ? float.PositiveInfinity : Mathf.Max(0f, pair.Value.regrowAt - Time.time)));
+        }
+
+        return list;
+    }
+
+    /// <summary>Lays a tree down again as it was saved (no falling copy): it stays down for the seconds left.</summary>
+    public void RestoreFelled(int index, float secondsLeft)
+    {
+        OwnTheData();
+        TerrainData data = terrain.terrainData;
+        if (index < 0 || index >= data.treeInstanceCount || felled.ContainsKey(index))
+        {
+            return;
+        }
+
+        TreeInstance tree = data.GetTreeInstance(index);
+        felled[index] = (tree, Time.time + secondsLeft);
+        Hide(index, tree);
+    }
+
+    /// <summary>This terrain's felling, added if it isn't there yet.</summary>
+    public static TerrainTreeFelling On(Terrain terrain)
+    {
+        if (!terrain.TryGetComponent(out TerrainTreeFelling felling))
+        {
+            felling = terrain.gameObject.AddComponent<TerrainTreeFelling>();
+            felling.terrain = terrain;
+        }
+
+        return felling;
+    }
+
     /// <summary>Every terrain with fellable trees.</summary>
     public static IReadOnlyList<TerrainTreeFelling> Active => active;
 

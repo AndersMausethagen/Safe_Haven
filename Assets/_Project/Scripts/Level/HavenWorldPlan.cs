@@ -54,10 +54,52 @@ public sealed class HavenWorldPlan
         public float Radius;
     }
 
+    /// <summary>What a path is: a main path out from the Haven, the ring, a spur to a place, a loop between main paths, a woodland trail.</summary>
+    public enum PathKind { Road, Ring, Spur, Loop, Trail }
+
+    /// <summary>What a glade is for: open meadow (forage, plants), rocky (stone), a lair (creatures), wet (a pool in it).</summary>
+    public enum GladeKind { Meadow, Rocky, Lair, Wet }
+
+    /// <summary>An open glade in the woods with a ragged rim.</summary>
+    public sealed class Glade
+    {
+        public Vector2 Centre;
+        public float Radius;
+        public GladeKind Kind;
+        public float[] Wobble;
+        public bool Landmark;
+        public int LandmarkKind;
+        public bool HasZone;
+
+        /// <summary>How open the glade is at a point: 1 well inside, fading to 0 at its ragged rim.</summary>
+        public float Open(Vector2 point)
+        {
+            Vector2 offset = point - Centre;
+            float distance = offset.magnitude;
+            if (distance > Radius * 1.35f)
+            {
+                return 0f;
+            }
+
+            float turns = Mathf.Repeat(Mathf.Atan2(offset.y, offset.x) / (Mathf.PI * 2f), 1f) * Wobble.Length;
+            int i = Mathf.FloorToInt(turns) % Wobble.Length;
+            float rim = Radius * Mathf.Lerp(Wobble[i], Wobble[(i + 1) % Wobble.Length], Mathf.SmoothStep(0f, 1f, turns - Mathf.Floor(turns)));
+            return 1f - Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(rim * 0.7f, rim, distance));
+        }
+    }
+
     public sealed class Node
     {
         public HavenResourceBand Band;
         public Vector2 At;
+    }
+
+    public sealed class Rock
+    {
+        public int Kind;
+        public Vector2 At;
+        public float Scale;
+        public float Turn;
     }
 
     public readonly HavenWorldRecipe Recipe;
@@ -66,6 +108,15 @@ public sealed class HavenWorldPlan
     public readonly List<Island> Islands = new List<Island>();
     public readonly List<RaidLayoutPond> Ponds = new List<RaidLayoutPond>();
     public readonly List<List<Vector2>> Paths = new List<List<Vector2>>();
+    /// <summary>What each of <see cref="Paths"/> is, by index.</summary>
+    public readonly List<PathKind> PathKinds = new List<PathKind>();
+    public readonly List<Glade> Glades = new List<Glade>();
+    /// <summary>Where a path crosses a river: the river's knot there (river index, knot index), made a broad, shallow ford.</summary>
+    public readonly List<(int river, int knot)> Fords = new List<(int, int)>();
+    // Each river's water level at each knot, running only downhill to the lake: the valley Height carves for it.
+    private readonly List<float[]> riverLevels = new List<float[]>();
+    private const float ValleyFloor = 5f;
+    private const float ValleyMax = 40f;
     public readonly List<List<Vector2>> Rivers = new List<List<Vector2>>();
     public readonly List<Poi> Pois = new List<Poi>();
     public readonly List<Outcrop> Outcrops = new List<Outcrop>();
@@ -75,6 +126,11 @@ public sealed class HavenWorldPlan
     public readonly List<Zone> Zones = new List<Zone>();
     public readonly List<Node> Nodes = new List<Node>();
     public float MountainPathAngle;
+    private readonly List<float> radialBearings = new List<float>();
+    /// <summary>Boat landings: where they stand on the shore and which way they run out over the water (bearing, degrees).</summary>
+    public readonly List<(Vector2 at, float bearing)> Landings = new List<(Vector2, float)>();
+    /// <summary>Rocks strewn over the mountain's flanks: which of the recipe's mountain rocks, its size and a turn added to facing downhill.</summary>
+    public readonly List<Rock> Rocks = new List<Rock>();
 
     private readonly System.Random random;
     private readonly Vector2 noise;
@@ -115,8 +171,15 @@ public sealed class HavenWorldPlan
         plan.PlaceMountainCliffs();
         plan.PlaceRavines();
         plan.PlaceGroves();
+        plan.PlaceOuterLoops();
+        plan.PlaceGlades();
+        plan.PlaceFords();
+        plan.LevelRivers();
         plan.PlaceZones();
         plan.PlaceNodes();
+        plan.PlaceLandings();
+        // Last, so the rocks never move what was placed before them.
+        plan.PlaceMountainRocks();
         return plan;
     }
 
@@ -152,16 +215,22 @@ public sealed class HavenWorldPlan
         float r = point.magnitude;
         float far = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(Recipe.buildable, Half, r));
         float hills = (Perlin(point, Recipe.hillScale, 0f) - 0.5f) * 2f * Mathf.Lerp(Recipe.havenHills, Recipe.outerHills, far);
-        float ridged = 1f - Mathf.Abs(Perlin(point, Recipe.hillScale * 0.6f, 97f) * 2f - 1f);
-        float ridge = Recipe.ridges * WoodsWeight(point) * Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.55f, 1f, ridged));
+        // Rounded crests (a parabola, not the V of ridged noise) on a wide ramp: ridges you see in the light and walk over, whose
+        // sides stay under the trees' 36 degrees. Sharp ones left a sixth of the woods bare, pale ribbons that read as paths.
+        float fold = Perlin(point, Recipe.hillScale * 0.6f, 97f) * 2f - 1f;
+        float ridged = 1f - fold * fold;
+        float ridge = Recipe.ridges * WoodsWeight(point) * Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.35f, 1f, ridged));
         // Gentle and open where the Haven is built: the ward reaches about 50 m.
         float open = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(Recipe.buildable, Recipe.buildable + 70f, r));
         float near = (Perlin(point, 25f, 13f) - 0.5f) * 0.8f * Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(10f, 40f, r));
         float height = (hills + ridge) * open + near * (1f - open);
         height += Recipe.mountainHeight * MountainWeight(point) * (0.7f + 0.3f * ridged);
+        // The edge of the world rises into a broken, rocky ridge (steep enough for the terrain's rock), not a smooth wall.
         float edge = Half - Mathf.Max(Mathf.Abs(point.x), Mathf.Abs(point.y));
         float rim = Mathf.Clamp01(1f - edge / Recipe.rim.y);
-        return height + Recipe.rim.x * rim * rim;
+        float crest = 1f - Mathf.Abs(Perlin(point, 38f, 211f) * 2f - 1f);
+        float rocky = Mathf.Lerp(0.55f, 1.35f, crest) + (Perlin(point, 11f, 223f) - 0.5f) * 0.3f;
+        return height + Recipe.rim.x * Mathf.Pow(rim, 1.6f) * rocky;
     }
 
     /// <summary>The ground with the lake, its islands and the ponds dug, in metres above the portal's ground.</summary>
@@ -188,6 +257,7 @@ public sealed class HavenWorldPlan
             }
         }
 
+        ground = RiverValley(point, ground);
         foreach (RaidLayoutPond pond in Ponds)
         {
             if ((point - pond.Position).sqrMagnitude >= (pond.Reach + PondBank) * (pond.Reach + PondBank))
@@ -281,8 +351,10 @@ public sealed class HavenWorldPlan
             }
 
             Vector2 from = Dir(bearing) * PathStart, to = Dir(bearing) * end;
-            Paths.Add(Wander(from, to, 0.08f));
+            AddPath(Wander(from, to, 0.08f), PathKind.Road);
         }
+
+        radialBearings.AddRange(bearings);
 
         if (Recipe.ringPath <= 0f)
         {
@@ -309,7 +381,7 @@ public sealed class HavenWorldPlan
 
             if (open && arc.Count >= 3)
             {
-                Paths.Add(arc);
+                AddPath(arc, PathKind.Ring);
             }
         }
     }
@@ -419,6 +491,21 @@ public sealed class HavenWorldPlan
         }
     }
 
+    // Where the lake path meets the water, running out from the shore; and on the island holding a place, facing the Haven's shore.
+    private void PlaceLandings()
+    {
+        Vector2 toLake = Lake.Position.normalized;
+        float local = Mathf.Atan2(-Lake.Position.y, -Lake.Position.x) - Lake.Turn;
+        Vector2 shore = Lake.Rim(local, 1.5f);
+        Landings.Add((shore, BearingOf(toLake)));
+        Island held = Islands.Find(island => Pois.Exists(poi => Vector2.Distance(poi.At, island.Centre) < 1f));
+        if (held != null)
+        {
+            Vector2 facing = (shore - held.Centre).normalized;
+            Landings.Add((held.Centre + facing * (held.Radius * 1.05f), BearingOf(facing)));
+        }
+    }
+
     private bool InWater(Vector2 point, float beyond) =>
         Lake.Edge(point) < beyond || Ponds.Exists(pond => pond.Edge(point) < beyond);
 
@@ -492,8 +579,365 @@ public sealed class HavenWorldPlan
         Vector2 end = to + (from - to).normalized * clearing * 0.5f;
         if (Vector2.Distance(from, end) > 4f)
         {
-            Paths.Add(Wander(from, end, 0.1f));
+            AddPath(Wander(from, end, 0.1f), PathKind.Spur);
         }
+    }
+
+    private void AddPath(List<Vector2> line, PathKind kind)
+    {
+        Paths.Add(line);
+        PathKinds.Add(kind);
+    }
+
+    /// <summary>The open ground of the glades at a point, 0 to 1.</summary>
+    public float GladeOpen(Vector2 point)
+    {
+        float open = 0f;
+        foreach (Glade glade in Glades)
+        {
+            open = Mathf.Max(open, glade.Open(point));
+        }
+
+        return open;
+    }
+
+    // ----- Woodland trails and glades -----
+
+    // A trail can go where it is dry, off the ravines' lips, round rock and places, and not up the mountain's steeps.
+    private bool TrailClear(List<Vector2> line)
+    {
+        // Every few metres, not just at the knots: an arc's knots lie 20 m apart, room enough to step over a river unseen.
+        var points = new List<Vector2>();
+        for (int i = 0; i < line.Count; i++)
+        {
+            points.Add(line[i]);
+            if (i + 1 < line.Count)
+            {
+                int steps = Mathf.FloorToInt(Vector2.Distance(line[i], line[i + 1]) / 4f);
+                for (int k = 1; k < steps; k++)
+                {
+                    points.Add(Vector2.Lerp(line[i], line[i + 1], k / (float)steps));
+                }
+            }
+        }
+
+        foreach (Vector2 point in points)
+        {
+            float edge = Half - Mathf.Max(Mathf.Abs(point.x), Mathf.Abs(point.y));
+            if (edge < Recipe.rim.y + 8f || point.magnitude < Recipe.haven || InWater(point, 3f) || Near(Rivers, point, 5f) || MountainWeight(point) > 0.6f
+                || Ravines.Exists(ravine => NearLine(ravine.Line, point, ravine.FloorWidth + 8f))
+                || Outcrops.Exists(outcrop => Vector2.Distance(outcrop.Centre, point) < outcrop.Radius + 3f)
+                || Pois.Exists(poi => Vector2.Distance(poi.At, point) < poi.Rule.clearing * 0.5f))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    // Deep in the woods, an arc from each main path to the next, so a walk out can come back another way.
+    private void PlaceOuterLoops()
+    {
+        if (!Recipe.outerLoops || radialBearings.Count < 2)
+        {
+            return;
+        }
+
+        var sorted = new List<float>(radialBearings);
+        sorted.Sort();
+        for (int i = 0; i < sorted.Count; i++)
+        {
+            float a = sorted[i], b = sorted[(i + 1) % sorted.Count] + (i + 1 == sorted.Count ? 360f : 0f);
+            for (int attempt = 0; attempt < 3; attempt++)
+            {
+                float radius = Range(Recipe.forest - 10f, MaxReach - 30f);
+                var arc = new List<Vector2>();
+                for (float t = a; t <= b + 0.01f; t += 4f)
+                {
+                    arc.Add(Dir(t) * (radius + (Perlin(Dir(t) * 60f, 35f, 19f + attempt) - 0.5f) * 40f));
+                }
+
+                // Its ends sit on the main paths it joins.
+                arc[0] = NearestOn(Paths, arc[0]);
+                arc[arc.Count - 1] = NearestOn(Paths, arc[arc.Count - 1]);
+                if (arc.Count >= 4 && TrailClear(arc.GetRange(1, arc.Count - 2)))
+                {
+                    AddPath(arc, PathKind.Loop);
+                    break;
+                }
+            }
+        }
+    }
+
+    private void PlaceGlades()
+    {
+        int count = random.Next(Recipe.glades.x, Recipe.glades.y + 1);
+        for (int i = 0; i < count; i++)
+        {
+            for (int tries = 0; tries < Tries; tries++)
+            {
+                // Square root leans them outward, where the woods are thickest and the work is.
+                float distance = Mathf.Lerp(Recipe.haven + 50f, MaxReach - 15f, Mathf.Sqrt((float)random.NextDouble()));
+                Vector2 at = Dir(Range(0f, 360f)) * distance;
+                float radius = Range(Recipe.gladeRadius.x, Recipe.gladeRadius.y);
+                if (MountainWeight(at) > 0.45f || InWater(at, radius + 10f) || Near(Rivers, at, radius + 6f)
+                    || Ravines.Exists(ravine => NearLine(ravine.Line, at, radius + 10f))
+                    || Outcrops.Exists(outcrop => Vector2.Distance(outcrop.Centre, at) < outcrop.Radius + radius + 8f)
+                    || Pois.Exists(poi => Vector2.Distance(poi.At, at) < poi.Rule.clearing + radius + 15f)
+                    || Glades.Exists(other => Vector2.Distance(other.Centre, at) < other.Radius + radius + 25f))
+                {
+                    continue;
+                }
+
+                var glade = new Glade { Centre = at, Radius = radius, Wobble = new float[10] };
+                for (int k = 0; k < glade.Wobble.Length; k++)
+                {
+                    glade.Wobble[k] = Range(0.78f, 1.22f);
+                }
+
+                // A path already through it, or a trail to the nearest one that can get there.
+                List<Vector2> trail = Near(Paths, at, radius) ? null : TrailTo(glade, NearestOn(Paths, at), 170f);
+                if (!Near(Paths, at, radius) && trail == null)
+                {
+                    continue;
+                }
+
+                if (trail != null)
+                {
+                    AddPath(trail, PathKind.Trail);
+                }
+
+                float outward = Mathf.InverseLerp(Recipe.haven, MaxReach, distance);
+                float roll = Range(0f, 1f);
+                glade.Kind = roll < 0.12f ? GladeKind.Wet : roll < 0.12f + 0.25f + outward * 0.15f ? GladeKind.Lair : roll < 0.7f ? GladeKind.Rocky : GladeKind.Meadow;
+                if (glade.Kind == GladeKind.Wet)
+                {
+                    AddGladePool(glade);
+                }
+
+                glade.Landmark = Recipe.gladeLandmarks.Count > 0 && glade.Kind != GladeKind.Wet && Range(0f, 1f) < Recipe.gladeLandmarkChance;
+                glade.LandmarkKind = Recipe.gladeLandmarks.Count > 0 ? random.Next(Recipe.gladeLandmarks.Count) : 0;
+                Glades.Add(glade);
+                break;
+            }
+        }
+
+        // Some glades get a second way out: to another glade or path, never the one they came by.
+        foreach (Glade glade in Glades)
+        {
+            if (Range(0f, 1f) >= Recipe.gladeLinks)
+            {
+                continue;
+            }
+
+            Vector2 target = default;
+            float best = float.MaxValue;
+            foreach (Glade other in Glades)
+            {
+                float d = Vector2.Distance(other.Centre, glade.Centre);
+                if (other != glade && d > 45f && d < 150f && d < best)
+                {
+                    best = d;
+                    target = other.Centre + (glade.Centre - other.Centre).normalized * other.Radius * 0.6f;
+                }
+            }
+
+            if (best == float.MaxValue)
+            {
+                continue;
+            }
+
+            List<Vector2> link = TrailTo(glade, target, 160f);
+            if (link != null && !SameAs(link))
+            {
+                AddPath(link, PathKind.Trail);
+            }
+        }
+    }
+
+    // From inside a glade (so the trail visibly enters it) to a point, if the way is clear.
+    private List<Vector2> TrailTo(Glade glade, Vector2 target, float longest)
+    {
+        Vector2 toward = (target - glade.Centre).normalized;
+        Vector2 start = glade.Centre + toward * glade.Radius * 0.55f;
+        if (Vector2.Distance(start, target) > longest || Vector2.Distance(start, target) < 6f)
+        {
+            return null;
+        }
+
+        for (int attempt = 0; attempt < 3; attempt++)
+        {
+            List<Vector2> line = Wander(start, target, 0.14f);
+            // The last stretch may meet the path it joins; only the way there must be clear.
+            int keep = Mathf.Max(1, line.Count - 2);
+            if (TrailClear(line.GetRange(1, keep - 1).FindAll(point => glade.Open(point) < 0.5f)))
+            {
+                return line;
+            }
+        }
+
+        return null;
+    }
+
+    // A trail that would only double one already there (both ends near another's).
+    private bool SameAs(List<Vector2> line)
+    {
+        foreach (List<Vector2> other in Paths)
+        {
+            if (NearLine(other, line[0], 12f) && NearLine(other, line[line.Count - 1], 12f) && NearLine(other, line[line.Count / 2], 12f))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>A river's water level at one of its knots (metres above the portal's ground): it only runs downhill.</summary>
+    public float RiverLevel(int river, int knot) => riverLevels[river][knot];
+
+    // A river runs only downhill: from its source each knot's level is the lowest ground met so far, never under the lake.
+    private void LevelRivers()
+    {
+        riverLevels.Clear();
+        foreach (List<Vector2> river in Rivers)
+        {
+            var levels = new float[river.Count];
+            float level = float.MaxValue;
+            for (int i = 0; i < river.Count; i++)
+            {
+                level = Mathf.Max(Mathf.Min(level, Ground(river[i])), Lake.Level + 0.2f);
+                levels[i] = level;
+            }
+
+            riverLevels.Add(levels);
+        }
+    }
+
+    // Brings the ground down to a river's level along it, with sides that widen the deeper the cut (about 18 degrees), so the river
+    // cuts only its own channel instead of a trench where the ground rises along its way.
+    private float RiverValley(Vector2 point, float ground)
+    {
+        for (int r = 0; r < riverLevels.Count; r++)
+        {
+            List<Vector2> river = Rivers[r];
+            float[] levels = riverLevels[r];
+            float best = float.MaxValue, level = 0f;
+            for (int i = 0; i + 1 < river.Count; i++)
+            {
+                Vector2 a = river[i], along = river[i + 1] - a;
+                float t = Mathf.Clamp01(Vector2.Dot(point - a, along) / Mathf.Max(0.0001f, along.sqrMagnitude));
+                float squared = (a + along * t - point).sqrMagnitude;
+                if (squared < best)
+                {
+                    best = squared;
+                    level = Mathf.Lerp(levels[i], levels[i + 1], t);
+                }
+            }
+
+            float distance = Mathf.Sqrt(best);
+            float cut = ground - (level + 0.2f);
+            if (cut <= 0f || distance > ValleyMax)
+            {
+                continue;
+            }
+
+            float reach = ValleyFloor + Mathf.Min(cut * 3f, ValleyMax - ValleyFloor);
+            if (distance < reach)
+            {
+                ground -= cut * (1f - Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(ValleyFloor * 0.6f, reach, distance)));
+            }
+        }
+
+        return ground;
+    }
+
+    // Every crossing of a path and a river gets a knot of its own, so the river can be made shallow just there.
+    private void PlaceFords()
+    {
+        for (int r = 0; r < Rivers.Count; r++)
+        {
+            List<Vector2> river = Rivers[r];
+            for (int i = 0; i + 1 < river.Count; i++)
+            {
+                if (!Crossing(river[i], river[i + 1], out Vector2 at))
+                {
+                    continue;
+                }
+
+                // Close to a knot already there: that knot is the ford.
+                if (Vector2.Distance(at, river[i]) < 2f)
+                {
+                    Fords.Add((r, i));
+                }
+                else if (Vector2.Distance(at, river[i + 1]) < 2f)
+                {
+                    Fords.Add((r, i + 1));
+                    i++;
+                }
+                else
+                {
+                    river.Insert(i + 1, at);
+                    Fords.Add((r, i + 1));
+                    i++;
+                }
+            }
+        }
+    }
+
+    private bool Crossing(Vector2 a, Vector2 b, out Vector2 at)
+    {
+        foreach (List<Vector2> path in Paths)
+        {
+            for (int k = 0; k + 1 < path.Count; k++)
+            {
+                if (Intersect(a, b, path[k], path[k + 1], out at))
+                {
+                    return true;
+                }
+            }
+        }
+
+        at = default;
+        return false;
+    }
+
+    private static bool Intersect(Vector2 a, Vector2 b, Vector2 c, Vector2 d, out Vector2 at)
+    {
+        Vector2 r = b - a, s = d - c;
+        float cross = r.x * s.y - r.y * s.x;
+        at = default;
+        if (Mathf.Abs(cross) < 1e-6f)
+        {
+            return false;
+        }
+
+        Vector2 ca = c - a;
+        float t = (ca.x * s.y - ca.y * s.x) / cross;
+        float u = (ca.x * r.y - ca.y * r.x) / cross;
+        if (t < 0f || t > 1f || u < 0f || u > 1f)
+        {
+            return false;
+        }
+
+        at = a + r * t;
+        return true;
+    }
+
+    // A wet glade's pool, off its middle so there is dry ground to stand on.
+    private void AddGladePool(Glade glade)
+    {
+        float radius = Mathf.Min(glade.Radius * 0.35f, Recipe.pondRadius.y);
+        var pond = new RaidLayoutPond
+        {
+            Position = glade.Centre + Dir(Range(0f, 360f)) * glade.Radius * 0.2f,
+            Radii = new Vector2(radius, radius / Range(1f, 1.5f)),
+            Turn = Range(0f, Mathf.PI * 2f),
+            Depth = 1.2f,
+        };
+        pond.Level = LevelAround(pond, 2f, 0.15f);
+        Ponds.Add(pond);
     }
 
     private void PlaceOutcrops()
@@ -680,6 +1124,16 @@ public sealed class HavenWorldPlan
 
             for (int i = 0; i < band.zones; i++)
             {
+                // Lairs first, then any dry glade still free: open ground to fight in, reached by a trail.
+                Glade den = Glades.Find(glade => !glade.HasZone && glade.Kind == GladeKind.Lair && InBand(glade.Centre, band.distance))
+                            ?? Glades.Find(glade => !glade.HasZone && glade.Kind != GladeKind.Wet && InBand(glade.Centre, band.distance));
+                if (den != null)
+                {
+                    den.HasZone = true;
+                    Zones.Add(new Zone { Band = band, At = den.Centre, Radius = Mathf.Max(9f, den.Radius * 0.55f) });
+                    continue;
+                }
+
                 for (int tries = 0; tries < Tries; tries++)
                 {
                     Vector2 at = Around(band.distance.x, Mathf.Min(band.distance.y, MaxReach));
@@ -710,6 +1164,11 @@ public sealed class HavenWorldPlan
 
             for (int i = 0; i < band.clusters; i++)
             {
+                if (!band.mountainOnly && Range(0f, 1f) < 0.5f && TryGladeCluster(band))
+                {
+                    continue;
+                }
+
                 for (int tries = 0; tries < Tries; tries++)
                 {
                     Vector2 at = Around(band.distance.x, Mathf.Min(band.distance.y, MaxReach));
@@ -733,6 +1192,74 @@ public sealed class HavenWorldPlan
             }
         }
     }
+
+    private void PlaceMountainRocks()
+    {
+        int kinds = Recipe.mountainRocks.Count;
+        if (kinds == 0)
+        {
+            return;
+        }
+
+        int count = random.Next(Recipe.mountainRockCount.x, Recipe.mountainRockCount.y + 1);
+        for (int i = 0; i < count; i++)
+        {
+            for (int tries = 0; tries < Tries; tries++)
+            {
+                Vector2 at = Around(Recipe.mountainFrom, MaxReach + PathFromRim);
+                // More of them higher up, where the mountain is barest; none on its paths, places, nodes or each other.
+                float weight = MountainWeight(at);
+                if (weight < 0.3f || Range(0f, 1f) > weight || Near(Paths, at, 5f) || Near(Rivers, at, 6f) || InWater(at, 3f)
+                    || Pois.Exists(poi => Vector2.Distance(poi.At, at) < poi.Rule.clearing + 4f)
+                    || Nodes.Exists(node => (node.At - at).sqrMagnitude < 16f)
+                    || Rocks.Exists(rock => (rock.At - at).sqrMagnitude < 81f))
+                {
+                    continue;
+                }
+
+                Rocks.Add(new Rock
+                {
+                    Kind = random.Next(kinds),
+                    At = at,
+                    Scale = Range(Recipe.mountainRockScale.x, Recipe.mountainRockScale.y),
+                    Turn = Range(-35f, 35f),
+                });
+                break;
+            }
+        }
+    }
+
+    private bool InBand(Vector2 point, Vector2 band) => point.magnitude >= band.x && point.magnitude <= band.y;
+
+    // A cluster round the edge of a glade that suits it: stone in the rocky ones, forage and plants in meadows and by pools.
+    private bool TryGladeCluster(HavenResourceBand band)
+    {
+        var suited = Glades.FindAll(glade => InBand(glade.Centre, band.distance) && Suits(glade.Kind, band.kind));
+        if (suited.Count == 0)
+        {
+            return false;
+        }
+
+        Glade glade = suited[random.Next(suited.Count)];
+        int count = random.Next(band.perCluster.x, band.perCluster.y + 1);
+        int placed = 0;
+        for (int k = 0; k < count * 3 && placed < count; k++)
+        {
+            Vector2 spot = glade.Centre + Dir(Range(0f, 360f)) * glade.Radius * Range(0.35f, 0.85f);
+            if (NodeFits(spot, band) && !Nodes.Exists(node => (node.At - spot).sqrMagnitude < 4f))
+            {
+                Nodes.Add(new Node { Band = band, At = spot });
+                placed++;
+            }
+        }
+
+        return placed > 0;
+    }
+
+    private static bool Suits(GladeKind glade, ResourceNodeKind kind) =>
+        kind == ResourceNodeKind.Rock ? glade == GladeKind.Rocky
+        : kind == ResourceNodeKind.Forage || kind == ResourceNodeKind.Plant ? glade == GladeKind.Meadow || glade == GladeKind.Wet
+        : glade != GladeKind.Lair;
 
     private bool NodeFits(Vector2 at, HavenResourceBand band) =>
         at.magnitude > Recipe.buildable && !Near(Paths, at, 3f) && !Near(Rivers, at, 6f) && !InWater(at, 2f)

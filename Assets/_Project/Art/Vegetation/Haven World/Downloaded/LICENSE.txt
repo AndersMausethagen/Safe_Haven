@@ -1,0 +1,3 @@
+Models and textures in this folder are from Poly Haven (https://polyhaven.com), released under CC0 1.0 (public domain).
+modular_wooden_pier, stone_fire_pit, rock_face_01, rock_face_02, rock_07, rock_09 - 1k textures.
+Converted by AgentScripts/BuildHavenWorldProps.cs.

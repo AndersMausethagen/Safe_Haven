@@ -1,0 +1,76 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b302529a90cd5d4eb925e50af633cad, type: 3}
+  m_Name: Mossy Forest Path Edge
+  m_EditorClassIdentifier: SafeHaven::ScatterPalette
+  entries:
+  - prefab: {fileID: 7996790799419281867, guid: 47e918ea29b202f40932c8d13556ade7, type: 3}
+    weight: 1
+    scale: {x: 0.8, y: 1.25}
+    alignToSlope: 0.6
+    sink: 0.05
+    randomYaw: 1
+  - prefab: {fileID: 2862827438135405961, guid: 8b1a211e2606d99409ad613404e2949b, type: 3}
+    weight: 1
+    scale: {x: 0.8, y: 1.25}
+    alignToSlope: 0.6
+    sink: 0.05
+    randomYaw: 1
+  - prefab: {fileID: 6413797731762803993, guid: cc15417ff40356a4d9383d3f1367deac, type: 3}
+    weight: 0.8
+    scale: {x: 0.8, y: 1.25}
+    alignToSlope: 0.6
+    sink: 0.05
+    randomYaw: 1
+  - prefab: {fileID: 9032853888213877702, guid: 3c747f0c8907a81429be0efcf034575a, type: 3}
+    weight: 0.8
+    scale: {x: 0.8, y: 1.25}
+    alignToSlope: 0.6
+    sink: 0.05
+    randomYaw: 1
+  - prefab: {fileID: 2442989021758159486, guid: 4d769df415f73634593100fa03bd9c51, type: 3}
+    weight: 0.5
+    scale: {x: 0.8, y: 1.25}
+    alignToSlope: 0.6
+    sink: 0.05
+    randomYaw: 1
+  - prefab: {fileID: 6738502702539548217, guid: 16ad38b0dd7488f4bb2214d4b77cb4a7, type: 3}
+    weight: 0.5
+    scale: {x: 0.8, y: 1.25}
+    alignToSlope: 0.6
+    sink: 0.05
+    randomYaw: 1
+  - prefab: {fileID: 215287014038029075, guid: c67c3f6cb76afa7468e2085a2c922228, type: 3}
+    weight: 0.6
+    scale: {x: 0.8, y: 1.25}
+    alignToSlope: 0.6
+    sink: 0.05
+    randomYaw: 1
+  - prefab: {fileID: 5152436223146484308, guid: c49348663b9e79b4da76c3a762053fc7, type: 3}
+    weight: 0.6
+    scale: {x: 0.8, y: 1.25}
+    alignToSlope: 0.6
+    sink: 0.05
+    randomYaw: 1
+  - prefab: {fileID: 4475807248674821059, guid: bc7ffb8de5777f44582a2d6e7995bcc5, type: 3}
+    weight: 0.6
+    scale: {x: 0.8, y: 1.25}
+    alignToSlope: 0.6
+    sink: 0.05
+    randomYaw: 1
+  - prefab: {fileID: 8202738798707269545, guid: ae5c35a4d0f61344791c2df137245efd, type: 3}
+    weight: 0.4
+    scale: {x: 0.8, y: 1.25}
+    alignToSlope: 0.6
+    sink: 0.05
+    randomYaw: 1
+  spacing: 1.4

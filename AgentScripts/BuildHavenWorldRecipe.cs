@@ -31,7 +31,20 @@ public static class BuildHavenWorldRecipe
             Poi("Old Barrow", "Old Barrow", 300f, 450f, 1, 12f),
             Poi("Burnt Farmstead", "Burnt Farmstead", 210f, 340f, 1, 14f),
             Poi("Wolf Den", "Wolf Den", 330f, 460f, 1, 12f),
+            // Built by BuildHavenWorldProps from a CC0 fire pit and the woods' logs.
+            Poi("Woodland Camp", "Woodland Camp", 170f, 330f, 2, 9f, folder: "Assets/_Project/Prefabs/World/"),
         };
+        // Lone big trees in some glades, so each reads as its own place from above; the maple's colour stands out among the cedars.
+        recipe.gladeLandmarks = new List<GameObject>();
+        foreach (string tree in new[] { "Misty Woods/Trees/Cedar Giant A", "Misty Woods/Trees/Cedar Giant B", "Misty Woods/Trees/Dead Cedar", "Safe Haven/Trees/Sugar Maple B" })
+        {
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>($"Assets/_Project/Art/Vegetation/{tree}.prefab");
+            if (prefab != null)
+            {
+                recipe.gladeLandmarks.Add(prefab);
+            }
+        }
+
         recipe.creatures = new List<HavenCreatureBand>
         {
             Band("Edge of the woods", 200f, 300f, 5, new Vector2Int(1, 2), ("ForestBittenWolf", 2f), ("BlightBoar", 1f), ("Rootling", 1f)),
@@ -54,11 +67,12 @@ public static class BuildHavenWorldRecipe
         return $"Haven World Recipe: {recipe.pointsOfInterest.Count} kinds of place, {recipe.creatures.Count} creature bands, {recipe.resources.Count} resource bands.";
     }
 
-    private static HavenPointOfInterest Poi(string name, string prefab, float from, float to, int count, float clearing, bool high = false, bool island = false) =>
+    private static HavenPointOfInterest Poi(string name, string prefab, float from, float to, int count, float clearing, bool high = false, bool island = false,
+                                            string folder = SetPieces) =>
         new HavenPointOfInterest
         {
             name = name,
-            prefab = AssetDatabase.LoadAssetAtPath<GameObject>(SetPieces + prefab + ".prefab"),
+            prefab = AssetDatabase.LoadAssetAtPath<GameObject>(folder + prefab + ".prefab"),
             distance = new Vector2(from, to),
             count = count,
             clearing = clearing,

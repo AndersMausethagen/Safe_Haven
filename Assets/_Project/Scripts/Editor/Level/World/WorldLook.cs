@@ -120,6 +120,10 @@ public sealed class WorldLook
                             (details + "Moss Cushion", 0.6f), (rocks + "Mossy Rock Small", 0.4f), (under + "Rotten Branch", 0.4f));
         made += MakePalette(MossyForest, "Rubble", 2f, (rocks + "Grey Rock", 1f), (rocks + "Mossy Rock", 1f), (rocks + "Mossy Rock Small", 1f),
                             (under + "Scree", 0.6f), (under + "Small Stone", 0.8f), (rocks + "Grey Boulder", 0.5f));
+        // Along trodden paths: pebbles, stones, fallen twigs and patches of forest floor, nothing that blocks the way.
+        made += MakePalette(MossyForest, "Path Edge", 1.4f, (under + "Pebbles A", 1f), (under + "Pebbles B", 1f), (under + "Small Stone", 0.8f),
+                            (under + "Short Branches", 0.8f), (under + "Twig Pile", 0.5f), (under + "Rotten Branch", 0.5f), (under + "Mossy Stones", 0.6f),
+                            (under + "Forest Floor Patch A", 0.6f), (under + "Forest Floor Patch B", 0.6f), (rocks + "Mossy Rock Small", 0.4f));
         made += MakeCrags(MossyForest, (rocks + "Cliff Boulder A", 1f), (rocks + "Cliff Boulder B", 1f), (rocks + "Cliff Boulder C", 1f),
                           (rocks + "Cliff Slab", 1f), (rocks + "Rock Outcrop A", 1.2f), (rocks + "Rock Outcrop B", 1.2f));
         made += MakeRules(MossyForest, "Dark Forest", "Assets/_Project/Data/World/Paint Rules - Dark Forest.asset", new Dictionary<string, string>

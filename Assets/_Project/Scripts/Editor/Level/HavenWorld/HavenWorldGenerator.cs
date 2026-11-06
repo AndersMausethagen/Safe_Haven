@@ -28,6 +28,7 @@ public static class HavenWorldGenerator
     public const string ContentName = "Haven World";
     private const string WorldRootName = "World";
     private static readonly string[] Regenerated = { "Tarn", "Hand-placed Trees" };
+    private const float WardKeepAway = 120f;
 
     [MenuItem("Safe Haven/World/Generate Haven World")]
     private static void Menu()
@@ -67,9 +68,10 @@ public static class HavenWorldGenerator
         HavenWorldPlan plan = HavenWorldPlan.Make(recipe);
         report.Append($"plan {clock.ElapsedMilliseconds} ms ({plan.Paths.Count} paths, {plan.Rivers.Count} rivers, {plan.Ponds.Count} ponds, {plan.Islands.Count} islands, " +
                       $"{plan.Outcrops.Count} outcrops, {plan.Cliffs.Count} cliffs, {plan.Ravines.Count} ravines, {plan.Groves.Count} groves, {plan.Pois.Count} places, " +
-                      $"{plan.Zones.Count} spawn zones, {plan.Nodes.Count} resource points); ");
+                      $"{plan.Glades.Count} glades, {plan.Zones.Count} spawn zones, {plan.Nodes.Count} resource points); ");
 
         SetBuildAutomatically(world, false);
+        WorldLook.EnsureAll();
         var templates = new Templates(LiveFeatures());
         Material still = StillWater();
         var made = new GameObject("World (generated)").transform;
@@ -170,9 +172,12 @@ public static class HavenWorldGenerator
         data.SetTreeInstances(new TreeInstance[0], false);
         float half = recipe.size * 0.5f;
         terrain.transform.position = new Vector3(-half, -recipe.depthAndHeight.x, -half);
+        // A fresh start every run: kept cells (and paint the World Builder would take for hand painting, so features never paint over it)
+        // belong to the ground that is about to be replaced. Changing every resolution is what clears them.
         if (world.Stash != null)
         {
             world.Stash.Trees.Clear();
+            world.Stash.Prepare(1, 1, data.alphamapLayers, 1);
             world.Stash.Prepare(data.heightmapResolution, data.alphamapResolution, data.alphamapLayers, data.detailResolution);
             EditorUtility.SetDirty(world.Stash);
         }
@@ -216,6 +221,7 @@ public static class HavenWorldGenerator
         int[] havenIndex = haven.Rules.Select(rule => rule.layer != null ? Index(rule.layer.name) : -1).ToArray();
         int[] woodsIndex = woods.Rules.Select(rule => rule.layer != null ? Index(rule.layer.name) : -1).ToArray();
         int meadow = Index("Haven Meadow"), litter = Index("Cedar Litter"), scree = Index("Gravel"), mud = Index("Muddy Bank"), bank = Index("Haven Bank");
+        int moss = Index("Cedar Moss");
         int count = layers.Length, resolution = data.alphamapResolution, heightsCount = heights.GetLength(0);
         Vector3 origin = terrain.transform.position;
         float size = data.size.x, cell = size / (heightsCount - 1);
@@ -250,7 +256,13 @@ public static class HavenWorldGenerator
                 if (litter >= 0) b[litter] = 1f;
                 Apply(haven, havenIndex, a, slope, h, hollow, point);
                 Apply(woods, woodsIndex, b, slope, h, hollow, point);
-                float share = plan.WoodsWeight(point);
+                // The Dark Forest leaves steep ground to its tan litter, which from above reads as a path: moss the woods' banks instead.
+                if (moss >= 0 && slope > 22f)
+                {
+                    Blend(b, moss, Mathf.SmoothStep(0f, 0.85f, Mathf.InverseLerp(22f, 34f, slope)));
+                }
+                // Glades open onto the Haven's lighter meadow ground: from above they read as bright rooms in the dark woods.
+                float share = plan.WoodsWeight(point) * (1f - 0.8f * plan.GladeOpen(point));
                 float mountain = plan.MountainWeight(point) * 0.55f;
                 float lakeEdge = plan.Lake.Edge(point);
                 float pondEdge = float.MaxValue;
@@ -384,6 +396,8 @@ public static class HavenWorldGenerator
         var forest = new byte[resolution * resolution];
         var clearing = new byte[resolution * resolution];
         Vector3 origin = terrain.transform.position;
+        var verge = new byte[resolution * resolution];
+        float[] thin = Corridors(plan, resolution, new Vector2(origin.x, origin.z), path, verge);
         for (int y = 0; y < resolution; y++)
         {
             for (int x = 0; x < resolution; x++)
@@ -391,11 +405,13 @@ public static class HavenWorldGenerator
                 var point = new Vector2(origin.x + (x + 0.5f) / resolution * recipe.size, origin.z + (y + 0.5f) / resolution * recipe.size);
                 // The raids' cedars only where the woods begin; the Haven's ring has its maple groves.
                 float woods = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.15f, 0.6f, plan.WoodsWeight(point)));
+                int cell = y * resolution + x;
+                // The woods thin out beside the paths, so a walk along one sees into the trees and has room to fight.
                 float density = Mathf.Lerp(recipe.woodsDensity.x, recipe.woodsDensity.y, Mathf.InverseLerp(recipe.haven, plan.Half, point.magnitude)) *
-                                woods * (1f - plan.MountainWeight(point) * 0.55f);
+                                woods * (1f - plan.MountainWeight(point) * 0.55f) * (1f - 0.92f * thin[cell]);
                 bool open = point.magnitude < recipe.buildable + 20f || plan.Lake.Edge(point) < 4f || plan.Pois.Exists(poi => Vector2.Distance(poi.At, point) < poi.Rule.clearing);
-                forest[y * resolution + x] = (byte)Mathf.RoundToInt(Mathf.Clamp01(density) * 255f);
-                clearing[y * resolution + x] = open ? (byte)255 : (byte)0;
+                forest[cell] = (byte)Mathf.RoundToInt(Mathf.Clamp01(density) * 255f);
+                clearing[cell] = open ? (byte)255 : (byte)Mathf.Max(verge[cell], Mathf.RoundToInt(plan.GladeOpen(point) * 255f));
             }
         }
 
@@ -414,6 +430,65 @@ public static class HavenWorldGenerator
         Object.DestroyImmediate(scaled);
         terrain.Flush();
         return trees + rocks;
+    }
+
+    // How much the woods thin beside each path (1 at the tread's edge, 0 past its clearing), the tread itself marked as path (no trees,
+    // no undergrowth) and a verge beside it marked as open (no trees, but undergrowth): a cedar's crown spreads 4-6 m, so trunks any
+    // closer would close over the path seen from above. Stamped segment by segment, so only the cells near a path are visited.
+    private static float[] Corridors(HavenWorldPlan plan, int resolution, Vector2 origin, byte[] tread, byte[] verge)
+    {
+        HavenWorldRecipe recipe = plan.Recipe;
+        float cellSize = recipe.size / resolution;
+        var thin = new float[resolution * resolution];
+        for (int p = 0; p < plan.Paths.Count; p++)
+        {
+            List<Vector2> line = plan.Paths[p];
+            HavenWorldPlan.PathKind kind = plan.PathKinds[p];
+            float half = PathWidth(recipe, kind) * 0.5f;
+            bool trail = kind == HavenWorldPlan.PathKind.Trail || kind == HavenWorldPlan.PathKind.Spur;
+            float clearingWidth = trail ? recipe.pathClearing.y : recipe.pathClearing.x;
+            float reach = half + clearingWidth + 1f;
+            for (int i = 0; i + 1 < line.Count; i++)
+            {
+                Vector2 a = line[i], b = line[i + 1];
+                int x0 = Mathf.Max(0, Mathf.FloorToInt((Mathf.Min(a.x, b.x) - reach - origin.x) / cellSize));
+                int x1 = Mathf.Min(resolution - 1, Mathf.CeilToInt((Mathf.Max(a.x, b.x) + reach - origin.x) / cellSize));
+                int y0 = Mathf.Max(0, Mathf.FloorToInt((Mathf.Min(a.y, b.y) - reach - origin.y) / cellSize));
+                int y1 = Mathf.Min(resolution - 1, Mathf.CeilToInt((Mathf.Max(a.y, b.y) + reach - origin.y) / cellSize));
+                Vector2 along = b - a;
+                float squared = Mathf.Max(0.0001f, along.sqrMagnitude);
+                for (int y = y0; y <= y1; y++)
+                {
+                    for (int x = x0; x <= x1; x++)
+                    {
+                        var point = new Vector2(origin.x + (x + 0.5f) * cellSize, origin.y + (y + 0.5f) * cellSize);
+                        float t = Mathf.Clamp01(Vector2.Dot(point - a, along) / squared);
+                        float edge = Vector2.Distance(a + along * t, point) - half;
+                        if (edge > clearingWidth)
+                        {
+                            continue;
+                        }
+
+                        int cell = y * resolution + x;
+                        // Ragged, so the corridor's sides are not two ruled lines of trunks.
+                        float ragged = clearingWidth * (0.75f + 0.5f * Mathf.PerlinNoise(point.x / 9f + 3.1f, point.y / 9f - 7.7f));
+                        thin[cell] = Mathf.Max(thin[cell], 1f - Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(edge / ragged)));
+                        if (edge < 1.2f)
+                        {
+                            tread[cell] = 255;
+                        }
+
+                        // Clearing strength 0.45: past the scatter's "no trees" (0.3), short of its "no undergrowth" (0.6).
+                        if (edge < (trail ? 3f : 4f) * (0.8f + 0.4f * Mathf.PerlinNoise(point.x / 6f - 2.3f, point.y / 6f + 5.9f)))
+                        {
+                            verge[cell] = (byte)Mathf.Max(verge[cell], 115);
+                        }
+                    }
+                }
+            }
+        }
+
+        return thin;
     }
 
     // ----- World Builder features -----
@@ -472,12 +547,49 @@ public static class HavenWorldGenerator
             Line(river, plan, plan.Rivers[i], false, seed + i);
             Set(river, "width", 4.5f + i);
             Set(river, "depth", 1.3f);
+            // The water follows the plan's downhill levels (the valley Height carved for it), not a running minimum of the shaped
+            // ground, which a path's cutting or a bank could drag down metres for the rest of the river.
+            Spline spline = river.Spline;
+            for (int k = 0; k < spline.Count; k++)
+            {
+                BezierKnot knot = spline[k];
+                knot.Position = new Unity.Mathematics.float3(knot.Position.x, plan.RiverLevel(i, k) - 0.35f, knot.Position.z);
+                spline.SetKnot(k, knot);
+            }
+
+            SetEnum(river, "surface", (int)RiverFeature.SurfaceMode.SplineHeight);
+            // Fords where paths cross: broad and shallow, so a path walks through the water rather than down a bank.
+            var knots = new SerializedObject(river);
+            SerializedProperty depths = knots.FindProperty("depthAtKnots.values"), widths = knots.FindProperty("widthAtKnots.values");
+            depths.arraySize = widths.arraySize = plan.Rivers[i].Count;
+            for (int k = 0; k < plan.Rivers[i].Count; k++)
+            {
+                bool ford = plan.Fords.Contains((i, k));
+                depths.GetArrayElementAtIndex(k).floatValue = ford ? 0.18f : 1f;
+                widths.GetArrayElementAtIndex(k).floatValue = ford ? 1.5f : 1f;
+            }
+
+            knots.ApplyModifiedPropertiesWithoutUndo();
         }
 
+        ScatterPalette verge = woods.Palette("Path Edge");
         for (int i = 0; i < plan.Paths.Count; i++)
         {
-            PathFeature path = Make(parent, $"Path {i + 1}", templates.Path, feature => feature.Configure(haven.PathGround, null));
+            HavenWorldPlan.PathKind kind = plan.PathKinds[i];
+            PathFeature path = Make(parent, $"{kind} {i + 1}", templates.Path, feature => feature.Configure(haven.PathGround, null));
             Line(path, plan, plan.Paths[i], false, seed + 100 + i);
+            // Worn, not ruled: the tread swells and pinches, the ground shows through, the edges lip and fray, stones and twigs lie by it.
+            bool trail = kind == HavenWorldPlan.PathKind.Trail || kind == HavenWorldPlan.PathKind.Loop;
+            // Graded over 20-30 m: up and over the woods' ridges in a cutting, not straight up their 40-degree sides.
+            path.ConfigureLook(PathWidth(plan.Recipe, kind), trail ? 0.7f : 0.5f, trail ? 0.6f : 0.4f, trail ? 0.06f : 0.09f, trail ? 0.9f : 0.7f,
+                               verge != null ? (trail ? 0.8f : 1.2f) : 0f, trail ? 20f : 30f);
+            Set(path, "sink", trail ? 0.08f : 0.12f);
+            if (verge != null)
+            {
+                var data = new SerializedObject(path);
+                data.FindProperty("edgeScatter").objectReferenceValue = verge;
+                data.ApplyModifiedPropertiesWithoutUndo();
+            }
         }
 
         for (int i = 0; i < plan.Outcrops.Count; i++)
@@ -518,6 +630,16 @@ public static class HavenWorldGenerator
             Line(grove, plan, plan.Groves[i], true, seed + 500 + i);
         }
     }
+
+    /// <summary>The tread's width of a kind of path, from the recipe.</summary>
+    public static float PathWidth(HavenWorldRecipe recipe, HavenWorldPlan.PathKind kind) => kind switch
+    {
+        HavenWorldPlan.PathKind.Road => recipe.roadWidth,
+        HavenWorldPlan.PathKind.Ring => recipe.ringWidth,
+        HavenWorldPlan.PathKind.Spur => recipe.spurWidth,
+        HavenWorldPlan.PathKind.Loop => recipe.loopWidth,
+        _ => recipe.trailWidth,
+    };
 
     // A new feature, copied from the template of its kind (or configured from the look when there is none), with a clean spline.
     private static T Make<T>(Transform parent, string name, T template, System.Action<T> configure) where T : WorldFeature
@@ -641,7 +763,7 @@ public static class HavenWorldGenerator
         Terrain terrain = Terrain.activeTerrain;
         HavenWorldPlan plan = HavenWorldPlan.Make(recipe);
         Transform content = ContentRoot();
-        foreach (string name in new[] { "Points of Interest", "Spawn Zones", "Resources" })
+        foreach (string name in new[] { "Points of Interest", "Spawn Zones", "Resources", "Mountain Rocks", "Glades" })
         {
             Transform old = content.Find(name);
             if (old != null)
@@ -669,6 +791,18 @@ public static class HavenWorldGenerator
                 Vector3 position = part.position;
                 position.y = Ground(new Vector2(position.x, position.z)).y + part.localPosition.y;
                 part.position = position;
+            }
+        }
+
+        if (recipe.landing != null)
+        {
+            foreach ((Vector2 at, float bearing) in plan.Landings)
+            {
+                var landing = (GameObject)PrefabUtility.InstantiatePrefab(recipe.landing, places);
+                landing.name = "Boat Landing";
+                Vector3 shore = Ground(at);
+                // The deck at the bank's height, running out over the water.
+                landing.transform.SetPositionAndRotation(new Vector3(shore.x, Mathf.Max(shore.y, plan.Lake.Level) - 0.3f, shore.z), Quaternion.Euler(0f, bearing, 0f));
             }
         }
 
@@ -705,6 +839,8 @@ public static class HavenWorldGenerator
             data.FindProperty("respawn").boolValue = zone.Band.respawnSeconds > 0f;
             data.FindProperty("respawnSeconds").floatValue = zone.Band.respawnSeconds;
             data.ApplyModifiedPropertiesWithoutUndo();
+            // Home stays safe: refilled only at night, and never within reach of the ward as it grows.
+            spawner.ConfigureHome(true, WardKeepAway);
         }
 
         var resources = new GameObject("Resources").transform;
@@ -722,6 +858,82 @@ public static class HavenWorldGenerator
             data.ApplyModifiedPropertiesWithoutUndo();
         }
 
+        var gladeRoot = new GameObject("Glades").transform;
+        gladeRoot.SetParent(content, false);
+        int marked = 0;
+        foreach (HavenWorldPlan.Glade glade in plan.Glades)
+        {
+            GameObject mark = glade.Landmark && glade.LandmarkKind < recipe.gladeLandmarks.Count ? recipe.gladeLandmarks[glade.LandmarkKind] : null;
+            if (mark == null)
+            {
+                continue;
+            }
+
+            var made = (GameObject)PrefabUtility.InstantiatePrefab(mark, gladeRoot);
+            made.name = $"{glade.Kind} Glade Landmark";
+            Vector2 at = glade.Centre + HavenWorldPlan.Dir(glade.Radius * 37f) * glade.Radius * 0.15f;
+            made.transform.SetPositionAndRotation(Ground(at), Quaternion.Euler(0f, glade.Radius * 53f % 360f, 0f));
+            foreach (Transform part in made.transform)
+            {
+                Vector3 position = part.position;
+                position.y = Ground(new Vector2(position.x, position.z)).y + part.localPosition.y;
+                part.position = position;
+            }
+
+            marked++;
+        }
+
+        var strewn = new GameObject("Mountain Rocks").transform;
+        strewn.SetParent(content, false);
+        var facings = new Dictionary<GameObject, Vector2>();
+        var footprints = new List<Bounds>();
+        foreach (HavenWorldPlan.Rock rock in plan.Rocks)
+        {
+            GameObject prefab = recipe.mountainRocks[rock.Kind];
+            if (prefab == null)
+            {
+                continue;
+            }
+
+            if (!facings.TryGetValue(prefab, out Vector2 facing))
+            {
+                facings[prefab] = facing = Facing(prefab);
+            }
+
+            var made = (GameObject)PrefabUtility.InstantiatePrefab(prefab, strewn);
+            Vector3 at = Ground(rock.At);
+            Vector3 normal = terrain.terrainData.GetInterpolatedNormal((rock.At.x - terrain.transform.position.x) / recipe.size,
+                                                                       (rock.At.y - terrain.transform.position.z) / recipe.size);
+            var downhill = new Vector2(normal.x, normal.z);
+            // A face turns its open side down the slope (its back into the hill); a lump just turns at random.
+            float yaw = downhill.sqrMagnitude > 0.01f && facing.sqrMagnitude > 0.09f
+                ? HavenWorldPlan.BearingOf(downhill) - HavenWorldPlan.BearingOf(facing) + rock.Turn
+                : rock.Turn * 5f;
+            Quaternion lean = Quaternion.Slerp(Quaternion.identity, Quaternion.FromToRotation(Vector3.up, normal), 0.5f);
+            float height = Height(prefab) * rock.Scale;
+            made.transform.SetPositionAndRotation(at - normal * (height * 0.2f), lean * Quaternion.Euler(0f, yaw, 0f));
+            made.transform.localScale = Vector3.one * rock.Scale;
+            Renderer drawn = made.GetComponentInChildren<Renderer>();
+            if (drawn != null)
+            {
+                footprints.Add(drawn.bounds);
+            }
+        }
+
+        int cleared = ClearTreesUnder(terrain, footprints);
+
+        // Felled trees in the woods are kept in the save (TerrainTreeMemory), on the terrain's own saveable entity.
+        if (!terrain.TryGetComponent(out SaveableEntity entity))
+        {
+            entity = terrain.gameObject.AddComponent<SaveableEntity>();
+            entity.AssignNewId();
+        }
+
+        if (!terrain.TryGetComponent(out TerrainTreeMemory _))
+        {
+            terrain.gameObject.AddComponent<TerrainTreeMemory>();
+        }
+
         long placed = clock.ElapsedMilliseconds;
         if (terrain.TryGetComponent(out TerrainMoss moss))
         {
@@ -732,7 +944,78 @@ public static class HavenWorldGenerator
         GrassSetup.BakeGroundColour(terrain);
         string navmesh = WorldBuilder.RebakeNavMesh();
         EditorSceneManager.MarkSceneDirty(terrain.gameObject.scene);
-        return $"Placed {plan.Pois.Count} places, {plan.Zones.Count} spawn zones, {plan.Nodes.Count} resource points in {placed} ms; moss, displacement, " +
+        return $"Placed {plan.Pois.Count} places, {plan.Zones.Count} spawn zones, {plan.Nodes.Count} resource points, {marked} glade landmarks, {plan.Rocks.Count} mountain rocks ({cleared} trees cleared from under them) in {placed} ms; moss, displacement, " +
                $"ground colour and navmesh ({navmesh}) in {clock.ElapsedMilliseconds - placed} ms.";
+    }
+
+    // The woods are painted before the rocks are placed: no terrain tree grows up through one.
+    private static int ClearTreesUnder(Terrain terrain, List<Bounds> footprints)
+    {
+        if (footprints.Count == 0)
+        {
+            return 0;
+        }
+
+        TerrainData data = terrain.terrainData;
+        Vector3 origin = terrain.transform.position;
+        Vector3 size = data.size;
+        TreeInstance[] trees = data.treeInstances;
+        var kept = new List<TreeInstance>(trees.Length);
+        foreach (TreeInstance tree in trees)
+        {
+            var at = new Vector3(origin.x + tree.position.x * size.x, 0f, origin.z + tree.position.z * size.z);
+            bool under = false;
+            foreach (Bounds footprint in footprints)
+            {
+                if (at.x > footprint.min.x - 0.5f && at.x < footprint.max.x + 0.5f && at.z > footprint.min.z - 0.5f && at.z < footprint.max.z + 0.5f)
+                {
+                    under = true;
+                    break;
+                }
+            }
+
+            if (!under)
+            {
+                kept.Add(tree);
+            }
+        }
+
+        if (kept.Count != trees.Length)
+        {
+            data.SetTreeInstances(kept.ToArray(), true);
+        }
+
+        return trees.Length - kept.Count;
+    }
+
+    // Which way a model's surface mostly faces on the ground (its area-weighted normal, x and z): long for a rock face, short for a lump.
+    private static Vector2 Facing(GameObject prefab)
+    {
+        MeshFilter filter = prefab.GetComponentsInChildren<MeshFilter>().FirstOrDefault(f => f.sharedMesh != null);
+        if (filter == null || !filter.sharedMesh.isReadable)
+        {
+            return Vector2.zero;
+        }
+
+        Mesh mesh = filter.sharedMesh;
+        Vector3[] vertices = mesh.vertices;
+        int[] triangles = mesh.triangles;
+        Vector3 sum = Vector3.zero;
+        float area = 0f;
+        for (int i = 0; i < triangles.Length; i += 3)
+        {
+            Vector3 cross = Vector3.Cross(vertices[triangles[i + 1]] - vertices[triangles[i]], vertices[triangles[i + 2]] - vertices[triangles[i]]);
+            sum += cross;
+            area += cross.magnitude;
+        }
+
+        Vector3 local = filter.transform.rotation * (sum / Mathf.Max(area, 0.0001f));
+        return new Vector2(local.x, local.z);
+    }
+
+    private static float Height(GameObject prefab)
+    {
+        MeshFilter filter = prefab.GetComponentsInChildren<MeshFilter>().FirstOrDefault(f => f.sharedMesh != null);
+        return filter != null ? filter.sharedMesh.bounds.size.y : 1f;
     }
 }
