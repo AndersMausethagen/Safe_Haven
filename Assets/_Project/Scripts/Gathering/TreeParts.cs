@@ -73,7 +73,9 @@ public sealed class TreeParts
         bool anyPart = false;
         foreach (Renderer renderer in NearestRenderers(source))
         {
-            if (!(renderer is MeshRenderer) || !renderer.TryGetComponent(out MeshFilter filter) || filter.sharedMesh == null)
+            // A shadows-only proxy (TreeShadowProxies) is not part of what is seen.
+            if (!(renderer is MeshRenderer) || renderer.shadowCastingMode == UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly
+                || !renderer.TryGetComponent(out MeshFilter filter) || filter.sharedMesh == null)
             {
                 continue;
             }

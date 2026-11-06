@@ -153,6 +153,8 @@ public static class VegetationPackConverter
 
             ClearExtras(root, parts);
             if (root.TryGetComponent(out LODGroup detail)) KeepDetailLonger(detail);
+            // Shadows from a lighter level: the top-down camera keeps most trees at their finest two (TreeShadowProxies).
+            TreeShadowProxies.Add(root);
             if (solid)
             {
                 var capsule = root.AddComponent<CapsuleCollider>();

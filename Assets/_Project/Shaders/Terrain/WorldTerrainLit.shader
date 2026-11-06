@@ -44,6 +44,8 @@ Shader "Safe Haven/Terrain (World)"
         _DisplacementStrength("Displacement Height Range (metres)", Range(0, 1)) = 0
         _DisplacementNear("Full Detail Distance (metres)", Float) = 8
         _DisplacementFar("Detail Fade Distance (metres)", Float) = 35
+        _DetailFocusNear("Full Detail Round the Player (metres)", Float) = 15
+        _DetailFocusFar("Detail Fade Round the Player (metres, 0 off)", Float) = 25
         _TessellationFactor("Maximum Tessellation", Range(1, 64)) = 8
         _TessellationEdgeLength("Target Edge Length (metres)", Float) = 0.08
         _TessellationPixels("Target Edge Length (pixels, 0 disables)", Range(0, 32)) = 4
@@ -168,6 +170,7 @@ Shader "Safe Haven/Terrain (World)"
             #pragma instancing_options assumeuniformscaling nomatrices nolightprobe nolightmap
 
             #pragma shader_feature_local_fragment _TERRAIN_BLEND_HEIGHT
+            #pragma shader_feature_local_fragment _ _WORLD_ALL_LAYERS
             #pragma shader_feature_local _NORMALMAP
             #pragma shader_feature_local_fragment _MASKMAP
             // Sample normal in pixel shader when doing instancing

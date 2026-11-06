@@ -194,6 +194,7 @@ public sealed class PlayerCameraController : MonoBehaviour
 
     private void OnDisable()
     {
+        TerrainDetailFocus.Clear();
         if (Current == this)
         {
             Current = null;
@@ -229,6 +230,8 @@ public sealed class PlayerCameraController : MonoBehaviour
         {
             return;
         }
+
+        TerrainDetailFocus.Set(target.position);
 
         UpdateStyle();
         ReadInput();

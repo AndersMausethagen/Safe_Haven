@@ -208,8 +208,8 @@ public sealed class TerrainSurfaceWindow : EditorWindow
         material.SetFloat("_DisplacementNear", near);
         material.SetFloat("_DisplacementFar", far);
         // Triangles smaller than this many pixels show no more detail, only cost: about 9 ms of GPU at 1080p was spent
-        // on 1-pixel triangles round the Haven with this at 0 (see LevelDesign.md).
-        material.SetFloat("_TessellationPixels", 4);
+        // on 1-pixel triangles round the Haven with this at 0 (see LevelDesign.md); 6 rather than 4 since the 1 km Haven.
+        material.SetFloat("_TessellationPixels", 6);
         EditorUtility.SetDirty(material);
         terrain.GetComponent<TerrainSurface>().SetQuality(TerrainSurface.DetailQuality.Ultra);
         SceneView.RepaintAll();

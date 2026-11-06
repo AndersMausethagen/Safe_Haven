@@ -9,6 +9,8 @@ Shader "Hidden/Safe Haven/Terrain/Base"
         _DisplacementStrength("Displacement Height Range (metres)", Range(0, 1)) = 0
         _DisplacementNear("Full Detail Distance (metres)", Float) = 8
         _DisplacementFar("Detail Fade Distance (metres)", Float) = 35
+        _DetailFocusNear("Full Detail Round the Player (metres)", Float) = 15
+        _DetailFocusFar("Detail Fade Round the Player (metres, 0 off)", Float) = 25
         _TessellationFactor("Maximum Tessellation", Range(1, 64)) = 8
         _TessellationEdgeLength("Target Edge Length (metres)", Float) = 0.08
         _TessellationPixels("Target Edge Length (pixels, 0 disables)", Range(0, 32)) = 4

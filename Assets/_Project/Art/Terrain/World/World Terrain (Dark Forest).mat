@@ -147,6 +147,8 @@ Material:
     - _CliffSlopeStart: 36
     - _CliffStrength: 1
     - _CliffTiling: 7
+    - _DetailFocusFar: 25
+    - _DetailFocusNear: 15
     - _DisplacementDataVersion: 0
     - _DisplacementFar: 35
     - _DisplacementLayerCount: 0
@@ -166,6 +168,8 @@ Material:
     - _Metallic3: 0
     - _NormalMapStrength: 1
     - _NumLayersCount: 1
+    - _RockAlwaysFrom: 50
+    - _RockAntiTiling: 1
     - _RockFromLayers: 0
     - _Smoothness0: 0.5
     - _Smoothness1: 0.5
@@ -181,7 +185,7 @@ Material:
     - _SurfaceSmoothness: 1
     - _TessellationEdgeLength: 0.08
     - _TessellationFactor: 8
-    - _TessellationPixels: 4
+    - _TessellationPixels: 6
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _CliffTint: {r: 0.82, g: 0.86, b: 0.84, a: 1}

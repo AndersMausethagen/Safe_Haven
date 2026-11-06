@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -35,9 +36,11 @@ public static class TerrainDisplacementEditor
             throw new InvalidOperationException("The Safe Haven terrain shader must compile before setup.");
 
         TerrainData data = terrain.terrainData;
-        TerrainLayer[] layers = data.terrainLayers;
-        if (layers.Length == 0 || layers.Length > 16)
-            throw new NotSupportedException("Displacement supports between 1 and 16 painted terrain layers.");
+        // The shader displaces the first sixteen layers (four control maps); any past them are painted but stay flat. Refusing a
+        // terrain with more left its displacement stale: the Haven's still had the tiling of its old 400 m terrain at 1 km.
+        TerrainLayer[] layers = data.terrainLayers.Take(16).ToArray();
+        if (layers.Length == 0)
+            throw new NotSupportedException("Displacement needs at least one painted terrain layer.");
         foreach (TerrainLayer layer in layers)
             if (layer == null || layer.tileSize.x <= 0 || layer.tileSize.y <= 0)
                 throw new InvalidOperationException("Every terrain layer must exist and have positive tile dimensions.");
@@ -201,7 +204,8 @@ public static class TerrainDisplacementEditor
     private const string StandardProfilePath = "Assets/_Project/Art/Terrain/SafeHaven/Haven World Terrain Surface Profile.asset";
     private const string StandardMaterialPath = "Assets/_Project/Art/Terrain/SafeHaven/Haven World Terrain Displacement.mat";
     private static readonly string[] DisplacementShape =
-        { "_DisplacementStrength", "_DisplacementNear", "_DisplacementFar", "_TessellationFactor", "_TessellationEdgeLength", "_TessellationPixels" };
+        { "_DisplacementStrength", "_DisplacementNear", "_DisplacementFar", "_TessellationFactor", "_TessellationEdgeLength", "_TessellationPixels",
+          "_DetailFocusNear", "_DetailFocusFar" };
 
     private static TerrainSurfaceProfile StandardProfile => AssetDatabase.LoadAssetAtPath<TerrainSurfaceProfile>(StandardProfilePath);
 

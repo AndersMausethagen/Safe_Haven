@@ -17,13 +17,27 @@ float4 _TerrainDetailQuality, _DisplacementTerrainSize;
 float _DisplacementDataVersion, _DisplacementMip, _HeightBlendSharpness;
 float _DisplacementNormalStrength, _NormalMapStrength, _SurfaceOcclusion, _SurfaceSmoothness;
 float _TessellationPixels, _SurfaceDebug;
+// Set by TerrainSurface when the first pass draws every layer (WorldTerrainAllLayers.hlsl): the add passes then draw nothing.
+float _WorldAllLayers;
+
+// Where the player is (xyz) while a game camera follows one (w = 1; TerrainDetailFocus). The camera hangs 20-40 m above a
+// top-down view, so a fade by distance from it tessellated nearly the whole screen; round the player is where relief is seen.
+float4 _TerrainDetailFocus;
+float _DetailFocusNear, _DetailFocusFar;
 
 float WorldDisplacementFade(float3 positionOS)
 {
-    float distanceToCamera = distance(TransformObjectToWorld(positionOS), _WorldSpaceCameraPos);
+    float3 world = TransformObjectToWorld(positionOS);
+    float distanceToCamera = distance(world, _WorldSpaceCameraPos);
     float range = max(_TerrainDetailQuality.z, 0.001);
-    return (1.0 - smoothstep(_DisplacementNear * range, max(_DisplacementFar * range, _DisplacementNear * range + 0.01), distanceToCamera))
-        * _TerrainDetailQuality.x;
+    float fade = 1.0 - smoothstep(_DisplacementNear * range, max(_DisplacementFar * range, _DisplacementNear * range + 0.01), distanceToCamera);
+    if (_TerrainDetailFocus.w > 0.5 && _DetailFocusFar > 0)
+    {
+        float toFocus = distance(world.xz, _TerrainDetailFocus.xz);
+        fade = min(fade, 1.0 - smoothstep(_DetailFocusNear * range, max(_DetailFocusFar * range, _DetailFocusNear * range + 0.01), toFocus));
+    }
+
+    return fade * _TerrainDetailQuality.x;
 }
 
 float WorldDisplacementHeightLOD(float2 uv, float mip, out float footprintResponse, out float minimumHeight)
@@ -45,9 +59,9 @@ float WorldDisplacementHeightLOD(float2 uv, float mip, out float footprintRespon
         if (weight <= 0.0001) continue;
         float4 tiling = LOAD_TEXTURE2D(_DisplacementLayers, int2(layer, 0));
         float4 remap = LOAD_TEXTURE2D(_DisplacementLayers, int2(layer, 1));
-        float sampleHeight = SAMPLE_TEXTURE2D_ARRAY_LOD(_DisplacementMasks, sampler_DisplacementMasks, uv * tiling.xy + tiling.zw, layer, mip).r;
         float midpoint = _DisplacementDataVersion > 0 ? remap.w : 0.5;
         float amplitude = _DisplacementDataVersion > 0 ? remap.z : 1;
+        float sampleHeight = SAMPLE_TEXTURE2D_ARRAY_LOD(_DisplacementMasks, sampler_DisplacementMasks, uv * tiling.xy + tiling.zw, layer, mip).r;
         float h = sampleHeight * remap.x + remap.y;
         // Height-aware weighting is shared by ALL geometry passes, never normalized separately per add pass.
         weight *= exp2(clamp((h - 0.5) * _HeightBlendSharpness, -8, 8));
@@ -331,10 +345,62 @@ float WorldEdgeFactor(float3 a, float3 b)
     return lerp(1.0, factor, fade * displaces);
 }
 
+// Work nobody sees is not done. A triangle wholly outside the view (the camera's, or a shadow cascade's in the shadow pass)
+// is dropped before it is tessellated: the terrain's patches are culled whole on the CPU, so their off-screen triangles still
+// reached the hull stage, each split up to 64 times. And an add pass draws only its own four layers, added on top of the
+// others: where none of them is painted it would add nothing, so that triangle is dropped too. The 18-layer Haven draws five
+// passes; in the woods, culling neither left the GPU tessellating five whole terrains a frame.
+float2 WorldSplatUV(float2 uv)
+{
+    return (uv * (_Control_TexelSize.zw - 1.0) + 0.5) * _Control_TexelSize.xy;
+}
+
+bool WorldPatchCulled(InputPatch<WorldControlPoint, 3> patch)
+{
+    float3 a = TransformObjectToWorld(patch[0].positionOS.xyz);
+    float3 b = TransformObjectToWorld(patch[1].positionOS.xyz);
+    float3 c = TransformObjectToWorld(patch[2].positionOS.xyz);
+    // Displacement and rock relief can lift a point off the flat triangle; keep anything that close to the edge.
+    float margin = 2.0 + max(_CliffDisplacement, 0.0);
+    float4x4 vp = UNITY_MATRIX_VP;
+    float4 planes[4] = { vp[3] + vp[0], vp[3] - vp[0], vp[3] + vp[1], vp[3] - vp[1] };
+    [unroll]
+    for (int i = 0; i < 4; i++)
+    {
+        float scale = rsqrt(max(dot(planes[i].xyz, planes[i].xyz), 1e-12));
+        float da = (dot(planes[i].xyz, a) + planes[i].w) * scale;
+        float db = (dot(planes[i].xyz, b) + planes[i].w) * scale;
+        float dc = (dot(planes[i].xyz, c) + planes[i].w) * scale;
+        if (max(da, max(db, dc)) < -margin) return true;
+    }
+
+#if defined(TERRAIN_SPLAT_ADDPASS)
+    if (_WorldAllLayers > 0.5) return true;
+    float2 ua = patch[0].texcoord, ub = patch[1].texcoord, uc = patch[2].texcoord;
+    float2 low = min(ua, min(ub, uc)), high = max(ua, max(ub, uc));
+    // A mip whose texels span the whole triangle (averaged, so any paint inside it shows), plus the corners themselves.
+    float texels = max(high.x - low.x, high.y - low.y) * _Control_TexelSize.z;
+    float mip = ceil(log2(max(texels, 1.0))) + 1.0;
+    half4 weights = SAMPLE_TEXTURE2D_LOD(_Control, sampler_Control, WorldSplatUV((ua + ub + uc) / 3.0), mip);
+    weights = max(weights, SAMPLE_TEXTURE2D_LOD(_Control, sampler_Control, WorldSplatUV(ua), 0));
+    weights = max(weights, SAMPLE_TEXTURE2D_LOD(_Control, sampler_Control, WorldSplatUV(ub), 0));
+    weights = max(weights, SAMPLE_TEXTURE2D_LOD(_Control, sampler_Control, WorldSplatUV(uc), 0));
+    if (dot(weights, 1.0) <= 0.0) return true;
+#endif
+    return false;
+}
+
 WorldTessFactors WorldPatchConstants(InputPatch<WorldControlPoint, 3> patch)
 {
     UNITY_SETUP_INSTANCE_ID(patch[0]);
     WorldTessFactors o;
+    if (WorldPatchCulled(patch))
+    {
+        o.edge[0] = o.edge[1] = o.edge[2] = 0;
+        o.inside = 0;
+        return o;
+    }
+
     o.edge[0] = WorldEdgeFactor(patch[1].positionOS.xyz, patch[2].positionOS.xyz);
     o.edge[1] = WorldEdgeFactor(patch[2].positionOS.xyz, patch[0].positionOS.xyz);
     o.edge[2] = WorldEdgeFactor(patch[0].positionOS.xyz, patch[1].positionOS.xyz);

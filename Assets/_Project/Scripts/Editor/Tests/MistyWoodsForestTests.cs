@@ -153,7 +153,18 @@ public sealed class MistyWoodsForestTests
                 Assert.AreEqual(mesh.subMeshCount, renderer.sharedMaterials.Length, $"{prefab.name}/{renderer.name}");
                 Assert.IsTrue(renderer.sharedMaterials.All(m => m != null), $"{prefab.name}/{renderer.name} has an empty material");
                 Assert.LessOrEqual(mesh.subMeshCount, 8, $"{prefab.name}/{renderer.name}: one draw per material");
-                Assert.AreNotEqual(ShadowCastingMode.ShadowsOnly, renderer.shadowCastingMode, $"{prefab.name}/{renderer.name}");
+                // Shadows-only renderers only as TreeShadowProxies' (a lighter level casting for the finest two, which the
+                // terrain draws to the shadow map alone), never a pack's leftover that would stand in for what is seen.
+                if (renderer.shadowCastingMode == ShadowCastingMode.ShadowsOnly)
+                {
+                    Assert.IsTrue(renderer.name.StartsWith("Shadow Proxy"), $"{prefab.name}/{renderer.name}");
+                    LODGroup group = prefab.GetComponent<LODGroup>();
+                    Assert.IsNotNull(group, $"{prefab.name}: a shadow proxy belongs to a LOD group");
+                    foreach (LOD lod in group.GetLODs().Where(l => l.renderers.Contains(renderer)))
+                    {
+                        Assert.IsTrue(lod.renderers.Any(r => r != null && r.shadowCastingMode == ShadowCastingMode.Off), $"{prefab.name}: its level is also drawn");
+                    }
+                }
             }
         }
     }

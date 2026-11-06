@@ -672,6 +672,10 @@ void ComputeMasks(out half4 masks[4], half4 hasMask, float4 uvSplat01, float4 uv
     masks[3] += _MaskMapRemapOffset3.rgba;
 }
 
+#if defined(_WORLD_ALL_LAYERS) && !defined(TERRAIN_SPLAT_BASEPASS) && !defined(TERRAIN_SPLAT_ADDPASS)
+#include "WorldTerrainAllLayers.hlsl"
+#endif
+
 // Used in Standard Terrain shader
 #ifdef TERRAIN_GBUFFER
 GBufferFragOutput SplatmapFragment(Varyings IN)
@@ -699,13 +703,21 @@ void SplatmapFragment(
     half occlusion = 1;
 #else
 
+    half3 albedo;
+    half smoothness, metallic, occlusion, alpha;
+    half4 splatControl = 0;
+#if defined(_WORLD_ALL_LAYERS) && !defined(TERRAIN_SPLAT_ADDPASS)
+    // Every painted layer in this one pass (WorldTerrainAllLayers.hlsl): the add passes are culled.
+    WorldAllLayersSurface(IN.uvMainAndLM.xy, albedo, smoothness, metallic, occlusion, normalTS, alpha);
+#else
+    {
     half4 hasMask = half4(_LayerHasMask0, _LayerHasMask1, _LayerHasMask2, _LayerHasMask3);
     float2 splatUV = (IN.uvMainAndLM.xy * (_Control_TexelSize.zw - 1.0f) + 0.5f) * _Control_TexelSize.xy;
-    half4 splatControl = SAMPLE_TEXTURE2D(_Control, sampler_Control, splatUV);
+    splatControl = SAMPLE_TEXTURE2D(_Control, sampler_Control, splatUV);
     half4 masks[4];
     ComputeMasks(masks, hasMask, IN.uvSplat01, IN.uvSplat23, splatControl);
 
-    half alpha = dot(splatControl, 1.0h);
+    alpha = dot(splatControl, 1.0h);
 #ifdef _TERRAIN_BLEND_HEIGHT
     // disable Height Based blend when there are more than 4 layers (multi-pass breaks the normalization)
     if (_NumLayersCount <= 4)
@@ -716,7 +728,7 @@ void SplatmapFragment(
     half4 mixedDiffuse;
     half4 defaultSmoothness;
     SplatmapMix(IN.uvMainAndLM, IN.uvSplat01, IN.uvSplat23, splatControl, weight, mixedDiffuse, defaultSmoothness, normalTS);
-    half3 albedo = mixedDiffuse.rgb;
+    albedo = mixedDiffuse.rgb;
 
     half4 defaultMetallic = half4(_Metallic0, _Metallic1, _Metallic2, _Metallic3);
     half4 defaultOcclusion = half4(_MaskMapRemapScale0.g, _MaskMapRemapScale1.g, _MaskMapRemapScale2.g, _MaskMapRemapScale3.g) +
@@ -724,15 +736,17 @@ void SplatmapFragment(
 
     half4 maskSmoothness = half4(masks[0].a, masks[1].a, masks[2].a, masks[3].a);
     defaultSmoothness = lerp(defaultSmoothness, maskSmoothness, hasMask);
-    half smoothness = dot(splatControl, defaultSmoothness);
+    smoothness = dot(splatControl, defaultSmoothness);
 
     half4 maskMetallic = half4(masks[0].r, masks[1].r, masks[2].r, masks[3].r);
     defaultMetallic = lerp(defaultMetallic, maskMetallic, hasMask);
-    half metallic = dot(splatControl, defaultMetallic);
+    metallic = dot(splatControl, defaultMetallic);
 
     half4 maskOcclusion = half4(masks[0].g, masks[1].g, masks[2].g, masks[3].g);
     defaultOcclusion = lerp(defaultOcclusion, maskOcclusion, hasMask);
-    half occlusion = dot(splatControl, defaultOcclusion);
+    occlusion = dot(splatControl, defaultOcclusion);
+    }
+#endif
 #endif
 
     InputData inputData;
@@ -749,6 +763,8 @@ void SplatmapFragment(
         float compression = saturate(footprintMask * 4) * response * _FootprintSettings.y;
         #ifdef TERRAIN_SPLAT_BASEPASS
             half3 compressedAlbedo = SAMPLE_TEXTURE2D_LOD(_MainTex, sampler_MainTex, IN.uvMainAndLM.xy, 2).rgb;
+        #elif defined(_WORLD_ALL_LAYERS) && !defined(TERRAIN_SPLAT_ADDPASS)
+            half3 compressedAlbedo = worldBlurredAlbedo;
         #else
             half3 compressedAlbedo = SAMPLE_TEXTURE2D_LOD(_Splat0, sampler_Splat0, IN.uvSplat01.xy, 5).rgb * _DiffuseRemapScale0.rgb * splatControl.r;
             compressedAlbedo += SAMPLE_TEXTURE2D_LOD(_Splat1, sampler_Splat0, IN.uvSplat01.zw, 5).rgb * _DiffuseRemapScale1.rgb * splatControl.g;

@@ -41,10 +41,20 @@ MeshControlPoint MeshVertex(MeshAttributes input)
     return result;
 }
 
+// Round the player too, as the terrain does (TerrainDetailFocus): from the top-down camera's height, a fade by camera distance
+// alone kept every rock on screen tessellated.
+float4 _TerrainDetailFocus;
+
 float MeshDistanceFade(float3 positionWS)
 {
-    return 1 - saturate((distance(positionWS, _WorldSpaceCameraPos) - _TessellationNear)
+    float fade = 1 - saturate((distance(positionWS, _WorldSpaceCameraPos) - _TessellationNear)
         / max(_TessellationFar - _TessellationNear, 0.01));
+    if (_TerrainDetailFocus.w > 0.5)
+    {
+        fade = min(fade, 1 - saturate((distance(positionWS.xz, _TerrainDetailFocus.xz) - 15.0) / 10.0));
+    }
+
+    return fade;
 }
 
 float MeshEdgeFactor(float3 a, float3 b)

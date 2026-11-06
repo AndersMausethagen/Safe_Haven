@@ -13,6 +13,7 @@ Material:
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
   - _TERRAIN_BLEND_HEIGHT
+  - _WORLD_ALL_LAYERS
   m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 1
@@ -148,6 +149,8 @@ Material:
     - _CliffSlopeStart: 42
     - _CliffStrength: 0.759
     - _CliffTiling: 4
+    - _DetailFocusFar: 25
+    - _DetailFocusNear: 15
     - _DisplacementDataVersion: 2
     - _DisplacementFar: 35
     - _DisplacementLayerCount: 16
@@ -168,6 +171,7 @@ Material:
     - _NormalMapStrength: 0.63
     - _NumLayersCount: 1
     - _RockAlwaysFrom: 50
+    - _RockAntiTiling: 1
     - _RockFromLayers: 1
     - _Smoothness0: 0.5
     - _Smoothness1: 0.5
@@ -183,11 +187,11 @@ Material:
     - _SurfaceSmoothness: 1
     - _TessellationEdgeLength: 0.02
     - _TessellationFactor: 64
-    - _TessellationPixels: 3.9
+    - _TessellationPixels: 6
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _CliffTint: {r: 1, g: 1, b: 1, a: 1}
-    - _DisplacementTerrainSize: {r: 400, g: 400, b: 0.01, a: 0}
+    - _DisplacementTerrainSize: {r: 1000, g: 1000, b: 0.01, a: 0}
     - _FootprintArea: {r: 0, g: 0, b: 1, a: 0}
     - _FootprintSettings: {r: 0, g: 0, b: 0, a: 0}
     - _SteepTint: {r: 1, g: 1, b: 1, a: 1}

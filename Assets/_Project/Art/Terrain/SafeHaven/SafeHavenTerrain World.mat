@@ -161,6 +161,8 @@ Material:
     - _CliffSlopeStart: 36
     - _CliffStrength: 0
     - _CliffTiling: 7
+    - _DetailFocusFar: 25
+    - _DetailFocusNear: 15
     - _DisplacementDataVersion: 0
     - _DisplacementFar: 35
     - _DisplacementLayerCount: 0
@@ -180,6 +182,8 @@ Material:
     - _Metallic3: 0
     - _NormalMapStrength: 1
     - _NumLayersCount: 1
+    - _RockAlwaysFrom: 50
+    - _RockAntiTiling: 1
     - _RockFromLayers: 0
     - _Smoothness0: 0.5
     - _Smoothness1: 0.5

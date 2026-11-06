@@ -167,6 +167,8 @@ public sealed class PlayerInteractionOutline : MonoBehaviour
 
     private static bool InNearestDetail(Renderer source)
     {
+        // A tree's shadows-only proxy (TreeShadowProxies) is never seen, so never outlined.
+        if (source.shadowCastingMode == UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly) return false;
         LODGroup group = source.GetComponentInParent<LODGroup>();
         if (group == null || group.lodCount == 0) return true;
         LOD[] lods = group.GetLODs();
