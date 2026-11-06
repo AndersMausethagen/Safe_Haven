@@ -1585,6 +1585,20 @@ Flames are the **Fire** shader (`Shaders/Fire.shader`, set up by `AgentScripts/B
 
 The light is the fire's `LightFlicker`: warm yellow (1, 0.8, 0.46), sliding towards a deeper orange as it dims. It wanders a few centimetres so shadows move (only when the light has its own child object). With **Sparks** set, motes rise from it (`Resources/Fire Sparks`); the campfire, standing torch, hand torch, camp and bonfire have them.
 
+## Co-op (multiplayer)
+
+Up to four players play together; one hosts (`MultiplayerSettings`, Resources; Systems Editor › Co-op). Built on **Netcode for GameObjects** (host-authoritative listen server) over **Unity Transport** today; Steam (Steamworks.NET with the SteamNetworkingSockets transport: lobbies, friend invites, Valve's relay) is the next step. Decided with the user: visitors may help in a Haven with the host's approval, raid loot is personal, Steam app 480 until the game has its own.
+
+**The approach: friends beside you, not a networked player.** The player you control stays the ordinary single-player `Player` (all 60 components, `Player.Current`), run entirely on your machine. Co-op adds friends beside it:
+- `CoopSession` (a game system) owns the NetworkManager, made in code with Netcode's scene management **off**, so each game changes scenes on its own. `Host`, `Join(address)`, `Leave`; joining needs the same `ProtocolVersion` and a free place. While a session runs, `GamePause.FreezesTime` is off: the Escape menu blocks your input but the world keeps running. The Escape menu's Co-op button opens your game to friends, closes it, or leaves.
+- `NetworkPlayerAvatar` (the Network Player prefab, one per connection, lives across scene loads): on its owner's machine it publishes a `PlayerLookState` (name, character-creation body, gear by slot, held item, scene — ids only, a network variable) and sends `PoseSnapshot`s (position, facing, `AnimatorFrame`) 20 times a second, unreliable. Elsewhere it draws a `RemotePlayerBody` when the friend is in the same scene.
+- `RemotePlayerBody`: a modular body built in code like the character preview (Animator with the player's controller, `ModularCharacter`, no player components, clip events off), dressed by `PlayerLook.Outfit` (the same rules as your own outfit), holding what they hold, with their name over them.
+- `PoseBuffer` draws friends `InterpolationDelay` behind the shared server clock, between the two poses around that moment; a big gap is a teleport. `AnimatorMirror` sets the friend's parameters and blends any layer into the state their game is in, which covers triggers and code-driven cross-fades.
+
+Testing: `CoopTests` (edit mode). Live, one Editor can host and run a second NetworkManager as a guest over 127.0.0.1 (Netcode allows several in one process). Multiplayer Play Mode instances tagged "Host"/"Guest" start a session on their own once they have a player and always save to a throwaway folder; each instance is a whole Editor, so check free RAM first.
+
+**Not yet:** a guest in your Haven still sees their own Haven's buildings (the host's world isn't sent yet), enemies don't see friends, and raids are solo. Next phases: Steam sessions and invites → visiting the host's Haven (their settlement sent to guests, guests' saves keep only their own character) → co-op raids (shared seed, host-run enemies, personal loot, downed and revive) → joining mid-session and the host leaving.
+
 ## Look and lighting
 
 | To change | Edit |

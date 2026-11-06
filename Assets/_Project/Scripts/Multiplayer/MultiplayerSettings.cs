@@ -1,0 +1,66 @@
+using Unity.Netcode;
+using UnityEngine;
+
+/// <summary>
+/// Co-op tuning (Resources/MultiplayerSettings): how many may play together, the port and Steam app, how often players
+/// tell each other where they are and how far behind the others are drawn, and what a friend's body is built from.
+/// Read by <see cref="CoopSession"/> and <see cref="NetworkPlayerAvatar"/>.
+/// </summary>
+[CreateAssetMenu(fileName = "MultiplayerSettings", menuName = "Safe Haven/Settings/Multiplayer Settings")]
+public sealed class MultiplayerSettings : GameSettings<MultiplayerSettings>
+{
+    [Header("Session")]
+    [Tooltip("Players in one session, the host included.")]
+    [SerializeField, Range(2, 8)] private int maxPlayers = 4;
+    [Tooltip("Port for direct (LAN or IP) sessions. Steam sessions don't use it.")]
+    [SerializeField] private ushort port = 7777;
+    [Tooltip("Steam app id. 480 is Valve's public test app (Spacewar) until Safe Haven has its own.")]
+    [SerializeField] private uint steamAppId = 480;
+    [Tooltip("Players can only play together on the same version. Raise it whenever what is sent over the network changes.")]
+    [SerializeField] private string protocolVersion = "1";
+
+    [Header("Other players")]
+    [Tooltip("The networked object every player gets (Network Player prefab: NetworkObject + NetworkPlayerAvatar).")]
+    [SerializeField] private NetworkObject playerPrefab;
+    [Tooltip("Where-I-am messages each player sends per second.")]
+    [SerializeField, Range(5, 60)] private int posesPerSecond = 20;
+    [Tooltip("Seconds other players are drawn behind the moment, so there is always a next pose to move towards. " +
+             "Higher hides more lag but shows them later.")]
+    [SerializeField, Range(0.02f, 0.5f)] private float interpolationDelay = 0.12f;
+    [Tooltip("Metres between two poses beyond which a player is moved at once (a portal, a respawn) rather than slid.")]
+    [SerializeField, Min(1f)] private float teleportDistance = 6f;
+    [Tooltip("Seconds a friend's animation takes to blend into the state their own game is in.")]
+    [SerializeField, Range(0f, 0.5f)] private float animationBlend = 0.12f;
+
+    [Header("Friend's body")]
+    [Tooltip("The player's Animator Controller, so a friend moves as they do on their own screen.")]
+    [SerializeField] private RuntimeAnimatorController bodyAnimations;
+    [Tooltip("Held item placement on the right hand (copy of the player's Held Item View).")]
+    [SerializeField] private Vector3 gripPosition;
+    [SerializeField] private Vector3 gripRotation;
+    [Tooltip("Height of the name over a friend's head, in metres.")]
+    [SerializeField, Min(0f)] private float nameHeight = 2.15f;
+
+    public int MaxPlayers => maxPlayers;
+    public ushort Port => port;
+    public uint SteamAppId => steamAppId;
+    public string ProtocolVersion => protocolVersion;
+    public NetworkObject PlayerPrefab => playerPrefab;
+    public float PoseInterval => 1f / Mathf.Max(1, posesPerSecond);
+    public float InterpolationDelay => interpolationDelay;
+    public float TeleportDistance => teleportDistance;
+    public float AnimationBlend => animationBlend;
+    public RuntimeAnimatorController BodyAnimations => bodyAnimations;
+    public Pose GripPose => new Pose(gripPosition, Quaternion.Euler(gripRotation));
+    public float NameHeight => nameHeight;
+
+#if UNITY_EDITOR
+    public void EditorSet(NetworkObject prefab, RuntimeAnimatorController animations, Pose grip)
+    {
+        playerPrefab = prefab;
+        bodyAnimations = animations;
+        gripPosition = grip.position;
+        gripRotation = grip.rotation.eulerAngles;
+    }
+#endif
+}

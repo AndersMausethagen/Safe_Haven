@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -967,5 +967,31 @@ public sealed class LootAndRarityPage : SystemsPage
         SettingsPanel(Settings<DroppedItemSettings>(DroppedItemSettings.ResourceName), "Dropped items", "Resources/DroppedItemSettings");
         SettingsPanel(Settings<NightSettings>(NightSettings.ResourceName), "Night", "Resources/NightSettings");
         SettingsPanel(Settings<MinimapSettings>(MinimapSettings.ResourceName), "Minimap", "Resources/MinimapSettings");
+    }
+}
+
+/// <summary>Co-op: session size, how often friends hear where you are, and how smoothly they are drawn.</summary>
+public sealed class MultiplayerPage : SystemsPage
+{
+    public override string Title => "Co-op";
+    public override string Group => "Settings";
+    public override string Help => "Up to Max Players play together; one hosts. Each player sends where they are a few times a second and " +
+                                   "friends are drawn slightly in the past so they move smoothly. Raise Protocol Version whenever what " +
+                                   "is sent changes, so old and new builds don't join each other.";
+
+    public override void Draw()
+    {
+        var settings = Settings<MultiplayerSettings>(MultiplayerSettings.ResourceName);
+        if (settings == null)
+        {
+            return;
+        }
+
+        SettingsPanel(settings, "Co-op", "Resources/MultiplayerSettings");
+        BeginDerived();
+        Derived("Pose messages per friend", $"{1f / settings.PoseInterval:0} per second");
+        Derived("Friends are drawn", $"{settings.InterpolationDelay * 1000f:0} ms behind (plus the connection's own delay)");
+        Derived("Upload while hosting", $"about {(settings.MaxPlayers - 1) * (1f / settings.PoseInterval) * 0.3f:0.0} KB/s of poses");
+        EndDerived();
     }
 }

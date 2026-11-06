@@ -73,6 +73,7 @@ public sealed class GameSystems : MonoBehaviour
         Add<OptionsSystem>(options => options.Initialise());
         Add<SoundCaptions>(captions => captions.Initialise());
         Add<CheatSystem>(cheats => cheats.Initialise());
+        Add<CoopSession>(coop => coop.Initialise(MultiplayerSettings.Current));
 
         SceneManager.sceneLoaded += OnSceneLoaded;
     }

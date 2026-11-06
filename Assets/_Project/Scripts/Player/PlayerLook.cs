@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -33,31 +34,42 @@ public sealed class PlayerLook : MonoBehaviour
 
     private void Dress()
     {
-        looks.Clear();
+        Outfit(slot =>
+        {
+            ItemStack stack = equipment.Gear.Get(slot);
+            return stack.IsEmpty ? null : stack.Item;
+        }, character.Appearance.clothes, looks);
+        character.SetOutfit(looks);
+    }
+
+    /// <summary>
+    /// What someone wearing this gear looks like: each worn item's look, and their plain clothes and shoes where chest or
+    /// feet are bare (not just underclothes). Shared with co-op's remote players, who know the gear only by item.
+    /// </summary>
+    public static void Outfit(Func<GearSlot, ItemDefinition> wornIn, int clothes, List<GearLookDefinition> into)
+    {
+        into.Clear();
         for (int slot = 0; slot < GearSlots.Count; slot++)
         {
-            ItemStack stack = equipment.Gear.Get((GearSlot)slot);
-            if (!stack.IsEmpty && stack.Item.WornLook != null)
+            ItemDefinition item = wornIn((GearSlot)slot);
+            if (item != null && item.WornLook != null)
             {
-                looks.Add(stack.Item.WornLook);
+                into.Add(item.WornLook);
             }
         }
 
-        // Without body armour or boots the player wears their plain clothes, not just their underclothes.
         CharacterCatalog catalog = CharacterCatalog.Current;
         if (catalog != null)
         {
-            if (equipment.Gear.Get(GearSlot.Chest).IsEmpty)
+            if (wornIn(GearSlot.Chest) == null)
             {
-                looks.Add(catalog.PlainClothing(character.Appearance.clothes));
+                into.Add(catalog.PlainClothing(clothes));
             }
 
-            if (equipment.Gear.Get(GearSlot.Feet).IsEmpty)
+            if (wornIn(GearSlot.Feet) == null)
             {
-                looks.Add(catalog.PlainShoes);
+                into.Add(catalog.PlainShoes);
             }
         }
-
-        character.SetOutfit(looks);
     }
 }

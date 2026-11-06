@@ -6,7 +6,7 @@ using UnityEngine.UI;
 using TMPro;
 
 /// <summary>
-/// The Escape menu: Continue, Save, Saved Games, Options and Quit Game. It is the only listener for the Escape key. A press
+/// The Escape menu: Continue, Save, Saved Games, Journal, Co-op (open this game to friends, or leave), Options and Quit Game. It is the only listener for the Escape key. A press
 /// first goes to <see cref="BackHandlers"/> (cancel building placement, close open windows, stop an interaction), and
 /// the menu opens only when nothing used it. While open it holds a <see cref="GamePause"/> request, which freezes time
 /// in single-player and blocks player input.
@@ -31,6 +31,8 @@ public sealed class PauseMenu : MonoBehaviour
     [SerializeField] private Button loadButton;
     [SerializeField] private Button optionsButton;
     private Button journalButton;
+    private Button coopButton;
+    private TMP_Text coopLabel;
     [SerializeField] private Button quitButton;
     [Tooltip("Explains why Save or Load is unavailable, and reports how they went.")]
     [SerializeField] private TMP_Text statusLabel;
@@ -72,6 +74,7 @@ public sealed class PauseMenu : MonoBehaviour
         loadButton.onClick.AddListener(ShowSaves);
         optionsButton.onClick.AddListener(ShowOptions);
         AddJournalButton();
+        AddCoopButton();
         quitButton.onClick.AddListener(AskQuit);
         confirmPrimaryButton.onClick.AddListener(OnConfirmPrimary);
         confirmSecondaryButton.onClick.AddListener(OnConfirmSecondary);
@@ -190,6 +193,50 @@ public sealed class PauseMenu : MonoBehaviour
 
     private static bool JournalWindowExists => Player.Current != null;
 
+    // Co-op, beside the Journal: open this game to friends, close it, or leave a friend's.
+    private void AddCoopButton()
+    {
+        if (coopButton != null || Player.Current == null || CoopSession.Current == null)
+        {
+            return;
+        }
+
+        coopButton = Instantiate(optionsButton, optionsButton.transform.parent);
+        coopButton.name = "Coop Button";
+        coopButton.transform.SetSiblingIndex(optionsButton.transform.GetSiblingIndex());
+        coopButton.onClick = new Button.ButtonClickedEvent();
+        coopButton.onClick.AddListener(ToggleCoop);
+        coopLabel = coopButton.GetComponentInChildren<TMP_Text>();
+    }
+
+    private static string CoopLabel(CoopSession coop) =>
+        !coop.IsActive ? "Open to Friends" : coop.IsHost ? "Close to Friends" : "Leave Session";
+
+    private void ToggleCoop()
+    {
+        CoopSession coop = CoopSession.Current;
+        if (coop == null)
+        {
+            return;
+        }
+
+        if (coop.IsActive)
+        {
+            coop.Leave();
+            statusLabel.text = "";
+        }
+        else if (coop.Host(out string problem))
+        {
+            statusLabel.text = "<color=#9BE37B>Friends can join you now.</color>";
+        }
+        else
+        {
+            statusLabel.text = $"<color=#FF7B6B>{problem}</color>";
+        }
+
+        Refresh();
+    }
+
     private void OpenJournal()
     {
         Close();
@@ -232,6 +279,14 @@ public sealed class PauseMenu : MonoBehaviour
         continueButton.interactable = !leaving;
         optionsButton.interactable = !leaving;
         quitButton.interactable = !leaving;
+        if (coopButton != null && CoopSession.Current != null)
+        {
+            coopButton.interactable = !leaving && GameSession.ActiveRaid == null;
+            if (coopLabel != null)
+            {
+                coopLabel.text = CoopLabel(CoopSession.Current);
+            }
+        }
 
         if (string.IsNullOrEmpty(statusLabel.text))
         {
@@ -295,6 +350,10 @@ public sealed class PauseMenu : MonoBehaviour
 
     private void QuitToMainMenu()
     {
+        if (CoopSession.Current != null)
+        {
+            CoopSession.Current.Leave();
+        }
         if (SceneLoader.Load(mainMenuScene, "Returning to the main menu"))
         {
             BeginLeaving();

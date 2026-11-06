@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
@@ -71,6 +71,7 @@ public sealed class SystemsEditorWindow : EditorWindow
             new GearScorePage(),
             new UIStylePage(),
             new PlaytestPage(),
+            new MultiplayerPage(),
         };
     }
 
