@@ -44,7 +44,7 @@ Light:
   m_Enabled: 1
   serializedVersion: 13
   m_Type: 2
-  m_Color: {r: 1, g: 0.49, b: 0.15, a: 1}
+  m_Color: {r: 1, g: 0.8, b: 0.46, a: 1}
   m_Intensity: 4
   m_Range: 9
   m_SpotAngle: 30
@@ -114,6 +114,10 @@ MonoBehaviour:
   intensityVariation: 0.32
   rangeVariation: 0.09
   speed: 5
+  dimColour: {r: 1, g: 0.52, b: 0.2, a: 0.4}
+  wander: 0.03
+  sparks: 1
+  sparksPerSecond: 3
 --- !u!114 &5326562405780882630
 MonoBehaviour:
   m_ObjectHideFlags: 0

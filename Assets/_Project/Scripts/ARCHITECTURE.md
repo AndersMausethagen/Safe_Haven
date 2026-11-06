@@ -1577,6 +1577,14 @@ maps with the right settings (normal map, linear ORM). Multi-material FBX/OBJ ke
 | Grow moss or rust on an object from code | Add `SurfaceLayerController` to the object and call `FadeTo("Moss", amount, seconds)` / `SetAmount` |
 | Use a new custom shader for models | Put it in `Shaders/` with URP Lit's property names (`_BaseMap`, `_BumpMap`, `_ORMMap` + `_ORMMAP`, `_EmissionMap`, `_EmissionColor`); LocalSpawn lists it automatically |
 
+## Fire
+
+Flames are the **Fire** shader (`Shaders/Fire.shader`, set up by `AgentScripts/BuildFire.cs`). It is additive, procedural (no textures) and HDR, so the bloom glows round it. The flames lick upward and flicker, yellow at the heart, orange and then red at the tips, and lean with the wind; each fire is out of step with the others. It has two modes:
+- **On a mesh** (the default): the round mesh the fires have always used (a Unity sphere) is pulled up into tongues. `StationFire.mat` uses it, so every torch, campfire, furnace, fire arrow and the prologue's fires burn with it.
+- **Flame From UV** (`_FIRE_UV`): the flame is shaped in each particle's or quad's UVs. The festival bonfire's flame particles use it (upright, low and dense: `BuildFire.Upright`). Add **Face Camera** (`_FIRE_BILLBOARD`) for a lone quad.
+
+The light is the fire's `LightFlicker`: warm yellow (1, 0.8, 0.46), sliding towards a deeper orange as it dims. It wanders a few centimetres so shadows move (only when the light has its own child object). With **Sparks** set, motes rise from it (`Resources/Fire Sparks`); the campfire, standing torch, hand torch, camp and bonfire have them.
+
 ## Look and lighting
 
 | To change | Edit |

@@ -44,7 +44,7 @@ Light:
   m_Enabled: 1
   serializedVersion: 13
   m_Type: 2
-  m_Color: {r: 1, g: 0.62, b: 0.3, a: 1}
+  m_Color: {r: 1, g: 0.8, b: 0.46, a: 1}
   m_Intensity: 6
   m_Range: 9
   m_SpotAngle: 30
@@ -114,6 +114,10 @@ MonoBehaviour:
   intensityVariation: 0.25
   rangeVariation: 0.06
   speed: 4
+  dimColour: {r: 1, g: 0.52, b: 0.2, a: 0.4}
+  wander: 0.03
+  sparks: 1
+  sparksPerSecond: 3
 --- !u!114 &4098070564385535230
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -127,6 +131,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: SafeHaven::AtmosphereLight
   fogStrength: 1
+  clearingRadius: 4
+  clearingStrength: 1
+  clearingSoftness: 0.6
 --- !u!1 &2858870712050343428
 GameObject:
   m_ObjectHideFlags: 0
@@ -224,6 +231,7 @@ MonoBehaviour:
   faction: 0
   baseStats: {fileID: 11400000, guid: 01155c9e2dd7c27468c1a359f747e1a1, type: 2}
   rules: {fileID: 0}
+  priorityTarget: 0
 --- !u!114 &702096154093074226
 MonoBehaviour:
   m_ObjectHideFlags: 0

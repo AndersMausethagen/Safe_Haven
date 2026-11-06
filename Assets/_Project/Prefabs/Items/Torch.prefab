@@ -116,6 +116,30 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2581900272769342234, guid: 25793c13e60e62342be2c2bd62265f8c, type: 3}
+      propertyPath: sparks
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2581900272769342234, guid: 25793c13e60e62342be2c2bd62265f8c, type: 3}
+      propertyPath: dimColour.a
+      value: 0.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 2581900272769342234, guid: 25793c13e60e62342be2c2bd62265f8c, type: 3}
+      propertyPath: dimColour.b
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2581900272769342234, guid: 25793c13e60e62342be2c2bd62265f8c, type: 3}
+      propertyPath: dimColour.g
+      value: 0.52
+      objectReference: {fileID: 0}
+    - target: {fileID: 3486999285975776318, guid: 25793c13e60e62342be2c2bd62265f8c, type: 3}
+      propertyPath: m_Color.b
+      value: 0.46
+      objectReference: {fileID: 0}
+    - target: {fileID: 3486999285975776318, guid: 25793c13e60e62342be2c2bd62265f8c, type: 3}
+      propertyPath: m_Color.g
+      value: 0.8
+      objectReference: {fileID: 0}
     - target: {fileID: 3794266879414224793, guid: 25793c13e60e62342be2c2bd62265f8c, type: 3}
       propertyPath: m_Name
       value: Model

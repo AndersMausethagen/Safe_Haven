@@ -379,7 +379,7 @@ public static class BuildSeasonalLife
         main.startLifetime = new ParticleSystem.MinMaxCurve(0.6f, 1.1f);
         main.startSpeed = new ParticleSystem.MinMaxCurve(1.2f, 2.4f);
         main.startSize = new ParticleSystem.MinMaxCurve(0.5f, 1.1f);
-        main.startRotation = new ParticleSystem.MinMaxCurve(0f, Mathf.PI * 2f);
+        main.startRotation = 0f; // upright flames (the Fire shader draws each as a flame)
         main.startColor = new ParticleSystem.MinMaxGradient(new Color(1f, 0.7f, 0.3f, 0.8f), new Color(1f, 0.45f, 0.15f, 0.7f));
         main.simulationSpace = ParticleSystemSimulationSpace.World;
         main.maxParticles = 120;
@@ -403,6 +403,7 @@ public static class BuildSeasonalLife
         renderer.sharedMaterial = material;
         renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
         renderer.receiveShadows = false;
+        BuildFire.Upright(system); // low and dense, drawn by the Fire shader (run BuildFire for the material)
     }
 
     private static string Scene(List<FestivalDefinition> festivals, GameObject bonfire)
