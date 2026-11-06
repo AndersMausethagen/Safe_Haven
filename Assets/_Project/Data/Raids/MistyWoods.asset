@@ -675,19 +675,22 @@ MonoBehaviour:
   stages:
   - displayName: The Mist Stirs
     startsAtSecondsLeft: 480
-    message: The mist thickens. Something out there has caught your scent.
+    message: 'The mist thickens. Something out there has caught your scent. The woods give more to those who stay: loot +25%.'
     enemyHealthBonus: 0.1
     enemyPowerBonus: 0.1
+    lootBonus: 0.25
   - displayName: The Hunt
     startsAtSecondsLeft: 240
-    message: Howls echo through the trees. The hunt has begun!
+    message: 'Howls echo through the trees. The hunt has begun! The woods give more to those who stay: loot +50%.'
     enemyHealthBonus: 0.2
     enemyPowerBonus: 0.2
+    lootBonus: 0.5
   - displayName: Collapse
     startsAtSecondsLeft: 60
-    message: The woods are collapsing! Get out now!
+    message: 'The woods are collapsing! Get out now! The woods give more to those who stay: loot +80%.'
     enemyHealthBonus: 0.35
     enemyPowerBonus: 0.35
+    lootBonus: 0.8
   extractedArtwork: {fileID: 0}
   failedArtwork: {fileID: 0}
   references:

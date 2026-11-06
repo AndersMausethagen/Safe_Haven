@@ -640,6 +640,19 @@ GDD §7.7. **Relics** are enchantments of the `Relic` school (`RelicSettings`, `
 
 Content: `AgentScripts/BuildRaidReasons.cs` (after BuildRaidEvents and BuildRaidLayout).
 
+## Raids with a reason from home
+
+- **The Haven's asks** (`HavenRequestDefinition` in `Data/Settlement/Requests`, `Resources/HavenRequestSettings`; content by `AgentScripts/BuildHavenRequests.cs`): residents (or the Haven as a whole) ask for what only raids give, for example Bjarne asks for iron ore and Ingrid for bog venom. Each ask has a reward (an item, coin, experience, the blight eased). Up to three stand at once, never two from one person, and only from people who live there and in the ask's season (`HavenRequestSettings.Choose`, seeded by the day, so a reload asks the same). They are saved as `SettlementState.Requests`.
+- **Where they show:** in the raid planner's briefing, under the rumours, with how much is home already (`HavenRequestBoard.BriefingLines`), and in the asker's words in passing (`ResidentAsides`).
+- **Handing in:** `HavenRequestBoard` (SafeHaven › 05 Gameplay) hands an ask in as soon as what it wants is home, in the bag or the stash. New asks come with the next homecoming.
+- **Staying on pays:** each danger stage has a **Loot Bonus** (`RaidStage`, Misty Woods +25/50/80%), and its message says so. `RaidDirector.StageLoot` multiplies what caches and events hold (`LootCache`, `RaidEventOutcomes`) and the essence creatures drop (`LootOnDeath`).
+
+## Fences: the skigard
+
+The first fence, built by the player from the start (Sticks and Oak Wood, no workshop): the old Norwegian roundpole fence and its gate, 100 health each (`Data/Combat/Stats/SkigardStats`). Modelled and textured in Blender by `Tools/Blender/skigard.py`: split spruce rails slanting between post pairs, twig bands, dark worn wood baked to one texture (`Art/Haven/Skigard`). The prefabs and buildings are made by `AgentScripts/BuildSkigard.cs`, from the Palisade's with their own save identity. Each piece is 4 m, and its rails repeat every 4 m, so pieces placed end to end make one fence.
+- **The gate** (`FenceGate`): it swings open away from the player, residents and companions as they come up, and shuts behind them. Creatures have to break it. Its sides carve the navmesh; its leaf doesn't, so residents still plan through it.
+- **Bending round the ward:** while dragging a line, scroll up to bend it round the portal (`BuildPlacement.LayArc`). Each piece is a chord of the circle through the line's start, spread evenly so the curve ends exactly where dragged (or on a fence end it joins), and a ring closes on itself. Line pieces of the same length join each other's ends (`BuildPlacer.Joins`), so a gate carries on from a skigard.
+
 ## Raid tension: danger stages and extraction choices
 
 - **Danger stages** (GDD §7.3 final danger phase): `RaidDefinition` › Escalation lists `RaidStage`s (name, starts at

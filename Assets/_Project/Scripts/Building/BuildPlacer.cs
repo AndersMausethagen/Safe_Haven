@@ -60,6 +60,9 @@ public sealed class BuildPlacer : MonoBehaviour
     private static readonly Collider[] Overlaps = new Collider[16];
 
     private readonly List<Vector3> lineCenters = new List<Vector3>();
+    private readonly List<Vector3> lineDirections = new List<Vector3>();
+    // A line bent round the portal (scroll while dragging a line), so a fence can follow the ward's circle.
+    private bool lineRound;
     private readonly List<ResourceAmount> scaledResources = new List<ResourceAmount>();
     private readonly List<ItemAmount> scaledItems = new List<ItemAmount>();
 
@@ -193,7 +196,7 @@ public sealed class BuildPlacer : MonoBehaviour
         CreateGhost(building.Prefab.transform);
 
         var hint = new StringBuilder($"Place the {building.DisplayName}: left-click to build");
-        hint.Append(building.PlaceInLines ? ", or drag to build a line." : ".");
+        hint.Append(building.PlaceInLines ? ", or drag to build a line (scroll while dragging to bend it round the portal)." : ".");
         if (building.YardDepth > 0f)
         {
             hint.Append(" Keep the marked ground in front of it clear.");
@@ -305,6 +308,12 @@ public sealed class BuildPlacer : MonoBehaviour
         if (!drawingLine && Mathf.Abs(scroll) > 0.01f)
         {
             yaw = Mathf.Repeat(yaw + Mathf.Sign(scroll) * (fine ? fineRotationStep : rotationStep), 360f);
+        }
+        else if (drawingLine && Mathf.Abs(scroll) > 0.01f && lineRound != scroll > 0f)
+        {
+            // Scrolling up bends the line round the portal; down straightens it again.
+            lineRound = scroll > 0f;
+            GameMessages.Post(lineRound ? "The line bends round the portal." : "The line runs straight.");
         }
 
         if (!Area.TryGetGroundPoint(view, out Vector3 cursor))
@@ -455,7 +464,8 @@ public sealed class BuildPlacer : MonoBehaviour
         return bestGap < float.MaxValue;
     }
 
-    // The nearest free end of a placed piece of the same kind (a palisade end to join), other than except.
+    // The nearest free end of a placed piece of the same kind (a palisade end to join), or of another line piece as long
+    // (a gate in a skigard), other than except.
     private bool TryFindLineEnd(Vector3 cursor, Vector3? except, out Vector3 end)
     {
         end = cursor;
@@ -464,7 +474,7 @@ public sealed class BuildPlacer : MonoBehaviour
         bool found = false;
         foreach (BuildingObject other in BuildingObject.Active)
         {
-            if (other.Definition != placing)
+            if (other.Definition != placing && !Joins(other))
             {
                 continue;
             }
@@ -491,6 +501,11 @@ public sealed class BuildPlacer : MonoBehaviour
         return found;
     }
 
+    // Another kind of line piece the one being placed can carry on from: drawn in lines too, and as long.
+    private bool Joins(BuildingObject other) =>
+        other.Definition != null && other.Definition.PlaceInLines && placing.PlaceInLines
+        && Mathf.Abs(BuildPlacement.PieceLength(other.LocalBounds) - BuildPlacement.PieceLength(LocalBounds)) < 0.25f;
+
     private void UpdateLine(Vector3 cursor, bool free)
     {
         Vector3 end = cursor;
@@ -516,17 +531,33 @@ public sealed class BuildPlacer : MonoBehaviour
             return;
         }
 
-        if (!joined && !free)
+        bool alongX = BuildPlacement.RunsAlongX(LocalBounds);
+        lineDirections.Clear();
+        if (lineRound && HomePortal.Current != null)
         {
-            end = lineStart + BuildPlacement.SnapDirection(delta, lineAngleStep) * delta.magnitude;
+            // To the end it was dragged to: a free end of the fence it joins (closing a ring), else the cursor.
+            BuildPlacement.LayArc(HomePortal.Current.transform.position, lineStart, joined ? end : cursor, length, maxLinePieces, lineCenters, lineDirections);
         }
 
-        Vector3 direction = BuildPlacement.LayLine(lineStart, end, length, maxLinePieces, lineCenters);
-        float pieceYaw = BuildPlacement.LineYaw(direction, BuildPlacement.RunsAlongX(LocalBounds));
+        if (lineDirections.Count == 0)
+        {
+            if (!joined && !free)
+            {
+                end = lineStart + BuildPlacement.SnapDirection(delta, lineAngleStep) * delta.magnitude;
+            }
+
+            Vector3 direction = BuildPlacement.LayLine(lineStart, end, length, maxLinePieces, lineCenters);
+            for (int i = 0; i < lineCenters.Count; i++)
+            {
+                lineDirections.Add(direction);
+            }
+        }
+
         ghost.Show(lineCenters.Count);
         int paid = 0;
         for (int i = 0; i < lineCenters.Count; i++)
         {
+            float pieceYaw = BuildPlacement.LineYaw(lineDirections[i], alongX);
             Vector3 position = BuildPlacement.PivotFor(lineCenters[i], pieceYaw, LocalBounds);
             string problem = CheckSpot(position, pieceYaw);
             if (problem == null)

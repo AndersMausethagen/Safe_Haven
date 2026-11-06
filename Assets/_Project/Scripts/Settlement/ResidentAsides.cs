@@ -54,7 +54,12 @@ public sealed class ResidentAsides : MonoBehaviour
         if (line == null && Time.time >= nextAside)
         {
             FestivalDefinition festival = Festivals.Now;
-            if (festival != null && festival.Lines.Count > 0)
+            HavenRequestDefinition asked = HavenRequestBoard.AskedBy(npc.Resident);
+            if (asked != null && festival == null && Random.value < 0.5f)
+            {
+                line = $"{asked.Ask} {asked.Count} {asked.Wanted.DisplayName}, if you come across it.";
+            }
+            else if (festival != null && festival.Lines.Count > 0)
             {
                 line = festival.Lines[Random.Range(0, festival.Lines.Count)];
             }

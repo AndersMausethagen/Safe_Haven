@@ -120,6 +120,40 @@ public sealed class SettlementState
 
     public void RestoreBlight(float blight) => Blight = Math.Min(1f, Math.Max(0f, blight));
 
+    private readonly List<string> requests = new List<string>();
+
+    /// <summary>What the Haven is asking to be brought home (HavenRequestDefinition ids), oldest first.</summary>
+    public IReadOnlyList<string> Requests => requests;
+
+    public void AddRequest(string id)
+    {
+        if (!string.IsNullOrEmpty(id) && !requests.Contains(id))
+        {
+            requests.Add(id);
+        }
+    }
+
+    public bool RemoveRequest(string id) => requests.Remove(id);
+
+    /// <summary>Asks answered, all told.</summary>
+    public int RequestsAnswered { get; private set; }
+
+    public void RecordRequestAnswered() => RequestsAnswered++;
+
+    public void RestoreRequests(IEnumerable<string> asked, int answered)
+    {
+        requests.Clear();
+        if (asked != null)
+        {
+            foreach (string id in asked)
+            {
+                AddRequest(id);
+            }
+        }
+
+        RequestsAnswered = Math.Max(0, answered);
+    }
+
     private readonly HashSet<string> spiritGifts = new HashSet<string>();
 
     /// <summary>What the spirits have given that lasts (SpiritBonds): "nokk", the Nøkk's air.</summary>

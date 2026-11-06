@@ -101,7 +101,7 @@ public sealed class LootOnDeath : MonoBehaviour
     private static IReadOnlyList<ResourceAmount> Reaped(IReadOnlyList<ResourceAmount> rolled, Combatant killer)
     {
         // The night's share and Essence Find on gear multiply: both are "more of what fell".
-        float find = (1f + killer.Stats.Get(StatType.EssenceFind)) * NightSettings.Current.EssenceAt(NightSettings.Darkness) - 1f;
+        float find = (1f + killer.Stats.Get(StatType.EssenceFind)) * NightSettings.Current.EssenceAt(NightSettings.Darkness) * RaidDirector.StageLootNow - 1f;
         ResourceDefinition cursed = SettlementSettings.Current.CursedEssence;
         if (find <= 0f || cursed == null)
         {

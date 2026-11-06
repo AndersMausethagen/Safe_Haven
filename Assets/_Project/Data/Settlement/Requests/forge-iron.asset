@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dafc92cc79ad39845bc5e18f47753891, type: 3}
+  m_Name: forge-iron
+  m_EditorClassIdentifier: SafeHaven::HavenRequestDefinition
+  id: forge-iron
+  asker: {fileID: 11400000, guid: de521ad7beeb20b49878a9b40c96bced, type: 2}
+  ask: The forge is cold without iron.
+  thanks: Now we'll hear the hammer again.
+  wanted: {fileID: 11400000, guid: ec438ce757d5e9e43bbd93390e7a2728, type: 2}
+  count: 10
+  reward: {fileID: 11400000, guid: 0dfb05089b661eb458b2f970761e95b4, type: 2}
+  rewardCount: 1
+  coins: 6
+  experience: 80
+  easesBlight: 0
+  inSeasons: []

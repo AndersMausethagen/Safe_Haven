@@ -71,6 +71,9 @@ public sealed class SettlementSaveData
     public List<string> spiritGifts = new List<string>();
     public int huldraRespect;
     public int huldraAwayUntil;
+    /// <summary>What the Haven is asking for (HavenRequestDefinition ids), and how many asks were answered. Empty in older saves.</summary>
+    public List<string> requests = new List<string>();
+    public int requestsAnswered;
     /// <summary>A BreachStatus.</summary>
     public int breach;
     /// <summary>Ward breaches beaten back. Missing in older saves, where a Won breach counts as one.</summary>

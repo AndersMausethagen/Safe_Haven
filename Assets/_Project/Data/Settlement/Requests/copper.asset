@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dafc92cc79ad39845bc5e18f47753891, type: 3}
+  m_Name: copper
+  m_EditorClassIdentifier: SafeHaven::HavenRequestDefinition
+  id: copper
+  asker: {fileID: 11400000, guid: 15e2a45207d23dd49a4a3a93e8bb8161, type: 2}
+  ask: Copper ore. The Haven needs pots more than swords.
+  thanks: Pots, pans, and a kettle for Sigrid.
+  wanted: {fileID: 11400000, guid: a9f806359436036488427616ef8b8c44, type: 2}
+  count: 8
+  reward: {fileID: 0}
+  rewardCount: 0
+  coins: 6
+  experience: 50
+  easesBlight: 0
+  inSeasons: []

@@ -58,6 +58,12 @@ public sealed class RaidDirector : MonoBehaviour
     /// <summary>The danger stage the raid is in, or null before the first.</summary>
     public RaidStage CurrentStage => RaidStages.Get(Session?.Definition.Stages, StageIndex);
 
+    /// <summary>How much more the woods give now for staying on (the danger stage's Loot Bonus): 1 in the calm.</summary>
+    public float StageLoot => 1f + (CurrentStage != null ? CurrentStage.LootBonus : 0f);
+
+    /// <summary>The stage loot of the scene's raid, or 1 outside a raid.</summary>
+    public static float StageLootNow => Current != null ? Current.StageLoot : 1f;
+
     /// <summary>Raised when a new danger stage begins, after enemies are strengthened and its spawn groups woken.</summary>
     public event Action<int, RaidStage> StageChanged;
 

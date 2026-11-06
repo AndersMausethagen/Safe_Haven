@@ -44,7 +44,7 @@ public sealed class GiveLootOutcome : RaidEventOutcome
             return;
         }
 
-        float multiplier = context.Session.Parameters.LootMultiplier;
+        float multiplier = context.Session.Parameters.LootMultiplier * RaidDirector.StageLootNow;
         ItemInventory bag = context.Player.GetComponent<ItemInventory>();
         foreach (ItemAmount drop in loot.Roll())
         {

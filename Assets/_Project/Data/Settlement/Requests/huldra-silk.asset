@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dafc92cc79ad39845bc5e18f47753891, type: 3}
+  m_Name: huldra-silk
+  m_EditorClassIdentifier: SafeHaven::HavenRequestDefinition
+  id: huldra-silk
+  asker: {fileID: 11400000, guid: 8adfc30233928ec499c01587419eabaa, type: 2}
+  ask: Huldra silk. Don't ask what for.
+  thanks: You didn't ask. Thank you.
+  wanted: {fileID: 11400000, guid: 1b426c80d20dbcd4ea2e82901b9dbfb9, type: 2}
+  count: 3
+  reward: {fileID: 0}
+  rewardCount: 0
+  coins: 12
+  experience: 80
+  easesBlight: 0
+  inSeasons: []

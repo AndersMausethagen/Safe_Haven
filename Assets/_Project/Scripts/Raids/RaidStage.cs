@@ -19,6 +19,9 @@ public sealed class RaidStage
     [SerializeField, Min(0f)] private float enemyHealthBonus;
     [Tooltip("Extra enemy physical and spell power while this stage lasts. 0.2 is +20%.")]
     [SerializeField, Min(0f)] private float enemyPowerBonus;
+    [Tooltip("Extra loot while this stage lasts: what caches and events hold, and the essence creatures drop. 0.25 is +25%. " +
+             "What staying on is worth, against the stronger creatures.")]
+    [SerializeField, Min(0f)] private float lootBonus;
 
     public RaidStage() { }
 
@@ -36,6 +39,9 @@ public sealed class RaidStage
     public string Message => message;
     public float EnemyHealthBonus => enemyHealthBonus;
     public float EnemyPowerBonus => enemyPowerBonus;
+    public float LootBonus => lootBonus;
+
+    public void SetLootBonus(float bonus) => lootBonus = Mathf.Max(0f, bonus);
 }
 
 /// <summary>Stage lookups, kept free of scene objects so they can be tested. Stage 0 is the calm before the first one.</summary>

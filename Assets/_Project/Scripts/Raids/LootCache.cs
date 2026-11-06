@@ -143,7 +143,7 @@ public sealed class LootCache : MonoBehaviour, IInteractionVerb
     private void Fill()
     {
         rolled = true;
-        float multiplier = RaidDirector.Current != null ? RaidDirector.Current.Parameters.LootMultiplier : 1f;
+        float multiplier = RaidDirector.Current != null ? RaidDirector.Current.Parameters.LootMultiplier * RaidDirector.StageLootNow : 1f;
         if (RaidDirector.Current != null)
         {
             JournalNotices.RollForFind();

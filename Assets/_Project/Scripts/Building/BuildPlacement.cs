@@ -288,6 +288,48 @@ public static class BuildPlacement
         return direction;
     }
 
+    /// <summary>
+    /// Lays pieces round a circle about <paramref name="centre"/> through <paramref name="start"/> (a fence round the
+    /// portal's ward): each piece is a chord of the circle, the next starting where the last ends, so a ring of them bends
+    /// round with no gaps. They run from start the shorter way round to <paramref name="cursor"/>'s bearing and end exactly
+    /// there: the pieces are spread evenly, overlapping a little rather than leaving a gap, so a ring closes on its own
+    /// first piece. Nothing is laid when start is closer to the centre than a piece is long (too tight to bend round).
+    /// </summary>
+    public static void LayArc(Vector3 centre, Vector3 start, Vector3 cursor, float pieceLength, int maxPieces, List<Vector3> centers,
+        List<Vector3> directions)
+    {
+        centers.Clear();
+        directions.Clear();
+        Vector2 middle = Flat(centre);
+        Vector2 from = Flat(start) - middle;
+        Vector2 to = Flat(cursor) - middle;
+        float radius = from.magnitude;
+        if (pieceLength <= 0f || radius < pieceLength || to.sqrMagnitude < 0.0001f)
+        {
+            return;
+        }
+
+        float step = 2f * Mathf.Asin(Mathf.Clamp01(pieceLength / (2f * radius)));
+        float first = Mathf.Atan2(from.y, from.x);
+        float turn = Mathf.DeltaAngle(first * Mathf.Rad2Deg, Mathf.Atan2(to.y, to.x) * Mathf.Rad2Deg) * Mathf.Deg2Rad;
+        int count = Mathf.Clamp(Mathf.CeilToInt(Mathf.Abs(turn) / step - 0.05f), 1, Mathf.Max(1, maxPieces));
+        if (count < maxPieces || Mathf.Abs(turn) <= step * count)
+        {
+            step = Mathf.Abs(turn) / count; // even, and never longer than a piece: they meet (or overlap) at every post pair
+        }
+
+        float sign = turn >= 0f ? 1f : -1f;
+        for (int i = 0; i < count; i++)
+        {
+            float a = first + sign * step * i, b = first + sign * step * (i + 1);
+            Vector2 p = middle + new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * radius;
+            Vector2 q = middle + new Vector2(Mathf.Cos(b), Mathf.Sin(b)) * radius;
+            Vector2 mid = (p + q) * 0.5f;
+            centers.Add(new Vector3(mid.x, start.y, mid.y));
+            directions.Add(new Vector3(q.x - p.x, 0f, q.y - p.y).normalized);
+        }
+    }
+
     /// <summary>Where a building's pivot goes so its footprint is centred on center.</summary>
     public static Vector3 PivotFor(Vector3 center, float yaw, Bounds local)
     {

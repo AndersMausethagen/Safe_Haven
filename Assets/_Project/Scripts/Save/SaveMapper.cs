@@ -165,6 +165,8 @@ public static class SaveMapper
         into.spiritGifts = new List<string>(settlement.SpiritGifts);
         into.huldraRespect = settlement.HuldraRespect;
         into.huldraAwayUntil = settlement.HuldraAwayUntil;
+        into.requests = new List<string>(settlement.Requests);
+        into.requestsAnswered = settlement.RequestsAnswered;
         into.breach = (int)settlement.Breach;
         into.breachesWon = settlement.BreachesWon;
         into.nextBreachAt = settlement.NextBreachAt;
@@ -241,6 +243,7 @@ public static class SaveMapper
         settlement.RestoreDays(saved.daysPassed);
         settlement.RestoreBlight(saved.blight);
         settlement.RestoreSpirits(saved.spiritGifts, saved.huldraRespect, saved.huldraAwayUntil);
+        settlement.RestoreRequests(saved.requests, saved.requestsAnswered);
         if (saved.tradeBought != null)
         {
             foreach (TradeSaveData bought in saved.tradeBought)

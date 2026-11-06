@@ -1,0 +1,209 @@
+using System.Collections.Generic;
+using System.Linq;
+using UnityEditor;
+using UnityEditor.SceneManagement;
+using UnityEngine;
+
+/// <summary>
+/// Raids with a reason from home (`unity command script run --file AgentScripts/BuildHavenRequests.cs --entry
+/// BuildHavenRequests.Apply`): what the Haven's people ask to be brought back from the raids, and what they give for it
+/// (Data/Settlement/Requests, Resources/HavenRequestSettings); the board that hands it in (SafeHaven › 05 Gameplay);
+/// and loot that grows with each danger stage, so staying on is a choice (the raids' Escalation › Loot Bonus).
+/// Re-runnable. Saves the scene only if it was clean when this began.
+/// </summary>
+public static class BuildHavenRequests
+{
+    private const string Folder = "Assets/_Project/Data/Settlement/Requests";
+
+    private sealed class Ask
+    {
+        public string Id, Asker, Wanted, Says, Thanks, Reward;
+        public int Count, RewardCount, Coins, Experience;
+        public float Blight;
+        public string[] Seasons = new string[0];
+    }
+
+    private static readonly Ask[] Asks =
+    {
+        new Ask { Id = "forge-iron", Asker = "Bjarne", Wanted = "IronOre", Count = 10, Says = "The forge is cold without iron.",
+            Thanks = "Now we'll hear the hammer again.", Reward = "FieldRepairKit", RewardCount = 1, Coins = 6, Experience = 80 },
+        new Ask { Id = "venom-draughts", Asker = "Ingrid", Wanted = "BogVenom", Count = 4, Says = "Bog venom, carried carefully. It makes the strongest draughts.",
+            Thanks = "Careful hands. These will save someone.", Reward = "HealingDraught", RewardCount = 2, Experience = 70 },
+        new Ask { Id = "wolf-fangs", Asker = "Sigrid", Wanted = "WolfFang", Count = 6, Says = "The wolves grow bold. Bring me their fangs and the children will sleep.",
+            Thanks = "One for every door. Let them see.", Coins = 10, Experience = 60, Blight = 0.05f },
+        new Ask { Id = "winter-hides", Asker = "Eirik", Wanted = "ThickHide", Count = 3, Says = "Winter's coming. Thick hides, for coats.",
+            Thanks = "Warm backs this winter.", Coins = 8, Experience = 70, Seasons = new[] { "Summer", "Autumn", "Late Autumn" } },
+        new Ask { Id = "wisp-embers", Asker = "Runa", Wanted = "WispEmber", Count = 3, Says = "Wisp embers. They remember the way through the mist.",
+            Thanks = "Listen to them hum.", Reward = "WayfinderRune", RewardCount = 1, Experience = 90 },
+        new Ask { Id = "trollstone", Asker = "Tor", Wanted = "Trollstone", Count = 2, Says = "Trollstone, for the ward's footing.",
+            Thanks = "Old stone, older than the trolls. Good.", Reward = "RunestoneFragment", RewardCount = 1, Experience = 100 },
+        new Ask { Id = "huldra-silk", Asker = "Liv", Wanted = "HuldraSilk", Count = 3, Says = "Huldra silk. Don't ask what for.",
+            Thanks = "You didn't ask. Thank you.", Coins = 12, Experience = 80 },
+        new Ask { Id = "boar-tusks", Asker = "Gunnar", Wanted = "BoarTusk", Count = 4, Says = "Boar tusks make good salves, ground fine.",
+            Thanks = "That's a week of grinding. Here.", Reward = "HealingSalve", RewardCount = 2, Experience = 60 },
+        new Ask { Id = "rootling-bark", Asker = "Hild", Wanted = "RootlingBark", Count = 6, Says = "Rootling bark. Burnt here, it takes the blight with it.",
+            Thanks = "Smell that? That's the woods getting better.", Coins = 6, Experience = 50, Blight = 0.1f },
+        new Ask { Id = "bones", Asker = "Asa", Wanted = "Bone", Count = 8, Says = "Bones, for needles and pins.",
+            Thanks = "I'll stitch you something.", Reward = "Bandage", RewardCount = 4, Experience = 40 },
+        new Ask { Id = "copper", Asker = "Yrsa", Wanted = "CopperOre", Count = 8, Says = "Copper ore. The Haven needs pots more than swords.",
+            Thanks = "Pots, pans, and a kettle for Sigrid.", Coins = 6, Experience = 50 },
+        new Ask { Id = "grave-iron", Asker = null, Wanted = "GraveIron", Count = 3, Says = "Grave iron from the barrows, to bind the ward.",
+            Thanks = "The ward drinks it in.", Reward = "RuneOfPlenty", RewardCount = 1, Experience = 120, Blight = 0.1f },
+        new Ask { Id = "winter-cold", Asker = null, Wanted = "RoughHide", Count = 6, Says = "The cold's in every bed. Hides, any hides.",
+            Thanks = "Nobody freezes tonight.", Coins = 8, Experience = 50, Seasons = new[] { "Winter" } },
+    };
+
+    public static string Apply()
+    {
+        var report = new List<string>();
+        if (!AssetDatabase.IsValidFolder(Folder))
+        {
+            AssetDatabase.CreateFolder("Assets/_Project/Data/Settlement", "Requests");
+        }
+
+        var made = new List<HavenRequestDefinition>();
+        var missing = new List<string>();
+        foreach (Ask ask in Asks)
+        {
+            ItemDefinition wanted = Item(ask.Wanted);
+            ResidentDefinition asker = ask.Asker != null ? Resident(ask.Asker) : null;
+            if (wanted == null || (ask.Asker != null && asker == null))
+            {
+                missing.Add(ask.Id);
+                continue;
+            }
+
+            string path = $"{Folder}/{ask.Id}.asset";
+            var request = AssetDatabase.LoadAssetAtPath<HavenRequestDefinition>(path);
+            if (request == null)
+            {
+                request = ScriptableObject.CreateInstance<HavenRequestDefinition>();
+                AssetDatabase.CreateAsset(request, path);
+            }
+
+            request.Configure(ask.Id, asker, ask.Says, ask.Thanks, wanted, ask.Count, ask.Reward != null ? Item(ask.Reward) : null,
+                ask.RewardCount, ask.Coins, ask.Experience, ask.Blight, ask.Seasons.ToList());
+            EditorUtility.SetDirty(request);
+            made.Add(request);
+        }
+
+        const string settingsPath = "Assets/_Project/Resources/HavenRequestSettings.asset";
+        var settings = AssetDatabase.LoadAssetAtPath<HavenRequestSettings>(settingsPath);
+        if (settings == null)
+        {
+            settings = ScriptableObject.CreateInstance<HavenRequestSettings>();
+            AssetDatabase.CreateAsset(settings, settingsPath);
+        }
+
+        settings.Configure(made, 3);
+        EditorUtility.SetDirty(settings);
+        report.Add($"{made.Count} requests{(missing.Count > 0 ? " (missing: " + string.Join(", ", missing) + ")" : "")}");
+        report.Add(StageLoot());
+        report.Add(Scene());
+        AssetDatabase.SaveAssets();
+        return string.Join("; ", report);
+    }
+
+    // Each danger stage: stronger creatures, and the woods give more for staying on.
+    private static string StageLoot()
+    {
+        float[] bonuses = { 0.25f, 0.5f, 0.8f };
+        int set = 0;
+        foreach (string guid in AssetDatabase.FindAssets("t:RaidDefinition", new[] { "Assets/_Project/Data/Raids" }))
+        {
+            var raid = AssetDatabase.LoadAssetAtPath<RaidDefinition>(AssetDatabase.GUIDToAssetPath(guid));
+            var data = new SerializedObject(raid);
+            SerializedProperty stages = FindStages(data);
+            if (stages == null)
+            {
+                continue;
+            }
+
+            for (int i = 0; i < stages.arraySize; i++)
+            {
+                SerializedProperty stage = stages.GetArrayElementAtIndex(i);
+                float bonus = bonuses[Mathf.Min(i, bonuses.Length - 1)];
+                stage.FindPropertyRelative("lootBonus").floatValue = bonus;
+                SerializedProperty message = stage.FindPropertyRelative("message");
+                string tail = $" The woods give more to those who stay: loot +{bonus:P0}.";
+                int cut = message.stringValue.IndexOf(" The woods give more", System.StringComparison.Ordinal);
+                message.stringValue = (cut >= 0 ? message.stringValue.Substring(0, cut) : message.stringValue) + tail;
+                set++;
+            }
+
+            data.ApplyModifiedPropertiesWithoutUndo();
+            EditorUtility.SetDirty(raid);
+        }
+
+        return $"{set} danger stages pay for staying";
+    }
+
+    private static SerializedProperty FindStages(SerializedObject data)
+    {
+        SerializedProperty it = data.GetIterator();
+        while (it.NextVisible(true))
+        {
+            if (it.isArray && it.propertyType == SerializedPropertyType.Generic && it.arraySize > 0
+                && it.GetArrayElementAtIndex(0).FindPropertyRelative("startsAtSecondsLeft") != null)
+            {
+                return it.Copy();
+            }
+        }
+
+        return null;
+    }
+
+    private static string Scene()
+    {
+        var scene = EditorSceneManager.GetActiveScene();
+        if (scene.name != "SafeHaven")
+        {
+            return "scene skipped (open SafeHaven)";
+        }
+
+        bool wasClean = !scene.isDirty;
+        GameObject gameplay = scene.GetRootGameObjects().FirstOrDefault(g => g.name == "05 Gameplay");
+        if (gameplay == null)
+        {
+            return "no 05 Gameplay";
+        }
+
+        Transform holder = gameplay.transform.Find("Haven Requests");
+        if (holder == null)
+        {
+            holder = new GameObject("Haven Requests").transform;
+            holder.SetParent(gameplay.transform, false);
+        }
+
+        if (!holder.TryGetComponent(out HavenRequestBoard _))
+        {
+            holder.gameObject.AddComponent<HavenRequestBoard>();
+        }
+
+        EditorSceneManager.MarkSceneDirty(scene);
+        if (wasClean)
+        {
+            EditorSceneManager.SaveScene(scene);
+        }
+
+        return wasClean ? "scene: request board (saved)" : "scene: request board (not saved: it had other changes)";
+    }
+
+    private static ItemDefinition Item(string name) => Find<ItemDefinition>(name, "Assets/_Project/Data/Items");
+
+    private static ResidentDefinition Resident(string name) => Find<ResidentDefinition>(name, "Assets/_Project/Data");
+
+    private static T Find<T>(string name, string folder) where T : Object
+    {
+        foreach (string guid in AssetDatabase.FindAssets($"{name} t:{typeof(T).Name}", new[] { folder }))
+        {
+            var asset = AssetDatabase.LoadAssetAtPath<T>(AssetDatabase.GUIDToAssetPath(guid));
+            if (asset != null && asset.name == name)
+            {
+                return asset;
+            }
+        }
+
+        return null;
+    }
+}

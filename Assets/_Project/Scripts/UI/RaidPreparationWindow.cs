@@ -635,7 +635,9 @@ public sealed class RaidPreparationWindow : MonoBehaviour
 
         List<RaidEventDefinition> foretold = closed ? new List<RaidEventDefinition>() : RaidForecast.For(raid, pendingSeed, HavenReadiness.ForetoldEvents);
         List<RaidRumourDefinition> rumours = closed ? new List<RaidRumourDefinition>() : RaidRumours.For(raid, pendingSeed, GameSession.Settlement, player != null ? player.GetComponent<PlayerCrafting>() : null, large ? raid.LargeRaid.widthScale : 1f);
-        while (rumourLines.Count < rumours.Count + foretold.Count)
+        List<string> asked = closed ? new List<string>() : HavenRequestBoard.BriefingLines(player);
+        int lines = rumours.Count + foretold.Count + asked.Count;
+        while (rumourLines.Count < lines)
         {
             rumourLines.Add(AddRumourLine());
         }
@@ -643,18 +645,20 @@ public sealed class RaidPreparationWindow : MonoBehaviour
         for (int i = 0; i < rumourLines.Count; i++)
         {
             RumourLine line = rumourLines[i];
-            line.Rect.gameObject.SetActive(i < rumours.Count + foretold.Count);
-            if (i < rumours.Count + foretold.Count)
+            line.Rect.gameObject.SetActive(i < lines);
+            if (i < lines)
             {
-                line.Label.text = i < rumours.Count ? rumours[i].BriefingFor(GameSession.Settlement) : $"Seen from the Watch Post: {foretold[i - rumours.Count].DisplayName}.";
+                line.Label.text = i < rumours.Count ? rumours[i].BriefingFor(GameSession.Settlement)
+                    : i < rumours.Count + foretold.Count ? $"Seen from the Watch Post: {foretold[i - rumours.Count].DisplayName}."
+                    : asked[i - rumours.Count - foretold.Count];
                 float height = Measure(line.Label, ColumnWidth - 16f);
                 line.Label.rectTransform.sizeDelta = new Vector2(ColumnWidth - 16f, height);
                 y = Stack(line.Rect, y, height, 6f);
             }
         }
 
-        thisRunHeading.gameObject.SetActive(anyChip || rumours.Count > 0);
-        y = (anyChip || rumours.Count > 0) ? y + SectionGap - 6f : BodyTop;
+        thisRunHeading.gameObject.SetActive(anyChip || lines > 0);
+        y = (anyChip || lines > 0) ? y + SectionGap - 6f : BodyTop;
 
         var enemies = new List<string>();
         foreach (MonsterDefinition monster in raid.KnownEnemies)
