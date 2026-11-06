@@ -418,7 +418,9 @@ public static class BuildLivingWorld
         if (deer != null)
         {
             Glimpse hollow = HollowDeer(deer, gone);
-            entries.Add(Entry("Hollowed Deer", hollow, 260f, Curve((0f, 1f), (5f, 1f), (7.5f, 0.25f), (17f, 0.1f), (19.5f, 0.9f), (24f, 1f)), new Vector2(18f, 24f), 1f));
+            GlimpseWatcher.Entry hollowed = Entry("Hollowed Deer", hollow, 260f, Curve((0f, 1f), (5f, 1f), (7.5f, 0.25f), (17f, 0.1f), (19.5f, 0.9f), (24f, 1f)), new Vector2(18f, 24f), 1f);
+            hollowed.moreWithBlight = 3f; // the blight round home brings them out, and nearer
+            entries.Add(hollowed);
         }
 
         Glimpse huldra = HuldraGlimpse(gone);
@@ -521,6 +523,7 @@ public static class BuildLivingWorld
 
             Glimpse glimpse = root.AddComponent<Glimpse>();
             Configure(glimpse, gone, 14f, true, 2.6f);
+            glimpse.SetSpirit(SpiritBonds.Huldra);
             return SavePrefab(root, $"{Prefabs}/Huldra Glimpse.prefab").GetComponent<Glimpse>();
         }
         finally
@@ -725,7 +728,7 @@ public static class BuildLivingWorld
             new SeasonCycle.Season { name = "Summer", days = 10 },
             new SeasonCycle.Season { name = "Autumn", days = 6, autumn = 0.9f, leafFall = 0.1f },
             new SeasonCycle.Season { name = "Late Autumn", days = 4, autumn = 1f, leafFall = 0.65f, frost = 0.15f },
-            new SeasonCycle.Season { name = "Winter", days = 6, autumn = 1f, leafFall = 1f, frost = 0.75f },
+            new SeasonCycle.Season { name = "Winter", days = 6, autumn = 1f, leafFall = 1f, frost = 0.75f, snows = true, lyingSnow = 0.6f },
             new SeasonCycle.Season { name = "Spring", days = 6, frost = 0.05f },
         }, 2);
         EditorUtility.SetDirty(year);

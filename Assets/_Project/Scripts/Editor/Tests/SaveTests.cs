@@ -193,6 +193,9 @@ public sealed class SaveTests
         settlement.AddResident(ingrid, alchemist);
         settlement.QueuePurification(2, 5);
         settlement.TickPurification(5.5f, 20f);
+        settlement.ChangeBlight(0.35f);
+        settlement.GiveSpiritGift(SpiritBonds.NokkGift);
+        settlement.SetHuldra(1, 9);
 
         SaveData data = SaveMapper.ToSaveData(player, null, "SafeHaven", null, DateTime.UtcNow, settlement: settlement);
         LoadedGame loaded = SaveMapper.FromSaveData(JsonUtility.FromJson<SaveData>(JsonUtility.ToJson(data)), lookup);
@@ -208,6 +211,10 @@ public sealed class SaveTests
         Assert.AreEqual(3, loaded.Player.State.EquippedSlot);
 
         SettlementState restored = loaded.Settlement;
+        Assert.AreEqual(0.35f, restored.Blight, 0.001f);
+        Assert.IsTrue(restored.HasSpiritGift(SpiritBonds.NokkGift));
+        Assert.AreEqual(1, restored.HuldraRespect);
+        Assert.AreEqual(9, restored.HuldraAwayUntil);
         Assert.IsTrue(restored.PortalRepaired);
         Assert.AreEqual(1, restored.WardLevel);
         Assert.AreEqual(2, restored.SuccessfulExtractions);

@@ -81,6 +81,7 @@ Shader "Safe Haven/Grass"
         float4 _SafeHavenWither[4];
         float _SafeHavenWitherCount;
         float4 _SafeHavenSeason; // Seasons: x autumn (the grass yellows), z frost
+        float _SafeHavenSnow; // Snow lying on the ground (WeatherSystem): sinks the blades into it and whitens their feet
         float _GrassInteractorCount;
         TEXTURE2D(_GrassFootprint0); SAMPLER(sampler_GrassFootprint0);
         TEXTURE2D(_GrassFootprint1);
@@ -172,6 +173,7 @@ Shader "Safe Haven/Grass"
             float clump = Noise(rootWS.xz / max(_ClumpScale, 0.05));
             float3 positionOS = input.positionOS.xyz * (_Size * scale * keep);
             positionOS.y *= 1.0 + (clump * 2.0 - 1.0) * _ClumpHeight;
+            positionOS.y *= 1.0 - 0.55 * _SafeHavenSnow;
             float3 world = TransformObjectToWorld(positionOS);
             if (_FacingBlades > 0.5)
             {
@@ -248,6 +250,7 @@ Shader "Safe Haven/Grass"
             half autumn = _SafeHavenSeason.x * smoothstep(0.2, 0.7, Noise(rootWS.xz / 6.0 + 31.0) + 0.25);
             colour = lerp(colour, half3(0.62, 0.52, 0.26) * lerp(0.65, 1.0, tip), saturate(autumn * 0.7));
             colour = lerp(colour, half3(0.8, 0.84, 0.88), saturate(_SafeHavenSeason.z * 0.6 * (0.4 + 0.6 * tip)));
+            colour = lerp(colour, half3(0.82, 0.86, 0.92), saturate(_SafeHavenSnow * (1.0 - 0.45 * tip)));
             half clump = Noise(rootWS.xz / max(_ClumpScale, 0.05) + 17.0);
             colour *= 1 - GrassFootprint(rootWS.xz).y;
             return colour * (1.0 + (input.color.g - 0.5) * 2.0 * _BladeVariation) * lerp(0.85, 1.12, clump);

@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0de871765cd6fce4c8fed103ef0082e3, type: 3}
+  m_Name: Footstep Snow
+  m_EditorClassIdentifier: SafeHaven::SoundDefinition
+  displayName: Footstep Snow
+  caption: 
+  clips:
+  - {fileID: 8300000, guid: 44fbc04c945e98347b2e278cb4dd1efa, type: 3}
+  - {fileID: 8300000, guid: 851951f2e0a131f46bd2d3ab211ebb54, type: 3}
+  - {fileID: 8300000, guid: 28024ac18877e4a4098bac4406e6bc43, type: 3}
+  - {fileID: 8300000, guid: 10b17a96b1a0a244d9f54a8afd437f3d, type: 3}
+  - {fileID: 8300000, guid: 68226e05340aff941a41b57f729b0fb1, type: 3}
+  channel: 2
+  volume: 0.34
+  volumeVariation: 0.1
+  pitchRange: {x: 0.92, y: 1.08}
+  positional: 1
+  fullVolumeDistance: 3
+  audibleDistance: 11
+  maxAtOnce: 3
+  minimumGap: 0.03
+  priority: 0
+  takesTheMix: 0

@@ -3323,6 +3323,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::TerrainSurface
   profile: {fileID: 11400000, guid: f6058aa1cf501804188cd25e1bcd9ca5, type: 2}
   quality: 3
+  singlePass: 1
 --- !u!114 &470310764
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3394,6 +3395,7 @@ MonoBehaviour:
   baseAmount: 0
   weatherAmount: 1
   goldenHourAmount: 1
+  morningAmount: 0
   weatherWindInfluence: 1
 --- !u!114 &470310766
 MonoBehaviour:
@@ -7537,6 +7539,104 @@ Transform:
   m_Children: []
   m_Father: {fileID: 545020516}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1068122208
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1068122213}
+  - component: {fileID: 1068122212}
+  - component: {fileID: 1068122211}
+  - component: {fileID: 1068122210}
+  - component: {fileID: 1068122209}
+  m_Layer: 0
+  m_Name: Seasons
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1068122209
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1068122208}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6583e0642c23d2b49a6af82161017612, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::SpringMelt
+  speed: 0.05
+--- !u!114 &1068122210
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1068122208}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9664abcd32187c42a593482c3e798f1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::WinterTracks
+  fromSnow: 0.3
+  layWithin: 60
+  trailLength: 45
+  stride: 0.8
+  relaySeconds: 8
+  printsWithin: 13
+  printsPerFrame: 12
+--- !u!114 &1068122211
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1068122208}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b53d9b375c6361248b5602bfb55cc994, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::WinterIce
+  freezeFromSnow: 0.3
+  formSeconds: 60
+  crack: {fileID: 11400000, guid: 2fe3340deb71b3f42b1e6ccc959f1484, type: 2}
+  creak: {fileID: 11400000, guid: 9527e199e327b4f47b52bf311f6123c6, type: 2}
+  creakEvery: {x: 6, y: 14}
+--- !u!114 &1068122212
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1068122208}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d02c8a4fbd291e46bbbda4ea8341615, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::Seasons
+  cycle: {fileID: 11400000, guid: 954a71a0b12124e4a8fcaf686e64d010, type: 2}
+  startDay: 2
+--- !u!4 &1068122213
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1068122208}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1081887842
 GameObject:
   m_ObjectHideFlags: 0
@@ -11357,6 +11457,12 @@ MonoBehaviour:
   every: {x: 14, y: 40}
   distance: {x: 1.5, y: 6}
   byNight: 0.1
+  byHour:
+    serializedVersion: 2
+    m_Curve: []
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!4 &1647658402
 Transform:
   m_ObjectHideFlags: 0
@@ -14930,3 +15036,4 @@ SceneRoots:
   - {fileID: 988397713}
   - {fileID: 2043221417}
   - {fileID: 2105121337}
+  - {fileID: 1068122213}

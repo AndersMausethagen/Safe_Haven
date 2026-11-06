@@ -19,7 +19,8 @@ public enum ResourceNodeKind
 /// A placeholder for a gathering node: when the scene starts it becomes one, picked at random from every gathering node
 /// (ContentDatabase) of the chosen Kind and within the Tier range, or from its own list. The node keeps its own look
 /// variants (GatheringNodeDefinition › Model Variants), so the same stone node can look different spot to spot. Stable
-/// Pick makes a spot pick the same node every visit (for home); otherwise each visit rolls again (raids).
+/// Pick makes a spot pick the same node every visit (for home); otherwise each visit rolls again (raids). At home
+/// only nodes in season are picked (GatheringNodeDefinition › In Seasons): no berries in winter.
 /// Nothing it becomes is saved.
 /// </summary>
 [DisallowMultipleComponent]
@@ -46,7 +47,7 @@ public sealed class RandomResourceNode : MonoBehaviour
     {
         var content = Resources.Load<ContentDatabase>(ContentDatabase.ResourceName);
         IReadOnlyList<GatheringNodeDefinition> pool = only.Count > 0 ? only : content != null ? content.GatheringNodes : null;
-        Collect(pool, kind, tiers, candidates, only.Count > 0);
+        Collect(pool, kind, tiers, candidates, only.Count > 0, Seasons.Today);
         if (candidates.Count == 0)
         {
             Debug.LogWarning($"{name}: no gathering node with a world prefab matches {kind}, tier {tiers.x}-{tiers.y}.", this);
@@ -62,8 +63,10 @@ public sealed class RandomResourceNode : MonoBehaviour
 
     /// <summary>The nodes that match: those with a world prefab, of the kind and within the tiers (all of them for an
     /// explicit list).</summary>
+    /// <param name="season">At home, the season now (Seasons.Today): nodes out of season are left out, unless that
+    /// leaves nothing. Null: any season (raids).</param>
     public static void Collect(IReadOnlyList<GatheringNodeDefinition> pool, ResourceNodeKind kind, Vector2Int tiers,
-        List<GatheringNodeDefinition> into, bool explicitList = false)
+        List<GatheringNodeDefinition> into, bool explicitList = false, string season = null)
     {
         into.Clear();
         if (pool == null)
@@ -80,6 +83,19 @@ public sealed class RandomResourceNode : MonoBehaviour
             {
                 into.Add(node);
             }
+        }
+
+        if (string.IsNullOrEmpty(season))
+        {
+            return;
+        }
+
+        int before = into.Count;
+        into.RemoveAll(node => !node.InSeason(season));
+        if (into.Count == 0 && before > 0)
+        {
+            // Nothing of this kind grows now: the spot stays as it was picked, so a spot is never simply empty.
+            Collect(pool, kind, tiers, into, explicitList);
         }
     }
 

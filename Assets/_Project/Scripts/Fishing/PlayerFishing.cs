@@ -231,7 +231,9 @@ public sealed class PlayerFishing : MonoBehaviour
         waterHeight = height;
         landing = new Vector3(target.x, height, target.z);
         castLanding = Time.time + 0.45f;
-        biteAt = castLanding + Random.Range(settings.BiteWait.x, settings.BiteWait.y) / Mathf.Max(0.1f, lure);
+        // The Nøkk's air (SpiritBonds): the water's own spirit sends fish to the line.
+        float favour = GameSession.Settlement.HasSpiritGift(SpiritBonds.NokkGift) ? 1.5f : 1f;
+        biteAt = castLanding + Random.Range(settings.BiteWait.x, settings.BiteWait.y) / Mathf.Max(0.1f, lure * favour);
         State = Phase.Waiting;
         ShowLine();
     }
@@ -248,7 +250,7 @@ public sealed class PlayerFishing : MonoBehaviour
     private void Strike()
     {
         FishingSettings settings = FishingSettings.Current;
-        if (still && Random.value < settings.NokkenChance)
+        if (still && !GameSession.Settlement.HasSpiritGift(SpiritBonds.NokkGift) && Random.value < settings.NokkenChance)
         {
             State = Phase.Grabbed;
             HideLine();

@@ -22,6 +22,14 @@ public sealed class SeasonCycle : ScriptableObject
         [Range(0f, 1f)] public float leafFall;
         [Tooltip("Frost on leaves and grass (0-1).")]
         [Range(0f, 1f)] public float frost;
+        [Tooltip("Rain falls as snow, and settles on the ground instead of soaking it.")]
+        public bool snows;
+        [Tooltip("Snow lying on the ground all through the season, between snowfalls (0-1; snowfall deepens it).")]
+        [Range(0f, 1f)] public float lyingSnow;
+        [Tooltip("Metres the rivers run higher with the thaw (spring): fords are swum, not waded. Still water is left alone.")]
+        [Min(0f)] public float riverRise;
+        [Tooltip("How many fireflies come out on its nights, of a summer's (0-1).")]
+        [Range(0f, 1f)] public float fireflies = 1f;
         [Tooltip("Weather this season brings, in place of the scene's own (none: the scene's).")]
         public ClimateDefinition climate;
     }
@@ -31,6 +39,21 @@ public sealed class SeasonCycle : ScriptableObject
     [SerializeField, Min(0)] private int turningDays = 2;
 
     public IReadOnlyList<Season> Seasons => seasons;
+
+    /// <summary>Days in the whole year (its seasons' days added up).</summary>
+    public int YearDays
+    {
+        get
+        {
+            int year = 0;
+            foreach (Season one in seasons)
+            {
+                year += Mathf.Max(1, one.days);
+            }
+
+            return year;
+        }
+    }
 
     public void Configure(List<Season> year, int turning)
     {
@@ -69,6 +92,28 @@ public sealed class SeasonCycle : ScriptableObject
 
             into -= length;
         }
+    }
+
+    /// <summary>Whether rain falls as snow on a day (it changes halfway through the turn), and how much snow lies.</summary>
+    public void SnowAt(float day, out bool snows, out float lying)
+    {
+        At(day, out Season season, out Season next, out float turned);
+        snows = season != null && (turned < 0.5f ? season.snows : next.snows);
+        lying = season != null ? Mathf.Lerp(season.lyingSnow, next.lyingSnow, turned) : 0f;
+    }
+
+    /// <summary>How much higher the rivers run on a day (metres), blended between seasons.</summary>
+    public float RiverRiseAt(float day)
+    {
+        At(day, out Season season, out Season next, out float turned);
+        return season != null ? Mathf.Lerp(season.riverRise, next.riverRise, turned) : 0f;
+    }
+
+    /// <summary>The share of a summer's fireflies on a day, blended between seasons.</summary>
+    public float FirefliesAt(float day)
+    {
+        At(day, out Season season, out Season next, out float turned);
+        return season != null ? Mathf.Lerp(season.fireflies, next.fireflies, turned) : 1f;
     }
 
     /// <summary>The look on a day: autumn, leaf fall and frost, blended between seasons.</summary>

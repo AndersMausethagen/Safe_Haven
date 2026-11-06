@@ -74,7 +74,8 @@ public sealed class Fireflies : MonoBehaviour
             return;
         }
 
-        int missing = profile.CountFor(AtmosphereConditions.Night, AtmosphereConditions.WeatherRain) - system.particleCount;
+        int wanted = Mathf.RoundToInt(profile.CountFor(AtmosphereConditions.Night, AtmosphereConditions.WeatherRain) * Seasons.Fireflies);
+        int missing = wanted - system.particleCount;
         if (missing <= 0)
         {
             return;

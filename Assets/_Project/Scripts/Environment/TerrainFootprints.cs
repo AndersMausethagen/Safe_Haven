@@ -58,10 +58,22 @@ public sealed class TerrainFootprints : MonoBehaviour
         }
         if (remaining > 0 && seconds > 0)
         {
-            Render(Vector2.zero, seconds / Mathf.Max(0.1f, Profile.footprintLifetime), false, Vector2.zero, Vector2.up);
-            remaining = Mathf.Max(0, remaining - seconds / Mathf.Max(0.1f, Profile.footprintLifetime));
+            WeatherSystem weather = WeatherSystem.Active;
+            float lifetime = Profile.footprintLifetime * SnowLifetime(weather != null ? weather.Snow : 0f, weather != null && weather.Snowing ? weather.Current.Rain : 0f);
+            Render(Vector2.zero, seconds / Mathf.Max(0.1f, lifetime), false, Vector2.zero, Vector2.up);
+            remaining = Mathf.Max(0, remaining - seconds / Mathf.Max(0.1f, lifetime));
         }
         Bind();
+    }
+
+    /// <summary>
+    /// How much longer prints last than usual: in lying snow they stay (up to five times as long, so tracks can be
+    /// followed), and falling snow fills them in again (a heavy fall fills them in twice as fast as usual).
+    /// </summary>
+    public static float SnowLifetime(float snow, float snowfall)
+    {
+        float kept = Mathf.Lerp(1f, 5f, Mathf.Clamp01((snow - 0.2f) / 0.5f));
+        return kept / (1f + Mathf.Clamp01(snowfall) * (kept * 2f - 1f));
     }
 
     public void Stamp(Vector3 worldPosition, Vector3 forward)

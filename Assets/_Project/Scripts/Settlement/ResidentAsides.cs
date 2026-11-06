@@ -53,8 +53,16 @@ public sealed class ResidentAsides : MonoBehaviour
 
         if (line == null && Time.time >= nextAside)
         {
-            string[] lines = settings.AsidesAt(AtmosphereConditions.Hour);
-            line = lines.Length > 0 ? lines[Random.Range(0, lines.Length)] : null;
+            FestivalDefinition festival = Festivals.Now;
+            if (festival != null && festival.Lines.Count > 0)
+            {
+                line = festival.Lines[Random.Range(0, festival.Lines.Count)];
+            }
+            else
+            {
+                string[] lines = settings.AsidesAt(AtmosphereConditions.Hour);
+                line = lines.Length > 0 ? lines[Random.Range(0, lines.Length)] : null;
+            }
         }
 
         if (line == null)

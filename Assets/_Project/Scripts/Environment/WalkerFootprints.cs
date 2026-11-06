@@ -4,7 +4,8 @@ using UnityEngine;
 /// Footprints for people other than the player (residents, companions): a print every half stride walked, left and
 /// right in turn, at the foot bone when the body is humanoid (else beside the middle). They go into the terrain's
 /// footprint field only where the player's own prints are kept (TerrainFootprints.StampInWindow), so they cost nothing
-/// out of sight. Added in code by the characters that walk (see <see cref="AddTo"/>).
+/// out of sight. Added in code by the characters that walk (see <see cref="AddTo(GameObject)"/>): people, and wild
+/// animals and creatures with their own strides, so their tracks show in snow and can be followed.
 /// </summary>
 [DisallowMultipleComponent]
 public sealed class WalkerFootprints : MonoBehaviour
@@ -28,6 +29,23 @@ public sealed class WalkerFootprints : MonoBehaviour
         {
             walker.AddComponent<WalkerFootprints>();
         }
+    }
+
+    /// <summary>Adds prints to an animal or creature: shorter or longer strides than a person's, feet further apart.</summary>
+    public static void AddTo(GameObject walker, float step, float spacing)
+    {
+        if (walker == null)
+        {
+            return;
+        }
+
+        if (!walker.TryGetComponent(out WalkerFootprints prints))
+        {
+            prints = walker.AddComponent<WalkerFootprints>();
+        }
+
+        prints.stepMeters = Mathf.Max(0.2f, step);
+        prints.footSpacing = Mathf.Max(0f, spacing);
     }
 
     private void OnEnable()

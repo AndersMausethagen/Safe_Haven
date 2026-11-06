@@ -25,6 +25,17 @@ public sealed class WaterSource : MonoBehaviour, IInteractionName
     [SerializeField, Min(0)] private int fillUpTo = 3;
 
     private Interactable interactable;
+    private int iceBrokenOnDay = -1;
+
+    /// <summary>In a snowing season a well or trough freezes over each night: the first use of the day breaks the ice.</summary>
+    public static bool FreezesNow
+    {
+        get
+        {
+            WeatherSystem weather = WeatherSystem.Active;
+            return weather != null && weather.Snowing && weather.Snow >= 0.3f;
+        }
+    }
 
     private void Awake()
     {
@@ -55,6 +66,15 @@ public sealed class WaterSource : MonoBehaviour, IInteractionName
         GameObject user = interactable.Interactor;
         if (user == null)
         {
+            return;
+        }
+
+        int today = GameSession.Settlement.DaysPassed;
+        if (FreezesNow && iceBrokenOnDay != today)
+        {
+            iceBrokenOnDay = today;
+            AudioManager.Play(AudioManager.Sounds != null ? AudioManager.Sounds.IceBreak : null, transform.position);
+            GameMessages.Post($"The {InteractionName.ToLowerInvariant()} has frozen over in the night. You break the ice.");
             return;
         }
 

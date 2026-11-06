@@ -109,6 +109,30 @@ Shader "Safe Haven/Water"
             float _WaterFoamSpotCount;
             float _SafeHavenRain;
             float4 _SafeHavenWind; // horizontal direction XZ (world), moss displacement, speed
+            // Ice (WinterIce, per surface through a property block): still water freezes over in a snowing season.
+            float _IceAmount;
+            #include "Assets/_Project/Shaders/SeasonSnow.hlsl"
+
+            // Cracks in the ice: the edges of a cell pattern, fine lines between plates.
+            half IceCracks(float2 p)
+            {
+                float2 cell = floor(p);
+                float2 f = frac(p);
+                float nearest = 8.0, second = 8.0;
+                for (int y = -1; y <= 1; y++)
+                {
+                    for (int x = -1; x <= 1; x++)
+                    {
+                        float2 o = float2(x, y);
+                        float2 r = o + float2(SeasonSnowHash(cell + o), SeasonSnowHash(cell + o + 17.3)) - f;
+                        float d = dot(r, r);
+                        if (d < nearest) { second = nearest; nearest = d; }
+                        else if (d < second) { second = d; }
+                    }
+                }
+
+                return 1.0 - smoothstep(0.0, 0.035, sqrt(second) - sqrt(nearest));
+            }
 
             struct Attributes
             {
@@ -456,6 +480,20 @@ Shader "Safe Haven/Water"
                 #if defined(SAFE_HAVEN_WATER_SIMPLE)
                     alpha = saturate(alpha + foam + fresnel * 0.5);
                 #endif
+                if (_IceAmount > 0.001)
+                {
+                    // Pale, cloudy ice with darker water seen through it in places, fine cracks, and snow drifted on it.
+                    float2 icy = positionWS.xz;
+                    half cloud = SeasonSnowNoise(icy * 0.35) * 0.6 + SeasonSnowNoise(icy * 1.7) * 0.4;
+                    half3 iceLight = sun.color * sun.shadowAttenuation * saturate(sun.direction.y) * 0.7 + ambient * 1.3;
+                    half3 ice = lerp(half3(0.18, 0.26, 0.32), half3(0.62, 0.72, 0.8), cloud) * iceLight;
+                    ice *= 1.0 - 0.35 * (IceCracks(icy * 0.8) * 0.7 + IceCracks(icy * 2.6) * 0.3);
+                    half drift = smoothstep(0.45, 0.75, cloud + (_SafeHavenSnow - 0.5) * 0.6) * _SafeHavenSnow;
+                    ice = lerp(ice, half3(0.82, 0.86, 0.92) * iceLight, drift);
+                    colour = lerp(colour, ice + reflection * 0.08, _IceAmount);
+                    alpha = lerp(alpha, 0.96, _IceAmount);
+                }
+
                 colour = MixFog(colour, input.alphaFog.y);
                 return half4(colour, alpha);
             }

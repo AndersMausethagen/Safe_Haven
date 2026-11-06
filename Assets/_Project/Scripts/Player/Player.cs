@@ -51,6 +51,8 @@ public sealed class Player : MonoBehaviour
 
     private void Awake()
     {
+        ColdBreath.AddTo(gameObject);
+        PlayerWarmth.AddTo(gameObject);
         if (Current != null && Current != this)
         {
             Debug.LogWarning($"A second player ({name}) appeared; the newest one is used.", this);

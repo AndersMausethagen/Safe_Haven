@@ -89,6 +89,14 @@ public sealed class AudioSettingsDefinition : ScriptableObject
     [SerializeField] private SoundDefinition footstepWood;
     [Tooltip("Steps in water.")]
     [SerializeField] private SoundDefinition footstepWater;
+    [Tooltip("Steps on terrain where snow lies (winter), whatever grows or lies under it.")]
+    [SerializeField] private SoundDefinition footstepSnow;
+    [Tooltip("Snow on the ground (0-1) from which steps crunch.")]
+    [SerializeField, Range(0f, 1f)] private float snowForSnowSteps = 0.3f;
+    [Tooltip("Steps on frozen water.")]
+    [SerializeField] private SoundDefinition footstepIce;
+    [Tooltip("Breaking the night's ice on a well in winter.")]
+    [SerializeField] private SoundDefinition iceBreak;
     [SerializeField] private SoundDefinition land;
     [Tooltip("Metres walked per step when the animation has no footstep events.")]
     [SerializeField, Min(0.2f)] private float strideLength = 1.4f;
@@ -183,6 +191,17 @@ public sealed class AudioSettingsDefinition : ScriptableObject
     public int GrassForGrassSteps => grassForGrassSteps;
     public SoundDefinition FootstepWood => footstepWood;
     public SoundDefinition FootstepWater => footstepWater;
+    public SoundDefinition FootstepSnow => footstepSnow;
+    public float SnowForSnowSteps => snowForSnowSteps;
+    public SoundDefinition FootstepIce => footstepIce;
+    public SoundDefinition IceBreak => iceBreak;
+
+    public void ConfigureWinterSteps(SoundDefinition snow, SoundDefinition ice, SoundDefinition breaking)
+    {
+        footstepSnow = snow;
+        footstepIce = ice;
+        iceBreak = breaking;
+    }
     public SoundDefinition Land => land;
     public float StrideLength => strideLength;
     public float MusicWhileSpeaking => musicWhileSpeaking;

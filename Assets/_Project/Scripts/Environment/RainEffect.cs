@@ -2,13 +2,20 @@ using UnityEngine;
 
 /// <summary>Rain around the camera: falling streaks from a box above the ground the camera looks at, and small splashes
 /// on that ground, both scaled by the intensity <see cref="WeatherSystem"/> sets. The streaks slant with the scene's
-/// Moss Wind. Also sets _SafeHavenRain (0..1) for shaders (rain rings on water).</summary>
+/// Moss Wind. Also sets _SafeHavenRain (0..1) for shaders (rain rings on water). In a snowing season the same weather
+/// falls as drifting flakes instead (no streaks, splashes or rings).</summary>
 [ExecuteAlways]
 [DisallowMultipleComponent]
 public sealed class RainEffect : MonoBehaviour
 {
     [SerializeField] private ParticleSystem drops;
     [SerializeField] private ParticleSystem splashes;
+    [Tooltip("Snowflakes, falling in place of the rain in a snowing season (optional).")]
+    [SerializeField] private ParticleSystem flakes;
+    [Tooltip("Flakes per second in a heavy snowfall.")]
+    [SerializeField, Min(0f)] private float flakesPerSecond = 900f;
+    [Tooltip("Sideways drift (m/s) the wind gives the flakes at the Moss Wind's usual strength (they drift more than rain).")]
+    [SerializeField, Min(0f)] private float flakeDrift = 1.6f;
     [Tooltip("Streaks per second in a downpour.")]
     [SerializeField, Min(0f)] private float dropsPerSecond = 3000f;
     [Tooltip("Splashes per second in a downpour.")]
@@ -21,16 +28,30 @@ public sealed class RainEffect : MonoBehaviour
     private static readonly int RainId = Shader.PropertyToID("_SafeHavenRain");
     private static readonly int WindId = Shader.PropertyToID("_SafeHavenWind");
     private float intensity;
+    private bool asSnow;
 
     public float Intensity => intensity;
 
-    /// <summary>0 = dry, 1 = downpour.</summary>
-    public void SetRain(float amount)
+    /// <summary>Whether it falls as snow now.</summary>
+    public bool AsSnow => asSnow;
+
+    /// <summary>0 = dry, 1 = downpour (or a heavy snowfall, with <paramref name="snow"/>).</summary>
+    public void SetRain(float amount, bool snow = false)
     {
         intensity = Mathf.Clamp01(amount);
-        Shader.SetGlobalFloat(RainId, intensity);
-        SetRate(drops, intensity * dropsPerSecond);
-        SetRate(splashes, intensity * splashesPerSecond);
+        asSnow = snow && flakes != null;
+        float rainfall = asSnow ? 0f : intensity;
+        Shader.SetGlobalFloat(RainId, rainfall);
+        SetRate(drops, rainfall * dropsPerSecond);
+        SetRate(splashes, rainfall * splashesPerSecond);
+        SetRate(flakes, asSnow ? intensity * flakesPerSecond : 0f);
+    }
+
+    public void Configure(ParticleSystem snowflakes, float perSecond, float drift)
+    {
+        flakes = snowflakes;
+        flakesPerSecond = perSecond;
+        flakeDrift = drift;
     }
 
     private void OnDisable()
@@ -65,6 +86,16 @@ public sealed class RainEffect : MonoBehaviour
         if (splashes != null)
         {
             splashes.transform.position = ground + Vector3.up * 0.05f;
+        }
+
+        if (flakes != null && asSnow)
+        {
+            flakes.transform.position = ground + Vector3.up * height;
+            Vector4 wind = Shader.GetGlobalVector(WindId);
+            Vector2 drift = new Vector2(wind.x, wind.y) * (flakeDrift * wind.z / 0.045f);
+            ParticleSystem.VelocityOverLifetimeModule velocity = flakes.velocityOverLifetime;
+            velocity.x = drift.x;
+            velocity.z = drift.y;
         }
     }
 

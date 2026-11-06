@@ -76,6 +76,7 @@ MonoBehaviour:
   creatureDistance: 14
   alarm: {fileID: 0}
   alertSeconds: 0.7
+  winterCoat: {r: 0.93, g: 0.93, b: 0.95, a: 0.9}
 --- !u!1001 &380452752895562842
 PrefabInstance:
   m_ObjectHideFlags: 0

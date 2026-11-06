@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a894733223a52d04bbe27afa97cb0ba3, type: 3}
+  m_Name: Midwinter Bonfire
+  m_EditorClassIdentifier: SafeHaven::FestivalDefinition
+  displayName: Midwinter Bonfire
+  dayOfYear: 23
+  hours: {x: 16.5, y: 24}
+  announcement: It's Midwinter. Tonight the Haven keeps the bonfire burning against the long dark.
+  lines:
+  - The longest night. From tomorrow the light comes back, a little at a time.
+  - Stand close to the fire. The cold can't have us tonight.
+  - My grandmother said the dead come to warm themselves at Midwinter. Leave them room.
+  - Burn a sprig of juniper for luck. Go on.
+  - Listen. Even the woods are quiet tonight.
+  music: {fileID: 11400000, guid: 7e12f4dd9fe56894bbc75084cfe02f39, type: 2}
+  boonName: Midwinter Warmth
+  boon:
+  - stat: 10
+    op: 0
+    value: 0.6
+  - stat: 16
+    op: 1
+    value: 0.05
+  boonSeconds: 1800

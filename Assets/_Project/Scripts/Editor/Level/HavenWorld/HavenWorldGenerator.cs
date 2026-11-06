@@ -1109,7 +1109,13 @@ public static class HavenWorldGenerator
             var go = new GameObject(name);
             go.transform.SetParent(root, false);
             go.transform.position = ground(at);
-            go.AddComponent<WildlifeHerd>().Configure(kinds, count, radius, hours);
+            var herd = go.AddComponent<WildlifeHerd>();
+            herd.Configure(kinds, count, radius, hours);
+            if (kinds == recipe.grazers)
+            {
+                herd.SetHollowed(recipe.hollowedGrazer);
+            }
+
             made++;
         }
 

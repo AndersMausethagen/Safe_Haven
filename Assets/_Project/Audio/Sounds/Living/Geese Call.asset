@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0de871765cd6fce4c8fed103ef0082e3, type: 3}
+  m_Name: Geese Call
+  m_EditorClassIdentifier: SafeHaven::SoundDefinition
+  displayName: Geese Call
+  caption: 
+  clips:
+  - {fileID: 8300000, guid: f0f56f5c8dd576740941cf6df6e0b40c, type: 3}
+  - {fileID: 8300000, guid: 49b51be89b1d2e84a8cbb54bd3677ac0, type: 3}
+  - {fileID: 8300000, guid: 4f1f5a82170b8094b95d8c59967fd259, type: 3}
+  channel: 1
+  volume: 0.5
+  volumeVariation: 0.1
+  pitchRange: {x: 0.95, y: 1.05}
+  positional: 1
+  fullVolumeDistance: 25
+  audibleDistance: 120
+  maxAtOnce: 1
+  minimumGap: 0.03
+  priority: 1
+  takesTheMix: 0

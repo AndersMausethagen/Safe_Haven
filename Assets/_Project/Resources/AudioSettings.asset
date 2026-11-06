@@ -71,6 +71,10 @@ MonoBehaviour:
   grassForGrassSteps: 2
   footstepWood: {fileID: 11400000, guid: 78db89018c9e64a4d8f84def91caba6a, type: 2}
   footstepWater: {fileID: 11400000, guid: 5b92b167e5b591449b2fcd212c1db02b, type: 2}
+  footstepSnow: {fileID: 11400000, guid: f5fe1a97432b6994496c6c3a24fb74dd, type: 2}
+  snowForSnowSteps: 0.3
+  footstepIce: {fileID: 11400000, guid: 488d32823e1af5c489a226f537f328e3, type: 2}
+  iceBreak: {fileID: 11400000, guid: 2fe3340deb71b3f42b1e6ccc959f1484, type: 2}
   land: {fileID: 11400000, guid: f128174308231b54ca039cf243fc0567, type: 2}
   strideLength: 1.4
   questStarted: {fileID: 11400000, guid: 53fe372285257d84faf9ea69968a9b0f, type: 2}

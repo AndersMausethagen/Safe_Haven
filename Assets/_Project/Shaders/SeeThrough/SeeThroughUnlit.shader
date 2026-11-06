@@ -32,6 +32,7 @@ Shader "Safe Haven/Unlit (See-Through)"
         [HideInInspector] _MainTex("BaseMap", 2D) = "white" {}
         [HideInInspector] _Color("Base Color", Color) = (0.5, 0.5, 0.5, 1)
         [HideInInspector] _SampleGI("SampleGI", float) = 0.0 // needed from bakedlit
+        [Toggle(_SEASON_SNOW)] _SeasonSnow("Snow Settles On It (winter)", Float) = 0
     }
 
     SubShader
@@ -91,6 +92,9 @@ Shader "Safe Haven/Unlit (See-Through)"
             // Includes
             #include "Packages/com.unity.render-pipelines.universal/Shaders/UnlitInput.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/Shaders/UnlitForwardPass.hlsl"
+            #pragma shader_feature_local_fragment _ _SEASON_SNOW
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
+            #include "Assets/_Project/Shaders/SeasonSnow.hlsl"
             #include "Assets/_Project/Shaders/SeeThrough/SeeThrough.hlsl"
             void SeeThroughUnlitFragment(
                 Varyings input
@@ -106,6 +110,13 @@ Shader "Safe Haven/Unlit (See-Through)"
                     , outRenderingLayers
             #endif
                 );
+            #if defined(_SEASON_SNOW)
+                float3 positionWS = ComputeWorldSpacePosition(input.positionCS.xy / _ScaledScreenParams.xy, input.positionCS.z, UNITY_MATRIX_I_VP);
+                half3 normalWS = normalize(cross(ddy(positionWS), ddx(positionWS)));
+                half cover = SeasonSnowCover(normalWS, positionWS);
+                half3 snowLit = half3(0.82, 0.86, 0.92) * (_MainLightColor.rgb * 0.55 + SampleSH(half3(0, 1, 0)));
+                outColor.rgb = lerp(outColor.rgb, snowLit, cover * 0.9);
+            #endif
             }
 
             ENDHLSL

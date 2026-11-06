@@ -25,6 +25,7 @@ Shader "Safe Haven/Lit (See-Through)"
 
         [ToggleOff] _SpecularHighlights("Specular Highlights", Float) = 1.0
         [ToggleOff] _EnvironmentReflections("Environment Reflections", Float) = 1.0
+        [Toggle(_SEASON_SNOW)] _SeasonSnow("Snow Settles On It (winter)", Float) = 0
         [ToggleOff] _ScreenSpaceReflections("Screen Space Reflections", Float) = 1.0
         [ToggleOff] _ScreenSpaceReflectionsContributeTransparent("Screen Space Reflections Contribute Transparent", Float) = 1.0
 
@@ -190,6 +191,10 @@ Shader "Safe Haven/Lit (See-Through)"
             #include_with_pragmas "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DOTS.hlsl"
 
             #include "Packages/com.unity.render-pipelines.universal/Shaders/LitInput.hlsl"
+            #pragma shader_feature_local_fragment _ _SEASON_SNOW
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
+            #define SEASON_SNOW_WRAP_PBR
+            #include "Assets/_Project/Shaders/SeasonSnow.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/Shaders/LitForwardPass.hlsl"
             #include "Assets/_Project/Shaders/SeeThrough/SeeThrough.hlsl"
             void SeeThroughLitFragment(

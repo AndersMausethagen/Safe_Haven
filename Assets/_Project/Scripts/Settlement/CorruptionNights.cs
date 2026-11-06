@@ -211,6 +211,7 @@ public sealed class CorruptionNights : MonoBehaviour
             leaveAt = -1f;
             ReturnWeather();
             GameMessages.Post(CorruptionSettings.Current.Cleared, MessageKind.Gain);
+            GameSession.Settlement.ChangeBlight(-0.1f); // beaten back: the woods heal a little
             int reward = CorruptionSettings.Current.ExperienceFor(bandSize);
             if (reward > 0)
             {
@@ -261,5 +262,7 @@ public sealed class CorruptionNights : MonoBehaviour
 
         fought = false;
         leaveAt = Time.time + CorruptionSettings.Current.DawnSeconds;
+        // They got away with it: the blight they carry spreads in the woods round home.
+        GameSession.Settlement.ChangeBlight(0.08f + 0.04f * attackers.Count);
     }
 }

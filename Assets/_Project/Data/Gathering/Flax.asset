@@ -31,6 +31,14 @@ MonoBehaviour:
   gatherRange: 1.6
   depleteOnGather: 1
   respawnSeconds: 360
+  inSeasons:
+  - Spring
+  - Summer
+  - Autumn
+  burstPieces: 0
+  fracture: {fileID: 0}
+  burstYields:
+    entries: []
   feedback: {fileID: 11400000, guid: 5e19753f3a66da744ae5d17004fb63d5, type: 2}
   worldModelPrefab: {fileID: 6089995343808359778, guid: d08301d09a9a74449b9cef4024873616, type: 3}
   worldPrefab: {fileID: 4564521982437816396, guid: dd15144a20b00e2408502e401ea88a06, type: 3}

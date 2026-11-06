@@ -55,6 +55,7 @@ Shader "Safe Haven/Mossy Stone ASE"
 		//[HideInInspector] _XRMotionVectorsPass("_XRMotionVectorsPass", Float) = 1
 
 		//[HideInInspector] _AlphaClip("__clip", Float) = 0.0
+		[Toggle(_SEASON_SNOW)] _SeasonSnow("Snow Settles On It (winter)", Float) = 0
 	}
 
 	SubShader
@@ -224,6 +225,8 @@ Shader "Safe Haven/Mossy Stone ASE"
 
 			#define ASE_GEOMETRY
 			#define _NORMAL_DROPOFF_TS 1
+			#pragma shader_feature_local_fragment _ _SEASON_SNOW
+			#include "Assets/_Project/Shaders/SeasonSnow.hlsl"
 			#pragma shader_feature_local_fragment _RECEIVE_SHADOWS_OFF
 			#pragma shader_feature_local_fragment _SPECULARHIGHLIGHTS_OFF
 			#pragma shader_feature_local_fragment _ENVIRONMENTREFLECTIONS_OFF
@@ -884,6 +887,9 @@ Shader "Safe Haven/Mossy Stone ASE"
 				#ifdef ASE_LIGHTING_SIMPLE
 					ASE_LIGHT_ACCUM4 color = UniversalFragmentBlinnPhong( inputData, surfaceData);
 				#else
+					#if defined(_SEASON_SNOW)
+						SeasonSnow(surfaceData.albedo, surfaceData.smoothness, inputData.normalWS, inputData.positionWS);
+					#endif
 					ASE_LIGHT_ACCUM4 color = UniversalFragmentPBR( inputData, surfaceData);
 				#endif
 

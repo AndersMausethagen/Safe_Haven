@@ -69,13 +69,18 @@ public sealed class WaterSurface : MonoBehaviour
         Unhook();
     }
 
+    /// <summary>Frozen over (WinterIce, in a snowing season): it is walked on, not waded, swum or drunk from.</summary>
+    public bool IsFrozen { get; private set; }
+
+    public void SetFrozen(bool frozen) => IsFrozen = frozen;
+
     /// <summary>The surface height of the water at <paramref name="point"/>, if the point is over a ripple-taking
-    /// water surface, at most <paramref name="reach"/> above it and not deeper than that surface's depth.</summary>
+    /// water surface that isn't frozen, at most <paramref name="reach"/> above it and not deeper than that surface's depth.</summary>
     public static bool TryFind(Vector3 point, float reach, out float height)
     {
         foreach (WaterSurface surface in All)
         {
-            if (surface != null && surface.takesRipples && surface.Contains(point, reach, out height))
+            if (surface != null && surface.takesRipples && !surface.IsFrozen && surface.Contains(point, reach, out height))
             {
                 return true;
             }
@@ -148,13 +153,13 @@ public sealed class WaterSurface : MonoBehaviour
         set => still = value;
     }
 
-    /// <summary>The water at a point, if any (within reach of its edge), with its surface height.</summary>
+    /// <summary>The open water at a point, if any (within reach of its edge), with its surface height. Ice isn't.</summary>
     public static WaterSurface At(Vector3 point, float reach, out float height)
     {
         height = 0f;
         foreach (WaterSurface surface in All)
         {
-            if (surface != null && surface.Contains(point, reach, out height))
+            if (surface != null && !surface.IsFrozen && surface.Contains(point, reach, out height))
             {
                 return surface;
             }

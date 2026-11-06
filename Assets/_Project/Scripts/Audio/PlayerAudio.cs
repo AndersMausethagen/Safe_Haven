@@ -205,8 +205,19 @@ public sealed class PlayerAudio : MonoBehaviour
 
         if (Physics.Raycast(position + Vector3.up * 0.5f, Vector3.down, out RaycastHit hit, 1.5f, ~0, QueryTriggerInteraction.Ignore))
         {
+            if (sounds.FootstepIce != null && hit.collider.GetComponentInParent<IceSheet>() != null)
+            {
+                return sounds.FootstepIce;
+            }
+
             if (hit.collider is TerrainCollider && hit.collider.TryGetComponent(out Terrain terrain))
             {
+                WeatherSystem weather = WeatherSystem.Active;
+                if (sounds.FootstepSnow != null && weather != null && weather.Snow >= sounds.SnowForSnowSteps)
+                {
+                    return sounds.FootstepSnow;
+                }
+
                 if (sounds.FootstepWater != null && TerrainPuddles.Contains(terrain, hit.point))
                 {
                     return sounds.FootstepWater;

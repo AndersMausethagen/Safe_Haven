@@ -26,8 +26,18 @@ MonoBehaviour:
   requiredToolTier: 1
   gatherAnimation: 1
   gatherSeconds: 4.5
+  swings: 3
+  swingSpeed: 1
   gatherRange: 1.6
   depleteOnGather: 1
   respawnSeconds: 600
+  inSeasons: []
+  burstPieces: 0
+  fracture: {fileID: 0}
+  burstYields:
+    entries: []
+  feedback: {fileID: 0}
   worldModelPrefab: {fileID: 7097349728917456308, guid: 2560fc16b34470249a4dd4f1c5585b44, type: 3}
   worldPrefab: {fileID: 4707785568422404063, guid: 8c73a6bd5fac65d40856f43f9a67962d, type: 3}
+  modelVariants: []
+  variantScale: {x: 0.9, y: 1.1}

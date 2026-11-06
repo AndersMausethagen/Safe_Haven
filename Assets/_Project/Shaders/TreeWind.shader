@@ -90,6 +90,19 @@ Shader "Safe Haven/Tree Wind"
             color.rgb = lerp(color.rgb, half3(0.8, 0.85, 0.9) * (0.45 + grey), _SafeHavenSeason.z * 0.28);
             return color;
         }
+        #include "Assets/_Project/Shaders/SeasonSnow.hlsl"
+        // Snow on the tops of crowns and branches: what faces up whitens, in clumps, so the woods read wintry from above.
+        half3 SnowOn(half3 albedo, half3 normalWS, float2 uv)
+        {
+            if (_SafeHavenSnow <= 0.001)
+            {
+                return albedo;
+            }
+
+            half clumps = frac(sin(dot(floor(uv * 9.0), float2(12.9, 78.2))) * 43758.5);
+            half cover = _SafeHavenSnow * smoothstep(0.15, 0.65, normalWS.y) * (0.55 + 0.45 * clumps);
+            return lerp(albedo, half3(0.82, 0.86, 0.92), saturate(cover * 0.8));
+        }
         float3 _LightDirection;
         float3 _LightPosition;
         struct Attributes
@@ -235,7 +248,8 @@ Shader "Safe Haven/Tree Wind"
             UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
             half4 baseColor = SampleBaseCoverage(input.uv);
             #if defined(_FAST_LEAF_LIGHTING)
-                half3 leaf = baseColor.rgb * FastLeafLighting(input, IS_FRONT_VFACE(face, 1.0, -1.0));
+                half3 leaf = SnowOn(baseColor.rgb, normalize(input.normalWS) * IS_FRONT_VFACE(face, 1.0, -1.0), input.uv)
+                    * FastLeafLighting(input, IS_FRONT_VFACE(face, 1.0, -1.0));
                 return half4(MixFog(leaf, input.fog), baseColor.a);
             #endif
             half4 mask = SAMPLE_TEXTURE2D(_ORMMap, sampler_ORMMap, input.uv);
@@ -282,6 +296,7 @@ Shader "Safe Haven/Tree Wind"
                 surface.smoothness = lerp(surface.smoothness, mossMask.a * 0.5, cover);
                 surface.occlusion = lerp(surface.occlusion, mossMask.g, cover);
             #endif
+            surface.albedo = SnowOn(surface.albedo, normalize(input.normalWS) * faceSign, input.uv);
             surface.normalTS = half3(0, 0, 1);
             half4 color = UniversalFragmentPBR(lighting, surface);
             #if defined(_ALPHATEST_ON)

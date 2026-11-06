@@ -21,10 +21,15 @@ public sealed class WildlifeHerd : MonoBehaviour
     [SerializeField, Min(20f)] private float goneBeyond = 85f;
     [Tooltip("Seconds before animals come back after they fled or the hour was wrong.")]
     [SerializeField, Min(10f)] private float awaySeconds = 300f;
+    [Tooltip("A hollowed one (a Glimpse) that may stand among them as the blight spreads round home: at full blight " +
+             "the herd is half the size and most likely has one.")]
+    [SerializeField] private Glimpse hollowed;
 
     private readonly List<Wildlife> living = new List<Wildlife>();
     private float nextCheck;
     private float awayUntil;
+
+    public void SetHollowed(Glimpse watcher) => hollowed = watcher;
 
     public void Configure(IReadOnlyList<Wildlife> animals, Vector2Int howMany, float area, AnimationCurve hours)
     {
@@ -84,7 +89,9 @@ public sealed class WildlifeHerd : MonoBehaviour
             return;
         }
 
-        int wanted = Random.Range(count.x, count.y + 1);
+        float blight = GameSession.Settlement.Blight;
+        int wanted = Mathf.Max(1, Mathf.RoundToInt(Random.Range(count.x, count.y + 1) * (1f - 0.5f * blight)));
+        bool hollowOne = hollowed != null && Random.value < blight * 0.7f;
         for (int i = 0; i < wanted * 3 && living.Count < wanted; i++)
         {
             Vector2 around = Random.insideUnitCircle * radius;
@@ -92,6 +99,14 @@ public sealed class WildlifeHerd : MonoBehaviour
             // Never right beside the player: they were there first.
             if ((at - player).sqrMagnitude < 18f * 18f || !NavMesh.SamplePosition(at, out NavMeshHit hit, 3f, NavMesh.AllAreas))
             {
+                continue;
+            }
+
+            if (hollowOne)
+            {
+                // It stands among them, watching, and is gone like any glimpse.
+                hollowOne = false;
+                Instantiate(hollowed, hit.position, Quaternion.Euler(0f, Random.Range(0f, 360f), 0f));
                 continue;
             }
 

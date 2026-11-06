@@ -129,6 +129,7 @@ MonoBehaviour:
   - {fileID: 1891235058169981651, guid: 530731b0216dffa40a52484a1666f75e, type: 3}
   foxes:
   - {fileID: 1081900227693273794, guid: 7b0b180b92953f3428ac6f04ea9b6b17, type: 3}
+  hollowedGrazer: {fileID: 284320703641946880, guid: e71a763a5d6957848aeb95d6536208f8, type: 3}
   pointsOfInterest:
   - name: Ruined Watchtower
     prefab: {fileID: 3890292879020267311, guid: 950d02f776d4a294fa75449c13c351ba, type: 3}

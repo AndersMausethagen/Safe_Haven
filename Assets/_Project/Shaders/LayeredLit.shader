@@ -62,6 +62,7 @@ Shader "Safe Haven/Layered Lit"
         _L2Smoothness ("Smoothness", Range(0, 1)) = 0.2
         [NoScaleOffset] _L2Height ("Height", 2D) = "gray" {}
         [Enum(R, 0, G, 1, B, 2, A, 3)] _L2HeightChannel ("Height Channel", Float) = 0
+        [Toggle(_SEASON_SNOW)] _SeasonSnow("Snow Settles On It (winter)", Float) = 0
     }
     SubShader
     {
@@ -288,12 +289,14 @@ Shader "Safe Haven/Layered Lit"
                     surface.emission *= 1.0 - w; \
                 } \
             }
+        #include "Assets/_Project/Shaders/SeasonSnow.hlsl"
         ENDHLSL
         Pass
         {
             Name "ForwardLit"
             Tags { "LightMode" = "UniversalForwardOnly" }
             HLSLPROGRAM
+            #pragma shader_feature_local_fragment _ _SEASON_SNOW
             #pragma target 3.5
             #pragma vertex LayeredVertex
             #pragma fragment LayeredFragment
@@ -370,6 +373,9 @@ Shader "Safe Haven/Layered Lit"
                 data.occlusion = occlusion;
                 data.emission = surface.emission;
                 data.normalTS = half3(0, 0, 1);
+                #if defined(_SEASON_SNOW)
+                    SeasonSnow(data.albedo, data.smoothness, lighting.normalWS, lighting.positionWS);
+                #endif
                 half4 color = UniversalFragmentPBR(lighting, data);
                 color.rgb = MixFog(color.rgb, input.fog);
                 return half4(color.rgb, 1);

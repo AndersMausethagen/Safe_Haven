@@ -18,6 +18,15 @@ public sealed class Glimpse : MonoBehaviour
     [SerializeField, Min(0f)] private float sinks = 2.2f;
     [SerializeField, Min(0.1f)] private float goneSeconds = 1.6f;
     [SerializeField] private SoundDefinition goneSound;
+    [Tooltip("Which spirit it is, if one that remembers how it was treated (SpiritBonds: huldra). Empty: none.")]
+    [SerializeField] private string spirit;
+
+    /// <summary>Raised as a glimpse begins to go: whether the player came too close (chased it) or it chose to.</summary>
+    public static event System.Action<Glimpse, bool> Left;
+
+    public string Spirit => spirit;
+
+    public void SetSpirit(string id) => spirit = id;
 
     private float leaveAt;
     private float leaving = -1f;
@@ -58,6 +67,7 @@ public sealed class Glimpse : MonoBehaviour
             if (near || Time.time >= leaveAt)
             {
                 leaving = 0f;
+                Left?.Invoke(this, near);
                 if (goneSound != null)
                 {
                     AudioManager.Play(goneSound, transform.position + Vector3.up);

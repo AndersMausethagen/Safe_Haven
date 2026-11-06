@@ -11,7 +11,8 @@ Material:
   m_Shader: {fileID: 4800000, guid: c2b444af46cc53a449c4f29576df1273, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
-  m_ValidKeywords: []
+  m_ValidKeywords:
+  - _SEASON_SNOW
   m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -45,6 +46,7 @@ Material:
     - _DstBlendAlpha: 0
     - _QueueOffset: 0
     - _SampleGI: 0
+    - _SeasonSnow: 1
     - _SrcBlend: 1
     - _SrcBlendAlpha: 1
     - _Surface: 0

@@ -282,4 +282,235 @@ public sealed class LivingWorldTests
 
         Assert.Greater(winter, 0.5f, "Some season frosts the leaves.");
     }
+
+    [Test]
+    public void GroundFrost_WinterWhitensAllDay_ALightFrostLiesInTheMorningOnly()
+    {
+        Assert.AreEqual(0f, Seasons.GroundFrost(0f, 6f, 1f), "No frost in summer, mist or not.");
+        Assert.AreEqual(1f, Seasons.GroundFrost(0.75f, 6f, 1f), 0.001f, "Winter: the ground is white at dawn.");
+        Assert.Greater(Seasons.GroundFrost(0.75f, 14f, 0f), 0.8f, "...and stays white through the day.");
+        float dawn = Seasons.GroundFrost(0.15f, 6f, 1f), afternoon = Seasons.GroundFrost(0.15f, 14f, 0f);
+        Assert.Greater(dawn, 0.3f, "Late autumn: patches of frost at dawn.");
+        Assert.Less(afternoon, dawn * 0.5f, "...mostly gone by the afternoon.");
+    }
+
+    [Test]
+    public void Snow_BuildsWhileItFalls_LiesThroughWinter_AndThawsAfter()
+    {
+        float snow = 0f;
+        for (int i = 0; i < 600; i++)
+        {
+            snow = WeatherSystem.AdvanceSnow(snow, 1f, 0.6f, true, 1f, 100f, 400f);
+        }
+
+        Assert.AreEqual(1f, snow, 0.001f, "A heavy snowfall covers the ground.");
+        float after = WeatherSystem.AdvanceSnow(snow, 0f, 0.6f, true, 60f, 100f, 400f);
+        Assert.That(after, Is.LessThan(1f).And.GreaterThan(0.95f), "Once it stops it lingers, settling slowly.");
+        Assert.AreEqual(0.6f, WeatherSystem.AdvanceSnow(0.6f, 0f, 0.6f, true, 3600f, 100f, 400f), 0.001f, "Never below the winter's own layer.");
+        Assert.AreEqual(0f, WeatherSystem.AdvanceSnow(1f, 0f, 0f, false, 400f, 100f, 400f), 0.001f, "Out of winter it thaws away.");
+    }
+
+    [Test]
+    public void SeasonCycle_OnlyWinterSnows_AndItsLayerComesAndGoesWithTheTurn()
+    {
+        var cycle = AssetDatabase.LoadAssetAtPath<SeasonCycle>("Assets/_Project/Data/World/Season Cycle.asset");
+        cycle.SnowAt(5f, out bool snows, out float lying);
+        Assert.IsFalse(snows, "Summer rains.");
+        Assert.AreEqual(0f, lying);
+        float winterStart = 0f;
+        SeasonCycle.Season winter = null;
+        foreach (SeasonCycle.Season season in cycle.Seasons)
+        {
+            if (season.snows)
+            {
+                winter = season;
+                break;
+            }
+
+            winterStart += season.days;
+        }
+
+        Assert.IsNotNull(winter, "Some season snows.");
+        cycle.SnowAt(winterStart + 1f, out snows, out lying);
+        Assert.IsTrue(snows);
+        Assert.AreEqual(winter.lyingSnow, lying, 0.001f);
+        Assert.Greater(lying, 0f, "Snow lies through the winter.");
+    }
+
+    [Test]
+    public void Weather_SnowFallsInsteadOfRain_AndDoesNotMakePuddles()
+    {
+        var go = new GameObject("Snow weather test");
+        try
+        {
+            var set = WeatherSetup.EnsureAssets();
+            var weather = go.AddComponent<WeatherSystem>();
+            weather.ChangesByItself = false;
+            weather.SetWeather(set.Storm, 0f);
+            weather.SetSnowfall(true, 0.6f);
+            float wetBefore = weather.Wetness;
+            for (int i = 0; i < 400; i++)
+            {
+                weather.Tick(1f);
+            }
+
+            Assert.AreEqual(1f, weather.Snow, 0.01f, "A storm in winter buries the ground in snow.");
+            Assert.Less(weather.Wetness, Mathf.Max(0.05f, wetBefore), "...and leaves no puddles.");
+            Assert.AreEqual(1f, Shader.GetGlobalFloat("_SafeHavenSnow"), 0.01f);
+            Assert.IsNotNull(set.RainPrefab.transform.Find("Snowflakes"), "The rain prefab has its snowflakes.");
+        }
+        finally
+        {
+            Object.DestroyImmediate(go);
+        }
+    }
+
+    // ----- The year in play -----
+
+    [Test]
+    public void Cold_ChillsSlowlyOutside_LessInFurs_AndAFireWarmsQuickly()
+    {
+        float exposure = 0f;
+        for (int i = 0; i < 300; i++) exposure = PlayerWarmth.Advance(exposure, 1f, 0f, false, 1f);
+        Assert.GreaterOrEqual(exposure, 1f, "Five minutes out in the full cold chills.");
+        float furs = 0f;
+        for (int i = 0; i < 300; i++) furs = PlayerWarmth.Advance(furs, 1f, 0.5f, false, 1f);
+        Assert.Less(furs, 1f, "Frost resistance halves it.");
+        float warmed = exposure;
+        for (int i = 0; i < 30; i++) warmed = PlayerWarmth.Advance(warmed, 1f, 0f, true, 1f);
+        Assert.AreEqual(0f, warmed, 0.001f, "Half a minute at a fire.");
+        Assert.Less(PlayerWarmth.Advance(0.5f, 0f, 0f, false, 10f), 0.5f, "A mild day eases it.");
+        Assert.AreEqual(0f, ColdBreath.Coldness(0f, 0f, 1f), "Summer: no breath, no cold.");
+        Assert.Greater(ColdBreath.Coldness(0.6f, 0.75f, 0f), 0.8f, "Winter.");
+    }
+
+    [Test]
+    public void Residents_KeepToTheFireInTheCold_AndSometimesGoOut()
+    {
+        Assert.AreEqual(ResidentActivity.Work, ResidentRoutine.InTheCold(ResidentActivity.Work, 15.5f, 0.2f), "A mild day.");
+        Assert.AreEqual(ResidentActivity.Fire, ResidentRoutine.InTheCold(ResidentActivity.Work, 15.5f, 0.6f), "A cold afternoon.");
+        Assert.AreEqual(ResidentActivity.Work, ResidentRoutine.InTheCold(ResidentActivity.Work, 11f, 0.9f), "Even a bitter day has some work.");
+        Assert.AreEqual(ResidentActivity.Fire, ResidentRoutine.InTheCold(ResidentActivity.Work, 8.5f, 0.9f));
+        Assert.AreEqual(ResidentActivity.Sleep, ResidentRoutine.InTheCold(ResidentActivity.Sleep, 15.5f, 1f));
+        int outings = 0;
+        for (int day = 0; day < 300; day++)
+        {
+            if (ResidentRoutine.Outing("Sigrid", day, out float start, out float hours))
+            {
+                outings++;
+                Assert.That(start, Is.InRange(10f, 14f));
+                Assert.That(hours, Is.InRange(0.9f, 1.7f));
+            }
+
+            ResidentRoutine.Outing("Sigrid", day, out float again, out _);
+            ResidentRoutine.Outing("Sigrid", day, out float again2, out _);
+            Assert.AreEqual(again, again2, "The same answer however often it is asked.");
+        }
+
+        Assert.That(outings, Is.InRange(60, 140), "About one day in three.");
+    }
+
+    [Test]
+    public void SeasonalNodes_OnlyGrowInTheirSeasons_ButASpotIsNeverEmpty()
+    {
+        var berries = ScriptableObject.CreateInstance<GatheringNodeDefinition>();
+        var sticks = ScriptableObject.CreateInstance<GatheringNodeDefinition>();
+        try
+        {
+            berries.ConfigureSeasons(new List<string> { "Summer", "Autumn" });
+            Assert.IsTrue(berries.InSeason("summer"));
+            Assert.IsFalse(berries.InSeason("Winter"));
+            Assert.IsTrue(berries.InSeason(null), "Raids have no season.");
+            Assert.IsTrue(sticks.InSeason("Winter"), "No seasons: all year.");
+        }
+        finally
+        {
+            Object.DestroyImmediate(berries);
+            Object.DestroyImmediate(sticks);
+        }
+
+        var content = Resources.Load<ContentDatabase>(ContentDatabase.ResourceName);
+        var picked = new List<GatheringNodeDefinition>();
+        RandomResourceNode.Collect(content.GatheringNodes, ResourceNodeKind.Forage, new Vector2Int(0, 1), picked, false, "Winter");
+        Assert.IsNotEmpty(picked);
+        Assert.IsFalse(picked.Exists(node => node.name == "Berries" || node.name == "Chanterelles"), "No berries or mushrooms in winter.");
+        RandomResourceNode.Collect(content.GatheringNodes, ResourceNodeKind.Forage, new Vector2Int(0, 1), picked, false, "Autumn");
+        Assert.IsTrue(picked.Exists(node => node.name == "Chanterelles"), "Mushrooms in autumn.");
+    }
+
+    [Test]
+    public void Festivals_FallOnTheirDayAndHours()
+    {
+        var feast = AssetDatabase.LoadAssetAtPath<FestivalDefinition>("Assets/_Project/Data/World/Festivals/Harvest Feast.asset");
+        var midwinter = AssetDatabase.LoadAssetAtPath<FestivalDefinition>("Assets/_Project/Data/World/Festivals/Midwinter Bonfire.asset");
+        Assert.IsNotNull(feast);
+        Assert.IsNotNull(midwinter);
+        var year = new List<FestivalDefinition> { feast, midwinter };
+        Assert.AreEqual(feast, Festivals.On(year, feast.DayOfYear, 19f));
+        Assert.IsNull(Festivals.On(year, feast.DayOfYear, 12f), "Not before evening.");
+        Assert.IsNull(Festivals.On(year, feast.DayOfYear + 1, 19f));
+        Assert.AreEqual(midwinter, Festivals.On(year, midwinter.DayOfYear, 22f));
+        Assert.Greater(feast.Boon.Count, 0);
+        Assert.Greater(feast.Lines.Count, 0);
+        Assert.IsNotNull(feast.Music);
+        var cycle = AssetDatabase.LoadAssetAtPath<SeasonCycle>("Assets/_Project/Data/World/Season Cycle.asset");
+        cycle.At(midwinter.DayOfYear + 0.5f, out SeasonCycle.Season season, out _, out _);
+        Assert.AreEqual("Winter", season.name, "Midwinter falls in winter.");
+        cycle.At(feast.DayOfYear + 0.5f, out season, out _, out _);
+        Assert.AreEqual("Autumn", season.name, "The harvest feast ends autumn.");
+    }
+
+    [Test]
+    public void Huldra_RemembersBeingLetBe_AndBeingChased()
+    {
+        Assert.AreEqual((1, 0, false), SpiritBonds.AfterHuldra(0, 0, false, 5, 2, 3));
+        Assert.AreEqual((0, 0, true), SpiritBonds.AfterHuldra(1, 0, false, 5, 2, 3), "The second time: a gift.");
+        Assert.AreEqual((0, 8, false), SpiritBonds.AfterHuldra(1, 0, true, 5, 2, 3), "Chased: away three days, respect gone.");
+    }
+
+    [Test]
+    public void Winter_IceSetsAndThaws_PrintsLastInSnow_AndTrailsLeadOut()
+    {
+        Assert.AreEqual(0.5f, WinterIce.Advance(0f, true, 30f, 60f), 0.001f);
+        Assert.AreEqual(0f, WinterIce.Advance(0.2f, false, 30f, 60f), 0.001f);
+        Assert.AreEqual(1f, TerrainFootprints.SnowLifetime(0f, 0f), 0.001f, "No snow: as usual.");
+        Assert.AreEqual(5f, TerrainFootprints.SnowLifetime(0.8f, 0f), 0.001f, "Lying snow keeps them.");
+        Assert.Less(TerrainFootprints.SnowLifetime(0.8f, 1f), 1f, "A heavy fall fills them in.");
+        Vector3 den = new Vector3(100f, 0f, 100f);
+        List<(Vector3 at, Vector3 forward)> trail = WinterTracks.Trail(den, Vector3.zero, 40f, 0.8f);
+        Assert.That(trail.Count, Is.InRange(48, 52));
+        Assert.Less(trail[trail.Count - 1].at.magnitude, den.magnitude, "It leads out towards home.");
+        Assert.AreEqual(trail[10].at, WinterTracks.Trail(den, Vector3.zero, 40f, 0.8f)[10].at, "The same trail each visit.");
+    }
+
+    [Test]
+    public void TheYear_FirefliesInSummer_RiversHighInSpring_GeeseInAV()
+    {
+        var cycle = AssetDatabase.LoadAssetAtPath<SeasonCycle>("Assets/_Project/Data/World/Season Cycle.asset");
+        Assert.AreEqual(32, cycle.YearDays);
+        Assert.AreEqual(1f, cycle.FirefliesAt(3f), 0.001f);
+        Assert.AreEqual(0f, cycle.FirefliesAt(22f), 0.001f, "None in winter.");
+        Assert.Greater(cycle.RiverRiseAt(28f), 0.3f, "The thaw.");
+        Assert.AreEqual(0f, cycle.RiverRiseAt(5f), 0.001f);
+        Vector3 heading = Vector3.forward;
+        Assert.AreEqual(Vector3.zero, MigratingGeese.PlaceInSkein(0, heading));
+        Vector3 left = MigratingGeese.PlaceInSkein(1, heading), right = MigratingGeese.PlaceInSkein(2, heading);
+        Assert.Less(left.z, 0f, "Behind the leader.");
+        Assert.AreEqual(-left.x, right.x, 0.001f, "Either side.");
+    }
+
+    [Test]
+    public void Blight_SpreadsAndEases_AndBringsTheHollowedNearer()
+    {
+        var settlement = new SettlementState();
+        settlement.ChangeBlight(0.5f);
+        settlement.PassDay();
+        Assert.AreEqual(0.5f - SettlementState.BlightEasedPerDay, settlement.Blight, 0.001f);
+        settlement.ChangeBlight(5f);
+        Assert.AreEqual(1f, settlement.Blight);
+        var entry = new GlimpseWatcher.Entry { beyondPortal = 250f, weight = 1f, moreWithBlight = 3f };
+        Assert.AreEqual(4f, entry.WeightNow(1f), 0.001f);
+        Assert.AreEqual(100f, entry.BeyondNow(1f), 0.001f);
+        Assert.AreEqual(250f, new GlimpseWatcher.Entry { beyondPortal = 250f }.BeyondNow(1f), "Others keep their distance.");
+    }
 }

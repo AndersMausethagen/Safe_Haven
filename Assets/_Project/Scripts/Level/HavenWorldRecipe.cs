@@ -194,6 +194,8 @@ public sealed class HavenWorldRecipe : ScriptableObject
     public List<Wildlife> grazers = new List<Wildlife>();
     [Tooltip("Foxes, in some of the rocky glades and lairs, about from dusk to dawn.")]
     public List<Wildlife> foxes = new List<Wildlife>();
+    [Tooltip("A hollowed grazer that may stand among a herd as the blight spreads (a Glimpse: it watches, then is gone).")]
+    public Glimpse hollowedGrazer;
 
     [Header("What Is Found There")]
     public List<HavenPointOfInterest> pointsOfInterest = new List<HavenPointOfInterest>();

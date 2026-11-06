@@ -100,10 +100,66 @@ public sealed class SettlementState
     /// <summary>Days that have passed at home: the seasons (Seasons) follow them. Counted when the night turns to day.</summary>
     public int DaysPassed { get; private set; }
 
-    /// <summary>A day has passed (dawn has come round).</summary>
-    public void PassDay() => DaysPassed++;
+    /// <summary>A day has passed (dawn has come round). The blight eases a little each day.</summary>
+    public void PassDay()
+    {
+        DaysPassed++;
+        Blight = Math.Max(0f, Blight - BlightEasedPerDay);
+    }
 
     public void RestoreDays(int days) => DaysPassed = Math.Max(0, days);
+
+    /// <summary>How far the blight has crept into the woods round home, 0 to 1: corrupted nights whose creatures got away
+    /// spread it; beating them back and the days passing ease it. Hollowed animals grow common as it spreads.</summary>
+    public float Blight { get; private set; }
+
+    public const float BlightEasedPerDay = 0.02f;
+
+    /// <summary>Spreads (positive) or eases (negative) the blight.</summary>
+    public void ChangeBlight(float by) => Blight = Math.Min(1f, Math.Max(0f, Blight + by));
+
+    public void RestoreBlight(float blight) => Blight = Math.Min(1f, Math.Max(0f, blight));
+
+    private readonly HashSet<string> spiritGifts = new HashSet<string>();
+
+    /// <summary>What the spirits have given that lasts (SpiritBonds): "nokk", the Nøkk's air.</summary>
+    public IReadOnlyCollection<string> SpiritGifts => spiritGifts;
+
+    public bool HasSpiritGift(string id) => spiritGifts.Contains(id);
+
+    public void GiveSpiritGift(string id)
+    {
+        if (!string.IsNullOrEmpty(id))
+        {
+            spiritGifts.Add(id);
+        }
+    }
+
+    /// <summary>Times the Huldra has been let be since she last left a gift (or was chased).</summary>
+    public int HuldraRespect { get; private set; }
+
+    /// <summary>The day before which she won't show herself, having been chased.</summary>
+    public int HuldraAwayUntil { get; private set; }
+
+    public void SetHuldra(int respect, int awayUntil)
+    {
+        HuldraRespect = Math.Max(0, respect);
+        HuldraAwayUntil = Math.Max(0, awayUntil);
+    }
+
+    public void RestoreSpirits(IEnumerable<string> gifts, int huldraRespect, int huldraAwayUntil)
+    {
+        spiritGifts.Clear();
+        if (gifts != null)
+        {
+            foreach (string gift in gifts)
+            {
+                GiveSpiritGift(gift);
+            }
+        }
+
+        SetHuldra(huldraRespect, huldraAwayUntil);
+    }
     public BreachStatus Breach { get; private set; }
 
     /// <summary>How many ward breaches have been beaten back: which one comes next, and how hard.</summary>

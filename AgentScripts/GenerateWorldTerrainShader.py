@@ -30,6 +30,8 @@ PROPERTIES = """
         _DisplacementStrength("Displacement Height Range (metres)", Range(0, 1)) = 0
         _DisplacementNear("Full Detail Distance (metres)", Float) = 8
         _DisplacementFar("Detail Fade Distance (metres)", Float) = 35
+        _DetailFocusNear("Full Detail Round the Player (metres)", Float) = 15
+        _DetailFocusFar("Detail Fade Round the Player (metres, 0 off)", Float) = 25
         _TessellationFactor("Maximum Tessellation", Range(1, 64)) = 8
         _TessellationEdgeLength("Target Edge Length (metres)", Float) = 0.08
         _TessellationPixels("Target Edge Length (pixels, 0 disables)", Range(0, 32)) = 4
@@ -81,6 +83,7 @@ PROPERTIES = """
         _SteepTint("Cliff Rock Tint", Color) = (1, 1, 1, 1)
         _SteepNormalStrength("Cliff Rock Normal Strength", Range(0, 2)) = 1
         _SteepHeightMidpoint("Cliff Rock Relief Midpoint (set by Enable or Refresh Displacement)", Range(0, 1)) = 0.5
+        _RockAntiTiling("Hide Rock Repetition (cracks no longer repeat every tile)", Range(0, 1)) = 1
 
         [Header(Breaking up tiling)]
         _AntiTiling("Hide Repetition", Range(0, 1)) = 0
@@ -183,24 +186,38 @@ half WorldMacroShadeIf(float2 uv, half weight)
     return WorldMacroShade(uv);
 }
 
+// One projection of the rock: sampled as it is and, where WorldRockBlend says, turned (WorldTerrainDisplacement.hlsl).
+void WorldRockSample(TEXTURE2D_PARAM(colourMap, smp), TEXTURE2D_PARAM(normalMap, normalSmp), TEXTURE2D_PARAM(maskMap, maskSmp),
+                     float2 uv, half b, half normalStrength, out half3 colour, out half4 mask, out half3 normal)
+{
+    colour = SAMPLE_TEXTURE2D(colourMap, smp, uv).rgb;
+    mask = SAMPLE_TEXTURE2D(maskMap, maskSmp, uv);
+    normal = UnpackNormalScale(SAMPLE_TEXTURE2D(normalMap, normalSmp, uv), normalStrength);
+    [branch] if (b > 0.001)
+    {
+        float2 turned = WorldRockTurnedUV(uv);
+        half3 turnedNormal = UnpackNormalScale(SAMPLE_TEXTURE2D(normalMap, normalSmp, turned), normalStrength);
+        turnedNormal.xy = mul(transpose(WorldRockTurn), turnedNormal.xy); // back into this projection's frame
+        colour = lerp(colour, SAMPLE_TEXTURE2D(colourMap, smp, turned).rgb, b);
+        mask = lerp(mask, SAMPLE_TEXTURE2D(maskMap, maskSmp, turned), b);
+        normal = normalize(lerp(normal, turnedNormal, b));
+    }
+}
+
 // Rock projected from three sides (no stretching on cliffs). Normals blend with the "whiteout" method.
 void WorldTriplanarRock(TEXTURE2D_PARAM(colourMap, smp), TEXTURE2D_PARAM(normalMap, normalSmp), TEXTURE2D_PARAM(maskMap, maskSmp),
                         float3 p, half3 n, half3 blend, float tiling, half3 tint, half normalStrength,
                         out half3 colour, out half4 mask, out half3 normal)
 {
     float3 q = p / max(tiling, 0.01);
-    float2 uvX = q.zy;
-    float2 uvY = q.xz;
-    float2 uvZ = q.xy;
-    colour = (SAMPLE_TEXTURE2D(colourMap, smp, uvX).rgb * blend.x +
-              SAMPLE_TEXTURE2D(colourMap, smp, uvY).rgb * blend.y +
-              SAMPLE_TEXTURE2D(colourMap, smp, uvZ).rgb * blend.z) * tint;
-    mask = SAMPLE_TEXTURE2D(maskMap, maskSmp, uvX) * blend.x +
-           SAMPLE_TEXTURE2D(maskMap, maskSmp, uvY) * blend.y +
-           SAMPLE_TEXTURE2D(maskMap, maskSmp, uvZ) * blend.z;
-    half3 tX = UnpackNormalScale(SAMPLE_TEXTURE2D(normalMap, normalSmp, uvX), normalStrength);
-    half3 tY = UnpackNormalScale(SAMPLE_TEXTURE2D(normalMap, normalSmp, uvY), normalStrength);
-    half3 tZ = UnpackNormalScale(SAMPLE_TEXTURE2D(normalMap, normalSmp, uvZ), normalStrength);
+    half b = WorldRockBlend(q);
+    half3 cX, cY, cZ, tX, tY, tZ;
+    half4 mX, mY, mZ;
+    WorldRockSample(TEXTURE2D_ARGS(colourMap, smp), TEXTURE2D_ARGS(normalMap, normalSmp), TEXTURE2D_ARGS(maskMap, maskSmp), q.zy, b, normalStrength, cX, mX, tX);
+    WorldRockSample(TEXTURE2D_ARGS(colourMap, smp), TEXTURE2D_ARGS(normalMap, normalSmp), TEXTURE2D_ARGS(maskMap, maskSmp), q.xz, b, normalStrength, cY, mY, tY);
+    WorldRockSample(TEXTURE2D_ARGS(colourMap, smp), TEXTURE2D_ARGS(normalMap, normalSmp), TEXTURE2D_ARGS(maskMap, maskSmp), q.xy, b, normalStrength, cZ, mZ, tZ);
+    colour = (cX * blend.x + cY * blend.y + cZ * blend.z) * tint;
+    mask = mX * blend.x + mY * blend.y + mZ * blend.z;
     tX = half3(tX.xy + n.zy, abs(tX.z) * n.x);
     tY = half3(tY.xy + n.xz, abs(tY.z) * n.y);
     tZ = half3(tZ.xy + n.xy, abs(tZ.z) * n.z);
@@ -336,6 +353,77 @@ void WorldWetness(Varyings IN, inout InputData inputData, inout half3 albedo, in
     half facing = saturate(dot(inputData.normalWS, inputData.viewDirectionWS));
     skySheen = puddle * lerp(0.26, 0.05, facing * facing);
 }
+
+// Frost on the ground in the cold of the year (Seasons sets _SafeHavenSeason.w: how much of the ground is frosted, 0-1;
+// x-z are the leaves' and grass's autumn, leaf fall and frost). Level ground frosts first, in patches that spread until
+// they nearly meet; slopes keep their colour longer, footprints break it, and a light frost lingers in shade (tree and
+// house shadows) after the sun has taken it off the open ground. Hoarfrost, not snow: a mottled, silvery dusting whose
+// brightness follows the ground's own texture, so roots, stones and paths still read from the top-down camera.
+float4 _SafeHavenSeason;
+
+void WorldFrost(Varyings IN, inout half3 albedo, inout half smoothness)
+{
+    half amount = _SafeHavenSeason.w;
+    if (amount <= 0.001)
+    {
+        return;
+    }
+
+    float2 xz = IN.positionWS.xz;
+    half sunlit = MainLightRealtimeShadow(TransformWorldToShadowCoord(IN.positionWS));
+    amount *= 1.0 - 0.6 * sunlit * saturate(1.0 - _SafeHavenSeason.z);
+    half level = smoothstep(0.5, 0.85, WorldGeometricNormal(IN).y);
+    float patches = WorldWetNoise(xz * 0.21 + 63.1) * 0.6 + WorldWetNoise(xz * 0.9 + 11.7) * 0.3 + WorldWetNoise(xz * 3.7 + 5.3) * 0.1;
+    patches = saturate((patches - 0.5) * 2.2 + 0.5);
+    half cover = smoothstep(0.0, 0.3, amount * 0.9 * lerp(0.45, 1.0, level) - (1.0 - patches) * 0.9);
+    cover *= 1.0 - saturate(WorldFootprintMask(xz) * 3.0);
+    if (cover <= 0.001)
+    {
+        return;
+    }
+
+    half ground = saturate(dot(albedo, half3(0.3, 0.59, 0.11)) * 2.4);
+    half grain = WorldWetNoise(xz * 23.0) * 0.6 + WorldWetNoise(xz * 61.0 + 7.1) * 0.4;
+    half crystals = saturate(grain * 1.6 - 0.3);
+    half3 frost = half3(0.62, 0.67, 0.74) * (0.5 + 0.6 * ground);
+    albedo = lerp(albedo, frost, cover * (0.3 + 0.3 * crystals));
+    smoothness = lerp(smoothness, 0.38, cover * 0.7);
+}
+
+// Snow lying on the ground (WeatherSystem sets _SafeHavenSnow, 0-1: a winter's thin layer, deeper while it snows). It
+// lies where the ground is level enough, shallowest at patches' edges, and footprints and trampling show the ground
+// through, so tracks read from above. Puddles have frozen or gone under it (the weather dries the ground while it snows).
+float _SafeHavenSnow;
+
+void WorldSnow(Varyings IN, inout InputData inputData, inout half3 albedo, inout half smoothness, inout half metallic, inout half occlusion)
+{
+    half amount = _SafeHavenSnow;
+    if (amount <= 0.001)
+    {
+        return;
+    }
+
+    float2 xz = IN.positionWS.xz;
+    half3 geometric = WorldGeometricNormal(IN);
+    half level = smoothstep(0.5, 0.85, geometric.y);
+    float patches = WorldWetNoise(xz * 0.21 + 63.1) * 0.6 + WorldWetNoise(xz * 0.9 + 11.7) * 0.3 + WorldWetNoise(xz * 3.7 + 5.3) * 0.1;
+    half cover = smoothstep(0.0, 0.25, amount * 1.25 * lerp(0.45, 1.0, level) - (1.0 - patches) * 0.9);
+    cover *= 1.0 - saturate(WorldFootprintMask(xz) * 3.0);
+    if (cover <= 0.001)
+    {
+        return;
+    }
+
+    half ground = saturate(dot(albedo, half3(0.3, 0.59, 0.11)) * 2.4);
+    half grain = WorldWetNoise(xz * 23.0) * 0.6 + WorldWetNoise(xz * 61.0 + 7.1) * 0.4;
+    half3 snow = half3(0.78, 0.82, 0.89) * (0.66 + 0.34 * ground) * (0.92 + 0.16 * grain);
+    albedo = lerp(albedo, snow, cover * 0.9);
+    smoothness = lerp(smoothness, 0.3, cover);
+    metallic *= 1.0 - cover;
+    occlusion = lerp(occlusion, 1.0, cover * 0.6);
+    // A layer of snow softens the ground's small relief.
+    inputData.normalWS = normalize(lerp(inputData.normalWS, geometric, cover * 0.5));
+}
 // ---------------------------------------------------------------------------------------------------------------------
 """
 
@@ -350,6 +438,8 @@ CALL = """
         float compression = saturate(footprintMask * 4) * response * _FootprintSettings.y;
         #ifdef TERRAIN_SPLAT_BASEPASS
             half3 compressedAlbedo = SAMPLE_TEXTURE2D_LOD(_MainTex, sampler_MainTex, IN.uvMainAndLM.xy, 2).rgb;
+        #elif defined(_WORLD_ALL_LAYERS) && !defined(TERRAIN_SPLAT_ADDPASS)
+            half3 compressedAlbedo = worldBlurredAlbedo;
         #else
             half3 compressedAlbedo = SAMPLE_TEXTURE2D_LOD(_Splat0, sampler_Splat0, IN.uvSplat01.xy, 5).rgb * _DiffuseRemapScale0.rgb * splatControl.r;
             compressedAlbedo += SAMPLE_TEXTURE2D_LOD(_Splat1, sampler_Splat0, IN.uvSplat01.zw, 5).rgb * _DiffuseRemapScale1.rgb * splatControl.g;
@@ -366,6 +456,8 @@ CALL = """
 #endif
     half skySheen;
     WorldWetness(IN, inputData, albedo, smoothness, metallic, occlusion, skySheen);
+    WorldFrost(IN, albedo, smoothness);
+    WorldSnow(IN, inputData, albedo, smoothness, metallic, occlusion);
 """
 
 
@@ -458,6 +550,30 @@ def layer_sampling(passes):
     return passes
 
 
+def single_pass_layers(passes):
+    """Every painted layer in one pass (WorldTerrainAllLayers.hlsl, keyword _WORLD_ALL_LAYERS): TerrainSurface culls
+    the add passes. URP's four-layer mix stays for the add passes and when the keyword is off."""
+    fragment = "\n// Used in Standard Terrain shader\n#ifdef TERRAIN_GBUFFER\nGBufferFragOutput SplatmapFragment"
+    passes = replace_once(passes, fragment,
+        "\n#if defined(_WORLD_ALL_LAYERS) && !defined(TERRAIN_SPLAT_BASEPASS) && !defined(TERRAIN_SPLAT_ADDPASS)\n"
+        "#include \"WorldTerrainAllLayers.hlsl\"\n#endif\n" + fragment, "the splatmap fragment")
+    start = passes.index("void SplatmapFragment(")
+    end = passes.index("    InputData inputData;", start)
+    body = passes[start:end]
+    body = replace_once(body, "#else\n\n    half4 hasMask",
+        "#else\n\n    half3 albedo;\n    half smoothness, metallic, occlusion, alpha;\n    half4 splatControl = 0;\n"
+        "#if defined(_WORLD_ALL_LAYERS) && !defined(TERRAIN_SPLAT_ADDPASS)\n"
+        "    // Every painted layer in this one pass (WorldTerrainAllLayers.hlsl): the add passes are culled.\n"
+        "    WorldAllLayersSurface(IN.uvMainAndLM.xy, albedo, smoothness, metallic, occlusion, normalTS, alpha);\n"
+        "#else\n    {\n    half4 hasMask", "the splatmap fragment's layers")
+    for declared in ("half4 splatControl = SAMPLE_TEXTURE2D", "half alpha = dot", "half3 albedo = mixedDiffuse",
+                     "half smoothness = dot", "half metallic = dot"):
+        body = replace_once(body, "    " + declared, "    " + declared.split(" ", 1)[1], "the splatmap fragment's " + declared)
+    body = replace_once(body, "    half occlusion = dot(splatControl, defaultOcclusion);\n#endif\n",
+        "    occlusion = dot(splatControl, defaultOcclusion);\n    }\n#endif\n#endif\n", "the splatmap fragment's occlusion")
+    return passes[:start] + body + passes[end:]
+
+
 def main():
     os.makedirs(TARGET, exist_ok=True)
     with open(os.path.join(SOURCE, "TerrainLit.shader"), encoding="utf-8") as f:
@@ -465,6 +581,9 @@ def main():
     shader = shader.replace('Shader "Universal Render Pipeline/Terrain/Lit"', 'Shader "Safe Haven/Terrain (World)"', 1)
     shader = shader.replace("        [ToggleUI] _EnableInstancedPerPixelNormal", PROPERTIES + "        [ToggleUI] _EnableInstancedPerPixelNormal", 1)
     shader = tessellate_shader(shader)
+    shader = replace_once(shader, "            #pragma shader_feature_local_fragment _TERRAIN_BLEND_HEIGHT\n",
+                          "            #pragma shader_feature_local_fragment _TERRAIN_BLEND_HEIGHT\n"
+                          "            #pragma shader_feature_local_fragment _ _WORLD_ALL_LAYERS\n", "the forward pass keywords")
     shader = shader.replace("Hidden/Universal Render Pipeline/Terrain/Lit (Add Pass)", "Hidden/Safe Haven/Terrain/Add")
     shader = shader.replace("Hidden/Universal Render Pipeline/Terrain/Lit (Base Pass)", "Hidden/Safe Haven/Terrain/Base")
     shader = re.sub(r'\n\s*CustomEditor "[^"]+"\n', "\n", shader)  # Unity's terrain GUI hides the rock settings
@@ -510,6 +629,7 @@ def main():
     }
 """)
     passes = layer_sampling(passes)
+    passes = single_pass_layers(passes)
     with open(os.path.join(TARGET, "WorldTerrainLitPasses.hlsl"), "w", encoding="utf-8", newline="\n") as f:
         f.write(HEADER.format(name="TerrainLitPasses.hlsl") + passes)
     with open(os.path.join(SOURCE, "TerrainLitDepthNormalsPass.hlsl"), encoding="utf-8") as f:

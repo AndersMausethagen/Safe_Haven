@@ -18,29 +18,49 @@ MonoBehaviour:
     autumn: 0
     leafFall: 0
     frost: 0
+    snows: 0
+    lyingSnow: 0
+    riverRise: 0
+    fireflies: 1
     climate: {fileID: 0}
   - name: Autumn
     days: 6
     autumn: 0.9
     leafFall: 0.1
     frost: 0
+    snows: 0
+    lyingSnow: 0
+    riverRise: 0
+    fireflies: 0.35
     climate: {fileID: 0}
   - name: Late Autumn
     days: 4
     autumn: 1
     leafFall: 0.65
     frost: 0.15
+    snows: 0
+    lyingSnow: 0
+    riverRise: 0
+    fireflies: 0
     climate: {fileID: 0}
   - name: Winter
     days: 6
     autumn: 1
     leafFall: 1
     frost: 0.75
+    snows: 1
+    lyingSnow: 0.6
+    riverRise: 0
+    fireflies: 0
     climate: {fileID: 0}
   - name: Spring
     days: 6
     autumn: 0
     leafFall: 0
     frost: 0.05
+    snows: 0
+    lyingSnow: 0
+    riverRise: 0.45
+    fireflies: 0.2
     climate: {fileID: 0}
   turningDays: 2

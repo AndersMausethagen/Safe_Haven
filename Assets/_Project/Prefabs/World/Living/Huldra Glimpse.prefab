@@ -565,6 +565,7 @@ MonoBehaviour:
   sinks: 2.6
   goneSeconds: 1.6
   goneSound: {fileID: 11400000, guid: 1f3fe8c1e8836904198e79f633ab5efc, type: 2}
+  spirit: huldra
 --- !u!1 &2093112415006556081
 GameObject:
   m_ObjectHideFlags: 0

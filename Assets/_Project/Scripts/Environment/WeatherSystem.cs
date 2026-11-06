@@ -25,6 +25,11 @@ public sealed class WeatherSystem : MonoBehaviour
     [SerializeField] private Volume overcastVolume;
 
     private static readonly int WetnessId = Shader.PropertyToID("_SafeHavenWetness");
+    private static readonly int SnowId = Shader.PropertyToID("_SafeHavenSnow");
+    /// <summary>How much slower snow builds up on the ground than rain soaks it, and how much longer it lingers after a snowfall than it takes to thaw.</summary>
+    private const float SnowSettleFactor = 1.5f, SnowLingerFactor = 6f;
+    /// <summary>Snow that is no longer the season's thaws this much slower than wet ground dries, and wets the ground as it goes.</summary>
+    private const float ThawFactor = 2f, MeltWater = 0.7f;
 
     private WeatherDefinition weather;
     private WeatherState from = WeatherState.Clear;
@@ -34,6 +39,9 @@ public sealed class WeatherSystem : MonoBehaviour
     private float timeLeft;
     private float flash;
     private float wetness;
+    private bool snowing;
+    private float lyingSnow;
+    private float snow;
     private System.Random random = new System.Random();
 
     /// <summary>The weather being blended to (or that has arrived).</summary>
@@ -45,6 +53,12 @@ public sealed class WeatherSystem : MonoBehaviour
     /// <summary>How wet the ground is, 0 dry to 1 soaked with full puddles. Lags behind the rain.</summary>
     public float Wetness => wetness;
 
+    /// <summary>Whether rain falls as snow (a snowing season: <see cref="SetSnowfall"/>).</summary>
+    public bool Snowing => snowing;
+
+    /// <summary>Snow on the ground, 0 none to 1 a full layer: the season's lying snow, deeper after a snowfall.</summary>
+    public float Snow => snow;
+
     /// <summary>Lightning brightness, 1 at a strike and fading within a fraction of a second.</summary>
     public float LightningFlash => flash;
 
@@ -55,6 +69,13 @@ public sealed class WeatherSystem : MonoBehaviour
 
     /// <summary>Changes the climate the next weather is picked from (a season's); the weather now carries on until then.</summary>
     public void SetClimate(ClimateDefinition next) => climate = next;
+
+    /// <summary>Set by the seasons: whether rain falls as snow, and how much snow lies between snowfalls (0-1).</summary>
+    public void SetSnowfall(bool falls, float lying)
+    {
+        snowing = falls;
+        lyingSnow = Mathf.Clamp01(lying);
+    }
 
     /// <summary>Whether the climate picks the next weather when one has lasted its time (developer tools can pause it).</summary>
     public bool ChangesByItself
@@ -108,6 +129,7 @@ public sealed class WeatherSystem : MonoBehaviour
         AtmosphereConditions.WeatherMist = 0f;
         AtmosphereConditions.WeatherRain = 0f;
         Shader.SetGlobalFloat(WetnessId, 0f);
+        Shader.SetGlobalFloat(SnowId, 0f);
         if (wind != null)
         {
             wind.SetWeather(1f, 0f);
@@ -160,6 +182,23 @@ public sealed class WeatherSystem : MonoBehaviour
             : Mathf.Max(rain, wetness - deltaTime / Mathf.Max(drySeconds, 1e-3f));
     }
 
+    /// <summary>Snow on the ground after <paramref name="deltaTime"/> seconds. While snow falls it builds towards the
+    /// snowfall's strength (never below what lies anyway) and lingers after; out of a snowing season it thaws away.</summary>
+    public static float AdvanceSnow(float snow, float falling, float lying, bool snowing, float deltaTime, float settleSeconds, float thawSeconds)
+    {
+        if (!snowing)
+        {
+            return Mathf.Max(lying, snow - deltaTime / Mathf.Max(thawSeconds, 1e-3f));
+        }
+
+        // The season's own layer is simply there (the season's turn already brings it in over days); a snowfall builds on it.
+        snow = Mathf.Max(snow, lying);
+        float target = Mathf.Max(lying, Mathf.Clamp01(falling));
+        return snow < target
+            ? Mathf.Min(target, snow + Mathf.Max(falling, 0.1f) * deltaTime / Mathf.Max(settleSeconds, 1e-3f))
+            : Mathf.Max(target, snow - deltaTime / Mathf.Max(thawSeconds * SnowLingerFactor, 1e-3f));
+    }
+
     /// <summary>Advances the blend, the climate's timer and lightning by <paramref name="deltaTime"/> seconds.</summary>
     public void Tick(float deltaTime)
     {
@@ -178,7 +217,12 @@ public sealed class WeatherSystem : MonoBehaviour
             }
         }
 
-        wetness = AdvanceWetness(wetness, current.Rain, deltaTime, climate != null ? climate.SoakSeconds : 75f, climate != null ? climate.DrySeconds : 240f);
+        float soak = climate != null ? climate.SoakSeconds : 75f, dry = climate != null ? climate.DrySeconds : 240f;
+        float before = snow;
+        snow = AdvanceSnow(snow, current.Rain, lyingSnow, snowing, deltaTime, soak * SnowSettleFactor, dry * ThawFactor);
+        // Snow doesn't soak the ground; snow thawing out of a snowing season does, a little.
+        float soaking = snowing ? 0f : Mathf.Max(current.Rain, before > snow ? before * MeltWater : 0f);
+        wetness = AdvanceWetness(wetness, soaking, deltaTime, soak, dry);
         flash = Mathf.Max(0f, flash - deltaTime * 5f);
         if (current.LightningPerMinute > 0f && random.NextDouble() < current.LightningPerMinute / 60f * deltaTime)
         {
@@ -220,6 +264,7 @@ public sealed class WeatherSystem : MonoBehaviour
         AtmosphereConditions.WeatherMist = Mathf.Clamp01(current.Mist);
         AtmosphereConditions.WeatherRain = Mathf.Clamp01(current.Rain);
         Shader.SetGlobalFloat(WetnessId, wetness);
+        Shader.SetGlobalFloat(SnowId, snow);
         if (wind != null)
         {
             wind.SetWeather(current.Wind, current.Gusts);
@@ -227,7 +272,7 @@ public sealed class WeatherSystem : MonoBehaviour
 
         if (rain != null)
         {
-            rain.SetRain(current.Rain);
+            rain.SetRain(current.Rain, snowing);
         }
 
         if (overcastVolume != null)

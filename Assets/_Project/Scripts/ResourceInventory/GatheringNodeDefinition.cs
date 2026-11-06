@@ -44,6 +44,9 @@ public sealed class GatheringNodeDefinition : ScriptableObject
     [SerializeField] private bool depleteOnGather = true;
     [Tooltip("Seconds until a gathered node grows back. 0 means it never comes back.")]
     [SerializeField, Min(0f)] private float respawnSeconds = 180f;
+    [Tooltip("The seasons it grows in, by the Season Cycle's names (Summer, Autumn...). Empty: all year. Random " +
+             "resource spots at home only become it in its seasons (berries in summer, mushrooms in autumn).")]
+    [SerializeField] private List<string> inSeasons = new List<string>();
 
     [Header("Break Apart")]
     [Tooltip("When gathered it cracks into about this many tumbling pieces of its own model, instead of shrinking away. 0: it doesn't. How they fly is in its Feel profile (Harvest Feedback). After changing this or its models: Safe Haven › Setup › Resources › Crack Mined Nodes.")]
@@ -72,6 +75,29 @@ public sealed class GatheringNodeDefinition : ScriptableObject
     public string Id => string.IsNullOrWhiteSpace(id) ? MakeId(name) : id.Trim();
     public string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;
     public int Tier => tier;
+
+    public IReadOnlyList<string> InSeasons => inSeasons;
+
+    /// <summary>Whether it grows in the season (null or empty: no season, so yes).</summary>
+    public bool InSeason(string season)
+    {
+        if (string.IsNullOrEmpty(season) || inSeasons == null || inSeasons.Count == 0)
+        {
+            return true;
+        }
+
+        foreach (string one in inSeasons)
+        {
+            if (string.Equals(one, season, System.StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public void ConfigureSeasons(List<string> seasons) => inSeasons = seasons ?? new List<string>();
     public ItemDropTable Yields => yields;
     public ToolType GatherTool => gatherTool;
     public int RequiredToolTier => gatherTool == ToolType.None ? 0 : Mathf.Max(1, requiredToolTier);

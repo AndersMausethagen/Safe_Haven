@@ -31,6 +31,13 @@ MonoBehaviour:
   gatherRange: 1.6
   depleteOnGather: 1
   respawnSeconds: 180
+  inSeasons: []
+  burstPieces: 0
+  fracture: {fileID: 0}
+  burstYields:
+    entries: []
   feedback: {fileID: 11400000, guid: 5c06cdc7d2e3557468f3fdeb64576beb, type: 2}
   worldModelPrefab: {fileID: 962954701236247394, guid: fb54f6832a611fb46a75194f39b19c77, type: 3}
   worldPrefab: {fileID: 948381022197778722, guid: 15b33c21de24fb7418664d30fe242c26, type: 3}
+  modelVariants: []
+  variantScale: {x: 0.9, y: 1.1}

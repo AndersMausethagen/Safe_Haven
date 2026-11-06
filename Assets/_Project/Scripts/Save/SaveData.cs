@@ -65,6 +65,12 @@ public sealed class SettlementSaveData
     public int successfulExtractions;
     /// <summary>Days that have passed at home (the seasons follow them). 0 in older saves.</summary>
     public int daysPassed;
+    /// <summary>How far the blight has crept into the woods round home (0-1). 0 in older saves.</summary>
+    public float blight;
+    /// <summary>Lasting gifts of the spirits (SpiritBonds). Empty in older saves.</summary>
+    public List<string> spiritGifts = new List<string>();
+    public int huldraRespect;
+    public int huldraAwayUntil;
     /// <summary>A BreachStatus.</summary>
     public int breach;
     /// <summary>Ward breaches beaten back. Missing in older saves, where a Won breach counts as one.</summary>

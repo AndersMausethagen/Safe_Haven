@@ -29,6 +29,9 @@ public sealed class HearthSmoke : MonoBehaviour
     [SerializeField] private GameObject livedIn;
 
     private Construction construction;
+
+    /// <summary>The building stands (built, not being built): its hearth burns and warms whoever is near.</summary>
+    public bool Burning => construction == null || (construction.IsStanding && !construction.IsBuilding);
     private ParticleSystem system;
     private Light glow;
     private float flicker;

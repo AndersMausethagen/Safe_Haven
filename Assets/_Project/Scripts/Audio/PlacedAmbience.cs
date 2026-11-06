@@ -227,7 +227,7 @@ public sealed class PlacedAmbience : MonoBehaviour
         bool found = false;
         foreach (WaterSurface water in WaterSurface.Surfaces)
         {
-            if (water == null || !water.IsStill)
+            if (water == null || !water.IsStill || water.IsFrozen)
             {
                 continue;
             }

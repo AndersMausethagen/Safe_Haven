@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -52,6 +53,7 @@ public sealed class ResidentLife : MonoBehaviour
     private void Awake()
     {
         WalkerFootprints.AddTo(gameObject);
+        ColdBreath.AddTo(gameObject);
         npc = GetComponent<ResidentNpc>();
         talkable = GetComponent<Talkable>();
     }
@@ -223,7 +225,21 @@ public sealed class ResidentLife : MonoBehaviour
     {
         SettlementSettings settings = SettlementSettings.Current;
         bool hasWorkplace = npc.TryGetWorkplace(out Vector3 workSpot, out Quaternion workFacing);
-        ResidentActivity next = ResidentRoutine.Decide(clock != null ? clock.Hour : 12f, settings.ResidentHours, hasWorkplace, InDanger(settings));
+        float hour = clock != null ? clock.Hour : 12f;
+        bool danger = InDanger(settings);
+        ResidentActivity next = ResidentRoutine.InTheCold(ResidentRoutine.Decide(hour, settings.ResidentHours, hasWorkplace, danger), hour, PlayerWarmth.ColdNow());
+        bool freeToGo = next == ResidentActivity.Work || (next == ResidentActivity.Fire && !hasWorkplace && hour >= settings.ResidentHours.WorkFrom);
+        if (freeToGo && GoingOut(hour, out Vector3 outTo, out Quaternion outFacing))
+        {
+            next = ResidentActivity.Outing;
+            workSpot = outTo;
+            workFacing = outFacing;
+        }
+
+        if (Festivals.Now != null && !danger)
+        {
+            next = ResidentActivity.Fire; // everyone to the festival's bonfire
+        }
         if (next == activity && started && !atOnce && !again)
         {
             return;
@@ -239,6 +255,10 @@ public sealed class ResidentLife : MonoBehaviour
             case ResidentActivity.Sleep:
                 place = home;
                 facing = homeFacing;
+                break;
+            case ResidentActivity.Outing:
+                place = workSpot;
+                facing = workFacing;
                 break;
             default:
                 Vector3 centre = Gathering(next, settings);
@@ -275,6 +295,11 @@ public sealed class ResidentLife : MonoBehaviour
     // Where they gather: the fire if there is one, else the portal. In danger, always the portal: it is the heart of the place.
     private Vector3 Gathering(ResidentActivity next, SettlementSettings settings)
     {
+        if (Festivals.Now != null && next != ResidentActivity.Shelter)
+        {
+            return Festivals.Place;
+        }
+
         BuildingObject fire = next != ResidentActivity.Shelter && settings.ResidentGatheringPlace != null ? BuildingObject.Find(settings.ResidentGatheringPlace) : null;
         if (fire != null)
         {
@@ -282,6 +307,83 @@ public sealed class ResidentLife : MonoBehaviour
         }
 
         return HomePortal.Current != null ? HomePortal.Current.transform.position : home;
+    }
+
+    // Places someone may walk out to on a day off work: the waystones and the lakeshore, near enough home and away
+    // from where creatures gather. Found once per scene.
+    private static readonly List<(Vector3 at, Vector3 lookAt)> OutingSpots = new List<(Vector3, Vector3)>();
+    private static UnityEngine.SceneManagement.Scene outingSpotsScene;
+
+    private bool GoingOut(float hour, out Vector3 to, out Quaternion facingThere)
+    {
+        to = default;
+        facingThere = Quaternion.identity;
+        string who = npc.Resident != null ? npc.Resident.DisplayName : name;
+        int day = GameSession.Settlement.DaysPassed;
+        if (!ResidentRoutine.Outing(who, day, out float start, out float hours) || hour < start || hour >= start + hours)
+        {
+            return false;
+        }
+
+        FindOutingSpots();
+        if (OutingSpots.Count == 0)
+        {
+            return false;
+        }
+
+        (Vector3 at, Vector3 lookAt) = OutingSpots[Mathf.Abs((who.GetHashCode() + day) % OutingSpots.Count)];
+        to = at;
+        Vector3 look = lookAt - at;
+        look.y = 0f;
+        facingThere = look.sqrMagnitude > 0.01f ? Quaternion.LookRotation(look) : Quaternion.identity;
+        return true;
+    }
+
+    private static void FindOutingSpots()
+    {
+        UnityEngine.SceneManagement.Scene scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
+        if (outingSpotsScene == scene)
+        {
+            return;
+        }
+
+        outingSpotsScene = scene;
+        OutingSpots.Clear();
+        Vector3 home = HomePortal.Current != null ? HomePortal.Current.transform.position : Vector3.zero;
+        MobSpawnZone[] lairs = FindObjectsByType<MobSpawnZone>();
+        void Add(Vector3 near, Vector3 lookAt)
+        {
+            if ((near - home).sqrMagnitude > 190f * 190f || !NavMesh.SamplePosition(near, out NavMeshHit hit, 4f, NavMesh.AllAreas))
+            {
+                return;
+            }
+
+            foreach (MobSpawnZone lair in lairs)
+            {
+                if (lair != null && (lair.transform.position - hit.position).sqrMagnitude < 45f * 45f)
+                {
+                    return;
+                }
+            }
+
+            OutingSpots.Add((hit.position, lookAt));
+        }
+
+        foreach (OfferingStone stone in FindObjectsByType<OfferingStone>())
+        {
+            Vector3 stoneAt = stone.transform.position;
+            Vector3 fromHome = (home - stoneAt).normalized;
+            Add(stoneAt + fromHome * 2.2f, stoneAt);
+        }
+
+        foreach (WaterSurface water in WaterSurface.Surfaces)
+        {
+            if (water != null && water.IsStill)
+            {
+                Vector3 shore = water.NearestPoint(home);
+                Add(shore + (home - shore).normalized * 2.5f, shore);
+            }
+        }
     }
 
     private bool InDanger(SettlementSettings settings)
@@ -434,6 +536,7 @@ public sealed class ResidentLife : MonoBehaviour
             ResidentActivity.Meal => settings.ResidentMealGesture,
             ResidentActivity.Sleep => settings.ResidentSleepGesture,
             ResidentActivity.Fire => Pick(settings.ResidentFireGestures),
+            ResidentActivity.Outing => Pick(settings.ResidentFireGestures),
             _ => null,
         };
 

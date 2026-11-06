@@ -24,6 +24,13 @@ public sealed class GlimpseWatcher : MonoBehaviour
         public Vector2 distance = new Vector2(18f, 24f);
         [Tooltip("Relative chance among the entries allowed now.")]
         [Min(0f)] public float weight = 1f;
+        [Tooltip("How much more often it comes as the blight spreads round home (SettlementState.Blight): its weight is " +
+                 "multiplied by 1 + this at full blight, and it comes up to 60% nearer the portal.")]
+        [Min(0f)] public float moreWithBlight;
+
+        public float WeightNow(float blight) => weight * (1f + moreWithBlight * blight);
+
+        public float BeyondNow(float blight) => moreWithBlight > 0f ? beyondPortal * (1f - 0.6f * blight) : beyondPortal;
     }
 
     [SerializeField] private List<Entry> entries = new List<Entry>();
@@ -62,7 +69,9 @@ public sealed class GlimpseWatcher : MonoBehaviour
         Vector3 at = player.transform.position;
         float fromHome = HomePortal.Current != null ? Vector3.Distance(at, HomePortal.Current.transform.position) : float.MaxValue;
         float hour = AtmosphereConditions.Hour;
-        Entry pick = Pick(entry => entry.prefab != null && fromHome >= entry.beyondPortal && UnityEngine.Random.value < entry.byHour.Evaluate(hour));
+        float blight = GameSession.Settlement.Blight;
+        Entry pick = Pick(entry => entry.prefab != null && fromHome >= entry.BeyondNow(blight) && SpiritBonds.Welcome(entry.prefab)
+            && UnityEngine.Random.value < entry.byHour.Evaluate(hour), blight);
         if (pick == null)
         {
             return;
@@ -85,19 +94,19 @@ public sealed class GlimpseWatcher : MonoBehaviour
     }
 
     // The allowed entries are settled first (the hour is a roll each), then one is drawn by weight.
-    private Entry Pick(Predicate<Entry> allowed)
+    private Entry Pick(Predicate<Entry> allowed, float blight)
     {
         var now = entries.FindAll(allowed);
         float total = 0f;
         foreach (Entry entry in now)
         {
-            total += entry.weight;
+            total += entry.WeightNow(blight);
         }
 
         float roll = UnityEngine.Random.value * total;
         foreach (Entry entry in now)
         {
-            if ((roll -= entry.weight) <= 0f)
+            if ((roll -= entry.WeightNow(blight)) <= 0f)
             {
                 return entry;
             }

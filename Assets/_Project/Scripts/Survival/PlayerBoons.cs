@@ -153,6 +153,17 @@ public sealed class PlayerBoons : MonoBehaviour
         }
     }
 
+    /// <summary>Ends a boon (or a hindrance such as the cold's Chilled) early, if it is at work.</summary>
+    public void End(string id)
+    {
+        int before = active.Count;
+        Remove(id);
+        if (active.Count != before)
+        {
+            Changed?.Invoke();
+        }
+    }
+
     private void Remove(string id)
     {
         for (int i = active.Count - 1; i >= 0; i--)

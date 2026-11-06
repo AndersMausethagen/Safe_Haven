@@ -31,6 +31,7 @@ MonoBehaviour:
   gatherRange: 1.6
   depleteOnGather: 1
   respawnSeconds: 600
+  inSeasons: []
   burstPieces: 7
   fracture: {fileID: 11400000, guid: 46963b5b0e2430e43b04a09fe377ff2c, type: 2}
   burstYields:

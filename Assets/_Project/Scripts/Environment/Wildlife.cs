@@ -29,6 +29,44 @@ public sealed class Wildlife : MonoBehaviour
     [SerializeField] private SoundDefinition alarm;
     [Tooltip("Seconds it stands, head up, before it runs from something that isn't on top of it.")]
     [SerializeField, Min(0f)] private float alertSeconds = 0.7f;
+    [Tooltip("Its winter coat where snow lies (RGB), and how far its coat turns to it (A; 0: no winter coat). Only the " +
+             "body's materials (names with Main) change: a fox goes white, a deer greyer.")]
+    [SerializeField] private Color winterCoat = new Color(1f, 1f, 1f, 0f);
+
+    private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
+
+    public void SetWinterCoat(Color coat) => winterCoat = coat;
+
+    // Puts on the winter coat if snow lies now (animals are made when the player comes near, so once is enough).
+    private void WearCoat()
+    {
+        WeatherSystem weather = WeatherSystem.Active;
+        float snow = weather != null ? weather.Snow : 0f;
+        float amount = winterCoat.a * Mathf.Clamp01((snow - 0.2f) / 0.4f);
+        if (amount <= 0.01f)
+        {
+            return;
+        }
+
+        var block = new MaterialPropertyBlock();
+        foreach (Renderer drawn in GetComponentsInChildren<Renderer>())
+        {
+            Material[] materials = drawn.sharedMaterials;
+            for (int i = 0; i < materials.Length; i++)
+            {
+                Material material = materials[i];
+                if (material == null || !material.name.Contains("Main") || !material.HasProperty(BaseColorId))
+                {
+                    continue;
+                }
+
+                Color from = material.GetColor(BaseColorId);
+                drawn.GetPropertyBlock(block, i);
+                block.SetColor(BaseColorId, Color.Lerp(from, new Color(winterCoat.r, winterCoat.g, winterCoat.b, from.a), amount));
+                drawn.SetPropertyBlock(block, i);
+            }
+        }
+    }
 
     private NavMeshAgent agent;
     private Animator animator;
@@ -49,6 +87,8 @@ public sealed class Wildlife : MonoBehaviour
 
     private void Awake()
     {
+        WalkerFootprints.AddTo(gameObject, 0.55f, 0.14f);
+        WearCoat();
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponentInChildren<Animator>();
         agent.speed = walkSpeed;

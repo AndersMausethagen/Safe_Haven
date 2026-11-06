@@ -102,7 +102,64 @@ public static class WeatherSetup
         set.RainPrefab = AssetDatabase.LoadAssetAtPath<GameObject>($"{ArtFolder}/Rain.prefab");
         if (set.RainPrefab == null)
             set.RainPrefab = EnsureRainPrefab(WaterSetup.EnsureAssets().Spray);
+        EnsureSnowflakes(set.RainPrefab, WaterSetup.EnsureAssets().Spray);
         return set;
+    }
+
+    /// <summary>Gives the rain prefab its snowflakes (falling instead of the rain in a snowing season) if it has none.</summary>
+    private static void EnsureSnowflakes(GameObject prefab, Material spray)
+    {
+        if (prefab == null || prefab.transform.Find("Snowflakes") != null)
+        {
+            return;
+        }
+
+        string path = AssetDatabase.GetAssetPath(prefab);
+        GameObject root = PrefabUtility.LoadPrefabContents(path);
+        try
+        {
+            AddSnowflakes(root, spray);
+            PrefabUtility.SaveAsPrefabAsset(root, path);
+        }
+        finally
+        {
+            PrefabUtility.UnloadPrefabContents(root);
+        }
+    }
+
+    // Slow, drifting flakes that flutter as they fall, from a box above the ground the camera looks at (as the rain).
+    private static void AddSnowflakes(GameObject root, Material spray)
+    {
+        var flakes = new GameObject("Snowflakes");
+        flakes.transform.SetParent(root.transform, false);
+        ParticleSystem system = WaterSetup.AddParticles(flakes, spray, loop: true, lifetime: (8.5f, 10.5f), speed: (0f, 0f),
+            size: (0.05f, 0.1f), gravity: 0f, alpha: 0.9f, max: 9000, grow: false);
+        ParticleSystem.MainModule main = system.main;
+        main.prewarm = false;
+        ParticleSystem.ShapeModule shape = system.shape;
+        shape.shapeType = ParticleSystemShapeType.Box;
+        shape.scale = new Vector3(40f, 0.1f, 40f);
+        ParticleSystem.VelocityOverLifetimeModule fall = system.velocityOverLifetime;
+        fall.enabled = true;
+        fall.space = ParticleSystemSimulationSpace.World;
+        fall.x = 0f;
+        fall.y = new ParticleSystem.MinMaxCurve(-1.6f, -1.1f);
+        fall.z = 0f;
+        ParticleSystem.NoiseModule flutter = system.noise;
+        flutter.enabled = true;
+        flutter.strength = 0.45f;
+        flutter.frequency = 0.35f;
+        flutter.scrollSpeed = 0.3f;
+        flutter.quality = ParticleSystemNoiseQuality.Low;
+        var renderer = flakes.GetComponent<ParticleSystemRenderer>();
+        renderer.renderMode = ParticleSystemRenderMode.Billboard;
+        var rain = root.GetComponent<RainEffect>();
+        if (rain != null)
+        {
+            var serialized = new SerializedObject(rain);
+            serialized.FindProperty("flakes").objectReferenceValue = system;
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+        }
     }
 
     /// <summary>Adds (or completes) the "Sky and Weather" rig in the open scene. Undoable.</summary>
@@ -319,6 +376,7 @@ public static class WeatherSetup
             serialized.FindProperty("drops").objectReferenceValue = dropSystem;
             serialized.FindProperty("splashes").objectReferenceValue = splashSystem;
             serialized.ApplyModifiedPropertiesWithoutUndo();
+            AddSnowflakes(root, spray);
             return PrefabUtility.SaveAsPrefabAsset(root, path);
         }
         finally

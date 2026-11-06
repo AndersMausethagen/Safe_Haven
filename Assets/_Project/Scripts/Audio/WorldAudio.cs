@@ -85,7 +85,8 @@ public sealed class WorldAudio
     public void Update(AudioSettingsDefinition sounds)
     {
         WeatherState state = weather != null && weather.isActiveAndEnabled ? weather.Current : default;
-        Follow(rain, sounds.RainLoop, state.Rain);
+        bool snowing = weather != null && weather.isActiveAndEnabled && weather.Snowing;
+        Follow(rain, sounds.RainLoop, snowing ? 0f : state.Rain); // snow falls quietly
         Follow(wind, sounds.WindLoop, Mathf.Clamp01((state.Wind - 0.8f) / 2.2f + state.Gusts * 0.4f));
         for (int i = thunderAt.Count - 1; i >= 0; i--)
         {
@@ -223,7 +224,7 @@ public sealed class WorldAudio
             if (surface != null && source != null)
             {
                 source.transform.position = surface.NearestPoint(ear);
-                source.volume = AudioManager.SteadyVolume(sound);
+                source.volume = surface.IsFrozen ? 0f : AudioManager.SteadyVolume(sound); // ice is silent
             }
         }
     }

@@ -380,6 +380,77 @@ void WorldWetness(Varyings IN, inout InputData inputData, inout half3 albedo, in
     half facing = saturate(dot(inputData.normalWS, inputData.viewDirectionWS));
     skySheen = puddle * lerp(0.26, 0.05, facing * facing);
 }
+
+// Frost on the ground in the cold of the year (Seasons sets _SafeHavenSeason.w: how much of the ground is frosted, 0-1;
+// x-z are the leaves' and grass's autumn, leaf fall and frost). Level ground frosts first, in patches that spread until
+// they nearly meet; slopes keep their colour longer, footprints break it, and a light frost lingers in shade (tree and
+// house shadows) after the sun has taken it off the open ground. Hoarfrost, not snow: a mottled, silvery dusting whose
+// brightness follows the ground's own texture, so roots, stones and paths still read from the top-down camera.
+float4 _SafeHavenSeason;
+
+void WorldFrost(Varyings IN, inout half3 albedo, inout half smoothness)
+{
+    half amount = _SafeHavenSeason.w;
+    if (amount <= 0.001)
+    {
+        return;
+    }
+
+    float2 xz = IN.positionWS.xz;
+    half sunlit = MainLightRealtimeShadow(TransformWorldToShadowCoord(IN.positionWS));
+    amount *= 1.0 - 0.6 * sunlit * saturate(1.0 - _SafeHavenSeason.z);
+    half level = smoothstep(0.5, 0.85, WorldGeometricNormal(IN).y);
+    float patches = WorldWetNoise(xz * 0.21 + 63.1) * 0.6 + WorldWetNoise(xz * 0.9 + 11.7) * 0.3 + WorldWetNoise(xz * 3.7 + 5.3) * 0.1;
+    patches = saturate((patches - 0.5) * 2.2 + 0.5);
+    half cover = smoothstep(0.0, 0.3, amount * 0.9 * lerp(0.45, 1.0, level) - (1.0 - patches) * 0.9);
+    cover *= 1.0 - saturate(WorldFootprintMask(xz) * 3.0);
+    if (cover <= 0.001)
+    {
+        return;
+    }
+
+    half ground = saturate(dot(albedo, half3(0.3, 0.59, 0.11)) * 2.4);
+    half grain = WorldWetNoise(xz * 23.0) * 0.6 + WorldWetNoise(xz * 61.0 + 7.1) * 0.4;
+    half crystals = saturate(grain * 1.6 - 0.3);
+    half3 frost = half3(0.62, 0.67, 0.74) * (0.5 + 0.6 * ground);
+    albedo = lerp(albedo, frost, cover * (0.3 + 0.3 * crystals));
+    smoothness = lerp(smoothness, 0.38, cover * 0.7);
+}
+
+// Snow lying on the ground (WeatherSystem sets _SafeHavenSnow, 0-1: a winter's thin layer, deeper while it snows). It
+// lies where the ground is level enough, shallowest at patches' edges, and footprints and trampling show the ground
+// through, so tracks read from above. Puddles have frozen or gone under it (the weather dries the ground while it snows).
+float _SafeHavenSnow;
+
+void WorldSnow(Varyings IN, inout InputData inputData, inout half3 albedo, inout half smoothness, inout half metallic, inout half occlusion)
+{
+    half amount = _SafeHavenSnow;
+    if (amount <= 0.001)
+    {
+        return;
+    }
+
+    float2 xz = IN.positionWS.xz;
+    half3 geometric = WorldGeometricNormal(IN);
+    half level = smoothstep(0.5, 0.85, geometric.y);
+    float patches = WorldWetNoise(xz * 0.21 + 63.1) * 0.6 + WorldWetNoise(xz * 0.9 + 11.7) * 0.3 + WorldWetNoise(xz * 3.7 + 5.3) * 0.1;
+    half cover = smoothstep(0.0, 0.25, amount * 1.25 * lerp(0.45, 1.0, level) - (1.0 - patches) * 0.9);
+    cover *= 1.0 - saturate(WorldFootprintMask(xz) * 3.0);
+    if (cover <= 0.001)
+    {
+        return;
+    }
+
+    half ground = saturate(dot(albedo, half3(0.3, 0.59, 0.11)) * 2.4);
+    half grain = WorldWetNoise(xz * 23.0) * 0.6 + WorldWetNoise(xz * 61.0 + 7.1) * 0.4;
+    half3 snow = half3(0.78, 0.82, 0.89) * (0.66 + 0.34 * ground) * (0.92 + 0.16 * grain);
+    albedo = lerp(albedo, snow, cover * 0.9);
+    smoothness = lerp(smoothness, 0.3, cover);
+    metallic *= 1.0 - cover;
+    occlusion = lerp(occlusion, 1.0, cover * 0.6);
+    // A layer of snow softens the ground's small relief.
+    inputData.normalWS = normalize(lerp(inputData.normalWS, geometric, cover * 0.5));
+}
 // ---------------------------------------------------------------------------------------------------------------------
 
 void InitializeBakedGIData(Varyings IN, inout InputData inputData)
@@ -781,6 +852,8 @@ void SplatmapFragment(
 #endif
     half skySheen;
     WorldWetness(IN, inputData, albedo, smoothness, metallic, occlusion, skySheen);
+    WorldFrost(IN, albedo, smoothness);
+    WorldSnow(IN, inputData, albedo, smoothness, metallic, occlusion);
 
 #if defined(_DBUFFER)
     half3 specular = half3(0.0h, 0.0h, 0.0h);
