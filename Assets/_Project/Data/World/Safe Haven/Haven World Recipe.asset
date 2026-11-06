@@ -66,10 +66,64 @@ MonoBehaviour:
   - {fileID: 2432845718604954315, guid: 59c9184e28e36c94daedba055f6d0418, type: 3}
   - {fileID: 4397208832055064175, guid: 79e5700236bb6024eb0da41cc302ed71, type: 3}
   - {fileID: 5402517183627898201, guid: dfa75a2b8fc307b4da9fb76b2ce561a5, type: 3}
-  gladeLandmarkChance: 0.4
+  gladeLandmarkChance: 0.7
   woods: {fileID: 11400000, guid: f8e72667c076c3349ab8ddaa5bb747a5, type: 2}
   woodsDensity: {x: 0.15, y: 0.95}
   groves: {x: 4, y: 5}
+  trailScenes:
+  - {fileID: 753853000388544552, guid: 57caefaa61c0de94b81f7cf499a12fa9, type: 3}
+  - {fileID: 2269726820070725017, guid: cac709e05e0b120449586c0237e3cb09, type: 3}
+  - {fileID: 6253381937994354546, guid: 4ade6f357f6d3cb46aff2417551611f6, type: 3}
+  - {fileID: 5327954161451364447, guid: d4a383034aadd6d468ff730796b8ba18, type: 3}
+  - {fileID: 8008296470320194651, guid: 10805448c6f7e3e42b58190ebd1a6238, type: 3}
+  trailSceneSpacing: {x: 60, y: 90}
+  junctionMarker: {fileID: 4905383062814407678, guid: b911fd387739c60428056fbbd56b1048, type: 3}
+  rimStones:
+  - {fileID: 215287014038029075, guid: c67c3f6cb76afa7468e2085a2c922228, type: 3}
+  - {fileID: 441103227287321634, guid: 086b79f7b81849d498d19b715da656e1, type: 3}
+  - {fileID: 4049676935685193896, guid: 5bd3b2fa8509c2b42b641640ad6d1fb3, type: 3}
+  - {fileID: 4526530113480679261, guid: 14eda99e96bb4a949919e06ee9eac62b, type: 3}
+  - {fileID: 3353307144408033917, guid: 510bc74acbd60e146a099e6cb9cde579, type: 3}
+  rimStoneSpacing: 4
+  rimClearing: 7
+  crownMargin: 6
+  lairDressing:
+  - {fileID: 6738502702539548217, guid: 16ad38b0dd7488f4bb2214d4b77cb4a7, type: 3}
+  - {fileID: 2442989021758159486, guid: 4d769df415f73634593100fa03bd9c51, type: 3}
+  - {fileID: 9032853888213877702, guid: 3c747f0c8907a81429be0efcf034575a, type: 3}
+  - {fileID: 5152436223146484308, guid: c49348663b9e79b4da76c3a762053fc7, type: 3}
+  - {fileID: 4475807248674821059, guid: bc7ffb8de5777f44582a2d6e7995bcc5, type: 3}
+  - {fileID: 1739018990979295435, guid: 2ce09f18f6069584cabbea106b7049eb, type: 3}
+  - {fileID: 3913526623298648739, guid: e3fcbec360440124c9b04a35026f8789, type: 3}
+  - {fileID: 1188827103026972050, guid: 13ede0d61a8b22146b752b143188bbfd, type: 3}
+  - {fileID: 7562607395878701512, guid: aeaf73295f201aa4a8ed55fbc57b1ca1, type: 3}
+  - {fileID: 5017457544455330745, guid: 9f38243f304f0fc4fb47b2c00b24c33b, type: 3}
+  rockyDressing:
+  - {fileID: 3804425623044629816, guid: 6b56cf7506af56b458a6f439cc35f2aa, type: 3}
+  - {fileID: 3353307144408033917, guid: 510bc74acbd60e146a099e6cb9cde579, type: 3}
+  - {fileID: 4526530113480679261, guid: 14eda99e96bb4a949919e06ee9eac62b, type: 3}
+  - {fileID: 4049676935685193896, guid: 5bd3b2fa8509c2b42b641640ad6d1fb3, type: 3}
+  - {fileID: 6169844609837343291, guid: e863dbb3d056d05408c8e93b57a199f5, type: 3}
+  - {fileID: 8754368635658585658, guid: b7599a01d63fcaf44a11df1a96e9bb39, type: 3}
+  - {fileID: 215287014038029075, guid: c67c3f6cb76afa7468e2085a2c922228, type: 3}
+  meadowDressing:
+  - {fileID: 3506748076108523107, guid: 325b5fb486ccc734098a5bd35f6e7fec, type: 3}
+  - {fileID: 4524226416875438628, guid: dfdf920b91fd95e45b5612400bb493c2, type: 3}
+  - {fileID: 3398821833554654059, guid: d10730ffaed10634284193da35a01564, type: 3}
+  - {fileID: 1608439702712057764, guid: 74f93ac9b5ea863479737efb88ebdd1f, type: 3}
+  - {fileID: 6127853619310230097, guid: c48575e522e864f42941ee13f8dfdc85, type: 3}
+  - {fileID: 8730277521983965954, guid: 933b567e87ebb924e8bef15c8ff7774f, type: 3}
+  - {fileID: 5335103311630097247, guid: 3f28a841568127248a5b6255c20111ef, type: 3}
+  wetDressing:
+  - {fileID: 4524226416875438628, guid: dfdf920b91fd95e45b5612400bb493c2, type: 3}
+  - {fileID: 3398821833554654059, guid: d10730ffaed10634284193da35a01564, type: 3}
+  - {fileID: 2765650739024952011, guid: f48ce462d6818454dbbedde5ee33ad5b, type: 3}
+  - {fileID: 2814974955353853566, guid: f251cbb8e36753f4faa718a860f2e3fa, type: 3}
+  - {fileID: 8056757738587741231, guid: 71a7402c314163746a0caf6f09c6773a, type: 3}
+  - {fileID: 441103227287321634, guid: 086b79f7b81849d498d19b715da656e1, type: 3}
+  - {fileID: 2316844624811504460, guid: 98dbed1ffc4531e4caecb17c290cb417, type: 3}
+  - {fileID: 4912269930610114677, guid: 4de1b90b93204584ea219bd2413b97ab, type: 3}
+  dressingPerGlade: {x: 5, y: 9}
   pointsOfInterest:
   - name: Ruined Watchtower
     prefab: {fileID: 3890292879020267311, guid: 950d02f776d4a294fa75449c13c351ba, type: 3}

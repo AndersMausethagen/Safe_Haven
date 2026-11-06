@@ -9027,6 +9027,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 4416926081852918481, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
       insertIndex: -1
       addedObject: {fileID: 4433956308097684742}
+    - targetCorrespondingSourceObject: {fileID: 4416926081852918481, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5744381681470567181}
   m_SourcePrefab: {fileID: 100100000, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
 --- !u!1 &5943822763764690748 stripped
 GameObject:
@@ -9498,6 +9501,9 @@ MonoBehaviour:
   radiusAtCamera: 1.2
   softness: 0.55
   margin: 1.6
+  canopyRadius: 14
+  crownStart: 2.5
+  canopySoftness: 5
   fadeSeconds: 0.25
 --- !u!114 &5797044328345205871
 MonoBehaviour:
@@ -9818,6 +9824,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: abf287c2449e43b4d80c50f854f13ac3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: SafeHaven::PlayerBurden
+--- !u!114 &5744381681470567181
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5943822763764690748}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb7d9a028739e5841ac0603646834ed1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::CharacterFillLight
+  offset: {x: 0, y: 4, z: -3}
+  intensity: 0.9
+  range: 16
+  colour: {r: 1, g: 0.95, b: 0.88, a: 1}
 --- !u!4 &6428716820787852678 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3893294197879345259, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}

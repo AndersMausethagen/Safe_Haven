@@ -621,6 +621,13 @@ The woods are laid out as rooms and corridors, read from the top-down camera:
 
 Measured on seed 1: paths over 20° fell from 15% to 4.5% of samples, and over 30° from 6% to under 1% (what is left is mostly the mountain road). Cedars within 2–4 m of a path's centre are down to 0.14 of the deep woods' density.
 
+Read from the top-down camera (measured at 12 spots: tree crowns covered 62–82% of the screen on woods trails, ravine edges and the Woodland Camp):
+- **Canopy cutaway** (`SeeThroughCanopyClip` in `Shaders/SeeThrough/SeeThrough.hlsl`, used by Tree Wind's leaf cards; set by `SeeThrough`): a leaf above the crown start (2.5 m over the player's feet) stipples away when the camera's line through it lands within 14 m of the player. Bark, undergrowth and shadows stay.
+- **Ravine rims:** bare at the lip, no trees for `rimClearing` metres beyond it, and stones (`rimStones`) every `rimStoneSpacing` metres along it, found by walking out from the floor to where the ground stops falling.
+- **Places** keep `crownMargin` metres more free of trees.
+- **Along the way** (`HavenWorldPlan.PlaceJunctions`, `PlaceTrailScenes`, `PlaceGladeDressing`; planned last, so nothing else moves; prefabs from `AgentScripts/BuildHavenWayScenes.cs`): a cairn where each trail leaves another path, a small scene every 60–90 m beside woods paths (none mineable), and each glade dressed for its kind. Landmark trees stand in 70% of glades.
+- **Character fill light** (`CharacterFillLight`, on the player): a soft point light on rendering layer 7 that only the player and creatures (`MonsterAI.Awake` marks them) receive, so figures read against the dark woods' floor.
+
 CC0 models for it (Poly Haven, `Art/Vegetation/Haven World/Downloaded`, see its LICENSE.txt) are converted by `AgentScripts/BuildHavenWorldProps.cs`: each download gets a source material and a mask the mesh shader reads (made from Poly Haven's ARM map), is wrapped in an identity-root source prefab (a single-mesh FBX keeps its ×100 scale and 270° turn on its root, which `VegetationPackConverter.Prop` resets) and converted. The results: four mountain rocks (`HavenWorldRecipe.mountainRocks`, strewn by `HavenWorldPlan.PlaceMountainRocks`, planned last so they move nothing else; rock faces turn their open side downhill by their area-weighted normal, and the terrain trees under them are cleared), the Boat Landing (`Prefabs/World`, the pier's straight sections and mooring gantry lowered to a 0.55 m deck, placed by `PlaceLandings` at the lake path's shore and the island with a place) and the Woodland Camp point of interest (a stone fire pit with the Misty Woods' logs, a stump, kindling and a mineable boulder).
 
 ## What only raids give

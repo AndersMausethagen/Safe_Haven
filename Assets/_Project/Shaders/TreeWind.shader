@@ -199,7 +199,11 @@ Shader "Safe Haven/Tree Wind"
         }
         half4 TreeFragment(Varyings input, FRONT_FACE_TYPE face : FRONT_FACE_SEMANTIC) : SV_Target
         {
-                SeeThroughClip(input.positionCS);
+                #if defined(_ALPHATEST_ON)
+                    SeeThroughCanopyClip(input.positionCS); // leaves: the canopy cutaway as well
+                #else
+                    SeeThroughClip(input.positionCS);
+                #endif
             UNITY_SETUP_INSTANCE_ID(input);
             UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
             half4 baseColor = SampleBaseCoverage(input.uv);
@@ -288,7 +292,11 @@ Shader "Safe Haven/Tree Wind"
         }
         half4 NormalsFragment(Varyings input, FRONT_FACE_TYPE face : FRONT_FACE_SEMANTIC) : SV_Target
         {
-                SeeThroughClip(input.positionCS);
+                #if defined(_ALPHATEST_ON)
+                    SeeThroughCanopyClip(input.positionCS); // leaves: the canopy cutaway as well
+                #else
+                    SeeThroughClip(input.positionCS);
+                #endif
             SampleBase(input.uv);
             float3 normal = SurfaceNormal(input, IS_FRONT_VFACE(face, 1.0, -1.0));
             #if defined(_GBUFFER_NORMALS_OCT)
@@ -363,7 +371,11 @@ Shader "Safe Haven/Tree Wind"
             #include_with_pragmas "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DOTS.hlsl"
             half4 DepthFragment(Varyings input) : SV_Target
             {
-                SeeThroughClip(input.positionCS);
+                #if defined(_ALPHATEST_ON)
+                    SeeThroughCanopyClip(input.positionCS); // leaves: the canopy cutaway as well
+                #else
+                    SeeThroughClip(input.positionCS);
+                #endif
                 SampleBase(input.uv);
                 return input.positionCS.z;
             }

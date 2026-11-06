@@ -412,6 +412,22 @@ public static class HavenWorldGenerator
                 bool open = point.magnitude < recipe.buildable + 20f || plan.Lake.Edge(point) < 4f || plan.Pois.Exists(poi => Vector2.Distance(poi.At, point) < poi.Rule.clearing);
                 forest[cell] = (byte)Mathf.RoundToInt(Mathf.Clamp01(density) * 255f);
                 clearing[cell] = open ? (byte)255 : (byte)Mathf.Max(verge[cell], Mathf.RoundToInt(plan.GladeOpen(point) * 255f));
+                // Seen from above a crown spreads 4-6 m: a place keeps that much more free of trees (undergrowth may stay).
+                if (!open && plan.Pois.Exists(poi => Vector2.Distance(poi.At, point) < poi.Rule.clearing + recipe.crownMargin))
+                {
+                    clearing[cell] = (byte)Mathf.Max(clearing[cell], 115);
+                }
+
+                // A ravine's lip is seen before it is fallen into: bare at the lip, then no trees for rimClearing metres.
+                float lip = RavineLipDistance(plan, point);
+                if (lip < 2f)
+                {
+                    clearing[cell] = (byte)Mathf.Max(clearing[cell], 200);
+                }
+                else if (lip < recipe.rimClearing)
+                {
+                    clearing[cell] = (byte)Mathf.Max(clearing[cell], 115);
+                }
             }
         }
 
@@ -489,6 +505,27 @@ public static class HavenWorldGenerator
         }
 
         return thin;
+    }
+
+    // Metres outside a ravine's lip (negative inside it): its floor's half width and the wall run, raggedness and all.
+    private const float RavineWall = 2.5f * 1.6f;
+
+    private static float RavineLipDistance(HavenWorldPlan plan, Vector2 point)
+    {
+        float best = float.MaxValue;
+        foreach (HavenWorldPlan.Ravine ravine in plan.Ravines)
+        {
+            float lip = ravine.FloorWidth * 0.5f + RavineWall;
+            if (!HavenWorldPlan.NearLine(ravine.Line, point, lip + 20f))
+            {
+                continue;
+            }
+
+            Vector2 on = HavenWorldPlan.NearestOn(new List<List<Vector2>> { ravine.Line }, point);
+            best = Mathf.Min(best, Vector2.Distance(on, point) - lip);
+        }
+
+        return best;
     }
 
     // ----- World Builder features -----
@@ -763,7 +800,7 @@ public static class HavenWorldGenerator
         Terrain terrain = Terrain.activeTerrain;
         HavenWorldPlan plan = HavenWorldPlan.Make(recipe);
         Transform content = ContentRoot();
-        foreach (string name in new[] { "Points of Interest", "Spawn Zones", "Resources", "Mountain Rocks", "Glades" })
+        foreach (string name in new[] { "Points of Interest", "Spawn Zones", "Resources", "Mountain Rocks", "Glades", "Along the Way" })
         {
             Transform old = content.Find(name);
             if (old != null)
@@ -920,6 +957,7 @@ public static class HavenWorldGenerator
             }
         }
 
+        int along = PlaceAlongTheWay(plan, terrain, content, Ground, footprints);
         int cleared = ClearTreesUnder(terrain, footprints);
 
         // Felled trees in the woods are kept in the save (TerrainTreeMemory), on the terrain's own saveable entity.
@@ -944,8 +982,124 @@ public static class HavenWorldGenerator
         GrassSetup.BakeGroundColour(terrain);
         string navmesh = WorldBuilder.RebakeNavMesh();
         EditorSceneManager.MarkSceneDirty(terrain.gameObject.scene);
-        return $"Placed {plan.Pois.Count} places, {plan.Zones.Count} spawn zones, {plan.Nodes.Count} resource points, {marked} glade landmarks, {plan.Rocks.Count} mountain rocks ({cleared} trees cleared from under them) in {placed} ms; moss, displacement, " +
+        return $"Placed {plan.Pois.Count} places, {plan.Zones.Count} spawn zones, {plan.Nodes.Count} resource points, {marked} glade landmarks, {along} scenes, markers, dressing and rim stones, {plan.Rocks.Count} mountain rocks ({cleared} trees cleared from under them) in {placed} ms; moss, displacement, " +
                $"ground colour and navmesh ({navmesh}) in {clock.ElapsedMilliseconds - placed} ms.";
+    }
+
+    // What makes the way between places worth walking and readable from above: scenes beside the paths, a cairn where a trail
+    // turns off, each glade dressed for its kind, and stones along every ravine's lip.
+    private static int PlaceAlongTheWay(HavenWorldPlan plan, Terrain terrain, Transform content, System.Func<Vector2, Vector3> ground, List<Bounds> footprints)
+    {
+        HavenWorldRecipe recipe = plan.Recipe;
+        var root = new GameObject("Along the Way").transform;
+        root.SetParent(content, false);
+        int placed = 0;
+
+        void Put(GameObject prefab, Vector2 at, float turn, float scale, Transform parent, float sink = 0f)
+        {
+            if (prefab == null)
+            {
+                return;
+            }
+
+            var made = (GameObject)PrefabUtility.InstantiatePrefab(prefab, parent);
+            made.transform.SetPositionAndRotation(ground(at) - Vector3.up * sink, Quaternion.Euler(0f, turn, 0f));
+            made.transform.localScale = Vector3.one * scale;
+            // Each part of a scene on the ground where it stands.
+            foreach (Transform part in made.transform)
+            {
+                Vector3 position = part.position;
+                position.y = ground(new Vector2(position.x, position.z)).y + part.localPosition.y * scale - sink;
+                part.position = position;
+            }
+
+            foreach (Renderer drawn in made.GetComponentsInChildren<Renderer>())
+            {
+                footprints.Add(drawn.bounds);
+            }
+
+            placed++;
+        }
+
+        var scenes = new GameObject("Trail Scenes").transform;
+        scenes.SetParent(root, false);
+        foreach (HavenWorldPlan.Placed scene in plan.TrailScenes)
+        {
+            Put(recipe.trailScenes[scene.Kind], scene.At, scene.Turn, 1f, scenes);
+        }
+
+        var markers = new GameObject("Junction Markers").transform;
+        markers.SetParent(root, false);
+        foreach (HavenWorldPlan.Placed marker in plan.Junctions)
+        {
+            Put(recipe.junctionMarker, marker.At, marker.Turn, 1f, markers);
+        }
+
+        var dressing = new GameObject("Glade Dressing").transform;
+        dressing.SetParent(root, false);
+        foreach ((HavenWorldPlan.Glade glade, HavenWorldPlan.Placed prop) in plan.GladeProps)
+        {
+            List<GameObject> kit = plan.DressingFor(glade.Kind);
+            Put(kit[prop.Kind % kit.Count], prop.At, prop.Turn, prop.Scale, dressing);
+        }
+
+        var rims = new GameObject("Ravine Rims").transform;
+        rims.SetParent(root, false);
+        if (recipe.rimStones.Count > 0)
+        {
+            var random = new System.Random(plan.Seed + 977);
+            foreach (HavenWorldPlan.Ravine ravine in plan.Ravines)
+            {
+                for (int i = 0; i + 1 < ravine.Line.Count; i++)
+                {
+                    Vector2 a = ravine.Line[i], b = ravine.Line[i + 1];
+                    Vector2 along = (b - a).normalized;
+                    int steps = Mathf.Max(1, Mathf.RoundToInt(Vector2.Distance(a, b) / recipe.rimStoneSpacing));
+                    for (int k = 0; k < steps; k++)
+                    {
+                        Vector2 centre = Vector2.Lerp(a, b, (k + 0.5f) / steps);
+                        foreach (float side in new[] { -1f, 1f })
+                        {
+                            Vector2 outward = Vector2.Perpendicular(along) * side;
+                            if (!FindLip(ground, centre, outward, ravine.FloorWidth * 0.5f, out Vector2 lip))
+                            {
+                                continue;
+                            }
+
+                            // Gaps now and then, so it reads as stones that came to rest there, not a wall.
+                            if (random.NextDouble() < 0.25)
+                            {
+                                continue;
+                            }
+
+                            GameObject stone = recipe.rimStones[random.Next(recipe.rimStones.Count)];
+                            Put(stone, lip + outward * (0.6f + (float)random.NextDouble() * 0.8f), (float)random.NextDouble() * 360f,
+                                0.8f + (float)random.NextDouble() * 0.5f, rims, 0.15f);
+                        }
+                    }
+                }
+            }
+        }
+
+        return placed;
+    }
+
+    // Walks out from a ravine's floor to where the ground stops falling away: its lip.
+    private static bool FindLip(System.Func<Vector2, Vector3> ground, Vector2 centre, Vector2 outward, float halfFloor, out Vector2 lip)
+    {
+        float top = ground(centre + outward * (halfFloor + 18f)).y;
+        for (float d = halfFloor; d < halfFloor + 14f; d += 0.5f)
+        {
+            Vector2 at = centre + outward * d;
+            if (ground(at).y >= top - 0.5f)
+            {
+                lip = at;
+                return true;
+            }
+        }
+
+        lip = default;
+        return false;
     }
 
     // The woods are painted before the rocks are placed: no terrain tree grows up through one.

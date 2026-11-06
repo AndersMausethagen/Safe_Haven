@@ -45,6 +45,9 @@ public static class BuildHavenWorldRecipe
             }
         }
 
+        // Most glades get one: tall silhouettes are how a top-down wood is found again (giant cedars, a dead cedar, a maple).
+        recipe.gladeLandmarkChance = 0.7f;
+
         recipe.creatures = new List<HavenCreatureBand>
         {
             Band("Edge of the woods", 200f, 300f, 5, new Vector2Int(1, 2), ("ForestBittenWolf", 2f), ("BlightBoar", 1f), ("Rootling", 1f)),

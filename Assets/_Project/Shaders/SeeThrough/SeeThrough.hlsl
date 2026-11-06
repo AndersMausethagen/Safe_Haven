@@ -53,4 +53,45 @@ void SeeThroughClip(float4 positionCS)
     }
 }
 
+// The canopy cutaway, for leaves only (Tree Wind's leaf cards): from a top-down camera the crowns of a dense wood would
+// roof over everything near the player, its creatures, its resources and a ravine's lip among them. A leaf higher than
+// the crown start above the player's feet, whose line of sight comes down on the ground within the radius of the player,
+// stipples away; bark, undergrowth and every shadow stay, so the wood still reads as a wood.
+float4 _SeeThroughCanopy;   // x: radius on the ground round the player (m), y: crown start above the feet (m), z: soft edge (m), w: feet height
+
+float SeeThroughCanopyAmount(float4 positionCS)
+{
+    if (_SeeThroughTarget.w <= 0.0 || _SeeThroughCanopy.x <= 0.0)
+    {
+        return 0.0;
+    }
+
+    float2 uv = positionCS.xy / _ScaledScreenParams.xy;
+    float3 positionWS = ComputeWorldSpacePosition(uv, positionCS.z, UNITY_MATRIX_I_VP);
+    float3 origin = _WorldSpaceCameraPos;
+    float feet = _SeeThroughCanopy.w;
+    float above = positionWS.y - feet;
+    if (above <= _SeeThroughCanopy.y || positionWS.y >= origin.y - 0.1)
+    {
+        return 0.0;
+    }
+
+    // Where the line from the camera through this leaf meets the ground at the player's feet.
+    float along = (origin.y - feet) / max(origin.y - positionWS.y, 1e-3);
+    float2 ground = origin.xz + (positionWS.xz - origin.xz) * along;
+    float fromPlayer = distance(ground, _SeeThroughTarget.xz);
+    float inside = 1.0 - smoothstep(_SeeThroughCanopy.x - _SeeThroughCanopy.z, _SeeThroughCanopy.x, fromPlayer);
+    float crown = smoothstep(_SeeThroughCanopy.y, _SeeThroughCanopy.y + 1.5, above);
+    return inside * crown * _SeeThroughTarget.w;
+}
+
+void SeeThroughCanopyClip(float4 positionCS)
+{
+    float amount = max(SeeThroughAmount(positionCS), SeeThroughCanopyAmount(positionCS));
+    if (amount > 0.0)
+    {
+        clip(SeeThroughBayer(positionCS.xy) - amount);
+    }
+}
+
 #endif

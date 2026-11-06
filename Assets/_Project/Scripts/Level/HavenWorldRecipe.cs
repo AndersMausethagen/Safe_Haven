@@ -166,6 +166,29 @@ public sealed class HavenWorldRecipe : ScriptableObject
     [Tooltip("Maple groves (World Builder areas) in the Haven's ring, least and most.")]
     public Vector2Int groves = new Vector2Int(4, 5);
 
+    [Header("Along the Way")]
+    [Tooltip("Small scenes beside the woods' paths (a fallen giant, a log stack, a waystone...), one every so many metres: " +
+             "something to come across between the glades.")]
+    public List<GameObject> trailScenes = new List<GameObject>();
+    public Vector2 trailSceneSpacing = new Vector2(60f, 90f);
+    [Tooltip("Stands where a trail leaves another path (a cairn): the way can be found without the map.")]
+    public GameObject junctionMarker;
+    [Tooltip("Stones lining a ravine's lip, every so many metres, so the drop is seen before it is fallen into.")]
+    public List<GameObject> rimStones = new List<GameObject>();
+    [Min(1f)] public float rimStoneSpacing = 4f;
+    [Tooltip("Metres past a ravine's lip kept clear of trees (the first 2 m of undergrowth too).")]
+    [Min(0f)] public float rimClearing = 7f;
+    [Tooltip("Metres added round a place's clearing for the trees' crowns, so a place is never roofed over from above.")]
+    [Min(0f)] public float crownMargin = 6f;
+
+    [Header("Glade Dressing")]
+    [Tooltip("What lies about each kind of glade, so a lair, a rocky glade, a meadow and a pool each look their part.")]
+    public List<GameObject> lairDressing = new List<GameObject>();
+    public List<GameObject> rockyDressing = new List<GameObject>();
+    public List<GameObject> meadowDressing = new List<GameObject>();
+    public List<GameObject> wetDressing = new List<GameObject>();
+    public Vector2Int dressingPerGlade = new Vector2Int(5, 9);
+
     [Header("What Is Found There")]
     public List<HavenPointOfInterest> pointsOfInterest = new List<HavenPointOfInterest>();
     public List<HavenCreatureBand> creatures = new List<HavenCreatureBand>();

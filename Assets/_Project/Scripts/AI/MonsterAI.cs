@@ -322,6 +322,7 @@ public sealed partial class MonsterAI : MonoBehaviour, IEventSubject, IStaggerab
     private void Awake()
     {
         all.Add(this);
+        CharacterFillLight.Mark(gameObject); // lit by the player's fill light, so creatures stand out in the dark woods
         combatant = GetComponent<Combatant>();
         damageable = GetComponent<Damageable>();
         var agent = GetComponent<NavMeshAgent>();
