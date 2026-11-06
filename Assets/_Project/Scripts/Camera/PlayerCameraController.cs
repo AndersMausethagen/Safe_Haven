@@ -155,6 +155,12 @@ public sealed class PlayerCameraController : MonoBehaviour
         lookAction = GameInput.CameraLook;
     }
 
+    private void Start()
+    {
+        // A camera left behind by a tool or test would draw over this one (it happened: a bare "Main Camera" at the root).
+        StrayCameras.SwitchOff(Camera.main);
+    }
+
     private void OnEnable()
     {
         Current = this;

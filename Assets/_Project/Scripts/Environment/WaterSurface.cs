@@ -206,6 +206,20 @@ public sealed class WaterSurface : MonoBehaviour
 
     public bool HasCentreline => centreline.Length >= 2;
 
+    /// <summary>A river's centreline in world space: each point (x, surface height, z) with its half width in w; empty for still water.</summary>
+    public Vector4[] WorldCentreline()
+    {
+        var world = new Vector4[centreline.Length];
+        float scale = Mathf.Abs(transform.lossyScale.x);
+        for (int i = 0; i < centreline.Length; i++)
+        {
+            Vector3 point = transform.TransformPoint(new Vector3(centreline[i].x, centreline[i].y, centreline[i].z));
+            world[i] = new Vector4(point.x, point.y, point.z, centreline[i].w * scale);
+        }
+
+        return world;
+    }
+
     /// <summary>The centre line point nearest <paramref name="xz"/> (interpolated: xyz on the surface, w the half
     /// width there) and how far <paramref name="xz"/> is from it on the ground plane.</summary>
     /// <summary>How the water moves at a point: the way the river runs, as fast as it runs there. Nothing on still water.</summary>
