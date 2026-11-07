@@ -284,6 +284,11 @@ public sealed class HomePortal : MonoBehaviour, IArea, IBuildArea
 
     private void Strengthen(GameObject user)
     {
+        if (HavenVisit.LeftToHost())
+        {
+            return;
+        }
+
         SettlementSettings settings = SettlementSettings.Current;
         int level = GameSession.Settlement.WardLevel;
         if (level >= settings.WardLevels.Count || !MaterialPool.For(user).TrySpend(settings.WardLevels[level].cost))

@@ -34,6 +34,7 @@ public sealed class HavenSync : IDisposable
     }
 
     private readonly Dictionary<string, int> marks = new Dictionary<string, int>();
+    private int settlementMark;
     private readonly HashSet<string> fresh = new HashSet<string>();
     private readonly HashSet<string> seen = new HashSet<string>();
     private readonly List<string> gone = new List<string>();
@@ -52,6 +53,7 @@ public sealed class HavenSync : IDisposable
     /// <summary>Forgets what was seen: the next look only takes note (a session starting or ending).</summary>
     public void Reset()
     {
+        settlementMark = 0;
         marks.Clear();
         fresh.Clear();
         watched = null;
@@ -185,6 +187,51 @@ public sealed class HavenSync : IDisposable
         }
 
         return applied;
+    }
+
+    // ---- The settlement: the host's, mirrored in each guest's game
+
+    /// <summary>
+    /// The host's settlement, packed, when it changed since the last look (null otherwise): residents and their jobs, the
+    /// portal and ward, rank, workshop queues. Progress that only ticks (purifying, a workshop's current craft) is left out
+    /// of the comparison, so it is sent with the next real change.
+    /// </summary>
+    public byte[] CollectSettlement()
+    {
+        SettlementSaveData data = SaveMapper.ToData(GameSession.Settlement);
+        float purifying = data.purificationProgress;
+        var progress = new List<float>();
+        foreach (StationSaveData station in data.stations)
+        {
+            progress.Add(station.progress);
+            station.progress = 0f;
+        }
+
+        data.purificationProgress = 0f;
+        int mark = JsonUtility.ToJson(data).GetHashCode();
+        if (mark == settlementMark)
+        {
+            return null;
+        }
+
+        settlementMark = mark;
+        data.purificationProgress = purifying;
+        for (int i = 0; i < progress.Count; i++)
+        {
+            data.stations[i].progress = progress[i];
+        }
+
+        return WorldTransfer.Pack(data);
+    }
+
+    /// <summary>A guest takes on the host's settlement, in place, so what listens to it (residents, the portal) redraws.</summary>
+    public static void ApplySettlement(byte[] packed, IContentLookup content)
+    {
+        SettlementSaveData data = WorldTransfer.Unpack<SettlementSaveData>(packed);
+        if (data != null)
+        {
+            GameSession.Settlement.TakeOn(SaveMapper.SettlementFrom(data, content));
+        }
     }
 
     // The persistent scene being played, when its state is the session's world (not a scene left behind by a load).

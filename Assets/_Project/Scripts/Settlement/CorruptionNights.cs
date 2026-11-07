@@ -57,7 +57,8 @@ public sealed class CorruptionNights : MonoBehaviour
 
     private void Update()
     {
-        if (Time.time < nextCheck)
+        // A friend's Haven: its nights are theirs (co-op raids and fights come later).
+        if (Time.time < nextCheck || HavenVisit.IsVisiting)
         {
             return;
         }

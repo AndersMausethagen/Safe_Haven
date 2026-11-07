@@ -317,6 +317,30 @@ public sealed class SettlementState
     /// <summary>Raised after anything here changes (but not on every purification tick).</summary>
     public event Action Changed;
 
+    /// <summary>
+    /// Becomes a copy of <paramref name="other"/> (a friend's settlement in co-op, freshly read and not used elsewhere),
+    /// keeping this object, so everything listening to <see cref="Changed"/> stays subscribed; then raises it. Every field
+    /// is copied by reflection so new ones are never missed; <paramref name="other"/> must not be used afterwards.
+    /// </summary>
+    public void TakeOn(SettlementState other)
+    {
+        if (other == null || other == this)
+        {
+            return;
+        }
+
+        foreach (System.Reflection.FieldInfo field in typeof(SettlementState).GetFields(
+                     System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic))
+        {
+            if (field.Name != nameof(Changed))
+            {
+                field.SetValue(this, field.GetValue(other));
+            }
+        }
+
+        Changed?.Invoke();
+    }
+
     public void RepairPortal()
     {
         if (!PortalRepaired)

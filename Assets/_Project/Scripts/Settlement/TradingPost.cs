@@ -72,6 +72,11 @@ public sealed class TradingPost : MonoBehaviour
 
     private static void Sell(GameObject user, TradeSettings.Sale sale)
     {
+        if (HavenVisit.LeftToHost())
+        {
+            return;
+        }
+
         TradeSettings settings = TradeSettings.Current;
         if (settings.Coin != null && MaterialPool.For(user).TrySpend(null, new[] { new ItemAmount(sale.item, 1) }))
         {
@@ -82,6 +87,11 @@ public sealed class TradingPost : MonoBehaviour
 
     private static void Buy(GameObject user, TradeSettings.Offer offer)
     {
+        if (HavenVisit.LeftToHost())
+        {
+            return;
+        }
+
         TradeSettings settings = TradeSettings.Current;
         if (settings.Coin == null || GameSession.Settlement.BoughtSinceLastRaid(offer.Key) >= offer.stock
             || GameSession.Stash.Items.SpaceFor(offer.item) < offer.amount

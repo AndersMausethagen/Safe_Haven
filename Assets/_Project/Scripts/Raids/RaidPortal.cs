@@ -224,6 +224,11 @@ public sealed class RaidPortal : MonoBehaviour, IStationMenuExtension, IInteract
 
     private void Repair(GameObject user)
     {
+        if (HavenVisit.LeftToHost())
+        {
+            return;
+        }
+
         if (!repairRequires.IsMet)
         {
             GameMessages.Post(repairLockedText, MessageKind.Warning);

@@ -344,4 +344,37 @@ public sealed class CoopTests
         Assert.IsTrue(typeof(ISharedState).IsAssignableFrom(typeof(ResourceNode)), "Nodes leave their regrowth countdown out of the comparison.");
         Assert.IsTrue(typeof(ISharedState).IsAssignableFrom(typeof(TerrainTreeMemory)), "Felled trees leave their countdowns out too.");
     }
+
+    [Test]
+    public void AFriendsSettlement_IsTakenOnInPlace_SoListenersStay()
+    {
+        var content = Resources.Load<ContentDatabase>(ContentDatabase.ResourceName);
+        var mine = new SettlementState();
+        int heard = 0;
+        mine.Changed += () => heard++;
+
+        var theirs = new SettlementState();
+        theirs.RaiseWardLevel();
+        theirs.RaiseWardLevel();
+        theirs.RepairPortal();
+        SettlementSaveData sent = SaveMapper.ToData(theirs);
+
+        mine.TakeOn(SaveMapper.SettlementFrom(sent, content));
+        Assert.AreEqual(2, mine.WardLevel);
+        Assert.IsTrue(mine.PortalRepaired);
+        Assert.AreEqual(1, heard, "Taking it on is announced once, to the same listeners.");
+
+        mine.RaiseWardLevel();
+        Assert.AreEqual(3, mine.WardLevel);
+        Assert.AreEqual(2, heard, "Still listened to afterwards.");
+    }
+
+    [Test]
+    public void AtHome_NothingIsLeftToAHost()
+    {
+        HavenVisit.Forget();
+        Assert.IsFalse(HavenVisit.LeftToHost());
+        Assert.IsFalse(HavenVisit.MayBuild);
+        Assert.IsFalse(HavenVisit.MayUseStash);
+    }
 }

@@ -48,6 +48,8 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
     private const string WorldRequest = "SafeHaven.WorldPlease";
     private const string ClockMessage = "SafeHaven.Clock";
     private const string EntitiesMessage = "SafeHaven.Entities";
+    private const string SettlementMessage = "SafeHaven.Settlement";
+    private const int SettlementEvery = 4;
     private const float ClockInterval = 5f;
 
     private MultiplayerSettings settings;
@@ -63,6 +65,7 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
     private int transfers;
     private float nextClock;
     private float nextSync;
+    private int syncLooks;
     private HavenSync sync;
     private readonly VisitorAccess access = new VisitorAccess();
     private readonly List<ulong> recipients = new List<ulong>();
@@ -371,6 +374,7 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
         network.CustomMessagingManager.RegisterNamedMessageHandler(WorldMessage, OnWorldPiece);
         network.CustomMessagingManager.RegisterNamedMessageHandler(ClockMessage, OnClock);
         network.CustomMessagingManager.RegisterNamedMessageHandler(EntitiesMessage, OnEntitiesFromHost);
+        network.CustomMessagingManager.RegisterNamedMessageHandler(SettlementMessage, OnSettlement);
         access.StartGuest(network);
         SetState(CoopState.Joining);
         return true;
@@ -578,6 +582,13 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
             {
                 SendPacket(EntitiesMessage, packet, Guests(NetworkManager.ServerClientId));
             }
+
+            // The settlement every couple of seconds, when it changed.
+            byte[] settlement = ++syncLooks % SettlementEvery == 0 ? sync.CollectSettlement() : null;
+            if (settlement != null)
+            {
+                SendPacket(SettlementMessage, settlement, Guests(NetworkManager.ServerClientId));
+            }
         }
         else if (HavenVisit.IsVisiting)
         {
@@ -616,6 +627,24 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
         try
         {
             sync.Apply(packet, false);
+        }
+        catch (Exception exception)
+        {
+            Debug.LogException(exception);
+        }
+    }
+
+    private void OnSettlement(ulong sender, FastBufferReader reader)
+    {
+        reader.ReadValueSafe(out byte[] packet);
+        if (!HavenVisit.IsVisiting)
+        {
+            return;
+        }
+
+        try
+        {
+            HavenSync.ApplySettlement(packet, Content());
         }
         catch (Exception exception)
         {

@@ -91,7 +91,7 @@ public sealed class HavenRequestBoard : MonoBehaviour
 
         nextCheck = Time.time + checkEvery;
         Player player = Player.Current;
-        if (player == null || RaidDirector.Current != null)
+        if (player == null || RaidDirector.Current != null || HavenVisit.IsVisiting)
         {
             return;
         }

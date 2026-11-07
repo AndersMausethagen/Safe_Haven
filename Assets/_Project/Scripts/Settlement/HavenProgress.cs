@@ -74,6 +74,12 @@ public sealed class HavenProgress : MonoBehaviour
     public void Count(bool announce)
     {
         nextCount = Time.time + RecountSeconds;
+        // A friend's Haven: its renown and rank are counted in their game and arrive with the settlement.
+        if (HavenVisit.IsVisiting)
+        {
+            return;
+        }
+
         KeepTrackOfBuildings();
         int now = HavenRenown.Compute();
         if (announce && renown >= 0 && now > renown)

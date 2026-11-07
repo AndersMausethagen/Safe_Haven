@@ -168,6 +168,23 @@ public static class HavenVisit
         }
     }
 
+    /// <summary>
+    /// True, and says so, when what a guest is about to do is the host's decision: their residents' jobs, the portal and
+    /// ward, the altar, trades and the workshops' queues. A guest's copy of the settlement only mirrors the host's
+    /// (<see cref="HavenSync"/>), so such a change would be undone at the host's next word.
+    /// </summary>
+    public static bool LeftToHost()
+    {
+        if (!IsVisiting)
+        {
+            return false;
+        }
+
+        string host = string.IsNullOrEmpty(HostName) ? "your friend" : HostName;
+        GameMessages.Post($"That's for {host} to decide in their own Haven.", MessageKind.Warning);
+        return true;
+    }
+
     /// <summary>The host's answer about building or the stash.</summary>
     public static void Allow(VisitorRight right, bool yes)
     {

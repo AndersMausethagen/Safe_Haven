@@ -58,6 +58,11 @@ public static class StationCrafting
     /// <summary>Pays for one craft and puts it at the end of the queue. Tells the player why not when it can't.</summary>
     public static bool TryQueue(GameObject user, StationQueue queue, RecipeDefinition recipe)
     {
+        if (HavenVisit.LeftToHost())
+        {
+            return false;
+        }
+
         string problem = Check(user, queue, recipe);
         if (problem != null)
         {

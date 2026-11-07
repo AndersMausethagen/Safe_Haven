@@ -149,6 +149,17 @@ public static class SaveMapper
         };
     }
 
+    /// <summary>The settlement as save data (co-op sends it to visiting friends).</summary>
+    public static SettlementSaveData ToData(SettlementState settlement)
+    {
+        var data = new SettlementSaveData();
+        WriteSettlement(settlement, data);
+        return data;
+    }
+
+    /// <summary>A settlement read from save data, on its own (co-op: a friend's settlement to take on).</summary>
+    public static SettlementState SettlementFrom(SettlementSaveData data, IContentLookup content) => ReadSettlement(data, content, new List<string>());
+
     private static void WriteSettlement(SettlementState settlement, SettlementSaveData into)
     {
         if (settlement == null)
