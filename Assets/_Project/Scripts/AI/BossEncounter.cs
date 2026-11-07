@@ -145,7 +145,19 @@ public sealed class BossEncounter : MonoBehaviour
             GameSession.ActiveRaid.BossesBeaten++;
         }
 
-        if (definition == null || !GameSession.Settlement.MarkBossDefeated(definition.Id))
+        // On a friend's raid (co-op) the boss falls in this player's own Haven's story: their first win there is what counts.
+        bool first;
+        if (definition != null && HavenVisit.IsVisiting)
+        {
+            GameSession.Settlement.MarkBossDefeated(definition.Id);
+            first = HavenVisit.BossBeatenHome(definition.Id);
+        }
+        else
+        {
+            first = definition != null && GameSession.Settlement.MarkBossDefeated(definition.Id);
+        }
+
+        if (!first)
         {
             return;
         }

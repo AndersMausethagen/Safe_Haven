@@ -482,4 +482,43 @@ public sealed class CoopTests
             Object.DestroyImmediate(holder);
         }
     }
+
+    [Test]
+    public void WhatAVisitorWinsOnAFriendsRaid_ReachesTheirOwnHaven()
+    {
+        var content = Resources.Load<ContentDatabase>(ContentDatabase.ResourceName);
+        ResidentDefinition traveller = null;
+        foreach (string guid in AssetDatabase.FindAssets("t:ResidentDefinition"))
+        {
+            traveller = AssetDatabase.LoadAssetAtPath<ResidentDefinition>(AssetDatabase.GUIDToAssetPath(guid));
+            if (traveller != null)
+            {
+                break;
+            }
+        }
+
+        Assert.IsNotNull(traveller);
+        var homeField = typeof(HavenVisit).GetField("home", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+        var ownGame = new SaveData { scene = "SafeHaven" };
+        homeField.SetValue(null, ownGame);
+        try
+        {
+            Assert.IsTrue(HavenVisit.RescuedHome(traveller));
+            Assert.IsFalse(HavenVisit.RescuedHome(traveller), "Once.");
+            HavenVisit.BossBeatenHome("heartroot");
+            HavenVisit.BossBeatenHome("heartroot");
+
+            SaveData written = HavenVisit.ForOwnSave(new SaveData { scene = "SafeHaven" });
+            Assert.AreEqual(1, written.settlement.residents.Count);
+            Assert.AreEqual(traveller.Id, written.settlement.residents[0].id);
+            CollectionAssert.AreEqual(new[] { "heartroot" }, written.settlement.defeatedBosses);
+            SettlementState read = SaveMapper.SettlementFrom(written.settlement, content);
+            Assert.IsNotNull(read.Find(traveller), "Home, they live in the Haven.");
+            Assert.IsTrue(read.IsBossDefeated("heartroot"));
+        }
+        finally
+        {
+            HavenVisit.Forget();
+        }
+    }
 }

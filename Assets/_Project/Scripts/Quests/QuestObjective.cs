@@ -177,7 +177,8 @@ public sealed class QuestObjective
             case ObjectiveType.CraftItem: // made before the quest (an older save, a found tool): having it is enough
                 return item == null ? 0 : player.Bag.Container.Count(item) + (player.Equipment != null ? player.Equipment.Gear.Slots.Count(item) : 0);
             case ObjectiveType.BuildStructure:
-                return BuildingObject.Count(building);
+                // A friend's Haven (co-op) is theirs: what stands there isn't this player's to count; what they build there is.
+                return HavenVisit.IsVisiting ? 0 : BuildingObject.Count(building);
             case ObjectiveType.GatherResource:
                 return item != null ? player.Bag.Container.Count(item) : player.Resources.Storage.GetAmount(resource);
             default:

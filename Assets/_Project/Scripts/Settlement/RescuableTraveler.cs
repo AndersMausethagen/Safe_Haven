@@ -180,6 +180,22 @@ public sealed class RescuableTraveler : MonoBehaviour, IInteractionName
             return;
         }
 
+        // Rescued on a friend's raid (co-op): they make their home in this player's own Haven, not the friend's.
+        if (HavenVisit.IsVisiting)
+        {
+            if (HavenVisit.RescuedHome(resident))
+            {
+                raid.Report?.Rescued.Add(resident);
+                GameMessages.Post($"{resident.DisplayName} steps through the portal with you, and will be waiting in your own Haven.", MessageKind.Gain);
+                if (rescuedEvent != null)
+                {
+                    GameEvents.Raise(rescuedEvent, player);
+                }
+            }
+
+            return;
+        }
+
         if (GameSession.Settlement.AddResident(resident))
         {
             raid.Report?.Rescued.Add(resident);

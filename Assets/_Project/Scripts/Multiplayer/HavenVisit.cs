@@ -199,6 +199,48 @@ public static class HavenVisit
         return true;
     }
 
+    /// <summary>
+    /// A traveller this guest rescued on the host's raid: they join the guest's own Haven (the game kept as home, which
+    /// saving while visiting and going home both write), not the mirror of the host's. False when they already live there.
+    /// </summary>
+    public static bool RescuedHome(ResidentDefinition resident)
+    {
+        if (home == null || resident == null)
+        {
+            return false;
+        }
+
+        home.settlement ??= new SettlementSaveData();
+        if (home.settlement.residents.Exists(entry => entry.id == resident.Id))
+        {
+            return false;
+        }
+
+        home.settlement.residents.Add(new ResidentSaveData { id = resident.Id, job = "" });
+        return true;
+    }
+
+    /// <summary>
+    /// A boss this guest helped bring down on the host's raid counts in the guest's own Haven too (what it unlocks there).
+    /// True the first time it falls for them, as their own first win would be.
+    /// </summary>
+    public static bool BossBeatenHome(string bossId)
+    {
+        if (home == null || string.IsNullOrEmpty(bossId))
+        {
+            return false;
+        }
+
+        home.settlement ??= new SettlementSaveData();
+        if (home.settlement.defeatedBosses.Contains(bossId))
+        {
+            return false;
+        }
+
+        home.settlement.defeatedBosses.Add(bossId);
+        return true;
+    }
+
     /// <summary>The host's answer about building or the stash.</summary>
     public static void Allow(VisitorRight right, bool yes)
     {
