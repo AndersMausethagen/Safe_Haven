@@ -44,21 +44,26 @@ MonoBehaviour:
   fineStrength: 0.5
   masterworkStrength: 1
   masterworkShare: 0.25
+  catchWork: 2
+  castExperience: 3
   questExperience: 50
   raidExtractedExperience: 150
   raidFailedExperience: 40
   firstCraftExperience: 10
-  catchExperience: 8
   handGatherExperience: 2
   exploredCellsPerExperience: 150
   insightStep: 100
   skills:
   - {fileID: 11400000, guid: a277ba53f2eae0648aa06826e44cbfd8, type: 2}
   - {fileID: 11400000, guid: e9528bdd6784e9d4eaa85d8753dfa51c, type: 2}
+  - {fileID: 11400000, guid: 4fde8ce0d82ef0d42b6bc607ec3f9a7a, type: 2}
+  - {fileID: 11400000, guid: b7b0a5e2ce2709341b1d81708498a315, type: 2}
   - {fileID: 11400000, guid: 8d43d0e08472c694fa5c6c56cdcdb5a8, type: 2}
   - {fileID: 11400000, guid: 088b48bc19cfef1429d3cde1d9bc6f5e, type: 2}
   - {fileID: 11400000, guid: d50f36a74b08c1b4a81b1f363a882045, type: 2}
   - {fileID: 11400000, guid: fc9f5ddf81e83b64d9706fd80ce6aade, type: 2}
   - {fileID: 11400000, guid: 71d286514cbbbe149ba663b354b4f1ae, type: 2}
   - {fileID: 11400000, guid: 98481e79d59499846a4c2d233cfe5948, type: 2}
+  - {fileID: 11400000, guid: c02bc5ecd6589b94daa2ae6d5320cfb6, type: 2}
+  - {fileID: 11400000, guid: 0bf8c75e4c32304428c7000e1e01913b, type: 2}
   - {fileID: 11400000, guid: cada299a42945b04b8c891d31b0c5351, type: 2}

@@ -19,4 +19,8 @@ public enum HitTechnique
     WeaponArt = 128,
     /// <summary>A swing of the weapon in hand (not an arrow or spell): trains the Melee skill.</summary>
     Melee = 256,
+    /// <summary>The player's arrow: trains the Archery skill.</summary>
+    Shot = 512,
+    /// <summary>The player's spell: trains the Runecraft skill.</summary>
+    Spell = 1024,
 }

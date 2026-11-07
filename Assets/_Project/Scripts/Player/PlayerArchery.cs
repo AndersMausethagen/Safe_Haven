@@ -432,8 +432,11 @@ public sealed class PlayerArchery : MonoBehaviour
         direction = ArcheryRules.Stray(direction, spread, strayAngle, strayRadius);
 
         ArrowProjectile projectile = PrefabPool.Spawn(arrow.Projectile, origin, Quaternion.LookRotation(direction));
-        float damage = arrow.Damage * ArcheryRules.DamageShare(draw) * damageMultiplier;
-        projectile.Launch(combatant, bow.ShotAttack, arrowItem, damage, direction * speed, counter ? HitTechnique.Counter : HitTechnique.None, perfect, recoverable: true);
+        // The Archery skill: a beginner's arrows fly softer, a master's harder.
+        float skill = combatant != null ? Mathf.Max(0f, 1f + combatant.Stats.Get(StatType.ArrowDamage)) : 1f;
+        float damage = arrow.Damage * ArcheryRules.DamageShare(draw) * damageMultiplier * skill;
+        HitTechnique technique = HitTechnique.Shot | (counter ? HitTechnique.Counter : HitTechnique.None);
+        projectile.Launch(combatant, bow.ShotAttack, arrowItem, damage, direction * speed, technique, perfect, recoverable: true);
 
         movement.SnapFacing(direction);
         AudioManager.Play(bow.SwingSound, origin);

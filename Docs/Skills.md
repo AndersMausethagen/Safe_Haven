@@ -1,7 +1,8 @@
 # Skills
 
 The player gets better at what they do. Felling trees trains Woodcutting, swinging a sword trains Melee, creeping past a wolf
-trains Sneaking. Skills replaced the character level and the four talent trees on 2026-11-07, modelled on RuneScape: Dragonwilds,
+trains Sneaking. Thirteen skills: Woodcutting, Mining, Foraging and Fishing (gathering); Weaponcrafting, Armorcrafting, Cooking,
+Alchemy and Construction (crafting); Melee, Archery and Runecraft (combat); Sneaking (stealth). Skills replaced the character level and the four talent trees on 2026-11-07, modelled on RuneScape: Dragonwilds,
 where every activity is a skill with small bonuses each level and something new at set levels.
 
 Code: `Progression/` (`ProficiencyDefinition`, `PerkDefinition`, `CharacterProgress`, `ExperienceTracker`, `PlayerTraining`,
@@ -26,11 +27,18 @@ The tuning the game had becomes level 10, reached around the first tier I raids.
 | Skill | Stat | Level 1 | Level 10 | Level 50 |
 |---|---|---|---|---|
 | Woodcutting / Mining | Tool rises on the timing bar | 90% speed | 100% | 125% |
+| Foraging | Picking by hand and the sickle | 85% speed | 100% | 130% |
+| | Extra plant chance | 0 | 0 | +20% |
+| Fishing | Catch zone on the reel | 80% | 100% | 130% |
 | | Critical zone width | 70% | 100% | 140% |
 | | Extra yield chance | 0 | 0 | +15% |
 | Melee | Damage of every swing | 88% | 100% | 120% |
 | | Stamina per swing | 125% | 100% | 80% |
 | | Stamina per blocked blow | 125% | 100% | 75% |
+| Archery | Arrow damage | 88% | 100% | 120% |
+| | Draw speed | 85% | 100% | 125% |
+| Runecraft | Spell damage | 88% | 100% | 120% |
+| | Stamina per spell | 125% | 100% | 80% |
 | Sneaking | Sneaking footsteps and lock noise | 130% | 100% | 60% |
 | | Visibility while sneaking (time to be spotted) | 118% (85%) | 100% | 71% (140%) |
 | | Lockpicking zone width | 80% | 100% | 130% |
@@ -70,6 +78,10 @@ The action rate is an assumption, not a measurement: count real actions per raid
 |---|---|---|
 | Woodcutting | a node gathered with an axe, at its tier | `ExperienceTracker.OnHarvested` |
 | Mining | a node gathered with a pickaxe | same |
+| Foraging | a node picked by hand or cut with a sickle | same |
+| Fishing | a fish landed, 2 x its tier's experience | `PlayerFishing.Land` |
+| Archery | each arrow that hurts a monster, as Melee's blows | `PlayerTraining` (`HitTechnique.Shot`) |
+| Runecraft | each spell that hurts a monster, as Melee's blows; every spell cast, 3 tier I experience | `PlayerTraining` (`HitTechnique.Spell`, `PlayerSkills.SkillCast`) |
 | Melee | each weapon swing that hurts a monster: the share of the monster's worth (its Experience, or 0.25 per point of health) it took off its health; parries and perfect dodges, 3 tier I experience, five times per monster | `PlayerTraining` |
 | Sneaking | first blow on an unaware monster (8), sneaking for 6 s within a monster's sight before it spots you (4, three times per monster), a monster that hunted you losing track (10), a lock pin set silently (2) | `PlayerTraining` |
 | Weaponcrafting | a weapon (3), tool (2) or batch of arrows (0.5) made, in its item tier's experience | `ExperienceTracker.PractiseCraft` |
@@ -90,7 +102,7 @@ Gear the player makes rolls its quality when it is made by hand, or when they co
 "Fine Iron Sword" and in green in the tooltip. Raid tiers are tuned to plain gear, so a well made kit is a head start, not a
 requirement.
 
-Blows of other kinds (arrows, spells, traps) and nodes no skill trains give Insight until their skill exists.
+Blows of other kinds (traps) give Insight. The Ambush Damage of a perk counts for arrows as well as swings.
 
 ## Raid tiers
 
@@ -100,5 +112,4 @@ to the suggested values (II x1.5, III x2.3, IV x3). A player whose skill keeps p
 
 ## Still to come
 
-- **The rest:** Foraging, Fishing, Archery and Runecraft, taking over the remaining Insight sources and the old Ranger and Runemaster talents.
 - Mentors (building upgrades that speed a skill), a rested bonus from beds and the Sauna.

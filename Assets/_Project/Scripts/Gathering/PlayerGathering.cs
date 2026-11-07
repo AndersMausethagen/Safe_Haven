@@ -269,6 +269,13 @@ public sealed class PlayerGathering : MonoBehaviour
         GatheringToolProfile profile = settings.Enabled ? settings.Profile(definition.GatherTool) : null;
         if (profile == null)
         {
+            // Picked by hand: the Foraging skill sets how long it takes.
+            if (definition.GatherTool == ToolType.None)
+            {
+                SkillHand(ToolType.None, out float pick, out _);
+                started.Duration = definition.GatherSeconds / pick;
+            }
+
             return;
         }
 
@@ -409,13 +416,24 @@ public sealed class PlayerGathering : MonoBehaviour
         }
     }
 
-    // How the woodcutting or mining skill changes the swing: how fast the tool rises and how wide its sweet spot is,
-    // as multipliers (a beginner's below 1).
+    // How the woodcutting, mining or foraging skill changes the work: how fast the tool rises (or the hand picks) and how
+    // wide its sweet spot is, as multipliers (a beginner's below 1).
     private void SkillHand(ToolType tool, out float speed, out float sweetSpot)
     {
         speed = 1f;
         sweetSpot = 1f;
-        if ((tool != ToolType.Axe && tool != ToolType.Pickaxe) || !TryGetComponent(out Combatant self))
+        if (!TryGetComponent(out Combatant self))
+        {
+            return;
+        }
+
+        if (tool == ToolType.Sickle || tool == ToolType.None)
+        {
+            speed = Mathf.Max(0.25f, 1f + self.Stats.Get(StatType.ForageSpeed));
+            return;
+        }
+
+        if (tool != ToolType.Axe && tool != ToolType.Pickaxe)
         {
             return;
         }

@@ -78,6 +78,12 @@ public sealed class LevelingSettings : GameSettings<LevelingSettings>
     [Tooltip("Share of a maker's quality chance that comes out Masterwork rather than Fine.")]
     [SerializeField, Range(0f, 1f)] private float masterworkShare = 0.25f;
 
+    [Header("Fishing and spells")]
+    [Tooltip("A fish landed, in its tier's experience.")]
+    [SerializeField, Min(0f)] private float catchWork = 2f;
+    [Tooltip("Any spell cast, in tier I experience (scaled by the place's tier): healing and warding train Runecraft too.")]
+    [SerializeField, Min(0)] private int castExperience = 3;
+
     [Header("Insight (put into any skill)")]
     [Tooltip("For a completed quest without its own Experience.")]
     [SerializeField, Min(0)] private int questExperience = 50;
@@ -86,9 +92,7 @@ public sealed class LevelingSettings : GameSettings<LevelingSettings>
     [SerializeField, Min(0)] private int raidFailedExperience = 40;
     [Tooltip("The first time each item is crafted.")]
     [SerializeField, Min(0)] private int firstCraftExperience = 10;
-    [Tooltip("A fish landed.")]
-    [SerializeField, Min(0)] private int catchExperience = 8;
-    [Tooltip("A node no skill trains (a bush picked by hand).")]
+    [Tooltip("A node no skill trains.")]
     [SerializeField, Min(0)] private int handGatherExperience = 2;
     [Tooltip("1 Insight for this many square metres of new ground explored.")]
     [SerializeField, Min(1)] private int exploredCellsPerExperience = 150;
@@ -124,7 +128,8 @@ public sealed class LevelingSettings : GameSettings<LevelingSettings>
     public float BuildWork => buildWork;
     public float UpgradeWork => upgradeWork;
     public float MasterworkShare => masterworkShare;
-    public int CatchExperience => catchExperience;
+    public float CatchWork => catchWork;
+    public int CastExperience => castExperience;
     public int ExploredCellsPerExperience => exploredCellsPerExperience;
     public int InsightStep => insightStep;
     public IReadOnlyList<ProficiencyDefinition> Skills => skills;
@@ -288,17 +293,13 @@ public sealed class LevelingSettings : GameSettings<LevelingSettings>
         return null;
     }
 
-    /// <summary>The gathering skill nodes of this tool train, or null.</summary>
+    /// <summary>The gathering skill nodes of this tool train (for no tool, the one that gathers by hand), or null.</summary>
     public ProficiencyDefinition SkillFor(ToolType tool)
     {
-        if (tool == ToolType.None)
-        {
-            return null;
-        }
-
         foreach (ProficiencyDefinition skill in skills)
         {
-            if (skill != null && skill.GatherTool == tool)
+            if (skill != null && skill.Training == ProficiencyTraining.Gathering
+                && (tool == ToolType.None ? skill.GathersByHand : skill.GatherTool == tool))
             {
                 return skill;
             }

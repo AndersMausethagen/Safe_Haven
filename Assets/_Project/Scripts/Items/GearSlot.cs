@@ -287,13 +287,20 @@ public static class StatNames
             case StatType.AlchemyYield: return "Extra Draught Chance";
             case StatType.BuildSpeed: return "Building Speed";
             case StatType.RefiningYield: return "Extra Refined Chance";
+            case StatType.ForageSpeed: return "Foraging Speed";
+            case StatType.ForageYield: return "Extra Forage Chance";
+            case StatType.ReelZone: return "Reel Catch Zone";
+            case StatType.ArrowDamage: return "Arrow Damage";
+            case StatType.SpellDamage: return "Spell Damage";
+            case StatType.SpellStaminaCost: return "Spell Stamina Cost";
             default: return stat.ToString();
         }
     }
 
     /// <summary>Stats where more is worse for whoever has them (a cost, noise, being seen): a positive value is a penalty.</summary>
     public static bool LowerIsBetter(StatType stat) =>
-        stat == StatType.MeleeStaminaCost || stat == StatType.BlockStaminaCost || stat == StatType.SneakNoise || stat == StatType.SneakVisibility;
+        stat == StatType.MeleeStaminaCost || stat == StatType.BlockStaminaCost || stat == StatType.SneakNoise || stat == StatType.SneakVisibility
+        || stat == StatType.SpellStaminaCost;
 
     /// <summary>Whether this bonus makes its owner worse off (a beginner's penalty).</summary>
     public static bool IsPenalty(StatType stat, float value) => LowerIsBetter(stat) ? value > 0f : value < 0f;

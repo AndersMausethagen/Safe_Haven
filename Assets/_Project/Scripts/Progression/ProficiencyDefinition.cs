@@ -94,6 +94,8 @@ public sealed class ProficiencyDefinition : ScriptableObject
     [SerializeField] private CraftedGoods crafts;
     [Tooltip("A gathering skill: nodes gathered with this tool train it. None for the rest.")]
     [SerializeField] private ToolType gatherTool;
+    [Tooltip("A gathering skill that nodes picked by hand (no tool) train as well.")]
+    [SerializeField] private bool gathersByHand;
     [SerializeField] private List<LevelBonus> levelBonuses = new List<LevelBonus>();
     [Tooltip("In order of level. Each offers two perks; the player keeps one.")]
     [SerializeField] private List<Milestone> milestones = new List<Milestone>();
@@ -107,6 +109,7 @@ public sealed class ProficiencyDefinition : ScriptableObject
     public ProficiencyTraining Training => training;
     public CraftedGoods Crafts => crafts;
     public ToolType GatherTool => gatherTool;
+    public bool GathersByHand => gathersByHand;
     public IReadOnlyList<LevelBonus> LevelBonuses => levelBonuses;
     public IReadOnlyList<Milestone> Milestones => milestones;
 
@@ -137,9 +140,10 @@ public sealed class ProficiencyDefinition : ScriptableObject
     /// <summary>Sets the skill up (editor tools and tests).</summary>
     public void Configure(string skillId, string label, string text, string trained, ProficiencyGroup inGroup,
         ProficiencyTraining trainedThrough, ToolType tool, IEnumerable<LevelBonus> bonuses, IEnumerable<Milestone> levels,
-        CraftedGoods madeGoods = CraftedGoods.None)
+        CraftedGoods madeGoods = CraftedGoods.None, bool byHand = false)
     {
         crafts = madeGoods;
+        gathersByHand = byHand;
         id = skillId;
         displayName = label;
         description = text;

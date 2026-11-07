@@ -276,8 +276,10 @@ public sealed class PlayerFishing : MonoBehaviour
             return;
         }
 
-        Reel = new ReelSession(hooked.fight, settings.ZoneSize, settings.ZoneLift, settings.ZoneFall, settings.CatchFill, settings.CatchDrain,
-            Random.Range(0, int.MaxValue));
+        // The Fishing skill widens (or for a beginner narrows) the catch zone.
+        float zone = TryGetComponent(out Combatant self) ? Mathf.Max(0.1f, 1f + self.Stats.Get(StatType.ReelZone)) : 1f;
+        Reel = new ReelSession(hooked.fight, Mathf.Min(0.9f, settings.ZoneSize * zone), settings.ZoneLift, settings.ZoneFall, settings.CatchFill,
+            settings.CatchDrain, Random.Range(0, int.MaxValue));
         State = Phase.Reeling;
     }
 
@@ -294,7 +296,8 @@ public sealed class PlayerFishing : MonoBehaviour
         {
             GameMessages.Post($"Caught a {fish.DisplayName}! ({kilograms:0.0} kg)", MessageKind.Gain);
             GameEvents.Raise(new GameEvent(GameEventKind.FishCaught, fish, 1, gameObject));
-            ExperienceTracker.GrantInsight(LevelingSettings.Current.CatchExperience);
+            int tier = Mathf.Max(1, fish.Tier);
+            ExperienceTracker.Practise(ProficiencyTraining.Fishing, tier, LevelingSettings.Current.TierExperience(tier) * LevelingSettings.Current.CatchWork);
         }
 
         AudioManager.Play(settings.CatchSound, transform.position);

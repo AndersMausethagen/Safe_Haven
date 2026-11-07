@@ -17,7 +17,7 @@ public sealed class SkillsWindow : MonoBehaviour
     private const float ScreenMargin = 24f;
     private const float ListX = 30f;
     private const float ListWidth = 440f;
-    private const float RowHeight = 38f;
+    private const float RowHeight = 34f;
     private const float DetailX = 500f;
     private const float DetailWidth = 850f;
     private const float MilestoneTop = 395f;

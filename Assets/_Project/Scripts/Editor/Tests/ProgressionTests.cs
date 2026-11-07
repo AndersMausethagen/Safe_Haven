@@ -127,7 +127,8 @@ public sealed class ProgressionTests
             Assert.AreEqual(0, GameSession.Progress.Insight);
 
             ExperienceTracker.Practise(ProficiencyTraining.Archery, 1, 10f);
-            Assert.AreEqual(10, GameSession.Progress.Insight, "practice no skill trains yet becomes Insight");
+            Assert.AreEqual(10, GameSession.Progress.ExperienceOf(settings.SkillTrainedBy(ProficiencyTraining.Archery)), "a kind of practice trains its skill");
+            Assert.AreEqual(0, GameSession.Progress.Insight);
         }
         finally
         {
@@ -219,7 +220,15 @@ public sealed class ProgressionTests
     {
         LevelingSettings settings = LevelingSettings.Current;
         string[] ids = settings.Skills.Select(s => s.Id).ToArray();
-        CollectionAssert.IsSubsetOf(new[] { "woodcutting", "mining", "melee", "sneaking" }, ids);
+        CollectionAssert.AreEquivalent(new[]
+        {
+            "woodcutting", "mining", "foraging", "fishing", "weaponcrafting", "armorcrafting", "cooking", "alchemy", "construction",
+            "melee", "archery", "runecraft", "sneaking",
+        }, ids);
+        Assert.AreSame(settings.FindSkill("foraging"), settings.SkillFor(ToolType.None), "picking by hand trains Foraging");
+        Assert.AreSame(settings.FindSkill("foraging"), settings.SkillFor(ToolType.Sickle));
+        Assert.AreSame(settings.FindSkill("fishing"), settings.SkillTrainedBy(ProficiencyTraining.Fishing));
+        Assert.AreSame(settings.FindSkill("runecraft"), settings.SkillTrainedBy(ProficiencyTraining.Spells));
         Assert.AreEqual(ids.Length, ids.Distinct().Count(), "skill ids are unique");
         Assert.AreSame(settings.FindSkill("mining"), settings.SkillFor(ToolType.Pickaxe));
         Assert.AreSame(settings.FindSkill("sneaking"), settings.SkillTrainedBy(ProficiencyTraining.Sneaking));

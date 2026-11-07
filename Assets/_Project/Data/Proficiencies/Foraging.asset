@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d75b22f30f824f747ae6ca96317ac240, type: 3}
+  m_Name: Foraging
+  m_EditorClassIdentifier: SafeHaven::ProficiencyDefinition
+  id: foraging
+  displayName: Foraging
+  description: 'Berries, herbs, mushrooms and fibre: knowing what grows where, and taking it without spoiling it.'
+  trainedBy: picking plants by hand and cutting them with the sickle
+  icon: {fileID: 0}
+  group: 0
+  training: 0
+  crafts: 0
+  gatherTool: 3
+  gathersByHand: 1
+  levelBonuses:
+  - stat: 45
+    atFirstLevel: -0.14999999
+    atLastLevel: 0.29999998
+  - stat: 46
+    atFirstLevel: 0
+    atLastLevel: 0.19999999
+  milestones:
+  - level: 10
+    first: {fileID: 11400000, guid: f90ade5029c604c4aad19dfeef5683f9, type: 2}
+    second: {fileID: 11400000, guid: bc7e0420fd970f048a6b4e6560ab0e01, type: 2}
+  - level: 20
+    first: {fileID: 11400000, guid: 2b173399c646a354fb81ae1b892d5583, type: 2}
+    second: {fileID: 11400000, guid: efeff1b130b751645a8f28c6e46f1f7b, type: 2}
+  - level: 30
+    first: {fileID: 11400000, guid: c104fa5fe4e3f80488dddd09ab5e0101, type: 2}
+    second: {fileID: 11400000, guid: 2fd000622ae0e524a996bf673fad1831, type: 2}
+  - level: 40
+    first: {fileID: 11400000, guid: 0c2190764c2f85f429ab50ef2f03a4b9, type: 2}
+    second: {fileID: 11400000, guid: db5149176fdd62e4caed6c9e5df0d04b, type: 2}
+  - level: 50
+    first: {fileID: 11400000, guid: c605e72585015d24e8256c63e3bcc0f2, type: 2}
+    second: {fileID: 11400000, guid: ff2120d78c2dde845b55d43321885ef6, type: 2}

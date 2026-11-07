@@ -21,6 +21,7 @@ MonoBehaviour:
   training: 0
   crafts: 0
   gatherTool: 1
+  gathersByHand: 0
   levelBonuses:
   - stat: 22
     atFirstLevel: -0.099999994

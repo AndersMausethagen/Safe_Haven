@@ -267,7 +267,8 @@ public sealed class ArrowProjectile : MonoBehaviour
                 info = info.Scaled(1f, 1f, technique, critical && attack.CanCrit);
             }
 
-            info = info.WithAmount(info.Amount * CombatFeelSettings.HighGroundFor(owner.transform.position, victim is Component struck ? struck.transform.position : hit.point));
+            info = info.WithAmount(info.Amount * CombatFeelSettings.HighGroundFor(owner.transform.position, victim is Component struck ? struck.transform.position : hit.point)
+                * PlayerProficiencies.AmbushScale(owner.Stats, victim));
 
             DamageResult result = victim.ApplyDamage(info);
             owner.ReportDamageDealt(victim, info, result);

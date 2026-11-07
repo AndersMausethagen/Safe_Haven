@@ -4,9 +4,9 @@ using UnityEngine;
 /// <summary>
 /// Watches the player for practice and reports it to ExperienceTracker, with the amounts in LevelingSettings:
 /// <list type="bullet">
-/// <item>Melee: every swing that hurts a monster pays the share of the monster's worth it took off its health; parries
-/// and perfect dodges pay a little, a few times per monster. Blows of other kinds (arrows, spells, traps) go to their
-/// skill, or Insight while there is none.</item>
+/// <item>Melee, Archery and Runecraft: every swing, arrow or spell that hurts a monster pays the share of the monster's
+/// worth it took off its health; parries and perfect dodges pay Melee a little, a few times per monster, and every spell
+/// cast pays Runecraft a little. Other blows (traps) give Insight.</item>
 /// <item>Sneaking: the first blow on an unaware monster, sneaking within sight of a monster that hasn't spotted you (a
 /// few times per monster), a monster that hunted you losing track, and every pin set silently in a lock.</item>
 /// </list>
@@ -29,6 +29,7 @@ public sealed class PlayerTraining : MonoBehaviour
     private PlayerGuard guard;
     private PlayerStealth stealth;
     private PlayerLockpicking lockpicking;
+    private PlayerSkills spells;
     private float nextSlipCheck;
 
     public static PlayerTraining AddTo(GameObject player) =>
@@ -41,6 +42,7 @@ public sealed class PlayerTraining : MonoBehaviour
         guard = GetComponent<PlayerGuard>();
         stealth = GetComponent<PlayerStealth>();
         lockpicking = GetComponent<PlayerLockpicking>();
+        spells = GetComponent<PlayerSkills>();
     }
 
     private void OnEnable()
@@ -49,6 +51,7 @@ public sealed class PlayerTraining : MonoBehaviour
         if (combat != null) combat.PerfectDodge += OnGuarded;
         if (guard != null) guard.Parried += OnGuarded;
         if (lockpicking != null) lockpicking.PinPressed += OnPinPressed;
+        if (spells != null) spells.SkillCast += OnSpellCast;
         MonsterAI.LostTrackOfPlayer += OnLostTrack;
     }
 
@@ -58,6 +61,7 @@ public sealed class PlayerTraining : MonoBehaviour
         if (combat != null) combat.PerfectDodge -= OnGuarded;
         if (guard != null) guard.Parried -= OnGuarded;
         if (lockpicking != null) lockpicking.PinPressed -= OnPinPressed;
+        if (spells != null) spells.SkillCast -= OnSpellCast;
         MonsterAI.LostTrackOfPlayer -= OnLostTrack;
     }
 
@@ -118,6 +122,14 @@ public sealed class PlayerTraining : MonoBehaviour
         {
             ExperienceTracker.Practise(ProficiencyTraining.Melee, tier, worth);
         }
+        else if ((damage.Technique & HitTechnique.Shot) != 0)
+        {
+            ExperienceTracker.Practise(ProficiencyTraining.Archery, tier, worth);
+        }
+        else if ((damage.Technique & HitTechnique.Spell) != 0)
+        {
+            ExperienceTracker.Practise(ProficiencyTraining.Spells, tier, worth);
+        }
         else
         {
             ExperienceTracker.GrantInsightShare(worth * (ExperienceTracker.OnRaid ? Rules.RaidMultiplier : 1f));
@@ -145,6 +157,13 @@ public sealed class PlayerTraining : MonoBehaviour
         {
             Sneak(Rules.LostTrackExperience);
         }
+    }
+
+    // Every spell cast trains Runecraft a little, so healing and warding count as well as hurting.
+    private void OnSpellCast(int slot, SkillDefinition spell)
+    {
+        int tier = ExperienceTracker.PlaceTier;
+        ExperienceTracker.Practise(ProficiencyTraining.Spells, tier, Rules.TierExperience(tier, Rules.CastExperience));
     }
 
     private void OnPinPressed(SwingResult result)

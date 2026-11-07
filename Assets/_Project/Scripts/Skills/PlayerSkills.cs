@@ -116,7 +116,10 @@ public sealed class PlayerSkills : MonoBehaviour
             SkillDefinition skill = pendingHit;
             pendingHit = null;
             float weaponDamage = combat != null && combat.Weapon != null ? combat.Weapon.Damage : 0f;
-            AttackResolver.Execute(combatant, skill.Attack, weaponDamage, transform.position, pendingDirection, hitLayers, Power(skill));
+            // The Runecraft skill scales every spell's damage; its hits carry the Spell technique, which trains it.
+            float runecraft = Mathf.Max(0f, 1f + combatant.Stats.Get(StatType.SpellDamage));
+            AttackResolver.Execute(combatant, skill.Attack, weaponDamage, transform.position, pendingDirection, hitLayers, Power(skill) * runecraft,
+                1f, HitTechnique.Spell);
         }
 
         if (activeBuffs.Count > 0)
@@ -199,7 +202,7 @@ public sealed class PlayerSkills : MonoBehaviour
             result = SkillCastResult.NoFocus;
         }
 
-        if (result == SkillCastResult.Cast && skill.StaminaCost > 0f && stamina != null && !stamina.TrySpend(skill.StaminaCost))
+        if (result == SkillCastResult.Cast && skill.StaminaCost > 0f && stamina != null && !stamina.TrySpend(SpellCost(skill)))
         {
             result = SkillCastResult.NoStamina;
         }
@@ -283,6 +286,10 @@ public sealed class PlayerSkills : MonoBehaviour
     public static float Power(SkillDefinition skill) => 1f + EssenceSettings.Current.PowerAt(GameSession.Progress.RankOf(skill));
 
     /// <summary>The skill's cooldown at its rank.</summary>
+    // A spell's stamina after the Runecraft skill: a beginner's words cost more breath.
+    private float SpellCost(SkillDefinition skill) =>
+        skill.StaminaCost * (combatant != null ? Mathf.Max(0.1f, 1f + combatant.Stats.Get(StatType.SpellStaminaCost)) : 1f);
+
     public static float CooldownOf(SkillDefinition skill) =>
         skill.Cooldown * (1f - EssenceSettings.Current.CooldownCutAt(GameSession.Progress.RankOf(skill)));
 

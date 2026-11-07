@@ -24,9 +24,10 @@ public static class BuildProficiencies
 
         var skills = new List<ProficiencyDefinition>
         {
-            Woodcutting(), Mining(),
+            Woodcutting(), Mining(), Foraging(), Fishing(),
             Weaponcrafting(), Armorcrafting(), Cooking(), Alchemy(), Construction(),
-            Melee(), Sneaking(),
+            Melee(), Archery(), Runecraft(),
+            Sneaking(),
         };
         string settings = Settings(skills);
         string talents = AssetDatabase.IsValidFolder(OldTalents) && AssetDatabase.DeleteAsset(OldTalents) ? "old talents removed" : "no old talents";
@@ -85,6 +86,59 @@ public static class BuildProficiencies
         Milestone(50,
             Perk("mine_master_miner", "Master Miner", "One blow, and the rock opens like a book.", Bonus(StatType.MineSweetSpot, 25 * Pct), Bonus(StatType.MineYield, 5 * Pct)),
             Perk("mine_iron_arms", "Iron Arms", "Hauling stone builds more than walls.", Bonus(StatType.Strength, 3f))));
+
+    private static ProficiencyDefinition Foraging() => Skill("foraging", "Foraging",
+        "Berries, herbs, mushrooms and fibre: knowing what grows where, and taking it without spoiling it.",
+        "picking plants by hand and cutting them with the sickle", ProficiencyGroup.Gathering, ProficiencyTraining.Gathering, ToolType.Sickle,
+        new[]
+        {
+            Level(StatType.ForageSpeed, -15 * Pct, 30 * Pct),
+            Level(StatType.ForageYield, 0f, 20 * Pct),
+        },
+        new[]
+        {
+            Milestone(10,
+                Perk("forage_forager", "Forager", "You find the berries the birds missed.", Bonus(StatType.ForageYield, 8 * Pct)),
+                Perk("forage_quick_fingers", "Quick Fingers", "Pick, drop, pick again.", Bonus(StatType.ForageSpeed, 10 * Pct))),
+            Milestone(20,
+                Perk("forage_wild_tea", "Wild Tea", "A leaf to chew on the long walk.", Bonus(StatType.MaxStamina, 8f)),
+                Perk("forage_light_step", "Light Step", "Through the undergrowth without a sound.", Bonus(StatType.MoveSpeed, 2 * Pct))),
+            Milestone(30,
+                Perk("forage_bountiful", "Bountiful", "The forest gives to those who ask kindly.", Bonus(StatType.ForageYield, 10 * Pct)),
+                Perk("forage_nimble_picker", "Nimble Picker", "Both hands, never a bruise.", Bonus(StatType.ForageSpeed, 15 * Pct))),
+            Milestone(40,
+                Perk("forage_forest_friend", "Forest Friend", "Wood and stone give a little more too.", Bonus(StatType.GatherYield, 5 * Pct)),
+                Perk("forage_pathfinder", "Pathfinder", "Every deer track is a road.", Bonus(StatType.MoveSpeed, 3 * Pct))),
+            Milestone(50,
+                Perk("forage_master_forager", "Master Forager", "Nothing that grows is hidden from you.", Bonus(StatType.ForageYield, 12 * Pct), Bonus(StatType.ForageSpeed, 10 * Pct)),
+                Perk("forage_wildheart", "Wildheart", "The forest's strength runs in you.", Bonus(StatType.MaxHealth, 20f))),
+        }, CraftedGoods.None, true);
+
+    private static ProficiencyDefinition Fishing() => Skill("fishing", "Fishing",
+        "Line, lure and patience: reading the water and keeping a fighting fish on the hook.",
+        "landing fish", ProficiencyGroup.Gathering, ProficiencyTraining.Fishing, ToolType.None,
+        new[]
+        {
+            Level(StatType.ReelZone, -20 * Pct, 30 * Pct),
+        },
+        new[]
+        {
+            Milestone(10,
+                Perk("fish_patient_line", "Patient Line", "Let it run, then bring it in.", Bonus(StatType.ReelZone, 10 * Pct)),
+                Perk("fish_strong_wrists", "Strong Wrists", "A rod is a weapon of a kind.", Bonus(StatType.MaxStamina, 8f))),
+            Milestone(20,
+                Perk("fish_wide_reel", "Wide Reel", "Room to give and take.", Bonus(StatType.ReelZone, 12 * Pct)),
+                Perk("fish_river_legs", "River Legs", "Cold water is nothing to you.", Bonus(StatType.FrostResistance, 6 * Pct))),
+            Milestone(30,
+                Perk("fish_old_lines", "Old Lines", "Knots your grandmother taught you.", Bonus(StatType.ReelZone, 12 * Pct)),
+                Perk("fish_fish_supper", "Fish Supper", "Fresh from the water, the best meal there is.", Bonus(StatType.MealDuration, 10 * Pct))),
+            Milestone(40,
+                Perk("fish_nokkens_respect", "Nokken's Respect", "The water spirit lets you be.", Bonus(StatType.HolyResistance, 8 * Pct)),
+                Perk("fish_long_arms", "Long Arms", "Casting and drawing are one motion.", Bonus(StatType.DrawSpeed, 6 * Pct))),
+            Milestone(50,
+                Perk("fish_master_angler", "Master Angler", "The river gives up what you ask of it.", Bonus(StatType.ReelZone, 20 * Pct)),
+                Perk("fish_sea_legs", "Sea Legs", "Steady on any footing.", Bonus(StatType.MaxHealth, 15f))),
+        });
 
     // ----- Crafting -----
 
@@ -251,6 +305,60 @@ public static class BuildProficiencies
             Perk("melee_warden", "Warden", "Behind you, the Haven. In front, nothing gets past.", Bonus(StatType.MaxHealth, 25f), Bonus(StatType.Armor, 5f)),
             Perk("melee_reaver", "Reaver", "Every blow a finishing blow.", Bonus(StatType.MeleeDamage, 10 * Pct))));
 
+    private static ProficiencyDefinition Archery() => Skill("archery", "Archery",
+        "Bow and arrow: the draw, the breath, the release.",
+        "arrows that hurt monsters", ProficiencyGroup.Combat, ProficiencyTraining.Archery, ToolType.None,
+        new[]
+        {
+            Level(StatType.ArrowDamage, -12 * Pct, 20 * Pct),
+            Level(StatType.DrawSpeed, -15 * Pct, 25 * Pct),
+        },
+        new[]
+        {
+            Milestone(10,
+                Perk("bow_steady_draw", "Steady Draw", "A bowstring you know like your own breath.", Bonus(StatType.DrawSpeed, 8 * Pct)),
+                Perk("bow_keen_sight", "Keen Sight", "Aim for the gap in the hide.", Bonus(StatType.PhysicalCritChance, 3 * Pct))),
+            Milestone(20,
+                Perk("bow_broadheads", "Broadheads", "Wide iron, deep wounds.", Bonus(StatType.ArrowDamage, 6 * Pct)),
+                Perk("bow_quiet_bow", "Quiet Bow", "Waxed string, felted limbs.", Bonus(StatType.SneakNoise, -8 * Pct))),
+            Milestone(30,
+                Perk("bow_hunters_eye", "Hunter's Eye", "Wait for the moment, then end it.", Bonus(StatType.PhysicalCritDamage, 15 * Pct)),
+                Perk("bow_quick_nock", "Quick Nock", "The next arrow is on the string before the first lands.", Bonus(StatType.DrawSpeed, 10 * Pct))),
+            Milestone(40,
+                Perk("bow_deadeye", "Deadeye", "Where you look, the arrow goes.", Bonus(StatType.ArrowDamage, 8 * Pct)),
+                Perk("bow_skirmisher", "Skirmisher", "Loose, step back, loose again.", Bonus(StatType.MoveSpeed, 3 * Pct))),
+            Milestone(50,
+                Perk("bow_master_archer", "Master Archer", "The bow is an arm you were born with.", Bonus(StatType.ArrowDamage, 10 * Pct), Bonus(StatType.DrawSpeed, 5 * Pct)),
+                Perk("bow_ranger", "Ranger", "From the shadows, one arrow is enough.", Bonus(StatType.AmbushDamage, 25 * Pct))),
+        });
+
+    private static ProficiencyDefinition Runecraft() => Skill("runecraft", "Runecraft",
+        "Old words cut and spoken: Purified and Cursed alike.",
+        "spells that hurt monsters, and every spell cast", ProficiencyGroup.Combat, ProficiencyTraining.Spells, ToolType.None,
+        new[]
+        {
+            Level(StatType.SpellDamage, -12 * Pct, 20 * Pct),
+            Level(StatType.SpellStaminaCost, 25 * Pct, -20 * Pct),
+        },
+        new[]
+        {
+            Milestone(10,
+                Perk("rune_rune_lore", "Rune Lore", "Old words, carved deeper.", Bonus(StatType.SpellPower, 4f)),
+                Perk("rune_warding_signs", "Warding Signs", "Marks against flame and frost.", Bonus(StatType.FireResistance, 5 * Pct), Bonus(StatType.FrostResistance, 5 * Pct))),
+            Milestone(20,
+                Perk("rune_sharp_runes", "Sharp Runes", "A rune cut true bites twice.", Bonus(StatType.SpellCritChance, 4 * Pct)),
+                Perk("rune_steady_breath", "Steady Breath", "The words come without gasping.", Bonus(StatType.SpellStaminaCost, -10 * Pct))),
+            Milestone(30,
+                Perk("rune_holy_marks", "Holy Marks", "What the dark fears, worn on the skin.", Bonus(StatType.HolyResistance, 8 * Pct)),
+                Perk("rune_deep_words", "Deep Words", "Spoken from the chest, not the throat.", Bonus(StatType.SpellDamage, 6 * Pct))),
+            Milestone(40,
+                Perk("rune_runes_of_ruin", "Runes of Ruin", "The word that means open, said too loud.", Bonus(StatType.SpellCritDamage, 20 * Pct)),
+                Perk("rune_rune_shield", "Rune Shield", "A sign on the shield turns the blow.", Bonus(StatType.Armor, 8f))),
+            Milestone(50,
+                Perk("rune_runemaster", "Runemaster", "The old words answer to you.", Bonus(StatType.SpellDamage, 10 * Pct), Bonus(StatType.SpellPower, 4f)),
+                Perk("rune_cursed_tongue", "Cursed Tongue", "What the curse takes, you keep.", Bonus(StatType.Lifesteal, 3 * Pct))),
+        });
+
     // ----- Stealth -----
 
     private static ProficiencyDefinition Sneaking() => Skill("sneaking", "Sneaking",
@@ -328,6 +436,8 @@ public static class BuildProficiencies
         so.FindProperty("fineStrength").floatValue = 0.5f;
         so.FindProperty("masterworkStrength").floatValue = 1f;
         so.FindProperty("masterworkShare").floatValue = 0.25f;
+        so.FindProperty("catchWork").floatValue = 2f;
+        so.FindProperty("castExperience").intValue = 3;
         if (so.FindProperty("levelUpSound").objectReferenceValue == null)
         {
             so.FindProperty("levelUpSound").objectReferenceValue =
@@ -350,7 +460,11 @@ public static class BuildProficiencies
 
     private static ProficiencyDefinition Skill(string id, string label, string text, string trainedBy, ProficiencyGroup group,
         ProficiencyTraining training, ToolType tool, ProficiencyDefinition.LevelBonus[] bonuses, ProficiencyDefinition.Milestone[] milestones,
-        CraftedGoods goods)
+        CraftedGoods goods) => Skill(id, label, text, trainedBy, group, training, tool, bonuses, milestones, goods, false);
+
+    private static ProficiencyDefinition Skill(string id, string label, string text, string trainedBy, ProficiencyGroup group,
+        ProficiencyTraining training, ToolType tool, ProficiencyDefinition.LevelBonus[] bonuses, ProficiencyDefinition.Milestone[] milestones,
+        CraftedGoods goods, bool byHand)
     {
         string path = $"{Folder}/{label.Replace(" ", "")}.asset";
         var skill = AssetDatabase.LoadAssetAtPath<ProficiencyDefinition>(path);
@@ -360,7 +474,7 @@ public static class BuildProficiencies
             AssetDatabase.CreateAsset(skill, path);
         }
 
-        skill.Configure(id, label, text, trainedBy, group, training, tool, bonuses, milestones, goods);
+        skill.Configure(id, label, text, trainedBy, group, training, tool, bonuses, milestones, goods, byHand);
         EditorUtility.SetDirty(skill);
         return skill;
     }

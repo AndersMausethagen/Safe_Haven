@@ -91,4 +91,16 @@ public enum StatType
     BuildSpeed = 43,
     /// <summary>Chance from 0 to 1 of one more plank, ingot or block when the player refines materials.</summary>
     RefiningYield = 44,
+    /// <summary>Share faster the player picks by hand and swings the sickle.</summary>
+    ForageSpeed = 45,
+    /// <summary>Chance from 0 to 1 of one extra of a plant's main yield (by hand or sickle), on top of Extra Yield Chance.</summary>
+    ForageYield = 46,
+    /// <summary>Share wider the catch zone on the fishing reel.</summary>
+    ReelZone = 47,
+    /// <summary>Share more damage from the player's arrows.</summary>
+    ArrowDamage = 48,
+    /// <summary>Share more damage from the player's spells.</summary>
+    SpellDamage = 49,
+    /// <summary>Share more stamina a spell costs. Negative is cheaper.</summary>
+    SpellStaminaCost = 50,
 }

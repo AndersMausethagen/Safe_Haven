@@ -91,6 +91,8 @@ public sealed class ResourceSource : MonoBehaviour
         {
             case ToolType.Axe: return stats.Get(StatType.ChopYield);
             case ToolType.Pickaxe: return stats.Get(StatType.MineYield);
+            case ToolType.Sickle: return stats.Get(StatType.ForageYield);
+            case ToolType.None: return node != null ? stats.Get(StatType.ForageYield) : 0f;
             default: return 0f;
         }
     }
