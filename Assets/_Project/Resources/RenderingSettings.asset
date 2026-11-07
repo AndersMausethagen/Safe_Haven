@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fed769687f27be45882e7b901c32680, type: 3}
+  m_Name: RenderingSettings
+  m_EditorClassIdentifier: SafeHaven::RenderingSettings
+  reflections: 1
+  reflectionResolution: 128
+  reflectionHeight: 4
+  reflectionMove: 8
+  reflectionHours: 0.25
+  reflectionInterval: 1
+  reflectionLayers:
+    serializedVersion: 2
+    m_Bits: 4294967263
+  cloudShadows: 1
+  cloudSize: 180
+  cloudSpeed: 2.5
+  cloudCover: {x: 0.28, y: 0.6}
+  cloudDarkness: 0.55
+  cloudSoftness: 0.18
+  cloudShader: {fileID: 4800000, guid: 305da9779ffbff94db43773d93efff6e, type: 3}

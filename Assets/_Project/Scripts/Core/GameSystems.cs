@@ -71,6 +71,7 @@ public sealed class GameSystems : MonoBehaviour
 
         Add<ExperienceTracker>(experience => experience.Initialise(LevelingSettings.Current));
         Add<OptionsSystem>(options => options.Initialise());
+        Add<WorldRendering>(rendering => rendering.Initialise(RenderingSettings.Current));
         Add<SoundCaptions>(captions => captions.Initialise());
         Add<CheatSystem>(cheats => cheats.Initialise());
         Add<SteamPlatform>(steam => steam.Initialise(MultiplayerSettings.Current));
