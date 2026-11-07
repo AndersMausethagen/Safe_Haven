@@ -77,6 +77,9 @@ public sealed class Transport : MonoBehaviour, ISaveable
     public TransportDefinition Definition => definition;
     public Interactable Interactable => interactable;
     public ItemContainer Cargo { get; private set; }
+
+    /// <summary>Set down from this player's own kit while playing (not saved): in a friend's Haven, theirs to open and pack.</summary>
+    public bool SetDownByThisPlayer { get; set; }
     public Rigidbody Body { get; private set; }
     public ITransportDriver Driver { get; private set; }
     public float Weight => Cargo.CurrentWeight;
@@ -209,8 +212,17 @@ public sealed class Transport : MonoBehaviour, ISaveable
             Driver.AddActions(page, user);
         }
 
-        page.Add(new MenuAction("Open the cargo", "Move things between it and your bag", true, () => CargoWindow.Create().Open(this, user), closesMenu: true));
-        page.Add(new MenuAction("Pack it up", empty ? "Back into your bag as a kit" : "Empty it first", empty, () => PackUp(user), closesMenu: true));
+        // A friend's Haven: their carts are their stores. Opening one takes the stash's yes; packing one away is theirs alone.
+        bool theirs = HavenVisit.IsVisiting && !SetDownByThisPlayer;
+        page.Add(new MenuAction("Open the cargo", "Move things between it and your bag", true, () =>
+        {
+            if (!theirs || !HavenVisit.StoresNeedAsking())
+            {
+                CargoWindow.Create().Open(this, user);
+            }
+        }, closesMenu: true));
+        string packing = theirs ? $"It is {(string.IsNullOrEmpty(HavenVisit.HostName) ? "your friend" : HavenVisit.HostName)}'s" : empty ? "Back into your bag as a kit" : "Empty it first";
+        page.Add(new MenuAction("Pack it up", packing, empty && !theirs, () => PackUp(user), closesMenu: true));
         return page;
     }
 

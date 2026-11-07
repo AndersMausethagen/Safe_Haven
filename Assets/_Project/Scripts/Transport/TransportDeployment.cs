@@ -33,7 +33,12 @@ public static class TransportDeployment
             return false;
         }
 
-        SaveableEntity.Spawn(definition.Prefab, spot, facing);
+        SaveableEntity made = SaveableEntity.Spawn(definition.Prefab, spot, facing);
+        if (made != null && made.TryGetComponent(out Transport transport))
+        {
+            transport.SetDownByThisPlayer = true;
+        }
+
         from.RemoveAt(slot, 1);
         GameMessages.Post($"You set down the {definition.DisplayName}.");
         return true;

@@ -525,7 +525,7 @@ public sealed class CoopTests
     }
 
     [Test]
-    public void AVisitorBuildsOnlyWithTheHostsYes_AndKeepsWhatTheNokkTaughtThem()
+    public void AVisitorBuildsAndOpensStoresOnlyWithTheHostsYes_AndKeepsWhatTheNokkTaughtThem()
     {
         var homeField = typeof(HavenVisit).GetField("home", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
         homeField.SetValue(null, new SaveData { scene = "SafeHaven" });
@@ -536,6 +536,13 @@ public sealed class CoopTests
             Assert.IsTrue(HavenVisit.BuildingNeedsAsking(), "no yes yet: the host is asked, nothing is built");
             HavenVisit.Allow(VisitorRight.Build, true);
             Assert.IsFalse(HavenVisit.BuildingNeedsAsking(), "with the yes");
+
+            // The host's stores (the stash, their carts' cargo) take the other yes, separately.
+            Assert.IsTrue(HavenVisit.StoresNeedAsking(), "building's yes isn't the stores'");
+            HavenVisit.Allow(VisitorRight.Stash, true);
+            Assert.IsFalse(HavenVisit.StoresNeedAsking());
+            HavenVisit.Allow(VisitorRight.Stash, false);
+            Assert.IsTrue(HavenVisit.StoresNeedAsking(), "taken back");
 
             Assert.IsFalse(SpiritBonds.HasGift(SpiritBonds.NokkGift));
             HavenVisit.SpiritGiftHome(SpiritBonds.NokkGift);
@@ -550,5 +557,6 @@ public sealed class CoopTests
         }
 
         Assert.IsFalse(HavenVisit.BuildingNeedsAsking(), "at home, building needs no one's yes");
+        Assert.IsFalse(HavenVisit.StoresNeedAsking(), "nor do one's own stores");
     }
 }

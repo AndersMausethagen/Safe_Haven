@@ -199,6 +199,23 @@ public static class HavenVisit
         return true;
     }
 
+    /// <summary>True while visiting without the host's yes to their stores (the stash, and their carts' cargo): the host is
+    /// asked, and the caller does nothing.</summary>
+    public static bool StoresNeedAsking()
+    {
+        if (!IsVisiting || StashAllowed)
+        {
+            return false;
+        }
+
+        if (CoopSession.Current != null)
+        {
+            CoopSession.Current.Access.Ask(VisitorRight.Stash);
+        }
+
+        return true;
+    }
+
     /// <summary>
     /// True, and says so, when what a guest is about to do is the host's decision: their residents' jobs, the portal and
     /// ward, the altar, trades and the workshops' queues. A guest's copy of the settlement only mirrors the host's
