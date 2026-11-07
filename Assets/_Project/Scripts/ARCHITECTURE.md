@@ -481,15 +481,17 @@ once between raids: `TaughtSinceRaid`, cleared by `RecordExtraction`). A perk ma
 (gathering, fishing, `CraftedWork`, `PlayerBoons`, `PlayerEating`, `BuildingRepairs`, `Construction`, `PlayerArchery`, `PlayerSkills`,
 `PlayerCombat`, `PlayerStealth`), and `PlayerTechniques` (added by `Player`) carries out the ones that answer events (Riposte,
 Second Wind, Soul Siphon, Pinning Shot, Sweep via `ResourceNode.GatherBy`, Forager's Haste); numbers in `TechniqueSettings`.
-Perks are chosen again for free beside the Portal. Feedback: `UIMotion` (UI) runs small unscaled motions (punch, pop, shake, flash,
+From Melee 30 Weapon Arts have their weapon kind's flourish (`Techniques.HasFlourish`/`FlourishOf`, read by `PlayerCombat.Swings` for
+damage and poise and by `PlayerTechniques` for Flurry's Focus refund and Pin's roots). Perks are chosen again for free beside the Portal. Feedback: `UIMotion` (UI) runs small unscaled motions (punch, pop, shake, flash,
 fade, spark bursts) on one hidden runner; `UIPress` (added to every painted button by `UIRole`) lifts and sinks buttons;
 `ExperienceHud` pops the level and milestone banner on override-sorted canvases above windows; `CraftFeedback` shows what
-`CraftedWork.Made` announces; sounds are `AudioSettingsDefinition` › Milestone, Perk Chosen, Insight, Craft Fine/Masterwork/Queued. To add a skill: create one (Create > Safe Haven >
+`CraftedWork.Made` announces (`ExperienceHud` also flies practice motes into the bar, `ExperienceTracker.SinceLastRaid` tells the
+planner what the stretch at home came to, `Techniques.FirstUsed` pops a technique's banner once); sounds are `AudioSettingsDefinition` › Milestone, Perk Chosen, Insight, Craft Fine/Masterwork/Queued. To add a skill: create one (Create > Safe Haven >
 Progression > Skill) with a unique id, its Training and (for gathering) Gather Tool or (for crafting) Crafts, level bonuses and
 milestones, add it to LevelingSettings' Skills, and report its practice to `ExperienceTracker.Practise`.
 
 Crafting skills: `CraftedWork` (Crafting) sorts what a recipe makes into `CraftedGoods` (weapons, tools, arrows, armour, meals, tonics,
-materials; nothing at the Farm Plot, Beehive or portal) and turns out gear as its maker would: quality rolled from Weaponcraft or
+materials; catches at the Dock, which train Fishing; nothing at the Farm Plot, Beehive or portal) and turns out gear as its maker would: quality rolled from Weaponcraft or
 Armorcraft Quality (`ItemQuality` on `ItemStack`, saved in `SlotSaveData.quality`, shared by `StashShare`, worth part of an empowering
 in `GearPower.QualityBonuses` and `GearScore`) and the condition it starts in (Finish). `PlayerCrafting.TryCraft` and
 `StationCrafting.Collect` give gear through it (`ItemInventory.GiveMade`); `ExperienceTracker.PractiseCraft(recipe)` is called by hand
@@ -497,7 +499,12 @@ crafts and by `SettlementSystem` for the player's own station orders (not worker
 slot (`StationQueue.AddExtra`). `PlayerEating` stretches meals and tonics by Meal and Tonic Duration, `Construction` hammers faster by
 Build Speed. `ExperienceTracker.Boost` multiplies all practice by the skill's mentor building's tiers above I
 (`ProficiencyDefinition.Mentor`, `LevelingSettings.MentorBonus`) and the player's Experience Gain (in `HavenSettings` › Rested Bonuses
-and the Sauna's boon). Content: `AgentScripts/BuildProficiencies.cs`.
+and the Sauna's boon). Crafting orders are `HavenRequestDefinition`s with a Quality: `CanAsk` waits for the making skill's From Level,
+`HavenRequestSettings.Choose` lets one stand at a time, `HavenRequestBoard` counts and takes pieces of at least that make
+(`ItemContainer.Count/Remove(item, least)`) and pays a lesson (`ExperienceTracker.Teach`, in full) and renown
+(`SettlementState.OrderRenown`, saved, a part of `HavenRenown`). `PlaytestLogger` writes per-minute `SkillXp` rows that
+`PlaytestLog.SkillRate` and the Skills page turn into experience per hour. Content: `AgentScripts/BuildProficiencies.cs`,
+`BuildHavenRequests.cs` (orders), `BuildDock.cs` (the Dock and the Fisher).
 
 ## Lifetimes
 

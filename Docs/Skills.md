@@ -93,7 +93,10 @@ them for one skill (`ProgressionTests.AuthoredCurve_...`):
 | 30 | ~8,100 | ~9.5 h |
 | 50 | ~63,000 | ~33 h |
 
-The action rate is an assumption, not a measurement: count real actions per raid from the playtest logs before tightening it.
+The action rate is an assumption, not a measurement. The playtest log now writes each skill's practice experience every played
+minute (`SkillXp` rows); Systems Editor › Settings › Skills turns real runs into experience per played hour per skill (median of
+runs without cheats) and the hours to levels 10, 20 and 50 that rate comes to. Tighten the curve from those numbers, not from the
+table above.
 
 ## What trains what
 
@@ -160,8 +163,44 @@ shows their rank.
 Every resident with a job gives the player one lesson in their job's skill between raids ("Ask for a lesson in...", in conversation):
 the tier experience of what they know (their rank, or their workplace's tier if higher) times 6, falling off like practice once the
 player knows more than they can teach. Smith: Weaponcrafting; Weaver: Armorcrafting; Cook: Cooking; Mason: Construction; Carpenter:
-Woodcutting; Farmer: Foraging; Hunter: Archery; Warden: Melee; Tracker: Sneaking; Rune Scholar: Runecraft. So Melee and Sneaking,
-which have no building, have teachers; nobody teaches Fishing yet.
+Woodcutting; Farmer: Foraging; Hunter: Archery; Warden: Melee; Tracker: Sneaking; Rune Scholar: Runecraft; Fisher: Fishing. So Melee
+and Sneaking, which have no building, have teachers.
+
+## Crafting orders
+
+Once the player's hands are up to it, residents order a piece of good make (a `HavenRequestDefinition` with Quality Fine or
+Masterwork). It is asked only once the skill that makes the item has reached the order's From Level, only one order stands at a time
+(the raids stay the main reason to go out), and it shows in the raid planner as "Ordered at home" and in the asker's words in passing.
+Only a piece of at least that make answers; the plainest that will do is taken, so a Masterwork is kept while a Fine piece answers.
+It pays coin, a lesson in the craft given in full (no fall-off: a level's worth of experience at the order's level, one and a half
+for a Masterwork) and lasting renown (the Haven window's "Good work for its people", saved).
+
+| Order | Asker | From |
+|---|---|---|
+| Fine Cured Leather Jack | Asa | Armorcrafting 10 |
+| Fine Iron Hatchet, Fine Iron Pickaxe | Tor, Hild | Weaponcrafting 12 |
+| Fine Iron Sword, Fine Hunter's Bow | Bjarne, Gunnar | 15 |
+| Fine Iron Mail Hauberk | Eirik | Armorcrafting 20 |
+| Masterwork Iron Spear, Masterwork Copper Scale Hauberk | Bjarne, Sigrid | 30 |
+
+Content: `AgentScripts/BuildHavenRequests.cs`.
+
+## The Dock and the Fisher
+
+The Dock (12 oak planks, 6 oak wood, 4 nettle cord; upgrades to the Long Pier) is Fishing's mentor building and a station of its
+own. Its catches: Set the Nets (1 nettle cord for 3 perch, 45 s), Trout Lines (2 grubs for 2 trout), and from the Long Pier Pike
+Traps and Deep Lines for char. What it brings in is caught, not made (`CraftedGoods.Catch`): each catch trains Fishing at 0.75 of
+a tier's experience (`LevelingSettings` › Dock Work), under the 2 of a fish landed by hand, and Double Catch works on the nets too.
+The Fisher (Gunnar or Yrsa can take it) works the Dock with a rod, keeps nets, lines and traps out while the player is away (stock
+20, 15 and 6) and gives lessons in Fishing. The model is generated from primitives for now. Content: `AgentScripts/BuildDock.cs`,
+then `BuildProficiencies.cs`.
+
+## Weapon flourishes
+
+From Melee 30 (`TechniqueSettings` › Flourish Level) every Weapon Art gains the flourish of its weapon's kind: one-handed arts
+(Flurry) strike 30% harder and a kill with one gives back half its Focus; two-handed arts (Sunder) wear down poise 2.5 times as hard,
+so they stagger; polearm arts (Pin) root what they hit. Reaching 30 says so, and the skills window tells of it on Melee
+(`Techniques.HasFlourish`, `PlayerCombat.Swings`, `PlayerTechniques`).
 
 ## Playing together
 
@@ -197,26 +236,36 @@ can't echo between players. Not yet tried with two players.
   finishes while watching makes the output slot jump with the smith's taps, a full output breathes red.
 - **Every button** lifts a little under the pointer, sinks while held and springs back (`UIPress`, added by `UIRole`).
 
-Code: `UIMotion` (punch, pop, shake, flash, fade, spark bursts, breathing; unscaled time), `UISprites` (vignette and band made in
-code), `ExperienceHud`, `CraftFeedback`, `SkillsWindow`, `RecipeBrowser`, `StationWindow`. Sounds: `Tools/Audio/progression.py`,
+- **Round two:** sparks are soft glowing motes, a few white-hot, drifting down as they fade; a milestone throws slow-turning rays of
+  light, and at home out of a fight it slows the world to a third for a moment. Practice flies from the player into the XP bar as a
+  mote that lands with a flash. A clean cut on a node floats what it brought ("+1 x3", Rich Seam's extra included) and kicks the
+  camera a little more for each in a run. The craft card's icon sits on a light disc tinted by its make, and good work gets a shine
+  across it. Hovering a skill shows its next milestone and both of what it offers. The first time a technique comes into play its
+  name pops as a banner with what it does (remembered in the save). The portal's planner opens with what the stretch at home came
+  to ("Since your last raid: Woodcutting 3 to 7, 2 Fine pieces made").
+
+Code: `UIMotion` (punch, pop, shake, flash, fade, spark bursts, rays, flying motes, breathing; unscaled time), `UISprites` (vignette,
+band, glow, ray and disc made in code), `ExperienceHud`, `CraftFeedback`, `SkillsWindow`, `RecipeBrowser`, `StationWindow`. Sounds: `Tools/Audio/progression.py`,
 wrapped by `AgentScripts/BuildGameFeel.cs` into `AudioSettings` (Milestone, Perk Chosen, Insight, Craft Fine, Craft Masterwork,
 Craft Queued) and `LevelingSettings` › Level Up Sound. The sounds are measured, not yet listened to by a person.
 
 ## Mentors and rest
 
-Every skill but Fishing, Melee and Sneaking has a mentor building at home (`ProficiencyDefinition` › Mentor): each tier it stands at
+Every skill but Melee and Sneaking has a mentor building at home (`ProficiencyDefinition` › Mentor): each tier it stands at
 above I adds 5% to the skill's experience, on raids too (`SettlementState` remembers what stands). Woodcutter's Lodge: Woodcutting;
 Smithy: Mining and Weaponcrafting; Farm Plot: Foraging; Tailor's Shop: Armorcrafting; Kitchen: Cooking; Cauldron: Alchemy; Workshop:
-Construction; Hunter's Lodge: Archery; Purification Altar: Runecraft. The skills window shows it.
+Construction; Hunter's Lodge: Archery; Purification Altar: Runecraft; Dock: Fishing. The skills window shows it.
 
 Setting out rested from a comfortable Haven (`HavenSettings` › Rested Bonuses, as long as the comfort at home allows) now also gives
 +20% experience, and the Sauna's warmth +10% (the Experience Gain stat). Beds still gate nothing.
 
 ## Still to watch
 
-- The pace is worked out, not measured yet. The playtest log now writes a `SkillLevel` row for every level (detail `insight` when
-  Insight raised it) and an `InsightSpent` row; Systems Editor › Settings › Skills puts the planned hours beside the median played
-  minutes at which real runs (without cheats) reached levels 5 to 50.
+- The pace is worked out, not measured yet. The playtest log writes a `SkillLevel` row for every level (detail `insight` when
+  Insight raised it), an `InsightSpent` row and per-minute `SkillXp` rows; Systems Editor › Settings › Skills puts the planned hours
+  beside the median played minutes at which real runs (without cheats) reached levels 5 to 50, and the measured experience per hour.
+- Crafting orders take a qualifying piece from the bag or stash as soon as it is home, like the raid asks. If players find a Fine
+  piece they meant to keep taken, make handing in a choice in conversation instead.
 - The raid planner shows the best fighting skill beside the gear score, against the level the tier expects (10, 20, 30, 40).
 - The prologue at level 1 took a blow more per fight before the eased curve; with a few wolves down that is mostly gone. Playtest it.
-- Fishing has neither a mentor building nor a teacher (a dock and a fisher would do).
+- The Dock can be placed anywhere, not only at the water's edge, and its model is primitives.
