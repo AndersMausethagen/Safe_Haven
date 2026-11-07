@@ -401,3 +401,56 @@ public sealed class RaidLayoutPlan
         return wet;
     }
 }
+
+/// <summary>A region of a large generated map: the land nearest its centre has its mood (forest, ridges, cliffs, ravines, hills).</summary>
+public sealed class RaidLayoutRegion
+{
+    public Vector2 Centre;
+    public RaidMapMood Mood;
+    /// <summary>How far its land reaches against the others' (distances are divided by it): the start's region reaches furthest.</summary>
+    public float Reach = 1f;
+}
+
+/// <summary>A river across the open land of a generated map, in metres from the map's south-west corner: deep enough to swim, with fords
+/// where trails cross it. Its surface only falls along the line, so it runs from the first point to the last.</summary>
+public sealed class RaidLayoutRiver
+{
+    public readonly List<Vector2> Line = new List<Vector2>();
+    /// <summary>Half the width of the water at each point.</summary>
+    public readonly List<float> HalfWidths = new List<float>();
+    /// <summary>How deep it is in its middle, away from fords.</summary>
+    public float Depth;
+    /// <summary>The height of its surface at each point, above the map's lowest point. RaidLayoutField works it out.</summary>
+    public float[] Level = System.Array.Empty<float>();
+
+    public void Nearest(Vector2 point, out int segment, out float along, out float distance)
+    {
+        segment = 0;
+        along = 0f;
+        float best = float.MaxValue;
+        for (int i = 0; i + 1 < Line.Count; i++)
+        {
+            Vector2 step = Line[i + 1] - Line[i];
+            float t = Mathf.Clamp01(Vector2.Dot(point - Line[i], step) / Mathf.Max(0.0001f, step.sqrMagnitude));
+            float squared = (Line[i] + step * t - point).sqrMagnitude;
+            if (squared < best)
+            {
+                best = squared;
+                segment = i;
+                along = t;
+            }
+        }
+
+        distance = Mathf.Sqrt(best);
+    }
+}
+
+/// <summary>A landmark on a generated map: something tall to find the way by.</summary>
+public sealed class RaidLayoutLandmark
+{
+    public Vector2 Position;
+    public float Scale;
+    public float Turn;
+    /// <summary>0-1: which of the rules' landmarks, by weight.</summary>
+    public float Pick;
+}

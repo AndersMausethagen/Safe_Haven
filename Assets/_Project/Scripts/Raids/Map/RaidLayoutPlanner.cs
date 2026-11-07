@@ -9,7 +9,8 @@ using UnityEngine;
 /// <para>
 /// Here: rolling the shape and mood, the order of the steps (Plan) and the geometry they share. The steps are parts, each
 /// with its own tuning: .Rooms (clearings and trails), .Sites (sites and set pieces), .Ground (hills, boulders, ponds),
-/// .Cliffs (levels, ramps, ravines, spires) and RaidLayoutVariety (regions, rivers, landmarks, routes). The map itself is
+/// .Cliffs (levels, ramps, ravines, spires), .Regions (a large map's regions), .Routes (a short way and a long one),
+/// .Height (heights, the apex, sites over ramps, ways down into ravines), .Rivers and .Landmarks. The map itself is
 /// a <see cref="RaidLayoutPlan"/>. Each step draws from the random streams in a fixed order, so moving code between the
 /// parts changes nothing, but reordering draws inside a step changes every map for a seed.
 /// </para>
@@ -116,6 +117,7 @@ public static partial class RaidLayoutPlanner
     }
 
     private static readonly float[] RavineSteers = { 0f, 15f, -15f, 30f, -30f, 45f, -45f };
+    private const float RiverBank = 3f;
 
     private static bool NearLine(List<Vector2> line, Vector2 point, float distance) => DistanceToLine(line, point) < distance;
 
