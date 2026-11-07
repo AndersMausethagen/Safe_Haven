@@ -112,29 +112,35 @@ $saved = & $unity command script eval_file --no-banner -- --file $probe 2>&1 | O
 if ($saved -match '"result":"playing"') { Write-Output '[RunTests] The Editor is in Play mode: stop Play first.'; exit 2 }
 if ($saved -match '"result":"([^"]*)"') { Write-Output "[RunTests] scenes: $($Matches[1])" } else { Write-Output "[RunTests] scene check failed: $saved" }
 
-# 3. Run the tests, watching for the dialog while they run.
-$before = if (Test-Path $results) { (Get-Item $results).LastWriteTime } else { [datetime]::MinValue }
+# 3. Run the tests, watching for the dialog while they run. The CLI's filter takes one name (a class, or any part of a
+# test's full name), so "A;B" runs each in turn and the script exits non-zero if any run failed or did not finish.
 $out = Join-Path $env:TEMP 'SafeHavenRunTests_out.txt'
 $err = Join-Path $env:TEMP 'SafeHavenRunTests_err.txt'
-$arguments = @('command', 'test', 'run', '--mode', $Mode, '--filter', "`"$Filter`"", '--no-banner', '--timeout', "$Timeout")
-$run = Start-Process -FilePath $unity -ArgumentList $arguments -NoNewWindow -PassThru -RedirectStandardOutput $out -RedirectStandardError $err
-$reported = @{}
-while (-not $run.HasExited) {
-    foreach ($line in Answer-Dialogs) { if (-not $reported.ContainsKey($line) -or $line -like '*clicked*') { $reported[$line] = $true; Write-Output $line } }
-    Start-Sleep -Milliseconds 1500
-}
+$failedRuns = 0
+foreach ($name in ($Filter -split ';' | ForEach-Object { $_.Trim() } | Where-Object { $_ })) {
+    $before = if (Test-Path $results) { (Get-Item $results).LastWriteTime } else { [datetime]::MinValue }
+    $arguments = @('command', 'test', 'run', '--mode', $Mode, '--filter', "`"$name`"", '--no-banner', '--timeout', "$Timeout")
+    $run = Start-Process -FilePath $unity -ArgumentList $arguments -NoNewWindow -PassThru -RedirectStandardOutput $out -RedirectStandardError $err
+    $reported = @{}
+    while (-not $run.HasExited) {
+        foreach ($line in Answer-Dialogs) { if (-not $reported.ContainsKey($line) -or $line -like '*clicked*') { $reported[$line] = $true; Write-Output $line } }
+        Start-Sleep -Milliseconds 1500
+    }
 
-# 4. What the CLI said, and the totals of this run.
-Get-Content $out, $err -ErrorAction SilentlyContinue | Where-Object { $_ -match '\S' } | Select-Object -Last 40
-if ((Test-Path $results) -and (Get-Item $results).LastWriteTime -gt $before) {
-    [xml]$xml = Get-Content $results
-    $r = $xml.'test-run'
-    Write-Output "[RunTests] $Filter : $($r.result) - $($r.passed)/$($r.total) passed, $($r.failed) failed, $($r.skipped) skipped ($([math]::Round([double]$r.duration, 1)) s)"
-    foreach ($case in $xml.SelectNodes("//test-case[@result='Failed']")) {
-        Write-Output "  FAILED $($case.fullname): $($case.failure.message.'#cdata-section')"
+    # 4. What the CLI said, and the totals of this run.
+    Get-Content $out, $err -ErrorAction SilentlyContinue | Where-Object { $_ -match '\S' } | Select-Object -Last 40
+    if ((Test-Path $results) -and (Get-Item $results).LastWriteTime -gt $before) {
+        [xml]$xml = Get-Content $results
+        $r = $xml.'test-run'
+        Write-Output "[RunTests] $name : $($r.result) - $($r.passed)/$($r.total) passed, $($r.failed) failed, $($r.skipped) skipped ($([math]::Round([double]$r.duration, 1)) s)"
+        foreach ($case in $xml.SelectNodes("//test-case[@result='Failed']")) {
+            Write-Output "  FAILED $($case.fullname): $($case.failure.message.'#cdata-section')"
+        }
+        if ([int]$r.failed -gt 0) { $failedRuns++ }
+    }
+    else {
+        Write-Output "[RunTests] $name : no new TestResults.xml, the run did not finish or matched no tests (see the output above)."
+        $failedRuns++
     }
 }
-else {
-    Write-Output '[RunTests] No new TestResults.xml: the run did not finish (see the output above).'
-}
-exit $run.ExitCode
+exit $(if ($failedRuns -gt 0) { 1 } else { 0 })
