@@ -132,7 +132,21 @@ foreach ($name in ($Filter -split ';' | ForEach-Object { $_.Trim() } | Where-Obj
     if ((Test-Path $results) -and (Get-Item $results).LastWriteTime -gt $before) {
         [xml]$xml = Get-Content $results
         $r = $xml.'test-run'
-        Write-Output "[RunTests] $name : $($r.result) - $($r.passed)/$($r.total) passed, $($r.failed) failed, $($r.skipped) skipped ($([math]::Round([double]$r.duration, 1)) s)"
+        # The CLI's filter matches any part of a test's name, so "FishingTests" also runs CoopFishingTests: the totals
+        # are for the class named, and any other class the filter caught is listed apart.
+        $fixtures = @($xml.SelectNodes("//test-suite[@type='TestFixture']"))
+        $named = @($fixtures | Where-Object { $_.name -eq $name })
+        if ($named.Count -eq 1) {
+            $f = $named[0]
+            Write-Output "[RunTests] $name : $($f.result) - $($f.passed)/$($f.total) passed, $($f.failed) failed, $($f.skipped) skipped ($([math]::Round([double]$f.duration, 1)) s)"
+        }
+        else {
+            Write-Output "[RunTests] $name : no class of that name ran; the filter matched: $(($fixtures | ForEach-Object { $_.name }) -join ', ')"
+            $failedRuns++
+        }
+        foreach ($other in ($fixtures | Where-Object { $_.name -ne $name })) {
+            Write-Output "  also matched $($other.name): $($other.passed)/$($other.total) passed, $($other.failed) failed"
+        }
         foreach ($case in $xml.SelectNodes("//test-case[@result='Failed']")) {
             Write-Output "  FAILED $($case.fullname): $($case.failure.message.'#cdata-section')"
         }
