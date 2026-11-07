@@ -61,7 +61,8 @@ public sealed class RaidPlan
 
     private static bool SparksOffered => SettlementSettings.Current.PortalSpark != null && SettlementSettings.Current.MaxSparksPerRaid > 0;
 
-    /// <summary>Starts a fresh plan at <paramref name="portal"/> for <paramref name="player"/>, and lays its first run out ahead.</summary>
+    /// <summary>Starts a fresh plan at <paramref name="portal"/> for <paramref name="player"/>, settled (<see cref="Settle"/>:
+    /// a tier, who could come along), and lays its first run out ahead.</summary>
     public void Begin(RaidPortal portal, GameObject player)
     {
         Portal = portal;
@@ -75,6 +76,7 @@ public sealed class RaidPlan
         Large = false;
         Seed = FreshSeed(Destination);
         Large = LargeByDefault(Destination);
+        Settle();
         layOutAhead(Destination, Seed, Large);
     }
 

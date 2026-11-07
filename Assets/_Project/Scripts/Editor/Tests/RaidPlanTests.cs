@@ -133,6 +133,18 @@ public sealed class RaidPlanTests
     }
 
     [Test]
+    public void APlan_IsSettledFromTheStart()
+    {
+        var sigrid = AssetDatabase.LoadAssetAtPath<ResidentDefinition>("Assets/_Project/Data/Prologue/Residents/Sigrid.asset");
+        GameSession.Settlement.AddResident(sigrid);
+        RaidPlan plan = NewPlan();
+        plan.Begin(Portal(mistyWoods), null);
+        Assert.IsNotNull(plan.Difficulty, "A tier from the start");
+        plan.StepCompanion(1);
+        Assert.AreSame(sigrid, plan.Companion, "Who could come along is known before anything is clicked");
+    }
+
+    [Test]
     public void ChangingTheSize_LaysTheRunOutAgain()
     {
         Assume.That(mistyWoods.CanBeLarge, "Misty Woods offers a large map");
