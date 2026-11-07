@@ -91,6 +91,7 @@ public sealed class SkillsPage : SystemsPage
     {
         runs = 0;
         var minutes = new Dictionary<string, Dictionary<int, List<float>>>();
+        var rates = new Dictionary<string, List<float>>();
         string folder = PlaytestLog.Folder;
         if (!Directory.Exists(folder))
         {
@@ -106,6 +107,17 @@ public sealed class SkillsPage : SystemsPage
             }
 
             runs++;
+            foreach (KeyValuePair<string, float> rate in PlaytestLog.SkillRate(entries))
+            {
+                if (!rates.TryGetValue(rate.Key, out List<float> list))
+                {
+                    list = new List<float>();
+                    rates[rate.Key] = list;
+                }
+
+                list.Add(rate.Value);
+            }
+
             foreach (KeyValuePair<string, SortedDictionary<int, float>> skill in PlaytestLog.SkillPace(entries))
             {
                 if (!minutes.TryGetValue(skill.Key, out Dictionary<int, List<float>> byLevel))
@@ -130,12 +142,26 @@ public sealed class SkillsPage : SystemsPage
             }
         }
 
-        if (minutes.Count == 0)
+        if (minutes.Count == 0 && rates.Count == 0)
         {
             return $"No skill levels in {runs} runs yet: the logs only hold them from 2026-11-07 on.";
         }
 
         var lines = new List<string>();
+        LevelingSettings settings = LevelingSettings.Current;
+        if (rates.Count > 0)
+        {
+            lines.Add("Experience per played hour (median of runs), and what it comes to at that rate:");
+            foreach (KeyValuePair<string, List<float>> rate in rates.OrderBy(pair => pair.Key))
+            {
+                float perHour = Median(rate.Value);
+                string projected = string.Join("   ", new[] { 10, 20, 50 }.Select(level =>
+                    $"{level}: {settings.TotalExperienceFor(level) / Mathf.Max(1f, perHour):0.#} h"));
+                lines.Add($"{rate.Key}  {perHour:0} xp/h ({rate.Value.Count} runs)   {projected}");
+            }
+
+            lines.Add("");
+        }
         foreach (KeyValuePair<string, Dictionary<int, List<float>>> skill in minutes.OrderBy(pair => pair.Key))
         {
             IEnumerable<string> marks = skill.Value.OrderBy(pair => pair.Key)

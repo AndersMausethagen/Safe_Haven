@@ -60,6 +60,8 @@ public static class PlaytestLog
     public const string SkillLevel = "SkillLevel";
     /// <summary>Insight put into a skill: subject the skill's id, amount the Insight.</summary>
     public const string InsightSpent = "InsightSpent";
+    /// <summary>Experience a skill gained by practice in the last played minute: subject its id, amount the experience.</summary>
+    public const string SkillXp = "SkillXp";
 
     public static string Folder => Path.Combine(Application.persistentDataPath, "Playtests");
 
@@ -212,6 +214,38 @@ public static class PlaytestLog
         }
 
         return pace;
+    }
+
+    /// <summary>
+    /// Experience each skill gained by practice per played hour over a run (the SkillXp rows over the run's played time),
+    /// by skill id; skills not practised are left out.
+    /// </summary>
+    public static Dictionary<string, float> SkillRate(IReadOnlyList<PlaytestEntry> entries)
+    {
+        var gained = new Dictionary<string, float>();
+        float played = 0f;
+        foreach (PlaytestEntry entry in entries)
+        {
+            played = Math.Max(played, entry.PlayedSeconds);
+            if (entry.Event == SkillXp && !string.IsNullOrEmpty(entry.Subject) && entry.Amount > 0)
+            {
+                gained.TryGetValue(entry.Subject, out float sum);
+                gained[entry.Subject] = sum + entry.Amount;
+            }
+        }
+
+        var rate = new Dictionary<string, float>();
+        if (played <= 60f)
+        {
+            return rate;
+        }
+
+        foreach (KeyValuePair<string, float> skill in gained)
+        {
+            rate[skill.Key] = skill.Value / (played / 3600f);
+        }
+
+        return rate;
     }
 
     public static string TierDetail(int gearScore, int recommended, string hour) => $"gear {gearScore}, recommended {recommended}, {hour}";

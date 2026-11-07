@@ -368,6 +368,21 @@ public sealed class ProgressionTests
     }
 
     [Test]
+    public void ThePlaytestLog_MeasuresExperiencePerPlayedHour()
+    {
+        var entries = new List<PlaytestEntry>
+        {
+            new PlaytestEntry { PlayedSeconds = 60f, Event = PlaytestLog.SkillXp, Subject = "mining", Amount = 100 },
+            new PlaytestEntry { PlayedSeconds = 120f, Event = PlaytestLog.SkillXp, Subject = "mining", Amount = 50 },
+            new PlaytestEntry { PlayedSeconds = 1800f, Event = PlaytestLog.SessionEnd },
+        };
+
+        Dictionary<string, float> rate = PlaytestLog.SkillRate(entries);
+        Assert.AreEqual(300f, rate["mining"], 0.01f, "150 in half an hour");
+        Assert.IsFalse(rate.ContainsKey("melee"));
+    }
+
+    [Test]
     public void RuneBook_IsReadForInsightAndFoundInSupplyCaches()
     {
         var book = AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Project/Data/Items/RuneBook.asset");

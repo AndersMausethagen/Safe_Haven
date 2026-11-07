@@ -30,7 +30,33 @@ public sealed class PlaytestLogger : MonoBehaviour, IGameSystem
             GameEvents.Raised += OnGameEvent;
             ExperienceTracker.LevelReached += OnLevelReached;
             ExperienceTracker.InsightSpent += OnInsightSpent;
+            ExperienceTracker.Gained += OnGained;
         }
+    }
+
+    // Practice gathered over a played minute, written as one row per skill: what the pace is measured from.
+    private readonly System.Collections.Generic.Dictionary<string, int> minuteXp = new System.Collections.Generic.Dictionary<string, int>();
+    private float nextXpRow = 60f;
+
+    private void OnGained(ProficiencyDefinition skill, int amount)
+    {
+        if (skill == null || ExperienceTracker.SpendingInsight)
+        {
+            return;
+        }
+
+        minuteXp.TryGetValue(skill.Id, out int sum);
+        minuteXp[skill.Id] = sum + amount;
+    }
+
+    private void FlushSkillXp()
+    {
+        foreach (System.Collections.Generic.KeyValuePair<string, int> skill in minuteXp)
+        {
+            Write(PlaytestLog.SkillXp, skill.Key, skill.Value);
+        }
+
+        minuteXp.Clear();
     }
 
     // Levels with the played minute they came at: what the skills' pace is measured from (PlaytestLog.SkillPace).
@@ -66,6 +92,12 @@ public sealed class PlaytestLogger : MonoBehaviour, IGameSystem
         if (!GamePause.IsPaused)
         {
             current.PlayedSeconds += Time.unscaledDeltaTime;
+        }
+
+        if (current.PlayedSeconds >= nextXpRow)
+        {
+            nextXpRow = current.PlayedSeconds + 60f;
+            FlushSkillXp();
         }
     }
 
@@ -201,6 +233,8 @@ public sealed class PlaytestLogger : MonoBehaviour, IGameSystem
         GameEvents.Raised -= OnGameEvent;
         ExperienceTracker.LevelReached -= OnLevelReached;
         ExperienceTracker.InsightSpent -= OnInsightSpent;
+        ExperienceTracker.Gained -= OnGained;
+        FlushSkillXp();
         EndSession();
     }
 
