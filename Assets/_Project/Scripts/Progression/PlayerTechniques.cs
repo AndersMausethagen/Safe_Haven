@@ -17,6 +17,7 @@ public sealed class PlayerTechniques : MonoBehaviour
     private PlayerStamina stamina;
     private Damageable health;
     private PlayerBoons boons;
+    private PlayerFocus focus;
     private bool sweeping;
 
     public static PlayerTechniques AddTo(GameObject player) =>
@@ -30,6 +31,7 @@ public sealed class PlayerTechniques : MonoBehaviour
         stamina = GetComponent<PlayerStamina>();
         health = GetComponent<Damageable>();
         boons = GetComponent<PlayerBoons>();
+        focus = GetComponent<PlayerFocus>();
     }
 
     private void OnEnable()
@@ -69,6 +71,20 @@ public sealed class PlayerTechniques : MonoBehaviour
         {
             health.Heal(health.MaxHealth * Rules.SoulSiphon);
             Techniques.Used(PerkTechnique.SoulSiphon);
+        }
+
+        // The flourishes that answer a Weapon Art landing: Flurry's kill gives Focus back, Pin roots.
+        if ((damage.Technique & HitTechnique.WeaponArt) != 0 && combat != null && combat.Weapon != null && Techniques.HasFlourish)
+        {
+            WeaponDefinition weapon = combat.Weapon;
+            if (weapon.Stance == WeaponStance.OneHanded && result.Killed && focus != null)
+            {
+                focus.Gain(weapon.WeaponArtFocus * Rules.FlurryRefund);
+            }
+            else if (weapon.Stance == WeaponStance.Polearm && !result.Killed && Rules.Pinning != null && target is Damageable pinned && pinned.IsAlive)
+            {
+                StatusEffects.Apply(pinned, Rules.Pinning, combatant);
+            }
         }
 
         if (!result.Killed && result.IsCritical && (damage.Technique & HitTechnique.Shot) != 0 && Rules.Pinning != null

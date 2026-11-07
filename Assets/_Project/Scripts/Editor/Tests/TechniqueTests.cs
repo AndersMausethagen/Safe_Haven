@@ -53,6 +53,28 @@ public sealed class TechniqueTests
     }
 
     [Test]
+    public void WeaponArts_GainTheirFlourish_FromMeleeThirty()
+    {
+        LevelingSettings settings = LevelingSettings.Current;
+        ProficiencyDefinition melee = settings.FindSkill("melee");
+        GameSession.StartNewGame();
+        try
+        {
+            Assert.IsFalse(Techniques.HasFlourish);
+            GameSession.Progress.AddExperience(melee, settings.TotalExperienceFor(TechniqueSettings.Current.FlourishLevel), settings);
+            Assert.IsTrue(Techniques.HasFlourish);
+            Assert.AreEqual("Flurry", Techniques.FlourishOf(WeaponStance.OneHanded));
+            Assert.AreEqual("Sunder", Techniques.FlourishOf(WeaponStance.TwoHanded));
+            Assert.AreEqual("Pin", Techniques.FlourishOf(WeaponStance.Polearm));
+            Assert.IsNull(Techniques.FlourishOf(WeaponStance.Bow));
+        }
+        finally
+        {
+            GameSession.StartNewGame();
+        }
+    }
+
+    [Test]
     public void SteadyRhythm_KeepsTheCombo_ThroughANormalSwing()
     {
         GatheringSession Session() => new GatheringSession(6, 1f, 0.5f, 0.4f, 0.1f, 0f, 3, 0f, new System.Random(1), result => 1f);

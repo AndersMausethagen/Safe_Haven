@@ -462,6 +462,21 @@ public sealed class SkillsWindow : MonoBehaviour
         resetButton.interactable = AtHome && progress.PerkCount > 0;
     }
 
+    // Melee's Weapon Art flourishes, waiting or won.
+    private static string Flourishes(ProficiencyDefinition skill, int level, UIStyle style)
+    {
+        if (skill.Training != ProficiencyTraining.Melee)
+        {
+            return "";
+        }
+
+        int from = TechniqueSettings.Current.FlourishLevel;
+        string what = "one-handed arts strike harder and a kill gives Focus back, two-handed arts sunder, polearm arts pin";
+        return level >= from
+            ? $"\n<color={style.AccentHex}>Weapon flourishes:</color> {what}."
+            : $"\n<color={style.MutedHex}>From {from}, weapon flourishes: {what}.</color>";
+    }
+
     // What speeds the skill now: its mentor building at home, and being rested.
     private static string Boosts(ProficiencyDefinition skill, LevelingSettings settings, UIStyle style)
     {
@@ -526,7 +541,7 @@ public sealed class SkillsWindow : MonoBehaviour
             ? $"{towards} / {needed} to level {skillLevel + 1}   ·   {progress.ExperienceOf(selected)} experience in all"
             : $"Highest level   ·   {progress.ExperienceOf(selected)} experience in all";
         string trained = string.IsNullOrWhiteSpace(selected.TrainedBy) ? "" : $"<color={style.MutedHex}>Trained by {selected.TrainedBy}.</color>  ";
-        skillAbout.text = trained + selected.Description + Boosts(selected, settings, style);
+        skillAbout.text = trained + selected.Description + Boosts(selected, settings, style) + Flourishes(selected, skillLevel, style);
         skillBonuses.text = $"Now: {DescribeLevel(selected, skillLevel, settings, style)}\n" +
                             $"<color={style.MutedHex}>At {settings.MaxLevel}: {DescribeLevel(selected, settings.MaxLevel, settings, style)}</color>";
 

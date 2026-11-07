@@ -81,6 +81,19 @@ public sealed partial class PlayerCombat
         activeSpeed = ComboRules.SpeedMultiplier(rhythm, Rules);
         activeDamageMultiplier = ComboRules.DamageMultiplier(rhythm, Rules);
         activePoiseMultiplier = 1f;
+        // A practised hand's Weapon Art has its weapon's flourish: a one-handed art cuts deeper, a two-handed one sunders.
+        if (kind == SwingKind.Art && weapon != null && Techniques.HasFlourish)
+        {
+            TechniqueSettings flourish = TechniqueSettings.Current;
+            if (weapon.Stance == WeaponStance.OneHanded)
+            {
+                activeDamageMultiplier *= flourish.FlurryDamage;
+            }
+            else if (weapon.Stance == WeaponStance.TwoHanded)
+            {
+                activePoiseMultiplier *= flourish.SunderPoise;
+            }
+        }
         activeForceCritical = false;
         if (rhythm > 0)
         {

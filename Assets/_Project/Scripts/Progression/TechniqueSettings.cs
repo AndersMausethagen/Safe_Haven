@@ -54,6 +54,16 @@ public sealed class TechniqueSettings : GameSettings<TechniqueSettings>
     [Tooltip("Shadowstep: how much faster sneaking is.")]
     [SerializeField, Min(1f)] private float shadowstep = 1.35f;
 
+    [Header("Weapon flourishes (Melee)")]
+    [Tooltip("The Melee level from which every Weapon Art gains the flourish of its weapon's kind.")]
+    [SerializeField, Range(1, 50)] private int flourishLevel = 30;
+    [Tooltip("One-handed (Flurry): how much harder the art hits.")]
+    [SerializeField, Min(1f)] private float flurryDamage = 1.3f;
+    [Tooltip("One-handed (Flurry): share of the art's Focus a kill with it gives back.")]
+    [SerializeField, Range(0f, 1f)] private float flurryRefund = 0.5f;
+    [Tooltip("Two-handed (Sunder): how many times the art wears down poise.")]
+    [SerializeField, Min(1f)] private float sunderPoise = 2.5f;
+
     public float CriticalCountsAs => criticalCountsAs;
     public int RichSeamOre => richSeamOre;
     public float SweepRadius => sweepRadius;
@@ -75,4 +85,8 @@ public sealed class TechniqueSettings : GameSettings<TechniqueSettings>
     public float SoulSiphon => soulSiphon;
     public float TakedownReach => takedownReach;
     public float Shadowstep => shadowstep;
+    public int FlourishLevel => flourishLevel;
+    public float FlurryDamage => flurryDamage;
+    public float FlurryRefund => flurryRefund;
+    public float SunderPoise => sunderPoise;
 }

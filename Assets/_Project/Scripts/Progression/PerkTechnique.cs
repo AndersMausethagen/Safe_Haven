@@ -97,6 +97,32 @@ public static class Techniques
         }
     }
 
+    /// <summary>
+    /// Whether Weapon Arts have their flourish: from TechniqueSettings › Flourish Level of the Melee skill. One-handed arts
+    /// strike harder and a kill gives Focus back (Flurry), two-handed ones sunder poise, polearm ones pin.
+    /// </summary>
+    public static bool HasFlourish
+    {
+        get
+        {
+            LevelingSettings settings = LevelingSettings.Current;
+            ProficiencyDefinition melee = settings.SkillTrainedBy(ProficiencyTraining.Melee);
+            return melee != null && GameSession.Progress.LevelOf(melee, settings) >= TechniqueSettings.Current.FlourishLevel;
+        }
+    }
+
+    /// <summary>The flourish of a stance's Weapon Art, by name, or null for one that has none.</summary>
+    public static string FlourishOf(WeaponStance stance)
+    {
+        switch (stance)
+        {
+            case WeaponStance.OneHanded: return "Flurry";
+            case WeaponStance.TwoHanded: return "Sunder";
+            case WeaponStance.Polearm: return "Pin";
+            default: return null;
+        }
+    }
+
     /// <summary>True when a chosen perk teaches this technique.</summary>
     public static bool Has(PerkTechnique technique)
     {

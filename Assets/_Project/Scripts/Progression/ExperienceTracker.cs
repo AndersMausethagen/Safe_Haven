@@ -430,6 +430,11 @@ public sealed class ExperienceTracker : MonoBehaviour, IGameSystem
             ? GameInput.WithRebinds($"{skill.DisplayName} {after}! A perk to choose (N).")
             : $"{skill.DisplayName} {after}!", MessageKind.Gain);
         LevelReached?.Invoke(skill, after, milestone);
+        int flourish = TechniqueSettings.Current.FlourishLevel;
+        if (skill.Training == ProficiencyTraining.Melee && before < flourish && after >= flourish)
+        {
+            GameMessages.Post("Weapon flourishes: one-handed arts strike harder and a kill gives back Focus, two-handed arts sunder, polearm arts pin.", MessageKind.Gain);
+        }
         AudioSettingsDefinition sounds = AudioManager.Sounds;
         UIMotion.Sound(milestone && sounds != null && sounds.Milestone != null ? sounds.Milestone : Rules.LevelUpSound);
     }
