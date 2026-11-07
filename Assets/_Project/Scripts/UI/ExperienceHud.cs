@@ -5,12 +5,16 @@ using UnityEngine.UI;
 /// <summary>
 /// The experience bar along the bottom of the screen: the skill trained last, its level and how far it is to the next
 /// one, "+12 Woodcutting" rising above it as experience comes in (amounts close together for the same skill add up), and
-/// a reminder (N) while Insight waits to be put into a skill or a perk to be chosen. Built in code for every scene with a
-/// player (ExperienceTracker); it only reads GameSession.Progress.
+/// a reminder (N) while Insight waits to be put into a skill or a perk to be chosen; beside it the next milestone and, on a
+/// raid, the bonus experience waiting for the way home. A level reached shows a banner high in the middle of the screen,
+/// held longer for a milestone. Built in code for every scene with a player (ExperienceTracker); it only reads
+/// GameSession.Progress.
 /// </summary>
 public sealed class ExperienceHud : MonoBehaviour
 {
     private const float GainSeconds = 1.6f;
+    private const float BannerSeconds = 2.6f;
+    private const float MilestoneBannerSeconds = 5f;
     private static Color Gold => UIStyle.Current.Accent;
 
     private RectTransform fill;
@@ -26,6 +30,12 @@ public sealed class ExperienceHud : MonoBehaviour
     private int writtenPoints = -1;
     private int writtenKeys = -1;
     private int writtenGain = -1;
+    private int writtenHeld = -1;
+    private TMP_Text bannerTitle;
+    private TMP_Text bannerLine;
+    private CanvasGroup banner;
+    private float bannerAt = -100f;
+    private float bannerFor;
 
     // The skill the bar follows: the one trained last, kept across scenes.
     private static ProficiencyDefinition shownSkill;
@@ -64,9 +74,29 @@ public sealed class ExperienceHud : MonoBehaviour
         hud.fill.offsetMin = hud.fill.offsetMax = Vector2.zero;
         hud.fill.gameObject.AddComponent<Image>().color = Gold;
 
-        hud.level = Label("Level", bar, new Vector2(1f, 0.5f), new Vector2(260f, 24f), new Vector2(136f, 0f), 17f, TextAlignmentOptions.Left);
-        hud.gain = Label("Gain", bar, new Vector2(0.5f, 1f), new Vector2(320f, 28f), new Vector2(0f, 18f), 19f, TextAlignmentOptions.Center);
+        // Above the bar's right end, reading leftwards, so a long line never runs off the screen.
+        hud.level = Label("Level", bar, new Vector2(1f, 1f), new Vector2(560f, 24f), Vector2.zero, 17f, TextAlignmentOptions.BottomRight);
+        hud.level.rectTransform.pivot = new Vector2(1f, 0f);
+        hud.level.rectTransform.anchoredPosition = new Vector2(0f, 4f);
+        hud.gain = Label("Gain", bar, new Vector2(0.5f, 1f), new Vector2(320f, 28f), new Vector2(0f, 44f), 19f, TextAlignmentOptions.Center);
+
+        // The banner: type on nothing, like the rest of the HUD, between two thin lines.
+        RectTransform bannerRoot = Rect("Level Banner", root.transform, new Vector2(0.5f, 0.74f), new Vector2(900f, 110f), Vector2.zero);
+        hud.banner = bannerRoot.gameObject.AddComponent<CanvasGroup>();
+        hud.banner.alpha = 0f;
+        hud.bannerTitle = Label("Title", bannerRoot, new Vector2(0.5f, 0.62f), new Vector2(900f, 52f), Vector2.zero, 40f, TextAlignmentOptions.Center);
+        hud.bannerTitle.characterSpacing = 6f;
+        hud.bannerLine = Label("Line", bannerRoot, new Vector2(0.5f, 0.2f), new Vector2(900f, 30f), Vector2.zero, 20f, TextAlignmentOptions.Center);
+        hud.bannerLine.color = UIStyle.Current.Text;
+        foreach (float y in new[] { 1f, 0f })
+        {
+            Image line = Rect("Rule", bannerRoot, new Vector2(0.5f, y), new Vector2(420f, 1f), Vector2.zero).gameObject.AddComponent<Image>();
+            line.color = UIStyle.Current.Accent;
+            line.raycastTarget = false;
+        }
+
         ExperienceTracker.Gained += hud.OnGained;
+        ExperienceTracker.LevelReached += hud.OnLevelReached;
         return hud;
     }
 
@@ -75,6 +105,7 @@ public sealed class ExperienceHud : MonoBehaviour
     private void OnDestroy()
     {
         ExperienceTracker.Gained -= OnGained;
+        ExperienceTracker.LevelReached -= OnLevelReached;
         if (Current == this)
         {
             Current = null;
@@ -94,8 +125,34 @@ public sealed class ExperienceHud : MonoBehaviour
         }
     }
 
+    private void OnLevelReached(ProficiencyDefinition skill, int reached, bool milestone)
+    {
+        bannerTitle.text = $"{skill.DisplayName.ToUpperInvariant()}  {reached}";
+        bannerLine.text = milestone
+            ? GameInput.WithRebinds($"A milestone: <color={UIStyle.Current.GoodHex}>a perk to choose (N)</color>")
+            : NextMilestone(skill, reached) is int next ? $"Next milestone at {next}" : "Mastered";
+        bannerAt = Time.unscaledTime;
+        bannerFor = milestone ? MilestoneBannerSeconds : BannerSeconds;
+    }
+
+    private static int? NextMilestone(ProficiencyDefinition skill, int level)
+    {
+        foreach (ProficiencyDefinition.Milestone milestone in skill.Milestones)
+        {
+            if (milestone.level > level)
+            {
+                return milestone.level;
+            }
+        }
+
+        return null;
+    }
+
     private void LateUpdate()
     {
+        float shown = Time.unscaledTime - bannerAt;
+        banner.alpha = shown >= bannerFor ? 0f : Mathf.Clamp01(shown / 0.25f) * Mathf.Clamp01((bannerFor - shown) / 0.6f);
+
         group.alpha = GamePause.IsPaused ? 0f : 1f;
         LevelingSettings settings = LevelingSettings.Current;
         CharacterProgress progress = GameSession.Progress;
@@ -106,13 +163,27 @@ public sealed class ExperienceHud : MonoBehaviour
         int skillLevel = shownSkill != null ? progress.LevelOf(shownSkill, settings) : 0;
         // Something to do in the skills window: a perk to choose, or Insight to put into a skill.
         int points = progress.PendingChoices(settings) + (progress.Insight > 0 ? 1 : 0);
-        if (shownSkill != writtenSkill || skillLevel != writtenLevel || points != writtenPoints || InputRebinds.Changes != writtenKeys)
+        int held = ExperienceTracker.HeldBonus;
+        if (shownSkill != writtenSkill || skillLevel != writtenLevel || points != writtenPoints || InputRebinds.Changes != writtenKeys
+            || held != writtenHeld)
         {
             writtenSkill = shownSkill;
             writtenLevel = skillLevel;
             writtenPoints = points;
             writtenKeys = InputRebinds.Changes;
+            writtenHeld = held;
+            string muted = UIStyle.Current.MutedHex;
             string name = shownSkill != null ? $"{shownSkill.DisplayName} {skillLevel}" : "Skills";
+            if (shownSkill != null && NextMilestone(shownSkill, skillLevel) is int next)
+            {
+                name += $"  <color={muted}>perk at {next}</color>";
+            }
+
+            if (held > 0)
+            {
+                name += $"  <color={muted}>+{held} if you get out</color>";
+            }
+
             level.text = points > 0 ? GameInput.WithRebinds($"{name}  <color={UIStyle.Current.GoodHex}>(N)</color>") : name;
         }
 
@@ -127,7 +198,7 @@ public sealed class ExperienceHud : MonoBehaviour
             }
 
             gain.alpha = 1f - Mathf.Clamp01((age - GainSeconds * 0.5f) / (GainSeconds * 0.5f));
-            gain.rectTransform.anchoredPosition = new Vector2(0f, 18f + age * 14f);
+            gain.rectTransform.anchoredPosition = new Vector2(0f, 44f + age * 14f);
         }
     }
 

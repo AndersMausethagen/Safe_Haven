@@ -414,6 +414,10 @@ public sealed class SkillsWindow : MonoBehaviour
         insightStep.interactable = canGrow && progress.Insight > 0;
         insightAll.interactable = canGrow && progress.Insight > 0;
         insightStepLabel.text = $"Put In {(progress.Insight > 0 ? Mathf.Min(settings.InsightStep, progress.Insight) : settings.InsightStep)} Insight";
+        if (canGrow && settings.InsightRate(skillLevel) < 1f)
+        {
+            skillExperience.text += $"   ·   Insight counts {Mathf.RoundToInt(settings.InsightRate(skillLevel) * 100f)}% from level {settings.InsightFullBelow}";
+        }
 
         IReadOnlyList<ProficiencyDefinition.Milestone> reached = selected.Milestones;
         for (int i = 0; i < milestones.Count; i++)

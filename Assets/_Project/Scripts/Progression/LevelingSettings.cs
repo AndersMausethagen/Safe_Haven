@@ -20,6 +20,9 @@ public sealed class LevelingSettings : GameSettings<LevelingSettings>
     [Tooltip("The level the game's numbers were tuned for. Skill level bonuses are 0 here: below it the player is a " +
              "beginner (At First Level), above it better than the game assumed (At Last Level).")]
     [SerializeField, Min(1)] private int baselineLevel = 10;
+    [Tooltip("How quickly a beginner's penalties fade: 1 evenly to the baseline, higher sheds most of them in the first few " +
+             "levels (2.5: two thirds gone by level 4, three quarters by 5).")]
+    [SerializeField, Range(1f, 4f)] private float beginnerEase = 2.5f;
     [SerializeField] private SoundDefinition levelUpSound;
 
     [Header("Experience per action")]
@@ -98,6 +101,10 @@ public sealed class LevelingSettings : GameSettings<LevelingSettings>
     [SerializeField, Min(0)] private int handGatherExperience = 2;
     [Tooltip("1 Insight for this many square metres of new ground explored.")]
     [SerializeField, Min(1)] private int exploredCellsPerExperience = 150;
+    [Tooltip("Insight goes into a skill in full below this level, so it can catch a neglected skill up...")]
+    [SerializeField, Min(1)] private int insightFullBelow = 20;
+    [Tooltip("...and at this share from there on, so practice always leads.")]
+    [SerializeField, Range(0.05f, 1f)] private float insightShareAbove = 0.5f;
     [Tooltip("Insight the skills window's button puts into a skill at a time.")]
     [SerializeField, Min(1)] private int insightStep = 100;
 
@@ -137,6 +144,10 @@ public sealed class LevelingSettings : GameSettings<LevelingSettings>
     public int CastExperience => castExperience;
     public int ExploredCellsPerExperience => exploredCellsPerExperience;
     public int InsightStep => insightStep;
+    public int InsightFullBelow => insightFullBelow;
+
+    /// <summary>Experience one point of Insight is worth to a skill at this level.</summary>
+    public float InsightRate(int level) => level < insightFullBelow ? 1f : insightShareAbove;
     public IReadOnlyList<ProficiencyDefinition> Skills => skills;
 
     /// <summary>Experience needed to go from <paramref name="level"/> to the next one (rounded to 5).</summary>
@@ -166,14 +177,16 @@ public sealed class LevelingSettings : GameSettings<LevelingSettings>
         return level;
     }
 
-    /// <summary>Where a level sits on the bonus curve: -1 at level 1, 0 at the baseline, 1 at the top, evenly between.</summary>
+    /// <summary>Where a level sits on the bonus curve: -1 at level 1, 0 at the baseline (eased: most of the way there within a
+    /// few levels), 1 at the top (evenly from the baseline).</summary>
     public float CurvePosition(int level)
     {
         int baseline = BaselineLevel;
         level = Mathf.Clamp(level, 1, maxLevel);
         if (level <= baseline)
         {
-            return baseline > 1 ? (level - baseline) / (float)(baseline - 1) : 0f;
+            // Eased: the first levels take away most of a beginner's penalties, so the first hour feels like quick growth.
+            return baseline > 1 ? -Mathf.Pow((baseline - level) / (float)(baseline - 1), beginnerEase) : 0f;
         }
 
         return maxLevel > baseline ? (level - baseline) / (float)(maxLevel - baseline) : 0f;

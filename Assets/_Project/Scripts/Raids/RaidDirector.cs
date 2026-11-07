@@ -297,6 +297,7 @@ public sealed class RaidDirector : MonoBehaviour
         }
 
         Companions.Settle(Report, extracted);
+        ExperienceTracker.SettleRaid(Report, extracted);
         GameSession.EndRaid(Report);
         SaveGameService.SaveOnceHome();
         GameEvents.Raise(new GameEvent(GameEventKind.RaidFinished, Session.Definition, 1, null, Session.Outcome, Session.Elapsed));

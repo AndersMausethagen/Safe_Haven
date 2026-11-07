@@ -16,6 +16,28 @@ public readonly struct EquipmentWear
     }
 }
 
+/// <summary>What one skill learned on a raid: its level before and after, the experience kept, and the raid's bonus, which
+/// came home only on extraction.</summary>
+public readonly struct SkillLesson
+{
+    public readonly ProficiencyDefinition Skill;
+    public readonly int LevelBefore;
+    public readonly int LevelAfter;
+    public readonly int Experience;
+    public readonly int Bonus;
+    public readonly bool BonusKept;
+
+    public SkillLesson(ProficiencyDefinition skill, int levelBefore, int levelAfter, int experience, int bonus, bool bonusKept)
+    {
+        Skill = skill;
+        LevelBefore = levelBefore;
+        LevelAfter = levelAfter;
+        Experience = experience;
+        Bonus = bonus;
+        BonusKept = bonusKept;
+    }
+}
+
 /// <summary>
 /// How a raid went, for the summary shown back in Safe Haven: the outcome, how long it lasted, the modifiers used, what
 /// the player came home with or lost compared with what they carried in, and – after a failed raid – the deployed
@@ -71,6 +93,8 @@ public sealed class RaidReport
     public ResidentDefinition LeftBehind { get; set; }
     /// <summary>Residents brought home by this raid.</summary>
     public List<ResidentDefinition> Rescued { get; } = new List<ResidentDefinition>();
+    /// <summary>What each skill learned (ExperienceTracker.SettleRaid).</summary>
+    public List<SkillLesson> Lessons { get; } = new List<SkillLesson>();
 
     /// <summary>Equipment kept after a failed raid, with its durability before and after.</summary>
     public IReadOnlyList<EquipmentWear> EquipmentDamaged => equipmentDamaged;

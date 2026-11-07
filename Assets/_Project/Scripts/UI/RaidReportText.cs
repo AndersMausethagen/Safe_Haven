@@ -51,6 +51,12 @@ public static class RaidReportText
             builder.Append(gathering).Append("\n\n");
         }
 
+        string lessons = Lessons(report);
+        if (lessons != null)
+        {
+            builder.Append(lessons).Append("\n\n");
+        }
+
         if (report.Events != null && report.Events.Count > 0)
         {
             builder.Append("<b>On the way</b>\n");
@@ -148,6 +154,38 @@ public static class RaidReportText
     }
 
     /// <summary>The gathering line: crit rate, glancing blows and how angry the forest got. Null when nothing was gathered.</summary>
+    /// <summary>"What you learned": each skill's levels and experience, and the raid bonus brought home or lost. Null when none.</summary>
+    public static string Lessons(RaidReport report)
+    {
+        if (report.Lessons.Count == 0)
+        {
+            return null;
+        }
+
+        var text = new StringBuilder("<b>What you learned</b>");
+        int bonus = 0;
+        bool kept = false;
+        foreach (SkillLesson lesson in report.Lessons)
+        {
+            string levels = lesson.LevelAfter > lesson.LevelBefore
+                ? $"<color={Gain}>{lesson.LevelBefore} → {lesson.LevelAfter}</color>"
+                : lesson.LevelAfter.ToString();
+            int total = lesson.Experience + (lesson.BonusKept ? lesson.Bonus : 0);
+            text.Append($"\n{lesson.Skill.DisplayName} {levels}  <color={Muted}>+{total}</color>");
+            bonus += lesson.Bonus;
+            kept |= lesson.BonusKept;
+        }
+
+        if (bonus > 0)
+        {
+            text.Append(kept
+                ? $"\n<color={Gain}>Raid bonus brought home: +{bonus}</color>"
+                : $"\n<color={Loss}>Raid bonus lost: {bonus}. It comes home only with you.</color>");
+        }
+
+        return text.ToString();
+    }
+
     public static string Gathering(GatheringStats stats)
     {
         if (stats == null || stats.Swings == 0)

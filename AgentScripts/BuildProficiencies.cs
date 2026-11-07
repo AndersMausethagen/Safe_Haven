@@ -406,6 +406,9 @@ public static class BuildProficiencies
         so.FindProperty("firstLevelExperience").intValue = 50;
         so.FindProperty("levelGrowth").floatValue = 1.105f;
         so.FindProperty("baselineLevel").intValue = 10;
+        so.FindProperty("beginnerEase").floatValue = 2.5f;
+        so.FindProperty("insightFullBelow").intValue = 20;
+        so.FindProperty("insightShareAbove").floatValue = 0.5f;
         SerializedProperty tiers = so.FindProperty("tierExperience");
         int[] perTier = { 10, 16, 25, 40, 60 };
         tiers.arraySize = perTier.Length;

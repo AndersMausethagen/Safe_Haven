@@ -107,7 +107,11 @@ public sealed class CharacterProgress
         }
     }
 
-    /// <summary>Puts up to <paramref name="amount"/> Insight into a skill, never past its last level. Returns what went in.</summary>
+    /// <summary>
+    /// Puts up to <paramref name="amount"/> Insight into a skill, never past its last level: in full below
+    /// LevelingSettings › Insight Full Below, at a share from there on (InsightRate), level by level. Returns the Insight
+    /// that went in.
+    /// </summary>
     public int SpendInsight(ProficiencyDefinition skill, int amount, LevelingSettings settings)
     {
         if (skill == null)
@@ -115,15 +119,25 @@ public sealed class CharacterProgress
             return 0;
         }
 
-        int room = settings.TotalExperienceFor(settings.MaxLevel) - ExperienceOf(skill);
-        int spent = Math.Min(Math.Min(amount, Insight), room);
-        if (spent <= 0)
+        int spent = 0;
+        while (spent < amount && Insight > 0 && !IsMaxLevel(skill, settings))
         {
-            return 0;
+            int level = LevelOf(skill, settings);
+            float rate = settings.InsightRate(level);
+            int room = settings.TotalExperienceFor(level + 1) - ExperienceOf(skill);
+            int affordable = (int)Math.Floor(Math.Min(amount - spent, Insight) * rate + 0.0001);
+            int experience = Math.Min(room, affordable);
+            if (experience <= 0)
+            {
+                break;
+            }
+
+            int cost = Math.Min(Insight, (int)Math.Ceiling(experience / rate - 0.0001));
+            Insight -= cost;
+            spent += cost;
+            AddExperience(skill, experience, settings);
         }
 
-        Insight -= spent;
-        AddExperience(skill, spent, settings);
         return spent;
     }
 

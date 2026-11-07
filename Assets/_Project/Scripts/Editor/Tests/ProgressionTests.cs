@@ -53,7 +53,8 @@ public sealed class ProgressionTests
         Assert.AreEqual(-0.3f, ProficiencyDefinition.ValueAt(bonus, 1, settings), 0.0001f, "a beginner");
         Assert.AreEqual(0f, ProficiencyDefinition.ValueAt(bonus, 10, settings), 0.0001f, "the player the game was tuned for");
         Assert.AreEqual(0.4f, ProficiencyDefinition.ValueAt(bonus, 50, settings), 0.0001f, "a master");
-        Assert.AreEqual(-0.3f * 5f / 9f, ProficiencyDefinition.ValueAt(bonus, 5, settings), 0.0001f, "evenly in between");
+        Assert.AreEqual(-0.3f * Mathf.Pow(5f / 9f, 2.5f), ProficiencyDefinition.ValueAt(bonus, 5, settings), 0.0001f,
+            "a beginner's penalties fade fast: three quarters gone by level 5");
         Assert.AreEqual(0.2f, ProficiencyDefinition.ValueAt(bonus, 30, settings), 0.0001f, "halfway up");
     }
 
@@ -111,6 +112,25 @@ public sealed class ProgressionTests
         int room = settings.TotalExperienceFor(3) - progress.ExperienceOf(skill);
         Assert.AreEqual(room, progress.SpendInsight(skill, int.MaxValue, settings), "only what the skill still has room for");
         Assert.AreEqual(900 - room, progress.Insight, "the rest stays to spend elsewhere");
+    }
+
+    [Test]
+    public void Insight_CountsHalfFromLevelTwenty_SoPracticeLeads()
+    {
+        LevelingSettings settings = LevelingSettings.Current;
+        ProficiencyDefinition skill = settings.Skills.First();
+        var progress = new CharacterProgress();
+        progress.AddExperience(skill, settings.TotalExperienceFor(settings.InsightFullBelow), settings);
+        progress.AddInsight(400);
+
+        int spent = progress.SpendInsight(skill, 400, settings);
+        Assert.AreEqual(400, spent);
+        Assert.AreEqual(settings.TotalExperienceFor(settings.InsightFullBelow) + 200, progress.ExperienceOf(skill), 1, "half its worth");
+
+        var fresh = new CharacterProgress();
+        fresh.AddInsight(100);
+        fresh.SpendInsight(skill, 100, settings);
+        Assert.AreEqual(100, fresh.ExperienceOf(skill), "in full for a neglected skill");
     }
 
     [Test]

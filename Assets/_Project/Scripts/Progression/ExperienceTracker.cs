@@ -19,7 +19,18 @@ using UnityEngine.SceneManagement;
 /// </summary>
 public sealed class ExperienceTracker : MonoBehaviour, IGameSystem
 {
+    // What each skill learned on the raid under way: its level when it started, the experience kept, and the raid's bonus,
+    // held until the raid ends (SettleRaid): it comes home only with an extraction.
+    private sealed class Lesson
+    {
+        public int LevelBefore;
+        public float Kept;
+        public float Held;
+    }
+
     private readonly Dictionary<string, float> carried = new Dictionary<string, float>();
+    private readonly Dictionary<ProficiencyDefinition, Lesson> lessons = new Dictionary<ProficiencyDefinition, Lesson>();
+    private RaidSession lessonsFor;
     private LevelingSettings settings;
     private int exploredCells;
     private float carriedInsight;
@@ -28,6 +39,9 @@ public sealed class ExperienceTracker : MonoBehaviour, IGameSystem
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetForNewPlaySession() => Current = null;
+
+    /// <summary>Raised with a skill and the level it reached, and whether that level is a milestone (the HUD's banner).</summary>
+    public static event Action<ProficiencyDefinition, int, bool> LevelReached;
 
     /// <summary>Raised with each amount gained: the skill, or null for Insight (the experience bar shows it).</summary>
     public static event Action<ProficiencyDefinition, int> Gained;
@@ -103,7 +117,18 @@ public sealed class ExperienceTracker : MonoBehaviour, IGameSystem
 
         LevelingSettings rules = Rules;
         CharacterProgress progress = GameSession.Progress;
-        float amount = baseAmount * rules.Multiplier(tier, progress.LevelOf(skill, rules), onRaid) * Boost(skill);
+        float amount = baseAmount * rules.Multiplier(tier, progress.LevelOf(skill, rules), false) * Boost(skill);
+        // On a raid the bonus share waits for the way home: kept on extraction, lost otherwise.
+        float bonus = onRaid ? amount * (rules.RaidMultiplier - 1f) : 0f;
+        if (bonus > 0f && Current != null && GameSession.ActiveRaid != null)
+        {
+            Current.Note(skill, amount, bonus);
+        }
+        else
+        {
+            amount += bonus;
+        }
+
         if (Current != null)
         {
             Current.carried.TryGetValue(skill.Id, out float before);
@@ -176,6 +201,83 @@ public sealed class ExperienceTracker : MonoBehaviour, IGameSystem
         }
     }
 
+    private void Note(ProficiencyDefinition skill, float kept, float held)
+    {
+        if (lessonsFor != GameSession.ActiveRaid)
+        {
+            lessons.Clear();
+            lessonsFor = GameSession.ActiveRaid;
+        }
+
+        if (!lessons.TryGetValue(skill, out Lesson lesson))
+        {
+            lesson = new Lesson { LevelBefore = GameSession.Progress.LevelOf(skill, settings) };
+            lessons[skill] = lesson;
+        }
+
+        lesson.Kept += kept;
+        lesson.Held += held;
+    }
+
+    /// <summary>
+    /// The raid is over: its held bonus experience comes home with an extraction and is lost otherwise, and what each skill
+    /// learned goes into the report. RaidDirector calls it before the raid ends.
+    /// </summary>
+    public static void SettleRaid(RaidReport report, bool extracted)
+    {
+        if (Current == null || Current.lessonsFor != GameSession.ActiveRaid || report == null)
+        {
+            return;
+        }
+
+        LevelingSettings rules = Rules;
+        int lost = 0;
+        foreach (KeyValuePair<ProficiencyDefinition, Lesson> entry in Current.lessons)
+        {
+            int bonus = Mathf.FloorToInt(entry.Value.Held);
+            if (extracted)
+            {
+                Award(entry.Key, bonus);
+            }
+            else
+            {
+                lost += bonus;
+            }
+
+            int levelAfter = GameSession.Progress.LevelOf(entry.Key, rules);
+            report.Lessons.Add(new SkillLesson(entry.Key, entry.Value.LevelBefore, levelAfter, Mathf.RoundToInt(entry.Value.Kept), bonus, extracted));
+        }
+
+        report.Lessons.Sort((a, b) => (b.Experience + b.Bonus).CompareTo(a.Experience + a.Bonus));
+        if (lost > 0)
+        {
+            GameMessages.Post($"The raid's extra lessons were lost with it (-{lost} experience). Get out to bring them home.", MessageKind.Warning);
+        }
+
+        Current.lessons.Clear();
+        Current.lessonsFor = null;
+    }
+
+    /// <summary>The raid bonus held so far on the raid under way, all skills together (the HUD shows it).</summary>
+    public static int HeldBonus
+    {
+        get
+        {
+            if (Current == null || Current.lessonsFor == null || Current.lessonsFor != GameSession.ActiveRaid)
+            {
+                return 0;
+            }
+
+            float held = 0f;
+            foreach (Lesson lesson in Current.lessons.Values)
+            {
+                held += lesson.Held;
+            }
+
+            return Mathf.FloorToInt(held);
+        }
+    }
+
     /// <summary>Puts Insight into a skill (the skills window), announcing any level it reaches.</summary>
     public static int SpendInsight(ProficiencyDefinition skill, int amount)
     {
@@ -236,6 +338,7 @@ public sealed class ExperienceTracker : MonoBehaviour, IGameSystem
         GameMessages.Post(milestone
             ? GameInput.WithRebinds($"{skill.DisplayName} {after}! A perk to choose (N).")
             : $"{skill.DisplayName} {after}!", MessageKind.Gain);
+        LevelReached?.Invoke(skill, after, milestone);
         if (Player.Current != null)
         {
             AudioManager.Play(Rules.LevelUpSound, Player.Current.transform.position);

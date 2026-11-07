@@ -49,6 +49,9 @@ The tuning the game had becomes level 10, reached around the first tier I raids.
 | Construction | Hammering speed | 80% | 100% | 150% |
 | | Chance of one more plank, ingot or block | 0 | 0 | +20% |
 
+The penalties fade eased, not evenly (`LevelingSettings` › Beginner Ease 2.5): two thirds of them are gone by level 4 and three
+quarters by level 5, so the first half hour feels like quick growth and the beginner is soon only a little behind.
+
 Movement, dodge and parry windows, invulnerability and attack cadence are never touched: a slow-feeling character is not a weak one.
 Melee damage scales every swing before backstabs and counters, so their order (plain 19, mid-strike backstab 26, counter 44, staggered
 backstab 50 on a Draug) keeps its proportions at every level.
@@ -110,6 +113,23 @@ Raid tiers are tuned to gear kits (`GearBalance`, [GearScoreAndRaidTiers](GearSc
 Melee skill expected at the tier (`LevelingSettings.ExpectedLevel`: 10, 20, 30, 40, so +0%, +5%, +10%, +15%), and enemy health was raised
 to the suggested values (II x1.5, III x2.3, IV x3). A player whose skill keeps pace finds each tier as gear alone used to.
 
+## Raid lessons wait for the way home
+
+On a raid, practice pays its usual experience at once and the raid's bonus (the extra half of x1.5) is held: it comes home with an
+extraction and is lost on a death or when time runs out (`ExperienceTracker.SettleRaid`, called by `RaidDirector`). Nothing earned is
+ever taken away; only the bonus is at risk, like the loot. The HUD shows "+N if you get out" beside the skill, and the raid summary
+lists what each skill learned and whether the bonus came home.
+
+## Insight
+
+Insight goes into a skill in full below level 20 and at half its worth from there on (`LevelingSettings` › Insight Full Below,
+Insight Share Above), so it catches a neglected skill up but practice always leads.
+
+## Seeing progress
+
+The bar along the bottom follows the skill trained last, with its next milestone ("perk at 20"); a level shows a banner high in the
+middle of the screen for a few seconds, a milestone for longer, with the perk to choose.
+
 ## Mentors and rest
 
 Every skill but Fishing, Melee and Sneaking has a mentor building at home (`ProficiencyDefinition` › Mentor): each tier it stands at
@@ -123,5 +143,5 @@ Setting out rested from a comfortable Haven (`HavenSettings` › Rested Bonuses,
 ## Still to watch
 
 - The pace is worked out, not measured: count real actions per raid in the playtest logs and check how long the baseline takes.
-- The prologue at level 1 takes a blow more per fight: playtest it.
+- The prologue at level 1 took a blow more per fight before the eased curve; with a few wolves down that is mostly gone. Playtest it.
 - Fishing, Melee and Sneaking have no mentor yet (a dock, a training yard).
