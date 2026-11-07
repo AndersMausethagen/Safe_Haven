@@ -21,10 +21,34 @@ public static class GearPower
         }
 
         bonuses.AddRange(stack.Item.StatBonuses);
+        bonuses.AddRange(QualityBonuses(stack.Item, stack.Quality, settings));
         bonuses.AddRange(EmpowerBonuses(stack.Item, stack.Empower, settings));
         if (stack.Enchantment != null)
         {
             bonuses.AddRange(stack.Enchantment.Bonuses);
+        }
+
+        return bonuses;
+    }
+
+    /// <summary>
+    /// What a better make adds to the item: what empowering it part of the way would (LevelingSettings › Fine and
+    /// Masterwork Strength, in levels of empowering).
+    /// </summary>
+    public static List<StatBonus> QualityBonuses(ItemDefinition item, ItemQuality quality, EssenceSettings settings)
+    {
+        float strength = LevelingSettings.Current.QualityStrength(quality);
+        List<StatBonus> bonuses = EmpowerBonuses(item, 1, settings);
+        for (int i = bonuses.Count - 1; i >= 0; i--)
+        {
+            if (strength <= 0f)
+            {
+                bonuses.RemoveAt(i);
+                continue;
+            }
+
+            StatBonus one = bonuses[i];
+            bonuses[i] = new StatBonus(one.stat, one.value * strength, one.op);
         }
 
         return bonuses;

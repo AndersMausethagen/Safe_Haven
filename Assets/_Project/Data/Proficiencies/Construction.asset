@@ -1,0 +1,46 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d75b22f30f824f747ae6ca96317ac240, type: 3}
+  m_Name: Construction
+  m_EditorClassIdentifier: SafeHaven::ProficiencyDefinition
+  id: construction
+  displayName: Construction
+  description: 'Beams, stone and joinery: raising the Haven, and readying what it is built from.'
+  trainedBy: hammering buildings up and refining planks, ingots and blocks
+  icon: {fileID: 0}
+  group: 1
+  training: 6
+  crafts: 64
+  gatherTool: 0
+  levelBonuses:
+  - stat: 43
+    atFirstLevel: -0.19999999
+    atLastLevel: 0.5
+  - stat: 44
+    atFirstLevel: 0
+    atLastLevel: 0.19999999
+  milestones:
+  - level: 10
+    first: {fileID: 11400000, guid: 65ca61e41e1c85c479c531ddaa60b59e, type: 2}
+    second: {fileID: 11400000, guid: d669b9ac165e3e24f87165c9cce40c3d, type: 2}
+  - level: 20
+    first: {fileID: 11400000, guid: 8e5a01ce1303e3e4a9c2456a5ef0a0c1, type: 2}
+    second: {fileID: 11400000, guid: a228c267ecd20d74c80202a89aef88e6, type: 2}
+  - level: 30
+    first: {fileID: 11400000, guid: 9972bf2fcf3f2cc4986cf2cf9f3a7cf6, type: 2}
+    second: {fileID: 11400000, guid: 9bb55cf71f0c2ad4aa647ed4f2924265, type: 2}
+  - level: 40
+    first: {fileID: 11400000, guid: ed9017d26466c2a4f8ebec9d2ded4870, type: 2}
+    second: {fileID: 11400000, guid: 15cbcaf0ac7c51a4987576d705271d20, type: 2}
+  - level: 50
+    first: {fileID: 11400000, guid: 61578a1081c0d8a47adc25b101df9582, type: 2}
+    second: {fileID: 11400000, guid: 5ebe0e4435fca114494f5b66f624052c, type: 2}

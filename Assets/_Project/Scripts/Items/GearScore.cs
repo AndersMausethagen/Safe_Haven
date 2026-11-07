@@ -29,7 +29,9 @@ public static class GearScore
 
         GearScoreSettings settings = GearScoreSettings.Current;
         float score = BaseOf(stack.Item, settings);
-        float extra = stack.Empower * settings.PerEmpowerLevel + (stack.Enchantment != null ? settings.PerEnchantment : 0f);
+        // A better make counts as the part of an empowering level it is worth (LevelingSettings › Quality Strength).
+        float empowered = stack.Empower + LevelingSettings.Current.QualityStrength(stack.Quality);
+        float extra = empowered * settings.PerEmpowerLevel + (stack.Enchantment != null ? settings.PerEnchantment : 0f);
         return Mathf.RoundToInt(score * (1f + extra));
     }
 

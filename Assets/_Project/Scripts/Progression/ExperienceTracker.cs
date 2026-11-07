@@ -9,9 +9,10 @@ using UnityEngine.SceneManagement;
 /// <item>Practice trains a skill (<see cref="Practise"/>): nodes gathered train the skill of their tool, and the player's
 /// own PlayerTraining reports blows, parries, ambushes and the like. An action is worth its tier's experience, less
 /// below the skill's band and more on a raid.</item>
+/// <item>What the player makes trains the crafting skill of its goods (<see cref="PractiseCraft"/>), and buildings
+/// hammered up train Construction.</item>
 /// <item>Everything else is Insight (<see cref="GrantInsight"/>), put into a skill of the player's choice in the skills
-/// window: quests, raids, first crafts, buildings, catches, new ground, rune books, experience stones, blows no skill
-/// trains yet.</item>
+/// window: quests, raids, first crafts, catches, new ground, rune books, experience stones, blows no skill trains yet.</item>
 /// </list>
 /// Announces levels and milestones and, in each scene with a player, adds the experience bar and the skills window. A
 /// game system (GameSystems).
@@ -89,7 +90,11 @@ public sealed class ExperienceTracker : MonoBehaviour, IGameSystem
     /// Practice of a skill at a place or node of <paramref name="tier"/>: <paramref name="baseAmount"/> experience before the
     /// skill's band and the raid bonus. Fractions are kept and paid once they add up to a whole point.
     /// </summary>
-    public static void Practise(ProficiencyDefinition skill, int tier, float baseAmount)
+    public static void Practise(ProficiencyDefinition skill, int tier, float baseAmount) => Practise(skill, tier, baseAmount, OnRaid);
+
+    /// <summary>Practice with the raid bonus decided by the caller: a station order that finishes while the player is
+    /// away on a raid was still made at home.</summary>
+    public static void Practise(ProficiencyDefinition skill, int tier, float baseAmount, bool onRaid)
     {
         if (skill == null || baseAmount <= 0f)
         {
@@ -98,7 +103,7 @@ public sealed class ExperienceTracker : MonoBehaviour, IGameSystem
 
         LevelingSettings rules = Rules;
         CharacterProgress progress = GameSession.Progress;
-        float amount = baseAmount * rules.Multiplier(tier, progress.LevelOf(skill, rules), OnRaid);
+        float amount = baseAmount * rules.Multiplier(tier, progress.LevelOf(skill, rules), onRaid);
         if (Current != null)
         {
             Current.carried.TryGetValue(skill.Id, out float before);
@@ -141,6 +146,23 @@ public sealed class ExperienceTracker : MonoBehaviour, IGameSystem
         int whole = Mathf.FloorToInt(Current.carriedInsight);
         Current.carriedInsight -= whole;
         GrantInsight(whole);
+    }
+
+    /// <summary>
+    /// The player made something: <paramref name="batches"/> crafts of the recipe train the crafting skill for its kind of
+    /// goods (CraftedWork.Of), each worth its tier's experience times the goods' work (LevelingSettings › Crafting). Never
+    /// the raid bonus: crafting is home work. Workers' orders train nobody; callers leave them out.
+    /// </summary>
+    public static void PractiseCraft(RecipeDefinition recipe, int batches = 1)
+    {
+        LevelingSettings rules = Rules;
+        CraftedGoods goods = CraftedWork.Of(recipe);
+        ProficiencyDefinition skill = rules.SkillCrafting(goods);
+        if (skill != null && batches > 0)
+        {
+            int tier = Mathf.Max(1, recipe.Output.Tier);
+            Practise(skill, tier, rules.TierExperience(tier) * rules.CraftWork(goods) * batches, false);
+        }
     }
 
     /// <summary>Puts Insight into a skill (the skills window), announcing any level it reaches.</summary>
@@ -241,12 +263,17 @@ public sealed class ExperienceTracker : MonoBehaviour, IGameSystem
         }
     }
 
+    // A building hammered up or upgraded trains Construction, by the level it reached (as its tier).
     private void OnConstructionFinished(Construction construction)
     {
-        if (Application.isPlaying)
+        if (!Application.isPlaying)
         {
-            GrantInsight(construction.Level <= 1 ? settings.BuildExperience : settings.UpgradeExperience);
+            return;
         }
+
+        int tier = Mathf.Max(1, construction.Level);
+        float work = construction.Level <= 1 ? settings.BuildWork : settings.UpgradeWork;
+        Practise(ProficiencyTraining.Construction, tier, settings.TierExperience(tier) * work);
     }
 
     // A node trains the skill of the tool it is gathered with, at the node's tier; one no skill trains gives Insight.

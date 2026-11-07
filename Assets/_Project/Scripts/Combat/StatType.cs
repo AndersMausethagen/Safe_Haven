@@ -71,4 +71,24 @@ public enum StatType
     AmbushDamage = 33,
     /// <summary>Share wider the zones on the lockpicking bar.</summary>
     LockpickZone = 34,
+    /// <summary>Chance from 0 to 1 that a weapon, tool or arrow the player makes comes out Fine; a share of that is Masterwork.</summary>
+    WeaponcraftQuality = 35,
+    /// <summary>Share of full durability a new weapon or tool the player makes starts with, less: -0.2 starts it at 80%.</summary>
+    WeaponcraftFinish = 36,
+    /// <summary>Chance from 0 to 1 that armour or a shield the player makes comes out Fine; a share of that is Masterwork.</summary>
+    ArmorcraftQuality = 37,
+    /// <summary>Share of full durability new armour the player makes starts with, less.</summary>
+    ArmorcraftFinish = 38,
+    /// <summary>Share longer the bonuses of meals the player eats last.</summary>
+    MealDuration = 39,
+    /// <summary>Chance from 0 to 1 of one more portion when the player cooks.</summary>
+    CookingYield = 40,
+    /// <summary>Share longer the bonuses of tonics the player drinks last.</summary>
+    TonicDuration = 41,
+    /// <summary>Chance from 0 to 1 of one more draught when the player brews.</summary>
+    AlchemyYield = 42,
+    /// <summary>Share faster the player hammers a building up.</summary>
+    BuildSpeed = 43,
+    /// <summary>Chance from 0 to 1 of one more plank, ingot or block when the player refines materials.</summary>
+    RefiningYield = 44,
 }

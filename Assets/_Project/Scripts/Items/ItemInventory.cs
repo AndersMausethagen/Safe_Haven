@@ -118,6 +118,34 @@ public sealed class ItemInventory : MonoBehaviour
         return added;
     }
 
+    /// <summary>Gives one piece just made, with its quality and condition (CraftedWork.Make), as Give gives a new item.
+    /// Returns how many arrived.</summary>
+    public int GiveMade(ItemStack made)
+    {
+        if (made.IsEmpty)
+        {
+            return 0;
+        }
+
+        if (!made.Item.KeepsCondition)
+        {
+            return Give(made.Item, made.Count);
+        }
+
+        int added = Container.AddStack(made);
+        if (added > 0)
+        {
+            Received?.Invoke(made.Item, added);
+            GameEvents.Raise(new GameEvent(GameEventKind.ItemObtained, made.Item, added, gameObject));
+            if (made.Item.IsEquippable && TryGetComponent(out PlayerEquipment equipment))
+            {
+                equipment.AutoEquip(made.Item);
+            }
+        }
+
+        return added;
+    }
+
     /// <summary>Offers several items and reports what was stored and what did not fit.</summary>
     public ItemGrantResult Give(IReadOnlyList<ItemAmount> items)
     {

@@ -57,6 +57,27 @@ public sealed class LevelingSettings : GameSettings<LevelingSettings>
     [Tooltip("A lock pin set in the silent zone.")]
     [SerializeField, Min(0)] private int silentPinExperience = 2;
 
+    [Header("Crafting")]
+    [Tooltip("Experience for one craft, in its item tier's experience: a weapon or a piece of armour is a day's work, a batch " +
+             "of arrows or planks a moment's.")]
+    [SerializeField, Min(0f)] private float weaponWork = 3f;
+    [SerializeField, Min(0f)] private float armorWork = 3f;
+    [SerializeField, Min(0f)] private float toolWork = 2f;
+    [SerializeField, Min(0f)] private float arrowWork = 0.5f;
+    [SerializeField, Min(0f)] private float mealWork = 1f;
+    [SerializeField, Min(0f)] private float tonicWork = 1.5f;
+    [SerializeField, Min(0f)] private float materialWork = 0.5f;
+    [Tooltip("A building hammered up, in the tier experience of its level (a ruin repaired counts as one).")]
+    [SerializeField, Min(0f)] private float buildWork = 4f;
+    [Tooltip("A building upgraded, in the tier experience of the level it reached.")]
+    [SerializeField, Min(0f)] private float upgradeWork = 6f;
+    [Tooltip("What a Fine piece is worth, in levels of empowering at the altar (its stats, weapon damage and gear score).")]
+    [SerializeField, Range(0f, 2f)] private float fineStrength = 0.5f;
+    [Tooltip("What a Masterwork piece is worth, in levels of empowering.")]
+    [SerializeField, Range(0f, 3f)] private float masterworkStrength = 1f;
+    [Tooltip("Share of a maker's quality chance that comes out Masterwork rather than Fine.")]
+    [SerializeField, Range(0f, 1f)] private float masterworkShare = 0.25f;
+
     [Header("Insight (put into any skill)")]
     [Tooltip("For a completed quest without its own Experience.")]
     [SerializeField, Min(0)] private int questExperience = 50;
@@ -65,12 +86,8 @@ public sealed class LevelingSettings : GameSettings<LevelingSettings>
     [SerializeField, Min(0)] private int raidFailedExperience = 40;
     [Tooltip("The first time each item is crafted.")]
     [SerializeField, Min(0)] private int firstCraftExperience = 10;
-    [Tooltip("A building hammered up (or a ruin repaired) at home.")]
-    [SerializeField, Min(0)] private int buildExperience = 15;
     [Tooltip("A fish landed.")]
     [SerializeField, Min(0)] private int catchExperience = 8;
-    [Tooltip("A building upgraded at home.")]
-    [SerializeField, Min(0)] private int upgradeExperience = 25;
     [Tooltip("A node no skill trains (a bush picked by hand).")]
     [SerializeField, Min(0)] private int handGatherExperience = 2;
     [Tooltip("1 Insight for this many square metres of new ground explored.")]
@@ -104,8 +121,9 @@ public sealed class LevelingSettings : GameSettings<LevelingSettings>
     public int RaidFailedExperience => raidFailedExperience;
     public int FirstCraftExperience => firstCraftExperience;
     public int HandGatherExperience => handGatherExperience;
-    public int BuildExperience => buildExperience;
-    public int UpgradeExperience => upgradeExperience;
+    public float BuildWork => buildWork;
+    public float UpgradeWork => upgradeWork;
+    public float MasterworkShare => masterworkShare;
     public int CatchExperience => catchExperience;
     public int ExploredCellsPerExperience => exploredCellsPerExperience;
     public int InsightStep => insightStep;
@@ -223,6 +241,45 @@ public sealed class LevelingSettings : GameSettings<LevelingSettings>
         foreach (ProficiencyDefinition skill in skills)
         {
             if (skill != null && skill.Id == id)
+            {
+                return skill;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>A craft's experience, in its item tier's experience, by the kind of goods.</summary>
+    public float CraftWork(CraftedGoods goods)
+    {
+        switch (goods)
+        {
+            case CraftedGoods.Weapons: return weaponWork;
+            case CraftedGoods.Armor: return armorWork;
+            case CraftedGoods.Tools: return toolWork;
+            case CraftedGoods.Arrows: return arrowWork;
+            case CraftedGoods.Meals: return mealWork;
+            case CraftedGoods.Tonics: return tonicWork;
+            case CraftedGoods.Materials: return materialWork;
+            default: return 0f;
+        }
+    }
+
+    /// <summary>What a better make is worth, in levels of empowering.</summary>
+    public float QualityStrength(ItemQuality quality) =>
+        quality == ItemQuality.Masterwork ? masterworkStrength : quality == ItemQuality.Fine ? fineStrength : 0f;
+
+    /// <summary>The crafting skill that making these goods trains, or null.</summary>
+    public ProficiencyDefinition SkillCrafting(CraftedGoods goods)
+    {
+        if (goods == CraftedGoods.None)
+        {
+            return null;
+        }
+
+        foreach (ProficiencyDefinition skill in skills)
+        {
+            if (skill != null && (skill.Crafts & goods) != 0)
             {
                 return skill;
             }

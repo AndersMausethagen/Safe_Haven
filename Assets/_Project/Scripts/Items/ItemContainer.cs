@@ -298,7 +298,7 @@ public sealed class ItemContainer
             return;
         }
 
-        Set(index, stack.IsEmpty ? ItemStack.Empty : new ItemStack(stack.Item, Mathf.Min(stack.Count, stack.Item.MaximumStack), stack.Durability, stack.Empower, stack.Enchantment));
+        Set(index, stack.IsEmpty ? ItemStack.Empty : new ItemStack(stack.Item, Mathf.Min(stack.Count, stack.Item.MaximumStack), stack.Durability, stack.Empower, stack.Enchantment, stack.Quality));
     }
 
     /// <summary>How many items are in the container, of every kind.</summary>

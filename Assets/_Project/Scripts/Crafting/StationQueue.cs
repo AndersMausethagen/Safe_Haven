@@ -277,6 +277,19 @@ public sealed class StationQueue
         OutputAmount += amount;
     }
 
+    /// <summary>Puts a little more of what was just made into the output slot (a practised hand's extra), if there is
+    /// room. Returns whether it went in.</summary>
+    public bool AddExtra(Object definition, int amount)
+    {
+        if (definition == null || amount <= 0 || SlotRoomFor(definition) < amount)
+        {
+            return false;
+        }
+
+        PutInSlot(definition, amount);
+        return true;
+    }
+
     /// <summary>Takes up to the given amount out of the output slot. Returns how many were taken.</summary>
     public int TakeOutput(int amount)
     {

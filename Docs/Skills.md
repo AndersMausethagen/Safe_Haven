@@ -34,6 +34,12 @@ The tuning the game had becomes level 10, reached around the first tier I raids.
 | Sneaking | Sneaking footsteps and lock noise | 130% | 100% | 60% |
 | | Visibility while sneaking (time to be spotted) | 118% (85%) | 100% | 71% (140%) |
 | | Lockpicking zone width | 80% | 100% | 130% |
+| Weaponcrafting / Armorcrafting | Condition new gear starts in | 75% | 100% | 100% |
+| | Chance of a better make (a quarter of it Masterwork) | 0 | 0 | 60% |
+| Cooking / Alchemy | How long meals / tonics last | 80% | 100% | 150% |
+| | Chance of one more portion / draught | 0 | 0 | +25% |
+| Construction | Hammering speed | 80% | 100% | 150% |
+| | Chance of one more plank, ingot or block | 0 | 0 | +20% |
 
 Movement, dodge and parry windows, invulnerability and attack cadence are never touched: a slow-feeling character is not a weak one.
 Melee damage scales every swing before backstabs and counters, so their order (plain 19, mid-strike backstab 26, counter 44, staggered
@@ -66,6 +72,23 @@ The action rate is an assumption, not a measurement: count real actions per raid
 | Mining | a node gathered with a pickaxe | same |
 | Melee | each weapon swing that hurts a monster: the share of the monster's worth (its Experience, or 0.25 per point of health) it took off its health; parries and perfect dodges, 3 tier I experience, five times per monster | `PlayerTraining` |
 | Sneaking | first blow on an unaware monster (8), sneaking for 6 s within a monster's sight before it spots you (4, three times per monster), a monster that hunted you losing track (10), a lock pin set silently (2) | `PlayerTraining` |
+| Weaponcrafting | a weapon (3), tool (2) or batch of arrows (0.5) made, in its item tier's experience | `ExperienceTracker.PractiseCraft` |
+| Armorcrafting | armour, a shield or a pack (3) | same |
+| Cooking | a meal (1) | same |
+| Alchemy | a tonic, cure or remedy (1.5) | same |
+| Construction | a building hammered up (4) or upgraded (6), in the tier experience of its level; a batch of planks, ingots, blocks or leather refined (0.5) | `OnConstructionFinished`, `PractiseCraft` |
+
+Crafting counts what the player makes by hand and what they order at a station, when it finishes; workers' orders train nobody,
+and the raid bonus never applies (an order that finishes while the player is away was made at home). Growing at the Farm Plot
+and the Beehive trains no craft (`CraftedWork.Of(recipe)`).
+
+## Better makes
+
+Gear the player makes rolls its quality when it is made by hand, or when they collect it from a station: **Fine** or **Masterwork**
+(`ItemStack.Quality`, saved and shared in co-op). A Fine piece is worth half a level of empowering at the altar (+10% of its stats,
++3% weapon damage, +5% gear score), a Masterwork a whole level (`LevelingSettings` › Fine and Masterwork Strength); it shows as
+"Fine Iron Sword" and in green in the tooltip. Raid tiers are tuned to plain gear, so a well made kit is a head start, not a
+requirement.
 
 Blows of other kinds (arrows, spells, traps) and nodes no skill trains give Insight until their skill exists.
 
@@ -77,7 +100,5 @@ to the suggested values (II x1.5, III x2.3, IV x3). A player whose skill keeps p
 
 ## Still to come
 
-- **Crafting skills:** Weaponcrafting, Armorcrafting, Cooking, Alchemy and Construction, from what the player makes (not workers' orders);
-  Fine and Masterwork items that raise gear score.
 - **The rest:** Foraging, Fishing, Archery and Runecraft, taking over the remaining Insight sources and the old Ranger and Runemaster talents.
 - Mentors (building upgrades that speed a skill), a rested bonus from beds and the Sauna.

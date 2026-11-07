@@ -19,6 +19,7 @@ MonoBehaviour:
   icon: {fileID: 0}
   group: 2
   training: 1
+  crafts: 0
   gatherTool: 0
   levelBonuses:
   - stat: 28

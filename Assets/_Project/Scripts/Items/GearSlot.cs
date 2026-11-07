@@ -277,6 +277,16 @@ public static class StatNames
             case StatType.SneakVisibility: return "Sneaking Visibility";
             case StatType.AmbushDamage: return "Ambush Damage";
             case StatType.LockpickZone: return "Lockpicking Zones";
+            case StatType.WeaponcraftQuality: return "Fine Weapon Chance";
+            case StatType.WeaponcraftFinish: return "New Weapon Condition";
+            case StatType.ArmorcraftQuality: return "Fine Armour Chance";
+            case StatType.ArmorcraftFinish: return "New Armour Condition";
+            case StatType.MealDuration: return "Meal Duration";
+            case StatType.CookingYield: return "Extra Portion Chance";
+            case StatType.TonicDuration: return "Tonic Duration";
+            case StatType.AlchemyYield: return "Extra Draught Chance";
+            case StatType.BuildSpeed: return "Building Speed";
+            case StatType.RefiningYield: return "Extra Refined Chance";
             default: return stat.ToString();
         }
     }

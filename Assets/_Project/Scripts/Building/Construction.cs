@@ -204,6 +204,9 @@ public sealed class Construction : MonoBehaviour, ISaveable, ISharedState, IStat
         look.BuildSite();
     }
 
+    // How fast whoever is hammering works: 1 is the building's Build Work in seconds (OnSiteStarted).
+    private float workSpeed = 1f;
+
     private void Start()
     {
         built = true;
@@ -219,7 +222,7 @@ public sealed class Construction : MonoBehaviour, ISaveable, ISharedState, IStat
             return;
         }
 
-        Work = Mathf.Min(WorkNeeded, Work + Time.deltaTime);
+        Work = Mathf.Min(WorkNeeded, Work + Time.deltaTime * workSpeed);
         ShowRise();
         if (Time.time >= nextBlow)
         {
@@ -245,7 +248,11 @@ public sealed class Construction : MonoBehaviour, ISaveable, ISharedState, IStat
             GameMessages.Post($"Repairing the {Definition.DisplayName}.");
         }
 
-        siteInteractable.Duration = Mathf.Max(0.1f, WorkNeeded - Work);
+        // The Construction skill: a beginner hammers slower, a master faster.
+        workSpeed = siteInteractable.Interactor != null && siteInteractable.Interactor.TryGetComponent(out Combatant builder)
+            ? Mathf.Max(0.25f, 1f + builder.Stats.Get(StatType.BuildSpeed))
+            : 1f;
+        siteInteractable.Duration = Mathf.Max(0.1f, (WorkNeeded - Work) / workSpeed);
         nextBlow = Time.time + 0.15f;
     }
 

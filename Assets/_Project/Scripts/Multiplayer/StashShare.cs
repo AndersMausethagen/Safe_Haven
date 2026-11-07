@@ -90,7 +90,7 @@ public sealed class StashShare
 
             if (kind.count > 0)
             {
-                var stack = new List<SlotSaveData> { new SlotSaveData { slot = -1, item = kind.item, count = kind.count, wear = kind.wear, empower = kind.empower, enchantment = kind.enchantment } };
+                var stack = new List<SlotSaveData> { new SlotSaveData { slot = -1, item = kind.item, count = kind.count, wear = kind.wear, empower = kind.empower, enchantment = kind.enchantment, quality = kind.quality } };
                 int before = stash.Items.Count(item);
                 SaveMapper.ReadSlots(stack, stash.Items, content, new List<string>());
                 if (stash.Items.Count(item) - before < kind.count)
@@ -150,6 +150,7 @@ public sealed class StashShare
         wear = 1f - stack.Durability,
         empower = stack.Empower,
         enchantment = stack.Enchantment != null ? stack.Enchantment.Id : "",
+        quality = (int)stack.Quality,
     };
 
     // ---- Guest
@@ -227,7 +228,7 @@ public sealed class StashShare
 
     // An item's kind: what it is and its condition, to the tenth of a percent of wear.
     private static string Key(SlotSaveData slot) =>
-        $"{slot.item}|{Mathf.RoundToInt(slot.wear * 1000f)}|{slot.empower}|{slot.enchantment ?? ""}";
+        $"{slot.item}|{Mathf.RoundToInt(slot.wear * 1000f)}|{slot.empower}|{slot.enchantment ?? ""}|{slot.quality}";
 
     private static SlotSaveData FromKey(string key)
     {
@@ -239,6 +240,7 @@ public sealed class StashShare
             wear = int.Parse(parts[1]) / 1000f,
             empower = int.Parse(parts[2]),
             enchantment = parts.Length > 3 ? parts[3] : "",
+            quality = parts.Length > 4 ? int.Parse(parts[4]) : 0,
         };
     }
 

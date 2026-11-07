@@ -351,6 +351,11 @@ public sealed class ItemTooltipView : MonoBehaviour
 
     private static void AppendEssenceWork(StringBuilder builder, ItemStack stack)
     {
+        foreach (StatBonus bonus in GearPower.QualityBonuses(stack.Item, stack.Quality, EssenceSettings.Current))
+        {
+            builder.Append($"\n<color={UIStyle.Current.GoodHex}>").Append(bonus.Describe()).Append($" ({stack.Quality.ToString().ToLowerInvariant()} make)</color>");
+        }
+
         foreach (StatBonus bonus in GearPower.EmpowerBonuses(stack.Item, stack.Empower, EssenceSettings.Current))
         {
             builder.Append($"\n<color={UIStyle.Current.AccentHex}>").Append(bonus.Describe()).Append(" (empowered)</color>");

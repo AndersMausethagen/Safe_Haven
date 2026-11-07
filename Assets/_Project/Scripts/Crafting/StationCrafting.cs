@@ -138,7 +138,17 @@ public static class StationCrafting
             taken = bag != null ? Mathf.Min(wanted, bag.Container.SpaceFor(item)) : 0;
             if (taken > 0)
             {
-                bag.Give(item, queue.TakeOutput(taken));
+                // Gear comes out as the one collecting it made it: its quality and condition from their crafting skill.
+                if (item.HasDurability)
+                {
+                    StatSheet maker = user.TryGetComponent(out Combatant combatant) ? combatant.Stats : null;
+                    taken = CraftedWork.GiveTo(bag, item, taken, maker);
+                    queue.TakeOutput(taken);
+                }
+                else
+                {
+                    bag.Give(item, queue.TakeOutput(taken));
+                }
             }
         }
         else if (output is ResourceDefinition resource)

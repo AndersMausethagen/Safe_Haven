@@ -146,6 +146,7 @@ public static class SaveMapper
             wear = 1f - stack.Durability,
             empower = stack.Empower,
             enchantment = stack.Enchantment != null ? stack.Enchantment.Id : "",
+            quality = (int)stack.Quality,
         };
     }
 
@@ -734,7 +735,7 @@ public static class SaveMapper
 
             EnchantmentDefinition enchantment = string.IsNullOrEmpty(slot.enchantment) ? null
                 : Resolve(EssenceSettings.Current.FindEnchantment(slot.enchantment), "enchantment", slot.enchantment, missing);
-            var stack = new ItemStack(item, slot.count, 1f - slot.wear, slot.empower, enchantment);
+            var stack = new ItemStack(item, slot.count, 1f - slot.wear, slot.empower, enchantment, (ItemQuality)Math.Max(0, Math.Min(slot.quality, 2)));
             if (into.IsValid(slot.slot) && into.GetSlot(slot.slot).IsEmpty)
             {
                 into.SetSlot(slot.slot, stack);

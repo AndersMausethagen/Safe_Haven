@@ -133,9 +133,11 @@ public sealed class PlayerEating : MonoBehaviour
             GameMessages.Post($"{item.DisplayName}: +{Mathf.RoundToInt(item.HealAmount)} health over {Rules.HealOverSeconds:0} s", MessageKind.Gain);
         }
 
-        if (item.HasBoon && boons != null && boons.Add(item.Id, item.DisplayName, item.BoonBonuses, item.BoonSeconds, !item.IsTonic))
+        // A cook knows how to make a meal last, an alchemist a tonic (the Cooking and Alchemy skills).
+        float boonSeconds = item.BoonSeconds * BoonScale(item);
+        if (item.HasBoon && boons != null && boons.Add(item.Id, item.DisplayName, item.BoonBonuses, boonSeconds, !item.IsTonic))
         {
-            GameMessages.Post($"{item.DisplayName}: {ItemTooltipView.DescribeBonuses(item.BoonBonuses)} for {RaidStats.FormatTime(item.BoonSeconds)}", MessageKind.Gain);
+            GameMessages.Post($"{item.DisplayName}: {ItemTooltipView.DescribeBonuses(item.BoonBonuses)} for {RaidStats.FormatTime(boonSeconds)}", MessageKind.Gain);
         }
 
         if (item.Cures.Count > 0 && TryGetComponent(out StatusEffects effects) && effects.Cure(item.Cures) > 0)
@@ -183,4 +185,9 @@ public sealed class PlayerEating : MonoBehaviour
         movement?.SetSpeedScale(this, 1f);
         Ended?.Invoke(item, eaten);
     }
+
+    private float BoonScale(ItemDefinition item) =>
+        TryGetComponent(out Combatant self)
+            ? Mathf.Max(0.1f, 1f + self.Stats.Get(item.IsTonic ? StatType.TonicDuration : StatType.MealDuration))
+            : 1f;
 }

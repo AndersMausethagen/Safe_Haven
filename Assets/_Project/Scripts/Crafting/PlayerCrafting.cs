@@ -256,7 +256,9 @@ public sealed class PlayerCrafting : MonoBehaviour
 
         if (recipe.Output != null)
         {
-            items.Give(recipe.Output, recipe.OutputAmount);
+            // Made by hand: quality, condition and any extra come from the player's crafting skill, which it trains.
+            CraftedWork.GiveTo(items, recipe.Output, recipe.OutputAmount, TryGetComponent(out Combatant self) ? self.Stats : null);
+            ExperienceTracker.PractiseCraft(recipe);
         }
         else
         {

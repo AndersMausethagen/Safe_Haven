@@ -293,6 +293,8 @@ public sealed class SlotSaveData
     public int empower;
     /// <summary>The enchantment's id, or empty.</summary>
     public string enchantment;
+    /// <summary>How well it was made (ItemQuality). Missing in older saves, where everything was plain.</summary>
+    public int quality;
 }
 
 [Serializable]

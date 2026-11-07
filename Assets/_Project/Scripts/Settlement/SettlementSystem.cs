@@ -81,9 +81,30 @@ public sealed class SettlementSystem : MonoBehaviour, IGameSystem
                 GameSession.Settlement.NoteMadeByWorker(made, recipe.OutputAmount);
             }
         }
-        else if (station.IsIdle)
+        else
         {
-            GameMessages.Post($"The {station.Type.DisplayName()} finished {recipe.DisplayName}.", MessageKind.Gain);
+            PlayerOrderFinished(station, recipe);
+            if (station.IsIdle)
+            {
+                GameMessages.Post($"The {station.Type.DisplayName()} finished {recipe.DisplayName}.", MessageKind.Gain);
+            }
+        }
+    }
+
+    // The player's own order: it trains their crafting skill, and a practised hand may get one more out of it (an extra
+    // portion, draught or plank, into the output slot while there is room). Gear gets its quality when it is collected.
+    private static void PlayerOrderFinished(StationQueue station, RecipeDefinition recipe)
+    {
+        if (recipe.Output == null)
+        {
+            return;
+        }
+
+        ExperienceTracker.PractiseCraft(recipe);
+        StatSheet maker = Player.Current != null && Player.Current.Combatant != null ? Player.Current.Combatant.Stats : null;
+        if (!recipe.Output.HasDurability && UnityEngine.Random.value < CraftedWork.ExtraChance(CraftedWork.Of(recipe), maker))
+        {
+            station.AddExtra(recipe.Output, 1);
         }
     }
 

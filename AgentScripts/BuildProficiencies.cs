@@ -3,7 +3,7 @@ using UnityEditor;
 using UnityEngine;
 
 /// <summary>
-/// The skills that replaced the character level and talents (`unity command script run --file AgentScripts/BuildProficiencies.cs --entry BuildProficiencies.Apply`):
+/// The skills that replaced the character level and talents (gathering, crafting, combat, stealth) (`unity command script run --file AgentScripts/BuildProficiencies.cs --entry BuildProficiencies.Apply`):
 /// Resources/LevelingSettings (the curve, the baseline level the game was tuned for, experience per action and Insight),
 /// each skill in Data/Proficiencies with its level bonuses and milestones, and their perks in Data/Proficiencies/Perks. The talents of
 /// the four trees (Data/Talents) are removed: their bonuses live on as perks. See Docs/Skills.md for why these numbers.
@@ -22,7 +22,12 @@ public static class BuildProficiencies
         EnsureFolder("Assets/_Project/Data", "Proficiencies");
         EnsureFolder(Folder, "Perks");
 
-        var skills = new List<ProficiencyDefinition> { Woodcutting(), Mining(), Melee(), Sneaking() };
+        var skills = new List<ProficiencyDefinition>
+        {
+            Woodcutting(), Mining(),
+            Weaponcrafting(), Armorcrafting(), Cooking(), Alchemy(), Construction(),
+            Melee(), Sneaking(),
+        };
         string settings = Settings(skills);
         string talents = AssetDatabase.IsValidFolder(OldTalents) && AssetDatabase.DeleteAsset(OldTalents) ? "old talents removed" : "no old talents";
         AssetDatabase.SaveAssets();
@@ -80,6 +85,144 @@ public static class BuildProficiencies
         Milestone(50,
             Perk("mine_master_miner", "Master Miner", "One blow, and the rock opens like a book.", Bonus(StatType.MineSweetSpot, 25 * Pct), Bonus(StatType.MineYield, 5 * Pct)),
             Perk("mine_iron_arms", "Iron Arms", "Hauling stone builds more than walls.", Bonus(StatType.Strength, 3f))));
+
+    // ----- Crafting -----
+
+    private static ProficiencyDefinition Weaponcrafting() => Skill("weaponcrafting", "Weaponcrafting",
+        "Edges, hafts and fletching: the feel of a good balance and a true line.",
+        "making weapons, tools and arrows", ProficiencyGroup.Crafting, ProficiencyTraining.Crafting, ToolType.None,
+        new[]
+        {
+            // A beginner's work starts worn; from the baseline on, some of it comes out Fine (a quarter of that Masterwork).
+            Level(StatType.WeaponcraftFinish, -25 * Pct, 0f),
+            Level(StatType.WeaponcraftQuality, 0f, 60 * Pct),
+        },
+        new[]
+        {
+            Milestone(10,
+                Perk("weapon_keen_grind", "Keen Grind", "A whetstone and patience.", Bonus(StatType.WeaponcraftQuality, 8 * Pct)),
+                Perk("weapon_tool_maker", "Tool Maker", "A haft that fits the hand wears the edge less.", Bonus(StatType.ToolCare, 15 * Pct))),
+            Milestone(20,
+                Perk("weapon_balanced_blades", "Balanced Blades", "You know where the weight should sit.", Bonus(StatType.PhysicalCritChance, 3 * Pct)),
+                Perk("weapon_true_fletching", "True Fletching", "Straight shafts, even feathers.", Bonus(StatType.DrawSpeed, 8 * Pct))),
+            Milestone(30,
+                Perk("weapon_smiths_eye", "Smith's Eye", "The colour of the steel tells you when.", Bonus(StatType.WeaponcraftQuality, 10 * Pct)),
+                Perk("weapon_know_your_steel", "Know Your Steel", "You made it; you know what it can do.", Bonus(StatType.MeleeDamage, 4 * Pct))),
+            Milestone(40,
+                Perk("weapon_hammer_arm", "Hammer Arm", "A thousand blows on the anvil.", Bonus(StatType.Strength, 3f)),
+                Perk("weapon_siege_smith", "Siege Smith", "Heads made for doors and walls.", Bonus(StatType.StructureDamage, 20 * Pct))),
+            Milestone(50,
+                Perk("weapon_master_smith", "Master Smith", "Others bring their blades to you.", Bonus(StatType.WeaponcraftQuality, 15 * Pct)),
+                Perk("weapon_runed_edges", "Runed Edges", "A mark cut into the fuller, for luck.", Bonus(StatType.PhysicalCritDamage, 15 * Pct))),
+        }, CraftedGoods.Weapons | CraftedGoods.Tools | CraftedGoods.Arrows);
+
+    private static ProficiencyDefinition Armorcrafting() => Skill("armorcrafting", "Armorcrafting",
+        "Leather, cloth, rings and plates: what turns a blow, and what lets you move.",
+        "making armour, shields and packs", ProficiencyGroup.Crafting, ProficiencyTraining.Crafting, ToolType.None,
+        new[]
+        {
+            Level(StatType.ArmorcraftFinish, -25 * Pct, 0f),
+            Level(StatType.ArmorcraftQuality, 0f, 60 * Pct),
+        },
+        new[]
+        {
+            Milestone(10,
+                Perk("armor_even_stitches", "Even Stitches", "Small, tight, every one the same.", Bonus(StatType.ArmorcraftQuality, 8 * Pct)),
+                Perk("armor_padded_lining", "Padded Lining", "Wool under the leather.", Bonus(StatType.MaxHealth, 10f))),
+            Milestone(20,
+                Perk("armor_fitted_plates", "Fitted Plates", "Made to your own shape.", Bonus(StatType.Armor, 6f)),
+                Perk("armor_light_harness", "Light Harness", "Straps where they don't bind.", Bonus(StatType.MoveSpeed, 2 * Pct))),
+            Milestone(30,
+                Perk("armor_armourers_eye", "Armourer's Eye", "You see the weak rivet before it gives.", Bonus(StatType.ArmorcraftQuality, 10 * Pct)),
+                Perk("armor_warm_furs", "Warm Furs", "Fur on the inside, where it counts.", Bonus(StatType.FrostResistance, 8 * Pct))),
+            Milestone(40,
+                Perk("armor_proofed_leather", "Proofed Leather", "Boiled, waxed and boiled again.", Bonus(StatType.PhysicalResistance, 4 * Pct)),
+                Perk("armor_ward_stitching", "Ward Stitching", "Old signs sewn into the hem.", Bonus(StatType.FireResistance, 6 * Pct), Bonus(StatType.HolyResistance, 6 * Pct))),
+            Milestone(50,
+                Perk("armor_master_armourer", "Master Armourer", "Others come to be measured.", Bonus(StatType.ArmorcraftQuality, 15 * Pct)),
+                Perk("armor_second_skin", "Second Skin", "You forget you are wearing it.", Bonus(StatType.Armor, 10f), Bonus(StatType.MaxHealth, 10f))),
+        }, CraftedGoods.Armor);
+
+    private static ProficiencyDefinition Cooking() => Skill("cooking", "Cooking",
+        "Fire, pot and patience: food that fills you and keeps you going.",
+        "cooking at the campfire and the kitchen", ProficiencyGroup.Crafting, ProficiencyTraining.Crafting, ToolType.None,
+        new[]
+        {
+            Level(StatType.MealDuration, -20 * Pct, 50 * Pct),
+            Level(StatType.CookingYield, 0f, 25 * Pct),
+        },
+        new[]
+        {
+            Milestone(10,
+                Perk("cook_hearty_portions", "Hearty Portions", "Always enough for one more.", Bonus(StatType.CookingYield, 8 * Pct)),
+                Perk("cook_slow_simmer", "Slow Simmer", "The longer it cooks, the longer it lasts.", Bonus(StatType.MealDuration, 15 * Pct))),
+            Milestone(20,
+                Perk("cook_trail_rations", "Trail Rations", "Food that walks with you.", Bonus(StatType.MaxStamina, 8f)),
+                Perk("cook_good_broth", "Good Broth", "Bones, roots and time.", Bonus(StatType.MaxHealth, 10f))),
+            Milestone(30,
+                Perk("cook_spice_lore", "Spice Lore", "A pinch of the right thing.", Bonus(StatType.MealDuration, 20 * Pct)),
+                Perk("cook_feast_maker", "Feast Maker", "Cook for one, feed four.", Bonus(StatType.CookingYield, 12 * Pct))),
+            Milestone(40,
+                Perk("cook_strong_stomach", "Strong Stomach", "Nothing you ate ever did you harm.", Bonus(StatType.MaxHealth, 15f)),
+                Perk("cook_hunters_table", "Hunter's Table", "Lean meat, light step.", Bonus(StatType.MoveSpeed, 2 * Pct))),
+            Milestone(50,
+                Perk("cook_hearth_master", "Hearth Master", "The Haven gathers where you cook.", Bonus(StatType.MealDuration, 25 * Pct), Bonus(StatType.CookingYield, 5 * Pct)),
+                Perk("cook_iron_gut", "Iron Gut", "A full belly is a deep breath.", Bonus(StatType.MaxStamina, 15f))),
+        }, CraftedGoods.Meals);
+
+    private static ProficiencyDefinition Alchemy() => Skill("alchemy", "Alchemy",
+        "Herbs, essences and the cauldron: draughts that turn a fight and cures that save a life.",
+        "brewing tonics and remedies", ProficiencyGroup.Crafting, ProficiencyTraining.Crafting, ToolType.None,
+        new[]
+        {
+            Level(StatType.TonicDuration, -20 * Pct, 50 * Pct),
+            Level(StatType.AlchemyYield, 0f, 25 * Pct),
+        },
+        new[]
+        {
+            Milestone(10,
+                Perk("alch_steady_hand", "Steady Hand", "Not a drop spilled.", Bonus(StatType.AlchemyYield, 8 * Pct)),
+                Perk("alch_long_brew", "Long Brew", "Let it steep another night.", Bonus(StatType.TonicDuration, 15 * Pct))),
+            Milestone(20,
+                Perk("alch_bitter_root", "Bitter Root", "A taste that keeps out the cold and the flame.", Bonus(StatType.FireResistance, 5 * Pct), Bonus(StatType.FrostResistance, 5 * Pct)),
+                Perk("alch_distiller", "Distiller", "Every drop wrung out.", Bonus(StatType.AlchemyYield, 10 * Pct))),
+            Milestone(30,
+                Perk("alch_rune_steeping", "Rune Steeping", "Words spoken over the pot.", Bonus(StatType.SpellPower, 4f)),
+                Perk("alch_lasting_draughts", "Lasting Draughts", "The warmth stays in the blood.", Bonus(StatType.TonicDuration, 20 * Pct))),
+            Milestone(40,
+                Perk("alch_cursed_lore", "Cursed Lore", "You know where the curse gathers.", Bonus(StatType.EssenceFind, 10 * Pct)),
+                Perk("alch_holy_water", "Holy Water", "Drawn from the Haven's well at dawn.", Bonus(StatType.HolyResistance, 8 * Pct))),
+            Milestone(50,
+                Perk("alch_master_alchemist", "Master Alchemist", "The cauldron does what you ask.", Bonus(StatType.TonicDuration, 25 * Pct), Bonus(StatType.AlchemyYield, 5 * Pct)),
+                Perk("alch_spell_distillation", "Spell Distillation", "A rune in a bottle.", Bonus(StatType.SpellCritChance, 5 * Pct))),
+        }, CraftedGoods.Tonics);
+
+    private static ProficiencyDefinition Construction() => Skill("construction", "Construction",
+        "Beams, stone and joinery: raising the Haven, and readying what it is built from.",
+        "hammering buildings up and refining planks, ingots and blocks", ProficiencyGroup.Crafting, ProficiencyTraining.Construction, ToolType.None,
+        new[]
+        {
+            Level(StatType.BuildSpeed, -20 * Pct, 50 * Pct),
+            Level(StatType.RefiningYield, 0f, 20 * Pct),
+        },
+        new[]
+        {
+            Milestone(10,
+                Perk("build_quick_hammer", "Quick Hammer", "Three blows where others need five.", Bonus(StatType.BuildSpeed, 12 * Pct)),
+                Perk("build_careful_saw", "Careful Saw", "Measure twice.", Bonus(StatType.RefiningYield, 8 * Pct))),
+            Milestone(20,
+                Perk("build_builders_back", "Builder's Back", "Beams on the shoulder all day.", Bonus(StatType.MaxStamina, 10f)),
+                Perk("build_wreckers_eye", "Wrecker's Eye", "Who knows how it stands knows how it falls.", Bonus(StatType.StructureDamage, 15 * Pct))),
+            Milestone(30,
+                Perk("build_master_joiner", "Master Joiner", "Nothing wasted, every offcut used.", Bonus(StatType.RefiningYield, 10 * Pct)),
+                Perk("build_raise_the_roof", "Raise the Roof", "Up before sundown.", Bonus(StatType.BuildSpeed, 15 * Pct))),
+            Milestone(40,
+                Perk("build_hearth_keeper", "Hearth Keeper", "The Haven keeps you as you keep it.", Bonus(StatType.MaxHealth, 10f)),
+                Perk("build_sapper", "Sapper", "Find the keystone, pull it.", Bonus(StatType.StructureDamage, 20 * Pct))),
+            Milestone(50,
+                Perk("build_master_builder", "Master Builder", "The Haven stands in your hands' shape.", Bonus(StatType.BuildSpeed, 25 * Pct), Bonus(StatType.RefiningYield, 5 * Pct)),
+                Perk("build_stone_skin", "Stone Skin", "Hard as the walls you raise.", Bonus(StatType.Armor, 8f))),
+        }, CraftedGoods.Materials);
 
     // ----- Combat -----
 
@@ -173,6 +316,18 @@ public static class BuildProficiencies
         so.FindProperty("silentPinExperience").intValue = 2;
         so.FindProperty("handGatherExperience").intValue = 2;
         so.FindProperty("insightStep").intValue = 100;
+        so.FindProperty("weaponWork").floatValue = 3f;
+        so.FindProperty("armorWork").floatValue = 3f;
+        so.FindProperty("toolWork").floatValue = 2f;
+        so.FindProperty("arrowWork").floatValue = 0.5f;
+        so.FindProperty("mealWork").floatValue = 1f;
+        so.FindProperty("tonicWork").floatValue = 1.5f;
+        so.FindProperty("materialWork").floatValue = 0.5f;
+        so.FindProperty("buildWork").floatValue = 4f;
+        so.FindProperty("upgradeWork").floatValue = 6f;
+        so.FindProperty("fineStrength").floatValue = 0.5f;
+        so.FindProperty("masterworkStrength").floatValue = 1f;
+        so.FindProperty("masterworkShare").floatValue = 0.25f;
         if (so.FindProperty("levelUpSound").objectReferenceValue == null)
         {
             so.FindProperty("levelUpSound").objectReferenceValue =
@@ -190,7 +345,12 @@ public static class BuildProficiencies
     // ----- Helpers -----
 
     private static ProficiencyDefinition Skill(string id, string label, string text, string trainedBy, ProficiencyGroup group,
-        ProficiencyTraining training, ToolType tool, ProficiencyDefinition.LevelBonus[] bonuses, params ProficiencyDefinition.Milestone[] milestones)
+        ProficiencyTraining training, ToolType tool, ProficiencyDefinition.LevelBonus[] bonuses, params ProficiencyDefinition.Milestone[] milestones) =>
+        Skill(id, label, text, trainedBy, group, training, tool, bonuses, milestones, CraftedGoods.None);
+
+    private static ProficiencyDefinition Skill(string id, string label, string text, string trainedBy, ProficiencyGroup group,
+        ProficiencyTraining training, ToolType tool, ProficiencyDefinition.LevelBonus[] bonuses, ProficiencyDefinition.Milestone[] milestones,
+        CraftedGoods goods)
     {
         string path = $"{Folder}/{label.Replace(" ", "")}.asset";
         var skill = AssetDatabase.LoadAssetAtPath<ProficiencyDefinition>(path);
@@ -200,7 +360,7 @@ public static class BuildProficiencies
             AssetDatabase.CreateAsset(skill, path);
         }
 
-        skill.Configure(id, label, text, trainedBy, group, training, tool, bonuses, milestones);
+        skill.Configure(id, label, text, trainedBy, group, training, tool, bonuses, milestones, goods);
         EditorUtility.SetDirty(skill);
         return skill;
     }
