@@ -18,6 +18,10 @@ public sealed class ExtractionPoint : MonoBehaviour, IInteractionCondition, IInt
 {
     private static readonly List<ExtractionPoint> active = new List<ExtractionPoint>();
 
+    // Entering Play doesn't reload scripts in this project, so statics are cleared when it starts.
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => active.Clear();
+
     [SerializeField] private string displayName = "Extraction";
     [Tooltip("Seconds to hold when no raid is running, such as a scene without a RaidDirector.")]
     [SerializeField, Min(RaidParameters.MinimumExtractionTime)] private float fallbackSeconds = 5f;

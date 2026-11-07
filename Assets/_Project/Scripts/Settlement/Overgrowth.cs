@@ -16,6 +16,10 @@ public sealed class Overgrowth : MonoBehaviour
 {
     private static readonly List<Overgrowth> all = new List<Overgrowth>();
 
+    // Entering Play doesn't reload scripts in this project, so statics are cleared when it starts.
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => all.Clear();
+
     [Tooltip("Metres of dead ground around it, healed when it is cleared.")]
     [SerializeField, Min(0.3f)] private float blightRadius = 1.6f;
     [SerializeField] private Material blightMaterial;

@@ -35,6 +35,10 @@ public sealed class SaveableEntity : MonoBehaviour
     private const float WalkerDrift = 3f;
 
     private static readonly List<SaveableEntity> live = new List<SaveableEntity>();
+
+    // Entering Play doesn't reload scripts in this project, so statics are cleared when it starts.
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => live.Clear();
     private static string pendingSpawnId;
 
     private ISaveable[] saveables = Array.Empty<ISaveable>();

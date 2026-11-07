@@ -19,6 +19,10 @@ public sealed class PersistentScene : MonoBehaviour
 
     private static readonly List<PersistentScene> active = new List<PersistentScene>();
 
+    // Entering Play doesn't reload scripts in this project, so statics are cleared when it starts.
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => active.Clear();
+
     /// <summary>The state this scene reads and writes. It belongs to the GameSession's world at the time the scene loaded.</summary>
     public SceneState State { get; private set; }
 

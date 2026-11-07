@@ -90,6 +90,10 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
     private Talkable talkable;
     private static readonly List<QuestGiver> active = new List<QuestGiver>();
 
+    // Entering Play doesn't reload scripts in this project, so statics are cleared when it starts.
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => active.Clear();
+
     /// <summary>Every enabled giver, for the maps.</summary>
     public static IReadOnlyList<QuestGiver> Active => active;
     /// <summary>What the giver's floating mark shows now, and for which quest (null: its own).</summary>

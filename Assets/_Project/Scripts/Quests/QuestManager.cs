@@ -36,14 +36,13 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
         }
     }
 
-    private static QuestManager instance;
 
     private ContentDatabase content;
     private QuestLog log;
     private readonly List<QuestDefinition> pendingRewards = new List<QuestDefinition>();
     private readonly List<WaitingQuest> waiting = new List<WaitingQuest>();
 
-    public static QuestManager Current => instance;
+    public static QuestManager Current { get; private set; }
 
     /// <summary>When the next story beat may come. Stories ask it before speaking.</summary>
     public StoryPacing Pacing { get; } = new StoryPacing();
@@ -77,7 +76,7 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
     /// <summary>Called once by GameSystems when the game starts.</summary>
     public void Initialise(ContentDatabase database)
     {
-        instance = this;
+        Current = this;
         content = database;
         GameEvents.Raised += OnGameEvent;
     }
@@ -86,9 +85,9 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
     {
         GameEvents.Raised -= OnGameEvent;
         Unbind();
-        if (instance == this)
+        if (Current == this)
         {
-            instance = null;
+            Current = null;
         }
     }
 

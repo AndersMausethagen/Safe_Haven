@@ -12,6 +12,10 @@ public sealed class VisibilitySource : MonoBehaviour
 {
     private static readonly List<VisibilitySource> active = new List<VisibilitySource>();
 
+    // Entering Play doesn't reload scripts in this project, so statics are cleared when it starts.
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => active.Clear();
+
     [Tooltip("Metres around it that are seen clearly, even at night.")]
     [SerializeField, Min(0f)] private float radius = 10f;
     [Tooltip("Share of the radius over which it fades out at the edge.")]

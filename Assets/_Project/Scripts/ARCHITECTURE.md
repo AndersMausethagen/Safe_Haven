@@ -482,7 +482,10 @@ play mode). Use `SceneLoader.Load` for gameplay scene changes so saveable object
 **Reaching a system.** Every scene or game singleton is reached the same way: `public static X Current { get; private
 set; }`, set when it wakes or is enabled, cleared when it goes (only if it is still the current one), and reset by a
 `[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]` hook, because domain reload is off.
-There is no `Instance`. Settings assets are `XSettings.Current` too. `Player.Current` is the local player; in co-op a
+No system is reached through an `Instance` (a private copy made on first use, as `BloodEffects` and `PrefabPool`
+keep, is their own business). Settings assets are `XSettings.Current` too. A static list, set or table is cleared by
+the same hook; a static event isn't (Editor tools listen to some and wouldn't subscribe again), so whatever subscribes
+to one in the game unsubscribes. `ConventionTests` checks all of these. `Player.Current` is the local player; in co-op a
 friend is a puppet, so code acting for whoever did something uses the object it was given (the `user` of an
 interaction, a hit's `Source`) rather than `Player.Current`.
 

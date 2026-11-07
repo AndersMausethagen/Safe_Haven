@@ -19,6 +19,10 @@ public sealed class QuestWaypoint : MonoBehaviour
 {
     private static readonly List<QuestWaypoint> active = new List<QuestWaypoint>();
 
+    // Entering Play doesn't reload scripts in this project, so statics are cleared when it starts.
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => active.Clear();
+
     [SerializeField] private QuestDefinition quest;
     [Tooltip("Only while this objective (1 is the first) is open. 0: for the whole quest.")]
     [SerializeField, Min(0)] private int objective;

@@ -8,6 +8,10 @@ using UnityEngine;
 public sealed class TerrainMist : MonoBehaviour
 {
     private static readonly List<TerrainMist> active = new List<TerrainMist>();
+
+    // Entering Play doesn't reload scripts in this project, so statics are cleared when it starts.
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => active.Clear();
     private Terrain terrain;
 
     [Tooltip("Extinction per metre inside the mist clouds. Zero disables this layer without changing the scene fog.")]

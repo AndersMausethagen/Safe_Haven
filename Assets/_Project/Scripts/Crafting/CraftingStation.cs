@@ -105,6 +105,10 @@ public sealed class CraftingStation : MonoBehaviour
 
     private static readonly List<CraftingStation> active = new List<CraftingStation>();
 
+    // Entering Play doesn't reload scripts in this project, so statics are cleared when it starts.
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => active.Clear();
+
     [SerializeField] private CraftingStationType type = CraftingStationType.Workbench;
     [Tooltip("Fixed id for the station's queue in saves. Leave empty to use the SaveableEntity id.")]
     [SerializeField] private string stationId;

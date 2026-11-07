@@ -9,6 +9,10 @@ public sealed class MistVolume : MonoBehaviour
 {
     private static readonly List<MistVolume> active = new List<MistVolume>();
 
+    // Entering Play doesn't reload scripts in this project, so statics are cleared when it starts.
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => active.Clear();
+
     [Header("Volume")]
     [Tooltip("Local width, height and depth in metres. The pivot is the bottom centre: place it on the ground or water surface and the mist rises Size.y above it. Rotation and scale are supported.")]
     [SerializeField] private Vector3 size = new Vector3(20f, 3f, 14f);

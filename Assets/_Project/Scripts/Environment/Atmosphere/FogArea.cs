@@ -13,6 +13,10 @@ public sealed class FogArea : MonoBehaviour
 {
     private static readonly List<FogArea> active = new List<FogArea>();
 
+    // Entering Play doesn't reload scripts in this project, so statics are cleared when it starts.
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => active.Clear();
+
     [Tooltip("Extra fog density at the heart of the area (extinction per metre), on top of the scene's fog.")]
     [SerializeField, Range(0f, 0.5f)] private float density = 0.06f;
     [Tooltip("Half its width, in metres.")]

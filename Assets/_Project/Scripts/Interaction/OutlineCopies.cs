@@ -27,6 +27,10 @@ public static class OutlineCopies
 
     private static readonly HashSet<Renderer> Copies = new HashSet<Renderer>();
 
+    // Entering Play doesn't reload scripts in this project, so statics are cleared when it starts.
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => Copies.Clear();
+
     /// <summary>True for the copies made here, so one outline never outlines another's copies.</summary>
     public static bool IsCopy(Renderer renderer) => Copies.Contains(renderer);
 

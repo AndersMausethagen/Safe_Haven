@@ -32,6 +32,10 @@ public sealed class Companion : MonoBehaviour, IConversationTopics, IQuestPerson
 
     private static readonly List<Companion> active = new List<Companion>();
 
+    // Entering Play doesn't reload scripts in this project, so statics are cleared when it starts.
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => active.Clear();
+
     [SerializeField] private CompanionDefinition definition;
     [Tooltip("Who they are: the name used when they are knocked down.")]
     [SerializeField, QuestIdentity] private ResidentDefinition resident;

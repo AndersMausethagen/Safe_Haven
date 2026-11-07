@@ -24,6 +24,14 @@ public sealed class SlashEffect : MonoBehaviour
     private static readonly Dictionary<int, Mesh> Meshes = new Dictionary<int, Mesh>();
     private static readonly Stack<SlashEffect> Idle = new Stack<SlashEffect>();
 
+    // Entering Play doesn't reload scripts in this project, so statics are cleared when it starts.
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession()
+    {
+        Meshes.Clear();
+        Idle.Clear();
+    }
+
     private Mesh mesh;
     private Material material;
     private MaterialPropertyBlock block;

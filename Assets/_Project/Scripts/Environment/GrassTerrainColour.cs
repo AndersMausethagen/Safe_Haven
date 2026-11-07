@@ -15,7 +15,6 @@ public sealed class GrassTerrainColour : MonoBehaviour
     private static readonly int MapId = Shader.PropertyToID("_GrassTerrainColor");
     private static readonly int RectId = Shader.PropertyToID("_GrassTerrainRect");
     private static readonly int OnId = Shader.PropertyToID("_GrassTerrainColorOn");
-    private static GrassTerrainColour current;
 
     public Texture2D ColourMap
     {
@@ -27,12 +26,12 @@ public sealed class GrassTerrainColour : MonoBehaviour
         }
     }
 
-    public static GrassTerrainColour Current => current;
+    public static GrassTerrainColour Current { get; private set; }
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetForNewPlaySession()
     {
-        current = null;
+        Current = null;
         Shader.SetGlobalFloat(OnId, 0f);
     }
 
@@ -40,9 +39,9 @@ public sealed class GrassTerrainColour : MonoBehaviour
 
     private void OnDisable()
     {
-        if (current == this)
+        if (Current == this)
         {
-            current = null;
+            Current = null;
             Shader.SetGlobalFloat(OnId, 0f);
         }
     }
@@ -62,7 +61,7 @@ public sealed class GrassTerrainColour : MonoBehaviour
         TerrainData data = GetComponent<Terrain>().terrainData;
         if (colourMap == null || data == null)
         {
-            if (current == this || current == null) Shader.SetGlobalFloat(OnId, 0f);
+            if (Current == this || Current == null) Shader.SetGlobalFloat(OnId, 0f);
             return;
         }
 
@@ -72,6 +71,6 @@ public sealed class GrassTerrainColour : MonoBehaviour
         Shader.SetGlobalVector(RectId, new Vector4(position.x, position.z, 1f / Mathf.Max(size.x, 1e-3f),
                                                    1f / Mathf.Max(size.z, 1e-3f)));
         Shader.SetGlobalFloat(OnId, 1f);
-        current = this;
+        Current = this;
     }
 }

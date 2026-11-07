@@ -14,6 +14,10 @@ public sealed class AtmosphereLight : MonoBehaviour
 {
     private static readonly List<AtmosphereLight> active = new List<AtmosphereLight>();
 
+    // Entering Play doesn't reload scripts in this project, so statics are cleared when it starts.
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => active.Clear();
+
     [Tooltip("Multiplies how strongly this light glows in the fog.")]
     [SerializeField, Min(0f)] private float fogStrength = 1f;
     [Tooltip("Radius in metres where this point light pushes back fog, terrain mist and shaft particles. Limited to the Light's range. Zero disables clearing.")]

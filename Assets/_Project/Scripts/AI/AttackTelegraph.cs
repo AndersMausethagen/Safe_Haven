@@ -20,6 +20,10 @@ public sealed class AttackTelegraph : MonoBehaviour
     // One unit-radius fan per arc, shared by every monster.
     private static readonly Dictionary<int, Mesh> Fans = new Dictionary<int, Mesh>();
 
+    // Entering Play doesn't reload scripts in this project, so statics are cleared when it starts.
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => Fans.Clear();
+
     [Tooltip("Height of the marker above the monster's feet, so it doesn't flicker into the ground.")]
     [SerializeField, Min(0f)] private float groundOffset = 0.06f;
 

@@ -14,6 +14,10 @@ public sealed class WitherSpot : MonoBehaviour
     private static readonly int SpotsId = Shader.PropertyToID("_SafeHavenWither");
     private static readonly int CountId = Shader.PropertyToID("_SafeHavenWitherCount");
     private static readonly List<WitherSpot> active = new List<WitherSpot>();
+
+    // Entering Play doesn't reload scripts in this project, so statics are cleared when it starts.
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => active.Clear();
     private static readonly Vector4[] spots = new Vector4[Max];
     private static int lastFrame = -1;
 

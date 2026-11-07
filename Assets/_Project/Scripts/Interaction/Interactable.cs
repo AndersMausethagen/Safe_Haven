@@ -19,6 +19,10 @@ public sealed class Interactable : MonoBehaviour
 {
     private static readonly List<Interactable> active = new List<Interactable>();
 
+    // Entering Play doesn't reload scripts in this project, so statics are cleared when it starts.
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => active.Clear();
+
     [SerializeField] private InteractionAnimation animationType = InteractionAnimation.GatherLow;
     [Tooltip("Seconds of work until the interaction completes. 0 keeps going until Complete() is called.")]
     [SerializeField, Min(0f)] private float duration = 3f;

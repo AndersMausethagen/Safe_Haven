@@ -164,8 +164,15 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
             }
         }
     }
-    private static AudioManager instance;
     private static readonly Dictionary<AudioChannel, float> volumes = new Dictionary<AudioChannel, float>();
+
+    // Entering Play doesn't reload scripts in this project, so statics are cleared when it starts.
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession()
+    {
+        Current = null;
+        volumes.Clear();
+    }
     private static float masterVolume = 1f;
     private static float dipLevel;
     private float roomHeldUntil;
@@ -188,10 +195,10 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
     private bool restartCombatMusic;
     private bool enemyChasing;
 
-    public static AudioManager Current => instance;
+    public static AudioManager Current { get; private set; }
 
     /// <summary>The game-wide sounds and audio rules (null before the game has started its systems).</summary>
-    public static AudioSettingsDefinition Sounds => instance != null ? instance.settings : null;
+    public static AudioSettingsDefinition Sounds => Current != null ? Current.settings : null;
 
     /// <summary>Whether the music thinks the player is fighting.</summary>
     public AudioMood Mood { get; private set; } = AudioMood.Exploring;
@@ -215,7 +222,7 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
     /// <summary>How far music and ambience are dipped right now to make room: 1 is not at all. Effects carry what the player has to hear, so they stay.</summary>
     private static float RoomMade(AudioChannel channel)
     {
-        if (instance == null)
+        if (Current == null)
         {
             return 1f;
         }
@@ -223,9 +230,9 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
         switch (channel)
         {
             case AudioChannel.Music:
-                return AudioDucking.Scale(dipLevel, instance.settings.MusicWhileSpeaking);
+                return AudioDucking.Scale(dipLevel, Current.settings.MusicWhileSpeaking);
             case AudioChannel.Ambience:
-                return AudioDucking.Scale(dipLevel, instance.settings.AmbienceWhileSpeaking);
+                return AudioDucking.Scale(dipLevel, Current.settings.AmbienceWhileSpeaking);
             default:
                 return 1f;
         }
@@ -256,9 +263,9 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
     {
         get
         {
-            if (instance != null && instance.ears != null && instance.ears.enabled)
+            if (Current != null && Current.ears != null && Current.ears.enabled)
             {
-                return instance.ears.transform.position;
+                return Current.ears.transform.position;
             }
 
             Camera view = Camera.main;
@@ -278,16 +285,16 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
     /// <summary>The volume a steady sound should sit at (a loop that follows the sliders), before any fade of its own.</summary>
     public static float SteadyVolume(SoundDefinition sound)
     {
-        float world = sound.Positional && instance != null ? instance.settings.WorldSoundsLevel : 1f;
+        float world = sound.Positional && Current != null ? Current.settings.WorldSoundsLevel : 1f;
         return sound.Volume * ChannelVolume(sound.Channel) * world;
     }
 
     /// <summary>Plays a sound once at a position. Safe to call with no sound or before the manager exists.</summary>
     public static void Play(SoundDefinition sound, Vector3 position)
     {
-        if (instance != null)
+        if (Current != null)
         {
-            instance.PlayEffect(sound, position);
+            Current.PlayEffect(sound, position);
         }
     }
 
@@ -297,9 +304,9 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
     /// </summary>
     public static void Play(SoundDefinition sound, Vector3 position, float size)
     {
-        if (instance != null)
+        if (Current != null)
         {
-            instance.PlayEffect(sound, position, size);
+            Current.PlayEffect(sound, position, size);
         }
     }
 
@@ -312,9 +319,9 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
     /// <summary>Sets up an audio source the way a sound asks: volume, pitch, 2D or 3D and distances.</summary>
     public static void Configure(AudioSource source, SoundDefinition sound)
     {
-        float world = sound.Positional && instance != null ? instance.settings.WorldSoundsLevel : 1f;
+        float world = sound.Positional && Current != null ? Current.settings.WorldSoundsLevel : 1f;
         // Birds and footsteps give way too, as they start: a sound already under way is too short to be worth following.
-        float room = sound.Priority == SoundPriority.Background && instance != null ? AudioDucking.Scale(dipLevel, instance.settings.BackgroundWhileSpeaking) : 1f;
+        float room = sound.Priority == SoundPriority.Background && Current != null ? AudioDucking.Scale(dipLevel, Current.settings.BackgroundWhileSpeaking) : 1f;
         source.volume = sound.PickVolume() * ChannelVolume(sound.Channel) * world * room;
         source.pitch = sound.PickPitch();
         source.spatialBlend = sound.Positional ? 1f : 0f;
@@ -329,7 +336,7 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
     /// <summary>Called once by GameSystems when the game starts.</summary>
     public void Initialise(AudioSettingsDefinition loaded)
     {
-        instance = this;
+        Current = this;
         settings = loaded;
         dipLevel = 0f;
         masterVolume = PlayerPrefs.GetFloat(VolumeKey + "Master", settings.MasterVolume);
@@ -353,9 +360,9 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
         GameEvents.Raised -= OnGameEvent;
         WatchPlayer(null);
         AudioListener.pause = false;
-        if (instance == this)
+        if (Current == this)
         {
-            instance = null;
+            Current = null;
         }
     }
 

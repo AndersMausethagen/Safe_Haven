@@ -22,6 +22,10 @@ public sealed class StashChest : MonoBehaviour
     [SerializeField, Min(0)] private int stashSlots;
 
     private static readonly List<StashChest> standing = new List<StashChest>();
+
+    // Entering Play doesn't reload scripts in this project, so statics are cleared when it starts.
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => standing.Clear();
     private Interactable interactable;
 
     /// <summary>Stash slots this chest gives room for (all of them for 0).</summary>

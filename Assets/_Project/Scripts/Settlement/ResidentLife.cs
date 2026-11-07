@@ -312,6 +312,10 @@ public sealed class ResidentLife : MonoBehaviour
     // Places someone may walk out to on a day off work: the waystones and the lakeshore, near enough home and away
     // from where creatures gather. Found once per scene.
     private static readonly List<(Vector3 at, Vector3 lookAt)> OutingSpots = new List<(Vector3, Vector3)>();
+
+    // Entering Play doesn't reload scripts in this project, so statics are cleared when it starts.
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => OutingSpots.Clear();
     private static UnityEngine.SceneManagement.Scene outingSpotsScene;
 
     private bool GoingOut(float hour, out Vector3 to, out Quaternion facingThere)

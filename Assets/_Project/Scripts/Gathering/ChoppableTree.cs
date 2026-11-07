@@ -16,6 +16,10 @@ public sealed class ChoppableTree : MonoBehaviour, IHarvestBody
     private const float ChopHeight = 1.1f;
     private static readonly List<ChoppableTree> enabledTrees = new List<ChoppableTree>();
 
+    // Entering Play doesn't reload scripts in this project, so statics are cleared when it starts.
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => enabledTrees.Clear();
+
     private readonly List<ItemAmount> logs = new List<ItemAmount>();
     private Interactable interactable;
     private ResourceSource source;
