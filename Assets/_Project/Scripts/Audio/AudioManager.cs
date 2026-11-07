@@ -188,7 +188,7 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
     private bool restartCombatMusic;
     private bool enemyChasing;
 
-    public static AudioManager Instance => instance;
+    public static AudioManager Current => instance;
 
     /// <summary>The game-wide sounds and audio rules (null before the game has started its systems).</summary>
     public static AudioSettingsDefinition Sounds => instance != null ? instance.settings : null;

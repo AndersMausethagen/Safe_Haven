@@ -63,7 +63,7 @@ public sealed class WorldAudio
             uiState.AnyWindowOpenChanged -= OnWindowsChanged;
         }
 
-        uiState = UIStateManager.Instance;
+        uiState = UIStateManager.Current;
         if (uiState != null)
         {
             uiState.AnyWindowOpenChanged += OnWindowsChanged;

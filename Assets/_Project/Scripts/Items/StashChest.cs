@@ -120,9 +120,9 @@ public sealed class StashChest : MonoBehaviour
             return;
         }
 
-        if (window == null && UIStateManager.Instance != null)
+        if (window == null && UIStateManager.Current != null)
         {
-            window = UIStateManager.Instance.Find<StashWindow>(UIWindowId.Stash);
+            window = UIStateManager.Current.Find<StashWindow>(UIWindowId.Stash);
         }
 
         if (window == null)

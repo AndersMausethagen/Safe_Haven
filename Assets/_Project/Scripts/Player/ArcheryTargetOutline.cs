@@ -35,7 +35,7 @@ public sealed class ArcheryTargetOutline : MonoBehaviour
 
     private void LateUpdate()
     {
-        bool visible = !GamePause.IsPaused && (UIStateManager.Instance == null || !UIStateManager.Instance.IsAnyWindowOpen);
+        bool visible = !GamePause.IsPaused && (UIStateManager.Current == null || !UIStateManager.Current.IsAnyWindowOpen);
         Damageable target = visible && archery.isActiveAndEnabled ? archery.Target : null;
         if (target != shown)
         {

@@ -75,7 +75,7 @@ public static class ProbeStories
         WitherSpot wither = stone.GetComponent<WitherSpot>();
         var zone = GameObject.Find("Out of the Stone").GetComponent<MobSpawnZone>();
         QuestDefinition quest = Resources.FindObjectsOfTypeAll<QuestDefinition>().FirstOrDefault(q => q.name == "TheWakingStone");
-        string questState = QuestManager.Instance != null && quest != null ? QuestManager.Instance.Log.StatusOf(quest).ToString() : "?";
+        string questState = QuestManager.Current != null && quest != null ? QuestManager.Current.Log.StatusOf(quest).ToString() : "?";
         return $"dialogue: \"{line}\" | weather: {(weather != null ? "rain " + weather.Current.Rain.ToString("F2") : "none")} | camera focus: {(focus != null ? focus.name : "-")} | " +
                $"stone glow {(glow != null ? glow.intensity.ToString("F1") : "-")}, wither {(wither != null ? wither.Amount.ToString("F2") : "-")}, usable {stone.GetComponent<Interactable>().enabled} | " +
                $"wolves alive {zone.AliveCount} | quest {questState}";

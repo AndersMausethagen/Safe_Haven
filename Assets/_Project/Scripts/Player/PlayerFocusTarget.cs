@@ -67,7 +67,7 @@ public sealed class PlayerFocusTarget : MonoBehaviour
 
     private void Update()
     {
-        gameState = gameState != null ? gameState : GameStateManager.Instance;
+        gameState = gameState != null ? gameState : GameStateManager.Current;
         bool inCombat = gameState != null && gameState.CurrentState == GameState.Combat;
         if (!inCombat || !CanFocus)
         {

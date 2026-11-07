@@ -244,7 +244,7 @@ public sealed class PlayerAnimationController : MonoBehaviour
             guard.Broken += OnGuardBroken;
         }
 
-        gameState = GameStateManager.Instance;
+        gameState = GameStateManager.Current;
         if (gameState == null)
         {
             return;

@@ -174,7 +174,7 @@ public sealed class PlayerCameraController : MonoBehaviour
     {
         Current = this;
 
-        gameState = GameStateManager.Instance;
+        gameState = GameStateManager.Current;
         GameState state = GameState.Exploration;
         if (gameState != null)
         {
@@ -188,7 +188,7 @@ public sealed class PlayerCameraController : MonoBehaviour
 
         SnapToProfile(settings.GetProfile(state));
 
-        uiState = UIStateManager.Instance;
+        uiState = UIStateManager.Current;
         if (uiState == null)
         {
             Debug.LogWarning("PlayerCameraController found no UIStateManager; the camera stays controllable while UI is open.", this);

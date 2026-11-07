@@ -70,7 +70,7 @@ public sealed class WorldInteractionIndicator : MonoBehaviour
     {
         viewCamera = viewCamera != null && viewCamera.isActiveAndEnabled ? viewCamera : Camera.main;
         if (interactor == null || !interactor.isActiveAndEnabled || (health != null && !health.IsAlive) || IsOccupied
-            || (UIStateManager.Instance != null && UIStateManager.Instance.IsAnyWindowOpen) || viewCamera == null)
+            || (UIStateManager.Current != null && UIStateManager.Current.IsAnyWindowOpen) || viewCamera == null)
         {
             Hide();
         }

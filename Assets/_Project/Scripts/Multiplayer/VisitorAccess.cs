@@ -208,7 +208,7 @@ public sealed class VisitorAccess : ICoopPart
                 Send(StashChangeMessage, NetworkManager.ServerClientId, WorldTransfer.Pack(change));
             }
 
-            StashWindow window = UIStateManager.Instance != null ? UIStateManager.Instance.Find<StashWindow>(UIWindowId.Stash) : null;
+            StashWindow window = UIStateManager.Current != null ? UIStateManager.Current.Find<StashWindow>(UIWindowId.Stash) : null;
             if (window != null)
             {
                 window.Close();

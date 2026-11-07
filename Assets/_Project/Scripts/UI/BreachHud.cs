@@ -71,7 +71,7 @@ public sealed class BreachHud : MonoBehaviour
     {
         WardBreachDirector breach = WardBreachDirector.Current;
         bool running = breach != null && breach.IsActive;
-        bool windows = UIStateManager.Instance != null && UIStateManager.Instance.IsAnyWindowOpen;
+        bool windows = UIStateManager.Current != null && UIStateManager.Current.IsAnyWindowOpen;
         group.alpha = running && !windows && !GamePause.IsPaused ? 1f : 0f;
         if (!running)
         {

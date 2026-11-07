@@ -261,7 +261,7 @@ public sealed class PlayerSkills : MonoBehaviour
             pendingHitAt = now + hitAfter + skill.Attack.HitDelay;
             busyUntil = Mathf.Max(busyUntil, pendingHitAt);
             pendingDirection = direction;
-            GameStateManager gameState = GameStateManager.Instance;
+            GameStateManager gameState = GameStateManager.Current;
             if (gameState != null)
             {
                 gameState.TrySetState(GameState.Combat);

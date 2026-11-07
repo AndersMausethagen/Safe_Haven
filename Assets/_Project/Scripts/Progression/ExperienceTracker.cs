@@ -13,7 +13,7 @@ public sealed class ExperienceTracker : MonoBehaviour, IGameSystem
     private LevelingSettings settings;
     private int exploredCells;
 
-    public static ExperienceTracker Instance { get; private set; }
+    public static ExperienceTracker Current { get; private set; }
 
     /// <summary>Raised with each amount of experience gained (the experience bar shows it).</summary>
     public static event Action<int> Gained;
@@ -21,7 +21,7 @@ public sealed class ExperienceTracker : MonoBehaviour, IGameSystem
     public void Initialise(LevelingSettings levelingSettings)
     {
         settings = levelingSettings;
-        Instance = this;
+        Current = this;
         GameEvents.Raised += OnGameEvent;
         ResourceSource.Harvested += OnHarvested;
         ExplorationMap.Explored += OnExplored;
@@ -34,9 +34,9 @@ public sealed class ExperienceTracker : MonoBehaviour, IGameSystem
         ResourceSource.Harvested -= OnHarvested;
         ExplorationMap.Explored -= OnExplored;
         Construction.Finished -= OnConstructionFinished;
-        if (Instance == this)
+        if (Current == this)
         {
-            Instance = null;
+            Current = null;
         }
     }
 
@@ -61,7 +61,7 @@ public sealed class ExperienceTracker : MonoBehaviour, IGameSystem
             return;
         }
 
-        LevelingSettings rules = Instance != null ? Instance.settings : LevelingSettings.Current;
+        LevelingSettings rules = Current != null ? Current.settings : LevelingSettings.Current;
         CharacterProgress progress = GameSession.Progress;
         int levels = progress.AddExperience(amount, rules);
         Gained?.Invoke(amount);

@@ -133,7 +133,7 @@ public sealed class SoundEditorWindow : EditorWindow
 
     private void DrawNowPlaying()
     {
-        AudioManager audio = AudioManager.Instance;
+        AudioManager audio = AudioManager.Current;
         using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
         {
             if (audio == null)

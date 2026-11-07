@@ -267,7 +267,7 @@ public sealed class CraftingStation : MonoBehaviour
             CharacterGestures.Play(user.transform, CharacterCatalog.Current.SitAtFire);
         }
 
-        StationWindow stationWindow = UIStateManager.Instance != null ? UIStateManager.Instance.Find<StationWindow>(UIWindowId.Station) : null;
+        StationWindow stationWindow = UIStateManager.Current != null ? UIStateManager.Current.Find<StationWindow>(UIWindowId.Station) : null;
         if (stationWindow != null)
         {
             // Pages such as the repair list come back here with "Back to the ..."; the station window replaces them.

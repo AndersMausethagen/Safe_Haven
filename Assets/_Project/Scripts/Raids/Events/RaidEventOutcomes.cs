@@ -203,7 +203,7 @@ public sealed class SpawnCreaturesOutcome : RaidEventOutcome
             GameObject root = Object.Instantiate(prefab, hit.position, Quaternion.Euler(0f, yaw, 0f));
             if (context.Director != null)
             {
-                context.Director.PrepareSpawned(root, hunt);
+                context.Director.Creatures.Prepare(root, hunt);
             }
         }
     }
@@ -336,7 +336,7 @@ public sealed class RescueResidentOutcome : RaidEventOutcome
         }
 
         RescuableTraveler freed = RescuableTraveler.Spawn(traveler, resident, spot, null);
-        context.Director?.PrepareSpawned(freed.gameObject, false);
+        context.Director?.Creatures.Prepare(freed.gameObject, false);
     }
 }
 
@@ -346,7 +346,7 @@ public sealed class StandTheLostOutcome : RaidEventOutcome
 {
     public override string DisplayName => "The Lost Stand Here";
 
-    public override void Apply(RaidEventContext context) => context.Director?.StandLostAt(context.Position);
+    public override void Apply(RaidEventContext context) => context.Director?.Companions.StandLostAt(context.Position);
 }
 
 /// <summary>Whoever stands here follows the player: they come home only if they reach an exit alive with them. The rest stays as it was.</summary>
@@ -355,7 +355,7 @@ public sealed class LeadTheLostOutcome : RaidEventOutcome
 {
     public override string DisplayName => "Lead the Lost Home";
 
-    public override void Apply(RaidEventContext context) => context.Director?.LeadLostHome();
+    public override void Apply(RaidEventContext context) => context.Director?.Companions.LeadLostHome();
 }
 
 /// <summary>A blow against what is behind the next ward breach: it comes shorter of fighters, and weaker.</summary>

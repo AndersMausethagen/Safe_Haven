@@ -349,9 +349,9 @@ public sealed class PauseMenu : MonoBehaviour
     {
         Close();
         JournalWindow.Create();
-        if (UIStateManager.Instance != null)
+        if (UIStateManager.Current != null)
         {
-            UIStateManager.Instance.RequestToggle(UIWindowId.Journal);
+            UIStateManager.Current.RequestToggle(UIWindowId.Journal);
         }
     }
 

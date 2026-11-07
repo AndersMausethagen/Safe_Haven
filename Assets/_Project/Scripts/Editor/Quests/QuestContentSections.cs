@@ -217,7 +217,7 @@ public sealed class QuestSection : ContentSection
         DrawSelectInOpenScenes(quest);
         ContentUtility.EndPanel();
 
-        if (EditorApplication.isPlaying && QuestManager.Instance != null)
+        if (EditorApplication.isPlaying && QuestManager.Current != null)
         {
             DrawPlaytest(quest);
         }
@@ -225,10 +225,10 @@ public sealed class QuestSection : ContentSection
 
     private void DrawPlaytest(QuestDefinition quest)
     {
-        QuestLog log = QuestManager.Instance.Log;
+        QuestLog log = QuestManager.Current.Log;
         QuestLog.Entry entry = log.Get(quest);
         ContentUtility.BeginPanel("Play Test", "The game is running: this quest's state for the current player.");
-        EditorGUILayout.LabelField("Status", QuestManager.Instance.IsWaiting(quest) ? "Waiting for its moment" : log.StatusOf(quest).ToString());
+        EditorGUILayout.LabelField("Status", QuestManager.Current.IsWaiting(quest) ? "Waiting for its moment" : log.StatusOf(quest).ToString());
         if (entry != null)
         {
             for (int i = 0; i < entry.Counts.Length; i++)
@@ -243,7 +243,7 @@ public sealed class QuestSection : ContentSection
             {
                 if (GUILayout.Button("Start Now"))
                 {
-                    if (!QuestManager.Instance.TryStartQuest(quest, out string reason))
+                    if (!QuestManager.Current.TryStartQuest(quest, out string reason))
                     {
                         Host.Notify(reason);
                     }
@@ -254,7 +254,7 @@ public sealed class QuestSection : ContentSection
             {
                 if (GUILayout.Button(new GUIContent("Turn In Now", "Hands it in as if the player returned to the giver.")))
                 {
-                    if (!QuestManager.Instance.TryTurnIn(quest, out string reason))
+                    if (!QuestManager.Current.TryTurnIn(quest, out string reason))
                     {
                         Host.Notify(reason);
                     }

@@ -52,7 +52,7 @@ public sealed class WorldMapHud : MonoBehaviour
             return;
         }
 
-        if (GamePause.IsPaused || (UIStateManager.Instance != null && UIStateManager.Instance.IsAnyWindowOpen))
+        if (GamePause.IsPaused || (UIStateManager.Current != null && UIStateManager.Current.IsAnyWindowOpen))
         {
             return;
         }
@@ -286,7 +286,7 @@ public sealed class WorldMapHud : MonoBehaviour
     // Where the quests want the player, then who else has a quest for them, unless a waypoint already marks them.
     private void PlaceQuestMarks(float width, float height)
     {
-        QuestLog log = QuestManager.Instance != null ? QuestManager.Instance.Log : GameSession.Quests;
+        QuestLog log = QuestManager.Current != null ? QuestManager.Current.Log : GameSession.Quests;
         QuestMarkerSettings settings = QuestMarkerSettings.Current;
         int used = PlaceRaidMarks(width, height);
         marked.Clear();

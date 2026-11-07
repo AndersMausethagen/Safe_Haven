@@ -13,6 +13,8 @@ using UnityEngine.SceneManagement;
 /// to the full-screen results (RaidResultsScreen) and from there home. The clock only starts once the scene is generated
 /// and the loading screen lifts (SceneTransition.WhenReady). A scene played straight from the
 /// editor runs a test raid from the fallback definition. Systems in the raid read its rules through <see cref="Current"/>.
+/// Its parts: <see cref="RaidCreatures"/> (the creatures' strength, hunting and waking) and <see cref="RaidCompanions"/>
+/// (who came along and the lost one).
 /// </summary>
 [DisallowMultipleComponent]
 [DefaultExecutionOrder(-50)]
@@ -38,6 +40,12 @@ public sealed class RaidDirector : MonoBehaviour
 
     /// <summary>The raid running in the loaded scene, or null outside raids.</summary>
     public static RaidDirector Current { get; private set; }
+
+    /// <summary>The people with the player: the resident who came along and the lost one found out here.</summary>
+    public RaidCompanions Companions { get; private set; }
+
+    /// <summary>The raid's creatures readied: strength, hunting, waiting groups woken.</summary>
+    public RaidCreatures Creatures { get; private set; }
 
     public RaidSession Session { get; private set; }
     public RaidParameters Parameters => Session.Parameters;
@@ -88,6 +96,8 @@ public sealed class RaidDirector : MonoBehaviour
         }
 
         Current = this;
+        Companions = new RaidCompanions(this);
+        Creatures = new RaidCreatures(this);
 
         // The raid's own systems (roaming spawns and the like, set up in the Systems Editor) are added here; every raid
         // scene also sleeps far idle creatures (global raid rules).
@@ -152,8 +162,8 @@ public sealed class RaidDirector : MonoBehaviour
         }
 
         running = true;
-        StrengthenEnemies(true);
-        BringCompanion();
+        Creatures.StrengthenAll(true);
+        Companions.BringCompanion();
         var pieceRandom = new System.Random(RaidLayout.SeedFor(Session.Seed, "Set Piece Guards"));
         // Following the host (co-op), their game brings the guards from the same seed.
         foreach (RaidSetPieceSite site in CreatureSource.Remote == null ? FindObjectsByType<RaidSetPieceSite>(FindObjectsInactive.Exclude) : System.Array.Empty<RaidSetPieceSite>())
@@ -169,92 +179,6 @@ public sealed class RaidDirector : MonoBehaviour
         }
 
         GameMessages.Post($"{Session.Definition.DisplayName}: grab what you can and reach an extraction within {RaidStats.FormatTime(Session.TimeRemaining)}.");
-    }
-
-    // They walk in beside the player. Fights grow with the raid's tier and so do they, so they stay as much help as they are in the first.
-    private void BringCompanion()
-    {
-        Companion prefab = SettlementSettings.Current.RaidCompanionPrefab;
-        if (Session.Companion == null || Session.Companion.RaidCompanion == null || prefab == null || player == null)
-        {
-            return;
-        }
-
-        Vector3 beside = player.transform.position - player.transform.forward * 2f + player.transform.right * 1.5f;
-        if (!UnityEngine.AI.NavMesh.SamplePosition(beside, out UnityEngine.AI.NavMeshHit hit, 8f, UnityEngine.AI.NavMesh.AllAreas))
-        {
-            Debug.LogWarning($"Nowhere for {Session.Companion.DisplayName} to stand; they stayed at home.", this);
-            return;
-        }
-
-        Companion = Companion.SpawnForRaid(prefab, Session.Companion, hit.position);
-        Companion.FormationOffset = new Vector3(2f, 0f, -3f);
-        ResidentRecord record = GameSession.Settlement.Find(Session.Companion);
-        Toughen(Companion, record != null ? CompanionBond.RankFor(record.RaidsAlong, SettlementSettings.Current.BondRanks) : null);
-    }
-
-    private void Toughen(Companion who, CompanionBondRank rank)
-    {
-        StatSheet stats = who.GetComponent<Combatant>().Stats;
-        float tougher = rank != null ? rank.healthBonus : 0f;
-        float harder = rank != null ? rank.damageBonus : 0f;
-        stats.AddModifier(new StatModifier(StatType.MaxHealth, StatModifierOp.Percent, PowerMultiplier * (1f + tougher) - 1f, this));
-        stats.AddModifier(new StatModifier(StatType.DamageBonus, StatModifierOp.Flat, HealthMultiplier * (1f + harder) - 1f, this));
-        Damageable body = who.GetComponent<Damageable>();
-        body.Heal(body.MaxHealth);
-    }
-
-    /// <summary>Whoever is lost longest stands here, waiting, as a rumour said they would.</summary>
-    public void StandLostAt(Vector3 position)
-    {
-        FallenRecord lost = GameSession.Settlement.LostToFind;
-        Companion prefab = SettlementSettings.Current.RaidCompanionPrefab;
-        if (lost == null || prefab == null || LostOne != null)
-        {
-            return;
-        }
-
-        Vector3 beside = position + Vector3.right * 2f;
-        if (!UnityEngine.AI.NavMesh.SamplePosition(beside, out UnityEngine.AI.NavMeshHit hit, 8f, UnityEngine.AI.NavMesh.AllAreas))
-        {
-            Debug.LogWarning($"Nowhere for {lost.Resident.DisplayName} to stand; they weren't found this raid.", this);
-            return;
-        }
-
-        LostOne = Companion.SpawnForRaid(prefab, lost.Resident, hit.position);
-        LostOne.FormationOffset = new Vector3(-2f, 0f, -3f);
-        Toughen(LostOne, null);
-        LostOne.StandLost();
-    }
-
-    /// <summary>The player has found them. They follow without knowing why.</summary>
-    public void LeadLostHome()
-    {
-        if (LostOne != null)
-        {
-            LostOneFollows = true;
-            LostOne.FollowWhoFoundThem();
-            GameMessages.Post(string.Format(SettlementSettings.Current.FoundFollowLine, LostOne.DisplayName), MessageKind.Gain);
-        }
-    }
-
-    // Home only with the player, alive and close by: they don't know the way. Never found, nothing has changed.
-    private void SettleTheLost(bool extracted)
-    {
-        if (LostOne == null || !LostOneFollows)
-        {
-            return;
-        }
-
-        bool close = player != null && Vector3.Distance(player.transform.position, LostOne.transform.position) <= SettlementSettings.Current.FoundComesHomeWithin;
-        if (extracted && close && !LostOne.IsLost && !LostOne.IsDowned && GameSession.Settlement.FindAgain(LostOne.Resident))
-        {
-            Report.FoundAgain = LostOne.Resident;
-        }
-        else
-        {
-            Report.LeftBehind = LostOne.Resident;
-        }
     }
 
     private void OnDestroy()
@@ -305,7 +229,7 @@ public sealed class RaidDirector : MonoBehaviour
     {
         StageIndex = index;
         RaidStage stage = CurrentStage;
-        StrengthenEnemies(false);
+        Creatures.StrengthenAll(false);
         if (stage != null)
         {
             GameMessages.Post(string.IsNullOrWhiteSpace(stage.Message) ? $"{stage.DisplayName}." : stage.Message, MessageKind.Warning);
@@ -315,111 +239,11 @@ public sealed class RaidDirector : MonoBehaviour
         {
             foreach (SpawnGroup group in generator.SpawnStage(index))
             {
-                Prepare(group);
+                Creatures.PrepareGroup(group);
             }
         }
 
         StageChanged?.Invoke(index, stage);
-    }
-
-    /// <summary>
-    /// Fills a waiting spawn group now (an extraction alarm, a scripted event) with this raid's seed and rules: its
-    /// creatures get the raid's and the current stage's strength, and hunt the player if the group says so. Returns how
-    /// many were spawned; 0 when the group had already spawned or the scene has no RaidGenerator. Co-op, on the host's
-    /// run, the host's game fills it (<see cref="CreatureSource.Remote"/>), after this player; the least it rolls is returned.
-    /// <paramref name="prey"/>: whom a hunting group goes for (a friend's body in the host's game); the player by default.
-    /// </summary>
-    public int Wake(SpawnGroup group, IDamageable prey = null)
-    {
-        if (group == null || group.HasSpawned || generator == null || Session.IsOver)
-        {
-            return 0;
-        }
-
-        if (CreatureSource.Remote != null)
-        {
-            group.MarkSpawned();
-            return CreatureSource.Remote.Wake(group) ? Mathf.Max(1, group.MinCount) : 0;
-        }
-
-        // A group filled by a raid spawn list fills the whole list, possibly onto other groups' points too.
-        IReadOnlyList<GameObject> spawned = generator.SpawnNow(group);
-        if (group.Trigger == SpawnTrigger.Alarm)
-        {
-            AlarmsRaised++;
-        }
-
-        int count = 0;
-        foreach (GameObject root in spawned)
-        {
-            if (root != null)
-            {
-                count++;
-                PrepareSpawned(root, group.HuntPlayer, true, prey);
-            }
-        }
-
-        return count;
-    }
-
-    /// <summary>How many alarm spawn groups have been woken this raid (extraction alarms). Roaming spawns grow with it.</summary>
-    public int AlarmsRaised { get; private set; }
-
-    private int Prepare(SpawnGroup group)
-    {
-        int count = 0;
-        foreach (GameObject spawned in group.Spawned)
-        {
-            if (spawned == null)
-            {
-                continue;
-            }
-
-            count++;
-            PrepareSpawned(spawned, group.HuntPlayer);
-        }
-
-        return count;
-    }
-
-    /// <summary>
-    /// Gives creatures spawned mid-raid (a pack root and all its members included) the raid's and the current stage's
-    /// strength at full health, and when <paramref name="huntPlayer"/> is set sends them straight at the player.
-    /// </summary>
-    /// <param name="mayBeElite">Off for what a creature summons: a swarm of elites would be no fun, and no reward.</param>
-    /// <param name="prey">Whom they hunt instead of the player (co-op: a friend's body, for what the friend woke).</param>
-    public void PrepareSpawned(GameObject root, bool huntPlayer, bool mayBeElite = true, IDamageable prey = null)
-    {
-        if (root == null)
-        {
-            return;
-        }
-
-        foreach (Combatant combatant in root.GetComponentsInChildren<Combatant>(true))
-        {
-            if (combatant.Faction == Faction.Enemy)
-            {
-                Strengthen(combatant, true);
-            }
-        }
-
-        if (huntPlayer && mayBeElite)
-        {
-            RaidElites.RollHunter(Session, root, HealthMultiplier, PowerMultiplier);
-        }
-
-        IDamageable hunted = prey is UnityEngine.Object body && body != null ? prey : playerHealth;
-        if (!huntPlayer || hunted == null)
-        {
-            return;
-        }
-
-        foreach (MonsterAI ai in root.GetComponentsInChildren<MonsterAI>())
-        {
-            ai.PlayerOnly = true;
-            ai.Relentless = true;
-            ai.Engage(hunted);
-        }
     }
 
     /// <summary>Ends the raid as extracted, if it is still running and the user is the player. Called by extraction points.</summary>
@@ -469,25 +293,7 @@ public sealed class RaidDirector : MonoBehaviour
             PlayerTransport.Current.LeaveRaid(Report, extracted);
         }
 
-        if (Session.Companion != null)
-        {
-            Report.Companion = Session.Companion;
-            // Down when the raid ends is as lost as bleeding out: nobody went back for them.
-            Report.CompanionLost = Companion != null && (Companion.IsLost || Companion.IsDowned);
-            if (Report.CompanionLost)
-            {
-                GameSession.Settlement.LoseResident(Session.Companion, Session.Definition.DisplayName);
-            }
-            else if (Companion != null)
-            {
-                bool rose = GameSession.Settlement.RecordRaidAlong(Session.Companion, SettlementSettings.Current.BondRanks, extracted, Session.BossesBeaten,
-                    Companion.TimesHelpedUp, Session.TimeRemaining, Companion.Kills, SettlementSettings.Current.MemoryReturnsEvery);
-                ResidentRecord record = GameSession.Settlement.Find(Session.Companion);
-                Report.CompanionNewRank = rose ? CompanionBond.RankFor(record.RaidsAlong, SettlementSettings.Current.BondRanks)?.name : null;
-            }
-        }
-
-        SettleTheLost(extracted);
+        Companions.Settle(Report, extracted);
         GameSession.EndRaid(Report);
         SaveGameService.SaveOnceHome();
         GameEvents.Raise(new GameEvent(GameEventKind.RaidFinished, Session.Definition, 1, null, Session.Outcome, Session.Elapsed));
@@ -563,66 +369,15 @@ public sealed class RaidDirector : MonoBehaviour
         return !string.IsNullOrEmpty(scene) && Application.CanStreamedLevelBeLoaded(scene);
     }
 
-    // The raid's enemy multipliers times the current stage's bonus and what the hour adds.
+    // The raid's enemy multipliers times the current stage's bonus and what the hour adds: the raid's rules right now,
+    // applied by Creatures and kept up with by Companions.
     /// <summary>The raid's enemy health multiplier right now.</summary>
-    /// <summary>Who came along on this raid, once they have walked in.</summary>
-    public Companion Companion { get; private set; }
-
-    /// <summary>Someone lost on an earlier raid, standing where a rumour said. Null when nobody is out there or they had nowhere to stand.</summary>
-    public Companion LostOne { get; private set; }
-
-    /// <summary>The player has found them, and they are coming along.</summary>
-    public bool LostOneFollows { get; private set; }
-
     public float HealthMultiplier => Parameters.EnemyHealthMultiplier * (1f + (CurrentStage?.EnemyHealthBonus ?? 0f)) * NightSettings.Current.HealthAt(NightSettings.Darkness);
     /// <summary>The raid's enemy damage multiplier right now.</summary>
     public float PowerMultiplier => Parameters.EnemyPowerMultiplier * (1f + (CurrentStage?.EnemyPowerBonus ?? 0f)) * NightSettings.Current.PowerAt(NightSettings.Darkness);
 
-    /// <param name="fillHealth">
-    /// At the start, living enemies are topped up to their new maximum. When a stage strengthens them mid-fight, they only
-    /// gain the extra maximum, so a wounded wolf stays wounded.
-    /// </param>
-    private void StrengthenEnemies(bool fillHealth)
-    {
-        if (Mathf.Approximately(HealthMultiplier, 1f) && Mathf.Approximately(PowerMultiplier, 1f) && StageIndex == 0)
-        {
-            return;
-        }
-
-        // Inactive enemies (waiting for a trigger, say) are included. Enemies spawned later by this raid get the same
-        // treatment through Prepare; anything else that spawns enemies needs to apply it itself.
-        foreach (Combatant combatant in FindObjectsByType<Combatant>(FindObjectsInactive.Include))
-        {
-            if (combatant.Faction == Faction.Enemy)
-            {
-                Strengthen(combatant, fillHealth);
-            }
-        }
-    }
-
-    private void Strengthen(Combatant combatant, bool fillHealth)
-    {
-        float health = HealthMultiplier;
-        float power = PowerMultiplier;
-        combatant.TryGetComponent(out Damageable damageable);
-        float oldMax = damageable != null ? damageable.MaxHealth : 0f;
-
-        // Percent bonuses on top of each creature's own stats, added by this raid and gone with the scene.
-        StatSheet stats = combatant.Stats;
-        stats.RemoveModifiersFrom(this);
-        stats.AddModifier(new StatModifier(StatType.MaxHealth, StatModifierOp.Percent, health - 1f, this));
-        stats.AddModifier(new StatModifier(StatType.DamageBonus, StatModifierOp.Flat, power - 1f, this));
-
-        // Enemies that have not woken yet start at their new maximum when they do; the rest are healed.
-        if (damageable != null && damageable.CurrentHealth > 0f)
-        {
-            float gain = fillHealth ? damageable.MaxHealth : damageable.MaxHealth - oldMax;
-            if (gain > 0f)
-            {
-                damageable.Heal(gain);
-            }
-        }
-    }
+    internal RaidGenerator Generator => generator;
+    internal Damageable PlayerHealth => playerHealth;
 
     private RaidSession StartTestRaid()
     {

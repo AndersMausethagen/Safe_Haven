@@ -459,7 +459,7 @@ public sealed class CreatureHost
             return;
         }
 
-        director.Wake(group, friend);
+        director.Creatures.Wake(group, friend);
     }
 
     // An event a friend set off made creatures: made here, by prefab id, and sent after them if they hunt.
@@ -489,7 +489,7 @@ public sealed class CreatureHost
         }
 
         GameObject made = Object.Instantiate(prefab.gameObject, position, Quaternion.Euler(0f, yaw, 0f));
-        director.PrepareSpawned(made, hunt, true, friend);
+        director.Creatures.Prepare(made, hunt, true, friend);
     }
 
     // The body in this game of a friend on the host's run, or null (gone, elsewhere, or down for good).

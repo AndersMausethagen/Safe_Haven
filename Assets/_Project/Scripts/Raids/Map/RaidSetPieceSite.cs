@@ -23,7 +23,7 @@ public sealed class RaidSetPieceSite : MonoBehaviour
                 Vector3 spot = transform.position + new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle)) * (Definition.Radius * GuardRing);
                 if (UnityEngine.AI.NavMesh.SamplePosition(spot, out UnityEngine.AI.NavMeshHit hit, FindGround, UnityEngine.AI.NavMesh.AllAreas))
                 {
-                    director.PrepareSpawned(Instantiate(guard.prefab, hit.position, Quaternion.Euler(0f, angle * Mathf.Rad2Deg, 0f)), false);
+                    director.Creatures.Prepare(Instantiate(guard.prefab, hit.position, Quaternion.Euler(0f, angle * Mathf.Rad2Deg, 0f)), false);
                 }
             }
         }

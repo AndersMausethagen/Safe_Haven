@@ -85,7 +85,7 @@ public static class PlaytestCliCommands
             sb.AppendLine("Essences: " + JoinOrNone(held));
         }
 
-        QuestLog log = QuestManager.Instance != null ? QuestManager.Instance.Log : GameSession.Quests;
+        QuestLog log = QuestManager.Current != null ? QuestManager.Current.Log : GameSession.Quests;
         IEnumerable<string> active = log.Entries.Where(e => e.Status == QuestStatus.Active || e.Status == QuestStatus.ReadyToTurnIn)
             .Select(e => $"{e.Quest.name}{(e.Status == QuestStatus.ReadyToTurnIn ? " (hand in)" : "")} [{string.Join(",", e.Counts.Select((c, i) => $"{c}/{e.Quest.Objectives[i].Amount}"))}]");
         sb.Append("Quests: " + JoinOrNone(active));
@@ -231,11 +231,11 @@ public static class PlaytestCliCommands
         [CliArg("objective", "Objective index for progress")] int objective = 0,
         [CliArg("amount", "Progress amount")] int amount = 1)
     {
-        QuestLog log = QuestManager.Instance != null ? QuestManager.Instance.Log : GameSession.Quests;
+        QuestLog log = QuestManager.Current != null ? QuestManager.Current.Log : GameSession.Quests;
         if (action == "list")
         {
-            IEnumerable<QuestDefinition> quests = QuestManager.Instance != null
-                ? QuestManager.Instance.Quests
+            IEnumerable<QuestDefinition> quests = QuestManager.Current != null
+                ? QuestManager.Current.Quests
                 : CliLookup.LoadAll(typeof(QuestDefinition)).Cast<QuestDefinition>();
             return string.Join("\n", quests.Where(q => CliLookup.Matches(q, id)).Select(q => DescribeQuest(log, q)));
         }
@@ -244,9 +244,9 @@ public static class PlaytestCliCommands
         switch (action)
         {
             case "start":
-                if (QuestManager.Instance != null)
+                if (QuestManager.Current != null)
                 {
-                    if (!QuestManager.Instance.TryStartQuest(quest, out string reason))
+                    if (!QuestManager.Current.TryStartQuest(quest, out string reason))
                     {
                         throw new InvalidOperationException($"Couldn't start {quest.name}: {reason}");
                     }

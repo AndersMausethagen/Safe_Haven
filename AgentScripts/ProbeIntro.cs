@@ -96,7 +96,7 @@ public static class ProbeIntro
     private static void Start(string quest)
     {
         var definition = AssetDatabase.LoadAssetAtPath<QuestDefinition>(Prologue + "Quests/" + quest + ".asset");
-        if (GameSession.Quests.StatusOf(definition) == QuestStatus.NotStarted && !QuestManager.Instance.TryStartQuest(definition, out string reason))
+        if (GameSession.Quests.StatusOf(definition) == QuestStatus.NotStarted && !QuestManager.Current.TryStartQuest(definition, out string reason))
             Debug.LogWarning($"Probe couldn't start {quest}: {reason}");
     }
 

@@ -314,7 +314,7 @@ public sealed class PlayerCombat : MonoBehaviour
             health.Guarded += OnGuarded;
         }
 
-        gameState = GameStateManager.Instance;
+        gameState = GameStateManager.Current;
         if (gameState == null)
         {
             Debug.LogWarning("PlayerCombat found no GameStateManager; attacking won't change the game mode.", this);

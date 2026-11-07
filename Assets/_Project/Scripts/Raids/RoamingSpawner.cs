@@ -77,7 +77,7 @@ public sealed class RoamingSpawner : MonoBehaviour
             nextSpawn = Time.time;
         }
 
-        int cap = settings.AliveCap(director.StageIndex, director.AlarmsRaised, director.Session.Definition.EffectiveEnemyDensity) + ExtraCap;
+        int cap = settings.AliveCap(director.StageIndex, director.Creatures.AlarmsRaised, director.Session.Definition.EffectiveEnemyDensity) + ExtraCap;
         if (Time.time >= nextSpawn && AliveCount < cap && spent < settings.TotalLimit && !AtGlobalLimit())
         {
             // A failed placement retries on the next think rather than waiting a whole interval.
@@ -244,7 +244,7 @@ public sealed class RoamingSpawner : MonoBehaviour
             Vector3 facing = player - point;
             facing.y = 0f;
             GameObject root = Instantiate(prefab, point, facing.sqrMagnitude > 0.01f ? Quaternion.LookRotation(facing) : Quaternion.identity, Container());
-            director.PrepareSpawned(root, false);
+            director.Creatures.Prepare(root, false);
             roots.Add(root);
 
             int count = 0;

@@ -16,7 +16,7 @@ public sealed class ActionCrosshair : MonoBehaviour
             return;
         }
 
-        UIStateManager ui = UIStateManager.Instance;
+        UIStateManager ui = UIStateManager.Current;
         bool show = CameraPointer.UsesScreenCenter && !GamePause.IsPaused && (ui == null || !ui.IsAnyWindowOpen);
         if (graphic.enabled != show)
         {

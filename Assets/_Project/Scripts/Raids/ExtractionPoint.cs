@@ -344,7 +344,7 @@ public sealed class ExtractionPoint : MonoBehaviour, IInteractionCondition, IInt
         }
 
         alarmRaised = true;
-        if (RaidDirector.Current.Wake(alarm) > 0 && !string.IsNullOrEmpty(alarmMessage))
+        if (RaidDirector.Current.Creatures.Wake(alarm) > 0 && !string.IsNullOrEmpty(alarmMessage))
         {
             GameMessages.Post(alarmMessage, MessageKind.Warning);
         }

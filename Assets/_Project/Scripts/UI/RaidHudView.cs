@@ -333,8 +333,8 @@ public sealed class RaidHudView : MonoBehaviour
     // A word and a number, so it doesn't rest on a colour.
     private string DescribeCompanion()
     {
-        string along = HowTheyAre(director != null ? director.Companion : null);
-        string found = director != null && director.LostOneFollows ? HowTheyAre(director.LostOne) : "";
+        string along = HowTheyAre(director != null ? director.Companions.Companion : null);
+        string found = director != null && director.Companions.LostOneFollows ? HowTheyAre(director.Companions.LostOne) : "";
         return along.Length > 0 && found.Length > 0 ? $"{along}  ·  {found}" : along + found;
     }
 
@@ -358,8 +358,8 @@ public sealed class RaidHudView : MonoBehaviour
             return "";
         }
 
-        string along = CountdownFor(director.Companion);
-        return along.Length > 0 || !director.LostOneFollows ? along : CountdownFor(director.LostOne);
+        string along = CountdownFor(director.Companions.Companion);
+        return along.Length > 0 || !director.Companions.LostOneFollows ? along : CountdownFor(director.Companions.LostOne);
     }
 
     private static string CountdownFor(Companion companion)

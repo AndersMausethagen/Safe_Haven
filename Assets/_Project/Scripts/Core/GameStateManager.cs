@@ -10,10 +10,10 @@ public sealed class GameStateManager : MonoBehaviour
     private bool isNotifying;
 
     /// <summary>The manager of the current scene, or null in scenes without one (the main menu, the raid results).</summary>
-    public static GameStateManager Instance { get; private set; }
+    public static GameStateManager Current { get; private set; }
 
     /// <summary>True while the player is in Combat mode. False where there is no manager, so it can be read from anywhere.</summary>
-    public static bool InCombat => Instance != null && Instance.CurrentState == GameState.Combat;
+    public static bool InCombat => Current != null && Current.CurrentState == GameState.Combat;
 
     public GameState CurrentState { get; private set; }
 
@@ -22,28 +22,28 @@ public sealed class GameStateManager : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance != null && Instance != this)
+        if (Current != null && Current != this)
         {
             Debug.LogError("Only one GameStateManager can exist at a time.", this);
             Destroy(this);
             return;
         }
 
-        Instance = this;
+        Current = this;
         CurrentState = initialState;
     }
 
     // Listeners unsubscribe through the reference they took when they subscribed, so none of them need this one to outlive the scene.
     private void OnDestroy()
     {
-        if (Instance == this)
+        if (Current == this)
         {
-            Instance = null;
+            Current = null;
         }
     }
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    private static void ResetStatics() => Instance = null;
+    private static void ResetStatics() => Current = null;
 
     /// <summary>Returns true if the mode changed; false if already in that mode or called from a GameStateChanged handler.</summary>
     public bool TrySetState(GameState nextState)

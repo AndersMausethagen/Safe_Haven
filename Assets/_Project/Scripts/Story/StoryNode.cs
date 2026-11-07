@@ -34,8 +34,8 @@ public sealed class StoryContext
     public int Output { get; set; }
 
     /// <summary>True in the quiet right after a fight (StoryPacing), when a line should wait.</summary>
-    public bool IsCatchingBreath => QuestManager.Instance != null
-        && QuestManager.Instance.Pacing.IsCatchingBreath(Time.time, StoryPacingSettings.Current);
+    public bool IsCatchingBreath => QuestManager.Current != null
+        && QuestManager.Current.Pacing.IsCatchingBreath(Time.time, StoryPacingSettings.Current);
 }
 
 /// <summary>

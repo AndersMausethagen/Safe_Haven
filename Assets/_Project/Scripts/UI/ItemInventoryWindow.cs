@@ -164,10 +164,10 @@ public sealed class ItemInventoryWindow : MonoBehaviour, IItemSlotHandler
             homeKnown = true;
         }
 
-        bool sideBySide = UIStateManager.Instance != null && UIStateManager.Instance.IsOpen(UIWindowId.Character);
+        bool sideBySide = UIStateManager.Current != null && UIStateManager.Current.IsOpen(UIWindowId.Character);
         if (sideBySide && characterPanel == null)
         {
-            CharacterWindow character = UIStateManager.Instance.Find<CharacterWindow>(UIWindowId.Character);
+            CharacterWindow character = UIStateManager.Current.Find<CharacterWindow>(UIWindowId.Character);
             characterPanel = character != null ? (RectTransform)character.transform : null;
         }
 

@@ -82,7 +82,7 @@ public sealed class CommandWheel : MonoBehaviour
     public void Open()
     {
         if (GamePause.IsPaused || BuildPlacer.IsBusy || DialogueBox.IsSpeaking ||
-            (UIStateManager.Instance != null && UIStateManager.Instance.IsAnyWindowOpen))
+            (UIStateManager.Current != null && UIStateManager.Current.IsAnyWindowOpen))
         {
             return;
         }
@@ -138,7 +138,7 @@ public sealed class CommandWheel : MonoBehaviour
         }
 
         if (GamePause.IsPaused || BuildPlacer.IsBusy ||
-            (UIStateManager.Instance != null && UIStateManager.Instance.IsAnyWindowOpen))
+            (UIStateManager.Current != null && UIStateManager.Current.IsAnyWindowOpen))
         {
             Cancel();
             return;

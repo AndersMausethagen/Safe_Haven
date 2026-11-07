@@ -81,7 +81,7 @@ public sealed class CheatWindow : MonoBehaviour
             return;
         }
 
-        if (Player.Current == null || UIStateManager.Instance == null || GamePause.IsPaused)
+        if (Player.Current == null || UIStateManager.Current == null || GamePause.IsPaused)
         {
             return;
         }

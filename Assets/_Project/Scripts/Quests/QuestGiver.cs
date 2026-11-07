@@ -185,7 +185,7 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
             case QuestGiverState.ReadyToTurnIn:
                 return true;
             case QuestGiverState.NotYet:
-                reason = QuestManager.Instance != null ? "Not yet: finish " + QuestManager.Instance.DescribeMissing(Quest) + " first." : "Not yet.";
+                reason = QuestManager.Current != null ? "Not yet: finish " + QuestManager.Current.DescribeMissing(Quest) + " first." : "Not yet.";
                 return false;
             case QuestGiverState.InProgress:
                 reason = waitingLines.HasAny ? Line(waitingLines) : DefaultWaitingText;
@@ -224,14 +224,14 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
     /// <summary>Starts the quest, or tells the player why it can't start. Can be chosen from any Inspector event.</summary>
     public void StartQuest()
     {
-        if (QuestManager.Instance == null)
+        if (QuestManager.Current == null)
         {
             return;
         }
 
         // Starting can synchronously complete quests and select the next offer.
         string line = offer != null ? offer.Text : greeting;
-        if (QuestManager.Instance.TryStartQuest(Quest, out string reason))
+        if (QuestManager.Current.TryStartQuest(Quest, out string reason))
         {
             EmoteDefinition taken = CharacterCatalog.Current.QuestTaken;
             CharacterGestures.Play(transform, taken);
@@ -247,12 +247,12 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
     /// <summary>Hands in the quest when its objectives are done. Can be chosen from any Inspector event.</summary>
     public void TurnIn()
     {
-        if (QuestManager.Instance == null)
+        if (QuestManager.Current == null)
         {
             return;
         }
 
-        if (QuestManager.Instance.TryTurnIn(Quest, out string reason))
+        if (QuestManager.Current.TryTurnIn(Quest, out string reason))
         {
             Say(turnInText);
         }
@@ -283,7 +283,7 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
 
     private void Refresh()
     {
-        QuestLog log = QuestManager.Instance != null ? QuestManager.Instance.Log : GameSession.Quests;
+        QuestLog log = QuestManager.Current != null ? QuestManager.Current.Log : GameSession.Quests;
         offer = SelectOffer(offers, log);
         state = StateFor(Quest, log);
         if (interactable != null && talkable == null)
@@ -366,7 +366,7 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
 
     private QuestOffer FollowingOffer()
     {
-        QuestLog log = QuestManager.Instance != null ? QuestManager.Instance.Log : GameSession.Quests;
+        QuestLog log = QuestManager.Current != null ? QuestManager.Current.Log : GameSession.Quests;
         bool found = false;
         foreach (QuestOffer candidate in offers)
         {
@@ -393,8 +393,8 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
     private void ContinueOffer(QuestDefinition finished, QuestDefinition next)
     {
         Refresh();
-        if (Quest != finished || state != QuestGiverState.ReadyToTurnIn || QuestManager.Instance == null) return;
-        if (!QuestManager.Instance.TryTurnIn(finished, out string reason))
+        if (Quest != finished || state != QuestGiverState.ReadyToTurnIn || QuestManager.Current == null) return;
+        if (!QuestManager.Current.TryTurnIn(finished, out string reason))
         {
             GameMessages.Post(reason, MessageKind.Warning);
             return;
@@ -402,7 +402,7 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
 
         Refresh();
         if (Quest == next && state == QuestGiverState.Available) StartQuest();
-        else if (QuestManager.Instance.Log.StatusOf(next) == QuestStatus.NotStarted)
+        else if (QuestManager.Current.Log.StatusOf(next) == QuestStatus.NotStarted)
             GameMessages.Post("The next quest is no longer available. Speak to the quest giver again.", MessageKind.Warning);
     }
 
@@ -433,7 +433,7 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
     // Each optional quest as its own answer: ask about it, take it, or hand it in.
     private void AddSideOffers(MenuPage page, DialogueSpeaker speaker, Action afterAnswer)
     {
-        QuestLog log = QuestManager.Instance != null ? QuestManager.Instance.Log : GameSession.Quests;
+        QuestLog log = QuestManager.Current != null ? QuestManager.Current.Log : GameSession.Quests;
         foreach (QuestOffer side in sideOffers)
         {
             if (side?.Quest == null) continue;
@@ -451,7 +451,7 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
                 case QuestGiverState.ReadyToTurnIn:
                     page.Add(new MenuAction("It's done.", side.Quest.DisplayName, true, () =>
                     {
-                        if (QuestManager.Instance != null && QuestManager.Instance.TryTurnIn(chosen.Quest, out string reason))
+                        if (QuestManager.Current != null && QuestManager.Current.TryTurnIn(chosen.Quest, out string reason))
                         {
                             if (string.IsNullOrWhiteSpace(chosen.ThanksText)) afterAnswer?.Invoke();
                             else DialogueBox.Current.Say(speaker, chosen.ThanksText, afterAnswer);
@@ -467,8 +467,8 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
 
     private void TakeSideOffer(QuestOffer side)
     {
-        if (QuestManager.Instance == null) return;
-        if (QuestManager.Instance.TryStartQuest(side.Quest, out string reason))
+        if (QuestManager.Current == null) return;
+        if (QuestManager.Current.TryStartQuest(side.Quest, out string reason))
         {
             EmoteDefinition taken = CharacterCatalog.Current.QuestTaken;
             CharacterGestures.Play(transform, taken);

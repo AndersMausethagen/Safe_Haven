@@ -58,8 +58,8 @@ public static class ProbePortalHeart
 
     public static string AfterPress()
     {
-        StationWindow window = UIStateManager.Instance != null ? UIStateManager.Instance.Find<StationWindow>(UIWindowId.Station) : null;
-        return $"action menu open {ActionMenuWindow.Current != null && ActionMenuWindow.Current.IsOpen}; station window open {window != null && UIStateManager.Instance.IsOpen(UIWindowId.Station)}; dialogue {Object.FindAnyObjectByType<DialogueBox>()?.isActiveAndEnabled}";
+        StationWindow window = UIStateManager.Current != null ? UIStateManager.Current.Find<StationWindow>(UIWindowId.Station) : null;
+        return $"action menu open {ActionMenuWindow.Current != null && ActionMenuWindow.Current.IsOpen}; station window open {window != null && UIStateManager.Current.IsOpen(UIWindowId.Station)}; dialogue {Object.FindAnyObjectByType<DialogueBox>()?.isActiveAndEnabled}";
     }
 
     public static string Woken()
@@ -76,7 +76,7 @@ public static class ProbePortalHeart
     {
         CraftingStation station = HomePortal.Current.GetComponent<CraftingStation>();
         station.OpenMenu(Player.Current.gameObject);
-        bool open = UIStateManager.Instance != null && UIStateManager.Instance.IsOpen(UIWindowId.Station);
+        bool open = UIStateManager.Current != null && UIStateManager.Current.IsOpen(UIWindowId.Station);
         return $"station usable {station.Usable}, tier {station.Tier}, window open {open}";
     }
 

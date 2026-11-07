@@ -11,7 +11,7 @@ public static class ProbeDialogue
         var answers = new List<DialogueChoice> { new DialogueChoice("I'll deal with it.", "The Hungry Pack"), new DialogueChoice("Not now.") };
         DialogueBox.Current.Ask(new DialogueSpeaker("Runa", wolf != null ? wolf.transform : null), "There's a pack in the hollow. If they find the camp we're done for. Will you thin them out?", answers,
             index => Debug.Log("Probe dialogue chose " + index));
-        return $"asked, open={DialogueBox.IsOpen}, any window open={UIStateManager.Instance != null && UIStateManager.Instance.IsAnyWindowOpen}";
+        return $"asked, open={DialogueBox.IsOpen}, any window open={UIStateManager.Current != null && UIStateManager.Current.IsAnyWindowOpen}";
     }
 
     public static string PlayerSays()

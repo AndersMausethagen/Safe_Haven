@@ -114,7 +114,7 @@ public sealed class PlayerInteractor : MonoBehaviour
             return false;
         }
 
-        if (UIStateManager.Instance != null && UIStateManager.Instance.IsAnyWindowOpen)
+        if (UIStateManager.Current != null && UIStateManager.Current.IsAnyWindowOpen)
         {
             blockedReason = "Close the open window.";
             return false;

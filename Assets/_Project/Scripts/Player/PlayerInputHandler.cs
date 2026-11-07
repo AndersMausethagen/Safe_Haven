@@ -337,7 +337,7 @@ public sealed class PlayerInputHandler : MonoBehaviour
             return;
         }
 
-        GameStateManager gameState = GameStateManager.Instance;
+        GameStateManager gameState = GameStateManager.Current;
         if (gameState == null)
         {
             Debug.LogError("PlayerInputHandler requires a GameStateManager in the scene to toggle combat.", this);
@@ -423,7 +423,7 @@ public sealed class PlayerInputHandler : MonoBehaviour
 
     private void RequestWindow(UIWindowId window)
     {
-        UIStateManager uiState = UIStateManager.Instance;
+        UIStateManager uiState = UIStateManager.Current;
         if (uiState == null)
         {
             Debug.LogError($"PlayerInputHandler requires a UIStateManager in the scene to toggle the {window} window.", this);

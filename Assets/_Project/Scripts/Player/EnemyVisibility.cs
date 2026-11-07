@@ -50,7 +50,7 @@ public sealed class EnemyVisibility : MonoBehaviour
     {
         Player player = Player.Current;
         bool show = player != null && !GamePause.IsPaused
-            && (UIStateManager.Instance == null || !UIStateManager.Instance.IsAnyWindowOpen);
+            && (UIStateManager.Current == null || !UIStateManager.Current.IsAnyWindowOpen);
         float rangeSquared = Range * Range;
         Damageable bowTarget = null;
         if (player != archer)

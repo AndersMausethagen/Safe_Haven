@@ -389,9 +389,9 @@ public sealed class PlayerGathering : MonoBehaviour
         {
             WearTool(tool);
         }
-        else if (result == SwingResult.Critical && CombatFeedback.Instance != null)
+        else if (result == SwingResult.Critical && CombatFeedback.Current != null)
         {
-            CombatFeedback.Instance.HitStop(settings.CriticalHitStop);
+            CombatFeedback.Current.HitStop(settings.CriticalHitStop);
         }
 
         float loudness = profile != null ? profile.Loudness : 1f;

@@ -117,7 +117,7 @@ public sealed class PlayerMovement : MonoBehaviour
 
     private void OnEnable()
     {
-        gameState = GameStateManager.Instance;
+        gameState = GameStateManager.Current;
         if (gameState == null)
         {
             Debug.LogWarning("PlayerMovement found no GameStateManager; using Exploration movement values.", this);

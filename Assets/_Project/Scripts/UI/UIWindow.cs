@@ -46,7 +46,7 @@ public sealed class UIWindow : MonoBehaviour
             return;
         }
 
-        uiState = UIStateManager.Instance;
+        uiState = UIStateManager.Current;
         if (uiState != null)
         {
             uiState.WindowToggleRequested += OnToggleRequested;

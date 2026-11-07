@@ -72,9 +72,9 @@ public sealed class GameStateManagerTests
     public void ADestroyedManager_LeavesNothingBehind()
     {
         GameStateManager manager = Manager();
-        Assert.AreSame(manager, GameStateManager.Instance);
+        Assert.AreSame(manager, GameStateManager.Current);
         Invoke(manager, "OnDestroy");
-        Assert.IsTrue(ReferenceEquals(GameStateManager.Instance, null), "a destroyed manager must not keep answering");
+        Assert.IsTrue(ReferenceEquals(GameStateManager.Current, null), "a destroyed manager must not keep answering");
     }
 
     [Test]

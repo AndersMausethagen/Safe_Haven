@@ -81,7 +81,7 @@ public sealed class QuestTrackerView : MonoBehaviour
         }
 
         var available = new List<QuestDefinition>();
-        QuestManager manager = QuestManager.Instance;
+        QuestManager manager = QuestManager.Current;
         if (manager != null && !onARaid)
             foreach (QuestDefinition quest in manager.Quests)
                 if (quest != null && !string.IsNullOrWhiteSpace(quest.AvailableObjective) &&

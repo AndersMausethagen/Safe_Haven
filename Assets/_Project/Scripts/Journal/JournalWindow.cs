@@ -187,7 +187,7 @@ public sealed class JournalWindow : MonoBehaviour
         switch (tab)
         {
             case Tab.Quests:
-                return JournalContent.Quests(log, progress, QuestManager.Instance != null ? QuestManager.Instance.Quests : null, Pin, out summary);
+                return JournalContent.Quests(log, progress, QuestManager.Current != null ? QuestManager.Current.Quests : null, Pin, out summary);
             case Tab.Creatures:
                 return JournalContent.Creatures(settings, progress, out summary);
             case Tab.Mechanics:

@@ -18,9 +18,9 @@ public sealed class UIStateManagerTests
         try
         {
             Invoke(manager, "Awake");
-            Assert.AreSame(manager, UIStateManager.Instance);
+            Assert.AreSame(manager, UIStateManager.Current);
             Invoke(manager, "OnDestroy");
-            Assert.IsTrue(ReferenceEquals(UIStateManager.Instance, null), "a destroyed manager must not keep answering");
+            Assert.IsTrue(ReferenceEquals(UIStateManager.Current, null), "a destroyed manager must not keep answering");
         }
         finally
         {

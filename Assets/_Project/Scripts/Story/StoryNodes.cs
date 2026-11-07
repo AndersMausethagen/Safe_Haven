@@ -571,7 +571,7 @@ public sealed class WaitForEventNode : StoryNode
     public override IEnumerator Run(StoryContext context)
     {
         float end = Time.time + orAfterSeconds;
-        QuestLog log = QuestManager.Instance != null ? QuestManager.Instance.Log : GameSession.Quests;
+        QuestLog log = QuestManager.Current != null ? QuestManager.Current.Log : GameSession.Quests;
         while (!log.HasHappened(questEvent) && (orAfterSeconds <= 0f || Time.time < end))
         {
             yield return null;
@@ -594,7 +594,7 @@ public sealed class HasHappenedNode : StoryNode
 
     public override IEnumerator Run(StoryContext context)
     {
-        QuestLog log = QuestManager.Instance != null ? QuestManager.Instance.Log : GameSession.Quests;
+        QuestLog log = QuestManager.Current != null ? QuestManager.Current.Log : GameSession.Quests;
         context.Output = log.HasHappened(questEvent) ? 0 : 1;
         yield break;
     }
@@ -615,7 +615,7 @@ public sealed class CheckQuestNode : StoryNode
 
     public override IEnumerator Run(StoryContext context)
     {
-        QuestLog log = QuestManager.Instance != null ? QuestManager.Instance.Log : GameSession.Quests;
+        QuestLog log = QuestManager.Current != null ? QuestManager.Current.Log : GameSession.Quests;
         QuestStatus status = log.StatusOf(quest);
         context.Output = status == QuestStatus.Completed ? 2 : status == QuestStatus.NotStarted || status == QuestStatus.Lapsed ? 0 : 1;
         yield break;
@@ -654,7 +654,7 @@ public sealed class StartQuestNode : StoryNode
 
     public override IEnumerator Run(StoryContext context)
     {
-        if (QuestManager.Instance != null && !QuestManager.Instance.TryStartQuest(quest, out string reason))
+        if (QuestManager.Current != null && !QuestManager.Current.TryStartQuest(quest, out string reason))
         {
             Debug.Log($"Story couldn't start {quest?.DisplayName}: {reason}", context.Script);
         }
@@ -679,7 +679,7 @@ public sealed class QuestProgressNode : StoryNode
 
     public override IEnumerator Run(StoryContext context)
     {
-        QuestLog log = QuestManager.Instance != null ? QuestManager.Instance.Log : GameSession.Quests;
+        QuestLog log = QuestManager.Current != null ? QuestManager.Current.Log : GameSession.Quests;
         log.AddProgress(quest, objective - 1, amount);
         yield break;
     }

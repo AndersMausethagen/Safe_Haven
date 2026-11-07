@@ -71,7 +71,7 @@ public sealed class QuestWaypointHud : MonoBehaviour
     {
         QuestWaypoint target = Pick(out float distance);
         bool show = target != null && distance > HideWithin && !GamePause.IsPaused
-                    && (UIStateManager.Instance == null || !UIStateManager.Instance.IsAnyWindowOpen);
+                    && (UIStateManager.Current == null || !UIStateManager.Current.IsAnyWindowOpen);
         marker.gameObject.SetActive(show);
         if (!show)
         {
@@ -133,7 +133,7 @@ public sealed class QuestWaypointHud : MonoBehaviour
             return null;
         }
 
-        QuestLog log = QuestManager.Instance != null ? QuestManager.Instance.Log : GameSession.Quests;
+        QuestLog log = QuestManager.Current != null ? QuestManager.Current.Log : GameSession.Quests;
         QuestWaypoint best = null;
         float nearest = float.MaxValue;
         foreach (QuestWaypoint waypoint in QuestWaypoint.Active)

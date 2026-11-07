@@ -228,7 +228,7 @@ public sealed class MinimapHud : MonoBehaviour
     private void LateUpdate()
     {
         Player player = Player.Current;
-        bool windows = UIStateManager.Instance != null && UIStateManager.Instance.IsAnyWindowOpen;
+        bool windows = UIStateManager.Current != null && UIStateManager.Current.IsAnyWindowOpen;
         bool shown = painted && player != null && zoom != Hidden && !windows && !WorldMapHud.IsOpen && !GamePause.IsPaused;
         group.alpha = shown ? 1f : 0f;
         if (!shown)

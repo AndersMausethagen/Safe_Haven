@@ -516,7 +516,7 @@ public static class Cheats
     /// <summary>Finishes every quest under way, to get past a part of the story.</summary>
     public static string CompleteActiveQuests()
     {
-        QuestLog log = QuestManager.Instance != null ? QuestManager.Instance.Log : GameSession.Quests;
+        QuestLog log = QuestManager.Current != null ? QuestManager.Current.Log : GameSession.Quests;
         var active = new List<QuestDefinition>();
         foreach (QuestLog.Entry entry in log.Entries)
         {

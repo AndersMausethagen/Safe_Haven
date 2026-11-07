@@ -43,7 +43,7 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
     private readonly List<QuestDefinition> pendingRewards = new List<QuestDefinition>();
     private readonly List<WaitingQuest> waiting = new List<WaitingQuest>();
 
-    public static QuestManager Instance => instance;
+    public static QuestManager Current => instance;
 
     /// <summary>When the next story beat may come. Stories ask it before speaking.</summary>
     public StoryPacing Pacing { get; } = new StoryPacing();

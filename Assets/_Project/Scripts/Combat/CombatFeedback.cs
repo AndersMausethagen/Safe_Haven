@@ -36,7 +36,7 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
     private float pendingSwingAt;
     private float pendingSwingStart;
 
-    public static CombatFeedback Instance { get; private set; }
+    public static CombatFeedback Current { get; private set; }
 
     /// <summary>True while a hit stop slows the game.</summary>
     public bool IsHitStopped => hitStopUntil >= 0f;
@@ -46,7 +46,7 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
     /// <summary>Called once by GameSystems when the game starts.</summary>
     public void Initialise(CombatFeelSettings settings)
     {
-        Instance = this;
+        Current = this;
         feel = settings;
         Damageable.AnyDamaged += OnAnyDamaged;
         Damageable.AnyGuarded += OnAnyGuarded;
@@ -60,9 +60,9 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
         MonsterAI.AnyStaggered -= OnAnyStaggered;
         WatchPlayer(null);
         EndHitStop();
-        if (Instance == this)
+        if (Current == this)
         {
-            Instance = null;
+            Current = null;
         }
     }
 

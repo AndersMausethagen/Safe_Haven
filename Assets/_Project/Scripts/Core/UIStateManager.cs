@@ -16,7 +16,7 @@ public sealed class UIStateManager : MonoBehaviour
     private readonly Dictionary<UIWindowId, UIWindow> windows = new Dictionary<UIWindowId, UIWindow>();
 
     /// <summary>The manager of the current scene, or null in scenes without one.</summary>
-    public static UIStateManager Instance { get; private set; }
+    public static UIStateManager Current { get; private set; }
 
     public bool IsAnyWindowOpen => openWindows.Count > 0;
 
@@ -28,27 +28,27 @@ public sealed class UIStateManager : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance != null && Instance != this)
+        if (Current != null && Current != this)
         {
             Debug.LogError("Only one UIStateManager can exist at a time.", this);
             Destroy(this);
             return;
         }
 
-        Instance = this;
+        Current = this;
     }
 
     // Listeners unsubscribe through the reference they took when they subscribed, so none of them need this one to outlive the scene.
     private void OnDestroy()
     {
-        if (Instance == this)
+        if (Current == this)
         {
-            Instance = null;
+            Current = null;
         }
     }
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    private static void ResetStatics() => Instance = null;
+    private static void ResetStatics() => Current = null;
 
     private void OnEnable()
     {

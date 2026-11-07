@@ -205,9 +205,9 @@ public sealed class RaidPortal : MonoBehaviour, IStationMenuExtension, IInteract
 
     private void OpenPlanner(GameObject user)
     {
-        if (preparationWindow == null && UIStateManager.Instance != null)
+        if (preparationWindow == null && UIStateManager.Current != null)
         {
-            preparationWindow = UIStateManager.Instance.Find<RaidPreparationWindow>(UIWindowId.RaidPreparation);
+            preparationWindow = UIStateManager.Current.Find<RaidPreparationWindow>(UIWindowId.RaidPreparation);
         }
 
         if (preparationWindow == null)

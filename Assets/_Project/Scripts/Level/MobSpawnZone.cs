@@ -23,7 +23,7 @@ public enum MobSpawnTrigger
 /// to (Spawn, e.g. from a quest), and can refill a while after its creatures are dead. <see cref="Cleared"/> (and On
 /// Cleared) fires when everything it spawned is dead, which is what a "kill them all" step listens to.
 /// <para>
-/// In a raid, spawned creatures get the raid's strength (RaidDirector.PrepareSpawned). Hunt Player sends them straight at
+/// In a raid, spawned creatures get the raid's strength (RaidCreatures.Prepare). Hunt Player sends them straight at
 /// the player. Works in any scene; nothing it spawns is saved.
 /// </para>
 /// </summary>
@@ -281,7 +281,7 @@ public sealed class MobSpawnZone : MonoBehaviour
 
         if (RaidDirector.Current != null)
         {
-            RaidDirector.Current.PrepareSpawned(creature, huntPlayer);
+            RaidDirector.Current.Creatures.Prepare(creature, huntPlayer);
             return;
         }
 

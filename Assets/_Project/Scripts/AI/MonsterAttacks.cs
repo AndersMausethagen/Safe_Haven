@@ -431,7 +431,7 @@ public sealed class MonsterAttacks
             called++;
             if (RaidDirector.Current != null)
             {
-                RaidDirector.Current.PrepareSpawned(root, true, false);
+                RaidDirector.Current.Creatures.Prepare(root, true, false);
             }
             else if (player != null)
             {

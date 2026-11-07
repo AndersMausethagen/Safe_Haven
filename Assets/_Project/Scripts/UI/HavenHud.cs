@@ -113,7 +113,7 @@ public sealed class HavenHud : MonoBehaviour
 
     private void LateUpdate()
     {
-        bool windows = UIStateManager.Instance != null && UIStateManager.Instance.IsAnyWindowOpen;
+        bool windows = UIStateManager.Current != null && UIStateManager.Current.IsAnyWindowOpen;
         group.alpha = GamePause.IsPaused ? 0f : 1f;
         badge.transform.parent.gameObject.SetActive(!windows);
         if (Time.unscaledTime >= nextStanding)

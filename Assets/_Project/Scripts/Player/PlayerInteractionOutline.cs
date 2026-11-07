@@ -48,7 +48,7 @@ public sealed class PlayerInteractionOutline : MonoBehaviour
         // Not at the oars or at work on something, like the prompt (WorldInteractionIndicator).
         bool visible = interactor.isActiveAndEnabled && (health == null || health.IsAlive)
             && interactor.Current == null && (stateMachine == null || !stateMachine.IsAboard)
-            && !GamePause.IsPaused && (UIStateManager.Instance == null || !UIStateManager.Instance.IsAnyWindowOpen);
+            && !GamePause.IsPaused && (UIStateManager.Current == null || !UIStateManager.Current.IsAnyWindowOpen);
         Interactable hovered = visible ? FindHovered() : null;
         if (visible && hovered != null && hovered.IsAvailable && !outlines.ContainsKey(hovered))
         {
