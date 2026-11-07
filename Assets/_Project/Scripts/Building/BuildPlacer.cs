@@ -133,6 +133,13 @@ public sealed class BuildPlacer : MonoBehaviour
             return;
         }
 
+        // A friend's Haven: a guest's building would only stand in their copy of it.
+        if (HavenVisit.IsVisiting)
+        {
+            GameMessages.Post(HavenVisit.Refusal, MessageKind.Warning);
+            return;
+        }
+
         if (!HasBuildArea)
         {
             GameMessages.Post(Area != null ? Area.WhyClosed : "You can only build in Safe Haven, inside the portal's ward.", MessageKind.Warning);

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -113,6 +113,11 @@ public static class SaveGameService
             return "The game is already loading.";
         }
 
+        if (HavenVisit.IsVisiting)
+        {
+            return "You're in a friend's Haven. Leave the session first (Escape menu).";
+        }
+
         return GameSession.ActiveRaid != null ? RaidRefusal : null;
     }
 
@@ -203,14 +208,14 @@ public static class SaveGameService
             return false;
         }
 
-        PlayerPersistence player = Player.Current.Persistence;
-        // Objects keep their own state; it is gathered into memory first, then copied to disk.
-        SaveableEntity.CaptureAll();
-        SaveData data = SaveMapper.ToSaveData(player.Capture(), GameSession.Stash, SceneManager.GetActiveScene().name, player.Pose, DateTime.UtcNow,
-            GameSession.World, GameSession.Quests, GameSession.Settlement, GameSession.Playtest, GameSession.Progress);
+        SaveData data = Capture();
+        // In a friend's Haven (co-op) only the character is this player's: it goes into their own journey, whose world stays as they left it.
+        if (HavenVisit.IsVisiting)
+        {
+            data = HavenVisit.ForOwnSave(data);
+        }
+
         data.displayName = name;
-        data.appearance = GameSession.Appearance.Clone();
-        data.raidUnderWay = raidUnderWay;
         try
         {
             Storage.Write(slot, data);
@@ -224,6 +229,43 @@ public static class SaveGameService
             problem = "The game couldn't be saved: " + exception.Message;
             return false;
         }
+    }
+
+    /// <summary>The game being played, as a save held in memory (nothing is written). Needs a player.</summary>
+    public static SaveData Capture()
+    {
+        PlayerPersistence player = Player.Current.Persistence;
+        // Objects keep their own state; it is gathered into memory first, then copied out.
+        SaveableEntity.CaptureAll();
+        SaveData data = SaveMapper.ToSaveData(player.Capture(), GameSession.Stash, SceneManager.GetActiveScene().name, player.Pose, DateTime.UtcNow,
+            GameSession.World, GameSession.Quests, GameSession.Settlement, GameSession.Playtest, GameSession.Progress);
+        data.displayName = CurrentName;
+        data.appearance = GameSession.Appearance.Clone();
+        data.raidUnderWay = raidUnderWay;
+        return data;
+    }
+
+    /// <summary>
+    /// Plays a save held in memory (co-op: a friend's Haven, or coming home from one) as a loaded save is played, without
+    /// changing which journey saving writes to. False, with a reason for the player, when it can't be played now.
+    /// </summary>
+    public static bool TryPlay(SaveData data, IContentLookup content, string caption, out string problem)
+    {
+        problem = loading ? "The game is already loading." : GameSession.ActiveRaid != null ? RaidRefusal : null;
+        if (problem != null)
+        {
+            return false;
+        }
+
+        if (!CanLoad(data.scene))
+        {
+            problem = $"The place '{data.scene}' can't be loaded.";
+            return false;
+        }
+
+        GameSession.LoadGame(SaveMapper.FromSaveData(data, content));
+        Go(data.scene, null, caption);
+        return true;
     }
 
     /// <summary>Gives a save a new name. The name is trimmed; an empty one is refused.</summary>

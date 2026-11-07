@@ -44,6 +44,12 @@ public sealed class SteamPlatform : MonoBehaviour, IGameSystem
         Current = this;
 #if STEAM_ON
         uint appId = settings.SteamAppId;
+        if (Application.isEditor && !settings.SteamInEditor)
+        {
+            Problem = "Steam is off in the Editor (Multiplayer Settings › Steam In Editor).";
+            return;
+        }
+
         try
         {
             if (appId == TestAppId || Application.isEditor)

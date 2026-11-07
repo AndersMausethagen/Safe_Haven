@@ -18,6 +18,9 @@ public sealed class MultiplayerSettings : GameSettings<MultiplayerSettings>
     [SerializeField] private uint steamAppId = 480;
     [Tooltip("Players can only play together on the same version. Raise it whenever what is sent over the network changes.")]
     [SerializeField] private string protocolVersion = "1";
+    [Tooltip("Start Steam when playing in the Editor. Off: Editor sessions are direct (LAN/IP). While on, Steam treats the " +
+             "Editor as the running game: friends see you in it, and closing Steam closes the Editor. Builds always use Steam.")]
+    [SerializeField] private bool steamInEditor;
 
     [Header("Other players")]
     [Tooltip("The networked object every player gets (Network Player prefab: NetworkObject + NetworkPlayerAvatar).")]
@@ -45,6 +48,7 @@ public sealed class MultiplayerSettings : GameSettings<MultiplayerSettings>
     public ushort Port => port;
     public uint SteamAppId => steamAppId;
     public string ProtocolVersion => protocolVersion;
+    public bool SteamInEditor => steamInEditor;
     public NetworkObject PlayerPrefab => playerPrefab;
     public float PoseInterval => 1f / Mathf.Max(1, posesPerSecond);
     public float InterpolationDelay => interpolationDelay;

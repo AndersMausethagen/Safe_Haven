@@ -109,6 +109,13 @@ public sealed class StashChest : MonoBehaviour
 
     private void OnUsed()
     {
+        // A friend's stash: what a guest put in would only be in their copy of it.
+        if (HavenVisit.IsVisiting)
+        {
+            GameMessages.Post(HavenVisit.Refusal, MessageKind.Warning);
+            return;
+        }
+
         if (window == null && UIStateManager.Instance != null)
         {
             window = UIStateManager.Instance.Find<StashWindow>(UIWindowId.Stash);

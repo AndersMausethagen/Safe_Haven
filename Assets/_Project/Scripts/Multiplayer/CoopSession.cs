@@ -1,9 +1,10 @@
-#if SAFEHAVEN_STEAM && (UNITY_STANDALONE_WIN || UNITY_STANDALONE_LINUX || UNITY_STANDALONE_OSX)
+﻿#if SAFEHAVEN_STEAM && (UNITY_STANDALONE_WIN || UNITY_STANDALONE_LINUX || UNITY_STANDALONE_OSX)
 #define STEAM_ON
 #endif
 using System;
 using System.IO;
 using System.Text;
+using Unity.Collections;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using UnityEngine;
@@ -42,6 +43,10 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
     public const string HostTag = "Host";
     public const string GuestTag = "Guest";
     public const string LocalAddress = "127.0.0.1";
+    private const string WorldMessage = "SafeHaven.World";
+    private const string WorldRequest = "SafeHaven.WorldPlease";
+    private const string ClockMessage = "SafeHaven.Clock";
+    private const float ClockInterval = 5f;
 
     private MultiplayerSettings settings;
     private SteamPlatform steam;
@@ -52,6 +57,9 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
     private CoopState state;
     private string autoStart;
     private ulong pendingLobby;
+    private readonly WorldTransfer.Receiver worldPieces = new WorldTransfer.Receiver();
+    private int transfers;
+    private float nextClock;
 
     public static CoopSession Current { get; private set; }
 
@@ -141,6 +149,8 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
             return false;
         }
 
+        // Friends ask for the Haven once they are fully connected (sent any earlier, it could arrive before they listen).
+        network.CustomMessagingManager.RegisterNamedMessageHandler(WorldRequest, (sender, _) => SendWorld(sender));
         SetState(CoopState.Hosting);
         if (viaSteam)
         {
@@ -180,8 +190,11 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
         return StartClient($"Couldn't reach {ip}:{port}.", out problem);
     }
 
-    /// <summary>Ends the session (hosting: for everyone).</summary>
-    public void Leave()
+    /// <summary>
+    /// Ends the session (hosting: for everyone). A guest goes home to their own Haven with what their character gained,
+    /// unless <paramref name="headHome"/> is false (the game is going to the main menu).
+    /// </summary>
+    public void Leave(bool headHome = true)
     {
         if (network != null && (network.IsListening || network.IsClient || network.IsServer))
         {
@@ -195,6 +208,7 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
         }
 
         SetState(CoopState.Offline);
+        HavenVisit.End(Content(), headHome);
     }
 
     /// <summary>Splits "host:port" (port optional).</summary>
@@ -341,6 +355,9 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
         }
 
         problem = string.Empty;
+        // Guests hear the host's world and clock.
+        network.CustomMessagingManager.RegisterNamedMessageHandler(WorldMessage, OnWorldPiece);
+        network.CustomMessagingManager.RegisterNamedMessageHandler(ClockMessage, OnClock);
         SetState(CoopState.Joining);
         return true;
     }
@@ -374,6 +391,12 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
         if (IsActive)
         {
             problem = "Already in a session.";
+            return false;
+        }
+
+        if (GameSession.ActiveRaid != null)
+        {
+            problem = "Finish your raid first.";
             return false;
         }
 
@@ -432,8 +455,110 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
         if (state == CoopState.Joining && clientId == network.LocalClientId)
         {
             SetState(CoopState.Joined);
+            using var ask = new FastBufferWriter(4, Allocator.Temp);
+            network.CustomMessagingManager.SendNamedMessage(WorldRequest, NetworkManager.ServerClientId, ask, NetworkDelivery.Reliable);
         }
     }
+
+    // ---- The host's world, for visiting guests (HavenVisit)
+
+    private void SendWorld(ulong clientId)
+    {
+        if (Player.Current == null || Player.Current.Persistence == null)
+        {
+            Debug.LogWarning("Co-op: no player to send a world from.");
+            return;
+        }
+
+        SaveData world = HavenVisit.WorldOf(SaveGameService.Capture(), HavenVisit.HostIsHome());
+        byte[] packed = WorldTransfer.Pack(world);
+        var pieces = WorldTransfer.Split(packed);
+        int transfer = ++transfers;
+        string hostName = GameSession.Appearance != null ? GameSession.Appearance.DisplayName : CharacterAppearance.DefaultName;
+        for (int index = 0; index < pieces.Count; index++)
+        {
+            byte[] piece = pieces[index];
+            using var writer = new FastBufferWriter(piece.Length + 256, Allocator.Temp);
+            writer.WriteValueSafe(transfer);
+            writer.WriteValueSafe(index);
+            writer.WriteValueSafe(pieces.Count);
+            writer.WriteValueSafe(hostName);
+            writer.WriteValueSafe(piece);
+            network.CustomMessagingManager.SendNamedMessage(WorldMessage, clientId, writer, NetworkDelivery.ReliableFragmentedSequenced);
+        }
+
+        Debug.Log($"Co-op: sent the Haven to player {clientId} ({packed.Length / 1024f:0.0} KB in {pieces.Count} pieces).");
+    }
+
+    private void OnWorldPiece(ulong sender, FastBufferReader reader)
+    {
+        reader.ReadValueSafe(out int transfer);
+        reader.ReadValueSafe(out int index);
+        reader.ReadValueSafe(out int count);
+        reader.ReadValueSafe(out string hostName);
+        reader.ReadValueSafe(out byte[] piece);
+        byte[] packed = worldPieces.Add(transfer, index, count, piece);
+        if (packed == null)
+        {
+            return;
+        }
+
+        SaveData world;
+        try
+        {
+            world = WorldTransfer.Unpack(packed);
+        }
+        catch (Exception exception)
+        {
+            Debug.LogException(exception);
+            OnVisitFailed("Your friend's Haven didn't arrive whole.");
+            return;
+        }
+
+        if (!HavenVisit.Begin(world, hostName, Content(), out string problem))
+        {
+            OnVisitFailed(problem);
+        }
+    }
+
+    private void OnVisitFailed(string problem)
+    {
+        LastProblem = problem;
+        GameMessages.Post(problem, MessageKind.Warning);
+        Leave(false);
+    }
+
+    // The host's time of day, every few seconds while at home: a visit shares the hour.
+    private void Update()
+    {
+        if (!IsHost || network == null || network.ConnectedClientsIds.Count < 2 || Time.unscaledTime < nextClock)
+        {
+            return;
+        }
+
+        nextClock = Time.unscaledTime + ClockInterval;
+        DayNightCycle clock = HavenVisit.HostIsHome() ? FindFirstObjectByType<DayNightCycle>() : null;
+        if (clock == null)
+        {
+            return;
+        }
+
+        using var writer = new FastBufferWriter(16, Allocator.Temp);
+        writer.WriteValueSafe(clock.Hour);
+        network.CustomMessagingManager.SendNamedMessageToAll(ClockMessage, writer, NetworkDelivery.Reliable);
+    }
+
+    private void OnClock(ulong sender, FastBufferReader reader)
+    {
+        reader.ReadValueSafe(out float hour);
+        DayNightCycle clock = HavenVisit.IsVisiting ? FindFirstObjectByType<DayNightCycle>() : null;
+        if (clock != null)
+        {
+            clock.Hour = hour;
+        }
+    }
+
+    private static IContentLookup Content() => Resources.Load<ContentDatabase>(ContentDatabase.ResourceName);
 
     private void OnClientDisconnected(ulong clientId)
     {
@@ -449,6 +574,7 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
         network.Shutdown();
         lobby?.Close();
         SetState(CoopState.Offline);
+        HavenVisit.End(Content());
     }
 
     private void OnTransportFailure()
@@ -457,6 +583,7 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
         GameMessages.Post(LastProblem, MessageKind.Warning);
         lobby?.Close();
         SetState(CoopState.Offline);
+        HavenVisit.End(Content());
     }
 
     private void OnFriendArrived(NetworkPlayerAvatar friend) => GameMessages.Post($"{friend.DisplayName} is here.");

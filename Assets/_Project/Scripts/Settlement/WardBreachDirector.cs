@@ -211,7 +211,7 @@ public sealed class WardBreachDirector : MonoBehaviour
                 Win();
             }
         }
-        else if (IsOverdue && !givingWay && cycle != null && cycle.IsNight && playerHealth != null && playerHealth.IsAlive)
+        else if (IsOverdue && !givingWay && cycle != null && cycle.IsNight && playerHealth != null && playerHealth.IsAlive && !HavenVisit.IsVisiting)
         {
             StartCoroutine(GiveWay());
         }
@@ -231,7 +231,8 @@ public sealed class WardBreachDirector : MonoBehaviour
     public void Begin()
     {
         WardBreachDefinition breach = Definition;
-        if (!IsPending || breach == null || !breach.HasEnemies || playerHealth == null || !playerHealth.IsAlive)
+        // A guest's copy of a friend's Haven doesn't hold its own breaches; the host's game does.
+        if (!IsPending || breach == null || !breach.HasEnemies || playerHealth == null || !playerHealth.IsAlive || HavenVisit.IsVisiting)
         {
             return;
         }

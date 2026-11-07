@@ -383,10 +383,12 @@ public sealed class PauseMenu : MonoBehaviour
 
     private void QuitToMainMenu()
     {
+        // Straight to the menu: a guest's visit ends without the trip home (their journey is on disk as last saved).
         if (CoopSession.Current != null)
         {
-            CoopSession.Current.Leave();
+            CoopSession.Current.Leave(false);
         }
+
         if (SceneLoader.Load(mainMenuScene, "Returning to the main menu"))
         {
             BeginLeaving();

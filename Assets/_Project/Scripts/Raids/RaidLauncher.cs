@@ -18,6 +18,12 @@ public static class RaidLauncher
             return "This portal doesn't lead anywhere.";
         }
 
+        // A guest's raid would set out from a copy of the host's Haven (co-op raids come later).
+        if (HavenVisit.IsVisiting)
+        {
+            return HavenVisit.Refusal;
+        }
+
         if (raid.IsLocked && !Cheats.NoRequirements)
         {
             return raid.LockedText;

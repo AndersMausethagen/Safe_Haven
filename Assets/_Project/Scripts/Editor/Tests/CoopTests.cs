@@ -85,6 +85,95 @@ public sealed class CoopTests
         Assert.IsFalse(CoopSession.TryParseAddress("10.0.0.5:0", 7777, out _, out _));
     }
 
+    private static SaveData Game(string who, string scene, Vector3 at)
+    {
+        var data = new SaveData { scene = scene, hasPlayerPose = true, playerPosition = at, displayName = who + "'s Journey" };
+        data.player.knownRecipes.Add(who + " recipe");
+        data.progress.level = who == "Host" ? 9 : 3;
+        data.appearance.name = who;
+        data.settlement.wardLevel = who == "Host" ? 4 : 1;
+        data.stash.items.Add(new SlotSaveData { item = who + " heirloom", count = 1 });
+        data.world.Add(new SceneSaveData { scene = scene });
+        data.world[0].entities.Add(new EntitySaveData { id = who + " house", spawned = true });
+        data.quests.Add(new QuestSaveData());
+        return data;
+    }
+
+    [Test]
+    public void AVisit_IsTheHostsWorld_WithYourCharacter_BesideTheHost()
+    {
+        SaveData host = Game("Host", "SafeHaven", new Vector3(10f, 0f, 20f));
+        SaveData world = HavenVisit.WorldOf(host, hostIsHome: true);
+        Assert.IsEmpty(world.player.knownRecipes, "Nothing of the host's character is sent.");
+        Assert.AreEqual(1, world.progress.level);
+
+        SaveData guest = Game("Guest", "SafeHaven", new Vector3(-5f, 0f, -5f));
+        SaveData visit = HavenVisit.Combine(world, guest);
+        Assert.AreEqual("Host house", visit.world[0].entities[0].id, "The host's buildings.");
+        Assert.AreEqual(4, visit.settlement.wardLevel, "The host's settlement.");
+        Assert.AreEqual("Host heirloom", visit.stash.items[0].item, "The host's stash (closed to guests for now).");
+        Assert.AreEqual("Guest recipe", visit.player.knownRecipes[0], "Your bag and recipes.");
+        Assert.AreEqual(3, visit.progress.level, "Your level.");
+        Assert.AreEqual("Guest", visit.appearance.name);
+        Assert.AreEqual(new Vector3(11.6f, 0f, 21.6f), visit.playerPosition, "Beside the host.");
+    }
+
+    [Test]
+    public void AHostOnARaid_IsVisitedInTheirHaven()
+    {
+        SaveData world = HavenVisit.WorldOf(Game("Host", "Raid_Deepwood", new Vector3(1f, 2f, 3f)), hostIsHome: false);
+        Assert.AreEqual(HavenVisit.HavenScene, world.scene);
+        Assert.IsFalse(world.hasPlayerPose, "Not beside them in the raid: at the Haven's arrival point.");
+    }
+
+    [Test]
+    public void SavingWhileVisiting_KeepsYourOwnWorld_WithWhatYourCharacterGained()
+    {
+        SaveData home = Game("Guest", "SafeHaven", new Vector3(-5f, 0f, -5f));
+        SaveData visit = HavenVisit.Combine(HavenVisit.WorldOf(Game("Host", "SafeHaven", Vector3.zero), true), home);
+        visit.player.knownRecipes.Add("learned on the visit");
+        visit.progress.level = 4;
+
+        SaveData kept = HavenVisit.KeepHome(home, visit);
+        Assert.AreEqual("Guest house", kept.world[0].entities[0].id, "Your own buildings, untouched.");
+        Assert.AreEqual(1, kept.settlement.wardLevel);
+        Assert.AreEqual("Guest heirloom", kept.stash.items[0].item);
+        Assert.AreEqual(new Vector3(-5f, 0f, -5f), kept.playerPosition, "You load at home, where you left.");
+        CollectionAssert.Contains(kept.player.knownRecipes, "learned on the visit");
+        Assert.AreEqual(4, kept.progress.level);
+        Assert.AreEqual(1, home.player.knownRecipes.Count, "The kept home game isn't changed by the visit.");
+    }
+
+    [Test]
+    public void AWorld_TravelsInPieces_AndArrivesWhole_InAnyOrder()
+    {
+        SaveData host = Game("Host", "SafeHaven", Vector3.one);
+        for (int i = 0; i < 400; i++)
+        {
+            host.world[0].entities.Add(new EntitySaveData { id = "tree " + i, position = new Vector3(i, 0f, i * 0.5f) });
+        }
+
+        byte[] packed = WorldTransfer.Pack(HavenVisit.WorldOf(host, true));
+        var pieces = WorldTransfer.Split(packed, 1000);
+        Assert.Greater(pieces.Count, 1);
+        var receiver = new WorldTransfer.Receiver();
+        byte[] whole = null;
+        for (int i = pieces.Count - 1; i >= 0; i--)
+        {
+            byte[] result = receiver.Add(7, i, pieces.Count, pieces[i]);
+            receiver.Add(7, i, pieces.Count, pieces[i]); // a repeat changes nothing
+            if (result != null)
+            {
+                whole = result;
+            }
+        }
+
+        Assert.IsNotNull(whole);
+        SaveData arrived = WorldTransfer.Unpack(whole);
+        Assert.AreEqual(401, arrived.world[0].entities.Count);
+        Assert.AreEqual("tree 399", arrived.world[0].entities[400].id);
+    }
+
     [Test]
     public void SteamJoinLinks_NameTheLobby()
     {
