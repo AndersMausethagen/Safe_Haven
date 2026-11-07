@@ -35,6 +35,8 @@ public enum CraftingStationType
     /// <summary>Bees turn flowers and berries into honey.</summary>
     [InspectorName("Beehive")] Beehive = 12,
     [InspectorName("Wainwright's Yard")] Wainwright = 13,
+    /// <summary>Nets, lines and traps set from a pier: fish brought in while you are about other things (the Fisher's workplace).</summary>
+    [InspectorName("Dock")] Dock = 14,
 }
 
 public static class CraftingStationTypes
@@ -63,6 +65,8 @@ public static class CraftingStationTypes
                 return "Farm Plot";
             case CraftingStationType.Wainwright:
                 return "Wainwright's Yard";
+            case CraftingStationType.Dock:
+                return "Dock";
             default:
                 return type.ToString();
         }

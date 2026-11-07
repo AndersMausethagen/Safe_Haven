@@ -33,3 +33,7 @@ MonoBehaviour:
   soulSiphon: 0.1
   takedownReach: 4
   shadowstep: 1.35
+  flourishLevel: 30
+  flurryDamage: 1.3
+  flurryRefund: 0.5
+  sunderPoise: 2.5

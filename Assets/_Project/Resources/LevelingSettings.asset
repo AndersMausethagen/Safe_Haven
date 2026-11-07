@@ -41,6 +41,7 @@ MonoBehaviour:
   mealWork: 1
   tonicWork: 1.5
   materialWork: 0.5
+  dockWork: 0.75
   buildWork: 4
   upgradeWork: 6
   fineStrength: 0.5

@@ -19,10 +19,10 @@ MonoBehaviour:
   icon: {fileID: 0}
   group: 0
   training: 5
-  crafts: 0
+  crafts: 128
   gatherTool: 0
   gathersByHand: 0
-  mentor: {fileID: 0}
+  mentor: {fileID: 11400000, guid: 01ca82d04753df04d8624425213e0975, type: 2}
   levelBonuses:
   - stat: 47
     atFirstLevel: -0.19999999

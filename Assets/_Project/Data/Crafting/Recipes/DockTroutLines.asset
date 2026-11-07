@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e984d5700951ee48b9215d668e8218a, type: 3}
+  m_Name: DockTroutLines
+  m_EditorClassIdentifier: SafeHaven::RecipeDefinition
+  id: docktroutlines
+  displayName: Trout Lines
+  output: {fileID: 11400000, guid: 0318e752045b5e54f87bb7ba2814fb8e, type: 2}
+  outputResource: {fileID: 0}
+  outputAmount: 2
+  resourceCost: []
+  itemCost:
+  - item: {fileID: 11400000, guid: 10c81a33462696a469286ca0416bb78e, type: 2}
+    amount: 2
+  station: 14
+  craftSeconds: 60
+  knownFromStart: 1
+  minimumStationTier: 1
+  requiredSkill: {fileID: 0}
+  requiredSkillLevel: 0
+  sortOrder: 2

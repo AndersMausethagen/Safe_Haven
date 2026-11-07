@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad044708340368842899cf78f08bfbfb, type: 3}
+  m_Name: Fisher
+  m_EditorClassIdentifier: SafeHaven::JobDefinition
+  id: job.fisher
+  displayName: Fisher
+  description: 'Works the Dock: keeps the nets and lines out while you are away, so there is fish in the stash, and gives lessons in Fishing.'
+  acceptLine: '"The water''s patient. So am I."'
+  teachesBuildings: []
+  teachesRecipes: []
+  workplace: {fileID: 11400000, guid: 01ca82d04753df04d8624425213e0975, type: 2}
+  workGesture: {fileID: 11400000, guid: 8e94db9e6609beb419853cd309fcecd4, type: 2}
+  workTool: {fileID: 11400000, guid: b04ccfef825e1bf478134cd72e4ff1e9, type: 2}
+  workToolScale: 1
+  workSound: {fileID: 11400000, guid: 5b92b167e5b591449b2fcd212c1db02b, type: 2}
+  workSoundDelay: 0.4
+  workSoundEvery: {x: 4, y: 9}
+  workOrders:
+  - recipe: {fileID: 11400000, guid: 6d4e51810055b0d40b704de8298762a7, type: 2}
+    stockTarget: 20
+    keepInput: 5
+  - recipe: {fileID: 11400000, guid: 063eb9633a2d4be4797de368b859da17, type: 2}
+    stockTarget: 15
+    keepInput: 6
+  - recipe: {fileID: 11400000, guid: be7b0ed0fdcc42a4da79f4fbd4ac4644, type: 2}
+    stockTarget: 6
+    keepInput: 6
+  teaches: {fileID: 11400000, guid: b7b0a5e2ce2709341b1d81708498a315, type: 2}
+  assignedEvent: {fileID: 0}
+  extraRumours: 0
+  gearRepairDiscount: 0
+  buildingRepairDiscount: 0
+  defendsAs: {fileID: 0}
+  wardHealth: 0
+  raidSeconds: 0

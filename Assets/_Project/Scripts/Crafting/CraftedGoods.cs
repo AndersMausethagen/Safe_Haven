@@ -17,6 +17,8 @@ public enum CraftedGoods
     Tonics = 32,
     /// <summary>Refined materials: planks, ingots, blocks, leather.</summary>
     Materials = 64,
+    /// <summary>Fish brought in at the Dock with nets, lines and traps.</summary>
+    Catch = 128,
 }
 
 /// <summary>How well a piece of gear was made. Fine and Masterwork pieces give more, as if empowered part of the way.</summary>
@@ -45,6 +47,12 @@ public static class CraftedWork
             || recipe.Station == CraftingStationType.Portal)
         {
             return CraftedGoods.None;
+        }
+
+        // What the Dock gives is caught, not made: it trains the angler.
+        if (recipe.Station == CraftingStationType.Dock)
+        {
+            return CraftedGoods.Catch;
         }
 
         return Of(recipe.Output);
@@ -126,6 +134,8 @@ public static class CraftedWork
             case CraftedGoods.Meals: return maker.Get(StatType.CookingYield);
             case CraftedGoods.Tonics: return maker.Get(StatType.AlchemyYield);
             case CraftedGoods.Materials: return maker.Get(StatType.RefiningYield);
+            // Double Catch works on the nets too.
+            case CraftedGoods.Catch: return Techniques.Has(PerkTechnique.DoubleCatch) ? TechniqueSettings.Current.DoubleCatchChance : 0f;
             default: return 0f;
         }
     }

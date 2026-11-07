@@ -72,6 +72,8 @@ public sealed class LevelingSettings : GameSettings<LevelingSettings>
     [SerializeField, Min(0f)] private float mealWork = 1f;
     [SerializeField, Min(0f)] private float tonicWork = 1.5f;
     [SerializeField, Min(0f)] private float materialWork = 0.5f;
+    [Tooltip("A catch from the Dock's nets, lines or traps: less than a fish landed by hand.")]
+    [SerializeField, Min(0f)] private float dockWork = 0.75f;
     [Tooltip("A building hammered up, in the tier experience of its level (a ruin repaired counts as one).")]
     [SerializeField, Min(0f)] private float buildWork = 4f;
     [Tooltip("A building upgraded, in the tier experience of the level it reached.")]
@@ -330,6 +332,7 @@ public sealed class LevelingSettings : GameSettings<LevelingSettings>
             case CraftedGoods.Meals: return mealWork;
             case CraftedGoods.Tonics: return tonicWork;
             case CraftedGoods.Materials: return materialWork;
+            case CraftedGoods.Catch: return dockWork;
             default: return 0f;
         }
     }

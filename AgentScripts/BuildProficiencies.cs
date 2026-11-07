@@ -143,7 +143,7 @@ public static class BuildProficiencies
             Milestone(50,
                 Perk("fish_master_angler", "Master Angler", "The river gives up what you ask of it.", Bonus(StatType.ReelZone, 20 * Pct)),
                 Perk("fish_sea_legs", "Sea Legs", "Steady on any footing.", Bonus(StatType.MaxHealth, 15f))),
-        });
+        }, CraftedGoods.Catch);  // the Dock's nets and lines
 
     // ----- Crafting -----
 
@@ -591,7 +591,7 @@ public static class BuildProficiencies
     {
         { "woodcutting", "Sawbench" }, { "mining", "Forge" }, { "foraging", "FarmPlot" }, { "weaponcrafting", "Forge" },
         { "armorcrafting", "Loom" }, { "cooking", "Kitchen" }, { "alchemy", "Cauldron" }, { "construction", "ConstructionTable" },
-        { "archery", "TanningRack" }, { "runecraft", "PurificationAltar" },
+        { "archery", "TanningRack" }, { "runecraft", "PurificationAltar" }, { "fishing", "Dock" },
     };
 
     private static string Mentors(List<ProficiencyDefinition> skills)
@@ -635,7 +635,7 @@ public static class BuildProficiencies
     {
         { "Smith", "weaponcrafting" }, { "Weaver", "armorcrafting" }, { "Cook", "cooking" }, { "Mason", "construction" },
         { "Carpenter", "woodcutting" }, { "Farmer", "foraging" }, { "Hunter", "archery" }, { "Warden", "melee" },
-        { "Tracker", "sneaking" }, { "RuneScholar", "runecraft" },
+        { "Tracker", "sneaking" }, { "RuneScholar", "runecraft" }, { "Fisher", "fishing" },
     };
 
     private static string Teachers(List<ProficiencyDefinition> skills)
