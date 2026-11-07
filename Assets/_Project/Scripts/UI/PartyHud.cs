@@ -22,6 +22,7 @@ public sealed class PartyHud : MonoBehaviour
         public TMP_Text Where;
         public RectTransform Fill;
         public Image FillImage;
+        public int Metres = -1;
     }
 
     private readonly List<Row> rows = new List<Row>();
@@ -98,11 +99,21 @@ public sealed class PartyHud : MonoBehaviour
             PlayerLookState look = friend.Look;
             bool here = friend.IsVisible;
             float health = look.Health / 255f;
-            row.Name.text = look.DisplayName;
+            string name = look.DisplayName;
+            if (row.Name.text != name)
+            {
+                row.Name.text = name;
+            }
             row.Fill.anchorMax = new Vector2(here || look.Health > 0 ? health : 0f, 1f);
             row.FillImage.color = look.Downed ? style.Danger : health < 0.3f ? style.Danger : style.Good;
+            if (!here)
+            {
+                row.Metres = -1;
+            }
+
             if (look.Downed)
             {
+                row.Metres = -1;
                 row.Where.text = "Down!";
                 row.Where.color = style.Danger;
             }
@@ -113,10 +124,16 @@ public sealed class PartyHud : MonoBehaviour
             }
             else if (here && Player.Current != null)
             {
-                row.Where.text = $"{Vector3.Distance(Player.Current.transform.position, friend.Body.transform.position):0} m";
+                int metres = Mathf.RoundToInt(Vector3.Distance(Player.Current.transform.position, friend.Body.transform.position));
+                if (row.Metres != metres)
+                {
+                    row.Metres = metres;
+                    row.Where.text = $"{metres} m";
+                }
+
                 row.Where.color = style.Muted;
             }
-            else if (CoopSession.Current != null && CoopSession.Current.TryNews(look.DisplayName, out RaidOutcome outcome))
+            else if (CoopSession.Current != null && CoopSession.Current.Raids.TryNews(look.DisplayName, out RaidOutcome outcome))
             {
                 row.Where.text = outcome == RaidOutcome.Extracted ? "Got out" : outcome == RaidOutcome.Died ? "Fell" : "Caught";
                 row.Where.color = outcome == RaidOutcome.Extracted ? style.Good : style.Danger;

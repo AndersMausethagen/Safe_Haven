@@ -35,7 +35,7 @@ public readonly struct FriendAsk
 /// goes through <see cref="StashShare"/>: the host sends it to those allowed, and they send back what they put in or take.
 /// Plain C#: registers its own messages on the session's NetworkManager.
 /// </summary>
-public sealed class VisitorAccess
+public sealed class VisitorAccess : ICoopPart
 {
     private const string AskMessage = "SafeHaven.Ask";
     private const string AnswerMessage = "SafeHaven.Answer";
@@ -49,7 +49,12 @@ public sealed class VisitorAccess
     private readonly StashShare stash = new StashShare();
     private readonly List<ulong> stashUsers = new List<ulong>();
     private readonly HashSet<ulong> closingStash = new HashSet<ulong>();
-    private NetworkManager network;
+    private const float LookSeconds = 0.5f;
+    private CoopLink link;
+    private bool isHost;
+    private float nextLook;
+
+    private NetworkManager network => link?.Network;
 
     /// <summary>Questions waiting for the host's answer, oldest first.</summary>
     public IReadOnlyList<FriendAsk> Asks => asks;
@@ -57,20 +62,41 @@ public sealed class VisitorAccess
     /// <summary>Raised when a question arrives or is answered.</summary>
     public event Action AsksChanged;
 
-    public void StartHosting(NetworkManager manager)
+    public void Begin(CoopLink session)
     {
-        network = manager;
+        link = session;
+        isHost = link.IsHost;
         Reset();
-        network.CustomMessagingManager.RegisterNamedMessageHandler(AskMessage, OnAsk);
-        network.CustomMessagingManager.RegisterNamedMessageHandler(StashChangeMessage, OnStashChange);
+        if (isHost)
+        {
+            link.On(AskMessage, OnAsk);
+            link.On(StashChangeMessage, OnStashChange);
+        }
+        else
+        {
+            link.On(AnswerMessage, OnAnswer);
+            link.On(StashMessage, OnStash);
+        }
     }
 
-    public void StartGuest(NetworkManager manager)
+    public void FriendLeft(ulong clientId) => Forget(clientId);
+
+    public void End()
     {
-        network = manager;
         Reset();
-        network.CustomMessagingManager.RegisterNamedMessageHandler(AnswerMessage, OnAnswer);
-        network.CustomMessagingManager.RegisterNamedMessageHandler(StashMessage, OnStash);
+        link = null;
+    }
+
+    /// <summary>Every frame; looks at the stash twice a second.</summary>
+    public void Tick()
+    {
+        if (link == null || Time.unscaledTime < nextLook)
+        {
+            return;
+        }
+
+        nextLook = Time.unscaledTime + LookSeconds;
+        Look(isHost);
     }
 
     public void Reset()
@@ -100,8 +126,8 @@ public sealed class VisitorAccess
         }
     }
 
-    /// <summary>A couple of times a second: the host sends its stash to those using it when it changed; a guest sends what they changed in it.</summary>
-    public void Tick(bool isHost)
+    // The host sends its stash to those using it when it changed; a guest sends what they changed in it.
+    private void Look(bool isHost)
     {
         if (network == null)
         {
@@ -240,7 +266,7 @@ public sealed class VisitorAccess
 
             foreach (VisitorRight right in pair.Value)
             {
-                if (network != null && IsConnected(pair.Key))
+                if (network != null && link.IsConnected(pair.Key))
                 {
                     using var writer = new FastBufferWriter(8, Allocator.Temp);
                     writer.WriteValueSafe((byte)right);
@@ -260,7 +286,7 @@ public sealed class VisitorAccess
     {
         asks.RemoveAll(waitingAsk => waitingAsk.ClientId == ask.ClientId && waitingAsk.Right == ask.Right);
         AsksChanged?.Invoke();
-        if (network == null || !IsConnected(ask.ClientId))
+        if (network == null || !link.IsConnected(ask.ClientId))
         {
             return;
         }
@@ -366,19 +392,6 @@ public sealed class VisitorAccess
         }
     }
 
-    private bool IsConnected(ulong clientId)
-    {
-        foreach (ulong client in network.ConnectedClientsIds)
-        {
-            if (client == clientId)
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     private static string NameOf(ulong clientId)
     {
         foreach (NetworkPlayerAvatar avatar in NetworkPlayerAvatar.All)
@@ -400,5 +413,7 @@ public sealed class VisitorAccess
         network.CustomMessagingManager.SendNamedMessage(message, to, writer, NetworkDelivery.ReliableFragmentedSequenced);
     }
 
-    private static IContentLookup Content() => Resources.Load<ContentDatabase>(ContentDatabase.ResourceName);
+    private static ContentDatabase content;
+
+    private static IContentLookup Content() => content != null ? content : content = Resources.Load<ContentDatabase>(ContentDatabase.ResourceName);
 }

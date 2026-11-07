@@ -366,7 +366,7 @@ public sealed class ItemInventory : MonoBehaviour
     public bool Drop(ItemContainer from, int slot)
     {
         ItemStack stack = from != null ? from.GetSlot(slot) : ItemStack.Empty;
-        if (stack.IsEmpty || DroppedItem.Drop(transform, stack) == null)
+        if (stack.IsEmpty || DroppedItem.DropByChoice(transform, stack) == null)
         {
             return false;
         }

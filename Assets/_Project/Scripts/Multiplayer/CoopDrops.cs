@@ -11,7 +11,7 @@ using UnityEngine;
 /// what is left (or that it is gone) goes to everyone (<c>DropResult</c>, <c>DropUpdate</c>). So nothing is taken twice.
 /// Raid loot itself stays personal. Plain C#: <see cref="CoopSession"/> owns the connection.
 /// </summary>
-public sealed class CoopDrops : IDisposable
+public sealed class CoopDrops : ICoopPart, IDisposable
 {
     private const string DropMessage = "SafeHaven.Drop";
     private const string ClaimMessage = "SafeHaven.DropClaim";
@@ -22,7 +22,9 @@ public sealed class CoopDrops : IDisposable
 
     private readonly Dictionary<string, DroppedItem> drops = new Dictionary<string, DroppedItem>();
     private readonly Dictionary<string, ulong> claimedBy = new Dictionary<string, ulong>();
-    private NetworkManager network;
+    private CoopLink link;
+
+    private NetworkManager network => link?.Network;
     private UnityEngine.SceneManagement.Scene scene;
 
     /// <summary>The session's, while one runs.</summary>
@@ -42,29 +44,34 @@ public sealed class CoopDrops : IDisposable
         }
     }
 
-    public void Start(NetworkManager manager, bool isHost)
+    public void Begin(CoopLink session)
     {
-        network = manager;
+        link = session;
         Current = this;
         Clear();
-        var messages = network.CustomMessagingManager;
-        messages.RegisterNamedMessageHandler(DropMessage, OnDrop);
-        messages.RegisterNamedMessageHandler(UpdateMessage, OnUpdate);
-        if (isHost)
+        link.On(DropMessage, OnDrop);
+        link.On(UpdateMessage, OnUpdate);
+        if (link.IsHost)
         {
-            messages.RegisterNamedMessageHandler(ClaimMessage, OnClaim);
-            messages.RegisterNamedMessageHandler(ResultMessage, OnResult);
+            link.On(ClaimMessage, OnClaim);
+            link.On(ResultMessage, OnResult);
         }
         else
         {
-            messages.RegisterNamedMessageHandler(GrantedMessage, OnGranted);
-            messages.RegisterNamedMessageHandler(DeniedMessage, (sender, _) => GameMessages.Post("Someone else is picking that up.", MessageKind.Warning));
+            link.On(GrantedMessage, OnGranted);
+            link.On(DeniedMessage, (sender, _) => GameMessages.Post("Someone else is picking that up.", MessageKind.Warning));
         }
     }
 
-    public void Stop()
+    public void Tick()
     {
-        network = null;
+    }
+
+    public void FriendLeft(ulong clientId) => Forget(clientId);
+
+    public void End()
+    {
+        link = null;
         if (Current == this)
         {
             Current = null;
@@ -151,11 +158,11 @@ public sealed class CoopDrops : IDisposable
         KeepToThisScene();
         item.ShareId = Guid.NewGuid().ToString("N");
         drops[item.ShareId] = item;
-        SendDrop(item.ShareId, ((ISaveable)item).CaptureState(), item.transform.position, item.transform.rotation, CoopCreatures.PlaceKey,
-            network.IsServer ? Guests(NetworkManager.ServerClientId) : ToHost());
+        SendDrop(item.ShareId, ((ISaveable)item).CaptureState(), item.transform.position, item.transform.rotation, CoopPlace.Key,
+            link.IsHost ? link.Guests() : link.Only(NetworkManager.ServerClientId));
     }
 
-    private void SendDrop(string id, string state, Vector3 at, Quaternion facing, FixedString128Bytes place, List<ulong> to)
+    private void SendDrop(string id, string state, Vector3 at, Quaternion facing, FixedString128Bytes place, IReadOnlyList<ulong> to)
     {
         if (to.Count == 0)
         {
@@ -180,11 +187,11 @@ public sealed class CoopDrops : IDisposable
         reader.ReadValueSafe(out Quaternion facing);
         if (network.IsServer)
         {
-            SendDrop(id, state, at, facing, place, Guests(sender));
+            SendDrop(id, state, at, facing, place, link.Guests(sender));
         }
 
         KeepToThisScene();
-        if (!place.Equals(CoopCreatures.PlaceKey) || drops.ContainsKey(id))
+        if (!place.Equals(CoopPlace.Key) || drops.ContainsKey(id))
         {
             return;
         }
@@ -261,7 +268,7 @@ public sealed class CoopDrops : IDisposable
 
     private void Broadcast(string id, string left, ulong except)
     {
-        List<ulong> to = Guests(except);
+        IReadOnlyList<ulong> to = link.Guests(except);
         if (to.Count == 0)
         {
             return;
@@ -303,24 +310,10 @@ public sealed class CoopDrops : IDisposable
         }
     }
 
-    private List<ulong> Guests(ulong except)
+    // Entering Play doesn't reload scripts in this project: statics carry over from the last session unless cleared.
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession()
     {
-        var to = new List<ulong>();
-        if (network == null || !network.IsServer)
-        {
-            return to;
-        }
-
-        foreach (ulong client in network.ConnectedClientsIds)
-        {
-            if (client != NetworkManager.ServerClientId && client != except)
-            {
-                to.Add(client);
-            }
-        }
-
-        return to;
+        Current = null;
     }
-
-    private static List<ulong> ToHost() => new List<ulong> { NetworkManager.ServerClientId };
 }

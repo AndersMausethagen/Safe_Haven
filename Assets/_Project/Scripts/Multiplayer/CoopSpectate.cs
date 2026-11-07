@@ -105,7 +105,7 @@ public static class CoopSpectate
     private static int Standing()
     {
         standing.Clear();
-        Unity.Collections.FixedString128Bytes place = CoopCreatures.PlaceKey;
+        Unity.Collections.FixedString128Bytes place = CoopPlace.Key;
         foreach (NetworkPlayerAvatar friend in NetworkPlayerAvatar.All)
         {
             if (friend != null && !friend.IsOwner && friend.IsVisible && friend.Body != null && !friend.Look.Downed && friend.Look.Health > 0

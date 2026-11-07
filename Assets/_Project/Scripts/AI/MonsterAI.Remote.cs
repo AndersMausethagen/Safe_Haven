@@ -159,4 +159,12 @@ public sealed partial class MonsterAI
 
         transform.SetPositionAndRotation(position, Quaternion.Euler(0f, yaw, 0f));
     }
+
+    // Entering Play doesn't reload scripts in this project: statics carry over from the last session unless cleared.
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetRemoteForNewPlaySession()
+    {
+        RemoteClock = null;
+        SpawningRemote = false;
+    }
 }

@@ -11,7 +11,7 @@ using UnityEngine.InputSystem;
 /// as a label in the world ("Astrid: Enemy · 34 m") and on the minimap (<see cref="Active"/>) for a few seconds.
 /// Plain C#: <see cref="CoopSession"/> ticks it and owns the connection.
 /// </summary>
-public sealed class CoopPings
+public sealed class CoopPings : ICoopPart
 {
     private const string PingMessage = "SafeHaven.Ping";
     private const float Lasts = 8f;
@@ -30,17 +30,29 @@ public sealed class CoopPings
 
     private static readonly List<Ping> active = new List<Ping>();
     private static readonly RaycastHit[] hits = new RaycastHit[16];
-    private NetworkManager network;
+    private CoopLink link;
+
+    private NetworkManager network => link?.Network;
     private float nextPing;
 
     /// <summary>Pings still showing, for the minimap.</summary>
     public static IReadOnlyList<Ping> Active => active;
 
-    public void Start(NetworkManager manager)
+    public void Begin(CoopLink session)
     {
-        network = manager;
+        link = session;
         Clear();
-        network.CustomMessagingManager.RegisterNamedMessageHandler(PingMessage, OnPing);
+        link.On(PingMessage, OnPing);
+    }
+
+    public void FriendLeft(ulong clientId)
+    {
+    }
+
+    public void End()
+    {
+        Clear();
+        link = null;
     }
 
     public void Clear()
@@ -57,7 +69,7 @@ public sealed class CoopPings
     }
 
     /// <summary>Every frame in a session: a press marks a spot; old pings fade.</summary>
-    public void Update()
+    public void Tick()
     {
         for (int i = active.Count - 1; i >= 0; i--)
         {
@@ -82,7 +94,7 @@ public sealed class CoopPings
         nextPing = Time.unscaledTime + Spacing;
         string me = GameSession.Appearance != null ? GameSession.Appearance.DisplayName : CharacterAppearance.DefaultName;
         Show(at, me, enemy);
-        Send(at, me, enemy, network.IsServer ? Others(NetworkManager.ServerClientId) : ToHost());
+        Send(at, me, enemy, link.IsHost ? link.Guests() : link.Only(NetworkManager.ServerClientId));
     }
 
     // What lies under the crosshair (the middle of the screen), past the player's own body.
@@ -121,16 +133,16 @@ public sealed class CoopPings
         // The host passes a guest's ping on to the others.
         if (network.IsServer)
         {
-            Send(at, who, enemy, Others(sender), place);
+            Send(at, who, enemy, link.Guests(sender), place);
         }
 
-        if (place.Equals(CoopCreatures.PlaceKey))
+        if (place.Equals(CoopPlace.Key))
         {
             Show(at, who, enemy);
         }
     }
 
-    private void Send(Vector3 at, string who, bool enemy, List<ulong> to, FixedString128Bytes? place = null)
+    private void Send(Vector3 at, string who, bool enemy, IReadOnlyList<ulong> to, FixedString128Bytes? place = null)
     {
         if (to.Count == 0)
         {
@@ -138,28 +150,12 @@ public sealed class CoopPings
         }
 
         using var writer = new FastBufferWriter(512, Allocator.Temp);
-        writer.WriteValueSafe(place ?? CoopCreatures.PlaceKey);
+        writer.WriteValueSafe(place ?? CoopPlace.Key);
         writer.WriteValueSafe(at);
         writer.WriteValueSafe(enemy);
         writer.WriteValueSafe(who);
         network.CustomMessagingManager.SendNamedMessage(PingMessage, to, writer, NetworkDelivery.ReliableFragmentedSequenced);
     }
-
-    private List<ulong> Others(ulong except)
-    {
-        var to = new List<ulong>();
-        foreach (ulong client in network.ConnectedClientsIds)
-        {
-            if (client != NetworkManager.ServerClientId && client != except)
-            {
-                to.Add(client);
-            }
-        }
-
-        return to;
-    }
-
-    private static List<ulong> ToHost() => new List<ulong> { NetworkManager.ServerClientId };
 
     private static void Show(Vector3 at, string who, bool enemy)
     {
@@ -182,6 +178,13 @@ public sealed class CoopPings
         active.Add(ping);
         GameMessages.Post(enemy ? $"{who}: enemy there!" : $"{who}: over here.");
     }
+
+    // Entering Play doesn't reload scripts in this project: statics carry over from the last session unless cleared.
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession()
+    {
+        active.Clear();
+    }
 }
 
 /// <summary>A ping in the world: a label over the spot, turned to the camera and kept readable at any distance.</summary>
@@ -190,6 +193,7 @@ public sealed class PingMarker : MonoBehaviour
     private const float Height = 1.6f;
     private CoopPings.Ping ping;
     private TextMeshPro label;
+    private int shownMetres = -1;
 
     public static PingMarker Create(CoopPings.Ping ping)
     {
@@ -217,6 +221,11 @@ public sealed class PingMarker : MonoBehaviour
         transform.localScale = Vector3.one * Mathf.Clamp(distance * 0.06f, 0.4f, 12f);
         float left = ping.Until - Time.unscaledTime;
         label.alpha = Mathf.Clamp01(left);
-        label.text = $"{ping.Who}{(ping.Enemy ? ": Enemy" : string.Empty)} · {distance:0} m";
+        int metres = Mathf.RoundToInt(distance);
+        if (metres != shownMetres)
+        {
+            shownMetres = metres;
+            label.text = $"{ping.Who}{(ping.Enemy ? ": Enemy" : string.Empty)} · {metres} m";
+        }
     }
 }

@@ -13,6 +13,8 @@ public sealed class DownedHud : MonoBehaviour
     private TMP_Text title;
     private TMP_Text detail;
     private RectTransform fill;
+    private int shownSeconds = -1;
+    private string shownHelper;
 
     public static DownedHud Current { get; private set; }
 
@@ -77,9 +79,21 @@ public sealed class DownedHud : MonoBehaviour
         }
 
         CoopDowned downed = session.Downed;
-        title.text = $"Down · {Mathf.CeilToInt(downed.BleedOutLeft)}";
+        int seconds = Mathf.CeilToInt(downed.BleedOutLeft);
+        if (seconds != shownSeconds)
+        {
+            shownSeconds = seconds;
+            title.text = $"Down · {seconds}";
+        }
+
         float help = downed.HelpShare;
-        detail.text = help >= 0f ? $"{downed.Helper} is helping you up" : "Crawl to a friend, or hold out for one to reach you";
+        string helper = help >= 0f ? downed.Helper : null;
+        if (helper != shownHelper || string.IsNullOrEmpty(detail.text))
+        {
+            shownHelper = helper;
+            detail.text = helper != null ? $"{helper} is helping you up" : "Crawl to a friend, or hold out for one to reach you";
+        }
+
         fill.parent.gameObject.SetActive(help >= 0f);
         fill.anchorMax = new Vector2(Mathf.Clamp01(help), 1f);
     }

@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using Unity.Collections;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using UnityEngine;
@@ -20,8 +19,12 @@ public enum CoopState
 }
 
 /// <summary>
-/// Co-op: one player hosts, up to <see cref="MultiplayerSettings.MaxPlayers"/> play together. Owns the Netcode
-/// NetworkManager (made here, in code) and picks its transport per session:
+/// Co-op: one player hosts, up to <see cref="MultiplayerSettings.MaxPlayers"/> play together. This is the connection:
+/// it owns the Netcode NetworkManager (made here, in code), picks its transport per session, lets players in, and runs the
+/// parts of co-op through one life (<see cref="ICoopPart"/>): the Haven shared with visitors (<see cref="HavenShare"/>),
+/// friends' questions to the host (<see cref="VisitorAccess"/>), raids together (<see cref="RaidsTogether"/>), raid
+/// creatures (<see cref="CoopCreatures"/>), downed and helped up (<see cref="CoopDowned"/>), pings, shared drops and the
+/// screens for all of it. A new part is one more entry in the list.
 /// <list type="bullet">
 /// <item>With Steam running (<see cref="SteamPlatform"/>): Steam's relay (SteamNetworkingSocketsTransport), addressed by
 /// Steam id. Hosting opens a friends-only <see cref="SteamLobby"/>; friends join from an invite, "Join Game" in their
@@ -44,18 +47,6 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
     public const string HostTag = "Host";
     public const string GuestTag = "Guest";
     public const string LocalAddress = "127.0.0.1";
-    private const string WorldMessage = "SafeHaven.World";
-    private const string WorldRequest = "SafeHaven.WorldPlease";
-    private const string ClockMessage = "SafeHaven.Clock";
-    private const string EntitiesMessage = "SafeHaven.Entities";
-    private const string SettlementMessage = "SafeHaven.Settlement";
-    private const string RaidOpenMessage = "SafeHaven.RaidOpen";
-    private const string RaidClosedMessage = "SafeHaven.RaidClosed";
-    private const string RaidNewsMessage = "SafeHaven.RaidNews";
-    /// <summary>Seconds a host's raid must still have for friends to follow.</summary>
-    private const float FollowUntilSecondsLeft = 60f;
-    private const int SettlementEvery = 4;
-    private const float ClockInterval = 5f;
 
     private MultiplayerSettings settings;
     private SteamPlatform steam;
@@ -66,26 +57,9 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
     private CoopState state;
     private string autoStart;
     private ulong pendingLobby;
-    private readonly WorldTransfer.Receiver worldPieces = new WorldTransfer.Receiver();
-    private int transfers;
-    private float nextClock;
-    private float nextSync;
-    private int syncLooks;
-    private HavenSync sync;
-    private readonly VisitorAccess access = new VisitorAccess();
-    private readonly CoopCreatures creatures = new CoopCreatures();
-    private readonly CoopDowned downed = new CoopDowned();
-    private readonly CoopPings pings = new CoopPings();
-    private readonly CoopDrops drops = new CoopDrops();
-    private readonly Dictionary<string, (RaidOutcome outcome, string raid, float at)> news = new Dictionary<string, (RaidOutcome, string, float)>();
-    private const float TogetherSeconds = 60f;
-    private const float TogetherReach = 25f;
-    private float nextCreatures;
-    private RaidInvite openRaid;
-    private float openRaidSince;
-    private RaidInvite hostRaid;
-    private bool homeAfterRaid;
-    private readonly List<ulong> recipients = new List<ulong>();
+    private readonly List<ICoopPart> parts = new List<ICoopPart>();
+    private HavenShare haven;
+    private bool partsRunning;
 
     public static CoopSession Current { get; private set; }
 
@@ -104,21 +78,22 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
     public event Action<CoopState> StateChanged;
 
     /// <summary>Friends' questions to the host (building, the stash) and the answers.</summary>
-    public VisitorAccess Access => access;
+    public VisitorAccess Access { get; private set; }
 
     /// <summary>Downed and helped up on raids together.</summary>
-    public CoopDowned Downed => downed;
+    public CoopDowned Downed { get; private set; }
+
+    /// <summary>Following the host into raids, and how friends' raids ended.</summary>
+    public RaidsTogether Raids { get; private set; }
 
     public void Initialise(MultiplayerSettings multiplayer, SteamPlatform platform)
     {
         settings = multiplayer;
         steam = platform;
         Current = this;
-        sync = new HavenSync();
+        BuildParts();
         NetworkPlayerAvatar.FriendArrived += OnFriendArrived;
         NetworkPlayerAvatar.FriendLeft += OnFriendLeft;
-        RaidLauncher.Launched += OnRaidLaunched;
-        GameEvents.Raised += OnGameEvent;
         if (steam != null && steam.IsReady)
         {
             lobby = new SteamLobby();
@@ -137,6 +112,26 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
 #endif
     }
 
+    // The parts of co-op, in the order they begin and tick.
+    private void BuildParts()
+    {
+        var creatures = new CoopCreatures(settings);
+        haven = new HavenShare();
+        Access = new VisitorAccess();
+        Raids = new RaidsTogether(settings, creatures.FollowHost);
+        Downed = new CoopDowned(settings);
+        haven.WorldSent += Raids.TellOfRaidUnderWay;
+        haven.VisitFailed += OnVisitFailed;
+        parts.Add(haven);
+        parts.Add(Access);
+        parts.Add(Raids);
+        parts.Add(creatures);
+        parts.Add(Downed);
+        parts.Add(new CoopPings());
+        parts.Add(new CoopDrops());
+        parts.Add(new CoopHud());
+    }
+
     public void OnSceneEntered(Scene scene)
     {
         if (Player.Current == null)
@@ -145,10 +140,8 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
         }
 
         // Back from a raid the session ended during: now home.
-        if (homeAfterRaid && GameSession.ActiveRaid == null)
+        if (haven.HeadHomeIfDue())
         {
-            homeAfterRaid = false;
-            HavenVisit.End(Content());
             return;
         }
 
@@ -192,15 +185,7 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
             return false;
         }
 
-        // Friends ask for the Haven once they are fully connected (sent any earlier, it could arrive before they listen).
-        network.CustomMessagingManager.RegisterNamedMessageHandler(WorldRequest, (sender, _) => SendWorld(sender));
-        network.CustomMessagingManager.RegisterNamedMessageHandler(EntitiesMessage, OnEntitiesFromGuest);
-        access.StartHosting(network);
-        creatures.StartHosting(network, settings);
-        pings.Start(network);
-        drops.Start(network, true);
-        network.CustomMessagingManager.RegisterNamedMessageHandler(RaidNewsMessage, OnRaidNews);
-        downed.Start(network, settings);
+        BeginParts();
         SetState(CoopState.Hosting);
         if (viaSteam)
         {
@@ -258,7 +243,7 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
         }
 
         SetState(CoopState.Offline);
-        EndVisit(headHome);
+        haven.EndVisit(headHome);
     }
 
     /// <summary>Splits "host:port" (port optional).</summary>
@@ -310,6 +295,63 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
 
         reason = string.Empty;
         return true;
+    }
+
+    // ---- The parts
+
+    private void BeginParts()
+    {
+        var link = new CoopLink(network);
+        foreach (ICoopPart part in parts)
+        {
+            part.Begin(link);
+        }
+
+        partsRunning = true;
+    }
+
+    private void EndParts()
+    {
+        if (!partsRunning)
+        {
+            return;
+        }
+
+        partsRunning = false;
+        foreach (ICoopPart part in parts)
+        {
+            try
+            {
+                part.End();
+            }
+            catch (Exception exception)
+            {
+                Debug.LogException(exception);
+            }
+        }
+    }
+
+    private void Update()
+    {
+        // Watching friends after a fall goes on (and ends) whatever the session does.
+        CoopSpectate.Update();
+        if (network == null || (state != CoopState.Hosting && state != CoopState.Joined))
+        {
+            return;
+        }
+
+        // One part failing must not stop the others.
+        foreach (ICoopPart part in parts)
+        {
+            try
+            {
+                part.Tick();
+            }
+            catch (Exception exception)
+            {
+                Debug.LogException(exception);
+            }
+        }
     }
 
     // ---- Steam
@@ -405,19 +447,8 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
         }
 
         problem = string.Empty;
-        // Guests hear the host's world and clock.
-        network.CustomMessagingManager.RegisterNamedMessageHandler(WorldMessage, OnWorldPiece);
-        network.CustomMessagingManager.RegisterNamedMessageHandler(ClockMessage, OnClock);
-        network.CustomMessagingManager.RegisterNamedMessageHandler(EntitiesMessage, OnEntitiesFromHost);
-        network.CustomMessagingManager.RegisterNamedMessageHandler(SettlementMessage, OnSettlement);
-        network.CustomMessagingManager.RegisterNamedMessageHandler(RaidOpenMessage, OnRaidOpen);
-        network.CustomMessagingManager.RegisterNamedMessageHandler(RaidClosedMessage, (sender, _) => openRaid = null);
-        access.StartGuest(network);
-        creatures.StartGuest(network);
-        pings.Start(network);
-        drops.Start(network, false);
-        network.CustomMessagingManager.RegisterNamedMessageHandler(RaidNewsMessage, OnRaidNews);
-        downed.Start(network, settings);
+        // Every part listens from the start, so nothing the host sends on connecting is missed.
+        BeginParts();
         SetState(CoopState.Joining);
         return true;
     }
@@ -515,70 +546,7 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
         if (state == CoopState.Joining && clientId == network.LocalClientId)
         {
             SetState(CoopState.Joined);
-            using var ask = new FastBufferWriter(4, Allocator.Temp);
-            network.CustomMessagingManager.SendNamedMessage(WorldRequest, NetworkManager.ServerClientId, ask, NetworkDelivery.Reliable);
-        }
-    }
-
-    // ---- The host's world, for visiting guests (HavenVisit)
-
-    private void SendWorld(ulong clientId)
-    {
-        if (Player.Current == null || Player.Current.Persistence == null)
-        {
-            Debug.LogWarning("Co-op: no player to send a world from.");
-            return;
-        }
-
-        SaveData world = HavenVisit.WorldOf(SaveGameService.Capture(), HavenVisit.HostIsHome());
-        byte[] packed = WorldTransfer.Pack(world);
-        var pieces = WorldTransfer.Split(packed);
-        int transfer = ++transfers;
-        string hostName = GameSession.Appearance != null ? GameSession.Appearance.DisplayName : CharacterAppearance.DefaultName;
-        for (int index = 0; index < pieces.Count; index++)
-        {
-            byte[] piece = pieces[index];
-            using var writer = new FastBufferWriter(piece.Length + 256, Allocator.Temp);
-            writer.WriteValueSafe(transfer);
-            writer.WriteValueSafe(index);
-            writer.WriteValueSafe(pieces.Count);
-            writer.WriteValueSafe(hostName);
-            writer.WriteValueSafe(piece);
-            network.CustomMessagingManager.SendNamedMessage(WorldMessage, clientId, writer, NetworkDelivery.ReliableFragmentedSequenced);
-        }
-
-        Debug.Log($"Co-op: sent the Haven to player {clientId} ({packed.Length / 1024f:0.0} KB in {pieces.Count} pieces).");
-        TellOfRaidUnderWay(clientId);
-    }
-
-    private void OnWorldPiece(ulong sender, FastBufferReader reader)
-    {
-        reader.ReadValueSafe(out int transfer);
-        reader.ReadValueSafe(out int index);
-        reader.ReadValueSafe(out int count);
-        reader.ReadValueSafe(out string hostName);
-        reader.ReadValueSafe(out byte[] piece);
-        byte[] packed = worldPieces.Add(transfer, index, count, piece);
-        if (packed == null)
-        {
-            return;
-        }
-
-        SaveData world;
-        try
-        {
-            world = WorldTransfer.Unpack(packed);
-        }
-        catch (Exception exception)
-        {
-            Debug.LogException(exception);
-            OnVisitFailed("Your friend's Haven didn't arrive whole.");
-            return;
-        }
-
-        if (!HavenVisit.Begin(world, hostName, Content(), out string problem))
-        {
-            OnVisitFailed(problem);
+            haven.AskForHaven();
         }
     }
 
@@ -589,421 +557,16 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
         Leave(false);
     }
 
-    private void Update()
-    {
-        // Watching friends after a fall goes on (and ends) whatever the session does.
-        CoopSpectate.Update();
-        if (network == null || (state != CoopState.Hosting && state != CoopState.Joined))
-        {
-            return;
-        }
-
-        pings.Update();
-        downed.FrameUpdate();
-
-        if (Time.unscaledTime >= nextSync)
-        {
-            nextSync = Time.unscaledTime + HavenSync.Interval;
-            ShareChanges();
-            access.Tick(IsHost);
-        }
-
-        if (IsHost)
-        {
-            ShareClock();
-        }
-
-        if (Time.unscaledTime >= nextCreatures)
-        {
-            nextCreatures = Time.unscaledTime + CoopCreatures.Interval;
-            creatures.Tick(IsHost);
-            downed.Tick();
-        }
-    }
-
-    // ---- Keeping the Haven in step (HavenSync)
-
-    // The host shares what changed in its Haven with every guest; a visiting guest shares what changed in their copy.
-    private void ShareChanges()
-    {
-        if (IsHost)
-        {
-            if (Guests(NetworkManager.ServerClientId).Count == 0)
-            {
-                return;
-            }
-
-            foreach (byte[] packet in sync.Collect(true))
-            {
-                SendPacket(EntitiesMessage, packet, Guests(NetworkManager.ServerClientId));
-            }
-
-            // The settlement every couple of seconds, when it changed.
-            byte[] settlement = ++syncLooks % SettlementEvery == 0 ? sync.CollectSettlement() : null;
-            if (settlement != null)
-            {
-                SendPacket(SettlementMessage, settlement, Guests(NetworkManager.ServerClientId));
-            }
-        }
-        else if (HavenVisit.IsVisiting)
-        {
-            foreach (byte[] packet in sync.Collect(false))
-            {
-                SendPacket(EntitiesMessage, packet, ToHost());
-            }
-        }
-    }
-
-    // A guest's change: taken on here, and passed to the other guests.
-    private void OnEntitiesFromGuest(ulong sender, FastBufferReader reader)
-    {
-        reader.ReadValueSafe(out byte[] packet);
-        try
-        {
-            sync.Apply(packet, true, noteMarks: false);
-        }
-        catch (Exception exception)
-        {
-            Debug.LogException(exception);
-            return;
-        }
-
-        SendPacket(EntitiesMessage, packet, Guests(sender));
-    }
-
-    private void OnEntitiesFromHost(ulong sender, FastBufferReader reader)
-    {
-        reader.ReadValueSafe(out byte[] packet);
-        if (!HavenVisit.IsVisiting)
-        {
-            return;
-        }
-
-        try
-        {
-            sync.Apply(packet, false);
-        }
-        catch (Exception exception)
-        {
-            Debug.LogException(exception);
-        }
-    }
-
-    // ---- Raids together: the host goes through the portal, friends follow
-
-    /// <summary>
-    /// The raid a visiting guest can follow the host into now, among a portal's destinations (null when none), with the
-    /// seconds the host's run has left.
-    /// </summary>
-    public RaidDefinition RaidToFollow(IEnumerable<RaidDefinition> destinations, out float secondsLeft)
-    {
-        secondsLeft = 0f;
-        if (openRaid == null || state != CoopState.Joined || !HavenVisit.IsVisiting || GameSession.ActiveRaid != null)
-        {
-            return null;
-        }
-
-        secondsLeft = openRaid.totalSeconds - (Time.unscaledTime - openRaidSince);
-        return secondsLeft >= FollowUntilSecondsLeft ? openRaid.FindRaid(destinations) : null;
-    }
-
-    /// <summary>Follows the host into their raid (see <see cref="RaidLauncher.TryFollow"/>).</summary>
-    public void FollowIntoRaid(RaidDefinition raid, GameObject player)
-    {
-        RaidInvite invite = openRaid;
-        float elapsed = invite != null ? Time.unscaledTime - openRaidSince : 0f;
-        if (RaidLauncher.TryFollow(invite, raid, player, (ContentDatabase)Content(), elapsed, out string problem))
-        {
-            creatures.FollowHost();
-        }
-        else
-        {
-            GameMessages.Post(problem, MessageKind.Warning);
-        }
-    }
-
-    /// <summary>
-    /// Ends a visit (the session is over): straight home, or, on a raid, once it is over, so a friend leaving or the host
-    /// going doesn't cut a run short. The raid's creatures are then this game's own (<see cref="CoopCreatures.Reset"/>).
-    /// </summary>
-    private void EndVisit(bool travel)
-    {
-        if (travel && HavenVisit.IsVisiting && GameSession.ActiveRaid != null)
-        {
-            homeAfterRaid = true;
-            GameMessages.Post("You'll head home once this raid is over.");
-            return;
-        }
-
-        homeAfterRaid = false;
-        HavenVisit.End(Content(), travel);
-    }
-
-    private void OnRaidLaunched(RaidInvite invite)
-    {
-        // Kept while the run lasts, for friends who join while the host is out (SendWorld).
-        hostRaid = invite;
-        if (!IsHost || network == null || Guests(NetworkManager.ServerClientId).Count == 0)
-        {
-            return;
-        }
-
-        SendPacket(RaidOpenMessage, WorldTransfer.Pack(invite), Guests(NetworkManager.ServerClientId));
-    }
-
-    // A friend who joined while the host is on a raid hears of it after the Haven, and can still follow.
-    private void TellOfRaidUnderWay(ulong clientId)
-    {
-        RaidSession run = GameSession.ActiveRaid;
-        if (hostRaid == null || run == null || run.Seed != hostRaid.seed || run.IsOver)
-        {
-            return;
-        }
-
-        hostRaid.elapsed = run.Elapsed;
-        recipients.Clear();
-        recipients.Add(clientId);
-        SendPacket(RaidOpenMessage, WorldTransfer.Pack(hostRaid), recipients);
-    }
-
-    private void OnRaidOpen(ulong sender, FastBufferReader reader)
-    {
-        reader.ReadValueSafe(out byte[] packet);
-        if (!HavenVisit.IsVisiting)
-        {
-            return;
-        }
-
-        openRaid = WorldTransfer.Unpack<RaidInvite>(packet);
-        openRaidSince = Time.unscaledTime - Mathf.Max(0f, openRaid.elapsed);
-        GameMessages.Post($"{HavenVisit.HostName} went through the portal. Use the portal to follow them.");
-    }
-
-    // The host's raid is over: friends can no longer follow into it.
-    private void OnGameEvent(GameEvent gameEvent)
-    {
-        if (gameEvent.Kind != GameEventKind.RaidFinished)
-        {
-            return;
-        }
-
-        hostRaid = null;
-        TellRaidNews(gameEvent);
-        if (!IsHost || network == null)
-        {
-            return;
-        }
-
-        using var writer = new FastBufferWriter(4, Allocator.Temp);
-        var guests = Guests(NetworkManager.ServerClientId);
-        if (guests.Count > 0)
-        {
-            network.CustomMessagingManager.SendNamedMessage(RaidClosedMessage, guests, writer, NetworkDelivery.ReliableFragmentedSequenced);
-        }
-    }
-
-    /// <summary>How a friend's last raid ended, if word came in the last few minutes (the party panel).</summary>
-    public bool TryNews(string friend, out RaidOutcome outcome)
-    {
-        outcome = RaidOutcome.InProgress;
-        if (!news.TryGetValue(friend, out var heard) || Time.unscaledTime - heard.at > 300f)
-        {
-            return false;
-        }
-
-        outcome = heard.outcome;
-        return true;
-    }
-
-    // Getting out together pays: friends beside this player as they extract, or who got out of the same raid within the minute.
-    private void RewardTogether(string raid)
-    {
-        var together = new HashSet<string>();
-        Unity.Collections.FixedString128Bytes place = CoopCreatures.PlaceKey;
-        foreach (NetworkPlayerAvatar friend in NetworkPlayerAvatar.All)
-        {
-            if (friend != null && !friend.IsOwner && friend.IsVisible && friend.Body != null && friend.Look.Health > 0 && friend.Look.Place.Equals(place)
-                && Player.Current != null && Vector3.Distance(friend.Body.transform.position, Player.Current.transform.position) <= TogetherReach)
-            {
-                together.Add(friend.Look.DisplayName);
-            }
-        }
-
-        foreach (KeyValuePair<string, (RaidOutcome outcome, string raid, float at)> heard in news)
-        {
-            if (heard.Value.outcome == RaidOutcome.Extracted && heard.Value.raid == raid && Time.unscaledTime - heard.Value.at <= TogetherSeconds)
-            {
-                together.Add(heard.Key);
-            }
-        }
-
-        int friends = Mathf.Min(3, together.Count);
-        if (friends > 0 && settings.TogetherExperience > 0)
-        {
-            ExperienceTracker.Grant(settings.TogetherExperience * friends);
-            GameMessages.Post($"Out together with {string.Join(", ", together)}: +{settings.TogetherExperience * friends} experience.", MessageKind.Gain);
-        }
-    }
-
-    // How this player's raid ended, for friends: who got out, who fell.
-    private void TellRaidNews(GameEvent gameEvent)
-    {
-        if (network == null || (state != CoopState.Hosting && state != CoopState.Joined))
-        {
-            return;
-        }
-
-        string raid = gameEvent.Subject is RaidDefinition definition ? definition.DisplayName : "the raid";
-        string me = GameSession.Appearance != null ? GameSession.Appearance.DisplayName : CharacterAppearance.DefaultName;
-        if (gameEvent.Outcome == RaidOutcome.Extracted)
-        {
-            RewardTogether(raid);
-        }
-
-        using var writer = new FastBufferWriter(256, Allocator.Temp);
-        writer.WriteValueSafe(me);
-        writer.WriteValueSafe((byte)gameEvent.Outcome);
-        writer.WriteValueSafe(raid);
-        if (IsHost)
-        {
-            var guests = Guests(NetworkManager.ServerClientId);
-            if (guests.Count > 0)
-            {
-                network.CustomMessagingManager.SendNamedMessage(RaidNewsMessage, guests, writer, NetworkDelivery.ReliableFragmentedSequenced);
-            }
-        }
-        else
-        {
-            network.CustomMessagingManager.SendNamedMessage(RaidNewsMessage, NetworkManager.ServerClientId, writer, NetworkDelivery.ReliableFragmentedSequenced);
-        }
-    }
-
-    private void OnRaidNews(ulong sender, FastBufferReader reader)
-    {
-        reader.ReadValueSafe(out string who);
-        reader.ReadValueSafe(out byte outcome);
-        reader.ReadValueSafe(out string raid);
-        // The host passes a guest's news on to the others.
-        if (IsHost)
-        {
-            var others = Guests(sender);
-            if (others.Count > 0)
-            {
-                using var writer = new FastBufferWriter(256, Allocator.Temp);
-                writer.WriteValueSafe(who);
-                writer.WriteValueSafe(outcome);
-                writer.WriteValueSafe(raid);
-                network.CustomMessagingManager.SendNamedMessage(RaidNewsMessage, others, writer, NetworkDelivery.ReliableFragmentedSequenced);
-            }
-        }
-
-        news[who] = ((RaidOutcome)outcome, raid, Time.unscaledTime);
-        switch ((RaidOutcome)outcome)
-        {
-            case RaidOutcome.Extracted:
-                GameMessages.Post($"{who} got out of {raid} with their haul.", MessageKind.Gain);
-                break;
-            case RaidOutcome.Died:
-                GameMessages.Post($"{who} fell in {raid}.", MessageKind.Warning);
-                break;
-            case RaidOutcome.TimeExpired:
-                GameMessages.Post($"{who} was caught as {raid} closed.", MessageKind.Warning);
-                break;
-        }
-    }
-
-    private void OnSettlement(ulong sender, FastBufferReader reader)
-    {
-        reader.ReadValueSafe(out byte[] packet);
-        if (!HavenVisit.IsVisiting)
-        {
-            return;
-        }
-
-        try
-        {
-            HavenSync.ApplySettlement(packet, Content());
-        }
-        catch (Exception exception)
-        {
-            Debug.LogException(exception);
-        }
-    }
-
-    // Sent in order with the world itself (same channel), so no change can arrive before the Haven it belongs to.
-    private void SendPacket(string message, byte[] packet, IReadOnlyList<ulong> to)
-    {
-        if (to.Count == 0)
-        {
-            return;
-        }
-
-        using var writer = new FastBufferWriter(packet.Length + 16, Allocator.Temp);
-        writer.WriteValueSafe(packet);
-        network.CustomMessagingManager.SendNamedMessage(message, to, writer, NetworkDelivery.ReliableFragmentedSequenced);
-    }
-
-    // Every guest but one (the sender of what is passed on, or nobody: the host's own id).
-    private IReadOnlyList<ulong> Guests(ulong except)
-    {
-        recipients.Clear();
-        foreach (ulong client in network.ConnectedClientsIds)
-        {
-            if (client != NetworkManager.ServerClientId && client != except)
-            {
-                recipients.Add(client);
-            }
-        }
-
-        return recipients;
-    }
-
-    private IReadOnlyList<ulong> ToHost()
-    {
-        recipients.Clear();
-        recipients.Add(NetworkManager.ServerClientId);
-        return recipients;
-    }
-
-    // The host's time of day, every few seconds while at home: a visit shares the hour.
-    private void ShareClock()
-    {
-        if (network.ConnectedClientsIds.Count < 2 || Time.unscaledTime < nextClock)
-        {
-            return;
-        }
-
-        nextClock = Time.unscaledTime + ClockInterval;
-        DayNightCycle clock = HavenVisit.HostIsHome() ? FindFirstObjectByType<DayNightCycle>() : null;
-        if (clock == null)
-        {
-            return;
-        }
-
-        using var writer = new FastBufferWriter(16, Allocator.Temp);
-        writer.WriteValueSafe(clock.Hour);
-        network.CustomMessagingManager.SendNamedMessageToAll(ClockMessage, writer, NetworkDelivery.Reliable);
-    }
-
-    private void OnClock(ulong sender, FastBufferReader reader)
-    {
-        reader.ReadValueSafe(out float hour);
-        // A raid keeps its own hour (rolled from its seed), wherever the host is.
-        DayNightCycle clock = HavenVisit.IsVisiting && GameSession.ActiveRaid == null ? FindFirstObjectByType<DayNightCycle>() : null;
-        if (clock != null)
-        {
-            clock.Hour = hour;
-        }
-    }
-
-    private static IContentLookup Content() => Resources.Load<ContentDatabase>(ContentDatabase.ResourceName);
-
     private void OnClientDisconnected(ulong clientId)
     {
+        // A friend left the host's session: every part lets go of what was theirs.
         if (network != null && network.IsServer && clientId != network.LocalClientId)
         {
-            access.Forget(clientId);
-            drops.Forget(clientId);
+            foreach (ICoopPart part in parts)
+            {
+                part.FriendLeft(clientId);
+            }
+
             return;
         }
 
@@ -1019,7 +582,7 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
         network.Shutdown();
         lobby?.Close();
         SetState(CoopState.Offline);
-        EndVisit(true);
+        haven.EndVisit(true);
     }
 
     private void OnTransportFailure()
@@ -1028,7 +591,7 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
         GameMessages.Post(LastProblem, MessageKind.Warning);
         lobby?.Close();
         SetState(CoopState.Offline);
-        EndVisit(true);
+        haven.EndVisit(true);
     }
 
     private void OnFriendArrived(NetworkPlayerAvatar friend) => GameMessages.Post($"{friend.DisplayName} is here.");
@@ -1043,27 +606,9 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
         }
 
         state = next;
-        if (state == CoopState.Hosting || state == CoopState.Joined)
-        {
-            PartyHud.Create();
-            DownedHud.Create();
-        }
-        if (state == CoopState.Offline || state == CoopState.Hosting || state == CoopState.Joining)
-        {
-            sync?.Reset();
-        }
-
         if (state == CoopState.Offline)
         {
-            access.Reset();
-            creatures.Reset();
-            downed.Reset();
-            pings.Clear();
-            drops.Stop();
-            news.Clear();
-            PartyHud.Remove();
-            DownedHud.Remove();
-            openRaid = null;
+            EndParts();
         }
 
         // Online, the Escape menu still opens but the world keeps running.
@@ -1075,12 +620,12 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
     {
         NetworkPlayerAvatar.FriendArrived -= OnFriendArrived;
         NetworkPlayerAvatar.FriendLeft -= OnFriendLeft;
-        RaidLauncher.Launched -= OnRaidLaunched;
-        GameEvents.Raised -= OnGameEvent;
-        sync?.Dispose();
-        creatures.Dispose();
-        drops.Dispose();
-        downed.Dispose();
+        EndParts();
+        foreach (ICoopPart part in parts)
+        {
+            (part as IDisposable)?.Dispose();
+        }
+
         DropLobby();
         if (Current == this)
         {

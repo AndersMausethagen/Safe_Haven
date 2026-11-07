@@ -147,11 +147,11 @@ public sealed class RaidPortal : MonoBehaviour, IStationMenuExtension, IInteract
     {
         // Co-op: the host went through; friends follow into the same raid.
         float secondsLeft = 0f;
-        RaidDefinition following = CoopSession.Current != null ? CoopSession.Current.RaidToFollow(Destinations, out secondsLeft) : null;
+        RaidDefinition following = CoopSession.Current != null ? CoopSession.Current.Raids.RaidToFollow(Destinations, out secondsLeft) : null;
         if (following != null)
         {
             page.Add(new MenuAction($"Follow {HavenVisit.HostName} to {following.DisplayName}", $"{Mathf.FloorToInt(secondsLeft / 60f)}:{Mathf.FloorToInt(secondsLeft % 60f):00} left of their raid. You bring only what you carry.",
-                true, () => CoopSession.Current.FollowIntoRaid(following, user), closesMenu: true));
+                true, () => CoopSession.Current.Raids.FollowIntoRaid(following, user), closesMenu: true));
         }
 
         if (IsRepaired)

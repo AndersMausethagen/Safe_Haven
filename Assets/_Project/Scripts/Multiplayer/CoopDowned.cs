@@ -14,7 +14,7 @@ using UnityEngine;
 /// The decision to go down waits for the next look after the blow, so a Deathless relic gets its say first.
 /// Plain C#: <see cref="CoopSession"/> ticks it and owns the connection.
 /// </summary>
-public sealed class CoopDowned : IDisposable
+public sealed class CoopDowned : ICoopPart, IDisposable
 {
     private const string HelpUpMessage = "SafeHaven.HelpUp";
     private const string HelpingMessage = "SafeHaven.Helping";
@@ -22,10 +22,17 @@ public sealed class CoopDowned : IDisposable
     private const float DownAt = 1.05f;
     private const float AloneSeconds = 3f;
 
-    private NetworkManager network;
+    private const float LookSeconds = 0.1f;
+    private CoopLink link;
+    private float nextLook;
+
+    private NetworkManager network => link?.Network;
     private MultiplayerSettings settings;
     private Damageable health;
     private Player player;
+    private PlayerMovement movement;
+    private PlayerStealth stealth;
+    private PlayerInputHandler input;
     private bool holding;
     private bool struckDown;
     private float bleedOutAt;
@@ -48,13 +55,17 @@ public sealed class CoopDowned : IDisposable
     /// <summary>Seconds left before a downed player dies (0 when not down).</summary>
     public float BleedOutLeft => IsDown ? Mathf.Max(0f, bleedOutAt - Time.time) : 0f;
 
-    public void Start(NetworkManager manager, MultiplayerSettings multiplayer)
+    public CoopDowned(MultiplayerSettings multiplayer)
     {
-        network = manager;
         settings = multiplayer;
+    }
+
+    public void Begin(CoopLink session)
+    {
+        link = session;
         Reset();
-        network.CustomMessagingManager.RegisterNamedMessageHandler(HelpUpMessage, OnHelpUp);
-        network.CustomMessagingManager.RegisterNamedMessageHandler(HelpingMessage, OnHelping);
+        link.On(HelpUpMessage, OnHelpUp);
+        link.On(HelpingMessage, OnHelping);
     }
 
     /// <summary>
@@ -80,13 +91,34 @@ public sealed class CoopDowned : IDisposable
         struckDown = false;
     }
 
+    void ICoopPart.Tick()
+    {
+        FrameUpdate();
+        if (Time.unscaledTime >= nextLook)
+        {
+            nextLook = Time.unscaledTime + LookSeconds;
+            Tick();
+        }
+    }
+
+    public void FriendLeft(ulong clientId)
+    {
+    }
+
+    public void End()
+    {
+        Reset();
+        link = null;
+    }
+
     public void Dispose()
     {
         Reset();
         Bind(null);
     }
 
-    public void Tick()
+    /// <summary>Ten times a second: holds or lets go of the floor, and ends a down that has run out.</summary>
+    private void Tick()
     {
         Bind(Player.Current);
         if (health == null || network == null)
@@ -120,7 +152,7 @@ public sealed class CoopDowned : IDisposable
     /// Every frame: a downed player can still drag themselves along, crouched and slow (they can't fight, use or carry on as
     /// usual: the rest of their input is off). They are drawn as crouching to friends, with "Down!" over their head.
     /// </summary>
-    public void FrameUpdate()
+    private void FrameUpdate()
     {
         if (struckDown && !IsDown && health != null)
         {
@@ -131,7 +163,7 @@ public sealed class CoopDowned : IDisposable
             }
         }
 
-        if (!IsDown || player == null || !player.TryGetComponent(out PlayerMovement movement))
+        if (!IsDown || movement == null)
         {
             return;
         }
@@ -255,9 +287,21 @@ public sealed class CoopDowned : IDisposable
             health.ReleaseFloor(this);
         }
 
+        // A new body (a new scene: home from the raid it happened on): a down left over from the last one is over, quietly.
+        if (IsDown)
+        {
+            IsDown = false;
+            helpStartedAt = -1f;
+            aloneSince = -1f;
+        }
+
         holding = false;
+        struckDown = false;
         player = now;
         health = now != null ? now.GetComponent<Damageable>() : null;
+        movement = now != null ? now.GetComponent<PlayerMovement>() : null;
+        stealth = now != null ? now.GetComponent<PlayerStealth>() : null;
+        input = now != null ? now.GetComponent<PlayerInputHandler>() : null;
         if (health != null)
         {
             health.Damaged += OnDamaged;
@@ -323,7 +367,7 @@ public sealed class CoopDowned : IDisposable
         helpStartedAt = -1f;
         health.RemoveInvulnerability(this);
         Release();
-        if (player != null && player.TryGetComponent(out PlayerStealth stealth))
+        if (stealth != null)
         {
             stealth.SetSneaking(false);
         }
@@ -339,7 +383,7 @@ public sealed class CoopDowned : IDisposable
             return;
         }
 
-        if (player.TryGetComponent(out PlayerInputHandler input))
+        if (input != null)
         {
             input.enabled = acting;
         }
@@ -350,13 +394,13 @@ public sealed class CoopDowned : IDisposable
             GameInput.Move.Enable();
         }
 
-        if (!acting && player.TryGetComponent(out PlayerMovement movement))
+        if (!acting && movement != null)
         {
             movement.SetMovementInput(Vector3.zero);
         }
 
         // Down is crouched and dragging along (FrameUpdate), not lying still.
-        if (player.TryGetComponent(out PlayerStealth stealth))
+        if (stealth != null)
         {
             stealth.SetSneaking(!acting);
         }
@@ -365,7 +409,7 @@ public sealed class CoopDowned : IDisposable
     // A friend on this run who is up and about.
     private bool FriendStandingHere()
     {
-        FixedString128Bytes place = CoopCreatures.PlaceKey;
+        FixedString128Bytes place = CoopPlace.Key;
         foreach (NetworkPlayerAvatar friend in NetworkPlayerAvatar.All)
         {
             // Up and about: neither down nor dead (health 0, watching the others).
@@ -376,5 +420,12 @@ public sealed class CoopDowned : IDisposable
         }
 
         return false;
+    }
+
+    // Entering Play doesn't reload scripts in this project: statics carry over from the last session unless cleared.
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession()
+    {
+        IsDown = false;
     }
 }

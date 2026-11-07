@@ -30,6 +30,7 @@ public sealed class NetworkPlayerAvatar : NetworkBehaviour
     private RemotePlayerBody body;
     private FriendRevive revive;
     private FriendHitbox hitbox;
+    private int shownState = -1;
     private AnimatorMirror ownMirror;
     private Animator ownAnimator;
     private PoseSnapshot outgoing;
@@ -140,7 +141,7 @@ public sealed class NetworkPlayerAvatar : NetworkBehaviour
     private void PublishLook()
     {
         // In a raid the place is the run, not only its scene: friends see each other only on the same map.
-        PlayerLookState now = PlayerLookState.Of(Player.Current, CoopCreatures.PlaceHere());
+        PlayerLookState now = PlayerLookState.Of(Player.Current, CoopPlace.Here);
         if (!now.Equals(look.Value))
         {
             look.Value = now;
@@ -157,7 +158,7 @@ public sealed class NetworkPlayerAvatar : NetworkBehaviour
 
     private void UpdateFriend()
     {
-        bool here = poses.Count > 0 && look.Value.Place.Length > 0 && look.Value.Place.Equals(CoopCreatures.PlaceKey);
+        bool here = poses.Count > 0 && look.Value.Place.Length > 0 && look.Value.Place.Equals(CoopPlace.Key);
         if (!here)
         {
             if (body != null && body.gameObject.activeSelf)
@@ -188,7 +189,12 @@ public sealed class NetworkPlayerAvatar : NetworkBehaviour
         // Down in a shared raid: friends can help them up, and creatures leave them be.
         revive.Show(look.Value.Downed, look.Value.DisplayName);
         bool fallen = look.Value.Health == 0 && GameSession.ActiveRaid != null;
-        body.ShowState(look.Value.DisplayName, look.Value.Downed, fallen);
+        int state = (look.Value.Downed ? 1 : 0) | (fallen ? 2 : 0);
+        if (state != shownState)
+        {
+            shownState = state;
+            body.ShowState(look.Value.DisplayName, look.Value.Downed, fallen);
+        }
         if (hitbox != null)
         {
             hitbox.IsDown = look.Value.Downed || fallen;
@@ -227,7 +233,9 @@ public sealed class NetworkPlayerAvatar : NetworkBehaviour
         FriendArrived?.Invoke(this);
     }
 
-    private static IContentLookup Content() => Resources.Load<ContentDatabase>(ContentDatabase.ResourceName);
+    private static ContentDatabase content;
+
+    private static IContentLookup Content() => content != null ? content : content = Resources.Load<ContentDatabase>(ContentDatabase.ResourceName);
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetForNewPlaySession()

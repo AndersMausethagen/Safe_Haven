@@ -76,6 +76,21 @@ public sealed class DroppedItem : MonoBehaviour, ISaveable, IInteractionName, II
     /// <summary>Taken by someone else (co-op): it goes, without a word.</summary>
     public void Vanish() => Remove();
 
+    /// <summary>
+    /// A player putting something down on purpose (the inventory's Drop): as <see cref="Drop"/>, and friends on a raid
+    /// together see it too (<see cref="DroppedByPlayer"/>). What falls out of a full bag is not offered to friends.
+    /// </summary>
+    public static DroppedItem DropByChoice(Transform user, ItemStack stack)
+    {
+        DroppedItem dropped = Drop(user, stack);
+        if (dropped != null)
+        {
+            DroppedByPlayer?.Invoke(dropped);
+        }
+
+        return dropped;
+    }
+
     /// <summary>Puts a stack on the ground in front of someone. Null when it can't be, and then the stack is still theirs.</summary>
     public static DroppedItem Drop(Transform user, ItemStack stack)
     {
@@ -89,11 +104,6 @@ public sealed class DroppedItem : MonoBehaviour, ISaveable, IInteractionName, II
         Quaternion facing = Quaternion.Euler(0f, UnityEngine.Random.Range(0f, 360f), 0f);
         var dropped = SaveableEntity.Spawn(settings.Prefab, FindSpot(user, settings), facing).GetComponent<DroppedItem>();
         dropped.Hold(stack);
-        if (user != null && Player.IsPlayer(user.gameObject))
-        {
-            DroppedByPlayer?.Invoke(dropped);
-        }
-
         dropped.ThrowFrom(user.position + Vector3.up * HandHeight);
         AudioManager.Play(AudioManager.Sounds?.ItemDropped, dropped.transform.position);
         return dropped;
@@ -332,5 +342,12 @@ public sealed class DroppedItem : MonoBehaviour, ISaveable, IInteractionName, II
         }
 
         Show();
+    }
+
+    // Entering Play doesn't reload scripts in this project: statics carry over from the last session unless cleared.
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession()
+    {
+        DroppedByPlayer = null;
     }
 }
