@@ -185,6 +185,12 @@ public sealed class MonsterSenses
 
     private static float VisibilityOf(Transform target)
     {
+        // Co-op: a friend's body carries their own game's stealth.
+        if (target.TryGetComponent(out FriendHitbox friend))
+        {
+            return friend.Visibility;
+        }
+
         Player player = Player.Current;
         if (player != null && player.Stealth != null && target.IsChildOf(player.transform))
         {

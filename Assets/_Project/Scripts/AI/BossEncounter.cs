@@ -77,9 +77,21 @@ public sealed class BossEncounter : MonoBehaviour
         yield return new WaitForSeconds(definition.WakeSeconds);
         health.RemoveInvulnerability(this);
         ai.enabled = true;
-        if (Player.Current != null)
+        IDamageable nearest = Player.Current != null ? Player.Current.Health : null;
+        float best = Player.Current != null ? (Player.Current.transform.position - transform.position).sqrMagnitude : float.MaxValue;
+        foreach (FriendHitbox friend in FriendHitbox.Active)
         {
-            ai.Engage(Player.Current.Health);
+            float distance = (friend.transform.position - transform.position).sqrMagnitude;
+            if (friend.IsAlive && distance < best)
+            {
+                best = distance;
+                nearest = friend;
+            }
+        }
+
+        if (nearest != null)
+        {
+            ai.Engage(nearest);
         }
     }
 

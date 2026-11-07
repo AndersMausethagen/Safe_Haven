@@ -451,13 +451,15 @@ public sealed class CoopTests
     [Test]
     public void BeingDown_TravelsWithAFriendsLook()
     {
-        var look = new PlayerLookState { Downed = true };
+        var look = new PlayerLookState { Downed = true, Health = 90, Visibility = 64 };
         Assert.IsFalse(look.Equals(new PlayerLookState()), "Going down is a change friends hear of.");
         using var writer = new FastBufferWriter(1024, Unity.Collections.Allocator.Temp);
         writer.WriteNetworkSerializable(look);
         using var reader = new FastBufferReader(writer, Unity.Collections.Allocator.Temp);
         reader.ReadNetworkSerializable(out PlayerLookState read);
         Assert.IsTrue(read.Downed);
+        Assert.AreEqual(90, read.Health);
+        Assert.AreEqual(64, read.Visibility, "A friend sneaking is as hard to see in the host's game as in their own.");
     }
 
     [Test]

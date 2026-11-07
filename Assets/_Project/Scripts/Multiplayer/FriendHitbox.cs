@@ -15,6 +15,21 @@ public sealed class FriendHitbox : MonoBehaviour, IDamageable
     public bool IsDown { get; set; }
 
     public bool IsAlive => isActiveAndEnabled && !IsDown;
+
+    /// <summary>How easily they are seen, 0 to 1, as their own game's stealth says (sneaking, in cover, fighting).</summary>
+    public float Visibility { get; set; } = 1f;
+
+    private static readonly System.Collections.Generic.List<FriendHitbox> active = new System.Collections.Generic.List<FriendHitbox>();
+
+    /// <summary>Friends' bodies standing in the host's game now.</summary>
+    public static System.Collections.Generic.IReadOnlyList<FriendHitbox> Active => active;
+
+    private void OnEnable() => active.Add(this);
+
+    private void OnDisable() => active.Remove(this);
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => active.Clear();
     public Faction Faction => Faction.Player;
     public TargetCategory Category => TargetCategory.Creature;
 

@@ -1038,7 +1038,8 @@ public sealed partial class MonsterAI : MonoBehaviour, IEventSubject, IStaggerab
         }
     }
 
-    private bool IsAtThePlayer => targetComponent != null && global::Player.IsPlayer(targetComponent.gameObject);
+    // The player, or a friend's body in the host's game (co-op): both get attack turns and the player's chase spacing.
+    private bool IsAtThePlayer => targetComponent != null && (targetComponent is FriendHitbox || global::Player.IsPlayer(targetComponent.gameObject));
 
     // Only so many close in on the player at once, so a crowd can be read: one crowded out circles until its next try, and one that only
     // has to let another's blow start first stands ready. Ranged and calling actions don't wait, nor do great beasts and elites, though

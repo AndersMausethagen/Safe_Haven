@@ -110,7 +110,9 @@ public sealed class NetworkPlayerAvatar : NetworkBehaviour
     {
         Player player = Player.Current;
         // Going down (or getting up) is told at once: friends need the "Help up" straight away.
-        if (Time.unscaledTime >= nextLookCheck || look.Value.Downed != CoopDowned.IsDown)
+        // Going down (or getting up) and starting or stopping to sneak are told at once; the rest twice a second.
+        if (Time.unscaledTime >= nextLookCheck || look.Value.Downed != CoopDowned.IsDown
+            || Mathf.Abs(look.Value.Visibility - PlayerLookState.VisibilityByte(Player.Current)) > 40)
         {
             nextLookCheck = Time.unscaledTime + LookCheckInterval;
             PublishLook();
@@ -198,6 +200,7 @@ public sealed class NetworkPlayerAvatar : NetworkBehaviour
         if (hitbox != null)
         {
             hitbox.IsDown = look.Value.Downed || fallen;
+            hitbox.Visibility = look.Value.Visibility / 255f;
         }
 
         double renderTime = NetworkManager.ServerTime.Time - settings.InterpolationDelay;

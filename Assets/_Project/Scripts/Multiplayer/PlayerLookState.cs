@@ -33,10 +33,16 @@ public struct PlayerLookState : INetworkSerializable, IEquatable<PlayerLookState
     public bool Downed;
     /// <summary>Health as a share of the maximum, 0 to 255 (the party panel).</summary>
     public byte Health;
+    /// <summary>How easily creatures see them, 0 to 255 (sneaking, cover, fighting: their own game's stealth).</summary>
+    public byte Visibility;
 
     public string DisplayName => Name.Length > 0 ? Name.ToString() : CharacterAppearance.DefaultName;
 
     /// <summary>The look of the local player now (or an empty look when there is none).</summary>
+    /// <summary>A player's stealth visibility as the look carries it.</summary>
+    public static byte VisibilityByte(Player player) =>
+        player != null && player.Stealth != null ? (byte)Mathf.Clamp(Mathf.RoundToInt(player.Stealth.Visibility * 255f), 0, 255) : (byte)255;
+
     public static PlayerLookState Of(Player player, string place)
     {
         var state = new PlayerLookState { Place = Clip128(place), Downed = CoopDowned.IsDown };
@@ -56,6 +62,7 @@ public struct PlayerLookState : INetworkSerializable, IEquatable<PlayerLookState
             return state;
         }
 
+        state.Visibility = VisibilityByte(player);
         state.Health = player.TryGetComponent(out Damageable health) && health.MaxHealth > 0f
             ? (byte)Mathf.Clamp(Mathf.CeilToInt(health.CurrentHealth / health.MaxHealth * 255f), 0, 255)
             : (byte)255;
@@ -129,13 +136,14 @@ public struct PlayerLookState : INetworkSerializable, IEquatable<PlayerLookState
         serializer.SerializeValue(ref Place);
         serializer.SerializeValue(ref Downed);
         serializer.SerializeValue(ref Health);
+        serializer.SerializeValue(ref Visibility);
     }
 
     public bool Equals(PlayerLookState other) =>
         Name.Equals(other.Name) && Gender == other.Gender && Skin == other.Skin && Hair == other.Hair &&
         HairColour == other.HairColour && Brows == other.Brows && Beard == other.Beard && Eyes == other.Eyes &&
         Underclothes == other.Underclothes && Clothes == other.Clothes && Gear.Equals(other.Gear) &&
-        Held.Equals(other.Held) && Place.Equals(other.Place) && Downed == other.Downed && Health == other.Health;
+        Held.Equals(other.Held) && Place.Equals(other.Place) && Downed == other.Downed && Health == other.Health && Visibility == other.Visibility;
 
     public override bool Equals(object obj) => obj is PlayerLookState other && Equals(other);
 
