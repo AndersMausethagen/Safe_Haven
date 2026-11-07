@@ -516,7 +516,7 @@ and its summary ends "Part of X, in its own file". `MonsterAI` (Awareness, Inves
 Reactions, Backstabs, Remote, Gizmos), `PlayerCombat` (Input, Swings, Finishers, Reactions), `PlayerAnimationController`
 (Locomotion, Combat, Work, Debug), `RaidPreparationWindow` (Briefing, Preparation, Building), `BuildPlacer` (Spots,
 Lines) and `RaidLayoutPlanner` (Rooms, Sites, Ground, Cliffs, Regions, Routes, Height, Rivers, Landmarks, each with its own tuning
-constants; the map's data is `RaidLayoutPlan`). A raid map step draws random numbers in a fixed order: moving code
+constants; the map's data is `RaidLayoutPlan`), `RaidLayoutField` (Levels, Ravines, Rivers, Ground), `RaidMapGenerator` (Points, Scenery, Water, Reach) and `HavenWorldPlan` (Ground, Water, Paths, Woodland, Rock, Resources, AlongTheWay). A raid map step draws random numbers in a fixed order: moving code
 between parts changes nothing, but reordering draws within a step changes every map a seed makes.
 
 **Files and serialized types.** A MonoBehaviour or ScriptableObject stays in the file named after it (moving it
