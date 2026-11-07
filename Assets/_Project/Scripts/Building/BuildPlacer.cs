@@ -134,13 +134,8 @@ public sealed class BuildPlacer : MonoBehaviour
         }
 
         // A friend's Haven: building there takes their yes (what is built then reaches them through HavenSync).
-        if (HavenVisit.IsVisiting && !HavenVisit.MayBuild)
+        if (HavenVisit.BuildingNeedsAsking())
         {
-            if (CoopSession.Current != null)
-            {
-                CoopSession.Current.Access.Ask(VisitorRight.Build);
-            }
-
             return;
         }
 
@@ -156,8 +151,8 @@ public sealed class BuildPlacer : MonoBehaviour
     /// <summary>The build area's opening line: where and what to build.</summary>
     public string Guidance => HasBuildArea ? Area.Guidance : "";
 
-    /// <summary>True when buildings may be moved, upgraded and repaired here.</summary>
-    public bool AllowsChanges => HasBuildArea && Area.AllowsChanges;
+    /// <summary>True when buildings may be moved, upgraded and repaired here (in a friend's Haven, with their yes).</summary>
+    public bool AllowsChanges => HasBuildArea && Area.AllowsChanges && (!HavenVisit.IsVisiting || HavenVisit.MayBuild);
 
     /// <summary>What can be built here now, in display order. Empty outside an open build area.</summary>
     public List<BuildingDefinition> Buildable()
@@ -184,6 +179,12 @@ public sealed class BuildPlacer : MonoBehaviour
     /// <summary>Starts placing <paramref name="building"/>: a ghost follows the pointer until it is built or cancelled.</summary>
     public void Place(BuildingDefinition building)
     {
+        // Every way in (the build menu, the Haven window) asks a friend's yes in their Haven.
+        if (HavenVisit.BuildingNeedsAsking())
+        {
+            return;
+        }
+
         if (building != null && building.Prefab != null && HasBuildArea)
         {
             BeginPlacing(building);
@@ -193,7 +194,7 @@ public sealed class BuildPlacer : MonoBehaviour
     /// <summary>Lets the player click a building they built, to upgrade or repair it (true) or to move it (false).</summary>
     public void PickBuilding(bool toUpgrade)
     {
-        if (AllowsChanges)
+        if (!HavenVisit.BuildingNeedsAsking() && AllowsChanges)
         {
             BeginPicking(toUpgrade);
         }

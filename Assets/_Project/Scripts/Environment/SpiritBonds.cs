@@ -43,6 +43,10 @@ public sealed class SpiritBonds : MonoBehaviour
         giftSound = leftSound;
     }
 
+    /// <summary>Whether this player has a spirit's gift: their own Haven's, also while visiting a friend's (co-op).</summary>
+    public static bool HasGift(string id) =>
+        HavenVisit.IsVisiting ? HavenVisit.HomeHasSpiritGift(id) : GameSession.Settlement.HasSpiritGift(id);
+
     /// <summary>Whether a glimpse may show itself now: a spirit that was chased keeps away for a while.</summary>
     public static bool Welcome(Glimpse glimpse) =>
         glimpse == null || glimpse.Spirit != Huldra || GameSession.Settlement.DaysPassed >= GameSession.Settlement.HuldraAwayUntil;
@@ -99,7 +103,7 @@ public sealed class SpiritBonds : MonoBehaviour
         const float tick = 0.5f;
         nextCheck = Time.time + tick;
         Player player = Player.Current;
-        if (player == null || GameSession.Settlement.HasSpiritGift(NokkGift))
+        if (player == null || HasGift(NokkGift))
         {
             return;
         }
@@ -124,7 +128,16 @@ public sealed class SpiritBonds : MonoBehaviour
 
         if (stoodFor >= listen.y)
         {
-            GameSession.Settlement.GiveSpiritGift(NokkGift);
+            // Learnt for good: in a friend's Haven, it goes home with this player (their copy here is the host's).
+            if (HavenVisit.IsVisiting)
+            {
+                HavenVisit.SpiritGiftHome(NokkGift);
+            }
+            else
+            {
+                GameSession.Settlement.GiveSpiritGift(NokkGift);
+            }
+
             GameMessages.Post("A tune rises out of the dark water, and stays with you. The Nøkk has taught you its air: "
                 + "fish will come to your line, and the Nøkken leaves you be.", MessageKind.Gain);
         }

@@ -523,4 +523,32 @@ public sealed class CoopTests
             HavenVisit.Forget();
         }
     }
+
+    [Test]
+    public void AVisitorBuildsOnlyWithTheHostsYes_AndKeepsWhatTheNokkTaughtThem()
+    {
+        var homeField = typeof(HavenVisit).GetField("home", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+        homeField.SetValue(null, new SaveData { scene = "SafeHaven" });
+        typeof(HavenVisit).GetProperty(nameof(HavenVisit.IsVisiting)).SetValue(null, true);
+        try
+        {
+            // Every way to build (the build menu, the Haven window, a building's own upgrade) goes through this.
+            Assert.IsTrue(HavenVisit.BuildingNeedsAsking(), "no yes yet: the host is asked, nothing is built");
+            HavenVisit.Allow(VisitorRight.Build, true);
+            Assert.IsFalse(HavenVisit.BuildingNeedsAsking(), "with the yes");
+
+            Assert.IsFalse(SpiritBonds.HasGift(SpiritBonds.NokkGift));
+            HavenVisit.SpiritGiftHome(SpiritBonds.NokkGift);
+            HavenVisit.SpiritGiftHome(SpiritBonds.NokkGift);
+            Assert.IsTrue(SpiritBonds.HasGift(SpiritBonds.NokkGift), "learnt at a friend's pond, it is theirs");
+            SaveData written = HavenVisit.ForOwnSave(new SaveData { scene = "SafeHaven" });
+            CollectionAssert.AreEqual(new[] { SpiritBonds.NokkGift }, written.settlement.spiritGifts, "and goes home with them, once");
+        }
+        finally
+        {
+            HavenVisit.Forget();
+        }
+
+        Assert.IsFalse(HavenVisit.BuildingNeedsAsking(), "at home, building needs no one's yes");
+    }
 }

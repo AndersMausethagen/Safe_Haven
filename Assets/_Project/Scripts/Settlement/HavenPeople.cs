@@ -126,7 +126,14 @@ public static class HavenPeople
         }
 
         entry.Details.Add(new HavenDetail("Keeps making, from the stash", string.Join("\n", orders)));
-        entry.Actions.Add(new HavenAction(record.WorkPaused ? "Back to work" : "Pause their work", () => record.WorkPaused = !record.WorkPaused, closesWindow: false, primary: false));
+        entry.Actions.Add(new HavenAction(record.WorkPaused ? "Back to work" : "Pause their work", () =>
+        {
+            // A friend's residents work as they decide; a copy changed here would be undone by their next word.
+            if (!HavenVisit.LeftToHost())
+            {
+                record.WorkPaused = !record.WorkPaused;
+            }
+        }, closesWindow: false, primary: false));
     }
 
     private static HavenEntry AwayEntry(ResidentDefinition person)

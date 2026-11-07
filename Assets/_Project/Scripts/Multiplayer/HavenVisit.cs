@@ -182,6 +182,23 @@ public static class HavenVisit
         }
     }
 
+    /// <summary>True while visiting without the host's yes to building (placing, moving, upgrading): the host is asked,
+    /// and the caller does nothing. False at home, or with the yes.</summary>
+    public static bool BuildingNeedsAsking()
+    {
+        if (!IsVisiting || MayBuild)
+        {
+            return false;
+        }
+
+        if (CoopSession.Current != null)
+        {
+            CoopSession.Current.Access.Ask(VisitorRight.Build);
+        }
+
+        return true;
+    }
+
     /// <summary>
     /// True, and says so, when what a guest is about to do is the host's decision: their residents' jobs, the portal and
     /// ward, the altar, trades and the workshops' queues. A guest's copy of the settlement only mirrors the host's
@@ -218,6 +235,26 @@ public static class HavenVisit
 
         home.settlement.residents.Add(new ResidentSaveData { id = resident.Id, job = "" });
         return true;
+    }
+
+    /// <summary>Whether this guest's own Haven holds a spirit's gift (what they learnt is theirs, wherever they stand).</summary>
+    public static bool HomeHasSpiritGift(string id) =>
+        home != null && home.settlement != null && home.settlement.spiritGifts != null && home.settlement.spiritGifts.Contains(id);
+
+    /// <summary>A spirit's gift this guest earnt in the host's Haven (the Nøkk's air) goes home with them.</summary>
+    public static void SpiritGiftHome(string id)
+    {
+        if (home == null || string.IsNullOrEmpty(id))
+        {
+            return;
+        }
+
+        home.settlement ??= new SettlementSaveData();
+        home.settlement.spiritGifts ??= new System.Collections.Generic.List<string>();
+        if (!home.settlement.spiritGifts.Contains(id))
+        {
+            home.settlement.spiritGifts.Add(id);
+        }
     }
 
     /// <summary>

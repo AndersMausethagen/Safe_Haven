@@ -128,6 +128,12 @@ public sealed class Construction : MonoBehaviour, ISaveable, ISharedState, IStat
     /// <summary>Pays for the next level and puts the scaffold up. False (with a message) when it can't.</summary>
     public bool TryOrderUpgrade(GameObject payer)
     {
+        // A friend's Haven: their buildings go up a level with their yes.
+        if (HavenVisit.BuildingNeedsAsking())
+        {
+            return false;
+        }
+
         if (!CanUpgrade)
         {
             GameMessages.Post(IsBuilding ? "It is already being worked on." : $"The {Title} can't be improved further.", MessageKind.Warning);
