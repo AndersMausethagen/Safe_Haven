@@ -6,7 +6,7 @@ using UnityEngine;
 /// A friend as you see them in co-op: a modular body built like the character preview's (no player components, so
 /// nothing in the game mistakes it for you), dressed from their <see cref="PlayerLookState"/>, holding what they hold,
 /// moved to where they are and animated as their own game animates them (<see cref="AnimatorMirror"/>), with their name
-/// over their head. Made and driven by <see cref="NetworkPlayerAvatar"/>.
+/// over their head and their footsteps heard (<see cref="RemoteFootsteps"/>). Made and driven by <see cref="NetworkPlayerAvatar"/>.
 /// </summary>
 [DisallowMultipleComponent]
 public sealed class RemotePlayerBody : MonoBehaviour
@@ -41,6 +41,7 @@ public sealed class RemotePlayerBody : MonoBehaviour
         body.character = holder.AddComponent<ModularCharacter>();
         body.mirror = new AnimatorMirror(animator);
         body.nameTag = NameTag(holder.transform, settings.NameHeight);
+        holder.AddComponent<RemoteFootsteps>();
         holder.SetActive(true);
         return body;
     }

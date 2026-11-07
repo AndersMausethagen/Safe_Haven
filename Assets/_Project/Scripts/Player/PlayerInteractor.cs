@@ -77,6 +77,15 @@ public sealed class PlayerInteractor : MonoBehaviour
         }
     }
 
+    /// <summary>Stops what the player is working at, unfinished (struck down, say: work doesn't go on without them).</summary>
+    public void CancelInteraction()
+    {
+        if (isInteracting)
+        {
+            End(InteractionResult.Cancelled);
+        }
+    }
+
     /// <summary>The nearest target shared by the world indicator and input. Reachable objects take priority.</summary>
     public Interactable FindFocus()
     {

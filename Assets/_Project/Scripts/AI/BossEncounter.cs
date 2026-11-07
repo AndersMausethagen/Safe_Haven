@@ -112,7 +112,12 @@ public sealed class BossEncounter : MonoBehaviour
             return;
         }
 
-        bar?.Set(health.HealthFraction);
+        // Unity's own null check: the bar may already be gone with its canvas.
+        if (bar != null)
+        {
+            bar.Set(health.HealthFraction);
+        }
+
         int reached = BossDefinition.PhaseAt(health.HealthFraction, definition.Phases);
         while (phase < reached)
         {

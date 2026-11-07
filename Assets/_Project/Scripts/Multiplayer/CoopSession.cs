@@ -493,6 +493,13 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
             return false;
         }
 
+        // The prologue is a story walked alone, before there is a Haven to show friends.
+        if (PrologueDirector.Current != null)
+        {
+            problem = "Reach your Haven first: the way there is walked alone.";
+            return false;
+        }
+
         if (settings.PlayerPrefab == null)
         {
             problem = "Multiplayer Settings has no Network Player prefab.";

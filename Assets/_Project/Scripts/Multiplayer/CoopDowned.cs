@@ -32,6 +32,7 @@ public sealed class CoopDowned : ICoopPart, IDisposable
     private Player player;
     private PlayerMovement movement;
     private PlayerStealth stealth;
+    private PlayerInteractor interactor;
     private PlayerInputHandler input;
     private bool holding;
     private bool struckDown;
@@ -301,6 +302,7 @@ public sealed class CoopDowned : ICoopPart, IDisposable
         health = now != null ? now.GetComponent<Damageable>() : null;
         movement = now != null ? now.GetComponent<PlayerMovement>() : null;
         stealth = now != null ? now.GetComponent<PlayerStealth>() : null;
+        interactor = now != null ? now.GetComponent<PlayerInteractor>() : null;
         input = now != null ? now.GetComponent<PlayerInputHandler>() : null;
         if (health != null)
         {
@@ -340,6 +342,12 @@ public sealed class CoopDowned : ICoopPart, IDisposable
         bleedOutAt = Time.time + seconds;
         aloneSince = -1f;
         health.AddInvulnerability(this);
+        // Whatever they were working at (a cache, a friend to help up) stops: it doesn't finish while they lie bleeding.
+        if (interactor != null)
+        {
+            interactor.CancelInteraction();
+        }
+
         SetActing(false);
         GameMessages.Post($"You're down! A friend can help you up within {seconds:0} seconds.", MessageKind.Warning);
     }

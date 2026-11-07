@@ -283,4 +283,28 @@ public sealed class InteractionTests
         Assert.IsNull(user.Current, "No work in progress, so no work bar.");
         Assert.IsFalse(target.IsInUse);
     }
+
+    [Test]
+    public void CancelInteraction_StopsWorkUnfinished_AndFreesTheTarget()
+    {
+        // Co-op: struck down mid-work (CoopDowned), the work doesn't finish while they lie bleeding.
+        PlayerInteractor user = Interactor();
+        Interactable target = Target(new Vector3(1f, 0f, 0f));
+        var data = new SerializedObject(target);
+        data.FindProperty("kind").intValue = (int)InteractionKind.Work;
+        data.FindProperty("duration").floatValue = 3f;
+        data.FindProperty("deactivateOnComplete").boolValue = false;
+        data.ApplyModifiedPropertiesWithoutUndo();
+        int completed = 0;
+        target.Completed.AddListener(() => completed++);
+        Invoke(user, "OnInteractionRequested");
+        Assert.AreSame(target, user.Current, "the work began");
+        Assert.IsTrue(target.IsInUse);
+
+        user.CancelInteraction();
+        Assert.IsNull(user.Current);
+        Assert.IsFalse(target.IsInUse, "free for someone else");
+        Assert.AreEqual(0, completed);
+        user.CancelInteraction();
+    }
 }

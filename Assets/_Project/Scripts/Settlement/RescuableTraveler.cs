@@ -94,6 +94,8 @@ public sealed class RescuableTraveler : MonoBehaviour, IInteractionName
         {
             health.Died += OnFell;
         }
+
+        ListenToRaid();
     }
 
     private void OnDisable()
@@ -111,11 +113,14 @@ public sealed class RescuableTraveler : MonoBehaviour, IInteractionName
         }
     }
 
-    private void Start()
+    // Start covers the scene's first frame, before the raid's director may be up; OnEnable covers being hidden and shown again.
+    private void Start() => ListenToRaid();
+
+    private void ListenToRaid()
     {
-        raid = RaidDirector.Current;
-        if (raid != null)
+        if (raid == null && RaidDirector.Current != null)
         {
+            raid = RaidDirector.Current;
             raid.Ended += OnRaidEnded;
         }
     }
