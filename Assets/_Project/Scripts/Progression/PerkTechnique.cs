@@ -72,6 +72,31 @@ public static class Techniques
     private static CharacterProgress forProgress;
     private static int forVersion = -1;
 
+    /// <summary>Raised with the perk the first time in a game its technique comes into play (the HUD names it).</summary>
+    public static event System.Action<PerkDefinition> FirstUsed;
+
+    /// <summary>
+    /// Called where a technique just came into play. The first time in a game (remembered in the save) it is announced,
+    /// so the player sees what they bought.
+    /// </summary>
+    public static void Used(PerkTechnique technique)
+    {
+        if (technique == PerkTechnique.None || !GameSession.Progress.MarkTechniqueSeen(technique))
+        {
+            return;
+        }
+
+        foreach (string id in GameSession.Progress.Perks)
+        {
+            PerkDefinition perk = LevelingSettings.Current.FindPerk(id, out _);
+            if (perk != null && perk.Technique == technique)
+            {
+                FirstUsed?.Invoke(perk);
+                return;
+            }
+        }
+    }
+
     /// <summary>True when a chosen perk teaches this technique.</summary>
     public static bool Has(PerkTechnique technique)
     {

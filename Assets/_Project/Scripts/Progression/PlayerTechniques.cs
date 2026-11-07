@@ -53,6 +53,7 @@ public sealed class PlayerTechniques : MonoBehaviour
         if (combat != null && Techniques.Has(PerkTechnique.Riposte))
         {
             combat.GrantCounter();
+            Techniques.Used(PerkTechnique.Riposte);
         }
     }
 
@@ -61,17 +62,20 @@ public sealed class PlayerTechniques : MonoBehaviour
         if (result.Killed && (damage.Technique & HitTechnique.Melee) != 0 && stamina != null && Techniques.Has(PerkTechnique.SecondWind))
         {
             stamina.Restore(Rules.SecondWindStamina);
+            Techniques.Used(PerkTechnique.SecondWind);
         }
 
         if (result.Killed && (damage.Technique & HitTechnique.Spell) != 0 && health != null && Techniques.Has(PerkTechnique.SoulSiphon))
         {
             health.Heal(health.MaxHealth * Rules.SoulSiphon);
+            Techniques.Used(PerkTechnique.SoulSiphon);
         }
 
         if (!result.Killed && result.IsCritical && (damage.Technique & HitTechnique.Shot) != 0 && Rules.Pinning != null
             && target is Damageable body && body.IsAlive && Techniques.Has(PerkTechnique.PinningShot))
         {
             StatusEffects.Apply(body, Rules.Pinning, combatant);
+            Techniques.Used(PerkTechnique.PinningShot);
         }
     }
 
@@ -87,6 +91,7 @@ public sealed class PlayerTechniques : MonoBehaviour
         {
             boons.Add("technique.foragers_haste", "Forager's Haste",
                 new List<StatBonus> { new StatBonus(StatType.MoveSpeed, Rules.HasteSpeed) }, Rules.HasteSeconds, false);
+            Techniques.Used(PerkTechnique.ForagersHaste);
         }
 
         if (node.GatherTool == ToolType.None && Techniques.Has(PerkTechnique.Sweep))
@@ -115,6 +120,7 @@ public sealed class PlayerTechniques : MonoBehaviour
             if (swept > 0)
             {
                 GameMessages.Post($"Sweep: {swept} more {kind.DisplayName} gathered.", MessageKind.Gain);
+                Techniques.Used(PerkTechnique.Sweep);
             }
         }
         finally

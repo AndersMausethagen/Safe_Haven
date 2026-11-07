@@ -14,6 +14,35 @@ public sealed class DamageNumberSpawner : MonoBehaviour
     [SerializeField, Min(0f)] private float spread = 0.4f;
 
     private Damageable damageable;
+    // The number any spawner floats: for words over things that have none (a node's clean cut).
+    private static DamageNumber anyPrefab;
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => anyPrefab = null;
+
+    /// <summary>Floats a word at a point in the world, using the floating number of any spawner in the game. False when there is none.</summary>
+    public static bool ShowAt(Vector3 position, string text, Color color)
+    {
+        if (anyPrefab == null)
+        {
+            foreach (DamageNumberSpawner spawner in FindObjectsByType<DamageNumberSpawner>())
+            {
+                if (spawner.prefab != null)
+                {
+                    anyPrefab = spawner.prefab;
+                    break;
+                }
+            }
+        }
+
+        if (anyPrefab == null)
+        {
+            return false;
+        }
+
+        PrefabPool.Spawn(anyPrefab, position, Quaternion.identity).ShowText(text, color);
+        return true;
+    }
 
     private void Awake()
     {

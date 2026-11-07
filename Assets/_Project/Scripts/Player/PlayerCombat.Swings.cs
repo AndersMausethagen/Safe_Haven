@@ -162,6 +162,7 @@ public sealed partial class PlayerCombat
         }
 
         GameMessages.Post("Silent takedown.", MessageKind.Gain);
+        Techniques.Used(PerkTechnique.SilentTakedown);
         return Mathf.Max(damage, body.CurrentHealth * 100f);
     }
 

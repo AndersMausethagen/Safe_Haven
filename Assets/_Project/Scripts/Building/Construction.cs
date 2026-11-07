@@ -255,6 +255,7 @@ public sealed class Construction : MonoBehaviour, ISaveable, ISharedState, IStat
         if (Player.IsPlayer(siteInteractable.Interactor) && Techniques.Has(PerkTechnique.RaiseInADay))
         {
             workSpeed *= TechniqueSettings.Current.RaiseSpeed;
+            Techniques.Used(PerkTechnique.RaiseInADay);
         }
         siteInteractable.Duration = Mathf.Max(0.1f, (WorkNeeded - Work) / workSpeed);
         nextBlow = Time.time + 0.15f;

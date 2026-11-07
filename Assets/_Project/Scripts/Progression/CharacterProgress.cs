@@ -20,6 +20,22 @@ public sealed class CharacterProgress
     private readonly Dictionary<string, int> creatures = new Dictionary<string, int>();
 
     private readonly Dictionary<string, int> plainRuns = new Dictionary<string, int>();
+    private readonly HashSet<string> techniquesSeen = new HashSet<string>();
+
+    /// <summary>Techniques that have come into play at least once (each is announced the first time).</summary>
+    public IEnumerable<string> TechniquesSeen => techniquesSeen;
+
+    /// <summary>True the first time a technique comes into play in this game.</summary>
+    public bool MarkTechniqueSeen(PerkTechnique technique) => techniquesSeen.Add(technique.ToString());
+
+    public void RestoreTechniquesSeen(IEnumerable<string> seen)
+    {
+        techniquesSeen.Clear();
+        if (seen != null)
+        {
+            techniquesSeen.UnionWith(seen);
+        }
+    }
 
     /// <summary>Counts up whenever the choice of perks changes, so what they teach is worked out again (Techniques).</summary>
     public int PerkVersion { get; private set; }

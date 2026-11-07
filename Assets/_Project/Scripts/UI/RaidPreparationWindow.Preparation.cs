@@ -154,6 +154,11 @@ public sealed partial class RaidPreparationWindow
 
         y += 54f;
         tierBriefing.text = plan.Difficulty != null ? plan.Difficulty.briefing : "";
+        // What the time at home came to, at the door to the next raid.
+        if (ExperienceTracker.SinceLastRaid() is string grown)
+        {
+            tierBriefing.text = $"<color={UIStyle.Current.GoodHex}>Since your last raid: {grown}.</color>\n\n" + tierBriefing.text;
+        }
         return Stack(tierBriefing, y, Measure(tierBriefing, ColumnWidth), SectionGap);
     }
 

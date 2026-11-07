@@ -160,12 +160,18 @@ public static class CraftedWork
             && GameSession.Progress.PlainRunOf(run) >= TechniqueSettings.Current.SureHandRun)
         {
             quality = ItemQuality.Fine;
+            Techniques.Used(armour ? PerkTechnique.ArmorSureHand : PerkTechnique.WeaponSureHand);
         }
 
         GameSession.Progress.NoteMade(run, quality == ItemQuality.Plain);
         // Runed Make: a Masterwork comes from the anvil already empowered once.
         int empower = quality == ItemQuality.Masterwork && GearPower.CanEmpower(item)
                       && Techniques.Has(armour ? PerkTechnique.ArmorRunedMake : PerkTechnique.WeaponRunedMake) ? 1 : 0;
+        if (empower > 0)
+        {
+            Techniques.Used(armour ? PerkTechnique.ArmorRunedMake : PerkTechnique.WeaponRunedMake);
+        }
+
         string name = GameSession.Appearance != null ? GameSession.Appearance.DisplayName : null;
         return new ItemStack(item, 1, Finish(goods, maker), empower, null, quality, name);
     }

@@ -17,6 +17,11 @@ public sealed class CraftFeedback : MonoBehaviour
     private RectTransform card;
     private CanvasGroup group;
     private Image icon;
+    private Image disc;
+    private RectTransform shine;
+    private Image shineImage;
+    private float shineAt = -10f;
+    private float shineFor;
     private Image edge;
     private TMP_Text title;
     private TMP_Text line;
@@ -65,19 +70,32 @@ public sealed class CraftFeedback : MonoBehaviour
     private void Build(Transform root)
     {
         UIStyle style = UIStyle.Current;
-        card = CodeUI.Box("Card", root, new Vector2(1f, 0f), new Vector2(460f, 84f), new Vector2(-266f, 470f));
+        card = CodeUI.Box("Card", root, new Vector2(1f, 0f), new Vector2(400f, 84f), new Vector2(-216f, 470f));
         card.gameObject.AddComponent<Image>().color = style.Panel;
         group = card.gameObject.AddComponent<CanvasGroup>();
         group.alpha = 0f;
         group.blocksRaycasts = false;
         edge = CodeUI.At("Edge", card, 0f, 0f, 4f, 84f).gameObject.AddComponent<Image>();
         edge.raycastTarget = false;
+        // The icon sits on a lit disc, in the colour of its make, so a dark icon still reads on the dark card.
+        disc = CodeUI.At("Disc", card, 10f, 4f, 76f, 76f).gameObject.AddComponent<Image>();
+        disc.sprite = UISprites.Disc;
+        disc.raycastTarget = false;
         icon = CodeUI.At("Icon", card, 16f, 10f, 64f, 64f).gameObject.AddComponent<Image>();
         icon.preserveAspect = true;
         icon.raycastTarget = false;
-        title = CodeUI.Label("Title", card, 94f, 12f, 350f, 32f, 22f, style.Text);
+        // A shine that sweeps across good work, clipped to the icon's square.
+        RectTransform clip = CodeUI.At("Shine Clip", card, 10f, 4f, 76f, 76f);
+        clip.gameObject.AddComponent<RectMask2D>();
+        shine = CodeUI.At("Shine", clip, -40f, -20f, 22f, 120f);
+        shine.localRotation = Quaternion.Euler(0f, 0f, -25f);
+        shineImage = shine.gameObject.AddComponent<Image>();
+        shineImage.sprite = UISprites.Glow;
+        shineImage.color = new Color(1f, 1f, 1f, 0f);
+        shineImage.raycastTarget = false;
+        title = CodeUI.Label("Title", card, 94f, 12f, 296f, 32f, 20f, style.Text);
         title.richText = true;
-        line = CodeUI.Label("Line", card, 94f, 46f, 350f, 26f, 17f, style.Muted);
+        line = CodeUI.Label("Line", card, 94f, 46f, 296f, 26f, 16f, style.Muted);
         line.richText = true;
         CraftedWork.Made += OnMade;
         ExperienceTracker.Gained += OnGained;
@@ -112,6 +130,15 @@ public sealed class CraftFeedback : MonoBehaviour
         icon.sprite = item.Icon;
         icon.enabled = item.Icon != null;
         edge.color = colour;
+        // Light, so dark line art reads on it, with a breath of the make's colour.
+        Color lit = Color.Lerp(style.Text, colour, quality == ItemQuality.Plain ? 0.1f : 0.35f);
+        lit.a = 0.85f;
+        disc.color = lit;
+        if (quality != ItemQuality.Plain)
+        {
+            shineAt = Time.unscaledTime + 0.15f;
+            shineFor = quality == ItemQuality.Masterwork ? 0.9f : 0.6f;
+        }
         string times = shownCount > 1 ? $"  <color={style.MutedHex}>x{shownCount}</color>" : "";
         title.text = $"<color={UIStyle.Hex(colour)}>{name}</color>{times}";
         line.text = queued ? "Queued at the station" : quality == ItemQuality.Masterwork ? "Masterwork: your finest work"
@@ -131,7 +158,7 @@ public sealed class CraftFeedback : MonoBehaviour
         if (quality != ItemQuality.Plain)
         {
             UIMotion.Flash(title, Color.white, 0.6f);
-            UIMotion.Burst(card, new Vector2(-182f, 0f), quality == ItemQuality.Masterwork ? 22 : 12, colour,
+            UIMotion.Burst(card, new Vector2(-152f, 0f), quality == ItemQuality.Masterwork ? 22 : 12, colour,
                 quality == ItemQuality.Masterwork ? 260f : 170f, 1.1f, quality == ItemQuality.Masterwork ? 12f : 9f);
             AudioSettingsDefinition sounds = AudioManager.Sounds;
             UIMotion.Sound(sounds == null ? null : quality == ItemQuality.Masterwork ? sounds.CraftMasterwork : sounds.CraftFine);
@@ -153,6 +180,17 @@ public sealed class CraftFeedback : MonoBehaviour
 
     private void LateUpdate()
     {
+        float sweep = (Time.unscaledTime - shineAt) / Mathf.Max(0.01f, shineFor);
+        if (sweep >= 0f && sweep <= 1f)
+        {
+            shine.anchoredPosition = new Vector2(Mathf.Lerp(-40f, 100f, sweep), 20f);
+            shineImage.color = new Color(1f, 1f, 1f, Mathf.Sin(sweep * Mathf.PI) * 0.85f);
+        }
+        else if (shineImage.color.a > 0f)
+        {
+            shineImage.color = new Color(1f, 1f, 1f, 0f);
+        }
+
         // In the right-hand column above the minimap, out of the way of the world; at the top of the screen while a
         // station's window fills the middle.
         bool windows = UIStateManager.Current != null && UIStateManager.Current.IsAnyWindowOpen;
@@ -160,7 +198,7 @@ public sealed class CraftFeedback : MonoBehaviour
         if (card.anchorMin != anchor)
         {
             card.anchorMin = card.anchorMax = anchor;
-            card.anchoredPosition = windows ? new Vector2(0f, -70f) : new Vector2(-266f, 470f);
+            card.anchoredPosition = windows ? new Vector2(0f, -70f) : new Vector2(-216f, 470f);
         }
 
         float age = Time.unscaledTime - shownAt;

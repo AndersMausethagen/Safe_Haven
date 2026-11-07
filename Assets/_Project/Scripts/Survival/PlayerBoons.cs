@@ -148,6 +148,10 @@ public sealed class PlayerBoons : MonoBehaviour
 
         int slots = SurvivalSettings.Current.MealSlots + GameSession.Settlement.UpgradeBonus(level => level.extraMealSlots)
                     + (Techniques.Has(PerkTechnique.ThirdPlate) ? 1 : 0);
+        if (Techniques.Has(PerkTechnique.ThirdPlate) && meals == slots - 1)
+        {
+            Techniques.Used(PerkTechnique.ThirdPlate); // the plate only the technique made room for
+        }
         if (meals >= slots && shortest >= 0)
         {
             GameMessages.Post($"{active[shortest].Name} gives way to the new meal.");

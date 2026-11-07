@@ -186,6 +186,8 @@ public sealed class ProgressSaveData
     public int insight;
     /// <summary>Plain pieces made in a row, by kind, for the Sure Hand technique. Missing in older saves.</summary>
     public List<AmountSaveData> plainRuns = new List<AmountSaveData>();
+    /// <summary>Techniques already announced. Missing in older saves.</summary>
+    public List<string> techniquesSeen = new List<string>();
     /// <summary>Ranks deepened at the altar, by skill id. Missing in older saves.</summary>
     public List<AmountSaveData> skillRanks = new List<AmountSaveData>();
     public List<string> crafted = new List<string>();

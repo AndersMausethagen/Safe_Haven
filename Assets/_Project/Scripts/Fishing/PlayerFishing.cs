@@ -241,6 +241,10 @@ public sealed class PlayerFishing : MonoBehaviour
         // The Nøkk's air (SpiritBonds): the water's own spirit sends fish to the line.
         float favour = SpiritBonds.HasGift(SpiritBonds.NokkGift) ? 1.5f : 1f;
         float quick = Techniques.Has(PerkTechnique.QuickBite) ? TechniqueSettings.Current.QuickBite : 1f;
+        if (quick > 1f)
+        {
+            Techniques.Used(PerkTechnique.QuickBite);
+        }
         biteAt = cast.LandsAt + Random.Range(settings.BiteWait.x, settings.BiteWait.y) / Mathf.Max(0.1f, lure * favour * quick);
         State = Phase.Waiting;
         ShowLine();
@@ -294,6 +298,7 @@ public sealed class PlayerFishing : MonoBehaviour
         if (caught > 1 && items.Give(fish, 1) > 0)
         {
             GameMessages.Post($"Double Catch: two {fish.DisplayName} on the one line!", MessageKind.Gain);
+            Techniques.Used(PerkTechnique.DoubleCatch);
         }
 
         if (items.Give(fish, 1) < 1)

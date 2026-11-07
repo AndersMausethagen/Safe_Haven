@@ -31,6 +31,13 @@ public sealed class ExperienceTracker : MonoBehaviour, IGameSystem
     private readonly Dictionary<string, float> carried = new Dictionary<string, float>();
     private readonly Dictionary<ProficiencyDefinition, Lesson> lessons = new Dictionary<ProficiencyDefinition, Lesson>();
     private RaidSession lessonsFor;
+
+    // The stretch at home since the last raid: each skill's level when it began, the perks then, and the good work since.
+    private readonly Dictionary<ProficiencyDefinition, int> homeStart = new Dictionary<ProficiencyDefinition, int>();
+    private CharacterProgress homeProgress;
+    private int homePerks;
+    private int homeFine;
+    private int homeMasterwork;
     private LevelingSettings settings;
     private int exploredCells;
     private float carriedInsight;
@@ -70,6 +77,7 @@ public sealed class ExperienceTracker : MonoBehaviour, IGameSystem
         ResourceSource.Harvested += OnHarvested;
         ExplorationMap.Explored += OnExplored;
         Construction.Finished += OnConstructionFinished;
+        CraftedWork.Made += OnMade;
     }
 
     private void OnDestroy()
@@ -78,6 +86,7 @@ public sealed class ExperienceTracker : MonoBehaviour, IGameSystem
         ResourceSource.Harvested -= OnHarvested;
         ExplorationMap.Explored -= OnExplored;
         Construction.Finished -= OnConstructionFinished;
+        CraftedWork.Made -= OnMade;
         if (Current == this)
         {
             Current = null;
@@ -87,6 +96,7 @@ public sealed class ExperienceTracker : MonoBehaviour, IGameSystem
     public void OnSceneEntered(Scene scene)
     {
         exploredCells = 0;
+        EnsureHomeStretch(); // a new or loaded game starts its stretch at home here
         if (Player.Current != null)
         {
             ExperienceHud.Create();
@@ -436,6 +446,7 @@ public sealed class ExperienceTracker : MonoBehaviour, IGameSystem
 
                 break;
             case GameEventKind.RaidFinished:
+                StartHomeStretch();
                 GrantInsight(gameEvent.Outcome == RaidOutcome.Extracted ? settings.RaidExtractedExperience : settings.RaidFailedExperience);
                 break;
             case GameEventKind.Crafted:
@@ -457,6 +468,76 @@ public sealed class ExperienceTracker : MonoBehaviour, IGameSystem
     }
 
     // A building hammered up or upgraded trains Construction, by the level it reached (as its tier).
+    private void OnMade(ItemDefinition item, int count, ItemQuality quality, string name)
+    {
+        EnsureHomeStretch();
+        homeFine += quality == ItemQuality.Fine ? count : 0;
+        homeMasterwork += quality == ItemQuality.Masterwork ? count : 0;
+    }
+
+    private void EnsureHomeStretch()
+    {
+        if (homeProgress != GameSession.Progress)
+        {
+            StartHomeStretch();
+        }
+    }
+
+    private void StartHomeStretch()
+    {
+        homeProgress = GameSession.Progress;
+        homeStart.Clear();
+        foreach (ProficiencyDefinition skill in settings.Skills)
+        {
+            if (skill != null)
+            {
+                homeStart[skill] = homeProgress.LevelOf(skill, settings);
+            }
+        }
+
+        homePerks = homeProgress.PerkCount;
+        homeFine = homeMasterwork = 0;
+    }
+
+    /// <summary>
+    /// What the stretch at home since the last raid came to, for the portal's planner: skills that grew, perks taken,
+    /// good work made. Null when nothing grew.
+    /// </summary>
+    public static string SinceLastRaid()
+    {
+        if (Current == null)
+        {
+            return null;
+        }
+
+        Current.EnsureHomeStretch();
+        LevelingSettings rules = Rules;
+        var parts = new List<string>();
+        foreach (KeyValuePair<ProficiencyDefinition, int> start in Current.homeStart)
+        {
+            int now = GameSession.Progress.LevelOf(start.Key, rules);
+            if (now > start.Value)
+            {
+                parts.Add($"{start.Key.DisplayName} {start.Value} → {now}");
+            }
+        }
+
+        int perks = GameSession.Progress.PerkCount - Current.homePerks;
+        if (perks > 0)
+        {
+            parts.Add($"{perks} perk{(perks == 1 ? "" : "s")} taken");
+        }
+
+        if (Current.homeFine + Current.homeMasterwork > 0)
+        {
+            parts.Add(Current.homeMasterwork > 0
+                ? $"{Current.homeMasterwork} Masterwork and {Current.homeFine} Fine made"
+                : $"{Current.homeFine} Fine piece{(Current.homeFine == 1 ? "" : "s")} made");
+        }
+
+        return parts.Count > 0 ? string.Join(",  ", parts) : null;
+    }
+
     private void OnConstructionFinished(Construction construction)
     {
         if (!Application.isPlaying)

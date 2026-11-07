@@ -78,6 +78,10 @@ public sealed class PlayerStealth : MonoBehaviour
         if (movement != null)
         {
             float shadowstep = Techniques.Has(PerkTechnique.Shadowstep) ? TechniqueSettings.Current.Shadowstep : 1f;
+            if (sneaking && shadowstep > 1f)
+            {
+                Techniques.Used(PerkTechnique.Shadowstep);
+            }
             movement.SetSpeedScale(this, sneaking ? Mathf.Min(1f, PerceptionSettings.Current.SneakSpeedScale * shadowstep) : 1f);
         }
 

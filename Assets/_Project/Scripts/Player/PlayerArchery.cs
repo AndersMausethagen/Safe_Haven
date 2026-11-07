@@ -435,6 +435,10 @@ public sealed class PlayerArchery : MonoBehaviour
         // The Archery skill: a beginner's arrows fly softer, a master's harder.
         float skill = combatant != null ? Mathf.Max(0f, 1f + combatant.Stats.Get(StatType.ArrowDamage)) : 1f;
         float deadly = perfect && Techniques.Has(PerkTechnique.DeadlyDraw) ? TechniqueSettings.Current.DeadlyDraw : 1f;
+        if (deadly > 1f)
+        {
+            Techniques.Used(PerkTechnique.DeadlyDraw);
+        }
         float damage = arrow.Damage * ArcheryRules.DamageShare(draw) * damageMultiplier * skill * deadly;
         HitTechnique technique = HitTechnique.Shot | (counter ? HitTechnique.Counter : HitTechnique.None);
         projectile.Launch(combatant, bow.ShotAttack, arrowItem, damage, direction * speed, technique, perfect, recoverable: true);

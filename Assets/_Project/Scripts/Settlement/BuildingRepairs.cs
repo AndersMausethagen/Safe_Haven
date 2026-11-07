@@ -99,6 +99,10 @@ public static class BuildingRepairs
         }
 
         GameMessages.Post($"Mended {damaged.Count} building{(damaged.Count == 1 ? "" : "s")}.", MessageKind.Gain);
+        if (Techniques.Has(PerkTechnique.PatchUp))
+        {
+            Techniques.Used(PerkTechnique.PatchUp);
+        }
         AudioManager.Play(AudioManager.Sounds?.Repaired, user.transform.position);
     }
 }

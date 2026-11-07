@@ -609,6 +609,8 @@ public static class SaveMapper
             into.plainRuns.Add(new AmountSaveData { id = run.Key, amount = run.Value });
         }
 
+        into.techniquesSeen.AddRange(progress.TechniquesSeen);
+
         foreach (KeyValuePair<string, int> skill in progress.SkillRanks)
         {
             into.skillRanks.Add(new AmountSaveData { id = skill.Key, amount = skill.Value });
@@ -676,6 +678,7 @@ public static class SaveMapper
         }
 
         progress.RestorePlainRuns(runs);
+        progress.RestoreTechniquesSeen(saved.techniquesSeen);
         var creatures = new List<KeyValuePair<string, int>>();
         foreach (AmountSaveData creature in saved.creatures ?? new List<AmountSaveData>())
         {

@@ -17,6 +17,8 @@ public sealed class UIMotion : MonoBehaviour
         Colour,
         Fade,
         Spark,
+        Ray,
+        Fly,
     }
 
     private struct Motion
@@ -33,6 +35,10 @@ public sealed class UIMotion : MonoBehaviour
         public Color Colour;
         public Color Rest;
         public float Spin;
+        public float Gravity;
+        public Vector3 Size;
+        public Vector3 To;
+        public System.Action Arrived;
     }
 
     private static UIMotion runner;
@@ -132,23 +138,25 @@ public sealed class UIMotion : MonoBehaviour
 
         for (int i = 0; i < count; i++)
         {
+            // Soft motes, a few of them white-hot, that drift down a little as they fade: embers rather than confetti.
             var spark = new GameObject("Spark", typeof(RectTransform), typeof(Image));
             var rect = (RectTransform)spark.transform;
             rect.SetParent(parent, false);
             rect.anchorMin = rect.anchorMax = new Vector2(0.5f, 0.5f);
-            float grain = Random.Range(0.6f, 1.3f);
-            rect.sizeDelta = Vector2.one * size * grain;
+            float grain = Random.Range(0.5f, 1.6f);
+            rect.sizeDelta = Vector2.one * size * 2.6f * grain;
             rect.anchoredPosition = at;
-            rect.localRotation = Quaternion.Euler(0f, 0f, 45f);
             var image = spark.GetComponent<Image>();
-            image.color = colour;
+            image.sprite = UISprites.Glow;
+            Color tint = Random.value < 0.25f ? Color.Lerp(colour, Color.white, 0.7f) : colour;
+            image.color = tint;
             image.raycastTarget = false;
             float angle = (i + Random.Range(-0.35f, 0.35f)) / count * Mathf.PI * 2f;
-            var velocity = new Vector3(Mathf.Cos(angle), Mathf.Sin(angle), 0f) * reach * Random.Range(0.55f, 1.15f);
+            var velocity = new Vector3(Mathf.Cos(angle), Mathf.Sin(angle), 0f) * reach * Random.Range(0.45f, 1.15f);
             Add(new Motion
             {
-                Kind = Kind.Spark, Target = rect, Graphic = image, Seconds = seconds * Random.Range(0.75f, 1.15f), From = at, Velocity = velocity,
-                Colour = colour, Spin = Random.Range(-540f, 540f),
+                Kind = Kind.Spark, Target = rect, Graphic = image, Seconds = seconds * Random.Range(0.75f, 1.25f), From = at, Velocity = velocity,
+                Colour = tint, Spin = Random.Range(0f, 6f), Gravity = reach * Random.Range(0.25f, 0.6f), Size = Vector3.one,
             });
         }
     }
@@ -163,6 +171,64 @@ public sealed class UIMotion : MonoBehaviour
 
         Vector3 ear = Player.Current != null ? Player.Current.transform.position : Camera.main != null ? Camera.main.transform.position : Vector3.zero;
         AudioManager.Play(sound, ear);
+    }
+
+    /// <summary>
+    /// A glowing mote flying along a curve from one point to another under <paramref name="parent"/>, growing brighter as it
+    /// goes; <paramref name="arrived"/> is called as it lands (the experience bar takes it in).
+    /// </summary>
+    public static void Fly(RectTransform parent, Vector2 from, Vector2 to, Color colour, float seconds, System.Action arrived, float size = 40f)
+    {
+        if (parent == null)
+        {
+            return;
+        }
+
+        var mote = new GameObject("Mote", typeof(RectTransform), typeof(Image));
+        var rect = (RectTransform)mote.transform;
+        rect.SetParent(parent, false);
+        rect.anchorMin = rect.anchorMax = new Vector2(0.5f, 0.5f);
+        rect.sizeDelta = Vector2.one * size;
+        rect.anchoredPosition = from;
+        var image = mote.GetComponent<Image>();
+        image.sprite = UISprites.Glow;
+        image.color = colour;
+        image.raycastTarget = false;
+        // The curve bows out sideways and up, so motes from the same spot don't all fly the same line.
+        Vector2 middle = (from + to) * 0.5f + new Vector2(Random.Range(-160f, 160f), Random.Range(60f, 180f));
+        Add(new Motion { Kind = Kind.Fly, Target = rect, Graphic = image, Seconds = seconds, From = from, Velocity = middle, To = to, Colour = colour, Arrived = arrived });
+    }
+
+    /// <summary>Rays of light thrown out from a point, turning slowly as they fade: the moment a milestone lands.</summary>
+    public static void Rays(RectTransform parent, Vector2 at, int count, Color colour, float length = 520f, float seconds = 1.3f)
+    {
+        if (parent == null)
+        {
+            return;
+        }
+
+        for (int i = 0; i < count; i++)
+        {
+            var shaft = new GameObject("Ray", typeof(RectTransform), typeof(Image));
+            var rect = (RectTransform)shaft.transform;
+            rect.SetParent(parent, false);
+            rect.SetAsFirstSibling();
+            rect.anchorMin = rect.anchorMax = new Vector2(0.5f, 0.5f);
+            rect.pivot = new Vector2(0.5f, 0f);
+            rect.sizeDelta = new Vector2(Random.Range(18f, 34f), length * Random.Range(0.6f, 1.1f));
+            rect.anchoredPosition = at;
+            float angle = (i + Random.Range(-0.2f, 0.2f)) / count * 360f;
+            rect.localRotation = Quaternion.Euler(0f, 0f, angle);
+            var image = shaft.GetComponent<Image>();
+            image.sprite = UISprites.Ray;
+            image.color = colour;
+            image.raycastTarget = false;
+            Add(new Motion
+            {
+                Kind = Kind.Ray, Target = rect, Graphic = image, Seconds = seconds * Random.Range(0.85f, 1.15f), Colour = colour,
+                Spin = angle, Gravity = Random.Range(-14f, 14f),
+            });
+        }
     }
 
     /// <summary>A gentle breathing between 0 and 1, for things that wait for the player: 0.5 + 0.5 sin, at <paramref name="perSecond"/>.</summary>
@@ -205,7 +271,7 @@ public sealed class UIMotion : MonoBehaviour
 
         motion.Start = Time.unscaledTime;
         // One motion of a kind per target: a new punch replaces the one still running.
-        if (motion.Kind != Kind.Spark)
+        if (motion.Kind != Kind.Spark && motion.Kind != Kind.Ray && motion.Kind != Kind.Fly)
         {
             for (int i = motions.Count - 1; i >= 0; i--)
             {
@@ -262,12 +328,26 @@ public sealed class UIMotion : MonoBehaviour
                 break;
             case Kind.Spark:
                 float out_ = 1f - (1f - t) * (1f - t) * (1f - t);
-                ((RectTransform)motion.Target).anchoredPosition = (Vector2)(motion.From + motion.Velocity * out_);
-                motion.Target.localRotation = Quaternion.Euler(0f, 0f, 45f + motion.Spin * t);
-                motion.Target.localScale = Vector3.one * (1f - t * 0.6f);
+                ((RectTransform)motion.Target).anchoredPosition = (Vector2)(motion.From + motion.Velocity * out_) + Vector2.down * motion.Gravity * t * t;
+                motion.Target.localScale = motion.Size * (1f - t * 0.55f);
                 Color colour = motion.Colour;
-                colour.a *= 1f - t * t;
+                colour.a *= (1f - t * t) * (0.85f + 0.15f * Mathf.Sin(t * 40f + motion.Spin));
                 motion.Graphic.color = colour;
+                break;
+            case Kind.Fly:
+                float ease = t * t * (3f - 2f * t);
+                Vector3 a = Vector3.Lerp(motion.From, motion.Velocity, ease);
+                Vector3 b = Vector3.Lerp(motion.Velocity, motion.To, ease);
+                ((RectTransform)motion.Target).anchoredPosition = Vector3.Lerp(a, b, ease);
+                motion.Target.localScale = Vector3.one * (0.6f + 0.6f * Mathf.Sin(t * Mathf.PI));
+                break;
+            case Kind.Ray:
+                // Grows out fast, then fades as it turns a little.
+                motion.Target.localScale = new Vector3(1f, Mathf.Min(1f, t * 5f), 1f);
+                motion.Target.localRotation = Quaternion.Euler(0f, 0f, motion.Spin + motion.Gravity * t);
+                Color light = motion.Colour;
+                light.a *= Mathf.Min(1f, t * 6f) * (1f - t) * (1f - t);
+                motion.Graphic.color = light;
                 break;
         }
     }
@@ -286,7 +366,12 @@ public sealed class UIMotion : MonoBehaviour
                 motion.Graphic.color = motion.Rest;
                 break;
             case Kind.Spark:
+            case Kind.Ray:
                 Destroy(motion.Target.gameObject);
+                break;
+            case Kind.Fly:
+                Destroy(motion.Target.gameObject);
+                motion.Arrived?.Invoke();
                 break;
         }
     }

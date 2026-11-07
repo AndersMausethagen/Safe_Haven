@@ -330,6 +330,10 @@ public sealed class PlayerGathering : MonoBehaviour
             // Rich Seam: every critical blow on rock brings one more.
             bool richSeam = node.Definition != null && node.Definition.GatherTool == ToolType.Pickaxe && Techniques.Has(PerkTechnique.RichSeam);
             int bonus = Session.Criticals * (GatheringMinigameSettings.Current.BonusPerCritical + (richSeam ? TechniqueSettings.Current.RichSeamOre : 0));
+            if (richSeam)
+            {
+                Techniques.Used(PerkTechnique.RichSeam);
+            }
             if (bonus > 0 && node.TryGetComponent(out ResourceSource source))
             {
                 source.GrantBonus(gameObject, bonus);
@@ -405,6 +409,22 @@ public sealed class PlayerGathering : MonoBehaviour
             CombatFeedback.Current.HitStop(settings.CriticalHitStop);
         }
 
+        if (result == SwingResult.Normal && Session != null && Session.KeepsComboOnNormal && Session.Combo > 0)
+        {
+            Techniques.Used(PerkTechnique.SteadyRhythm);
+        }
+
+        if (result == SwingResult.Critical && Session != null)
+        {
+            // A clean cut answers on the node: what it brings, its run, and a small kick of the camera.
+            bool richSeam = tool == ToolType.Pickaxe && Techniques.Has(PerkTechnique.RichSeam);
+            int bonus = settings.BonusPerCritical + (richSeam ? TechniqueSettings.Current.RichSeamOre : 0);
+            string run = Session.Combo > 1 ? $" x{Session.Combo}" : "";
+            DamageNumberSpawner.ShowAt(position + Vector3.up * 1.6f, bonus > 0 ? $"+{bonus}{run}" : $"Clean{run}",
+                Session.Combo > 2 ? Color.white : UIStyle.Current.Accent);
+            CameraShake.Add(0.06f + 0.02f * Mathf.Min(Session.Combo, 4));
+        }
+
         float loudness = profile != null ? profile.Loudness : 1f;
         if (node != null)
         {
@@ -430,7 +450,16 @@ public sealed class PlayerGathering : MonoBehaviour
         }
 
         float counts = TechniqueSettings.Current.CriticalCountsAs;
-        return result => settings.ProgressFor(result) * (result == SwingResult.Critical ? counts : 1f);
+        PerkTechnique technique = tool == ToolType.Axe ? PerkTechnique.HeartwoodStrike : PerkTechnique.Shatter;
+        return result =>
+        {
+            if (result == SwingResult.Critical)
+            {
+                Techniques.Used(technique);
+            }
+
+            return settings.ProgressFor(result) * (result == SwingResult.Critical ? counts : 1f);
+        };
     }
 
     // How the woodcutting, mining or foraging skill changes the work: how fast the tool rises (or the hand picks) and how

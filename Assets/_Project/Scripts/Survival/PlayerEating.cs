@@ -121,6 +121,7 @@ public sealed class PlayerEating : MonoBehaviour
         if (spare)
         {
             GameMessages.Post($"Spare Dose: there's still some {item.DisplayName} left.", MessageKind.Gain);
+            Techniques.Used(PerkTechnique.SpareDose);
         }
 
         if (needs != null && (item.HungerRestore > 0f || item.ThirstRestore > 0f))
@@ -133,6 +134,12 @@ public sealed class PlayerEating : MonoBehaviour
         if (kind == CraftedGoods.Meals && Techniques.Has(PerkTechnique.HeartyMeals))
         {
             heal += health.MaxHealth * techniques.HeartyHeal;
+            Techniques.Used(PerkTechnique.HeartyMeals);
+        }
+
+        if (kind == CraftedGoods.Tonics && item.HealAmount > 0f && Techniques.Has(PerkTechnique.PotentRemedies))
+        {
+            Techniques.Used(PerkTechnique.PotentRemedies);
         }
 
         if (heal > 0f)

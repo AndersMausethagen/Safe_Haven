@@ -23,6 +23,10 @@ public sealed class ExperienceHud : MonoBehaviour
     private RectTransform bannerRect;
     private Image screenGlow;
     private float shownShare;
+    private float lastMote = -10f;
+    private float slowUntil = -10f;
+    private bool slowing;
+    private const float SlowSeconds = 0.9f;
     private ProficiencyDefinition easedSkill;
     private int easedLevel;
     private TMP_Text level;
@@ -125,6 +129,7 @@ public sealed class ExperienceHud : MonoBehaviour
 
         ExperienceTracker.Gained += hud.OnGained;
         ExperienceTracker.LevelReached += hud.OnLevelReached;
+        Techniques.FirstUsed += hud.OnTechniqueFirstUsed;
         Preload();
         return hud;
     }
@@ -135,6 +140,7 @@ public sealed class ExperienceHud : MonoBehaviour
     {
         ExperienceTracker.Gained -= OnGained;
         ExperienceTracker.LevelReached -= OnLevelReached;
+        Techniques.FirstUsed -= OnTechniqueFirstUsed;
         if (Current == this)
         {
             Current = null;
@@ -149,10 +155,41 @@ public sealed class ExperienceHud : MonoBehaviour
         gainAt = Time.unscaledTime;
         writtenGain = -1;
         UIMotion.Punch(gain.transform, same ? 0.12f : 0.3f, 0.3f);
+        FlyMote(skill);
         if (skill != null)
         {
             shownSkill = skill;
         }
+    }
+
+    // What was learned flies from the player into the bar, which takes it in with a flash: dozens of small
+    // moments a session, so they are quick and never more than a few a second.
+    private void FlyMote(ProficiencyDefinition skill)
+    {
+        Camera view = Camera.main;
+        if (skill == null || Player.Current == null || view == null || Time.unscaledTime - lastMote < 0.15f || GamePause.IsPaused)
+        {
+            return;
+        }
+
+        lastMote = Time.unscaledTime;
+        var canvas = (RectTransform)transform;
+        Vector3 screen = view.WorldToScreenPoint(Player.Current.transform.position + Vector3.up * 1.9f);
+        if (screen.z <= 0f || !RectTransformUtility.ScreenPointToLocalPointInRectangle(canvas, screen, null, out Vector2 from))
+        {
+            return;
+        }
+
+        Vector3 barEnd = bar.TransformPoint(new Vector3(bar.rect.xMin + bar.rect.width * Mathf.Clamp01(shownShare), 0f, 0f));
+        Vector2 to = canvas.InverseTransformPoint(barEnd);
+        UIMotion.Fly(canvas, from, to, Color.Lerp(Gold, Color.white, 0.35f), 0.55f, () =>
+        {
+            if (fillImage != null)
+            {
+                UIMotion.Flash(fillImage, Color.white, 0.25f);
+                UIMotion.Punch(bar, 0.12f, 0.25f);
+            }
+        });
     }
 
     private void OnLevelReached(ProficiencyDefinition skill, int reached, bool milestone)
@@ -171,7 +208,17 @@ public sealed class ExperienceHud : MonoBehaviour
         UIMotion.Burst(bannerRect, new Vector2(0f, 14f), milestone ? 34 : 14, style.Accent, milestone ? 460f : 260f, milestone ? 1.4f : 0.9f, milestone ? 13f : 9f);
         if (milestone)
         {
+            // At home and out of a fight, the world holds its breath a moment as a milestone lands.
+            if (GameSession.ActiveRaid == null && Player.Current != null && (Player.Current.Stealth == null || !Player.Current.Stealth.IsFighting))
+            {
+                slowUntil = Time.unscaledTime + SlowSeconds;
+                slowing = true;
+            }
+
             UIMotion.Burst(bannerRect, new Vector2(0f, 14f), 18, Color.white, 300f, 1.1f, 7f);
+            Color shaft = style.Accent;
+            shaft.a = 0.55f;
+            UIMotion.Rays(bannerRect, new Vector2(0f, 14f), 12, shaft, 620f, 1.6f);
             Color glow = style.Accent;
             glow.a = 0.55f;
             UIMotion.Flash(screenGlow, glow, 1.6f);
@@ -182,6 +229,55 @@ public sealed class ExperienceHud : MonoBehaviour
             UIMotion.Flash(fillImage, Color.white, 0.6f);
             UIMotion.Punch(bar, 0.25f, 0.5f);
         }
+    }
+
+    // Eases time from a third back to full over the milestone's first moment; never touches a paused or frozen game.
+    private void SlowMotion()
+    {
+        if (!slowing || GamePause.IsTimeFrozen)
+        {
+            return;
+        }
+
+        float left = slowUntil - Time.unscaledTime;
+        if (left <= 0f)
+        {
+            slowing = false;
+            Time.timeScale = 1f;
+            return;
+        }
+
+        float t = 1f - left / SlowSeconds;
+        Time.timeScale = Mathf.Lerp(0.3f, 1f, t * t);
+    }
+
+    private void OnDisable()
+    {
+        if (slowing && !GamePause.IsTimeFrozen)
+        {
+            Time.timeScale = 1f;
+        }
+
+        slowing = false;
+    }
+
+    // The first time a technique comes into play it is named, so the player knows what just happened and why.
+    private void OnTechniqueFirstUsed(PerkDefinition perk)
+    {
+        if (Time.unscaledTime - bannerAt < bannerFor)
+        {
+            GameMessages.Post($"Technique: {perk.DisplayName}. {perk.Description}", MessageKind.Gain);
+            return;
+        }
+
+        bannerTitle.text = perk.DisplayName.ToUpperInvariant();
+        bannerLine.text = $"<color={UIStyle.Current.AccentHex}>Technique</color>   {perk.Description}";
+        bannerAt = Time.unscaledTime;
+        bannerFor = BannerSeconds + 1.2f;
+        UIMotion.Pop(bannerRect, 0.75f, 0.35f);
+        UIMotion.Flash(bannerTitle, Color.white, 0.5f);
+        UIMotion.Burst(bannerRect, new Vector2(0f, 14f), 10, UIStyle.Current.Accent, 220f, 0.8f, 8f);
+        UIMotion.Sound(AudioManager.Sounds != null ? AudioManager.Sounds.PerkChosen : null);
     }
 
     private static int? NextMilestone(ProficiencyDefinition skill, int level)
@@ -199,6 +295,7 @@ public sealed class ExperienceHud : MonoBehaviour
 
     private void LateUpdate()
     {
+        SlowMotion();
         float shown = Time.unscaledTime - bannerAt;
         banner.alpha = shown >= bannerFor ? 0f : Mathf.Clamp01(shown / 0.25f) * Mathf.Clamp01((bannerFor - shown) / 0.6f);
 

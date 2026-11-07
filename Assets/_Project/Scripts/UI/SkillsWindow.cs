@@ -200,6 +200,9 @@ public sealed class SkillsWindow : MonoBehaviour
         button.targetGraphic = row.Background;
         button.onClick.AddListener(() => Select(skill));
         rect.gameObject.AddComponent<UIRole>().Set(UIRole.Kind.Button);
+        var hover = rect.gameObject.AddComponent<UnityEngine.EventSystems.EventTrigger>();
+        AddTrigger(hover, UnityEngine.EventSystems.EventTriggerType.PointerEnter, () => ShowNext(skill, rect));
+        AddTrigger(hover, UnityEngine.EventSystems.EventTriggerType.PointerExit, HideNext);
         row.Name = CodeUI.Label("Name", rect, 14f, 2f, ListWidth - 120f, RowHeight - 10f, 18f, style.Text);
         row.Level = CodeUI.Label("Level", rect, ListWidth - 104f, 2f, 90f, RowHeight - 10f, 18f, style.Accent, TextAlignmentOptions.Right);
         Image track = CodeUI.At("Track", rect, 14f, RowHeight - 9f, ListWidth - 28f, 3f).gameObject.AddComponent<Image>();
@@ -214,6 +217,66 @@ public sealed class SkillsWindow : MonoBehaviour
         row.Selected.color = style.Accent;
         row.Selected.raycastTarget = false;
         return row;
+    }
+
+    private RectTransform nextPanel;
+    private TMP_Text nextText;
+
+    private static void AddTrigger(UnityEngine.EventSystems.EventTrigger trigger, UnityEngine.EventSystems.EventTriggerType type, System.Action action)
+    {
+        var entry = new UnityEngine.EventSystems.EventTrigger.Entry { eventID = type };
+        entry.callback.AddListener(_ => action());
+        trigger.triggers.Add(entry);
+    }
+
+    // Beside a hovered skill: its next milestone and both of what it offers, so the player has something to aim at.
+    private void ShowNext(ProficiencyDefinition skill, RectTransform row)
+    {
+        LevelingSettings settings = LevelingSettings.Current;
+        int level = GameSession.Progress.LevelOf(skill, settings);
+        UIStyle style = UIStyle.Current;
+        string text = null;
+        foreach (ProficiencyDefinition.Milestone milestone in skill.Milestones)
+        {
+            if (milestone.level > level)
+            {
+                text = $"<color={style.AccentHex}>{skill.DisplayName} {milestone.level}</color>  <color={style.MutedHex}>in {milestone.level - level} level{(milestone.level - level == 1 ? "" : "s")}</color>\n"
+                       + $"{Offer(milestone.first, style)}\n<color={style.MutedHex}>or</color>  {Offer(milestone.second, style)}";
+                break;
+            }
+        }
+
+        if (text == null)
+        {
+            text = $"<color={style.AccentHex}>{skill.DisplayName} {level}</color>\nEvery milestone reached.";
+        }
+
+        if (nextPanel == null)
+        {
+            nextPanel = CodeUI.At("Next Milestone", panel, 0f, 0f, 380f, 82f);
+            nextPanel.gameObject.AddComponent<Image>().color = style.Panel;
+            nextPanel.gameObject.AddComponent<Outline>().effectColor = style.Accent;
+            nextText = CodeUI.Paragraph("Text", nextPanel, 12f, 8f, 356f, 70f, 16f, style.Text);
+            nextText.richText = true;
+        }
+
+        nextText.text = text;
+        nextPanel.gameObject.SetActive(true);
+        nextPanel.SetAsLastSibling();
+        nextPanel.anchoredPosition = new Vector2(ListX + ListWidth + 8f, row.anchoredPosition.y);
+        UIMotion.Pop(nextPanel, 0.9f, 0.18f);
+    }
+
+    private static string Offer(PerkDefinition perk, UIStyle style) => perk == null ? "-"
+        : perk.IsTechnique ? $"<b>{perk.DisplayName}</b> <size=80%><color={style.AccentHex}>TECHNIQUE</color></size>"
+        : $"<b>{perk.DisplayName}</b> <color={style.GoodHex}>{perk.DescribeBonuses()}</color>";
+
+    private void HideNext()
+    {
+        if (nextPanel != null)
+        {
+            nextPanel.gameObject.SetActive(false);
+        }
     }
 
     private void BuildDetail(UIStyle style)

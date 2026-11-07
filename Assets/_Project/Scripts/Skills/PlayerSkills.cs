@@ -250,6 +250,7 @@ public sealed class PlayerSkills : MonoBehaviour
         if (Techniques.Has(PerkTechnique.SpellEcho) && UnityEngine.Random.value < TechniqueSettings.Current.SpellEchoChance)
         {
             GameMessages.Post($"Spell Echo: {skill.DisplayName} is ready again.", MessageKind.Gain);
+            Techniques.Used(PerkTechnique.SpellEcho);
         }
         else
         {
