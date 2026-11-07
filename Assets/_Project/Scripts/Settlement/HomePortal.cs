@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Text;
 using UnityEngine;
 
 /// <summary>
@@ -11,7 +10,7 @@ using UnityEngine;
 /// <para>
 /// Where it belongs: on the portal in Safe Haven, beside its RaidPortal and a CraftingStation with Opens When Used off, next to an
 /// Interactable that doesn't deactivate on completion. The ward radius and upgrade costs live in SettlementSettings; the ward level in
-/// SettlementState; the ring shows the ward.
+/// SettlementState; the ring shows the ward. The portal is the ward and the voice; what its menu offers is <see cref="HomePortalMenu"/>.
 /// </para>
 /// </summary>
 [DisallowMultipleComponent]
@@ -56,6 +55,7 @@ public sealed class HomePortal : MonoBehaviour, IArea, IBuildArea
     private Interactable interactable;
     private RaidPortal raid;
     private CraftingStation station;
+    private HomePortalMenu menu;
     private int whisperIndex;
 
     /// <summary>The portal in the loaded scene, or null outside Safe Haven.</summary>
@@ -160,7 +160,8 @@ public sealed class HomePortal : MonoBehaviour, IArea, IBuildArea
 
         AudioManager.Play(voice, transform.position);
         // Raised when the conversation ends, so the next quest doesn't appear while the portal is still speaking.
-        ActionMenuWindow.Current.Open(() => BuildPage(user), user, transform, menuRange, () => RaiseTalked(user));
+        menu ??= new HomePortalMenu(this, raid, station);
+        ActionMenuWindow.Current.Open(() => menu.Build(user), user, transform, menuRange, () => RaiseTalked(user));
     }
 
     private void RaiseTalked(GameObject user)
@@ -203,108 +204,26 @@ public sealed class HomePortal : MonoBehaviour, IArea, IBuildArea
         return null;
     }
 
-    private static void OpenHaven()
+    /// <summary>What the portal says now: the line for the story's step, or one of its whispers; null when it has nothing.</summary>
+    public string SpokenLine()
     {
-        if (HavenWindow.Current != null)
-        {
-            HavenWindow.Current.Open();
-        }
-    }
-
-    private MenuPage BuildPage(GameObject user)
-    {
-        SettlementSettings settings = SettlementSettings.Current;
-        SettlementState settlement = GameSession.Settlement;
-        var body = new StringBuilder();
         string questLine = QuestLine();
         if (questLine != null)
         {
-            body.Append(questLine).Append("\n\n");
-        }
-        else if (whispers.Length > 0)
-        {
-            body.Append(whispers[Mathf.Clamp(whisperIndex, 0, whispers.Length - 1)]).Append("\n\n");
+            return questLine;
         }
 
-        UIStyle style = UIStyle.Current;
-        body.Append($"<color={UIStyle.Hex(style.Accent)}>The ward shelters {WardRadius:0} m around the portal. You can build inside it.</color>");
-        WardBreachDirector breach = WardBreachDirector.Current;
-        if (breach != null && breach.IsPending)
-        {
-            body.Append($"\n\n<color={UIStyle.Hex(style.Warning)}>").Append(breach.Definition.PendingText).Append("</color>");
-        }
-
-        if (settlement.WardStrain > 0)
-        {
-            int raids = settlement.WardStrain;
-            body.Append($"\n\n<color={UIStyle.Hex(style.Warning)}>The ward is strained. It will mend after {raids} more successful raid{(raids == 1 ? "" : "s")}.</color>");
-        }
-
-        if (raid != null && !raid.IsRepaired)
-        {
-            body.Append("\n\n").Append(raid.RuinText);
-        }
-
-        var page = new MenuPage { Title = raid != null && !raid.IsRepaired ? "The Sleeping Portal" : "The Portal", Body = body.ToString() };
-        // What most visits are for comes first: going through it.
-        raid?.AddActions(page, user);
-        if (station != null && station.Usable)
-        {
-            page.Add(new MenuAction("Make Portal Sparks", "Queue them at the portal's own fire", true, () => station.OpenMenu(user), closesMenu: true));
-        }
-
-        if (questLine == null && whispers.Length > 1)
-        {
-            page.Add(new MenuAction("Listen", null, true, () =>
-            {
-                whisperIndex = (whisperIndex + 1) % whispers.Length;
-                AudioManager.Play(voice, transform.position);
-            }));
-        }
-
-        int level = settlement.WardLevel;
-        if (level < settings.WardLevels.Count)
-        {
-            SettlementSettings.WardLevel next = settings.WardLevels[level];
-            MaterialPool pool = MaterialPool.For(user);
-            bool affordable = pool.CanAfford(next.cost, null, out string missing);
-            string opens = string.IsNullOrEmpty(next.opens) ? "" : $". {next.opens}";
-            string detail = $"{AmountText.Describe(next.cost)}  →  ward {settings.WardRadiusAt(level + 1):0} m{opens}" + (affordable ? "" : $"   <color={UIStyle.Hex(style.Danger)}>{missing}</color>");
-            page.Add(new MenuAction("Strengthen the ward", detail, affordable, () => Strengthen(user)));
-        }
-
-        if (breach != null && breach.IsPending)
-        {
-            page.Add(new MenuAction("Begin the defense", breach.Hint, true, breach.Begin, closesMenu: true));
-        }
-
-        MenuAction mend = BuildingRepairs.MendAction(user);
-        if (mend != null)
-        {
-            page.Add(mend);
-        }
-
-        page.Add(new MenuAction("How is Safe Haven doing?", $"Rank, renown and what to do next ({GameInput.KeyLabel(GameInput.Haven)})", true, OpenHaven));
-        return page;
+        return whispers.Length > 0 ? whispers[Mathf.Clamp(whisperIndex, 0, whispers.Length - 1)] : null;
     }
 
-    private void Strengthen(GameObject user)
+    /// <summary>True when it has more whispers to give (none while a story's step has its line).</summary>
+    public bool HasMoreToSay => QuestLine() == null && whispers.Length > 1;
+
+    /// <summary>Its next whisper, aloud.</summary>
+    public void SayNext()
     {
-        if (HavenVisit.LeftToHost())
-        {
-            return;
-        }
-
-        SettlementSettings settings = SettlementSettings.Current;
-        int level = GameSession.Settlement.WardLevel;
-        if (level >= settings.WardLevels.Count || !MaterialPool.For(user).TrySpend(settings.WardLevels[level].cost))
-        {
-            return;
-        }
-
-        GameSession.Settlement.RaiseWardLevel();
-        string opens = settings.WardLevels[level].opens;
-        GameMessages.Post($"The portal glows brighter. The ward now reaches {WardRadius:0} m.{(string.IsNullOrEmpty(opens) ? "" : " " + opens)}", MessageKind.Gain);
+        whisperIndex = (whisperIndex + 1) % whispers.Length;
+        AudioManager.Play(voice, transform.position);
     }
 
     private void DrawWard()
