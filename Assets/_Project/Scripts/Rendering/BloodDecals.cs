@@ -1,0 +1,68 @@
+using System.Collections.Generic;
+using UnityEngine;
+
+/// <summary>
+/// Blood as decals on the ground (BloodEffects' stains and pools when RenderingSettings has a blood decal): one of four
+/// splats from the atlas, turned at random, in the creature's own blood colour. URP's decal shader takes no tint, so the
+/// atlas is tinted once per colour into a copy (half size) and kept for the rest of the run.
+/// </summary>
+public static class BloodDecals
+{
+    private static readonly int BaseMapId = Shader.PropertyToID("Base_Map");
+    private static readonly Dictionary<Color32, Material> Tinted = new Dictionary<Color32, Material>();
+
+    /// <summary>Whether blood can be drawn as decals now.</summary>
+    public static bool Available
+    {
+        get
+        {
+            RenderingSettings settings = RenderingSettings.Current;
+            return DecalPool.Current != null && settings.BloodDecal != null && settings.BloodAtlas != null && settings.BloodAtlas.isReadable;
+        }
+    }
+
+    /// <summary>A splat <paramref name="size"/> metres across lying on the ground, for <paramref name="seconds"/>,
+    /// spreading to <paramref name="grow"/> times its size over <paramref name="growSeconds"/> (a pool).</summary>
+    public static void Splat(Vector3 ground, Vector3 normal, float size, Color color, float seconds, float grow = 1f, float growSeconds = 1f)
+    {
+        int tile = Random.Range(0, 4);
+        var uv = new Vector4(0.5f, 0.5f, (tile % 2) * 0.5f, (tile / 2) * 0.5f);
+        Vector3 along = Quaternion.AngleAxis(Random.Range(0f, 360f), normal) * Vector3.ProjectOnPlane(Vector3.forward, normal);
+        DecalPool.Current.Press(For(color), ground, normal, along, new Vector2(size, size), uv, seconds, grow, growSeconds);
+    }
+
+    private static Material For(Color color)
+    {
+        Color32 key = color;
+        if (Tinted.TryGetValue(key, out Material material) && material != null)
+        {
+            return material;
+        }
+
+        RenderingSettings settings = RenderingSettings.Current;
+        Texture2D atlas = settings.BloodAtlas;
+        int mip = atlas.mipmapCount > 1 ? 1 : 0;
+        int width = Mathf.Max(1, atlas.width >> mip), height = Mathf.Max(1, atlas.height >> mip);
+        Color32[] pixels = atlas.GetPixels32(mip);
+        // The atlas is near white; the creature's colour sets the hue, the atlas the shading. Thin blood shows less.
+        float r = color.r * 0.85f, g = color.g * 0.85f, b = color.b * 0.85f, a = Mathf.Clamp01(color.a + 0.05f);
+        for (int i = 0; i < pixels.Length; i++)
+        {
+            Color32 p = pixels[i];
+            float shade = p.r / 255f;
+            pixels[i] = new Color32((byte)Mathf.Min(255f, r * shade * 255f), (byte)Mathf.Min(255f, g * shade * 255f),
+                (byte)Mathf.Min(255f, b * shade * 255f), (byte)(p.a * a));
+        }
+
+        var texture = new Texture2D(width, height, TextureFormat.RGBA32, true)
+        {
+            name = "Blood " + ColorUtility.ToHtmlStringRGB(color), wrapMode = TextureWrapMode.Clamp, hideFlags = HideFlags.DontSave,
+        };
+        texture.SetPixels32(pixels);
+        texture.Apply(true, true);
+        material = new Material(settings.BloodDecal) { name = texture.name, hideFlags = HideFlags.DontSave };
+        material.SetTexture(BaseMapId, texture);
+        Tinted[key] = material;
+        return material;
+    }
+}

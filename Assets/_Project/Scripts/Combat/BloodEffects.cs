@@ -7,6 +7,8 @@ using UnityEngine;
 /// particle shape, so the spray really does go the way the blow went. One copy per scene with three world-space particle systems (the
 /// prefab Build Combat Effects makes), so a fight makes no garbage and stains don't hold effect copies out of a pool.
 /// <para>
+/// Stains and pools are decals on the ground (BloodDecals: ragged splats with droplets, in the creature's colour, lying
+/// over the terrain's bumps and up rocks and walls) when RenderingSettings has a blood decal; flat particle quads otherwise.
 /// The colour comes from what bleeds (Content Editor › Monsters › Blood Color); Options › Gameplay › Blood turns it all off.
 /// Amounts are in Combat Feel › Blood.
 /// </para>
@@ -118,6 +120,14 @@ public sealed class BloodEffects : MonoBehaviour
             return;
         }
 
+        if (BloodDecals.Available)
+        {
+            // Starts small and spreads, as blood does.
+            BloodDecals.Splat(ground, normal, size * 0.55f, Shade(color, 0.7f), CombatFeelSettings.Current.BloodPoolSeconds,
+                1.9f, 5f);
+            return;
+        }
+
         Quaternion lying = Quaternion.AngleAxis(Random.Range(0f, 360f), normal) * Quaternion.FromToRotation(Vector3.forward, normal);
         var pool = new ParticleSystem.EmitParams
         {
@@ -225,6 +235,12 @@ public sealed class BloodEffects : MonoBehaviour
 
     private void EmitStain(Vector3 ground, Vector3 normal, float size, Color color)
     {
+        if (BloodDecals.Available)
+        {
+            BloodDecals.Splat(ground, normal, size * 1.5f, color, CombatFeelSettings.Current.BloodStainSeconds);
+            return;
+        }
+
         // The quad lies on the ground, turned at random so stains don't all look alike.
         Quaternion lying = Quaternion.AngleAxis(Random.Range(0f, 360f), normal) * Quaternion.FromToRotation(Vector3.forward, normal);
         var stain = new ParticleSystem.EmitParams

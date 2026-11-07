@@ -37,6 +37,27 @@ public sealed class RenderingSettings : GameSettings<RenderingSettings>
     [SerializeField, Range(0f, 1f)] private float cloudDarkness = 0.55f;
     [Tooltip("How soft the shadows' edges are.")]
     [SerializeField, Range(0.02f, 0.5f)] private float cloudSoftness = 0.18f;
+    [Header("Decals")]
+    [Tooltip("Short-lived decals out at once (blood, footprints); the oldest is reused after that.")]
+    [SerializeField, Min(8)] private int decalPoolSize = 128;
+    [Tooltip("Blood on the ground, tinted per creature from Blood Atlas (2x2 splats).")]
+    [SerializeField] private Material bloodDecal;
+    [Tooltip("The blood splats, readable: tinted into a copy for each creature's blood colour.")]
+    [SerializeField] private Texture2D bloodAtlas;
+    [Tooltip("Boot prints in wet ground (left and right side by side).")]
+    [SerializeField] private Material footprintDecal;
+    [Tooltip("Prints are left once the ground is this wet (WeatherSystem's wetness, 0-1).")]
+    [SerializeField, Range(0f, 1f)] private float footprintWetness = 0.15f;
+    [SerializeField, Min(1f)] private float footprintSeconds = 40f;
+    [Tooltip("Worn, trampled ground round every building, its yard included.")]
+    [SerializeField] private Material trampledDecal;
+    [Tooltip("Metres the worn ground reaches past a building's footprint.")]
+    [SerializeField, Min(0f)] private float trampledMargin = 1.6f;
+    [Tooltip("Ash and char round a campfire.")]
+    [SerializeField] private Material scorchDecal;
+    [Tooltip("Damp, dirt and moss creeping up the foot of a building's walls.")]
+    [SerializeField] private Material grimeDecal;
+    [SerializeField, Min(0.1f)] private float grimeHeight = 0.7f;
     [Tooltip("Shaders/CloudCookie.shader, referenced so builds include it.")]
     [SerializeField] private Shader cloudShader;
 
@@ -53,5 +74,16 @@ public sealed class RenderingSettings : GameSettings<RenderingSettings>
     public Vector2 CloudCover => cloudCover;
     public float CloudDarkness => cloudDarkness;
     public float CloudSoftness => cloudSoftness;
+    public int DecalPoolSize => decalPoolSize;
+    public Material BloodDecal => bloodDecal;
+    public Texture2D BloodAtlas => bloodAtlas;
+    public Material FootprintDecal => footprintDecal;
+    public float FootprintWetness => footprintWetness;
+    public float FootprintSeconds => footprintSeconds;
+    public Material TrampledDecal => trampledDecal;
+    public float TrampledMargin => trampledMargin;
+    public Material ScorchDecal => scorchDecal;
+    public Material GrimeDecal => grimeDecal;
+    public float GrimeHeight => grimeHeight;
     public Shader CloudShader => cloudShader != null ? cloudShader : Shader.Find("Hidden/Safe Haven/Cloud Cookie");
 }

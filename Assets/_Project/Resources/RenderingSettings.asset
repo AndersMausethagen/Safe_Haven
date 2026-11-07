@@ -27,4 +27,15 @@ MonoBehaviour:
   cloudCover: {x: 0.28, y: 0.6}
   cloudDarkness: 0.55
   cloudSoftness: 0.18
+  decalPoolSize: 128
+  bloodDecal: {fileID: 2100000, guid: f7ae1475f1a410743b157c1e53f93ce3, type: 2}
+  bloodAtlas: {fileID: 2800000, guid: 7fe320d85bee25b4aacd117857eba120, type: 3}
+  footprintDecal: {fileID: 2100000, guid: c324e0879c3863940921b2da7454e24e, type: 2}
+  footprintWetness: 0.15
+  footprintSeconds: 40
+  trampledDecal: {fileID: 2100000, guid: 4dd150bff8b6b204fa525f0eb31016f0, type: 2}
+  trampledMargin: 1.6
+  scorchDecal: {fileID: 2100000, guid: 482c6d188d2b0534b8a6fbebc34dfe02, type: 2}
+  grimeDecal: {fileID: 2100000, guid: 1b3cfce3fef016e46918c8cb89899a92, type: 2}
+  grimeHeight: 0.7
   cloudShader: {fileID: 4800000, guid: 305da9779ffbff94db43773d93efff6e, type: 3}
