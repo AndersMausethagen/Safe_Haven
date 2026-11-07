@@ -333,6 +333,41 @@ public sealed class ProgressionTests
     }
 
     [Test]
+    public void TheTotalLevel_GivesATitle_AndRenown()
+    {
+        LevelingSettings settings = LevelingSettings.Current;
+        int start = settings.Skills.Count;
+        Assert.AreEqual("Newcomer", settings.TitleFor(start));
+        Assert.AreEqual(0, settings.RenownFor(start), "a newcomer adds nothing");
+        Assert.AreEqual(2, settings.RenownFor(start + 40));
+        Assert.AreNotEqual(settings.TitleFor(start), settings.TitleFor(settings.Skills.Count * settings.MaxLevel), "a master is called something else");
+    }
+
+    [Test]
+    public void WatchingAFriend_TeachesAShare_ThatIsNotPassedOn()
+    {
+        LevelingSettings settings = LevelingSettings.Current;
+        ProficiencyDefinition skill = settings.FindSkill("fishing");
+        var practised = new List<float>();
+        void Note(ProficiencyDefinition s, float amount) => practised.Add(amount);
+        ExperienceTracker.Practised += Note;
+        GameSession.StartNewGame();
+        try
+        {
+            ExperienceTracker.Practise(skill, 1, 20f);
+            CollectionAssert.AreEqual(new[] { 20f }, practised, "practice is announced for friends to watch");
+            ExperienceTracker.LearnByWatching(skill, 20f * settings.WatchShare);
+            Assert.AreEqual(25, GameSession.Progress.ExperienceOf(skill));
+            Assert.AreEqual(1, practised.Count, "what was watched is not announced again, so it can't echo");
+        }
+        finally
+        {
+            ExperienceTracker.Practised -= Note;
+            GameSession.StartNewGame();
+        }
+    }
+
+    [Test]
     public void RuneBook_IsReadForInsightAndFoundInSupplyCaches()
     {
         var book = AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Project/Data/Items/RuneBook.asset");

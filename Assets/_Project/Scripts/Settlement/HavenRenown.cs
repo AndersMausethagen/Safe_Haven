@@ -62,6 +62,16 @@ public static class HavenRenown
             parts?.Add(new Part("Clearing the overgrowth", clearing));
         }
 
+        // The Haven is known by its people, its keeper among them.
+        LevelingSettings leveling = LevelingSettings.Current;
+        int totalLevel = GameSession.Progress.TotalLevel(leveling);
+        int skilled = leveling.RenownFor(totalLevel);
+        if (skilled > 0)
+        {
+            total += skilled;
+            parts?.Add(new Part($"Your skills (total level {totalLevel})", skilled));
+        }
+
         int residents = GameSession.Settlement.Residents.Count * settings.ResidentRenown;
         if (residents > 0)
         {

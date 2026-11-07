@@ -325,7 +325,10 @@ public sealed class SkillsWindow : MonoBehaviour
             ? $"<color={style.AccentHex}>{progress.Insight} Insight</color> to put into a skill"
             : "No Insight to spend";
         string choices = pending > 0 ? $"   ·   <color={style.GoodHex}>{pending} perk{(pending == 1 ? "" : "s")} to choose</color>" : "";
-        header.text = $"Total level {progress.TotalLevel(settings)}   ·   {insight}{choices}";
+        int totalLevel = progress.TotalLevel(settings);
+        string title = settings.TitleFor(totalLevel);
+        title = string.IsNullOrEmpty(title) ? "" : $"<color={style.AccentHex}>{title}</color>   ·   ";
+        header.text = $"{title}Total level {totalLevel}   ·   {insight}{choices}";
 
         foreach (SkillRow row in rows)
         {

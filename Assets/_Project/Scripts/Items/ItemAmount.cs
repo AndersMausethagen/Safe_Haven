@@ -34,6 +34,8 @@ public readonly struct ItemStack
     public readonly EnchantmentDefinition Enchantment;
     /// <summary>How well it was made: a crafting skill's Fine or Masterwork. Plain for everything else.</summary>
     public readonly ItemQuality Quality;
+    /// <summary>Who made a Fine or Masterwork piece, for the tooltip ("Made by Astrid"). Empty for everything else.</summary>
+    public readonly string Maker;
     private readonly float wear;
 
     public ItemStack(ItemDefinition item, int count) : this(item, count, 1f)
@@ -41,7 +43,7 @@ public readonly struct ItemStack
     }
 
     public ItemStack(ItemDefinition item, int count, float durability, int empower = 0, EnchantmentDefinition enchantment = null,
-        ItemQuality quality = ItemQuality.Plain)
+        ItemQuality quality = ItemQuality.Plain, string maker = null)
     {
         bool empty = item == null || count <= 0;
         Item = empty ? null : item;
@@ -53,6 +55,7 @@ public readonly struct ItemStack
         Empower = gear ? Mathf.Max(0, empower) : 0;
         Enchantment = gear ? enchantment : null;
         Quality = gear ? quality : ItemQuality.Plain;
+        Maker = Quality != ItemQuality.Plain && !string.IsNullOrEmpty(maker) ? maker : "";
     }
 
     public bool IsEmpty => Item == null;
@@ -83,7 +86,7 @@ public readonly struct ItemStack
     public bool IsDamaged => !IsEmpty && Item.HasDurability && wear > 0.0001f;
 
     /// <summary>The same stack with another durability.</summary>
-    public ItemStack WithDurability(float durability) => new ItemStack(Item, Count, durability, Empower, Enchantment, Quality);
+    public ItemStack WithDurability(float durability) => new ItemStack(Item, Count, durability, Empower, Enchantment, Quality, Maker);
 
     /// <summary>The water in a water container (ItemDefinition.WaterCapacity), 0 for anything else.</summary>
     public float Water => IsEmpty || !Item.HoldsWater ? 0f : Durability * Item.WaterCapacity;
@@ -93,13 +96,16 @@ public readonly struct ItemStack
         IsEmpty || !Item.HoldsWater ? this : WithDurability(Mathf.Clamp01(water / Item.WaterCapacity));
 
     /// <summary>The same stack empowered to a level.</summary>
-    public ItemStack WithEmpower(int level) => new ItemStack(Item, Count, Durability, level, Enchantment, Quality);
+    public ItemStack WithEmpower(int level) => new ItemStack(Item, Count, Durability, level, Enchantment, Quality, Maker);
 
     /// <summary>The same stack carrying another enchantment. Null takes it away.</summary>
-    public ItemStack WithEnchantment(EnchantmentDefinition enchantment) => new ItemStack(Item, Count, Durability, Empower, enchantment, Quality);
+    public ItemStack WithEnchantment(EnchantmentDefinition enchantment) => new ItemStack(Item, Count, Durability, Empower, enchantment, Quality, Maker);
 
     /// <summary>The same stack made to another quality.</summary>
-    public ItemStack WithQuality(ItemQuality quality) => new ItemStack(Item, Count, Durability, Empower, Enchantment, quality);
+    public ItemStack WithQuality(ItemQuality quality) => new ItemStack(Item, Count, Durability, Empower, Enchantment, quality, Maker);
+
+    /// <summary>The same stack signed by its maker.</summary>
+    public ItemStack WithMaker(string maker) => new ItemStack(Item, Count, Durability, Empower, Enchantment, Quality, maker);
 
     /// <summary>How many more of the same item fit on this stack.</summary>
     public int SpaceLeft => IsEmpty ? 0 : Mathf.Max(0, Item.MaximumStack - Count);

@@ -295,6 +295,8 @@ public sealed class SlotSaveData
     public string enchantment;
     /// <summary>How well it was made (ItemQuality). Missing in older saves, where everything was plain.</summary>
     public int quality;
+    /// <summary>Who made a Fine or Masterwork piece. Missing in older saves.</summary>
+    public string maker;
 }
 
 [Serializable]

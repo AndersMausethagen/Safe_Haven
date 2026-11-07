@@ -150,7 +150,8 @@ public static class CraftedWork
 
         CraftedGoods goods = Of(item);
         ItemQuality quality = QualityFor(QualityChance(goods, maker), UnityEngine.Random.value, LevelingSettings.Current.MasterworkShare);
-        return new ItemStack(item, 1, Finish(goods, maker), 0, null, quality);
+        string name = GameSession.Appearance != null ? GameSession.Appearance.DisplayName : null;
+        return new ItemStack(item, 1, Finish(goods, maker), 0, null, quality, name);
     }
 
     /// <summary>Gives a crafted batch to a maker's bag: gear piece by piece as they make it, the rest as it comes, with the

@@ -48,6 +48,8 @@ MonoBehaviour:
   masterworkShare: 0.25
   catchWork: 2
   castExperience: 3
+  watchShare: 0.25
+  watchReach: 20
   questExperience: 50
   raidExtractedExperience: 150
   raidFailedExperience: 40
@@ -57,6 +59,20 @@ MonoBehaviour:
   insightFullBelow: 20
   insightShareAbove: 0.5
   insightStep: 100
+  titles:
+  - totalLevel: 13
+    name: Newcomer
+  - totalLevel: 60
+    name: Settler
+  - totalLevel: 130
+    name: Woodsfolk
+  - totalLevel: 260
+    name: Haven-Keeper
+  - totalLevel: 400
+    name: Elder of the Haven
+  - totalLevel: 600
+    name: Legend of the Forest
+  totalLevelsPerRenown: 20
   skills:
   - {fileID: 11400000, guid: a277ba53f2eae0648aa06826e44cbfd8, type: 2}
   - {fileID: 11400000, guid: e9528bdd6784e9d4eaa85d8753dfa51c, type: 2}

@@ -100,7 +100,7 @@ public sealed class CraftingSkillTests
     public void Quality_IsSaved()
     {
         var bag = new ItemContainer(4, 1);
-        bag.AddStack(new ItemStack(Item("CopperSword"), 1, 0.8f, 0, null, ItemQuality.Masterwork));
+        bag.AddStack(new ItemStack(Item("CopperSword"), 1, 0.8f, 0, null, ItemQuality.Masterwork, "Astrid"));
         string json = JsonUtility.ToJson(new SlotList { slots = SaveMapper.ToSlots(bag) });
         var content = AssetDatabase.LoadAssetAtPath<ContentDatabase>("Assets/_Project/Resources/ContentDatabase.asset");
         ItemContainer read = SaveMapper.ReadSlots(JsonUtility.FromJson<SlotList>(json).slots, new ItemContainer(4, 1), content, new List<string>());
@@ -108,6 +108,31 @@ public sealed class CraftingSkillTests
         ItemStack stack = read.GetSlot(0);
         Assert.AreEqual(ItemQuality.Masterwork, stack.Quality);
         Assert.AreEqual(0.8f, stack.Durability, 0.001f);
+        Assert.AreEqual("Astrid", stack.Maker, "its maker's name goes with it");
+        Assert.AreEqual("", new ItemStack(Item("CopperSword"), 1, 1f, 0, null, ItemQuality.Plain, "Astrid").Maker, "plain work goes unsigned");
+    }
+
+    [Test]
+    public void TheCaravan_PaysForGoodWork_AndNothingForPlain()
+    {
+        TradeSettings trade = TradeSettings.Current;
+        var plain = new ItemStack(Item("IronGreatsword"), 1);
+        Assert.AreEqual(0, trade.CoinsFor(plain));
+        Assert.Greater(trade.CoinsFor(plain.WithQuality(ItemQuality.Fine)), 0);
+        Assert.Greater(trade.CoinsFor(plain.WithQuality(ItemQuality.Masterwork)), trade.CoinsFor(plain.WithQuality(ItemQuality.Fine)));
+    }
+
+    [Test]
+    public void SpecialCrafts_NeedAPractisedHand()
+    {
+        RecipeDefinition helm = Recipes().First(r => r.Output != null && r.Output.name == "TrollstoneHelm");
+        Assert.AreEqual("armorcrafting", helm.RequiredSkill.Id);
+        var progress = new CharacterProgress();
+        StringAssert.Contains("Armorcrafting", helm.SkillProblem(progress));
+        progress.AddExperience(helm.RequiredSkill, LevelingSettings.Current.TotalExperienceFor(helm.RequiredSkillLevel), LevelingSettings.Current);
+        Assert.IsNull(helm.SkillProblem(progress));
+        Assert.IsTrue(Recipes().Where(r => r.Output != null && r.Output.Tier <= 4 && CraftedWork.Of(r.Output) != CraftedGoods.Meals
+                && CraftedWork.Of(r.Output) != CraftedGoods.Tonics).All(r => r.RequiredSkill == null), "the tier kits never wait on a skill");
     }
 
     [Test]

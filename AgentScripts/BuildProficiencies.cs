@@ -32,9 +32,10 @@ public static class BuildProficiencies
         string settings = Settings(skills);
         string mentors = Mentors(skills);
         string rested = Rested();
+        string gates = Gates(skills);
         string talents = AssetDatabase.IsValidFolder(OldTalents) && AssetDatabase.DeleteAsset(OldTalents) ? "old talents removed" : "no old talents";
         AssetDatabase.SaveAssets();
-        return $"{skills.Count} skills; {settings}; {mentors}; {rested}; {talents}";
+        return $"{skills.Count} skills; {settings}; {mentors}; {rested}; {gates}; {talents}";
     }
 
     // ----- Gathering -----
@@ -449,6 +450,22 @@ public static class BuildProficiencies
                 AssetDatabase.LoadAssetAtPath<SoundDefinition>("Assets/_Project/Audio/Sounds/Library/Quest Completed.asset");
         }
 
+        (int level, string name)[] titles =
+        {
+            (13, "Newcomer"), (60, "Settler"), (130, "Woodsfolk"), (260, "Haven-Keeper"), (400, "Elder of the Haven"), (600, "Legend of the Forest"),
+        };
+        SerializedProperty titleList = so.FindProperty("titles");
+        titleList.arraySize = titles.Length;
+        for (int i = 0; i < titles.Length; i++)
+        {
+            titleList.GetArrayElementAtIndex(i).FindPropertyRelative("totalLevel").intValue = titles[i].level;
+            titleList.GetArrayElementAtIndex(i).FindPropertyRelative("name").stringValue = titles[i].name;
+        }
+
+        so.FindProperty("totalLevelsPerRenown").intValue = 20;
+        so.FindProperty("watchShare").floatValue = 0.25f;
+        so.FindProperty("watchReach").floatValue = 20f;
+
         SerializedProperty list = so.FindProperty("skills");
         list.arraySize = skills.Count;
         for (int i = 0; i < skills.Count; i++) list.GetArrayElementAtIndex(i).objectReferenceValue = skills[i];
@@ -500,6 +517,38 @@ public static class BuildProficiencies
         BoonSource source = prefab != null ? prefab.GetComponentInChildren<BoonSource>(true) : null;
         string sauna = source != null && AddBonus(new SerializedObject(source), "bonuses", StatType.ExperienceGain, 0.1f) ? "sauna +10%" : "sauna had it";
         return rested + ", " + sauna;
+    }
+
+    // A few special crafts only a practised hand can make: the tier V Trollstone work and the finest meal and draught.
+    // The tier kits (copper to moonsilver) never are: raid tiers need them.
+    private static string Gates(List<ProficiencyDefinition> skills)
+    {
+        ProficiencyDefinition Find(string id) => skills.Find(skill => skill.Id == id);
+        (string recipe, string skill, int level)[] gates =
+        {
+            ("TrollstoneHelm", "armorcrafting", 30), ("TrollstoneHauberk", "armorcrafting", 30), ("TrollstoneGauntlets", "armorcrafting", 30),
+            ("TrollstoneGirdle", "armorcrafting", 30), ("TrollstoneBoots", "armorcrafting", 30), ("TrollwallShield", "armorcrafting", 30),
+            ("TrollstoneBlade", "weaponcrafting", 30), ("TrollstoneMaul", "weaponcrafting", 30), ("TrollhornBow", "weaponcrafting", 30),
+            ("HavenFeast", "cooking", 25), ("RadiantDraught", "alchemy", 25),
+        };
+        int set = 0;
+        foreach ((string recipe, string skill, int level) in gates)
+        {
+            var asset = AssetDatabase.LoadAssetAtPath<RecipeDefinition>($"Assets/_Project/Data/Crafting/Recipes/{recipe}.asset");
+            if (asset == null)
+            {
+                continue;
+            }
+
+            var so = new SerializedObject(asset);
+            so.FindProperty("requiredSkill").objectReferenceValue = Find(skill);
+            so.FindProperty("requiredSkillLevel").intValue = level;
+            so.ApplyModifiedPropertiesWithoutUndo();
+            EditorUtility.SetDirty(asset);
+            set++;
+        }
+
+        return $"{set} recipes need a skill";
     }
 
     private static bool AddBonus(SerializedObject so, string field, StatType stat, float value)

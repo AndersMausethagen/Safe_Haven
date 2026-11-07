@@ -43,6 +43,9 @@ public sealed class ExperienceTracker : MonoBehaviour, IGameSystem
     /// <summary>Raised with a skill and the level it reached, and whether that level is a milestone (the HUD's banner).</summary>
     public static event Action<ProficiencyDefinition, int, bool> LevelReached;
 
+    /// <summary>Raised with the experience each practice earned (what friends nearby learn a share of: CoopLessons).</summary>
+    public static event Action<ProficiencyDefinition, float> Practised;
+
     /// <summary>Raised with the skill and the Insight put into it (the playtest log).</summary>
     public static event Action<ProficiencyDefinition, int> InsightSpent;
 
@@ -124,6 +127,7 @@ public sealed class ExperienceTracker : MonoBehaviour, IGameSystem
         LevelingSettings rules = Rules;
         CharacterProgress progress = GameSession.Progress;
         float amount = baseAmount * rules.Multiplier(tier, progress.LevelOf(skill, rules), false) * Boost(skill);
+        Practised?.Invoke(skill, amount);
         // On a raid the bonus share waits for the way home: kept on extraction, lost otherwise.
         float bonus = onRaid ? amount * (rules.RaidMultiplier - 1f) : 0f;
         if (bonus > 0f && Current != null && GameSession.ActiveRaid != null)
@@ -159,6 +163,30 @@ public sealed class ExperienceTracker : MonoBehaviour, IGameSystem
         float mentor = skill != null && skill.Mentor != null ? Rules.MentorBonus(GameSession.Settlement.BuiltTier(skill.Mentor)) : 0f;
         float gain = Player.Current != null && Player.Current.Combatant != null ? Player.Current.Combatant.Stats.Get(StatType.ExperienceGain) : 0f;
         return Mathf.Max(0f, 1f + mentor + gain);
+    }
+
+    /// <summary>A share of a friend's practice, learned by watching (CoopLessons). Kept at once, and never passed on again.</summary>
+    public static void LearnByWatching(ProficiencyDefinition skill, float amount)
+    {
+        if (skill == null || amount <= 0f)
+        {
+            return;
+        }
+
+        float total = amount;
+        if (Current != null)
+        {
+            Current.carried.TryGetValue(skill.Id, out float before);
+            total += before;
+        }
+
+        int whole = Mathf.FloorToInt(total);
+        if (Current != null)
+        {
+            Current.carried[skill.Id] = total - whole;
+        }
+
+        Award(skill, whole);
     }
 
     /// <summary>Practice of whatever skill this kind of training trains; Insight while no skill does.</summary>

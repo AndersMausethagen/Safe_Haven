@@ -46,12 +46,30 @@ public sealed class RecipeDefinition : ScriptableObject
     [SerializeField] private bool knownFromStart = true;
     [Tooltip("Asks for at least this station tier, for what a tier opens beyond its materials: a better yield, a field kit. 0 goes by the rule alone.")]
     [SerializeField, Range(0, Tiers.Max)] private int minimumStationTier;
+    [Tooltip("A craft only a practised hand can make: needs this skill at Required Skill Level as well. Empty for none.")]
+    [SerializeField] private ProficiencyDefinition requiredSkill;
+    [SerializeField, Range(0, 50)] private int requiredSkillLevel;
     [Tooltip("Recipes with lower values are listed first.")]
     [SerializeField] private int sortOrder;
 
     public string Id => string.IsNullOrWhiteSpace(id) ? name : id;
     public string DisplayName => !string.IsNullOrWhiteSpace(displayName) ? displayName : OutputName;
     public ItemDefinition Output => output;
+    public ProficiencyDefinition RequiredSkill => requiredSkill;
+    public int RequiredSkillLevel => requiredSkill != null ? requiredSkillLevel : 0;
+
+    /// <summary>"Needs Armorcrafting 30." while the player's skill is short of it; null when it isn't, or the recipe asks none.</summary>
+    public string SkillProblem(CharacterProgress progress)
+    {
+        if (requiredSkill == null || requiredSkillLevel <= 0 || progress == null || Cheats.NoRequirements)
+        {
+            return null;
+        }
+
+        return progress.LevelOf(requiredSkill, LevelingSettings.Current) >= requiredSkillLevel
+            ? null
+            : $"Needs {requiredSkill.DisplayName} {requiredSkillLevel}.";
+    }
     /// <summary>The resource made, when the recipe makes a resource rather than an item.</summary>
     public ResourceDefinition OutputResource => output == null ? outputResource : null;
     public int OutputAmount => Mathf.Max(1, outputAmount);

@@ -89,6 +89,12 @@ public sealed class LevelingSettings : GameSettings<LevelingSettings>
     [Tooltip("Any spell cast, in tier I experience (scaled by the place's tier): healing and warding train Runecraft too.")]
     [SerializeField, Min(0)] private int castExperience = 3;
 
+    [Header("Co-op")]
+    [Tooltip("Share of a friend's practice the player learns by watching it nearby.")]
+    [SerializeField, Range(0f, 1f)] private float watchShare = 0.25f;
+    [Tooltip("How near, in metres, a friend's practice teaches.")]
+    [SerializeField, Min(1f)] private float watchReach = 20f;
+
     [Header("Insight (put into any skill)")]
     [Tooltip("For a completed quest without its own Experience.")]
     [SerializeField, Min(0)] private int questExperience = 50;
@@ -108,9 +114,29 @@ public sealed class LevelingSettings : GameSettings<LevelingSettings>
     [Tooltip("Insight the skills window's button puts into a skill at a time.")]
     [SerializeField, Min(1)] private int insightStep = 100;
 
+    [Header("Total level")]
+    [Tooltip("Titles for every skill's level added up, lowest first: the highest reached is the player's.")]
+    [SerializeField] private List<Title> titles = new List<Title>();
+    [Tooltip("Total levels above the start (one per skill) for each point of Haven renown: the Haven is known by its people.")]
+    [SerializeField, Min(1)] private int totalLevelsPerRenown = 20;
+
     [Header("Skills")]
     [Tooltip("Every skill, in the order the skills window shows them within their group.")]
     [SerializeField] private List<ProficiencyDefinition> skills = new List<ProficiencyDefinition>();
+
+    /// <summary>A name for how far the player has come, from a total level up.</summary>
+    [System.Serializable]
+    public struct Title
+    {
+        [Min(0)] public int totalLevel;
+        public string name;
+
+        public Title(int totalLevel, string name)
+        {
+            this.totalLevel = totalLevel;
+            this.name = name;
+        }
+    }
 
     // Total experience needed to reach each level, worked out once.
     private int[] totals;
@@ -144,6 +170,26 @@ public sealed class LevelingSettings : GameSettings<LevelingSettings>
     public int CastExperience => castExperience;
     public int ExploredCellsPerExperience => exploredCellsPerExperience;
     public int InsightStep => insightStep;
+    public float WatchShare => watchShare;
+
+    /// <summary>The title for a total level, or empty when none is reached yet.</summary>
+    public string TitleFor(int totalLevel)
+    {
+        string title = "";
+        foreach (Title entry in titles)
+        {
+            if (totalLevel >= entry.totalLevel)
+            {
+                title = entry.name;
+            }
+        }
+
+        return title;
+    }
+
+    /// <summary>The Haven renown the player's total level brings.</summary>
+    public int RenownFor(int totalLevel) => Mathf.Max(0, totalLevel - skills.Count) / Mathf.Max(1, totalLevelsPerRenown);
+    public float WatchReach => watchReach;
     public int InsightFullBelow => insightFullBelow;
 
     /// <summary>Experience one point of Insight is worth to a skill at this level.</summary>

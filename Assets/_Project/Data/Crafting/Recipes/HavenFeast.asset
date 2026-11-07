@@ -31,4 +31,6 @@ MonoBehaviour:
   craftSeconds: 30
   knownFromStart: 1
   minimumStationTier: 0
+  requiredSkill: {fileID: 11400000, guid: d50f36a74b08c1b4a81b1f363a882045, type: 2}
+  requiredSkillLevel: 25
   sortOrder: 140

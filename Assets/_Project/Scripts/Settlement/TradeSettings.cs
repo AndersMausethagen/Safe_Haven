@@ -10,6 +10,16 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "Safe Haven/Settings/Trade Settings", fileName = "TradeSettings")]
 public sealed class TradeSettings : GameSettings<TradeSettings>
 {
+    [Tooltip("Coin a Fine piece of gear sells for, per point of its item Value.")]
+    [SerializeField, Min(0f)] private float coinsPerValueFine = 0.1f;
+    [Tooltip("Coin a Masterwork piece sells for, per point of its item Value.")]
+    [SerializeField, Min(0f)] private float coinsPerValueMasterwork = 0.25f;
+
+    /// <summary>What a better make fetches from the caravan: nothing for plain gear, which it doesn't buy.</summary>
+    public int CoinsFor(ItemStack stack) =>
+        stack.IsEmpty || stack.Quality == ItemQuality.Plain ? 0
+        : Mathf.Max(1, Mathf.RoundToInt(stack.Item.Value * (stack.Quality == ItemQuality.Masterwork ? coinsPerValueMasterwork : coinsPerValueFine)));
+
     [Serializable]
     public sealed class Sale
     {

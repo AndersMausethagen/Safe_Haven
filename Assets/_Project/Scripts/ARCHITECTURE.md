@@ -471,7 +471,10 @@ Damage, Ambush Damage) and `CostOf` (Melee Stamina Cost), `PlayerGuard` (Block S
 (Sneak Noise and Visibility) and `PlayerLockpicking` (Lockpick Zone). `GearBalance` counts the Melee skill expected at each raid tier
 (`LevelingSettings.ExpectedLevel`), and the raid planner shows the best fighting skill against it. `PlaytestLogger` writes
 `SkillLevel` and `InsightSpent` rows; `PlaytestLog.SkillPace` and the Systems Editor's Skills page (`Editor/Systems/SkillsPage`)
-measure the pace from them. Perks are chosen again for free beside the Portal. To add a skill: create one (Create > Safe Haven >
+measure the pace from them. `CoopLessons` (an `ICoopPart`) shares a quarter of each player's practice with friends nearby
+(`ExperienceTracker.Practised`, `LearnByWatching`). `RecipeDefinition.RequiredSkill` gates a few special crafts; `ItemStack.Maker`
+signs a better make; `TradeSettings.CoinsFor` prices it at the Trading Post; `LevelingSettings` gives the total level a title and
+`HavenRenown` a share of renown. Perks are chosen again for free beside the Portal. To add a skill: create one (Create > Safe Haven >
 Progression > Skill) with a unique id, its Training and (for gathering) Gather Tool or (for crafting) Crafts, level bonuses and
 milestones, add it to LevelingSettings' Skills, and report its practice to `ExperienceTracker.Practise`.
 

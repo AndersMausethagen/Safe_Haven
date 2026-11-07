@@ -130,6 +130,22 @@ Insight Share Above), so it catches a neglected skill up but practice always lea
 The bar along the bottom follows the skill trained last, with its next milestone ("perk at 20"); a level shows a banner high in the
 middle of the screen for a few seconds, a milestone for longer, with the perk to choose.
 
+## Playing together
+
+A friend's practice within 20 m in the same place teaches the player a quarter of it (`CoopLessons`, the `SafeHaven.Lesson` message,
+sent every two seconds per skill and passed on by the host). What is learned by watching is kept at once and never sent on, so it
+can't echo between players. Not yet tried with two players.
+
+## Specials, signatures and titles
+
+- **Specials:** a few crafts need a skill as well as their station (`RecipeDefinition` › Required Skill): the tier V Trollstone set and
+  shield (Armorcrafting 30), the Trollstone blade, maul and Trollhorn bow (Weaponcrafting 30), the Haven Feast (Cooking 25) and the
+  Radiant Draught (Alchemy 25). The tier kits from copper to moonsilver never wait on a skill: raid tiers need them.
+- **Signatures:** a Fine or Masterwork piece carries its maker's name ("Made by Astrid", saved and shared). The Trading Post buys
+  them from the bag: a Fine piece for a tenth of its value in coin, a Masterwork for a quarter (`TradeSettings`).
+- **Total level:** every skill's level added up gives a title (Newcomer, Settler, Woodsfolk, Haven-Keeper, Elder of the Haven,
+  Legend of the Forest), shown in the skills window, and one point of Haven renown for every 20 levels above the start.
+
 ## Mentors and rest
 
 Every skill but Fishing, Melee and Sneaking has a mentor building at home (`ProficiencyDefinition` › Mentor): each tier it stands at

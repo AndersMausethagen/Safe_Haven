@@ -54,6 +54,22 @@ public sealed class TradingPost : MonoBehaviour
             }
         }
 
+        // Fine and Masterwork pieces in the bag, not worn: the caravan pays for good work.
+        if (settings.Coin != null && user.TryGetComponent(out ItemInventory bag))
+        {
+            ItemContainer slots = bag.Container;
+            for (int i = 0; i < slots.SlotCount; i++)
+            {
+                ItemStack piece = slots.GetSlot(i);
+                int coins = settings.CoinsFor(piece);
+                if (coins > 0)
+                {
+                    int index = i;
+                    page.Add(new MenuAction($"Sell your {piece.DisplayName}", $"{coins} {coin}: good work fetches a good price", true, () => SellMade(user, index)));
+                }
+            }
+        }
+
         foreach (TradeSettings.Offer offer in settings.Offers)
         {
             if (offer.item == null || GameSession.Settlement.SmithyTier < offer.smithyTier)
@@ -83,6 +99,26 @@ public sealed class TradingPost : MonoBehaviour
             int added = GameSession.Stash.Items.Add(settings.Coin, sale.coins);
             GameMessages.Post($"Sold {sale.item.DisplayName} for {added} {settings.Coin.DisplayName}, in the stash.", MessageKind.Gain);
         }
+    }
+
+    private static void SellMade(GameObject user, int index)
+    {
+        if (HavenVisit.LeftToHost() || !user.TryGetComponent(out ItemInventory bag))
+        {
+            return;
+        }
+
+        TradeSettings settings = TradeSettings.Current;
+        ItemStack piece = bag.Container.GetSlot(index);
+        int coins = settings.CoinsFor(piece);
+        if (settings.Coin == null || coins <= 0)
+        {
+            return;
+        }
+
+        bag.Container.SetSlot(index, ItemStack.Empty);
+        int added = GameSession.Stash.Items.Add(settings.Coin, coins);
+        GameMessages.Post($"Sold your {piece.DisplayName} for {added} {settings.Coin.DisplayName}, in the stash.", MessageKind.Gain);
     }
 
     private static void Buy(GameObject user, TradeSettings.Offer offer)

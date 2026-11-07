@@ -356,6 +356,11 @@ public sealed class ItemTooltipView : MonoBehaviour
             builder.Append($"\n<color={UIStyle.Current.GoodHex}>").Append(bonus.Describe()).Append($" ({stack.Quality.ToString().ToLowerInvariant()} make)</color>");
         }
 
+        if (!string.IsNullOrEmpty(stack.Maker))
+        {
+            builder.Append($"\n<i><color={UIStyle.Current.MutedHex}>Made by {stack.Maker}.</color></i>");
+        }
+
         foreach (StatBonus bonus in GearPower.EmpowerBonuses(stack.Item, stack.Empower, EssenceSettings.Current))
         {
             builder.Append($"\n<color={UIStyle.Current.AccentHex}>").Append(bonus.Describe()).Append(" (empowered)</color>");

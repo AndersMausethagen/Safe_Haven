@@ -205,6 +205,11 @@ public sealed class PlayerCrafting : MonoBehaviour
             return CraftCheck.Fail($"Made at {recipe.Station.WithArticle()}.");
         }
 
+        if (recipe.SkillProblem(GameSession.Progress) is string unskilled)
+        {
+            return CraftCheck.Fail(unskilled);
+        }
+
         MaterialPool pool = Pool;
         if (!pool.CanAfford(recipe.ResourceCost, recipe.ItemCost, out string missing))
         {

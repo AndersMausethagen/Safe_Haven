@@ -35,6 +35,11 @@ public static class StationCrafting
             return $"Needs {queue.Type.DisplayName()} Tier {Tiers.ToRoman(recipe.RequiredStationTier)}.";
         }
 
+        if (recipe.SkillProblem(GameSession.Progress) is string unskilled)
+        {
+            return unskilled;
+        }
+
         if (queue.FreeQueueSlots <= 0)
         {
             return "The queue is full.";
