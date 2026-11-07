@@ -17,7 +17,16 @@ public sealed partial class MonsterAI
     /// <summary>Seconds without a pose after which the creature is taken to have stood still meanwhile.</summary>
     private const double RemoteQuietGap = 0.25;
 
+    /// <summary>Whom the host's creature is after, as told to this player: nobody, them, or someone else on their side.</summary>
+    public enum RemoteHunt : byte
+    {
+        None = 0,
+        You = 1,
+        Friend = 2,
+    }
+
     private readonly PoseBuffer remotePoses = new PoseBuffer();
+    private RemoteHunt remoteHunt;
     private float remoteSpeed;
     private bool suppressed;
 
@@ -80,8 +89,9 @@ public sealed partial class MonsterAI
     /// Where the host's creature was at <paramref name="time"/> (the session's clock) and what it was doing. A strike or death
     /// in progress here finishes first.
     /// </summary>
-    public void ApplyRemotePose(double time, Vector3 position, float yaw, float speed, State state)
+    public void ApplyRemotePose(double time, Vector3 position, float yaw, float speed, State state, RemoteHunt hunting = RemoteHunt.None)
     {
+        remoteHunt = hunting;
         // Nothing was sent while it stood still: it starts moving from where it stood, a moment before this, not slides from
         // the last pose a while ago.
         if (remotePoses.TryNewest(out PoseSnapshot newest) && time - newest.Time > RemoteQuietGap)

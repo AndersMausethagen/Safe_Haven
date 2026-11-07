@@ -217,6 +217,42 @@ public sealed class WeatherTests
     }
 
     [Test]
+    public void Climate_SameSeedGivesTheSameWeatherWhateverTheFrameRate()
+    {
+        // Co-op: every game on one raid seeds its weather from the run; frame rates differ, and storms flash every frame.
+        WeatherDefinition clear = Asset<WeatherDefinition>();
+        clear.Configure("Clear", 1f, 0.2f, 0f, 0f, 2f, Color.gray, 0f, 0.05f, 0.2f);
+        WeatherDefinition rainy = Asset<WeatherDefinition>();
+        rainy.Configure("Rain", 1.5f, 0.2f, 0.7f, 0.8f, 2f, Color.gray, 0f, 0.05f, 0.2f);
+        WeatherDefinition storm = Asset<WeatherDefinition>();
+        storm.Configure("Storm", 2f, 0.2f, 1f, 1f, 2f, Color.gray, 6f, 0.05f, 0.2f);
+        ClimateDefinition climate = Asset<ClimateDefinition>();
+        climate.Configure(clear, 0f, new ClimateDefinition.Entry { weather = clear, chance = 1f },
+                          new ClimateDefinition.Entry { weather = rainy, chance = 1f },
+                          new ClimateDefinition.Entry { weather = storm, chance = 1f });
+
+        List<WeatherDefinition> Run(string name, float frame)
+        {
+            var seen = new List<WeatherDefinition>();
+            WeatherSystem system = Make<WeatherSystem>(name);
+            Wire(system, ("climate", climate));
+            system.SetWeather(clear, 0f);
+            system.SetRandomSeed(42); // as the raid's sky rig does once the weather has started
+            system.Changed += seen.Add;
+            for (float time = 0f; time < 90f; time += frame)
+            {
+                system.Tick(frame);
+            }
+
+            return seen;
+        }
+
+        List<WeatherDefinition> fast = Run("fast", 1f / 144f), slow = Run("slow", 1f / 25f);
+        Assert.GreaterOrEqual(fast.Count, 6, "the climate changed the weather several times");
+        CollectionAssert.AreEqual(fast, slow);
+    }
+
+    [Test]
     public void Setup_CreatesTheLooksAndWiresTheRig()
     {
         // First: a new scene unloads assets only scripts hold, such as the set below.

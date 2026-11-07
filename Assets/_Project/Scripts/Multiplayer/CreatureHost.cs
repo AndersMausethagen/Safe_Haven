@@ -18,8 +18,8 @@ public sealed class CreatureHost
     /// <summary>Metres beyond which a creature's pose goes three times a second instead of ten (unless its state changes).</summary>
     private const float NearReach = 40f;
 
-    /// <summary>Poses per unreliable message (18 bytes each), under the transport's single-packet limit.</summary>
-    private const int PosesPerMessage = 56;
+    /// <summary>Poses per unreliable message (19 bytes each), under the transport's single-packet limit.</summary>
+    private const int PosesPerMessage = 54;
 
     /// <summary>Seconds after which a creature's pose is sent again even when nothing changed, in case one was lost.</summary>
     private const float KeyframeSeconds = 1f;
@@ -44,6 +44,7 @@ public sealed class CreatureHost
         public byte Speed;
         public byte State;
         public byte Health;
+        public byte Hunting;
         public float At;
     }
 
@@ -287,10 +288,10 @@ public sealed class CreatureHost
                 continue;
             }
 
-            SentPose pose = PoseOf(hosted, now);
+            SentPose pose = PoseOf(hosted, now, clientId);
             bool seen = last.TryGetValue(id, out SentPose was);
             bool changed = !seen || (was.Position - pose.Position).sqrMagnitude > 0.0009f || was.Yaw != pose.Yaw || was.State != pose.State
-                || was.Health != pose.Health || was.Speed != pose.Speed;
+                || was.Health != pose.Health || was.Speed != pose.Speed || was.Hunting != pose.Hunting;
             bool due = !seen || now - was.At >= KeyframeSeconds;
             bool far = distance > NearReach * NearReach;
             if ((!changed && !due) || (far && !due && seen && was.State == pose.State && ticks % 3 != 0))
@@ -305,7 +306,7 @@ public sealed class CreatureHost
         for (int from = 0; from < outgoing.Count; from += PosesPerMessage)
         {
             int count = Mathf.Min(PosesPerMessage, outgoing.Count - from);
-            using var poses = new FastBufferWriter(16 + count * 18, Allocator.Temp);
+            using var poses = new FastBufferWriter(16 + count * 19, Allocator.Temp);
             poses.WriteValueSafe(link.Now);
             poses.WriteValueSafe((ushort)count);
             for (int i = from; i < from + count; i++)
@@ -317,22 +318,35 @@ public sealed class CreatureHost
                 poses.WriteValueSafe(pose.Speed);
                 poses.WriteValueSafe(pose.State);
                 poses.WriteValueSafe(pose.Health);
+                poses.WriteValueSafe(pose.Hunting);
             }
 
             link.Send(CoopCreatures.PosesMessage, clientId, poses, NetworkDelivery.UnreliableSequenced);
         }
     }
 
-    // Facing to 1.4 degrees, speed to a tenth of a metre a second, health to a 255th.
-    private static SentPose PoseOf(Hosted hosted, float now) => new SentPose
+    // Facing to 1.4 degrees, speed to a tenth of a metre a second, health to a 255th; and whom it is after, for that friend.
+    private static SentPose PoseOf(Hosted hosted, float now, ulong friend) => new SentPose
     {
         Position = hosted.Ai.transform.position,
         Yaw = (byte)(Mathf.RoundToInt(Mathf.Repeat(hosted.Ai.transform.eulerAngles.y, 360f) / 360f * 256f) & 255),
         Speed = (byte)Mathf.Clamp(Mathf.RoundToInt(hosted.Ai.Speed * 10f), 0, 255),
         State = (byte)hosted.Ai.CurrentState,
         Health = HealthByte(hosted),
+        Hunting = (byte)HuntingFor(hosted.Ai, friend),
         At = now,
     };
+
+    // After this friend, after someone else on the players' side (the host, another friend), or nobody.
+    private static MonsterAI.RemoteHunt HuntingFor(MonsterAI creature, ulong friend)
+    {
+        if (!creature.IsHuntingPlayerSide)
+        {
+            return MonsterAI.RemoteHunt.None;
+        }
+
+        return creature.Target is FriendHitbox hitbox && hitbox.ClientId == friend ? MonsterAI.RemoteHunt.You : MonsterAI.RemoteHunt.Friend;
+    }
 
     private static byte HealthByte(Hosted hosted) =>
         hosted.Health != null ? (byte)Mathf.Clamp(Mathf.CeilToInt(hosted.Health.CurrentHealth / hosted.Health.MaxHealth * 255f), 0, 255) : (byte)255;

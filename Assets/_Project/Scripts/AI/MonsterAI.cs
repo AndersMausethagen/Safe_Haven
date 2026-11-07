@@ -164,14 +164,23 @@ public sealed partial class MonsterAI : MonoBehaviour, IEventSubject, IStaggerab
     public bool IsClosingIn => CurrentState == State.Attacking && attacks.IsClosingIn;
 
     /// <summary>True while this monster chases or attacks the player or someone on their side.</summary>
-    public bool IsHuntingPlayerSide => targetComponent != null && IsEngaging(target) && target.Faction.IsPlayerSide();
+    public bool IsHuntingPlayerSide => IsRemote ? remoteHunt != RemoteHunt.None && IsEngagedState
+        : targetComponent != null && IsEngaging(target) && target.Faction.IsPlayerSide();
 
     /// <summary>True while chasing or attacking the given target.</summary>
     public bool IsEngaging(IDamageable candidate)
     {
-        return candidate != null && target == candidate
-            && (CurrentState == State.Chasing || CurrentState == State.Attacking || CurrentState == State.Staggered || CurrentState == State.Hopping);
+        // Co-op, the host's creature: after this player when the host says so.
+        if (IsRemote)
+        {
+            return candidate != null && remoteHunt == RemoteHunt.You && IsEngagedState && candidate is Component body && global::Player.IsPlayer(body.gameObject);
+        }
+
+        return candidate != null && target == candidate && IsEngagedState;
     }
+
+    private bool IsEngagedState =>
+        CurrentState == State.Chasing || CurrentState == State.Attacking || CurrentState == State.Staggered || CurrentState == State.Hopping;
 
     /// <summary>Its poise right now (null before it has woken).</summary>
     public PoiseMeter Poise => poise;

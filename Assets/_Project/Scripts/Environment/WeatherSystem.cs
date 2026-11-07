@@ -42,7 +42,10 @@ public sealed class WeatherSystem : MonoBehaviour
     private bool snowing;
     private float lyingSnow;
     private float snow;
+    // The climate's picks and how long each weather lasts: a raid seeds it so friends on one run share the weather.
     private System.Random random = new System.Random();
+    // Lightning draws every frame, so it keeps its own (frame rates differ between games; the climate's course must not).
+    private System.Random lightning = new System.Random();
 
     /// <summary>The weather being blended to (or that has arrived).</summary>
     public WeatherDefinition Weather => weather;
@@ -224,7 +227,7 @@ public sealed class WeatherSystem : MonoBehaviour
         float soaking = snowing ? 0f : Mathf.Max(current.Rain, before > snow ? before * MeltWater : 0f);
         wetness = AdvanceWetness(wetness, soaking, deltaTime, soak, dry);
         flash = Mathf.Max(0f, flash - deltaTime * 5f);
-        if (current.LightningPerMinute > 0f && random.NextDouble() < current.LightningPerMinute / 60f * deltaTime)
+        if (current.LightningPerMinute > 0f && lightning.NextDouble() < current.LightningPerMinute / 60f * deltaTime)
         {
             Strike();
         }
@@ -232,8 +235,14 @@ public sealed class WeatherSystem : MonoBehaviour
         Apply();
     }
 
-    /// <summary>Makes lightning predictable in tests.</summary>
-    public void SetRandomSeed(int seed) => random = new System.Random(seed);
+    /// <summary>Makes the weather's course follow <paramref name="seed"/> (a raid's, so every game on the run has the same
+    /// weather; tests); the weather now starts its time over.</summary>
+    public void SetRandomSeed(int seed)
+    {
+        random = new System.Random(seed);
+        lightning = new System.Random(unchecked(seed * 31 + 17));
+        timeLeft = Duration(weather);
+    }
 
     private void Begin()
     {

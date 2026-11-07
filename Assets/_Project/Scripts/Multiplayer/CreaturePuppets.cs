@@ -250,9 +250,10 @@ public sealed class CreaturePuppets
             reader.ReadValueSafe(out byte speed);
             reader.ReadValueSafe(out byte state);
             reader.ReadValueSafe(out byte health);
+            reader.ReadValueSafe(out byte hunting);
             if (byId.TryGetValue(id, out Puppet puppet) && puppet.Ai != null)
             {
-                puppet.Ai.ApplyRemotePose(time, position, yaw * (360f / 256f), speed / 10f, (MonsterAI.State)state);
+                puppet.Ai.ApplyRemotePose(time, position, yaw * (360f / 256f), speed / 10f, (MonsterAI.State)state, (MonsterAI.RemoteHunt)hunting);
                 if (puppet.Health != null)
                 {
                     puppet.Health.ShowShare(health / 255f);

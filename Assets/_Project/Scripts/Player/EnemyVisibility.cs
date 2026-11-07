@@ -23,6 +23,8 @@ public sealed class EnemyVisibility : MonoBehaviour
     private Material outlineMaterial;
     private Material hostileMaterial;
     private Material maskMaterial;
+    private Player archer;
+    private PlayerArchery archery;
 
     private void Awake()
     {
@@ -51,7 +53,12 @@ public sealed class EnemyVisibility : MonoBehaviour
             && (UIStateManager.Instance == null || !UIStateManager.Instance.IsAnyWindowOpen);
         float rangeSquared = Range * Range;
         Damageable bowTarget = null;
-        PlayerArchery archery = player != null ? player.GetComponent<PlayerArchery>() : null;
+        if (player != archer)
+        {
+            archer = player;
+            archery = player != null ? player.GetComponent<PlayerArchery>() : null;
+        }
+
         if (archery != null)
         {
             bowTarget = archery.Target;

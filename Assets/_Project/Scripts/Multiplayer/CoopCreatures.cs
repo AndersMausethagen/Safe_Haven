@@ -5,7 +5,7 @@
 /// host). The messages:
 /// <list type="bullet">
 /// <item><c>CreatureSpawn</c> (reliable): new creatures near a friend, by prefab id, with elite affixes.</item>
-/// <item><c>CreaturePoses</c> (unreliable, 18 bytes each): only those that moved or changed, each at least once a second.</item>
+/// <item><c>CreaturePoses</c> (unreliable, 19 bytes each, with whom it is after): only those that moved or changed, each at least once a second.</item>
 /// <item><c>CreatureStrike</c>: a strike's action, target, time and where it began; <c>CreatureDied</c>, <c>CreatureGone</c>.</item>
 /// <item><c>CreatureHit</c> (friend to host): a blow landed on a puppet.</item>
 /// </list>
