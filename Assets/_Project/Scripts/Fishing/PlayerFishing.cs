@@ -7,7 +7,8 @@ using UnityEngine;
 /// (ReelSession): hold attack to lift the catch zone, let go to drop it, and keep it on the fish until it is landed.
 /// Guard (right mouse) reels in at any time; walking away slackens the line. In still water a bite can instead be the
 /// Nøkken (NokkenEncounter). FishingHud shows it all. Lives on the player beside PlayerArchery; the rod is a weapon of
-/// kind Fishing Rod, so the attack and guard buttons are this component's while it is held.
+/// kind Fishing Rod, so the attack and guard buttons are this component's while it is held. The float and the line are
+/// a <see cref="FishingLine"/>'s.
 /// </summary>
 [DisallowMultipleComponent]
 public sealed class PlayerFishing : MonoBehaviour
@@ -21,8 +22,7 @@ public sealed class PlayerFishing : MonoBehaviour
     private PlayerMovement movement;
     private ItemInventory items;
     private Damageable health;
-    private Transform bobber;
-    private LineRenderer line;
+    private FishingLine look;
     private Vector3 castFrom;
     private Vector3 landing;
     private float waterHeight;
@@ -39,7 +39,7 @@ public sealed class PlayerFishing : MonoBehaviour
     public Phase State { get; private set; }
     public ReelSession Reel { get; private set; }
     public FishingSettings.Fish Hooked => hooked;
-    public Transform Bobber => bobber;
+    public Transform Bobber => look?.Bobber;
     public WeaponDefinition Rod => combat != null && combat.Weapon != null && combat.Weapon.IsFishingRod ? combat.Weapon : null;
 
     /// <summary>0..1 while swinging back for a cast.</summary>
@@ -55,6 +55,7 @@ public sealed class PlayerFishing : MonoBehaviour
         movement = GetComponent<PlayerMovement>();
         items = GetComponent<ItemInventory>();
         health = GetComponent<Damageable>();
+        look = new FishingLine(transform);
     }
 
     private void OnEnable()
@@ -230,7 +231,7 @@ public sealed class PlayerFishing : MonoBehaviour
         still = water.IsStill;
         waterHeight = height;
         landing = new Vector3(target.x, height, target.z);
-        castLanding = Time.time + 0.45f;
+        castLanding = Time.time + FishingLine.FlightSeconds;
         // The Nøkk's air (SpiritBonds): the water's own spirit sends fish to the line.
         float favour = SpiritBonds.HasGift(SpiritBonds.NokkGift) ? 1.5f : 1f;
         biteAt = castLanding + Random.Range(settings.BiteWait.x, settings.BiteWait.y) / Mathf.Max(0.1f, lure * favour);
@@ -365,76 +366,15 @@ public sealed class PlayerFishing : MonoBehaviour
 
     private void ShowLine()
     {
-        if (bobber == null)
-        {
-            GameObject body = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            DestroyImmediate(body.GetComponent<Collider>());
-            body.name = "Fishing Float";
-            body.transform.localScale = Vector3.one * 0.14f;
-            body.GetComponent<Renderer>().material.color = new Color(0.85f, 0.15f, 0.1f);
-            GameObject cap = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            DestroyImmediate(cap.GetComponent<Collider>());
-            cap.transform.SetParent(body.transform, false);
-            cap.transform.localPosition = Vector3.up * 0.45f;
-            cap.transform.localScale = Vector3.one * 0.6f;
-            cap.GetComponent<Renderer>().material.color = Color.white;
-            bobber = body.transform;
-
-            line = new GameObject("Fishing Line").AddComponent<LineRenderer>();
-            line.positionCount = 12;
-            line.widthMultiplier = 0.012f;
-            line.material = new Material(Shader.Find("Sprites/Default"));
-            line.startColor = line.endColor = new Color(0.9f, 0.9f, 0.85f, 0.8f);
-        }
-
-        bobber.gameObject.SetActive(true);
-        line.gameObject.SetActive(true);
+        look.Show();
         AnimateBobber();
     }
 
-    private void HideLine()
-    {
-        if (bobber != null) bobber.gameObject.SetActive(false);
-        if (line != null) line.gameObject.SetActive(false);
-    }
+    private void HideLine() => look.Hide();
 
-    private void AnimateBobber()
-    {
-        if (bobber == null || !bobber.gameObject.activeSelf)
-        {
-            return;
-        }
+    private void AnimateBobber() => look.Tick(landing, castLanding, State, Reel, castFrom, waterHeight);
 
-        Vector3 tip = transform.position + Vector3.up * 1.7f + transform.forward * 0.7f + transform.right * 0.25f;
-        Vector3 at;
-        if (Time.time < castLanding)
-        {
-            // In flight: an arc from the rod tip to where it lands.
-            float t = 1f - (castLanding - Time.time) / 0.45f;
-            at = Vector3.Lerp(tip, landing, t) + Vector3.up * Mathf.Sin(t * Mathf.PI) * 2f;
-        }
-        else
-        {
-            float bob = Mathf.Sin(Time.time * 2.4f) * 0.025f;
-            float under = State == Phase.Bite ? -0.18f : State == Phase.Reeling ? -0.06f + Mathf.Sin(Time.time * 17f) * 0.04f : 0f;
-            Vector3 drawn = State == Phase.Reeling && Reel != null ? Vector3.Lerp(landing, Flat(castFrom) + Vector3.up * waterHeight, Reel.Catch * 0.6f) : landing;
-            at = drawn + Vector3.up * (bob + under);
-        }
-
-        bobber.position = at;
-        for (int i = 0; i < line.positionCount; i++)
-        {
-            float t = i / (line.positionCount - 1f);
-            float sag = State == Phase.Reeling || State == Phase.Bite ? 0.05f : 0.6f;
-            line.SetPosition(i, Vector3.Lerp(tip, at, t) + Vector3.down * Mathf.Sin(t * Mathf.PI) * sag);
-        }
-    }
-
-    private void OnDestroy()
-    {
-        if (bobber != null) Destroy(bobber.gameObject);
-        if (line != null) Destroy(line.gameObject);
-    }
+    private void OnDestroy() => look?.Destroy();
 
     private static Vector3 Flat(Vector3 v) => new Vector3(v.x, 0f, v.z);
 }

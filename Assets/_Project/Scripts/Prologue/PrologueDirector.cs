@@ -7,10 +7,11 @@ using UnityEngine.AI;
 /// <summary>
 /// Runs authored encounters from quest progress; never creates a raid or applies raid loss rules. Everything the player
 /// is asked to do shows in the quest tracker like any quest (timed chapters with their time left, QuestTimers); a
-/// chapter's arrival text is said in the dialogue box by the companion it names ("Runa: ...") or the leader.
+/// chapter's arrival text is said in the dialogue box by the companion it names ("Runa: ...") or the leader. Where the
+/// player may build meanwhile (the campfire, when the leader asks) is its <see cref="PrologueBuildArea"/>.
 /// </summary>
 [DisallowMultipleComponent]
-public sealed class PrologueDirector : MonoBehaviour, IBuildArea
+public sealed class PrologueDirector : MonoBehaviour
 {
     [SerializeField] private PrologueDefinition definition;
     [Tooltip("The forest's edge, where the expedition stops inside the trees (PrologueSite.Forest).")]
@@ -40,6 +41,7 @@ public sealed class PrologueDirector : MonoBehaviour, IBuildArea
     private bool reviving;
     private bool chapterActive;
     private bool wolvesComing; // the camp's warning line is up; its wolves spawn when it closes
+    private PrologueBuildArea buildArea;
 
     public static PrologueDirector Current { get; private set; }
     public PrologueDefinition Definition => definition;
@@ -59,72 +61,7 @@ public sealed class PrologueDirector : MonoBehaviour, IBuildArea
     public bool HasAcceptedChapter => ready && chapterActive && !ending;
     public bool CanBuild => ready && !ending && chapterActive && step == PrologueStep.LightFire &&
         definition.Campfire != null && BuildingObject.Find(definition.Campfire) == null;
-    public Vector3 BuildOrigin => campPoint.position;
     public Terrain BuildTerrain => buildTerrain;
-
-    public bool IsBuildSpot(Vector3 point, float reach)
-    {
-        Vector3 offset = point - campPoint.position;
-        offset.y = 0f;
-        return CanBuild && offset.magnitude + reach <= definition.BuildRadius;
-    }
-
-    // ----- Building (IBuildArea): only the campfire, beside the shelter, when the leader asks for it -----
-
-    string IBuildArea.WhyClosed => CanBuild ? null : definition.WaitingForLeaderText;
-    string IBuildArea.Guidance => "Build the expedition's campfire beside the shelter. ";
-    bool IBuildArea.AllowsChanges => false;
-    float IBuildArea.GroundHeight => campPoint.position.y;
-
-    IEnumerable<BuildingDefinition> IBuildArea.Buildable(PlayerCrafting crafting)
-    {
-        yield return definition.Campfire;
-    }
-
-    // Forest placement follows the real terrain rather than a flat plane.
-    bool IBuildArea.TryGetGroundPoint(Camera view, out Vector3 point)
-    {
-        point = default;
-        if (!CameraPointer.TryGetRay(view, out Ray ray) || !buildTerrain.GetComponent<TerrainCollider>().Raycast(ray, out RaycastHit hit, 200f))
-        {
-            return false;
-        }
-
-        point = hit.point;
-        return true;
-    }
-
-    Vector3 IBuildArea.OnGround(Vector3 point) => OnBuildGround(point);
-
-    string IBuildArea.CheckSpot(FootprintRect footprint, Vector3 point)
-    {
-        if (!IsBuildSpot(footprint.WorldCenter(point.y), Mathf.Max(footprint.HalfSize.x, footprint.HalfSize.y)))
-        {
-            return "Build the fire beside the shelter.";
-        }
-
-        Vector2 x = footprint.AxisX * footprint.HalfSize.x;
-        Vector2 z = footprint.AxisZ * footprint.HalfSize.y;
-        for (int corner = 0; corner < 4; corner++)
-        {
-            Vector2 sample = footprint.Center + ((corner & 1) == 0 ? x : -x) + ((corner & 2) == 0 ? z : -z);
-            if (Mathf.Abs(OnBuildGround(new Vector3(sample.x, 0f, sample.y)).y - point.y) > 0.2f)
-            {
-                return "The ground is too uneven. Try flatter ground beside the shelter.";
-            }
-        }
-
-        return null;
-    }
-
-    string IBuildArea.CheckBuilding(BuildingDefinition building) => CanBuild && building == definition.Campfire
-        ? null : "Only the expedition's campfire can be built here, when the leader asks for it.";
-
-    private Vector3 OnBuildGround(Vector3 point)
-    {
-        point.y = buildTerrain.SampleHeight(point) + buildTerrain.transform.position.y;
-        return point;
-    }
 
     private void Awake()
     {
@@ -135,7 +72,8 @@ public sealed class PrologueDirector : MonoBehaviour, IBuildArea
             return;
         }
         Current = this;
-        BuildArea.Enter(this);
+        buildArea = new PrologueBuildArea(this, campPoint, buildTerrain);
+        BuildArea.Enter(buildArea);
         GameEvents.Raised += OnGameEvent;
     }
 
@@ -196,7 +134,7 @@ public sealed class PrologueDirector : MonoBehaviour, IBuildArea
 
     private void OnDestroy()
     {
-        BuildArea.Leave(this);
+        if (buildArea != null) BuildArea.Leave(buildArea);
         GameEvents.Raised -= OnGameEvent;
         if (health != null)
         {
