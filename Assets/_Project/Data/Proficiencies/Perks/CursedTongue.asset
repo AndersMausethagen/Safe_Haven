@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Cursed Tongue
   description: What the curse takes, you keep.
   icon: {fileID: 0}
+  technique: 0
   bonuses:
   - stat: 20
     op: 0

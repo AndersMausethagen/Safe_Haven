@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Soft Hands
   description: The lock tells your fingers what it wants.
   icon: {fileID: 0}
+  technique: 0
   bonuses:
   - stat: 34
     op: 0

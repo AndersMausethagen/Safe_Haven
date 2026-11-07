@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Patient Line
   description: Let it run, then bring it in.
   icon: {fileID: 0}
+  technique: 0
   bonuses:
   - stat: 47
     op: 0

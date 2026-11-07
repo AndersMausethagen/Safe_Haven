@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 619212b829a38d043a960961972d05f0, type: 3}
+  m_Name: TechniqueSettings
+  m_EditorClassIdentifier: SafeHaven::TechniqueSettings
+  criticalCountsAs: 2
+  richSeamOre: 1
+  sweepRadius: 3
+  sweepMost: 3
+  hasteSpeed: 0.15
+  hasteSeconds: 10
+  quickBite: 2
+  doubleCatchChance: 0.25
+  sureHandRun: 4
+  heartyHeal: 0.25
+  potentHeal: 0.3
+  spareDoseChance: 0.25
+  patchUpCost: 0.5
+  raiseSpeed: 2
+  secondWindStamina: 20
+  deadlyDraw: 1.5
+  pinning: {fileID: 11400000, guid: 89bc0b3576e7cde40a48a2c27f924015, type: 2}
+  spellEchoChance: 0.15
+  soulSiphon: 0.1
+  takedownReach: 4
+  shadowstep: 1.35

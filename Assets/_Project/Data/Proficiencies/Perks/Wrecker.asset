@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Wrecker
   description: Every wall has a weak joint.
   icon: {fileID: 0}
+  technique: 0
   bonuses:
   - stat: 12
     op: 0

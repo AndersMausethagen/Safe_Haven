@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Master Builder
   description: The Haven stands in your hands' shape.
   icon: {fileID: 0}
+  technique: 0
   bonuses:
   - stat: 43
     op: 0

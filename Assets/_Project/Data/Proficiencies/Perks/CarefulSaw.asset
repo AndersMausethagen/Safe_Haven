@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Careful Saw
   description: Measure twice.
   icon: {fileID: 0}
+  technique: 0
   bonuses:
   - stat: 44
     op: 0

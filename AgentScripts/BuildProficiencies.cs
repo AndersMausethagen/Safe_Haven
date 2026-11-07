@@ -29,6 +29,7 @@ public static class BuildProficiencies
             Melee(), Archery(), Runecraft(),
             Sneaking(),
         };
+        string techniques = TeachTechniques(skills);
         string settings = Settings(skills);
         string mentors = Mentors(skills);
         string rested = Rested();
@@ -36,7 +37,7 @@ public static class BuildProficiencies
         string teachers = Teachers(skills);
         string talents = AssetDatabase.IsValidFolder(OldTalents) && AssetDatabase.DeleteAsset(OldTalents) ? "old talents removed" : "no old talents";
         AssetDatabase.SaveAssets();
-        return $"{skills.Count} skills; {settings}; {mentors}; {rested}; {gates}; {teachers}; {talents}";
+        return $"{skills.Count} skills; {techniques}; {settings}; {mentors}; {rested}; {gates}; {teachers}; {talents}";
     }
 
     // ----- Gathering -----
@@ -55,13 +56,13 @@ public static class BuildProficiencies
             Perk("wood_woodsmans_eye", "Woodsman's Eye", "You see the second log in the first.", Bonus(StatType.ChopYield, 8 * Pct))),
         Milestone(20,
             Perk("wood_steady_swing", "Steady Swing", "The axe falls where you look.", Bonus(StatType.ChopSweetSpot, 15 * Pct)),
-            Perk("wood_quick_hands", "Quick Hands", "No pause between one cut and the next.", Bonus(StatType.ChopSpeed, 10 * Pct))),
+            null),  // taught a technique: TechniquePerks
         Milestone(30,
             Perk("wood_timber_sense", "Timber Sense", "Sound wood rings; you hear it.", Bonus(StatType.ChopYield, 10 * Pct)),
             Perk("wood_foresters_lungs", "Forester's Lungs", "A day in the woods is a day's breath.", Bonus(StatType.MaxStamina, 10f))),
         Milestone(40,
             Perk("wood_heartwood", "Heartwood", "What grows, you know how to take.", Bonus(StatType.GatherYield, 6 * Pct)),
-            Perk("wood_swing_through", "Swing Through", "Let the weight of the head do the lifting.", Bonus(StatType.ChopSpeed, 12 * Pct))),
+            null),  // taught a technique: TechniquePerks
         Milestone(50,
             Perk("wood_master_feller", "Master Feller", "Trees fall where you tell them.", Bonus(StatType.ChopSweetSpot, 25 * Pct), Bonus(StatType.ChopYield, 5 * Pct)),
             Perk("wood_axe_fighter", "Axe Fighter", "Twenty winters of felling make a fearsome arm.", Bonus(StatType.MeleeDamage, 5 * Pct))));
@@ -80,13 +81,13 @@ public static class BuildProficiencies
             Perk("mine_careful_hands", "Careful Hands", "A pick lasts as long as the hand is patient.", Bonus(StatType.ToolCare, 15 * Pct))),
         Milestone(20,
             Perk("mine_read_the_seam", "Read the Seam", "Every rock tells you where it will break.", Bonus(StatType.MineSweetSpot, 15 * Pct)),
-            Perk("mine_heavy_swing", "Heavy Swing", "Lift, fall, lift: a rhythm you no longer think about.", Bonus(StatType.MineSpeed, 10 * Pct))),
+            null),  // taught a technique: TechniquePerks
         Milestone(30,
             Perk("mine_deep_veins", "Deep Veins", "The best ore hides a hand's width further in.", Bonus(StatType.MineYield, 10 * Pct)),
             Perk("mine_work_song", "Work Song", "Keep the rhythm and the work keeps you.", Bonus(StatType.MaxStamina, 10f))),
         Milestone(40,
             Perk("mine_wrecker", "Wrecker", "Every wall has a weak joint.", Bonus(StatType.StructureDamage, 15 * Pct)),
-            Perk("mine_stonecutter", "Stonecutter", "Stone gives way to the hand that knows it.", Bonus(StatType.MineSpeed, 12 * Pct))),
+            null),  // taught a technique: TechniquePerks
         Milestone(50,
             Perk("mine_master_miner", "Master Miner", "One blow, and the rock opens like a book.", Bonus(StatType.MineSweetSpot, 25 * Pct), Bonus(StatType.MineYield, 5 * Pct)),
             Perk("mine_iron_arms", "Iron Arms", "Hauling stone builds more than walls.", Bonus(StatType.Strength, 3f))));
@@ -106,13 +107,13 @@ public static class BuildProficiencies
                 Perk("forage_quick_fingers", "Quick Fingers", "Pick, drop, pick again.", Bonus(StatType.ForageSpeed, 10 * Pct))),
             Milestone(20,
                 Perk("forage_wild_tea", "Wild Tea", "A leaf to chew on the long walk.", Bonus(StatType.MaxStamina, 8f)),
-                Perk("forage_light_step", "Light Step", "Through the undergrowth without a sound.", Bonus(StatType.MoveSpeed, 2 * Pct))),
+                null),  // taught a technique: TechniquePerks
             Milestone(30,
                 Perk("forage_bountiful", "Bountiful", "The forest gives to those who ask kindly.", Bonus(StatType.ForageYield, 10 * Pct)),
                 Perk("forage_nimble_picker", "Nimble Picker", "Both hands, never a bruise.", Bonus(StatType.ForageSpeed, 15 * Pct))),
             Milestone(40,
                 Perk("forage_forest_friend", "Forest Friend", "Wood and stone give a little more too.", Bonus(StatType.GatherYield, 5 * Pct)),
-                Perk("forage_pathfinder", "Pathfinder", "Every deer track is a road.", Bonus(StatType.MoveSpeed, 3 * Pct))),
+                null),  // taught a technique: TechniquePerks
             Milestone(50,
                 Perk("forage_master_forager", "Master Forager", "Nothing that grows is hidden from you.", Bonus(StatType.ForageYield, 12 * Pct), Bonus(StatType.ForageSpeed, 10 * Pct)),
                 Perk("forage_wildheart", "Wildheart", "The forest's strength runs in you.", Bonus(StatType.MaxHealth, 20f))),
@@ -132,13 +133,13 @@ public static class BuildProficiencies
                 Perk("fish_strong_wrists", "Strong Wrists", "A rod is a weapon of a kind.", Bonus(StatType.MaxStamina, 8f))),
             Milestone(20,
                 Perk("fish_wide_reel", "Wide Reel", "Room to give and take.", Bonus(StatType.ReelZone, 12 * Pct)),
-                Perk("fish_river_legs", "River Legs", "Cold water is nothing to you.", Bonus(StatType.FrostResistance, 6 * Pct))),
+                null),  // taught a technique: TechniquePerks
             Milestone(30,
                 Perk("fish_old_lines", "Old Lines", "Knots your grandmother taught you.", Bonus(StatType.ReelZone, 12 * Pct)),
                 Perk("fish_fish_supper", "Fish Supper", "Fresh from the water, the best meal there is.", Bonus(StatType.MealDuration, 10 * Pct))),
             Milestone(40,
                 Perk("fish_nokkens_respect", "Nokken's Respect", "The water spirit lets you be.", Bonus(StatType.HolyResistance, 8 * Pct)),
-                Perk("fish_long_arms", "Long Arms", "Casting and drawing are one motion.", Bonus(StatType.DrawSpeed, 6 * Pct))),
+                null),  // taught a technique: TechniquePerks
             Milestone(50,
                 Perk("fish_master_angler", "Master Angler", "The river gives up what you ask of it.", Bonus(StatType.ReelZone, 20 * Pct)),
                 Perk("fish_sea_legs", "Sea Legs", "Steady on any footing.", Bonus(StatType.MaxHealth, 15f))),
@@ -162,13 +163,13 @@ public static class BuildProficiencies
                 Perk("weapon_tool_maker", "Tool Maker", "A haft that fits the hand wears the edge less.", Bonus(StatType.ToolCare, 15 * Pct))),
             Milestone(20,
                 Perk("weapon_balanced_blades", "Balanced Blades", "You know where the weight should sit.", Bonus(StatType.PhysicalCritChance, 3 * Pct)),
-                Perk("weapon_true_fletching", "True Fletching", "Straight shafts, even feathers.", Bonus(StatType.DrawSpeed, 8 * Pct))),
+                null),  // taught a technique: TechniquePerks
             Milestone(30,
                 Perk("weapon_smiths_eye", "Smith's Eye", "The colour of the steel tells you when.", Bonus(StatType.WeaponcraftQuality, 10 * Pct)),
                 Perk("weapon_know_your_steel", "Know Your Steel", "You made it; you know what it can do.", Bonus(StatType.MeleeDamage, 4 * Pct))),
             Milestone(40,
                 Perk("weapon_hammer_arm", "Hammer Arm", "A thousand blows on the anvil.", Bonus(StatType.Strength, 3f)),
-                Perk("weapon_siege_smith", "Siege Smith", "Heads made for doors and walls.", Bonus(StatType.StructureDamage, 20 * Pct))),
+                null),  // taught a technique: TechniquePerks
             Milestone(50,
                 Perk("weapon_master_smith", "Master Smith", "Others bring their blades to you.", Bonus(StatType.WeaponcraftQuality, 15 * Pct)),
                 Perk("weapon_runed_edges", "Runed Edges", "A mark cut into the fuller, for luck.", Bonus(StatType.PhysicalCritDamage, 15 * Pct))),
@@ -189,13 +190,13 @@ public static class BuildProficiencies
                 Perk("armor_padded_lining", "Padded Lining", "Wool under the leather.", Bonus(StatType.MaxHealth, 10f))),
             Milestone(20,
                 Perk("armor_fitted_plates", "Fitted Plates", "Made to your own shape.", Bonus(StatType.Armor, 6f)),
-                Perk("armor_light_harness", "Light Harness", "Straps where they don't bind.", Bonus(StatType.MoveSpeed, 2 * Pct))),
+                null),  // taught a technique: TechniquePerks
             Milestone(30,
                 Perk("armor_armourers_eye", "Armourer's Eye", "You see the weak rivet before it gives.", Bonus(StatType.ArmorcraftQuality, 10 * Pct)),
                 Perk("armor_warm_furs", "Warm Furs", "Fur on the inside, where it counts.", Bonus(StatType.FrostResistance, 8 * Pct))),
             Milestone(40,
                 Perk("armor_proofed_leather", "Proofed Leather", "Boiled, waxed and boiled again.", Bonus(StatType.PhysicalResistance, 4 * Pct)),
-                Perk("armor_ward_stitching", "Ward Stitching", "Old signs sewn into the hem.", Bonus(StatType.FireResistance, 6 * Pct), Bonus(StatType.HolyResistance, 6 * Pct))),
+                null),  // taught a technique: TechniquePerks
             Milestone(50,
                 Perk("armor_master_armourer", "Master Armourer", "Others come to be measured.", Bonus(StatType.ArmorcraftQuality, 15 * Pct)),
                 Perk("armor_second_skin", "Second Skin", "You forget you are wearing it.", Bonus(StatType.Armor, 10f), Bonus(StatType.MaxHealth, 10f))),
@@ -216,13 +217,13 @@ public static class BuildProficiencies
                 Perk("cook_slow_simmer", "Slow Simmer", "The longer it cooks, the longer it lasts.", Bonus(StatType.MealDuration, 15 * Pct))),
             Milestone(20,
                 Perk("cook_trail_rations", "Trail Rations", "Food that walks with you.", Bonus(StatType.MaxStamina, 8f)),
-                Perk("cook_good_broth", "Good Broth", "Bones, roots and time.", Bonus(StatType.MaxHealth, 10f))),
+                null),  // taught a technique: TechniquePerks
             Milestone(30,
                 Perk("cook_spice_lore", "Spice Lore", "A pinch of the right thing.", Bonus(StatType.MealDuration, 20 * Pct)),
                 Perk("cook_feast_maker", "Feast Maker", "Cook for one, feed four.", Bonus(StatType.CookingYield, 12 * Pct))),
             Milestone(40,
                 Perk("cook_strong_stomach", "Strong Stomach", "Nothing you ate ever did you harm.", Bonus(StatType.MaxHealth, 15f)),
-                Perk("cook_hunters_table", "Hunter's Table", "Lean meat, light step.", Bonus(StatType.MoveSpeed, 2 * Pct))),
+                null),  // taught a technique: TechniquePerks
             Milestone(50,
                 Perk("cook_hearth_master", "Hearth Master", "The Haven gathers where you cook.", Bonus(StatType.MealDuration, 25 * Pct), Bonus(StatType.CookingYield, 5 * Pct)),
                 Perk("cook_iron_gut", "Iron Gut", "A full belly is a deep breath.", Bonus(StatType.MaxStamina, 15f))),
@@ -243,13 +244,13 @@ public static class BuildProficiencies
                 Perk("alch_long_brew", "Long Brew", "Let it steep another night.", Bonus(StatType.TonicDuration, 15 * Pct))),
             Milestone(20,
                 Perk("alch_bitter_root", "Bitter Root", "A taste that keeps out the cold and the flame.", Bonus(StatType.FireResistance, 5 * Pct), Bonus(StatType.FrostResistance, 5 * Pct)),
-                Perk("alch_distiller", "Distiller", "Every drop wrung out.", Bonus(StatType.AlchemyYield, 10 * Pct))),
+                null),  // taught a technique: TechniquePerks
             Milestone(30,
                 Perk("alch_rune_steeping", "Rune Steeping", "Words spoken over the pot.", Bonus(StatType.SpellPower, 4f)),
                 Perk("alch_lasting_draughts", "Lasting Draughts", "The warmth stays in the blood.", Bonus(StatType.TonicDuration, 20 * Pct))),
             Milestone(40,
                 Perk("alch_cursed_lore", "Cursed Lore", "You know where the curse gathers.", Bonus(StatType.EssenceFind, 10 * Pct)),
-                Perk("alch_holy_water", "Holy Water", "Drawn from the Haven's well at dawn.", Bonus(StatType.HolyResistance, 8 * Pct))),
+                null),  // taught a technique: TechniquePerks
             Milestone(50,
                 Perk("alch_master_alchemist", "Master Alchemist", "The cauldron does what you ask.", Bonus(StatType.TonicDuration, 25 * Pct), Bonus(StatType.AlchemyYield, 5 * Pct)),
                 Perk("alch_spell_distillation", "Spell Distillation", "A rune in a bottle.", Bonus(StatType.SpellCritChance, 5 * Pct))),
@@ -270,13 +271,13 @@ public static class BuildProficiencies
                 Perk("build_careful_saw", "Careful Saw", "Measure twice.", Bonus(StatType.RefiningYield, 8 * Pct))),
             Milestone(20,
                 Perk("build_builders_back", "Builder's Back", "Beams on the shoulder all day.", Bonus(StatType.MaxStamina, 10f)),
-                Perk("build_wreckers_eye", "Wrecker's Eye", "Who knows how it stands knows how it falls.", Bonus(StatType.StructureDamage, 15 * Pct))),
+                null),  // taught a technique: TechniquePerks
             Milestone(30,
                 Perk("build_master_joiner", "Master Joiner", "Nothing wasted, every offcut used.", Bonus(StatType.RefiningYield, 10 * Pct)),
                 Perk("build_raise_the_roof", "Raise the Roof", "Up before sundown.", Bonus(StatType.BuildSpeed, 15 * Pct))),
             Milestone(40,
                 Perk("build_hearth_keeper", "Hearth Keeper", "The Haven keeps you as you keep it.", Bonus(StatType.MaxHealth, 10f)),
-                Perk("build_sapper", "Sapper", "Find the keystone, pull it.", Bonus(StatType.StructureDamage, 20 * Pct))),
+                null),  // taught a technique: TechniquePerks
             Milestone(50,
                 Perk("build_master_builder", "Master Builder", "The Haven stands in your hands' shape.", Bonus(StatType.BuildSpeed, 25 * Pct), Bonus(StatType.RefiningYield, 5 * Pct)),
                 Perk("build_stone_skin", "Stone Skin", "Hard as the walls you raise.", Bonus(StatType.Armor, 8f))),
@@ -298,13 +299,13 @@ public static class BuildProficiencies
             Perk("melee_thick_skin", "Thick Skin", "Scars are just armour you grew yourself.", Bonus(StatType.MaxHealth, 15f))),
         Milestone(20,
             Perk("melee_shield_arm", "Shield Arm", "Take the blow where it hurts least.", Bonus(StatType.Armor, 8f)),
-            Perk("melee_keen_edge", "Keen Edge", "Aim for the gap in the hide.", Bonus(StatType.PhysicalCritChance, 4 * Pct))),
+            null),  // taught a technique: TechniquePerks
         Milestone(30,
             Perk("melee_endurance", "Endurance", "Twenty winters in the shield wall.", Bonus(StatType.MaxStamina, 15f)),
             Perk("melee_hunters_patience", "Hunter's Patience", "Wait for the moment, then end it.", Bonus(StatType.PhysicalCritDamage, 20 * Pct))),
         Milestone(40,
             Perk("melee_unbroken", "Unbroken", "Knocked down, never out.", Bonus(StatType.PhysicalResistance, 6 * Pct)),
-            Perk("melee_red_edge", "Red Edge", "What the blade takes, it gives back.", Bonus(StatType.Lifesteal, 4 * Pct))),
+            null),  // taught a technique: TechniquePerks
         Milestone(50,
             Perk("melee_warden", "Warden", "Behind you, the Haven. In front, nothing gets past.", Bonus(StatType.MaxHealth, 25f), Bonus(StatType.Armor, 5f)),
             Perk("melee_reaver", "Reaver", "Every blow a finishing blow.", Bonus(StatType.MeleeDamage, 10 * Pct))));
@@ -324,13 +325,13 @@ public static class BuildProficiencies
                 Perk("bow_keen_sight", "Keen Sight", "Aim for the gap in the hide.", Bonus(StatType.PhysicalCritChance, 3 * Pct))),
             Milestone(20,
                 Perk("bow_broadheads", "Broadheads", "Wide iron, deep wounds.", Bonus(StatType.ArrowDamage, 6 * Pct)),
-                Perk("bow_quiet_bow", "Quiet Bow", "Waxed string, felted limbs.", Bonus(StatType.SneakNoise, -8 * Pct))),
+                null),  // taught a technique: TechniquePerks
             Milestone(30,
                 Perk("bow_hunters_eye", "Hunter's Eye", "Wait for the moment, then end it.", Bonus(StatType.PhysicalCritDamage, 15 * Pct)),
                 Perk("bow_quick_nock", "Quick Nock", "The next arrow is on the string before the first lands.", Bonus(StatType.DrawSpeed, 10 * Pct))),
             Milestone(40,
                 Perk("bow_deadeye", "Deadeye", "Where you look, the arrow goes.", Bonus(StatType.ArrowDamage, 8 * Pct)),
-                Perk("bow_skirmisher", "Skirmisher", "Loose, step back, loose again.", Bonus(StatType.MoveSpeed, 3 * Pct))),
+                null),  // taught a technique: TechniquePerks
             Milestone(50,
                 Perk("bow_master_archer", "Master Archer", "The bow is an arm you were born with.", Bonus(StatType.ArrowDamage, 10 * Pct), Bonus(StatType.DrawSpeed, 5 * Pct)),
                 Perk("bow_ranger", "Ranger", "From the shadows, one arrow is enough.", Bonus(StatType.AmbushDamage, 25 * Pct))),
@@ -351,13 +352,13 @@ public static class BuildProficiencies
                 Perk("rune_warding_signs", "Warding Signs", "Marks against flame and frost.", Bonus(StatType.FireResistance, 5 * Pct), Bonus(StatType.FrostResistance, 5 * Pct))),
             Milestone(20,
                 Perk("rune_sharp_runes", "Sharp Runes", "A rune cut true bites twice.", Bonus(StatType.SpellCritChance, 4 * Pct)),
-                Perk("rune_steady_breath", "Steady Breath", "The words come without gasping.", Bonus(StatType.SpellStaminaCost, -10 * Pct))),
+                null),  // taught a technique: TechniquePerks
             Milestone(30,
                 Perk("rune_holy_marks", "Holy Marks", "What the dark fears, worn on the skin.", Bonus(StatType.HolyResistance, 8 * Pct)),
                 Perk("rune_deep_words", "Deep Words", "Spoken from the chest, not the throat.", Bonus(StatType.SpellDamage, 6 * Pct))),
             Milestone(40,
                 Perk("rune_runes_of_ruin", "Runes of Ruin", "The word that means open, said too loud.", Bonus(StatType.SpellCritDamage, 20 * Pct)),
-                Perk("rune_rune_shield", "Rune Shield", "A sign on the shield turns the blow.", Bonus(StatType.Armor, 8f))),
+                null),  // taught a technique: TechniquePerks
             Milestone(50,
                 Perk("rune_runemaster", "Runemaster", "The old words answer to you.", Bonus(StatType.SpellDamage, 10 * Pct), Bonus(StatType.SpellPower, 4f)),
                 Perk("rune_cursed_tongue", "Cursed Tongue", "What the curse takes, you keep.", Bonus(StatType.Lifesteal, 3 * Pct))),
@@ -381,13 +382,13 @@ public static class BuildProficiencies
             Perk("sneak_soft_hands", "Soft Hands", "The lock tells your fingers what it wants.", Bonus(StatType.LockpickZone, 15 * Pct))),
         Milestone(20,
             Perk("sneak_shadow_strike", "Shadow Strike", "The first blow is the one they never see.", Bonus(StatType.AmbushDamage, 25 * Pct)),
-            Perk("sneak_quiet_step", "Quiet Step", "Heel, then toe, then nothing.", Bonus(StatType.SneakNoise, -15 * Pct))),
+            null),  // taught a technique: TechniquePerks
         Milestone(30,
             Perk("sneak_keen_eye", "Keen Eye", "You see them first, and where it will hurt.", Bonus(StatType.PhysicalCritChance, 4 * Pct)),
             Perk("sneak_low_profile", "Low Profile", "A shape among shapes.", Bonus(StatType.SneakVisibility, -12 * Pct))),
         Milestone(40,
             Perk("sneak_assassin", "Assassin", "Unaware is as good as undefended.", Bonus(StatType.AmbushDamage, 35 * Pct)),
-            Perk("sneak_ghost", "Ghost", "Gone before the forest knows you were there.", Bonus(StatType.SneakNoise, -15 * Pct), Bonus(StatType.SneakVisibility, -8 * Pct))),
+            null),  // taught a technique: TechniquePerks
         Milestone(50,
             Perk("sneak_nightstalker", "Nightstalker", "The dark is yours, and everything in it.", Bonus(StatType.AmbushDamage, 30 * Pct), Bonus(StatType.MoveSpeed, 3 * Pct)),
             Perk("sneak_cutpurse", "Cutpurse", "The forest's curses come away in your hand.", Bonus(StatType.EssenceFind, 20 * Pct))));
@@ -473,6 +474,114 @@ public static class BuildProficiencies
         so.ApplyModifiedPropertiesWithoutUndo();
         EditorUtility.SetDirty(settings);
         return "settings " + SettingsPath;
+    }
+
+    // ----- Techniques -----
+
+    // At levels 20 and 40 the second perk of every skill teaches a new way of doing something (PerkTechnique). Which perk
+    // teaches which is only this table: change it and run the builder again.
+    private static readonly (string skill, int level, string id, string label, string text, PerkTechnique technique)[] TechniquePerks =
+    {
+        ("woodcutting", 20, "wood_steady_rhythm", "Steady Rhythm", "A sound swing keeps the run going: only a glancing blow breaks your combo.", PerkTechnique.SteadyRhythm),
+        ("woodcutting", 40, "wood_heartwood_strike", "Heartwood Strike", "A critical swing bites twice as deep: it counts as two.", PerkTechnique.HeartwoodStrike),
+        ("mining", 20, "mine_rich_seam", "Rich Seam", "Every critical blow on rock brings one more ore.", PerkTechnique.RichSeam),
+        ("mining", 40, "mine_shatter", "Shatter", "A critical blow splits the rock: it counts as two.", PerkTechnique.Shatter),
+        ("foraging", 20, "forage_sweep", "Sweep", "Picking a plant by hand gathers the same plants close by.", PerkTechnique.Sweep),
+        ("foraging", 40, "forage_foragers_haste", "Forager's Haste", "Every plant picked puts a spring in your step for a while.", PerkTechnique.ForagersHaste),
+        ("fishing", 20, "fish_quick_bite", "Quick Bite", "Fish bite twice as soon.", PerkTechnique.QuickBite),
+        ("fishing", 40, "fish_double_catch", "Double Catch", "Now and then two fish come up on the one line.", PerkTechnique.DoubleCatch),
+        ("weaponcrafting", 20, "weapon_sure_hand", "Sure Hand", "After four plain pieces in a row, the next is Fine for sure.", PerkTechnique.WeaponSureHand),
+        ("weaponcrafting", 40, "weapon_runed_make", "Runed Make", "A Masterwork weapon or tool comes from the anvil already empowered once.", PerkTechnique.WeaponRunedMake),
+        ("armorcrafting", 20, "armor_sure_fit", "Sure Fit", "After four plain pieces in a row, the next is Fine for sure.", PerkTechnique.ArmorSureHand),
+        ("armorcrafting", 40, "armor_runed_make", "Runed Armour", "A Masterwork piece of armour comes already empowered once.", PerkTechnique.ArmorRunedMake),
+        ("cooking", 20, "cook_third_plate", "Third Plate", "Room for one more meal's bonus at a time.", PerkTechnique.ThirdPlate),
+        ("cooking", 40, "cook_hearty_meals", "Hearty Meals", "A meal heals a quarter of your health as well.", PerkTechnique.HeartyMeals),
+        ("alchemy", 20, "alch_potent_remedies", "Potent Remedies", "Healing draughts heal a third more.", PerkTechnique.PotentRemedies),
+        ("alchemy", 40, "alch_spare_dose", "Spare Dose", "A draught or tonic now and then isn't used up.", PerkTechnique.SpareDose),
+        ("construction", 20, "build_patch_up", "Patch Up", "Mending what a breach broke costs half.", PerkTechnique.PatchUp),
+        ("construction", 40, "build_raise_in_a_day", "Raise in a Day", "Your hammer works twice as fast.", PerkTechnique.RaiseInADay),
+        ("melee", 20, "melee_riposte", "Riposte", "A parry readies a counter, as a perfect dodge does.", PerkTechnique.Riposte),
+        ("melee", 40, "melee_second_wind", "Second Wind", "A kill with your weapon gives back 20 stamina.", PerkTechnique.SecondWind),
+        ("archery", 20, "bow_deadly_draw", "Deadly Draw", "A perfect shot hits half again as hard.", PerkTechnique.DeadlyDraw),
+        ("archery", 40, "bow_pinning_shot", "Pinning Shot", "A critical arrow roots what it hits for a moment.", PerkTechnique.PinningShot),
+        ("runecraft", 20, "rune_spell_echo", "Spell Echo", "Now and then a spell leaves no cooldown behind.", PerkTechnique.SpellEcho),
+        ("runecraft", 40, "rune_soul_siphon", "Soul Siphon", "A kill with a spell heals a tenth of your health.", PerkTechnique.SoulSiphon),
+        ("sneaking", 20, "sneak_silent_takedown", "Silent Takedown", "A blow from the shadows finishes an ordinary creature it has nearly done for.", PerkTechnique.SilentTakedown),
+        ("sneaking", 40, "sneak_shadowstep", "Shadowstep", "You sneak a third faster.", PerkTechnique.Shadowstep),
+    };
+
+    private static string TeachTechniques(List<ProficiencyDefinition> skills)
+    {
+        int taught = 0;
+        foreach (var entry in TechniquePerks)
+        {
+            ProficiencyDefinition skill = skills.Find(candidate => candidate.Id == entry.skill);
+            if (skill == null)
+            {
+                continue;
+            }
+
+            string path = $"{PerkFolder}/{entry.label.Replace(" ", "").Replace("'", "")}.asset";
+            var perk = AssetDatabase.LoadAssetAtPath<PerkDefinition>(path);
+            if (perk == null)
+            {
+                perk = ScriptableObject.CreateInstance<PerkDefinition>();
+                AssetDatabase.CreateAsset(perk, path);
+            }
+
+            perk.Configure(entry.id, entry.label, entry.text, entry.technique);
+            EditorUtility.SetDirty(perk);
+
+            var so = new SerializedObject(skill);
+            SerializedProperty milestones = so.FindProperty("milestones");
+            for (int i = 0; i < milestones.arraySize; i++)
+            {
+                SerializedProperty milestone = milestones.GetArrayElementAtIndex(i);
+                if (milestone.FindPropertyRelative("level").intValue == entry.level)
+                {
+                    milestone.FindPropertyRelative("second").objectReferenceValue = perk;
+                    taught++;
+                }
+            }
+
+            so.ApplyModifiedPropertiesWithoutUndo();
+            EditorUtility.SetDirty(skill);
+        }
+
+        // Perks no milestone offers any more go.
+        var offered = new HashSet<PerkDefinition>();
+        foreach (ProficiencyDefinition skill in skills)
+        {
+            foreach (ProficiencyDefinition.Milestone milestone in skill.Milestones)
+            {
+                offered.Add(milestone.first);
+                offered.Add(milestone.second);
+            }
+        }
+
+        int removed = 0;
+        foreach (string guid in AssetDatabase.FindAssets("t:PerkDefinition", new[] { PerkFolder }))
+        {
+            string path = AssetDatabase.GUIDToAssetPath(guid);
+            if (!offered.Contains(AssetDatabase.LoadAssetAtPath<PerkDefinition>(path)) && AssetDatabase.DeleteAsset(path))
+            {
+                removed++;
+            }
+        }
+
+        const string settingsPath = "Assets/_Project/Resources/TechniqueSettings.asset";
+        var techniques = AssetDatabase.LoadAssetAtPath<TechniqueSettings>(settingsPath);
+        if (techniques == null)
+        {
+            techniques = ScriptableObject.CreateInstance<TechniqueSettings>();
+            AssetDatabase.CreateAsset(techniques, settingsPath);
+        }
+
+        var rules = new SerializedObject(techniques);
+        rules.FindProperty("pinning").objectReferenceValue = AssetDatabase.LoadAssetAtPath<StatusEffectDefinition>("Assets/_Project/Data/Combat/Status/Roots.asset");
+        rules.ApplyModifiedPropertiesWithoutUndo();
+        EditorUtility.SetDirty(techniques);
+        return $"{taught} techniques taught, {removed} old perks removed";
     }
 
     // ----- Mentors and rest -----

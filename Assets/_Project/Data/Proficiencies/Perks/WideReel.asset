@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Wide Reel
   description: Room to give and take.
   icon: {fileID: 0}
+  technique: 0
   bonuses:
   - stat: 47
     op: 0

@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Master Forager
   description: Nothing that grows is hidden from you.
   icon: {fileID: 0}
+  technique: 0
   bonuses:
   - stat: 46
     op: 0

@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Raise the Roof
   description: Up before sundown.
   icon: {fileID: 0}
+  technique: 0
   bonuses:
   - stat: 43
     op: 0

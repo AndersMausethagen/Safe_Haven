@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Reaver
   description: Every blow a finishing blow.
   icon: {fileID: 0}
+  technique: 0
   bonuses:
   - stat: 28
     op: 0

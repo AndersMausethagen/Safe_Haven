@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Iron Gut
   description: A full belly is a deep breath.
   icon: {fileID: 0}
+  technique: 0
   bonuses:
   - stat: 15
     op: 0

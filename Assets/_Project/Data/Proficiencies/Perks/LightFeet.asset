@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Light Feet
   description: Moss under the boots, never twigs.
   icon: {fileID: 0}
+  technique: 0
   bonuses:
   - stat: 16
     op: 0

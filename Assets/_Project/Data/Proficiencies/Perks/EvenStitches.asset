@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Even Stitches
   description: Small, tight, every one the same.
   icon: {fileID: 0}
+  technique: 0
   bonuses:
   - stat: 37
     op: 0

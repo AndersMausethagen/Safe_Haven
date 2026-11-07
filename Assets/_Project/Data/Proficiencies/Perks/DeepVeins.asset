@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Deep Veins
   description: The best ore hides a hand's width further in.
   icon: {fileID: 0}
+  technique: 0
   bonuses:
   - stat: 27
     op: 0

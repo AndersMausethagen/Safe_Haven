@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Feast Maker
   description: Cook for one, feed four.
   icon: {fileID: 0}
+  technique: 0
   bonuses:
   - stat: 40
     op: 0

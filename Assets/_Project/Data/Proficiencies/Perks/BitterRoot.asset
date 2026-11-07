@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Bitter Root
   description: A taste that keeps out the cold and the flame.
   icon: {fileID: 0}
+  technique: 0
   bonuses:
   - stat: 9
     op: 0

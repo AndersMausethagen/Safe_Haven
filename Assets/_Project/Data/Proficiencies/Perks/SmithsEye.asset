@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Smith's Eye
   description: The colour of the steel tells you when.
   icon: {fileID: 0}
+  technique: 0
   bonuses:
   - stat: 35
     op: 0

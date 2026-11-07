@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Steady Hand
   description: Not a drop spilled.
   icon: {fileID: 0}
+  technique: 0
   bonuses:
   - stat: 42
     op: 0

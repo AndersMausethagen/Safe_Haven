@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Forager
   description: You find the berries the birds missed.
   icon: {fileID: 0}
+  technique: 0
   bonuses:
   - stat: 46
     op: 0

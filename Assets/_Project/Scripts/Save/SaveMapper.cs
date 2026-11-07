@@ -604,6 +604,10 @@ public static class SaveMapper
 
         into.perks.AddRange(progress.Perks);
         into.insight = progress.Insight;
+        foreach (KeyValuePair<string, int> run in progress.PlainRuns)
+        {
+            into.plainRuns.Add(new AmountSaveData { id = run.Key, amount = run.Value });
+        }
 
         foreach (KeyValuePair<string, int> skill in progress.SkillRanks)
         {
@@ -665,6 +669,13 @@ public static class SaveMapper
         }
 
         progress.Restore(experience, perks, insight, saved.crafted, saved.stones, skillRanks);
+        var runs = new List<KeyValuePair<string, int>>();
+        foreach (AmountSaveData run in saved.plainRuns ?? new List<AmountSaveData>())
+        {
+            runs.Add(new KeyValuePair<string, int>(run.id, run.amount));
+        }
+
+        progress.RestorePlainRuns(runs);
         var creatures = new List<KeyValuePair<string, int>>();
         foreach (AmountSaveData creature in saved.creatures ?? new List<AmountSaveData>())
         {

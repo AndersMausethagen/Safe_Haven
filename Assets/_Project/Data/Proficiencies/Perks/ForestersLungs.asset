@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Forester's Lungs
   description: A day in the woods is a day's breath.
   icon: {fileID: 0}
+  technique: 0
   bonuses:
   - stat: 15
     op: 0

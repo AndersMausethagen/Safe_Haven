@@ -146,7 +146,9 @@ public sealed class PlayerBoons : MonoBehaviour
             }
         }
 
-        if (meals >= SurvivalSettings.Current.MealSlots + GameSession.Settlement.UpgradeBonus(level => level.extraMealSlots) && shortest >= 0)
+        int slots = SurvivalSettings.Current.MealSlots + GameSession.Settlement.UpgradeBonus(level => level.extraMealSlots)
+                    + (Techniques.Has(PerkTechnique.ThirdPlate) ? 1 : 0);
+        if (meals >= slots && shortest >= 0)
         {
             GameMessages.Post($"{active[shortest].Name} gives way to the new meal.");
             Stop(shortest);

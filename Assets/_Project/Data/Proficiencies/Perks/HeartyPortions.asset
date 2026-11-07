@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Hearty Portions
   description: Always enough for one more.
   icon: {fileID: 0}
+  technique: 0
   bonuses:
   - stat: 40
     op: 0

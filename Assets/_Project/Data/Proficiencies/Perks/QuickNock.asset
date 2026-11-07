@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Quick Nock
   description: The next arrow is on the string before the first lands.
   icon: {fileID: 0}
+  technique: 0
   bonuses:
   - stat: 17
     op: 0

@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Armourer's Eye
   description: You see the weak rivet before it gives.
   icon: {fileID: 0}
+  technique: 0
   bonuses:
   - stat: 37
     op: 0

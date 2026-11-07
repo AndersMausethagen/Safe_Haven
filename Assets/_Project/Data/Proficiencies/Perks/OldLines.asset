@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Old Lines
   description: Knots your grandmother taught you.
   icon: {fileID: 0}
+  technique: 0
   bonuses:
   - stat: 47
     op: 0

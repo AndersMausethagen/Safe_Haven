@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Hearth Master
   description: The Haven gathers where you cook.
   icon: {fileID: 0}
+  technique: 0
   bonuses:
   - stat: 39
     op: 0

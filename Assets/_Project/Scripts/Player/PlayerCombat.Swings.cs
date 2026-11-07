@@ -150,6 +150,21 @@ public sealed partial class PlayerCombat
         }
     }
 
+    // Silent Takedown: a blow from the shadows finishes an ordinary creature it has nearly done for anyway. Never a boss or
+    // an elite, and never one that knows you are there.
+    private static float SilentTakedown(IDamageable target, float damage)
+    {
+        if (!(target is Damageable body) || !body.TryGetComponent(out MonsterAI monster) || !monster.IsUnaware
+            || body.GetComponent<EliteCreature>() != null || body.GetComponentInParent<BossEncounter>() != null
+            || !Techniques.Has(PerkTechnique.SilentTakedown) || body.CurrentHealth > damage * TechniqueSettings.Current.TakedownReach)
+        {
+            return damage;
+        }
+
+        GameMessages.Post("Silent takedown.", MessageKind.Gain);
+        return Mathf.Max(damage, body.CurrentHealth * 100f);
+    }
+
     // The swing's stamina, after the Melee skill: a beginner tires sooner, a master later.
     private float CostOf(SwingKind kind, AttackDefinition attack) =>
         BaseCostOf(kind, attack) * Mathf.Max(0.1f, 1f + combatant.Stats.Get(StatType.MeleeStaminaCost));
@@ -350,6 +365,7 @@ public sealed partial class PlayerCombat
         // The Melee skill scales every swing alike, before nothing else changes, so the order of blows (plain, backstab,
         // counter) holds at every level; a perk can add to a blow from the shadows.
         damage *= Mathf.Max(0f, 1f + combatant.Stats.Get(StatType.MeleeDamage)) * PlayerProficiencies.AmbushScale(combatant.Stats, target);
+        damage = SilentTakedown(target, damage);
         technique |= HitTechnique.Melee;
         AttackResolver.Apply(combatant, pending.Attack, pending.WeaponDamage, pending.Hit, pending.Origin, pending.Direction, damage,
             pending.Poise, technique, critical);

@@ -240,7 +240,8 @@ public sealed class PlayerFishing : MonoBehaviour
         still = water.IsStill;
         // The Nøkk's air (SpiritBonds): the water's own spirit sends fish to the line.
         float favour = SpiritBonds.HasGift(SpiritBonds.NokkGift) ? 1.5f : 1f;
-        biteAt = cast.LandsAt + Random.Range(settings.BiteWait.x, settings.BiteWait.y) / Mathf.Max(0.1f, lure * favour);
+        float quick = Techniques.Has(PerkTechnique.QuickBite) ? TechniqueSettings.Current.QuickBite : 1f;
+        biteAt = cast.LandsAt + Random.Range(settings.BiteWait.x, settings.BiteWait.y) / Mathf.Max(0.1f, lure * favour * quick);
         State = Phase.Waiting;
         ShowLine();
     }
@@ -288,6 +289,13 @@ public sealed class PlayerFishing : MonoBehaviour
         FishingSettings settings = FishingSettings.Current;
         ItemDefinition fish = hooked.item;
         float kilograms = Random.Range(hooked.size.x, hooked.size.y);
+        // Double Catch: now and then a second one comes up on the line.
+        int caught = Techniques.Has(PerkTechnique.DoubleCatch) && Random.value < TechniqueSettings.Current.DoubleCatchChance ? 2 : 1;
+        if (caught > 1 && items.Give(fish, 1) > 0)
+        {
+            GameMessages.Post($"Double Catch: two {fish.DisplayName} on the one line!", MessageKind.Gain);
+        }
+
         if (items.Give(fish, 1) < 1)
         {
             GameMessages.Post($"No room for the {fish.DisplayName}. You let it go.", MessageKind.Warning);

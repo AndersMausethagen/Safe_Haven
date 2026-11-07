@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Weapon Drill
   description: A thousand cuts at a post, for the one that counts.
   icon: {fileID: 0}
+  technique: 0
   bonuses:
   - stat: 1
     op: 0

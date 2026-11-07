@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Builder's Back
   description: Beams on the shoulder all day.
   icon: {fileID: 0}
+  technique: 0
   bonuses:
   - stat: 15
     op: 0

@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Cursed Lore
   description: You know where the curse gathers.
   icon: {fileID: 0}
+  technique: 0
   bonuses:
   - stat: 21
     op: 0

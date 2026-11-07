@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Heartwood
   description: What grows, you know how to take.
   icon: {fileID: 0}
+  technique: 0
   bonuses:
   - stat: 18
     op: 0

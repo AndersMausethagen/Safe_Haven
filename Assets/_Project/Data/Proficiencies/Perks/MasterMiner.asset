@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Master Miner
   description: One blow, and the rock opens like a book.
   icon: {fileID: 0}
+  technique: 0
   bonuses:
   - stat: 26
     op: 0

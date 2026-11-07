@@ -303,7 +303,8 @@ public sealed class PlayerGathering : MonoBehaviour
             settings.MaxCombo,
             settings.ZoneJitter,
             random,
-            settings.ProgressFor);
+            ProgressFor(definition.GatherTool, settings));
+        Session.KeepsComboOnNormal = definition.GatherTool == ToolType.Axe && Techniques.Has(PerkTechnique.SteadyRhythm);
 
         if (settings.HoldToRaise && !settings.AutoGather)
         {
@@ -326,7 +327,9 @@ public sealed class PlayerGathering : MonoBehaviour
 
         if (result == InteractionResult.Completed && node != null && Session.Criticals > 0)
         {
-            int bonus = Session.Criticals * GatheringMinigameSettings.Current.BonusPerCritical;
+            // Rich Seam: every critical blow on rock brings one more.
+            bool richSeam = node.Definition != null && node.Definition.GatherTool == ToolType.Pickaxe && Techniques.Has(PerkTechnique.RichSeam);
+            int bonus = Session.Criticals * (GatheringMinigameSettings.Current.BonusPerCritical + (richSeam ? TechniqueSettings.Current.RichSeamOre : 0));
             if (bonus > 0 && node.TryGetComponent(out ResourceSource source))
             {
                 source.GrantBonus(gameObject, bonus);
@@ -414,6 +417,20 @@ public sealed class PlayerGathering : MonoBehaviour
         {
             target.Complete();
         }
+    }
+
+    // How much each swing moves the work on: Heartwood Strike (axe) and Shatter (pickaxe) make a critical one count more.
+    private static System.Func<SwingResult, float> ProgressFor(ToolType tool, GatheringMinigameSettings settings)
+    {
+        bool doubled = (tool == ToolType.Axe && Techniques.Has(PerkTechnique.HeartwoodStrike))
+                       || (tool == ToolType.Pickaxe && Techniques.Has(PerkTechnique.Shatter));
+        if (!doubled)
+        {
+            return settings.ProgressFor;
+        }
+
+        float counts = TechniqueSettings.Current.CriticalCountsAs;
+        return result => settings.ProgressFor(result) * (result == SwingResult.Critical ? counts : 1f);
     }
 
     // How the woodcutting, mining or foraging skill changes the work: how fast the tool rises (or the hand picks) and how

@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Sharp Runes
   description: A rune cut true bites twice.
   icon: {fileID: 0}
+  technique: 0
   bonuses:
   - stat: 5
     op: 0

@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Quick Fingers
   description: Pick, drop, pick again.
   icon: {fileID: 0}
+  technique: 0
   bonuses:
   - stat: 45
     op: 0

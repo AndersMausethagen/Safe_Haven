@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Runes of Ruin
   description: The word that means open, said too loud.
   icon: {fileID: 0}
+  technique: 0
   bonuses:
   - stat: 6
     op: 0

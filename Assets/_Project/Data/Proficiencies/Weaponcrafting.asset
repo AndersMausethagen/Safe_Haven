@@ -36,13 +36,13 @@ MonoBehaviour:
     second: {fileID: 11400000, guid: 68ca6c18fe650124e95ad7da57abfbac, type: 2}
   - level: 20
     first: {fileID: 11400000, guid: 802b83a4781e4a542862dbcda58e0ade, type: 2}
-    second: {fileID: 11400000, guid: bc6f432319d07e54f8f431270d734745, type: 2}
+    second: {fileID: 11400000, guid: 9a086e21bf6b4824dbd07ace9feb3213, type: 2}
   - level: 30
     first: {fileID: 11400000, guid: 1269e5efc11eb26449db238306472488, type: 2}
     second: {fileID: 11400000, guid: ea23b171373691e4db4cfb358b05a302, type: 2}
   - level: 40
     first: {fileID: 11400000, guid: af25946a5f97bb44891291ce83c4512c, type: 2}
-    second: {fileID: 11400000, guid: d455d61c27d7c4f4d95cbb17969ac9d5, type: 2}
+    second: {fileID: 11400000, guid: 5f9238b106214224fbcb865cc7a77dc2, type: 2}
   - level: 50
     first: {fileID: 11400000, guid: 0009f14d4d74be940a88e376b494e2df, type: 2}
     second: {fileID: 11400000, guid: 55cc9593277d1a94d80087c551e41098, type: 2}

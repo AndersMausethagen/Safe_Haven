@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Iron Arms
   description: Hauling stone builds more than walls.
   icon: {fileID: 0}
+  technique: 0
   bonuses:
   - stat: 13
     op: 0

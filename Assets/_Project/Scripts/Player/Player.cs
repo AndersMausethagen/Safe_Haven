@@ -53,6 +53,7 @@ public sealed class Player : MonoBehaviour
     {
         ColdBreath.AddTo(gameObject);
         PlayerTraining.AddTo(gameObject);
+        PlayerTechniques.AddTo(gameObject);
         PlayerWarmth.AddTo(gameObject);
         if (Current != null && Current != this)
         {

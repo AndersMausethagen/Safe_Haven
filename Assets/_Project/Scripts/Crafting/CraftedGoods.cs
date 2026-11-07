@@ -150,8 +150,21 @@ public static class CraftedWork
 
         CraftedGoods goods = Of(item);
         ItemQuality quality = QualityFor(QualityChance(goods, maker), UnityEngine.Random.value, LevelingSettings.Current.MasterworkShare);
+        bool armour = IsArmour(goods);
+        string run = armour ? "armour" : "weapons";
+        // Sure Hand: after a run of plain pieces, the next is good work for sure.
+        if (quality == ItemQuality.Plain && Techniques.Has(armour ? PerkTechnique.ArmorSureHand : PerkTechnique.WeaponSureHand)
+            && GameSession.Progress.PlainRunOf(run) >= TechniqueSettings.Current.SureHandRun)
+        {
+            quality = ItemQuality.Fine;
+        }
+
+        GameSession.Progress.NoteMade(run, quality == ItemQuality.Plain);
+        // Runed Make: a Masterwork comes from the anvil already empowered once.
+        int empower = quality == ItemQuality.Masterwork && GearPower.CanEmpower(item)
+                      && Techniques.Has(armour ? PerkTechnique.ArmorRunedMake : PerkTechnique.WeaponRunedMake) ? 1 : 0;
         string name = GameSession.Appearance != null ? GameSession.Appearance.DisplayName : null;
-        return new ItemStack(item, 1, Finish(goods, maker), 0, null, quality, name);
+        return new ItemStack(item, 1, Finish(goods, maker), empower, null, quality, name);
     }
 
     /// <summary>Gives a crafted batch to a maker's bag: gear piece by piece as they make it, the rest as it comes, with the

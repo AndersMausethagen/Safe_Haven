@@ -477,7 +477,11 @@ signs a better make; `TradeSettings.CoinsFor` prices it at the Trading Post; `Le
 `HavenRenown` a share of renown. Residents learn too: `SettlementSystem` counts a worker's crafts (`ResidentRecord.WorkDone`) for
 their rank (`SettlementSettings.RankFor`), which `CraftingStation` adds to its speed (`SettlementState.WorkerSpeed`) and which may
 put an extra in the output slot; `JobDefinition.Teaches` is the skill `ResidentNpc` offers a lesson in (`ExperienceTracker.TakeLesson`,
-once between raids: `TaughtSinceRaid`, cleared by `RecordExtraction`). Perks are chosen again for free beside the Portal. To add a skill: create one (Create > Safe Haven >
+once between raids: `TaughtSinceRaid`, cleared by `RecordExtraction`). A perk may teach a technique (`PerkDefinition.Technique`, `PerkTechnique`): `Techniques.Has` is asked by the system it changes
+(gathering, fishing, `CraftedWork`, `PlayerBoons`, `PlayerEating`, `BuildingRepairs`, `Construction`, `PlayerArchery`, `PlayerSkills`,
+`PlayerCombat`, `PlayerStealth`), and `PlayerTechniques` (added by `Player`) carries out the ones that answer events (Riposte,
+Second Wind, Soul Siphon, Pinning Shot, Sweep via `ResourceNode.GatherBy`, Forager's Haste); numbers in `TechniqueSettings`.
+Perks are chosen again for free beside the Portal. To add a skill: create one (Create > Safe Haven >
 Progression > Skill) with a unique id, its Training and (for gathering) Gather Tool or (for crafting) Crafts, level bonuses and
 milestones, add it to LevelingSettings' Skills, and report its practice to `ExperienceTracker.Practise`.
 

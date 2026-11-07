@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Trail Rations
   description: Food that walks with you.
   icon: {fileID: 0}
+  technique: 0
   bonuses:
   - stat: 15
     op: 0

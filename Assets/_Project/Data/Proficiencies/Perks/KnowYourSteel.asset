@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Know Your Steel
   description: You made it; you know what it can do.
   icon: {fileID: 0}
+  technique: 0
   bonuses:
   - stat: 28
     op: 0

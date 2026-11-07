@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Proofed Leather
   description: Boiled, waxed and boiled again.
   icon: {fileID: 0}
+  technique: 0
   bonuses:
   - stat: 8
     op: 0

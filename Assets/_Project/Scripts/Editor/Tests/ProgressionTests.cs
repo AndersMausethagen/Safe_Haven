@@ -288,7 +288,7 @@ public sealed class ProgressionTests
             {
                 Assert.NotNull(milestone.first, skill.name);
                 Assert.NotNull(milestone.second, skill.name);
-                Assert.IsTrue(milestone.first.Bonuses.Count > 0 && milestone.second.Bonuses.Count > 0, skill.name);
+                Assert.IsTrue((milestone.first.Bonuses.Count > 0 || milestone.first.IsTechnique) && (milestone.second.Bonuses.Count > 0 || milestone.second.IsTechnique), skill.name);
                 perkIds.Add(milestone.first.Id);
                 perkIds.Add(milestone.second.Id);
             }

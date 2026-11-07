@@ -19,6 +19,21 @@ public sealed class CharacterProgress
     // Creatures met, by id, with how many the player's side has slain: the journal's record.
     private readonly Dictionary<string, int> creatures = new Dictionary<string, int>();
 
+    private readonly Dictionary<string, int> plainRuns = new Dictionary<string, int>();
+
+    /// <summary>Counts up whenever the choice of perks changes, so what they teach is worked out again (Techniques).</summary>
+    public int PerkVersion { get; private set; }
+
+    /// <summary>Plain pieces made in a row, by kind ("weapons", "armour"), for Sure Hand.</summary>
+    public IReadOnlyDictionary<string, int> PlainRuns => plainRuns;
+
+    public int PlainRunOf(string kind) => plainRuns.TryGetValue(kind, out int run) ? run : 0;
+
+    /// <summary>Notes a piece made: a plain one lengthens the run, a better one ends it.</summary>
+    public void NoteMade(string kind, bool plain) => plainRuns[kind] = plain ? PlainRunOf(kind) + 1 : 0;
+
+    public void RestorePlainRuns(IEnumerable<KeyValuePair<string, int>> saved) => Fill(plainRuns, saved);
+
     /// <summary>Experience not yet put into a skill.</summary>
     public int Insight { get; private set; }
 
@@ -214,6 +229,7 @@ public sealed class CharacterProgress
         }
 
         perks.Add(perk.Id);
+        PerkVersion++;
         Changed?.Invoke();
         return true;
     }
@@ -227,6 +243,7 @@ public sealed class CharacterProgress
         }
 
         perks.Clear();
+        PerkVersion++;
         Changed?.Invoke();
     }
 
@@ -294,6 +311,7 @@ public sealed class CharacterProgress
         Fill(experience, savedExperience);
         Fill(skillRanks, savedSkillRanks);
         Insight = Math.Max(0, savedInsight);
+        PerkVersion++;
         perks.Clear();
         if (savedPerks != null)
         {

@@ -269,11 +269,27 @@ public sealed class ResourceNode : MonoBehaviour, IInteractionCondition, ISaveab
         Swung?.Invoke(result, from);
     }
 
-    private void OnGathered()
+    private void OnGathered() => Gathered(interactable.Interactor);
+
+    /// <summary>Gathers the node for someone without their working it (the Sweep technique): its yield, then as if worked.
+    /// False when it is depleted or can't be gathered now.</summary>
+    public bool GatherBy(GameObject gatherer)
+    {
+        if (IsDepleted || gatherer == null || !interactable.enabled || !TryGetComponent(out ResourceSource source))
+        {
+            return false;
+        }
+
+        source.GrantTo(gatherer);
+        Gathered(gatherer);
+        return true;
+    }
+
+    private void Gathered(GameObject by)
     {
         if (node != null && TryGetComponent(out ResourceSource source))
         {
-            source.GrantExtra(interactable.Interactor, node.BurstYields);
+            source.GrantExtra(by, node.BurstYields);
         }
 
         Harvested?.Invoke();

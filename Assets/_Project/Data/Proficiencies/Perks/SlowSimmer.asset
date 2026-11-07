@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Slow Simmer
   description: The longer it cooks, the longer it lasts.
   icon: {fileID: 0}
+  technique: 0
   bonuses:
   - stat: 39
     op: 0

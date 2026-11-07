@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Bountiful
   description: The forest gives to those who ask kindly.
   icon: {fileID: 0}
+  technique: 0
   bonuses:
   - stat: 46
     op: 0

@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Nimble Picker
   description: Both hands, never a bruise.
   icon: {fileID: 0}
+  technique: 0
   bonuses:
   - stat: 45
     op: 0

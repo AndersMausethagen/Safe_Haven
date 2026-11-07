@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Rune Steeping
   description: Words spoken over the pot.
   icon: {fileID: 0}
+  technique: 0
   bonuses:
   - stat: 2
     op: 0

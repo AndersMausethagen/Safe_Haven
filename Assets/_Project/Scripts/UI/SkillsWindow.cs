@@ -460,7 +460,15 @@ public sealed class SkillsWindow : MonoBehaviour
         }
 
         string name = owned ? $"<color={style.AccentHex}>{perk.DisplayName}</color>" : perk.DisplayName;
-        string bonuses = $"<color={(open ? style.GoodHex : style.MutedHex)}>{perk.DescribeBonuses()}</color>";
+        if (perk.IsTechnique)
+        {
+            // A technique is a new thing to do, not a number: its words are the point, so they read in full colour.
+            string tag = $"<size=75%><color={(open ? style.AccentHex : style.MutedHex)}>TECHNIQUE</color></size>";
+            card.Text.text = $"<b>{name}</b>  {tag}\n<size=88%><color={(open ? style.TextHex : style.MutedHex)}>{perk.Description}</color></size>";
+            return;
+        }
+
+        string bonuses =$"<color={(open ? style.GoodHex : style.MutedHex)}>{perk.DescribeBonuses()}</color>";
         card.Text.text = $"<b>{name}</b>  <size=90%>{bonuses}</size>\n<size=85%><color={style.MutedHex}>{perk.Description}</color></size>";
     }
 

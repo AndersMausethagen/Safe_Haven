@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Work Song
   description: Keep the rhythm and the work keeps you.
   icon: {fileID: 0}
+  technique: 0
   bonuses:
   - stat: 15
     op: 0

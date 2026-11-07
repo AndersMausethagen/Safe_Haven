@@ -101,6 +101,9 @@ public sealed class GatheringSession : ITimingBar
     /// <summary>Critical swings in a row so far.</summary>
     public int Combo { get; private set; }
 
+    /// <summary>A normal swing keeps the combo (the Steady Rhythm technique); only a glancing one breaks it.</summary>
+    public bool KeepsComboOnNormal { get; set; }
+
     public bool IsComplete => Progress >= SwingsRequired - 0.001f;
 
     /// <summary>Hold to raise: the tool is on its way up.</summary>
@@ -217,6 +220,10 @@ public sealed class GatheringSession : ITimingBar
         {
             Criticals++;
             Combo++;
+        }
+        else if (result == SwingResult.Normal && KeepsComboOnNormal)
+        {
+            // Steady Rhythm: a sound swing keeps the run going.
         }
         else
         {

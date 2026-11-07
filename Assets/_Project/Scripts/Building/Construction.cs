@@ -252,6 +252,10 @@ public sealed class Construction : MonoBehaviour, ISaveable, ISharedState, IStat
         workSpeed = siteInteractable.Interactor != null && siteInteractable.Interactor.TryGetComponent(out Combatant builder)
             ? Mathf.Max(0.25f, 1f + builder.Stats.Get(StatType.BuildSpeed))
             : 1f;
+        if (Player.IsPlayer(siteInteractable.Interactor) && Techniques.Has(PerkTechnique.RaiseInADay))
+        {
+            workSpeed *= TechniqueSettings.Current.RaiseSpeed;
+        }
         siteInteractable.Duration = Mathf.Max(0.1f, (WorkNeeded - Work) / workSpeed);
         nextBlow = Time.time + 0.15f;
     }

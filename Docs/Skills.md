@@ -16,6 +16,26 @@ abilities.
   the player the game was tuned for. Below it the player is a beginner and worse than that; above it, better.
 - **Every 10 levels (10 to 50):** a milestone with two perks; the player keeps one. The old talents live on as perks. The first choice
   can be made anywhere; changing it, or choosing all again, only at home beside the portal, for free.
+- **Techniques (levels 20 and 40):** one of the two perks teaches a new way of doing something instead of bonuses
+  (`PerkDefinition` › Technique, `PerkTechnique`, numbers in `Resources/TechniqueSettings`). Which perk teaches which is one table in
+  `AgentScripts/BuildProficiencies.cs` (`TechniquePerks`), so they can be reshuffled without code.
+
+  | Skill | 20 | 40 |
+  |---|---|---|
+  | Woodcutting | Steady Rhythm: a normal swing keeps the combo | Heartwood Strike: a critical swing counts twice |
+  | Mining | Rich Seam: one more ore per critical | Shatter: a critical counts twice |
+  | Foraging | Sweep: picking by hand gathers the same plants within 3 m | Forager's Haste: +15% speed for 10 s after a plant |
+  | Fishing | Quick Bite: fish bite twice as soon | Double Catch: 25% chance of two fish |
+  | Weaponcrafting | Sure Hand: after four plain pieces the next is Fine | Runed Make: a Masterwork comes empowered once |
+  | Armorcrafting | Sure Fit | Runed Armour (the same, for armour) |
+  | Cooking | Third Plate: one more meal slot | Hearty Meals: a meal heals 25% of health |
+  | Alchemy | Potent Remedies: draughts heal 30% more | Spare Dose: 25% chance a draught isn't used up |
+  | Construction | Patch Up: breach repairs cost half | Raise in a Day: the hammer works twice as fast |
+  | Melee | Riposte: a parry readies a counter | Second Wind: a weapon kill gives back 20 stamina |
+  | Archery | Deadly Draw: a perfect shot hits 50% harder | Pinning Shot: a critical arrow roots |
+  | Runecraft | Spell Echo: 15% chance of no cooldown | Soul Siphon: a spell kill heals 10% |
+  | Sneaking | Silent Takedown: an ambush finishes an ordinary creature with at most 4x the blow's health | Shadowstep: sneaking a third faster |
+
 - **Insight:** experience that isn't practice (quests, raids, first crafts, buildings, catches, new ground, rune books, experience stones,
   blows no skill trains yet). The player puts it into any skill from the skills window. An old save's character experience becomes
   Insight (`SaveMapper.LegacyExperience`); its talents are gone.

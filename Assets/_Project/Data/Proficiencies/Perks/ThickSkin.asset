@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Thick Skin
   description: Scars are just armour you grew yourself.
   icon: {fileID: 0}
+  technique: 0
   bonuses:
   - stat: 0
     op: 0

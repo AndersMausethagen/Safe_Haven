@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Read the Seam
   description: Every rock tells you where it will break.
   icon: {fileID: 0}
+  technique: 0
   bonuses:
   - stat: 26
     op: 0

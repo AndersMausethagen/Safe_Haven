@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Timber Sense
   description: Sound wood rings; you hear it.
   icon: {fileID: 0}
+  technique: 0
   bonuses:
   - stat: 24
     op: 0

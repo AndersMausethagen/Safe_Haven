@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Shadow Strike
   description: The first blow is the one they never see.
   icon: {fileID: 0}
+  technique: 0
   bonuses:
   - stat: 33
     op: 0

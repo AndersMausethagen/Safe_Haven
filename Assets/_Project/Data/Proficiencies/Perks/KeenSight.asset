@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Keen Sight
   description: Aim for the gap in the hide.
   icon: {fileID: 0}
+  technique: 0
   bonuses:
   - stat: 3
     op: 0

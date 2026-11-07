@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Holy Marks
   description: What the dark fears, worn on the skin.
   icon: {fileID: 0}
+  technique: 0
   bonuses:
   - stat: 11
     op: 0

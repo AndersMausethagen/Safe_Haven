@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Low Profile
   description: A shape among shapes.
   icon: {fileID: 0}
+  technique: 0
   bonuses:
   - stat: 32
     op: 0

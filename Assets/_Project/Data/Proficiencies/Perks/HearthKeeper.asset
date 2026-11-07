@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Hearth Keeper
   description: The Haven keeps you as you keep it.
   icon: {fileID: 0}
+  technique: 0
   bonuses:
   - stat: 0
     op: 0

@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Runemaster
   description: The old words answer to you.
   icon: {fileID: 0}
+  technique: 0
   bonuses:
   - stat: 49
     op: 0

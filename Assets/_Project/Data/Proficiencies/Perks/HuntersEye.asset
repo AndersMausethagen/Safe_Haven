@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Hunter's Eye
   description: Wait for the moment, then end it.
   icon: {fileID: 0}
+  technique: 0
   bonuses:
   - stat: 4
     op: 0

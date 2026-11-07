@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Shield Arm
   description: Take the blow where it hurts least.
   icon: {fileID: 0}
+  technique: 0
   bonuses:
   - stat: 7
     op: 0

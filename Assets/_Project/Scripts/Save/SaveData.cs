@@ -184,6 +184,8 @@ public sealed class ProgressSaveData
     public List<string> perks = new List<string>();
     /// <summary>Experience not yet put into a skill. Missing in older saves.</summary>
     public int insight;
+    /// <summary>Plain pieces made in a row, by kind, for the Sure Hand technique. Missing in older saves.</summary>
+    public List<AmountSaveData> plainRuns = new List<AmountSaveData>();
     /// <summary>Ranks deepened at the altar, by skill id. Missing in older saves.</summary>
     public List<AmountSaveData> skillRanks = new List<AmountSaveData>();
     public List<string> crafted = new List<string>();

@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Assassin
   description: Unaware is as good as undefended.
   icon: {fileID: 0}
+  technique: 0
   bonuses:
   - stat: 33
     op: 0

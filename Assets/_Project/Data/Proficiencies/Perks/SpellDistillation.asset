@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Spell Distillation
   description: A rune in a bottle.
   icon: {fileID: 0}
+  technique: 0
   bonuses:
   - stat: 5
     op: 0

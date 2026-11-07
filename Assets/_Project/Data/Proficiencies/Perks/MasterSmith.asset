@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Master Smith
   description: Others bring their blades to you.
   icon: {fileID: 0}
+  technique: 0
   bonuses:
   - stat: 35
     op: 0

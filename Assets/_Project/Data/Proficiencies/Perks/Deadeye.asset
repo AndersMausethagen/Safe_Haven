@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Deadeye
   description: Where you look, the arrow goes.
   icon: {fileID: 0}
+  technique: 0
   bonuses:
   - stat: 48
     op: 0

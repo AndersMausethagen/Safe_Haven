@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Steady Draw
   description: A bowstring you know like your own breath.
   icon: {fileID: 0}
+  technique: 0
   bonuses:
   - stat: 17
     op: 0

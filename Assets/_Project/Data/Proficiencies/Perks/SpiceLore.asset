@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Spice Lore
   description: A pinch of the right thing.
   icon: {fileID: 0}
+  technique: 0
   bonuses:
   - stat: 39
     op: 0

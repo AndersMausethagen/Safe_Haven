@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Forest Friend
   description: Wood and stone give a little more too.
   icon: {fileID: 0}
+  technique: 0
   bonuses:
   - stat: 18
     op: 0

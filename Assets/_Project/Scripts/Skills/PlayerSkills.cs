@@ -246,7 +246,15 @@ public sealed class PlayerSkills : MonoBehaviour
     private void Perform(SkillDefinition skill)
     {
         float now = Time.time;
-        cooldowns.Start(skill, now, CooldownOf(skill));
+        // Spell Echo: now and then the words leave no weariness behind.
+        if (Techniques.Has(PerkTechnique.SpellEcho) && UnityEngine.Random.value < TechniqueSettings.Current.SpellEchoChance)
+        {
+            GameMessages.Post($"Spell Echo: {skill.DisplayName} is ready again.", MessageKind.Gain);
+        }
+        else
+        {
+            cooldowns.Start(skill, now, CooldownOf(skill));
+        }
         busyUntil = now + skill.CastTime;
 
         // Like the weapon swing, the direction is locked in toward the cursor as the cast begins.

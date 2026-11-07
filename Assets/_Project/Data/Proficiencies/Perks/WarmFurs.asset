@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Warm Furs
   description: Fur on the inside, where it counts.
   icon: {fileID: 0}
+  technique: 0
   bonuses:
   - stat: 10
     op: 0
