@@ -23,13 +23,10 @@ public sealed class PlayerFishing : MonoBehaviour
     private ItemInventory items;
     private Damageable health;
     private FishingLine look;
-    private Vector3 castFrom;
-    private Vector3 landing;
-    private float waterHeight;
+    private FishingCast cast;
     private float chargeStarted;
     private float biteAt;
     private float strikeUntil;
-    private float castLanding;
     private bool held;
     private bool still;
     private FishingSettings.Fish hooked;
@@ -170,7 +167,7 @@ public sealed class PlayerFishing : MonoBehaviour
                 FaceCursor();
                 break;
             case Phase.Waiting:
-                if (Flat(transform.position - castFrom).magnitude > SlackDistance)
+                if (Flat(transform.position - cast.From).magnitude > SlackDistance)
                 {
                     EndLine("You walked off. The line went slack.");
                     return;
@@ -230,14 +227,11 @@ public sealed class PlayerFishing : MonoBehaviour
 
         items.Container.RemoveAt(slot, 1);
         AudioManager.Play(settings.CastSound, transform.position);
-        castFrom = transform.position;
+        cast = new FishingCast(transform.position, new Vector3(target.x, height, target.z), height, Time.time + FishingLine.FlightSeconds);
         still = water.IsStill;
-        waterHeight = height;
-        landing = new Vector3(target.x, height, target.z);
-        castLanding = Time.time + FishingLine.FlightSeconds;
         // The Nøkk's air (SpiritBonds): the water's own spirit sends fish to the line.
         float favour = SpiritBonds.HasGift(SpiritBonds.NokkGift) ? 1.5f : 1f;
-        biteAt = castLanding + Random.Range(settings.BiteWait.x, settings.BiteWait.y) / Mathf.Max(0.1f, lure * favour);
+        biteAt = cast.LandsAt + Random.Range(settings.BiteWait.x, settings.BiteWait.y) / Mathf.Max(0.1f, lure * favour);
         State = Phase.Waiting;
         ShowLine();
     }
@@ -247,7 +241,7 @@ public sealed class PlayerFishing : MonoBehaviour
         FishingSettings settings = FishingSettings.Current;
         State = Phase.Bite;
         strikeUntil = Time.time + settings.StrikeWindow;
-        AudioManager.Play(settings.BiteSound, landing);
+        AudioManager.Play(settings.BiteSound, cast.Landing);
         CameraShake.Add(0.08f);
     }
 
@@ -259,7 +253,7 @@ public sealed class PlayerFishing : MonoBehaviour
             State = Phase.Grabbed;
             HideLine();
             movement.SetSpeedScale(this, 1f);
-            NokkenEncounter.Begin(this, landing, waterHeight, () =>
+            NokkenEncounter.Begin(this, cast.Landing, cast.WaterHeight, () =>
             {
                 State = Rod != null ? Phase.Ready : Phase.None;
             });
@@ -375,7 +369,7 @@ public sealed class PlayerFishing : MonoBehaviour
 
     private void HideLine() => look.Hide();
 
-    private void AnimateBobber() => look.Tick(landing, castLanding, State, Reel, castFrom, waterHeight);
+    private void AnimateBobber() => look.Tick(cast, State, Reel);
 
     private void OnDestroy() => look?.Destroy();
 

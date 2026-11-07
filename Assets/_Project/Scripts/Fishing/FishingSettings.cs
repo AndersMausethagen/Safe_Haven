@@ -78,6 +78,14 @@ public sealed class FishingSettings : GameSettings<FishingSettings>
     [Tooltip("Raised the first time the player meets the Nøkken (quests, stories).")]
     [SerializeField, RaisedByGame] private GameEventDefinition metNokken;
 
+    [Header("Float and Line")]
+    [Tooltip("What bobs on the water: a model without colliders, about 15 cm across. Empty: a plain sphere.")]
+    [SerializeField] private GameObject floatModel;
+    [Tooltip("The fishing line's material. It is tinted by Line Colour.")]
+    [SerializeField] private Material lineMaterial;
+    [SerializeField] private Color lineColour = new Color(0.9f, 0.9f, 0.85f, 0.8f);
+    [SerializeField, Min(0.001f)] private float lineWidth = 0.012f;
+
     [Header("Sound")]
     [SerializeField] private SoundDefinition castSound;
     [SerializeField] private SoundDefinition biteSound;
@@ -105,6 +113,10 @@ public sealed class FishingSettings : GameSettings<FishingSettings>
     public SoundDefinition NokkenScream => nokkenScream;
     public SoundDefinition NokkenSplash => nokkenSplash;
     public GameEventDefinition MetNokken => metNokken;
+    public GameObject FloatModel => floatModel;
+    public Material LineMaterial => lineMaterial;
+    public Color LineColour => lineColour;
+    public float LineWidth => lineWidth;
     public SoundDefinition CastSound => castSound;
     public SoundDefinition BiteSound => biteSound;
     public SoundDefinition CatchSound => catchSound;

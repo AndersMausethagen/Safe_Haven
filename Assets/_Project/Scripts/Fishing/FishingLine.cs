@@ -1,9 +1,27 @@
 using UnityEngine;
 
+/// <summary>Where a line was cast: from where the player stood to the spot on the water, and when the float lands there.</summary>
+public readonly struct FishingCast
+{
+    public readonly Vector3 From;
+    public readonly Vector3 Landing;
+    public readonly float WaterHeight;
+    public readonly float LandsAt;
+
+    public FishingCast(Vector3 from, Vector3 landing, float waterHeight, float landsAt)
+    {
+        From = from;
+        Landing = landing;
+        WaterHeight = waterHeight;
+        LandsAt = landsAt;
+    }
+}
+
 /// <summary>
-/// The float and the line while fishing: a red-and-white float that arcs out from the rod tip, bobs on the water, goes
-/// under at a bite and is drawn in while reeling, with a line to it that sags until it is taut. Made the first time a line
-/// is cast. Plain C#, owned by <see cref="PlayerFishing"/>, which says where the float is meant to be.
+/// The float and the line while fishing: the float arcs out from the rod tip, bobs on the water, goes under at a bite and
+/// is drawn in while reeling, with a line to it that sags until it is taut. What they look like is FishingSettings'
+/// (Float and Line); how they move is here. Made the first time a line is cast. Plain C#, owned by
+/// <see cref="PlayerFishing"/>, which says where the line was cast.
 /// </summary>
 public sealed class FishingLine
 {
@@ -11,6 +29,8 @@ public sealed class FishingLine
     public const float FlightSeconds = 0.45f;
 
     private const int Points = 12;
+    // The size of the plain sphere used when the settings name no float.
+    private const float PlainFloatSize = 0.14f;
 
     private readonly Transform angler;
     private Transform bobber;
@@ -42,11 +62,10 @@ public sealed class FishingLine
     }
 
     /// <summary>
-    /// Places the float and draws the line: in flight until <paramref name="landsAt"/>, then on the water at
-    /// <paramref name="landing"/>, under at a bite and drawn towards the bank (<paramref name="castFrom"/> at
-    /// <paramref name="waterHeight"/>) as the reel's catch fills.
+    /// Places the float and draws the line: in flight until the cast lands, then on the water, under at a bite and drawn
+    /// towards the bank as the reel's catch fills.
     /// </summary>
-    public void Tick(Vector3 landing, float landsAt, PlayerFishing.Phase phase, ReelSession reel, Vector3 castFrom, float waterHeight)
+    public void Tick(in FishingCast cast, PlayerFishing.Phase phase, ReelSession reel)
     {
         if (bobber == null || !bobber.gameObject.activeSelf)
         {
@@ -55,18 +74,18 @@ public sealed class FishingLine
 
         Vector3 tip = angler.position + Vector3.up * 1.7f + angler.forward * 0.7f + angler.right * 0.25f;
         Vector3 at;
-        if (Time.time < landsAt)
+        if (Time.time < cast.LandsAt)
         {
             // In flight: an arc from the rod tip to where it lands.
-            float t = 1f - (landsAt - Time.time) / FlightSeconds;
-            at = Vector3.Lerp(tip, landing, t) + Vector3.up * Mathf.Sin(t * Mathf.PI) * 2f;
+            float t = 1f - (cast.LandsAt - Time.time) / FlightSeconds;
+            at = Vector3.Lerp(tip, cast.Landing, t) + Vector3.up * Mathf.Sin(t * Mathf.PI) * 2f;
         }
         else
         {
             float bob = Mathf.Sin(Time.time * 2.4f) * 0.025f;
             float under = phase == PlayerFishing.Phase.Bite ? -0.18f : phase == PlayerFishing.Phase.Reeling ? -0.06f + Mathf.Sin(Time.time * 17f) * 0.04f : 0f;
-            Vector3 bank = new Vector3(castFrom.x, waterHeight, castFrom.z);
-            Vector3 drawn = phase == PlayerFishing.Phase.Reeling && reel != null ? Vector3.Lerp(landing, bank, reel.Catch * 0.6f) : landing;
+            Vector3 bank = new Vector3(cast.From.x, cast.WaterHeight, cast.From.z);
+            Vector3 drawn = phase == PlayerFishing.Phase.Reeling && reel != null ? Vector3.Lerp(cast.Landing, bank, reel.Catch * 0.6f) : cast.Landing;
             at = drawn + Vector3.up * (bob + under);
         }
 
@@ -87,23 +106,24 @@ public sealed class FishingLine
 
     private void Build()
     {
-        GameObject body = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        Object.DestroyImmediate(body.GetComponent<Collider>());
-        body.name = "Fishing Float";
-        body.transform.localScale = Vector3.one * 0.14f;
-        body.GetComponent<Renderer>().material.color = new Color(0.85f, 0.15f, 0.1f);
-        GameObject cap = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        Object.DestroyImmediate(cap.GetComponent<Collider>());
-        cap.transform.SetParent(body.transform, false);
-        cap.transform.localPosition = Vector3.up * 0.45f;
-        cap.transform.localScale = Vector3.one * 0.6f;
-        cap.GetComponent<Renderer>().material.color = Color.white;
-        bobber = body.transform;
+        FishingSettings settings = FishingSettings.Current;
+        if (settings.FloatModel != null)
+        {
+            bobber = Object.Instantiate(settings.FloatModel).transform;
+        }
+        else
+        {
+            GameObject plain = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            Object.DestroyImmediate(plain.GetComponent<Collider>());
+            plain.transform.localScale = Vector3.one * PlainFloatSize;
+            bobber = plain.transform;
+        }
 
+        bobber.name = "Fishing Float";
         line = new GameObject("Fishing Line").AddComponent<LineRenderer>();
         line.positionCount = Points;
-        line.widthMultiplier = 0.012f;
-        line.material = new Material(Shader.Find("Sprites/Default"));
-        line.startColor = line.endColor = new Color(0.9f, 0.9f, 0.85f, 0.8f);
+        line.widthMultiplier = settings.LineWidth;
+        line.sharedMaterial = settings.LineMaterial;
+        line.startColor = line.endColor = settings.LineColour;
     }
 }

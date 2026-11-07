@@ -59,6 +59,10 @@ MonoBehaviour:
   nokkenScream: {fileID: 11400000, guid: 6510718f5af764e4aa78349c4b3f7cdf, type: 2}
   nokkenSplash: {fileID: 11400000, guid: 5b92b167e5b591449b2fcd212c1db02b, type: 2}
   metNokken: {fileID: 11400000, guid: 59322588444ffdc4189d97bdc8cd89cd, type: 2}
+  floatModel: {fileID: 2114678918455451842, guid: 91cd44f02a8a8dc4895c8f4608b2e4f2, type: 3}
+  lineMaterial: {fileID: 2100000, guid: cfcf00604847de146aec40174c56be0f, type: 2}
+  lineColour: {r: 0.9, g: 0.9, b: 0.85, a: 0.8}
+  lineWidth: 0.012
   castSound: {fileID: 11400000, guid: e3702f94155b6bc42b71a0d0872c141d, type: 2}
   biteSound: {fileID: 11400000, guid: 5b92b167e5b591449b2fcd212c1db02b, type: 2}
   catchSound: {fileID: 11400000, guid: 267e4afb23133494087d8d9ce98fe7e4, type: 2}
