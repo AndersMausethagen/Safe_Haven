@@ -109,5 +109,7 @@ The home quest line (`SafeHaven`, under **Home Moments**, built by `AgentScripts
 - What a story changes in the world (an object hidden, a gate opened) is kept after loading by that object's own
   SaveableEntity; the story itself only remembers which triggers have fired.
 - Withered ground and glows are not saved.
-- New node kinds: subclass `StoryNode` (or `StoryTrigger`) in `Scripts/Story/StoryNodes.cs`, mark it `[Serializable]`,
-  give it a Title, a Category and Run (or Listen). Don't rename node classes once graphs use them.
+- New node kinds: subclass `StoryNode` (or `StoryTrigger`) in the file for its menu category (`Scripts/Story/StoryTriggers.cs`,
+  `StoryTalkNodes.cs`, `StoryFlowNodes.cs`, `StoryQuestNodes.cs`, `StoryWorldNodes.cs`, `StoryCameraSoundNodes.cs`), mark it
+  `[Serializable]`, give it a Title, a Category and Run (or Listen). Graphs find a node by its class name, not its file, so a
+  node can move between files; don't rename node classes once graphs use them.

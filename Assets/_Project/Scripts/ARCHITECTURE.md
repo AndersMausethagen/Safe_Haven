@@ -380,8 +380,8 @@ Who someone is comes from the object: `Talkable` asks any `IQuestPerson` beside 
 remembered in the quest log's saved set (`QuestDeeds` keys, e.g. `talked:expedition.sigrid`), so Count Already Owned, a
 quest's **When Player Does** start (`QuestDefinition.StartWhen`, any objective as the condition) and once-per-game triggers
 know a deed done earlier; old saves' per-person event ids map to the deeds (`QuestDeeds.FromLegacy`). Stories use the same
-vocabulary: the trigger **When Player: …** (`WhenPlayerDid`) and the step **Count As Done** (`CountAsDoneNode`), in
-`Story/StoryDeedNodes.cs`.
+vocabulary: the trigger **When Player: …** (`WhenPlayerDid`, in `Story/StoryTriggers.cs`) and the step **Count As
+Done** (`CountAsDoneNode`, in `Story/StoryQuestNodes.cs`).
 
 For designers (Content Editor › Quests):
 
