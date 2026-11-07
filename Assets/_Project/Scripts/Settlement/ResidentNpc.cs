@@ -182,6 +182,21 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics, IQuestPers
             page.Body = said != null ? said + "\n\n" + body : body.ToString();
         }
 
+        // A lesson in their job's skill, once between raids.
+        ResidentRecord record = GameSession.Settlement.Find(resident);
+        if (current != null && current.Teaches != null && record != null)
+        {
+            ProficiencyDefinition skill = current.Teaches;
+            string why = record.TaughtSinceRaid ? "Another, after your next raid." : $"What a {SettlementSettings.Current.RankFor(record.WorkDone).name} {current.DisplayName} knows";
+            page.Add(new MenuAction($"Ask for a lesson in {skill.DisplayName}", why, !record.TaughtSinceRaid, () =>
+            {
+                int learned = ExperienceTracker.TakeLesson(record);
+                DialogueBox.Current.Say(speaker, learned > 0
+                    ? $"Watch my hands, not my face. There. (+{learned} {skill.DisplayName})"
+                    : "There's nothing more I can show you. You know it better than I do now.", afterAnswer);
+            }));
+        }
+
         foreach (JobDefinition job in GameSession.Settlement.JobsOpenTo(resident))
         {
             if (job == null)

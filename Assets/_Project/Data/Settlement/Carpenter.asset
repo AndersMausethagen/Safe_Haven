@@ -35,6 +35,7 @@ MonoBehaviour:
   - recipe: {fileID: 11400000, guid: 496e771937405b14095ec667cded81a4, type: 2}
     stockTarget: 40
     keepInput: 10
+  teaches: {fileID: 11400000, guid: a277ba53f2eae0648aa06826e44cbfd8, type: 2}
   assignedEvent: {fileID: 0}
   extraRumours: 0
   gearRepairDiscount: 0

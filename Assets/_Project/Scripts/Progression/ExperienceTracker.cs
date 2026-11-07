@@ -165,6 +165,38 @@ public sealed class ExperienceTracker : MonoBehaviour, IGameSystem
         return Mathf.Max(0f, 1f + mentor + gain);
     }
 
+    /// <summary>The tier a resident teaches at: their rank in the job, or their workplace's tier if that is higher.</summary>
+    public static int LessonTier(ResidentRecord teacher)
+    {
+        if (teacher == null || teacher.Job == null)
+        {
+            return 1;
+        }
+
+        int rank = 1 + SettlementSettings.Current.RankIndex(teacher.WorkDone);
+        int workplace = teacher.Job.Workplace != null ? GameSession.Settlement.BuiltTier(teacher.Job.Workplace) : 0;
+        return Mathf.Clamp(Mathf.Max(rank, workplace), 1, Tiers.Max);
+    }
+
+    /// <summary>
+    /// A resident's lesson in their job's skill: the tier experience of what they know times the lesson's work, falling off
+    /// like practice when the player already knows more than they can teach. Once between raids each. Returns what it gave.
+    /// </summary>
+    public static int TakeLesson(ResidentRecord teacher)
+    {
+        ProficiencyDefinition skill = teacher?.Job?.Teaches;
+        if (skill == null || teacher.TaughtSinceRaid)
+        {
+            return 0;
+        }
+
+        int before = GameSession.Progress.ExperienceOf(skill);
+        int tier = LessonTier(teacher);
+        Practise(skill, tier, Rules.TierExperience(tier) * SettlementSettings.Current.LessonWork, false);
+        teacher.TaughtSinceRaid = true;
+        return GameSession.Progress.ExperienceOf(skill) - before;
+    }
+
     /// <summary>A share of a friend's practice, learned by watching (CoopLessons). Kept at once, and never passed on again.</summary>
     public static void LearnByWatching(ProficiencyDefinition skill, float amount)
     {

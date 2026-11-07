@@ -205,7 +205,8 @@ public sealed class CraftingStation : MonoBehaviour
             StationQueue queue = GameSession.Settlement.Workshops.GetOrCreate(Id, type, OutputCapacity, QueueLength);
             if (queue != null)
             {
-                queue.SpeedMultiplier = Speed;
+                // The building's level, and the rank of the resident who works here.
+                queue.SpeedMultiplier = Speed * GameSession.Settlement.WorkerSpeed(type);
                 queue.Tier = Tier;
             }
 

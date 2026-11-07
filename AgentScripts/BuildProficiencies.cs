@@ -33,9 +33,10 @@ public static class BuildProficiencies
         string mentors = Mentors(skills);
         string rested = Rested();
         string gates = Gates(skills);
+        string teachers = Teachers(skills);
         string talents = AssetDatabase.IsValidFolder(OldTalents) && AssetDatabase.DeleteAsset(OldTalents) ? "old talents removed" : "no old talents";
         AssetDatabase.SaveAssets();
-        return $"{skills.Count} skills; {settings}; {mentors}; {rested}; {gates}; {talents}";
+        return $"{skills.Count} skills; {settings}; {mentors}; {rested}; {gates}; {teachers}; {talents}";
     }
 
     // ----- Gathering -----
@@ -517,6 +518,37 @@ public static class BuildProficiencies
         BoonSource source = prefab != null ? prefab.GetComponentInChildren<BoonSource>(true) : null;
         string sauna = source != null && AddBonus(new SerializedObject(source), "bonuses", StatType.ExperienceGain, 0.1f) ? "sauna +10%" : "sauna had it";
         return rested + ", " + sauna;
+    }
+
+    // The skill each job's resident gives a lesson in, once between raids. Warden and Tracker are Melee's and Sneaking's
+    // teachers, who have no building to learn from; nobody teaches Fishing yet.
+    private static readonly Dictionary<string, string> JobTeaches = new Dictionary<string, string>
+    {
+        { "Smith", "weaponcrafting" }, { "Weaver", "armorcrafting" }, { "Cook", "cooking" }, { "Mason", "construction" },
+        { "Carpenter", "woodcutting" }, { "Farmer", "foraging" }, { "Hunter", "archery" }, { "Warden", "melee" },
+        { "Tracker", "sneaking" }, { "RuneScholar", "runecraft" },
+    };
+
+    private static string Teachers(List<ProficiencyDefinition> skills)
+    {
+        int set = 0;
+        foreach (string guid in AssetDatabase.FindAssets("t:JobDefinition"))
+        {
+            var job = AssetDatabase.LoadAssetAtPath<JobDefinition>(AssetDatabase.GUIDToAssetPath(guid));
+            if (job == null)
+            {
+                continue;
+            }
+
+            ProficiencyDefinition skill = JobTeaches.TryGetValue(job.name, out string id) ? skills.Find(candidate => candidate.Id == id) : null;
+            var so = new SerializedObject(job);
+            so.FindProperty("teaches").objectReferenceValue = skill;
+            so.ApplyModifiedPropertiesWithoutUndo();
+            EditorUtility.SetDirty(job);
+            set += skill != null ? 1 : 0;
+        }
+
+        return $"{set} jobs teach";
     }
 
     // A few special crafts only a practised hand can make: the tier V Trollstone work and the finest meal and draught.

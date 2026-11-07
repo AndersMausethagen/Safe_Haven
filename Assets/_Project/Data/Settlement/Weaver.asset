@@ -29,9 +29,11 @@ MonoBehaviour:
   - recipe: {fileID: 11400000, guid: 6188361025614234b9e434545f1036f7, type: 2}
     stockTarget: 20
     keepInput: 3
+  teaches: {fileID: 11400000, guid: 088b48bc19cfef1429d3cde1d9bc6f5e, type: 2}
   assignedEvent: {fileID: 0}
   extraRumours: 0
   gearRepairDiscount: 0
   buildingRepairDiscount: 0
+  defendsAs: {fileID: 0}
   wardHealth: 0
   raidSeconds: 0

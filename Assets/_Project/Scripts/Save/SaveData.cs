@@ -163,6 +163,10 @@ public sealed class ResidentSaveData
     public bool stranger;
     public int comingBack;
     public bool allCameBack;
+    /// <summary>Crafts made on their own, for their rank in the job. Missing in older saves: a novice.</summary>
+    public int workDone;
+    /// <summary>A lesson given since the last raid survived.</summary>
+    public bool taughtSinceRaid;
 }
 
 [Serializable]

@@ -42,6 +42,10 @@ public sealed class ResidentRecord
     public CompanionMemory ComingBack { get; set; }
     /// <summary>That was the last of them.</summary>
     public bool AllCameBack { get; set; }
+    /// <summary>Crafts made at their workplace on their own: their rank in the job grows with it (SettlementSettings › Worker Ranks).</summary>
+    public int WorkDone { get; set; }
+    /// <summary>They have given the player a lesson since the last raid survived (one each in between).</summary>
+    public bool TaughtSinceRaid { get; set; }
 }
 
 /// <summary>Someone who went along on a raid and didn't come home. The forest has them: they can be found again, and won't know the player.</summary>
@@ -370,6 +374,11 @@ public sealed class SettlementState
         SuccessfulExtractions++;
         WardStrain = Math.Max(0, WardStrain - 1);
         tradeBought.Clear();
+        foreach (ResidentRecord record in residents)
+        {
+            record.TaughtSinceRaid = false;
+        }
+
         Changed?.Invoke();
     }
 
@@ -413,6 +422,27 @@ public sealed class SettlementState
         WardStrain = Math.Max(WardStrain, strainRaids);
         BreachPendingSince = SuccessfulExtractions;
         Changed?.Invoke();
+    }
+
+    /// <summary>The resident whose job works at this kind of station, if one does.</summary>
+    public ResidentRecord WorkerAt(CraftingStationType station)
+    {
+        foreach (ResidentRecord record in residents)
+        {
+            if (record.Job != null && record.Job.Workplace != null && record.Job.Workplace.Station == station && station != CraftingStationType.None)
+            {
+                return record;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>How much faster a station works for the rank of the resident who works there (1 with nobody).</summary>
+    public float WorkerSpeed(CraftingStationType station)
+    {
+        ResidentRecord worker = WorkerAt(station);
+        return worker != null ? SettlementSettings.Current.RankFor(worker.WorkDone).speed : 1f;
     }
 
     public ResidentRecord Find(ResidentDefinition resident)

@@ -32,9 +32,11 @@ MonoBehaviour:
   workSoundDelay: 0.4
   workSoundEvery: {x: 7, y: 16}
   workOrders: []
+  teaches: {fileID: 11400000, guid: 0bf8c75e4c32304428c7000e1e01913b, type: 2}
   assignedEvent: {fileID: 0}
   extraRumours: 0
   gearRepairDiscount: 0
   buildingRepairDiscount: 0
+  defendsAs: {fileID: 0}
   wardHealth: 0
   raidSeconds: 0

@@ -130,6 +130,19 @@ Insight Share Above), so it catches a neglected skill up but practice always lea
 The bar along the bottom follows the skill trained last, with its next milestone ("perk at 20"); a level shows a banner high in the
 middle of the screen for a few seconds, a milestone for longer, with the perk to choose.
 
+## Residents learn, and teach
+
+A resident working through their job's orders gets better at it with every craft (`ResidentRecord.WorkDone`, saved): Novice,
+Apprentice (10), Journeyman (30), Expert (70), Master (150) (`SettlementSettings` › Worker Ranks). Each rank makes their station work
+10% faster, for the player's orders too, and gives a 3% chance more of one extra of what they make. The Haven window's People page
+shows their rank.
+
+Every resident with a job gives the player one lesson in their job's skill between raids ("Ask for a lesson in...", in conversation):
+the tier experience of what they know (their rank, or their workplace's tier if higher) times 6, falling off like practice once the
+player knows more than they can teach. Smith: Weaponcrafting; Weaver: Armorcrafting; Cook: Cooking; Mason: Construction; Carpenter:
+Woodcutting; Farmer: Foraging; Hunter: Archery; Warden: Melee; Tracker: Sneaking; Rune Scholar: Runecraft. So Melee and Sneaking,
+which have no building, have teachers; nobody teaches Fishing yet.
+
 ## Playing together
 
 A friend's practice within 20 m in the same place teaches the player a quarter of it (`CoopLessons`, the `SafeHaven.Lesson` message,
@@ -163,4 +176,4 @@ Setting out rested from a comfortable Haven (`HavenSettings` › Rested Bonuses,
   minutes at which real runs (without cheats) reached levels 5 to 50.
 - The raid planner shows the best fighting skill beside the gear score, against the level the tier expects (10, 20, 30, 40).
 - The prologue at level 1 took a blow more per fight before the eased curve; with a few wolves down that is mostly gone. Playtest it.
-- Fishing, Melee and Sneaking have no mentor yet (a dock, a training yard).
+- Fishing has neither a mentor building nor a teacher (a dock and a fisher would do).

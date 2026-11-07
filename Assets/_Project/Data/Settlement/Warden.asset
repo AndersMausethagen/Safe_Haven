@@ -26,6 +26,7 @@ MonoBehaviour:
   workSoundDelay: 0.4
   workSoundEvery: {x: 1.5, y: 4}
   workOrders: []
+  teaches: {fileID: 11400000, guid: 98481e79d59499846a4c2d233cfe5948, type: 2}
   assignedEvent: {fileID: 0}
   extraRumours: 0
   gearRepairDiscount: 0

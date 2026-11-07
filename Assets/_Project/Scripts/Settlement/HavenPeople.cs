@@ -53,6 +53,16 @@ public static class HavenPeople
         if (job != null)
         {
             entry.Details.Add(new HavenDetail(job.DisplayName, JobText(job)));
+            SettlementSettings people = SettlementSettings.Current;
+            if (job.WorkOrders.Count > 0)
+            {
+                entry.Details.Add(new HavenDetail("Rank", $"{people.RankFor(record.WorkDone).name} ({record.WorkDone} made)"));
+            }
+
+            if (job.Teaches != null)
+            {
+                entry.Details.Add(new HavenDetail("Teaches", record.TaughtSinceRaid ? $"{job.Teaches.DisplayName} (again after a raid)" : job.Teaches.DisplayName));
+            }
             string workplace = WorkplaceText(job);
             if (workplace != null)
             {

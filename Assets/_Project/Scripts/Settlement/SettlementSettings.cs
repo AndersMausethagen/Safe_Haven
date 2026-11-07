@@ -36,6 +36,56 @@ public sealed class SettlementSettings : GameSettings<SettlementSettings>
         [Range(0f, 0.9f)] public float extractionCut;
     }
 
+    /// <summary>How good a worker has become at their job, by the crafts they have made.</summary>
+    [System.Serializable]
+    public struct WorkerRank
+    {
+        public string name;
+        [Tooltip("Crafts made at their workplace to reach it.")]
+        [Min(0)] public int crafts;
+        [Tooltip("How much faster their station works.")]
+        [Min(0.1f)] public float speed;
+        [Tooltip("Chance of one more of what they make.")]
+        [Range(0f, 1f)] public float extraChance;
+
+        public WorkerRank(string name, int crafts, float speed, float extraChance)
+        {
+            this.name = name;
+            this.crafts = crafts;
+            this.speed = speed;
+            this.extraChance = extraChance;
+        }
+    }
+
+    [Header("Workers learn")]
+    [Tooltip("Lowest first. A worker reaches each by the crafts they make at their workplace.")]
+    [SerializeField] private List<WorkerRank> workerRanks = new List<WorkerRank>
+    {
+        new WorkerRank("Novice", 0, 1f, 0f), new WorkerRank("Apprentice", 10, 1.1f, 0.03f), new WorkerRank("Journeyman", 30, 1.2f, 0.06f),
+        new WorkerRank("Expert", 70, 1.3f, 0.09f), new WorkerRank("Master", 150, 1.4f, 0.12f),
+    };
+    [Tooltip("A lesson from a resident, in the tier experience of their rank (or their workplace's tier, if higher).")]
+    [SerializeField, Min(0f)] private float lessonWork = 6f;
+
+    public float LessonWork => lessonWork;
+
+    /// <summary>The rank a worker with this many crafts behind them has reached, and its place in the list.</summary>
+    public WorkerRank RankFor(int crafts) => workerRanks.Count > 0 ? workerRanks[RankIndex(crafts)] : new WorkerRank("", 0, 1f, 0f);
+
+    public int RankIndex(int crafts)
+    {
+        int index = 0;
+        for (int i = 0; i < workerRanks.Count; i++)
+        {
+            if (crafts >= workerRanks[i].crafts)
+            {
+                index = i;
+            }
+        }
+
+        return index;
+    }
+
     [Header("Daily Life")]
     [Tooltip("The hour residents get up.")]
     [SerializeField, Range(0f, 24f)] private float residentWakeHour = 6.5f;

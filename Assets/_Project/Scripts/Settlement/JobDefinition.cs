@@ -25,6 +25,7 @@ public sealed class WorkOrder
 public sealed class JobDefinition : ScriptableObject
 {
     public EmoteDefinition WorkGesture => workGesture;
+    public ProficiencyDefinition Teaches => teaches;
     public ItemDefinition WorkTool => workTool;
     public float WorkToolScale => workToolScale;
     public SoundDefinition WorkSound => workSound;
@@ -58,6 +59,8 @@ public sealed class JobDefinition : ScriptableObject
     [SerializeField] private Vector2 workSoundEvery = new Vector2(1.5f, 4f);
     [Tooltip("What they keep making on their own at their workplace, first that can be made first, while the player is away too.")]
     [SerializeField] private List<WorkOrder> workOrders = new List<WorkOrder>();
+    [Tooltip("The skill they can give the player a lesson in, once between raids. Empty for none.")]
+    [SerializeField] private ProficiencyDefinition teaches;
     [Tooltip("Raised when someone takes the job, for quests such as \"Find work for the traveler\".")]
     [SerializeField, RaisedByGame] private GameEventDefinition assignedEvent;
 

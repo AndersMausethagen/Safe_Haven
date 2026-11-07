@@ -76,6 +76,7 @@ public sealed class SettlementSystem : MonoBehaviour, IGameSystem
         if (station.WorkerCrafts > 0)
         {
             station.WorkerCrafts--;
+            WorkerLearned(station, recipe);
             if (recipe.OutputDefinition is IStackDefinition made)
             {
                 GameSession.Settlement.NoteMadeByWorker(made, recipe.OutputAmount);
@@ -88,6 +89,30 @@ public sealed class SettlementSystem : MonoBehaviour, IGameSystem
             {
                 GameMessages.Post($"The {station.Type.DisplayName()} finished {recipe.DisplayName}.", MessageKind.Gain);
             }
+        }
+    }
+
+    // A worker gets better at their job with every craft: a new rank speeds their station, and a practised hand may get
+    // one more out of what they make.
+    private static void WorkerLearned(StationQueue station, RecipeDefinition recipe)
+    {
+        ResidentRecord worker = GameSession.Settlement.WorkerAt(station.Type);
+        if (worker == null)
+        {
+            return;
+        }
+
+        SettlementSettings settings = SettlementSettings.Current;
+        int before = settings.RankIndex(worker.WorkDone);
+        worker.WorkDone++;
+        if (settings.RankIndex(worker.WorkDone) > before && worker.Job != null)
+        {
+            GameMessages.Post($"{worker.Resident.DisplayName} is now a {settings.RankFor(worker.WorkDone).name} {worker.Job.DisplayName}.", MessageKind.Gain);
+        }
+
+        if (recipe.Output != null && !recipe.Output.HasDurability && UnityEngine.Random.value < settings.RankFor(worker.WorkDone).extraChance)
+        {
+            station.AddExtra(recipe.Output, 1);
         }
     }
 
