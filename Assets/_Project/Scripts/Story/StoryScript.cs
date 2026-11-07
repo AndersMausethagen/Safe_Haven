@@ -14,6 +14,11 @@ using UnityEngine;
 /// world is kept by those objects' own SaveableEntities). Quests stay data: a story moves them on by raising Quest
 /// Events and starting quests, and reacts to them through its triggers.
 /// </para>
+/// <para>
+/// Co-op: a story's progress is each player's own, so a friend visiting someone's Haven doesn't play that Haven's
+/// stories (they would start quests and stage scenes from the visitor's own progress in the host's world). Its triggers
+/// wait, unspent, for the friend's own Haven; stories in a raid followed with the host run as usual.
+/// </para>
 /// </summary>
 [DisallowMultipleComponent]
 [AddComponentMenu("Safe Haven/Quests/Story Script")]
@@ -154,7 +159,7 @@ public sealed class StoryScript : MonoBehaviour, ISaveable, ISharedState
     /// <summary>Starts the story from a trigger, unless it is once-only and has fired before.</summary>
     public void Fire(StoryTrigger trigger)
     {
-        if (trigger == null || !isActiveAndEnabled || trigger.once && fired.Contains(trigger.id))
+        if (trigger == null || !isActiveAndEnabled || trigger.once && fired.Contains(trigger.id) || HavenVisit.InHostsHaven)
         {
             return;
         }

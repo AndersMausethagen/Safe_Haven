@@ -88,6 +88,29 @@ public sealed class StoryTests
     }
 
     [Test]
+    public void AVisitor_DoesntPlayTheHostsHavenStories_ButKeepsThemForHome()
+    {
+        holder = new GameObject("Story");
+        var script = holder.AddComponent<StoryScript>();
+        var trigger = new WhenQuestEvent();
+        script.AddNode(trigger);
+        var visiting = typeof(HavenVisit).GetProperty(nameof(HavenVisit.IsVisiting));
+        visiting.SetValue(null, true);
+        try
+        {
+            script.Fire(trigger);
+            Assert.IsFalse(script.HasFired(trigger), "Not in a friend's Haven, and not spent there either");
+        }
+        finally
+        {
+            visiting.SetValue(null, false);
+        }
+
+        script.Fire(trigger);
+        Assert.IsTrue(script.HasFired(trigger), "At home it plays");
+    }
+
+    [Test]
     public void TheDemoTellsBothStories()
     {
         string scene = System.IO.File.ReadAllText("Assets/_Project/Scenes/Demo/StoryDemo.unity");

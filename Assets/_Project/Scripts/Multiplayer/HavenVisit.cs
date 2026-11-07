@@ -28,6 +28,9 @@ public static class HavenVisit
     /// <summary>True while this player is a guest in a friend's Haven.</summary>
     public static bool IsVisiting { get; private set; }
 
+    /// <summary>True while a guest stands in the host's Haven itself (a visit goes on through a raid followed with the host).</summary>
+    public static bool InHostsHaven => IsVisiting && GameSession.ActiveRaid == null;
+
     /// <summary>The host's name, while visiting.</summary>
     public static string HostName { get; private set; } = string.Empty;
 
