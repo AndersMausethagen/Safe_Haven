@@ -56,6 +56,7 @@ Shader "Safe Haven/Grass"
         HLSLINCLUDE
         #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
         #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
+        #include "Assets/_Project/Shaders/SurfaceWetness.hlsl"
         #define GRASS_MAX_INTERACTORS 8
         TEXTURE2D(_BaseMap); SAMPLER(sampler_BaseMap);
         CBUFFER_START(UnityPerMaterial)
@@ -333,9 +334,10 @@ Shader "Safe Haven/Grass"
                 data.smoothness = _Smoothness;
                 data.occlusion = 1;
                 data.normalTS = half3(0, 0, 1);
+                SurfaceWet(data.albedo, data.smoothness, lighting.normalWS, input.positionWS, 0.5);
                 half4 colour = UniversalFragmentPBR(lighting, data);
                 // Sun shining through the blades when looking towards it.
-                Light sun = GetMainLight(lighting.shadowCoord);
+                Light sun = GetMainLight(lighting.shadowCoord, input.positionWS, lighting.shadowMask);
                 half back = pow(saturate(dot(lighting.viewDirectionWS, -sun.direction)), 4.0);
                 colour.rgb += albedo.rgb * sun.color * back * _Translucency * sun.shadowAttenuation;
                 colour.rgb += _GlowColor.rgb * input.glow; // glowing plants at night (bloom does the halo)

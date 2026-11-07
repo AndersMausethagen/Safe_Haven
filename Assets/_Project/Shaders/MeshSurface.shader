@@ -32,7 +32,7 @@ Shader "Safe Haven/Mesh Surface (Tessellated)"
         [ToggleOff(_RECEIVE_SHADOWS_OFF)] _ReceiveShadows("Receive Shadows", Float) = 1
         [ToggleOff(_SPECULARHIGHLIGHTS_OFF)] _SpecularHighlights("Specular Highlights", Float) = 1
         [ToggleOff(_ENVIRONMENTREFLECTIONS_OFF)] _EnvironmentReflections("Environment Reflections", Float) = 1
-        [Toggle(_SEASON_SNOW)] _SeasonSnow("Snow Settles On It (winter)", Float) = 0
+        [Toggle(_SEASON_SNOW)] _SeasonSnow("Weather Settles On It (snow, rain)", Float) = 0
     }
     SubShader
     {
@@ -79,6 +79,7 @@ Shader "Safe Haven/Mesh Surface (Tessellated)"
             #pragma shader_feature_local_fragment _ _SEASON_SNOW
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
             #define SEASON_SNOW_WRAP_PBR
+            #include "Assets/_Project/Shaders/SurfaceWetness.hlsl"
             #include "Assets/_Project/Shaders/SeasonSnow.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/Shaders/LitForwardPass.hlsl"
             #define MESH_FORWARD

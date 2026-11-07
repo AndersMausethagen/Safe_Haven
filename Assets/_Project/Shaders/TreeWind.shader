@@ -90,6 +90,7 @@ Shader "Safe Haven/Tree Wind"
             color.rgb = lerp(color.rgb, half3(0.8, 0.85, 0.9) * (0.45 + grey), _SafeHavenSeason.z * 0.28);
             return color;
         }
+        #include "Assets/_Project/Shaders/SurfaceWetness.hlsl"
         #include "Assets/_Project/Shaders/SeasonSnow.hlsl"
         // Snow on the tops of crowns and branches: what faces up whitens, in clumps, so the woods read wintry from above.
         half3 SnowOn(half3 albedo, half3 normalWS, float2 uv)
@@ -215,6 +216,9 @@ Shader "Safe Haven/Tree Wind"
                 shadow = BEYOND_SHADOW_FAR(coord) ? 1.0 : LerpWhiteTo(raw, GetMainLightShadowParams().x);
                 shadow = lerp(shadow, 1.0, GetMainLightShadowFade(input.positionWS));
             #endif
+            #if defined(_LIGHT_COOKIES)
+                shadow *= SampleMainLightCookie(input.positionWS).r; // passing cloud shadows
+            #endif
             half3 light = input.ambient + input.sun * shadow;
             #if defined(_ADDITIONAL_LIGHTS)
                 half3 normal = normalize(input.normalWS) * faceSign;
@@ -250,6 +254,7 @@ Shader "Safe Haven/Tree Wind"
             #if defined(_FAST_LEAF_LIGHTING)
                 half3 leaf = SnowOn(baseColor.rgb, normalize(input.normalWS) * IS_FRONT_VFACE(face, 1.0, -1.0), input.uv)
                     * FastLeafLighting(input, IS_FRONT_VFACE(face, 1.0, -1.0));
+                leaf *= lerp(1.0, 0.78, (half)_SafeHavenWetness); // rain-darkened leaves
                 return half4(MixFog(leaf, input.fog), baseColor.a);
             #endif
             half4 mask = SAMPLE_TEXTURE2D(_ORMMap, sampler_ORMMap, input.uv);
@@ -297,12 +302,20 @@ Shader "Safe Haven/Tree Wind"
                 surface.occlusion = lerp(surface.occlusion, mossMask.g, cover);
             #endif
             surface.albedo = SnowOn(surface.albedo, normalize(input.normalWS) * faceSign, input.uv);
+            #if defined(_ALPHATEST_ON)
+                SurfaceWet(surface.albedo, surface.smoothness, lighting.normalWS, lighting.positionWS, 0.4);
+            #else
+                SurfaceWet(surface.albedo, surface.smoothness, lighting.normalWS, lighting.positionWS, 1.0);
+            #endif
             surface.normalTS = half3(0, 0, 1);
             half4 color = UniversalFragmentPBR(lighting, surface);
             #if defined(_ALPHATEST_ON)
                 // Sunlight through the leaf from behind, as the SeedMesh foliage's transmission does.
-                Light sun = GetMainLight(lighting.shadowCoord);
-                half back = saturate(dot(-lighting.normalWS, sun.direction));
+                // Through the leaf from behind, and brightest looking towards a low sun: canopies glow at golden hour.
+                Light sun = GetMainLight(lighting.shadowCoord, lighting.positionWS, lighting.shadowMask);
+                half through = saturate(dot(-lighting.normalWS, sun.direction));
+                half toward = pow(saturate(dot(lighting.viewDirectionWS, -sun.direction)), 3.0);
+                half back = through * 0.6 + toward * 0.8;
                 color.rgb += surface.albedo * sun.color * back * sun.shadowAttenuation * _Translucency;
             #endif
             color.rgb = MixFog(color.rgb, input.fog);

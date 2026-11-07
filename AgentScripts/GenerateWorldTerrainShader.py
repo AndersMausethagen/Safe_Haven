@@ -341,17 +341,18 @@ void WorldWetness(Varyings IN, inout InputData inputData, inout half3 albedo, in
         return;
     }
 
-    albedo = lerp(albedo, albedo * 0.6, puddle);
+    // Water over a dark bed: from above most of what shows is the mud under it, with the world's reflection (the probe
+    // that follows the player) brightening towards the flat angles.
+    albedo = lerp(albedo, albedo * 0.45, puddle);
     smoothness = lerp(smoothness, 0.97, puddle);
-    metallic = lerp(metallic, 0.2, puddle);
+    metallic = lerp(metallic, 0.06, puddle);
     occlusion = lerp(occlusion, 1.0, puddle);
     float2 lean = _SafeHavenRain * (WorldRainRings(xz * 1.9, _Time.y) + WorldRainRings(xz * 1.9 + 3.7, _Time.y * 1.3 + 0.5)) * 0.32;
     inputData.normalWS = normalize(lerp(inputData.normalWS, normalize(half3(lean.x, 1.0, lean.y)), puddle));
 
-    // Water shows the sky, and more of it the flatter it is seen. There are no reflections of the scene to draw on, so
-    // the sky's ambient colour stands in; black puddles read as holes.
+    // A little of the sky's ambient colour on top, so a puddle under an even grey sky never reads as a hole.
     half facing = saturate(dot(inputData.normalWS, inputData.viewDirectionWS));
-    skySheen = puddle * lerp(0.26, 0.05, facing * facing);
+    skySheen = puddle * lerp(0.1, 0.015, facing * facing);
 }
 
 // Frost on the ground in the cold of the year (Seasons sets _SafeHavenSeason.w: how much of the ground is frosted, 0-1;

@@ -32,7 +32,7 @@ Shader "Safe Haven/Unlit (See-Through)"
         [HideInInspector] _MainTex("BaseMap", 2D) = "white" {}
         [HideInInspector] _Color("Base Color", Color) = (0.5, 0.5, 0.5, 1)
         [HideInInspector] _SampleGI("SampleGI", float) = 0.0 // needed from bakedlit
-        [Toggle(_SEASON_SNOW)] _SeasonSnow("Snow Settles On It (winter)", Float) = 0
+        [Toggle(_SEASON_SNOW)] _SeasonSnow("Weather Settles On It (snow, rain)", Float) = 0
     }
 
     SubShader

@@ -345,6 +345,7 @@ Shader "Safe Haven/Forest Ground ASE"
 			#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Texture.hlsl"
 			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
+			#include "Assets/_Project/Shaders/SurfaceWetness.hlsl"
 			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Input.hlsl"
 			#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/TextureStack.hlsl"
             #include_with_pragmas "Packages/com.unity.render-pipelines.core/ShaderLibrary/FoveatedRenderingKeywords.hlsl"
@@ -882,6 +883,7 @@ Shader "Safe Haven/Forest Ground ASE"
 				#ifdef ASE_LIGHTING_SIMPLE
 					ASE_LIGHT_ACCUM4 color = UniversalFragmentBlinnPhong( inputData, surfaceData);
 				#else
+					SurfaceWet(surfaceData.albedo, surfaceData.smoothness, inputData.normalWS, inputData.positionWS, 1.0);
 					ASE_LIGHT_ACCUM4 color = UniversalFragmentPBR( inputData, surfaceData);
 				#endif
 

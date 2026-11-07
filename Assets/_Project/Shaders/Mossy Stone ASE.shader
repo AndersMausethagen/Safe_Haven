@@ -55,7 +55,7 @@ Shader "Safe Haven/Mossy Stone ASE"
 		//[HideInInspector] _XRMotionVectorsPass("_XRMotionVectorsPass", Float) = 1
 
 		//[HideInInspector] _AlphaClip("__clip", Float) = 0.0
-		[Toggle(_SEASON_SNOW)] _SeasonSnow("Snow Settles On It (winter)", Float) = 0
+		[Toggle(_SEASON_SNOW)] _SeasonSnow("Weather Settles On It (snow, rain)", Float) = 0
 	}
 
 	SubShader
@@ -349,6 +349,7 @@ Shader "Safe Haven/Mossy Stone ASE"
 			#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Texture.hlsl"
 			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
+			#include "Assets/_Project/Shaders/SurfaceWetness.hlsl"
 			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Input.hlsl"
 			#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/TextureStack.hlsl"
             #include_with_pragmas "Packages/com.unity.render-pipelines.core/ShaderLibrary/FoveatedRenderingKeywords.hlsl"
@@ -889,6 +890,7 @@ Shader "Safe Haven/Mossy Stone ASE"
 				#else
 					#if defined(_SEASON_SNOW)
 						SeasonSnow(surfaceData.albedo, surfaceData.smoothness, inputData.normalWS, inputData.positionWS);
+						SurfaceWet(surfaceData.albedo, surfaceData.smoothness, inputData.normalWS, inputData.positionWS, 1.0);
 					#endif
 					ASE_LIGHT_ACCUM4 color = UniversalFragmentPBR( inputData, surfaceData);
 				#endif

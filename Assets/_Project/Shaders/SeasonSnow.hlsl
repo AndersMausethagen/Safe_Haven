@@ -2,8 +2,9 @@
 #define SAFE_HAVEN_SEASON_SNOW
 // Snow settling on things in winter (WeatherSystem sets _SafeHavenSnow: 0 none, 1 a full layer). Whatever faces up
 // whitens, in clumps that follow the surface's own normal map, so it gathers on the tops of rocks, logs, roofs and
-// bushes and stays out of their undersides and steep faces. Materials opt in with the "Snow Settles On It" toggle
-// (keyword _SEASON_SNOW), so floors and other indoor surfaces stay clear.
+// bushes and stays out of their undersides and steep faces. Materials opt in with the "Weather Settles On It" toggle
+// (keyword _SEASON_SNOW), so floors and other indoor surfaces stay clear: the same toggle lets the rain soak them when
+// the shader includes SurfaceWetness.hlsl first.
 float _SafeHavenSnow;
 
 float SeasonSnowHash(float2 p)
@@ -55,6 +56,9 @@ half4 SeasonSnowFragmentPBR(InputData inputData, SurfaceData surfaceData)
 {
     #if defined(_SEASON_SNOW)
         SeasonSnow(surfaceData.albedo, surfaceData.smoothness, inputData.normalWS, inputData.positionWS);
+        #if defined(SAFE_HAVEN_SURFACE_WETNESS)
+            SurfaceWet(surfaceData.albedo, surfaceData.smoothness, inputData.normalWS, inputData.positionWS, 1.0 - surfaceData.metallic * 0.8);
+        #endif
     #endif
     return UniversalFragmentPBR(inputData, surfaceData);
 }
