@@ -35,14 +35,14 @@ public sealed partial class MonsterAI
 
     /// <summary>
     /// True while co-op builds a puppet. A friend's game on the host's run makes no creatures of its own: any other made
-    /// now is removed before it can think (<see cref="CoopCreatures.FromHost"/>).
+    /// now is removed before it can think (<see cref="CreatureSource.Remote"/>, set by co-op).
     /// </summary>
     public static bool SpawningRemote { get; set; }
 
     /// <summary>True for a creature this game was about to make while the host's game sends them: it goes at once.</summary>
     private bool SuppressedByHost()
     {
-        if (!CoopCreatures.FromHost || SpawningRemote)
+        if (CreatureSource.Remote == null || SpawningRemote)
         {
             return false;
         }
