@@ -210,7 +210,8 @@ public sealed class CoopCreatures : IDisposable
 
         if (scratch.Count > 0)
         {
-            using var spawns = new FastBufferWriter(64 + scratch.Count * 96, Allocator.Temp);
+            // Strings go two bytes a character: room to grow, up to a large batch.
+            using var spawns = new FastBufferWriter(256 + scratch.Count * 192, Allocator.Temp, 256 * 1024);
             spawns.WriteValueSafe(scratch.Count);
             foreach (MonsterAI creature in scratch)
             {
@@ -221,6 +222,7 @@ public sealed class CoopCreatures : IDisposable
                 spawns.WriteValueSafe(creature.transform.position);
                 spawns.WriteValueSafe(creature.transform.eulerAngles.y);
                 spawns.WriteValueSafe(HealthByte(creature));
+                spawns.WriteValueSafe(AffixesOf(creature));
             }
 
             network.CustomMessagingManager.SendNamedMessage(SpawnMessage, clientId, spawns, NetworkDelivery.ReliableFragmentedSequenced);
@@ -254,6 +256,55 @@ public sealed class CoopCreatures : IDisposable
             }
 
             network.CustomMessagingManager.SendNamedMessage(PosesMessage, clientId, poses, NetworkDelivery.UnreliableSequenced);
+        }
+    }
+
+    // An elite's affixes by name ("Frenzied|Ironhide"), or empty for a plain creature.
+    private static string AffixesOf(MonsterAI creature)
+    {
+        if (!creature.TryGetComponent(out EliteCreature elite))
+        {
+            return string.Empty;
+        }
+
+        var names = new List<string>();
+        foreach (EliteAffixDefinition affix in elite.Affixes)
+        {
+            if (affix != null)
+            {
+                names.Add(affix.name);
+            }
+        }
+
+        return string.Join("|", names);
+    }
+
+    // The same elite in this game: the run's affixes by name, scaled as this raid scales its creatures.
+    private static void MakeElite(MonsterAI puppet, string names)
+    {
+        RaidSession run = GameSession.ActiveRaid;
+        RaidDirector director = RaidDirector.Current;
+        if (string.IsNullOrEmpty(names) || run == null || director == null)
+        {
+            return;
+        }
+
+        var chosen = new List<EliteAffixDefinition>();
+        foreach (string name in names.Split('|'))
+        {
+            foreach (EliteAffixDefinition affix in run.Definition.EliteAffixes)
+            {
+                if (affix != null && affix.name == name)
+                {
+                    chosen.Add(affix);
+                    break;
+                }
+            }
+        }
+
+        if (chosen.Count > 0)
+        {
+            EliteCreature.Make(puppet, chosen, run.Difficulty, director.HealthMultiplier, director.PowerMultiplier);
         }
     }
 
@@ -425,6 +476,7 @@ public sealed class CoopCreatures : IDisposable
             reader.ReadValueSafe(out Vector3 position);
             reader.ReadValueSafe(out float yaw);
             reader.ReadValueSafe(out byte health);
+            reader.ReadValueSafe(out string affixes);
             if (!FromHost || puppets.ContainsKey(id))
             {
                 continue;
@@ -445,6 +497,7 @@ public sealed class CoopCreatures : IDisposable
             }
 
             puppet.MakeRemote();
+            MakeElite(puppet, affixes);
             if (copy.TryGetComponent(out Damageable damageable))
             {
                 damageable.HealthFloor = 1f;
