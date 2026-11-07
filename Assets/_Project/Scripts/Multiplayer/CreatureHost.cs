@@ -117,7 +117,8 @@ public sealed class CreatureHost
             Forget();
         }
 
-        if (link == null || GameSession.ActiveRaid == null)
+        // A raid, or the host's own Haven with friends visiting (each friend is told of what is in their place only).
+        if (link == null || (GameSession.ActiveRaid == null && !HavenVisit.HostIsHome()))
         {
             return;
         }

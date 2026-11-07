@@ -181,6 +181,12 @@ public sealed class MobSpawnZone : MonoBehaviour
             return 0;
         }
 
+        // Co-op, in the host's Haven or on their run: the host's game makes the creatures (and its zones' clearing counts there).
+        if (CreatureSource.Remote != null)
+        {
+            return 0;
+        }
+
         hasSpawned = true;
         int wanted = random.Next(Mathf.Min(count.x, count.y), Mathf.Max(count.x, count.y) + 1);
         var counts = new Dictionary<GameObject, int>();

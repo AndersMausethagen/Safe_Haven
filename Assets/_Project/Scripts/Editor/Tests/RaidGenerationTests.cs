@@ -296,14 +296,14 @@ public sealed class RaidGenerationTests
         var hostRandom = new System.Random(9);
         var friendRandom = new System.Random(9);
         host.Spawn(hostRandom, SpawnRules.Default);
-        RaidDirector.RemoteCreatures = new CreaturesElsewhere();
+        CreatureSource.Remote = new CreaturesElsewhere();
         try
         {
             friend.Spawn(friendRandom, SpawnRules.Default);
         }
         finally
         {
-            RaidDirector.RemoteCreatures = null;
+            CreatureSource.Remote = null;
         }
 
         var hostCrates = new List<Vector3>();

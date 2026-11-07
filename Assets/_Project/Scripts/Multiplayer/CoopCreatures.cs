@@ -1,5 +1,6 @@
 /// <summary>
-/// Raid creatures in co-op: the host's game runs them, friends on the same run see the host's. Two roles, one per side:
+/// Creatures in co-op: the host's game runs them, friends on the same run or in the host's Haven see the host's (a friend's
+/// game makes none there: <see cref="CreatureSource.Remote"/>; it takes them over if the host leaves). Two roles, one per side:
 /// <see cref="CreatureHost"/> (numbers creatures, sends spawns, poses, strikes, deaths; applies friends' hits; party
 /// scaling) and <see cref="CreaturePuppets"/> (no creatures of its own; the host's as puppets; this player's blows to the
 /// host). The messages:

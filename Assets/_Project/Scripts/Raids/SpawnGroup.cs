@@ -146,7 +146,7 @@ public sealed class SpawnGroup : MonoBehaviour
     {
         Vector2 offset = InsideCircle(random) * scatterRadius;
         float yaw = (float)random.NextDouble() * 360f;
-        if (RaidDirector.RemoteCreatures != null && prefab.GetComponentInChildren<MonsterAI>(true) != null)
+        if (CreatureSource.Remote != null && prefab.GetComponentInChildren<MonsterAI>(true) != null)
         {
             return null;
         }

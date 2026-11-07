@@ -35,6 +35,7 @@ public sealed class CreaturePuppets : IRaidCreatureSource
     private ContentDatabase content;
     private Scene scene;
     private bool following;
+    private bool handedBack;
     private float hostGoneSince = -1f;
 
     /// <summary>True on the host's run: the host's game sends the creatures, none are made here.</summary>
@@ -67,6 +68,7 @@ public sealed class CreaturePuppets : IRaidCreatureSource
     public void FollowHost()
     {
         following = true;
+        handedBack = false;
         SetFromHost(GameSession.ActiveRaid != null);
     }
 
@@ -76,11 +78,11 @@ public sealed class CreaturePuppets : IRaidCreatureSource
         FromHost = fromHost;
         if (fromHost)
         {
-            RaidDirector.RemoteCreatures = this;
+            CreatureSource.Remote = this;
         }
-        else if (RaidDirector.RemoteCreatures == this)
+        else if (CreatureSource.Remote == this)
         {
-            RaidDirector.RemoteCreatures = null;
+            CreatureSource.Remote = null;
         }
     }
 
@@ -94,21 +96,53 @@ public sealed class CreaturePuppets : IRaidCreatureSource
             byId.Clear();
             byCreature.Clear();
             hostGoneSince = -1f;
+            handedBack = false;
         }
 
-        SetFromHost(following && GameSession.ActiveRaid != null);
-        if (GameSession.ActiveRaid == null)
+        bool raid = GameSession.ActiveRaid != null;
+        if (!raid)
         {
             following = false;
+        }
+
+        // On the host's run (followed in from its start) or in their Haven, the host's game makes the creatures; unless it
+        // handed them over here when the host left.
+        SetFromHost((raid ? following : HavenVisit.IsVisiting) && !handedBack);
+        // Only once the place is set up (the raid running, the Haven loaded), not while its scene is still coming in.
+        bool settled = raid ? RaidDirector.Current != null : HavenVisit.IsVisiting && PersistentScene.For(scene) != null;
+        if (!settled)
+        {
+            hostGoneSince = -1f;
             return;
         }
 
-        // In the raid: this game's own creatures make way for the host's (a safety net; MonsterAI removes them as they wake).
-        if (!FromHost || RaidDirector.Current == null)
+        if (HostHere())
+        {
+            hostGoneSince = -1f;
+            // Back in their Haven: their game makes the creatures again (these make way below, theirs are sent anew).
+            if (handedBack && !raid)
+            {
+                handedBack = false;
+                SetFromHost(true);
+            }
+        }
+        else if (FromHost && hostGoneSince < 0f)
+        {
+            hostGoneSince = Time.unscaledTime;
+        }
+        else if (FromHost && Time.unscaledTime - hostGoneSince >= HostGoneSeconds)
+        {
+            // The host left: the creatures here are this game's from now on.
+            HandBack(quiet: !raid);
+            return;
+        }
+
+        if (!FromHost)
         {
             return;
         }
 
+        // This game's own creatures make way for the host's (a safety net; MonsterAI removes them as they wake).
         scratch.Clear();
         foreach (MonsterAI creature in MonsterAI.All)
         {
@@ -122,27 +156,21 @@ public sealed class CreaturePuppets : IRaidCreatureSource
         {
             Object.Destroy(creature.gameObject);
         }
+    }
 
-        // The host left the run: the creatures here are this game's from now on.
-        bool hostHere = false;
+    // The host stands in this place (their avatar's place is this game's).
+    private static bool HostHere()
+    {
         FixedString128Bytes place = CoopPlace.Key;
         foreach (NetworkPlayerAvatar friend in NetworkPlayerAvatar.All)
         {
-            hostHere |= friend != null && friend.OwnerClientId == NetworkManager.ServerClientId && friend.Look.Place.Equals(place);
+            if (friend != null && friend.OwnerClientId == NetworkManager.ServerClientId && friend.Look.Place.Equals(place))
+            {
+                return true;
+            }
         }
 
-        if (hostHere)
-        {
-            hostGoneSince = -1f;
-        }
-        else if (hostGoneSince < 0f)
-        {
-            hostGoneSince = Time.unscaledTime;
-        }
-        else if (Time.unscaledTime - hostGoneSince >= HostGoneSeconds)
-        {
-            HandBack(quiet: false);
-        }
+        return false;
     }
 
     private void HandBack(bool quiet)
@@ -163,6 +191,8 @@ public sealed class CreaturePuppets : IRaidCreatureSource
         byId.Clear();
         byCreature.Clear();
         following = false;
+        handedBack = true;
+        hostGoneSince = -1f;
         SetFromHost(false);
         if (hadAny && !quiet)
         {
@@ -393,6 +423,6 @@ public sealed class CreaturePuppets : IRaidCreatureSource
     private static void ResetForNewPlaySession()
     {
         FromHost = false;
-        RaidDirector.RemoteCreatures = null;
+        CreatureSource.Remote = null;
     }
 }

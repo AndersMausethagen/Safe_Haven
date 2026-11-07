@@ -194,9 +194,9 @@ public sealed class SpawnCreaturesOutcome : RaidEventOutcome
             GameObject prefab = prefabs[context.Random.Next(prefabs.Count)];
             float yaw = (float)context.Random.NextDouble() * 360f;
             // Co-op, on the host's run: the host's game makes them, after this player.
-            if (RaidDirector.RemoteCreatures != null)
+            if (CreatureSource.Remote != null)
             {
-                RaidDirector.RemoteCreatures.Spawn(prefab, hit.position, yaw, hunt);
+                CreatureSource.Remote.Spawn(prefab, hit.position, yaw, hunt);
                 continue;
             }
 

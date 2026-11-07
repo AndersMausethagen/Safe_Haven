@@ -39,10 +39,6 @@ public sealed class RaidDirector : MonoBehaviour
     /// <summary>The raid running in the loaded scene, or null outside raids.</summary>
     public static RaidDirector Current { get; private set; }
 
-    /// <summary>Set while another game makes this raid's creatures (co-op, on the host's run): none are made here, and
-    /// what this player wakes is asked of that game. Null when this game makes its own.</summary>
-    public static IRaidCreatureSource RemoteCreatures { get; set; }
-
     public RaidSession Session { get; private set; }
     public RaidParameters Parameters => Session.Parameters;
     public GameObject Player => player;
@@ -160,7 +156,7 @@ public sealed class RaidDirector : MonoBehaviour
         BringCompanion();
         var pieceRandom = new System.Random(RaidLayout.SeedFor(Session.Seed, "Set Piece Guards"));
         // Following the host (co-op), their game brings the guards from the same seed.
-        foreach (RaidSetPieceSite site in RemoteCreatures == null ? FindObjectsByType<RaidSetPieceSite>(FindObjectsInactive.Exclude) : System.Array.Empty<RaidSetPieceSite>())
+        foreach (RaidSetPieceSite site in CreatureSource.Remote == null ? FindObjectsByType<RaidSetPieceSite>(FindObjectsInactive.Exclude) : System.Array.Empty<RaidSetPieceSite>())
         {
             site.BringGuards(this, pieceRandom);
         }
@@ -330,7 +326,7 @@ public sealed class RaidDirector : MonoBehaviour
     /// Fills a waiting spawn group now (an extraction alarm, a scripted event) with this raid's seed and rules: its
     /// creatures get the raid's and the current stage's strength, and hunt the player if the group says so. Returns how
     /// many were spawned; 0 when the group had already spawned or the scene has no RaidGenerator. Co-op, on the host's
-    /// run, the host's game fills it (<see cref="RemoteCreatures"/>), after this player; the least it rolls is returned.
+    /// run, the host's game fills it (<see cref="CreatureSource.Remote"/>), after this player; the least it rolls is returned.
     /// <paramref name="prey"/>: whom a hunting group goes for (a friend's body in the host's game); the player by default.
     /// </summary>
     public int Wake(SpawnGroup group, IDamageable prey = null)
@@ -340,10 +336,10 @@ public sealed class RaidDirector : MonoBehaviour
             return 0;
         }
 
-        if (RemoteCreatures != null)
+        if (CreatureSource.Remote != null)
         {
             group.MarkSpawned();
-            return RemoteCreatures.Wake(group) ? Mathf.Max(1, group.MinCount) : 0;
+            return CreatureSource.Remote.Wake(group) ? Mathf.Max(1, group.MinCount) : 0;
         }
 
         // A group filled by a raid spawn list fills the whole list, possibly onto other groups' points too.

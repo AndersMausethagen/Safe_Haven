@@ -57,4 +57,42 @@ public sealed class LevelSpawnerTests
         var stone = AssetDatabase.LoadAssetAtPath<GatheringNodeDefinition>("Assets/_Project/Data/Gathering/GreyStone.asset");
         Assert.GreaterOrEqual(stone.ModelVariants.Count(v => v != null), 2, "grey stones look different spot to spot");
     }
+
+    [Test]
+    public void MobZone_MakesNoneWhileAnotherGameMakesTheCreatures()
+    {
+        // Co-op, in the host's Haven or on their run: the host's game makes the creatures, and an empty zone here isn't cleared.
+        var wolf = new GameObject("Wolf");
+        wolf.AddComponent<MonsterAI>();
+        MobSpawnZone zone = new GameObject("Zone").AddComponent<MobSpawnZone>();
+        try
+        {
+            zone.SetCorners(new[] { Vector3.zero, new Vector3(10f, 0f, 0f), new Vector3(10f, 0f, 10f), new Vector3(0f, 0f, 10f) });
+            var data = new SerializedObject(zone);
+            SerializedProperty creatures = data.FindProperty("creatures");
+            creatures.arraySize = 1;
+            creatures.GetArrayElementAtIndex(0).FindPropertyRelative("prefab").objectReferenceValue = wolf;
+            creatures.GetArrayElementAtIndex(0).FindPropertyRelative("weight").floatValue = 1f;
+            data.ApplyModifiedPropertiesWithoutUndo();
+
+            CreatureSource.Remote = new Elsewhere();
+            Assert.AreEqual(0, zone.Spawn());
+            Assert.IsFalse(zone.IsCleared, "nothing was made here, so nothing was cleared");
+        }
+        finally
+        {
+            CreatureSource.Remote = null;
+            Object.DestroyImmediate(zone.gameObject);
+            Object.DestroyImmediate(wolf);
+        }
+    }
+
+    private sealed class Elsewhere : IRaidCreatureSource
+    {
+        public bool Wake(SpawnGroup group) => true;
+
+        public void Spawn(GameObject prefab, Vector3 position, float yaw, bool hunt)
+        {
+        }
+    }
 }
