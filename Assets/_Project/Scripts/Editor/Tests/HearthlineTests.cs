@@ -223,6 +223,7 @@ public sealed class HearthlineTests
     public void VitalsCanBeKeptLit()
     {
         CollectionAssert.Contains(GameOptions.Accessibility, GameOptions.AlwaysShowVitals);
-        Assert.IsFalse(GameOptions.AlwaysShowVitals.On, "quiet by default");
+        // The default, not the value now: that is the player's own choice, kept in their preferences.
+        Assert.AreEqual(0f, GameOptions.AlwaysShowVitals.Default, "quiet by default");
     }
 }

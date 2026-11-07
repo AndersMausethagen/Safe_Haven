@@ -326,4 +326,17 @@ public sealed class WorldBuilderTests
             Object.DestroyImmediate(stash);
         }
     }
+
+    [Test]
+    public void SharesEdge_SideBySideAndEndToEnd_NotCornersOrGaps()
+    {
+        // The meadow (300 x 200) beside the forest (200 x 200), as in the prologue.
+        var meadow = new Rect(-400f, -100f, 300f, 200f);
+        var forest = new Rect(-100f, -100f, 200f, 200f);
+        Assert.IsTrue(WorldBuilder.SharesEdge(meadow, forest));
+        Assert.IsTrue(WorldBuilder.SharesEdge(forest, meadow));
+        Assert.IsTrue(WorldBuilder.SharesEdge(forest, new Rect(-100f, 100f, 200f, 200f)), "end to end");
+        Assert.IsFalse(WorldBuilder.SharesEdge(forest, new Rect(100f, 100f, 200f, 200f)), "only a corner");
+        Assert.IsFalse(WorldBuilder.SharesEdge(forest, new Rect(101f, -100f, 200f, 200f)), "a gap between");
+    }
 }

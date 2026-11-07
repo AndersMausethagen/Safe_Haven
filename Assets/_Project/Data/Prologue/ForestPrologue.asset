@@ -55,7 +55,7 @@ MonoBehaviour:
     timeToTalk: 0
   - quest: {fileID: 11400000, guid: 4f625534621489e4183de610d93d4f36, type: 2}
     behaviour: 1
-    arrivalText: Dry stone overhead. Good work. We need warmth before anyone can think clearly. Gather four Sticks and six Small Rocks nearby; there is loose fuel on the forest floor.
+    arrivalText: Dry stone overhead. Good work. We need warmth before anyone can think clearly. Gather eight Sticks and twelve Small Rocks nearby; there is loose fuel on the forest floor.
     statusText: 
     duration: 0
     initialEnemies: 0

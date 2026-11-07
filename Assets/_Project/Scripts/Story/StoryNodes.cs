@@ -527,7 +527,8 @@ public sealed class WaitUntilDefeatedNode : StoryNode
     public override IEnumerator Run(StoryContext context)
     {
         yield return null;
-        while (zone != null && !zone.IsCleared)
+        // Co-op, where another game makes the creatures, there is nothing here to defeat: waiting would never end.
+        while (zone != null && !zone.IsCleared && CreatureSource.Remote == null)
         {
             yield return null;
         }
@@ -745,8 +746,9 @@ public sealed class SpawnEnemiesNode : StoryNode
             yield break;
         }
 
-        zone.Spawn();
-        while (waitUntilDefeated && !zone.IsCleared)
+        // Nothing made (no room for them, or another game makes the creatures): no fight to wait out.
+        int made = zone.Spawn();
+        while (waitUntilDefeated && made > 0 && !zone.IsCleared)
         {
             yield return null;
         }

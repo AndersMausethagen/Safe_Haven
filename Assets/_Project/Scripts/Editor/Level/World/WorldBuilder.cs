@@ -465,6 +465,7 @@ public static class WorldBuilder
 
         try
         {
+            terrains = WithSeamNeighbours(terrains, all);
             List<WorldFeature> shaping = all.Where(f => f.ShapesTerrain &&
                                                         terrains.Any(t => FlatRect(f.WorldBounds()).Overlaps(FlatRect(t)))).ToList();
             List<FeatureBuilder> builders = shaping.Select(FeatureBuilder.For).Where(b => b != null).ToList();
@@ -1262,6 +1263,50 @@ public static class WorldBuilder
     }
 
     public static Rect FlatRect(Bounds bounds) => Rect.MinMaxRect(bounds.min.x, bounds.min.z, bounds.max.x, bounds.max.z);
+
+    /// <summary>
+    /// The terrains to build, with every neighbour that shares an edge a shaping feature crosses (a river from the meadow
+    /// into the forest). Both sides of such an edge take one height (<see cref="ShareEdges"/>) only when both are built:
+    /// building one alone samples the feature on its own grid again and leaves a step at the seam. A neighbour brought in
+    /// may bring its own neighbours the same way.
+    /// </summary>
+    public static List<Terrain> WithSeamNeighbours(List<Terrain> terrains, List<WorldFeature> all)
+    {
+        var result = new List<Terrain>(terrains);
+        for (int i = 0; i < result.Count; i++)
+        {
+            Terrain built = result[i];
+            Rect here = FlatRect(built);
+            foreach (Terrain other in Terrain.activeTerrains)
+            {
+                if (result.Contains(other) || other.terrainData == null || other.gameObject.scene != built.gameObject.scene
+                    || other.GetComponent<WorldTerrain>() == null)
+                {
+                    continue;
+                }
+
+                Rect there = FlatRect(other);
+                if (SharesEdge(here, there) && all.Any(f => f != null && f.ShapesTerrain
+                        && FlatRect(f.WorldBounds()).Overlaps(here) && FlatRect(f.WorldBounds()).Overlaps(there)))
+                {
+                    result.Add(other);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    /// <summary>Whether two terrain rectangles meet along an edge (not just at a corner).</summary>
+    public static bool SharesEdge(Rect a, Rect b)
+    {
+        const float Touch = 0.01f;
+        bool sideBySide = (Mathf.Abs(a.xMax - b.xMin) < Touch || Mathf.Abs(b.xMax - a.xMin) < Touch)
+                          && Mathf.Min(a.yMax, b.yMax) - Mathf.Max(a.yMin, b.yMin) > Touch;
+        bool endToEnd = (Mathf.Abs(a.yMax - b.yMin) < Touch || Mathf.Abs(b.yMax - a.yMin) < Touch)
+                        && Mathf.Min(a.xMax, b.xMax) - Mathf.Max(a.xMin, b.xMin) > Touch;
+        return sideBySide || endToEnd;
+    }
 
     private static string PathOf(WorldFeature feature)
     {

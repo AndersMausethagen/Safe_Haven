@@ -14194,6 +14194,10 @@ MonoBehaviour:
   intensityVariation: 0.25
   rangeVariation: 0.06
   speed: 4
+  dimColour: {r: 1, g: 0.5, b: 0.18, a: 0.35}
+  wander: 0.03
+  sparks: 0
+  sparksPerSecond: 3
 --- !u!108 &372467329
 Light:
   m_ObjectHideFlags: 0
@@ -17727,6 +17731,7 @@ MonoBehaviour:
   baseAmount: 0
   weatherAmount: 1
   goldenHourAmount: 1
+  morningAmount: 0
   weatherWindInfluence: 1
 --- !u!114 &480706351
 MonoBehaviour:
@@ -17755,6 +17760,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::TerrainSurface
   profile: {fileID: 11400000, guid: efe6a3275bbbded4d9f0749292121b75, type: 2}
   quality: 3
+  singlePass: 1
 --- !u!114 &480706353
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -23998,6 +24004,7 @@ MonoBehaviour:
   softEdge: 1.6
   flatten: 0.85
   sink: 0.06
+  gradeSmoothing: 4
   widthAtKnots:
     values:
     - 1
@@ -24009,6 +24016,10 @@ MonoBehaviour:
     - 1
     - 1
     - 1
+  widthWander: 0
+  patchiness: 0
+  shoulder: 0
+  raggedGrass: 0
   layer: {fileID: 8574412962073106934, guid: f7c1b94bbb5ffbe4c8e8d1a7e37be29c, type: 2}
   paintStrength: 1
   clearGrass: 1
@@ -25461,12 +25472,17 @@ MonoBehaviour:
   softEdge: 1.2
   flatten: 0.7
   sink: 0.06
+  gradeSmoothing: 4
   widthAtKnots:
     values:
     - 1
     - 1
     - 1
     - 1
+  widthWander: 0
+  patchiness: 0
+  shoulder: 0
+  raggedGrass: 0
   layer: {fileID: 8574412962073106934, guid: f7c1b94bbb5ffbe4c8e8d1a7e37be29c, type: 2}
   paintStrength: 1
   clearGrass: 1
@@ -29307,6 +29323,10 @@ MonoBehaviour:
   intensityVariation: 0.25
   rangeVariation: 0.06
   speed: 4
+  dimColour: {r: 1, g: 0.5, b: 0.18, a: 0.35}
+  wander: 0.03
+  sparks: 0
+  sparksPerSecond: 3
 --- !u!108 &780647939
 Light:
   m_ObjectHideFlags: 0
@@ -37134,9 +37154,9 @@ MonoBehaviour:
     askText: 
     thanksText: 
   - quest: {fileID: 11400000, guid: 4f625534621489e4183de610d93d4f36, type: 2}
-    text: Dry stone overhead. Good work. We need warmth before anyone can think clearly. Gather four Sticks and six Small Rocks nearby; there is loose fuel on the forest floor.
+    text: Dry stone overhead. Good work. We need warmth before anyone can think clearly. Gather eight Sticks and twelve Small Rocks nearby; there is loose fuel on the forest floor.
     acceptText: I will gather the supplies.
-    waitingText: Gather four Sticks and six Small Rocks nearby, then return to me.
+    waitingText: Gather eight Sticks and twelve Small Rocks nearby, then return to me.
     askText: 
     thanksText: 
   - quest: {fileID: 11400000, guid: 2ba326763b19a9e46be36507850aed82, type: 2}
@@ -38526,6 +38546,10 @@ MonoBehaviour:
   intensityVariation: 0.25
   rangeVariation: 0.06
   speed: 4
+  dimColour: {r: 1, g: 0.5, b: 0.18, a: 0.35}
+  wander: 0.03
+  sparks: 0
+  sparksPerSecond: 3
 --- !u!108 &1002472648
 Light:
   m_ObjectHideFlags: 0
@@ -39720,6 +39744,10 @@ MonoBehaviour:
   intensityVariation: 0.25
   rangeVariation: 0.06
   speed: 4
+  dimColour: {r: 1, g: 0.5, b: 0.18, a: 0.35}
+  wander: 0.03
+  sparks: 0
+  sparksPerSecond: 3
 --- !u!108 &1034764989
 Light:
   m_ObjectHideFlags: 0
@@ -61145,6 +61173,10 @@ MonoBehaviour:
   intensityVariation: 0.25
   rangeVariation: 0.06
   speed: 4
+  dimColour: {r: 1, g: 0.5, b: 0.18, a: 0.35}
+  wander: 0.03
+  sparks: 0
+  sparksPerSecond: 3
 --- !u!108 &1521611959
 Light:
   m_ObjectHideFlags: 0
@@ -72323,6 +72355,7 @@ MonoBehaviour:
   softEdge: 1.6
   flatten: 0.85
   sink: 0.06
+  gradeSmoothing: 4
   widthAtKnots:
     values:
     - 1
@@ -72333,6 +72366,10 @@ MonoBehaviour:
     - 1
     - 1
     - 1
+  widthWander: 0
+  patchiness: 0
+  shoulder: 0
+  raggedGrass: 0
   layer: {fileID: 8574412962073106934, guid: 5dc6fe76479435e46af225728b371098, type: 2}
   paintStrength: 1
   clearGrass: 1
@@ -77212,6 +77249,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::TerrainSurface
   profile: {fileID: 11400000, guid: 21133d55e7eb3174dbc1fbfbf8a1518b, type: 2}
   quality: 3
+  singlePass: 1
 --- !u!114 &1865125226
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -77245,6 +77283,7 @@ MonoBehaviour:
   baseAmount: 0
   weatherAmount: 1
   goldenHourAmount: 1
+  morningAmount: 0
   weatherWindInfluence: 1
 --- !u!114 &1865125227
 MonoBehaviour:
@@ -82341,6 +82380,10 @@ MonoBehaviour:
   intensityVariation: 0.25
   rangeVariation: 0.06
   speed: 4
+  dimColour: {r: 1, g: 0.5, b: 0.18, a: 0.35}
+  wander: 0.03
+  sparks: 0
+  sparksPerSecond: 3
 --- !u!108 &1983935831
 Light:
   m_ObjectHideFlags: 0
@@ -86646,6 +86689,10 @@ MonoBehaviour:
   intensityVariation: 0.25
   rangeVariation: 0.06
   speed: 4
+  dimColour: {r: 1, g: 0.5, b: 0.18, a: 0.35}
+  wander: 0.03
+  sparks: 0
+  sparksPerSecond: 3
 --- !u!108 &2143363918
 Light:
   m_ObjectHideFlags: 0
@@ -89403,6 +89450,10 @@ MonoBehaviour:
   intensityVariation: 0.25
   rangeVariation: 0.06
   speed: 4
+  dimColour: {r: 1, g: 0.5, b: 0.18, a: 0.35}
+  wander: 0.03
+  sparks: 0
+  sparksPerSecond: 3
 --- !u!1 &4108508234536663948
 GameObject:
   m_ObjectHideFlags: 0

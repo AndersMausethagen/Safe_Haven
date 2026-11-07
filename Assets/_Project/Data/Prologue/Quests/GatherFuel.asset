@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::QuestDefinition
   id: prologue.gatherfuel
   displayName: A Spark in the Dark
-  description: Gather four Sticks and six Small Rocks from the forest floor, then speak to Sigrid.
+  description: Gather eight Sticks and twelve Small Rocks from the forest floor, then speak to Sigrid.
   chain: Prologue - The Unquiet Forest
   journalNotes: Sticks and small rocks lie about on the forest floor, and you can pick them up as you walk. This is how every fire you ever build starts.
   rank: 0
@@ -24,6 +24,7 @@ MonoBehaviour:
   showTimerInHud: 0
   prerequisites:
   - {fileID: 11400000, guid: 0279feb93b7c8b74e9fd8683d9d10fd3, type: 2}
+  startedFirst: []
   start: 2
   startEvent: {fileID: 0}
   closedBy: {fileID: 0}
@@ -33,7 +34,7 @@ MonoBehaviour:
   objectives:
   - type: 0
     description: 
-    amount: 4
+    amount: 8
     item: {fileID: 11400000, guid: e8bb5d2fbded52b42a179a47cce32d53, type: 2}
     resource: {fileID: 0}
     monster: {fileID: 0}
@@ -46,7 +47,7 @@ MonoBehaviour:
     countAlreadyOwned: 1
   - type: 0
     description: 
-    amount: 6
+    amount: 12
     item: {fileID: 11400000, guid: 9f085f39a2da68c45b58d2db986835f4, type: 2}
     resource: {fileID: 0}
     monster: {fileID: 0}

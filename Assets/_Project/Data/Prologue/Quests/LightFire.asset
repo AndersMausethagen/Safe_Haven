@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::QuestDefinition
   id: prologue.lightfire
   displayName: A Fire of Our Own
-  description: Use the build menu (G) to place a Campfire beside the shelter. Construction uses four Sticks and six Small Rocks.
+  description: Use the build menu (G) to place a Campfire beside the shelter. Construction uses eight Sticks and twelve Small Rocks.
   chain: Prologue - The Unquiet Forest
   journalNotes: The first fire anyone has lit in here for a very long time, though you won't know that yet. Press (G) to open the build menu.
   rank: 0
@@ -24,6 +24,7 @@ MonoBehaviour:
   showTimerInHud: 0
   prerequisites:
   - {fileID: 11400000, guid: 4f625534621489e4183de610d93d4f36, type: 2}
+  startedFirst: []
   start: 2
   startEvent: {fileID: 0}
   closedBy: {fileID: 0}
