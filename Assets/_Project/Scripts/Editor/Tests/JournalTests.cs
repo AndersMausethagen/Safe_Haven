@@ -92,7 +92,7 @@ public sealed class JournalTests
     {
         ProgressSaveData read = JsonUtility.FromJson<ProgressSaveData>("{\"level\":3}");
         var loaded = (CharacterProgress)typeof(SaveMapper).GetMethod("ReadProgress", BindingFlags.NonPublic | BindingFlags.Static).Invoke(null, new object[] { read });
-        Assert.AreEqual(3, loaded.Level);
+        Assert.AreEqual(SaveMapper.LegacyExperience(3, 0), loaded.Insight, "its level comes back as Insight");
         Assert.IsEmpty(loaded.Creatures);
     }
 

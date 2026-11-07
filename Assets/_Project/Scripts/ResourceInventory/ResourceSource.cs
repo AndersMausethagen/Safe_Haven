@@ -17,8 +17,11 @@ public sealed class ResourceSource : MonoBehaviour
 
     private Interactable interactable;
 
-    /// <summary>Raised with whoever gathered a node (its yield granted), for experience.</summary>
-    public static event System.Action<GameObject> Harvested;
+    /// <summary>Raised with whoever gathered a node (its yield granted) and the node, for experience.</summary>
+    public static event System.Action<GameObject, ResourceSource> Harvested;
+
+    /// <summary>The node's definition when this is a gathering node: its tool and tier say which skill it trains.</summary>
+    public GatheringNodeDefinition Node => TryGetComponent(out ResourceNode node) ? node.Definition : null;
 
     public ItemDropTable Drops => drops;
 
@@ -69,16 +72,27 @@ public sealed class ResourceSource : MonoBehaviour
         return true;
     }
 
-    // A talent's chance of one extra of the main yield (StatType.GatherYield), then the Harvested news.
+    // The chance of one extra of the main yield (StatType.GatherYield, plus the tool's own from the woodcutting or
+    // mining skill), then the Harvested news.
     private void AfterHarvest(GameObject recipient)
     {
         Combatant gatherer = recipient != null ? recipient.GetComponentInParent<Combatant>() : null;
-        if (gatherer != null && Random.value < gatherer.Stats.Get(StatType.GatherYield))
+        if (gatherer != null && Random.value < gatherer.Stats.Get(StatType.GatherYield) + ToolYield(gatherer.Stats, Node))
         {
             GrantBonus(recipient, 1);
         }
 
-        Harvested?.Invoke(recipient);
+        Harvested?.Invoke(recipient, this);
+    }
+
+    private static float ToolYield(StatSheet stats, GatheringNodeDefinition node)
+    {
+        switch (node != null ? node.GatherTool : ToolType.None)
+        {
+            case ToolType.Axe: return stats.Get(StatType.ChopYield);
+            case ToolType.Pickaxe: return stats.Get(StatType.MineYield);
+            default: return 0f;
+        }
     }
 
     /// <summary>Gives these items instead of a roll of the drop table (a felled tree's logs, which depend on the axe), with

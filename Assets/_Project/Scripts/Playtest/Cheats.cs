@@ -155,8 +155,8 @@ public static class Cheats
 
     public static string GrantExperience(int amount)
     {
-        ExperienceTracker.Grant(amount);
-        return Did("Experience", $"{amount} experience.");
+        ExperienceTracker.GrantInsight(amount);
+        return Did("Insight", $"{amount} Insight to put into a skill (N).");
     }
 
     /// <summary>Gives items, to the bag or the stash. What doesn't fit the bag (weight, slots) goes to the stash. Gear isn't equipped.</summary>

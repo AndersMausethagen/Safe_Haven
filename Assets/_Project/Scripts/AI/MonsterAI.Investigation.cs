@@ -65,9 +65,18 @@ public sealed partial class MonsterAI
     }
 
     // Out of sight for too long or out of chase range: it goes to where it last saw the target and searches there.
+    /// <summary>Raised when a monster that was hunting the player loses track of them (Sneaking experience).</summary>
+    public static event System.Action<MonsterAI> LostTrackOfPlayer;
+
     private void LoseTrack()
     {
+        bool wasPlayer = targetComponent != null && global::Player.IsPlayer(targetComponent.gameObject);
         ClearTarget();
+        if (wasPlayer)
+        {
+            LostTrackOfPlayer?.Invoke(this);
+        }
+
         senses.Awareness.LoseTrack(lastKnownTargetPosition, PerceptionSettings.Current.LostTrackAwareness);
         BeginInvestigate(true);
     }

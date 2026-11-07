@@ -35,7 +35,9 @@ public sealed class PlayerStealth : MonoBehaviour
 
             if (IsSneaking)
             {
-                return rules.SneakingVisibility;
+                // The Sneaking skill: a beginner crouches badly, a master hardly shows.
+                float skill = combatant != null ? Mathf.Max(0.1f, 1f + combatant.Stats.Get(StatType.SneakVisibility)) : 1f;
+                return rules.SneakingVisibility * skill;
             }
 
             return movement.IsMoving ? rules.MovingVisibility : rules.StillVisibility;

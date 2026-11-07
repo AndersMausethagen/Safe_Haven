@@ -17,4 +17,6 @@ public enum HitTechnique
     Backstab = 64,
     /// <summary>A weapon art, paid for with Focus.</summary>
     WeaponArt = 128,
+    /// <summary>A swing of the weapon in hand (not an arrow or spell): trains the Melee skill.</summary>
+    Melee = 256,
 }

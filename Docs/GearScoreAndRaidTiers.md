@@ -48,9 +48,9 @@ leaves room to go in under-geared on purpose. Tier I has no floor, as nobody can
 | Raid tier | Recommended | At least | Enemy health | Enemy damage | Enemies | Loot | Drops up to |
 |---|---|---|---|---|---|---|---|
 | I | 10 | 0 | x1 | x1 | x1 | x1 | Tier II |
-| II | 30 | 15 | x1.4 | x1.35 | x1.15 | x1.1 | Tier III |
-| III | 50 | 30 | x2.1 | x2.6 | x1.3 | x1.2 | Tier IV |
-| IV | 70 | 45 | x2.6 | x3.4 | x1.45 | x1.35 | Tier V |
+| II | 30 | 15 | x1.5 | x1.35 | x1.15 | x1.1 | Tier III |
+| III | 50 | 30 | x2.3 | x2.6 | x1.3 | x1.2 | Tier IV |
+| IV | 70 | 45 | x3 | x3.4 | x1.45 | x1.35 | Tier V |
 
 **A raid of tier N pays for the gear of tier N+1.** This keeps "tiers mean one thing everywhere" (see [BaseProgression](BaseProgression.md)):
 wear tier I in a tier I raid, bring home copper, make copper gear, go to tier II for iron.
@@ -119,7 +119,7 @@ A kill also gives more experience by itself, as that goes by the creature's heal
 | III | Mistcloaked | +40% health, walks wrapped in fog | Back onto open ground and watch for its ring |
 | IV | Rallying | +50% health, those within 9 m hit 15% harder, shown by a faint circle | Kill it first |
 
-Affix multipliers multiply the raid's own scaling rather than adding to it, so an Ironhide at tier IV has 2.6 x 1.8 times a plain creature's health, not 2.6 + 0.8.
+Affix multipliers multiply the raid's own scaling rather than adding to it, so an Ironhide at tier IV has 3 x 1.8 times a plain creature's health, not 3 + 0.8.
 
 ### What stops what a tier shouldn't hold
 
@@ -133,15 +133,20 @@ Three things stop what a tier shouldn't hold, as loot reaches the player many wa
 ## The balance, as measured
 
 Rules tab › What it comes to works this out live from the assets (`GearBalance`). It compares the best kit of a tier to a reference creature
-(60 health, 5 armor, hits for 15), using damage, armor and health only. It leaves out attack speed, skills and timing, so read the numbers
+(60 health, 5 armor, hits for 15), using damage, armor and health only. It leaves out attack speed, perks and timing, so read the numbers
 against each other, not as a fight's length.
+
+**Skills (2026-11-07).** The kit's damage includes the Melee skill a player is expected to have at the tier: the baseline level (10) at tier I,
+whose level bonuses are nothing, then 20, 30 and 40 (+5%, +10%, +15% melee damage; see [Skills](Skills.md)). Enemy health was raised to the
+suggested values with that counted (tier II x1.4 to x1.5, III x2.1 to x2.3, IV x2.6 to x3), so a player whose skill keeps pace finds each tier as
+the gear alone used to; one ahead in skill finds it easier, one behind harder. Enemy damage is unchanged: skills don't add toughness.
 
 | Tier | Kit score | Damage | Armor | Health | Own kit: hits to kill / die | Kit before: kill / die |
 |---|---|---|---|---|---|---|
 | I | 18 | 12.8 | 32 | 150 | 4.9 / 13.2 | no gear: can't compare / 6.7 |
-| II | 40 | 18.2 | 67 | 160 | 4.8 / 13.2 | 6.9 / 9.8 |
-| III | 64 | 26.9 | 126 | 230 | 4.9 / 13.3 | 7.3 / 6.9 |
-| IV | 83 | 33.3 | 180 | 240 | 4.9 / 13.2 | 6.1 / 10.2 |
+| II | 40 | 19.1 | 67 | 160 | 4.9 / 13.2 | 7.4 / 9.8 |
+| III | 64 | 29.6 | 126 | 230 | 4.9 / 13.3 | 7.6 / 6.9 |
+| IV | 85 | 38.3 | 184 | 240 | 4.9 / 13.4 | 6.4 / 10.2 |
 
 The multipliers are set so that own kit stays level: a new tier feels the same with the right gear. A kit makes a player about **1.2 to 1.5 times
 as deadly and 1.3 to 2 times as tough** per tier. A tier up with the old kit costs about 25-50% more hits to kill. Going back a tier feels the

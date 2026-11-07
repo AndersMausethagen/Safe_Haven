@@ -1,0 +1,83 @@
+# Skills
+
+The player gets better at what they do. Felling trees trains Woodcutting, swinging a sword trains Melee, creeping past a wolf
+trains Sneaking. Skills replaced the character level and the four talent trees on 2026-11-07, modelled on RuneScape: Dragonwilds,
+where every activity is a skill with small bonuses each level and something new at set levels.
+
+Code: `Progression/` (`ProficiencyDefinition`, `PerkDefinition`, `CharacterProgress`, `ExperienceTracker`, `PlayerTraining`,
+`PlayerProficiencies`, `LevelingSettings`), the window `UI/SkillsWindow` (N). Content: `AgentScripts/BuildProficiencies.cs`, assets in
+`Data/Proficiencies`. In code a skill is a *proficiency*, because `SkillDefinition` is a spell; in the game spells are now called
+abilities.
+
+## What a skill gives
+
+- **Every level:** a little more of a few stats (`ProficiencyDefinition` › Level Bonuses). Each is **0 at the baseline level (10)**,
+  the player the game was tuned for. Below it the player is a beginner and worse than that; above it, better.
+- **Every 10 levels (10 to 50):** a milestone with two perks; the player keeps one. The old talents live on as perks. The first choice
+  can be made anywhere; changing it, or choosing all again, only at home beside the portal, for free.
+- **Insight:** experience that isn't practice (quests, raids, first crafts, buildings, catches, new ground, rune books, experience stones,
+  blows no skill trains yet). The player puts it into any skill from the skills window. An old save's character experience becomes
+  Insight (`SaveMapper.LegacyExperience`); its talents are gone.
+
+## Making the start weaker
+
+The tuning the game had becomes level 10, reached around the first tier I raids. A new player starts below it:
+
+| Skill | Stat | Level 1 | Level 10 | Level 50 |
+|---|---|---|---|---|
+| Woodcutting / Mining | Tool rises on the timing bar | 90% speed | 100% | 125% |
+| | Critical zone width | 70% | 100% | 140% |
+| | Extra yield chance | 0 | 0 | +15% |
+| Melee | Damage of every swing | 88% | 100% | 120% |
+| | Stamina per swing | 125% | 100% | 80% |
+| | Stamina per blocked blow | 125% | 100% | 75% |
+| Sneaking | Sneaking footsteps and lock noise | 130% | 100% | 60% |
+| | Visibility while sneaking (time to be spotted) | 118% (85%) | 100% | 71% (140%) |
+| | Lockpicking zone width | 80% | 100% | 130% |
+
+Movement, dodge and parry windows, invulnerability and attack cadence are never touched: a slow-feeling character is not a weak one.
+Melee damage scales every swing before backstabs and counters, so their order (plain 19, mid-strike backstab 26, counter 44, staggered
+backstab 50 on a Draug) keeps its proportions at every level.
+
+The prologue's fights were tuned to the old player, now level 10. At level 1 they take one more blow (wolf and small troll 7 to 8 with
+sword or club, 9 to 10 with the spear) and 25% more stamina per swing; companions fight alongside. Not yet playtested.
+
+## Pace
+
+Each level takes 1.105 times the one before, from 50 experience. An action is worth its tier's experience (10, 16, 25, 40, 60 for
+tiers I to V: a node's tier, or the raid's tier for anything done there; I at home), 60% when one tier below the skill's band (levels
+1-10 are tier I's band, 11-20 tier II's...) and 25% two or more below, and x1.5 on a raid. With about 180 actions an hour, a quarter of
+them for one skill (`ProgressionTests.AuthoredCurve_...`):
+
+| Level | Total experience | Normal mixed play |
+|---|---|---|
+| 10 (baseline) | ~700 | ~1.5 h |
+| 20 | ~2,700 | ~4.5 h |
+| 30 | ~8,100 | ~9.5 h |
+| 50 | ~63,000 | ~33 h |
+
+The action rate is an assumption, not a measurement: count real actions per raid from the playtest logs before tightening it.
+
+## What trains what
+
+| Skill | Practice | Where |
+|---|---|---|
+| Woodcutting | a node gathered with an axe, at its tier | `ExperienceTracker.OnHarvested` |
+| Mining | a node gathered with a pickaxe | same |
+| Melee | each weapon swing that hurts a monster: the share of the monster's worth (its Experience, or 0.25 per point of health) it took off its health; parries and perfect dodges, 3 tier I experience, five times per monster | `PlayerTraining` |
+| Sneaking | first blow on an unaware monster (8), sneaking for 6 s within a monster's sight before it spots you (4, three times per monster), a monster that hunted you losing track (10), a lock pin set silently (2) | `PlayerTraining` |
+
+Blows of other kinds (arrows, spells, traps) and nodes no skill trains give Insight until their skill exists.
+
+## Raid tiers
+
+Raid tiers are tuned to gear kits (`GearBalance`, [GearScoreAndRaidTiers](GearScoreAndRaidTiers.md)). The kit's damage now includes the
+Melee skill expected at the tier (`LevelingSettings.ExpectedLevel`: 10, 20, 30, 40, so +0%, +5%, +10%, +15%), and enemy health was raised
+to the suggested values (II x1.5, III x2.3, IV x3). A player whose skill keeps pace finds each tier as gear alone used to.
+
+## Still to come
+
+- **Crafting skills:** Weaponcrafting, Armorcrafting, Cooking, Alchemy and Construction, from what the player makes (not workers' orders);
+  Fine and Masterwork items that raise gear score.
+- **The rest:** Foraging, Fishing, Archery and Runecraft, taking over the remaining Insight sources and the old Ranger and Runemaster talents.
+- Mentors (building upgrades that speed a skill), a rested bonus from beds and the Sauna.

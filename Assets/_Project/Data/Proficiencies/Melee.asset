@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d75b22f30f824f747ae6ca96317ac240, type: 3}
+  m_Name: Melee
+  m_EditorClassIdentifier: SafeHaven::ProficiencyDefinition
+  id: melee
+  displayName: Melee
+  description: 'The weapon in hand and the shield on the arm: striking, blocking, and knowing when to step aside.'
+  trainedBy: weapon blows that hurt monsters, parries and perfect dodges
+  icon: {fileID: 0}
+  group: 2
+  training: 1
+  gatherTool: 0
+  levelBonuses:
+  - stat: 28
+    atFirstLevel: -0.12
+    atLastLevel: 0.19999999
+  - stat: 29
+    atFirstLevel: 0.25
+    atLastLevel: -0.19999999
+  - stat: 30
+    atFirstLevel: 0.25
+    atLastLevel: -0.25
+  milestones:
+  - level: 10
+    first: {fileID: 11400000, guid: dda7eb2aa74df7a48a1281090ef9a692, type: 2}
+    second: {fileID: 11400000, guid: bfbff429b2bcdfd42a4bfe973fd641c6, type: 2}
+  - level: 20
+    first: {fileID: 11400000, guid: fc909f40d5c18d74a99f0e9a5f0b5c02, type: 2}
+    second: {fileID: 11400000, guid: f5203844d3594964d84bb26bafc7f8e1, type: 2}
+  - level: 30
+    first: {fileID: 11400000, guid: 141c3cf7613ba1640b4c2c7383aea85f, type: 2}
+    second: {fileID: 11400000, guid: 8ad455a3025ec304cbc2aa49befcdb5d, type: 2}
+  - level: 40
+    first: {fileID: 11400000, guid: b29796117e4e2a54980fe7228a4ea00f, type: 2}
+    second: {fileID: 11400000, guid: 71d216a601661274a9b6e98347930a06, type: 2}
+  - level: 50
+    first: {fileID: 11400000, guid: 09a41c8cb494ff64fa4e2e75b54c26e2, type: 2}
+    second: {fileID: 11400000, guid: 120f527755b2f9b4197ff121840b6481, type: 2}

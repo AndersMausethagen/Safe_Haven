@@ -80,7 +80,7 @@ MonoBehaviour:
     recommendedGearScore: 30
     minimumGearScore: 15
     wardLevelNeeded: 1
-    enemyHealth: 1.4
+    enemyHealth: 1.5
     enemyPower: 1.35
     enemyDensity: 1.15
     loot: 1.1
@@ -106,7 +106,7 @@ MonoBehaviour:
     recommendedGearScore: 50
     minimumGearScore: 30
     wardLevelNeeded: 2
-    enemyHealth: 2.1
+    enemyHealth: 2.3
     enemyPower: 2.6
     enemyDensity: 1.3
     loot: 1.2
@@ -132,7 +132,7 @@ MonoBehaviour:
     recommendedGearScore: 70
     minimumGearScore: 45
     wardLevelNeeded: 3
-    enemyHealth: 2.6
+    enemyHealth: 3
     enemyPower: 3.4
     enemyDensity: 1.45
     loot: 1.35

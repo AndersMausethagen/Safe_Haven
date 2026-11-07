@@ -216,7 +216,7 @@ public sealed class CorruptionNights : MonoBehaviour
             int reward = CorruptionSettings.Current.ExperienceFor(bandSize);
             if (reward > 0)
             {
-                ExperienceTracker.Grant(reward);
+                ExperienceTracker.GrantInsight(reward);
             }
 
             return;

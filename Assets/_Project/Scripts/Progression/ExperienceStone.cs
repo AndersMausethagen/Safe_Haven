@@ -50,7 +50,7 @@ public sealed class ExperienceStone : MonoBehaviour
 
         Show(true);
         GameMessages.Post("Old memories flow from the stone.", MessageKind.Gain);
-        ExperienceTracker.Grant(experience);
+        ExperienceTracker.GrantInsight(experience);
     }
 
     private void Show(bool used)

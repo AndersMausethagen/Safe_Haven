@@ -57,6 +57,8 @@ public sealed partial class MonsterAI
     // this, an arrow from beyond its chase range was forgotten the next moment.
     private void OnDamaged(DamageInfo damage, DamageResult result)
     {
+        // Before it reacts: a hit from the shadows is judged by how things stood when it landed.
+        LastHitAmbushed = damageable.DamageTakenMultiplier > 1f && IsUnaware;
         // Burning ticks don't jolt the body; strong blows rock it hardest.
         if (pose != null && result.Damage > 0f && !result.Blocked && (damage.Technique & HitTechnique.OverTime) == 0)
         {

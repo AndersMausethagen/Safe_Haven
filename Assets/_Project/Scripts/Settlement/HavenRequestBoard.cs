@@ -130,7 +130,7 @@ public sealed class HavenRequestBoard : MonoBehaviour
         Give(TradeSettings.Current.Coin, request.Coins, bag, given);
         if (request.Experience > 0)
         {
-            ExperienceTracker.Grant(request.Experience);
+            ExperienceTracker.GrantInsight(request.Experience);
             given.Add($"{request.Experience} experience");
         }
 

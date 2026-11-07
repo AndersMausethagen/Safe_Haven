@@ -264,9 +264,29 @@ public static class StatNames
             case StatType.ToolCare: return "Less Tool Wear";
             case StatType.Lifesteal: return "Life Drain";
             case StatType.EssenceFind: return "Cursed Essence Found";
+            case StatType.ChopSpeed: return "Chopping Speed";
+            case StatType.ChopSweetSpot: return "Chopping Sweet Spot";
+            case StatType.ChopYield: return "Extra Wood Chance";
+            case StatType.MineSpeed: return "Mining Speed";
+            case StatType.MineSweetSpot: return "Mining Sweet Spot";
+            case StatType.MineYield: return "Extra Ore Chance";
+            case StatType.MeleeDamage: return "Melee Damage";
+            case StatType.MeleeStaminaCost: return "Swing Stamina Cost";
+            case StatType.BlockStaminaCost: return "Block Stamina Cost";
+            case StatType.SneakNoise: return "Sneaking Noise";
+            case StatType.SneakVisibility: return "Sneaking Visibility";
+            case StatType.AmbushDamage: return "Ambush Damage";
+            case StatType.LockpickZone: return "Lockpicking Zones";
             default: return stat.ToString();
         }
     }
+
+    /// <summary>Stats where more is worse for whoever has them (a cost, noise, being seen): a positive value is a penalty.</summary>
+    public static bool LowerIsBetter(StatType stat) =>
+        stat == StatType.MeleeStaminaCost || stat == StatType.BlockStaminaCost || stat == StatType.SneakNoise || stat == StatType.SneakVisibility;
+
+    /// <summary>Whether this bonus makes its owner worse off (a beginner's penalty).</summary>
+    public static bool IsPenalty(StatType stat, float value) => LowerIsBetter(stat) ? value > 0f : value < 0f;
 
     /// <summary>Stats stored as fractions (0.25 = 25%): crit, resistances and structure damage.</summary>
     public static bool IsFraction(StatType stat)
@@ -291,7 +311,7 @@ public static class StatNames
             case StatType.EssenceFind:
                 return true;
             default:
-                return false;
+                return stat >= StatType.ChopSpeed;
         }
     }
 }

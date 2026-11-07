@@ -267,7 +267,7 @@ public sealed class RaidsTogether : ICoopPart, IDisposable
         int friends = Mathf.Min(3, together.Count);
         if (friends > 0 && settings != null && settings.TogetherExperience > 0)
         {
-            ExperienceTracker.Grant(settings.TogetherExperience * friends);
+            ExperienceTracker.GrantInsight(settings.TogetherExperience * friends);
             GameMessages.Post($"Out together with {string.Join(", ", together)}: +{settings.TogetherExperience * friends} experience.", MessageKind.Gain);
         }
     }

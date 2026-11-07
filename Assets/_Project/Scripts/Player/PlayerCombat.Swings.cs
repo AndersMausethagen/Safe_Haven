@@ -150,7 +150,11 @@ public sealed partial class PlayerCombat
         }
     }
 
-    private float CostOf(SwingKind kind, AttackDefinition attack)
+    // The swing's stamina, after the Melee skill: a beginner tires sooner, a master later.
+    private float CostOf(SwingKind kind, AttackDefinition attack) =>
+        BaseCostOf(kind, attack) * Mathf.Max(0.1f, 1f + combatant.Stats.Get(StatType.MeleeStaminaCost));
+
+    private float BaseCostOf(SwingKind kind, AttackDefinition attack)
     {
         if (stamina == null || kind == SwingKind.Art)
         {
@@ -343,6 +347,10 @@ public sealed partial class PlayerCombat
             critical |= backstabbed.IsStaggered;
         }
 
+        // The Melee skill scales every swing alike, before nothing else changes, so the order of blows (plain, backstab,
+        // counter) holds at every level; a perk can add to a blow from the shadows.
+        damage *= Mathf.Max(0f, 1f + combatant.Stats.Get(StatType.MeleeDamage)) * PlayerProficiencies.AmbushScale(combatant.Stats, target);
+        technique |= HitTechnique.Melee;
         AttackResolver.Apply(combatant, pending.Attack, pending.WeaponDamage, pending.Hit, pending.Origin, pending.Direction, damage,
             pending.Poise, technique, critical);
         if (backstab)

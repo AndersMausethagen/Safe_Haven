@@ -270,7 +270,7 @@ public sealed class CheatWindow : MonoBehaviour
         Action(page, "Heal and fill everything", Margin, y, wide, Cheats.Heal);
         Action(page, "Learn every recipe and building", right, y, wide, Cheats.UnlockEverything);
         y += RowStep;
-        Action(page, "500 experience", Margin, y, wide, () => Cheats.GrantExperience(500));
+        Action(page, "500 Insight", Margin, y, wide, () => Cheats.GrantExperience(500));
         Action(page, "50 of every essence", right, y, wide, () => Cheats.GiveEssences(50));
         y += RowStep + 8f;
 

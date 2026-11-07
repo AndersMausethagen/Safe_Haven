@@ -105,8 +105,11 @@ public sealed class PlayerLockpicking : MonoBehaviour
         target.HoldOpen = true;
         autoTimer = 0f;
         LockpickingSettings settings = LockpickingSettings.Current;
-        Session = new LockSession(cache.LockPins, settings.SlipsAllowed, settings.CycleSeconds, settings.NormalZoneWidth,
-            settings.CriticalZoneWidth, settings.NarrowingPerPin, settings.ZoneJitter, random);
+        // The Sneaking skill widens (or for a beginner narrows) both zones.
+        float zones = TryGetComponent(out Combatant self) ? Mathf.Max(0.1f, 1f + self.Stats.Get(StatType.LockpickZone)) : 1f;
+        float normal = Mathf.Min(1f, settings.NormalZoneWidth * zones);
+        Session = new LockSession(cache.LockPins, settings.SlipsAllowed, settings.CycleSeconds, normal,
+            Mathf.Min(normal, settings.CriticalZoneWidth * zones), settings.NarrowingPerPin, settings.ZoneJitter, random);
         if (!explained)
         {
             explained = true;
@@ -145,6 +148,9 @@ public sealed class PlayerLockpicking : MonoBehaviour
         }
     }
 
+    /// <summary>Raised with how each press on a lock went: Critical sets a pin silently (Sneaking experience).</summary>
+    public event System.Action<SwingResult> PinPressed;
+
     private void AfterPress(SwingResult result)
     {
         LockpickingSettings settings = LockpickingSettings.Current;
@@ -153,7 +159,12 @@ public sealed class PlayerLockpicking : MonoBehaviour
         AudioManager.Play(forced ? settings.ForcedSound : settings.SoundOf(result), position);
         if (noise != null)
         {
-            noise.Make(position, forced ? settings.ForcedNoise : settings.NoiseOf(result));
+            noise.Make(position, (forced ? settings.ForcedNoise : settings.NoiseOf(result)) * noise.SneakSkillScale);
+        }
+
+        if (!forced)
+        {
+            PinPressed?.Invoke(result);
         }
 
         if (barView != null)

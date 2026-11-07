@@ -100,7 +100,7 @@ public sealed class SkillWindow : MonoBehaviour, IItemSlotHandler
         int free = skills.Loadout.FirstEmptySlot();
         if (free < 0)
         {
-            GameMessages.Post("The skill bar is full. Drag the skill onto a slot to replace one.", MessageKind.Warning);
+            GameMessages.Post("The ability bar is full. Drag the ability onto a slot to replace one.", MessageKind.Warning);
             return;
         }
 

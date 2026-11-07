@@ -1,25 +1,42 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 /// <summary>
-/// Turns what the player does into experience for GameSession.Progress, with amounts from LevelingSettings: monsters
-/// the player kills, quests completed, raids finished (more for getting out), the first craft of each item, nodes
-/// gathered, new ground explored, rune books read and experience stones touched (Grant). Announces level-ups and, in
-/// each scene with a player, adds the experience bar and the talent window. A game system (GameSystems).
+/// Turns what the player does into experience for GameSession.Progress, with the amounts in LevelingSettings:
+/// <list type="bullet">
+/// <item>Practice trains a skill (<see cref="Practise"/>): nodes gathered train the skill of their tool, and the player's
+/// own PlayerTraining reports blows, parries, ambushes and the like. An action is worth its tier's experience, less
+/// below the skill's band and more on a raid.</item>
+/// <item>Everything else is Insight (<see cref="GrantInsight"/>), put into a skill of the player's choice in the skills
+/// window: quests, raids, first crafts, buildings, catches, new ground, rune books, experience stones, blows no skill
+/// trains yet.</item>
+/// </list>
+/// Announces levels and milestones and, in each scene with a player, adds the experience bar and the skills window. A
+/// game system (GameSystems).
 /// </summary>
 public sealed class ExperienceTracker : MonoBehaviour, IGameSystem
 {
+    private readonly Dictionary<string, float> carried = new Dictionary<string, float>();
     private LevelingSettings settings;
     private int exploredCells;
+    private float carriedInsight;
 
     public static ExperienceTracker Current { get; private set; }
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetForNewPlaySession() => Current = null;
 
-    /// <summary>Raised with each amount of experience gained (the experience bar shows it).</summary>
-    public static event Action<int> Gained;
+    /// <summary>Raised with each amount gained: the skill, or null for Insight (the experience bar shows it).</summary>
+    public static event Action<ProficiencyDefinition, int> Gained;
+
+    /// <summary>The tier of where the player is: the raid's, or I at home and in the prologue.</summary>
+    public static int PlaceTier => GameSession.ActiveRaid != null ? Mathf.Max(1, GameSession.ActiveRaid.Tier) : 1;
+
+    public static bool OnRaid => GameSession.ActiveRaid != null;
+
+    private static LevelingSettings Rules => Current != null && Current.settings != null ? Current.settings : LevelingSettings.Current;
 
     public void Initialise(LevelingSettings levelingSettings)
     {
@@ -49,33 +66,146 @@ public sealed class ExperienceTracker : MonoBehaviour, IGameSystem
         if (Player.Current != null)
         {
             ExperienceHud.Create();
-            TalentWindow.Create();
+            SkillsWindow.Create();
             JournalWindow.Create();
             JournalNotices.CheckPages();
             MinimapHud.Create();
         }
     }
 
-    /// <summary>Gives experience now (an experience stone, a story). Announces any level reached.</summary>
-    public static void Grant(int amount)
+    /// <summary>Gives Insight now (an experience stone, a story, a quest): experience the player puts into any skill.</summary>
+    public static void GrantInsight(int amount)
     {
         if (amount <= 0)
         {
             return;
         }
 
-        LevelingSettings rules = Current != null ? Current.settings : LevelingSettings.Current;
-        CharacterProgress progress = GameSession.Progress;
-        int levels = progress.AddExperience(amount, rules);
-        Gained?.Invoke(amount);
-        if (levels > 0)
+        GameSession.Progress.AddInsight(amount);
+        Gained?.Invoke(null, amount);
+    }
+
+    /// <summary>
+    /// Practice of a skill at a place or node of <paramref name="tier"/>: <paramref name="baseAmount"/> experience before the
+    /// skill's band and the raid bonus. Fractions are kept and paid once they add up to a whole point.
+    /// </summary>
+    public static void Practise(ProficiencyDefinition skill, int tier, float baseAmount)
+    {
+        if (skill == null || baseAmount <= 0f)
         {
-            int points = progress.UnspentPoints(rules);
-            GameMessages.Post($"Level {progress.Level}! {points} talent point{(points == 1 ? "" : "s")} to spend (N).", MessageKind.Gain);
-            if (Player.Current != null)
-            {
-                AudioManager.Play(rules.LevelUpSound, Player.Current.transform.position);
-            }
+            return;
+        }
+
+        LevelingSettings rules = Rules;
+        CharacterProgress progress = GameSession.Progress;
+        float amount = baseAmount * rules.Multiplier(tier, progress.LevelOf(skill, rules), OnRaid);
+        if (Current != null)
+        {
+            Current.carried.TryGetValue(skill.Id, out float before);
+            amount += before;
+        }
+
+        int whole = Mathf.FloorToInt(amount);
+        if (Current != null)
+        {
+            Current.carried[skill.Id] = amount - whole;
+        }
+
+        Award(skill, whole);
+    }
+
+    /// <summary>Practice of whatever skill this kind of training trains; Insight while no skill does.</summary>
+    public static void Practise(ProficiencyTraining training, int tier, float baseAmount)
+    {
+        ProficiencyDefinition skill = Rules.SkillTrainedBy(training);
+        if (skill != null)
+        {
+            Practise(skill, tier, baseAmount);
+        }
+        else
+        {
+            GrantInsightShare(baseAmount * (OnRaid ? Rules.RaidMultiplier : 1f));
+        }
+    }
+
+    /// <summary>Insight from something worth a fraction of a point (a blow no skill trains): kept until it adds up.</summary>
+    public static void GrantInsightShare(float amount)
+    {
+        if (Current == null)
+        {
+            GrantInsight(Mathf.RoundToInt(amount));
+            return;
+        }
+
+        Current.carriedInsight += Mathf.Max(0f, amount);
+        int whole = Mathf.FloorToInt(Current.carriedInsight);
+        Current.carriedInsight -= whole;
+        GrantInsight(whole);
+    }
+
+    /// <summary>Puts Insight into a skill (the skills window), announcing any level it reaches.</summary>
+    public static int SpendInsight(ProficiencyDefinition skill, int amount)
+    {
+        LevelingSettings rules = Rules;
+        CharacterProgress progress = GameSession.Progress;
+        int before = progress.LevelOf(skill, rules);
+        int spent = progress.SpendInsight(skill, amount, rules);
+        Announce(skill, before, progress.LevelOf(skill, rules));
+        return spent;
+    }
+
+    /// <summary>A monster's worth in experience: its own Experience, or worked out from its health.</summary>
+    public static float MonsterWorth(MonsterDefinition monster, float maxHealth)
+    {
+        LevelingSettings rules = Rules;
+        if (monster != null && monster.Experience > 0)
+        {
+            return monster.Experience;
+        }
+
+        return Mathf.Max(rules.MinimumKillExperience, maxHealth * rules.KillExperiencePerHealth);
+    }
+
+    private static void Award(ProficiencyDefinition skill, int amount)
+    {
+        if (amount <= 0)
+        {
+            return;
+        }
+
+        LevelingSettings rules = Rules;
+        CharacterProgress progress = GameSession.Progress;
+        int before = progress.LevelOf(skill, rules);
+        int had = progress.ExperienceOf(skill);
+        progress.AddExperience(skill, amount, rules);
+        int gained = progress.ExperienceOf(skill) - had;
+        if (gained > 0)
+        {
+            Gained?.Invoke(skill, gained);
+        }
+
+        Announce(skill, before, progress.LevelOf(skill, rules));
+    }
+
+    private static void Announce(ProficiencyDefinition skill, int before, int after)
+    {
+        if (skill == null || after <= before)
+        {
+            return;
+        }
+
+        bool milestone = false;
+        foreach (ProficiencyDefinition.Milestone reached in skill.Milestones)
+        {
+            milestone |= reached.level > before && reached.level <= after;
+        }
+
+        GameMessages.Post(milestone
+            ? GameInput.WithRebinds($"{skill.DisplayName} {after}! A perk to choose (N).")
+            : $"{skill.DisplayName} {after}!", MessageKind.Gain);
+        if (Player.Current != null)
+        {
+            AudioManager.Play(Rules.LevelUpSound, Player.Current.transform.position);
         }
     }
 
@@ -83,27 +213,20 @@ public sealed class ExperienceTracker : MonoBehaviour, IGameSystem
     {
         switch (gameEvent.Kind)
         {
-            case GameEventKind.Killed:
-                if (gameEvent.Subject is MonsterDefinition monster && gameEvent.ForPlayerSide)
-                {
-                    Grant(KillExperience(monster, gameEvent.Origin));
-                }
-
-                break;
             case GameEventKind.QuestCompleted:
                 if (gameEvent.Subject is QuestDefinition quest)
                 {
-                    Grant(quest.Experience > 0 ? quest.Experience : settings.QuestExperience);
+                    GrantInsight(quest.Experience > 0 ? quest.Experience : settings.QuestExperience);
                 }
 
                 break;
             case GameEventKind.RaidFinished:
-                Grant(gameEvent.Outcome == RaidOutcome.Extracted ? settings.RaidExtractedExperience : settings.RaidFailedExperience);
+                GrantInsight(gameEvent.Outcome == RaidOutcome.Extracted ? settings.RaidExtractedExperience : settings.RaidFailedExperience);
                 break;
             case GameEventKind.Crafted:
                 if (gameEvent.Subject != null && GameSession.Progress.MarkCrafted(gameEvent.Subject.name))
                 {
-                    Grant(settings.FirstCraftExperience);
+                    GrantInsight(settings.FirstCraftExperience);
                 }
 
                 break;
@@ -111,49 +234,49 @@ public sealed class ExperienceTracker : MonoBehaviour, IGameSystem
                 if (gameEvent.Subject is ItemDefinition book && book.Experience > 0)
                 {
                     GameMessages.Post($"You read the {book.DisplayName}.", MessageKind.Gain);
-                    Grant(book.Experience);
+                    GrantInsight(book.Experience);
                 }
 
                 break;
         }
     }
 
-    /// <summary>The experience for killing a monster: its own, or worked out from its health.</summary>
-    public int KillExperience(MonsterDefinition monster, GameObject body)
-    {
-        if (monster.Experience > 0)
-        {
-            return monster.Experience;
-        }
-
-        float health = body != null && body.TryGetComponent(out Damageable damageable) ? damageable.MaxHealth : 0f;
-        return Mathf.Max(settings.MinimumKillExperience, Mathf.RoundToInt(health * settings.KillExperiencePerHealth));
-    }
-
     private void OnConstructionFinished(Construction construction)
     {
         if (Application.isPlaying)
         {
-            Grant(construction.Level <= 1 ? settings.BuildExperience : settings.UpgradeExperience);
+            GrantInsight(construction.Level <= 1 ? settings.BuildExperience : settings.UpgradeExperience);
         }
     }
 
-    private void OnHarvested(GameObject gatherer)
+    // A node trains the skill of the tool it is gathered with, at the node's tier; one no skill trains gives Insight.
+    private void OnHarvested(GameObject gatherer, ResourceSource source)
     {
-        if (Player.IsPlayer(gatherer))
+        if (!Player.IsPlayer(gatherer))
         {
-            Grant(settings.GatherExperience);
+            return;
+        }
+
+        GatheringNodeDefinition node = source != null ? source.Node : null;
+        ProficiencyDefinition skill = node != null ? settings.SkillFor(node.GatherTool) : null;
+        if (skill != null)
+        {
+            Practise(skill, node.Tier, settings.TierExperience(node.Tier));
+        }
+        else
+        {
+            GrantInsight(settings.HandGatherExperience);
         }
     }
 
     private void OnExplored(int cells)
     {
         exploredCells += cells;
-        int experience = exploredCells / settings.ExploredCellsPerExperience;
-        if (experience > 0)
+        int insight = exploredCells / settings.ExploredCellsPerExperience;
+        if (insight > 0)
         {
-            exploredCells -= experience * settings.ExploredCellsPerExperience;
-            Grant(experience);
+            exploredCells -= insight * settings.ExploredCellsPerExperience;
+            GrantInsight(insight);
         }
     }
 }

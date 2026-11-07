@@ -293,7 +293,7 @@ public sealed class PlayerInputHandler : MonoBehaviour
         }
     }
 
-    private void OnTalents(InputAction.CallbackContext context) => RequestWindow(UIWindowId.Talents);
+    private void OnTalents(InputAction.CallbackContext context) => RequestWindow(UIWindowId.Proficiencies);
     private void OnJournal(InputAction.CallbackContext context) => RequestWindow(UIWindowId.Journal);
 
     private void OnHaven(InputAction.CallbackContext context) => RequestWindow(UIWindowId.Haven);

@@ -284,13 +284,14 @@ public sealed class PlayerGathering : MonoBehaviour
         }
 
         int toolTier = ItemInventory.GatheringTier(gameObject, definition.GatherTool);
-        float rise = settings.RiseSecondsFor(profile, toolTier, definition.RequiredToolTier) / Mathf.Max(0.1f, definition.SwingSpeed);
+        SkillHand(definition.GatherTool, out float speed, out float sweetSpot);
+        float rise = settings.RiseSecondsFor(profile, toolTier, definition.RequiredToolTier) / Mathf.Max(0.1f, definition.SwingSpeed * speed);
         Session = new GatheringSession(
             definition.Swings,
             rise,
             settings.SweetSpot,
             profile.NormalZoneWidth,
-            settings.CriticalWidthFor(profile, toolTier, definition.RequiredToolTier),
+            Mathf.Min(settings.CriticalWidthFor(profile, toolTier, definition.RequiredToolTier) * sweetSpot, profile.NormalZoneWidth),
             settings.CriticalWidthPerCombo,
             settings.MaxCombo,
             settings.ZoneJitter,
@@ -406,6 +407,22 @@ public sealed class PlayerGathering : MonoBehaviour
         {
             target.Complete();
         }
+    }
+
+    // How the woodcutting or mining skill changes the swing: how fast the tool rises and how wide its sweet spot is,
+    // as multipliers (a beginner's below 1).
+    private void SkillHand(ToolType tool, out float speed, out float sweetSpot)
+    {
+        speed = 1f;
+        sweetSpot = 1f;
+        if ((tool != ToolType.Axe && tool != ToolType.Pickaxe) || !TryGetComponent(out Combatant self))
+        {
+            return;
+        }
+
+        bool axe = tool == ToolType.Axe;
+        speed = Mathf.Max(0.25f, 1f + self.Stats.Get(axe ? StatType.ChopSpeed : StatType.MineSpeed));
+        sweetSpot = Mathf.Max(0.1f, 1f + self.Stats.Get(axe ? StatType.ChopSweetSpot : StatType.MineSweetSpot));
     }
 
     private void WearTool(ToolType tool)

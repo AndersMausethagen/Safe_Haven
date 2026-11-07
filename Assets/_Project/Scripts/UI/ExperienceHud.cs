@@ -3,9 +3,10 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// The experience bar along the bottom of the screen: the level, how far it is to the next one, and "+12 XP" rising
-/// above it as experience comes in (amounts close together add up). Built in code for every scene with a player
-/// (ExperienceTracker); it only reads GameSession.Progress.
+/// The experience bar along the bottom of the screen: the skill trained last, its level and how far it is to the next
+/// one, "+12 Woodcutting" rising above it as experience comes in (amounts close together for the same skill add up), and
+/// a reminder (N) while Insight waits to be put into a skill or a perk to be chosen. Built in code for every scene with a
+/// player (ExperienceTracker); it only reads GameSession.Progress.
 /// </summary>
 public sealed class ExperienceHud : MonoBehaviour
 {
@@ -19,15 +20,24 @@ public sealed class ExperienceHud : MonoBehaviour
     private int shownGain;
     private float gainAt = -10f;
     // What the texts say now: written again only when it changes (no new strings every frame).
+    private ProficiencyDefinition gainedSkill;
+    private ProficiencyDefinition writtenSkill;
     private int writtenLevel = -1;
     private int writtenPoints = -1;
     private int writtenKeys = -1;
     private int writtenGain = -1;
 
+    // The skill the bar follows: the one trained last, kept across scenes.
+    private static ProficiencyDefinition shownSkill;
+
     public static ExperienceHud Current { get; private set; }
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    private static void ResetForNewPlaySession() => Current = null;
+    private static void ResetForNewPlaySession()
+    {
+        Current = null;
+        shownSkill = null;
+    }
 
     public static ExperienceHud Create()
     {
@@ -54,8 +64,8 @@ public sealed class ExperienceHud : MonoBehaviour
         hud.fill.offsetMin = hud.fill.offsetMax = Vector2.zero;
         hud.fill.gameObject.AddComponent<Image>().color = Gold;
 
-        hud.level = Label("Level", bar, new Vector2(1f, 0.5f), new Vector2(120f, 24f), new Vector2(66f, 0f), 17f, TextAlignmentOptions.Left);
-        hud.gain = Label("Gain", bar, new Vector2(0.5f, 1f), new Vector2(240f, 28f), new Vector2(0f, 18f), 19f, TextAlignmentOptions.Center);
+        hud.level = Label("Level", bar, new Vector2(1f, 0.5f), new Vector2(260f, 24f), new Vector2(136f, 0f), 17f, TextAlignmentOptions.Left);
+        hud.gain = Label("Gain", bar, new Vector2(0.5f, 1f), new Vector2(320f, 28f), new Vector2(0f, 18f), 19f, TextAlignmentOptions.Center);
         ExperienceTracker.Gained += hud.OnGained;
         return hud;
     }
@@ -71,10 +81,17 @@ public sealed class ExperienceHud : MonoBehaviour
         }
     }
 
-    private void OnGained(int amount)
+    private void OnGained(ProficiencyDefinition skill, int amount)
     {
-        shownGain = Time.unscaledTime - gainAt < GainSeconds * 0.6f ? shownGain + amount : amount;
+        bool same = skill == gainedSkill && Time.unscaledTime - gainAt < GainSeconds * 0.6f;
+        shownGain = same ? shownGain + amount : amount;
+        gainedSkill = skill;
         gainAt = Time.unscaledTime;
+        writtenGain = -1;
+        if (skill != null)
+        {
+            shownSkill = skill;
+        }
     }
 
     private void LateUpdate()
@@ -82,15 +99,21 @@ public sealed class ExperienceHud : MonoBehaviour
         group.alpha = GamePause.IsPaused ? 0f : 1f;
         LevelingSettings settings = LevelingSettings.Current;
         CharacterProgress progress = GameSession.Progress;
-        float share = progress.IsMaxLevel(settings) ? 1f : progress.Experience / (float)settings.ExperienceToNext(progress.Level);
+        int needed = 0;
+        int towards = shownSkill != null ? progress.TowardsNext(shownSkill, settings, out needed) : 0;
+        float share = shownSkill == null ? 0f : needed <= 0 ? 1f : towards / (float)needed;
         fill.anchorMax = new Vector2(Mathf.Clamp01(share), 1f);
-        int points = progress.UnspentPoints(settings);
-        if (progress.Level != writtenLevel || points != writtenPoints || InputRebinds.Changes != writtenKeys)
+        int skillLevel = shownSkill != null ? progress.LevelOf(shownSkill, settings) : 0;
+        // Something to do in the skills window: a perk to choose, or Insight to put into a skill.
+        int points = progress.PendingChoices(settings) + (progress.Insight > 0 ? 1 : 0);
+        if (shownSkill != writtenSkill || skillLevel != writtenLevel || points != writtenPoints || InputRebinds.Changes != writtenKeys)
         {
-            writtenLevel = progress.Level;
+            writtenSkill = shownSkill;
+            writtenLevel = skillLevel;
             writtenPoints = points;
             writtenKeys = InputRebinds.Changes;
-            level.text = points > 0 ? GameInput.WithRebinds($"Lv {progress.Level}  <color={UIStyle.Current.GoodHex}>+{points} (N)</color>") : $"Lv {progress.Level}";
+            string name = shownSkill != null ? $"{shownSkill.DisplayName} {skillLevel}" : "Skills";
+            level.text = points > 0 ? GameInput.WithRebinds($"{name}  <color={UIStyle.Current.GoodHex}>(N)</color>") : name;
         }
 
         float age = Time.unscaledTime - gainAt;
@@ -100,7 +123,7 @@ public sealed class ExperienceHud : MonoBehaviour
             if (shownGain != writtenGain)
             {
                 writtenGain = shownGain;
-                gain.text = $"+{shownGain} XP";
+                gain.text = $"+{shownGain} {(gainedSkill != null ? gainedSkill.DisplayName : "Insight")}";
             }
 
             gain.alpha = 1f - Mathf.Clamp01((age - GainSeconds * 0.5f) / (GainSeconds * 0.5f));

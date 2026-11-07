@@ -52,6 +52,7 @@ public sealed class Player : MonoBehaviour
     private void Awake()
     {
         ColdBreath.AddTo(gameObject);
+        PlayerTraining.AddTo(gameObject);
         PlayerWarmth.AddTo(gameObject);
         if (Current != null && Current != this)
         {

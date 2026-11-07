@@ -67,7 +67,7 @@ public sealed class HavenProgress : MonoBehaviour
             clearedQuarter = quarter;
             GameMessages.Post(quarter >= 4 ? "The clearing is free of the overgrowth. The whole glade breathes again."
                 : $"The clearing breathes again: {quarter * 25}% cleared.", MessageKind.Gain);
-            ExperienceTracker.Grant(HavenSettings.Current.ClearingExperiencePerQuarter * quarter);
+            ExperienceTracker.GrantInsight(HavenSettings.Current.ClearingExperiencePerQuarter * quarter);
         }
 
         Count(true);
@@ -105,7 +105,7 @@ public sealed class HavenProgress : MonoBehaviour
             }
             AudioManager.Play(settings.RankSound, transform.position);
             CameraShake.Add(0.15f);
-            ExperienceTracker.Grant(settings.RankExperience);
+            ExperienceTracker.GrantInsight(settings.RankExperience);
             GameMessages.Post($"Safe Haven is now a {reached.name}! The ward reaches {(HomePortal.Current != null ? HomePortal.Current.WardRadius : 0f):0} m.", MessageKind.Gain);
         }
 

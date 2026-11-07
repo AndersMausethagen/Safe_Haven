@@ -169,7 +169,7 @@ public sealed class NokkenEncounter : MonoBehaviour
 
         if (brokeFree)
         {
-            ExperienceTracker.Grant(settings.NokkenEscapeExperience(first));
+            ExperienceTracker.GrantInsight(settings.NokkenEscapeExperience(first));
         }
 
         done?.Invoke();

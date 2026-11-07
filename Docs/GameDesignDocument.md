@@ -81,7 +81,7 @@ Recovered resources expand Safe Haven with workshops, farms, crafted equipment, 
 | Base building                  | Visible long-term progression        | Every successful journey can improve the home                                  |
 | Survival                       | Preparation and meaningful decisions | Food, water, and weather influence plans without becoming busywork             |
 | NPC recruitment                | Emotional and mechanical development | Rescued people bring abilities, stories, and life to the settlement            |
-| Equipment, Essence, and skills | Player progression and builds        | Boss-earned abilities, talent choices, magical enhancements, and varied builds |
+| Equipment, Essence, and skills | Player progression and builds        | Boss-earned abilities, skills and perk choices, magical enhancements, and varied builds |
 | Controlled base defense        | Occasional stakes at home            | Build wards, defenses, and resident preparedness against warned breaches       |
 | Nordic folklore                | Distinctive world identity           | Forest spirits, huldras, trolls, fiddlers, old bargains, and mountain myths    |
 
@@ -198,11 +198,11 @@ Notice a threat or opportunity → observe positioning and telegraphs → act wi
 
 ### 5.3 Early, mid, and late game
 
-**Early:** harvest wood, stone, food and water; build campfire and construction table; recover Life Orbs and activate the portal. Introduce the ward visually without forcing an early defense event. **Mid:** undertake raids for ore, Cursed Essence, recipes, rare materials, and recruits; purify Essence, choose talents, construct the first defenses, and grow a staffed settlement. **Late:** undertake difficult raids and boss fights, enhance equipment and skills, master mixed Purified/Cursed builds, withstand rarer advanced ward breaches, and deepen the mythology of the forest.
+**Early:** harvest wood, stone, food and water; build campfire and construction table; recover Life Orbs and activate the portal. Introduce the ward visually without forcing an early defense event. **Mid:** undertake raids for ore, Cursed Essence, recipes, rare materials, and recruits; purify Essence, choose perks, construct the first defenses, and grow a staffed settlement. **Late:** undertake difficult raids and boss fights, enhance equipment and skills, master mixed Purified/Cursed builds, withstand rarer advanced ward breaches, and deepen the mythology of the forest.
 
 ### 5.4 Progression model
 
-Separate permanent progression (base, blueprints, levels, talents, learned abilities and upgrades, boss flags, recruited residents, and safely banked Purified Essence) from at-risk state (unextracted Cursed Essence, raid inventory, cargo, consumables, and accompanying NPCs). Each tier should introduce a novel choice, not only higher numbers. Deployed equipment is retained on death but takes repairable durability damage. Defense damage is a repairable settlement state rather than a reset of permanent progression.
+Separate permanent progression (base, blueprints, skills, perks, learned abilities and upgrades, boss flags, recruited residents, and safely banked Purified Essence) from at-risk state (unextracted Cursed Essence, raid inventory, cargo, consumables, and accompanying NPCs). Each tier should introduce a novel choice, not only higher numbers. Deployed equipment is retained on death but takes repairable durability damage. Defense damage is a repairable settlement state rather than a reset of permanent progression.
 
 ## 6. Safe Haven: a peaceful home worth defending
 
@@ -752,7 +752,7 @@ The village should respond to a rescued resident, a lost companion, and a major 
 
 Separate four sources of progression to avoid making every improvement consume the same currency:
 
-9.  **Character levels and Talent Points:** earned from gameplay and spent on modest, persistent passive choices. Talent Points do **not** cost Essence.
+9.  **Skills and perks:** each activity (woodcutting, mining, melee, sneaking, and later crafting, cooking, archery...) is a skill that levels by doing it, with small bonuses every level and a choice of two perks every ten. They replaced character levels and Talent Points (November 7, 2026; see [Skills](Skills.md)). Perks do **not** cost Essence.
 
 10. **Skill unlocks:** generally earned from bosses, quests, discoveries, and story milestones. An initial unlock should **not** also demand a large Essence payment.
 
@@ -770,9 +770,11 @@ Players should gain useful progress even after some failed Raids through levels 
 
 These are **learnable disciplines, not exclusive classes**. The player can mix and match skills from both paths. The first prototype needs only a small number of representative skills, not a complete parallel tree per discipline.
 
-### 16.3 Equipped skills and talents
+### 16.3 Equipped abilities, skills and perks
 
-Keep the existing prototype target of **three active combat skill slots**, with a clear role for mobility/defense and limited cooldown clutter. Players may know more skills than they equip and may adjust loadouts in Safe Haven. Talent Points are earned by leveling and spent across simple branches such as Combat, Survival, and Magic. Talents are lightweight passive modifiers; they should not require Essence. Respec should be affordable enough to encourage experimentation.
+Keep the existing prototype target of **three active combat skill slots**, with a clear role for mobility/defense and limited cooldown clutter. Players may know more skills than they equip and may adjust loadouts in Safe Haven. In the game these active skills are called **abilities**, so that "skills" means what the player gets better at by doing.
+
+**Skills (implemented November 7, 2026):** Woodcutting, Mining, Melee (striking, blocking, parrying) and Sneaking, levels 1 to 50, trained by doing. Every level adds a little; the game's tuning is level 10, so a beginner is weaker than the game used to assume (slower and less precise with tools, softer and more tiring blows, louder and easier to see) and a master stronger. Every ten levels the player chooses one of two perks, which can be chosen again for free at home. Experience that isn't practice (quests, raids, discoveries) is **Insight**, put into any skill. Raid tiers count the skill expected at each tier. Crafting skills (Weaponcrafting, Armorcrafting, Cooking, Alchemy, Construction) and Foraging, Fishing, Archery and Runecraft follow. Numbers and reasons: [Skills](Skills.md).
 
 ### 16.4 Skill enhancement and cost rules
 
@@ -937,7 +939,7 @@ RaidDirector chooses a seed, assembles compatible room modules and points of int
 
 Autosave in Safe Haven after major actions and upon returning from raids. At deployment, persist a transaction-like snapshot of committed equipment, companions, and the raid seed. A crash must not duplicate gear or corrupt the settlement. For MVP, interrupted raids may deliberately reset to the pre-raid snapshot, as long as the policy is explicit and tested. Before release, decide and test interrupted-raid recovery, save scumming, item duplication, and save version migration.
 
-**New persistent fields:** include purification queues, permanent Essence balances, provisional Raid Essence, learned skills/ranks, Talent Points, defense placements and health, ward status, upcoming breach state, and resolved defense-event IDs. Extraction commits Essence exactly once, and breach rewards/consequences must also be idempotent. A new game or recovery save must not spawn duplicated defenders or resurrect destroyed defensive objects.
+**New persistent fields:** include purification queues, permanent Essence balances, provisional Raid Essence, learned abilities/ranks, skill experience, chosen perks and Insight, defense placements and health, ward status, upcoming breach state, and resolved defense-event IDs. Extraction commits Essence exactly once, and breach rewards/consequences must also be idempotent. A new game or recovery save must not spawn duplicated defenders or resurrect destroyed defensive objects.
 
 **As built (November 3, 2026):** the game saves as a raid sets out and when the player is home again. An interrupted raid resets to the save it set out from, and the player is told. Its haul is lost and nothing is doubled.
 

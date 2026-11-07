@@ -8,7 +8,9 @@ using UnityEngine;
 /// What a fight comes to at one raid tier, worked out from the real assets: the best kit of a tier, its gear score, its damage and how
 /// much it can take, and from that the hits to kill and the hits to die against a reference creature. It is how a tier gets tuned to its
 /// gear score: at the recommended kit those hits should stay about the same from tier to tier, and the kit before should feel it.
-/// Plain arithmetic: it ignores attack speed, skills and timing, so read the numbers against each other, not as a fight's length.
+/// The kit's damage counts the Melee skill a player is expected to have at the tier (LevelingSettings.ExpectedLevel): none at tier I,
+/// whose expected level is the baseline the game was tuned for, a little more each tier after.
+/// Plain arithmetic: it ignores attack speed, perks and timing, so read the numbers against each other, not as a fight's length.
 /// </summary>
 public static class GearBalance
 {
@@ -21,6 +23,8 @@ public static class GearBalance
         public float Armor;
         public float Health;
         public float Reduction;
+        /// <summary>The Melee skill's damage bonus at the level expected for the tier, already in Damage.</summary>
+        public float SkillDamage;
         public readonly List<ItemDefinition> Pieces = new List<ItemDefinition>();
 
         /// <summary>How much damage it takes to kill: health over what armor lets through.</summary>
@@ -72,6 +76,9 @@ public static class GearBalance
         Wear(ring);
         Wear(ring);
         Measure(kit);
+        LevelingSettings skills = LevelingSettings.Current;
+        kit.SkillDamage = LevelingSettings.BonusAt(skills.SkillTrainedBy(ProficiencyTraining.Melee), StatType.MeleeDamage, skills.ExpectedLevel(tier), skills);
+        kit.Damage *= 1f + kit.SkillDamage;
         return kit;
     }
 

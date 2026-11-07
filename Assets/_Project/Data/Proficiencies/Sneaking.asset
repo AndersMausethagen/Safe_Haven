@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d75b22f30f824f747ae6ca96317ac240, type: 3}
+  m_Name: Sneaking
+  m_EditorClassIdentifier: SafeHaven::ProficiencyDefinition
+  id: sneaking
+  displayName: Sneaking
+  description: 'Moving unseen and unheard: where to put a foot, when to stand still, how to open a lock without a sound.'
+  trainedBy: ambushes, slipping past monsters, losing those that hunt you, and silent lock pins
+  icon: {fileID: 0}
+  group: 3
+  training: 2
+  gatherTool: 0
+  levelBonuses:
+  - stat: 31
+    atFirstLevel: 0.29999998
+    atLastLevel: -0.39999998
+  - stat: 32
+    atFirstLevel: 0.17999999
+    atLastLevel: -0.29
+  - stat: 34
+    atFirstLevel: -0.19999999
+    atLastLevel: 0.29999998
+  milestones:
+  - level: 10
+    first: {fileID: 11400000, guid: 5409056c003fddb4093b7460be74b94d, type: 2}
+    second: {fileID: 11400000, guid: 3623febf7d308794bbf66973bf93f3a1, type: 2}
+  - level: 20
+    first: {fileID: 11400000, guid: 881c3855dbc449544b38db8dfd6e01b0, type: 2}
+    second: {fileID: 11400000, guid: 6565b97fd4d19104c9de1cdda10b4edd, type: 2}
+  - level: 30
+    first: {fileID: 11400000, guid: 8940f5a1506d489438c74b586f3c32c9, type: 2}
+    second: {fileID: 11400000, guid: 32d3ec1c059f8ee43a412db08d0a2d41, type: 2}
+  - level: 40
+    first: {fileID: 11400000, guid: c468abb3404839e45aca8898bde9a504, type: 2}
+    second: {fileID: 11400000, guid: e3d50555690e8e941bc8a56aef08a337, type: 2}
+  - level: 50
+    first: {fileID: 11400000, guid: 1736ed0eb9c4dc84083ab0233e89130c, type: 2}
+    second: {fileID: 11400000, guid: b6601a9516d06bc42a426958551cf477, type: 2}

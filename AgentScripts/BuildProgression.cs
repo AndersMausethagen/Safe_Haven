@@ -7,28 +7,25 @@ using UnityEngine.AI;
 using UnityEngine.SceneManagement;
 
 /// <summary>
-/// Levels and talents content (`unity command run_script --file AgentScripts/BuildProgression.cs --entry BuildProgression.Apply`):
-/// the twenty talents of the four trees (Data/Talents), Resources/LevelingSettings, the Rune Book (read for experience;
-/// in supply caches), the Experience Stone prefab placed off the paths of the prologue and the Misty Woods raid, and
-/// PlayerTalents on the player prefab. Safe to run again. Reopens the scene that was open.
+/// Progression content (`unity command run_script --file AgentScripts/BuildProgression.cs --entry BuildProgression.Apply`):
+/// the Rune Book (read for Insight; in supply caches), the Experience Stone prefab placed off the paths of the prologue
+/// and the Misty Woods raid, and PlayerProficiencies on the player prefab. The skills, their perks and LevelingSettings
+/// are AgentScripts/BuildProficiencies.cs (they replaced the talents this once made). Safe to run again. Reopens the
+/// scene that was open.
 /// </summary>
 public static class BuildProgression
 {
-    private const string Talents = "Assets/_Project/Data/Talents/";
     private const string StonePrefab = "Assets/_Project/Prefabs/Interactables/ExperienceStone.prefab";
-    private const float Pct = 0.01f;
 
     public static string Apply()
     {
         string previous = SceneManager.GetActiveScene().path;
         if (SceneManager.GetActiveScene().isDirty) return "the open scene has unsaved changes";
 
-        List<TalentDefinition> talents = MakeTalents();
-        string settings = Settings(talents);
         ItemDefinition book = RuneBook();
         string caches = AddToCaches(book);
         GameObject stone = MakeStone();
-        string player = AddPlayerTalents();
+        string player = AddPlayerProficiencies();
         AssetDatabase.SaveAssets();
 
         string prologue = InScene("Assets/_Project/Scenes/Prologue_MistyWoods.unity", () => PlaceStones(stone, new[] { new Vector2(-14f, -57f) }));
@@ -47,86 +44,7 @@ public static class BuildProgression
         });
 
         if (!string.IsNullOrEmpty(previous)) EditorSceneManager.OpenScene(previous);
-        return $"{talents.Count} talents; {settings}; {caches}; {player}; prologue {prologue}; raid {raid}";
-    }
-
-    // ----- Talents -----
-
-    private static List<TalentDefinition> MakeTalents()
-    {
-        var made = new List<TalentDefinition>
-        {
-            Talent("Ranger", "steady_draw", "Steady Draw", "A bowstring you know like your own breath.", TalentTree.Ranger, 0, 3, Bonus(StatType.DrawSpeed, 8 * Pct)),
-            Talent("Ranger", "light_feet", "Light Feet", "Moss under the boots, never twigs.", TalentTree.Ranger, 0, 3, Bonus(StatType.MoveSpeed, 3 * Pct)),
-            Talent("Ranger", "forager", "Forager", "You find the berries the birds missed.", TalentTree.Ranger, 1, 3, Bonus(StatType.GatherYield, 8 * Pct)),
-            Talent("Ranger", "keen_eye", "Keen Eye", "Aim for the gap in the hide.", TalentTree.Ranger, 1, 3, Bonus(StatType.PhysicalCritChance, 3 * Pct)),
-            Talent("Ranger", "hunters_patience", "Hunter's Patience", "Wait for the moment, then end it.", TalentTree.Ranger, 2, 2, Bonus(StatType.PhysicalCritDamage, 15 * Pct)),
-
-            Talent("Soldier", "thick_skin", "Thick Skin", "Scars are just armour you grew yourself.", TalentTree.Soldier, 0, 3, Bonus(StatType.MaxHealth, 10)),
-            Talent("Soldier", "shield_arm", "Shield Arm", "Take the blow where it hurts least.", TalentTree.Soldier, 0, 3, Bonus(StatType.Armor, 5)),
-            Talent("Soldier", "weapon_drill", "Weapon Drill", "A thousand cuts at a post, for the one that counts.", TalentTree.Soldier, 1, 3, Bonus(StatType.PhysicalPower, 3)),
-            Talent("Soldier", "endurance", "Endurance", "Twenty winters in the shield wall.", TalentTree.Soldier, 1, 3, Bonus(StatType.MaxStamina, 10)),
-            Talent("Soldier", "unbroken", "Unbroken", "Knocked down, never out.", TalentTree.Soldier, 2, 2, Bonus(StatType.PhysicalResistance, 5 * Pct)),
-
-            Talent("Runemaster", "rune_lore", "Rune Lore", "Old words, carved deeper.", TalentTree.Runemaster, 0, 3, Bonus(StatType.SpellPower, 4)),
-            Talent("Runemaster", "warding_signs", "Warding Signs", "Marks against flame and frost.", TalentTree.Runemaster, 0, 3,
-                Bonus(StatType.FireResistance, 5 * Pct), Bonus(StatType.FrostResistance, 5 * Pct)),
-            Talent("Runemaster", "sharp_runes", "Sharp Runes", "A rune cut true bites twice.", TalentTree.Runemaster, 1, 3, Bonus(StatType.SpellCritChance, 4 * Pct)),
-            Talent("Runemaster", "holy_marks", "Holy Marks", "What the dark fears, worn on the skin.", TalentTree.Runemaster, 1, 2, Bonus(StatType.HolyResistance, 8 * Pct)),
-            Talent("Runemaster", "runes_of_ruin", "Runes of Ruin", "The word that means open, said too loud.", TalentTree.Runemaster, 2, 2, Bonus(StatType.SpellCritDamage, 20 * Pct)),
-
-            Talent("Tinkerer", "careful_hands", "Careful Hands", "Strike with the grain and the edge lasts.", TalentTree.Tinkerer, 0, 3, Bonus(StatType.ToolCare, 15 * Pct)),
-            Talent("Tinkerer", "work_song", "Work Song", "Keep the rhythm and the work keeps you.", TalentTree.Tinkerer, 0, 3, Bonus(StatType.MaxStamina, 8)),
-            Talent("Tinkerer", "prospector", "Prospector", "You see the seam before the pick does.", TalentTree.Tinkerer, 1, 3, Bonus(StatType.GatherYield, 6 * Pct)),
-            Talent("Tinkerer", "wrecker", "Wrecker", "Every wall has a weak joint.", TalentTree.Tinkerer, 1, 3, Bonus(StatType.StructureDamage, 15 * Pct)),
-            Talent("Tinkerer", "strong_back", "Strong Back", "Hauling stone builds more than walls.", TalentTree.Tinkerer, 2, 2, Bonus(StatType.Strength, 3)),
-        };
-        return made;
-    }
-
-    private static StatBonus Bonus(StatType stat, float value) => new StatBonus(stat, value);
-
-    private static TalentDefinition Talent(string folder, string id, string label, string text, TalentTree tree, int row, int ranks, params StatBonus[] bonuses)
-    {
-        string dir = Talents + folder;
-        if (!AssetDatabase.IsValidFolder(dir))
-        {
-            if (!AssetDatabase.IsValidFolder(Talents.TrimEnd('/'))) AssetDatabase.CreateFolder("Assets/_Project/Data", "Talents");
-            AssetDatabase.CreateFolder(Talents.TrimEnd('/'), folder);
-        }
-
-        string path = $"{dir}/{label.Replace(" ", "").Replace("'", "")}.asset";
-        var talent = AssetDatabase.LoadAssetAtPath<TalentDefinition>(path);
-        if (talent == null)
-        {
-            talent = ScriptableObject.CreateInstance<TalentDefinition>();
-            AssetDatabase.CreateAsset(talent, path);
-        }
-
-        talent.Configure(id, label, text, tree, row, ranks, bonuses);
-        EditorUtility.SetDirty(talent);
-        return talent;
-    }
-
-    private static string Settings(List<TalentDefinition> talents)
-    {
-        const string path = "Assets/_Project/Resources/LevelingSettings.asset";
-        var settings = AssetDatabase.LoadAssetAtPath<LevelingSettings>(path);
-        if (settings == null)
-        {
-            settings = ScriptableObject.CreateInstance<LevelingSettings>();
-            AssetDatabase.CreateAsset(settings, path);
-        }
-
-        var so = new SerializedObject(settings);
-        SerializedProperty list = so.FindProperty("talents");
-        list.arraySize = talents.Count;
-        for (int i = 0; i < talents.Count; i++) list.GetArrayElementAtIndex(i).objectReferenceValue = talents[i];
-        so.FindProperty("levelUpSound").objectReferenceValue =
-            AssetDatabase.LoadAssetAtPath<SoundDefinition>("Assets/_Project/Audio/Sounds/Library/Quest Completed.asset");
-        so.ApplyModifiedPropertiesWithoutUndo();
-        EditorUtility.SetDirty(settings);
-        return "settings " + path;
+        return $"{caches}; {player}; prologue {prologue}; raid {raid}";
     }
 
     // ----- Rune Book -----
@@ -265,16 +183,16 @@ public static class BuildProgression
 
     // ----- Player -----
 
-    private static string AddPlayerTalents()
+    private static string AddPlayerProficiencies()
     {
         const string path = "Assets/_Project/Prefabs/Characters/PlayerArmature.prefab";
         GameObject root = PrefabUtility.LoadPrefabContents(path);
         try
         {
-            if (root.GetComponent<PlayerTalents>() != null) return "player has talents";
-            root.AddComponent<PlayerTalents>();
+            if (root.GetComponent<PlayerProficiencies>() != null) return "player has skills";
+            root.AddComponent<PlayerProficiencies>();
             PrefabUtility.SaveAsPrefabAsset(root, path);
-            return "PlayerTalents on the player";
+            return "PlayerProficiencies on the player";
         }
         finally
         {

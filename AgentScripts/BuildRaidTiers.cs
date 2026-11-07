@@ -92,9 +92,9 @@ public static class BuildRaidTiers
         (int tier, int recommended, int minimum, float health, float power, float density, float loot, string briefing)[] tiers =
         {
             (1, 10, 0, 1f, 1f, 1f, 1f, "Wolves, boars and bog things. Copper and hardwood for those who can carry them."),
-            (2, 30, 15, 1.4f, 1.35f, 1.15f, 1.1f, "Wolves pounce from a distance and bog things spit in volleys. Root Guardians wake, Moss Shamans call them on. Iron, deepstone and elderwood lie deeper in."),
-            (3, 50, 30, 2.1f, 2.6f, 1.3f, 1.2f, "The dead walk: Draugs among the trees. Boars trample, Guardians slam the ground and the great troll charges. Moonsilver can be found here."),
-            (4, 70, 45, 2.6f, 3.4f, 1.45f, 1.35f, "The woods at their worst. Draugs rally with a war cry, Guardians call up roots and the great troll calls its kin. Its Trollstone is worth taking."),
+            (2, 30, 15, 1.5f, 1.35f, 1.15f, 1.1f, "Wolves pounce from a distance and bog things spit in volleys. Root Guardians wake, Moss Shamans call them on. Iron, deepstone and elderwood lie deeper in."),
+            (3, 50, 30, 2.3f, 2.6f, 1.3f, 1.2f, "The dead walk: Draugs among the trees. Boars trample, Guardians slam the ground and the great troll charges. Moonsilver can be found here."),
+            (4, 70, 45, 3f, 3.4f, 1.45f, 1.35f, "The woods at their worst. Draugs rally with a war cry, Guardians call up roots and the great troll calls its kin. Its Trollstone is worth taking."),
         };
         var so = new SerializedObject(AssetDatabase.LoadAssetAtPath<RaidDefinition>(RaidPath));
         SerializedProperty list = so.FindProperty("difficulties");

@@ -294,7 +294,7 @@ public sealed class PlayerFishing : MonoBehaviour
         {
             GameMessages.Post($"Caught a {fish.DisplayName}! ({kilograms:0.0} kg)", MessageKind.Gain);
             GameEvents.Raise(new GameEvent(GameEventKind.FishCaught, fish, 1, gameObject));
-            ExperienceTracker.Grant(LevelingSettings.Current.CatchExperience);
+            ExperienceTracker.GrantInsight(LevelingSettings.Current.CatchExperience);
         }
 
         AudioManager.Play(settings.CatchSound, transform.position);

@@ -168,9 +168,18 @@ public sealed class ResidentSaveData
 [Serializable]
 public sealed class ProgressSaveData
 {
+    /// <summary>The character level from before skills, read once to turn its experience into Insight; 1 in newer saves.</summary>
     public int level = 1;
+    /// <summary>Experience towards that level; 0 in newer saves.</summary>
     public int experience;
+    /// <summary>Talent ranks from before skills: no longer read (talents became perks).</summary>
     public List<AmountSaveData> talents = new List<AmountSaveData>();
+    /// <summary>Total experience in each skill (ProficiencyDefinition), by id. Missing in older saves.</summary>
+    public List<AmountSaveData> proficiencies = new List<AmountSaveData>();
+    /// <summary>The perk chosen at each reached skill milestone, by perk id. Missing in older saves.</summary>
+    public List<string> perks = new List<string>();
+    /// <summary>Experience not yet put into a skill. Missing in older saves.</summary>
+    public int insight;
     /// <summary>Ranks deepened at the altar, by skill id. Missing in older saves.</summary>
     public List<AmountSaveData> skillRanks = new List<AmountSaveData>();
     public List<string> crafted = new List<string>();

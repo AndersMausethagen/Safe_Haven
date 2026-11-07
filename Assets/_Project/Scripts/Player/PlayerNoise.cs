@@ -75,6 +75,10 @@ public sealed class PlayerNoise : MonoBehaviour
         }
     }
 
+    /// <summary>How much louder the Sneaking skill makes the quiet work, sneaking footsteps and picking locks, as a
+    /// multiplier: above 1 for a beginner, below for a master.</summary>
+    public float SneakSkillScale => combatant != null ? Mathf.Max(0.1f, 1f + combatant.Stats.Get(StatType.SneakNoise)) : 1f;
+
     /// <summary>How far every sound the player makes carries, as a share of normal. Relics change it.</summary>
     public float Reach { get; set; } = 1f;
 
@@ -106,7 +110,7 @@ public sealed class PlayerNoise : MonoBehaviour
         else if (movement.IsGrounded)
         {
             nextStepAt = Time.time + rules.FootstepInterval;
-            Make(transform.position, (IsSneaking ? rules.SneakingFootstepNoise : rules.FootstepNoise) * GearScale(rules) + (burden != null ? burden.StepNoise(IsSneaking) : 0f));
+            Make(transform.position, (IsSneaking ? rules.SneakingFootstepNoise * SneakSkillScale : rules.FootstepNoise) * GearScale(rules) + (burden != null ? burden.StepNoise(IsSneaking) : 0f));
         }
     }
 

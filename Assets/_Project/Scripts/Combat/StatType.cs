@@ -43,4 +43,32 @@ public enum StatType
     Lifesteal = 20,
     /// <summary>Share more Cursed Essence from kills. 0.25 means a quarter more on average.</summary>
     EssenceFind = 21,
+
+    // Skills (Progression/ProficiencyDefinition) and their perks. Shares: 0.1 means 10% more, a negative value less.
+    /// <summary>Share faster the axe rises on the timing bar (felling and splitting).</summary>
+    ChopSpeed = 22,
+    /// <summary>Share wider the axe's critical zone on the timing bar.</summary>
+    ChopSweetSpot = 23,
+    /// <summary>Chance from 0 to 1 of one extra of a tree's main yield, on top of Extra Yield Chance.</summary>
+    ChopYield = 24,
+    /// <summary>Share faster the pickaxe rises on the timing bar.</summary>
+    MineSpeed = 25,
+    /// <summary>Share wider the pickaxe's critical zone on the timing bar.</summary>
+    MineSweetSpot = 26,
+    /// <summary>Chance from 0 to 1 of one extra of a rock's main yield, on top of Extra Yield Chance.</summary>
+    MineYield = 27,
+    /// <summary>Share more damage from weapon swings (not arrows or spells). Applied before backstabs, so their order holds.</summary>
+    MeleeDamage = 28,
+    /// <summary>Share more stamina a weapon swing costs. Negative is cheaper.</summary>
+    MeleeStaminaCost = 29,
+    /// <summary>Share more stamina a blocked blow costs. Negative is cheaper.</summary>
+    BlockStaminaCost = 30,
+    /// <summary>Share louder the player's footsteps while sneaking, and picking locks. Negative is quieter.</summary>
+    SneakNoise = 31,
+    /// <summary>Share easier the player is to see while sneaking. Negative is harder: monsters take longer to spot them.</summary>
+    SneakVisibility = 32,
+    /// <summary>Share more damage on a hit against an unaware monster, on top of the ambush bonus.</summary>
+    AmbushDamage = 33,
+    /// <summary>Share wider the zones on the lockpicking bar.</summary>
+    LockpickZone = 34,
 }

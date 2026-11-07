@@ -31,7 +31,7 @@ public sealed class AltarWindow : MonoBehaviour
     private const float ReadSeconds = 0.5f;
     private const float ScreenMargin = 24f;
 
-    private static readonly string[] PageNames = { "Purify", "Empower", "Enchant", "Skills" };
+    private static readonly string[] PageNames = { "Purify", "Empower", "Enchant", "Abilities" };
 
     private static readonly string[] PageLines =
     {

@@ -147,8 +147,8 @@ public sealed class EssenceTests
             Assert.Greater(settings.SkillRanks[i].purified, settings.SkillRanks[i - 1].purified);
         }
 
-        progress.ResetTalents();
-        Assert.AreEqual(2, progress.RankOf(skill), "resetting talents doesn't undo what essence bought");
+        progress.ResetPerks();
+        Assert.AreEqual(2, progress.RankOf(skill), "choosing perks again doesn't undo what essence bought");
     }
 
     [Test]

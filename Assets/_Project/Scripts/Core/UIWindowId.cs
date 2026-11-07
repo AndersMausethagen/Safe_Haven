@@ -26,8 +26,8 @@ public enum UIWindowId
     Station = 9,
     /// <summary>A conversation: the speaker's portrait, their line and the player's answers (DialogueBox).</summary>
     Dialogue = 10,
-    /// <summary>Level, experience and the four talent trees (N).</summary>
-    Talents = 11,
+    /// <summary>The skills: their levels, perks and Insight (N).</summary>
+    Proficiencies = 11,
     /// <summary>The overview of Safe Haven: its rank, renown, people and what to do next (H).</summary>
     Haven = 12,
     /// <summary>The Purification Altar: purifying, empowering and enchanting gear, deepening skills.</summary>

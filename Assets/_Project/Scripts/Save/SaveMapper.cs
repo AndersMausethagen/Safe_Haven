@@ -573,6 +573,19 @@ public static class SaveMapper
         return loaded;
     }
 
+    /// <summary>All the experience a character level from before skills stood for (that curve: 100, then 1.18 times more
+    /// each level, rounded to 5), with the experience towards the next. 0 for a newer save.</summary>
+    public static int LegacyExperience(int level, int experience)
+    {
+        int total = Math.Max(0, experience);
+        for (int reached = 1; reached < level; reached++)
+        {
+            total += Math.Max(1, (int)Math.Round(100.0 * Math.Pow(1.18, reached - 1) / 5.0) * 5);
+        }
+
+        return total;
+    }
+
     private static void WriteProgress(CharacterProgress progress, ProgressSaveData into)
     {
         if (progress == null)
@@ -580,12 +593,13 @@ public static class SaveMapper
             return;
         }
 
-        into.level = progress.Level;
-        into.experience = progress.Experience;
-        foreach (KeyValuePair<string, int> rank in progress.Ranks)
+        foreach (KeyValuePair<string, int> skill in progress.Experience)
         {
-            into.talents.Add(new AmountSaveData { id = rank.Key, amount = rank.Value });
+            into.proficiencies.Add(new AmountSaveData { id = skill.Key, amount = skill.Value });
         }
+
+        into.perks.AddRange(progress.Perks);
+        into.insight = progress.Insight;
 
         foreach (KeyValuePair<string, int> skill in progress.SkillRanks)
         {
@@ -611,7 +625,8 @@ public static class SaveMapper
         }
     }
 
-    // Talents that no longer exist give their points back.
+    // Perks that no longer exist are dropped (their milestone waits for a new choice). A save from before skills turns
+    // its character experience into Insight, to put into skills; its talents are gone.
     private static CharacterProgress ReadProgress(ProgressSaveData saved)
     {
         var progress = new CharacterProgress();
@@ -621,15 +636,22 @@ public static class SaveMapper
         }
 
         LevelingSettings settings = LevelingSettings.Current;
-        var ranks = new List<KeyValuePair<string, int>>();
-        foreach (AmountSaveData talent in saved.talents ?? new List<AmountSaveData>())
+        var experience = new List<KeyValuePair<string, int>>();
+        foreach (AmountSaveData skill in saved.proficiencies ?? new List<AmountSaveData>())
         {
-            TalentDefinition known = settings.FindTalent(talent.id);
-            if (known != null)
+            experience.Add(new KeyValuePair<string, int>(skill.id, skill.amount));
+        }
+
+        var perks = new List<string>();
+        foreach (string perk in saved.perks ?? new List<string>())
+        {
+            if (settings.FindPerk(perk, out _) != null)
             {
-                ranks.Add(new KeyValuePair<string, int>(talent.id, Math.Min(talent.amount, known.MaxRank)));
+                perks.Add(perk);
             }
         }
+
+        int insight = saved.insight + LegacyExperience(saved.level, saved.experience);
 
         int deepest = EssenceSettings.Current.SkillRanks.Count;
         var skillRanks = new List<KeyValuePair<string, int>>();
@@ -638,7 +660,7 @@ public static class SaveMapper
             skillRanks.Add(new KeyValuePair<string, int>(skill.id, Math.Min(skill.amount, deepest)));
         }
 
-        progress.Restore(saved.level, saved.experience, ranks, saved.crafted, saved.stones, skillRanks);
+        progress.Restore(experience, perks, insight, saved.crafted, saved.stones, skillRanks);
         var creatures = new List<KeyValuePair<string, int>>();
         foreach (AmountSaveData creature in saved.creatures ?? new List<AmountSaveData>())
         {

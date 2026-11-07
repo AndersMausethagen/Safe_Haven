@@ -93,6 +93,13 @@ public sealed partial class MonsterAI
             rules.LookAroundSpeed * Time.deltaTime);
     }
 
+    /// <summary>Not hunting anyone and hasn't noticed anything: a blow now is an ambush.</summary>
+    public bool IsUnaware => senses != null && CurrentState != State.Dead && CurrentState != State.Staggered
+        && !CanTarget(target) && senses.Stage == AwarenessStage.Unaware;
+
+    /// <summary>Whether the last blow it took found it unaware (read after the blow, when it already knows).</summary>
+    public bool LastHitAmbushed { get; private set; }
+
     // Unaware monsters take extra damage, a hit from the shadows (PerceptionSettings › Ambush).
     private void RefreshAmbush()
     {

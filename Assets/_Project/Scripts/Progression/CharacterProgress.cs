@@ -2,57 +2,219 @@ using System;
 using System.Collections.Generic;
 
 /// <summary>
-/// The player's permanent growth: level, experience towards the next level, the ranks bought in each talent and the ranks
-/// skills have been deepened to (GDD §16.4), plus the items crafted at least once (for first-craft experience) and the experience stones already touched. Lives in GameSession (it belongs to the game, not to
-/// the player object, so it survives every scene change) and is saved by SaveMapper. Plain C#, so the rules are
-/// testable; the numbers come from LevelingSettings.
+/// The player's permanent growth: experience in each skill (woodcutting, melee...; levels and bonuses follow from it,
+/// see LevelingSettings), the perk chosen at each skill milestone, unspent Insight (experience from quests, raids and
+/// discoveries, put into a skill of the player's choice), the ranks spells have been deepened to at the altar (GDD §16.4),
+/// the items crafted at least once (for first-craft Insight), the experience stones already touched and the journal's
+/// record. Lives in GameSession (it belongs to the game, not to the player object, so it survives every scene change) and
+/// is saved by SaveMapper. Plain C#, so the rules are testable; the numbers come from LevelingSettings.
 /// </summary>
 public sealed class CharacterProgress
 {
-    private readonly Dictionary<string, int> ranks = new Dictionary<string, int>();
+    private readonly Dictionary<string, int> experience = new Dictionary<string, int>();
+    private readonly HashSet<string> perks = new HashSet<string>();
     private readonly Dictionary<string, int> skillRanks = new Dictionary<string, int>();
     private readonly HashSet<string> crafted = new HashSet<string>();
     private readonly HashSet<string> stones = new HashSet<string>();
     // Creatures met, by id, with how many the player's side has slain: the journal's record.
     private readonly Dictionary<string, int> creatures = new Dictionary<string, int>();
 
-    public int Level { get; private set; } = 1;
+    /// <summary>Experience not yet put into a skill.</summary>
+    public int Insight { get; private set; }
 
-    /// <summary>Experience gathered towards the next level.</summary>
-    public int Experience { get; private set; }
-
-    /// <summary>Raised after anything changes: experience, a level, a talent.</summary>
+    /// <summary>Raised after anything changes: experience, a level, a perk, Insight.</summary>
     public event Action Changed;
 
-    /// <summary>Raised with the new level each time one is reached.</summary>
-    public event Action<int> LeveledUp;
+    /// <summary>Raised with the skill and its new level each time one is reached.</summary>
+    public event Action<ProficiencyDefinition, int> LeveledUp;
 
-    public IReadOnlyDictionary<string, int> Ranks => ranks;
+    /// <summary>Total experience by skill id.</summary>
+    public IReadOnlyDictionary<string, int> Experience => experience;
+    public IEnumerable<string> Perks => perks;
+    public int PerkCount => perks.Count;
     public IReadOnlyDictionary<string, int> SkillRanks => skillRanks;
     public IEnumerable<string> CraftedItems => crafted;
     public IEnumerable<string> UsedStones => stones;
 
-    public int PointsEarned(LevelingSettings settings) => (Level - 1) * settings.TalentPointsPerLevel;
+    public int ExperienceOf(ProficiencyDefinition skill) => skill != null && experience.TryGetValue(skill.Id, out int total) ? total : 0;
 
-    public int PointsSpent
+    public int LevelOf(ProficiencyDefinition skill, LevelingSettings settings) => settings.LevelFor(ExperienceOf(skill));
+
+    public bool IsMaxLevel(ProficiencyDefinition skill, LevelingSettings settings) => LevelOf(skill, settings) >= settings.MaxLevel;
+
+    /// <summary>Every skill's level added up: one number for how far the player has come.</summary>
+    public int TotalLevel(LevelingSettings settings)
     {
-        get
+        int total = 0;
+        foreach (ProficiencyDefinition skill in settings.Skills)
         {
-            int spent = 0;
-            foreach (int rank in ranks.Values)
+            if (skill != null)
             {
-                spent += rank;
+                total += LevelOf(skill, settings);
             }
+        }
 
-            return spent;
+        return total;
+    }
+
+    /// <summary>Experience towards the skill's next level, and how much that level takes (0 at the top).</summary>
+    public int TowardsNext(ProficiencyDefinition skill, LevelingSettings settings, out int needed)
+    {
+        int level = LevelOf(skill, settings);
+        if (level >= settings.MaxLevel)
+        {
+            needed = 0;
+            return 0;
+        }
+
+        needed = settings.ExperienceToNext(level);
+        return ExperienceOf(skill) - settings.TotalExperienceFor(level);
+    }
+
+    /// <summary>Adds experience to a skill, never past its last level. Returns the levels gained.</summary>
+    public int AddExperience(ProficiencyDefinition skill, int amount, LevelingSettings settings)
+    {
+        if (skill == null || amount <= 0)
+        {
+            return 0;
+        }
+
+        int before = LevelOf(skill, settings);
+        int cap = settings.TotalExperienceFor(settings.MaxLevel);
+        int total = Math.Min(cap, ExperienceOf(skill) + amount);
+        if (total == ExperienceOf(skill))
+        {
+            return 0;
+        }
+
+        experience[skill.Id] = total;
+        int after = settings.LevelFor(total);
+        for (int level = before + 1; level <= after; level++)
+        {
+            LeveledUp?.Invoke(skill, level);
+        }
+
+        Changed?.Invoke();
+        return after - before;
+    }
+
+    public void AddInsight(int amount)
+    {
+        if (amount > 0)
+        {
+            Insight += amount;
+            Changed?.Invoke();
         }
     }
 
-    public int UnspentPoints(LevelingSettings settings) => Math.Max(0, PointsEarned(settings) - PointsSpent);
+    /// <summary>Puts up to <paramref name="amount"/> Insight into a skill, never past its last level. Returns what went in.</summary>
+    public int SpendInsight(ProficiencyDefinition skill, int amount, LevelingSettings settings)
+    {
+        if (skill == null)
+        {
+            return 0;
+        }
 
-    public bool IsMaxLevel(LevelingSettings settings) => Level >= settings.MaxLevel;
+        int room = settings.TotalExperienceFor(settings.MaxLevel) - ExperienceOf(skill);
+        int spent = Math.Min(Math.Min(amount, Insight), room);
+        if (spent <= 0)
+        {
+            return 0;
+        }
 
-    public int RankOf(TalentDefinition talent) => talent != null && ranks.TryGetValue(talent.Id, out int rank) ? rank : 0;
+        Insight -= spent;
+        AddExperience(skill, spent, settings);
+        return spent;
+    }
+
+    public bool HasPerk(PerkDefinition perk) => perk != null && perks.Contains(perk.Id);
+
+    /// <summary>The perk chosen at a milestone, or null while it waits for a choice.</summary>
+    public PerkDefinition ChosenAt(ProficiencyDefinition.Milestone milestone) =>
+        HasPerk(milestone.first) ? milestone.first : HasPerk(milestone.second) ? milestone.second : null;
+
+    /// <summary>Milestones reached whose perk hasn't been chosen yet, across every skill.</summary>
+    public int PendingChoices(LevelingSettings settings)
+    {
+        int pending = 0;
+        foreach (ProficiencyDefinition skill in settings.Skills)
+        {
+            if (skill == null)
+            {
+                continue;
+            }
+
+            int level = LevelOf(skill, settings);
+            foreach (ProficiencyDefinition.Milestone milestone in skill.Milestones)
+            {
+                if (milestone.level <= level && ChosenAt(milestone) == null)
+                {
+                    pending++;
+                }
+            }
+        }
+
+        return pending;
+    }
+
+    /// <summary>
+    /// Whether this perk can be taken now; reason says why not. A milestone's first choice can be made anywhere;
+    /// changing it for the other needs <paramref name="atHome"/> (the same quiet place as a full reset).
+    /// </summary>
+    public bool CanChoose(ProficiencyDefinition skill, PerkDefinition perk, LevelingSettings settings, bool atHome, out string reason)
+    {
+        reason = null;
+        if (skill == null || perk == null || !skill.TryFindMilestone(perk, out ProficiencyDefinition.Milestone milestone))
+        {
+            reason = "No such perk.";
+        }
+        else if (HasPerk(perk))
+        {
+            reason = "Already chosen.";
+        }
+        else if (LevelOf(skill, settings) < milestone.level)
+        {
+            reason = $"Needs {skill.DisplayName} {milestone.level}.";
+        }
+        else if (ChosenAt(milestone) != null && !atHome)
+        {
+            reason = "A choice can only be changed at home, beside the portal.";
+        }
+
+        return reason == null;
+    }
+
+    /// <summary>Takes the perk (giving up the milestone's other one). False when CanChoose says no.</summary>
+    public bool Choose(ProficiencyDefinition skill, PerkDefinition perk, LevelingSettings settings, bool atHome)
+    {
+        if (!CanChoose(skill, perk, settings, atHome, out _))
+        {
+            return false;
+        }
+
+        skill.TryFindMilestone(perk, out ProficiencyDefinition.Milestone milestone);
+        PerkDefinition other = milestone.Other(perk);
+        if (other != null)
+        {
+            perks.Remove(other.Id);
+        }
+
+        perks.Add(perk.Id);
+        Changed?.Invoke();
+        return true;
+    }
+
+    /// <summary>Gives back every perk choice (chosen again for free at home).</summary>
+    public void ResetPerks()
+    {
+        if (perks.Count == 0)
+        {
+            return;
+        }
+
+        perks.Clear();
+        Changed?.Invoke();
+    }
 
     /// <summary>How far a skill has been deepened at the altar. 0 is the skill as it was learned.</summary>
     public int RankOf(SkillDefinition skill) => skill != null && skillRanks.TryGetValue(skill.Id, out int rank) ? rank : 0;
@@ -67,86 +229,6 @@ public sealed class CharacterProgress
         }
     }
 
-    /// <summary>Points spent in one tree, which opens its later rows.</summary>
-    public int SpentIn(TalentTree tree, LevelingSettings settings)
-    {
-        int spent = 0;
-        foreach (KeyValuePair<string, int> entry in ranks)
-        {
-            TalentDefinition talent = settings.FindTalent(entry.Key);
-            if (talent != null && talent.Tree == tree)
-            {
-                spent += entry.Value;
-            }
-        }
-
-        return spent;
-    }
-
-    /// <summary>Adds experience, levelling up as often as it reaches (never past the last level). Returns levels gained.</summary>
-    public int AddExperience(int amount, LevelingSettings settings)
-    {
-        if (amount <= 0 || IsMaxLevel(settings))
-        {
-            return 0;
-        }
-
-        Experience += amount;
-        int gained = 0;
-        while (!IsMaxLevel(settings) && Experience >= settings.ExperienceToNext(Level))
-        {
-            Experience -= settings.ExperienceToNext(Level);
-            Level++;
-            gained++;
-            LeveledUp?.Invoke(Level);
-        }
-
-        if (IsMaxLevel(settings))
-        {
-            Experience = 0;
-        }
-
-        Changed?.Invoke();
-        return gained;
-    }
-
-    /// <summary>Whether one more rank of the talent can be bought now; reason says why not.</summary>
-    public bool CanRaise(TalentDefinition talent, LevelingSettings settings, out string reason)
-    {
-        reason = null;
-        if (talent == null)
-        {
-            reason = "No such talent.";
-        }
-        else if (RankOf(talent) >= talent.MaxRank)
-        {
-            reason = "Already at its highest rank.";
-        }
-        else if (UnspentPoints(settings) <= 0)
-        {
-            reason = "No talent points left. Level up to earn more.";
-        }
-        else if (SpentIn(talent.Tree, settings) < talent.Row * settings.PointsPerRow)
-        {
-            reason = $"Spend {talent.Row * settings.PointsPerRow} points in {talent.Tree} first.";
-        }
-
-        return reason == null;
-    }
-
-    public bool Raise(TalentDefinition talent, LevelingSettings settings)
-    {
-        if (!CanRaise(talent, settings, out _))
-        {
-            return false;
-        }
-
-        ranks[talent.Id] = RankOf(talent) + 1;
-        Changed?.Invoke();
-        return true;
-    }
-
-    /// <summary>Gives back every talent point (respec).</summary>
     /// <summary>The rest of what the journal keeps.</summary>
     public JournalRecord Journal { get; } = new JournalRecord();
 
@@ -182,17 +264,6 @@ public sealed class CharacterProgress
         }
     }
 
-    public void ResetTalents()
-    {
-        if (ranks.Count == 0)
-        {
-            return;
-        }
-
-        ranks.Clear();
-        Changed?.Invoke();
-    }
-
     /// <summary>True the first time an item is crafted (for first-craft experience).</summary>
     public bool MarkCrafted(string itemId) => !string.IsNullOrEmpty(itemId) && crafted.Add(itemId);
 
@@ -203,13 +274,17 @@ public sealed class CharacterProgress
     public bool HasUsedStone(string stoneId) => stones.Contains(stoneId);
 
     /// <summary>Puts back saved progress (loading).</summary>
-    public void Restore(int level, int experience, IEnumerable<KeyValuePair<string, int>> savedRanks, IEnumerable<string> craftedItems,
-        IEnumerable<string> usedStones = null, IEnumerable<KeyValuePair<string, int>> savedSkillRanks = null)
+    public void Restore(IEnumerable<KeyValuePair<string, int>> savedExperience, IEnumerable<string> savedPerks, int savedInsight,
+        IEnumerable<string> craftedItems, IEnumerable<string> usedStones = null, IEnumerable<KeyValuePair<string, int>> savedSkillRanks = null)
     {
-        Level = Math.Max(1, level);
-        Experience = Math.Max(0, experience);
-        Fill(ranks, savedRanks);
+        Fill(experience, savedExperience);
         Fill(skillRanks, savedSkillRanks);
+        Insight = Math.Max(0, savedInsight);
+        perks.Clear();
+        if (savedPerks != null)
+        {
+            perks.UnionWith(savedPerks);
+        }
 
         crafted.Clear();
         if (craftedItems != null)
