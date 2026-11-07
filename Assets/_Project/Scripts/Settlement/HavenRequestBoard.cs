@@ -59,18 +59,19 @@ public sealed class HavenRequestBoard : MonoBehaviour
         ItemInventory bag = player != null ? player.GetComponent<ItemInventory>() : null;
         foreach (HavenRequestDefinition request in Standing())
         {
-            lines.Add(request.BriefingLine(AtHome(request.Wanted, bag)));
+            lines.Add(request.BriefingLine(AtHome(request, bag)));
         }
 
         return lines;
     }
 
-    private static int AtHome(ItemDefinition item, ItemInventory bag)
+    /// <summary>How much of what a request wants is home, in the bag or the stash (an order's only of its make).</summary>
+    public static int AtHome(HavenRequestDefinition request, ItemInventory bag)
     {
-        int count = bag != null ? bag.Container.Count(item) : 0;
+        int count = bag != null ? bag.Container.Count(request.Wanted, request.Quality) : 0;
         if (GameSession.Stash != null)
         {
-            count += GameSession.Stash.Items.Count(item);
+            count += GameSession.Stash.Items.Count(request.Wanted, request.Quality);
         }
 
         return count;
@@ -99,32 +100,32 @@ public sealed class HavenRequestBoard : MonoBehaviour
         ItemInventory bag = player.GetComponent<ItemInventory>();
         foreach (HavenRequestDefinition request in Standing())
         {
-            if (AtHome(request.Wanted, bag) >= request.Count)
+            if (AtHome(request, bag) >= request.Count)
             {
-                Answer(request, player, bag);
+                Answer(request, bag);
             }
         }
 
         Refill(force: false);
     }
 
-    // Takes what was asked for (from the bag first, then the stash) and gives the reward.
-    private static void Answer(HavenRequestDefinition request, Player player, ItemInventory bag)
+    /// <summary>Takes what was asked for (from the bag first, then the stash) and gives the reward.</summary>
+    public static void Answer(HavenRequestDefinition request, ItemInventory bag)
     {
         int left = request.Count;
         if (bag != null)
         {
-            left -= bag.Container.Remove(request.Wanted, left);
+            left -= bag.Container.Remove(request.Wanted, left, request.Quality);
         }
 
         if (left > 0 && GameSession.Stash != null)
         {
-            left -= GameSession.Stash.Items.Remove(request.Wanted, left);
+            left -= GameSession.Stash.Items.Remove(request.Wanted, left, request.Quality);
         }
 
         SettlementState settlement = GameSession.Settlement;
         settlement.RemoveRequest(request.Id);
-        settlement.RecordRequestAnswered();
+        settlement.RecordRequestAnswered(request.Renown);
         var given = new List<string>();
         Give(request.Reward, request.RewardCount, bag, given);
         Give(TradeSettings.Current.Coin, request.Coins, bag, given);
@@ -134,6 +135,19 @@ public sealed class HavenRequestBoard : MonoBehaviour
             given.Add($"{request.Experience} experience");
         }
 
+        // An order's asker shows how they would have done it: a lesson in the craft, and the Haven is known for the work.
+        ProficiencyDefinition craft = request.Craft;
+        if (request.Lesson > 0 && craft != null)
+        {
+            ExperienceTracker.Teach(craft, request.Lesson);
+            given.Add($"a lesson in {craft.DisplayName} (+{request.Lesson})");
+        }
+
+        if (request.Renown > 0)
+        {
+            given.Add($"{request.Renown} renown");
+        }
+
         if (request.EasesBlight > 0f)
         {
             settlement.ChangeBlight(-request.EasesBlight);
@@ -141,13 +155,15 @@ public sealed class HavenRequestBoard : MonoBehaviour
         }
 
         string thanks = string.IsNullOrEmpty(request.Thanks) ? "Thank you." : request.Thanks;
-        GameMessages.Post($"{request.AskerName} takes the {request.Count} {request.Wanted.DisplayName}. \"{thanks}\"", MessageKind.Gain);
+        string what = request.Count == 1 ? request.WantedName : $"{request.Count} {request.WantedName}";
+        GameMessages.Post($"{request.AskerName} takes the {what}. \"{thanks}\"", MessageKind.Gain);
         if (given.Count > 0)
         {
             GameMessages.Post("For it: " + string.Join(", ", given) + ".", MessageKind.Gain);
         }
 
-        AudioManager.Play(AudioManager.Sounds != null ? AudioManager.Sounds.QuestCompleted : null, player.transform.position);
+        Vector3 at = bag != null ? bag.transform.position : Vector3.zero;
+        AudioManager.Play(AudioManager.Sounds != null ? AudioManager.Sounds.QuestCompleted : null, at);
     }
 
     private static void Give(ItemDefinition item, int count, ItemInventory bag, List<string> given)

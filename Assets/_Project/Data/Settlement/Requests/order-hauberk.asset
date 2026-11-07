@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dafc92cc79ad39845bc5e18f47753891, type: 3}
+  m_Name: order-hauberk
+  m_EditorClassIdentifier: SafeHaven::HavenRequestDefinition
+  id: order-hauberk
+  asker: {fileID: 11400000, guid: 33e7204287863854f8c6ad025490f531, type: 2}
+  ask: The wardens need mail that holds. A Fine iron hauberk.
+  thanks: 'It''ll turn a blade. The rings, though: close them this way.'
+  wanted: {fileID: 11400000, guid: 30d16cb0aadf68d4e8181a6d2f7e2abe, type: 2}
+  count: 1
+  reward: {fileID: 0}
+  rewardCount: 0
+  coins: 16
+  experience: 0
+  easesBlight: 0
+  inSeasons: []
+  quality: 1
+  fromLevel: 20
+  lesson: 335
+  renown: 15

@@ -180,6 +180,7 @@ public static class SaveMapper
         into.huldraAwayUntil = settlement.HuldraAwayUntil;
         into.requests = new List<string>(settlement.Requests);
         into.requestsAnswered = settlement.RequestsAnswered;
+        into.orderRenown = settlement.OrderRenown;
         into.breach = (int)settlement.Breach;
         into.breachesWon = settlement.BreachesWon;
         into.nextBreachAt = settlement.NextBreachAt;
@@ -256,7 +257,7 @@ public static class SaveMapper
         settlement.RestoreDays(saved.daysPassed);
         settlement.RestoreBlight(saved.blight);
         settlement.RestoreSpirits(saved.spiritGifts, saved.huldraRespect, saved.huldraAwayUntil);
-        settlement.RestoreRequests(saved.requests, saved.requestsAnswered);
+        settlement.RestoreRequests(saved.requests, saved.requestsAnswered, saved.orderRenown);
         if (saved.tradeBought != null)
         {
             foreach (TradeSaveData bought in saved.tradeBought)

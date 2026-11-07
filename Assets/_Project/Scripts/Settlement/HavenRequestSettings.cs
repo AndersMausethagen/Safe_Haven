@@ -56,6 +56,12 @@ public sealed class HavenRequestSettings : GameSettings<HavenRequestSettings>
                 continue;
             }
 
+            // One crafting order at a time: the raids stay the main reason to go out.
+            if (pick.IsOrder && (HasOrder(standing) || HasOrder(chosen)))
+            {
+                continue;
+            }
+
             chosen.Add(pick);
         }
 
@@ -90,6 +96,24 @@ public sealed class HavenRequestSettings : GameSettings<HavenRequestSettings>
         foreach (HavenRequestDefinition one in list)
         {
             if (one != null && one.Asker == request.Asker)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static bool HasOrder(IReadOnlyList<HavenRequestDefinition> requests)
+    {
+        if (requests == null)
+        {
+            return false;
+        }
+
+        foreach (HavenRequestDefinition request in requests)
+        {
+            if (request != null && request.IsOrder)
             {
                 return true;
             }

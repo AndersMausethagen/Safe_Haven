@@ -209,7 +209,10 @@ public sealed class ExperienceTracker : MonoBehaviour, IGameSystem
     }
 
     /// <summary>A share of a friend's practice, learned by watching (CoopLessons). Kept at once, and never passed on again.</summary>
-    public static void LearnByWatching(ProficiencyDefinition skill, float amount)
+    public static void LearnByWatching(ProficiencyDefinition skill, float amount) => Teach(skill, amount);
+
+    /// <summary>Experience given in full to a skill, without fall-off or the raid bonus: a lesson (a crafting order's, a friend's).</summary>
+    public static void Teach(ProficiencyDefinition skill, float amount)
     {
         if (skill == null || amount <= 0f)
         {

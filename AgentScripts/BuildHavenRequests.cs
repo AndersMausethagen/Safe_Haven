@@ -7,7 +7,8 @@ using UnityEngine;
 /// <summary>
 /// Raids with a reason from home (`unity command script run --file AgentScripts/BuildHavenRequests.cs --entry
 /// BuildHavenRequests.Apply`): what the Haven's people ask to be brought back from the raids, and what they give for it
-/// (Data/Settlement/Requests, Resources/HavenRequestSettings); the board that hands it in (SafeHaven › 05 Gameplay);
+/// (Data/Settlement/Requests, Resources/HavenRequestSettings), and the crafting orders they place once the player's hands are
+/// up to it (a Fine or Masterwork piece, paid with a lesson in the craft and renown); the board that hands it in (SafeHaven › 05 Gameplay);
 /// and loot that grows with each danger stage, so staying on is a choice (the raids' Escalation › Loot Bonus).
 /// Re-runnable. Saves the scene only if it was clean when this began.
 /// </summary>
@@ -21,6 +22,13 @@ public static class BuildHavenRequests
         public int Count, RewardCount, Coins, Experience;
         public float Blight;
         public string[] Seasons = new string[0];
+
+        // A crafting order: the make wanted, the level of the skill that makes it from which it is asked, its lesson in
+        // levels' worth of experience at that level, and the renown it brings.
+        public ItemQuality Quality;
+        public int From;
+        public float LessonLevels;
+        public int Renown;
     }
 
     private static readonly Ask[] Asks =
@@ -51,6 +59,32 @@ public static class BuildHavenRequests
             Thanks = "The ward drinks it in.", Reward = "RuneOfPlenty", RewardCount = 1, Experience = 120, Blight = 0.1f },
         new Ask { Id = "winter-cold", Asker = null, Wanted = "RoughHide", Count = 6, Says = "The cold's in every bed. Hides, any hides.",
             Thanks = "Nobody freezes tonight.", Coins = 8, Experience = 50, Seasons = new[] { "Winter" } },
+
+        // Crafting orders: a piece of good make, from the player's own hands. One stands at a time.
+        new Ask { Id = "order-leather-jack", Asker = "Asa", Wanted = "CuredLeatherJack", Count = 1, Quality = ItemQuality.Fine, From = 10,
+            Says = "Show me your stitching. A Fine leather jack, every seam tight.", Thanks = "Tight seams. Here, let me show you a lock stitch.",
+            Coins = 8, LessonLevels = 1f, Renown = 8 },
+        new Ask { Id = "order-hatchet", Asker = "Tor", Wanted = "IronHatchet", Count = 1, Quality = ItemQuality.Fine, From = 12,
+            Says = "My hatchet's chewed to the haft. A Fine iron one would bite clean.", Thanks = "Balanced right. Hold the haft lower, like this.",
+            Coins = 10, LessonLevels = 1f, Renown = 10 },
+        new Ask { Id = "order-pickaxe", Asker = "Hild", Wanted = "IronPickaxe", Count = 1, Quality = ItemQuality.Fine, From = 12,
+            Says = "The quarry eats picks. A Fine iron one, tempered hard.", Thanks = "Hard as the stone it's for. Watch how I set the head.",
+            Coins = 10, LessonLevels = 1f, Renown = 10 },
+        new Ask { Id = "order-sword", Asker = "Bjarne", Wanted = "IronSword", Count = 1, Quality = ItemQuality.Fine, From = 15,
+            Says = "A Fine iron sword, for the ward. By your hand, not mine: I want to see what you've learned.",
+            Thanks = "Good steel. Now let me show you the fold.", Coins = 12, LessonLevels = 1f, Renown = 12 },
+        new Ask { Id = "order-bow", Asker = "Gunnar", Wanted = "HuntersBow", Count = 1, Quality = ItemQuality.Fine, From = 15,
+            Says = "A Fine hunter's bow. Mine pulls left.", Thanks = "Straight as a sunbeam. Feel where the draw sits.",
+            Coins = 12, LessonLevels = 1f, Renown = 12 },
+        new Ask { Id = "order-hauberk", Asker = "Eirik", Wanted = "IronMailHauberk", Count = 1, Quality = ItemQuality.Fine, From = 20,
+            Says = "The wardens need mail that holds. A Fine iron hauberk.", Thanks = "It'll turn a blade. The rings, though: close them this way.",
+            Coins = 16, LessonLevels = 1f, Renown = 15 },
+        new Ask { Id = "order-masterwork-spear", Asker = "Bjarne", Wanted = "IronSpear", Count = 1, Quality = ItemQuality.Masterwork, From = 30,
+            Says = "A Masterwork spear. The kind they'll sing about at the Haven fires.", Thanks = "They will sing of this one. Both of us.",
+            Coins = 25, LessonLevels = 1.5f, Renown = 25 },
+        new Ask { Id = "order-masterwork-mail", Asker = "Sigrid", Wanted = "CopperScaleHauberk", Count = 1, Quality = ItemQuality.Masterwork, From = 30,
+            Says = "For the children's first raid, one day: a Masterwork scale hauberk. Nothing less.", Thanks = "Nothing less. Thank you.",
+            Coins = 25, LessonLevels = 1.5f, Renown = 25 },
     };
 
     public static string Apply()
@@ -83,6 +117,17 @@ public static class BuildHavenRequests
 
             request.Configure(ask.Id, asker, ask.Says, ask.Thanks, wanted, ask.Count, ask.Reward != null ? Item(ask.Reward) : null,
                 ask.RewardCount, ask.Coins, ask.Experience, ask.Blight, ask.Seasons.ToList());
+            if (ask.Quality != ItemQuality.Plain)
+            {
+                if (request.Craft == null)
+                {
+                    missing.Add(ask.Id + " (no skill makes it)");
+                }
+
+                int lesson = Mathf.RoundToInt(LevelingSettings.Current.ExperienceToNext(ask.From) * ask.LessonLevels);
+                request.ConfigureOrder(ask.Quality, ask.From, lesson, ask.Renown);
+            }
+
             EditorUtility.SetDirty(request);
             made.Add(request);
         }

@@ -184,6 +184,52 @@ public sealed class ItemContainer
         return count;
     }
 
+    /// <summary>How many of the item are of at least <paramref name="least"/> make.</summary>
+    public int Count(ItemDefinition item, ItemQuality least)
+    {
+        int count = 0;
+        if (item == null)
+        {
+            return count;
+        }
+
+        foreach (ItemStack stack in slots)
+        {
+            if (stack.Item == item && stack.Quality >= least)
+            {
+                count += stack.Count;
+            }
+        }
+
+        return count;
+    }
+
+    /// <summary>
+    /// Removes up to the amount of pieces of at least <paramref name="least"/> make, the plainest that will do first, so a
+    /// Masterwork is kept while a Fine piece answers. Returns how many were removed.
+    /// </summary>
+    public int Remove(ItemDefinition item, int amount, ItemQuality least)
+    {
+        if (item == null || amount <= 0)
+        {
+            return 0;
+        }
+
+        int remaining = amount;
+        for (ItemQuality make = least; make <= ItemQuality.Masterwork && remaining > 0; make++)
+        {
+            for (int i = slots.Length - 1; i >= 0 && remaining > 0; i--)
+            {
+                if (slots[i].Item == item && slots[i].Quality == make)
+                {
+                    remaining -= RemoveAt(i, remaining);
+                }
+            }
+        }
+
+        return amount - remaining;
+    }
+
     public bool Contains(ItemDefinition item, int amount)
     {
         return item != null && amount >= 0 && Count(item) >= amount;

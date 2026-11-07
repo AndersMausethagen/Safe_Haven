@@ -64,6 +64,67 @@ public sealed class HavenRequestTests
     }
 
     [Test]
+    public void CraftingOrders_WaitForTheSkill_TakeOnlyTheirMake_AndPayALessonAndRenown()
+    {
+        var settings = AssetDatabase.LoadAssetAtPath<HavenRequestSettings>("Assets/_Project/Resources/HavenRequestSettings.asset");
+        HavenRequestDefinition order = settings.Find("order-sword");
+        Assert.IsNotNull(order);
+        Assert.AreEqual(ItemQuality.Fine, order.Quality);
+        ProficiencyDefinition craft = order.Craft;
+        Assert.IsNotNull(craft, "a skill makes it");
+        Assert.Greater(order.Lesson, 0);
+        GameSession.StartNewGame();
+        try
+        {
+            SettlementState settlement = GameSession.Settlement;
+            settlement.AddResident(order.Asker, null);
+            Assert.IsFalse(order.CanAsk(settlement, "Summer"), "not before the player could make it");
+            LevelingSettings leveling = LevelingSettings.Current;
+            GameSession.Progress.AddExperience(craft, leveling.TotalExperienceFor(order.FromLevel), leveling);
+            Assert.IsTrue(order.CanAsk(settlement, "Summer"));
+            StringAssert.Contains("Ordered at home", order.BriefingLine(0));
+            StringAssert.Contains("Fine", order.BriefingLine(0));
+
+            // One order at a time.
+            foreach (HavenRequestDefinition request in settings.Requests)
+            {
+                if (request.Asker != null && settlement.Find(request.Asker) == null)
+                {
+                    settlement.AddResident(request.Asker, null);
+                }
+            }
+
+            GameSession.Progress.AddExperience(leveling.FindSkill("armorcrafting"), leveling.TotalExperienceFor(30), leveling);
+            for (int day = 0; day < 20; day++)
+            {
+                Assert.LessOrEqual(HavenRequestSettings.Choose(settings.Requests, null, 3, settlement, "Summer", day).FindAll(r => r.IsOrder).Count, 1);
+            }
+
+            // A plain sword doesn't do; a Fine one does, and a Masterwork is kept while the Fine one answers.
+            ItemContainer stash = GameSession.Stash.Items;
+            stash.SetSlot(0, new ItemStack(order.Wanted, 1));
+            Assert.AreEqual(0, HavenRequestBoard.AtHome(order, null));
+            stash.SetSlot(1, new ItemStack(order.Wanted, 1, 1f, 0, null, ItemQuality.Masterwork, "Test"));
+            stash.SetSlot(2, new ItemStack(order.Wanted, 1, 1f, 0, null, ItemQuality.Fine, "Test"));
+            Assert.AreEqual(2, HavenRequestBoard.AtHome(order, null));
+
+            settlement.AddRequest(order.Id);
+            int before = GameSession.Progress.ExperienceOf(craft);
+            HavenRequestBoard.Answer(order, null);
+            Assert.AreEqual(ItemQuality.Masterwork, stash.GetSlot(1).Quality, "the finer piece is kept");
+            Assert.AreEqual(1, stash.Count(order.Wanted, ItemQuality.Fine), "the Fine one went, only the Masterwork is left of good make");
+            Assert.AreEqual(2, stash.Count(order.Wanted, ItemQuality.Plain), "the plain one stays");
+            Assert.AreEqual(before + order.Lesson, GameSession.Progress.ExperienceOf(craft), "the lesson in full");
+            Assert.AreEqual(order.Renown, settlement.OrderRenown);
+            Assert.IsFalse(((System.Collections.Generic.ICollection<string>)new System.Collections.Generic.List<string>(settlement.Requests)).Contains(order.Id));
+        }
+        finally
+        {
+            GameSession.StartNewGame();
+        }
+    }
+
+    [Test]
     public void DangerStages_PayMoreTheLongerYouStay()
     {
         var raid = AssetDatabase.LoadAssetAtPath<RaidDefinition>("Assets/_Project/Data/Raids/MistyWoods.asset");

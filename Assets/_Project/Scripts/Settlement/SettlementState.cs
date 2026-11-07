@@ -142,10 +142,18 @@ public sealed class SettlementState
     /// <summary>Asks answered, all told.</summary>
     public int RequestsAnswered { get; private set; }
 
-    public void RecordRequestAnswered() => RequestsAnswered++;
+    /// <summary>Renown the Haven keeps for crafting orders filled (HavenRequestDefinition › Renown).</summary>
+    public int OrderRenown { get; private set; }
 
-    public void RestoreRequests(IEnumerable<string> asked, int answered)
+    public void RecordRequestAnswered(int renown = 0)
     {
+        RequestsAnswered++;
+        OrderRenown += Math.Max(0, renown);
+    }
+
+    public void RestoreRequests(IEnumerable<string> asked, int answered, int orderRenown = 0)
+    {
+        OrderRenown = Math.Max(0, orderRenown);
         requests.Clear();
         if (asked != null)
         {

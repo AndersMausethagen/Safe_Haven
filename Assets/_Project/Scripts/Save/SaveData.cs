@@ -74,6 +74,8 @@ public sealed class SettlementSaveData
     /// <summary>What the Haven is asking for (HavenRequestDefinition ids), and how many asks were answered. Empty in older saves.</summary>
     public List<string> requests = new List<string>();
     public int requestsAnswered;
+    /// <summary>Renown kept for crafting orders filled. 0 in older saves.</summary>
+    public int orderRenown;
     /// <summary>A BreachStatus.</summary>
     public int breach;
     /// <summary>Ward breaches beaten back. Missing in older saves, where a Won breach counts as one.</summary>

@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dafc92cc79ad39845bc5e18f47753891, type: 3}
+  m_Name: order-bow
+  m_EditorClassIdentifier: SafeHaven::HavenRequestDefinition
+  id: order-bow
+  asker: {fileID: 11400000, guid: 9f83966b2e3c8fe42a58fd9d130cb08e, type: 2}
+  ask: A Fine hunter's bow. Mine pulls left.
+  thanks: Straight as a sunbeam. Feel where the draw sits.
+  wanted: {fileID: 11400000, guid: 8bee2403760b32642a0a6e000f024315, type: 2}
+  count: 1
+  reward: {fileID: 0}
+  rewardCount: 0
+  coins: 12
+  experience: 0
+  easesBlight: 0
+  inSeasons: []
+  quality: 1
+  fromLevel: 15
+  lesson: 200
+  renown: 12

@@ -25,3 +25,7 @@ MonoBehaviour:
   easesBlight: 0
   inSeasons:
   - Winter
+  quality: 0
+  fromLevel: 0
+  lesson: 0
+  renown: 0

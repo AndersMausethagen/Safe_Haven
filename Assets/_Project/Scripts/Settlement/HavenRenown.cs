@@ -72,6 +72,13 @@ public static class HavenRenown
             parts?.Add(new Part($"Your skills (total level {totalLevel})", skilled));
         }
 
+        int orders = GameSession.Settlement.OrderRenown;
+        if (orders > 0)
+        {
+            total += orders;
+            parts?.Add(new Part("Good work for its people", orders));
+        }
+
         int residents = GameSession.Settlement.Residents.Count * settings.ResidentRenown;
         if (residents > 0)
         {

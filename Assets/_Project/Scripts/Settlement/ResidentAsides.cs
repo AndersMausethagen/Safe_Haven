@@ -57,7 +57,9 @@ public sealed class ResidentAsides : MonoBehaviour
             HavenRequestDefinition asked = HavenRequestBoard.AskedBy(npc.Resident);
             if (asked != null && festival == null && Random.value < 0.5f)
             {
-                line = $"{asked.Ask} {asked.Count} {asked.Wanted.DisplayName}, if you come across it.";
+                line = asked.IsOrder
+                    ? $"{asked.Ask} A {asked.WantedName}, when your hands are up to it."
+                    : $"{asked.Ask} {asked.Count} {asked.WantedName}, if you come across it.";
             }
             else if (festival != null && festival.Lines.Count > 0)
             {
