@@ -445,6 +445,7 @@ public static class WorldBuilder
     {
         var watch = System.Diagnostics.Stopwatch.StartNew();
         Building = true;
+        LastObjects.Clear();
         WorldGround.Scope = terrains.Count > 0 ? terrains[0].gameObject.scene : areas.Count > 0 ? areas[0].gameObject.scene : default;
         int group = triggerGroup;
         triggerGroup = -1;
@@ -675,15 +676,39 @@ public static class WorldBuilder
             return; // hand-adjusted: keep them
         }
 
-        if (old != null)
+        if (old == null)
         {
-            Undo.DestroyObjectImmediate(old.gameObject);
+            Transform root = builder.Feature.GeneratedRoot(true);
+            Undo.RegisterCreatedObjectUndo(root.gameObject, "Build World");
+            builder.Objects(root, context);
+            return;
         }
 
-        Transform root = builder.Feature.GeneratedRoot(true);
-        Undo.RegisterCreatedObjectUndo(root.gameObject, "Build World");
-        builder.Objects(root, context);
+        // Made afresh beside the old objects (switched off, so they don't stand in the way of the new ones, as when they
+        // were deleted first), then the old are kept wherever the fresh came out the same (GeneratedObjects): unchanged
+        // objects keep their file ids, so the scene's diff is the real change, and their save ids.
+        string name = old.name;
+        bool wasActive = old.gameObject.activeSelf;
+        Undo.RecordObject(old.gameObject, "Build World");
+        old.name = name + " (previous)";
+        old.gameObject.SetActive(false);
+        Transform fresh = builder.Feature.GeneratedRoot(true);
+        Undo.RegisterCreatedObjectUndo(fresh.gameObject, "Build World");
+        builder.Objects(fresh, context);
+        if (!GeneratedObjects.CanReconcile(old, fresh))
+        {
+            Undo.DestroyObjectImmediate(old.gameObject);
+            return;
+        }
+
+        GeneratedObjects.Result result = GeneratedObjects.Reconcile(old, fresh);
+        old.name = name;
+        old.gameObject.SetActive(wasActive);
+        LastObjects.Add($"{builder.Feature.name}: {result}");
     }
+
+    /// <summary>For each feature whose objects the last build made again: how many were kept, new and gone.</summary>
+    public static readonly List<string> LastObjects = new List<string>();
 
     // ------------------------------------------------------------------ heights
 

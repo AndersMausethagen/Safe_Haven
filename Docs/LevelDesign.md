@@ -220,7 +220,7 @@ keeps the ground under the features). Its Inspector:
 
 How it works: each build starts from the ground as it was before any feature (kept per cell in the stash, with hand
 edits since the last build added in), applies the features in order, puts the ground back where no feature reaches any
-more, then regenerates the features' objects. A build joins the undo step of the edit that caused it: one **Ctrl+Z**
+more, then regenerates the features' objects, keeping every object that came out the same (`GeneratedObjects`: a prefab instance with the same prefab and overrides, or a container of such): unchanged objects keep their file ids and save ids, so saving the scene after a build only writes what changed (a rebuild of the whole Haven kept 26,013 of 26,015 objects; the two rivers' water strips are always made again). A build joins the undo step of the edit that caused it: one **Ctrl+Z**
 takes back both. Opening a scene never rebuilds or dirties it.
 
 ### Terrain shader (rock on steep ground)
