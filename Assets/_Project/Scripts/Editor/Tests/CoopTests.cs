@@ -377,4 +377,47 @@ public sealed class CoopTests
         Assert.IsFalse(HavenVisit.MayBuild);
         Assert.IsFalse(HavenVisit.MayUseStash);
     }
+
+    [Test]
+    public void AFollowersRaid_IsTheHostsRun_SameMapSameRules()
+    {
+        var content = Resources.Load<ContentDatabase>(ContentDatabase.ResourceName);
+        RaidDefinition raid = null;
+        foreach (string guid in AssetDatabase.FindAssets("t:RaidDefinition"))
+        {
+            var candidate = AssetDatabase.LoadAssetAtPath<RaidDefinition>(AssetDatabase.GUIDToAssetPath(guid));
+            if (candidate != null && candidate.Difficulties.Count > 1)
+            {
+                raid = candidate;
+                break;
+            }
+        }
+
+        Assert.IsNotNull(raid, "A raid with tiers to test with.");
+        var modifiers = new List<RaidModifierDefinition>();
+        foreach (ItemDefinition item in content.Items)
+        {
+            if (item != null && item.IsRaidModifier && item.RaidModifier != null)
+            {
+                modifiers.Add(item.RaidModifier);
+                break;
+            }
+        }
+
+        RaidDifficulty tier = raid.Difficulties[1];
+        RaidSession host = RaidLauncher.Build(raid, modifiers, null, "SafeHaven", 12345, tier, 2, false, 180f, 0.1f, 1, null, 0f);
+        RaidInvite invite = WorldTransfer.Unpack<RaidInvite>(WorldTransfer.Pack(RaidInvite.Of(host, 180f, 0.1f, 1)));
+        Assert.AreSame(raid, invite.FindRaid(new[] { raid }));
+
+        RaidSession follower = RaidLauncher.FromInvite(invite, raid, content, null, "SafeHaven", 90f);
+        Assert.AreEqual(host.Seed, follower.Seed);
+        Assert.AreSame(host.Difficulty, follower.Difficulty);
+        Assert.AreEqual(host.TotalSeconds, follower.TotalSeconds, 0.001f);
+        Assert.AreEqual(host.Parameters.ExtractionTime, follower.Parameters.ExtractionTime, 0.001f);
+        Assert.AreEqual(host.Parameters.EnemyHealthMultiplier, follower.Parameters.EnemyHealthMultiplier, 0.001f);
+        Assert.AreEqual(host.Parameters.LootMultiplier, follower.Parameters.LootMultiplier, 0.001f);
+        CollectionAssert.AreEqual(host.Modifiers, follower.Modifiers);
+        CollectionAssert.AreEqual(host.Foretold, follower.Foretold, "The same events are foretold, so the same ones happen.");
+        Assert.AreEqual(host.TotalSeconds - 90f, follower.TimeRemaining, 0.001f, "The follower's clock starts where the host's stands.");
+    }
 }

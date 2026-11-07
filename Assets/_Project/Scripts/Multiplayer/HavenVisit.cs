@@ -42,8 +42,11 @@ public static class HavenVisit
 
     private static bool stashHere;
 
-    /// <summary>Why a guest can't do this in a friend's Haven (raids, breaches, loading).</summary>
-    public static string Refusal => $"This is {HostPossessive} Haven. That will come with a later update to co-op.";
+    /// <summary>Why a guest can't do this in a friend's Haven (a ward breach, loading a save).</summary>
+    public static string Refusal => $"This is {HostPossessive} Haven: that is theirs to start.";
+
+    /// <summary>Why a guest can't open the portal themselves: they follow the host through it.</summary>
+    public static string RaidRefusal => $"This is {HostPossessive} Haven. When they go through the portal, you can follow them.";
 
     private static string HostPossessive => string.IsNullOrEmpty(HostName) ? "your friend's" : HostName + "'s";
 
@@ -134,7 +137,18 @@ public static class HavenVisit
     }
 
     /// <summary>What saving while visiting writes: the guest's own journey with their character as it is now.</summary>
-    public static SaveData ForOwnSave(SaveData now) => home != null ? KeepHome(home, now) : now;
+    public static SaveData ForOwnSave(SaveData now)
+    {
+        if (home == null)
+        {
+            return now;
+        }
+
+        // Saved on the way into a raid (following the host): if the game ends mid-raid, the journey knows it never came home.
+        SaveData kept = KeepHome(home, now);
+        kept.raidUnderWay = now.raidUnderWay;
+        return kept;
+    }
 
     /// <summary>Back to this player's own Haven, with their character as it is now (when <paramref name="travel"/>).</summary>
     public static void End(IContentLookup content, bool travel = true)

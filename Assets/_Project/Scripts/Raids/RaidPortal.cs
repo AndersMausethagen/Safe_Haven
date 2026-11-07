@@ -145,6 +145,15 @@ public sealed class RaidPortal : MonoBehaviour, IStationMenuExtension, IInteract
 
     public void AddActions(MenuPage page, GameObject user)
     {
+        // Co-op: the host went through; friends follow into the same raid.
+        float secondsLeft = 0f;
+        RaidDefinition following = CoopSession.Current != null ? CoopSession.Current.RaidToFollow(Destinations, out secondsLeft) : null;
+        if (following != null)
+        {
+            page.Add(new MenuAction($"Follow {HavenVisit.HostName} to {following.DisplayName}", $"{Mathf.FloorToInt(secondsLeft / 60f)}:{Mathf.FloorToInt(secondsLeft % 60f):00} left of their raid. You bring only what you carry.",
+                true, () => CoopSession.Current.FollowIntoRaid(following, user), closesMenu: true));
+        }
+
         if (IsRepaired)
         {
             page.Add(new MenuAction("Plan a raid", "Choose a destination, supplies and modifiers", true, () => OpenPlanner(user), closesMenu: true));
@@ -173,6 +182,11 @@ public sealed class RaidPortal : MonoBehaviour, IStationMenuExtension, IInteract
 
     private static void Improve(GameObject user)
     {
+        if (HavenVisit.LeftToHost())
+        {
+            return;
+        }
+
         SettlementSettings settings = SettlementSettings.Current;
         int level = GameSession.Settlement.PortalLevel;
         if (level >= settings.PortalLevels.Count || !MaterialPool.For(user).TrySpend(settings.PortalLevels[level].cost, settings.PortalLevels[level].items))

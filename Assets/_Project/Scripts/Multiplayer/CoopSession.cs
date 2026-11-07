@@ -49,6 +49,10 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
     private const string ClockMessage = "SafeHaven.Clock";
     private const string EntitiesMessage = "SafeHaven.Entities";
     private const string SettlementMessage = "SafeHaven.Settlement";
+    private const string RaidOpenMessage = "SafeHaven.RaidOpen";
+    private const string RaidClosedMessage = "SafeHaven.RaidClosed";
+    /// <summary>Seconds a host's raid must still have for friends to follow.</summary>
+    private const float FollowUntilSecondsLeft = 60f;
     private const int SettlementEvery = 4;
     private const float ClockInterval = 5f;
 
@@ -68,6 +72,8 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
     private int syncLooks;
     private HavenSync sync;
     private readonly VisitorAccess access = new VisitorAccess();
+    private RaidInvite openRaid;
+    private float openRaidSince;
     private readonly List<ulong> recipients = new List<ulong>();
 
     public static CoopSession Current { get; private set; }
@@ -97,6 +103,8 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
         sync = new HavenSync();
         NetworkPlayerAvatar.FriendArrived += OnFriendArrived;
         NetworkPlayerAvatar.FriendLeft += OnFriendLeft;
+        RaidLauncher.Launched += OnRaidLaunched;
+        GameEvents.Raised += OnGameEvent;
         if (steam != null && steam.IsReady)
         {
             lobby = new SteamLobby();
@@ -375,6 +383,8 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
         network.CustomMessagingManager.RegisterNamedMessageHandler(ClockMessage, OnClock);
         network.CustomMessagingManager.RegisterNamedMessageHandler(EntitiesMessage, OnEntitiesFromHost);
         network.CustomMessagingManager.RegisterNamedMessageHandler(SettlementMessage, OnSettlement);
+        network.CustomMessagingManager.RegisterNamedMessageHandler(RaidOpenMessage, OnRaidOpen);
+        network.CustomMessagingManager.RegisterNamedMessageHandler(RaidClosedMessage, (sender, _) => openRaid = null);
         access.StartGuest(network);
         SetState(CoopState.Joining);
         return true;
@@ -634,6 +644,74 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
         }
     }
 
+    // ---- Raids together: the host goes through the portal, friends follow
+
+    /// <summary>
+    /// The raid a visiting guest can follow the host into now, among a portal's destinations (null when none), with the
+    /// seconds the host's run has left.
+    /// </summary>
+    public RaidDefinition RaidToFollow(IEnumerable<RaidDefinition> destinations, out float secondsLeft)
+    {
+        secondsLeft = 0f;
+        if (openRaid == null || state != CoopState.Joined || !HavenVisit.IsVisiting || GameSession.ActiveRaid != null)
+        {
+            return null;
+        }
+
+        secondsLeft = openRaid.totalSeconds - (Time.unscaledTime - openRaidSince);
+        return secondsLeft >= FollowUntilSecondsLeft ? openRaid.FindRaid(destinations) : null;
+    }
+
+    /// <summary>Follows the host into their raid (see <see cref="RaidLauncher.TryFollow"/>).</summary>
+    public void FollowIntoRaid(RaidDefinition raid, GameObject player)
+    {
+        RaidInvite invite = openRaid;
+        float elapsed = invite != null ? Time.unscaledTime - openRaidSince : 0f;
+        if (!RaidLauncher.TryFollow(invite, raid, player, (ContentDatabase)Content(), elapsed, out string problem))
+        {
+            GameMessages.Post(problem, MessageKind.Warning);
+        }
+    }
+
+    private void OnRaidLaunched(RaidInvite invite)
+    {
+        if (!IsHost || network == null || Guests(NetworkManager.ServerClientId).Count == 0)
+        {
+            return;
+        }
+
+        SendPacket(RaidOpenMessage, WorldTransfer.Pack(invite), Guests(NetworkManager.ServerClientId));
+    }
+
+    private void OnRaidOpen(ulong sender, FastBufferReader reader)
+    {
+        reader.ReadValueSafe(out byte[] packet);
+        if (!HavenVisit.IsVisiting)
+        {
+            return;
+        }
+
+        openRaid = WorldTransfer.Unpack<RaidInvite>(packet);
+        openRaidSince = Time.unscaledTime;
+        GameMessages.Post($"{HavenVisit.HostName} went through the portal. Use the portal to follow them.");
+    }
+
+    // The host's raid is over: friends can no longer follow into it.
+    private void OnGameEvent(GameEvent gameEvent)
+    {
+        if (gameEvent.Kind != GameEventKind.RaidFinished || !IsHost || network == null)
+        {
+            return;
+        }
+
+        using var writer = new FastBufferWriter(4, Allocator.Temp);
+        var guests = Guests(NetworkManager.ServerClientId);
+        if (guests.Count > 0)
+        {
+            network.CustomMessagingManager.SendNamedMessage(RaidClosedMessage, guests, writer, NetworkDelivery.ReliableFragmentedSequenced);
+        }
+    }
+
     private void OnSettlement(ulong sender, FastBufferReader reader)
     {
         reader.ReadValueSafe(out byte[] packet);
@@ -771,6 +849,7 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
         if (state == CoopState.Offline)
         {
             access.Reset();
+            openRaid = null;
         }
 
         // Online, the Escape menu still opens but the world keeps running.
@@ -782,6 +861,8 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
     {
         NetworkPlayerAvatar.FriendArrived -= OnFriendArrived;
         NetworkPlayerAvatar.FriendLeft -= OnFriendLeft;
+        RaidLauncher.Launched -= OnRaidLaunched;
+        GameEvents.Raised -= OnGameEvent;
         sync?.Dispose();
         DropLobby();
         if (Current == this)

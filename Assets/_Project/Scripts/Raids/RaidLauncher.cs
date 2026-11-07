@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -18,10 +19,10 @@ public static class RaidLauncher
             return "This portal doesn't lead anywhere.";
         }
 
-        // A guest's raid would set out from a copy of the host's Haven (co-op raids come later).
+        // A guest goes on raids by following the host (TryFollow), not by opening the portal themselves.
         if (HavenVisit.IsVisiting)
         {
-            return HavenVisit.Refusal;
+            return HavenVisit.RaidRefusal;
         }
 
         if (raid.IsLocked && !Cheats.NoRequirements)
@@ -115,6 +116,9 @@ public static class RaidLauncher
     public static bool CanGoAlong(ResidentDefinition person) =>
         person != null && person.RaidCompanion != null && GameSession.Settlement.Find(person) != null;
 
+    /// <summary>Raised when the player goes through the portal, with what friends need to follow (co-op).</summary>
+    public static event Action<RaidInvite> Launched;
+
     /// <summary>The raid, mood and shape of the last run started this session, so the next briefing can offer a different one.</summary>
     public static (string raid, string mood, RaidLayoutShape shape) LastRun { get; private set; }
 
@@ -173,24 +177,92 @@ public static class RaidLauncher
             modifiers.Add(item.RaidModifier);
         }
 
-        SaveGameService.SaveBeforeRaid(raid);
-
         // The seed is usually rolled when the briefing opens, so the hour it shows is the hour the raid gets.
         int runSeed = seed ?? RaidSession.NewSeed();
-        RaidParameters parameters = RaidParameters.Calculate(raid, modifiers, ExtraSeconds(sparks) + (large && raid.CanBeLarge ? raid.LargeRaid.extraSeconds : 0f), RaidTimeOfDay.For(raid, runSeed), difficulty, ExtractionCut);
+        bool isLarge = large && raid.CanBeLarge;
+        float extra = ExtraSeconds(sparks) + (isLarge ? raid.LargeRaid.extraSeconds : 0f);
+        float cut = ExtractionCut;
+        int foretold = HavenReadiness.ForetoldEvents;
+        RaidSession session = Go(raid, modifiers, player, runSeed, difficulty, sparks, isLarge, extra, cut, foretold, CanGoAlong(companion) ? companion : null, 0f);
+        Launched?.Invoke(RaidInvite.Of(session, extra, cut, foretold));
+        return true;
+    }
+
+    /// <summary>
+    /// Follows a friend (co-op) into the raid they went through the portal to: the same raid, seed, tier and modifiers,
+    /// so the same map, with this player's own gear and loot. The friend paid for the way; following costs nothing. The
+    /// clock starts where the friend's stands now (<paramref name="elapsed"/>). Returns false, with a reason, when it can't.
+    /// </summary>
+    public static bool TryFollow(RaidInvite invite, RaidDefinition raid, GameObject player, ContentDatabase content, float elapsed, out string problem)
+    {
+        problem = invite == null || raid == null ? "That way has closed." : null;
+        if (problem == null && GameSession.ActiveRaid != null)
+        {
+            problem = "A raid is already under way.";
+        }
+
+        if (problem == null && (string.IsNullOrWhiteSpace(raid.SceneName) || !Application.CanStreamedLevelBeLoaded(raid.SceneName)))
+        {
+            problem = $"{raid.DisplayName} can't be reached: its scene isn't in the build.";
+        }
+
+        RaidDifficulty difficulty = raid != null ? invite.DifficultyIn(raid) : null;
+        problem ??= CheckGear(difficulty, player);
+        if (problem == null && (player == null || !player.TryGetComponent(out ItemInventory _)))
+        {
+            problem = "There is nobody to send into the raid.";
+        }
+
+        if (problem != null)
+        {
+            return false;
+        }
+
+        HavenReadiness.GiveRest(player);
+        Go(raid, invite.ModifiersFrom(content), player, invite.seed, difficulty, invite.sparks, invite.large && raid.CanBeLarge,
+            invite.extraSeconds, invite.extractionCut, invite.foretoldEvents, null, elapsed);
+        return true;
+    }
+
+    /// <summary>The run a friend's invite describes, as <see cref="TryFollow"/> builds it (without going anywhere).</summary>
+    public static RaidSession FromInvite(RaidInvite invite, RaidDefinition raid, ContentDatabase content, PlayerSnapshot loadout, string returnScene, float elapsed) =>
+        Build(raid, invite.ModifiersFrom(content), loadout, returnScene, invite.seed, invite.DifficultyIn(raid), invite.sparks, invite.large && raid.CanBeLarge,
+            invite.extraSeconds, invite.extractionCut, invite.foretoldEvents, null, elapsed);
+
+    /// <summary>Builds a run from everything that decides it. Pure apart from reading the content: launching and following both use it.</summary>
+    public static RaidSession Build(RaidDefinition raid, List<RaidModifierDefinition> modifiers, PlayerSnapshot loadout, string returnScene, int runSeed,
+        RaidDifficulty difficulty, int sparks, bool large, float extraSeconds, float extractionCut, int foretoldEvents, ResidentDefinition companion, float elapsed)
+    {
+        RaidParameters parameters = RaidParameters.Calculate(raid, modifiers, extraSeconds, RaidTimeOfDay.For(raid, runSeed), difficulty, extractionCut);
+        var session = new RaidSession(raid, modifiers, parameters, loadout, returnScene, sparks, runSeed, difficulty)
+        {
+            Companion = companion,
+            IsLarge = large,
+            Foretold = RaidForecast.For(raid, runSeed, foretoldEvents),
+        };
+        if (elapsed > 0f)
+        {
+            session.Tick(elapsed);
+        }
+
+        return session;
+    }
+
+    // Saves, builds the run and loads its scene: the part a launch and a follow share.
+    private static RaidSession Go(RaidDefinition raid, List<RaidModifierDefinition> modifiers, GameObject player, int runSeed, RaidDifficulty difficulty,
+        int sparks, bool large, float extraSeconds, float extractionCut, int foretoldEvents, ResidentDefinition companion, float elapsed)
+    {
+        SaveGameService.SaveBeforeRaid(raid);
         if (player.TryGetComponent(out PlayerTransport transport))
         {
             transport.LeaveForRaid();
         }
 
         PlayerSnapshot loadout = PlayerSnapshot.Capture(player);
-        var session = new RaidSession(raid, modifiers, parameters, loadout, SceneManager.GetActiveScene().name, sparks, runSeed, difficulty)
-        {
-            GearScoreAtEntry = GearScore.Of(player),
-            Companion = CanGoAlong(companion) ? companion : null,
-            IsLarge = large && raid.CanBeLarge,
-            Foretold = RaidForecast.For(raid, runSeed, HavenReadiness.ForetoldEvents),
-        };
+        RaidSession session = Build(raid, modifiers, loadout, SceneManager.GetActiveScene().name, runSeed, difficulty, sparks, large,
+            extraSeconds, extractionCut, foretoldEvents, companion, elapsed);
+        session.GearScoreAtEntry = GearScore.Of(player);
+
         if (raid.LayoutRules != null)
         {
             (RaidShapeRule shape, RaidMapMood mood) = RaidLayoutPlanner.Choose(raid.LayoutRules, runSeed);
@@ -207,6 +279,6 @@ public static class RaidLauncher
         }
 
         SceneLoader.Load(raid.SceneName, $"Through the portal: {raid.DisplayName}");
-        return true;
+        return session;
     }
 }

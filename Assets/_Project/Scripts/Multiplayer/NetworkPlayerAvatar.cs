@@ -135,7 +135,14 @@ public sealed class NetworkPlayerAvatar : NetworkBehaviour
 
     private void PublishLook()
     {
-        PlayerLookState now = PlayerLookState.Of(Player.Current, SceneManager.GetActiveScene().name);
+        // In a raid the place is the run, not only its scene: friends see each other only on the same map.
+        string place = SceneManager.GetActiveScene().name;
+        if (GameSession.ActiveRaid != null)
+        {
+            place += "#" + GameSession.ActiveRaid.Seed;
+        }
+
+        PlayerLookState now = PlayerLookState.Of(Player.Current, place);
         if (!now.Equals(look.Value))
         {
             look.Value = now;
