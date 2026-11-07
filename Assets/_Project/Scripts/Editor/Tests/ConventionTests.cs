@@ -11,13 +11,21 @@ using NUnit.Framework;
 /// </summary>
 public sealed class ConventionTests
 {
-    private const string Hook = "RuntimeInitializeLoadType.SubsystemRegistration";
+    private const string HookAttribute = "RuntimeInitializeLoadType.SubsystemRegistration)]";
 
     private static readonly Regex Singleton = new Regex(@"public static (\w+) Current \{ get; private set; \}");
     private static readonly Regex BackingFieldSingleton = new Regex(@"public static (\w+) Current\s*=>\s*\w+;");
     private static readonly Regex InstanceSingleton = new Regex(@"\b(?:public|internal) static\s+\w+\s+Instance\b");
-    private static readonly Regex StaticCollection = new Regex(@"static readonly (?:List|Dictionary|HashSet|Queue|Stack)<");
+    private static readonly Regex StaticCollection = new Regex(@"static readonly (?:List|Dictionary|HashSet|Queue|Stack)<.*?> (\w+) = new");
     private static readonly Regex StaticEvent = new Regex(@"public static event [^;]*?(\w+);");
+    private static readonly Regex TypeDeclaration = new Regex(@"\b(?:class|struct)\s+(\w+)");
+
+    // Static collections deliberately kept when Play starts, and why.
+    private static readonly Dictionary<string, string> KeptCollections = new Dictionary<string, string>
+    {
+        ["MeshSurface.all"] = "its surfaces register in edit mode too (ExecuteAlways) and keep their slot in it",
+        ["MeshSurface.materials"] = "goes with MeshSurface.all",
+    };
 
     private static IEnumerable<(string path, string source)> RuntimeScripts()
     {
@@ -32,6 +40,73 @@ public sealed class ConventionTests
     }
 
     private static string WithoutComments(string source) => Regex.Replace(source, @"^\s*//.*$", "", RegexOptions.Multiline);
+
+    // What runs when Play starts: the bodies of the SubsystemRegistration hooks, and of the methods they call in the same file.
+    private static string ResetCode(string source)
+    {
+        var code = new List<string>();
+        int at = 0;
+        while ((at = source.IndexOf(HookAttribute, at, System.StringComparison.Ordinal)) >= 0)
+        {
+            at += HookAttribute.Length;
+            code.Add(MethodBody(source, source.IndexOf(')', at) + 1));
+        }
+
+        string hooks = string.Join("\n", code);
+        foreach (Match call in Regex.Matches(hooks, @"\b(\w+)\(\)"))
+        {
+            Match declaration = Regex.Match(source, @"\bvoid " + call.Groups[1].Value + @"\(\)");
+            if (declaration.Success)
+            {
+                code.Add(MethodBody(source, declaration.Index + declaration.Length));
+            }
+        }
+
+        return string.Join("\n", code);
+    }
+
+    // The body after a method's parameter list: "=> ...;" or a braced block.
+    private static string MethodBody(string source, int from)
+    {
+        int start = from;
+        while (start < source.Length && char.IsWhiteSpace(source[start]))
+        {
+            start++;
+        }
+
+        if (start < source.Length && source[start] == '=')
+        {
+            return source.Substring(start, source.IndexOf(';', start) - start + 1);
+        }
+
+        int depth = 0;
+        for (int i = start; i < source.Length; i++)
+        {
+            depth += source[i] == '{' ? 1 : source[i] == '}' ? -1 : 0;
+            if (depth == 0 && source[i] == '}')
+            {
+                return source.Substring(start, i - start + 1);
+            }
+        }
+
+        return string.Empty;
+    }
+
+    private static string TypeAt(string source, int position, string path)
+    {
+        string type = null;
+        foreach (Match declaration in TypeDeclaration.Matches(source))
+        {
+            if (declaration.Index > position)
+            {
+                break;
+            }
+
+            type = declaration.Groups[1].Value;
+        }
+
+        return type ?? Path.GetFileNameWithoutExtension(path).Split('.')[0];
+    }
 
     [Test]
     public void EverySingleton_IsReachedThroughCurrent()
@@ -56,18 +131,37 @@ public sealed class ConventionTests
     [Test]
     public void EverySingleton_IsResetWhenPlayStarts()
     {
-        string[] offenders = RuntimeScripts().Where(script => Singleton.IsMatch(script.source) && !script.source.Contains(Hook))
+        string[] offenders = RuntimeScripts()
+            .Where(script => Singleton.IsMatch(script.source) && !Regex.IsMatch(ResetCode(script.source), @"\bCurrent\s*=\s*null"))
             .Select(script => script.path).ToArray();
-        Assert.IsEmpty(offenders, "Current is never reset when Play starts:\n" + string.Join("\n", offenders));
+        Assert.IsEmpty(offenders, "Current isn't set to null when Play starts:\n" + string.Join("\n", offenders));
     }
 
     [Test]
     public void EveryStaticCollection_IsClearedWhenPlayStarts()
     {
-        // Registries of live objects and caches of made meshes: left from the last session, they hold destroyed objects.
-        string[] offenders = RuntimeScripts().Where(script => StaticCollection.IsMatch(script.source) && !script.source.Contains(Hook))
-            .Select(script => script.path).ToArray();
-        Assert.IsEmpty(offenders, "A static list, set or table is never cleared when Play starts:\n" + string.Join("\n", offenders));
+        // Registries of live objects, caches of made meshes and pools: left from the last session, they hold destroyed objects.
+        var offenders = new List<string>();
+        foreach ((string path, string source) in RuntimeScripts())
+        {
+            string reset = null;
+            foreach (Match collection in StaticCollection.Matches(source))
+            {
+                string name = collection.Groups[1].Value;
+                if (KeptCollections.ContainsKey($"{TypeAt(source, collection.Index, path)}.{name}"))
+                {
+                    continue;
+                }
+
+                reset ??= ResetCode(source);
+                if (!Regex.IsMatch(reset, @"\b" + name + @"\.Clear\(\)"))
+                {
+                    offenders.Add($"{path}: {name}");
+                }
+            }
+        }
+
+        Assert.IsEmpty(offenders, "Not cleared when Play starts:\n" + string.Join("\n", offenders));
     }
 
     [Test]
@@ -79,8 +173,7 @@ public sealed class ConventionTests
         var events = new List<string>();
         foreach ((string path, string source) in scripts)
         {
-            string type = Path.GetFileNameWithoutExtension(path).Split('.')[0];
-            events.AddRange(StaticEvent.Matches(source).Cast<Match>().Select(match => $"{type}.{match.Groups[1].Value}"));
+            events.AddRange(StaticEvent.Matches(source).Cast<Match>().Select(match => $"{TypeAt(source, match.Index, path)}.{match.Groups[1].Value}"));
         }
 
         var offenders = new List<string>();
@@ -99,5 +192,30 @@ public sealed class ConventionTests
 
         Assert.Greater(events.Count, 10, "The scan found the static events");
         Assert.IsEmpty(offenders, string.Join("\n", offenders));
+    }
+
+    [Test]
+    public void TheResetCheck_ReadsHookBodies()
+    {
+        const string source = @"
+public sealed class Example : MonoBehaviour
+{
+    private static readonly List<int> kept = new List<int>();
+    public static Example Current { get; private set; }
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => Clean();
+
+    private static void Clean()
+    {
+        Current = null;
+        kept.Clear();
+    }
+}";
+        string reset = ResetCode(source);
+        StringAssert.Contains("Current = null", reset, "Through the method the hook calls");
+        StringAssert.Contains("kept.Clear()", reset);
+        Assert.AreEqual("Example", TypeAt(source, source.IndexOf("kept", System.StringComparison.Ordinal), "Other.cs"));
+        StringAssert.DoesNotContain("Current = null", ResetCode(source.Replace("        Current = null;\n", "")));
     }
 }

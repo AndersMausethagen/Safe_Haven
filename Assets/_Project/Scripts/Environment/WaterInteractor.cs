@@ -124,6 +124,7 @@ public sealed class WaterInteractor : MonoBehaviour
     private static void ResetForNewPlaySession()
     {
         Active.Clear();
+        Spotted.Clear();
         updatedFrame = -1;
         SpotCount = 0;
         Shader.SetGlobalFloat(SpotCountId, 0f);

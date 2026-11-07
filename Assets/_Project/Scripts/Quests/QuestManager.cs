@@ -70,6 +70,7 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetForNewPlaySession()
     {
+        Current = null;
         Changed = null;
     }
 
