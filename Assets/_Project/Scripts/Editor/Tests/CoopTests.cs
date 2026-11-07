@@ -420,4 +420,43 @@ public sealed class CoopTests
         CollectionAssert.AreEqual(host.Foretold, follower.Foretold, "The same events are foretold, so the same ones happen.");
         Assert.AreEqual(host.TotalSeconds - 90f, follower.TimeRemaining, 0.001f, "The follower's clock starts where the host's stands.");
     }
+
+    [Test]
+    public void HealthFloors_FromSeveralHolders_TheHighestCounts_AndNoneUndoesAnother()
+    {
+        var holder = new GameObject("Floor Test");
+        try
+        {
+            Damageable health = holder.AddComponent<Damageable>();
+            var downedRule = new object();
+            Assert.AreEqual(0f, health.HealthFloor);
+
+            health.HealthFloor = 1f; // a Deathless relic
+            health.HoldFloor(downedRule, 1f);
+            health.ReleaseFloor(downedRule);
+            Assert.AreEqual(1f, health.HealthFloor, "Letting go of the downed rule's floor leaves the relic's.");
+
+            health.HoldFloor(downedRule, 1f);
+            health.HealthFloor = 0f; // the relic spent
+            Assert.AreEqual(1f, health.HealthFloor, "The relic letting go leaves the downed rule's floor.");
+            health.ReleaseFloor(downedRule);
+            Assert.AreEqual(0f, health.HealthFloor);
+        }
+        finally
+        {
+            Object.DestroyImmediate(holder);
+        }
+    }
+
+    [Test]
+    public void BeingDown_TravelsWithAFriendsLook()
+    {
+        var look = new PlayerLookState { Downed = true };
+        Assert.IsFalse(look.Equals(new PlayerLookState()), "Going down is a change friends hear of.");
+        using var writer = new FastBufferWriter(1024, Unity.Collections.Allocator.Temp);
+        writer.WriteNetworkSerializable(look);
+        using var reader = new FastBufferReader(writer, Unity.Collections.Allocator.Temp);
+        reader.ReadNetworkSerializable(out PlayerLookState read);
+        Assert.IsTrue(read.Downed);
+    }
 }

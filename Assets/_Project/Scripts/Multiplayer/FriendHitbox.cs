@@ -11,7 +11,10 @@ public sealed class FriendHitbox : MonoBehaviour, IDamageable
     /// <summary>The friend's connection, so a strike at this body can be sent to them.</summary>
     public ulong ClientId { get; private set; }
 
-    public bool IsAlive => isActiveAndEnabled;
+    /// <summary>Down, waiting for help: creatures leave them be.</summary>
+    public bool IsDown { get; set; }
+
+    public bool IsAlive => isActiveAndEnabled && !IsDown;
     public Faction Faction => Faction.Player;
     public TargetCategory Category => TargetCategory.Creature;
 

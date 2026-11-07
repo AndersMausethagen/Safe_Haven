@@ -44,7 +44,18 @@ public sealed class MultiplayerSettings : GameSettings<MultiplayerSettings>
     [Tooltip("Height of the name over a friend's head, in metres.")]
     [SerializeField, Min(0f)] private float nameHeight = 2.15f;
 
+    [Header("Downed (raids together)")]
+    [Tooltip("Seconds a knocked-down player has for a friend to help them up before the blow kills them.")]
+    [SerializeField, Min(5f)] private float bleedOutSeconds = 45f;
+    [Tooltip("Seconds a friend holds E beside them to help them up.")]
+    [SerializeField, Min(0.5f)] private float helpUpSeconds = 3f;
+    [Tooltip("Share of their health a player gets up with.")]
+    [SerializeField, Range(0.05f, 1f)] private float helpedUpHealth = 0.35f;
+
     public int MaxPlayers => maxPlayers;
+    public float BleedOutSeconds => bleedOutSeconds;
+    public float HelpUpSeconds => helpUpSeconds;
+    public float HelpedUpHealth => helpedUpHealth;
     public ushort Port => port;
     public uint SteamAppId => steamAppId;
     public string ProtocolVersion => protocolVersion;

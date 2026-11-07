@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -76,7 +77,32 @@ public sealed class Damageable : MonoBehaviour, IDamageable, ISaveable, ISharedS
     public float DamageTakenMultiplier { get; set; } = 1f;
 
     /// <summary>A hit can't take its health below this, so it can't die: a building breaks and waits for repairs, but is never lost.</summary>
-    public float HealthFloor { get; set; }
+    public float HealthFloor
+    {
+        get
+        {
+            float floor = baseFloor;
+            foreach (float held in heldFloors.Values)
+            {
+                floor = Mathf.Max(floor, held);
+            }
+
+            return floor;
+        }
+        set => baseFloor = value;
+    }
+
+    private float baseFloor;
+    private readonly Dictionary<object, float> heldFloors = new Dictionary<object, float>();
+
+    /// <summary>
+    /// Holds health at or above <paramref name="floor"/> for <paramref name="source"/> until released, beside
+    /// <see cref="HealthFloor"/>'s own value: the highest floor counts, so one holder (co-op's downed rule) never undoes
+    /// another's (a Deathless relic).
+    /// </summary>
+    public void HoldFloor(object source, float floor) => heldFloors[source] = floor;
+
+    public void ReleaseFloor(object source) => heldFloors.Remove(source);
 
     /// <summary>True when it has been worn down to its floor.</summary>
     public bool IsBroken => HealthFloor > 0f && currentHealth <= HealthFloor;

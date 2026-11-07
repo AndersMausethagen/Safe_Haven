@@ -73,6 +73,7 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
     private HavenSync sync;
     private readonly VisitorAccess access = new VisitorAccess();
     private readonly CoopCreatures creatures = new CoopCreatures();
+    private readonly CoopDowned downed = new CoopDowned();
     private float nextCreatures;
     private RaidInvite openRaid;
     private float openRaidSince;
@@ -96,6 +97,9 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
 
     /// <summary>Friends' questions to the host (building, the stash) and the answers.</summary>
     public VisitorAccess Access => access;
+
+    /// <summary>Downed and helped up on raids together.</summary>
+    public CoopDowned Downed => downed;
 
     public void Initialise(MultiplayerSettings multiplayer, SteamPlatform platform)
     {
@@ -177,6 +181,7 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
         network.CustomMessagingManager.RegisterNamedMessageHandler(EntitiesMessage, OnEntitiesFromGuest);
         access.StartHosting(network);
         creatures.StartHosting(network);
+        downed.Start(network, settings);
         SetState(CoopState.Hosting);
         if (viaSteam)
         {
@@ -390,6 +395,7 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
         network.CustomMessagingManager.RegisterNamedMessageHandler(RaidClosedMessage, (sender, _) => openRaid = null);
         access.StartGuest(network);
         creatures.StartGuest(network);
+        downed.Start(network, settings);
         SetState(CoopState.Joining);
         return true;
     }
@@ -583,6 +589,7 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
         {
             nextCreatures = Time.unscaledTime + CoopCreatures.Interval;
             creatures.Tick(IsHost);
+            downed.Tick();
         }
     }
 
@@ -864,6 +871,7 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
         {
             access.Reset();
             creatures.Reset();
+            downed.Reset();
             openRaid = null;
         }
 
@@ -880,6 +888,7 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
         GameEvents.Raised -= OnGameEvent;
         sync?.Dispose();
         creatures.Dispose();
+        downed.Dispose();
         DropLobby();
         if (Current == this)
         {

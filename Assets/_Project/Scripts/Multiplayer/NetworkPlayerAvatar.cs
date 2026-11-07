@@ -28,6 +28,8 @@ public sealed class NetworkPlayerAvatar : NetworkBehaviour
     private readonly PoseBuffer poses = new PoseBuffer();
     private MultiplayerSettings settings;
     private RemotePlayerBody body;
+    private FriendRevive revive;
+    private FriendHitbox hitbox;
     private AnimatorMirror ownMirror;
     private Animator ownAnimator;
     private PoseSnapshot outgoing;
@@ -105,7 +107,8 @@ public sealed class NetworkPlayerAvatar : NetworkBehaviour
     private void UpdateOwn()
     {
         Player player = Player.Current;
-        if (Time.unscaledTime >= nextLookCheck)
+        // Going down (or getting up) is told at once: friends need the "Help up" straight away.
+        if (Time.unscaledTime >= nextLookCheck || look.Value.Downed != CoopDowned.IsDown)
         {
             nextLookCheck = Time.unscaledTime + LookCheckInterval;
             PublishLook();
@@ -171,12 +174,21 @@ public sealed class NetworkPlayerAvatar : NetworkBehaviour
             // The host's creatures go for friends too (CoopCreatures sends them the blows).
             if (IsServer)
             {
-                FriendHitbox.Attach(body.gameObject, OwnerClientId);
+                hitbox = FriendHitbox.Attach(body.gameObject, OwnerClientId);
             }
+
+            revive = FriendRevive.Create(body.transform, look.Value.DisplayName, OwnerClientId, settings.HelpUpSeconds);
         }
         else if (!body.gameObject.activeSelf)
         {
             body.gameObject.SetActive(true);
+        }
+
+        // Down in a shared raid: friends can help them up, and creatures leave them be.
+        revive.Show(look.Value.Downed, look.Value.DisplayName);
+        if (hitbox != null)
+        {
+            hitbox.IsDown = look.Value.Downed;
         }
 
         double renderTime = NetworkManager.ServerTime.Time - settings.InterpolationDelay;

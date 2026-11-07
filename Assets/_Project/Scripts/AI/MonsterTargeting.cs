@@ -54,6 +54,12 @@ public sealed class MonsterTargeting
             return false;
         }
 
+        // Co-op: a knocked-down player is left for their friends to help (CoopDowned).
+        if (CoopDowned.IsDown && Player.IsPlayer(component.gameObject))
+        {
+            return false;
+        }
+
         if (PlayerOnly && !IsPriorityTarget(component))
         {
             return false;

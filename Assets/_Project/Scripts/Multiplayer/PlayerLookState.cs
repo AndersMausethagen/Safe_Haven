@@ -29,13 +29,15 @@ public struct PlayerLookState : INetworkSerializable, IEquatable<PlayerLookState
     public FixedString64Bytes Held;
     /// <summary>The scene the player is in. Friends are only drawn where you are.</summary>
     public FixedString128Bytes Place;
+    /// <summary>Knocked down in a shared raid, waiting for a friend to help them up (CoopDowned).</summary>
+    public bool Downed;
 
     public string DisplayName => Name.Length > 0 ? Name.ToString() : CharacterAppearance.DefaultName;
 
     /// <summary>The look of the local player now (or an empty look when there is none).</summary>
     public static PlayerLookState Of(Player player, string place)
     {
-        var state = new PlayerLookState { Place = Clip128(place) };
+        var state = new PlayerLookState { Place = Clip128(place), Downed = CoopDowned.IsDown };
         CharacterAppearance look = GameSession.Appearance ?? new CharacterAppearance();
         state.Name = Clip64(look.DisplayName);
         state.Gender = (int)look.gender;
@@ -120,13 +122,14 @@ public struct PlayerLookState : INetworkSerializable, IEquatable<PlayerLookState
         serializer.SerializeValue(ref Gear);
         serializer.SerializeValue(ref Held);
         serializer.SerializeValue(ref Place);
+        serializer.SerializeValue(ref Downed);
     }
 
     public bool Equals(PlayerLookState other) =>
         Name.Equals(other.Name) && Gender == other.Gender && Skin == other.Skin && Hair == other.Hair &&
         HairColour == other.HairColour && Brows == other.Brows && Beard == other.Beard && Eyes == other.Eyes &&
         Underclothes == other.Underclothes && Clothes == other.Clothes && Gear.Equals(other.Gear) &&
-        Held.Equals(other.Held) && Place.Equals(other.Place);
+        Held.Equals(other.Held) && Place.Equals(other.Place) && Downed == other.Downed;
 
     public override bool Equals(object obj) => obj is PlayerLookState other && Equals(other);
 
