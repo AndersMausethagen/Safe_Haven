@@ -30,9 +30,11 @@ public static class BuildProficiencies
             Sneaking(),
         };
         string settings = Settings(skills);
+        string mentors = Mentors(skills);
+        string rested = Rested();
         string talents = AssetDatabase.IsValidFolder(OldTalents) && AssetDatabase.DeleteAsset(OldTalents) ? "old talents removed" : "no old talents";
         AssetDatabase.SaveAssets();
-        return $"{skills.Count} skills; {settings}; {talents}";
+        return $"{skills.Count} skills; {settings}; {mentors}; {rested}; {talents}";
     }
 
     // ----- Gathering -----
@@ -450,6 +452,72 @@ public static class BuildProficiencies
         so.ApplyModifiedPropertiesWithoutUndo();
         EditorUtility.SetDirty(settings);
         return "settings " + SettingsPath;
+    }
+
+    // ----- Mentors and rest -----
+
+    // The Haven building that teaches each skill: every tier above I adds 5% to its experience (LevelingSettings).
+    private static readonly Dictionary<string, string> MentorOf = new Dictionary<string, string>
+    {
+        { "woodcutting", "Sawbench" }, { "mining", "Forge" }, { "foraging", "FarmPlot" }, { "weaponcrafting", "Forge" },
+        { "armorcrafting", "Loom" }, { "cooking", "Kitchen" }, { "alchemy", "Cauldron" }, { "construction", "ConstructionTable" },
+        { "archery", "TanningRack" }, { "runecraft", "PurificationAltar" },
+    };
+
+    private static string Mentors(List<ProficiencyDefinition> skills)
+    {
+        int set = 0;
+        foreach (ProficiencyDefinition skill in skills)
+        {
+            BuildingDefinition building = MentorOf.TryGetValue(skill.Id, out string asset)
+                ? AssetDatabase.LoadAssetAtPath<BuildingDefinition>($"Assets/_Project/Data/Buildings/{asset}.asset")
+                : null;
+            var so = new SerializedObject(skill);
+            so.FindProperty("mentor").objectReferenceValue = building;
+            so.ApplyModifiedPropertiesWithoutUndo();
+            EditorUtility.SetDirty(skill);
+            set += building != null ? 1 : 0;
+        }
+
+        var settings = new SerializedObject(AssetDatabase.LoadAssetAtPath<LevelingSettings>(SettingsPath));
+        settings.FindProperty("mentorBonusPerTier").floatValue = 0.05f;
+        settings.ApplyModifiedPropertiesWithoutUndo();
+        return $"{set} skills with a mentor";
+    }
+
+    // Rested (setting out from a comfortable Haven) and the sauna's warmth make practice count for more.
+    private static string Rested()
+    {
+        var haven = AssetDatabase.LoadAssetAtPath<HavenSettings>("Assets/_Project/Resources/HavenSettings.asset");
+        string rested = AddBonus(new SerializedObject(haven), "restedBonuses", StatType.ExperienceGain, 0.2f) ? "rested +20% experience" : "rested had it";
+
+        // The prefab asset's own component, edited in place: opening and saving the prefab's contents would stamp a save id
+        // on its SaveableEntity, which only placed instances may have.
+        GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Project/Prefabs/Structures/Sauna.prefab");
+        BoonSource source = prefab != null ? prefab.GetComponentInChildren<BoonSource>(true) : null;
+        string sauna = source != null && AddBonus(new SerializedObject(source), "bonuses", StatType.ExperienceGain, 0.1f) ? "sauna +10%" : "sauna had it";
+        return rested + ", " + sauna;
+    }
+
+    private static bool AddBonus(SerializedObject so, string field, StatType stat, float value)
+    {
+        SerializedProperty list = so.FindProperty(field);
+        for (int i = 0; i < list.arraySize; i++)
+        {
+            if (list.GetArrayElementAtIndex(i).FindPropertyRelative("stat").intValue == (int)stat)
+            {
+                return false;
+            }
+        }
+
+        list.InsertArrayElementAtIndex(list.arraySize);
+        SerializedProperty bonus = list.GetArrayElementAtIndex(list.arraySize - 1);
+        bonus.FindPropertyRelative("stat").intValue = (int)stat;
+        bonus.FindPropertyRelative("op").intValue = (int)StatModifierOp.Flat;
+        bonus.FindPropertyRelative("value").floatValue = value;
+        so.ApplyModifiedPropertiesWithoutUndo();
+        EditorUtility.SetDirty(so.targetObject);
+        return true;
     }
 
     // ----- Helpers -----

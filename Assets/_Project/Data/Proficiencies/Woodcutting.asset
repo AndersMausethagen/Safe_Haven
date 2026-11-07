@@ -22,6 +22,7 @@ MonoBehaviour:
   crafts: 0
   gatherTool: 1
   gathersByHand: 0
+  mentor: {fileID: 11400000, guid: 1fe15b30940bf7049a4e4966e9954e1b, type: 2}
   levelBonuses:
   - stat: 22
     atFirstLevel: -0.099999994

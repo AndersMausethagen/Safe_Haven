@@ -219,6 +219,9 @@ MonoBehaviour:
   - stat: 10
     op: 0
     value: 0.1
+  - stat: 51
+    op: 0
+    value: 0.1
   seconds: 600
 --- !u!114 &1216436105421682365
 MonoBehaviour:

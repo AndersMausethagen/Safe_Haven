@@ -33,6 +33,9 @@ MonoBehaviour:
   - stat: 0
     op: 1
     value: 0.1
+  - stat: 51
+    op: 0
+    value: 0.2
   restedSecondsPerComfort: 60
   ranks:
   - name: Overgrown Camp

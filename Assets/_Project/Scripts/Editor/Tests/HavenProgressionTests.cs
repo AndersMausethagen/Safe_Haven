@@ -200,7 +200,9 @@ public sealed class HavenProgressionTests
     [Test]
     public void WellRested_KeepsItsWorth_AsGearImproves()
     {
-        Assert.IsTrue(HavenSettings.Current.RestedBonuses.All(bonus => bonus.op == StatModifierOp.Percent), "a flat bonus shrinks against a late kit");
+        // A share stat (experience gain, move speed) is relative already; a flat amount of health or stamina is not.
+        Assert.IsTrue(HavenSettings.Current.RestedBonuses.All(bonus => bonus.op == StatModifierOp.Percent || StatNames.IsFraction(bonus.stat)),
+            "a flat bonus shrinks against a late kit");
     }
 
     [Test]

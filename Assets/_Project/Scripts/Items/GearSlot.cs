@@ -293,6 +293,7 @@ public static class StatNames
             case StatType.ArrowDamage: return "Arrow Damage";
             case StatType.SpellDamage: return "Spell Damage";
             case StatType.SpellStaminaCost: return "Spell Stamina Cost";
+            case StatType.ExperienceGain: return "Experience Gain";
             default: return stat.ToString();
         }
     }

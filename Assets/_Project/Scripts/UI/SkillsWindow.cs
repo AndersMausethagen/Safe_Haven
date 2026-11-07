@@ -219,8 +219,9 @@ public sealed class SkillsWindow : MonoBehaviour
     {
         skillName = CodeUI.Label("Skill Name", panel, DetailX, 116f, DetailWidth, 40f, 30f, style.Accent);
         skillExperience = CodeUI.Label("Skill Experience", panel, DetailX, 156f, DetailWidth, 28f, 18f, style.Muted);
-        skillAbout = CodeUI.Paragraph("Skill About", panel, DetailX, 188f, DetailWidth, 54f, 17f, style.Text);
-        skillBonuses = CodeUI.Paragraph("Skill Bonuses", panel, DetailX, 244f, DetailWidth, 56f, 17f, style.Text);
+        skillAbout = CodeUI.Paragraph("Skill About", panel, DetailX, 186f, DetailWidth, 72f, 17f, style.Text);
+        skillAbout.richText = true;
+        skillBonuses = CodeUI.Paragraph("Skill Bonuses", panel, DetailX, 258f, DetailWidth, 44f, 17f, style.Text);
         skillBonuses.richText = true;
         insightStepLabel = CodeUI.AddButton("Insight Step", panel, DetailX, 304f, 260f, UIRole.Kind.Button, () => PutInsight(LevelingSettings.Current.InsightStep), out insightStep);
         CodeUI.AddButton("Insight All", panel, DetailX + 272f, 304f, 220f, UIRole.Kind.Button, () => PutInsight(int.MaxValue), out insightAll).text = "Put In All Insight";
@@ -341,6 +342,28 @@ public sealed class SkillsWindow : MonoBehaviour
         resetButton.interactable = AtHome && progress.PerkCount > 0;
     }
 
+    // What speeds the skill now: its mentor building at home, and being rested.
+    private static string Boosts(ProficiencyDefinition skill, LevelingSettings settings, UIStyle style)
+    {
+        var parts = new List<string>();
+        if (skill.Mentor != null)
+        {
+            int tier = GameSession.Settlement.BuiltTier(skill.Mentor);
+            float bonus = settings.MentorBonus(tier);
+            parts.Add(bonus > 0f
+                ? $"{skill.Mentor.DisplayName} {Tiers.ToRoman(tier)}: <color={style.GoodHex}>+{Mathf.RoundToInt(bonus * 100f)}% experience</color>"
+                : $"<color={style.MutedHex}>A {skill.Mentor.DisplayName} upgraded past tier I teaches it faster</color>");
+        }
+
+        float gain = Player.Current != null && Player.Current.Combatant != null ? Player.Current.Combatant.Stats.Get(StatType.ExperienceGain) : 0f;
+        if (gain > 0f)
+        {
+            parts.Add($"<color={style.GoodHex}>Rested: +{Mathf.RoundToInt(gain * 100f)}% experience</color>");
+        }
+
+        return parts.Count > 0 ? "\n" + string.Join("   ·   ", parts) : "";
+    }
+
     private static bool HasPending(ProficiencyDefinition skill, int level, CharacterProgress progress)
     {
         foreach (ProficiencyDefinition.Milestone milestone in skill.Milestones)
@@ -383,7 +406,7 @@ public sealed class SkillsWindow : MonoBehaviour
             ? $"{towards} / {needed} to level {skillLevel + 1}   ·   {progress.ExperienceOf(selected)} experience in all"
             : $"Highest level   ·   {progress.ExperienceOf(selected)} experience in all";
         string trained = string.IsNullOrWhiteSpace(selected.TrainedBy) ? "" : $"<color={style.MutedHex}>Trained by {selected.TrainedBy}.</color>  ";
-        skillAbout.text = trained + selected.Description;
+        skillAbout.text = trained + selected.Description + Boosts(selected, settings, style);
         skillBonuses.text = $"Now: {DescribeLevel(selected, skillLevel, settings, style)}\n" +
                             $"<color={style.MutedHex}>At {settings.MaxLevel}: {DescribeLevel(selected, settings.MaxLevel, settings, style)}</color>";
 

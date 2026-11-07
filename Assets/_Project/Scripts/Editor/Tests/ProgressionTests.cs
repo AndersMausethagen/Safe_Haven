@@ -137,6 +137,30 @@ public sealed class ProgressionTests
     }
 
     [Test]
+    public void AMentorBuilding_AndRest_SpeedPractice()
+    {
+        LevelingSettings settings = LevelingSettings.Current;
+        ProficiencyDefinition smithing = settings.FindSkill("weaponcrafting");
+        Assert.NotNull(smithing.Mentor, "the smithy teaches weaponcrafting");
+        GameSession.StartNewGame();
+        try
+        {
+            Assert.AreEqual(1f, ExperienceTracker.Boost(smithing), 0.0001f, "no smithy, no lessons");
+            GameSession.Settlement.NoteBuilt(smithing.Mentor, 3);
+            Assert.AreEqual(1.1f, ExperienceTracker.Boost(smithing), 0.0001f, "two tiers above I: +10%");
+            ExperienceTracker.Practise(smithing, 1, 10f, false);
+            Assert.AreEqual(11, GameSession.Progress.ExperienceOf(smithing));
+        }
+        finally
+        {
+            GameSession.StartNewGame();
+        }
+
+        Assert.IsTrue(HavenSettings.Current.RestedBonuses.Any(b => b.stat == StatType.ExperienceGain && b.value > 0f),
+            "setting out rested makes practice count for more");
+    }
+
+    [Test]
     public void Skills_BecomeStatModifiersOnThePlayer()
     {
         LevelingSettings settings = LevelingSettings.Current;

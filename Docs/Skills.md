@@ -110,6 +110,18 @@ Raid tiers are tuned to gear kits (`GearBalance`, [GearScoreAndRaidTiers](GearSc
 Melee skill expected at the tier (`LevelingSettings.ExpectedLevel`: 10, 20, 30, 40, so +0%, +5%, +10%, +15%), and enemy health was raised
 to the suggested values (II x1.5, III x2.3, IV x3). A player whose skill keeps pace finds each tier as gear alone used to.
 
-## Still to come
+## Mentors and rest
 
-- Mentors (building upgrades that speed a skill), a rested bonus from beds and the Sauna.
+Every skill but Fishing, Melee and Sneaking has a mentor building at home (`ProficiencyDefinition` › Mentor): each tier it stands at
+above I adds 5% to the skill's experience, on raids too (`SettlementState` remembers what stands). Woodcutter's Lodge: Woodcutting;
+Smithy: Mining and Weaponcrafting; Farm Plot: Foraging; Tailor's Shop: Armorcrafting; Kitchen: Cooking; Cauldron: Alchemy; Workshop:
+Construction; Hunter's Lodge: Archery; Purification Altar: Runecraft. The skills window shows it.
+
+Setting out rested from a comfortable Haven (`HavenSettings` › Rested Bonuses, as long as the comfort at home allows) now also gives
++20% experience, and the Sauna's warmth +10% (the Experience Gain stat). Beds still gate nothing.
+
+## Still to watch
+
+- The pace is worked out, not measured: count real actions per raid in the playtest logs and check how long the baseline takes.
+- The prologue at level 1 takes a blow more per fight: playtest it.
+- Fishing, Melee and Sneaking have no mentor yet (a dock, a training yard).

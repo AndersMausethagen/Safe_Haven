@@ -96,6 +96,9 @@ public sealed class ProficiencyDefinition : ScriptableObject
     [SerializeField] private ToolType gatherTool;
     [Tooltip("A gathering skill that nodes picked by hand (no tool) train as well.")]
     [SerializeField] private bool gathersByHand;
+    [Tooltip("The Haven building that teaches it: each of its tiers above I adds LevelingSettings › Mentor Bonus Per Tier to " +
+             "the experience. Empty for none.")]
+    [SerializeField] private BuildingDefinition mentor;
     [SerializeField] private List<LevelBonus> levelBonuses = new List<LevelBonus>();
     [Tooltip("In order of level. Each offers two perks; the player keeps one.")]
     [SerializeField] private List<Milestone> milestones = new List<Milestone>();
@@ -110,6 +113,7 @@ public sealed class ProficiencyDefinition : ScriptableObject
     public CraftedGoods Crafts => crafts;
     public ToolType GatherTool => gatherTool;
     public bool GathersByHand => gathersByHand;
+    public BuildingDefinition Mentor => mentor;
     public IReadOnlyList<LevelBonus> LevelBonuses => levelBonuses;
     public IReadOnlyList<Milestone> Milestones => milestones;
 

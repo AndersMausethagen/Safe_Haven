@@ -480,7 +480,9 @@ in `GearPower.QualityBonuses` and `GearScore`) and the condition it starts in (F
 `StationCrafting.Collect` give gear through it (`ItemInventory.GiveMade`); `ExperienceTracker.PractiseCraft(recipe)` is called by hand
 crafts and by `SettlementSystem` for the player's own station orders (not workers'), which may also put an extra portion in the output
 slot (`StationQueue.AddExtra`). `PlayerEating` stretches meals and tonics by Meal and Tonic Duration, `Construction` hammers faster by
-Build Speed. Content: `AgentScripts/BuildProficiencies.cs`.
+Build Speed. `ExperienceTracker.Boost` multiplies all practice by the skill's mentor building's tiers above I
+(`ProficiencyDefinition.Mentor`, `LevelingSettings.MentorBonus`) and the player's Experience Gain (in `HavenSettings` › Rested Bonuses
+and the Sauna's boon). Content: `AgentScripts/BuildProficiencies.cs`.
 
 ## Lifetimes
 

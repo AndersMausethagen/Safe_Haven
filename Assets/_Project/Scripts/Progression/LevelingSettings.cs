@@ -33,6 +33,8 @@ public sealed class LevelingSettings : GameSettings<LevelingSettings>
     [SerializeField, Range(0f, 1f)] private float farBelow = 0.25f;
     [Tooltip("Everything learned on a raid counts this many times: danger teaches faster.")]
     [SerializeField, Min(1f)] private float raidMultiplier = 1.5f;
+    [Tooltip("Share more experience for each tier of a skill's mentor building above I (a Smithy III: two tiers).")]
+    [SerializeField, Range(0f, 0.5f)] private float mentorBonusPerTier = 0.05f;
 
     [Header("Combat")]
     [Tooltip("A monster's worth in experience: its Experience, or this much per point of its health. Each blow gives the " +
@@ -120,6 +122,9 @@ public sealed class LevelingSettings : GameSettings<LevelingSettings>
     public int LostTrackExperience => lostTrackExperience;
     public int SilentPinExperience => silentPinExperience;
     public float RaidMultiplier => raidMultiplier;
+
+    /// <summary>The share more experience a skill gets from its mentor building at this built tier (0 when unbuilt or I).</summary>
+    public float MentorBonus(int builtTier) => Mathf.Max(0, builtTier - 1) * mentorBonusPerTier;
     public int QuestExperience => questExperience;
     public int RaidExtractedExperience => raidExtractedExperience;
     public int RaidFailedExperience => raidFailedExperience;

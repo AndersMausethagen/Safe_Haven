@@ -103,7 +103,7 @@ public sealed class ExperienceTracker : MonoBehaviour, IGameSystem
 
         LevelingSettings rules = Rules;
         CharacterProgress progress = GameSession.Progress;
-        float amount = baseAmount * rules.Multiplier(tier, progress.LevelOf(skill, rules), onRaid);
+        float amount = baseAmount * rules.Multiplier(tier, progress.LevelOf(skill, rules), onRaid) * Boost(skill);
         if (Current != null)
         {
             Current.carried.TryGetValue(skill.Id, out float before);
@@ -117,6 +117,17 @@ public sealed class ExperienceTracker : MonoBehaviour, IGameSystem
         }
 
         Award(skill, whole);
+    }
+
+    /// <summary>
+    /// What a skill's experience is multiplied by beyond the action itself: its mentor building's tiers at home
+    /// (SettlementState remembers them on raids too) and the player's Experience Gain (rested, the sauna).
+    /// </summary>
+    public static float Boost(ProficiencyDefinition skill)
+    {
+        float mentor = skill != null && skill.Mentor != null ? Rules.MentorBonus(GameSession.Settlement.BuiltTier(skill.Mentor)) : 0f;
+        float gain = Player.Current != null && Player.Current.Combatant != null ? Player.Current.Combatant.Stats.Get(StatType.ExperienceGain) : 0f;
+        return Mathf.Max(0f, 1f + mentor + gain);
     }
 
     /// <summary>Practice of whatever skill this kind of training trains; Insight while no skill does.</summary>

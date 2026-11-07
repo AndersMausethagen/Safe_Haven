@@ -103,4 +103,6 @@ public enum StatType
     SpellDamage = 49,
     /// <summary>Share more stamina a spell costs. Negative is cheaper.</summary>
     SpellStaminaCost = 50,
+    /// <summary>Share more experience from all practice. 0.2 means 20% more: being rested, a warm sauna.</summary>
+    ExperienceGain = 51,
 }
