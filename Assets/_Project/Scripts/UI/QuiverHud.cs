@@ -87,7 +87,9 @@ public sealed class QuiverHud : MonoBehaviour
             return;
         }
 
-        bool bow = archery.isActiveAndEnabled && archery.Bow != null && !GamePause.IsPaused && !DialogueBox.IsOpen;
+        // Out of the way of windows: it draws above them, so it hides while one is open.
+        bool windows = UIStateManager.Current != null && UIStateManager.Current.IsAnyWindowOpen;
+        bool bow = archery.isActiveAndEnabled && archery.Bow != null && !GamePause.IsPaused && !DialogueBox.IsOpen && !windows;
         group.alpha = Mathf.MoveTowards(group.alpha, bow ? 1f : 0f, Time.unscaledDeltaTime * 6f);
         if (!bow)
         {

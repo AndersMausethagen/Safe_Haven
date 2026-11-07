@@ -17,7 +17,7 @@ MonoBehaviour:
   levelGrowth: 1.105
   baselineLevel: 10
   beginnerEase: 2.5
-  levelUpSound: {fileID: 11400000, guid: c08cfff61a51d7442a93c4dae8255955, type: 2}
+  levelUpSound: {fileID: 11400000, guid: d822f0272ab32e24f95aa198883df3f0, type: 2}
   tierExperience: 0a0000001000000019000000280000003c000000i
   levelsPerTier: 10
   oneTierBelow: 0.6

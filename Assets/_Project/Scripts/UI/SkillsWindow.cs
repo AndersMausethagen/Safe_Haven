@@ -114,6 +114,7 @@ public sealed class SkillsWindow : MonoBehaviour
 
     private void Update()
     {
+        Breathe();
         if (watched != GameSession.Progress)
         {
             if (watched != null)
@@ -253,6 +254,35 @@ public sealed class SkillsWindow : MonoBehaviour
         return card;
     }
 
+    // Milestones reached and waiting for a choice breathe in the accent, so the eye goes to them.
+    private void Breathe()
+    {
+        if (window == null || !window.IsOpen || selected == null)
+        {
+            return;
+        }
+
+        LevelingSettings settings = LevelingSettings.Current;
+        CharacterProgress progress = GameSession.Progress;
+        int level = progress.LevelOf(selected, settings);
+        UIStyle style = UIStyle.Current;
+        float breath = UIMotion.Breath(0.7f) * 0.35f;
+        IReadOnlyList<ProficiencyDefinition.Milestone> reached = selected.Milestones;
+        for (int i = 0; i < milestones.Count && i < reached.Count; i++)
+        {
+            bool waiting = reached[i].level <= level && progress.ChosenAt(reached[i]) == null;
+            if (!waiting)
+            {
+                continue;
+            }
+
+            (TMP_Text label, PerkCard first, PerkCard second) = milestones[i];
+            first.Background.color = Color.Lerp(style.ControlLit, style.Accent, breath);
+            second.Background.color = Color.Lerp(style.ControlLit, style.Accent, breath);
+            label.color = Color.Lerp(style.Accent, Color.white, breath * 2f);
+        }
+    }
+
     /// <summary>Shows a skill on the right.</summary>
     public void Select(ProficiencyDefinition skill)
     {
@@ -277,7 +307,12 @@ public sealed class SkillsWindow : MonoBehaviour
         if (spent <= 0)
         {
             GameMessages.Post($"{selected.DisplayName} can't grow any further.", MessageKind.Warning);
+            UIMotion.Shake(insightStep.transform);
+            return;
         }
+
+        UIMotion.Punch(skillName.transform, 0.12f, 0.35f);
+        UIMotion.Sound(AudioManager.Sounds != null ? AudioManager.Sounds.Insight : null);
     }
 
     private void Choose(PerkDefinition perk)
@@ -286,10 +321,29 @@ public sealed class SkillsWindow : MonoBehaviour
         if (!GameSession.Progress.CanChoose(selected, perk, settings, AtHome, out string reason))
         {
             GameMessages.Post(reason, MessageKind.Warning);
+            foreach ((TMP_Text _, PerkCard first, PerkCard second) in milestones)
+            {
+                if (first.Perk == perk) UIMotion.Shake(first.Background.transform);
+                if (second.Perk == perk) UIMotion.Shake(second.Background.transform);
+            }
+
             return;
         }
 
         GameSession.Progress.Choose(selected, perk, settings, AtHome);
+        foreach ((TMP_Text _, PerkCard first, PerkCard second) in milestones)
+        {
+            PerkCard card = first.Perk == perk ? first : second.Perk == perk ? second : null;
+            if (card != null)
+            {
+                UIStyle style = UIStyle.Current;
+                UIMotion.Punch(card.Background.transform, 0.08f, 0.4f);
+                UIMotion.Flash(card.Background, style.Accent, 0.6f);
+                UIMotion.Burst((RectTransform)card.Background.transform, Vector2.zero, 16, style.Accent, 200f, 0.9f, 9f);
+            }
+        }
+
+        UIMotion.Sound(AudioManager.Sounds != null ? AudioManager.Sounds.PerkChosen : null);
     }
 
     private void ResetPerks()

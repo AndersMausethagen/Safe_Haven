@@ -91,6 +91,12 @@ MonoBehaviour:
   click: {fileID: 11400000, guid: eff8873ac748ee54a8ebd626d23d77c0, type: 2}
   windowOpen: {fileID: 11400000, guid: 9044e19de8efd554caa2dc573c052a9c, type: 2}
   windowClose: {fileID: 11400000, guid: 44120f3e32f7b744b91233bbcbda2e5e, type: 2}
+  milestone: {fileID: 11400000, guid: 5810af58d8561674390350c579715397, type: 2}
+  perkChosen: {fileID: 11400000, guid: 82daaf18bf55c33408a9a2fe7da36c60, type: 2}
+  insight: {fileID: 11400000, guid: 1d09ea13624159e46a1b05cb8911d0ef, type: 2}
+  craftFine: {fileID: 11400000, guid: 84ec23a2f4818884b8ddfef4fa9de995, type: 2}
+  craftMasterwork: {fileID: 11400000, guid: 05db45d4309d12544852d594d292a780, type: 2}
+  craftQueued: {fileID: 11400000, guid: a52d2c853eb561d409e3ffce6a6a0808, type: 2}
   rainLoop: {fileID: 11400000, guid: 41b52ed9d9ac5dc4e98d701e13e8e1bf, type: 2}
   windLoop: {fileID: 11400000, guid: 56cbd875720b75f49b3da3759391025e, type: 2}
   thunder: {fileID: 11400000, guid: 6510718f5af764e4aa78349c4b3f7cdf, type: 2}

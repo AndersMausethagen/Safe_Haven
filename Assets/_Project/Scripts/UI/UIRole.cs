@@ -165,6 +165,10 @@ public sealed class UIRole : MonoBehaviour
             colors.colorMultiplier = 1f;
             button.colors = colors;
             enabled = true;
+            if (Application.isPlaying && !TryGetComponent(out UIPress _))
+            {
+                gameObject.AddComponent<UIPress>();
+            }
         }
 
         labelColor = label;

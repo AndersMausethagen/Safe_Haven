@@ -481,7 +481,10 @@ once between raids: `TaughtSinceRaid`, cleared by `RecordExtraction`). A perk ma
 (gathering, fishing, `CraftedWork`, `PlayerBoons`, `PlayerEating`, `BuildingRepairs`, `Construction`, `PlayerArchery`, `PlayerSkills`,
 `PlayerCombat`, `PlayerStealth`), and `PlayerTechniques` (added by `Player`) carries out the ones that answer events (Riposte,
 Second Wind, Soul Siphon, Pinning Shot, Sweep via `ResourceNode.GatherBy`, Forager's Haste); numbers in `TechniqueSettings`.
-Perks are chosen again for free beside the Portal. To add a skill: create one (Create > Safe Haven >
+Perks are chosen again for free beside the Portal. Feedback: `UIMotion` (UI) runs small unscaled motions (punch, pop, shake, flash,
+fade, spark bursts) on one hidden runner; `UIPress` (added to every painted button by `UIRole`) lifts and sinks buttons;
+`ExperienceHud` pops the level and milestone banner on override-sorted canvases above windows; `CraftFeedback` shows what
+`CraftedWork.Made` announces; sounds are `AudioSettingsDefinition` › Milestone, Perk Chosen, Insight, Craft Fine/Masterwork/Queued. To add a skill: create one (Create > Safe Haven >
 Progression > Skill) with a unique id, its Training and (for gathering) Gather Tool or (for crafting) Crafts, level bonuses and
 milestones, add it to LevelingSettings' Skills, and report its practice to `ExperienceTracker.Practise`.
 

@@ -90,6 +90,7 @@ public sealed class ExperienceTracker : MonoBehaviour, IGameSystem
         if (Player.Current != null)
         {
             ExperienceHud.Create();
+            CraftFeedback.Create();
             SkillsWindow.Create();
             JournalWindow.Create();
             JournalNotices.CheckPages();
@@ -419,10 +420,8 @@ public sealed class ExperienceTracker : MonoBehaviour, IGameSystem
             ? GameInput.WithRebinds($"{skill.DisplayName} {after}! A perk to choose (N).")
             : $"{skill.DisplayName} {after}!", MessageKind.Gain);
         LevelReached?.Invoke(skill, after, milestone);
-        if (Player.Current != null)
-        {
-            AudioManager.Play(Rules.LevelUpSound, Player.Current.transform.position);
-        }
+        AudioSettingsDefinition sounds = AudioManager.Sounds;
+        UIMotion.Sound(milestone && sounds != null && sounds.Milestone != null ? sounds.Milestone : Rules.LevelUpSound);
     }
 
     private void OnGameEvent(GameEvent gameEvent)

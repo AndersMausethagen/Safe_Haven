@@ -139,7 +139,24 @@ public sealed class RecipeBrowser : MonoBehaviour
     {
         if (maker != null && recipe != null && !elsewhere.Contains(recipe))
         {
+            int waiting = maker.Waiting(recipe);
+            int could = maker.HowMany(recipe);
+            if (count <= 0 || could <= 0)
+            {
+                // Nothing to make with: the button says no rather than doing nothing.
+                UIMotion.Shake(makeButton.transform);
+                return;
+            }
+
             maker.Make(recipe, count);
+            UIMotion.Punch(icon.transform, 0.18f, 0.4f);
+            UIMotion.Flash(icon, Color.white, 0.35f);
+            int queued = maker.Waiting(recipe) - waiting;
+            if (queued > 0 && recipe.Output != null)
+            {
+                CraftFeedback.ShowQueued(recipe.Output, queued * recipe.OutputAmount);
+            }
+
             Made?.Invoke();
             Refresh();
         }

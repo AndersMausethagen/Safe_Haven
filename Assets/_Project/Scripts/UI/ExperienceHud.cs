@@ -17,7 +17,14 @@ public sealed class ExperienceHud : MonoBehaviour
     private const float MilestoneBannerSeconds = 5f;
     private static Color Gold => UIStyle.Current.Accent;
 
+    private RectTransform bar;
     private RectTransform fill;
+    private Image fillImage;
+    private RectTransform bannerRect;
+    private Image screenGlow;
+    private float shownShare;
+    private ProficiencyDefinition easedSkill;
+    private int easedLevel;
     private TMP_Text level;
     private TMP_Text gain;
     private CanvasGroup group;
@@ -65,25 +72,46 @@ public sealed class ExperienceHud : MonoBehaviour
         hud.group = root.AddComponent<CanvasGroup>();
         hud.group.blocksRaycasts = false;
 
+        // A milestone lights the edges of the screen for a moment: a wash of the accent, under everything else.
+        hud.screenGlow = Rect("Milestone Glow", root.transform, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero).gameObject.AddComponent<Image>();
+        var glowRect = (RectTransform)hud.screenGlow.transform;
+        glowRect.anchorMin = Vector2.zero;
+        glowRect.anchorMax = Vector2.one;
+        glowRect.offsetMin = glowRect.offsetMax = Vector2.zero;
+        hud.screenGlow.sprite = UISprites.Vignette;
+        hud.screenGlow.color = new Color(1f, 1f, 1f, 0f);
+        hud.screenGlow.raycastTarget = false;
+        OnTop(hud.screenGlow.gameObject, 245);
+
         RectTransform bar = Rect("Bar", root.transform, new Vector2(0.5f, 0f), new Vector2(560f, 8f), new Vector2(0f, 8f));
+        hud.bar = bar;
         bar.gameObject.AddComponent<Image>().color = new Color(0f, 0f, 0f, 0.6f);
         hud.fill = Rect("Fill", bar, new Vector2(0f, 0.5f), Vector2.zero, Vector2.zero);
         hud.fill.anchorMin = new Vector2(0f, 0f);
         hud.fill.anchorMax = new Vector2(0f, 1f);
         hud.fill.pivot = new Vector2(0f, 0.5f);
         hud.fill.offsetMin = hud.fill.offsetMax = Vector2.zero;
-        hud.fill.gameObject.AddComponent<Image>().color = Gold;
+        hud.fillImage = hud.fill.gameObject.AddComponent<Image>();
+        hud.fillImage.color = Gold;
 
         // Above the bar's right end, reading leftwards, so a long line never runs off the screen.
         hud.level = Label("Level", bar, new Vector2(1f, 1f), new Vector2(560f, 24f), Vector2.zero, 17f, TextAlignmentOptions.BottomRight);
         hud.level.rectTransform.pivot = new Vector2(1f, 0f);
         hud.level.rectTransform.anchoredPosition = new Vector2(0f, 4f);
-        hud.gain = Label("Gain", bar, new Vector2(0.5f, 1f), new Vector2(320f, 28f), new Vector2(0f, 44f), 19f, TextAlignmentOptions.Center);
+        hud.gain = Label("Gain", bar, new Vector2(0.5f, 1f), new Vector2(320f, 28f), new Vector2(0f, 112f), 19f, TextAlignmentOptions.Center);
 
         // The banner: type on nothing, like the rest of the HUD, between two thin lines.
         RectTransform bannerRoot = Rect("Level Banner", root.transform, new Vector2(0.5f, 0.74f), new Vector2(900f, 110f), Vector2.zero);
+        hud.bannerRect = bannerRoot;
+        // A level is worth interrupting for: the banner draws above any open window (the station's, as the craft lands).
+        OnTop(bannerRoot.gameObject, 250);
         hud.banner = bannerRoot.gameObject.AddComponent<CanvasGroup>();
         hud.banner.alpha = 0f;
+        // A soft dark band under the type, so it reads over a sunlit meadow as well as at night.
+        Image backing = Rect("Backing", bannerRoot, new Vector2(0.5f, 0.5f), new Vector2(980f, 150f), new Vector2(0f, 4f)).gameObject.AddComponent<Image>();
+        backing.sprite = UISprites.Band;
+        backing.color = new Color(0f, 0f, 0f, 0.55f);
+        backing.raycastTarget = false;
         hud.bannerTitle = Label("Title", bannerRoot, new Vector2(0.5f, 0.62f), new Vector2(900f, 52f), Vector2.zero, 40f, TextAlignmentOptions.Center);
         hud.bannerTitle.characterSpacing = 6f;
         hud.bannerLine = Label("Line", bannerRoot, new Vector2(0.5f, 0.2f), new Vector2(900f, 30f), Vector2.zero, 20f, TextAlignmentOptions.Center);
@@ -97,6 +125,7 @@ public sealed class ExperienceHud : MonoBehaviour
 
         ExperienceTracker.Gained += hud.OnGained;
         ExperienceTracker.LevelReached += hud.OnLevelReached;
+        Preload();
         return hud;
     }
 
@@ -119,6 +148,7 @@ public sealed class ExperienceHud : MonoBehaviour
         gainedSkill = skill;
         gainAt = Time.unscaledTime;
         writtenGain = -1;
+        UIMotion.Punch(gain.transform, same ? 0.12f : 0.3f, 0.3f);
         if (skill != null)
         {
             shownSkill = skill;
@@ -133,6 +163,25 @@ public sealed class ExperienceHud : MonoBehaviour
             : NextMilestone(skill, reached) is int next ? $"Next milestone at {next}" : "Mastered";
         bannerAt = Time.unscaledTime;
         bannerFor = milestone ? MilestoneBannerSeconds : BannerSeconds;
+
+        // The pop: the banner springs in, its title flashes white, sparks fly; a milestone is bigger in every way.
+        UIStyle style = UIStyle.Current;
+        UIMotion.Pop(bannerRect, milestone ? 0.45f : 0.7f, milestone ? 0.55f : 0.4f);
+        UIMotion.Flash(bannerTitle, Color.white, milestone ? 0.9f : 0.5f);
+        UIMotion.Burst(bannerRect, new Vector2(0f, 14f), milestone ? 34 : 14, style.Accent, milestone ? 460f : 260f, milestone ? 1.4f : 0.9f, milestone ? 13f : 9f);
+        if (milestone)
+        {
+            UIMotion.Burst(bannerRect, new Vector2(0f, 14f), 18, Color.white, 300f, 1.1f, 7f);
+            Color glow = style.Accent;
+            glow.a = 0.55f;
+            UIMotion.Flash(screenGlow, glow, 1.6f);
+        }
+
+        if (skill == shownSkill)
+        {
+            UIMotion.Flash(fillImage, Color.white, 0.6f);
+            UIMotion.Punch(bar, 0.25f, 0.5f);
+        }
     }
 
     private static int? NextMilestone(ProficiencyDefinition skill, int level)
@@ -159,7 +208,17 @@ public sealed class ExperienceHud : MonoBehaviour
         int needed = 0;
         int towards = shownSkill != null ? progress.TowardsNext(shownSkill, settings, out needed) : 0;
         float share = shownSkill == null ? 0f : needed <= 0 ? 1f : towards / (float)needed;
-        fill.anchorMax = new Vector2(Mathf.Clamp01(share), 1f);
+        // The bar eases to where it should be; after a level it starts again from empty rather than draining back.
+        int shownLevel = shownSkill != null ? progress.LevelOf(shownSkill, settings) : 0;
+        if (shownSkill != easedSkill || shownLevel != easedLevel)
+        {
+            shownShare = shownSkill != easedSkill ? share : 0f;
+            easedSkill = shownSkill;
+            easedLevel = shownLevel;
+        }
+
+        shownShare = Mathf.Lerp(shownShare, share, 1f - Mathf.Exp(-6f * Time.unscaledDeltaTime));
+        fill.anchorMax = new Vector2(Mathf.Clamp01(shownShare), 1f);
         int skillLevel = shownSkill != null ? progress.LevelOf(shownSkill, settings) : 0;
         // Something to do in the skills window: a perk to choose, or Insight to put into a skill.
         int points = progress.PendingChoices(settings) + (progress.Insight > 0 ? 1 : 0);
@@ -187,6 +246,9 @@ public sealed class ExperienceHud : MonoBehaviour
             level.text = points > 0 ? GameInput.WithRebinds($"{name}  <color={UIStyle.Current.GoodHex}>(N)</color>") : name;
         }
 
+        // A perk waiting to be chosen keeps calling softly.
+        level.color = points > 0 ? Color.Lerp(Gold, Color.white, UIMotion.Breath(0.8f) * 0.6f) : Gold;
+
         float age = Time.unscaledTime - gainAt;
         gain.gameObject.SetActive(age < GainSeconds);
         if (age < GainSeconds)
@@ -198,8 +260,37 @@ public sealed class ExperienceHud : MonoBehaviour
             }
 
             gain.alpha = 1f - Mathf.Clamp01((age - GainSeconds * 0.5f) / (GainSeconds * 0.5f));
-            gain.rectTransform.anchoredPosition = new Vector2(0f, 44f + age * 14f);
+            gain.rectTransform.anchoredPosition = new Vector2(0f, 112f + age * 14f);
         }
+    }
+
+    // The moments' sounds are loaded now, so the first level of a session doesn't stall the frame it lands on.
+    private static void Preload()
+    {
+        AudioSettingsDefinition sounds = AudioManager.Sounds;
+        var moments = new[] { LevelingSettings.Current.LevelUpSound, sounds?.Milestone, sounds?.PerkChosen, sounds?.CraftFine, sounds?.CraftMasterwork };
+        foreach (SoundDefinition sound in moments)
+        {
+            if (sound == null)
+            {
+                continue;
+            }
+
+            foreach (AudioClip clip in sound.Clips)
+            {
+                if (clip != null && clip.loadState == AudioDataLoadState.Unloaded)
+                {
+                    clip.LoadAudioData();
+                }
+            }
+        }
+    }
+
+    private static void OnTop(GameObject part, int order)
+    {
+        var canvas = part.AddComponent<Canvas>();
+        canvas.overrideSorting = true;
+        canvas.sortingOrder = order;
     }
 
     private static RectTransform Rect(string name, Transform parent, Vector2 anchorAt, Vector2 size, Vector2 position)

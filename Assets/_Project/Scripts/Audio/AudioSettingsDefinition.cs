@@ -127,6 +127,18 @@ public sealed class AudioSettingsDefinition : ScriptableObject
     [SerializeField] private SoundDefinition click;
     [SerializeField] private SoundDefinition windowOpen;
     [SerializeField] private SoundDefinition windowClose;
+    [Tooltip("A skill milestone reached: the big moment (the level-up sound is LevelingSettings').")]
+    [SerializeField] private SoundDefinition milestone;
+    [Tooltip("A perk taken in the skills window.")]
+    [SerializeField] private SoundDefinition perkChosen;
+    [Tooltip("Insight put into a skill.")]
+    [SerializeField] private SoundDefinition insight;
+    [Tooltip("A Fine piece made.")]
+    [SerializeField] private SoundDefinition craftFine;
+    [Tooltip("A Masterwork made.")]
+    [SerializeField] private SoundDefinition craftMasterwork;
+    [Tooltip("An order queued at a station.")]
+    [SerializeField] private SoundDefinition craftQueued;
 
     [Header("Weather and Water (loops on the Ambience volume)")]
     [Tooltip("Loops while it rains, as loud as the rain is heavy.")]
@@ -225,6 +237,12 @@ public sealed class AudioSettingsDefinition : ScriptableObject
     public SoundDefinition Click => click;
     public SoundDefinition WindowOpen => windowOpen;
     public SoundDefinition WindowClose => windowClose;
+    public SoundDefinition Milestone => milestone;
+    public SoundDefinition PerkChosen => perkChosen;
+    public SoundDefinition Insight => insight;
+    public SoundDefinition CraftFine => craftFine;
+    public SoundDefinition CraftMasterwork => craftMasterwork;
+    public SoundDefinition CraftQueued => craftQueued;
     public SoundDefinition RainLoop => rainLoop;
     public SoundDefinition WindLoop => windLoop;
     public SoundDefinition Thunder => thunder;

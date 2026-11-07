@@ -34,6 +34,9 @@ public enum ItemQuality
 /// </summary>
 public static class CraftedWork
 {
+    /// <summary>Raised with what the player has just made: the item, how many, its make and its full name (CraftFeedback).</summary>
+    public static event Action<ItemDefinition, int, ItemQuality, string> Made;
+
     /// <summary>What a recipe makes, as goods a skill is trained by. Growing (the Farm Plot, the Beehive) and the portal's
     /// work make nothing a craftsman does.</summary>
     public static CraftedGoods Of(RecipeDefinition recipe)
@@ -184,7 +187,13 @@ public static class CraftedWork
                 GameMessages.Post($"A little extra: +1 {item.DisplayName}", MessageKind.Gain);
             }
 
-            return bag.Give(item, amount + extra);
+            int arrived = bag.Give(item, amount + extra);
+            if (arrived > 0)
+            {
+                Made?.Invoke(item, arrived, ItemQuality.Plain, item.DisplayName);
+            }
+
+            return arrived;
         }
 
         int given = 0;
@@ -197,6 +206,7 @@ public static class CraftedWork
             }
 
             given++;
+            Made?.Invoke(item, 1, piece.Quality, piece.DisplayName);
             if (piece.Quality != ItemQuality.Plain)
             {
                 GameMessages.Post($"You made a {piece.DisplayName}!", MessageKind.Gain);

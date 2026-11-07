@@ -179,6 +179,29 @@ can't echo between players. Not yet tried with two players.
 - **Total level:** every skill's level added up gives a title (Newcomer, Settler, Woodsfolk, Haven-Keeper, Elder of the Haven,
   Legend of the Forest), shown in the skills window, and one point of Haven renown for every 20 levels above the start.
 
+## How progress feels
+
+- **A level** pops a banner high in the middle of the screen over a soft dark band: it springs in, its title flashes white,
+  sparks fly, and a lyre strum climbs to a bowl (Level Up). **A milestone** is bigger in every way: more sparks, the screen's edges
+  glow in the accent, and a frame drum, a swelling string and a full strum land on a bell (Milestone, which takes the mix). Both
+  draw above any open window, as a craft at a station is where a crafting milestone lands.
+- The XP bar eases to its new place, flashes and jumps on a level, starts again from empty; "+12 Woodcutting" pops; the "(N)" of a
+  waiting perk breathes.
+- In the skills window, waiting milestones breathe in the accent; a chosen perk punches, flashes and sparks to a knocked rune
+  (Perk Chosen); Insight going in is heard; a refused choice shakes.
+- **Crafting:** whatever is made rises as a card in the right-hand column (top of the screen while a window is open): its icon, its
+  name in the colour of its make (Fine in the Rare colour, Masterwork in the Epic one), "x5" for a run, and the experience it
+  taught. Good work has its own sound after the smith's taps (Craft Fine: a bowl; Craft Masterwork: a bell and a rising strum) and
+  sparks. Queuing at a station shows as queued with a tally knocked into the bench; the recipe's icon punches; a make with nothing
+  to make with shakes the button. At the station the progress bar warms towards the accent as the craft nears done, a craft that
+  finishes while watching makes the output slot jump with the smith's taps, a full output breathes red.
+- **Every button** lifts a little under the pointer, sinks while held and springs back (`UIPress`, added by `UIRole`).
+
+Code: `UIMotion` (punch, pop, shake, flash, fade, spark bursts, breathing; unscaled time), `UISprites` (vignette and band made in
+code), `ExperienceHud`, `CraftFeedback`, `SkillsWindow`, `RecipeBrowser`, `StationWindow`. Sounds: `Tools/Audio/progression.py`,
+wrapped by `AgentScripts/BuildGameFeel.cs` into `AudioSettings` (Milestone, Perk Chosen, Insight, Craft Fine, Craft Masterwork,
+Craft Queued) and `LevelingSettings` › Level Up Sound. The sounds are measured, not yet listened to by a person.
+
 ## Mentors and rest
 
 Every skill but Fishing, Melee and Sneaking has a mentor building at home (`ProficiencyDefinition` › Mentor): each tier it stands at

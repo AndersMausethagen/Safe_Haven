@@ -180,6 +180,7 @@ public sealed class StationWindow : MonoBehaviour
     {
         station = source;
         user = viewer;
+        shownOutput = source.Queue.OutputAmount;
         crafting = viewer != null ? viewer.GetComponent<PlayerCrafting>() : null;
         range = maxDistance;
         titleLabel.text = source.Type.DisplayName();
@@ -208,6 +209,9 @@ public sealed class StationWindow : MonoBehaviour
         }
     }
 
+    // What the output slot held last frame, to notice a craft finishing.
+    private int shownOutput = -1;
+
     private void Update()
     {
         if (!IsOpen)
@@ -226,8 +230,25 @@ public sealed class StationWindow : MonoBehaviour
         progressFill.anchorMax = new Vector2(queue.Blocked ? 1f : fraction, 1f);
         if (progressImage != null)
         {
-            progressImage.color = queue.Blocked ? UIStyle.Current.Danger : UIStyle.Current.Good;
+            // The bar warms towards the accent as the craft nears done, and breathes red when the output is full.
+            UIStyle style = UIStyle.Current;
+            progressImage.color = queue.Blocked ? Color.Lerp(style.Danger, Color.white, UIMotion.Breath(1.2f) * 0.3f)
+                : Color.Lerp(style.Good, style.Accent, fraction * fraction);
         }
+
+        // A craft finished while watching: the output slot jumps and the smith's taps are heard.
+        if (queue.OutputAmount > shownOutput)
+        {
+            UIMotion.Punch(outputGrid, 0.15f, 0.4f);
+            if (progressImage != null)
+            {
+                UIMotion.Flash(progressImage, Color.white, 0.4f);
+            }
+
+            UIMotion.Sound(AudioManager.Sounds != null ? AudioManager.Sounds.Crafted : null);
+        }
+
+        shownOutput = queue.OutputAmount;
 
         tooltip.Follow(GameInput.PointerPosition);
 
@@ -439,7 +460,17 @@ public sealed class StationWindow : MonoBehaviour
     {
         if (station != null)
         {
-            StationCrafting.Collect(user, station.Queue);
+            int taken = StationCrafting.Collect(user, station.Queue);
+            if (taken > 0)
+            {
+                UIMotion.Punch(outputGrid, 0.1f, 0.3f);
+            }
+            else if (station.Queue.Output != null)
+            {
+                UIMotion.Shake(outputGrid); // no room in the bag
+            }
+
+            shownOutput = station.Queue.OutputAmount;
             Refresh();
         }
     }
