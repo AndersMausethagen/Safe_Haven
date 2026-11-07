@@ -142,6 +142,9 @@ Setting out rested from a comfortable Haven (`HavenSettings` › Rested Bonuses,
 
 ## Still to watch
 
-- The pace is worked out, not measured: count real actions per raid in the playtest logs and check how long the baseline takes.
+- The pace is worked out, not measured yet. The playtest log now writes a `SkillLevel` row for every level (detail `insight` when
+  Insight raised it) and an `InsightSpent` row; Systems Editor › Settings › Skills puts the planned hours beside the median played
+  minutes at which real runs (without cheats) reached levels 5 to 50.
+- The raid planner shows the best fighting skill beside the gear score, against the level the tier expects (10, 20, 30, 40).
 - The prologue at level 1 took a blow more per fight before the eased curve; with a few wolves down that is mostly gone. Playtest it.
 - Fishing, Melee and Sneaking have no mentor yet (a dock, a training yard).

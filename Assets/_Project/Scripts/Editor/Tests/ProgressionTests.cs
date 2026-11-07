@@ -316,6 +316,23 @@ public sealed class ProgressionTests
     }
 
     [Test]
+    public void ThePlaytestLog_MeasuresPace_FromLevelsReachedByPractice()
+    {
+        var entries = new List<PlaytestEntry>
+        {
+            new PlaytestEntry { PlayedSeconds = 300f, Event = PlaytestLog.SkillLevel, Subject = "melee", Amount = 2 },
+            new PlaytestEntry { PlayedSeconds = 600f, Event = PlaytestLog.SkillLevel, Subject = "melee", Amount = 3, Detail = "insight" },
+            new PlaytestEntry { PlayedSeconds = 900f, Event = PlaytestLog.SkillLevel, Subject = "melee", Amount = 4, Detail = "milestone" },
+            new PlaytestEntry { PlayedSeconds = 960f, Event = PlaytestLog.SkillLevel, Subject = "melee", Amount = 2 },
+        };
+
+        SortedDictionary<int, float> melee = PlaytestLog.SkillPace(entries)["melee"];
+        Assert.AreEqual(5f, melee[2], 0.001f, "the first time counts");
+        Assert.IsFalse(melee.ContainsKey(3), "a level Insight bought says nothing about pace");
+        Assert.AreEqual(15f, melee[4], 0.001f);
+    }
+
+    [Test]
     public void RuneBook_IsReadForInsightAndFoundInSupplyCaches()
     {
         var book = AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Project/Data/Items/RuneBook.asset");

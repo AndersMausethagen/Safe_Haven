@@ -28,7 +28,22 @@ public sealed class PlaytestLogger : MonoBehaviour, IGameSystem
         if (logging)
         {
             GameEvents.Raised += OnGameEvent;
+            ExperienceTracker.LevelReached += OnLevelReached;
+            ExperienceTracker.InsightSpent += OnInsightSpent;
         }
+    }
+
+    // Levels with the played minute they came at: what the skills' pace is measured from (PlaytestLog.SkillPace).
+    private void OnLevelReached(ProficiencyDefinition skill, int level, bool milestone)
+    {
+        EnsureRun();
+        Write(PlaytestLog.SkillLevel, skill.Id, level, ExperienceTracker.SpendingInsight ? "insight" : milestone ? "milestone" : "");
+    }
+
+    private void OnInsightSpent(ProficiencyDefinition skill, int amount)
+    {
+        EnsureRun();
+        Write(PlaytestLog.InsightSpent, skill.Id, amount);
     }
 
     public void OnSceneEntered(Scene scene)
@@ -184,6 +199,8 @@ public sealed class PlaytestLogger : MonoBehaviour, IGameSystem
     {
         Cheats.Used -= OnCheat;
         GameEvents.Raised -= OnGameEvent;
+        ExperienceTracker.LevelReached -= OnLevelReached;
+        ExperienceTracker.InsightSpent -= OnInsightSpent;
         EndSession();
     }
 

@@ -69,6 +69,7 @@ public sealed class SystemsEditorWindow : EditorWindow
             new WardBreachPage(),
             new LootAndRarityPage(),
             new GearScorePage(),
+            new SkillsPage(),
             new UIStylePage(),
             new PlaytestPage(),
             new MultiplayerPage(),

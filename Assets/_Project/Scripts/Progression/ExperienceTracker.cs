@@ -43,6 +43,12 @@ public sealed class ExperienceTracker : MonoBehaviour, IGameSystem
     /// <summary>Raised with a skill and the level it reached, and whether that level is a milestone (the HUD's banner).</summary>
     public static event Action<ProficiencyDefinition, int, bool> LevelReached;
 
+    /// <summary>Raised with the skill and the Insight put into it (the playtest log).</summary>
+    public static event Action<ProficiencyDefinition, int> InsightSpent;
+
+    /// <summary>True while Insight is raising a skill, so a level reached then can be told from practice.</summary>
+    public static bool SpendingInsight { get; private set; }
+
     /// <summary>Raised with each amount gained: the skill, or null for Insight (the experience bar shows it).</summary>
     public static event Action<ProficiencyDefinition, int> Gained;
 
@@ -285,7 +291,21 @@ public sealed class ExperienceTracker : MonoBehaviour, IGameSystem
         CharacterProgress progress = GameSession.Progress;
         int before = progress.LevelOf(skill, rules);
         int spent = progress.SpendInsight(skill, amount, rules);
-        Announce(skill, before, progress.LevelOf(skill, rules));
+        SpendingInsight = true;
+        try
+        {
+            Announce(skill, before, progress.LevelOf(skill, rules));
+        }
+        finally
+        {
+            SpendingInsight = false;
+        }
+
+        if (spent > 0)
+        {
+            InsightSpent?.Invoke(skill, spent);
+        }
+
         return spent;
     }
 

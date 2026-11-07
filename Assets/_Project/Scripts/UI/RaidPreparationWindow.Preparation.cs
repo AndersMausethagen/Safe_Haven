@@ -108,6 +108,22 @@ public sealed partial class RaidPreparationWindow
         }
     }
 
+    // The best fighting skill against the level the tier was tuned for (LevelingSettings.ExpectedLevel): gear isn't all of it.
+    private static string FightingSkillLine(int tier, UIStyle style)
+    {
+        LevelingSettings settings = LevelingSettings.Current;
+        int best = 0;
+        foreach (ProficiencyTraining training in new[] { ProficiencyTraining.Melee, ProficiencyTraining.Archery, ProficiencyTraining.Spells })
+        {
+            ProficiencyDefinition skill = settings.SkillTrainedBy(training);
+            best = skill != null ? Mathf.Max(best, GameSession.Progress.LevelOf(skill, settings)) : best;
+        }
+
+        int expected = settings.ExpectedLevel(tier);
+        Color colour = best >= expected ? style.Good : best >= expected - 10 ? style.Accent : style.Warning;
+        return $"<size=85%>Fighting skill <color={UIStyle.Hex(colour)}>{best}</color>  ·  the tier expects {expected}</size>";
+    }
+
     private float DrawTiers(RaidDefinition raid, float y)
     {
         UIStyle style = UIStyle.Current;
@@ -131,7 +147,8 @@ public sealed partial class RaidPreparationWindow
         if (plan.Difficulty != null)
         {
             Color colour = score >= plan.Difficulty.recommendedGearScore ? style.Good : score >= plan.Difficulty.minimumGearScore ? style.Accent : style.Warning;
-            gearLabel.text = $"Your gear <color={UIStyle.Hex(colour)}>{score}</color>  ·  recommended {plan.Difficulty.recommendedGearScore}";
+            gearLabel.text = $"Your gear <color={UIStyle.Hex(colour)}>{score}</color>  ·  recommended {plan.Difficulty.recommendedGearScore}"
+                             + "\n" + FightingSkillLine(plan.Difficulty.tier, style);
             Stack(gearLabel, y, 46f);
         }
 

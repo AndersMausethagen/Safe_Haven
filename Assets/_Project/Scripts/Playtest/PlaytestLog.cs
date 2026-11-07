@@ -56,6 +56,10 @@ public static class PlaytestLog
     public const string SessionEnd = "SessionEnd";
     public const string SceneEntered = "SceneEntered";
     public const string PlayerDied = "PlayerDied";
+    /// <summary>A skill reached a level: subject the skill's id, amount the level, detail "insight" when Insight raised it.</summary>
+    public const string SkillLevel = "SkillLevel";
+    /// <summary>Insight put into a skill: subject the skill's id, amount the Insight.</summary>
+    public const string InsightSpent = "InsightSpent";
 
     public static string Folder => Path.Combine(Application.persistentDataPath, "Playtests");
 
@@ -181,6 +185,35 @@ public static class PlaytestLog
     }
 
     /// <summary>The Detail of a RaidTier row, which goes just before its RaidFinished row.</summary>
+    /// <summary>
+    /// Played minutes at which each skill first reached each level by practice (levels Insight raised are left out), by
+    /// skill id. A run with cheats should not be passed in.
+    /// </summary>
+    public static Dictionary<string, SortedDictionary<int, float>> SkillPace(IReadOnlyList<PlaytestEntry> entries)
+    {
+        var pace = new Dictionary<string, SortedDictionary<int, float>>();
+        foreach (PlaytestEntry entry in entries)
+        {
+            if (entry.Event != SkillLevel || entry.Detail == "insight" || string.IsNullOrEmpty(entry.Subject))
+            {
+                continue;
+            }
+
+            if (!pace.TryGetValue(entry.Subject, out SortedDictionary<int, float> levels))
+            {
+                levels = new SortedDictionary<int, float>();
+                pace[entry.Subject] = levels;
+            }
+
+            if (!levels.ContainsKey(entry.Amount))
+            {
+                levels[entry.Amount] = entry.PlayedSeconds / 60f;
+            }
+        }
+
+        return pace;
+    }
+
     public static string TierDetail(int gearScore, int recommended, string hour) => $"gear {gearScore}, recommended {recommended}, {hour}";
 
     private static int ReadMargin(string detail)

@@ -469,7 +469,9 @@ are read by `PlayerGathering` (Chop/Mine Speed and Sweet Spot; Forage Speed for 
 `PlayerSkills` (Spell Damage and Stamina Cost), `ArrowProjectile` (Ambush Damage), `PlayerCombat.Strike` (Melee
 Damage, Ambush Damage) and `CostOf` (Melee Stamina Cost), `PlayerGuard` (Block Stamina Cost), `PlayerNoise` and `PlayerStealth`
 (Sneak Noise and Visibility) and `PlayerLockpicking` (Lockpick Zone). `GearBalance` counts the Melee skill expected at each raid tier
-(`LevelingSettings.ExpectedLevel`). Perks are chosen again for free beside the Portal. To add a skill: create one (Create > Safe Haven >
+(`LevelingSettings.ExpectedLevel`), and the raid planner shows the best fighting skill against it. `PlaytestLogger` writes
+`SkillLevel` and `InsightSpent` rows; `PlaytestLog.SkillPace` and the Systems Editor's Skills page (`Editor/Systems/SkillsPage`)
+measure the pace from them. Perks are chosen again for free beside the Portal. To add a skill: create one (Create > Safe Haven >
 Progression > Skill) with a unique id, its Training and (for gathering) Gather Tool or (for crafting) Crafts, level bonuses and
 milestones, add it to LevelingSettings' Skills, and report its practice to `ExperienceTracker.Practise`.
 
