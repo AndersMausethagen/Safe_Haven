@@ -315,7 +315,7 @@ public sealed class StashWindow : MonoBehaviour
         var amounts = storage != null ? new List<ResourceAmount>(storage.StoredAmounts) : new List<ResourceAmount>();
         if (amounts.Count == 0)
         {
-            return "<color=#AAB0BC>nothing</color>";
+            return $"<color={UIStyle.Current.MutedHex}>nothing</color>";
         }
 
         amounts.Sort((a, b) =>

@@ -422,17 +422,17 @@ public sealed class ItemInventoryWindow : MonoBehaviour, IItemSlotHandler
             }
         }
 
-        string bagColor = used >= container.UnlockedSlots ? "#FF7B6B" : "#AAB0BC";
+        string bagColor = used >= container.UnlockedSlots ? UIStyle.Current.DangerHex : UIStyle.Current.MutedHex;
         builder.Append($"     <color={bagColor}>Bag {used}/{container.UnlockedSlots}</color>");
         if (container.HasWeightLimit)
         {
             float weight = container.CurrentWeight;
             float budget = container.WeightCapacity;
-            string weightColor = weight >= budget - 0.01f ? "#FF7B6B" : weight >= budget * 0.8f ? "#E8C46A" : "#AAB0BC";
+            string weightColor = weight >= budget - 0.01f ? UIStyle.Current.DangerHex : weight >= budget * 0.8f ? UIStyle.Current.WarningHex : UIStyle.Current.MutedHex;
             builder.Append($"     <color={weightColor}>Weight {weight:0.#}/{budget:0}</color>");
             if (Player.Current != null && Player.Current.TryGetComponent(out PlayerBurden burden) && burden.IsHeavy)
             {
-                builder.Append("  <color=#E8C46A>Heavy: slower, tires faster</color>");
+                builder.Append($"  <color={UIStyle.Current.WarningHex}>Heavy: slower, tires faster</color>");
             }
         }
 

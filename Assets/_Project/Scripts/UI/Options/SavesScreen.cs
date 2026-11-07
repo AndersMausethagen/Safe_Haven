@@ -263,7 +263,7 @@ public sealed class SavesScreen : MonoBehaviour
         bool playing = InGame && save.Slot == SaveGameService.CurrentSlot;
         int actions = InGame ? 4 : 3;
         float textRight = 16f + actions * (ActionWidth + 8f);
-        TMP_Text name = OptionsWidgets.Text("Name", row, playing ? $"{save.Name}  <size=70%><color=#E8C46A>playing now</color></size>" : save.Name, 26f, OptionsWidgets.Body);
+        TMP_Text name = OptionsWidgets.Text("Name", row, playing ? $"{save.Name}  <size=70%><color={UIStyle.Current.AccentHex}>playing now</color></size>" : save.Name, 26f, OptionsWidgets.Body);
         OptionsWidgets.Stretch((RectTransform)name.transform, new Vector2(18f, 44f), new Vector2(-textRight, -8f));
         name.fontStyle = FontStyles.Bold;
         name.textWrappingMode = TextWrappingModes.NoWrap;
@@ -298,12 +298,12 @@ public sealed class SavesScreen : MonoBehaviour
     {
         if (SaveGameService.TrySaveAsNew(out string problem))
         {
-            ShowStatus($"<color=#9BE37B>Saved as {SaveGameService.CurrentName}.</color>");
+            ShowStatus($"<color={UIStyle.Current.GoodHex}>Saved as {SaveGameService.CurrentName}.</color>");
             Refresh();
         }
         else
         {
-            ShowStatus($"<color=#FF7B6B>{problem}</color>");
+            ShowStatus($"<color={UIStyle.Current.DangerHex}>{problem}</color>");
         }
     }
 
@@ -323,7 +323,7 @@ public sealed class SavesScreen : MonoBehaviour
         if (!SaveGameService.TryLoad(save.Slot, lookup, fallbackScene, out string problem))
         {
             ShowFooter();
-            ShowStatus($"<color=#FF7B6B>{problem}</color>");
+            ShowStatus($"<color={UIStyle.Current.DangerHex}>{problem}</color>");
             return;
         }
 
@@ -342,7 +342,7 @@ public sealed class SavesScreen : MonoBehaviour
         {
             bool saved = SaveGameService.TryOverwrite(save.Slot, out string problem);
             ShowFooter();
-            ShowStatus(saved ? $"<color=#9BE37B>Saved over {save.Name}.</color>" : $"<color=#FF7B6B>{problem}</color>");
+            ShowStatus(saved ? $"<color={UIStyle.Current.GoodHex}>Saved over {save.Name}.</color>" : $"<color={UIStyle.Current.DangerHex}>{problem}</color>");
             Refresh();
         });
     }
@@ -353,7 +353,7 @@ public sealed class SavesScreen : MonoBehaviour
         {
             bool deleted = SaveGameService.TryDelete(save.Slot, out string problem);
             ShowFooter();
-            ShowStatus(deleted ? $"Deleted {save.Name}." : $"<color=#FF7B6B>{problem}</color>");
+            ShowStatus(deleted ? $"Deleted {save.Name}." : $"<color={UIStyle.Current.DangerHex}>{problem}</color>");
             Refresh();
         });
     }
@@ -384,7 +384,7 @@ public sealed class SavesScreen : MonoBehaviour
         }
         else
         {
-            ShowStatus($"<color=#FF7B6B>{problem}</color>");
+            ShowStatus($"<color={UIStyle.Current.DangerHex}>{problem}</color>");
         }
     }
 

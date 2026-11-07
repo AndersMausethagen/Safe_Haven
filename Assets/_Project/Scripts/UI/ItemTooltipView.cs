@@ -100,10 +100,10 @@ public sealed class ItemTooltipView : MonoBehaviour
         builder.Append("\n\n<b>Costs</b>").Append(DescribeCosts(recipe, crafting));
         string where = recipe.IsHandcrafted ? "By hand" : recipe.Station.DisplayName();
         string time = recipe.IsHandcrafted ? "" : $"  ·  {FormatSeconds(recipe.CraftSeconds)}";
-        builder.Append($"\n\n<color=#AAB0BC>{where}{time}</color>");
+        builder.Append($"\n\n<color={UIStyle.Current.MutedHex}>{where}{time}</color>");
         if (!string.IsNullOrEmpty(problem))
         {
-            builder.Append($"\n<color=#FF7B6B>{problem}</color>");
+            builder.Append($"\n<color={UIStyle.Current.DangerHex}>{problem}</color>");
         }
 
         return builder.ToString();
@@ -129,7 +129,7 @@ public sealed class ItemTooltipView : MonoBehaviour
             }
         }
 
-        return builder.Length > 0 ? builder.ToString() : "\n<color=#AAB0BC>Nothing</color>";
+        return builder.Length > 0 ? builder.ToString() : $"\n<color={UIStyle.Current.MutedHex}>Nothing</color>";
     }
 
     /// <summary>"8 s", "1 m 30 s".</summary>
@@ -147,15 +147,15 @@ public sealed class ItemTooltipView : MonoBehaviour
             return;
         }
 
-        builder.Append($"\n<color={(have >= need ? "#8BE08B" : "#FF7B6B")}>{need} {name}</color>  <color=#AAB0BC>(have {have})</color>");
+        builder.Append($"\n<color={(have >= need ? UIStyle.Current.GoodHex : UIStyle.Current.DangerHex)}>{need} {name}</color>  <color={UIStyle.Current.MutedHex}>(have {have})</color>");
     }
 
     private static string DescribeResource(ResourceDefinition resource)
     {
         var builder = new StringBuilder();
-        builder.Append(Tiers.RichLabel(resource.Tier)).Append("  <color=#AAB0BC>")
+        builder.Append(Tiers.RichLabel(resource.Tier)).Append($"  <color={UIStyle.Current.MutedHex}>")
             .Append(resource.Category != null ? resource.Category.DisplayName : "Resource").Append("</color>");
-        builder.Append("\n<color=#AAB0BC>A resource: weightless, kept with your essences.</color>");
+        builder.Append($"\n<color={UIStyle.Current.MutedHex}>A resource: weightless, kept with your essences.</color>");
         if (!string.IsNullOrWhiteSpace(resource.Description))
         {
             builder.Append("\n\n").Append(resource.Description);
@@ -209,14 +209,14 @@ public sealed class ItemTooltipView : MonoBehaviour
         int count = held ? stack.Value.Count : 1;
         var builder = new StringBuilder();
         builder.Append(Rarity.Rich(Rarity.NameOf(item.Rarity), item.Rarity)).Append("  ")
-            .Append(Tiers.RichLabel(item.Tier)).Append("  <color=#AAB0BC>").Append(item.Category).Append("</color>");
+            .Append(Tiers.RichLabel(item.Tier)).Append($"  <color={UIStyle.Current.MutedHex}>").Append(item.Category).Append("</color>");
         string gearSlot = GearSlots.Describe(item);
         if (gearSlot.Length > 0)
         {
-            builder.Append("\n<color=#AAB0BC>").Append(gearSlot).Append("</color>");
+            builder.Append($"\n<color={UIStyle.Current.MutedHex}>").Append(gearSlot).Append("</color>");
             if (GearScore.Counts(item))
             {
-                builder.Append($"\n<color=#E8C46A>Gear Score {(stack.HasValue ? GearScore.Of(stack.Value) : GearScore.Of(item))}</color>");
+                builder.Append($"\n<color={UIStyle.Current.AccentHex}>Gear Score {(stack.HasValue ? GearScore.Of(stack.Value) : GearScore.Of(item))}</color>");
             }
         }
 
@@ -229,7 +229,7 @@ public sealed class ItemTooltipView : MonoBehaviour
         int numbersStart = builder.Length;
         foreach (StatBonus bonus in item.StatBonuses)
         {
-            builder.Append("\n<color=#8BE08B>").Append(bonus.Describe()).Append("</color>");
+            builder.Append($"\n<color={UIStyle.Current.GoodHex}>").Append(bonus.Describe()).Append("</color>");
         }
 
         if (held)
@@ -241,44 +241,44 @@ public sealed class ItemTooltipView : MonoBehaviour
         {
             ItemStack worn = stack.Value;
             int percent = Mathf.RoundToInt(worn.Durability * 100f);
-            string color = worn.IsBroken ? "#FF7B6B" : worn.IsDamaged ? "#E8C46A" : "#8BE08B";
+            string color = worn.IsBroken ? UIStyle.Current.DangerHex : worn.IsDamaged ? UIStyle.Current.WarningHex : UIStyle.Current.GoodHex;
             builder.Append($"\n<color={color}>Durability {percent}%{(worn.IsBroken ? " – broken, repair it at a Workshop" : "")}</color>");
         }
 
         if (item.HoldsWater)
         {
             float water = held ? stack.Value.Water : item.WaterCapacity;
-            string color = water < 0.5f ? "#FF7B6B" : "#7FC4E8";
+            string color = water < 0.5f ? UIStyle.Current.DangerHex : UIStyle.Current.WaterHex;
             builder.Append($"\n<color={color}>Water {Mathf.RoundToInt(water)} / {Mathf.RoundToInt(item.WaterCapacity)}{(water < 0.5f ? " – fill it at a stream or a well" : "")}</color>");
         }
 
         if (item.Weight > 0f)
         {
-            builder.Append($"\n<color=#AAB0BC>Weight {item.Weight:0.##}{(count > 1 ? $"  ({item.Weight * count:0.#} for the stack)" : "")}</color>");
+            builder.Append($"\n<color={UIStyle.Current.MutedHex}>Weight {item.Weight:0.##}{(count > 1 ? $"  ({item.Weight * count:0.#} for the stack)" : "")}</color>");
         }
 
         if (item.Value > 0 && held)
         {
-            builder.Append($"\n<color=#E8C46A>Value {item.Value}{(count > 1 ? $"  ({item.Value * count} for the stack)" : "")}</color>");
+            builder.Append($"\n<color={UIStyle.Current.AccentHex}>Value {item.Value}{(count > 1 ? $"  ({item.Value * count} for the stack)" : "")}</color>");
         }
 
         if (item.IsTool)
         {
-            builder.Append($"\n<color=#E8C46A>{item.ToolType}: gathers up to {Tiers.RichLabel(item.ToolTier)} resources</color>");
+            builder.Append($"\n<color={UIStyle.Current.AccentHex}>{item.ToolType}: gathers up to {Tiers.RichLabel(item.ToolTier)} resources</color>");
         }
 
         if (item.IsWeapon)
         {
-            builder.Append($"\n<color=#E8C46A>Weapon: {Mathf.RoundToInt(item.Weapon.Damage)} damage.</color>");
+            builder.Append($"\n<color={UIStyle.Current.AccentHex}>Weapon: {Mathf.RoundToInt(item.Weapon.Damage)} damage.</color>");
         }
 
         if (item.IsConsumable)
         {
-            builder.Append("\n<color=#8BE08B>").Append(DescribeRestores(item.HealAmount, item.HungerRestore, item.ThirstRestore))
+            builder.Append($"\n<color={UIStyle.Current.GoodHex}>").Append(DescribeRestores(item.HealAmount, item.HungerRestore, item.ThirstRestore))
                 .Append(held ? " Right-click to use." : "").Append("</color>");
             if (item.HasBoon)
             {
-                builder.Append($"\n<color=#E8C46A>{(item.IsTonic ? "Tonic" : "Meal")}: {DescribeBonuses(item.BoonBonuses)} for {RaidStats.FormatTime(item.BoonSeconds)}.</color>");
+                builder.Append($"\n<color={UIStyle.Current.AccentHex}>{(item.IsTonic ? "Tonic" : "Meal")}: {DescribeBonuses(item.BoonBonuses)} for {RaidStats.FormatTime(item.BoonSeconds)}.</color>");
             }
 
             if (item.Cures.Count > 0)
@@ -289,45 +289,45 @@ public sealed class ItemTooltipView : MonoBehaviour
                     cured.Add(effect.DisplayName);
                 }
 
-                builder.Append($"\n<color=#8BE08B>Cures {string.Join(", ", cured)}.</color>");
+                builder.Append($"\n<color={UIStyle.Current.GoodHex}>Cures {string.Join(", ", cured)}.</color>");
             }
         }
 
         if (item.IsBlueprint)
         {
-            builder.Append($"\n<color=#C9A2FF>Blueprint.{(held ? " Right-click to study it and learn how to make it." : " Study it to learn how to make it.")}</color>");
+            builder.Append($"\n<color={UIStyle.Current.AccentHex}>Blueprint.{(held ? " Right-click to study it and learn how to make it." : " Study it to learn how to make it.")}</color>");
         }
 
         if (item.IsBackpack)
         {
             if (item.CarryCapacityBonus > 0)
             {
-                builder.Append($"\n<color=#8BC4FF>+{item.CarryCapacityBonus} carry weight while worn.</color>");
+                builder.Append($"\n<color={UIStyle.Current.GoodHex}>+{item.CarryCapacityBonus} carry weight while worn.</color>");
                 if (item.CarryNoise > 0f)
                 {
-                    builder.Append($"\n<color=#E8C46A>Rattles: every step carries {item.CarryNoise:0.#} m further.</color>");
+                    builder.Append($"\n<color={UIStyle.Current.WarningHex}>Rattles: every step carries {item.CarryNoise:0.#} m further.</color>");
                 }
 
                 if (item.CarrySpeedScale < 1f)
                 {
-                    builder.Append($"\n<color=#E8C46A>{Mathf.RoundToInt((1f - item.CarrySpeedScale) * 100f)}% slower while worn.</color>");
+                    builder.Append($"\n<color={UIStyle.Current.WarningHex}>{Mathf.RoundToInt((1f - item.CarrySpeedScale) * 100f)}% slower while worn.</color>");
                 }
             }
 
             if (item.BagSlotBonus > 0)
             {
-                builder.Append($"\n<color=#8BC4FF>Unlocks {item.BagSlotBonus} extra bag slots while worn.</color>");
+                builder.Append($"\n<color={UIStyle.Current.GoodHex}>Unlocks {item.BagSlotBonus} extra bag slots while worn.</color>");
             }
         }
 
         if (item.IsRaidModifier)
         {
-            builder.Append($"\n<color=#C9A2FF>Raid modifier: {item.RaidModifier.DescribeEffects()}. Choose it at the raid portal.</color>");
+            builder.Append($"\n<color={UIStyle.Current.AccentHex}>Raid modifier: {item.RaidModifier.DescribeEffects()}. Choose it at the raid portal.</color>");
         }
 
         if (item.IsEquippable && held)
         {
-            builder.Append("\n<color=#AAB0BC>Right-click to equip or unequip (C opens the character screen).</color>");
+            builder.Append($"\n<color={UIStyle.Current.MutedHex}>Right-click to equip or unequip (C opens the character screen).</color>");
         }
 
         if (held && !string.IsNullOrWhiteSpace(item.Description))
@@ -337,7 +337,7 @@ public sealed class ItemTooltipView : MonoBehaviour
 
         if (held && item.Stackable)
         {
-            builder.Append($"\n\n<color=#AAB0BC>{count} / {item.MaximumStack} in this stack</color>");
+            builder.Append($"\n\n<color={UIStyle.Current.MutedHex}>{count} / {item.MaximumStack} in this stack</color>");
         }
 
         // A blank line between the words and the numbers that follow them.
@@ -353,7 +353,7 @@ public sealed class ItemTooltipView : MonoBehaviour
     {
         foreach (StatBonus bonus in GearPower.EmpowerBonuses(stack.Item, stack.Empower, EssenceSettings.Current))
         {
-            builder.Append("\n<color=#E8C46A>").Append(bonus.Describe()).Append(" (empowered)</color>");
+            builder.Append($"\n<color={UIStyle.Current.AccentHex}>").Append(bonus.Describe()).Append(" (empowered)</color>");
         }
 
         if (stack.Enchantment == null)
@@ -361,17 +361,17 @@ public sealed class ItemTooltipView : MonoBehaviour
             return;
         }
 
-        builder.Append($"\n\n<color=#E8C46A>{stack.Enchantment.DisplayName}</color>");
+        builder.Append($"\n\n<color={UIStyle.Current.AccentHex}>{stack.Enchantment.DisplayName}</color>");
         foreach (StatBonus bonus in stack.Enchantment.Bonuses)
         {
-            builder.Append(bonus.value >= 0f ? "\n<color=#8BE08B>" : "\n<color=#FF7B6B>").Append(bonus.Describe()).Append("</color>");
+            builder.Append(bonus.value >= 0f ? $"\n<color={UIStyle.Current.GoodHex}>" : $"\n<color={UIStyle.Current.DangerHex}>").Append(bonus.Describe()).Append("</color>");
         }
 
         foreach (RelicEffect effect in stack.Enchantment.Effects)
         {
             if (effect != null)
             {
-                builder.Append("\n<color=#FFD27A>").Append(effect.Describe()).Append("</color>");
+                builder.Append($"\n<color={UIStyle.Current.AccentHex}>").Append(effect.Describe()).Append("</color>");
             }
         }
 

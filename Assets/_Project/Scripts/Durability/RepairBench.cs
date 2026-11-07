@@ -105,7 +105,7 @@ public sealed class RepairBench : MonoBehaviour, IStationMenuExtension
             RepairCost cost = Repairs.Cost(stack, Repairs.RecipeFor(stack.Item, recipes), DurabilitySettings.Current);
             string problem = Repairs.Check(user, container, slot, recipes);
             string detail = $"{stack.Durability:P0}  →  100%    {cost.Describe()}"
-                + (problem != null ? $"   <color=#FF7B6B>{problem}</color>" : "");
+                + (problem != null ? $"   <color={UIStyle.Current.DangerHex}>{problem}</color>" : "");
             page.Add(new MenuAction($"Repair {stack.Item.DisplayName}", detail, problem == null,
                 () => Repairs.TryRepair(user, container, slot, recipes)));
         }

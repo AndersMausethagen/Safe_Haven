@@ -92,7 +92,7 @@ public sealed class MainMenuView : MonoBehaviour
         else
         {
             saveInfoLabel.text = SaveGameService.HasSave
-                ? "<color=#FF7B6B>No save can be loaded. See Saved Games.</color>"
+                ? $"<color={UIStyle.Current.DangerHex}>No save can be loaded. See Saved Games.</color>"
                 : "No saved game yet. The prologue saves safe checkpoints; press F5 at home to save.";
         }
     }

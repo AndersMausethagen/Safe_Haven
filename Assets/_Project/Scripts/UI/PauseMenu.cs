@@ -294,17 +294,17 @@ public sealed class PauseMenu : MonoBehaviour
         {
             if (!coop.InviteFriends())
             {
-                statusLabel.text = "<color=#FF7B6B>Steam's invite window isn't available yet.</color>";
+                statusLabel.text = $"<color={UIStyle.Current.DangerHex}>Steam's invite window isn't available yet.</color>";
             }
         }
         else if (coop.Host(out string problem))
         {
-            statusLabel.text = coop.ViaSteam ? "<color=#9BE37B>Open to friends. Invite them, or they can join you from Steam.</color>"
-                : "<color=#9BE37B>Open to friends on your network.</color>";
+            statusLabel.text = coop.ViaSteam ? $"<color={UIStyle.Current.GoodHex}>Open to friends. Invite them, or they can join you from Steam.</color>"
+                : $"<color={UIStyle.Current.GoodHex}>Open to friends on your network.</color>";
         }
         else
         {
-            statusLabel.text = $"<color=#FF7B6B>{problem}</color>";
+            statusLabel.text = $"<color={UIStyle.Current.DangerHex}>{problem}</color>";
         }
 
         Refresh();
@@ -432,12 +432,12 @@ public sealed class PauseMenu : MonoBehaviour
     {
         if (SaveGameService.TrySave(out string problem))
         {
-            statusLabel.text = "<color=#9BE37B>Game saved.</color>";
+            statusLabel.text = $"<color={UIStyle.Current.GoodHex}>Game saved.</color>";
             GameMessages.Post("Game saved.", MessageKind.Gain);
         }
         else
         {
-            statusLabel.text = $"<color=#FF7B6B>{problem}</color>";
+            statusLabel.text = $"<color={UIStyle.Current.DangerHex}>{problem}</color>";
         }
 
         Refresh();

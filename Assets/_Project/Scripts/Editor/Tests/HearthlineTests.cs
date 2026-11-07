@@ -51,6 +51,32 @@ public sealed class HearthlineTests
     }
 
     [Test]
+    public void TextBuiltInCode_TakesItsColoursFromTheStyle()
+    {
+        // Rich text built in code colours itself with UIStyle's tokens (UIStyle.Current.DangerHex and the like), so the
+        // same message is never two different reds and a change in UIStyle changes the game.
+        var offenders = new System.Collections.Generic.List<string>();
+        foreach (string file in Directory.GetFiles("Assets/_Project/Scripts", "*.cs", SearchOption.AllDirectories))
+        {
+            if (file.Replace('\\', '/').Contains("/Editor/"))
+            {
+                continue;
+            }
+
+            string[] lines = File.ReadAllLines(file);
+            for (int i = 0; i < lines.Length; i++)
+            {
+                if (!lines[i].TrimStart().StartsWith("//") && Regex.IsMatch(lines[i], "<color=#[0-9A-Fa-f]{6}|\"#[0-9A-Fa-f]{6}\""))
+                {
+                    offenders.Add($"{file}:{i + 1}");
+                }
+            }
+        }
+
+        Assert.IsEmpty(offenders, "Hard-coded text colours: " + string.Join(", ", offenders));
+    }
+
+    [Test]
     public void Windows_AreSolid()
     {
         // This project blends in Linear: a faint overlay on a dark panel comes out far brighter than its alpha.

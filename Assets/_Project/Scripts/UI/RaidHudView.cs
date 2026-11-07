@@ -208,7 +208,7 @@ public sealed class RaidHudView : MonoBehaviour
         {
             if (site != null && !site.IsResolved && site.IsFoundFrom(position) && announced.Add(site))
             {
-                alerts.Post($"<color=#FFD27A>{site.DisplayName} is close by</color>");
+                alerts.Post($"<color={UIStyle.Current.AccentHex}>{site.DisplayName} is close by</color>");
             }
         }
 
@@ -218,7 +218,7 @@ public sealed class RaidHudView : MonoBehaviour
             {
                 Vector3 offset = site.transform.position - position;
                 offset.y = 0f;
-                alerts.Post($"<color=#DCCBF2>{site.DisplayName}  {Mathf.RoundToInt(offset.magnitude)} m  {SideOf(offset)}</color>");
+                alerts.Post($"<color={UIStyle.Current.TextHex}>{site.DisplayName}  {Mathf.RoundToInt(offset.magnitude)} m  {SideOf(offset)}</color>");
             }
         }
     }
@@ -256,7 +256,7 @@ public sealed class RaidHudView : MonoBehaviour
         }
 
         string carted = cart != null ? $"  ·  the {cart.Definition.DisplayName}" : "";
-        return $"At risk: <color=#F0BC6C>{risk.Items} items ({risk.Value} value)  ·  {risk.Resources} materials{carted}</color>";
+        return $"At risk: <color={UIStyle.Current.WarningHex}>{risk.Items} items ({risk.Value} value)  ·  {risk.Resources} materials{carted}</color>";
     }
 
     private void ShowTime(float remaining, float warning, float critical)
@@ -291,12 +291,12 @@ public sealed class RaidHudView : MonoBehaviour
             {
                 case ExtractionHoldState.Holding:
                 case ExtractionHoldState.Done:
-                    return $"<color=#BFD8A5>Holding {point.DisplayName}... {percent}%  ({point.TimeLeft:0} s)</color>";
+                    return $"<color={UIStyle.Current.GoodHex}>Holding {point.DisplayName}... {percent}%  ({point.TimeLeft:0} s)</color>";
                 case ExtractionHoldState.Contested:
-                    return $"<color=#F0917E>{point.DisplayName} contested! Drive them out  ({percent}%)</color>";
+                    return $"<color={UIStyle.Current.DangerHex}>{point.DisplayName} contested! Drive them out  ({percent}%)</color>";
                 default:
                     float away = player != null ? point.DistanceFrom(player.transform.position) : 0f;
-                    return $"<color=#F0BC6C>Back to {point.DisplayName}'s circle  {Mathf.RoundToInt(away)} m  ({percent}%)</color>";
+                    return $"<color={UIStyle.Current.WarningHex}>Back to {point.DisplayName}'s circle  {Mathf.RoundToInt(away)} m  ({percent}%)</color>";
             }
         }
 
@@ -312,8 +312,8 @@ public sealed class RaidHudView : MonoBehaviour
         }
 
         nearest = NextToOpen();
-        return nearest != null ? $"<color=#F0917E>No way out yet:</color> {nearest.DisplayName} opens in {RaidStats.FormatTime(nearest.SecondsUntilChange)}"
-            : "<color=#F0917E>No open way out right now</color>";
+        return nearest != null ? $"<color={UIStyle.Current.DangerHex}>No way out yet:</color> {nearest.DisplayName} opens in {RaidStats.FormatTime(nearest.SecondsUntilChange)}"
+            : $"<color={UIStyle.Current.DangerHex}>No open way out right now</color>";
     }
 
     private static ExtractionPoint NextToOpen()
@@ -345,8 +345,8 @@ public sealed class RaidHudView : MonoBehaviour
             return "";
         }
 
-        return companion.IsLost ? $"<color=#FF7B6B>{companion.DisplayName} is gone</color>"
-            : companion.IsDowned ? $"<color=#FF7B6B>{companion.DisplayName} is down</color>"
+        return companion.IsLost ? $"<color={UIStyle.Current.DangerHex}>{companion.DisplayName} is gone</color>"
+            : companion.IsDowned ? $"<color={UIStyle.Current.DangerHex}>{companion.DisplayName} is down</color>"
             : $"{companion.DisplayName}: {Mathf.RoundToInt(companion.HealthShare * 100f)}%";
     }
 
@@ -365,7 +365,7 @@ public sealed class RaidHudView : MonoBehaviour
     private static string CountdownFor(Companion companion)
     {
         return companion != null && companion.IsDowned && !companion.IsLost
-            ? $"<color=#FF7B6B>{companion.DisplayName} is down: {companion.BleedOutLeft:0} s to help them up</color>"
+            ? $"<color={UIStyle.Current.DangerHex}>{companion.DisplayName} is down: {companion.BleedOutLeft:0} s to help them up</color>"
             : "";
     }
 

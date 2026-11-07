@@ -15,10 +15,10 @@ public static class RaidHudText
         string line = $"{exit}  {UnityEngine.Mathf.RoundToInt(metres)} m";
         if (closesIn >= 0f && closesIn <= ClosingSoon)
         {
-            line += $"  <color=#F0BC6C>closes in {RaidStats.FormatTime(closesIn)}</color>";
+            line += $"  <color={UIStyle.Current.WarningHex}>closes in {RaidStats.FormatTime(closesIn)}</color>";
         }
 
-        return string.IsNullOrEmpty(cost) ? line : line + $"  <color=#EBD29A>needs {cost}</color>";
+        return string.IsNullOrEmpty(cost) ? line : line + $"  <color={UIStyle.Current.AccentHex}>needs {cost}</color>";
     }
 
     /// <summary>An exit on the world map, where there is room for all of it.</summary>

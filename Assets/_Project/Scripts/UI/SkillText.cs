@@ -8,22 +8,22 @@ public static class SkillText
     {
         var builder = new StringBuilder();
         builder.Append(SkillSchools.Rich(skill.School))
-            .Append($"  <color=#AAB0BC>Cooldown {PlayerSkills.CooldownOf(skill):0.#}s  ·  Stamina {skill.StaminaCost:0}</color>");
+            .Append($"  <color={UIStyle.Current.MutedHex}>Cooldown {PlayerSkills.CooldownOf(skill):0.#}s  ·  Stamina {skill.StaminaCost:0}</color>");
         int rank = GameSession.Progress.RankOf(skill);
         if (rank > 0)
         {
-            builder.Append($"\n<color=#E8C46A>Deepened to rank {AltarWork.Roman(rank)}: {(PlayerSkills.Power(skill) - 1f) * 100f:+0}% power.</color>");
+            builder.Append($"\n<color={UIStyle.Current.AccentHex}>Deepened to rank {AltarWork.Roman(rank)}: {(PlayerSkills.Power(skill) - 1f) * 100f:+0}% power.</color>");
         }
 
         if (skill.LungeDistance > 0f)
         {
-            builder.Append($"\n<color=#E8C46A>Lunges {skill.LungeDistance:0.#} m toward the cursor.</color>");
+            builder.Append($"\n<color={UIStyle.Current.AccentHex}>Lunges {skill.LungeDistance:0.#} m toward the cursor.</color>");
         }
 
         AttackDefinition attack = skill.Attack;
         if (attack != null)
         {
-            builder.Append("\n<color=#FF9B7B>Deals ");
+            builder.Append($"\n<color={UIStyle.Current.DangerHex}>Deals ");
             bool hasBase = attack.BaseDamage > 0f;
             if (hasBase)
             {
@@ -41,7 +41,7 @@ public static class SkillText
 
         if (skill.Heal > 0f)
         {
-            builder.Append($"\n<color=#8BE08B>Restores {skill.Heal:0} health.</color>");
+            builder.Append($"\n<color={UIStyle.Current.GoodHex}>Restores {skill.Heal:0} health.</color>");
         }
 
         if (skill.HasBuffs)
@@ -49,7 +49,7 @@ public static class SkillText
             foreach (SkillStatBuff buff in skill.Buffs)
             {
                 string amount = buff.op == StatModifierOp.Percent ? $"{buff.value * 100f:+0;-0}%" : $"{buff.value:+0.##;-0.##}";
-                builder.Append($"\n<color=#8BC4FF>{amount} {Spaced(buff.stat.ToString())} for {skill.BuffDuration:0.#}s.</color>");
+                builder.Append($"\n<color={UIStyle.Current.GoodHex}>{amount} {Spaced(buff.stat.ToString())} for {skill.BuffDuration:0.#}s.</color>");
             }
         }
 
@@ -59,8 +59,8 @@ public static class SkillText
         }
 
         builder.Append(equippedSlot >= 0
-            ? $"\n\n<color=#E8C46A>On the skill bar: {PlayerInputHandler.SkillKeyLabel(equippedSlot)}</color>"
-            : "\n\n<color=#AAB0BC>Drag onto the skill bar, or right-click to slot it.</color>");
+            ? $"\n\n<color={UIStyle.Current.AccentHex}>On the skill bar: {PlayerInputHandler.SkillKeyLabel(equippedSlot)}</color>"
+            : $"\n\n<color={UIStyle.Current.MutedHex}>Drag onto the skill bar, or right-click to slot it.</color>");
         return builder.ToString();
     }
 

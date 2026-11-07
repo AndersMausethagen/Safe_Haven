@@ -47,7 +47,7 @@ public static class ConstructionUpgradeOffer
         };
         bool affordable = MaterialPool.For(user).CanAfford(next.essence, next.cost, out string missing);
         string cost = next.CostText;
-        page.Add(new MenuAction("Upgrade", affordable ? cost : $"{cost}   <color=#FF7B6B>{missing}</color>", affordable && BuildingUnlocks.IsOpen(next),
+        page.Add(new MenuAction("Upgrade", affordable ? cost : $"{cost}   <color={UIStyle.Current.DangerHex}>{missing}</color>", affordable && BuildingUnlocks.IsOpen(next),
             () => construction.TryOrderUpgrade(user), closesMenu: true));
         return page;
     }

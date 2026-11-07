@@ -40,4 +40,5 @@ MonoBehaviour:
   good: {r: 0.525, g: 0.627, b: 0.435, a: 1}
   warning: {r: 0.91, g: 0.62, b: 0.27, a: 1}
   danger: {r: 0.79, g: 0.333, b: 0.247, a: 1}
+  water: {r: 0.5, g: 0.77, b: 0.91, a: 1}
   windowFadeSeconds: 0.12

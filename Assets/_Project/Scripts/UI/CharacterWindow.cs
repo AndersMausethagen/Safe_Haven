@@ -184,7 +184,7 @@ public sealed class CharacterWindow : MonoBehaviour, IItemSlotHandler
         ItemStack stack = gear.GetSlot(slot.Index);
         if (stack.IsEmpty)
         {
-            tooltip.Show(GearSlots.Label((GearSlot)slot.Index), new Color(0.92f, 0.87f, 0.74f, 1f), "<color=#AAB0BC>Empty. Drag gear here from the bag, or right-click it there.</color>");
+            tooltip.Show(GearSlots.Label((GearSlot)slot.Index), new Color(0.92f, 0.87f, 0.74f, 1f), $"<color={UIStyle.Current.MutedHex}>Empty. Drag gear here from the bag, or right-click it there.</color>");
         }
         else
         {
@@ -321,7 +321,7 @@ public sealed class CharacterWindow : MonoBehaviour, IItemSlotHandler
         CombatRules rules = combatant.Rules;
         float armor = stats.Get(StatType.Armor);
         var text = new StringBuilder();
-        text.Append("<color=#E8C46A><b>Attributes</b></color>\n");
+        text.Append($"<color={UIStyle.Current.AccentHex}><b>Attributes</b></color>\n");
         text.Append(Line("Gear Score", GearScore.Of(combatant.gameObject).ToString()));
         if (health != null)
         {
@@ -329,36 +329,36 @@ public sealed class CharacterWindow : MonoBehaviour, IItemSlotHandler
         }
 
         text.Append(Line("Strength", Number(stats.Get(StatType.Strength))));
-        text.Append(Line("Armor", $"{Number(armor)}  <color=#AAB0BC>({Mathf.RoundToInt(rules.GetArmorReduction(armor) * 100f)}% less physical damage)</color>"));
+        text.Append(Line("Armor", $"{Number(armor)}  <color={UIStyle.Current.MutedHex}>({Mathf.RoundToInt(rules.GetArmorReduction(armor) * 100f)}% less physical damage)</color>"));
 
-        text.Append("\n<color=#E8C46A><b>Offense</b></color>\n");
+        text.Append($"\n<color={UIStyle.Current.AccentHex}><b>Offense</b></color>\n");
         text.Append(Line("Physical Power", Number(rules.PowerFor(stats, DamageType.Physical))));
         text.Append(Line("Spell Power", Number(rules.PowerFor(stats, DamageType.Fire))));
-        text.Append(Line("Physical Crit", $"{Percent(stats.Get(StatType.PhysicalCritChance))}  <color=#AAB0BC>×{1f + stats.Get(StatType.PhysicalCritDamage):0.##}</color>"));
-        text.Append(Line("Spell Crit", $"{Percent(stats.Get(StatType.SpellCritChance))}  <color=#AAB0BC>×{1f + stats.Get(StatType.SpellCritDamage):0.##}</color>"));
+        text.Append(Line("Physical Crit", $"{Percent(stats.Get(StatType.PhysicalCritChance))}  <color={UIStyle.Current.MutedHex}>×{1f + stats.Get(StatType.PhysicalCritDamage):0.##}</color>"));
+        text.Append(Line("Spell Crit", $"{Percent(stats.Get(StatType.SpellCritChance))}  <color={UIStyle.Current.MutedHex}>×{1f + stats.Get(StatType.SpellCritDamage):0.##}</color>"));
         if (equipment.MainHand.IsEmpty || equipment.MainHand.IsBroken)
         {
-            text.Append(Line("Weapon", "<color=#AAB0BC>Unarmed</color>"));
+            text.Append(Line("Weapon", $"<color={UIStyle.Current.MutedHex}>Unarmed</color>"));
         }
         else
         {
-            text.Append(Line("Weapon", $"{equipment.MainHand.Item.DisplayName}  <color=#AAB0BC>{Mathf.RoundToInt(equipment.MainHand.Item.Weapon.Damage)} dmg</color>"));
+            text.Append(Line("Weapon", $"{equipment.MainHand.Item.DisplayName}  <color={UIStyle.Current.MutedHex}>{Mathf.RoundToInt(equipment.MainHand.Item.Weapon.Damage)} dmg</color>"));
         }
 
-        text.Append("\n<color=#E8C46A><b>Resistances</b></color>\n");
+        text.Append($"\n<color={UIStyle.Current.AccentHex}><b>Resistances</b></color>\n");
         text.Append(Line("Physical", Percent(rules.ClampResistance(stats.Get(StatType.PhysicalResistance)))));
         text.Append(Line("Fire", Percent(rules.ClampResistance(stats.Get(StatType.FireResistance)))));
         text.Append(Line("Frost", Percent(rules.ClampResistance(stats.Get(StatType.FrostResistance)))));
         text.Append(Line("Holy", Percent(rules.ClampResistance(stats.Get(StatType.HolyResistance)))));
 
-        text.Append("\n<color=#E8C46A><b>Gathering</b></color>\n");
+        text.Append($"\n<color={UIStyle.Current.AccentHex}><b>Gathering</b></color>\n");
         ToolType[] tools = { ToolType.Axe, ToolType.Pickaxe, ToolType.Sickle };
         foreach (ToolType tool in tools)
         {
             int tier = equipment.Gear.ToolTier(tool);
             text.Append(Line(tool.ToString(), tier > 0
                 ? $"<color=#{ColorUtility.ToHtmlStringRGB(Tiers.ColorOf(tier))}>Tier {Tiers.ToRoman(tier)}</color>"
-                : "<color=#AAB0BC>none</color>"));
+                : $"<color={UIStyle.Current.MutedHex}>none</color>"));
         }
 
         statsLabel.text = text.ToString();

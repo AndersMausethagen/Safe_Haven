@@ -168,8 +168,8 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics, IQuestPers
         {
             var body = new StringBuilder(current == null && !string.IsNullOrWhiteSpace(resident.WelcomeLine) ? resident.WelcomeLine : resident.Description);
             body.Append("\n\n").Append(current != null
-                ? $"<color=#E8C46A>Works as the {current.DisplayName}.</color> {current.Description}"
-                : "<color=#E8C46A>Has no job yet.</color>");
+                ? $"<color={UIStyle.Current.AccentHex}>Works as the {current.DisplayName}.</color> {current.Description}"
+                : $"<color={UIStyle.Current.AccentHex}>Has no job yet.</color>");
             string said = Remembered();
             foreach (string more in new[] { Grief(), said == null ? BossTalk() : null })
             {

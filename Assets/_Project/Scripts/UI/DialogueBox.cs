@@ -338,7 +338,7 @@ public sealed class DialogueBox : MonoBehaviour
                 buttons[i].interactable = choice.Enabled;
                 buttons[i].image.color = choice.Enabled ? ButtonColour : ButtonOff;
                 string tag = choice.QuestTag();
-                buttonLabels[i].text = $"<color=#C9A86A>{i + 1}.</color> {choice.Label}" +
+                buttonLabels[i].text = $"<color={UIStyle.Current.AccentHex}>{i + 1}.</color> {choice.Label}" +
                                        (tag != null ? $"\n<size=75%>{tag}</size>" :
                                        string.IsNullOrWhiteSpace(choice.Detail) ? "" : $"  <size=75%><alpha=#99>{choice.Detail}</size>");
             }
@@ -536,7 +536,7 @@ public sealed class DialogueBox : MonoBehaviour
     private void Subtitle(string speakerName, string line, Action done)
     {
         subtitleDone = done;
-        subtitle.text = string.IsNullOrWhiteSpace(speakerName) ? line : $"<color=#E8C46A>{speakerName}:</color> {line}";
+        subtitle.text = string.IsNullOrWhiteSpace(speakerName) ? line : $"<color={UIStyle.Current.AccentHex}>{speakerName}:</color> {line}";
         subtitleStrip.SetActive(true);
         float seconds = (1f + (line ?? "").Length / SubtitleLettersPerSecond) * GameOptions.SubtitleHold;
         subtitleEnds = Time.time + Mathf.Clamp(seconds, SubtitleMinSeconds, SubtitleMaxSeconds) * subtitleTimeMultiplier;

@@ -65,6 +65,8 @@ public sealed class UIStyle : GameSettings<UIStyle>
     [SerializeField] private Color good = new Color(0.525f, 0.627f, 0.435f, 1f);
     [SerializeField] private Color warning = new Color(0.91f, 0.62f, 0.27f, 1f);
     [SerializeField] private Color danger = new Color(0.79f, 0.333f, 0.247f, 1f);
+    [Tooltip("How much water a waterskin holds: in its slot and its tooltip.")]
+    [SerializeField] private Color water = new Color(0.5f, 0.77f, 0.91f, 1f);
 
     [Header("Motion")]
     [Tooltip("Seconds a window takes to fade in when it opens. 0: it appears at once. Closing is always immediate.")]
@@ -89,6 +91,7 @@ public sealed class UIStyle : GameSettings<UIStyle>
     public Color Good => good;
     public Color Warning => warning;
     public Color Danger => danger;
+    public Color Water => water;
     public float WindowFadeSeconds => windowFadeSeconds;
     public Sprite Hearthmark => hearthmark;
     public Sprite CarvedCorner => carvedCorner;
@@ -110,6 +113,19 @@ public sealed class UIStyle : GameSettings<UIStyle>
 
     /// <summary>A colour for rich text, with its #.</summary>
     public static string Hex(Color color) => "#" + ColorUtility.ToHtmlStringRGB(color);
+
+    // The tokens text built in code colours itself with, as rich-text colours ("#C9553F"); made once, again after an edit.
+    private string textHex, mutedHex, accentHex, goodHex, warningHex, dangerHex, waterHex;
+
+    public string TextHex => textHex ??= Hex(text);
+    public string MutedHex => mutedHex ??= Hex(muted);
+    public string AccentHex => accentHex ??= Hex(accent);
+    public string GoodHex => goodHex ??= Hex(good);
+    public string WarningHex => warningHex ??= Hex(warning);
+    public string DangerHex => dangerHex ??= Hex(danger);
+    public string WaterHex => waterHex ??= Hex(water);
+
+    private void OnValidate() => textHex = mutedHex = accentHex = goodHex = warningHex = dangerHex = waterHex = null;
 
     /// <summary>Sets up text that sits directly on the world, with the shadow that keeps it readable there.</summary>
     public void OnWorld(TMP_Text label, bool title = false)

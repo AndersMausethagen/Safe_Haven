@@ -177,7 +177,7 @@ public sealed class RaidPortal : MonoBehaviour, IStationMenuExtension, IInteract
         SettlementSettings.PortalLevel next = settings.PortalLevels[level];
         bool affordable = MaterialPool.For(user).CanAfford(next.cost, next.items, out string missing);
         string cost = AmountText.Describe(next.items) + (next.items.Count > 0 && next.cost.Count > 0 ? ", " : "") + AmountText.Describe(next.cost);
-        page.Add(new MenuAction($"Improve the portal: {next.title}", $"{next.description}\n{cost}" + (affordable ? "" : $"   <color=#FF7B6B>{missing}</color>"), affordable, () => Improve(user)));
+        page.Add(new MenuAction($"Improve the portal: {next.title}", $"{next.description}\n{cost}" + (affordable ? "" : $"   <color={UIStyle.Current.DangerHex}>{missing}</color>"), affordable, () => Improve(user)));
     }
 
     private static void Improve(GameObject user)
@@ -232,7 +232,7 @@ public sealed class RaidPortal : MonoBehaviour, IStationMenuExtension, IInteract
         bool affordable = MaterialPool.For(user).CanAfford(cost, null, out string missing);
         bool unlocked = repairRequires.IsMet;
         page.Add(new MenuAction("Wake the portal", !unlocked ? repairLockedText
-            : AmountText.Describe(cost) + (affordable ? "" : $"   <color=#FF7B6B>{missing}</color>"), unlocked && affordable,
+            : AmountText.Describe(cost) + (affordable ? "" : $"   <color={UIStyle.Current.DangerHex}>{missing}</color>"), unlocked && affordable,
             () => Repair(user), closesMenu: true));
     }
 

@@ -13,8 +13,8 @@ using TMPro;
 /// </summary>
 public sealed class QuestTrackerView : MonoBehaviour
 {
-    private const string Done = "#8BE08B";
-    private const string Muted = "#AAB0BC";
+    private static string Done => UIStyle.Current.GoodHex;
+    private static string Muted => UIStyle.Current.MutedHex;
 
     [SerializeField] private TMP_Text label;
     [Tooltip("Hidden when there are no active quests.")]

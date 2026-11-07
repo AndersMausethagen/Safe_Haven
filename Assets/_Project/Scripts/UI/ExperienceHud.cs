@@ -90,7 +90,7 @@ public sealed class ExperienceHud : MonoBehaviour
             writtenLevel = progress.Level;
             writtenPoints = points;
             writtenKeys = InputRebinds.Changes;
-            level.text = points > 0 ? GameInput.WithRebinds($"Lv {progress.Level}  <color=#8BE08B>+{points} (N)</color>") : $"Lv {progress.Level}";
+            level.text = points > 0 ? GameInput.WithRebinds($"Lv {progress.Level}  <color={UIStyle.Current.GoodHex}>+{points} (N)</color>") : $"Lv {progress.Level}";
         }
 
         float age = Time.unscaledTime - gainAt;

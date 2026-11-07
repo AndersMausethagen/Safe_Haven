@@ -7,9 +7,9 @@ using System.Text;
 /// </summary>
 public static class RaidReportText
 {
-    public const string Gain = "#8BE08B";
-    public const string Loss = "#FF7B6B";
-    public const string Muted = "#AAB0BC";
+    public static string Gain => UIStyle.Current.GoodHex;
+    public static string Loss => UIStyle.Current.DangerHex;
+    public static string Muted => UIStyle.Current.MutedHex;
 
     public static string Title(RaidReport report)
     {

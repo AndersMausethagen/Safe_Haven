@@ -9,7 +9,7 @@ using UnityEngine;
 /// </summary>
 public static class StationMenu
 {
-    private const string ProblemColor = "#FF7B6B";
+    private static string ProblemColor => UIStyle.Current.DangerHex;
 
     public static MenuPage Build(CraftingStation station, GameObject user)
     {
