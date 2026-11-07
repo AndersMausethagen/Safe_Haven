@@ -52,7 +52,18 @@ public sealed class MultiplayerSettings : GameSettings<MultiplayerSettings>
     [Tooltip("Share of their health a player gets up with.")]
     [SerializeField, Range(0.05f, 1f)] private float helpedUpHealth = 0.35f;
 
+    [Header("Raids together")]
+    [Tooltip("Share of a creature's health added for each friend on the run with the host: more players, tougher creatures.")]
+    [SerializeField, Range(0f, 2f)] private float creatureHealthPerFriend = 0.6f;
+    [Tooltip("Each fall in the same raid leaves this share of the last one's bleed-out time.")]
+    [SerializeField, Range(0.3f, 1f)] private float bleedOutPerFall = 0.7f;
+    [Tooltip("The shortest bleed-out, however often a player has fallen.")]
+    [SerializeField, Min(3f)] private float shortestBleedOut = 12f;
+
     public int MaxPlayers => maxPlayers;
+    public float CreatureHealthPerFriend => creatureHealthPerFriend;
+    public float BleedOutPerFall => bleedOutPerFall;
+    public float ShortestBleedOut => shortestBleedOut;
     public float BleedOutSeconds => bleedOutSeconds;
     public float HelpUpSeconds => helpUpSeconds;
     public float HelpedUpHealth => helpedUpHealth;
@@ -65,7 +76,7 @@ public sealed class MultiplayerSettings : GameSettings<MultiplayerSettings>
     public string ProtocolVersion => $"{protocolVersion}.{WireFormat}";
 
     /// <summary>Raise whenever any co-op message or synced value changes shape.</summary>
-    public const int WireFormat = 10;
+    public const int WireFormat = 11;
     public bool SteamInEditor => steamInEditor;
     public NetworkObject PlayerPrefab => playerPrefab;
     public float PoseInterval => 1f / Mathf.Max(1, posesPerSecond);

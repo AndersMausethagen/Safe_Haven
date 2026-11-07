@@ -27,6 +27,8 @@ public sealed class CoopDowned : IDisposable
     private bool struckDown;
     private float bleedOutAt;
     private float aloneSince = -1f;
+    private int falls;
+    private int fallsInRun;
 
     /// <summary>True while this player is down, waiting for a friend.</summary>
     public static bool IsDown { get; private set; }
@@ -188,11 +190,16 @@ public sealed class CoopDowned : IDisposable
     private void GoDown()
     {
         IsDown = true;
-        bleedOutAt = Time.time + settings.BleedOutSeconds;
+        // Each fall in the same raid leaves less time than the last.
+        int run = GameSession.ActiveRaid != null ? GameSession.ActiveRaid.Seed : 0;
+        falls = run == fallsInRun ? falls + 1 : 1;
+        fallsInRun = run;
+        float seconds = Mathf.Max(settings.ShortestBleedOut, settings.BleedOutSeconds * Mathf.Pow(settings.BleedOutPerFall, falls - 1));
+        bleedOutAt = Time.time + seconds;
         aloneSince = -1f;
         health.AddInvulnerability(this);
         SetActing(false);
-        GameMessages.Post($"You're down! A friend can help you up within {settings.BleedOutSeconds:0} seconds.", MessageKind.Warning);
+        GameMessages.Post($"You're down! A friend can help you up within {seconds:0} seconds.", MessageKind.Warning);
     }
 
     private void StandUp(string helper, bool quiet)

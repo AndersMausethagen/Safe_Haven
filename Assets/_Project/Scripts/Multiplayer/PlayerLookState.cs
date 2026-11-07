@@ -31,6 +31,8 @@ public struct PlayerLookState : INetworkSerializable, IEquatable<PlayerLookState
     public FixedString128Bytes Place;
     /// <summary>Knocked down in a shared raid, waiting for a friend to help them up (CoopDowned).</summary>
     public bool Downed;
+    /// <summary>Health as a share of the maximum, 0 to 255 (the party panel).</summary>
+    public byte Health;
 
     public string DisplayName => Name.Length > 0 ? Name.ToString() : CharacterAppearance.DefaultName;
 
@@ -54,6 +56,9 @@ public struct PlayerLookState : INetworkSerializable, IEquatable<PlayerLookState
             return state;
         }
 
+        state.Health = player.TryGetComponent(out Damageable health) && health.MaxHealth > 0f
+            ? (byte)Mathf.Clamp(Mathf.CeilToInt(health.CurrentHealth / health.MaxHealth * 255f), 0, 255)
+            : (byte)255;
         var gear = new StringBuilder();
         for (int slot = 0; slot < GearSlots.Count; slot++)
         {
@@ -123,13 +128,14 @@ public struct PlayerLookState : INetworkSerializable, IEquatable<PlayerLookState
         serializer.SerializeValue(ref Held);
         serializer.SerializeValue(ref Place);
         serializer.SerializeValue(ref Downed);
+        serializer.SerializeValue(ref Health);
     }
 
     public bool Equals(PlayerLookState other) =>
         Name.Equals(other.Name) && Gender == other.Gender && Skin == other.Skin && Hair == other.Hair &&
         HairColour == other.HairColour && Brows == other.Brows && Beard == other.Beard && Eyes == other.Eyes &&
         Underclothes == other.Underclothes && Clothes == other.Clothes && Gear.Equals(other.Gear) &&
-        Held.Equals(other.Held) && Place.Equals(other.Place) && Downed == other.Downed;
+        Held.Equals(other.Held) && Place.Equals(other.Place) && Downed == other.Downed && Health == other.Health;
 
     public override bool Equals(object obj) => obj is PlayerLookState other && Equals(other);
 

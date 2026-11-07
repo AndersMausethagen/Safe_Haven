@@ -63,6 +63,8 @@ public sealed class CoopCreatures : IDisposable
     private readonly Dictionary<ulong, Dictionary<int, SentPose>> sent = new Dictionary<ulong, Dictionary<int, SentPose>>();
     private readonly List<SentPose> outgoing = new List<SentPose>();
     private int ticks;
+    private int friendsOnRun;
+    private float healthPerFriend = 0.6f;
     private static FixedString128Bytes placeKey;
     private static string placeText = string.Empty;
     private static Scene placeScene;
@@ -80,6 +82,7 @@ public sealed class CoopCreatures : IDisposable
         public float At;
     }
     private readonly List<int> vanished = new List<int>();
+    private readonly HashSet<int> scaled = new HashSet<int>();
     private int nextId;
 
     // Friend
@@ -108,9 +111,10 @@ public sealed class CoopCreatures : IDisposable
         FromHost = false;
     }
 
-    public void StartHosting(NetworkManager manager)
+    public void StartHosting(NetworkManager manager, MultiplayerSettings settings)
     {
         network = manager;
+        healthPerFriend = settings != null ? settings.CreatureHealthPerFriend : healthPerFriend;
         Reset();
         network.CustomMessagingManager.RegisterNamedMessageHandler(HitMessage, OnHit);
     }
@@ -208,6 +212,8 @@ public sealed class CoopCreatures : IDisposable
             hitByHost.Clear();
             friendPlace.Clear();
             sent.Clear();
+            scaled.Clear();
+            friendsOnRun = 0;
             puppets.Clear();
             hitByMe.Clear();
             hostGoneSince = -1f;
@@ -247,6 +253,7 @@ public sealed class CoopCreatures : IDisposable
         TellOfVanished();
         ticks++;
         FixedString128Bytes place = PlaceKey;
+        ScaleForParty(place);
         foreach (NetworkPlayerAvatar friend in NetworkPlayerAvatar.All)
         {
             if (friend == null || friend.OwnerClientId == NetworkManager.ServerClientId)
@@ -267,6 +274,38 @@ public sealed class CoopCreatures : IDisposable
             {
                 SendTo(friend.OwnerClientId, friend.Body.transform.position);
             }
+        }
+    }
+
+    // Each friend on the run adds a share of every creature's health (health keeps its share of the maximum as it grows).
+    private void ScaleForParty(FixedString128Bytes place)
+    {
+        int friends = 0;
+        foreach (NetworkPlayerAvatar friend in NetworkPlayerAvatar.All)
+        {
+            if (friend != null && friend.OwnerClientId != NetworkManager.ServerClientId && friend.IsVisible && friend.Look.Place.Equals(place))
+            {
+                friends++;
+            }
+        }
+
+        bool changed = friends != friendsOnRun;
+        friendsOnRun = friends;
+        foreach (KeyValuePair<MonsterAI, int> pair in ids)
+        {
+            MonsterAI creature = pair.Key;
+            if (creature == null || (!changed && scaled.Contains(pair.Value)) || !creature.TryGetComponent(out Combatant combatant))
+            {
+                continue;
+            }
+
+            combatant.Stats.RemoveModifiersFrom(this);
+            if (friends > 0)
+            {
+                combatant.Stats.AddModifier(new StatModifier(StatType.MaxHealth, StatModifierOp.Percent, healthPerFriend * friends, this));
+            }
+
+            scaled.Add(pair.Value);
         }
     }
 

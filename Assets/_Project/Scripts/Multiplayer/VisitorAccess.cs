@@ -170,6 +170,22 @@ public sealed class VisitorAccess
             return;
         }
 
+        // A yes taken back while using the stash: what was just put in or taken goes first, then the stash closes.
+        if (!yes && right == VisitorRight.Stash && HavenVisit.MayUseStash)
+        {
+            StashShare.Change change = stash.CollectChange(GameSession.Stash);
+            if (change != null)
+            {
+                Send(StashChangeMessage, NetworkManager.ServerClientId, WorldTransfer.Pack(change));
+            }
+
+            StashWindow window = UIStateManager.Instance != null ? UIStateManager.Instance.Find<StashWindow>(UIWindowId.Stash) : null;
+            if (window != null)
+            {
+                window.Close();
+            }
+        }
+
         HavenVisit.Allow(right, yes);
         string what = right == VisitorRight.Build ? "build here" : "use the stash";
         GameMessages.Post(yes ? $"{HavenVisit.HostName} lets you {what}." : $"{HavenVisit.HostName} would rather you didn't {what}.",
@@ -191,6 +207,45 @@ public sealed class VisitorAccess
     }
 
     // ---- Host
+
+    /// <summary>True when any friend may build or use the stash.</summary>
+    public bool AnyAllowed
+    {
+        get
+        {
+            foreach (HashSet<VisitorRight> rights in allowed.Values)
+            {
+                if (rights.Count > 0)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+    }
+
+    /// <summary>The host takes back every yes: friends can no longer build or use the stash until they ask again.</summary>
+    public void RevokeAll()
+    {
+        foreach (KeyValuePair<ulong, HashSet<VisitorRight>> pair in allowed)
+        {
+            foreach (VisitorRight right in pair.Value)
+            {
+                if (network != null && IsConnected(pair.Key))
+                {
+                    using var writer = new FastBufferWriter(8, Allocator.Temp);
+                    writer.WriteValueSafe((byte)right);
+                    writer.WriteValueSafe(false);
+                    network.CustomMessagingManager.SendNamedMessage(AnswerMessage, pair.Key, writer, NetworkDelivery.ReliableFragmentedSequenced);
+                }
+            }
+        }
+
+        allowed.Clear();
+        GameMessages.Post("Friends can no longer build or use your stash.");
+        AsksChanged?.Invoke();
+    }
 
     /// <summary>The host's answer: a yes lasts while the friend stays.</summary>
     public void Answer(FriendAsk ask, bool yes)

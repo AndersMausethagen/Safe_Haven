@@ -239,6 +239,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "Ping",
+                    "type": "Button",
+                    "id": "b52aa97f-3bd1-4f53-b0af-0dd85090b31a",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -855,6 +864,28 @@
                     "processors": "",
                     "groups": "Keyboard&Mouse",
                     "action": "CommandWheel",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "fd184744-d19f-445b-847b-8f7a486d6cfa",
+                    "path": "<Keyboard>/y",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "Ping",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "d8a9ca6e-413f-4030-b801-e53bc9f3a57b",
+                    "path": "<Mouse>/forwardButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "Ping",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

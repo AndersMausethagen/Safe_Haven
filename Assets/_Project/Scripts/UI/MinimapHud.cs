@@ -352,6 +352,22 @@ public sealed class MinimapHud : MonoBehaviour
             Add(companion.transform, style.CompanionMark, down ? style.Danger : style.Good, down ? 16f : 13f, pinned: down);
         }
 
+        // Co-op: friends here (kept at the edge when far, so the party can regroup), and pings.
+        foreach (NetworkPlayerAvatar friend in NetworkPlayerAvatar.All)
+        {
+            if (friend != null && !friend.IsOwner && friend.IsVisible && friend.Body != null)
+            {
+                bool friendDown = friend.Look.Downed;
+                Add(friend.Body.transform, style.CompanionMark, friendDown ? style.Danger : style.Accent, friendDown ? 16f : 13f, pinned: true);
+            }
+        }
+
+        foreach (CoopPings.Ping ping in CoopPings.Active)
+        {
+            Marker mark = Add(null, style.EventMark, ping.Enemy ? style.Danger : style.Accent, 15f, pinned: true);
+            mark.Position = ping.Position;
+        }
+
         ReadRaidSites(player, style);
         ReadQuest(style);
         ReadBreach(style);

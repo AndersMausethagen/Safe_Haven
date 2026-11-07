@@ -51,6 +51,7 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
     private const string SettlementMessage = "SafeHaven.Settlement";
     private const string RaidOpenMessage = "SafeHaven.RaidOpen";
     private const string RaidClosedMessage = "SafeHaven.RaidClosed";
+    private const string RaidNewsMessage = "SafeHaven.RaidNews";
     /// <summary>Seconds a host's raid must still have for friends to follow.</summary>
     private const float FollowUntilSecondsLeft = 60f;
     private const int SettlementEvery = 4;
@@ -74,6 +75,7 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
     private readonly VisitorAccess access = new VisitorAccess();
     private readonly CoopCreatures creatures = new CoopCreatures();
     private readonly CoopDowned downed = new CoopDowned();
+    private readonly CoopPings pings = new CoopPings();
     private float nextCreatures;
     private RaidInvite openRaid;
     private float openRaidSince;
@@ -190,7 +192,9 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
         network.CustomMessagingManager.RegisterNamedMessageHandler(WorldRequest, (sender, _) => SendWorld(sender));
         network.CustomMessagingManager.RegisterNamedMessageHandler(EntitiesMessage, OnEntitiesFromGuest);
         access.StartHosting(network);
-        creatures.StartHosting(network);
+        creatures.StartHosting(network, settings);
+        pings.Start(network);
+        network.CustomMessagingManager.RegisterNamedMessageHandler(RaidNewsMessage, OnRaidNews);
         downed.Start(network, settings);
         SetState(CoopState.Hosting);
         if (viaSteam)
@@ -405,6 +409,8 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
         network.CustomMessagingManager.RegisterNamedMessageHandler(RaidClosedMessage, (sender, _) => openRaid = null);
         access.StartGuest(network);
         creatures.StartGuest(network);
+        pings.Start(network);
+        network.CustomMessagingManager.RegisterNamedMessageHandler(RaidNewsMessage, OnRaidNews);
         downed.Start(network, settings);
         SetState(CoopState.Joining);
         return true;
@@ -583,6 +589,8 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
         {
             return;
         }
+
+        pings.Update();
 
         if (Time.unscaledTime >= nextSync)
         {
@@ -771,6 +779,7 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
         }
 
         hostRaid = null;
+        TellRaidNews(gameEvent);
         if (!IsHost || network == null)
         {
             return;
@@ -781,6 +790,67 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
         if (guests.Count > 0)
         {
             network.CustomMessagingManager.SendNamedMessage(RaidClosedMessage, guests, writer, NetworkDelivery.ReliableFragmentedSequenced);
+        }
+    }
+
+    // How this player's raid ended, for friends: who got out, who fell.
+    private void TellRaidNews(GameEvent gameEvent)
+    {
+        if (network == null || (state != CoopState.Hosting && state != CoopState.Joined))
+        {
+            return;
+        }
+
+        string raid = gameEvent.Subject is RaidDefinition definition ? definition.DisplayName : "the raid";
+        string me = GameSession.Appearance != null ? GameSession.Appearance.DisplayName : CharacterAppearance.DefaultName;
+        using var writer = new FastBufferWriter(256, Allocator.Temp);
+        writer.WriteValueSafe(me);
+        writer.WriteValueSafe((byte)gameEvent.Outcome);
+        writer.WriteValueSafe(raid);
+        if (IsHost)
+        {
+            var guests = Guests(NetworkManager.ServerClientId);
+            if (guests.Count > 0)
+            {
+                network.CustomMessagingManager.SendNamedMessage(RaidNewsMessage, guests, writer, NetworkDelivery.ReliableFragmentedSequenced);
+            }
+        }
+        else
+        {
+            network.CustomMessagingManager.SendNamedMessage(RaidNewsMessage, NetworkManager.ServerClientId, writer, NetworkDelivery.ReliableFragmentedSequenced);
+        }
+    }
+
+    private void OnRaidNews(ulong sender, FastBufferReader reader)
+    {
+        reader.ReadValueSafe(out string who);
+        reader.ReadValueSafe(out byte outcome);
+        reader.ReadValueSafe(out string raid);
+        // The host passes a guest's news on to the others.
+        if (IsHost)
+        {
+            var others = Guests(sender);
+            if (others.Count > 0)
+            {
+                using var writer = new FastBufferWriter(256, Allocator.Temp);
+                writer.WriteValueSafe(who);
+                writer.WriteValueSafe(outcome);
+                writer.WriteValueSafe(raid);
+                network.CustomMessagingManager.SendNamedMessage(RaidNewsMessage, others, writer, NetworkDelivery.ReliableFragmentedSequenced);
+            }
+        }
+
+        switch ((RaidOutcome)outcome)
+        {
+            case RaidOutcome.Extracted:
+                GameMessages.Post($"{who} got out of {raid} with their haul.", MessageKind.Gain);
+                break;
+            case RaidOutcome.Died:
+                GameMessages.Post($"{who} fell in {raid}.", MessageKind.Warning);
+                break;
+            case RaidOutcome.TimeExpired:
+                GameMessages.Post($"{who} was caught as {raid} closed.", MessageKind.Warning);
+                break;
         }
     }
 
@@ -914,6 +984,10 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
         }
 
         state = next;
+        if (state == CoopState.Hosting || state == CoopState.Joined)
+        {
+            PartyHud.Create();
+        }
         if (state == CoopState.Offline || state == CoopState.Hosting || state == CoopState.Joining)
         {
             sync?.Reset();
@@ -924,6 +998,8 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
             access.Reset();
             creatures.Reset();
             downed.Reset();
+            pings.Clear();
+            PartyHud.Remove();
             openRaid = null;
         }
 

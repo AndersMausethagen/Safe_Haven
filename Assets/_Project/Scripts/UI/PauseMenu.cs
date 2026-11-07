@@ -37,6 +37,7 @@ public sealed class PauseMenu : MonoBehaviour
     private TMP_Text coopLeaveLabel;
     private Button askButton;
     private TMP_Text askLabel;
+    private Button revokeButton;
     private VisitorAccess hookedAccess;
     [SerializeField] private Button quitButton;
     [Tooltip("Explains why Save or Load is unavailable, and reports how they went.")]
@@ -210,6 +211,8 @@ public sealed class PauseMenu : MonoBehaviour
 
         coopButton = MenuButton("Coop Button", OnCoop, out coopLabel);
         askButton = MenuButton("Coop Ask Button", ShowAsk, out askLabel);
+        revokeButton = MenuButton("Coop Revoke Button", AskRevoke, out TMP_Text revokeLabel);
+        revokeLabel.text = "Take Back Permissions";
         coopLeaveButton = MenuButton("Coop Leave Button", LeaveCoop, out coopLeaveLabel);
     }
 
@@ -242,6 +245,19 @@ public sealed class PauseMenu : MonoBehaviour
             ? "They build with their own materials, and can also move, upgrade or take down what stands here."
             : "They can put things in and take things out.";
         Confirm($"{ask.Question}\n{detail} The answer holds while they stay.", "Allow", () => AnswerAsk(ask, true), "Refuse", () => AnswerAsk(ask, false));
+    }
+
+    private void AskRevoke()
+    {
+        Confirm("Take back what friends were allowed?\nThey can no longer build or use your stash, unless they ask again.", "Take Back", () =>
+        {
+            if (CoopSession.Current != null)
+            {
+                CoopSession.Current.Access.RevokeAll();
+            }
+
+            ShowMain();
+        });
     }
 
     private void AnswerAsk(FriendAsk ask, bool yes)
@@ -322,6 +338,7 @@ public sealed class PauseMenu : MonoBehaviour
         int asks = coop.IsHost ? coop.Access.Asks.Count : 0;
         askButton.gameObject.SetActive(asks > 0);
         askButton.interactable = !leaving;
+        revokeButton.gameObject.SetActive(coop.IsHost && coop.Access.AnyAllowed);
         askLabel.text = asks == 1 ? "A Friend Asks" : $"Friends Ask ({asks})";
         coopLeaveButton.gameObject.SetActive(coop.IsActive);
         coopLeaveButton.interactable = !leaving;
