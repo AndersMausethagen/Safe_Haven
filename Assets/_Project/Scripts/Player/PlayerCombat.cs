@@ -300,7 +300,7 @@ public sealed partial class PlayerCombat : MonoBehaviour
         eating = GetComponent<PlayerEating>();
         focus = GetComponent<PlayerFocus>();
         focusTarget = GetComponent<PlayerFocusTarget>();
-        mode = new PlayerCombatMode(transform, health);
+        mode = new PlayerCombatMode(transform);
         announcedWeapon = weapon;
     }
 

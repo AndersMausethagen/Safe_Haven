@@ -2,8 +2,9 @@ using UnityEngine;
 
 /// <summary>
 /// Keeps the global mode in step with the player's fighting: attacking or being attacked enters GameState.Combat, and
-/// only a stretch with no blows and no creature after the player (within the technique settings' Fight Hold Range)
-/// returns to Exploration (StrikeRules.FightIsOver). The quiet stretch also counts from entering Combat, so a manual
+/// only a stretch with no blows and no creature after the player's side nearby (within the technique settings' Fight
+/// Hold Range: after the player, a companion, or in co-op a friend fighting beside them) returns to Exploration
+/// (StrikeRules.FightIsOver). The quiet stretch also counts from entering Combat, so a manual
 /// toggle returns to Exploration when left idle. Plain C#, owned by <see cref="PlayerCombat"/>.
 /// </summary>
 public sealed class PlayerCombatMode
@@ -12,19 +13,21 @@ public sealed class PlayerCombatMode
     private const float HuntCheckInterval = 0.25f;
 
     private readonly Transform player;
-    private readonly Damageable health;
     private readonly System.Func<float> clock;
+    private readonly System.Func<Vector3, float, bool> huntedNear;
     private GameStateManager gameState;
     private float lastActivityTime;
     private float nextHuntCheck;
     private bool hunted;
 
     /// <param name="clock">The time now: Time.time unless given another (tests).</param>
-    public PlayerCombatMode(Transform player, Damageable health, System.Func<float> clock = null)
+    /// <param name="huntedNear">Whether a creature near a point (within a range) is after the player's side:
+    /// MonsterAI.AnyHuntingPlayerSideWithin unless given another (tests).</param>
+    public PlayerCombatMode(Transform player, System.Func<float> clock = null, System.Func<Vector3, float, bool> huntedNear = null)
     {
         this.player = player;
-        this.health = health;
         this.clock = clock ?? (() => Time.time);
+        this.huntedNear = huntedNear ?? MonsterAI.AnyHuntingPlayerSideWithin;
     }
 
     /// <summary>Starts following the game's mode (PlayerCombat.OnEnable).</summary>
@@ -90,18 +93,7 @@ public sealed class PlayerCombatMode
         }
 
         nextHuntCheck = clock() + HuntCheckInterval;
-        hunted = false;
-        float range = CombatTechniqueSettings.Current.FightHoldRange;
-        foreach (MonsterAI monster in MonsterAI.Active)
-        {
-            if (monster != null && health != null && monster.IsEngaging(health)
-                && (monster.transform.position - player.position).sqrMagnitude <= range * range)
-            {
-                hunted = true;
-                break;
-            }
-        }
-
+        hunted = huntedNear(player.position, CombatTechniqueSettings.Current.FightHoldRange);
         return hunted;
     }
 }

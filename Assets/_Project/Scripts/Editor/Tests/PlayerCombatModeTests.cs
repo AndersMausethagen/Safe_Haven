@@ -12,6 +12,9 @@ public sealed class PlayerCombatModeTests
     private GameStateManager manager;
     private PlayerCombatMode mode;
     private float now;
+    // Whether a creature is after the player's side, and where the mode asked about.
+    private bool hunting;
+    private Vector3 askedAbout;
 
     [SetUp]
     public void SetUp()
@@ -21,7 +24,12 @@ public sealed class PlayerCombatModeTests
         Invoke(manager, "Awake");
         player = new GameObject("Player");
         now = 100f;
-        mode = new PlayerCombatMode(player.transform, null, () => now);
+        hunting = false;
+        mode = new PlayerCombatMode(player.transform, () => now, (point, range) =>
+        {
+            askedAbout = point;
+            return hunting;
+        });
         mode.Attach(null);
     }
 
@@ -93,6 +101,24 @@ public sealed class PlayerCombatModeTests
         now += 1.5f;
         mode.Tick(Timeout);
         Assert.AreEqual(GameState.Exploration, manager.CurrentState);
+    }
+
+    [Test]
+    public void ACreatureAfterThePlayersSide_HoldsTheFight()
+    {
+        // After the player, a companion, or a friend fighting beside them: the quiet doesn't end it.
+        player.transform.position = new Vector3(3f, 0f, 7f);
+        mode.Enter();
+        hunting = true;
+        now += 1000f;
+        mode.Tick(Timeout);
+        Assert.AreEqual(GameState.Combat, manager.CurrentState);
+        Assert.AreEqual(player.transform.position, askedAbout, "Asked about creatures near the player");
+
+        hunting = false;
+        now += 1f;
+        mode.Tick(Timeout);
+        Assert.AreEqual(GameState.Exploration, manager.CurrentState, "Once none is, the long quiet ends it");
     }
 
     [Test]

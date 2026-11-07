@@ -151,6 +151,23 @@ public sealed partial class MonsterAI : MonoBehaviour, IEventSubject, IStaggerab
     /// <summary>True while walking to a point given by <see cref="Roam"/>, watching for targets on the way.</summary>
     public bool IsRoaming => roaming && CurrentState == State.Returning;
 
+    /// <summary>
+    /// True while a monster within <paramref name="range"/> of <paramref name="point"/> chases or attacks the player or
+    /// anyone on their side: a companion, a friend, or (in a friend's game) whoever the host's creature is after.
+    /// </summary>
+    public static bool AnyHuntingPlayerSideWithin(Vector3 point, float range)
+    {
+        foreach (MonsterAI monster in active)
+        {
+            if (monster != null && monster.IsHuntingPlayerSide && (monster.transform.position - point).sqrMagnitude <= range * range)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /// <summary>True while any monster chases or attacks the player or someone on their side: a fight is on.</summary>
     public static bool AnyHuntingPlayerSide()
     {
