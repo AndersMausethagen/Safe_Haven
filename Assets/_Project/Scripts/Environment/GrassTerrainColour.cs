@@ -30,7 +30,7 @@ public sealed class GrassTerrainColour : MonoBehaviour
     public static GrassTerrainColour Current => current;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    private static void ResetStatics()
+    private static void ResetForNewPlaySession()
     {
         current = null;
         Shader.SetGlobalFloat(OnId, 0f);

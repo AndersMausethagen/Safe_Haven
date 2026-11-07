@@ -33,6 +33,9 @@ public sealed class ExplorationMap : MonoBehaviour, ISaveable, ISharedState
     /// <summary>The map in the loaded scene, or null.</summary>
     public static ExplorationMap Current { get; private set; }
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => Current = null;
+
     /// <summary>Raised with how many cells the player has just explored (for experience).</summary>
     public static event System.Action<int> Explored;
 

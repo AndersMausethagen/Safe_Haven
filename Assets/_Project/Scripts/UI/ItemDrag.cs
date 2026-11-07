@@ -66,5 +66,5 @@ public static class ItemDrag
     }
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    private static void ResetStatics() => End();
+    private static void ResetForNewPlaySession() => End();
 }

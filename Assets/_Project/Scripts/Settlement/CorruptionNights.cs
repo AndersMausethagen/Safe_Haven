@@ -39,7 +39,7 @@ public sealed class CorruptionNights : MonoBehaviour
     public IReadOnlyList<MonsterAI> Attackers => attackers;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    private static void ResetStatics() => Current = null;
+    private static void ResetForNewPlaySession() => Current = null;
 
     private void OnEnable() => Current = this;
 

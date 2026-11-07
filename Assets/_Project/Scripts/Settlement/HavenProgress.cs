@@ -17,6 +17,9 @@ public sealed class HavenProgress : MonoBehaviour
     private float nextCount;
 
     public static HavenProgress Current { get; private set; }
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => Current = null;
     public int Renown => Mathf.Max(0, renown);
 
     private void OnEnable()

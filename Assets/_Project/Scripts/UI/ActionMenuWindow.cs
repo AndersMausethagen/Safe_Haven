@@ -76,6 +76,9 @@ public sealed class ActionMenuWindow : MonoBehaviour
     /// <summary>The menu window in the loaded scene, or null.</summary>
     public static ActionMenuWindow Current { get; private set; }
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => Current = null;
+
     public bool IsOpen => window != null && window.IsOpen;
 
     private void Awake()

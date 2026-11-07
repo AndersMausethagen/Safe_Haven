@@ -176,7 +176,7 @@ public static class GameInput
     private static InputActionAsset foundIn;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    private static void ResetStatics()
+    private static void ResetForNewPlaySession()
     {
         Found.Clear();
         foundIn = null;

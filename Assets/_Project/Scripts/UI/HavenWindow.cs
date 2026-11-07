@@ -118,6 +118,9 @@ public sealed class HavenWindow : MonoBehaviour
 
     public static HavenWindow Current { get; private set; }
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => Current = null;
+
     /// <summary>Builds the window (closed) for this scene, unless it has one.</summary>
     public static HavenWindow Create()
     {

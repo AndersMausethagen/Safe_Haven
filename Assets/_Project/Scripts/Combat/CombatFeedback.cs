@@ -38,6 +38,9 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
 
     public static CombatFeedback Current { get; private set; }
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => Current = null;
+
     /// <summary>True while a hit stop slows the game.</summary>
     public bool IsHitStopped => hitStopUntil >= 0f;
 

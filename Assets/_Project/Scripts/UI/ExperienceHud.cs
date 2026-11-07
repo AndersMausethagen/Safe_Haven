@@ -26,6 +26,9 @@ public sealed class ExperienceHud : MonoBehaviour
 
     public static ExperienceHud Current { get; private set; }
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => Current = null;
+
     public static ExperienceHud Create()
     {
         if (Current != null)

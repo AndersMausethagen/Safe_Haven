@@ -33,6 +33,9 @@ public sealed class HavenHud : MonoBehaviour
 
     public static HavenHud Current { get; private set; }
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => Current = null;
+
     public static HavenHud Create()
     {
         if (Current != null)

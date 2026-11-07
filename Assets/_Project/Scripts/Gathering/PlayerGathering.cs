@@ -64,7 +64,7 @@ public sealed class PlayerGathering : MonoBehaviour
     public ToolType Tool => node != null && node.Definition != null ? node.Definition.GatherTool : ToolType.None;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    private static void ResetStatics()
+    private static void ResetForNewPlaySession()
     {
         Swung = null;
     }

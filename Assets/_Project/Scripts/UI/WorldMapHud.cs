@@ -39,6 +39,9 @@ public sealed class WorldMapHud : MonoBehaviour
     private readonly System.Collections.Generic.List<Vector3> marked = new System.Collections.Generic.List<Vector3>();
 
     public static WorldMapHud Current { get; private set; }
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => Current = null;
     public static bool IsOpen => Current != null;
 
     /// <summary>The player has opened the map on a raid, so the HUD needn't tell them what is on it. Remembered between sessions.</summary>

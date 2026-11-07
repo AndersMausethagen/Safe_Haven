@@ -18,6 +18,9 @@ public sealed class DownedHud : MonoBehaviour
 
     public static DownedHud Current { get; private set; }
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => Current = null;
+
     public static DownedHud Create()
     {
         if (Current != null)

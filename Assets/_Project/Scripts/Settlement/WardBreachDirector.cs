@@ -61,6 +61,9 @@ public sealed class WardBreachDirector : MonoBehaviour
     /// <summary>The breach director in the loaded scene, or null.</summary>
     public static WardBreachDirector Current { get; private set; }
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => Current = null;
+
     /// <summary>The breach under way, else the one due next.</summary>
     public WardBreachDefinition Definition => running != null ? running
         : WardBreachSettings.Current.For(GameSession.Settlement.BreachesWon) ?? definition;

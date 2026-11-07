@@ -33,7 +33,7 @@ public sealed class GrassInteractor : MonoBehaviour
     public static int UploadedCount { get; private set; }
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    private static void ResetStatics()
+    private static void ResetForNewPlaySession()
     {
         Active.Clear();
         uploadedFrame = -1;

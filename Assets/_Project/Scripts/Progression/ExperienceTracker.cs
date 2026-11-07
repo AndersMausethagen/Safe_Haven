@@ -15,6 +15,9 @@ public sealed class ExperienceTracker : MonoBehaviour, IGameSystem
 
     public static ExperienceTracker Current { get; private set; }
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => Current = null;
+
     /// <summary>Raised with each amount of experience gained (the experience bar shows it).</summary>
     public static event Action<int> Gained;
 

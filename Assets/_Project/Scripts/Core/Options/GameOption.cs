@@ -119,7 +119,7 @@ public sealed class GameOption
 
     // Entering play mode doesn't reload scripts in this project (Enter Play Mode Options), so statics are reset here.
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    private static void ResetStatics()
+    private static void ResetForNewPlaySession()
     {
         AnyChanged = null;
     }

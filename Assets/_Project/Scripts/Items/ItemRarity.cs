@@ -43,7 +43,7 @@ public static class Rarity
     }
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    private static void ResetStatics()
+    private static void ResetForNewPlaySession()
     {
         settings = null;
         loaded = false;

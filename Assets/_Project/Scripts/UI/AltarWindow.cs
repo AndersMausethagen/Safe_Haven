@@ -177,6 +177,9 @@ public sealed class AltarWindow : MonoBehaviour
 
     public static AltarWindow Current { get; private set; }
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => Current = null;
+
     /// <summary>Builds the window (closed) for this scene, unless it has one.</summary>
     public static AltarWindow Create()
     {

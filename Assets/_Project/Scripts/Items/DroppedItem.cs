@@ -135,7 +135,11 @@ public sealed class DroppedItem : MonoBehaviour, ISaveable, IInteractionName, II
 
     // Entering play mode doesn't reload scripts in this project, so statics are reset here.
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    private static void ResetStatics() => all.Clear();
+    private static void ResetForNewPlaySession()
+    {
+        all.Clear();
+        DroppedByPlayer = null;
+    }
 
     private void Update()
     {
@@ -342,12 +346,5 @@ public sealed class DroppedItem : MonoBehaviour, ISaveable, IInteractionName, II
         }
 
         Show();
-    }
-
-    // Entering Play doesn't reload scripts in this project: statics carry over from the last session unless cleared.
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    private static void ResetForNewPlaySession()
-    {
-        DroppedByPlayer = null;
     }
 }

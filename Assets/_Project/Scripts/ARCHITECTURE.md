@@ -164,7 +164,7 @@ counts the cleared encounter, not player kill credit. No `RaidSession`, regular 
 durability penalty is involved. Supplies deliberately reset to home starting contents.
 
 `BuildPlacer` retains its ordinary placement, footprint checks, material payment and Built event. In the forest
-the `PrologueDirector` is the build area (`IBuildArea`), which exposes only the prologue definition's Campfire, the same `Data/Buildings/Campfire.asset` the player builds at home
+the `PrologueDirector` enters its `PrologueBuildArea` as the build area (`IBuildArea`), which exposes only the prologue definition's Campfire, the same `Data/Buildings/Campfire.asset` the player builds at home
 (Sticks and Small Rocks; upgrades only at home), only during the accepted building chapter, and only inside the
 shelter's build radius. Keep the gathering objectives aligned with its Construction Items when tuning costs
 (PrologueTests checks this). The fire quest counts **Build Structure**, not a use-fire event.
@@ -476,6 +476,50 @@ and per-rank bonuses, and add it to LevelingSettings' Talents.
 Persistent systems implement `IGameSystem.OnSceneEntered`, which `GameSystems` calls once per scene after the scene's
 objects have woken up. Use that instead of `SceneManager.sceneLoaded` (it also covers the editor's "no scene reload"
 play mode). Use `SceneLoader.Load` for gameplay scene changes so saveable objects are recorded first.
+
+## Conventions: reaching a system, and keeping classes to one job
+
+**Reaching a system.** Every scene or game singleton is reached the same way: `public static X Current { get; private
+set; }`, set when it wakes or is enabled, cleared when it goes (only if it is still the current one), and reset by a
+`[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]` hook, because domain reload is off.
+There is no `Instance`. Settings assets are `XSettings.Current` too. `Player.Current` is the local player; in co-op a
+friend is a puppet, so code acting for whoever did something uses the object it was given (the `user` of an
+interaction, a hit's `Source`) rather than `Player.Current`.
+
+- A MonoBehaviour reads `X.Current` where it needs it, or keeps it from `OnEnable` when it subscribes to its events.
+- A plain C# part is given what it needs in its constructor (`new RaidCompanions(raid)`, `new ConstructionLook(this,
+  building)`) and reads nothing global it could be given.
+- Where a lower system must not know a higher one, it asks through an interface: `IRaidCreatureSource`
+  (`CreatureSource.Remote`, so AI doesn't know co-op), `IBuildArea` (so `BuildPlacer` knows neither the Haven nor the
+  prologue), `IQuestTarget` and `IQuestPerson` (so quests don't know who people are).
+
+**A class that grows a second job** gives it to a class of its own, usually plain C# owned by the component. Callers use
+that part directly (`director.Creatures.Wake(...)`, `director.Companions.Companion`), not forwarding methods.
+
+| Owner | Its parts |
+|---|---|
+| `RaidDirector` (the raid's life: clock, stages, ending) | `RaidCreatures` (strength, hunting, alarms), `RaidCompanions` (who came along, the lost one) |
+| `Construction` (level, work, payment, saving) | `ConstructionLook` (rising, scaffold, dressing, dust), `ConstructionUpgradeOffer` |
+| `HomePortal` (the ward and the voice) | `HomePortalMenu` (what using it offers) |
+| `PlayerCombat` (the swing state machine) | `MeleeTargeting` (aim assist, what can be finished), `PlayerCombatMode` (Combat and Exploration) |
+| `RaidPreparationWindow` (the planner's view) | `RaidPlan` (the choices, their rules and launching) |
+| `PlayerFishing` (casting, biting, reeling) | `FishingLine` (the float and the line) |
+| `PrologueDirector` (the chapters) | `PrologueBuildArea` (where the campfire may go) |
+
+**A state machine** whose behaviour all reads and writes the same state stays one class and is split into partial files
+by concern: `X.cs` holds the state (fields, properties, events) and the lifecycle; each `X.Concern.cs` holds behaviour,
+and its summary ends "Part of X, in its own file". `MonsterAI` (Awareness, Investigation, Targets, Fighting, Home,
+Reactions, Backstabs, Remote, Gizmos), `PlayerCombat` (Input, Swings, Finishers, Reactions), `PlayerAnimationController`
+(Locomotion, Combat, Work, Debug), `RaidPreparationWindow` (Briefing, Preparation, Building), `BuildPlacer` (Spots,
+Lines) and `RaidLayoutPlanner` (Rooms, Sites, Ground, Cliffs and `RaidLayoutVariety`, each with its own tuning
+constants; the map's data is `RaidLayoutPlan`). A raid map step draws random numbers in a fixed order: moving code
+between parts changes nothing, but reordering draws within a step changes every map a seed makes.
+
+**Files and serialized types.** A MonoBehaviour or ScriptableObject stays in the file named after it (moving it
+changes its script GUID and breaks every reference); partial files beside it are free. Plain `[Serializable]` types
+kept by `[SerializeReference]` (story nodes, raid outcomes) are found by class name, so they may move between files, but
+renaming one needs `[MovedFrom]`. Story nodes live in one file per graph menu category (`Story/StoryTriggers.cs`,
+`StoryTalkNodes.cs`, `StoryFlowNodes.cs`, `StoryQuestNodes.cs`, `StoryWorldNodes.cs`, `StoryCameraSoundNodes.cs`).
 
 ## Scene changes, raid results and raid layouts
 

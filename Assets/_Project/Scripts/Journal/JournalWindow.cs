@@ -50,6 +50,9 @@ public sealed class JournalWindow : MonoBehaviour
 
     public static JournalWindow Current { get; private set; }
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => Current = null;
+
     /// <summary>Builds the window (closed) for this scene, unless it has one.</summary>
     public static JournalWindow Create()
     {

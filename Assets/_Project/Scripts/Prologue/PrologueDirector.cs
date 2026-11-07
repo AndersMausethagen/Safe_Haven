@@ -44,6 +44,9 @@ public sealed class PrologueDirector : MonoBehaviour
     private PrologueBuildArea buildArea;
 
     public static PrologueDirector Current { get; private set; }
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => Current = null;
     public PrologueDefinition Definition => definition;
     public PrologueStep Step => step;
     public float SecondsRemaining => Mathf.Max(0f, (chapter != null ? chapter.Duration : 0f) - elapsed);

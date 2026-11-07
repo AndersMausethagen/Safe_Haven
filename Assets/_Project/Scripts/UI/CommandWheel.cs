@@ -56,7 +56,7 @@ public sealed class CommandWheel : MonoBehaviour
     public static bool IsHeld { get; private set; }
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    private static void ResetStatics() => IsHeld = false;
+    private static void ResetForNewPlaySession() => IsHeld = false;
 
     private void Awake()
     {

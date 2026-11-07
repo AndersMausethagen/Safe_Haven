@@ -45,7 +45,7 @@ public sealed class TerrainMossBloom : MonoBehaviour
     public float TargetRadius => followWardRadius && HomePortal.Current != null ? HomePortal.Current.WardRadius : radius;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    private static void ResetStatics()
+    private static void ResetForNewPlaySession()
     {
         RuntimeCopies.Clear();
     }

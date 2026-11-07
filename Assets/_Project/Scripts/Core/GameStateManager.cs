@@ -43,7 +43,7 @@ public sealed class GameStateManager : MonoBehaviour
     }
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    private static void ResetStatics() => Current = null;
+    private static void ResetForNewPlaySession() => Current = null;
 
     /// <summary>Returns true if the mode changed; false if already in that mode or called from a GameStateChanged handler.</summary>
     public bool TrySetState(GameState nextState)

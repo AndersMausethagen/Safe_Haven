@@ -41,6 +41,9 @@ public sealed class RaidDirector : MonoBehaviour
     /// <summary>The raid running in the loaded scene, or null outside raids.</summary>
     public static RaidDirector Current { get; private set; }
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => Current = null;
+
     /// <summary>The people with the player: the resident who came along and the lost one found out here.</summary>
     public RaidCompanions Companions { get; private set; }
 

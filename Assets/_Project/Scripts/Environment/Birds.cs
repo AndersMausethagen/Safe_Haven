@@ -82,6 +82,9 @@ public sealed class Birds : MonoBehaviour
     /// <summary>The scene's birds, if it has any (crows sent to a carcass, Aftermath).</summary>
     public static Birds Current { get; private set; }
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => Current = null;
+
     private void OnEnable()
     {
         Current = this;

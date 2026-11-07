@@ -33,6 +33,9 @@ public sealed class TalentWindow : MonoBehaviour
 
     public static TalentWindow Current { get; private set; }
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => Current = null;
+
     /// <summary>Builds the window (closed) for this scene, unless it has one.</summary>
     public static TalentWindow Create()
     {

@@ -61,6 +61,9 @@ public sealed class HomePortal : MonoBehaviour, IArea, IBuildArea
     /// <summary>The portal in the loaded scene, or null outside Safe Haven.</summary>
     public static HomePortal Current { get; private set; }
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => Current = null;
+
     /// <summary>How far from the portal the player may build, at the current ward level.</summary>
     public float WardRadius => SettlementSettings.Current.WardRadiusAt(GameSession.Settlement.WardLevel)
         + HavenSettings.Current.WardBonusAt(GameSession.Settlement.HavenRank)

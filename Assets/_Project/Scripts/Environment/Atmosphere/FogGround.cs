@@ -21,6 +21,9 @@ public sealed class FogGround : MonoBehaviour, ISceneSetup
     /// <summary>The ground height field in the loaded scene, or null.</summary>
     public static FogGround Current { get; private set; }
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => Current = null;
+
     public Texture2D Texture => texture;
     /// <summary>World XZ rectangle covered.</summary>
     public Rect Area { get; private set; }

@@ -32,7 +32,7 @@ public static class Cheats
     public static bool NoRequirements { get; private set; }
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    private static void ResetStatics()
+    private static void ResetForNewPlaySession()
     {
         Invincible = OneHitKills = Fast = EndlessStamina = NoNeeds = FreeCosts = NoRequirements = false;
         Used = null;

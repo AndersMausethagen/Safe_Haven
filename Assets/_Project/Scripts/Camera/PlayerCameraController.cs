@@ -29,6 +29,9 @@ public sealed class PlayerCameraController : MonoBehaviour
     /// <summary>The scene's player camera rig, while it is enabled; null in scenes without one.</summary>
     public static PlayerCameraController Current { get; private set; }
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => Current = null;
+
     private static readonly RaycastHit[] ClipHits = new RaycastHit[16];
 
     private CinemachineCamera cinemachineCamera;

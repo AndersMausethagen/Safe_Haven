@@ -100,7 +100,7 @@ public sealed class Transport : MonoBehaviour, ISaveable
     }
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    private static void ResetStatics() => all.Clear();
+    private static void ResetForNewPlaySession() => all.Clear();
 
     private void Awake()
     {

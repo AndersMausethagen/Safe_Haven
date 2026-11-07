@@ -155,7 +155,7 @@ public static class InteractableGrid
     private static long Key(int x, int z) => ((long)x << 32) ^ (uint)z;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    private static void ResetStatics()
+    private static void ResetForNewPlaySession()
     {
         cells.Clear();
         shaped.Clear();

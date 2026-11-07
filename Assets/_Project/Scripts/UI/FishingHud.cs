@@ -31,6 +31,9 @@ public sealed class FishingHud : MonoBehaviour
 
     public static FishingHud Current { get; private set; }
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => Current = null;
+
     public static FishingHud Create()
     {
         if (Current != null)

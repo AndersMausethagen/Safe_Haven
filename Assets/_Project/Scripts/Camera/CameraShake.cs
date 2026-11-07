@@ -32,7 +32,7 @@ public sealed class CameraShake : CinemachineExtension
     }
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    private static void ResetStatics()
+    private static void ResetForNewPlaySession()
     {
         trauma = 0f;
         lastDecayTime = 0f;

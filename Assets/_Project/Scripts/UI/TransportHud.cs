@@ -26,6 +26,9 @@ public sealed class TransportHud : MonoBehaviour
 
     public static TransportHud Current { get; private set; }
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => Current = null;
+
     public static TransportHud Create()
     {
         if (Current != null)

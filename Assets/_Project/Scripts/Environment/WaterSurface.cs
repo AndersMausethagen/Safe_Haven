@@ -63,7 +63,7 @@ public sealed class WaterSurface : MonoBehaviour
     }
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    private static void ResetStatics()
+    private static void ResetForNewPlaySession()
     {
         All.Clear();
         Unhook();

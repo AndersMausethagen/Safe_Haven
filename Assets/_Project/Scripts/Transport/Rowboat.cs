@@ -62,7 +62,7 @@ public sealed class Rowboat : MonoBehaviour, ITransportDriver
     public bool IsHeldBy(GameObject user) => rower != null && rower.gameObject == user;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    private static void ResetStatics() => taught = false;
+    private static void ResetForNewPlaySession() => taught = false;
 
     private void Awake()
     {

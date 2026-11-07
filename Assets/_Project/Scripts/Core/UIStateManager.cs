@@ -48,7 +48,7 @@ public sealed class UIStateManager : MonoBehaviour
     }
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    private static void ResetStatics() => Current = null;
+    private static void ResetForNewPlaySession() => Current = null;
 
     private void OnEnable()
     {

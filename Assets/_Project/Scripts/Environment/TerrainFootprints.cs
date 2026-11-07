@@ -29,7 +29,7 @@ public sealed class TerrainFootprints : MonoBehaviour
     private TerrainSurfaceProfile Profile => surface != null ? surface.Profile : null;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    private static void ResetStatics()
+    private static void ResetForNewPlaySession()
     {
         ActiveFields.Clear();
         Shader.SetGlobalFloat("_GrassFootprintCount", 0);

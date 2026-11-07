@@ -21,6 +21,9 @@ public sealed class ViewBounds : MonoBehaviour
     /// <summary>The bounds of the loaded scene, or null.</summary>
     public static ViewBounds Current { get; private set; }
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => Current = null;
+
     private void OnEnable()
     {
         Current = this;

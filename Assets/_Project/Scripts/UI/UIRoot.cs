@@ -32,6 +32,9 @@ public sealed class UIRoot : MonoBehaviour
     /// <summary>The screen UI root of the loaded scene, or null.</summary>
     public static UIRoot Current { get; private set; }
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => Current = null;
+
     public Canvas Canvas { get; private set; }
 
     public float Scale

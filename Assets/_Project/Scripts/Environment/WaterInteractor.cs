@@ -121,7 +121,7 @@ public sealed class WaterInteractor : MonoBehaviour
     }
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    private static void ResetStatics()
+    private static void ResetForNewPlaySession()
     {
         Active.Clear();
         updatedFrame = -1;

@@ -32,6 +32,9 @@ public sealed class PartyHud : MonoBehaviour
 
     public static PartyHud Current { get; private set; }
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => Current = null;
+
     public static PartyHud Create()
     {
         if (Current != null)

@@ -191,7 +191,7 @@ public sealed class TerrainTreeFelling : MonoBehaviour
     }
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    private static void ResetStatics() => active.Clear();
+    private static void ResetForNewPlaySession() => active.Clear();
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     private static void Hook()

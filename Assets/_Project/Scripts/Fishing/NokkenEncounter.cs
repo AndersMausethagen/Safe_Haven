@@ -28,6 +28,9 @@ public sealed class NokkenEncounter : MonoBehaviour
 
     public static NokkenEncounter Current { get; private set; }
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => Current = null;
+
     /// <summary>0..1: how close the player is to breaking free.</summary>
     public float Struggle => Mathf.Clamp01(presses / Mathf.Max(1, FishingSettings.Current.NokkenPresses));
 

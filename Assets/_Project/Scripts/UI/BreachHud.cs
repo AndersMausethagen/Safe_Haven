@@ -24,6 +24,9 @@ public sealed class BreachHud : MonoBehaviour
 
     public static BreachHud Current { get; private set; }
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => Current = null;
+
     public static BreachHud Create()
     {
         if (Current != null)

@@ -68,6 +68,9 @@ public sealed class MinimapHud : MonoBehaviour
 
     public static MinimapHud Current { get; private set; }
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => Current = null;
+
     /// <summary>This scene's painted ground, or null until it is painted. Owned by the minimap; the world map only shows it.</summary>
     public Texture2D PaintedMap => painted ? map : null;
 

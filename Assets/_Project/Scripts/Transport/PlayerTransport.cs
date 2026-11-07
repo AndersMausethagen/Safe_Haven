@@ -23,6 +23,9 @@ public sealed class PlayerTransport : MonoBehaviour
 
     public static PlayerTransport Current { get; private set; }
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => Current = null;
+
     /// <summary>What the player is moving now, or null.</summary>
     public Transport Using { get; private set; }
 

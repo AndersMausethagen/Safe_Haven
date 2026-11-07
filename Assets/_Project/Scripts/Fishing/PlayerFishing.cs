@@ -36,6 +36,9 @@ public sealed class PlayerFishing : MonoBehaviour
 
     public static PlayerFishing Current { get; private set; }
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => Current = null;
+
     public Phase State { get; private set; }
     public ReelSession Reel { get; private set; }
     public FishingSettings.Fish Hooked => hooked;

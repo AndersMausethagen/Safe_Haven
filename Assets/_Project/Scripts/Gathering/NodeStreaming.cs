@@ -104,7 +104,7 @@ public sealed class NodeStreaming : MonoBehaviour
     }
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    private static void ResetStatics()
+    private static void ResetForNewPlaySession()
     {
         active.Clear();
         byCollider.Clear();
