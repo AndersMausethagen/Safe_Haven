@@ -80,6 +80,14 @@ Shader "Hidden/Safe Haven/Atmosphere"
         TEXTURE2D(_AtmosphereFog);
         TEXTURE2D(_AtmosphereShafts);
         float _SafeHavenNight;
+        // Temporal accumulation (the Resolve pass): last frame's resolved fog and shafts, where the camera saw from then,
+        // how much of them to keep, the frame index the march's jitter turns with, and the fog buffers' texel size.
+        TEXTURE2D(_AtmosphereFogHistory);
+        TEXTURE2D(_AtmosphereShaftsHistory);
+        float4x4 _AtmospherePrevViewProj;
+        float _AtmosphereHistoryWeight;
+        float _AtmosphereFrame;
+        float4 _AtmosphereFogTexel;
 
         float3 WorldPositionAt(float2 uv, out float rawDepth)
         {
@@ -367,8 +375,10 @@ Shader "Hidden/Safe Haven/Atmosphere"
 
                 int steps = max(1, (int)_FogParams2.y);
                 float stepLength = marchDistance / steps;
-                // Interleaved gradient noise hides the banding of few steps as a fine, stable grain.
-                float jitter = frac(52.9829189 * frac(dot(input.positionCS.xy, float2(0.06711056, 0.00583715))));
+                // Interleaved gradient noise hides the banding of few steps; it turns every frame, and the Resolve pass
+                // averages the frames, so the grain melts into smooth fog and shafts.
+                float2 grainAt = input.positionCS.xy + _AtmosphereFrame * float2(5.588238, 5.588238);
+                float jitter = frac(52.9829189 * frac(dot(grainAt, float2(0.06711056, 0.00583715))));
 
                 Light mainLight = GetMainLight();
                 float phase = Phase(dot(direction, mainLight.direction), _FogParams0.w);
@@ -519,6 +529,61 @@ Shader "Hidden/Safe Haven/Atmosphere"
                 }
 
                 return float4(color, 1.0);
+            }
+            ENDHLSL
+        }
+
+        Pass
+        {
+            Name "Resolve"
+
+            HLSLPROGRAM
+            #pragma vertex Vert
+            #pragma fragment FragResolve
+
+            struct ResolveOutput
+            {
+                float4 fog : SV_Target0;
+                float4 shafts : SV_Target1;
+            };
+
+            // This frame's march blended with last frame's, reprojected to where the camera saw the same air then. Last
+            // frame's value is clamped to the range of this frame's neighbours, so moving light or fog never ghosts.
+            ResolveOutput FragResolve(Varyings input)
+            {
+                UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
+                float2 uv = input.texcoord;
+                float2 texel = _AtmosphereFogTexel.xy;
+                float4 fog = SAMPLE_TEXTURE2D(_AtmosphereFog, sampler_LinearClamp, uv);
+                float4 shafts = SAMPLE_TEXTURE2D(_AtmosphereShafts, sampler_LinearClamp, uv);
+                float4 fogLow = fog, fogHigh = fog, shaftLow = shafts, shaftHigh = shafts;
+                float2 offsets[4] = { float2(texel.x, 0), float2(-texel.x, 0), float2(0, texel.y), float2(0, -texel.y) };
+                [unroll] for (int i = 0; i < 4; i++)
+                {
+                    float4 f = SAMPLE_TEXTURE2D(_AtmosphereFog, sampler_LinearClamp, uv + offsets[i]);
+                    float4 s = SAMPLE_TEXTURE2D(_AtmosphereShafts, sampler_LinearClamp, uv + offsets[i]);
+                    fogLow = min(fogLow, f); fogHigh = max(fogHigh, f);
+                    shaftLow = min(shaftLow, s); shaftHigh = max(shaftHigh, s);
+                }
+
+                float rawDepth;
+                float3 positionWS = WorldPositionAt(uv, rawDepth);
+                float3 ray = positionWS - _WorldSpaceCameraPos;
+                float reach = IsFar(rawDepth) ? _FogParams2.x : min(length(ray), _FogParams2.x);
+                positionWS = _WorldSpaceCameraPos + normalize(ray) * reach;
+                float2 before = ComputeNormalizedDeviceCoordinates(positionWS, _AtmospherePrevViewProj);
+                float keep = _AtmosphereHistoryWeight;
+                if (any(before < 0.0) || any(before > 1.0))
+                {
+                    keep = 0.0;
+                }
+
+                float4 oldFog = clamp(SAMPLE_TEXTURE2D(_AtmosphereFogHistory, sampler_LinearClamp, before), fogLow, fogHigh);
+                float4 oldShafts = clamp(SAMPLE_TEXTURE2D(_AtmosphereShaftsHistory, sampler_LinearClamp, before), shaftLow, shaftHigh);
+                ResolveOutput output;
+                output.fog = lerp(fog, oldFog, keep);
+                output.shafts = lerp(shafts, oldShafts, keep);
+                return output;
             }
             ENDHLSL
         }

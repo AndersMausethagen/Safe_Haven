@@ -28,6 +28,9 @@ public sealed class AtmosphereFeature : ScriptableRendererFeature
     [SerializeField] private Shader shader;
     [Tooltip("Gathers the fog at this share of the screen's resolution.")]
     [SerializeField, Range(0.25f, 1f)] private float fogResolution = 0.5f;
+    [Tooltip("Share of last frame's fog kept each frame (temporal accumulation): the march's grain turns every frame and " +
+             "averages away. 0 switches it off.")]
+    [SerializeField, Range(0f, 0.95f)] private float historyWeight = 0.85f;
 
     /// <summary>Share of Fog Resolution the fog is drawn at: the player's Volumetric Fog setting. 1 is as authored.</summary>
     public static float QualityScale { get; set; } = 1f;
@@ -79,13 +82,14 @@ public sealed class AtmosphereFeature : ScriptableRendererFeature
             return;
         }
 
-        pass.Setup(fog, fogOn, fogOfWar, warOn, Mathf.Max(0.25f, fogResolution * QualityScale));
+        pass.Setup(fog, fogOn, fogOfWar, warOn, Mathf.Max(0.25f, fogResolution * QualityScale), historyWeight);
         pass.ConfigureInput(ScriptableRenderPassInput.Depth);
         renderer.EnqueuePass(pass);
     }
 
     protected override void Dispose(bool disposing)
     {
+        pass?.ReleaseHistory();
         CoreUtils.Destroy(material);
         material = null;
         pass = null;
@@ -171,8 +175,9 @@ public sealed class AtmosphereFeature : ScriptableRendererFeature
             profilingSampler = new ProfilingSampler("Safe Haven Atmosphere");
         }
 
-        public void Setup(AtmosphericFog fogSettings, bool fogActive, FogOfWar war, bool warActive, float fogResolution)
+        public void Setup(AtmosphericFog fogSettings, bool fogActive, FogOfWar war, bool warActive, float fogResolution, float history)
         {
+            keepHistory = history;
             fog = fogSettings;
             fogOn = fogActive;
             fogOfWar = war;
@@ -185,6 +190,88 @@ public sealed class AtmosphereFeature : ScriptableRendererFeature
             public Material material;
             public TextureHandle source;
             public int pass;
+            public TextureHandle fogHistory;
+            public TextureHandle shaftHistory;
+        }
+
+        // Last frame's resolved fog and shafts for one camera, in two pairs used in turn.
+        private sealed class History
+        {
+            public readonly RTHandle[] Fog = new RTHandle[2];
+            public readonly RTHandle[] Shafts = new RTHandle[2];
+            public int Read;
+            public bool Valid;
+            public Matrix4x4 ViewProjection;
+            public int Width, Height;
+        }
+
+        private static readonly int FogHistoryId = Shader.PropertyToID("_AtmosphereFogHistory");
+        private static readonly int ShaftHistoryId = Shader.PropertyToID("_AtmosphereShaftsHistory");
+        private static readonly int PrevViewProjId = Shader.PropertyToID("_AtmospherePrevViewProj");
+        private static readonly int HistoryWeightId = Shader.PropertyToID("_AtmosphereHistoryWeight");
+        private static readonly int FrameId = Shader.PropertyToID("_AtmosphereFrame");
+        private static readonly int FogTexelId = Shader.PropertyToID("_AtmosphereFogTexel");
+        private readonly Dictionary<Camera, History> histories = new Dictionary<Camera, History>();
+        private float keepHistory;
+
+        public void ReleaseHistory()
+        {
+            foreach (History history in histories.Values)
+            {
+                Release(history);
+            }
+
+            histories.Clear();
+        }
+
+        private static void Release(History history)
+        {
+            for (int i = 0; i < 2; i++)
+            {
+                history.Fog[i]?.Release();
+                history.Shafts[i]?.Release();
+                history.Fog[i] = null;
+                history.Shafts[i] = null;
+            }
+        }
+
+        private History HistoryFor(Camera camera, int width, int height)
+        {
+            if (histories.Count > 4)
+            {
+                foreach (Camera gone in new List<Camera>(histories.Keys))
+                {
+                    if (gone == null)
+                    {
+                        Release(histories[gone]);
+                        histories.Remove(gone);
+                    }
+                }
+            }
+
+            if (!histories.TryGetValue(camera, out History history))
+            {
+                history = new History();
+                histories[camera] = history;
+            }
+
+            if (history.Fog[0] == null || history.Width != width || history.Height != height)
+            {
+                Release(history);
+                for (int i = 0; i < 2; i++)
+                {
+                    history.Fog[i] = RTHandles.Alloc(width, height, colorFormat: GraphicsFormat.R16G16B16A16_SFloat,
+                        filterMode: FilterMode.Bilinear, wrapMode: TextureWrapMode.Clamp, name: "_AtmosphereFogHistory" + i);
+                    history.Shafts[i] = RTHandles.Alloc(width, height, colorFormat: GraphicsFormat.R16G16B16A16_SFloat,
+                        filterMode: FilterMode.Bilinear, wrapMode: TextureWrapMode.Clamp, name: "_AtmosphereShaftsHistory" + i);
+                }
+
+                history.Width = width;
+                history.Height = height;
+                history.Valid = false;
+            }
+
+            return history;
         }
 
         public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameData)
@@ -197,6 +284,7 @@ public sealed class AtmosphereFeature : ScriptableRendererFeature
             }
 
             UploadParameters(camera.camera.transform.position);
+            material.SetFloat(FrameId, keepHistory > 0f ? Time.frameCount % 64 : 0f);
             var pipeline = UniversalRenderPipeline.asset;
             material.SetFloat(ShadowCascades, pipeline != null ? pipeline.shadowCascadeCount : 1);
 
@@ -237,6 +325,8 @@ public sealed class AtmosphereFeature : ScriptableRendererFeature
                     builder.SetRenderFunc(static (PassData d, RasterGraphContext context) =>
                         Blitter.BlitTexture(context.cmd, new Vector4(1f, 1f, 0f, 0f), d.material, d.pass));
                 }
+
+                Resolve(renderGraph, resources, camera.camera, fogDesc, fogTexture, shaftTexture);
             }
             else
             {
@@ -271,6 +361,48 @@ public sealed class AtmosphereFeature : ScriptableRendererFeature
             }
 
             resources.cameraColor = target;
+        }
+
+        // Blends this frame's march with last frame's (Resolve pass), writing into the history pair not read this frame;
+        // the composite reads the blend.
+        private void Resolve(RenderGraph renderGraph, UniversalResourceData resources, Camera camera, TextureDesc fogDesc,
+            TextureHandle fogTexture, TextureHandle shaftTexture)
+        {
+            History history = HistoryFor(camera, fogDesc.width, fogDesc.height);
+            Matrix4x4 viewProjection = GL.GetGPUProjectionMatrix(camera.projectionMatrix, true) * camera.worldToCameraMatrix;
+            material.SetMatrix(PrevViewProjId, history.Valid ? history.ViewProjection : viewProjection);
+            material.SetFloat(HistoryWeightId, history.Valid ? keepHistory : 0f);
+            material.SetVector(FogTexelId, new Vector4(1f / fogDesc.width, 1f / fogDesc.height, fogDesc.width, fogDesc.height));
+            int write = 1 - history.Read;
+            TextureHandle fogOut = renderGraph.ImportTexture(history.Fog[write]);
+            TextureHandle shaftOut = renderGraph.ImportTexture(history.Shafts[write]);
+            using (var builder = renderGraph.AddRasterRenderPass<PassData>("Atmosphere Resolve", out var data, profilingSampler))
+            {
+                data.material = material;
+                data.pass = 2;
+                data.fogHistory = renderGraph.ImportTexture(history.Fog[history.Read]);
+                data.shaftHistory = renderGraph.ImportTexture(history.Shafts[history.Read]);
+                builder.UseTexture(fogTexture);
+                builder.UseTexture(shaftTexture);
+                builder.UseTexture(data.fogHistory);
+                builder.UseTexture(data.shaftHistory);
+                builder.UseTexture(resources.cameraDepthTexture);
+                builder.UseAllGlobalTextures(true);
+                builder.SetRenderAttachment(fogOut, 0, AccessFlags.Write);
+                builder.SetRenderAttachment(shaftOut, 1, AccessFlags.Write);
+                builder.SetGlobalTextureAfterPass(fogOut, FogTextureId);
+                builder.SetGlobalTextureAfterPass(shaftOut, ShaftTextureId);
+                builder.SetRenderFunc(static (PassData d, RasterGraphContext context) =>
+                {
+                    d.material.SetTexture(FogHistoryId, d.fogHistory);
+                    d.material.SetTexture(ShaftHistoryId, d.shaftHistory);
+                    Blitter.BlitTexture(context.cmd, new Vector4(1f, 1f, 0f, 0f), d.material, d.pass);
+                });
+            }
+
+            history.Read = write;
+            history.ViewProjection = viewProjection;
+            history.Valid = keepHistory > 0f;
         }
 
         private void UploadParameters(Vector3 cameraPosition)
