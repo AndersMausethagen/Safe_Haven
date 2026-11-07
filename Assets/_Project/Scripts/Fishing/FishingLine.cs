@@ -21,7 +21,8 @@ public readonly struct FishingCast
 /// The float and the line while fishing: the float arcs out from the rod tip, bobs on the water, goes under at a bite and
 /// is drawn in while reeling, with a line to it that sags until it is taut. What they look like is FishingSettings'
 /// (Float and Line); how they move is here. Made the first time a line is cast. Plain C#, owned by
-/// <see cref="PlayerFishing"/>, which says where the line was cast.
+/// <see cref="PlayerFishing"/>, which says where the line was cast; a friend's line in co-op is drawn by the same view
+/// on their body (RemoteFishing).
 /// </summary>
 public sealed class FishingLine
 {
@@ -63,9 +64,9 @@ public sealed class FishingLine
 
     /// <summary>
     /// Places the float and draws the line: in flight until the cast lands, then on the water, under at a bite and drawn
-    /// towards the bank as the reel's catch fills.
+    /// towards the bank as the reel's catch (0 to 1) fills.
     /// </summary>
-    public void Tick(in FishingCast cast, PlayerFishing.Phase phase, ReelSession reel)
+    public void Tick(in FishingCast cast, PlayerFishing.Phase phase, float reelCatch)
     {
         if (bobber == null || !bobber.gameObject.activeSelf)
         {
@@ -85,7 +86,7 @@ public sealed class FishingLine
             float bob = Mathf.Sin(Time.time * 2.4f) * 0.025f;
             float under = phase == PlayerFishing.Phase.Bite ? -0.18f : phase == PlayerFishing.Phase.Reeling ? -0.06f + Mathf.Sin(Time.time * 17f) * 0.04f : 0f;
             Vector3 bank = new Vector3(cast.From.x, cast.WaterHeight, cast.From.z);
-            Vector3 drawn = phase == PlayerFishing.Phase.Reeling && reel != null ? Vector3.Lerp(cast.Landing, bank, reel.Catch * 0.6f) : cast.Landing;
+            Vector3 drawn = phase == PlayerFishing.Phase.Reeling ? Vector3.Lerp(cast.Landing, bank, Mathf.Clamp01(reelCatch) * 0.6f) : cast.Landing;
             at = drawn + Vector3.up * (bob + under);
         }
 

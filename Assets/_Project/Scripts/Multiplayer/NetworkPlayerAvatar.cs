@@ -7,8 +7,9 @@ using UnityEngine.SceneManagement;
 /// <summary>
 /// One per player in a co-op session (the Network Player prefab, spawned by Netcode for each connection). On its owner's
 /// machine it watches the local <see cref="Player"/> and tells the others how they look (<see cref="PlayerLookState"/>,
-/// a network variable) and where they are and what they are doing (<see cref="PoseSnapshot"/>s, a few each second,
-/// unreliable). Everywhere else it draws them as a <see cref="RemotePlayerBody"/>, a little in the past so movement is
+/// a network variable), where they are and what they are doing (<see cref="PoseSnapshot"/>s, a few each second,
+/// unreliable) and their fishing line when one is out (<see cref="FishingLineState"/>, a network variable, so friends see
+/// the float: <see cref="RemoteFishing"/>). Everywhere else it draws them as a <see cref="RemotePlayerBody"/>, a little in the past so movement is
 /// smooth, and only while they are in the same place as you.
 /// <para>
 /// The player you control stays the ordinary single-player <see cref="Player"/>, run entirely on your machine: co-op adds
@@ -25,6 +26,9 @@ public sealed class NetworkPlayerAvatar : NetworkBehaviour
     private readonly NetworkVariable<PlayerLookState> look =
         new NetworkVariable<PlayerLookState>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
+    private readonly NetworkVariable<FishingLineState> fishing =
+        new NetworkVariable<FishingLineState>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+
     private readonly PoseBuffer poses = new PoseBuffer();
     private MultiplayerSettings settings;
     private RemotePlayerBody body;
@@ -37,6 +41,10 @@ public sealed class NetworkPlayerAvatar : NetworkBehaviour
     private float nextPose;
     private float nextLookCheck;
     private bool announced;
+    private RemoteFishing remoteFishing;
+    // The owner's last cast, and the server time it left the rod (worked out once per cast, so clock drift doesn't resend it).
+    private float castLandsAt = float.NaN;
+    private double castAt;
 
     /// <summary>Every player in the session, you included.</summary>
     public static IReadOnlyList<NetworkPlayerAvatar> All => all;
@@ -80,6 +88,8 @@ public sealed class NetworkPlayerAvatar : NetworkBehaviour
         }
 
         poses.Clear();
+        remoteFishing?.Destroy();
+        remoteFishing = null;
         if (body != null)
         {
             Destroy(body.gameObject);
@@ -118,6 +128,7 @@ public sealed class NetworkPlayerAvatar : NetworkBehaviour
             PublishLook();
         }
 
+        PublishFishing();
         if (player == null || Time.unscaledTime < nextPose)
         {
             return;
@@ -150,6 +161,29 @@ public sealed class NetworkPlayerAvatar : NetworkBehaviour
         }
     }
 
+    // Sent when the line goes out, changes phase or reels in a step; nothing while it waits in the water.
+    private void PublishFishing()
+    {
+        PlayerFishing rod = PlayerFishing.Current;
+        FishingLineState now = default;
+        if (rod != null && rod.LineOut)
+        {
+            FishingCast cast = rod.LastCast;
+            if (cast.LandsAt != castLandsAt)
+            {
+                castLandsAt = cast.LandsAt;
+                castAt = FishingLineState.CastTime(cast.LandsAt, NetworkManager.ServerTime.Time, Time.time);
+            }
+
+            now = FishingLineState.Of(rod.State, cast, rod.ReelCatch, castAt);
+        }
+
+        if (!now.Equals(fishing.Value))
+        {
+            fishing.Value = now;
+        }
+    }
+
     [Rpc(SendTo.NotOwner, Delivery = RpcDelivery.Unreliable)]
     private void PoseRpc(PoseSnapshot pose)
     {
@@ -168,6 +202,7 @@ public sealed class NetworkPlayerAvatar : NetworkBehaviour
                 body.gameObject.SetActive(false);
             }
 
+            remoteFishing?.Hide();
             return;
         }
 
@@ -209,6 +244,9 @@ public sealed class NetworkPlayerAvatar : NetworkBehaviour
             body.Place(position, yaw);
             body.Mirror.Apply(animation, settings.AnimationBlend);
         }
+
+        remoteFishing ??= new RemoteFishing(body.transform);
+        remoteFishing.Show(fishing.Value, NetworkManager.ServerTime.Time, Time.time, Time.deltaTime);
     }
 
     private void OnLookChanged(PlayerLookState before, PlayerLookState now)

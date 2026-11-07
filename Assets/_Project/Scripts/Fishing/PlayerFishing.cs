@@ -40,6 +40,15 @@ public sealed class PlayerFishing : MonoBehaviour
     public ReelSession Reel { get; private set; }
     public FishingSettings.Fish Hooked => hooked;
     public Transform Bobber => look?.Bobber;
+
+    /// <summary>True while a line is in the water: cast, bitten or being reeled in.</summary>
+    public bool LineOut => State == Phase.Waiting || State == Phase.Bite || State == Phase.Reeling;
+
+    /// <summary>Where the last line was cast (co-op tells friends, so they see the float).</summary>
+    public FishingCast LastCast => cast;
+
+    /// <summary>How far the catch is reeled in, 0 to 1; 0 when not reeling.</summary>
+    public float ReelCatch => Reel != null ? Reel.Catch : 0f;
     public WeaponDefinition Rod => combat != null && combat.Weapon != null && combat.Weapon.IsFishingRod ? combat.Weapon : null;
 
     /// <summary>0..1 while swinging back for a cast.</summary>
@@ -369,7 +378,7 @@ public sealed class PlayerFishing : MonoBehaviour
 
     private void HideLine() => look.Hide();
 
-    private void AnimateBobber() => look.Tick(cast, State, Reel);
+    private void AnimateBobber() => look.Tick(cast, State, ReelCatch);
 
     private void OnDestroy() => look?.Destroy();
 
