@@ -39,6 +39,10 @@ public sealed class RaidDirector : MonoBehaviour
     /// <summary>The raid running in the loaded scene, or null outside raids.</summary>
     public static RaidDirector Current { get; private set; }
 
+    /// <summary>Set while another game makes this raid's creatures (co-op, on the host's run): none are made here, and
+    /// what this player wakes is asked of that game. Null when this game makes its own.</summary>
+    public static IRaidCreatureSource RemoteCreatures { get; set; }
+
     public RaidSession Session { get; private set; }
     public RaidParameters Parameters => Session.Parameters;
     public GameObject Player => player;
@@ -155,7 +159,8 @@ public sealed class RaidDirector : MonoBehaviour
         StrengthenEnemies(true);
         BringCompanion();
         var pieceRandom = new System.Random(RaidLayout.SeedFor(Session.Seed, "Set Piece Guards"));
-        foreach (RaidSetPieceSite site in FindObjectsByType<RaidSetPieceSite>(FindObjectsInactive.Exclude))
+        // Following the host (co-op), their game brings the guards from the same seed.
+        foreach (RaidSetPieceSite site in RemoteCreatures == null ? FindObjectsByType<RaidSetPieceSite>(FindObjectsInactive.Exclude) : System.Array.Empty<RaidSetPieceSite>())
         {
             site.BringGuards(this, pieceRandom);
         }
@@ -324,13 +329,21 @@ public sealed class RaidDirector : MonoBehaviour
     /// <summary>
     /// Fills a waiting spawn group now (an extraction alarm, a scripted event) with this raid's seed and rules: its
     /// creatures get the raid's and the current stage's strength, and hunt the player if the group says so. Returns how
-    /// many were spawned; 0 when the group had already spawned or the scene has no RaidGenerator.
+    /// many were spawned; 0 when the group had already spawned or the scene has no RaidGenerator. Co-op, on the host's
+    /// run, the host's game fills it (<see cref="RemoteCreatures"/>), after this player; the least it rolls is returned.
+    /// <paramref name="prey"/>: whom a hunting group goes for (a friend's body in the host's game); the player by default.
     /// </summary>
-    public int Wake(SpawnGroup group)
+    public int Wake(SpawnGroup group, IDamageable prey = null)
     {
         if (group == null || group.HasSpawned || generator == null || Session.IsOver)
         {
             return 0;
+        }
+
+        if (RemoteCreatures != null)
+        {
+            group.MarkSpawned();
+            return RemoteCreatures.Wake(group) ? Mathf.Max(1, group.MinCount) : 0;
         }
 
         // A group filled by a raid spawn list fills the whole list, possibly onto other groups' points too.
@@ -346,7 +359,7 @@ public sealed class RaidDirector : MonoBehaviour
             if (root != null)
             {
                 count++;
-                PrepareSpawned(root, group.HuntPlayer);
+                PrepareSpawned(root, group.HuntPlayer, true, prey);
             }
         }
 
@@ -378,7 +391,8 @@ public sealed class RaidDirector : MonoBehaviour
     /// strength at full health, and when <paramref name="huntPlayer"/> is set sends them straight at the player.
     /// </summary>
     /// <param name="mayBeElite">Off for what a creature summons: a swarm of elites would be no fun, and no reward.</param>
-    public void PrepareSpawned(GameObject root, bool huntPlayer, bool mayBeElite = true)
+    /// <param name="prey">Whom they hunt instead of the player (co-op: a friend's body, for what the friend woke).</param>
+    public void PrepareSpawned(GameObject root, bool huntPlayer, bool mayBeElite = true, IDamageable prey = null)
     {
         if (root == null)
         {
@@ -398,7 +412,8 @@ public sealed class RaidDirector : MonoBehaviour
             RaidElites.RollHunter(Session, root, HealthMultiplier, PowerMultiplier);
         }
 
-        if (!huntPlayer || playerHealth == null)
+        IDamageable hunted = prey is UnityEngine.Object body && body != null ? prey : playerHealth;
+        if (!huntPlayer || hunted == null)
         {
             return;
         }
@@ -407,7 +422,7 @@ public sealed class RaidDirector : MonoBehaviour
         {
             ai.PlayerOnly = true;
             ai.Relentless = true;
-            ai.Engage(playerHealth);
+            ai.Engage(hunted);
         }
     }
 

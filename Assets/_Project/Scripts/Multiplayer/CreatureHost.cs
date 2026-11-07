@@ -62,6 +62,7 @@ public sealed class CreatureHost
     private int nextId;
     private int ticks;
     private int friendsOnRun;
+    private ContentDatabase content;
 
     public CreatureHost(float healthPerFriend)
     {
@@ -73,6 +74,8 @@ public sealed class CreatureHost
         link = session;
         Forget();
         link.On(CoopCreatures.HitMessage, OnHit);
+        link.On(CoopCreatures.WakeMessage, OnWake);
+        link.On(CoopCreatures.CallMessage, OnCall);
         Damageable.AnyDied += OnAnyDied;
         Damageable.AnyDamaged += OnAnyDamaged;
     }
@@ -432,6 +435,76 @@ public sealed class CreatureHost
         {
             hosted.HitByHost = true;
         }
+    }
+
+    /// <summary>Metres from a friend's body within which they may ask for creatures (an event, a beacon: where they stand).</summary>
+    private const float CallReach = 60f;
+
+    // A friend lit an extraction beacon on this run: its alarm group is filled here and hunts them.
+    private void OnWake(ulong sender, FastBufferReader reader)
+    {
+        reader.ReadValueSafe(out string path);
+        FriendHitbox friend = FriendOnThisRun(sender);
+        RaidDirector director = RaidDirector.Current;
+        RaidGenerator generator = director != null ? director.GetComponentInChildren<RaidGenerator>() : null;
+        if (generator == null)
+        {
+            generator = Object.FindAnyObjectByType<RaidGenerator>();
+        }
+
+        SpawnGroup group = generator != null ? generator.FindGroup(path) : null;
+        if (friend == null || group == null || (group.transform.position - friend.transform.position).sqrMagnitude > CallReach * CallReach * 4f)
+        {
+            return;
+        }
+
+        director.Wake(group, friend);
+    }
+
+    // An event a friend set off made creatures: made here, by prefab id, and sent after them if they hunt.
+    private void OnCall(ulong sender, FastBufferReader reader)
+    {
+        reader.ReadValueSafe(out string prefabId);
+        reader.ReadValueSafe(out Vector3 position);
+        reader.ReadValueSafe(out float yaw);
+        reader.ReadValueSafe(out bool hunt);
+        FriendHitbox friend = FriendOnThisRun(sender);
+        RaidDirector director = RaidDirector.Current;
+        if (friend == null || director == null || (position - friend.transform.position).sqrMagnitude > CallReach * CallReach)
+        {
+            return;
+        }
+
+        if (content == null)
+        {
+            content = Resources.Load<ContentDatabase>(ContentDatabase.ResourceName);
+        }
+
+        SaveableEntity prefab = content != null ? content.FindPrefab(prefabId) : null;
+        if (prefab == null)
+        {
+            Debug.LogWarning($"Co-op: no creature prefab '{prefabId}' for what a friend's event called.");
+            return;
+        }
+
+        GameObject made = Object.Instantiate(prefab.gameObject, position, Quaternion.Euler(0f, yaw, 0f));
+        director.PrepareSpawned(made, hunt, true, friend);
+    }
+
+    // The body in this game of a friend on the host's run, or null (gone, elsewhere, or down for good).
+    private static FriendHitbox FriendOnThisRun(ulong clientId)
+    {
+        FixedString128Bytes place = CoopPlace.Key;
+        foreach (NetworkPlayerAvatar avatar in NetworkPlayerAvatar.All)
+        {
+            if (avatar != null && avatar.OwnerClientId == clientId && avatar.Look.Place.Equals(place) && avatar.Body != null
+                && avatar.Body.TryGetComponent(out FriendHitbox hitbox) && hitbox.IsAlive)
+            {
+                return hitbox;
+            }
+        }
+
+        return null;
     }
 
     // A friend's blow on one of the host's creatures: applied here, and the creature turns on them.

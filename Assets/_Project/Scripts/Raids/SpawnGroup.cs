@@ -140,10 +140,17 @@ public sealed class SpawnGroup : MonoBehaviour
     /// Places a prefab at one of this group's points with the group's scatter and facing, and keeps it as spawned here.
     /// Consumes the random state as Spawn does for one pick.
     /// </summary>
+    /// <summary>Places one copy of <paramref name="prefab"/> at <paramref name="point"/>, scattered and turned by
+    /// <paramref name="random"/>. Null, after the same rolls, for a creature while another game makes them (co-op).</summary>
     public GameObject PlaceAt(Transform point, GameObject prefab, System.Random random)
     {
         Vector2 offset = InsideCircle(random) * scatterRadius;
         float yaw = (float)random.NextDouble() * 360f;
+        if (RaidDirector.RemoteCreatures != null && prefab.GetComponentInChildren<MonsterAI>(true) != null)
+        {
+            return null;
+        }
+
         Vector3 position = Place(point.position, offset);
         Quaternion rotation = randomFacing ? Quaternion.Euler(0f, yaw, 0f) : point.rotation;
         GameObject copy = Instantiate(prefab, position, rotation, transform);

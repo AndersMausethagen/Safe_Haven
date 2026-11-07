@@ -15,6 +15,7 @@ public sealed class PauseTests
         GamePause.Release(ownerA);
         GamePause.Release(ownerB);
         GamePause.FreezesTime = true;
+        GamePause.TimeIsShared = false;
         Time.timeScale = 1f;
         foreach (Func<bool> handler in registered)
         {
@@ -69,6 +70,30 @@ public sealed class PauseTests
         Assert.IsTrue(GamePause.IsPaused);
         Assert.IsFalse(GamePause.IsTimeFrozen);
         Assert.AreEqual(1f, Time.timeScale);
+    }
+
+    [Test]
+    public void HitStopLeavesSharedTimeAlone()
+    {
+        Assume.That(GameOptions.HitStop.On, "the player's options have hit-stop off");
+        // Not initialised: that would subscribe to game-wide events, and edit mode never calls OnDestroy to let go.
+        var feedback = new GameObject("feedback").AddComponent<CombatFeedback>();
+        try
+        {
+            // Hosting friends in co-op: the world they fight in runs on this game's time.
+            GamePause.TimeIsShared = true;
+            feedback.SlowTime(0.05f, 1f);
+            Assert.AreEqual(1f, Time.timeScale);
+            Assert.IsFalse(feedback.IsHitStopped);
+
+            GamePause.TimeIsShared = false;
+            feedback.SlowTime(0.05f, 1f);
+            Assert.AreEqual(0.05f, Time.timeScale, 1e-4f, "alone, a strong hit still stops time");
+        }
+        finally
+        {
+            UnityEngine.Object.DestroyImmediate(feedback.gameObject);
+        }
     }
 
     [Test]

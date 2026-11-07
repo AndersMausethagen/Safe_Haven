@@ -236,7 +236,11 @@ public sealed class RaidGenerator : MonoBehaviour, ISceneSetup
         IReadOnlyList<SpawnTable.Entry> entries = GameSession.ActiveRaid != null ? list.EntriesFor(GameSession.ActiveRaid.Tier) : list.entries;
         foreach ((int index, GameObject prefab) in SpawnGroup.Plan(random, list.CountFor(Rules), transforms, list.separation, entries))
         {
-            placed.Add(points[index].group.PlaceAt(points[index].point, prefab, random));
+            GameObject made = points[index].group.PlaceAt(points[index].point, prefab, random);
+            if (made != null)
+            {
+                placed.Add(made);
+            }
         }
 
         foreach (SpawnGroup group in lists[list])
@@ -343,7 +347,23 @@ public sealed class RaidGenerator : MonoBehaviour, ISceneSetup
     }
 
     // The group's place in the hierarchy names it for its seed, so renaming or moving a group reshuffles only that one.
-    private static string PathOf(Transform target)
+    /// <summary>A spawn group of this raid by its place in the hierarchy (<see cref="PathOf"/>, the same in every game
+    /// on one run), or null.</summary>
+    public SpawnGroup FindGroup(string path)
+    {
+        foreach (SpawnGroup group in FindObjectsByType<SpawnGroup>(FindObjectsInactive.Exclude))
+        {
+            if (group.gameObject.scene == gameObject.scene && PathOf(group.transform) == path)
+            {
+                return group;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>Where <paramref name="target"/> sits in the hierarchy: seeds its group's rolls, and names it between games.</summary>
+    public static string PathOf(Transform target)
     {
         string path = target.name;
         for (Transform parent = target.parent; parent != null; parent = parent.parent)

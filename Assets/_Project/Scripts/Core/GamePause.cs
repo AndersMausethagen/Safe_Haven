@@ -35,6 +35,10 @@ public static class GamePause
         }
     }
 
+    /// <summary>True while other players' games depend on this game's time (hosting friends in co-op: its creatures are
+    /// theirs too). Nothing may slow time then, as hit-stop would stall the world they fight in.</summary>
+    public static bool TimeIsShared { get; set; }
+
     /// <summary>Raised when the game becomes paused (true) or unpaused (false).</summary>
     public static event Action<bool> Changed;
 
@@ -72,6 +76,7 @@ public static class GamePause
         requests.Clear();
         Changed = null;
         freezesTime = true;
+        TimeIsShared = false;
         Time.timeScale = 1f;
     }
 }

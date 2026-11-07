@@ -88,7 +88,8 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
     /// keep the slowest and the longest.</summary>
     public void SlowTime(float scale, float seconds)
     {
-        if (seconds <= 0f || !GameOptions.HitStop.On)
+        // Hosting friends in co-op, time is theirs too (GamePause.TimeIsShared): the camera shake carries the blow alone.
+        if (seconds <= 0f || !GameOptions.HitStop.On || GamePause.TimeIsShared)
         {
             return;
         }

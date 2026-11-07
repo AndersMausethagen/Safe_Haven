@@ -73,14 +73,26 @@ public static class SafeHavenDialogs
 '@
 }
 
+# Unity's own progress windows come and go by themselves; anything else is worth a look.
+$passing = 'Hold on|Reloading Domain|Running managed callbacks|Compiling|Importing|Refresh|Unity Version Control|Loading|Saving|Building|Progress'
+
 function Answer-Dialogs {
     $ids = New-Object 'System.Collections.Generic.HashSet[uint32]'
     foreach ($p in Get-Process Unity -ErrorAction SilentlyContinue) { [void]$ids.Add([uint32]$p.Id) }
-    foreach ($line in [SafeHavenDialogs]::Answer($ids)) { Write-Output "[RunTests] $line" }
+    foreach ($line in [SafeHavenDialogs]::Answer($ids)) {
+        if ($line -notmatch "other Editor dialog open: .*($passing)") { Write-Output "[RunTests] $line" }
+    }
 }
 
-# 1. A dialog left by an earlier run blocks the CLI: answer it first.
+# 1. A dialog left by an earlier run blocks the CLI: answer it first. Then wait out a recompile or domain reload.
 Answer-Dialogs
+$deadline = (Get-Date).AddSeconds(180)
+while ((Get-Date) -lt $deadline) {
+    $status = & $unity status 2>&1 | Out-String
+    if ($status -match '\bready\b') { break }
+    Answer-Dialogs
+    Start-Sleep -Seconds 2
+}
 Start-Sleep -Milliseconds 500
 
 # 2. Save dirty scenes so the runner has nothing to ask about.

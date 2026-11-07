@@ -7,10 +7,11 @@ using UnityEngine.SceneManagement;
 /// <summary>
 /// A friend's side of raid creatures in co-op (<see cref="CoopCreatures"/>): on the host's run this game makes no
 /// creatures of its own (<see cref="FromHost"/>) and shows the host's as puppets (<see cref="MonsterAI.MakeRemote"/>):
-/// built from what the host says, moved, struck with and killed by its word, and this player's blows sent to it. If the
-/// host leaves the run first, the puppets become this game's own creatures. Plain C#.
+/// built from what the host says, moved, struck with and killed by its word, and this player's blows sent to it. What
+/// this player wakes (an extraction alarm, an event's creatures) is asked of the host (<see cref="IRaidCreatureSource"/>).
+/// If the host leaves the run first, the puppets become this game's own creatures. Plain C#.
 /// </summary>
-public sealed class CreaturePuppets
+public sealed class CreaturePuppets : IRaidCreatureSource
 {
     /// <summary>Seconds a friend waits, once the host has left the run, before the creatures become their own.</summary>
     private const float HostGoneSeconds = 2f;
@@ -66,7 +67,21 @@ public sealed class CreaturePuppets
     public void FollowHost()
     {
         following = true;
-        FromHost = GameSession.ActiveRaid != null;
+        SetFromHost(GameSession.ActiveRaid != null);
+    }
+
+    // The host's game makes the raid's creatures: none here (MonsterAI, spawn groups, events ask the raid's source).
+    private void SetFromHost(bool fromHost)
+    {
+        FromHost = fromHost;
+        if (fromHost)
+        {
+            RaidDirector.RemoteCreatures = this;
+        }
+        else if (RaidDirector.RemoteCreatures == this)
+        {
+            RaidDirector.RemoteCreatures = null;
+        }
     }
 
     /// <summary>Ten times a second.</summary>
@@ -81,7 +96,7 @@ public sealed class CreaturePuppets
             hostGoneSince = -1f;
         }
 
-        FromHost = following && GameSession.ActiveRaid != null;
+        SetFromHost(following && GameSession.ActiveRaid != null);
         if (GameSession.ActiveRaid == null)
         {
             following = false;
@@ -148,7 +163,7 @@ public sealed class CreaturePuppets
         byId.Clear();
         byCreature.Clear();
         following = false;
-        FromHost = false;
+        SetFromHost(false);
         if (hadAny && !quiet)
         {
             GameMessages.Post($"{HavenVisit.HostName} has left the raid. You're on your own out here.", MessageKind.Warning);
@@ -318,6 +333,39 @@ public sealed class CreaturePuppets
         }
     }
 
+    /// <summary>An extraction beacon's alarm (a waiting spawn group) this player woke: the host's game fills it.</summary>
+    public bool Wake(SpawnGroup group)
+    {
+        if (link == null || group == null)
+        {
+            return false;
+        }
+
+        string path = RaidGenerator.PathOf(group.transform);
+        using var writer = CoopLink.Writer(16 + path.Length * 2);
+        writer.WriteValueSafe(path);
+        link.ToHost(CoopCreatures.WakeMessage, writer);
+        return true;
+    }
+
+    /// <summary>A creature an event made for this player: the host's game makes it, by prefab id.</summary>
+    public void Spawn(GameObject prefab, Vector3 position, float yaw, bool hunt)
+    {
+        string prefabId = prefab != null && prefab.TryGetComponent(out SaveableEntity entity) ? entity.PrefabId : null;
+        if (link == null || string.IsNullOrEmpty(prefabId))
+        {
+            Debug.LogWarning($"Co-op: '{(prefab != null ? prefab.name : "nothing")}' has no prefab id, so the host's game can't make it for this player.");
+            return;
+        }
+
+        using var writer = CoopLink.Writer(32 + prefabId.Length * 2);
+        writer.WriteValueSafe(prefabId);
+        writer.WriteValueSafe(position);
+        writer.WriteValueSafe(yaw);
+        writer.WriteValueSafe(hunt);
+        link.ToHost(CoopCreatures.CallMessage, writer);
+    }
+
     // A blow this player landed on one of the host's creatures goes to the host.
     private void OnAnyDamaged(Damageable victim, DamageInfo damage, DamageResult result)
     {
@@ -342,5 +390,9 @@ public sealed class CreaturePuppets
 
     // Entering Play doesn't reload scripts in this project: statics carry over from the last session unless cleared.
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    private static void ResetForNewPlaySession() => FromHost = false;
+    private static void ResetForNewPlaySession()
+    {
+        FromHost = false;
+        RaidDirector.RemoteCreatures = null;
+    }
 }

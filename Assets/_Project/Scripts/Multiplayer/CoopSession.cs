@@ -335,6 +335,8 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
     {
         // Watching friends after a fall goes on (and ends) whatever the session does.
         CoopSpectate.Update();
+        // Hosting friends, this game's time runs the creatures they fight: no hit-stop may slow it.
+        GamePause.TimeIsShared = state == CoopState.Hosting && NetworkPlayerAvatar.All.Count > 1;
         if (network == null || (state != CoopState.Hosting && state != CoopState.Joined))
         {
             return;

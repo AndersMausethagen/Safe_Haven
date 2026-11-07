@@ -278,6 +278,63 @@ public sealed class RaidGenerationTests
     }
 
     // A group of points in a row along x, spacing metres apart, filling exactly min to max.
+    [Test]
+    public void SpawnGroup_FriendOnTheHostsRunMakesNoCreaturesButRollsAlike()
+    {
+        // Co-op: the host's game makes the raid's creatures; a friend's game rolls the same layout and places the rest.
+        var wolf = Track(new GameObject("Wolf"));
+        wolf.AddComponent<MonsterAI>();
+        var crate = Track(new GameObject("Crate"));
+        SpawnTable mixed = Track(ScriptableObject.CreateInstance<SpawnTable>());
+        mixed.SetEntries(new[]
+        {
+            new SpawnTable.Entry { prefab = wolf, weight = 1f },
+            new SpawnTable.Entry { prefab = crate, weight = 1f },
+        });
+        SpawnGroup host = Group(mixed, 8, 8, Vector3.zero, 5f);
+        SpawnGroup friend = Group(mixed, 8, 8, Vector3.zero, 5f);
+        var hostRandom = new System.Random(9);
+        var friendRandom = new System.Random(9);
+        host.Spawn(hostRandom, SpawnRules.Default);
+        RaidDirector.RemoteCreatures = new CreaturesElsewhere();
+        try
+        {
+            friend.Spawn(friendRandom, SpawnRules.Default);
+        }
+        finally
+        {
+            RaidDirector.RemoteCreatures = null;
+        }
+
+        var hostCrates = new List<Vector3>();
+        int wolves = 0;
+        foreach (GameObject made in host.Spawned)
+        {
+            if (made.name == "Wolf") wolves++;
+            else hostCrates.Add(made.transform.position);
+        }
+
+        var friendCrates = new List<Vector3>();
+        foreach (GameObject made in friend.Spawned)
+        {
+            Assert.AreEqual("Crate", made.name, "no creature is made in the friend's game");
+            friendCrates.Add(made.transform.position);
+        }
+
+        Assert.Greater(wolves, 0, "the host's game made some");
+        CollectionAssert.AreEqual(hostCrates, friendCrates, "the rest lies where it does in the host's game");
+        Assert.AreEqual(hostRandom.Next(), friendRandom.Next(), "both games rolled alike");
+    }
+
+    private sealed class CreaturesElsewhere : IRaidCreatureSource
+    {
+        public bool Wake(SpawnGroup group) => true;
+
+        public void Spawn(GameObject prefab, Vector3 position, float yaw, bool hunt)
+        {
+        }
+    }
+
     private SpawnGroup Group(SpawnTable table, int min, int max, Vector3 origin, float spacing)
     {
         var root = Track(new GameObject("Group"));

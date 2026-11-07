@@ -58,7 +58,7 @@ public sealed class RoamingSpawner : MonoBehaviour
     {
         RoamingSpawnSettings settings = Settings;
         // Co-op: following the host, their game sends the creatures.
-        if (settings == null || !settings.Enabled || !director.IsRunning || director.Player == null || Time.time < nextThink || CoopCreatures.FromHost)
+        if (settings == null || !settings.Enabled || !director.IsRunning || director.Player == null || Time.time < nextThink || RaidDirector.RemoteCreatures != null)
         {
             return;
         }
