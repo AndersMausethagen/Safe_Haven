@@ -284,6 +284,7 @@ public sealed class Transport : MonoBehaviour, ISaveable
         var content = Resources.Load<ContentDatabase>(ContentDatabase.ResourceName);
         if (saved.slots != null && content != null)
         {
+            Cargo.Clear();
             SaveMapper.ReadSlots(saved.slots, Cargo, content, new List<string>());
         }
     }

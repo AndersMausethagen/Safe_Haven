@@ -31,6 +31,9 @@ public sealed class SaveableEntity : MonoBehaviour
     [Tooltip("The state of every ISaveable component here: health, regrowth timers and the like.")]
     [SerializeField] private bool saveComponents = true;
 
+    /// <summary>Metres a walking creature may differ between friends' games before it is put where the host has it.</summary>
+    private const float WalkerDrift = 3f;
+
     private static readonly List<SaveableEntity> live = new List<SaveableEntity>();
     private static string pendingSpawnId;
 
@@ -41,6 +44,7 @@ public sealed class SaveableEntity : MonoBehaviour
     private bool spawned;
     private bool destroyed;
     private bool started;
+    private bool walks;
 
     /// <summary>Every saveable object currently loaded, active or not.</summary>
     public static IReadOnlyList<SaveableEntity> Live => live;
@@ -48,11 +52,22 @@ public sealed class SaveableEntity : MonoBehaviour
     public string Id => id;
     public string PrefabId => prefabId;
     public bool IsPersistent => state != null;
+    /// <summary>True once its components hold their remembered state (after Start).</summary>
+    public bool HasStarted => started;
+    /// <summary>True for objects created while playing (placed buildings, dropped items), recreated from their prefab.</summary>
+    public bool IsSpawned => spawned;
+    /// <summary>True once it is gone for good (died, picked up, taken down), even before Unity has removed it.</summary>
+    public bool IsGone => destroyed;
+
+    /// <summary>Raised when play creates a saveable object (a building placed, an item dropped), not when a load recreates one.</summary>
+    public static event Action<SaveableEntity> Created;
 
     /// <summary>Creates a saveable object while playing so it is saved and recreated later, such as a building the player places.</summary>
     public static SaveableEntity Spawn(SaveableEntity prefab, Vector3 position, Quaternion rotation)
     {
-        return Spawn(prefab, null, position, rotation, null);
+        SaveableEntity copy = Spawn(prefab, null, position, rotation, null);
+        Created?.Invoke(copy);
+        return copy;
     }
 
     /// <param name="sceneAnchor">An object in the scene the copy belongs to; the copy starts as its child so it wakes up in that scene.</param>
@@ -108,6 +123,7 @@ public sealed class SaveableEntity : MonoBehaviour
         live.Add(this);
         saveables = GetComponents<ISaveable>();
         damageable = GetComponent<Damageable>();
+        walks = TryGetComponent(out NavMeshAgent _);
         owner = PersistentScene.For(gameObject.scene);
         if (owner == null || owner.State == null || string.IsNullOrEmpty(id))
         {
@@ -244,6 +260,126 @@ public sealed class SaveableEntity : MonoBehaviour
                 {
                     Debug.LogException(exception, this);
                 }
+            }
+        }
+    }
+
+    // ----- Co-op: a friend's copy of the Haven kept in step (HavenSync) -----
+
+    /// <summary>
+    /// A number that changes when something a friend would see changes here: gone, switched off, moved (when
+    /// <paramref name="withMovement"/>, or for objects placed while playing), or a shared component's state.
+    /// </summary>
+    public int SharedMark(bool withMovement)
+    {
+        unchecked
+        {
+            int mark = destroyed ? 7 : gameObject.activeSelf ? 1 : 2;
+            if ((saveTransform && withMovement) || spawned)
+            {
+                // Things that walk by themselves (a wolf about the Haven) walk in each game too: only where they roam to counts.
+                float perMetre = walks ? 1f / WalkerDrift : 10f;
+                Vector3 at = transform.position;
+                mark = mark * 31 + Mathf.RoundToInt(at.x * perMetre);
+                mark = mark * 31 + Mathf.RoundToInt(at.y * perMetre);
+                mark = mark * 31 + Mathf.RoundToInt(at.z * perMetre);
+                mark = mark * 31 + (walks ? 0 : Mathf.RoundToInt(transform.eulerAngles.y * 0.5f));
+            }
+
+            if (saveComponents && started)
+            {
+                foreach (ISaveable saveable in saveables)
+                {
+                    if (saveable is ISharedState shared)
+                    {
+                        mark = mark * 31 + (shared.IsShared ? shared.SharedMark : 0);
+                    }
+                    else
+                    {
+                        mark = mark * 31 + (saveable.CaptureState()?.GetHashCode() ?? 0);
+                    }
+                }
+            }
+
+            return mark;
+        }
+    }
+
+    /// <summary>False for a component kept to each player (the explored map, the clock): it is never sent or overwritten.</summary>
+    public bool IsSharedKey(string key)
+    {
+        foreach (ISaveable saveable in saveables)
+        {
+            if (saveable.SaveKey == key)
+            {
+                return !(saveable is ISharedState shared) || shared.IsShared;
+            }
+        }
+
+        return true;
+    }
+
+    /// <summary>Records the object's state as it is now and returns it (null outside a persistent scene).</summary>
+    public EntityState CaptureNow()
+    {
+        Capture();
+        return state != null && state.Entities.TryGetValue(id, out EntityState entity) ? entity : null;
+    }
+
+    /// <summary>
+    /// Takes on a friend's state for this object while it is loaded: goes, moves, switches on or off, and restores each
+    /// shared component whose state differs. The scene's remembered state has already been updated.
+    /// </summary>
+    public void ApplyShared(EntityState incoming)
+    {
+        if (incoming == null || destroyed)
+        {
+            return;
+        }
+
+        if (incoming.Destroyed)
+        {
+            destroyed = true;
+            gameObject.SetActive(false);
+            Destroy(gameObject);
+            return;
+        }
+
+        float apart = (transform.position - incoming.Position).magnitude;
+        if ((saveTransform || spawned) && incoming.HasTransform
+            && (walks ? apart > WalkerDrift : apart > 0.05f || Quaternion.Angle(transform.rotation, incoming.Rotation) > 1f))
+        {
+            MoveTo(incoming.Position, incoming.Rotation);
+        }
+
+        if (saveActiveState && gameObject.activeSelf != incoming.Active)
+        {
+            gameObject.SetActive(incoming.Active);
+        }
+
+        // Not started yet: Start restores from the scene's state, which already holds this.
+        if (!saveComponents || !started)
+        {
+            return;
+        }
+
+        foreach (ISaveable saveable in saveables)
+        {
+            if ((saveable is ISharedState shared && !shared.IsShared) || !incoming.Components.TryGetValue(saveable.SaveKey, out string component))
+            {
+                continue;
+            }
+
+            try
+            {
+                if (saveable.CaptureState() != component)
+                {
+                    saveable.RestoreState(component);
+                }
+            }
+            catch (Exception exception)
+            {
+                Debug.LogException(exception, this);
             }
         }
     }

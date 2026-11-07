@@ -8,7 +8,7 @@ using UnityEngine;
 /// Other systems react through events (damage numbers, health bars, audio, loot) without this component knowing them.
 /// </summary>
 [RequireComponent(typeof(Combatant))]
-public sealed class Damageable : MonoBehaviour, IDamageable, ISaveable
+public sealed class Damageable : MonoBehaviour, IDamageable, ISaveable, ISharedState
 {
     [Serializable]
     private struct SavedHealth
@@ -42,6 +42,10 @@ public sealed class Damageable : MonoBehaviour, IDamageable, ISaveable
     /// <summary>True when dying removes the object (enemies, buildings), so a save should remember it as gone.</summary>
     public bool DestroysOnDeath => destroyOnDeath;
     public string SaveKey => "health";
+
+    bool ISharedState.IsShared => true;
+
+    int ISharedState.SharedMark => Mathf.CeilToInt(currentHealth);
 
     /// <summary>Raised after every hit that lands, with the hit and what it did.</summary>
     public event Action<DamageInfo, DamageResult> Damaged;

@@ -2,6 +2,7 @@
 #define STEAM_ON
 #endif
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Unity.Collections;
@@ -46,6 +47,7 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
     private const string WorldMessage = "SafeHaven.World";
     private const string WorldRequest = "SafeHaven.WorldPlease";
     private const string ClockMessage = "SafeHaven.Clock";
+    private const string EntitiesMessage = "SafeHaven.Entities";
     private const float ClockInterval = 5f;
 
     private MultiplayerSettings settings;
@@ -60,6 +62,10 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
     private readonly WorldTransfer.Receiver worldPieces = new WorldTransfer.Receiver();
     private int transfers;
     private float nextClock;
+    private float nextSync;
+    private HavenSync sync;
+    private readonly VisitorAccess access = new VisitorAccess();
+    private readonly List<ulong> recipients = new List<ulong>();
 
     public static CoopSession Current { get; private set; }
 
@@ -77,11 +83,15 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
 
     public event Action<CoopState> StateChanged;
 
+    /// <summary>Friends' questions to the host (building, the stash) and the answers.</summary>
+    public VisitorAccess Access => access;
+
     public void Initialise(MultiplayerSettings multiplayer, SteamPlatform platform)
     {
         settings = multiplayer;
         steam = platform;
         Current = this;
+        sync = new HavenSync();
         NetworkPlayerAvatar.FriendArrived += OnFriendArrived;
         NetworkPlayerAvatar.FriendLeft += OnFriendLeft;
         if (steam != null && steam.IsReady)
@@ -151,6 +161,8 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
 
         // Friends ask for the Haven once they are fully connected (sent any earlier, it could arrive before they listen).
         network.CustomMessagingManager.RegisterNamedMessageHandler(WorldRequest, (sender, _) => SendWorld(sender));
+        network.CustomMessagingManager.RegisterNamedMessageHandler(EntitiesMessage, OnEntitiesFromGuest);
+        access.StartHosting(network);
         SetState(CoopState.Hosting);
         if (viaSteam)
         {
@@ -358,6 +370,8 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
         // Guests hear the host's world and clock.
         network.CustomMessagingManager.RegisterNamedMessageHandler(WorldMessage, OnWorldPiece);
         network.CustomMessagingManager.RegisterNamedMessageHandler(ClockMessage, OnClock);
+        network.CustomMessagingManager.RegisterNamedMessageHandler(EntitiesMessage, OnEntitiesFromHost);
+        access.StartGuest(network);
         SetState(CoopState.Joining);
         return true;
     }
@@ -528,10 +542,126 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
         Leave(false);
     }
 
-    // The host's time of day, every few seconds while at home: a visit shares the hour.
     private void Update()
     {
-        if (!IsHost || network == null || network.ConnectedClientsIds.Count < 2 || Time.unscaledTime < nextClock)
+        if (network == null || (state != CoopState.Hosting && state != CoopState.Joined))
+        {
+            return;
+        }
+
+        if (Time.unscaledTime >= nextSync)
+        {
+            nextSync = Time.unscaledTime + HavenSync.Interval;
+            ShareChanges();
+            access.Tick(IsHost);
+        }
+
+        if (IsHost)
+        {
+            ShareClock();
+        }
+    }
+
+    // ---- Keeping the Haven in step (HavenSync)
+
+    // The host shares what changed in its Haven with every guest; a visiting guest shares what changed in their copy.
+    private void ShareChanges()
+    {
+        if (IsHost)
+        {
+            if (Guests(NetworkManager.ServerClientId).Count == 0)
+            {
+                return;
+            }
+
+            foreach (byte[] packet in sync.Collect(true))
+            {
+                SendPacket(EntitiesMessage, packet, Guests(NetworkManager.ServerClientId));
+            }
+        }
+        else if (HavenVisit.IsVisiting)
+        {
+            foreach (byte[] packet in sync.Collect(false))
+            {
+                SendPacket(EntitiesMessage, packet, ToHost());
+            }
+        }
+    }
+
+    // A guest's change: taken on here, and passed to the other guests.
+    private void OnEntitiesFromGuest(ulong sender, FastBufferReader reader)
+    {
+        reader.ReadValueSafe(out byte[] packet);
+        try
+        {
+            sync.Apply(packet, true);
+        }
+        catch (Exception exception)
+        {
+            Debug.LogException(exception);
+            return;
+        }
+
+        SendPacket(EntitiesMessage, packet, Guests(sender));
+    }
+
+    private void OnEntitiesFromHost(ulong sender, FastBufferReader reader)
+    {
+        reader.ReadValueSafe(out byte[] packet);
+        if (!HavenVisit.IsVisiting)
+        {
+            return;
+        }
+
+        try
+        {
+            sync.Apply(packet, false);
+        }
+        catch (Exception exception)
+        {
+            Debug.LogException(exception);
+        }
+    }
+
+    // Sent in order with the world itself (same channel), so no change can arrive before the Haven it belongs to.
+    private void SendPacket(string message, byte[] packet, IReadOnlyList<ulong> to)
+    {
+        if (to.Count == 0)
+        {
+            return;
+        }
+
+        using var writer = new FastBufferWriter(packet.Length + 16, Allocator.Temp);
+        writer.WriteValueSafe(packet);
+        network.CustomMessagingManager.SendNamedMessage(message, to, writer, NetworkDelivery.ReliableFragmentedSequenced);
+    }
+
+    // Every guest but one (the sender of what is passed on, or nobody: the host's own id).
+    private IReadOnlyList<ulong> Guests(ulong except)
+    {
+        recipients.Clear();
+        foreach (ulong client in network.ConnectedClientsIds)
+        {
+            if (client != NetworkManager.ServerClientId && client != except)
+            {
+                recipients.Add(client);
+            }
+        }
+
+        return recipients;
+    }
+
+    private IReadOnlyList<ulong> ToHost()
+    {
+        recipients.Clear();
+        recipients.Add(NetworkManager.ServerClientId);
+        return recipients;
+    }
+
+    // The host's time of day, every few seconds while at home: a visit shares the hour.
+    private void ShareClock()
+    {
+        if (network.ConnectedClientsIds.Count < 2 || Time.unscaledTime < nextClock)
         {
             return;
         }
@@ -562,6 +692,12 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
 
     private void OnClientDisconnected(ulong clientId)
     {
+        if (network != null && network.IsServer && clientId != network.LocalClientId)
+        {
+            access.Forget(clientId);
+            return;
+        }
+
         // Only our own connection ending ends our session (the host sees friends leave through their avatars).
         if (network == null || network.IsServer || (clientId != network.LocalClientId && state != CoopState.Joining))
         {
@@ -598,6 +734,16 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
         }
 
         state = next;
+        if (state == CoopState.Offline || state == CoopState.Hosting || state == CoopState.Joining)
+        {
+            sync?.Reset();
+        }
+
+        if (state == CoopState.Offline)
+        {
+            access.Reset();
+        }
+
         // Online, the Escape menu still opens but the world keeps running.
         GamePause.FreezesTime = state == CoopState.Offline;
         StateChanged?.Invoke(state);
@@ -607,6 +753,7 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
     {
         NetworkPlayerAvatar.FriendArrived -= OnFriendArrived;
         NetworkPlayerAvatar.FriendLeft -= OnFriendLeft;
+        sync?.Dispose();
         DropLobby();
         if (Current == this)
         {

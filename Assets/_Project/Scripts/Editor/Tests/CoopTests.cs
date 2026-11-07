@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using NUnit.Framework;
 using Unity.Netcode;
 using UnityEditor;
@@ -245,5 +245,103 @@ public sealed class CoopTests
         {
             Object.DestroyImmediate(holder);
         }
+    }
+
+    [Test]
+    public void TheStash_IsTheHosts_AndAGuestSendsOnlyWhatTheyPutInOrTook()
+    {
+        var content = Resources.Load<ContentDatabase>(ContentDatabase.ResourceName);
+        ItemDefinition material = null;
+        foreach (ItemDefinition item in content.Items)
+        {
+            if (item != null && item.Category == ItemCategory.Material && item.MaximumStack >= 10)
+            {
+                material = item;
+                break;
+            }
+        }
+
+        Assert.IsNotNull(material);
+        var host = new StashStorage();
+        host.Items.Add(material, 10);
+        var guestStash = new StashStorage();
+        var guest = new StashShare();
+
+        Assert.IsTrue(guest.TakeSnapshot(StashShare.SnapshotOf(host, 0), guestStash, content));
+        Assert.AreEqual(10, guestStash.Items.Count(material));
+        Assert.IsNull(guest.CollectChange(guestStash), "Nothing done, nothing sent.");
+
+        guestStash.Items.Remove(material, 4);
+        StashShare.Change change = guest.CollectChange(guestStash);
+        Assert.AreEqual(1, change.number);
+        Assert.AreEqual(1, change.items.Count);
+        Assert.AreEqual(-4, change.items[0].count);
+
+        // Meanwhile the host's workshop made 3 more: the guest's change doesn't overwrite them.
+        host.Items.Add(material, 3);
+        StashShare.ApplyChange(change, host, content);
+        Assert.AreEqual(9, host.Items.Count(material));
+
+        Assert.IsFalse(guest.TakeSnapshot(StashShare.SnapshotOf(host, 0), guestStash, content),
+            "A stash from before the guest's change would show what they took for a moment, and let them take it twice.");
+        Assert.AreEqual(6, guestStash.Items.Count(material));
+        Assert.IsTrue(guest.TakeSnapshot(StashShare.SnapshotOf(host, 1), guestStash, content));
+        Assert.AreEqual(9, guestStash.Items.Count(material));
+    }
+
+    [Test]
+    public void TheHostsStash_IsSent_OnlyWhenItChanged()
+    {
+        var content = Resources.Load<ContentDatabase>(ContentDatabase.ResourceName);
+        ItemDefinition material = null;
+        foreach (ItemDefinition item in content.Items)
+        {
+            if (item != null && item.Category == ItemCategory.Material)
+            {
+                material = item;
+                break;
+            }
+        }
+
+        var host = new StashStorage();
+        var share = new StashShare();
+        Assert.IsTrue(share.HostStashChanged(host), "The first look sends it.");
+        Assert.IsFalse(share.HostStashChanged(host));
+        host.Items.Add(material, 1);
+        Assert.IsTrue(share.HostStashChanged(host));
+        Assert.IsFalse(share.HostStashChanged(host));
+    }
+
+    [Test]
+    public void AChangedObject_IsSent_WithoutWhatEachPlayerKeeps_AndDoesntWipeWhatItDoesntMention()
+    {
+        var entity = new EntityState("node-1") { PrefabId = "p", Active = true };
+        entity.Components["node"] = "{\"depleted\":true}";
+        entity.Components["exploration"] = "mine";
+
+        EntitySaveData sent = SaveMapper.ToData(entity, key => key != "exploration");
+        Assert.AreEqual(1, sent.components.Count);
+        Assert.AreEqual("node", sent.components[0].key);
+
+        var theirs = new EntityState("node-1");
+        theirs.Components["exploration"] = "theirs";
+        SaveMapper.ReadInto(sent, theirs);
+        Assert.AreEqual("{\"depleted\":true}", theirs.Components["node"]);
+        Assert.AreEqual("theirs", theirs.Components["exploration"], "Each player's own state stays theirs.");
+
+        sent.destroyed = true;
+        SaveMapper.ReadInto(sent, theirs);
+        Assert.IsTrue(theirs.Destroyed);
+        Assert.AreEqual(0, theirs.Components.Count);
+    }
+
+    [Test]
+    public void SavedComponents_SayHowTheyAreShared()
+    {
+        Assert.IsTrue(typeof(ISharedState).IsAssignableFrom(typeof(ExplorationMap)));
+        Assert.IsTrue(typeof(ISharedState).IsAssignableFrom(typeof(DayNightCycle)));
+        Assert.IsTrue(typeof(ISharedState).IsAssignableFrom(typeof(StoryScript)));
+        Assert.IsTrue(typeof(ISharedState).IsAssignableFrom(typeof(ResourceNode)), "Nodes leave their regrowth countdown out of the comparison.");
+        Assert.IsTrue(typeof(ISharedState).IsAssignableFrom(typeof(TerrainTreeMemory)), "Felled trees leave their countdowns out too.");
     }
 }

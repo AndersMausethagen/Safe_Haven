@@ -13,7 +13,7 @@ using UnityEngine.Rendering;
 /// </para></summary>
 [ExecuteAlways]
 [DisallowMultipleComponent]
-public sealed class DayNightCycle : MonoBehaviour, ISaveable
+public sealed class DayNightCycle : MonoBehaviour, ISaveable, ISharedState
 {
     // Identifies this run of the game, so a restore can tell "away on a raid" (same run: time passed) from "loaded from
     // disk" (another run: no way to know how long it was).
@@ -123,6 +123,11 @@ public sealed class DayNightCycle : MonoBehaviour, ISaveable
     public bool IsNight => State.IsMoon;
 
     public string SaveKey => "clock";
+
+    // Each player's own in co-op.
+    bool ISharedState.IsShared => false;
+
+    int ISharedState.SharedMark => 0;
 
     public string CaptureState() =>
         string.Join("|", (fadeElapsed >= 0f ? fadeTo : hour).ToString("R", CultureInfo.InvariantCulture), Run,

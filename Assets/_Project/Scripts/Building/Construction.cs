@@ -19,7 +19,7 @@ using UnityEngine;
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(BuildingObject))]
-public sealed class Construction : MonoBehaviour, ISaveable, IStationMenuExtension
+public sealed class Construction : MonoBehaviour, ISaveable, ISharedState, IStationMenuExtension
 {
     private const string Dressing = "Dressing Level ";
     private const string TierPart = "Tier ";
@@ -63,6 +63,10 @@ public sealed class Construction : MonoBehaviour, ISaveable, IStationMenuExtensi
     public float Share => WorkNeeded > 0f ? Mathf.Clamp01(Work / WorkNeeded) : 1f;
 
     public string SaveKey => "construction";
+
+    bool ISharedState.IsShared => true;
+
+    int ISharedState.SharedMark => unchecked(((Level * 31 + Target) * 31 + Mathf.FloorToInt(Work)) * 2 + (Paid ? 1 : 0));
 
     /// <summary>The name with its level's title: "Sturdy Sawbench".</summary>
     public string Title => Level >= 2 && Definition.UpgradeTo(Level) != null ? $"{Definition.UpgradeTo(Level).title} {Definition.DisplayName}" : Definition.DisplayName;

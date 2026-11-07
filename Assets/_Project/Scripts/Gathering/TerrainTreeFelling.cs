@@ -68,6 +68,43 @@ public sealed class TerrainTreeFelling : MonoBehaviour
         return list;
     }
 
+    /// <summary>A number that changes when a tree falls or grows back (co-op compares it, not the countdowns).</summary>
+    public int FelledMark
+    {
+        get
+        {
+            unchecked
+            {
+                int mark = felled.Count;
+                foreach (int index in felled.Keys)
+                {
+                    mark += (index + 1) * -1640531535;
+                }
+
+                return mark;
+            }
+        }
+    }
+
+    /// <summary>Stands every felled tree back up except those listed: they grew back, or were never felled, in a friend's Haven.</summary>
+    public void RegrowAllBut(ICollection<int> stayDown)
+    {
+        scratch.Clear();
+        foreach (int index in felled.Keys)
+        {
+            if (!stayDown.Contains(index))
+            {
+                scratch.Add(index);
+            }
+        }
+
+        foreach (int index in scratch)
+        {
+            terrain.terrainData.SetTreeInstance(index, felled[index].tree);
+            felled.Remove(index);
+        }
+    }
+
     /// <summary>Lays a tree down again as it was saved (no falling copy): it stays down for the seconds left.</summary>
     public void RestoreFelled(int index, float secondsLeft)
     {

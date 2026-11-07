@@ -17,7 +17,7 @@ using UnityEngine;
 /// </summary>
 [DisallowMultipleComponent]
 [AddComponentMenu("Safe Haven/Quests/Story Script")]
-public sealed class StoryScript : MonoBehaviour, ISaveable
+public sealed class StoryScript : MonoBehaviour, ISaveable, ISharedState
 {
     [SerializeReference] private List<StoryNode> nodes = new List<StoryNode>();
     [SerializeField] private List<StoryLink> links = new List<StoryLink>();
@@ -39,6 +39,11 @@ public sealed class StoryScript : MonoBehaviour, ISaveable
     public event Action<StoryNode> NodeStarted;
 
     public string SaveKey => "story";
+
+    // Each player's own in co-op.
+    bool ISharedState.IsShared => false;
+
+    int ISharedState.SharedMark => 0;
 
     // ----- Editing (the graph window) -----
 

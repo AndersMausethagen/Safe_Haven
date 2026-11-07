@@ -8,7 +8,7 @@ using UnityEngine;
 /// adds both. Felled trees are kept by their index on the terrain, so regenerating the woods starts them all standing again.
 /// </summary>
 [RequireComponent(typeof(Terrain))]
-public sealed class TerrainTreeMemory : MonoBehaviour, ISaveable
+public sealed class TerrainTreeMemory : MonoBehaviour, ISaveable, ISharedState
 {
     [Serializable]
     private sealed class State
@@ -21,6 +21,10 @@ public sealed class TerrainTreeMemory : MonoBehaviour, ISaveable
     private const float Forever = -1f;
 
     public string SaveKey => "felledTrees";
+
+    bool ISharedState.IsShared => true;
+
+    int ISharedState.SharedMark => TryGetComponent(out TerrainTreeFelling felling) ? felling.FelledMark : 0;
 
     public string CaptureState()
     {
@@ -56,6 +60,8 @@ public sealed class TerrainTreeMemory : MonoBehaviour, ISaveable
         }
 
         TerrainTreeFelling felling = TerrainTreeFelling.On(terrain);
+        // Restored again in a friend's Haven (co-op): trees no longer down stand back up.
+        felling.RegrowAllBut(state.indices);
         for (int i = 0; i < state.indices.Count && i < state.secondsLeft.Count; i++)
         {
             felling.RestoreFelled(state.indices[i], state.secondsLeft[i] < 0f ? float.PositiveInfinity : state.secondsLeft[i]);

@@ -55,6 +55,13 @@ public sealed class PersistentScene : MonoBehaviour
         active.Remove(this);
     }
 
+    /// <summary>Recreates one object spawned in a friend's copy of this scene (co-op), from its remembered state. Null when it can't be.</summary>
+    public SaveableEntity Recreate(EntityState entity)
+    {
+        SaveableEntity prefab = content != null && entity != null && entity.Spawned && !entity.Destroyed ? content.FindPrefab(entity.PrefabId) : null;
+        return prefab != null ? SaveableEntity.Spawn(prefab, entity.Id, entity.Position, entity.Rotation, transform) : null;
+    }
+
     private void RecreateSpawned()
     {
         foreach (EntityState entity in new List<EntityState>(State.Entities.Values))

@@ -388,17 +388,7 @@ public static class SaveMapper
             var sceneData = new SceneSaveData { scene = scene.Scene };
             foreach (EntityState entity in scene.Entities.Values)
             {
-                var entityData = new EntitySaveData
-                {
-                    id = entity.Id, prefab = entity.PrefabId, spawned = entity.Spawned, destroyed = entity.Destroyed, active = entity.Active,
-                    hasTransform = entity.HasTransform, position = entity.Position, rotation = entity.Rotation,
-                };
-                foreach (KeyValuePair<string, string> component in entity.Components)
-                {
-                    entityData.components.Add(new ComponentSaveData { key = component.Key, state = component.Value });
-                }
-
-                sceneData.entities.Add(entityData);
+                sceneData.entities.Add(ToData(entity));
             }
 
             into.Add(sceneData);
@@ -428,25 +418,55 @@ public static class SaveMapper
                     continue;
                 }
 
-                EntityState entity = scene.GetOrAdd(entityData.id);
-                entity.PrefabId = entityData.prefab;
-                entity.Spawned = entityData.spawned;
-                entity.Destroyed = entityData.destroyed;
-                entity.Active = entityData.active;
-                entity.HasTransform = entityData.hasTransform;
-                entity.Position = entityData.position;
-                entity.Rotation = entityData.rotation;
-                foreach (ComponentSaveData component in entityData.components)
-                {
-                    if (!string.IsNullOrEmpty(component?.key))
-                    {
-                        entity.Components[component.key] = component.state;
-                    }
-                }
+                ReadInto(entityData, scene.GetOrAdd(entityData.id));
             }
         }
 
         return world;
+    }
+
+    /// <summary>One remembered object as save data; <paramref name="include"/> picks its components (all when null).</summary>
+    public static EntitySaveData ToData(EntityState entity, Func<string, bool> include = null)
+    {
+        var data = new EntitySaveData
+        {
+            id = entity.Id, prefab = entity.PrefabId, spawned = entity.Spawned, destroyed = entity.Destroyed, active = entity.Active,
+            hasTransform = entity.HasTransform, position = entity.Position, rotation = entity.Rotation,
+        };
+        foreach (KeyValuePair<string, string> component in entity.Components)
+        {
+            if (include == null || include(component.Key))
+            {
+                data.components.Add(new ComponentSaveData { key = component.Key, state = component.Value });
+            }
+        }
+
+        return data;
+    }
+
+    /// <summary>Copies saved data into a remembered object. Components it doesn't mention keep their state.</summary>
+    public static void ReadInto(EntitySaveData data, EntityState entity)
+    {
+        entity.PrefabId = data.prefab;
+        entity.Spawned = data.spawned;
+        entity.Destroyed = data.destroyed;
+        entity.Active = data.active;
+        entity.HasTransform = data.hasTransform;
+        entity.Position = data.position;
+        entity.Rotation = data.rotation;
+        if (data.destroyed)
+        {
+            entity.Components.Clear();
+            return;
+        }
+
+        foreach (ComponentSaveData component in data.components)
+        {
+            if (!string.IsNullOrEmpty(component?.key))
+            {
+                entity.Components[component.key] = component.state;
+            }
+        }
     }
 
     private static List<int> ToSaved(List<CompanionMemory> memories) => memories.ConvertAll(memory => (int)memory);

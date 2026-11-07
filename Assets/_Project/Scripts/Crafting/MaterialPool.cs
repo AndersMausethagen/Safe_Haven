@@ -37,7 +37,8 @@ public sealed class MaterialPool
     {
         ResourceInventory resources = player != null ? player.GetComponent<ResourceInventory>() : null;
         ItemInventory items = player != null ? player.GetComponent<ItemInventory>() : null;
-        bool atHome = RaidDirector.Current == null;
+        // In a friend's Haven (co-op) only what you carry counts: their stash and carts are theirs.
+        bool atHome = RaidDirector.Current == null && !HavenVisit.IsVisiting;
         return new MaterialPool(
             resources != null ? resources.Storage : null,
             items != null ? items.Container : null,

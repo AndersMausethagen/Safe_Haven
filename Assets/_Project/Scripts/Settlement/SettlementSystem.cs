@@ -42,6 +42,12 @@ public sealed class SettlementSystem : MonoBehaviour, IGameSystem
 
     private void Update()
     {
+        // A friend's Haven runs in their game; this copy only shows it (co-op).
+        if (HavenVisit.IsVisiting)
+        {
+            return;
+        }
+
         SettlementState settlement = GameSession.Settlement;
         settlement.Workshops.Tick(Time.deltaTime, GameSession.Stash.Resources, OnCrafted);
         if (Time.unscaledTime >= nextWorkerLook)

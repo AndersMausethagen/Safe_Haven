@@ -12,8 +12,10 @@ using UnityEngine.SceneManagement;
 /// world is never touched and the host's world is never written.</item>
 /// <item><see cref="End"/>: back to their own Haven, with whatever their character gained.</item>
 /// </list>
-/// Until the host's game hears about changes to its world, guests don't change it: no building, no stash, no raids, no
-/// ward breaches (<see cref="Refusal"/>). Gathering, crafting with your own things, fighting and talking are fine.
+/// While visiting, both games keep the Haven in step (<see cref="HavenSync"/>): what a guest gathers, fells, drops or
+/// builds shows in the host's Haven and the other way round. Gathering, crafting with your own things, fighting and
+/// talking are free; building and the stash need the host's yes (<see cref="VisitorAccess"/>: <see cref="MayBuild"/>,
+/// <see cref="MayUseStash"/>). Raids, ward breaches and loading wait for later phases (<see cref="Refusal"/>).
 /// </summary>
 public static class HavenVisit
 {
@@ -29,7 +31,18 @@ public static class HavenVisit
     /// <summary>The host's name, while visiting.</summary>
     public static string HostName { get; private set; } = string.Empty;
 
-    /// <summary>Why a guest can't do this in a friend's Haven (building, the stash, raids, breaches).</summary>
+    /// <summary>True while visiting with the host's yes to building.</summary>
+    public static bool MayBuild { get; private set; }
+
+    /// <summary>True while visiting with the host's yes to the stash (it may still be on its way: <see cref="MayUseStash"/>).</summary>
+    public static bool StashAllowed { get; private set; }
+
+    /// <summary>True while visiting with the host's yes to the stash, and the host's stash has arrived.</summary>
+    public static bool MayUseStash => StashAllowed && stashHere;
+
+    private static bool stashHere;
+
+    /// <summary>Why a guest can't do this in a friend's Haven (raids, breaches, loading).</summary>
     public static string Refusal => $"This is {HostPossessive} Haven. That will come with a later update to co-op.";
 
     private static string HostPossessive => string.IsNullOrEmpty(HostName) ? "your friend's" : HostName + "'s";
@@ -155,12 +168,32 @@ public static class HavenVisit
         }
     }
 
+    /// <summary>The host's answer about building or the stash.</summary>
+    public static void Allow(VisitorRight right, bool yes)
+    {
+        if (right == VisitorRight.Build)
+        {
+            MayBuild = yes;
+        }
+        else if (right == VisitorRight.Stash)
+        {
+            StashAllowed = yes;
+            stashHere &= yes;
+        }
+    }
+
+    /// <summary>The host's stash has arrived: it can be opened.</summary>
+    public static void StashArrived() => stashHere = StashAllowed;
+
     /// <summary>Drops the visit without travelling (the game is going to the main menu, say).</summary>
     public static void Forget()
     {
         IsVisiting = false;
         HostName = string.Empty;
         home = null;
+        MayBuild = false;
+        StashAllowed = false;
+        stashHere = false;
     }
 
     /// <summary>True when the active scene is a home that remembers itself (not a raid): where a host can be visited beside.</summary>

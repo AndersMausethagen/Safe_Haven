@@ -6,7 +6,7 @@ using UnityEngine.UI;
 using TMPro;
 
 /// <summary>
-/// The Escape menu: Continue, Save, Saved Games, Journal, Co-op (open this game to friends and invite them, close it, or leave a friend's), Options and Quit Game. It is the only listener for the Escape key. A press
+/// The Escape menu: Continue, Save, Saved Games, Journal, Co-op (open this game to friends and invite them, answer what friends ask, close it, or leave a friend's), Options and Quit Game. It is the only listener for the Escape key. A press
 /// first goes to <see cref="BackHandlers"/> (cancel building placement, close open windows, stop an interaction), and
 /// the menu opens only when nothing used it. While open it holds a <see cref="GamePause"/> request, which freezes time
 /// in single-player and blocks player input.
@@ -35,6 +35,9 @@ public sealed class PauseMenu : MonoBehaviour
     private TMP_Text coopLabel;
     private Button coopLeaveButton;
     private TMP_Text coopLeaveLabel;
+    private Button askButton;
+    private TMP_Text askLabel;
+    private VisitorAccess hookedAccess;
     [SerializeField] private Button quitButton;
     [Tooltip("Explains why Save or Load is unavailable, and reports how they went.")]
     [SerializeField] private TMP_Text statusLabel;
@@ -77,6 +80,7 @@ public sealed class PauseMenu : MonoBehaviour
         optionsButton.onClick.AddListener(ShowOptions);
         AddJournalButton();
         AddCoopButton();
+        HookAsks(CoopSession.Current != null ? CoopSession.Current.Access : null);
         quitButton.onClick.AddListener(AskQuit);
         confirmPrimaryButton.onClick.AddListener(OnConfirmPrimary);
         confirmSecondaryButton.onClick.AddListener(OnConfirmSecondary);
@@ -88,6 +92,7 @@ public sealed class PauseMenu : MonoBehaviour
     {
         // Never leave the game paused by a menu that is gone (for example when its scene unloads).
         GamePause.Release(this);
+        HookAsks(null);
         if (!bound)
         {
             return;
@@ -204,7 +209,49 @@ public sealed class PauseMenu : MonoBehaviour
         }
 
         coopButton = MenuButton("Coop Button", OnCoop, out coopLabel);
+        askButton = MenuButton("Coop Ask Button", ShowAsk, out askLabel);
         coopLeaveButton = MenuButton("Coop Leave Button", LeaveCoop, out coopLeaveLabel);
+    }
+
+    private void HookAsks(VisitorAccess access)
+    {
+        if (hookedAccess != null)
+        {
+            hookedAccess.AsksChanged -= Refresh;
+        }
+
+        hookedAccess = access;
+        if (hookedAccess != null)
+        {
+            hookedAccess.AsksChanged += Refresh;
+        }
+    }
+
+    // A friend's question (to build, to use the stash), on the confirm page; answered one at a time, oldest first.
+    private void ShowAsk()
+    {
+        VisitorAccess access = CoopSession.Current != null ? CoopSession.Current.Access : null;
+        if (access == null || access.Asks.Count == 0)
+        {
+            ShowMain();
+            return;
+        }
+
+        FriendAsk ask = access.Asks[0];
+        string detail = ask.Right == VisitorRight.Build
+            ? "They build with their own materials, and can also move, upgrade or take down what stands here."
+            : "They can put things in and take things out.";
+        Confirm($"{ask.Question}\n{detail} The answer holds while they stay.", "Allow", () => AnswerAsk(ask, true), "Refuse", () => AnswerAsk(ask, false));
+    }
+
+    private void AnswerAsk(FriendAsk ask, bool yes)
+    {
+        if (CoopSession.Current != null)
+        {
+            CoopSession.Current.Access.Answer(ask, yes);
+        }
+
+        ShowAsk();
     }
 
     private Button MenuButton(string buttonName, UnityEngine.Events.UnityAction action, out TMP_Text label)
@@ -272,6 +319,10 @@ public sealed class PauseMenu : MonoBehaviour
         coopButton.gameObject.SetActive(!coop.IsActive || invite);
         coopButton.interactable = canChange || invite;
         coopLabel.text = invite ? "Invite Friends" : "Open to Friends";
+        int asks = coop.IsHost ? coop.Access.Asks.Count : 0;
+        askButton.gameObject.SetActive(asks > 0);
+        askButton.interactable = !leaving;
+        askLabel.text = asks == 1 ? "A Friend Asks" : $"Friends Ask ({asks})";
         coopLeaveButton.gameObject.SetActive(coop.IsActive);
         coopLeaveButton.interactable = !leaving;
         coopLeaveLabel.text = coop.IsHost ? "Close to Friends" : "Leave Session";

@@ -281,6 +281,7 @@ public sealed class DroppedItem : MonoBehaviour, ISaveable, IInteractionName, II
         var content = Resources.Load<ContentDatabase>(ContentDatabase.ResourceName);
         if (saved.slots != null && content != null)
         {
+            Held.Clear();
             SaveMapper.ReadSlots(saved.slots, Held, content, new List<string>());
         }
 

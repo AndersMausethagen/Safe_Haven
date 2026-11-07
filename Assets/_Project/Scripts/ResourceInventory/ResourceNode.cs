@@ -11,7 +11,7 @@ using UnityEngine;
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Interactable), typeof(ResourceSource))]
-public sealed class ResourceNode : MonoBehaviour, IInteractionCondition, ISaveable, IInteractionName
+public sealed class ResourceNode : MonoBehaviour, IInteractionCondition, ISaveable, ISharedState, IInteractionName
 {
     [System.Serializable]
     private struct SavedNode
@@ -53,6 +53,11 @@ public sealed class ResourceNode : MonoBehaviour, IInteractionCondition, ISaveab
 
     public string SaveKey => "node";
 
+    bool ISharedState.IsShared => true;
+
+    // Gathered or not; the regrowth countdown is left out.
+    int ISharedState.SharedMark => IsDepleted ? 1 : 0;
+
     // The regrowth time is saved as time left, since the game clock starts over after loading.
     public string CaptureState()
     {
@@ -66,6 +71,11 @@ public sealed class ResourceNode : MonoBehaviour, IInteractionCondition, ISaveab
         {
             respawnAt = Time.time + saved.respawnRemaining;
             SetPresent(false);
+        }
+        else if (IsDepleted)
+        {
+            // Grown back in a friend's Haven (co-op).
+            SetPresent(true);
         }
     }
 

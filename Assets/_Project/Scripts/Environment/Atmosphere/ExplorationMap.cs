@@ -8,7 +8,7 @@ using UnityEngine;
 /// map is turned and rolled anew. One per scene.
 /// </summary>
 [DisallowMultipleComponent]
-public sealed class ExplorationMap : MonoBehaviour, ISaveable
+public sealed class ExplorationMap : MonoBehaviour, ISaveable, ISharedState
 {
     [Tooltip("Metres per cell. Smaller is sharper and costs more memory.")]
     [SerializeField, Min(0.25f)] private float cellSize = 1f;
@@ -39,6 +39,11 @@ public sealed class ExplorationMap : MonoBehaviour, ISaveable
     public ExplorationGrid Grid => grid;
     public Texture2D Texture => texture;
     public string SaveKey => "exploration";
+
+    // Each player's own in co-op.
+    bool ISharedState.IsShared => false;
+
+    int ISharedState.SharedMark => 0;
 
     /// <summary>Lifts the fog of war around a place the player hasn't been (a beacon, a rumour).</summary>
     public void RevealAround(Vector3 position, float radius)

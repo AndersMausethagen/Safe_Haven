@@ -16,9 +16,14 @@ public static class WorldTransfer
     /// <summary>Bytes of world per message, below the transports' payload limits with room for the header.</summary>
     public const int PieceSize = 4000;
 
-    public static byte[] Pack(SaveData world)
+    public static byte[] Pack(SaveData world) => Pack((object)world);
+
+    public static SaveData Unpack(byte[] packed) => Unpack<SaveData>(packed);
+
+    /// <summary>Any [Serializable] message as gzipped JSON (the world, a batch of changed objects, the stash).</summary>
+    public static byte[] Pack(object message)
     {
-        byte[] json = Encoding.UTF8.GetBytes(JsonUtility.ToJson(world));
+        byte[] json = Encoding.UTF8.GetBytes(JsonUtility.ToJson(message));
         using var packed = new MemoryStream();
         using (var zip = new GZipStream(packed, System.IO.Compression.CompressionLevel.Optimal, true))
         {
@@ -28,13 +33,13 @@ public static class WorldTransfer
         return packed.ToArray();
     }
 
-    public static SaveData Unpack(byte[] packed)
+    public static T Unpack<T>(byte[] packed)
     {
         using var source = new MemoryStream(packed);
         using var zip = new GZipStream(source, CompressionMode.Decompress);
         using var json = new MemoryStream();
         zip.CopyTo(json);
-        return JsonUtility.FromJson<SaveData>(Encoding.UTF8.GetString(json.ToArray()));
+        return JsonUtility.FromJson<T>(Encoding.UTF8.GetString(json.ToArray()));
     }
 
     /// <summary>The packed world in pieces of at most <see cref="PieceSize"/> bytes, in order.</summary>

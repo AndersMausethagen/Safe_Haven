@@ -133,10 +133,14 @@ public sealed class BuildPlacer : MonoBehaviour
             return;
         }
 
-        // A friend's Haven: a guest's building would only stand in their copy of it.
-        if (HavenVisit.IsVisiting)
+        // A friend's Haven: building there takes their yes (what is built then reaches them through HavenSync).
+        if (HavenVisit.IsVisiting && !HavenVisit.MayBuild)
         {
-            GameMessages.Post(HavenVisit.Refusal, MessageKind.Warning);
+            if (CoopSession.Current != null)
+            {
+                CoopSession.Current.Access.Ask(VisitorRight.Build);
+            }
+
             return;
         }
 
