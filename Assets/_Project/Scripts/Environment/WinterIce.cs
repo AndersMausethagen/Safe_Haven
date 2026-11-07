@@ -45,6 +45,8 @@ public sealed class WinterIce : MonoBehaviour
         Mathf.MoveTowards(amount, cold ? 1f : 0f, deltaTime / Mathf.Max(formSeconds, 1e-3f));
 
     private float nextScan;
+    private Player swimmer;
+    private PlayerSwimming swimming;
 
     private void Start()
     {
@@ -82,8 +84,13 @@ public sealed class WinterIce : MonoBehaviour
 
         WeatherSystem weather = WeatherSystem.Active;
         bool cold = weather != null && weather.Snowing && weather.Snow >= freezeFromSnow;
+        // Looked up once per player, not every frame.
         Player player = Player.Current;
-        PlayerSwimming swimming = player != null ? player.GetComponent<PlayerSwimming>() : null;
+        if (player != swimmer)
+        {
+            swimmer = player;
+            swimming = player != null ? player.GetComponent<PlayerSwimming>() : null;
+        }
         foreach (Frozen frozen in waters)
         {
             if (frozen.Water == null)
