@@ -435,6 +435,12 @@ public sealed class RaidDirector : MonoBehaviour
     {
         if (Session.End(RaidOutcome.Died))
         {
+            // Co-op: friends still standing on the run are watched first; the raid ends for this player afterwards.
+            if (CoopSpectate.TryBegin(Finish))
+            {
+                return;
+            }
+
             Finish();
         }
     }

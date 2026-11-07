@@ -56,6 +56,18 @@ public sealed class RemotePlayerBody : MonoBehaviour
         Hold(look.Held.ToString(), content);
     }
 
+    /// <summary>"Astrid · Down!" in red over a friend who is down; their plain name otherwise.</summary>
+    public void ShowState(string name, bool down, bool fallen)
+    {
+        UIStyle style = UIStyle.Current;
+        string shown = down ? $"{name} · Down!" : fallen ? $"{name} · Fallen" : name;
+        if (nameTag.text != shown)
+        {
+            nameTag.text = shown;
+            nameTag.color = down || fallen ? style.Danger : style.Text;
+        }
+    }
+
     public void Place(Vector3 position, float yaw)
     {
         transform.SetPositionAndRotation(position, Quaternion.Euler(0f, yaw, 0f));

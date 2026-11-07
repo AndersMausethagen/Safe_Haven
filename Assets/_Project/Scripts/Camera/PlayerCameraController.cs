@@ -87,6 +87,15 @@ public sealed class PlayerCameraController : MonoBehaviour
     /// roaring on the ridge), until EndFocus. The player keeps control.</summary>
     public void BeginFocus(Transform target) => focusTarget = target;
 
+    /// <summary>Co-op, fallen on a raid: the view follows <paramref name="other"/> (a friend) instead of the player; null goes back.</summary>
+    public void Watch(Transform other)
+    {
+        playerTarget = playerTarget != null ? playerTarget : target;
+        target = other != null ? other : playerTarget;
+    }
+
+    private Transform playerTarget;
+
     public void EndFocus(Transform target)
     {
         if (focusTarget == target) focusTarget = null;

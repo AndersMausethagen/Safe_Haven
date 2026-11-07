@@ -48,6 +48,7 @@ public sealed class VisitorAccess
     private readonly HashSet<VisitorRight> waiting = new HashSet<VisitorRight>();
     private readonly StashShare stash = new StashShare();
     private readonly List<ulong> stashUsers = new List<ulong>();
+    private readonly HashSet<ulong> closingStash = new HashSet<ulong>();
     private NetworkManager network;
 
     /// <summary>Questions waiting for the host's answer, oldest first.</summary>
@@ -78,6 +79,7 @@ public sealed class VisitorAccess
         asks.Clear();
         allowed.Clear();
         stashApplied.Clear();
+        closingStash.Clear();
         waiting.Clear();
         stash.Reset();
         if (hadAsks)
@@ -91,6 +93,7 @@ public sealed class VisitorAccess
     {
         allowed.Remove(clientId);
         stashApplied.Remove(clientId);
+        closingStash.Remove(clientId);
         if (asks.RemoveAll(ask => ask.ClientId == clientId) > 0)
         {
             AsksChanged?.Invoke();
@@ -230,6 +233,11 @@ public sealed class VisitorAccess
     {
         foreach (KeyValuePair<ulong, HashSet<VisitorRight>> pair in allowed)
         {
+            if (pair.Value.Contains(VisitorRight.Stash))
+            {
+                closingStash.Add(pair.Key);
+            }
+
             foreach (VisitorRight right in pair.Value)
             {
                 if (network != null && IsConnected(pair.Key))
@@ -316,7 +324,9 @@ public sealed class VisitorAccess
     private void OnStashChange(ulong sender, FastBufferReader reader)
     {
         reader.ReadValueSafe(out byte[] packed);
-        if (!allowed.TryGetValue(sender, out HashSet<VisitorRight> rights) || !rights.Contains(VisitorRight.Stash))
+        bool using_ = allowed.TryGetValue(sender, out HashSet<VisitorRight> rights) && rights.Contains(VisitorRight.Stash);
+        bool closing = !using_ && closingStash.Remove(sender);
+        if (!using_ && !closing)
         {
             return;
         }

@@ -13,6 +13,7 @@ public sealed class FriendRevive : MonoBehaviour, IInteractionVerb
 
     private ulong clientId;
     private Interactable interactable;
+    private float seconds;
 
     public string Verb => "Help up";
 
@@ -26,6 +27,7 @@ public sealed class FriendRevive : MonoBehaviour, IInteractionVerb
         FriendRevive revive = spot.AddComponent<FriendRevive>();
         revive.clientId = clientId;
         revive.interactable = interactable;
+        revive.seconds = seconds;
         return revive;
     }
 
@@ -43,9 +45,32 @@ public sealed class FriendRevive : MonoBehaviour, IInteractionVerb
         }
     }
 
-    private void OnEnable() => interactable.Completed.AddListener(OnHelped);
+    private void OnEnable()
+    {
+        interactable.Completed.AddListener(OnHelped);
+        interactable.Started.AddListener(OnStarted);
+        interactable.Cancelled.AddListener(OnCancelled);
+    }
 
-    private void OnDisable() => interactable.Completed.RemoveListener(OnHelped);
+    private void OnDisable()
+    {
+        interactable.Completed.RemoveListener(OnHelped);
+        interactable.Started.RemoveListener(OnStarted);
+        interactable.Cancelled.RemoveListener(OnCancelled);
+    }
+
+    private void OnStarted() => TellHelping(true);
+
+    private void OnCancelled() => TellHelping(false);
+
+    // The downed friend sees who is helping them up, and how far along.
+    private void TellHelping(bool helping)
+    {
+        if (CoopSession.Current != null)
+        {
+            CoopSession.Current.Downed.SendHelping(clientId, helping, seconds);
+        }
+    }
 
     private void OnHelped()
     {

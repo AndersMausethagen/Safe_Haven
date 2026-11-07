@@ -49,6 +49,10 @@ public sealed class MultiplayerSettings : GameSettings<MultiplayerSettings>
     [SerializeField, Min(5f)] private float bleedOutSeconds = 45f;
     [Tooltip("Seconds a friend holds E beside them to help them up.")]
     [SerializeField, Min(0.5f)] private float helpUpSeconds = 3f;
+    [Tooltip("Share of walking speed a downed player crawls at.")]
+    [SerializeField, Range(0.1f, 0.6f)] private float crawlSpeed = 0.3f;
+    [Tooltip("Experience for extracting together: this much for each friend who got out of the same run with you (within the minute, or beside you).")]
+    [SerializeField, Min(0)] private int togetherExperience = 30;
     [Tooltip("Share of their health a player gets up with.")]
     [SerializeField, Range(0.05f, 1f)] private float helpedUpHealth = 0.35f;
 
@@ -67,6 +71,8 @@ public sealed class MultiplayerSettings : GameSettings<MultiplayerSettings>
     public float BleedOutSeconds => bleedOutSeconds;
     public float HelpUpSeconds => helpUpSeconds;
     public float HelpedUpHealth => helpedUpHealth;
+    public float CrawlSpeed => crawlSpeed;
+    public int TogetherExperience => togetherExperience;
     public ushort Port => port;
     public uint SteamAppId => steamAppId;
     /// <summary>
@@ -76,7 +82,7 @@ public sealed class MultiplayerSettings : GameSettings<MultiplayerSettings>
     public string ProtocolVersion => $"{protocolVersion}.{WireFormat}";
 
     /// <summary>Raise whenever any co-op message or synced value changes shape.</summary>
-    public const int WireFormat = 11;
+    public const int WireFormat = 12;
     public bool SteamInEditor => steamInEditor;
     public NetworkObject PlayerPrefab => playerPrefab;
     public float PoseInterval => 1f / Mathf.Max(1, posesPerSecond);

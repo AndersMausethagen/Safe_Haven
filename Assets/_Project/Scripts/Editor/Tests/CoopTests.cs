@@ -459,4 +459,27 @@ public sealed class CoopTests
         reader.ReadNetworkSerializable(out PlayerLookState read);
         Assert.IsTrue(read.Downed);
     }
+
+    [Test]
+    public void AFriendDownOrFallen_SaysSoOverTheirHead()
+    {
+        var holder = new GameObject("Coop Test");
+        try
+        {
+            RemotePlayerBody body = RemotePlayerBody.Create(holder.transform, MultiplayerSettings.Current);
+            var tag = body.GetComponentInChildren<TMPro.TextMeshPro>();
+            body.ShowState("Astrid", true, false);
+            Assert.AreEqual("Astrid · Down!", tag.text);
+            Assert.AreEqual(UIStyle.Current.Danger, tag.color);
+            body.ShowState("Astrid", false, true);
+            Assert.AreEqual("Astrid · Fallen", tag.text);
+            body.ShowState("Astrid", false, false);
+            Assert.AreEqual("Astrid", tag.text);
+            Assert.AreEqual(UIStyle.Current.Text, tag.color);
+        }
+        finally
+        {
+            Object.DestroyImmediate(holder);
+        }
+    }
 }

@@ -4,7 +4,8 @@ using Unity.Netcode;
 using UnityEngine;
 
 /// <summary>
-/// Downed and helped up, on a raid together. While a friend who is still standing is on the same run, a blow that would
+/// Downed and helped up, on a raid together. Down, a player crawls (crouched, slow: <see cref="FrameUpdate"/>) and sees the
+/// seconds left and any friend helping them (<see cref="DownedHud"/>, <c>SafeHaven.Helping</c>). While a friend who is still standing is on the same run, a blow that would
 /// kill this player knocks them down instead: health is held at 1 (<see cref="Damageable.HoldFloor"/>), and reaching it
 /// puts them on the ground, unable to act and left alone by creatures (<see cref="IsDown"/>). A friend holds E beside them
 /// (<see cref="FriendRevive"/>) to help them up with some health (<c>SafeHaven.HelpUp</c>, passed on by the host). They
@@ -16,7 +17,9 @@ using UnityEngine;
 public sealed class CoopDowned : IDisposable
 {
     private const string HelpUpMessage = "SafeHaven.HelpUp";
-    private const float DownAt = 1.001f;
+    private const string HelpingMessage = "SafeHaven.Helping";
+    /// <summary>Health at (or just over) the held floor of 1: a frame's regeneration can't hide a killing blow.</summary>
+    private const float DownAt = 1.05f;
     private const float AloneSeconds = 3f;
 
     private NetworkManager network;
@@ -29,9 +32,18 @@ public sealed class CoopDowned : IDisposable
     private float aloneSince = -1f;
     private int falls;
     private int fallsInRun;
+    private string helper;
+    private float helpStartedAt = -1f;
+    private float helpSeconds;
 
     /// <summary>True while this player is down, waiting for a friend.</summary>
     public static bool IsDown { get; private set; }
+
+    /// <summary>Who is helping this downed player up now, or null.</summary>
+    public string Helper => helpStartedAt >= 0f ? helper : null;
+
+    /// <summary>How far a friend's help has got (0 to 1), or -1 while nobody is helping.</summary>
+    public float HelpShare => helpStartedAt >= 0f && helpSeconds > 0f ? Mathf.Clamp01((Time.time - helpStartedAt) / helpSeconds) : -1f;
 
     /// <summary>Seconds left before a downed player dies (0 when not down).</summary>
     public float BleedOutLeft => IsDown ? Mathf.Max(0f, bleedOutAt - Time.time) : 0f;
@@ -42,6 +54,7 @@ public sealed class CoopDowned : IDisposable
         settings = multiplayer;
         Reset();
         network.CustomMessagingManager.RegisterNamedMessageHandler(HelpUpMessage, OnHelpUp);
+        network.CustomMessagingManager.RegisterNamedMessageHandler(HelpingMessage, OnHelping);
     }
 
     /// <summary>
@@ -93,12 +106,6 @@ public sealed class CoopDowned : IDisposable
                 Release();
             }
 
-            if (struckDown && holding && health.IsAlive && health.CurrentHealth <= DownAt)
-            {
-                GoDown();
-            }
-
-            struckDown = false;
             return;
         }
 
@@ -106,6 +113,97 @@ public sealed class CoopDowned : IDisposable
         if (Time.time >= bleedOutAt || (aloneSince >= 0f && Time.time - aloneSince >= AloneSeconds) || GameSession.ActiveRaid == null)
         {
             Die();
+        }
+    }
+
+    /// <summary>
+    /// Every frame: a downed player can still drag themselves along, crouched and slow (they can't fight, use or carry on as
+    /// usual: the rest of their input is off). They are drawn as crouching to friends, with "Down!" over their head.
+    /// </summary>
+    public void FrameUpdate()
+    {
+        if (struckDown && !IsDown && health != null)
+        {
+            struckDown = false;
+            if (holding && health.IsAlive && health.CurrentHealth <= DownAt)
+            {
+                GoDown();
+            }
+        }
+
+        if (!IsDown || player == null || !player.TryGetComponent(out PlayerMovement movement))
+        {
+            return;
+        }
+
+        // Behind the Escape menu, nobody crawls.
+        if (GamePause.IsPaused)
+        {
+            movement.SetMovementInput(Vector3.zero);
+            return;
+        }
+
+        Vector2 stick = GameInput.Move != null ? GameInput.Move.ReadValue<Vector2>() : Vector2.zero;
+        Camera view = Camera.main;
+        Vector3 direction = Vector3.zero;
+        if (view != null && stick.sqrMagnitude > 0.01f)
+        {
+            Vector3 forward = Vector3.ProjectOnPlane(view.transform.forward, Vector3.up).normalized;
+            Vector3 right = Vector3.ProjectOnPlane(view.transform.right, Vector3.up).normalized;
+            direction = forward * stick.y + right * stick.x;
+        }
+
+        movement.SetMovementInput(Vector3.ClampMagnitude(direction, 1f) * settings.CrawlSpeed);
+    }
+
+    /// <summary>A friend began (or stopped) holding E beside a downed friend: they see who is helping, and how far along.</summary>
+    public void SendHelping(ulong friendClientId, bool helping, float seconds)
+    {
+        if (network == null || (!network.IsConnectedClient && !network.IsServer))
+        {
+            return;
+        }
+
+        using var writer = new FastBufferWriter(128, Allocator.Temp);
+        writer.WriteValueSafe(friendClientId);
+        writer.WriteValueSafe(GameSession.Appearance != null ? GameSession.Appearance.DisplayName : CharacterAppearance.DefaultName);
+        writer.WriteValueSafe(helping);
+        writer.WriteValueSafe(seconds);
+        ulong to = network.IsServer ? friendClientId : NetworkManager.ServerClientId;
+        network.CustomMessagingManager.SendNamedMessage(HelpingMessage, to, writer, NetworkDelivery.ReliableFragmentedSequenced);
+    }
+
+    private void OnHelping(ulong sender, FastBufferReader reader)
+    {
+        reader.ReadValueSafe(out ulong target);
+        reader.ReadValueSafe(out string who);
+        reader.ReadValueSafe(out bool helping);
+        reader.ReadValueSafe(out float seconds);
+        if (network.IsServer && target != NetworkManager.ServerClientId)
+        {
+            using var writer = new FastBufferWriter(128, Allocator.Temp);
+            writer.WriteValueSafe(target);
+            writer.WriteValueSafe(who);
+            writer.WriteValueSafe(helping);
+            writer.WriteValueSafe(seconds);
+            network.CustomMessagingManager.SendNamedMessage(HelpingMessage, target, writer, NetworkDelivery.ReliableFragmentedSequenced);
+            return;
+        }
+
+        if (!IsDown)
+        {
+            return;
+        }
+
+        if (helping)
+        {
+            helper = who;
+            helpSeconds = seconds;
+            helpStartedAt = Time.time;
+        }
+        else if (helper == who)
+        {
+            helpStartedAt = -1f;
         }
     }
 
@@ -202,9 +300,10 @@ public sealed class CoopDowned : IDisposable
         GameMessages.Post($"You're down! A friend can help you up within {seconds:0} seconds.", MessageKind.Warning);
     }
 
-    private void StandUp(string helper, bool quiet)
+    private void StandUp(string helpedBy, bool quiet)
     {
         IsDown = false;
+        helpStartedAt = -1f;
         if (health != null)
         {
             health.RemoveInvulnerability(this);
@@ -214,15 +313,21 @@ public sealed class CoopDowned : IDisposable
         SetActing(true);
         if (!quiet)
         {
-            GameMessages.Post($"{helper} helped you up.", MessageKind.Gain);
+            GameMessages.Post($"{helpedBy} helped you up.", MessageKind.Gain);
         }
     }
 
     private void Die()
     {
         IsDown = false;
+        helpStartedAt = -1f;
         health.RemoveInvulnerability(this);
         Release();
+        if (player != null && player.TryGetComponent(out PlayerStealth stealth))
+        {
+            stealth.SetSneaking(false);
+        }
+
         health.Finish(null);
     }
 
@@ -239,15 +344,21 @@ public sealed class CoopDowned : IDisposable
             input.enabled = acting;
         }
 
+        // The handler switches the whole Player map off with it: moving stays on, to crawl.
+        if (!acting && GameInput.Move != null)
+        {
+            GameInput.Move.Enable();
+        }
+
         if (!acting && player.TryGetComponent(out PlayerMovement movement))
         {
             movement.SetMovementInput(Vector3.zero);
         }
 
-        PlayerAnimationController animation = player.GetComponentInChildren<PlayerAnimationController>();
-        if (animation != null)
+        // Down is crouched and dragging along (FrameUpdate), not lying still.
+        if (player.TryGetComponent(out PlayerStealth stealth))
         {
-            animation.SetDead(!acting);
+            stealth.SetSneaking(!acting);
         }
     }
 
@@ -257,7 +368,8 @@ public sealed class CoopDowned : IDisposable
         FixedString128Bytes place = CoopCreatures.PlaceKey;
         foreach (NetworkPlayerAvatar friend in NetworkPlayerAvatar.All)
         {
-            if (friend != null && !friend.IsOwner && friend.IsVisible && !friend.Look.Downed && friend.Look.Place.Equals(place))
+            // Up and about: neither down nor dead (health 0, watching the others).
+            if (friend != null && !friend.IsOwner && friend.IsVisible && !friend.Look.Downed && friend.Look.Health > 0 && friend.Look.Place.Equals(place))
             {
                 return true;
             }

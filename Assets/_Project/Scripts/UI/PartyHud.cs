@@ -106,10 +106,20 @@ public sealed class PartyHud : MonoBehaviour
                 row.Where.text = "Down!";
                 row.Where.color = style.Danger;
             }
+            else if (here && look.Health == 0 && GameSession.ActiveRaid != null)
+            {
+                row.Where.text = "Fallen";
+                row.Where.color = style.Danger;
+            }
             else if (here && Player.Current != null)
             {
                 row.Where.text = $"{Vector3.Distance(Player.Current.transform.position, friend.Body.transform.position):0} m";
                 row.Where.color = style.Muted;
+            }
+            else if (CoopSession.Current != null && CoopSession.Current.TryNews(look.DisplayName, out RaidOutcome outcome))
+            {
+                row.Where.text = outcome == RaidOutcome.Extracted ? "Got out" : outcome == RaidOutcome.Died ? "Fell" : "Caught";
+                row.Where.color = outcome == RaidOutcome.Extracted ? style.Good : style.Danger;
             }
             else
             {

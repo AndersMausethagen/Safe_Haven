@@ -53,6 +53,29 @@ public sealed class DroppedItem : MonoBehaviour, ISaveable, IInteractionName, II
     public string Verb => "Pick up";
     public string SaveKey => "droppedItem";
 
+    /// <summary>Raised when a player puts something on the ground (co-op shares it with friends on the run: CoopDrops).</summary>
+    public static event System.Action<DroppedItem> DroppedByPlayer;
+
+    /// <summary>Co-op: the drop's name in every friend's game on the run, or null when it is only here.</summary>
+    public string ShareId { get; set; }
+
+    /// <summary>A friend's drop made here (co-op): at its spot, holding what it held (its saved state). Null when it can't be.</summary>
+    public static DroppedItem PlaceAt(string state, Vector3 at, Quaternion facing)
+    {
+        DroppedItemSettings settings = DroppedItemSettings.Current;
+        if (settings.Prefab == null || string.IsNullOrEmpty(state))
+        {
+            return null;
+        }
+
+        var dropped = SaveableEntity.Spawn(settings.Prefab, at, facing).GetComponent<DroppedItem>();
+        ((ISaveable)dropped).RestoreState(state);
+        return dropped != null && !dropped.Stack.IsEmpty ? dropped : null;
+    }
+
+    /// <summary>Taken by someone else (co-op): it goes, without a word.</summary>
+    public void Vanish() => Remove();
+
     /// <summary>Puts a stack on the ground in front of someone. Null when it can't be, and then the stack is still theirs.</summary>
     public static DroppedItem Drop(Transform user, ItemStack stack)
     {
@@ -66,6 +89,11 @@ public sealed class DroppedItem : MonoBehaviour, ISaveable, IInteractionName, II
         Quaternion facing = Quaternion.Euler(0f, UnityEngine.Random.Range(0f, 360f), 0f);
         var dropped = SaveableEntity.Spawn(settings.Prefab, FindSpot(user, settings), facing).GetComponent<DroppedItem>();
         dropped.Hold(stack);
+        if (user != null && Player.IsPlayer(user.gameObject))
+        {
+            DroppedByPlayer?.Invoke(dropped);
+        }
+
         dropped.ThrowFrom(user.position + Vector3.up * HandHeight);
         AudioManager.Play(AudioManager.Sounds?.ItemDropped, dropped.transform.position);
         return dropped;
@@ -116,7 +144,18 @@ public sealed class DroppedItem : MonoBehaviour, ISaveable, IInteractionName, II
 
     private void OnPickedUp()
     {
-        GameObject user = interactable.Interactor;
+        // Shared with friends on a raid together: the host decides who gets it (CoopDrops), then PickUp follows.
+        if (CoopDrops.Current != null && CoopDrops.Current.Claim(this, interactable.Interactor))
+        {
+            return;
+        }
+
+        PickUp(interactable.Interactor);
+    }
+
+    /// <summary>Into the user's bag, as much as fits.</summary>
+    public void PickUp(GameObject user)
+    {
         ItemInventory bag = user != null ? user.GetComponentInParent<ItemInventory>() : null;
         if (bag == null)
         {

@@ -76,6 +76,10 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
     private readonly CoopCreatures creatures = new CoopCreatures();
     private readonly CoopDowned downed = new CoopDowned();
     private readonly CoopPings pings = new CoopPings();
+    private readonly CoopDrops drops = new CoopDrops();
+    private readonly Dictionary<string, (RaidOutcome outcome, string raid, float at)> news = new Dictionary<string, (RaidOutcome, string, float)>();
+    private const float TogetherSeconds = 60f;
+    private const float TogetherReach = 25f;
     private float nextCreatures;
     private RaidInvite openRaid;
     private float openRaidSince;
@@ -194,6 +198,7 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
         access.StartHosting(network);
         creatures.StartHosting(network, settings);
         pings.Start(network);
+        drops.Start(network, true);
         network.CustomMessagingManager.RegisterNamedMessageHandler(RaidNewsMessage, OnRaidNews);
         downed.Start(network, settings);
         SetState(CoopState.Hosting);
@@ -410,6 +415,7 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
         access.StartGuest(network);
         creatures.StartGuest(network);
         pings.Start(network);
+        drops.Start(network, false);
         network.CustomMessagingManager.RegisterNamedMessageHandler(RaidNewsMessage, OnRaidNews);
         downed.Start(network, settings);
         SetState(CoopState.Joining);
@@ -585,12 +591,15 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
 
     private void Update()
     {
+        // Watching friends after a fall goes on (and ends) whatever the session does.
+        CoopSpectate.Update();
         if (network == null || (state != CoopState.Hosting && state != CoopState.Joined))
         {
             return;
         }
 
         pings.Update();
+        downed.FrameUpdate();
 
         if (Time.unscaledTime >= nextSync)
         {
@@ -793,6 +802,49 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
         }
     }
 
+    /// <summary>How a friend's last raid ended, if word came in the last few minutes (the party panel).</summary>
+    public bool TryNews(string friend, out RaidOutcome outcome)
+    {
+        outcome = RaidOutcome.InProgress;
+        if (!news.TryGetValue(friend, out var heard) || Time.unscaledTime - heard.at > 300f)
+        {
+            return false;
+        }
+
+        outcome = heard.outcome;
+        return true;
+    }
+
+    // Getting out together pays: friends beside this player as they extract, or who got out of the same raid within the minute.
+    private void RewardTogether(string raid)
+    {
+        var together = new HashSet<string>();
+        Unity.Collections.FixedString128Bytes place = CoopCreatures.PlaceKey;
+        foreach (NetworkPlayerAvatar friend in NetworkPlayerAvatar.All)
+        {
+            if (friend != null && !friend.IsOwner && friend.IsVisible && friend.Body != null && friend.Look.Health > 0 && friend.Look.Place.Equals(place)
+                && Player.Current != null && Vector3.Distance(friend.Body.transform.position, Player.Current.transform.position) <= TogetherReach)
+            {
+                together.Add(friend.Look.DisplayName);
+            }
+        }
+
+        foreach (KeyValuePair<string, (RaidOutcome outcome, string raid, float at)> heard in news)
+        {
+            if (heard.Value.outcome == RaidOutcome.Extracted && heard.Value.raid == raid && Time.unscaledTime - heard.Value.at <= TogetherSeconds)
+            {
+                together.Add(heard.Key);
+            }
+        }
+
+        int friends = Mathf.Min(3, together.Count);
+        if (friends > 0 && settings.TogetherExperience > 0)
+        {
+            ExperienceTracker.Grant(settings.TogetherExperience * friends);
+            GameMessages.Post($"Out together with {string.Join(", ", together)}: +{settings.TogetherExperience * friends} experience.", MessageKind.Gain);
+        }
+    }
+
     // How this player's raid ended, for friends: who got out, who fell.
     private void TellRaidNews(GameEvent gameEvent)
     {
@@ -803,6 +855,11 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
 
         string raid = gameEvent.Subject is RaidDefinition definition ? definition.DisplayName : "the raid";
         string me = GameSession.Appearance != null ? GameSession.Appearance.DisplayName : CharacterAppearance.DefaultName;
+        if (gameEvent.Outcome == RaidOutcome.Extracted)
+        {
+            RewardTogether(raid);
+        }
+
         using var writer = new FastBufferWriter(256, Allocator.Temp);
         writer.WriteValueSafe(me);
         writer.WriteValueSafe((byte)gameEvent.Outcome);
@@ -840,6 +897,7 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
             }
         }
 
+        news[who] = ((RaidOutcome)outcome, raid, Time.unscaledTime);
         switch ((RaidOutcome)outcome)
         {
             case RaidOutcome.Extracted:
@@ -945,6 +1003,7 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
         if (network != null && network.IsServer && clientId != network.LocalClientId)
         {
             access.Forget(clientId);
+            drops.Forget(clientId);
             return;
         }
 
@@ -987,6 +1046,7 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
         if (state == CoopState.Hosting || state == CoopState.Joined)
         {
             PartyHud.Create();
+            DownedHud.Create();
         }
         if (state == CoopState.Offline || state == CoopState.Hosting || state == CoopState.Joining)
         {
@@ -999,7 +1059,10 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
             creatures.Reset();
             downed.Reset();
             pings.Clear();
+            drops.Stop();
+            news.Clear();
             PartyHud.Remove();
+            DownedHud.Remove();
             openRaid = null;
         }
 
@@ -1016,6 +1079,7 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
         GameEvents.Raised -= OnGameEvent;
         sync?.Dispose();
         creatures.Dispose();
+        drops.Dispose();
         downed.Dispose();
         DropLobby();
         if (Current == this)

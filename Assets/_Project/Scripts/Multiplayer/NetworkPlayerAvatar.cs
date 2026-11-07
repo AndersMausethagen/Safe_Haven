@@ -78,6 +78,7 @@ public sealed class NetworkPlayerAvatar : NetworkBehaviour
             FriendLeft?.Invoke(this);
         }
 
+        poses.Clear();
         if (body != null)
         {
             Destroy(body.gameObject);
@@ -186,9 +187,11 @@ public sealed class NetworkPlayerAvatar : NetworkBehaviour
 
         // Down in a shared raid: friends can help them up, and creatures leave them be.
         revive.Show(look.Value.Downed, look.Value.DisplayName);
+        bool fallen = look.Value.Health == 0 && GameSession.ActiveRaid != null;
+        body.ShowState(look.Value.DisplayName, look.Value.Downed, fallen);
         if (hitbox != null)
         {
-            hitbox.IsDown = look.Value.Downed;
+            hitbox.IsDown = look.Value.Downed || fallen;
         }
 
         double renderTime = NetworkManager.ServerTime.Time - settings.InterpolationDelay;

@@ -60,8 +60,8 @@ public sealed class TerrainTreeMemory : MonoBehaviour, ISaveable, ISharedState
         }
 
         TerrainTreeFelling felling = TerrainTreeFelling.On(terrain);
-        // Restored again in a friend's Haven (co-op): trees no longer down stand back up.
-        felling.RegrowAllBut(state.indices);
+        // Restored again in a friend's Haven (co-op), felled trees add up: each game grows its own back on its timers, so a
+        // friend's list without a tree felled here a moment ago never stands that tree back up.
         for (int i = 0; i < state.indices.Count && i < state.secondsLeft.Count; i++)
         {
             felling.RestoreFelled(state.indices[i], state.secondsLeft[i] < 0f ? float.PositiveInfinity : state.secondsLeft[i]);

@@ -86,25 +86,6 @@ public sealed class TerrainTreeFelling : MonoBehaviour
         }
     }
 
-    /// <summary>Stands every felled tree back up except those listed: they grew back, or were never felled, in a friend's Haven.</summary>
-    public void RegrowAllBut(ICollection<int> stayDown)
-    {
-        scratch.Clear();
-        foreach (int index in felled.Keys)
-        {
-            if (!stayDown.Contains(index))
-            {
-                scratch.Add(index);
-            }
-        }
-
-        foreach (int index in scratch)
-        {
-            terrain.terrainData.SetTreeInstance(index, felled[index].tree);
-            felled.Remove(index);
-        }
-    }
-
     /// <summary>Lays a tree down again as it was saved (no falling copy): it stays down for the seconds left.</summary>
     public void RestoreFelled(int index, float secondsLeft)
     {
