@@ -12,6 +12,8 @@ public sealed class RaidPlan
     private readonly HashSet<ItemDefinition> picked = new HashSet<ItemDefinition>();
     private readonly List<ResidentDefinition> companions = new List<ResidentDefinition>();
     private readonly System.Action<RaidDefinition, int, bool> layOutAhead;
+    // The portal's destinations as planning began (RaidPortal.Destinations builds a new list on every read).
+    private IReadOnlyList<RaidDefinition> destinations = System.Array.Empty<RaidDefinition>();
     private int destinationIndex;
 
     /// <param name="layOutAhead">Lays a run out ahead (raid, seed, large), so entering is quick and the briefing can tell
@@ -44,28 +46,12 @@ public sealed class RaidPlan
     public IReadOnlyCollection<ItemDefinition> Picked => picked;
 
     /// <summary>Which of the portal's destinations is planned for (clamped to them).</summary>
-    public int DestinationIndex
-    {
-        get
-        {
-            int count = Portal != null ? Portal.Destinations.Count : 0;
-            return Mathf.Clamp(destinationIndex, 0, Mathf.Max(0, count - 1));
-        }
-    }
+    /// <summary>The portal's destinations, the first one first.</summary>
+    public IReadOnlyList<RaidDefinition> Destinations => destinations;
 
-    public RaidDefinition Destination
-    {
-        get
-        {
-            if (Portal == null)
-            {
-                return null;
-            }
+    public int DestinationIndex => Mathf.Clamp(destinationIndex, 0, Mathf.Max(0, destinations.Count - 1));
 
-            IReadOnlyList<RaidDefinition> destinations = Portal.Destinations;
-            return destinations.Count > 0 ? destinations[DestinationIndex] : null;
-        }
-    }
+    public RaidDefinition Destination => destinations.Count > 0 ? destinations[DestinationIndex] : null;
 
     /// <summary>A locked place: it can be read about but not planned for (unless the cheat menu lifts requirements).</summary>
     public bool IsClosed => Destination != null && Destination.IsLocked && !Cheats.NoRequirements;
@@ -80,6 +66,7 @@ public sealed class RaidPlan
     {
         Portal = portal;
         Player = player;
+        destinations = portal != null ? portal.Destinations : System.Array.Empty<RaidDefinition>();
         picked.Clear();
         destinationIndex = 0;
         Difficulty = null;
@@ -95,6 +82,7 @@ public sealed class RaidPlan
     {
         Portal = null;
         Player = null;
+        destinations = System.Array.Empty<RaidDefinition>();
     }
 
     /// <summary>Another destination: its own default tier and size.</summary>

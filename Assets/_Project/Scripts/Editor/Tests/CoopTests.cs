@@ -559,4 +559,48 @@ public sealed class CoopTests
         Assert.IsFalse(HavenVisit.BuildingNeedsAsking(), "at home, building needs no one's yes");
         Assert.IsFalse(HavenVisit.StoresNeedAsking(), "nor do one's own stores");
     }
+
+    [Test]
+    public void AVisitor_HasNoRaidToPlan_AndIsToldToFollowTheHost()
+    {
+        GameSession.StartNewGame();
+        var host = new GameObject("Portal");
+        var visitor = new GameObject("Visitor");
+        var portal = host.AddComponent<RaidPortal>();
+        var so = new SerializedObject(portal);
+        so.FindProperty("raid").objectReferenceValue = AssetDatabase.LoadAssetAtPath<RaidDefinition>("Assets/_Project/Data/Raids/MistyWoods.asset");
+        so.FindProperty("needsRepair").boolValue = false;
+        so.ApplyModifiedPropertiesWithoutUndo();
+        var homeField = typeof(HavenVisit).GetField("home", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+        homeField.SetValue(null, new SaveData { scene = "SafeHaven" });
+        var told = new List<string>();
+        System.Action<string, MessageKind> listen = (text, kind) => told.Add(text);
+        GameMessages.Posted += listen;
+        try
+        {
+            var atHome = new MenuPage();
+            portal.AddActions(atHome, visitor);
+            Assert.IsTrue(atHome.Actions.Exists(action => action.Label == "Plan a raid" && action.Enabled), "At home the planner opens");
+
+            typeof(HavenVisit).GetProperty(nameof(HavenVisit.IsVisiting)).SetValue(null, true);
+            var visiting = new MenuPage();
+            portal.AddActions(visiting, visitor);
+            MenuAction plan = visiting.Actions.Find(action => action.Label == "Plan a raid");
+            Assert.IsNotNull(plan, "Still shown, so the visitor learns why");
+            Assert.IsFalse(plan.Enabled, "A visitor follows the host instead of planning (nothing laid out for a run they can't enter)");
+            Assert.AreEqual(HavenVisit.RaidRefusal, plan.Detail);
+
+            // A portal without a station opens the planner when used: a visitor is told instead.
+            typeof(RaidPortal).GetMethod("OpenPlanner", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).Invoke(portal, new object[] { visitor });
+            CollectionAssert.Contains(told, HavenVisit.RaidRefusal);
+        }
+        finally
+        {
+            GameMessages.Posted -= listen;
+            HavenVisit.Forget();
+            Object.DestroyImmediate(host);
+            Object.DestroyImmediate(visitor);
+            GameSession.StartNewGame();
+        }
+    }
 }

@@ -369,7 +369,7 @@ public sealed partial class RaidPreparationWindow : MonoBehaviour
 
     private void DrawTabs()
     {
-        int count = plan.Portal != null ? plan.Portal.Destinations.Count : 0;
+        int count = plan.Destinations.Count;
         while (tabs.Count < count)
         {
             tabs.Add(AddTab(tabs.Count));
@@ -387,7 +387,7 @@ public sealed partial class RaidPreparationWindow : MonoBehaviour
                 continue;
             }
 
-            RaidDefinition raid = plan.Portal.Destinations[i];
+            RaidDefinition raid = plan.Destinations[i];
             bool shown = i == plan.DestinationIndex;
             tab.Rect.anchoredPosition = new Vector2(Width - Margin - (count - i) * width, tab.Rect.anchoredPosition.y);
             tab.Label.text = raid.IsLocked ? $"{raid.DisplayName} <size=70%>locked</size>" : raid.DisplayName;

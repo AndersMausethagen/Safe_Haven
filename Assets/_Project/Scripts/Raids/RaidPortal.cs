@@ -156,7 +156,10 @@ public sealed class RaidPortal : MonoBehaviour, IStationMenuExtension, IInteract
 
         if (IsRepaired)
         {
-            page.Add(new MenuAction("Plan a raid", "Choose a destination, supplies and modifiers", true, () => OpenPlanner(user), closesMenu: true));
+            // A friend visiting goes on raids by following the host: there is nothing for them to plan.
+            page.Add(HavenVisit.IsVisiting
+                ? new MenuAction("Plan a raid", HavenVisit.RaidRefusal, false, null)
+                : new MenuAction("Plan a raid", "Choose a destination, supplies and modifiers", true, () => OpenPlanner(user), closesMenu: true));
             AddImprovement(page, user);
         }
         else if (hasHomeMenu)
@@ -205,6 +208,13 @@ public sealed class RaidPortal : MonoBehaviour, IStationMenuExtension, IInteract
 
     private void OpenPlanner(GameObject user)
     {
+        // Nor lay out a run they can't enter.
+        if (HavenVisit.IsVisiting)
+        {
+            GameMessages.Post(HavenVisit.RaidRefusal);
+            return;
+        }
+
         if (preparationWindow == null && UIStateManager.Current != null)
         {
             preparationWindow = UIStateManager.Current.Find<RaidPreparationWindow>(UIWindowId.RaidPreparation);
