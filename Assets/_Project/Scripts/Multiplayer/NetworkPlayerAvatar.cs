@@ -9,7 +9,8 @@ using UnityEngine.SceneManagement;
 /// machine it watches the local <see cref="Player"/> and tells the others how they look (<see cref="PlayerLookState"/>,
 /// a network variable), where they are and what they are doing (<see cref="PoseSnapshot"/>s, a few each second,
 /// unreliable) and their fishing line when one is out (<see cref="FishingLineState"/>, a network variable, so friends see
-/// the float: <see cref="RemoteFishing"/>). Everywhere else it draws them as a <see cref="RemotePlayerBody"/>, a little in the past so movement is
+/// the float: <see cref="RemoteFishing"/>), and the companion they brought on a raid (<see cref="CompanionLookState"/>, with
+/// its own poses beside theirs; drawn by <see cref="RemoteCompanion"/>, which a friend can help up). Everywhere else it draws them as a <see cref="RemotePlayerBody"/>, a little in the past so movement is
 /// smooth, and only while they are in the same place as you.
 /// <para>
 /// The player you control stays the ordinary single-player <see cref="Player"/>, run entirely on your machine: co-op adds
@@ -29,7 +30,11 @@ public sealed class NetworkPlayerAvatar : NetworkBehaviour
     private readonly NetworkVariable<FishingLineState> fishing =
         new NetworkVariable<FishingLineState>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
+    private readonly NetworkVariable<CompanionLookState> companionLook =
+        new NetworkVariable<CompanionLookState>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+
     private readonly PoseBuffer poses = new PoseBuffer();
+    private readonly PoseBuffer companionPoses = new PoseBuffer();
     private MultiplayerSettings settings;
     private RemotePlayerBody body;
     private FriendRevive revive;
@@ -42,6 +47,11 @@ public sealed class NetworkPlayerAvatar : NetworkBehaviour
     private float nextLookCheck;
     private bool announced;
     private RemoteFishing remoteFishing;
+    private RemoteCompanion remoteCompanion;
+    // The owner's own companion on a raid, and the mirror of its animation.
+    private Companion ownCompanion;
+    private AnimatorMirror companionMirror;
+    private PoseSnapshot companionOutgoing;
     // The owner's last cast, and the server time it left the rod (worked out once per cast, so clock drift doesn't resend it).
     private float castLandsAt = float.NaN;
     private double castAt;
@@ -88,8 +98,11 @@ public sealed class NetworkPlayerAvatar : NetworkBehaviour
         }
 
         poses.Clear();
+        companionPoses.Clear();
         remoteFishing?.Destroy();
         remoteFishing = null;
+        remoteCompanion?.Destroy();
+        remoteCompanion = null;
         if (body != null)
         {
             Destroy(body.gameObject);
@@ -129,6 +142,7 @@ public sealed class NetworkPlayerAvatar : NetworkBehaviour
         }
 
         PublishFishing();
+        PublishCompanion();
         if (player == null || Time.unscaledTime < nextPose)
         {
             return;
@@ -149,6 +163,49 @@ public sealed class NetworkPlayerAvatar : NetworkBehaviour
         outgoing.Yaw = at.eulerAngles.y;
         ownMirror?.Capture(ref outgoing.Animation);
         PoseRpc(outgoing);
+        if (ownCompanion != null && companionLook.Value.IsOut)
+        {
+            Transform companion = ownCompanion.transform;
+            companionOutgoing.Time = outgoing.Time;
+            companionOutgoing.Position = companion.position;
+            companionOutgoing.Yaw = companion.eulerAngles.y;
+            companionMirror?.Capture(ref companionOutgoing.Animation);
+            CompanionPoseRpc(companionOutgoing);
+        }
+    }
+
+    // Who came along and whether they are down, when that changes; where they are goes with the poses.
+    private void PublishCompanion()
+    {
+        Companion companion = RaidDirector.Current != null && RaidDirector.Current.Companions != null ? RaidDirector.Current.Companions.Companion : null;
+        if (companion != ownCompanion)
+        {
+            ownCompanion = companion;
+            Animator animator = companion != null ? companion.GetComponentInChildren<Animator>() : null;
+            companionMirror = animator != null ? new AnimatorMirror(animator) : null;
+        }
+
+        CompanionLookState now = CompanionLookState.Of(companion);
+        if (!now.Equals(companionLook.Value))
+        {
+            companionLook.Value = now;
+        }
+    }
+
+    [Rpc(SendTo.NotOwner, Delivery = RpcDelivery.Unreliable)]
+    private void CompanionPoseRpc(PoseSnapshot pose)
+    {
+        companionPoses.Add(pose);
+    }
+
+    // A friend helped this player's companion up in their game: they get up here, where they really are.
+    [Rpc(SendTo.Owner)]
+    private void HelpCompanionUpRpc()
+    {
+        if (ownCompanion != null && ownCompanion.IsDowned && !ownCompanion.IsLost)
+        {
+            ownCompanion.Revive();
+        }
     }
 
     private void PublishLook()
@@ -203,6 +260,7 @@ public sealed class NetworkPlayerAvatar : NetworkBehaviour
             }
 
             remoteFishing?.Hide();
+            remoteCompanion?.Hide();
             return;
         }
 
@@ -247,6 +305,13 @@ public sealed class NetworkPlayerAvatar : NetworkBehaviour
 
         remoteFishing ??= new RemoteFishing(body.transform);
         remoteFishing.Show(fishing.Value, NetworkManager.ServerTime.Time, Time.time, Time.deltaTime);
+
+        remoteCompanion ??= new RemoteCompanion(null, HelpCompanionUpRpc, settings.HelpUpSeconds);
+        remoteCompanion.Show(companionLook.Value, Content());
+        if (companionLook.Value.IsOut && companionPoses.Sample(renderTime, settings.TeleportDistance, out Vector3 standing, out float facing, out AnimatorFrame moving))
+        {
+            remoteCompanion.Place(standing, facing, moving, settings.AnimationBlend);
+        }
     }
 
     private void OnLookChanged(PlayerLookState before, PlayerLookState now)
@@ -260,6 +325,7 @@ public sealed class NetworkPlayerAvatar : NetworkBehaviour
         {
             // A new place: what was received before was somewhere else.
             poses.Clear();
+            companionPoses.Clear();
         }
 
         if (body != null)

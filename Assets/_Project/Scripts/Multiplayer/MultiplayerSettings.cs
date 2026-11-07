@@ -82,7 +82,7 @@ public sealed class MultiplayerSettings : GameSettings<MultiplayerSettings>
     public string ProtocolVersion => $"{protocolVersion}.{WireFormat}";
 
     /// <summary>Raise whenever any co-op message or synced value changes shape.</summary>
-    public const int WireFormat = 17;
+    public const int WireFormat = 18;
     public bool SteamInEditor => steamInEditor;
     public NetworkObject PlayerPrefab => playerPrefab;
     public float PoseInterval => 1f / Mathf.Max(1, posesPerSecond);

@@ -153,7 +153,8 @@ public sealed class RemotePlayerBody : MonoBehaviour
         heldId = string.Empty;
     }
 
-    private static TextMeshPro NameTag(Transform parent, float height)
+    /// <summary>A name over someone's head, in Hearthline's text-on-the-world (also a friend's companion's: RemoteCompanion).</summary>
+    internal static TextMeshPro NameTag(Transform parent, float height)
     {
         var holder = new GameObject("Name");
         holder.transform.SetParent(parent, false);
