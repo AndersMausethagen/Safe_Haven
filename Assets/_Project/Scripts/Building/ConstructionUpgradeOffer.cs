@@ -1,0 +1,54 @@
+using UnityEngine;
+
+/// <summary>
+/// The offer to take a standing building up a level: what the next level costs and brings, and a button that pays and
+/// puts the scaffold up (<see cref="Construction.TryOrderUpgrade"/>). Opened from a station's menu and when the player
+/// picks a building to upgrade in the build menu.
+/// </summary>
+public static class ConstructionUpgradeOffer
+{
+    /// <summary>Opens the offer for <paramref name="building"/> to <paramref name="user"/>, or says why there is none.</summary>
+    public static void Show(BuildingObject building, GameObject user)
+    {
+        if (!building.TryGetComponent(out Construction construction))
+        {
+            GameMessages.Post($"The {building.Definition.DisplayName} can't be upgraded.", MessageKind.Warning);
+            return;
+        }
+
+        if (construction.IsBuilding)
+        {
+            GameMessages.Post(construction.Paid ? $"The {building.Definition.DisplayName} is waiting for you: hold E at its scaffold."
+                : $"Walk up to the {building.Definition.DisplayName} and hold E to repair it.");
+            return;
+        }
+
+        BuildingLevel next = building.Definition.UpgradeTo(construction.Level + 1);
+        if (next == null)
+        {
+            GameMessages.Post($"The {construction.Title} is as good as it gets.");
+            return;
+        }
+
+        ActionMenuWindow menu = ActionMenuWindow.Current;
+        if (menu != null)
+        {
+            menu.Open(() => Page(building, construction, next, user), user);
+        }
+    }
+
+    private static MenuPage Page(BuildingObject building, Construction construction, BuildingLevel next, GameObject user)
+    {
+        var page = new MenuPage
+        {
+            Title = $"{next.title} {building.Definition.DisplayName}",
+            Body = $"Level {construction.Level + 1} of {building.Definition.MaxLevel}.\n"
+                + HavenBuildings.WhatTierBrings(building.Definition, construction.Level + 1, next, user.GetComponent<PlayerCrafting>()),
+        };
+        bool affordable = MaterialPool.For(user).CanAfford(next.essence, next.cost, out string missing);
+        string cost = next.CostText;
+        page.Add(new MenuAction("Upgrade", affordable ? cost : $"{cost}   <color=#FF7B6B>{missing}</color>", affordable && BuildingUnlocks.IsOpen(next),
+            () => construction.TryOrderUpgrade(user), closesMenu: true));
+        return page;
+    }
+}

@@ -226,53 +226,6 @@ public sealed class BuildPlacer : MonoBehaviour
         GameMessages.Post(toUpgrade ? "Click a building to upgrade or repair it. Right-click to cancel." : "Click a building to move it. Right-click to cancel.");
     }
 
-    /// <summary>The next level of a building: what it costs and brings, and a button to order it (the scaffold goes up).</summary>
-    public void ShowUpgrade(BuildingObject building)
-    {
-        if (!building.TryGetComponent(out Construction construction))
-        {
-            GameMessages.Post($"The {building.Definition.DisplayName} can't be upgraded.", MessageKind.Warning);
-            return;
-        }
-
-        if (construction.IsBuilding)
-        {
-            GameMessages.Post(construction.Paid ? $"The {building.Definition.DisplayName} is waiting for you: hold E at its scaffold."
-                : $"Walk up to the {building.Definition.DisplayName} and hold E to repair it.");
-            return;
-        }
-
-        BuildingLevel next = building.Definition.UpgradeTo(construction.Level + 1);
-        if (next == null)
-        {
-            GameMessages.Post($"The {construction.Title} is as good as it gets.");
-            return;
-        }
-
-        ActionMenuWindow menu = ActionMenuWindow.Current;
-        if (menu == null)
-        {
-            return;
-        }
-
-        menu.Open(() => UpgradePage(building, construction, next), gameObject);
-    }
-
-    private MenuPage UpgradePage(BuildingObject building, Construction construction, BuildingLevel next)
-    {
-        var page = new MenuPage
-        {
-            Title = $"{next.title} {building.Definition.DisplayName}",
-            Body = $"Level {construction.Level + 1} of {building.Definition.MaxLevel}.\n"
-                + HavenBuildings.WhatTierBrings(building.Definition, construction.Level + 1, next, GetComponent<PlayerCrafting>()),
-        };
-        bool affordable = MaterialPool.For(gameObject).CanAfford(next.essence, next.cost, out string missing);
-        string cost = next.CostText;
-        page.Add(new MenuAction("Upgrade", affordable ? cost : $"{cost}   <color=#FF7B6B>{missing}</color>", affordable && BuildingUnlocks.IsOpen(next),
-            () => construction.TryOrderUpgrade(gameObject), closesMenu: true));
-        return page;
-    }
-
     private void Update()
     {
         if (!IsBusy)
@@ -401,7 +354,7 @@ public sealed class BuildPlacer : MonoBehaviour
             }
 
             Cancel();
-            ShowUpgrade(building);
+            ConstructionUpgradeOffer.Show(building, gameObject);
             return;
         }
 
