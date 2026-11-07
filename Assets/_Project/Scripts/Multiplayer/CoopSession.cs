@@ -77,6 +77,8 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
     private float nextCreatures;
     private RaidInvite openRaid;
     private float openRaidSince;
+    private RaidInvite hostRaid;
+    private bool homeAfterRaid;
     private readonly List<ulong> recipients = new List<ulong>();
 
     public static CoopSession Current { get; private set; }
@@ -133,6 +135,14 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
     {
         if (Player.Current == null)
         {
+            return;
+        }
+
+        // Back from a raid the session ended during: now home.
+        if (homeAfterRaid && GameSession.ActiveRaid == null)
+        {
+            homeAfterRaid = false;
+            HavenVisit.End(Content());
             return;
         }
 
@@ -239,7 +249,7 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
         }
 
         SetState(CoopState.Offline);
-        HavenVisit.End(Content(), headHome);
+        EndVisit(headHome);
     }
 
     /// <summary>Splits "host:port" (port optional).</summary>
@@ -526,6 +536,7 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
         }
 
         Debug.Log($"Co-op: sent the Haven to player {clientId} ({packed.Length / 1024f:0.0} KB in {pieces.Count} pieces).");
+        TellOfRaidUnderWay(clientId);
     }
 
     private void OnWorldPiece(ulong sender, FastBufferReader reader)
@@ -694,14 +705,48 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
         }
     }
 
+    /// <summary>
+    /// Ends a visit (the session is over): straight home, or, on a raid, once it is over, so a friend leaving or the host
+    /// going doesn't cut a run short. The raid's creatures are then this game's own (<see cref="CoopCreatures.Reset"/>).
+    /// </summary>
+    private void EndVisit(bool travel)
+    {
+        if (travel && HavenVisit.IsVisiting && GameSession.ActiveRaid != null)
+        {
+            homeAfterRaid = true;
+            GameMessages.Post("You'll head home once this raid is over.");
+            return;
+        }
+
+        homeAfterRaid = false;
+        HavenVisit.End(Content(), travel);
+    }
+
     private void OnRaidLaunched(RaidInvite invite)
     {
+        // Kept while the run lasts, for friends who join while the host is out (SendWorld).
+        hostRaid = invite;
         if (!IsHost || network == null || Guests(NetworkManager.ServerClientId).Count == 0)
         {
             return;
         }
 
         SendPacket(RaidOpenMessage, WorldTransfer.Pack(invite), Guests(NetworkManager.ServerClientId));
+    }
+
+    // A friend who joined while the host is on a raid hears of it after the Haven, and can still follow.
+    private void TellOfRaidUnderWay(ulong clientId)
+    {
+        RaidSession run = GameSession.ActiveRaid;
+        if (hostRaid == null || run == null || run.Seed != hostRaid.seed || run.IsOver)
+        {
+            return;
+        }
+
+        hostRaid.elapsed = run.Elapsed;
+        recipients.Clear();
+        recipients.Add(clientId);
+        SendPacket(RaidOpenMessage, WorldTransfer.Pack(hostRaid), recipients);
     }
 
     private void OnRaidOpen(ulong sender, FastBufferReader reader)
@@ -713,14 +758,20 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
         }
 
         openRaid = WorldTransfer.Unpack<RaidInvite>(packet);
-        openRaidSince = Time.unscaledTime;
+        openRaidSince = Time.unscaledTime - Mathf.Max(0f, openRaid.elapsed);
         GameMessages.Post($"{HavenVisit.HostName} went through the portal. Use the portal to follow them.");
     }
 
     // The host's raid is over: friends can no longer follow into it.
     private void OnGameEvent(GameEvent gameEvent)
     {
-        if (gameEvent.Kind != GameEventKind.RaidFinished || !IsHost || network == null)
+        if (gameEvent.Kind != GameEventKind.RaidFinished)
+        {
+            return;
+        }
+
+        hostRaid = null;
+        if (!IsHost || network == null)
         {
             return;
         }
@@ -838,7 +889,7 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
         network.Shutdown();
         lobby?.Close();
         SetState(CoopState.Offline);
-        HavenVisit.End(Content());
+        EndVisit(true);
     }
 
     private void OnTransportFailure()
@@ -847,7 +898,7 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
         GameMessages.Post(LastProblem, MessageKind.Warning);
         lobby?.Close();
         SetState(CoopState.Offline);
-        HavenVisit.End(Content());
+        EndVisit(true);
     }
 
     private void OnFriendArrived(NetworkPlayerAvatar friend) => GameMessages.Post($"{friend.DisplayName} is here.");

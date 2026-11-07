@@ -96,6 +96,8 @@ public sealed class CoopCreatures : IDisposable
 
     public void Reset()
     {
+        // Mid-raid, puppets left behind become this game's own creatures rather than standing still.
+        HandBack(quiet: true);
         ids.Clear();
         byId.Clear();
         told.Clear();
@@ -386,8 +388,11 @@ public sealed class CoopCreatures : IDisposable
         }
     }
 
-    private void TakeOver()
+    private void TakeOver() => HandBack(quiet: false);
+
+    private void HandBack(bool quiet)
     {
+        bool hadAny = puppets.Count > 0;
         foreach (MonsterAI puppet in puppets.Values)
         {
             if (puppet != null)
@@ -403,7 +408,10 @@ public sealed class CoopCreatures : IDisposable
         puppets.Clear();
         following = false;
         FromHost = false;
-        GameMessages.Post($"{HavenVisit.HostName} has left the raid. You're on your own out here.", MessageKind.Warning);
+        if (hadAny && !quiet)
+        {
+            GameMessages.Post($"{HavenVisit.HostName} has left the raid. You're on your own out here.", MessageKind.Warning);
+        }
     }
 
     private void OnSpawn(ulong sender, FastBufferReader reader)

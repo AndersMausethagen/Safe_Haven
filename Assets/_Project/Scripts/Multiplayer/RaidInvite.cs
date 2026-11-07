@@ -23,6 +23,8 @@ public sealed class RaidInvite
     public int foretoldEvents;
     /// <summary>The run's whole length, for how long friends can still follow.</summary>
     public float totalSeconds;
+    /// <summary>Seconds of the run already gone when this was sent (a friend joining while the host is out).</summary>
+    public float elapsed;
 
     public static RaidInvite Of(RaidSession session, float extraSeconds, float extractionCut, int foretoldEvents)
     {
