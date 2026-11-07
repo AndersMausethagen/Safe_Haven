@@ -37,7 +37,22 @@ public sealed class PoseBuffer
     public int Count => count;
     public double NewestTime => count > 0 ? poses[count - 1].Time : double.NegativeInfinity;
 
-    public void Clear() => count = 0;
+    public void Clear()
+    {
+        for (int i = 0; i < count; i++)
+        {
+            FramePool.Return(poses[i].Animation);
+        }
+
+        count = 0;
+    }
+
+    /// <summary>The newest pose kept, if any.</summary>
+    public bool TryNewest(out PoseSnapshot pose)
+    {
+        pose = count > 0 ? poses[count - 1] : default;
+        return count > 0;
+    }
 
     public void Add(PoseSnapshot pose)
     {
@@ -49,6 +64,7 @@ public sealed class PoseBuffer
 
         if (at > 0 && poses[at - 1].Time == pose.Time)
         {
+            FramePool.Return(pose.Animation);
             return;
         }
 
@@ -56,10 +72,12 @@ public sealed class PoseBuffer
         {
             if (at == 0)
             {
+                FramePool.Return(pose.Animation);
                 return; // older than everything kept
             }
 
-            // Drop the oldest.
+            // Drop the oldest; its arrays go back for the next pose received.
+            FramePool.Return(poses[0].Animation);
             System.Array.Copy(poses, 1, poses, 0, count - 1);
             count--;
             at--;

@@ -156,7 +156,7 @@ public sealed class NetworkPlayerAvatar : NetworkBehaviour
 
     private void UpdateFriend()
     {
-        bool here = poses.Count > 0 && look.Value.Place.Length > 0 && look.Value.Place.ToString() == CoopCreatures.PlaceHere();
+        bool here = poses.Count > 0 && look.Value.Place.Length > 0 && look.Value.Place.Equals(CoopCreatures.PlaceKey);
         if (!here)
         {
             if (body != null && body.gameObject.activeSelf)

@@ -18,6 +18,16 @@ public struct AnimatorFrame : INetworkSerializable
 
     public int LayerCount => States?.Length ?? 0;
 
+    private static void Half<T>(BufferSerializer<T> serializer, ref float value) where T : IReaderWriter
+    {
+        ushort half = serializer.IsWriter ? Mathf.FloatToHalf(value) : (ushort)0;
+        serializer.SerializeValue(ref half);
+        if (serializer.IsReader)
+        {
+            value = Mathf.HalfToFloat(half);
+        }
+    }
+
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
     {
         int layers = States?.Length ?? 0;
@@ -26,22 +36,23 @@ public struct AnimatorFrame : INetworkSerializable
         serializer.SerializeValue(ref values);
         if (serializer.IsReader)
         {
-            States = new int[layers];
-            Times = new float[layers];
-            Weights = new float[layers];
-            Values = new float[values];
+            States = FramePool.Ints(layers);
+            Times = FramePool.Floats(layers);
+            Weights = FramePool.Floats(layers);
+            Values = FramePool.Floats(values);
         }
 
         for (int i = 0; i < layers; i++)
         {
             serializer.SerializeValue(ref States[i]);
             serializer.SerializeValue(ref Times[i]);
-            serializer.SerializeValue(ref Weights[i]);
+            Half(serializer, ref Weights[i]);
         }
 
+        // Parameters (speeds, blend values, small whole numbers) at half precision: exact to 2048, three digits beyond.
         for (int i = 0; i < values; i++)
         {
-            serializer.SerializeValue(ref Values[i]);
+            Half(serializer, ref Values[i]);
         }
 
         serializer.SerializeValue(ref Flags);
@@ -197,5 +208,55 @@ public sealed class AnimatorMirror
         {
             array = new T[length];
         }
+    }
+}
+
+/// <summary>
+/// Arrays for friends' animation frames as they arrive (20 a second from each friend), handed back when the pose buffer drops
+/// a frame, so receiving them makes no garbage. Main thread only, as messages are.
+/// </summary>
+public static class FramePool
+{
+    private static readonly System.Collections.Generic.Dictionary<int, System.Collections.Generic.Stack<int[]>> ints =
+        new System.Collections.Generic.Dictionary<int, System.Collections.Generic.Stack<int[]>>();
+    private static readonly System.Collections.Generic.Dictionary<int, System.Collections.Generic.Stack<float[]>> floats =
+        new System.Collections.Generic.Dictionary<int, System.Collections.Generic.Stack<float[]>>();
+
+    public static int[] Ints(int length) => ints.TryGetValue(length, out var stack) && stack.Count > 0 ? stack.Pop() : new int[length];
+
+    public static float[] Floats(int length) => floats.TryGetValue(length, out var stack) && stack.Count > 0 ? stack.Pop() : new float[length];
+
+    public static void Return(AnimatorFrame frame)
+    {
+        Give(ints, frame.States);
+        Give(floats, frame.Times);
+        Give(floats, frame.Weights);
+        Give(floats, frame.Values);
+    }
+
+    private static void Give<TItem>(System.Collections.Generic.Dictionary<int, System.Collections.Generic.Stack<TItem[]>> pool, TItem[] array)
+    {
+        if (array == null || array.Length == 0)
+        {
+            return;
+        }
+
+        if (!pool.TryGetValue(array.Length, out var stack))
+        {
+            pool[array.Length] = stack = new System.Collections.Generic.Stack<TItem[]>();
+        }
+
+        // A few spare per size is plenty; more would only hold memory.
+        if (stack.Count < 64)
+        {
+            stack.Push(array);
+        }
+    }
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession()
+    {
+        ints.Clear();
+        floats.Clear();
     }
 }

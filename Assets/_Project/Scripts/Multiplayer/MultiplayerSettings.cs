@@ -58,7 +58,14 @@ public sealed class MultiplayerSettings : GameSettings<MultiplayerSettings>
     public float HelpedUpHealth => helpedUpHealth;
     public ushort Port => port;
     public uint SteamAppId => steamAppId;
-    public string ProtocolVersion => protocolVersion;
+    /// <summary>
+    /// The version friends must share: the asset's, plus the wire format's (<see cref="WireFormat"/>), so a build with
+    /// different messages is turned away with "a different version" instead of failing on data it can't read.
+    /// </summary>
+    public string ProtocolVersion => $"{protocolVersion}.{WireFormat}";
+
+    /// <summary>Raise whenever any co-op message or synced value changes shape.</summary>
+    public const int WireFormat = 10;
     public bool SteamInEditor => steamInEditor;
     public NetworkObject PlayerPrefab => playerPrefab;
     public float PoseInterval => 1f / Mathf.Max(1, posesPerSecond);

@@ -643,7 +643,7 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
         reader.ReadValueSafe(out byte[] packet);
         try
         {
-            sync.Apply(packet, true);
+            sync.Apply(packet, true, noteMarks: false);
         }
         catch (Exception exception)
         {
@@ -860,7 +860,8 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
     private void OnClock(ulong sender, FastBufferReader reader)
     {
         reader.ReadValueSafe(out float hour);
-        DayNightCycle clock = HavenVisit.IsVisiting ? FindFirstObjectByType<DayNightCycle>() : null;
+        // A raid keeps its own hour (rolled from its seed), wherever the host is.
+        DayNightCycle clock = HavenVisit.IsVisiting && GameSession.ActiveRaid == null ? FindFirstObjectByType<DayNightCycle>() : null;
         if (clock != null)
         {
             clock.Hour = hour;

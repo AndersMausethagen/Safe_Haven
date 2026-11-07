@@ -322,6 +322,11 @@ public sealed partial class MonsterAI : MonoBehaviour, IEventSubject, IStaggerab
     private void Awake()
     {
         all.Add(this);
+        if (SuppressedByHost())
+        {
+            return;
+        }
+
         CharacterFillLight.Mark(gameObject); // lit by the player's fill light, so creatures stand out in the dark woods
         WalkerFootprints.AddTo(gameObject, 0.75f, 0.18f); // tracks, which last in snow
         combatant = GetComponent<Combatant>();
@@ -364,6 +369,12 @@ public sealed partial class MonsterAI : MonoBehaviour, IEventSubject, IStaggerab
 
     private void Start()
     {
+        // Removed before it could wake (co-op: the host's game sends the creatures).
+        if (suppressed)
+        {
+            return;
+        }
+
         ResetHome();
         lastSenseTime = Time.time;
         nextGlanceAt = Time.time + UnityEngine.Random.Range(0f, PerceptionSettings.Current.IdleGlanceSeconds.y);
@@ -412,6 +423,12 @@ public sealed partial class MonsterAI : MonoBehaviour, IEventSubject, IStaggerab
 
     private void OnEnable()
     {
+        // Removed before it could wake (co-op: the host's game sends the creatures).
+        if (suppressed)
+        {
+            return;
+        }
+
         active.Add(this);
         damageable.Damaged += OnDamaged;
         damageable.Died += OnDied;
@@ -419,6 +436,12 @@ public sealed partial class MonsterAI : MonoBehaviour, IEventSubject, IStaggerab
 
     private void OnDisable()
     {
+        // Removed before it could wake (co-op: the host's game sends the creatures).
+        if (suppressed)
+        {
+            return;
+        }
+
         active.Remove(this);
         damageable.Damaged -= OnDamaged;
         damageable.Died -= OnDied;
@@ -427,7 +450,7 @@ public sealed partial class MonsterAI : MonoBehaviour, IEventSubject, IStaggerab
 
     private void Update()
     {
-        if (CurrentState == State.Dead || definition == null)
+        if (CurrentState == State.Dead || definition == null || suppressed)
         {
             return;
         }

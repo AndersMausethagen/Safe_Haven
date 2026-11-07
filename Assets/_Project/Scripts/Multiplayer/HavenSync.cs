@@ -134,7 +134,11 @@ public sealed class HavenSync : IDisposable
     /// Takes on a friend's changes: into the remembered world (also when that place isn't loaded, say the host is on a
     /// raid), and onto the loaded objects, creating what was placed and removing what is gone.
     /// </summary>
-    public int Apply(byte[] packed, bool withMovement)
+    /// <param name="noteMarks">
+    /// False on the host for a guest's changes: its marks are left as they were, so its next look sends the result to everyone,
+    /// the sender included. When two players change the same thing at once, both games end with the host's.
+    /// </param>
+    public int Apply(byte[] packed, bool withMovement, bool noteMarks = true)
     {
         Batch batch = WorldTransfer.Unpack<Batch>(packed);
         if (batch?.entities == null || string.IsNullOrEmpty(batch.scene))
@@ -175,7 +179,7 @@ public sealed class HavenSync : IDisposable
                 {
                     marks.Remove(data.id);
                 }
-                else if (entity.HasStarted && sceneState == watched)
+                else if (noteMarks && entity.HasStarted && sceneState == watched)
                 {
                     marks[data.id] = entity.SharedMark(withMovement);
                 }

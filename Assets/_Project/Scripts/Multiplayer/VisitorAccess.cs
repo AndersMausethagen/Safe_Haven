@@ -266,11 +266,21 @@ public sealed class VisitorAccess
             return;
         }
 
-        StashShare.Change change = WorldTransfer.Unpack<StashShare.Change>(packed);
-        StashShare.ApplyChange(change, GameSession.Stash, Content());
-        stashApplied[sender] = Mathf.Max(stashApplied.TryGetValue(sender, out int applied) ? applied : 0, change.number);
         // Always answered, even when nothing could be done: the guest waits for this number before taking the stash on.
-        SendSnapshot(sender);
+        try
+        {
+            StashShare.Change change = WorldTransfer.Unpack<StashShare.Change>(packed);
+            stashApplied[sender] = Mathf.Max(stashApplied.TryGetValue(sender, out int applied) ? applied : 0, change.number);
+            StashShare.ApplyChange(change, GameSession.Stash, Content());
+        }
+        catch (Exception exception)
+        {
+            Debug.LogException(exception);
+        }
+        finally
+        {
+            SendSnapshot(sender);
+        }
     }
 
     private void SendSnapshot(ulong clientId)

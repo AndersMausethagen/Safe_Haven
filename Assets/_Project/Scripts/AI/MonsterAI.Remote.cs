@@ -10,12 +10,38 @@ using UnityEngine.AI;
 /// </summary>
 public sealed partial class MonsterAI
 {
-    private const float RemoteFollowRate = 10f;
+    /// <summary>Seconds behind the host a puppet is drawn: enough to cover two lost updates at ten a second (snapshot interpolation).</summary>
+    private const double RemoteDelay = 0.15;
     private const float RemoteSnapDistance = 6f;
 
-    private Vector3 remoteAt;
-    private float remoteYaw;
+    /// <summary>Seconds without a pose after which the creature is taken to have stood still meanwhile.</summary>
+    private const double RemoteQuietGap = 0.25;
+
+    private readonly PoseBuffer remotePoses = new PoseBuffer();
     private float remoteSpeed;
+    private bool suppressed;
+
+    /// <summary>The session's clock (co-op sets it): puppets are drawn on it, a little behind.</summary>
+    public static System.Func<double> RemoteClock { get; set; }
+
+    /// <summary>
+    /// True while co-op builds a puppet. A friend's game on the host's run makes no creatures of its own: any other made
+    /// now is removed before it can think (<see cref="CoopCreatures.FromHost"/>).
+    /// </summary>
+    public static bool SpawningRemote { get; set; }
+
+    /// <summary>True for a creature this game was about to make while the host's game sends them: it goes at once.</summary>
+    private bool SuppressedByHost()
+    {
+        if (!CoopCreatures.FromHost || SpawningRemote)
+        {
+            return false;
+        }
+
+        suppressed = true;
+        Destroy(gameObject);
+        return true;
+    }
 
     /// <summary>True for a creature shown in a friend's game and run by the host's.</summary>
     public bool IsRemote { get; private set; }
@@ -27,8 +53,7 @@ public sealed partial class MonsterAI
     public void MakeRemote()
     {
         IsRemote = true;
-        remoteAt = transform.position;
-        remoteYaw = transform.eulerAngles.y;
+        remotePoses.Clear();
         if (TryGetComponent(out NavMeshAgent agent))
         {
             agent.enabled = false;
@@ -51,16 +76,21 @@ public sealed partial class MonsterAI
         }
     }
 
-    /// <summary>Where the host's creature is and what it is doing. A strike or death in progress here finishes first.</summary>
-    public void ApplyRemotePose(Vector3 position, float yaw, float speed, State state)
+    /// <summary>
+    /// Where the host's creature was at <paramref name="time"/> (the session's clock) and what it was doing. A strike or death
+    /// in progress here finishes first.
+    /// </summary>
+    public void ApplyRemotePose(double time, Vector3 position, float yaw, float speed, State state)
     {
-        remoteAt = position;
-        remoteYaw = yaw;
-        remoteSpeed = speed;
-        if ((transform.position - position).sqrMagnitude > RemoteSnapDistance * RemoteSnapDistance)
+        // Nothing was sent while it stood still: it starts moving from where it stood, a moment before this, not slides from
+        // the last pose a while ago.
+        if (remotePoses.TryNewest(out PoseSnapshot newest) && time - newest.Time > RemoteQuietGap)
         {
-            transform.position = position;
+            remotePoses.Add(new PoseSnapshot { Time = time - 0.1, Position = newest.Position, Yaw = newest.Yaw });
         }
+
+        remotePoses.Add(new PoseSnapshot { Time = time, Position = position, Yaw = yaw });
+        remoteSpeed = speed;
 
         if (CurrentState != State.Attacking && CurrentState != State.Dead && state != State.Attacking && state != State.Dead)
         {
@@ -68,13 +98,18 @@ public sealed partial class MonsterAI
         }
     }
 
-    /// <summary>The host's creature strikes: the same action plays here, at <paramref name="at"/> (this player) or straight ahead.</summary>
-    public void PlayRemoteStrike(int action, IDamageable at)
+    /// <summary>
+    /// The host's creature strikes from <paramref name="from"/>: this one steps there (it is drawn a little behind) and the
+    /// same action plays here, at <paramref name="at"/> (this player) or straight ahead.
+    /// </summary>
+    public void PlayRemoteStrike(int action, IDamageable at, Vector3 from, float yaw)
     {
         if (!IsRemote || CurrentState == State.Dead || definition == null)
         {
             return;
         }
+
+        transform.SetPositionAndRotation(from, Quaternion.Euler(0f, yaw, 0f));
 
         Vector3 toTarget = transform.forward;
         if (at is Component body && CanTarget(at))
@@ -117,8 +152,11 @@ public sealed partial class MonsterAI
             return;
         }
 
-        float follow = 1f - Mathf.Exp(-RemoteFollowRate * Time.deltaTime);
-        transform.position = Vector3.Lerp(transform.position, remoteAt, follow);
-        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0f, remoteYaw, 0f), follow);
+        if (RemoteClock == null || !remotePoses.Sample(RemoteClock() - RemoteDelay, RemoteSnapDistance, out Vector3 position, out float yaw, out _))
+        {
+            return;
+        }
+
+        transform.SetPositionAndRotation(position, Quaternion.Euler(0f, yaw, 0f));
     }
 }

@@ -310,7 +310,13 @@ public sealed class Damageable : MonoBehaviour, IDamageable, ISaveable, ISharedS
             return;
         }
 
-        currentHealth = Mathf.Max(Mathf.Max(HealthFloor, 1f), MaxHealth * Mathf.Clamp01(share));
+        float shown = Mathf.Max(Mathf.Max(HealthFloor, 1f), MaxHealth * Mathf.Clamp01(share));
+        if (Mathf.Abs(shown - currentHealth) < 0.01f)
+        {
+            return;
+        }
+
+        currentHealth = shown;
         HealthChanged?.Invoke(currentHealth, MaxHealth);
     }
 

@@ -42,12 +42,22 @@ public sealed class CoopDowned : IDisposable
         network.CustomMessagingManager.RegisterNamedMessageHandler(HelpUpMessage, OnHelpUp);
     }
 
-    /// <summary>The session ended: stand up quietly and let go of the health floor.</summary>
+    /// <summary>
+    /// The session ended. Down on a raid, nobody is left to help: the blow that knocked them down kills them (leaving is no
+    /// way back up). Otherwise stand up quietly. Either way the health floor goes.
+    /// </summary>
     public void Reset()
     {
         if (IsDown)
         {
-            StandUp(null, quiet: true);
+            if (GameSession.ActiveRaid != null && health != null)
+            {
+                Die();
+            }
+            else
+            {
+                StandUp(null, quiet: true);
+            }
         }
 
         Release();
@@ -237,10 +247,10 @@ public sealed class CoopDowned : IDisposable
     // A friend on this run who is up and about.
     private bool FriendStandingHere()
     {
-        string place = CoopCreatures.PlaceHere();
+        FixedString128Bytes place = CoopCreatures.PlaceKey;
         foreach (NetworkPlayerAvatar friend in NetworkPlayerAvatar.All)
         {
-            if (friend != null && !friend.IsOwner && friend.IsVisible && !friend.Look.Downed && friend.Look.Place.ToString() == place)
+            if (friend != null && !friend.IsOwner && friend.IsVisible && !friend.Look.Downed && friend.Look.Place.Equals(place))
             {
                 return true;
             }
