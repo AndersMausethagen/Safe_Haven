@@ -26,6 +26,8 @@ public sealed class FishingHud : MonoBehaviour
     private GameObject struggle;
     private TMP_Text struggleText;
     private RectTransform struggleFill;
+    private Image zoneImage;
+    private int writtenTenths = -1;
 
     public static FishingHud Current { get; private set; }
 
@@ -120,7 +122,12 @@ public sealed class FishingHud : MonoBehaviour
         {
             zone.sizeDelta = new Vector2(56f, session.ZoneSize * BarHeight);
             zone.anchoredPosition = new Vector2(0f, session.Zone * BarHeight);
-            zone.GetComponent<Image>().color = session.InZone ? new Color(0.35f, 0.85f, 0.4f, 0.65f) : new Color(0.85f, 0.45f, 0.3f, 0.45f);
+            if (zoneImage == null)
+            {
+                zoneImage = zone.GetComponent<Image>();
+            }
+
+            zoneImage.color = session.InZone ? new Color(0.35f, 0.85f, 0.4f, 0.65f) : new Color(0.85f, 0.45f, 0.3f, 0.45f);
             fish.anchoredPosition = new Vector2(0f, session.Fish * BarHeight);
             fishIcon.sprite = fishing.Hooked != null && fishing.Hooked.item != null ? fishing.Hooked.item.Icon : null;
             fishIcon.color = fishIcon.sprite != null ? Color.white : Gold;
@@ -131,7 +138,13 @@ public sealed class FishingHud : MonoBehaviour
         struggle.SetActive(nokken != null);
         if (nokken != null)
         {
-            struggleText.text = $"SPACE!  <size=50%><alpha=#AA>{nokken.SecondsLeft:0.0}s";
+            int tenths = Mathf.RoundToInt(nokken.SecondsLeft * 10f);
+            if (tenths != writtenTenths)
+            {
+                writtenTenths = tenths;
+                struggleText.text = $"SPACE!  <size=50%><alpha=#AA>{nokken.SecondsLeft:0.0}s";
+            }
+
             struggleText.transform.localScale = Vector3.one * (1f + Mathf.PingPong(Time.time * 6f, 0.15f));
             struggleFill.anchorMax = new Vector2(nokken.Struggle, 1f);
         }

@@ -29,6 +29,7 @@ public sealed class HavenHud : MonoBehaviour
     private float bannerAt = -10f;
     private float nextStanding;
     private int shownGain;
+    private int writtenGain = -1;
 
     public static HavenHud Current { get; private set; }
 
@@ -124,7 +125,12 @@ public sealed class HavenHud : MonoBehaviour
         gain.gameObject.SetActive(age < GainSeconds);
         if (age < GainSeconds)
         {
-            gain.text = $"+{shownGain} Renown";
+            if (shownGain != writtenGain)
+            {
+                writtenGain = shownGain;
+                gain.text = $"+{shownGain} Renown";
+            }
+
             gain.alpha = 1f - Mathf.Clamp01((age - GainSeconds * 0.5f) / (GainSeconds * 0.5f));
             gain.rectTransform.anchoredPosition = new Vector2(BadgeWidth * 0.5f, GainY - age * 10f);
         }

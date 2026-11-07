@@ -63,6 +63,7 @@ public static class InputRebinds
         new RebindRow("Windows", "Haven", "Player/Haven"),
         new RebindRow("Windows", "World Map", "Player/WorldMap"),
         new RebindRow("Windows", "Command Wheel", "Player/CommandWheel"),
+        new RebindRow("Windows", "Mark for Friends (co-op)", "Player/Ping"),
 
         new RebindRow("Camera and Building", "Camera Style", "Camera/ToggleStyle"),
         new RebindRow("Camera and Building", "Turn Camera", "Camera/Orbit"),
@@ -81,6 +82,9 @@ public static class InputRebinds
     /// <summary>True while waiting for the player to press the new key, and just after: the Escape that cancels it means nothing else.</summary>
     public static bool IsListening => operation != null || Time.frameCount - finishedFrame <= 1;
 
+    /// <summary>Goes up whenever the keys change (loaded, rebound, reset): text that names keys looks again then.</summary>
+    public static int Changes { get; private set; }
+
     /// <summary>Puts back what the player chose earlier. Called once when the game starts.</summary>
     public static void Load()
     {
@@ -89,6 +93,8 @@ public static class InputRebinds
         {
             InputSystem.actions.LoadBindingOverridesFromJson(json);
         }
+
+        Changes++;
     }
 
     /// <summary>Back to the keys the game came with.</summary>
@@ -100,10 +106,12 @@ public static class InputRebinds
         }
 
         PlayerPrefs.DeleteKey(Key);
+        Changes++;
     }
 
     private static void Save()
     {
+        Changes++;
         PlayerPrefs.SetString(Key, InputSystem.actions.SaveBindingOverridesAsJson());
     }
 

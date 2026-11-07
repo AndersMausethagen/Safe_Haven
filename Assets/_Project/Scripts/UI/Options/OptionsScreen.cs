@@ -36,6 +36,7 @@ public sealed class OptionsScreen : MonoBehaviour
     private float confirmUntil = -1f;
     private int keptMode;
     private Vector2Int keptResolution;
+    private int writtenCountdown = -1;
 
     /// <summary>True while the screen is up, or was until this frame: the same Escape press must not close the menu under it.</summary>
     public static bool HasEscape => (current != null && current.window.activeSelf) || closedFrame == Time.frameCount;
@@ -117,7 +118,12 @@ public sealed class OptionsScreen : MonoBehaviour
         }
 
         float left = confirmUntil - Time.unscaledTime;
-        confirmText.text = $"Keep these display settings? Going back in {Mathf.CeilToInt(Mathf.Max(0f, left))} s.";
+        int countdown = Mathf.CeilToInt(Mathf.Max(0f, left));
+        if (countdown != writtenCountdown)
+        {
+            writtenCountdown = countdown;
+            confirmText.text = $"Keep these display settings? Going back in {countdown} s.";
+        }
         if (left <= 0f)
         {
             RevertDisplay();

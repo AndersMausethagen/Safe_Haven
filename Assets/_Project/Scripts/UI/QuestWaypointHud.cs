@@ -20,6 +20,9 @@ public sealed class QuestWaypointHud : MonoBehaviour
     private Image diamond;
     private TMP_Text arrowMark;
     private Camera view;
+    private QuestWaypoint writtenTarget;
+    private string writtenLabel;
+    private int writtenMetres = -1;
 
     public static QuestWaypointHud Create()
     {
@@ -109,7 +112,15 @@ public sealed class QuestWaypointHud : MonoBehaviour
         arrow.gameObject.SetActive(!onScreen);
         arrow.localRotation = Quaternion.Euler(0f, 0f, Mathf.Atan2(local.y, local.x) * Mathf.Rad2Deg);
         arrow.anchoredPosition = local.normalized * 26f;
-        text.text = $"{target.Label}\n{distance:0} m";
+        // Written again only when the target, its label or the whole metres change.
+        int metres = Mathf.RoundToInt(distance);
+        if (target != writtenTarget || metres != writtenMetres || target.Label != writtenLabel)
+        {
+            writtenTarget = target;
+            writtenLabel = target.Label;
+            writtenMetres = metres;
+            text.text = $"{target.Label}\n{metres} m";
+        }
     }
 
     // The nearest waypoint whose quest wants the player there.

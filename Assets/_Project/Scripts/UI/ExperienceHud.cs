@@ -18,6 +18,11 @@ public sealed class ExperienceHud : MonoBehaviour
     private CanvasGroup group;
     private int shownGain;
     private float gainAt = -10f;
+    // What the texts say now: written again only when it changes (no new strings every frame).
+    private int writtenLevel = -1;
+    private int writtenPoints = -1;
+    private int writtenKeys = -1;
+    private int writtenGain = -1;
 
     public static ExperienceHud Current { get; private set; }
 
@@ -77,13 +82,24 @@ public sealed class ExperienceHud : MonoBehaviour
         float share = progress.IsMaxLevel(settings) ? 1f : progress.Experience / (float)settings.ExperienceToNext(progress.Level);
         fill.anchorMax = new Vector2(Mathf.Clamp01(share), 1f);
         int points = progress.UnspentPoints(settings);
-        level.text = points > 0 ? GameInput.WithRebinds($"Lv {progress.Level}  <color=#8BE08B>+{points} (N)</color>") : $"Lv {progress.Level}";
+        if (progress.Level != writtenLevel || points != writtenPoints || InputRebinds.Changes != writtenKeys)
+        {
+            writtenLevel = progress.Level;
+            writtenPoints = points;
+            writtenKeys = InputRebinds.Changes;
+            level.text = points > 0 ? GameInput.WithRebinds($"Lv {progress.Level}  <color=#8BE08B>+{points} (N)</color>") : $"Lv {progress.Level}";
+        }
 
         float age = Time.unscaledTime - gainAt;
         gain.gameObject.SetActive(age < GainSeconds);
         if (age < GainSeconds)
         {
-            gain.text = $"+{shownGain} XP";
+            if (shownGain != writtenGain)
+            {
+                writtenGain = shownGain;
+                gain.text = $"+{shownGain} XP";
+            }
+
             gain.alpha = 1f - Mathf.Clamp01((age - GainSeconds * 0.5f) / (GainSeconds * 0.5f));
             gain.rectTransform.anchoredPosition = new Vector2(0f, 18f + age * 14f);
         }

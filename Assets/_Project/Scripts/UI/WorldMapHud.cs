@@ -26,6 +26,7 @@ public sealed class WorldMapHud : MonoBehaviour
     private TMP_Text titleLabel;
     private RectTransform titleMark;
     private bool suspendedGameplay;
+    private int writtenSeconds = -1;
 
     private sealed class QuestMark
     {
@@ -247,7 +248,13 @@ public sealed class WorldMapHud : MonoBehaviour
         // The raid doesn't stop for the map, and the map covers the clock.
         if (RaidDirector.Current != null)
         {
-            titleLabel.text = $"World Map  ·  {RaidStats.FormatTime(RaidDirector.Current.Session.TimeRemaining)}";
+            // Written again once a second, as the clock turns.
+            int seconds = Mathf.CeilToInt(RaidDirector.Current.Session.TimeRemaining);
+            if (seconds != writtenSeconds)
+            {
+                writtenSeconds = seconds;
+                titleLabel.text = $"World Map  ·  {RaidStats.FormatTime(RaidDirector.Current.Session.TimeRemaining)}";
+            }
         }
 
         if (titleMark != null)

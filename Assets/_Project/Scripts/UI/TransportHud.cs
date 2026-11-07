@@ -20,6 +20,9 @@ public sealed class TransportHud : MonoBehaviour
     private TMP_Text status;
     private RectTransform fill;
     private Image fillImage;
+    // What the lines say now: written again only when they change.
+    private (int metres, int state) writtenStatus = (-1, -1);
+    private (int weight, int capacity, int slower) writtenLoad = (-1, -1, -1);
 
     public static TransportHud Current { get; private set; }
 
@@ -99,20 +102,29 @@ public sealed class TransportHud : MonoBehaviour
         DrawLoad(shown, style);
         float reach = TransportSettings.Current.ExtractionRange;
         bool held = used != null && used == cart;
-        status.text = cart != null ? RaidLine(held, away, reach) : "";
-        status.color = held || away <= reach ? style.Text : style.Warning;
-        if (cart != null && !held && cart.TryGetComponent(out CartScavenging scavenging) && scavenging.IsBeingEaten)
+        bool eaten = cart != null && !held && cart.TryGetComponent(out CartScavenging scavenging) && scavenging.IsBeingEaten;
+        // state: 0 no cart, 1 held, 2 in reach, 3 out of reach, 4 being eaten.
+        int state = cart == null ? 0 : eaten ? 4 : held ? 1 : away <= reach ? 2 : 3;
+        var now = (Mathf.RoundToInt(away), state);
+        if (now != writtenStatus)
         {
-            status.text = $"{away:0} m away. Something is tearing at it";
-            status.color = style.Danger;
+            writtenStatus = now;
+            status.text = state == 0 ? "" : eaten ? $"{away:0} m away. Something is tearing at it" : RaidLine(held, away, reach);
         }
+
+        status.color = eaten ? style.Danger : held || away <= reach ? style.Text : style.Warning;
     }
 
     private void DrawLoad(Transport used, UIStyle style)
     {
         title.text = used.IsOverfilled ? "Overfilled" : used.Definition.DisplayName;
         title.color = used.IsOverfilled ? style.Warning : style.Accent;
-        load.text = $"{used.Weight:0} / {used.Definition.Capacity:0}   <alpha=#AA>{(1f - used.SpeedScale) * 100f:0}% slower";
+        var now = (Mathf.RoundToInt(used.Weight), Mathf.RoundToInt(used.Definition.Capacity), Mathf.RoundToInt((1f - used.SpeedScale) * 100f));
+        if (now != writtenLoad)
+        {
+            writtenLoad = now;
+            load.text = $"{now.Item1} / {now.Item2}   <alpha=#AA>{now.Item3}% slower";
+        }
         fill.anchorMax = new Vector2(Mathf.Clamp01(used.Weight / used.Definition.Capacity), 1f);
         fillImage.color = used.IsOverfilled ? style.Warning : style.Accent;
     }

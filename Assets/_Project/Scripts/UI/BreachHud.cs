@@ -19,6 +19,8 @@ public sealed class BreachHud : MonoBehaviour
     private RectTransform bar;
     private RectTransform fill;
     private Image fillImage;
+    // The progress line as written (wave, waves, left, ward %): written again only when one changes.
+    private (int wave, int waves, int left, int ward) written = (-1, -1, -1, -1);
 
     public static BreachHud Current { get; private set; }
 
@@ -79,8 +81,14 @@ public sealed class BreachHud : MonoBehaviour
         UIStyle style = UIStyle.Current;
         title.text = breach.Definition.DisplayName;
         int left = breach.AttackersLeft;
-        string ward = breach.WardAtRisk ? $"  ·  Ward {Mathf.CeilToInt(breach.WardHealth * 100f)}%" : "";
-        progress.text = $"Wave {breach.Wave} of {breach.WaveCount}  ·  {left} left{ward}";
+        int wardShare = breach.WardAtRisk ? Mathf.CeilToInt(breach.WardHealth * 100f) : -1;
+        var now = (breach.Wave, breach.WaveCount, left, wardShare);
+        if (now != written)
+        {
+            written = now;
+            string ward = wardShare >= 0 ? $"  ·  Ward {wardShare}%" : "";
+            progress.text = $"Wave {breach.Wave} of {breach.WaveCount}  ·  {left} left{ward}";
+        }
         bar.gameObject.SetActive(breach.WardAtRisk);
         fill.anchorMax = new Vector2(breach.WardHealth, 1f);
         fillImage.color = breach.WardHealth <= WardInDanger ? style.Danger : style.Accent;
