@@ -13,15 +13,18 @@ public sealed class PlayerCombatMode
 
     private readonly Transform player;
     private readonly Damageable health;
+    private readonly System.Func<float> clock;
     private GameStateManager gameState;
     private float lastActivityTime;
     private float nextHuntCheck;
     private bool hunted;
 
-    public PlayerCombatMode(Transform player, Damageable health)
+    /// <param name="clock">The time now: Time.time unless given another (tests).</param>
+    public PlayerCombatMode(Transform player, Damageable health, System.Func<float> clock = null)
     {
         this.player = player;
         this.health = health;
+        this.clock = clock ?? (() => Time.time);
     }
 
     /// <summary>Starts following the game's mode (PlayerCombat.OnEnable).</summary>
@@ -35,7 +38,7 @@ public sealed class PlayerCombatMode
         }
 
         gameState.GameStateChanged += OnGameStateChanged;
-        lastActivityTime = Time.time;
+        lastActivityTime = clock();
     }
 
     public void Detach()
@@ -50,7 +53,7 @@ public sealed class PlayerCombatMode
     /// <summary>Enters (or stays in) GameState.Combat: the player attacked or was attacked.</summary>
     public void Enter()
     {
-        lastActivityTime = Time.time;
+        lastActivityTime = clock();
         if (gameState != null)
         {
             gameState.TrySetState(GameState.Combat);
@@ -58,13 +61,13 @@ public sealed class PlayerCombatMode
     }
 
     /// <summary>A blow landed: the fight goes on.</summary>
-    public void NoteActivity() => lastActivityTime = Time.time;
+    public void NoteActivity() => lastActivityTime = clock();
 
     /// <summary>Returns to Exploration once the fight is over: <paramref name="timeout"/> seconds of quiet (0 stays in Combat).</summary>
     public void Tick(float timeout)
     {
         if (gameState != null && gameState.CurrentState == GameState.Combat
-            && StrikeRules.FightIsOver(Time.time - lastActivityTime, timeout, IsHunted()))
+            && StrikeRules.FightIsOver(clock() - lastActivityTime, timeout, IsHunted()))
         {
             gameState.TrySetState(GameState.Exploration);
         }
@@ -74,19 +77,19 @@ public sealed class PlayerCombatMode
     {
         if (state == GameState.Combat)
         {
-            lastActivityTime = Time.time;
+            lastActivityTime = clock();
         }
     }
 
     // Looked at a few times a second, only while the quiet stretch could end the fight.
     private bool IsHunted()
     {
-        if (Time.time < nextHuntCheck)
+        if (clock() < nextHuntCheck)
         {
             return hunted;
         }
 
-        nextHuntCheck = Time.time + HuntCheckInterval;
+        nextHuntCheck = clock() + HuntCheckInterval;
         hunted = false;
         float range = CombatTechniqueSettings.Current.FightHoldRange;
         foreach (MonsterAI monster in MonsterAI.Active)

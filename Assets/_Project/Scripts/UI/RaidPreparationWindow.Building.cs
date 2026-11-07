@@ -63,9 +63,9 @@ public sealed partial class RaidPreparationWindow
         sparksHeading = Heading("Extra time", part, RightColumn, 0f, ColumnWidth, style);
         sparksRowRect = At("Sparks", part, RightColumn, 0f, ColumnWidth, 46f);
         sparksRow = sparksRowRect.gameObject;
-        AddButton("Fewer", sparksRowRect, 0f, 0f, 46f, UIRole.Kind.Button, () => StepSparks(-1), out fewerSparks).text = "−";
+        AddButton("Fewer", sparksRowRect, 0f, 0f, 46f, UIRole.Kind.Button, () => Change(() => plan.StepSparks(-1)), out fewerSparks).text = "−";
         sparksValue = Label("Value", sparksRowRect, 50f, 0f, 76f, 46f, 20f, style.Text, TextAlignmentOptions.Center);
-        AddButton("More", sparksRowRect, 130f, 0f, 46f, UIRole.Kind.Button, () => StepSparks(1), out moreSparks).text = "+";
+        AddButton("More", sparksRowRect, 130f, 0f, 46f, UIRole.Kind.Button, () => Change(() => plan.StepSparks(1)), out moreSparks).text = "+";
         sparksAdded = Label("Added", sparksRowRect, 190f, 0f, 100f, 46f, 20f, style.Good);
         RectTransform owned = At("Owned", sparksRowRect, ColumnWidth - 210f, 0f, 210f, 46f);
         owned.gameObject.AddComponent<Image>().color = Color.clear;
@@ -77,16 +77,16 @@ public sealed partial class RaidPreparationWindow
         sizeHeading = Heading("Size", part, RightColumn, 0f, ColumnWidth, style);
         sizeRowRect = At("Size", part, RightColumn, 0f, ColumnWidth, 46f);
         sizeRow = sizeRowRect.gameObject;
-        AddButton("Change", sizeRowRect, 0f, 0f, 150f, UIRole.Kind.Button, ToggleSize, out Button sizeButton);
+        AddButton("Change", sizeRowRect, 0f, 0f, 150f, UIRole.Kind.Button, () => Change(plan.ToggleSize), out Button sizeButton);
         sizeName = sizeButton.GetComponentInChildren<TMP_Text>();
         sizeDetail = Label("Detail", sizeRowRect, 164f, 0f, ColumnWidth - 164f, 46f, 16f, style.Muted);
 
         companionHeading = Heading("Companion", part, RightColumn, 0f, ColumnWidth, style);
         companionRowRect = At("Companion", part, RightColumn, 0f, ColumnWidth, 46f);
         companionRow = companionRowRect.gameObject;
-        AddButton("Previous", companionRowRect, 0f, 0f, 46f, UIRole.Kind.Button, () => StepCompanion(-1), out Button previous).text = "<";
+        AddButton("Previous", companionRowRect, 0f, 0f, 46f, UIRole.Kind.Button, () => Change(() => plan.StepCompanion(-1)), out Button previous).text = "<";
         companionName = Label("Name", companionRowRect, 50f, 0f, 230f, 46f, 20f, style.Text, TextAlignmentOptions.Center);
-        AddButton("Next", companionRowRect, 284f, 0f, 46f, UIRole.Kind.Button, () => StepCompanion(1), out Button next).text = ">";
+        AddButton("Next", companionRowRect, 284f, 0f, 46f, UIRole.Kind.Button, () => Change(() => plan.StepCompanion(1)), out Button next).text = ">";
         companionBond = Label("Bond", companionRowRect, 340f, 0f, 216f, 46f, 17f, style.Muted, TextAlignmentOptions.MidlineRight);
         companionRisk = Paragraph("Risk", part, RightColumn, 0f, ColumnWidth, 26f, 15f, style.Muted);
 
@@ -188,7 +188,7 @@ public sealed partial class RaidPreparationWindow
         const float width = 168f;
         RectTransform rect = At($"Destination {index}", panel, 0f, 44f, width, 46f);
         rect.gameObject.AddComponent<Image>().color = Color.clear;
-        rect.gameObject.AddComponent<Button>().onClick.AddListener(() => PickDestination(index));
+        rect.gameObject.AddComponent<Button>().onClick.AddListener(() => Change(() => plan.PickDestination(index)));
         TMP_Text label = Label("Label", rect, 0f, 0f, width, 44f, 20f, style.Muted, TextAlignmentOptions.Center);
         RectTransform mark = At("Mark", rect, 0f, 44f, width, 2f);
         mark.gameObject.AddComponent<Image>().color = style.Accent;
@@ -200,7 +200,7 @@ public sealed partial class RaidPreparationWindow
         UIStyle style = UIStyle.Current;
         const float width = 64f;
         var entry = new TierButton();
-        entry.Label = AddButton($"Tier {index}", preparation.transform, RightColumn + index * (width + 6f), 0f, width, UIRole.Kind.Button, () => PickTier(entry.Tier), out entry.Button);
+        entry.Label = AddButton($"Tier {index}", preparation.transform, RightColumn + index * (width + 6f), 0f, width, UIRole.Kind.Button, () => Change(() => plan.PickTier(entry.Tier)), out entry.Button);
         RectTransform mark = At("Mark", entry.Button.transform, 0f, 44f, width, 2f);
         var line = mark.gameObject.AddComponent<Image>();
         line.color = style.Accent;

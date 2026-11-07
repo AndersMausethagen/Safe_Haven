@@ -319,33 +319,10 @@ public sealed partial class RaidPreparationWindow : MonoBehaviour
         Refresh();
     }
 
-    private void PickDestination(int index)
+    // A click changes the plan, and the window shows the plan again.
+    private void Change(System.Action change)
     {
-        plan.PickDestination(index);
-        Refresh();
-    }
-
-    private void PickTier(RaidDifficulty tier)
-    {
-        plan.PickTier(tier);
-        Refresh();
-    }
-
-    private void ToggleSize()
-    {
-        plan.ToggleSize();
-        Refresh();
-    }
-
-    private void StepCompanion(int step)
-    {
-        plan.StepCompanion(step);
-        Refresh();
-    }
-
-    private void StepSparks(int step)
-    {
-        plan.StepSparks(step);
+        change();
         Refresh();
     }
 

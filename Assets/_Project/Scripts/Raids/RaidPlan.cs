@@ -11,7 +11,15 @@ public sealed class RaidPlan
 {
     private readonly HashSet<ItemDefinition> picked = new HashSet<ItemDefinition>();
     private readonly List<ResidentDefinition> companions = new List<ResidentDefinition>();
+    private readonly System.Action<RaidDefinition, int, bool> layOutAhead;
     private int destinationIndex;
+
+    /// <param name="layOutAhead">Lays a run out ahead (raid, seed, large), so entering is quick and the briefing can tell
+    /// of its routes: RaidLayoutPrefetch.Prepare unless given another (tests).</param>
+    public RaidPlan(System.Action<RaidDefinition, int, bool> layOutAhead = null)
+    {
+        this.layOutAhead = layOutAhead ?? RaidLayoutPrefetch.Prepare;
+    }
 
     public RaidPortal Portal { get; private set; }
 
@@ -80,7 +88,7 @@ public sealed class RaidPlan
         Large = false;
         Seed = FreshSeed(Destination);
         Large = LargeByDefault(Destination);
-        RaidLayoutPrefetch.Prepare(Destination, Seed, Large);
+        layOutAhead(Destination, Seed, Large);
     }
 
     public void End()
@@ -95,7 +103,7 @@ public sealed class RaidPlan
         destinationIndex = index;
         Difficulty = null;
         Large = LargeByDefault(Destination);
-        RaidLayoutPrefetch.Prepare(Destination, Seed, Large);
+        layOutAhead(Destination, Seed, Large);
     }
 
     public void PickTier(RaidDifficulty tier) => Difficulty = tier;
@@ -103,7 +111,7 @@ public sealed class RaidPlan
     public void ToggleSize()
     {
         Large = !Large;
-        RaidLayoutPrefetch.Prepare(Destination, Seed, Large);
+        layOutAhead(Destination, Seed, Large);
     }
 
     public void StepSparks(int step) => Sparks = Mathf.Clamp(Sparks + step, 0, SettlementSettings.Current.MaxSparksPerRaid);
