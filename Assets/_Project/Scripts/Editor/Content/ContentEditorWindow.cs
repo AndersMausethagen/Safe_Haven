@@ -526,7 +526,7 @@ public sealed class ContentEditorWindow : EditorWindow, IContentEditorHost
         else if (Current.UsesDataInspector)
         {
             ContentUtility.BeginPanel("Settings", "Hover any setting for an explanation. Changes are saved automatically.");
-            if (inspector.Draw(asset, Current.HiddenFields))
+            if (inspector.Draw(asset, Current.HiddenFieldsFor(asset)))
             {
                 RecomputeProblems();
             }

@@ -24,14 +24,35 @@ MonoBehaviour:
   showTimerInHud: 0
   prerequisites:
   - {fileID: 11400000, guid: a089752e48d75934fb5e34dbeec0b389, type: 2}
+  startedFirst: []
   start: 1
   startEvent: {fileID: 11400000, guid: 6f84424e4c227b4449220dab22e7e824, type: 2}
+  startWhen:
+    type: 0
+    description: 
+    amount: 1
+    item: {fileID: 0}
+    resource: {fileID: 0}
+    monster: {fileID: 0}
+    faction: 1
+    building: {fileID: 0}
+    raid: {fileID: 0}
+    mustExtract: 1
+    withinMinutes: 0
+    questEvent: {fileID: 0}
+    person: {fileID: 0}
+    target: {fileID: 0}
+    job: {fileID: 0}
+    breach: {fileID: 0}
+    rank: 1
+    bringHome: 0
+    countAlreadyOwned: 0
   closedBy: {fileID: 0}
   startDelay: 0
   onStarted: []
   objectivesInOrder: 0
   objectives:
-  - type: 6
+  - type: 11
     description: Inspect the dormant portal
     amount: 1
     item: {fileID: 0}
@@ -40,9 +61,15 @@ MonoBehaviour:
     faction: 1
     building: {fileID: 0}
     raid: {fileID: 0}
-    mustExtract: 0
+    mustExtract: 1
     withinMinutes: 0
-    questEvent: {fileID: 11400000, guid: b3710131b64b67644a96acc43d56964c, type: 2}
+    questEvent: {fileID: 0}
+    person: {fileID: 0}
+    target: {fileID: 11400000, guid: e835c314791108c43b5172c1cc4a57fd, type: 2}
+    job: {fileID: 0}
+    breach: {fileID: 0}
+    rank: 1
+    bringHome: 0
     countAlreadyOwned: 1
   - type: 6
     description: Reactivate the portal to search for the expedition
@@ -56,6 +83,12 @@ MonoBehaviour:
     mustExtract: 0
     withinMinutes: 0
     questEvent: {fileID: 11400000, guid: 33b3fdbc627e48d4f9a56fdda934ff2e, type: 2}
+    person: {fileID: 0}
+    target: {fileID: 0}
+    job: {fileID: 0}
+    breach: {fileID: 0}
+    rank: 1
+    bringHome: 0
     countAlreadyOwned: 1
   turnInToGiver: 0
   turnInTo: 

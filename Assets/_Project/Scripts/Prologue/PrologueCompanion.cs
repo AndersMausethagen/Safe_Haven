@@ -21,9 +21,9 @@ public sealed class CompanionTopic
 /// expedition sets out. An alchemist also heals the player now and then during a fight.
 /// </summary>
 [RequireComponent(typeof(NavMeshAgent), typeof(Talkable))]
-public sealed class PrologueCompanion : MonoBehaviour, IConversationTopics
+public sealed class PrologueCompanion : MonoBehaviour, IConversationTopics, IQuestPerson
 {
-    [SerializeField] private ResidentDefinition resident;
+    [SerializeField, QuestIdentity] private ResidentDefinition resident;
     [Tooltip("Their line by the morning fire in the meadow, and on the road to the forest.")]
     [SerializeField, TextArea] private string meadowLine;
     [SerializeField, TextArea] private string forestLine;

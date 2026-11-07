@@ -17,12 +17,28 @@ public enum ObjectiveType
     CraftItem = 4,
     /// <summary>Finish X raids, optionally in one place, by extracting, within a time.</summary>
     CompleteRaids = 5,
-    /// <summary>Have a Quest Event happen X times: reach a place, use an object, talk to someone.</summary>
+    /// <summary>Have a Story Event happen X times: a moment only a story or a scene knows (a lesson, an answer chosen).
+    /// For talking, reaching and using, the dynamic types below need no event made for each.</summary>
+    [InspectorName("Story Event (one-off moment)")]
     QuestEvent = 6,
     /// <summary>Build X of a structure (or any structure) with the build menu.</summary>
     BuildStructure = 7,
     /// <summary>Land X fish with a rod: of one kind, or any fish.</summary>
     CatchFish = 8,
+    /// <summary>Talk to someone (their Resident Definition) or something (a Quest Target, such as the Portal).</summary>
+    TalkTo = 9,
+    /// <summary>Reach a place: a Quest Target that a Quest Zone in a scene is marked with.</summary>
+    ReachPlace = 10,
+    /// <summary>Use, inspect or light a thing: a Quest Target that an Inspect Point in a scene is marked with.</summary>
+    UseObject = 11,
+    /// <summary>Find and free a stranded person, or bring them home: one person, or anyone.</summary>
+    RescuePerson = 12,
+    /// <summary>Give someone work: a job, a person, or both.</summary>
+    AssignJob = 13,
+    /// <summary>Beat back a ward breach: one kind, or any.</summary>
+    DefendBreach = 14,
+    /// <summary>Raise Safe Haven to a rank (Haven Settings › Ranks), counting a rank already reached.</summary>
+    ReachHavenRank = 15,
 }
 
 /// <summary>
@@ -35,6 +51,10 @@ public enum ObjectiveType
 /// <see cref="Progress"/> from a GameEventKind (add one in GameEvents if nothing reports it yet), 5) word it in
 /// <see cref="Describe"/>; check it in <see cref="FindProblem"/> and, if it can be met before the quest starts, in
 /// <see cref="Owned"/>.
+/// </para>
+/// <para>
+/// The deed types (Talk To, Reach Place, Use Object, Rescue Person) name their target as an asset, so one type serves every
+/// person, place and thing: a designer assigns who or what, and makes no new event. What raises each is in GameEventKind.
 /// </para>
 /// </summary>
 [Serializable]
@@ -60,13 +80,26 @@ public sealed class QuestObjective
     [Tooltip("Only raids finished within this many minutes count. 0 ignores time.")]
     [SerializeField, Min(0f)] private float withinMinutes;
     [SerializeField] private GameEventDefinition questEvent;
+    [Tooltip("Who: their Resident Definition. Empty, for Rescue Person: anyone; for Assign Job: whoever gets it.")]
+    [SerializeField] private ResidentDefinition person;
+    [Tooltip("The place or thing (a Quest Target). For Talk To, instead of a person: the Portal, a shrine.")]
+    [SerializeField] private QuestTargetDefinition target;
+    [Tooltip("Empty: any job.")]
+    [SerializeField] private JobDefinition job;
+    [Tooltip("Empty: any ward breach.")]
+    [SerializeField] private WardBreachDefinition breach;
+    [Tooltip("The rank to reach: 1 is the first above where Safe Haven starts (Haven Settings › Ranks).")]
+    [SerializeField, Min(1)] private int rank = 1;
+    [Tooltip("Off: finding and freeing them is enough. On: they must come home with the player.")]
+    [SerializeField] private bool bringHome;
     [Tooltip("Counts what the player already has when the quest starts, including a Quest Event that already happened (counts once).")]
     [SerializeField] private bool countAlreadyOwned;
 
     public ObjectiveType Type => type;
 
     /// <summary>Whether a raid can move this on whatever is out there. A Quest Event depends on the place: see what has a waypoint there.</summary>
-    public bool CanProgressOnARaid => type != ObjectiveType.CraftItem && type != ObjectiveType.BuildStructure && type != ObjectiveType.QuestEvent;
+    public bool CanProgressOnARaid => type != ObjectiveType.CraftItem && type != ObjectiveType.BuildStructure && type != ObjectiveType.QuestEvent
+        && type != ObjectiveType.AssignJob && type != ObjectiveType.ReachHavenRank;
     public int Amount => Mathf.Max(1, amount);
     public bool CountAlreadyOwned => countAlreadyOwned && Array.IndexOf(FieldsOf(type), nameof(countAlreadyOwned)) >= 0;
     public ItemDefinition Item => item;
@@ -76,6 +109,47 @@ public sealed class QuestObjective
     /// <summary>The structure to build or destroy; null counts any.</summary>
     public BuildingDefinition Building => building;
     public GameEventDefinition QuestEvent => questEvent;
+    public ResidentDefinition Person => person;
+    public QuestTargetDefinition Target => target;
+    public JobDefinition Job => job;
+    public WardBreachDefinition Breach => breach;
+    public int Rank => Mathf.Max(1, rank);
+    public bool BringHome => bringHome;
+
+    /// <summary>Who or what a deed objective is about (Talk To, Reach Place, Use Object, Rescue Person); null otherwise.</summary>
+    public Object DeedTarget
+    {
+        get
+        {
+            switch (type)
+            {
+                case ObjectiveType.TalkTo: return person != null ? (Object)person : target;
+                case ObjectiveType.ReachPlace:
+                case ObjectiveType.UseObject: return target;
+                case ObjectiveType.RescuePerson: return person;
+                default: return null;
+            }
+        }
+    }
+
+    /// <summary>The kind of game event a deed objective waits for; null for other types.</summary>
+    public GameEventKind? DeedKind
+    {
+        get
+        {
+            switch (type)
+            {
+                case ObjectiveType.TalkTo: return GameEventKind.Talked;
+                case ObjectiveType.ReachPlace: return GameEventKind.Reached;
+                case ObjectiveType.UseObject: return GameEventKind.Used;
+                case ObjectiveType.RescuePerson: return bringHome ? GameEventKind.PersonRescued : GameEventKind.PersonFreed;
+                default: return null;
+            }
+        }
+    }
+
+    /// <summary>The key the quest log keeps once this deed is done (QuestDeeds); null when it isn't one, or has no target.</summary>
+    public string DeedKey => DeedKind.HasValue ? QuestDeeds.Key(DeedKind.Value, DeedTarget) : null;
 
     public static QuestObjective Create(ObjectiveType type, int amount, Object target = null, bool mustExtract = true, float withinMinutes = 0f,
         Faction faction = Faction.Enemy)
@@ -87,7 +161,26 @@ public sealed class QuestObjective
         objective.building = target as BuildingDefinition;
         objective.raid = target as RaidDefinition;
         objective.questEvent = target as GameEventDefinition;
+        objective.person = target as ResidentDefinition;
+        objective.target = target as QuestTargetDefinition;
+        objective.job = target as JobDefinition;
+        objective.breach = target as WardBreachDefinition;
         return objective;
+    }
+
+    /// <summary>A deed objective ("talk to Sigrid", "bring Ingrid home") for code and tools; also used as a quest's or a
+    /// story's "when the player does" condition.</summary>
+    public static QuestObjective Deed(ObjectiveType type, Object who, bool home = false)
+    {
+        QuestObjective objective = Create(type, 1, who);
+        objective.bringHome = home;
+        return objective;
+    }
+
+    /// <summary>A Reach Haven Rank objective.</summary>
+    public static QuestObjective HavenRank(int haveRank, bool countReached = true)
+    {
+        return new QuestObjective { type = ObjectiveType.ReachHavenRank, rank = Mathf.Max(1, haveRank), countAlreadyOwned = countReached };
     }
 
     /// <summary>The serialized fields an objective of <paramref name="type"/> uses, besides its type, amount and text.</summary>
@@ -113,6 +206,19 @@ public sealed class QuestObjective
                 return new[] { nameof(building), nameof(countAlreadyOwned) };
             case ObjectiveType.CatchFish:
                 return new[] { nameof(item) };
+            case ObjectiveType.TalkTo:
+                return new[] { nameof(person), nameof(target), nameof(countAlreadyOwned) };
+            case ObjectiveType.ReachPlace:
+            case ObjectiveType.UseObject:
+                return new[] { nameof(target), nameof(countAlreadyOwned) };
+            case ObjectiveType.RescuePerson:
+                return new[] { nameof(person), nameof(bringHome), nameof(countAlreadyOwned) };
+            case ObjectiveType.AssignJob:
+                return new[] { nameof(job), nameof(person), nameof(countAlreadyOwned) };
+            case ObjectiveType.DefendBreach:
+                return new[] { nameof(breach) };
+            case ObjectiveType.ReachHavenRank:
+                return new[] { nameof(rank), nameof(countAlreadyOwned) };
             default:
                 return Array.Empty<string>();
         }
@@ -155,32 +261,60 @@ public sealed class QuestObjective
             case ObjectiveType.CatchFish:
                 // An empty item counts any fish.
                 return gameEvent.Kind == GameEventKind.FishCaught && Is(item, gameEvent.Subject, false) ? gameEvent.Amount : 0;
+            case ObjectiveType.TalkTo:
+            case ObjectiveType.ReachPlace:
+            case ObjectiveType.UseObject:
+                return gameEvent.Kind == DeedKind && DeedTarget != null && gameEvent.Subject == DeedTarget ? gameEvent.Amount : 0;
+            case ObjectiveType.RescuePerson:
+                // An empty person counts anyone found (or brought home).
+                return gameEvent.Kind == DeedKind && Is(person, gameEvent.Subject, false) ? gameEvent.Amount : 0;
+            case ObjectiveType.AssignJob:
+                return gameEvent.Kind == GameEventKind.JobAssigned && Is(job, gameEvent.Subject, false) && Is(person, gameEvent.Detail, false) ? 1 : 0;
+            case ObjectiveType.DefendBreach:
+                return gameEvent.Kind == GameEventKind.BreachRepelled && Is(breach, gameEvent.Subject, false) ? 1 : 0;
+            case ObjectiveType.ReachHavenRank:
+                return gameEvent.Kind == GameEventKind.HavenRankReached && gameEvent.Amount >= Rank ? 1 : 0;
             default:
                 return 0;
         }
     }
 
+    /// <summary>True when the event is what this objective waits for: a story's or a quest's "when the player does".</summary>
+    public bool Matches(in GameEvent gameEvent) => Progress(gameEvent) > 0;
+
     /// <summary>What already counts when the quest starts, with Count Already Owned: what the player holds (bag and gear,
     /// or their essences), the structures standing, or a Quest Event that already happened (once). 0 otherwise.</summary>
     public int Owned(Player player, QuestLog log)
     {
-        if (!CountAlreadyOwned || player == null)
+        if (!CountAlreadyOwned)
         {
             return 0;
         }
 
+        // What the player carries needs the player (not yet there while a scene loads); deeds and states need only the log.
         switch (type)
         {
             case ObjectiveType.QuestEvent:
                 return log != null && log.HasHappened(questEvent) ? 1 : 0;
             case ObjectiveType.CollectItem:
             case ObjectiveType.CraftItem: // made before the quest (an older save, a found tool): having it is enough
-                return item == null ? 0 : player.Bag.Container.Count(item) + (player.Equipment != null ? player.Equipment.Gear.Slots.Count(item) : 0);
+                return item == null || player == null ? 0 : player.Bag.Container.Count(item) + (player.Equipment != null ? player.Equipment.Gear.Slots.Count(item) : 0);
             case ObjectiveType.BuildStructure:
                 // A friend's Haven (co-op) is theirs: what stands there isn't this player's to count; what they build there is.
                 return HavenVisit.IsVisiting ? 0 : BuildingObject.Count(building);
             case ObjectiveType.GatherResource:
-                return item != null ? player.Bag.Container.Count(item) : player.Resources.Storage.GetAmount(resource);
+                return player == null ? 0 : item != null ? player.Bag.Container.Count(item) : player.Resources.Storage.GetAmount(resource);
+            case ObjectiveType.TalkTo:
+            case ObjectiveType.ReachPlace:
+            case ObjectiveType.UseObject:
+                return log != null && log.HasDone(DeedKey) ? 1 : 0;
+            case ObjectiveType.RescuePerson:
+                // Home already (an older save, or rescued before the quest): that is found and home both.
+                return log != null && (log.HasDone(DeedKey) || (person != null && GameSession.Settlement.HasResident(person))) ? 1 : 0;
+            case ObjectiveType.AssignJob:
+                return HasJob() ? 1 : 0;
+            case ObjectiveType.ReachHavenRank:
+                return GameSession.Settlement.HavenRank >= Rank ? 1 : 0;
             default:
                 return 0;
         }
@@ -225,6 +359,22 @@ public sealed class QuestObjective
                 return Amount > 1 ? $"{text} ({count} times)" : text;
             case ObjectiveType.CatchFish:
                 return $"Catch {count} {(item != null ? Name(item) : "fish")}";
+            case ObjectiveType.TalkTo:
+                return $"Talk to {(DeedTarget != null ? Name(DeedTarget) : "(no one chosen)")}";
+            case ObjectiveType.ReachPlace:
+                return $"Reach {(target != null ? target.DisplayName : "(no place chosen)")}";
+            case ObjectiveType.UseObject:
+                return target != null ? $"{target.UseVerb} {target.DisplayName}" : "Use (nothing chosen)";
+            case ObjectiveType.RescuePerson:
+                string who = person != null ? person.DisplayName : Amount == 1 ? "a stranded traveller" : $"{count} stranded travellers";
+                return bringHome ? $"Bring {who} home" : $"Find {who}";
+            case ObjectiveType.AssignJob:
+                return job != null ? $"Give {(person != null ? person.DisplayName : "someone")} work as {job.DisplayName}"
+                    : $"Give {(person != null ? person.DisplayName : "someone")} work";
+            case ObjectiveType.DefendBreach:
+                return breach != null ? $"Defend Safe Haven: {breach.DisplayName}" : "Defend Safe Haven from a ward breach";
+            case ObjectiveType.ReachHavenRank:
+                return $"Raise Safe Haven to {HavenRankName(Rank)} (H)";
             default:
                 return type.ToString();
         }
@@ -242,11 +392,40 @@ public sealed class QuestObjective
             case ObjectiveType.GatherResource:
                 return GatherTarget == null ? "has no material or essence" : null;
             case ObjectiveType.QuestEvent:
-                return questEvent == null ? "has no quest event" : null;
+                return questEvent == null ? "has no story event" : null;
+            case ObjectiveType.TalkTo:
+                return person == null && target == null ? "has no one to talk to" : null;
+            case ObjectiveType.ReachPlace:
+                return target == null ? "has no place" : null;
+            case ObjectiveType.UseObject:
+                return target == null ? "has no object" : null;
+            case ObjectiveType.ReachHavenRank:
+                HavenSettings ranks = HavenSettings.Current;
+                return ranks != null && Rank >= ranks.Ranks.Count ? $"asks for rank {Rank}, but Safe Haven has only {ranks.Ranks.Count} ranks" : null;
             default:
                 return null;
         }
     }
 
-    private static string Name(Object definition) => definition is IDisplayName named ? named.DisplayName : "(nothing chosen)";
+    private static string Name(Object definition) => definition is IDisplayName named ? named.DisplayName
+        : definition is IQuestTarget target ? target.DisplayName : "(nothing chosen)";
+
+    // Someone holds the job (the person named, or anyone).
+    private bool HasJob()
+    {
+        SettlementState settlement = GameSession.Settlement;
+        if (person != null)
+        {
+            ResidentRecord record = settlement.Find(person);
+            return record != null && (job == null ? record.Job != null : record.Job == job);
+        }
+
+        return job != null && settlement.HasWorker(job);
+    }
+
+    private static string HavenRankName(int index)
+    {
+        HavenSettings settings = HavenSettings.Current;
+        return settings != null && index >= 0 && index < settings.Ranks.Count ? $"a {settings.Ranks[index].name}" : $"rank {index}";
+    }
 }

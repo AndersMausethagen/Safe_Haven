@@ -30,13 +30,16 @@ public sealed class HomeStoryTests
     }
 
     [Test]
-    public void TheHamletRank_RaisesWhatTheQuestWaitsFor()
+    public void TheHamletRank_IsWhatTheQuestWaitsFor()
     {
-        HavenSettings.Rank hamlet = HavenSettings.Current.Ranks.First(rank => rank.name == "Hamlet");
+        int hamlet = HavenSettings.Current.Ranks.ToList().FindIndex(rank => rank.name == "Hamlet");
+        QuestObjective objective = Quest("ALightTheyCanSee").Objectives[0];
 
-        Assert.IsNotNull(hamlet.reachedEvent);
-        Assert.AreEqual(hamlet.reachedEvent, Quest("ALightTheyCanSee").Objectives[0].QuestEvent);
-        Assert.IsTrue(Quest("ALightTheyCanSee").Objectives[0].CountAlreadyOwned, "a haven can be a Hamlet before the quest starts");
+        Assert.AreEqual(ObjectiveType.ReachHavenRank, objective.Type);
+        Assert.AreEqual(hamlet, objective.Rank);
+        Assert.IsTrue(objective.Matches(new GameEvent(GameEventKind.HavenRankReached, null, hamlet)), "reaching the Hamlet counts");
+        Assert.IsFalse(objective.Matches(new GameEvent(GameEventKind.HavenRankReached, null, hamlet - 1)), "the rank below doesn't");
+        Assert.IsTrue(objective.CountAlreadyOwned, "a haven can be a Hamlet before the quest starts");
     }
 
     [Test]

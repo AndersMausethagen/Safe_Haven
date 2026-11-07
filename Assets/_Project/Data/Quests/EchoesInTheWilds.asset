@@ -23,8 +23,29 @@ MonoBehaviour:
   announceCompletion: 1
   showTimerInHud: 0
   prerequisites: []
-  start: 1
-  startEvent: {fileID: 11400000, guid: 85043c09728f72640a4a8dba469a35bc, type: 2}
+  startedFirst: []
+  start: 3
+  startEvent: {fileID: 0}
+  startWhen:
+    type: 10
+    description: 
+    amount: 1
+    item: {fileID: 0}
+    resource: {fileID: 0}
+    monster: {fileID: 0}
+    faction: 1
+    building: {fileID: 0}
+    raid: {fileID: 0}
+    mustExtract: 1
+    withinMinutes: 0
+    questEvent: {fileID: 0}
+    person: {fileID: 0}
+    target: {fileID: 11400000, guid: 4565b885a8575db41bfbc11bf823e166, type: 2}
+    job: {fileID: 0}
+    breach: {fileID: 0}
+    rank: 1
+    bringHome: 0
+    countAlreadyOwned: 0
   closedBy: {fileID: 0}
   startDelay: 0
   onStarted: []
@@ -42,8 +63,14 @@ MonoBehaviour:
     mustExtract: 1
     withinMinutes: 0
     questEvent: {fileID: 0}
+    person: {fileID: 0}
+    target: {fileID: 0}
+    job: {fileID: 0}
+    breach: {fileID: 0}
+    rank: 1
+    bringHome: 0
     countAlreadyOwned: 0
-  - type: 6
+  - type: 10
     description: 
     amount: 1
     item: {fileID: 0}
@@ -54,7 +81,13 @@ MonoBehaviour:
     raid: {fileID: 0}
     mustExtract: 1
     withinMinutes: 0
-    questEvent: {fileID: 11400000, guid: 1aa9208cf08755041886f4eef1166d73, type: 2}
+    questEvent: {fileID: 0}
+    person: {fileID: 0}
+    target: {fileID: 11400000, guid: 20219ccaaa4651f46944bf5d351c2583, type: 2}
+    job: {fileID: 0}
+    breach: {fileID: 0}
+    rank: 1
+    bringHome: 0
     countAlreadyOwned: 0
   turnInToGiver: 0
   turnInTo: 

@@ -81,7 +81,8 @@ public sealed class QuestLog
     /// <summary>Every quest that has started, in no particular order.</summary>
     public IEnumerable<Entry> Entries => entries.Values;
 
-    /// <summary>Ids of every Quest Event raised in this game, so story moments are remembered across saves.</summary>
+    /// <summary>Ids of every Quest Event raised in this game, and the keys of the player's deeds (QuestDeeds: talked to,
+    /// reached, used, freed, brought home), so story moments and deeds are remembered across saves.</summary>
     public IEnumerable<string> HappenedEventIds => happenedEvents;
 
     /// <summary>True when this Quest Event has been raised at any point in this game (it is saved).</summary>
@@ -90,12 +91,23 @@ public sealed class QuestLog
         return gameEvent != null && happenedEvents.Contains(gameEvent.Id);
     }
 
+    /// <summary>True when the player has done this deed at any point in this game (QuestDeeds key; it is saved).</summary>
+    public bool HasDone(string deedKey)
+    {
+        return !string.IsNullOrEmpty(deedKey) && happenedEvents.Contains(deedKey);
+    }
+
     /// <summary>Remembers a Quest Event by id; used when loading a save.</summary>
     public void RestoreHappened(string eventId)
     {
         if (!string.IsNullOrEmpty(eventId))
         {
             happenedEvents.Add(eventId);
+            string deed = QuestDeeds.FromLegacy(eventId);
+            if (deed != null)
+            {
+                happenedEvents.Add(deed);
+            }
         }
     }
 
@@ -164,6 +176,12 @@ public sealed class QuestLog
         if (gameEvent.Kind == GameEventKind.Custom && gameEvent.Subject is GameEventDefinition custom)
         {
             happenedEvents.Add(custom.Id);
+        }
+
+        string deed = gameEvent.ForPlayerSide ? QuestDeeds.KeyOf(gameEvent) : null;
+        if (deed != null)
+        {
+            happenedEvents.Add(deed);
         }
 
         // Copied first: completing a quest can start others, which changes the collection.

@@ -6,7 +6,7 @@ using UnityEngine;
 /// hold is runtime state in SettlementState.
 /// </summary>
 [CreateAssetMenu(fileName = "NewResident", menuName = "Safe Haven/Settlement/Resident")]
-public sealed class ResidentDefinition : ScriptableObject
+public sealed class ResidentDefinition : ScriptableObject, IQuestTarget
 {
     [Header("Identity")]
     [Tooltip("Stable unique identifier, used for saves.")]
@@ -45,6 +45,7 @@ public sealed class ResidentDefinition : ScriptableObject
     [SerializeField] private JobDefinition[] jobs = new JobDefinition[0];
 
     public string Id => string.IsNullOrWhiteSpace(id) ? name : id;
+    public string QuestId => Id;
     public string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;
     public string Description => description;
     public string RescueLine => rescueLine;

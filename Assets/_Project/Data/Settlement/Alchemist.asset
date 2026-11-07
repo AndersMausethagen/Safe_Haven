@@ -27,9 +27,10 @@ MonoBehaviour:
   workSoundDelay: 0.4
   workSoundEvery: {x: 3, y: 8}
   workOrders: []
-  assignedEvent: {fileID: 11400000, guid: da5d7d1abc8282c40a98b65eea37ba76, type: 2}
+  assignedEvent: {fileID: 0}
   extraRumours: 0
   gearRepairDiscount: 0
   buildingRepairDiscount: 0
+  defendsAs: {fileID: 0}
   wardHealth: 0
   raidSeconds: 0

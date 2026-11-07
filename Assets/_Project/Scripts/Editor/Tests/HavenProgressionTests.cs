@@ -250,11 +250,14 @@ public sealed class HavenProgressionTests
     }
 
     [Test]
-    public void SavedQuestEvents_KeepTheirIds()
+    public void SavedTalksWithThePortal_StillCount()
     {
-        var talked = AssetDatabase.LoadAssetAtPath<GameEventDefinition>("Assets/_Project/Data/Quests/Events/TalkedToPortal.asset");
-        Assert.NotNull(talked);
-        Assert.AreEqual("talkedtohearttree", talked.Id, "saves remember this id");
+        // Saves from before deeds remember talking to the portal by the old event's id ("talkedtohearttree").
+        var portal = AssetDatabase.LoadAssetAtPath<QuestTargetDefinition>("Assets/_Project/Data/Quests/Targets/The Portal.asset");
+        Assert.NotNull(portal);
+        var log = new QuestLog();
+        log.RestoreHappened("talkedtohearttree");
+        Assert.IsTrue(log.HasDone(QuestDeeds.Key(GameEventKind.Talked, portal)), "an old save's talk with the portal is the deed");
     }
 
     [Test]

@@ -11,6 +11,9 @@ public enum QuestStart
     OnQuestEvent = 1,
     /// <summary>When something starts it: a QuestGiver the player interacts with, or any Inspector event calling QuestGiver.StartQuest.</summary>
     ByQuestGiver = 2,
+    /// <summary>When the player does something (Start When): talks to someone, reaches a place, uses a thing, finds a
+    /// stranded person, kills or crafts something. Any objective type can be the condition.</summary>
+    WhenPlayerDoes = 3,
 }
 
 /// <summary>How much a quest matters to the story: the colour of its marks everywhere (QuestMarkerSettings). Saved by number.</summary>
@@ -61,6 +64,8 @@ public sealed class QuestDefinition : ScriptableObject
     [SerializeField] private QuestStart start = QuestStart.Automatically;
     [Tooltip("For On Quest Event: the event that starts the quest.")]
     [SerializeField] private GameEventDefinition startEvent;
+    [Tooltip("For When Player Does: what the player does that starts it, e.g. Reach Place: the Wilds Echo. Its amount is ignored.")]
+    [SerializeField] private QuestObjective startWhen = new QuestObjective();
     [Tooltip("For an optional quest: once this quest starts, it is no longer offered. If it is under way it lapses and leaves the tracker; if it only waits to be handed in, it is handed in by itself.")]
     [SerializeField] private QuestDefinition closedBy;
     [Tooltip("Automatically and On Quest Event: seconds to wait once it is ready, for a beat of its own (a breather before a big moment). " +
@@ -106,6 +111,7 @@ public sealed class QuestDefinition : ScriptableObject
     public IReadOnlyList<QuestDefinition> StartedFirst => startedFirst;
     public QuestStart Start => start;
     public GameEventDefinition StartEvent => startEvent;
+    public QuestObjective StartWhen => startWhen;
     public QuestDefinition ClosedBy => closedBy;
     public float StartDelay => startDelay;
     public IReadOnlyList<GameEventDefinition> OnStarted => onStarted;
@@ -158,6 +164,12 @@ public sealed class QuestDefinition : ScriptableObject
         if (start == QuestStart.OnQuestEvent && startEvent == null)
         {
             problems.Add("Starts on a quest event, but none is chosen, so it never starts.");
+        }
+
+        string startProblem = start == QuestStart.WhenPlayerDoes ? startWhen?.FindProblem() ?? (startWhen == null ? "is empty" : null) : null;
+        if (startProblem != null)
+        {
+            problems.Add($"Starts when the player does something, but that {startProblem}, so it never starts.");
         }
 
         if (start == QuestStart.ByQuestGiver && startDelay > 0f)

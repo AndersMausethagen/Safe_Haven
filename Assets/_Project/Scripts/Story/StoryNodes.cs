@@ -40,7 +40,7 @@ public sealed class WhenQuestEvent : StoryTrigger
     [Tooltip("Starts when this Quest Event is raised (a zone, an interaction, another story).")]
     public GameEventDefinition questEvent;
 
-    public override string Title => "When Quest Event";
+    public override string Title => "When Story Event";
 
     public override Action Listen(StoryScript script, Action fire)
     {

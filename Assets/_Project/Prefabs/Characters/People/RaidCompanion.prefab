@@ -174,4 +174,5 @@ MonoBehaviour:
   portrait: {fileID: 0}
   cameraDistance: 0.65
   followUpLine: Anything else?
-  talkedEvent: {fileID: 11400000, guid: d656e5181cedb8f408b76012090c7439, type: 2}
+  questTarget: {fileID: 0}
+  talkedEvent: {fileID: 0}

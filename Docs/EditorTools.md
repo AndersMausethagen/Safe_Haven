@@ -45,7 +45,7 @@ Inspect Point, Zone, Waypoint, World Event...), Fog Area, Mist Volume and Story 
 | Set something on the ground | Select it, End (Shift+End tilts it with the slope, Ctrl+End lets it fall with physics) |
 | Make an item, monster or building | Content Editor (or Safe Haven › Content › ...) |
 | Tune hunger, carrying, combat, raids | Systems Editor |
-| Add a quest or story beat | Content Editor › Quests, Quest Map, Story Graph; GameObject › Safe Haven › Quest ... objects |
+| Add a quest or story beat | Content Editor › Quests › **New** (choose who gives it; objectives name their person, place or thing, e.g. Talk To Sigrid, Reach Place: the Old Tower), then the quest's **Make It Work** list sets up what is missing (a giver, a Quest Zone or Inspect Point for a place, the selected object as a target). Quest Map, Story Graph; GameObject › Safe Haven › Quest ... objects |
 | Check a level before playing | World Tools › Scene, or Safe Haven › Scene › Level Check |
 | Play without touching my save | World Tools › Scene › Play the Haven / Play the Prologue |
 

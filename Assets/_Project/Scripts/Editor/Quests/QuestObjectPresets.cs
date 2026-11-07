@@ -12,28 +12,39 @@ public static class QuestObjectPresets
     private const int Priority = 10;
 
     [MenuItem(Menu + "Quest Giver", false, Priority)]
-    private static void CreateQuestGiver(MenuCommand command)
+    private static void CreateQuestGiver(MenuCommand command) => CreateQuestGiver(command.context as GameObject);
+
+    /// <summary>A Quest Giver (talk to it) at the Scene view's centre or under <paramref name="parent"/>, selected.</summary>
+    public static GameObject CreateQuestGiver(GameObject parent = null)
     {
         GameObject giver = GameObject.CreatePrimitive(PrimitiveType.Capsule);
         giver.name = "Quest Giver";
         AddInteractable(giver, InteractionAnimation.Talk);
         giver.AddComponent<QuestGiver>();
-        Place(giver, command, "Create Quest Giver");
+        Place(giver, parent, "Create Quest Giver");
+        return giver;
     }
 
     [MenuItem(Menu + "Quest Inspect Point", false, Priority + 1)]
-    private static void CreateInspectPoint(MenuCommand command)
+    private static void CreateInspectPoint(MenuCommand command) => CreateInspectPoint(command.context as GameObject);
+
+    /// <summary>An Inspect Point (use it: Use Object for its Target) at the Scene view's centre, selected.</summary>
+    public static GameObject CreateInspectPoint(GameObject parent = null)
     {
         GameObject point = GameObject.CreatePrimitive(PrimitiveType.Cube);
         point.name = "Quest Inspect Point";
         point.transform.localScale = new Vector3(0.6f, 0.6f, 0.6f);
         AddInteractable(point, InteractionAnimation.GatherLow);
         AddTrigger(point, TriggerWhen.PlayerInteracts);
-        Place(point, command, "Create Quest Inspect Point");
+        Place(point, parent, "Create Quest Inspect Point");
+        return point;
     }
 
     [MenuItem(Menu + "Quest Zone", false, Priority + 2)]
-    private static void CreateZone(MenuCommand command)
+    private static void CreateZone(MenuCommand command) => CreateZone(command.context as GameObject);
+
+    /// <summary>A Quest Zone (walk in: Reach Place for its Target) at the Scene view's centre, selected.</summary>
+    public static GameObject CreateZone(GameObject parent = null)
     {
         var zone = new GameObject("Quest Zone");
         BoxCollider box = zone.AddComponent<BoxCollider>();
@@ -41,7 +52,8 @@ public static class QuestObjectPresets
         box.size = new Vector3(6f, 3f, 6f);
         box.center = new Vector3(0f, 1.5f, 0f);
         AddTrigger(zone, TriggerWhen.PlayerEntersZone);
-        Place(zone, command, "Create Quest Zone");
+        Place(zone, parent, "Create Quest Zone");
+        return zone;
     }
 
     [MenuItem(Menu + "Quest Event Listener", false, Priority + 3)]
@@ -49,7 +61,7 @@ public static class QuestObjectPresets
     {
         var listener = new GameObject("Quest Event Listener");
         listener.AddComponent<GameEventListener>();
-        Place(listener, command, "Create Quest Event Listener");
+        Place(listener, command.context as GameObject, "Create Quest Event Listener");
     }
 
     [MenuItem(Menu + "Quest Waypoint", false, Priority + 3)]
@@ -57,7 +69,7 @@ public static class QuestObjectPresets
     {
         var waypoint = new GameObject("Quest Waypoint");
         waypoint.AddComponent<QuestWaypoint>();
-        Place(waypoint, command, "Create Quest Waypoint");
+        Place(waypoint, command.context as GameObject, "Create Quest Waypoint");
     }
 
     [MenuItem(Menu + "World Event (Zone + Response)", false, Priority + 4)]
@@ -70,14 +82,14 @@ public static class QuestObjectPresets
         box.center = new Vector3(0f, 1.5f, 0f);
         AddTrigger(worldEvent, TriggerWhen.PlayerEntersZone);
         worldEvent.AddComponent<GameEventListener>();
-        Place(worldEvent, command, "Create World Event");
+        Place(worldEvent, command.context as GameObject, "Create World Event");
     }
 
     [MenuItem(Menu + "Ward Moss Bloom", false, Priority + 5)]
     private static void CreateWardMossBloom(MenuCommand command)
     {
         GameObject bloom = BuildWardMossBloom(null, null);
-        Place(bloom, command, "Create Ward Moss Bloom");
+        Place(bloom, command.context as GameObject, "Create Ward Moss Bloom");
     }
 
     /// <summary>
@@ -179,9 +191,9 @@ public static class QuestObjectPresets
         data.ApplyModifiedPropertiesWithoutUndo();
     }
 
-    private static void Place(GameObject created, MenuCommand command, string undoName)
+    private static void Place(GameObject created, GameObject parent, string undoName)
     {
-        if (command.context is GameObject parent)
+        if (parent != null)
         {
             Vector3 scale = created.transform.localScale;
             GameObjectUtility.SetParentAndAlign(created, parent);

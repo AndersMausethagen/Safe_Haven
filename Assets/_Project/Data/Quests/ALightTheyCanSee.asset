@@ -25,25 +25,52 @@ MonoBehaviour:
   prerequisites:
   - {fileID: 11400000, guid: fea0201f13773f04a96efbcb5b364ea9, type: 2}
   - {fileID: 11400000, guid: b95103f99c217d3489eb46bd97d706d8, type: 2}
+  startedFirst: []
   start: 0
   startEvent: {fileID: 0}
-  closedBy: {fileID: 0}
-  startDelay: 0
-  onStarted: []
-  objectivesInOrder: 0
-  objectives:
-  - type: 6
+  startWhen:
+    type: 0
     description: 
     amount: 1
     item: {fileID: 0}
     resource: {fileID: 0}
     monster: {fileID: 0}
-    faction: 0
+    faction: 1
     building: {fileID: 0}
     raid: {fileID: 0}
-    mustExtract: 0
+    mustExtract: 1
     withinMinutes: 0
-    questEvent: {fileID: 11400000, guid: d81ec9226282a0a4f8cbcbb8094b2a98, type: 2}
+    questEvent: {fileID: 0}
+    person: {fileID: 0}
+    target: {fileID: 0}
+    job: {fileID: 0}
+    breach: {fileID: 0}
+    rank: 1
+    bringHome: 0
+    countAlreadyOwned: 0
+  closedBy: {fileID: 0}
+  startDelay: 0
+  onStarted: []
+  objectivesInOrder: 0
+  objectives:
+  - type: 15
+    description: 
+    amount: 1
+    item: {fileID: 0}
+    resource: {fileID: 0}
+    monster: {fileID: 0}
+    faction: 1
+    building: {fileID: 0}
+    raid: {fileID: 0}
+    mustExtract: 1
+    withinMinutes: 0
+    questEvent: {fileID: 0}
+    person: {fileID: 0}
+    target: {fileID: 0}
+    job: {fileID: 0}
+    breach: {fileID: 0}
+    rank: 2
+    bringHome: 0
     countAlreadyOwned: 1
   turnInToGiver: 0
   turnInTo: 

@@ -281,14 +281,19 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
     private void OnGameEvent(GameEvent gameEvent)
     {
         Log.Handle(gameEvent);
-        if (gameEvent.Kind == GameEventKind.Custom)
+        foreach (QuestDefinition quest in Quests)
         {
-            foreach (QuestDefinition quest in Quests)
+            if (quest == null)
             {
-                if (quest != null && quest.Start == QuestStart.OnQuestEvent && quest.StartEvent == gameEvent.Subject)
-                {
-                    Begin(quest);
-                }
+                continue;
+            }
+
+            bool starts = quest.Start == QuestStart.OnQuestEvent
+                ? gameEvent.Kind == GameEventKind.Custom && quest.StartEvent == gameEvent.Subject
+                : quest.Start == QuestStart.WhenPlayerDoes && quest.StartWhen != null && gameEvent.ForPlayerSide && quest.StartWhen.Matches(gameEvent);
+            if (starts)
+            {
+                Begin(quest);
             }
         }
     }
@@ -310,6 +315,10 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
         foreach (QuestDefinition quest in Quests)
         {
             if (quest != null && quest.Start == QuestStart.OnQuestEvent && Log.HasHappened(quest.StartEvent))
+            {
+                Begin(quest);
+            }
+            else if (quest != null && quest.Start == QuestStart.WhenPlayerDoes && quest.StartWhen != null && Log.HasDone(quest.StartWhen.DeedKey))
             {
                 Begin(quest);
             }

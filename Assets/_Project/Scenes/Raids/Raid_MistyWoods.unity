@@ -1984,7 +1984,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95038b40ed62e5c43863f2a9e90920c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameEventTrigger
-  gameEvent: {fileID: 11400000, guid: 85043c09728f72640a4a8dba469a35bc, type: 2}
+  target: {fileID: 11400000, guid: 4565b885a8575db41bfbc11bf823e166, type: 2}
+  gameEvent: {fileID: 0}
   when: 0
   area: {fileID: 0}
   repeat: 1
@@ -13773,6 +13774,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: SafeHaven::RaidSky
   cycle: {fileID: 0}
+  weather: {fileID: 0}
 --- !u!4 &1987402904
 Transform:
   m_ObjectHideFlags: 0
@@ -13975,7 +13977,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95038b40ed62e5c43863f2a9e90920c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameEventTrigger
-  gameEvent: {fileID: 11400000, guid: 1aa9208cf08755041886f4eef1166d73, type: 2}
+  target: {fileID: 11400000, guid: 20219ccaaa4651f46944bf5d351c2583, type: 2}
+  gameEvent: {fileID: 0}
   when: 0
   area: {fileID: 0}
   repeat: 1

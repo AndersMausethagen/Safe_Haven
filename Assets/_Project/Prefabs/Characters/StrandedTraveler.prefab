@@ -156,8 +156,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RescuableTraveler
   resident: {fileID: 11400000, guid: 272895da9ba7e784b8a97bcd2be637c8, type: 2}
-  freedEvent: {fileID: 11400000, guid: 4db7fcedfe05ca34cb26fb8f31d5351b, type: 2}
-  rescuedEvent: {fileID: 11400000, guid: 333d8f3d8fb83304ea285c56f7052dac, type: 2}
+  freedEvent: {fileID: 0}
+  rescuedEvent: {fileID: 0}
   followDistance: 2.5
   extractionReach: 12
   speedParameter: Speed

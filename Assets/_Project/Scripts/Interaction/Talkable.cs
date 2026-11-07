@@ -9,6 +9,10 @@ using UnityEngine;
 /// Where it belongs: beside an Interactable of the Use kind, with at least one IConversationTopics (QuestGiver,
 /// PrologueCompanion, Companion, ResidentNpc).
 /// </para>
+/// <para>
+/// For quests, talking to them counts as Talk To whoever they are: a person by their resident record (any IQuestPerson
+/// beside it: ResidentNpc, PrologueCompanion, Companion), anything else by its Quest Target. No event is made per person.
+/// </para>
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Interactable))]
@@ -22,7 +26,9 @@ public sealed class Talkable : MonoBehaviour, IInteractionName
     [SerializeField, Range(0.3f, 1f)] private float cameraDistance = 0.65f;
     [Tooltip("Said when the conversation opens again after an answer.")]
     [SerializeField] private string followUpLine = "Anything else?";
-    [Tooltip("Raised each time the player starts talking to them, for quests. Optional.")]
+    [Tooltip("For quests, when this isn't a person (people are known by their resident record): what talking to it counts as, e.g. the Portal.")]
+    [SerializeField, QuestIdentity] private QuestTargetDefinition questTarget;
+    [Tooltip("A story moment of its own, raised each time the player starts talking to them. Optional: Talk To objectives need none.")]
     [SerializeField, RaisedByGame] private GameEventDefinition talkedEvent;
 
     private Interactable interactable;
@@ -31,6 +37,16 @@ public sealed class Talkable : MonoBehaviour, IInteractionName
     public string SpeakerName => string.IsNullOrWhiteSpace(speakerName) ? gameObject.name : speakerName;
     public string InteractionName => SpeakerName;
     public DialogueSpeaker Speaker => new DialogueSpeaker(SpeakerName, transform, portrait, cameraDistance);
+
+    /// <summary>Who or what talking to them counts as for quests: their resident record, or the Quest Target; null when neither.</summary>
+    public UnityEngine.Object QuestIdentity
+    {
+        get
+        {
+            ResidentDefinition person = TryGetComponent(out IQuestPerson someone) ? someone.Resident : null;
+            return person != null ? person : questTarget;
+        }
+    }
 
     /// <summary>True while a conversation with them is open.</summary>
     public bool IsTalking => box != null;
@@ -56,6 +72,7 @@ public sealed class Talkable : MonoBehaviour, IInteractionName
 
     private void OnUsed()
     {
+        QuestDeeds.Raise(GameEventKind.Talked, QuestIdentity, interactable.Interactor);
         if (talkedEvent != null)
         {
             GameEvents.Raise(talkedEvent, interactable.Interactor);

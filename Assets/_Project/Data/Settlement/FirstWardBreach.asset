@@ -30,4 +30,4 @@ MonoBehaviour:
   reward:
   - resource: {fileID: 11400000, guid: a86ac9a152512464ab08e0446c161e61, type: 2}
     amount: 2
-  wonEvent: {fileID: 11400000, guid: 1f08102c61035f343a7ca290ab90c84d, type: 2}
+  wonEvent: {fileID: 0}

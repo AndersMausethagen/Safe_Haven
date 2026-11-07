@@ -83,7 +83,8 @@ public sealed class PrologueTests
             Assert.IsTrue(log.TryStart(chapter.Quest), chapter.Quest.DisplayName);
             Assert.IsEmpty(chapter.Quest.FindProblems(), chapter.Quest.DisplayName);
             foreach (QuestObjective objective in chapter.Quest.Objectives)
-                log.Handle(new GameEvent(objective.Type == ObjectiveType.QuestEvent ? GameEventKind.Custom :
+                log.Handle(objective.DeedKind.HasValue ? new GameEvent(objective.DeedKind.Value, objective.DeedTarget, objective.Amount) :
+                    new GameEvent(objective.Type == ObjectiveType.QuestEvent ? GameEventKind.Custom :
                     objective.Type == ObjectiveType.BuildStructure ? GameEventKind.Built :
                     objective.Type == ObjectiveType.CraftItem ? GameEventKind.Crafted : GameEventKind.ItemObtained,
                     objective.Type == ObjectiveType.QuestEvent ? (UnityEngine.Object)objective.QuestEvent :
@@ -325,7 +326,9 @@ public sealed class PrologueTests
         PrologueChapter shelter = Definition.Chapters.Single(c => c.Behaviour == PrologueStep.FindShelter);
         foreach (var chapter in Definition.Chapters.TakeWhile(c => c != shelter)) log.ForceComplete(chapter.Quest);
         log.TryStart(shelter.Quest);
+        // The shelter's zone raises the story event and counts as reaching the shelter, which the quest asks for.
         log.Handle(new GameEvent(GameEventKind.Custom, Definition.ShelterEvent));
+        log.Handle(new GameEvent(GameEventKind.Reached, shelter.Quest.Objectives[0].DeedTarget));
         Assert.AreSame(shelter, Definition.Chapter(log), "The return objective is still part of the current chapter.");
         Assert.IsTrue(log.TryTurnIn(shelter.Quest));
         Assert.AreEqual(before, EditorJsonUtility.ToJson(Definition));

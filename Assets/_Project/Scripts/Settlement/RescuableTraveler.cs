@@ -22,7 +22,7 @@ public sealed class RescuableTraveler : MonoBehaviour, IInteractionName
         Fallen,
     }
 
-    [SerializeField] private ResidentDefinition resident;
+    [SerializeField, QuestIdentity] private ResidentDefinition resident;
     [Tooltip("Raised when the player frees them, for quests.")]
     [SerializeField, RaisedByGame] private GameEventDefinition freedEvent;
     [Tooltip("Raised when they come home with the player, for quests.")]
@@ -129,6 +129,7 @@ public sealed class RescuableTraveler : MonoBehaviour, IInteractionName
     {
         state = State.Following;
         GameMessages.Post($"{resident.DisplayName}: \"{resident.RescueLine}\"", MessageKind.Gain);
+        QuestDeeds.Raise(GameEventKind.PersonFreed, resident, interactable.Interactor);
         if (freedEvent != null)
         {
             GameEvents.Raise(freedEvent, interactable.Interactor);
@@ -192,6 +193,7 @@ public sealed class RescuableTraveler : MonoBehaviour, IInteractionName
             {
                 raid.Report?.Rescued.Add(resident);
                 GameMessages.Post($"{resident.DisplayName} steps through the portal with you, and will be waiting in your own Haven.", MessageKind.Gain);
+                QuestDeeds.Raise(GameEventKind.PersonRescued, resident, player);
                 if (rescuedEvent != null)
                 {
                     GameEvents.Raise(rescuedEvent, player);
@@ -205,6 +207,7 @@ public sealed class RescuableTraveler : MonoBehaviour, IInteractionName
         {
             raid.Report?.Rescued.Add(resident);
             GameMessages.Post($"{resident.DisplayName} steps through the portal with you.", MessageKind.Gain);
+            QuestDeeds.Raise(GameEventKind.PersonRescued, resident, player);
             if (rescuedEvent != null)
             {
                 GameEvents.Raise(rescuedEvent, player);

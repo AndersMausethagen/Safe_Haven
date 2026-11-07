@@ -15,7 +15,7 @@ using UnityEngine;
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Talkable))]
-public sealed class ResidentNpc : MonoBehaviour, IConversationTopics
+public sealed class ResidentNpc : MonoBehaviour, IConversationTopics, IQuestPerson
 {
     private const string DefaultAcceptLine = "I'll get to it.";
     private const float WorkSpotClearance = 1f;
@@ -290,6 +290,7 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics
             crafting.Unlock(job.TeachesRecipes);
         }
 
+        QuestDeeds.Raise(GameEventKind.JobAssigned, job, user, resident);
         if (job.AssignedEvent != null)
         {
             GameEvents.Raise(job.AssignedEvent, user);

@@ -2063,11 +2063,8 @@ public static class BuildPrologueMeadow
         foreach (PrologueCompanion companion in companions)
         {
             if (!companion.gameObject.activeSelf || companion.Resident == null) continue;
-            GameEventDefinition talked = Ev("TalkedTo" + companion.Resident.DisplayName);
-            var talkable = new SerializedObject(companion.GetComponent<Talkable>());
-            talkable.FindProperty("talkedEvent").objectReferenceValue = talked;
-            talkable.ApplyModifiedPropertiesWithoutUndo();
-            var spoke = new WhenQuestEvent { questEvent = talked, once = false };
+            // Talking to them counts as Talk To their resident record (Talkable, through PrologueCompanion): no event per person.
+            var spoke = new WhenPlayerDid { deed = QuestObjective.Deed(ObjectiveType.TalkTo, companion.Resident), once = false };
             var resting = new CheckQuestNode { quest = warmth };
             var moment = new WaitNode { seconds = 9f };
             var stillThere = new CheckQuestNode { quest = warmth };

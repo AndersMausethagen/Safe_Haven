@@ -167,6 +167,12 @@ public sealed class HavenProgress : MonoBehaviour
     // Every rank reached counts, so a quest about a rank also finishes for a haven that got there before the event existed.
     private static void RaiseRankEvents(HavenSettings settings)
     {
+        int rank = GameSession.Settlement.HavenRank;
+        if (rank > 0)
+        {
+            GameEvents.Raise(new GameEvent(GameEventKind.HavenRankReached, null, rank, Player.Current != null ? Player.Current.gameObject : null));
+        }
+
         for (int i = 0; i <= GameSession.Settlement.HavenRank && i < settings.Ranks.Count; i++)
         {
             GameEventDefinition reachedEvent = settings.Ranks[i].reachedEvent;

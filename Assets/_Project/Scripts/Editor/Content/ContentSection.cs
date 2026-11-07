@@ -60,6 +60,10 @@ public abstract class ContentSection
     public virtual bool DrawSettings(Object asset) => false;
     /// <summary>Fields drawn by the section's own panels rather than in the settings list.</summary>
     public virtual ICollection<string> HiddenFields => NoFields;
+
+    /// <summary>The fields hidden for this asset: its own settings can make some meaningless (a quest's start event when
+    /// it starts from a giver). The section's Hidden Fields by default.</summary>
+    public virtual ICollection<string> HiddenFieldsFor(Object asset) => HiddenFields;
     /// <summary>Fields left out of the New form because a creation option sets them.</summary>
     protected virtual IEnumerable<string> CreateHiddenFields => NoFields;
     /// <summary>Fields pointing at generated prefabs; they are cleared on new and duplicated assets.</summary>

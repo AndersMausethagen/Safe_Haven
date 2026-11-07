@@ -28,6 +28,9 @@ public enum QuestSceneRole
     PrefabOverride,
     /// <summary>A story's Start Quest node, which starts the quest like a Quest Giver would.</summary>
     Starts,
+    /// <summary>The object is this person, place or thing for quests (a [QuestIdentity] field: a zone's Target, a
+    /// Talkable's Quest Target, an expedition member's resident).</summary>
+    Is,
 }
 
 /// <summary>One scene or prefab object that uses a quest or Quest Event.</summary>
@@ -38,6 +41,8 @@ public sealed class QuestSceneUse
     public long ObjectFileId;
     public QuestSceneRole Role;
     public string TargetGuid;
+    /// <summary>The component that uses it (a Talkable, a Quest Event Trigger...); null for a prefab override.</summary>
+    public Type Component;
 
     public bool IsScene => AssetPath.EndsWith(".unity", StringComparison.OrdinalIgnoreCase);
 
@@ -70,9 +75,36 @@ public static class QuestSceneIndex
     private static readonly Regex ReferencePattern = new Regex(@"^( *)(?:- )?(\w+): \{fileID: -?\d+, guid: ([0-9a-f]{32}), type: 2\}", RegexOptions.Compiled | RegexOptions.Multiline);
     private static readonly Regex OverridePattern = new Regex(@"propertyPath: (\S+)\s+value:[^\n]*\n\s+objectReference: \{fileID: -?\d+, guid: ([0-9a-f]{32}), type: 2\}", RegexOptions.Compiled);
     private static readonly Regex StoryNodePattern = new Regex(@"^ *type: \{class: (\w+),", RegexOptions.Compiled | RegexOptions.Multiline);
+    private static readonly Regex InstanceOfPattern = new Regex(@"^  m_PrefabInstance: \{fileID: (-?\d+)\}", RegexOptions.Compiled | RegexOptions.Multiline);
+    private static readonly Regex InstanceNamePattern = new Regex(@"propertyPath: m_Name\s+value: (.+)", RegexOptions.Compiled);
+    private static readonly Regex SourcePattern = new Regex(@"^  m_SourcePrefab: \{fileID: \d+, guid: ([0-9a-f]{32})", RegexOptions.Compiled | RegexOptions.Multiline);
 
     private static List<QuestSceneUse> cached;
     private static Dictionary<Type, HashSet<string>> raisingFields;
+    private static Dictionary<Type, HashSet<string>> identityFields;
+
+    /// <summary>Every field marked [QuestIdentity] (who or what its object is for quests), by declaring type.</summary>
+    public static IReadOnlyDictionary<Type, HashSet<string>> IdentityFields
+    {
+        get
+        {
+            if (identityFields == null)
+            {
+                identityFields = new Dictionary<Type, HashSet<string>>();
+                foreach (FieldInfo field in TypeCache.GetFieldsWithAttribute<QuestIdentityAttribute>())
+                {
+                    if (!identityFields.TryGetValue(field.DeclaringType, out HashSet<string> names))
+                    {
+                        identityFields[field.DeclaringType] = names = new HashSet<string>();
+                    }
+
+                    names.Add(field.Name);
+                }
+            }
+
+            return identityFields;
+        }
+    }
 
     /// <summary>Every field marked [RaisedByGame], by the type that declares it.</summary>
     public static IReadOnlyDictionary<Type, HashSet<string>> RaisingFields
@@ -166,6 +198,12 @@ public static class QuestSceneIndex
         return false;
     }
 
+    /// <summary>Saved scene and prefab objects that are this person, place or thing for quests.</summary>
+    public static List<QuestSceneUse> MarkedAs(UnityEngine.Object identity)
+    {
+        return UsesOf(identity).FindAll(use => use.Role == QuestSceneRole.Is);
+    }
+
     /// <summary>Whether a story starts the quest with a Start Quest node.</summary>
     public static bool IsStartedByStory(QuestDefinition quest)
     {
@@ -197,9 +235,18 @@ public static class QuestSceneIndex
         };
 
         var targets = new HashSet<string>();
-        foreach (string guid in AssetDatabase.FindAssets("t:QuestDefinition t:GameEventDefinition"))
+        foreach (string guid in AssetDatabase.FindAssets("t:QuestDefinition t:GameEventDefinition t:QuestTargetDefinition t:ResidentDefinition"))
         {
             targets.Add(guid);
+        }
+
+        // Components whose fields say who or what they are for quests.
+        foreach (Type marked in IdentityFields.Keys)
+        {
+            if (typeof(MonoBehaviour).IsAssignableFrom(marked))
+            {
+                scripts[ScriptGuid(marked)] = marked;
+            }
         }
 
         // Components and data assets with [RaisedByGame] Quest Event fields (a traveler being freed, a job being assigned).
@@ -241,6 +288,10 @@ public static class QuestSceneIndex
     {
         var uses = new List<QuestSceneUse>();
         var names = new Dictionary<long, string>();
+        // A prefab instance's objects are written "stripped", without a name: it is the instance's (its m_Name override,
+        // or its prefab's file name).
+        var strippedOf = new Dictionary<long, long>();
+        var instanceNames = new Dictionary<long, string>();
         string[] documents = text.Split(new[] { "\n--- !u!" }, StringSplitOptions.None);
         foreach (string document in documents)
         {
@@ -256,6 +307,11 @@ public static class QuestSceneIndex
             {
                 Match name = NamePattern.Match(document);
                 names[fileId] = name.Success ? name.Groups[1].Value.Trim() : "(unnamed)";
+                Match instance = name.Success ? Match.Empty : InstanceOfPattern.Match(document);
+                if (instance.Success)
+                {
+                    strippedOf[fileId] = long.Parse(instance.Groups[1].Value);
+                }
             }
             else if (classId == "114")
             {
@@ -263,6 +319,17 @@ public static class QuestSceneIndex
             }
             else if (classId == "1001")
             {
+                Match renamed = InstanceNamePattern.Match(document);
+                Match source = SourcePattern.Match(document);
+                if (renamed.Success)
+                {
+                    instanceNames[fileId] = renamed.Groups[1].Value.Trim();
+                }
+                else if (source.Success)
+                {
+                    instanceNames[fileId] = Path.GetFileNameWithoutExtension(AssetDatabase.GUIDToAssetPath(source.Groups[1].Value));
+                }
+
                 foreach (Match change in OverridePattern.Matches(document))
                 {
                     if (targets.Contains(change.Groups[2].Value))
@@ -276,6 +343,14 @@ public static class QuestSceneIndex
                         });
                     }
                 }
+            }
+        }
+
+        foreach (KeyValuePair<long, long> stripped in strippedOf)
+        {
+            if (instanceNames.TryGetValue(stripped.Value, out string instanceName) && !string.IsNullOrEmpty(instanceName))
+            {
+                names[stripped.Key] = instanceName;
             }
         }
 
@@ -317,6 +392,7 @@ public static class QuestSceneIndex
                 ObjectFileId = ownerId,
                 Role = role,
                 TargetGuid = guid,
+                Component = type,
             });
         }
     }
@@ -374,6 +450,11 @@ public static class QuestSceneIndex
         if (type == typeof(GameEventTrigger) && field == "onlyDuringQuest")
         {
             return QuestSceneRole.LimitedTo;
+        }
+
+        if (type != null && IdentityFields.TryGetValue(type, out HashSet<string> identity) && identity.Contains(field))
+        {
+            return QuestSceneRole.Is;
         }
 
         if (type != null && RaisingFields.TryGetValue(type, out HashSet<string> raised) && raised.Contains(field))

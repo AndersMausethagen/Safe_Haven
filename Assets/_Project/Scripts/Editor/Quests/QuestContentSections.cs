@@ -14,11 +14,93 @@ public sealed class QuestSection : ContentSection
     public override Type AssetType => typeof(QuestDefinition);
     public override string Folder => "Assets/_Project/Data/Quests";
     public override string Help =>
-        "Quests and quest chains. A quest has objectives (gather, kill, craft, complete raids, or any Quest Event), rewards, " +
+        "Quests and quest chains. A quest has objectives (talk to someone, reach a place, use a thing, find a person, gather, kill, " +
+        "craft, complete raids: each names who or what, so no event is made per person or place; a Story Event is for one-off moments), rewards, " +
         "and a way to start: automatically, on a Quest Event, or from a Quest Giver. To make a chain, list the previous quest " +
         "as a prerequisite and let the next one start automatically; it leaves a pause after the last quest and any fight on its " +
         "own (Start Delay asks for longer). What happens around a quest, such as a line, a camera move or a fight, is a story: " +
         "Scene Reactions below makes one for it.";
+
+    // ---- The New Quest form: only the essentials, a first objective to fill in, and who gives it.
+
+    private QuestDefinition draftQuest;
+    private List<GameObject> giverCandidates = new List<GameObject>();
+    private int giverChoice;
+
+    private static readonly string[] AdvancedFields =
+    {
+        "journalNotes", "availableObjective", "announceStart", "announceCompletion", "showTimerInHud", "startedFirst", "closedBy",
+        "startDelay", "onStarted", "turnInTo", "rewardResources", "rewardRecipes", "completionEvent", "onCompleted",
+    };
+
+    protected override IEnumerable<string> CreateHiddenFields
+    {
+        get
+        {
+            var hidden = new HashSet<string>(AdvancedFields);
+            hidden.UnionWith(HiddenFieldsFor(draftQuest));
+            return hidden;
+        }
+    }
+
+    protected override void InitializeDraft(ScriptableObject draft)
+    {
+        draftQuest = (QuestDefinition)draft;
+        var data = new SerializedObject(draft);
+        data.FindProperty("start").enumValueIndex = (int)QuestStart.ByQuestGiver;
+        SerializedProperty objectives = data.FindProperty("objectives");
+        objectives.arraySize = 1;
+        objectives.GetArrayElementAtIndex(0).boxedValue = QuestObjective.Create(ObjectiveType.TalkTo, 1);
+        objectives.GetArrayElementAtIndex(0).isExpanded = true;
+        data.ApplyModifiedPropertiesWithoutUndo();
+        giverCandidates = QuestChecklist.GiverCandidates();
+        giverChoice = 0;
+    }
+
+    public override void DrawCreateOptions()
+    {
+        if (draftQuest == null || draftQuest.Start != QuestStart.ByQuestGiver)
+        {
+            return;
+        }
+
+        ContentUtility.BeginPanel("Who Gives It", "Someone in the open scenes offers it once it is created (their Quest Giver; a person gets one). " +
+            "Other settings (journal notes, timers, closing) are on the quest once it exists, with a checklist of anything missing.");
+        var names = new List<string> { "Decide later", "A new Quest Giver at the Scene view" };
+        names.AddRange(giverCandidates.Where(g => g != null).Select(g => $"{g.name}  ({g.scene.name})"));
+        giverChoice = EditorGUILayout.Popup("Given by", Mathf.Clamp(giverChoice, 0, names.Count - 1), names.ToArray());
+        ContentUtility.EndPanel();
+    }
+
+    protected override void AfterCreate(ScriptableObject asset, bool withOptions)
+    {
+        var quest = (QuestDefinition)asset;
+        if (withOptions && quest.Start == QuestStart.ByQuestGiver && giverChoice > 0)
+        {
+            GameObject giver = giverChoice == 1 ? QuestObjectPresets.CreateQuestGiver() : giverCandidates.ElementAtOrDefault(giverChoice - 2);
+            if (giver != null)
+            {
+                QuestChecklist.GiveTo(quest, giver);
+            }
+        }
+
+        draftQuest = null;
+    }
+
+    // Only what this quest's choices use: the start event for an event start, Start When for a deed start, and so on.
+    public override ICollection<string> HiddenFieldsFor(Object asset)
+    {
+        var hidden = new HashSet<string>(HiddenFields);
+        if (asset is QuestDefinition quest)
+        {
+            if (quest.Start != QuestStart.OnQuestEvent) hidden.Add("startEvent");
+            if (quest.Start != QuestStart.WhenPlayerDoes) hidden.Add("startWhen");
+            if (quest.Start == QuestStart.ByQuestGiver) hidden.Add("startDelay");
+            if (!quest.TurnInToGiver) hidden.Add("turnInTo");
+        }
+
+        return hidden;
+    }
 
     public override string ListGroup(Object asset)
     {
@@ -86,6 +168,11 @@ public sealed class QuestSection : ContentSection
     public override void DrawExtras(Object asset)
     {
         var quest = (QuestDefinition)asset;
+        if (QuestChecklist.Draw(quest))
+        {
+            Host.Repaint();
+        }
+
         ContentUtility.BeginPanel("In the Game", "How this quest fits with the others and what the player sees.");
         EditorGUILayout.LabelField("Rank", QuestMarkerSettings.RankName(quest.Rank), ContentUtility.WrappedMiniLabel);
         EditorGUILayout.LabelField("Starts", DescribeStart(quest), ContentUtility.WrappedMiniLabel);
@@ -216,6 +303,7 @@ public sealed class QuestSection : ContentSection
         [QuestSceneRole.Other] = "Referenced by",
         [QuestSceneRole.PrefabOverride] = "Prefab override in",
         [QuestSceneRole.Starts] = "Started by story",
+        [QuestSceneRole.Is] = "Is it",
     };
 
     /// <summary>Lists scene and prefab uses as links that open the scene and select the object.</summary>

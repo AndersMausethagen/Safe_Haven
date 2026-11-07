@@ -12856,7 +12856,8 @@ MonoBehaviour:
   portrait: {fileID: 0}
   cameraDistance: 0.65
   followUpLine: Anything else?
-  talkedEvent: {fileID: 11400000, guid: eb2539c68ce00724ea300d5133c29bdc, type: 2}
+  questTarget: {fileID: 0}
+  talkedEvent: {fileID: 0}
 --- !u!114 &334759812
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -29739,7 +29740,8 @@ MonoBehaviour:
   portrait: {fileID: 0}
   cameraDistance: 0.65
   followUpLine: Anything else?
-  talkedEvent: {fileID: 11400000, guid: 45b20a2d17557304a8cb59976d6b5ca7, type: 2}
+  questTarget: {fileID: 0}
+  talkedEvent: {fileID: 0}
 --- !u!1 &787164407
 GameObject:
   m_ObjectHideFlags: 0
@@ -30630,7 +30632,8 @@ MonoBehaviour:
   portrait: {fileID: 0}
   cameraDistance: 0.65
   followUpLine: Anything else?
-  talkedEvent: {fileID: 11400000, guid: 1bb643130e8944049b38a3399cf7edf9, type: 2}
+  questTarget: {fileID: 0}
+  talkedEvent: {fileID: 0}
 --- !u!114 &810501276
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -32996,19 +32999,19 @@ MonoBehaviour:
   - rid: 2623125860895687518
   - rid: 2623125860895687519
   - rid: 2623125860895687520
-  - rid: 2623125860895687521
+  - rid: 2623125951272714346
   - rid: 2623125860895687522
   - rid: 2623125860895687523
   - rid: 2623125860895687524
   - rid: 2623125860895687525
   - rid: 2623125860895687526
-  - rid: 2623125860895687527
+  - rid: 2623125951272714347
   - rid: 2623125860895687528
   - rid: 2623125860895687529
   - rid: 2623125860895687530
   - rid: 2623125860895687531
   - rid: 2623125860895687532
-  - rid: 2623125860895687533
+  - rid: 2623125951272714348
   - rid: 2623125860895687534
   - rid: 2623125860895687535
   - rid: 2623125860895687536
@@ -33109,13 +33112,6 @@ MonoBehaviour:
         id: 31180dba3829404290475f67056d8037
         position: {x: 1240, y: 60}
         quest: {fileID: 11400000, guid: 2f76858ea1c6b6043bdee39be76ef0b1, type: 2}
-    - rid: 2623125860895687521
-      type: {class: WhenQuestEvent, ns: , asm: SafeHaven}
-      data:
-        id: 5f2c60b905644a2196d12e212f6961cb
-        position: {x: 40, y: 230}
-        once: 0
-        questEvent: {fileID: 11400000, guid: eb2539c68ce00724ea300d5133c29bdc, type: 2}
     - rid: 2623125860895687522
       type: {class: CheckQuestNode, ns: , asm: SafeHaven}
       data:
@@ -33146,13 +33142,6 @@ MonoBehaviour:
         id: 8ba4aa14167644988f4eb649335e21a8
         position: {x: 1540, y: 60}
         quest: {fileID: 11400000, guid: 2f76858ea1c6b6043bdee39be76ef0b1, type: 2}
-    - rid: 2623125860895687527
-      type: {class: WhenQuestEvent, ns: , asm: SafeHaven}
-      data:
-        id: 1ba8471e282442cd84e938b4da0d7778
-        position: {x: 40, y: 400}
-        once: 0
-        questEvent: {fileID: 11400000, guid: 3943805714479a044b6e4e23704963cd, type: 2}
     - rid: 2623125860895687528
       type: {class: CheckQuestNode, ns: , asm: SafeHaven}
       data:
@@ -33183,13 +33172,6 @@ MonoBehaviour:
         id: 017013e9c46744ac8ce45d30e9fda260
         position: {x: 1540, y: 230}
         quest: {fileID: 11400000, guid: 2f76858ea1c6b6043bdee39be76ef0b1, type: 2}
-    - rid: 2623125860895687533
-      type: {class: WhenQuestEvent, ns: , asm: SafeHaven}
-      data:
-        id: fbac80e65a694eaaa346e067f02e7061
-        position: {x: 40, y: 570}
-        once: 0
-        questEvent: {fileID: 11400000, guid: 1bb643130e8944049b38a3399cf7edf9, type: 2}
     - rid: 2623125860895687534
       type: {class: CheckQuestNode, ns: , asm: SafeHaven}
       data:
@@ -33220,6 +33202,84 @@ MonoBehaviour:
         id: 879b4a49646b48ac9c3a5d8f700c5de8
         position: {x: 1540, y: 400}
         quest: {fileID: 11400000, guid: 2f76858ea1c6b6043bdee39be76ef0b1, type: 2}
+    - rid: 2623125951272714346
+      type: {class: WhenPlayerDid, ns: , asm: SafeHaven}
+      data:
+        id: 5f2c60b905644a2196d12e212f6961cb
+        position: {x: 40, y: 230}
+        once: 0
+        deed:
+          type: 9
+          description: 
+          amount: 1
+          item: {fileID: 0}
+          resource: {fileID: 0}
+          monster: {fileID: 0}
+          faction: 1
+          building: {fileID: 0}
+          raid: {fileID: 0}
+          mustExtract: 1
+          withinMinutes: 0
+          questEvent: {fileID: 0}
+          person: {fileID: 11400000, guid: 4260d606f7c62c042b848adc806c44d3, type: 2}
+          target: {fileID: 0}
+          job: {fileID: 0}
+          breach: {fileID: 0}
+          rank: 1
+          bringHome: 0
+          countAlreadyOwned: 0
+    - rid: 2623125951272714347
+      type: {class: WhenPlayerDid, ns: , asm: SafeHaven}
+      data:
+        id: 1ba8471e282442cd84e938b4da0d7778
+        position: {x: 40, y: 400}
+        once: 0
+        deed:
+          type: 9
+          description: 
+          amount: 1
+          item: {fileID: 0}
+          resource: {fileID: 0}
+          monster: {fileID: 0}
+          faction: 1
+          building: {fileID: 0}
+          raid: {fileID: 0}
+          mustExtract: 1
+          withinMinutes: 0
+          questEvent: {fileID: 0}
+          person: {fileID: 11400000, guid: b230d041259b863428e4e973c6ff0d86, type: 2}
+          target: {fileID: 0}
+          job: {fileID: 0}
+          breach: {fileID: 0}
+          rank: 1
+          bringHome: 0
+          countAlreadyOwned: 0
+    - rid: 2623125951272714348
+      type: {class: WhenPlayerDid, ns: , asm: SafeHaven}
+      data:
+        id: fbac80e65a694eaaa346e067f02e7061
+        position: {x: 40, y: 570}
+        once: 0
+        deed:
+          type: 9
+          description: 
+          amount: 1
+          item: {fileID: 0}
+          resource: {fileID: 0}
+          monster: {fileID: 0}
+          faction: 1
+          building: {fileID: 0}
+          raid: {fileID: 0}
+          mustExtract: 1
+          withinMinutes: 0
+          questEvent: {fileID: 0}
+          person: {fileID: 11400000, guid: 33e7204287863854f8c6ad025490f531, type: 2}
+          target: {fileID: 0}
+          job: {fileID: 0}
+          breach: {fileID: 0}
+          rank: 1
+          bringHome: 0
+          countAlreadyOwned: 0
 --- !u!114 &874362784
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -37258,7 +37318,8 @@ MonoBehaviour:
   portrait: {fileID: 0}
   cameraDistance: 0.65
   followUpLine: Anything else?
-  talkedEvent: {fileID: 11400000, guid: 3943805714479a044b6e4e23704963cd, type: 2}
+  questTarget: {fileID: 0}
+  talkedEvent: {fileID: 0}
 --- !u!114 &983162869
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -47980,6 +48041,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95038b40ed62e5c43863f2a9e90920c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: SafeHaven::GameEventTrigger
+  target: {fileID: 11400000, guid: 0b0d203ed855c6a4dbc56818fb24ab02, type: 2}
   gameEvent: {fileID: 11400000, guid: e7d3f1e76eaac0c4093ec068db341d61, type: 2}
   when: 0
   area: {fileID: 0}
@@ -57757,7 +57819,8 @@ MonoBehaviour:
   portrait: {fileID: 0}
   cameraDistance: 0.65
   followUpLine: Anything else?
-  talkedEvent: {fileID: 11400000, guid: d656e5181cedb8f408b76012090c7439, type: 2}
+  questTarget: {fileID: 0}
+  talkedEvent: {fileID: 0}
 --- !u!1 &1448302185
 GameObject:
   m_ObjectHideFlags: 0
@@ -64053,7 +64116,8 @@ MonoBehaviour:
   portrait: {fileID: 0}
   cameraDistance: 0.65
   followUpLine: Anything else?
-  talkedEvent: {fileID: 11400000, guid: 3c4a3556d9e8a7741ac54999bfd13e25, type: 2}
+  questTarget: {fileID: 0}
+  talkedEvent: {fileID: 0}
 --- !u!1001 &1609158741
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -83020,6 +83084,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95038b40ed62e5c43863f2a9e90920c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: SafeHaven::GameEventTrigger
+  target: {fileID: 11400000, guid: 7206b17fa6b8435469cbf75f1d860beb, type: 2}
   gameEvent: {fileID: 11400000, guid: 3e4af787a3ca3d241a28d20824384e0f, type: 2}
   when: 0
   area: {fileID: 0}
@@ -85936,7 +86001,8 @@ MonoBehaviour:
   portrait: {fileID: 0}
   cameraDistance: 0.65
   followUpLine: Anything else?
-  talkedEvent: {fileID: 11400000, guid: 5b6e9cf3d8ea3e44cabe07b5cf724775, type: 2}
+  questTarget: {fileID: 0}
+  talkedEvent: {fileID: 0}
 --- !u!1001 &2112114438
 PrefabInstance:
   m_ObjectHideFlags: 0

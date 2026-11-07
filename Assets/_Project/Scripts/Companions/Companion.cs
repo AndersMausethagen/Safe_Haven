@@ -26,7 +26,7 @@ using UnityEngine.AI;
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(NavMeshAgent), typeof(Combatant), typeof(Damageable))]
-public sealed class Companion : MonoBehaviour, IConversationTopics
+public sealed class Companion : MonoBehaviour, IConversationTopics, IQuestPerson
 {
     private const float ThinkInterval = 0.2f;
 
@@ -34,7 +34,7 @@ public sealed class Companion : MonoBehaviour, IConversationTopics
 
     [SerializeField] private CompanionDefinition definition;
     [Tooltip("Who they are: the name used when they are knocked down.")]
-    [SerializeField] private ResidentDefinition resident;
+    [SerializeField, QuestIdentity] private ResidentDefinition resident;
     [SerializeField] private CompanionOrder startingOrder = CompanionOrder.Follow;
     [Tooltip("Their place while following, turned with the way the leader is heading: (2, 0, -3) walks right of and behind them.")]
     [SerializeField] private Vector3 formationOffset;

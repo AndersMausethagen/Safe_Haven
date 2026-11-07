@@ -363,6 +363,38 @@ holds priority until Silence/Resume/another Play Music action or leaving the sce
 Hold Portal **Quest Started** listener plays the authored defence playlist, including checkpoint replay. Designers
 can replace that clip or add weather, lights and object actions in the quest's Scene Reactions panel.
 
+### Quest deeds: who or what, not an event per person
+
+An objective names its target as an asset, so one objective type serves every person, place and thing, and a designer
+assigns the target instead of making an event:
+
+- **Talk To** a person (their `ResidentDefinition`) or a thing (a `QuestTargetDefinition`, such as the Portal).
+- **Reach Place** / **Use Object**: a `QuestTargetDefinition` ("Quest Target", `Data/Quests/Targets`) that a scene's Quest Zone
+  or Inspect Point (`GameEventTrigger.Target`) is marked with. A target says how "use" reads for it (Inspect, Light, Touch).
+- **Rescue Person** (found and freed, or brought home), **Assign Job**, **Defend Breach**, **Reach Haven Rank**; and as before
+  Collect, Gather, Kill, Craft, Build, Catch Fish, Complete Raids.
+- **Story Event** (the old Quest Event objective): one-off moments only: a lesson learnt, an answer chosen.
+
+Who someone is comes from the object: `Talkable` asks any `IQuestPerson` beside it (`ResidentNpc`, `PrologueCompanion`,
+`Companion`) for its resident record, so talking to an expedition member or resident needs no setup at all. Deeds are
+remembered in the quest log's saved set (`QuestDeeds` keys, e.g. `talked:expedition.sigrid`), so Count Already Owned, a
+quest's **When Player Does** start (`QuestDefinition.StartWhen`, any objective as the condition) and once-per-game triggers
+know a deed done earlier; old saves' per-person event ids map to the deeds (`QuestDeeds.FromLegacy`). Stories use the same
+vocabulary: the trigger **When Player: …** (`WhenPlayerDid`) and the step **Count As Done** (`CountAsDoneNode`), in
+`Story/StoryDeedNodes.cs`.
+
+For designers (Content Editor › Quests):
+
+- **New Quest** shows only the essentials (name, chain, rank, what comes first, how it starts, objectives, hand-in, rewards)
+  with a first Talk To objective to fill in and **Given By**: someone in the open scenes, or a new Quest Giver at the Scene
+  view. Other settings are on the quest once it exists. Fields that a quest's choices make meaningless are hidden
+  (`ContentSection.HiddenFieldsFor`): the start event unless it starts on one, Start When unless When Player Does...
+- **Make It Work** (`QuestChecklist`), at the top of every quest: how it starts (who offers it), each objective's person,
+  place or thing in the scenes (`QuestSceneIndex.MarkedAs`, the `[QuestIdentity]` fields), how it is handed in, its
+  rewards; each missing piece has buttons: give it to someone in the open scenes (or the selected object, or a new giver),
+  create a Quest Zone or Inspect Point for the target at the Scene view, make the selected object the target, add a first
+  objective. A Quest Target field has **New** beside it (`QuestTargetTools`).
+
 ### Who raises which game event
 
 | Event | Raised by |
@@ -376,7 +408,12 @@ can replace that clip or add weather, lights and object actions in the quest's S
 | RaidEvent | `RaidEventDirector` when an event begins (Amount 0) and `RaidEventSite` when the player acts on it (Amount: the choice, from 1). The playtest log's record of event participation |
 | RaidFinished | `RaidDirector` when a raid ends |
 | QuestStarted / QuestCompleted | `QuestManager` |
-| Custom (Quest Events) | `GameEventTrigger`, `GameEventDefinition.Raise`, a quest's completion event and On Started/On Completed lists, and the Quest Event fields on `RescuableTraveler` (freed/rescued), `HomePortal` (talked to), `RaidPortal` (repaired), `JobDefinition` (job assigned, via `ResidentNpc`) and `WardBreachDefinition` (breach won). The Content Editor's "nothing raises this event" check finds these by the `[RaisedByGame]` attribute on the field; when you add a new Quest Event field that the game raises, mark it `[RaisedByGame]` |
+| Talked / Reached / Used | Deeds by target (`QuestDeeds.Raise`): `Talkable` when talked to (Subject: who it is: an `IQuestPerson`'s resident record, or its Quest Target), `HomePortal` when a talk ends (its Quest Target), and `GameEventTrigger` with a Target (a zone or area: Reached; an interaction or Raise: Used). Stories raise them with **Count As Done** |
+| PersonFreed / PersonRescued | `RescuableTraveler` when found and freed, and when they come home (Subject: their resident) |
+| JobAssigned | `ResidentNpc.GiveJob` (Subject: the job; Detail: the person) |
+| BreachRepelled | `WardBreachDirector` when a breach is beaten back (Subject: the breach) |
+| HavenRankReached | `HavenProgress` each time it counts the ranks (Amount: the rank, from 1) |
+| Custom (Story Events) | One-off moments only: `GameEventTrigger`'s Quest Event, `GameEventDefinition.Raise`, a quest's completion event and On Started/On Completed lists, story nodes, `RaidPortal` (repaired), the prologue's chapter events, and the optional Story Event fields on `Talkable`, `HomePortal`, `RescuableTraveler`, `JobDefinition` and `WardBreachDefinition`. Talking to someone, reaching a place, using a thing, rescuing someone, hiring, defending and Haven ranks are deeds above: a Quest Event made per person or place is not needed (and the shared traveller and companion prefabs used to raise one person's event for everyone). The Content Editor's "nothing raises this event" check finds raisers by `[RaisedByGame]` on the field; fields naming who or what an object is for quests carry `[QuestIdentity]` |
 
 ### Base building: clearing, construction, upgrades, renown
 
@@ -808,7 +845,10 @@ filled in when it is saved (`SaveableEntityTools`). Safe Haven > Scene > Assign 
 | Keep something locked until the story reaches it (the rootbound stones, the portal) | Add `QuestGate` next to its `Interactable` and pick the quest; the prompt shows the locked text |
 | Change what the portal says at each step | Portal in SafeHaven: **Quest Whispers** (one line per active quest) |
 | Have a conversation with the portal at a step of the story | Give that step's Quest Whisper a **Moment** (a Quest Event) and make a Story Script that starts on it (**When Quest Event**). It replaces the tree's menu once; end the story with Raise Quest Event if a quest waits for the talk |
-| Make a quest wait for a Haven rank, or a story start on one | Give the rank a **Reached Event** (Systems Editor › World › Haven, `Resources/HavenSettings`); use it in a Quest Event objective with Count Already Owned |
+| Make a quest wait for a Haven rank | A **Reach Haven Rank** objective (its rank as in Systems Editor › World › Haven); Count Already Owned counts a rank already reached. A story starts on it with **When Player: Reach Haven Rank** |
+| Make a quest ask the player to talk to someone, reach a place or use a thing | **Talk To** (choose the person), **Reach Place** / **Use Object** (choose or make a Quest Target with **New**). The quest's **Make It Work** list then offers to put a Quest Zone or Inspect Point for it at the Scene view, or to make the selected object it. No Quest Event is needed |
+| Start a quest when the player does something | **Start** › **When Player Does**, then **Start When**: any objective, e.g. Reach Place: the Wilds Echo |
+| Start a story when the player talks to someone or reaches a place | Story Graph › **When Player: …** with the deed; **Count As Done** in a story counts a deed done (e.g. the talk once its lines are said) |
 | Add or change an enchantment | Create > Safe Haven > Essence > Enchantment, then add it to `Resources/EssenceSettings` › **Enchantments** (Systems Editor › Essence). A Cursed one must state its drawback as a negative bonus (`EssenceTests`) |
 | Change what empowering or skill ranks cost and give | `Resources/EssenceSettings` (Systems Editor › Essence) |
 | Add a kind of cart or boat | A `TransportDefinition` in `Data/Transport`, a prefab with `Transport`, `SaveableEntity`, an `Interactable` and a driver (`Haulable` or `Rowboat`) with every collider on Ignore Raycast, and a kit item whose Transport points back at it. See `AgentScripts/BuildTransport.cs`, and call `SaveableEntity.RefreshPrefabId` on a new prefab or it can't be recreated from a save |

@@ -25,15 +25,13 @@ public static class BuildHomeStory
         if (SceneManager.GetActiveScene().isDirty) return "the open scene has unsaved changes";
 
         GameEventDefinition waking = Event("TheWaking", "home.the_waking", "");
-        GameEventDefinition hamlet = Event("HavenIsAHamlet", "home.haven_hamlet", "Raise Safe Haven to a Hamlet (H)");
-        Event("TravelerFreed", null, "Find Ingrid in the Misty Woods");
-        Event("AlchemistHired", null, "Speak to Ingrid and give her work");
-        QuestDefinition light = ALightTheyCanSee(hamlet);
+        // Reaching the Hamlet, finding Ingrid and hiring her are deeds (Reach Haven Rank, Rescue Person, Assign Job): no event each.
+        QuestDefinition light = ALightTheyCanSee();
         QuestTexts();
         BringIngridHome();
         Ingrid();
         Breach();
-        Haven(hamlet);
+        Haven();
         Load<ContentDatabase>("Assets/_Project/Resources/ContentDatabase.asset").CollectAll();
         EditorUtility.SetDirty(Load<ContentDatabase>("Assets/_Project/Resources/ContentDatabase.asset"));
         AssetDatabase.SaveAssets();
@@ -86,13 +84,14 @@ public static class BuildHomeStory
         prerequisites.GetArrayElementAtIndex(0).objectReferenceValue = Quest("AwakeningThePortal");
         SerializedProperty objectives = so.FindProperty("objectives");
         objectives.arraySize = 2;
-        Objective(objectives.GetArrayElementAtIndex(0), Load<GameEventDefinition>(Quests + "Events/TravelerFreed.asset"));
-        Objective(objectives.GetArrayElementAtIndex(1), Load<GameEventDefinition>(Quests + "Events/TravelerRescued.asset"));
+        var ingrid = Load<ResidentDefinition>("Assets/_Project/Data/Settlement/Ingrid.asset");
+        Deed(objectives.GetArrayElementAtIndex(0), QuestObjective.Deed(ObjectiveType.RescuePerson, ingrid, false), "Find Ingrid in the Misty Woods");
+        Deed(objectives.GetArrayElementAtIndex(1), QuestObjective.Deed(ObjectiveType.RescuePerson, ingrid, true), "Bring Ingrid home safely");
         so.ApplyModifiedPropertiesWithoutUndo();
         EditorUtility.SetDirty(quest);
     }
 
-    private static QuestDefinition ALightTheyCanSee(GameEventDefinition hamlet)
+    private static QuestDefinition ALightTheyCanSee()
     {
         string path = Quests + "ALightTheyCanSee.asset";
         var quest = Load<QuestDefinition>(path);
@@ -114,7 +113,7 @@ public static class BuildHomeStory
         prerequisites.GetArrayElementAtIndex(1).objectReferenceValue = Quest("AGrowingHome");
         SerializedProperty objectives = so.FindProperty("objectives");
         objectives.arraySize = 1;
-        Objective(objectives.GetArrayElementAtIndex(0), hamlet);
+        Deed(objectives.GetArrayElementAtIndex(0), QuestObjective.HavenRank(HamletRank()), "");
         SerializedProperty rewards = so.FindProperty("rewardResources");
         rewards.arraySize = 1;
         rewards.GetArrayElementAtIndex(0).FindPropertyRelative("resource").objectReferenceValue = LifeOrb();
@@ -127,13 +126,23 @@ public static class BuildHomeStory
     // What the Rootbound Stones quest gathers, so the essence isn't named twice.
     private static Object LifeOrb() => Quest("RootboundStones").Objectives[0].Resource;
 
-    private static void Objective(SerializedProperty objective, GameEventDefinition questEvent)
+    // A deed objective, counted when it was done before the quest began; its own words when given.
+    private static void Deed(SerializedProperty objective, QuestObjective deed, string text)
     {
-        objective.FindPropertyRelative("type").intValue = (int)ObjectiveType.QuestEvent;
-        objective.FindPropertyRelative("description").stringValue = "";
-        objective.FindPropertyRelative("amount").intValue = 1;
-        objective.FindPropertyRelative("questEvent").objectReferenceValue = questEvent;
+        objective.boxedValue = deed;
+        objective.FindPropertyRelative("description").stringValue = text;
         objective.FindPropertyRelative("countAlreadyOwned").boolValue = true;
+    }
+
+    private static int HamletRank()
+    {
+        var settings = Load<HavenSettings>("Assets/_Project/Resources/HavenSettings.asset");
+        for (int i = 0; i < settings.Ranks.Count; i++)
+        {
+            if (settings.Ranks[i].name == "Hamlet") return i;
+        }
+
+        return 2;
     }
 
     private static GameEventDefinition Event(string file, string id, string objectiveText)
@@ -178,17 +187,10 @@ public static class BuildHomeStory
         EditorUtility.SetDirty(breach);
     }
 
-    private static void Haven(GameEventDefinition hamlet)
+    private static void Haven()
     {
         var settings = Load<HavenSettings>("Assets/_Project/Resources/HavenSettings.asset");
         var so = new SerializedObject(settings);
-        SerializedProperty ranks = so.FindProperty("ranks");
-        for (int i = 0; i < ranks.arraySize; i++)
-        {
-            SerializedProperty rank = ranks.GetArrayElementAtIndex(i);
-            if (rank.FindPropertyRelative("name").stringValue == "Hamlet") rank.FindPropertyRelative("reachedEvent").objectReferenceValue = hamlet;
-        }
-
         string[] people = { "Prologue/Residents/Sigrid", "Settlement/Ingrid", "Prologue/Residents/Bjarne", "Prologue/Residents/Tor", "Prologue/Residents/Eirik", "Prologue/Residents/Runa", "Prologue/Residents/Liv" };
         SerializedProperty expedition = so.FindProperty("expedition");
         expedition.arraySize = people.Length;
@@ -225,7 +227,7 @@ public static class BuildHomeStory
     {
         Scene scene = EditorSceneManager.OpenScene(HomeScene);
         var waking = Load<GameEventDefinition>(Quests + "Events/TheWaking.asset");
-        var talked = Load<GameEventDefinition>(Quests + "Events/TalkedToPortal.asset");
+        var talked = Load<QuestTargetDefinition>(Quests + "Targets/The Portal.asset");
         HomePortal tree = Object.FindAnyObjectByType<HomePortal>(FindObjectsInactive.Include);
         RaidPortal portal = Object.FindAnyObjectByType<RaidPortal>(FindObjectsInactive.Include);
 
@@ -250,7 +252,7 @@ public static class BuildHomeStory
         return $"{root.childCount} stories, dirty={scene.isDirty}";
     }
 
-    private static void TheWaking(Transform root, GameEventDefinition waking, GameEventDefinition talked)
+    private static void TheWaking(Transform root, GameEventDefinition waking, QuestTargetDefinition talked)
     {
         StoryScript story = Story(root, "Story - The Waking");
         var heard = new WhenQuestEvent { questEvent = waking };
@@ -274,7 +276,7 @@ public static class BuildHomeStory
         var pact = Say("<i>I am a door, little one, and I have gone to sleep. I am too thin to wake myself. Long ago people kept a hearth beside these stones, and I kept the night from their door. That was the pact. No fire has burned here in a hundred winters.</i>");
         var hearth = Say("<i>So light one. The forest cannot forget a hearth that someone tends. It will feed my ward, and out in the mist your people will see it and know which way is home.</i>");
         var plan = Say("<i>A fire first. Then a home worth coming back to. Then we go and fetch them. And one day, little one, you will tell me why these old stones woke for your hand.</i>");
-        var done = new RaiseQuestEventNode { questEvent = talked };
+        var done = new CountAsDoneNode { deed = QuestObjective.Deed(ObjectiveType.TalkTo, talked) };
         Link(story, (heard, 0, caught), (caught, 0, alive), (caught, 1, whatAreYou), (whatAreYou, 0, alive), (alive, 0, forgets),
             (forgets, 0, pact), (forgets, 1, nothing), (nothing, 0, pact), (pact, 0, hearth), (hearth, 0, plan), (plan, 0, done));
     }

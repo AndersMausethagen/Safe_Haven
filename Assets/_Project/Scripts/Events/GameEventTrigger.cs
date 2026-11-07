@@ -31,12 +31,20 @@ public enum TriggerRepeat
 /// the Old Tower", "Inspect the shrine", "The moss blooms when you first come home". Its Raise method can also be chosen
 /// from any event in the Inspector. Pair it with a Quest Event Listener to make something happen in the scene. Listed in
 /// Add Component as Safe Haven › Quests › Quest Event Trigger; quick setups under GameObject › Safe Haven.
+/// <para>
+/// Its Target says what it is for quests: a zone or area counts as Reach Place for it, an interaction (or Raise) as Use
+/// Object. Any quest can then ask for that place or thing with no Quest Event made for it; the Quest Event stays for story
+/// moments of its own. Either or both.
+/// </para>
 /// </summary>
 [AddComponentMenu("Safe Haven/Quests/Quest Event Trigger")]
 public sealed class GameEventTrigger : MonoBehaviour
 {
     private const float AreaCheckInterval = 0.25f;
 
+    [Tooltip("What this place or thing is for quests: a zone counts as reaching it, an interaction as using it. Optional.")]
+    [SerializeField, QuestIdentity] private QuestTargetDefinition target;
+    [Tooltip("A story moment of its own to raise as well. Optional: Reach Place and Use Object objectives need only the Target.")]
     [SerializeField, RaisedByGame] private GameEventDefinition gameEvent;
     [SerializeField] private TriggerWhen when = TriggerWhen.PlayerEntersZone;
     [Tooltip("For Player Inside Area: the area to watch, a component that is one (the portal, for its ward).")]
@@ -55,6 +63,10 @@ public sealed class GameEventTrigger : MonoBehaviour
     private bool wasInside;
 
     public GameEventDefinition Event => gameEvent;
+    public QuestTargetDefinition Target => target;
+
+    /// <summary>What reaching or using it counts as: Reached for a zone or area, Used for an interaction or Raise.</summary>
+    public GameEventKind DeedKind => when == TriggerWhen.PlayerEntersZone || when == TriggerWhen.PlayerInsideArea ? GameEventKind.Reached : GameEventKind.Used;
     public TriggerWhen When => when;
     public TriggerRepeat Repeat => repeat;
 
@@ -122,12 +134,13 @@ public sealed class GameEventTrigger : MonoBehaviour
     {
         get
         {
-            if (gameEvent == null || (repeat != TriggerRepeat.EveryTime && raised))
+            if ((gameEvent == null && target == null) || (repeat != TriggerRepeat.EveryTime && raised))
             {
                 return false;
             }
 
-            if (repeat == TriggerRepeat.OncePerGame && GameSession.Quests.HasHappened(gameEvent))
+            if (repeat == TriggerRepeat.OncePerGame && (gameEvent != null ? GameSession.Quests.HasHappened(gameEvent)
+                    : GameSession.Quests.HasDone(QuestDeeds.Key(DeedKind, target))))
             {
                 return false;
             }
@@ -155,6 +168,7 @@ public sealed class GameEventTrigger : MonoBehaviour
         }
 
         raised = true;
+        QuestDeeds.Raise(DeedKind, target, actor);
         GameEvents.Raise(gameEvent, actor);
         return true;
     }

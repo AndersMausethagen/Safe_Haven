@@ -38,7 +38,12 @@ public sealed class HomePortal : MonoBehaviour, IArea, IBuildArea
         "<i>Three stones still hold my light, choked by cursed roots. Free them, and I may wake.</i>",
         "<i>Beyond me the forest is sick. Go, take what you need, and come home before the way closes.</i>",
     };
-    [Tooltip("Raised when the player finishes at the portal (the menu closes), for quests such as \"Listen to the portal\".")]
+    [Tooltip("For quests: what finishing a conversation at the portal counts as (Talk To), e.g. the Portal Quest Target.")]
+    [SerializeField, QuestIdentity] private QuestTargetDefinition questTarget;
+
+    /// <summary>What talking to the portal counts as for quests (Talk To).</summary>
+    public QuestTargetDefinition QuestTarget => questTarget;
+    [Tooltip("A story moment of its own, raised when a conversation with the portal ends. Optional: Talk To objectives need none.")]
     [SerializeField, RaisedByGame] private GameEventDefinition talkedEvent;
     [Tooltip("What is heard when it speaks: its whispers here, and the same sound on its lines in story graphs. Optional.")]
     [SerializeField] private SoundDefinition voice;
@@ -160,6 +165,7 @@ public sealed class HomePortal : MonoBehaviour, IArea, IBuildArea
 
     private void RaiseTalked(GameObject user)
     {
+        QuestDeeds.Raise(GameEventKind.Talked, questTarget, user);
         if (talkedEvent != null)
         {
             GameEvents.Raise(talkedEvent, user);

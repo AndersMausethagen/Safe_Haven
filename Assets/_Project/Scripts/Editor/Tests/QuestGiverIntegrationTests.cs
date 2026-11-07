@@ -330,7 +330,8 @@ public sealed class QuestGiverIntegrationTests
 
                 Assert.AreEqual(QuestStatus.Active, manager.Log.StatusOf(chapter.Quest), chapter.Quest.name);
                 foreach (var goal in chapter.Quest.Objectives)
-                    GameEvents.Raise(new GameEvent(goal.Type == ObjectiveType.QuestEvent ? GameEventKind.Custom :
+                    GameEvents.Raise(goal.DeedKind.HasValue ? new GameEvent(goal.DeedKind.Value, goal.DeedTarget, goal.Amount) :
+                        new GameEvent(goal.Type == ObjectiveType.QuestEvent ? GameEventKind.Custom :
                         goal.Type == ObjectiveType.BuildStructure ? GameEventKind.Built :
                         goal.Type == ObjectiveType.CraftItem ? GameEventKind.Crafted : GameEventKind.ItemObtained,
                         goal.Type == ObjectiveType.QuestEvent ? (Object)goal.QuestEvent :

@@ -24,15 +24,36 @@ MonoBehaviour:
   showTimerInHud: 0
   prerequisites:
   - {fileID: 11400000, guid: 2614c1d189f3a034691f98f3d3efeee0, type: 2}
+  startedFirst: []
   start: 0
   startEvent: {fileID: 0}
+  startWhen:
+    type: 0
+    description: 
+    amount: 1
+    item: {fileID: 0}
+    resource: {fileID: 0}
+    monster: {fileID: 0}
+    faction: 1
+    building: {fileID: 0}
+    raid: {fileID: 0}
+    mustExtract: 1
+    withinMinutes: 0
+    questEvent: {fileID: 0}
+    person: {fileID: 0}
+    target: {fileID: 0}
+    job: {fileID: 0}
+    breach: {fileID: 0}
+    rank: 1
+    bringHome: 0
+    countAlreadyOwned: 0
   closedBy: {fileID: 0}
   startDelay: 0
   onStarted: []
   objectivesInOrder: 1
   objectives:
-  - type: 6
-    description: 
+  - type: 12
+    description: Find Ingrid in the Misty Woods
     amount: 1
     item: {fileID: 0}
     resource: {fileID: 0}
@@ -42,10 +63,16 @@ MonoBehaviour:
     raid: {fileID: 0}
     mustExtract: 1
     withinMinutes: 0
-    questEvent: {fileID: 11400000, guid: 4db7fcedfe05ca34cb26fb8f31d5351b, type: 2}
+    questEvent: {fileID: 0}
+    person: {fileID: 11400000, guid: 272895da9ba7e784b8a97bcd2be637c8, type: 2}
+    target: {fileID: 0}
+    job: {fileID: 0}
+    breach: {fileID: 0}
+    rank: 1
+    bringHome: 0
     countAlreadyOwned: 1
-  - type: 6
-    description: 
+  - type: 12
+    description: Bring Ingrid home safely
     amount: 1
     item: {fileID: 0}
     resource: {fileID: 0}
@@ -55,7 +82,13 @@ MonoBehaviour:
     raid: {fileID: 0}
     mustExtract: 1
     withinMinutes: 0
-    questEvent: {fileID: 11400000, guid: 333d8f3d8fb83304ea285c56f7052dac, type: 2}
+    questEvent: {fileID: 0}
+    person: {fileID: 11400000, guid: 272895da9ba7e784b8a97bcd2be637c8, type: 2}
+    target: {fileID: 0}
+    job: {fileID: 0}
+    breach: {fileID: 0}
+    rank: 1
+    bringHome: 1
     countAlreadyOwned: 1
   turnInToGiver: 0
   turnInTo: 

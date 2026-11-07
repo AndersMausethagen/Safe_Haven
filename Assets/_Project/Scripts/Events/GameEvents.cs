@@ -31,6 +31,22 @@ public enum GameEventKind
     RaidEvent = 11,
     /// <summary>A fish was landed with a rod. Subject: the fish's ItemDefinition.</summary>
     FishCaught = 12,
+    /// <summary>The player started talking to someone or something. Subject: who (ResidentDefinition) or what (QuestTargetDefinition).</summary>
+    Talked = 13,
+    /// <summary>The player reached a place (a Quest Zone or area marked with it). Subject: the QuestTargetDefinition.</summary>
+    Reached = 14,
+    /// <summary>The player used, inspected or lit a thing (an Inspect Point marked with it). Subject: the QuestTargetDefinition.</summary>
+    Used = 15,
+    /// <summary>A stranded person was found and freed. Subject: their ResidentDefinition.</summary>
+    PersonFreed = 16,
+    /// <summary>A rescued person came home with the player. Subject: their ResidentDefinition.</summary>
+    PersonRescued = 17,
+    /// <summary>Someone was given work. Subject: the JobDefinition; Detail: their ResidentDefinition.</summary>
+    JobAssigned = 18,
+    /// <summary>A ward breach was beaten back. Subject: the WardBreachDefinition.</summary>
+    BreachRepelled = 19,
+    /// <summary>Safe Haven stands at a rank (on reaching it, and again on loading). Amount: the rank, from 1.</summary>
+    HavenRankReached = 20,
 }
 
 /// <summary>
@@ -54,10 +70,13 @@ public readonly struct GameEvent
     public readonly float Seconds;
     /// <summary>For Killed and Destroyed: the side of what fell. Null when unknown.</summary>
     public readonly Faction? VictimFaction;
+    /// <summary>A second thing it was about, when there is one: for JobAssigned, the person given the job.</summary>
+    public readonly Object Detail;
 
     public GameEvent(GameEventKind kind, Object subject, int amount = 1, GameObject actor = null, RaidOutcome outcome = RaidOutcome.InProgress,
-        float seconds = 0f, GameObject origin = null, Faction? victimFaction = null)
+        float seconds = 0f, GameObject origin = null, Faction? victimFaction = null, Object detail = null)
     {
+        Detail = detail;
         Kind = kind;
         Subject = subject;
         Amount = amount;

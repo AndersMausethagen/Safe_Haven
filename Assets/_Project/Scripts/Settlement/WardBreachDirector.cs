@@ -458,6 +458,7 @@ public sealed class WardBreachDirector : MonoBehaviour
         string rewards = breach.Reward.Count > 0 ? $" Reward: {AmountText.Describe(breach.Reward)}." : "";
         GameMessages.Post(breach.WonText + rewards, MessageKind.Gain);
         AudioManager.Play(AudioManager.Sounds?.BreachWon, transform.position);
+        QuestDeeds.Raise(GameEventKind.BreachRepelled, breach, player);
         if (breach.WonEvent != null)
         {
             GameEvents.Raise(breach.WonEvent, player);
