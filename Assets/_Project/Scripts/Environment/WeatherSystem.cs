@@ -235,6 +235,47 @@ public sealed class WeatherSystem : MonoBehaviour
         Apply();
     }
 
+    /// <summary>A weather this scene knows, by its asset name (another game's, in co-op): the climate's first, then any
+    /// loaded (a corruption night's, a story's). Null when none is called that.</summary>
+    public WeatherDefinition FindWeather(string weatherName)
+    {
+        if (string.IsNullOrEmpty(weatherName))
+        {
+            return null;
+        }
+
+        if (weather != null && weather.name == weatherName)
+        {
+            return weather;
+        }
+
+        if (climate != null)
+        {
+            if (climate.Start != null && climate.Start.name == weatherName)
+            {
+                return climate.Start;
+            }
+
+            foreach (ClimateDefinition.Entry entry in climate.Weathers)
+            {
+                if (entry.weather != null && entry.weather.name == weatherName)
+                {
+                    return entry.weather;
+                }
+            }
+        }
+
+        foreach (WeatherDefinition loaded in Resources.FindObjectsOfTypeAll<WeatherDefinition>())
+        {
+            if (loaded.name == weatherName)
+            {
+                return loaded;
+            }
+        }
+
+        return null;
+    }
+
     /// <summary>Makes the weather's course follow <paramref name="seed"/> (a raid's, so every game on the run has the same
     /// weather; tests); the weather now starts its time over.</summary>
     public void SetRandomSeed(int seed)

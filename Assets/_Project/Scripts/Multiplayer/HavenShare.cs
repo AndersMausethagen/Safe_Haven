@@ -10,7 +10,7 @@ using UnityEngine.SceneManagement;
 /// in pieces (<c>SafeHaven.World</c>, <see cref="WorldTransfer"/>), and the guest's visit begins.</item>
 /// <item>Twice a second both sides send what changed in the Haven (<c>SafeHaven.Entities</c>, <see cref="HavenSync"/>);
 /// the host's game has the last word. Every couple of seconds the host sends its settlement when it changed
-/// (<c>SafeHaven.Settlement</c>), every five its hour (<c>SafeHaven.Clock</c>).</item>
+/// (<c>SafeHaven.Settlement</c>), every five its hour and weather (<c>SafeHaven.Clock</c>).</item>
 /// <item>A visit ends when the session does: straight home, or after a raid under way (<see cref="EndVisit"/>).</item>
 /// </list>
 /// </summary>
@@ -261,7 +261,7 @@ public sealed class HavenShare : ICoopPart, IDisposable
 
     // ---- The hour
 
-    // The host's time of day while at home, to the guests: a visit shares the hour.
+    // The host's time of day and weather while at home, to the guests: a visit shares the sky.
     private void ShareClock()
     {
         DayNightCycle clock = HavenVisit.HostIsHome() ? ClockHere() : null;
@@ -270,19 +270,39 @@ public sealed class HavenShare : ICoopPart, IDisposable
             return;
         }
 
-        using var writer = CoopLink.Writer(16);
+        WeatherSystem weather = WeatherSystem.Active;
+        string weatherName = weather != null && weather.Weather != null ? weather.Weather.name : string.Empty;
+        using var writer = CoopLink.Writer(16 + weatherName.Length * 2);
         writer.WriteValueSafe(clock.Hour);
+        writer.WriteValueSafe(weatherName);
         link.ToGuests(ClockMessage, writer, CoopLink.NoOne, NetworkDelivery.Reliable);
     }
 
     private void OnClock(ulong sender, FastBufferReader reader)
     {
         reader.ReadValueSafe(out float hour);
-        // A raid keeps its own hour (rolled from its seed), wherever the host is.
+        reader.ReadValueSafe(out string weatherName);
+        // A raid keeps its own hour and weather (from its seed), wherever the host is.
         DayNightCycle clock = HavenVisit.IsVisiting && GameSession.ActiveRaid == null ? ClockHere() : null;
-        if (clock != null)
+        if (clock == null)
         {
-            clock.Hour = hour;
+            return;
+        }
+
+        clock.Hour = hour;
+        // The host's weather too: this game's climate stops choosing its own while here.
+        WeatherSystem weather = WeatherSystem.Active;
+        if (weather != null && !string.IsNullOrEmpty(weatherName))
+        {
+            weather.ChangesByItself = false;
+            if (weather.Weather == null || weather.Weather.name != weatherName)
+            {
+                WeatherDefinition hosts = weather.FindWeather(weatherName);
+                if (hosts != null)
+                {
+                    weather.SetWeather(hosts);
+                }
+            }
         }
     }
 

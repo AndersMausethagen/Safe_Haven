@@ -253,6 +253,28 @@ public sealed class WeatherTests
     }
 
     [Test]
+    public void FindWeather_ByNameFromTheClimateOrWhatIsLoaded()
+    {
+        // Co-op: a visit follows the host's weather by name.
+        WeatherDefinition clear = Weather("Clear", 1f, 0f, 0f);
+        clear.name = "Probe Clear";
+        WeatherDefinition rainy = Weather("Rain", 1.5f, 0.7f, 0.8f);
+        rainy.name = "Probe Rain";
+        WeatherDefinition corruption = Weather("Corruption", 2f, 0.2f, 1f);
+        corruption.name = "Probe Corruption Haze";
+        ClimateDefinition climate = Asset<ClimateDefinition>();
+        climate.Configure(clear, 0f, new ClimateDefinition.Entry { weather = rainy, chance = 1f });
+        WeatherSystem system = Make<WeatherSystem>("weather");
+        Wire(system, ("climate", climate));
+
+        Assert.AreSame(clear, system.FindWeather("Probe Clear"));
+        Assert.AreSame(rainy, system.FindWeather("Probe Rain"));
+        Assert.AreSame(corruption, system.FindWeather("Probe Corruption Haze"), "not the climate's, but loaded");
+        Assert.IsNull(system.FindWeather("No Such Sky"));
+        Assert.IsNull(system.FindWeather(""));
+    }
+
+    [Test]
     public void Setup_CreatesTheLooksAndWiresTheRig()
     {
         // First: a new scene unloads assets only scripts hold, such as the set below.
