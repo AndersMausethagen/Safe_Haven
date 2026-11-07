@@ -1,3 +1,6 @@
+#if SAFEHAVEN_STEAM && (UNITY_STANDALONE_WIN || UNITY_STANDALONE_LINUX || UNITY_STANDALONE_OSX)
+#define STEAM_ON
+#endif
 using System;
 using System.IO;
 using System.Text;
@@ -16,12 +19,18 @@ public enum CoopState
 
 /// <summary>
 /// Co-op: one player hosts, up to <see cref="MultiplayerSettings.MaxPlayers"/> play together. Owns the Netcode
-/// NetworkManager (made here, in code, on the Game Systems object's side) and its transport: Unity Transport for LAN and
-/// direct sessions today, Steam's relay once Steam is added (sessions are addressed by Steam id then, not IP).
+/// NetworkManager (made here, in code) and picks its transport per session:
+/// <list type="bullet">
+/// <item>With Steam running (<see cref="SteamPlatform"/>): Steam's relay (SteamNetworkingSocketsTransport), addressed by
+/// Steam id. Hosting opens a friends-only <see cref="SteamLobby"/>; friends join from an invite, "Join Game" in their
+/// friends list, or a +connect_lobby launch. Nobody's IP address is shown and no ports need opening.</item>
+/// <item>Without Steam: Unity Transport, joined by IP (LAN, or a forwarded port).</item>
+/// </list>
 /// <para>
 /// While a session runs, the Escape menu no longer stops the world (<see cref="GamePause.FreezesTime"/>): one player
 /// can't pause their friends. Each player keeps their own <see cref="Player"/> and save; friends appear beside them as
 /// <see cref="NetworkPlayerAvatar"/>s. Netcode's own scene management is off, so the game's scene changes are untouched.
+/// A Steam join asked for where there is no player yet (the main menu) waits until a game is loaded.
 /// </para>
 /// <para>
 /// Testing in the Editor (Multiplayer Play Mode): an additional instance tagged "Host" hosts and one tagged "Guest" joins
@@ -35,16 +44,24 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
     public const string LocalAddress = "127.0.0.1";
 
     private MultiplayerSettings settings;
+    private SteamPlatform steam;
+    private SteamLobby lobby;
     private NetworkManager network;
-    private UnityTransport transport;
+    private UnityTransport directTransport;
+    private NetworkTransport steamTransport;
     private CoopState state;
     private string autoStart;
+    private ulong pendingLobby;
 
     public static CoopSession Current { get; private set; }
 
     public CoopState State => state;
     public bool IsActive => state != CoopState.Offline;
     public bool IsHost => state == CoopState.Hosting;
+    /// <summary>True when this session runs through Steam (friends are invited, not given an address).</summary>
+    public bool ViaSteam { get; private set; }
+    /// <summary>True when sessions can go through Steam now.</summary>
+    public bool SteamReady => steam != null && steam.IsReady && (network == null || steamTransport != null);
     /// <summary>Players in the session now, you included (1 while offline).</summary>
     public int PlayerCount => IsActive ? Mathf.Max(1, NetworkPlayerAvatar.All.Count) : 1;
     /// <summary>Why the last attempt or session ended, for the menu (empty when it ended normally).</summary>
@@ -52,12 +69,26 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
 
     public event Action<CoopState> StateChanged;
 
-    public void Initialise(MultiplayerSettings multiplayer)
+    public void Initialise(MultiplayerSettings multiplayer, SteamPlatform platform)
     {
         settings = multiplayer;
+        steam = platform;
         Current = this;
         NetworkPlayerAvatar.FriendArrived += OnFriendArrived;
         NetworkPlayerAvatar.FriendLeft += OnFriendLeft;
+        if (steam != null && steam.IsReady)
+        {
+            lobby = new SteamLobby();
+            lobby.JoinAsked += OnSteamJoinAsked;
+            lobby.HostFound += OnSteamHostFound;
+            lobby.Failed += OnSteamFailed;
+            steam.ShuttingDown += DropLobby;
+            // Started by Steam to join a friend: "+connect_lobby <id>" on the command line.
+            if (SteamLobby.TryParseConnect(string.Join(" ", Environment.GetCommandLineArgs()), out ulong launchLobby))
+            {
+                pendingLobby = launchLobby;
+            }
+        }
 #if UNITY_EDITOR
         PrepareTestInstance();
 #endif
@@ -65,8 +96,21 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
 
     public void OnSceneEntered(Scene scene)
     {
+        if (Player.Current == null)
+        {
+            return;
+        }
+
+        // A Steam join asked for before there was a game to bring into it.
+        if (pendingLobby != 0 && lobby != null)
+        {
+            ulong id = pendingLobby;
+            pendingLobby = 0;
+            OnSteamJoinAsked(id);
+        }
+
         // A tagged test instance starts once it has a player to bring.
-        if (!string.IsNullOrEmpty(autoStart) && Player.Current != null && !IsActive)
+        if (!string.IsNullOrEmpty(autoStart) && !IsActive)
         {
             string role = autoStart;
             autoStart = null;
@@ -75,7 +119,7 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
         }
     }
 
-    /// <summary>Opens this game to friends. False (with the reason) when it can't.</summary>
+    /// <summary>Opens this game to friends: through Steam when it runs, else on the LAN/IP port.</summary>
     public bool Host(out string problem)
     {
         if (!Prepare(out problem))
@@ -83,43 +127,57 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
             return false;
         }
 
-        transport.SetConnectionData(LocalAddress, settings.Port, "0.0.0.0");
+        bool viaSteam = SteamReady;
+        if (!viaSteam)
+        {
+            directTransport.SetConnectionData(LocalAddress, settings.Port, "0.0.0.0");
+        }
+
+        Use(viaSteam);
         network.ConnectionApprovalCallback = Approve;
         if (!network.StartHost())
         {
-            problem = $"Couldn't open a session on port {settings.Port}.";
+            problem = viaSteam ? "Couldn't open a session through Steam." : $"Couldn't open a session on port {settings.Port}.";
             return false;
         }
 
         SetState(CoopState.Hosting);
-        GameMessages.Post("Your Haven is open to friends.");
+        if (viaSteam)
+        {
+            lobby.Open(settings.MaxPlayers, settings.ProtocolVersion);
+            GameMessages.Post("Your Haven is open to friends. Invite them from the Escape menu or Steam.");
+        }
+        else
+        {
+            GameMessages.Post($"Your Haven is open to friends on port {settings.Port}.");
+        }
+
         return true;
     }
 
-    /// <summary>Joins the session at <paramref name="address"/> (an IP, optionally with ":port").</summary>
+    /// <summary>Opens Steam's invite dialog while hosting through Steam.</summary>
+    public bool InviteFriends()
+    {
+        return IsHost && ViaSteam && lobby != null && lobby.Invite();
+    }
+
+    /// <summary>Joins the session at <paramref name="address"/> (an IP, optionally with ":port"), without Steam.</summary>
     public bool Join(string address, out string problem)
     {
-        if (!Prepare(out problem))
-        {
-            return false;
-        }
-
         if (!TryParseAddress(address, settings.Port, out string ip, out ushort port))
         {
             problem = $"'{address}' isn't an address to join.";
             return false;
         }
 
-        transport.SetConnectionData(ip, port);
-        network.NetworkConfig.ConnectionData = Encoding.UTF8.GetBytes(settings.ProtocolVersion);
-        if (!network.StartClient())
+        if (!Prepare(out problem))
         {
-            problem = $"Couldn't reach {ip}:{port}.";
             return false;
         }
 
-        SetState(CoopState.Joining);
-        return true;
+        directTransport.SetConnectionData(ip, port);
+        Use(false);
+        return StartClient($"Couldn't reach {ip}:{port}.", out problem);
     }
 
     /// <summary>Ends the session (hosting: for everyone).</summary>
@@ -130,6 +188,7 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
             network.Shutdown();
         }
 
+        lobby?.Close();
         if (IsActive)
         {
             GameMessages.Post(IsHost ? "Your Haven is closed to friends." : "You left the session.");
@@ -189,6 +248,109 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
         return true;
     }
 
+    // ---- Steam
+
+    // A friend's invite or "Join Game": join them, leaving any session we are in, once there is a game to bring.
+    private void OnSteamJoinAsked(ulong lobbyId)
+    {
+        if (Player.Current == null)
+        {
+            pendingLobby = lobbyId;
+            GameMessages.Post("Load a game to join your friend.");
+            return;
+        }
+
+        if (IsActive)
+        {
+            Leave();
+        }
+
+        GameMessages.Post("Joining your friend...");
+        lobby.Enter(lobbyId);
+    }
+
+    private void OnSteamHostFound(ulong hostId, string hostVersion)
+    {
+        if (!MayJoin(settings.ProtocolVersion, hostVersion ?? string.Empty, 0, 1, out string reason))
+        {
+            LastProblem = reason;
+            GameMessages.Post(reason, MessageKind.Warning);
+            lobby.Close();
+            return;
+        }
+
+        if (!JoinSteam(hostId, out string problem))
+        {
+            LastProblem = problem;
+            GameMessages.Post(problem, MessageKind.Warning);
+            lobby.Close();
+        }
+    }
+
+    // Leaves the lobby and drops its Steam callbacks while Steam still runs (whichever of us goes first).
+    private void DropLobby()
+    {
+        if (lobby == null)
+        {
+            return;
+        }
+
+        if (steam != null && steam.IsReady)
+        {
+            lobby.Dispose();
+        }
+
+        lobby = null;
+    }
+
+    private void OnSteamFailed(string problem)
+    {
+        LastProblem = problem;
+        GameMessages.Post(problem, MessageKind.Warning);
+    }
+
+    private bool JoinSteam(ulong hostId, out string problem)
+    {
+        if (!Prepare(out problem))
+        {
+            return false;
+        }
+
+        if (!SteamReady)
+        {
+            problem = "Steam isn't running.";
+            return false;
+        }
+
+#if STEAM_ON
+        ((Netcode.Transports.SteamNetworkingSocketsTransport)steamTransport).ConnectToSteamID = hostId;
+#endif
+        Use(true);
+        return StartClient("Couldn't reach your friend through Steam.", out problem);
+    }
+
+    // ---- Netcode
+
+    private bool StartClient(string failure, out string problem)
+    {
+        network.NetworkConfig.ConnectionData = Encoding.UTF8.GetBytes(settings.ProtocolVersion);
+        if (!network.StartClient())
+        {
+            problem = failure;
+            return false;
+        }
+
+        problem = string.Empty;
+        SetState(CoopState.Joining);
+        return true;
+    }
+
+    private void Use(bool viaSteam)
+    {
+        ViaSteam = viaSteam;
+        network.NetworkConfig.NetworkTransport = viaSteam ? steamTransport : directTransport;
+    }
+
     private void Approve(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
     {
         // The host's own connection is always let in.
@@ -235,17 +397,23 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
         return true;
     }
 
-    // Built inactive so Netcode's Awake finds its configuration in place.
+    // Built inactive so Netcode's Awake finds its configuration in place. Both transports live on it; each session uses one.
     private void CreateNetwork()
     {
         var holder = new GameObject("Coop Network");
         holder.SetActive(false);
         DontDestroyOnLoad(holder);
-        transport = holder.AddComponent<UnityTransport>();
+        directTransport = holder.AddComponent<UnityTransport>();
+#if STEAM_ON
+        if (steam != null && steam.IsReady)
+        {
+            steamTransport = holder.AddComponent<Netcode.Transports.SteamNetworkingSocketsTransport>();
+        }
+#endif
         network = holder.AddComponent<NetworkManager>();
         network.NetworkConfig = new NetworkConfig
         {
-            NetworkTransport = transport,
+            NetworkTransport = directTransport,
             PlayerPrefab = settings.PlayerPrefab.gameObject,
             EnableSceneManagement = false,
             ConnectionApproval = true,
@@ -279,6 +447,7 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
         LastProblem = !string.IsNullOrEmpty(reason) ? reason : state == CoopState.Joining ? "Couldn't reach the host." : "The host closed the session.";
         GameMessages.Post(LastProblem, MessageKind.Warning);
         network.Shutdown();
+        lobby?.Close();
         SetState(CoopState.Offline);
     }
 
@@ -286,6 +455,7 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
     {
         LastProblem = "The connection failed.";
         GameMessages.Post(LastProblem, MessageKind.Warning);
+        lobby?.Close();
         SetState(CoopState.Offline);
     }
 
@@ -310,6 +480,7 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
     {
         NetworkPlayerAvatar.FriendArrived -= OnFriendArrived;
         NetworkPlayerAvatar.FriendLeft -= OnFriendLeft;
+        DropLobby();
         if (Current == this)
         {
             Current = null;

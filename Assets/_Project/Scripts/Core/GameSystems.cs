@@ -73,7 +73,8 @@ public sealed class GameSystems : MonoBehaviour
         Add<OptionsSystem>(options => options.Initialise());
         Add<SoundCaptions>(captions => captions.Initialise());
         Add<CheatSystem>(cheats => cheats.Initialise());
-        Add<CoopSession>(coop => coop.Initialise(MultiplayerSettings.Current));
+        Add<SteamPlatform>(steam => steam.Initialise(MultiplayerSettings.Current));
+        Add<CoopSession>(coop => coop.Initialise(MultiplayerSettings.Current, SteamPlatform.Current));
 
         SceneManager.sceneLoaded += OnSceneLoaded;
     }

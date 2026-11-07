@@ -1587,7 +1587,7 @@ The light is the fire's `LightFlicker`: warm yellow (1, 0.8, 0.46), sliding towa
 
 ## Co-op (multiplayer)
 
-Up to four players play together; one hosts (`MultiplayerSettings`, Resources; Systems Editor › Co-op). Built on **Netcode for GameObjects** (host-authoritative listen server) over **Unity Transport** today; Steam (Steamworks.NET with the SteamNetworkingSockets transport: lobbies, friend invites, Valve's relay) is the next step. Decided with the user: visitors may help in a Haven with the host's approval, raid loot is personal, Steam app 480 until the game has its own.
+Up to four players play together; one hosts (`MultiplayerSettings`, Resources; Systems Editor › Co-op). Built on **Netcode for GameObjects** (host-authoritative listen server). With the Steam client running, sessions go through **Steam**: `SteamPlatform` starts Steamworks.NET (app 480 through the SteamAppId environment variable), `SteamLobby` opens a friends-only lobby holding the host's Steam id and protocol version, friends join from an overlay invite, "Join Game" in their friends list or a `+connect_lobby` launch, and traffic goes over Valve's relay (SteamNetworkingSockets transport: no IPs, no ports). Without Steam, sessions fall back to **Unity Transport** by IP/LAN. Steam code compiles only while the Steamworks.NET package is present (`SAFEHAVEN_STEAM`). Decided with the user: visitors may help in a Haven with the host's approval, raid loot is personal, Steam app 480 until the game has its own.
 
 **The approach: friends beside you, not a networked player.** The player you control stays the ordinary single-player `Player` (all 60 components, `Player.Current`), run entirely on your machine. Co-op adds friends beside it:
 - `CoopSession` (a game system) owns the NetworkManager, made in code with Netcode's scene management **off**, so each game changes scenes on its own. `Host`, `Join(address)`, `Leave`; joining needs the same `ProtocolVersion` and a free place. While a session runs, `GamePause.FreezesTime` is off: the Escape menu blocks your input but the world keeps running. The Escape menu's Co-op button opens your game to friends, closes it, or leaves.
@@ -1597,7 +1597,16 @@ Up to four players play together; one hosts (`MultiplayerSettings`, Resources; S
 
 Testing: `CoopTests` (edit mode). Live, one Editor can host and run a second NetworkManager as a guest over 127.0.0.1 (Netcode allows several in one process). Multiplayer Play Mode instances tagged "Host"/"Guest" start a session on their own once they have a player and always save to a throwaway folder; each instance is a whole Editor, so check free RAM first.
 
-**Not yet:** a guest in your Haven still sees their own Haven's buildings (the host's world isn't sent yet), enemies don't see friends, and raids are solo. Next phases: Steam sessions and invites → visiting the host's Haven (their settlement sent to guests, guests' saves keep only their own character) → co-op raids (shared seed, host-run enemies, personal loot, downed and revive) → joining mid-session and the host leaving.
+**Not yet:** a real join through Steam is untested (it needs a second Steam account); a guest in your Haven still sees their own Haven's buildings (the host's world isn't sent yet), enemies don't see friends, and raids are solo. Next phases: visiting the host's Haven (their settlement sent to guests, guests' saves keep only their own character) → co-op raids (shared seed, host-run enemies, personal loot, downed and revive) → joining mid-session and the host leaving.
+
+## Editor memory
+
+The forest and mountain packs bring hundreds of 4K/8K textures, and the Editor held 10+ GB. Three things keep it down:
+- **Editor texture cap** (`EditorTextureCap`, Safe Haven › Editor › Light Textures in the Editor): Unity's import override caps the Editor's own copies at 2048 (local Library only). `SafeHavenBuild.BuildWindows` lifts it for the build; any other build with the cap on stops with an explanation.
+- **Texture streaming** (`AgentScripts/StreamLargeTextures.cs`): the large textures the game uses stream their mips (both quality levels, 2 GB budget on PC), so the game and the GPU keep only what the camera needs.
+- **After Play** (`PlayModeMemory`): with no domain reload a session's assets stayed loaded (about 2 GB per Play); they are unloaded when Play ends.
+
+Import workers are limited in the local Editor user settings (2 at most, none kept on standby).
 
 ## Look and lighting
 

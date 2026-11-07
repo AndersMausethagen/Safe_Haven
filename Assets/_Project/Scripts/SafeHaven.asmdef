@@ -13,7 +13,9 @@
         "Unity.RenderPipelines.Universal.Runtime",
         "Unity.Netcode.Runtime",
         "Unity.Networking.Transport",
-        "Unity.Collections"
+        "Unity.Collections",
+        "com.rlabrecque.steamworks.net",
+        "GUID:98d94cfe204587a4f92ed81e64a8e624"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -22,6 +24,12 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [],
-    "versionDefines": [],
+    "versionDefines": [
+        {
+            "name": "com.rlabrecque.steamworks.net",
+            "expression": "",
+            "define": "SAFEHAVEN_STEAM"
+        }
+    ],
     "noEngineReferences": false
 }

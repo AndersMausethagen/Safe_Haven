@@ -86,6 +86,20 @@ public sealed class CoopTests
     }
 
     [Test]
+    public void SteamJoinLinks_NameTheLobby()
+    {
+        Assert.IsTrue(SteamLobby.TryParseConnect("+connect_lobby 109775241234567890", out ulong lobby));
+        Assert.AreEqual(109775241234567890UL, lobby);
+        Assert.IsTrue(SteamLobby.TryParseConnect("\"C:/Games/Safe Haven.exe\" -screen-fullscreen 1 +connect_lobby 42", out lobby),
+            "Steam starting the game puts it among the other arguments.");
+        Assert.AreEqual(42UL, lobby);
+        Assert.IsFalse(SteamLobby.TryParseConnect("+connect_lobby", out _));
+        Assert.IsFalse(SteamLobby.TryParseConnect("+connect_lobby friend", out _));
+        Assert.IsFalse(SteamLobby.TryParseConnect("+connect_lobby 0", out _));
+        Assert.IsFalse(SteamLobby.TryParseConnect("", out _));
+    }
+
+    [Test]
     public void AFriendsGear_DressesThemAsItDressesYou()
     {
         var content = Resources.Load<ContentDatabase>(ContentDatabase.ResourceName);

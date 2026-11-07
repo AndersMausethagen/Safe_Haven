@@ -32,7 +32,8 @@ public static class SafeHavenBuild
             options = BuildOptions.None
         };
 
-        BuildReport report = BuildPipeline.BuildPlayer(options);
+        // Full-size textures in the build, whatever the Editor works with (EditorTextureCap).
+        BuildReport report = EditorTextureCap.WithFullTextures(() => BuildPipeline.BuildPlayer(options));
         if (report.summary.result != BuildResult.Succeeded)
         {
             throw new InvalidOperationException(

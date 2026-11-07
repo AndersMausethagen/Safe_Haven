@@ -1,6 +1,8 @@
 {
   "dependencies": {
+    "com.community.netcode.transport.steamnetworkingsockets": "https://github.com/Unity-Technologies/multiplayer-community-contributions.git?path=/Transports/com.community.netcode.transport.steamnetworkingsockets#0fab638470379ace12b0149dfb41c043d23dbce5",
     "com.coplaydev.unity-mcp": "https://github.com/CoplayDev/unity-mcp.git?path=/MCPForUnity",
+    "com.rlabrecque.steamworks.net": "https://github.com/rlabrecque/Steamworks.NET.git?path=/com.rlabrecque.steamworks.net#2025.165.0",
     "com.ramenvr.aura-unity": "https://github.com/ramenvr/AuraForUnityPlugin.git",
     "com.unity.ai.inference": "2.6.1",
     "com.unity.ai.navigation": "2.0.15",
