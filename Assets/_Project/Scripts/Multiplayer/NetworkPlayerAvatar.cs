@@ -136,13 +136,7 @@ public sealed class NetworkPlayerAvatar : NetworkBehaviour
     private void PublishLook()
     {
         // In a raid the place is the run, not only its scene: friends see each other only on the same map.
-        string place = SceneManager.GetActiveScene().name;
-        if (GameSession.ActiveRaid != null)
-        {
-            place += "#" + GameSession.ActiveRaid.Seed;
-        }
-
-        PlayerLookState now = PlayerLookState.Of(Player.Current, place);
+        PlayerLookState now = PlayerLookState.Of(Player.Current, CoopCreatures.PlaceHere());
         if (!now.Equals(look.Value))
         {
             look.Value = now;
@@ -159,7 +153,7 @@ public sealed class NetworkPlayerAvatar : NetworkBehaviour
 
     private void UpdateFriend()
     {
-        bool here = poses.Count > 0 && look.Value.Place.Length > 0 && look.Value.Place.ToString() == SceneManager.GetActiveScene().name;
+        bool here = poses.Count > 0 && look.Value.Place.Length > 0 && look.Value.Place.ToString() == CoopCreatures.PlaceHere();
         if (!here)
         {
             if (body != null && body.gameObject.activeSelf)
@@ -174,6 +168,11 @@ public sealed class NetworkPlayerAvatar : NetworkBehaviour
         {
             body = RemotePlayerBody.Create(transform, settings);
             body.Dress(look.Value, Content());
+            // The host's creatures go for friends too (CoopCreatures sends them the blows).
+            if (IsServer)
+            {
+                FriendHitbox.Attach(body.gameObject, OwnerClientId);
+            }
         }
         else if (!body.gameObject.activeSelf)
         {

@@ -311,7 +311,7 @@ public sealed partial class MonsterAI : MonoBehaviour, IEventSubject, IStaggerab
     public Vector3 AttackDirection => attacks != null ? attacks.Direction : Vector3.zero;
 
     /// <summary>Horizontal movement speed in meters per second, for animation.</summary>
-    public float Speed => movement != null ? movement.Speed : 0f;
+    public float Speed => IsRemote ? remoteSpeed : movement != null ? movement.Speed : 0f;
 
     /// <summary>Raised when the state changes. Arguments: previous state, new state.</summary>
     public event Action<State, State> StateChanged;
@@ -429,6 +429,13 @@ public sealed partial class MonsterAI : MonoBehaviour, IEventSubject, IStaggerab
     {
         if (CurrentState == State.Dead || definition == null)
         {
+            return;
+        }
+
+        // Co-op: the host's creature, shown here (MonsterAI.Remote).
+        if (IsRemote)
+        {
+            UpdateRemote();
             return;
         }
 
@@ -971,6 +978,7 @@ public sealed partial class MonsterAI : MonoBehaviour, IEventSubject, IStaggerab
     // Action index, or -1 for the definition's plain attack.
     private void BeginAttack(int action, Vector3 toTarget)
     {
+        LastAction = action;
         circling = false;
         attacks.Begin(action, toTarget);
         if (IsAtThePlayer)

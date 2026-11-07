@@ -40,7 +40,8 @@ public sealed class MonsterTargeting
         layers = targetLayers;
     }
 
-    public static bool IsPriorityTarget(Component candidate) => candidate.TryGetComponent(out Combatant other) && other.IsPriorityTarget;
+    public static bool IsPriorityTarget(Component candidate) =>
+        (candidate.TryGetComponent(out Combatant other) && other.IsPriorityTarget) || candidate.TryGetComponent(out FriendHitbox _);
 
     public bool IsAvoided(Vector3 position) => AvoidArea != null && AvoidArea(position);
 

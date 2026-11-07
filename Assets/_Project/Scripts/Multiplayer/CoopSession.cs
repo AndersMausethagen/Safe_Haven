@@ -72,6 +72,8 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
     private int syncLooks;
     private HavenSync sync;
     private readonly VisitorAccess access = new VisitorAccess();
+    private readonly CoopCreatures creatures = new CoopCreatures();
+    private float nextCreatures;
     private RaidInvite openRaid;
     private float openRaidSince;
     private readonly List<ulong> recipients = new List<ulong>();
@@ -174,6 +176,7 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
         network.CustomMessagingManager.RegisterNamedMessageHandler(WorldRequest, (sender, _) => SendWorld(sender));
         network.CustomMessagingManager.RegisterNamedMessageHandler(EntitiesMessage, OnEntitiesFromGuest);
         access.StartHosting(network);
+        creatures.StartHosting(network);
         SetState(CoopState.Hosting);
         if (viaSteam)
         {
@@ -386,6 +389,7 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
         network.CustomMessagingManager.RegisterNamedMessageHandler(RaidOpenMessage, OnRaidOpen);
         network.CustomMessagingManager.RegisterNamedMessageHandler(RaidClosedMessage, (sender, _) => openRaid = null);
         access.StartGuest(network);
+        creatures.StartGuest(network);
         SetState(CoopState.Joining);
         return true;
     }
@@ -574,6 +578,12 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
         {
             ShareClock();
         }
+
+        if (Time.unscaledTime >= nextCreatures)
+        {
+            nextCreatures = Time.unscaledTime + CoopCreatures.Interval;
+            creatures.Tick(IsHost);
+        }
     }
 
     // ---- Keeping the Haven in step (HavenSync)
@@ -667,7 +677,11 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
     {
         RaidInvite invite = openRaid;
         float elapsed = invite != null ? Time.unscaledTime - openRaidSince : 0f;
-        if (!RaidLauncher.TryFollow(invite, raid, player, (ContentDatabase)Content(), elapsed, out string problem))
+        if (RaidLauncher.TryFollow(invite, raid, player, (ContentDatabase)Content(), elapsed, out string problem))
+        {
+            creatures.FollowHost();
+        }
+        else
         {
             GameMessages.Post(problem, MessageKind.Warning);
         }
@@ -849,6 +863,7 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
         if (state == CoopState.Offline)
         {
             access.Reset();
+            creatures.Reset();
             openRaid = null;
         }
 
@@ -864,6 +879,7 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
         RaidLauncher.Launched -= OnRaidLaunched;
         GameEvents.Raised -= OnGameEvent;
         sync?.Dispose();
+        creatures.Dispose();
         DropLobby();
         if (Current == this)
         {

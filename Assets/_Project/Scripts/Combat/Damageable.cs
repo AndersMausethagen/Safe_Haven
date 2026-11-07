@@ -276,6 +276,30 @@ public sealed class Damageable : MonoBehaviour, IDamageable, ISaveable, ISharedS
         return healed;
     }
 
+    /// <summary>Co-op: shows the health a friend's game reports, as a share of the maximum (never below <see cref="HealthFloor"/>).</summary>
+    public void ShowShare(float share)
+    {
+        if (!IsAlive)
+        {
+            return;
+        }
+
+        currentHealth = Mathf.Max(Mathf.Max(HealthFloor, 1f), MaxHealth * Mathf.Clamp01(share));
+        HealthChanged?.Invoke(currentHealth, MaxHealth);
+    }
+
+    /// <summary>Co-op: dies now, as the host's game says this creature did, by <paramref name="killer"/>'s blow (or none).</summary>
+    public void Finish(Combatant killer)
+    {
+        if (!IsAlive)
+        {
+            return;
+        }
+
+        HealthFloor = 0f;
+        ApplyDamage(new DamageInfo(killer, null, currentHealth * 1000f + 100000f, DamageType.Physical, false, transform.position, transform.forward, 0f, HitTechnique.None));
+    }
+
     /// <summary>
     /// Brings a dead object back with a share of its health, such as the player waking at the portal. Only for objects
     /// that aren't destroyed on death.

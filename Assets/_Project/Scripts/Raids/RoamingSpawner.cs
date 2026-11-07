@@ -57,7 +57,8 @@ public sealed class RoamingSpawner : MonoBehaviour
     private void Update()
     {
         RoamingSpawnSettings settings = Settings;
-        if (settings == null || !settings.Enabled || !director.IsRunning || director.Player == null || Time.time < nextThink)
+        // Co-op: following the host, their game sends the creatures.
+        if (settings == null || !settings.Enabled || !director.IsRunning || director.Player == null || Time.time < nextThink || CoopCreatures.FromHost)
         {
             return;
         }
