@@ -44,8 +44,19 @@ public sealed class UIPress : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
     private bool Live => selectable == null || selectable.IsInteractable();
 
+    private static float lastHover;
+
     public void OnPointerEnter(PointerEventData eventData)
     {
+        // A soft tick, never more than one a moment, so sweeping over a row murmurs instead of rattling.
+        if (Time.unscaledTime - lastHover > 0.06f && TryGetComponent(out Selectable target) && target.IsInteractable()
+            && AudioManager.Sounds != null && AudioManager.Sounds.Hover != null)
+        {
+            lastHover = Time.unscaledTime;
+            Vector3 at = Player.Current != null ? Player.Current.transform.position : Camera.main != null ? Camera.main.transform.position : Vector3.zero;
+            AudioManager.Play(AudioManager.Sounds.Hover, at);
+        }
+
         over = true;
         Aim(Live ? Hover : 1f);
     }

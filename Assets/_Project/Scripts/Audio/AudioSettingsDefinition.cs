@@ -125,6 +125,8 @@ public sealed class AudioSettingsDefinition : ScriptableObject
     [Header("Interface Sounds")]
     [Tooltip("Pressing a button.")]
     [SerializeField] private SoundDefinition click;
+    [Tooltip("The pointer finding a button: a very soft tick.")]
+    [SerializeField] private SoundDefinition hover;
     [SerializeField] private SoundDefinition windowOpen;
     [SerializeField] private SoundDefinition windowClose;
     [Tooltip("A skill milestone reached: the big moment (the level-up sound is LevelingSettings').")]
@@ -235,6 +237,7 @@ public sealed class AudioSettingsDefinition : ScriptableObject
     public float CombatFadeSeconds => combatFadeSeconds;
     public float WorldSoundsLevel => worldSoundsLevel;
     public SoundDefinition Click => click;
+    public SoundDefinition Hover => hover;
     public SoundDefinition WindowOpen => windowOpen;
     public SoundDefinition WindowClose => windowClose;
     public SoundDefinition Milestone => milestone;

@@ -15,6 +15,7 @@ MonoBehaviour:
   m_Active: 1
   shader: {fileID: 4800000, guid: 9f137836d130a774d9858229d0c9b5ae, type: 3}
   fogResolution: 0.5
+  historyWeight: 0.85
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -44,7 +45,8 @@ MonoBehaviour:
   - {fileID: -6831963361569781261}
   - {fileID: 8954078253120216104}
   - {fileID: 5474396184367094398}
-  m_RendererFeatureMap: ad6b866f10d7b46cf349261b85fd2fa128dc4700bb46437c7e5af43853f6f84bl
+  - {fileID: 3167078257296711087}
+  m_RendererFeatureMap: ad6b866f10d7b46cf349261b85fd2fa128dc4700bb46437c7e5af43853f6f84baf9d0826e5b8f32bl
   xrSystemData: {fileID: 0}
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
   m_AssetVersion: 3
@@ -73,6 +75,21 @@ MonoBehaviour:
   m_AccurateGbufferNormals: 0
   m_IntermediateTextureMode: 0
   m_TileOnlyMode: 0
+--- !u!114 &3167078257296711087
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a9d0af65503cf264a9bfeacc80e33ba5, type: 3}
+  m_Name: UI Backdrop Blur
+  m_EditorClassIdentifier: SafeHaven::UIBlurFeature
+  m_Active: 1
+  shader: {fileID: 4800000, guid: 0b4afbaf7e4dc044e85f11625758ad8e, type: 3}
+  resolution: 0.25
 --- !u!114 &5474396184367094398
 MonoBehaviour:
   m_ObjectHideFlags: 1

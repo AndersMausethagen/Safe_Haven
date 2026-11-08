@@ -122,6 +122,7 @@ public sealed class UIWindow : MonoBehaviour
         IsOpen = open;
         content.SetActive(open);
         uiState?.SetWindowOpen(this, open);
+        UIBackdrop.Track(this, open);
         OpenChanged?.Invoke(open);
     }
 

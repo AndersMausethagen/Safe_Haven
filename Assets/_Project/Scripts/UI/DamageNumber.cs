@@ -28,12 +28,17 @@ public sealed class DamageNumber : MonoBehaviour
     private Camera viewCamera;
     private float age;
     private float sizeMultiplier = 1f;
+    private Vector3 drift;
+    private float tilt;
+    private bool critical;
 
     public void Show(DamageResult result)
     {
         label.text = Mathf.RoundToInt(result.Damage) + (result.IsCritical ? "!" : "");
         label.color = result.IsCritical ? criticalColor : ColorFor(result.Type);
         sizeMultiplier = result.IsCritical ? criticalScale : 1f;
+        critical = result.IsCritical;
+        Throw();
         Apply();
     }
 
@@ -43,6 +48,8 @@ public sealed class DamageNumber : MonoBehaviour
         label.text = text;
         label.color = color;
         sizeMultiplier = 0.8f;
+        critical = false;
+        Throw();
         Apply();
     }
 
@@ -60,7 +67,9 @@ public sealed class DamageNumber : MonoBehaviour
             return;
         }
 
-        transform.position += Vector3.up * (riseSpeed * Time.deltaTime);
+        // Thrown up and a little aside, slowing as it rises, so numbers from quick blows fan out instead of stacking.
+        float slow = 1f - Mathf.Clamp01(age / lifetime);
+        transform.position += (Vector3.up * riseSpeed * (0.4f + 1.2f * slow) + drift * slow) * Time.deltaTime;
         Apply();
     }
 
@@ -68,8 +77,8 @@ public sealed class DamageNumber : MonoBehaviour
     {
         float t = Mathf.Clamp01(age / lifetime);
 
-        // Starts oversized and settles quickly, so a hit reads as a pop.
-        float pop = 1f + 0.5f * Mathf.Clamp01(1f - age / 0.15f);
+        // Starts oversized and settles quickly, so a hit reads as a pop; a critical punches harder and longer.
+        float pop = 1f + (critical ? 1.1f : 0.5f) * Mathf.Clamp01(1f - age / (critical ? 0.22f : 0.15f));
         transform.localScale = Vector3.one * (unitSize * sizeMultiplier * pop);
 
         // Fully visible for the first half, then fades out.
@@ -78,8 +87,15 @@ public sealed class DamageNumber : MonoBehaviour
         viewCamera = viewCamera != null ? viewCamera : Camera.main;
         if (viewCamera != null)
         {
-            transform.rotation = viewCamera.transform.rotation;
+            transform.rotation = viewCamera.transform.rotation * Quaternion.Euler(0f, 0f, tilt * Mathf.Clamp01(1f - age / 0.3f));
         }
+    }
+
+    private void Throw()
+    {
+        Vector2 aside = Random.insideUnitCircle.normalized * Random.Range(0.25f, 0.6f);
+        drift = new Vector3(aside.x, 0f, aside.y);
+        tilt = critical ? Random.Range(-12f, 12f) : 0f;
     }
 
     private Color ColorFor(DamageType type)

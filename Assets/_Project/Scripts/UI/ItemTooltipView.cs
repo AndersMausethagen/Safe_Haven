@@ -42,6 +42,7 @@ public sealed class ItemTooltipView : MonoBehaviour
 
         ItemDefinition item = stack.Item;
         Show(stack.DisplayName, Rarity.ColorOf(item.Rarity), Describe(item, stack));
+        Header(item.Rarity, stack.Quality);
     }
 
     /// <summary>Shows a new item or a resource (an ItemDefinition or ResourceDefinition), such as a station's output.</summary>
@@ -50,6 +51,7 @@ public sealed class ItemTooltipView : MonoBehaviour
         if (definition is ItemDefinition item)
         {
             Show(item.DisplayName, Rarity.ColorOf(item.Rarity), Describe(item, null));
+            Header(item.Rarity, ItemQuality.Plain);
         }
         else if (definition is ResourceDefinition resource)
         {
@@ -171,7 +173,74 @@ public sealed class ItemTooltipView : MonoBehaviour
         titleLabel.color = titleColor;
         bodyLabel.text = body;
         panel.gameObject.SetActive(true);
+        Header(ItemRarity.Common, ItemQuality.Plain);
         LayoutRebuilder.ForceRebuildLayoutImmediate(panel);
+    }
+
+    private Image band;
+    private Material plainTitle;
+    private static readonly System.Collections.Generic.Dictionary<ItemRarity, Material> Glowing =
+        new System.Collections.Generic.Dictionary<ItemRarity, Material>();
+
+    // Hearthline 2: the top of the tooltip takes on the item's rarity (a solid mix, not a see-through wash), and a rare
+    // name glows faintly in its colour.
+    private void Header(ItemRarity rarity, ItemQuality quality)
+    {
+        UIStyle style = UIStyle.Current;
+        if (band == null)
+        {
+            var rect = (RectTransform)new GameObject("Rarity Band", typeof(RectTransform)).transform;
+            rect.SetParent(panel, false);
+            rect.SetAsFirstSibling();
+            rect.gameObject.AddComponent<LayoutElement>().ignoreLayout = true;
+            rect.anchorMin = new Vector2(0f, 1f);
+            rect.anchorMax = new Vector2(1f, 1f);
+            rect.pivot = new Vector2(0.5f, 1f);
+            band = rect.gameObject.AddComponent<Image>();
+            band.raycastTarget = false;
+            plainTitle = titleLabel.fontSharedMaterial;
+        }
+
+        bool lit = rarity >= ItemRarity.Uncommon || quality != ItemQuality.Plain;
+        band.enabled = lit;
+        if (lit)
+        {
+            Color colour = quality == ItemQuality.Masterwork ? Rarity.ColorOf(ItemRarity.Epic)
+                : quality == ItemQuality.Fine && rarity < ItemRarity.Rare ? Rarity.ColorOf(ItemRarity.Rare) : Rarity.ColorOf(rarity);
+            band.color = Color.Lerp(style.Panel, colour, 0.2f);
+            Canvas.ForceUpdateCanvases();
+            float top = panel.rect.yMax;
+            float below = titleLabel.rectTransform.TransformPoint(new Vector3(0f, titleLabel.rectTransform.rect.yMin, 0f)).y;
+            float height = Mathf.Max(24f, top - panel.InverseTransformPoint(new Vector3(0f, below, 0f)).y + 8f);
+            band.rectTransform.sizeDelta = new Vector2(0f, height);
+            band.rectTransform.anchoredPosition = Vector2.zero;
+        }
+
+        titleLabel.fontSharedMaterial = rarity >= ItemRarity.Rare || quality == ItemQuality.Masterwork
+            ? GlowFor(quality == ItemQuality.Masterwork && rarity < ItemRarity.Epic ? ItemRarity.Epic : rarity) : plainTitle;
+    }
+
+    private Material GlowFor(ItemRarity rarity)
+    {
+        if (plainTitle == null || !plainTitle.HasProperty("_GlowColor"))
+        {
+            return plainTitle;
+        }
+
+        if (!Glowing.TryGetValue(rarity, out Material material) || material == null)
+        {
+            material = new Material(plainTitle) { name = plainTitle.name + " Glow " + rarity, hideFlags = HideFlags.DontSave };
+            material.EnableKeyword("GLOW_ON");
+            Color colour = Rarity.ColorOf(rarity);
+            colour.a = 0.55f;
+            material.SetColor("_GlowColor", colour);
+            material.SetFloat("_GlowOuter", 0.35f);
+            material.SetFloat("_GlowInner", 0.05f);
+            material.SetFloat("_GlowPower", 0.6f);
+            Glowing[rarity] = material;
+        }
+
+        return material;
     }
 
     public void Hide()
@@ -201,6 +270,28 @@ public sealed class ItemTooltipView : MonoBehaviour
         panel.anchoredPosition = position;
     }
 
+    // Against what is worn in the slot it would go to: an arrow up in green, down in red, nothing when it is the same.
+    private static string Compared(ItemDefinition item, int score)
+    {
+        PlayerEquipment equipment = Player.Current != null ? Player.Current.GetComponent<PlayerEquipment>() : null;
+        if (equipment == null || !GearSlots.TryFindSlot(item, equipment.Gear.Slots, out GearSlot slot))
+        {
+            return "";
+        }
+
+        ItemStack worn = equipment.Gear.Get(slot);
+        if (worn.IsEmpty)
+        {
+            return $"  <color={UIStyle.Current.GoodHex}>\u25B2 nothing worn</color>";
+        }
+
+        int difference = score - GearScore.Of(worn);
+        UIStyle style = UIStyle.Current;
+        return difference > 0 ? $"  <color={style.GoodHex}>\u25B2 +{difference}</color>"
+            : difference < 0 ? $"  <color={style.DangerHex}>\u25BC {difference}</color>"
+            : "";
+    }
+
     // Without a stack (a recipe's output) it describes the item as it comes out new, for someone deciding whether to make
     // it: what it is for comes before its numbers, and there is no wear, stack size, price or use hint.
     private static string Describe(ItemDefinition item, ItemStack? stack)
@@ -216,7 +307,8 @@ public sealed class ItemTooltipView : MonoBehaviour
             builder.Append($"\n<color={UIStyle.Current.MutedHex}>").Append(gearSlot).Append("</color>");
             if (GearScore.Counts(item))
             {
-                builder.Append($"\n<color={UIStyle.Current.AccentHex}>Gear Score {(stack.HasValue ? GearScore.Of(stack.Value) : GearScore.Of(item))}</color>");
+                int score = stack.HasValue ? GearScore.Of(stack.Value) : GearScore.Of(item);
+                builder.Append($"\n<color={UIStyle.Current.AccentHex}>Gear Score {score}</color>").Append(Compared(item, score));
             }
         }
 

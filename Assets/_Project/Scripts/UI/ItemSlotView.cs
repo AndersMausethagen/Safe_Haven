@@ -74,6 +74,9 @@ public sealed class ItemSlotView : MonoBehaviour,
         icon.enabled = filled && stack.Item.Icon != null;
         icon.sprite = filled ? stack.Item.Icon : null;
         icon.color = locked ? new Color(1f, 1f, 1f, 0.45f) : stack.IsBroken ? new Color(1f, 0.55f, 0.5f, 0.7f) : Color.white;
+        bool special = filled && (stack.Item.Rarity >= ItemRarity.Uncommon || worked.HasValue);
+        Light(special ? (worked ?? Rarity.ColorOf(stack.Item.Rarity)) : (Color?)null,
+            filled && (stack.Item.Rarity >= ItemRarity.Epic || stack.Quality == ItemQuality.Masterwork));
         // Gear never stacks, so its corner shows wear instead of a count once it is damaged.
         // A water container shows how much it holds (red when empty).
         countLabel.text = filled && stack.Count > 1 ? stack.Count.ToString()
@@ -141,6 +144,54 @@ public sealed class ItemSlotView : MonoBehaviour,
     {
         hovered = false;
         UpdateFrame();
+    }
+
+    private Image rarityLight;
+    private SlotShimmer shimmer;
+
+    // Hearthline 2: a rare thing glows from behind its icon in its rarity's colour, and the best (Epic and up, a
+    // Masterwork) catch a slow shine now and then.
+    private void Light(Color? colour, bool shine)
+    {
+        if (icon == null)
+        {
+            return;
+        }
+
+        if (colour.HasValue && rarityLight == null && UIStyle.Current.Glow != null)
+        {
+            var rect = (RectTransform)new GameObject("Rarity Light", typeof(RectTransform)).transform;
+            rect.SetParent(icon.transform.parent, false);
+            rect.SetSiblingIndex(icon.transform.GetSiblingIndex());
+            rect.anchorMin = Vector2.zero;
+            rect.anchorMax = Vector2.one;
+            rect.offsetMin = new Vector2(-6f, -6f);
+            rect.offsetMax = new Vector2(6f, 6f);
+            rarityLight = rect.gameObject.AddComponent<Image>();
+            rarityLight.sprite = UIStyle.Current.Glow;
+            rarityLight.raycastTarget = false;
+        }
+
+        if (rarityLight != null)
+        {
+            rarityLight.enabled = colour.HasValue;
+            if (colour.HasValue)
+            {
+                Color c = colour.Value;
+                c.a = 0.42f;
+                rarityLight.color = c;
+            }
+        }
+
+        if (shine && shimmer == null)
+        {
+            shimmer = SlotShimmer.Add(icon.rectTransform);
+        }
+
+        if (shimmer != null)
+        {
+            shimmer.enabled = shine;
+        }
     }
 
     private void UpdateFrame()

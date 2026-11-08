@@ -89,6 +89,7 @@ MonoBehaviour:
   breachWon: {fileID: 11400000, guid: f443c04be342be847a34cf586fe684b1, type: 2}
   breachLost: {fileID: 11400000, guid: e9fabecc739f91c4a8a254619617abe8, type: 2}
   click: {fileID: 11400000, guid: eff8873ac748ee54a8ebd626d23d77c0, type: 2}
+  hover: {fileID: 11400000, guid: ee2de6eb7db916a42b42f02740ea1f4d, type: 2}
   windowOpen: {fileID: 11400000, guid: 9044e19de8efd554caa2dc573c052a9c, type: 2}
   windowClose: {fileID: 11400000, guid: 44120f3e32f7b744b91233bbcbda2e5e, type: 2}
   milestone: {fileID: 11400000, guid: 5810af58d8561674390350c579715397, type: 2}

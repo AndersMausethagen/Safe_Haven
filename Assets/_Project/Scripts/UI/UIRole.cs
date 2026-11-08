@@ -124,11 +124,64 @@ public sealed class UIRole : MonoBehaviour
             bool onRaid = RaidDirector.Current != null;
             frame = HearthlineArt.AddFrame(panel, style, onRaid);
             Paint(GetComponent<Outline>(), style.RimFor(onRaid));
+            Dress(panel, style);
+        }
+        else if (kind == Kind.PrimaryButton && transform is RectTransform press)
+        {
+            UIStyle style = UIStyle.Current;
+            Color warm = style.AccentBright;
+            warm.a = 0.32f;
+            HearthlineArt.AddGlow(press, style, warm, 26f);
         }
         else if (frame != null)
         {
             frame.SetActive(false);
         }
+    }
+
+    // Hearthline 2: a window's surface has depth (the panel material) and its title is carved, with a rule beneath it.
+    private static void Dress(RectTransform panel, UIStyle style)
+    {
+        var image = panel.GetComponent<Image>();
+        if (image != null && image.sprite == null && style.PanelMaterial != null
+            && (image.material == null || image.material == Canvas.GetDefaultCanvasMaterial()))
+        {
+            image.material = style.PanelMaterial;
+        }
+
+        // Tooltips keep their plain type: a carved name over a few lines of stats reads as a sign, not a window.
+        TMP_Text title = panel.name.Contains("Tooltip") ? null : FindTitle(panel);
+        if (title != null)
+        {
+            style.Display(title);
+            HearthlineArt.AddTitleRule(title, style);
+        }
+    }
+
+    // The window's own title: the first label named Title in its first levels, not one inside a list row further down.
+    private static TMP_Text FindTitle(Transform panel)
+    {
+        var level = new System.Collections.Generic.List<Transform> { panel };
+        for (int depth = 0; depth < 3 && level.Count > 0; depth++)
+        {
+            var next = new System.Collections.Generic.List<Transform>();
+            foreach (Transform node in level)
+            {
+                foreach (Transform child in node)
+                {
+                    if (child.name == "Title" && child.TryGetComponent(out TMP_Text label))
+                    {
+                        return label;
+                    }
+
+                    next.Add(child);
+                }
+            }
+
+            level = next;
+        }
+
+        return null;
     }
 
     private static void Paint(Graphic graphic, Color color)

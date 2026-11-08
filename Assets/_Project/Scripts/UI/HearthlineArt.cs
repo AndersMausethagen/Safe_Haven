@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -45,6 +46,68 @@ public static class HearthlineArt
         }
 
         return frame.gameObject;
+    }
+
+    private const string RuleName = "Hearthline Rule";
+    private const string GlowName = "Hearthline Glow";
+
+    /// <summary>The carved rule under a window's title: a child of the title, below its text, outside any layout.</summary>
+    public static void AddTitleRule(TMP_Text title, UIStyle style)
+    {
+        if (title == null || style.Divider == null || title.transform.Find(RuleName) != null)
+        {
+            return;
+        }
+
+        var rect = (RectTransform)new GameObject(RuleName, typeof(RectTransform)).transform;
+        rect.SetParent(title.transform, false);
+        // Just under the letters themselves, not the label's box, which may reach down to the line beneath.
+        title.ForceMeshUpdate();
+        Bounds letters = title.textBounds;
+        Rect box = title.rectTransform.rect;
+        rect.anchorMin = rect.anchorMax = new Vector2(0.5f, 0.5f);
+        rect.pivot = new Vector2(0.5f, 1f);
+        float width = letters.size.x > 1f ? letters.size.x + 220f : box.width * 0.6f;
+        rect.sizeDelta = new Vector2(Mathf.Clamp(width, 240f, 460f), 16f);
+        // From the last line's baseline: the text bounds take in the shadow's padding, which reaches well below the letters.
+        TMP_TextInfo info = title.textInfo;
+        float under = info.lineCount > 0 ? info.lineInfo[info.lineCount - 1].baseline - title.fontSize * 0.16f
+            : letters.size.y > 1f ? letters.min.y : box.yMin;
+        rect.anchoredPosition = new Vector2(letters.size.x > 1f ? letters.center.x - box.center.x : 0f, under - box.center.y - 2f);
+        var image = rect.gameObject.AddComponent<Image>();
+        image.sprite = style.Divider;
+        image.preserveAspect = true;
+        image.raycastTarget = false;
+        Color ink = style.Accent;
+        ink.a = 0.7f;
+        image.color = ink;
+    }
+
+    /// <summary>A soft glow behind a control, kept on its place by UIGlowFollow; it sits just before the control, outside
+    /// any layout, so the control draws over it.</summary>
+    public static Image AddGlow(RectTransform target, UIStyle style, Color colour, float reach)
+    {
+        if (target == null || target.parent == null || style.Glow == null)
+        {
+            return null;
+        }
+
+        Transform existing = target.parent.Find(target.name + " " + GlowName);
+        if (existing != null)
+        {
+            return existing.GetComponent<Image>();
+        }
+
+        var rect = (RectTransform)new GameObject(target.name + " " + GlowName, typeof(RectTransform)).transform;
+        rect.SetParent(target.parent, false);
+        rect.SetSiblingIndex(target.GetSiblingIndex());
+        rect.gameObject.AddComponent<LayoutElement>().ignoreLayout = true;
+        var image = rect.gameObject.AddComponent<Image>();
+        image.sprite = style.Glow;
+        image.raycastTarget = false;
+        image.color = colour;
+        rect.gameObject.AddComponent<UIGlowFollow>().Follow(target, reach);
+        return image;
     }
 
     public static Image AddIcon(Transform parent, string name, Sprite sprite, Vector2 anchor, Vector2 size,

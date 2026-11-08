@@ -41,4 +41,14 @@ MonoBehaviour:
   warning: {r: 0.91, g: 0.62, b: 0.27, a: 1}
   danger: {r: 0.79, g: 0.333, b: 0.247, a: 1}
   water: {r: 0.5, g: 0.77, b: 0.91, a: 1}
+  accentBright: {r: 0.98, g: 0.82, b: 0.52, a: 1}
+  accentDeep: {r: 0.55, g: 0.38, b: 0.17, a: 1}
+  info: {r: 0.58, g: 0.74, b: 0.86, a: 1}
+  faint: {r: 0.46, g: 0.43, b: 0.39, a: 1}
+  displayFont: {fileID: 11400000, guid: 9455f5643f989494c840c921de057df7, type: 2}
+  displayMaterial: {fileID: 2100000, guid: faafd2c3e613e754db41f9fef2ef516e, type: 2}
+  panelMaterial: {fileID: 2100000, guid: eba68826d5063f04386bacfc4ef922ce, type: 2}
+  divider: {fileID: 21300000, guid: 4656cf0811ec03a4f9484e4ee7385653, type: 3}
+  glow: {fileID: 21300000, guid: 987a250c56b86934e8a414b06c59518a, type: 3}
+  cursor: {fileID: 2800000, guid: 7ce558fddc2129f49b782623273b6edb, type: 3}
   windowFadeSeconds: 0.12

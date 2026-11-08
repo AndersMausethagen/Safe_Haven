@@ -68,6 +68,28 @@ public sealed class UIStyle : GameSettings<UIStyle>
     [Tooltip("How much water a waterskin holds: in its slot and its tooltip.")]
     [SerializeField] private Color water = new Color(0.5f, 0.77f, 0.91f, 1f);
 
+    [Header("Hearthline 2")]
+    [Tooltip("The amber's lit end, for highlights and glows.")]
+    [SerializeField] private Color accentBright = new Color(0.98f, 0.82f, 0.52f, 1f);
+    [Tooltip("The amber's deep end, for rules and quiet marks.")]
+    [SerializeField] private Color accentDeep = new Color(0.55f, 0.38f, 0.17f, 1f);
+    [Tooltip("Information that isn't a call to act: hints, comparisons that are only facts.")]
+    [SerializeField] private Color info = new Color(0.58f, 0.74f, 0.86f, 1f);
+    [Tooltip("The third step of text: what can't be used now.")]
+    [SerializeField] private Color faint = new Color(0.46f, 0.43f, 0.39f, 1f);
+    [Tooltip("Window titles: Cinzel, carved capitals.")]
+    [SerializeField] private TMP_FontAsset displayFont;
+    [Tooltip("The display font's material: a soft shadow under the letters.")]
+    [SerializeField] private Material displayMaterial;
+    [Tooltip("Shaders/UI/HearthlinePanel: a window's surface (lift, inner shadow, grain).")]
+    [SerializeField] private Material panelMaterial;
+    [Tooltip("The rule under a window's title.")]
+    [SerializeField] private Sprite divider;
+    [Tooltip("A soft round glow: behind the one button to press, under lit item icons.")]
+    [SerializeField] private Sprite glow;
+    [Tooltip("The pointer.")]
+    [SerializeField] private Texture2D cursor;
+
     [Header("Motion")]
     [Tooltip("Seconds a window takes to fade in when it opens. 0: it appears at once. Closing is always immediate.")]
     [SerializeField, Range(0f, 0.5f)] private float windowFadeSeconds = 0.12f;
@@ -92,6 +114,18 @@ public sealed class UIStyle : GameSettings<UIStyle>
     public Color Warning => warning;
     public Color Danger => danger;
     public Color Water => water;
+    public Color AccentBright => accentBright;
+    public Color AccentDeep => accentDeep;
+    public Color Info => info;
+    public Color Faint => faint;
+    public TMP_FontAsset DisplayFont => displayFont;
+    public Material DisplayMaterial => displayMaterial;
+    public Material PanelMaterial => panelMaterial;
+    public Sprite Divider => divider;
+    public Sprite Glow => glow;
+    public Texture2D Cursor => cursor;
+    public string InfoHex => infoHex ??= Hex(info);
+    public string FaintHex => faintHex ??= Hex(faint);
     public float WindowFadeSeconds => windowFadeSeconds;
     public Sprite Hearthmark => hearthmark;
     public Sprite CarvedCorner => carvedCorner;
@@ -124,6 +158,7 @@ public sealed class UIStyle : GameSettings<UIStyle>
     public string WarningHex => warningHex ??= Hex(warning);
     public string DangerHex => dangerHex ??= Hex(danger);
     public string WaterHex => waterHex ??= Hex(water);
+    private string infoHex, faintHex;
 
     private void OnValidate() => textHex = mutedHex = accentHex = goodHex = warningHex = dangerHex = waterHex = null;
 
@@ -143,7 +178,8 @@ public sealed class UIStyle : GameSettings<UIStyle>
         }
     }
 
-    /// <summary>Sets up a window's title.</summary>
+    /// <summary>Sets up a serif title (a name, a heading inside a window). A window's own title is carved in the display
+    /// face by its UIRole instead (Display).</summary>
     public void Title(TMP_Text label)
     {
         if (titleFont != null)
@@ -152,5 +188,29 @@ public sealed class UIStyle : GameSettings<UIStyle>
         }
 
         label.color = text;
+    }
+
+    /// <summary>
+    /// A window's title in the display face: carved capitals spaced a little apart, a soft shadow under them, and a fall of
+    /// light from the text colour at the top to a touch of amber at the foot.
+    /// </summary>
+    public void Display(TMP_Text label)
+    {
+        if (displayFont == null || label == null)
+        {
+            return;
+        }
+
+        label.font = displayFont;
+        if (displayMaterial != null)
+        {
+            label.fontSharedMaterial = displayMaterial;
+        }
+
+        label.characterSpacing = 5f;
+        label.color = Color.white;
+        label.enableVertexGradient = true;
+        Color foot = Color.Lerp(text, accentBright, 0.45f);
+        label.colorGradient = new VertexGradient(text, text, foot, foot);
     }
 }
