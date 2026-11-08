@@ -4,8 +4,9 @@ using UnityEngine;
 /// <summary>
 /// Needles, twigs and bits of bark drifting down from the crowns around the camera: the canopy shedding. Each piece starts
 /// inside the crown of a real tall tree near what the camera looks at (painted terrain trees), so nothing falls over a
-/// clearing, then tumbles down with the shared wind (MossWind's direction and tree strength) and settles to nothing.
-/// Purely visual; keeps about <see cref="aloft"/> pieces in the air, fewer by night, more in strong wind.
+/// clearing, then falls. In calm weather (clear, mist, fog) a few drop nearly straight down, turning a little; once it is
+/// breezy the shared wind (MossWind's direction and tree strength) carries them, and a storm strips the crowns and drives
+/// them along. Purely visual; keeps about <see cref="aloft"/> pieces in the air (half that when calm), fewer by night.
 /// <para>Where it belongs: the Canopy Debris prefab in a forest scene (set up for the Misty Woods by BuildMistyWoodsForest,
 /// for the Haven by BuildSafeHavenForest).</para>
 /// </summary>
@@ -28,6 +29,12 @@ public sealed class CanopyDebris : MonoBehaviour
     [SerializeField, Min(0f)] private float drift = 1.2f;
     [Tooltip("How many more pieces fly in a gale than in still air.")]
     [SerializeField, Min(1f)] private float galeMultiplier = 2.5f;
+    [Tooltip("Tree wind (_SafeHavenTreeWind: Clear 0.8, Breezy 1.6, Storm 2.8) up to which the air counts as calm: pieces " +
+             "fall nearly straight, and only Calm Share of Aloft are in the air.")]
+    [SerializeField, Min(0f)] private float calmWind = 0.9f;
+    [Tooltip("Tree wind of a full gale: Gale Multiplier times as many pieces, carried hardest.")]
+    [SerializeField, Min(0.1f)] private float galeWind = 2.8f;
+    [SerializeField, Range(0f, 1f)] private float calmShare = 0.5f;
 
     private readonly List<Vector3> crowns = new List<Vector3>();
     private readonly List<int> near = new List<int>();
@@ -81,10 +88,11 @@ public sealed class CanopyDebris : MonoBehaviour
             Cache(centre);
         }
 
-        Blow();
-        float wind = Mathf.Clamp01(Shader.GetGlobalFloat(TreeWindId));
+        float tree = Shader.GetGlobalFloat(TreeWindId);
+        Blow(tree);
+        float gale = Mathf.InverseLerp(calmWind, galeWind, tree);
         float day = AtmosphereConditions.Night > 0.5f ? 0.35f : 1f;
-        float wanted = aloft * day * Mathf.Lerp(1f, galeMultiplier, wind);
+        float wanted = aloft * day * (tree <= calmWind ? calmShare : Mathf.Lerp(calmShare, galeMultiplier, gale));
         if (near.Count == 0 || wanted - system.particleCount <= 0)
         {
             return;
@@ -115,13 +123,17 @@ public sealed class CanopyDebris : MonoBehaviour
         }
     }
 
-    // The wind carries what falls: its direction and strength, read each frame from the shader globals MossWind sets.
-    private void Blow()
+    // The wind carries what falls, once there is wind: its direction and strength, read each frame from the shader
+    // globals MossWind sets. Calm air lets pieces drop nearly straight, with a little turning.
+    private void Blow(float tree)
     {
         Vector4 wind = Shader.GetGlobalVector(WindId);
         var direction = new Vector2(wind.x, wind.y);
         direction = direction.sqrMagnitude > 1e-6f ? direction.normalized : Vector2.right;
-        float strength = drift * Mathf.Max(0.15f, Shader.GetGlobalFloat(TreeWindId));
+        float strength = drift * Mathf.Max(0f, tree - calmWind) * 1.6f;
+        ParticleSystem.NoiseModule turning = system.noise;
+        turning.enabled = true;
+        turning.strength = Mathf.Lerp(0.12f, 0.7f, Mathf.InverseLerp(calmWind, galeWind, tree));
         ParticleSystem.ForceOverLifetimeModule force = system.forceOverLifetime;
         force.enabled = true;
         force.space = ParticleSystemSimulationSpace.World;

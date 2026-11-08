@@ -62,8 +62,9 @@ After the second list, in this order.
 - [x] Too many sounds from finished quests and skill levels early on: make the first skill levels a little slower and the
       sounds a little quieter. The first six levels take 80 each (were 50 to 80; level 10 at 780, was 685); Quest
       Completed 1 to 0.6, Quest Started 1 to 0.45, Level Up 0.75 to 0.45, Milestone 0.9 to 0.7.
-- [ ] Debris falls off trees from time to time: in clear weather it should fall nearly straight down, and drift with the
-      wind when breezy or stormy.
+- [x] Debris falls off trees from time to time: in clear weather it should fall nearly straight down, and drift with the
+      wind when breezy or stormy. Calm (tree wind up to 0.9: clear, mist, fog): half as many, no sideways push, a little
+      turning; breezy and stormy carry them harder (2.2x as many fell in clear weather before).
 - [ ] Quest "They are still out there": how to reactivate the portal isn't said. Meanwhile building quests pile up. New
       order: quests that teach the mechanics first (a chest for safe storage, gear to gather for it, a basic weapon), then
       opening the portal for the first raid. Saving the first NPC unlocks the building they work at.
