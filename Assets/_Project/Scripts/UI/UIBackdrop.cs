@@ -6,7 +6,7 @@ using UnityEngine.UI;
 /// Behind a full-screen window (the Haven, skills, journal, raid planner, pause menu: one on a canvas sorted at 100 or
 /// more), the game goes soft and dark: a blurred, dimmed picture of it (UIBlurFeature) laid over the HUD and the world,
 /// just under the window, fading in as the window opens. A solid picture, not a translucent panel, so it stays even over
-/// bright grass in the Linear blend. Side windows (the bag, a station, the stash) leave the world in view.
+/// bright grass in the Linear blend. Side windows (the bag, a station, the stash) and dialogue leave the world in view.
 /// UIWindow tells it whenever a window opens or closes.
 /// </summary>
 public sealed class UIBackdrop : MonoBehaviour
@@ -24,7 +24,7 @@ public sealed class UIBackdrop : MonoBehaviour
     /// <summary>A window opened or closed.</summary>
     public static void Track(UIWindow window, bool isOpen)
     {
-        if (!Application.isPlaying || OrderOf(window) < FullScreenOrder)
+        if (!Application.isPlaying || OrderOf(window) < FullScreenOrder || !Dims(window))
         {
             return;
         }
@@ -44,6 +44,10 @@ public sealed class UIBackdrop : MonoBehaviour
 
         instance.Restack();
     }
+
+    /// <summary>Whether a full-screen window darkens the game behind it. Dialogue sits on a high canvas so it shows over
+    /// everything, but a conversation happens in the world: the speakers stay in view.</summary>
+    public static bool Dims(UIWindow window) => window != null && window.Id != UIWindowId.Dialogue;
 
     private static int OrderOf(UIWindow window)
     {

@@ -223,8 +223,14 @@ public sealed class RecipeBrowser : MonoBehaviour
 
     private static void Paint(Button tab, bool on)
     {
-        tab.GetComponentInChildren<TMP_Text>().color = on ? UIStyle.Current.Accent : UIStyle.Current.Muted;
-        tab.transform.Find("Line").gameObject.SetActive(on);
+        // The tab answers the pointer too (brightens under it), so it paints itself.
+        UITabHover hover = tab.GetComponent<UITabHover>();
+        if (hover == null)
+        {
+            hover = tab.gameObject.AddComponent<UITabHover>();
+        }
+
+        hover.SetOpen(on);
     }
 
     private void RefreshFilter()
