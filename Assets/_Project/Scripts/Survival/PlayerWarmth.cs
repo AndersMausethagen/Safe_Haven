@@ -38,6 +38,9 @@ public sealed class PlayerWarmth : MonoBehaviour
 
     public bool IsChilled => chilled;
 
+    /// <summary>Standing by a fire, a hearth or in the sauna (rescanned every 10 s, in any season).</summary>
+    public bool ByAFire => NearHeat();
+
     public static void AddTo(GameObject player)
     {
         if (player != null && !player.TryGetComponent(out PlayerWarmth _))

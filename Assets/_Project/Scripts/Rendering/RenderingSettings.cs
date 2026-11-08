@@ -64,6 +64,22 @@ public sealed class RenderingSettings : GameSettings<RenderingSettings>
     [Tooltip("Index of the Sky Occlusion Renderer in the pipeline's renderer list (set by AgentScripts/BuildRendering.cs); -1 off.")]
     [SerializeField] private int skyOcclusionRendererIndex = -1;
 
+    [Header("Wet characters")]
+    [Tooltip("People and creatures out in the rain soak, darken and gloss (CharacterWetness).")]
+    [SerializeField] private bool wetCharacters = true;
+    [Tooltip("Seconds out in a downpour to soak through (lighter rain takes longer).")]
+    [SerializeField, Min(1f)] private float soakSeconds = 30f;
+    [Tooltip("Seconds to dry from soaked, out of the rain.")]
+    [SerializeField, Min(1f)] private float drySeconds = 150f;
+    [Tooltip("...and by a fire (the player).")]
+    [SerializeField, Min(1f)] private float fireDrySeconds = 20f;
+    [Tooltip("How much soaked cloth, hair and hide darken (polished and metal things less).")]
+    [SerializeField, Range(0f, 1f)] private float wetDarkening = 0.5f;
+    [Tooltip("How glossy a soaked surface gets at least.")]
+    [SerializeField, Range(0f, 1f)] private float wetSmoothness = 0.7f;
+    [Tooltip("Metres above a character's feet the look for a roof starts (over the head).")]
+    [SerializeField, Min(0.5f)] private float shelterRayStart = 2.2f;
+
     [Header("Decals")]
     [Tooltip("Short-lived decals out at once (blood, footprints); the oldest is reused after that.")]
     [SerializeField, Min(8)] private int decalPoolSize = 128;
@@ -113,6 +129,13 @@ public sealed class RenderingSettings : GameSettings<RenderingSettings>
     public float SkyOcclusionInterval => skyOcclusionInterval;
     public LayerMask SkyOcclusionLayers => skyOcclusionLayers;
     public int SkyOcclusionRendererIndex => skyOcclusionRendererIndex;
+    public bool WetCharacters => wetCharacters;
+    public float SoakSeconds => soakSeconds;
+    public float DrySeconds => drySeconds;
+    public float FireDrySeconds => fireDrySeconds;
+    public float WetDarkening => wetDarkening;
+    public float WetSmoothness => wetSmoothness;
+    public float ShelterRayStart => shelterRayStart;
     public int DecalPoolSize => decalPoolSize;
     public Material BloodDecal => bloodDecal;
     public Texture2D BloodAtlas => bloodAtlas;

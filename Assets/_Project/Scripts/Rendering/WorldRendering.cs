@@ -45,6 +45,11 @@ public sealed class WorldRendering : MonoBehaviour, IGameSystem
         grade.transform.SetParent(transform, false);
         raidGrade = grade.AddComponent<RaidGradeVolume>();
         raidGrade.Initialise();
+        if (settings.WetCharacters)
+        {
+            gameObject.AddComponent<WetCharacters>().Initialise(settings);
+        }
+
         cloudLayer = gameObject.AddComponent<CloudLayer>();
         cloudLayer.Initialise(settings);
         sky = gameObject.AddComponent<SkyDome>();
