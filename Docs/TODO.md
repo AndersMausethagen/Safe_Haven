@@ -45,7 +45,8 @@ After the second list, in this order.
 - [x] The things in the base to clear have a flat square round them, like a see-through square on the ground. Remove it.
       It was Overgrowth's patch of dead ground, a flat quad 3-6 m wide made under every piece; gone (the green motes on
       clearing stay).
-- [ ] The highlight sometimes crosses inside an object instead of following only its outline.
+- [x] The highlight sometimes crosses inside an object instead of following only its outline. The stencil mask was depth
+      tested against an object drawn moved (wind, tessellation) and had holes; now Always, and only LOD0 is copied.
 - [ ] Small trees can't be chopped, only broken down to sticks.
 - [ ] Trees grow back in the Haven when a save is loaded: they shouldn't. A felled tree gives a sapling, which can be
       planted and grows back (about 5 in-game days; suggest a better pace). Cheap: saved state of each planted tree and its

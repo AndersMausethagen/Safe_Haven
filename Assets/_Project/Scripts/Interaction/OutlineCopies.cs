@@ -6,7 +6,9 @@ using UnityEngine.Rendering;
 /// <summary>
 /// Outlines made of copies: each mesh renderer of an object gets two hidden copies under it, a stencil mask of the
 /// mesh and the outline shell (InteractionOutline shaders), so the object's own materials are never touched. Used by
-/// the interaction outline (what can be used) and the archery target outline (what an arrow would hit).
+/// the interaction outline (what can be used) and the archery target outline (what an arrow would hit). The mask is drawn
+/// without a depth test (InteractionOutlineMask.mat › Depth Test Always): the object itself may be drawn moved (wind sway,
+/// tessellation), so a depth-tested mask left holes the outline showed through, as lines across the inside.
 /// </summary>
 public static class OutlineCopies
 {
@@ -45,9 +47,12 @@ public static class OutlineCopies
         }
 
         var result = new List<Entry>();
+        HashSet<Renderer> lowerDetail = LowerDetail(root);
         foreach (Renderer source in root.GetComponentsInChildren<Renderer>(true))
         {
-            if (IsCopy(source) || include != null && !include(source))
+            // Only the most detailed level of a LOD group: its copies are drawn whatever the group shows, so the coarser
+            // levels' shells only blurred the edge (and cost two more of each).
+            if (IsCopy(source) || lowerDetail.Contains(source) || include != null && !include(source))
             {
                 continue;
             }
@@ -77,6 +82,28 @@ public static class OutlineCopies
         }
 
         return result;
+    }
+
+    // The renderers of every level but the first of the LOD groups under root.
+    private static HashSet<Renderer> LowerDetail(Transform root)
+    {
+        var lower = new HashSet<Renderer>();
+        foreach (LODGroup group in root.GetComponentsInChildren<LODGroup>(true))
+        {
+            LOD[] lods = group.GetLODs();
+            for (int i = 1; i < lods.Length; i++)
+            {
+                foreach (Renderer renderer in lods[i].renderers)
+                {
+                    if (renderer != null)
+                    {
+                        lower.Add(renderer);
+                    }
+                }
+            }
+        }
+
+        return lower;
     }
 
     /// <summary>True when every original has gone, as when an object swaps its model: its outlines need making again.</summary>
