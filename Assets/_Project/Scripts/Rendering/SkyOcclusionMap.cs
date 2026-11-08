@@ -20,6 +20,9 @@ public sealed class SkyOcclusionMap : MonoBehaviour
     private RenderTexture map;
     private bool active;
     private float nextRender;
+    private float lastRender = -1000f;
+    private Vector3 renderedAt = new Vector3(float.MaxValue, 0f, 0f);
+    private int renderedBuildings = -1;
 
     public void Initialise(RenderingSettings rules)
     {
@@ -63,6 +66,7 @@ public sealed class SkyOcclusionMap : MonoBehaviour
         strength = Mathf.Clamp01(dimming);
         active = strength > 0f && settings.SkyOcclusion && settings.SkyOcclusionRendererIndex >= 0;
         nextRender = 0f;
+        renderedAt = new Vector3(float.MaxValue, 0f, 0f);
         if (!active)
         {
             Off();
@@ -82,7 +86,19 @@ public sealed class SkyOcclusionMap : MonoBehaviour
             return;
         }
 
+        Vector3 here = centre.position;
+        float move = settings.SkyOcclusionMove;
+        bool moved = (new Vector2(here.x - renderedAt.x, here.z - renderedAt.z)).sqrMagnitude > move * move;
+        bool built = BuildingObject.Active.Count != renderedBuildings;
+        if (!moved && !built && Time.unscaledTime < lastRender + settings.SkyOcclusionRefresh)
+        {
+            return;
+        }
+
         nextRender = Time.unscaledTime + settings.SkyOcclusionInterval;
+        lastRender = Time.unscaledTime;
+        renderedAt = here;
+        renderedBuildings = BuildingObject.Active.Count;
         // Snapped to whole texels, so the map doesn't shimmer as it follows.
         float area = settings.SkyOcclusionArea;
         float texel = area / map.width;

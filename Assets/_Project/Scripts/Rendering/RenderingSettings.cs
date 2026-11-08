@@ -58,8 +58,12 @@ public sealed class RenderingSettings : GameSettings<RenderingSettings>
     [Tooltip("Metres the map covers, centred on the player.")]
     [SerializeField, Min(20f)] private float skyOcclusionArea = 160f;
     [SerializeField] private int skyOcclusionResolution = 512;
-    [Tooltip("Seconds between redraws: buildings put up, people moving.")]
+    [Tooltip("Seconds at least between redraws (each costs about 3 ms).")]
     [SerializeField, Min(0.2f)] private float skyOcclusionInterval = 1.5f;
+    [Tooltip("Redrawn once the player is this many metres from where it was last drawn (it covers Area round them)...")]
+    [SerializeField, Min(1f)] private float skyOcclusionMove = 12f;
+    [Tooltip("...or a building has gone up or come down, or this many seconds have passed (felled trees, people).")]
+    [SerializeField, Min(1f)] private float skyOcclusionRefresh = 10f;
     [SerializeField] private LayerMask skyOcclusionLayers = ~(1 << 5);
     [Tooltip("Index of the Sky Occlusion Renderer in the pipeline's renderer list (set by AgentScripts/BuildRendering.cs); -1 off.")]
     [SerializeField] private int skyOcclusionRendererIndex = -1;
@@ -87,11 +91,16 @@ public sealed class RenderingSettings : GameSettings<RenderingSettings>
     [SerializeField, Range(0, 6)] private int shadowedLights = 3;
     [Tooltip("Metres round what the camera looks at that a light may be.")]
     [SerializeField, Min(4f)] private float fireShadowReach = 30f;
-    [Tooltip("Lights reaching less than this many metres don't count (small glows).")]
-    [SerializeField, Min(0f)] private float fireShadowLeastRange = 4f;
+    [Tooltip("Lights reaching less than this many metres don't count (small glows: the Rootbound Stones reach 4).")]
+    [SerializeField, Min(0f)] private float fireShadowLeastRange = 5f;
     [SerializeField, Range(0f, 1f)] private float fireShadowStrength = 0.85f;
     [Tooltip("They come on once the night is at least this far in (0-1), or in the golden hour.")]
     [SerializeField, Range(0f, 1f)] private float fireShadowsFromNight = 0.15f;
+    [Tooltip("Every fire and lamp glows in the volumetric mist (an AtmosphereLight is added where one is missing).")]
+    [SerializeField] private bool fireFogGlow = true;
+    [SerializeField, Min(0f)] private float fireFogGlowStrength = 0.35f;
+    [Tooltip("Metres of mist each pushes back round its flame (0 none).")]
+    [SerializeField, Min(0f)] private float fireFogClearing = 0f;
 
     [Header("Decals")]
     [Tooltip("Short-lived decals out at once (blood, footprints); the oldest is reused after that.")]
@@ -140,6 +149,8 @@ public sealed class RenderingSettings : GameSettings<RenderingSettings>
     public float SkyOcclusionArea => skyOcclusionArea;
     public int SkyOcclusionResolution => skyOcclusionResolution;
     public float SkyOcclusionInterval => skyOcclusionInterval;
+    public float SkyOcclusionMove => skyOcclusionMove;
+    public float SkyOcclusionRefresh => skyOcclusionRefresh;
     public LayerMask SkyOcclusionLayers => skyOcclusionLayers;
     public int SkyOcclusionRendererIndex => skyOcclusionRendererIndex;
     public bool WetCharacters => wetCharacters;
@@ -155,6 +166,9 @@ public sealed class RenderingSettings : GameSettings<RenderingSettings>
     public float FireShadowLeastRange => fireShadowLeastRange;
     public float FireShadowStrength => fireShadowStrength;
     public float FireShadowsFromNight => fireShadowsFromNight;
+    public bool FireFogGlow => fireFogGlow;
+    public float FireFogGlowStrength => fireFogGlowStrength;
+    public float FireFogClearing => fireFogClearing;
     public int DecalPoolSize => decalPoolSize;
     public Material BloodDecal => bloodDecal;
     public Texture2D BloodAtlas => bloodAtlas;

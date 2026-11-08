@@ -2,7 +2,7 @@ using UnityEngine;
 
 /// <summary>
 /// Gives every animated character in the scene a CharacterWetness while it rains: the player, residents, companions and
-/// creatures, whether placed, spawned or generated with a raid. Looks every two seconds while it is raining; once on a
+/// creatures, whether placed, spawned or generated with a raid. Looks every five seconds while it is raining; once on a
 /// character the wetness dries by itself. Made by WorldRendering when RenderingSettings › Wet Characters is on.
 /// </summary>
 public sealed class WetCharacters : MonoBehaviour
@@ -19,7 +19,7 @@ public sealed class WetCharacters : MonoBehaviour
             return;
         }
 
-        nextScan = Time.time + 2f;
+        nextScan = Time.time + 5f; // characters seldom come and go: a scan every few seconds while it rains
         WeatherSystem weather = WeatherSystem.Active;
         if (weather == null || weather.Snowing || weather.Current.Rain <= 0.02f)
         {

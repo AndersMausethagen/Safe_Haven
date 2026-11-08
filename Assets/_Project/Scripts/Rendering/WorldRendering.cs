@@ -14,6 +14,7 @@ public sealed class WorldRendering : MonoBehaviour, IGameSystem
     private CloudShadows clouds;
     private SkyDome sky;
     private RaidGradeVolume raidGrade;
+    private WorldLights lights;
     private GroundWear wear;
     private SkyOcclusionMap occlusion;
 
@@ -45,9 +46,11 @@ public sealed class WorldRendering : MonoBehaviour, IGameSystem
         grade.transform.SetParent(transform, false);
         raidGrade = grade.AddComponent<RaidGradeVolume>();
         raidGrade.Initialise();
+        lights = gameObject.AddComponent<WorldLights>();
+        lights.Initialise(settings);
         if (settings.FireShadows)
         {
-            gameObject.AddComponent<LightShadowBudget>().Initialise(settings);
+            gameObject.AddComponent<LightShadowBudget>().Initialise(settings, lights);
         }
 
         if (settings.WetCharacters)
@@ -69,6 +72,7 @@ public sealed class WorldRendering : MonoBehaviour, IGameSystem
     public void OnSceneEntered(Scene scene)
     {
         sky?.Bind();
+        lights.Rescan();
         reflections?.Refresh();
         wear?.Clear();
         RaidDefinition raid = GameSession.ActiveRaid?.Definition;

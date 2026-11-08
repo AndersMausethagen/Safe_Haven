@@ -5,7 +5,7 @@ using UnityEngine.Rendering.Universal;
 /// <summary>
 /// Shadows from fires and lamps, within a budget: at dusk and by night the few world lights nearest what the camera looks
 /// at (campfires, torches, lantern posts, braziers: point and spot lights of some reach that no character carries) cast
-/// soft shadows, the nearest at a finer resolution; every other light keeps none. By day the sun drowns them, so none
+/// soft shadows, the nearest at a finer resolution (picked from WorldLights' list, scanned every few seconds); every other light keeps none. By day the sun drowns them, so none
 /// cast. Every light it switched on is put back as it was when it drops out of the budget. Made by WorldRendering;
 /// numbers in RenderingSettings › Fire shadows.
 /// </summary>
@@ -20,12 +20,20 @@ public sealed class LightShadowBudget : MonoBehaviour
     private readonly List<Light> chosen = new List<Light>();
     private readonly List<Light> dropped = new List<Light>();
     private RenderingSettings settings;
+    private WorldLights world;
     private float nextLook;
+    private Vector3 sortFrom;
+    private System.Comparison<Light> nearer;
 
     /// <summary>Lights casting shadows now (for tests and probes).</summary>
     public IReadOnlyCollection<Light> Shadowed => shadowed;
 
-    public void Initialise(RenderingSettings rules) => settings = rules;
+    public void Initialise(RenderingSettings rules, WorldLights fires)
+    {
+        settings = rules;
+        world = fires;
+        nearer = (a, b) => (a.transform.position - sortFrom).sqrMagnitude.CompareTo((b.transform.position - sortFrom).sqrMagnitude);
+    }
 
     /// <summary>Whether a light counts: a world fire or lamp of some reach, not carried by anyone.</summary>
     public static bool Counts(Light light, float leastRange) =>
@@ -89,9 +97,9 @@ public sealed class LightShadowBudget : MonoBehaviour
     {
         candidates.Clear();
         float reach = settings.FireShadowReach * settings.FireShadowReach;
-        foreach (Light light in FindObjectsByType<Light>(FindObjectsInactive.Exclude))
+        foreach (Light light in world.Lights)
         {
-            if (!Counts(light, settings.FireShadowLeastRange))
+            if (light == null || !light.isActiveAndEnabled)
             {
                 continue;
             }
@@ -103,7 +111,8 @@ public sealed class LightShadowBudget : MonoBehaviour
             }
         }
 
-        candidates.Sort((a, b) => (a.transform.position - centre).sqrMagnitude.CompareTo((b.transform.position - centre).sqrMagnitude));
+        sortFrom = centre;
+        candidates.Sort(nearer);
         for (int i = 0; i < candidates.Count && chosen.Count < settings.ShadowedLights; i++)
         {
             chosen.Add(candidates[i]);

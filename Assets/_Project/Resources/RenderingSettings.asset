@@ -37,6 +37,8 @@ MonoBehaviour:
   skyOcclusionArea: 160
   skyOcclusionResolution: 512
   skyOcclusionInterval: 1.5
+  skyOcclusionMove: 12
+  skyOcclusionRefresh: 10
   skyOcclusionLayers:
     serializedVersion: 2
     m_Bits: 4294967263
@@ -51,9 +53,12 @@ MonoBehaviour:
   fireShadows: 1
   shadowedLights: 3
   fireShadowReach: 30
-  fireShadowLeastRange: 4
+  fireShadowLeastRange: 5
   fireShadowStrength: 0.85
   fireShadowsFromNight: 0.15
+  fireFogGlow: 1
+  fireFogGlowStrength: 0.35
+  fireFogClearing: 0
   decalPoolSize: 128
   bloodDecal: {fileID: 2100000, guid: f7ae1475f1a410743b157c1e53f93ce3, type: 2}
   bloodAtlas: {fileID: 2800000, guid: 7fe320d85bee25b4aacd117857eba120, type: 3}

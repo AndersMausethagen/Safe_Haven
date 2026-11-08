@@ -44,6 +44,13 @@ public sealed class AtmosphereLight : MonoBehaviour
         : 0f;
     public float ClearingSoftness => Mathf.Clamp(clearingSoftness, 0.05f, 1f);
 
+    /// <summary>Set up from code (WorldLights gives a fire that has none its glow).</summary>
+    public void Configure(float strength, float clearing)
+    {
+        fogStrength = Mathf.Max(0f, strength);
+        clearingRadius = Mathf.Max(0f, clearing);
+    }
+
     private void OnEnable()
     {
         source = GetComponent<Light>();
