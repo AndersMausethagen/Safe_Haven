@@ -42,7 +42,9 @@ Shader "Safe Haven/Tree Wind"
     }
     SubShader
     {
-        Tags { "RenderPipeline" = "UniversalPipeline" "RenderType" = "Opaque" "Queue" = "Geometry" }
+        // The wind moves the vertices of a tree that never moves itself: its motion vectors must be drawn every frame,
+        // or TAA and STP smear the sway (the MotionVectors pass below).
+        Tags { "RenderPipeline" = "UniversalPipeline" "RenderType" = "Opaque" "Queue" = "Geometry" "AlwaysRenderMotionVectors" = "true" }
         Cull [_Cull]
         HLSLINCLUDE
         #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
@@ -129,15 +131,21 @@ Shader "Safe Haven/Tree Wind"
             UNITY_VERTEX_INPUT_INSTANCE_ID
             UNITY_VERTEX_OUTPUT_STEREO
         };
-        float3 WindPositionWS(Attributes input)
+        // Where the wind has the vertex at a moment, in object space.
+        float3 WindPositionOS(Attributes input, float time)
         {
             // No Moss Wind in the scene leaves the direction at zero, and normalising it would give NaN (an invisible tree).
             float2 windXZ = dot(_SafeHavenWind.xy, _SafeHavenWind.xy) > 1e-8 ? _SafeHavenWind.xy : float2(1.0, 0.0);
             float3 dirOS = TransformWorldToObjectDir(float3(windXZ.x, 0.0, windXZ.y));
             float3 moved;
             TreeWind_float(input.positionOS.xyz, input.normalOS, input.wind, input.windPhase,
-                _Time.y, _WindStrength * _SafeHavenTreeWind, _TreeHeight, dirOS, moved);
-            return TransformObjectToWorld(moved);
+                time, _WindStrength * _SafeHavenTreeWind, _TreeHeight, dirOS, moved);
+            return moved;
+        }
+
+        float3 WindPositionWS(Attributes input)
+        {
+            return TransformObjectToWorld(WindPositionOS(input, _Time.y));
         }
         Varyings TreeVertex(Attributes input)
         {
@@ -434,6 +442,57 @@ Shader "Safe Haven/Tree Wind"
                 #endif
                 SampleBase(input.uv);
                 return input.positionCS.z;
+            }
+            ENDHLSL
+        }
+        Pass
+        {
+            // Where each vertex is now against where the wind had it a frame ago, so TAA and STP follow the sway.
+            Name "MotionVectors"
+            Tags { "LightMode" = "MotionVectors" }
+            ColorMask RG
+            HLSLPROGRAM
+            #pragma target 3.5
+            #pragma vertex MotionVertex
+            #pragma fragment MotionFragment
+            #pragma shader_feature_local _ALPHATEST_ON
+            #pragma multi_compile_instancing
+            #include_with_pragmas "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DOTS.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/MotionVectorsCommon.hlsl"
+            struct MotionVaryings
+            {
+                float4 positionCS : SV_POSITION;
+                float2 uv : TEXCOORD0;
+                float4 now : TEXCOORD1;
+                float4 before : TEXCOORD2;
+                UNITY_VERTEX_INPUT_INSTANCE_ID
+                UNITY_VERTEX_OUTPUT_STEREO
+            };
+            MotionVaryings MotionVertex(Attributes input)
+            {
+                MotionVaryings output = (MotionVaryings)0;
+                UNITY_SETUP_INSTANCE_ID(input);
+                UNITY_TRANSFER_INSTANCE_ID(input, output);
+                UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(output);
+                float3 nowOS = WindPositionOS(input, _Time.y);
+                float3 beforeOS = WindPositionOS(input, _Time.y - unity_DeltaTime.x);
+                float3 nowWS = TransformObjectToWorld(nowOS);
+                output.positionCS = TransformWorldToHClip(nowWS);
+                output.now = mul(_NonJitteredViewProjMatrix, float4(nowWS, 1.0));
+                output.before = mul(_PrevViewProjMatrix, mul(UNITY_PREV_MATRIX_M, float4(beforeOS, 1.0)));
+                output.uv = TRANSFORM_TEX(input.uv, _BaseMap);
+                return output;
+            }
+            float4 MotionFragment(MotionVaryings input) : SV_Target
+            {
+                UNITY_SETUP_INSTANCE_ID(input);
+                #if defined(_ALPHATEST_ON)
+                    SeeThroughCanopyClip(input.positionCS);
+                #else
+                    SeeThroughClip(input.positionCS);
+                #endif
+                SampleBase(input.uv);
+                return float4(CalcNdcMotionVectorFromCsPositions(input.now, input.before), 0, 0);
             }
             ENDHLSL
         }

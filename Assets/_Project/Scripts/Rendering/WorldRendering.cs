@@ -72,6 +72,13 @@ public sealed class WorldRendering : MonoBehaviour, IGameSystem
     public void OnSceneEntered(Scene scene)
     {
         sky?.Bind();
+        // Painted trees sway in their vertices (Tree Wind's motion vectors): their own pass, not the camera's guess, so
+        // TAA and STP don't smear them.
+        foreach (Terrain terrain in Terrain.activeTerrains)
+        {
+            terrain.treeMotionVectorModeOverride = TreeMotionVectorModeOverride.PerObjectMotion;
+        }
+
         lights.Rescan();
         reflections?.Refresh();
         wear?.Clear();
