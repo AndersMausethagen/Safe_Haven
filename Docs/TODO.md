@@ -3,6 +3,30 @@
 Open work and ideas. Tick items off (`[x]`) or delete them when done. Architecture notes for each system live in
 [ARCHITECTURE.md](../Assets/_Project/Scripts/ARCHITECTURE.md).
 
+## Faster builds (2026-11-08)
+
+Every build re-imports all textures at full size and then back to the Editor's 2K cap (`EditorTextureCap`), twice per
+build; with the forest and mountain packs' 4K and 8K textures that is most of a build's time. Agreed to wait; in order:
+- [ ] Build from a second checkout (a git worktree with its own Library): textures import full-size once and stay, later
+      builds redo only what changed, the Editor keeps its cap, and the build runs from the command line while the Editor works.
+- [ ] Take the test scenes out of the build list: `SampleScene`, `GameplayTestScene`, `Demo/StoryDemo`.
+- [ ] Or, instead of the second checkout: Unity Accelerator (local import cache; the project has caching off), so flipping the
+      cap reuses both imports.
+- [ ] Faster texture compression for development builds only (release keeps full quality).
+- [ ] Script-only development builds when only code changed (`BuildOptions.BuildScriptsOnly`).
+- [ ] Shader compile time. Measured from the 2026-11-08 development build's log: about 8,100 variants compiled (19,500 from
+      the cache) in 44.7 CPU-hours, nearly all in a few slow shaders: Terrain (World) 1,467 variants in 17.7 h (~43 s each:
+      tessellation, 14 layers in one pass), its Add pass 906 in 9.1 h, URP Lit 1,430 in 4.8 h, Terrain Base 500 in 3.0 h,
+      Mesh Surface (Tessellated) 999 in 2.8 h, URP's stock Terrain/Lit (three passes) ~1,100 in 3.8 h. So: strip unused
+      keywords in the terrain shaders first (an IPreprocessShaders step or the generator). The character look added the most:
+      Lit (See-Through) went to 9,792 variants (~12 CPU-s each) once the 87 character materials wore it with skin/cloth
+      keywords; align them on a few keyword sets, or carry skin and cloth without a keyword (a material property the shader
+      reads, if the material buffer allows, or a rendering-layer bit). Keep URP's stock terrain shader out
+      of the build (probably the test scenes); avoid editing includes the terrain uses; then the Mobile quality level's
+      pipeline asset (URP keeps the union of both) and DX12 in the API list (every pass compiles for both).
+- [ ] The user's call, not a default: cap 8K textures at 4K in shipping builds too (the cap note says 2K and 4K look the same
+      from the top-down camera); smaller download and less video memory, but less source detail.
+
 ## Playtest feedback (2026-11-05)
 
 From the user's playtest. Grouped; nothing here is built yet unless ticked. Decided with the user: bugs and tuning

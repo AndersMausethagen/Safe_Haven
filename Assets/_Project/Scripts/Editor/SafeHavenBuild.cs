@@ -32,6 +32,9 @@ public static class SafeHavenBuild
             options = BuildOptions.None
         };
 
+        // A dirty scene (the World Builder dirties the Haven after every Editor start) makes the build ask to save in a native
+        // dialog no command can answer, and it waits there for good: save first, as the test runner does.
+        UnityEditor.SceneManagement.EditorSceneManager.SaveOpenScenes();
         // Full-size textures in the build, whatever the Editor works with (EditorTextureCap).
         BuildReport report = EditorTextureCap.WithFullTextures(() => BuildPipeline.BuildPlayer(options));
         if (report.summary.result != BuildResult.Succeeded)

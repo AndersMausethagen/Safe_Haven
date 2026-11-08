@@ -752,10 +752,15 @@ numbers in `Resources/RenderingSettings`. `WorldRendering` (an `IGameSystem`) ow
   into one; softened by night, when the moon is all the light), four shadow cascades (the Shadows option's High keeps all four).
   `LightShadowBudget` gives the three fires and lamps nearest the view soft shadows at dusk and night (the nearest at the medium
   tier, so all fit the 2048 atlas). Every renderer on the pipeline's list must be Forward+: one on Forward switches the GPU Resident
-  Drawer off for all cameras. SSAO reaches 0.8 m: from the camera's height a smaller reach is a few pixels. `SkyOcclusionMap` draws a top-down height map round the player through the Sky Occlusion Renderer
+  Drawer off for all cameras. SSAO reaches 0.8 m: from the camera's height a smaller reach is a few pixels. `WorldLights` finds
+  the world's fires and lamps every 3 s (lights reaching 5 m or more that nobody carries) for the shadow budget and gives any
+  without fog glow an `AtmosphereLight`. Measured: the Resident Drawer's occlusion culling trims triangles but no frame time, as
+  the frame waits on the terrain's tessellation, not on draw calls. `SkyOcclusionMap` draws a top-down height map round the player through the Sky Occlusion Renderer
   (a Render Objects override pass, pipeline renderer #1) and `Shaders/SkyOcclusion.hlsl` dims indirect light under cover and keeps
   rain and snow off what stands under a roof. Not in the generated terrain: one more texture took it over its limit. In raids at
-  0.35 strength (`_SkyOcclusionRect.w`): full strength under the forest canopy hid the player at night.
+  0.35 strength (`_SkyOcclusionRect.w`): full strength under the forest canopy hid the player at night. A render costs about
+  3 ms of CPU, 2 of them the terrain's trees whatever their distance, so it redraws on need (12 m moved, a building up or down,
+  every 10 s), not on a timer; drawing it a quarter a frame cost four times as much.
 - **Weather on surfaces.** `Shaders/SurfaceWetness.hlsl` soaks whatever has "Weather Settles On It" (the old snow toggle) plus trees
   and grass; the terrain's puddles are its own (`GenerateWorldTerrainShader.py`). Include SurfaceWetness before SeasonSnow, and in
   ASE shaders after URP's Lighting.hlsl (it needs `_Time`). Characters (URP Lit) soak per character instead (`CharacterWetness`,
@@ -769,6 +774,20 @@ numbers in `Resources/RenderingSettings`. `WorldRendering` (an `IGameSystem`) ow
   reprojection and neighbourhood clamping); water adds screen-space reflection (loads, not samples, inside the march loop: a
   gradient instruction there is a compiler warning `WaterTests` catches); `LightFlicker` gives fires heat haze and embers that
   light; `EffectParticle` fades softly into what it meets.
+
+- **Characters.** Character materials wear Lit (See-Through) with `_CHARACTER_SKIN` or `_CHARACTER_CLOTH`
+  (`AgentScripts/BuildCharacterLook.cs`, on the assets: a build keeps only the keyword sets its materials use, so runtime
+  copies with new keywords would lose them). `CharacterShading.hlsl` adds a sky-and-sun rim and light through skin, with global
+  strengths (URP's Lit keeps its material buffer fixed); those variants are never see-through. `CharacterLook` sets the
+  strengths and gives characters `CharacterWetness` in rain.
+- **Temporal AA.** Tree Wind writes motion vectors (`AlwaysRenderMotionVectors`, painted trees set to per-object motion), so
+  TAA and STP follow its sway; terrain grass has no motion-vector path and softens under them. TAA is an option, not the default.
+- **Shader warm-up.** `ShaderWarmup` compiles `Settings/Rendering/Warmup.shadervariants` behind the first loading screen (builds
+  only). Record with `AgentScripts/RecordShaderWarmup.cs`: Begin, tour, Save (or Merge to add to it). The Editor logs a variant
+  only when first made, so shaders drawn before Begin are missed (AddMaterials fills in from materials), and saving clears it.
+- **Measuring.** A development build from `AgentScripts/BuildBenchmark.cs` (Build/WindowsDev) run with `-sh-benchmark`
+  (`FrameBenchmark`) loads a new game in a scratch save folder, times four places by day and dusk with the CPU/GPU split, and
+  writes benchmark.txt to the persistent data folder.
 
 ## Drawing a large world from a top-down camera
 

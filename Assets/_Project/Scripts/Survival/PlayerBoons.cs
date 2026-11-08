@@ -87,7 +87,7 @@ public sealed class PlayerBoons : MonoBehaviour
             MakeRoomForMeal();
         }
 
-        Start(new Entry { Id = id, Name = displayName, IsMeal = isMeal, SecondsLeft = seconds, Bonuses = bonuses });
+        Begin(new Entry { Id = id, Name = displayName, IsMeal = isMeal, SecondsLeft = seconds, Bonuses = bonuses });
         Changed?.Invoke();
         return true;
     }
@@ -102,7 +102,7 @@ public sealed class PlayerBoons : MonoBehaviour
 
         foreach (BoonRecord record in records)
         {
-            Start(new Entry { Id = record.Id, Name = record.Name, IsMeal = record.IsMeal, SecondsLeft = record.SecondsLeft, Bonuses = record.Bonuses });
+            Begin(new Entry { Id = record.Id, Name = record.Name, IsMeal = record.IsMeal, SecondsLeft = record.SecondsLeft, Bonuses = record.Bonuses });
         }
 
         Changed?.Invoke();
@@ -181,7 +181,7 @@ public sealed class PlayerBoons : MonoBehaviour
         }
     }
 
-    private void Start(Entry entry)
+    private void Begin(Entry entry) // not "Start": Unity takes that name for its lifecycle message and logs an error
     {
         active.Add(entry);
         StatSheet stats = Stats;
