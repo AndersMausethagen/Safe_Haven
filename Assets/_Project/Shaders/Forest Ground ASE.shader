@@ -883,6 +883,7 @@ Shader "Safe Haven/Forest Ground ASE"
 				#ifdef ASE_LIGHTING_SIMPLE
 					ASE_LIGHT_ACCUM4 color = UniversalFragmentBlinnPhong( inputData, surfaceData);
 				#else
+					surfaceData.occlusion *= SkyAmbient(inputData.positionWS);
 					SurfaceWet(surfaceData.albedo, surfaceData.smoothness, inputData.normalWS, inputData.positionWS, 1.0);
 					ASE_LIGHT_ACCUM4 color = UniversalFragmentPBR( inputData, surfaceData);
 				#endif

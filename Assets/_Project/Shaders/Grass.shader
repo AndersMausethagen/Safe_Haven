@@ -332,7 +332,7 @@ Shader "Safe Haven/Grass"
                 data.albedo = albedo.rgb;
                 data.alpha = 1;
                 data.smoothness = _Smoothness;
-                data.occlusion = 1;
+                data.occlusion = SkyAmbient(input.positionWS);
                 data.normalTS = half3(0, 0, 1);
                 SurfaceWet(data.albedo, data.smoothness, lighting.normalWS, input.positionWS, 0.5);
                 half4 colour = UniversalFragmentPBR(lighting, data);

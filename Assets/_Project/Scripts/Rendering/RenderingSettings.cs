@@ -37,6 +37,19 @@ public sealed class RenderingSettings : GameSettings<RenderingSettings>
     [SerializeField, Range(0f, 1f)] private float cloudDarkness = 0.55f;
     [Tooltip("How soft the shadows' edges are.")]
     [SerializeField, Range(0.02f, 0.5f)] private float cloudSoftness = 0.18f;
+    [Header("Sky occlusion")]
+    [Tooltip("Dim the sky's light and reflections under roofs and canopies, and keep rain and snow out from under them " +
+             "(SkyOcclusionMap: a top-down height map round the player). At home only.")]
+    [SerializeField] private bool skyOcclusion = true;
+    [Tooltip("Metres the map covers, centred on the player.")]
+    [SerializeField, Min(20f)] private float skyOcclusionArea = 160f;
+    [SerializeField] private int skyOcclusionResolution = 512;
+    [Tooltip("Seconds between redraws: buildings put up, people moving.")]
+    [SerializeField, Min(0.2f)] private float skyOcclusionInterval = 1.5f;
+    [SerializeField] private LayerMask skyOcclusionLayers = ~(1 << 5);
+    [Tooltip("Index of the Sky Occlusion Renderer in the pipeline's renderer list (set by AgentScripts/BuildRendering.cs); -1 off.")]
+    [SerializeField] private int skyOcclusionRendererIndex = -1;
+
     [Header("Decals")]
     [Tooltip("Short-lived decals out at once (blood, footprints); the oldest is reused after that.")]
     [SerializeField, Min(8)] private int decalPoolSize = 128;
@@ -74,6 +87,12 @@ public sealed class RenderingSettings : GameSettings<RenderingSettings>
     public Vector2 CloudCover => cloudCover;
     public float CloudDarkness => cloudDarkness;
     public float CloudSoftness => cloudSoftness;
+    public bool SkyOcclusion => skyOcclusion;
+    public float SkyOcclusionArea => skyOcclusionArea;
+    public int SkyOcclusionResolution => skyOcclusionResolution;
+    public float SkyOcclusionInterval => skyOcclusionInterval;
+    public LayerMask SkyOcclusionLayers => skyOcclusionLayers;
+    public int SkyOcclusionRendererIndex => skyOcclusionRendererIndex;
     public int DecalPoolSize => decalPoolSize;
     public Material BloodDecal => bloodDecal;
     public Texture2D BloodAtlas => bloodAtlas;

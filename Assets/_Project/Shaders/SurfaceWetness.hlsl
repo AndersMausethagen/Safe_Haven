@@ -1,5 +1,6 @@
 #ifndef SAFE_HAVEN_SURFACE_WETNESS
 #define SAFE_HAVEN_SURFACE_WETNESS
+#include "Assets/_Project/Shaders/SkyOcclusion.hlsl"
 // Things getting wet in the rain (WeatherSystem sets _SafeHavenWetness, 0 dry to 1 soaked, rising with the rain and
 // drying after it; RainEffect sets _SafeHavenRain while it falls). Wet surfaces darken as their pores fill and turn
 // glossy under a film of water, most on whatever faces the sky; while it rains, thin runnels slide down steep faces.
@@ -27,6 +28,12 @@ float WetnessNoise(float2 p)
 void SurfaceWet(inout half3 albedo, inout half smoothness, half3 normalWS, float3 positionWS, half porosity)
 {
     half wet = (half)_SafeHavenWetness;
+    if (wet <= 0.001)
+    {
+        return;
+    }
+
+    wet *= SkyVisibility(positionWS); // under a roof or a thick canopy it stays dry
     if (wet <= 0.001)
     {
         return;

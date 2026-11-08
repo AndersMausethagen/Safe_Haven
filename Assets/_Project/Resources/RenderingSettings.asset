@@ -27,6 +27,14 @@ MonoBehaviour:
   cloudCover: {x: 0.28, y: 0.6}
   cloudDarkness: 0.55
   cloudSoftness: 0.18
+  skyOcclusion: 1
+  skyOcclusionArea: 160
+  skyOcclusionResolution: 512
+  skyOcclusionInterval: 1.5
+  skyOcclusionLayers:
+    serializedVersion: 2
+    m_Bits: 4294967263
+  skyOcclusionRendererIndex: 1
   decalPoolSize: 128
   bloodDecal: {fileID: 2100000, guid: f7ae1475f1a410743b157c1e53f93ce3, type: 2}
   bloodAtlas: {fileID: 2800000, guid: 7fe320d85bee25b4aacd117857eba120, type: 3}

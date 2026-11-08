@@ -12,6 +12,7 @@ public sealed class WorldRendering : MonoBehaviour, IGameSystem
     private FollowReflectionProbe reflections;
     private CloudShadows clouds;
     private GroundWear wear;
+    private SkyOcclusionMap occlusion;
 
     public void Initialise(RenderingSettings rules)
     {
@@ -31,6 +32,12 @@ public sealed class WorldRendering : MonoBehaviour, IGameSystem
         wear = gameObject.AddComponent<GroundWear>();
         wear.Initialise(settings);
 
+        if (settings.SkyOcclusion)
+        {
+            occlusion = gameObject.AddComponent<SkyOcclusionMap>();
+            occlusion.Initialise(settings);
+        }
+
         if (settings.CloudShadows)
         {
             clouds = gameObject.AddComponent<CloudShadows>();
@@ -42,6 +49,7 @@ public sealed class WorldRendering : MonoBehaviour, IGameSystem
     {
         reflections?.Refresh();
         wear?.Clear();
+        occlusion?.Bind(GameSession.ActiveRaid == null);
         clouds?.Bind(RenderSettings.sun, GameSession.ActiveRaid == null);
     }
 }

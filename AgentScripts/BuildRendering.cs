@@ -29,7 +29,7 @@ public static class BuildRendering
 
     public static string Apply()
     {
-        var report = new List<string> { Settings(), Shadows(), Feature(), Volume(), Haze() };
+        var report = new List<string> { Settings(), Shadows(), Feature(), Volume(), Haze(), SkyOcclusion() };
         AssetDatabase.SaveAssets();
         return string.Join("; ", report);
     }
@@ -150,5 +150,89 @@ public static class BuildRendering
         material.enableInstancing = true;
         EditorUtility.SetDirty(material);
         return "heat haze";
+    }
+
+    // The Sky Occlusion Renderer: a copy of the plain Mobile renderer that draws nothing itself and has one Render Objects
+    // pass drawing every opaque thing with the height material, listed on the PC pipeline for SkyOcclusionMap's camera.
+    private static string SkyOcclusion()
+    {
+        const string path = "Assets/_Project/Settings/Rendering/Sky Occlusion Renderer.asset";
+        var renderer = AssetDatabase.LoadAssetAtPath<UniversalRendererData>(path);
+        if (renderer == null)
+        {
+            AssetDatabase.CopyAsset("Assets/_Project/Settings/Rendering/Mobile_Renderer.asset", path);
+            renderer = AssetDatabase.LoadAssetAtPath<UniversalRendererData>(path);
+        }
+
+        const string materialPath = "Assets/_Project/Settings/Rendering/Sky Occlusion Height.mat";
+        var height = AssetDatabase.LoadAssetAtPath<Material>(materialPath);
+        if (height == null)
+        {
+            height = new Material(Shader.Find("Hidden/Safe Haven/Sky Occlusion Height"));
+            AssetDatabase.CreateAsset(height, materialPath);
+        }
+
+        height.enableInstancing = true;
+        var so = new SerializedObject(renderer);
+        so.FindProperty("m_OpaqueLayerMask").intValue = 0;
+        so.FindProperty("m_TransparentLayerMask").intValue = 0;
+        so.ApplyModifiedPropertiesWithoutUndo();
+
+        RenderObjects draw = renderer.rendererFeatures.OfType<RenderObjects>().FirstOrDefault();
+        if (draw == null)
+        {
+            draw = ScriptableObject.CreateInstance<RenderObjects>();
+            draw.name = "Heights";
+            AssetDatabase.AddObjectToAsset(draw, renderer);
+            renderer.rendererFeatures.Add(draw);
+            var rendererSo = new SerializedObject(renderer);
+            SerializedProperty map = rendererSo.FindProperty("m_RendererFeatureMap");
+            map.arraySize = renderer.rendererFeatures.Count;
+            for (int i = 0; i < renderer.rendererFeatures.Count; i++)
+            {
+                AssetDatabase.TryGetGUIDAndLocalFileIdentifier(renderer.rendererFeatures[i], out string _, out long id);
+                map.GetArrayElementAtIndex(i).longValue = id;
+            }
+
+            rendererSo.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        draw.settings.Event = RenderPassEvent.AfterRenderingOpaques;
+        draw.settings.filterSettings.RenderQueueType = RenderQueueType.Opaque;
+        draw.settings.filterSettings.LayerMask = ~(1 << 5);
+        draw.settings.overrideMode = RenderObjects.RenderObjectsSettings.OverrideMaterialMode.Material;
+        draw.settings.overrideMaterial = height;
+        draw.settings.overrideMaterialPassIndex = 0;
+        EditorUtility.SetDirty(draw);
+        renderer.SetDirty();
+        EditorUtility.SetDirty(renderer);
+
+        var pipeline = AssetDatabase.LoadAssetAtPath<UniversalRenderPipelineAsset>(Pipeline);
+        var pipelineSo = new SerializedObject(pipeline);
+        SerializedProperty list = pipelineSo.FindProperty("m_RendererDataList");
+        int index = -1;
+        for (int i = 0; i < list.arraySize; i++)
+        {
+            if (list.GetArrayElementAtIndex(i).objectReferenceValue == renderer)
+            {
+                index = i;
+            }
+        }
+
+        if (index < 0)
+        {
+            index = list.arraySize;
+            list.InsertArrayElementAtIndex(index);
+            list.GetArrayElementAtIndex(index).objectReferenceValue = renderer;
+            pipelineSo.ApplyModifiedPropertiesWithoutUndo();
+            EditorUtility.SetDirty(pipeline);
+        }
+
+        var settings = AssetDatabase.LoadAssetAtPath<RenderingSettings>("Assets/_Project/Resources/RenderingSettings.asset");
+        var settingsSo = new SerializedObject(settings);
+        settingsSo.FindProperty("skyOcclusionRendererIndex").intValue = index;
+        settingsSo.ApplyModifiedPropertiesWithoutUndo();
+        EditorUtility.SetDirty(settings);
+        return $"sky occlusion renderer #{index}";
     }
 }

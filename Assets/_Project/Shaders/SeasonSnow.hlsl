@@ -32,6 +32,9 @@ half SeasonSnowCover(half3 normalWS, float3 positionWS)
     }
 
     float clumps = SeasonSnowNoise(positionWS.xz * 2.3 + positionWS.y * 0.7) * 0.6 + SeasonSnowNoise(positionWS.xz * 7.9) * 0.4;
+    #if defined(SAFE_HAVEN_SKY_OCCLUSION)
+        clumps -= (1.0 - SkyVisibility(positionWS)) * 2.0; // no snow under a roof
+    #endif
     half reach = normalWS.y + (clumps - 0.5) * 0.45 - (1.0 - _SafeHavenSnow) * 0.55;
     return smoothstep(0.3, 0.7, reach) * saturate(_SafeHavenSnow * 1.6);
 }
@@ -54,6 +57,9 @@ void SeasonSnow(inout half3 albedo, inout half smoothness, half3 normalWS, float
 #if defined(SEASON_SNOW_WRAP_PBR)
 half4 SeasonSnowFragmentPBR(InputData inputData, SurfaceData surfaceData)
 {
+    #if defined(SAFE_HAVEN_SKY_OCCLUSION)
+        surfaceData.occlusion *= SkyAmbient(inputData.positionWS); // under roofs and canopies, less sky light
+    #endif
     #if defined(_SEASON_SNOW)
         SeasonSnow(surfaceData.albedo, surfaceData.smoothness, inputData.normalWS, inputData.positionWS);
         #if defined(SAFE_HAVEN_SURFACE_WETNESS)
