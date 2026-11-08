@@ -77,6 +77,8 @@ public sealed class OptionsTests
     {
         GameOptions.DamageNumbers.Value = 1f;
         Assert.AreEqual("On", GameOptions.DamageNumbers.ValueText);
+        GameOptions.AntiAliasing.Value = 4f;
+        Assert.AreEqual("TAA", GameOptions.AntiAliasing.ValueText, "temporal, as a choice");
         GameOptions.AntiAliasing.Value = 2f;
         Assert.AreEqual("4x MSAA", GameOptions.AntiAliasing.ValueText);
         GameOptions.ScreenShake.Value = 0.5f;

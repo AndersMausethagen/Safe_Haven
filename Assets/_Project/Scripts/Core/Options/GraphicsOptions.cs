@@ -12,16 +12,20 @@ using UnityEngine.Rendering.Universal;
 /// </summary>
 public static class GraphicsOptions
 {
-    private static readonly int[] MsaaSamples = { 1, 2, 4, 8 };
+    // Anti-Aliasing: Off, 2x, 4x, 8x MSAA, TAA (temporal, which needs MSAA off).
+    private static readonly int[] MsaaSamples = { 1, 2, 4, 8, 1 };
+    private const int TemporalChoice = 4;
     private static readonly int[] ShadowResolution = { 1024, 2048, 4096 };
     private static readonly float[] ShadowDistanceShare = { 0.5f, 0.7f, 1f };
-    private static readonly int[] ShadowCascades = { 1, 2, 2 };
+    // High keeps the pipeline's own four (sharper near the player over the same distance).
+    private static readonly int[] ShadowCascades = { 1, 2, 4 };
     private static readonly float[] FogShare = { 0.5f, 0.75f, 1f };
     private static readonly float[] LodShare = { 0.6f, 0.8f, 1f };
     private static readonly int[] MipLimit = { 2, 1, 0 };
     private static readonly UpscalingFilterSelection[] Upscalers =
         { UpscalingFilterSelection.Linear, UpscalingFilterSelection.FSR, UpscalingFilterSelection.STP };
 
+    private static readonly Dictionary<Camera, AntialiasingMode> AuthoredCameras = new Dictionary<Camera, AntialiasingMode>();
     private static readonly Dictionary<Terrain, (float density, float distance)> AuthoredTerrains = new Dictionary<Terrain, (float, float)>();
 
     private static RenderPipelineAsset authoredForQuality;
@@ -109,6 +113,40 @@ public static class GraphicsOptions
     /// <summary>The terrains of the loaded scene: their surface detail, grass and small plants.</summary>
     public static void ApplyToScene()
     {
+        bool temporal = GameOptions.AntiAliasing.Index == TemporalChoice;
+        var goneCameras = new List<Camera>();
+        foreach (Camera camera in AuthoredCameras.Keys)
+        {
+            if (camera == null)
+            {
+                goneCameras.Add(camera);
+            }
+        }
+
+        foreach (Camera camera in goneCameras)
+        {
+            AuthoredCameras.Remove(camera);
+        }
+
+        foreach (Camera camera in Object.FindObjectsByType<Camera>(FindObjectsInactive.Include))
+        {
+            if (!camera.CompareTag("MainCamera") || !camera.TryGetComponent(out UniversalAdditionalCameraData data))
+            {
+                continue;
+            }
+
+            if (!AuthoredCameras.ContainsKey(camera))
+            {
+                AuthoredCameras[camera] = data.antialiasing;
+            }
+
+            data.antialiasing = temporal ? AntialiasingMode.TemporalAntiAliasing : AuthoredCameras[camera];
+            if (temporal)
+            {
+                data.taaSettings.quality = TemporalAAQuality.High;
+            }
+        }
+
         var detail = (TerrainSurface.DetailQuality)GameOptions.TerrainDetail.Index;
         foreach (TerrainSurface surface in Object.FindObjectsByType<TerrainSurface>(FindObjectsInactive.Include))
         {

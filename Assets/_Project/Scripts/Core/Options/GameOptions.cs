@@ -30,7 +30,7 @@ public static class GameOptions
     public static readonly GameOption RenderScale = GameOption.Slider("RenderScale", "Render Scale",
         "How many pixels are drawn, as a share of the screen. Lowering it is the biggest gain on a slow graphics card.", 1f, 0.5f, 1f, 0.05f);
     public static readonly GameOption Upscaling = GameOption.Choice("Upscaling", "Upscaling", "How a Render Scale below 100% is brought up to the screen.", 1, "Bilinear", "FSR", "STP");
-    public static readonly GameOption AntiAliasing = GameOption.Choice("AntiAliasing", "Anti-Aliasing", "Smooths jagged edges. Higher settings cost more.", 2, "Off", "2x MSAA", "4x MSAA", "8x MSAA");
+    public static readonly GameOption AntiAliasing = GameOption.Choice("AntiAliasing", "Anti-Aliasing", "Smooths jagged edges. Higher MSAA costs more; TAA also smooths shimmering grass, leaves and fine detail, a little softer in motion.", 2, "Off", "2x MSAA", "4x MSAA", "8x MSAA", "TAA");
     public static readonly GameOption Shadows = GameOption.Choice("Shadows", "Shadows", "Sharpness and reach of shadows. High is the game as it was made.", 2, "Low", "Medium", "High");
     public static readonly GameOption AmbientOcclusion = GameOption.Toggle("AmbientOcclusion", "Ambient Occlusion", "Soft shade where things meet the ground.", true);
     public static readonly GameOption VolumetricFog = GameOption.Choice("VolumetricFog", "Volumetric Fog", "Detail of the fog and light shafts. Costly in the raid forests.", 2, "Low", "Medium", "High");
