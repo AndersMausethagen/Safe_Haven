@@ -207,6 +207,19 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
         return IsHost && ViaSteam && lobby != null && lobby.Invite();
     }
 
+    /// <summary>Friends in an open session of this game (through Steam) that this player could visit: empty without Steam.</summary>
+    public System.Collections.Generic.IReadOnlyList<SteamLobby.FriendHaven> FriendsHosting() =>
+        SteamReady && lobby != null ? lobby.FriendsHosting() : new System.Collections.Generic.List<SteamLobby.FriendHaven>();
+
+    /// <summary>Goes to a friend's session (their Haven) through Steam, as their invite would: leaving any session first.</summary>
+    public void Visit(ulong lobbyId)
+    {
+        if (lobby != null)
+        {
+            OnSteamJoinAsked(lobbyId);
+        }
+    }
+
     /// <summary>Joins the session at <paramref name="address"/> (an IP, optionally with ":port"), without Steam.</summary>
     public bool Join(string address, out string problem)
     {

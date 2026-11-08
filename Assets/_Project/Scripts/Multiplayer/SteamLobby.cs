@@ -15,6 +15,19 @@ using Steamworks;
 /// </summary>
 public sealed class SteamLobby : IDisposable
 {
+    /// <summary>A friend in an open session of this game: their name and the lobby to walk in through.</summary>
+    public readonly struct FriendHaven
+    {
+        public readonly string Name;
+        public readonly ulong Lobby;
+
+        public FriendHaven(string name, ulong lobby)
+        {
+            Name = name;
+            Lobby = lobby;
+        }
+    }
+
     public const string ConnectCommand = "+connect_lobby";
     private const string HostKey = "host";
     private const string VersionKey = "version";
@@ -112,6 +125,25 @@ public sealed class SteamLobby : IDisposable
         SteamFriends.SetRichPresence("connect", $"{ConnectCommand} {LobbyId}");
     }
 
+    /// <summary>Friends (from the Steam friends list) playing this game in an open session that can be joined.</summary>
+    public System.Collections.Generic.List<FriendHaven> FriendsHosting()
+    {
+        var found = new System.Collections.Generic.List<FriendHaven>();
+        AppId_t game = SteamUtils.GetAppID();
+        int count = SteamFriends.GetFriendCount(EFriendFlags.k_EFriendFlagImmediate);
+        for (int i = 0; i < count; i++)
+        {
+            CSteamID friend = SteamFriends.GetFriendByIndex(i, EFriendFlags.k_EFriendFlagImmediate);
+            if (SteamFriends.GetFriendGamePlayed(friend, out FriendGameInfo_t playing) && playing.m_gameID.AppID() == game &&
+                playing.m_steamIDLobby.IsValid() && playing.m_steamIDLobby.m_SteamID != 0)
+            {
+                found.Add(new FriendHaven(SteamFriends.GetFriendPersonaName(friend), playing.m_steamIDLobby.m_SteamID));
+            }
+        }
+
+        return found;
+    }
+
     private void OnLobbyJoinRequested(GameLobbyJoinRequested_t request) => JoinAsked?.Invoke(request.m_steamIDLobby.m_SteamID);
 
     private void OnPresenceJoinRequested(GameRichPresenceJoinRequested_t request)
@@ -152,6 +184,7 @@ public sealed class SteamLobby : IDisposable
     public void Open(int maxPlayers, string protocolVersion) => Failed?.Invoke("This build has no Steam.");
     public bool Invite() => false;
     public void Enter(ulong lobbyId) => Failed?.Invoke("This build has no Steam.");
+    public System.Collections.Generic.List<FriendHaven> FriendsHosting() => new System.Collections.Generic.List<FriendHaven>();
     public void Close() { }
     public void Dispose() { }
 #endif

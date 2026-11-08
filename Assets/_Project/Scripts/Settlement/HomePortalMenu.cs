@@ -2,9 +2,10 @@ using System.Text;
 using UnityEngine;
 
 /// <summary>
-/// What the portal offers when used: what it says, then going through it (its RaidPortal's actions), Portal Sparks at
-/// its fire, strengthening the ward, the defense against a breach, mending buildings and the Haven page. One menu for
-/// everything the portal is the centre of; the portal itself is the ward and the voice. Plain C#, made by
+/// What the portal offers when used: what it says, then going through it (its RaidPortal's actions), the way to friends'
+/// Havens (calling friends here, or walking to one whose door is open: co-op, told as the portal reaching other doors),
+/// Portal Sparks at its fire, strengthening the ward, the defense against a breach, mending buildings and the Haven page.
+/// One menu for everything the portal is the centre of; the portal itself is the ward and the voice. Plain C#, made by
 /// <see cref="HomePortal"/>.
 /// </summary>
 public sealed class HomePortalMenu
@@ -58,6 +59,7 @@ public sealed class HomePortalMenu
             raid.AddActions(page, user);
         }
 
+        AddOtherHavens(page, user);
         if (station != null && station.Usable)
         {
             page.Add(new MenuAction("Make Portal Sparks", "Queue them at the portal's own fire", true, () => station.OpenMenu(user), closesMenu: true));
@@ -90,6 +92,68 @@ public sealed class HomePortalMenu
         }
 
         page.Add(new MenuAction("How is Safe Haven doing?", $"Rank, renown and what to do next ({GameInput.KeyLabel(GameInput.Haven)})", true, OpenHaven));
+        return page;
+    }
+
+    // Co-op through the portal: it hears other portals in other clearings, and can call friends here or carry the player to
+    // a friend whose way stands open (both through Steam).
+    private void AddOtherHavens(MenuPage page, GameObject user)
+    {
+        CoopSession coop = CoopSession.Current;
+        if (coop == null || raid != null && !raid.IsRepaired)
+        {
+            return;
+        }
+
+        string noSteam = $"<color={UIStyle.Hex(UIStyle.Current.Danger)}>I can't reach the other doors: Steam isn't running.</color>";
+        switch (coop.State)
+        {
+            case CoopState.Offline:
+                page.Add(new MenuAction("Call friends to Safe Haven", coop.SteamReady ? "I'll open my way and call to them" : noSteam, coop.SteamReady,
+                    () => CallFriends(coop), closesMenu: true));
+                page.Add(new MenuAction("Walk to a friend's Haven", coop.SteamReady ? "I hear other doors. Name one, and I'll carry you" : noSteam, coop.SteamReady,
+                    () => ActionMenuWindow.Current.Open(() => FriendsPage(user, coop), user, portal.transform)));
+                break;
+            case CoopState.Hosting:
+                page.Add(new MenuAction("Call another friend", $"My way stands open ({coop.PlayerCount} here)", coop.ViaSteam, () => coop.InviteFriends()));
+                page.Add(new MenuAction("Close the way", "Friends here go home", true, () => coop.Leave(), closesMenu: true));
+                break;
+            case CoopState.Joined:
+                page.Add(new MenuAction("Walk home", "Back through to your own Haven", true, () => coop.Leave(), closesMenu: true));
+                break;
+        }
+    }
+
+    private static void CallFriends(CoopSession coop)
+    {
+        if (!coop.Host(out string problem))
+        {
+            GameMessages.Post(string.IsNullOrEmpty(problem) ? "The portal can't open its way just now." : problem, MessageKind.Warning);
+            return;
+        }
+
+        GameMessages.Post("The portal hums, and its way stands open. Your friends can walk through to you.", MessageKind.Gain);
+        coop.InviteFriends();
+    }
+
+    // The friends whose door is open now, rebuilt while it shows, so one who opens theirs appears.
+    private MenuPage FriendsPage(GameObject user, CoopSession coop)
+    {
+        var page = new MenuPage { Title = "Other Havens", Body = "I hear other doors, faint, like bells under water. These ones stand open." };
+        var friends = coop.FriendsHosting();
+        if (friends.Count == 0)
+        {
+            page.Body = "I hear other doors, faint, like bells under water. None of your friends' stands open just now. " +
+                        "When one of them opens their way, it will ring here.";
+        }
+
+        foreach (SteamLobby.FriendHaven friend in friends)
+        {
+            ulong lobby = friend.Lobby;
+            page.Add(new MenuAction($"{friend.Name}'s Haven", "Walk through to them", true, () => coop.Visit(lobby), closesMenu: true));
+        }
+
+        page.Add(new MenuAction("Back", null, true, () => ActionMenuWindow.Current.Open(() => Build(user), user, portal.transform)));
         return page;
     }
 
