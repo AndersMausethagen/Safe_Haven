@@ -34,6 +34,9 @@ public sealed class FishingLine
     private const float PlainFloatSize = 0.14f;
 
     private readonly Transform angler;
+    private HeldItemView held;
+    private GameObject tipOf;
+    private MeshFilter tipFilter;
     private Transform bobber;
     private LineRenderer line;
 
@@ -73,7 +76,7 @@ public sealed class FishingLine
             return;
         }
 
-        Vector3 tip = angler.position + Vector3.up * 1.7f + angler.forward * 0.7f + angler.right * 0.25f;
+        Vector3 tip = RodTip();
         Vector3 at;
         if (Time.time < cast.LandsAt)
         {
@@ -97,6 +100,41 @@ public sealed class FishingLine
             float t = i / (line.positionCount - 1f);
             line.SetPosition(i, Vector3.Lerp(tip, at, t) + Vector3.down * Mathf.Sin(t * Mathf.PI) * sag);
         }
+    }
+
+    /// <summary>Where the line leaves the rod: the far end of the rod in the angler's hand (HeldItemView), the end of its
+    /// model's longest side away from the grip. A fixed spot by the shoulder only while no rod is shown.</summary>
+    public Vector3 RodTip()
+    {
+        held ??= angler.GetComponent<HeldItemView>();
+        GameObject rod = held != null ? held.ShownModel : null;
+        if (rod == null)
+        {
+            return angler.position + Vector3.up * 1.7f + angler.forward * 0.7f + angler.right * 0.25f;
+        }
+
+        if (rod != tipOf)
+        {
+            tipOf = rod;
+            tipFilter = rod.GetComponentInChildren<MeshFilter>();
+        }
+
+        if (tipFilter == null || tipFilter.sharedMesh == null)
+        {
+            return rod.transform.position;
+        }
+
+        // The rod's length runs along its mesh's longest side; the tip is the end of it farther from the hand.
+        Bounds local = tipFilter.sharedMesh.bounds;
+        Vector3 size = local.size;
+        int axis = size.x >= size.y && size.x >= size.z ? 0 : size.y >= size.z ? 1 : 2;
+        Vector3 half = Vector3.zero;
+        half[axis] = local.extents[axis];
+        Transform mesh = tipFilter.transform;
+        Vector3 one = mesh.TransformPoint(local.center + half);
+        Vector3 other = mesh.TransformPoint(local.center - half);
+        Vector3 hand = held.Grip != null ? held.Grip.position : rod.transform.position;
+        return (one - hand).sqrMagnitude >= (other - hand).sqrMagnitude ? one : other;
     }
 
     public void Destroy()
