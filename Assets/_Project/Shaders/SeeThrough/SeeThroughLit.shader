@@ -2,6 +2,8 @@
 // dithered circle when they stand between the camera and the player (Shaders/SeeThrough/SeeThrough.hlsl; Gord-style
 // see-through occluders). Same properties and keywords as the original, so a material only swaps its shader: Safe
 // Haven › Rendering › Make Materials See-Through. Regenerate from the package's shader when URP is upgraded.
+// _CHARACTER_CLOTH / _CHARACTER_SKIN: the variant characters wear (CharacterShading.hlsl): a rim and light through skin,
+// and never see-through.
 Shader "Safe Haven/Lit (See-Through)"
 {
     Properties
@@ -192,7 +194,9 @@ Shader "Safe Haven/Lit (See-Through)"
 
             #include "Packages/com.unity.render-pipelines.universal/Shaders/LitInput.hlsl"
             #pragma shader_feature_local_fragment _ _SEASON_SNOW
+            #pragma shader_feature_local_fragment _ _CHARACTER_CLOTH _CHARACTER_SKIN
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
+            #include "Assets/_Project/Shaders/CharacterShading.hlsl"
             #define SEASON_SNOW_WRAP_PBR
             #include "Assets/_Project/Shaders/SurfaceWetness.hlsl"
             #include "Assets/_Project/Shaders/SeasonSnow.hlsl"
@@ -379,6 +383,8 @@ Shader "Safe Haven/Lit (See-Through)"
             // Shader Stages
             #pragma vertex DepthOnlyVertex
             #pragma fragment SeeThroughDepthFragment
+            // Characters never dissolve, in depth as in colour, or the depth prepass and the colour would disagree.
+            #pragma shader_feature_local_fragment _ _CHARACTER_CLOTH _CHARACTER_SKIN
 
             // -------------------------------------
             // Material Keywords
@@ -430,6 +436,8 @@ Shader "Safe Haven/Lit (See-Through)"
             // Shader Stages
             #pragma vertex DepthNormalsVertex
             #pragma fragment SeeThroughNormalsFragment
+            // Characters never dissolve, in depth as in colour, or the depth prepass and the colour would disagree.
+            #pragma shader_feature_local_fragment _ _CHARACTER_CLOTH _CHARACTER_SKIN
 
             // -------------------------------------
             // Material Keywords

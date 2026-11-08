@@ -66,7 +66,11 @@ half4 SeasonSnowFragmentPBR(InputData inputData, SurfaceData surfaceData)
             SurfaceWet(surfaceData.albedo, surfaceData.smoothness, inputData.normalWS, inputData.positionWS, 1.0 - surfaceData.metallic * 0.8);
         #endif
     #endif
-    return UniversalFragmentPBR(inputData, surfaceData);
+    half4 colour = UniversalFragmentPBR(inputData, surfaceData);
+    #if defined(SAFE_HAVEN_CHARACTER)
+        colour.rgb += CharacterLight(inputData, surfaceData);
+    #endif
+    return colour;
 }
 #define UniversalFragmentPBR SeasonSnowFragmentPBR
 #endif

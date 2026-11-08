@@ -46,6 +46,9 @@ float SeeThroughAmount(float4 positionCS)
 
 void SeeThroughClip(float4 positionCS)
 {
+    #if defined(_CHARACTER_CLOTH) || defined(_CHARACTER_SKIN)
+        return; // a creature between the camera and the player must stay in sight
+    #endif
     float amount = SeeThroughAmount(positionCS);
     if (amount > 0.0)
     {

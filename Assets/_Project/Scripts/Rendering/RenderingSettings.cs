@@ -68,6 +68,19 @@ public sealed class RenderingSettings : GameSettings<RenderingSettings>
     [Tooltip("Index of the Sky Occlusion Renderer in the pipeline's renderer list (set by AgentScripts/BuildRendering.cs); -1 off.")]
     [SerializeField] private int skyOcclusionRendererIndex = -1;
 
+    [Header("Characters")]
+    [Tooltip("How bright the rim the sky and sun put on a figure's edge is (CharacterShading.hlsl).")]
+    [SerializeField, Range(0f, 2f)] private float rimStrength = 0.2f;
+    [Tooltip("How thin it is: higher keeps it to the very edge.")]
+    [SerializeField, Range(1f, 8f)] private float rimSharpness = 4f;
+    [Tooltip("How much stronger at night (1 = twice), so figures still read in the dark.")]
+    [SerializeField, Range(0f, 3f)] private float rimAtNight = 0.8f;
+    [Tooltip("How much of the sun the edge catches, against the sky's light.")]
+    [SerializeField, Range(0f, 2f)] private float rimSunShare = 0.5f;
+    [Tooltip("The colour light takes on passing into skin.")]
+    [SerializeField] private Color skinScatter = new Color(1f, 0.45f, 0.3f);
+    [SerializeField, Range(0f, 2f)] private float skinScatterStrength = 0.4f;
+
     [Header("Wet characters")]
     [Tooltip("People and creatures out in the rain soak, darken and gloss (CharacterWetness).")]
     [SerializeField] private bool wetCharacters = true;
@@ -160,6 +173,12 @@ public sealed class RenderingSettings : GameSettings<RenderingSettings>
     public float SkyOcclusionRefresh => skyOcclusionRefresh;
     public LayerMask SkyOcclusionLayers => skyOcclusionLayers;
     public int SkyOcclusionRendererIndex => skyOcclusionRendererIndex;
+    public float RimStrength => rimStrength;
+    public float RimSharpness => rimSharpness;
+    public float RimAtNight => rimAtNight;
+    public float RimSunShare => rimSunShare;
+    public Color SkinScatter => skinScatter;
+    public float SkinScatterStrength => skinScatterStrength;
     public bool WetCharacters => wetCharacters;
     public float SoakSeconds => soakSeconds;
     public float DrySeconds => drySeconds;

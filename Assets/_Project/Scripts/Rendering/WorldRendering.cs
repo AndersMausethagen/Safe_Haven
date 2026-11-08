@@ -53,10 +53,7 @@ public sealed class WorldRendering : MonoBehaviour, IGameSystem
             gameObject.AddComponent<LightShadowBudget>().Initialise(settings, lights);
         }
 
-        if (settings.WetCharacters)
-        {
-            gameObject.AddComponent<WetCharacters>().Initialise(settings);
-        }
+        gameObject.AddComponent<CharacterLook>().Initialise(settings);
 
         cloudLayer = gameObject.AddComponent<CloudLayer>();
         cloudLayer.Initialise(settings);

@@ -8,7 +8,7 @@ using UnityEngine;
 /// look is set on copies of their materials, made the first time they get wet, put away once dry and worn again in the next shower. The copies are
 /// never destroyed here: a death ragdoll takes its skin's materials (DeathRagdoll), so it may still be drawing them; the
 /// scene's unload frees them. A hit flash (HitReaction) is a property block over them and still shows. Added by
-/// WetCharacters; numbers in RenderingSettings › Wet characters.
+/// CharacterLook; numbers in RenderingSettings › Wet characters.
 /// </summary>
 public sealed class CharacterWetness : MonoBehaviour
 {

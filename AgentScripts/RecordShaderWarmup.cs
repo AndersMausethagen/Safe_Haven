@@ -93,6 +93,55 @@ public static class RecordShaderWarmup
         return $"added {added}; {collection.shaderCount} shaders, {collection.variantCount} variants";
     }
 
+    /// <summary>Adds what was recorded since Begin to the saved collection, keeping what it held (a new shader or keyword
+    /// set added later needs only a short tour of its own).</summary>
+    public static string Merge()
+    {
+        string count = Count();
+        if (count.StartsWith("0 shaders"))
+        {
+            return "nothing recorded since Begin";
+        }
+
+        const string temporary = "Assets/_Project/Settings/Rendering/Warmup (new).shadervariants";
+        typeof(ShaderUtil).GetMethod("SaveCurrentShaderVariantCollection", Hidden).Invoke(null, new object[] { temporary });
+        AssetDatabase.ImportAsset(temporary);
+        var recorded = AssetDatabase.LoadAssetAtPath<ShaderVariantCollection>(temporary);
+        var collection = AssetDatabase.LoadAssetAtPath<ShaderVariantCollection>(Path);
+        int before = collection.variantCount;
+        SerializedProperty shaders = new SerializedObject(recorded).FindProperty("m_Shaders");
+        for (int i = 0; i < shaders.arraySize; i++)
+        {
+            SerializedProperty entry = shaders.GetArrayElementAtIndex(i);
+            if (!(entry.FindPropertyRelative("first").objectReferenceValue is Shader shader))
+            {
+                continue;
+            }
+
+            SerializedProperty variants = entry.FindPropertyRelative("second.variants");
+            for (int v = 0; v < variants.arraySize; v++)
+            {
+                SerializedProperty variant = variants.GetArrayElementAtIndex(v);
+                string[] keywords = variant.FindPropertyRelative("keywords").stringValue
+                    .Split(new[] { ' ' }, System.StringSplitOptions.RemoveEmptyEntries);
+                var pass = (UnityEngine.Rendering.PassType)variant.FindPropertyRelative("passType").intValue;
+                try
+                {
+                    collection.Add(new ShaderVariantCollection.ShaderVariant(shader, pass, keywords));
+                }
+                catch (System.ArgumentException)
+                {
+                    // A keyword the shader no longer has.
+                }
+            }
+        }
+
+        EditorUtility.SetDirty(collection);
+        AssetDatabase.SaveAssetIfDirty(collection);
+        AssetDatabase.DeleteAsset(temporary);
+        return $"merged {count}: {before} -> {collection.variantCount} variants, {collection.shaderCount} shaders";
+    }
+
     public static string Save()
     {
         string count = Count();
