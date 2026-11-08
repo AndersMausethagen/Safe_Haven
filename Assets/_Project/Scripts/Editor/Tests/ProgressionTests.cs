@@ -22,6 +22,20 @@ public sealed class ProgressionTests
     }
 
     [Test]
+    public void TheFirstLevels_AreSlowerThanTheCurve_ButNeverCheaperThanTheOneBefore()
+    {
+        LevelingSettings authored = LevelingSettings.Current;
+        Assert.Greater(authored.ExperienceToNext(1), 50, "a little slower at the start: the level sounds piled up");
+        int previous = 0;
+        for (int level = 1; level < 50; level++)
+        {
+            int needed = authored.ExperienceToNext(level);
+            Assert.GreaterOrEqual(needed, previous, $"level {level}");
+            previous = needed;
+        }
+    }
+
+    [Test]
     public void Experience_RaisesTheSkillsLevel_UpToTheLastLevel()
     {
         ProficiencyDefinition skill = Skill("chopping");

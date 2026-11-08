@@ -59,8 +59,9 @@ After the second list, in this order.
 - [x] Small trees and bushes bend for the player as the grass does; some details don't yet. The grass's detail plants
       all bend already (proper bend weights); the painted shrubs, saplings and young cedars (Tree Wind) now push aside
       too, fully under 4 m, fading out by 9 m. Not seen clearly in a screenshot: check in play.
-- [ ] Too many sounds from finished quests and skill levels early on: make the first skill levels a little slower and the
-      sounds a little quieter.
+- [x] Too many sounds from finished quests and skill levels early on: make the first skill levels a little slower and the
+      sounds a little quieter. The first six levels take 80 each (were 50 to 80; level 10 at 780, was 685); Quest
+      Completed 1 to 0.6, Quest Started 1 to 0.45, Level Up 0.75 to 0.45, Milestone 0.9 to 0.7.
 - [ ] Debris falls off trees from time to time: in clear weather it should fall nearly straight down, and drift with the
       wind when breezy or stormy.
 - [ ] Quest "They are still out there": how to reactivate the portal isn't said. Meanwhile building quests pile up. New

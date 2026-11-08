@@ -16,8 +16,9 @@ public static class BuildGameFeel
     {
         AssetDatabase.Refresh();
         // Volume, whether it takes the mix (ducks the music and the rest) for its moment, clips.
-        SoundDefinition levelUp = Sound("Level Up", 0.75f, false, "Level Up");
-        SoundDefinition milestone = Sound("Milestone", 0.9f, true, "Milestone");
+        // Quieter than they were: early on they came often, piled up with the quests' (2026-11-08).
+        SoundDefinition levelUp = Sound("Level Up", 0.45f, false, "Level Up");
+        SoundDefinition milestone = Sound("Milestone", 0.7f, true, "Milestone");
         SoundDefinition perk = Sound("Perk Chosen", 0.75f, false, "Perk Chosen");
         SoundDefinition insight = Sound("Insight", 0.6f, false, "Insight");
         SoundDefinition fine = Sound("Craft Fine", 0.7f, false, "Craft Fine");

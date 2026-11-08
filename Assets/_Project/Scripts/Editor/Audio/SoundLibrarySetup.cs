@@ -89,8 +89,8 @@ public static class SoundLibrarySetup
         Make(new Spec { Name = "Footstep Water", Clips = Files(oga, "sfx100v2_footstep_wet_01", "sfx100v2_footstep_wet_02", "sfx100v2_footstep_wet_03"), Volume = 0.25f, Pitch = new Vector2(0.9f, 1.1f), Audible = 10f, MaxAtOnce = 3 });
         Make(new Spec { Name = "Land", Clips = Made(combat, "Land", 4), Volume = 0.34f, Pitch = new Vector2(0.95f, 1.05f), Audible = 12f, MaxAtOnce = 1 });
         // World and interface.
-        Make(new Spec { Name = "Quest Started", Clips = Made(face, "Quest Started", 1), Volume = 0.4f, Pitch = Vector2.one, Positional = false, MaxAtOnce = 1 });
-        Make(new Spec { Name = "Quest Completed", Clips = Made(face, "Quest Completed", 1), Volume = 0.62f, Pitch = Vector2.one, Positional = false, MaxAtOnce = 1 });
+        Make(new Spec { Name = "Quest Started", Clips = Made(face, "Quest Started", 1), Volume = 0.45f, Pitch = Vector2.one, Positional = false, MaxAtOnce = 1 });
+        Make(new Spec { Name = "Quest Completed", Clips = Made(face, "Quest Completed", 1), Volume = 0.6f, Pitch = Vector2.one, Positional = false, MaxAtOnce = 1 });
         Make(new Spec { Name = "Crafted", Clips = Made(face, "Crafted", 3), Volume = 0.5f, Positional = false, MaxAtOnce = 2 });
         Make(new Spec { Name = "Built", Clips = Numbered(impact, "impactPlank_medium_", 5), Volume = 0.8f, Pitch = new Vector2(0.85f, 1f) });
         Make(new Spec { Name = "Click", Clips = Made(face, "Click", 3), Volume = 0.17f, Pitch = new Vector2(0.97f, 1.03f), Positional = false, MaxAtOnce = 2 });

@@ -13,10 +13,11 @@ MonoBehaviour:
   m_Name: Quest Completed
   m_EditorClassIdentifier: SafeHaven::SoundDefinition
   displayName: Quest Completed
+  caption: 
   clips:
   - {fileID: 8300000, guid: 69de22832d8d56a4bb1001639beec80a, type: 3}
   channel: 2
-  volume: 1
+  volume: 0.6
   volumeVariation: 0.1
   pitchRange: {x: 1, y: 1}
   positional: 0

@@ -17,6 +17,10 @@ public sealed class LevelingSettings : GameSettings<LevelingSettings>
     [SerializeField, Min(1)] private int firstLevelExperience = 50;
     [Tooltip("Each level takes this many times the experience of the one before.")]
     [SerializeField, Range(1f, 2f)] private float levelGrowth = 1.105f;
+    [Tooltip("The first levels take this many times their experience (level 1 to 2), easing back to 1 over Early Levels: " +
+             "at the start every skill levelled within minutes, level sounds and banners piling up with the quests'.")]
+    [SerializeField, Range(1f, 3f)] private float earlySlowdown = 1.6f;
+    [SerializeField, Min(1)] private int earlyLevels = 5;
     [Tooltip("The level the game's numbers were tuned for. Skill level bonuses are 0 here: below it the player is a " +
              "beginner (At First Level), above it better than the game assumed (At Last Level).")]
     [SerializeField, Min(1)] private int baselineLevel = 10;
@@ -201,7 +205,9 @@ public sealed class LevelingSettings : GameSettings<LevelingSettings>
     /// <summary>Experience needed to go from <paramref name="level"/> to the next one (rounded to 5).</summary>
     public int ExperienceToNext(int level)
     {
-        float needed = firstLevelExperience * Mathf.Pow(levelGrowth, Mathf.Max(0, level - 1));
+        // Eased off geometrically, no faster than the levels grow, so no level is ever cheaper than the one before.
+        float early = level <= earlyLevels ? Mathf.Pow(earlySlowdown, (earlyLevels - (level - 1)) / (float)earlyLevels) : 1f;
+        float needed = firstLevelExperience * Mathf.Pow(levelGrowth, Mathf.Max(0, level - 1)) * early;
         return Mathf.Max(1, Mathf.RoundToInt(needed / 5f) * 5);
     }
 
@@ -403,11 +409,12 @@ public sealed class LevelingSettings : GameSettings<LevelingSettings>
     }
 
     /// <summary>Sets the curve and skills up (tests and editor tools).</summary>
-    public void Configure(int levels, int firstLevel, float growth, int baseline, IEnumerable<ProficiencyDefinition> allSkills)
+    public void Configure(int levels, int firstLevel, float growth, int baseline, IEnumerable<ProficiencyDefinition> allSkills, float slowStart = 1f)
     {
         maxLevel = Mathf.Max(2, levels);
         firstLevelExperience = Mathf.Max(1, firstLevel);
         levelGrowth = Mathf.Clamp(growth, 1f, 2f);
+        earlySlowdown = Mathf.Clamp(slowStart, 1f, 3f);
         baselineLevel = Mathf.Max(1, baseline);
         skills = new List<ProficiencyDefinition>(allSkills);
         totals = null;
