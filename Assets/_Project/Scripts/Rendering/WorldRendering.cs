@@ -45,6 +45,11 @@ public sealed class WorldRendering : MonoBehaviour, IGameSystem
         grade.transform.SetParent(transform, false);
         raidGrade = grade.AddComponent<RaidGradeVolume>();
         raidGrade.Initialise();
+        if (settings.FireShadows)
+        {
+            gameObject.AddComponent<LightShadowBudget>().Initialise(settings);
+        }
+
         if (settings.WetCharacters)
         {
             gameObject.AddComponent<WetCharacters>().Initialise(settings);

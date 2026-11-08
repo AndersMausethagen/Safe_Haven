@@ -80,6 +80,19 @@ public sealed class RenderingSettings : GameSettings<RenderingSettings>
     [Tooltip("Metres above a character's feet the look for a roof starts (over the head).")]
     [SerializeField, Min(0.5f)] private float shelterRayStart = 2.2f;
 
+    [Header("Fire shadows")]
+    [Tooltip("At dusk and by night the fires and lamps nearest the view cast soft shadows (LightShadowBudget).")]
+    [SerializeField] private bool fireShadows = true;
+    [Tooltip("How many at once (each point light draws six shadow faces).")]
+    [SerializeField, Range(0, 6)] private int shadowedLights = 3;
+    [Tooltip("Metres round what the camera looks at that a light may be.")]
+    [SerializeField, Min(4f)] private float fireShadowReach = 30f;
+    [Tooltip("Lights reaching less than this many metres don't count (small glows).")]
+    [SerializeField, Min(0f)] private float fireShadowLeastRange = 4f;
+    [SerializeField, Range(0f, 1f)] private float fireShadowStrength = 0.85f;
+    [Tooltip("They come on once the night is at least this far in (0-1), or in the golden hour.")]
+    [SerializeField, Range(0f, 1f)] private float fireShadowsFromNight = 0.15f;
+
     [Header("Decals")]
     [Tooltip("Short-lived decals out at once (blood, footprints); the oldest is reused after that.")]
     [SerializeField, Min(8)] private int decalPoolSize = 128;
@@ -136,6 +149,12 @@ public sealed class RenderingSettings : GameSettings<RenderingSettings>
     public float WetDarkening => wetDarkening;
     public float WetSmoothness => wetSmoothness;
     public float ShelterRayStart => shelterRayStart;
+    public bool FireShadows => fireShadows;
+    public int ShadowedLights => shadowedLights;
+    public float FireShadowReach => fireShadowReach;
+    public float FireShadowLeastRange => fireShadowLeastRange;
+    public float FireShadowStrength => fireShadowStrength;
+    public float FireShadowsFromNight => fireShadowsFromNight;
     public int DecalPoolSize => decalPoolSize;
     public Material BloodDecal => bloodDecal;
     public Texture2D BloodAtlas => bloodAtlas;
