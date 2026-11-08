@@ -2,6 +2,9 @@
 // uv2 = (phase, flutter), animated by TreeWind.hlsl, the same formula as the generator's 3D preview.
 // Trunk, leaves and vines must all use it so leaves stay on the bending branches.
 // Direction and strength come from the scene's MossWind (and its WindZone): _SafeHavenWind / _SafeHavenTreeWind.
+// Small plants (bushes, saplings, young trees) give way to the player and creatures as the grass does:
+// their twigs bend away from GrassInteractor objects (_GrassInteractors, the grass's own list), fully under 4 m and
+// fading out by 9 m; trunks and tall trees don't.
 // Materials are created on import by TreeWindMaterials (Safe Haven > Environment > Apply Tree Wind Materials).
 // Fast Leaf Lighting (leaves and vines): sun and ambient are lit per vertex, darker inside the canopy (the baked
 // flex: 0 at the trunk, 1 at the twig tips); the pixel samples the leaf texture, one hardware shadow compare
@@ -39,6 +42,7 @@ Shader "Safe Haven/Tree Wind"
         [Header(Wind)]
         _WindStrength ("Wind Strength", Range(0, 2)) = 1
         _TreeHeight ("Tree Height (object units)", Float) = 10
+        _PushStrength ("Push Away (metres, small plants only)", Range(0, 1)) = 0.35
     }
     SubShader
     {
@@ -61,12 +65,15 @@ Shader "Safe Haven/Tree Wind"
             float4 _BaseMap_ST;
             half4 _BaseColor;
             half _BumpScale, _OcclusionStrength, _Roughness, _Metallic, _Cutoff, _Translucency, _Deciduous;
-            float _WindStrength, _TreeHeight;
+            float _WindStrength, _TreeHeight, _PushStrength;
             half4 _MossColor;
             float4 _MossRemap;
             float _MossTiling, _MossAmount, _Smoothness;
         CBUFFER_END
         float4 _SafeHavenWind; // horizontal direction XZ (world), moss displacement, moss speed
+        #define TREE_MAX_PUSHERS 8
+        float4 _GrassInteractors[TREE_MAX_PUSHERS]; // world position, radius (GrassInteractor, shared with the grass)
+        float _GrassInteractorCount;
         float _SafeHavenTreeWind; // tree strength (WindZone Main), 0 = still; time is real seconds like the preview
         float4 _SafeHavenSeason; // Seasons: x autumn colour, y leaf fall, z frost (all 0 outside a season cycle)
 
@@ -131,6 +138,36 @@ Shader "Safe Haven/Tree Wind"
             UNITY_VERTEX_INPUT_INSTANCE_ID
             UNITY_VERTEX_OUTPUT_STEREO
         };
+        // A small plant's twigs pushed aside by whoever stands in it (object space): the nearer, the further, twig tips
+        // most (the baked flex), nothing for a trunk or for a plant taller than about 9 m.
+        float3 PushOS(float3 positionOS, float flex)
+        {
+            float scaleY = length(float3(UNITY_MATRIX_M._m01, UNITY_MATRIX_M._m11, UNITY_MATRIX_M._m21));
+            float small = 1.0 - saturate((_TreeHeight * scaleY - 4.0) / 5.0);
+            float weight = small * saturate(flex) * saturate(flex) * _PushStrength;
+            int count = (int)min(_GrassInteractorCount, TREE_MAX_PUSHERS);
+            if (weight <= 0.0 || count <= 0)
+            {
+                return float3(0.0, 0.0, 0.0);
+            }
+
+            float3 positionWS = TransformObjectToWorld(positionOS);
+            float2 push = float2(0.0, 0.0);
+            for (int i = 0; i < count; i++)
+            {
+                float4 pusher = _GrassInteractors[i];
+                float radius = max(pusher.w * 1.6, 1e-3);
+                float2 away = positionWS.xz - pusher.xz;
+                float distance = length(away);
+                float reach = saturate(1.0 - distance / radius) * step(abs(positionWS.y - pusher.y), radius + 2.0);
+                push += (distance > 1e-4 ? away / distance : float2(0.0, 0.0)) * reach;
+            }
+
+            float2 aside = push * weight;
+            // Bent aside, a twig also dips a little.
+            return TransformWorldToObjectDir(float3(aside.x, -dot(aside, aside) * 0.3, aside.y), false);
+        }
+
         // Where the wind has the vertex at a moment, in object space.
         float3 WindPositionOS(Attributes input, float time)
         {
@@ -140,7 +177,7 @@ Shader "Safe Haven/Tree Wind"
             float3 moved;
             TreeWind_float(input.positionOS.xyz, input.normalOS, input.wind, input.windPhase,
                 time, _WindStrength * _SafeHavenTreeWind, _TreeHeight, dirOS, moved);
-            return moved;
+            return moved + PushOS(moved, input.wind.y);
         }
 
         float3 WindPositionWS(Attributes input)

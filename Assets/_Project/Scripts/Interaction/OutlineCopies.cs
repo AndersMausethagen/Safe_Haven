@@ -76,8 +76,8 @@ public static class OutlineCopies
                 continue;
             }
 
-            Renderer outlineCopy = Copy(source, mesh, outline, outlineName);
-            Renderer maskCopy = Copy(source, mesh, mask, maskName);
+            Renderer outlineCopy = Copy(source, mesh, outline, outlineName, SkipCutouts(source, mesh));
+            Renderer maskCopy = Copy(source, mesh, mask, maskName, null);
             result.Add(new Entry(source, outlineCopy, maskCopy));
         }
 
@@ -151,7 +151,11 @@ public static class OutlineCopies
             Material[] materials = entry.Outline.sharedMaterials;
             for (int i = 0; i < materials.Length; i++)
             {
-                materials[i] = material;
+                // A part left out (cut-out leaves) stays out.
+                if (materials[i] != null)
+                {
+                    materials[i] = material;
+                }
             }
 
             entry.Outline.sharedMaterials = materials;
@@ -184,8 +188,29 @@ public static class OutlineCopies
         entries.Clear();
     }
 
+    // Which of a renderer's parts the outline leaves out: its cut-out ones (leaf cards, fur, hair), drawn as whole quads,
+    // whose rectangles traced lines all through a tree's crown wherever the cards left gaps. They still mask. All of a
+    // renderer cut out (a fern, a bush of cards) keeps them all, so it is outlined at all.
+    private static bool[] SkipCutouts(Renderer source, Mesh mesh)
+    {
+        Material[] materials = source.sharedMaterials;
+        var skip = new bool[mesh.subMeshCount];
+        bool any = false, all = true;
+        for (int i = 0; i < skip.Length; i++)
+        {
+            Material material = i < materials.Length ? materials[i] : null;
+            skip[i] = material != null && (material.IsKeywordEnabled("_ALPHATEST_ON") ||
+                                          material.HasProperty("_AlphaClip") && material.GetFloat("_AlphaClip") > 0.5f);
+            any |= skip[i];
+            all &= skip[i];
+        }
+
+        return any && !all ? skip : null;
+    }
+
     // Mask the unexpanded mesh first, so even thin meshes touching the ground get a hollow, depth-tested contour.
-    private static Renderer Copy(Renderer source, Mesh mesh, Material material, string name)
+    // Parts in skip get no material: they aren't drawn.
+    private static Renderer Copy(Renderer source, Mesh mesh, Material material, string name, bool[] skip)
     {
         var holder = new GameObject(name) { hideFlags = HideFlags.DontSave, layer = source.gameObject.layer };
         holder.transform.SetParent(source.transform, false);
@@ -208,7 +233,7 @@ public static class OutlineCopies
         var materials = new Material[mesh.subMeshCount];
         for (int i = 0; i < materials.Length; i++)
         {
-            materials[i] = material;
+            materials[i] = skip != null && skip[i] ? null : material;
         }
 
         copy.sharedMaterials = materials;
