@@ -8,6 +8,8 @@
 
 float4 _SafeHavenCharacterRim;    // x strength, y sharpness (power), z extra at night, w sun share
 float4 _SafeHavenSkinScatter;     // rgb tint, w strength
+float4 _SafeHavenCharacterFillPosition; // CharacterFillLight: xyz where it hangs, w range
+float4 _SafeHavenCharacterFillColour;   // rgb colour × intensity (0 = none)
 float _SafeHavenNight;
 
 #if defined(_CHARACTER_CLOTH) || defined(_CHARACTER_SKIN)
@@ -28,6 +30,14 @@ half3 CharacterLight(InputData inputData, SurfaceData surfaceData)
                   * saturate(dot(normal, sun.direction) + 0.35);
     half strength = _SafeHavenCharacterRim.x * (1.0 + _SafeHavenCharacterRim.z * _SafeHavenNight);
     half3 light = rim * strength * (sky + sunEdge * _SafeHavenCharacterRim.w) * lerp(half3(1, 1, 1), surfaceData.albedo * 1.6 + 0.2, 0.5);
+
+    // The player's fill light (CharacterFillLight), with URP's point-light falloff: in the shader, not on a light layer.
+    float3 toFill = _SafeHavenCharacterFillPosition.xyz - inputData.positionWS;
+    float d2 = max(dot(toFill, toFill), 1e-4);
+    float reach = d2 / max(_SafeHavenCharacterFillPosition.w * _SafeHavenCharacterFillPosition.w, 1e-4);
+    float smooth = saturate(1.0 - reach * reach);
+    half fillAtten = smooth * smooth / d2;
+    light += surfaceData.albedo * _SafeHavenCharacterFillColour.rgb * fillAtten * saturate(dot(normal, toFill * rsqrt(d2)));
 
     #if defined(_CHARACTER_SKIN)
         // Wrap lighting: light reaching a little past where the surface turns away, tinted by what it passed through.

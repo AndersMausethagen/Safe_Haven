@@ -12,6 +12,13 @@ using UnityEngine;
 /// </summary>
 public static class BuildBenchmark
 {
+    /// <summary>The same build, also counting what it compiles (ShaderVariantReport → Logs/ShaderVariants.txt).</summary>
+    public static string BuildWithReport()
+    {
+        ShaderVariantReport.Begin();
+        return Build();
+    }
+
     public static string Build()
     {
         string[] scenes = Array.ConvertAll(Array.FindAll(EditorBuildSettings.scenes, scene => scene.enabled), scene => scene.path);

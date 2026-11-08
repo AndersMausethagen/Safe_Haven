@@ -17,16 +17,16 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/_Project/Scenes/RaidResults.unity
     guid: b9bec01c2346e654aba8758c17a0d9f6
-  - enabled: 1
+  - enabled: 0
     path: Assets/_Project/Scenes/SampleScene.unity
     guid: 99c9720ab356a0642a771bea13969a05
-  - enabled: 1
+  - enabled: 0
     path: Assets/_Project/Scenes/GameplayTestScene.unity
     guid: 5afdd46ffac25394f8923774a39d255b
   - enabled: 1
     path: Assets/_Project/Scenes/Prologue_MistyWoods.unity
     guid: 7f894bf3c7241eb488ad7167f4edd4e9
-  - enabled: 1
+  - enabled: 0
     path: Assets/_Project/Scenes/Demo/StoryDemo.unity
     guid: 54afeda1a3bb7be479088e33b3f2a05d
   m_configObjects:

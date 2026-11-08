@@ -43,6 +43,12 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4294967263
   skyOcclusionRendererIndex: 1
+  rimStrength: 0.2
+  rimSharpness: 4
+  rimAtNight: 0.8
+  rimSunShare: 0.5
+  skinScatter: {r: 1, g: 0.45, b: 0.3, a: 1}
+  skinScatterStrength: 0.4
   wetCharacters: 1
   soakSeconds: 30
   drySeconds: 150

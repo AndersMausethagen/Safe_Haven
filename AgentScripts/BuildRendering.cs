@@ -29,7 +29,7 @@ public static class BuildRendering
 
     public static string Apply()
     {
-        var report = new List<string> { Settings(), Shadows(), Feature(), Volume(), Haze(), SkyOcclusion(), Sky(), AmbientOcclusion() };
+        var report = new List<string> { Settings(), Shadows(), Feature(), Volume(), Haze(), SkyOcclusion(), Sky(), AmbientOcclusion(), Variants() };
         AssetDatabase.SaveAssets();
         return string.Join("; ", report);
     }
@@ -134,6 +134,40 @@ public static class BuildRendering
         EditorUtility.SetDirty(filmic);
         EditorUtility.SetDirty(profile);
         return $"Haven volume: {Curve}";
+    }
+
+    // Fewer shader variants (measured with ShaderVariantReport: 43,296 after URP's own stripping). Light layers were on 76%
+    // of all variants for one user, the character fill light, which the character shader now draws itself; probe blending
+    // (70%) and box projection (50%) do nothing with the one follow-the-player probe and no scene probes. The test scenes
+    // leave the build (disabled in the list, not removed).
+    private static readonly string[] TestScenes =
+    {
+        "Assets/_Project/Scenes/SampleScene.unity", "Assets/_Project/Scenes/GameplayTestScene.unity", "Assets/_Project/Scenes/Demo/StoryDemo.unity",
+    };
+
+    private static string Variants()
+    {
+        var pipeline = AssetDatabase.LoadAssetAtPath<UniversalRenderPipelineAsset>(Pipeline);
+        var so = new SerializedObject(pipeline);
+        so.FindProperty("m_SupportsLightLayers").boolValue = false;
+        so.FindProperty("m_ReflectionProbeBlending").boolValue = false;
+        so.FindProperty("m_ReflectionProbeBoxProjection").boolValue = false;
+        so.ApplyModifiedPropertiesWithoutUndo();
+        EditorUtility.SetDirty(pipeline);
+
+        EditorBuildSettingsScene[] scenes = EditorBuildSettings.scenes;
+        int off = 0;
+        foreach (EditorBuildSettingsScene scene in scenes)
+        {
+            if (System.Array.IndexOf(TestScenes, scene.path) >= 0 && scene.enabled)
+            {
+                scene.enabled = false;
+                off++;
+            }
+        }
+
+        EditorBuildSettings.scenes = scenes;
+        return $"light layers, probe blending and box projection off; {off} test scenes out of the build";
     }
 
     // SSAO seen from the top-down camera, 20-30 m up: at 0.4 m it was a few pixels wide. A wider reach and twelve samples
