@@ -289,7 +289,7 @@ public static class StatNames
             case StatType.RefiningYield: return "Extra Refined Chance";
             case StatType.ForageSpeed: return "Foraging Speed";
             case StatType.ForageYield: return "Extra Forage Chance";
-            case StatType.ReelZone: return "Reel Catch Zone";
+            case StatType.ReelZone: return "Line Control";
             case StatType.ArrowDamage: return "Arrow Damage";
             case StatType.SpellDamage: return "Spell Damage";
             case StatType.SpellStaminaCost: return "Spell Stamina Cost";

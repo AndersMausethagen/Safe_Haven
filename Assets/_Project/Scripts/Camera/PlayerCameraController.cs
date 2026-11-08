@@ -117,6 +117,41 @@ public sealed class PlayerCameraController : MonoBehaviour
 
     private GameState FramingState => bowInHand || gameState == null ? GameState.Exploration : gameState.CurrentState;
 
+    private Transform closeUpSubject;
+    private float closeUpWeight;
+    private Vector3 closeUpPoint;
+    private Vector3 closeUpPointVelocity;
+    private bool closeUpPointSet;
+    private float closeUpFit;
+    private float closeUpYaw;
+    private bool closeUpNear;
+    private float closeUpNearWeight;
+
+    /// <summary>Brings the view down and in on the player and <paramref name="subject"/> together (a fish on the line): it
+    /// swings round behind the player to look out at the subject, lower to the ground, keeping both in view, until
+    /// <see cref="EndCloseUp"/>, then turns back to the player's own view. Top-down only.</summary>
+    public void BeginCloseUp(Transform subject)
+    {
+        closeUpSubject = subject;
+        closeUpNear = true;
+    }
+
+    /// <summary>Only leans the view towards <paramref name="subject"/> so it stays in the picture with the player (a float on
+    /// the water), without coming closer or turning, until <see cref="EndCloseUp"/> or a <see cref="BeginCloseUp"/>.</summary>
+    public void KeepInView(Transform subject)
+    {
+        closeUpSubject = subject;
+        closeUpNear = false;
+    }
+
+    public void EndCloseUp(Transform subject)
+    {
+        if (closeUpSubject == subject)
+        {
+            closeUpSubject = null;
+        }
+    }
+
     public void BeginDialogue(Transform speaker, float distanceScale)
     {
         dialogueTarget = speaker;
@@ -252,6 +287,9 @@ public sealed class PlayerCameraController : MonoBehaviour
         bool framing = dialogueTarget != null || Time.unscaledTime < dialogueHoldUntil;
         dialogueWeight = Mathf.MoveTowards(dialogueWeight, framing ? 1f : 0f, Time.unscaledDeltaTime / settings.DialogueBlendTime);
         focusWeight = Mathf.MoveTowards(focusWeight, focusTarget != null ? 1f : 0f, Time.unscaledDeltaTime / settings.FocusBlendTime);
+        bool closeUp = closeUpSubject != null && closeUpSubject.gameObject.activeInHierarchy;
+        closeUpWeight = Mathf.MoveTowards(closeUpWeight, closeUp ? 1f : 0f, Time.unscaledDeltaTime / settings.CloseUpBlendTime);
+        closeUpNearWeight = Mathf.MoveTowards(closeUpNearWeight, closeUp && closeUpNear ? 1f : 0f, Time.unscaledDeltaTime / settings.CloseUpBlendTime);
         UpdateFocus();
         ApplyToCinemachine();
     }
@@ -434,6 +472,7 @@ public sealed class PlayerCameraController : MonoBehaviour
         }
 
         focus.position = Vector3.Lerp(focus.position, dialoguePoint, Mathf.SmoothStep(0f, 1f, dialogueWeight));
+        UpdateCloseUp();
         if (focusTarget != null)
         {
             focusPoint = Glide(focusPoint, focusTarget.position + Vector3.up, ref focusPointVelocity, ref focusPointSet);
@@ -509,6 +548,56 @@ public sealed class PlayerCameraController : MonoBehaviour
         return Vector3.ClampMagnitude(offset, maxLookAhead);
     }
 
+    // The close view looks at the ground halfway between the player and the subject, and remembers how far back it
+    // must sit to keep both in the picture.
+    private void UpdateCloseUp()
+    {
+        if (closeUpSubject != null && closeUpSubject.gameObject.activeInHierarchy)
+        {
+            Vector3 player = target.position;
+            Vector3 subject = closeUpSubject.position;
+            // Nearer the player than the subject: the player stands clear of the bottom of the picture.
+            Vector3 middle = Vector3.Lerp(player, subject, 0.4f);
+            middle.y = Mathf.Min(player.y, subject.y) + 0.4f;
+            closeUpPoint = Glide(closeUpPoint, middle, ref closeUpPointVelocity, ref closeUpPointSet);
+            // From behind the player, looking out at the subject: the player low in the picture, the subject beyond.
+            Vector3 toward = subject - player;
+            toward.y = 0f;
+            if (toward.sqrMagnitude > 0.25f)
+            {
+                closeUpYaw = Mathf.Atan2(toward.x, toward.z) * Mathf.Rad2Deg;
+            }
+
+            closeUpFit = FitDistance(subject - player);
+        }
+        else if (closeUpWeight <= 0f)
+        {
+            closeUpPointSet = false;
+        }
+
+        float w = Mathf.SmoothStep(0f, 1f, closeUpWeight) * (1f - actionWeight);
+        if (w > 0f)
+        {
+            focus.position = Vector3.Lerp(focus.position, closeUpPoint, w);
+        }
+    }
+
+    // How far back along the close view the camera must be so that two points this far apart both fit, with the margin.
+    private float FitDistance(Vector3 apart)
+    {
+        Camera view = Camera.main;
+        float aspect = view != null ? view.aspect : 16f / 9f;
+        float vertical = Mathf.Deg2Rad * fieldOfView * 0.5f;
+        float horizontal = Mathf.Atan(Mathf.Tan(vertical) * aspect);
+        Quaternion facing = Quaternion.Euler(0f, closeUpYaw, 0f);
+        Vector3 across = facing * Vector3.right;
+        Vector3 along = facing * Vector3.forward;
+        float wide = Mathf.Abs(Vector3.Dot(apart, across)) * 0.5f + settings.CloseUpMargin;
+        // Seen from the close view's pitch, distance along the ground shows foreshortened on screen.
+        float deep = Mathf.Abs(Vector3.Dot(apart, along)) * 0.5f * Mathf.Sin(Mathf.Deg2Rad * settings.CloseUpPitch) + settings.CloseUpMargin;
+        return Mathf.Max(settings.CloseUpDistance, wide / Mathf.Tan(horizontal), deep / Mathf.Tan(vertical));
+    }
+
     private void ApplyToCinemachine()
     {
         float w = actionWeight;
@@ -519,7 +608,17 @@ public sealed class PlayerCameraController : MonoBehaviour
         float viewPitch = Mathf.Lerp(pitch, actionPitch, w);
         dialogueDistanceNow = Mathf.SmoothDamp(dialogueDistanceNow, dialogueDistance, ref dialogueDistanceVelocity, settings.DialogueTargetSmoothTime, Mathf.Infinity, Time.unscaledDeltaTime);
         distance *= Mathf.Lerp(1f, dialogueDistanceNow, Mathf.SmoothStep(0f, 1f, dialogueWeight));
-        Vector3 back = Quaternion.Euler(viewPitch, yaw, 0f) * Vector3.back;
+        float close = Mathf.SmoothStep(0f, 1f, Mathf.Min(closeUpWeight, closeUpNearWeight)) * (1f - w);
+        float viewYaw = yaw;
+        if (close > 0f)
+        {
+            distance = Mathf.Lerp(distance, Mathf.Min(closeUpFit, distance), close);
+            viewPitch = Mathf.Lerp(viewPitch, settings.CloseUpPitch, close);
+            // The close view swings round behind the player; the player's own view direction is kept and comes back.
+            viewYaw = Mathf.LerpAngle(yaw, closeUpYaw, close);
+        }
+
+        Vector3 back = Quaternion.Euler(viewPitch, viewYaw, 0f) * Vector3.back;
 
         // The action camera orbits the point the composer looks at, not the focus below it.
         Vector3 lookOffset = composer != null ? composer.TargetOffset : Vector3.zero;

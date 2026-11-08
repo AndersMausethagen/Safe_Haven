@@ -448,9 +448,15 @@ ward (`HomePortal.WardRadius`; the moss spreads out to the new edge). Content is
 ### Fishing and the Nøkken
 
 A Fishing Rod is a weapon of kind Fishing Rod (`WeaponDefinition.TakesAttackInput`, like the bow), so `PlayerFishing`
-owns the attack and guard buttons while it is held: hold to swing back, let go to cast at the cursor (one bait from the
-bag, best first: Grubs from rotten logs and stumps, or Berries), wait for the float to go under, strike, then the
-reeling game (`ReelSession`, plain C#: keep the catch zone on the darting fish until the catch fills). Which fish bite
+owns the attack and guard buttons while it is held: hold to raise the rod and swing it back, let go to cast at the
+cursor (the float leaves at the throw's flick; one bait from the bag, best first: Grubs from rotten logs and stumps, or
+Berries), wait for the float to go under, strike, then the fight (`FishFight`, plain C#): the fish rests, warns and runs
+to a side or straight out; hold attack to reel, let go to give line, lean the rod against a run with the movement keys
+(`PlayerMovement.MoveKeys`); too much tension for too long snaps the line, slack lets a fresh fish throw the hook, steady
+pressure tires it, and a tired fish at the bank is landed (swung out, or held up when heavy). The Fishing skill's Line
+Control (`StatType.ReelZone`) stretches the line's patience and tires fish sooner. The poses are the Interaction layer's
+fish states (`PlayerAnimationController.Fishing`: `FishingPose`, `FishSpeed`); the view closes in on the player and the
+float (`PlayerCameraController.BeginCloseUp`); `FishingLine` draws the float, the line and the landed fish. Which fish bite
 where (`WaterSurface.IsStill`: the Safe Haven tarn; rivers flow), bait, timings and the Nøkken are in
 `Resources/FishingSettings`. In still water a struck bite can be the Nøkken (`NokkenEncounter`): it rises at the water's
 edge, the camera closes in, it drags the player towards the deep and hurts them until Space is hammered enough (or it

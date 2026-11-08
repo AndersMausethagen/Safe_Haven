@@ -49,7 +49,7 @@ The tuning the game had becomes level 10, reached around the first tier I raids.
 | Woodcutting / Mining | Tool rises on the timing bar | 90% speed | 100% | 125% |
 | Foraging | Picking by hand and the sickle | 85% speed | 100% | 130% |
 | | Extra plant chance | 0 | 0 | +20% |
-| Fishing | Catch zone on the reel | 80% | 100% | 130% |
+| Fishing | Line control (strain and slack the line takes, how soon fish tire) | 80% | 100% | 130% |
 | | Critical zone width | 70% | 100% | 140% |
 | | Extra yield chance | 0 | 0 | +15% |
 | Melee | Damage of every swing | 88% | 100% | 120% |

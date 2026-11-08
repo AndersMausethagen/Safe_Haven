@@ -6,38 +6,110 @@ using UnityEngine;
 
 public sealed class FishingTests
 {
-    [Test]
-    public void Reel_FillsWhileTheZoneIsOnTheFish_AndDrainsWhenItIsNot()
+    private static FishingSettings.FightTuning Tuning => FishingSettings.Current.Fight;
+
+    // Plays a fight with a simple angler: reels while the fish isn't running and the line isn't near breaking, gives line
+    // on runs, and (when leaning) holds the rod against the run. Returns the outcome and the seconds it took.
+    private static FishFight.Outcome Play(float fight, float size, bool leaning, out float seconds, float control = 1f, int seed = 3,
+        System.Func<FishFight, bool> reel = null)
     {
-        var held = new ReelSession(0f, 0.3f, 2.6f, 2.2f, 0.32f, 0.15f, 1);
-        Assert.IsTrue(held.InZone);
-        float start = held.Catch;
-        for (int i = 0; i < 10; i++)
+        var fish = new FishFight(Tuning, fight, size, control, 9f, seed);
+        const float step = 0.02f;
+        seconds = 0f;
+        for (int i = 0; i < 9000 && !fish.Over; i++, seconds += step)
         {
-            held.Tick(0.05f, held.Zone + 0.15f < held.Fish);
+            bool reeling = reel != null ? reel(fish) : fish.Current != FishFight.Mood.Running && fish.Tension < 0.9f;
+            fish.Tick(step, reeling, leaning ? fish.Counter : 0f);
         }
 
-        Assert.Greater(held.Catch, start);
-
-        var dropped = new ReelSession(0f, 0.2f, 2.6f, 2.2f, 0.32f, 0.15f, 1);
-        for (int i = 0; i < 400 && !dropped.Over; i++)
-        {
-            dropped.Tick(0.05f, false);
-        }
-
-        Assert.IsTrue(dropped.Escaped, "letting go entirely loses the fish");
+        return fish.Result;
     }
 
     [Test]
-    public void Reel_CanBeWonByFollowingTheFish()
+    public void Fight_ReelingOnRestsAndGivingLineOnRuns_LandsEveryFish()
     {
-        var reel = new ReelSession(0.5f, 0.28f, 2.6f, 2.2f, 0.32f, 0.15f, 7);
-        for (int i = 0; i < 2000 && !reel.Over; i++)
+        foreach (float fight in new[] { 0.2f, 0.35f, 0.55f, 0.75f })
         {
-            reel.Tick(0.02f, reel.Zone + reel.ZoneSize * 0.5f < reel.Fish);
+            foreach (float size in new[] { 0f, 1f })
+            {
+                for (int seed = 1; seed <= 4; seed++)
+                {
+                    Assert.AreEqual(FishFight.Outcome.Landed, Play(fight, size, true, out float seconds, seed: seed), $"fight {fight}, size {size}, seed {seed}");
+                    Assert.Less(seconds, 75f, $"a fight is a minute or so at most (fight {fight}, size {size})");
+                    Assert.Greater(seconds, 6f, "and it is a fight, not a tug");
+                }
+            }
+        }
+    }
+
+    [Test]
+    public void Fight_IsForgiving_WithoutLeaningTheRodItStillLands()
+    {
+        foreach (float fight in new[] { 0.2f, 0.55f, 0.75f })
+        {
+            Assert.AreEqual(FishFight.Outcome.Landed, Play(fight, 0.5f, false, out _), $"fight {fight}");
+        }
+    }
+
+    [Test]
+    public void Fight_LeaningAgainstTheRuns_TiresTheFishSooner()
+    {
+        Play(0.75f, 1f, true, out float leaning);
+        Play(0.75f, 1f, false, out float straight);
+        Assert.Less(leaning, straight * 0.9f);
+    }
+
+    [Test]
+    public void Fight_ReelingThroughEveryRun_SnapsTheLine()
+    {
+        Assert.AreEqual(FishFight.Outcome.Snapped, Play(0.75f, 1f, false, out _, reel: fish => true));
+    }
+
+    [Test]
+    public void Fight_NeverReeling_LosesTheFish()
+    {
+        FishFight.Outcome outcome = Play(0.35f, 0.5f, false, out _, reel: fish => false);
+        Assert.That(outcome, Is.EqualTo(FishFight.Outcome.ThrewHook).Or.EqualTo(FishFight.Outcome.Spooled));
+    }
+
+    [Test]
+    public void Fight_TheSkillsLineControl_LetsTheLineTakeMore()
+    {
+        // Reeling through the runs of a strong fish: a practised angler's line holds for longer before it goes.
+        Play(0.75f, 1f, false, out float beginner, 0.8f, reel: fish => true);
+        Play(0.75f, 1f, false, out float master, 1.3f, reel: fish => true);
+        Assert.Greater(master, beginner);
+    }
+
+    [Test]
+    public void Fight_AFishWarnsBeforeEveryRun_AndTheHudSaysWhatToDo()
+    {
+        var fish = new FishFight(Tuning, 0.5f, 0.5f, 1f, 9f, 5);
+        FishFight.Mood last = fish.Current;
+        int runs = 0;
+        bool sawSpent = false;
+        for (int i = 0; i < 6000 && !fish.Over; i++)
+        {
+            if (fish.Spent)
+            {
+                sawSpent = true;
+                StringAssert.Contains("tired", FishingHud.HintFor(fish, true));
+            }
+
+            fish.Tick(0.02f, fish.Current != FishFight.Mood.Running && fish.Tension < 0.9f, fish.Counter);
+            if (fish.Current == FishFight.Mood.Running && last != FishFight.Mood.Running)
+            {
+                Assert.AreEqual(FishFight.Mood.Warning, last, "a run comes after a warning");
+                runs++;
+            }
+
+            Assert.IsFalse(string.IsNullOrEmpty(FishingHud.HintFor(fish, false)));
+            last = fish.Current;
         }
 
-        Assert.IsTrue(reel.Caught);
+        Assert.Greater(runs, 1);
+        Assert.IsTrue(sawSpent, "it tires before it is landed");
+        Assert.AreEqual(FishFight.Outcome.Landed, fish.Result);
     }
 
     [Test]

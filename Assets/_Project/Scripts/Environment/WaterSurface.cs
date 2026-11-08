@@ -168,6 +168,38 @@ public sealed class WaterSurface : MonoBehaviour
         return null;
     }
 
+    /// <summary>
+    /// Open water at a spot: inside a surface (within <paramref name="reach"/> of its height) and with the ground under
+    /// it at least <paramref name="depth"/> below the surface. A pond's surface is one flat sheet over its whole bed, so
+    /// its bounds alone take in the banks; the shore is where the ground comes up through it.
+    /// </summary>
+    public static WaterSurface OpenAt(Vector3 point, float reach, out float height, float depth = 0.1f)
+    {
+        WaterSurface surface = At(point, reach, out height);
+        return surface != null && GroundBelow(point) <= height - depth ? surface : null;
+    }
+
+    // The terrain's height under a point; far below when no terrain is there (open water then).
+    private static float GroundBelow(Vector3 point)
+    {
+        foreach (Terrain terrain in Terrain.activeTerrains)
+        {
+            if (terrain == null || terrain.terrainData == null)
+            {
+                continue;
+            }
+
+            Vector3 corner = terrain.transform.position;
+            Vector3 size = terrain.terrainData.size;
+            if (point.x >= corner.x && point.x <= corner.x + size.x && point.z >= corner.z && point.z <= corner.z + size.z)
+            {
+                return terrain.SampleHeight(point) + corner.y;
+            }
+        }
+
+        return float.NegativeInfinity;
+    }
+
     public bool Contains(Vector3 point, float reach, out float height)
     {
         height = 0f;

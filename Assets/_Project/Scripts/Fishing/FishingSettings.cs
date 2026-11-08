@@ -6,10 +6,11 @@ using UnityEngine;
 public enum FishWater { Anywhere = 0, Flowing = 1, Still = 2 }
 
 /// <summary>
-/// Fishing (PlayerFishing): how far and how fast the line is cast, how long a bite takes, the reeling game (how fast the
-/// fish darts, how the catch zone rises and falls, how quickly the catch fills and drains), which fish bite where, which
-/// bait works how well, and the Nøkken who sometimes rises from still water instead of a fish. Lives at
-/// Resources/FishingSettings; built-in defaults apply when the asset is missing (then nothing bites).
+/// Fishing (PlayerFishing): how far and how fast the line is cast, how long a bite takes, the fight with a hooked fish
+/// (FishFight: how it runs and rests, how fast the reel brings it in, how long the line holds at full strain or slack,
+/// how soon it tires), which fish bite where, which bait works how well, and the Nøkken who sometimes rises from still
+/// water instead of a fish. Lives at Resources/FishingSettings; built-in defaults apply when the asset is missing (then
+/// nothing bites).
 /// </summary>
 [CreateAssetMenu(menuName = "Safe Haven/Settings/Fishing Settings", fileName = "FishingSettings")]
 public sealed class FishingSettings : GameSettings<FishingSettings>
@@ -21,10 +22,49 @@ public sealed class FishingSettings : GameSettings<FishingSettings>
         [Tooltip("Relative chance against the other fish that can bite there.")]
         [Min(0f)] public float weight = 1f;
         public FishWater water = FishWater.Anywhere;
-        [Tooltip("0: a lazy fish that hardly moves; 1: one that darts all over the bar.")]
+        [Tooltip("0: a lazy fish that hardly runs; 1: a fighter that runs hard and often.")]
         [Range(0f, 1f)] public float fight = 0.3f;
-        [Tooltip("Kilograms, shown when caught.")]
+        [Tooltip("Kilograms, shown when caught. Heavier ones last longer on the line and hang bigger from it.")]
         public Vector2 size = new Vector2(0.3f, 1.2f);
+        [Tooltip("Its colour when it hangs from the line at the landing.")]
+        public Color colour = new Color(0.55f, 0.6f, 0.5f, 1f);
+    }
+
+    /// <summary>The fight with a hooked fish (FishFight). Seconds and metres; pairs run from a lazy fish to a fighter.</summary>
+    [Serializable]
+    public sealed class FightTuning
+    {
+        [Tooltip("Metres a second the reel brings in a resting fish, and a spent one.")]
+        [Min(0.1f)] public float reelSpeed = 1.6f;
+        [Min(0.1f)] public float spentReelSpeed = 3f;
+        [Tooltip("Metres a second a running fish takes at its hardest pull while the reel isn't turning.")]
+        [Min(0f)] public float runTake = 2.4f;
+        [Tooltip("Seconds of steady pressure to tire a fish (lazy to fighter), for one of middling size.")]
+        public Vector2 tireSeconds = new Vector2(9f, 22f);
+        [Tooltip("Seconds a fish rests between runs, warns before one (the float jerks), and runs.")]
+        public Vector2 restSeconds = new Vector2(2.8f, 1.5f);
+        public Vector2 warnSeconds = new Vector2(0.8f, 0.5f);
+        public Vector2 runSeconds = new Vector2(1.1f, 2.4f);
+        [Tooltip("How hard a fresh fish pulls on a run (1 is enough to strain a turning reel).")]
+        public Vector2 runPull = new Vector2(0.55f, 1f);
+        [Tooltip("Share of runs that go straight out, where the rod's side doesn't help.")]
+        [Range(0f, 1f)] public float straightRuns = 0.2f;
+        [Tooltip("Seconds the line holds at full strain before it snaps, and slack before a fresh fish shakes the hook.")]
+        [Min(0.1f)] public float strainSeconds = 1.3f;
+        [Min(0.1f)] public float slackSeconds = 5f;
+        [Tooltip("Rod held against a run: its pull drops by this share and it tires this many times faster.")]
+        [Range(0f, 0.9f)] public float sideGrip = 0.45f;
+        [Min(1f)] public float sideTire = 2.2f;
+        [Tooltip("Rod held with the run: its pull grows by this factor and it tires at this share of the speed.")]
+        [Min(1f)] public float wrongSidePull = 1.25f;
+        [Range(0.1f, 1f)] public float wrongSideTire = 0.6f;
+        [Tooltip("Furthest a run swings off the line of the cast, in degrees.")]
+        [Range(5f, 70f)] public float maxAngle = 40f;
+        [Tooltip("Metres of line at which a tired fish is landed where the water comes right up to the angler (it is landed sooner, tired or not, where it is brought up onto the shore), and the most line there is.")]
+        [Min(0.5f)] public float landDistance = 1f;
+        [Min(5f)] public float maxLine = 28f;
+        [Tooltip("A fish is tired enough to land once its stamina is down to this share.")]
+        [Range(0f, 0.6f)] public float landStamina = 0.2f;
     }
 
     [Serializable]
@@ -47,15 +87,24 @@ public sealed class FishingSettings : GameSettings<FishingSettings>
     [Tooltip("Seconds to strike (press attack) once the float goes under.")]
     [SerializeField, Min(0.2f)] private float strikeWindow = 1.1f;
 
-    [Header("Reeling")]
-    [Tooltip("Share of the bar the catch zone covers.")]
-    [SerializeField, Range(0.1f, 0.6f)] private float zoneSize = 0.28f;
-    [Tooltip("How fast the zone climbs while attack is held, and falls when let go (bar heights per second²).")]
-    [SerializeField, Min(0.1f)] private float zoneLift = 2.6f;
-    [SerializeField, Min(0.1f)] private float zoneFall = 2.2f;
-    [Tooltip("Catch gained per second while the fish is in the zone, and lost while it isn't.")]
-    [SerializeField, Min(0.01f)] private float catchFill = 0.32f;
-    [SerializeField, Min(0.01f)] private float catchDrain = 0.15f;
+    [Header("The fight")]
+    [SerializeField] private FightTuning fightTuning = new FightTuning();
+    [Tooltip("A fish this heavy or more (kg) is lifted out with both hands and held up; a lighter one is swung out on the line.")]
+    [SerializeField, Min(0f)] private float haulKilograms = 2.5f;
+    [Tooltip("The water thrown up when a fish runs, jumps or is lifted out (a particle effect that plays once).")]
+    [SerializeField] private GameObject splashEffect;
+    [Tooltip("What the landed fish is drawn with (its shape is made in code; Fish › Colour tints it).")]
+    [SerializeField] private Material fishMaterial;
+
+    [Header("Animation (shares of the clips)")]
+    [Tooltip("Where the throw (Fish Cast) stops at the top of the backswing while a cast is being charged.")]
+    [SerializeField, Range(0f, 1f)] private float castHoldPoint = 0.27f;
+    [Tooltip("Where in the throw the rod flicks forward and the float leaves the tip.")]
+    [SerializeField, Range(0f, 1f)] private float castReleasePoint = 0.4f;
+    [Tooltip("Where in a landing (Fish Catch, Fish Haul Begin) the rod is high and the fish clear of the water.")]
+    [SerializeField, Range(0f, 1f)] private float landLiftPoint = 0.4f;
+    [Tooltip("Seconds a heavy fish is held up before it is put away.")]
+    [SerializeField, Min(0f)] private float haulHoldSeconds = 1.6f;
     [SerializeField] private List<Fish> fish = new List<Fish>();
     [SerializeField] private List<Bait> bait = new List<Bait>();
 
@@ -90,17 +139,26 @@ public sealed class FishingSettings : GameSettings<FishingSettings>
     [SerializeField] private SoundDefinition castSound;
     [SerializeField] private SoundDefinition biteSound;
     [SerializeField] private SoundDefinition catchSound;
+    [Tooltip("The reel turning (played over and over while reeling), the line creaking near its limit, and it snapping.")]
+    [SerializeField] private SoundDefinition reelSound;
+    [SerializeField] private SoundDefinition strainSound;
+    [SerializeField] private SoundDefinition snapSound;
+    [Tooltip("A fish thrashing at the surface on a run, and coming out of the water.")]
+    [SerializeField] private SoundDefinition splashSound;
 
     public float MinimumCast => minimumCast;
     public float MaximumCast => Mathf.Max(minimumCast, maximumCast);
     public float ChargeSeconds => chargeSeconds;
     public Vector2 BiteWait => biteWait;
     public float StrikeWindow => strikeWindow;
-    public float ZoneSize => zoneSize;
-    public float ZoneLift => zoneLift;
-    public float ZoneFall => zoneFall;
-    public float CatchFill => catchFill;
-    public float CatchDrain => catchDrain;
+    public FightTuning Fight => fightTuning ??= new FightTuning();
+    public float HaulKilograms => haulKilograms;
+    public GameObject SplashEffect => splashEffect;
+    public Material FishMaterial => fishMaterial;
+    public float CastHoldPoint => castHoldPoint;
+    public float CastReleasePoint => Mathf.Max(castHoldPoint, castReleasePoint);
+    public float LandLiftPoint => landLiftPoint;
+    public float HaulHoldSeconds => haulHoldSeconds;
     public IReadOnlyList<Fish> FishList => fish;
     public IReadOnlyList<Bait> BaitList => bait;
     public float NokkenChance => nokkenChance;
@@ -120,6 +178,10 @@ public sealed class FishingSettings : GameSettings<FishingSettings>
     public SoundDefinition CastSound => castSound;
     public SoundDefinition BiteSound => biteSound;
     public SoundDefinition CatchSound => catchSound;
+    public SoundDefinition ReelSound => reelSound;
+    public SoundDefinition StrainSound => strainSound;
+    public SoundDefinition SnapSound => snapSound;
+    public SoundDefinition SplashSound => splashSound;
 
     /// <summary>A fish that bites in this water, weighted at random (null when none can).</summary>
     public Fish PickFish(bool still, float roll)

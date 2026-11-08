@@ -32,6 +32,13 @@ public struct FishingLineState : INetworkSerializable, IEquatable<FishingLineSta
     /// <summary>The line of a player in <paramref name="phase"/>, cast as <paramref name="cast"/> at server time <paramref name="castAt"/>; none outside a line's phases.</summary>
     public static FishingLineState Of(PlayerFishing.Phase phase, in FishingCast cast, float reelCatch, double castAt)
     {
+        // A landing shows to friends as a line reeled all the way in.
+        if (phase == PlayerFishing.Phase.Landing)
+        {
+            phase = PlayerFishing.Phase.Reeling;
+            reelCatch = 1f;
+        }
+
         if (phase != PlayerFishing.Phase.Waiting && phase != PlayerFishing.Phase.Bite && phase != PlayerFishing.Phase.Reeling)
         {
             return default;

@@ -95,7 +95,7 @@ public enum StatType
     ForageSpeed = 45,
     /// <summary>Chance from 0 to 1 of one extra of a plant's main yield (by hand or sickle), on top of Extra Yield Chance.</summary>
     ForageYield = 46,
-    /// <summary>Share wider the catch zone on the fishing reel.</summary>
+    /// <summary>Share more line control when fishing: the line holds longer at full strain or slack, and fish tire sooner.</summary>
     ReelZone = 47,
     /// <summary>Share more damage from the player's arrows.</summary>
     ArrowDamage = 48,

@@ -43,6 +43,16 @@ public sealed class PlayerCameraSettings : ScriptableObject
     [Tooltip("Seconds the view takes to turn to something a story points at (Focus Camera) and back.")]
     [SerializeField, Min(0.01f)] private float focusBlendTime = 1.5f;
 
+    [Header("Close up (a fish on the line)")]
+    [Tooltip("Seconds the view takes to come down close to something the player is busy with, and to go back.")]
+    [SerializeField, Min(0.01f)] private float closeUpBlendTime = 1.1f;
+    [Tooltip("Pitch of the close view, lower than the usual framing so the water and the ground fill more of it.")]
+    [SerializeField, Range(15f, 80f)] private float closeUpPitch = 34f;
+    [Tooltip("Distance of the close view, in metres; it pulls back as far as it must to keep the player and the subject in view.")]
+    [SerializeField, Min(2f)] private float closeUpDistance = 9f;
+    [Tooltip("Room kept round the player and the subject at the screen's edges, in metres.")]
+    [SerializeField, Min(0f)] private float closeUpMargin = 3f;
+
     [Header("Input")]
     [Tooltip("Zoom change (0-1 of the state's range) per mouse wheel notch.")]
     [SerializeField, Range(0.01f, 0.5f)] private float zoomStep = 0.1f;
@@ -100,6 +110,10 @@ public sealed class PlayerCameraSettings : ScriptableObject
     public float DialogueTargetSmoothTime => dialogueTargetSmoothTime;
     public float DialogueMaxLean => dialogueMaxLean;
     public float FocusBlendTime => focusBlendTime;
+    public float CloseUpBlendTime => closeUpBlendTime;
+    public float CloseUpPitch => closeUpPitch;
+    public float CloseUpDistance => closeUpDistance;
+    public float CloseUpMargin => closeUpMargin;
     public float TransitionTime => transitionTime;
     public float ZoomSmoothTime => zoomSmoothTime;
     public float LookAheadSmoothTime => lookAheadSmoothTime;
