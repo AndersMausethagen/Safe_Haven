@@ -316,6 +316,20 @@ opens (`UIStyle` › Window Fade Seconds, `CanvasGroup` on its content, added if
 animation should only move things, not touch the alpha. The fade advances by a capped step, so a slow first frame can't use it up, and a window
 that reopens within a tenth of a second (the next line of a conversation) doesn't fade again.
 
+**Hearthline 2** (`AgentScripts/BuildHearthline2.cs`; art from `Tools/UI/hearthline_art.py`, the hover tick from
+`Tools/Audio/hover.py`). A full-screen window (a canvas sorted at 100 or more: the Haven, skills, journal, raid planner, pause)
+lays a blurred, dimmed picture of the game under itself: `UIWindow` tells `UIBackdrop`, which shows `UIBlurFeature.Output` (a
+quarter-resolution blur of the finished frame, made only while wanted) on its own overlay canvas one below the window. A `UIRole`
+window gets the `UI/Hearthline Panel` material (lift, inner shadow, grain; solid) when its image has no sprite, and its own `Title`
+label (searched three levels down; tooltips excluded) is carved in the display face (`UIStyle.Display`: Cinzel, a shadowed title
+material made from Cinzel's own atlas, a vertex gradient) with `HearthlineArt.AddTitleRule` under it, placed from the text's last
+baseline because the shadow pads the text bounds. `UIStyle.Title` stays the serif for names and headings inside windows: the Haven
+overview's camp name uses it. A primary button gets a glow sibling (`HearthlineArt.AddGlow`, `UIGlowFollow`, which copies the
+button's real rectangle, not its `sizeDelta`, as a stretched button's isn't its size). `ItemSlotView` lights rare things from
+behind the icon and adds `SlotShimmer` to the best; `ItemTooltipView` tints a header band by rarity (a solid mix, never a wash),
+glows rare names (a cached `GLOW_ON` copy of the title material per rarity) and compares gear score with what is worn in the same
+slot. `UIPress` plays `AudioSettings` › Hover; `UICursor` sets the Hearthline pointer.
+
 ### Story pacing: room between beats
 
 Quests that start by themselves (**Automatically**, **On Quest Event**) don't start on the spot. `QuestManager.Begin` asks
@@ -718,6 +732,30 @@ GDD §9.1. A raid with **Raid Definition › Layout Rules** gets a new map from 
 **Raid tiers and gear score:** a raid's `RaidDifficulty` rows are the tiers the portal offers; the planner starts on the highest one `GearScore` is ready for, and `RaidLauncher.CheckGear` refuses anyone under its floor. `RaidSession.Tier` and `Difficulty` carry the choice into the run. The tier's multipliers go through `RaidParameters` like any modifier, spawn entries and map trees have From and To (`RaidSpawnList.EntriesFor`, `RaidMapDefinition.UseGenerated`), and `RaidDifficulty.Allows` caps drops and switches off `ResourceNode`s. `GearBalance` measures a kit against a tier. Higher tiers also change what creatures do: a `MonsterAttack` with From Tier is only chosen in raids of that tier or above, so a new ability is a row of data on the monster (`AgentScripts/BuildRaidAbilities.cs`, run after `BuildRaidTiers`). A monster with any actions never uses its plain attack, so one action has to be for every tier. `MonsterAttacks.HoldsGround` decides when one stops rather than closes in. **Elites** (`Raids/Elites`): `RaidElites` promotes creatures from the raid's seed once the raid begins, and rolls a chance on hunters sent later; `EliteCreature` applies an `EliteAffixDefinition`'s numbers and `EliteBehaviour`s, marks the creature with a ring and a name, and pays the tier's Elite Loot on a player's kill. A new affix with existing behaviours is only an asset; a new kind of behaviour is a `[Serializable]` subclass. The playtest log writes a `RaidTier` row before each `RaidFinished`, and the Run Comparison window adds them up per tier. Why these numbers, and how to tune them: [gear score and raid tiers](../../../Docs/GearScoreAndRaidTiers.md). Set up by `AgentScripts/BuildRaidTiers.cs`.
 
 Content: `AgentScripts/BuildRaidLayout.cs`, then `AgentScripts/BuildRaidWater.cs` (ponds, plants, mist; run it after `BuildRaidLook`, which takes the prologue's mist back).
+
+## World rendering: light, weather on surfaces, decals
+
+Content: `AgentScripts/BuildRendering.cs`, `BuildWeatherSurfaces.cs`, `BuildDecals.cs` (textures from `Tools/Decals/decals.py`);
+numbers in `Resources/RenderingSettings`. `WorldRendering` (an `IGameSystem`) owns the runtime parts and re-binds them per scene.
+- **Tonemapping.** `FilmicTonemapping` (a volume override) with `TonemapFeature` after the Atmosphere feature: Khronos PBR Neutral
+  or AgX before URP's post-processing, so a volume using it sets URP's Tonemapping to None and Bloom's threshold is in screen range.
+  The Haven's base volume uses Neutral; the raids keep ACES.
+- **Light.** `FollowReflectionProbe` (realtime, a face a frame, when the player moves or the hour turns), `CloudShadows` (a tiling
+  cookie on the sun; URP takes only a Texture2D as a sun cookie, so the drawn pattern is copied on the GPU into one; at home
+  only), four shadow cascades. `SkyOcclusionMap` draws a top-down height map round the player through the Sky Occlusion Renderer
+  (a Render Objects override pass, pipeline renderer #1) and `Shaders/SkyOcclusion.hlsl` dims indirect light under cover and keeps
+  rain and snow off what stands under a roof. Not in the generated terrain: one more texture took it over its limit.
+- **Weather on surfaces.** `Shaders/SurfaceWetness.hlsl` soaks whatever has "Weather Settles On It" (the old snow toggle) plus trees
+  and grass; the terrain's puddles are its own (`GenerateWorldTerrainShader.py`). Include SurfaceWetness before SeasonSnow, and in
+  ASE shaders after URP's Lighting.hlsl (it needs `_Time`).
+- **Decals.** URP's Decal feature, screen space (the terrain's DBuffer variant turned it grey, and with decal layers on nothing
+  lands on the terrain, whose depth pass writes no rendering layers; so no angle fade: keep decal boxes thin). `DecalPool` (blood
+  via `BloodDecals`, tinted per colour from one atlas, and `FootprintDecals`), `GroundWear` (trampled earth, scorch, wall grime on
+  standing buildings, as children of them).
+- **Fog, water, fire.** The atmosphere accumulates over frames (`AtmosphereFeature` › History Weight, a Resolve pass with
+  reprojection and neighbourhood clamping); water adds screen-space reflection (loads, not samples, inside the march loop: a
+  gradient instruction there is a compiler warning `WaterTests` catches); `LightFlicker` gives fires heat haze and embers that
+  light; `EffectParticle` fades softly into what it meets.
 
 ## Drawing a large world from a top-down camera
 
