@@ -37,7 +37,8 @@ In the user's order. Fishing first, then the rest.
 ## Third playtest list (2026-11-08)
 
 After the second list, in this order.
-- [ ] A stream interactable is still near the Haven, though the stream was moved.
+- [x] A stream interactable is still near the Haven, though the stream was moved. The old stream's Drinking Spot,
+      kept by the Haven rework, stood on dry ground at (44, 6); removed (any drinkable water serves).
 - [ ] The portal: visit a friend's Haven or invite a friend to ours, so co-op is part of the lore and the world's things.
 - [ ] The things in the base to clear have a flat square round them, like a see-through square on the ground. Remove it.
 - [ ] The highlight sometimes crosses inside an object instead of following only its outline.

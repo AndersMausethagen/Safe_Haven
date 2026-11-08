@@ -42,9 +42,9 @@ public static class BuildHavenWorld
             Object.DestroyImmediate(tile.gameObject);
         }
 
+        // The old stream goes with its drinking spot: any drinkable water serves now (WaterSurface.Drinkable), and a spot
+        // kept from it was left stranded on dry ground when the river replaced it.
         GameObject stream = GameObject.Find("Stream");
-        Transform drinking = stream != null ? stream.transform.Find("Drinking Spot") : null;
-        if (drinking != null) drinking.SetParent(null, true);
         if (stream != null) Object.DestroyImmediate(stream);
 
         RiverFeature river = Features();
@@ -106,8 +106,6 @@ public static class BuildHavenWorld
             if (!skip.Contains(root.name)) targets.Add(root.transform);
         }
 
-        GameObject stream = GameObject.Find("Stream/Drinking Spot");
-        if (stream != null) targets.Add(stream.transform);
         var heights = new Dictionary<Transform, float>();
         foreach (Transform target in targets.Distinct())
         {
