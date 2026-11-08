@@ -163533,6 +163533,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5137951b044e20d499e1acee933bbea3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: SafeHaven::TerrainTreeMemory
+  keepFelled: 1
 --- !u!114 &954570857
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -179822,7 +179823,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3995415526987974039, guid: 83e508b71ba177149a0f08689ff8aea4, type: 3}
       propertyPath: ruinText
-      value: The stones that dropped you here, cracked and cold. A faint hum lingers in them, and under it a voice you know. Life Orbs might wake them.
+      value: 'The stones that dropped you here, cracked and cold. A faint hum lingers in them, and under it a voice you know. Three Life Orbs would wake them: the rootbound stones around the clearing still hold some.'
       objectReference: {fileID: 0}
     - target: {fileID: 3995415526987974039, guid: 83e508b71ba177149a0f08689ff8aea4, type: 3}
       propertyPath: windowRange
@@ -180000,6 +180001,12 @@ MonoBehaviour:
   - quest: {fileID: 11400000, guid: f89173a9aeb790c4f9aeb1cc56e0e655, type: 2}
     text: <i>Build your fire inside my ward, and a table to work at beside it. Open the build menu (G). The sooner it burns, the sooner they can see it.</i>
     moment: {fileID: 0}
+  - quest: {fileID: 11400000, guid: 56c6112e347c2994db25d8808b5e4599, type: 2}
+    text: <i>What you carry through me, the woods can take from you. What you leave here, I keep. Build a chest beside your workshop (G), and put in it what you cannot bear to lose.</i>
+    moment: {fileID: 0}
+  - quest: {fileID: 11400000, guid: 1f3262601d6fae14abe8db6df70ed0b4, type: 2}
+    text: <i>A hatchet fells trees. It will not keep the wolves off you. Make something to fight with at your workshop, and carry it.</i>
+    moment: {fileID: 0}
   - quest: {fileID: 11400000, guid: 9ffed2822f546824fa97d9d34216d5d5, type: 2}
     text: <i>Now feed yourself. Berries, water from the stream, a stew over your fire. You will be walking people home.</i>
     moment: {fileID: 0}
@@ -180011,6 +180018,12 @@ MonoBehaviour:
     moment: {fileID: 0}
   - quest: {fileID: 11400000, guid: 08ed06b5fb8d1854c86788aa2a00156f, type: 2}
     text: <i>Make yourself tools and go. Take what the woods will give you, and come home before the way closes. It will not wait, and neither will the wolves.</i>
+    moment: {fileID: 0}
+  - quest: {fileID: 11400000, guid: 449fc8864f45d83459f6ef5d2c3d8ea8, type: 2}
+    text: '<i>You brought the woods home on your back. Now make something of them: a lodge by the trees, a saw that turns logs into planks. The smithy and the walls start with a plank.</i>'
+    moment: {fileID: 0}
+  - quest: {fileID: 11400000, guid: d215378a9433ba6498ac63dfe30d9cc4, type: 2}
+    text: <i>My ward keeps out the worst of the forest, not all of it. Put a wall between your fire and the trees.</i>
     moment: {fileID: 0}
   - quest: {fileID: 11400000, guid: f7e615034e347bc438f7fdf1f08bd615, type: 2}
     text: <i>She is close, little one. Just beyond me, off the path, hiding. Find her, keep her near you, and bring her through.</i>

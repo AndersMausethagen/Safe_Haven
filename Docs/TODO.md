@@ -65,13 +65,20 @@ After the second list, in this order.
 - [x] Debris falls off trees from time to time: in clear weather it should fall nearly straight down, and drift with the
       wind when breezy or stormy. Calm (tree wind up to 0.9: clear, mist, fog): half as many, no sideways push, a little
       turning; breezy and stormy carry them harder (2.2x as many fell in clear weather before).
-- [ ] Quest "They are still out there": how to reactivate the portal isn't said. Meanwhile building quests pile up. New
+- [x] Quest "They are still out there": how to reactivate the portal isn't said. Meanwhile building quests pile up. New
       order: quests that teach the mechanics first (a chest for safe storage, gear to gather for it, a basic weapon), then
-      opening the portal for the first raid. Saving the first NPC unlocks the building they work at.
-- [ ] An NPC, Hild, appeared in the Haven with no explanation. NPCs don't just appear: each is saved on a raid, in a designed
+      opening the portal for the first raid. Saving the first NPC unlocks the building they work at. Now (`BuildOpeningOrder`):
+      tools, Workshop and campfire, A Safe Place (Small Chest), Something to Fight With (Knotted Club), food, Life Orbs, the
+      portal, the first raid; the Woodcutter's Lodge, walls and A Growing Home only after it. The quest says three Life Orbs
+      wake the portal and that The First Days lead there; the portal says so too. Ingrid, the first rescue, opens the Altar.
+- [ ] Rescue order: approve or change the proposal in [Docs/RescueOrder.md](RescueOrder.md), then build it (each job
+      teaches its workplace, rumours ordered by who is home, Smithy after the Workshop, sites for Hild, Asa, Gunnar, Yrsa).
+- [x] An NPC, Hild, appeared in the Haven with no explanation. NPCs don't just appear: each is saved on a raid, in a designed
       order that unlocks buildings as the player needs them, each one solving a problem. The user's outline: good gear and
       repairing it; refining (wood to planks); better tools; moving goods (wheelbarrows, boats); copper (stronger armour, tools,
       weapons). Research how similar games bring in a problem and its answer through their mechanics, and suggest the flow.
+      Nobody arrives with a rank now (HavenSettings › Ranks: no settlers); the flow is the proposal above. Hild stays in a
+      save she already joined.
 
 ## Prologue playtest (2026-11-08)
 

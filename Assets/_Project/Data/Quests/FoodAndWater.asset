@@ -23,7 +23,7 @@ MonoBehaviour:
   announceCompletion: 1
   showTimerInHud: 0
   prerequisites:
-  - {fileID: 11400000, guid: d215378a9433ba6498ac63dfe30d9cc4, type: 2}
+  - {fileID: 11400000, guid: 1f3262601d6fae14abe8db6df70ed0b4, type: 2}
   startedFirst: []
   start: 0
   startEvent: {fileID: 0}
@@ -94,25 +94,6 @@ MonoBehaviour:
     description: 
     amount: 1
     item: {fileID: 11400000, guid: 253fefd8f83ac6e4c89379e2ad873d6c, type: 2}
-    resource: {fileID: 0}
-    monster: {fileID: 0}
-    faction: 1
-    building: {fileID: 0}
-    raid: {fileID: 0}
-    mustExtract: 1
-    withinMinutes: 0
-    questEvent: {fileID: 0}
-    person: {fileID: 0}
-    target: {fileID: 0}
-    job: {fileID: 0}
-    breach: {fileID: 0}
-    rank: 1
-    bringHome: 0
-    countAlreadyOwned: 0
-  - type: 4
-    description: Make a Knotted Club at the Workshop
-    amount: 1
-    item: {fileID: 11400000, guid: 4ca32159a9749ec43b3e7cd7b16436b2, type: 2}
     resource: {fileID: 0}
     monster: {fileID: 0}
     faction: 1

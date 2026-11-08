@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::QuestDefinition
   id: prologue.find_the_expedition
   displayName: They Are Still Out There
-  description: You heard Sigrid through the dormant stones. Your companions may still be alive. Inspect the portal, establish a foothold around it, and use Life Orbs to restore the connection.
+  description: 'You heard Sigrid through the dormant stones, so someone out there is alive. The portal wakes again with three Life Orbs, held by the rootbound stones around the clearing. Before you can free them and go through you need tools, a workshop, a chest for what you can''t afford to lose and a weapon: the quests of The First Days lead there one step at a time.'
   chain: The Lost Expedition
   journalNotes: You heard Sigrid's voice in the stones, and you are sure of it. That means at least one person is alive, and perhaps others who could hear you too if you could be louder.
   rank: 0
@@ -50,7 +50,7 @@ MonoBehaviour:
   closedBy: {fileID: 0}
   startDelay: 0
   onStarted: []
-  objectivesInOrder: 0
+  objectivesInOrder: 1
   objectives:
   - type: 11
     description: Inspect the dormant portal
@@ -72,7 +72,7 @@ MonoBehaviour:
     bringHome: 0
     countAlreadyOwned: 1
   - type: 6
-    description: Reactivate the portal to search for the expedition
+    description: Wake the portal with three Life Orbs (follow The First Days)
     amount: 1
     item: {fileID: 0}
     resource: {fileID: 0}

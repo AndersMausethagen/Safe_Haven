@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::QuestDefinition
   id: woodcutterslodge
   displayName: The Woodcutter's Lodge
-  description: A hatchet is slow work. A lodge with a sawbench turns logs into planks, and gives a woodcutter somewhere to work from. Build it near the trees (G).
+  description: You came home with hardwood on your back, and a hatchet won't make planks of it. A lodge with a sawbench turns logs into planks, and the smithy, the walls and the storage shed all start with a plank. Build it near the trees (G).
   chain: The First Days
   journalNotes: Planks, not logs. That is the difference between a camp and a place people stay.
   rank: 0
@@ -23,10 +23,30 @@ MonoBehaviour:
   announceCompletion: 1
   showTimerInHud: 0
   prerequisites:
-  - {fileID: 11400000, guid: f89173a9aeb790c4f9aeb1cc56e0e655, type: 2}
+  - {fileID: 11400000, guid: 08ed06b5fb8d1854c86788aa2a00156f, type: 2}
   startedFirst: []
   start: 0
   startEvent: {fileID: 0}
+  startWhen:
+    type: 0
+    description: 
+    amount: 1
+    item: {fileID: 0}
+    resource: {fileID: 0}
+    monster: {fileID: 0}
+    faction: 1
+    building: {fileID: 0}
+    raid: {fileID: 0}
+    mustExtract: 1
+    withinMinutes: 0
+    questEvent: {fileID: 0}
+    person: {fileID: 0}
+    target: {fileID: 0}
+    job: {fileID: 0}
+    breach: {fileID: 0}
+    rank: 1
+    bringHome: 0
+    countAlreadyOwned: 0
   closedBy: {fileID: 0}
   startDelay: 0
   onStarted: []
@@ -44,6 +64,12 @@ MonoBehaviour:
     mustExtract: 1
     withinMinutes: 0
     questEvent: {fileID: 0}
+    person: {fileID: 0}
+    target: {fileID: 0}
+    job: {fileID: 0}
+    breach: {fileID: 0}
+    rank: 1
+    bringHome: 0
     countAlreadyOwned: 1
   turnInToGiver: 0
   turnInTo: 

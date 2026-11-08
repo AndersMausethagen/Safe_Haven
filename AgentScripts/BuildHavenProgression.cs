@@ -829,14 +829,14 @@ public static class BuildHavenProgression
             SetStats(bonuses, new[] { (StatType.MaxStamina, StatModifierOp.Percent, 0.15f), (StatType.MaxHealth, StatModifierOp.Percent, 0.1f) });
             SerializedProperty ranks = so.FindProperty("ranks");
             int[] renown = { 0, 25, 90, 180, 300 };
-            ResidentDefinition[] settlers = { null, hild, asa, gunnar, yrsa };
+            // Nobody arrives with a rank (playtest 2026-11-08: Hild turned up unexplained). Everyone comes home from a raid.
             for (int i = 0; i < ranks.arraySize && i < renown.Length; i++)
             {
                 ranks.GetArrayElementAtIndex(i).FindPropertyRelative("renown").intValue = renown[i];
-                ranks.GetArrayElementAtIndex(i).FindPropertyRelative("settler").objectReferenceValue = settlers[i];
+                ranks.GetArrayElementAtIndex(i).FindPropertyRelative("settler").objectReferenceValue = null;
             }
         });
-        return "people: Hild, Asa, Gunnar and Yrsa come with the ranks; Bjarne smelts moonsilver; Liv keeps two runes of her own; Sigrid adds 2 minutes";
+        return "people: nobody comes with a rank; Bjarne smelts moonsilver; Liv keeps two runes of her own; Sigrid adds 2 minutes";
     }
 
     private static void Job(string file, string id, string label, string description, string accept, string workplace, params (string recipe, int stock, int keep)[] orders)

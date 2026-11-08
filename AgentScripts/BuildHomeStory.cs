@@ -53,7 +53,7 @@ public static class BuildHomeStory
         Text("AwakeningThePortal", null, "At the heart of the clearing stand the stones that dropped you here. Feed them the Life Orbs and the way back to your people opens.");
         Text("ThroughThePortal", null, "Your people are past the door, and the Misty Woods won't wait. Craft stone tools by hand from your bag (B), then step through. Bring home hardwood and iron ore for the haven, and get back to an extraction point before the portal closes. Carried things are lost if you fall; your tools and weapon come back damaged.");
         Text("KnowYourEnemy", null, "Forest-Bitten Wolves hunt the Misty Woods, on the same paths your people must walk home. Thin their numbers before they grow bolder.");
-        Text("AGrowingHome", null, "Ingrid was the first. When the others come through that door they will need more than a fire: Tor will ask for a woodcutter's lodge before supper, Bjarne for a smithy, and everyone for somewhere dry to set down what they carried. Build them.");
+        Text("AGrowingHome", null, "Ingrid was the first. When the others come through that door they will need more than a fire: Bjarne will want a smithy, and everyone somewhere dry to set down what they carried. Build them.");
         Text("TheWeakeningWard", null, "The light that called Ingrid home was seen by other things too. Something is testing the ward. Prepare, then speak to the portal when you are ready.");
         Text("SmithsRequest", null, "An old note on the board, in the last smith's hand: this hearth wants copper, and proof you can work it.");
     }
@@ -241,7 +241,7 @@ public static class BuildHomeStory
 
         Whispers(tree, waking);
         var portalData = new SerializedObject(portal);
-        portalData.FindProperty("ruinText").stringValue = "The stones that dropped you here, cracked and cold. A faint hum lingers in them, and under it a voice you know. Life Orbs might wake them.";
+        portalData.FindProperty("ruinText").stringValue = "The stones that dropped you here, cracked and cold. A faint hum lingers in them, and under it a voice you know. Three Life Orbs would wake them: the rootbound stones around the clearing still hold some.";
         portalData.ApplyModifiedPropertiesWithoutUndo();
         var board = new SerializedObject(Object.FindAnyObjectByType<QuestGiver>(FindObjectsInactive.Include));
         board.FindProperty("greeting").stringValue = "\"To whoever comes after: this hearth wants copper, and hands that can work it. Smelt ingots and make a pickaxe. What I left behind this board is yours.\" - the last smith";
@@ -323,10 +323,15 @@ public static class BuildHomeStory
             ("Awakening", "<i>Listen, little one. Rest your hand on the stone.</i>", waking),
             ("SettlingIn", "<i>Start with what the clearing gives. Fallen branches, loose stones, your own two hands. That is how every hearth began. Your resource bars (I) will fill.</i>", null),
             ("FirstCamp", "<i>Build your fire inside my ward, and a table to work at beside it. Open the build menu (G). The sooner it burns, the sooner they can see it.</i>", null),
+            // SafeKeeping and FirstWeapon are made by BuildOpeningOrder; run it once before running this again.
+            ("SafeKeeping", "<i>What you carry through me, the woods can take from you. What you leave here, I keep. Build a chest beside your workshop (G), and put in it what you cannot bear to lose.</i>", null),
+            ("FirstWeapon", "<i>A hatchet fells trees. It will not keep the wolves off you. Make something to fight with at your workshop, and carry it.</i>", null),
             ("FoodAndWater", "<i>Now feed yourself. Berries, water from the stream, a stew over your fire. You will be walking people home.</i>", null),
             ("RootboundStones", "<i>The forest has put its roots in even here. Three stones around the clearing still hold my light, choked and cold. Free them, and bring the Life Orbs back.</i>", null),
             ("AwakeningThePortal", "<i>Now bring me what you freed. Feed me that light and I will open for you, as I did in the dark.</i>", null),
             ("ThroughThePortal", "<i>Make yourself tools and go. Take what the woods will give you, and come home before the way closes. It will not wait, and neither will the wolves.</i>", null),
+            ("WoodcuttersLodge", "<i>You brought the woods home on your back. Now make something of them: a lodge by the trees, a saw that turns logs into planks. The smithy and the walls start with a plank.</i>", null),
+            ("RaiseTheWalls", "<i>My ward keeps out the worst of the forest, not all of it. Put a wall between your fire and the trees.</i>", null),
             ("AStrangerInTheMist", "<i>She is close, little one. Just beyond me, off the path, hiding. Find her, keep her near you, and bring her through.</i>", null),
             ("AGrowingHome", "<i>One fire brought Ingrid home. The others will want more than a fire: a bench, a furnace, a dry place to set down what they carry. Build what they will need.</i>", null),
             ("TheWeakeningWard", "<i>The light that reached her reached other things as well. They are on the old path now, testing me. Prepare yourself. When you are ready, tell me, and I will let them come.</i>", null),

@@ -49,22 +49,22 @@ MonoBehaviour:
     wardBonus: 3
     line: Someone lives here now. The ward reaches further.
     reachedEvent: {fileID: 0}
-    settler: {fileID: 11400000, guid: f8b63bb3e2db2fb44947d33b612f80f3, type: 2}
+    settler: {fileID: 0}
   - name: Hamlet
     renown: 90
     wardBonus: 6
     line: Smoke from more than one chimney.
     reachedEvent: {fileID: 0}
-    settler: {fileID: 11400000, guid: ec38b2d8e58d6d84899dfeda6a4f8aeb, type: 2}
+    settler: {fileID: 0}
   - name: Village
     renown: 180
     wardBonus: 10
     line: Travellers speak of a light in the old wood.
     reachedEvent: {fileID: 0}
-    settler: {fileID: 11400000, guid: 9f83966b2e3c8fe42a58fd9d130cb08e, type: 2}
+    settler: {fileID: 0}
   - name: Haven
     renown: 300
     wardBonus: 15
     line: A true haven. The forest itself seems to breathe easier.
     reachedEvent: {fileID: 0}
-    settler: {fileID: 11400000, guid: 15e2a45207d23dd49a4a3a93e8bb8161, type: 2}
+    settler: {fileID: 0}

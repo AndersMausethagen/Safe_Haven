@@ -329,42 +329,7 @@ public static class BuildFoundation
             SetGather(objectives.GetArrayElementAtIndex(2), "Sticks", 6);
             so.FindProperty("description").stringValue = "A hearth starts small. Craft a stone hatchet and pickaxe from your bag (B), then gather what the clearing offers: enough for a fire and a workshop.";
         });
-        Edit(Find<QuestDefinition>("FoodAndWater"), so =>
-        {
-            SerializedProperty objectives = so.FindProperty("objectives");
-            for (int i = 0; i < objectives.arraySize; i++)
-            {
-                if (objectives.GetArrayElementAtIndex(i).FindPropertyRelative("item").objectReferenceValue == Item("KnottedClub"))
-                {
-                    return;
-                }
-            }
-
-            objectives.arraySize++;
-            SerializedProperty added = objectives.GetArrayElementAtIndex(objectives.arraySize - 1);
-            added.Copy();
-            added.FindPropertyRelative("type").enumValueIndex = TypeOfCraft(objectives);
-            added.FindPropertyRelative("description").stringValue = "Make a Knotted Club at the Workshop";
-            added.FindPropertyRelative("amount").intValue = 1;
-            added.FindPropertyRelative("item").objectReferenceValue = Item("KnottedClub");
-            added.FindPropertyRelative("questEvent").objectReferenceValue = null;
-            added.FindPropertyRelative("countAlreadyOwned").boolValue = true;
-        });
-        return "quests: Gifts of the Clearing gathers what a workshop costs; Strength for the Road makes the first weapon";
-    }
-
-    private static int TypeOfCraft(SerializedProperty objectives)
-    {
-        for (int i = 0; i < objectives.arraySize; i++)
-        {
-            SerializedProperty type = objectives.GetArrayElementAtIndex(i).FindPropertyRelative("type");
-            if (type.enumDisplayNames[type.enumValueIndex] == "Craft Item")
-            {
-                return type.enumValueIndex;
-            }
-        }
-
-        throw new InvalidOperationException("FoodAndWater has no craft objective to copy the type from");
+        return "quests: Gifts of the Clearing gathers what a workshop costs (the first weapon has its own quest: BuildOpeningOrder)";
     }
 
     private static void SetGather(SerializedProperty objective, string item, int amount)

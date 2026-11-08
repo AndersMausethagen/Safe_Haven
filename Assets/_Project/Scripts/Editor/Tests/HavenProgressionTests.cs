@@ -180,7 +180,7 @@ public sealed class HavenProgressionTests
     }
 
     [Test]
-    public void Ranks_LandThroughTheGame_AndBringPeopleWhoCanWork()
+    public void Ranks_LandThroughTheGame()
     {
         IReadOnlyList<HavenSettings.Rank> ranks = HavenSettings.Current.Ranks;
         for (int i = 1; i < ranks.Count; i++)
@@ -189,12 +189,7 @@ public sealed class HavenProgressionTests
         }
 
         Assert.Greater(ranks[ranks.Count - 1].renown, 180, "the top rank waits for the late game");
-        foreach (HavenSettings.Rank rank in ranks.Where(one => one.settler != null))
-        {
-            Assert.IsNotEmpty(rank.settler.Jobs, rank.settler.name);
-            Assert.NotNull(rank.settler.Jobs[0], rank.settler.name);
-            Assert.IsNotEmpty(rank.settler.Jobs[0].WorkOrders, rank.settler.name);
-        }
+        // Nobody comes with a rank any more (HomeStoryTests.NoRank_BringsSomeone): people are found on raids.
     }
 
     [Test]
