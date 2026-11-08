@@ -35,6 +35,12 @@ public sealed class FocusCameraNode : StoryNode
 
     public override IEnumerator Run(StoryContext context)
     {
+        // Around a fight the camera stays with the player.
+        if (context.InFight)
+        {
+            yield break;
+        }
+
         PlayerCameraController camera = PlayerCameraController.Current;
         if (camera == null || target == null)
         {

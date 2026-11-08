@@ -47,6 +47,11 @@ fight isn't held: it shows as a subtitle. **Wait For Quiet** waits for the end o
 have no line. Stories that start from a quest wait with it, as quests leave room for themselves (see the quest's **Start
 Delay**).
 
+A story that is part of a fight (it has **Spawn Enemies**, **Wait Until Defeated**, **Creature Hunts** or **When Zone
+Cleared**) never stops the play: every **Say** in it is spoken as an aside, and **Focus Camera** does nothing, before, during
+and after the fight. A word from someone is enough there (the user's call, 2026-11-08); keep conversations and camera moves
+for quiet stories.
+
 ## Examples
 
 `Scenes/Demo/StoryDemo.unity` (built by `AgentScripts/BuildStoryDemo.cs`) has both:

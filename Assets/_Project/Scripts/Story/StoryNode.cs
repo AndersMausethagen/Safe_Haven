@@ -28,6 +28,10 @@ public sealed class StoryContext
     }
 
     public StoryScript Script { get; }
+
+    /// <summary>The story is part of a fight (<see cref="StoryScript.IsFight"/>): its lines are spoken asides and the
+    /// camera stays with the player, so nothing stops the play before, during or after it.</summary>
+    public bool InFight => Script != null && Script.IsFight;
     public Player Player => Player.Current;
 
     /// <summary>The output the node just run leaves through (a choice's answer). 0 for most nodes; -1 stops here.</summary>
@@ -58,6 +62,10 @@ public abstract class StoryNode
 
     /// <summary>True for nodes that start a story (no input).</summary>
     public virtual bool IsTrigger => false;
+
+    /// <summary>True for nodes that start, wait on or end a fight (spawning enemies, a zone being cleared, a creature
+    /// set hunting): a story with one speaks in asides and doesn't turn the camera (<see cref="StoryContext.InFight"/>).</summary>
+    public virtual bool IsFight => false;
 
     public virtual int OutputCount => 1;
 

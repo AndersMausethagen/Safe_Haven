@@ -17,7 +17,9 @@ In the user's order. Fishing first, then the rest.
       10 m of the camp (Stay Within: `MonsterAI.HoldsHome`, `LeashOverride`); Reach Portal's companions Flee to the portal.
 - [x] Prologue: Ingrid heals the player when their health is low (alchemists, so Sigrid too: at half health, 35 % back, a
       spoken aside, every 10 s at most).
-- [ ] Quests: no camera moves and no dialogue boxes before and after fights; a spoken comment from someone is enough.
+- [x] Quests: no camera moves and no dialogue boxes before and after fights; a spoken comment from someone is enough.
+      A story with a fight node speaks in asides and doesn't turn the camera (`StoryScript.IsFight`); the camp and portal
+      warnings are asides.
 - [ ] Start camera: the map-edge limit (`ViewBounds`) overrides it. Remove the limit; bring back the invisible walls that
       keep the player on the map (the map will be extended so its edge can't be seen).
 - [ ] More than 30 arrows: let the stack (or quiver) hold more.

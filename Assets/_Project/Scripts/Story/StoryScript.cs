@@ -35,6 +35,24 @@ public sealed class StoryScript : MonoBehaviour, ISaveable, ISharedState
     private int running;
 
     public IReadOnlyList<StoryNode> Nodes => nodes;
+
+    /// <summary>The story starts, waits on or ends a fight (a node's <see cref="StoryNode.IsFight"/>): its lines are spoken
+    /// asides and it never turns the camera, so before, during and after a fight the play goes on.</summary>
+    public bool IsFight
+    {
+        get
+        {
+            foreach (StoryNode node in nodes)
+            {
+                if (node != null && node.IsFight)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+    }
     public IReadOnlyList<StoryLink> Links => links;
 
     /// <summary>True while any part of the story is running.</summary>

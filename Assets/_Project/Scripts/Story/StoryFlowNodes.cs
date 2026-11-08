@@ -42,6 +42,8 @@ public sealed class WaitUntilDefeatedNode : StoryNode
 {
     public MobSpawnZone zone;
 
+    public override bool IsFight => true;
+
     public override string Title => "Wait Until Enemies Are Defeated";
     public override string Category => "Flow";
 

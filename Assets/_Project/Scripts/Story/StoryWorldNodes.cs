@@ -17,6 +17,8 @@ public sealed class SpawnEnemiesNode : StoryNode
     [Tooltip("Carry on only once everything it spawned is dead.")]
     public bool waitUntilDefeated;
 
+    public override bool IsFight => true;
+
     public override string Title => "Spawn Enemies";
     public override string Category => "World";
 
@@ -101,6 +103,8 @@ public sealed class CreatureHuntsNode : StoryNode
     [Tooltip("Once there it stays: it fights anyone within this many metres of the place and chases no further, and what " +
              "it meets on the way doesn't stop it. 0: it hunts as it likes from wherever it finds someone.")]
     [Min(0f)] public float stayWithin;
+
+    public override bool IsFight => true;
 
     public override string Title => hunt ? "Creature Hunts" : "Creature Stops Hunting";
     public override string Category => "World";

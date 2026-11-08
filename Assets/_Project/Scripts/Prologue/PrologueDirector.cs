@@ -222,8 +222,7 @@ public sealed class PrologueDirector : MonoBehaviour
             bool line = chapter.Quest.Start != QuestStart.ByQuestGiver && !string.IsNullOrWhiteSpace(chapter.ArrivalText);
             if (line && step == PrologueStep.DefendCamp && !restoring)
             {
-                // The camp's wolves come once the warning has been read. Spawned with it, they crossed the clearing
-                // while the camera was on the speaker, and the companions had them down before the player saw them.
+                // The camp's wolves come once the warning has been spoken (an aside, so the player is free meanwhile).
                 wolvesComing = true;
                 Speak(chapter.ArrivalText, () =>
                 {
@@ -286,6 +285,14 @@ public sealed class PrologueDirector : MonoBehaviour
         }
 
         DialogueBox box = DialogueBox.Current;
+        var who = new DialogueSpeaker(speaker.Resident.DisplayName, speaker.transform, null, definition.DialogueCameraDistance);
+        // Before a fight a word is enough: a conversation box and the camera turning to the speaker stopped the play.
+        if (step == PrologueStep.DefendCamp || step == PrologueStep.HoldPortal)
+        {
+            box.Aside(who, text, done);
+            return;
+        }
+
         System.Action finish = null;
         if (done != null)
         {
@@ -298,8 +305,7 @@ public sealed class PrologueDirector : MonoBehaviour
             box.Closed += finish;
         }
 
-        box.Say(new DialogueSpeaker(speaker.Resident.DisplayName, speaker.transform, null, definition.DialogueCameraDistance),
-            text, finish, subtitleTimeMultiplier: 1.8f);
+        box.Say(who, text, finish, subtitleTimeMultiplier: 1.8f);
     }
 
     private void OnGameEvent(GameEvent gameEvent)

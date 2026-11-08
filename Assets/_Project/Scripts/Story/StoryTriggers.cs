@@ -294,6 +294,8 @@ public sealed class WhenPlayerDoes : StoryTrigger
 [Serializable]
 public sealed class WhenZoneCleared : StoryTrigger
 {
+    public override bool IsFight => true;
+
     [Tooltip("Starts when everything this Mob Spawn Zone spawned is dead.")]
     public MobSpawnZone zone;
 

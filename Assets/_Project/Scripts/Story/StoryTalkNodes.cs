@@ -37,7 +37,7 @@ public sealed class SayNode : StoryNode
     [TextArea(2, 5)] public string line;
     [Tooltip("Waits out the pause after a fight (Systems Editor › World › Story Pacing), so a line doesn't land on the last blow. Off: right away.")]
     public bool afterFightPause = true;
-    [Tooltip("Spoken aside, as talk on the road or by the fire: a subtitle that leaves the controls and the camera to the player. It waits for a conversation or another aside to end first.")]
+    [Tooltip("Spoken aside, as talk on the road or by the fire: a subtitle that leaves the controls and the camera to the player. It waits for a conversation or another aside to end first. Every line of a story that is part of a fight is an aside.")]
     public bool aside;
 
     public override string Title => aside ? "Say Aside" : "Say";
@@ -57,7 +57,8 @@ public sealed class SayNode : StoryNode
 
         bool done = false;
         DialogueBox box = DialogueBox.Current;
-        if (aside)
+        // Around a fight a conversation box stops the play: a word from someone is enough.
+        if (aside || context.InFight)
         {
             while (DialogueBox.IsSpeaking)
             {
