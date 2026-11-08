@@ -31352,7 +31352,7 @@ MonoBehaviour:
         - item: {fileID: 11400000, guid: 99887c135c70abc40aae37cfc66809b9, type: 2}
           amount: 1
         - item: {fileID: 11400000, guid: 14b1c5230b317074b8251810d5264494, type: 2}
-          amount: 30
+          amount: 60
         equip: 1
     - rid: 2623125862064848899
       type: {class: WhenQuest, ns: , asm: SafeHaven}
@@ -80628,7 +80628,7 @@ MonoBehaviour:
         - item: {fileID: 11400000, guid: 99887c135c70abc40aae37cfc66809b9, type: 2}
           amount: 1
         - item: {fileID: 11400000, guid: 14b1c5230b317074b8251810d5264494, type: 2}
-          amount: 30
+          amount: 60
         equip: 1
     - rid: 2623125860895687652
       type: {class: RaiseQuestEventNode, ns: , asm: SafeHaven}

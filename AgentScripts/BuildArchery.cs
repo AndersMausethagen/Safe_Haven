@@ -47,7 +47,7 @@ public static class BuildArchery
         Set(bowItem, so => so.FindProperty("weapon").objectReferenceValue = bow);
         ItemDefinition arrowItem = Item("Assets/_Project/Data/Items/CrudeStoneArrow.asset", "crude_stone_arrow", "Crude Stone Arrow",
             "A straight stick with a chipped stone head. Shot by a bow from your bag; the arrow decides the damage.",
-            ItemCategory.Equipment, true, 50, 0.05f, arrowModel);
+            ItemCategory.Equipment, true, 99, 0.05f, arrowModel);
         Set(arrowItem, so => so.FindProperty("arrow").objectReferenceValue = arrow);
 
         Icon(bowItem, bowModel, "CrudeWoodenBow");
@@ -365,7 +365,7 @@ public static class BuildArchery
         ArrowDefinition fire = ArrowKind(ArrowFolder + "/FireArrow.asset", fireProjectile, "Fire Arrow", 10f, 0.65f, 0f, 5f, 8f);
         ItemDefinition fireItem = Item("Assets/_Project/Data/Items/FireArrow.asset", "fire_arrow", "Fire Arrow",
             "An arrow wrapped in flax and lit as it is loosed. Sets creatures burning for a few seconds and lights the fog " +
-            "where it lands. Burns up.", ItemCategory.Equipment, true, 50, 0.06f, fireModel);
+            "where it lands. Burns up.", ItemCategory.Equipment, true, 99, 0.06f, fireModel);
         Set(fireItem, so => so.FindProperty("arrow").objectReferenceValue = fire);
         Icon(fireItem, fireModel, "FireArrow");
 
@@ -375,7 +375,7 @@ public static class BuildArchery
         ArrowDefinition whistle = ArrowKind(ArrowFolder + "/WhistlingArrow.asset", whistleProjectile, "Whistling Arrow", 6f, 0.6f, 0.5f, 0f, 25f);
         ItemDefinition whistleItem = Item("Assets/_Project/Data/Items/WhistlingArrow.asset", "whistling_arrow", "Whistling Arrow",
             "A hollow bone head that shrieks in flight and cracks loudly where it strikes. Monsters far around come to look: " +
-            "shoot it past them to draw them away.", ItemCategory.Equipment, true, 50, 0.05f, whistleModel);
+            "shoot it past them to draw them away.", ItemCategory.Equipment, true, 99, 0.05f, whistleModel);
         Set(whistleItem, so => so.FindProperty("arrow").objectReferenceValue = whistle);
         Icon(whistleItem, whistleModel, "WhistlingArrow");
 

@@ -23,7 +23,8 @@ In the user's order. Fishing first, then the rest.
 - [x] Start camera: the map-edge limit (`ViewBounds`) overrides it. Remove the limit; bring back the invisible walls that
       keep the player on the map (the map will be extended so its edge can't be seen). `ViewBounds` is gone; the prologue's
       Boundary walls were still there (12 to 14 m inside the terrain on every side).
-- [ ] More than 30 arrows: let the stack (or quiver) hold more.
+- [x] More than 30 arrows: let the stack (or quiver) hold more. Arrows stack to 99 (were 50); the bow comes with 60 in the
+      prologue (was 30: the playtest ran out).
 - [ ] Light: a light slot in the Character window, switched with C. Instead of a torch in hand, a lantern on the belt, so
       both hands are free.
 - [ ] New item, Primitive Firefly Lantern: 6 sticks and 1 firefly, made from the inventory; a pale green, flickering glow,
