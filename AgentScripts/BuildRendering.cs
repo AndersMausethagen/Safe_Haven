@@ -29,7 +29,7 @@ public static class BuildRendering
 
     public static string Apply()
     {
-        var report = new List<string> { Settings(), Shadows(), Feature(), Volume(), Haze(), SkyOcclusion(), Sky() };
+        var report = new List<string> { Settings(), Shadows(), Feature(), Volume(), Haze(), SkyOcclusion(), Sky(), AmbientOcclusion() };
         AssetDatabase.SaveAssets();
         return string.Join("; ", report);
     }
@@ -134,6 +134,28 @@ public static class BuildRendering
         EditorUtility.SetDirty(filmic);
         EditorUtility.SetDirty(profile);
         return $"Haven volume: {Curve}";
+    }
+
+    // SSAO seen from the top-down camera, 20-30 m up: at 0.4 m it was a few pixels wide. A wider reach and twelve samples
+    // ground logs, stones and feet in a firmer contact shadow; it stays local, so it doesn't stack with the broad dimming
+    // under cover (SkyOcclusion.hlsl).
+    private static string AmbientOcclusion()
+    {
+        var data = AssetDatabase.LoadAssetAtPath<ScriptableRendererData>(Renderer);
+        ScriptableRendererFeature ssao = data.rendererFeatures.FirstOrDefault(f => f != null && f.GetType().Name == "ScreenSpaceAmbientOcclusion");
+        if (ssao == null)
+        {
+            return "no SSAO";
+        }
+
+        var so = new SerializedObject(ssao);
+        so.FindProperty("m_Settings.Radius").floatValue = 0.8f;
+        so.FindProperty("m_Settings.Intensity").floatValue = 0.8f;
+        so.FindProperty("m_Settings.DirectLightingStrength").floatValue = 0.3f;
+        so.FindProperty("m_Settings.Samples").enumValueIndex = 0; // High: 12
+        so.ApplyModifiedPropertiesWithoutUndo();
+        EditorUtility.SetDirty(data);
+        return "SSAO wider";
     }
 
     // The sky every scene with a clock gets (SkyDome): Shaders/Sky.shader with its default colours.
