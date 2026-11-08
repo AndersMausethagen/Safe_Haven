@@ -261,30 +261,14 @@ public sealed class PrologueMeadowTests
     }
 
     [Test]
-    public void ViewBounds_StopsTheViewAtTheEdge_AndLeavesTheMiddleAlone()
-    {
-        var area = new Rect(-400f, -100f, 500f, 200f);
-        var offset = new Vector3(0f, 16f, -13.5f);
-        var middle = new Vector3(-150f, 5f, 0f);
-        Assert.AreEqual(middle, ViewBounds.KeepInside(area, middle, offset, 40f, 16f / 9f), "Far from the edge the camera just follows.");
-
-        Vector3 west = ViewBounds.KeepInside(area, new Vector3(-399f, 5f, 0f), offset, 40f, 16f / 9f);
-        Assert.Greater(west.x, -399f, "At the west edge the view stops short of it.");
-        Vector3 north = ViewBounds.KeepInside(area, new Vector3(-150f, 5f, 99f), offset, 40f, 16f / 9f);
-        Assert.Less(north.z, 99f);
-        Assert.AreEqual(-150f, north.x, 0.001f, "Only the way that would leave the map is held back.");
-        Vector3 small = ViewBounds.KeepInside(new Rect(0f, 0f, 2f, 2f), new Vector3(50f, 0f, 50f), offset, 40f, 16f / 9f);
-        Assert.Less(Mathf.Abs(small.x - 1f), 0.01f, "A view wider than the map is centred on it.");
-    }
-
-    [Test]
     public void SavedScene_KeepsPlayerAndViewInsideTheTerrain_AndWaterIsDrinkable()
     {
         var scene = EditorSceneManager.OpenPreviewScene(ScenePath);
         try
         {
             var roots = scene.GetRootGameObjects();
-            Assert.AreEqual(1, roots.SelectMany(r => r.GetComponentsInChildren<ViewBounds>(true)).Count());
+            Assert.IsFalse(roots.SelectMany(r => r.GetComponentsInChildren<Transform>(true)).Any(t => t.name == "View Bounds"),
+                "The camera follows the player to the edge; the walls keep them in.");
             Transform West(string name) => roots.SelectMany(r => r.GetComponentsInChildren<Transform>(true)).First(t => t.name == name && t.parent != null && t.parent.name == "Boundary");
             Terrain meadow = roots.SelectMany(r => r.GetComponentsInChildren<Terrain>(true)).Single(t => t.transform.position.x < -100f);
             Assert.Greater(West("West Wall").position.x, meadow.transform.position.x + 5f, "Nobody walks to where the ground runs out.");

@@ -283,8 +283,10 @@ A chapter's companions can **Watch Only**: they wait at the site and leave enemi
 fighting chapter closes any conversation (`PrologueDirector.RefreshStep`).
 
 The player stands still in a conversation (`PlayerInputHandler.IsListening`; in a fight the feet stay free). The camera glides between
-speakers and leans at most **Dialogue Max Lean** towards someone far off (`PlayerCameraSettings`). `ViewBounds` in a scene stops the
-top-down view at the edge of its terrains, while the Boundary walls keep the player well inside them.
+speakers and leans at most **Dialogue Max Lean** towards someone far off (`PlayerCameraSettings`). The view follows the player to
+the edge of the map; the Boundary walls keep the player well inside its terrains (a view limit there overrode the prologue's
+opening framing and was removed: the maps are to grow past what the camera can see). With a fish on the line the view comes
+down close behind the player (`BeginCloseUp`), and while a float is out it leans to keep it in view (`KeepInView`).
 
 Any `WaterSurface` can be **Drinkable** (a World Builder river always is): it makes a `WaterSource` reached across
 its whole edge (`WaterShore`) while playing. **Oval** makes a disc mesh's outline the oval, not its bounding box.

@@ -149,7 +149,7 @@ public static class SceneFolders
         }
 
         if (Own<GameStateManager>() || Own<SaveHotkeys>() || Own<PersistentScene>() || Own<SceneAudio>() ||
-            Own<Unity.AI.Navigation.NavMeshSurface>() || Own<ViewBounds>() || name == "VisualScripting SceneVariables")
+            Own<Unity.AI.Navigation.NavMeshSurface>() || name == "VisualScripting SceneVariables")
         {
             return Systems;
         }

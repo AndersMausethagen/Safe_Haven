@@ -971,7 +971,8 @@ public static class BuildPrologueMeadow
     }
 
     // The invisible edge of the world, around the meadow and forest and well inside the terrain: nobody walks to where the
-    // ground runs out, and the camera (ViewBounds) stops following before the view reaches it.
+    // ground runs out. The camera follows the player all the way (the map will be extended so its edge can't be seen; a view
+    // limit that stopped following near the edge overrode the start's framing and was removed, 2026-11-08).
     private static void Walls(Terrain meadow)
     {
         const float inset = 14f, half = 2f;
@@ -992,13 +993,6 @@ public static class BuildPrologueMeadow
         {
             Transform t = boundary.Find(wall);
             t.position = new Vector3(x, t.position.y, t.position.z);
-        }
-
-        GameObject bounds = GameObject.Find("View Bounds");
-        if (bounds == null)
-        {
-            bounds = new GameObject("View Bounds");
-            bounds.AddComponent<ViewBounds>();
         }
     }
 

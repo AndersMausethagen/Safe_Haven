@@ -20,8 +20,9 @@ In the user's order. Fishing first, then the rest.
 - [x] Quests: no camera moves and no dialogue boxes before and after fights; a spoken comment from someone is enough.
       A story with a fight node speaks in asides and doesn't turn the camera (`StoryScript.IsFight`); the camp and portal
       warnings are asides.
-- [ ] Start camera: the map-edge limit (`ViewBounds`) overrides it. Remove the limit; bring back the invisible walls that
-      keep the player on the map (the map will be extended so its edge can't be seen).
+- [x] Start camera: the map-edge limit (`ViewBounds`) overrides it. Remove the limit; bring back the invisible walls that
+      keep the player on the map (the map will be extended so its edge can't be seen). `ViewBounds` is gone; the prologue's
+      Boundary walls were still there (12 to 14 m inside the terrain on every side).
 - [ ] More than 30 arrows: let the stack (or quiver) hold more.
 - [ ] Light: a light slot in the Character window, switched with C. Instead of a torch in hand, a lantern on the belt, so
       both hands are free.

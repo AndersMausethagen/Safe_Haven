@@ -483,7 +483,6 @@ public sealed class PlayerCameraController : MonoBehaviour
         }
 
         focus.position = Vector3.Lerp(focus.position, focusPoint, Mathf.SmoothStep(0f, 1f, focusWeight));
-        KeepViewInBounds();
     }
 
     // A new look-at starts where it is (the weight blends the view over from the player); only changes after that glide.
@@ -497,23 +496,6 @@ public sealed class PlayerCameraController : MonoBehaviour
         }
 
         return Vector3.SmoothDamp(from, to, ref velocity, settings.DialogueTargetSmoothTime, Mathf.Infinity, Time.unscaledDeltaTime);
-    }
-
-    // Top-down only: the action camera looks at the horizon, where the world's edge is a matter for the map itself.
-    private void KeepViewInBounds()
-    {
-        ViewBounds bounds = ViewBounds.Current;
-        if (bounds == null || actionWeight >= 1f)
-        {
-            return;
-        }
-
-        outputCamera = outputCamera != null ? outputCamera : Camera.main;
-        if (outputCamera != null)
-        {
-            Vector3 kept = bounds.Keep(focus.position, follow.FollowOffset, cinemachineCamera.Lens.FieldOfView, outputCamera.aspect);
-            focus.position = Vector3.Lerp(kept, focus.position, actionWeight);
-        }
     }
 
     private Vector3 GetCursorOffset()
