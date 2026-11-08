@@ -39,6 +39,22 @@ public sealed class CanopyDebris : MonoBehaviour
     private ParticleSystem system;
     private float nextCache;
 
+    /// <summary>The scene's canopy, if it has one: RainDrips drips from the same crowns after rain.</summary>
+    public static CanopyDebris Current { get; private set; }
+
+    /// <summary>Crowns of the tall trees round what the camera looks at (70 % up each tree), refreshed every two seconds.</summary>
+    public IReadOnlyList<Vector3> Crowns => crowns;
+
+    private void OnEnable() => Current = this;
+
+    private void OnDisable()
+    {
+        if (Current == this)
+        {
+            Current = null;
+        }
+    }
+
     private void Awake()
     {
         system = GetComponent<ParticleSystem>();

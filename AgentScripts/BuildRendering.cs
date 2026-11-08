@@ -193,6 +193,9 @@ public static class BuildRendering
 
         height.enableInstancing = true;
         var so = new SerializedObject(renderer);
+        // Forward+ like PC_Renderer: one renderer on the pipeline's list on plain Forward switches the GPU Resident Drawer
+        // (and its occlusion culling) off for every camera.
+        so.FindProperty("m_RenderingMode").intValue = (int)RenderingMode.ForwardPlus;
         so.FindProperty("m_OpaqueLayerMask").intValue = 0;
         so.FindProperty("m_TransparentLayerMask").intValue = 0;
         so.ApplyModifiedPropertiesWithoutUndo();

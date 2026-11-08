@@ -26,12 +26,14 @@ MonoBehaviour:
   moonCycleDays: 12
   moonPhaseAtStart: 0.42
   cloudShadows: 1
+  cloudShadowsInRaids: 1
   cloudSize: 180
   cloudSpeed: 2.5
   cloudCover: {x: 0.28, y: 0.6}
   cloudDarkness: 0.55
   cloudSoftness: 0.18
   skyOcclusion: 1
+  skyOcclusionInRaids: 0.35
   skyOcclusionArea: 160
   skyOcclusionResolution: 512
   skyOcclusionInterval: 1.5
@@ -39,6 +41,13 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4294967263
   skyOcclusionRendererIndex: 1
+  wetCharacters: 1
+  soakSeconds: 30
+  drySeconds: 150
+  fireDrySeconds: 20
+  wetDarkening: 0.5
+  wetSmoothness: 0.7
+  shelterRayStart: 2.2
   decalPoolSize: 128
   bloodDecal: {fileID: 2100000, guid: f7ae1475f1a410743b157c1e53f93ce3, type: 2}
   bloodAtlas: {fileID: 2800000, guid: 7fe320d85bee25b4aacd117857eba120, type: 3}

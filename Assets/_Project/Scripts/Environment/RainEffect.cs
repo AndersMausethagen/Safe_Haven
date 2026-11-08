@@ -1,7 +1,7 @@
 using UnityEngine;
 
 /// <summary>Rain around the camera: falling streaks from a box above the ground the camera looks at, and small splashes
-/// on that ground, both scaled by the intensity <see cref="WeatherSystem"/> sets. The streaks slant with the scene's
+/// on whatever each drop hits (a roof, a rock, the ground; RainDrips adds the drips off eaves and leaves), both scaled by the intensity <see cref="WeatherSystem"/> sets. The streaks slant with the scene's
 /// Moss Wind. Also sets _SafeHavenRain (0..1) for shaders (rain rings on water). In a snowing season the same weather
 /// falls as drifting flakes instead (no streaks, splashes or rings).</summary>
 [ExecuteAlways]
@@ -29,6 +29,12 @@ public sealed class RainEffect : MonoBehaviour
     private static readonly int WindId = Shader.PropertyToID("_SafeHavenWind");
     private float intensity;
     private bool asSnow;
+    private float splashRate;
+    private bool playSetUp;
+    private RainDrips drips;
+    private float splashCarry;
+    private float splashReach;
+    private ParticleSystem.EmitParams splashAt;
 
     public float Intensity => intensity;
 
@@ -43,7 +49,18 @@ public sealed class RainEffect : MonoBehaviour
         float rainfall = asSnow ? 0f : intensity;
         Shader.SetGlobalFloat(RainId, rainfall);
         SetRate(drops, rainfall * dropsPerSecond);
-        SetRate(splashes, rainfall * splashesPerSecond);
+        // Splashes are placed one by one in play (LateUpdate), on whatever each drop hits; the box only in the editor.
+        splashRate = rainfall * splashesPerSecond;
+        if (Application.isPlaying)
+        {
+            SetUpPlay();
+        }
+
+        SetRate(splashes, Application.isPlaying ? 0f : splashRate);
+        if (Application.isPlaying && splashes != null && splashRate > 0f && !splashes.isPlaying)
+        {
+            splashes.Play();
+        }
         SetRate(flakes, asSnow ? intensity * flakesPerSecond : 0f);
     }
 
@@ -66,6 +83,7 @@ public sealed class RainEffect : MonoBehaviour
             return;
         }
 
+        SetUpPlay();
         Camera camera = Camera.main;
         if (camera == null)
         {
@@ -83,9 +101,9 @@ public sealed class RainEffect : MonoBehaviour
             velocity.z = slant.y;
         }
 
-        if (splashes != null)
+        if (splashes != null && splashRate > 0f && !asSnow)
         {
-            splashes.transform.position = ground + Vector3.up * 0.05f;
+            Splash(ground);
         }
 
         if (flakes != null && asSnow)
@@ -97,6 +115,68 @@ public sealed class RainEffect : MonoBehaviour
             velocity.x = drift.x;
             velocity.z = drift.y;
         }
+    }
+
+    // In play only, once: ExecuteAlways runs Awake in the editor, and entering Play may not run it again.
+    private void SetUpPlay()
+    {
+        if (playSetUp && drips != null)
+        {
+            return;
+        }
+
+        playSetUp = true;
+        if (splashes != null)
+        {
+            ParticleSystem.MainModule main = splashes.main;
+            main.simulationSpace = ParticleSystemSimulationSpace.World;
+            splashReach = Mathf.Max(splashes.shape.scale.x, splashes.shape.scale.z) * 0.5f;
+            ParticleSystem.EmissionModule emission = splashes.emission;
+            emission.rateOverTime = 0f;
+        }
+
+        drips = GetComponent<RainDrips>();
+        if (drips == null)
+        {
+            drips = gameObject.AddComponent<RainDrips>();
+            drips.Initialise(this, drops != null ? drops.GetComponent<ParticleSystemRenderer>() : null);
+        }
+    }
+
+    // Each drop's splash where it really lands: on a roof, a rock, a cart or the ground, never under a roof or on water
+    // (which rings instead).
+    private void Splash(Vector3 ground)
+    {
+        splashCarry += splashRate * Time.deltaTime;
+        int count = Mathf.Min((int)splashCarry, 24);
+        splashCarry -= (int)splashCarry;
+        float reach = splashReach > 0f ? splashReach : 18f;
+        for (int i = 0; i < count; i++)
+        {
+            Vector2 offset = Random.insideUnitCircle * reach;
+            var from = new Vector3(ground.x + offset.x, ground.y + 30f, ground.z + offset.y);
+            if (Physics.Raycast(from, Vector3.down, out RaycastHit hit, 60f, SplashLayers, QueryTriggerInteraction.Ignore))
+            {
+                SplashAt(hit.point, hit.normal);
+            }
+        }
+    }
+
+    /// <summary>Layers a splash can land on: not the UI, not Ignore Raycast.</summary>
+    public const int SplashLayers = ~((1 << 2) | (1 << 5));
+
+    /// <summary>One splash at a point (a drip landing, a drop): skipped where water stands over it.</summary>
+    public void SplashAt(Vector3 point, Vector3 normal)
+    {
+        if (splashes == null || (WaterSurface.TryFind(point, 0.5f, out float water) && water > point.y - 0.05f))
+        {
+            return;
+        }
+
+        splashAt.position = point + normal * 0.03f;
+        splashAt.velocity = normal * Random.Range(0.5f, 1.2f) + (Vector3)(Random.insideUnitCircle * 0.3f);
+        splashAt.applyShapeToPosition = false;
+        splashes.Emit(splashAt, 1);
     }
 
     private static void SetRate(ParticleSystem system, float rate)
