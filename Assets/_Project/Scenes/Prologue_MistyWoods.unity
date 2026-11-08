@@ -27076,6 +27076,8 @@ MonoBehaviour:
         creature: {fileID: 1803281365}
         hunt: 1
         towards: {fileID: 913407437}
+        walkSpeed: 0.35
+        stayWithin: 10
     - rid: 2623125911485546599
       type: {class: FocusCameraNode, ns: , asm: SafeHaven}
       data:

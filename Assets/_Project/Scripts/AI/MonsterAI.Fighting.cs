@@ -326,7 +326,7 @@ public sealed partial class MonsterAI
         Vector3 away = toTarget.sqrMagnitude > 0.001f ? -toTarget.normalized : -transform.forward;
         Vector3 destination = transform.position + away * Mathf.Max(2f, distance);
         if (movement.TryFindGround(destination, 2f, out Vector3 ground)
-            && (Relentless || IsRouted || definition.LeashRange <= 0f || Vector3.Distance(home, ground) <= definition.LeashRange))
+            && (Relentless || IsRouted || Leash <= 0f || Vector3.Distance(home, ground) <= Leash))
         {
             movement.MoveTo(ground);
         }

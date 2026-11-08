@@ -56,7 +56,7 @@ public sealed class PrologueDirector : MonoBehaviour
     /// <summary>True while the companions stand still and take no orders: before the game has begun and around the morning fire.</summary>
     public bool CompanionsHeld => !ready || chapter == null || chapter.Companions == PrologueCompanions.StandStill;
     /// <summary>True while the companions leave enemies to the player.</summary>
-    public bool CompanionsHoldFire => chapter != null && chapter.Companions == PrologueCompanions.WatchOnly;
+    public bool CompanionsHoldFire => chapter != null && (chapter.Companions == PrologueCompanions.WatchOnly || chapter.Companions == PrologueCompanions.Flee);
     /// <summary>The place the companions talk about now.</summary>
     public PrologueSite TalkSite => chapter != null ? chapter.Talk : PrologueSite.Portal;
     /// <summary>True while there is time to talk (the companions' topics).</summary>

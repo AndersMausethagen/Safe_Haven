@@ -20,12 +20,14 @@ public sealed class PrologueTests
         const PrologueSite F = PrologueSite.Forest, C = PrologueSite.Camp, P = PrologueSite.Portal, M = PrologueSite.Meadow;
         CollectionAssert.AreEqual(new[] { F, C, C, C, C, C, P, P, P, M }, steps.Select(s => s.Checkpoint()),
             "A checkpoint on the way to the portal restarts at the camp.");
-        CollectionAssert.AreEqual(new PrologueSite?[] { null, C, C, C, C, null, P, P, P, M }, steps.Select(s => s.Rally()),
-            "Companions walk with the player to the shelter and to the portal.");
+        CollectionAssert.AreEqual(new PrologueSite?[] { null, C, C, C, C, P, P, P, P, M }, steps.Select(s => s.Rally()),
+            "Companions walk with the player to the shelter, and run ahead to the portal from the old troll.");
         CollectionAssert.AreEqual(new[] { F, C, C, C, C, P, P, P, P, M }, steps.Select(s => s.Talk()));
         CollectionAssert.AreEqual(new[] { false, true, true, true, false, false, false, false, false, false }, steps.Select(s => s.AtRest()),
             "No small talk while wolves attack.");
         CollectionAssert.AreEqual(new[] { false, false, false, false, false, false, false, true, true, false }, steps.Select(s => s.PortalOpen()));
+        PrologueChapter flight = Definition.Chapters.Single(c => c.Behaviour == PrologueStep.ReachPortal);
+        Assert.AreEqual(PrologueCompanions.Flee, flight.Companions, "Nobody stays to fight the old troll.");
     }
 
     [Test]

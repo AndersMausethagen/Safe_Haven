@@ -484,8 +484,19 @@ public sealed partial class MonsterAI : MonoBehaviour, IEventSubject, IStaggerab
                 return;
             }
 
+            // Held to its destination: what it meets far from there is left alone, and it walks on.
+            if (HoldsHome && IsBeyondLeash())
+            {
+                ClearTarget();
+                UpdateReturn();
+                return;
+            }
+
             roaming = false;
-            home = transform.position;
+            if (!HoldsHome)
+            {
+                home = transform.position;
+            }
         }
 
         if (Time.time >= nextScanTime)

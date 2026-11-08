@@ -12,9 +12,11 @@ In the user's order. Fishing first, then the rest.
       A fish brought onto the shore is caught there.
 - [x] The fire's warm blur (heat shimmer) is far too strong. The haze drew a half-resolution copy of the scene at full
       opacity above every fire: a third of the ripple now (Strength 0.004), half blended in (`HeatHaze.shader`, Opacity).
-- [ ] Prologue: the troll walks far too fast towards the camp; it should stop at the camp, not go on. The NPCs run to the
-      portal instead of staying to fight.
-- [ ] Prologue: Ingrid heals the player when their health is low.
+- [x] Prologue: the troll walks far too fast towards the camp; it should stop at the camp, not go on. The NPCs run to the
+      portal instead of staying to fight. It walks at a third of its speed (Creature Hunts › Walk Speed) and stays within
+      10 m of the camp (Stay Within: `MonsterAI.HoldsHome`, `LeashOverride`); Reach Portal's companions Flee to the portal.
+- [x] Prologue: Ingrid heals the player when their health is low (alchemists, so Sigrid too: at half health, 35 % back, a
+      spoken aside, every 10 s at most).
 - [ ] Quests: no camera moves and no dialogue boxes before and after fights; a spoken comment from someone is enough.
 - [ ] Start camera: the map-edge limit (`ViewBounds`) overrides it. Remove the limit; bring back the invisible walls that
       keep the player on the map (the map will be extended so its edge can't be seen).

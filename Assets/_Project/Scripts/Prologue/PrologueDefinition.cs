@@ -39,6 +39,8 @@ public enum PrologueCompanions
     StoryLeads,
     /// <summary>They wait at the chapter's place and leave any enemies to the player (a lesson).</summary>
     WatchOnly,
+    /// <summary>They run to the chapter's place and fight nothing on the way (the flight from the old troll).</summary>
+    Flee,
 }
 
 /// <summary>
@@ -72,10 +74,10 @@ public static class PrologueSteps
         switch (step)
         {
             case PrologueStep.FindShelter:
-            case PrologueStep.ReachPortal:
                 return null;
             case PrologueStep.Story:
                 return PrologueSite.Meadow;
+            case PrologueStep.ReachPortal:
             case PrologueStep.ActivatePortal:
             case PrologueStep.HoldPortal:
             case PrologueStep.Finished:
@@ -139,6 +141,8 @@ public sealed class PrologueChapter
     public int InitialEnemies => initialEnemies;
     public PrologueWaveEnemy[] Enemies => enemies;
     public PrologueCompanions Companions => behaviour == PrologueStep.Story ? companions
+        // Running from the old troll: everyone makes for the standing stones, and nobody turns to fight it.
+        : behaviour == PrologueStep.ReachPortal ? PrologueCompanions.Flee
         : behaviour.Rally().HasValue ? PrologueCompanions.WaitAtSite : PrologueCompanions.Follow;
 
     /// <summary>Where a checkpoint in this chapter puts the player back.</summary>

@@ -6,6 +6,16 @@ using UnityEngine;
 /// </summary>
 public sealed partial class MonsterAI
 {
+    /// <summary>A story's hold on where it belongs: meeting someone on the way to a roam's end doesn't make that spot its
+    /// home, and (with <see cref="LeashOverride"/>) it chases no further than that from home: the old troll that walks to
+    /// the camp and stays there.</summary>
+    public bool HoldsHome { get; set; }
+
+    /// <summary>Metres it chases from home before giving up; 0 uses its definition's leash.</summary>
+    public float LeashOverride { get; set; }
+
+    private float Leash => LeashOverride > 0f ? LeashOverride : definition.LeashRange;
+
     /// <summary>
     /// Makes where it stands, facing the way it faces, its home (the raid map turned under it). A roaming monster keeps
     /// the place it walks to.
@@ -52,7 +62,7 @@ public sealed partial class MonsterAI
 
     private void GoHomeOrIdle()
     {
-        if (definition.LeashRange > 0f && HorizontalDistance(home) > HomeTolerance)
+        if (Leash > 0f && HorizontalDistance(home) > HomeTolerance)
         {
             BeginReturn();
             return;
@@ -72,6 +82,6 @@ public sealed partial class MonsterAI
 
     private bool IsBeyondLeash()
     {
-        return definition.LeashRange > 0f && HorizontalDistance(home) > definition.LeashRange;
+        return Leash > 0f && HorizontalDistance(home) > Leash;
     }
 }

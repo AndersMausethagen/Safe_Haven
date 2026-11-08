@@ -485,6 +485,9 @@ public sealed class PrologueMeadowTests
             StoryScript intro = stories.Single(s => s.name == "Story - The Morning Fire");
             Assert.IsTrue(intro.Nodes.OfType<SayNode>().Any(n => n.line.Contains("Ingrid") && n.line.Contains("Liv")), "The player learns who they are looking for.");
             Assert.AreEqual(3, intro.Nodes.OfType<ChoiceNode>().Single().answers.Count, "Why the player came.");
+            CreatureHuntsNode troll = stories.Single(s => s.name == "Story - The Old Troll").Nodes.OfType<CreatureHuntsNode>().Single();
+            Assert.Less(troll.walkSpeed, 0.5f, "The old troll walks to the camp, slow and heavy.");
+            Assert.Greater(troll.stayWithin, 0f, "It stays at the camp and doesn't chase the party up the path.");
             InvokeEventNode swing = stories.Single(s => s.name == "Story - The Old Troll Returns").Nodes.OfType<InvokeEventNode>().Single();
             Assert.AreEqual(1, swing.response.GetPersistentEventCount(), "The troll's blow is wired to its animator.");
 

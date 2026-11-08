@@ -18,7 +18,7 @@ public sealed class CompanionTopic
 /// when the person is rescued later. In their conversation (their Talkable) they say their line for the part of the night
 /// it is; around the camp the player can also ask their topics, one after another, to get to know them. The director's rally points become
 /// Companion orders (stay at the camp, at the portal; otherwise follow), and the companion stands still until the
-/// expedition sets out. An alchemist also heals the player now and then during a fight.
+/// expedition sets out. An alchemist (Ingrid, Sigrid) heals the player when they are badly hurt and close by, with a word.
 /// </summary>
 [RequireComponent(typeof(NavMeshAgent), typeof(Talkable))]
 public sealed class PrologueCompanion : MonoBehaviour, IConversationTopics, IQuestPerson
@@ -33,10 +33,21 @@ public sealed class PrologueCompanion : MonoBehaviour, IConversationTopics, IQue
     [SerializeField] private CompanionTopic[] campTopics = new CompanionTopic[0];
     [Tooltip("Asked by the morning fire: who they are and what they make of the mission, each once per visit to the scene.")]
     [SerializeField] private CompanionTopic[] morningTopics = new CompanionTopic[0];
-    [Tooltip("Heals the player by Support Amount every Support Interval during a fight, when within 10 m.")]
+    [Tooltip("Heals the player when their health is down to Low Health, within Support Reach, at most every Support Interval.")]
     [SerializeField] private bool alchemist;
-    [SerializeField, Min(1f)] private float supportInterval = 6f;
-    [SerializeField, Min(0f)] private float supportAmount = 8f;
+    [Tooltip("Share of the player's health at or below which an alchemist heals them.")]
+    [SerializeField, Range(0.1f, 0.9f)] private float lowHealth = 0.5f;
+    [Tooltip("Share of the player's most health given back each time.")]
+    [SerializeField, Range(0.05f, 1f)] private float healShare = 0.35f;
+    [SerializeField, Min(1f)] private float supportInterval = 10f;
+    [SerializeField, Min(1f)] private float supportReach = 12f;
+    [Tooltip("What they say as they heal, one at random.")]
+    [SerializeField, TextArea] private string[] healLines =
+    {
+        "Hold still. Drink this.",
+        "You're bleeding. Here.",
+        "Not yet, you don't. Drink.",
+    };
 
     private NavMeshAgent agent;
     private Companion companion;
@@ -78,11 +89,34 @@ public sealed class PrologueCompanion : MonoBehaviour, IConversationTopics, IQue
             companion.HoldFire = expedition != null && expedition.CompanionsHoldFire;
         }
 
-        if (!alchemist || Player.Current == null || expedition == null || !expedition.IsFighting || Time.time < nextSupport) return;
+        if (alchemist)
+        {
+            Support();
+        }
+    }
+
+    /// <summary>Heals the player when they are badly hurt and near, with a word; then not again for a while.</summary>
+    private void Support()
+    {
+        Player player = Player.Current;
+        if (player == null || Time.time < nextSupport || !gameObject.activeInHierarchy || companion != null && companion.IsDowned)
+        {
+            return;
+        }
+
+        Damageable health = player.Health;
+        if (!health.IsAlive || health.HealthFraction > lowHealth ||
+            Vector3.Distance(transform.position, player.transform.position) > supportReach)
+        {
+            return;
+        }
+
         nextSupport = Time.time + supportInterval;
-        if ((companion == null || !companion.IsDowned) &&
-            Vector3.Distance(transform.position, Player.Current.transform.position) < 10f)
-            Player.Current.Health.Heal(supportAmount);
+        health.Heal(health.MaxHealth * healShare);
+        if (healLines.Length > 0 && DialogueBox.Current != null && !DialogueBox.IsOpen && TryGetComponent(out Talkable talkable))
+        {
+            DialogueBox.Current.Aside(talkable.Speaker, healLines[UnityEngine.Random.Range(0, healLines.Length)]);
+        }
     }
 
     /// <summary>Their line for this part of the night (when nothing before it spoke) and the camp topics not asked yet.</summary>

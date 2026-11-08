@@ -96,6 +96,11 @@ public sealed class CreatureHuntsNode : StoryNode
     public bool hunt = true;
     [Tooltip("Where it heads when it wakes.")]
     public Transform towards;
+    [Tooltip("How fast it walks there, as a share of its own speed: 1 as fast as it hunts, about a third a slow, heavy walk.")]
+    [Range(0.1f, 1f)] public float walkSpeed = 1f;
+    [Tooltip("Once there it stays: it fights anyone within this many metres of the place and chases no further, and what " +
+             "it meets on the way doesn't stop it. 0: it hunts as it likes from wherever it finds someone.")]
+    [Min(0f)] public float stayWithin;
 
     public override string Title => hunt ? "Creature Hunts" : "Creature Stops Hunting";
     public override string Category => "World";
@@ -129,6 +134,9 @@ public sealed class CreatureHuntsNode : StoryNode
         yield return null;
         if (towards != null)
         {
+            creature.HoldsHome = stayWithin > 0f;
+            creature.LeashOverride = stayWithin;
+            creature.RoamSpeedScale = walkSpeed;
             creature.Roam(towards.position);
         }
     }

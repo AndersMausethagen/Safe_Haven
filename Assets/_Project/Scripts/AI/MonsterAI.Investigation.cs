@@ -106,7 +106,10 @@ public sealed partial class MonsterAI
             if (roaming)
             {
                 roaming = false;
-                home = transform.position;
+                if (!HoldsHome)
+                {
+                    home = transform.position;
+                }
             }
             searchingLostTarget = false;
             SetState(State.Chasing);
@@ -153,7 +156,7 @@ public sealed partial class MonsterAI
     // Where to look, kept inside its leash (and defensive radius), so checking a noise never drags it off for good.
     private Vector3 InvestigationSpot(Vector3 stimulus)
     {
-        float limit = definition.LeashRange;
+        float limit = Leash;
         if (definition.HasTemperament(MonsterTemperament.Defensive))
         {
             limit = limit > 0f ? Mathf.Min(limit, definition.DefensiveRadius) : definition.DefensiveRadius;
