@@ -3,6 +3,31 @@
 Open work and ideas. Tick items off (`[x]`) or delete them when done. Architecture notes for each system live in
 [ARCHITECTURE.md](../Assets/_Project/Scripts/ARCHITECTURE.md).
 
+## Prologue playtest (2026-11-08)
+
+From the user's run through the prologue in a build. Build work is paused until these are done.
+- [x] Main menu: the buttons and notes sit at the far edges on a super-ultrawide screen. Keep the layout within 16:9, centred
+      (`UIAspectLimit`), the picture still full width.
+- [x] Dialogue blurred the whole screen: the backdrop took its high canvas for a full-screen window. Dialogue is left out
+      (`UIBackdrop.Dims`). Check in a conversation.
+- [x] Crafting tabs (All, Tools, Gear...) don't answer the pointer: brighten under it (`UITabHover`). Check at a station.
+- [x] Woodcutting minigame doesn't work: holding doesn't move the axe, and tapping fast chops fast. Wanted: hold to raise the
+      axe or pick gradually with the animation; at the top a glimmer and a sound; let go there for a critical; after a
+      blow, a ready stance until the next hold. Found: only the mining states use the WorkSpeed raise; a release at any point
+      swings at once.
+- [x] Water reflects a plain light blue, no clouds, and the sun shows as a big yellow ball in it. The sky's sun disc is
+      softened (the water draws its own glint); check the clouds in the reflection. Found: realtime
+      reflection probes were off in the PC quality level, so the follow probe never rendered.
+- [x] Fishing line doesn't start at the rod: it came from a fixed point by the shoulder. Now the held rod's tip
+      (`FishingLine.RodTip`). Fishing clips exist in the
+      player controller (Fish Begin/Cast/Wait/Fight/Catch/Haul) but PlayerFishing never plays them: still to hook up.
+- [x] Prologue boar too tough: one boar, a regular one (not the blight boar), and the hunt asks for one. `Boar`
+      (70 health, 2 armour, 6 damage; BuildPrologueBoar); the prefab's Combatant takes BoarStats.
+- [ ] Archery: the aim doesn't hold on an enemy when the mouse is held over it. Test with `PlayerArchery.ChooseTarget`
+      and a ray through the creature, while drawing.
+- [x] The portal's sleeping stones lost the model's own textures (2026-11-03, `BuildPortalHeart.SleepingStones` painted them
+      flat Base Stone): flat, blue at night, low-detail. `BuildPortalHeart.RestoreSleepingStones` gives them back.
+
 ## Faster builds (2026-11-08)
 
 Every build re-imports all textures at full size and then back to the Editor's 2K cap (`EditorTextureCap`), twice per

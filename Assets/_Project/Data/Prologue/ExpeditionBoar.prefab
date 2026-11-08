@@ -66,7 +66,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 8ae0d7ac507590842a2c1293193e793a, type: 2}
+  - {fileID: 2100000, guid: 89c5e3e89339790439186f19a207bd55, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -156,7 +156,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 8ae0d7ac507590842a2c1293193e793a, type: 2}
+  - {fileID: 2100000, guid: 89c5e3e89339790439186f19a207bd55, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -377,6 +377,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3577244518674774702, guid: a661dc05d2e43f943a476376f636ef9a, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 89c5e3e89339790439186f19a207bd55, type: 2}
     - target: {fileID: 3835146995149518521, guid: a661dc05d2e43f943a476376f636ef9a, type: 3}
       propertyPath: m_Controller
       value: 
@@ -405,6 +409,18 @@ PrefabInstance:
       propertyPath: m_Center.y
       value: 0.575
       objectReference: {fileID: 0}
+    - target: {fileID: 5396958096653743341, guid: a661dc05d2e43f943a476376f636ef9a, type: 3}
+      propertyPath: definition
+      value: 
+      objectReference: {fileID: 11400000, guid: b22c293353a041944aa0e1f4eb3bcb99, type: 2}
+    - target: {fileID: 5462047865405197361, guid: a661dc05d2e43f943a476376f636ef9a, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 89c5e3e89339790439186f19a207bd55, type: 2}
+    - target: {fileID: 5644319553241884348, guid: a661dc05d2e43f943a476376f636ef9a, type: 3}
+      propertyPath: baseStats
+      value: 
+      objectReference: {fileID: 11400000, guid: b1c8d43eb3789f74694060203712643d, type: 2}
     - target: {fileID: 6176404170011855247, guid: a661dc05d2e43f943a476376f636ef9a, type: 3}
       propertyPath: m_Controller
       value: 

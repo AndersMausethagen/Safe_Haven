@@ -686,6 +686,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 489a951193635d0419115cdcc5775d51, type: 2}
   - {fileID: 11400000, guid: 916ab17a0415c3041aec1267259d1567, type: 2}
   - {fileID: 11400000, guid: d0d3ffee305a6ca489fca58781bf31c1, type: 2}
+  - {fileID: 11400000, guid: b22c293353a041944aa0e1f4eb3bcb99, type: 2}
   residentNotes:
   - who: {fileID: 11400000, guid: 4260d606f7c62c042b848adc806c44d3, type: 2}
     about: {fileID: 11400000, guid: afbf4a58442496641826a078787f7e2e, type: 2}

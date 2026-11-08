@@ -65907,11 +65907,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4428770297748371014, guid: eefa6649a4b17b24fa8383ad769dab93, type: 3}
       propertyPath: count.x
-      value: 3
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4428770297748371014, guid: eefa6649a4b17b24fa8383ad769dab93, type: 3}
       propertyPath: count.y
-      value: 3
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4428770297748371014, guid: eefa6649a4b17b24fa8383ad769dab93, type: 3}
       propertyPath: respawn

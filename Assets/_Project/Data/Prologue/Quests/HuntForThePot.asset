@@ -16,7 +16,7 @@ MonoBehaviour:
   displayName: Meat for the Road
   description: Runa has seen blight boar on the grass north of the road, east of the camp, where they have no business being. She lent you her spare bow. Bring two down.
   chain: Prologue - Before the Road
-  journalNotes: Runa doesn't like it. Boar don't come this far onto open grass, and they don't look like that. She hasn't said what she thinks it means, but she has stopped lending out arrows without counting them.
+  journalNotes: Runa doesn't like it. Boar don't come this far onto open grass. She hasn't said what she thinks it means, but she has stopped lending out arrows without counting them.
   rank: 2
   availableObjective: 
   announceStart: 1
@@ -27,23 +27,49 @@ MonoBehaviour:
   startedFirst: []
   start: 2
   startEvent: {fileID: 0}
+  startWhen:
+    type: 0
+    description: 
+    amount: 1
+    item: {fileID: 0}
+    resource: {fileID: 0}
+    monster: {fileID: 0}
+    faction: 1
+    building: {fileID: 0}
+    raid: {fileID: 0}
+    mustExtract: 1
+    withinMinutes: 0
+    questEvent: {fileID: 0}
+    person: {fileID: 0}
+    target: {fileID: 0}
+    job: {fileID: 0}
+    breach: {fileID: 0}
+    rank: 1
+    bringHome: 0
+    countAlreadyOwned: 0
   closedBy: {fileID: 11400000, guid: 2f630af2f0eaf434a97dc64ffe2d130c, type: 2}
   startDelay: 0
   onStarted: []
   objectivesInOrder: 0
   objectives:
   - type: 2
-    description: Bring down two blight boar on the grass north of the road
-    amount: 2
+    description: Bring down a boar on the grass north of the road
+    amount: 1
     item: {fileID: 0}
     resource: {fileID: 0}
-    monster: {fileID: 11400000, guid: e646ff37405b36e43a4fa710a23060e2, type: 2}
+    monster: {fileID: 11400000, guid: b22c293353a041944aa0e1f4eb3bcb99, type: 2}
     faction: 0
     building: {fileID: 0}
     raid: {fileID: 0}
     mustExtract: 0
     withinMinutes: 0
     questEvent: {fileID: 0}
+    person: {fileID: 0}
+    target: {fileID: 0}
+    job: {fileID: 0}
+    breach: {fileID: 0}
+    rank: 1
+    bringHome: 0
     countAlreadyOwned: 0
   turnInToGiver: 1
   turnInTo: Runa
