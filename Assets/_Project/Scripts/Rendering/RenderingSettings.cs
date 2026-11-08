@@ -102,6 +102,13 @@ public sealed class RenderingSettings : GameSettings<RenderingSettings>
     [Tooltip("Metres of mist each pushes back round its flame (0 none).")]
     [SerializeField, Min(0f)] private float fireFogClearing = 0f;
 
+    [Header("Shader warm-up")]
+    [Tooltip("The shader variants play uses, recorded by AgentScripts/RecordShaderWarmup.cs; compiled behind the first " +
+             "loading screen of a session (ShaderWarmup), in builds.")]
+    [SerializeField] private ShaderVariantCollection warmupVariants;
+    [Tooltip("Never hold the loading screen longer than this for it.")]
+    [SerializeField, Min(1f)] private float warmupMostSeconds = 20f;
+
     [Header("Decals")]
     [Tooltip("Short-lived decals out at once (blood, footprints); the oldest is reused after that.")]
     [SerializeField, Min(8)] private int decalPoolSize = 128;
@@ -169,6 +176,8 @@ public sealed class RenderingSettings : GameSettings<RenderingSettings>
     public bool FireFogGlow => fireFogGlow;
     public float FireFogGlowStrength => fireFogGlowStrength;
     public float FireFogClearing => fireFogClearing;
+    public ShaderVariantCollection WarmupVariants => warmupVariants;
+    public float WarmupMostSeconds => warmupMostSeconds;
     public int DecalPoolSize => decalPoolSize;
     public Material BloodDecal => bloodDecal;
     public Texture2D BloodAtlas => bloodAtlas;

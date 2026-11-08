@@ -59,6 +59,8 @@ MonoBehaviour:
   fireFogGlow: 1
   fireFogGlowStrength: 0.35
   fireFogClearing: 0
+  warmupVariants: {fileID: 20000000, guid: a574bebc07ab1e748bf204e58a21ab48, type: 2}
+  warmupMostSeconds: 20
   decalPoolSize: 128
   bloodDecal: {fileID: 2100000, guid: f7ae1475f1a410743b157c1e53f93ce3, type: 2}
   bloodAtlas: {fileID: 2800000, guid: 7fe320d85bee25b4aacd117857eba120, type: 3}

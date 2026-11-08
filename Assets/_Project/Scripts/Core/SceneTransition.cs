@@ -303,12 +303,15 @@ public static class SceneTransition
             while (operation.progress < 0.9f)
             {
                 screen.Progress = operation.progress / 0.9f * LoadShare;
+                ShaderWarmup.Step();
                 yield return null;
             }
 
             screen.Progress = LoadShare;
-            while (Time.realtimeSinceStartup - shownAt < settings.MinimumLoadingSeconds)
+            // The first load of a session also compiles the game's shaders here, not mid-play (ShaderWarmup).
+            while (Time.realtimeSinceStartup - shownAt < settings.MinimumLoadingSeconds || !ShaderWarmup.Done)
             {
+                ShaderWarmup.Step();
                 yield return null;
             }
 
