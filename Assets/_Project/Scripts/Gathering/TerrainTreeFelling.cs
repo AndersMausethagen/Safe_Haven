@@ -7,8 +7,10 @@ using UnityEngine.SceneManagement;
 /// Near the player each choppable tree (its prototype prefab has a ChoppableTree) gets an invisible stand-in from
 /// TreeChoppingSettings › Terrain Tree Proxy: the Tree gathering node, sized like the tree. Felling it hides the terrain
 /// tree (scale 0, so it neither shows nor blocks) as a copy comes down in its place (FelledTree), until the node's respawn
-/// time has passed, then it grows back. Felling works on a runtime copy of the terrain data, so the scene's terrain asset
-/// is never changed.
+/// time has passed, then it grows back. A tree shorter than Small Tree Height isn't felled: its stand-in is Small Tree
+/// Proxy, broken down by hand for sticks. Where the woods are remembered (TerrainTreeMemory › Keep Felled: the Haven) a
+/// tree that comes down stays down; saplings planted there (PlantedTrees) are what grows back. Felling works on a runtime
+/// copy of the terrain data, so the scene's terrain asset is never changed.
 /// <para>
 /// Added by itself to every terrain with choppable tree prototypes when a scene loads; nothing to set up.
 /// </para>
@@ -40,7 +42,7 @@ public sealed class TerrainTreeFelling : MonoBehaviour
 
     private static readonly List<TerrainTreeFelling> active = new List<TerrainTreeFelling>();
 
-    private readonly Dictionary<int, ChoppableTree> proxies = new Dictionary<int, ChoppableTree>();
+    private readonly Dictionary<int, GameObject> proxies = new Dictionary<int, GameObject>();
     private readonly Dictionary<int, (TreeInstance tree, GameObject copy)> swaying = new Dictionary<int, (TreeInstance, GameObject)>();
     private readonly Dictionary<int, (TreeInstance tree, float regrowAt)> felled = new Dictionary<int, (TreeInstance, float)>();
     private readonly List<int> scratch = new List<int>();
@@ -55,6 +57,19 @@ public sealed class TerrainTreeFelling : MonoBehaviour
 
     /// <summary>Terrain trees felled and not yet grown back.</summary>
     public int FelledCount => felled.Count;
+
+    /// <summary>Trees that come down here stay down (the Haven's remembered woods: TerrainTreeMemory › Keep Felled).</summary>
+    public bool KeepsFelled => TryGetComponent(out TerrainTreeMemory memory) && memory.KeepsFelled;
+
+    /// <summary>Raised with a tree's index when it is felled or broken down.</summary>
+    public event System.Action<int> TreeDown;
+
+    /// <summary>The terrain's own runtime copy of its data, made now if it hasn't been: what trees may be added to.</summary>
+    public TerrainData OwnedData()
+    {
+        OwnTheData();
+        return terrain.terrainData;
+    }
 
     /// <summary>The trees down now, by index on the terrain, with the seconds until each grows back (infinity: never).</summary>
     public List<(int index, float secondsLeft)> FelledNow()
@@ -97,7 +112,7 @@ public sealed class TerrainTreeFelling : MonoBehaviour
         }
 
         TreeInstance tree = data.GetTreeInstance(index);
-        felled[index] = (tree, Time.time + secondsLeft);
+        felled[index] = (tree, KeepsFelled ? float.PositiveInfinity : Time.time + secondsLeft);
         Hide(index, tree);
     }
 
@@ -250,7 +265,7 @@ public sealed class TerrainTreeFelling : MonoBehaviour
         foreach (var pair in proxies)
         {
             if (pair.Value == null || (positions[pair.Key] - player).sqrMagnitude > ReleaseRadius * ReleaseRadius
-                && !pair.Value.GetComponent<Interactable>().IsInUse)
+                && !(pair.Value.TryGetComponent(out Interactable work) && work.IsInUse))
             {
                 scratch.Add(pair.Key);
             }
@@ -346,7 +361,15 @@ public sealed class TerrainTreeFelling : MonoBehaviour
     private void Spawn(int index)
     {
         TreeInstance tree = terrain.terrainData.GetTreeInstance(index);
-        GameObject proxy = Instantiate(TreeChoppingSettings.Current.TerrainTreeProxy, positions[index], Quaternion.identity, transform);
+        TreeChoppingSettings settings = TreeChoppingSettings.Current;
+        float standing = prototypeHeight[tree.prototypeIndex] * tree.heightScale;
+        if (standing < settings.SmallTreeHeight && settings.SmallTreeProxy != null)
+        {
+            SpawnSmall(index, tree);
+            return;
+        }
+
+        GameObject proxy = Instantiate(settings.TerrainTreeProxy, positions[index], Quaternion.identity, transform);
         proxy.name = "Tree " + index;
         float scale = Mathf.Max(0.1f, tree.heightScale);
         if (proxy.TryGetComponent(out CapsuleCollider trunk))
@@ -366,14 +389,54 @@ public sealed class TerrainTreeFelling : MonoBehaviour
         var node = proxy.GetComponent<ResourceNode>();
         int felledIndex = index;
         node.Harvested += () => Fell(felledIndex);
-        proxies[index] = choppableTree;
+        proxies[index] = proxy;
+    }
+
+    // A small tree: broken down by hand (sticks and a sapling), no axe and no fall.
+    private void SpawnSmall(int index, TreeInstance tree)
+    {
+        GameObject proxy = Instantiate(TreeChoppingSettings.Current.SmallTreeProxy, positions[index], Quaternion.identity, transform);
+        proxy.name = "Small Tree " + index;
+        if (proxy.TryGetComponent(out CapsuleCollider trunk))
+        {
+            trunk.radius = Mathf.Max(0.25f, prototypeRadius[tree.prototypeIndex] * Mathf.Max(0.1f, tree.widthScale));
+            trunk.height = Mathf.Max(trunk.radius * 2f, prototypeHeight[tree.prototypeIndex] * tree.heightScale * 0.5f);
+            trunk.center = Vector3.up * trunk.height * 0.5f;
+        }
+
+        int broken = index;
+        proxy.GetComponent<ResourceNode>().Harvested += () => Break(broken);
+        proxies[index] = proxy;
+    }
+
+    private void Break(int index)
+    {
+        OwnTheData();
+        TreeInstance tree = terrain.terrainData.GetTreeInstance(index);
+        GameObject burst = TreeChoppingSettings.Current.SmallTreeBreak;
+        if (burst != null)
+        {
+            Destroy(Instantiate(burst, positions[index] + Vector3.up, Quaternion.identity), 4f);
+        }
+
+        Down(index, tree);
+    }
+
+    // The tree is gone from where it stood: until it grows back, or for good where the woods are remembered.
+    private void Down(int index, TreeInstance tree)
+    {
+        float respawn = TreeChoppingSettings.Current.TerrainTreeRegrowSeconds;
+        felled[index] = (tree, KeepsFelled || respawn <= 0f ? float.PositiveInfinity : Time.time + respawn);
+        Hide(index, tree);
+        Release(index);
+        TreeDown?.Invoke(index);
     }
 
     private void Release(int index)
     {
-        if (proxies.TryGetValue(index, out ChoppableTree proxy) && proxy != null)
+        if (proxies.TryGetValue(index, out GameObject proxy) && proxy != null)
         {
-            Destroy(proxy.gameObject);
+            Destroy(proxy);
         }
 
         proxies.Remove(index);
@@ -392,10 +455,7 @@ public sealed class TerrainTreeFelling : MonoBehaviour
             Destroy(moving.copy);
         }
 
-        float respawn = TreeChoppingSettings.Current.TerrainTreeRegrowSeconds;
-        felled[index] = (tree, respawn > 0f ? Time.time + respawn : float.PositiveInfinity);
-        Hide(index, tree);
-        Release(index);
+        Down(index, tree);
     }
 
     private void RegrowDue()

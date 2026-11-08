@@ -4,8 +4,10 @@ using UnityEngine;
 
 /// <summary>
 /// Remembers which painted terrain trees are felled (TerrainTreeFelling) in the game's save, so a cleared stretch of the Haven's woods
-/// stays cleared after a raid or a reload, until each tree grows back. On the terrain beside a SaveableEntity; the Haven world generator
-/// adds both. Felled trees are kept by their index on the terrain, so regenerating the woods starts them all standing again.
+/// stays cleared after a raid or a reload. With Keep Felled (the Haven) a tree that comes down never grows back by itself:
+/// saplings planted there (PlantedTrees, which keeps its own trees) are how the woods return. On the terrain beside a
+/// SaveableEntity; the Haven world generator adds both. Felled trees are kept by their index among the trees the terrain was
+/// made with, so regenerating the woods starts them all standing again.
 /// </summary>
 [RequireComponent(typeof(Terrain))]
 public sealed class TerrainTreeMemory : MonoBehaviour, ISaveable, ISharedState
@@ -19,6 +21,15 @@ public sealed class TerrainTreeMemory : MonoBehaviour, ISaveable, ISharedState
     }
 
     private const float Forever = -1f;
+
+    [Tooltip("A tree that comes down stays down (the Haven): only planted saplings grow back.")]
+    [SerializeField] private bool keepFelled = true;
+
+    public bool KeepsFelled => keepFelled;
+
+    // The trees the terrain was made with; planted ones come after them and are PlantedTrees' to keep.
+    private int MadeWith(Terrain terrain) =>
+        TryGetComponent(out PlantedTrees planted) ? planted.BaseCount : terrain.terrainData.treeInstanceCount;
 
     public string SaveKey => "felledTrees";
 
@@ -34,9 +45,14 @@ public sealed class TerrainTreeMemory : MonoBehaviour, ISaveable, ISharedState
             return null;
         }
 
-        var state = new State { treeCount = terrain.terrainData.treeInstanceCount };
+        var state = new State { treeCount = MadeWith(terrain) };
         foreach ((int index, float secondsLeft) in felling.FelledNow())
         {
+            if (index >= state.treeCount)
+            {
+                continue;
+            }
+
             state.indices.Add(index);
             state.secondsLeft.Add(float.IsPositiveInfinity(secondsLeft) ? Forever : secondsLeft);
         }
@@ -54,7 +70,7 @@ public sealed class TerrainTreeMemory : MonoBehaviour, ISaveable, ISharedState
         State state = JsonUtility.FromJson<State>(json);
         Terrain terrain = GetComponent<Terrain>();
         // Saved against other woods (the world was generated again): nothing of it applies.
-        if (state == null || state.treeCount != terrain.terrainData.treeInstanceCount)
+        if (state == null || state.treeCount != MadeWith(terrain))
         {
             return;
         }

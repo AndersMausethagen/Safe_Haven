@@ -47,10 +47,14 @@ After the second list, in this order.
       clearing stay).
 - [x] The highlight sometimes crosses inside an object instead of following only its outline. The stencil mask was depth
       tested against an object drawn moved (wind, tessellation) and had holes; now Always, and only LOD0 is copied.
-- [ ] Small trees can't be chopped, only broken down to sticks.
-- [ ] Trees grow back in the Haven when a save is loaded: they shouldn't. A felled tree gives a sapling, which can be
+- [x] Small trees can't be chopped, only broken down to sticks. Below 6 m: "Break down" by hand, 2-3 Sticks and a
+      Cedar Sapling (Young Tree node, small tree proxy).
+- [x] Trees grow back in the Haven when a save is loaded: they shouldn't. A felled tree gives a sapling, which can be
       planted and grows back (about 5 in-game days; suggest a better pace). Cheap: saved state of each planted tree and its
-      growth, no per-frame distance work; must not clash with the interactable tree optimiser.
+      growth, no per-frame distance work; must not clash with the interactable tree optimiser. Done: felled trees stay
+      down at home (they came back after 15 minutes); felling or breaking down gives a Cedar Sapling; planted at home it
+      grows in 3 in-game days (72 minutes at the usual clock: 5 days would be 2 hours of play), as a painted tree of the
+      terrain's own, so the felling stand-ins (the optimiser) work on it unchanged; growth set every 4 s from the day.
 - [ ] Small trees and bushes bend for the player as the grass does; some details don't yet.
 - [ ] Too many sounds from finished quests and skill levels early on: make the first skill levels a little slower and the
       sounds a little quieter.

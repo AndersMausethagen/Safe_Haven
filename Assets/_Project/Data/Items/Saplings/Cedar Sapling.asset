@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0f3bdb25f2718449be18e3af26396e7, type: 3}
+  m_Name: Cedar Sapling
+  m_EditorClassIdentifier: SafeHaven::SaplingDefinition
+  growsInto:
+  - {fileID: 5667429938717972990, guid: d95df214bedaa324a88a6cff270c042c, type: 3}
+  - {fileID: 3226712138437348941, guid: 8c77f9772bf5c4d428ffde22612e5d28, type: 3}
+  - {fileID: 4664926423558582574, guid: 7a69d1e42a50043469c59a9b5e184d8b, type: 3}
+  - {fileID: 8869661558912811196, guid: 0976536dbf8ecfc4189e694d6cefa254, type: 3}
+  - {fileID: 6554074881052131378, guid: 97d9b686c0ec3b44794902aef75578ae, type: 3}
+  growDays: 3
+  startScale: 0.15
+  fullScale: {x: 0.85, y: 1.15}
+  spacing: 2.5

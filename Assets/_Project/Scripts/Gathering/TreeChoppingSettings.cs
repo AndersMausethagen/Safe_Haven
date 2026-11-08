@@ -43,6 +43,15 @@ public sealed class TreeChoppingSettings : GameSettings<TreeChoppingSettings>
     [Tooltip("Seconds until a felled terrain tree grows back. 0: never (until the scene loads again).")]
     [SerializeField, Min(0f)] private float terrainTreeRegrowSeconds = 900f;
 
+    [Header("Small trees")]
+    [Tooltip("Trees shorter than this (metres, as they stand) aren't felled with an axe: they are broken down by hand for " +
+             "sticks (and a sapling), through Small Tree Proxy.")]
+    [SerializeField, Min(0f)] private float smallTreeHeight = 6f;
+    [Tooltip("The invisible stand-in for a small painted tree: a node gathered by hand (Young Tree) instead of the felling one.")]
+    [SerializeField] private GameObject smallTreeProxy;
+    [Tooltip("Played where a small tree is broken down (a burst of leaves).")]
+    [SerializeField] private GameObject smallTreeBreak;
+
     [Header("Working the fallen tree")]
     [Tooltip("The share of the logs above that bringing the tree down gives. The rest of the reward is in cutting it up.")]
     [SerializeField, Range(0.1f, 1f)] private float fellingShare = 0.6f;
@@ -177,6 +186,9 @@ public sealed class TreeChoppingSettings : GameSettings<TreeChoppingSettings>
     public IReadOnlyList<ItemDefinition> WoodByTier => woodByTier;
     public GameObject TerrainTreeProxy => terrainTreeProxy;
     public float TerrainTreeRegrowSeconds => terrainTreeRegrowSeconds;
+    public float SmallTreeHeight => smallTreeHeight;
+    public GameObject SmallTreeProxy => smallTreeProxy;
+    public GameObject SmallTreeBreak => smallTreeBreak;
 
     /// <summary>A tree's size from its height in metres.</summary>
     public float SizeOf(float height) => Mathf.Clamp(height / referenceHeight, minSize, maxSize);

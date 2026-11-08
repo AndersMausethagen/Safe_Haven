@@ -144,6 +144,10 @@ public sealed class ItemDefinition : ScriptableObject, IStackDefinition
     [Tooltip("Makes this item a transport's kit: using it sets the cart or boat down. Empty for other items.")]
     [SerializeField] private TransportDefinition transport;
 
+    [Header("Planting")]
+    [Tooltip("Makes this item a sapling planted at home (right-click): what tree it grows into and how fast. Empty for other items.")]
+    [SerializeField] private SaplingDefinition sapling;
+
     [Header("Lantern")]
     [Tooltip("Makes this item a light worn on the belt (the Light slot): how it shines and how long it lasts. Empty for other items.")]
     [SerializeField] private LanternDefinition lantern;
@@ -185,6 +189,8 @@ public sealed class ItemDefinition : ScriptableObject, IStackDefinition
     public float ThirstRestore => thirstRestore;
     public float WaterCapacity => waterCapacity;
     public bool HoldsWater => waterCapacity > 0f;
+    public SaplingDefinition Sapling => sapling;
+    public bool IsSapling => sapling != null;
     public LanternDefinition Lantern => lantern;
     public bool IsLantern => lantern != null;
 
@@ -202,7 +208,7 @@ public sealed class ItemDefinition : ScriptableObject, IStackDefinition
     public float GearRepair => gearRepair;
     public GameObject PlacesInRaid => placesInRaid;
     /// <summary>True when right-clicking does something: eat, drink, heal, equip or read.</summary>
-    public bool IsUsable => IsConsumable || IsEquippable || IsBlueprint || experience > 0 || transport != null;
+    public bool IsUsable => IsConsumable || IsEquippable || IsBlueprint || experience > 0 || transport != null || IsSapling;
     public TransportDefinition Transport => transport;
     public int CarryCapacityBonus => carryCapacityBonus;
     public float CarryNoise => carryNoise;

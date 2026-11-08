@@ -202,6 +202,11 @@ public sealed class ItemInventory : MonoBehaviour
             return Study(from, slot, item);
         }
 
+        if (item.IsSapling)
+        {
+            return Plant(from, slot, item);
+        }
+
         if (item.Transport != null)
         {
             return TransportDeployment.Deploy(gameObject, from, slot);
@@ -221,6 +226,32 @@ public sealed class ItemInventory : MonoBehaviour
         }
 
         return Consume(from, slot, item);
+    }
+
+    // A sapling goes into the ground a step in front of the player, at home only.
+    private bool Plant(ItemContainer from, int slot, ItemDefinition item)
+    {
+        PlantedTrees home = PlantedTrees.Current;
+        if (home == null)
+        {
+            GameMessages.Post($"A {item.DisplayName.ToLowerInvariant()} only takes root at home, in Safe Haven.", MessageKind.Warning);
+            return false;
+        }
+
+        Vector3 ahead = transform.forward;
+        ahead.y = 0f;
+        Vector3 at = transform.position + (ahead.sqrMagnitude > 0.01f ? ahead.normalized : Vector3.forward) * 1.6f;
+        if (!home.TryPlant(at, item.Sapling, out string problem))
+        {
+            GameMessages.Post(problem, MessageKind.Warning);
+            return false;
+        }
+
+        from.RemoveAt(slot, 1);
+        float days = item.Sapling.GrowDays;
+        GameMessages.Post($"You plant the {item.DisplayName.ToLowerInvariant()}. It should be a tree in about {days:0} day{(Mathf.Approximately(days, 1f) ? "" : "s")}.", MessageKind.Gain);
+        GameEvents.Raise(new GameEvent(GameEventKind.Consumed, item, 1, gameObject));
+        return true;
     }
 
     /// <summary>

@@ -27,6 +27,9 @@ MonoBehaviour:
   maxChance: 0.75
   terrainTreeProxy: {fileID: 1000865458160168767, guid: 36ef7e4c9d335574089c821a1f07f8f1, type: 3}
   terrainTreeRegrowSeconds: 900
+  smallTreeHeight: 6
+  smallTreeProxy: {fileID: 1000865458160168767, guid: 3ff15ae3251d803438f641815fb6dacb, type: 3}
+  smallTreeBreak: {fileID: 4074184185658077091, guid: 450fe5a12a2c2d54b85d5db2a1434208, type: 3}
   fellingShare: 0.6
   sectionsPerSize: 2
   minSections: 2
