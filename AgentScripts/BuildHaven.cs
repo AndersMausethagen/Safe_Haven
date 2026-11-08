@@ -492,7 +492,6 @@ public static class BuildHaven
             Overgrowth overgrowth = root.GetComponent<Overgrowth>() ?? root.AddComponent<Overgrowth>();
             var data = new SerializedObject(overgrowth);
             data.FindProperty("blightRadius").floatValue = blightRadius;
-            data.FindProperty("blightMaterial").objectReferenceValue = blight;
             data.ApplyModifiedPropertiesWithoutUndo();
             PrefabUtility.SaveAsPrefabAsset(root, prefabPath);
         }

@@ -5,8 +5,9 @@ using UnityEngine;
 /// <summary>
 /// Overgrowth choking Safe Haven's clearing at the start: brambles, fallen logs, old stumps, boulders. Each is a
 /// gathering node that never grows back (Respawn Seconds 0), gathered like any other (by hand, or with an axe or
-/// pickaxe of the right tier: the big stumps and boulders wait for better tools). While it stands it blocks building, and
-/// the ground under it lies dark and dead; clearing it gives its materials and the ground heals with a breath of green.
+/// pickaxe of the right tier: the big stumps and boulders wait for better tools). While it stands it blocks building;
+/// clearing it gives its materials and the ground heals with a breath of green motes. (A flat patch of dead ground under
+/// each piece read as a see-through square on the grass and was removed, 2026-11-08.)
 /// How much of the clearing is cleared adds to Safe Haven's renown (HavenRenown).
 /// </summary>
 [DisallowMultipleComponent]
@@ -20,14 +21,11 @@ public sealed class Overgrowth : MonoBehaviour
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetForNewPlaySession() => all.Clear();
 
-    [Tooltip("Metres of dead ground around it, healed when it is cleared.")]
+    [Tooltip("Metres round it where green motes rise when it is cleared.")]
     [SerializeField, Min(0.3f)] private float blightRadius = 1.6f;
-    [SerializeField] private Material blightMaterial;
 
     private ResourceNode node;
-    private Renderer blight;
     private ParticleSystem bloom;
-    private float healStarted = -1f;
 
     /// <summary>Raised when a piece of overgrowth is cleared.</summary>
     public static event Action<Overgrowth> Cleared;
@@ -61,19 +59,6 @@ public sealed class Overgrowth : MonoBehaviour
     private void Awake()
     {
         node = GetComponent<ResourceNode>();
-        if (blightMaterial != null)
-        {
-            GameObject decal = GameObject.CreatePrimitive(PrimitiveType.Quad);
-            decal.name = "Blight";
-            DestroyImmediate(decal.GetComponent<Collider>());
-            decal.transform.SetParent(transform, false);
-            decal.transform.localPosition = Vector3.up * 0.04f;
-            decal.transform.localRotation = Quaternion.Euler(90f, UnityEngine.Random.Range(0f, 360f), 0f);
-            decal.transform.localScale = Vector3.one * blightRadius * 2f / Mathf.Max(0.01f, transform.lossyScale.x);
-            blight = decal.GetComponent<Renderer>();
-            blight.sharedMaterial = blightMaterial;
-            blight.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-        }
     }
 
     private void OnEnable()
@@ -88,33 +73,8 @@ public sealed class Overgrowth : MonoBehaviour
         node.Harvested -= OnHarvested;
     }
 
-    private void Start()
-    {
-        if (blight != null)
-        {
-            blight.gameObject.SetActive(!IsCleared);
-        }
-    }
-
-    private void Update()
-    {
-        if (healStarted < 0f || blight == null)
-        {
-            return;
-        }
-
-        float t = Mathf.Clamp01((Time.time - healStarted) / 1.6f);
-        blight.transform.localScale = Vector3.one * Mathf.Lerp(blightRadius * 2f, 0.01f, t * t) / Mathf.Max(0.01f, transform.lossyScale.x);
-        if (t >= 1f)
-        {
-            healStarted = -1f;
-            blight.gameObject.SetActive(false);
-        }
-    }
-
     private void OnHarvested()
     {
-        healStarted = Time.time;
         Bloom();
         Cleared?.Invoke(this);
     }
@@ -139,10 +99,7 @@ public sealed class Overgrowth : MonoBehaviour
             main.gravityModifier = -0.08f;
             ParticleSystem.EmissionModule emission = bloom.emission;
             emission.rateOverTime = 0f;
-            if (blightMaterial != null)
-            {
-                go.GetComponent<ParticleSystemRenderer>().sharedMaterial = ConstructionSettings.Current.DustMaterial;
-            }
+            go.GetComponent<ParticleSystemRenderer>().sharedMaterial = ConstructionSettings.Current.DustMaterial;
         }
 
         for (int i = 0; i < 36; i++)

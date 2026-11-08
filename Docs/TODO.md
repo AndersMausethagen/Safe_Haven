@@ -42,7 +42,9 @@ After the second list, in this order.
 - [x] The portal: visit a friend's Haven or invite a friend to ours, so co-op is part of the lore and the world's things.
       Its menu (once awake): Call friends to Safe Haven, Walk to a friend's Haven (friends whose door is open, from Steam),
       Call another friend / Close the way while hosting, Walk home while visiting. Still to try in a Steam build.
-- [ ] The things in the base to clear have a flat square round them, like a see-through square on the ground. Remove it.
+- [x] The things in the base to clear have a flat square round them, like a see-through square on the ground. Remove it.
+      It was Overgrowth's patch of dead ground, a flat quad 3-6 m wide made under every piece; gone (the green motes on
+      clearing stay).
 - [ ] The highlight sometimes crosses inside an object instead of following only its outline.
 - [ ] Small trees can't be chopped, only broken down to sticks.
 - [ ] Trees grow back in the Haven when a save is loaded: they shouldn't. A felled tree gives a sapling, which can be
