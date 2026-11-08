@@ -1,11 +1,13 @@
 // Safe Haven: heat shimmering over a fire (LightFlicker adds it over campfires, bonfires and torches). A camera-facing
 // quad that redraws the scene behind it (the opaque texture) through a slow upward-rolling ripple, strongest just
-// above the flames and fading out at the quad's edges and top. Drawn before the flames, so they stay sharp.
+// above the flames and fading out at the quad's edges and top. Drawn before the flames, so they stay sharp. Kept faint:
+// the user found it far too strong (2026-11-08), and the opaque texture is half resolution, so a full blend blurs.
 Shader "Safe Haven/Heat Haze"
 {
     Properties
     {
-        _Strength ("Strength", Range(0, 0.05)) = 0.012
+        _Strength ("Strength", Range(0, 0.05)) = 0.004
+        _Opacity ("Opacity", Range(0, 1)) = 0.5
         _Speed ("Rise Speed", Range(0, 4)) = 1.4
         _Scale ("Ripple Size", Range(1, 40)) = 14
     }
@@ -31,6 +33,7 @@ Shader "Safe Haven/Heat Haze"
 
             CBUFFER_START(UnityPerMaterial)
                 float _Strength;
+                float _Opacity;
                 float _Speed;
                 float _Scale;
             CBUFFER_END
@@ -76,7 +79,9 @@ Shader "Safe Haven/Heat Haze"
                 float mask = smoothstep(0.0, 0.35, across) * smoothstep(0.0, 0.15, uv.y) * (1.0 - smoothstep(0.4, 1.0, uv.y));
                 float2 screenUV = GetNormalizedScreenSpaceUV(input.positionCS);
                 half3 scene = SampleSceneColor(screenUV + ripple * _Strength * mask);
-                return half4(scene, mask);
+                // The scene copy is half the screen's resolution: blended in fully it reads as a blur over the fire, so
+                // only part of it shows, enough to carry the ripple.
+                return half4(scene, mask * _Opacity);
             }
             ENDHLSL
         }

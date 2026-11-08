@@ -25,9 +25,10 @@ Material:
     m_TexEnvs: []
     m_Ints: []
     m_Floats:
+    - _Opacity: 0.5
     - _Scale: 14
     - _Speed: 1.4
-    - _Strength: 0.012
+    - _Strength: 0.004
     m_Colors: []
   m_BuildTextureStacks: []
   m_AllowLocking: 1

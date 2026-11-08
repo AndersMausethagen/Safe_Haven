@@ -10,7 +10,8 @@ In the user's order. Fishing first, then the rest.
       give line by how hard the fish fights, lean the rod against its runs, it tires and is landed; the view comes down
       close, keeping the player and the float in view (`FishFight`, `PlayerFishing`, `PlayerCameraController.BeginCloseUp`).
       A fish brought onto the shore is caught there.
-- [ ] The fire's warm blur (heat shimmer) is far too strong.
+- [x] The fire's warm blur (heat shimmer) is far too strong. The haze drew a half-resolution copy of the scene at full
+      opacity above every fire: a third of the ripple now (Strength 0.004), half blended in (`HeatHaze.shader`, Opacity).
 - [ ] Prologue: the troll walks far too fast towards the camp; it should stop at the camp, not go on. The NPCs run to the
       portal instead of staying to fight.
 - [ ] Prologue: Ingrid heals the player when their health is low.
