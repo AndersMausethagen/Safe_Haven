@@ -1,5 +1,6 @@
 // Unlit particles for combat effects (CombatEffectsBuilder): texture x vertex colour x tint, additive by default. Set
-// the blend to SrcAlpha / OneMinusSrcAlpha for dust and smoke.
+// the blend to SrcAlpha / OneMinusSrcAlpha for dust and smoke. Soft: particles fade out where they meet what is behind them
+// (the ground, a wall) over Soft Distance, so smoke and dust never show the hard line of their quad cutting into it.
 Shader "Safe Haven/Effect Particle"
 {
     Properties
@@ -8,6 +9,7 @@ Shader "Safe Haven/Effect Particle"
         [HDR] _TintColor ("Tint", Color) = (1, 1, 1, 1)
         [Enum(UnityEngine.Rendering.BlendMode)] _SrcBlend ("Source Blend", Float) = 5
         [Enum(UnityEngine.Rendering.BlendMode)] _DstBlend ("Destination Blend", Float) = 1
+        _SoftDistance ("Soft Distance (m)", Range(0, 2)) = 0.35
     }
 
     SubShader
@@ -26,6 +28,7 @@ Shader "Safe Haven/Effect Particle"
             #pragma vertex Vert
             #pragma fragment Frag
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareDepthTexture.hlsl"
 
             TEXTURE2D(_MainTex);
             SAMPLER(sampler_MainTex);
@@ -35,6 +38,7 @@ Shader "Safe Haven/Effect Particle"
                 half4 _TintColor;
                 half _SrcBlend;
                 half _DstBlend;
+                float _SoftDistance;
             CBUFFER_END
 
             struct Attributes
@@ -63,7 +67,15 @@ Shader "Safe Haven/Effect Particle"
             half4 Frag(Varyings input) : SV_Target
             {
                 half4 texel = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, input.uv);
-                return texel * input.color;
+                half4 colour = texel * input.color;
+                if (_SoftDistance > 0.001)
+                {
+                    float2 screenUV = GetNormalizedScreenSpaceUV(input.positionCS);
+                    float behind = LinearEyeDepth(SampleSceneDepth(screenUV), _ZBufferParams) - input.positionCS.w;
+                    colour.a *= saturate(behind / _SoftDistance);
+                }
+
+                return colour;
             }
             ENDHLSL
         }

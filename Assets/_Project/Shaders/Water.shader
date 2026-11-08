@@ -30,6 +30,7 @@ Shader "Safe Haven/Water"
         _WindRipples ("Wind Makes It Choppy", Range(0, 2)) = 1
         _Smoothness ("Smoothness", Range(0, 1)) = 0.93
         _Reflection ("Reflection Strength", Range(0, 1)) = 0.8
+        _ScreenReflection ("Screen-Space Reflection", Range(0, 1)) = 1
         _Refraction ("Refraction", Range(0, 0.15)) = 0.03
         [Header(Flow)]
         _FlowDirection ("Flow Direction (object X, Z)", Vector) = (1, 0, 0, 0)
@@ -97,6 +98,7 @@ Shader "Safe Haven/Water"
                 half4 _ShallowColor, _DeepColor, _FastColor, _FoamColor;
                 float4 _FlowDirection;
                 float _DepthDistance, _Clarity, _Murk, _NormalTiling, _NormalStrength, _WindRipples, _Smoothness;
+                float _ScreenReflection;
                 float _Reflection, _Refraction, _FlowSpeed, _FallSpeed, _FallTiling, _VertexAlpha, _Cull, _SteepFaces;
                 float _FoamTiling, _ShoreFoam, _FoamTrail, _SpeedFoam, _FallFoam, _Caustics, _CausticsTiling;
                 float _RippleStrength, _RainRipples, _FlowFromMesh;
@@ -268,6 +270,43 @@ Shader "Safe Haven/Water"
                     raw = lerp(UNITY_NEAR_CLIP_VALUE, 1, raw);
                 #endif
                 return ComputeWorldSpacePosition(uv, raw, UNITY_MATRIX_I_VP);
+            }
+
+            // Screen-space reflection: the reflected ray marched against the depth buffer, in growing steps; where it passes
+            // behind something on screen (a tree on the far shore, a jetty, the player), that thing's colour is what the water
+            // shows. Fades out towards the screen's edges and the march's end, where the probe's reflection takes over.
+            half3 ScreenReflection(float3 positionWS, float3 direction, half3 fallback)
+            {
+                if (_ScreenReflection <= 0.001)
+                {
+                    return fallback;
+                }
+
+                float3 p = positionWS;
+                float stride = 0.35;
+                [loop] for (int i = 0; i < 24; i++)
+                {
+                    p += direction * stride;
+                    stride *= 1.15;
+                    float2 uv = ComputeNormalizedDeviceCoordinates(p, UNITY_MATRIX_VP);
+                    if (any(uv < 0.0) || any(uv > 1.0))
+                    {
+                        break;
+                    }
+
+                    float rayDepth = LinearEyeDepth(p, UNITY_MATRIX_V);
+                    float sceneDepth = LinearEyeDepth(LoadSceneDepth(uint2(uv * _ScreenSize.xy)), _ZBufferParams);
+                    float behind = rayDepth - sceneDepth;
+                    if (behind > 0.02 && behind < stride * 2.0 + 0.25)
+                    {
+                        float2 edge = smoothstep(0.0, 0.1, uv) * smoothstep(0.0, 0.1, 1.0 - uv);
+                        half found = edge.x * edge.y * (1.0 - i / 24.0) * _ScreenReflection;
+                        half3 seen = SAMPLE_TEXTURE2D_X_LOD(_CameraOpaqueTexture, sampler_CameraOpaqueTexture, UnityStereoTransformScreenSpaceTex(uv), 0).rgb;
+                        return lerp(fallback, seen, found);
+                    }
+                }
+
+                return fallback;
             }
 
             // GGX sun glint (URP's minimal Cook-Torrance), water F0 = 0.02.
@@ -474,6 +513,9 @@ Shader "Safe Haven/Water"
 
                 half fresnel = 0.02 + 0.98 * pow(1.0 - saturate(dot(normal, view)), 5.0);
                 half3 reflection = GlossyEnvironmentReflection(reflect(-view, normal), positionWS, 1.0 - _Smoothness, 1.0, screenUV);
+                #if !defined(SAFE_HAVEN_WATER_SIMPLE)
+                    reflection = ScreenReflection(positionWS, reflect(-view, normal), reflection);
+                #endif
                 half3 colour = lerp(water, reflection, fresnel * _Reflection * (1.0 - white * 0.5)) + glint * (1.0 - white);
                 half3 foamLight = sun.color * sun.shadowAttenuation * saturate(dot(surfaceNormal, sun.direction)) * 0.8 + ambient;
                 colour = lerp(colour, _FoamColor.rgb * foamLight, foam);

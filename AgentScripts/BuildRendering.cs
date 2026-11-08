@@ -29,7 +29,7 @@ public static class BuildRendering
 
     public static string Apply()
     {
-        var report = new List<string> { Settings(), Shadows(), Feature(), Volume() };
+        var report = new List<string> { Settings(), Shadows(), Feature(), Volume(), Haze() };
         AssetDatabase.SaveAssets();
         return string.Join("; ", report);
     }
@@ -134,5 +134,21 @@ public static class BuildRendering
         EditorUtility.SetDirty(filmic);
         EditorUtility.SetDirty(profile);
         return $"Haven volume: {Curve}";
+    }
+
+    // The heat haze LightFlicker puts over fires (Resources/Heat Haze).
+    private static string Haze()
+    {
+        const string path = "Assets/_Project/Resources/Heat Haze.mat";
+        var material = AssetDatabase.LoadAssetAtPath<Material>(path);
+        if (material == null)
+        {
+            material = new Material(Shader.Find("Safe Haven/Heat Haze"));
+            AssetDatabase.CreateAsset(material, path);
+        }
+
+        material.enableInstancing = true;
+        EditorUtility.SetDirty(material);
+        return "heat haze";
     }
 }
