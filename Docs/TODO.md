@@ -23,8 +23,10 @@ From the user's run through the prologue in a build. Build work is paused until 
       player controller (Fish Begin/Cast/Wait/Fight/Catch/Haul) but PlayerFishing never plays them: still to hook up.
 - [x] Prologue boar too tough: one boar, a regular one (not the blight boar), and the hunt asks for one. `Boar`
       (70 health, 2 armour, 6 damage; BuildPrologueBoar); the prefab's Combatant takes BoarStats.
-- [ ] Archery: the aim doesn't hold on an enemy when the mouse is held over it. Test with `PlayerArchery.ChooseTarget`
-      and a ray through the creature, while drawing.
+- [ ] Archery: the aim doesn't hold on an enemy when the mouse is held over it. Not reproduced in the editor (2026-11-08):
+      a ray anywhere over the body of a Boar, Small Moss Troll or Rootling picks it (`PlayerArchery.ChooseTarget`), and it
+      held on every frame while drawing, loosing and being charged, through the real mouse path too; the outline sits on
+      it. Need from the user: what fails (no red outline, outline flickers, arrows miss an outlined target), which creature.
 - [x] The portal's sleeping stones lost the model's own textures (2026-11-03, `BuildPortalHeart.SleepingStones` painted them
       flat Base Stone): flat, blue at night, low-detail. `BuildPortalHeart.RestoreSleepingStones` gives them back.
 

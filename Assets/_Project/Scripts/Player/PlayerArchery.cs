@@ -564,7 +564,15 @@ public sealed class PlayerArchery : MonoBehaviour
             return;
         }
 
-        bool crosshair = CameraPointer.UsesScreenCenter;
+        ChooseTarget(ray, CameraPointer.UsesScreenCenter);
+    }
+
+    /// <summary>Picks the target and aim point for a pointer ray (the cursor's, or the crosshair's when
+    /// <paramref name="crosshair"/>): the hostile creature it points at, else the nearest one close to it that the bow can
+    /// see. Public so a probe can aim as a hovering mouse would.</summary>
+    public void ChooseTarget(Ray ray, bool crosshair)
+    {
+        Vector3 origin = Origin;
         float reach = Vector3.Distance(ray.origin, transform.position) + aimRange;
         bool pointed = Nearest(ray, reach, out RaycastHit hit);
         Vector3 spot = pointed ? hit.point : ray.GetPoint(reach);
