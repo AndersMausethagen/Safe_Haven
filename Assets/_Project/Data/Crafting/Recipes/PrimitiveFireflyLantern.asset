@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e984d5700951ee48b9215d668e8218a, type: 3}
+  m_Name: PrimitiveFireflyLantern
+  m_EditorClassIdentifier: SafeHaven::RecipeDefinition
+  id: primitive_firefly_lantern
+  displayName: 
+  output: {fileID: 11400000, guid: b1c908dc52f27d245ac297b292dc261b, type: 2}
+  outputResource: {fileID: 0}
+  outputAmount: 1
+  resourceCost: []
+  itemCost:
+  - item: {fileID: 11400000, guid: e8bb5d2fbded52b42a179a47cce32d53, type: 2}
+    amount: 6
+  - item: {fileID: 11400000, guid: 56e2fd4d1b777f24ca26e167686a976c, type: 2}
+    amount: 1
+  station: 0
+  craftSeconds: 5
+  knownFromStart: 1
+  minimumStationTier: 0
+  requiredSkill: {fileID: 0}
+  requiredSkillLevel: 0
+  sortOrder: 0

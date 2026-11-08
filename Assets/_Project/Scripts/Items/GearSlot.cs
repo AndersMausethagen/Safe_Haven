@@ -52,6 +52,8 @@ public enum GearSlot
     PickaxeTool = 15,
     SickleTool = 16,
     OffHand = 17,
+    /// <summary>A lantern on the belt: light with both hands free.</summary>
+    Light = 18,
 }
 
 /// <summary>
@@ -63,7 +65,7 @@ public enum GearSlot
 public static class GearSlots
 {
     /// <summary>How many gear slots there are, retired ones included.</summary>
-    public const int Count = 18;
+    public const int Count = 19;
 
     /// <summary>Slots that no longer take anything.</summary>
     public static bool IsRetired(GearSlot slot) =>
@@ -91,6 +93,8 @@ public static class GearSlots
                 return item.IsTool && item.ToolType == ToolType.Pickaxe;
             case GearSlot.SickleTool:
                 return item.IsTool && item.ToolType == ToolType.Sickle;
+            case GearSlot.Light:
+                return item.IsLantern;
             case GearSlot.Finger1:
             case GearSlot.Finger2:
                 return item.ArmorSlot == ArmorSlot.Finger;

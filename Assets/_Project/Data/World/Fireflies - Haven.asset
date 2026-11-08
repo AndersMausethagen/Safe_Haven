@@ -13,11 +13,19 @@ MonoBehaviour:
   m_Name: Fireflies - Haven
   m_EditorClassIdentifier: SafeHaven::FireflyProfile
   colour: {r: 0.55, g: 1, b: 0.3, a: 1}
-  nightCount: 130
+  nightCount: 90
   dayCount: 8
   radius: 26
   height: {x: 0.4, y: 2.8}
-  size: {x: 0.22, y: 0.4}
+  size: {x: 0.18, y: 0.33}
   life: {x: 6, y: 12}
   wander: 0.7
   rainShyness: 0.85
+  lightShare: 0.2
+  lightDistance: {x: 1.2, y: 5}
+  catchable: {fileID: 11400000, guid: 56e2fd4d1b777f24ca26e167686a976c, type: 2}
+  catchableAtNight: 3
+  catchableByDay: 0
+  nearPlayerShare: 0.35
+  catchableLife: {x: 45, y: 90}
+  catchableGlow: {fileID: 2100000, guid: 56ca087bb1eca684999b226916dc8156, type: 2}

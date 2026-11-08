@@ -11627,7 +11627,7 @@ MonoBehaviour:
         id: 32a517dbddaf4c238f45f2336a4f8bb4
         position: {x: 2440, y: 570}
         items:
-        - item: {fileID: 11400000, guid: 3ed1b8336d9f73749968dc70e483ba5d, type: 2}
+        - item: {fileID: 11400000, guid: b1c908dc52f27d245ac297b292dc261b, type: 2}
           amount: 1
         equip: 1
     - rid: 2623125860895687630

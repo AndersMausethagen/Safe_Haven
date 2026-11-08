@@ -447,6 +447,20 @@ building and its levels, a second of a kind counts half, cleared overgrowth, res
 Portal) celebrates each `HavenSettings` rank once and records it in `SettlementState.HavenRank`, which widens the
 ward (`HomePortal.WardRadius`; the moss spreads out to the new edge). Content is built by `AgentScripts/BuildHaven.cs`. A level can ask for other buildings (`BuildingLevel.requires`), a building for a rank (`requiredRank`); `BuildingUnlocks` answers both. Ranks can bring a settler (`HavenSettings.Rank.settler`). Beds are counted in `SettlementState.NoteBuildings` and never gate anyone. What every reached upgrade adds, where raids can't look at the scene, comes from `SettlementState.UpgradeBonus`. The Trading Post is `TradingPost` + `TradeSettings`; `WatchPostArcher` and `WardTotem` act only in a breach; `FieldCamp` and any other `ItemDefinition.placesInRaid` kit are set down by `ItemInventory`. See [base progression](../../../Docs/BaseProgression.md).
 
+### Lanterns and fireflies
+
+A lantern is an item with a `LanternDefinition` (its light, colour, flicker, hours and refill). It is worn in the Light gear
+slot (`GearSlot.Light`, appended at 18, so saves keep their indices; the character screen's right column) and keeps the
+light it has left as its condition (`ItemStack.LightHours`, like a waterskin's water). `PlayerLantern` hangs it from the
+left hip on a short swing, lights it (L, the light key: the lantern first, else the off-hand torch), breathes its light and
+glass, and burns it down in in-game hours (from the `DayNightCycle`'s clock), writing what is left back every 3 in-game
+minutes. Right-clicking a lantern that isn't full with its refill in the bag refills it (`ItemInventory.Refill`); empty,
+L refills it the same way. The Primitive Firefly Lantern (6 Sticks and a Firefly, by hand) is what the prologue hands out
+on the road instead of a torch. Fireflies (`Fireflies`, a particle swarm per place, `FireflyProfile`) send a share of new
+ones to the fires and lamps near the view (`WorldLights.Current`) and the player's lantern; `CatchableFireflies` keeps a few
+real ones about at night (by lights, or near the player), pooled and moved by one Update, each an Interactable on a still
+anchor ("Catch Firefly") that gives a Firefly. Content: `AgentScripts/BuildFireflyLantern.cs`.
+
 ### Fishing and the Nøkken
 
 A Fishing Rod is a weapon of kind Fishing Rod (`WeaponDefinition.TakesAttackInput`, like the bow), so `PlayerFishing`

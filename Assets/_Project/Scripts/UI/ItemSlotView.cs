@@ -80,6 +80,7 @@ public sealed class ItemSlotView : MonoBehaviour,
         // Gear never stacks, so its corner shows wear instead of a count once it is damaged.
         // A water container shows how much it holds (red when empty).
         countLabel.text = filled && stack.Count > 1 ? stack.Count.ToString()
+            : filled && stack.Item.IsLantern ? $"<color={(stack.LightHours < 1f ? UIStyle.Current.DangerHex : UIStyle.Current.GoodHex)}>{Mathf.CeilToInt(stack.LightHours)}h</color>"
             : filled && stack.Item.HoldsWater ? $"<color={(stack.Water < 0.5f ? UIStyle.Current.DangerHex : UIStyle.Current.WaterHex)}>{Mathf.RoundToInt(stack.Water)}</color>"
             : stack.IsDamaged ? $"<color={(stack.IsBroken ? UIStyle.Current.DangerHex : UIStyle.Current.WarningHex)}>{Mathf.RoundToInt(stack.Durability * 100f)}%</color>"
             : worked.HasValue ? $"<color=#{ColorUtility.ToHtmlStringRGB(worked.Value)}>♦</color>"

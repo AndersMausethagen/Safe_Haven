@@ -186,6 +186,11 @@ public sealed class ItemInventory : MonoBehaviour
             return false;
         }
 
+        if (item.IsLantern && Refill(from, slot))
+        {
+            return true;
+        }
+
         if (item.IsEquippable)
         {
             var equipment = GetComponent<PlayerEquipment>();
@@ -216,6 +221,31 @@ public sealed class ItemInventory : MonoBehaviour
         }
 
         return Consume(from, slot, item);
+    }
+
+    /// <summary>
+    /// Refills a lantern that isn't full with one of its refills (a firefly) from the bag or the pocket it is in: it is full
+    /// again. False when it is full or there is nothing to refill it with.
+    /// </summary>
+    public bool Refill(ItemContainer from, int slot)
+    {
+        ItemStack stack = from != null ? from.GetSlot(slot) : ItemStack.Empty;
+        LanternDefinition lantern = stack.IsEmpty ? null : stack.Item.Lantern;
+        if (lantern == null || lantern.Refill == null || stack.Durability >= 0.999f)
+        {
+            return false;
+        }
+
+        ItemContainer source = from.Count(lantern.Refill) > 0 ? from : Container.Count(lantern.Refill) > 0 ? Container : null;
+        if (source == null)
+        {
+            return false;
+        }
+
+        source.Remove(lantern.Refill, 1);
+        from.SetDurability(slot, 1f);
+        GameMessages.Post($"You let a {lantern.Refill.DisplayName.ToLowerInvariant()} into the {stack.Item.DisplayName}. It glows full again.", MessageKind.Gain);
+        return true;
     }
 
     // A water container: drinks what thirst lacks, from what is in it, and keeps the container.

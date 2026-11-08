@@ -20,6 +20,7 @@ public sealed class PlayerInputHandler : MonoBehaviour
 
     private PlayerStealth stealth;
     private PlayerEquipment equipment;
+    private PlayerLantern lantern;
     private CommandWheel commandWheel;
     // The skill actions' callbacks, one per slot, kept so they can be unsubscribed.
     private readonly System.Action<InputAction.CallbackContext>[] skillCallbacks = new System.Action<InputAction.CallbackContext>[SkillLoadout.SlotCount];
@@ -39,6 +40,7 @@ public sealed class PlayerInputHandler : MonoBehaviour
         stateMachine = GetComponent<PlayerStateMachine>();
         stealth = GetComponent<PlayerStealth>();
         equipment = GetComponent<PlayerEquipment>();
+        lantern = GetComponent<PlayerLantern>();
         movementCamera = movementCamera != null ? movementCamera : Camera.main;
 
         if (movementCamera == null)
@@ -277,8 +279,14 @@ public sealed class PlayerInputHandler : MonoBehaviour
 
     private void OnCycleArrows(InputAction.CallbackContext context) => stateMachine.RequestArrowCycle();
 
+    // The light key: the lantern on the belt when one is worn, else the torch in the off hand.
     private void OnToggleTorch(InputAction.CallbackContext context)
     {
+        if (lantern != null && lantern.Toggle())
+        {
+            return;
+        }
+
         if (equipment != null)
         {
             equipment.ToggleTorch();

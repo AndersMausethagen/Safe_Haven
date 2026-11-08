@@ -25,12 +25,13 @@ In the user's order. Fishing first, then the rest.
       Boundary walls were still there (12 to 14 m inside the terrain on every side).
 - [x] More than 30 arrows: let the stack (or quiver) hold more. Arrows stack to 99 (were 50); the bow comes with 60 in the
       prologue (was 30: the playtest ran out).
-- [ ] Light: a light slot in the Character window, switched with C. Instead of a torch in hand, a lantern on the belt, so
-      both hands are free.
-- [ ] New item, Primitive Firefly Lantern: 6 sticks and 1 firefly, made from the inventory; a pale green, flickering glow,
+- [x] Light: a light slot in the Character window, switched with C. Instead of a torch in hand, a lantern on the belt, so
+      both hands are free. Read as: the Light slot is in the Character window (C opens it); L (the light key) lights the
+      lantern, as C already opens that window. The prologue hands out the lantern instead of the torch.
+- [x] New item, Primitive Firefly Lantern: 6 sticks and 1 firefly, made from the inventory; a pale green, flickering glow,
       as of fireflies inside; light for 24 in-game hours; refilled in the inventory with a firefly.
-- [ ] Fireflies can be caught with E when close.
-- [ ] Fireflies gather round lights and now and then come near the player, so one can be caught. Slightly less prominent,
+- [x] Fireflies can be caught with E when close.
+- [x] Fireflies gather round lights and now and then come near the player, so one can be caught. Slightly less prominent,
       but not rare.
 
 ## Third playtest list (2026-11-08)

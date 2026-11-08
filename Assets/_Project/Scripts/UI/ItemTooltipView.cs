@@ -337,6 +337,15 @@ public sealed class ItemTooltipView : MonoBehaviour
             builder.Append($"\n<color={color}>Durability {percent}%{(worn.IsBroken ? " – broken, repair it at a Workshop" : "")}</color>");
         }
 
+        if (item.IsLantern)
+        {
+            float hours = held ? stack.Value.LightHours : item.Lantern.Hours;
+            string colour = hours < 1f ? UIStyle.Current.DangerHex : UIStyle.Current.GoodHex;
+            string refill = item.Lantern.Refill != null ? item.Lantern.Refill.DisplayName.ToLowerInvariant() : "refill";
+            builder.Append($"\n<color={colour}>Light {Mathf.CeilToInt(hours)} of {Mathf.RoundToInt(item.Lantern.Hours)} hours</color>");
+            builder.Append($"\nWorn in the Light slot; L lights it. Right-click with a {refill} in the bag to refill it.");
+        }
+
         if (item.HoldsWater)
         {
             float water = held ? stack.Value.Water : item.WaterCapacity;

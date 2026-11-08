@@ -16,8 +16,24 @@ public sealed class WorldLights : MonoBehaviour
     private RenderingSettings settings;
     private float nextScan;
 
+    /// <summary>The one made for the game (WorldRendering), or null.</summary>
+    public static WorldLights Current { get; private set; }
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => Current = null;
+
     /// <summary>Fires and lamps as of the last scan (some may have gone since: skip nulls).</summary>
     public IReadOnlyList<Light> Lights => lights;
+
+    private void OnEnable() => Current = this;
+
+    private void OnDisable()
+    {
+        if (Current == this)
+        {
+            Current = null;
+        }
+    }
 
     public void Initialise(RenderingSettings rules) => settings = rules;
 

@@ -144,6 +144,10 @@ public sealed class ItemDefinition : ScriptableObject, IStackDefinition
     [Tooltip("Makes this item a transport's kit: using it sets the cart or boat down. Empty for other items.")]
     [SerializeField] private TransportDefinition transport;
 
+    [Header("Lantern")]
+    [Tooltip("Makes this item a light worn on the belt (the Light slot): how it shines and how long it lasts. Empty for other items.")]
+    [SerializeField] private LanternDefinition lantern;
+
     [Header("Raid")]
     [Tooltip("Makes this item a raid modifier: picked at the raid portal and used up when the raid starts. Empty for other items.")]
     [SerializeField] private RaidModifierDefinition raidModifier;
@@ -181,9 +185,12 @@ public sealed class ItemDefinition : ScriptableObject, IStackDefinition
     public float ThirstRestore => thirstRestore;
     public float WaterCapacity => waterCapacity;
     public bool HoldsWater => waterCapacity > 0f;
+    public LanternDefinition Lantern => lantern;
+    public bool IsLantern => lantern != null;
 
-    /// <summary>Each stack keeps its own condition: durability for gear, the water level for a water container.</summary>
-    public bool KeepsCondition => HasDurability || HoldsWater;
+    /// <summary>Each stack keeps its own condition: durability for gear, the water level for a water container, the light
+    /// left in a lantern.</summary>
+    public bool KeepsCondition => HasDurability || HoldsWater || IsLantern;
     public IReadOnlyList<StatBonus> BoonBonuses => boonBonuses;
     public float BoonSeconds => boonSeconds;
     public bool IsTonic => tonic;
@@ -207,7 +214,7 @@ public sealed class ItemDefinition : ScriptableObject, IStackDefinition
     public bool IsArmor => armorSlot != ArmorSlot.None;
     public GearLookDefinition WornLook => wornLook;
     /// <summary>True for anything that goes into a gear slot: armor, jewelry, weapons, backpacks and tools.</summary>
-    public bool IsEquippable => IsArmor || IsWeapon || IsBackpack || IsTool;
+    public bool IsEquippable => IsArmor || IsWeapon || IsBackpack || IsTool || IsLantern;
     public IReadOnlyList<StatBonus> StatBonuses => statBonuses;
     public IReadOnlyList<BuildingDefinition> TeachesBuildings => teachesBuildings;
     public IReadOnlyList<RecipeDefinition> TeachesRecipes => teachesRecipes;

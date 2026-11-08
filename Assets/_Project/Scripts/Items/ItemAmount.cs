@@ -92,6 +92,12 @@ public readonly struct ItemStack
     public float Water => IsEmpty || !Item.HoldsWater ? 0f : Durability * Item.WaterCapacity;
 
     /// <summary>The same container holding <paramref name="water"/>.</summary>
+    /// <summary>In-game hours of light left in a lantern (ItemDefinition.Lantern), 0 for anything else.</summary>
+    public float LightHours => IsEmpty || !Item.IsLantern ? 0f : Durability * Item.Lantern.Hours;
+
+    public ItemStack WithLightHours(float hours) =>
+        IsEmpty || !Item.IsLantern ? this : WithDurability(Mathf.Clamp01(hours / Item.Lantern.Hours));
+
     public ItemStack WithWater(float water) =>
         IsEmpty || !Item.HoldsWater ? this : WithDurability(Mathf.Clamp01(water / Item.WaterCapacity));
 

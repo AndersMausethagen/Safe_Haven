@@ -45,7 +45,8 @@ public sealed class DynamicQuestTests
         Assert.AreEqual(12, (int)GearSlot.MainHand);
         Assert.AreEqual(16, (int)GearSlot.SickleTool);
         Assert.AreEqual(17, (int)GearSlot.OffHand);
-        Assert.AreEqual(18, GearSlots.Count);
+        Assert.AreEqual(18, (int)GearSlot.Light, "new slots go at the end");
+        Assert.AreEqual(19, GearSlots.Count);
     }
 
     [TestCase(WeaponStance.TwoHanded)]
