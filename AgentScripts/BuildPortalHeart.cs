@@ -177,20 +177,54 @@ public static class BuildPortalHeart
     }
 
     // The active look was the only one with a model, so a sleeping portal at the centre of the base would be nothing at all.
+    // The copy keeps the model's own material (its base colour, normal and occlusion maps): until 2026-11-08 this painted it
+    // flat Base Stone, which threw the carved detail away and let the night turn the stones blue.
     private static void SleepingStones(RaidPortal portal)
     {
         Transform dormant = portal.transform.Find("Dormant Look");
+        Transform frame = portal.transform.Find("Active Look").GetComponentsInChildren<BoxCollider>(true).First().transform;
         if (dormant.childCount > 0)
         {
+            RestoreStones(dormant, frame);
             return;
         }
 
-        Transform frame = portal.transform.Find("Active Look").GetComponentsInChildren<BoxCollider>(true).First().transform;
-        Material stone = AssetDatabase.LoadAssetAtPath<Material>("Assets/_Project/Materials/Haven/Base Stone.mat");
         GameObject copy = Object.Instantiate(frame.gameObject, dormant, true);
         copy.name = "Sleeping Stones";
-        var renderer = copy.GetComponent<MeshRenderer>();
-        renderer.sharedMaterials = Enumerable.Repeat(stone, renderer.sharedMaterials.Length).ToArray();
+    }
+
+    /// <summary>Gives the sleeping stones the active model's own materials back (`--entry BuildPortalHeart.RestoreSleepingStones`,
+    /// SafeHaven open). Saves the scene.</summary>
+    public static string RestoreSleepingStones()
+    {
+        RaidPortal portal = Object.FindObjectsByType<RaidPortal>(FindObjectsInactive.Include)
+            .FirstOrDefault(p => p.transform.Find("Dormant Look/Sleeping Stones") != null);
+        if (portal == null)
+        {
+            return "no portal with sleeping stones in the open scene";
+        }
+
+        Transform frame = portal.transform.Find("Active Look").GetComponentsInChildren<BoxCollider>(true).First().transform;
+        string done = RestoreStones(portal.transform.Find("Dormant Look"), frame);
+        UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(portal.gameObject.scene);
+        UnityEditor.SceneManagement.EditorSceneManager.SaveScene(portal.gameObject.scene);
+        return done;
+    }
+
+    private static string RestoreStones(Transform dormant, Transform frame)
+    {
+        Transform stones = dormant.Find("Sleeping Stones");
+        var renderer = stones != null ? stones.GetComponent<MeshRenderer>() : null;
+        var source = frame.GetComponent<MeshRenderer>();
+        if (renderer == null || source == null)
+        {
+            return "no sleeping stones or active model renderer";
+        }
+
+        Undo.RecordObject(renderer, "Restore sleeping stones");
+        renderer.sharedMaterials = source.sharedMaterials;
+        EditorUtility.SetDirty(renderer);
+        return "sleeping stones wear " + string.Join(", ", source.sharedMaterials.Select(m => m != null ? m.name + " (" + m.shader.name + ")" : "none"));
     }
 
     // ----- The words -----
