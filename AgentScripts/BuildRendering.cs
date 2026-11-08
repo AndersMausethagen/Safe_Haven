@@ -29,7 +29,7 @@ public static class BuildRendering
 
     public static string Apply()
     {
-        var report = new List<string> { Settings(), Shadows(), Feature(), Volume(), Haze(), SkyOcclusion() };
+        var report = new List<string> { Settings(), Shadows(), Feature(), Volume(), Haze(), SkyOcclusion(), Sky() };
         AssetDatabase.SaveAssets();
         return string.Join("; ", report);
     }
@@ -134,6 +134,25 @@ public static class BuildRendering
         EditorUtility.SetDirty(filmic);
         EditorUtility.SetDirty(profile);
         return $"Haven volume: {Curve}";
+    }
+
+    // The sky every scene with a clock gets (SkyDome): Shaders/Sky.shader with its default colours.
+    private static string Sky()
+    {
+        const string path = "Assets/_Project/Settings/Rendering/Sky.mat";
+        var material = AssetDatabase.LoadAssetAtPath<Material>(path);
+        if (material == null)
+        {
+            material = new Material(Shader.Find("Safe Haven/Sky"));
+            AssetDatabase.CreateAsset(material, path);
+        }
+
+        var settings = AssetDatabase.LoadAssetAtPath<RenderingSettings>("Assets/_Project/Resources/RenderingSettings.asset");
+        var so = new SerializedObject(settings);
+        so.FindProperty("skyMaterial").objectReferenceValue = material;
+        so.ApplyModifiedPropertiesWithoutUndo();
+        EditorUtility.SetDirty(settings);
+        return "sky";
     }
 
     // The heat haze LightFlicker puts over fires (Resources/Heat Haze).

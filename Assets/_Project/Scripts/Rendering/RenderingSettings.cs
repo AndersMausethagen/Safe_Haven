@@ -1,8 +1,8 @@
 using UnityEngine;
 
 /// <summary>
-/// The numbers of the world's runtime rendering (WorldRendering): the reflection probe that follows the player and the
-/// cloud shadows drifting over the ground. Lives at Resources/RenderingSettings; built-in defaults apply when it is missing.
+/// The numbers of the world's runtime rendering (WorldRendering): the reflection probe that follows the player, the sky,
+/// the clouds and their shadows, sky occlusion and decals. Lives at Resources/RenderingSettings; built-in defaults apply when it is missing.
 /// </summary>
 [CreateAssetMenu(menuName = "Safe Haven/Settings/Rendering Settings", fileName = "RenderingSettings")]
 public sealed class RenderingSettings : GameSettings<RenderingSettings>
@@ -21,8 +21,18 @@ public sealed class RenderingSettings : GameSettings<RenderingSettings>
     [SerializeField, Min(0.01f)] private float reflectionHours = 0.25f;
     [Tooltip("...and never more often than this, in seconds (each render is spread over nine frames, a face a frame).")]
     [SerializeField, Min(0.1f)] private float reflectionInterval = 1f;
+    [Tooltip("...or this many seconds have passed, so drifting clouds and turning weather reach the reflections.")]
+    [SerializeField, Min(1f)] private float reflectionSkySeconds = 6f;
     [Tooltip("What it sees.")]
     [SerializeField] private LayerMask reflectionLayers = ~(1 << 5);
+
+    [Header("Sky")]
+    [Tooltip("The sky every scene with a clock gets (Shaders/Sky.shader): gradient, sun, moon, stars and the clouds.")]
+    [SerializeField] private Material skyMaterial;
+    [Tooltip("Days the moon takes from new to new.")]
+    [SerializeField, Min(1f)] private float moonCycleDays = 12f;
+    [Tooltip("Its phase on the first day (0 new, 0.5 full).")]
+    [SerializeField, Range(0f, 1f)] private float moonPhaseAtStart = 0.42f;
 
     [Header("Cloud shadows")]
     [Tooltip("Soft shadows of passing clouds on the sunlit ground, at home only: the raids keep their own look.")]
@@ -80,7 +90,11 @@ public sealed class RenderingSettings : GameSettings<RenderingSettings>
     public float ReflectionMove => reflectionMove;
     public float ReflectionHours => reflectionHours;
     public float ReflectionInterval => reflectionInterval;
+    public float ReflectionSkySeconds => reflectionSkySeconds;
     public LayerMask ReflectionLayers => reflectionLayers;
+    public Material SkyMaterial => skyMaterial;
+    public float MoonCycleDays => moonCycleDays;
+    public float MoonPhaseAtStart => moonPhaseAtStart;
     public bool CloudShadows => cloudShadows;
     public float CloudSize => cloudSize;
     public float CloudSpeed => cloudSpeed;

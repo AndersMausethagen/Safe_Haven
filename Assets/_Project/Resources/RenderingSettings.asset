@@ -18,9 +18,13 @@ MonoBehaviour:
   reflectionMove: 8
   reflectionHours: 0.25
   reflectionInterval: 1
+  reflectionSkySeconds: 6
   reflectionLayers:
     serializedVersion: 2
     m_Bits: 4294967263
+  skyMaterial: {fileID: 2100000, guid: beeb45b88a88b2844867f31395329b16, type: 2}
+  moonCycleDays: 12
+  moonPhaseAtStart: 0.42
   cloudShadows: 1
   cloudSize: 180
   cloudSpeed: 2.5

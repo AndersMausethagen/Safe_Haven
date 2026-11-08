@@ -3,32 +3,33 @@ using UnityEngine.Experimental.Rendering;
 using UnityEngine.Rendering.Universal;
 
 /// <summary>
-/// Soft shadows of passing clouds: a tiling cloud pattern drawn into a light cookie on the sun, drifting with the wind.
-/// The share of sky under cloud follows the weather; a sky that is all cloud casts none (the light is already soft and
-/// even). At home only, so the raids keep their own look. URP takes only a Texture2D as a sun cookie, so the pattern drawn
-/// into a render texture is copied on the GPU into one. Made by WorldRendering; numbers in RenderingSettings.
+/// Soft shadows of passing clouds: the clouds' tiling pattern drawn into a light cookie on the sun, drifting with the wind.
+/// Cover and drift come from the CloudLayer the sky draws too; a sky that is all cloud casts none (the light is already
+/// soft and even). URP takes only a Texture2D as a sun cookie, so the pattern drawn into a render texture is copied on the
+/// GPU into one. Made by WorldRendering; numbers in RenderingSettings.
 /// Shader: Shaders/CloudCookie.shader.
 /// </summary>
+[DefaultExecutionOrder(91)]
 public sealed class CloudShadows : MonoBehaviour
 {
     private static readonly int CoverId = Shader.PropertyToID("_CloudCover");
     private static readonly int SoftnessId = Shader.PropertyToID("_CloudSoftness");
     private static readonly int DarknessId = Shader.PropertyToID("_CloudDarkness");
-    private static readonly int WindId = Shader.PropertyToID("_SafeHavenWind");
 
     private RenderingSettings settings;
+    private CloudLayer layer;
     private Material material;
     private RenderTexture drawn;
     private Texture2D cookie;
     private Light sun;
     private UniversalAdditionalLightData sunData;
-    private Vector2 offset;
     private float drawnCover = -1f;
     private float drawnDarkness = -1f;
 
-    public void Initialise(RenderingSettings rules)
+    public void Initialise(RenderingSettings rules, CloudLayer clouds)
     {
         settings = rules;
+        layer = clouds;
         Shader shader = settings.CloudShader;
         if (shader == null)
         {
@@ -64,34 +65,21 @@ public sealed class CloudShadows : MonoBehaviour
 
     private void LateUpdate()
     {
-        if (sun == null || sunData == null)
+        if (sun == null || sunData == null || layer == null)
         {
             return;
         }
 
-        float clouds = WeatherSystem.Active != null ? WeatherSystem.Active.Current.Clouds : 0f;
-        Vector2 range = settings.CloudCover;
-        float cover = Mathf.Lerp(range.x, range.y, Mathf.Clamp01(clouds * 2f));
+        float cover = layer.Cover;
         // Under a sky of solid cloud the light is even: no shapes to cast.
-        float darkness = settings.CloudDarkness * (1f - Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.6f, 0.9f, clouds)));
+        float darkness = settings.CloudDarkness * (1f - layer.Overcast);
         if (Mathf.Abs(cover - drawnCover) > 0.005f || Mathf.Abs(darkness - drawnDarkness) > 0.005f)
         {
             Draw(cover, darkness);
         }
 
-        Vector4 wind = Shader.GetGlobalVector(WindId);
-        var direction = new Vector2(wind.x, wind.y);
-        if (direction.sqrMagnitude < 1e-4f)
-        {
-            direction = new Vector2(0.8f, 0.6f);
-        }
-
-        float strength = Mathf.Max(0.3f, AtmosphereConditions.WeatherWind);
-        offset += direction.normalized * (settings.CloudSpeed * strength * Time.deltaTime);
-        offset.x = Mathf.Repeat(offset.x, settings.CloudSize);
-        offset.y = Mathf.Repeat(offset.y, settings.CloudSize);
         sunData.lightCookieSize = new Vector2(settings.CloudSize, settings.CloudSize);
-        sunData.lightCookieOffset = offset;
+        sunData.lightCookieOffset = layer.Offset;
         if (sun.cookie != cookie)
         {
             sun.cookie = cookie;

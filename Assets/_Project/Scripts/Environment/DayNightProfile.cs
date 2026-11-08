@@ -75,6 +75,26 @@ public sealed class DayNightProfile : ScriptableObject
     public float Sunset => sunset;
 
     /// <summary>Everything the scene's light, ambient, fog and volumes should be at <paramref name="hour"/>.</summary>
+    /// <summary>Where the sun and moon really stand in the sky at an hour, as directions toward them (below the horizon
+    /// while down), and the sun's colour. The light's own angle never drops below Lowest Light Angle, so the sky can't
+    /// use it. By day the moon follows its night path under the horizon, and by night the sun does.</summary>
+    public void SkyAt(float hour, out Vector3 sunDirection, out Vector3 moonDirection, out Color sunColourNow)
+    {
+        hour = Mathf.Repeat(hour, 24f);
+        float day = Mathf.Max(sunset - sunrise, 0.1f);
+        float sinceSunrise = Mathf.Repeat(hour - sunrise, 24f);
+        bool sunUp = sinceSunrise < day;
+        float dayFraction = sunUp ? sinceSunrise / day : 0f;
+        float nightFraction = sunUp ? 0f : (sinceSunrise - day) / (24f - day);
+        float sunElevation = sunUp ? noonElevation * Mathf.Sin(Mathf.PI * dayFraction) : -0.5f * noonElevation * Mathf.Sin(Mathf.PI * nightFraction);
+        float sunYaw = noonYaw + (sunUp ? Mathf.Lerp(-80f, 80f, dayFraction) : Mathf.Lerp(80f, 280f, nightFraction));
+        float moonAngle = sunUp ? -moonElevation * Mathf.Sin(Mathf.PI * dayFraction) : moonElevation * Mathf.Sin(Mathf.PI * nightFraction);
+        float moonYaw = noonYaw + (sunUp ? Mathf.Lerp(-60f, -300f, dayFraction) : Mathf.Lerp(60f, -60f, nightFraction));
+        sunDirection = -(Quaternion.Euler(sunElevation, sunYaw, 0f) * Vector3.forward);
+        moonDirection = -(Quaternion.Euler(moonAngle, moonYaw, 0f) * Vector3.forward);
+        sunColourNow = sunColour.Evaluate(hour / 24f);
+    }
+
     public DayNightState Evaluate(float hour)
     {
         hour = Mathf.Repeat(hour, 24f);

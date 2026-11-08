@@ -3,14 +3,16 @@ using UnityEngine.SceneManagement;
 
 /// <summary>
 /// The world's runtime rendering helpers, made by GameSystems so scenes need no setup: the reflection probe that follows the
-/// player (FollowReflectionProbe) and the cloud shadows on the sun (CloudShadows). Each scene entered re-binds them to
+/// player (FollowReflectionProbe), the sky (SkyDome) and its clouds (CloudLayer) with their shadows on the sun (CloudShadows). Each scene entered re-binds them to
 /// that scene's sun and player. Numbers in RenderingSettings.
 /// </summary>
 public sealed class WorldRendering : MonoBehaviour, IGameSystem
 {
     private RenderingSettings settings;
     private FollowReflectionProbe reflections;
+    private CloudLayer cloudLayer;
     private CloudShadows clouds;
+    private SkyDome sky;
     private GroundWear wear;
     private SkyOcclusionMap occlusion;
 
@@ -38,15 +40,20 @@ public sealed class WorldRendering : MonoBehaviour, IGameSystem
             occlusion.Initialise(settings);
         }
 
+        cloudLayer = gameObject.AddComponent<CloudLayer>();
+        cloudLayer.Initialise(settings);
+        sky = gameObject.AddComponent<SkyDome>();
+        sky.Initialise(settings);
         if (settings.CloudShadows)
         {
             clouds = gameObject.AddComponent<CloudShadows>();
-            clouds.Initialise(settings);
+            clouds.Initialise(settings, cloudLayer);
         }
     }
 
     public void OnSceneEntered(Scene scene)
     {
+        sky?.Bind();
         reflections?.Refresh();
         wear?.Clear();
         occlusion?.Bind(GameSession.ActiveRaid == null);

@@ -3,7 +3,7 @@ using UnityEngine.Rendering;
 
 /// <summary>
 /// One realtime reflection probe above the player, re-rendered when they have moved on or the light has changed (a face a
-/// frame), so reflections show the clearing, the trees and the sky as they are now. Its box is far larger than anything
+/// frame), and every few seconds for the drifting clouds, so reflections show the clearing, the trees and the sky as they are now. Its box is far larger than anything
 /// near, so it stands in for the sky everywhere and needs no box projection. Made by WorldRendering.
 /// </summary>
 [RequireComponent(typeof(ReflectionProbe))]
@@ -14,6 +14,7 @@ public sealed class FollowReflectionProbe : MonoBehaviour
     private Vector3 renderedAt = new Vector3(float.MaxValue, 0f, 0f);
     private float renderedHour = -100f;
     private float nextRender;
+    private float renderedTime = -100f;
     private int rendering = -1;
 
     public void Initialise(RenderingSettings rules)
@@ -56,7 +57,8 @@ public sealed class FollowReflectionProbe : MonoBehaviour
         rendering = -1;
         float hours = Mathf.Abs(Mathf.DeltaAngle(hour * 15f, renderedHour * 15f)) / 15f;
         bool moved = (at - renderedAt).sqrMagnitude > settings.ReflectionMove * settings.ReflectionMove;
-        if (Time.unscaledTime < nextRender || (!moved && hours < settings.ReflectionHours))
+        bool skyMoved = Time.unscaledTime >= renderedTime + settings.ReflectionSkySeconds;
+        if (Time.unscaledTime < nextRender || (!moved && hours < settings.ReflectionHours && !skyMoved))
         {
             return;
         }
@@ -64,6 +66,7 @@ public sealed class FollowReflectionProbe : MonoBehaviour
         transform.position = at;
         renderedAt = at;
         renderedHour = hour;
+        renderedTime = Time.unscaledTime;
         nextRender = Time.unscaledTime + settings.ReflectionInterval;
         rendering = probe.RenderProbe();
     }
