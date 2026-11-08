@@ -3,6 +3,53 @@
 Open work and ideas. Tick items off (`[x]`) or delete them when done. Architecture notes for each system live in
 [ARCHITECTURE.md](../Assets/_Project/Scripts/ARCHITECTURE.md).
 
+## Second playtest list (2026-11-08)
+
+In the user's order. Fishing first, then the rest.
+- [x] Fishing: the fishing animations in use, and a fight in the manner of realistic fishing games, made casual: reel or
+      give line by how hard the fish fights, lean the rod against its runs, it tires and is landed; the view comes down
+      close, keeping the player and the float in view (`FishFight`, `PlayerFishing`, `PlayerCameraController.BeginCloseUp`).
+      A fish brought onto the shore is caught there.
+- [ ] The fire's warm blur (heat shimmer) is far too strong.
+- [ ] Prologue: the troll walks far too fast towards the camp; it should stop at the camp, not go on. The NPCs run to the
+      portal instead of staying to fight.
+- [ ] Prologue: Ingrid heals the player when their health is low.
+- [ ] Quests: no camera moves and no dialogue boxes before and after fights; a spoken comment from someone is enough.
+- [ ] Start camera: the map-edge limit (`ViewBounds`) overrides it. Remove the limit; bring back the invisible walls that
+      keep the player on the map (the map will be extended so its edge can't be seen).
+- [ ] More than 30 arrows: let the stack (or quiver) hold more.
+- [ ] Light: a light slot in the Character window, switched with C. Instead of a torch in hand, a lantern on the belt, so
+      both hands are free.
+- [ ] New item, Primitive Firefly Lantern: 6 sticks and 1 firefly, made from the inventory; a pale green, flickering glow,
+      as of fireflies inside; light for 24 in-game hours; refilled in the inventory with a firefly.
+- [ ] Fireflies can be caught with E when close.
+- [ ] Fireflies gather round lights and now and then come near the player, so one can be caught. Slightly less prominent,
+      but not rare.
+
+## Third playtest list (2026-11-08)
+
+After the second list, in this order.
+- [ ] A stream interactable is still near the Haven, though the stream was moved.
+- [ ] The portal: visit a friend's Haven or invite a friend to ours, so co-op is part of the lore and the world's things.
+- [ ] The things in the base to clear have a flat square round them, like a see-through square on the ground. Remove it.
+- [ ] The highlight sometimes crosses inside an object instead of following only its outline.
+- [ ] Small trees can't be chopped, only broken down to sticks.
+- [ ] Trees grow back in the Haven when a save is loaded: they shouldn't. A felled tree gives a sapling, which can be
+      planted and grows back (about 5 in-game days; suggest a better pace). Cheap: saved state of each planted tree and its
+      growth, no per-frame distance work; must not clash with the interactable tree optimiser.
+- [ ] Small trees and bushes bend for the player as the grass does; some details don't yet.
+- [ ] Too many sounds from finished quests and skill levels early on: make the first skill levels a little slower and the
+      sounds a little quieter.
+- [ ] Debris falls off trees from time to time: in clear weather it should fall nearly straight down, and drift with the
+      wind when breezy or stormy.
+- [ ] Quest "They are still out there": how to reactivate the portal isn't said. Meanwhile building quests pile up. New
+      order: quests that teach the mechanics first (a chest for safe storage, gear to gather for it, a basic weapon), then
+      opening the portal for the first raid. Saving the first NPC unlocks the building they work at.
+- [ ] An NPC, Hild, appeared in the Haven with no explanation. NPCs don't just appear: each is saved on a raid, in a designed
+      order that unlocks buildings as the player needs them, each one solving a problem. The user's outline: good gear and
+      repairing it; refining (wood to planks); better tools; moving goods (wheelbarrows, boats); copper (stronger armour, tools,
+      weapons). Research how similar games bring in a problem and its answer through their mechanics, and suggest the flow.
+
 ## Prologue playtest (2026-11-08)
 
 From the user's run through the prologue in a build. Build work is paused until these are done.
