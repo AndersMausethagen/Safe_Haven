@@ -75,6 +75,9 @@ public sealed class GatheringMinigameSettings : GameSettings<GatheringMinigameSe
     [Header("Bar")]
     [Tooltip("Where the zones sit up the bar. High, so the swing has time to build, and a press in time comes just before the blow would.")]
     [SerializeField, Range(0.2f, 0.9f)] private float sweetSpot = 0.8f;
+    [Tooltip("Hold to raise: let go before the tool has risen this share of the way and it goes back down with no blow, " +
+             "so tapping the button doesn't chop.")]
+    [SerializeField, Range(0f, 0.8f)] private float minimumRaise = 0.35f;
     [Tooltip("Critical width added per tool tier above the node's required tier.")]
     [SerializeField, Range(0f, 0.2f)] private float criticalWidthPerTier = 0.03f;
     [Tooltip("How much quicker the tool rises per tool tier above the node's required tier (0.08: 8 % per tier), so a better tool is also a quicker rhythm.")]
@@ -145,6 +148,7 @@ public sealed class GatheringMinigameSettings : GameSettings<GatheringMinigameSe
     public float CriticalWidthPerCombo => criticalWidthPerCombo;
     public int MaxCombo => maxCombo;
     public float SweetSpot => sweetSpot;
+    public float MinimumRaise => minimumRaise;
     public float ZoneJitter => zoneJitter;
     public int BonusPerCritical => bonusPerCritical;
     public float CriticalHitStop => criticalHitStop;

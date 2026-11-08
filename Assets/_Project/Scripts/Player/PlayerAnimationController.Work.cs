@@ -61,6 +61,19 @@ public sealed partial class PlayerAnimationController
         }
     }
 
+    /// <summary>Let go before the tool was up: it goes back down to the ready pose (the clip played back to its start at
+    /// <paramref name="speed"/>), and no blow follows.</summary>
+    public void LowerWork(float speed)
+    {
+        if (workContact <= 0f || workPhase == WorkPhase.Following)
+        {
+            return;
+        }
+
+        workPhase = WorkPhase.Lowering;
+        SetFloat(WorkSpeedHash, -Mathf.Max(0.1f, speed));
+    }
+
     /// <summary>Brings the tool down. Returns the seconds until it lands, or 0 when swings aren't being held.</summary>
     public float StrikeWork()
     {
@@ -88,6 +101,20 @@ public sealed partial class PlayerAnimationController
         return wait;
     }
 
+    private float ClipLength(int layer, AnimatorStateInfo state)
+    {
+        animator.GetCurrentAnimatorClipInfo(layer, clipInfo);
+        if (clipInfo.Count > 0 && clipInfo[0].clip != null)
+        {
+            return clipInfo[0].clip.length;
+        }
+
+        float speed = Mathf.Abs(state.speed * state.speedMultiplier);
+        return speed > 1e-4f && !float.IsInfinity(state.length) ? state.length * speed : 1f;
+    }
+
+    private readonly System.Collections.Generic.List<AnimatorClipInfo> clipInfo = new System.Collections.Generic.List<AnimatorClipInfo>();
+
     private void UpdateWorkSwing()
     {
         // A held clip has stopped, and reports its length as infinite: there is nothing to watch until it is released.
@@ -108,7 +135,25 @@ public sealed partial class PlayerAnimationController
             return;
         }
 
-        float time = state.normalizedTime % 1f * state.length;
+        // Seconds into the clip itself. AnimatorStateInfo.length is divided by the state's speed, so while the tool waits
+        // (speed 0) it is infinite and during a slow raise far too long: reading time from it put the tool "at the top"
+        // before it moved, and every hold after that was ignored.
+        float time = Mathf.Repeat(state.normalizedTime, 1f) * ClipLength(layer, state);
+        if (workPhase == WorkPhase.Lowering)
+        {
+            if (time <= 0.02f || time > workHold + 0.05f)
+            {
+                // Back at the ready: wait there for the next hold.
+                animator.Play(state.shortNameHash, layer, 0f);
+                SetFloat(WorkSpeedHash, 0f);
+                workPhase = WorkPhase.Rising;
+                time = 0f;
+            }
+
+            workTime = time;
+            return;
+        }
+
         if (workPhase == WorkPhase.Following && time < workTime)
         {
             workPhase = WorkPhase.Rising;

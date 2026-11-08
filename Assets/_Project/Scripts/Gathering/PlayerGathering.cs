@@ -24,7 +24,9 @@ public readonly struct GatheringSwing
 /// <summary>
 /// Runs the gathering timing minigame on the player. When an interaction starts on a ResourceNode whose tool uses the
 /// minigame (GatheringMinigameSettings), it holds the interaction open and runs a GatheringSession. With hold to raise (the
-/// default) holding Attack or Interact raises the tool, a glint and a ping mark the critical moment, and letting go swings;
+/// default) holding Attack or Interact raises the tool, reaching the top of its backswing as a glint and a ping mark the
+/// critical moment, and letting go swings (a tap, let go before the tool is up, lowers it again with no blow; a new raise
+/// waits until the tool is back at the ready);
 /// otherwise each press is a swing and with no press the tool comes down by itself. How good a swing was is settled by the press,
 /// so timing stays fair, but the tool then has to come down: the blow itself, with its sound, chips and everything that
 /// follows, happens when it lands. Glancing blows wear the tool. When the last swing lands the node completes as usual and
@@ -51,6 +53,7 @@ public sealed class PlayerGathering : MonoBehaviour
     private TimingBarView barView;
     private HeldItemView held;
     private float raiseSpeed;
+    private float riseSeconds = 1f;
     private bool glinted;
     private readonly System.Random random = new System.Random();
 
@@ -67,6 +70,7 @@ public sealed class PlayerGathering : MonoBehaviour
     private static void ResetForNewPlaySession()
     {
         Swung = null;
+        HeldForTests = null;
     }
 
     private void Awake()
@@ -160,11 +164,30 @@ public sealed class PlayerGathering : MonoBehaviour
     // as it passes the critical moment.
     private void UpdateHold()
     {
-        bool down = IsHeld(GameInput.Attack) || IsHeld(GameInput.Interact);
+        // A new raise waits until the last blow has landed and the tool is back at the ready.
+        bool ready = !blowComing && (animations == null || animations.WorkReady);
+        bool down = (IsHeld(GameInput.Attack) || IsHeld(GameInput.Interact)) && (ready || Session.IsRaising);
+        bool wasRaising = Session.IsRaising;
         SwingResult? swung = Session.Hold(Time.deltaTime, down, out bool late);
+        if (Session.IsRaising && !wasRaising)
+        {
+            // The tool reaches the top of its backswing at the critical moment, so the glint comes at the peak; held
+            // longer it waits there until the swing is late.
+            raiseSpeed = animations != null && animations.WorkRaiseSeconds > 0f
+                ? animations.WorkRaiseSeconds / (riseSeconds * Mathf.Clamp(Session.Zones.Center, 0.2f, 1f))
+                : 1f;
+        }
+
         if (animations != null)
         {
-            animations.SetWorkRaise(Session.IsRaising ? raiseSpeed : 0f);
+            if (Session.DroppedRaise)
+            {
+                animations.LowerWork(raiseSpeed * 2.5f);
+            }
+            else
+            {
+                animations.SetWorkRaise(Session.IsRaising ? raiseSpeed : 0f);
+            }
         }
 
         if (Session.InCriticalZone && !glinted)
@@ -184,7 +207,12 @@ public sealed class PlayerGathering : MonoBehaviour
         }
     }
 
-    private static bool IsHeld(UnityEngine.InputSystem.InputAction action) => action != null && action.enabled && action.IsPressed();
+    private static bool IsHeld(UnityEngine.InputSystem.InputAction action) =>
+        HeldForTests ?? (action != null && action.enabled && action.IsPressed());
+
+    /// <summary>Tests and probes only: stands in for the held button (null: the real input). The input system ignores the
+    /// mouse while the window is unfocused, so a probe can't hold it.</summary>
+    public static bool? HeldForTests { get; set; }
 
     // A flare of white light at the tool's head, and a small ping: the moment to let go.
     private void Glint()
@@ -305,12 +333,14 @@ public sealed class PlayerGathering : MonoBehaviour
             random,
             ProgressFor(definition.GatherTool, settings));
         Session.KeepsComboOnNormal = definition.GatherTool == ToolType.Axe && Techniques.Has(PerkTechnique.SteadyRhythm);
+        Session.MinimumRaise = settings.HoldToRaise ? settings.MinimumRaise : 0f;
+        riseSeconds = rise;
 
         if (settings.HoldToRaise && !settings.AutoGather)
         {
             // The tool waits low until the button is held, and rises over exactly the swing's timing window.
             Session.WaitForRelease();
-            raiseSpeed = animations != null && animations.WorkRaiseSeconds > 0f ? animations.WorkRaiseSeconds / rise : 1f;
+            raiseSpeed = animations != null && animations.WorkRaiseSeconds > 0f ? animations.WorkRaiseSeconds / (rise * Mathf.Clamp(settings.SweetSpot, 0.2f, 1f)) : 1f;
             if (animations != null)
             {
                 animations.SetWorkRaise(0f);

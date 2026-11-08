@@ -541,4 +541,19 @@ public sealed class GatheringMinigameTests
         data.ApplyModifiedPropertiesWithoutUndo();
         return item;
     }
+
+    [Test]
+    public void HoldToRaise_ATapDropsTheToolInsteadOfChopping()
+    {
+        var session = new GatheringSession(3, 1f, 0.8f, 0.3f, 0.1f, 0f, 1, 0f, new System.Random(1), r => 1f) { MinimumRaise = 0.35f };
+        Assert.IsNull(session.Hold(0.1f, true, out _), "rising");
+        Assert.IsNull(session.Hold(0.02f, false, out _), "let go at 10%: no swing");
+        Assert.IsTrue(session.DroppedRaise, "the raise was dropped");
+        Assert.AreEqual(0, session.SwingsDone);
+
+        Assert.IsNull(session.Hold(0.8f, true, out _), "a proper raise");
+        SwingResult? swung = session.Hold(0.02f, false, out _);
+        Assert.IsTrue(swung.HasValue, "let go near the top: a swing");
+        Assert.IsFalse(session.DroppedRaise);
+    }
 }

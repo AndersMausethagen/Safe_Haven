@@ -382,7 +382,12 @@ public sealed partial class PlayerAnimationController : MonoBehaviour
         Rising,
         Holding,
         Following,
+        /// <summary>Let go too soon: the tool goes back down to the ready pose, no blow.</summary>
+        Lowering,
     }
+
+    /// <summary>The tool is at the ready or rising (not following through a blow or going back down): a new hold may raise it.</summary>
+    public bool WorkReady => workContact <= 0f || workPhase == WorkPhase.Rising || workPhase == WorkPhase.Holding;
 
     /// <summary>Seconds of the swing clip from its start to the raised point (where the tool waits to strike).</summary>
     public float WorkRaiseSeconds => workHold;

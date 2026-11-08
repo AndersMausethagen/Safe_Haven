@@ -109,6 +109,13 @@ public sealed class GatheringSession : ITimingBar
     /// <summary>Hold to raise: the tool is on its way up.</summary>
     public bool IsRaising => raising;
 
+    /// <summary>Hold to raise: a release before the tool has risen this far (a share of the rise) drops it instead of
+    /// swinging. 0: every release swings.</summary>
+    public float MinimumRaise { get; set; }
+
+    /// <summary>The last <see cref="Hold"/> call dropped a raise (let go before <see cref="MinimumRaise"/>).</summary>
+    public bool DroppedRaise { get; private set; }
+
     /// <summary>Hold to raise: the tool is up in the critical zone right now (the moment to let go).</summary>
     public bool InCriticalZone => raising && Mathf.Abs(phase - Zones.Center) <= Zones.CriticalWidth * 0.5f;
 
@@ -152,6 +159,7 @@ public sealed class GatheringSession : ITimingBar
             return null;
         }
 
+        DroppedRaise = false;
         if (!held)
         {
             waitForRelease = false;
@@ -161,6 +169,14 @@ public sealed class GatheringSession : ITimingBar
             }
 
             raising = false;
+            if (phase < MinimumRaise)
+            {
+                // Let go before the tool was up: it goes back down, no blow. A tap is not a chop.
+                phase = 0f;
+                DroppedRaise = true;
+                return null;
+            }
+
             late = phase > Zones.Center;
             SwingResult released = Zones.Evaluate(phase);
             Resolve(released);
