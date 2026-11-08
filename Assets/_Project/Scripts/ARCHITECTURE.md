@@ -739,15 +739,28 @@ Content: `AgentScripts/BuildRendering.cs`, `BuildWeatherSurfaces.cs`, `BuildDeca
 numbers in `Resources/RenderingSettings`. `WorldRendering` (an `IGameSystem`) owns the runtime parts and re-binds them per scene.
 - **Tonemapping.** `FilmicTonemapping` (a volume override) with `TonemapFeature` after the Atmosphere feature: Khronos PBR Neutral
   or AgX before URP's post-processing, so a volume using it sets URP's Tonemapping to None and Bloom's threshold is in screen range.
-  The Haven's base volume uses Neutral; the raids keep ACES.
-- **Light.** `FollowReflectionProbe` (realtime, a face a frame, when the player moves or the hour turns), `CloudShadows` (a tiling
-  cookie on the sun; URP takes only a Texture2D as a sun cookie, so the drawn pattern is copied on the GPU into one; at home
-  only), four shadow cascades. `SkyOcclusionMap` draws a top-down height map round the player through the Sky Occlusion Renderer
+  The Haven's base volume uses Neutral. Each raid's `RaidDefinition` › Look › Grade (`RaidGrade`) is applied by `RaidGradeVolume`, a
+  global volume above the scene's own that sets only the tonemapping (so the raid's night and weather volumes still blend under
+  it). Neutral alone turned the raid mist milky lavender (its volumes were graded under ACES): the grade adds `FilmicTonemapping`
+  › Contrast and › Filter, at -0.9 stops, contrast 1.35, a faint teal filter.
+- **Sky.** `SkyDome` puts `Shaders/Sky.shader` (RenderingSettings › Sky Material) on every scene with a `DayNightCycle` and feeds it
+  where the sun and moon really stand (`DayNightProfile.SkyAt`: the light's own angle is clamped, so the sky can't use it), the moon's
+  phase (Settlement days) and lightning. Its clouds are `CloudLayer`'s: one cover and drift, and one pattern (`CloudNoise.hlsl`)
+  shared with the cloud-shadow cookie. Seldom seen from above, it is what every reflection shows.
+- **Light.** `FollowReflectionProbe` (realtime, a face a frame, when the player moves, the hour turns, or every 6 s for the clouds),
+  `CloudShadows` (a tiling cookie on the sun; URP takes only a Texture2D as a sun cookie, so the drawn pattern is copied on the GPU
+  into one; softened by night, when the moon is all the light), four shadow cascades (the Shadows option's High keeps all four).
+  `LightShadowBudget` gives the three fires and lamps nearest the view soft shadows at dusk and night (the nearest at the medium
+  tier, so all fit the 2048 atlas). Every renderer on the pipeline's list must be Forward+: one on Forward switches the GPU Resident
+  Drawer off for all cameras. SSAO reaches 0.8 m: from the camera's height a smaller reach is a few pixels. `SkyOcclusionMap` draws a top-down height map round the player through the Sky Occlusion Renderer
   (a Render Objects override pass, pipeline renderer #1) and `Shaders/SkyOcclusion.hlsl` dims indirect light under cover and keeps
-  rain and snow off what stands under a roof. Not in the generated terrain: one more texture took it over its limit.
+  rain and snow off what stands under a roof. Not in the generated terrain: one more texture took it over its limit. In raids at
+  0.35 strength (`_SkyOcclusionRect.w`): full strength under the forest canopy hid the player at night.
 - **Weather on surfaces.** `Shaders/SurfaceWetness.hlsl` soaks whatever has "Weather Settles On It" (the old snow toggle) plus trees
   and grass; the terrain's puddles are its own (`GenerateWorldTerrainShader.py`). Include SurfaceWetness before SeasonSnow, and in
-  ASE shaders after URP's Lighting.hlsl (it needs `_Time`).
+  ASE shaders after URP's Lighting.hlsl (it needs `_Time`). Characters (URP Lit) soak per character instead (`CharacterWetness`,
+  added by `WetCharacters`): on copies of their materials, never destroyed, since a death ragdoll may still draw them. Rain splashes
+  are placed one by one with a ray (`RainEffect`), and `RainDrips` drips off building outlines, sloping edges and tree crowns.
 - **Decals.** URP's Decal feature, screen space (the terrain's DBuffer variant turned it grey, and with decal layers on nothing
   lands on the terrain, whose depth pass writes no rendering layers; so no angle fade: keep decal boxes thin). `DecalPool` (blood
   via `BloodDecals`, tinted per colour from one atlas, and `FootprintDecals`), `GroundWear` (trampled earth, scorch, wall grime on
