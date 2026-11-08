@@ -39,6 +39,11 @@ public sealed class FilmicTonemapping : VolumeComponent
     public ClampedFloatParameter exposure = new ClampedFloatParameter(0f, -3f, 3f);
     [Tooltip("Colour after the curve: 1 as it comes, more richer.")]
     public ClampedFloatParameter saturation = new ClampedFloatParameter(1f, 0f, 2f);
+    [Tooltip("Contrast before the curve, round middle grey: 1 none, more deepens the shadows and lifts the lights (ACES " +
+             "had a lot of its own; a scene graded for it wants some).")]
+    public ClampedFloatParameter contrast = new ClampedFloatParameter(1f, 0.5f, 2f);
+    [Tooltip("Multiplies the light before the curve: a tint for the whole scene. White leaves it.")]
+    public ColorParameter filter = new ColorParameter(Color.white, false, false, true);
 
     public bool IsActive() => active && curve.value != FilmicCurve.Off;
 }

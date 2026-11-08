@@ -13,6 +13,7 @@ public sealed class WorldRendering : MonoBehaviour, IGameSystem
     private CloudLayer cloudLayer;
     private CloudShadows clouds;
     private SkyDome sky;
+    private RaidGradeVolume raidGrade;
     private GroundWear wear;
     private SkyOcclusionMap occlusion;
 
@@ -40,6 +41,10 @@ public sealed class WorldRendering : MonoBehaviour, IGameSystem
             occlusion.Initialise(settings);
         }
 
+        var grade = new GameObject("Raid Grade");
+        grade.transform.SetParent(transform, false);
+        raidGrade = grade.AddComponent<RaidGradeVolume>();
+        raidGrade.Initialise();
         cloudLayer = gameObject.AddComponent<CloudLayer>();
         cloudLayer.Initialise(settings);
         sky = gameObject.AddComponent<SkyDome>();
@@ -56,7 +61,9 @@ public sealed class WorldRendering : MonoBehaviour, IGameSystem
         sky?.Bind();
         reflections?.Refresh();
         wear?.Clear();
-        occlusion?.Bind(GameSession.ActiveRaid == null);
-        clouds?.Bind(RenderSettings.sun, GameSession.ActiveRaid == null);
+        RaidDefinition raid = GameSession.ActiveRaid?.Definition;
+        raidGrade.Apply(raid != null ? raid.Grade : null);
+        occlusion?.Bind(raid == null ? 1f : settings.SkyOcclusionInRaids);
+        clouds?.Bind(RenderSettings.sun, raid == null || settings.CloudShadowsInRaids);
     }
 }

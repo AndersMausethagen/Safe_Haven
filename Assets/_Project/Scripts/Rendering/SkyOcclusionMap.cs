@@ -56,10 +56,12 @@ public sealed class SkyOcclusionMap : MonoBehaviour
         Off();
     }
 
-    /// <summary>A new scene: on at home, off in the raids.</summary>
-    public void Bind(bool show)
+    /// <summary>A new scene: how much cover dims the indirect light here (0 off, 1 fully; rain stays out from under
+    /// cover whenever it is on).</summary>
+    public void Bind(float dimming)
     {
-        active = show && settings.SkyOcclusion && settings.SkyOcclusionRendererIndex >= 0;
+        strength = Mathf.Clamp01(dimming);
+        active = strength > 0f && settings.SkyOcclusion && settings.SkyOcclusionRendererIndex >= 0;
         nextRender = 0f;
         if (!active)
         {
@@ -90,8 +92,10 @@ public sealed class SkyOcclusionMap : MonoBehaviour
         above.transform.SetPositionAndRotation(new Vector3(at.x, at.y + 400f, at.z), Quaternion.LookRotation(Vector3.down, Vector3.forward));
         above.Render();
         Shader.SetGlobalTexture(MapId, map);
-        Shader.SetGlobalVector(RectId, new Vector4(at.x - area * 0.5f, at.z - area * 0.5f, 1f / area, 1f));
+        Shader.SetGlobalVector(RectId, new Vector4(at.x - area * 0.5f, at.z - area * 0.5f, 1f / area, strength));
     }
+
+    private float strength = 1f;
 
     private static void Off() => Shader.SetGlobalVector(RectId, Vector4.zero);
 

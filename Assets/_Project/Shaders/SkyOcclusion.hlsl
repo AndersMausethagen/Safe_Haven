@@ -6,11 +6,11 @@
 // cover that grows over the first two metres of height above the point. 1 everywhere outside the map, or with it off.
 TEXTURE2D(_SkyOcclusionMap);
 SAMPLER(sampler_SkyOcclusionMap);
-float4 _SkyOcclusionRect; // x min, z min, 1 / size, on (1) or off (0)
+float4 _SkyOcclusionRect; // x min, z min, 1 / size, how much cover dims indirect light (0 = the map is off)
 
 half SkyVisibility(float3 positionWS)
 {
-    if (_SkyOcclusionRect.w < 0.5)
+    if (_SkyOcclusionRect.w <= 0.0)
     {
         return 1.0;
     }
@@ -38,6 +38,7 @@ half SkyVisibility(float3 positionWS)
 // What indirect light (ambient and reflections) is multiplied by: a little always comes in round the edges.
 half SkyAmbient(float3 positionWS)
 {
-    return lerp(0.35, 1.0, SkyVisibility(positionWS));
+    // At full strength a third gets in under full cover; the raids use less, so the forest floor stays readable at night.
+    return lerp(1.0 - 0.65 * saturate(_SkyOcclusionRect.w), 1.0, SkyVisibility(positionWS));
 }
 #endif

@@ -67,6 +67,8 @@ public sealed class TonemapFeature : ScriptableRendererFeature
     {
         private static readonly int ExposureId = Shader.PropertyToID("_TonemapExposure");
         private static readonly int SaturationId = Shader.PropertyToID("_TonemapSaturation");
+        private static readonly int ContrastId = Shader.PropertyToID("_TonemapContrast");
+        private static readonly int FilterId = Shader.PropertyToID("_TonemapFilter");
 
         private readonly Material material;
         private int curvePass;
@@ -89,6 +91,8 @@ public sealed class TonemapFeature : ScriptableRendererFeature
             curvePass = settings.curve.value == FilmicCurve.Neutral ? 0 : settings.curve.value == FilmicCurve.AgX ? 1 : 2;
             material.SetFloat(ExposureId, Mathf.Pow(2f, settings.exposure.value));
             material.SetFloat(SaturationId, settings.saturation.value);
+            material.SetFloat(ContrastId, settings.contrast.value);
+            material.SetColor(FilterId, settings.filter.value);
         }
 
         public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameData)

@@ -35,8 +35,9 @@ public sealed class RenderingSettings : GameSettings<RenderingSettings>
     [SerializeField, Range(0f, 1f)] private float moonPhaseAtStart = 0.42f;
 
     [Header("Cloud shadows")]
-    [Tooltip("Soft shadows of passing clouds on the sunlit ground, at home only: the raids keep their own look.")]
+    [Tooltip("Soft shadows of passing clouds on the sunlit ground.")]
     [SerializeField] private bool cloudShadows = true;
+    [SerializeField] private bool cloudShadowsInRaids = true;
     [Tooltip("Metres one tile of the cloud pattern covers.")]
     [SerializeField, Min(20f)] private float cloudSize = 180f;
     [Tooltip("Metres a second they drift at the wind's usual strength.")]
@@ -49,8 +50,11 @@ public sealed class RenderingSettings : GameSettings<RenderingSettings>
     [SerializeField, Range(0.02f, 0.5f)] private float cloudSoftness = 0.18f;
     [Header("Sky occlusion")]
     [Tooltip("Dim the sky's light and reflections under roofs and canopies, and keep rain and snow out from under them " +
-             "(SkyOcclusionMap: a top-down height map round the player). At home only.")]
+             "(SkyOcclusionMap: a top-down height map round the player).")]
     [SerializeField] private bool skyOcclusion = true;
+    [Tooltip("How much cover dims the light in the raids (1 as at home). Raids are nearly all canopy and dark: at full " +
+             "strength the player vanished on the forest floor at night.")]
+    [SerializeField, Range(0f, 1f)] private float skyOcclusionInRaids = 0.35f;
     [Tooltip("Metres the map covers, centred on the player.")]
     [SerializeField, Min(20f)] private float skyOcclusionArea = 160f;
     [SerializeField] private int skyOcclusionResolution = 512;
@@ -96,12 +100,14 @@ public sealed class RenderingSettings : GameSettings<RenderingSettings>
     public float MoonCycleDays => moonCycleDays;
     public float MoonPhaseAtStart => moonPhaseAtStart;
     public bool CloudShadows => cloudShadows;
+    public bool CloudShadowsInRaids => cloudShadowsInRaids;
     public float CloudSize => cloudSize;
     public float CloudSpeed => cloudSpeed;
     public Vector2 CloudCover => cloudCover;
     public float CloudDarkness => cloudDarkness;
     public float CloudSoftness => cloudSoftness;
     public bool SkyOcclusion => skyOcclusion;
+    public float SkyOcclusionInRaids => skyOcclusionInRaids;
     public float SkyOcclusionArea => skyOcclusionArea;
     public int SkyOcclusionResolution => skyOcclusionResolution;
     public float SkyOcclusionInterval => skyOcclusionInterval;

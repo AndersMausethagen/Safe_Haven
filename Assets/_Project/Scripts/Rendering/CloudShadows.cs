@@ -72,7 +72,8 @@ public sealed class CloudShadows : MonoBehaviour
 
         float cover = layer.Cover;
         // Under a sky of solid cloud the light is even: no shapes to cast.
-        float darkness = settings.CloudDarkness * (1f - layer.Overcast);
+        // At night the moon is all the light there is: clouds pass over it softly, or the ground (and the player) go black.
+        float darkness = settings.CloudDarkness * (1f - layer.Overcast) * (1f - 0.65f * AtmosphereConditions.Night);
         if (Mathf.Abs(cover - drawnCover) > 0.005f || Mathf.Abs(darkness - drawnDarkness) > 0.005f)
         {
             Draw(cover, darkness);

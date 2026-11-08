@@ -16,6 +16,8 @@ Shader "Hidden/Safe Haven/Filmic Tonemap"
 
         float _TonemapExposure;
         float _TonemapSaturation;
+        float _TonemapContrast;
+        float4 _TonemapFilter;
 
         float3 Saturate(float3 color, float amount)
         {
@@ -81,7 +83,9 @@ Shader "Hidden/Safe Haven/Filmic Tonemap"
 
         float3 Source(float2 uv)
         {
-            return SAMPLE_TEXTURE2D_X(_BlitTexture, sampler_PointClamp, uv).rgb * _TonemapExposure;
+            float3 color = max(0.0, SAMPLE_TEXTURE2D_X(_BlitTexture, sampler_PointClamp, uv).rgb * _TonemapExposure * _TonemapFilter.rgb);
+            // Contrast round middle grey, in stops (a power curve keeps black black and grey grey).
+            return 0.18 * pow(color / 0.18, _TonemapContrast);
         }
         ENDHLSL
 
