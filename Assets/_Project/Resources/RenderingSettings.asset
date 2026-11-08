@@ -18,7 +18,7 @@ MonoBehaviour:
   reflectionMove: 8
   reflectionHours: 0.25
   reflectionInterval: 1
-  reflectionSkySeconds: 6
+  reflectionSkySeconds: 20
   reflectionLayers:
     serializedVersion: 2
     m_Bits: 4294967263

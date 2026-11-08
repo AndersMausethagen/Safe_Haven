@@ -16,7 +16,8 @@ Shader "Safe Haven/Sky"
         _SunsetColour ("Sunset Glow", Color) = (1.0, 0.45, 0.18, 1)
         _SunsetStrength ("Sunset Strength", Range(0, 4)) = 1.6
         _SunSize ("Sun Size (degrees)", Range(0.2, 5)) = 1.4
-        _SunGlow ("Sun Glow", Range(0, 2)) = 0.35
+        _SunGlow ("Sun Glow", Range(0, 2)) = 0.2
+        _SunDisc ("Sun Disc Brightness", Range(0, 40)) = 2
         [Header(Night)]
         _NightZenith ("Night Zenith", Color) = (0.012, 0.02, 0.05, 1)
         _NightHorizon ("Night Horizon", Color) = (0.035, 0.05, 0.085, 1)
@@ -56,7 +57,7 @@ Shader "Safe Haven/Sky"
             CBUFFER_START(UnityPerMaterial)
                 half4 _DayZenith, _DayHorizon, _SunsetColour, _NightZenith, _NightHorizon, _MoonColour;
                 half4 _CloudLit, _CloudShade, _OvercastColour, _StormColour, _LightningColour, _GroundColour;
-                float _DayBrightness, _SunsetStrength, _SunSize, _SunGlow, _StarDensity, _StarBrightness, _GalaxyBrightness;
+                float _DayBrightness, _SunsetStrength, _SunSize, _SunGlow, _SunDisc, _StarDensity, _StarBrightness, _GalaxyBrightness;
                 float _MoonBrightness, _MoonSize, _CloudScale, _CloudSoftness, _HorizonFog;
             CBUFFER_END
 
@@ -175,8 +176,10 @@ Shader "Safe Haven/Sky"
                 float cosSun = dot(direction, sun);
                 float sunUp = smoothstep(-0.03, 0.02, sun.y);
                 float discCos = cos(radians(_SunSize) * 0.5);
-                half3 sunLight = _SkySunColour.rgb * sunUp * (smoothstep(discCos, lerp(discCos, 1.0, 0.25), cosSun) * 40.0
-                               + pow(saturate(cosSun), 12.0) * _SunGlow + pow(saturate(cosSun), 300.0) * 2.0);
+                // A soft sun, not a blinding disc: the camera never looks at the sky, but the reflection probe does, and a bright
+                // disc came back from the water as a big yellow ball (the water draws its own sun glint).
+                half3 sunLight = _SkySunColour.rgb * sunUp * (smoothstep(discCos, lerp(discCos, 1.0, 0.25), cosSun) * _SunDisc
+                               + pow(saturate(cosSun), 12.0) * _SunGlow + pow(saturate(cosSun), 300.0) * 0.4);
                 half4 moonDisc = Moon(direction, moon, _SkyMoonDirection.w);
                 float moonUp = smoothstep(-0.02, 0.04, moon.y);
                 half moonHalo = pow(saturate(dot(direction, moon)), 400.0) * 0.25 * night * moonUp;

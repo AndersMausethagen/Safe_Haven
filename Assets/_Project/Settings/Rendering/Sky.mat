@@ -34,7 +34,8 @@ Material:
     - _MoonSize: 3.2
     - _StarBrightness: 6
     - _StarDensity: 170
-    - _SunGlow: 0.35
+    - _SunDisc: 2
+    - _SunGlow: 0.2
     - _SunSize: 1.4
     - _SunsetStrength: 1.6
     m_Colors:

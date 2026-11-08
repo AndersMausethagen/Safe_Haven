@@ -22,7 +22,7 @@ public sealed class RenderingSettings : GameSettings<RenderingSettings>
     [Tooltip("...and never more often than this, in seconds (each render is spread over nine frames, a face a frame).")]
     [SerializeField, Min(0.1f)] private float reflectionInterval = 1f;
     [Tooltip("...or this many seconds have passed, so drifting clouds and turning weather reach the reflections.")]
-    [SerializeField, Min(1f)] private float reflectionSkySeconds = 6f;
+    [SerializeField, Min(1f)] private float reflectionSkySeconds = 20f;
     [Tooltip("What it sees.")]
     [SerializeField] private LayerMask reflectionLayers = ~(1 << 5);
 

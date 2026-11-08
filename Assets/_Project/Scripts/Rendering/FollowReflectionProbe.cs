@@ -15,6 +15,7 @@ public sealed class FollowReflectionProbe : MonoBehaviour
     private float renderedHour = -100f;
     private float nextRender;
     private float renderedTime = -100f;
+    private bool warned;
     private int rendering = -1;
 
     public void Initialise(RenderingSettings rules)
@@ -49,9 +50,17 @@ public sealed class FollowReflectionProbe : MonoBehaviour
         Vector3 at = Where();
         float hour = AtmosphereConditions.Hour;
         transform.position = rendering >= 0 ? transform.position : at;
-        if (rendering >= 0 && !probe.IsFinishedRendering(rendering))
+        if (rendering >= 0 && !probe.IsFinishedRendering(rendering) && Time.unscaledTime < renderedTime + 3f)
         {
             return;
+        }
+
+        // A render that never finishes (realtime reflection probes off in the quality level, as they were until
+        // 2026-11-08) must not hold the probe in place for good: give up on it and carry on following.
+        if (!QualitySettings.realtimeReflectionProbes && !warned)
+        {
+            warned = true;
+            Debug.LogWarning("FollowReflectionProbe: realtime reflection probes are off in this quality level, so water and wet surfaces reflect only the default sky.");
         }
 
         rendering = -1;

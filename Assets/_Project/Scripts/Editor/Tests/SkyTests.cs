@@ -44,4 +44,24 @@ public sealed class SkyTests
         Assert.AreEqual(0f, SkyDome.MoonPhase(12f, 12f, 0f), 1e-4f, "new again after a whole cycle");
         Assert.AreEqual(0.25f, SkyDome.MoonPhase(0f, 12f, 0.25f), 1e-4f, "starting phase");
     }
+
+    [Test]
+    public void ThePcQualityLevel_RendersRealtimeReflections()
+    {
+        // Without them the follow-the-player probe never renders: water and wet stone reflect only the default sky.
+        var asset = AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/QualitySettings.asset")[0];
+        SerializedProperty levels = new SerializedObject(asset).FindProperty("m_QualitySettings");
+        bool found = false;
+        for (int i = 0; i < levels.arraySize; i++)
+        {
+            SerializedProperty level = levels.GetArrayElementAtIndex(i);
+            if (level.FindPropertyRelative("name").stringValue == "PC")
+            {
+                found = true;
+                Assert.IsTrue(level.FindPropertyRelative("realtimeReflectionProbes").boolValue);
+            }
+        }
+
+        Assert.IsTrue(found, "a PC quality level");
+    }
 }
