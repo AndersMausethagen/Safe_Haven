@@ -72,9 +72,16 @@ public sealed class TerrainSurface : MonoBehaviour
         if (layerTable != null) DestroyImmediate(layerTable);
     }
 
+    // Apply can resize the terrain's patch bounds, which Unity forbids inside OnValidate ("SendMessage cannot be called
+    // during ... OnValidate"): it waits for the Editor's next tick.
     private void OnValidate()
     {
-        if (isActiveAndEnabled) Apply();
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.delayCall += () =>
+        {
+            if (this != null && isActiveAndEnabled) Apply();
+        };
+#endif
     }
 
     private void OnTextureChanged(Terrain changed, string textureName, RectInt region, bool synched)

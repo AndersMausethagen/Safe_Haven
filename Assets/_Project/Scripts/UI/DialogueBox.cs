@@ -115,6 +115,7 @@ public sealed class DialogueBox : MonoBehaviour
     private const float LineX = 510f;
     private const float LineWidth = 480f;
     private const float PanelHeight = 250f;
+    private const float BubbleAnswersWidth = 380f;
     private const float AnswerRowHeight = 46f;
     private const float AnswerRowStep = 52f;
     // A subtitle stays for its reading time: a second plus letters at this pace, within these bounds.
@@ -162,6 +163,14 @@ public sealed class DialogueBox : MonoBehaviour
     private float nextFightCheck;
     private float subtitleTimeMultiplier = 1f;
     private bool demoting;
+    // Speech bubbles (2026-11-09): a line from someone in the world is shown in a bubble over them (SpeechBubble); the
+    // box then only holds the answers, if any. A voice with nobody to point at keeps the box.
+    private SpeechBubble bubble;
+    private TMP_Text activeLine;
+    private TMP_Text activeHint;
+    private Transform shownOver;
+    private Image panelBackground;
+    private Outline panelRim;
 
     /// <summary>The dialogue box of the loaded scene, made on first use.</summary>
     public static DialogueBox Current
@@ -203,7 +212,7 @@ public sealed class DialogueBox : MonoBehaviour
         if (!IsOpen && MonsterAI.AnyHuntingPlayerSide())
         {
             Speak(speaker, line);
-            Subtitle(speaker.Name, line, done);
+            Subtitle(speaker.Name, line, done, Over(speaker));
             return;
         }
 
@@ -217,7 +226,7 @@ public sealed class DialogueBox : MonoBehaviour
     {
         subtitleTimeMultiplier = 1f;
         Speak(speaker, line);
-        Subtitle(speaker.Name, line, done);
+        Subtitle(speaker.Name, line, done, Over(speaker));
     }
 
     /// <summary>True while a subtitle is shown.</summary>
@@ -291,8 +300,23 @@ public sealed class DialogueBox : MonoBehaviour
         answered = false;
         nameLabel.text = speaker.Name ?? "";
         lineLabel.text = line ?? "";
-        lineLabel.maxVisibleCharacters = 0;
-        letters = lineLabel.text.Length;
+        shownOver = Over(speaker);
+        bool bubbled = shownOver != null;
+        if (bubbled)
+        {
+            bubble.Show(speaker.Name, line, shownOver);
+            activeLine = bubble.Line;
+            activeHint = bubble.Hint;
+        }
+        else
+        {
+            bubble.Hide();
+            activeLine = lineLabel;
+            activeHint = hint;
+        }
+
+        activeLine.maxVisibleCharacters = 0;
+        letters = activeLine.text.Length;
         revealStarted = Time.unscaledTime;
         if (!window.IsOpen)
         {
@@ -300,12 +324,12 @@ public sealed class DialogueBox : MonoBehaviour
             window.Open();
         }
 
-        bool live = speaker.Portrait == null && speaker.Model != null;
+        bool live = speaker.Portrait == null && speaker.Model != null && !bubbled;
         portrait.gameObject.SetActive(live);
-        picture.gameObject.SetActive(!live && speaker.Portrait != null);
+        picture.gameObject.SetActive(!live && !bubbled && speaker.Portrait != null);
         picture.sprite = speaker.Portrait;
         portraitCamera.Show(live ? speaker.Model : null);
-        LayOutFor(live || speaker.Portrait != null);
+        LayOutFor(live || (!bubbled && speaker.Portrait != null));
         Frame(speaker.Model, speaker.CameraDistance);
         if (!string.IsNullOrWhiteSpace(line))
         {
@@ -324,10 +348,18 @@ public sealed class DialogueBox : MonoBehaviour
             AddAnswerRow();
         }
 
-        // Up to four answers fit the box; more make it taller, growing upwards.
-        float height = Mathf.Max(PanelHeight, count * AnswerRowStep + 30f);
-        ((RectTransform)content.transform).sizeDelta = new Vector2(PanelWidth, height);
+        // Up to four answers fit the box; more make it taller, growing upwards. With a bubble the box is only the answers:
+        // a narrow column (nothing at all when there are none; the bubble has the hint).
+        float height = bubbled ? count * AnswerRowStep + 30f : Mathf.Max(PanelHeight, count * AnswerRowStep + 30f);
+        ((RectTransform)content.transform).sizeDelta = new Vector2(bubbled ? BubbleAnswersWidth : PanelWidth, height);
         answerColumn.sizeDelta = new Vector2(answerColumn.sizeDelta.x, height - 30f);
+        answerColumn.anchoredPosition = new Vector2(bubbled ? -BubbleAnswersWidth / 2f : -160f, 0f);
+        panelBackground.enabled = !bubbled || count > 0;
+        panelRim.enabled = panelBackground.enabled;
+        portraitFrame.SetActive(!bubbled && portraitFrame.activeSelf);
+        nameLabel.gameObject.SetActive(!bubbled);
+        lineLabel.gameObject.SetActive(!bubbled);
+        hint.gameObject.SetActive(!bubbled);
         for (int i = 0; i < buttons.Count; i++)
         {
             bool shown = i < count;
@@ -368,7 +400,10 @@ public sealed class DialogueBox : MonoBehaviour
         lineLabel.rectTransform.anchoredPosition = new Vector2(LineX - freed / 2f, lineLabel.rectTransform.anchoredPosition.y);
     }
 
-    private bool Revealed => lineLabel.maxVisibleCharacters >= letters;
+    private bool Revealed => activeLine.maxVisibleCharacters >= letters;
+
+    // Where a bubble goes: over the speaker, else where their voice comes from (the portal); null keeps the box.
+    private static Transform Over(DialogueSpeaker speaker) => speaker.Model != null ? speaker.Model : speaker.VoiceFrom;
 
     private void Update()
     {
@@ -401,7 +436,7 @@ public sealed class DialogueBox : MonoBehaviour
         if (!Revealed)
         {
             float shown = (Time.unscaledTime - revealStarted) * GameOptions.DialogueLettersPerSecond(LettersPerSecond);
-            lineLabel.maxVisibleCharacters = float.IsInfinity(shown) || shown >= letters ? letters : Mathf.FloorToInt(shown);
+            activeLine.maxVisibleCharacters = float.IsInfinity(shown) || shown >= letters ? letters : Mathf.FloorToInt(shown);
             UpdateHint();
         }
 
@@ -421,7 +456,7 @@ public sealed class DialogueBox : MonoBehaviour
         bool next = GameInput.Advance.WasPressedThisFrame() || GameInput.Click.WasPressedThisFrame() && !OverButton();
         if (next && !Revealed)
         {
-            lineLabel.maxVisibleCharacters = letters;
+            activeLine.maxVisibleCharacters = letters;
             UpdateHint();
             return;
         }
@@ -460,7 +495,7 @@ public sealed class DialogueBox : MonoBehaviour
     {
         if (!Revealed)
         {
-            lineLabel.maxVisibleCharacters = letters;
+            activeLine.maxVisibleCharacters = letters;
         }
 
         answered = true;
@@ -482,7 +517,7 @@ public sealed class DialogueBox : MonoBehaviour
     private void UpdateHint()
     {
         bool asking = choices != null && choices.Count > 0;
-        hint.text = !Revealed ? "<alpha=#88>E ›" : asking ? "" : "E / Space  ›";
+        activeHint.text = !Revealed ? "<alpha=#88>E ›" : asking ? "" : "E / Space  ›";
     }
 
     private void Frame(Transform speaker, float distance = 0f)
@@ -512,6 +547,11 @@ public sealed class DialogueBox : MonoBehaviour
             return;
         }
 
+        if (!IsSubtitling)
+        {
+            bubble.Hide();
+        }
+
         if (demoting)
         {
             portraitCamera.Show(null);
@@ -533,11 +573,23 @@ public sealed class DialogueBox : MonoBehaviour
 
     // ----- Subtitles -----
 
-    private void Subtitle(string speakerName, string line, Action done)
+    private void Subtitle(string speakerName, string line, Action done, Transform over = null)
     {
         subtitleDone = done;
-        subtitle.text = string.IsNullOrWhiteSpace(speakerName) ? line : $"<color={UIStyle.Current.AccentHex}>{speakerName}:</color> {line}";
-        subtitleStrip.SetActive(true);
+        if (over != null)
+        {
+            // Over whoever says it, read in its own time like a subtitle, nothing to press.
+            subtitleStrip.SetActive(false);
+            bubble.Show(speakerName, line, over);
+            bubble.Line.maxVisibleCharacters = int.MaxValue;
+        }
+        else
+        {
+            bubble.Hide();
+            subtitle.text = string.IsNullOrWhiteSpace(speakerName) ? line : $"<color={UIStyle.Current.AccentHex}>{speakerName}:</color> {line}";
+            subtitleStrip.SetActive(true);
+        }
+
         float seconds = (1f + (line ?? "").Length / SubtitleLettersPerSecond) * GameOptions.SubtitleHold;
         subtitleEnds = Time.time + Mathf.Clamp(seconds, SubtitleMinSeconds, SubtitleMaxSeconds) * subtitleTimeMultiplier;
     }
@@ -549,10 +601,11 @@ public sealed class DialogueBox : MonoBehaviour
         onContinue = null;
         string speakerName = nameLabel.text;
         string line = lineLabel.text;
+        Transform over = shownOver;
         demoting = true;
         window.Close();
         demoting = false;
-        Subtitle(speakerName, line, done);
+        Subtitle(speakerName, line, done, over);
     }
 
     private void FinishSubtitle()
@@ -573,6 +626,7 @@ public sealed class DialogueBox : MonoBehaviour
         subtitleStrip.SetActive(false);
         if (!window.IsOpen)
         {
+            bubble.Hide();
             Closed?.Invoke();
         }
     }
@@ -616,6 +670,8 @@ public sealed class DialogueBox : MonoBehaviour
         var rim = panel.gameObject.AddComponent<Outline>();
         rim.effectColor = Rim;
         rim.effectDistance = new Vector2(2f, -2f);
+        box.panelBackground = background;
+        box.panelRim = rim;
 
         RectTransform frame = Rect("Portrait Frame", panel, new Vector2(0f, 0.5f), new Vector2(206f, 206f), new Vector2(125f, 0f));
         frame.gameObject.AddComponent<Image>().color = Rim;
@@ -660,6 +716,9 @@ public sealed class DialogueBox : MonoBehaviour
         box.subtitle.fontSizeMax = 24f;
         box.subtitleStrip = strip.gameObject;
         strip.gameObject.SetActive(false);
+        box.bubble = SpeechBubble.Create(root.transform);
+        box.activeLine = box.lineLabel;
+        box.activeHint = box.hint;
 
         box.window = root.AddComponent<UIWindow>();
         box.window.Configure(UIWindowId.Dialogue, panel.gameObject);
