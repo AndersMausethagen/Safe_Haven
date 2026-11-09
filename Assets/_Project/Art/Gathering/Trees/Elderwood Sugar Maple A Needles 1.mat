@@ -73,6 +73,7 @@ Material:
     - _WindStrength: 1
     m_Colors:
     - _BaseColor: {r: 0.8517264, g: 0.9474706, b: 0.99924976, a: 1}
+    - _EmissionColor: {r: 0.19, g: 0.23, b: 0.28, a: 1}
     - _MossColor: {r: 0.75, g: 0.75, b: 0.75, a: 1}
     - _MossRemap: {r: 0, g: 0.5, b: 0, a: 0}
   m_BuildTextureStacks: []

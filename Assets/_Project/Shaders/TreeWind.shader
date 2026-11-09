@@ -43,6 +43,7 @@ Shader "Safe Haven/Tree Wind"
         _WindStrength ("Wind Strength", Range(0, 2)) = 1
         _TreeHeight ("Tree Height (object units)", Float) = 10
         _PushStrength ("Push Away (metres, small plants only)", Range(0, 1)) = 0.35
+        [HDR] _EmissionColor ("Glow (times the surface colour; black: none)", Color) = (0, 0, 0, 1)
     }
     SubShader
     {
@@ -69,6 +70,7 @@ Shader "Safe Haven/Tree Wind"
             half4 _MossColor;
             float4 _MossRemap;
             float _MossTiling, _MossAmount, _Smoothness;
+            half4 _EmissionColor;
         CBUFFER_END
         float4 _SafeHavenWind; // horizontal direction XZ (world), moss displacement, moss speed
         #define TREE_MAX_PUSHERS 8
@@ -354,6 +356,8 @@ Shader "Safe Haven/Tree Wind"
                 SurfaceWet(surface.albedo, surface.smoothness, lighting.normalWS, lighting.positionWS, 1.0);
             #endif
             surface.normalTS = half3(0, 0, 1);
+            // A faint glow of the surface's own colour (the Elderwood tree's pale leaves and bark); black for every other tree.
+            surface.emission = surface.albedo * _EmissionColor.rgb;
             half4 color = UniversalFragmentPBR(lighting, surface);
             #if defined(_ALPHATEST_ON)
                 // Sunlight through the leaf from behind, as the SeedMesh foliage's transmission does.

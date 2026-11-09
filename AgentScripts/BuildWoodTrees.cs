@@ -12,7 +12,7 @@ using UnityEngine;
 /// <list type="bullet">
 /// <item>Oak Wood (tier I): summer green, ~10 m.</item>
 /// <item>Hardwood (tier II): a hard maple in autumn orange, ~13 m.</item>
-/// <item>Elderwood (tier III): an old tree, silver bark and pale leaves, ~15 m.</item>
+/// <item>Elderwood (tier III): an old tree, silver bark and pale leaves that glow faintly, ~15 m.</item>
 /// </list>
 /// The node prefabs and their nested model prefabs keep their GUIDs (scenes, spawners and saves still find them); the
 /// four maples (A-D) become each node's looks (A in the model prefab, B-D as model variants). The generated oaks in
@@ -35,6 +35,8 @@ public static class BuildWoodTrees
         public Color Leaves;         // multiplies the maple's leaf colour
         public Color Bark;           // multiplies the bark
         public Color LeafFall;       // what falls when it's hit (TreeLeafLook)
+        public Color LeafGlow;       // Tree Wind _EmissionColor on the leaves (times their colour; black: none)
+        public Color BarkGlow;       // and on the bark
     }
 
     private static readonly Tier[] Tiers =
@@ -59,6 +61,8 @@ public static class BuildWoodTrees
             Model = "Assets/_Project/Environment/ResourceNodes/ElderwoodModel.prefab", Definition = "Assets/_Project/Data/Gathering/Elderwood.asset",
             Wood = "Assets/_Project/Data/Items/Materials/Elderwood.asset", Height = 15f,
             Leaves = new Color(1.5f, 1.26f, 2.16f), Bark = new Color(1.35f, 1.38f, 1.42f), LeafFall = new Color(0.7f, 0.78f, 0.8f),
+            // A faint glow of its own pale colour, so the rare tree is found in the dark like the ores (the user, 2026-11-09).
+            LeafGlow = new Color(0.19f, 0.23f, 0.28f), BarkGlow = new Color(0.07f, 0.08f, 0.1f),
         },
     };
 
@@ -263,6 +267,10 @@ public static class BuildWoodTrees
         Color tint = leaves ? tier.Leaves : tier.Bark;
         Color baseColour = source.HasProperty("_BaseColor") ? source.GetColor("_BaseColor") : Color.white;
         material.SetColor("_BaseColor", new Color(baseColour.r * tint.r, baseColour.g * tint.g, baseColour.b * tint.b, baseColour.a));
+        if (material.HasProperty("_EmissionColor"))
+        {
+            material.SetColor("_EmissionColor", leaves ? tier.LeafGlow : tier.BarkGlow); // black (none) unless the tier glows
+        }
         EditorUtility.SetDirty(material);
         return material;
     }
