@@ -36,7 +36,17 @@
     ],
     "threshold": 0.4
    },
-   "metal_floor": 0.5
+   "metal_floor": 0.5,
+   "roughness": {
+    "rock": [
+     0.7,
+     0.92
+    ],
+    "ore": [
+     0.25,
+     0.4
+    ]
+   }
   },
   {
    "asset": "Iron Ore",
@@ -65,7 +75,17 @@
     "threshold": 0.4
    },
    "metal_floor": 0.8,
-   "dielectric_darken": 0.75
+   "dielectric_darken": 0.75,
+   "roughness": {
+    "rock": [
+     0.72,
+     0.94
+    ],
+    "ore": [
+     0.3,
+     0.45
+    ]
+   }
   },
   {
    "asset": "Moonsilver Ore",
@@ -92,7 +112,17 @@
     }
    ],
    "max_height": 2.0,
-   "metal_floor": 0.8
+   "metal_floor": 0.8,
+   "roughness": {
+    "rock": [
+     0.7,
+     0.92
+    ],
+    "ore": [
+     0.18,
+     0.32
+    ]
+   }
   },
   {
    "asset": "Deepstone",
@@ -123,7 +153,13 @@
      "prompt": "A single deepstone boulder for a Nordic fantasy game: a broad, low blue-black stone split by a few deep cracks that glow bright electric blue from inside, a smaller dark stone beside it."
     }
    ],
-   "max_height": 1.8
+   "max_height": 1.8,
+   "roughness": {
+    "rock": [
+     0.5,
+     0.8
+    ]
+   }
   },
   {
    "asset": "Granite",
@@ -279,7 +315,13 @@
      "prompt": "A small bundle of four fallen dry branches and twigs lying on the ground, crossed over each other, brown bark with pale broken ends."
     }
    ],
-   "max_height": 0.3
+   "max_height": 0.3,
+   "roughness": {
+    "rock": [
+     0.7,
+     0.92
+    ]
+   }
   },
   {
    "asset": "Chanterelles",

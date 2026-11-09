@@ -108,7 +108,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aecdc764a0346784e9958a956dddd948, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SaveableEntity
-  id: 04b688fd15684188870e24f156138026
+  id: 
   prefabId: 879636884ea876843960148e835a6af2
   saveTransform: 1
   saveActiveState: 1

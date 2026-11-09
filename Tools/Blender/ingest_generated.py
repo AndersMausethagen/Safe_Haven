@@ -99,6 +99,7 @@ def manifest_value(key):
 # its base colour only as reflection; as a matte rock it is lit diffusely by base * (1 - m), so dropping the false metal
 # without darkening leaves a pale rock (Iron's host rock went from dark to pale grey).
 DIELECTRIC_DARKEN = manifest_value("dielectric_darken") or 0.0
+ROUGHNESS = manifest_value("roughness")
 
 
 def manifest_glow():
@@ -159,6 +160,7 @@ def import_look(path, key, turn, coll):
         lift.label = "SH Height"
         # Metallic from the ORM's blue, for the ORM bake (prop_bake reads an "SH Metal" node).
         bsdf = next((n for n in material.node_tree.nodes if n.type == 'BSDF_PRINCIPLED'), None)
+        metal_out = None
         if bsdf is not None and bsdf.inputs["Metallic"].links and METAL_FLOOR is not None:
             remap = material.node_tree.nodes.new("ShaderNodeMapRange")
             remap.inputs["From Min"].default_value = METAL_FLOOR
@@ -210,9 +212,40 @@ def import_look(path, key, turn, coll):
                 tree.links.new(bsdf.inputs["Base Color"].links[0].from_socket, darken.inputs["A"])
                 tree.links.new(factor.outputs["Value"], darken.inputs["B"])
                 tree.links.new(darken.outputs["Result"], bsdf.inputs["Base Color"])
+        if bsdf is not None and ROUGHNESS:
+            set_roughness(material.node_tree, bsdf, metal_out)
     for poly in obj.data.polygons:
         poly.use_smooth = True
     return obj
+
+
+def set_roughness(tree, bsdf, metal_out):
+    """Roughness into the asset's ranges (manifest roughness: {"rock": [lo, hi], "ore": [lo, hi]}), keeping the
+    generated variation inside them. UltraTex makes rock and wood glossy (Iron's rock 0.2, Sticks 0.27: wet-looking) and
+    copper a mirror (0.02), which shows only a pin-point sun glint; matte rock with polished but not mirror ore catches
+    the sun, the moon and torches as broad highlights on the metal alone."""
+    socket = bsdf.inputs["Roughness"]
+    source = socket.links[0].from_socket if socket.links else None
+
+    def ranged(lo, hi):
+        node = tree.nodes.new("ShaderNodeMapRange")
+        node.inputs["To Min"].default_value = lo
+        node.inputs["To Max"].default_value = hi
+        if source is not None:
+            tree.links.new(source, node.inputs["Value"])
+        else:
+            node.inputs["Value"].default_value = socket.default_value
+        return node.outputs["Result"]
+
+    rock = ranged(*ROUGHNESS["rock"])
+    if "ore" in ROUGHNESS and metal_out is not None:
+        blend = tree.nodes.new("ShaderNodeMix")
+        blend.data_type = 'FLOAT'
+        tree.links.new(metal_out, blend.inputs["Factor"])
+        tree.links.new(rock, blend.inputs["A"])
+        tree.links.new(ranged(*ROUGHNESS["ore"]), blend.inputs["B"])
+        rock = blend.outputs["Result"]
+    tree.links.new(rock, socket)
 
 
 def emission_from_albedo(glow):
