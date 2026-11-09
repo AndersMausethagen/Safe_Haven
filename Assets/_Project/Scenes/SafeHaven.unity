@@ -327942,6 +327942,9 @@ MonoBehaviour:
     - clip: {fileID: 8300000, guid: 14e89dfc88b417241a54b137f98c1e89, type: 3}
       volume: 1
       startAt: 0
+    - clip: {fileID: 8300000, guid: 560945074b2a2ff41ab6bc0855a756ca, type: 3}
+      volume: 1
+      startAt: 0
     order: 0
   combat:
     tracks:

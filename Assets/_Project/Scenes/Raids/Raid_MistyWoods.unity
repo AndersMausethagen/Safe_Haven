@@ -13099,10 +13099,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SceneAudio
   exploring:
     tracks:
+    - clip: {fileID: 8300000, guid: d33bd38e4b80c7b44b05a8bbae974df8, type: 3}
+      volume: 1
+      startAt: 0
     - clip: {fileID: 8300000, guid: 506de2d37425fa747801c9cafb2f6161, type: 3}
       volume: 1
       startAt: 0
-    order: 0
+    order: 1
   combat:
     tracks: []
     order: 0
