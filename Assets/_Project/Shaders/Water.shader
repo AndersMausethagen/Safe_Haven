@@ -31,6 +31,11 @@ Shader "Safe Haven/Water"
         _Smoothness ("Smoothness", Range(0, 1)) = 0.93
         _Reflection ("Reflection Strength", Range(0, 1)) = 0.8
         _ScreenReflection ("Screen-Space Reflection", Range(0, 1)) = 1
+        [Header(Sky in the Water)]
+        _SkyTilt ("Sky Seen From Eye Height", Range(0, 1)) = 0.5
+        _SkySaturation ("Sky Reflection Colour", Range(0, 1)) = 0.5
+        _CloudReflection ("Cloud Reflection", Range(0, 1)) = 1
+        _SkyReflectionFloor ("Reflection From Above", Range(0, 0.3)) = 0.08
         _Refraction ("Refraction", Range(0, 0.15)) = 0.03
         [Header(Flow)]
         _FlowDirection ("Flow Direction (object X, Z)", Vector) = (1, 0, 0, 0)
@@ -99,6 +104,7 @@ Shader "Safe Haven/Water"
                 float4 _FlowDirection;
                 float _DepthDistance, _Clarity, _Murk, _NormalTiling, _NormalStrength, _WindRipples, _Smoothness;
                 float _ScreenReflection;
+                float _SkyTilt, _SkySaturation, _CloudReflection, _SkyReflectionFloor;
                 float _Reflection, _Refraction, _FlowSpeed, _FallSpeed, _FallTiling, _VertexAlpha, _Cull, _SteepFaces;
                 float _FoamTiling, _ShoreFoam, _FoamTrail, _SpeedFoam, _FallFoam, _Caustics, _CausticsTiling;
                 float _RippleStrength, _RainRipples, _FlowFromMesh;
@@ -114,6 +120,52 @@ Shader "Safe Haven/Water"
             // Ice (WinterIce, per surface through a property block): still water freezes over in a snowing season.
             float _IceAmount;
             #include "Assets/_Project/Shaders/SeasonSnow.hlsl"
+            #include "Assets/_Project/Shaders/CloudNoise.hlsl"
+            // The sky's state (SkyDome, CloudLayer): the water traces the same clouds in its reflection.
+            float4 _SkyState, _SkySunColour, _SkyClouds, _SafeHavenCloudOffset;
+            float _SkyCloudScale;
+            half4 _SkyCloudLit;
+
+            // Where the player is (TerrainDetailFocus; w = 1 while a game camera follows one).
+            float4 _TerrainDetailFocus;
+
+            // The sky seen in the water. The top-down camera looks steeply down from high up: every point of a pond then
+            // reflects nearly the same patch of flat blue overhead, from a probe too coarse for clouds. Instead the sky is
+            // looked up as the player standing there would see it, from their eye (Sky Seen From Eye Height blends the
+            // camera's reflection into theirs): across a pond that ray sweeps from the sky above to the horizon, so the
+            // clouds show their shapes. The probe's blue is softened (Sky Reflection Colour), and the sky's own cloud
+            // pattern is traced along the ray (CloudNoise, as Sky.shader draws it), sharp at any probe size and drifting
+            // with the clouds overhead and their shadows.
+            float3 SkyDirection(float3 positionWS, float3 normal, float3 cameraReflection)
+            {
+                if (_TerrainDetailFocus.w < 0.5 || _SkyTilt <= 0.001)
+                {
+                    return cameraReflection;
+                }
+
+                float3 eye = _TerrainDetailFocus.xyz + float3(0.0, 1.7, 0.0);
+                float3 eyeReflection = reflect(-normalize(eye - positionWS), normal);
+                eyeReflection.y = max(eyeReflection.y, 0.03); // water above the eye (a pond up a slope) still shows sky
+                return normalize(lerp(cameraReflection, normalize(eyeReflection), _SkyTilt));
+            }
+
+            half3 SkyInWater(float3 direction, half3 probe)
+            {
+                half grey = dot(probe, half3(0.2126, 0.7152, 0.0722));
+                half3 sky = lerp(grey.xxx, probe, _SkySaturation);
+                if (_CloudReflection > 0.001 && direction.y > 0.0 && _SkyCloudScale > 0.0)
+                {
+                    float2 uv = direction.xz / (direction.y + 0.08) * _SkyCloudScale + _SafeHavenCloudOffset.xy;
+                    float density = CloudDensity(uv, 4);
+                    float cloud = CloudMask(density, _SkyClouds.y, 0.2) * smoothstep(0.0, 0.12, direction.y);
+                    cloud = lerp(cloud, 1.0, _SkyClouds.z);
+                    half3 lit = _SkyCloudLit.rgb * _SkySunColour.rgb * 1.25 * lerp(0.06, 1.0, _SkyState.x);
+                    half3 cloudColour = lerp(lit, lit * 0.55, saturate((density - 0.5) * 2.0)); // thick cores in shade
+                    sky = lerp(sky, cloudColour, cloud * _CloudReflection);
+                }
+
+                return sky;
+            }
 
             // Cracks in the ice: the edges of a cell pattern, fine lines between plates.
             half IceCracks(float2 p)
@@ -511,8 +563,10 @@ Shader "Safe Haven/Water"
                 mask *= lerp(0.75, 1.25, foamFlat.g); // break up the edges
                 half foam = smoothstep(1.0 - mask, 1.0 - mask + 0.2, pattern) * saturate(mask * 3.0);
 
-                half fresnel = 0.02 + 0.98 * pow(1.0 - saturate(dot(normal, view)), 5.0);
-                half3 reflection = GlossyEnvironmentReflection(reflect(-view, normal), positionWS, 1.0 - _Smoothness, 1.0, screenUV);
+                // Seen from above, real water reflects about 2%: Reflection From Above keeps the sky in it readable.
+                half fresnel = max(0.02 + 0.98 * pow(1.0 - saturate(dot(normal, view)), 5.0), _SkyReflectionFloor);
+                float3 skyRay = SkyDirection(positionWS, normal, reflect(-view, normal));
+                half3 reflection = SkyInWater(skyRay, GlossyEnvironmentReflection(skyRay, positionWS, 1.0 - _Smoothness, 1.0, screenUV));
                 #if !defined(SAFE_HAVEN_WATER_SIMPLE)
                     reflection = ScreenReflection(positionWS, reflect(-view, normal), reflection);
                 #endif

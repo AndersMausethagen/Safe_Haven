@@ -13,6 +13,9 @@ public sealed class SkyDome : MonoBehaviour
     private static readonly int MoonId = Shader.PropertyToID("_SkyMoonDirection");
     private static readonly int SunColourId = Shader.PropertyToID("_SkySunColour");
     private static readonly int StateId = Shader.PropertyToID("_SkyState");
+    // The water traces the sky's clouds in its reflection (Water.shader): it needs the sky material's cloud size and colour.
+    private static readonly int CloudScaleId = Shader.PropertyToID("_SkyCloudScale");
+    private static readonly int CloudLitId = Shader.PropertyToID("_SkyCloudLit");
 
     private RenderingSettings settings;
     private Material sky;
@@ -60,6 +63,11 @@ public sealed class SkyDome : MonoBehaviour
         Shader.SetGlobalVector(MoonId, new Vector4(moon.x, moon.y, moon.z, phase));
         Shader.SetGlobalColor(SunColourId, sunColour); // converted to linear by Unity
         Shader.SetGlobalVector(StateId, new Vector4(daylight, state.Night, state.GoldenHour, flash));
+        if (sky != null)
+        {
+            Shader.SetGlobalFloat(CloudScaleId, sky.GetFloat("_CloudScale"));
+            Shader.SetGlobalColor(CloudLitId, sky.GetColor("_CloudLit"));
+        }
     }
 
     private void OnDestroy()
