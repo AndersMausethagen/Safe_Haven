@@ -56,8 +56,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.9868795, y: 0.2, z: 1.1220016}
-  m_Center: {x: 0.1755, y: 0.08500001, z: 0.0885008}
+  m_Size: {x: 0.7088722, y: 0.2, z: 0.6188799}
+  m_Center: {x: 0, y: 0.1, z: 0}
 --- !u!114 &2111271593981369704
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -70,7 +70,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aecdc764a0346784e9958a956dddd948, type: 3}
   m_Name: 
   m_EditorClassIdentifier: SafeHaven::SaveableEntity
-  id: 
+  id: 04856561b04f4d8b93efc1615ec93b6d
   prefabId: e8f5ac7427646e942aaf261bf18f6768
   saveTransform: 1
   saveActiveState: 1
@@ -92,6 +92,7 @@ MonoBehaviour:
   duration: 0.75
   range: 1.5
   deactivateOnComplete: 0
+  kind: 0
   started:
     m_PersistentCalls:
       m_Calls: []
@@ -134,6 +135,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: SafeHaven::ResourceNode
   node: {fileID: 11400000, guid: 67001cdb00fa76a4ca674fbd8fe7b0b8, type: 2}
+  keepOwnModel: 0
 --- !u!1001 &8580312699260292537
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -152,7 +154,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6199728653846469325, guid: 2813b2a24ee3b3f4c8ede941df63e3a9, type: 3}
       propertyPath: m_LocalScale.y
-      value: 1.7
+      value: 1.35
       objectReference: {fileID: 0}
     - target: {fileID: 6199728653846469325, guid: 2813b2a24ee3b3f4c8ede941df63e3a9, type: 3}
       propertyPath: m_LocalScale.z
