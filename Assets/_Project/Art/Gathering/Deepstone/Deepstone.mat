@@ -14,6 +14,7 @@ Material:
   m_ValidKeywords:
   - _ORMMAP
   - _PARALLAXMAP
+  - _SEASON_SNOW
   m_InvalidKeywords:
   - _LAYERTRIPLANAR_ON
   - _NORMALMAP
@@ -147,7 +148,7 @@ Material:
     - _Roughness: 1
     - _ScreenSpaceReflections: 1
     - _ScreenSpaceReflectionsContributeTransparent: 1
-    - _SeasonSnow: 0
+    - _SeasonSnow: 1
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
@@ -161,7 +162,7 @@ Material:
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _EmissionColor: {r: 2.6, g: 2.6, b: 2.6, a: 1}
+    - _EmissionColor: {r: 4, g: 4, b: 4, a: 1}
     - _L1Tint: {r: 1, g: 1, b: 1, a: 1}
     - _L2Tint: {r: 1, g: 1, b: 1, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}

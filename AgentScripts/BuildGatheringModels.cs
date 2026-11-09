@@ -5,114 +5,119 @@ using UnityEngine;
 
 /// <summary>
 /// Real models for the gathering nodes (`unity command script run --file AgentScripts/BuildGatheringModels.cs --entry
-/// BuildGatheringModels.Apply`), modelled and baked in Blender by the Tools/Blender scripts on prop_bake.py
-/// (forage_nodes.py: Small Rocks, Sticks, Berry Bush; ore_nodes.py, ...) into Art/Gathering/&lt;Asset&gt;. They replace
-/// the primitive stand-ins inside the nodes' model prefabs (so the nodes, dropped items and every placed node take them),
-/// and the other looks become the nodes' Model Variants, which each spot picks from by its position.
+/// BuildGatheringModels.Apply`). Solid things (stone, ore, the Life Orbs, mushrooms, turnips, small rocks, sticks) are
+/// made by LocalSpawn (Hunyuan3D + UltraTex, Tools/LocalSpawn/generate_gathering.py) and made game-ready by
+/// Tools/Blender/ingest_generated.py; leafy plants are built by Tools/Blender/plant_nodes.py as leaf cards with wind.
+/// Both write Art/Gathering/&lt;Asset&gt;: an FBX of the looks ("&lt;Asset&gt; A", "B"...), each with "LOD1", "LOD2"
+/// and, for solid ones, a convex "Collider", and one texture set.
 ///
-/// Each asset's material is Layered Lit with all its baked maps: Albedo, Normal, ORM (occlusion, roughness, metallic),
-/// Height (parallax occlusion, at the asset's depth), BlendMask (curvature, edge wear, cavity, coverage) and, for
-/// glowing ones, Emission. The live moss layer is copied from a Haven scan (the Field Stone's moss) and grows from the
-/// baked coverage, at the asset's amount. Node and item colliders are fitted to the new models, node models are scaled
-/// evenly, and the pieces mined nodes break into are cut again from the new models (NodeFractureBuilder). Assets whose
-/// FBX hasn't been baked yet are skipped. Re-runnable.
+/// Set up the way the project's other props are (see the asset conventions): each look is a LODGroup (hard switches for
+/// rock, crossfade for foliage, the last level culled); solid nodes collide with the convex hull, plants with a fitted
+/// box, wherever the collider sits (the node's root or its nested model, whose overrides are reverted); rock and ore
+/// use Layered Lit with every map (parallax, moss grown from the baked coverage, snow and rain), plants Tree Wind
+/// (alpha-tested two-sided cards, translucency, wind, giving way to the player). The first look goes into the node's
+/// stand-in model prefab (its GUID kept, so every node and item takes it), the others become Model Variants. The pieces
+/// mined nodes break into are cut again from the new models. Assets whose FBX hasn't been made are skipped. Re-runnable.
 /// </summary>
 public static class BuildGatheringModels
 {
     private const string Art = "Assets/_Project/Art/Gathering/";
     private const string FieldStone = "Assets/_Project/Models/PolyHaven/stone_01/stone_01.fbx";
+    private const string FernLeaves = "Assets/_Project/Art/Vegetation/Safe Haven/Plants/Lake Fern A.prefab";
     private const string Nodes = "Assets/_Project/Prefabs/Resources/";
     private const string Defs = "Assets/_Project/Data/Gathering/";
     private const string NodeModels = "Assets/_Project/Environment/ResourceNodes/";
+    private const string HavenModels = "Assets/_Project/Art/Haven/Models/";
+
+    private enum Kind { Stone, Solid, Foliage }
 
     private sealed class Asset
     {
         public string Name;              // folder and FBX under Art/Gathering
-        public string[] Variants;        // object names in the FBX; the first is the node's own model
+        public int Looks = 2;            // "<Name> A", "B", ...; the first is the node's own model
+        public Kind Kind;
         public string ModelPrefab;       // the stand-in prefab every node and item nests
-        public string Definition;        // the GatheringNodeDefinition (null: no variants)
+        public string Definition;        // the GatheringNodeDefinition
         public string Node;              // the node prefab
         public string Item;              // the dropped item prefab, if any
         public float NodeScale = 1f;     // the node's model, scaled evenly
-        public int TextureSize = 1024;
+        public int TextureSize = 2048;
         public float Parallax;           // parallax occlusion depth in UV units (0: none)
         public float Moss;               // live moss amount (0: none)
-        public Color Glow = Color.black; // HDR multiplier for the baked emission (black: none)
-    }
+        public Color Glow = Color.black; // HDR multiplier for the emission map (black: none)
+        public bool Hull;                // collide with the convex hull (solid things you walk round), else a fitted box
+        public float[] LodHeights = { 0.25f, 0.1f, 0.02f }; // screen height where LOD0, 1, 2 end (culled below the last)
 
-    private static string[] Looks(string name, int count) =>
-        Enumerable.Range(0, count).Select(i => $"{name} {(char)('A' + i)}").ToArray();
+        public string Looked(int index) => $"{Name} {(char)('A' + index)}";
+    }
 
     private static readonly Asset[] Assets =
     {
-        new Asset
-        {
-            Name = "Small Rocks", Variants = Looks("Small Rocks", 3), ModelPrefab = "Assets/_Project/Art/Bootstrap/SmallRocks.prefab",
+        // Small things the player picks up: tiny on screen, culled early, boxes to aim at.
+        new Asset { Name = "Small Rocks", Kind = Kind.Stone, ModelPrefab = "Assets/_Project/Art/Bootstrap/SmallRocks.prefab",
             Definition = Defs + "SmallRocks.asset", Node = Nodes + "SmallRocksNode.prefab", Item = "Assets/_Project/Prefabs/Items/SmallRocks.prefab",
-            NodeScale = 1.35f, Parallax = 0.012f, Moss = 0.55f,
-        },
-        new Asset
-        {
-            Name = "Sticks", Variants = Looks("Sticks", 3), ModelPrefab = "Assets/_Project/Art/Bootstrap/Sticks.prefab",
+            NodeScale = 1.35f, Parallax = 0.01f, Moss = 0.5f, LodHeights = new[] { 0.12f, 0.05f, 0.012f } },
+        new Asset { Name = "Sticks", Kind = Kind.Solid, ModelPrefab = "Assets/_Project/Art/Bootstrap/Sticks.prefab",
             Definition = Defs + "Sticks.asset", Node = Nodes + "SticksNode.prefab", Item = "Assets/_Project/Prefabs/Items/Sticks.prefab",
-            NodeScale = 1.35f, Parallax = 0.006f, Moss = 0.3f,
-        },
-        new Asset
-        {
-            Name = "Berry Bush", Variants = Looks("Berry Bush", 2), ModelPrefab = NodeModels + "BerryBushModel.prefab",
-            Definition = Defs + "Berries.asset", Node = Nodes + "BerriesNode.prefab", TextureSize = 2048,
-        },
+            NodeScale = 1.35f, Parallax = 0.006f, Moss = 0.25f, LodHeights = new[] { 0.12f, 0.05f, 0.012f } },
 
-        // Stone and ore (ore_nodes.py): boulders of 2 to 3 m.
-        Boulder("Granite", "GraniteModel", "Granite", "GraniteNode", moss: 0.45f),
-        Boulder("Copper Ore", "CopperOreModel", "CopperOre", "CopperOreNode", moss: 0.35f),
-        Boulder("Iron Ore", "IronOreModel", "IronOre", "IronOreNode", moss: 0.25f),
-        Boulder("Moonsilver Ore", "MoonsilverOreModel", "MoonsilverOre", "MoonsilverOreNode", moss: 0.15f,
-            glow: new Color(1.6f, 1.6f, 1.6f)),
-        Boulder("Deepstone", "DeepstoneModel", "Deepstone", "DeepstoneNode", moss: 0f, glow: new Color(2.6f, 2.6f, 2.6f)),
-        new Asset
-        {
-            Name = "Rootbound Stone", Variants = Looks("Rootbound Stone", 1), ModelPrefab = NodeModels + "RootboundStoneModel.prefab",
-            Node = Nodes + "RootboundStone.prefab", TextureSize = 2048, Parallax = 0.01f, Moss = 0.4f, Glow = new Color(2.2f, 2.2f, 2.2f),
-        },
+        // Stone and ore: 2-3 m boulders, seen from far, convex hulls.
+        Boulder("Granite", "GraniteModel", "Granite", "GraniteNode", moss: 0.5f),
+        // Ore glows faintly where it is, so it can be found in the dark (copper warm, iron steel, moonsilver white); faint
+        // enough that by day the ore shows its own colour and metal (stronger read as orange fungus and white iron).
+        Boulder("Copper Ore", "CopperOreModel", "CopperOre", "CopperOreNode", moss: 0.3f, glow: 0.3f),
+        Boulder("Iron Ore", "IronOreModel", "IronOre", "IronOreNode", moss: 0.25f, glow: 0.2f),
+        Boulder("Moonsilver Ore", "MoonsilverOreModel", "MoonsilverOre", "MoonsilverOreNode", moss: 0.15f, glow: 0.6f),
+        Boulder("Deepstone", "DeepstoneModel", "Deepstone", "DeepstoneNode", moss: 0f, glow: 4f),
+        new Asset { Name = "Rootbound Stone", Looks = 1, Kind = Kind.Stone, ModelPrefab = NodeModels + "RootboundStoneModel.prefab",
+            Node = Nodes + "RootboundStone.prefab", Parallax = 0.01f, Moss = 0.4f, Glow = Grey(2.2f), Hull = true,
+            LodHeights = new[] { 0.3f, 0.12f, 0.01f } },
 
-        // The Life Orbs' old places (orb_nodes.py): carved standing stones, roots cradling the light.
-        Single("Life Orb", "LifeOrbModel", "LifeOrb", "LifeOrbNode", glow: 1.4f),
-        Single("Life Mote", "LifeMoteModel", "LifeMote", "LifeMoteNode", glow: 1.2f),
-        Single("Radiant Life Orb", "RadiantLifeOrbModel", "RadiantLifeOrb", "RadiantLifeOrbNode", glow: 1.7f),
+        // The Life Orbs' old places.
+        Shrine("Life Orb", "LifeOrbModel", "LifeOrb", "LifeOrbNode", glow: 1.6f),
+        Shrine("Life Mote", "LifeMoteModel", "LifeMote", "LifeMoteNode", glow: 1.4f),
+        Shrine("Radiant Life Orb", "RadiantLifeOrbModel", "RadiantLifeOrb", "RadiantLifeOrbNode", glow: 1.9f),
 
-        // Plants (plant_nodes.py): two looks each, no moss or parallax (thin leaves).
+        // Solid plants (LocalSpawn): Layered Lit, no moss.
+        new Asset { Name = "Chanterelles", Kind = Kind.Solid, ModelPrefab = HavenModels + "Chanterelle Patch.prefab",
+            Definition = Defs + "Chanterelles.asset", Node = Nodes + "ChanterellesNode.prefab", Parallax = 0.004f,
+            LodHeights = new[] { 0.12f, 0.05f, 0.012f } },
+        new Asset { Name = "Wild Turnips", Kind = Kind.Solid, ModelPrefab = HavenModels + "Wild Turnip Clump.prefab",
+            Definition = Defs + "WildTurnips.asset", Node = Nodes + "WildTurnipsNode.prefab", LodHeights = new[] { 0.12f, 0.05f, 0.012f } },
+
+        // Leaf-card plants (plant_nodes.py): Tree Wind.
+        Plant("Berry Bush", NodeModels + "BerryBushModel", "Berries", "BerriesNode"),
         Plant("Healing Herb", NodeModels + "HealingHerbModel", "HealingHerb", "HealingHerbNode"),
         Plant("Flax", NodeModels + "FlaxModel", "Flax", "FlaxNode"),
-        Plant("Huldra Silk", NodeModels + "HuldraSilkModel", "HuldraSilk", "HuldraSilkNode", glow: 1.2f),
+        Plant("Huldra Silk", NodeModels + "HuldraSilkModel", "HuldraSilk", "HuldraSilkNode"),
         Plant("Nettle", NodeModels + "NettleFiberModel", "NettleFiber", "NettleFiberNode"),
-        Plant("Chanterelles", HavenModels + "Chanterelle Patch", "Chanterelles", "ChanterellesNode", parallax: 0.004f),
         Plant("Cloudberries", HavenModels + "Cloudberry Patch", "CloudberryPatch", "CloudberryPatchNode"),
         Plant("Wild Barley", HavenModels + "Wild Barley Stand", "WildBarley", "WildBarleyNode"),
-        Plant("Wild Turnips", HavenModels + "Wild Turnip Clump", "WildTurnips", "WildTurnipsNode"),
     };
 
-    private const string HavenModels = "Assets/_Project/Art/Haven/Models/";
+    private static Color Grey(float v) => new Color(v, v, v);
 
-    private static Asset Single(string name, string model, string definition, string node, float glow) =>
+    private static Asset Boulder(string name, string model, string definition, string node, float moss, float glow = 0f) =>
         new Asset
         {
-            Name = name, Variants = Looks(name, 1), ModelPrefab = NodeModels + model + ".prefab", Definition = Defs + definition + ".asset",
-            Node = Nodes + node + ".prefab", Parallax = 0.008f, Moss = 0.45f, Glow = new Color(glow, glow, glow),
+            Name = name, Kind = Kind.Stone, ModelPrefab = NodeModels + model + ".prefab", Definition = Defs + definition + ".asset",
+            Node = Nodes + node + ".prefab", Parallax = 0.01f, Moss = moss, Glow = Grey(glow), Hull = true,
+            LodHeights = new[] { 0.3f, 0.12f, 0.01f },
         };
 
-    private static Asset Plant(string name, string model, string definition, string node, float glow = 0f, float parallax = 0f) =>
+    private static Asset Shrine(string name, string model, string definition, string node, float glow) =>
         new Asset
         {
-            Name = name, Variants = Looks(name, 2), ModelPrefab = model + ".prefab", Definition = Defs + definition + ".asset",
-            Node = Nodes + node + ".prefab", TextureSize = 2048, Parallax = parallax, Moss = 0f, Glow = new Color(glow, glow, glow),
+            Name = name, Looks = 1, Kind = Kind.Stone, ModelPrefab = NodeModels + model + ".prefab", Definition = Defs + definition + ".asset",
+            Node = Nodes + node + ".prefab", Parallax = 0.008f, Moss = 0.45f, Glow = Grey(glow), Hull = true,
+            LodHeights = new[] { 0.2f, 0.08f, 0.015f },
         };
 
-    private static Asset Boulder(string name, string model, string definition, string node, float moss, Color? glow = null) =>
+    private static Asset Plant(string name, string model, string definition, string node) =>
         new Asset
         {
-            Name = name, Variants = Looks(name, 2), ModelPrefab = NodeModels + model + ".prefab", Definition = Defs + definition + ".asset",
-            Node = Nodes + node + ".prefab", TextureSize = 2048, Parallax = 0.01f, Moss = moss, Glow = glow ?? Color.black,
+            Name = name, Kind = Kind.Foliage, ModelPrefab = model + ".prefab", Definition = Defs + definition + ".asset",
+            Node = Nodes + node + ".prefab", TextureSize = 1024, LodHeights = new[] { 0.15f, 0.06f, 0.015f },
         };
 
     public static string Apply()
@@ -123,35 +128,46 @@ public static class BuildGatheringModels
         foreach (Asset asset in Assets)
         {
             string folder = Art + asset.Name + "/";
-            if (Load<GameObject>(folder + asset.Name + ".fbx") == null)
+            string fbx = folder + asset.Name + ".fbx";
+            if (Load<GameObject>(fbx) == null)
             {
                 continue;
             }
 
             Import(asset, folder);
-            Material material = MaterialFor(asset, folder);
-            Mesh[] meshes = asset.Variants.Select(v => MeshIn(folder + asset.Name + ".fbx", v)).ToArray();
-            if (meshes.Any(m => m == null))
+            Material material = asset.Kind == Kind.Foliage ? FoliageMaterial(asset, folder) : StoneMaterial(asset, folder);
+            var looks = new List<Mesh[]>();
+            for (int i = 0; i < asset.Looks; i++)
             {
-                return $"{asset.Name}: missing a mesh in the FBX (expected {string.Join(", ", asset.Variants)})";
+                string look = asset.Looked(i);
+                Mesh[] levels = { MeshIn(fbx, look), MeshIn(fbx, look + " LOD1"), MeshIn(fbx, look + " LOD2") };
+                if (levels[0] == null)
+                {
+                    return $"{asset.Name}: no mesh '{look}' in {fbx}";
+                }
+
+                looks.Add(levels.Where(m => m != null).ToArray());
             }
 
-            ReplaceModel(asset.ModelPrefab, meshes[0], material);
+            Mesh hull = asset.Hull ? MeshIn(fbx, asset.Looked(0) + " Collider") : null;
+            ReplaceModel(asset, looks[0], material, hull);
             var variants = new List<GameObject>();
-            for (int i = 1; i < meshes.Length; i++)
+            for (int i = 1; i < looks.Count; i++)
             {
-                variants.Add(VariantPrefab(folder + asset.Variants[i] + ".prefab", meshes[i], material));
+                variants.Add(VariantPrefab(asset, folder + asset.Looked(i) + ".prefab", looks[i], material));
             }
 
+            RemoveStaleVariants(asset, folder);
             if (asset.Definition != null)
             {
                 SetVariants(asset.Definition, variants);
             }
 
-            Bounds node = FitNode(asset.Node, asset.NodeScale);
+            Bounds node = FitNode(asset, hull);
             string item = asset.Item != null ? $", item {FitItem(asset.Item).size}" : "";
-            int triangles = meshes.Sum(m => (int)m.GetIndexCount(0) / 3);
-            report.Add($"{asset.Name}: {meshes.Length} looks ({triangles / meshes.Length} triangles on average), node {node.size}{item}");
+            int triangles = looks.Sum(levels => (int)levels[0].GetIndexCount(0) / 3);
+            report.Add($"{asset.Name}: {looks.Count} looks ({triangles / looks.Count} triangles, {looks[0].Length} levels), " +
+                       $"{(hull != null ? "hull" : "box")} {node.size}{item}");
         }
 
         // Mined nodes break apart into pieces cut ahead of time from their models: cut them again from the new ones.
@@ -160,17 +176,18 @@ public static class BuildGatheringModels
         return string.Join("; ", report);
     }
 
-    // ----- Imports and the material -----
+    // ----- Imports and materials -----
 
     private static void Import(Asset asset, string folder)
     {
         string prefix = folder + asset.Name;
-        Texture(prefix + "_Albedo.png", TextureImporterType.Default, true, asset.TextureSize);
-        Texture(prefix + "_Normal.png", TextureImporterType.NormalMap, false, asset.TextureSize);
-        Texture(prefix + "_ORM.png", TextureImporterType.Default, false, asset.TextureSize);
-        Texture(prefix + "_Height.png", TextureImporterType.Default, false, asset.TextureSize);
-        Texture(prefix + "_BlendMask.png", TextureImporterType.Default, false, asset.TextureSize);
-        Texture(prefix + "_Emission.png", TextureImporterType.Default, true, asset.TextureSize);
+        bool cutout = asset.Kind == Kind.Foliage;
+        Texture(prefix + "_Albedo.png", TextureImporterType.Default, true, asset.TextureSize, cutout);
+        Texture(prefix + "_Normal.png", TextureImporterType.NormalMap, false, asset.TextureSize, false);
+        Texture(prefix + "_ORM.png", TextureImporterType.Default, false, asset.TextureSize / 2, false);
+        Texture(prefix + "_Height.png", TextureImporterType.Default, false, asset.TextureSize / 2, false);
+        Texture(prefix + "_BlendMask.png", TextureImporterType.Default, false, asset.TextureSize / 2, false);
+        Texture(prefix + "_Emission.png", TextureImporterType.Default, true, asset.TextureSize, false);
         var model = (ModelImporter)AssetImporter.GetAtPath(prefix + ".fbx");
         model.materialImportMode = ModelImporterMaterialImportMode.None;
         model.importAnimation = false;
@@ -182,7 +199,7 @@ public static class BuildGatheringModels
         model.SaveAndReimport();
     }
 
-    private static void Texture(string path, TextureImporterType type, bool colour, int size)
+    private static void Texture(string path, TextureImporterType type, bool colour, int size, bool cutout)
     {
         if (!(AssetImporter.GetAtPath(path) is TextureImporter importer))
         {
@@ -193,29 +210,20 @@ public static class BuildGatheringModels
         importer.sRGBTexture = colour;
         importer.maxTextureSize = size;
         importer.mipmapEnabled = true;
+        importer.streamingMipmaps = true;
         importer.alphaSource = TextureImporterAlphaSource.FromInput;
-        importer.alphaIsTransparency = false;
+        importer.alphaIsTransparency = cutout;
+        // Leaf cards: keep the leaves' coverage in the smaller mipmaps, or they thin out and vanish with distance.
+        importer.mipMapsPreserveCoverage = cutout;
+        importer.alphaTestReferenceValue = 0.45f;
         importer.SaveAndReimport();
     }
 
-    private static Material MaterialFor(Asset asset, string folder)
+    private static Material StoneMaterial(Asset asset, string folder)
     {
         Material scan = AssetDatabase.LoadAllAssetsAtPath(FieldStone).OfType<Material>().First();
-        string path = folder + asset.Name + ".mat";
-        var material = Load<Material>(path);
-        if (material == null)
-        {
-            material = new Material(scan);
-            AssetDatabase.CreateAsset(material, path);
-        }
-        else
-        {
-            material.shader = scan.shader;
-            material.CopyPropertiesFromMaterial(scan);
-        }
-
+        Material material = Begin(folder + asset.Name + ".mat", scan);
         string prefix = folder + asset.Name;
-        material.name = asset.Name;
         material.SetTexture("_BaseMap", Load<Texture2D>(prefix + "_Albedo.png"));
         material.SetTextureScale("_BaseMap", Vector2.one);
         material.SetTextureOffset("_BaseMap", Vector2.zero);
@@ -229,16 +237,10 @@ public static class BuildGatheringModels
         material.SetFloat("_OcclusionStrength", 1f);
 
         var height = Load<Texture2D>(prefix + "_Height.png");
-        material.SetTexture("_ParallaxMap", asset.Parallax > 0 ? height : null);
-        material.SetFloat("_Parallax", asset.Parallax);
-        if (asset.Parallax > 0 && height != null)
-        {
-            material.EnableKeyword("_PARALLAXMAP");
-        }
-        else
-        {
-            material.DisableKeyword("_PARALLAXMAP");
-        }
+        bool parallax = asset.Parallax > 0 && height != null;
+        material.SetTexture("_ParallaxMap", parallax ? height : null);
+        material.SetFloat("_Parallax", parallax ? asset.Parallax : 0f);
+        SetKeyword(material, "_PARALLAXMAP", parallax);
 
         // Moss grows from the baked coverage (faces to the sky, in patches) in clumps sized for a prop, not a boulder.
         material.SetTexture("_BlendMask", Load<Texture2D>(prefix + "_BlendMask.png"));
@@ -249,14 +251,83 @@ public static class BuildGatheringModels
         material.SetFloat("_L1PatchScale", 3f);
         material.SetFloat("_L2Amount", 0f);
 
+        // Stone and wood get wet in the rain and take snow like the Haven's other rocks; mushrooms and roots don't.
+        bool weather = asset.Kind == Kind.Stone || asset.Name == "Sticks";
+        material.SetFloat("_SeasonSnow", weather ? 1f : 0f);
+        SetKeyword(material, "_SEASON_SNOW", weather);
+
         var glow = Load<Texture2D>(prefix + "_Emission.png");
         bool glows = glow != null && asset.Glow.maxColorComponent > 0;
         material.SetTexture("_EmissionMap", glows ? glow : null);
         material.SetColor("_EmissionColor", glows ? asset.Glow : Color.black);
         material.globalIlluminationFlags = glows ? MaterialGlobalIlluminationFlags.RealtimeEmissive : MaterialGlobalIlluminationFlags.EmissiveIsBlack;
+        return Finish(material);
+    }
+
+    /// <summary>Tree Wind, set up like the Haven's ferns: alpha-tested two-sided cards, translucency, wind from the
+    /// mesh's uv1/uv2, and small plants giving way to the player.</summary>
+    private static Material FoliageMaterial(Asset asset, string folder)
+    {
+        Material fern = Load<GameObject>(FernLeaves).GetComponentInChildren<Renderer>(true).sharedMaterial;
+        Material material = Begin(folder + asset.Name + ".mat", fern);
+        string prefix = folder + asset.Name;
+        material.SetTexture("_BaseMap", Load<Texture2D>(prefix + "_Albedo.png"));
+        material.SetTextureScale("_BaseMap", Vector2.one);
+        material.SetTextureOffset("_BaseMap", Vector2.zero);
+        material.SetColor("_BaseColor", Color.white);
+        material.SetTexture("_BumpMap", Load<Texture2D>(prefix + "_Normal.png"));
+        material.SetTexture("_ORMMap", Load<Texture2D>(prefix + "_ORM.png"));
+        // The baked ORM is glTF's (R occlusion, G roughness, B metallic), not HDRP's mask map.
+        material.SetFloat("_MaskHDRP", 0f);
+        SetKeyword(material, "_MASK_HDRP", false);
+        material.SetFloat("_AlphaClip", 1f);
+        SetKeyword(material, "_ALPHATEST_ON", true);
+        material.SetFloat("_Cutoff", 0.45f);
+        material.SetFloat("_Cull", 0f);
+        material.SetFloat("_Translucency", 0.5f);
+        material.SetFloat("_WindStrength", 1f);
+        material.SetFloat("_PushStrength", 0.35f);
+        material.SetFloat("_MossAmount", 0f);
+        Mesh first = MeshIn(prefix + ".fbx", asset.Looked(0));
+        material.SetFloat("_TreeHeight", first != null ? Mathf.Max(0.2f, first.bounds.size.y) : 1f);
+        return Finish(material);
+    }
+
+    private static Material Begin(string path, Material from)
+    {
+        var material = Load<Material>(path);
+        if (material == null)
+        {
+            material = new Material(from);
+            AssetDatabase.CreateAsset(material, path);
+        }
+        else
+        {
+            material.shader = from.shader;
+            material.CopyPropertiesFromMaterial(from);
+        }
+
+        material.name = System.IO.Path.GetFileNameWithoutExtension(path);
+        return material;
+    }
+
+    private static Material Finish(Material material)
+    {
         material.enableInstancing = true;
         EditorUtility.SetDirty(material);
         return material;
+    }
+
+    private static void SetKeyword(Material material, string keyword, bool on)
+    {
+        if (on)
+        {
+            material.EnableKeyword(keyword);
+        }
+        else
+        {
+            material.DisableKeyword(keyword);
+        }
     }
 
     private static T Load<T>(string path) where T : Object => AssetDatabase.LoadAssetAtPath<T>(path);
@@ -267,10 +338,11 @@ public static class BuildGatheringModels
     // ----- Prefabs -----
 
     /// <summary>The stand-in prefab keeps its root (and its GUID, so every node and item still nests it); its primitive
-    /// children give way to the new model. Lights and particle effects on it stay.</summary>
-    private static void ReplaceModel(string path, Mesh mesh, Material material)
+    /// children give way to the new look (lights and particle effects stay). Solid things collide with the hull,
+    /// on the model's root, where the stand-in's box was.</summary>
+    private static void ReplaceModel(Asset asset, Mesh[] levels, Material material, Mesh hull)
     {
-        GameObject root = PrefabUtility.LoadPrefabContents(path);
+        GameObject root = PrefabUtility.LoadPrefabContents(asset.ModelPrefab);
         try
         {
             for (int i = root.transform.childCount - 1; i >= 0; i--)
@@ -282,8 +354,24 @@ public static class BuildGatheringModels
                 }
             }
 
-            AddLook(root.transform, mesh, material);
-            PrefabUtility.SaveAsPrefabAsset(root, path);
+            AddLook(asset, root.transform, levels, material);
+            if (hull != null)
+            {
+                foreach (BoxCollider box in root.GetComponents<BoxCollider>())
+                {
+                    Object.DestroyImmediate(box);
+                }
+
+                MeshCollider meshCollider = root.TryGetComponent(out MeshCollider existingCollider) ? existingCollider : root.AddComponent<MeshCollider>();
+                meshCollider.sharedMesh = hull;
+                meshCollider.convex = true;
+            }
+            else if (root.TryGetComponent(out BoxCollider box))
+            {
+                FitBox(root, box);
+            }
+
+            PrefabUtility.SaveAsPrefabAsset(root, asset.ModelPrefab);
         }
         finally
         {
@@ -291,12 +379,12 @@ public static class BuildGatheringModels
         }
     }
 
-    private static GameObject VariantPrefab(string path, Mesh mesh, Material material)
+    private static GameObject VariantPrefab(Asset asset, string path, Mesh[] levels, Material material)
     {
-        var root = new GameObject(mesh.name);
+        var root = new GameObject(levels[0].name);
         try
         {
-            AddLook(root.transform, mesh, material);
+            AddLook(asset, root.transform, levels, material, onRoot: true);
             return PrefabUtility.SaveAsPrefabAsset(root, path);
         }
         finally
@@ -305,14 +393,52 @@ public static class BuildGatheringModels
         }
     }
 
-    private static void AddLook(Transform parent, Mesh mesh, Material material)
+    /// <summary>A look: a LODGroup over its levels, culled when it gets smaller on screen than the last height.
+    /// Rock switches hard; foliage crossfades; distant foliage and the last rock level cast no shadow.</summary>
+    private static void AddLook(Asset asset, Transform parent, Mesh[] levels, Material material, bool onRoot = false)
     {
-        var look = new GameObject(mesh.name);
-        look.transform.SetParent(parent, false);
-        look.AddComponent<MeshFilter>().sharedMesh = mesh;
-        var renderer = look.AddComponent<MeshRenderer>();
-        renderer.sharedMaterial = material;
-        renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
+        GameObject look = onRoot ? parent.gameObject : new GameObject(levels[0].name);
+        if (!onRoot)
+        {
+            look.transform.SetParent(parent, false);
+        }
+
+        var lods = new LOD[levels.Length];
+        for (int i = 0; i < levels.Length; i++)
+        {
+            var part = new GameObject($"LOD{i}");
+            part.transform.SetParent(look.transform, false);
+            part.AddComponent<MeshFilter>().sharedMesh = levels[i];
+            var renderer = part.AddComponent<MeshRenderer>();
+            renderer.sharedMaterial = material;
+            bool shadow = asset.Kind == Kind.Foliage ? i == 0 : i < levels.Length - 1 || levels.Length == 1;
+            renderer.shadowCastingMode = shadow ? UnityEngine.Rendering.ShadowCastingMode.On : UnityEngine.Rendering.ShadowCastingMode.Off;
+            float height = asset.LodHeights[Mathf.Min(i, asset.LodHeights.Length - 1)];
+            if (i == levels.Length - 1)
+            {
+                height = asset.LodHeights[asset.LodHeights.Length - 1];
+            }
+
+            lods[i] = new LOD(height, new Renderer[] { renderer });
+        }
+
+        LODGroup group = look.TryGetComponent(out LODGroup existing) ? existing : look.AddComponent<LODGroup>();
+        group.SetLODs(lods);
+        group.fadeMode = asset.Kind == Kind.Foliage ? LODFadeMode.CrossFade : LODFadeMode.None;
+        group.animateCrossFading = asset.Kind == Kind.Foliage;
+        group.RecalculateBounds();
+    }
+
+    private static void RemoveStaleVariants(Asset asset, string folder)
+    {
+        for (int i = asset.Looks; i < 8; i++)
+        {
+            string path = folder + asset.Looked(i) + ".prefab";
+            if (Load<GameObject>(path) != null)
+            {
+                AssetDatabase.DeleteAsset(path);
+            }
+        }
     }
 
     private static void SetVariants(string definitionPath, List<GameObject> variants)
@@ -330,20 +456,41 @@ public static class BuildGatheringModels
         EditorUtility.SetDirty(definition);
     }
 
-    /// <summary>Scale the node's model evenly and fit its box collider (what the player aims at) to the new look.</summary>
-    private static Bounds FitNode(string path, float scale)
+    /// <summary>The node: its model scaled evenly; the nested model's collider takes the model prefab's values again
+    /// (the stand-in's overrides are reverted), and a box on the node's own root is fitted to the new look (or, for a
+    /// solid thing, becomes the hull).</summary>
+    private static Bounds FitNode(Asset asset, Mesh hull)
     {
-        GameObject root = PrefabUtility.LoadPrefabContents(path);
+        GameObject root = PrefabUtility.LoadPrefabContents(asset.Node);
         try
         {
             Transform model = root.transform.Find("Model");
             if (model != null)
             {
-                model.localScale = Vector3.one * scale;
+                model.localScale = Vector3.one * asset.NodeScale;
+                foreach (Collider nested in model.GetComponents<Collider>())
+                {
+                    if (PrefabUtility.IsPartOfPrefabInstance(nested))
+                    {
+                        PrefabUtility.RevertObjectOverride(nested, InteractionMode.AutomatedAction);
+                    }
+                }
             }
 
-            Bounds bounds = FitCollider(root);
-            PrefabUtility.SaveAsPrefabAsset(root, path);
+            Bounds bounds = Measure(root);
+            if (root.TryGetComponent(out BoxCollider box))
+            {
+                if (hull != null && model != null && model.GetComponent<MeshCollider>() != null)
+                {
+                    Object.DestroyImmediate(box); // the model's hull collides now
+                }
+                else
+                {
+                    SetBox(box, bounds);
+                }
+            }
+
+            PrefabUtility.SaveAsPrefabAsset(root, asset.Node);
             return bounds;
         }
         finally
@@ -357,7 +504,12 @@ public static class BuildGatheringModels
         GameObject root = PrefabUtility.LoadPrefabContents(path);
         try
         {
-            Bounds bounds = FitCollider(root);
+            Bounds bounds = Measure(root);
+            if (root.TryGetComponent(out BoxCollider box))
+            {
+                SetBox(box, bounds);
+            }
+
             PrefabUtility.SaveAsPrefabAsset(root, path);
             return bounds;
         }
@@ -367,16 +519,25 @@ public static class BuildGatheringModels
         }
     }
 
-    /// <summary>Renderer bounds aren't up to date inside prefab contents: the box comes from the meshes' own bounds and
-    /// the transforms down to them.</summary>
-    private static Bounds FitCollider(GameObject root)
+    private static void FitBox(GameObject owner, BoxCollider box) => SetBox(box, Measure(owner));
+
+    private static void SetBox(BoxCollider box, Bounds boundsInRootSpace)
+    {
+        // The bounds are in the space of the prefab root the box sits on (Measure is called on that root).
+        box.center = boundsInRootSpace.center;
+        box.size = boundsInRootSpace.size;
+    }
+
+    /// <summary>The LOD0 meshes' bounds in the root's space (renderer bounds aren't up to date inside prefab contents),
+    /// at least 0.2 m high so flat things stay easy to aim at.</summary>
+    private static Bounds Measure(GameObject root)
     {
         var bounds = new Bounds();
         bool first = true;
         Matrix4x4 toRoot = root.transform.worldToLocalMatrix;
         foreach (MeshFilter filter in root.GetComponentsInChildren<MeshFilter>(true))
         {
-            if (filter.sharedMesh == null)
+            if (filter.sharedMesh == null || (filter.name.StartsWith("LOD") && filter.name != "LOD0"))
             {
                 continue;
             }
@@ -400,18 +561,10 @@ public static class BuildGatheringModels
             }
         }
 
-        // Sticks lie flat: keep the box at least as tall as the stand-ins' (0.2 m), so it stays easy to aim at.
         if (bounds.size.y < 0.2f)
         {
             bounds = new Bounds(new Vector3(bounds.center.x, bounds.min.y + 0.1f, bounds.center.z),
                 new Vector3(bounds.size.x, 0.2f, bounds.size.z));
-        }
-
-        var box = root.GetComponent<BoxCollider>();
-        if (box != null)
-        {
-            box.center = bounds.center;
-            box.size = bounds.size;
         }
 
         return bounds;

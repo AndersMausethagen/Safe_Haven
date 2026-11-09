@@ -84,3 +84,7 @@ auth.json
 .DS_Store
 Thumbs.db
 Desktop.ini
+
+# Personal Claude Code settings
+.claude/settings.local.json
+__pycache__/

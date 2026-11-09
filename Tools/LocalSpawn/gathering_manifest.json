@@ -1,0 +1,497 @@
+{
+ "_notes": [
+  "Concept prompts for the gathering nodes LocalSpawn makes (Hunyuan3D shape + UltraTex texture), written to the asset",
+  "principles: mineable ores share a dark host rock with the metal EXPOSED in clusters that break the silhouette, each",
+  "metal its own hue, value and shape; everything seen three-quarter from above (the game's camera) and evenly lit.",
+  "width: metres across the widest side in the game. glow: an emission mask from the albedo, 'hue' (closeness to a",
+  "colour) or 'bright' (luminance), tinted. turn: degrees about the vertical, to put the best side to the camera.",
+  "UltraTex (FLUX) is a non-commercial licence and Hunyuan3D's licence excludes some territories: re-texture/check before a release.",
+  "max_height: metres; a look taller than this (scaled by width) is scaled down to it.",
+  "Mineable ores glow faintly in the dark where their ore is (user, 2026-11-09): glow 'metal' = where the baked metallic is (copper nuggets, iron blocks) in the metal's own colour; moonsilver crystals white, deepstone seams blue."
+ ],
+ "common": "Three-quarter view from slightly above, whole object visible and centred, isolated on a plain light grey background.",
+ "assets": [
+  {
+   "asset": "Copper Ore",
+   "width": 2.4,
+   "looks": [
+    {
+     "key": "A",
+     "seed": 4101,
+     "prompt": "A single copper ore deposit for a Nordic fantasy survival game: a squat dark grey granite boulder, about two metres wide, broken and angular, with large clusters of bright raw native copper bursting out of its top and front - chunky rounded orange-copper metal nuggets and thick copper veins, glinting metallic, with patches of teal-green verdigris patina around them. The copper covers about a third of the visible rock and clearly stands out."
+    },
+    {
+     "key": "B",
+     "seed": 4102,
+     "prompt": "A single copper ore deposit for a Nordic fantasy survival game: a low, wide dark grey boulder split down the middle, a thick seam of raw native copper running across its top with clusters of chunky rounded copper nuggets along it, glinting orange metal, teal-green verdigris crusts around the copper. The copper clearly stands out from the dark rock."
+    }
+   ],
+   "max_height": 1.6,
+   "glow": {
+    "mode": "metal",
+    "tint": [
+     1.0,
+     0.55,
+     0.25
+    ],
+    "threshold": 0.4
+   },
+   "metal_floor": 0.5
+  },
+  {
+   "asset": "Iron Ore",
+   "width": 2.5,
+   "looks": [
+    {
+     "key": "A",
+     "seed": 4221,
+     "prompt": "A single iron ore deposit for a Nordic fantasy survival game: a dark grey boulder about two metres wide whose whole top has been split open, showing a large broad face of glittering steel-grey metallic magnetite with chunky angular crystal facets raised in relief across it, thick shiny metal veins running down its front, and rust-red and orange stains bleeding down the rock below. One solid stone, nothing loose or floating. The bright metal clearly stands out against the dark matte rock."
+    },
+    {
+     "key": "B",
+     "seed": 4202,
+     "prompt": "A single iron ore deposit for a Nordic fantasy survival game: a tall jagged slab of dark grey rock leaning slightly, its broken top crowded with big angular dark gunmetal magnetite crystal blocks, rust-red iron oxide stains running down its faces. The angular metal blocks and red rust clearly stand out.",
+     "metal_above": 0.7
+    }
+   ],
+   "max_height": 1.8,
+   "glow": {
+    "mode": "metal",
+    "tint": [
+     0.85,
+     0.85,
+     0.9
+    ],
+    "threshold": 0.4
+   },
+   "metal_floor": 0.8,
+   "dielectric_darken": 0.75
+  },
+  {
+   "asset": "Moonsilver Ore",
+   "width": 2.6,
+   "glow": {
+    "mode": "bright",
+    "tint": [
+     0.92,
+     0.96,
+     1.0
+    ],
+    "threshold": 0.6
+   },
+   "looks": [
+    {
+     "key": "A",
+     "seed": 4301,
+     "prompt": "A single moonsilver ore deposit for a Nordic fantasy game: a dark grey boulder with clusters of tall pale silver-white crystal spikes, long and hexagonal, growing out of its top and front, glowing faintly with cold moonlight blue, thin bright silver veins in the rock around them. The pale spikes clearly stand out from the dark rock."
+    },
+    {
+     "key": "B",
+     "seed": 4302,
+     "prompt": "A single moonsilver ore deposit for a Nordic fantasy game: a low cracked dark boulder with one big cluster of long pale silver crystal spikes fanning out of a split in its top, faint cold blue glow, a few smaller silver spikes on its side. Pale silver against dark rock."
+    }
+   ],
+   "max_height": 2.0,
+   "metal_floor": 0.8
+  },
+  {
+   "asset": "Deepstone",
+   "width": 2.8,
+   "glow": {
+    "mode": "hue",
+    "colour": [
+     0.3,
+     0.55,
+     1.0
+    ],
+    "tint": [
+     0.3,
+     0.55,
+     1.0
+    ],
+    "threshold": 0.8
+   },
+   "looks": [
+    {
+     "key": "A",
+     "seed": 4401,
+     "prompt": "A single deepstone boulder for a Nordic fantasy game: a heavy blue-black stone from deep underground, smooth and dense, cracked all over with thin glowing electric-blue veins of light, about two and a half metres wide."
+    },
+    {
+     "key": "B",
+     "seed": 4402,
+     "prompt": "A single deepstone boulder for a Nordic fantasy game: a broad, low blue-black stone split by a few deep cracks that glow bright electric blue from inside, a smaller dark stone beside it."
+    }
+   ],
+   "max_height": 1.8
+  },
+  {
+   "asset": "Granite",
+   "width": 2.5,
+   "looks": [
+    {
+     "key": "A",
+     "seed": 4501,
+     "prompt": "A single pink-grey granite boulder for a Nordic forest game: coarse speckled granite with pink feldspar, white quartz and black mica grains, split and rounded by weather, a few patches of green moss on top, about two metres wide."
+    },
+    {
+     "key": "B",
+     "seed": 4502,
+     "prompt": "A single pink-grey granite boulder for a Nordic forest game: a flatter, wider speckled granite block with one sharp broken face, pink and grey grains, a little moss and lichen on top."
+    }
+   ],
+   "max_height": 1.6
+  },
+  {
+   "asset": "Rootbound Stone",
+   "width": 1.8,
+   "glow": {
+    "mode": "hue",
+    "colour": [
+     0.3,
+     1.0,
+     0.45
+    ],
+    "tint": [
+     0.3,
+     1.0,
+     0.45
+    ],
+    "threshold": 0.86
+   },
+   "looks": [
+    {
+     "key": "A",
+     "seed": 4601,
+     "prompt": "A single grey boulder for a Nordic fairy-tale game, tightly bound by thick dark twisted cursed roots wrapping around it from the ground, the roots near-black with a faint violet sheen, soft green light glowing from cracks in the stone between the roots, as if something alive is trapped inside."
+    }
+   ],
+   "max_height": 1.9
+  },
+  {
+   "asset": "Life Orb",
+   "width": 0.7,
+   "glow": {
+    "mode": "hue",
+    "colour": [
+     0.45,
+     1.0,
+     0.35
+    ],
+    "tint": [
+     0.35,
+     1.0,
+     0.5
+    ],
+    "threshold": 0.88,
+    "min_brightness": 0.6,
+    "min_saturation": 0.3
+   },
+   "looks": [
+    {
+     "key": "A",
+     "seed": 4701,
+     "prompt": "An ancient small Nordic standing stone, weathered and mossy, with a carved band of knotwork glowing soft green, three gnarled roots rising from its top like fingers cradling a glowing green orb of light."
+    }
+   ]
+  },
+  {
+   "asset": "Life Mote",
+   "width": 0.55,
+   "glow": {
+    "mode": "hue",
+    "colour": [
+     0.6,
+     1.0,
+     0.65
+    ],
+    "tint": [
+     0.6,
+     1.0,
+     0.65
+    ],
+    "threshold": 0.86
+   },
+   "looks": [
+    {
+     "key": "A",
+     "seed": 4801,
+     "prompt": "A small cairn of three stacked flat mossy stones for a Nordic fairy-tale game, two thin roots curling up from the top stone holding a small pale-green glowing wisp of light."
+    }
+   ]
+  },
+  {
+   "asset": "Radiant Life Orb",
+   "width": 0.8,
+   "glow": {
+    "mode": "hue",
+    "colour": [
+     0.25,
+     1.0,
+     0.9
+    ],
+    "tint": [
+     0.25,
+     1.0,
+     0.9
+    ],
+    "threshold": 0.88,
+    "min_saturation": 0.12,
+    "min_brightness": 0.55
+   },
+   "looks": [
+    {
+     "key": "A",
+     "seed": 4911,
+     "prompt": "A tall ancient Nordic runestone of weathered grey granite with patches of moss, a carved band of knotwork inlaid with pale cyan stone around its middle, five twisted dark roots rising from its top like fingers cradling a large smooth pale cyan crystal orb. Matte, softly lit, no glow, no bloom, no light rays, every surface clearly textured."
+    }
+   ]
+  },
+  {
+   "asset": "Small Rocks",
+   "width": 0.55,
+   "looks": [
+    {
+     "key": "A",
+     "seed": 5001,
+     "prompt": "A small pile of three grey split field stones lying together on the ground, each the size of a loaf of bread, weathered granite with spots of lichen."
+    },
+    {
+     "key": "B",
+     "seed": 5002,
+     "prompt": "A small cluster of four grey fist-to-loaf sized field stones, one larger flat stone and three smaller ones beside it, weathered, a little lichen."
+    }
+   ],
+   "max_height": 0.35
+  },
+  {
+   "asset": "Sticks",
+   "width": 0.7,
+   "looks": [
+    {
+     "key": "A",
+     "seed": 5101,
+     "prompt": "A small heap of three fallen forked dry branches lying crossed on the ground, grey-brown bark, broken pale ends, each about half a metre long and thick as a thumb."
+    },
+    {
+     "key": "B",
+     "seed": 5102,
+     "prompt": "A small bundle of four fallen dry branches and twigs lying on the ground, crossed over each other, brown bark with pale broken ends."
+    }
+   ],
+   "max_height": 0.3
+  },
+  {
+   "asset": "Chanterelles",
+   "width": 0.5,
+   "looks": [
+    {
+     "key": "A",
+     "seed": 5201,
+     "prompt": "A cluster of seven golden egg-yolk yellow chanterelle mushrooms with wavy funnel-shaped caps and ridged undersides, growing from a small patch of moss and pine needles."
+    },
+    {
+     "key": "B",
+     "seed": 5202,
+     "prompt": "A small group of five golden-yellow chanterelle mushrooms of different sizes with wavy funnel caps, on a little mound of forest moss."
+    }
+   ],
+   "max_height": 0.3
+  },
+  {
+   "asset": "Wild Turnips",
+   "width": 0.6,
+   "looks": [
+    {
+     "key": "A",
+     "seed": 5301,
+     "prompt": "A clump of two wild turnips growing in soil, their round white roots with purple shoulders half out of the ground, a rosette of broad lobed green leaves rising from them."
+    },
+    {
+     "key": "B",
+     "seed": 5302,
+     "prompt": "A single wild turnip plant: one big round white and purple turnip root showing at the ground, crowned by a bushy rosette of broad, ruffled green leaves."
+    }
+   ],
+   "max_height": 0.45
+  }
+ ],
+ "sprite_common": "Botanical texture sprite for a game, seen flat from straight above, the stalk at the bottom centre pointing up, evenly lit with no shadow, crisp edges, the whole thing visible and centred, isolated on a pure white background.",
+ "sprites": [
+  {
+   "asset": "Berry Bush",
+   "sprites": [
+    {
+     "name": "spray_a",
+     "seed": 6101,
+     "prompt": "A short twig of wild redcurrant with six fresh green rounded, saw-edged, three-lobed leaves along it."
+    },
+    {
+     "name": "spray_b",
+     "seed": 6102,
+     "prompt": "A short twig of wild redcurrant with five deep green rounded saw-edged leaves, one leaf turning yellow."
+    },
+    {
+     "name": "spray_c",
+     "seed": 6103,
+     "prompt": "A small sprig of four young light green redcurrant leaves, rounded and saw-edged."
+    },
+    {
+     "name": "spray_d",
+     "seed": 6104,
+     "prompt": "A twig of seven dark green redcurrant leaves, rounded with toothed edges, slightly overlapping."
+    }
+   ]
+  },
+  {
+   "asset": "Healing Herb",
+   "sprites": [
+    {
+     "name": "leaf_a",
+     "seed": 6201,
+     "prompt": "A single long feathery yarrow leaf, finely divided like a fern, grey-green."
+    },
+    {
+     "name": "leaf_b",
+     "seed": 6202,
+     "prompt": "Two feathery finely divided yarrow leaves side by side, soft grey-green."
+    },
+    {
+     "name": "flower_a",
+     "seed": 6203,
+     "prompt": "A flat-topped round head of many tiny white yarrow flowers seen from above, creamy white with pale yellow centres."
+    },
+    {
+     "name": "flower_b",
+     "seed": 6204,
+     "prompt": "A flat round cluster of tiny white and faintly pink yarrow flowers seen from above."
+    }
+   ]
+  },
+  {
+   "asset": "Flax",
+   "sprites": [
+    {
+     "name": "leaves_a",
+     "seed": 6301,
+     "prompt": "A slender green flax stem tip with many narrow pointed leaves along it."
+    },
+    {
+     "name": "leaves_b",
+     "seed": 6302,
+     "prompt": "Three thin flax stems with narrow blue-green leaves."
+    },
+    {
+     "name": "flower_a",
+     "seed": 6303,
+     "prompt": "A single sky-blue flax flower seen from straight above, five rounded petals with fine darker veins, yellow centre."
+    },
+    {
+     "name": "flower_b",
+     "seed": 6304,
+     "prompt": "A single pale blue flax flower from above, five overlapping petals, darker blue veins."
+    }
+   ]
+  },
+  {
+   "asset": "Huldra Silk",
+   "sprites": [
+    {
+     "name": "grass_a",
+     "seed": 6401,
+     "prompt": "A small tuft of five thin green grass blades fanning out, some tips turning golden."
+    },
+    {
+     "name": "grass_b",
+     "seed": 6402,
+     "prompt": "A tuft of six slender sedge leaves, green with reddish-brown tips, fanning upward."
+    },
+    {
+     "name": "grass_c",
+     "seed": 6403,
+     "prompt": "A small upright tuft of thin green grass blades, slightly curved."
+    },
+    {
+     "name": "grass_d",
+     "seed": 6404,
+     "prompt": "A sparse tuft of four long thin grass blades, one bent over, green and straw coloured."
+    }
+   ]
+  },
+  {
+   "asset": "Nettle",
+   "sprites": [
+    {
+     "name": "leaf_a",
+     "seed": 6501,
+     "prompt": "A single stinging nettle leaf, heart-shaped with deeply saw-toothed edges and fine hairs, dark green, wrinkled with veins."
+    },
+    {
+     "name": "leaf_b",
+     "seed": 6502,
+     "prompt": "A single large dark green nettle leaf, pointed heart shape, coarse toothed edge, deep veins."
+    },
+    {
+     "name": "leaf_c",
+     "seed": 6503,
+     "prompt": "A young light green nettle leaf, heart-shaped with toothed edges."
+    },
+    {
+     "name": "leaf_d",
+     "seed": 6504,
+     "prompt": "A pair of opposite dark green nettle leaves on a short stem, heart-shaped and toothed."
+    }
+   ]
+  },
+  {
+   "asset": "Cloudberry",
+   "sprites": [
+    {
+     "name": "leaf_a",
+     "seed": 6601,
+     "prompt": "A single cloudberry leaf seen from above, round and five-lobed like a small maple leaf, wrinkled, fresh green."
+    },
+    {
+     "name": "leaf_b",
+     "seed": 6602,
+     "prompt": "A single cloudberry leaf, rounded with five shallow lobes and a crinkled surface, deep green."
+    },
+    {
+     "name": "leaf_c",
+     "seed": 6721,
+     "prompt": "A single round cloudberry leaf, almost circular like a mallow or geranium leaf, with five very shallow rounded lobes and no points, its surface deeply crinkled and wrinkled, soft rounded teeth on the edge, mostly green with an orange-brown autumn rim."
+    },
+    {
+     "name": "leaf_d",
+     "seed": 6604,
+     "prompt": "Two overlapping round lobed cloudberry leaves, wrinkled, green."
+    }
+   ]
+  },
+  {
+   "asset": "Wild Barley",
+   "sprites": [
+    {
+     "name": "blade_a",
+     "seed": 6911,
+     "prompt": "A tuft of five long narrow wild barley leaf blades, ripening from muted green to dry straw-yellow at the tips, slightly twisted, matte, natural."
+    },
+    {
+     "name": "blade_b",
+     "seed": 6702,
+     "prompt": "Long narrow pale green and golden barley leaf blades."
+    },
+    {
+     "name": "ear_a",
+     "seed": 6703,
+     "prompt": "A single ripe golden ear of wild barley seen from the side, two rows of plump grains with long bristly awns pointing up."
+    },
+    {
+     "name": "ear_b",
+     "seed": 6704,
+     "prompt": "A single drooping golden barley ear with long fine awns, seen from the side."
+    }
+   ]
+  }
+ ]
+}

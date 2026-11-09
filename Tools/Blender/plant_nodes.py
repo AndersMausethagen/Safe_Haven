@@ -1,26 +1,29 @@
-"""The plants the player gathers in Safe Haven, modelled and textured in Blender: Healing Herb, Flax, Huldra Silk,
-Nettle, Chanterelles, Cloudberries, Wild Barley and Wild Turnips.
+"""The plants the player gathers in Safe Haven, modelled and textured in Blender: the Berry Bush, Healing Herb, Flax,
+Huldra Silk, Nettle, Chanterelles, Cloudberries, Wild Barley and Wild Turnips.
 
-They replace the stand-ins (spheres and cylinders, or a borrowed bush). Each is a Nordic plant the item comes from, at
-real size or a little over, so it reads from the game's camera:
+Each is a Nordic plant the item comes from, a little over real size so it reads from the game's camera, and built the way
+the game's other plants are (see the asset principles): woody or juicy parts (stems, berries, roots, mushrooms) as
+geometry, and leaves, flower heads, grass blades and ears of barley as two-sided leaf CARDS cut out of a small sprite
+sheet, with the wind data the game's Tree Wind shader reads (uv1 = sway, flex; uv2 = phase, flutter), so they sway
+and bend away from the player like the ferns and shrubs. Two levels of detail drop cards at random (the silhouette stays).
 
-- Healing Herb: yarrow, feathery leaves and flat heads of small white flowers.
-- Flax: a clump of thin stems with narrow leaves, sky-blue five-petalled flowers and seed bolls.
-- Huldra Silk: cotton grass: a tussock of grass blades with silky white tufts on thin stems, glowing faintly.
-- Nettle: a clump of upright stinging nettles, pairs of heart-shaped, saw-edged leaves.
-- Chanterelles: golden funnel-shaped mushrooms with ridges under their wavy caps, in a little moss.
-- Cloudberries: a low patch of round, lobed, wrinkled leaves with amber berries made of beads.
-- Wild Barley: straw stalks with drooping, bearded golden heads.
-- Wild Turnips: purple-shouldered white roots showing at the ground, under a rosette of lobed leaves.
+- Berry Bush: wild currant, arching woody stems, sprays of saw-edged leaves, strings of red berries on its top.
+- Healing Herb: yarrow, feathery leaves round its foot, flat heads of small white flowers.
+- Flax: thin stems, narrow leaves, sky-blue five-petalled flowers and seed bolls.
+- Huldra Silk: cotton grass, a tussock of grass blades with silky white tufts on thin stems, glowing faintly.
+- Nettle: upright stinging nettles, pairs of heart-shaped, saw-edged leaves.
+- Chanterelles: golden funnel-shaped mushrooms with ridges under their wavy caps (solid: no cards, Layered Lit).
+- Cloudberries: a low patch of round, lobed leaves with amber berries made of beads.
+- Wild Barley: straw stalks, grass blades, drooping bearded ears.
+- Wild Turnips: purple-shouldered white roots at the ground under a rosette of lobed leaves.
 
-Built from leaf blades (outlines), stems (tubes), petals, grain heads, lathed shapes (caps, roots) and bead berries;
-coloured procedurally (each leaf a little different, its "sh_var") and baked with prop_bake.py into Albedo, Normal
-(veins, ridges), ORM, Height, BlendMask and, for Huldra Silk, Emission. Leaves face up and out (one-sided in the game);
-grass blades and petals have both sides. Writes Assets/_Project/Art/Gathering/<Asset>/, a preview render to the path
-given, and Plants.blend beside this script.
+One 1024 texture set each: the sprites in its bottom three quarters (their alpha is the leaf shape), the solid parts'
+own baked islands in the top quarter. Albedo (with alpha), Normal (veins, ridges) and ORM; Emission for Huldra Silk;
+Height and BlendMask only for the Chanterelles. Writes Assets/_Project/Art/Gathering/<Asset>/, a preview render to the
+path given, and Plants.blend beside this script.
 
 Run: blender -b --factory-startup --python Tools/Blender/plant_nodes.py -- <project root> <preview.png> [asset ...]
-(assets: herb, flax, silk, nettle, chanterelle, cloudberry, barley, turnip; all when none are named).
+(assets: bush, herb, flax, silk, nettle, chanterelle, cloudberry, barley, turnip; all when none are named).
 """
 import math
 import os
@@ -36,9 +39,11 @@ from prop_bake import *  # noqa: E402,F401,F403  (helpers, materials, bake)
 from prop_bake import ROOT, args  # noqa: E402
 
 PREVIEW = args[1] if len(args) > 1 else os.path.join(ROOT, "Tools", "Blender", "plant_preview.png")
-WANTED = set(args[2:]) or {"herb", "flax", "silk", "nettle", "chanterelle", "cloudberry", "barley", "turnip"}
+WANTED = set(args[2:]) or {"bush", "herb", "flax", "silk", "nettle", "cloudberry", "barley"}
 
 UP = Vector((0, 0, 1))
+SPRITES = os.path.join(ROOT, "Tools", "LocalSpawn", "Gathering", "Sprites")
+IMAGE_CELLS = set()  # sheet cells showing a generated sprite: their cards are square, like the images
 
 
 # ----- Materials ----------------------------------------------------------------------------------------------------
@@ -167,15 +172,31 @@ def gills_material(name, stops):
     return material
 
 
-# ----- Parts --------------------------------------------------------------------------------------------------------
+# ----- Building blocks ----------------------------------------------------------------------------------------------
 
 class Kit:
-    """One mesh being built, with its grain UVs and per-face variation."""
+    """One mesh being built: grain UVs (what the procedural surfaces follow), per-part variation (sh_var) and the wind
+    the game's Tree Wind shader reads: "wind" = (sway, flex), "phase" = (phase, flutter). Sway (0 at the ground, 1 at
+    the top) is filled in from the height at the end; flex (0 at a stem's foot, 1 at its tip), phase (per stem) and
+    flutter (0 at a leaf's base, 1 at its tip) are set as parts are made. Cards (sh_card = 1) are leaf cards: their
+    "atlas" UVs point into the sprite sheet and they aren't baked themselves."""
 
-    def __init__(self):
+    def __init__(self, cards=False):
         self.bm = bmesh.new()
         self.uv = self.bm.loops.layers.uv.new("grain")
+        self.wind = self.bm.loops.layers.uv.new("wind")
+        self.phase = self.bm.loops.layers.uv.new("phase")
+        self.atlas = self.bm.loops.layers.uv.new("atlas") if cards else None
         self.var = self.bm.faces.layers.float.new("sh_var")
+        self.card_flag = self.bm.faces.layers.int.new("sh_card")
+
+    def wind_on(self, faces, flex, phase, flutter=None):
+        """flex and flutter: a number, or a function of the vertex position."""
+        for f in faces:
+            for loop in f.loops:
+                p = loop.vert.co
+                loop[self.wind].uv = (0.0, flex(p) if callable(flex) else flex)
+                loop[self.phase].uv = (phase, flutter(p) if callable(flutter) else (flutter or 0.0))
 
     def face(self, verts, uvs, material, var, facing=None):
         try:
@@ -191,70 +212,38 @@ class Kit:
             f.normal_flip()
         return f
 
-    def blade(self, base, direction, up, length, width, outline, material, var, fold=0.2, curl=0.15, droop=0.0,
-              double=False, serrate=0.0):
-        """A leaf, petal or grass blade from an outline [(across, along)] (half of it, from stalk to tip), folded a
-        little along its middle and curling at the tip; one-sided (facing up) unless double."""
-        direction = direction.normalized()
-        side = direction.cross(up).normalized()
-        normal = side.cross(direction).normalized()
-        sides = []
-        for sign in (-1, 1):
-            row = []
-            for i, (across, along) in enumerate(outline):
-                if serrate and 0 < i < len(outline) - 1:
-                    across *= 1.0 + serrate * (1 if i % 2 else -1)
-                a = across * sign
-                p = base + direction * along * length + side * a * width
-                p += normal * (abs(a) * fold * width - (along ** 2) * curl * length)
-                p += UP * (-droop * along ** 2 * length)
-                row.append(p)
-            sides.append(row)
-        for flip in ((False, True) if double else (False,)):
-            facing = -normal if flip else normal
-            verts = [[self.bm.verts.new(p) for p in row] for row in sides]
-            mid = [self.bm.verts.new(base + direction * along * length + normal * (-(along ** 2) * curl * length)
-                                     + UP * (-droop * along ** 2 * length)) for _, along in outline]
-            for s, row in enumerate(verts):
-                sign = -1 if s == 0 else 1
-                for i in range(len(outline) - 1):
-                    quad = (row[i], row[i + 1], mid[i + 1], mid[i])
-                    uvs = [(0.5 + outline[i][0] * sign * 0.5 / 0.5 * 0.5, outline[i][1]),
-                           (0.5 + outline[i + 1][0] * sign * 0.5 / 0.5 * 0.5, outline[i + 1][1]),
-                           (0.5, outline[i + 1][1]), (0.5, outline[i][1])]
-                    if outline[i][0] == 0 and outline[i + 1][0] == 0:
-                        continue
-                    if outline[i][0] == 0:
-                        self.face((row[i + 1], mid[i + 1], mid[i]), uvs[1:], material, var, facing)
-                    elif outline[i + 1][0] == 0:
-                        self.face((row[i], mid[i + 1], mid[i]), [uvs[0], uvs[2], uvs[3]], material, var, facing)
-                    else:
-                        self.face(quad, uvs, material, var, facing)
-
-    def stem(self, points, radius, tip_radius, material, var, sides=5):
-        start = len(self.bm.faces)
+    def stem(self, points, radius, tip_radius, material, var, phase, sides=5, flex0=0.0, flex1=1.0):
+        before = set(self.bm.faces)
         radii = [radius + (tip_radius - radius) * i / (len(points) - 1) for i in range(len(points))]
         tube(self.bm, points, radii, sides, self.uv, wood_cap=True, material=material, cap_material=material, tile=0.25)
-        self.bm.faces.ensure_lookup_table()
-        for f in self.bm.faces[start:]:
+        new = [f for f in self.bm.faces if f not in before]
+        base, tip = points[0], points[-1]
+        span = max((tip - base).length, 1e-4)
+        for f in new:
             f[self.var] = var
+            f.smooth = True
+        self.wind_on(new, lambda p: flex0 + (flex1 - flex0) * min(1.0, (p - base).length / span), phase)
+        return new
 
-    def blob(self, centre, radius, material, var, squash=(1, 1, 1), subdivisions=1, lumpy=0.0, seed=0.0):
+    def blob(self, centre, radius, material, var, phase, flex=0.0, squash=(1, 1, 1), subdivisions=1, lumpy=0.0, seed=0.0):
         result = bmesh.ops.create_icosphere(self.bm, subdivisions=subdivisions, radius=1.0)
+        faces = {f for v in result["verts"] for f in v.link_faces}
         for v in result["verts"]:
             d = v.co.normalized()
             r = radius * (1.0 + lumpy * noise.noise(d * 2.0 + Vector((seed, seed, seed))))
             v.co = centre + Vector((d.x * squash[0], d.y * squash[1], d.z * squash[2])) * r
-        for f in {f for v in result["verts"] for f in v.link_faces}:
+        for f in faces:
             f.material_index = material
             f[self.var] = var
             f.smooth = True
             for loop in f.loops:
                 d = (loop.vert.co - centre).normalized()
                 loop[self.uv].uv = (0.5 + math.atan2(d.y, d.x) / (2 * math.pi), (d.z + 1) / 2)
+        self.wind_on(faces, flex, phase)
+        return faces
 
     def lathe(self, centre, profile, segments, material, var, wobble=0.0, seed=0.0, axis=UP):
-        """A turned shape: profile [(radius, height)] from bottom to top, U round, V along the profile."""
+        """A turned shape: profile [(radius, height)] from bottom to top, U round, V along the profile. Rigid."""
         turn = UP.rotation_difference(axis).to_matrix().to_4x4()
         rings = []
         for j, (r, h) in enumerate(profile):
@@ -264,6 +253,7 @@ class Kit:
                 rr = r * (1.0 + wobble * noise.noise(Vector((math.cos(a) * 2, math.sin(a) * 2, seed + j * 0.1))))
                 ring.append(self.bm.verts.new(centre + turn @ Vector((math.cos(a) * rr, math.sin(a) * rr, h))))
             rings.append(ring)
+        faces = []
         for j in range(len(profile) - 1):
             for k in range(segments):
                 k2 = (k + 1) % segments
@@ -272,10 +262,168 @@ class Kit:
                 f = self.face((rings[j][k], rings[j + 1][k], rings[j + 1][k2], rings[j][k2]), uvs, material, var)
                 if f:
                     f.smooth = True
+                    faces.append(f)
+        self.wind_on(faces, 0.0, 0.0)
         return rings
 
+    def card(self, base, direction, up, length, width, rect, phase, bend=0.12, droop=0.0, flex=1.0):
+        """A leaf card: a quad bent once along its length, base at base, pointing along direction, facing up; its atlas
+        UVs cover rect (u0, v0, u1, v1) of the sprite sheet (the sprite's foot at v0). Two-sided in the game."""
+        direction = direction.normalized()
+        side = direction.cross(up).normalized()
+        normal = side.cross(direction).normalized()
+        if tuple(rect) in IMAGE_CELLS:
+            width = length  # the sprite is square, its leaf in the middle
+        rows = []
+        for j, t in enumerate((0.0, 0.5, 1.0)):
+            centre = base + direction * length * t - normal * bend * length * t * t - UP * droop * length * t * t
+            rows.append([self.bm.verts.new(centre - side * width * 0.5), self.bm.verts.new(centre + side * width * 0.5)])
+        u0, v0, u1, v1 = rect
+        faces = []
+        for j in range(2):
+            ta, tb = j * 0.5, (j + 1) * 0.5
+            verts = (rows[j][0], rows[j][1], rows[j + 1][1], rows[j + 1][0])
+            f = self.bm.faces.new(verts)
+            f.normal_update()
+            if f.normal.dot(normal) < 0:
+                f.normal_flip()
+            f[self.card_flag] = 1
+            f.smooth = True
+            for loop in f.loops:
+                v = loop.vert
+                across = 0.0 if v in (rows[0][0], rows[1][0], rows[2][0]) else 1.0
+                along = next(t for (t, row) in zip((0.0, 0.5, 1.0), rows) if v in row)
+                loop[self.atlas].uv = (u0 + (u1 - u0) * across, v0 + (v1 - v0) * along)
+                loop[self.wind].uv = (0.0, flex)
+                loop[self.phase].uv = (phase, along)
+            faces.append(f)
+        return faces
+
+    def object(self, name, coll, materials, height):
+        """The mesh, with sway filled in from each vertex's height over the plant's."""
+        for f in self.bm.faces:
+            for loop in f.loops:
+                w = loop[self.wind].uv
+                loop[self.wind].uv = (max(0.0, min(1.0, loop.vert.co.z / max(height, 0.05))), w.y)
+        return mesh_object(name, self.bm, coll, materials)
+
+
+def sprite_material(name, path, fallback):
+    """A generated sprite (transparent PNG) for the sheet: its colour where it is opaque (a dark plant colour behind,
+    so mipmaps don't get light halos), its alpha as the leaf's shape (labelled "SH Solid": the coverage bake), its
+    shading as relief (the normal map)."""
+    material, tree, bsdf = new_material(name)
+    links = tree.links
+    uv = tree.nodes.new("ShaderNodeUVMap")
+    uv.uv_map = "grain"
+    uv.location = (-900, 0)
+    tex = node(tree, "ShaderNodeTexImage", (-650, 0))
+    tex.image = image(path, 'sRGB')
+    tex.interpolation = 'Cubic'
+    tex.extension = 'CLIP'
+    links.new(uv.outputs["UV"], tex.inputs["Vector"])
+    colour = mix(tree, (-300, 100), rgb(tree, (-500, 250), fallback), tex.outputs["Color"], tex.outputs["Alpha"])
+    links.new(colour, bsdf.inputs["Base Color"])
+    bsdf.inputs["Roughness"].default_value = 0.65
+    solid = tree.nodes.new("NodeReroute")
+    links.new(tex.outputs["Alpha"], solid.inputs[0])
+    solid.label = "SH Solid"
+    grey = node(tree, "ShaderNodeRGBToBW", (-300, -200))
+    links.new(tex.outputs["Color"], grey.inputs["Color"])
+    bump = node(tree, "ShaderNodeBump", (0, -200), Strength=0.35, Distance=0.002)
+    links.new(grey.outputs["Val"], bump.inputs["Height"])
+    links.new(bump.outputs["Normal"], bsdf.inputs["Normal"])
+    return material
+
+
+def sprite_set(asset, names, fallback=(0.08, 0.13, 0.03)):
+    """The generated sprites for an asset, as materials, or None when any is missing (the drawn leaves are used)."""
+    paths = [os.path.join(SPRITES, asset, f"{n}.png") for n in names]
+    if not all(os.path.exists(p) for p in paths):
+        print("SPRITES missing for", asset, "- drawing leaves instead")
+        return None
+    return [sprite_material(f"{asset} Sprite {n} (bake)", p, fallback) for n, p in zip(names, paths)]
+
+
+class Sheet:
+    """The sprite sheet the leaf cards show: flat drawings of leaves (and flower heads, grass tufts, ears of barley),
+    one per cell of a grid in region (u0, v0, u1, v1) of the texture, built as flat geometry lying on the texture
+    itself (its XY is its atlas UV), baked with the plant's own materials. Each cell's foot is at its bottom."""
+
+    def __init__(self, cols, rows, region=(0.0, 0.0, 1.0, 0.75)):
+        self.kit = Kit(cards=False)
+        self.cols, self.rows, self.region = cols, rows, region
+
+    def rect(self, index, pad=0.01):
+        u0, v0, u1, v1 = self.region
+        cw, ch = (u1 - u0) / self.cols, (v1 - v0) / self.rows
+        c, r = index % self.cols, index // self.cols
+        return (u0 + c * cw + pad, v0 + r * ch + pad, u0 + (c + 1) * cw - pad, v0 + (r + 1) * ch - pad)
+
+    def to_sheet(self, rect, x, y):
+        u0, v0, u1, v1 = rect
+        return Vector((u0 + (u1 - u0) * x, v0 + (v1 - v0) * y, 0.0))
+
+    def leaf(self, rect, base, angle, length, width, outline, material, var, serrate=0.0):
+        """A leaf drawn in the cell: base (x, y in 0-1), pointing at angle (radians from straight up), length and width
+        as fractions of the cell. Its grain UVs are U across, V from stalk to tip (the veins follow them)."""
+        d = Vector((math.sin(angle), math.cos(angle), 0.0))
+        side = Vector((d.y, -d.x, 0.0))
+        b = Vector((base[0], base[1], 0.0))
+        verts, uvs = [], []
+        half = []
+        for sign in (-1, 1):
+            row = []
+            for i, (across, along) in enumerate(outline):
+                if serrate and 0 < i < len(outline) - 1:
+                    across *= 1.0 + serrate * (1 if i % 2 else -1)
+                p = b + d * along * length + side * across * sign * width
+                row.append((p, (0.5 + across * sign, along)))
+            half.append(row)
+        mid = [(b + d * along * length, (0.5, along)) for _, along in outline]
+        for row in half:
+            for i in range(len(outline) - 1):
+                pts = [row[i], row[i + 1], mid[i + 1], mid[i]]
+                if outline[i][0] == 0 and outline[i + 1][0] == 0:
+                    continue
+                if outline[i][0] == 0:
+                    pts = [row[i + 1], mid[i + 1], mid[i]]
+                elif outline[i + 1][0] == 0:
+                    pts = [row[i], mid[i + 1], mid[i]]
+                vs = [self.kit.bm.verts.new(self.to_sheet(rect, p.x, p.y)) for p, _ in pts]
+                f = self.kit.face(vs, [g for _, g in pts], material, var, facing=UP)
+
+    def line(self, rect, points, width, material, var):
+        """A thin stalk or twig drawn in the cell along points (x, y)."""
+        for a, b in zip(points, points[1:]):
+            a, b = Vector((a[0], a[1], 0)), Vector((b[0], b[1], 0))
+            side = Vector(((b - a).y, -(b - a).x, 0)).normalized() * width * 0.5
+            vs = [self.kit.bm.verts.new(self.to_sheet(rect, p.x, p.y)) for p in (a - side, a + side, b + side, b - side)]
+            self.kit.face(vs, [(0, 0), (1, 0), (1, 1), (0, 1)], material, var, facing=UP)
+
+    def disc(self, rect, centre, radius, petals, material, var, rng, petal_outline=None):
+        """A flower seen from above: petals round a centre."""
+        for k in range(petals):
+            a = 2 * math.pi * k / petals + rng.uniform(-0.15, 0.15)
+            self.leaf(rect, centre, a, radius, radius * 0.75, petal_outline or PETAL, material, var)
+
+    def image(self, index, material):
+        """Cell index shows a generated sprite: one quad over the cell, its grain UVs the image's."""
+        rect = self.rect(index)
+        u0, v0, u1, v1 = rect
+        vs = [self.kit.bm.verts.new(Vector(p)) for p in ((u0, v0, 0), (u1, v0, 0), (u1, v1, 0), (u0, v1, 0))]
+        self.kit.face(vs, [(0, 0), (1, 0), (1, 1), (0, 1)], material, 0.5, facing=UP)
+        IMAGE_CELLS.add(rect)
+
     def object(self, name, coll, materials):
-        obj = mesh_object(name, self.bm, coll, materials)
+        obj = mesh_object(name, self.kit.bm, coll, materials)
+        mesh = obj.data
+        atlas = mesh.uv_layers.new(name="atlas")
+        for loop in mesh.loops:
+            co = mesh.vertices[loop.vertex_index].co
+            atlas.data[loop.index].uv = (co.x, co.y)
+        mesh.uv_layers.active = atlas
+        atlas.active_render = True
         return obj
 
 
@@ -306,6 +454,16 @@ def tuft(rng, count, spread, centre=Vector()):
     return out
 
 
+def facing_out(p, centre, rng, lift=0.5):
+    """A leaf's direction and the way its face turns: out from the plant's middle and up, a little at random."""
+    out = p - centre
+    out.z *= 0.5
+    out = out.normalized() if out.length > 1e-5 else Vector((1, 0, 0))
+    direction = (out + Vector((rng.uniform(-0.5, 0.5), rng.uniform(-0.5, 0.5), rng.uniform(0.0, lift)))).normalized()
+    up = (UP * 0.8 + out * 0.4 + Vector((rng.uniform(-0.3, 0.3), rng.uniform(-0.3, 0.3), 0))).normalized()
+    return direction, up
+
+
 # ----- Outlines (half of each, across and along) --------------------------------------------------------------------
 
 OVATE = [(0.0, 0.0), (0.32, 0.22), (0.38, 0.55), (0.2, 0.85), (0.0, 1.0)]
@@ -313,244 +471,468 @@ HEART = [(0.0, 0.0), (0.42, 0.12), (0.45, 0.4), (0.3, 0.7), (0.12, 0.9), (0.0, 1
 NARROW = [(0.0, 0.0), (0.25, 0.3), (0.2, 0.75), (0.0, 1.0)]
 GRASS = [(0.0, 0.0), (0.5, 0.05), (0.45, 0.6), (0.0, 1.0)]
 PETAL = [(0.0, 0.0), (0.28, 0.25), (0.42, 0.7), (0.3, 0.95), (0.0, 1.0)]
-ROUND = [(0.0, 0.0), (0.45, 0.15), (0.55, 0.5), (0.4, 0.85), (0.0, 1.0)]
 FEATHER = [(0.0, 0.0), (0.3, 0.1), (0.1, 0.18), (0.32, 0.3), (0.1, 0.4), (0.3, 0.52), (0.1, 0.62), (0.26, 0.74),
            (0.08, 0.85), (0.0, 1.0)]
 LOBED = [(0.0, 0.0), (0.4, 0.15), (0.25, 0.3), (0.45, 0.45), (0.25, 0.6), (0.38, 0.75), (0.0, 1.0)]
 
-GREEN = [(0.0, (0.05, 0.11, 0.025)), (0.5, (0.09, 0.17, 0.035)), (0.9, (0.14, 0.2, 0.045)), (1.0, (0.3, 0.28, 0.07))]
-DARK_GREEN = [(0.0, (0.03, 0.07, 0.02)), (0.5, (0.055, 0.11, 0.03)), (1.0, (0.09, 0.15, 0.04))]
-GREY_GREEN = [(0.0, (0.08, 0.13, 0.05)), (0.6, (0.13, 0.18, 0.08)), (1.0, (0.2, 0.22, 0.1))]
+GREEN = [(0.0, (0.07, 0.13, 0.03)), (0.5, (0.11, 0.19, 0.04)), (0.9, (0.16, 0.22, 0.05)), (1.0, (0.3, 0.28, 0.07))]
+DARK_GREEN = [(0.0, (0.04, 0.08, 0.02)), (0.5, (0.065, 0.12, 0.03)), (1.0, (0.1, 0.16, 0.04))]
+GREY_GREEN = [(0.0, (0.09, 0.14, 0.05)), (0.6, (0.14, 0.19, 0.08)), (1.0, (0.2, 0.22, 0.1))]
+HAVEN_GREEN = [(0.0, (0.09, 0.15, 0.03)), (0.5, (0.14, 0.21, 0.04)), (0.9, (0.2, 0.25, 0.05)), (1.0, (0.32, 0.29, 0.07))]
+
+# The sheet: cards in the bottom three quarters, everything solid (stems, berries, roots) baked in the top quarter.
+SOLID_REGION = (0.0, 0.76, 1.0, 1.0)
+
+
+def plant(name, height, solids, cards, sheet, coll, materials):
+    """A plant's solid parts (with their own atlas islands) and its cards (pointing into the sheet), as the dict
+    prop_bake.make_asset takes."""
+    low = solids.object(name, coll, materials, height)
+    card_obj = cards.object(f"{name} Cards", coll, materials, height) if cards is not None else None
+    return low, card_obj
+
+
+def plant_asset(variants, sheet_obj):
+    return {"lows": [v[0] for v in variants], "cards": [v[1] for v in variants], "sheet": sheet_obj}
 
 
 # ----- Plants -------------------------------------------------------------------------------------------------------
 
-def flower(kit, centre, facing, petals, length, width, material, var, rng, cup=0.25, double=True):
-    side = facing.orthogonal().normalized()
-    for k in range(petals):
-        a = 2 * math.pi * k / petals + rng.uniform(-0.1, 0.1)
-        out = (side * math.cos(a) + facing.cross(side) * math.sin(a)).normalized()
-        direction = (out + facing * cup).normalized()
-        kit.blade(centre, direction, facing, length, width, PETAL, material, var, fold=0.1, curl=-0.05, double=double)
+def berry_bush(coll):
+    """Wild currant: arching woody stems, a crown of leaf-spray cards and strings of red berries on its top."""
+    bark = bark_material("Currant Bark (bake)", tint=(0.6, 0.52, 0.45))
+    leaf = varied("Currant Leaf (bake)", HAVEN_GREEN, veins=0.6, midrib=0.8, rim_dark=0.15, roughness=0.7)
+    twig = varied("Currant Twig (bake)", [(0.0, (0.2, 0.15, 0.1)), (1.0, (0.28, 0.2, 0.12))], roughness=0.8)
+    berry = varied("Currant (bake)", [(0.0, (0.5, 0.025, 0.02)), (0.6, (0.68, 0.04, 0.025)), (1.0, (0.8, 0.1, 0.04))],
+                   roughness=0.25, sheen=0.6)
+    materials = (bark, leaf, twig, berry)
+    sheet = Sheet(2, 2)
+    sprites = sprite_set("Berry Bush", ['spray_a', 'spray_b', 'spray_c', 'spray_d'], (0.08, 0.13, 0.03))
+    if sprites:
+        materials = materials + tuple(sprites)
+        for cell, _ in enumerate(sprites):
+            sheet.image(cell, len(materials) - len(sprites) + cell)
+    else:
+        rng = random.Random(5)
+        for cell in range(4):
+            # A spray: a twig with five to seven leaves along it, the youngest at the tip.
+            rect = sheet.rect(cell)
+            sheet.line(rect, [(0.5, 0.0), (0.5 + rng.uniform(-0.05, 0.05), 0.55), (0.5, 0.95)], 0.025, 2, rng.random())
+            for k in range(rng.randint(5, 7)):
+                t = 0.12 + 0.8 * k / 6
+                side = -1 if k % 2 else 1
+                sheet.leaf(rect, (0.5, t * 0.9), side * rng.uniform(0.5, 1.0), rng.uniform(0.32, 0.42) * (1.1 - t * 0.4),
+                           0.85, HEART, 1, min(0.95, rng.gauss(0.45 + 0.1 * cell, 0.15)), serrate=0.12)
+            sheet.leaf(rect, (0.5, 0.88), rng.uniform(-0.2, 0.2), 0.12, 0.8, HEART, 1, 0.6, serrate=0.12)
+    variants = []
+    for key, seed, spread, height, stems in (("A", 5, 0.62, 0.9, 10), ("B", 11, 0.7, 0.82, 9)):
+        rng = random.Random(seed)
+        solids, cards = Kit(), Kit(cards=True)
+        tips = []
+        for s in range(stems):
+            turn = 2 * math.pi * (s + rng.uniform(-0.3, 0.3)) / stems
+            out = Vector((math.cos(turn), math.sin(turn), 0))
+            reach, top = spread * rng.uniform(0.45, 0.95), height * rng.uniform(0.7, 1.0)
+            phase = rng.random()
+            points = []
+            for i in range(9):
+                t = i / 8
+                p = out * rng.uniform(0.0, 0.05) + out * reach * t ** 1.3
+                p.z = top * math.sin(t * math.pi * 0.62) / math.sin(math.pi * 0.62) * (1 - 0.25 * t * t)
+                points.append(p)
+            solids.stem(points, 0.014, 0.004, 0, rng.random(), phase, sides=5)
+            for i in range(3, 9):
+                tips.append((points[i], phase))
+            for b in range(rng.randint(2, 4)):
+                at = rng.randint(3, 7)
+                d = (out * 0.5 + Vector((-out.y, out.x, 0)) * rng.choice((-0.7, 0.7)) + UP * rng.uniform(0.1, 0.6)).normalized()
+                length = rng.uniform(0.15, 0.3)
+                branch = bent_path(points[at], d, length, 4, rng.uniform(-0.2, 0.2), rng, droop=length * 0.25)
+                solids.stem(branch, 0.007, 0.003, 0, rng.random(), phase, sides=4, flex0=0.4)
+                tips.extend((p, phase) for p in branch[1:])
+        centre = Vector((0, 0, height * 0.3))
+        # The crown: leaf sprays on the twigs and over the dome the stems make.
+        dome = []
+        for _ in range(170):
+            a = rng.uniform(0, 2 * math.pi)
+            up_share = rng.random() ** 0.7
+            elevation = math.asin(up_share)
+            r = spread * 0.9 * (1.0 + 0.2 * noise.noise(Vector((math.cos(a) * 1.4, math.sin(a) * 1.4, up_share * 1.5 + seed))))
+            dome.append((Vector((math.cos(a) * math.cos(elevation) * r, math.sin(a) * math.cos(elevation) * r,
+                                 0.12 + (height - 0.12) * math.sin(elevation))), rng.random()))
+        for p, phase in tips + dome:
+            direction, up = facing_out(p, centre, rng)
+            length = rng.uniform(0.22, 0.3)
+            cards.card(p - direction * length * 0.25, direction, up, length, length * 0.95, sheet.rect(rng.randrange(4)),
+                       phase, bend=0.15, droop=0.1)
+        # Strings of berries on the top of the crown, where the camera sees them.
+        tops = [p for p, _ in dome if p.z > height * 0.5]
+        rng.shuffle(tops)
+        for p in tops[:38]:
+            hang = Vector((rng.uniform(-0.6, 0.6), rng.uniform(-0.6, 0.6), -0.7)).normalized()
+            at = p + (p - centre).normalized() * 0.04
+            value = rng.random()
+            for k in range(rng.randint(4, 6)):
+                solids.blob(at + hang * (0.015 + k * 0.03), rng.uniform(0.018, 0.022), 3, value, 0.0, flex=0.8,
+                            subdivisions=1)
+        variants.append(plant(f"Berry Bush {key}", height, solids, cards, sheet, coll, materials))
+    return plant_asset(variants, sheet.object("Berry Bush Sheet", coll, materials))
 
 
-def healing_herb(name, seed, coll):
-    rng = random.Random(seed)
-    kit = Kit()
-    leaf = varied("Yarrow Leaf (bake)", GREY_GREEN, veins=0.0, midrib=0.6)
+def healing_herb(coll):
+    """Yarrow: feathery leaves round the foot, stems with flat heads of small white flowers (cards seen from above)."""
+    leaf = varied("Yarrow Leaf (bake)", GREY_GREEN, midrib=0.6, roughness=0.75)
     stalk = varied("Yarrow Stem (bake)", [(0.0, (0.12, 0.16, 0.06)), (1.0, (0.18, 0.2, 0.08))], roughness=0.7)
     bloom = varied("Yarrow Flower (bake)", [(0.0, (0.72, 0.7, 0.62)), (0.7, (0.85, 0.83, 0.76)), (1.0, (0.85, 0.7, 0.72))],
                    roughness=0.8)
-    # Feathery leaves round the foot.
-    for k in range(16):
-        a = 2 * math.pi * k / 16 + rng.uniform(-0.2, 0.2)
-        out = Vector((math.cos(a), math.sin(a), rng.uniform(0.2, 0.7))).normalized()
-        kit.blade(Vector((0, 0, 0.02)), out, UP, rng.uniform(0.16, 0.24), 0.06, FEATHER, 0, rng.random(), fold=0.3,
-                  curl=0.25, double=True)
-    for base, lean in tuft(rng, 9, 0.1):
-        height = rng.uniform(0.38, 0.55)
-        points = ring_points(base, lean, height, 6, bend=0.05, rng=rng)
-        kit.stem(points, 0.006, 0.004, 1, rng.random())
-        for i in (2, 3, 4):
-            kit.blade(points[i], (lean + Vector((rng.uniform(-1, 1), rng.uniform(-1, 1), 0.3))).normalized(), UP,
-                      rng.uniform(0.08, 0.12), 0.04, FEATHER, 0, rng.random(), fold=0.3, curl=0.2, double=True)
-        # A flat head of tiny flowers.
-        top = points[-1]
-        for _ in range(14):
-            a, r = rng.uniform(0, 6.28), 0.045 * math.sqrt(rng.random())
-            at = top + Vector((math.cos(a) * r, math.sin(a) * r, 0.01 * rng.random()))
-            flower(kit, at, UP, 5, 0.012, 0.012, 2, rng.random(), rng, cup=0.1, double=False)
-    return kit.object(name, coll, (leaf, stalk, bloom))
+    materials = (leaf, stalk, bloom)
+    sheet = Sheet(2, 2)
+    sprites = sprite_set("Healing Herb", ['leaf_a', 'leaf_b', 'flower_a', 'flower_b'], (0.08, 0.13, 0.03))
+    if sprites:
+        materials = materials + tuple(sprites)
+        for cell, _ in enumerate(sprites):
+            sheet.image(cell, len(materials) - len(sprites) + cell)
+    else:
+        rng = random.Random(1)
+        for cell in (0, 1):
+            sheet.leaf(sheet.rect(cell), (0.5, 0.02), 0.0, 0.95, 0.75, FEATHER, 0, rng.random())
+        for cell in (2, 3):
+            rect = sheet.rect(cell)
+            for _ in range(26):
+                a, r = rng.uniform(0, 6.28), 0.4 * math.sqrt(rng.random())
+                sheet.disc(rect, (0.5 + math.cos(a) * r, 0.5 + math.sin(a) * r), 0.07, 5, 2, rng.random(), rng)
+    variants = []
+    for key, seed in (("A", 601), ("B", 602)):
+        rng = random.Random(seed)
+        solids, cards = Kit(), Kit(cards=True)
+        for k in range(14):
+            a = 2 * math.pi * k / 14 + rng.uniform(-0.2, 0.2)
+            out = Vector((math.cos(a), math.sin(a), rng.uniform(0.3, 0.8))).normalized()
+            cards.card(Vector((0, 0, 0.02)), out, UP, rng.uniform(0.18, 0.26), 0.13, sheet.rect(rng.randrange(2)),
+                       rng.random(), bend=0.25, droop=0.2, flex=0.6)
+        height = 0.55
+        for base, lean in tuft(rng, 9, 0.1):
+            points = ring_points(base, lean, rng.uniform(0.38, 0.55), 5, bend=0.05, rng=rng)
+            phase = rng.random()
+            solids.stem(points, 0.006, 0.004, 1, rng.random(), phase, sides=4)
+            for i in (2, 3):
+                d = (lean + Vector((rng.uniform(-1, 1), rng.uniform(-1, 1), 0.3))).normalized()
+                cards.card(points[i], d, UP, rng.uniform(0.09, 0.13), 0.06, sheet.rect(rng.randrange(2)), phase, bend=0.2)
+            # The flower head: a card lying flat on the stem's top.
+            top = points[-1] + UP * 0.005
+            size = rng.uniform(0.1, 0.13)
+            cards.card(top - Vector((0, size * 0.5, 0)), Vector((0, 1, 0.02)), UP, size, size,
+                       sheet.rect(2 + rng.randrange(2)), phase, bend=-0.05)
+        variants.append(plant(f"Healing Herb {key}", height, solids, cards, sheet, coll, materials))
+    return plant_asset(variants, sheet.object("Healing Herb Sheet", coll, materials))
 
 
-def flax(name, seed, coll):
-    rng = random.Random(seed)
-    kit = Kit()
+def flax(coll):
+    """Flax: thin stems, narrow leaves, sky-blue flowers (cards facing up and out) and seed bolls."""
     leaf = varied("Flax Leaf (bake)", [(0.0, (0.1, 0.17, 0.08)), (1.0, (0.16, 0.24, 0.1))], midrib=0.4)
     stalk = varied("Flax Stem (bake)", [(0.0, (0.14, 0.2, 0.08)), (1.0, (0.22, 0.26, 0.1))], roughness=0.7)
     bloom = varied("Flax Flower (bake)", [(0.0, (0.18, 0.32, 0.75)), (0.7, (0.3, 0.45, 0.88)), (1.0, (0.45, 0.55, 0.92))],
                    roughness=0.6, veins=0.5)
     boll = varied("Flax Boll (bake)", [(0.0, (0.35, 0.33, 0.12)), (1.0, (0.55, 0.5, 0.22))], roughness=0.5)
-    for base, lean in tuft(rng, 70, 0.32):
-        height = rng.uniform(0.5, 0.75)
-        points = ring_points(base, lean, height, 7, bend=rng.uniform(0.0, 0.08), rng=rng)
-        kit.stem(points, 0.0035, 0.002, 1, rng.random(), sides=4)
-        for i in range(1, 6):
-            if rng.random() < 0.7:
-                d = (Vector((rng.uniform(-1, 1), rng.uniform(-1, 1), 0)) + lean * 1.5).normalized()
-                kit.blade(points[i], d, UP, rng.uniform(0.03, 0.05), 0.012, NARROW, 0, rng.random(), double=True)
-        top = points[-1]
-        roll = rng.random()
-        if roll < 0.55:
-            facing = (lean + Vector((rng.uniform(-0.5, 0.5), rng.uniform(-0.5, 0.5), 0.6))).normalized()
-            flower(kit, top, facing, 5, 0.022, 0.022, 2, rng.random(), rng, cup=0.25)
-        elif roll < 0.85:
-            kit.blob(top + UP * 0.006, 0.0065, 3, rng.random(), subdivisions=0)
-    return kit.object(name, coll, (leaf, stalk, bloom, boll))
+    materials = (leaf, stalk, bloom, boll)
+    sheet = Sheet(2, 2)
+    sprites = sprite_set("Flax", ['leaves_a', 'leaves_b', 'flower_a', 'flower_b'], (0.08, 0.13, 0.03))
+    if sprites:
+        materials = materials + tuple(sprites)
+        for cell, _ in enumerate(sprites):
+            sheet.image(cell, len(materials) - len(sprites) + cell)
+    else:
+        rng = random.Random(2)
+        for cell in (0, 1):
+            rect = sheet.rect(cell)
+            for j in range(4):
+                sheet.leaf(rect, (0.2 + 0.2 * j, 0.02), rng.uniform(-0.25, 0.25), rng.uniform(0.7, 0.95), 0.12, NARROW, 0,
+                           rng.random())
+        for cell in (2, 3):
+            sheet.disc(sheet.rect(cell), (0.5, 0.5), 0.46, 5, 2, rng.random(), rng)
+    variants = []
+    for key, seed in (("A", 611), ("B", 612)):
+        rng = random.Random(seed)
+        solids, cards = Kit(), Kit(cards=True)
+        height = 0.72
+        for base, lean in tuft(rng, 55, 0.3):
+            points = ring_points(base, lean, rng.uniform(0.5, 0.72), 5, bend=rng.uniform(0.0, 0.08), rng=rng)
+            phase = rng.random()
+            solids.stem(points, 0.004, 0.0025, 1, rng.random(), phase, sides=3)
+            if rng.random() < 0.6:
+                d = (lean + Vector((rng.uniform(-1, 1), rng.uniform(-1, 1), 0))).normalized()
+                cards.card(points[1], d, UP, rng.uniform(0.12, 0.18), 0.08, sheet.rect(rng.randrange(2)), phase, bend=0.1)
+            top, roll = points[-1], rng.random()
+            if roll < 0.6:
+                facing = (lean + Vector((rng.uniform(-0.5, 0.5), rng.uniform(-0.5, 0.5), 0.6))).normalized()
+                size = rng.uniform(0.045, 0.055)
+                side = facing.orthogonal().normalized()
+                cards.card(top - side * size * 0.5, side, facing, size, size, sheet.rect(2 + rng.randrange(2)), phase,
+                           bend=-0.15)
+            elif roll < 0.85:
+                solids.blob(top + UP * 0.006, 0.0075, 3, rng.random(), phase, flex=1.0, subdivisions=0)
+        variants.append(plant(f"Flax {key}", height, solids, cards, sheet, coll, materials))
+    return plant_asset(variants, sheet.object("Flax Sheet", coll, materials))
 
 
-def huldra_silk(name, seed, coll):
-    rng = random.Random(seed)
-    kit = Kit()
+def huldra_silk(coll):
+    """Cotton grass: a tussock of grass-blade cards, thin stems with silky white tufts that glow a little at night."""
     grass = varied("Cotton Grass (bake)", [(0.0, (0.08, 0.13, 0.05)), (0.7, (0.14, 0.2, 0.07)), (1.0, (0.35, 0.3, 0.12))],
                    midrib=0.3)
     stalk = varied("Cotton Grass Stem (bake)", [(0.0, (0.15, 0.18, 0.08)), (1.0, (0.25, 0.25, 0.1))], roughness=0.7)
     silk = varied("Huldra Silk (bake)", [(0.0, (0.78, 0.79, 0.76)), (1.0, (0.9, 0.9, 0.86))], roughness=0.95, glow=0.12,
                   strands=True)
-    for base, lean in tuft(rng, 90, 0.35):
-        d = (lean + Vector((rng.uniform(-0.5, 0.5), rng.uniform(-0.5, 0.5), 0))).normalized()
-        kit.blade(base, d, Vector((d.y, -d.x, 0)).normalized() if abs(d.z) < 0.99 else UP, rng.uniform(0.25, 0.45), 0.014,
-                  GRASS, 0, rng.random(), fold=0.4, curl=0.0, droop=rng.uniform(0.2, 0.6), double=True)
-    for base, lean in tuft(rng, 26, 0.3):
-        points = ring_points(base, lean, rng.uniform(0.4, 0.62), 6, bend=0.03, rng=rng)
-        kit.stem(points, 0.003, 0.002, 1, rng.random(), sides=4)
-        # The silk: a soft tuft of white threads.
-        top = points[-1] + UP * 0.02
-        kit.blob(top, 0.028, 2, rng.random(), squash=(1.0, 1.0, 1.25), subdivisions=2, lumpy=0.35, seed=rng.random() * 50)
-    return kit.object(name, coll, (grass, stalk, silk))
+    materials = (grass, stalk, silk)
+    sheet = Sheet(2, 2)
+    sprites = sprite_set("Huldra Silk", ['grass_a', 'grass_b', 'grass_c', 'grass_d'], (0.08, 0.13, 0.03))
+    if sprites:
+        materials = materials + tuple(sprites)
+        for cell, _ in enumerate(sprites):
+            sheet.image(cell, len(materials) - len(sprites) + cell)
+    else:
+        rng = random.Random(3)
+        for cell in range(4):
+            rect = sheet.rect(cell)
+            for j in range(6):
+                sheet.leaf(rect, (0.25 + 0.1 * j, 0.0), rng.uniform(-0.4, 0.4), rng.uniform(0.6, 0.98), 0.08, GRASS, 0,
+                           rng.random())
+    variants = []
+    for key, seed in (("A", 621), ("B", 622)):
+        rng = random.Random(seed)
+        solids, cards = Kit(), Kit(cards=True)
+        height = 0.62
+        for base, lean in tuft(rng, 26, 0.32):
+            d = (lean + Vector((rng.uniform(-0.4, 0.4), rng.uniform(-0.4, 0.4), 0))).normalized()
+            up = Vector((d.y, -d.x, 0)).normalized() if abs(d.z) < 0.99 else Vector((1, 0, 0))
+            length = rng.uniform(0.28, 0.42)
+            cards.card(base, d, up, length, length * 0.6, sheet.rect(rng.randrange(4)), rng.random(), bend=0.2,
+                       droop=rng.uniform(0.1, 0.3))
+        for base, lean in tuft(rng, 22, 0.28):
+            points = ring_points(base, lean, rng.uniform(0.4, 0.6), 5, bend=0.03, rng=rng)
+            phase = rng.random()
+            solids.stem(points, 0.003, 0.002, 1, rng.random(), phase, sides=3)
+            # A silky head: a soft, slightly uneven ball with a smaller puff off one side (strong lumps on a coarse
+            # sphere read as a faceted pebble, a white hexagon in game).
+            top = points[-1] + UP * 0.025
+            solids.blob(top, 0.024, 2, rng.random(), phase, flex=1.0, squash=(1.0, 1.0, 1.3),
+                        subdivisions=2, lumpy=0.12, seed=rng.random() * 50)
+            puff = Vector((rng.uniform(-1, 1), rng.uniform(-1, 1), rng.uniform(0.2, 0.8))).normalized()
+            solids.blob(top + puff * 0.016, 0.014, 2, rng.random(), phase, flex=1.0, subdivisions=1, lumpy=0.1,
+                        seed=rng.random() * 50)
+        variants.append(plant(f"Huldra Silk {key}", height, solids, cards, sheet, coll, materials))
+    return plant_asset(variants, sheet.object("Huldra Silk Sheet", coll, materials))
 
 
-def nettle(name, seed, coll):
-    rng = random.Random(seed)
-    kit = Kit()
+def nettle(coll):
+    """Stinging nettles: upright stems with pairs of heart-shaped, saw-edged leaves, each pair a quarter turn on."""
     leaf = varied("Nettle Leaf (bake)", DARK_GREEN, veins=0.7, midrib=0.8, rim_dark=0.1)
     stalk = varied("Nettle Stem (bake)", [(0.0, (0.1, 0.13, 0.05)), (1.0, (0.18, 0.15, 0.07))], roughness=0.75)
-    for base, lean in tuft(rng, 16, 0.3):
-        height = rng.uniform(0.55, 0.85)
-        points = ring_points(base, lean, height, 9, bend=0.04, rng=rng)
-        kit.stem(points, 0.006, 0.003, 1, rng.random(), sides=4)
-        turn = rng.uniform(0, math.pi)
-        for i in range(2, 10):
-            # Opposite pairs, each pair turned a quarter from the last, smaller towards the top.
-            for sign in (-1, 1):
-                a = turn + (i % 2) * math.pi / 2 + (0 if sign > 0 else math.pi)
-                d = Vector((math.cos(a), math.sin(a), 0.15 + 0.06 * i)).normalized()
-                size = 0.11 * (1.15 - i / 11)
-                kit.blade(points[i], d, UP, size, size * 0.75, HEART, 0, rng.random(), fold=0.25, curl=0.3,
-                          droop=0.15, serrate=0.18)
-    return kit.object(name, coll, (leaf, stalk))
+    materials = (leaf, stalk)
+    sheet = Sheet(2, 2)
+    sprites = sprite_set("Nettle", ['leaf_a', 'leaf_b', 'leaf_c', 'leaf_d'], (0.08, 0.13, 0.03))
+    if sprites:
+        materials = materials + tuple(sprites)
+        for cell, _ in enumerate(sprites):
+            sheet.image(cell, len(materials) - len(sprites) + cell)
+    else:
+        rng = random.Random(4)
+        for cell in range(4):
+            sheet.leaf(sheet.rect(cell), (0.5, 0.02), 0.0, 0.96, 0.85, HEART, 0, rng.random(), serrate=0.2)
+    variants = []
+    for key, seed in (("A", 631), ("B", 632)):
+        rng = random.Random(seed)
+        solids, cards = Kit(), Kit(cards=True)
+        height = 0.85
+        for base, lean in tuft(rng, 14, 0.3):
+            points = ring_points(base, lean, rng.uniform(0.55, 0.85), 8, bend=0.04, rng=rng)
+            phase = rng.random()
+            solids.stem(points, 0.006, 0.003, 1, rng.random(), phase, sides=4)
+            turn = rng.uniform(0, math.pi)
+            for i in range(2, 9):
+                for sign in (-1, 1):
+                    a = turn + (i % 2) * math.pi / 2 + (0 if sign > 0 else math.pi)
+                    d = Vector((math.cos(a), math.sin(a), 0.2 + 0.05 * i)).normalized()
+                    size = 0.12 * (1.15 - i / 11)
+                    cards.card(points[i], d, UP, size, size * 0.8, sheet.rect(rng.randrange(4)), phase, bend=0.3,
+                               droop=0.15)
+        variants.append(plant(f"Nettle {key}", height, solids, cards, sheet, coll, materials))
+    return plant_asset(variants, sheet.object("Nettle Sheet", coll, materials))
 
 
-def chanterelles(name, seed, coll):
-    rng = random.Random(seed)
-    kit = Kit()
-    cap = gills_material("Chanterelle (bake)", [(0.0, (0.85, 0.42, 0.03)), (0.6, (0.93, 0.55, 0.05)), (1.0, (0.96, 0.64, 0.1))])
-    for k in range(rng.randint(6, 8)):
-        a, r = rng.uniform(0, 6.28), 0.22 * math.sqrt(rng.random())
-        at = Vector((math.cos(a) * r, math.sin(a) * r, -0.01))
-        size = rng.uniform(0.8, 1.5)
-        tilt = Vector((rng.uniform(-0.25, 0.25), rng.uniform(-0.25, 0.25), 1.0)).normalized()
-        # Stem into funnel into wavy cap rim, then back under it.
-        profile = [(0.012, 0.0), (0.011, 0.02), (0.014, 0.04), (0.024, 0.055), (0.038, 0.065), (0.045, 0.07),
-                   (0.042, 0.066), (0.03, 0.058), (0.018, 0.045), (0.012, 0.03)]
-        profile = [(rr * size, h * size) for rr, h in profile]
-        kit.lathe(at, profile, 16, 0, rng.random(), wobble=0.12, seed=rng.random() * 30, axis=tilt)
-    return kit.object(name, coll, (cap,))
-
-
-def cloudberries(name, seed, coll):
-    rng = random.Random(seed)
-    kit = Kit()
+def cloudberries(coll):
+    """A low patch of round, lobed, wrinkled leaves with amber berries made of beads on short stems."""
     leaf = varied("Cloudberry Leaf (bake)", GREEN, veins=0.8, midrib=0.6, rim_dark=0.15)
     stalk = varied("Cloudberry Stem (bake)", [(0.0, (0.12, 0.13, 0.05)), (1.0, (0.2, 0.17, 0.08))], roughness=0.7)
     berry = varied("Cloudberry (bake)", [(0.0, (0.85, 0.42, 0.08)), (0.6, (0.92, 0.55, 0.12)), (1.0, (0.95, 0.68, 0.25))],
                    roughness=0.35, sheen=0.6)
-    for base, lean in tuft(rng, 24, 0.26):
-        height = rng.uniform(0.08, 0.16)
-        points = ring_points(base, lean, height, 3, rng=rng)
-        kit.stem(points, 0.004, 0.003, 1, rng.random(), sides=4)
-        d = Vector((rng.uniform(-1, 1), rng.uniform(-1, 1), 0.25)).normalized()
-        kit.blade(points[-1] - d * 0.03, d, UP, rng.uniform(0.07, 0.1), 0.09, LOBED, 0, rng.random(), fold=0.15, curl=0.1,
-                  serrate=0.15)
-    for base, lean in tuft(rng, 9, 0.22):
-        top = base + UP * rng.uniform(0.16, 0.22) + lean * 0.02
-        kit.stem([base, base.lerp(top, 0.5), top], 0.003, 0.0025, 1, rng.random(), sides=4)
-        # An aggregate berry: a dome of beads.
-        value_ = rng.random()
-        for j in range(14):
-            phi = math.acos(1 - 2 * (j + 0.5) / 18)
-            theta = j * 2.39996
-            d = Vector((math.sin(phi) * math.cos(theta), math.sin(phi) * math.sin(theta), math.cos(phi)))
-            kit.blob(top + UP * 0.016 + d * 0.015, 0.0075, 2, value_, subdivisions=0)
-    return kit.object(name, coll, (leaf, stalk, berry))
+    materials = (leaf, stalk, berry)
+    sheet = Sheet(2, 2)
+    sprites = sprite_set("Cloudberry", ['leaf_a', 'leaf_b', 'leaf_c', 'leaf_d'], (0.08, 0.13, 0.03))
+    if sprites:
+        materials = materials + tuple(sprites)
+        for cell, _ in enumerate(sprites):
+            sheet.image(cell, len(materials) - len(sprites) + cell)
+    else:
+        rng = random.Random(6)
+        for cell in range(4):
+            sheet.leaf(sheet.rect(cell), (0.5, 0.02), 0.0, 0.96, 0.95, LOBED, 0, rng.random(), serrate=0.15)
+    variants = []
+    for key, seed in (("A", 641), ("B", 642)):
+        rng = random.Random(seed)
+        solids, cards = Kit(), Kit(cards=True)
+        height = 0.24
+        for base, lean in tuft(rng, 22, 0.26):
+            points = ring_points(base, lean, rng.uniform(0.08, 0.16), 2, rng=rng)
+            phase = rng.random()
+            solids.stem(points, 0.004, 0.003, 1, rng.random(), phase, sides=3)
+            d = Vector((rng.uniform(-1, 1), rng.uniform(-1, 1), 0.25)).normalized()
+            size = rng.uniform(0.09, 0.13)
+            cards.card(points[-1] - d * size * 0.3, d, UP, size, size, sheet.rect(rng.randrange(4)), phase, bend=0.12)
+        for base, lean in tuft(rng, 9, 0.22):
+            top = base + UP * rng.uniform(0.16, 0.22) + lean * 0.02
+            phase = rng.random()
+            solids.stem([base, base.lerp(top, 0.5), top], 0.003, 0.0025, 1, rng.random(), phase, sides=3)
+            value = rng.random()
+            for j in range(14):
+                phi = math.acos(1 - 2 * (j + 0.5) / 18)
+                theta = j * 2.39996
+                d = Vector((math.sin(phi) * math.cos(theta), math.sin(phi) * math.sin(theta), math.cos(phi)))
+                solids.blob(top + UP * 0.016 + d * 0.015, 0.0075, 2, value, phase, flex=1.0, subdivisions=0)
+        variants.append(plant(f"Cloudberries {key}", height, solids, cards, sheet, coll, materials))
+    return plant_asset(variants, sheet.object("Cloudberries Sheet", coll, materials))
 
 
-def wild_barley(name, seed, coll):
-    rng = random.Random(seed)
-    kit = Kit()
+def wild_barley(coll):
+    """Barley: straw stalks, grass-blade cards, and bearded ears as crossed cards on the drooping tips."""
     straw = varied("Barley Straw (bake)", [(0.0, (0.48, 0.4, 0.17)), (0.6, (0.62, 0.52, 0.24)), (1.0, (0.55, 0.55, 0.25))],
                    roughness=0.6, midrib=0.3)
     grain = varied("Barley Grain (bake)", [(0.0, (0.58, 0.47, 0.2)), (1.0, (0.75, 0.62, 0.3))], roughness=0.55)
-    for base, lean in tuft(rng, 26, 0.18):
-        height = rng.uniform(0.6, 0.85)
-        nod = rng.uniform(0.12, 0.3)
-        points = ring_points(base, lean, height, 8, bend=nod, rng=rng)
-        kit.stem(points, 0.004, 0.0025, 0, rng.random(), sides=4)
-        for i in (1, 3):
-            d = (Vector((rng.uniform(-1, 1), rng.uniform(-1, 1), 0.5))).normalized()
-            kit.blade(points[i], d, UP, rng.uniform(0.15, 0.22), 0.016, GRASS, 0, rng.random(), droop=0.5, double=True)
-        # The head: two rows of grains along the drooping tip, each with a long awn.
-        tip = points[-1]
-        along = (points[-1] - points[-2]).normalized()
-        side = along.cross(UP).normalized()
-        v = rng.random()
-        for g in range(8):
-            at = tip + along * (0.007 * g)
-            for sign in (-1, 1):
-                p = at + side * sign * 0.004
-                kit.blob(p, 0.005, 1, v, squash=(1.0, 1.0, 1.6), subdivisions=0)
-                awn = (along + side * sign * 0.25 + UP * 0.35).normalized()
-                kit.stem([p, p + awn * 0.05, p + awn * 0.1 - UP * 0.01], 0.0008, 0.0004, 1, v, sides=3)
-    return kit.object(name, coll, (straw, grain))
+    materials = (straw, grain)
+    sheet = Sheet(2, 2)
+    sprites = sprite_set("Wild Barley", ['blade_a', 'blade_b', 'ear_a', 'ear_b'], (0.45, 0.38, 0.16))
+    if sprites:
+        materials = materials + tuple(sprites)
+        for cell, _ in enumerate(sprites):
+            sheet.image(cell, len(materials) - len(sprites) + cell)
+    else:
+        rng = random.Random(7)
+        for cell in (0, 1):
+            rect = sheet.rect(cell)
+            for j in range(3):
+                sheet.leaf(rect, (0.3 + 0.2 * j, 0.0), rng.uniform(-0.3, 0.3), rng.uniform(0.7, 0.98), 0.1, GRASS, 0,
+                           rng.random())
+        for cell in (2, 3):
+            # An ear: two rows of grains up a short stalk, each with a long awn.
+            rect = sheet.rect(cell)
+            sheet.line(rect, [(0.5, 0.0), (0.5, 0.55)], 0.03, 0, 0.5)
+            for g in range(9):
+                y = 0.08 + g * 0.055
+                for sign in (-1, 1):
+                    sheet.leaf(rect, (0.5 + sign * 0.03, y), sign * 0.35, 0.09, 0.6, OVATE, 1, rng.random())
+                    sheet.line(rect, [(0.5 + sign * 0.05, y + 0.08), (0.5 + sign * 0.16, y + 0.45)], 0.008, 1, 0.7)
+    variants = []
+    for key, seed in (("A", 661), ("B", 662)):
+        rng = random.Random(seed)
+        solids, cards = Kit(), Kit(cards=True)
+        height = 0.85
+        for base, lean in tuft(rng, 26, 0.18):
+            points = ring_points(base, lean, rng.uniform(0.6, 0.85), 6, bend=rng.uniform(0.12, 0.3), rng=rng)
+            phase = rng.random()
+            solids.stem(points, 0.004, 0.0025, 0, rng.random(), phase, sides=3)
+            for i in (1, 3):
+                d = Vector((rng.uniform(-1, 1), rng.uniform(-1, 1), 0.5)).normalized()
+                up = Vector((d.y, -d.x, 0)).normalized()
+                cards.card(points[i], d, up, rng.uniform(0.18, 0.25), 0.05, sheet.rect(rng.randrange(2)), phase, droop=0.4)
+            along = (points[-1] - points[-2]).normalized()
+            side = along.cross(UP).normalized()
+            rect = sheet.rect(2 + rng.randrange(2))
+            for turn in (side, along.cross(side).normalized()):
+                cards.card(points[-1] - along * 0.01, along, turn, 0.16, 0.09, rect, phase, bend=0.05)
+        variants.append(plant(f"Wild Barley {key}", height, solids, cards, sheet, coll, materials))
+    return plant_asset(variants, sheet.object("Wild Barley Sheet", coll, materials))
 
 
-def wild_turnips(name, seed, coll):
-    rng = random.Random(seed)
-    kit = Kit()
+def wild_turnips(coll):
+    """Wild turnips: purple-shouldered white roots showing at the ground, under a rosette of lobed leaf cards."""
     leaf = varied("Turnip Leaf (bake)", GREEN, veins=0.7, midrib=0.9)
     root = varied("Turnip Root (bake)", [(0.0, (0.82, 0.78, 0.72)), (1.0, (0.88, 0.85, 0.78))], roughness=0.5)
     shoulder = varied("Turnip Shoulder (bake)", [(0.0, (0.42, 0.12, 0.32)), (1.0, (0.55, 0.2, 0.4))], roughness=0.5)
-    for k in range(rng.randint(2, 3)):
-        a, r = rng.uniform(0, 6.28), 0.08 * k
-        at = Vector((math.cos(a) * r, math.sin(a) * r, -0.05))
-        size = rng.uniform(0.8, 1.15)
-        white = [(0.004, -0.06), (0.025, -0.04), (0.05, 0.0), (0.06, 0.03)]
-        purple = [(0.06, 0.03), (0.058, 0.055), (0.045, 0.075), (0.02, 0.088), (0.006, 0.092)]
-        kit.lathe(at, [(rr * size, h * size) for rr, h in white], 14, 1, rng.random(), wobble=0.06, seed=rng.random() * 9)
-        kit.lathe(at, [(rr * size, h * size) for rr, h in purple], 14, 2, rng.random(), wobble=0.06, seed=rng.random() * 9)
-        crown = at + UP * 0.09 * size
-        for j in range(rng.randint(6, 9)):
-            b = 2 * math.pi * j / 8 + rng.uniform(-0.3, 0.3)
-            d = Vector((math.cos(b), math.sin(b), rng.uniform(0.9, 1.6))).normalized()
-            kit.blade(crown, d, UP, rng.uniform(0.2, 0.3), 0.09, LOBED, 0, rng.random(), fold=0.2, curl=0.35, droop=0.25)
-    return kit.object(name, coll, (leaf, root, shoulder))
+    materials = (leaf, root, shoulder)
+    sheet = Sheet(2, 2)
+    rng = random.Random(8)
+    for cell in range(4):
+        sheet.leaf(sheet.rect(cell), (0.5, 0.02), 0.0, 0.96, 0.8, LOBED, 0, rng.random())
+    variants = []
+    for key, seed in (("A", 671), ("B", 672)):
+        rng = random.Random(seed)
+        solids, cards = Kit(), Kit(cards=True)
+        height = 0.35
+        for k in range(rng.randint(2, 3)):
+            a, r = rng.uniform(0, 6.28), 0.08 * k
+            at = Vector((math.cos(a) * r, math.sin(a) * r, -0.05))
+            size = rng.uniform(0.8, 1.15)
+            white = [(0.004, -0.06), (0.025, -0.04), (0.05, 0.0), (0.06, 0.03)]
+            purple = [(0.06, 0.03), (0.058, 0.055), (0.045, 0.075), (0.02, 0.088), (0.006, 0.092)]
+            solids.lathe(at, [(rr * size, h * size) for rr, h in white], 12, 1, rng.random(), wobble=0.06,
+                         seed=rng.random() * 9)
+            solids.lathe(at, [(rr * size, h * size) for rr, h in purple], 12, 2, rng.random(), wobble=0.06,
+                         seed=rng.random() * 9)
+            crown = at + UP * 0.09 * size
+            phase = rng.random()
+            for j in range(rng.randint(6, 9)):
+                b = 2 * math.pi * j / 8 + rng.uniform(-0.3, 0.3)
+                d = Vector((math.cos(b), math.sin(b), rng.uniform(0.9, 1.6))).normalized()
+                length = rng.uniform(0.22, 0.32)
+                cards.card(crown, d, UP, length, length * 0.5, sheet.rect(rng.randrange(4)), phase, bend=0.3, droop=0.25)
+        variants.append(plant(f"Wild Turnips {key}", height, solids, cards, sheet, coll, materials))
+    return plant_asset(variants, sheet.object("Wild Turnips Sheet", coll, materials))
 
 
-# ----- Assets -------------------------------------------------------------------------------------------------------
+def chanterelles(coll):
+    """Golden funnel-shaped mushrooms with ridges under their wavy caps: solid, no cards (they don't sway)."""
+    cap = gills_material("Chanterelle (bake)", [(0.0, (0.85, 0.42, 0.03)), (0.6, (0.93, 0.55, 0.05)), (1.0, (0.96, 0.64, 0.1))])
+    lows = []
+    for key, seed in (("A", 651), ("B", 652)):
+        rng = random.Random(seed)
+        kit = Kit()
+        for k in range(rng.randint(6, 8)):
+            a, r = rng.uniform(0, 6.28), 0.22 * math.sqrt(rng.random())
+            at = Vector((math.cos(a) * r, math.sin(a) * r, -0.01))
+            size = rng.uniform(0.8, 1.5)
+            tilt = Vector((rng.uniform(-0.25, 0.25), rng.uniform(-0.25, 0.25), 1.0)).normalized()
+            profile = [(0.012, 0.0), (0.011, 0.02), (0.014, 0.04), (0.024, 0.055), (0.038, 0.065), (0.045, 0.07),
+                       (0.042, 0.066), (0.03, 0.058), (0.018, 0.045), (0.012, 0.03)]
+            kit.lathe(at, [(rr * size, h * size) for rr, h in profile], 16, 0, rng.random(), wobble=0.12,
+                      seed=rng.random() * 30, axis=tilt)
+        lows.append(kit.object(f"Chanterelles {key}", coll, (cap,), 0.12))
+    return lows
 
+
+# key, asset, builder, cards (Tree Wind) or solid (Layered Lit), glow
 PLANTS = (
-    ("herb", "Healing Herb", healing_herb, 2, False),
-    ("flax", "Flax", flax, 2, False),
-    ("silk", "Huldra Silk", huldra_silk, 2, True),
-    ("nettle", "Nettle", nettle, 2, False),
-    ("chanterelle", "Chanterelles", chanterelles, 2, False),
-    ("cloudberry", "Cloudberries", cloudberries, 2, False),
-    ("barley", "Wild Barley", wild_barley, 2, False),
-    ("turnip", "Wild Turnips", wild_turnips, 2, False),
+    ("bush", "Berry Bush", berry_bush, True, False),
+    ("herb", "Healing Herb", healing_herb, True, False),
+    ("flax", "Flax", flax, True, False),
+    ("silk", "Huldra Silk", huldra_silk, True, True),
+    ("nettle", "Nettle", nettle, True, False),
+    ("cloudberry", "Cloudberries", cloudberries, True, False),
+    ("barley", "Wild Barley", wild_barley, True, False),
 )
 
 
 def main():
     bpy.ops.wm.read_factory_settings(use_empty=True)
     rows = []
-    for index, (key, name, maker, count, glow) in enumerate(PLANTS):
+    for key, name, builder, cards, glow in PLANTS:
         if key not in WANTED:
             continue
-
-        def builder(coll, name=name, maker=maker, count=count, index=index):
-            return [maker(f"{name} {chr(65 + i)}", 600 + index * 10 + i, coll) for i in range(count)]
-        rows.append((make_asset(name, builder, 2048, collection(name), glow=glow, cavity_distance=0.04), 1.1))
-    depth = stage(rows, row_spacing=1.1)
+        if cards:
+            made = make_asset(name, builder, 1024, collection(name), glow=glow, masks=False, alpha=True,
+                              lods=(0.5, 0.25), lod_mode='thin', solid_region=SOLID_REGION)
+        else:
+            made = make_asset(name, builder, 1024, collection(name), cavity_distance=0.04, lods=(0.5, 0.25))
+        rows.append((made, 1.6 if name == "Berry Bush" else 1.1))
+    depth = stage(rows, row_spacing=1.2)
     camera((0.0, -depth - 2.6, 4.8), (0.0, -depth * 0.5 + 0.3, 0.2), lens=35)
     render(PREVIEW, 1600, 1600)
     for objects, _ in rows:

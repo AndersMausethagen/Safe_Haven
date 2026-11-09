@@ -9,7 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 459348204992816425}
-  - component: {fileID: 6046558257793656847}
   - component: {fileID: 8407726397120441101}
   - component: {fileID: 3133301613012124359}
   - component: {fileID: 6080014193867310256}
@@ -38,27 +37,6 @@ Transform:
   - {fileID: 7804623620440741031}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &6046558257793656847
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4766336034433878874}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1.7382262, y: 1.6475973, z: 1.777988}
-  m_Center: {x: -0.12746072, y: 0.5691253, z: 0.02764225}
 --- !u!114 &8407726397120441101
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -71,7 +49,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aecdc764a0346784e9958a956dddd948, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SaveableEntity
-  id: 
+  id: 146de4e2c75d4c4cbadc104fe84a24dc
   prefabId: 0fe564bf746ab6a4981ab527c459bf3a
   saveTransform: 1
   saveActiveState: 1

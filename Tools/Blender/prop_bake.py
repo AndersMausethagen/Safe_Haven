@@ -385,19 +385,47 @@ def centre_on_ground(obj):
 
 # ----- UVs, baking, export ------------------------------------------------------------------------------------------
 
-def atlas_uvs(objects, margin=0.004):
-    """A shared "atlas" UV map over all of an asset's variants, for the bake (the old UVs stay as "grain")."""
+def atlas_uvs(objects, margin=0.004, region=(0.0, 0.0, 1.0, 1.0)):
+    """A shared "atlas" UV map over all of an asset's variants, for the bake (the old UVs stay as "grain"): islands at
+    one texel density (averaged), packed tightly with rotation into region (u0, v0, u1, v1) of the texture."""
     for obj in objects:
         layers = obj.data.uv_layers
         if "atlas" not in layers:
             layers.new(name="atlas")
         layers.active = layers["atlas"]
+        # Normal maps are baked in the tangent space of the UV map Blender renders with: it must be the one the game
+        # reads (the atlas, UV0), not the grain map the procedural textures follow.
+        layers["atlas"].active_render = True
     select_only(objects)
     bpy.ops.object.mode_set(mode='EDIT')
     bpy.ops.mesh.select_all(action='SELECT')
     bpy.ops.uv.smart_project(angle_limit=math.radians(66), island_margin=margin, scale_to_bounds=False)
-    bpy.ops.uv.pack_islands(margin=margin)
+    bpy.ops.uv.average_islands_scale()
+    bpy.ops.uv.pack_islands(rotate=True, rotate_method='ANY', scale=True, margin_method='SCALED', margin=margin,
+                            shape_method='CONCAVE')
     bpy.ops.object.mode_set(mode='OBJECT')
+    u0, v0, u1, v1 = region
+    if tuple(region) != (0.0, 0.0, 1.0, 1.0):
+        for obj in objects:
+            for loop in obj.data.uv_layers["atlas"].data:
+                loop.uv = (u0 + loop.uv.x * (u1 - u0), v0 + loop.uv.y * (v1 - v0))
+
+
+def uv_order(obj, names):
+    """Keep only these UV maps, in this order (FBX and Unity number them by their order): copy each, rebuild."""
+    mesh = obj.data
+    saved = {}
+    for name in names:
+        layer = mesh.uv_layers.get(name)
+        data = numpy.zeros(len(mesh.loops) * 2, dtype=numpy.float32)
+        if layer is not None:
+            layer.data.foreach_get("uv", data)
+        saved[name] = data
+    while mesh.uv_layers:
+        mesh.uv_layers.remove(mesh.uv_layers[0])
+    for name in names:
+        layer = mesh.uv_layers.new(name=name)
+        layer.data.foreach_set("uv", saved[name])
 
 
 def use_gpu(scene):
@@ -483,6 +511,7 @@ def signals(tree, cavity_distance, dense, occlusion_distance):
     metal_node = labelled(tree, "SH Metal")
     return {
         "Albedo": albedo,
+        "Solid": labelled(tree, "SH Solid").outputs[0] if labelled(tree, "SH Solid") else value(tree, (-900, -3200), 1.0),
         "Occlusion": occlusion.outputs["Value"],
         "Curvature": curvature.outputs["Color"],
         "Edge": edge_broken.outputs["Value"],
@@ -529,9 +558,11 @@ def pack(name, size, channels, colourspace='Non-Color'):
     return img
 
 
-def bake(name, lows, highs, size, ground, glow=False, cavity_distance=0.05):
+def bake(name, lows, highs, size, ground, glow=False, cavity_distance=0.05, masks=True, alpha=False):
     """Every map the game reads (see the module's notes) for the lows, from the highs when there are any (selected to
-    active), else from the lows' own materials."""
+    active), else from the lows' own materials. masks=False skips Height and BlendMask (no parallax, no moss). alpha=True
+    puts the coverage (what was baked at all: leaf shapes on a sprite sheet) into the albedo's alpha, unpadded so cut-out
+    edges stay where the leaf ends. ORM, Height and BlendMask are saved at half size: they change slowly."""
     scene = bpy.context.scene
     use_gpu(scene)
     scene.cycles.samples = 16
@@ -558,7 +589,7 @@ def bake(name, lows, highs, size, ground, glow=False, cavity_distance=0.05):
     occlusion_distance = max(0.15, cavity_distance * 5)
     signal_sockets = {tree: signals(tree, cavity_distance, bool(highs), occlusion_distance) for tree in source_trees}
 
-    def run(kind, bake_type, colourspace='Non-Color', pass_filter=None, signal=None, with_ground=False):
+    def run(kind, bake_type, colourspace='Non-Color', pass_filter=None, signal=None, with_ground=False, margin=16):
         img = bpy.data.images.new(f"{name}_{kind}", size, size, alpha=False)
         img.colorspace_settings.name = colourspace
         for target in targets:
@@ -568,7 +599,7 @@ def bake(name, lows, highs, size, ground, glow=False, cavity_distance=0.05):
         pairs = list(zip(lows, highs)) if highs else [(low, None) for low in lows]
         for index, (low, high) in enumerate(pairs):
             select_only([high, low] if high else [low], active=low)
-            kwargs = dict(type=bake_type, use_clear=index == 0, margin=16)
+            kwargs = dict(type=bake_type, use_clear=index == 0, margin=margin)
             if pass_filter:
                 kwargs["pass_filter"] = pass_filter
             if bake_type == 'NORMAL':
@@ -583,22 +614,25 @@ def bake(name, lows, highs, size, ground, glow=False, cavity_distance=0.05):
 
     # The base colour itself (a diffuse-colour bake would leave metals black).
     albedo = run("Albedo", 'EMIT', 'sRGB', signal="Albedo")
+    if alpha:
+        coverage = pixels(run("Coverage", 'EMIT', signal="Solid", margin=0))[:, 0]
+        colour = pixels(albedo)
+        albedo = pack(f"{name}_Albedo", size, (colour[:, 0], colour[:, 1], colour[:, 2], coverage), 'sRGB')
     normal = run("Normal", 'NORMAL')
     ao = pixels(run("AO", 'EMIT', signal="Occlusion"))[:, 0]
     rough = pixels(run("Rough", 'ROUGHNESS'))[:, 0]
-    height = pixels(run("HeightRaw", 'EMIT', signal="Height"))[:, 0]
     metal = pixels(run("Metal", 'EMIT', signal="Metal"))[:, 0] if any(labelled(t, "SH Metal") for t in source_trees) else None
-    mask = [pixels(run(kind, 'EMIT', signal=kind))[:, 0] for kind in ("Curvature", "Edge", "Cavity", "Coverage")]
-    out = {
-        "Albedo": albedo,
-        "Normal": normal,
-        "ORM": pack(f"{name}_ORM", size, (ao, rough, metal)),
-        "Height": pack(f"{name}_Height", size, (height, height, height)),
-        "BlendMask": pack(f"{name}_BlendMask", size, mask),
-    }
+    out = {"Albedo": albedo, "Normal": normal, "ORM": pack(f"{name}_ORM", size, (ao, rough, metal))}
+    if masks:
+        height = pixels(run("HeightRaw", 'EMIT', signal="Height"))[:, 0]
+        mask = [pixels(run(kind, 'EMIT', signal=kind))[:, 0] for kind in ("Curvature", "Edge", "Cavity", "Coverage")]
+        out["Height"] = pack(f"{name}_Height", size, (height, height, height))
+        out["BlendMask"] = pack(f"{name}_BlendMask", size, mask)
     if glow:
         out["Emission"] = run("Emission", 'EMIT', 'sRGB', signal="Glow")
     for kind, img in out.items():
+        if kind in ("ORM", "Height", "BlendMask"):
+            img.scale(size // 2, size // 2)
         img.filepath_raw = os.path.join(folder, f"{name}_{kind}.png")
         img.file_format = 'PNG'
         img.save()
@@ -616,6 +650,8 @@ def baked_material(name, images):
     albedo.image = images["Albedo"]
     links.new(uv.outputs["UV"], albedo.inputs["Vector"])
     links.new(albedo.outputs["Color"], bsdf.inputs["Base Color"])
+    if images["Albedo"].alpha_mode != 'NONE' and images["Albedo"].channels == 4:
+        links.new(albedo.outputs["Alpha"], bsdf.inputs["Alpha"])  # leaf cards cut out where the leaf ends
     orm = node(tree, "ShaderNodeTexImage", (-400, 0))
     orm.image = images["ORM"]
     links.new(uv.outputs["UV"], orm.inputs["Vector"])
@@ -639,16 +675,78 @@ def baked_material(name, images):
 
 
 def finish(objects, material):
-    """Only the baked material and the atlas UVs (first, as Unity's UV0) go to the game."""
+    """Only the baked material and the UVs the game reads go to it: the atlas first (Unity's UV0), then the wind
+    channels Tree Wind reads, when the asset has them (uv1 = sway, flex; uv2 = phase, flutter)."""
     for obj in objects:
         obj.data.materials.clear()
         obj.data.materials.append(material)
-        layers = obj.data.uv_layers
-        for layer in [l for l in layers if l.name != "atlas"]:
-            layers.remove(layer)
-        layers["atlas"].name = "UVMap"
-        for attribute in [a.name for a in obj.data.attributes if a.name.startswith("sh_")]:
+        windy = "wind" in obj.data.uv_layers
+        uv_order(obj, ["atlas", "wind", "phase"] if windy else ["atlas"])
+        obj.data.uv_layers["atlas"].name = "UVMap"
+        for attribute in [a.name for a in obj.data.attributes if a.name.startswith("sh_") and a.name != "sh_card"]:
             obj.data.attributes.remove(obj.data.attributes[attribute])
+
+
+def lod(obj, level, ratio, mode, rng):
+    """A copy of obj for a level of detail: decimated (solid shapes), or thinned (foliage: whole leaf cards, the faces
+    marked sh_card, dropped at random, the rest kept as they are so the silhouette stays; solid parts decimated)."""
+    copy = obj.copy()
+    copy.data = obj.data.copy()
+    copy.name = f"{obj.name} LOD{level}"
+    copy.data.name = copy.name
+    for coll in obj.users_collection:
+        coll.objects.link(copy)
+    if mode == 'thin' and "sh_card" in copy.data.attributes:
+        bm = bmesh.new()
+        bm.from_mesh(copy.data)
+        card = bm.faces.layers.int.get("sh_card")
+        bm.faces.ensure_lookup_table()
+        seen, doomed = set(), []
+        for face in bm.faces:
+            if face.index in seen or not face[card]:
+                continue
+            island, stack = [], [face]
+            while stack:
+                f = stack.pop()
+                if f.index in seen:
+                    continue
+                seen.add(f.index)
+                island.append(f)
+                stack.extend(g for e in f.edges for g in e.link_faces if g[card] and g.index not in seen)
+            if rng.random() > ratio:
+                doomed.extend(island)
+        bmesh.ops.delete(bm, geom=doomed, context='FACES')
+        bm.to_mesh(copy.data)
+        bm.free()
+    else:
+        decimate = copy.modifiers.new("Decimate", 'DECIMATE')
+        decimate.ratio = ratio
+        select_only([copy])
+        bpy.ops.object.modifier_apply(modifier=decimate.name)
+    return copy
+
+
+def hull(obj, name, faces=96):
+    """A convex hull of obj, decimated to about faces: a node's collider (never a box round a round rock)."""
+    bm = bmesh.new()
+    bm.from_mesh(obj.data)
+    bmesh.ops.convex_hull(bm, input=bm.verts, use_existing_faces=False)
+    loose = [v for v in bm.verts if not v.link_faces]
+    bmesh.ops.delete(bm, geom=loose, context='VERTS')
+    mesh = bpy.data.meshes.new(name)
+    bm.to_mesh(mesh)
+    bm.free()
+    collider = bpy.data.objects.new(name, mesh)
+    for coll in obj.users_collection:
+        coll.objects.link(collider)
+    if len(mesh.polygons) > faces:
+        decimate = collider.modifiers.new("Decimate", 'DECIMATE')
+        decimate.ratio = faces / len(mesh.polygons)
+        select_only([collider])
+        bpy.ops.object.modifier_apply(modifier=decimate.name)
+    while mesh.uv_layers:
+        mesh.uv_layers.remove(mesh.uv_layers[0])
+    return collider
 
 
 def export(objects, name):
@@ -660,28 +758,66 @@ def export(objects, name):
     return path
 
 
-def make_asset(name, builder, size, coll, glow=False, cavity_distance=0.05):
-    """Build an asset's variants, bake them into one atlas, export them. builder(coll) returns the variants (lows), or
-    (lows, highs) to bake sculpted highs onto them."""
+def make_asset(name, builder, size, coll, glow=False, cavity_distance=0.05, masks=True, lods=(0.5, 0.22),
+               lod_mode='decimate', collider=False, alpha=False, solid_region=(0.0, 0.0, 1.0, 1.0)):
+    """Build an asset's variants, bake them into one atlas and export them, each with its levels of detail
+    ("<variant> LOD1", "LOD2", at the ratios in lods) and, with collider, a convex "<variant> Collider".
+
+    builder(coll) returns the variants (lows), or (lows, highs) to bake sculpted highs onto them, or a dict with
+    "lows", "highs", "cards" (one card object per variant, already UV'd onto the sprite sheet, joined to its variant
+    after the bake) and "sheet" (the flat sprite sheet baked with the lows, then dropped). solid_region is where the
+    lows' own islands go, so the sheet can have the rest."""
     built = builder(coll)
-    lows, highs = built if isinstance(built, tuple) else (built, [])
-    atlas_uvs(lows, margin=0.006 if highs else 0.003)
+    if isinstance(built, dict):
+        lows, highs = built["lows"], built.get("highs", [])
+        cards, sheet = built.get("cards", []), built.get("sheet")
+    else:
+        lows, highs = built if isinstance(built, tuple) else (built, [])
+        cards, sheet = [], None
+    atlas_uvs(lows, margin=0.006 if highs else 0.003, region=solid_region)
     ground = ground_for_ao(coll)
     # The variants share the origin: spread them out for the bake so they don't shade each other.
     for i, low in enumerate(lows):
         low.location.x = i * 5.0
         if highs:
             highs[i].location.x = i * 5.0
-    images = bake(name, lows, highs, size, ground, glow=glow, cavity_distance=cavity_distance)
+    if sheet is not None:
+        sheet.location = (-20.0, 0.0, 30.0)  # flat, high and far from everything, so nothing shades it
+    images = bake(name, lows + ([sheet] if sheet else []), highs, size, ground, glow=glow,
+                  cavity_distance=cavity_distance, masks=masks, alpha=alpha)
     for low in lows:
         low.location.x = 0.0
     bpy.data.objects.remove(ground)
     for high in highs:
         bpy.data.objects.remove(high)
+    if sheet is not None:
+        bpy.data.objects.remove(sheet)
+    variants = []
+    for i, low in enumerate(lows):
+        if i < len(cards) and cards[i] is not None:
+            kept = low.name
+            low = join([low, cards[i]], kept)
+        variants.append(low)
     material = baked_material(name, images)
-    finish(lows, material)
-    export(lows, name)
-    return lows
+    finish(variants, material)
+    exported = []
+    rng = random.Random(7)
+    for variant in variants:
+        exported.append(variant)
+        levels = [lod(variant, k + 1, ratio, lod_mode, rng) for k, ratio in enumerate(lods)]
+        exported.extend(levels)
+        if collider:
+            exported.append(hull(levels[-1] if levels else variant, f"{variant.name} Collider"))
+        for level in levels:
+            level.hide_render = True
+    for obj in exported:
+        if "sh_card" in obj.data.attributes:
+            obj.data.attributes.remove(obj.data.attributes["sh_card"])
+    export(exported, name)
+    for obj in exported:
+        if obj.name.endswith("Collider"):
+            obj.hide_render = True
+    return variants
 
 
 # ----- Preview ------------------------------------------------------------------------------------------------------
