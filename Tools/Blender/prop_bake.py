@@ -392,6 +392,9 @@ REGION_DIRECTIONS = [Vector(d).normalized() for d in
                      + [d for d in itertools.product((1, 0, -1), repeat=3) if sum(abs(x) for x in d) == 2]]
 
 
+SMART_FALLBACK = []  # looks whose region unwrap ran away and took smart project (more vertices): recorded by the ingest
+
+
 def region_seams(obj, smooth=6):
     """Seams between a few large regions of faces that look the same way (26 directions, a majority filter so borders
     don't zigzag, small pieces merged into the neighbour they touch most). Smart project on a noisy generated mesh cuts
@@ -465,24 +468,76 @@ def atlas_uvs(objects, margin=0.004, region=(0.0, 0.0, 1.0, 1.0), unwrap='smart'
         # reads (the atlas, UV0), not the grain map the procedural textures follow.
         layers["atlas"].active_render = True
     if unwrap == 'regions':
+        # Each look unwrapped on its own: with several objects in edit mode at once the minimum-stretch solver collapsed
+        # them all (Copper Ore A and B together), though each unwraps fine alone.
+        # The solver can also run away on one region of a noisy generated mesh (a sliver with a huge extent and no area):
+        # packed with the rest it shrinks every look to nothing, and every bake came out black (Copper Ore A at 5,000
+        # triangles). A trial pack of the look alone shows it; that look takes smart project, which always works.
         for obj in objects:
             region_seams(obj)
+            select_only([obj])
+            bpy.ops.object.mode_set(mode='EDIT')
+            bpy.ops.mesh.select_all(action='SELECT')
+            bpy.ops.uv.unwrap(method='MINIMUM_STRETCH', margin=margin)
+            bpy.ops.uv.select_all(action='SELECT')
+            bpy.ops.uv.average_islands_scale()
+            bpy.ops.uv.pack_islands(rotate=True, rotate_method='ANY', scale=True, margin_method='SCALED', margin=margin,
+                                    shape_method='CONCAVE')
+            bpy.ops.object.mode_set(mode='OBJECT')
+            if uv_area(obj) < 0.05:
+                print("ATLAS region unwrap ran away on", obj.name, "- smart project for it")
+                SMART_FALLBACK.append(obj.name)
+                bpy.ops.object.mode_set(mode='EDIT')
+                bpy.ops.mesh.select_all(action='SELECT')
+                bpy.ops.mesh.mark_seam(clear=True)
+                bpy.ops.uv.smart_project(angle_limit=math.radians(66), island_margin=margin, scale_to_bounds=False)
+                bpy.ops.object.mode_set(mode='OBJECT')
     select_only(objects)
     bpy.ops.object.mode_set(mode='EDIT')
     bpy.ops.mesh.select_all(action='SELECT')
-    if unwrap == 'regions':
-        bpy.ops.uv.unwrap(method='MINIMUM_STRETCH', margin=margin)
-    else:
+    if unwrap != 'regions':
         bpy.ops.uv.smart_project(angle_limit=math.radians(66), island_margin=margin, scale_to_bounds=False)
+    bpy.ops.uv.select_all(action='SELECT')
     bpy.ops.uv.average_islands_scale()
     bpy.ops.uv.pack_islands(rotate=True, rotate_method='ANY', scale=True, margin_method='SCALED', margin=margin,
                             shape_method='CONCAVE')
     bpy.ops.object.mode_set(mode='OBJECT')
+    collapsed = [obj for obj in objects if unwrap == 'regions' and uv_area(obj) < 0.01]
+    if collapsed:
+        # The minimum-stretch solver can collapse a region to nothing on a noisy generated mesh (Copper Ore A at 5,000
+        # triangles: 98.5% of its faces at zero UV area, so every bake came out black). Those looks take smart project
+        # (it always works, at more vertices); the others keep their regions; all are packed together again.
+        print("ATLAS region unwrap collapsed on", [o.name for o in collapsed], "- smart project for those")
+        select_only(collapsed)
+        bpy.ops.object.mode_set(mode='EDIT')
+        bpy.ops.mesh.select_all(action='SELECT')
+        bpy.ops.mesh.mark_seam(clear=True)
+        bpy.ops.uv.smart_project(angle_limit=math.radians(66), island_margin=margin, scale_to_bounds=False)
+        bpy.ops.object.mode_set(mode='OBJECT')
+        select_only(objects)
+        bpy.ops.object.mode_set(mode='EDIT')
+        bpy.ops.mesh.select_all(action='SELECT')
+        bpy.ops.uv.select_all(action='SELECT')
+        bpy.ops.uv.average_islands_scale()
+        bpy.ops.uv.pack_islands(rotate=True, rotate_method='ANY', scale=True, margin_method='SCALED', margin=margin,
+                                shape_method='CONCAVE')
+        bpy.ops.object.mode_set(mode='OBJECT')
     u0, v0, u1, v1 = region
     if tuple(region) != (0.0, 0.0, 1.0, 1.0):
         for obj in objects:
             for loop in obj.data.uv_layers["atlas"].data:
                 loop.uv = (u0 + loop.uv.x * (u1 - u0), v0 + loop.uv.y * (v1 - v0))
+
+
+def uv_area(obj, layer="atlas"):
+    """The share of the UV square obj's faces cover in layer."""
+    data = obj.data.uv_layers[layer].data
+    total = 0.0
+    for poly in obj.data.polygons:
+        pts = [data[i].uv for i in poly.loop_indices]
+        total += abs(0.5 * sum(pts[i].x * pts[(i + 1) % len(pts)].y - pts[(i + 1) % len(pts)].x * pts[i].y
+                               for i in range(len(pts))))
+    return total
 
 
 def uv_order(obj, names):
@@ -672,7 +727,21 @@ def bake(name, lows, highs, size, ground, glow=False, cavity_distance=0.05, mask
         ground.hide_render = not with_ground
         pairs = list(zip(lows, highs)) if highs else [(low, None) for low in lows]
         for index, (low, high) in enumerate(pairs):
+            # Only this pair renders while it bakes: another look's mesh in the scene could stop every ray (two generated
+            # copper ores baked entirely black together, each fine alone).
+            others = [o for pair in pairs for o in pair if o is not None and o is not low and o is not high]
+            hidden = [(o, o.hide_render) for o in others]
+            for o, _ in hidden:
+                o.hide_render = True
             select_only([high, low] if high else [low], active=low)
+            if os.environ.get("SH_BAKE_DEBUG") and kind == "Albedo":
+                for o in (low, high):
+                    if o is None:
+                        continue
+                    corners = [o.matrix_world @ Vector(c) for c in o.bound_box]
+                    lo = [round(min(c[k] for c in corners), 2) for k in range(3)]
+                    hi = [round(max(c[k] for c in corners), 2) for k in range(3)]
+                    print("BAKEPOS", o.name, "world", lo, hi, "hidden", o.hide_render, "selected", o.select_get(), "polys", len(o.data.polygons))
             kwargs = dict(type=bake_type, use_clear=index == 0, margin=margin)
             if pass_filter:
                 kwargs["pass_filter"] = pass_filter
@@ -681,6 +750,12 @@ def bake(name, lows, highs, size, ground, glow=False, cavity_distance=0.05, mask
             if high is not None:
                 kwargs.update(use_selected_to_active=True, cage_extrusion=0.03, max_ray_distance=0.08)
             bpy.ops.object.bake(**kwargs)
+            for o, was in hidden:
+                o.hide_render = was
+            if os.environ.get("SH_BAKE_DEBUG"):
+                px = numpy.empty(size * size * 4, dtype=numpy.float32)
+                img.pixels.foreach_get(px)
+                print("BAKEDBG", kind, index, low.name, high.name if high else "-", "lit %.2f" % (px.reshape(-1, 4)[:, :3].max(axis=1) > 0.02).mean())
         for restore in restores:
             restore()
         ground.hide_render = True

@@ -1,0 +1,21 @@
+{
+ "note": "LOD0 triangles per look, by ingest_generated.py: the top-down view's budget, raised where a decimation would break the shape (shape_limited)",
+ "looks": {
+  "Wild Turnips A": {
+   "source": 9001,
+   "view": 300,
+   "triangles": 1341,
+   "shape_limited": true,
+   "check": "(deviation 1.1%, silhouette 0.964)",
+   "unwrap": "smart"
+  },
+  "Wild Turnips B": {
+   "source": 9917,
+   "view": 300,
+   "triangles": 994,
+   "shape_limited": true,
+   "check": "(deviation 1.0%, silhouette 0.968)",
+   "unwrap": "smart"
+  }
+ }
+}

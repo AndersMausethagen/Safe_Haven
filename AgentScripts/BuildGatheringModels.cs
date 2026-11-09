@@ -46,7 +46,8 @@ public static class BuildGatheringModels
         public float Moss;               // live moss amount (0: none)
         public Color Glow = Color.black; // HDR multiplier for the emission map (black: none)
         public bool Hull;                // collide with the convex hull (solid things you walk round), else a fitted box
-        public float[] LodHeights = { 0.25f, 0.1f, 0.02f }; // screen height where LOD0, 1, 2 end (culled below the last)
+        public float[] LodHeights;      // screen height where LOD0, 1, 2 end; null: from ScreenBudget (the game's own view)
+        public bool KeepVariants;       // the definition's model variants stay (GreyStone's scanned rocks); extra looks are added
 
         public string Looked(int index) => $"{Name} {(char)('A' + index)}";
     }
@@ -57,13 +58,19 @@ public static class BuildGatheringModels
         // 0.5 m pile was ~3,500 px/m, the Haven's scans are 700-1500).
         new Asset { Name = "Small Rocks", TextureSize = 1024, Kind = Kind.Stone, ModelPrefab = "Assets/_Project/Art/Bootstrap/SmallRocks.prefab",
             Definition = Defs + "SmallRocks.asset", Node = Nodes + "SmallRocksNode.prefab", Item = "Assets/_Project/Prefabs/Items/SmallRocks.prefab",
-            NodeScale = 1.35f, Parallax = 0.01f, Moss = 0.5f, LodHeights = new[] { 0.12f, 0.05f, 0.012f } },
+            NodeScale = 1.35f, Parallax = 0.01f, Moss = 0.5f },
         new Asset { Name = "Sticks", TextureSize = 1024, Kind = Kind.Solid, ModelPrefab = "Assets/_Project/Art/Bootstrap/Sticks.prefab",
             Definition = Defs + "Sticks.asset", Node = Nodes + "SticksNode.prefab", Item = "Assets/_Project/Prefabs/Items/Sticks.prefab",
-            NodeScale = 1.35f, Parallax = 0.006f, Moss = 0.25f, LodHeights = new[] { 0.12f, 0.05f, 0.012f } },
+            NodeScale = 1.35f, Parallax = 0.006f, Moss = 0.25f },
 
         // Stone and ore: 2-3 m boulders, seen from far, convex hulls.
         Boulder("Granite", "GraniteModel", "Granite", "GraniteNode", moss: 0.5f),
+        // GreyStone: the older generated rock (it had 90k vertices and 128 MB of uncompressed textures), now through the
+        // same pipeline; its node gets a model prefab nested as "Model" like the others, and keeps the scanned rocks
+        // (Field Stone, Grey Boulder, Lichen Boulder) as its other looks.
+        new Asset { Name = "Grey Stone", Looks = 1, Kind = Kind.Stone, ModelPrefab = NodeModels + "GreyStoneModel.prefab",
+            Definition = Defs + "GreyStone.asset", Node = Nodes + "GreyStoneNode.prefab", Parallax = 0.01f, Moss = 0.4f,
+            Hull = true, KeepVariants = true },
         // Ore glows faintly where it is, so it can be found in the dark (copper warm, iron steel, moonsilver white); faint
         // enough that by day the ore shows its own colour and metal (stronger read as orange fungus and white iron).
         Boulder("Copper Ore", "CopperOreModel", "CopperOre", "CopperOreNode", moss: 0.3f, glow: 0.3f),
@@ -71,20 +78,18 @@ public static class BuildGatheringModels
         Boulder("Moonsilver Ore", "MoonsilverOreModel", "MoonsilverOre", "MoonsilverOreNode", moss: 0.15f, glow: 0.6f),
         Boulder("Deepstone", "DeepstoneModel", "Deepstone", "DeepstoneNode", moss: 0f, glow: 4f),
         new Asset { Name = "Rootbound Stone", Looks = 1, Kind = Kind.Stone, ModelPrefab = NodeModels + "RootboundStoneModel.prefab",
-            Node = Nodes + "RootboundStone.prefab", Parallax = 0.01f, Moss = 0.4f, Glow = Grey(2.2f), Hull = true,
-            LodHeights = new[] { 0.3f, 0.12f, 0.01f } },
+            Node = Nodes + "RootboundStone.prefab", Parallax = 0.01f, Moss = 0.4f, Glow = Grey(2.2f), Hull = true },
 
         // The Life Orbs' old places.
         Shrine("Life Orb", "LifeOrbModel", "LifeOrb", "LifeOrbNode", glow: 1.6f),
-        Shrine("Life Mote", "LifeMoteModel", "LifeMote", "LifeMoteNode", glow: 1.4f, textureSize: 1024),
+        Shrine("Life Mote", "LifeMoteModel", "LifeMote", "LifeMoteNode", glow: 1.4f),
         Shrine("Radiant Life Orb", "RadiantLifeOrbModel", "RadiantLifeOrb", "RadiantLifeOrbNode", glow: 1.9f),
 
         // Solid plants (LocalSpawn): Layered Lit, no moss.
         new Asset { Name = "Chanterelles", TextureSize = 1024, Kind = Kind.Solid, ModelPrefab = HavenModels + "Chanterelle Patch.prefab",
-            Definition = Defs + "Chanterelles.asset", Node = Nodes + "ChanterellesNode.prefab", Parallax = 0.004f,
-            LodHeights = new[] { 0.12f, 0.05f, 0.012f } },
+            Definition = Defs + "Chanterelles.asset", Node = Nodes + "ChanterellesNode.prefab", Parallax = 0.004f },
         new Asset { Name = "Wild Turnips", TextureSize = 1024, Kind = Kind.Solid, ModelPrefab = HavenModels + "Wild Turnip Clump.prefab",
-            Definition = Defs + "WildTurnips.asset", Node = Nodes + "WildTurnipsNode.prefab", LodHeights = new[] { 0.12f, 0.05f, 0.012f } },
+            Definition = Defs + "WildTurnips.asset", Node = Nodes + "WildTurnipsNode.prefab" },
 
         // Leaf-card plants (plant_nodes.py): Tree Wind.
         Plant("Berry Bush", NodeModels + "BerryBushModel", "Berries", "BerriesNode"),
@@ -103,23 +108,21 @@ public static class BuildGatheringModels
         {
             Name = name, Kind = Kind.Stone, ModelPrefab = NodeModels + model + ".prefab", Definition = Defs + definition + ".asset",
             Node = Nodes + node + ".prefab", Parallax = 0.01f, Moss = moss, Glow = Grey(glow), Hull = true,
-            LodHeights = new[] { 0.3f, 0.12f, 0.01f },
         };
 
-    private static Asset Shrine(string name, string model, string definition, string node, float glow, int textureSize = 2048) =>
+    private static Asset Shrine(string name, string model, string definition, string node, float glow, int textureSize = 1024) =>
         new Asset
         {
             TextureSize = textureSize,
             Name = name, Looks = 1, Kind = Kind.Stone, ModelPrefab = NodeModels + model + ".prefab", Definition = Defs + definition + ".asset",
             Node = Nodes + node + ".prefab", Parallax = 0.008f, Moss = 0.45f, Glow = Grey(glow), Hull = true,
-            LodHeights = new[] { 0.2f, 0.08f, 0.015f },
         };
 
     private static Asset Plant(string name, string model, string definition, string node) =>
         new Asset
         {
             Name = name, Kind = Kind.Foliage, ModelPrefab = model + ".prefab", Definition = Defs + definition + ".asset",
-            Node = Nodes + node + ".prefab", TextureSize = 1024, LodHeights = new[] { 0.15f, 0.06f, 0.015f },
+            Node = Nodes + node + ".prefab", TextureSize = 1024,
         };
 
     public static string Apply()
@@ -142,7 +145,9 @@ public static class BuildGatheringModels
             for (int i = 0; i < asset.Looks; i++)
             {
                 string look = asset.Looked(i);
-                Mesh[] levels = { MeshIn(fbx, look), MeshIn(fbx, look + " LOD1"), MeshIn(fbx, look + " LOD2") };
+                Mesh[] levels = asset.Kind == Kind.Foliage
+                    ? new[] { MeshIn(fbx, look), MeshIn(fbx, look + " LOD1"), MeshIn(fbx, look + " LOD2") }
+                    : SolidLevels(folder, fbx, look);
                 if (levels[0] == null)
                 {
                     return $"{asset.Name}: no mesh '{look}' in {fbx}";
@@ -152,6 +157,7 @@ public static class BuildGatheringModels
             }
 
             Mesh hull = asset.Hull ? MeshIn(fbx, asset.Looked(0) + " Collider") : null;
+            AdoptModel(asset);
             ReplaceModel(asset, looks[0], material, hull);
             var variants = new List<GameObject>();
             for (int i = 1; i < looks.Count; i++)
@@ -160,7 +166,7 @@ public static class BuildGatheringModels
             }
 
             RemoveStaleVariants(asset, folder);
-            if (asset.Definition != null)
+            if (asset.Definition != null && !asset.KeepVariants)
             {
                 SetVariants(asset.Definition, variants);
             }
@@ -335,10 +341,109 @@ public static class BuildGatheringModels
 
     private static T Load<T>(string path) where T : Object => AssetDatabase.LoadAssetAtPath<T>(path);
 
+    /// <summary>A solid look's levels: Blender's (decimated within the UV islands, so the texture stays put), or, where
+    /// Blender couldn't reduce LOD1 to half of LOD0 or LOD2 to a quarter (aiming at ~35% and ~10%), Unity's mesh LOD generator
+    /// (ModelSimplifier.Lighter), saved beside the model. Unity's generator simplifies across UV seams, which a rock's
+    /// texture hides but a mushroom patch's doesn't (its caps turned grey), so it is the fallback.</summary>
+    private static Mesh[] SolidLevels(string folder, string fbx, string look)
+    {
+        Mesh lod0 = MeshIn(fbx, look);
+        if (lod0 == null)
+        {
+            return new Mesh[] { null };
+        }
+
+        int triangles = (int)lod0.GetIndexCount(0) / 3;
+        // LOD0 is the import's own mesh: decimated as far as its shape allows (measured there), never further here.
+        Mesh[] blender = { lod0, MeshIn(fbx, look + " LOD1"), MeshIn(fbx, look + " LOD2") };
+        if (blender[1] != null && blender[2] != null &&
+            blender[1].GetIndexCount(0) / 3 <= triangles * 0.5f && blender[2].GetIndexCount(0) / 3 <= triangles * 0.25f)
+        {
+            return blender;
+        }
+
+        return new[] { lod0 }.Concat(SaveLevels(folder, lod0, new[] { (0.35f, " LOD1"), (0.1f, " LOD2") })).ToArray();
+    }
+
+    /// <summary>Levels made by Unity's mesh LOD generator from <paramref name="source"/> at these shares of its
+    /// triangles, saved in the asset's LODs folder (reused, so references keep their GUIDs).</summary>
+    private static Mesh[] SaveLevels(string folder, Mesh source, (float share, string suffix)[] wanted)
+    {
+        string lodFolder = folder + "LODs";
+        if (!AssetDatabase.IsValidFolder(lodFolder))
+        {
+            AssetDatabase.CreateFolder(folder.TrimEnd('/'), "LODs");
+        }
+
+        var levels = new List<Mesh>();
+        foreach ((float share, string suffix) in wanted)
+        {
+            Mesh lighter = ModelSimplifier.Lighter(source, share);
+            lighter.name = source.name + suffix;
+            string path = $"{lodFolder}/{lighter.name}.asset";
+            var existing = Load<Mesh>(path);
+            if (existing != null)
+            {
+                EditorUtility.CopySerialized(lighter, existing);
+                Object.DestroyImmediate(lighter);
+                EditorUtility.SetDirty(existing);
+                levels.Add(existing);
+            }
+            else
+            {
+                AssetDatabase.CreateAsset(lighter, path);
+                levels.Add(lighter);
+            }
+        }
+
+        AssetDatabase.SaveAssets();
+        return levels.ToArray();
+    }
+
     private static Mesh MeshIn(string model, string name) =>
         AssetDatabase.LoadAllAssetsAtPath(model).OfType<Mesh>().FirstOrDefault(mesh => mesh.name == name);
 
     // ----- Prefabs -----
+
+    /// <summary>A node whose model is a raw child (GreyStone's GLB with a sphere collider) gets a model prefab nested as
+    /// "Model", like every other node, so the look, its hull and its variants are built the same way. Nodes that have
+    /// one already are left alone.</summary>
+    private static void AdoptModel(Asset asset)
+    {
+        if (Load<GameObject>(asset.ModelPrefab) == null)
+        {
+            var empty = new GameObject(System.IO.Path.GetFileNameWithoutExtension(asset.ModelPrefab));
+            PrefabUtility.SaveAsPrefabAsset(empty, asset.ModelPrefab);
+            Object.DestroyImmediate(empty);
+        }
+
+        GameObject root = PrefabUtility.LoadPrefabContents(asset.Node);
+        try
+        {
+            if (root.transform.Find("Model") != null)
+            {
+                return;
+            }
+
+            for (int i = root.transform.childCount - 1; i >= 0; i--)
+            {
+                GameObject child = root.transform.GetChild(i).gameObject;
+                if (child.GetComponentInChildren<Renderer>(true) != null && child.GetComponentInChildren<ParticleSystem>(true) == null)
+                {
+                    Object.DestroyImmediate(child);
+                }
+            }
+
+            var model = (GameObject)PrefabUtility.InstantiatePrefab(Load<GameObject>(asset.ModelPrefab), root.transform);
+            model.name = "Model";
+            model.transform.localPosition = Vector3.zero;
+            PrefabUtility.SaveAsPrefabAsset(root, asset.Node);
+        }
+        finally
+        {
+            PrefabUtility.UnloadPrefabContents(root);
+        }
+    }
 
     /// <summary>The stand-in prefab keeps its root (and its GUID, so every node and item still nests it); its primitive
     /// children give way to the new look (lights and particle effects stay). Solid things collide with the hull,
@@ -407,6 +512,9 @@ public static class BuildGatheringModels
         }
 
         var lods = new LOD[levels.Length];
+        Bounds seen = levels[0].bounds;
+        seen.size *= asset.NodeScale;
+        float[] heights = asset.LodHeights ?? ScreenBudget.LodHeights(seen, levels.Select(m => (int)m.GetIndexCount(0) / 3).ToArray(), asset.Kind == Kind.Foliage);
         for (int i = 0; i < levels.Length; i++)
         {
             var part = new GameObject($"LOD{i}");
@@ -416,10 +524,10 @@ public static class BuildGatheringModels
             renderer.sharedMaterial = material;
             bool shadow = asset.Kind == Kind.Foliage ? i == 0 : i < levels.Length - 1 || levels.Length == 1;
             renderer.shadowCastingMode = shadow ? UnityEngine.Rendering.ShadowCastingMode.On : UnityEngine.Rendering.ShadowCastingMode.Off;
-            float height = asset.LodHeights[Mathf.Min(i, asset.LodHeights.Length - 1)];
+            float height = heights[Mathf.Min(i, heights.Length - 1)];
             if (i == levels.Length - 1)
             {
-                height = asset.LodHeights[asset.LodHeights.Length - 1];
+                height = heights[heights.Length - 1];
             }
 
             lods[i] = new LOD(height, new Renderer[] { renderer });

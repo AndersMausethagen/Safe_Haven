@@ -1,0 +1,12 @@
+{
+ "note": "LOD0 triangles per look, by ingest_generated.py: the top-down view's budget, raised where a decimation would break the shape (shape_limited)",
+ "looks": {
+  "Life Mote A": {
+   "source": 8653,
+   "view": 300,
+   "triangles": 1810,
+   "shape_limited": true,
+   "check": "(deviation 1.2%, silhouette 0.975)"
+  }
+ }
+}

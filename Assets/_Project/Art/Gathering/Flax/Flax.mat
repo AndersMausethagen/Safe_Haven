@@ -67,7 +67,7 @@ Material:
     - _Roughness: 1
     - _Smoothness: 0.2
     - _Translucency: 0.5
-    - _TreeHeight: 0.6957692
+    - _TreeHeight: 0.6949892
     - _WindStrength: 1
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}

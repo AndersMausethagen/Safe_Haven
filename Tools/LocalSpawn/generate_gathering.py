@@ -47,8 +47,8 @@ def looks(manifest, wanted):
 def images(manifest, wanted):
     for asset, look, folder in looks(manifest, wanted):
         concept = os.path.join(folder, "concept.png")
-        if os.path.exists(concept):
-            continue
+        if os.path.exists(concept) or not look["prompt"].strip():
+            continue  # made already, or an adopted model with no concept (ingest only)
         prompt = f"{look['prompt']} {manifest['common']}"
         ok = run([PYTHON, "generate_image.py", "--style", "3D source (flat lit)", "--width", "1024", "--height", "1024",
                   "--seed", str(look["seed"]), "--out-dir", folder, "--name", "concept", prompt], cwd=AGENT,

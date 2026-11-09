@@ -338,7 +338,29 @@ def save_emission(out, w, h, folder):
     no_moss_where_glowing(out, w, h, folder)
 
 
-LOD0_TRIANGLES = manifest_value("lod0_triangles") or 5000
+LOD0_TRIANGLES = manifest_value("lod0_triangles") or 5000  # the most a look may have (close views)
+
+# The game's top-down view (Assets/_Project/Scripts/Editor/Environment/ScreenBudget.cs, measured in Play): 147 pixels a
+# metre at 2160p at the default zoom, 48 degree pitch; a target of 40 pixels per visible triangle (10 at 1080p, the 2x2
+# quad GPUs shade); the projected box is ~60% covered. LOD0 is what the top-down view draws (no lower level inside it),
+# so LOD0 is sized for that view: big enough to read, never denser than the screen can show.
+PIXELS_PER_METRE, PITCH, PIXELS_PER_TRIANGLE, FILL = 147.0, math.radians(48.0), 40.0, 0.6
+# The least a look starts its search from; shape_keeping_triangles then raises it until the shape holds (a fixed
+# 150-350 shredded small rocks and mushroom caps).
+SILHOUETTE_FLOOR = 300
+
+
+def view_triangles(obj):
+    """LOD0 triangles for obj from its size in the top-down view, between the silhouette floor and the manifest cap.
+    The size is read from the vertices: obj.dimensions can be stale after the mesh is transformed (Copper Ore A came out
+    at 3,284 triangles alone and 5,000 beside another look)."""
+    co = numpy.empty(len(obj.data.vertices) * 3, dtype=numpy.float32)
+    obj.data.vertices.foreach_get("co", co)
+    co = co.reshape(-1, 3) * numpy.array(obj.scale, dtype=numpy.float32)
+    x, y, z = (co.max(axis=0) - co.min(axis=0)).tolist()
+    across, deep = max(x, y), min(x, y)
+    area = FILL * PIXELS_PER_METRE ** 2 * across * (z * math.cos(PITCH) + deep * math.sin(PITCH))
+    return int(max(SILHOUETTE_FLOOR, min(LOD0_TRIANGLES, area / (PIXELS_PER_TRIANGLE * 0.5))))
 
 
 def budget(high):
@@ -354,16 +376,135 @@ def budget(high):
         c.objects.link(low)
     bm = bmesh.new()
     bm.from_mesh(low.data)
-    bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=1e-4)
+    bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=1e-4)  # the glTF's seam splits only: a wider weld collapsed
+    # thin mushroom caps into a broken, black-baked mesh (2026-11-09)
     bmesh.ops.triangulate(bm, faces=bm.faces)
     bm.to_mesh(low.data)
     bm.free()
-    if len(low.data.polygons) > LOD0_TRIANGLES:
-        decimate = low.modifiers.new("Decimate", 'DECIMATE')
-        decimate.ratio = LOD0_TRIANGLES / len(low.data.polygons)
-        select_only([low])
-        bpy.ops.object.modifier_apply(modifier=decimate.name)
+    wanted = view_triangles(low)
+    target, report = shape_keeping_triangles(low, wanted)
+    print("BUDGET", low.name, len(low.data.polygons), "->", target, report)
+    BUDGETS[name] = {"source": len(low.data.polygons), "view": wanted, "triangles": target,
+                     "shape_limited": target > wanted * 1.05, "check": report}
+    if len(low.data.polygons) > target:
+        decimate_to(low, target)
     return low
+
+
+# How far a decimation may go: 95% of the original surface within 2% of the model's size of the decimated one, and the
+# silhouette from the game's 48-degree camera at least 95% the same. Measured in a fraction of a second, no bake: a
+# fixed budget shredded some generated meshes (mushroom patch at 1,341: 11% off, silhouette 0.73; small rocks at 948:
+# 24% off) and wasted triangles on others.
+SHAPE_DEVIATION, SHAPE_SILHOUETTE = 0.02, 0.95
+BUDGETS = {}  # look -> its budget and why, written beside the textures (<Asset>_Budget.json) for ModelBudgetTests
+
+
+def save_budgets():
+    import prop_bake
+    for look, entry in BUDGETS.items():
+        entry["unwrap"] = "smart" if look in prop_bake.SMART_FALLBACK else "regions"
+    with open(os.path.join(ART, NAME, f"{NAME}_Budget.json"), "w", encoding="utf-8") as f:
+        json.dump({"note": "LOD0 triangles per look, by ingest_generated.py: the top-down view's budget, raised where a "
+                           "decimation would break the shape (shape_limited)", "looks": BUDGETS}, f, indent=1)
+
+
+def decimate_to(obj, target):
+    decimate = obj.modifiers.new("Decimate", 'DECIMATE')
+    decimate.ratio = min(1.0, target / max(1, len(obj.data.polygons)))
+    select_only([obj])
+    bpy.ops.object.modifier_apply(modifier=decimate.name)
+
+
+def _tree(obj):
+    from mathutils.bvhtree import BVHTree
+    bm = bmesh.new()
+    bm.from_mesh(obj.data)
+    tree = BVHTree.FromBMesh(bm)
+    bm.free()
+    return tree
+
+
+def _surface_points(obj, n=2500):
+    obj.data.calc_loop_triangles()
+    tris = obj.data.loop_triangles
+    verts = obj.data.vertices
+    areas = numpy.array([t.area for t in tris], dtype=numpy.float64)
+    rng = numpy.random.default_rng(7)
+    picks = rng.choice(len(tris), n, p=areas / areas.sum())
+    points = []
+    for i in picks:
+        a, b, c = (verts[k].co for k in tris[i].vertices)
+        r1, r2 = rng.random(), rng.random()
+        if r1 + r2 > 1:
+            r1, r2 = 1 - r1, 1 - r2
+        points.append(a + (b - a) * r1 + (c - a) * r2)
+    return points
+
+
+def _silhouette(tree, lo, hi, res=80):
+    """Which of res x res rays from the game's 48-degree camera hit the mesh."""
+    pitch = math.radians(48.0)
+    look = Vector((0.0, math.cos(pitch), -math.sin(pitch)))
+    right = Vector((1.0, 0.0, 0.0))
+    up = look.cross(right).normalized()
+    centre = (lo + hi) * 0.5
+    span = max(hi - lo) * 1.3
+    mask = numpy.zeros((res, res), dtype=bool)
+    for i in range(res):
+        for j in range(res):
+            start = centre + right * ((i / res - 0.5) * span) + up * ((j / res - 0.5) * span) - look * span * 3
+            mask[i, j] = tree.ray_cast(start, look, span * 10)[0] is not None
+    return mask
+
+
+def shape_keeping_triangles(obj, wanted):
+    """The fewest triangles, from wanted up, at which a collapse decimation keeps obj's shape (SHAPE_DEVIATION,
+    SHAPE_SILHOUETTE), capped by the manifest's lod0_triangles; tried on copies, obj is left as it is."""
+    source = len(obj.data.polygons)
+    cap = min(source, LOD0_TRIANGLES)
+    co = numpy.empty(len(obj.data.vertices) * 3, dtype=numpy.float32)
+    obj.data.vertices.foreach_get("co", co)
+    co = co.reshape(-1, 3)
+    lo, hi = Vector(co.min(axis=0).tolist()), Vector(co.max(axis=0).tolist())
+    size = max(hi - lo)
+    tree = _tree(obj)
+    points = _surface_points(obj)
+    mask = _silhouette(tree, lo, hi)
+    target = max(300, min(wanted, cap))
+    while True:
+        if target >= source:
+            return source, "(kept whole)"
+        trial = obj.copy()
+        trial.data = obj.data.copy()
+        for c in obj.users_collection:
+            c.objects.link(trial)
+        decimate_to(trial, target)
+        trial_tree = _tree(trial)
+        gaps = sorted((p - trial_tree.find_nearest(p)[0]).length for p in points)
+        deviation = gaps[int(len(gaps) * 0.95)] / size
+        trial_mask = _silhouette(trial_tree, lo, hi)
+        overlap = (trial_mask & mask).sum() / max(1, (trial_mask | mask).sum())
+        reached = len(trial.data.polygons)
+        mesh = trial.data
+        bpy.data.objects.remove(trial)
+        bpy.data.meshes.remove(mesh)
+        if deviation <= SHAPE_DEVIATION and overlap >= SHAPE_SILHOUETTE and reached <= target * 1.15:
+            return target, f"(deviation {100 * deviation:.1f}%, silhouette {overlap:.3f})"
+        if target >= cap:
+            return cap, f"(cap; deviation {100 * deviation:.1f}%, silhouette {overlap:.3f})"
+        target = min(cap, int(target * 1.35))
+
+
+def albedo_is_black():
+    path = os.path.join(ART, NAME, f"{NAME}_Albedo.png")
+    if not os.path.exists(path):
+        return False
+    img = bpy.data.images.load(path, check_existing=False)
+    px = numpy.empty(img.size[0] * img.size[1] * 4, dtype=numpy.float32)
+    img.pixels.foreach_get(px)
+    lit = (px.reshape(-1, 4)[:, :3].max(axis=1) > 0.02).mean()
+    bpy.data.images.remove(img)
+    return lit < 0.02
 
 
 def no_moss_where_glowing(out, w, h, folder):
@@ -389,12 +530,30 @@ def no_moss_where_glowing(out, w, h, folder):
 def main():
     bpy.ops.wm.read_factory_settings(use_empty=True)
     coll = collection(NAME)
+    if os.environ.get("SH_BUDGET_ONLY"):
+        for k, path in enumerate(GLBS):
+            budget(import_look(path, chr(65 + k), TURNS[k] if k < len(TURNS) else 0.0, coll))
+        return
 
-    def builder(c):
+    def builder(c, from_high=True):
         highs = [import_look(path, chr(65 + k), TURNS[k] if k < len(TURNS) else 0.0, c) for k, path in enumerate(GLBS)]
-        return [budget(high) for high in highs], highs
+        lows = [budget(high) for high in highs]
+        if from_high:
+            return lows, highs
+        for high in highs:
+            bpy.data.objects.remove(high)
+        return lows
 
-    looks = make_asset(NAME, builder, 2048, coll, cavity_distance=0.15, collider=True, lods=(0.5, 0.2), unwrap='regions')
+    looks = make_asset(NAME, builder, 2048, coll, cavity_distance=0.15, collider=True, lods=(0.35, 0.1), unwrap='regions')
+    if albedo_is_black():
+        # Thin double-sided shells (the mushroom patch's caps) send the high-to-low rays nowhere: every colour bake came
+        # out black. The decimated copy keeps the generated texture coordinates, so it bakes from its own material.
+        print("BAKE from the full mesh came out black: baking from the decimated mesh's own material")
+        bpy.ops.wm.read_factory_settings(use_empty=True)
+        coll = collection(NAME)
+        looks = make_asset(NAME, lambda c: builder(c, from_high=False), 2048, coll, cavity_distance=0.15, collider=True,
+                           lods=(0.35, 0.1), unwrap='regions')
+    save_budgets()
     if GLOW:
         emission_from_albedo(GLOW)
     stage([(looks, WIDTH * 1.4)], row_spacing=WIDTH)

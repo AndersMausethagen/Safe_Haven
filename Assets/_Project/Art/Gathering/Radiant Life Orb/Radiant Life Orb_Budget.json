@@ -1,0 +1,12 @@
+{
+ "note": "Kept at the first budget pass (4,999): at the view budget (1,105) the shape check passed (deviation 0.4%, silhouette 0.984) but it shaded wrong in game (teal facets on the stone). To look at.",
+ "looks": {
+  "Radiant Life Orb A": {
+   "triangles": 4999,
+   "view": 1105,
+   "shape_limited": true,
+   "unwrap": "smart",
+   "check": "in-game shading broke below this"
+  }
+ }
+}

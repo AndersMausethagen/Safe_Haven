@@ -56,8 +56,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.9437995, y: 0.32329038, z: 0.7314616}
-  m_Center: {x: -0.00036805868, y: 0.16079472, z: -0.00013116002}
+  m_Size: {x: 0.9504534, y: 0.31877458, z: 0.7369647}
+  m_Center: {x: 0.0036996603, y: 0.15997727, z: -0.0014012158}
 --- !u!114 &2111271593981369704
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -70,7 +70,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aecdc764a0346784e9958a956dddd948, type: 3}
   m_Name: 
   m_EditorClassIdentifier: SafeHaven::SaveableEntity
-  id: bf958c26fb104cbbb0d7a2614ea5f55b
+  id: 91bc7d556dad4c2d8c04cd940b31ad12
   prefabId: e8f5ac7427646e942aaf261bf18f6768
   saveTransform: 1
   saveActiveState: 1

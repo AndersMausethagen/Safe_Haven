@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -9,7 +10,8 @@ using UnityEngine;
 /// baked into "Simplified/&lt;prefab&gt;_&lt;mesh&gt;.asset" beside the prefab, which the prefab's MeshFilters (and
 /// MeshColliders using the same mesh) then use. It is one lighter mesh, not an LOD chain.
 /// <para>
-/// The copy keeps the source's vertices (wind weights, UVs, normals) and only drops triangles, so materials and shaders
+/// The copy keeps the source's vertex attributes (wind weights, UVs, normals) and drops triangles and the vertices no
+/// triangle uses any more (it once kept them all, so every level still drew the source's whole vertex buffer), so materials and shaders
 /// are unaffected. The source model is never changed; level 0 (Restore) puts the source mesh back. Re-baking keeps the
 /// copy's asset, so scene references stay. A "_Wind" prefab variant keeps the override when its GLB reimports.
 /// </para>
@@ -77,7 +79,229 @@ public sealed class ModelSimplifier : EditorWindow
         }
 
         result.bounds = source.bounds;
-        return result;
+        return Compact(result);
+    }
+
+    /// <summary>Drops the vertices no triangle uses any more, keeping every attribute of the rest (wind weights, UVs,
+    /// colours). Dropping only triangles left each level the source's whole vertex buffer: the Lichen Boulder drew 56k
+    /// vertices at every level, GreyStone's rock 90k for 7.6k triangles. Skinned and blend-shape meshes are left as
+    /// they are.</summary>
+    public static Mesh Compact(Mesh mesh)
+    {
+        if (mesh.blendShapeCount > 0 || mesh.HasVertexAttribute(UnityEngine.Rendering.VertexAttribute.BlendIndices)) return mesh;
+        int count = mesh.vertexCount;
+        // Read through MeshData: a copy of an imported mesh that isn't Read/Write gives empty arrays from mesh.vertices
+        // and GetIndices (the Lichen Boulder's levels came out empty that way), but its MeshData is readable here.
+        var subIndices = new List<int[]>();
+        var topologies = new MeshTopology[mesh.subMeshCount];
+        Vector3[] positions, normals;
+        Vector4[] tangents;
+        Color[] colours;
+        var uvs = new List<Vector4[]>();
+        var uvDimensions = new int[8];
+        using (Mesh.MeshDataArray array = Mesh.AcquireReadOnlyMeshData(mesh))
+        {
+            Mesh.MeshData data = array[0];
+            for (int s = 0; s < mesh.subMeshCount; s++)
+            {
+                var descriptor = data.GetSubMesh(s);
+                topologies[s] = descriptor.topology;
+                using (var indices = new Unity.Collections.NativeArray<int>(descriptor.indexCount, Unity.Collections.Allocator.Temp))
+                {
+                    data.GetIndices(indices, s, true);
+                    subIndices.Add(indices.ToArray());
+                }
+            }
+
+            T[] Read<T>(System.Action<Unity.Collections.NativeArray<T>> get) where T : struct
+            {
+                using (var values = new Unity.Collections.NativeArray<T>(count, Unity.Collections.Allocator.Temp))
+                {
+                    get(values);
+                    return values.ToArray();
+                }
+            }
+
+            positions = Read<Vector3>(data.GetVertices);
+            normals = data.HasVertexAttribute(UnityEngine.Rendering.VertexAttribute.Normal) ? Read<Vector3>(data.GetNormals) : null;
+            tangents = data.HasVertexAttribute(UnityEngine.Rendering.VertexAttribute.Tangent) ? Read<Vector4>(data.GetTangents) : null;
+            colours = data.HasVertexAttribute(UnityEngine.Rendering.VertexAttribute.Color) ? Read<Color>(data.GetColors) : null;
+            for (int channel = 0; channel < 8; channel++)
+            {
+                var attribute = (UnityEngine.Rendering.VertexAttribute)((int)UnityEngine.Rendering.VertexAttribute.TexCoord0 + channel);
+                if (!data.HasVertexAttribute(attribute))
+                {
+                    uvs.Add(null);
+                    continue;
+                }
+
+                uvDimensions[channel] = data.GetVertexAttributeDimension(attribute);
+                int c = channel;
+                uvs.Add(Read<Vector4>(values => data.GetUVs(c, values)));
+            }
+        }
+
+        int indexTotal = subIndices.Sum(i => i.Length);
+        if (indexTotal == 0 || positions.Length != count) return mesh; // nothing read: never write an empty mesh
+
+        var remap = new int[count];
+        for (int i = 0; i < count; i++) remap[i] = -1;
+        var used = new List<int>();
+        foreach (int[] indices in subIndices)
+        {
+            for (int i = 0; i < indices.Length; i++)
+            {
+                int v = indices[i];
+                if (remap[v] < 0)
+                {
+                    remap[v] = used.Count;
+                    used.Add(v);
+                }
+
+                indices[i] = remap[v];
+            }
+        }
+
+        if (used.Count == count) return mesh;
+
+        T[] Pick<T>(T[] all) => all == null || all.Length != count ? null : used.Select(v => all[v]).ToArray();
+        Bounds bounds = mesh.bounds;
+        string name = mesh.name;
+        mesh.Clear();
+        mesh.name = name;
+        mesh.indexFormat = used.Count > 65535 ? UnityEngine.Rendering.IndexFormat.UInt32 : UnityEngine.Rendering.IndexFormat.UInt16;
+        mesh.vertices = Pick(positions);
+        if (Pick(normals) is Vector3[] n) mesh.normals = n;
+        if (Pick(tangents) is Vector4[] t) mesh.tangents = t;
+        if (Pick(colours) is Color[] c2) mesh.colors = c2;
+        for (int channel = 0; channel < 8; channel++)
+        {
+            if (uvDimensions[channel] == 0) continue;
+            Vector4[] all = uvs[channel];
+            switch (uvDimensions[channel])
+            {
+                case 2: mesh.SetUVs(channel, used.Select(v => (Vector2)all[v]).ToList()); break;
+                case 3: mesh.SetUVs(channel, used.Select(v => (Vector3)all[v]).ToList()); break;
+                default: mesh.SetUVs(channel, used.Select(v => all[v]).ToList()); break;
+            }
+        }
+
+        mesh.subMeshCount = subIndices.Count;
+        for (int s = 0; s < subIndices.Count; s++) mesh.SetIndices(subIndices[s], topologies[s], s, false);
+        mesh.bounds = bounds;
+        return mesh;
+    }
+
+    /// <summary>Bakes every simplified copy in the project again from its source at the level it was made at (found by
+    /// its triangle count), in place, so references keep its GUID. Used once to compact the copies made before
+    /// <see cref="Compact"/>; harmless to run again.</summary>
+    public static string RebakeAll(IReadOnlyDictionary<string, int> knownLevels = null)
+    {
+        var report = new List<string>();
+        foreach (string guid in AssetDatabase.FindAssets("t:Mesh", new[] { "Assets" }))
+        {
+            string path = AssetDatabase.GUIDToAssetPath(guid);
+            if (!path.Contains("/" + FolderName + "/")) continue;
+            var copy = AssetDatabase.LoadAssetAtPath<Mesh>(path);
+            Mesh source = copy != null ? SourceOf(copy) : null;
+            if (source == null || source == copy) { report.Add($"{path}: no source"); continue; }
+            using var readable = new ReadableSource(source);
+            source = readable.Mesh;
+            Mesh levels = GenerateLevels(source);
+            try
+            {
+                int level = -1;
+                MeshLodRange[] ranges = levels.GetLods(0);
+                for (int i = 0; i < ranges.Length; i++)
+                    if (ranges[i].indexCount == copy.GetIndexCount(0)) { level = i; break; }
+                if (level <= 0 && knownLevels != null && knownLevels.TryGetValue(Path.GetFileNameWithoutExtension(path), out int known)) level = known;
+                if (level <= 0) { report.Add($"{path}: level not found ({copy.GetIndexCount(0) / 3} triangles)"); continue; }
+                int before = copy.vertexCount;
+                Mesh baked = Bake(source, levels, level);
+                if (baked.GetIndexCount(0) == 0) { DestroyImmediate(baked); report.Add($"{path}: baked empty, left as it was"); continue; }
+                EditorUtility.CopySerialized(baked, copy);
+                DestroyImmediate(baked);
+                MarkNotReadable(copy);
+                EditorUtility.SetDirty(copy);
+                report.Add($"{Path.GetFileNameWithoutExtension(path)}: level {level}, {copy.GetIndexCount(0) / 3} triangles, vertices {before} -> {copy.vertexCount}");
+            }
+            finally
+            {
+                DestroyImmediate(levels);
+            }
+        }
+
+        AssetDatabase.SaveAssets();
+        return string.Join("\n", report);
+    }
+
+    /// <summary>While open, the source's model imports Read/Write, so a copy of it carries its data: a copy of a mesh
+    /// that isn't readable has nothing on the CPU, and saving it wrote an empty mesh (the Lichen Boulder's levels).
+    /// Disposing puts the import setting back.</summary>
+    private sealed class ReadableSource : System.IDisposable
+    {
+        private readonly ModelImporter importer;
+        public Mesh Mesh { get; }
+
+        public ReadableSource(Mesh source)
+        {
+            Mesh = source;
+            importer = AssetImporter.GetAtPath(AssetDatabase.GetAssetPath(source)) as ModelImporter;
+            if (source.isReadable || importer == null || importer.isReadable)
+            {
+                importer = null;
+                return;
+            }
+
+            GlobalObjectId id = GlobalObjectId.GetGlobalObjectIdSlow(source);
+            importer.isReadable = true;
+            importer.SaveAndReimport();
+            Mesh = GlobalObjectId.GlobalObjectIdentifierToObjectSlow(id) as Mesh ?? source;
+        }
+
+        public void Dispose()
+        {
+            if (importer == null) return;
+            importer.isReadable = false;
+            importer.SaveAndReimport();
+        }
+    }
+
+    // Saved copies keep no CPU copy in the game (twice the memory otherwise).
+    private static void MarkNotReadable(Mesh asset)
+    {
+        var serialized = new SerializedObject(asset);
+        SerializedProperty readable = serialized.FindProperty("m_IsReadable");
+        if (readable != null && readable.boolValue)
+        {
+            readable.boolValue = false;
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+        }
+    }
+
+    /// <summary>A lighter copy of <paramref name="source"/> with about <paramref name="share"/> of its triangles (the
+    /// generated level nearest it), vertices compacted: an LOD level for a model. Unity's generator reduces meshes
+    /// Blender's collapse can't (generated meshes full of tiny holes: the mushroom patch's LOD2 kept 97% of LOD0).
+    /// A source that isn't Read/Write is made so while it is read.</summary>
+    public static Mesh Lighter(Mesh source, float share)
+    {
+        using var readable = new ReadableSource(source);
+        Mesh levels = GenerateLevels(readable.Mesh);
+        try
+        {
+            MeshLodRange[] ranges = levels.GetLods(0);
+            float want = readable.Mesh.GetIndexCount(0) * share;
+            int best = 0;
+            for (int i = 1; i < ranges.Length; i++)
+                if (Mathf.Abs(ranges[i].indexCount - want) < Mathf.Abs(ranges[best].indexCount - want)) best = i;
+            Mesh baked = Bake(readable.Mesh, levels, best);
+            MarkNotReadable(baked);
+            return baked;
+        }
+        finally
+        {
+            DestroyImmediate(levels);
+        }
     }
 
     /// <summary>A temporary copy of <paramref name="source"/> with Unity's detail levels generated; destroy it after use.</summary>
@@ -205,10 +429,11 @@ public sealed class ModelSimplifier : EditorWindow
                 continue;
             }
 
-            Mesh levels = GenerateLevels(pair.Key);
+            using var readable = new ReadableSource(pair.Key);
+            Mesh levels = GenerateLevels(readable.Mesh);
             try
             {
-                targets[pair.Key] = Save(prefabPath, pair.Key, Bake(pair.Key, levels, pair.Value));
+                targets[pair.Key] = Save(prefabPath, readable.Mesh, Bake(readable.Mesh, levels, pair.Value));
             }
             finally
             {
@@ -259,6 +484,7 @@ public sealed class ModelSimplifier : EditorWindow
             AssetDatabase.CreateAsset(baked, path);
         }
 
+        MarkNotReadable(baked);
         AssetDatabase.SaveAssets();
         AssetImporter importer = AssetImporter.GetAtPath(path);
         string sourceId = GlobalObjectId.GetGlobalObjectIdSlow(source).ToString();

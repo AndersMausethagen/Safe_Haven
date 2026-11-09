@@ -103,7 +103,8 @@
     {
      "key": "A",
      "seed": 4301,
-     "prompt": "A single moonsilver ore deposit for a Nordic fantasy game: a dark grey boulder with clusters of tall pale silver-white crystal spikes, long and hexagonal, growing out of its top and front, glowing faintly with cold moonlight blue, thin bright silver veins in the rock around them. The pale spikes clearly stand out from the dark rock."
+     "prompt": "A single moonsilver ore deposit for a Nordic fantasy game: a dark grey boulder with clusters of tall pale silver-white crystal spikes, long and hexagonal, growing out of its top and front, glowing faintly with cold moonlight blue, thin bright silver veins in the rock around them. The pale spikes clearly stand out from the dark rock.",
+     "metal_above": 0.45
     },
     {
      "key": "B",
@@ -257,8 +258,7 @@
      "seed": 4801,
      "prompt": "A small cairn of three stacked flat mossy stones for a Nordic fairy-tale game, two thin roots curling up from the top stone holding a small pale-green glowing wisp of light."
     }
-   ],
-   "lod0_triangles": 2500
+   ]
   },
   {
    "asset": "Radiant Life Orb",
@@ -302,8 +302,7 @@
      "prompt": "A small cluster of four grey fist-to-loaf sized field stones, one larger flat stone and three smaller ones beside it, weathered, a little lichen."
     }
    ],
-   "max_height": 0.35,
-   "lod0_triangles": 2000
+   "max_height": 0.35
   },
   {
    "asset": "Sticks",
@@ -326,8 +325,7 @@
      0.7,
      0.92
     ]
-   },
-   "lod0_triangles": 2000
+   }
   },
   {
    "asset": "Chanterelles",
@@ -344,8 +342,7 @@
      "prompt": "A small group of five golden-yellow chanterelle mushrooms of different sizes with wavy funnel caps, on a little mound of forest moss."
     }
    ],
-   "max_height": 0.3,
-   "lod0_triangles": 2500
+   "max_height": 0.3
   },
   {
    "asset": "Wild Turnips",
@@ -362,8 +359,25 @@
      "prompt": "A single wild turnip plant: one big round white and purple turnip root showing at the ground, crowned by a bushy rosette of broad, ruffled green leaves."
     }
    ],
-   "max_height": 0.45,
-   "lod0_triangles": 2500
+   "max_height": 0.45
+  },
+  {
+   "asset": "Grey Stone",
+   "width": 1.97,
+   "note": "Adopted from the older generated rock (Models/Generated/a_worn_grey_minable_00005_x4_00002_paint): no concept; ingest only.",
+   "roughness": {
+    "rock": [
+     0.7,
+     0.92
+    ]
+   },
+   "looks": [
+    {
+     "key": "A",
+     "seed": 0,
+     "prompt": ""
+    }
+   ]
   }
  ],
  "sprite_common": "Botanical texture sprite for a game, seen flat from straight above, the stalk at the bottom centre pointing up, evenly lit with no shadow, crisp edges, the whole thing visible and centred, isolated on a pure white background.",

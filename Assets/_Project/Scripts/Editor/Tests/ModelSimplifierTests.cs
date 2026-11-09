@@ -1,3 +1,4 @@
+using System.Linq;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -33,7 +34,7 @@ public sealed class ModelSimplifierTests
     }
 
     [Test]
-    public void Bake_KeepsVerticesAndDropsTriangles()
+    public void Bake_DropsTrianglesAndTheVerticesTheyLeaveUnused()
     {
         Mesh source = Sheet(60);
         Mesh levels = ModelSimplifier.GenerateLevels(source);
@@ -43,10 +44,17 @@ public sealed class ModelSimplifierTests
             Assert.That(levels.lodCount, Is.GreaterThan(2));
             Assert.That(baked.GetIndexCount(0), Is.EqualTo(levels.GetLods(0)[2].indexCount));
             Assert.That(baked.GetIndexCount(0), Is.LessThan(source.GetIndexCount(0)));
-            Assert.That(baked.vertexCount, Is.EqualTo(source.vertexCount));
+            Assert.That(baked.vertexCount, Is.LessThan(source.vertexCount), "vertices no triangle uses are dropped");
             Assert.That(baked.HasVertexAttribute(VertexAttribute.TexCoord2), "wind weights are kept");
+            Assert.That(baked.indexFormat, Is.EqualTo(IndexFormat.UInt16), "small enough for 16-bit indices");
             Assert.That(baked.lodCount, Is.EqualTo(1), "one lighter mesh, not an LOD chain");
-            foreach (int index in baked.triangles) Assert.That(index, Is.InRange(0, source.vertexCount - 1));
+            int[] triangles = baked.triangles;
+            foreach (int index in triangles) Assert.That(index, Is.InRange(0, baked.vertexCount - 1));
+            // Every kept vertex is used, and each triangle is still where it was (positions and wind carried along).
+            Assert.That(triangles.Distinct().Count(), Is.EqualTo(baked.vertexCount));
+            var wind = new System.Collections.Generic.List<Vector2>();
+            baked.GetUVs(2, wind);
+            Assert.That(wind.Count, Is.EqualTo(baked.vertexCount));
         }
         finally
         {

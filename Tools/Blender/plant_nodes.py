@@ -32,6 +32,7 @@ import sys
 
 import bmesh
 import bpy
+import numpy
 from mathutils import Matrix, Vector, noise
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -43,7 +44,10 @@ WANTED = set(args[2:]) or {"bush", "herb", "flax", "silk", "nettle", "cloudberry
 
 UP = Vector((0, 0, 1))
 SPRITES = os.path.join(ROOT, "Tools", "LocalSpawn", "Gathering", "Sprites")
-IMAGE_CELLS = set()  # sheet cells showing a generated sprite: their cards are square, like the images
+# Sheet cells showing a generated sprite -> the part of the sprite that isn't transparent (x0, y0, x1, y1 in 0-1 of the
+# sprite). Cards show only that part: alpha-tested pixels still cost shading, and the square sprites are only 24% leaf
+# (40% of their opaque bounding box), so a card cropped to the box draws 42% fewer wasted pixels.
+IMAGE_CELLS = {}
 
 
 # ----- Materials ----------------------------------------------------------------------------------------------------
@@ -272,8 +276,16 @@ class Kit:
         direction = direction.normalized()
         side = direction.cross(up).normalized()
         normal = side.cross(direction).normalized()
-        if tuple(rect) in IMAGE_CELLS:
-            width = length  # the sprite is square, its leaf in the middle
+        crop = IMAGE_CELLS.get(tuple(rect))
+        if crop is not None:
+            # The sprite is square with its stalk at the bottom middle: the card covers only its opaque box, at the same
+            # size in the world and with the stalk where it was.
+            x0, y0, x1, y1 = crop
+            base = base + direction * length * y0 + side * length * ((x0 + x1) * 0.5 - 0.5)
+            width = length * (x1 - x0)
+            length = length * (y1 - y0)
+            u0, v0, u1, v1 = rect
+            rect = (u0 + (u1 - u0) * x0, v0 + (v1 - v0) * y0, u0 + (u1 - u0) * x1, v0 + (v1 - v0) * y1)
         rows = []
         for j, t in enumerate((0.0, 0.5, 1.0)):
             centre = base + direction * length * t - normal * bend * length * t * t - UP * droop * length * t * t
@@ -334,6 +346,19 @@ def sprite_material(name, path, fallback):
     links.new(grey.outputs["Val"], bump.inputs["Height"])
     links.new(bump.outputs["Normal"], bsdf.inputs["Normal"])
     return material
+
+
+def opaque_box(img, threshold=0.16, pad=0.015):
+    """The box round a sprite's opaque pixels (alpha over threshold), padded, as (x0, y0, x1, y1) in 0-1, y up."""
+    w, h = img.size
+    px = numpy.empty(w * h * 4, dtype=numpy.float32)
+    img.pixels.foreach_get(px)
+    alpha = px.reshape(h, w, 4)[:, :, 3] > threshold
+    rows, cols = numpy.nonzero(alpha.any(axis=1))[0], numpy.nonzero(alpha.any(axis=0))[0]
+    if len(rows) == 0:
+        return (0.0, 0.0, 1.0, 1.0)
+    return (max(0.0, cols[0] / w - pad), max(0.0, rows[0] / h - pad),
+            min(1.0, (cols[-1] + 1) / w + pad), min(1.0, (rows[-1] + 1) / h + pad))
 
 
 def sprite_set(asset, names, fallback=(0.08, 0.13, 0.03)):
@@ -407,13 +432,14 @@ class Sheet:
             a = 2 * math.pi * k / petals + rng.uniform(-0.15, 0.15)
             self.leaf(rect, centre, a, radius, radius * 0.75, petal_outline or PETAL, material, var)
 
-    def image(self, index, material):
+    def image(self, index, material, sprite=None):
         """Cell index shows a generated sprite: one quad over the cell, its grain UVs the image's."""
         rect = self.rect(index)
         u0, v0, u1, v1 = rect
         vs = [self.kit.bm.verts.new(Vector(p)) for p in ((u0, v0, 0), (u1, v0, 0), (u1, v1, 0), (u0, v1, 0))]
         self.kit.face(vs, [(0, 0), (1, 0), (1, 1), (0, 1)], material, 0.5, facing=UP)
-        IMAGE_CELLS.add(rect)
+        picture = next((n.image for n in sprite.node_tree.nodes if n.type == 'TEX_IMAGE' and n.image), None) if sprite else None
+        IMAGE_CELLS[tuple(rect)] = opaque_box(picture) if picture else (0.0, 0.0, 1.0, 1.0)
 
     def object(self, name, coll, materials):
         obj = mesh_object(name, self.kit.bm, coll, materials)
@@ -511,7 +537,7 @@ def berry_bush(coll):
     if sprites:
         materials = materials + tuple(sprites)
         for cell, _ in enumerate(sprites):
-            sheet.image(cell, len(materials) - len(sprites) + cell)
+            sheet.image(cell, len(materials) - len(sprites) + cell, sprites[cell])
     else:
         rng = random.Random(5)
         for cell in range(4):
@@ -568,11 +594,13 @@ def berry_bush(coll):
         # Strings of berries on the top of the crown, where the camera sees them.
         tops = [p for p, _ in dome if p.z > height * 0.5]
         rng.shuffle(tops)
-        for p in tops[:38]:
+        # Strings of currants on the top of the crown: 26 strings of 3-5 (38 of 4-6 made the berries 3,800 of the bush's
+        # 7,400 triangles, for dots a few pixels wide from the game's camera).
+        for p in tops[:26]:
             hang = Vector((rng.uniform(-0.6, 0.6), rng.uniform(-0.6, 0.6), -0.7)).normalized()
             at = p + (p - centre).normalized() * 0.04
             value = rng.random()
-            for k in range(rng.randint(4, 6)):
+            for k in range(rng.randint(3, 5)):
                 solids.blob(at + hang * (0.015 + k * 0.03), rng.uniform(0.018, 0.022), 3, value, 0.0, flex=0.8,
                             subdivisions=1)
         variants.append(plant(f"Berry Bush {key}", height, solids, cards, sheet, coll, materials))
@@ -591,7 +619,7 @@ def healing_herb(coll):
     if sprites:
         materials = materials + tuple(sprites)
         for cell, _ in enumerate(sprites):
-            sheet.image(cell, len(materials) - len(sprites) + cell)
+            sheet.image(cell, len(materials) - len(sprites) + cell, sprites[cell])
     else:
         rng = random.Random(1)
         for cell in (0, 1):
@@ -640,7 +668,7 @@ def flax(coll):
     if sprites:
         materials = materials + tuple(sprites)
         for cell, _ in enumerate(sprites):
-            sheet.image(cell, len(materials) - len(sprites) + cell)
+            sheet.image(cell, len(materials) - len(sprites) + cell, sprites[cell])
     else:
         rng = random.Random(2)
         for cell in (0, 1):
@@ -688,7 +716,7 @@ def huldra_silk(coll):
     if sprites:
         materials = materials + tuple(sprites)
         for cell, _ in enumerate(sprites):
-            sheet.image(cell, len(materials) - len(sprites) + cell)
+            sheet.image(cell, len(materials) - len(sprites) + cell, sprites[cell])
     else:
         rng = random.Random(3)
         for cell in range(4):
@@ -733,7 +761,7 @@ def nettle(coll):
     if sprites:
         materials = materials + tuple(sprites)
         for cell, _ in enumerate(sprites):
-            sheet.image(cell, len(materials) - len(sprites) + cell)
+            sheet.image(cell, len(materials) - len(sprites) + cell, sprites[cell])
     else:
         rng = random.Random(4)
         for cell in range(4):
@@ -771,7 +799,7 @@ def cloudberries(coll):
     if sprites:
         materials = materials + tuple(sprites)
         for cell, _ in enumerate(sprites):
-            sheet.image(cell, len(materials) - len(sprites) + cell)
+            sheet.image(cell, len(materials) - len(sprites) + cell, sprites[cell])
     else:
         rng = random.Random(6)
         for cell in range(4):
@@ -793,11 +821,9 @@ def cloudberries(coll):
             phase = rng.random()
             solids.stem([base, base.lerp(top, 0.5), top], 0.003, 0.0025, 1, rng.random(), phase, sides=3)
             value = rng.random()
-            for j in range(14):
-                phi = math.acos(1 - 2 * (j + 0.5) / 18)
-                theta = j * 2.39996
-                d = Vector((math.sin(phi) * math.cos(theta), math.sin(phi) * math.sin(theta), math.cos(phi)))
-                solids.blob(top + UP * 0.016 + d * 0.015, 0.0075, 2, value, phase, flex=1.0, subdivisions=0)
+            # One bumpy ball a berry (it was 14 beads, 2,500 of the patch's 3,100 triangles for a berry 2 cm across).
+            solids.blob(top + UP * 0.02, 0.019, 2, value, phase, flex=1.0, squash=(1.0, 1.0, 0.9), subdivisions=2,
+                        lumpy=0.22, seed=rng.random() * 50)
         variants.append(plant(f"Cloudberries {key}", height, solids, cards, sheet, coll, materials))
     return plant_asset(variants, sheet.object("Cloudberries Sheet", coll, materials))
 
@@ -813,7 +839,7 @@ def wild_barley(coll):
     if sprites:
         materials = materials + tuple(sprites)
         for cell, _ in enumerate(sprites):
-            sheet.image(cell, len(materials) - len(sprites) + cell)
+            sheet.image(cell, len(materials) - len(sprites) + cell, sprites[cell])
     else:
         rng = random.Random(7)
         for cell in (0, 1):
@@ -928,9 +954,9 @@ def main():
             continue
         if cards:
             made = make_asset(name, builder, 1024, collection(name), glow=glow, masks=False, alpha=True,
-                              lods=(0.5, 0.25), lod_mode='thin', solid_region=SOLID_REGION)
+                              lods=(0.6, 0.3), lod_mode='thin', solid_region=SOLID_REGION)
         else:
-            made = make_asset(name, builder, 1024, collection(name), cavity_distance=0.04, lods=(0.5, 0.25))
+            made = make_asset(name, builder, 1024, collection(name), cavity_distance=0.04, lods=(0.35, 0.1))
         rows.append((made, 1.6 if name == "Berry Bush" else 1.1))
     depth = stage(rows, row_spacing=1.2)
     camera((0.0, -depth - 2.6, 4.8), (0.0, -depth * 0.5 + 0.3, 0.2), lens=35)

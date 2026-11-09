@@ -1,0 +1,21 @@
+{
+ "note": "LOD0 triangles per look, by ingest_generated.py: the top-down view's budget, raised where a decimation would break the shape (shape_limited)",
+ "looks": {
+  "Chanterelles A": {
+   "source": 7830,
+   "view": 300,
+   "triangles": 3298,
+   "shape_limited": true,
+   "check": "(deviation 1.4%, silhouette 0.953)",
+   "unwrap": "smart"
+  },
+  "Chanterelles B": {
+   "source": 7778,
+   "view": 300,
+   "triangles": 4452,
+   "shape_limited": true,
+   "check": "(deviation 1.2%, silhouette 0.974)",
+   "unwrap": "regions"
+  }
+ }
+}

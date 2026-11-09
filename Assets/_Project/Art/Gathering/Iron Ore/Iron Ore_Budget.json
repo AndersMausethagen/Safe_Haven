@@ -1,0 +1,19 @@
+{
+ "note": "LOD0 triangles per look, by ingest_generated.py: the top-down view's budget, raised where a decimation would break the shape (shape_limited)",
+ "looks": {
+  "Iron Ore A": {
+   "source": 10001,
+   "view": 4656,
+   "triangles": 4656,
+   "shape_limited": false,
+   "check": "(deviation 0.1%, silhouette 1.000)"
+  },
+  "Iron Ore B": {
+   "source": 8726,
+   "view": 829,
+   "triangles": 1510,
+   "shape_limited": true,
+   "check": "(deviation 1.2%, silhouette 0.953)"
+  }
+ }
+}

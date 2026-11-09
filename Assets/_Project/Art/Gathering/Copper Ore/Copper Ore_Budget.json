@@ -1,0 +1,21 @@
+{
+ "note": "LOD0 triangles per look, by ingest_generated.py: the top-down view's budget, raised where a decimation would break the shape (shape_limited)",
+ "looks": {
+  "Copper Ore A": {
+   "source": 8537,
+   "view": 2341,
+   "triangles": 2341,
+   "shape_limited": false,
+   "check": "(deviation 0.6%, silhouette 0.990)",
+   "unwrap": "smart"
+  },
+  "Copper Ore B": {
+   "source": 9811,
+   "view": 3218,
+   "triangles": 3218,
+   "shape_limited": false,
+   "check": "(deviation 0.3%, silhouette 0.996)",
+   "unwrap": "regions"
+  }
+ }
+}

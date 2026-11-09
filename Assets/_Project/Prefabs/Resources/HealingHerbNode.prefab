@@ -56,8 +56,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.4847024, y: 0.5087422, z: 0.56144154}
-  m_Center: {x: -0.00678584, y: 0.23261528, z: -0.0007504225}
+  m_Size: {x: 0.45841235, y: 0.5075007, z: 0.51906544}
+  m_Center: {x: -0.0076546073, y: 0.23199452, z: 0.012522727}
 --- !u!114 &8222769955065994141
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -70,7 +70,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aecdc764a0346784e9958a956dddd948, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SaveableEntity
-  id: ae7bee48915a430cabcedd0c2112b846
+  id: ab0d1f685f354127b05748ece9ff266f
   prefabId: dd1ab12d09fe61049b4f79441821d70a
   saveTransform: 1
   saveActiveState: 1

@@ -71,6 +71,7 @@ MonoBehaviour:
   duration: 4
   range: 1.8
   deactivateOnComplete: 0
+  kind: 0
   started:
     m_PersistentCalls:
       m_Calls: []
@@ -118,6 +119,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: SafeHaven::ResourceNode
   node: {fileID: 11400000, guid: ad31a9c04b185e240a379c5709172689, type: 2}
+  keepOwnModel: 0
 --- !u!114 &2666588335304020468
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -131,7 +133,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: SafeHaven::Overgrowth
   blightRadius: 2.4
-  blightMaterial: {fileID: 2100000, guid: e7acef66f8b82854da2e6295bba71b9c, type: 2}
 --- !u!1001 &1515881100201868981
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -183,6 +184,18 @@ PrefabInstance:
     - target: {fileID: 830622066108468587, guid: 5384e39ea2c999546a9f2a17013df603, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5610616483185015322, guid: 5384e39ea2c999546a9f2a17013df603, type: 3}
+      propertyPath: m_LODs.Array.data[0].screenRelativeHeight
+      value: 0.10998097
+      objectReference: {fileID: 0}
+    - target: {fileID: 5610616483185015322, guid: 5384e39ea2c999546a9f2a17013df603, type: 3}
+      propertyPath: m_LODs.Array.data[1].screenRelativeHeight
+      value: 0.07669726
+      objectReference: {fileID: 0}
+    - target: {fileID: 5610616483185015322, guid: 5384e39ea2c999546a9f2a17013df603, type: 3}
+      propertyPath: m_LODs.Array.data[2].screenRelativeHeight
+      value: 0.043413542
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
