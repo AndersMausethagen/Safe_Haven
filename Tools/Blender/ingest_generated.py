@@ -188,7 +188,18 @@ def import_look(path, key, turn, coll):
                 tree.links.new(crown.outputs["Result"], masked.inputs[1])
                 metal_out = masked.outputs["Value"]
             tag = material.node_tree.nodes.new("NodeReroute")
-            material.node_tree.links.new(metal_out, tag.inputs[0])
+            strength = manifest_value("metal_strength")
+            if strength is not None:
+                # A crystal is mostly glass with a metallic sheen: fully metal, Moonsilver's pale crystals mirrored the
+                # dark ground through the follow-the-player reflection probe and read dark grey in game. The mask
+                # (metal_out) still places the ore's polish, its glow and the darkened rock; only metallic is scaled.
+                scaled = material.node_tree.nodes.new("ShaderNodeMath")
+                scaled.operation = 'MULTIPLY'
+                scaled.inputs[1].default_value = strength
+                material.node_tree.links.new(metal_out, scaled.inputs[0])
+                material.node_tree.links.new(scaled.outputs["Value"], tag.inputs[0])
+            else:
+                material.node_tree.links.new(metal_out, tag.inputs[0])
             tag.label = "SH Metal"
             if DIELECTRIC_DARKEN > 0 and bsdf.inputs["Base Color"].links:
                 tree = material.node_tree
@@ -212,6 +223,22 @@ def import_look(path, key, turn, coll):
                 tree.links.new(bsdf.inputs["Base Color"].links[0].from_socket, darken.inputs["A"])
                 tree.links.new(factor.outputs["Value"], darken.inputs["B"])
                 tree.links.new(darken.outputs["Result"], bsdf.inputs["Base Color"])
+        lift = manifest_value("ore_brighten")
+        if bsdf is not None and lift and metal_out is not None and bsdf.inputs["Base Color"].links:
+            # The ore's colour times lift where the ore is (Moonsilver's "pale" crystals were a mid grey, 0.6).
+            tree = material.node_tree
+            factor = tree.nodes.new("ShaderNodeMath")  # 1 + (lift - 1) * mask
+            factor.operation = 'MULTIPLY_ADD'
+            tree.links.new(metal_out, factor.inputs[0])
+            factor.inputs[1].default_value = lift - 1.0
+            factor.inputs[2].default_value = 1.0
+            brighten = tree.nodes.new("ShaderNodeMix")
+            brighten.data_type = 'RGBA'
+            brighten.blend_type = 'MULTIPLY'
+            brighten.inputs["Factor"].default_value = 1.0
+            tree.links.new(bsdf.inputs["Base Color"].links[0].from_socket, brighten.inputs["A"])
+            tree.links.new(factor.outputs["Value"], brighten.inputs["B"])
+            tree.links.new(brighten.outputs["Result"], bsdf.inputs["Base Color"])
         if bsdf is not None and ROUGHNESS:
             set_roughness(material.node_tree, bsdf, metal_out)
     for poly in obj.data.polygons:

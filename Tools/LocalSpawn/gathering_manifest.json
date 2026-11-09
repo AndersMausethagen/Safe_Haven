@@ -122,7 +122,9 @@
      0.18,
      0.32
     ]
-   }
+   },
+   "metal_strength": 0.3,
+   "ore_brighten": 2.2
   },
   {
    "asset": "Deepstone",
