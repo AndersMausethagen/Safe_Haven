@@ -86,7 +86,7 @@ public sealed class HomeStoryTests
     [Test]
     public void TheChestAndTheWeapon_CanBeMadeWithWhatCameBefore()
     {
-        BuildingDefinition chest = Quest("SafeKeeping").Objectives.Single().Building;
+        BuildingDefinition chest = Quest("SafeKeeping").Objectives.Single(o => o.Type == ObjectiveType.BuildStructure).Building;
         Assert.AreEqual("SmallChest", chest.name);
         Assert.IsTrue(chest.KnownFromStart);
         Assert.IsTrue(chest.Requires.All(r => r.building.name == "ConstructionTable" && r.tier <= 1), "the workshop of A Light in the Wood is enough");

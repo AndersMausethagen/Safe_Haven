@@ -140,6 +140,7 @@ public sealed class RaidDirector : MonoBehaviour
         }
 
         PlayerGathering.Swung += OnSwung;
+        GameEvents.Raised += OnGameEvent;
         // Thresholds the raid starts below (a short test raid) would all fire at once, so they are skipped.
         foreach (float time in warningTimes)
         {
@@ -188,6 +189,7 @@ public sealed class RaidDirector : MonoBehaviour
     {
         SceneTransition.CancelWhenReady(BeginRaid);
         PlayerGathering.Swung -= OnSwung;
+        GameEvents.Raised -= OnGameEvent;
         if (playerHealth != null)
         {
             playerHealth.Died -= OnPlayerDied;
@@ -269,6 +271,15 @@ public sealed class RaidDirector : MonoBehaviour
         }
     }
 
+    // What this player's bag couldn't take: the summary shows it, with what would have carried it (HavenAnswers).
+    private void OnGameEvent(GameEvent gameEvent)
+    {
+        if (gameEvent.Kind == GameEventKind.LeftBehind && gameEvent.ByPlayer)
+        {
+            Session.RecordLeftBehind(gameEvent.Subject, gameEvent.Amount);
+        }
+    }
+
     private void OnPlayerDied(Damageable victim, DamageInfo killingBlow)
     {
         if (Session.End(RaidOutcome.Died))
@@ -288,8 +299,14 @@ public sealed class RaidDirector : MonoBehaviour
         PlayerSnapshot final = player != null ? PlayerSnapshot.Capture(player) : Session.Loadout;
         bool extracted = Session.Outcome == RaidOutcome.Extracted;
         // A failed raid keeps knowledge, the safe pocket and the deployed equipment, worn down (GDD §8.3).
+        // An extraction reports what wore on the way (glancing blows chip the axe), so worn gear is seen before it breaks.
         var wear = new List<EquipmentWear>();
         PlayerSnapshot keeps = extracted ? final : final?.AfterFailedRaid(Session.Loadout, DurabilitySettings.Current.LossOnFailedRaid, wear);
+        if (extracted && final != null)
+        {
+            wear.AddRange(final.WornSince(Session.Loadout));
+        }
+
         Report = RaidReport.Create(Session, Session.Loadout, keeps, final, wear);
         if (PlayerTransport.Current != null)
         {
@@ -313,6 +330,9 @@ public sealed class RaidDirector : MonoBehaviour
         // Started before listeners run, so a faulty one can't leave the player stranded in the raid.
         StartCoroutine(ReturnAfterDelay());
         Ended?.Invoke(Session);
+        // After Ended: someone rescued has come home and taught what they know, so their workplace answers nothing now.
+        HavenAnswers.Fill(Report, player != null ? player.GetComponent<PlayerCrafting>() : null,
+            Resources.Load<ContentDatabase>(ContentDatabase.ResourceName), GameSession.Settlement);
     }
 
     // The raid is decided; the player only watches the outcome until the scene changes.

@@ -125,6 +125,36 @@ public sealed class RaidSession
         bonusSeconds = Mathf.Max(bonusSeconds + seconds, Elapsed + MinimumSecondsLeft - Parameters.Duration);
     }
 
+    /// <summary>What didn't fit in the bag (or the essence bars) and stayed out there, for the summary.</summary>
+    public IReadOnlyList<ItemAmount> ItemsLeftBehind => itemsLeftBehind;
+    public IReadOnlyList<ResourceAmount> ResourcesLeftBehind => resourcesLeftBehind;
+    private readonly List<ItemAmount> itemsLeftBehind = new List<ItemAmount>();
+    private readonly List<ResourceAmount> resourcesLeftBehind = new List<ResourceAmount>();
+
+    /// <summary>Notes loot that didn't fit (an ItemDefinition or a ResourceDefinition), adding to what was left of it before.</summary>
+    public void RecordLeftBehind(UnityEngine.Object what, int amount)
+    {
+        if (IsOver || amount <= 0)
+        {
+            return;
+        }
+
+        if (what is ItemDefinition item)
+        {
+            int at = itemsLeftBehind.FindIndex(entry => entry.Item == item);
+            int had = at >= 0 ? itemsLeftBehind[at].Amount : 0;
+            if (at >= 0) itemsLeftBehind[at] = new ItemAmount(item, had + amount);
+            else itemsLeftBehind.Add(new ItemAmount(item, amount));
+        }
+        else if (what is ResourceDefinition resource)
+        {
+            int at = resourcesLeftBehind.FindIndex(entry => entry.Resource == resource);
+            int had = at >= 0 ? resourcesLeftBehind[at].Amount : 0;
+            if (at >= 0) resourcesLeftBehind[at] = new ResourceAmount(resource, had + amount);
+            else resourcesLeftBehind.Add(new ResourceAmount(resource, amount));
+        }
+    }
+
     /// <summary>Notes something that happened, for the summary, in place of <paramref name="replaces"/> when it was noted.</summary>
     public void RecordEvent(string what, string replaces = null)
     {

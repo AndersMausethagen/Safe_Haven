@@ -401,6 +401,7 @@ public sealed class ItemInventory : MonoBehaviour
             {
                 worn.SetDurability(i, stack.Durability + item.GearRepair);
                 mended++;
+                GameEvents.Raise(new GameEvent(GameEventKind.Repaired, stack.Item, 1, gameObject));
             }
         }
 

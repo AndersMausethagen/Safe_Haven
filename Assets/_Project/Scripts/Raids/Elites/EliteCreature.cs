@@ -232,6 +232,7 @@ public sealed class EliteCreature : MonoBehaviour
             if (result.HasOverflow)
             {
                 GameMessages.Post("Bag full, left behind: " + AmountText.Describe(result.Overflow), MessageKind.Warning);
+                LootGrant.LeftBehind(killer, result.Overflow);
             }
         }
 
@@ -239,6 +240,7 @@ public sealed class EliteCreature : MonoBehaviour
         if (overflow.Count > 0)
         {
             GameMessages.Post("Can't carry more: " + AmountText.Describe(overflow) + " left behind.", MessageKind.Warning);
+            LootGrant.LeftBehind(killer, overflow);
         }
 
         GameMessages.Post($"{Title} slain.", MessageKind.Gain);

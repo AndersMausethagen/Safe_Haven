@@ -244,7 +244,8 @@ public sealed class StashWindow : MonoBehaviour
             return;
         }
 
-        if (from.Container.TransferTo(index, to.Container) == 0)
+        int moved = to == stash ? GameSession.Stash.Store(from.Container, index, player) : from.Container.TransferTo(index, to.Container);
+        if (moved == 0)
         {
             GameMessages.Post(to == stash ? "Storage is full." : "No room in the bag.", MessageKind.Warning);
         }
@@ -280,8 +281,8 @@ public sealed class StashWindow : MonoBehaviour
 
     private void StoreResources()
     {
-        int moved = carried != null ? carried.TransferAllTo(GameSession.Stash.Resources) : 0;
-        moved += GameSession.Stash.StoreMaterials(bag.Container);
+        int moved = GameSession.Stash.StoreResources(carried, player);
+        moved += GameSession.Stash.StoreMaterials(bag.Container, player);
         GameMessages.Post(moved > 0 ? $"Stored {moved} materials." : "You carry no materials.", moved > 0 ? MessageKind.Info : MessageKind.Warning);
     }
 

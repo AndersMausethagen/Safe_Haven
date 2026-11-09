@@ -293,7 +293,7 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics, IQuestPers
     /// Someone brought home shows the player how to build where they work: the buildings of every job they can do, so a rescue
     /// opens a workplace (Docs/RescueOrder.md). Giving them the job teaches the same again, for a co-op friend who wasn't there.
     /// </summary>
-    public static void TeachWhatTheyKnow(ResidentDefinition resident, GameObject user)
+    public static void TeachWhatTheyKnow(ResidentDefinition resident, GameObject user, bool announce = true)
     {
         var crafting = user != null ? user.GetComponent<PlayerCrafting>() : null;
         if (crafting == null || resident == null)
@@ -305,8 +305,26 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics, IQuestPers
         {
             if (job != null)
             {
-                crafting.UnlockBuildings(job.TeachesBuildings);
+                crafting.UnlockBuildings(job.TeachesBuildings, announce);
             }
+        }
+    }
+
+    /// <summary>
+    /// Everyone living in Safe Haven teaches the player their workplaces, quietly: called whenever the player appears in a scene.
+    /// A rescue at the end of a raid teaches the raid's player after their state was taken home (RaidDirector), so this is what
+    /// makes what the rescued know arrive home with the player. Not in a friend's Haven: their people are theirs to learn from.
+    /// </summary>
+    public static void TeachEveryoneHome(GameObject user)
+    {
+        if (HavenVisit.IsVisiting || user == null)
+        {
+            return;
+        }
+
+        foreach (ResidentRecord record in GameSession.Settlement.Residents)
+        {
+            TeachWhatTheyKnow(record.Resident, user, false);
         }
     }
 

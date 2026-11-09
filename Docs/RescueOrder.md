@@ -47,6 +47,25 @@ Steps 2 to 6 follow the outline from the playtest of 2026-11-08: gear and repair
 the story already sends the player after her, and she leads to Bjarne. That's roughly one person every two or three raids
 early, slower later.
 
+## The problem comes first (2026-11-09)
+
+Each person answers a problem, and the raid summary now shows the problem before they are home (`HavenAnswers`, read from the
+recipes, buildings and jobs, so no hint is written by hand):
+
+- **Left behind**: what the bag couldn't take, with its weight, and what would have carried it: "A Wheelbarrow would have
+  carried it. Bring Tor home: the Carpenter knows how."
+- **Nobody at home can use these yet**: a find no known recipe or building takes, and who would know: copper ore before
+  Bjarne, thick hides before whoever works them first.
+- **Worn on the way** (and gear kept after a failed raid): "A smith would do it for 50% less. Bring Bjarne home."
+
+What came home and what held the player back lead the summary; lessons and the way there follow, with a scrollbar.
+
+Quests teach an answer by doing it: A Safe Place asks for something put in the chest (Store Item), A Smith's Hearth for a repair
+(Repair Item), Heavy Loads for the Lodge at Tier II before the Yard (Upgrade Building).
+
+Whoever is home teaches their workplaces whenever the player appears (`ResidentNpc.TeachEveryoneHome`): a rescue at the end
+of a raid taught only the raid's player, after their state had been taken home, so the plans were lost on the way back.
+
 ## As built
 
 - Each job teaches its workplace, and those buildings are not known from the start. The Smithy and the Cauldron need only the

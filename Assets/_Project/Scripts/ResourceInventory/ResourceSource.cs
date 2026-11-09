@@ -169,6 +169,7 @@ public sealed class ResourceSource : MonoBehaviour
                 if (result.HasOverflow)
                 {
                     leftBehind.Add(AmountText.Describe(result.Overflow));
+                    LootGrant.LeftBehind(recipient, result.Overflow);
                 }
             }
             else
@@ -181,6 +182,7 @@ public sealed class ResourceSource : MonoBehaviour
         if (overflow.Count > 0)
         {
             leftBehind.Add(AmountText.Describe(overflow));
+            LootGrant.LeftBehind(recipient, overflow);
         }
     }
 

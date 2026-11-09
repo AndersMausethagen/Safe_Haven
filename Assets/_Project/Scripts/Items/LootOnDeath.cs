@@ -67,6 +67,7 @@ public sealed class LootOnDeath : MonoBehaviour
             if (result.HasOverflow)
             {
                 GameMessages.Post("Bag full, left behind: " + AmountText.Describe(result.Overflow), MessageKind.Warning);
+                LootGrant.LeftBehind(inventory.gameObject, result.Overflow);
             }
         }
 
@@ -82,6 +83,7 @@ public sealed class LootOnDeath : MonoBehaviour
             if (overflow.Count > 0)
             {
                 GameMessages.Post("Can't carry more: " + AmountText.Describe(overflow) + " left behind.", MessageKind.Warning);
+                LootGrant.LeftBehind(killingBlow.Source.gameObject, overflow);
             }
         }
 

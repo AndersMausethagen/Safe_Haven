@@ -47,6 +47,14 @@ public enum GameEventKind
     BreachRepelled = 19,
     /// <summary>Safe Haven stands at a rank (on reaching it, and again on loading). Amount: the rank, from 1.</summary>
     HavenRankReached = 20,
+    /// <summary>Loot or a gathered yield didn't fit and is gone (bag full, bars capped). Subject: the ItemDefinition or ResourceDefinition.</summary>
+    LeftBehind = 21,
+    /// <summary>The player put things in the stash at home. Subject: the ItemDefinition or ResourceDefinition.</summary>
+    Stored = 22,
+    /// <summary>A piece of gear was repaired, at a bench or with a kit. Subject: its ItemDefinition.</summary>
+    Repaired = 23,
+    /// <summary>A building's upgrade was finished. Subject: the BuildingDefinition; Amount: the tier it stands at now, from 2.</summary>
+    Upgraded = 24,
 }
 
 /// <summary>

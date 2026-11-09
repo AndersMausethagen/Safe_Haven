@@ -156,6 +156,14 @@ public static class BuildRescueOrder
         ("Mason", new[] { "Cottage", "StoneWall" }),
     };
 
+    /// <summary>Only the rescue and work quests (their objectives), without the rumours, people or the Haven scene.</summary>
+    public static string QuestsOnly()
+    {
+        string quests = QuestsInOrder();
+        AssetDatabase.SaveAssets();
+        return quests;
+    }
+
     public static string Apply()
     {
         string buildings = TaughtBuildings();
@@ -502,6 +510,12 @@ public static class BuildRescueOrder
                 work.Add((QuestObjective.Create(ObjectiveType.BuildStructure, 1, place), $"Build a {place.DisplayName} (build menu: G)"));
             }
 
+            // The smith's point is the mending: once is enough to see it costs half now.
+            if (job.GearRepairDiscount > 0f)
+            {
+                work.Add((QuestObjective.Create(ObjectiveType.RepairItem, 1), $"Repair a worn piece of gear at the Workshop: with {person.Name} at work it costs less"));
+            }
+
             Made(person.WorkFile, "work." + person.Job.ToLowerInvariant(), person.WorkTitle, Work, person.WorkText, rescue, false, work.ToArray());
             before = rescue;
             made += 2;
@@ -526,8 +540,9 @@ public static class BuildRescueOrder
         After("AGrowingHome", Quest("WoodcuttersLodge"));
         Made("HeavyLoads", "work.heavy_loads", "Heavy Loads", Work,
             "Copper ore and planks weigh more than any pack can take home. Tor knows carts: raise his Woodcutter's Lodge to Tier II and he plans a Wainwright's Yard, where barrows, handcarts and a rowboat are built.",
-            Quest("WoodcuttersLodge"), false,
-            (QuestObjective.Create(ObjectiveType.BuildStructure, 1, Building("WainwrightsYard")), "Build a Wainwright's Yard (Woodcutter's Lodge Tier II)"),
+            Quest("WoodcuttersLodge"), true,
+            (QuestObjective.Upgrade(Building("Sawbench"), 2), "Raise the Woodcutter's Lodge to Tier II (H)"),
+            (QuestObjective.Create(ObjectiveType.BuildStructure, 1, Building("WainwrightsYard")), "Build a Wainwright's Yard (build menu: G)"),
             (QuestObjective.Create(ObjectiveType.CraftItem, 1, Find<ItemDefinition>("Wheelbarrow")), "Make a Wheelbarrow at the Wainwright's Yard"));
         return made + 1 + " quests in order";
     }

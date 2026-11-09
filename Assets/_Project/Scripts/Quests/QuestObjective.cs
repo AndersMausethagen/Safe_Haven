@@ -39,6 +39,12 @@ public enum ObjectiveType
     DefendBreach = 14,
     /// <summary>Raise Safe Haven to a rank (Haven Settings › Ranks), counting a rank already reached.</summary>
     ReachHavenRank = 15,
+    /// <summary>Put X of an item, or anything, in the stash at home (a chest).</summary>
+    StoreItem = 16,
+    /// <summary>Repair X pieces of gear, or one kind of item: at the Workshop, or with a repair kit.</summary>
+    RepairItem = 17,
+    /// <summary>Raise X of a building (or any building) to a tier: 2 is its first upgrade.</summary>
+    UpgradeBuilding = 18,
 }
 
 /// <summary>
@@ -90,6 +96,8 @@ public sealed class QuestObjective
     [SerializeField] private WardBreachDefinition breach;
     [Tooltip("The rank to reach: 1 is the first above where Safe Haven starts (Haven Settings › Ranks).")]
     [SerializeField, Min(1)] private int rank = 1;
+    [Tooltip("The tier to raise it to: 2 is its first upgrade (Tier II).")]
+    [SerializeField, Min(2)] private int tier = 2;
     [Tooltip("Off: finding and freeing them is enough. On: they must come home with the player.")]
     [SerializeField] private bool bringHome;
     [Tooltip("Counts what the player already has when the quest starts, including a Quest Event that already happened (counts once).")]
@@ -99,7 +107,8 @@ public sealed class QuestObjective
 
     /// <summary>Whether a raid can move this on whatever is out there. A Quest Event depends on the place: see what has a waypoint there.</summary>
     public bool CanProgressOnARaid => type != ObjectiveType.CraftItem && type != ObjectiveType.BuildStructure && type != ObjectiveType.QuestEvent
-        && type != ObjectiveType.AssignJob && type != ObjectiveType.ReachHavenRank;
+        && type != ObjectiveType.AssignJob && type != ObjectiveType.ReachHavenRank && type != ObjectiveType.StoreItem
+        && type != ObjectiveType.RepairItem && type != ObjectiveType.UpgradeBuilding;
     public int Amount => Mathf.Max(1, amount);
     public bool CountAlreadyOwned => countAlreadyOwned && Array.IndexOf(FieldsOf(type), nameof(countAlreadyOwned)) >= 0;
     public ItemDefinition Item => item;
@@ -114,6 +123,8 @@ public sealed class QuestObjective
     public JobDefinition Job => job;
     public WardBreachDefinition Breach => breach;
     public int Rank => Mathf.Max(1, rank);
+    /// <summary>The tier an Upgrade Building objective asks for, from 2.</summary>
+    public int Tier => Mathf.Max(2, tier);
     public bool BringHome => bringHome;
 
     /// <summary>Who or what a deed objective is about (Talk To, Reach Place, Use Object, Rescue Person); null otherwise.</summary>
@@ -183,6 +194,12 @@ public sealed class QuestObjective
         return new QuestObjective { type = ObjectiveType.ReachHavenRank, rank = Mathf.Max(1, haveRank), countAlreadyOwned = countReached };
     }
 
+    /// <summary>An Upgrade Building objective: raise the building (null: any) to a tier, counting one standing there already.</summary>
+    public static QuestObjective Upgrade(BuildingDefinition building, int toTier, bool countReached = true)
+    {
+        return new QuestObjective { type = ObjectiveType.UpgradeBuilding, building = building, tier = Mathf.Max(2, toTier), countAlreadyOwned = countReached };
+    }
+
     /// <summary>The serialized fields an objective of <paramref name="type"/> uses, besides its type, amount and text.</summary>
     public static string[] FieldsOf(ObjectiveType type)
     {
@@ -219,6 +236,12 @@ public sealed class QuestObjective
                 return new[] { nameof(breach) };
             case ObjectiveType.ReachHavenRank:
                 return new[] { nameof(rank), nameof(countAlreadyOwned) };
+            case ObjectiveType.StoreItem:
+                return new[] { nameof(item), nameof(countAlreadyOwned) };
+            case ObjectiveType.RepairItem:
+                return new[] { nameof(item) };
+            case ObjectiveType.UpgradeBuilding:
+                return new[] { nameof(building), nameof(tier), nameof(countAlreadyOwned) };
             default:
                 return Array.Empty<string>();
         }
@@ -274,6 +297,14 @@ public sealed class QuestObjective
                 return gameEvent.Kind == GameEventKind.BreachRepelled && Is(breach, gameEvent.Subject, false) ? 1 : 0;
             case ObjectiveType.ReachHavenRank:
                 return gameEvent.Kind == GameEventKind.HavenRankReached && gameEvent.Amount >= Rank ? 1 : 0;
+            case ObjectiveType.StoreItem:
+                // An empty item counts anything put away, essences too.
+                return gameEvent.Kind == GameEventKind.Stored && Is(item, gameEvent.Subject, false) ? gameEvent.Amount : 0;
+            case ObjectiveType.RepairItem:
+                return gameEvent.Kind == GameEventKind.Repaired && Is(item, gameEvent.Subject, false) ? gameEvent.Amount : 0;
+            case ObjectiveType.UpgradeBuilding:
+                // Amount carries the tier reached, not a count: one building raised is one.
+                return gameEvent.Kind == GameEventKind.Upgraded && Is(building, gameEvent.Subject, false) && gameEvent.Amount >= Tier ? 1 : 0;
             default:
                 return 0;
         }
@@ -315,9 +346,31 @@ public sealed class QuestObjective
                 return HasJob() ? 1 : 0;
             case ObjectiveType.ReachHavenRank:
                 return GameSession.Settlement.HavenRank >= Rank ? 1 : 0;
+            case ObjectiveType.StoreItem:
+                // Already in the stash (an older save, or put away before the quest): it is safe, which is the point.
+                StashStorage stash = GameSession.Stash;
+                return stash == null ? 0 : item != null ? stash.Items.Count(item) : stash.Items.CountItems();
+            case ObjectiveType.UpgradeBuilding:
+                return HavenVisit.IsVisiting ? 0 : StandingAtTier();
             default:
                 return 0;
         }
+    }
+
+    // Buildings of the kind (or any) standing at the tier asked for or above.
+    private int StandingAtTier()
+    {
+        int count = 0;
+        foreach (BuildingObject built in BuildingObject.Active)
+        {
+            if (built.Definition != null && (building == null || built.Definition == building)
+                && built.TryGetComponent(out Construction construction) && construction.Level >= Tier)
+            {
+                count++;
+            }
+        }
+
+        return count;
     }
 
     // An empty target counts anything only where the objective allows "any" (kills, raids); items and resources must be named.
@@ -375,6 +428,14 @@ public sealed class QuestObjective
                 return breach != null ? $"Defend Safe Haven: {breach.DisplayName}" : "Defend Safe Haven from a ward breach";
             case ObjectiveType.ReachHavenRank:
                 return $"Raise Safe Haven to {HavenRankName(Rank)} (H)";
+            case ObjectiveType.StoreItem:
+                return item != null ? $"Put {count} {Name(item)} in a chest" : Amount == 1 ? "Put something in a chest" : $"Put {count} things in a chest";
+            case ObjectiveType.RepairItem:
+                string bench = DurabilitySettings.Current != null ? DurabilitySettings.Current.RepairStation.DisplayName() : "Workshop";
+                return item != null ? $"Repair your {Name(item)} ({bench})" : Amount == 1 ? $"Repair a piece of gear ({bench})" : $"Repair {count} pieces of gear ({bench})";
+            case ObjectiveType.UpgradeBuilding:
+                string which = building != null ? $"the {building.DisplayName}" : "a building";
+                return Amount == 1 ? $"Raise {which} to Tier {Tiers.ToRoman(Tier)} (H)" : $"Raise {count} of {which} to Tier {Tiers.ToRoman(Tier)} (H)";
             default:
                 return type.ToString();
         }
@@ -402,6 +463,8 @@ public sealed class QuestObjective
             case ObjectiveType.ReachHavenRank:
                 HavenSettings ranks = HavenSettings.Current;
                 return ranks != null && Rank >= ranks.Ranks.Count ? $"asks for rank {Rank}, but Safe Haven has only {ranks.Ranks.Count} ranks" : null;
+            case ObjectiveType.UpgradeBuilding:
+                return building != null && Tier > building.MaxLevel ? $"asks for Tier {Tiers.ToRoman(Tier)}, but the {building.DisplayName} goes up to Tier {Tiers.ToRoman(building.MaxLevel)}" : null;
             default:
                 return null;
         }

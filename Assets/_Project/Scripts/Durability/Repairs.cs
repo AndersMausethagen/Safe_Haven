@@ -130,6 +130,7 @@ public static class Repairs
 
         container.SetDurability(slot, 1f);
         GameMessages.Post($"{stack.Item.DisplayName} repaired.", MessageKind.Gain);
+        GameEvents.Raise(new GameEvent(GameEventKind.Repaired, stack.Item, 1, player));
         return true;
     }
 }

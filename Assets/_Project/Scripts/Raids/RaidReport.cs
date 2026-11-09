@@ -62,7 +62,35 @@ public sealed class RaidReport
         ReturnScene = session.ReturnScene;
         Gathering = session.Gathering;
         Events = session.EventLog;
+        ItemsLeftBehind = new List<ItemAmount>(session.ItemsLeftBehind);
+        ResourcesLeftBehind = new List<ResourceAmount>(session.ResourcesLeftBehind);
     }
+
+    /// <summary>What the bag couldn't take and stayed out there (RaidSession.RecordLeftBehind).</summary>
+    public IReadOnlyList<ItemAmount> ItemsLeftBehind { get; }
+    public IReadOnlyList<ResourceAmount> ResourcesLeftBehind { get; }
+
+    /// <summary>The weight of the items left behind, in the bag's units (kg).</summary>
+    public float WeightLeftBehind
+    {
+        get
+        {
+            float total = 0f;
+            foreach (ItemAmount entry in ItemsLeftBehind)
+            {
+                total += entry.Item != null ? entry.Item.Weight * entry.Amount : 0f;
+            }
+
+            return total;
+        }
+    }
+
+    /// <summary>Finds brought home that nobody at home can use yet, and who could (HavenAnswers.Fill).</summary>
+    public List<UnusedFind> NoUseYet { get; } = new List<UnusedFind>();
+    /// <summary>What would have carried the load left behind, and who knows how to make it. Null when nothing was left.</summary>
+    public HavenAnswer Carrier { get; set; }
+    /// <summary>Who would mend the worn gear for less, while nobody at home does. Null otherwise.</summary>
+    public HavenAnswer Mender { get; set; }
 
     public RaidDefinition Definition { get; }
     /// <summary>How the player gathered: swings, criticals and the forest's peak annoyance.</summary>
@@ -96,7 +124,8 @@ public sealed class RaidReport
     /// <summary>What each skill learned (ExperienceTracker.SettleRaid).</summary>
     public List<SkillLesson> Lessons { get; } = new List<SkillLesson>();
 
-    /// <summary>Equipment kept after a failed raid, with its durability before and after.</summary>
+    /// <summary>Gear that came home worn, with its durability before and after: every deployed piece after a failed raid,
+    /// what wore on the way (glancing blows) after an extraction.</summary>
     public IReadOnlyList<EquipmentWear> EquipmentDamaged => equipmentDamaged;
 
     /// <summary>Items the player has more of than they carried in: loot.</summary>
@@ -131,7 +160,7 @@ public sealed class RaidReport
     /// What the player held when the raid ended. Loot found during a failed raid shows as lost only when this is given.
     /// Null counts as the same as after.
     /// </param>
-    /// <param name="damaged">Equipment kept with durability damage after a failed raid.</param>
+    /// <param name="damaged">Gear that came home worn: kept after a failed raid, or chipped on the way.</param>
     public static RaidReport Create(RaidSession session, PlayerSnapshot before, PlayerSnapshot after, PlayerSnapshot final = null,
         IEnumerable<EquipmentWear> damaged = null)
     {

@@ -27,6 +27,8 @@ public sealed class PlayerPersistence : MonoBehaviour
             }
         }
 
+        ResidentNpc.TeachEveryoneHome(gameObject);
+
         if (GameSession.TakeSpawnPose(out PlayerPose pose))
         {
             GameSession.TakeArrivalPoint();

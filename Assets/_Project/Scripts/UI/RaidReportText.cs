@@ -29,45 +29,6 @@ public static class RaidReportText
             builder.Append($"<b><color={Loss}>Brought down by a {report.BroughtDownBy}.</color></b>\n\n");
         }
 
-        if (report.Modifiers.Count > 0)
-        {
-            var names = new List<string>();
-            foreach (RaidModifierDefinition modifier in report.Modifiers)
-            {
-                names.Add(modifier.DisplayName);
-            }
-
-            builder.Append($"<color={Muted}>Modifiers used: {string.Join(", ", names)}</color>\n\n");
-        }
-
-        if (report.SparksUsed > 0)
-        {
-            builder.Append($"<color={Muted}>Portal Sparks used: {report.SparksUsed}</color>\n\n");
-        }
-
-        string gathering = Gathering(report.Gathering);
-        if (gathering != null)
-        {
-            builder.Append(gathering).Append("\n\n");
-        }
-
-        string lessons = Lessons(report);
-        if (lessons != null)
-        {
-            builder.Append(lessons).Append("\n\n");
-        }
-
-        if (report.Events != null && report.Events.Count > 0)
-        {
-            builder.Append("<b>On the way</b>\n");
-            foreach (string happened in report.Events)
-            {
-                builder.Append($"<color={Muted}>{happened}</color>\n");
-            }
-
-            builder.Append('\n');
-        }
-
         if (report.Companion != null)
         {
             builder.Append(report.CompanionLost
@@ -87,7 +48,9 @@ public static class RaidReportText
 
         foreach (ResidentDefinition rescued in report.Rescued)
         {
-            builder.Append($"<b><color={Gain}>{rescued.DisplayName} came home with you.</color></b>\n<i>\"{rescued.ArrivalLine}\"</i>\n\n");
+            builder.Append($"<b><color={Gain}>{rescued.DisplayName} came home with you.</color></b>\n<i>\"{rescued.ArrivalLine}\"</i>\n");
+            string plans = PlansOf(rescued);
+            builder.Append(plans.Length > 0 ? $"<color={Muted}>{rescued.DisplayName} knows how to build: {plans}.</color>\n\n" : "\n");
         }
 
         if (!string.IsNullOrEmpty(report.TransportLine))
@@ -109,6 +72,12 @@ public static class RaidReportText
             if (lostAny)
             {
                 builder.Append("\n\n<b>Used up</b>\n").Append(List(report.ItemsLost, report.ResourcesLost, "-", Loss));
+            }
+
+            string problems = Problems(report);
+            if (problems.Length > 0)
+            {
+                builder.Append("\n\n").Append(problems);
             }
         }
         else
@@ -139,7 +108,7 @@ public static class RaidReportText
                     builder.Append($"\n{Rarity.Rich(wear.Item.DisplayName, wear.Item.Rarity)}  {wear.Before:P0} → {state}");
                 }
 
-                builder.Append($"\n<color={Muted}>Repair it at a Workshop.</color>");
+                builder.Append($"\n<color={Muted}>{RepairAdvice(report)}</color>");
             }
 
             if (gainedAny)
@@ -150,7 +119,169 @@ public static class RaidReportText
             builder.Append($"\n\n<color={Muted}>You woke at the portal. Your safe pocket, recipes and discoveries are kept. Your storage is untouched.</color>");
         }
 
-        return builder.ToString();
+        // What came home and what held the player back come first; how the raid went follows, for whoever scrolls on.
+        string details = Details(report);
+        if (details.Length > 0)
+        {
+            builder.Append("\n\n").Append(details);
+        }
+
+        return builder.ToString().TrimEnd();
+    }
+
+    // Lessons, the way there, how the gathering went, and the modifiers and sparks spent.
+    private static string Details(RaidReport report)
+    {
+        var builder = new StringBuilder();
+        string lessons = Lessons(report);
+        if (lessons != null)
+        {
+            builder.Append(lessons).Append("\n\n");
+        }
+
+        if (report.Events != null && report.Events.Count > 0)
+        {
+            builder.Append("<b>On the way</b>\n");
+            foreach (string happened in report.Events)
+            {
+                builder.Append($"<color={Muted}>{happened}</color>\n");
+            }
+
+            builder.Append('\n');
+        }
+
+        string gathering = Gathering(report.Gathering);
+        if (gathering != null)
+        {
+            builder.Append(gathering).Append("\n\n");
+        }
+
+        if (report.Modifiers.Count > 0)
+        {
+            var names = new List<string>();
+            foreach (RaidModifierDefinition modifier in report.Modifiers)
+            {
+                names.Add(modifier.DisplayName);
+            }
+
+            builder.Append($"<color={Muted}>Modifiers used: {string.Join(", ", names)}</color>\n\n");
+        }
+
+        if (report.SparksUsed > 0)
+        {
+            builder.Append($"<color={Muted}>Portal Sparks used: {report.SparksUsed}</color>\n\n");
+        }
+
+        return builder.ToString().TrimEnd();
+    }
+
+    /// <summary>
+    /// What held the player back on an extraction, each with who at home answers it (HavenAnswers): the load left behind, finds
+    /// nobody can use yet, and gear worn on the way. Empty when nothing did.
+    /// </summary>
+    public static string Problems(RaidReport report)
+    {
+        var text = new StringBuilder();
+        if (report.ItemsLeftBehind.Count > 0 || report.ResourcesLeftBehind.Count > 0)
+        {
+            float weight = report.WeightLeftBehind;
+            text.Append($"<b>Left behind</b>  <color={Muted}>no room to carry it{(weight >= 0.5f ? $", {weight:0} kg" : "")}</color>\n");
+            text.Append(List(report.ItemsLeftBehind, report.ResourcesLeftBehind, "-", Loss));
+            string carrier = CarrierAdvice(report.Carrier);
+            if (carrier.Length > 0)
+            {
+                text.Append($"\n<color={Muted}>{carrier}</color>");
+            }
+        }
+
+        if (report.NoUseYet.Count > 0)
+        {
+            text.Append(text.Length > 0 ? "\n\n" : "").Append("<b>Nobody at home can use these yet</b>");
+            foreach (UnusedFind find in report.NoUseYet)
+            {
+                var ways = new List<string>();
+                foreach (HavenAnswer answer in find.Answers)
+                {
+                    string how = answer.HowTo();
+                    if (how.Length > 0)
+                    {
+                        ways.Add(how);
+                    }
+                }
+
+                string name = find.What is ItemDefinition item ? Rarity.RichName(item) : find.Name;
+                text.Append($"\n{find.Amount} {name}  <color={Muted}>{(ways.Count > 0 ? string.Join(" Or: ", ways) : "Nobody knows its use yet.")}</color>");
+            }
+        }
+
+        if (report.EquipmentDamaged.Count > 0)
+        {
+            text.Append(text.Length > 0 ? "\n\n" : "").Append("<b>Worn on the way</b>");
+            foreach (EquipmentWear wear in report.EquipmentDamaged)
+            {
+                string state = wear.After <= 0.0001f ? $"<color={Loss}>broken</color>" : $"{wear.After:P0}";
+                text.Append($"\n{Rarity.Rich(wear.Item.DisplayName, wear.Item.Rarity)}  {wear.Before:P0} → {state}");
+            }
+
+            text.Append($"\n<color={Muted}>{RepairAdvice(report)}</color>");
+        }
+
+        return text.ToString();
+    }
+
+    // "Repair it at the Workshop.", and who would do it for less while nobody at home does.
+    private static string RepairAdvice(RaidReport report)
+    {
+        DurabilitySettings settings = DurabilitySettings.Current;
+        string advice = $"Repair it at the {(settings != null ? settings.RepairStation.DisplayName() : "Workshop")}.";
+        HavenAnswer mender = report.Mender;
+        if (mender != null && mender.Person != null && mender.Job != null)
+        {
+            advice += $" A {mender.Job.DisplayName.ToLowerInvariant()} would do it for {mender.Job.GearRepairDiscount:P0} less. {mender.HowTo()}";
+        }
+
+        return advice;
+    }
+
+    // "A Wheelbarrow would have carried it. Bring Tor home: the Carpenter knows how."
+    private static string CarrierAdvice(HavenAnswer carrier)
+    {
+        if (carrier == null || carrier.Carrier == null)
+        {
+            return "";
+        }
+
+        string how = carrier.HowTo();
+        if (how.Length > 0)
+        {
+            return $"A {carrier.Carrier.DisplayName} would have carried it. {how}";
+        }
+
+        string where = carrier.Building != null ? $" from the {carrier.Building.DisplayName}" : "";
+        return $"A {carrier.Carrier.DisplayName}{where} would have carried it.";
+    }
+
+    // The workplaces a person shows the player how to build: what every job they can do teaches.
+    private static string PlansOf(ResidentDefinition resident)
+    {
+        var names = new List<string>();
+        foreach (JobDefinition job in resident.Jobs)
+        {
+            if (job == null)
+            {
+                continue;
+            }
+
+            foreach (BuildingDefinition building in job.TeachesBuildings)
+            {
+                if (building != null && !names.Contains(building.DisplayName))
+                {
+                    names.Add(building.DisplayName);
+                }
+            }
+        }
+
+        return string.Join(", ", names);
     }
 
     /// <summary>The gathering line: crit rate, glancing blows and how angry the forest got. Null when nothing was gathered.</summary>

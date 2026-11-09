@@ -340,53 +340,95 @@ public sealed class PlayerSnapshot
             deployed.Add(record.Stack);
         }
 
-        // Worn gear is matched first, so it stays on when the same item was also in the bag.
-        Keep(gear, kept.gear, deployed, durabilityLoss, wear);
+        // Worn gear is matched first, so it stays on when the same item was also in the bag. Every piece with its exact wear is
+        // matched before any chipped one (a glancing blow wears an axe on the way), so a piece found out there can't take the
+        // place of the one carried in.
+        var held = new List<SlotRecord>(gear);
+        int wornCount = held.Count;
         foreach (SlotRecord record in slots)
         {
-            ItemStack stack = record.Stack;
-            if (!stack.Item.HasDurability)
+            if (record.Stack.Item.HasDurability)
             {
-                continue;
+                held.Add(record);
             }
+        }
 
-            // Durability doesn't change during a raid, so the carried-in copy is the one with the same wear.
-            int match = deployed.FindIndex(candidate => candidate.Item == stack.Item && Mathf.Approximately(candidate.Durability, stack.Durability));
-            if (match < 0)
+        var done = new bool[held.Count];
+        foreach (bool exact in new[] { true, false })
+        {
+            for (int i = 0; i < held.Count; i++)
             {
-                continue;
-            }
+                if (done[i])
+                {
+                    continue;
+                }
 
-            deployed.RemoveAt(match);
-            ItemStack worn = stack.WithDurability(stack.Durability - durabilityLoss);
-            kept.slots.Add(new SlotRecord(record.Index, worn));
-            wear?.Add(new EquipmentWear(stack.Item, stack.Durability, worn.Durability));
-            if (record.Index == condition.EquippedSlot)
-            {
-                kept.condition.EquippedSlot = record.Index;
+                ItemStack stack = held[i].Stack;
+                int match = CarriedIn(deployed, stack, exact);
+                if (match < 0)
+                {
+                    continue;
+                }
+
+                done[i] = true;
+                deployed.RemoveAt(match);
+                ItemStack worn = stack.WithDurability(stack.Durability - durabilityLoss);
+                (i < wornCount ? kept.gear : kept.slots).Add(new SlotRecord(held[i].Index, worn));
+                wear?.Add(new EquipmentWear(stack.Item, stack.Durability, worn.Durability));
+                if (i >= wornCount && held[i].Index == condition.EquippedSlot)
+                {
+                    kept.condition.EquippedSlot = held[i].Index;
+                }
             }
         }
 
         return kept;
     }
 
-    private static void Keep(List<SlotRecord> records, List<SlotRecord> into, List<ItemStack> deployed, float durabilityLoss,
-        List<EquipmentWear> wear)
+    // Which carried-in piece a piece held at the end is: the same item with the same wear, or (not exact) the least worn-down
+    // copy that was more whole going in. A piece found out there in better shape than anything carried in matches none.
+    private static int CarriedIn(List<ItemStack> deployed, ItemStack stack, bool exact)
     {
-        foreach (SlotRecord record in records)
+        if (exact)
         {
-            ItemStack stack = record.Stack;
-            int match = deployed.FindIndex(candidate => candidate.Item == stack.Item && Mathf.Approximately(candidate.Durability, stack.Durability));
-            if (match < 0)
-            {
-                continue;
-            }
-
-            deployed.RemoveAt(match);
-            ItemStack worn = stack.WithDurability(stack.Durability - durabilityLoss);
-            into.Add(new SlotRecord(record.Index, worn));
-            wear?.Add(new EquipmentWear(stack.Item, stack.Durability, worn.Durability));
+            return deployed.FindIndex(candidate => candidate.Item == stack.Item && Mathf.Approximately(candidate.Durability, stack.Durability));
         }
+
+        int best = -1;
+        for (int i = 0; i < deployed.Count; i++)
+        {
+            ItemStack candidate = deployed[i];
+            if (candidate.Item == stack.Item && candidate.Durability > stack.Durability && (best < 0 || candidate.Durability < deployed[best].Durability))
+            {
+                best = i;
+            }
+        }
+
+        return best;
+    }
+
+    /// <summary>
+    /// Gear that wore down since <paramref name="loadout"/> (an extraction's report): each worn piece, matched to what was worn
+    /// in the same slot going in, with its durability then and now. Empty when nothing wore, or with no loadout.
+    /// </summary>
+    public List<EquipmentWear> WornSince(PlayerSnapshot loadout)
+    {
+        var worn = new List<EquipmentWear>();
+        if (loadout == null)
+        {
+            return worn;
+        }
+
+        foreach (SlotRecord now in gear)
+        {
+            int at = loadout.gear.FindIndex(then => then.Index == now.Index && then.Stack.Item == now.Stack.Item);
+            if (at >= 0 && loadout.gear[at].Stack.Durability - now.Stack.Durability > 0.001f)
+            {
+                worn.Add(new EquipmentWear(now.Stack.Item, loadout.gear[at].Stack.Durability, now.Stack.Durability));
+            }
+        }
+
+        return worn;
     }
 
     /// <summary>How many of each item the bag, safe pocket and worn gear hold, across all their stacks.</summary>

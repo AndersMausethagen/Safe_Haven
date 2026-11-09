@@ -39,10 +39,45 @@ public sealed class RaidResultsScreen : MonoBehaviour
 
     private string destination;
     private bool extracted;
+    private ScrollRect reportScroll;
 
     private void Awake()
     {
         continueButton.onClick.AddListener(Continue);
+        reportScroll = bodyLabel.GetComponentInParent<ScrollRect>();
+        if (reportScroll != null && reportScroll.verticalScrollbar == null)
+        {
+            reportScroll.verticalScrollbar = ScrollBar((RectTransform)reportScroll.transform);
+            reportScroll.verticalScrollbarVisibility = ScrollRect.ScrollbarVisibility.AutoHide;
+        }
+    }
+
+    // A thin bar beside the report: a long one (a rescue, a haul and what held the player back) runs past the panel, and
+    // without it nothing says so. Built here, from the UI style, like the Options screen's.
+    private static Scrollbar ScrollBar(RectTransform view)
+    {
+        var track = new GameObject("Scrollbar", typeof(RectTransform), typeof(Image), typeof(Scrollbar));
+        var rect = (RectTransform)track.transform;
+        rect.SetParent(view, false);
+        rect.anchorMin = new Vector2(1f, 0f);
+        rect.anchorMax = new Vector2(1f, 1f);
+        rect.pivot = new Vector2(0f, 0.5f);
+        rect.offsetMin = new Vector2(12f, 0f);
+        rect.offsetMax = new Vector2(18f, 0f);
+        track.GetComponent<Image>().color = UIStyle.Current.Inset;
+
+        var handle = new GameObject("Handle", typeof(RectTransform), typeof(Image));
+        var handleRect = (RectTransform)handle.transform;
+        handleRect.SetParent(rect, false);
+        handleRect.sizeDelta = Vector2.zero;
+        var image = handle.GetComponent<Image>();
+        image.color = UIStyle.Current.Rim;
+
+        var bar = track.GetComponent<Scrollbar>();
+        bar.handleRect = handleRect;
+        bar.targetGraphic = image;
+        bar.direction = Scrollbar.Direction.BottomToTop;
+        return bar;
     }
 
     private void Start()
@@ -77,10 +112,24 @@ public sealed class RaidResultsScreen : MonoBehaviour
         titleLabel.color = extracted ? successColor : failureColor;
         subtitleLabel.text = RaidReportText.Subtitle(report);
         bodyLabel.text = RaidReportText.Describe(report);
+        ToTop();
         Sprite own = report.Definition != null ? report.Definition.ResultArtwork(extracted) : null;
         SetArtwork(own != null ? own : extracted ? extractedArtwork : failedArtwork);
         destination = CanLoad(report.ReturnScene) ? report.ReturnScene : fallbackScene;
         continueLabel.text = extracted ? "Return to Safe Haven" : "Wake at the portal";
+    }
+
+    // The report opens at its start, with the bar sized to the new text.
+    private void ToTop()
+    {
+        if (reportScroll == null)
+        {
+            return;
+        }
+
+        Canvas.ForceUpdateCanvases();
+        LayoutRebuilder.ForceRebuildLayoutImmediate(reportScroll.content);
+        reportScroll.verticalNormalizedPosition = 1f;
     }
 
     private void ShowEmpty()

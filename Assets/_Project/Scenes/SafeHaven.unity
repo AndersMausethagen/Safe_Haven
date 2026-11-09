@@ -214094,6 +214094,7 @@ MonoBehaviour:
           job: {fileID: 0}
           breach: {fileID: 0}
           rank: 1
+          tier: 2
           bringHome: 0
           countAlreadyOwned: 0
 --- !u!114 &1256036002
@@ -326669,6 +326670,7 @@ MonoBehaviour:
           job: {fileID: 0}
           breach: {fileID: 0}
           rank: 1
+          tier: 2
           bringHome: 0
           countAlreadyOwned: 0
 --- !u!114 &1952896958

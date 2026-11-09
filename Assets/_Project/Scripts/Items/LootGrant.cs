@@ -39,4 +39,28 @@ public static class LootGrant
 
         return overflow;
     }
+
+    /// <summary>Raises LeftBehind for loot that didn't fit and is gone, so the raid report can say what a cart would have carried.</summary>
+    public static void LeftBehind(GameObject who, IEnumerable<ItemAmount> items)
+    {
+        foreach (ItemAmount entry in items)
+        {
+            if (entry.Item != null && entry.Amount > 0)
+            {
+                GameEvents.Raise(new GameEvent(GameEventKind.LeftBehind, entry.Item, entry.Amount, who));
+            }
+        }
+    }
+
+    /// <summary>Raises LeftBehind for essences that didn't fit.</summary>
+    public static void LeftBehind(GameObject who, IEnumerable<ResourceAmount> resources)
+    {
+        foreach (ResourceAmount entry in resources)
+        {
+            if (entry.Resource != null && entry.Amount > 0)
+            {
+                GameEvents.Raise(new GameEvent(GameEventKind.LeftBehind, entry.Resource, entry.Amount, who));
+            }
+        }
+    }
 }

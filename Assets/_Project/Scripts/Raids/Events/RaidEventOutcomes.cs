@@ -58,6 +58,7 @@ public sealed class GiveLootOutcome : RaidEventOutcome
             if (given < amount)
             {
                 GameMessages.Post($"Bag full, left behind: {amount - given} {drop.Item.DisplayName}", MessageKind.Warning);
+                LootGrant.LeftBehind(context.Player, new[] { new ItemAmount(drop.Item, amount - given) });
             }
         }
 
@@ -67,7 +68,7 @@ public sealed class GiveLootOutcome : RaidEventOutcome
             resources.Add(new ResourceAmount(drop.Resource, RaidParameters.ScaleAmount(drop.Amount, multiplier, (float)context.Random.NextDouble())));
         }
 
-        LootGrant.GiveResources(context.Player, resources);
+        LootGrant.LeftBehind(context.Player, LootGrant.GiveResources(context.Player, resources));
     }
 }
 

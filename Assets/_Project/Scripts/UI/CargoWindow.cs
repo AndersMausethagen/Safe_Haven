@@ -228,13 +228,12 @@ public sealed class CargoWindow : MonoBehaviour
 
     private void SendToStorage()
     {
-        ItemContainer stash = GameSession.Stash.Items;
         ItemContainer load = transport.Cargo;
         for (int i = 0; i < load.SlotCount; i++)
         {
             if (!load.GetSlot(i).IsEmpty)
             {
-                load.TransferTo(i, stash);
+                GameSession.Stash.Store(load, i, viewer);
             }
         }
 

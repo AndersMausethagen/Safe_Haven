@@ -26,14 +26,11 @@ public static class BuildOpeningOrder
             if (open.isDirty) return "the open scene " + open.name + " has unsaved changes";
         }
 
-        QuestDefinition safe = Made("SafeKeeping", "safekeeping", "A Safe Place",
-            "What you carry through the portal is lost if you fall out there. What you leave in a chest at home stays safe. Build a Small Chest beside the workshop (build menu: G), and before every raid leave in it whatever you can't afford to lose.",
-            Quest("FirstCamp"),
-            QuestObjective.Create(ObjectiveType.BuildStructure, 1, Building("SmallChest")), "Build a Small Chest (build menu: G)");
+        QuestDefinition safe = SafePlace();
         QuestDefinition weapon = Made("FirstWeapon", "firstweapon", "Something to Fight With",
             "A hatchet fells trees; it won't keep a wolf off you. Make a Knotted Club at the workshop, from oak and nettle fibre: it stuns what it hits. Wear it in your weapon slot (C) before you go near the portal.",
             safe,
-            QuestObjective.Create(ObjectiveType.CraftItem, 1, Item("KnottedClub")), "Make a Knotted Club at the Workshop");
+            (QuestObjective.Create(ObjectiveType.CraftItem, 1, Item("KnottedClub")), "Make a Knotted Club at the Workshop"));
 
         After("FoodAndWater", weapon);
         DropCraft("FoodAndWater", "KnottedClub");
@@ -50,10 +47,25 @@ public static class BuildOpeningOrder
         return $"{safe.DisplayName}: {string.Join("; ", safe.FindProblems())} | {weapon.DisplayName}: {string.Join("; ", weapon.FindProblems())} | {portal} | {ranks} | {home}";
     }
 
+    /// <summary>Only A Safe Place: build the chest, then put something in it, so the stash is used once and not only built.</summary>
+    public static string SafePlaceOnly()
+    {
+        QuestDefinition safe = SafePlace();
+        AssetDatabase.SaveAssets();
+        return $"{safe.DisplayName}: {safe.Objectives.Count} objectives, {string.Join("; ", safe.FindProblems())}";
+    }
+
     // ----- Quests -----
 
-    // A First Days quest of one objective, made once and kept up to date. Copied from FirstCamp, so it is set up like its neighbours.
-    private static QuestDefinition Made(string file, string id, string title, string description, QuestDefinition after, QuestObjective objective, string objectiveText)
+    private static QuestDefinition SafePlace() => Made("SafeKeeping", "safekeeping", "A Safe Place",
+        "What you carry through the portal is lost if you fall out there. What you leave in a chest at home stays safe. Build a Small Chest beside the workshop (build menu: G), and before every raid leave in it whatever you can't afford to lose.",
+        Quest("FirstCamp"),
+        (QuestObjective.Create(ObjectiveType.BuildStructure, 1, Building("SmallChest")), "Build a Small Chest (build menu: G)"),
+        (QuestObjective.Create(ObjectiveType.StoreItem, 1), "Put something you can't afford to lose in the chest"));
+
+    // A First Days quest, made once and kept up to date, its objectives in order. Copied from FirstCamp, so it is set up like its neighbours.
+    private static QuestDefinition Made(string file, string id, string title, string description, QuestDefinition after,
+        params (QuestObjective objective, string text)[] steps)
     {
         string path = Quests + file + ".asset";
         var quest = AssetDatabase.LoadAssetAtPath<QuestDefinition>(path);
@@ -75,11 +87,16 @@ public static class BuildOpeningOrder
         prerequisites.arraySize = 1;
         prerequisites.GetArrayElementAtIndex(0).objectReferenceValue = after;
         SerializedProperty objectives = so.FindProperty("objectives");
-        objectives.arraySize = 1;
-        SerializedProperty only = objectives.GetArrayElementAtIndex(0);
-        only.boxedValue = objective;
-        only.FindPropertyRelative("description").stringValue = objectiveText;
-        only.FindPropertyRelative("countAlreadyOwned").boolValue = true;
+        objectives.arraySize = steps.Length;
+        for (int i = 0; i < steps.Length; i++)
+        {
+            SerializedProperty step = objectives.GetArrayElementAtIndex(i);
+            step.boxedValue = steps[i].objective;
+            step.FindPropertyRelative("description").stringValue = steps[i].text;
+            step.FindPropertyRelative("countAlreadyOwned").boolValue = true;
+        }
+
+        so.FindProperty("objectivesInOrder").boolValue = steps.Length > 1;
         so.FindProperty("rewardItems").arraySize = 0;
         so.FindProperty("rewardResources").arraySize = 0;
         so.FindProperty("rewardRecipes").arraySize = 0;

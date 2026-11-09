@@ -389,6 +389,9 @@ assigns the target instead of making an event:
   or Inspect Point (`GameEventTrigger.Target`) is marked with. A target says how "use" reads for it (Inspect, Light, Touch).
 - **Rescue Person** (found and freed, or brought home), **Assign Job**, **Defend Breach**, **Reach Haven Rank**; and as before
   Collect, Gather, Kill, Craft, Build, Catch Fish, Complete Raids.
+- **Store Item** (put something, or one kind, in the stash at home), **Repair Item** (at the Workshop or with a kit) and
+  **Upgrade Building** (raise a building, or any, to a tier; Count Already Owned counts one standing there): quests teach an
+  answer by doing it (A Safe Place, A Smith's Hearth, Heavy Loads).
 - **Story Event** (the old Quest Event objective): one-off moments only: a lesson learnt, an answer chosen.
 
 Who someone is comes from the object: `Talkable` asks any `IQuestPerson` beside it (`ResidentNpc`, `PrologueCompanion`,
@@ -429,6 +432,10 @@ For designers (Content Editor › Quests):
 | JobAssigned | `ResidentNpc.GiveJob` (Subject: the job; Detail: the person) |
 | BreachRepelled | `WardBreachDirector` when a breach is beaten back (Subject: the breach) |
 | HavenRankReached | `HavenProgress` each time it counts the ranks (Amount: the rank, from 1) |
+| LeftBehind | Loot that didn't fit and is gone, through `LootGrant.LeftBehind`: `ResourceSource` (gathering), `LootOnDeath`, `EliteCreature`, `GiveLootOutcome`. `RaidDirector` counts the player's into the session for the summary |
+| Stored | `StashStorage.Store`, `StoreMaterials` and `StoreResources`: the stash window and a cart's Send to Storage |
+| Repaired | `Repairs.TryRepair` (at the Workshop) and a repair kit (`ItemInventory`), one per piece |
+| Upgraded | `Construction.Finish` when an upgrade is done (Amount: the tier it stands at now; building it the first time raises Built) |
 | Custom (Story Events) | One-off moments only: `GameEventTrigger`'s Quest Event, `GameEventDefinition.Raise`, a quest's completion event and On Started/On Completed lists, story nodes, `RaidPortal` (repaired), the prologue's chapter events, and the optional Story Event fields on `Talkable`, `HomePortal`, `RescuableTraveler`, `JobDefinition` and `WardBreachDefinition`. Talking to someone, reaching a place, using a thing, rescuing someone, hiring, defending and Haven ranks are deeds above: a Quest Event made per person or place is not needed (and the shared traveller and companion prefabs used to raise one person's event for everyone). The Content Editor's "nothing raises this event" check finds raisers by `[RaisedByGame]` on the field; fields naming who or what an object is for quests carry `[QuestIdentity]` |
 
 ### Base building: clearing, construction, upgrades, renown

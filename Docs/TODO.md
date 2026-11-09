@@ -74,6 +74,13 @@ After the second list, in this order.
 - [x] Rescue order: approve or change the proposal in [Docs/RescueOrder.md](RescueOrder.md), then build it (each job
       teaches its workplace, rumours ordered by who is home, Smithy after the Workshop, sites for Hild, Asa, Gunnar, Yrsa).
       Built (`BuildRescueOrder`), checked in Play on an isolated save. Not yet seen: the four new sites in a launched raid.
+- [x] The problem before the person: the raid summary shows what was left behind and what would have carried it, finds nobody
+      at home can use yet and who would, and worn gear and who mends it for less (`HavenAnswers`). New objectives Store Item,
+      Repair Item, Upgrade Building in A Safe Place, A Smith's Hearth and Heavy Loads. A rescue's plans now reach home
+      (`ResidentNpc.TeachEveryoneHome`). Checked in a launched raid on an isolated save.
+- [ ] Young Tree (`Data/Gathering/YoungTree.asset`) gives sticks and a cedar sapling, but its world prefab is the Sticks Node,
+      which gives 4-6 sticks and no sapling: `GatheringMinigameTests.NodePrefabs_GiveWhatTheirDefinitionSays` fails since
+      f4d0d470. Give it a prefab of its own, or point it at the planted young tree's.
 - [x] An NPC, Hild, appeared in the Haven with no explanation. NPCs don't just appear: each is saved on a raid, in a designed
       order that unlocks buildings as the player needs them, each one solving a problem. The user's outline: good gear and
       repairing it; refining (wood to planks); better tools; moving goods (wheelbarrows, boats); copper (stronger armour, tools,

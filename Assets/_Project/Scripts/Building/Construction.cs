@@ -292,10 +292,8 @@ public sealed class Construction : MonoBehaviour, ISaveable, ISharedState, IStat
         look.Celebrate();
         GameMessages.Post(first ? $"The {Definition.DisplayName} stands!" : $"The {Title} is finished!", MessageKind.Gain);
         Teach(by, first ? Definition.TeachesRecipes : Definition.UpgradeTo(Level)?.teachesRecipes);
-        if (first)
-        {
-            GameEvents.Raise(new GameEvent(GameEventKind.Built, Definition, 1, by != null ? by : Player.Current != null ? Player.Current.gameObject : null));
-        }
+        GameObject builder = by != null ? by : Player.Current != null ? Player.Current.gameObject : null;
+        GameEvents.Raise(first ? new GameEvent(GameEventKind.Built, Definition, 1, builder) : new GameEvent(GameEventKind.Upgraded, Definition, Level, builder));
 
         Finished?.Invoke(this);
     }
