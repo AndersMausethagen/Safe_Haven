@@ -62,8 +62,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.0510621, y: 0.6093784, z: 0.57489556}
-  m_Center: {x: 0.0018865466, y: 0.30529985, z: 0.0010611415}
+  m_Size: {x: 1.0535367, y: 0.607522, z: 0.57815444}
+  m_Center: {x: -0.00106287, y: 0.30293202, z: 0.0040149093}
 --- !u!114 &8240163907587623572
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -76,7 +76,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aecdc764a0346784e9958a956dddd948, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SaveableEntity
-  id: 968e5d8701114e2b8d96515fd3c6ab5f
+  id: 
   prefabId: 03169009b2a502142b5738f9649f15be
   saveTransform: 1
   saveActiveState: 1
@@ -127,7 +127,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageNumberSpawner
   prefab: {fileID: 2585767536226189764, guid: a3d82cadb26fc11408659ab4fc485897, type: 3}
-  height: 0.85998905
+  height: 0.856693
   spread: 0.4
 --- !u!208 &489742327470140598
 NavMeshObstacle:
@@ -139,11 +139,11 @@ NavMeshObstacle:
   m_Enabled: 1
   serializedVersion: 3
   m_Shape: 1
-  m_Extents: {x: 0.52553105, y: 0.3046892, z: 0.28744778}
+  m_Extents: {x: 0.5267683, y: 0.303761, z: 0.28907722}
   m_MoveThreshold: 0.1
   m_Carve: 1
   m_CarveOnlyStationary: 1
-  m_Center: {x: 0.0018865466, y: 0.30529985, z: 0.0010611415}
+  m_Center: {x: -0.00106287, y: 0.30293202, z: 0.0040149093}
   m_TimeToStationary: 0.5
 --- !u!114 &2813291349044586580
 MonoBehaviour:
@@ -364,7 +364,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6116774650318019959, guid: 23fed0501bab5b243abf7d5db76c65a8, type: 3}
       propertyPath: height
-      value: 1.059989
+      value: 1.0566931
       objectReference: {fileID: 0}
     - target: {fileID: 6538676668843931636, guid: 23fed0501bab5b243abf7d5db76c65a8, type: 3}
       propertyPath: m_Name

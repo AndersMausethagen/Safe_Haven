@@ -4,7 +4,9 @@
   "the pilot's whole Smithy. Same phases and keys as gathering_manifest.json (generate_gathering.py --group structures);",
   "the models go to the 'art' folder and into the prefabs by AgentScripts/BuildStructureModels.cs.",
   "Fires are made cold (no flames, no glow, no smoke): the game adds the flame, the light and the sparks.",
-  "Built things keep their stand-in's footprint (width), because the building's collider and nav obstacle are that size.",
+  "Sod roofs are made bare (dark peat, no grass): the 3D model draws grass badly, and the builder grows the game's own",
+  "grass on the roof instead, so it is the meadow's grass in colour, wind and season.",
+  "A building is made to look like its concept image, not like the stand-in it replaces.",
   "UltraTex (FLUX) is a non-commercial licence and Hunyuan3D's licence excludes some territories: re-texture/check before a release."
  ],
  "art": "Assets/_Project/Art/Haven/Structures",
@@ -40,7 +42,7 @@
   },
   {
    "asset": "Smithy Generated",
-   "width": 6.4,
+   "width": 7.4,
    "max_height": 4.6,
    "texture_size": 4096,
    "lod0_triangles": 16000,
@@ -48,9 +50,15 @@
    "looks": [
     {
      "key": "A",
-     "seed": 6301,
-     "prompt": "A small old Norse village smithy, one compact building seen from outside: low walls of dark tarred horizontal logs with notched corners on a foundation of grey field stones, a steep roof of thick green turf edged with birch bark and a log along the eaves, a squat stone chimney at one gable, and across the front an open lean-to porch on two timber posts sheltering a stone forge, an iron anvil on a tree stump and a wooden quench barrel. No people, no fire, no smoke."
+     "seed": 6313,
+     "prompt": "A small old Norse village smithy, one long low building seen from outside, about twice as wide as it is tall: walls of dark weathered horizontal logs with notched corners on a foundation of rounded grey field stones; a low-pitched gable roof covered with a thick, lumpy layer of bare dark brown peat earth, with no grass, no plants and no moss growing on it, a peeled log along each eave holding the earth, pale birch bark showing under the roof's edges, and weathered bargeboards on the gables; a squat chimney of grey stones with a flat cap stone rising through the roof at one end; the long front side open under the eave between two timber posts with diagonal braces, showing a stone forge inside, with an iron anvil on a tree stump and a wooden quench barrel standing at the opening. No people, no fire, no smoke.",
+     "turn": 180
     }
+   ],
+   "mesh_budget": 16000,
+   "generate_args": [
+    "--octree-resolution",
+    "384"
    ]
   }
  ]

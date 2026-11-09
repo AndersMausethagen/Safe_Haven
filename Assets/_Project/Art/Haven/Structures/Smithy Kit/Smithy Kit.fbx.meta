@@ -7,6 +7,16 @@ ModelImporter:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
+      name: Kit Birch
+    second: {fileID: 2100000, guid: 380fa462fa75dae4e87a7c6003a81e16, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Kit Boulder
+    second: {fileID: 2100000, guid: ce4c7bced51ed894c823358b6776289a, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
       name: Kit Ember
     second: {fileID: 2100000, guid: 191d801594b057848a5c6acf9e5323b7, type: 2}
   - first:
@@ -19,6 +29,11 @@ ModelImporter:
       assembly: UnityEngine.CoreModule
       name: Kit Planks
     second: {fileID: 2100000, guid: fda1a1ac76860fb47a627522f194816a, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Kit Soil
+    second: {fileID: 2100000, guid: 9862e8d48a8fb4646a0248b017b79cab, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule

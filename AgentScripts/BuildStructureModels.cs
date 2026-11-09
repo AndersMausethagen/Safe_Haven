@@ -20,6 +20,10 @@ using UnityEngine;
 /// Storage Shed's scaled-down one, which the Storage Shed keeps), and the Smithy made both ways as two prefabs to
 /// compare ("Smithy Generated", "Smithy Kit"); the Smithy the game places is not changed until one is chosen.
 /// Assets whose FBX hasn't been made are skipped. Re-runnable.
+///
+/// Sod roofs are modelled bare and get the meadow's own grass here (RoofGrass): clumps of the terrain's grass
+/// scattered over the roof and merged into one mesh, drawn by the grass shader's merged-clumps variant, so a roof
+/// has the ground's colour, wind, seasons and snow.
 /// </summary>
 public static class BuildStructureModels
 {
@@ -30,6 +34,13 @@ public static class BuildStructureModels
     private const string Stations = "Assets/_Project/Environment/Stations/";
     private const string Structures = "Assets/_Project/Prefabs/Structures/";
     private const string MeadowGrass = "Assets/_Project/Art/Terrain/World/Meadow Grass/Meadow Grass";
+    private const string DarkHumus = "Assets/_Project/Art/Terrain/World/Dark Humus/Dark Humus";
+    // The terrain's grass clump that grows on roofs, and how many of them a square metre of roof gets.
+    // (The Haven's meadow is painted almost wholly with this clump.)
+    private const string GrassClump = "Assets/_Project/Art/Vegetation/Safe Haven/Details/Short Grass.prefab";
+    private const float GrassPerSquareMetre = 6f;
+    // Moss on what a generated building turns to the sky: an olive that sits between the peat and the grass.
+    private static readonly Color RoofMoss = new Color(0.62f, 0.6f, 0.36f);
 
     private sealed class Generated
     {
@@ -37,6 +48,7 @@ public static class BuildStructureModels
         public int TextureSize = 2048; // the import's size; the baked files may be larger
         public float Parallax;
         public float Moss;
+        public Color MossTint = Color.white;
         public Color Tint = Color.white; // over the baked colour, where it sits too bright or too green beside the ground
         public int Cap = 5000;         // the manifest's lod0_triangles, for the budget report
     }
@@ -61,6 +73,11 @@ public static class BuildStructureModels
         new KitMaterial { Slot = "Kit Planks", Scan = "weathered_planks", Tint = new Color(1.2f, 1.08f, 0.96f), Parallax = 0.004f },
         new KitMaterial { Slot = "Kit Stone", Scan = "rock_wall_10", Tint = new Color(1.2f, 1.3f, 1.45f), Parallax = 0.012f },
         new KitMaterial { Slot = "Kit Iron", Scan = "rust_coarse_01", Tint = new Color(0.5f, 0.5f, 0.55f), Size = 512, Metallic = 0.6f },
+        // Field stones one by one (footings, chimneys, forges): the gathering rocks' pale scan. No moss: a tiling
+        // material's moss falls everywhere, the forge's stones under the roof included.
+        new KitMaterial { Slot = "Kit Boulder", Scan = "rock_boulder_dry", Tint = new Color(0.64f, 0.66f, 0.7f), Parallax = 0.012f },
+        // Birch bark under the sod, white along the eaves and gables: the plank scan, bleached.
+        new KitMaterial { Slot = "Kit Birch", Scan = "weathered_planks", Tint = new Color(2.1f, 2.0f, 1.82f) },
     };
 
     public static string Apply()
@@ -98,12 +115,24 @@ public static class BuildStructureModels
             report.Add(Budget(chest.Name, levels, chest.Cap, chest.TextureSize));
         }
 
-        var smithy = new Generated { Name = "Smithy Generated", TextureSize = 4096, Parallax = 0.004f, Cap = 16000, Tint = new Color(0.92f, 0.8f, 0.74f) };
+        // The bare peat roof greens over with the live moss layer (grown from the baked sky-facing mask), under the grass.
+        var smithy = new Generated { Name = "Smithy Generated", TextureSize = 4096, Parallax = 0.004f, Cap = 16000, Moss = 0.75f, MossTint = RoofMoss };
         if (Ready(smithy))
         {
             (Mesh[] levels, Material material) = Setup(smithy);
-            LookPrefab(Art + smithy.Name + "/" + smithy.Name + ".prefab", smithy.Name, levels, new[] { new[] { material } });
-            report.Add(Budget(smithy.Name, levels, smithy.Cap, smithy.TextureSize));
+            // Its roof is painted as bare peat: grass grows where the model faces the sky, high up, and is not grey
+            // stone (the chimney) or pale bark.
+            string folder = Art + smithy.Name + "/";
+            Color[] albedo = Readable(Load<Texture2D>(folder + smithy.Name + "_Albedo.png"), 1024);
+            float roofFrom = levels[0].bounds.min.y + levels[0].bounds.size.y * 0.45f;
+            (Mesh grass, Material grassMaterial) = RoofGrass(folder, smithy.Name, levels[0], (sub, centre, uv) =>
+            {
+                Color c = albedo[Mathf.Clamp((int)(uv.y * 1024f), 0, 1023) * 1024 + Mathf.Clamp((int)(uv.x * 1024f), 0, 1023)];
+                float max = Mathf.Max(c.r, c.g, c.b), min = Mathf.Min(c.r, c.g, c.b);
+                return centre.y > roofFrom && max < 0.62f && max - min > 0.14f * max;
+            }, 9f);
+            LookPrefab(folder + smithy.Name + ".prefab", smithy.Name, levels, new[] { new[] { material } }, grass, grassMaterial);
+            report.Add(Budget(smithy.Name, levels, smithy.Cap, smithy.TextureSize) + GrassLine(grass));
         }
 
         string kitSmithy = Art + "Smithy Kit/Smithy Kit.fbx";
@@ -141,6 +170,7 @@ public static class BuildStructureModels
         material.SetFloat("_Metallic", 1f); // the ORM's blue is the metallic itself
         Parallax(material, Load<Texture2D>(prefix + "_Height.png"), asset.Parallax);
         Moss(material, Load<Texture2D>(prefix + "_BlendMask.png"), asset.Moss, 3f);
+        material.SetColor("_L1Tint", asset.MossTint);
         Finish(material);
         return (Levels(folder, prefix + ".fbx", asset.Name + " A"), material);
     }
@@ -191,6 +221,7 @@ public static class BuildStructureModels
         }
 
         materials["Kit Turf"] = Turf();
+        materials["Kit Soil"] = Soil();
         materials["Kit Ember"] = Load<Material>("Assets/_Project/Materials/Haven/Base Ember.mat");
 
         // The FBX's faces carry the kit's material names; the import maps each to the kit's own material.
@@ -215,8 +246,13 @@ public static class BuildStructureModels
             slots.Add(part.GetComponent<MeshRenderer>().sharedMaterials);
         }
 
-        LookPrefab(System.IO.Path.ChangeExtension(fbx, ".prefab"), name, levels.ToArray(), slots.ToArray());
-        return Budget(name, levels.ToArray(), cap, 1024) + $" | {slots[0].Length} materials: {string.Join(", ", slots[0].Select(m => m != null ? m.name : "none"))}";
+        // Grass on the sod: the faces of the roof's own material.
+        Material[] first = slots[0];
+        (Mesh grass, Material grassMaterial) = RoofGrass(System.IO.Path.GetDirectoryName(fbx).Replace('\\', '/') + "/", name, levels[0],
+            (sub, centre, uv) => sub < first.Length && first[sub] != null && first[sub].name == "Kit Turf");
+        LookPrefab(System.IO.Path.ChangeExtension(fbx, ".prefab"), name, levels.ToArray(), slots.ToArray(), grass, grassMaterial);
+        return Budget(name, levels.ToArray(), cap, 1024) + GrassLine(grass) +
+               $" | {slots[0].Length} materials: {string.Join(", ", slots[0].Select(m => m != null ? m.name : "none"))}";
     }
 
     private static Material Scanned(KitMaterial kit)
@@ -251,14 +287,13 @@ public static class BuildStructureModels
         return Finish(material);
     }
 
-    /// <summary>The sod roof: the meadow's own grass at the meadow's own size (the kit repeats it every 2.5 m, the
-    /// ground every 4), toned to the olive the ground has under its blades, with drier patches so it is not a lawn.</summary>
+    /// <summary>The sod under a roof's grass: the meadow's own ground at the meadow's own size (4 m a repeat, as the
+    /// kit maps it), toned to the olive the ground has under its blades.</summary>
     private static Material Turf()
     {
         Material material = Begin(Kit + "Kit Turf.mat");
         material.SetTexture("_BaseMap", Load<Texture2D>(MeadowGrass + "_Color.jpg"));
-        material.SetTextureScale("_BaseMap", new Vector2(0.625f, 0.625f));
-        material.SetColor("_BaseColor", new Color(0.95f, 0.8f, 0.62f));
+        material.SetColor("_BaseColor", new Color(0.8f, 0.68f, 0.52f));
         material.SetTexture("_BumpMap", Load<Texture2D>(MeadowGrass + "_Normal.jpg"));
         material.SetFloat("_BumpScale", 1.5f);
         material.SetTexture("_ORMMap", null);
@@ -267,12 +302,182 @@ public static class BuildStructureModels
         material.SetFloat("_Metallic", 0f);
         material.SetFloat("_Smoothness", 0.06f);
         Parallax(material, null, 0f);
-        Moss(material, null, 0.3f, 2f);
-        material.SetFloat("_L1Upward", 0f);
-        material.SetFloat("_L1Patchiness", 0.9f);
-        material.SetColor("_L1Tint", new Color(1.1f, 0.95f, 0.5f)); // the moss, turned to dry grass
-        material.SetFloat("_L1Sharpness", 1.5f);
+        Moss(material, null, 0f, 1f);
         return Finish(material);
+    }
+
+    /// <summary>Bare earth: the cut edge of a sod roof, a smithy's floor. The forest's dark humus.</summary>
+    private static Material Soil()
+    {
+        Material material = Begin(Kit + "Kit Soil.mat");
+        material.SetTexture("_BaseMap", Load<Texture2D>(DarkHumus + "_Color.jpg"));
+        material.SetTexture("_BumpMap", Load<Texture2D>(DarkHumus + "_Normal.jpg"));
+        material.SetFloat("_BumpScale", 1.5f);
+        material.SetTexture("_ORMMap", null);
+        material.DisableKeyword("_ORMMAP");
+        material.SetTexture("_MetallicGlossMap", null);
+        material.SetFloat("_Metallic", 0f);
+        material.SetFloat("_Smoothness", 0.08f);
+        Parallax(material, null, 0f);
+        Moss(material, null, 0f, 1f);
+        return Finish(material);
+    }
+
+    // ----- Roof grass -----
+
+    /// <summary>The meadow's grass on a sod roof: clumps of the terrain's grass detail scattered over the roof's
+    /// faces that look to the sky (and that <paramref name="grows"/> accepts: submesh, face centre, face UV), merged
+    /// into one mesh saved beside the model. Each vertex carries its clump's root in UV1; the grass shader's
+    /// merged-clumps variant (_BAKED_ROOTS) sways, colours and thins every clump about that root, as it does a
+    /// terrain detail about its instance. The material is the terrain clump's own, with that variant on.</summary>
+    private static (Mesh, Material) RoofGrass(string folder, string name, Mesh roof, System.Func<int, Vector3, Vector2, bool> grows,
+        float perSquareMetre = GrassPerSquareMetre)
+    {
+        var prefab = Load<GameObject>(GrassClump);
+        Mesh clump = prefab.GetComponentInChildren<MeshFilter>().sharedMesh;
+        Material meadow = prefab.GetComponentInChildren<MeshRenderer>().sharedMaterial;
+
+        Vector3[] roofVertices = roof.vertices;
+        Vector2[] roofUv = roof.uv;
+        var random = new System.Random(7);
+        var roots = new List<Vector3>();
+        for (int sub = 0; sub < roof.subMeshCount; sub++)
+        {
+            int[] triangles = roof.GetTriangles(sub);
+            for (int i = 0; i < triangles.Length; i += 3)
+            {
+                Vector3 a = roofVertices[triangles[i]], b = roofVertices[triangles[i + 1]], c = roofVertices[triangles[i + 2]];
+                Vector3 normal = Vector3.Cross(b - a, c - a);
+                float area = normal.magnitude * 0.5f;
+                if (area < 1e-6f || normal.y / (area * 2f) < 0.5f)
+                {
+                    continue;
+                }
+
+                Vector2 uv = roofUv.Length > 0 ? (roofUv[triangles[i]] + roofUv[triangles[i + 1]] + roofUv[triangles[i + 2]]) / 3f : Vector2.zero;
+                if (!grows(sub, (a + b + c) / 3f, uv))
+                {
+                    continue;
+                }
+
+                float expected = area * perSquareMetre;
+                int count = (int)expected + (random.NextDouble() < expected - (int)expected ? 1 : 0);
+                for (int k = 0; k < count; k++)
+                {
+                    float u = (float)random.NextDouble(), v = (float)random.NextDouble();
+                    if (u + v > 1f)
+                    {
+                        u = 1f - u;
+                        v = 1f - v;
+                    }
+
+                    roots.Add(a + (b - a) * u + (c - a) * v);
+                }
+            }
+        }
+
+        Vector3[] clumpVertices = clump.vertices;
+        Vector3[] clumpNormals = clump.normals;
+        Color[] clumpColours = clump.colors;
+        Vector2[] clumpUv = clump.uv;
+        int[] clumpTriangles = clump.triangles;
+        int per = clumpVertices.Length;
+        var vertices = new List<Vector3>(roots.Count * per);
+        var normals = new List<Vector3>(roots.Count * per);
+        var colours = new List<Color>(roots.Count * per);
+        var uvs = new List<Vector2>(roots.Count * per);
+        var rootUvs = new List<Vector3>(roots.Count * per);
+        var indices = new List<int>(roots.Count * clumpTriangles.Length);
+        foreach (Vector3 root in roots)
+        {
+            Quaternion turn = Quaternion.Euler(0f, (float)random.NextDouble() * 360f, 0f);
+            float scale = Mathf.Lerp(0.8f, 1.25f, (float)random.NextDouble());
+            float phase = (float)random.NextDouble();
+            int first = vertices.Count;
+            for (int i = 0; i < per; i++)
+            {
+                vertices.Add(root + turn * (clumpVertices[i] * scale));
+                normals.Add(turn * clumpNormals[i]);
+                Color colour = i < clumpColours.Length ? clumpColours[i] : Color.white;
+                colour.g = Mathf.Repeat(colour.g + phase, 1f); // each blade's own number: its sway and its shade
+                colours.Add(colour);
+                uvs.Add(i < clumpUv.Length ? clumpUv[i] : Vector2.zero);
+                rootUvs.Add(root);
+            }
+
+            foreach (int index in clumpTriangles)
+            {
+                indices.Add(first + index);
+            }
+        }
+
+        var mesh = new Mesh { name = name + " Roof Grass" };
+        mesh.indexFormat = vertices.Count > 65535 ? UnityEngine.Rendering.IndexFormat.UInt32 : UnityEngine.Rendering.IndexFormat.UInt16;
+        mesh.SetVertices(vertices);
+        mesh.SetNormals(normals);
+        mesh.SetColors(colours);
+        mesh.SetUVs(0, uvs);
+        mesh.SetUVs(1, rootUvs);
+        mesh.SetTriangles(indices, 0);
+        mesh.RecalculateBounds();
+        Bounds bounds = mesh.bounds;
+        bounds.Expand(0.6f); // the wind moves the blades
+        mesh.bounds = bounds;
+        mesh.UploadMeshData(true);
+
+        string meshPath = folder + mesh.name + ".asset";
+        var saved = Load<Mesh>(meshPath);
+        if (saved != null)
+        {
+            EditorUtility.CopySerialized(mesh, saved);
+            Object.DestroyImmediate(mesh);
+            EditorUtility.SetDirty(saved);
+        }
+        else
+        {
+            AssetDatabase.CreateAsset(mesh, meshPath);
+            saved = mesh;
+        }
+
+        string materialPath = Kit + "Roof Grass.mat";
+        var material = Load<Material>(materialPath);
+        if (material == null)
+        {
+            material = new Material(meadow);
+            AssetDatabase.CreateAsset(material, materialPath);
+        }
+        else
+        {
+            material.shader = meadow.shader;
+            material.CopyPropertiesFromMaterial(meadow);
+        }
+
+        material.name = "Roof Grass";
+        material.SetFloat("_BakedRoots", 1f);
+        material.EnableKeyword("_BAKED_ROOTS");
+        material.enableInstancing = false; // one mesh per roof: there is nothing to instance
+        EditorUtility.SetDirty(material);
+        return (saved, material);
+    }
+
+    private static string GrassLine(Mesh grass) =>
+        grass == null ? "" : $" | roof grass {TriangleCount(grass)} tris {grass.vertexCount} verts (one draw; the shader thins it with distance)";
+
+    /// <summary>A texture's pixels at <paramref name="size"/>, whatever its import settings (a blit and a read-back).</summary>
+    private static Color[] Readable(Texture2D texture, int size)
+    {
+        RenderTexture target = RenderTexture.GetTemporary(size, size, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.sRGB);
+        RenderTexture previous = RenderTexture.active;
+        Graphics.Blit(texture, target);
+        RenderTexture.active = target;
+        var copy = new Texture2D(size, size, TextureFormat.RGBA32, false);
+        copy.ReadPixels(new Rect(0, 0, size, size), 0, 0);
+        copy.Apply();
+        RenderTexture.active = previous;
+        RenderTexture.ReleaseTemporary(target);
+        Color[] pixels = copy.GetPixels();
+        Object.DestroyImmediate(copy);
+        return pixels;
     }
 
     // ----- Shared -----
@@ -449,7 +654,8 @@ public static class BuildStructureModels
         AssetDatabase.LoadAllAssetsAtPath(model).OfType<Mesh>().FirstOrDefault(mesh => mesh.name == name);
 
     /// <summary>A model prefab that is the look itself: the LODGroup on its root.</summary>
-    private static GameObject LookPrefab(string path, string name, Mesh[] levels, Material[][] materials)
+    private static GameObject LookPrefab(string path, string name, Mesh[] levels, Material[][] materials,
+        Mesh grass = null, Material grassMaterial = null)
     {
         bool exists = Load<GameObject>(path) != null;
         GameObject root = exists ? PrefabUtility.LoadPrefabContents(path) : new GameObject(name);
@@ -460,7 +666,7 @@ public static class BuildStructureModels
                 Object.DestroyImmediate(root.transform.GetChild(i).gameObject);
             }
 
-            AddLevels(root, levels, materials);
+            AddLevels(root, levels, materials, grass, grassMaterial);
             return PrefabUtility.SaveAsPrefabAsset(root, path);
         }
         finally
@@ -477,9 +683,21 @@ public static class BuildStructureModels
     }
 
     /// <summary>A LODGroup on <paramref name="look"/> over its levels: hard switches, heights from the game's own view
-    /// (LOD0 holds over the whole top-down view), the last level casting no shadow.</summary>
-    private static void AddLevels(GameObject look, Mesh[] levels, Material[][] materials)
+    /// (LOD0 holds over the whole top-down view), the last level casting no shadow. Roof grass, where there is any,
+    /// is drawn with every level but the last.</summary>
+    private static void AddLevels(GameObject look, Mesh[] levels, Material[][] materials, Mesh grass = null, Material grassMaterial = null)
     {
+        MeshRenderer grassRenderer = null;
+        if (grass != null && grass.vertexCount > 0)
+        {
+            var part = new GameObject("Roof Grass");
+            part.transform.SetParent(look.transform, false);
+            part.AddComponent<MeshFilter>().sharedMesh = grass;
+            grassRenderer = part.AddComponent<MeshRenderer>();
+            grassRenderer.sharedMaterial = grassMaterial;
+            grassRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+        }
+
         float[] heights = ScreenBudget.LodHeights(levels[0].bounds, levels.Select(TriangleCount).ToArray());
         var lods = new LOD[levels.Length];
         for (int i = 0; i < levels.Length; i++)
@@ -491,7 +709,9 @@ public static class BuildStructureModels
             renderer.sharedMaterials = materials[Mathf.Min(i, materials.Length - 1)];
             bool shadow = i < levels.Length - 1 || levels.Length == 1;
             renderer.shadowCastingMode = shadow ? UnityEngine.Rendering.ShadowCastingMode.On : UnityEngine.Rendering.ShadowCastingMode.Off;
-            lods[i] = new LOD(i == levels.Length - 1 ? heights[heights.Length - 1] : heights[Mathf.Min(i, heights.Length - 1)], new Renderer[] { renderer });
+            bool grassy = grassRenderer != null && (i < levels.Length - 1 || levels.Length == 1);
+            lods[i] = new LOD(i == levels.Length - 1 ? heights[heights.Length - 1] : heights[Mathf.Min(i, heights.Length - 1)],
+                grassy ? new Renderer[] { renderer, grassRenderer } : new Renderer[] { renderer });
         }
 
         LODGroup group = look.TryGetComponent(out LODGroup existing) ? existing : look.AddComponent<LODGroup>();

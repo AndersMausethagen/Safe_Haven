@@ -14,7 +14,11 @@ Run with LocalSpawn's Python (Unity closed: generation needs ~13 GB RAM):
 Other groups of models use the same phases: --group structures reads structures_manifest.json, works in
 Tools/LocalSpawn/Structures and writes to the manifest's "art" folder (then AgentScripts/BuildStructureModels.cs).
 A manifest asset may set texture_size (1024, 2048 or 4096: the generated maps and the baked atlas), quality
-(LocalSpawn's: game or hero) and generate_args (more generate_3d.py switches); a look may set the last two as well.
+(LocalSpawn's: game or hero), mesh_budget (triangles of the generated mesh: at least the asset's lod0_triangles) and
+generate_args (more generate_3d.py switches); a look may set the last three as well.
+
+The 3d phase keeps LocalSpawn's ComfyUI up between models (each would otherwise load its models again) and stops it
+when the phase is done.
 """
 import glob
 import json
@@ -72,18 +76,26 @@ def images(manifest, wanted):
 
 
 def shapes(manifest, wanted):
+    started = False
     for asset, look, folder in looks(manifest, wanted):
         concept = os.path.join(folder, "concept.png")
         if not os.path.exists(concept) or glob.glob(os.path.join(folder, "**", "*.glb"), recursive=True):
             continue
+        started = True
         # quality: LocalSpawn's mesh size (game 10k faces, hero 30k: a building's LOD0 can't exceed what it is given);
         # generate_args: more of generate_3d.py's switches for this asset or look, e.g. ["--watertight"] for a mesh
         # that comes out in open sheets, ["--ultratex-resolution", "2048"] for a large one's texture.
         extra = [str(a) for a in asset.get("generate_args", []) + look.get("generate_args", [])]
+        budget = look.get("mesh_budget", asset.get("mesh_budget"))
+        if budget:
+            extra += ["--mesh-budget", str(budget)]
         run([PYTHON, "generate_3d.py", "--image", concept, "--model", "hunyuan3d",
              "--quality", look.get("quality", asset.get("quality", "game")), "--ultratex",
              "--texture-size", str(asset.get("texture_size", 2048)), "--normal-map", "high", "--target", "unity", "--format", "glb", "--out-dir", folder,
-             "--name", "model", "--seed", str(look["seed"])] + extra, cwd=AGENT, log=os.path.join(folder, "3d.log"))
+             "--name", "model", "--seed", str(look["seed"]), "--keep-loaded"] + extra, cwd=AGENT,
+            log=os.path.join(folder, "3d.log"))
+    if started:
+        run([PYTHON, "generate_image.py", "--stop"], cwd=AGENT)  # the server holds ~13 GB of RAM and the GPU
 
 
 def sprites(manifest, wanted):

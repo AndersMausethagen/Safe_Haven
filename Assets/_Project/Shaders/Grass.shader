@@ -44,6 +44,7 @@ Shader "Safe Haven/Grass"
         _FarEnd ("Draw Distance (metres; the terrain's Detail Distance)", Float) = 50
         _FarDensity ("Density at the Draw Distance", Range(0.05, 1)) = 0.35
         _AnimationDistance ("Animated Up To (metres)", Float) = 45
+        [Toggle(_BAKED_ROOTS)] _BakedRoots ("Merged Clumps (roots in UV1; roof grass)", Float) = 0
         [Header(Night Glow)]
         [HDR] _GlowColor ("Glow Colour (at night, where vertex colour B is set)", Color) = (0, 0, 0, 1)
         _GlowPulse ("Glow Pulse", Range(0, 1)) = 0.4
@@ -119,6 +120,9 @@ Shader "Safe Haven/Grass"
             float4 positionOS : POSITION;
             float3 normalOS : NORMAL;
             float2 uv : TEXCOORD0;
+            #if defined(_BAKED_ROOTS)
+            float3 root : TEXCOORD1; // the clump's root in object space (see _BAKED_ROOTS below)
+            #endif
             half4 color : COLOR;
             UNITY_VERTEX_INPUT_INSTANCE_ID
         };
@@ -161,9 +165,17 @@ Shader "Safe Haven/Grass"
 
         // Bent world position of a vertex: clump height, wind sway (stronger at the tip, in travelling gust waves)
         // and interactors pushing it away. Far blades skip all of it.
+        // _BAKED_ROOTS: many clumps merged into one mesh (the grass on a sod roof), each vertex carrying its clump's
+        // root in TEXCOORD1. A terrain detail is one clump per instance, rooted at the instance's origin.
         float3 GrassPosition(Attributes input, out float3 rootWS)
         {
-            rootWS = TransformObjectToWorld(float3(0, 0, 0));
+            #if defined(_BAKED_ROOTS)
+            float3 rootOS = input.root;
+            #else
+            float3 rootOS = float3(0, 0, 0);
+            #endif
+            float3 bladeOS = input.positionOS.xyz - rootOS;
+            rootWS = TransformObjectToWorld(rootOS);
             float keep, scale, animate;
             DistanceLod(rootWS, input.color.g, keep, scale, animate);
             if (_GrassTerrainColorOn > 0.5) // the colour map's alpha is 0 under water: nothing grows there
@@ -172,10 +184,10 @@ Shader "Safe Haven/Grass"
                 keep *= step(0.5, SAMPLE_TEXTURE2D_LOD(_GrassTerrainColor, sampler_GrassTerrainColor, mapUV, 0).a);
             }
             float clump = Noise(rootWS.xz / max(_ClumpScale, 0.05));
-            float3 positionOS = input.positionOS.xyz * (_Size * scale * keep);
+            float3 positionOS = bladeOS * (_Size * scale * keep);
             positionOS.y *= 1.0 + (clump * 2.0 - 1.0) * _ClumpHeight;
             positionOS.y *= 1.0 - 0.55 * _SafeHavenSnow;
-            float3 world = TransformObjectToWorld(positionOS);
+            float3 world = TransformObjectToWorld(rootOS + positionOS);
             if (_FacingBlades > 0.5)
             {
                 // Each blade turns around its own axis to show its full width to the camera (an axial billboard).
@@ -188,7 +200,11 @@ Shader "Safe Haven/Grass"
                 float halfWidth = input.color.a * 0.05 * (input.uv.x * 2.0 - 1.0);
                 world += sideWS * (halfWidth * instanceScale * _Size * scale * keep);
             }
+            #if defined(_BAKED_ROOTS)
+            float2 footprint = float2(0, 0); // footprints are a map of the ground: a roof over a path is not trodden
+            #else
             float2 footprint = GrassFootprint(world.xz).xz;
+            #endif
             if (animate <= 0.0 || keep <= 0.0)
             {
                 world.y = lerp(world.y, min(world.y, rootWS.y + 0.01), footprint.x) - footprint.y;
@@ -208,7 +224,7 @@ Shader "Safe Haven/Grass"
             // A little life without a MossWind; stronger than its usual 1 in storms (WeatherSystem).
             float amount = _WindStrength * _Size * lerp(0.15, 1.0, windy) * clamp(_SafeHavenTreeWind, 1.0, 4.0);
             world.xz += (direction * sway + float2(-direction.y, direction.x) * flutter) * amount * bend;
-            float height = max(input.positionOS.y * _Size, 1e-3);
+            float height = max(bladeOS.y * _Size, 1e-3);
             int count = (int)min(_GrassInteractorCount, GRASS_MAX_INTERACTORS);
             for (int i = 0; i < count; i++)
             {
@@ -253,7 +269,9 @@ Shader "Safe Haven/Grass"
             colour = lerp(colour, half3(0.8, 0.84, 0.88), saturate(_SafeHavenSeason.z * 0.6 * (0.4 + 0.6 * tip)));
             colour = lerp(colour, half3(0.82, 0.86, 0.92), saturate(_SafeHavenSnow * (1.0 - 0.45 * tip)));
             half clump = Noise(rootWS.xz / max(_ClumpScale, 0.05) + 17.0);
+            #if !defined(_BAKED_ROOTS)
             colour *= 1 - GrassFootprint(rootWS.xz).y;
+            #endif
             return colour * (1.0 + (input.color.g - 0.5) * 2.0 * _BladeVariation) * lerp(0.85, 1.12, clump);
         }
 
@@ -293,6 +311,7 @@ Shader "Safe Haven/Grass"
             #pragma vertex GrassVertex
             #pragma fragment GrassFragment
             #pragma multi_compile_instancing
+            #pragma shader_feature_local_vertex _BAKED_ROOTS
             #pragma multi_compile_fog
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE _MAIN_LIGHT_SHADOWS_SCREEN
             #pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
@@ -358,6 +377,7 @@ Shader "Safe Haven/Grass"
             #pragma vertex ShadowVertex
             #pragma fragment ShadowFragment
             #pragma multi_compile_instancing
+            #pragma shader_feature_local_vertex _BAKED_ROOTS
             #pragma multi_compile_vertex _ _CASTING_PUNCTUAL_LIGHT_SHADOW
             float3 _LightDirection;
             float3 _LightPosition;
@@ -397,6 +417,7 @@ Shader "Safe Haven/Grass"
             #pragma vertex GrassVertex
             #pragma fragment DepthFragment
             #pragma multi_compile_instancing
+            #pragma shader_feature_local_vertex _BAKED_ROOTS
             half4 DepthFragment(Varyings input) : SV_Target
             {
                 GrassAlbedo(input);
@@ -414,6 +435,7 @@ Shader "Safe Haven/Grass"
             #pragma vertex GrassVertex
             #pragma fragment NormalsFragment
             #pragma multi_compile_instancing
+            #pragma shader_feature_local_vertex _BAKED_ROOTS
             #pragma multi_compile_fragment _ _GBUFFER_NORMALS_OCT
             half4 NormalsFragment(Varyings input) : SV_Target
             {
