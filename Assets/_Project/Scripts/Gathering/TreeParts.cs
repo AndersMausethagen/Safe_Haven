@@ -35,6 +35,9 @@ public sealed class TreeParts
     public Color LeafTint { get; private set; } = new Color(0.38f, 0.56f, 0.22f);
     /// <summary>The tree's own leaf-fall effect (TreeLeafLook), or null for Tree Chopping Settings › Leaf Fall.</summary>
     public GameObject LeafFall { get; private set; }
+
+    /// <summary>The tree's own wood (ChoppableTree.Wood), or null: its logs roll by the axe's tier.</summary>
+    public ItemDefinition Wood { get; set; }
     /// <summary>The tree's own bark, or null when its bark is made for its model alone and won't wrap a log.</summary>
     public Material Bark { get; private set; }
 

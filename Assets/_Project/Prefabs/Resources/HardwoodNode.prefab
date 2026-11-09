@@ -13,6 +13,9 @@ GameObject:
   - component: {fileID: 7409639655577795583}
   - component: {fileID: 8695715786287007832}
   - component: {fileID: 25243016511775383}
+  - component: {fileID: 8093600428432395839}
+  - component: {fileID: 2162467726030986276}
+  - component: {fileID: 7607982805971783542}
   m_Layer: 0
   m_Name: HardwoodNode
   m_TagString: Untagged
@@ -95,6 +98,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ResourceNode
   node: {fileID: 11400000, guid: 722c003ae9974774e904b3602a018469, type: 2}
+  keepOwnModel: 0
 --- !u!114 &25243016511775383
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -113,6 +117,56 @@ MonoBehaviour:
   saveActiveState: 1
   rememberDestruction: 1
   saveComponents: 1
+--- !u!136 &8093600428432395839
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2009929089532973240}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.3065973
+  m_Height: 5.9082727
+  m_Direction: 1
+  m_Center: {x: 0, y: 2.9541364, z: 0}
+--- !u!114 &2162467726030986276
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2009929089532973240}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9f9c0a17caeb0b8499b87857f58ed6c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::ChoppableTree
+  wood: {fileID: 11400000, guid: 183fddc5567e8b8479fcb1618e73496c, type: 2}
+--- !u!114 &7607982805971783542
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2009929089532973240}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a36ce106e7163244ae9975f36a669db, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::TreeLeafLook
+  leafFall: {fileID: 0}
+  colour: {r: 0.62, g: 0.3, b: 0.1, a: 1}
 --- !u!1001 &3520256619448243969
 PrefabInstance:
   m_ObjectHideFlags: 0

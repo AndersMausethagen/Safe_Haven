@@ -176,9 +176,30 @@ public sealed class ModelBudgetTests
                     continue;
                 }
 
-                Bounds bounds = filter.sharedMesh.bounds;
-                Vector3 scale = first.transform.lossyScale;
-                bounds.size = Vector3.Scale(bounds.size, new Vector3(Mathf.Abs(scale.x), Mathf.Abs(scale.y), Mathf.Abs(scale.z)));
+                // All of LOD0's parts (a tree is a trunk and a crown), as the builders size it.
+                Bounds bounds = default;
+                bool any = false;
+                foreach (Renderer part in lods[0].renderers.Where(r => r != null))
+                {
+                    if (!part.TryGetComponent(out MeshFilter partFilter) || partFilter.sharedMesh == null)
+                    {
+                        continue;
+                    }
+
+                    Bounds b = partFilter.sharedMesh.bounds;
+                    Vector3 s = part.transform.lossyScale;
+                    b.size = Vector3.Scale(b.size, new Vector3(Mathf.Abs(s.x), Mathf.Abs(s.y), Mathf.Abs(s.z)));
+                    if (any)
+                    {
+                        bounds.Encapsulate(b);
+                    }
+                    else
+                    {
+                        bounds = b;
+                        any = true;
+                    }
+                }
+
                 float farthest = ScreenBudget.FarthestTopDownRelativeHeight(bounds);
                 if (lods[0].screenRelativeTransitionHeight > farthest * 1.02f)
                 {

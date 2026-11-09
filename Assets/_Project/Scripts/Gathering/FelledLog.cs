@@ -188,7 +188,7 @@ public sealed class FelledLog : MonoBehaviour, IHarvestBody
         sections.RemoveAt(0);
         TreeChoppingSettings rules = TreeChoppingSettings.Current;
         int axe = Mathf.Max(1, ItemInventory.GatheringTier(user, ToolType.Axe));
-        ChoppableTree.Roll(rules.SectionLogs(axe) + HavenReadiness.ExtraLogs, axe, size, () => Random.value, yield);
+        ChoppableTree.Roll(rules.SectionLogs(axe) + HavenReadiness.ExtraLogs, axe, size, () => Random.value, yield, parts?.Wood);
         source.GrantItems(user, yield);
 
         Vector3 roll = Vector3.Cross(transform.up, Vector3.up);

@@ -51,6 +51,37 @@ public sealed class FellingTests
     }
 
     [Test]
+    public void ATreeWithItsOwnWood_GivesOnlyThatWood_WhateverTheAxe()
+    {
+        var hardwood = AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Project/Data/Items/Materials/Hardwood.asset");
+        var logs = new List<ItemAmount>();
+        foreach (int axe in new[] { 1, 2, 4 })
+        {
+            ChoppableTree.Roll(5, axe, 1.5f, () => 0f, logs, hardwood);
+            Assert.AreEqual(1, logs.Count, $"axe {axe}");
+            Assert.AreEqual(hardwood, logs[0].Item);
+            Assert.AreEqual(5, logs[0].Amount);
+        }
+    }
+
+    [TestCase("OakWoodNode", "OakWood")]
+    [TestCase("HardwoodNode", "Hardwood")]
+    [TestCase("ElderwoodNode", "Elderwood")]
+    public void TheWoodNodes_AreFellableTrees_OfTheirOwnWood(string node, string wood)
+    {
+        // Oak Wood, Hardwood and Elderwood stand as real trees (BuildWoodTrees): felled with an axe of their tier like the
+        // forest's trees, and every log is their own wood.
+        var prefab = AssetDatabase.LoadAssetAtPath<GameObject>($"Assets/_Project/Prefabs/Resources/{node}.prefab");
+        Assert.IsTrue(prefab.TryGetComponent(out ChoppableTree tree), "fellable");
+        Assert.AreEqual(AssetDatabase.LoadAssetAtPath<ItemDefinition>($"Assets/_Project/Data/Items/Materials/{wood}.asset"), tree.Wood);
+        Assert.IsTrue(prefab.TryGetComponent(out CapsuleCollider trunk), "a trunk the axe and a falling tree can meet");
+        Assert.Greater(trunk.height, 3f);
+        Assert.IsNotNull(prefab.GetComponentInChildren<LODGroup>(true), "a real tree model, not the primitive stand-in");
+        Assert.IsTrue(prefab.TryGetComponent(out TreeLeafLook _));
+        Assert.AreEqual(ToolType.Axe, prefab.GetComponent<ResourceNode>().Definition.GatherTool);
+    }
+
+    [Test]
     public void ATree_FallsAwayFromTheFeller_WhenThereIsRoom()
     {
         Vector3 fall = FellDirection.Choose(Vector3.right, 75f, 5, way => 1f);

@@ -13,6 +13,9 @@ GameObject:
   - component: {fileID: 2720804293349983114}
   - component: {fileID: 8475720860609265073}
   - component: {fileID: 5317867585658608980}
+  - component: {fileID: 8863316120087789964}
+  - component: {fileID: 6891558376276248844}
+  - component: {fileID: 8878136794279009131}
   m_Layer: 0
   m_Name: OakWoodNode
   m_TagString: Untagged
@@ -52,6 +55,7 @@ MonoBehaviour:
   duration: 2
   range: 1.6
   deactivateOnComplete: 0
+  kind: 0
   started:
     m_PersistentCalls:
       m_Calls: []
@@ -94,6 +98,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ResourceNode
   node: {fileID: 11400000, guid: 7fe91c2456449cd4084e759d6450700a, type: 2}
+  keepOwnModel: 0
 --- !u!114 &5317867585658608980
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -112,6 +117,56 @@ MonoBehaviour:
   saveActiveState: 1
   rememberDestruction: 1
   saveComponents: 1
+--- !u!136 &8863316120087789964
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 948381022197778722}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.23584406
+  m_Height: 4.544825
+  m_Direction: 1
+  m_Center: {x: 0, y: 2.2724125, z: 0}
+--- !u!114 &6891558376276248844
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 948381022197778722}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9f9c0a17caeb0b8499b87857f58ed6c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::ChoppableTree
+  wood: {fileID: 11400000, guid: 8ae2883815327b74fa7975309c803f92, type: 2}
+--- !u!114 &8878136794279009131
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 948381022197778722}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a36ce106e7163244ae9975f36a669db, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::TreeLeafLook
+  leafFall: {fileID: 0}
+  colour: {r: 0.32, g: 0.44, b: 0.22, a: 1}
 --- !u!1001 &1190989569361963681
 PrefabInstance:
   m_ObjectHideFlags: 0

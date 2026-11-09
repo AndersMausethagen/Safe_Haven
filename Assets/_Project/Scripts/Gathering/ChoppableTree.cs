@@ -20,6 +20,10 @@ public sealed class ChoppableTree : MonoBehaviour, IHarvestBody
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetForNewPlaySession() => enabledTrees.Clear();
 
+    [Tooltip("This tree's own wood (an oak gives Oak Wood, a hardwood tree Hardwood, an elder Elderwood): every log it " +
+             "gives is this. Empty: the woods roll by the axe's tier (TreeChoppingSettings), as the painted forest's do.")]
+    [SerializeField] private ItemDefinition wood;
+
     private readonly List<ItemAmount> logs = new List<ItemAmount>();
     private Interactable interactable;
     private ResourceSource source;
@@ -34,6 +38,9 @@ public sealed class ChoppableTree : MonoBehaviour, IHarvestBody
     public float Size { get; private set; } = 1f;
 
     public float HarvestSize => Size;
+
+    /// <summary>The tree's own wood, or null: the woods roll by the axe's tier.</summary>
+    public ItemDefinition Wood => wood;
 
     private void Awake()
     {
@@ -81,7 +88,13 @@ public sealed class ChoppableTree : MonoBehaviour, IHarvestBody
         return Parts;
     }
 
-    private TreeParts Parts => parts ??= standIn != null ? standIn() : TreeParts.Of(gameObject);
+    private TreeParts Parts => parts ??= WithWood(standIn != null ? standIn() : TreeParts.Of(gameObject));
+
+    private TreeParts WithWood(TreeParts tree)
+    {
+        tree.Wood = wood;
+        return tree;
+    }
 
     private void OnEnable()
     {
@@ -136,7 +149,7 @@ public sealed class ChoppableTree : MonoBehaviour, IHarvestBody
 
         GameObject user = interactable.Interactor;
         int axe = Mathf.Max(1, ItemInventory.GatheringTier(user, ToolType.Axe));
-        Roll(TreeChoppingSettings.Current.FellingLogs(axe, Size), axe, Size, () => Random.value, logs);
+        Roll(TreeChoppingSettings.Current.FellingLogs(axe, Size), axe, Size, () => Random.value, logs, wood);
         if (FelledTree.Spawn(Parts, Size, user, logs) == null)
         {
             source.GrantItems(user, logs);
@@ -173,10 +186,21 @@ public sealed class ChoppableTree : MonoBehaviour, IHarvestBody
     public static void Roll(int axeTier, float size, System.Func<float> random, List<ItemAmount> into) =>
         Roll(TreeChoppingSettings.Current.Logs(axeTier, size), axeTier, size, random, into);
 
-    /// <summary><paramref name="total"/> logs of a tree of <paramref name="size"/>, merged by wood.</summary>
-    public static void Roll(int total, int axeTier, float size, System.Func<float> random, List<ItemAmount> into)
+    /// <summary><paramref name="total"/> logs of a tree of <paramref name="size"/>, merged by wood; all of them
+    /// <paramref name="ownWood"/> when the tree has one.</summary>
+    public static void Roll(int total, int axeTier, float size, System.Func<float> random, List<ItemAmount> into, ItemDefinition ownWood = null)
     {
         into.Clear();
+        if (ownWood != null)
+        {
+            if (total > 0)
+            {
+                into.Add(new ItemAmount(ownWood, total));
+            }
+
+            return;
+        }
+
         TreeChoppingSettings rules = TreeChoppingSettings.Current;
         var counts = new Dictionary<ItemDefinition, int>();
         for (int i = 0; i < total; i++)
