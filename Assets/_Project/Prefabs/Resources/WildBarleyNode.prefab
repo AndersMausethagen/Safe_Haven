@@ -56,8 +56,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.6509458, y: 0.895, z: 0.6190015}
-  m_Center: {x: -0.04259023, y: 0.4475, z: -0.09503698}
+  m_Size: {x: 0.91619277, y: 0.8351291, z: 0.72241884}
+  m_Center: {x: 0.06827527, y: 0.39619187, z: 0.06941858}
 --- !u!114 &2015788424741158479
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -135,6 +135,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: SafeHaven::ResourceNode
   node: {fileID: 11400000, guid: c8f3702ae985a5140a5aae806df63482, type: 2}
+  keepOwnModel: 0
 --- !u!1001 &7244409953445098173
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -56,8 +56,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.6550586, y: 0.5587034, z: 0.6673583}
-  m_Center: {x: 0.012470603, y: 0.25064826, z: -0.0004786849}
+  m_Size: {x: 0.4584667, y: 0.48444548, z: 0.5173189}
+  m_Center: {x: 0.032407105, y: 0.21988846, z: -0.051279575}
 --- !u!114 &8222769955065994141
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -92,6 +92,7 @@ MonoBehaviour:
   duration: 2
   range: 1.5
   deactivateOnComplete: 0
+  kind: 0
   started:
     m_PersistentCalls:
       m_Calls: []
@@ -134,6 +135,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ResourceNode
   node: {fileID: 11400000, guid: 3e099ac7dae81a844a18a518d437da43, type: 2}
+  keepOwnModel: 0
 --- !u!1001 &124805726255525053
 PrefabInstance:
   m_ObjectHideFlags: 0

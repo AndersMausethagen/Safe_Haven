@@ -95,6 +95,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ResourceNode
   node: {fileID: 11400000, guid: 0f9ee456effddc34eadcc24a1eb3a666, type: 2}
+  keepOwnModel: 0
 --- !u!114 &1318889157062175519
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -1,20 +1,19 @@
 """The first things the player gathers in Safe Haven, modelled and textured in Blender: Small Rocks, Sticks and the Berry Bush.
 
 They replace the sphere and cylinder stand-ins of the Small Rocks, Sticks and Berries nodes (and the dropped Small Rocks and
-Sticks), and are meant to sit beside the Poly Haven scans the Haven is dressed with (Field Stone, the fallen logs), so they
-are made the same way: real-size shapes whose surfaces come from CC0 scanned textures (Poly Haven lichen_rock and
-bark_brown_02, in Tools/Blender/Sources/PolyHaven), baked into each asset's own UVs with ambient occlusion.
+Sticks), and are made like the Poly Haven scans the Haven is dressed with: real-size shapes whose surfaces come from CC0
+scanned textures (rock_boulder_dry, bark_brown_02), baked with prop_bake.py into Albedo, Normal, ORM, Height (parallax)
+and BlendMask (where moss grows) maps.
 
-- Small Rocks: three clusters of rounded granite field stones with lichen, 3 to 5 stones, about 0.55 x 0.5 m. Sculpted
-  high (voronoi facets and noise on a subdivided sphere), baked onto a low mesh of about 250 triangles a stone.
-- Sticks: three heaps of fallen, forked branches, 3 to 5 sticks 0.35 to 0.6 m long, with broken, pale ends.
-- Berry Bush: two wild currant shrubs, about 1.3 m across and 0.9 m high: arching woody stems, about a thousand leaves
-  and clusters of red berries hanging on the outside, where the game's camera above sees them.
+- Small Rocks: three clusters of split grey field stones, 3 to 5 stones, about 0.55 x 0.5 m. Sculpted high (split
+  planes and noise on a subdivided sphere), baked onto a low mesh of about 250 triangles a stone.
+- Sticks: three heaps of fallen, forked branches, 3 to 5 sticks 0.35 to 0.6 m long, with broken, pale ends; half again
+  as thick as real twigs, so they read from the game's camera.
+- Berry Bush: two wild currant shrubs, about 1.3 m across and 0.9 m high: arching woody stems, a leafy crown and strings
+  of red berries on its top, where the game's camera sees them.
 
-Each asset is one FBX holding its variants as separate objects ("<Asset> A", "B", ...), each with its pivot on the ground
-under its middle, and three 2048 or 1024 textures: <Asset>_Albedo.png, <Asset>_Normal.png and <Asset>_ORM.png (R
-occlusion, G roughness, B metallic: what the game's Layered Lit shader reads). Writes Assets/_Project/Art/Gathering/
-<Asset>/, a preview render of all variants to the path given, and Forage.blend beside this script.
+Writes Assets/_Project/Art/Gathering/<Asset>/, a preview render of all variants to the path given, and Forage.blend
+beside this script.
 
 Run: blender -b --factory-startup --python Tools/Blender/forage_nodes.py -- <project root> <preview.png> [asset ...]
 (assets: rocks, sticks, bush; all when none are named).
@@ -29,293 +28,19 @@ import bmesh
 import bpy
 from mathutils import Matrix, Vector, noise
 
-args = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
-ROOT = args[0] if args else "D:/Safe Haven/Safe Haven"
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from prop_bake import *  # noqa: E402,F401,F403  (helpers, materials, bake)
+from prop_bake import ROOT, args  # noqa: E402
+
 PREVIEW = args[1] if len(args) > 1 else os.path.join(ROOT, "Tools", "Blender", "forage_preview.png")
 WANTED = set(args[2:]) or {"rocks", "sticks", "bush"}
-SOURCES = os.path.join(ROOT, "Tools", "Blender", "Sources", "PolyHaven")
-ART = os.path.join(ROOT, "Assets", "_Project", "Art", "Gathering")
-
-
-# ----- Small helpers ------------------------------------------------------------------------------------------------
-
-def collection(name):
-    found = bpy.data.collections.get(name)
-    if found is None:
-        found = bpy.data.collections.new(name)
-        bpy.context.scene.collection.children.link(found)
-    return found
-
-
-def mesh_object(name, bm, coll, materials=()):
-    mesh = bpy.data.meshes.new(name)
-    bm.to_mesh(mesh)
-    bm.free()
-    obj = bpy.data.objects.new(name, mesh)
-    coll.objects.link(obj)
-    for material in materials:
-        mesh.materials.append(material)
-    return obj
-
-
-def select_only(objects, active=None):
-    bpy.ops.object.select_all(action='DESELECT')
-    for obj in objects:
-        obj.select_set(True)
-    bpy.context.view_layer.objects.active = active or objects[0]
-
-
-def join(objects, name):
-    select_only(objects)
-    bpy.ops.object.join()
-    joined = bpy.context.view_layer.objects.active
-    joined.name = name
-    joined.data.name = name
-    return joined
-
-
-def image(path, colourspace):
-    img = bpy.data.images.load(path, check_existing=True)
-    img.colorspace_settings.name = colourspace
-    return img
-
-
-def source(asset, kind):
-    return os.path.join(SOURCES, asset, f"{asset}_{kind}_2k.jpg")
-
-
-def node(tree, kind, location, **inputs):
-    n = tree.nodes.new(kind)
-    n.location = location
-    for key, value in inputs.items():
-        n.inputs[key].default_value = value
-    return n
-
-
-def ramp(tree, location, stops):
-    n = tree.nodes.new("ShaderNodeValToRGB")
-    n.location = location
-    elements = n.color_ramp.elements
-    while len(elements) > len(stops):
-        elements.remove(elements[-1])
-    while len(elements) < len(stops):
-        elements.new(0.5)
-    for element, (pos, colour) in zip(elements, stops):
-        element.position = pos
-        element.color = (*colour, 1.0)
-    return n
-
-
-def mix(tree, location, a, b, factor, blend='MIX'):
-    n = tree.nodes.new("ShaderNodeMix")
-    n.data_type = 'RGBA'
-    n.blend_type = blend
-    n.location = location
-    tree.links.new(factor, n.inputs["Factor"])
-    tree.links.new(a, n.inputs["A"])
-    tree.links.new(b, n.inputs["B"])
-    return n.outputs["Result"]
-
-
-def value(tree, location, v):
-    n = tree.nodes.new("ShaderNodeValue")
-    n.location = location
-    n.outputs[0].default_value = v
-    return n.outputs[0]
-
-
-def rgb(tree, location, colour):
-    n = tree.nodes.new("ShaderNodeRGB")
-    n.location = location
-    n.outputs[0].default_value = (*colour, 1.0)
-    return n.outputs[0]
-
-
-def new_material(name):
-    material = bpy.data.materials.get(name) or bpy.data.materials.new(name)
-    material.use_nodes = True
-    tree = material.node_tree
-    tree.nodes.clear()
-    out = node(tree, "ShaderNodeOutputMaterial", (1200, 0))
-    bsdf = node(tree, "ShaderNodeBsdfPrincipled", (900, 0))
-    tree.links.new(bsdf.outputs["BSDF"], out.inputs["Surface"])
-    return material, tree, bsdf
-
-
-# ----- Tubes: sticks and stems --------------------------------------------------------------------------------------
-
-def tube(bm, points, radii, sides, uv, wood_cap=True, jagged=0.0, rng=None, material=0, cap_material=1, tile=0.5):
-    """A tube through points (each ring sized by radii) with parallel-transport frames, so it never twists. Its "grain"
-    UVs run round it (U, in metres of circumference / tile) and along it (V, metres / tile), so a tiling bark texture
-    keeps its real size. The ends are closed with caps of cap_material (pale broken wood), the far end jagged."""
-    rng = rng or random.Random(0)
-    rings = []
-    tangent = (points[1] - points[0]).normalized()
-    normal = tangent.orthogonal().normalized()
-    length = 0.0
-    for i, p in enumerate(points):
-        if i > 0:
-            length += (p - points[i - 1]).length
-            new_tangent = (points[min(i + 1, len(points) - 1)] - points[i - 1]).normalized()
-            rotation = tangent.rotation_difference(new_tangent)
-            normal = (rotation @ normal).normalized()
-            tangent = new_tangent
-        binormal = tangent.cross(normal)
-        ring = []
-        for s in range(sides):
-            a = 2 * math.pi * s / sides
-            offset = normal * math.cos(a) + binormal * math.sin(a)
-            # Bark is never perfectly round.
-            wobble = 1.0 + 0.08 * noise.noise(p * 40.0 + offset * 3.0)
-            ring.append(bm.verts.new(p + offset * radii[i] * wobble))
-        rings.append((ring, length, radii[i]))
-    faces = []
-    for (ring_a, la, ra), (ring_b, lb, rb) in zip(rings, rings[1:]):
-        for s in range(sides):
-            quad = (ring_a[s], ring_a[(s + 1) % sides], ring_b[(s + 1) % sides], ring_b[s])
-            f = bm.faces.new(quad)
-            f.material_index = material
-            circumference_a = 2 * math.pi * ra / tile
-            circumference_b = 2 * math.pi * rb / tile
-            loops = f.loops
-            loops[0][uv].uv = (circumference_a * s / sides, la / tile)
-            loops[1][uv].uv = (circumference_a * (s + 1) / sides, la / tile)
-            loops[2][uv].uv = (circumference_b * (s + 1) / sides, lb / tile)
-            loops[3][uv].uv = (circumference_b * s / sides, lb / tile)
-            faces.append(f)
-    if wood_cap:
-        for index, (ring, _, radius) in ((0, rings[0]), (-1, rings[-1])):
-            centre_point = points[index]
-            direction = (points[-1] - points[-2]).normalized() if index == -1 else (points[0] - points[1]).normalized()
-            # A broken end: the cap pulled out into splinters.
-            centre = bm.verts.new(centre_point + direction * radius * (0.6 if index == -1 else 0.2) * (1 + jagged))
-            for v in ring:
-                v.co += direction * radius * rng.uniform(0.0, 0.9) * jagged
-            for s in range(sides):
-                tri = (ring[s], ring[(s + 1) % sides], centre) if index == -1 else (ring[(s + 1) % sides], ring[s], centre)
-                f = bm.faces.new(tri)
-                f.material_index = cap_material
-                for loop in f.loops:
-                    co = loop.vert.co - centre_point
-                    loop[uv].uv = (0.5 + co.dot(direction.orthogonal().normalized()) / (radius * 4 + 1e-6),
-                                   0.5 + co.dot(direction.cross(direction.orthogonal()).normalized()) / (radius * 4 + 1e-6))
-                faces.append(f)
-    bmesh.ops.recalc_face_normals(bm, faces=faces)
-    return faces
-
-
-def bent_path(start, direction, length, segments, bend, rng, lift=0.0, droop=0.0):
-    """Points along a gently bending line: a branch."""
-    points = []
-    d = direction.normalized()
-    side = Vector((-d.y, d.x, 0.0)).normalized() if abs(d.z) < 0.99 else Vector((1, 0, 0))
-    seed = Vector((rng.uniform(0, 100), rng.uniform(0, 100), rng.uniform(0, 100)))
-    for i in range(segments + 1):
-        t = i / segments
-        p = start + d * length * t
-        p += side * bend * math.sin(t * math.pi) * length
-        p += side * 0.035 * length * noise.noise(seed + Vector((t * 3.0, 0, 0)))
-        p.z += lift * math.sin(t * math.pi) - droop * t * t
-        points.append(p)
-    return points
 
 
 # ----- Materials for the bake ---------------------------------------------------------------------------------------
 
-def rock_material():
-    """Weathered grey field stone (Poly Haven rock_boulder_dry), projected from six sides in object space so it has no
-    seams."""
-    material, tree, bsdf = new_material("Field Stone (bake)")
-    links = tree.links
-    coords = node(tree, "ShaderNodeTexCoord", (-900, 0))
-    mapping = node(tree, "ShaderNodeMapping", (-700, 0))
-    # The texture is about 2 m across; finer reads better on stones this small.
-    mapping.inputs["Scale"].default_value = (1.6, 1.6, 1.6)
-    links.new(coords.outputs["Object"], mapping.inputs["Vector"])
-    maps = {}
-    for i, (kind, space) in enumerate((("diff", 'sRGB'), ("rough", 'Non-Color'), ("nor_gl", 'Non-Color'))):
-        tex = tree.nodes.new("ShaderNodeTexImage")
-        tex.location = (-450, 300 - i * 300)
-        tex.image = image(source("rock_boulder_dry", kind), space)
-        tex.projection = 'BOX'
-        tex.projection_blend = 0.35
-        links.new(mapping.outputs["Vector"], tex.inputs["Vector"])
-        maps[kind] = tex
-    # A little greyer and darker than the sunlit scan, like the Haven's other field stones.
-    grade = node(tree, "ShaderNodeHueSaturation", (-100, 300), Saturation=0.6, Value=0.6)
-    links.new(maps["diff"].outputs["Color"], grade.inputs["Color"])
-    links.new(grade.outputs["Color"], bsdf.inputs["Base Color"])
-    links.new(maps["rough"].outputs["Color"], bsdf.inputs["Roughness"])
-    # Box-projected normal maps don't line up with tangents: the relief comes from the sculpt and a bump of the colour.
-    bump = node(tree, "ShaderNodeBump", (500, -300), Strength=0.25, Distance=0.004)
-    links.new(maps["rough"].outputs["Color"], bump.inputs["Height"])
-    links.new(bump.outputs["Normal"], bsdf.inputs["Normal"])
-    return material
-
-
-def bark_material(name="Brown Bark (bake)", tint=(0.78, 0.68, 0.56)):
-    """Poly Haven bark_brown_02 on the tubes' grain UVs (real size: 1 m to a tile)."""
-    material, tree, bsdf = new_material(name)
-    links = tree.links
-    uv = tree.nodes.new("ShaderNodeUVMap")
-    uv.uv_map = "grain"
-    uv.location = (-900, 0)
-    mapping = node(tree, "ShaderNodeMapping", (-700, 0))
-    # Grain UVs are in half metres; the texture covers 1 m. Twigs have finer bark: scale it down a little.
-    mapping.inputs["Scale"].default_value = (1.4, 1.4, 1.0)
-    links.new(uv.outputs["UV"], mapping.inputs["Vector"])
-    maps = {}
-    for i, (kind, space) in enumerate((("diff", 'sRGB'), ("rough", 'Non-Color'), ("nor_gl", 'Non-Color'))):
-        tex = tree.nodes.new("ShaderNodeTexImage")
-        tex.location = (-450, 300 - i * 300)
-        tex.image = image(source("bark_brown_02", kind), space)
-        links.new(mapping.outputs["Vector"], tex.inputs["Vector"])
-        maps[kind] = tex
-    tinted = mix(tree, (100, 300), maps["diff"].outputs["Color"], rgb(tree, (-100, 450), tint), value(tree, (-100, 550), 1.0),
-                 blend='MULTIPLY')
-    # Dead wood weathers grey where it faces the sky.
-    up = node(tree, "ShaderNodeNewGeometry", (-450, 700))
-    split = node(tree, "ShaderNodeSeparateXYZ", (-250, 700))
-    links.new(up.outputs["Normal"], split.inputs["Vector"])
-    weather = ramp(tree, (-50, 700), [(0.5, (0, 0, 0)), (1.0, (0.18, 0.18, 0.18))])
-    links.new(split.outputs["Z"], weather.inputs["Fac"])
-    grey = node(tree, "ShaderNodeRGB", (100, 650))
-    grey.outputs[0].default_value = (0.22, 0.2, 0.17, 1)
-    coloured = mix(tree, (350, 400), tinted, grey.outputs[0], weather.outputs["Color"])
-    links.new(coloured, bsdf.inputs["Base Color"])
-    links.new(maps["rough"].outputs["Color"], bsdf.inputs["Roughness"])
-    normal_map = node(tree, "ShaderNodeNormalMap", (300, -300), Strength=1.0)
-    links.new(maps["nor_gl"].outputs["Color"], normal_map.inputs["Color"])
-    links.new(normal_map.outputs["Normal"], bsdf.inputs["Normal"])
-    return material
-
-
-def broken_wood_material():
-    """The pale, splintered wood of a broken end: fibres along the break, darker towards the bark."""
-    material, tree, bsdf = new_material("Broken Wood (bake)")
-    links = tree.links
-    uv = tree.nodes.new("ShaderNodeUVMap")
-    uv.uv_map = "grain"
-    uv.location = (-800, 0)
-    wave = tree.nodes.new("ShaderNodeTexWave")
-    wave.location = (-500, 0)
-    wave.wave_type = 'RINGS'
-    wave.inputs["Scale"].default_value = 9.0
-    wave.inputs["Distortion"].default_value = 4.0
-    links.new(uv.outputs["UV"], wave.inputs["Vector"])
-    colour = ramp(tree, (-200, 0), [(0.2, (0.36, 0.28, 0.18)), (0.8, (0.55, 0.45, 0.31))])
-    links.new(wave.outputs["Fac"], colour.inputs["Fac"])
-    links.new(colour.outputs["Color"], bsdf.inputs["Base Color"])
-    bsdf.inputs["Roughness"].default_value = 0.9
-    bump = node(tree, "ShaderNodeBump", (500, -250), Strength=0.4, Distance=0.002)
-    links.new(wave.outputs["Fac"], bump.inputs["Height"])
-    links.new(bump.outputs["Normal"], bsdf.inputs["Normal"])
-    return material
-
-
 def leaf_material():
     """Currant leaves: fresh green, lighter along the midrib and veins, darker at the rim; each leaf a slightly different
-    green (its "leafvar" face attribute), a few turning yellow. U runs across the leaf (0 to 1), V from stalk to tip."""
+    green (its "sh_leafvar" face attribute), a few turning yellow. U runs across the leaf (0 to 1), V from stalk to tip."""
     material, tree, bsdf = new_material("Currant Leaf (bake)")
     links = tree.links
     uv = tree.nodes.new("ShaderNodeUVMap")
@@ -351,7 +76,7 @@ def leaf_material():
     links.new(across2.outputs["Value"], midrib.inputs["Fac"])
 
     attribute = tree.nodes.new("ShaderNodeAttribute")
-    attribute.attribute_name = "leafvar"
+    attribute.attribute_name = "sh_leafvar"
     attribute.attribute_type = 'GEOMETRY'
     attribute.location = (-800, 500)
     greens = ramp(tree, (-500, 500), [(0.0, (0.05, 0.11, 0.025)), (0.5, (0.09, 0.17, 0.035)), (0.86, (0.15, 0.22, 0.045)),
@@ -393,7 +118,7 @@ def berry_material():
     material, tree, bsdf = new_material("Currant (bake)")
     links = tree.links
     attribute = tree.nodes.new("ShaderNodeAttribute")
-    attribute.attribute_name = "leafvar"
+    attribute.attribute_name = "sh_leafvar"
     attribute.attribute_type = 'GEOMETRY'
     attribute.location = (-600, 0)
     reds = ramp(tree, (-300, 0), [(0.0, (0.42, 0.02, 0.015)), (0.6, (0.62, 0.035, 0.02)), (1.0, (0.75, 0.08, 0.03))])
@@ -412,58 +137,6 @@ def berry_material():
 
 
 # ----- Small Rocks --------------------------------------------------------------------------------------------------
-
-def stone(name, size, rng, coll, high_subdiv=6):
-    """A rounded field stone: an ellipsoid, flattened under, with broad voronoi facets and fine noise (the high mesh), and
-    a decimated copy of it (the low mesh the game uses)."""
-    bm = bmesh.new()
-    bmesh.ops.create_icosphere(bm, subdivisions=high_subdiv, radius=1.0)
-    seed = Vector((rng.uniform(0, 500), rng.uniform(0, 500), rng.uniform(0, 500)))
-    sx, sy, sz = size[0], size[1], size[2] * 0.8
-    planes = []
-    for _ in range(rng.randint(5, 7)):
-        n = Vector((rng.uniform(-1, 1), rng.uniform(-1, 1), rng.uniform(-0.1, 1.0))).normalized()
-        reach = abs(n.x) * sx + abs(n.y) * sy + abs(n.z) * sz
-        planes.append((n, reach * rng.uniform(0.42, 0.62)))
-    for v in bm.verts:
-        d = v.co.normalized()
-        # Broad facets: the stone was split along planes and then worn round.
-        facets = 0.0
-        bumps = 0.035 * noise.fractal(d * 2.5 + seed, 0.6, 2.0, 4)
-        grain = 0.012 * noise.fractal(d * 18.0 + seed, 0.5, 2.0, 3)
-        r = 1.0 + facets + bumps + grain
-        p = Vector((d.x * sx, d.y * sy, d.z * sz)) * r
-        # Split faces: a few planes the stone broke along, worn a little round at the edges.
-        for normal, depth in planes:
-            over = p.dot(normal) - depth
-            if over > 0:
-                p -= normal * over
-        v.co = p
-    # Sits on the ground: the lower part flattened, a little sunk in.
-    lowest = min(v.co.z for v in bm.verts)
-    floor = lowest + sz * 0.45
-    for v in bm.verts:
-        if v.co.z < floor:
-            v.co.z = floor + (v.co.z - floor) * 0.15
-    shift = -min(v.co.z for v in bm.verts) - sz * 0.08
-    for v in bm.verts:
-        v.co.z += shift
-    high = mesh_object(f"{name} High", bm, coll)
-    low = high.copy()
-    low.data = high.data.copy()
-    low.name = name
-    low.data.name = name
-    coll.objects.link(low)
-    decimate = low.modifiers.new("Decimate", 'DECIMATE')
-    decimate.ratio = 260.0 / (len(high.data.polygons))
-    select_only([low])
-    bpy.ops.object.modifier_apply(modifier=decimate.name)
-    for poly in high.data.polygons:
-        poly.use_smooth = True
-    for poly in low.data.polygons:
-        poly.use_smooth = True
-    return low, high
-
 
 def rock_cluster(name, layout, seed, coll):
     """Stones placed by layout: (x, y, size x, y, z, turn degrees)."""
@@ -552,13 +225,6 @@ def build_sticks(coll):
     return objects
 
 
-def centre_on_ground(obj):
-    xs = [v.co.x for v in obj.data.vertices]
-    ys = [v.co.y for v in obj.data.vertices]
-    zs = [v.co.z for v in obj.data.vertices]
-    obj.data.transform(Matrix.Translation((-(min(xs) + max(xs)) / 2, -(min(ys) + max(ys)) / 2, -min(zs))))
-
-
 # ----- Berry Bush ---------------------------------------------------------------------------------------------------
 
 LEAF_OUTLINE = [(0.0, 0.0), (0.34, 0.28), (0.36, 0.62), (0.0, 1.0)]  # half a leaf: (across, along)
@@ -633,7 +299,7 @@ def bush(name, seed, spread, height, stems, coll, materials, shell_leaves=1100, 
     rng = random.Random(seed)
     bm = bmesh.new()
     uv = bm.loops.layers.uv.new("grain")
-    var = bm.faces.layers.float.new("leafvar")
+    var = bm.faces.layers.float.new("sh_leafvar")
     leaf_points = []
     for s in range(stems):
         turn = 2 * math.pi * (s + rng.uniform(-0.3, 0.3)) / stems
@@ -710,247 +376,22 @@ def build_bush(coll):
             bush("Berry Bush B", 11, 0.68, 0.8, 11, coll, materials, shell_leaves=1200, clusters=44)]
 
 
-# ----- UVs, baking, export ------------------------------------------------------------------------------------------
-
-def atlas_uvs(objects, margin=0.003):
-    """A shared "atlas" UV map over all of an asset's variants, for the bake (the old UVs stay as "grain")."""
-    for obj in objects:
-        layers = obj.data.uv_layers
-        if "atlas" not in layers:
-            layers.new(name="atlas")
-        layers.active = layers["atlas"]
-    select_only(objects)
-    bpy.ops.object.mode_set(mode='EDIT')
-    bpy.ops.mesh.select_all(action='SELECT')
-    bpy.ops.uv.smart_project(angle_limit=math.radians(66), island_margin=margin, scale_to_bounds=False)
-    bpy.ops.uv.pack_islands(margin=margin)
-    bpy.ops.object.mode_set(mode='OBJECT')
-
-
-def use_gpu(scene):
-    scene.render.engine = 'CYCLES'
-    try:
-        prefs = bpy.context.preferences.addons["cycles"].preferences
-        prefs.compute_device_type = 'OPTIX'
-        prefs.get_devices()
-        for device in prefs.devices:
-            device.use = True
-        scene.cycles.device = 'GPU'
-    except Exception:
-        scene.cycles.device = 'CPU'
-
-
-def ground_for_ao(coll):
-    """A plane under everything, so the occlusion bake darkens what touches the ground."""
-    bm = bmesh.new()
-    bmesh.ops.create_grid(bm, x_segments=1, y_segments=1, size=20.0)
-    return mesh_object("AO Ground", bm, coll)
-
-
-def bake(name, lows, highs, size, ground):
-    """Albedo, Normal and ORM (R occlusion, G roughness) for the lows, from the highs when there are any (selected to
-    active), else from the lows' own materials."""
-    scene = bpy.context.scene
-    use_gpu(scene)
-    scene.cycles.samples = 16
-    folder = os.path.join(ART, name)
-    os.makedirs(folder, exist_ok=True)
-    images = {}
-    for kind, colourspace in (("Albedo", 'sRGB'), ("Normal", 'Non-Color'), ("AO", 'Non-Color'), ("Rough", 'Non-Color')):
-        img = bpy.data.images.new(f"{name}_{kind}", size, size, alpha=False)
-        img.colorspace_settings.name = colourspace
-        images[kind] = img
-    if highs:
-        target_material, tree, _ = new_material(f"{name} (target)")
-        for low in lows:
-            low.data.materials.clear()
-            low.data.materials.append(target_material)
-        targets = [tree.nodes.new("ShaderNodeTexImage")]
-        trees = [tree]
-    else:
-        trees = list({m.node_tree for low in lows for m in low.data.materials})
-        targets = [t.nodes.new("ShaderNodeTexImage") for t in trees]
-    for tree, target in zip(trees, targets):
-        uv = tree.nodes.new("ShaderNodeUVMap")
-        uv.uv_map = "atlas"
-        tree.links.new(uv.outputs["UV"], target.inputs["Vector"])
-        tree.nodes.active = target
-    # Bake every variant into the shared images in one go per pass (their atlas islands don't overlap).
-    passes = (("Albedo", 'DIFFUSE', {'COLOR'}), ("Normal", 'NORMAL', None), ("AO", 'AO', None), ("Rough", 'ROUGHNESS', None))
-    for kind, bake_type, pass_filter in passes:
-        for target in targets:
-            target.image = images[kind]
-        first = True
-        pairs = list(zip(lows, highs)) if highs else [(low, None) for low in lows]
-        for low, high in pairs:
-            if high is not None:
-                select_only([high, low], active=low)
-            else:
-                select_only([low])
-            ground.hide_render = kind != "AO"
-            kwargs = dict(type=bake_type, use_clear=first, margin=8)
-            if pass_filter:
-                kwargs["pass_filter"] = pass_filter
-            if bake_type == 'NORMAL':
-                kwargs["normal_space"] = 'TANGENT'
-            if high is not None:
-                kwargs.update(use_selected_to_active=True, cage_extrusion=0.02, max_ray_distance=0.05)
-            bpy.ops.object.bake(**kwargs)
-            first = False
-    ground.hide_render = True
-    # ORM: occlusion in R, roughness in G, nothing metallic.
-    orm = bpy.data.images.new(f"{name}_ORM", size, size, alpha=False)
-    orm.colorspace_settings.name = 'Non-Color'
-    ao = list(images["AO"].pixels)
-    rough = list(images["Rough"].pixels)
-    pixels = [0.0] * (size * size * 4)
-    pixels[0::4] = ao[0::4]
-    pixels[1::4] = rough[0::4]
-    pixels[3::4] = [1.0] * (size * size)
-    orm.pixels = pixels
-    out = {"Albedo": images["Albedo"], "Normal": images["Normal"], "ORM": orm}
-    for kind, img in out.items():
-        img.filepath_raw = os.path.join(folder, f"{name}_{kind}.png")
-        img.file_format = 'PNG'
-        img.save()
-    return out
-
-
-def baked_material(name, images):
-    material, tree, bsdf = new_material(name)
-    links = tree.links
-    uv = tree.nodes.new("ShaderNodeUVMap")
-    uv.uv_map = "UVMap"  # the atlas, renamed by finish()
-    uv.location = (-700, 0)
-    albedo = node(tree, "ShaderNodeTexImage", (-400, 300))
-    albedo.image = images["Albedo"]
-    links.new(uv.outputs["UV"], albedo.inputs["Vector"])
-    links.new(albedo.outputs["Color"], bsdf.inputs["Base Color"])
-    orm = node(tree, "ShaderNodeTexImage", (-400, 0))
-    orm.image = images["ORM"]
-    links.new(uv.outputs["UV"], orm.inputs["Vector"])
-    split = node(tree, "ShaderNodeSeparateColor", (-100, 0))
-    links.new(orm.outputs["Color"], split.inputs["Color"])
-    links.new(split.outputs["Green"], bsdf.inputs["Roughness"])
-    normal_tex = node(tree, "ShaderNodeTexImage", (-400, -300))
-    normal_tex.image = images["Normal"]
-    links.new(uv.outputs["UV"], normal_tex.inputs["Vector"])
-    normal_map = node(tree, "ShaderNodeNormalMap", (-100, -300))
-    normal_map.uv_map = "UVMap"
-    links.new(normal_tex.outputs["Color"], normal_map.inputs["Color"])
-    links.new(normal_map.outputs["Normal"], bsdf.inputs["Normal"])
-    return material
-
-
-def finish(objects, material):
-    """Only the baked material and the atlas UVs (first, as Unity's UV0) go to the game."""
-    for obj in objects:
-        obj.data.materials.clear()
-        obj.data.materials.append(material)
-        layers = obj.data.uv_layers
-        for layer in [l for l in layers if l.name != "atlas"]:
-            layers.remove(layer)
-        layers["atlas"].name = "UVMap"
-        if "leafvar" in obj.data.attributes:
-            obj.data.attributes.remove(obj.data.attributes["leafvar"])
-
-
-def export(objects, name):
-    select_only(objects)
-    path = os.path.join(ART, name, f"{name}.fbx")
-    bpy.ops.export_scene.fbx(filepath=path, use_selection=True, apply_scale_options='FBX_SCALE_ALL', axis_forward='-Z',
-                             axis_up='Y', bake_space_transform=True, object_types={'MESH'}, mesh_smooth_type='FACE',
-                             use_mesh_modifiers=True, path_mode='STRIP', embed_textures=False)
-    return path
-
-
-def make_asset(name, builder, size, coll):
-    built = builder(coll)
-    lows, highs = built if isinstance(built, tuple) else (built, [])
-    atlas_uvs(lows, margin=0.004 if highs else 0.002)
-    ground = ground_for_ao(coll)
-    # The variants share the origin: spread them out for the bake so they don't shade each other.
-    for i, low in enumerate(lows):
-        low.location.x = i * 3.0
-        if highs:
-            highs[i].location.x = i * 3.0
-    images = bake(name, lows, highs, size, ground)
-    for low in lows:
-        low.location.x = 0.0
-    bpy.data.objects.remove(ground)
-    for high in highs:
-        bpy.data.objects.remove(high)
-    material = baked_material(name, images)
-    finish(lows, material)
-    export(lows, name)
-    return lows
-
-
-# ----- Preview ------------------------------------------------------------------------------------------------------
-
-def stage(rows):
-    """The variants in rows on a meadow, under a low sun, seen from above at the game's angle."""
-    scene = bpy.context.scene
-    for z, objects in enumerate(rows):
-        for i, obj in enumerate(objects):
-            obj.location = ((i - (len(objects) - 1) / 2) * (1.7 if "Bush" in obj.name else 0.85), -z * 1.25 + 1.1, 0)
-    bm = bmesh.new()
-    bmesh.ops.create_grid(bm, x_segments=1, y_segments=1, size=12.0)
-    ground = mesh_object("Meadow", bm, collection("Preview"))
-    grass, tree, bsdf = new_material("Meadow")
-    noise_node = node(tree, "ShaderNodeTexNoise", (-400, 0), Scale=6.0, Detail=8.0)
-    colours = ramp(tree, (-150, 0), [(0.3, (0.1, 0.13, 0.04)), (0.7, (0.2, 0.22, 0.07))])
-    tree.links.new(noise_node.outputs["Fac"], colours.inputs["Fac"])
-    tree.links.new(colours.outputs["Color"], bsdf.inputs["Base Color"])
-    bsdf.inputs["Roughness"].default_value = 0.95
-    ground.data.materials.append(grass)
-    bpy.ops.object.light_add(type='SUN', rotation=(math.radians(50), math.radians(10), math.radians(-40)))
-    sun = bpy.context.active_object
-    sun.data.energy = 3.5
-    sun.data.angle = math.radians(3)
-    world = bpy.data.worlds.new("Sky")
-    scene.world = world
-    world.use_nodes = True
-    world.node_tree.nodes["Background"].inputs["Color"].default_value = (0.55, 0.65, 0.8, 1)
-    world.node_tree.nodes["Background"].inputs["Strength"].default_value = 0.9
-
-
-def camera(location, target, lens=50):
-    bpy.ops.object.camera_add(location=location)
-    cam = bpy.context.active_object
-    cam.rotation_euler = (Vector(target) - Vector(location)).to_track_quat('-Z', 'Y').to_euler()
-    cam.data.lens = lens
-    bpy.context.scene.camera = cam
-    return cam
-
-
-def render(path, width, height):
-    scene = bpy.context.scene
-    use_gpu(scene)
-    scene.cycles.samples = 96
-    scene.cycles.use_denoising = True
-    scene.render.resolution_x = width
-    scene.render.resolution_y = height
-    scene.render.film_transparent = False
-    scene.view_settings.view_transform = 'AgX'
-    scene.render.filepath = path
-    bpy.ops.render.render(write_still=True)
 
 
 def main():
     bpy.ops.wm.read_factory_settings(use_empty=True)
     rows = []
     if "bush" in WANTED:
-        rows.append(make_asset("Berry Bush", build_bush, 2048, collection("Berry Bush")))
+        rows.append((make_asset("Berry Bush", build_bush, 2048, collection("Berry Bush")), 1.7))
     if "rocks" in WANTED:
-        rows.append(make_asset("Small Rocks", build_rocks, 1024, collection("Small Rocks")))
+        rows.append(make_asset("Small Rocks", build_rocks, 1024, collection("Small Rocks"), cavity_distance=0.03))
     if "sticks" in WANTED:
-        rows.append(make_asset("Sticks", build_sticks, 1024, collection("Sticks")))
-    stage(rows)
-    camera((0.0, -4.6, 4.4), (0.0, -0.2, 0.2), lens=40)
+        rows.append(make_asset("Sticks", build_sticks, 1024, collection("Sticks"), cavity_distance=0.03))
+    depth = stage(rows)
+    camera((0.0, -depth - 3.4, 4.4), (0.0, -depth * 0.5, 0.2), lens=40)
     render(PREVIEW, 1600, 1000)
     bpy.ops.wm.save_as_mainfile(filepath=os.path.join(ROOT, "Tools", "Blender", "Forage.blend"))
-    print("FORAGE DONE", ART)
+    print("FORAGE DONE")
 
 
 if __name__ == "__main__":

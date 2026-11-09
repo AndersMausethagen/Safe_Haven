@@ -4,7 +4,8 @@
 // B cavity, A coverage) allows; its Amount (0-1) grows it from the strongest mask spots outward, shaped by the
 // layer's height. Drive Amount per object with SurfaceLayerController (MaterialPropertyBlock).
 // GLB models (LocalSpawnMaterials) use the glTF channel packing instead of Lit's: _ORMMap (R occlusion,
-// G roughness, B metallic) with the _ORMMAP keyword.
+// G roughness, B metallic) with the _ORMMAP keyword. A height map in _ParallaxMap with _PARALLAXMAP (Lit's names) adds
+// parallax occlusion mapping; the layers follow the shifted UVs only when they use them (not in triplanar mode).
 Shader "Safe Haven/Layered Lit"
 {
     Properties
@@ -13,6 +14,8 @@ Shader "Safe Haven/Layered Lit"
         [MainColor] _BaseColor ("Base Color Tint", Color) = (1, 1, 1, 1)
         [Normal][NoScaleOffset] _BumpMap ("Normal Map", 2D) = "bump" {}
         _BumpScale ("Normal Strength", Float) = 1
+        [NoScaleOffset] _ParallaxMap ("Height Map (parallax occlusion; white is high)", 2D) = "gray" {}
+        _Parallax ("Parallax Depth (UV units)", Range(0, 0.05)) = 0
         [NoScaleOffset] _MetallicGlossMap ("Metallic (R) Smoothness (A)", 2D) = "white" {}
         _Metallic ("Metallic", Range(0, 1)) = 0
         _Smoothness ("Smoothness", Range(0, 1)) = 0.5
@@ -78,6 +81,7 @@ Shader "Safe Haven/Layered Lit"
         TEXTURE2D(_ORMMap);
         TEXTURE2D(_EmissionMap);
         TEXTURE2D(_BlendMask);
+        TEXTURE2D(_ParallaxMap);
         TEXTURE2D(_L1Color); SAMPLER(sampler_L1Color);
         TEXTURE2D(_L1Normal); TEXTURE2D(_L1MetallicGloss); TEXTURE2D(_L1Height);
         TEXTURE2D(_L2Color); SAMPLER(sampler_L2Color);
@@ -85,7 +89,7 @@ Shader "Safe Haven/Layered Lit"
         CBUFFER_START(UnityPerMaterial)
             float4 _BaseMap_ST;
             half4 _BaseColor, _EmissionColor, _L1Tint, _L2Tint;
-            half _BumpScale, _Metallic, _Smoothness, _OcclusionStrength, _LayerTriplanar, _Roughness;
+            half _BumpScale, _Metallic, _Smoothness, _OcclusionStrength, _LayerTriplanar, _Roughness, _Parallax;
             half _L1Amount, _L1Source, _L1Upward, _L1HeightBlend, _L1Sharpness, _L1NormalScale, _L1Patchiness;
             half _L1Metallic, _L1Smoothness, _L1HeightChannel;
             half _L2Amount, _L2Source, _L2Upward, _L2HeightBlend, _L2Sharpness, _L2NormalScale, _L2Patchiness;
@@ -157,6 +161,40 @@ Shader "Safe Haven/Layered Lit"
         half3 BaseNormal(Varyings input, Frame frame)
         {
             return ToWorld(frame, UnpackNormalScale(SAMPLE_TEXTURE2D(_BumpMap, sampler_BumpMap, input.uv), _BumpScale));
+        }
+
+        // Parallax occlusion mapping: march the view ray down into _ParallaxMap (white is the surface, black _Parallax
+        // UV units below it) and shift the UVs to where it lands, so cracks and pits have depth that moves with the
+        // view. 6 to 16 steps (more at grazing angles), then a linear step between the last two samples. The shift is
+        // limited at grazing angles, so it never reaches far beyond a baked atlas island's margin.
+        float2 ParallaxOcclusionUV(float2 uv, Frame frame, half3 viewWS)
+        {
+            if (!frame.hasTangent || _Parallax <= 0)
+            {
+                return uv;
+            }
+
+            half3 view = half3(dot(viewWS, frame.tangent), dot(viewWS, frame.bitangent), dot(viewWS, frame.normal));
+            float2 dx = ddx(uv);
+            float2 dy = ddy(uv);
+            int steps = (int)lerp(16.0, 6.0, saturate(view.z));
+            float layer = 1.0 / steps;
+            float2 shift = view.xy / max(view.z, 0.35) * _Parallax * layer;
+            float2 current = uv;
+            float rayDepth = 0;
+            float surfaceDepth = 1.0 - SAMPLE_TEXTURE2D_GRAD(_ParallaxMap, sampler_BaseMap, current, dx, dy).g;
+            [loop] for (int i = 0; i < 16 && i < steps && rayDepth < surfaceDepth; i++)
+            {
+                current -= shift;
+                rayDepth += layer;
+                surfaceDepth = 1.0 - SAMPLE_TEXTURE2D_GRAD(_ParallaxMap, sampler_BaseMap, current, dx, dy).g;
+            }
+
+            float2 previous = current + shift;
+            float after = surfaceDepth - rayDepth;
+            float before = (1.0 - SAMPLE_TEXTURE2D_GRAD(_ParallaxMap, sampler_BaseMap, previous, dx, dy).g) - (rayDepth - layer);
+            float weight = after / min(after - before, -1e-4);
+            return lerp(current, previous, saturate(weight));
         }
 
         // Layer projection: object-space triplanar (stable across the generator's UV islands) or the model's UVs.
@@ -303,6 +341,7 @@ Shader "Safe Haven/Layered Lit"
             #pragma fragment LayeredFragment
             #pragma shader_feature_local_fragment _METALLICSPECGLOSSMAP
             #pragma shader_feature_local_fragment _ORMMAP
+            #pragma shader_feature_local_fragment _PARALLAXMAP
             #pragma multi_compile_instancing
             #include_with_pragmas "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DOTS.hlsl"
             #pragma multi_compile_fog
@@ -326,6 +365,9 @@ Shader "Safe Haven/Layered Lit"
                 UNITY_SETUP_INSTANCE_ID(input);
                 UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
                 Frame frame = SurfaceFrame(input, IS_FRONT_VFACE(face, 1.0, -1.0));
+                #if defined(_PARALLAXMAP)
+                    input.uv = ParallaxOcclusionUV(input.uv, frame, GetWorldSpaceNormalizeViewDir(input.positionWS));
+                #endif
                 Surface surface;
                 surface.albedo = SAMPLE_TEXTURE2D(_BaseMap, sampler_BaseMap, input.uv).rgb * _BaseColor.rgb;
                 surface.normal = BaseNormal(input, frame);

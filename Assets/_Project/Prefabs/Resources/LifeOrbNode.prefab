@@ -52,6 +52,7 @@ MonoBehaviour:
   duration: 3.5
   range: 1.6
   deactivateOnComplete: 0
+  kind: 0
   started:
     m_PersistentCalls:
       m_Calls: []
@@ -94,6 +95,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ResourceNode
   node: {fileID: 11400000, guid: e77aff8a4e388bd47bdc46d19aab4460, type: 2}
+  keepOwnModel: 0
 --- !u!114 &7687514720534006754
 MonoBehaviour:
   m_ObjectHideFlags: 0

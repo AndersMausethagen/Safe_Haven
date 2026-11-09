@@ -41,5 +41,6 @@ MonoBehaviour:
   feedback: {fileID: 11400000, guid: 5e19753f3a66da744ae5d17004fb63d5, type: 2}
   worldModelPrefab: {fileID: 1091124516054281608, guid: 853dc861cd3f250409901a4c2af247ca, type: 3}
   worldPrefab: {fileID: 1699181372466110288, guid: f6d8bfacb080b84408ebd7afcb7fa627, type: 3}
-  modelVariants: []
+  modelVariants:
+  - {fileID: 8308825940633616636, guid: 9f6398c5179cde947ab36c9d1e317c62, type: 3}
   variantScale: {x: 0.9, y: 1.1}
