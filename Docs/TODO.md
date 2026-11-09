@@ -71,8 +71,9 @@ After the second list, in this order.
       tools, Workshop and campfire, A Safe Place (Small Chest), Something to Fight With (Knotted Club), food, Life Orbs, the
       portal, the first raid; the Woodcutter's Lodge, walls and A Growing Home only after it. The quest says three Life Orbs
       wake the portal and that The First Days lead there; the portal says so too. Ingrid, the first rescue, opens the Altar.
-- [ ] Rescue order: approve or change the proposal in [Docs/RescueOrder.md](RescueOrder.md), then build it (each job
+- [x] Rescue order: approve or change the proposal in [Docs/RescueOrder.md](RescueOrder.md), then build it (each job
       teaches its workplace, rumours ordered by who is home, Smithy after the Workshop, sites for Hild, Asa, Gunnar, Yrsa).
+      Built (`BuildRescueOrder`), checked in Play on an isolated save. Not yet seen: the four new sites in a launched raid.
 - [x] An NPC, Hild, appeared in the Haven with no explanation. NPCs don't just appear: each is saved on a raid, in a designed
       order that unlocks buildings as the player needs them, each one solving a problem. The user's outline: good gear and
       repairing it; refining (wood to planks); better tools; moving goods (wheelbarrows, boats); copper (stronger armour, tools,

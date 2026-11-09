@@ -289,6 +289,27 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics, IQuestPers
 
     private void Assign(JobDefinition job, GameObject user) => GiveJob(resident, job, user);
 
+    /// <summary>
+    /// Someone brought home shows the player how to build where they work: the buildings of every job they can do, so a rescue
+    /// opens a workplace (Docs/RescueOrder.md). Giving them the job teaches the same again, for a co-op friend who wasn't there.
+    /// </summary>
+    public static void TeachWhatTheyKnow(ResidentDefinition resident, GameObject user)
+    {
+        var crafting = user != null ? user.GetComponent<PlayerCrafting>() : null;
+        if (crafting == null || resident == null)
+        {
+            return;
+        }
+
+        foreach (JobDefinition job in resident.Jobs)
+        {
+            if (job != null)
+            {
+                crafting.UnlockBuildings(job.TeachesBuildings);
+            }
+        }
+    }
+
     /// <summary>Gives someone a job, in conversation or from the Haven window: records it and teaches the player what the job knows.</summary>
     public static void GiveJob(ResidentDefinition resident, JobDefinition job, GameObject user)
     {

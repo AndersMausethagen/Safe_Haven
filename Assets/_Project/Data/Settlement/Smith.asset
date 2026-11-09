@@ -16,7 +16,8 @@ MonoBehaviour:
   displayName: Smith
   description: 'Runs the Smithy: keeps ore turning into ingots while you are away, the work goes faster, and repairs to gear cost half.'
   acceptLine: '"Bring me iron. I don''t care how."'
-  teachesBuildings: []
+  teachesBuildings:
+  - {fileID: 11400000, guid: 25c95a1289ab72b4ea0bb96e2ec3f020, type: 2}
   teachesRecipes: []
   workplace: {fileID: 11400000, guid: 25c95a1289ab72b4ea0bb96e2ec3f020, type: 2}
   workGesture: {fileID: 11400000, guid: befa690f3a033144da5dc52883dbdb0f, type: 2}

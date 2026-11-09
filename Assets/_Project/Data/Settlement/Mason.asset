@@ -16,7 +16,9 @@ MonoBehaviour:
   displayName: Mason
   description: 'Runs the Workshop''s stone bench: keeps grey stone and granite turning into blocks while you are away, and the work goes faster.'
   acceptLine: '"Stone wants to be square. It just needs telling."'
-  teachesBuildings: []
+  teachesBuildings:
+  - {fileID: 11400000, guid: 00ba6eab323cada479456440115e7140, type: 2}
+  - {fileID: 11400000, guid: d076d5d9f032fc14ea227d5d823100fc, type: 2}
   teachesRecipes: []
   workplace: {fileID: 11400000, guid: cfa8f019a4062c84f8e9b8cd432080e0, type: 2}
   workGesture: {fileID: 11400000, guid: befa690f3a033144da5dc52883dbdb0f, type: 2}

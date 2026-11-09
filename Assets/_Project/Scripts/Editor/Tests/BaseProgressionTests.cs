@@ -110,7 +110,7 @@ public sealed class BaseProgressionTests
 
         Assert.IsEmpty(Building("ConstructionTable").Requires, "the Workshop is where it starts");
         Assert.AreEqual(Building("ConstructionTable"), Building("Sawbench").Requires[0].building);
-        Assert.AreEqual(Building("Sawbench"), Building("Forge").Requires[0].building);
+        Assert.AreEqual(Building("ConstructionTable"), Building("Forge").Requires[0].building, "Bjarne comes home before Tor (Docs/RescueOrder.md)");
     }
 
     [TestCase("CopperOre", "StonePickaxe")]
@@ -144,9 +144,9 @@ public sealed class BaseProgressionTests
     [Test]
     public void OpeningARequirement_NamesWhatIsMissing()
     {
-        BuildingDefinition smithy = Building("Forge");
-        Assert.IsFalse(BuildingUnlocks.IsOpen(smithy));
-        StringAssert.Contains(Building("Sawbench").DisplayName, BuildingUnlocks.Missing(smithy));
+        BuildingDefinition palisade = Building("Palisade");
+        Assert.IsFalse(BuildingUnlocks.IsOpen(palisade));
+        StringAssert.Contains(Building("Sawbench").DisplayName, BuildingUnlocks.Missing(palisade));
     }
 
     [Test]
@@ -166,9 +166,9 @@ public sealed class BaseProgressionTests
     }
 
     [Test]
-    public void TheForgeBlueprint_NoLongerGatesTheSmithy()
+    public void TheForgeBlueprint_NoLongerGatesTheSmithy_Bjarne_Does()
     {
-        Assert.IsTrue(Building("Forge").KnownFromStart);
+        Assert.IsFalse(Building("Forge").KnownFromStart);
         Assert.IsEmpty(Item("ForgeBlueprint").TeachesBuildings);
         Assert.IsFalse(Building("Furnace").ShowInBuildMenu);
     }

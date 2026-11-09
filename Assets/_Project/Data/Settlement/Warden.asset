@@ -16,7 +16,8 @@ MonoBehaviour:
   displayName: Warden
   description: 'Stands the watch: in a breach the ward holds half as long again.'
   acceptLine: '"Nothing comes through while I can stand."'
-  teachesBuildings: []
+  teachesBuildings:
+  - {fileID: 11400000, guid: 3019dc5f891f4c24f90723c22b1cde97, type: 2}
   teachesRecipes: []
   workplace: {fileID: 11400000, guid: 3019dc5f891f4c24f90723c22b1cde97, type: 2}
   workGesture: {fileID: 11400000, guid: 46b1b4f7175bfa749974f1b7ed099575, type: 2}

@@ -15,7 +15,7 @@ MonoBehaviour:
   id: settler.asa
   displayName: Asa
   description: A farmer from a village that isn't there any more. She brought the seed, and little else.
-  rescueLine: Thank you! Get me out of here and I'll follow you anywhere.
+  rescueLine: You're not from the village. Doesn't matter. Help me with this sack.
   arrivalLine: There's good dirt under all this moss. Who's been using it?
   welcomeLine: 
   fallenLine: I can't go on... come back for me.
@@ -24,8 +24,11 @@ MonoBehaviour:
     behindYou: []
     hurt: []
     won: []
+    helpedUp: []
   model: {fileID: 4704275745086199601, guid: eece4adebb5d1a04d820228f6b254479, type: 3}
   raidCompanion: {fileID: 11400000, guid: bfeda7cc0c77ea24dac614548220c4eb, type: 2}
+  memoryLines: []
+  returningLines: []
   jobs:
   - {fileID: 11400000, guid: 42d876bf3cb45f84088e94fc709b0672, type: 2}
   - {fileID: 11400000, guid: cdd8fcb3acc60ec45854efd2eb13a408, type: 2}

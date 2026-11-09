@@ -1,0 +1,71 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2f02987ee9197d4682f5db8cbc7a967, type: 3}
+  m_Name: YrsasFire
+  m_EditorClassIdentifier: SafeHaven::RaidEventDefinition
+  id: rumour.yrsasfire
+  displayName: A Fire in the Woods
+  weight: 0
+  earliestSeconds: 30
+  latestSecondsLeft: 60
+  minimumStage: 0
+  warning: 
+  warningSound: {fileID: 0}
+  sitePrefab: {fileID: 7345240531865155924, guid: 94c2d67e1a5baaf4398d18dfa586c456, type: 3}
+  siteDistance: {x: 35, y: 70}
+  siteText: A cookfire in the open, a pot on it, and a woman stirring it with a wolf-spear across her knees.
+  onStart: []
+  choices:
+  - label: Eat first
+    detail: It's very good. The wolves think so too.
+    cost: []
+    result: Best thing you've eaten since the stones broke.
+    outcomes:
+    - rid: 2623125980239888504
+    - rid: 2623125980239888505
+    - rid: 2623125980239888506
+  - label: Put the fire out and go
+    detail: Quiet. She will tell you what she thinks of it all the way home.
+    cost: []
+    result: '"A good stew, wasted."'
+    outcomes:
+    - rid: 2623125980239888507
+  references:
+    version: 2
+    RefIds:
+    - rid: 2623125980239888504
+      type: {class: GiveBoonOutcome, ns: , asm: SafeHaven}
+      data:
+        name: Hot Meal
+        bonuses:
+        - stat: 15
+          op: 0
+          value: 20
+        seconds: 300
+    - rid: 2623125980239888505
+      type: {class: SpawnCreaturesOutcome, ns: , asm: SafeHaven}
+      data:
+        prefabs:
+        - {fileID: 4584692032328657812, guid: 64cf9de042e1bc142907212054f70f50, type: 3}
+        count: 1
+        radius: 14
+        hunt: 1
+    - rid: 2623125980239888506
+      type: {class: RescueResidentOutcome, ns: , asm: SafeHaven}
+      data:
+        resident: {fileID: 11400000, guid: 15e2a45207d23dd49a4a3a93e8bb8161, type: 2}
+        traveler: {fileID: 4560087502640453408, guid: 34ab3b53d3ced634486fa4ab89e59887, type: 3}
+    - rid: 2623125980239888507
+      type: {class: RescueResidentOutcome, ns: , asm: SafeHaven}
+      data:
+        resident: {fileID: 11400000, guid: 15e2a45207d23dd49a4a3a93e8bb8161, type: 2}
+        traveler: {fileID: 4560087502640453408, guid: 34ab3b53d3ced634486fa4ab89e59887, type: 3}

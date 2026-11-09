@@ -16,7 +16,9 @@ MonoBehaviour:
   displayName: Carpenter
   description: 'Runs the Woodcutter''s Lodge: keeps logs turning into planks while you are away, the work goes faster, and mending buildings after a breach costs half.'
   acceptLine: '"I''ll have that lot square by morning."'
-  teachesBuildings: []
+  teachesBuildings:
+  - {fileID: 11400000, guid: 1fe15b30940bf7049a4e4966e9954e1b, type: 2}
+  - {fileID: 11400000, guid: e26a3ab6b257d3942925a533c5c2ebda, type: 2}
   teachesRecipes: []
   workplace: {fileID: 11400000, guid: 1fe15b30940bf7049a4e4966e9954e1b, type: 2}
   workGesture: {fileID: 11400000, guid: befa690f3a033144da5dc52883dbdb0f, type: 2}

@@ -16,7 +16,8 @@ MonoBehaviour:
   displayName: Cook
   description: 'Runs the Kitchen: keeps bread and stew in the stash for you to take on the road, and the work goes faster.'
   acceptLine: '"Sit. Eat. Then you can go and get yourself killed."'
-  teachesBuildings: []
+  teachesBuildings:
+  - {fileID: 11400000, guid: 5fc659bb8c8927248a51373740a3a65e, type: 2}
   teachesRecipes: []
   workplace: {fileID: 11400000, guid: 5fc659bb8c8927248a51373740a3a65e, type: 2}
   workGesture: {fileID: 11400000, guid: 7c9176c17f7f8644085abfda4ecc4cac, type: 2}

@@ -210,7 +210,7 @@ public static class HavenBuildings
                     {
                         ways.Add(GameSession.Settlement.HasResident(resident)
                             ? $"Give {resident.DisplayName} the {job.DisplayName} job."
-                            : $"Bring {resident.DisplayName} home and give them the {job.DisplayName} job.");
+                            : $"Bring {resident.DisplayName} home: the {job.DisplayName} knows how.");
                     }
                 }
             }

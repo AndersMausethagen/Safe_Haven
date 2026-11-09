@@ -34,6 +34,9 @@ public sealed class RaidRumourDefinition : ScriptableObject
     [SerializeField] private RumourHour hour = RumourHour.Any;
     [Tooltip("Only while this person hasn't come home.")]
     [SerializeField] private ResidentDefinition seeks;
+    [Tooltip("Only once this person has come home (or fallen since): who is found next follows a designed order, each answering " +
+             "the problem the last one left (Docs/RescueOrder.md).")]
+    [SerializeField] private ResidentDefinition afterHome;
     [Tooltip("Only while the player doesn't yet know everything this item teaches.")]
     [SerializeField] private ItemDefinition teaches;
     [Tooltip("Only while a ward breach is waiting or close at hand.")]
@@ -65,6 +68,8 @@ public sealed class RaidRumourDefinition : ScriptableObject
     public RaidSetPieceDefinition SetPiece => setPiece;
     public float Weight => weight;
     public bool Urgent => urgent;
+    public ResidentDefinition Seeks => seeks;
+    public ResidentDefinition AfterHome => afterHome;
 
     /// <summary>Whether it can come up for this hour and this state of the game.</summary>
     public bool CanComeUp(RaidTimeOfDay timeOfDay, SettlementState settlement, PlayerCrafting crafting)
@@ -85,6 +90,11 @@ public sealed class RaidRumourDefinition : ScriptableObject
         }
 
         if (seeks != null && settlement.HasResident(seeks))
+        {
+            return false;
+        }
+
+        if (afterHome != null && !settlement.HasResident(afterHome))
         {
             return false;
         }

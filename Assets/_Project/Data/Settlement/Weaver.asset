@@ -16,7 +16,8 @@ MonoBehaviour:
   displayName: Weaver
   description: 'Runs the Tailor''s Shop: keeps flax turning into linen while you are away, and the work goes faster.'
   acceptLine: '"Good cloth takes as long as it takes."'
-  teachesBuildings: []
+  teachesBuildings:
+  - {fileID: 11400000, guid: 6439e52b4c107bd478aa3e11a3ff7aec, type: 2}
   teachesRecipes: []
   workplace: {fileID: 11400000, guid: 6439e52b4c107bd478aa3e11a3ff7aec, type: 2}
   workGesture: {fileID: 11400000, guid: 7c9176c17f7f8644085abfda4ecc4cac, type: 2}

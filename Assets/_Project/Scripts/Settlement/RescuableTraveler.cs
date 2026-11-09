@@ -193,6 +193,7 @@ public sealed class RescuableTraveler : MonoBehaviour, IInteractionName
             {
                 raid.Report?.Rescued.Add(resident);
                 GameMessages.Post($"{resident.DisplayName} steps through the portal with you, and will be waiting in your own Haven.", MessageKind.Gain);
+                ResidentNpc.TeachWhatTheyKnow(resident, player);
                 QuestDeeds.Raise(GameEventKind.PersonRescued, resident, player);
                 if (rescuedEvent != null)
                 {
@@ -207,6 +208,7 @@ public sealed class RescuableTraveler : MonoBehaviour, IInteractionName
         {
             raid.Report?.Rescued.Add(resident);
             GameMessages.Post($"{resident.DisplayName} steps through the portal with you.", MessageKind.Gain);
+            ResidentNpc.TeachWhatTheyKnow(resident, player);
             QuestDeeds.Raise(GameEventKind.PersonRescued, resident, player);
             if (rescuedEvent != null)
             {

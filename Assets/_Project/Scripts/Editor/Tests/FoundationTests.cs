@@ -48,7 +48,7 @@ public sealed class FoundationTests
     }
 
     [Test]
-    public void Bjarne_CanBeFound_OnceTheSmithyStands()
+    public void Bjarne_CanBeFound_OnceIngridIsHome()
     {
         RaidRumourDefinition rumour = All<RaidRumourDefinition>().First(one => one.name == "Bjarne");
         Assert.IsTrue(MistyWoods.GetSystem<RaidRumoursSystem>().Pool.Contains(rumour));
@@ -59,17 +59,18 @@ public sealed class FoundationTests
             settlement.RecordExtraction();
         }
 
-        Assert.IsFalse(rumour.CanComeUp(null, settlement, null), "nowhere to work yet");
-        settlement.NoteBuilt(AssetDatabase.LoadAssetAtPath<BuildingDefinition>("Assets/_Project/Data/Buildings/Forge.asset"), 1);
-        Assert.IsTrue(rumour.CanComeUp(null, settlement, null));
+        Assert.IsFalse(rumour.CanComeUp(null, settlement, null), "Ingrid comes home first (Docs/RescueOrder.md)");
+        settlement.AddResident(AssetDatabase.LoadAssetAtPath<ResidentDefinition>("Assets/_Project/Data/Settlement/Ingrid.asset"));
+        Assert.IsTrue(rumour.CanComeUp(null, settlement, null), "no Smithy needed: his rescue opens it");
     }
 
     [Test]
-    public void ACraftsmanWithAWorkshop_IsSoughtBeforeAnyRumourByChance()
+    public void TheNextPersonInTheOrder_IsSoughtBeforeAnyRumourByChance()
     {
         var settlement = new SettlementState();
         settlement.RecordExtraction();
-        settlement.NoteBuilt(AssetDatabase.LoadAssetAtPath<BuildingDefinition>("Assets/_Project/Data/Buildings/Sawbench.asset"), 1);
+        settlement.AddResident(AssetDatabase.LoadAssetAtPath<ResidentDefinition>("Assets/_Project/Data/Settlement/Ingrid.asset"));
+        settlement.AddResident(AssetDatabase.LoadAssetAtPath<ResidentDefinition>("Assets/_Project/Data/Prologue/Residents/Bjarne.asset"));
         for (int seed = 1; seed <= 12; seed++)
         {
             List<RaidRumourDefinition> picked = RaidRumours.For(MistyWoods, seed, settlement, null);

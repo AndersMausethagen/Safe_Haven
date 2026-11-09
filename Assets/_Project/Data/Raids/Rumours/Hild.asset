@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 29a4813b55e8bc543a181501cef14e82, type: 3}
+  m_Name: Hild
+  m_EditorClassIdentifier: SafeHaven::RaidRumourDefinition
+  id: rumour.hild
+  briefing: A wall of dry stone has gone up overnight in the deep woods, round nothing at all.
+  site: {fileID: 11400000, guid: ad033535fa390cb47acaee988fd47c6c, type: 2}
+  setPiece: {fileID: 0}
+  weight: 2
+  hour: 0
+  seeks: {fileID: 11400000, guid: f8b63bb3e2db2fb44947d33b612f80f3, type: 2}
+  afterHome: {fileID: 11400000, guid: 8adfc30233928ec499c01587419eabaa, type: 2}
+  teaches: {fileID: 0}
+  breachComing: 0
+  afterExtractions: 1
+  needsBuilding: {fileID: 0}
+  needsTier: 1
+  untilBeaten: {fileID: 0}
+  urgent: 1
+  seeksLost: 0

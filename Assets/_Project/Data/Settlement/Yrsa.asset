@@ -15,7 +15,7 @@ MonoBehaviour:
   id: settler.yrsa
   displayName: Yrsa
   description: She cooked for a jarl once, and tells you so. People came from three valleys for her stew.
-  rescueLine: Thank you! Get me out of here and I'll follow you anywhere.
+  rescueLine: Mind the pot. If you've come to eat, you'll carry.
   arrivalLine: Show me your kitchen. No, on second thought, show me what you eat.
   welcomeLine: 
   fallenLine: I can't go on... come back for me.

@@ -53,7 +53,7 @@ public static class BuildHomeStory
         Text("AwakeningThePortal", null, "At the heart of the clearing stand the stones that dropped you here. Feed them the Life Orbs and the way back to your people opens.");
         Text("ThroughThePortal", null, "Your people are past the door, and the Misty Woods won't wait. Craft stone tools by hand from your bag (B), then step through. Bring home hardwood and iron ore for the haven, and get back to an extraction point before the portal closes. Carried things are lost if you fall; your tools and weapon come back damaged.");
         Text("KnowYourEnemy", null, "Forest-Bitten Wolves hunt the Misty Woods, on the same paths your people must walk home. Thin their numbers before they grow bolder.");
-        Text("AGrowingHome", null, "Ingrid was the first. When the others come through that door they will need more than a fire: Bjarne will want a smithy, and everyone somewhere dry to set down what they carried. Build them.");
+        Text("AGrowingHome", null, "Ingrid, Bjarne and Tor are home, and more will come through that door. They need beds, and somewhere dry to set down what they carry. Build them.");
         Text("TheWeakeningWard", null, "The light that called Ingrid home was seen by other things too. Something is testing the ward. Prepare, then speak to the portal when you are ready.");
         Text("SmithsRequest", null, "An old note on the board, in the last smith's hand: this hearth wants copper, and proof you can work it.");
     }
@@ -172,7 +172,7 @@ public static class BuildHomeStory
         so.FindProperty("description").stringValue = "The expedition's alchemist, and the first of the seven to come home. She knows more about the curse than she lets on.";
         so.FindProperty("rescueLine").stringValue = "It's you! I saw a light through the trees and thought the forest had finally taken my wits. Get me out of here.";
         so.FindProperty("arrivalLine").stringValue = "I kept saying the word so the forest couldn't take it. Fire. Fire. Fire. And then I saw yours.";
-        so.FindProperty("welcomeLine").stringValue = "I watched your fire for three nights from under a root. When the stones broke, Bjarne was thrown north, towards the troll country. The rest I couldn't see. Let me be of use until we find them.";
+        so.FindProperty("welcomeLine").stringValue = "I watched your fire for three nights from under a root. When the stones broke I heard Bjarne's hammer start up, somewhere deep in the woods, slow, like he's working one-handed. The rest I couldn't see. Let me be of use until we find them.";
         so.ApplyModifiedPropertiesWithoutUndo();
         EditorUtility.SetDirty(ingrid);
     }
@@ -237,7 +237,7 @@ public static class BuildHomeStory
         TheWaking(root, waking, talked);
         FirstFire(root, tree.transform);
         TheDoorWakes(root, portal.transform);
-        BjarnesHammer(root);
+        SigridsHorn(root);
 
         Whispers(tree, waking);
         var portalData = new SerializedObject(portal);
@@ -305,15 +305,16 @@ public static class BuildHomeStory
         Link(story, (repaired, 0, wait), (wait, 0, focus), (wait, 0, sigrid), (sigrid, 0, tree));
     }
 
-    private static void BjarnesHammer(Transform root)
+    // Sigrid is the last to be found (Docs/RescueOrder.md); Bjarne, who this used to be, comes home second now.
+    private static void SigridsHorn(Transform root)
     {
-        StoryScript story = Story(root, "Story - Bjarne's Hammer");
+        StoryScript story = Story(root, "Story - Sigrid's Horn");
         var reached = new WhenQuest { quest = Quest("ALightTheyCanSee"), when = WhenQuest.Moment.IsCompleted };
         var wait = new WaitNode { seconds = 1.5f };
-        var hammer = Say("<i>Listen. Far to the north, past the troll country, a hammer on stone. Three beats and a rest, over and over. Someone out there has seen your light and is answering it.</i>");
-        var bjarne = new SayNode { speaker = new StorySpeaker { player = true }, line = "That's Bjarne." };
-        var north = Say("<i>Then he is still himself. The way north is not open yet. Grow strong, little one, and keep this fire high. He can hold on a long while now.</i>");
-        Link(story, (reached, 0, wait), (wait, 0, hammer), (hammer, 0, bjarne), (bjarne, 0, north));
+        var horn = Say("<i>Listen. Far off, at dusk, a horn: three long notes and a rest, over and over. The expedition's signal. Someone out there has seen your light and is answering it.</i>");
+        var sigrid = new SayNode { speaker = new StorySpeaker { player = true }, line = "That's Sigrid." };
+        var hold = Say("<i>Then she is still herself, and she is holding on. She will want the others home before her. Bring them, little one, and keep this fire high.</i>");
+        Link(story, (reached, 0, wait), (wait, 0, horn), (horn, 0, sigrid), (sigrid, 0, hold));
     }
 
     private static void Whispers(HomePortal tree, GameEventDefinition waking)
@@ -330,7 +331,7 @@ public static class BuildHomeStory
             ("RootboundStones", "<i>The forest has put its roots in even here. Three stones around the clearing still hold my light, choked and cold. Free them, and bring the Life Orbs back.</i>", null),
             ("AwakeningThePortal", "<i>Now bring me what you freed. Feed me that light and I will open for you, as I did in the dark.</i>", null),
             ("ThroughThePortal", "<i>Make yourself tools and go. Take what the woods will give you, and come home before the way closes. It will not wait, and neither will the wolves.</i>", null),
-            ("WoodcuttersLodge", "<i>You brought the woods home on your back. Now make something of them: a lodge by the trees, a saw that turns logs into planks. The smithy and the walls start with a plank.</i>", null),
+            ("WoodcuttersLodge", "<i>Your carpenter is home. Let him make something of the woods: a lodge by the trees, a saw that turns logs into planks. The walls and the shed start with a plank.</i>", null),
             ("RaiseTheWalls", "<i>My ward keeps out the worst of the forest, not all of it. Put a wall between your fire and the trees.</i>", null),
             ("AStrangerInTheMist", "<i>She is close, little one. Just beyond me, off the path, hiding. Find her, keep her near you, and bring her through.</i>", null),
             ("AGrowingHome", "<i>One fire brought Ingrid home. The others will want more than a fire: a bench, a furnace, a dry place to set down what they carry. Build what they will need.</i>", null),
@@ -340,7 +341,25 @@ public static class BuildHomeStory
 
         var so = new SerializedObject(tree);
         SerializedProperty whispers = so.FindProperty("questWhispers");
-        whispers.arraySize = lines.Length;
+        // Whispers other builders added (BuildRescueOrder's, one per rescue) are kept, after these.
+        var kept = new List<(Object quest, string text, Object moment)>();
+        for (int i = 0; i < whispers.arraySize; i++)
+        {
+            SerializedProperty old = whispers.GetArrayElementAtIndex(i);
+            Object quest = old.FindPropertyRelative("quest").objectReferenceValue;
+            if (quest != null && !lines.Any(line => line.quest == quest.name))
+                kept.Add((quest, old.FindPropertyRelative("text").stringValue, old.FindPropertyRelative("moment").objectReferenceValue));
+        }
+
+        whispers.arraySize = lines.Length + kept.Count;
+        for (int i = 0; i < kept.Count; i++)
+        {
+            SerializedProperty extra = whispers.GetArrayElementAtIndex(lines.Length + i);
+            extra.FindPropertyRelative("quest").objectReferenceValue = kept[i].quest;
+            extra.FindPropertyRelative("text").stringValue = kept[i].text;
+            extra.FindPropertyRelative("moment").objectReferenceValue = kept[i].moment;
+        }
+
         for (int i = 0; i < lines.Length; i++)
         {
             SerializedProperty whisper = whispers.GetArrayElementAtIndex(i);

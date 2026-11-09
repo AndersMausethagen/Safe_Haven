@@ -732,7 +732,11 @@ Find → make contact → meet conditions or secure rescue → escort to extract
 | Runa | Tracker | One more rumour in every briefing |
 | Liv | Rune Scholar | Teaches the raid runes, which nobody else knows; the cauldron works faster |
 | Sigrid | Leader | 30 more seconds in every raid |
-| Bjarne | Smith | Repairs to gear cost half; the forge works faster. He was thrown north, so he waits for the road to Troll Valley |
+| Bjarne | Smith | Repairs to gear cost half; the forge works faster. Found second, after Ingrid, by his hammer in the deep woods |
+
+**Rescue order (November 9, 2026).** Everyone is found in a designed order, each answering the problem the player has just met, and each rescue
+teaches the building they work at: Ingrid, Bjarne, Tor, Eirik, Gunnar, Asa, Yrsa, Runa, Liv, Hild, Sigrid. Nobody arrives with a Haven rank. See
+[Who comes home, and when](RescueOrder.md).
 
 ### 15.4 Personality and well-being
 

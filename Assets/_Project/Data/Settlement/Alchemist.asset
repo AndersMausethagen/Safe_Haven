@@ -18,6 +18,7 @@ MonoBehaviour:
   acceptLine: An altar to cleanse the curse? I know the old way. Build it, and I'll keep it burning.
   teachesBuildings:
   - {fileID: 11400000, guid: dd9792482f40fc243a8d7294434f1ee9, type: 2}
+  - {fileID: 11400000, guid: a10bf06ba7306584f8632f492a16fdac, type: 2}
   teachesRecipes: []
   workplace: {fileID: 11400000, guid: dd9792482f40fc243a8d7294434f1ee9, type: 2}
   workGesture: {fileID: 11400000, guid: 7c9176c17f7f8644085abfda4ecc4cac, type: 2}

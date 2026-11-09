@@ -19,10 +19,12 @@ MonoBehaviour:
   weight: 2
   hour: 0
   seeks: {fileID: 11400000, guid: de521ad7beeb20b49878a9b40c96bced, type: 2}
+  afterHome: {fileID: 11400000, guid: 272895da9ba7e784b8a97bcd2be637c8, type: 2}
   teaches: {fileID: 0}
   breachComing: 0
   afterExtractions: 1
-  needsBuilding: {fileID: 11400000, guid: 25c95a1289ab72b4ea0bb96e2ec3f020, type: 2}
+  needsBuilding: {fileID: 0}
   needsTier: 1
   untilBeaten: {fileID: 0}
   urgent: 1
+  seeksLost: 0

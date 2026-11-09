@@ -15,7 +15,7 @@ MonoBehaviour:
   id: settler.hild
   displayName: Hild
   description: A mason who followed the smoke. She has opinions about your footings.
-  rescueLine: Thank you! Get me out of here and I'll follow you anywhere.
+  rescueLine: Mind the coping. It's the only level thing for a mile.
   arrivalLine: Whoever laid this hearth had never met a level. I'll stay.
   welcomeLine: 
   fallenLine: I can't go on... come back for me.
@@ -24,7 +24,10 @@ MonoBehaviour:
     behindYou: []
     hurt: []
     won: []
+    helpedUp: []
   model: {fileID: 1441834787134571619, guid: e398fdb177c2d5b4b84f05ca6a27d2cf, type: 3}
   raidCompanion: {fileID: 11400000, guid: 60d284aaf3c06f24fba9e928940c43c5, type: 2}
+  memoryLines: []
+  returningLines: []
   jobs:
   - {fileID: 11400000, guid: 59a0d6a12e809f84f92d2b2a418d1d26, type: 2}

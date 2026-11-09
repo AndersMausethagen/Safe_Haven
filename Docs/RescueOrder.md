@@ -1,14 +1,16 @@
 # Who comes home, and when
 
-**Status: proposal (2026-11-09), waiting for approval.** Nothing below is built yet except where marked. Hild, Asa,
-Gunnar and Yrsa no longer arrive with a Haven rank, and the opening quests now teach before they build (`BuildOpeningOrder`).
+**Status: built (2026-11-09), approved by the user.** `AgentScripts/BuildRescueOrder.cs` sets it up; `RescueOrderTests` holds it. Not yet
+playtested in a real raid: the four new rescue sites (Gunnar, Asa, Yrsa, Hild) are placeholder shapes like the others.
 
 ## The rule
 
 Every person is found on a raid and brought home. Each one answers a problem the player has **just felt**, and their rescue
-opens the building they work at: their job teaches it, as Ingrid's job already teaches the Purification Altar. The building
-is not known from the start any more. Their rumour comes up in the briefing once the problem is there, not once the
-building stands. Today Tor and Bjarne are sought only after the Lodge and the Smithy are built, which is the reverse.
+opens the building they work at: coming home, they teach the player the workplaces of every job they can do
+(`ResidentNpc.TeachWhatTheyKnow`), and giving them the job teaches it again for a co-op friend. The building is not known from
+the start. Their rumour waits for the person before them (Raid Rumour › After Home) and is urgent, so the next person is
+always in the briefing. A quest per rescue ("Bring X Home", The Lost Expedition) says what problem they answer; a quest after it
+("Hands at Home") gives them work and builds their workplace. Existing saves keep every building they already knew.
 
 ## What other games do
 
@@ -26,8 +28,8 @@ What we take from them: show the problem first and the person second, so a rescu
 | # | When | Who | The problem just felt | Their rescue opens |
 |---|---|---|---|---|
 | – | Opening, alone | – | Learning the basics | Tools, Workshop I, Small Chest, Knotted Club, food, the portal (**built**) |
-| 1 | Raid 1, story | **Ingrid**, Alchemist | You come home hurt, with cursed things you can't use | Purification Altar; she heals you on raids (**built**). Her welcome names Bjarne, which points to the next rescue |
-| 2 | Raid 2 | **Bjarne**, Smith | Gear breaks on raids, and a club is all there is | **Smithy**: repairs at half cost, the tier I weapons and shields (Spear, Wicker Shield) |
+| 1 | Raid 1, story | **Ingrid**, Alchemist | You come home hurt, with cursed things you can't use | **Cauldron** (healing draughts) and Purification Altar; she heals you on raids. Her welcome names Bjarne's hammer, which points to the next rescue |
+| 2 | Raid 2 | **Bjarne**, Smith | Gear breaks on raids, and a club is all there is | **Smithy**: repairs at half cost, copper smelted from ore |
 | 3 | Raid 3–4 | **Tor**, Carpenter | Logs are heavy, and everything better needs planks | **Woodcutter's Lodge**: planks, Round Shield; this opens the Palisade, Storage Shed and Watch Post |
 | 4 | Smithy II | (Bjarne) | Stone tools are slow, and deep ore needs a better pick | Copper tools. No new person: the Smithy's upgrade answers it |
 | 5 | Lodge II | (Tor) | You can't carry enough home: ore and planks weigh too much | **Wainwright's Yard** (Wheelbarrow, Handcart, Rowboat), taught by Tor at Lodge II instead of found plans |
@@ -37,7 +39,7 @@ What we take from them: show the problem first and the person second, so a rescu
 | 9 | After the Hunter's Lodge | **Asa**, Farmer and Weaver | Food runs out on long raids; iron gear needs linen | Farm Plot and Tailor's Shop |
 | 10 | After the Farm Plot | **Yrsa**, Cook | Plain food only keeps you alive | Kitchen: meals with lasting bonuses |
 | 11 | Mid game | **Runa**, Tracker | Raids feel random | One more rumour in every briefing |
-| 12 | Mid game | **Liv**, Rune Scholar | The deep woods need more than steel | Cauldron and the raid runes |
+| 12 | Mid game | **Liv**, Rune Scholar | The deep woods need more than steel | The raid runes (she works at Ingrid's Cauldron) |
 | 13 | Village rank | **Hild**, Mason | Palisades burn and huts are cramped | Stone Wall and Cottage (Workshop III) |
 | 14 | Last | **Sigrid**, Leader | The expedition's leader is still out there | Haven Banner; more time in every raid. This ends The Lost Expedition |
 
@@ -45,17 +47,18 @@ Steps 2 to 6 follow the outline from the playtest of 2026-11-08: gear and repair
 the story already sends the player after her, and she leads to Bjarne. That's roughly one person every two or three raids
 early, slower later.
 
-## What building it takes
+## As built
 
-- Each job teaches its workplace (Smithy, Lodge, Watch Post, Hunter's Lodge, Farm Plot, Tailor's Shop, Kitchen, Cauldron,
-  Banner, Stone Wall), and those buildings stop being known from the start.
-- Rumours: drop "needs building" for Tor and Bjarne, and add an **after this person is home** condition, so the order holds.
-  Eirik already has a breach-coming condition.
-- The **Smithy needs only the Workshop**, since Bjarne now comes before Tor.
-- Rescue sites for Hild, Asa, Gunnar and Yrsa (only the expedition's seven have sites).
-- One "Bring X home" quest per rescue, then a short "give them work and build" quest, the same pattern as Ingrid's.
-  Woodcutter's Lodge and Raise the Walls move behind Tor's rescue.
-- Tor's Lodge II teaches the Wainwright's Yard. Today the Yard comes from found plans, which could stay as a shortcut.
+- Each job teaches its workplace, and those buildings are not known from the start. The Smithy and the Cauldron need only the
+  Workshop; the Wainwright's Yard needs Lodge II.
+- Rumours: none waits for a building; each waits for the person before (After Home). Gunnar, Asa, Yrsa and Hild have rumours
+  and sites of their own: a hunter's pit, a burned farmstead, a cookfire that draws wolves, a dry-stone wall round nothing.
+- The Woodcutter's Lodge quest gives Tor work; Raise the Walls, A Growing Home (now a Storage Shed and a Hut) and Heavy Loads
+  (Wainwright's Yard and a Wheelbarrow) follow it.
+- The portal has a line for each rescue. Its old moment at the Hamlet rank, Bjarne's hammer "past the troll country", is
+  Sigrid's horn now, since she is found last.
+- Not done: tier I weapons stay at the Workshop (moving them to the Smithy would change the base tiers); Hild's rank-free
+  arrival only affects new games, and a save where she already came keeps her.
 
 ## Sources
 

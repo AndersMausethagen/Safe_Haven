@@ -16,7 +16,8 @@ MonoBehaviour:
   displayName: Hunter
   description: 'Runs the Hunter''s Lodge: keeps hides turning into leather while you are away, and the work goes faster.'
   acceptLine: '"You bring the hides. I''ll bring the patience."'
-  teachesBuildings: []
+  teachesBuildings:
+  - {fileID: 11400000, guid: 27159a7266bda614cbc6774955749e0e, type: 2}
   teachesRecipes: []
   workplace: {fileID: 11400000, guid: 27159a7266bda614cbc6774955749e0e, type: 2}
   workGesture: {fileID: 11400000, guid: 7c9176c17f7f8644085abfda4ecc4cac, type: 2}

@@ -1,0 +1,62 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2f02987ee9197d4682f5db8cbc7a967, type: 3}
+  m_Name: HildsWall
+  m_EditorClassIdentifier: SafeHaven::RaidEventDefinition
+  id: rumour.hildswall
+  displayName: A Wall Round Nothing
+  weight: 0
+  earliestSeconds: 30
+  latestSecondsLeft: 60
+  minimumStage: 0
+  warning: 
+  warningSound: {fileID: 0}
+  sitePrefab: {fileID: 7345240531865155924, guid: 3d8191b4a917bfd4e85112d74ff2dcbe, type: 3}
+  siteDistance: {x: 35, y: 70}
+  siteText: A ring of dry-stone wall, chest high and dead level. From inside it someone tells you to mind the coping.
+  onStart: []
+  choices:
+  - label: Help her finish it, then climb out
+    detail: 'A minute and a half: she won''t leave it half done.'
+    cost: []
+    result: '"There. Now it''ll stand."'
+    outcomes:
+    - rid: 2623125980239888508
+    - rid: 2623125980239888509
+  - label: Pull a stretch down
+    detail: Quick, and loud, and she'll never forgive you.
+    cost: []
+    result: She climbs out over the rubble without a word.
+    outcomes:
+    - rid: 2623125980239888510
+    - rid: 2623125980239888511
+  references:
+    version: 2
+    RefIds:
+    - rid: 2623125980239888508
+      type: {class: ChangeTimeOutcome, ns: , asm: SafeHaven}
+      data:
+        seconds: -90
+    - rid: 2623125980239888509
+      type: {class: RescueResidentOutcome, ns: , asm: SafeHaven}
+      data:
+        resident: {fileID: 11400000, guid: f8b63bb3e2db2fb44947d33b612f80f3, type: 2}
+        traveler: {fileID: 4560087502640453408, guid: 34ab3b53d3ced634486fa4ab89e59887, type: 3}
+    - rid: 2623125980239888510
+      type: {class: MakeNoiseOutcome, ns: , asm: SafeHaven}
+      data:
+        radius: 35
+    - rid: 2623125980239888511
+      type: {class: RescueResidentOutcome, ns: , asm: SafeHaven}
+      data:
+        resident: {fileID: 11400000, guid: f8b63bb3e2db2fb44947d33b612f80f3, type: 2}
+        traveler: {fileID: 4560087502640453408, guid: 34ab3b53d3ced634486fa4ab89e59887, type: 3}

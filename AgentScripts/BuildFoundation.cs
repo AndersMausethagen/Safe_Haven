@@ -371,14 +371,13 @@ public static class BuildFoundation
         });
     }
 
-    // Tor could already be found; he and Bjarne are now sought as soon as they have somewhere to work.
+    // Bjarne's rumour and rescue. Who is sought when, and what each opens, is BuildRescueOrder's (Docs/RescueOrder.md): a
+    // rescue opens the workplace now, so neither rumour waits for a building.
     private static string Bjarne()
     {
-        BuildingDefinition lodge = Load<BuildingDefinition>("Assets/_Project/Data/Buildings/Sawbench.asset");
-        BuildingDefinition smithy = Load<BuildingDefinition>("Assets/_Project/Data/Buildings/Forge.asset");
         Edit(Load<RaidRumourDefinition>(Rumours + "Tor.asset"), so =>
         {
-            so.FindProperty("needsBuilding").objectReferenceValue = lodge;
+            so.FindProperty("needsBuilding").objectReferenceValue = null;
             so.FindProperty("urgent").boolValue = true;
         });
 
@@ -425,7 +424,7 @@ public static class BuildFoundation
             so.FindProperty("briefing").stringValue = "A hammer rings in the deep woods at dusk, slow and unevenly, as if the smith is one-armed.";
             so.FindProperty("site").objectReferenceValue = raidEvent;
             so.FindProperty("seeks").objectReferenceValue = bjarne;
-            so.FindProperty("needsBuilding").objectReferenceValue = smithy;
+            so.FindProperty("needsBuilding").objectReferenceValue = null;
             so.FindProperty("urgent").boolValue = true;
         });
 
@@ -441,7 +440,7 @@ public static class BuildFoundation
                 }
             }
         });
-        return "bjarne: rumour and rescue added; he and Tor are sought first once their workplace stands";
+        return "bjarne: rumour and rescue added (the order is BuildRescueOrder's)";
     }
 
     private static GameObject ForgeSite()

@@ -1,0 +1,46 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2f02987ee9197d4682f5db8cbc7a967, type: 3}
+  m_Name: GunnarsPit
+  m_EditorClassIdentifier: SafeHaven::RaidEventDefinition
+  id: rumour.gunnarspit
+  displayName: The Hunter's Pit
+  weight: 0
+  earliestSeconds: 30
+  latestSecondsLeft: 60
+  minimumStage: 0
+  warning: 
+  warningSound: {fileID: 0}
+  sitePrefab: {fileID: 7345240531865155924, guid: a1b5c758e70050f4c80952f8cda33269, type: 3}
+  siteDistance: {x: 35, y: 70}
+  siteText: A pit trap, well made, with a hunter at the bottom of it and a dead boar across him.
+  onStart: []
+  choices:
+  - label: Cut a pole and haul him out
+    detail: Half a minute.
+    cost: []
+    result: '"Mind the stakes," he says, from somewhere under the boar.'
+    outcomes:
+    - rid: 2623125980239888500
+    - rid: 2623125980239888501
+  references:
+    version: 2
+    RefIds:
+    - rid: 2623125980239888500
+      type: {class: ChangeTimeOutcome, ns: , asm: SafeHaven}
+      data:
+        seconds: -30
+    - rid: 2623125980239888501
+      type: {class: RescueResidentOutcome, ns: , asm: SafeHaven}
+      data:
+        resident: {fileID: 11400000, guid: 9f83966b2e3c8fe42a58fd9d130cb08e, type: 2}
+        traveler: {fileID: 4560087502640453408, guid: 34ab3b53d3ced634486fa4ab89e59887, type: 3}

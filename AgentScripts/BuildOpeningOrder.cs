@@ -37,10 +37,7 @@ public static class BuildOpeningOrder
 
         After("FoodAndWater", weapon);
         DropCraft("FoodAndWater", "KnottedClub");
-        After("WoodcuttersLodge", Quest("ThroughThePortal"));
-        Text("WoodcuttersLodge", "You came home with hardwood on your back, and a hatchet won't make planks of it. A lodge with a sawbench turns logs into planks, and the smithy, the walls and the storage shed all start with a plank. Build it near the trees (G).");
-        After("AGrowingHome", Quest("WoodcuttersLodge"));
-        Text("AGrowingHome", "Ingrid was the first. When the others come through that door they will need more than a fire: Bjarne will want a smithy, and everyone somewhere dry to set down what they carried. Build them.");
+        // The Woodcutter's Lodge, the walls and A Growing Home follow Tor's rescue now: BuildRescueOrder, run after this.
         string portal = ThePortalQuest();
         string ranks = NoSettlers();
 
@@ -158,7 +155,7 @@ public static class BuildOpeningOrder
         // A later whisper wins when two quests are active, so each goes where its quest sits in the story.
         Whisper(tree, "SafeKeeping", "FirstCamp", "<i>What you carry through me, the woods can take from you. What you leave here, I keep. Build a chest beside your workshop (G), and put in it what you cannot bear to lose.</i>");
         Whisper(tree, "FirstWeapon", "SafeKeeping", "<i>A hatchet fells trees. It will not keep the wolves off you. Make something to fight with at your workshop, and carry it.</i>");
-        Whisper(tree, "WoodcuttersLodge", "ThroughThePortal", "<i>You brought the woods home on your back. Now make something of them: a lodge by the trees, a saw that turns logs into planks. The smithy and the walls start with a plank.</i>");
+        Whisper(tree, "WoodcuttersLodge", "ThroughThePortal", "<i>Your carpenter is home. Let him make something of the woods: a lodge by the trees, a saw that turns logs into planks. The walls and the shed start with a plank.</i>");
         Whisper(tree, "RaiseTheWalls", "WoodcuttersLodge", "<i>My ward keeps out the worst of the forest, not all of it. Put a wall between your fire and the trees.</i>");
 
         var portalData = new SerializedObject(portal);

@@ -15,7 +15,7 @@ MonoBehaviour:
   id: settler.gunnar
   displayName: Gunnar
   description: A hunter who has been walking these woods for years, alone by choice, until the choice ran out.
-  rescueLine: Thank you! Get me out of here and I'll follow you anywhere.
+  rescueLine: Took you long enough. That boar's been lying on me since yesterday.
   arrivalLine: You've been frightening my deer. Least you can do is give me a roof.
   welcomeLine: 
   fallenLine: I can't go on... come back for me.

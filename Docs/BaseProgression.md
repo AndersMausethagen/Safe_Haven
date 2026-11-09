@@ -1,7 +1,8 @@
 # Base progression
 
 How Safe Haven grows, and why. The numbers live in the assets and are set by `AgentScripts/BuildBaseTiers.cs`,
-`AgentScripts/BuildFoundation.cs`, `AgentScripts/BuildHavenProgression.cs` and `AgentScripts/BuildBalancePass.cs`; running them again, in that order, restores them. Rule: **the base shows progress, and everything it gives helps you in the woods.**
+`AgentScripts/BuildFoundation.cs`, `AgentScripts/BuildHavenProgression.cs` and `AgentScripts/BuildBalancePass.cs`, then `AgentScripts/BuildRescueOrder.cs`
+for who opens what; running them again, in that order, restores them. Rule: **the base shows progress, and everything it gives helps you in the woods.**
 
 ## The rules
 
@@ -25,8 +26,9 @@ against a raid of 16:40. `HavenProgressionTests.NoUpgrade_IsOnlySpeed` holds the
 Campfire, Torch, Lantern Post        open from the start
 Workshop I                           basic gear, utilities, stone work, repairs
 ├─ Hut                               the first beds
-├─ Woodcutter's Lodge I              planks, shields
-│  ├─ Smithy I                       smelts copper
+├─ Smithy I                          smelts copper (Bjarne)
+├─ Cauldron I                        healing and tonics (Ingrid)
+├─ Woodcutter's Lodge I              planks, shields (Tor)
 │  │  └─ Kitchen                     meals with lasting bonuses
 │  ├─ Cauldron, Storage Shed, Palisade, Watch Post
 ├─ Hunter's Lodge I                  cures hides; bows and more game at higher tiers
@@ -41,7 +43,11 @@ Runic Ward Totem Watch Post III and Purification Altar   slows and wears down wh
 Trading Post     Workshop II and the rank of Village     sells valuables, buys what luck left short
 ```
 
-Beehive, Sauna, Wainwright's Yard and Elder Tree still come from things found in raids; the Purification Altar from giving Ingrid a job.
+**People open their workplaces** ([rescue order](RescueOrder.md)): a building someone works at is not known from the start. Bringing that person
+home teaches it, as does giving them the job: the Altar and Cauldron (Ingrid), Smithy (Bjarne), Lodge and Wainwright's Yard (Tor, the Yard at Lodge II),
+Watch Post (Eirik), Hunter's Lodge and Dock (Gunnar), Farm Plot and Tailor's Shop (Asa), Kitchen (Yrsa), Cottage and Stone Wall (Hild), Haven Banner
+(Sigrid). The chain above still sets what has to stand first. Beehive, Sauna and Elder Tree come from things found in raids, and the Wainwright's
+Ledger is a shortcut to the Yard.
 
 **Later tiers ask for other buildings** (`BuildingLevel.requires`), so the whole haven climbs together: Smithy III needs the Hunter's Lodge and Tailor's
 Shop (iron gear is made with their leather and linen), Smithy IV needs Altar II, Smithy V needs Workshop IV, Workshop III needs Lodge II, Workshop IV and

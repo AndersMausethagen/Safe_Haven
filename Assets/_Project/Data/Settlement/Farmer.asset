@@ -16,7 +16,8 @@ MonoBehaviour:
   displayName: Farmer
   description: 'Tends the Farm Plot: keeps what you have planted growing from the stash''s seed, and it grows faster.'
   acceptLine: '"Leave me the seed. The rest takes care of itself, with a bit of shouting."'
-  teachesBuildings: []
+  teachesBuildings:
+  - {fileID: 11400000, guid: 1b4e0a9fa52cb7d41b48c5e1bfae2ebc, type: 2}
   teachesRecipes: []
   workplace: {fileID: 11400000, guid: 1b4e0a9fa52cb7d41b48c5e1bfae2ebc, type: 2}
   workGesture: {fileID: 11400000, guid: 7c9176c17f7f8644085abfda4ecc4cac, type: 2}

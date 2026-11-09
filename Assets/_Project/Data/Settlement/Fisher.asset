@@ -16,7 +16,8 @@ MonoBehaviour:
   displayName: Fisher
   description: 'Works the Dock: keeps the nets and lines out while you are away, so there is fish in the stash, and gives lessons in Fishing.'
   acceptLine: '"The water''s patient. So am I."'
-  teachesBuildings: []
+  teachesBuildings:
+  - {fileID: 11400000, guid: 01ca82d04753df04d8624425213e0975, type: 2}
   teachesRecipes: []
   workplace: {fileID: 11400000, guid: 01ca82d04753df04d8624425213e0975, type: 2}
   workGesture: {fileID: 11400000, guid: 8e94db9e6609beb419853cd309fcecd4, type: 2}

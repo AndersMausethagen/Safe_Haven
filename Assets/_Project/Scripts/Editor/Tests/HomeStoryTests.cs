@@ -99,13 +99,13 @@ public sealed class HomeStoryTests
     }
 
     [Test]
-    public void TheBuildingQuests_ComeAfterTheFirstRaid()
+    public void TheBuildingQuests_ComeAfterTor()
     {
-        CollectionAssert.AreEqual(new[] { Quest("ThroughThePortal") }, Quest("WoodcuttersLodge").Prerequisites);
+        CollectionAssert.AreEqual(new[] { Quest("BringTorHome") }, Quest("WoodcuttersLodge").Prerequisites, "the lodge is his to show");
         CollectionAssert.AreEqual(new[] { Quest("WoodcuttersLodge") }, Quest("RaiseTheWalls").Prerequisites);
         CollectionAssert.AreEqual(new[] { Quest("WoodcuttersLodge") }, Quest("AGrowingHome").Prerequisites, "its smithy and shed need the lodge");
         Assert.AreEqual(4, Quest("RaiseTheWalls").Objectives.Single().Amount, "four lengths of palisade");
-        Assert.IsFalse(Quest("AGrowingHome").Objectives.Any(o => o.Building != null && o.Building.name == "Sawbench"), "the lodge has its own quest");
+        Assert.IsFalse(Quest("AGrowingHome").Objectives.Any(o => o.Building != null && (o.Building.name == "Sawbench" || o.Building.name == "Forge")), "the lodge and the smithy have their own quests");
     }
 
     [Test]

@@ -129,8 +129,8 @@ public sealed class RaidReasonsTests
         RaidRumourDefinition tor = Rumour("Tor");
         int day = SeedAt("Day");
         SettlementState settlement = Survived(1);
-        Assert.IsFalse(tor.CanComeUp(RaidTimeOfDay.For(Woods, day), settlement, null), "nowhere for him to work yet");
-        settlement.NoteBuilt(AssetDatabase.LoadAssetAtPath<BuildingDefinition>("Assets/_Project/Data/Buildings/Sawbench.asset"), 1);
+        Assert.IsFalse(tor.CanComeUp(RaidTimeOfDay.For(Woods, day), settlement, null), "Bjarne comes home first");
+        settlement.AddResident(Person("Bjarne"));
         Assert.IsTrue(tor.CanComeUp(RaidTimeOfDay.For(Woods, day), settlement, null));
         settlement.AddResident(Person("Tor"));
         Assert.IsFalse(tor.CanComeUp(RaidTimeOfDay.For(Woods, day), settlement, null));
