@@ -7,6 +7,9 @@ line, a pike breaking the water in a cold lake.
 - Line Snap: a sharp crack, the freed line's twang and a little whip of air.
 - Fish Splash: the slap of a tail on the water, the bubbles it drags under (they ring and rise in pitch as they shrink,
   as real bubbles do), and droplets falling back.
+- Nokken Startle: the stinger when the Nokken takes the player. A cluster of fiddle strings a semitone apart, bowed hard at
+  the bridge (sul ponticello: the glassy, scraping top of the string, little of its body), bending up as the bow digs in;
+  a breathy, inhuman shriek gliding up over them; the water bursting underneath. Sudden, high and wrong, then gone.
 
 Run from the project root: python Tools/Audio/fishing.py
 """
@@ -90,6 +93,40 @@ def fish_splash(rng, size):
     return fade_end(darken(out, -3.0))
 
 
+def screech(frequency, seconds, rng, bend=1.06):
+    """A string bowed hard at the bridge: the saw's upper partials and the bow's scrape, little of the string's body."""
+    t = times(seconds)
+    catch = lowpass(white(len(t), rng), 30)
+    catch /= max(1e-9, np.abs(catch).max())
+    glide = 1 + (bend - 1) * (1 - np.exp(-t / 0.25))
+    phase = np.cumsum(frequency * glide * (1 + 0.006 * catch + 0.004 * np.sin(TAU * 6.5 * t))) / RATE
+    saw = 2 * (phase % 1) - 1
+    scrape = band(white(len(t), rng), 2500, 9000) * 0.18 * (0.3 + saw ** 2)
+    return band(saw, frequency * 0.9, 9000) + scrape
+
+
+def nokken_startle(rng):
+    seconds = 1.9
+    t = times(seconds)
+    # The strings: a semitone cluster high on the E string, each slightly out of time with the others.
+    strings = blank(seconds)
+    for semitone, level in ((0, 1.0), (1, 0.85), (2, 0.7), (-11, 0.45)):
+        frequency = 1318.5 * 2 ** (semitone / 12)
+        place(strings, screech(frequency, seconds, rng, bend=rng.uniform(1.03, 1.07)), rng.uniform(0.0, 0.025), level)
+    strings_env = np.clip(t / 0.012, 0, 1) * np.exp(-np.maximum(0, t - 0.35) / 0.45)
+    # The shriek: a high, breathy throat gliding up, nothing human about its vowel.
+    pitch = 820 * (1 + 0.55 * (1 - np.exp(-t / 0.3)))
+    shape = vowel((2400, 3100, 6, 1.0), (3800, 4600, 7, 0.6), (900, 1200, 4, 0.3))(len(t))
+    shriek = voice(pitch, shape, rng, rough=0.35, breath=0.6)
+    shriek_env = np.clip((t - 0.03) / 0.05, 0, 1) * np.exp(-np.maximum(0, t - 0.4) / 0.35)
+    # The water bursting: a dull, heavy blow under the first instant.
+    burst = thump(rng, 0.6, 45, 140, 0.18)
+    out = strings * strings_env * 0.55 + shriek * shriek_env * 0.45
+    out /= max(1e-9, np.abs(out).max())
+    place(out, burst / max(1e-9, np.abs(burst).max()), 0.0, 0.55)
+    return fade_end(drive(out, 1.4), 0.3)
+
+
 def main():
     for i in range(1, 4):
         name = f"Reel Turn {i}"
@@ -103,6 +140,9 @@ def main():
     for i in range(1, 5):
         name = f"Fish Splash {i}"
         save(OUT, name, space(fish_splash(seeded(name), 0.4 + 0.2 * i), FOREST, 0.12), mono=True)
+    # Stereo and not positioned: it is the player's fright, not a sound out on the water.
+    name = "Nokken Startle"
+    save(OUT, name, space(nokken_startle(seeded(name)), VALE, 0.22), peak=0.95)
 
 
 if __name__ == "__main__":

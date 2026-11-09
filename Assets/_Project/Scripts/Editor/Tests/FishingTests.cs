@@ -128,6 +128,9 @@ public sealed class FishingTests
         Assert.Greater(settings.NokkenChance, 0f);
         Assert.NotNull(settings.MetNokken);
         Assert.NotNull(settings.NokkenModel);
+        Assert.NotNull(settings.NokkenStartle, "a high, sudden stinger as it takes the player");
+        Assert.IsFalse(settings.NokkenStartle.Positional, "the player's fright, at full strength wherever the camera is");
+        Assert.Greater(settings.NokkenHoldShake, 0f, "the camera keeps shaking while it drags the player");
     }
 
     [Test]

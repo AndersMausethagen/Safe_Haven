@@ -144,6 +144,10 @@ public sealed class DynamicQuestTests
         eventMusic.tracks.Add(new MusicTrack(clip, .7f));
         audio.PlayEventMusic(eventMusic);
         Assert.AreSame(eventMusic, MusicRules.Choose(audio, defaults, AudioMood.Combat, 1f).Playlist);
+        // A place's mood music (the prologue's dark forest) lets a fight's music take over, and comes back after it.
+        audio.PlayEventMusic(eventMusic, true);
+        Assert.AreSame(defaults.DefaultCombat, MusicRules.Choose(audio, defaults, AudioMood.Combat, 1f).Playlist);
+        Assert.AreSame(eventMusic, MusicRules.Choose(audio, defaults, AudioMood.Exploring, 1f).Playlist);
         audio.SilenceMusic();
         Assert.IsNull(MusicRules.Choose(audio, defaults, AudioMood.Exploring, 1f).Playlist);
         Assert.AreSame(defaults.DefaultCombat, MusicRules.Choose(audio, defaults, AudioMood.Combat, 1f).Playlist);

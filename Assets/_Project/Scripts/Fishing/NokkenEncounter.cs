@@ -64,6 +64,8 @@ public sealed class NokkenEncounter : MonoBehaviour
         figure.position = surfaceAt + Vector3.down * 2.5f;
         figure.rotation = Quaternion.LookRotation(-toWater.normalized);
 
+        // The fright first, then the water and its roar; the battle music follows (Update).
+        AudioManager.Play(settings.NokkenStartle, player.position);
         AudioManager.Play(settings.NokkenScream, surfaceAt);
         AudioManager.Play(settings.NokkenSplash, surfaceAt);
         if (first)
@@ -71,7 +73,7 @@ public sealed class NokkenEncounter : MonoBehaviour
             AudioManager.Play(settings.NokkenScream, player.position);
         }
 
-        CameraShake.Add(first ? 0.9f : 0.6f);
+        CameraShake.Add(first ? settings.NokkenGrabShake : settings.NokkenGrabShake * 0.8f);
         PlayerCameraController camera = PlayerCameraController.Current;
         if (camera != null)
         {
@@ -90,6 +92,14 @@ public sealed class NokkenEncounter : MonoBehaviour
             return;
         }
 
+        FishingSettings settings = FishingSettings.Current;
+        if (Time.time - started >= settings.NokkenMusicDelay)
+        {
+            AudioManager.KeepCombat();
+        }
+
+        // Shaken the whole time it has hold of them, not only at the grab.
+        CameraShake.AtLeast(settings.NokkenHoldShake);
         float risen = Mathf.Clamp01((Time.time - started) / RiseSeconds);
         figure.position = Vector3.Lerp(surfaceAt + Vector3.down * 2.5f, surfaceAt + Vector3.down * 0.4f, 1f - (1f - risen) * (1f - risen));
 

@@ -190,6 +190,7 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
     private Damageable player;
     private float lastDamageTime = float.NegativeInfinity;
     private float combatUntil = float.NegativeInfinity;
+    private float keptInCombatUntil = float.NegativeInfinity;
     private float lastCombatEndedAt = float.NegativeInfinity;
     private float nextCombatCheck;
     private bool restartCombatMusic;
@@ -290,6 +291,16 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
     }
 
     /// <summary>Plays a sound once at a position. Safe to call with no sound or before the manager exists.</summary>
+    /// <summary>Counts as a fight for the music while called each frame: a fight without a monster chasing the player,
+    /// such as the Nøkken's grip. The combat music lingers after it as after any fight.</summary>
+    public static void KeepCombat()
+    {
+        if (Current != null)
+        {
+            Current.keptInCombatUntil = Time.unscaledTime + 0.25f;
+        }
+    }
+
     public static void Play(SoundDefinition sound, Vector3 position)
     {
         if (Current != null)
@@ -463,6 +474,7 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
         }
 
         bool fighting = enemyChasing
+            || Time.unscaledTime < keptInCombatUntil
             || (settings.RecentDamageSeconds > 0f && Time.unscaledTime - lastDamageTime < settings.RecentDamageSeconds);
         if (fighting)
         {

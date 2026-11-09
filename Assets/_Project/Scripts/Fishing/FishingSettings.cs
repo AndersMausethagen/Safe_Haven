@@ -124,6 +124,13 @@ public sealed class FishingSettings : GameSettings<FishingSettings>
     [SerializeField] private GameObject nokkenModel;
     [SerializeField] private SoundDefinition nokkenScream;
     [SerializeField] private SoundDefinition nokkenSplash;
+    [Tooltip("The fright as it takes the player: a high, sudden stinger, heard before anything else.")]
+    [SerializeField] private SoundDefinition nokkenStartle;
+    [Tooltip("Seconds after the stinger before the battle music comes in; it then plays for as long as the Nøkken holds on.")]
+    [SerializeField, Min(0f)] private float nokkenMusicDelay = 0.6f;
+    [Tooltip("Camera shake as it takes the player (0-1, 1 the strongest), and the shake that keeps on while it drags them.")]
+    [SerializeField, Range(0f, 1f)] private float nokkenGrabShake = 1f;
+    [SerializeField, Range(0f, 1f)] private float nokkenHoldShake = 0.5f;
     [Tooltip("Raised the first time the player meets the Nøkken (quests, stories).")]
     [SerializeField, RaisedByGame] private GameEventDefinition metNokken;
 
@@ -170,6 +177,10 @@ public sealed class FishingSettings : GameSettings<FishingSettings>
     public GameObject NokkenModel => nokkenModel;
     public SoundDefinition NokkenScream => nokkenScream;
     public SoundDefinition NokkenSplash => nokkenSplash;
+    public SoundDefinition NokkenStartle => nokkenStartle;
+    public float NokkenMusicDelay => nokkenMusicDelay;
+    public float NokkenGrabShake => nokkenGrabShake;
+    public float NokkenHoldShake => nokkenHoldShake;
     public GameEventDefinition MetNokken => metNokken;
     public GameObject FloatModel => floatModel;
     public Material LineMaterial => lineMaterial;

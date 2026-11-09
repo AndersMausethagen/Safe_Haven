@@ -31,6 +31,14 @@ public sealed class CameraShake : CinemachineExtension
         trauma = Mathf.Clamp01(trauma + amount * GameOptions.ScreenShake.Value);
     }
 
+    /// <summary>Keeps the shake at least this strong (0-1) while called each frame: a rumble that lasts, such as being
+    /// dragged by the Nøkken, rather than a single blow.</summary>
+    public static void AtLeast(float amount)
+    {
+        Decay();
+        trauma = Mathf.Max(trauma, Mathf.Clamp01(amount * GameOptions.ScreenShake.Value));
+    }
+
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetForNewPlaySession()
     {

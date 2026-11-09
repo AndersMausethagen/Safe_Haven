@@ -84,6 +84,10 @@ MonoBehaviour:
   nokkenModel: {fileID: 1361258407523271697, guid: 280a30c33cf4c3444a326b93e937de36, type: 3}
   nokkenScream: {fileID: 11400000, guid: 6510718f5af764e4aa78349c4b3f7cdf, type: 2}
   nokkenSplash: {fileID: 11400000, guid: 5b92b167e5b591449b2fcd212c1db02b, type: 2}
+  nokkenStartle: {fileID: 11400000, guid: 2d82c52b4ea56654ebee3e82625bf984, type: 2}
+  nokkenMusicDelay: 0.6
+  nokkenGrabShake: 1
+  nokkenHoldShake: 0.5
   metNokken: {fileID: 11400000, guid: 59322588444ffdc4189d97bdc8cd89cd, type: 2}
   floatModel: {fileID: 2114678918455451842, guid: 91cd44f02a8a8dc4895c8f4608b2e4f2, type: 3}
   lineMaterial: {fileID: 2100000, guid: cfcf00604847de146aec40174c56be0f, type: 2}
