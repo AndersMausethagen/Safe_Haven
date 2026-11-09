@@ -12,6 +12,18 @@ public sealed class PrologueTests
     private PrologueDefinition Definition => AssetDatabase.LoadAssetAtPath<PrologueDefinition>(Root + "/ForestPrologue.asset");
 
     [Test]
+    public void TheCampfire_OpensTheSameStationWindowAsInTheHaven()
+    {
+        // Without the StationWindow under Screen Canvas, stations fall back to the old text menu (StationMenu).
+        string guid = AssetDatabase.AssetPathToGUID("Assets/_Project/Prefabs/UI/StationWindow.prefab");
+        Assert.IsNotEmpty(guid);
+        foreach (string scene in new[] { "Assets/_Project/Scenes/SafeHaven.unity", "Assets/_Project/Scenes/Prologue_MistyWoods.unity" })
+        {
+            StringAssert.Contains(guid, System.IO.File.ReadAllText(scene), scene);
+        }
+    }
+
+    [Test]
     public void Steps_SayWhereTheNightIs()
     {
         // FindShelter, GatherFuel, LightFire, CatchBreath, DefendCamp, ReachPortal, ActivatePortal, HoldPortal, Finished, Story

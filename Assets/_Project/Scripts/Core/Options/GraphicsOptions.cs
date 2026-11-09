@@ -15,10 +15,12 @@ public static class GraphicsOptions
     // Anti-Aliasing: Off, 2x, 4x, 8x MSAA, TAA (temporal, which needs MSAA off).
     private static readonly int[] MsaaSamples = { 1, 2, 4, 8, 1 };
     private const int TemporalChoice = 4;
-    private static readonly int[] ShadowResolution = { 1024, 2048, 4096 };
-    private static readonly float[] ShadowDistanceShare = { 0.5f, 0.7f, 1f };
-    // High keeps the pipeline's own four (sharper near the player over the same distance).
-    private static readonly int[] ShadowCascades = { 1, 2, 4 };
+    // Ultra goes past the pipeline asset's own 4096: the sun's 8192 map (URP's largest), for the ground's small relief shadows.
+    private static readonly int[] ShadowResolution = { 1024, 2048, 4096, 8192 };
+    private const int UltraShadows = 3;
+    private static readonly float[] ShadowDistanceShare = { 0.5f, 0.7f, 1f, 1f };
+    // High and Ultra keep the pipeline's own four (sharper near the player over the same distance).
+    private static readonly int[] ShadowCascades = { 1, 2, 4, 4 };
     private static readonly float[] FogShare = { 0.5f, 0.75f, 1f };
     private static readonly float[] LodShare = { 0.6f, 0.8f, 1f };
     private static readonly int[] MipLimit = { 2, 1, 0 };
@@ -95,7 +97,9 @@ public static class GraphicsOptions
         runtime.msaaSampleCount = MsaaSamples[GameOptions.AntiAliasing.Index];
 
         int shadows = GameOptions.Shadows.Index;
-        runtime.mainLightShadowmapResolution = Mathf.Min(ShadowResolution[shadows], authored.mainLightShadowmapResolution);
+        runtime.mainLightShadowmapResolution = shadows >= UltraShadows
+            ? ShadowResolution[UltraShadows]
+            : Mathf.Min(ShadowResolution[shadows], authored.mainLightShadowmapResolution);
         runtime.shadowDistance = authored.shadowDistance * ShadowDistanceShare[shadows];
         runtime.shadowCascadeCount = Mathf.Min(ShadowCascades[shadows], authored.shadowCascadeCount);
 

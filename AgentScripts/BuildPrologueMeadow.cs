@@ -1559,8 +1559,16 @@ public static class BuildPrologueMeadow
         dark.FindPropertyRelative("dayNight").objectReferenceValue = cycle;
         dark.FindPropertyRelative("hour").floatValue = 23f;
         dark.FindPropertyRelative("transitionSeconds").floatValue = 4f;
-        SerializedProperty quiet = Action(SceneEventActionKind.SilenceMusic);
-        quiet.FindPropertyRelative("sceneAudio").objectReferenceValue = audio;
+        // The dark forest has its own music (2026-11-09; it was silent): fights still bring the combat music.
+        SerializedProperty eerie = Action(SceneEventActionKind.PlayMusic);
+        eerie.FindPropertyRelative("sceneAudio").objectReferenceValue = audio;
+        SerializedProperty eerieTracks = eerie.FindPropertyRelative("music.tracks");
+        eerieTracks.arraySize = 1;
+        eerieTracks.GetArrayElementAtIndex(0).FindPropertyRelative("clip").objectReferenceValue =
+            Load<AudioClip>("Assets/_Project/Audio/Misty woods - Eerie raid.mp3");
+        eerieTracks.GetArrayElementAtIndex(0).FindPropertyRelative("volume").floatValue = 1f;
+        eerieTracks.GetArrayElementAtIndex(0).FindPropertyRelative("startAt").floatValue = 0f;
+        eerie.FindPropertyRelative("fightsInterrupt").boolValue = true;
         SerializedProperty open = Action(SceneEventActionKind.SetObjectActive);
         open.FindPropertyRelative("target").objectReferenceValue = threshold.gameObject;
         open.FindPropertyRelative("active").boolValue = false;
@@ -1903,7 +1911,8 @@ public static class BuildPrologueMeadow
         // ----- The road, with a stop at the cart -----
         var walkStory = Story(moments, "Story - The Road East");
         var setOut = new WhenQuest { quest = road, when = WhenQuest.Moment.Starts, once = false, alsoAfterLoading = true };
-        const float Pace = 2f, Fade = 8f;
+        // 3.5 m/s (was 2): the player walks at 5 and was always waiting for them (playtest, 2026-11-09).
+        const float Pace = 3.5f, Fade = 8f;
         var walk = new WalkPartyNode { route = route, pace = Pace, waitForPlayer = 22f, waitUntilArrived = true };
         Link(walkStory, (setOut, 0, walk));
         foreach ((float reaches, float hour) in new[] { (0.4f, 11.5f), (0.78f, 15f) })

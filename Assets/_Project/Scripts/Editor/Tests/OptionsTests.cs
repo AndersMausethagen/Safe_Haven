@@ -220,4 +220,13 @@ public sealed class OptionsTests
         InputSystem.actions.RemoveAllBindingOverrides();
         Assert.AreEqual(original, GameInput.KeyLabel(action));
     }
+
+    [Test]
+    public void UltraShadows_AreTheDefault()
+    {
+        // The ground's own relief shadows only resolve in an 8K sun shadow map at the usual top-down zoom (2026-11-09).
+        Assert.AreEqual(4, GameOptions.Shadows.Choices.Length);
+        Assert.AreEqual("Ultra", GameOptions.Shadows.Choices[3]);
+        Assert.AreEqual(3f, GameOptions.Shadows.Default);
+    }
 }

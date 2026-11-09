@@ -31,7 +31,9 @@ public static class GameOptions
         "How many pixels are drawn, as a share of the screen. Lowering it is the biggest gain on a slow graphics card.", 1f, 0.5f, 1f, 0.05f);
     public static readonly GameOption Upscaling = GameOption.Choice("Upscaling", "Upscaling", "How a Render Scale below 100% is brought up to the screen.", 1, "Bilinear", "FSR", "STP");
     public static readonly GameOption AntiAliasing = GameOption.Choice("AntiAliasing", "Anti-Aliasing", "Smooths jagged edges. Higher MSAA costs more; TAA also smooths shimmering grass, leaves and fine detail, a little softer in motion.", 2, "Off", "2x MSAA", "4x MSAA", "8x MSAA", "TAA");
-    public static readonly GameOption Shadows = GameOption.Choice("Shadows", "Shadows", "Sharpness and reach of shadows. High is the game as it was made.", 2, "Low", "Medium", "High");
+    // Ultra (2026-11-09): an 8K sun shadow map. At the usual top-down zoom a 4K map was too coarse for the ground's own
+    // relief (stones, roots, clumps a few centimetres high): its shadows only showed when zoomed in.
+    public static readonly GameOption Shadows = GameOption.Choice("Shadows", "Shadows", "Sharpness and reach of shadows. Ultra is the game as it was made: the ground's own small shadows show at every zoom. High uses less video memory.", 3, "Low", "Medium", "High", "Ultra");
     public static readonly GameOption AmbientOcclusion = GameOption.Toggle("AmbientOcclusion", "Ambient Occlusion", "Soft shade where things meet the ground.", true);
     public static readonly GameOption VolumetricFog = GameOption.Choice("VolumetricFog", "Volumetric Fog", "Detail of the fog and light shafts. Costly in the raid forests.", 2, "Low", "Medium", "High");
     public static readonly GameOption TerrainDetail = GameOption.Choice("TerrainDetail", "Terrain Detail", "How much the ground's surface is shaped by its stones and roots.", 3, "Off", "Low", "Balanced", "Ultra");
@@ -48,7 +50,7 @@ public static class GameOptions
         new[] { 0.75f, 0f, 0f, 0f, 0f, 0f, 0.4f, 0f, 1f },
         new[] { 0.85f, 1f, 1f, 1f, 1f, 1f, 0.7f, 1f, 2f },
         new[] { 1f, 2f, 1f, 1f, 1f, 2f, 0.85f, 2f, 2f },
-        new[] { 1f, 2f, 2f, 1f, 2f, 3f, 1f, 2f, 2f },
+        new[] { 1f, 2f, 3f, 1f, 2f, 3f, 1f, 2f, 2f },
     };
 
     /// <summary>Sets every member to what the preset says.</summary>
