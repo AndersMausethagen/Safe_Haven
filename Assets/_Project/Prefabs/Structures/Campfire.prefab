@@ -63,8 +63,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.5751755, y: 0.5513254, z: 1.6136801}
-  m_Center: {x: -0.02758789, y: 0.25433725, z: -0.011692643}
+  m_Size: {x: 1.5761957, y: 0.52868974, z: 1.5956237}
+  m_Center: {x: -0.0019261837, y: 0.26565507, z: -0.00058054924}
 --- !u!114 &4997697805100979590
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -77,7 +77,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aecdc764a0346784e9958a956dddd948, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SaveableEntity
-  id: 
+  id: 9dcf3c5968e642e2b8a008084bb83060
   prefabId: 62042647728bcb448a5358ddaddaa4a1
   saveTransform: 1
   saveActiveState: 1
@@ -140,11 +140,11 @@ NavMeshObstacle:
   m_Enabled: 1
   serializedVersion: 3
   m_Shape: 1
-  m_Extents: {x: 0.78758776, y: 0.2756627, z: 0.80684006}
+  m_Extents: {x: 0.78809786, y: 0.26434487, z: 0.79781187}
   m_MoveThreshold: 0.1
   m_Carve: 1
   m_CarveOnlyStationary: 1
-  m_Center: {x: -0.02758789, y: 0.25433725, z: -0.011692643}
+  m_Center: {x: -0.0019261837, y: 0.26565507, z: -0.00058054924}
   m_TimeToStationary: 0.5
 --- !u!114 &8277968264310112107
 MonoBehaviour:

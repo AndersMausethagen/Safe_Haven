@@ -9,7 +9,12 @@ Phases (each skips what already exists, so it can be stopped and rerun):
           -> Assets/_Project/Art/Gathering/<asset>/ (then run AgentScripts/BuildGatheringModels.cs in Unity)
 
 Run with LocalSpawn's Python (Unity closed: generation needs ~13 GB RAM):
-  D:\\ComfyUI\\.venv\\Scripts\\python.exe Tools/LocalSpawn/generate_gathering.py [images|3d|sprites|ingest|all] [asset ...]
+  D:\\ComfyUI\\.venv\\Scripts\\python.exe Tools/LocalSpawn/generate_gathering.py [--group NAME] [images|3d|sprites|ingest|all] [asset ...]
+
+Other groups of models use the same phases: --group structures reads structures_manifest.json, works in
+Tools/LocalSpawn/Structures and writes to the manifest's "art" folder (then AgentScripts/BuildStructureModels.cs).
+A manifest asset may set texture_size (1024, 2048 or 4096: the generated maps and the baked atlas), quality
+(LocalSpawn's: game or hero) and generate_args (more generate_3d.py switches); a look may set the last two as well.
 """
 import glob
 import json
@@ -22,13 +27,21 @@ ROOT = os.path.abspath(os.path.join(HERE, "..", ".."))
 AGENT = r"D:\ComfyUI\agent"
 PYTHON = r"D:\ComfyUI\.venv\Scripts\python.exe"
 BLENDER = r"C:\Program Files\Blender Foundation\Blender 5.2\blender.exe"
-OUT = os.path.join(HERE, "Gathering")
+ARGS = sys.argv[1:]
+GROUP = "gathering"
+if "--group" in ARGS:
+    at = ARGS.index("--group")
+    GROUP = ARGS[at + 1].lower()
+    del ARGS[at:at + 2]
+MANIFEST = os.path.join(HERE, f"{GROUP}_manifest.json")
+OUT = os.path.join(HERE, GROUP.capitalize())
 
 
-def run(cmd, cwd=None, log=None):
+def run(cmd, cwd=None, log=None, env=None):
     print(">", " ".join(f'"{c}"' if " " in c else c for c in cmd), flush=True)
     with open(log, "a", encoding="utf-8") if log else open(os.devnull, "w") as sink:
-        result = subprocess.run(cmd, cwd=cwd, stdout=sink if log else None, stderr=subprocess.STDOUT if log else None)
+        result = subprocess.run(cmd, cwd=cwd, stdout=sink if log else None, stderr=subprocess.STDOUT if log else None,
+                                env={**os.environ, **env} if env else None)
     if result.returncode != 0:
         print(f"  failed ({result.returncode})" + (f", see {log}" if log else ""), flush=True)
     return result.returncode == 0
@@ -63,9 +76,14 @@ def shapes(manifest, wanted):
         concept = os.path.join(folder, "concept.png")
         if not os.path.exists(concept) or glob.glob(os.path.join(folder, "**", "*.glb"), recursive=True):
             continue
-        run([PYTHON, "generate_3d.py", "--image", concept, "--model", "hunyuan3d", "--quality", "game", "--ultratex",
-             "--texture-size", "2048", "--normal-map", "high", "--target", "unity", "--format", "glb", "--out-dir", folder,
-             "--name", "model", "--seed", str(look["seed"])], cwd=AGENT, log=os.path.join(folder, "3d.log"))
+        # quality: LocalSpawn's mesh size (game 10k faces, hero 30k: a building's LOD0 can't exceed what it is given);
+        # generate_args: more of generate_3d.py's switches for this asset or look, e.g. ["--watertight"] for a mesh
+        # that comes out in open sheets, ["--ultratex-resolution", "2048"] for a large one's texture.
+        extra = [str(a) for a in asset.get("generate_args", []) + look.get("generate_args", [])]
+        run([PYTHON, "generate_3d.py", "--image", concept, "--model", "hunyuan3d",
+             "--quality", look.get("quality", asset.get("quality", "game")), "--ultratex",
+             "--texture-size", str(asset.get("texture_size", 2048)), "--normal-map", "high", "--target", "unity", "--format", "glb", "--out-dir", folder,
+             "--name", "model", "--seed", str(look["seed"])] + extra, cwd=AGENT, log=os.path.join(folder, "3d.log"))
 
 
 def sprites(manifest, wanted):
@@ -102,13 +120,14 @@ def ingest(manifest, wanted):
         glow_args = ["--glow-json", json.dumps(glow)] if glow else []
         run([BLENDER, "-b", "--factory-startup", "--python", os.path.join(ROOT, "Tools", "Blender", "ingest_generated.py"),
              "--", ROOT, asset["asset"], str(asset["width"])] + glow_args + turns + glbs,
-            log=os.path.join(OUT, asset["asset"], "ingest.log"))
+            log=os.path.join(OUT, asset["asset"], "ingest.log"),
+            env={"SH_MANIFEST": MANIFEST, "SH_ART": os.path.join(ROOT, *manifest.get("art", "Assets/_Project/Art/Gathering").split("/"))})
 
 
 def main():
-    phase = sys.argv[1] if len(sys.argv) > 1 else "all"
-    wanted = set(sys.argv[2:])
-    with open(os.path.join(HERE, "gathering_manifest.json"), encoding="utf-8") as f:
+    phase = ARGS[0] if ARGS else "all"
+    wanted = set(ARGS[1:])
+    with open(MANIFEST, encoding="utf-8") as f:
         manifest = json.load(f)
     if phase in ("images", "all"):
         images(manifest, wanted)
@@ -118,7 +137,7 @@ def main():
         sprites(manifest, wanted)
     if phase in ("ingest", "all"):
         ingest(manifest, wanted)
-    print("GATHERING DONE", phase, flush=True)
+    print(GROUP.upper(), "DONE", phase, flush=True)
 
 
 if __name__ == "__main__":

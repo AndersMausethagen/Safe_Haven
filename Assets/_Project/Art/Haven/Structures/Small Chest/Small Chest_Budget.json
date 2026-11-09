@@ -1,0 +1,18 @@
+{
+ "note": "LOD0 triangles per look, by ingest_generated.py: the top-down view's budget, raised where a decimation would break the shape (shape_limited)",
+ "looks": {
+  "Small Chest A": {
+   "source": 11004,
+   "view": 568,
+   "triangles": 568,
+   "shape_limited": false,
+   "check": "(deviation 0.6%, silhouette 0.994)",
+   "holes_generated": 101,
+   "holes_filled": 342,
+   "holes": 2,
+   "largest_hole": 0.063,
+   "non_manifold_edges": 1,
+   "unwrap": "regions"
+  }
+ }
+}

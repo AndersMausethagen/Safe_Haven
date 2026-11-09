@@ -32,7 +32,8 @@ from mathutils import Matrix, Vector, noise
 args = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
 ROOT = args[0] if args else "D:/Safe Haven/Safe Haven"
 SOURCES = os.path.join(ROOT, "Tools", "Blender", "Sources", "PolyHaven")
-ART = os.path.join(ROOT, "Assets", "_Project", "Art", "Gathering")
+# Where the assets go: the gathering nodes' folder, or another group's (SH_ART, set by generate_gathering.py --group).
+ART = os.environ.get("SH_ART") or os.path.join(ROOT, "Assets", "_Project", "Art", "Gathering")
 
 # ----- Small helpers ------------------------------------------------------------------------------------------------
 

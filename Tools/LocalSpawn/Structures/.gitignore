@@ -1,0 +1,7 @@
+# Generated models and their maps are intermediate (the game reads Assets/_Project/Art/Haven/Structures): keep
+# only the concept images, which with the manifest regenerate everything.
+*
+!*/
+!concept.png
+!.gitignore
+_rejected/

@@ -5,6 +5,8 @@ top (see the asset principles), so AgentScripts/BuildGatheringModels.cs takes th
 
 - each GLB becomes one look ("<Asset> A", "B", ...): scaled so its widest side is the size given, turned about the
   vertical, its pivot on the ground under its middle, lowest point on the ground;
+- its small holes are closed and its specks cleared (mesh_repair.py: generated meshes arrive with dozens of open
+  borders), before anything is decimated or baked; what is still open is written to <Asset>_Budget.json;
 - two levels of detail ("<look> LOD1", "LOD2", decimated) and a convex "<look> Collider";
 - the looks share one texture set: their own maps are baked into a shared atlas (2048), and Height (parallax) and
   BlendMask (curvature, edge wear, cavity, coverage: where the live moss grows) are baked from the mesh (prop_bake.py).
@@ -31,6 +33,7 @@ import bpy
 from mathutils import Matrix, Vector
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import mesh_repair  # noqa: E402
 from prop_bake import *  # noqa: E402,F401,F403
 from prop_bake import ROOT, args  # noqa: E402
 
@@ -53,10 +56,14 @@ while i < len(rest):
         i += 1
 
 
+# The group's manifest: the gathering nodes', or another group's (SH_MANIFEST, set by generate_gathering.py --group).
+MANIFEST = os.environ.get("SH_MANIFEST") or os.path.join(ROOT, "Tools", "LocalSpawn", "gathering_manifest.json")
+
+
 def manifest_max_height():
-    """The asset's height cap from Tools/LocalSpawn/gathering_manifest.json (max_height), if it has one."""
+    """The asset's height cap from the manifest (max_height), if it has one."""
     try:
-        with open(os.path.join(ROOT, "Tools", "LocalSpawn", "gathering_manifest.json"), encoding="utf-8") as f:
+        with open(MANIFEST, encoding="utf-8") as f:
             entry = next((a for a in json.load(f)["assets"] if a["asset"] == NAME), {})
         return entry.get("max_height")
     except (OSError, ValueError):
@@ -71,7 +78,7 @@ def manifest_metal_floor():
     UltraTex paints metallic onto rock, wood and moss too (Iron's host rock ~0.7, Sticks' wood 1.0), which makes them
     shine like metal; only an ore keeps its metallic, remapped so everything under the floor becomes 0."""
     try:
-        with open(os.path.join(ROOT, "Tools", "LocalSpawn", "gathering_manifest.json"), encoding="utf-8") as f:
+        with open(MANIFEST, encoding="utf-8") as f:
             entry = next((a for a in json.load(f)["assets"] if a["asset"] == NAME), {})
         return entry.get("metal_floor")
     except (OSError, ValueError):
@@ -89,7 +96,7 @@ def look_value(look_key, key):
 
 def manifest_value(key):
     try:
-        with open(os.path.join(ROOT, "Tools", "LocalSpawn", "gathering_manifest.json"), encoding="utf-8") as f:
+        with open(MANIFEST, encoding="utf-8") as f:
             return next((a for a in json.load(f)["assets"] if a["asset"] == NAME), {}).get(key)
     except (OSError, ValueError):
         return None
@@ -105,7 +112,7 @@ ROUGHNESS = manifest_value("roughness")
 def manifest_glow():
     """The asset's glow from the manifest, which wins over --glow-json (it can change while a batch is running)."""
     try:
-        with open(os.path.join(ROOT, "Tools", "LocalSpawn", "gathering_manifest.json"), encoding="utf-8") as f:
+        with open(MANIFEST, encoding="utf-8") as f:
             return next((a for a in json.load(f)["assets"] if a["asset"] == NAME), {}).get("glow")
     except (OSError, ValueError):
         return None
@@ -339,6 +346,9 @@ def save_emission(out, w, h, folder):
 
 
 LOD0_TRIANGLES = manifest_value("lod0_triangles") or 5000  # the most a look may have (close views)
+# The atlas: 2048, or the asset's own (manifest texture_size: a building's 6 m needs more than a boulder's 2 m);
+# SH_BAKE_SIZE overrides both, for a quick first look at a pipeline change.
+TEXTURE_SIZE = int(os.environ.get("SH_BAKE_SIZE") or manifest_value("texture_size") or 2048)
 
 # The game's top-down view (Assets/_Project/Scripts/Editor/Environment/ScreenBudget.cs, measured in Play): 147 pixels a
 # metre at 2160p at the default zoom, 48 degree pitch; a target of 40 pixels per visible triangle (10 at 1080p, the 2x2
@@ -368,6 +378,13 @@ def budget(high):
     (manifest lod0_triangles, 5000 by default: the scanned boulder nodes are 6000), its maps baked from the full
     generated mesh. The generated meshes came in at ~10k triangles whatever their size, a 0.4 m mushroom patch too."""
     name = high.name
+    # Holes first, on the generated mesh itself: the bake's source and the game's mesh then carry the same patches
+    # (a patch on the game's mesh alone would bake black: its rays find nothing). SH_NO_REPAIR=1 leaves it as it came.
+    mended = None if os.environ.get("SH_NO_REPAIR") else mesh_repair.repair(high)
+    if mended:
+        for poly in high.data.polygons:
+            poly.use_smooth = True
+        print("REPAIR", name, mended)
     high.name = name + " (high)"  # first, so the copy can take the look's own name
     low = high.copy()
     low.data = high.data.copy()
@@ -388,6 +405,12 @@ def budget(high):
                      "shape_limited": target > wanted * 1.05, "check": report}
     if len(low.data.polygons) > target:
         decimate_to(low, target)
+    # What the game's mesh still has open (flat keys: ModelBudgetTests reads an entry as one brace-free block).
+    still = mesh_repair.measure_object(low)
+    BUDGETS[name].update(holes_generated=mended["holes_before"] if mended else still["holes"],
+                         holes_filled=mended["filled"] if mended else 0, holes=still["holes"],
+                         largest_hole=still["largest_hole"], non_manifold_edges=still["non_manifold_edges"])
+    print("HOLES", name, still)
     return low
 
 
@@ -544,14 +567,14 @@ def main():
             bpy.data.objects.remove(high)
         return lows
 
-    looks = make_asset(NAME, builder, 2048, coll, cavity_distance=0.15, collider=True, lods=(0.35, 0.1), unwrap='regions')
+    looks = make_asset(NAME, builder, TEXTURE_SIZE, coll, cavity_distance=0.15, collider=True, lods=(0.35, 0.1), unwrap='regions')
     if albedo_is_black():
         # Thin double-sided shells (the mushroom patch's caps) send the high-to-low rays nowhere: every colour bake came
         # out black. The decimated copy keeps the generated texture coordinates, so it bakes from its own material.
         print("BAKE from the full mesh came out black: baking from the decimated mesh's own material")
         bpy.ops.wm.read_factory_settings(use_empty=True)
         coll = collection(NAME)
-        looks = make_asset(NAME, lambda c: builder(c, from_high=False), 2048, coll, cavity_distance=0.15, collider=True,
+        looks = make_asset(NAME, lambda c: builder(c, from_high=False), TEXTURE_SIZE, coll, cavity_distance=0.15, collider=True,
                            lods=(0.35, 0.1), unwrap='regions')
     save_budgets()
     if GLOW:

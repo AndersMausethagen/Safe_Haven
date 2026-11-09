@@ -1,0 +1,57 @@
+{
+ "_notes": [
+  "Concept prompts for the built things LocalSpawn makes (Hunyuan3D shape + UltraTex texture): stations, chests and",
+  "the pilot's whole Smithy. Same phases and keys as gathering_manifest.json (generate_gathering.py --group structures);",
+  "the models go to the 'art' folder and into the prefabs by AgentScripts/BuildStructureModels.cs.",
+  "Fires are made cold (no flames, no glow, no smoke): the game adds the flame, the light and the sparks.",
+  "Built things keep their stand-in's footprint (width), because the building's collider and nav obstacle are that size.",
+  "UltraTex (FLUX) is a non-commercial licence and Hunyuan3D's licence excludes some territories: re-texture/check before a release."
+ ],
+ "art": "Assets/_Project/Art/Haven/Structures",
+ "common": "Three-quarter view from slightly above, whole object visible and centred, isolated on a plain light grey background. Matte, softly lit, no glow.",
+ "assets": [
+  {
+   "asset": "Campfire",
+   "width": 1.6,
+   "max_height": 0.6,
+   "texture_size": 2048,
+   "lod0_triangles": 6000,
+   "looks": [
+    {
+     "key": "A",
+     "seed": 6101,
+     "prompt": "A cold unlit campfire: a ring of nine rounded grey field stones, each the size of a loaf of bread, set close together around a bed of pale grey ash and black charcoal, with five short split birch logs, white bark and charred black ends, laid low in a star across the middle. No flames, no smoke, no embers."
+    }
+   ]
+  },
+  {
+   "asset": "Small Chest",
+   "width": 1.05,
+   "max_height": 0.7,
+   "texture_size": 2048,
+   "metal_floor": 0.5,
+   "looks": [
+    {
+     "key": "A",
+     "seed": 6201,
+     "prompt": "A sturdy old Norse wooden sea chest, closed, with a slightly curved lid, thick weathered oak planks, three hammered black iron straps with round rivets running over the lid and down the front, an iron hasp with a ring lock in the middle of the front, and an iron carrying ring on each end."
+    }
+   ]
+  },
+  {
+   "asset": "Smithy Generated",
+   "width": 6.4,
+   "max_height": 4.6,
+   "texture_size": 4096,
+   "lod0_triangles": 16000,
+   "metal_floor": 0.5,
+   "looks": [
+    {
+     "key": "A",
+     "seed": 6301,
+     "prompt": "A small old Norse village smithy, one compact building seen from outside: low walls of dark tarred horizontal logs with notched corners on a foundation of grey field stones, a steep roof of thick green turf edged with birch bark and a log along the eaves, a squat stone chimney at one gable, and across the front an open lean-to porch on two timber posts sheltering a stone forge, an iron anvil on a tree stump and a wooden quench barrel. No people, no fire, no smoke."
+    }
+   ]
+  }
+ ]
+}
