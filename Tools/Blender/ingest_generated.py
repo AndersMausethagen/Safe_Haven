@@ -338,6 +338,34 @@ def save_emission(out, w, h, folder):
     no_moss_where_glowing(out, w, h, folder)
 
 
+LOD0_TRIANGLES = manifest_value("lod0_triangles") or 5000
+
+
+def budget(high):
+    """The game's mesh: a copy of the generated one (welded at its glTF seams) decimated to the asset's budget
+    (manifest lod0_triangles, 5000 by default: the scanned boulder nodes are 6000), its maps baked from the full
+    generated mesh. The generated meshes came in at ~10k triangles whatever their size, a 0.4 m mushroom patch too."""
+    name = high.name
+    high.name = name + " (high)"  # first, so the copy can take the look's own name
+    low = high.copy()
+    low.data = high.data.copy()
+    low.name = name
+    for c in high.users_collection:
+        c.objects.link(low)
+    bm = bmesh.new()
+    bm.from_mesh(low.data)
+    bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=1e-4)
+    bmesh.ops.triangulate(bm, faces=bm.faces)
+    bm.to_mesh(low.data)
+    bm.free()
+    if len(low.data.polygons) > LOD0_TRIANGLES:
+        decimate = low.modifiers.new("Decimate", 'DECIMATE')
+        decimate.ratio = LOD0_TRIANGLES / len(low.data.polygons)
+        select_only([low])
+        bpy.ops.object.modifier_apply(modifier=decimate.name)
+    return low
+
+
 def no_moss_where_glowing(out, w, h, folder):
     """Clear the BlendMask's coverage (alpha: where the live moss grows) wherever the emission glows: the coverage is
     baked from up-facing surfaces, so moss grew in blotches on the Radiant Life Orb's glowing orb."""
@@ -363,9 +391,10 @@ def main():
     coll = collection(NAME)
 
     def builder(c):
-        return [import_look(path, chr(65 + k), TURNS[k] if k < len(TURNS) else 0.0, c) for k, path in enumerate(GLBS)]
+        highs = [import_look(path, chr(65 + k), TURNS[k] if k < len(TURNS) else 0.0, c) for k, path in enumerate(GLBS)]
+        return [budget(high) for high in highs], highs
 
-    looks = make_asset(NAME, builder, 2048, coll, cavity_distance=0.15, collider=True, lods=(0.5, 0.2))
+    looks = make_asset(NAME, builder, 2048, coll, cavity_distance=0.15, collider=True, lods=(0.5, 0.2), unwrap='regions')
     if GLOW:
         emission_from_albedo(GLOW)
     stage([(looks, WIDTH * 1.4)], row_spacing=WIDTH)

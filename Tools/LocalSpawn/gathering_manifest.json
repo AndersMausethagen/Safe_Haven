@@ -204,7 +204,8 @@
      "prompt": "A single grey boulder for a Nordic fairy-tale game, tightly bound by thick dark twisted cursed roots wrapping around it from the ground, the roots near-black with a faint violet sheen, soft green light glowing from cracks in the stone between the roots, as if something alive is trapped inside."
     }
    ],
-   "max_height": 1.9
+   "max_height": 1.9,
+   "lod0_triangles": 6000
   },
   {
    "asset": "Life Orb",
@@ -256,7 +257,8 @@
      "seed": 4801,
      "prompt": "A small cairn of three stacked flat mossy stones for a Nordic fairy-tale game, two thin roots curling up from the top stone holding a small pale-green glowing wisp of light."
     }
-   ]
+   ],
+   "lod0_triangles": 2500
   },
   {
    "asset": "Radiant Life Orb",
@@ -300,7 +302,8 @@
      "prompt": "A small cluster of four grey fist-to-loaf sized field stones, one larger flat stone and three smaller ones beside it, weathered, a little lichen."
     }
    ],
-   "max_height": 0.35
+   "max_height": 0.35,
+   "lod0_triangles": 2000
   },
   {
    "asset": "Sticks",
@@ -323,7 +326,8 @@
      0.7,
      0.92
     ]
-   }
+   },
+   "lod0_triangles": 2000
   },
   {
    "asset": "Chanterelles",
@@ -340,7 +344,8 @@
      "prompt": "A small group of five golden-yellow chanterelle mushrooms of different sizes with wavy funnel caps, on a little mound of forest moss."
     }
    ],
-   "max_height": 0.3
+   "max_height": 0.3,
+   "lod0_triangles": 2500
   },
   {
    "asset": "Wild Turnips",
@@ -357,7 +362,8 @@
      "prompt": "A single wild turnip plant: one big round white and purple turnip root showing at the ground, crowned by a bushy rosette of broad, ruffled green leaves."
     }
    ],
-   "max_height": 0.45
+   "max_height": 0.45,
+   "lod0_triangles": 2500
   }
  ],
  "sprite_common": "Botanical texture sprite for a game, seen flat from straight above, the stalk at the bottom centre pointing up, evenly lit with no shadow, crisp edges, the whole thing visible and centred, isolated on a pure white background.",

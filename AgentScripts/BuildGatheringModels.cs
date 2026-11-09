@@ -53,11 +53,12 @@ public static class BuildGatheringModels
 
     private static readonly Asset[] Assets =
     {
-        // Small things the player picks up: tiny on screen, culled early, boxes to aim at.
-        new Asset { Name = "Small Rocks", Kind = Kind.Stone, ModelPrefab = "Assets/_Project/Art/Bootstrap/SmallRocks.prefab",
+        // Small things the player picks up: tiny on screen, culled early, boxes to aim at; textures at 1024 (at 2048 a
+        // 0.5 m pile was ~3,500 px/m, the Haven's scans are 700-1500).
+        new Asset { Name = "Small Rocks", TextureSize = 1024, Kind = Kind.Stone, ModelPrefab = "Assets/_Project/Art/Bootstrap/SmallRocks.prefab",
             Definition = Defs + "SmallRocks.asset", Node = Nodes + "SmallRocksNode.prefab", Item = "Assets/_Project/Prefabs/Items/SmallRocks.prefab",
             NodeScale = 1.35f, Parallax = 0.01f, Moss = 0.5f, LodHeights = new[] { 0.12f, 0.05f, 0.012f } },
-        new Asset { Name = "Sticks", Kind = Kind.Solid, ModelPrefab = "Assets/_Project/Art/Bootstrap/Sticks.prefab",
+        new Asset { Name = "Sticks", TextureSize = 1024, Kind = Kind.Solid, ModelPrefab = "Assets/_Project/Art/Bootstrap/Sticks.prefab",
             Definition = Defs + "Sticks.asset", Node = Nodes + "SticksNode.prefab", Item = "Assets/_Project/Prefabs/Items/Sticks.prefab",
             NodeScale = 1.35f, Parallax = 0.006f, Moss = 0.25f, LodHeights = new[] { 0.12f, 0.05f, 0.012f } },
 
@@ -75,14 +76,14 @@ public static class BuildGatheringModels
 
         // The Life Orbs' old places.
         Shrine("Life Orb", "LifeOrbModel", "LifeOrb", "LifeOrbNode", glow: 1.6f),
-        Shrine("Life Mote", "LifeMoteModel", "LifeMote", "LifeMoteNode", glow: 1.4f),
+        Shrine("Life Mote", "LifeMoteModel", "LifeMote", "LifeMoteNode", glow: 1.4f, textureSize: 1024),
         Shrine("Radiant Life Orb", "RadiantLifeOrbModel", "RadiantLifeOrb", "RadiantLifeOrbNode", glow: 1.9f),
 
         // Solid plants (LocalSpawn): Layered Lit, no moss.
-        new Asset { Name = "Chanterelles", Kind = Kind.Solid, ModelPrefab = HavenModels + "Chanterelle Patch.prefab",
+        new Asset { Name = "Chanterelles", TextureSize = 1024, Kind = Kind.Solid, ModelPrefab = HavenModels + "Chanterelle Patch.prefab",
             Definition = Defs + "Chanterelles.asset", Node = Nodes + "ChanterellesNode.prefab", Parallax = 0.004f,
             LodHeights = new[] { 0.12f, 0.05f, 0.012f } },
-        new Asset { Name = "Wild Turnips", Kind = Kind.Solid, ModelPrefab = HavenModels + "Wild Turnip Clump.prefab",
+        new Asset { Name = "Wild Turnips", TextureSize = 1024, Kind = Kind.Solid, ModelPrefab = HavenModels + "Wild Turnip Clump.prefab",
             Definition = Defs + "WildTurnips.asset", Node = Nodes + "WildTurnipsNode.prefab", LodHeights = new[] { 0.12f, 0.05f, 0.012f } },
 
         // Leaf-card plants (plant_nodes.py): Tree Wind.
@@ -105,9 +106,10 @@ public static class BuildGatheringModels
             LodHeights = new[] { 0.3f, 0.12f, 0.01f },
         };
 
-    private static Asset Shrine(string name, string model, string definition, string node, float glow) =>
+    private static Asset Shrine(string name, string model, string definition, string node, float glow, int textureSize = 2048) =>
         new Asset
         {
+            TextureSize = textureSize,
             Name = name, Looks = 1, Kind = Kind.Stone, ModelPrefab = NodeModels + model + ".prefab", Definition = Defs + definition + ".asset",
             Node = Nodes + node + ".prefab", Parallax = 0.008f, Moss = 0.45f, Glow = Grey(glow), Hull = true,
             LodHeights = new[] { 0.2f, 0.08f, 0.015f },
@@ -187,7 +189,7 @@ public static class BuildGatheringModels
         Texture(prefix + "_ORM.png", TextureImporterType.Default, false, asset.TextureSize / 2, false);
         Texture(prefix + "_Height.png", TextureImporterType.Default, false, asset.TextureSize / 2, false);
         Texture(prefix + "_BlendMask.png", TextureImporterType.Default, false, asset.TextureSize / 2, false);
-        Texture(prefix + "_Emission.png", TextureImporterType.Default, true, asset.TextureSize, false);
+        Texture(prefix + "_Emission.png", TextureImporterType.Default, true, asset.TextureSize / 2, false); // a soft glow
         var model = (ModelImporter)AssetImporter.GetAtPath(prefix + ".fbx");
         model.materialImportMode = ModelImporterMaterialImportMode.None;
         model.importAnimation = false;
@@ -251,8 +253,9 @@ public static class BuildGatheringModels
         material.SetFloat("_L1PatchScale", 3f);
         material.SetFloat("_L2Amount", 0f);
 
-        // Stone and wood get wet in the rain and take snow like the Haven's other rocks; mushrooms and roots don't.
-        bool weather = asset.Kind == Kind.Stone || asset.Name == "Sticks";
+        // Everything solid gets wet in the rain and takes snow (one keyword in Layered Lit does both): stone and wood
+        // like the Haven's other rocks, and mushroom caps and turnip leaves, which stayed dry in the rain before.
+        bool weather = asset.Kind == Kind.Stone || asset.Kind == Kind.Solid;
         material.SetFloat("_SeasonSnow", weather ? 1f : 0f);
         SetKeyword(material, "_SEASON_SNOW", weather);
 

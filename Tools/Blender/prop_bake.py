@@ -18,6 +18,7 @@ A bake material marks its height with a node labelled "SH Height" (any node; its
 with one labelled "SH Glow" (colour). The curvature, cavity and coverage come from the geometry (Cycles' pointiness,
 ambient occlusion and the normal), so every material gets them.
 """
+import itertools
 import math
 import os
 import random
@@ -385,7 +386,74 @@ def centre_on_ground(obj):
 
 # ----- UVs, baking, export ------------------------------------------------------------------------------------------
 
-def atlas_uvs(objects, margin=0.004, region=(0.0, 0.0, 1.0, 1.0)):
+REGION_DIRECTIONS = [Vector(d).normalized() for d in
+                     [(1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0), (0, 0, 1), (0, 0, -1)]
+                     + [p for p in itertools.product((1, -1), repeat=3)]
+                     + [d for d in itertools.product((1, 0, -1), repeat=3) if sum(abs(x) for x in d) == 2]]
+
+
+def region_seams(obj, smooth=6):
+    """Seams between a few large regions of faces that look the same way (26 directions, a majority filter so borders
+    don't zigzag, small pieces merged into the neighbour they touch most). Smart project on a noisy generated mesh cuts
+    a thousand islands (Copper Ore: 10k vertices in Unity for 5k triangles, every island border splitting vertices);
+    these regions give ~17 islands and 0.7 vertices a triangle, like the Haven's scanned rocks."""
+    bm = bmesh.new()
+    bm.from_mesh(obj.data)
+    bm.faces.ensure_lookup_table()
+    count = len(REGION_DIRECTIONS)
+    label = [max(range(count), key=lambda k: f.normal.dot(REGION_DIRECTIONS[k])) for f in bm.faces]
+    for _ in range(smooth):
+        new = list(label)
+        for f in bm.faces:
+            votes = [0] * count
+            votes[label[f.index]] += 1
+            for e in f.edges:
+                for g in e.link_faces:
+                    if g is not f:
+                        votes[label[g.index]] += 1
+            new[f.index] = max(range(count), key=lambda k: votes[k])
+        label = new
+
+    def components():
+        comp, comps = [-1] * len(bm.faces), []
+        for f in bm.faces:
+            if comp[f.index] >= 0:
+                continue
+            members, stack = [], [f]
+            while stack:
+                g = stack.pop()
+                if comp[g.index] >= 0:
+                    continue
+                comp[g.index] = len(comps)
+                members.append(g)
+                stack.extend(h for e in g.edges for h in e.link_faces
+                             if comp[h.index] < 0 and label[h.index] == label[g.index])
+            comps.append(members)
+        return comps
+
+    for _ in range(8):
+        small = [c for c in components() if len(c) < max(30, len(bm.faces) // 60)]
+        if not small:
+            break
+        for c in small:
+            votes = {}
+            for g in c:
+                for e in g.edges:
+                    for h in e.link_faces:
+                        if label[h.index] != label[g.index]:
+                            votes[label[h.index]] = votes.get(label[h.index], 0) + 1
+            if votes:
+                k = max(votes, key=votes.get)
+                for g in c:
+                    label[g.index] = k
+    for e in bm.edges:
+        faces = e.link_faces
+        e.seam = len(faces) == 2 and label[faces[0].index] != label[faces[1].index]
+    bm.to_mesh(obj.data)
+    bm.free()
+
+
+def atlas_uvs(objects, margin=0.004, region=(0.0, 0.0, 1.0, 1.0), unwrap='smart'):
     """A shared "atlas" UV map over all of an asset's variants, for the bake (the old UVs stay as "grain"): islands at
     one texel density (averaged), packed tightly with rotation into region (u0, v0, u1, v1) of the texture."""
     for obj in objects:
@@ -396,10 +464,16 @@ def atlas_uvs(objects, margin=0.004, region=(0.0, 0.0, 1.0, 1.0)):
         # Normal maps are baked in the tangent space of the UV map Blender renders with: it must be the one the game
         # reads (the atlas, UV0), not the grain map the procedural textures follow.
         layers["atlas"].active_render = True
+    if unwrap == 'regions':
+        for obj in objects:
+            region_seams(obj)
     select_only(objects)
     bpy.ops.object.mode_set(mode='EDIT')
     bpy.ops.mesh.select_all(action='SELECT')
-    bpy.ops.uv.smart_project(angle_limit=math.radians(66), island_margin=margin, scale_to_bounds=False)
+    if unwrap == 'regions':
+        bpy.ops.uv.unwrap(method='MINIMUM_STRETCH', margin=margin)
+    else:
+        bpy.ops.uv.smart_project(angle_limit=math.radians(66), island_margin=margin, scale_to_bounds=False)
     bpy.ops.uv.average_islands_scale()
     bpy.ops.uv.pack_islands(rotate=True, rotate_method='ANY', scale=True, margin_method='SCALED', margin=margin,
                             shape_method='CONCAVE')
@@ -718,6 +792,35 @@ def lod(obj, level, ratio, mode, rng):
         bmesh.ops.delete(bm, geom=doomed, context='FACES')
         bm.to_mesh(copy.data)
         bm.free()
+        # The solid parts (stems, berries, heads) decimated in a separate copy and joined back: the Berry Bush's LOD2
+        # kept 86% of LOD0's triangles while only its cards were thinned.
+        solids = copy.copy()
+        solids.data = copy.data.copy()
+        for coll in copy.users_collection:
+            coll.objects.link(solids)
+        for target, keep_cards in ((copy, True), (solids, False)):
+            bm = bmesh.new()
+            bm.from_mesh(target.data)
+            flag = bm.faces.layers.int.get("sh_card")
+            bmesh.ops.delete(bm, geom=[f for f in bm.faces if bool(f[flag]) != keep_cards], context='FACES')
+            bm.to_mesh(target.data)
+            bm.free()
+        if len(solids.data.polygons) > 0 and len(copy.data.polygons) > 0:
+            decimate = solids.modifiers.new("Decimate", 'DECIMATE')
+            decimate.ratio = ratio
+            select_only([solids])
+            bpy.ops.object.modifier_apply(modifier=decimate.name)
+            name = copy.name
+            copy = join([copy, solids], name)
+        elif len(solids.data.polygons) > 0:
+            bpy.data.objects.remove(copy)
+            copy = solids
+            decimate = copy.modifiers.new("Decimate", 'DECIMATE')
+            decimate.ratio = ratio
+            select_only([copy])
+            bpy.ops.object.modifier_apply(modifier=decimate.name)
+        else:
+            bpy.data.objects.remove(solids)
     else:
         decimate = copy.modifiers.new("Decimate", 'DECIMATE')
         decimate.ratio = ratio
@@ -728,9 +831,29 @@ def lod(obj, level, ratio, mode, rng):
 
 def hull(obj, name, faces=96):
     """A convex hull of obj, decimated to about faces: a node's collider (never a box round a round rock)."""
+    # The hull's points, a farthest-point sample of them (the extremes first, so the shape keeps its reach), and the
+    # hull of those. (A decimate modifier on the hull silently did nothing: Granite's collider was 2,030 triangles;
+    # PhysX cooks at most 255 polygons anyway, so the rest was load time and memory.)
+    points = max(8, faces // 2 + 2)
     bm = bmesh.new()
     bm.from_mesh(obj.data)
-    bmesh.ops.convex_hull(bm, input=bm.verts, use_existing_faces=False)
+    hull_geom = bmesh.ops.convex_hull(bm, input=bm.verts, use_existing_faces=False)["geom"]
+    cos = list({tuple(v.co) for v in hull_geom if isinstance(v, bmesh.types.BMVert)})
+    bm.free()
+    if len(cos) > points:
+        vecs = [Vector(c) for c in cos]
+        centre = sum(vecs, Vector()) / len(vecs)
+        chosen = [max(vecs, key=lambda v: (v - centre).length)]
+        nearest = [(v - chosen[0]).length for v in vecs]
+        while len(chosen) < points:
+            i = max(range(len(vecs)), key=lambda k: nearest[k])
+            chosen.append(vecs[i])
+            nearest = [min(nearest[k], (vecs[k] - vecs[i]).length) for k in range(len(vecs))]
+        cos = [tuple(v) for v in chosen]
+    bm = bmesh.new()
+    for c in cos:
+        bm.verts.new(c)
+    bmesh.ops.convex_hull(bm, input=list(bm.verts), use_existing_faces=False)
     loose = [v for v in bm.verts if not v.link_faces]
     bmesh.ops.delete(bm, geom=loose, context='VERTS')
     mesh = bpy.data.meshes.new(name)
@@ -739,11 +862,6 @@ def hull(obj, name, faces=96):
     collider = bpy.data.objects.new(name, mesh)
     for coll in obj.users_collection:
         coll.objects.link(collider)
-    if len(mesh.polygons) > faces:
-        decimate = collider.modifiers.new("Decimate", 'DECIMATE')
-        decimate.ratio = faces / len(mesh.polygons)
-        select_only([collider])
-        bpy.ops.object.modifier_apply(modifier=decimate.name)
     while mesh.uv_layers:
         mesh.uv_layers.remove(mesh.uv_layers[0])
     return collider
@@ -759,7 +877,7 @@ def export(objects, name):
 
 
 def make_asset(name, builder, size, coll, glow=False, cavity_distance=0.05, masks=True, lods=(0.5, 0.22),
-               lod_mode='decimate', collider=False, alpha=False, solid_region=(0.0, 0.0, 1.0, 1.0)):
+               lod_mode='decimate', collider=False, alpha=False, solid_region=(0.0, 0.0, 1.0, 1.0), unwrap='smart'):
     """Build an asset's variants, bake them into one atlas and export them, each with its levels of detail
     ("<variant> LOD1", "LOD2", at the ratios in lods) and, with collider, a convex "<variant> Collider".
 
@@ -774,7 +892,7 @@ def make_asset(name, builder, size, coll, glow=False, cavity_distance=0.05, mask
     else:
         lows, highs = built if isinstance(built, tuple) else (built, [])
         cards, sheet = [], None
-    atlas_uvs(lows, margin=0.006 if highs else 0.003, region=solid_region)
+    atlas_uvs(lows, margin=0.006 if highs else 0.003, region=solid_region, unwrap=unwrap)
     ground = ground_for_ao(coll)
     # The variants share the origin: spread them out for the bake so they don't shade each other.
     for i, low in enumerate(lows):
