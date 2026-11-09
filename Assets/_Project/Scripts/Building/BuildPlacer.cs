@@ -204,11 +204,27 @@ public sealed partial class BuildPlacer : MonoBehaviour
         }
     }
 
+    /// <summary>The turn that points a piece's front (+Z) at the camera, on the rotation step.</summary>
+    private float FacingCamera()
+    {
+        Camera view = Camera.main;
+        Vector3 toCamera = view != null ? -view.transform.forward : Vector3.back;
+        toCamera.y = 0f;
+        if (toCamera.sqrMagnitude < 1e-4f)
+        {
+            return 180f;
+        }
+
+        float facing = Mathf.Atan2(toCamera.x, toCamera.z) * Mathf.Rad2Deg;
+        return Mathf.Repeat(Mathf.Round(facing / rotationStep) * rotationStep, 360f);
+    }
+
     private void BeginPlacing(BuildingDefinition building)
     {
         Cancel();
         placing = building;
-        yaw = 0f;
+        // A building with a front (its yard) starts turned to show it to the camera.
+        yaw = building.YardDepth > 0f && building.YardSide == YardSide.Front ? FacingCamera() : 0f;
         CreateGhost(building.Prefab.transform);
 
         var hint = new StringBuilder($"Place the {building.DisplayName}: left-click to build");

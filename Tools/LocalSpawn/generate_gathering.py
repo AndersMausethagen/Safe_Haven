@@ -13,6 +13,8 @@ Run with LocalSpawn's Python (Unity closed: generation needs ~13 GB RAM):
 
 Other groups of models use the same phases: --group structures reads structures_manifest.json, works in
 Tools/LocalSpawn/Structures and writes to the manifest's "art" folder (then AgentScripts/BuildStructureModels.cs).
+An asset with "kit" (its Blender script) is a building made from the building kit (Tools/Blender/building_kit.py):
+only its concept image is generated here, as the guide the script is written after.
 A manifest asset may set texture_size (1024, 2048 or 4096: the generated maps and the baked atlas), quality
 (LocalSpawn's: game or hero), mesh_budget (triangles of the generated mesh: at least the asset's lod0_triangles) and
 generate_args (more generate_3d.py switches); a look may set the last three as well.
@@ -79,8 +81,8 @@ def shapes(manifest, wanted):
     started = False
     for asset, look, folder in looks(manifest, wanted):
         concept = os.path.join(folder, "concept.png")
-        if not os.path.exists(concept) or glob.glob(os.path.join(folder, "**", "*.glb"), recursive=True):
-            continue
+        if asset.get("kit") or not os.path.exists(concept) or glob.glob(os.path.join(folder, "**", "*.glb"), recursive=True):
+            continue  # built in Blender from the kit after its concept; no concept yet; or made already
         started = True
         # quality: LocalSpawn's mesh size (game 10k faces, hero 30k: a building's LOD0 can't exceed what it is given);
         # generate_args: more of generate_3d.py's switches for this asset or look, e.g. ["--watertight"] for a mesh

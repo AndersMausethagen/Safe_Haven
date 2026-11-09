@@ -1,11 +1,81 @@
 fileFormatVersion: 2
-guid: 29a79aa0c52daa343979ed655f1b5649
+guid: 45bcfa5cd21204f4f865251a57593ac6
 ModelImporter:
   serializedVersion: 24600
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Kit Birch
+    second: {fileID: 2100000, guid: 380fa462fa75dae4e87a7c6003a81e16, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Kit Boulder
+    second: {fileID: 2100000, guid: ce4c7bced51ed894c823358b6776289a, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Kit Cloth
+    second: {fileID: 2100000, guid: 7e0a12b6c004dae44a0681d79e243061, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Kit Copper
+    second: {fileID: 2100000, guid: cb89bdd850fafc74e8fbc6c546e786b8, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Kit Ember
+    second: {fileID: 2100000, guid: 191d801594b057848a5c6acf9e5323b7, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Kit Iron
+    second: {fileID: 2100000, guid: ca3d8ac7605d92f498dd5b4d6d45a47f, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Kit Moonsilver
+    second: {fileID: 2100000, guid: be706c79431402c4880e50867264a6b0, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Kit Planks
+    second: {fileID: 2100000, guid: fda1a1ac76860fb47a627522f194816a, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Kit Soil
+    second: {fileID: 2100000, guid: 9862e8d48a8fb4646a0248b017b79cab, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Kit Stone
+    second: {fileID: 2100000, guid: 89c89710003f46f4a8270df1edc37abf, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Kit Trollstone
+    second: {fileID: 2100000, guid: 46982e72209de484cabd658841e2e196, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Kit Turf
+    second: {fileID: 2100000, guid: 165b9db82a613da41b73c6885ecebd49, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Kit Water
+    second: {fileID: 2100000, guid: 18abac1238195464a9ad5a2030e7e1f8, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Kit Wood
+    second: {fileID: 2100000, guid: 29eba5d2644dc374499280e89a6dbe4f, type: 2}
   materials:
-    materialImportMode: 0
+    materialImportMode: 2
     materialName: 0
     materialSearch: 1
     materialLocation: 1

@@ -436,16 +436,21 @@ public static class BuildBaseTiers
         BuildingDefinition building = Buildings[file];
         string modelPath = Models + modelName + ".prefab";
         PrefabBuildUtility.EnsureFolder(Models.TrimEnd('/'));
-        var made = new GameObject(modelName);
-        GameObject model;
-        try
+        // A model made for real (AgentScripts/BuildStructureModels.cs: it has levels of detail) is kept: only a
+        // stand-in of primitives is drawn again.
+        var model = AssetDatabase.LoadAssetAtPath<GameObject>(modelPath);
+        if (model == null || model.GetComponentInChildren<LODGroup>(true) == null)
         {
-            shape(made.transform);
-            model = PrefabUtility.SaveAsPrefabAsset(made, modelPath);
-        }
-        finally
-        {
-            Object.DestroyImmediate(made);
+            var made = new GameObject(modelName);
+            try
+            {
+                shape(made.transform);
+                model = PrefabUtility.SaveAsPrefabAsset(made, modelPath);
+            }
+            finally
+            {
+                Object.DestroyImmediate(made);
+            }
         }
 
         string prefabPath = AssetDatabase.GetAssetPath(building.Prefab);

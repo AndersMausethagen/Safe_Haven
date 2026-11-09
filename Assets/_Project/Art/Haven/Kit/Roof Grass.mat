@@ -31,7 +31,6 @@ Material:
     m_Ints: []
     m_Floats:
     - _AnimationDistance: 45
-    - _BakedRoots: 1
     - _BladeVariation: 0.12
     - _ClumpHeight: 0.15
     - _ClumpScale: 1.5

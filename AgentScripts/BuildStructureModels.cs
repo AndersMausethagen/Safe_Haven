@@ -10,16 +10,20 @@ using UnityEngine;
 /// LOD0 holds over the whole top-down view, instanced materials, meshes that are not readable.
 ///
 /// Two sources, both under Art/Haven/Structures/&lt;Asset&gt;:
-/// - generated (LocalSpawn: Tools/LocalSpawn/generate_gathering.py --group structures, made game-ready by
-///   Tools/Blender/ingest_generated.py): an FBX of "&lt;Asset&gt; A" with "LOD1", "LOD2" and one baked texture set;
-/// - kit-built (Tools/Blender/smithy.py): an FBX of "&lt;Asset&gt;", "LOD1", "LOD2" whose faces use the kit's tiling
-///   scanned materials (Art/Haven/Kit/Textures; "Kit Wood", "Kit Planks", ...), so the textures stay sharp on a
-///   building of any size and several buildings share them.
+/// - generated, for stations and props (LocalSpawn: Tools/LocalSpawn/generate_gathering.py --group structures, made
+///   game-ready by Tools/Blender/ingest_generated.py): an FBX of "&lt;Asset&gt; A" with "LOD1", "LOD2" and one baked
+///   texture set;
+/// - kit-built, for buildings (Tools/Blender/building_kit.py and a script per building, e.g. smithy.py): an FBX of
+///   "&lt;Asset&gt;", "LOD1", "LOD2" and "Tier N" parts whose faces use the kit's tiling scanned materials
+///   (Art/Haven/Kit/Textures; "Kit Wood", "Kit Planks", ...), so the textures stay sharp on a building of any size
+///   and all buildings share them.
 ///
-/// The pilot: the Campfire's stones and logs (its flame and light stay), the Small Chest (its own model in place of the
-/// Storage Shed's scaled-down one, which the Storage Shed keeps), and the Smithy made both ways as two prefabs to
-/// compare ("Smithy Generated", "Smithy Kit"); the Smithy the game places is not changed until one is chosen.
-/// Assets whose FBX hasn't been made are skipped. Re-runnable.
+/// So far: the Campfire's stones and logs (its flame and light stay), the Small Chest (its own model in place of the
+/// Storage Shed's scaled-down one, which the Storage Shed keeps), and the Smithy: its model prefab
+/// (Art/Haven/Models/Smithy Model.prefab, which the Smithy's building prefab holds) becomes the kit model with a
+/// "Tier N" child for what each upgrade adds, and the building's collider and navigation size are fitted again.
+/// AgentScripts/BuildBaseTiers.cs keeps such a model when it runs. Assets whose FBX hasn't been made are skipped.
+/// Re-runnable.
 ///
 /// Sod roofs are modelled bare and get the meadow's own grass here (RoofGrass): clumps of the terrain's grass
 /// scattered over the roof and merged into one mesh, drawn by the grass shader's merged-clumps variant, so a roof
@@ -39,8 +43,22 @@ public static class BuildStructureModels
     // (The Haven's meadow is painted almost wholly with this clump.)
     private const string GrassClump = "Assets/_Project/Art/Vegetation/Safe Haven/Details/Short Grass.prefab";
     private const float GrassPerSquareMetre = 6f;
-    // Moss on what a generated building turns to the sky: an olive that sits between the peat and the grass.
-    private static readonly Color RoofMoss = new Color(0.62f, 0.6f, 0.36f);
+    private const string Models = "Assets/_Project/Art/Haven/Models/";
+    private const string Tints = "Assets/_Project/Materials/Haven/";
+
+    // Kit-built buildings: the asset under Art/Haven/Structures, the model prefab it becomes (the one the building's
+    // prefab holds), the building's definition under Data/Buildings, and the most triangles the view can show of it.
+    private static readonly (string name, string model, string building, int cap)[] KitBuildings =
+    {
+        ("Smithy", "Smithy Model", "Forge", 16000),
+    };
+
+    // What a tier's parts are made of: the kit's slot and the game's tint material.
+    private static readonly (string slot, string tint)[] TierTints =
+    {
+        ("Kit Copper", "Base Copper"), ("Kit Moonsilver", "Base Moonsilver"), ("Kit Trollstone", "Base Trollstone"),
+        ("Kit Cloth", "Base Cloth"), ("Kit Water", "Base Water"),
+    };
 
     private sealed class Generated
     {
@@ -48,7 +66,6 @@ public static class BuildStructureModels
         public int TextureSize = 2048; // the import's size; the baked files may be larger
         public float Parallax;
         public float Moss;
-        public Color MossTint = Color.white;
         public Color Tint = Color.white; // over the baked colour, where it sits too bright or too green beside the ground
         public int Cap = 5000;         // the manifest's lod0_triangles, for the budget report
     }
@@ -115,30 +132,21 @@ public static class BuildStructureModels
             report.Add(Budget(chest.Name, levels, chest.Cap, chest.TextureSize));
         }
 
-        // The bare peat roof greens over with the live moss layer (grown from the baked sky-facing mask), under the grass.
-        var smithy = new Generated { Name = "Smithy Generated", TextureSize = 4096, Parallax = 0.004f, Cap = 16000, Moss = 0.75f, MossTint = RoofMoss };
-        if (Ready(smithy))
+        // The pilot's two candidate Smithies; the kit one was chosen and is now "Smithy".
+        foreach (string candidate in new[] { "Smithy Generated", "Smithy Kit" })
         {
-            (Mesh[] levels, Material material) = Setup(smithy);
-            // Its roof is painted as bare peat: grass grows where the model faces the sky, high up, and is not grey
-            // stone (the chimney) or pale bark.
-            string folder = Art + smithy.Name + "/";
-            Color[] albedo = Readable(Load<Texture2D>(folder + smithy.Name + "_Albedo.png"), 1024);
-            float roofFrom = levels[0].bounds.min.y + levels[0].bounds.size.y * 0.45f;
-            (Mesh grass, Material grassMaterial) = RoofGrass(folder, smithy.Name, levels[0], (sub, centre, uv) =>
+            if (AssetDatabase.IsValidFolder(Art + candidate))
             {
-                Color c = albedo[Mathf.Clamp((int)(uv.y * 1024f), 0, 1023) * 1024 + Mathf.Clamp((int)(uv.x * 1024f), 0, 1023)];
-                float max = Mathf.Max(c.r, c.g, c.b), min = Mathf.Min(c.r, c.g, c.b);
-                return centre.y > roofFrom && max < 0.62f && max - min > 0.14f * max;
-            }, 9f);
-            LookPrefab(folder + smithy.Name + ".prefab", smithy.Name, levels, new[] { new[] { material } }, grass, grassMaterial);
-            report.Add(Budget(smithy.Name, levels, smithy.Cap, smithy.TextureSize) + GrassLine(grass));
+                AssetDatabase.DeleteAsset(Art + candidate);
+            }
         }
 
-        string kitSmithy = Art + "Smithy Kit/Smithy Kit.fbx";
-        if (Load<GameObject>(kitSmithy) != null)
+        foreach ((string name, string model, string building, int cap) in KitBuildings)
         {
-            report.Add(KitBuilding("Smithy Kit", kitSmithy, 16000));
+            if (Load<GameObject>(Art + name + "/" + name + ".fbx") != null)
+            {
+                report.Add(KitBuilding(name, cap, Models + model + ".prefab", building));
+            }
         }
 
         AssetDatabase.SaveAssets();
@@ -170,7 +178,6 @@ public static class BuildStructureModels
         material.SetFloat("_Metallic", 1f); // the ORM's blue is the metallic itself
         Parallax(material, Load<Texture2D>(prefix + "_Height.png"), asset.Parallax);
         Moss(material, Load<Texture2D>(prefix + "_BlendMask.png"), asset.Moss, 3f);
-        material.SetColor("_L1Tint", asset.MossTint);
         Finish(material);
         return (Levels(folder, prefix + ".fbx", asset.Name + " A"), material);
     }
@@ -212,9 +219,19 @@ public static class BuildStructureModels
 
     // ----- Kit-built buildings -----
 
-    private static string KitBuilding(string name, string fbx, int cap)
+    private static string KitBuilding(string name, int cap, string modelPrefab, string building)
     {
+        string fbx = Art + name + "/" + name + ".fbx";
         var materials = new Dictionary<string, Material>();
+        foreach ((string slot, string tint) in TierTints)
+        {
+            var material = Load<Material>(Tints + tint + ".mat");
+            if (material != null)
+            {
+                materials[slot] = material;
+            }
+        }
+
         foreach (KitMaterial kit in KitMaterials)
         {
             materials[kit.Slot] = Scanned(kit);
@@ -248,11 +265,66 @@ public static class BuildStructureModels
 
         // Grass on the sod: the faces of the roof's own material.
         Material[] first = slots[0];
-        (Mesh grass, Material grassMaterial) = RoofGrass(System.IO.Path.GetDirectoryName(fbx).Replace('\\', '/') + "/", name, levels[0],
+        (Mesh grass, Material grassMaterial) = RoofGrass(Art + name + "/", name, levels[0],
             (sub, centre, uv) => sub < first.Length && first[sub] != null && first[sub].name == "Kit Turf");
-        LookPrefab(System.IO.Path.ChangeExtension(fbx, ".prefab"), name, levels.ToArray(), slots.ToArray(), grass, grassMaterial);
-        return Budget(name, levels.ToArray(), cap, 1024) + GrassLine(grass) +
+        GameObject look = LookPrefab(System.IO.Path.ChangeExtension(fbx, ".prefab"), name, levels.ToArray(), slots.ToArray(), grass, grassMaterial);
+
+        // What each tier adds, and the model prefab the building holds.
+        var tiers = new List<(int tier, Mesh mesh, Material[] materials)>();
+        for (int tier = 2; tier <= 9; tier++)
+        {
+            Transform part = model.transform.Find($"{name} Tier {tier}");
+            if (part != null)
+            {
+                tiers.Add((tier, part.GetComponent<MeshFilter>().sharedMesh, part.GetComponent<MeshRenderer>().sharedMaterials));
+            }
+        }
+
+        string placed = "";
+        if (Load<GameObject>(modelPrefab) != null)
+        {
+            ModelWithTiers(modelPrefab, look, tiers);
+            var definition = Load<BuildingDefinition>("Assets/_Project/Data/Buildings/" + building + ".asset");
+            if (definition != null && definition.Prefab != null)
+            {
+                BuildingPrefabBuilder.Update(definition.Prefab, definition);
+                Refit(AssetDatabase.GetAssetPath(definition.Prefab)); // the collider and navigation size of the stand-in
+                placed = $" | in {System.IO.Path.GetFileName(AssetDatabase.GetAssetPath(definition.Prefab))}, tiers {string.Join(" ", tiers.Select(t => t.tier))}";
+            }
+        }
+
+        return Budget(name, levels.ToArray(), cap, 1024) + GrassLine(grass) + placed +
                $" | {slots[0].Length} materials: {string.Join(", ", slots[0].Select(m => m != null ? m.name : "none"))}";
+    }
+
+    /// <summary>The model prefab a building's prefab holds, remade as the kit model's look and one switched-off
+    /// "Tier N" child for each upgrade's parts (Construction switches them on).</summary>
+    private static void ModelWithTiers(string path, GameObject look, List<(int tier, Mesh mesh, Material[] materials)> tiers)
+    {
+        GameObject root = PrefabUtility.LoadPrefabContents(path);
+        try
+        {
+            for (int i = root.transform.childCount - 1; i >= 0; i--)
+            {
+                Object.DestroyImmediate(root.transform.GetChild(i).gameObject);
+            }
+
+            PrefabUtility.InstantiatePrefab(look, root.transform);
+            foreach ((int tier, Mesh mesh, Material[] materials) in tiers)
+            {
+                var part = new GameObject("Tier " + tier);
+                part.transform.SetParent(root.transform, false);
+                part.AddComponent<MeshFilter>().sharedMesh = mesh;
+                part.AddComponent<MeshRenderer>().sharedMaterials = materials;
+                part.SetActive(false);
+            }
+
+            PrefabUtility.SaveAsPrefabAsset(root, path);
+        }
+        finally
+        {
+            PrefabUtility.UnloadPrefabContents(root);
+        }
     }
 
     private static Material Scanned(KitMaterial kit)
@@ -421,7 +493,7 @@ public static class BuildStructureModels
         mesh.SetTriangles(indices, 0);
         mesh.RecalculateBounds();
         Bounds bounds = mesh.bounds;
-        bounds.Expand(0.6f); // the wind moves the blades
+        bounds.Expand(0.3f); // the wind moves the blades (kept small: a building's footprint is its meshes' bounds)
         mesh.bounds = bounds;
         mesh.UploadMeshData(true);
 
@@ -462,23 +534,6 @@ public static class BuildStructureModels
 
     private static string GrassLine(Mesh grass) =>
         grass == null ? "" : $" | roof grass {TriangleCount(grass)} tris {grass.vertexCount} verts (one draw; the shader thins it with distance)";
-
-    /// <summary>A texture's pixels at <paramref name="size"/>, whatever its import settings (a blit and a read-back).</summary>
-    private static Color[] Readable(Texture2D texture, int size)
-    {
-        RenderTexture target = RenderTexture.GetTemporary(size, size, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.sRGB);
-        RenderTexture previous = RenderTexture.active;
-        Graphics.Blit(texture, target);
-        RenderTexture.active = target;
-        var copy = new Texture2D(size, size, TextureFormat.RGBA32, false);
-        copy.ReadPixels(new Rect(0, 0, size, size), 0, 0);
-        copy.Apply();
-        RenderTexture.active = previous;
-        RenderTexture.ReleaseTemporary(target);
-        Color[] pixels = copy.GetPixels();
-        Object.DestroyImmediate(copy);
-        return pixels;
-    }
 
     // ----- Shared -----
 
