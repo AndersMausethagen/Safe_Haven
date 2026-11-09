@@ -52,6 +52,94 @@
      "prompt": "A small old Norse village smithy, one long low building seen from outside, about twice as wide as it is tall: walls of dark weathered horizontal logs with notched corners on a foundation of rounded grey field stones; a low-pitched gable roof covered with a thick, lumpy layer of bare dark brown peat earth, with no grass, no plants and no moss growing on it, a peeled log along each eave holding the earth, pale birch bark showing under the roof's edges, and weathered bargeboards on the gables; a squat chimney of grey stones with a flat cap stone rising through the roof at one end; the long front side open under the eave between two timber posts with diagonal braces, showing a stone forge inside, with an iron anvil on a tree stump and a wooden quench barrel standing at the opening. No people, no fire, no smoke."
     }
    ]
+  },
+  {
+   "asset": "Workshop",
+   "kit": "Tools/Blender/workshop.py",
+   "looks": [
+    {
+     "key": "A",
+     "seed": 6401,
+     "prompt": "A small old Norse village workshop, one long low building seen from outside, about twice as wide as it is tall: walls of dark weathered horizontal logs with notched corners on a foundation of rounded grey field stones; a low-pitched gable roof covered with a thick, lumpy layer of bare dark brown peat earth, with no grass, no plants and no moss growing on it, a peeled log along each eave holding the earth, pale birch bark showing under the roof's edges, and weathered bargeboards on the gables; the long front side open under the eave between timber posts with diagonal braces, showing a carpenter's and stonemason's workshop inside: a heavy wooden workbench with a vice and tools on it, a rack of saws, hammers and chisels on the back wall, a round grindstone in a wooden frame, a sawhorse with a plank across it, and a half-carved block of grey stone standing at the opening. No people, no fire, no smoke."
+    }
+   ]
+  },
+  {
+   "asset": "Woodcutters Lodge",
+   "kit": "Tools/Blender/woodcutters_lodge.py",
+   "looks": [
+    {
+     "key": "A",
+     "seed": 6402,
+     "prompt": "A small old Norse village woodcutter's lodge, one long low building seen from outside, about twice as wide as it is tall: walls of dark weathered horizontal logs with notched corners on a foundation of rounded grey field stones; a low-pitched gable roof covered with a thick, lumpy layer of bare dark brown peat earth, with no grass, no plants and no moss growing on it, a peeled log along each eave holding the earth, pale birch bark showing under the roof's edges, and weathered bargeboards on the gables; a closed log cabin at the left end with a plank door, and to the right of it the long front side open under the eave between timber posts, sheltering a long sawbench with a big two-handed frame saw; a tall stack of round logs and a neat stack of sawn planks beside the opening, a chopping block with an axe standing in it, and two round wooden shields leaning against the wall. No people, no fire, no smoke."
+    }
+   ]
+  },
+  {
+   "asset": "Hunters Lodge",
+   "kit": "Tools/Blender/hunters_lodge.py",
+   "looks": [
+    {
+     "key": "A",
+     "seed": 6403,
+     "prompt": "A small old Norse village hunter's lodge, one long low building seen from outside, about twice as wide as it is tall: walls of dark weathered horizontal logs with notched corners on a foundation of rounded grey field stones; a low-pitched gable roof covered with a thick, lumpy layer of bare dark brown peat earth, with no grass, no plants and no moss growing on it, a peeled log along each eave holding the earth, pale birch bark showing under the roof's edges, and weathered bargeboards on the gables; a plank door in the middle of the long front side with a pair of antlers above it, and a small shuttered window; beside the door a wooden frame with a brown animal hide stretched and laced on it, a rack of poles with strips of meat and fish hung to dry, a bow and a quiver hanging on the wall, and a chopping stump. No people, no fire, no smoke."
+    }
+   ]
+  },
+  {
+   "asset": "Tailors Shop",
+   "kit": "Tools/Blender/tailors_shop.py",
+   "looks": [
+    {
+     "key": "A",
+     "seed": 6404,
+     "prompt": "A small old Norse village weaver's and tailor's house, one long low building seen from outside, about twice as wide as it is tall: walls of dark weathered horizontal logs with notched corners on a foundation of rounded grey field stones; a low-pitched gable roof covered with a thick, lumpy layer of bare dark brown peat earth, with no grass, no plants and no moss growing on it, a peeled log along each eave holding the earth, pale birch bark showing under the roof's edges, and weathered bargeboards on the gables; a plank door at the left end of the long front side and, along the rest of it, an open porch under the eave between timber posts, with an upright wooden weaving loom with stone weights, baskets of grey wool, a low bench, and a line of dyed cloth in dull red, blue and ochre hung up to dry. No people, no fire, no smoke."
+    }
+   ]
+  },
+  {
+   "asset": "Trading Post",
+   "kit": "Tools/Blender/trading_post.py",
+   "looks": [
+    {
+     "key": "A",
+     "seed": 6405,
+     "prompt": "A small old Norse village trading post, one long low building seen from outside, about twice as wide as it is tall: walls of dark weathered horizontal logs with notched corners on a foundation of rounded grey field stones; a low-pitched gable roof covered with a thick, lumpy layer of bare dark brown peat earth, with no grass, no plants and no moss growing on it, a peeled log along each eave holding the earth, pale birch bark showing under the roof's edges, and weathered bargeboards on the gables; the long front side open under the eave between timber posts, with a long plank counter across the opening; behind and beside it crates, barrels and bulging sacks, a hanging balance scale, furs and a coil of rope hung from the posts, and a striped cloth awning stretched out over the counter on two poles. No people, no fire, no smoke."
+    }
+   ]
+  },
+  {
+   "asset": "Cottage",
+   "kit": "Tools/Blender/cottage.py",
+   "looks": [
+    {
+     "key": "A",
+     "seed": 6406,
+     "prompt": "A small old Norse village family cottage, one low building seen from outside, a little wider than it is tall: walls of dark weathered horizontal logs with notched corners on a foundation of rounded grey field stones; a low-pitched gable roof covered with a thick, lumpy layer of bare dark brown peat earth, with no grass, no plants and no moss growing on it, a peeled log along each eave holding the earth, pale birch bark showing under the roof's edges, and weathered bargeboards on the gables; a plank door with iron hinges in the middle of the long front side under a small porch roof on two posts, a small window with wooden shutters, a squat chimney of grey stones with a flat cap stone rising through the roof; a bench beside the door and a neat stack of split firewood against the wall. No people, no fire, no smoke."
+    }
+   ]
+  },
+  {
+   "asset": "Hut",
+   "kit": "Tools/Blender/hut.py",
+   "looks": [
+    {
+     "key": "A",
+     "seed": 6407,
+     "prompt": "A very small old Norse village sleeping hut, one low building seen from outside, a little wider than it is tall: walls of dark weathered horizontal logs with notched corners on a foundation of rounded grey field stones; a low-pitched gable roof covered with a thick, lumpy layer of bare dark brown peat earth, with no grass, no plants and no moss growing on it, a peeled log along each eave holding the earth, pale birch bark showing under the roof's edges, and weathered bargeboards on the gables; a low plank door in the long front side and no window; a bench made of a split log beside the door and a wooden bucket. No people, no fire, no smoke."
+    }
+   ]
+  },
+  {
+   "asset": "Sauna",
+   "kit": "Tools/Blender/sauna.py",
+   "looks": [
+    {
+     "key": "A",
+     "seed": 6408,
+     "prompt": "A small old Norse village bathhouse, a log sauna, one low building seen from outside, a little wider than it is tall: walls of dark weathered horizontal logs with notched corners on a foundation of rounded grey field stones; a low-pitched gable roof covered with a thick, lumpy layer of bare dark brown peat earth, with no grass, no plants and no moss growing on it, a peeled log along each eave holding the earth, pale birch bark showing under the roof's edges, and weathered bargeboards on the gables; a low plank door in the long front side, a stubby chimney of grey stones rising through the roof; a bench beside the door with a wooden bucket and a bundle of leafy birch twigs on it, and a water barrel at the corner. No people, no fire, no smoke."
+    }
+   ]
   }
  ]
 }

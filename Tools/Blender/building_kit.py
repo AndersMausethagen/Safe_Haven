@@ -34,14 +34,16 @@ KIT = os.path.join(ROOT, "Assets", "_Project", "Art", "Haven", "Kit", "Textures"
 TERRAIN = os.path.join(ROOT, "Assets", "_Project", "Art", "Terrain", "World")
 STRUCTURES = os.path.join(ROOT, "Assets", "_Project", "Art", "Haven", "Structures")
 
-# Material slots, and how many metres one repeat of each texture covers (the scans' real size). The last five are
-# the plain tinted materials tier parts are made of (the game's "Base ..." tints).
+# Material slots, and how many metres one repeat of each texture covers (the scans' real size). Those after the
+# birch are the plain tinted materials small things and tier parts are made of (the game's "Base ..." tints).
 (WOOD, PLANKS, STONE, IRON, TURF, EMBER, BOULDER, SOIL, BIRCH,
- COPPER, MOONSILVER, TROLLSTONE, CLOTH, WATER) = range(14)
+ COPPER, MOONSILVER, TROLLSTONE, CLOTH, WATER, LINEN, HIDE, DYE_BLUE, DYE_OCHRE) = range(18)
 SLOTS = ["Kit Wood", "Kit Planks", "Kit Stone", "Kit Iron", "Kit Turf", "Kit Ember", "Kit Boulder", "Kit Soil", "Kit Birch",
-         "Kit Copper", "Kit Moonsilver", "Kit Trollstone", "Kit Cloth", "Kit Water"]
+         "Kit Copper", "Kit Moonsilver", "Kit Trollstone", "Kit Cloth", "Kit Water", "Kit Linen", "Kit Hide",
+         "Kit Dye Blue", "Kit Dye Ochre"]
 TILE = {WOOD: 0.5, PLANKS: 2.0, STONE: 1.8, IRON: 2.2, TURF: 4.0, EMBER: 1.0, BOULDER: 1.6, SOIL: 3.0, BIRCH: 2.0,
-        COPPER: 1.0, MOONSILVER: 1.0, TROLLSTONE: 1.0, CLOTH: 1.0, WATER: 1.0}
+        COPPER: 1.0, MOONSILVER: 1.0, TROLLSTONE: 1.0, CLOTH: 1.0, WATER: 1.0, LINEN: 1.0, HIDE: 1.0, DYE_BLUE: 1.0,
+        DYE_OCHRE: 1.0}
 
 LOG = 0.15       # a wall log's radius
 COURSE = LOG * 1.8
@@ -507,7 +509,7 @@ def chimney(bm, x, z, base, top, level, rng, half=0.42, cap=True):
             for k in range(2):
                 t = (k + shift) / 2 * 2 * half - half + half / 2
                 centre = (x + ax * t + ox * half * 0.92, y, z + az * t + oz * half * 0.92)
-                boulder(bm, centre, (rng.uniform(0.44, 0.52), h * 1.08, rng.uniform(0.3, 0.38)), level, rng,
+                boulder(bm, centre, (rng.uniform(0.44, 0.52) * half / 0.42, h * 1.08, rng.uniform(0.3, 0.38)), level, rng,
                         yaw=angle + rng.uniform(-0.12, 0.12))
         y += h * 0.93
         course += 1
@@ -603,7 +605,11 @@ def materials():
             plain("Kit Moonsilver", (0.72, 0.78, 0.86), glow=(0.15, 0.2, 0.28), metallic=0.8),
             plain("Kit Trollstone", (0.2, 0.27, 0.2)),
             plain("Kit Cloth", (0.46, 0.14, 0.1)),
-            plain("Kit Water", (0.1, 0.18, 0.22))]
+            plain("Kit Water", (0.1, 0.18, 0.22)),
+            plain("Kit Linen", (0.62, 0.56, 0.44)),
+            plain("Kit Hide", (0.4, 0.27, 0.16)),
+            plain("Kit Dye Blue", (0.16, 0.24, 0.36)),
+            plain("Kit Dye Ochre", (0.6, 0.42, 0.14))]
 
 
 # ----- Building it -----------------------------------------------------------------------------------------------------

@@ -51,13 +51,32 @@ public static class BuildStructureModels
     private static readonly (string name, string model, string building, int cap)[] KitBuildings =
     {
         ("Smithy", "Smithy Model", "Forge", 16000),
+        ("Workshop", "Workshop Model", "ConstructionTable", 16000),
+        ("Woodcutters Lodge", "Woodcutters Lodge Model", "Sawbench", 16000),
+        ("Hunters Lodge", "Hunters Lodge Model", "TanningRack", 16000),
+        ("Tailors Shop", "Tailors Shop Model", "Loom", 16000),
+        ("Trading Post", "Trading Post Model", "TradingPost", 16000),
+        ("Cottage", "Cottage Model", "Cottage", 12000),
+        ("Hut", "Hut Model", "Hut", 10000),
+        ("Sauna", "Sauna Model", "Sauna", 10000),
     };
 
-    // What a tier's parts are made of: the kit's slot and the game's tint material.
-    private static readonly (string slot, string tint)[] TierTints =
+    // Where a lived-in building's smoke rises (its chimney's top) and where its window glows at night, in the
+    // building's own space (HearthSmoke on its prefab).
+    private static readonly Dictionary<string, (Vector3 chimney, Vector3 light)> Hearths = new Dictionary<string, (Vector3, Vector3)>
     {
-        ("Kit Copper", "Base Copper"), ("Kit Moonsilver", "Base Moonsilver"), ("Kit Trollstone", "Base Trollstone"),
-        ("Kit Cloth", "Base Cloth"), ("Kit Water", "Base Water"),
+        ["Cottage"] = (new Vector3(-1.25f, 4.05f, -0.55f), new Vector3(-1.15f, 1.4f, 2.0f)),
+        ["Hut"] = (new Vector3(0.8f, 3.5f, -0.35f), new Vector3(-0.45f, 1.0f, 1.7f)),
+    };
+
+    // What small things and a tier's parts are made of: the kit's slot and the game's tint material. One with a
+    // colour is made from Base Cloth when it isn't there yet (dyed cloth).
+    private static readonly (string slot, string tint, Color make)[] TierTints =
+    {
+        ("Kit Copper", "Base Copper", Color.clear), ("Kit Moonsilver", "Base Moonsilver", Color.clear),
+        ("Kit Trollstone", "Base Trollstone", Color.clear), ("Kit Cloth", "Base Cloth", Color.clear),
+        ("Kit Water", "Base Water", Color.clear), ("Kit Linen", "Base Linen", Color.clear), ("Kit Hide", "Base Hide", Color.clear),
+        ("Kit Dye Blue", "Base Dye Blue", new Color(0.16f, 0.24f, 0.36f)), ("Kit Dye Ochre", "Base Dye Ochre", new Color(0.6f, 0.42f, 0.14f)),
     };
 
     private sealed class Generated
@@ -223,9 +242,17 @@ public static class BuildStructureModels
     {
         string fbx = Art + name + "/" + name + ".fbx";
         var materials = new Dictionary<string, Material>();
-        foreach ((string slot, string tint) in TierTints)
+        foreach ((string slot, string tint, Color make) in TierTints)
         {
             var material = Load<Material>(Tints + tint + ".mat");
+            if (material == null && make.a > 0f)
+            {
+                material = new Material(Load<Material>(Tints + "Base Cloth.mat")) { name = tint };
+                material.SetColor("_BaseColor", make);
+                material.SetColor("_Color", make);
+                AssetDatabase.CreateAsset(material, Tints + tint + ".mat");
+            }
+
             if (material != null)
             {
                 materials[slot] = material;
@@ -288,7 +315,60 @@ public static class BuildStructureModels
             if (definition != null && definition.Prefab != null)
             {
                 BuildingPrefabBuilder.Update(definition.Prefab, definition);
-                Refit(AssetDatabase.GetAssetPath(definition.Prefab)); // the collider and navigation size of the stand-in
+                Bounds body = levels[0].bounds;
+                PrefabBuildUtility.EditPrefab(definition.Prefab, root =>
+                {
+                    // The kit model is life-size (the Workshop's stand-in was shown at 0.7).
+                    var modelAsset = Load<GameObject>(modelPrefab);
+                    foreach (Transform child in root.transform)
+                    {
+                        if (PrefabUtility.GetCorrespondingObjectFromSource(child.gameObject) == modelAsset)
+                        {
+                            child.localScale = Vector3.one;
+                        }
+                    }
+
+                    // The washing line of a lived-in house stands behind the house, and is no part of its collider.
+                    Transform lived = root.transform.Find("Lived In");
+                    Transform line = lived != null ? lived.Find("Line") : null;
+                    if (line != null)
+                    {
+                        lived.localPosition += new Vector3(0f, 0f, body.min.z - 1.3f - (lived.localPosition.z + line.localPosition.z));
+                    }
+
+                    if (lived != null)
+                    {
+                        lived.SetParent(null, false);
+                    }
+
+                    PrefabBuildUtility.FitToModel(root); // the collider and navigation size of the stand-in
+                    if (lived != null)
+                    {
+                        lived.SetParent(root.transform, false);
+                    }
+                });
+                if (Hearths.TryGetValue(name, out (Vector3 chimney, Vector3 light) hearth))
+                {
+                    PrefabBuildUtility.EditPrefab(definition.Prefab, root =>
+                    {
+                        if (root.TryGetComponent(out HearthSmoke smoke))
+                        {
+                            var data = new SerializedObject(smoke);
+                            data.FindProperty("chimney").vector3Value = hearth.chimney;
+                            data.FindProperty("lightAt").vector3Value = hearth.light;
+                            data.ApplyModifiedPropertiesWithoutUndo();
+                        }
+                    });
+                }
+
+                // A kit building's front is +Z: that is where its yard lies.
+                var yard = new SerializedObject(definition);
+                if (yard.FindProperty("yardSide").enumValueIndex != (int)YardSide.Front)
+                {
+                    yard.FindProperty("yardSide").enumValueIndex = (int)YardSide.Front;
+                    yard.ApplyModifiedPropertiesWithoutUndo();
+                    EditorUtility.SetDirty(definition);
+                }
                 placed = $" | in {System.IO.Path.GetFileName(AssetDatabase.GetAssetPath(definition.Prefab))}, tiers {string.Join(" ", tiers.Select(t => t.tier))}";
             }
         }

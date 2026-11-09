@@ -88,7 +88,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DamageNumberSpawner
   prefab: {fileID: 2585767536226189764, guid: a3d82cadb26fc11408659ab4fc485897, type: 3}
-  height: 1.91
+  height: 4.686347
   spread: 0.4
 --- !u!114 &4283811811746767659
 MonoBehaviour:
@@ -118,6 +118,7 @@ MonoBehaviour:
   type: 5
   stationId: 
   menuRange: 6
+  opensWhenUsed: 1
 --- !u!114 &6208632720167887912
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -194,8 +195,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 7.5882044, y: 3.9371853, z: 5.1}
-  m_Center: {x: 0.80589795, y: 1.9685926, z: 0}
+  m_Size: {x: 8.950001, y: 4.5048237, z: 5.98762}
+  m_Center: {x: 0, y: 2.1839352, z: 0.011273146}
 --- !u!208 &3428944449984106364
 NavMeshObstacle:
   m_ObjectHideFlags: 0
@@ -206,11 +207,11 @@ NavMeshObstacle:
   m_Enabled: 1
   serializedVersion: 3
   m_Shape: 1
-  m_Extents: {x: 3.7941022, y: 1.9685926, z: 2.55}
+  m_Extents: {x: 4.4750004, y: 2.2524118, z: 2.99381}
   m_MoveThreshold: 0.1
   m_Carve: 1
   m_CarveOnlyStationary: 1
-  m_Center: {x: 0.80589795, y: 1.9685926, z: 0}
+  m_Center: {x: 0, y: 2.1839352, z: 0.011273146}
   m_TimeToStationary: 0.5
 --- !u!1001 &3515375682247902557
 PrefabInstance:
@@ -302,7 +303,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6116774650318019959, guid: 23fed0501bab5b243abf7d5db76c65a8, type: 3}
       propertyPath: height
-      value: 2.11
+      value: 4.886347
       objectReference: {fileID: 0}
     - target: {fileID: 6538676668843931636, guid: 23fed0501bab5b243abf7d5db76c65a8, type: 3}
       propertyPath: m_Name

@@ -33,7 +33,7 @@ MonoBehaviour:
   requires: []
   requiredRank: 0
   yardDepth: 2
-  yardSide: 2
+  yardSide: 0
   placeInLines: 0
   station: 1
   outputCapacity: 10

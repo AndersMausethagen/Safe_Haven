@@ -27,13 +27,33 @@ ModelImporter:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
+      name: Kit Dye Blue
+    second: {fileID: 2100000, guid: bd1afdd64f1996546a113b53e0c65c66, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Kit Dye Ochre
+    second: {fileID: 2100000, guid: 4b0f25deba76f034e80e1ce6c8593732, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
       name: Kit Ember
     second: {fileID: 2100000, guid: 191d801594b057848a5c6acf9e5323b7, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
+      name: Kit Hide
+    second: {fileID: 2100000, guid: 41646e2ba1977a84e92972ac10c1d7ee, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
       name: Kit Iron
     second: {fileID: 2100000, guid: ca3d8ac7605d92f498dd5b4d6d45a47f, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Kit Linen
+    second: {fileID: 2100000, guid: b725deab42338be49995839242e77ae4, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule

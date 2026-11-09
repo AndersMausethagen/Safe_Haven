@@ -64,17 +64,21 @@ def looks(manifest, wanted):
 
 
 def images(manifest, wanted):
+    started = False
     for asset, look, folder in looks(manifest, wanted):
         concept = os.path.join(folder, "concept.png")
         if os.path.exists(concept) or not look["prompt"].strip():
             continue  # made already, or an adopted model with no concept (ingest only)
+        started = True
         prompt = f"{look['prompt']} {manifest['common']}"
         ok = run([PYTHON, "generate_image.py", "--style", "3D source (flat lit)", "--width", "1024", "--height", "1024",
-                  "--seed", str(look["seed"]), "--out-dir", folder, "--name", "concept", prompt], cwd=AGENT,
+                  "--seed", str(look["seed"]), "--out-dir", folder, "--name", "concept", "--keep-loaded", prompt], cwd=AGENT,
                  log=os.path.join(folder, "image.log"))
         made = sorted(glob.glob(os.path.join(folder, "concept_*.png")))
         if ok and made:
             os.replace(made[-1], concept)
+    if started and len(ARGS) > 0 and ARGS[0] == "images":
+        run([PYTHON, "generate_image.py", "--stop"], cwd=AGENT)  # "all" goes on to the 3d phase, which stops it
 
 
 def shapes(manifest, wanted):

@@ -111,12 +111,15 @@ public static class BuildLivingWorld
             GameObject root = PrefabUtility.LoadPrefabContents(path);
             try
             {
-                Bounds bounds = BoundsOf(root);
+                // The old washing line goes before the house is measured: counted in, it moved the next one a
+                // step further out on every run (it stood 8 m from the Cottage).
                 Transform old = root.transform.Find("Lived In");
                 if (old != null)
                 {
                     Object.DestroyImmediate(old.gameObject);
                 }
+
+                Bounds bounds = BoundsOf(root);
 
                 GameObject props = washing ? WashingLine(root.transform, bounds) : null;
                 HearthSmoke hearth = Ensure<HearthSmoke>(root);

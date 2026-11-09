@@ -332,8 +332,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 4.4, y: 3.4823885, z: 3.4198165}
-  m_Center: {x: 0, y: 1.7411942, z: 0}
+  m_Size: {x: 6.7500005, y: 4.2081, z: 5.258995}
+  m_Center: {x: 0, y: 2.0326035, z: 0.011322737}
 --- !u!114 &1502324341121869812
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -397,7 +397,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: SafeHaven::DamageNumberSpawner
   prefab: {fileID: 2585767536226189764, guid: a3d82cadb26fc11408659ab4fc485897, type: 3}
-  height: 3.7323885
+  height: 4.3866534
   spread: 0.4
 --- !u!208 &6850495904946490827
 NavMeshObstacle:
@@ -409,11 +409,11 @@ NavMeshObstacle:
   m_Enabled: 1
   serializedVersion: 3
   m_Shape: 1
-  m_Extents: {x: 2.2, y: 1.7411942, z: 1.7099082}
+  m_Extents: {x: 3.3750002, y: 2.10405, z: 2.6294975}
   m_MoveThreshold: 0.1
   m_Carve: 1
   m_CarveOnlyStationary: 1
-  m_Center: {x: 0, y: 1.7411942, z: 0}
+  m_Center: {x: 0, y: 2.0326035, z: 0.011322737}
   m_TimeToStationary: 0.5
 --- !u!114 &8431171365457575310
 MonoBehaviour:
@@ -453,11 +453,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2582949664537544eba4cb3754fc8eaa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: SafeHaven::HearthSmoke
-  chimney: {x: 0.79699963, y: 3.4823885, z: -3.5024772}
+  chimney: {x: -1.25, y: 4.05, z: -0.55}
   puffs: 1.6
   rise: 9
   smoke: {fileID: 2100000, guid: e0dc5fdfe4f83b44294848291dbc9ed2, type: 2}
-  lightAt: {x: 0.019999743, y: 1.1, z: 2.109908}
+  lightAt: {x: -1.15, y: 1.4, z: 2}
   lightRange: 6
   lightIntensity: 1.6
   lightColour: {r: 1, g: 0.62, b: 0.3, a: 1}
@@ -578,7 +578,7 @@ Transform:
   m_GameObject: {fileID: 3676736905331008022}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 4.5225}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -860,7 +860,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6116774650318019959, guid: 23fed0501bab5b243abf7d5db76c65a8, type: 3}
       propertyPath: height
-      value: 3.9323885
+      value: 4.586653
       objectReference: {fileID: 0}
     - target: {fileID: 6538676668843931636, guid: 23fed0501bab5b243abf7d5db76c65a8, type: 3}
       propertyPath: m_Name
