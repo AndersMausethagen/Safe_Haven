@@ -140,6 +140,7 @@ public sealed class OptionsScreen : MonoBehaviour
         window = dim.gameObject;
 
         RectTransform panel = OptionsWidgets.Place(OptionsWidgets.Rect("Panel", dim), new Vector2(0.5f, 0.5f), new Vector2(1280f, 900f), Vector2.zero);
+        panel.gameObject.AddComponent<FitInsideParent>();
         panel.gameObject.AddComponent<Image>().color = OptionsWidgets.Panel;
         var rim = panel.gameObject.AddComponent<Outline>();
         rim.effectColor = OptionsWidgets.WindowRim;

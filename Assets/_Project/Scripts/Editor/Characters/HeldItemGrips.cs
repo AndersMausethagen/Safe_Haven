@@ -47,7 +47,7 @@ public sealed class HeldItemGrips : EditorWindow
             }
         }
 
-        HeldItemView view = Application.isPlaying ? FindFirstObjectByType<HeldItemView>() : null;
+        HeldItemView view = Application.isPlaying ? FindAnyObjectByType<HeldItemView>() : null;
         EditorGUILayout.HelpBox(Application.isPlaying
             ? "Pick an item to hold it; torches preview in the left hand, other weapons in the right. Changes are saved to the item."
             : "Enter Play mode to see an item in the player's hand while you tune it.", MessageType.None);
@@ -102,7 +102,7 @@ public sealed class HeldItemGrips : EditorWindow
     private void OnDisable()
     {
         // Closing the window hands the hand back to the equipped weapon.
-        HeldItemView view = Application.isPlaying ? FindFirstObjectByType<HeldItemView>() : null;
+        HeldItemView view = Application.isPlaying ? FindAnyObjectByType<HeldItemView>() : null;
         if (view != null)
         {
             view.Preview = null;

@@ -311,7 +311,7 @@ public sealed class HavenShare : ICoopPart, IDisposable
     {
         if (clockHere == null || clockHere.gameObject.scene != SceneManager.GetActiveScene())
         {
-            clockHere = UnityEngine.Object.FindFirstObjectByType<DayNightCycle>();
+            clockHere = UnityEngine.Object.FindAnyObjectByType<DayNightCycle>();
         }
 
         return clockHere;

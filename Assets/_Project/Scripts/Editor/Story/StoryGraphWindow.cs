@@ -20,7 +20,7 @@ public sealed class StoryGraphWindow : EditorWindow
 {
     private StoryScript script;
     private StoryGraphView view;
-    private Label title;
+    private Label heading;
     private Label problems;
 
     [MenuItem("Safe Haven/Story Graph", false, 21)]
@@ -76,8 +76,8 @@ public sealed class StoryGraphWindow : EditorWindow
     {
         rootVisualElement.style.flexDirection = FlexDirection.Column;
         var bar = new VisualElement { style = { flexDirection = FlexDirection.Row, paddingLeft = 6, paddingTop = 3, paddingBottom = 3 } };
-        title = new Label { style = { unityFontStyleAndWeight = FontStyle.Bold, flexGrow = 1, unityTextAlign = TextAnchor.MiddleLeft } };
-        bar.Add(title);
+        heading = new Label { style = { unityFontStyleAndWeight = FontStyle.Bold, flexGrow = 1, unityTextAlign = TextAnchor.MiddleLeft } };
+        bar.Add(heading);
         bar.Add(new Button(() => view?.FrameAll()) { text = "Frame All" });
         bar.Add(new Button(() =>
         {
@@ -130,7 +130,7 @@ public sealed class StoryGraphWindow : EditorWindow
         }
 
         script = target;
-        title.text = script != null ? $"{script.name}  ({script.gameObject.scene.name})" : "Select a Story Script (or GameObject › Safe Haven › Story Script)";
+        heading.text = script != null ? $"{script.name}  ({script.gameObject.scene.name})" : "Select a Story Script (or GameObject › Safe Haven › Story Script)";
         view.Show(script);
         ShowProblems();
     }

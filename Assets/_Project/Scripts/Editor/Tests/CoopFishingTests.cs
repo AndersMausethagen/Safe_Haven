@@ -90,7 +90,7 @@ public sealed class CoopFishingTests
                 Object.DestroyImmediate(friend.Bobber.gameObject);
             }
 
-            foreach (LineRenderer line in Object.FindObjectsByType<LineRenderer>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+            foreach (LineRenderer line in Object.FindObjectsByType<LineRenderer>(FindObjectsInactive.Include))
             {
                 if (line.name == "Fishing Line")
                 {

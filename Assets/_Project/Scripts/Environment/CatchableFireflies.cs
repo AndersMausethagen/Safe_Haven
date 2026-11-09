@@ -210,7 +210,7 @@ public sealed class CatchableFireflies : MonoBehaviour
     /// <summary>Gives a catchable firefly its name and verb in the interaction prompt ("[E] Catch Firefly").</summary>
     private sealed class FlyName : MonoBehaviour, IInteractionName, IInteractionVerb
     {
-        public Fly Fly;
+        [System.NonSerialized] public Fly Fly;
         public string InteractionName => Fly != null ? Fly.InteractionName : "Firefly";
         public string Verb => "Catch";
     }

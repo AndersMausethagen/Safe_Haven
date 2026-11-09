@@ -54,7 +54,18 @@ public sealed class ArtCover : UIBehaviour
     protected override void OnTransformParentChanged() => Fit();
 
 #if UNITY_EDITOR
-    protected override void OnValidate() => Fit();
+    // Unity forbids resizing a RectTransform inside OnValidate (it warns "SendMessage cannot be called during ... OnValidate"),
+    // so the refit waits for the Editor's next tick, as Unity's own layout components do.
+    protected override void OnValidate()
+    {
+        UnityEditor.EditorApplication.delayCall += () =>
+        {
+            if (this != null)
+            {
+                Fit();
+            }
+        };
+    }
 #endif
 
     private void LateUpdate()

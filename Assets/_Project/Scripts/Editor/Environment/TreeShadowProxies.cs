@@ -21,7 +21,7 @@ public static class TreeShadowProxies
     {
         int changed = 0, checkedTrees = 0;
         var prefabs = new HashSet<GameObject>();
-        foreach (Terrain terrain in Object.FindObjectsByType<Terrain>(FindObjectsSortMode.None))
+        foreach (Terrain terrain in Object.FindObjectsByType<Terrain>())
         {
             foreach (TreePrototype prototype in terrain.terrainData.treePrototypes)
             {
@@ -41,7 +41,7 @@ public static class TreeShadowProxies
             }
         }
 
-        foreach (Terrain terrain in Object.FindObjectsByType<Terrain>(FindObjectsSortMode.None))
+        foreach (Terrain terrain in Object.FindObjectsByType<Terrain>())
         {
             terrain.terrainData.RefreshPrototypes();
             terrain.Flush();

@@ -30,6 +30,51 @@ public sealed class OptionsSliderGrip : MonoBehaviour, IPointerDownHandler, IPoi
 }
 
 /// <summary>
+/// Shrinks a fixed-size, centred window until it fits inside its parent (the screen) with a margin; never enlarges it.
+/// The canvas follows the UI size option by shrinking its reference height (1080 units at 1x, 720 at 1.5x), so a
+/// 900-unit window fell off the top and bottom at large UI sizes; this keeps it whole, as big as the screen allows.
+/// </summary>
+public sealed class FitInsideParent : MonoBehaviour
+{
+    public float Margin = 24f;
+
+    private Vector2 lastRoom = new Vector2(-1f, -1f);
+    private Vector2 lastSize;
+
+    private void OnEnable() => Fit(true);
+
+    // The screen or the UI size can change while the window is open; a size compare a frame is all this costs.
+    private void LateUpdate() => Fit(false);
+
+    private void Fit(bool force)
+    {
+        var rect = (RectTransform)transform;
+        if (!(rect.parent is RectTransform parent))
+        {
+            return;
+        }
+
+        Vector2 room = parent.rect.size;
+        Vector2 size = rect.rect.size;
+        if (!force && room == lastRoom && size == lastSize)
+        {
+            return;
+        }
+
+        lastRoom = room;
+        lastSize = size;
+        if (size.x <= 0f || size.y <= 0f)
+        {
+            return;
+        }
+
+        float fit = Mathf.Min(1f, Mathf.Min((room.x - 2f * Margin) / size.x, (room.y - 2f * Margin) / size.y));
+        fit = Mathf.Max(0.1f, fit);
+        rect.localScale = new Vector3(fit, fit, 1f);
+    }
+}
+
+/// <summary>
 /// The parts the Options screen is made of, built in code like the game's other code-made windows. Colours follow them.
 /// Rows return an action that redraws them from the setting, so the screen can refresh after a preset or a reset.
 /// </summary>

@@ -87,7 +87,7 @@ public static class HavenPeople
             entry.Actions.Add(new HavenAction($"Work as {offered.DisplayName}", () => ResidentNpc.GiveJob(person, offered, Player.Current != null ? Player.Current.gameObject : null), closesWindow: false));
         }
 
-        foreach (ResidentNpc npc in Object.FindObjectsByType<ResidentNpc>(FindObjectsSortMode.None))
+        foreach (ResidentNpc npc in Object.FindObjectsByType<ResidentNpc>())
         {
             if (npc.Resident == person)
             {

@@ -519,7 +519,7 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
 
         // The follow camera would otherwise sweep across the map to catch up once the loading screen lifts.
         Vector3 moved = player.position - from;
-        foreach (CinemachineCamera follow in FindObjectsByType<CinemachineCamera>(FindObjectsSortMode.None))
+        foreach (CinemachineCamera follow in FindObjectsByType<CinemachineCamera>())
         {
             if (follow.Follow != null && follow.Follow.IsChildOf(player))
             {

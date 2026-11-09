@@ -41,8 +41,8 @@ public sealed class SkyControllerWindow : EditorWindow
 
     private void OnGUI()
     {
-        var cycle = FindFirstObjectByType<DayNightCycle>();
-        var weather = FindFirstObjectByType<WeatherSystem>();
+        var cycle = FindAnyObjectByType<DayNightCycle>();
+        var weather = FindAnyObjectByType<WeatherSystem>();
         if (cycle == null && weather == null)
         {
             EditorGUILayout.HelpBox("This scene has no day/night or weather. Add them with Safe Haven > Environment > " +

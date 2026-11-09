@@ -15,8 +15,8 @@ public static class SkyCliCommands
     [CliCommand("sh_sky", "Show or set the time of day, clock speed and weather. Negative values leave a setting alone.", Tags = new[] { Tag })]
     public static string Sky(float hour = -1f, string weather = "", float transition = 0f, float speed = -1f, bool lightning = false)
     {
-        var cycle = Object.FindFirstObjectByType<DayNightCycle>();
-        var system = Object.FindFirstObjectByType<WeatherSystem>();
+        var cycle = Object.FindAnyObjectByType<DayNightCycle>();
+        var system = Object.FindAnyObjectByType<WeatherSystem>();
         if (cycle == null && system == null)
         {
             return "This scene has no day/night cycle or weather (Safe Haven > World > Sky and Weather > Add Day, Night and Weather to Scene).";

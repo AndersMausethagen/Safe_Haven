@@ -669,7 +669,7 @@ public sealed class CoopSession : MonoBehaviour, IGameSystem
             Application.runInBackground = true;
         }
 
-        foreach (string tag in Unity.Multiplayer.PlayMode.CurrentPlayer.ReadOnlyTags())
+        foreach (string tag in Unity.Multiplayer.PlayMode.CurrentPlayer.Tags)
         {
             if (tag == HostTag || tag == GuestTag)
             {

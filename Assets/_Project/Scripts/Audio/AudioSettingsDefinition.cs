@@ -42,7 +42,6 @@ public sealed class AudioSettingsDefinition : ScriptableObject
     [SerializeField, Min(0f)] private float returnSeconds = 1.4f;
 
     [Header("What Counts as Combat")]
-    [HideInInspector, SerializeField] private bool weaponDrawn = true;
     [Tooltip("An enemy is chasing or attacking the player.")]
     [SerializeField] private bool enemyChasingPlayer = true;
     [Tooltip("The player hit something or was hit within this many seconds. 0 turns this off.")]
