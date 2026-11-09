@@ -45,6 +45,7 @@ MonoBehaviour:
     job: {fileID: 0}
     breach: {fileID: 0}
     rank: 1
+    tier: 2
     bringHome: 0
     countAlreadyOwned: 0
   closedBy: {fileID: 0}
@@ -69,6 +70,7 @@ MonoBehaviour:
     job: {fileID: 0}
     breach: {fileID: 11400000, guid: b723d3c3c8a02e74bab2f79e1831f16c, type: 2}
     rank: 1
+    tier: 2
     bringHome: 0
     countAlreadyOwned: 0
   turnInToGiver: 0

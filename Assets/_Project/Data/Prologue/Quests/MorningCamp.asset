@@ -23,8 +23,30 @@ MonoBehaviour:
   announceCompletion: 0
   showTimerInHud: 0
   prerequisites: []
+  startedFirst: []
   start: 2
   startEvent: {fileID: 0}
+  startWhen:
+    type: 0
+    description: 
+    amount: 1
+    item: {fileID: 0}
+    resource: {fileID: 0}
+    monster: {fileID: 0}
+    faction: 1
+    building: {fileID: 0}
+    raid: {fileID: 0}
+    mustExtract: 1
+    withinMinutes: 0
+    questEvent: {fileID: 0}
+    person: {fileID: 0}
+    target: {fileID: 0}
+    job: {fileID: 0}
+    breach: {fileID: 0}
+    rank: 1
+    tier: 2
+    bringHome: 0
+    countAlreadyOwned: 0
   closedBy: {fileID: 0}
   startDelay: 0
   onStarted: []
@@ -42,6 +64,13 @@ MonoBehaviour:
     mustExtract: 0
     withinMinutes: 0
     questEvent: {fileID: 11400000, guid: 367a938ebe0a9f847806fbc01218a5e2, type: 2}
+    person: {fileID: 0}
+    target: {fileID: 0}
+    job: {fileID: 0}
+    breach: {fileID: 0}
+    rank: 1
+    tier: 2
+    bringHome: 0
     countAlreadyOwned: 0
   turnInToGiver: 1
   turnInTo: Sigrid

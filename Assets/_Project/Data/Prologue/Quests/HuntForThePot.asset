@@ -45,6 +45,7 @@ MonoBehaviour:
     job: {fileID: 0}
     breach: {fileID: 0}
     rank: 1
+    tier: 2
     bringHome: 0
     countAlreadyOwned: 0
   closedBy: {fileID: 11400000, guid: 2f630af2f0eaf434a97dc64ffe2d130c, type: 2}
@@ -53,11 +54,11 @@ MonoBehaviour:
   objectivesInOrder: 0
   objectives:
   - type: 2
-    description: Bring down a boar on the grass north of the road
-    amount: 1
+    description: Bring down two blight boar on the grass north of the road
+    amount: 2
     item: {fileID: 0}
     resource: {fileID: 0}
-    monster: {fileID: 11400000, guid: b22c293353a041944aa0e1f4eb3bcb99, type: 2}
+    monster: {fileID: 11400000, guid: e646ff37405b36e43a4fa710a23060e2, type: 2}
     faction: 0
     building: {fileID: 0}
     raid: {fileID: 0}
@@ -69,6 +70,7 @@ MonoBehaviour:
     job: {fileID: 0}
     breach: {fileID: 0}
     rank: 1
+    tier: 2
     bringHome: 0
     countAlreadyOwned: 0
   turnInToGiver: 1

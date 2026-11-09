@@ -416,12 +416,14 @@ public sealed class PrologueMeadowTests
     }
 
     [Test]
-    public void EirikLesson_CanBeTakenAfterTheCrossing_AndClosesWithTheShelter()
+    public void EirikLesson_IsAtTheMorningCamp_AndClosesWithTheRoad()
     {
+        // 2026-11-09: at the camp with a practice sword, a duel with Eirik in place of the rootling at the forest's edge.
         QuestDefinition lesson = Quest("EirikLesson");
         Assert.AreEqual(QuestRank.Optional, lesson.Rank);
-        Assert.AreSame(Quest("FindShelter"), lesson.ClosedBy);
-        CollectionAssert.AreEqual(new[] { Quest("RoadToForest") }, lesson.Prerequisites, "It must be over before the shelter quest, so it can't wait for that.");
+        Assert.AreSame(Quest("RoadToForest"), lesson.ClosedBy, "an errand of the camp: it closes when the party sets out");
+        CollectionAssert.AreEqual(new[] { Quest("MorningCamp") }, lesson.Prerequisites, "offered as soon as Sigrid has given the morning");
+        Assert.NotNull(AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Project/Data/Items/Weapons/PracticeSword.asset"));
         Assert.IsTrue(lesson.ObjectivesInOrder);
         Assert.AreEqual(4, lesson.Objectives.Count);
         Assert.IsEmpty(lesson.FindProblems());

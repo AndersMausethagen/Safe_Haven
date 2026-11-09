@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4c76fa069e85f784a9c1abb8f78fae26, type: 3}
-  m_Name: StoneAxe
+  m_Name: WoodsmansAxe
   m_EditorClassIdentifier: Assembly-CSharp::ItemDefinition
   id: woodsmans_axe
   displayName: Hand Axe
@@ -36,6 +36,7 @@ MonoBehaviour:
   healAmount: 0
   hungerRestore: 0
   thirstRestore: 0
+  waterCapacity: 0
   boonBonuses: []
   boonSeconds: 300
   tonic: 0
@@ -44,6 +45,9 @@ MonoBehaviour:
   placesInRaid: {fileID: 0}
   carryCapacityBonus: 0
   bagSlotBonus: 0
+  carryNoise: 0
+  carrySpeedScale: 1
+  carrySound: {fileID: 0}
   armorSlot: 0
   wornLook: {fileID: 0}
   statBonuses: []
@@ -52,4 +56,6 @@ MonoBehaviour:
   experience: 0
   learnedAtHome: 0
   transport: {fileID: 0}
+  sapling: {fileID: 0}
+  lantern: {fileID: 0}
   raidModifier: {fileID: 0}

@@ -19,6 +19,9 @@ public sealed class Combatant : MonoBehaviour
     private StatSheet stats;
 
     public Faction Faction => faction;
+
+    /// <summary>Changes sides for a while (a practice duel, CompanionSpar), so the other side's blows land; put it back after.</summary>
+    public void SetFaction(Faction value) => faction = value;
     public bool IsPriorityTarget => priorityTarget;
     public CombatRules Rules => rules != null ? rules : CombatRules.Default;
 

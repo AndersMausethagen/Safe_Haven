@@ -24,8 +24,30 @@ MonoBehaviour:
   showTimerInHud: 0
   prerequisites:
   - {fileID: 11400000, guid: 2ba326763b19a9e46be36507850aed82, type: 2}
+  startedFirst: []
   start: 0
   startEvent: {fileID: 0}
+  startWhen:
+    type: 0
+    description: 
+    amount: 1
+    item: {fileID: 0}
+    resource: {fileID: 0}
+    monster: {fileID: 0}
+    faction: 1
+    building: {fileID: 0}
+    raid: {fileID: 0}
+    mustExtract: 1
+    withinMinutes: 0
+    questEvent: {fileID: 0}
+    person: {fileID: 0}
+    target: {fileID: 0}
+    job: {fileID: 0}
+    breach: {fileID: 0}
+    rank: 1
+    tier: 2
+    bringHome: 0
+    countAlreadyOwned: 0
   closedBy: {fileID: 0}
   startDelay: 0
   onStarted: []
@@ -43,6 +65,13 @@ MonoBehaviour:
     mustExtract: 0
     withinMinutes: 0
     questEvent: {fileID: 0}
+    person: {fileID: 0}
+    target: {fileID: 0}
+    job: {fileID: 0}
+    breach: {fileID: 0}
+    rank: 1
+    tier: 2
+    bringHome: 0
     countAlreadyOwned: 0
   - type: 4
     description: Stew the berries at the campfire
@@ -56,6 +85,13 @@ MonoBehaviour:
     mustExtract: 0
     withinMinutes: 0
     questEvent: {fileID: 0}
+    person: {fileID: 0}
+    target: {fileID: 0}
+    job: {fileID: 0}
+    breach: {fileID: 0}
+    rank: 1
+    tier: 2
+    bringHome: 0
     countAlreadyOwned: 0
   turnInToGiver: 1
   turnInTo: Sigrid

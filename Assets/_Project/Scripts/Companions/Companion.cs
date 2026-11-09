@@ -92,6 +92,9 @@ public sealed class Companion : MonoBehaviour, IConversationTopics, IQuestPerson
     public static IReadOnlyList<Companion> Active => active;
 
     public CompanionDefinition Definition => definition;
+
+    /// <summary>Its body (animations, weapon), for a practice duel that borrows it (CompanionSpar).</summary>
+    public CompanionBody Body => body;
     public CompanionOrder Order { get; private set; }
     public bool IsDowned => getUpAt >= 0f;
     public string DisplayName => resident != null ? resident.DisplayName : name;

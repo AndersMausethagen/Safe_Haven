@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::QuestDefinition
   id: prologue.eirik_lesson
   displayName: A Lesson from Eirik
-  description: Eirik would rather you learned on a dummy and a rootling than on whatever waits down the road. He is right, and it will only take a moment.
+  description: Eirik would rather you learned with a practice sword at the camp than on whatever waits down the road. A dummy first, then Eirik himself.
   chain: Prologue - Before the Road
   journalNotes: 'Eirik was a soldier before this and teaches the way soldiers do: briefly, and assuming you''ll need it by nightfall. What he is really showing you is that a staggered enemy struck from behind takes the most. The Mechanics tab has the rest.'
   rank: 2
@@ -23,10 +23,32 @@ MonoBehaviour:
   announceCompletion: 1
   showTimerInHud: 0
   prerequisites:
-  - {fileID: 11400000, guid: 2f630af2f0eaf434a97dc64ffe2d130c, type: 2}
+  - {fileID: 11400000, guid: 3514f440e604ac048bb77179757dee9b, type: 2}
+  startedFirst: []
   start: 2
   startEvent: {fileID: 0}
-  closedBy: {fileID: 11400000, guid: 0279feb93b7c8b74e9fd8683d9d10fd3, type: 2}
+  startWhen:
+    type: 0
+    description: 
+    amount: 1
+    item: {fileID: 0}
+    resource: {fileID: 0}
+    monster: {fileID: 0}
+    faction: 1
+    building: {fileID: 0}
+    raid: {fileID: 0}
+    mustExtract: 1
+    withinMinutes: 0
+    questEvent: {fileID: 0}
+    person: {fileID: 0}
+    target: {fileID: 0}
+    job: {fileID: 0}
+    breach: {fileID: 0}
+    rank: 1
+    tier: 2
+    bringHome: 0
+    countAlreadyOwned: 0
+  closedBy: {fileID: 11400000, guid: 2f630af2f0eaf434a97dc64ffe2d130c, type: 2}
   startDelay: 0
   onStarted: []
   objectivesInOrder: 1
@@ -43,6 +65,13 @@ MonoBehaviour:
     mustExtract: 0
     withinMinutes: 0
     questEvent: {fileID: 11400000, guid: 2ef887948d56a194dab8b9f1f4cc879f, type: 2}
+    person: {fileID: 0}
+    target: {fileID: 0}
+    job: {fileID: 0}
+    breach: {fileID: 0}
+    rank: 1
+    tier: 2
+    bringHome: 0
     countAlreadyOwned: 0
   - type: 6
     description: Dodge (Space)
@@ -56,9 +85,16 @@ MonoBehaviour:
     mustExtract: 0
     withinMinutes: 0
     questEvent: {fileID: 11400000, guid: 7d0d71c3831a90141bcf44deab963ec0, type: 2}
+    person: {fileID: 0}
+    target: {fileID: 0}
+    job: {fileID: 0}
+    breach: {fileID: 0}
+    rank: 1
+    tier: 2
+    bringHome: 0
     countAlreadyOwned: 0
   - type: 6
-    description: 'Parry the rootling: hold the right mouse just before it strikes, or dodge through the blow'
+    description: 'Parry Eirik: hold the right mouse just before his blow lands, or dodge through it'
     amount: 1
     item: {fileID: 0}
     resource: {fileID: 0}
@@ -69,9 +105,16 @@ MonoBehaviour:
     mustExtract: 0
     withinMinutes: 0
     questEvent: {fileID: 11400000, guid: 81603cd61f5800f4690ce89ffab396b1, type: 2}
+    person: {fileID: 0}
+    target: {fileID: 0}
+    job: {fileID: 0}
+    breach: {fileID: 0}
+    rank: 1
+    tier: 2
+    bringHome: 0
     countAlreadyOwned: 0
   - type: 6
-    description: Bring it down. Staggered and struck from behind, it takes the most
+    description: 'Win the duel: wear Eirik down until he yields'
     amount: 1
     item: {fileID: 0}
     resource: {fileID: 0}
@@ -82,6 +125,13 @@ MonoBehaviour:
     mustExtract: 0
     withinMinutes: 0
     questEvent: {fileID: 11400000, guid: ba7681990b5907e4fb1b74ec9d211f19, type: 2}
+    person: {fileID: 0}
+    target: {fileID: 0}
+    job: {fileID: 0}
+    breach: {fileID: 0}
+    rank: 1
+    tier: 2
+    bringHome: 0
     countAlreadyOwned: 0
   turnInToGiver: 1
   turnInTo: Eirik

@@ -161,17 +161,23 @@ public static class BuildPrologueMeadow
         });
         Edit(Quest("EirikLesson"), so =>
         {
+            // At the morning camp, before the road (2026-11-09: it was at the forest's edge, against a rootling). Eirik spars
+            // the player himself; neither can die (SparNode: whoever is worn to a quarter yields).
             Basics(so, "prologue.eirik_lesson", "A Lesson from Eirik", SideChain,
-                "Eirik would rather you learned on a dummy and a rootling than on whatever waits down the road. He is right, and it will only take a moment.", "");
-            Side(so, Existing("FindShelter"));
-            Prerequisites(so, road);
+                "Eirik would rather you learned with a practice sword at the camp than on whatever waits down the road. A dummy first, then Eirik himself.", "");
+            Side(so, road);
             Objectives(so, true,
                 (ObjectiveType.QuestEvent, "Strike the dummy three times (left mouse)", 3, lessonHit),
                 (ObjectiveType.QuestEvent, "Dodge (Space)", 1, lessonDodged),
-                (ObjectiveType.QuestEvent, "Parry the rootling: hold the right mouse just before it strikes, or dodge through the blow", 1, lessonDefended),
-                (ObjectiveType.QuestEvent, "Bring it down. Staggered and struck from behind, it takes the most", 1, lessonDone));
+                (ObjectiveType.QuestEvent, "Parry Eirik: hold the right mouse just before his blow lands, or dodge through it", 1, lessonDefended),
+                (ObjectiveType.QuestEvent, "Win the duel: wear Eirik down until he yields", 1, lessonDone));
             Rewards(so, (Item("Bandage"), 2));
         });
+        // One errand at a time, in the order they are offered (wood follows the morning by itself); Eirik's lesson opens with
+        // the first (2026-11-09: the chain was set in the Quest Map by hand, and a Data run lost it; it lives here now).
+        Edit(Quest("FishForBreakfast"), so => Prerequisites(so, Existing("WoodForTheRoad")));
+        Edit(Quest("HuntForThePot"), so => Prerequisites(so, Existing("FishForBreakfast")));
+        Edit(Quest("EirikLesson"), so => Prerequisites(so, morning));
         // Wood cut in the morning counts towards the fire.
         Edit(Existing("GatherFuel"), so =>
         {
@@ -192,6 +198,7 @@ public static class BuildPrologueMeadow
         EditorUtility.SetDirty(chapterData.targetObject);
         string ranks = Ranks();
         string sword = WornSword();
+        PracticeSword();
         string boar = UnsavedCopy("Assets/_Project/Prefabs/Enemies/BlightBoar.prefab", Prologue + "ExpeditionBoar.prefab");
         UnsavedCopy("Assets/_Project/Prefabs/Enemies/Rootling.prefab", Prologue + "ExpeditionRootling.prefab");
         string moon = ForestMoon();
@@ -277,6 +284,30 @@ public static class BuildPrologueMeadow
     }
 
     // The sword has no Tier I of its own in the game, so the expedition carries an old one: a copper sword's moves, the club's damage.
+    // Eirik's practice sword for the lesson at the camp: the copper sword's look, blunted.
+    private static void PracticeSword()
+    {
+        const string weaponPath = "Assets/_Project/Data/Combat/Weapons/PracticeSword.asset";
+        string itemPath = Items + "Weapons/PracticeSword.asset";
+        if (Load<WeaponDefinition>(weaponPath) == null) AssetDatabase.CopyAsset("Assets/_Project/Data/Combat/Weapons/CopperSword.asset", weaponPath);
+        var weapon = Load<WeaponDefinition>(weaponPath);
+        var weaponData = new SerializedObject(weapon);
+        weaponData.FindProperty("displayName").stringValue = "Practice Sword";
+        weaponData.FindProperty("damage").floatValue = 6f;
+        weaponData.ApplyModifiedPropertiesWithoutUndo();
+        EditorUtility.SetDirty(weapon);
+        if (Load<ItemDefinition>(itemPath) == null) AssetDatabase.CopyAsset(Items + "Weapons/CopperSword.asset", itemPath);
+        var item = Load<ItemDefinition>(itemPath);
+        var so = new SerializedObject(item);
+        so.FindProperty("id").stringValue = "practice_sword";
+        so.FindProperty("displayName").stringValue = "Practice Sword";
+        so.FindProperty("description").stringValue = "A blunted blade Eirik keeps for teaching. It bruises; it does not cut.";
+        so.FindProperty("tier").intValue = 1;
+        so.FindProperty("weapon").objectReferenceValue = weapon;
+        so.ApplyModifiedPropertiesWithoutUndo();
+        EditorUtility.SetDirty(item);
+    }
+
     private static string WornSword()
     {
         const string weaponPath = "Assets/_Project/Data/Combat/Weapons/WornSword.asset";
@@ -305,6 +336,8 @@ public static class BuildPrologueMeadow
     private static void AxeNames()
     {
         var item = Load<ItemDefinition>("Assets/_Project/Data/Items/WoodsmansAxe.asset");
+        // The object kept its first name (StoneAxe), and every import warned that it doesn't match the file's name.
+        if (item.name != "WoodsmansAxe") item.name = "WoodsmansAxe";
         var so = new SerializedObject(item);
         so.FindProperty("displayName").stringValue = "Hand Axe";
         so.FindProperty("description").stringValue = "A compact one-handed fighting axe carried by forest expeditions. No use on a tree. Leaves a hand free for a torch.";
@@ -447,9 +480,9 @@ public static class BuildPrologueMeadow
 
     private static readonly (string quest, string ask, string text, string accept, string waiting, string thanks) LessonOffer =
         ("EirikLesson", "Show me how to use this.",
-            "Before you go in? Gladly. There is a dummy over there; hit it until your arm knows the way. Then I'll find you something that hits back, and we will see whether you can keep your teeth.",
+            "Before we set out? Gladly. Take this practice sword; it bruises, it doesn't cut. Hit the dummy by the fire until your arm knows the way, then come and try it on me.",
             "Show me.",
-            "Dummy first, then the rootling. Watch its shoulders: the blow is coming when they drop.",
+            "Dummy first, then me. Watch my shoulders: the blow is coming when they drop.",
             "You'll do. Better than most I have trained, worse than you will be. Take these; you will want them.");
 
     private static void Rewards(SerializedObject so, params (ItemDefinition item, int amount)[] rewards)
@@ -1119,14 +1152,7 @@ public static class BuildPrologueMeadow
         instance.transform.SetParent(root, false);
         instance.transform.position = at;
         Object.DestroyImmediate(instance.transform.Find("HealthBar").gameObject);
-        // Several passes: a component can't go before those that depend on it.
-        for (int pass = 0; pass < 3; pass++)
-        {
-            foreach (Component part in instance.GetComponents<Component>())
-            {
-                if (!(part is Transform)) Object.DestroyImmediate(part);
-            }
-        }
+        Strip(instance, false, part => false);
 
         var seat = Load<GameObject>("Assets/_Project/Prefabs/Environment/World/Rotting Log.prefab");
         foreach ((Vector2 offset, float turn) in new[] { (new Vector2(-3.4f, 0.8f), 80f), (new Vector2(0.8f, 3.5f), 170f) })
@@ -1802,12 +1828,48 @@ public static class BuildPrologueMeadow
         return go.transform;
     }
 
+    // Strips a prop's behaviour, a component only once nothing left on its object requires it: removing them in any order
+    // logged "Can't remove X because Y depends on it" on every rebuild (and left those for a later pass).
+    private static void Strip(GameObject prop, bool children, System.Func<Component, bool> keep)
+    {
+        for (int pass = 0; pass < 12; pass++)
+        {
+            bool removed = false;
+            foreach (Component part in children ? prop.GetComponentsInChildren<Component>(true) : prop.GetComponents<Component>())
+            {
+                if (part == null || part is Transform || keep(part) || IsRequired(part)) continue;
+                Object.DestroyImmediate(part);
+                removed = true;
+            }
+
+            if (!removed) break;
+        }
+    }
+
+    private static bool IsRequired(Component part)
+    {
+        foreach (Component other in part.GetComponents<Component>())
+        {
+            if (other == null || other == part) continue;
+            foreach (RequireComponent need in other.GetType().GetCustomAttributes(typeof(RequireComponent), true))
+            {
+                foreach (System.Type type in new[] { need.m_Type0, need.m_Type1, need.m_Type2 })
+                {
+                    if (type != null && type.IsInstanceOfType(part) && part.GetComponents(type).Length == 1) return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     private static Damageable Dummy(Transform root)
     {
         var dummy = (GameObject)PrefabUtility.InstantiatePrefab(Load<GameObject>("Assets/_Project/Prefabs/Enemies/TrainingDummy.prefab"));
         dummy.name = "Eirik's Dummy";
         dummy.transform.SetParent(root, false);
-        dummy.transform.position = Ground(-69f, -2f);
+        // By the morning camp, east of the fire: the lesson is before the road now (2026-11-09).
+        dummy.transform.position = Ground(Camp.x + 9f, Camp.y - 3f);
         dummy.transform.rotation = Quaternion.LookRotation(Vector3.back);
         return dummy.GetComponent<Damageable>();
     }
@@ -1821,14 +1883,7 @@ public static class BuildPrologueMeadow
         cart.transform.SetParent(root, false);
         cart.transform.position = Ground(Cart.x, Cart.y);
         cart.transform.rotation = Quaternion.Euler(0f, 55f, 16f);
-        for (int pass = 0; pass < 4; pass++)
-        {
-            foreach (Component part in cart.GetComponentsInChildren<Component>(true))
-            {
-                if (part is Transform || part is MeshFilter || part is MeshRenderer || part is LODGroup) continue;
-                Object.DestroyImmediate(part);
-            }
-        }
+        Strip(cart, true, part => part is MeshFilter || part is MeshRenderer || part is LODGroup);
 
         Bounds bounds = new Bounds(cart.transform.position, Vector3.one);
         foreach (Renderer renderer in cart.GetComponentsInChildren<Renderer>(true)) bounds.Encapsulate(renderer.bounds);
@@ -2028,10 +2083,9 @@ public static class BuildPrologueMeadow
 
         // ----- Eirik's lesson -----
         var lessonStory = Story(moments, "Story - A Lesson from Eirik");
-        var picked = new WhenQuestEvent { questEvent = Ev("WeaponChosen") };
-        var call = new WaitNode { seconds = 6f };
-        var invite = Aside(E(), "Before you go in: come and see me. A little practice now beats a lot of regret later.");
-        Link(lessonStory, (picked, 0, call), (call, 0, invite));
+        var taught = new WhenQuest { quest = lesson, when = WhenQuest.Moment.Starts };
+        var giveSword = new GiveItemsNode { equip = true, items = { new ItemAmount(Item("Weapons/PracticeSword"), 1) } };
+        Link(lessonStory, (taught, 0, giveSword));
         var struck = new WhenObjectHit { target = dummy, once = false };
         var countHit = new RaiseQuestEventNode { questEvent = Ev("LessonHit") };
         var dodged = new WhenPlayerDoes { move = WhenPlayerDoes.Move.Dodge, once = false };
@@ -2041,18 +2095,18 @@ public static class BuildPrologueMeadow
         var through = new WhenPlayerDoes { move = WhenPlayerDoes.Move.DodgeThroughABlow, once = false };
         var countBlock = new RaiseQuestEventNode { questEvent = Ev("LessonDefended") };
         var countBlock2 = new RaiseQuestEventNode { questEvent = Ev("LessonDefended") };
-        var felled = new WhenZoneCleared { zone = practice, once = false };
-        var countDone = new RaiseQuestEventNode { questEvent = Ev("LessonDone") };
-        Link(lessonStory, (struck, 0, countHit), (dodged, 0, lessonOn), (lessonOn, 1, countDodge), (parried, 0, countBlock), (through, 0, countBlock2), (felled, 0, countDone));
+        Link(lessonStory, (struck, 0, countHit), (dodged, 0, lessonOn), (lessonOn, 1, countDodge), (parried, 0, countBlock), (through, 0, countBlock2));
+        // The duel: Eirik himself, neither can die (whoever is worn to a quarter yields); lose, and he offers another go.
         var firstDodge = new WhenQuestEvent { questEvent = Ev("LessonDodged") };
-        var out1 = new SpawnEnemiesNode { zone = practice };
-        var tip = Aside(E(), "Good. Now something that hits back. When it winds up, raise your guard just before the blow, or roll through it.");
-        Link(lessonStory, (firstDodge, 0, out1), (firstDodge, 0, tip));
-        var learned = new WhenQuest { quest = lesson, when = WhenQuest.Moment.IsCompleted, once = false };
-        var clear1 = new DespawnEnemiesNode { zone = practice };
-        var goingIn = new WhenQuest { quest = Existing("FindShelter"), when = WhenQuest.Moment.Starts, once = false };
-        var clear2 = new DespawnEnemiesNode { zone = practice };
-        Link(lessonStory, (learned, 0, clear1), (goingIn, 0, clear2));
+        var tip = Aside(E(), "Good. Now me. When I wind up, raise your guard just before the blow, or roll through it.");
+        var squareUp = new WaitNode { seconds = 3f };
+        var duel = new SparNode { companion = eirik.GetComponent<Companion>(), yieldAt = 0.25f };
+        var yields = Aside(E(), "Enough, enough! I yield. You'll do.");
+        var countDone = new RaiseQuestEventNode { questEvent = Ev("LessonDone") };
+        var lost = Aside(E(), "Down you go. Catch your breath; we go again when you're ready.");
+        var again = new WaitNode { seconds = 5f };
+        Link(lessonStory, (firstDodge, 0, tip), (firstDodge, 0, squareUp), (squareUp, 0, duel), (duel, 0, yields), (duel, 0, countDone),
+            (duel, 1, lost), (lost, 0, again), (again, 0, duel));
 
         // ----- A moment of warmth, until the wolves -----
         var rest = Story(moments, "Story - A Moment of Warmth");
@@ -2138,7 +2192,10 @@ public static class BuildPrologueMeadow
         var step = new PlaySoundNode { sound = Load<SoundDefinition>("Assets/_Project/Audio/Sounds/Library/TrollStep.asset"), at = troll };
         var hurry = new WaitNode { seconds = 7f };
         var nearly = new SayNode { speaker = S(), line = "Almost! Hold it off, just a little longer!", afterFightPause = false };
-        Link(returns, (hold, 0, coming), (coming, 0, appear), (appear, 0, place), (place, 0, advance), (appear, 0, lit), (appear, 0, spotted), (appear, 0, tremble), (appear, 0, step), (appear, 0, hurry), (hurry, 0, nearly));
+        // A puppet while it is walked to the stones: its own mind would turn it on whoever is nearest instead (it was set
+        // in the scene by hand once, and a rebuild lost it; it lives here now).
+        var puppet = new CreatureHuntsNode { creature = troll.GetComponent<MonsterAI>(), hunt = false };
+        Link(returns, (hold, 0, coming), (coming, 0, appear), (appear, 0, puppet), (puppet, 0, place), (place, 0, advance), (puppet, 0, lit), (puppet, 0, spotted), (puppet, 0, tremble), (puppet, 0, step), (puppet, 0, hurry), (hurry, 0, nearly));
         var look = new FocusCameraNode { target = Mark(moments, "Between the Troll and the Stones", 2f, 12f), seconds = 4.5f, revealRadius = 22f };
         // The camera turns while it is still walking; the arm comes down as the minute runs out (40 + 19 + 0.8 + a moment).
         var turnToLook = new WaitNode { seconds = 15.5f };
@@ -2149,7 +2206,7 @@ public static class BuildPrologueMeadow
         var crash = new ShakeCameraNode { strength = 1f };
         var flash = new LightningNode();
         var boom = new PlaySoundNode { sound = Load<SoundDefinition>("Assets/_Project/Audio/Sounds/Library/Thunder.asset"), at = troll };
-        Link(returns, (appear, 0, turnToLook), (turnToLook, 0, look), (advance, 0, swing), (advance, 0, blow), (blow, 0, crash), (blow, 0, flash), (blow, 0, boom));
+        Link(returns, (puppet, 0, turnToLook), (turnToLook, 0, look), (advance, 0, swing), (advance, 0, blow), (blow, 0, crash), (blow, 0, flash), (blow, 0, boom));
     }
 
     /// <summary>The portal remembers why the player came (`--entry BuildPrologueMeadow.HomeEcho`). In SafeHaven, under Home Moments: it speaks once the Waking is over.</summary>
