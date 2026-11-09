@@ -83,8 +83,9 @@ public sealed class InputActionsTests : InputTestFixture
         {
             (Key.E, GameInput.Interact), (Key.Space, GameInput.Dodge), (Key.LeftCtrl, GameInput.Sneak),
             (Key.Tab, GameInput.ToggleCombat), (Key.Z, GameInput.SwapWeapon), (Key.L, GameInput.ToggleTorch),
-            (Key.Q, GameInput.Skill(0)), (Key.R, GameInput.Skill(1)), (Key.F, GameInput.Skill(2)), (Key.X, GameInput.Skill(3)),
-            (Key.T, GameInput.Skill(4)), (Key.Digit1, GameInput.Skill(0)), (Key.Digit5, GameInput.Skill(4)),
+            (Key.Digit1, GameInput.Skill(0)), (Key.Digit2, GameInput.Skill(1)), (Key.Digit3, GameInput.Skill(2)),
+            (Key.Digit4, GameInput.Skill(3)), (Key.Digit5, GameInput.Skill(4)), (Key.Numpad1, GameInput.Skill(0)),
+            (Key.Numpad5, GameInput.Skill(4)), (Key.F, GameInput.QuickItems), (Key.LeftAlt, GameInput.CommandWheel),
             (Key.I, GameInput.Inventory), (Key.B, GameInput.Items), (Key.K, GameInput.Skills), (Key.C, GameInput.Character),
             (Key.G, GameInput.Build), (Key.N, GameInput.Talents), (Key.H, GameInput.Haven), (Key.M, GameInput.WorldMap),
             (Key.V, GameInput.CameraToggleStyle), (Key.LeftShift, GameInput.BuildFineRotate), (Key.LeftAlt, GameInput.BuildFreePlace),
@@ -173,8 +174,10 @@ public sealed class InputActionsTests : InputTestFixture
         InputSystem.AddDevice<Keyboard>();
         InputSystem.AddDevice<Mouse>();
 
-        Assert.AreEqual("Q", PlayerInputHandler.SkillKeyLabel(0));
-        Assert.AreEqual("T", PlayerInputHandler.SkillKeyLabel(4));
+        // The skill bar is on the number keys (2026-11-09); F is the quickbar's.
+        Assert.AreEqual("1", PlayerInputHandler.SkillKeyLabel(0));
+        Assert.AreEqual("5", PlayerInputHandler.SkillKeyLabel(4));
+        Assert.AreEqual("F", GameInput.KeyLabel(GameInput.QuickItems));
         Assert.AreEqual("Z", GameInput.KeyLabel(GameInput.SwapWeapon));
         Assert.AreEqual("", GameInput.KeyLabel(null));
     }

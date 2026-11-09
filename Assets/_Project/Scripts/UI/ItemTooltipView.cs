@@ -32,7 +32,8 @@ public sealed class ItemTooltipView : MonoBehaviour
         Hide();
     }
 
-    public void Show(ItemStack stack)
+    /// <param name="footer">An extra last line from the screen showing it (the bag's quickbar hint), or null.</param>
+    public void Show(ItemStack stack, string footer = null)
     {
         if (stack.IsEmpty)
         {
@@ -41,7 +42,8 @@ public sealed class ItemTooltipView : MonoBehaviour
         }
 
         ItemDefinition item = stack.Item;
-        Show(stack.DisplayName, Rarity.ColorOf(item.Rarity), Describe(item, stack));
+        string text = Describe(item, stack);
+        Show(stack.DisplayName, Rarity.ColorOf(item.Rarity), string.IsNullOrEmpty(footer) ? text : text + "\n" + footer);
         Header(item.Rarity, stack.Quality);
     }
 

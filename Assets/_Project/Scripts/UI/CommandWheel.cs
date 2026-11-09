@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>Hold Alt to issue one shared order to the companions, use a carried consumable, or (hovering Emotes) make a
-/// gesture.</summary>
+/// gesture. Hold F for the quickbar: the favourites picked in the bag, each in its own place.</summary>
 [DisallowMultipleComponent]
 public sealed class CommandWheel : MonoBehaviour
 {
@@ -27,12 +27,15 @@ public sealed class CommandWheel : MonoBehaviour
         public readonly Action Select;
         /// <summary>Hovered for a moment, it turns the wheel to another page instead of being chosen on release.</summary>
         public readonly Action Opens;
+        /// <summary>Shown greyed (a quickbar item with none left): it keeps its place, and choosing it only says so.</summary>
+        public readonly bool Dimmed;
 
-        public Choice(string label, Action select, Action opens = null)
+        public Choice(string label, Action select, Action opens = null, bool dimmed = false)
         {
             Label = label;
             Select = select;
             Opens = opens;
+            Dimmed = dimmed;
         }
     }
 
@@ -89,6 +92,39 @@ public sealed class CommandWheel : MonoBehaviour
 
         BuildChoices();
         ShowPage("Choose");
+    }
+
+    /// <summary>Opens the quickbar: the bag's favourites in their own places, with how many are carried. One with none left
+    /// stays where it is, greyed, so nothing moves under the player's hand.</summary>
+    public void OpenQuickItems()
+    {
+        if (GamePause.IsPaused || BuildPlacer.IsBusy || DialogueBox.IsSpeaking ||
+            (UIStateManager.Current != null && UIStateManager.Current.IsAnyWindowOpen))
+        {
+            return;
+        }
+
+        ItemInventory inventory = Player.Current != null ? Player.Current.Bag : null;
+        if (inventory == null)
+        {
+            return;
+        }
+
+        choices.Clear();
+        foreach (ItemDefinition item in inventory.Quick.Items)
+        {
+            ItemDefinition chosen = item;
+            int carried = inventory.CountCarried(chosen);
+            choices.Add(new Choice($"{chosen.DisplayName} x{carried}", () => inventory.UseFirst(chosen), dimmed: carried <= 0));
+        }
+
+        if (choices.Count == 0)
+        {
+            GameMessages.Post($"Your quickbar is empty. In the bag, point at something to use and press {GameInput.KeyLabel(GameInput.QuickItems)}.", MessageKind.Info);
+            return;
+        }
+
+        ShowPage("Quickbar");
     }
 
     // Lays out the choices just built as a fresh page of the open wheel.
@@ -351,8 +387,9 @@ public sealed class CommandWheel : MonoBehaviour
         for (int i = 0; i < choices.Count; i++)
         {
             bool active = i == selected;
-            slots[i].color = active ? style.Accent : style.Control;
-            labels[i].color = active ? style.Panel : style.Text;
+            bool dimmed = choices[i].Dimmed;
+            slots[i].color = active ? (dimmed ? style.Muted : style.Accent) : style.Control;
+            labels[i].color = active ? style.Panel : dimmed ? style.Muted : style.Text;
             slots[i].transform.localScale = Vector3.one * (active ? 1.12f : 1f);
         }
 

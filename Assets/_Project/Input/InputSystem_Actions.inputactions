@@ -241,6 +241,15 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "QuickItems",
+                    "type": "Button",
+                    "id": "e5363d69-9499-41e5-9983-4a92e2a718f3",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "Ping",
                     "type": "Button",
                     "id": "b52aa97f-3bd1-4f53-b0af-0dd85090b31a",
@@ -550,8 +559,8 @@
                 },
                 {
                     "name": "",
-                    "id": "d9f968af-c3ff-4d34-9b26-c53ed997c9bf",
-                    "path": "<Keyboard>/q",
+                    "id": "e29c9284-b68e-43fa-a26b-175eb2cf08ae",
+                    "path": "<Keyboard>/1",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
@@ -561,8 +570,8 @@
                 },
                 {
                     "name": "",
-                    "id": "e29c9284-b68e-43fa-a26b-175eb2cf08ae",
-                    "path": "<Keyboard>/1",
+                    "id": "9508fcf0-48fb-4094-9138-096409efdd48",
+                    "path": "<Keyboard>/numpad1",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
@@ -583,8 +592,8 @@
                 },
                 {
                     "name": "",
-                    "id": "15096cb4-0b29-48fa-a690-bd9b054041a1",
-                    "path": "<Keyboard>/r",
+                    "id": "5657956d-14c0-4b0c-aa8b-f26b6dbe9672",
+                    "path": "<Keyboard>/2",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
@@ -594,8 +603,8 @@
                 },
                 {
                     "name": "",
-                    "id": "5657956d-14c0-4b0c-aa8b-f26b6dbe9672",
-                    "path": "<Keyboard>/2",
+                    "id": "7d95415e-ee95-4780-9066-f22c4a29aef0",
+                    "path": "<Keyboard>/numpad2",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
@@ -616,8 +625,8 @@
                 },
                 {
                     "name": "",
-                    "id": "cbd5f940-3202-4958-a60d-2a85538a528b",
-                    "path": "<Keyboard>/f",
+                    "id": "9976b761-913f-47c0-b542-35dad9fcd92c",
+                    "path": "<Keyboard>/3",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
@@ -627,8 +636,8 @@
                 },
                 {
                     "name": "",
-                    "id": "9976b761-913f-47c0-b542-35dad9fcd92c",
-                    "path": "<Keyboard>/3",
+                    "id": "4c9decfc-543e-4bfb-ad28-9c43e259502a",
+                    "path": "<Keyboard>/numpad3",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
@@ -649,8 +658,8 @@
                 },
                 {
                     "name": "",
-                    "id": "17f8f859-305c-4da6-91f7-26619383451d",
-                    "path": "<Keyboard>/x",
+                    "id": "16105b4b-49dd-41f8-b0af-e637c7f73e78",
+                    "path": "<Keyboard>/4",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
@@ -660,8 +669,8 @@
                 },
                 {
                     "name": "",
-                    "id": "16105b4b-49dd-41f8-b0af-e637c7f73e78",
-                    "path": "<Keyboard>/4",
+                    "id": "bd5f9142-840f-4c29-82c5-1c0166d3a958",
+                    "path": "<Keyboard>/numpad4",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
@@ -682,8 +691,8 @@
                 },
                 {
                     "name": "",
-                    "id": "e2399c6f-07e1-437c-b55a-bb59759f3bcf",
-                    "path": "<Keyboard>/t",
+                    "id": "e8c5fe67-b497-4eb4-a17d-556eab1484a1",
+                    "path": "<Keyboard>/5",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
@@ -693,8 +702,8 @@
                 },
                 {
                     "name": "",
-                    "id": "e8c5fe67-b497-4eb4-a17d-556eab1484a1",
-                    "path": "<Keyboard>/5",
+                    "id": "79fa0138-e254-4ca5-aa0e-572f1609e945",
+                    "path": "<Keyboard>/numpad5",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
@@ -864,6 +873,17 @@
                     "processors": "",
                     "groups": "Keyboard&Mouse",
                     "action": "CommandWheel",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "36058980-feca-4faf-a47e-4a11729d2e29",
+                    "path": "<Keyboard>/f",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "QuickItems",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

@@ -56,6 +56,8 @@ public sealed class PlayerInputHandler : MonoBehaviour
             commandWheel = gameObject.AddComponent<CommandWheel>();
         }
 
+        ItemUseBar.For(gameObject);
+
         if (!TryGetComponent(out EnemyVisibility _))
         {
             gameObject.AddComponent<EnemyVisibility>();
@@ -235,6 +237,8 @@ public sealed class PlayerInputHandler : MonoBehaviour
         Hook(GameInput.WorldMap, OnWorldMap, on);
         Hook(GameInput.CommandWheel, OnCommandWheel, on);
         Hook(GameInput.CommandWheel, OnCommandWheelReleased, on, performed: false, canceled: true);
+        Hook(GameInput.QuickItems, OnQuickItems, on);
+        Hook(GameInput.QuickItems, OnCommandWheelReleased, on, performed: false, canceled: true);
         for (int i = 0; i < skillCallbacks.Length; i++)
         {
             Hook(GameInput.Skill(i), skillCallbacks[i], on);
@@ -312,6 +316,8 @@ public sealed class PlayerInputHandler : MonoBehaviour
     }
 
     private void OnCommandWheel(InputAction.CallbackContext context) => commandWheel?.Open();
+
+    private void OnQuickItems(InputAction.CallbackContext context) => commandWheel?.OpenQuickItems();
 
     private void OnCommandWheelReleased(InputAction.CallbackContext context) => commandWheel?.CloseAndExecute();
 

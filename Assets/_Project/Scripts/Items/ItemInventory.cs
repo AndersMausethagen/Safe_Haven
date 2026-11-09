@@ -33,6 +33,12 @@ public sealed class ItemInventory : MonoBehaviour
     private Damageable health;
     private int bonusSlots;
 
+    /// <summary>The favourites on the quickbar (hold F). Which items, not the stacks: those stay in the bag.</summary>
+    public QuickItems Quick { get; } = new QuickItems();
+
+    /// <summary>Something was used from the bag or the pocket (it worked): the item and where it was. Screens show it.</summary>
+    public event Action<ItemDefinition, ItemContainer, int> ItemUsed;
+
     /// <summary>Created on first use so other components can reach it regardless of Awake order.</summary>
     public ItemContainer Container
     {
@@ -167,6 +173,47 @@ public sealed class ItemInventory : MonoBehaviour
     /// aren't wasted. Returns true when something happened.
     /// </summary>
     public bool Use(ItemContainer from, int slot)
+    {
+        ItemStack used = from != null ? from.GetSlot(slot) : ItemStack.Empty;
+        bool worked = UseStack(from, slot);
+        if (worked && !used.IsEmpty)
+        {
+            ItemUsed?.Invoke(used.Item, from, slot);
+        }
+
+        return worked;
+    }
+
+    /// <summary>Uses one of <paramref name="item"/> from the bag, else the safe pocket (the quickbar). False when there is
+    /// none, with a word to the player.</summary>
+    public bool UseFirst(ItemDefinition item)
+    {
+        if (item == null)
+        {
+            return false;
+        }
+
+        foreach (ItemContainer source in new[] { Container, SafePocket })
+        {
+            for (int i = 0; source != null && i < source.UnlockedSlots; i++)
+            {
+                ItemStack stack = source.GetSlot(i);
+                if (!stack.IsEmpty && stack.Item == item)
+                {
+                    return Use(source, i);
+                }
+            }
+        }
+
+        GameMessages.Post($"No {item.DisplayName} left.", MessageKind.Warning);
+        return false;
+    }
+
+    /// <summary>How many of <paramref name="item"/> the bag and the safe pocket hold together.</summary>
+    public int CountCarried(ItemDefinition item) =>
+        item == null ? 0 : Container.Count(item) + (SafePocket != null ? SafePocket.Count(item) : 0);
+
+    private bool UseStack(ItemContainer from, int slot)
     {
         ItemStack stack = from != null ? from.GetSlot(slot) : ItemStack.Empty;
         if (stack.IsEmpty)

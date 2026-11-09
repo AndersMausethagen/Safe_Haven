@@ -57,7 +57,8 @@ public sealed class ItemSlotView : MonoBehaviour,
 
     /// <param name="isLocked">Shows the slot as locked: it keeps its item but can take no new ones.</param>
     /// <param name="isEquipped">Highlights the slot as the equipped weapon.</param>
-    public void Show(ItemStack stack, bool isLocked = false, bool isEquipped = false)
+    /// <param name="isQuick">Marks the item as one on the quickbar (a small amber dot by its tier).</param>
+    public void Show(ItemStack stack, bool isLocked = false, bool isEquipped = false, bool isQuick = false)
     {
         filled = !stack.IsEmpty;
         locked = isLocked;
@@ -89,6 +90,11 @@ public sealed class ItemSlotView : MonoBehaviour,
         {
             string rare = filled && GameOptions.RarityLetters.On && stack.Item.Rarity != ItemRarity.Common ? Rarity.NameOf(stack.Item.Rarity).Substring(0, 1) : "";
             tierLabel.text = rare.Length > 0 ? $"{GearGlow.CornerText(stack)} {rare}" : GearGlow.CornerText(stack);
+            if (filled && isQuick)
+            {
+                tierLabel.text = $"<color={UIStyle.Current.AccentHex}>\u2022</color> {tierLabel.text}".TrimEnd();
+            }
+
             tierLabel.color = filled ? Tiers.ColorOf(stack.Item.Tier) : Color.clear;
         }
 

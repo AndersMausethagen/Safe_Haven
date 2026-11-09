@@ -63,6 +63,7 @@ public static class InputRebinds
         new RebindRow("Windows", "Haven", "Player/Haven"),
         new RebindRow("Windows", "World Map", "Player/WorldMap"),
         new RebindRow("Windows", "Command Wheel", "Player/CommandWheel"),
+        new RebindRow("Windows", "Quickbar (hold; in the bag: add or remove)", "Player/QuickItems"),
         new RebindRow("Windows", "Mark for Friends (co-op)", "Player/Ping"),
 
         new RebindRow("Camera and Building", "Camera Style", "Camera/ToggleStyle"),

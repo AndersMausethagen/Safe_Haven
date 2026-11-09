@@ -83,6 +83,18 @@ public static class SaveMapper
                 data.player.knownBuildings.Add(building.Id);
             }
 
+            if (player.QuickBar != null)
+            {
+                data.player.quickItems = new List<string>();
+                foreach (ItemDefinition item in player.QuickBar)
+                {
+                    if (item != null)
+                    {
+                        data.player.quickItems.Add(item.Id);
+                    }
+                }
+            }
+
             PlayerSnapshot.Condition state = player.State;
             data.player.hasNeeds = state.HasNeeds;
             data.player.hunger = state.Hunger;
@@ -553,6 +565,20 @@ public static class SaveMapper
             : new PlayerSnapshot.Condition { EquippedSlot = player.equippedSlot };
         ItemContainer gear = player.hasGear ? ReadSlots(player.gear ?? new List<SlotSaveData>(), new ItemContainer(GearSlots.Count, 1), content, loaded.MissingContent) : null;
         loaded.Player = PlayerSnapshot.Capture(bag, resources, known, ReadPocket(player.safePocket, content, loaded.MissingContent), buildings, state, gear);
+        if (player.quickItems != null)
+        {
+            var quick = new List<ItemDefinition>();
+            foreach (string id in player.quickItems)
+            {
+                ItemDefinition item = Resolve(content.FindItem(id), "item", id, loaded.MissingContent);
+                if (item != null)
+                {
+                    quick.Add(item);
+                }
+            }
+
+            loaded.Player.WithQuickItems(quick);
+        }
 
         StashSaveData stash = data.stash ?? new StashSaveData();
         loaded.Stash = new StashStorage();

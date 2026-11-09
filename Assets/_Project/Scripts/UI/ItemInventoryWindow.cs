@@ -84,6 +84,8 @@ public sealed class ItemInventoryWindow : MonoBehaviour, IItemSlotHandler
 
         container.SlotChanged += OnSlotChanged;
         container.LayoutChanged += OnLayoutChanged;
+        inventory.Quick.Changed += OnQuickChanged;
+        inventory.ItemUsed += OnItemUsed;
         container.WeightChanged += RefreshGathering;
         if (pocket != null)
         {
@@ -137,6 +139,12 @@ public sealed class ItemInventoryWindow : MonoBehaviour, IItemSlotHandler
             equipment.Changed -= OnEquipmentChanged;
         }
 
+        if (inventory != null)
+        {
+            inventory.Quick.Changed -= OnQuickChanged;
+            inventory.ItemUsed -= OnItemUsed;
+        }
+
         CancelDrag();
         hovered = null;
         tooltip?.Hide();
@@ -147,6 +155,10 @@ public sealed class ItemInventoryWindow : MonoBehaviour, IItemSlotHandler
         UpdateLayout();
         Vector2 pointer = GameInput.PointerPosition;
         tooltip.Follow(pointer);
+        if (hovered != null && dragFrom < 0 && QuickKeyPressed())
+        {
+            ToggleQuick(ContainerOf(hovered).GetSlot(hovered.Index));
+        }
 
         // Recipes depend on what is carried, so they are rechecked now and then while the window is open.
         if (recipesDirty || Time.unscaledTime >= nextRecipeRefresh)
@@ -203,7 +215,12 @@ public sealed class ItemInventoryWindow : MonoBehaviour, IItemSlotHandler
         }
 
         ItemContainer owner = ContainerOf(slot);
-        if (eventData.button == PointerEventData.InputButton.Right)
+        if (eventData.button == PointerEventData.InputButton.Left && eventData.clickCount == 2 && !GameInput.SplitModifier.IsPressed())
+        {
+            // A double-click uses it too, for those who reach for the left button.
+            inventory.Use(owner, slot.Index);
+        }
+        else if (eventData.button == PointerEventData.InputButton.Right)
         {
             if (GameInput.DiscardModifier.IsPressed())
             {
@@ -268,7 +285,8 @@ public sealed class ItemInventoryWindow : MonoBehaviour, IItemSlotHandler
         hovered = slot;
         if (dragFrom < 0)
         {
-            tooltip.Show(ContainerOf(slot).GetSlot(slot.Index));
+            ItemStack stack = ContainerOf(slot).GetSlot(slot.Index);
+            tooltip.Show(stack, QuickHint(stack));
         }
     }
 
@@ -278,6 +296,108 @@ public sealed class ItemInventoryWindow : MonoBehaviour, IItemSlotHandler
         {
             hovered = null;
             tooltip.Hide();
+        }
+    }
+
+    // ----- Quickbar and use feedback -----
+
+    // The Player map is off while a window is open, so the quickbar key is read from its bound controls (rebinds included).
+    private static bool QuickKeyPressed()
+    {
+        InputAction action = GameInput.QuickItems;
+        if (action == null)
+        {
+            return false;
+        }
+
+        foreach (InputControl control in action.controls)
+        {
+            if (control is UnityEngine.InputSystem.Controls.ButtonControl button && button.wasPressedThisFrame)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private string QuickHint(ItemStack stack)
+    {
+        if (stack.IsEmpty || !QuickItems.Accepts(stack.Item))
+        {
+            return null;
+        }
+
+        string key = GameInput.KeyLabel(GameInput.QuickItems);
+        return inventory.Quick.Contains(stack.Item)
+            ? $"<color={UIStyle.Current.AccentHex}>On the quickbar (hold {key}). {key}: take it off.</color>"
+            : $"<color={UIStyle.Current.MutedHex}>{key}: add to the quickbar (hold {key} to use it anywhere).</color>";
+    }
+
+    private void ToggleQuick(ItemStack stack)
+    {
+        if (stack.IsEmpty)
+        {
+            return;
+        }
+
+        string key = GameInput.KeyLabel(GameInput.QuickItems);
+        if (!QuickItems.Accepts(stack.Item))
+        {
+            GameMessages.Post("Only things you can use go on the quickbar.", MessageKind.Warning);
+        }
+        else if (inventory.Quick.Toggle(stack.Item))
+        {
+            GameMessages.Post($"{stack.Item.DisplayName} is on the quickbar: hold {key} to use it.", MessageKind.Info);
+        }
+        else if (inventory.Quick.IsFull && !inventory.Quick.Contains(stack.Item))
+        {
+            GameMessages.Post($"The quickbar is full ({QuickItems.Capacity}). Take something off it first.", MessageKind.Warning);
+        }
+        else
+        {
+            GameMessages.Post($"{stack.Item.DisplayName} is off the quickbar.", MessageKind.Info);
+        }
+    }
+
+    private void OnQuickChanged()
+    {
+        ShowAll(container, slots);
+        if (pocket != null)
+        {
+            ShowAll(pocket, pocketSlots);
+        }
+
+        if (hovered != null && dragFrom < 0)
+        {
+            ItemStack stack = ContainerOf(hovered).GetSlot(hovered.Index);
+            tooltip.Show(stack, QuickHint(stack));
+        }
+    }
+
+    // Used from this window: its slot gives a little jump, so the right-click is seen to have worked (the use bar says what).
+    private void OnItemUsed(ItemDefinition item, ItemContainer from, int index)
+    {
+        List<ItemSlotView> views = from == container ? slots : from == pocket ? pocketSlots : null;
+        if (views != null && index >= 0 && index < views.Count && isActiveAndEnabled)
+        {
+            StartCoroutine(Pulse((RectTransform)views[index].transform));
+        }
+    }
+
+    private static System.Collections.IEnumerator Pulse(RectTransform slot)
+    {
+        const float seconds = 0.28f;
+        for (float t = 0f; t < seconds && slot != null; t += Time.unscaledDeltaTime)
+        {
+            float k = t / seconds;
+            slot.localScale = Vector3.one * (1f + 0.18f * Mathf.Sin(k * Mathf.PI));
+            yield return null;
+        }
+
+        if (slot != null)
+        {
+            slot.localScale = Vector3.one;
         }
     }
 
@@ -354,7 +474,8 @@ public sealed class ItemInventoryWindow : MonoBehaviour, IItemSlotHandler
     {
         for (int i = 0; i < views.Count; i++)
         {
-            views[i].Show(source.GetSlot(i), !source.IsUnlocked(i), false);
+            ItemStack stack = source.GetSlot(i);
+            views[i].Show(stack, !source.IsUnlocked(i), false, !stack.IsEmpty && inventory.Quick.Contains(stack.Item));
         }
     }
 
@@ -375,10 +496,11 @@ public sealed class ItemInventoryWindow : MonoBehaviour, IItemSlotHandler
     {
         if (index >= 0 && index < views.Count)
         {
-            views[index].Show(source.GetSlot(index), !source.IsUnlocked(index), false);
+            ItemStack stack = source.GetSlot(index);
+            views[index].Show(stack, !source.IsUnlocked(index), false, !stack.IsEmpty && inventory.Quick.Contains(stack.Item));
             if (hovered == views[index] && dragFrom < 0)
             {
-                tooltip.Show(source.GetSlot(index));
+                tooltip.Show(stack, QuickHint(stack));
             }
         }
 

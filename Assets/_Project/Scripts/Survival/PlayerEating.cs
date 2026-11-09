@@ -25,6 +25,9 @@ public sealed class PlayerEating : MonoBehaviour
 
     public bool IsEating => eating != null;
 
+    /// <summary>How far through the current meal or draught, 0-1 (0 when not eating). The use bar shows it.</summary>
+    public float Progress => IsEating ? Mathf.Clamp01(1f - (doneAt - Time.time) / Mathf.Max(0.01f, Rules.EatSeconds)) : 0f;
+
     /// <summary>The meal being eaten, or null.</summary>
     public ItemDefinition Meal => eating;
 

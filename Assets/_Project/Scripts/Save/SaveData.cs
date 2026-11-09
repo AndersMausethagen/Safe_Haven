@@ -282,6 +282,8 @@ public sealed class PlayerSaveData
     public bool hasGear;
     /// <summary>Worn gear; slot is the GearSlot.</summary>
     public List<SlotSaveData> gear = new List<SlotSaveData>();
+    /// <summary>The quickbar's items (hold F), by item id, in order. Missing in older saves.</summary>
+    public List<string> quickItems;
 }
 
 [Serializable]

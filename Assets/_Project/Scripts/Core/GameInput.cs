@@ -43,6 +43,8 @@ public static class GameInput
     public static InputAction Haven => Find("Player/Haven");
     public static InputAction WorldMap => Find("Player/WorldMap");
     public static InputAction CommandWheel => Find("Player/CommandWheel");
+    /// <summary>Hold for the quickbar wheel; in the bag, tap over an item to put it on the quickbar or take it off.</summary>
+    public static InputAction QuickItems => Find("Player/QuickItems");
     /// <summary>Co-op: mark what is under the crosshair for friends (CoopPings).</summary>
     public static InputAction Ping => Find("Player/Ping");
 
