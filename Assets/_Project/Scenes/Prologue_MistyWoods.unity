@@ -8020,6 +8020,7 @@ MonoBehaviour:
     music:
       tracks: []
       order: 0
+    fightsInterrupt: 0
     weatherSystem: {fileID: 0}
     weather: {fileID: 0}
     transitionSeconds: 0
@@ -8037,6 +8038,7 @@ MonoBehaviour:
     music:
       tracks: []
       order: 0
+    fightsInterrupt: 0
     weatherSystem: {fileID: 0}
     weather: {fileID: 0}
     transitionSeconds: 0
@@ -11136,7 +11138,7 @@ MonoBehaviour:
         position: {x: 340, y: 60}
         route: {fileID: 775170817}
         companions: []
-        pace: 2
+        pace: 3.5
         waitForPlayer: 22
         waitUntilArrived: 1
     - rid: 2623125860895687576
@@ -11357,7 +11359,7 @@ MonoBehaviour:
         position: {x: 1540, y: 740}
         route: {fileID: 552861943}
         companions: []
-        pace: 2
+        pace: 3.5
         waitForPlayer: 22
         waitUntilArrived: 1
     - rid: 2623125860895687600
@@ -12141,6 +12143,7 @@ MonoBehaviour:
             volume: 1
             startAt: 0
           order: 0
+        fightsInterrupt: 0
     - rid: 2623125860895687466
       type: {class: RevealGroundNode, ns: , asm: SafeHaven}
       data:
@@ -12717,8 +12720,14 @@ MonoBehaviour:
     answer: Someone is paying. And I would rather know what is coming out of there than wait for it to find me.
     raises: {fileID: 0}
   alchemist: 0
+  lowHealth: 0.5
+  healShare: 0.35
   supportInterval: 6
-  supportAmount: 8
+  supportReach: 12
+  healLines:
+  - Hold still. Drink this.
+  - You're bleeding. Here.
+  - Not yet, you don't. Drink.
 --- !u!114 &334759805
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -16725,6 +16734,7 @@ MonoBehaviour:
     music:
       tracks: []
       order: 0
+    fightsInterrupt: 0
     weatherSystem: {fileID: 0}
     weather: {fileID: 0}
     transitionSeconds: 0
@@ -20056,6 +20066,7 @@ MonoBehaviour:
     music:
       tracks: []
       order: 0
+    fightsInterrupt: 0
     weatherSystem: {fileID: 0}
     weather: {fileID: 0}
     transitionSeconds: 10
@@ -20073,6 +20084,7 @@ MonoBehaviour:
     music:
       tracks: []
       order: 0
+    fightsInterrupt: 0
     weatherSystem: {fileID: 1564691422}
     weather: {fileID: 11400000, guid: ac800fba89188184986f338827a9d29a, type: 2}
     transitionSeconds: 14
@@ -20090,6 +20102,7 @@ MonoBehaviour:
     music:
       tracks: []
       order: 0
+    fightsInterrupt: 0
     weatherSystem: {fileID: 1564691422}
     weather: {fileID: 11400000, guid: ac800fba89188184986f338827a9d29a, type: 2}
     transitionSeconds: 4
@@ -20102,11 +20115,15 @@ MonoBehaviour:
     hour: 23
     look: {fileID: 1987402905}
     lookAmount: 1
-  - kind: 1
+  - kind: 0
     sceneAudio: {fileID: 1874386228}
     music:
-      tracks: []
+      tracks:
+      - clip: {fileID: 8300000, guid: d33bd38e4b80c7b44b05a8bbae974df8, type: 3}
+        volume: 1
+        startAt: 0
       order: 0
+    fightsInterrupt: 1
     weatherSystem: {fileID: 1564691422}
     weather: {fileID: 11400000, guid: ac800fba89188184986f338827a9d29a, type: 2}
     transitionSeconds: 4
@@ -20124,6 +20141,7 @@ MonoBehaviour:
     music:
       tracks: []
       order: 0
+    fightsInterrupt: 0
     weatherSystem: {fileID: 1564691422}
     weather: {fileID: 11400000, guid: ac800fba89188184986f338827a9d29a, type: 2}
     transitionSeconds: 4
@@ -20141,6 +20159,7 @@ MonoBehaviour:
     music:
       tracks: []
       order: 0
+    fightsInterrupt: 0
     weatherSystem: {fileID: 1564691422}
     weather: {fileID: 11400000, guid: ac800fba89188184986f338827a9d29a, type: 2}
     transitionSeconds: 4
@@ -20158,6 +20177,7 @@ MonoBehaviour:
     music:
       tracks: []
       order: 0
+    fightsInterrupt: 0
     weatherSystem: {fileID: 1564691422}
     weather: {fileID: 11400000, guid: ac800fba89188184986f338827a9d29a, type: 2}
     transitionSeconds: 4
@@ -20175,6 +20195,7 @@ MonoBehaviour:
     music:
       tracks: []
       order: 0
+    fightsInterrupt: 0
     weatherSystem: {fileID: 1564691422}
     weather: {fileID: 11400000, guid: ac800fba89188184986f338827a9d29a, type: 2}
     transitionSeconds: 4
@@ -29603,8 +29624,14 @@ MonoBehaviour:
   campTopics: []
   morningTopics: []
   alchemist: 0
+  lowHealth: 0.5
+  healShare: 0.35
   supportInterval: 6
-  supportAmount: 8
+  supportReach: 12
+  healLines:
+  - Hold still. Drink this.
+  - You're bleeding. Here.
+  - Not yet, you don't. Drink.
 --- !u!114 &786901627
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -30495,8 +30522,14 @@ MonoBehaviour:
     answer: Once, as a boy, with my sister. Spruce, moss, the quiet you get in old woods. Nothing in it frightened me but the dark. I would like that to still be true.
     raises: {fileID: 0}
   alchemist: 0
+  lowHealth: 0.5
+  healShare: 0.35
   supportInterval: 6
-  supportAmount: 8
+  supportReach: 12
+  healLines:
+  - Hold still. Drink this.
+  - You're bleeding. Here.
+  - Not yet, you don't. Drink.
 --- !u!114 &810501269
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -33227,6 +33260,7 @@ MonoBehaviour:
           job: {fileID: 0}
           breach: {fileID: 0}
           rank: 1
+          tier: 2
           bringHome: 0
           countAlreadyOwned: 0
     - rid: 2623125951272714347
@@ -33253,6 +33287,7 @@ MonoBehaviour:
           job: {fileID: 0}
           breach: {fileID: 0}
           rank: 1
+          tier: 2
           bringHome: 0
           countAlreadyOwned: 0
     - rid: 2623125951272714348
@@ -33279,6 +33314,7 @@ MonoBehaviour:
           job: {fileID: 0}
           breach: {fileID: 0}
           rank: 1
+          tier: 2
           bringHome: 0
           countAlreadyOwned: 0
 --- !u!114 &874362784
@@ -37093,8 +37129,14 @@ MonoBehaviour:
     answer: Because the only old things out there are stones and roots, and the marks on them are older than any village. Whatever is wrong, I expect to find it written down.
     raises: {fileID: 0}
   alchemist: 1
+  lowHealth: 0.5
+  healShare: 0.35
   supportInterval: 6
-  supportAmount: 8
+  supportReach: 12
+  healLines:
+  - Hold still. Drink this.
+  - You're bleeding. Here.
+  - Not yet, you don't. Drink.
 --- !u!114 &983162861
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -46793,6 +46835,8 @@ MonoBehaviour:
         creature: {fileID: 1803281365}
         hunt: 0
         towards: {fileID: 0}
+        walkSpeed: 1
+        stayWithin: 0
 --- !u!114 &1226592531
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -57682,8 +57726,14 @@ MonoBehaviour:
   campTopics: []
   morningTopics: []
   alchemist: 0
+  lowHealth: 0.5
+  healShare: 0.35
   supportInterval: 6
-  supportAmount: 8
+  supportReach: 12
+  healLines:
+  - Hold still. Drink this.
+  - You're bleeding. Here.
+  - Not yet, you don't. Drink.
 --- !u!114 &1447795153
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -63979,8 +64029,14 @@ MonoBehaviour:
   campTopics: []
   morningTopics: []
   alchemist: 0
+  lowHealth: 0.5
+  healShare: 0.35
   supportInterval: 6
-  supportAmount: 8
+  supportReach: 12
+  healLines:
+  - Hold still. Drink this.
+  - You're bleeding. Here.
+  - Not yet, you don't. Drink.
 --- !u!114 &1606609655
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -72186,6 +72242,7 @@ MonoBehaviour:
         volume: 1
         startAt: 0
       order: 0
+    fightsInterrupt: 0
     weatherSystem: {fileID: 0}
     weather: {fileID: 0}
     transitionSeconds: 0
@@ -85819,8 +85876,14 @@ MonoBehaviour:
   campTopics: []
   morningTopics: []
   alchemist: 1
+  lowHealth: 0.5
+  healShare: 0.35
   supportInterval: 6
-  supportAmount: 8
+  supportReach: 12
+  healLines:
+  - Hold still. Drink this.
+  - You're bleeding. Here.
+  - Not yet, you don't. Drink.
 --- !u!114 &2111941103
 MonoBehaviour:
   m_ObjectHideFlags: 0

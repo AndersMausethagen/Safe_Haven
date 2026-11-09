@@ -71,8 +71,9 @@ public sealed class PrologueTests
             !(c.Behaviour == PrologueStep.Story && c.Quest.Start == QuestStart.Automatically)).All(c => !string.IsNullOrWhiteSpace(c.ArrivalText)));
         Assert.IsNull(Definition.StartingWeapon, "The weapon is chosen at the tree line, in the scene's story (Story - Choose a Weapon).");
         Assert.IsNull(Definition.StartingTorch, "Nobody carries a lit torch in the morning: it is handed out on the road (Story - The Road East).");
-        Assert.AreEqual(3, Definition.WaveSize(1));
-        Assert.AreEqual(6, Definition.WaveSize(100), "Waves are capped; the companions fight too.");
+        // 40% fewer at the portal on request (2026-11-09): 2 at first, waves of 2, 3, 3, 3 (13 in all, was 22).
+        Assert.AreEqual(2, Definition.WaveSize(1));
+        Assert.AreEqual(3, Definition.WaveSize(100), "Waves are capped; the companions fight too.");
     }
 
     [Test]

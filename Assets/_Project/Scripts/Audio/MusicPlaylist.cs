@@ -158,19 +158,20 @@ public readonly struct MusicChoice
 /// </summary>
 public static class MusicRules
 {
-    // Event music first; then a fight's combat music, even in a scene kept silent (the prologue's quiet forest); a
+    // Event music first (unless it lets fights interrupt it, as a place's mood music does); then a fight's combat music, even in a scene kept silent (the prologue's quiet forest); a
     // silence holds only while nobody fights.
     public static MusicChoice Choose(SceneAudio scene, AudioSettingsDefinition defaults, AudioMood mood, float raidTimeLeft)
     {
         bool overridden = scene != null && scene.MusicOverridden;
-        if (overridden && scene.EventMusic != null)
+        bool combatAllowed = scene == null || scene.CombatMusic;
+        bool fightTakesOver = mood == AudioMood.Combat && combatAllowed && scene != null && scene.FightsInterruptEventMusic;
+        if (overridden && scene.EventMusic != null && !fightTakesOver)
             return new MusicChoice(scene.EventMusic, "Quest/event: music");
         if (!overridden && scene != null && scene.FinalStretch.HasTracks && raidTimeLeft <= scene.FinalStretchSeconds)
         {
             return new MusicChoice(scene.FinalStretch, "Scene: final stretch");
         }
 
-        bool combatAllowed = scene == null || scene.CombatMusic;
         if (mood == AudioMood.Combat && combatAllowed)
         {
             if (scene != null && scene.Combat.HasTracks)
@@ -184,6 +185,8 @@ public static class MusicRules
             }
         }
 
+        if (overridden && scene.EventMusic != null)
+            return new MusicChoice(scene.EventMusic, "Quest/event: music");
         if (overridden)
             return new MusicChoice(null, "Quest/event: silence");
 

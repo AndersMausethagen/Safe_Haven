@@ -83,7 +83,8 @@ public sealed partial class PlayerAnimationController
         }
 
         int layer = animator.GetLayerIndex(InteractionLayer);
-        float wait = workContact - workHold;
+        float strike = Mathf.Max(0.1f, GatheringMinigameSettings.Current.StrikeSpeed);
+        float wait = (workContact - workHold) / strike;
         if (workPhase != WorkPhase.Holding && layer >= 0)
         {
             // Still on its way back up: to the raised point at once, so a quick swing isn't made to wait for the last one.
@@ -95,7 +96,7 @@ public sealed partial class PlayerAnimationController
             }
         }
 
-        SetFloat(WorkSpeedHash, 1f);
+        SetFloat(WorkSpeedHash, strike);
         workPhase = WorkPhase.Following;
         workTime = workHold;
         return wait;

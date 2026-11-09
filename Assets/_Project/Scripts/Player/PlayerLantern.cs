@@ -261,6 +261,17 @@ public sealed class PlayerLantern : MonoBehaviour
             glow.color = item.Lantern.Colour;
             glow.range = item.Lantern.Range;
             glow.shadows = LightShadows.None;
+            if (item.Lantern.FogGlow > 0f && glow.type == LightType.Point)
+            {
+                // The torch's halo in the fog, tinted by the lantern's own colour; it breathes with the light.
+                AtmosphereLight halo = glow.GetComponent<AtmosphereLight>();
+                if (halo == null)
+                {
+                    halo = glow.gameObject.AddComponent<AtmosphereLight>();
+                }
+
+                halo.Configure(item.Lantern.FogGlow, item.Lantern.FogClearing);
+            }
         }
 
         var found = new System.Collections.Generic.List<Renderer>();

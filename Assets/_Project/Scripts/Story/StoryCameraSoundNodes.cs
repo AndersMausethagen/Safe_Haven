@@ -117,6 +117,8 @@ public sealed class MusicNode : StoryNode
     public Change change = Change.Play;
     [Tooltip("For Play: the music, such as combat music.")]
     public MusicPlaylist playlist = new MusicPlaylist();
+    [Tooltip("For Play: combat music takes over while the player fights, and this comes back after (a place's mood music).")]
+    public bool fightsInterrupt;
 
     public override string Title => change == Change.Play ? "Play Music" : change == Change.Silence ? "Silence Music" : "Resume Music";
     public override string Category => "Camera & Sound";
@@ -131,7 +133,7 @@ public sealed class MusicNode : StoryNode
 
         switch (change)
         {
-            case Change.Play: audio.PlayEventMusic(playlist); break;
+            case Change.Play: audio.PlayEventMusic(playlist, fightsInterrupt); break;
             case Change.Silence: audio.SilenceMusic(); break;
             case Change.Resume: audio.ResumeMusic(); break;
         }

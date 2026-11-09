@@ -34,11 +34,16 @@ public sealed class SceneAudio : MonoBehaviour
     public bool CombatMusic => combatMusic;
     public float FinalStretchSeconds => finalStretchSeconds;
     private bool musicOverridden;
+    private bool fightsInterruptEventMusic;
     private MusicPlaylist eventMusic;
     public bool MusicOverridden => musicOverridden || startSilent;
     public MusicPlaylist EventMusic => eventMusic;
+    /// <summary>The event music steps aside for combat music while the player fights, and comes back after.</summary>
+    public bool FightsInterruptEventMusic => fightsInterruptEventMusic;
 
-    public void PlayEventMusic(MusicPlaylist playlist)
+    /// <param name="fightsInterrupt">Combat music takes over while the player fights (a place's mood music, such as the
+    /// prologue's dark forest); false keeps this music through fights (a boss's or a scripted moment's).</param>
+    public void PlayEventMusic(MusicPlaylist playlist, bool fightsInterrupt = false)
     {
         if (playlist == null || !playlist.HasTracks)
         {
@@ -47,6 +52,7 @@ public sealed class SceneAudio : MonoBehaviour
         }
         musicOverridden = true;
         eventMusic = playlist;
+        fightsInterruptEventMusic = fightsInterrupt;
     }
 
     public void SilenceMusic()

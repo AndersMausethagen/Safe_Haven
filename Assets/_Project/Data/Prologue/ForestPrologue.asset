@@ -137,7 +137,7 @@ MonoBehaviour:
 
       Hold them back. Stay close to the portal!'
     duration: 60
-    initialEnemies: 4
+    initialEnemies: 2
     enemies:
     - prefab: {fileID: 4509420567327699722, guid: 133e61ca36473ab4999a603e504581a7, type: 3}
       weight: 3
@@ -175,10 +175,10 @@ MonoBehaviour:
   leader: {fileID: 11400000, guid: b230d041259b863428e4e973c6ff0d86, type: 2}
   dialogueCameraDistance: 0.65
   waveInterval: 12
-  firstWaveSize: 3
+  firstWaveSize: 2
   waveGrowth: 1
-  maximumWaveSize: 6
-  maximumEnemies: 16
+  maximumWaveSize: 3
+  maximumEnemies: 10
   rumble: {fileID: 11400000, guid: 6510718f5af764e4aa78349c4b3f7cdf, type: 2}
   homeScene: SafeHaven
   survivedText: 'Sigrid: It is open! Everyone, through! The old troll''s fist comes down on the stones. You reach for the others... and the forest disappears.'

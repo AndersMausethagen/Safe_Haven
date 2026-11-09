@@ -106,8 +106,12 @@ public sealed class PlaytestFixesTests
     {
         GatheringMinigameSettings settings = GatheringMinigameSettings.Current;
         GatheringToolProfile axe = settings.Profile(ToolType.Axe);
-        Assert.GreaterOrEqual(axe.RiseSeconds, 2f, "faster than this and chopping is a test of reflexes");
+        // The swing became 35% quicker on request (2026-11-09: the rise 2.2 s -> 1.63 s); the zones widened with it, so the
+        // time to land a blow stays what playtests asked for, and only the rhythm is quicker.
+        Assert.GreaterOrEqual(axe.RiseSeconds, 1.6f, "faster than this and chopping is a test of reflexes");
         Assert.GreaterOrEqual(axe.CriticalZoneWidth * axe.RiseSeconds, 0.25f, "a quarter of a second to land it in");
+        GatheringToolProfile pickaxe = settings.Profile(ToolType.Pickaxe);
+        Assert.GreaterOrEqual(pickaxe.CriticalZoneWidth * pickaxe.RiseSeconds, 0.25f, "mining too");
         Assert.AreEqual(0f, settings.ZoneJitter, "the spot stays put, so it can be felt as a rhythm");
     }
 }

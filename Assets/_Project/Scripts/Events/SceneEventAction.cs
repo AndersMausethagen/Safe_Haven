@@ -12,6 +12,9 @@ public sealed class SceneEventAction
     [SerializeField] private SceneEventActionKind kind;
     [SerializeField] private SceneAudio sceneAudio;
     [SerializeField] private MusicPlaylist music = new MusicPlaylist();
+    [Tooltip("Play Music: combat music takes over while the player fights, and this comes back after (a place's mood " +
+        "music). Off: it plays through fights too (a boss's or a scripted moment's music).")]
+    [SerializeField] private bool fightsInterrupt;
     [SerializeField] private WeatherSystem weatherSystem;
     [SerializeField] private WeatherDefinition weather;
     [SerializeField, Min(0f)] private float transitionSeconds = 3f;
@@ -70,7 +73,7 @@ public sealed class SceneEventAction
         }
         switch (kind)
         {
-            case SceneEventActionKind.PlayMusic: sceneAudio.PlayEventMusic(music); break;
+            case SceneEventActionKind.PlayMusic: sceneAudio.PlayEventMusic(music, fightsInterrupt); break;
             case SceneEventActionKind.SilenceMusic: sceneAudio.SilenceMusic(); break;
             case SceneEventActionKind.ResumeMusic: sceneAudio.ResumeMusic(); break;
             case SceneEventActionKind.ChangeWeather: weatherSystem.SetWeather(weather, atOnce ? 0f : transitionSeconds); break;

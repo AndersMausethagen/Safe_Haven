@@ -25,6 +25,10 @@ public sealed class LanternDefinition : ScriptableObject
     [SerializeField, Min(0.05f)] private float pulseSpeed = 1.1f;
     [Tooltip("How bright the glass glows while lit (emission, HDR).")]
     [SerializeField, Min(0f)] private float glow = 3f;
+    [Tooltip("How strongly the light glows in fog and mist, like a torch's halo (in its own colour). 0: no halo.")]
+    [SerializeField, Min(0f)] private float fogGlow = 1.6f;
+    [Tooltip("Metres around the lantern where it thins the fog, as a torch does (smaller: a softer light).")]
+    [SerializeField, Min(0f)] private float fogClearing = 3f;
 
     [Header("On the belt")]
     [Tooltip("The lantern's model: a child named Glow is its lit glass, children named Mote are the fireflies inside, " +
@@ -41,6 +45,8 @@ public sealed class LanternDefinition : ScriptableObject
     public float Flicker => flicker;
     public float PulseSpeed => pulseSpeed;
     public float Glow => glow;
+    public float FogGlow => fogGlow;
+    public float FogClearing => fogClearing;
     public GameObject Model => model;
     public Vector3 BeltOffset => beltOffset;
 

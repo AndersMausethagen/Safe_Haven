@@ -8,7 +8,7 @@ public sealed class SceneEventActionDrawer : PropertyDrawer
     {
         switch ((SceneEventActionKind)property.FindPropertyRelative("kind").enumValueIndex)
         {
-            case SceneEventActionKind.PlayMusic: return new[] { "sceneAudio", "music" };
+            case SceneEventActionKind.PlayMusic: return new[] { "sceneAudio", "music", "fightsInterrupt" };
             case SceneEventActionKind.SilenceMusic:
             case SceneEventActionKind.ResumeMusic: return new[] { "sceneAudio" };
             case SceneEventActionKind.ChangeWeather: return new[] { "weatherSystem", "weather", "transitionSeconds" };

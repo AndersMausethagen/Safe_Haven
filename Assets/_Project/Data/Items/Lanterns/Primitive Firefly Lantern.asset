@@ -15,10 +15,12 @@ MonoBehaviour:
   hours: 24
   refill: {fileID: 11400000, guid: 56e2fd4d1b777f24ca26e167686a976c, type: 2}
   colour: {r: 0.62, g: 1, b: 0.55, a: 1}
-  range: 7
-  intensity: 1.4
+  range: 8
+  intensity: 2.2
   flicker: 0.35
   pulseSpeed: 1.1
   glow: 3
+  fogGlow: 1.6
+  fogClearing: 3
   model: {fileID: 1115392956136609664, guid: 00e44cd221e51b84a81b78c64acc9275, type: 3}
   beltOffset: {x: -0.21, y: -0.06, z: 0.04}

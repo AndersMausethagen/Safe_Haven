@@ -71,6 +71,9 @@ public sealed class GatheringMinigameSettings : GameSettings<GatheringMinigameSe
     [SerializeField, Min(0f)] private float groundSwingContact = 0.4f;
     [Tooltip("The tool waits this long before contact, raised, until the player swings: the delay from the press to the blow.")]
     [SerializeField, Range(0.02f, 0.4f)] private float swingWindUp = 0.15f;
+    [Tooltip("How fast the blow plays from the raised point through contact and back (1 = as the clip was made). " +
+             "The raise follows the tool's Rise Seconds; this is the strike itself.")]
+    [SerializeField, Range(0.5f, 3f)] private float strikeSpeed = 1.35f;
 
     [Header("Bar")]
     [Tooltip("Where the zones sit up the bar. High, so the swing has time to build, and a press in time comes just before the blow would.")]
@@ -217,6 +220,7 @@ public sealed class GatheringMinigameSettings : GameSettings<GatheringMinigameSe
     }
 
     public float SwingWindUp => swingWindUp;
+    public float StrikeSpeed => strikeSpeed;
 
     public float NoiseRadius(SwingResult result)
     {
