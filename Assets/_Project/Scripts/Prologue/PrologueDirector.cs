@@ -41,6 +41,7 @@ public sealed class PrologueDirector : MonoBehaviour
     private bool reviving;
     private bool chapterActive;
     private bool wolvesComing; // the camp's warning line is up; its wolves spawn when it closes
+    private const float BetweenCampWaves = 3f;
     private PrologueBuildArea buildArea;
 
     public static PrologueDirector Current { get; private set; }
@@ -161,7 +162,18 @@ public sealed class PrologueDirector : MonoBehaviour
         if (step == PrologueStep.CatchBreath && elapsed >= chapter.Duration)
             GameEvents.Raise(definition.RestedEvent);
         else if (step == PrologueStep.DefendCamp && enemies.Count == 0 && !wolvesComing)
-            GameEvents.Raise(definition.CampDefendedEvent);
+        {
+            // They come again once the last of a wave has fallen, after a breath to see it is over.
+            if (wave >= chapter.Waves) GameEvents.Raise(definition.CampDefendedEvent);
+            else if (nextWave < 0f) nextWave = elapsed + BetweenCampWaves;
+            else if (elapsed >= nextWave)
+            {
+                nextWave = -1f;
+                wave++;
+                if (!string.IsNullOrWhiteSpace(chapter.NextWaveText)) Speak(chapter.NextWaveText, null);
+                Spawn(campSpawns, chapter.InitialEnemies);
+            }
+        }
         else if (step == PrologueStep.HoldPortal)
         {
             if (elapsed >= chapter.Duration)
@@ -219,7 +231,9 @@ public sealed class PrologueDirector : MonoBehaviour
 
         if (chapterActive)
         {
-            bool line = chapter.Quest.Start != QuestStart.ByQuestGiver && !string.IsNullOrWhiteSpace(chapter.ArrivalText);
+            // A briefing the player accepted has been said by its giver; a later part of the same quest is called out in passing.
+            bool opens = definition.OpensItsQuest(chapter);
+            bool line = (!opens || chapter.Quest.Start != QuestStart.ByQuestGiver) && !string.IsNullOrWhiteSpace(chapter.ArrivalText);
             if (line && step == PrologueStep.DefendCamp && !restoring)
             {
                 // The camp's wolves come once the warning has been spoken (an aside, so the player is free meanwhile).
@@ -229,13 +243,13 @@ public sealed class PrologueDirector : MonoBehaviour
                     if (!wolvesComing || !chapterActive || step != PrologueStep.DefendCamp) return;
                     wolvesComing = false;
                     StartChapter();
-                });
+                }, false);
             }
             else
             {
                 // In a fight the line becomes a subtitle once the enemies close in (DialogueBox), so nothing waits for it.
                 if (line)
-                    Speak(chapter.ArrivalText, null);
+                    Speak(chapter.ArrivalText, null, !opens);
                 wolvesComing = false;
                 StartChapter();
             }
@@ -255,7 +269,11 @@ public sealed class PrologueDirector : MonoBehaviour
         if (chapter.Duration > 0f)
             QuestTimers.Set(chapter.Quest, chapter.Duration);
         if (step == PrologueStep.DefendCamp)
+        {
+            wave = 1;
+            nextWave = -1f;
             Spawn(campSpawns, chapter.InitialEnemies);
+        }
         else if (step == PrologueStep.ReachPortal)
             Rumble(0.4f);
         else if (step == PrologueStep.HoldPortal)
@@ -263,8 +281,9 @@ public sealed class PrologueDirector : MonoBehaviour
     }
 
     // "Runa: Wolves!" is said by Runa; a line without a name by the leader. Done runs once the player has moved on
-    // from the line (or the box closed another way), or at once when no one can say it.
-    private void Speak(string text, System.Action done)
+    // from the line (or the box closed another way), or at once when no one can say it. In passing: a subtitle that
+    // leaves the controls and the camera to the player, for a word said while they are busy.
+    private void Speak(string text, System.Action done, bool inPassing = false)
     {
         PrologueCompanion speaker = null;
         int colon = text.IndexOf(':');
@@ -287,7 +306,7 @@ public sealed class PrologueDirector : MonoBehaviour
         DialogueBox box = DialogueBox.Current;
         var who = new DialogueSpeaker(speaker.Resident.DisplayName, speaker.transform, null, definition.DialogueCameraDistance);
         // Before a fight a word is enough: a conversation box and the camera turning to the speaker stopped the play.
-        if (step == PrologueStep.DefendCamp || step == PrologueStep.HoldPortal)
+        if (inPassing || step == PrologueStep.DefendCamp || step == PrologueStep.HoldPortal)
         {
             box.Aside(who, text, done);
             return;

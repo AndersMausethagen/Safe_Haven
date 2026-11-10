@@ -1,7 +1,7 @@
 # Quest redesign: the first two hours
 
-**Status: approved by the user on 2026-11-10. Step 1 is built (categories and the open door); steps 2 and 3 are not.** See
-"What it takes to build" for what each step holds and "As built" for how step 1 differs from the plan. This covers the
+**Status: approved by the user on 2026-11-10. Steps 1 (categories and the open door) and 2 (the prologue) are built; step 3
+is not.** See "What it takes to build" for what each step holds and the "As built" sections for how they differ from the plan. This covers the
 prologue, the first days at home and the first four raids, up to the Heartroot. The rescue order in `Docs/RescueOrder.md`
 stays as approved.
 
@@ -253,6 +253,32 @@ After any step: update GDD §21 and the status table in `ARCHITECTURE.md`.
 - **Not checked by hand.** The flow was stepped in Play on throwaway saves by completing quests from the CLI: each step
   started what it should, the portal said the right lines, and gear given in the prologue arrived at home. Nobody has played
   it from New Game yet.
+
+## As built: step 2 (2026-11-10)
+
+`AgentScripts/BuildPrologueMeadow.cs` (`Data`, then `Moments`) sets it up; `PrologueTests`, `PrologueMeadowTests` and
+`QuestGiverIntegrationTests` hold it.
+
+- **Seven quests in nine chapters.** A Morning by the Fire, The Road East, Shelter from the Storm, A Moment of Warmth, Eyes
+  Between the Trees, Something Is Coming, The Last Connection. Where the Sun Went, A Spark in the Dark, A Fire of Our Own and
+  Wake the Waystones are gone. A chapter can now end at an objective (`PrologueChapter.EndsAtObjective`), so one quest runs
+  through several chapters: Shelter from the Storm is the shelter, then the fire beside it; Something Is Coming is the
+  flight, then the hand on the stone. A later part's line is said in passing, not as a briefing.
+- **Sigrid briefs twice**, in the morning and before the road. Every quest after that starts by itself.
+- **The weapon** is chosen when the player says they are ready, and the party sets off once it is in hand.
+- **The first fight is at the cart, in daylight.** The boar run past it, and three wolves come after them.
+- **A Name Gone Missing**: the rest opens with Sigrid counting the four who went ahead and losing Liv's name. Eirik admits he
+  had to think for his sister's.
+- **Berries for the Pot** is Eirik's errand during the rest. The wolves wait for whoever took it, two and a half minutes at
+  most.
+- **The camp is attacked twice**: three wolves, then three more once they have fallen (`PrologueChapter.Waves`).
+- **At the stones** Sigrid lays her hand on the centre stone first, and nothing happens.
+- **Played through in the Editor** on throwaway saves, as far as the arrival at home, stepping from the CLI with the player
+  made invulnerable. The real fights were fought by the companions and the probe. Two fixes came out of it: the wolves
+  arrived as Sigrid's lost name was being said (the rest's clock now waits for that scene), and two lines repeated
+  themselves.
+- **Not checked:** how long it takes a real player, and whether the two camp waves and the road wolves are too hard for a
+  player who skipped Eirik's lesson. The target is 12 to 14 minutes without the errands.
 
 The open questions below were answered with the recommendations: the errands stay as they are until step 2, the weapon is
 kept, there is no chest before the first raid, the twist stands, and the Heartroot comes at raid three or four.

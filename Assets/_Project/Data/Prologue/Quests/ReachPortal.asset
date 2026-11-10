@@ -16,7 +16,10 @@ MonoBehaviour:
   displayName: Something Is Coming
   description: Something much larger is approaching. Leave the camp and take the old path north to the standing stones.
   chain: Prologue - The Unquiet Forest
-  journalNotes: Whatever it is, the trees are moving out of its way. Don't stop to look.
+  journalNotes: 'Whatever it is, the trees are moving out of its way. Don''t stop to look.
+
+
+    Sigrid has seen writing like this once before, and she doesn''t say where. The stones are older than the road, and much older than anyone who should know how to use them.'
   rank: 0
   availableObjective: Stay alert. The expedition is moving on.
   announceStart: 0
@@ -51,7 +54,7 @@ MonoBehaviour:
   closedBy: {fileID: 0}
   startDelay: 8
   onStarted: []
-  objectivesInOrder: 0
+  objectivesInOrder: 1
   objectives:
   - type: 10
     description: 
@@ -62,7 +65,7 @@ MonoBehaviour:
     faction: 1
     building: {fileID: 0}
     raid: {fileID: 0}
-    mustExtract: 1
+    mustExtract: 0
     withinMinutes: 0
     questEvent: {fileID: 0}
     person: {fileID: 0}
@@ -73,8 +76,28 @@ MonoBehaviour:
     tier: 2
     bringHome: 0
     countAlreadyOwned: 0
-  turnInToGiver: 1
-  turnInTo: Sigrid
+  - type: 6
+    description: Touch the centre stone
+    amount: 1
+    item: {fileID: 0}
+    resource: {fileID: 0}
+    monster: {fileID: 0}
+    faction: 1
+    building: {fileID: 0}
+    raid: {fileID: 0}
+    mustExtract: 0
+    withinMinutes: 0
+    questEvent: {fileID: 11400000, guid: 3bbc727584d9a984cb3a088c5fe2d14b, type: 2}
+    person: {fileID: 0}
+    target: {fileID: 0}
+    job: {fileID: 0}
+    breach: {fileID: 0}
+    rank: 1
+    tier: 2
+    bringHome: 0
+    countAlreadyOwned: 0
+  turnInToGiver: 0
+  turnInTo: 
   rewardItems: []
   rewardResources: []
   rewardRecipes: []

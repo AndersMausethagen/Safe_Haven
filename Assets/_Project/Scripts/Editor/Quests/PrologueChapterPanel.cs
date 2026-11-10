@@ -24,16 +24,16 @@ public static class PrologueChapterPanel
     {
         var data = new SerializedObject(definition);
         SerializedProperty chapters = data.FindProperty("chapters");
-        int index = -1;
+        var parts = new System.Collections.Generic.List<int>();
         bool sameChain = false;
         for (int i = 0; i < chapters.arraySize; i++)
         {
             var other = chapters.GetArrayElementAtIndex(i).FindPropertyRelative("quest").objectReferenceValue as QuestDefinition;
-            if (other == quest) index = i;
+            if (other == quest) parts.Add(i);
             sameChain |= other != null && !string.IsNullOrWhiteSpace(quest.Chain) && other.Chain == quest.Chain;
         }
 
-        if (index < 0)
+        if (parts.Count == 0)
         {
             if (!sameChain) return false;
             ContentUtility.BeginPanel("Story Chapter", $"This quest is in the chain of {definition.name}, but not in its sequence: it runs beside it. Side quests stay out; a step of the main story goes in.");
@@ -49,12 +49,26 @@ public static class PrologueChapterPanel
             return true;
         }
 
-        ContentUtility.BeginPanel($"Story Chapter {index + 1} of {chapters.arraySize}", $"Its place in {definition.name}. Behaviour Story has no mechanic of its own: story graphs and scene reactions make its moments, and you say below where it is and what the companions do. The order of the chapters doesn't change the prerequisites: keep them in step in the Quest Map.");
+        // A quest that runs through several chapters (Ends At Objective) shows each of them.
         data.Update();
+        foreach (int part in parts)
+        {
+            if (part < chapters.arraySize && chapters.GetArrayElementAtIndex(part).FindPropertyRelative("quest").objectReferenceValue == quest)
+                DrawChapter(definition, data, chapters, part);
+        }
+
+        data.ApplyModifiedProperties();
+        return true;
+    }
+
+    private static void DrawChapter(PrologueDefinition definition, SerializedObject data, SerializedProperty chapters, int index)
+    {
+        ContentUtility.BeginPanel($"Story Chapter {index + 1} of {chapters.arraySize}", $"Its place in {definition.name}. Behaviour Story has no mechanic of its own: story graphs and scene reactions make its moments, and you say below where it is and what the companions do. The order of the chapters doesn't change the prerequisites: keep them in step in the Quest Map.");
         SerializedProperty chapter = chapters.GetArrayElementAtIndex(index);
         SerializedProperty behaviour = chapter.FindPropertyRelative("behaviour");
         EditorGUILayout.PropertyField(behaviour);
         EditorGUILayout.PropertyField(chapter.FindPropertyRelative("arrivalText"));
+        EditorGUILayout.PropertyField(chapter.FindPropertyRelative("endsAtObjective"));
         if ((PrologueStep)behaviour.intValue == PrologueStep.Story)
         {
             EditorGUILayout.PropertyField(chapter.FindPropertyRelative("site"));
@@ -66,6 +80,11 @@ public static class PrologueChapterPanel
             EditorGUILayout.PropertyField(chapter.FindPropertyRelative("duration"));
             EditorGUILayout.PropertyField(chapter.FindPropertyRelative("initialEnemies"));
             EditorGUILayout.PropertyField(chapter.FindPropertyRelative("enemies"), true);
+            if ((PrologueStep)behaviour.intValue == PrologueStep.DefendCamp)
+            {
+                EditorGUILayout.PropertyField(chapter.FindPropertyRelative("waves"));
+                EditorGUILayout.PropertyField(chapter.FindPropertyRelative("nextWaveText"));
+            }
         }
 
         using (new EditorGUILayout.HorizontalScope())
@@ -91,6 +110,5 @@ public static class PrologueChapterPanel
         }
 
         ContentUtility.EndPanel();
-        return true;
     }
 }

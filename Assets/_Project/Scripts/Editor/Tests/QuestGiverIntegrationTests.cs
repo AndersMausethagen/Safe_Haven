@@ -296,14 +296,15 @@ public sealed class QuestGiverIntegrationTests
                 .Single(c => c.Resident.DisplayName == "Sigrid");
             var giver = leader.GetComponent<QuestGiver>();
             Assert.NotNull(giver, "Saved scene, not an indirect director binding, must contain the giver.");
-            var briefings = definition.Chapters.Where(c => c.Quest.Start == QuestStart.ByQuestGiver).ToArray();
-            CollectionAssert.AreEqual(definition.Chapters.Where(c => c.Quest.Start == QuestStart.ByQuestGiver || c.Quest.TurnInToGiver)
+            // A quest can run through several chapters (Ends At Objective): its first chapter is the one that opens it.
+            var openings = definition.Chapters.Where(definition.OpensItsQuest).ToArray();
+            var briefings = openings.Where(c => c.Quest.Start == QuestStart.ByQuestGiver).ToArray();
+            CollectionAssert.AreEqual(openings.Where(c => c.Quest.Start == QuestStart.ByQuestGiver || c.Quest.TurnInToGiver)
                 .Select(c => c.Quest), giver.Offers.Select(o => o.Quest));
             var acceptedOffers = giver.Offers.Where(o => o.Quest.Start == QuestStart.ByQuestGiver).ToArray();
             CollectionAssert.AreEqual(briefings.Select(c => c.ArrivalText), acceptedOffers.Select(o => o.Text));
-            CollectionAssert.AreEqual(new[] { "Tell me.", "I'm ready. Let's go.", "I will find us shelter.", "I will gather the supplies.",
-                "I will build the campfire.", "Let us catch our breath.", "I will try the waystones." },
-                acceptedOffers.Select(o => o.AcceptText));
+            // Sigrid briefs twice; from the tree line on the night starts each quest by itself (Docs/QuestRedesign.md, step 2).
+            CollectionAssert.AreEqual(new[] { "Tell me.", "I'm ready. Let's go." }, acceptedOffers.Select(o => o.AcceptText));
             var talkable = leader.GetComponent<Talkable>();
             Assert.NotNull(talkable, "The leader's offers are taken in a conversation.");
             Assert.AreEqual(definition.DialogueCameraDistance, new SerializedObject(talkable).FindProperty("cameraDistance").floatValue);
@@ -311,8 +312,8 @@ public sealed class QuestGiverIntegrationTests
             Assert.Less(components.IndexOf(giver), components.IndexOf(leader), "The quest offer speaks before the camp chatter.");
             Assert.IsTrue(giver.Offers.All(o => !string.IsNullOrWhiteSpace(o.WaitingText)));
             string before = EditorJsonUtility.ToJson(definition);
-            Manager(definition.Chapters.Select(c => c.Quest).ToArray());
-            foreach (var chapter in definition.Chapters)
+            Manager(openings.Select(c => c.Quest).ToArray());
+            foreach (var chapter in openings)
             {
                 if (chapter.Quest.Start == QuestStart.ByQuestGiver)
                 {

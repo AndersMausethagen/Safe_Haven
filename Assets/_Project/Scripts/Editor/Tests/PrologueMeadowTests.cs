@@ -165,7 +165,7 @@ public sealed class PrologueMeadowTests
     [Test]
     public void StoryChapters_SayWhereTheyAreAndWhatTheCompanionsDo()
     {
-        PrologueChapter morning = Definition.Chapters[0], road = Definition.Chapters[1], treeLine = Definition.Chapters[2];
+        PrologueChapter morning = Definition.Chapters[0], road = Definition.Chapters[1];
         Assert.AreSame(Quest("MorningCamp"), morning.Quest);
         Assert.AreEqual(PrologueSite.Meadow, morning.Checkpoint);
         Assert.AreEqual(PrologueCompanions.StandStill, morning.Companions);
@@ -176,14 +176,11 @@ public sealed class PrologueMeadowTests
         Assert.AreEqual(PrologueCompanions.StoryLeads, road.Companions);
         Assert.IsFalse(road.AtRest);
 
-        Assert.AreSame(Quest("TreeLine"), treeLine.Quest);
-        Assert.AreEqual(PrologueSite.Forest, treeLine.Checkpoint);
-        Assert.AreEqual(PrologueCompanions.WatchOnly, treeLine.Companions);
-
         PrologueChapter shelter = Definition.Chapters.Single(c => c.Behaviour == PrologueStep.FindShelter);
         Assert.AreEqual(PrologueSite.Forest, shelter.Checkpoint);
         Assert.AreEqual(PrologueCompanions.Follow, shelter.Companions);
-        CollectionAssert.AreEqual(new[] { Quest("TreeLine") }, shelter.Quest.Prerequisites);
+        CollectionAssert.AreEqual(new[] { Quest("RoadToForest") }, shelter.Quest.Prerequisites, "the shelter follows the road: no stop at the tree line");
+        Assert.IsNull(Quest("TreeLine"), "the weapon is chosen before the road now");
     }
 
     [Test]
@@ -428,14 +425,13 @@ public sealed class PrologueMeadowTests
         Assert.IsTrue(lesson.ObjectivesInOrder);
         Assert.AreEqual(4, lesson.Objectives.Count);
         Assert.IsEmpty(lesson.FindProblems());
-        Assert.AreEqual(PrologueCompanions.WatchOnly, Definition.Chapters[2].Companions, "Nobody kills the practice target for the player.");
     }
 
     [Test]
     public void Errands_MakeLaterQuestsShorter()
     {
         var sticks = Definition.Sticks;
-        QuestDefinition wood = Quest("WoodForTheRoad"), fuel = Quest("GatherFuel");
+        QuestDefinition wood = Quest("WoodForTheRoad"), fuel = Quest("FindShelter");
         Assert.IsTrue(wood.RewardItems.Any(r => r.Item == sticks && r.Amount == 4), "The wood is the fire's kindling.");
         Assert.IsTrue(fuel.Objectives.Single(o => o.Item == sticks).CountAlreadyOwned);
     }
@@ -460,7 +456,8 @@ public sealed class PrologueMeadowTests
             var roots = scene.GetRootGameObjects();
             var stories = roots.SelectMany(r => r.GetComponentsInChildren<StoryScript>(true)).ToArray();
             foreach (string name in new[] { "Story - The Old Troll Returns", "Story - The Handcart", "Story - The Road Behind", "Story - A Lesson from Eirik",
-                "Story - A Moment of Warmth", "Story - They Remember", "Story - What Sigrid Knows", "Story - The Stone by the Lake" })
+                "Story - A Moment of Warmth", "Story - They Remember", "Story - What Sigrid Knows", "Story - The Stone by the Lake", "Story - A Name Gone Missing",
+                "Story - Choose a Weapon" })
             {
                 StoryScript story = stories.SingleOrDefault(s => s.name == name);
                 Assert.NotNull(story, name);
@@ -473,8 +470,30 @@ public sealed class PrologueMeadowTests
             Assert.IsTrue(intro.Nodes.OfType<SayNode>().Any(n => n.line.Contains("Ingrid") && n.line.Contains("Liv")), "The player learns who they are looking for.");
             Assert.AreEqual(3, intro.Nodes.OfType<ChoiceNode>().Single().answers.Count, "Why the player came.");
             // Around a fight a word from someone is enough: these speak in asides and never turn the camera.
-            foreach (string fight in new[] { "Story - The Old Troll", "Story - The Old Troll Returns", "Story - Rootlings on the Road", "Story - Troll Ambush" })
+            foreach (string fight in new[] { "Story - The Old Troll", "Story - The Old Troll Returns", "Story - Rootlings on the Road", "Story - Troll Ambush", "Story - The Road East" })
                 Assert.IsTrue(stories.Single(s => s.name == fight).IsFight, fight);
+
+            // Step 2 of Docs/QuestRedesign.md: armed before the road, a fight at the cart in daylight, a name gone missing by
+            // the fire, and Sigrid's hand on the stone before the player's.
+            StoryScript walk = stories.Single(s => s.name == "Story - The Road East");
+            MobSpawnZone wolves = roots.SelectMany(r => r.GetComponentsInChildren<MobSpawnZone>(true)).Single(z => z.name == "Wolves on the Road");
+            Assert.AreEqual("ExpeditionWolf", wolves.Entries[0].prefab.name);
+            SpawnEnemiesNode roadFight = walk.Nodes.OfType<SpawnEnemiesNode>().Single();
+            Assert.AreSame(wolves, roadFight.zone);
+            Assert.IsTrue(roadFight.waitUntilDefeated, "the party walks on when the wolves are down");
+            var chosen = AssetDatabase.LoadAssetAtPath<GameEventDefinition>(Root + "Events/WeaponChosen.asset");
+            Assert.IsTrue(walk.Nodes.OfType<WaitForEventNode>().Any(n => n.questEvent == chosen && n.orAfterSeconds == 0f), "nobody sets off until the player is armed");
+            StoryScript weapon = stories.Single(s => s.name == "Story - Choose a Weapon");
+            Assert.AreSame(Quest("RoadToForest"), weapon.Nodes.OfType<WhenQuest>().Single().quest, "the weapon is chosen as the party sets out");
+            Assert.AreEqual(5, weapon.Nodes.OfType<ChoiceNode>().Single().answers.Count);
+            Assert.IsFalse(weapon.IsFight, "choosing is a conversation");
+            StoryScript missing = stories.Single(s => s.name == "Story - A Name Gone Missing");
+            Assert.IsTrue(missing.Nodes.OfType<SayNode>().Any(n => n.line == "Liv." && !n.aside), "nobody should miss it: it is said in the box");
+            StoryScript stones = stories.Single(s => s.name == "Story - What Sigrid Knows");
+            Assert.IsTrue(stones.Nodes.OfType<SayNode>().Any(n => n.line.Contains("will not wake for me")));
+            Assert.AreSame(Definition.PortalReachedEvent, stones.Nodes.OfType<WhenQuestEvent>().Single().questEvent, "it starts when the stones are reached: there is no quest to accept there");
+            StoryScript rest = stories.Single(s => s.name == "Story - A Moment of Warmth");
+            Assert.IsTrue(rest.Nodes.OfType<CheckQuestNode>().Any(n => n.quest == Quest("BerriesForThePot")), "whoever went for berries is waited for");
             Assert.IsFalse(stories.Single(s => s.name == "Story - The Morning Fire").IsFight, "a conversation by the fire stays one");
             CreatureHuntsNode troll = stories.Single(s => s.name == "Story - The Old Troll").Nodes.OfType<CreatureHuntsNode>().Single();
             Assert.Less(troll.walkSpeed, 0.5f, "The old troll walks to the camp, slow and heavy.");
@@ -492,8 +511,9 @@ public sealed class PrologueMeadowTests
                 Assert.AreEqual("Narrator", reading.speaker.Describe(), "What the player finds isn't the player talking: " + found);
             }
 
-            StringAssert.DoesNotContain("35", roots.SelectMany(r => r.GetComponentsInChildren<PrologueCompanion>(true)).Single(c => c.Resident.DisplayName == "Sigrid")
-                .GetComponent<QuestGiver>().Offers.Single(o => o.Quest == Quest("CatchBreath")).Text, "The rest has no countdown any more.");
+            QuestGiver sigrid = roots.SelectMany(r => r.GetComponentsInChildren<PrologueCompanion>(true)).Single(c => c.Resident.DisplayName == "Sigrid").GetComponent<QuestGiver>();
+            CollectionAssert.AreEqual(new[] { Quest("MorningCamp"), Quest("RoadToForest") }, sigrid.Offers.Select(o => o.Quest), "Sigrid briefs twice; the night starts the rest");
+            Assert.IsFalse(roots.SelectMany(r => r.GetComponentsInChildren<QuestWaypoint>(true)).Any(w => w.Quest == null), "no mark for a quest that is gone");
         }
         finally
         {
@@ -569,6 +589,7 @@ public sealed class PrologueMeadowTests
             Assert.IsTrue(givers.Any(g => g.SideOffers.Any(o => o.Quest == Quest("HuntForThePot"))), "Runa offers the hunt.");
             Assert.IsTrue(givers.Any(g => g.SideOffers.Any(o => o.Quest == Quest("FishForBreakfast"))), "Eirik offers the fishing.");
             Assert.IsTrue(givers.Any(g => g.SideOffers.Any(o => o.Quest == Quest("WoodForTheRoad"))), "Eirik offers the wood.");
+            Assert.IsTrue(givers.Any(g => g.SideOffers.Any(o => o.Quest == Quest("BerriesForThePot"))), "Eirik offers the berries, by the forest fire.");
             foreach (QuestGiver giver in givers)
             {
                 var parts = giver.GetComponents<IConversationTopics>().ToList();

@@ -9,8 +9,11 @@ The plan is [QuestRedesign.md](QuestRedesign.md). Step 1 is built: the kinds of 
 and the stones. Checked in Play on throwaway saves by completing the quests from the CLI, not played by hand.
 - [ ] Play it by hand from New Game: is the first raid reached at about minute 22 (with the prologue as it is, more like 30)?
       Are 4 stick and 4 rock piles by the portal enough for the fire's 8 Sticks and 12 Small Rocks without a search?
-- [ ] Step 2, the prologue: 12 main quests to 7, the weapon chosen in the morning, a fight on the road, a camp defence that
-      lasts longer than 15 seconds.
+- [x] Step 2, the prologue: 12 main quests to 7, the weapon chosen in the morning, a fight on the road, a camp defence that
+      lasts longer than 15 seconds. Played through in the Editor from the CLI, not by hand.
+- [ ] Prologue by hand: time it from New Game without the errands (target 12 to 14 minutes). Are the three wolves at the cart
+      fair for a player who skipped Eirik's lesson, and do the two camp waves feel like a fight and not a chore?
+- [ ] Prologue: the morning errands are still a chain (wood, then fish, then the hunt). Offer them at once, or keep the chain?
 - [ ] Step 3, the first act's story: the three stones' lines and rootlings, the figure in raid 1, what each person remembers
       on coming home, a quest for the Heartroot with the ember, the twist at the fire.
 - [ ] Into the Misty Woods and Bring Ingrid Home both say "Find Ingrid in the Misty Woods" in the tracker. Fine while they

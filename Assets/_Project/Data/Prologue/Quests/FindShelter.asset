@@ -14,18 +14,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::QuestDefinition
   id: prologue.findshelter
   displayName: Shelter from the Storm
-  description: The expedition came for four of its own and to look into rumours of a bewitched forest, and the forest has already put out the sun. Follow the old road in and find dry shelter.
+  description: It should be noon, and it is the middle of the night. The expedition came for four of its own, and the forest has already put out the sun. Follow the old road in, find dry shelter and get a fire going beside it.
   chain: Prologue - The Unquiet Forest
-  journalNotes: A storm with no sun over it, and the road is getting harder to follow. Runa says the forest has moved since the others came through, which is not something forests do.
+  journalNotes: 'It really is noon. Everyone agrees on that and no one can explain the stars. Runa says the forest has moved since the others came through, which is not something forests do.
+
+
+    Sticks and small rocks lie about on the forest floor, and you can pick them up as you walk: this is how every fire you ever build starts. Press (G) to open the build menu. It is the first fire anyone has lit in here for a very long time, though you won''t know that yet.'
   rank: 0
-  availableObjective: Speak to Sigrid about the next step.
+  availableObjective: Stay close. The expedition is moving on.
   announceStart: 0
   announceCompletion: 0
   showTimerInHud: 0
   prerequisites:
-  - {fileID: 11400000, guid: 7782d364f6bf30b4ba50ba576e7be27f, type: 2}
+  - {fileID: 11400000, guid: 2f630af2f0eaf434a97dc64ffe2d130c, type: 2}
   startedFirst: []
-  start: 2
+  start: 0
   startEvent: {fileID: 0}
   startWhen:
     type: 0
@@ -49,7 +52,7 @@ MonoBehaviour:
     bringHome: 0
     countAlreadyOwned: 0
   closedBy: {fileID: 0}
-  startDelay: 0
+  startDelay: 5
   onStarted: []
   objectivesInOrder: 0
   objectives:
@@ -62,7 +65,7 @@ MonoBehaviour:
     faction: 1
     building: {fileID: 0}
     raid: {fileID: 0}
-    mustExtract: 1
+    mustExtract: 0
     withinMinutes: 0
     questEvent: {fileID: 0}
     person: {fileID: 0}
@@ -73,8 +76,68 @@ MonoBehaviour:
     tier: 2
     bringHome: 0
     countAlreadyOwned: 0
-  turnInToGiver: 1
-  turnInTo: Sigrid
+  - type: 0
+    description: 
+    amount: 8
+    item: {fileID: 11400000, guid: e8bb5d2fbded52b42a179a47cce32d53, type: 2}
+    resource: {fileID: 0}
+    monster: {fileID: 0}
+    faction: 1
+    building: {fileID: 0}
+    raid: {fileID: 0}
+    mustExtract: 0
+    withinMinutes: 0
+    questEvent: {fileID: 0}
+    person: {fileID: 0}
+    target: {fileID: 0}
+    job: {fileID: 0}
+    breach: {fileID: 0}
+    rank: 1
+    tier: 2
+    bringHome: 0
+    countAlreadyOwned: 1
+  - type: 0
+    description: 
+    amount: 12
+    item: {fileID: 11400000, guid: 9f085f39a2da68c45b58d2db986835f4, type: 2}
+    resource: {fileID: 0}
+    monster: {fileID: 0}
+    faction: 1
+    building: {fileID: 0}
+    raid: {fileID: 0}
+    mustExtract: 0
+    withinMinutes: 0
+    questEvent: {fileID: 0}
+    person: {fileID: 0}
+    target: {fileID: 0}
+    job: {fileID: 0}
+    breach: {fileID: 0}
+    rank: 1
+    tier: 2
+    bringHome: 0
+    countAlreadyOwned: 1
+  - type: 7
+    description: Build a Campfire beside the shelter (G)
+    amount: 1
+    item: {fileID: 0}
+    resource: {fileID: 0}
+    monster: {fileID: 0}
+    faction: 1
+    building: {fileID: 11400000, guid: 95f7d6e0cc6f5144fa85269777959d65, type: 2}
+    raid: {fileID: 0}
+    mustExtract: 0
+    withinMinutes: 0
+    questEvent: {fileID: 0}
+    person: {fileID: 0}
+    target: {fileID: 0}
+    job: {fileID: 0}
+    breach: {fileID: 0}
+    rank: 1
+    tier: 2
+    bringHome: 0
+    countAlreadyOwned: 0
+  turnInToGiver: 0
+  turnInTo: 
   rewardItems: []
   rewardResources: []
   rewardRecipes: []

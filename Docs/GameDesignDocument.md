@@ -959,6 +959,13 @@ Use readable finite-state behavior for enemies; companions require follow, hold,
 
 ### 21.0 Prologue: the Unquiet Forest
 
+**As built (November 10, 2026; `Docs/QuestRedesign.md`, step 2).** Seven quests where there were twelve. Where the text below
+differs, this wins: the weapon is chosen as the party sets out, not at the tree line; three wolves come out of the trees after
+the fleeing boar at the cart, in daylight; the shelter, the fuel and the fire are one quest (Shelter from the Storm) with no
+briefings in between; the rest opens with Sigrid unable to remember Liv's name; the berries are Eirik's errand during the rest,
+and the wolves wait for whoever took it; the camp is attacked in two waves of three; at the stones Sigrid's hand fails before
+the player's, and reaching and waking them is one quest (Something Is Coming).
+
 New Game begins in a green meadow west of the forest, on a sunny early morning, then walks into a dedicated, hand-authored
 variant of Misty Woods, before the home progression below.
 The expedition is investigating reports of a bewitched forest: trolls and witches are roaming beyond their old

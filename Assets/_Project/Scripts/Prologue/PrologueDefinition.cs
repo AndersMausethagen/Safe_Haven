@@ -132,9 +132,34 @@ public sealed class PrologueChapter
     [SerializeField] private PrologueCompanions companions = PrologueCompanions.WaitAtSite;
     [Tooltip("Story behaviour: there is time to talk, so the player can ask the companions their topics.")]
     [SerializeField] private bool timeToTalk;
+    [Header("Part of a quest")]
+    [Tooltip("0: the chapter lasts until its quest is complete. Otherwise it ends once the quest's objectives up to this one (1 is the first) are done, " +
+             "and the next chapter takes the same quest on: one quest for the player, several steps for the scene (find the shelter, then build the fire).")]
+    [SerializeField, Min(0)] private int endsAtObjective;
+    [Header("Camp defence")]
+    [Tooltip("How many times they come. Each wave after the first comes when the one before has fallen, and is as large as the first.")]
+    [SerializeField, Min(1)] private int waves = 1;
+    [Tooltip("Called out as each later wave comes (\"Runa: More of them!\"). Optional.")]
+    [SerializeField, TextArea(1, 3)] private string nextWaveText;
 
     public QuestDefinition Quest => quest;
     public PrologueStep Behaviour => behaviour;
+    /// <summary>The objective (1 is the first) this chapter ends at, or 0 when it lasts as long as its quest.</summary>
+    public int EndsAtObjective => endsAtObjective;
+    public int Waves => Mathf.Max(1, waves);
+    public string NextWaveText => nextWaveText;
+
+    /// <summary>True once the chapter is behind the player: its quest is complete, or the part of it this chapter stands for is done.</summary>
+    public bool IsDone(QuestLog log)
+    {
+        if (log.StatusOf(quest) == QuestStatus.Completed) return true;
+        if (endsAtObjective <= 0) return false;
+        QuestLog.Entry entry = log.Get(quest);
+        if (entry == null) return false;
+        for (int i = 0; i < endsAtObjective && i < entry.Counts.Length; i++)
+            if (!entry.IsObjectiveDone(i)) return false;
+        return true;
+    }
     public string ArrivalText => arrivalText;
     public string StatusText => statusText;
     public float Duration => duration;
@@ -194,7 +219,7 @@ public sealed class PrologueWaveEnemy
 [CreateAssetMenu(menuName = "Safe Haven/Story/Prologue", fileName = "ForestPrologue")]
 public sealed class PrologueDefinition : ScriptableObject
 {
-    [Tooltip("Ordered story phases. Each phase waits for its quest to complete. Quests define objectives and prerequisites; Behaviour selects the scene reaction. Extra phases can reuse a behaviour.")]
+    [Tooltip("Ordered story phases. Each phase waits for its quest to complete, or for the part of it the phase stands for (Ends At Objective), so one quest can run through several phases. Quests define objectives and prerequisites; Behaviour selects the scene reaction. Extra phases can reuse a behaviour.")]
     [SerializeField] private PrologueChapter[] chapters = new PrologueChapter[0];
     [SerializeField, RaisedByGame] private GameEventDefinition startedEvent;
     [SerializeField, RaisedByGame] private GameEventDefinition shelterEvent;
@@ -277,19 +302,36 @@ public sealed class PrologueDefinition : ScriptableObject
     public PrologueChapter Chapter(QuestLog log)
     {
         foreach (PrologueChapter chapter in chapters)
-            if (log.StatusOf(chapter.Quest) != QuestStatus.Completed)
+            if (!chapter.IsDone(log))
                 return chapter;
         return null;
+    }
+
+    /// <summary>True when the chapter is the first of its quest: its quest's start is the chapter's start. A later part of the
+    /// same quest begins without any hand-over, in the middle of what the player is doing.</summary>
+    public bool OpensItsQuest(PrologueChapter chapter)
+    {
+        foreach (PrologueChapter other in chapters)
+            if (other != null && other.Quest == chapter.Quest)
+                return other == chapter;
+        return true;
     }
 
     public string FindProblem()
     {
         if (chapters == null || chapters.Length == 0) return "The prologue needs story chapters.";
         var seen = new System.Collections.Generic.HashSet<QuestDefinition>();
+        PrologueChapter previous = null;
         foreach (PrologueChapter chapter in chapters)
         {
             if (chapter == null || chapter.Quest == null) return "A prologue chapter or quest is missing.";
-            if (!seen.Add(chapter.Quest)) return "Each prologue chapter needs a different quest.";
+            bool samePart = previous != null && previous.Quest == chapter.Quest;
+            if (!samePart && !seen.Add(chapter.Quest)) return "Chapters that share a quest must follow each other.";
+            if (samePart && (previous.EndsAtObjective <= 0 || (chapter.EndsAtObjective > 0 && chapter.EndsAtObjective <= previous.EndsAtObjective)))
+                return $"{chapter.Quest.DisplayName} runs through several chapters: each but the last needs Ends At Objective, later each time.";
+            if (chapter.EndsAtObjective > chapter.Quest.Objectives.Count)
+                return $"{chapter.Quest.DisplayName} has no objective {chapter.EndsAtObjective} for its chapter to end at.";
+            previous = chapter;
             if (chapter.Behaviour == PrologueStep.Finished) return "Finished is reserved for the end of the sequence.";
             if ((chapter.Behaviour == PrologueStep.CatchBreath || chapter.Behaviour == PrologueStep.HoldPortal) &&
                 chapter.Duration <= 0f) return "Timed chapters need a positive duration.";

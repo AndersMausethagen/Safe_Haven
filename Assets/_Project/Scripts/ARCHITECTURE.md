@@ -137,7 +137,10 @@ pacing"), a fighting chapter (camp defence, portal hold) says its arrival line a
 without answers is a subtitle that leaves the controls to the player (`DialogueBox`), so nothing waits for it, and story
 graphs can Spawn Enemies before Say (Troll Ambush). Add or reorder chapters together with their quest prerequisites in
 the existing Quest Map; chapter list order does not rewrite the prerequisite graph. A chapter waits for its quest
-to complete. Reusable behaviour presets handle shelter, fuel, fire, rest, camp defence, travel, activation and the
+to complete, or with **Ends At Objective** for the part of it up to that objective: then the next chapter takes the same quest on
+(Shelter from the Storm is the shelter, then the fire), its line is said in passing, and `PrologueDefinition.OpensItsQuest`
+tells the parts apart. A camp defence can come in **Waves** (the next when the last has fallen, with an optional **Next Wave
+Text**). Reusable behaviour presets handle shelter, fuel, fire, rest, camp defence, travel, activation and the
 portal hold; new kinds of scene mechanics still require code. The same asset holds the field building, building radius,
 starting armor, dialogue camera distance scale, waiting-for-leader text, and each fighting chapter's own
 Enemies (prefab, weight, from wave: wolves at the camp; wolves, small moss trolls and from the second wave mistwings at

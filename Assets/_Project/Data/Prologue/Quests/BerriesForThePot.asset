@@ -14,18 +14,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::QuestDefinition
   id: prologue.berries
   displayName: Berries for the Pot
-  description: Eirik says nobody fights well on an empty stomach. Pick berries in the clearing west of the shelter and stew them over the campfire in his waterskin.
-  chain: Prologue - The Unquiet Forest
+  description: 'Eirik says nobody fights well on an empty stomach. There are berries in the clearing west of the shelter: pick five and stew them over the fire in his waterskin. Whatever is out there won''t wait for ever.'
+  chain: Prologue - By the Fire
   journalNotes: 'Eirik is right about this, annoyingly. Hunger won''t kill you, but it will wear you down. A cooked meal does more than fill you: it gives you a bonus for a while.'
-  rank: 0
-  availableObjective: Stay alert. The expedition is moving on.
-  announceStart: 0
-  announceCompletion: 0
+  rank: 2
+  availableObjective: 
+  announceStart: 1
+  announceCompletion: 1
   showTimerInHud: 0
   prerequisites:
-  - {fileID: 11400000, guid: 2ba326763b19a9e46be36507850aed82, type: 2}
+  - {fileID: 11400000, guid: 0279feb93b7c8b74e9fd8683d9d10fd3, type: 2}
   startedFirst: []
-  start: 0
+  start: 2
   startEvent: {fileID: 0}
   startWhen:
     type: 0
@@ -48,7 +48,7 @@ MonoBehaviour:
     tier: 2
     bringHome: 0
     countAlreadyOwned: 0
-  closedBy: {fileID: 0}
+  closedBy: {fileID: 11400000, guid: 2f76858ea1c6b6043bdee39be76ef0b1, type: 2}
   startDelay: 0
   onStarted: []
   objectivesInOrder: 1
@@ -94,8 +94,10 @@ MonoBehaviour:
     bringHome: 0
     countAlreadyOwned: 0
   turnInToGiver: 1
-  turnInTo: Sigrid
-  rewardItems: []
+  turnInTo: Eirik
+  rewardItems:
+  - item: {fileID: 11400000, guid: 7a7fe539c225ffa48a608e7af98d39e4, type: 2}
+    amount: 2
   rewardResources: []
   rewardRecipes: []
   experience: 0

@@ -10,6 +10,17 @@ public sealed class PrologueTests
 {
     private const string Root = "Assets/_Project/Data/Prologue";
     private PrologueDefinition Definition => AssetDatabase.LoadAssetAtPath<PrologueDefinition>(Root + "/ForestPrologue.asset");
+    // The quests of the sequence, each once: a quest can run through several chapters (Ends At Objective).
+    private QuestDefinition[] Quests => Definition.Chapters.Select(c => c.Quest).Distinct().ToArray();
+
+    // What doing an objective looks like to the quest log.
+    private static GameEvent Doing(QuestObjective objective) =>
+        objective.DeedKind.HasValue ? new GameEvent(objective.DeedKind.Value, objective.DeedTarget, objective.Amount) :
+                    new GameEvent(objective.Type == ObjectiveType.QuestEvent ? GameEventKind.Custom :
+                    objective.Type == ObjectiveType.BuildStructure ? GameEventKind.Built :
+                    objective.Type == ObjectiveType.CraftItem ? GameEventKind.Crafted : GameEventKind.ItemObtained,
+                    objective.Type == ObjectiveType.QuestEvent ? (UnityEngine.Object)objective.QuestEvent :
+                    objective.Type == ObjectiveType.BuildStructure ? (UnityEngine.Object)objective.Building : objective.Item, objective.Amount);
 
     [Test]
     public void TheCampfire_OpensTheSameStationWindowAsInTheHaven()
@@ -75,13 +86,15 @@ public sealed class PrologueTests
     {
         Assert.NotNull(Definition);
         Assert.IsNull(Definition.FindProblem());
-        Assert.AreEqual(12, Definition.Chapters.Length);
+        // Seven quests in nine chapters (Docs/QuestRedesign.md, step 2): it was twelve of each.
+        Assert.AreEqual(9, Definition.Chapters.Length);
+        Assert.AreEqual(7, Quests.Length);
+        CollectionAssert.AreEqual(new[] { "MorningCamp", "RoadToForest", "FindShelter", "CatchBreath", "DefendCamp", "ReachPortal", "HoldPortal" }, Quests.Select(q => q.name));
         Assert.AreEqual(60f, Definition.Chapters.Single(c => c.Behaviour == PrologueStep.HoldPortal).Duration);
-        // The flight from the old troll is told by its story graph in the scene (Story - The Old Troll), not an arrival line;
-        // so are the Story chapters that start by themselves (the morning fire, the tree line).
-        Assert.IsTrue(Definition.Chapters.Where(c => c.Behaviour != PrologueStep.ReachPortal &&
-            !(c.Behaviour == PrologueStep.Story && c.Quest.Start == QuestStart.Automatically)).All(c => !string.IsNullOrWhiteSpace(c.ArrivalText)));
-        Assert.IsNull(Definition.StartingWeapon, "The weapon is chosen at the tree line, in the scene's story (Story - Choose a Weapon).");
+        // Story graphs in the scene tell the flight from the old troll and what happens at the stones (Story - The Old Troll,
+        // Story - What Sigrid Knows), and open the rest (Story - A Name Gone Missing): those chapters have no arrival line.
+        Assert.IsTrue(Definition.Chapters.Where(c => c.Quest.name != "ReachPortal" && c.Quest.name != "CatchBreath").All(c => !string.IsNullOrWhiteSpace(c.ArrivalText)));
+        Assert.IsNull(Definition.StartingWeapon, "The weapon is chosen as the party sets out, in the scene's story (Story - Choose a Weapon).");
         Assert.IsNull(Definition.StartingTorch, "Nobody carries a lit torch in the morning: it is handed out on the road (Story - The Road East).");
         // 40% fewer at the portal on request (2026-11-09): 2 at first, waves of 2, 3, 3, 3 (13 in all, was 22).
         Assert.AreEqual(2, Definition.WaveSize(1));
@@ -92,25 +105,27 @@ public sealed class PrologueTests
     public void AuthoredQuests_FormACompleteEventDrivenSequence()
     {
         var log = new QuestLog();
-        foreach (PrologueChapter chapter in Definition.Chapters)
+        var visited = new System.Collections.Generic.List<PrologueChapter>();
+        foreach (QuestDefinition quest in Quests)
         {
-            Assert.AreSame(chapter, Definition.Chapter(log));
-            Assert.IsTrue(log.TryStart(chapter.Quest), chapter.Quest.DisplayName);
-            Assert.IsEmpty(chapter.Quest.FindProblems(), chapter.Quest.DisplayName);
-            foreach (QuestObjective objective in chapter.Quest.Objectives)
-                log.Handle(objective.DeedKind.HasValue ? new GameEvent(objective.DeedKind.Value, objective.DeedTarget, objective.Amount) :
-                    new GameEvent(objective.Type == ObjectiveType.QuestEvent ? GameEventKind.Custom :
-                    objective.Type == ObjectiveType.BuildStructure ? GameEventKind.Built :
-                    objective.Type == ObjectiveType.CraftItem ? GameEventKind.Crafted : GameEventKind.ItemObtained,
-                    objective.Type == ObjectiveType.QuestEvent ? (UnityEngine.Object)objective.QuestEvent :
-                    objective.Type == ObjectiveType.BuildStructure ? (UnityEngine.Object)objective.Building : objective.Item, objective.Amount));
-            if (chapter.Quest.TurnInToGiver)
+            Assert.AreSame(quest, Definition.Chapter(log).Quest);
+            Assert.IsTrue(log.TryStart(quest), quest.DisplayName);
+            Assert.IsEmpty(quest.FindProblems(), quest.DisplayName);
+            foreach (QuestObjective objective in quest.Objectives)
             {
-                Assert.AreEqual(QuestStatus.ReadyToTurnIn, log.StatusOf(chapter.Quest));
-                Assert.IsTrue(log.TryTurnIn(chapter.Quest));
+                // Every chapter of the quest gets its turn as the objectives are done in order.
+                if (!visited.Contains(Definition.Chapter(log))) visited.Add(Definition.Chapter(log));
+                log.Handle(Doing(objective));
             }
-            Assert.AreEqual(QuestStatus.Completed, log.StatusOf(chapter.Quest));
+
+            if (quest.TurnInToGiver)
+            {
+                Assert.AreEqual(QuestStatus.ReadyToTurnIn, log.StatusOf(quest));
+                Assert.IsTrue(log.TryTurnIn(quest));
+            }
+            Assert.AreEqual(QuestStatus.Completed, log.StatusOf(quest));
         }
+        CollectionAssert.AreEqual(Definition.Chapters, visited, "each chapter in its turn, none skipped");
         Assert.IsNull(Definition.Chapter(log));
         Assert.IsTrue(log.HasHappened(Definition.FinishedEvent), "The hold objective is the actual finished story event.");
     }
@@ -118,37 +133,102 @@ public sealed class PrologueTests
     [Test]
     public void LaterChapters_CannotStartBeforeTheirPrerequisites()
     {
-        foreach (PrologueChapter chapter in Definition.Chapters.Skip(1))
-            Assert.IsFalse(new QuestLog().TryStart(chapter.Quest), chapter.Quest.name);
+        foreach (QuestDefinition quest in Quests.Skip(1))
+            Assert.IsFalse(new QuestLog().TryStart(quest), quest.name);
+    }
+
+    // Sigrid briefs twice, in the morning and before the road. From the tree line on the night gives nobody time to be
+    // briefed: each quest starts by itself, and what a part of a quest needs said is called out in passing.
+    [Test]
+    public void OnlyTheMorningAndTheRoad_AreBriefings()
+    {
+        QuestDefinition[] quests = Quests;
+        for (int i = 0; i < quests.Length; i++)
+        {
+            Assert.AreEqual(i < 2 ? QuestStart.ByQuestGiver : QuestStart.Automatically, quests[i].Start, quests[i].name);
+            bool nextBriefing = i + 1 < quests.Length && quests[i + 1].Start == QuestStart.ByQuestGiver;
+            Assert.AreEqual(nextBriefing, quests[i].TurnInToGiver,
+                "The next briefing hands this quest in and accepts its successor in one interaction.");
+            if (nextBriefing) Assert.AreEqual("Sigrid", quests[i].TurnInTo);
+        }
     }
 
     [Test]
-    public void PeacefulChapters_KeepTheirReturnObjectiveUntilTheNextBriefing()
+    public void OneQuest_RunsThroughSeveralChapters()
     {
-        // The leader's briefings wait to be accepted; what a companion calls out ("Eirik: ...", "Runa: Wolves!") or a
-        // story tells starts at once.
-        for (int i = 0; i < Definition.Chapters.Length; i++)
+        PrologueChapter[] shelter = Definition.Chapters.Where(c => c.Quest.name == "FindShelter").ToArray();
+        CollectionAssert.AreEqual(new[] { PrologueStep.FindShelter, PrologueStep.LightFire }, shelter.Select(c => c.Behaviour));
+        Assert.AreEqual(1, shelter[0].EndsAtObjective, "the first part ends at the shelter");
+        Assert.AreEqual(0, shelter[1].EndsAtObjective, "the last part lasts as long as the quest");
+        Assert.IsTrue(Definition.OpensItsQuest(shelter[0]));
+        Assert.IsFalse(Definition.OpensItsQuest(shelter[1]), "no hand-over in the middle of a quest: its line is said in passing");
+        Assert.AreEqual(PrologueCompanions.Follow, shelter[0].Companions);
+        Assert.IsTrue(shelter[1].AtRest, "the companions can be asked things while the player gathers");
+
+        PrologueChapter[] stones = Definition.Chapters.Where(c => c.Quest.name == "ReachPortal").ToArray();
+        CollectionAssert.AreEqual(new[] { PrologueStep.ReachPortal, PrologueStep.ActivatePortal }, stones.Select(c => c.Behaviour));
+        Assert.IsTrue(stones[0].Quest.ObjectivesInOrder, "the stone can't be touched before it is reached");
+        Assert.AreEqual(Definition.PortalActivatedEvent, stones[0].Quest.Objectives[1].QuestEvent);
+
+        // The rules a designer is told about when they are broken.
+        var copy = UnityEngine.Object.Instantiate(Definition);
+        try
         {
-            var chapter = Definition.Chapters[i];
-            int colon = chapter.ArrivalText.IndexOf(':');
-            bool spokenByCompanion = colon > 0 && colon < 16;
-            bool briefing = !string.IsNullOrWhiteSpace(chapter.ArrivalText) && !spokenByCompanion;
-            Assert.AreEqual(briefing ? QuestStart.ByQuestGiver : QuestStart.Automatically, chapter.Quest.Start, chapter.Quest.name);
-            bool nextBriefing = i + 1 < Definition.Chapters.Length && Definition.Chapters[i + 1].Quest.Start == QuestStart.ByQuestGiver;
-            Assert.AreEqual(nextBriefing, chapter.Quest.TurnInToGiver,
-                "The next briefing hands this quest in and accepts its successor in one interaction.");
-            if (nextBriefing) Assert.AreEqual("Sigrid", chapter.Quest.TurnInTo);
+            var data = new SerializedObject(copy);
+            SerializedProperty chapters = data.FindProperty("chapters");
+            int first = System.Array.IndexOf(Definition.Chapters, shelter[0]);
+            chapters.GetArrayElementAtIndex(first).FindPropertyRelative("endsAtObjective").intValue = 0;
+            data.ApplyModifiedPropertiesWithoutUndo();
+            StringAssert.Contains("Ends At Objective", copy.FindProblem());
+            chapters.GetArrayElementAtIndex(first).FindPropertyRelative("endsAtObjective").intValue = 9;
+            data.ApplyModifiedPropertiesWithoutUndo();
+            StringAssert.Contains("no objective 9", copy.FindProblem());
+            chapters.GetArrayElementAtIndex(first).FindPropertyRelative("endsAtObjective").intValue = 1;
+            chapters.MoveArrayElement(first + 1, 0);
+            data.ApplyModifiedPropertiesWithoutUndo();
+            StringAssert.Contains("must follow each other", copy.FindProblem());
         }
+        finally
+        {
+            UnityEngine.Object.DestroyImmediate(copy);
+        }
+    }
+
+    // The camp was two wolves, over in fifteen seconds of the playtest.
+    [Test]
+    public void TheCamp_IsAttackedTwice()
+    {
+        PrologueChapter camp = Definition.Chapters.Single(c => c.Behaviour == PrologueStep.DefendCamp);
+        Assert.AreEqual(3, camp.InitialEnemies);
+        Assert.AreEqual(2, camp.Waves);
+        StringAssert.StartsWith("Runa:", camp.NextWaveText, "someone calls out the second wave");
+        Assert.IsTrue(Definition.Chapters.Where(c => c != camp).All(c => c.Waves == 1));
+    }
+
+    // Eirik's errand during the rest: it gates nothing, and the wolves end it.
+    [Test]
+    public void TheBerries_AreAnErrand()
+    {
+        var pot = AssetDatabase.LoadAssetAtPath<QuestDefinition>(Root + "/Quests/BerriesForThePot.asset");
+        Assert.AreEqual(QuestRank.Optional, pot.Rank);
+        Assert.AreEqual(QuestStart.ByQuestGiver, pot.Start);
+        Assert.IsFalse(Definition.Chapters.Any(c => c.Quest == pot), "not a step of the story");
+        Assert.AreEqual("DefendCamp", pot.ClosedBy.name);
+        Assert.AreEqual("Eirik", pot.TurnInTo);
+        Assert.IsFalse(Quests.Any(q => q.Prerequisites.Contains(pot)), "nothing waits for it");
+        Assert.IsNotEmpty(pot.RewardItems);
+        Assert.IsEmpty(pot.FindProblems());
     }
 
     [Test]
     public void Chain_AnnouncesOnlyItsBeginningAndEnd_AndMakesTimedInstructionsExplicit()
     {
-        for (int i = 0; i < Definition.Chapters.Length; i++)
+        QuestDefinition[] quests = Quests;
+        for (int i = 0; i < quests.Length; i++)
         {
-            var quest = Definition.Chapters[i].Quest;
+            var quest = quests[i];
             Assert.AreEqual(i == 0, quest.AnnounceStart, quest.name);
-            Assert.AreEqual(i == Definition.Chapters.Length - 1, quest.AnnounceCompletion, quest.name);
+            Assert.AreEqual(i == quests.Length - 1, quest.AnnounceCompletion, quest.name);
             Assert.IsFalse(string.IsNullOrWhiteSpace(quest.AvailableObjective), quest.name);
         }
         var rest = Definition.Chapters.Single(c => c.Quest.name == "CatchBreath");
@@ -165,17 +245,24 @@ public sealed class PrologueTests
         var fire = Definition.Chapters.Single(c => c.Behaviour == PrologueStep.LightFire).Quest;
         foreach (var chapter in Definition.Chapters.TakeWhile(c => c.Quest != fire)) log.ForceComplete(chapter.Quest);
         Assert.IsTrue(log.TryStart(fire));
+        foreach (QuestObjective before in fire.Objectives.Where(o => o.Type != ObjectiveType.BuildStructure)) log.Handle(Doing(before));
         log.Handle(new GameEvent(GameEventKind.Custom, Definition.FireEvent));
         Assert.AreEqual(QuestStatus.Active, log.StatusOf(fire), "The old use-fire shortcut must not complete construction.");
         Assert.AreSame(AssetDatabase.LoadAssetAtPath<BuildingDefinition>("Assets/_Project/Data/Buildings/Campfire.asset"),
             Definition.Campfire, "The expedition builds the same campfire the player can build at home.");
         Assert.IsTrue(Definition.Campfire.ShowInBuildMenu);
-        var gather = Definition.Chapters.Single(c => c.Behaviour == PrologueStep.GatherFuel && c.Quest.name == "GatherFuel").Quest;
+        // The quest asks for exactly what the fire costs, and counts what the player already carries.
+        Assert.AreEqual(Definition.Campfire.ConstructionItems.Count, fire.Objectives.Count(o => o.Type == ObjectiveType.CollectItem));
         foreach (var cost in Definition.Campfire.ConstructionItems)
-            Assert.AreEqual(cost.Amount, gather.Objectives.Single(o => o.Item == cost.Item).Amount);
+        {
+            QuestObjective gather = fire.Objectives.Single(o => o.Item == cost.Item);
+            Assert.AreEqual(cost.Amount, gather.Amount);
+            Assert.IsTrue(gather.CountAlreadyOwned);
+        }
+
         log.Handle(new GameEvent(GameEventKind.Built, Definition.Campfire));
         Assert.AreEqual(QuestStatus.Completed, log.StatusOf(fire));
-        Assert.AreEqual(QuestStatus.NotStarted, log.StatusOf(Definition.Chapters.Single(c => c.Quest.name == "BerriesForThePot").Quest));
+        Assert.AreEqual("CatchBreath", Definition.Chapter(log).Quest.name, "the rest follows the fire, with nothing to hand in between");
     }
 
     [Test]
@@ -341,10 +428,11 @@ public sealed class PrologueTests
         // The shelter's zone raises the story event and counts as reaching the shelter, which the quest asks for.
         log.Handle(new GameEvent(GameEventKind.Custom, Definition.ShelterEvent));
         log.Handle(new GameEvent(GameEventKind.Reached, shelter.Quest.Objectives[0].DeedTarget));
-        Assert.AreSame(shelter, Definition.Chapter(log), "The return objective is still part of the current chapter.");
-        Assert.IsTrue(log.TryTurnIn(shelter.Quest));
         Assert.AreEqual(before, EditorJsonUtility.ToJson(Definition));
-        Assert.AreSame(Definition.Chapters[System.Array.IndexOf(Definition.Chapters, shelter) + 1], Definition.Chapter(log));
+        PrologueChapter fire = Definition.Chapters[System.Array.IndexOf(Definition.Chapters, shelter) + 1];
+        Assert.AreSame(fire, Definition.Chapter(log), "Reaching the shelter moves on to the fire, with nobody to report to.");
+        Assert.AreSame(shelter.Quest, fire.Quest, "It is still the same quest for the player.");
+        Assert.AreEqual(QuestStatus.Active, log.StatusOf(shelter.Quest));
     }
 
     [Test]

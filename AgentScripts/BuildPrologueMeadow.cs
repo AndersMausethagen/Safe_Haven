@@ -20,6 +20,12 @@ using UnityEngine.Splines;
 /// in the forest's west wall, the road, the rivers, the lake, the woods, and the NavMesh. Moments: the camp, the people, the
 /// looks, the reactions and the stories. Each is safe to run again and replaces what it made before.
 /// </para>
+/// <para>
+/// Since 2026-11-10 (Docs/QuestRedesign.md, step 2) the main line is seven quests where it was twelve: the weapon is chosen
+/// as the party sets out, wolves come out of the trees at the cart, the shelter and the fire are one quest, the berries are
+/// Eirik's errand, the camp is attacked twice, and the stones are reached and woken in one quest. Where a Tree Line, a
+/// Gather Fuel, a Light Fire or an Activate Portal quest is mentioned in older notes, it is gone.
+/// </para>
 /// </summary>
 public static class BuildPrologueMeadow
 {
@@ -28,6 +34,8 @@ public static class BuildPrologueMeadow
     private const string Items = "Assets/_Project/Data/Items/";
     private const string MainChain = "Prologue - The Unquiet Forest";
     private const string SideChain = "Prologue - Before the Road";
+    private const string CampChain = "Prologue - By the Fire";
+    private static readonly Vector2 RoadWolves = new Vector2(-203f, -4f);
     private const string MeadowData = Prologue + "Vegetation/Prologue Meadow Terrain.asset";
     private const string TrunksAsset = Prologue + "Vegetation/Prologue Forest Trunks.asset";
     private const string NavMeshAsset = "Assets/_Project/Scenes/Prologue_MistyWoods/NavMesh-NavMesh.asset";
@@ -76,6 +84,7 @@ public static class BuildPrologueMeadow
         Event("RoadGone", "prologue.road_gone", "The Road Behind Is Gone", "");
         Event("PressedSigrid", "prologue.pressed_sigrid", "Pressed Sigrid About the Stones", "");
         Event("TouchedLakeStone", "prologue.touched_lake_stone", "Touched the Stone by the Lake", "");
+        Event("NameGoneMissing", "prologue.name_gone_missing", "A Name Went Missing by the Fire", "");
         Event("CameForCoin", "prologue.came_for_coin", "Came for the Coin", "");
         Event("CameForKin", "prologue.came_for_kin", "Came for Someone", "");
         Event("CameForTruth", "prologue.came_for_truth", "Came to Know", "");
@@ -86,8 +95,9 @@ public static class BuildPrologueMeadow
 
         QuestDefinition morning = Quest("MorningCamp");
         QuestDefinition road = Quest("RoadToForest");
-        QuestDefinition treeLine = Quest("TreeLine");
         QuestDefinition shelter = Existing("FindShelter");
+        QuestDefinition rest = Existing("CatchBreath"), wolves = Existing("DefendCamp"), stones = Existing("ReachPortal"), hold = Existing("HoldPortal");
+        var prologue = Load<PrologueDefinition>(Prologue + "ForestPrologue.asset");
 
         Edit(morning, so =>
         {
@@ -111,26 +121,84 @@ public static class BuildPrologueMeadow
             TurnIn(so, false, "");
             Objectives(so, false, (ObjectiveType.QuestEvent, "Walk with the expedition to the forest", 1, entered));
         });
-        Edit(treeLine, so =>
+        // One quest from the tree line to the first fire. It was four (the tree line, the shelter, the fuel, the fire), each
+        // handed over in a talk with Sigrid: nine quests in six minutes of the playtest. It starts by itself as the forest
+        // closes in, and its chapters end at its objectives (PrologueChapter.EndsAtObjective).
+        const string shelterBriefing = "That was no weather. The sun went down hours early and this storm came out of a clear sky. Ingrid, Bjarne, Tor and Liv walked into this two days ago, so we go on, not back. Follow the old road into the trees and find us dry shelter. We are right behind you.";
+        Edit(shelter, so =>
         {
-            Basics(so, "prologue.tree_line", "Where the Sun Went", MainChain,
-                "It should be noon, and it is the middle of the night. The expedition has stopped just inside the trees. Sigrid wants you armed before anyone goes further.",
-                "Stay alert. The expedition is moving on.");
+            so.FindProperty("description").stringValue = "It should be noon, and it is the middle of the night. The expedition came for four of its own, and the forest has already put out the sun. Follow the old road in, find dry shelter and get a fire going beside it.";
+            so.FindProperty("availableObjective").stringValue = "Stay close. The expedition is moving on.";
             Starts(so, QuestStart.Automatically);
             so.FindProperty("startDelay").floatValue = 5f;
             Prerequisites(so, road);
             Announce(so, false, false);
-            TurnIn(so, true, "Sigrid");
-            Objectives(so, false, (ObjectiveType.QuestEvent, "Choose a weapon", 1, chosen));
+            TurnIn(so, false, "");
+            var steps = new List<(ObjectiveType type, string text, int amount, Object target)> { (ObjectiveType.ReachPlace, "Find the rock shelter along the old road", 1, null) };
+            // What the fire costs, so the quest and the build menu always agree (PrologueTests checks it).
+            foreach (ItemAmount cost in prologue.Campfire.ConstructionItems) steps.Add((ObjectiveType.CollectItem, "", cost.Amount, cost.Item));
+            steps.Add((ObjectiveType.BuildStructure, "Build a Campfire beside the shelter (G)", 1, null));
+            Objectives(so, false, steps.ToArray());
+            SerializedProperty list = so.FindProperty("objectives");
+            for (int i = 0; i < list.arraySize; i++)
+            {
+                SerializedProperty step = list.GetArrayElementAtIndex(i);
+                step.FindPropertyRelative("target").objectReferenceValue = i == 0 ? Load<QuestTargetDefinition>("Assets/_Project/Data/Quests/Targets/Rock Shelter.asset") : null;
+                step.FindPropertyRelative("building").objectReferenceValue = i == list.arraySize - 1 ? prologue.Campfire : null;
+                step.FindPropertyRelative("person").objectReferenceValue = null;
+                // Wood cut in the morning, and anything picked up on the way in, counts towards the fire.
+                step.FindPropertyRelative("countAlreadyOwned").boolValue = i > 0 && i < list.arraySize - 1;
+            }
         });
-        const string shelterBriefing = "That was no weather. The sun went down hours early and this storm came out of a clear sky. Ingrid, Bjarne, Tor and Liv walked into this two days ago, so we go on, not back. Keep your torch up and follow the old road into the trees. Find us dry shelter; we will follow you.";
-        Edit(shelter, so =>
+
+        // The berries are Eirik's errand during the rest: the wolves wait for whoever has gone to pick them, for a while.
+        Edit(Existing("BerriesForThePot"), so =>
         {
-            so.FindProperty("description").stringValue = "The expedition came for four of its own and to look into rumours of a bewitched forest, and the forest has already put out the sun. Follow the old road in and find dry shelter.";
+            so.FindProperty("chain").stringValue = CampChain;
+            so.FindProperty("description").stringValue = "Eirik says nobody fights well on an empty stomach. There are berries in the clearing west of the shelter: pick five and stew them over the fire in his waterskin. Whatever is out there won't wait for ever.";
+            so.FindProperty("availableObjective").stringValue = "";
             Starts(so, QuestStart.ByQuestGiver);
-            Prerequisites(so, treeLine);
-            Announce(so, false, false);
+            Prerequisites(so, shelter);
+            Announce(so, true, true);
+            so.FindProperty("closedBy").objectReferenceValue = wolves;
+            TurnIn(so, true, "Eirik");
+            Rewards(so, (Item("Bandage"), 2));
         });
+
+        // The rest starts by itself once the fire burns, and lasts until the wolves find it.
+        Edit(rest, so =>
+        {
+            so.FindProperty("description").stringValue = "A fire at last. Sit a while and talk to the others. It won't last.";
+            so.FindProperty("availableObjective").stringValue = "Warm yourself by the fire.";
+            Starts(so, QuestStart.Automatically);
+            so.FindProperty("startDelay").floatValue = 3f;
+            Prerequisites(so, shelter);
+            Announce(so, false, false);
+            TurnIn(so, false, "");
+            so.FindProperty("objectives").GetArrayElementAtIndex(0).FindPropertyRelative("description").stringValue = "Rest by the fire, and talk with the others";
+        });
+
+        // Reaching the stones and waking them is one quest: nobody stops to be briefed with the old troll behind them.
+        Edit(stones, so =>
+        {
+            so.FindProperty("description").stringValue = "Something much larger is approaching. Leave the camp, take the old path north to the standing stones, and wake them.";
+            TurnIn(so, false, "");
+            Objectives(so, true, (ObjectiveType.ReachPlace, "", 1, null), (ObjectiveType.QuestEvent, "Touch the centre stone", 1, prologue.PortalActivatedEvent));
+            SerializedProperty list = so.FindProperty("objectives");
+            list.GetArrayElementAtIndex(0).FindPropertyRelative("target").objectReferenceValue = Load<QuestTargetDefinition>("Assets/_Project/Data/Quests/Targets/Waystones.asset");
+            list.GetArrayElementAtIndex(1).FindPropertyRelative("target").objectReferenceValue = null;
+        });
+        Edit(hold, so => Prerequisites(so, stones));
+        // The journal's notes for the quests that took others in (BuildJournal holds the same text).
+        Edit(road, so => so.FindProperty("journalNotes").stringValue = "The old road runs straight at the trees. Somebody built it to go somewhere, and nobody at the camp knows where.\n\nChoose your weapon by how you want to fight rather than by its numbers. You will be making others soon enough.");
+        Edit(shelter, so => so.FindProperty("journalNotes").stringValue = "It really is noon. Everyone agrees on that and no one can explain the stars. Runa says the forest has moved since the others came through, which is not something forests do.\n\nSticks and small rocks lie about on the forest floor, and you can pick them up as you walk: this is how every fire you ever build starts. Press (G) to open the build menu. It is the first fire anyone has lit in here for a very long time, though you won't know that yet.");
+        Edit(stones, so => so.FindProperty("journalNotes").stringValue = "Whatever it is, the trees are moving out of its way. Don't stop to look.\n\nSigrid has seen writing like this once before, and she doesn't say where. The stones are older than the road, and much older than anyone who should know how to use them.");
+
+        foreach (string retired in new[] { "TreeLine", "GatherFuel", "LightFire", "ActivatePortal" })
+        {
+            string path = Prologue + "Quests/" + retired + ".asset";
+            if (Load<QuestDefinition>(path) != null) AssetDatabase.DeleteAsset(path);
+        }
 
         // Optional errands by the fire. Closed By ends them when the expedition sets out.
         Edit(Quest("HuntForThePot"), so =>
@@ -178,19 +246,6 @@ public static class BuildPrologueMeadow
         Edit(Quest("FishForBreakfast"), so => Prerequisites(so, Existing("WoodForTheRoad")));
         Edit(Quest("HuntForThePot"), so => Prerequisites(so, Existing("FishForBreakfast")));
         Edit(Quest("EirikLesson"), so => Prerequisites(so, morning));
-        // Wood cut in the morning counts towards the fire.
-        Edit(Existing("GatherFuel"), so =>
-        {
-            SerializedProperty fuel = so.FindProperty("objectives");
-            for (int i = 0; i < fuel.arraySize; i++) fuel.GetArrayElementAtIndex(i).FindPropertyRelative("countAlreadyOwned").boolValue = true;
-        });
-        // No more waiting on a countdown: the rest lasts until the wolves find it.
-        Edit(Existing("CatchBreath"), so =>
-        {
-            so.FindProperty("description").stringValue = "A fire and a warm meal at last. Sit a while and talk to the others. It won't last.";
-            so.FindProperty("objectives").GetArrayElementAtIndex(0).FindPropertyRelative("description").stringValue = "Rest by the fire, and talk with the others";
-        });
-
         AxeNames();
         var chapterData = new SerializedObject(Load<PrologueDefinition>(Prologue + "ForestPrologue.asset"));
         chapterData.FindProperty("startingBackpack").objectReferenceValue = Item("HideRucksack");
@@ -202,7 +257,7 @@ public static class BuildPrologueMeadow
         string boar = UnsavedCopy("Assets/_Project/Prefabs/Enemies/BlightBoar.prefab", Prologue + "ExpeditionBoar.prefab");
         UnsavedCopy("Assets/_Project/Prefabs/Enemies/Rootling.prefab", Prologue + "ExpeditionRootling.prefab");
         string moon = ForestMoon();
-        string chapters = Chapters(morning, road, treeLine, shelter, shelterBriefing);
+        string chapters = Chapters(morning, road, shelter, rest, wolves, stones, hold, shelterBriefing);
         AssetDatabase.SaveAssets();
         foreach (string guid in AssetDatabase.FindAssets("t:ContentDatabase"))
         {
@@ -215,57 +270,108 @@ public static class BuildPrologueMeadow
         return $"{chapters}; {ranks}; {sword}; {boar}; {moon}; problem: {Load<PrologueDefinition>(Prologue + "ForestPrologue.asset").FindProblem() ?? "none"}";
     }
 
-    private static string Chapters(QuestDefinition morning, QuestDefinition road, QuestDefinition treeLine, QuestDefinition shelter, string shelterBriefing)
+    // The whole sequence, written out: nine chapters for seven quests.
+    private static string Chapters(QuestDefinition morning, QuestDefinition road, QuestDefinition shelter, QuestDefinition rest, QuestDefinition wolves,
+        QuestDefinition stones, QuestDefinition hold, string shelterBriefing)
     {
         var prologue = Load<PrologueDefinition>(Prologue + "ForestPrologue.asset");
         var so = new SerializedObject(prologue);
         so.FindProperty("startingTorch").objectReferenceValue = null;
         so.FindProperty("survivedText").stringValue = "Sigrid: It is open! Everyone, through! The old troll's fist comes down on the stones. You reach for the others... and the forest disappears.";
         SerializedProperty chapters = so.FindProperty("chapters");
-        for (int i = chapters.arraySize - 1; i >= 0; i--)
+
+        // What the fights and the flight say and hold stays as it is tuned (BuildPrologueFinale, the Content Editor).
+        var kept = new Dictionary<PrologueStep, (string arrival, string status, float duration, int initial, List<(Object prefab, float weight, int fromWave)> enemies)>();
+        for (int i = 0; i < chapters.arraySize; i++)
         {
             SerializedProperty row = chapters.GetArrayElementAtIndex(i);
-            Object quest = row.FindPropertyRelative("quest").objectReferenceValue;
-            if (quest == morning || quest == road || quest == treeLine) chapters.DeleteArrayElementAtIndex(i);
-            else if (quest == shelter) row.FindPropertyRelative("arrivalText").stringValue = shelterBriefing;
-            else if (quest == Existing("CatchBreath"))
+            var behaviour = (PrologueStep)row.FindPropertyRelative("behaviour").intValue;
+            var enemies = new List<(Object prefab, float weight, int fromWave)>();
+            SerializedProperty list = row.FindPropertyRelative("enemies");
+            for (int e = 0; e < list.arraySize; e++)
             {
-                row.FindPropertyRelative("behaviour").intValue = (int)PrologueStep.Story;
-                row.FindPropertyRelative("site").intValue = (int)PrologueSite.Camp;
-                row.FindPropertyRelative("companions").intValue = (int)PrologueCompanions.WaitAtSite;
-                row.FindPropertyRelative("timeToTalk").boolValue = true;
-                row.FindPropertyRelative("duration").floatValue = 0f;
-                row.FindPropertyRelative("arrivalText").stringValue = RestBriefing;
+                SerializedProperty enemy = list.GetArrayElementAtIndex(e);
+                enemies.Add((enemy.FindPropertyRelative("prefab").objectReferenceValue, enemy.FindPropertyRelative("weight").floatValue, enemy.FindPropertyRelative("fromWave").intValue));
+            }
+
+            kept[behaviour] = (row.FindPropertyRelative("arrivalText").stringValue, row.FindPropertyRelative("statusText").stringValue,
+                row.FindPropertyRelative("duration").floatValue, row.FindPropertyRelative("initialEnemies").intValue, enemies);
+        }
+
+        foreach (PrologueStep needed in new[] { PrologueStep.DefendCamp, PrologueStep.ReachPortal, PrologueStep.HoldPortal })
+        {
+            if (!kept.ContainsKey(needed)) throw new System.InvalidOperationException("ForestPrologue has no " + needed + " chapter to keep.");
+        }
+
+        chapters.arraySize = 0;
+        SerializedProperty Row(QuestDefinition quest, PrologueStep behaviour, string arrival, int endsAt = 0)
+        {
+            int at = chapters.arraySize++;
+            SerializedProperty chapter = chapters.GetArrayElementAtIndex(at);
+            chapter.FindPropertyRelative("quest").objectReferenceValue = quest;
+            chapter.FindPropertyRelative("behaviour").intValue = (int)behaviour;
+            chapter.FindPropertyRelative("arrivalText").stringValue = arrival;
+            chapter.FindPropertyRelative("statusText").stringValue = kept.TryGetValue(behaviour, out var old) && behaviour != PrologueStep.Story ? old.status : "";
+            chapter.FindPropertyRelative("duration").floatValue = 0f;
+            chapter.FindPropertyRelative("initialEnemies").intValue = 0;
+            chapter.FindPropertyRelative("enemies").ClearArray();
+            chapter.FindPropertyRelative("site").intValue = (int)PrologueSite.Meadow;
+            chapter.FindPropertyRelative("companions").intValue = (int)PrologueCompanions.WaitAtSite;
+            chapter.FindPropertyRelative("timeToTalk").boolValue = false;
+            chapter.FindPropertyRelative("endsAtObjective").intValue = endsAt;
+            chapter.FindPropertyRelative("waves").intValue = 1;
+            chapter.FindPropertyRelative("nextWaveText").stringValue = "";
+            return chapter;
+        }
+
+        void Story(SerializedProperty chapter, PrologueSite site, PrologueCompanions companions, bool talk)
+        {
+            chapter.FindPropertyRelative("site").intValue = (int)site;
+            chapter.FindPropertyRelative("companions").intValue = (int)companions;
+            chapter.FindPropertyRelative("timeToTalk").boolValue = talk;
+        }
+
+        void Fight(SerializedProperty chapter, PrologueStep behaviour)
+        {
+            var old = kept[behaviour];
+            chapter.FindPropertyRelative("duration").floatValue = old.duration;
+            chapter.FindPropertyRelative("initialEnemies").intValue = old.initial;
+            SerializedProperty list = chapter.FindPropertyRelative("enemies");
+            foreach ((Object prefab, float weight, int fromWave) in old.enemies)
+            {
+                SerializedProperty enemy = list.GetArrayElementAtIndex(list.arraySize++);
+                enemy.FindPropertyRelative("prefab").objectReferenceValue = prefab;
+                enemy.FindPropertyRelative("weight").floatValue = weight;
+                enemy.FindPropertyRelative("fromWave").intValue = fromWave;
             }
         }
 
-        Insert(chapters, 0, morning, MorningBriefing, PrologueSite.Meadow, PrologueCompanions.StandStill, true);
-        Insert(chapters, 1, road, RoadBriefing, PrologueSite.Meadow, PrologueCompanions.StoryLeads, false);
-        Insert(chapters, 2, treeLine, "", PrologueSite.Forest, PrologueCompanions.WatchOnly, false);
+        Story(Row(morning, PrologueStep.Story, MorningBriefing), PrologueSite.Meadow, PrologueCompanions.StandStill, true);
+        Story(Row(road, PrologueStep.Story, RoadBriefing), PrologueSite.Meadow, PrologueCompanions.StoryLeads, false);
+        // Shelter from the Storm, in two parts: to the shelter, then the fire beside it.
+        Row(shelter, PrologueStep.FindShelter, shelterBriefing, 1);
+        Row(shelter, PrologueStep.LightFire, FireBriefing).FindPropertyRelative("statusText").stringValue = "Build a Campfire beside the shelter (G)";
+        // The rest opens with what Sigrid can't remember (Story - A Name Gone Missing), so the chapter has no line of its own.
+        Story(Row(rest, PrologueStep.Story, ""), PrologueSite.Camp, PrologueCompanions.WaitAtSite, true);
+        // The camp was two wolves and over in fifteen seconds (playtest logs): three now, and three more when they have fallen.
+        SerializedProperty camp = Row(wolves, PrologueStep.DefendCamp, kept[PrologueStep.DefendCamp].arrival);
+        Fight(camp, PrologueStep.DefendCamp);
+        camp.FindPropertyRelative("initialEnemies").intValue = 3;
+        camp.FindPropertyRelative("waves").intValue = 2;
+        camp.FindPropertyRelative("nextWaveText").stringValue = "Runa: More of them, coming round the other side!";
+        // Something Is Coming, in two parts: the flight to the stones, then the hand on the stone. Both are told by stories.
+        Row(stones, PrologueStep.ReachPortal, "", 1);
+        Row(stones, PrologueStep.ActivatePortal, "");
+        Fight(Row(hold, PrologueStep.HoldPortal, kept[PrologueStep.HoldPortal].arrival), PrologueStep.HoldPortal);
+
         so.ApplyModifiedPropertiesWithoutUndo();
         EditorUtility.SetDirty(prologue);
         return $"{chapters.arraySize} chapters";
     }
 
-    private const string RestBriefing = "A fire and a warm meal. Sit, talk to the others, get your breath back. Whatever is out there will still be there when we are done.";
+    private const string FireBriefing = "Dry stone overhead. Good work. Now a fire, before anyone can think clearly: eight sticks and twelve small rocks off the forest floor, then build it beside the shelter (G).";
     private const string MorningBriefing = "There you are. Come and stand by the fire with the rest of us. You should know who you are walking with before we set out.";
     private const string RoadBriefing = "The packs are tied and the fire is nearly out. Ingrid's party should have been back yesterday, and the forest is half a morning down the road. If you have anything left to do here, do it now: once we set out, we do not come back for it. Are you ready?";
-
-    private static void Insert(SerializedProperty chapters, int at, QuestDefinition quest, string arrival, PrologueSite site, PrologueCompanions companions, bool talk)
-    {
-        chapters.InsertArrayElementAtIndex(at);
-        SerializedProperty chapter = chapters.GetArrayElementAtIndex(at);
-        chapter.FindPropertyRelative("quest").objectReferenceValue = quest;
-        chapter.FindPropertyRelative("behaviour").intValue = (int)PrologueStep.Story;
-        chapter.FindPropertyRelative("arrivalText").stringValue = arrival;
-        chapter.FindPropertyRelative("statusText").stringValue = "";
-        chapter.FindPropertyRelative("duration").floatValue = 0f;
-        chapter.FindPropertyRelative("initialEnemies").intValue = 0;
-        chapter.FindPropertyRelative("enemies").ClearArray();
-        chapter.FindPropertyRelative("site").intValue = (int)site;
-        chapter.FindPropertyRelative("companions").intValue = (int)companions;
-        chapter.FindPropertyRelative("timeToTalk").boolValue = talk;
-    }
 
     // Gold for the prologue's story, bronze for the errands before the road. Only the prologue's own chains: every other
     // quest's kind (rescues, the haven, tales, errands) is set by BuildQuestCategories, and this used to turn them all gold.
@@ -275,8 +381,8 @@ public static class BuildPrologueMeadow
         foreach (string guid in AssetDatabase.FindAssets("t:QuestDefinition"))
         {
             var quest = Load<QuestDefinition>(AssetDatabase.GUIDToAssetPath(guid));
-            if (quest.Chain != SideChain && quest.Chain != MainChain) continue;
-            QuestRank rank = quest.Chain == SideChain ? QuestRank.Optional : QuestRank.MainStory;
+            if (quest.Chain != SideChain && quest.Chain != CampChain && quest.Chain != MainChain) continue;
+            QuestRank rank = quest.Chain == MainChain ? QuestRank.MainStory : QuestRank.Optional;
             story += rank == QuestRank.MainStory ? 1 : 0;
             optional += rank == QuestRank.Optional ? 1 : 0;
             Edit(quest, so => so.FindProperty("rank").intValue = (int)rank);
@@ -1096,6 +1202,7 @@ public static class BuildPrologueMeadow
         string places = Places(director, root, fireAt, sigrid, eirik, runa);
         GiverData(companions, eirik, runa);
         SigridOffers(sigrid);
+        string marks = OldWaypoints(sigrid, eirik);
         LeaderLine(intro);
         Look(root);
         Transform threshold = Threshold(root);
@@ -1106,6 +1213,8 @@ public static class BuildPrologueMeadow
 
         MobSpawnZone boars = Zone(root, "Meadow Boars", Prologue + "ExpeditionBoar.prefab", BoarMeadow, 9f, 3, MobSpawnTrigger.Manual, false, true);
         MobSpawnZone ambushZone = Zone(root, "Rootlings on the Road", Prologue + "ExpeditionRootling.prefab", new Vector2(-46f, -3f), 6f, 4, MobSpawnTrigger.Manual, true, false);
+        // What the boar are running from: the first fight, by the cart and in daylight.
+        MobSpawnZone roadWolves = Zone(root, "Wolves on the Road", Prologue + "ExpeditionWolf.prefab", RoadWolves, 5f, 3, MobSpawnTrigger.Manual, true, false);
         MobSpawnZone practice = Zone(root, "Practice Rootling", Prologue + "ExpeditionRootling.prefab", new Vector2(-61f, 1f), 3f, 1, MobSpawnTrigger.Manual, true, true);
         var practiceData = new SerializedObject(practice);
         practiceData.FindProperty("respawnSeconds").floatValue = 5f;
@@ -1128,7 +1237,7 @@ public static class BuildPrologueMeadow
         SaveableEntityTools.AssignSceneIds(scene);
         Reactions(root, threshold, sigrid, eirik);
         Stories(moments, sigrid, eirik, runa, route, treeLine, threshold, ambushZone, boars);
-        Beats(moments, root, companions, sigrid, eirik, runa, route, routeOn, treeLine, dummy, practice, cartProp, lakeStone, troll, runners, behind);
+        Beats(moments, root, companions, sigrid, eirik, runa, route, routeOn, treeLine, dummy, practice, cartProp, lakeStone, troll, runners, behind, roadWolves);
 
         var surface = Object.FindAnyObjectByType<Unity.AI.Navigation.NavMeshSurface>();
         surface.BuildNavMesh();
@@ -1142,7 +1251,7 @@ public static class BuildPrologueMeadow
         EditorSceneManager.SaveScene(scene);
         AssetDatabase.SaveAssets();
         string problems = string.Join("; ", moments.GetComponentsInChildren<StoryScript>().SelectMany(s => s.FindProblems()));
-        return $"{places}; boars {boars.transform.position:F0}; problems: {(problems.Length > 0 ? problems : "none")}; dirty {scene.isDirty}";
+        return $"{places}; boars {boars.transform.position:F0}; {marks}; problems: {(problems.Length > 0 ? problems : "none")}; dirty {scene.isDirty}";
     }
 
     // A fire to stand around: the campfire's model and light, without what makes it a building the player owns.
@@ -1272,6 +1381,11 @@ public static class BuildPrologueMeadow
                 "Two fish from the lake. Hold attack to swing back, let go to cast, and strike when the float goes under.",
                 "Breakfast! You may be the best person on this expedition. Keep the rod; there is bound to be water in those woods."),
             LessonOffer,
+            ("BerriesForThePot", "Is there anything to eat?",
+                "Dry bread, unless you fancy a walk. There are berry bushes in the clearing west of the shelter. Pick five and stew them over the fire; take my waterskin for the pot. Be quick about it. I do not like how quiet it is.",
+                "I'll get them.",
+                "Five berries from the clearing to the west, then the pot. My waterskin is in your pack.",
+                "Hot food. You have just made three friends for life. Take these, in case the night is not done with us."),
         });
     }
 
@@ -1328,36 +1442,59 @@ public static class BuildPrologueMeadow
         so.ApplyModifiedPropertiesWithoutUndo();
     }
 
+    // Sigrid briefs twice, in the morning and before the road. After that the night gives nobody time to be briefed.
     private static void SigridOffers(Transform sigrid)
     {
         var so = new SerializedObject(sigrid.GetComponent<QuestGiver>());
         SerializedProperty offers = so.FindProperty("offers");
-        for (int i = offers.arraySize - 1; i >= 0; i--)
-        {
-            var quest = offers.GetArrayElementAtIndex(i).FindPropertyRelative("quest").objectReferenceValue as QuestDefinition;
-            if (quest == Existing("MorningCamp") || quest == Existing("RoadToForest") || quest == Existing("TreeLine")) offers.DeleteArrayElementAtIndex(i);
-        }
-
+        offers.arraySize = 0;
         AddOffer(offers, 0, Existing("MorningCamp"), MorningBriefing, "Tell me.", "Finish your porridge and listen. This is the only quiet you will get today.");
         AddOffer(offers, 1, Existing("RoadToForest"), RoadBriefing, "I'm ready. Let's go.", "Stay on the road. We keep a steady pace, and the others will wait if you fall behind.");
-        AddOffer(offers, 2, Existing("TreeLine"), "", "It's done.", "Take what suits you. Nobody goes further unarmed.");
-        for (int i = 0; i < offers.arraySize; i++)
+        so.ApplyModifiedPropertiesWithoutUndo();
+    }
+
+    // The marks older builds put in the scene for quests that are merged or gone: Sigrid's own (a briefing to fetch, a quest
+    // to hand in) go, and the ones at the shelter and the stones point at the step of the quest that now holds them.
+    private static string OldWaypoints(Transform sigrid, Transform eirik)
+    {
+        int removed = 0, moved = 0;
+        foreach (QuestWaypoint mark in sigrid.GetComponents<QuestWaypoint>())
         {
-            SerializedProperty offer = offers.GetArrayElementAtIndex(i);
-            PrologueDefinition definition = Load<PrologueDefinition>(Prologue + "ForestPrologue.asset");
-            if (offer.FindPropertyRelative("quest").objectReferenceValue == Existing("FindShelter"))
+            Object.DestroyImmediate(mark);
+            removed++;
+        }
+
+        QuestDefinition shelter = Existing("FindShelter"), stones = Existing("ReachPortal");
+        int fire = shelter.Objectives.Count;
+        foreach (QuestWaypoint mark in Object.FindObjectsByType<QuestWaypoint>(FindObjectsInactive.Include))
+        {
+            (QuestDefinition quest, int objective, string label, string name)? now = mark.name switch
             {
-                offer.FindPropertyRelative("text").stringValue = definition.Chapters.First(c => c.Quest == Existing("FindShelter")).ArrivalText;
+                "Quest Waypoint - Shelter from the Storm" => (shelter, 1, "Shelter", mark.name),
+                "Quest Waypoint - A Fire of Our Own" => (shelter, fire, "Build the fire here", "Quest Waypoint - Shelter from the Storm (the fire)"),
+                "Quest Waypoint - Shelter from the Storm (the fire)" => (shelter, fire, "Build the fire here", mark.name),
+                "Quest Waypoint - Something Is Coming" => (stones, 1, "The standing stones", mark.name),
+                "Quest Waypoint - Wake the Waystones" => (stones, 2, "The centre stone", "Quest Waypoint - Something Is Coming (the stone)"),
+                "Quest Waypoint - Something Is Coming (the stone)" => (stones, 2, "The centre stone", mark.name),
+                _ => null,
+            };
+            if (now.HasValue)
+            {
+                mark.Configure(now.Value.quest, now.Value.objective, now.Value.label);
+                mark.name = now.Value.name;
+                EditorUtility.SetDirty(mark);
+                moved++;
             }
-            else if (offer.FindPropertyRelative("quest").objectReferenceValue == Existing("CatchBreath"))
+            else if (mark.Quest == null)
             {
-                offer.FindPropertyRelative("text").stringValue = definition.Chapters.First(c => c.Quest == Existing("CatchBreath")).ArrivalText;
-                offer.FindPropertyRelative("acceptText").stringValue = "Let us catch our breath.";
-                offer.FindPropertyRelative("waitingText").stringValue = "Sit. Talk to the others. We have earned this, however long it lasts.";
+                // A mark for a quest that no longer exists.
+                Object.DestroyImmediate(mark.gameObject.GetComponents<Component>().Length <= 2 ? (Object)mark.gameObject : mark);
+                removed++;
             }
         }
 
-        so.ApplyModifiedPropertiesWithoutUndo();
+        Waypoint(eirik, Existing("BerriesForThePot"), 0, "Eirik", QuestWaypointWhen.ReadyToTurnIn);
+        return $"old marks: {removed} removed, {moved} kept";
     }
 
     private static void AddOffer(SerializedProperty offers, int at, QuestDefinition quest, string text, string accept, string waiting)
@@ -1491,7 +1628,6 @@ public static class BuildPrologueMeadow
         Waypoint(sigrid, Existing("MorningCamp"), 0, "Sigrid", QuestWaypointWhen.Available);
         Waypoint(sigrid, Existing("RoadToForest"), 0, "Sigrid", QuestWaypointWhen.Available);
         Waypoint(sigrid, Existing("MorningCamp"), 0, "Sigrid", QuestWaypointWhen.ReadyToTurnIn);
-        Waypoint(sigrid, Existing("TreeLine"), 0, "Sigrid", QuestWaypointWhen.ReadyToTurnIn);
         Waypoint(treeLine, Existing("RoadToForest"), 0, "The forest", QuestWaypointWhen.Active);
         Waypoint(runa, Existing("HuntForThePot"), 0, "Runa", QuestWaypointWhen.ReadyToTurnIn);
         Waypoint(eirik, Existing("FishForBreakfast"), 0, "Eirik", QuestWaypointWhen.ReadyToTurnIn);
@@ -1643,7 +1779,7 @@ public static class BuildPrologueMeadow
 
     private static void Stories(Transform moments, Transform sigrid, Transform eirik, Transform runa, Transform route, Transform treeLine, Transform threshold, MobSpawnZone ambushZone, MobSpawnZone boars)
     {
-        QuestDefinition morning = Existing("MorningCamp"), road = Existing("RoadToForest"), treeLineQuest = Existing("TreeLine"), shelter = Existing("FindShelter");
+        QuestDefinition morning = Existing("MorningCamp"), road = Existing("RoadToForest"), shelter = Existing("FindShelter");
         GameEventDefinition met = Load<GameEventDefinition>(Prologue + "Events/MetTheExpedition.asset");
         GameEventDefinition entered = Load<GameEventDefinition>(Prologue + "Events/ForestEntered.asset");
         GameEventDefinition litEvent = Load<GameEventDefinition>(Prologue + "Events/TorchesLit.asset");
@@ -1743,7 +1879,9 @@ public static class BuildPrologueMeadow
         var shake = new ShakeCameraNode { strength = 0.5f };
         var thunder = new PlaySoundNode { sound = Load<SoundDefinition>("Assets/_Project/Audio/Sounds/Library/Thunder.asset") };
         var wind = Aside(R(), "There. Feel that? The wind turned, and there is mist coming up off the moss.");
-        Link(line2, (across, 0, flash), (across, 0, shake), (across, 0, thunder), (across, 0, wind));
+        var listen = new WaitNode { seconds = 5f };
+        var clearSky = Aside(E(), "Twenty years a soldier, and I have never seen the sun simply leave.");
+        Link(line2, (across, 0, flash), (across, 0, shake), (across, 0, thunder), (across, 0, wind), (across, 0, listen), (listen, 0, clearSky));
 
         // ----- The storm breaks with the first attack on the camp, and stays broken after loading -----
         var breaks = Story(moments, "Story - The Storm Breaks");
@@ -1757,16 +1895,18 @@ public static class BuildPrologueMeadow
         var over = new ChangeWeatherNode { weather = Weather("Storm + Mist"), transitionSeconds = 0f };
         Link(breaks, (attack, 0, gathers), (loaded, 0, settled), (settled, 0, already), (already, 1, underWay), (already, 2, over));
 
-        // ----- Armed at the tree line -----
+        // ----- Armed before the road -----
+        // The moment the player says they are ready. It was at the tree line, after a walk with nothing in hand; the walk
+        // (Story - The Road East) waits for the choice. After the errands, so a borrowed bow or practice sword isn't what
+        // the player goes in with.
         var pick = Story(moments, "Story - Choose a Weapon");
-        var stop = new WhenQuest { quest = treeLineQuest, when = WhenQuest.Moment.Starts, once = false, alsoAfterLoading = true };
+        var stop = new WhenQuest { quest = road, when = WhenQuest.Moment.Starts, once = false, alsoAfterLoading = true };
         var hasOne = new HasHappenedNode { questEvent = chosen };
-        var gather = new WaitNode { seconds = 1.5f };
-        var eirikSays = new SayNode { speaker = E(), line = "That storm came out of a clear sky. I have been a soldier twenty years and I have never seen the sun simply leave." };
+        var gather = new WaitNode { seconds = 0.6f };
         var choice = new ChoiceNode
         {
             speaker = S(),
-            line = "Whatever waits in there, you should not meet it with your bare hands. We carry spare arms in the packs. They are old and they are plain, but they will do. Take what suits you.",
+            line = "Then one thing first. Nobody walks that road unarmed. We carry spare arms in the packs. They are old and they are plain, but they will do. Take what suits you.",
             answers = new List<string> { "The sword.", "The axe.", "The spear.", "The club.", "The bow." },
             mustAnswer = true,
         };
@@ -1775,20 +1915,21 @@ public static class BuildPrologueMeadow
         var giveSpear = new GiveItemsNode { equip = true, items = { new ItemAmount(Item("Weapons/FireHardenedSpear"), 1) } };
         var giveClub = new GiveItemsNode { equip = true, items = { new ItemAmount(Item("Weapons/KnottedClub"), 1) } };
         var giveBowNow = new GiveItemsNode { equip = true, items = { new ItemAmount(Item("CrudeWoodenBow"), 1), new ItemAmount(Item("CrudeStoneArrow"), 30) } };
-        Link(pick, (stop, 0, hasOne), (hasOne, 1, gather), (gather, 0, eirikSays), (eirikSays, 0, choice),
+        Link(pick, (stop, 0, hasOne), (hasOne, 1, gather), (gather, 0, choice),
             (choice, 0, giveSword), (choice, 1, giveAxeNow), (choice, 2, giveSpear), (choice, 3, giveClub), (choice, 4, giveBowNow));
         (GiveItemsNode give, StorySpeaker who, string line)[] after =
         {
             (giveSword, E(), "A soldier's choice. It is old iron, but it holds an edge. Guard well and let them come to you."),
-            (giveAxeNow, E(), "The axe. Good. It splits wolves and firewood alike, and you keep the torch in your other hand."),
-            (giveSpear, E(), "Long reach, and it wants both hands, so your torch goes in your pack. Press L to swap them when you need the light."),
-            (giveClub, R(), "Simple. I respect that. Hit it until it stops, and you keep the torch in your other hand."),
-            (giveBowNow, R(), "A bow! Then there are two of us. It wants both hands, so your torch went into your pack. Press L to swap bow and torch whenever you need the light. Hold the left button to draw, let go to shoot."),
+            (giveAxeNow, E(), "The axe. Good. It splits wolves and firewood alike, and it leaves you a hand free."),
+            (giveSpear, E(), "Long reach, and it wants both hands. If you ever need a light instead, press L to swap them."),
+            (giveClub, R(), "Simple. I respect that. Hit it until it stops, and it leaves you a hand free."),
+            (giveBowNow, R(), "A bow! Then there are two of us. Hold the left button to draw, let go to shoot. It wants both hands: if you ever need a light instead, press L to swap them."),
         };
         foreach ((GiveItemsNode give, StorySpeaker who, string line) in after)
         {
-            var done = new RaiseQuestEventNode { questEvent = chosen };
-            Link(pick, (give, 0, done), (done, 0, new SayNode { speaker = who, line = line }));
+            // The line first: the walk sets off when the event is raised, and nobody should be talking then.
+            var said = new SayNode { speaker = who, line = line };
+            Link(pick, (give, 0, said), (said, 0, new RaiseQuestEventNode { questEvent = chosen }));
         }
 
         // ----- Wolves on the way in -----
@@ -1922,7 +2063,8 @@ public static class BuildPrologueMeadow
         var group = new GameObject("Running Animals").transform;
         group.SetParent(root, false);
         var runners = new Transform[3];
-        Vector2[] starts = { new Vector2(-150f, 3f), new Vector2(-144f, -1f), new Vector2(-153f, -14f) };
+        // East of the cart, out of sight of it: they come down the road and past it (Story - The Road East).
+        Vector2[] starts = { new Vector2(-188f, 3f), new Vector2(-183f, -2f), new Vector2(-191f, -12f) };
         for (int i = 0; i < runners.Length; i++)
         {
             var boar = (GameObject)PrefabUtility.InstantiatePrefab(Load<GameObject>(Prologue + "ExpeditionBoar.prefab"));
@@ -1956,7 +2098,8 @@ public static class BuildPrologueMeadow
     // ----- The beats of the new telling -----
 
     private static void Beats(Transform moments, Transform root, PrologueCompanion[] companions, Transform sigrid, Transform eirik, Transform runa, Transform route, Transform routeOn,
-        Transform treeLine, Damageable dummy, MobSpawnZone practice, Interactable cartProp, Interactable lakeStone, Transform troll, Transform[] runners, Transform behind)
+        Transform treeLine, Damageable dummy, MobSpawnZone practice, Interactable cartProp, Interactable lakeStone, Transform troll, Transform[] runners, Transform behind,
+        MobSpawnZone roadWolves)
     {
         StorySpeaker S() => Speaker(sigrid, "Sigrid");
         StorySpeaker E() => Speaker(eirik, "Eirik");
@@ -1971,11 +2114,14 @@ public static class BuildPrologueMeadow
         // 3.5 m/s (was 2): the player walks at 5 and was always waiting for them (playtest, 2026-11-09).
         const float Pace = 3.5f, Fade = 8f;
         var walk = new WalkPartyNode { route = route, pace = Pace, waitForPlayer = 22f, waitUntilArrived = true };
-        Link(walkStory, (setOut, 0, walk));
-        foreach ((float reaches, float hour) in new[] { (0.4f, 11.5f), (0.78f, 15f) })
+        // Nobody sets off until the player is armed (Story - Choose a Weapon). What hangs on the walk's progress starts with
+        // the walk: Wait Until The Walk Reaches lets everything through while there is no walk.
+        var armed = new WaitForEventNode { questEvent = Ev("WeaponChosen"), orAfterSeconds = 0f };
+        Link(walkStory, (setOut, 0, armed), (armed, 0, walk));
+        foreach ((float reaches, float hour) in new[] { (0.4f, 11.5f), (0.78f, 14f) })
         {
             var wait = new WaitForWalkNode { reaches = reaches };
-            Link(walkStory, (setOut, 0, wait), (wait, 0, new ChangeTimeOfDayNode { hour = hour, seconds = Fade, fadeStraightThere = true }));
+            Link(walkStory, (armed, 0, wait), (wait, 0, new ChangeTimeOfDayNode { hour = hour, seconds = Fade, fadeStraightThere = true }));
         }
 
         foreach ((float reaches, StorySpeaker who, string line) in new[]
@@ -1987,13 +2133,29 @@ public static class BuildPrologueMeadow
         })
         {
             var wait = new WaitForWalkNode { reaches = reaches };
-            Link(walkStory, (setOut, 0, wait), (wait, 0, Aside(who, line)));
+            Link(walkStory, (armed, 0, wait), (wait, 0, Aside(who, line)));
         }
 
         var sighted = Aside(R(), "Hold up. That's Bjarne's handcart, tipped off the road. Have a look; I'll watch the trees.");
         var looked = new WaitForEventNode { questEvent = Ev("CartInspected"), orAfterSeconds = 25f };
-        var moveOn = Aside(S(), "Whatever happened here, it was quick, and it was not here that it ended. We go on.");
-        Link(walkStory, (walk, 0, sighted), (sighted, 0, looked), (looked, 0, moveOn));
+        // The first fight, in daylight: boar come down the road past the cart, and what they run from comes after them.
+        var running = Aside(R(), "Boar, running flat out, and not from us. Off the road!");
+        var behindThem = new WaitNode { seconds = 5f };
+        var wolvesCry = Aside(R(), "Wolves behind them! In the open, in daylight. They don't do that. Weapons!");
+        var wolvesCome = new SpawnEnemiesNode { zone = roadWolves, waitUntilDefeated = true };
+        var moveOn = Aside(S(), "Wolves that hunt by day and do not fear four armed people. Whatever happened to this cart was quick, and it did not end here. We go on.");
+        Link(walkStory, (walk, 0, sighted), (sighted, 0, looked), (looked, 0, running), (looked, 0, behindThem), (behindThem, 0, wolvesCry), (behindThem, 0, wolvesCome), (wolvesCome, 0, moveOn));
+        float[] runToZ = { 6f, 1f, -13f };
+        for (int i = 0; i < runners.Length; i++)
+        {
+            Transform runner = runners[i];
+            Transform runTo = Mark(root, "Running Boar " + i + " Goes To", -272f, runToZ[i]);
+            var show = new SetActiveNode { target = runner.gameObject, active = true };
+            var run = new MoveObjectNode { target = runner, destination = runTo, seconds = 8f, animationSpeed = 1.6f, waitUntilArrived = true };
+            var gone = new SetActiveNode { target = runner.gameObject, active = false };
+            Link(walkStory, (looked, 0, show), (show, 0, run), (run, 0, gone));
+        }
+
         var walkOn = new WalkPartyNode { route = routeOn, pace = Pace, waitForPlayer = 22f, waitUntilArrived = true };
         foreach ((float reaches, float hour) in new[] { (0.15f, 17f), (0.36f, 19f), (0.58f, 20.5f), (0.8f, 22.5f) })
         {
@@ -2019,21 +2181,7 @@ public static class BuildPrologueMeadow
 
         var toBirds = new WaitForWalkNode { reaches = 0.32f };
         var quiet = new SetActiveNode { target = GameObject.Find("Birds"), active = false };
-        var toRunners = new WaitForWalkNode { reaches = 0.25f };
-        // They come down the road towards the party and split around it: the line waits until they are on screen.
-        var inSight = new WaitNode { seconds = 2.5f };
-        var running = Aside(R(), "Boar, running flat out, and not from us. Stay on the road.");
-        Link(walkStory, (moveOn, 0, toBirds), (toBirds, 0, quiet), (moveOn, 0, toRunners), (toRunners, 0, inSight), (inSight, 0, running));
-        float[] runToZ = { 4f, 0f, -14f };
-        for (int i = 0; i < runners.Length; i++)
-        {
-            Transform runner = runners[i];
-            Transform runTo = Mark(root, "Running Boar " + i + " Goes To", -240f, runToZ[i]);
-            var show = new SetActiveNode { target = runner.gameObject, active = true };
-            var run = new MoveObjectNode { target = runner, destination = runTo, seconds = 8.5f, animationSpeed = 1.6f, waitUntilArrived = true };
-            var gone = new SetActiveNode { target = runner.gameObject, active = false };
-            Link(walkStory, (toRunners, 0, show), (show, 0, run), (run, 0, gone));
-        }
+        Link(walkStory, (moveOn, 0, toBirds), (toBirds, 0, quiet));
 
         var toTorches = new WaitForWalkNode { reaches = 0.55f };
         var lightUp = Aside(S(), "I can see that. Light your torches, and take this one.");
@@ -2111,14 +2259,35 @@ public static class BuildPrologueMeadow
             (duel, 1, lost), (lost, 0, again), (again, 0, duel));
 
         // ----- A moment of warmth, until the wolves -----
+        // The rest ends 9 s after the player talks to someone, or 50 s after Sigrid's lost name has been said (the first run
+        // through in Play had the wolves arrive as that scene ended). Whoever took Eirik's errand is waited for: until the
+        // stew is handed in, or two and a half minutes more at most, so an errand left lying can't stop the night.
         var rest = Story(moments, "Story - A Moment of Warmth");
-        QuestDefinition warmth = Existing("CatchBreath"), wolves = Existing("DefendCamp");
+        QuestDefinition warmth = Existing("CatchBreath"), wolves = Existing("DefendCamp"), pot = Existing("BerriesForThePot");
+        GameEventDefinition restedEvent = Load<PrologueDefinition>(Prologue + "ForestPrologue.asset").RestedEvent;
+        // Each ending checks that the rest is still on, so whichever comes first is the only one.
+        StoryNode Ends(StoryNode from, int output)
+        {
+            var still = new CheckQuestNode { quest = warmth };
+            var over = new RaiseQuestEventNode { questEvent = restedEvent };
+            Link(rest, (from, output, still), (still, 1, over), (over, 0, new StartQuestNode { quest = wolves }));
+            return still;
+        }
+
         var sat = new WhenQuest { quest = warmth, when = WhenQuest.Moment.Starts, once = false, alsoAfterLoading = true };
-        var enough = new WaitNode { seconds = 45f };
-        var stillResting = new CheckQuestNode { quest = warmth };
-        var rested = new RaiseQuestEventNode { questEvent = Load<PrologueDefinition>(Prologue + "ForestPrologue.asset").RestedEvent };
-        var attack = new StartQuestNode { quest = wolves };
-        Link(rest, (sat, 0, enough), (enough, 0, stillResting), (stillResting, 1, rested), (rested, 0, attack));
+        // Or after 40 s, should the scene never be said: nothing optional may hold the night up.
+        var heardOut = new WaitForEventNode { questEvent = Ev("NameGoneMissing"), orAfterSeconds = 40f };
+        var enough = new WaitNode { seconds = 50f };
+        var errand = new CheckQuestNode { quest = pot };
+        var longer = new WaitNode { seconds = 150f };
+        Link(rest, (sat, 0, heardOut), (heardOut, 0, enough), (enough, 0, errand), (errand, 1, longer));
+        Ends(errand, 0);
+        Ends(errand, 2);
+        Ends(longer, 0);
+        var fed = new WhenQuest { quest = pot, when = WhenQuest.Moment.IsCompleted, once = false };
+        var full = new WaitNode { seconds = 9f };
+        Link(rest, (fed, 0, full));
+        Ends(full, 0);
         foreach (PrologueCompanion companion in companions)
         {
             if (!companion.gameObject.activeSelf || companion.Resident == null) continue;
@@ -2126,11 +2295,32 @@ public static class BuildPrologueMeadow
             var spoke = new WhenPlayerDid { deed = QuestObjective.Deed(ObjectiveType.TalkTo, companion.Resident), once = false };
             var resting = new CheckQuestNode { quest = warmth };
             var moment = new WaitNode { seconds = 9f };
-            var stillThere = new CheckQuestNode { quest = warmth };
-            var over = new RaiseQuestEventNode { questEvent = Load<PrologueDefinition>(Prologue + "ForestPrologue.asset").RestedEvent };
-            var theyCome = new StartQuestNode { quest = wolves };
-            Link(rest, (spoke, 0, resting), (resting, 1, moment), (moment, 0, stillThere), (stillThere, 1, over), (over, 0, theyCome));
+            var busy = new CheckQuestNode { quest = pot };
+            Link(rest, (spoke, 0, resting), (resting, 1, moment), (moment, 0, busy));
+            Ends(busy, 0);
+            Ends(busy, 2);
         }
+
+        // ----- A name gone missing -----
+        // The one beat of the rest nobody should miss: the forest is already taking them. The portal's "the forest does not
+        // kill the lost, it forgets them" then answers something the player saw.
+        var name = Story(moments, "Story - A Name Gone Missing");
+        // Also after loading, until it has been said to the end: the rest's clock waits for it.
+        var sitDown = new WhenQuest { quest = warmth, when = WhenQuest.Moment.Starts, once = false, alsoAfterLoading = true };
+        var saidBefore = new HasHappenedNode { questEvent = Ev("NameGoneMissing") };
+        var said = new RaiseQuestEventNode { questEvent = Ev("NameGoneMissing") };
+        var settleIn = new WaitNode { seconds = 1.5f };
+        var sit = new SayNode { speaker = S(), line = "A fire. Sit down, all of you, and get your breath back. Whatever is out there will still be there when we are done." };
+        var count = new SayNode { speaker = S(), line = "At first light we find the four who went ahead. Ingrid. Bjarne. Tor. And..." };
+        var gap = new SayNode { speaker = new StorySpeaker(), line = "<i>She stops. Her lips move, and nothing comes.</i>" };
+        var liv = new SayNode { speaker = R(), line = "Liv." };
+        var ofCourse = new SayNode { speaker = S(), line = "Liv. Of course. Eleven years I have known her, and for a moment there was a hole where her name should be." };
+        var aWhile = new WaitNode { seconds = 3f };
+        var mine = Aside(E(), "It is this place. At the tree line I had to think for my own sister's name. I did not like to say.");
+        var hungry = new WaitNode { seconds = 5f };
+        var bread = Aside(E(), "And there is only dry bread, unless someone fancies a walk. Ask me if you do.");
+        Link(name, (sitDown, 0, saidBefore), (saidBefore, 1, settleIn), (settleIn, 0, sit), (sit, 0, count), (count, 0, gap), (gap, 0, liv), (liv, 0, ofCourse),
+            (ofCourse, 0, said), (said, 0, aWhile), (aWhile, 0, mine), (mine, 0, hungry), (hungry, 0, bread));
 
         // ----- They remember -----
         var memory = Story(moments, "Story - They Remember");
@@ -2159,25 +2349,29 @@ public static class BuildPrologueMeadow
             Link(memory, (sitting, 0, wait), (wait, 0, came), (came, 0, Aside(who, line)));
         }
 
-        var fuel = new WhenQuest { quest = Existing("GatherFuel"), when = WhenQuest.Moment.Starts };
+        var fuel = new WhenQuestEvent { questEvent = Load<PrologueDefinition>(Prologue + "ForestPrologue.asset").ShelterEvent };
+        var afterSigrid = new WaitNode { seconds = 7f };
         var cutWood = new CheckQuestNode { quest = Existing("WoodForTheRoad") };
-        Link(memory, (fuel, 0, cutWood), (cutWood, 2, Aside(E(), "And the kindling you cut this morning is dry in your pack. We only need stones.")));
-        QuestDefinition pot = Existing("BerriesForThePot");
+        Link(memory, (fuel, 0, afterSigrid), (afterSigrid, 0, cutWood), (cutWood, 2, Aside(E(), "And the kindling you cut this morning is dry in your pack. We only need stones.")));
         var cooking = new WhenQuest { quest = pot, when = WhenQuest.Moment.Starts };
         var caught = new CheckQuestNode { quest = Existing("FishForBreakfast") };
         var fewer = new QuestProgressNode { quest = pot, objective = 1, amount = 3 };
         Link(memory, (cooking, 0, caught), (caught, 2, fewer), (fewer, 0, Aside(E(), "I salted what was left of your fish, so we need fewer berries. Two handfuls will do.")));
 
         // ----- Sigrid at the stones -----
+        // Her hand first, and nothing: the stones wake for the player's. "Why me?" is asked here and answered much later.
         var stones = Story(moments, "Story - What Sigrid Knows");
-        var touching = new WhenQuest { quest = Existing("ActivatePortal"), when = WhenQuest.Moment.Starts };
+        var touching = new WhenQuestEvent { questEvent = Load<PrologueDefinition>(Prologue + "ForestPrologue.asset").PortalReachedEvent };
         var pause = new WaitNode { seconds = 1.5f };
+        var herHand = new SayNode { speaker = new StorySpeaker(), line = "<i>Sigrid lays her palm flat on the centre stone and holds it there. Nothing. The stone stays cold.</i>" };
+        var notForMe = new SayNode { speaker = S(), line = "It will not wake for me. It never has. You, then. Put your hand on the centre stone." };
         var asked = new HasHappenedNode { questEvent = Ev("PressedSigrid") };
         var owns = new SayNode { speaker = S(), line = "You asked me by the fire, so here it is. I have seen stones like these wake once. It took everyone who stood too near, and it put them somewhere else. Ingrid knew that when she came. Now you do." };
         var silent = new SayNode { speaker = S(), line = "Whatever you see, do not let go of the stone. There are things I should have told you, and there is no time left to tell them." };
         var sawOne = new HasHappenedNode { questEvent = Ev("TouchedLakeStone") };
         var same = new SayNode { speaker = new StorySpeaker(), line = "<i>The same marks as the stone by the lake, and the same warmth. It was already awake this morning.</i>" };
-        Link(stones, (touching, 0, pause), (pause, 0, asked), (asked, 0, owns), (asked, 1, silent), (owns, 0, sawOne), (silent, 0, sawOne), (sawOne, 0, same));
+        Link(stones, (touching, 0, pause), (pause, 0, herHand), (herHand, 0, notForMe), (notForMe, 0, asked), (asked, 0, owns), (asked, 1, silent),
+            (owns, 0, sawOne), (silent, 0, sawOne), (sawOne, 0, same));
 
         // ----- The old troll comes for the stones -----
         var returns = Story(moments, "Story - The Old Troll Returns");
