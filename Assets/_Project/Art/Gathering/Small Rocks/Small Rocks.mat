@@ -14,7 +14,6 @@ Material:
   m_ValidKeywords:
   - _ORMMAP
   - _PARALLAXMAP
-  - _SEASON_SNOW
   m_InvalidKeywords:
   - _LAYERTRIPLANAR_ON
   - _NORMALMAP
@@ -90,6 +89,10 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _ParallaxMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
     - _AddPrecomputedVelocity: 0
@@ -144,6 +147,7 @@ Material:
     - _Roughness: 1
     - _ScreenSpaceReflections: 1
     - _ScreenSpaceReflectionsContributeTransparent: 1
+    - _SeasonSnow: 0
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
