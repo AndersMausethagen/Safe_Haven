@@ -58602,7 +58602,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -4234473462164445276, guid: a7ed8451c774159429f5d83eb83c8d4f, type: 3}
+  - {fileID: 2100000, guid: 8e99e06ad88c04144b9865ad8b8c0377, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -263986,6 +263986,10 @@ PrefabInstance:
       propertyPath: range
       value: 2.2
       objectReference: {fileID: 0}
+    - target: {fileID: 3266309045430461537, guid: 83e508b71ba177149a0f08689ff8aea4, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 8e99e06ad88c04144b9865ad8b8c0377, type: 2}
     - target: {fileID: 3995415526987974039, guid: 83e508b71ba177149a0f08689ff8aea4, type: 3}
       propertyPath: ruinText
       value: 'The stones that dropped you here, cracked and cold. A faint hum lingers in them, and under it a voice you know. Three Life Orbs would wake them: the rootbound stones around the clearing still hold some.'
