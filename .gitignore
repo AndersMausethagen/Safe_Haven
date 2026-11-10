@@ -88,3 +88,6 @@ Desktop.ini
 # Personal Claude Code settings
 .claude/settings.local.json
 __pycache__/
+
+# LocalSpawn's untouched voice recordings (the clips the game uses are in Assets/_Project/Audio/Voice)
+Tools/Audio/Voices/raw/

@@ -1,0 +1,12 @@
+{
+  "name": "tor",
+  "description": "An older man in his sixties, a carpenter. A gentle, soft, slow voice, patient and warm, with a craftsman's calm.",
+  "reference_text": "This stone is dry enough. Give me sound timber and a little daylight, and I could make somewhere worth staying.",
+  "language": "English",
+  "seed": 3106,
+  "source": "designed",
+  "model": "Qwen3-TTS-12Hz-1.7B-VoiceDesign",
+  "created": "2026-11-10 19:38:06",
+  "seconds": 9.36,
+  "sample_rate": 24000
+}

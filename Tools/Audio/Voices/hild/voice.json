@@ -1,0 +1,12 @@
+{
+  "name": "hild",
+  "description": "A woman in her forties, a stonemason. A strong, blunt, dry voice, full of opinions, medium pitch.",
+  "reference_text": "Whoever laid this hearth had never met a level. I'll stay. Mind the coping, it's the only level thing for a mile.",
+  "language": "English",
+  "seed": 3110,
+  "source": "designed",
+  "model": "Qwen3-TTS-12Hz-1.7B-VoiceDesign",
+  "created": "2026-11-10 19:39:51",
+  "seconds": 6.72,
+  "sample_rate": 24000
+}

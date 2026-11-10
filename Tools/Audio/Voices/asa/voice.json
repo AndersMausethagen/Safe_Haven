@@ -1,0 +1,12 @@
+{
+  "name": "asa",
+  "description": "A woman in her thirties, a farmer. A plain, sturdy, warm voice, practical and down to earth.",
+  "reference_text": "There's good dirt under all this moss. Who's been using it? I brought seed, and little else.",
+  "language": "English",
+  "seed": 3108,
+  "source": "designed",
+  "model": "Qwen3-TTS-12Hz-1.7B-VoiceDesign",
+  "created": "2026-11-10 19:39:00",
+  "seconds": 7.76,
+  "sample_rate": 24000
+}

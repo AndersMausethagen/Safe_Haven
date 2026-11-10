@@ -264,7 +264,13 @@ public sealed class PrologueDefinition : ScriptableObject
     [SerializeField, TextArea(1, 3)] private string recoveryText;
     [SerializeField, Min(0f)] private float endingSeconds = 3f;
     [SerializeField, Min(0f)] private float recoverySeconds = 2f;
+    [Tooltip("Played as the connection breaks, before home loads: what happened at the stones, who caught the player, and what there is to do. Empty goes straight home.")]
+    [SerializeField] private CinematicDefinition endingCinematic;
+    [Tooltip("Loads home in the background while the cinematic plays, so the wait after it is short.")]
+    [SerializeField] private bool loadHomeDuringCinematic = true;
 
+    public CinematicDefinition EndingCinematic => endingCinematic;
+    public bool LoadHomeDuringCinematic => loadHomeDuringCinematic;
     public PrologueChapter[] Chapters => chapters;
     public GameEventDefinition StartedEvent => startedEvent;
     public GameEventDefinition ShelterEvent => shelterEvent;

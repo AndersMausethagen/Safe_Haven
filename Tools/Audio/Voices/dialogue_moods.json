@@ -1,0 +1,2680 @@
+{
+ "a1e44e6f1d57": {
+  "speaker": "Asa",
+  "text": "There's good dirt under all this moss. Who's been using it?",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "acba48946a3c": {
+  "speaker": "Asa",
+  "text": "I can't go on... come back for me.",
+  "mood": "Tired",
+  "by": "kind"
+ },
+ "bbfa99a3a8b6": {
+  "speaker": "Asa",
+  "text": "You're not from the village. Doesn't matter. Help me with this sack.",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "feb2e590d94e": {
+  "speaker": "Bjarne",
+  "text": "Behind you!",
+  "mood": "Yelling",
+  "by": "kind"
+ },
+ "adf3f3a0af4a": {
+  "speaker": "Bjarne",
+  "text": "Watch your back!",
+  "mood": "Yelling",
+  "by": "kind"
+ },
+ "5a88d37568e0": {
+  "speaker": "Bjarne",
+  "text": "I owe you one.",
+  "mood": "Glad",
+  "by": "kind"
+ },
+ "ae359110044c": {
+  "speaker": "Bjarne",
+  "text": "Still here. Still here.",
+  "mood": "Glad",
+  "by": "kind"
+ },
+ "c1ec9e49018d": {
+  "speaker": "Bjarne",
+  "text": "Thank you. I thought that was it.",
+  "mood": "Glad",
+  "by": "kind"
+ },
+ "10fbffecf4d7": {
+  "speaker": "Bjarne",
+  "text": "I can't take much more of this.",
+  "mood": "Scared",
+  "by": "kind"
+ },
+ "26e24ac05c56": {
+  "speaker": "Bjarne",
+  "text": "I'm hurt!",
+  "mood": "Scared",
+  "by": "kind"
+ },
+ "4f8ad24ff846": {
+  "speaker": "Bjarne",
+  "text": "I'll hold this spot.",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "eb99880dd98a": {
+  "speaker": "Bjarne",
+  "text": "I'll keep back.",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "d1969253b611": {
+  "speaker": "Bjarne",
+  "text": "Nothing gets to you without going through me.",
+  "mood": "Stern",
+  "by": "direction"
+ },
+ "9ba192078d22": {
+  "speaker": "Bjarne",
+  "text": "Point the way.",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "15c43796b7f0": {
+  "speaker": "Bjarne",
+  "text": "Right behind you.",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "5df601393266": {
+  "speaker": "Bjarne",
+  "text": "Here they come!",
+  "mood": "Yelling",
+  "by": "kind"
+ },
+ "63314f39ce6b": {
+  "speaker": "Bjarne",
+  "text": "Weapons up!",
+  "mood": "Yelling",
+  "by": "kind"
+ },
+ "73cafab3e9aa": {
+  "speaker": "Bjarne",
+  "text": "Clear. Get your breath.",
+  "mood": "Glad",
+  "by": "kind"
+ },
+ "201a6ff6658e": {
+  "speaker": "Bjarne",
+  "text": "That's the last of them.",
+  "mood": "Glad",
+  "by": "kind"
+ },
+ "96e028137023": {
+  "speaker": "Bjarne",
+  "text": "I came to examine the old iron markers. Whatever protects the road has cracked. Steel will",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "a493a54c5148": {
+  "speaker": "Bjarne",
+  "text": "We came to learn why this forest has become bewitched. First, we need shelter. Follow the ",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "6937b456273a": {
+  "speaker": "Bjarne",
+  "text": "Hold still. Drink this.",
+  "mood": "Stern",
+  "by": "kind"
+ },
+ "4ee8aec2b5a0": {
+  "speaker": "Bjarne",
+  "text": "Not yet, you don't. Drink.",
+  "mood": "Stern",
+  "by": "kind"
+ },
+ "83cf1d54bf23": {
+  "speaker": "Bjarne",
+  "text": "You're bleeding. Here.",
+  "mood": "Stern",
+  "by": "kind"
+ },
+ "70d6b5d71c5c": {
+  "speaker": "Bjarne",
+  "text": "Stay near the stones. We can still get out of this together.",
+  "mood": "Stern",
+  "by": "direction"
+ },
+ "cef0a0574320": {
+  "speaker": "Bjarne",
+  "text": "Anything else?",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "8e380ffa97a7": {
+  "speaker": "Bjarne",
+  "text": "Where's the anvil? No, don't tell me. I'll find it.",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "28b3e35db35c": {
+  "speaker": "Bjarne",
+  "text": "Tell Sigrid I kept it lit.",
+  "mood": "Tired",
+  "by": "kind"
+ },
+ "2036e6375a75": {
+  "speaker": "Bjarne",
+  "text": "You took your time. Mind the hammer.",
+  "mood": "Glad",
+  "by": "direction"
+ },
+ "8a4f5935addb": {
+  "speaker": "Bjarne",
+  "text": "I blazed the trees going in, a cut every twenty paces. Coming back, my marks were on the w",
+  "mood": "Tired",
+  "by": "direction",
+  "emotion": {
+   "afraid": 0.25,
+   "melancholic": 0.25
+  }
+ },
+ "29785ea6db14": {
+  "speaker": "Eirik",
+  "text": "Behind you!",
+  "mood": "Yelling",
+  "by": "kind"
+ },
+ "e943a5d69c50": {
+  "speaker": "Eirik",
+  "text": "Watch your back!",
+  "mood": "Yelling",
+  "by": "kind"
+ },
+ "f4bb15837e28": {
+  "speaker": "Eirik",
+  "text": "I owe you one.",
+  "mood": "Glad",
+  "by": "kind"
+ },
+ "2c208d6c9a4f": {
+  "speaker": "Eirik",
+  "text": "Still here. Still here.",
+  "mood": "Glad",
+  "by": "kind"
+ },
+ "7b44fb41a6db": {
+  "speaker": "Eirik",
+  "text": "Thank you. I thought that was it.",
+  "mood": "Glad",
+  "by": "kind"
+ },
+ "45a96e8c622c": {
+  "speaker": "Eirik",
+  "text": "I can't take much more of this.",
+  "mood": "Scared",
+  "by": "kind"
+ },
+ "d7d6543bf2f6": {
+  "speaker": "Eirik",
+  "text": "I'm hurt!",
+  "mood": "Scared",
+  "by": "kind"
+ },
+ "8abede55a1d0": {
+  "speaker": "Eirik",
+  "text": "I'll hold this spot.",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "e07e6f7dbf35": {
+  "speaker": "Eirik",
+  "text": "I'll keep back.",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "c04da0bacbb6": {
+  "speaker": "Eirik",
+  "text": "Nothing gets to you without going through me.",
+  "mood": "Stern",
+  "by": "direction"
+ },
+ "bbdd75f7cb3a": {
+  "speaker": "Eirik",
+  "text": "Point the way.",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "d1b9a304eddd": {
+  "speaker": "Eirik",
+  "text": "Right behind you.",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "ff0c7c66e917": {
+  "speaker": "Eirik",
+  "text": "Here they come!",
+  "mood": "Yelling",
+  "by": "kind"
+ },
+ "0f0752e9d8b4": {
+  "speaker": "Eirik",
+  "text": "Weapons up!",
+  "mood": "Yelling",
+  "by": "kind"
+ },
+ "37f4e3c9bfcf": {
+  "speaker": "Eirik",
+  "text": "Clear. Get your breath.",
+  "mood": "Glad",
+  "by": "kind"
+ },
+ "776e1b923a5d": {
+  "speaker": "Eirik",
+  "text": "That's the last of them.",
+  "mood": "Glad",
+  "by": "kind"
+ },
+ "ecf931abe27e": {
+  "speaker": "Eirik",
+  "text": "I trust that she wants to get out of here alive. That is enough for tonight. But watch her",
+  "mood": "Calm",
+  "by": "direction"
+ },
+ "b0793a604c63": {
+  "speaker": "Eirik",
+  "text": "My sister's farm is two valleys from here. Her dogs ran into these woods last month and ne",
+  "mood": "Sad",
+  "by": "direction",
+  "emotion": {
+   "sad": 0.35
+  }
+ },
+ "2be6d1c7fb78": {
+  "speaker": "Eirik",
+  "text": "Once, as a boy, with my sister. Spruce, moss, the quiet you get in old woods. Nothing in i",
+  "mood": "Calm",
+  "by": "direction",
+  "emotion": {
+   "melancholic": 0.3,
+   "calm": 0.2
+  }
+ },
+ "ee09dd20e0e2": {
+  "speaker": "Eirik",
+  "text": "Twenty winters in the shield wall at Granheim. I stopped counting the fights a long time a",
+  "mood": "Calm",
+  "by": "direction",
+  "emotion": {
+   "melancholic": 0.35
+  }
+ },
+ "4cc1b4c6dd1f": {
+  "speaker": "Eirik",
+  "text": "Wolves, probably. Perhaps a witch, perhaps a sick troll. It is usually less than the stori",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "49035598e0ba": {
+  "speaker": "Eirik",
+  "text": "Eat something, even if you are not hungry. I have buried enough friends who thought they c",
+  "mood": "Calm",
+  "by": "direction"
+ },
+ "508dfc1d9aef": {
+  "speaker": "Eirik",
+  "text": "Stay between me and the trees. If anything comes out of the dark, it meets my shield first",
+  "mood": "Stern",
+  "by": "direction"
+ },
+ "bee95266131e": {
+  "speaker": "Eirik",
+  "text": "Hold still. Drink this.",
+  "mood": "Stern",
+  "by": "kind"
+ },
+ "86df8075c7bf": {
+  "speaker": "Eirik",
+  "text": "Not yet, you don't. Drink.",
+  "mood": "Stern",
+  "by": "kind"
+ },
+ "907dcf3eb497": {
+  "speaker": "Eirik",
+  "text": "You're bleeding. Here.",
+  "mood": "Stern",
+  "by": "kind"
+ },
+ "2f26f0679d18": {
+  "speaker": "Eirik",
+  "text": "Eat something. It is a long road, and the porridge is not getting any better.",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "2a01eb5d9ef5": {
+  "speaker": "Eirik",
+  "text": "Go! I will hold them. Nobody gets left behind, not while I am standing.",
+  "mood": "Yelling",
+  "by": "direction"
+ },
+ "7a112b27feae": {
+  "speaker": "Eirik",
+  "text": "Anything else?",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "f9398ee8d258": {
+  "speaker": "Eirik",
+  "text": "Come back when it's done.",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "b3f411f0c08b": {
+  "speaker": "Eirik",
+  "text": "Before we set out? Gladly. Take this practice sword; it bruises, it doesn't cut. Hit the d",
+  "mood": "Glad",
+  "by": "direction"
+ },
+ "767a22ae60af": {
+  "speaker": "Eirik",
+  "text": "Dry bread, unless you fancy a walk. There are berry bushes in the clearing west of the she",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "c28e92c08877": {
+  "speaker": "Eirik",
+  "text": "Now that is a fine idea. Anything but this porridge. Here is a rod and a handful of grubs,",
+  "mood": "Glad",
+  "by": "direction"
+ },
+ "865f6003701b": {
+  "speaker": "Eirik",
+  "text": "We always need firewood. Take this hatchet; there are good trees on the slope north of the",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "3dae44864cb6": {
+  "speaker": "Eirik",
+  "text": "Breakfast! You may be the best person on this expedition. Keep the rod; there is bound to ",
+  "mood": "Joyful",
+  "by": "direction"
+ },
+ "58c732b675e8": {
+  "speaker": "Eirik",
+  "text": "Hot food. You have just made three friends for life. Take these, in case the night is not ",
+  "mood": "Glad",
+  "by": "direction"
+ },
+ "66a26e4cddf1": {
+  "speaker": "Eirik",
+  "text": "That will keep us warm. Keep the hatchet.",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "aa06518f4d6a": {
+  "speaker": "Eirik",
+  "text": "You'll do. Better than most I have trained, worse than you will be. Take these; you will w",
+  "mood": "Glad",
+  "by": "direction"
+ },
+ "204532e77379": {
+  "speaker": "Eirik",
+  "text": "Dummy first, then me. Watch my shoulders: the blow is coming when they drop.",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "237db04c75f3": {
+  "speaker": "Eirik",
+  "text": "Five berries from the clearing to the west, then the pot. My waterskin is in your pack.",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "7d57bc6e0d58": {
+  "speaker": "Eirik",
+  "text": "Six logs from the slope north of the road. Walk up to a tree and get chopping.",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "a06343cbeb7e": {
+  "speaker": "Eirik",
+  "text": "Two fish from the lake. Hold attack to swing back, let go to cast, and strike when the flo",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "409a4177aa8b": {
+  "speaker": "Eirik",
+  "text": "Show me the wall. Then show me where it's weakest.",
+  "mood": "Stern",
+  "by": "direction"
+ },
+ "5cd65fb6b333": {
+  "speaker": "Eirik",
+  "text": "Behind you, you fool!",
+  "mood": "Yelling",
+  "by": "kind"
+ },
+ "fea15bc6d989": {
+  "speaker": "Eirik",
+  "text": "Go. I've held worse.",
+  "mood": "Tired",
+  "by": "kind"
+ },
+ "234d8569fee7": {
+  "speaker": "Eirik",
+  "text": "Still got one more swing in me, then.",
+  "mood": "Glad",
+  "by": "kind"
+ },
+ "e582a314648a": {
+  "speaker": "Eirik",
+  "text": "Ugh. Took your time.",
+  "mood": "Glad",
+  "by": "kind"
+ },
+ "642add613889": {
+  "speaker": "Eirik",
+  "text": "Twenty winters, and it still hurts.",
+  "mood": "Scared",
+  "by": "kind"
+ },
+ "026f1f260873": {
+  "speaker": "Eirik",
+  "text": "Don't look at me like that. I was resting. ...Thank you.",
+  "mood": "Tired",
+  "by": "direction"
+ },
+ "ca4d6075a674": {
+  "speaker": "Eirik",
+  "text": "My knees are too old to run from a closing portal. Next time leave earlier.",
+  "mood": "Tired",
+  "by": "direction"
+ },
+ "1f29819f666c": {
+  "speaker": "Eirik",
+  "text": "That many, and I'm still here. Don't tell the young ones. They'll want to try it.",
+  "mood": "Glad",
+  "by": "direction"
+ },
+ "42963c424b5a": {
+  "speaker": "Eirik",
+  "text": "Twenty winters I've been telling that kind of story. First time it's been true.",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "96cb0594d562": {
+  "speaker": "Eirik",
+  "text": "Took you long enough. How many are behind you?",
+  "mood": "Stern",
+  "by": "direction"
+ },
+ "8be05c10a12e": {
+  "speaker": "Eirik",
+  "text": "Finally, something I can hit.",
+  "mood": "Yelling",
+  "by": "kind"
+ },
+ "bce3accf463e": {
+  "speaker": "Eirik",
+  "text": "Stay behind my shield, if you can find it.",
+  "mood": "Yelling",
+  "by": "kind"
+ },
+ "60556e38b6f5": {
+  "speaker": "Eirik",
+  "text": "Clean your blade. It's a bad habit to forget.",
+  "mood": "Glad",
+  "by": "kind"
+ },
+ "63fa83d0ac03": {
+  "speaker": "Eirik",
+  "text": "Is that all? I was only warming up.",
+  "mood": "Glad",
+  "by": "kind"
+ },
+ "2cfa0e55e972": {
+  "speaker": "Eirik",
+  "text": "A soldier's choice. It is old iron, but it holds an edge. Guard well and let them come to ",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "0806b86eec93": {
+  "speaker": "Eirik",
+  "text": "Eirik. Twenty winters in the shield wall at Granheim. I walk in front, I carry the heavy t",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "259bff6f5a51": {
+  "speaker": "Eirik",
+  "text": "Long reach, and it wants both hands. If you ever need a light instead, press L to swap the",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "e253fe508b50": {
+  "speaker": "Eirik",
+  "text": "The axe. Good. It splits wolves and firewood alike, and it leaves you a hand free.",
+  "mood": "Glad",
+  "by": "direction"
+ },
+ "eece7650fb22": {
+  "speaker": "Eirik",
+  "text": "Then we are after the same thing. We will find them.",
+  "mood": "Calm",
+  "by": "direction"
+ },
+ "e60cc7b39128": {
+  "speaker": "Eirik",
+  "text": "A bewitched forest. My grandmother called any forest that ate her goats bewitched.",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "ca4cbe04a50b": {
+  "speaker": "Eirik",
+  "text": "A whole day gone in a morning's walk. I don't like this, and I have liked very few things.",
+  "mood": "Neutral",
+  "by": "direction",
+  "emotion": {
+   "afraid": 0.3
+  }
+ },
+ "1d8417ed6712": {
+  "speaker": "Eirik",
+  "text": "And the kindling you cut this morning is dry in your pack. We only need stones.",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "7117ba9e1974": {
+  "speaker": "Eirik",
+  "text": "And there is only dry bread, unless someone fancies a walk. Ask me if you do.",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "1c84061a496c": {
+  "speaker": "Eirik",
+  "text": "Down you go. Catch your breath; we go again when you're ready.",
+  "mood": "Glad",
+  "by": "direction"
+ },
+ "d50f787957ae": {
+  "speaker": "Eirik",
+  "text": "Enough, enough! I yield. You'll do.",
+  "mood": "Joyful",
+  "by": "direction"
+ },
+ "8778acb3c599": {
+  "speaker": "Eirik",
+  "text": "Good. Now me. When I wind up, raise your guard just before the blow, or roll through it.",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "236c80028a4c": {
+  "speaker": "Eirik",
+  "text": "I salted what was left of your fish, so we need fewer berries. Two handfuls will do.",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "421f24f8ee2b": {
+  "speaker": "Eirik",
+  "text": "Is it past noon already? We have not been walking an hour.",
+  "mood": "Neutral",
+  "by": "direction",
+  "emotion": {
+   "surprised": 0.25
+  }
+ },
+ "1e77282ea3ce": {
+  "speaker": "Eirik",
+  "text": "It is this place. At the tree line I had to think for my own sister's name. I did not like",
+  "mood": "Neutral",
+  "by": "direction",
+  "emotion": {
+   "afraid": 0.3,
+   "melancholic": 0.2
+  }
+ },
+ "b7949786e4d1": {
+  "speaker": "Eirik",
+  "text": "Nothing gets worse than this porridge.",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "3610b36553f1": {
+  "speaker": "Eirik",
+  "text": "Sigrid. The sun is going down. It was morning.",
+  "mood": "Scared",
+  "by": "direction",
+  "emotion": {
+   "afraid": 0.4
+  }
+ },
+ "4d163872b0ec": {
+  "speaker": "Eirik",
+  "text": "Steady now. It is a fine morning to walk into something stupid.",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "1fd66a7f37f5": {
+  "speaker": "Eirik",
+  "text": "That trout this morning. I keep thinking about that trout.",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "fdd9aacb46e5": {
+  "speaker": "Eirik",
+  "text": "Twenty years a soldier, and I have never seen the sun simply leave.",
+  "mood": "Neutral",
+  "by": "direction",
+  "emotion": {
+   "afraid": 0.35
+  }
+ },
+ "35cf24431724": {
+  "speaker": "Eirik",
+  "text": "Whoever you came for: we have not stopped looking. Remember that.",
+  "mood": "Calm",
+  "by": "direction"
+ },
+ "4fce6c3e4d95": {
+  "speaker": "Gunnar",
+  "text": "You've been frightening my deer. Least you can do is give me a roof.",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "baff5d14427f": {
+  "speaker": "Gunnar",
+  "text": "I can't go on... come back for me.",
+  "mood": "Tired",
+  "by": "kind"
+ },
+ "4e8a945d6f2f": {
+  "speaker": "Gunnar",
+  "text": "Took you long enough. That boar's been lying on me since yesterday.",
+  "mood": "Tired",
+  "by": "direction"
+ },
+ "c76619189511": {
+  "speaker": "Hild",
+  "text": "Whoever laid this hearth had never met a level. I'll stay.",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "668e374da7f3": {
+  "speaker": "Hild",
+  "text": "I can't go on... come back for me.",
+  "mood": "Tired",
+  "by": "kind"
+ },
+ "42fc5176f1e2": {
+  "speaker": "Hild",
+  "text": "Mind the coping. It's the only level thing for a mile.",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "413107a4ebca": {
+  "speaker": "Ingrid",
+  "text": "Behind you!",
+  "mood": "Yelling",
+  "by": "kind"
+ },
+ "4e787ffc807c": {
+  "speaker": "Ingrid",
+  "text": "Watch your back!",
+  "mood": "Yelling",
+  "by": "kind"
+ },
+ "72ec23e5d325": {
+  "speaker": "Ingrid",
+  "text": "I owe you one.",
+  "mood": "Glad",
+  "by": "kind"
+ },
+ "03f43a605375": {
+  "speaker": "Ingrid",
+  "text": "Still here. Still here.",
+  "mood": "Glad",
+  "by": "kind"
+ },
+ "8d07deaf4e3e": {
+  "speaker": "Ingrid",
+  "text": "Thank you. I thought that was it.",
+  "mood": "Glad",
+  "by": "kind"
+ },
+ "ed15b636c600": {
+  "speaker": "Ingrid",
+  "text": "I can't take much more of this.",
+  "mood": "Scared",
+  "by": "kind"
+ },
+ "28e63a11fe8f": {
+  "speaker": "Ingrid",
+  "text": "I'm hurt!",
+  "mood": "Scared",
+  "by": "kind"
+ },
+ "41bcb1d1d38a": {
+  "speaker": "Ingrid",
+  "text": "I'll hold this spot.",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "2c7c46cfe240": {
+  "speaker": "Ingrid",
+  "text": "I'll keep back.",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "7b1ba29498df": {
+  "speaker": "Ingrid",
+  "text": "Nothing gets to you without going through me.",
+  "mood": "Stern",
+  "by": "direction"
+ },
+ "67d23e22c07b": {
+  "speaker": "Ingrid",
+  "text": "Point the way.",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "2434b274aa32": {
+  "speaker": "Ingrid",
+  "text": "Right behind you.",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "a014e5985f4a": {
+  "speaker": "Ingrid",
+  "text": "Here they come!",
+  "mood": "Yelling",
+  "by": "kind"
+ },
+ "c22445c06a4a": {
+  "speaker": "Ingrid",
+  "text": "Weapons up!",
+  "mood": "Yelling",
+  "by": "kind"
+ },
+ "87194276e014": {
+  "speaker": "Ingrid",
+  "text": "Clear. Get your breath.",
+  "mood": "Glad",
+  "by": "kind"
+ },
+ "8b42edab358e": {
+  "speaker": "Ingrid",
+  "text": "That's the last of them.",
+  "mood": "Glad",
+  "by": "kind"
+ },
+ "1c8f76456f8f": {
+  "speaker": "Ingrid",
+  "text": "The plants are wrong. Roots that should sleep in this season are warm to the touch. Someth",
+  "mood": "Neutral",
+  "by": "direction",
+  "emotion": {
+   "afraid": 0.3
+  }
+ },
+ "b681b610162a": {
+  "speaker": "Ingrid",
+  "text": "We came to learn why this forest has become bewitched. First, we need shelter. Follow the ",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "1f3fd4dd0dba": {
+  "speaker": "Ingrid",
+  "text": "Hold still. Drink this.",
+  "mood": "Stern",
+  "by": "kind"
+ },
+ "439cbf682099": {
+  "speaker": "Ingrid",
+  "text": "Not yet, you don't. Drink.",
+  "mood": "Stern",
+  "by": "kind"
+ },
+ "6ecb8f1c00a3": {
+  "speaker": "Ingrid",
+  "text": "You're bleeding. Here.",
+  "mood": "Stern",
+  "by": "kind"
+ },
+ "33c08208b361": {
+  "speaker": "Ingrid",
+  "text": "Stay near the stones. We can still get out of this together.",
+  "mood": "Stern",
+  "by": "direction"
+ },
+ "9a43f5e57993": {
+  "speaker": "Ingrid",
+  "text": "Anything else?",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "58a94203429e": {
+  "speaker": "Ingrid",
+  "text": "I kept saying the word so the forest couldn't take it. Fire. Fire. Fire. And then I saw yo",
+  "mood": "Tired",
+  "by": "direction",
+  "emotion": {
+   "melancholic": 0.3,
+   "afraid": 0.3
+  }
+ },
+ "a746957e8f6d": {
+  "speaker": "Ingrid",
+  "text": "I can't... go on. I'll hide here. Come back for me.",
+  "mood": "Tired",
+  "by": "kind"
+ },
+ "18ca34a3c2a4": {
+  "speaker": "Ingrid",
+  "text": "It's you! I saw a light through the trees and thought the forest had finally taken my wits",
+  "mood": "Glad",
+  "by": "direction",
+  "emotion": {
+   "happy": 0.4,
+   "surprised": 0.2
+  }
+ },
+ "cd9cdccb02ea": {
+  "speaker": "Ingrid",
+  "text": "I watched your fire for three nights from under a root. You should know two things. The ol",
+  "mood": "Tired",
+  "by": "direction",
+  "emotion": {
+   "melancholic": 0.3,
+   "afraid": 0.2
+  }
+ },
+ "1fbcff1954ea": {
+  "speaker": "Liv",
+  "text": "Behind you!",
+  "mood": "Yelling",
+  "by": "kind"
+ },
+ "01993f80c9d2": {
+  "speaker": "Liv",
+  "text": "Watch your back!",
+  "mood": "Yelling",
+  "by": "kind"
+ },
+ "4c9eb0ccffcd": {
+  "speaker": "Liv",
+  "text": "I owe you one.",
+  "mood": "Glad",
+  "by": "kind"
+ },
+ "bbc3327e66fe": {
+  "speaker": "Liv",
+  "text": "Still here. Still here.",
+  "mood": "Glad",
+  "by": "kind"
+ },
+ "80dc0f32cc9d": {
+  "speaker": "Liv",
+  "text": "Thank you. I thought that was it.",
+  "mood": "Glad",
+  "by": "kind"
+ },
+ "dc8be3b09db6": {
+  "speaker": "Liv",
+  "text": "I can't take much more of this.",
+  "mood": "Scared",
+  "by": "kind"
+ },
+ "02a927c71499": {
+  "speaker": "Liv",
+  "text": "I'm hurt!",
+  "mood": "Scared",
+  "by": "kind"
+ },
+ "c9d2bc0f9a2d": {
+  "speaker": "Liv",
+  "text": "I'll hold this spot.",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "1dd15646b8fd": {
+  "speaker": "Liv",
+  "text": "I'll keep back.",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "b49ef4e8075b": {
+  "speaker": "Liv",
+  "text": "Nothing gets to you without going through me.",
+  "mood": "Stern",
+  "by": "direction"
+ },
+ "f4b559d46ef8": {
+  "speaker": "Liv",
+  "text": "Point the way.",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "6d2f2cd1e3d8": {
+  "speaker": "Liv",
+  "text": "Right behind you.",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "380714219996": {
+  "speaker": "Liv",
+  "text": "Here they come!",
+  "mood": "Yelling",
+  "by": "kind"
+ },
+ "4ac8f8870521": {
+  "speaker": "Liv",
+  "text": "Weapons up!",
+  "mood": "Yelling",
+  "by": "kind"
+ },
+ "caeb9ea32148": {
+  "speaker": "Liv",
+  "text": "Clear. Get your breath.",
+  "mood": "Glad",
+  "by": "kind"
+ },
+ "8f8a2aeb8c2e": {
+  "speaker": "Liv",
+  "text": "That's the last of them.",
+  "mood": "Glad",
+  "by": "kind"
+ },
+ "8e4d98588b80": {
+  "speaker": "Liv",
+  "text": "There are old paths here, older than the villages. My teacher said the waystones connected",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "475a6b7d8d80": {
+  "speaker": "Liv",
+  "text": "We came to learn why this forest has become bewitched. First, we need shelter. Follow the ",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "18c0112c208b": {
+  "speaker": "Liv",
+  "text": "Hold still. Drink this.",
+  "mood": "Stern",
+  "by": "kind"
+ },
+ "5e443a9d9793": {
+  "speaker": "Liv",
+  "text": "Not yet, you don't. Drink.",
+  "mood": "Stern",
+  "by": "kind"
+ },
+ "e5ad4da1b109": {
+  "speaker": "Liv",
+  "text": "You're bleeding. Here.",
+  "mood": "Stern",
+  "by": "kind"
+ },
+ "78a80ac74fe4": {
+  "speaker": "Liv",
+  "text": "The stones are answering you. Stay close. I will try to keep the passage open.",
+  "mood": "Stern",
+  "by": "direction"
+ },
+ "09f8f3147553": {
+  "speaker": "Liv",
+  "text": "Anything else?",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "c31f49e71de1": {
+  "speaker": "Liv",
+  "text": "Your ward is a promise too. Did anyone tell you?",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "68c7bc7eddb7": {
+  "speaker": "Liv",
+  "text": "Write it down. Somebody has to write it down.",
+  "mood": "Tired",
+  "by": "kind"
+ },
+ "1541b0517f14": {
+  "speaker": "Liv",
+  "text": "The stones broke along a line. A line! Do you understand what that means?",
+  "mood": "Neutral",
+  "by": "direction",
+  "emotion": {
+   "surprised": 0.35,
+   "happy": 0.15
+  }
+ },
+ "5561d69a04e5": {
+  "speaker": "Notice Board",
+  "text": "Come back when it's done.",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "c9cd91fa9b2c": {
+  "speaker": "Notice Board",
+  "text": "To whoever comes after: this hearth wants copper, and hands that can work it. Smelt ingots",
+  "mood": "Calm",
+  "by": "model"
+ },
+ "fa16c71ca180": {
+  "speaker": "RaidCompanion",
+  "text": "Anything else?",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "675a9acc24c7": {
+  "speaker": "Resident",
+  "text": "Anything else?",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "2594ae66254b": {
+  "speaker": "Runa",
+  "text": "Behind you! Turn!",
+  "mood": "Yelling",
+  "by": "kind"
+ },
+ "9f4bad61ca3c": {
+  "speaker": "Runa",
+  "text": "On your back!",
+  "mood": "Yelling",
+  "by": "kind"
+ },
+ "cd8e4b911f96": {
+  "speaker": "Runa",
+  "text": "I owe you one.",
+  "mood": "Glad",
+  "by": "kind"
+ },
+ "ede041b14d72": {
+  "speaker": "Runa",
+  "text": "Still here. Still here.",
+  "mood": "Glad",
+  "by": "kind"
+ },
+ "a69d67c10a70": {
+  "speaker": "Runa",
+  "text": "Thank you. I thought that was it.",
+  "mood": "Glad",
+  "by": "kind"
+ },
+ "91299b28b316": {
+  "speaker": "Runa",
+  "text": "I'm bleeding!",
+  "mood": "Scared",
+  "by": "kind"
+ },
+ "71421b87e14d": {
+  "speaker": "Runa",
+  "text": "They're too close, I need room!",
+  "mood": "Scared",
+  "by": "kind"
+ },
+ "fd523a609744": {
+  "speaker": "Runa",
+  "text": "I'll hold this spot.",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "eeb193236763": {
+  "speaker": "Runa",
+  "text": "I'll keep back.",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "9ddfaf8a7306": {
+  "speaker": "Runa",
+  "text": "Nothing gets to you without going through me.",
+  "mood": "Stern",
+  "by": "direction"
+ },
+ "5e2f37f34a49": {
+  "speaker": "Runa",
+  "text": "Point the way.",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "9ff984e0284f": {
+  "speaker": "Runa",
+  "text": "Right behind you.",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "8c3ea4543b32": {
+  "speaker": "Runa",
+  "text": "Contact! I've got the range.",
+  "mood": "Yelling",
+  "by": "kind"
+ },
+ "f0c49388c196": {
+  "speaker": "Runa",
+  "text": "Moving, there!",
+  "mood": "Yelling",
+  "by": "kind"
+ },
+ "aa90de8076a5": {
+  "speaker": "Runa",
+  "text": "All clear.",
+  "mood": "Glad",
+  "by": "kind"
+ },
+ "48290a9d96af": {
+  "speaker": "Runa",
+  "text": "Nothing else moving.",
+  "mood": "Glad",
+  "by": "kind"
+ },
+ "7dcdf070c8ed": {
+  "speaker": "Runa",
+  "text": "Deer, boar, wolf, all running west out of the trees, out here where they don't belong. Not",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "16b7baffeed3": {
+  "speaker": "Runa",
+  "text": "Poaching on the jarl's land. You learn to hit with the first arrow when the second one bri",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "6ce65a9922ba": {
+  "speaker": "Runa",
+  "text": "Someone is paying. And I would rather know what is coming out of there than wait for it to",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "76c565135e42": {
+  "speaker": "Runa",
+  "text": "Troll tracks. Small ones, the moss kind. They never come this far down. Something is pushi",
+  "mood": "Neutral",
+  "by": "direction",
+  "emotion": {
+   "afraid": 0.25
+  }
+ },
+ "1074ba01f75e": {
+  "speaker": "Runa",
+  "text": "Walk where the moss is thick; it's quieter. Keep your back to the fire, never your face. A",
+  "mood": "Calm",
+  "by": "direction"
+ },
+ "eba413013aa1": {
+  "speaker": "Runa",
+  "text": "I counted three wolves circling and one shape that was not a wolf. Keep your voice down. I",
+  "mood": "Calm",
+  "by": "direction",
+  "emotion": {
+   "afraid": 0.3,
+   "calm": 0.2
+  }
+ },
+ "07aa6906d1c5": {
+  "speaker": "Runa",
+  "text": "Tracks everywhere, all running the same way. Whatever they are fleeing, we are walking tow",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "ee6768de6d61": {
+  "speaker": "Runa",
+  "text": "Hold still. Drink this.",
+  "mood": "Stern",
+  "by": "kind"
+ },
+ "13bf2677757e": {
+  "speaker": "Runa",
+  "text": "Not yet, you don't. Drink.",
+  "mood": "Stern",
+  "by": "kind"
+ },
+ "d09702cb66c8": {
+  "speaker": "Runa",
+  "text": "You're bleeding. Here.",
+  "mood": "Stern",
+  "by": "kind"
+ },
+ "f24d01247188": {
+  "speaker": "Runa",
+  "text": "Nice morning. That is usually how it starts.",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "8c705e2c6bd4": {
+  "speaker": "Runa",
+  "text": "I will take the ones on the stones. You just keep breathing.",
+  "mood": "Stern",
+  "by": "direction"
+ },
+ "7ee09e478af5": {
+  "speaker": "Runa",
+  "text": "Anything else?",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "7dcf8ab9db2b": {
+  "speaker": "Runa",
+  "text": "Wolves! They are not hunting; something is driving them towards us. Protect the camp!",
+  "mood": "Yelling",
+  "by": "direction"
+ },
+ "c12e96614ee4": {
+  "speaker": "Runa",
+  "text": "More of them, coming round the other side!",
+  "mood": "Yelling",
+  "by": "kind"
+ },
+ "d89caf7801af": {
+  "speaker": "Runa",
+  "text": "Come back when it's done.",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "21df7a00a9af": {
+  "speaker": "Runa",
+  "text": "As it happens. There are blight boar on the grass north of the road, east of the camp, whi",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "eeb952b8fed5": {
+  "speaker": "Runa",
+  "text": "Clean enough. Keep the bow; you've earned it, and I was tired of carrying it.",
+  "mood": "Glad",
+  "by": "direction"
+ },
+ "64ff1b055945": {
+  "speaker": "Runa",
+  "text": "Two boar, on the grass north of the road, east of the camp. Hold the left button to draw.",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "786ca2a1ec9d": {
+  "speaker": "Runa",
+  "text": "This place can be found. Good. So can everything else, by the same road.",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "00393675d940": {
+  "speaker": "Runa",
+  "text": "Behind you! Turn around!",
+  "mood": "Yelling",
+  "by": "kind"
+ },
+ "f64ff77036a6": {
+  "speaker": "Runa",
+  "text": "I know the way. Go on. I'll catch you up.",
+  "mood": "Tired",
+  "by": "kind"
+ },
+ "a9ab3bf298fc": {
+  "speaker": "Runa",
+  "text": "Bow's still good. So am I.",
+  "mood": "Glad",
+  "by": "kind"
+ },
+ "3f4dcea20386": {
+  "speaker": "Runa",
+  "text": "Move. I've got your back.",
+  "mood": "Glad",
+  "by": "kind"
+ },
+ "bc1cd1f6f652": {
+  "speaker": "Runa",
+  "text": "Too close, too close!",
+  "mood": "Scared",
+  "by": "kind"
+ },
+ "4be15bcea6e9": {
+  "speaker": "Runa",
+  "text": "I counted our steps to the exit. I'd rather not count that close again.",
+  "mood": "Tired",
+  "by": "direction"
+ },
+ "22bb3b638e13": {
+  "speaker": "Runa",
+  "text": "I've tracked things my whole life, and never one that big. It left nothing behind but quie",
+  "mood": "Neutral",
+  "by": "direction",
+  "emotion": {
+   "afraid": 0.3
+  }
+ },
+ "4ecbbe66d0c6": {
+  "speaker": "Runa",
+  "text": "The forest doesn't hate us. It doesn't notice us. That's worse. Next time I pick the way.",
+  "mood": "Neutral",
+  "by": "direction",
+  "emotion": {
+   "melancholic": 0.3
+  }
+ },
+ "ac8498391449": {
+  "speaker": "Runa",
+  "text": "You crossed open ground to reach me. Stupid. Don't stop.",
+  "mood": "Stern",
+  "by": "direction"
+ },
+ "82f25a4f97a4": {
+  "speaker": "Runa",
+  "text": "I've watched you for two days. You leave a trail like a cart.",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "83ddfdab46db": {
+  "speaker": "Runa",
+  "text": "I see them. Take the near ones.",
+  "mood": "Yelling",
+  "by": "kind"
+ },
+ "da46190badca": {
+  "speaker": "Runa",
+  "text": "There! In the trees!",
+  "mood": "Yelling",
+  "by": "kind"
+ },
+ "22573aadb98e": {
+  "speaker": "Runa",
+  "text": "Nothing else on the wind.",
+  "mood": "Glad",
+  "by": "kind"
+ },
+ "2e7baa813e90": {
+  "speaker": "Runa",
+  "text": "That's all of them. I think.",
+  "mood": "Glad",
+  "by": "kind"
+ },
+ "54116c754e87": {
+  "speaker": "Runa",
+  "text": "A bow! Then there are two of us. Hold the left button to draw, let go to shoot. It wants b",
+  "mood": "Glad",
+  "by": "direction"
+ },
+ "fc45b90fe661": {
+  "speaker": "Runa",
+  "text": "An honest answer. I like you already.",
+  "mood": "Glad",
+  "by": "direction"
+ },
+ "58db53990606": {
+  "speaker": "Runa",
+  "text": "Down! Moss trolls in the bushes, the small kind. Don't let them get behind you!",
+  "mood": "Yelling",
+  "by": "direction"
+ },
+ "17f7d42bc191": {
+  "speaker": "Runa",
+  "text": "It followed us! The old one, coming through the trees, right for the stones!",
+  "mood": "Scared",
+  "by": "direction",
+  "emotion": {
+   "afraid": 0.5,
+   "surprised": 0.15
+  }
+ },
+ "8a27c131194d": {
+  "speaker": "Runa",
+  "text": "It hasn't seen us yet. It will smell the smoke soon enough.",
+  "mood": "Calm",
+  "by": "direction",
+  "emotion": {
+   "afraid": 0.3,
+   "calm": 0.2
+  }
+ },
+ "1bfebe52b185": {
+  "speaker": "Runa",
+  "text": "Liv.",
+  "mood": "Calm",
+  "by": "direction"
+ },
+ "328df4ed422f": {
+  "speaker": "Runa",
+  "text": "Off the road, on your left! Rootlings. They were lying in wait, and they don't do that.",
+  "mood": "Yelling",
+  "by": "direction"
+ },
+ "b00d7059f538": {
+  "speaker": "Runa",
+  "text": "Runa. I find the tracks, and I shoot what makes them. Trolls off their crags, witches on t",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "be8e32bc3a0b": {
+  "speaker": "Runa",
+  "text": "Simple. I respect that. Hit it until it stops, and it leaves you a hand free.",
+  "mood": "Glad",
+  "by": "direction"
+ },
+ "887555d0ecff": {
+  "speaker": "Runa",
+  "text": "Small ones never come alone and never come this far down. Something up in the high woods i",
+  "mood": "Stern",
+  "by": "direction"
+ },
+ "c31becc1faf5": {
+  "speaker": "Runa",
+  "text": "A shepherd told me his dogs won't go past the tree line any more. Dogs. I have seen those ",
+  "mood": "Neutral",
+  "by": "direction",
+  "emotion": {
+   "afraid": 0.2
+  }
+ },
+ "6220934ca767": {
+  "speaker": "Runa",
+  "text": "Boar, running flat out, and not from us. Off the road!",
+  "mood": "Yelling",
+  "by": "direction"
+ },
+ "03b14bc0c556": {
+  "speaker": "Runa",
+  "text": "Hold up. That's Bjarne's handcart, tipped off the road. Have a look; I'll watch the trees.",
+  "mood": "Stern",
+  "by": "direction"
+ },
+ "bcb862eb293e": {
+  "speaker": "Runa",
+  "text": "No birds. Have you noticed? Not one for a while now.",
+  "mood": "Calm",
+  "by": "direction",
+  "emotion": {
+   "afraid": 0.3,
+   "calm": 0.2
+  }
+ },
+ "dcf1a7e7f7bc": {
+  "speaker": "Runa",
+  "text": "Sigrid. Look behind us. Where is the road? It was right there, and now there's only mist.",
+  "mood": "Scared",
+  "by": "direction"
+ },
+ "79762cc1733a": {
+  "speaker": "Runa",
+  "text": "Still think the coin is worth it?",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "81fe60ce0409": {
+  "speaker": "Runa",
+  "text": "The shadows are wrong. They were behind us when we crossed the stream.",
+  "mood": "Neutral",
+  "by": "direction",
+  "emotion": {
+   "afraid": 0.35
+  }
+ },
+ "f079ef1436aa": {
+  "speaker": "Runa",
+  "text": "There. Feel that? The wind turned, and there is mist coming up off the moss.",
+  "mood": "Neutral",
+  "by": "direction",
+  "emotion": {
+   "afraid": 0.3
+  }
+ },
+ "cc5dc71a6d5b": {
+  "speaker": "Runa",
+  "text": "Wolves behind them! In the open, in daylight. They don't do that. Weapons!",
+  "mood": "Yelling",
+  "by": "direction"
+ },
+ "e7adde700087": {
+  "speaker": "Runa",
+  "text": "You shot straight this morning. It may matter before the night is out.",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "416711decc01": {
+  "speaker": "Runa",
+  "text": "Your grandmother never saw wolves walk into a lit camp.",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "534359605b4e": {
+  "speaker": "Sigrid",
+  "text": "Behind you!",
+  "mood": "Yelling",
+  "by": "kind"
+ },
+ "1445bbf884a9": {
+  "speaker": "Sigrid",
+  "text": "Watch your back!",
+  "mood": "Yelling",
+  "by": "kind"
+ },
+ "4c3a786d0b11": {
+  "speaker": "Sigrid",
+  "text": "I owe you one.",
+  "mood": "Glad",
+  "by": "kind"
+ },
+ "7743400ecfaf": {
+  "speaker": "Sigrid",
+  "text": "Still here. Still here.",
+  "mood": "Glad",
+  "by": "kind"
+ },
+ "7ab773db310c": {
+  "speaker": "Sigrid",
+  "text": "Thank you. I thought that was it.",
+  "mood": "Glad",
+  "by": "kind"
+ },
+ "1435ba85f835": {
+  "speaker": "Sigrid",
+  "text": "I can't take much more of this.",
+  "mood": "Scared",
+  "by": "kind"
+ },
+ "33c1a5e3abf1": {
+  "speaker": "Sigrid",
+  "text": "I'm hurt!",
+  "mood": "Scared",
+  "by": "kind"
+ },
+ "d9572a64fe0e": {
+  "speaker": "Sigrid",
+  "text": "I'll hold this spot.",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "9df3125f8491": {
+  "speaker": "Sigrid",
+  "text": "I'll keep back.",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "8025809c9a81": {
+  "speaker": "Sigrid",
+  "text": "Nothing gets to you without going through me.",
+  "mood": "Stern",
+  "by": "direction"
+ },
+ "127c73ed974c": {
+  "speaker": "Sigrid",
+  "text": "Point the way.",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "71e2b614d154": {
+  "speaker": "Sigrid",
+  "text": "Right behind you.",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "471cf2035963": {
+  "speaker": "Sigrid",
+  "text": "Here they come!",
+  "mood": "Yelling",
+  "by": "kind"
+ },
+ "29e1def52759": {
+  "speaker": "Sigrid",
+  "text": "Weapons up!",
+  "mood": "Yelling",
+  "by": "kind"
+ },
+ "c1fe8d6ca29c": {
+  "speaker": "Sigrid",
+  "text": "Clear. Get your breath.",
+  "mood": "Glad",
+  "by": "kind"
+ },
+ "d221ef2d0fb7": {
+  "speaker": "Sigrid",
+  "text": "That's the last of them.",
+  "mood": "Glad",
+  "by": "kind"
+ },
+ "053ff52b89af": {
+  "speaker": "Sigrid",
+  "text": "Because the only old things out there are stones and roots, and the marks on them are olde",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "0418ea8f8156": {
+  "speaker": "Sigrid",
+  "text": "Eirik sees a great deal for a man who pretends not to. Yes. I have seen stones like these ",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "8793c7c39e0b": {
+  "speaker": "Sigrid",
+  "text": "I know what it feels like: a door left open in winter. Someone opened it on purpose. Wheth",
+  "mood": "Calm",
+  "by": "direction",
+  "emotion": {
+   "melancholic": 0.25,
+   "calm": 0.2
+  }
+ },
+ "52c2d1d575e7": {
+  "speaker": "Sigrid",
+  "text": "Ingrid, Bjarne, Tor and Liv. An alchemist, a smith, a carpenter and a scholar: the ones wh",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "53cd9f2912e6": {
+  "speaker": "Sigrid",
+  "text": "The cause. Trolls do not leave their crags for no reason, and wolves do not forget fire. S",
+  "mood": "Stern",
+  "by": "direction"
+ },
+ "44633b210fe7": {
+  "speaker": "Sigrid",
+  "text": "They did not send me. They asked for someone who could read the old marks, and I was the o",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "c53623d73d20": {
+  "speaker": "Sigrid",
+  "text": "Words for things your tongue has no names for. Most of them mean wait. One of them means o",
+  "mood": "Calm",
+  "by": "direction"
+ },
+ "fd961fae27d8": {
+  "speaker": "Sigrid",
+  "text": "The villages think we came for wolves and witches. Let them. The stones out here are older",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "76203d72bee1": {
+  "speaker": "Sigrid",
+  "text": "Keep the torch high and the road under your feet. The forest is listening tonight. Let it ",
+  "mood": "Calm",
+  "by": "direction"
+ },
+ "543ad19d15bb": {
+  "speaker": "Sigrid",
+  "text": "Hold still. Drink this.",
+  "mood": "Stern",
+  "by": "kind"
+ },
+ "f132afa2d9df": {
+  "speaker": "Sigrid",
+  "text": "Not yet, you don't. Drink.",
+  "mood": "Stern",
+  "by": "kind"
+ },
+ "f751debd61d7": {
+  "speaker": "Sigrid",
+  "text": "You're bleeding. Here.",
+  "mood": "Stern",
+  "by": "kind"
+ },
+ "2e44675fdddf": {
+  "speaker": "Sigrid",
+  "text": "Take what time you need, but not too much. It is a long walk, and I want to be at the fore",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "ec9cbef506e6": {
+  "speaker": "Sigrid",
+  "text": "Stand inside the ring. Whatever you see, do not let go of the stone until I say.",
+  "mood": "Stern",
+  "by": "direction"
+ },
+ "391fef0a2269": {
+  "speaker": "Sigrid",
+  "text": "Anything else?",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "59bb2faac379": {
+  "speaker": "Sigrid",
+  "text": "Dry stone overhead. Good work. Now a fire, before anyone can think clearly: eight sticks a",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "37b5ff1bb70c": {
+  "speaker": "Sigrid",
+  "text": "That was no weather. The sun went down hours early and this storm came out of a clear sky.",
+  "mood": "Stern",
+  "by": "direction"
+ },
+ "6ec4a4d98c7d": {
+  "speaker": "Sigrid",
+  "text": "The packs are tied and the fire is nearly out. Ingrid's party should have been back yester",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "4c2744958650": {
+  "speaker": "Sigrid",
+  "text": "The stones are drawing power! Hold them off until the connection forms!",
+  "mood": "Yelling",
+  "by": "direction"
+ },
+ "1c36832f26b2": {
+  "speaker": "Sigrid",
+  "text": "There you are. Come and stand by the fire with the rest of us. You should know who you are",
+  "mood": "Glad",
+  "by": "direction",
+  "emotion": {
+   "happy": 0.25
+  }
+ },
+ "a089025e2ba8": {
+  "speaker": "Sigrid",
+  "text": "Come back when it's done.",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "0879fdb649d0": {
+  "speaker": "Sigrid",
+  "text": "Hold together! Nobody gets left behind. We will find each other, whatever happens.",
+  "mood": "Yelling",
+  "by": "direction"
+ },
+ "f7d6413d0e2a": {
+  "speaker": "Sigrid",
+  "text": "Finish your porridge and listen. This is the only quiet you will get today.",
+  "mood": "Stern",
+  "by": "direction"
+ },
+ "b940fd324d01": {
+  "speaker": "Sigrid",
+  "text": "Stay on the road. We keep a steady pace, and the others will wait if you fall behind.",
+  "mood": "Stern",
+  "by": "direction"
+ },
+ "1d4032fe69b3": {
+  "speaker": "Sigrid",
+  "text": "Seven went in. Tell me who's home.",
+  "mood": "Stern",
+  "by": "direction"
+ },
+ "1510e2502705": {
+  "speaker": "Sigrid",
+  "text": "Behind you! Move!",
+  "mood": "Yelling",
+  "by": "kind"
+ },
+ "6f337bd93c06": {
+  "speaker": "Sigrid",
+  "text": "Don't you stop for me. That's an order.",
+  "mood": "Tired",
+  "by": "kind"
+ },
+ "220a9c1c0714": {
+  "speaker": "Sigrid",
+  "text": "Back in line. Thank you.",
+  "mood": "Glad",
+  "by": "kind"
+ },
+ "44a6dc3f243c": {
+  "speaker": "Sigrid",
+  "text": "Good. On your feet. I mean, on mine.",
+  "mood": "Glad",
+  "by": "kind"
+ },
+ "c83427a9275f": {
+  "speaker": "Sigrid",
+  "text": "Still standing. Barely.",
+  "mood": "Scared",
+  "by": "kind"
+ },
+ "7ee8dc1bcfc1": {
+  "speaker": "Sigrid",
+  "text": "A retreat is only a defeat if you learn nothing. What did we learn?",
+  "mood": "Stern",
+  "by": "direction"
+ },
+ "9528ca031d18": {
+  "speaker": "Sigrid",
+  "text": "I gave you an order once to leave me if it came to that. You didn't. We'll talk about disc",
+  "mood": "Stern",
+  "by": "direction"
+ },
+ "394e637562bc": {
+  "speaker": "Sigrid",
+  "text": "I've buried good people on less than what we just did. Write it down somewhere. It should ",
+  "mood": "Calm",
+  "by": "direction",
+  "emotion": {
+   "melancholic": 0.35
+  }
+ },
+ "52d7287f9b34": {
+  "speaker": "Sigrid",
+  "text": "I've served under worse than you. Don't let it go to your head.",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "b706dbb4a24b": {
+  "speaker": "Sigrid",
+  "text": "You came back. I told them you would.",
+  "mood": "Glad",
+  "by": "direction"
+ },
+ "a40d26166e98": {
+  "speaker": "Sigrid",
+  "text": "Form up on me!",
+  "mood": "Yelling",
+  "by": "kind"
+ },
+ "9368d894ea64": {
+  "speaker": "Sigrid",
+  "text": "Stand together! Nobody runs!",
+  "mood": "Yelling",
+  "by": "kind"
+ },
+ "32c71e3f29a8": {
+  "speaker": "Sigrid",
+  "text": "Count heads. Everyone still here?",
+  "mood": "Glad",
+  "by": "kind"
+ },
+ "2c8bbea96460": {
+  "speaker": "Sigrid",
+  "text": "Good. Move before more come.",
+  "mood": "Glad",
+  "by": "kind"
+ },
+ "869a001ac1cc": {
+  "speaker": "Sigrid",
+  "text": "...can anyone hear... Ingrid was right behind me when the stones broke. She's hurt. Find h",
+  "mood": "Scared",
+  "by": "direction",
+  "emotion": {
+   "afraid": 0.35,
+   "sad": 0.2
+  }
+ },
+ "efd49b01c1b8": {
+  "speaker": "Sigrid",
+  "text": "A fire. Sit down, all of you, and get your breath back. Whatever is out there will still b",
+  "mood": "Tired",
+  "by": "direction"
+ },
+ "e51b80c5623c": {
+  "speaker": "Sigrid",
+  "text": "Almost! Hold it off, just a little longer!",
+  "mood": "Yelling",
+  "by": "kind"
+ },
+ "5144aa4ce4f3": {
+  "speaker": "Sigrid",
+  "text": "At first light we find the four who went ahead. Ingrid. Bjarne. Tor. And...",
+  "mood": "Neutral",
+  "by": "hand",
+  "emotion": {
+   "afraid": 0.2,
+   "melancholic": 0.2
+  },
+  "take": 4,
+  "from": "unity"
+ },
+ "d2ef296b3fd8": {
+  "speaker": "Sigrid",
+  "text": "Careful. The ones who go looking for the truth of it are the ones who find it.",
+  "mood": "Stern",
+  "by": "direction"
+ },
+ "7761ac604c16": {
+  "speaker": "Sigrid",
+  "text": "For anyone who slept through last night's talk, and I know who you are: I am Sigrid, and w",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "8f8c51a7519c": {
+  "speaker": "Sigrid",
+  "text": "It will not wake for me. It never has. You, then. Put your hand on the centre stone.",
+  "mood": "Stern",
+  "by": "direction"
+ },
+ "097d5b4eb70a": {
+  "speaker": "Sigrid",
+  "text": "Leave the fire! Take the old path north, to the standing stones. Now!",
+  "mood": "Yelling",
+  "by": "direction"
+ },
+ "52d4678c991e": {
+  "speaker": "Sigrid",
+  "text": "Liv. Of course. Eleven years I have known her, and for a moment there was a hole where her",
+  "mood": "Neutral",
+  "by": "direction",
+  "emotion": {
+   "afraid": 0.35,
+   "sad": 0.15
+  }
+ },
+ "bcc9a3c2faa5": {
+  "speaker": "Sigrid",
+  "text": "Roots do not set ambushes on a road. Something taught them to. Keep moving. We need walls ",
+  "mood": "Stern",
+  "by": "direction"
+ },
+ "db2f97f49a82": {
+  "speaker": "Sigrid",
+  "text": "That is no thunder. An old one, a mountain troll, and it is walking towards our fire.",
+  "mood": "Stern",
+  "by": "direction",
+  "emotion": {
+   "afraid": 0.35,
+   "angry": 0.15
+  }
+ },
+ "18434bb5a0bd": {
+  "speaker": "Sigrid",
+  "text": "We leave when you are ready. If you want to earn your porridge first, ask the others. They",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "b62bef3ca79f": {
+  "speaker": "Sigrid",
+  "text": "Whatever you see, do not let go of the stone. There are things I should have told you, and",
+  "mood": "Stern",
+  "by": "direction",
+  "emotion": {
+   "afraid": 0.3,
+   "sad": 0.25
+  }
+ },
+ "3f5aecab3990": {
+  "speaker": "Sigrid",
+  "text": "You asked me by the fire, so here it is. I have seen stones like these wake once. It took ",
+  "mood": "Calm",
+  "by": "direction",
+  "emotion": {
+   "melancholic": 0.3
+  }
+ },
+ "0dea2076e3a3": {
+  "speaker": "Sigrid",
+  "text": "I can see that. Light your torches, and take this one.",
+  "mood": "Stern",
+  "by": "direction"
+ },
+ "e1ef4f263cca": {
+  "speaker": "Sigrid",
+  "text": "Keep walking.",
+  "mood": "Stern",
+  "by": "direction"
+ },
+ "1b12cd47c900": {
+  "speaker": "Sigrid",
+  "text": "Not alone, and not before we are ready. Come back to the others.",
+  "mood": "Stern",
+  "by": "direction"
+ },
+ "3f96ad6608ec": {
+  "speaker": "Sigrid",
+  "text": "Rumours grow in the telling. That is why we go and look, instead of sitting in a longhouse",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "42e6f20d62cf": {
+  "speaker": "Sigrid",
+  "text": "Save it for the road. We have until the porridge gets worse.",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "3e8d9f9c4e28": {
+  "speaker": "Sigrid",
+  "text": "Wolves that hunt by day and do not fear four armed people. Whatever happened to this cart ",
+  "mood": "Stern",
+  "by": "direction"
+ },
+ "11473473c565": {
+  "speaker": "Sigrid",
+  "text": "You wanted to know if the stories were true. How are you finding it?",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "f73ec731c30d": {
+  "speaker": "Sigrid",
+  "text": "And you. You came to us with a strong back and few questions. Nobody walks towards that fo",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "9c66c89507e9": {
+  "speaker": "Sigrid",
+  "text": "Then one thing first. Nobody walks that road unarmed. We carry spare arms in the packs. Th",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "342d4e0a9589": {
+  "speaker": "The Portal",
+  "text": "A fire first, little one. Fallen branches and loose stones lie all around me: pick them up",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "698d38946570": {
+  "speaker": "The Portal",
+  "text": "A horn at dusk, the expedition's signal. She is the last of them. Bring her home, little o",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "515e3120225e": {
+  "speaker": "The Portal",
+  "text": "A saw, out where nobody saws. Your carpenter is hurt, but he is still measuring.",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "1206d3441d9f": {
+  "speaker": "The Portal",
+  "text": "A snare line, a mile of it, and at the end a man who did not mean to be caught.",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "bdceca42e955": {
+  "speaker": "The Portal",
+  "text": "A wall went up overnight out there, round nothing. Whoever built it will want to build a b",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "b9dfae488539": {
+  "speaker": "The Portal",
+  "text": "Bare hands bring little home, little one. A hatchet in your belt and a pick beside it brin",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "88f636b3e644": {
+  "speaker": "The Portal",
+  "text": "Come and sit by me, little one. There is something I should have told you before you went ",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "652f2a5af07f": {
+  "speaker": "The Portal",
+  "text": "Go, little one. She is just beyond me, off the path. Come back through one of my doors bef",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "ce1a588e9f04": {
+  "speaker": "The Portal",
+  "text": "Listen, little one. Rest your hand on the stone.",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "7f599ca3175b": {
+  "speaker": "The Portal",
+  "text": "Listen. A hammer, far off in the deep woods, slow and uneven. One of yours. Ask me what th",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "a2b1086258fd": {
+  "speaker": "The Portal",
+  "text": "Marks on the trees that only the dark shows. Go through at night.",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "394d03077fdf": {
+  "speaker": "The Portal",
+  "text": "My ward keeps out the worst of the forest, not all of it. Put a wall between your fire and",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "40b357728cac": {
+  "speaker": "The Portal",
+  "text": "Now bring me what you freed. Feed me that light and I will open for you, as I did in the d",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "addba548796c": {
+  "speaker": "The Portal",
+  "text": "Now feed yourself. Berries, water from the stream, a stew over your fire. You will be walk",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "d18846585484": {
+  "speaker": "The Portal",
+  "text": "Now the woods have told me. Something breathes under the roots, little one, in a hollow de",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "9ccca3aac0dc": {
+  "speaker": "The Portal",
+  "text": "Old stones are humming in the deep woods. Someone is inside the ring, writing.",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "a1758afc4fa4": {
+  "speaker": "The Portal",
+  "text": "One fire brought Ingrid home. The others will want more than a fire: a bench, a furnace, a",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "66a3dfca329a": {
+  "speaker": "The Portal",
+  "text": "One weapon is one answer, and it will not last for ever. Make a second at your workshop: a",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "122c522e5992": {
+  "speaker": "The Portal",
+  "text": "She is close, little one. Just beyond me, off the path, hiding. Find her, keep her near yo",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "a5d9d0d5cbee": {
+  "speaker": "The Portal",
+  "text": "Smoke from a farmstead that burned long ago. Someone kept the seed.",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "d9092e30c218": {
+  "speaker": "The Portal",
+  "text": "Someone is cooking out there. The wolves can smell it. So can I.",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "a9b1d2be041a": {
+  "speaker": "The Portal",
+  "text": "Something tests my ward. Out there, someone else is holding a clearing against the wolves.",
+  "mood": "Stern",
+  "by": "direction"
+ },
+ "4dd665e2fe43": {
+  "speaker": "The Portal",
+  "text": "The brighter this place burns, the further it can be seen. Build. Clear the old growth. Gi",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "3491cd345f3f": {
+  "speaker": "The Portal",
+  "text": "The forest has put its roots in even here. Three stones around the clearing still hold my ",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "e6d4b67488c1": {
+  "speaker": "The Portal",
+  "text": "The light that reached her reached other things as well. They are on the old path now, tes",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "15c83058c241": {
+  "speaker": "The Portal",
+  "text": "What you carry through me, the woods can take from you. What you leave here, I keep. Build",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "3bba3ed63fe0": {
+  "speaker": "The Portal",
+  "text": "You brought the woods home on your back. Now make something of them: a lodge by the trees,",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "bacebf0efa04": {
+  "speaker": "The Portal",
+  "text": "You have a fire. Now a roof to work under: a workshop beside it. What the woods break, it ",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "d0af44ce40a0": {
+  "speaker": "The Portal",
+  "text": "A hundred winters I kept this clearing alone. I had forgotten how loud a home is. Do not s",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "9a3cd8bc2f03": {
+  "speaker": "The Portal",
+  "text": "Every hearth in my light is a little more of the old pact kept.",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "32b2576fdab2": {
+  "speaker": "The Portal",
+  "text": "I listen for your people every night. Some nights I hear them.",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "3ce82e61c862": {
+  "speaker": "The Portal",
+  "text": "The forest cannot forget a place that someone tends.",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "183dd09c3cfb": {
+  "speaker": "The Portal",
+  "text": "A fire first. Then a home worth coming back to. Then we go and fetch them. And one day, li",
+  "mood": "Calm",
+  "by": "model"
+ },
+ "f7d7b9fe43be": {
+  "speaker": "The Portal",
+  "text": "Did you see what grew out of them as they fell? Root. The same root that choked my stones,",
+  "mood": "Sad",
+  "by": "model"
+ },
+ "19e2bc5ec533": {
+  "speaker": "The Portal",
+  "text": "Do you feel that? The ward has remembered what it is for. And far out in the mist, little ",
+  "mood": "Calm",
+  "by": "direction",
+  "emotion": {
+   "happy": 0.3,
+   "calm": 0.2
+  }
+ },
+ "1a74552f73ab": {
+  "speaker": "The Portal",
+  "text": "I am a door, little one, and I have gone to sleep. I am too thin to wake myself. Long ago ",
+  "mood": "Calm",
+  "by": "direction",
+  "emotion": {
+   "melancholic": 0.35,
+   "calm": 0.2
+  }
+ },
+ "e35518fff3a7": {
+  "speaker": "The Portal",
+  "text": "I have not told you everything. The Heartroot was no monster. It was the forest's guardian",
+  "mood": "Calm",
+  "by": "direction",
+  "emotion": {
+   "sad": 0.3,
+   "calm": 0.2
+  }
+ },
+ "e8c1f6b40c78": {
+  "speaker": "The Portal",
+  "text": "It is all one thing, little one. Something old is pushing those roots, from somewhere deep",
+  "mood": "Calm",
+  "by": "model"
+ },
+ "245194b18d05": {
+  "speaker": "The Portal",
+  "text": "Its last word was for you. Hearth-keeper. Nobody has called anyone that in a hundred winte",
+  "mood": "Calm",
+  "by": "model"
+ },
+ "4fbd6788bc22": {
+  "speaker": "The Portal",
+  "text": "Listen. Far off, at dusk, a horn: three long notes and a rest, over and over. The expediti",
+  "mood": "Calm",
+  "by": "direction",
+  "emotion": {
+   "happy": 0.2,
+   "surprised": 0.15,
+   "calm": 0.2
+  }
+ },
+ "c0a6b1358ea0": {
+  "speaker": "The Portal",
+  "text": "Look, now that there is light to see by. Three of my stones, choked in roots. And the root",
+  "mood": "Calm",
+  "by": "model"
+ },
+ "c600954f71c6": {
+  "speaker": "The Portal",
+  "text": "My stones have gone quiet, but she is right. One spark burns close, just beyond me, hiding",
+  "mood": "Calm",
+  "by": "model"
+ },
+ "39e704df982c": {
+  "speaker": "The Portal",
+  "text": "Seven sparks, scattered through the Misty Woods. They are alive. I hear them when the wind",
+  "mood": "Calm",
+  "by": "direction",
+  "emotion": {
+   "sad": 0.25,
+   "calm": 0.25
+  }
+ },
+ "7b8cc4a0c9eb": {
+  "speaker": "The Portal",
+  "text": "So light one. The forest cannot forget a hearth that someone tends. It will feed my ward, ",
+  "mood": "Calm",
+  "by": "model"
+ },
+ "5024f67bc4a4": {
+  "speaker": "The Portal",
+  "text": "The last of an old promise. I keep the dark from this clearing. But that is not what you n",
+  "mood": "Calm",
+  "by": "model"
+ },
+ "804efcbaab27": {
+  "speaker": "The Portal",
+  "text": "Then she is still herself, and she is holding on. She will want the others home before her",
+  "mood": "Calm",
+  "by": "direction",
+  "emotion": {
+   "happy": 0.2,
+   "calm": 0.3
+  }
+ },
+ "b6587a578789": {
+  "speaker": "The Portal",
+  "text": "There. A hearth beside my stones, after a hundred winters.",
+  "mood": "Calm",
+  "by": "direction",
+  "emotion": {
+   "happy": 0.3,
+   "calm": 0.2
+  }
+ },
+ "668df3fce100": {
+  "speaker": "The Portal",
+  "text": "With its roots gone quiet I can reach further. North, past the troll country, the road is ",
+  "mood": "Calm",
+  "by": "model"
+ },
+ "e873704df046": {
+  "speaker": "The Portal",
+  "text": "With what? You have nothing but your hands, and I cannot open.",
+  "mood": "Stern",
+  "by": "model"
+ },
+ "98f67f63063d": {
+  "speaker": "The Portal",
+  "text": "Would you have woken it, knowing? It could not be saved, only stopped. Better by the hand ",
+  "mood": "Calm",
+  "by": "direction",
+  "emotion": {
+   "sad": 0.25,
+   "calm": 0.25
+  }
+ },
+ "b4a5825c9db0": {
+  "speaker": "The Portal",
+  "text": "You brought it down. Lay what you carried out of the hollow by the fire, little one, where",
+  "mood": "Calm",
+  "by": "direction",
+  "emotion": {
+   "sad": 0.3,
+   "calm": 0.2
+  }
+ },
+ "4f0b009136c5": {
+  "speaker": "The Portal",
+  "text": "You came for coin. There is none here. Stay anyway. They need you to.",
+  "mood": "Calm",
+  "by": "model"
+ },
+ "3958201de7f0": {
+  "speaker": "The Portal",
+  "text": "You came for coin. There is none in this. But there is a debt now, and you have begun to p",
+  "mood": "Calm",
+  "by": "model"
+ },
+ "3e3f78e0e359": {
+  "speaker": "The Portal",
+  "text": "You came for someone. Every one of your people is out there because of what was let go col",
+  "mood": "Calm",
+  "by": "model"
+ },
+ "5985c4c61e7d": {
+  "speaker": "The Portal",
+  "text": "You came looking for someone. Now there are others looking for you. Let them find a light.",
+  "mood": "Calm",
+  "by": "model"
+ },
+ "e87ac2ecf9e2": {
+  "speaker": "The Portal",
+  "text": "You came to see if the stories were true. Here is the one nobody tells: we broke the pact ",
+  "mood": "Calm",
+  "by": "direction",
+  "emotion": {
+   "sad": 0.3,
+   "calm": 0.2
+  }
+ },
+ "679f652f07a6": {
+  "speaker": "The Portal",
+  "text": "You came to see whether the stories were true. Now you are one of them.",
+  "mood": "Calm",
+  "by": "model"
+ },
+ "928f98baf858": {
+  "speaker": "The Portal",
+  "text": "Your people did, long before you were born. You are mending it. Every fire kept here is a ",
+  "mood": "Calm",
+  "by": "model"
+ },
+ "2eb7e0dea082": {
+  "speaker": "The Portal",
+  "text": "And the guardian under the roots, who kept the forest's half. Where is it now?",
+  "mood": "Calm",
+  "by": "model"
+ },
+ "e864cb232902": {
+  "speaker": "The Portal",
+  "text": "And this. Their door, and the night kept from it, for as long as the fire burned.",
+  "mood": "Calm",
+  "by": "model"
+ },
+ "b846d5abd39c": {
+  "speaker": "The Portal",
+  "text": "I remember this. A fire beside my stones, and someone to keep it.",
+  "mood": "Calm",
+  "by": "direction",
+  "emotion": {
+   "happy": 0.25,
+   "calm": 0.25
+  }
+ },
+ "c386892a6dc1": {
+  "speaker": "The Portal",
+  "text": "Little one, behind you! My ward is too thin yet. They are coming up through it.",
+  "mood": "Scared",
+  "by": "direction",
+  "emotion": {
+   "afraid": 0.5,
+   "surprised": 0.15
+  }
+ },
+ "ae616ce24bf2": {
+  "speaker": "The Portal",
+  "text": "Rootlings, in my clearing. Feed me those orbs, and they will not get in so easily again.",
+  "mood": "Stern",
+  "by": "direction"
+ },
+ "10fcb367d4d5": {
+  "speaker": "The Portal",
+  "text": "First the way home. Then their names. Then there is no one left to find.",
+  "mood": "Calm",
+  "by": "model"
+ },
+ "f3110aac1411": {
+  "speaker": "The Portal",
+  "text": "That is what you killed. I am sorry. Someone had to.",
+  "mood": "Sad",
+  "by": "direction",
+  "emotion": {
+   "sad": 0.4
+  }
+ },
+ "81282749735d": {
+  "speaker": "The Portal",
+  "text": "Little one. You fell out of the dark with the whole forest at your heels, and I caught you",
+  "mood": "Calm",
+  "by": "direction",
+  "emotion": {
+   "sad": 0.3,
+   "calm": 0.25
+  }
+ },
+ "767246a502c1": {
+  "speaker": "Tor",
+  "text": "Behind you!",
+  "mood": "Yelling",
+  "by": "kind"
+ },
+ "8f6bcce22e65": {
+  "speaker": "Tor",
+  "text": "Watch your back!",
+  "mood": "Yelling",
+  "by": "kind"
+ },
+ "8fb10eae6846": {
+  "speaker": "Tor",
+  "text": "I owe you one.",
+  "mood": "Glad",
+  "by": "kind"
+ },
+ "e51b7497f811": {
+  "speaker": "Tor",
+  "text": "Still here. Still here.",
+  "mood": "Glad",
+  "by": "kind"
+ },
+ "632c23f8863b": {
+  "speaker": "Tor",
+  "text": "Thank you. I thought that was it.",
+  "mood": "Glad",
+  "by": "kind"
+ },
+ "b1d5c4ed4660": {
+  "speaker": "Tor",
+  "text": "I can't take much more of this.",
+  "mood": "Scared",
+  "by": "kind"
+ },
+ "1e78a85a8bf5": {
+  "speaker": "Tor",
+  "text": "I'm hurt!",
+  "mood": "Scared",
+  "by": "kind"
+ },
+ "c7346545ab5e": {
+  "speaker": "Tor",
+  "text": "I'll hold this spot.",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "cc5007a5209b": {
+  "speaker": "Tor",
+  "text": "I'll keep back.",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "5367a35600a7": {
+  "speaker": "Tor",
+  "text": "Nothing gets to you without going through me.",
+  "mood": "Stern",
+  "by": "direction"
+ },
+ "8bbb9f70511b": {
+  "speaker": "Tor",
+  "text": "Point the way.",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "02da70cd5cfe": {
+  "speaker": "Tor",
+  "text": "Right behind you.",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "1882efe7a557": {
+  "speaker": "Tor",
+  "text": "Here they come!",
+  "mood": "Yelling",
+  "by": "kind"
+ },
+ "26671639a8fd": {
+  "speaker": "Tor",
+  "text": "Weapons up!",
+  "mood": "Yelling",
+  "by": "kind"
+ },
+ "e1e4fc5f01a3": {
+  "speaker": "Tor",
+  "text": "Clear. Get your breath.",
+  "mood": "Glad",
+  "by": "kind"
+ },
+ "e0683435e9d8": {
+  "speaker": "Tor",
+  "text": "That's the last of them.",
+  "mood": "Glad",
+  "by": "kind"
+ },
+ "73d0a3581264": {
+  "speaker": "Tor",
+  "text": "This stone is dry enough. Give me sound timber and a little daylight, and I could make som",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "d5e0f61c0bde": {
+  "speaker": "Tor",
+  "text": "We came to learn why this forest has become bewitched. First, we need shelter. Follow the ",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "c538debbdac0": {
+  "speaker": "Tor",
+  "text": "Hold still. Drink this.",
+  "mood": "Stern",
+  "by": "kind"
+ },
+ "34f54bc231d0": {
+  "speaker": "Tor",
+  "text": "Not yet, you don't. Drink.",
+  "mood": "Stern",
+  "by": "kind"
+ },
+ "96eec5185117": {
+  "speaker": "Tor",
+  "text": "You're bleeding. Here.",
+  "mood": "Stern",
+  "by": "kind"
+ },
+ "8c7ae76a3e04": {
+  "speaker": "Tor",
+  "text": "Stay near the stones. We can still get out of this together.",
+  "mood": "Stern",
+  "by": "direction"
+ },
+ "97d4e5dedbe4": {
+  "speaker": "Tor",
+  "text": "Anything else?",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "97287dc8882b": {
+  "speaker": "Tor",
+  "text": "It's built crooked, you know. All of it. Give me a week.",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "266b9cf5a88a": {
+  "speaker": "Tor",
+  "text": "My tools. Leave them, if you have to. Not me.",
+  "mood": "Tired",
+  "by": "kind"
+ },
+ "3c10de8801a3": {
+  "speaker": "Tor",
+  "text": "Still measuring. I knew someone would come, and I wanted something to show for it.",
+  "mood": "Tired",
+  "by": "direction",
+  "emotion": {
+   "melancholic": 0.2,
+   "happy": 0.2
+  }
+ },
+ "9ce02ecc08f5": {
+  "speaker": "Tor",
+  "text": "There's a hollow in the deep woods where nothing grows, and the ground breathes there. In,",
+  "mood": "Neutral",
+  "by": "direction",
+  "emotion": {
+   "afraid": 0.3,
+   "melancholic": 0.2
+  }
+ },
+ "4fb7976a0979": {
+  "speaker": "Yrsa",
+  "text": "Show me your kitchen. No, on second thought, show me what you eat.",
+  "mood": "Neutral",
+  "by": "direction"
+ },
+ "5283bcdeb24a": {
+  "speaker": "Yrsa",
+  "text": "I can't go on... come back for me.",
+  "mood": "Tired",
+  "by": "kind"
+ },
+ "4fbeb1dbec14": {
+  "speaker": "Yrsa",
+  "text": "Mind the pot. If you've come to eat, you'll carry.",
+  "mood": "Neutral",
+  "by": "direction"
+ }
+}

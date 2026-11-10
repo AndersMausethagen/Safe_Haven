@@ -3,6 +3,28 @@
 Open work and ideas. Tick items off (`[x]`) or delete them when done. Architecture notes for each system live in
 [ARCHITECTURE.md](../Assets/_Project/Scripts/ARCHITECTURE.md).
 
+## Spoken dialogue (2026-11-10)
+
+Every line a named character says has a recording: 412 lines, twelve voices (see ARCHITECTURE.md › Spoken dialogue).
+Checked in Play from the CLI: a recorded line is found and heard on the Voice volume, a subtitle waits for its recording,
+an unrecorded line is only read. Every clip was written down again by a speech recogniser and says its words. **Nobody
+has listened to a single line yet.**
+- [ ] Listen. The voices themselves (their reference clips are in `Tools/Audio/Voices/<name>/`), then lines in the game.
+      Yrsa's reference measured very high (308 Hz) for "an older woman, medium-low": the likeliest to want redesigning.
+- [ ] The direction (`DIRECTION` in `Tools/Audio/dialogue_voices.py`) was written by reading the scenes, and the moods'
+      strengths were set by measurement. Change a line in Safe Haven › Voice Lines (Mood, Feeling, Take, Speak again).
+- [ ] The Voice Lines window compiles, opens and runs without errors, and its speaking path was run from the command
+      line; it has not been seen or clicked by hand (a capture of it from the CLI came out blank).
+- [ ] Names: "Bjarne" is spelt "Byarna" for the voice model. Eirik and Sigrid come out as a recogniser's "Iric" and
+      "Sigrit": listen whether they are right.
+- [ ] The shouts in a fight (Yelling) are acted as angry and surprised, not shouted: the model has no shout. If they
+      are too tame, borrow the feeling from a recording of a shout (LocalSpawn › Voice › Feeling from a recording).
+- [ ] The licence of the voice model that speaks the lines (IndexTTS-2.5) is bilibili's own, not open source. Fine for
+      a prototype; read `D:\ComfyUI\agent\integrations\index-tts\README-WINDOWS.md` before these recordings ship.
+- [ ] The portal's "Warmth stirs in the old stone." is read on screen and not spoken (it is narration around her words).
+- [ ] An empty folder `D:\Assets` is left from a first run that wrote its clips beside the wrong folder (moved since).
+      It can be deleted.
+
 ## Backstory cinematic (2026-11-10)
 
 "The Old Story" plays when a new game starts ([script](BackstoryCinematic.md)). Checked in Play from the CLI: the pictures
@@ -10,7 +32,8 @@ by screenshots of every shot, the flow by starting a new game on throwaway saves
 - [ ] Listen to it from New Game: the voice's pace (the model reads briskly and has no speed control; pauses were added
       between sentences), the music under it (Nightsong, then Eerie raid from the forgetting to the lanterns, then
       Nightsong), and the levels of the wind, birds and footsteps.
-- [ ] The portal still speaks in text only at home. Voice its main lines with the same voice, or leave it?
+- [ ] Its narration was spoken by Qwen3-TTS; the portal's lines in the game and the prologue-end cinematic by the acting
+      model in the same voice. If they sound like two people, speak the opening again with the acting model.
 - [ ] Watch it again from the journal's Backstory tab (the screen plays over any scene; the tab has no button yet).
 - [ ] The abandoned village (6c) came out without the guardians standing in it, and the promise (2) shows two of three.
       Repaint if they are missed.

@@ -1,0 +1,12 @@
+{
+  "name": "sigrid",
+  "description": "A woman in her forties who leads an expedition. A low, firm, steady voice with calm authority, a little rough from years outdoors, measured and sure.",
+  "reference_text": "Hold together! Nobody gets left behind. We will find each other, whatever this forest does.",
+  "language": "English",
+  "seed": 3201,
+  "source": "designed",
+  "model": "Qwen3-TTS-12Hz-1.7B-VoiceDesign",
+  "created": "2026-11-10 19:35:39",
+  "seconds": 8.24,
+  "sample_rate": 24000
+}

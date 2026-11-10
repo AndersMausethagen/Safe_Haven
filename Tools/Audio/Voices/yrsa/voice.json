@@ -1,0 +1,12 @@
+{
+  "name": "yrsa",
+  "description": "An older woman in her sixties, a proud cook. A warm, full, lively voice, bossy and fond, medium-low.",
+  "reference_text": "Show me your kitchen. No, on second thought, show me what you eat. I cooked for a jarl once.",
+  "language": "English",
+  "seed": 3111,
+  "source": "designed",
+  "model": "Qwen3-TTS-12Hz-1.7B-VoiceDesign",
+  "created": "2026-11-10 19:40:22",
+  "seconds": 5.68,
+  "sample_rate": 24000
+}

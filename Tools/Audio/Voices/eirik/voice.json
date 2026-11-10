@@ -1,0 +1,12 @@
+{
+  "name": "eirik",
+  "description": "A man in his late forties, an old soldier. A gruff, weathered baritone voice, slightly gravelly, with dry humour, unhurried.",
+  "reference_text": "A soldier's choice. It is old iron, but it holds an edge. Guard well, and it will see you home.",
+  "language": "English",
+  "seed": 3102,
+  "source": "designed",
+  "model": "Qwen3-TTS-12Hz-1.7B-VoiceDesign",
+  "created": "2026-11-10 19:36:06",
+  "seconds": 7.44,
+  "sample_rate": 24000
+}

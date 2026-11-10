@@ -1,0 +1,1665 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52895d688248030459544f95fb0e4e4e, type: 3}
+  m_Name: VoiceBank
+  m_EditorClassIdentifier: SafeHaven::VoiceBank
+  lines:
+  - speaker: Asa
+    text: I can't go on... come back for me.
+    clip: {fileID: 8300000, guid: b36487fd38043204799f3c41c1e04c39, type: 3}
+    mood: Tired
+  - speaker: Asa
+    text: There's good dirt under all this moss. Who's been using it?
+    clip: {fileID: 8300000, guid: fd07c4203cea27f44b32ccbf7c102018, type: 3}
+    mood: Neutral
+  - speaker: Asa
+    text: You're not from the village. Doesn't matter. Help me with this sack.
+    clip: {fileID: 8300000, guid: 49803bdab1faf0841b79ab23ed61048b, type: 3}
+    mood: Neutral
+  - speaker: Bjarne
+    text: Anything else?
+    clip: {fileID: 8300000, guid: 507a815e0116cf04ab4482113d562c2d, type: 3}
+    mood: Neutral
+  - speaker: Bjarne
+    text: Behind you!
+    clip: {fileID: 8300000, guid: 37e0089e38bbb0d45a9fe7ecbc672497, type: 3}
+    mood: Yelling
+  - speaker: Bjarne
+    text: Clear. Get your breath.
+    clip: {fileID: 8300000, guid: ce1a81d3341020c48ae55231b2a41c81, type: 3}
+    mood: Glad
+  - speaker: Bjarne
+    text: Here they come!
+    clip: {fileID: 8300000, guid: b2870a97bd5318348a225b94a12e3133, type: 3}
+    mood: Yelling
+  - speaker: Bjarne
+    text: Hold still. Drink this.
+    clip: {fileID: 8300000, guid: 74f606c22f9eb1c4eaf777eedc9cbd8a, type: 3}
+    mood: Stern
+  - speaker: Bjarne
+    text: I blazed the trees going in, a cut every twenty paces. Coming back, my marks were on the wrong side of them. The road hadn't moved. The roots had moved it, under us, in the night. Tor was thrown further in than me, with a bad leg. Listen for a saw where nobody saws.
+    clip: {fileID: 8300000, guid: ab1cab7b83bcd0a41a7bb1e4fa4180d0, type: 3}
+    mood: Tired
+  - speaker: Bjarne
+    text: I came to examine the old iron markers. Whatever protects the road has cracked. Steel will help tonight, but steel alone will not mend this.
+    clip: {fileID: 8300000, guid: c45e3357e242a1c429c125cd14f0c679, type: 3}
+    mood: Neutral
+  - speaker: Bjarne
+    text: I can't take much more of this.
+    clip: {fileID: 8300000, guid: 54a0e1a9396c1634aa20f4a96271f742, type: 3}
+    mood: Scared
+  - speaker: Bjarne
+    text: I owe you one.
+    clip: {fileID: 8300000, guid: 4dc3e85ba2b9341499508f1b5e401c78, type: 3}
+    mood: Glad
+  - speaker: Bjarne
+    text: I'll hold this spot.
+    clip: {fileID: 8300000, guid: e1fa9404d8e0c14438af55dcc74d5fd4, type: 3}
+    mood: Neutral
+  - speaker: Bjarne
+    text: I'll keep back.
+    clip: {fileID: 8300000, guid: eb6ef4f8bac2f1143833bc28b2009a9d, type: 3}
+    mood: Neutral
+  - speaker: Bjarne
+    text: I'm hurt!
+    clip: {fileID: 8300000, guid: 8e7cb44b10a9a974c8ac72deb135a1f9, type: 3}
+    mood: Scared
+  - speaker: Bjarne
+    text: Not yet, you don't. Drink.
+    clip: {fileID: 8300000, guid: 15c215313912bca4c951362c6238faed, type: 3}
+    mood: Stern
+  - speaker: Bjarne
+    text: Nothing gets to you without going through me.
+    clip: {fileID: 8300000, guid: 21cfafc9ee9d06547814ba149e97d39c, type: 3}
+    mood: Stern
+  - speaker: Bjarne
+    text: Point the way.
+    clip: {fileID: 8300000, guid: 057a405473ed17d41b8863919f15a1c6, type: 3}
+    mood: Neutral
+  - speaker: Bjarne
+    text: Right behind you.
+    clip: {fileID: 8300000, guid: 3774dc756c03e404399dd0d54b3e410a, type: 3}
+    mood: Neutral
+  - speaker: Bjarne
+    text: Stay near the stones. We can still get out of this together.
+    clip: {fileID: 8300000, guid: fe9551bf98219584e8864adaec855fc3, type: 3}
+    mood: Stern
+  - speaker: Bjarne
+    text: Still here. Still here.
+    clip: {fileID: 8300000, guid: b1af42aec1d375e4cbbf5b722c79b05b, type: 3}
+    mood: Glad
+  - speaker: Bjarne
+    text: Tell Sigrid I kept it lit.
+    clip: {fileID: 8300000, guid: 72b8b7f0172fe8c409fa0010a50051a2, type: 3}
+    mood: Tired
+  - speaker: Bjarne
+    text: Thank you. I thought that was it.
+    clip: {fileID: 8300000, guid: 356b11b8d6359b244998af3a0a0d3280, type: 3}
+    mood: Glad
+  - speaker: Bjarne
+    text: That's the last of them.
+    clip: {fileID: 8300000, guid: 1126f72dbcbaa8445affca5861dfa01f, type: 3}
+    mood: Glad
+  - speaker: Bjarne
+    text: Watch your back!
+    clip: {fileID: 8300000, guid: 6416262af2fc1b74cbe07fa11007e8b9, type: 3}
+    mood: Yelling
+  - speaker: Bjarne
+    text: We came to learn why this forest has become bewitched. First, we need shelter. Follow the old road.
+    clip: {fileID: 8300000, guid: b5e952e0afedcb141870e148403c4090, type: 3}
+    mood: Neutral
+  - speaker: Bjarne
+    text: Weapons up!
+    clip: {fileID: 8300000, guid: cbfbc780e3602d74c92b9aa27711694a, type: 3}
+    mood: Yelling
+  - speaker: Bjarne
+    text: Where's the anvil? No, don't tell me. I'll find it.
+    clip: {fileID: 8300000, guid: 57f221b3844013c458ae489612287e27, type: 3}
+    mood: Neutral
+  - speaker: Bjarne
+    text: You took your time. Mind the hammer.
+    clip: {fileID: 8300000, guid: 7866238e06ce11b48ab8cad7e274a72f, type: 3}
+    mood: Glad
+  - speaker: Bjarne
+    text: You're bleeding. Here.
+    clip: {fileID: 8300000, guid: e61c23a8ecbf3d346912a1f14c609b3c, type: 3}
+    mood: Stern
+  - speaker: Eirik
+    text: A bewitched forest. My grandmother called any forest that ate her goats bewitched.
+    clip: {fileID: 8300000, guid: c5ba246834c9a2d45a02c2cc1e44a0e0, type: 3}
+    mood: Neutral
+  - speaker: Eirik
+    text: A soldier's choice. It is old iron, but it holds an edge. Guard well and let them come to you.
+    clip: {fileID: 8300000, guid: 6dffd0a0a3838394e9db576dc7d5462b, type: 3}
+    mood: Neutral
+  - speaker: Eirik
+    text: A whole day gone in a morning's walk. I don't like this, and I have liked very few things.
+    clip: {fileID: 8300000, guid: ff7af6077b097034f80df9426df95ba6, type: 3}
+    mood: Neutral
+  - speaker: Eirik
+    text: And the kindling you cut this morning is dry in your pack. We only need stones.
+    clip: {fileID: 8300000, guid: 2cab46183d862324692d0f89a8d5864f, type: 3}
+    mood: Neutral
+  - speaker: Eirik
+    text: And there is only dry bread, unless someone fancies a walk. Ask me if you do.
+    clip: {fileID: 8300000, guid: a7b79be8218a5874da4dbb0dfe4ea395, type: 3}
+    mood: Neutral
+  - speaker: Eirik
+    text: Anything else?
+    clip: {fileID: 8300000, guid: 83068c97dd16e3d4596ae04ab143dd09, type: 3}
+    mood: Neutral
+  - speaker: Eirik
+    text: Before we set out? Gladly. Take this practice sword; it bruises, it doesn't cut. Hit the dummy by the fire until your arm knows the way, then come and try it on me.
+    clip: {fileID: 8300000, guid: 9471952cc6628934f989972b3f7f72dc, type: 3}
+    mood: Glad
+  - speaker: Eirik
+    text: Behind you!
+    clip: {fileID: 8300000, guid: 4a283a64be3ad8741aa56f4a866a9df1, type: 3}
+    mood: Yelling
+  - speaker: Eirik
+    text: Behind you, you fool!
+    clip: {fileID: 8300000, guid: ed89d1a92d186694bafde644d4d42689, type: 3}
+    mood: Yelling
+  - speaker: Eirik
+    text: Breakfast! You may be the best person on this expedition. Keep the rod; there is bound to be water in those woods.
+    clip: {fileID: 8300000, guid: 1ba930f3e4c17014f94a5b4507f64569, type: 3}
+    mood: Joyful
+  - speaker: Eirik
+    text: Clean your blade. It's a bad habit to forget.
+    clip: {fileID: 8300000, guid: 93846f07e7c1b1547bfd3778c6cb369f, type: 3}
+    mood: Glad
+  - speaker: Eirik
+    text: Clear. Get your breath.
+    clip: {fileID: 8300000, guid: 52f025ddcf6b1a547b9bcfafe980ea13, type: 3}
+    mood: Glad
+  - speaker: Eirik
+    text: Come back when it's done.
+    clip: {fileID: 8300000, guid: f08111001f8daf045988347326a0b533, type: 3}
+    mood: Neutral
+  - speaker: Eirik
+    text: Don't look at me like that. I was resting. ...Thank you.
+    clip: {fileID: 8300000, guid: 51357d1b788232e4aa5da24909d7e648, type: 3}
+    mood: Tired
+  - speaker: Eirik
+    text: Down you go. Catch your breath; we go again when you're ready.
+    clip: {fileID: 8300000, guid: f87de12687ce902489ff2fdd762733f5, type: 3}
+    mood: Glad
+  - speaker: Eirik
+    text: Dry bread, unless you fancy a walk. There are berry bushes in the clearing west of the shelter. Pick five and stew them over the fire; take my waterskin for the pot. Be quick about it. I do not like how quiet it is.
+    clip: {fileID: 8300000, guid: ad0baedc0049e6049b51e6f4622a7821, type: 3}
+    mood: Neutral
+  - speaker: Eirik
+    text: 'Dummy first, then me. Watch my shoulders: the blow is coming when they drop.'
+    clip: {fileID: 8300000, guid: 12ead151de096d344b5426345228c780, type: 3}
+    mood: Neutral
+  - speaker: Eirik
+    text: Eat something, even if you are not hungry. I have buried enough friends who thought they could fight on an empty stomach.
+    clip: {fileID: 8300000, guid: 28bcab84dccf87f43a346b795b8f2d88, type: 3}
+    mood: Calm
+  - speaker: Eirik
+    text: Eat something. It is a long road, and the porridge is not getting any better.
+    clip: {fileID: 8300000, guid: c466766e5c6c62b4ea8f04f22b6fb9a6, type: 3}
+    mood: Neutral
+  - speaker: Eirik
+    text: Eirik. Twenty winters in the shield wall at Granheim. I walk in front, I carry the heavy things and I make sure everyone eats. There is porridge. It is bad.
+    clip: {fileID: 8300000, guid: 2feeaf8c0fe6ce548945ccd2188575b6, type: 3}
+    mood: Neutral
+  - speaker: Eirik
+    text: Enough, enough! I yield. You'll do.
+    clip: {fileID: 8300000, guid: ee4a459efdcd8fb449b1bccc7c9370e0, type: 3}
+    mood: Joyful
+  - speaker: Eirik
+    text: Finally, something I can hit.
+    clip: {fileID: 8300000, guid: 327646bbfc4722a4c99ec49f29daec04, type: 3}
+    mood: Yelling
+  - speaker: Eirik
+    text: Five berries from the clearing to the west, then the pot. My waterskin is in your pack.
+    clip: {fileID: 8300000, guid: e76a88054f797654aaca70589f4a1b68, type: 3}
+    mood: Neutral
+  - speaker: Eirik
+    text: Go! I will hold them. Nobody gets left behind, not while I am standing.
+    clip: {fileID: 8300000, guid: 28856ba356339414ca776b8462ce4d59, type: 3}
+    mood: Yelling
+  - speaker: Eirik
+    text: Go. I've held worse.
+    clip: {fileID: 8300000, guid: 327a4ac5c76c2c941a7b2d69b6aed799, type: 3}
+    mood: Tired
+  - speaker: Eirik
+    text: Good. Now me. When I wind up, raise your guard just before the blow, or roll through it.
+    clip: {fileID: 8300000, guid: adb50d458299a2c40885e12c709c994b, type: 3}
+    mood: Neutral
+  - speaker: Eirik
+    text: Here they come!
+    clip: {fileID: 8300000, guid: 0e72afac7acd476408181fe711df7a33, type: 3}
+    mood: Yelling
+  - speaker: Eirik
+    text: Hold still. Drink this.
+    clip: {fileID: 8300000, guid: f3067dbb560caa1479ec8f1854db609e, type: 3}
+    mood: Stern
+  - speaker: Eirik
+    text: Hot food. You have just made three friends for life. Take these, in case the night is not done with us.
+    clip: {fileID: 8300000, guid: 58c0be05072d59d41ba0530435096d1e, type: 3}
+    mood: Glad
+  - speaker: Eirik
+    text: I can't take much more of this.
+    clip: {fileID: 8300000, guid: e507a31f27313994f91fef5a8713899b, type: 3}
+    mood: Scared
+  - speaker: Eirik
+    text: I owe you one.
+    clip: {fileID: 8300000, guid: c5677fc41c7a8634a8d0fd8b0d29af21, type: 3}
+    mood: Glad
+  - speaker: Eirik
+    text: I salted what was left of your fish, so we need fewer berries. Two handfuls will do.
+    clip: {fileID: 8300000, guid: 2e20fd68a506a604788a3d5f686e8bb4, type: 3}
+    mood: Neutral
+  - speaker: Eirik
+    text: I trust that she wants to get out of here alive. That is enough for tonight. But watch her hands when she talks about the stones. She knows more than she says.
+    clip: {fileID: 8300000, guid: 2d9f1bf9af8b9a749b2b79f361add32a, type: 3}
+    mood: Calm
+  - speaker: Eirik
+    text: I'll hold this spot.
+    clip: {fileID: 8300000, guid: 46a75a232524a2a4184e0e98383185e3, type: 3}
+    mood: Neutral
+  - speaker: Eirik
+    text: I'll keep back.
+    clip: {fileID: 8300000, guid: 3bd6651b503aa80459d9b0719d940ae5, type: 3}
+    mood: Neutral
+  - speaker: Eirik
+    text: I'm hurt!
+    clip: {fileID: 8300000, guid: ab969f96233cac349a4ad8c5a69eeef2, type: 3}
+    mood: Scared
+  - speaker: Eirik
+    text: Is it past noon already? We have not been walking an hour.
+    clip: {fileID: 8300000, guid: 301ba9746bb278c4ba3472acbd8c08e8, type: 3}
+    mood: Neutral
+  - speaker: Eirik
+    text: Is that all? I was only warming up.
+    clip: {fileID: 8300000, guid: 4a48c480d00063d4ba6377100b63934a, type: 3}
+    mood: Glad
+  - speaker: Eirik
+    text: It is this place. At the tree line I had to think for my own sister's name. I did not like to say.
+    clip: {fileID: 8300000, guid: 74b7a60713ceb95408be796aca66d42d, type: 3}
+    mood: Neutral
+  - speaker: Eirik
+    text: Long reach, and it wants both hands. If you ever need a light instead, press L to swap them.
+    clip: {fileID: 8300000, guid: 66f291ca0d56c844581fafbd4c919ccb, type: 3}
+    mood: Neutral
+  - speaker: Eirik
+    text: My knees are too old to run from a closing portal. Next time leave earlier.
+    clip: {fileID: 8300000, guid: 80509fd8ca841a84197e89bda19f0439, type: 3}
+    mood: Tired
+  - speaker: Eirik
+    text: My sister's farm is two valleys from here. Her dogs ran into these woods last month and never came back. Someone has to walk in front. Better me than you.
+    clip: {fileID: 8300000, guid: 5d5a9dce9fa60754eb3dd8fd0b0eae84, type: 3}
+    mood: Sad
+  - speaker: Eirik
+    text: Not yet, you don't. Drink.
+    clip: {fileID: 8300000, guid: 89b0dc09e4bf8a4468444967cab918c6, type: 3}
+    mood: Stern
+  - speaker: Eirik
+    text: Nothing gets to you without going through me.
+    clip: {fileID: 8300000, guid: 661fa7550239f414481d760c1e597ddd, type: 3}
+    mood: Stern
+  - speaker: Eirik
+    text: Nothing gets worse than this porridge.
+    clip: {fileID: 8300000, guid: cfb4050fd2624654fae3ff5fefda58f8, type: 3}
+    mood: Neutral
+  - speaker: Eirik
+    text: Now that is a fine idea. Anything but this porridge. Here is a rod and a handful of grubs, and the lake is just south of the road. Two fish, and I'll owe you.
+    clip: {fileID: 8300000, guid: 9d8cbe106cda7ea40a924402a6385377, type: 3}
+    mood: Glad
+  - speaker: Eirik
+    text: Once, as a boy, with my sister. Spruce, moss, the quiet you get in old woods. Nothing in it frightened me but the dark. I would like that to still be true.
+    clip: {fileID: 8300000, guid: 8ed445dac0096754ab228e14c211005d, type: 3}
+    mood: Calm
+  - speaker: Eirik
+    text: Point the way.
+    clip: {fileID: 8300000, guid: ec4064322b7c9774ba3f3e61401c64b8, type: 3}
+    mood: Neutral
+  - speaker: Eirik
+    text: Right behind you.
+    clip: {fileID: 8300000, guid: 6fc4282fac76bf9438d0066f474da8de, type: 3}
+    mood: Neutral
+  - speaker: Eirik
+    text: Show me the wall. Then show me where it's weakest.
+    clip: {fileID: 8300000, guid: 0376781091242514e8954362c0db1410, type: 3}
+    mood: Stern
+  - speaker: Eirik
+    text: Sigrid. The sun is going down. It was morning.
+    clip: {fileID: 8300000, guid: 3282fc066ab7844438b3717a37a97b23, type: 3}
+    mood: Scared
+  - speaker: Eirik
+    text: Six logs from the slope north of the road. Walk up to a tree and get chopping.
+    clip: {fileID: 8300000, guid: 6ee96e8ac3b389f458ccbedc9f0e6f8d, type: 3}
+    mood: Neutral
+  - speaker: Eirik
+    text: Stay behind my shield, if you can find it.
+    clip: {fileID: 8300000, guid: f249cb30e3329224f886ed3a1cdb7173, type: 3}
+    mood: Yelling
+  - speaker: Eirik
+    text: Stay between me and the trees. If anything comes out of the dark, it meets my shield first.
+    clip: {fileID: 8300000, guid: 47e09c1fa05388b4fad74e0484e6d64e, type: 3}
+    mood: Stern
+  - speaker: Eirik
+    text: Steady now. It is a fine morning to walk into something stupid.
+    clip: {fileID: 8300000, guid: 398353fdd173e4040a12a1a2a51f6fce, type: 3}
+    mood: Neutral
+  - speaker: Eirik
+    text: Still got one more swing in me, then.
+    clip: {fileID: 8300000, guid: bd36014e6e651d746bfc3e86500bbe23, type: 3}
+    mood: Glad
+  - speaker: Eirik
+    text: Still here. Still here.
+    clip: {fileID: 8300000, guid: ccf246ac4de2c3640923316412e9a980, type: 3}
+    mood: Glad
+  - speaker: Eirik
+    text: Thank you. I thought that was it.
+    clip: {fileID: 8300000, guid: 41b20d24cd2df7d4ca9fefa34c84c929, type: 3}
+    mood: Glad
+  - speaker: Eirik
+    text: That many, and I'm still here. Don't tell the young ones. They'll want to try it.
+    clip: {fileID: 8300000, guid: 817143be8a6789044885cf35795c695e, type: 3}
+    mood: Glad
+  - speaker: Eirik
+    text: That trout this morning. I keep thinking about that trout.
+    clip: {fileID: 8300000, guid: abe009523260d864a9741a3578b14e6a, type: 3}
+    mood: Neutral
+  - speaker: Eirik
+    text: That will keep us warm. Keep the hatchet.
+    clip: {fileID: 8300000, guid: 87f36997daa8bf54b965b188c2a9796a, type: 3}
+    mood: Neutral
+  - speaker: Eirik
+    text: That's the last of them.
+    clip: {fileID: 8300000, guid: 2bdef70829612f142801275529e6f5d5, type: 3}
+    mood: Glad
+  - speaker: Eirik
+    text: The axe. Good. It splits wolves and firewood alike, and it leaves you a hand free.
+    clip: {fileID: 8300000, guid: d850ccf58df47ea4ba56d5923d694aee, type: 3}
+    mood: Glad
+  - speaker: Eirik
+    text: Then we are after the same thing. We will find them.
+    clip: {fileID: 8300000, guid: ac5d57419608a93499757c2b0e6871f5, type: 3}
+    mood: Calm
+  - speaker: Eirik
+    text: Took you long enough. How many are behind you?
+    clip: {fileID: 8300000, guid: e153e03342f07cd4090b72a6946d8548, type: 3}
+    mood: Stern
+  - speaker: Eirik
+    text: Twenty winters in the shield wall at Granheim. I stopped counting the fights a long time ago. I still count the friends.
+    clip: {fileID: 8300000, guid: d392507aa452f3d4b9a8f1ae7a65bb7f, type: 3}
+    mood: Calm
+  - speaker: Eirik
+    text: Twenty winters I've been telling that kind of story. First time it's been true.
+    clip: {fileID: 8300000, guid: 1f9b6f86db5f4ac4fa462c9ae9e03c25, type: 3}
+    mood: Neutral
+  - speaker: Eirik
+    text: Twenty winters, and it still hurts.
+    clip: {fileID: 8300000, guid: e264abed5f998474b9435ec6ba205afe, type: 3}
+    mood: Scared
+  - speaker: Eirik
+    text: Twenty years a soldier, and I have never seen the sun simply leave.
+    clip: {fileID: 8300000, guid: a51688df118cafc46acc43a0c957636c, type: 3}
+    mood: Neutral
+  - speaker: Eirik
+    text: Two fish from the lake. Hold attack to swing back, let go to cast, and strike when the float goes under.
+    clip: {fileID: 8300000, guid: 198dc949c4911b9468bd601db8fd7279, type: 3}
+    mood: Neutral
+  - speaker: Eirik
+    text: Ugh. Took your time.
+    clip: {fileID: 8300000, guid: 8ba33006eb335fb4eb61432fca85a857, type: 3}
+    mood: Glad
+  - speaker: Eirik
+    text: Watch your back!
+    clip: {fileID: 8300000, guid: 13bb415a67faf2342a974ba12f277809, type: 3}
+    mood: Yelling
+  - speaker: Eirik
+    text: We always need firewood. Take this hatchet; there are good trees on the slope north of the road. Six logs will do us.
+    clip: {fileID: 8300000, guid: 7f0d7df89bd9e7941b3a0bafa25b5d2a, type: 3}
+    mood: Neutral
+  - speaker: Eirik
+    text: Weapons up!
+    clip: {fileID: 8300000, guid: 098243ef290253c4689750d88a518e7a, type: 3}
+    mood: Yelling
+  - speaker: Eirik
+    text: 'Whoever you came for: we have not stopped looking. Remember that.'
+    clip: {fileID: 8300000, guid: eb11234114a05e34292295d300f5de9f, type: 3}
+    mood: Calm
+  - speaker: Eirik
+    text: Wolves, probably. Perhaps a witch, perhaps a sick troll. It is usually less than the stories and more than you packed for. Four friends, if we are lucky. Bjarne owes me money.
+    clip: {fileID: 8300000, guid: 10682ec7f7b547343843c8215e6c45ce, type: 3}
+    mood: Neutral
+  - speaker: Eirik
+    text: You'll do. Better than most I have trained, worse than you will be. Take these; you will want them.
+    clip: {fileID: 8300000, guid: 1f2b17393d3eeca43bb6a394d46d3fb6, type: 3}
+    mood: Glad
+  - speaker: Eirik
+    text: You're bleeding. Here.
+    clip: {fileID: 8300000, guid: 91a8b2ae30b0dad448e9cc509eb967fe, type: 3}
+    mood: Stern
+  - speaker: Gunnar
+    text: I can't go on... come back for me.
+    clip: {fileID: 8300000, guid: 9d8a052ab15627442a6e8befcbc72820, type: 3}
+    mood: Tired
+  - speaker: Gunnar
+    text: Took you long enough. That boar's been lying on me since yesterday.
+    clip: {fileID: 8300000, guid: dbee761b1a9125c4e93df02ea5f8c88f, type: 3}
+    mood: Tired
+  - speaker: Gunnar
+    text: You've been frightening my deer. Least you can do is give me a roof.
+    clip: {fileID: 8300000, guid: 08b1c97dfc4a0df4884bf817884c33bd, type: 3}
+    mood: Neutral
+  - speaker: Hild
+    text: I can't go on... come back for me.
+    clip: {fileID: 8300000, guid: d7d9b3b8034dfe7459ae23323ba494d4, type: 3}
+    mood: Tired
+  - speaker: Hild
+    text: Mind the coping. It's the only level thing for a mile.
+    clip: {fileID: 8300000, guid: 83e1a7262aedf7f4d8e97a60213b6846, type: 3}
+    mood: Neutral
+  - speaker: Hild
+    text: Whoever laid this hearth had never met a level. I'll stay.
+    clip: {fileID: 8300000, guid: 2d2e0777309fdde4dbb1a9b0219694d0, type: 3}
+    mood: Neutral
+  - speaker: Ingrid
+    text: Anything else?
+    clip: {fileID: 8300000, guid: 771b8c90681689a459d9b8bc289d2489, type: 3}
+    mood: Neutral
+  - speaker: Ingrid
+    text: Behind you!
+    clip: {fileID: 8300000, guid: baffb943bef550c458235f11ef47355f, type: 3}
+    mood: Yelling
+  - speaker: Ingrid
+    text: Clear. Get your breath.
+    clip: {fileID: 8300000, guid: 4bd5ece68cfd5084f92278d69c02afa0, type: 3}
+    mood: Glad
+  - speaker: Ingrid
+    text: Here they come!
+    clip: {fileID: 8300000, guid: 10dfeec2e307694419f0aa9f5a00db15, type: 3}
+    mood: Yelling
+  - speaker: Ingrid
+    text: Hold still. Drink this.
+    clip: {fileID: 8300000, guid: de695576f93f22d47a0a43f4a814572e, type: 3}
+    mood: Stern
+  - speaker: Ingrid
+    text: I can't take much more of this.
+    clip: {fileID: 8300000, guid: 53a1127e45503f04e902382209d7bf35, type: 3}
+    mood: Scared
+  - speaker: Ingrid
+    text: I can't... go on. I'll hide here. Come back for me.
+    clip: {fileID: 8300000, guid: 9a13d7ac408ac32439f9b6b0de42314e, type: 3}
+    mood: Tired
+  - speaker: Ingrid
+    text: I kept saying the word so the forest couldn't take it. Fire. Fire. Fire. And then I saw yours.
+    clip: {fileID: 8300000, guid: 38b9b429b4819ab48800cba96fabd247, type: 3}
+    mood: Tired
+  - speaker: Ingrid
+    text: I owe you one.
+    clip: {fileID: 8300000, guid: 651174f167d171a4fb58a8c082218afd, type: 3}
+    mood: Glad
+  - speaker: Ingrid
+    text: 'I watched your fire for three nights from under a root. You should know two things. The old troll at the stones didn''t come for us: it came for the door. And on the second night something walked past my root in Granheim mail, like Eirik''s. I called to it. It turned, and it didn''t know its name. When the stones broke I heard Bjarne''s hammer start up, somewhere deep in the woods, slow, like he''s working one-handed. Let me be of use until we find them.'
+    clip: {fileID: 8300000, guid: a34168d08bced6947a42e7b291497dbb, type: 3}
+    mood: Tired
+  - speaker: Ingrid
+    text: I'll hold this spot.
+    clip: {fileID: 8300000, guid: 814b624a65521a24897ddbdc325aa962, type: 3}
+    mood: Neutral
+  - speaker: Ingrid
+    text: I'll keep back.
+    clip: {fileID: 8300000, guid: ce96d222bd9d59547a44271fdaa2e093, type: 3}
+    mood: Neutral
+  - speaker: Ingrid
+    text: I'm hurt!
+    clip: {fileID: 8300000, guid: ae85375c5d1463e419c0db98a8ff72f0, type: 3}
+    mood: Scared
+  - speaker: Ingrid
+    text: It's you! I saw a light through the trees and thought the forest had finally taken my wits. Get me out of here.
+    clip: {fileID: 8300000, guid: 171236ce7c4a21f4098e784cc7857a0b, type: 3}
+    mood: Glad
+  - speaker: Ingrid
+    text: Not yet, you don't. Drink.
+    clip: {fileID: 8300000, guid: bcdec0d6d08e53944914e6f052e5648c, type: 3}
+    mood: Stern
+  - speaker: Ingrid
+    text: Nothing gets to you without going through me.
+    clip: {fileID: 8300000, guid: b389054f4422b8a4493d8900d2619018, type: 3}
+    mood: Stern
+  - speaker: Ingrid
+    text: Point the way.
+    clip: {fileID: 8300000, guid: 58417356612a74d45966f0b9800b8bb7, type: 3}
+    mood: Neutral
+  - speaker: Ingrid
+    text: Right behind you.
+    clip: {fileID: 8300000, guid: 0f199ca9f1a8f1a4bbacd90a5284f553, type: 3}
+    mood: Neutral
+  - speaker: Ingrid
+    text: Stay near the stones. We can still get out of this together.
+    clip: {fileID: 8300000, guid: cc76f2affc3a2f0489f684b6aae6c9ba, type: 3}
+    mood: Stern
+  - speaker: Ingrid
+    text: Still here. Still here.
+    clip: {fileID: 8300000, guid: 406107643a52cb34290f8deb49727acf, type: 3}
+    mood: Glad
+  - speaker: Ingrid
+    text: Thank you. I thought that was it.
+    clip: {fileID: 8300000, guid: 210b2dc587df6c34c91a29a7698013af, type: 3}
+    mood: Glad
+  - speaker: Ingrid
+    text: That's the last of them.
+    clip: {fileID: 8300000, guid: 6b4a6341e4ba9e948891dd65e8f60561, type: 3}
+    mood: Glad
+  - speaker: Ingrid
+    text: The plants are wrong. Roots that should sleep in this season are warm to the touch. Something is feeding the enchantment. Stay close; I brought a little medicine.
+    clip: {fileID: 8300000, guid: 3207f5acc12276649a29fd77f9eedcd4, type: 3}
+    mood: Neutral
+  - speaker: Ingrid
+    text: Watch your back!
+    clip: {fileID: 8300000, guid: 514e4958ecc9605479397dbf3fbd95a4, type: 3}
+    mood: Yelling
+  - speaker: Ingrid
+    text: We came to learn why this forest has become bewitched. First, we need shelter. Follow the old road.
+    clip: {fileID: 8300000, guid: 7694001cb777cc84489ab113aa5edb3b, type: 3}
+    mood: Neutral
+  - speaker: Ingrid
+    text: Weapons up!
+    clip: {fileID: 8300000, guid: 7aefb445ea1fd0b43b76b699d90a9315, type: 3}
+    mood: Yelling
+  - speaker: Ingrid
+    text: You're bleeding. Here.
+    clip: {fileID: 8300000, guid: 5a15ba7712d48bb4fb9dbe009f268e75, type: 3}
+    mood: Stern
+  - speaker: Liv
+    text: Anything else?
+    clip: {fileID: 8300000, guid: e82013321a21cf9458c7d818848761c2, type: 3}
+    mood: Neutral
+  - speaker: Liv
+    text: Behind you!
+    clip: {fileID: 8300000, guid: 2c4d2f37ff5a7b04fb44a0cdc81de64e, type: 3}
+    mood: Yelling
+  - speaker: Liv
+    text: Clear. Get your breath.
+    clip: {fileID: 8300000, guid: 89dc2c86b836c494d8ff5d71bb8e5b50, type: 3}
+    mood: Glad
+  - speaker: Liv
+    text: Here they come!
+    clip: {fileID: 8300000, guid: 48f6a81b82906004fb457969902956dd, type: 3}
+    mood: Yelling
+  - speaker: Liv
+    text: Hold still. Drink this.
+    clip: {fileID: 8300000, guid: a57e42cc47a00a144b440da5c82d7c98, type: 3}
+    mood: Stern
+  - speaker: Liv
+    text: I can't take much more of this.
+    clip: {fileID: 8300000, guid: 4dd5503233e6da740a4d536b486d88ca, type: 3}
+    mood: Scared
+  - speaker: Liv
+    text: I owe you one.
+    clip: {fileID: 8300000, guid: fc194ac9fe30f6b4ea37f3348c722d91, type: 3}
+    mood: Glad
+  - speaker: Liv
+    text: I'll hold this spot.
+    clip: {fileID: 8300000, guid: 71e74c2b3a7c2714db60d58485d63a62, type: 3}
+    mood: Neutral
+  - speaker: Liv
+    text: I'll keep back.
+    clip: {fileID: 8300000, guid: f169c828cc4d0b449930c967a7d76477, type: 3}
+    mood: Neutral
+  - speaker: Liv
+    text: I'm hurt!
+    clip: {fileID: 8300000, guid: 6359e7e3627139e439732878eb9476a3, type: 3}
+    mood: Scared
+  - speaker: Liv
+    text: Not yet, you don't. Drink.
+    clip: {fileID: 8300000, guid: ef9b064ff837c1447aa5133b20684ac1, type: 3}
+    mood: Stern
+  - speaker: Liv
+    text: Nothing gets to you without going through me.
+    clip: {fileID: 8300000, guid: 0805304cd77a8504caa22a68b3412cfd, type: 3}
+    mood: Stern
+  - speaker: Liv
+    text: Point the way.
+    clip: {fileID: 8300000, guid: 4a9549ed3555c6f4b8357e61be3dc18b, type: 3}
+    mood: Neutral
+  - speaker: Liv
+    text: Right behind you.
+    clip: {fileID: 8300000, guid: e843bd4ab599c214c924f4d34ca23ea9, type: 3}
+    mood: Neutral
+  - speaker: Liv
+    text: Still here. Still here.
+    clip: {fileID: 8300000, guid: cd2e0d39dee6ba243b48c85837583dbd, type: 3}
+    mood: Glad
+  - speaker: Liv
+    text: Thank you. I thought that was it.
+    clip: {fileID: 8300000, guid: 04d50f3f5ebdbd649956560f7cc48af0, type: 3}
+    mood: Glad
+  - speaker: Liv
+    text: That's the last of them.
+    clip: {fileID: 8300000, guid: 03ca90bf20884244eb3764c311d9dfea, type: 3}
+    mood: Glad
+  - speaker: Liv
+    text: The stones are answering you. Stay close. I will try to keep the passage open.
+    clip: {fileID: 8300000, guid: 3416589ad3fc3864ba2ea6b1c2425e6c, type: 3}
+    mood: Stern
+  - speaker: Liv
+    text: The stones broke along a line. A line! Do you understand what that means?
+    clip: {fileID: 8300000, guid: a32e007b442c17d45a2d5a45afb793e9, type: 3}
+    mood: Neutral
+  - speaker: Liv
+    text: There are old paths here, older than the villages. My teacher said the waystones connected places of shelter. I thought that was only a story.
+    clip: {fileID: 8300000, guid: c249dbfbad7d7d84088f454b1051e76b, type: 3}
+    mood: Neutral
+  - speaker: Liv
+    text: Watch your back!
+    clip: {fileID: 8300000, guid: a3d03cfa41a50c748a6ce23ccb8415b4, type: 3}
+    mood: Yelling
+  - speaker: Liv
+    text: We came to learn why this forest has become bewitched. First, we need shelter. Follow the old road.
+    clip: {fileID: 8300000, guid: 3be901309a511b84baf60103dd3e69fc, type: 3}
+    mood: Neutral
+  - speaker: Liv
+    text: Weapons up!
+    clip: {fileID: 8300000, guid: 8b784bf39ab41504aafc472cd407ac88, type: 3}
+    mood: Yelling
+  - speaker: Liv
+    text: Write it down. Somebody has to write it down.
+    clip: {fileID: 8300000, guid: 66a92fd1d9a7c434ea7f135dc386a021, type: 3}
+    mood: Tired
+  - speaker: Liv
+    text: Your ward is a promise too. Did anyone tell you?
+    clip: {fileID: 8300000, guid: 68a2ea839bb590d46ba8ad6e16546756, type: 3}
+    mood: Neutral
+  - speaker: Liv
+    text: You're bleeding. Here.
+    clip: {fileID: 8300000, guid: 2811366d1e044d44aa5cf44521b6c5e2, type: 3}
+    mood: Stern
+  - speaker: Runa
+    text: 'A bow! Then there are two of us. Hold the left button to draw, let go to shoot. It wants both hands: if you ever need a light instead, press L to swap them.'
+    clip: {fileID: 8300000, guid: e10a06dcf9691e348ad0d7a0d4993041, type: 3}
+    mood: Glad
+  - speaker: Runa
+    text: A shepherd told me his dogs won't go past the tree line any more. Dogs. I have seen those dogs go after a bear.
+    clip: {fileID: 8300000, guid: 60e60de069e0c6346bbfddd1147488ef, type: 3}
+    mood: Neutral
+  - speaker: Runa
+    text: All clear.
+    clip: {fileID: 8300000, guid: 246fc323bc90a6648a3cf8f44f556923, type: 3}
+    mood: Glad
+  - speaker: Runa
+    text: An honest answer. I like you already.
+    clip: {fileID: 8300000, guid: 65b1c68954e2f8843a335d5ca1307aa1, type: 3}
+    mood: Glad
+  - speaker: Runa
+    text: Anything else?
+    clip: {fileID: 8300000, guid: 4e42d85a37bb25144afd9728e84015d6, type: 3}
+    mood: Neutral
+  - speaker: Runa
+    text: 'As it happens. There are blight boar on the grass north of the road, east of the camp, which is wrong all by itself, and we could use the meat. Take my spare bow: hold the left button to draw, let go to shoot. Bring down two.'
+    clip: {fileID: 8300000, guid: 1f3ba2136e07161439fa5efaef36d854, type: 3}
+    mood: Neutral
+  - speaker: Runa
+    text: Behind you! Turn around!
+    clip: {fileID: 8300000, guid: 9c0f1febe953baf48909b5c49fefef58, type: 3}
+    mood: Yelling
+  - speaker: Runa
+    text: Behind you! Turn!
+    clip: {fileID: 8300000, guid: 2df6c1fcd101c51459125db621f9b3c1, type: 3}
+    mood: Yelling
+  - speaker: Runa
+    text: Boar, running flat out, and not from us. Off the road!
+    clip: {fileID: 8300000, guid: 5f8fe6ce5afe5724288d71004def958e, type: 3}
+    mood: Yelling
+  - speaker: Runa
+    text: Bow's still good. So am I.
+    clip: {fileID: 8300000, guid: 74239cae808b4374da6e7d7df070f7e5, type: 3}
+    mood: Glad
+  - speaker: Runa
+    text: Clean enough. Keep the bow; you've earned it, and I was tired of carrying it.
+    clip: {fileID: 8300000, guid: 874361cc0a48fcd4ab5f75b71d5a4f93, type: 3}
+    mood: Glad
+  - speaker: Runa
+    text: Come back when it's done.
+    clip: {fileID: 8300000, guid: a76dc37174204e540ae9740778c41314, type: 3}
+    mood: Neutral
+  - speaker: Runa
+    text: Contact! I've got the range.
+    clip: {fileID: 8300000, guid: 9f004f8f4442d8b4eab921f500cc4df8, type: 3}
+    mood: Yelling
+  - speaker: Runa
+    text: Deer, boar, wolf, all running west out of the trees, out here where they don't belong. Nothing sleeps in the open unless it is afraid to sleep at home.
+    clip: {fileID: 8300000, guid: 1dbc98fd453f16442bb82f5b9ca4d1c1, type: 3}
+    mood: Neutral
+  - speaker: Runa
+    text: Down! Moss trolls in the bushes, the small kind. Don't let them get behind you!
+    clip: {fileID: 8300000, guid: 5b7587afb06bc4b41809d6dd35d796dc, type: 3}
+    mood: Yelling
+  - speaker: Runa
+    text: Hold still. Drink this.
+    clip: {fileID: 8300000, guid: 9d234d2413caa9c428b3f9e590a4ea95, type: 3}
+    mood: Stern
+  - speaker: Runa
+    text: Hold up. That's Bjarne's handcart, tipped off the road. Have a look; I'll watch the trees.
+    clip: {fileID: 8300000, guid: ab97c743e16e6bb41a3d349d5de0da2b, type: 3}
+    mood: Stern
+  - speaker: Runa
+    text: I counted our steps to the exit. I'd rather not count that close again.
+    clip: {fileID: 8300000, guid: 290a9c897b0fd244a9c0174ed2e3c57e, type: 3}
+    mood: Tired
+  - speaker: Runa
+    text: I counted three wolves circling and one shape that was not a wolf. Keep your voice down. I would rather see them before they see us.
+    clip: {fileID: 8300000, guid: 77d6d43e94a1cb245b906345bb40bfbb, type: 3}
+    mood: Calm
+  - speaker: Runa
+    text: I know the way. Go on. I'll catch you up.
+    clip: {fileID: 8300000, guid: a968875f42be7eb48a9884b8dd544c56, type: 3}
+    mood: Tired
+  - speaker: Runa
+    text: I owe you one.
+    clip: {fileID: 8300000, guid: fc6f5c651d353c945be79d86bfce67b4, type: 3}
+    mood: Glad
+  - speaker: Runa
+    text: I see them. Take the near ones.
+    clip: {fileID: 8300000, guid: 49013079f05fb8740a8339b6ea0b49cb, type: 3}
+    mood: Yelling
+  - speaker: Runa
+    text: I will take the ones on the stones. You just keep breathing.
+    clip: {fileID: 8300000, guid: 8b2f79279eededc4fbe22c37f3feff77, type: 3}
+    mood: Stern
+  - speaker: Runa
+    text: I'll hold this spot.
+    clip: {fileID: 8300000, guid: a77b4da4bb8142548bdae09c11a78782, type: 3}
+    mood: Neutral
+  - speaker: Runa
+    text: I'll keep back.
+    clip: {fileID: 8300000, guid: b6219b91f3dd6834b9cc14f9e9a6f54c, type: 3}
+    mood: Neutral
+  - speaker: Runa
+    text: I'm bleeding!
+    clip: {fileID: 8300000, guid: e27cef95161e3a4469daecebade2eb76, type: 3}
+    mood: Scared
+  - speaker: Runa
+    text: It followed us! The old one, coming through the trees, right for the stones!
+    clip: {fileID: 8300000, guid: 5bcf03c80a87f2643b1935558f653b7a, type: 3}
+    mood: Scared
+  - speaker: Runa
+    text: It hasn't seen us yet. It will smell the smoke soon enough.
+    clip: {fileID: 8300000, guid: fb1fc1c06f619d54cbf32932d86d3ed7, type: 3}
+    mood: Calm
+  - speaker: Runa
+    text: I've tracked things my whole life, and never one that big. It left nothing behind but quiet. I don't trust the quiet.
+    clip: {fileID: 8300000, guid: fc2e0dd987cd6ce4f97da6fb6ad18f88, type: 3}
+    mood: Neutral
+  - speaker: Runa
+    text: I've watched you for two days. You leave a trail like a cart.
+    clip: {fileID: 8300000, guid: b664268b5889ed44a87c7bb509197348, type: 3}
+    mood: Neutral
+  - speaker: Runa
+    text: Liv.
+    clip: {fileID: 8300000, guid: 6339812b4f2b77d4eaeac365a85a3a24, type: 3}
+    mood: Calm
+  - speaker: Runa
+    text: More of them, coming round the other side!
+    clip: {fileID: 8300000, guid: 3db403b6baa161f4ea54f61f32220c28, type: 3}
+    mood: Yelling
+  - speaker: Runa
+    text: Move. I've got your back.
+    clip: {fileID: 8300000, guid: 5d9469d380b8b794abf5b734fe89f26c, type: 3}
+    mood: Glad
+  - speaker: Runa
+    text: Moving, there!
+    clip: {fileID: 8300000, guid: e20a69933f201ae4dbd03401f8fea2e7, type: 3}
+    mood: Yelling
+  - speaker: Runa
+    text: Nice morning. That is usually how it starts.
+    clip: {fileID: 8300000, guid: 741de59b199ca0740be59f9bc3d897ab, type: 3}
+    mood: Neutral
+  - speaker: Runa
+    text: No birds. Have you noticed? Not one for a while now.
+    clip: {fileID: 8300000, guid: f3c5437041e089c459dae8707591f30c, type: 3}
+    mood: Calm
+  - speaker: Runa
+    text: Not yet, you don't. Drink.
+    clip: {fileID: 8300000, guid: f9984e679fa00f0459af6286497b9d62, type: 3}
+    mood: Stern
+  - speaker: Runa
+    text: Nothing else moving.
+    clip: {fileID: 8300000, guid: f917846b8ab9f524e893f3632213c60a, type: 3}
+    mood: Glad
+  - speaker: Runa
+    text: Nothing else on the wind.
+    clip: {fileID: 8300000, guid: 7dff68e6cdf422c47ae30ef66534189a, type: 3}
+    mood: Glad
+  - speaker: Runa
+    text: Nothing gets to you without going through me.
+    clip: {fileID: 8300000, guid: 4ceaea7418ce33d4d9088d269a8d8ac9, type: 3}
+    mood: Stern
+  - speaker: Runa
+    text: Off the road, on your left! Rootlings. They were lying in wait, and they don't do that.
+    clip: {fileID: 8300000, guid: dd7bcb06eaf054f4587aef86952619dd, type: 3}
+    mood: Yelling
+  - speaker: Runa
+    text: On your back!
+    clip: {fileID: 8300000, guid: 2490ec969c97feb4291e2c12619c9ab2, type: 3}
+    mood: Yelling
+  - speaker: Runa
+    text: Poaching on the jarl's land. You learn to hit with the first arrow when the second one brings the wardens.
+    clip: {fileID: 8300000, guid: e41326343ac0bf04e953bb8de54f325a, type: 3}
+    mood: Neutral
+  - speaker: Runa
+    text: Point the way.
+    clip: {fileID: 8300000, guid: 0dd3cc9aefce2574dbbc94d206ecfacc, type: 3}
+    mood: Neutral
+  - speaker: Runa
+    text: Right behind you.
+    clip: {fileID: 8300000, guid: 50ee2cf2f1e15aa4baf9bbb76952511e, type: 3}
+    mood: Neutral
+  - speaker: Runa
+    text: Runa. I find the tracks, and I shoot what makes them. Trolls off their crags, witches on the roads, wolves that don't run from fire. I want to see it for myself before I believe any of it.
+    clip: {fileID: 8300000, guid: 5b630fe8dddfdc849b1eaf980afa89bc, type: 3}
+    mood: Neutral
+  - speaker: Runa
+    text: Sigrid. Look behind us. Where is the road? It was right there, and now there's only mist.
+    clip: {fileID: 8300000, guid: 663cd1a73989465429534e500fd844e9, type: 3}
+    mood: Scared
+  - speaker: Runa
+    text: Simple. I respect that. Hit it until it stops, and it leaves you a hand free.
+    clip: {fileID: 8300000, guid: dd38d185d18123d49b31a63d80b62b98, type: 3}
+    mood: Glad
+  - speaker: Runa
+    text: Small ones never come alone and never come this far down. Something up in the high woods is scaring them. Finish the berries and get back to the fire.
+    clip: {fileID: 8300000, guid: c73a4b0c2e80f614a9df9011fc95a75d, type: 3}
+    mood: Stern
+  - speaker: Runa
+    text: Someone is paying. And I would rather know what is coming out of there than wait for it to find me.
+    clip: {fileID: 8300000, guid: 32cbbb580447d574797cb1329bd0c2a1, type: 3}
+    mood: Neutral
+  - speaker: Runa
+    text: Still here. Still here.
+    clip: {fileID: 8300000, guid: 45d7491edd5c6144dba729195089836c, type: 3}
+    mood: Glad
+  - speaker: Runa
+    text: Still think the coin is worth it?
+    clip: {fileID: 8300000, guid: b8b08f907523c8342ba2a8eeed2f6732, type: 3}
+    mood: Neutral
+  - speaker: Runa
+    text: Thank you. I thought that was it.
+    clip: {fileID: 8300000, guid: 4ea73de70d4ed4b4dbef50bcab7d66a0, type: 3}
+    mood: Glad
+  - speaker: Runa
+    text: That's all of them. I think.
+    clip: {fileID: 8300000, guid: 087f9d3db4e570049b9a94dd4bae4adb, type: 3}
+    mood: Glad
+  - speaker: Runa
+    text: The forest doesn't hate us. It doesn't notice us. That's worse. Next time I pick the way.
+    clip: {fileID: 8300000, guid: 63833d0fe975b874bbe39f3852ff5d29, type: 3}
+    mood: Neutral
+  - speaker: Runa
+    text: The shadows are wrong. They were behind us when we crossed the stream.
+    clip: {fileID: 8300000, guid: 9c687087c94df444f89c669e99f40b99, type: 3}
+    mood: Neutral
+  - speaker: Runa
+    text: There! In the trees!
+    clip: {fileID: 8300000, guid: e796fc2dcd1add5438cd20312ffc0cb4, type: 3}
+    mood: Yelling
+  - speaker: Runa
+    text: There. Feel that? The wind turned, and there is mist coming up off the moss.
+    clip: {fileID: 8300000, guid: 246dea1a952668f488500a5b1a369292, type: 3}
+    mood: Neutral
+  - speaker: Runa
+    text: They're too close, I need room!
+    clip: {fileID: 8300000, guid: 81ea3fc73cda9a34db3e6f75d2e0c9ce, type: 3}
+    mood: Scared
+  - speaker: Runa
+    text: This place can be found. Good. So can everything else, by the same road.
+    clip: {fileID: 8300000, guid: 3ebbc495be3b3b04885d0088d293f798, type: 3}
+    mood: Neutral
+  - speaker: Runa
+    text: Too close, too close!
+    clip: {fileID: 8300000, guid: 7a6713e478ab65a41a13db717f036cca, type: 3}
+    mood: Scared
+  - speaker: Runa
+    text: Tracks everywhere, all running the same way. Whatever they are fleeing, we are walking towards it. Lovely.
+    clip: {fileID: 8300000, guid: d03f894e2c385c74a88ef62f1305099b, type: 3}
+    mood: Neutral
+  - speaker: Runa
+    text: Troll tracks. Small ones, the moss kind. They never come this far down. Something is pushing everything out of the high woods, and it is big.
+    clip: {fileID: 8300000, guid: 884998b47e09f6f42aa1238c2ab52ed9, type: 3}
+    mood: Neutral
+  - speaker: Runa
+    text: Two boar, on the grass north of the road, east of the camp. Hold the left button to draw.
+    clip: {fileID: 8300000, guid: f1a2f189f99c84e47b91c1fb535afb99, type: 3}
+    mood: Neutral
+  - speaker: Runa
+    text: Walk where the moss is thick; it's quieter. Keep your back to the fire, never your face. And if you hear something heavy breathing, don't run until I say so.
+    clip: {fileID: 8300000, guid: 471231dede619f14cae77093e5d13a89, type: 3}
+    mood: Calm
+  - speaker: Runa
+    text: Wolves behind them! In the open, in daylight. They don't do that. Weapons!
+    clip: {fileID: 8300000, guid: 89ff60b0b72a9b74aa849a9c9645c4c4, type: 3}
+    mood: Yelling
+  - speaker: Runa
+    text: Wolves! They are not hunting; something is driving them towards us. Protect the camp!
+    clip: {fileID: 8300000, guid: 975467f132dd26c43af41894f85f276b, type: 3}
+    mood: Yelling
+  - speaker: Runa
+    text: You crossed open ground to reach me. Stupid. Don't stop.
+    clip: {fileID: 8300000, guid: 0303a7826858702498e9cf558bbf5d14, type: 3}
+    mood: Stern
+  - speaker: Runa
+    text: You shot straight this morning. It may matter before the night is out.
+    clip: {fileID: 8300000, guid: 27e1f4c9d6643ad47801d4ae50c36024, type: 3}
+    mood: Neutral
+  - speaker: Runa
+    text: Your grandmother never saw wolves walk into a lit camp.
+    clip: {fileID: 8300000, guid: 3ea329d713bc0364391d7b8cab265569, type: 3}
+    mood: Neutral
+  - speaker: Runa
+    text: You're bleeding. Here.
+    clip: {fileID: 8300000, guid: c068e26ed9424b04ab04698f2ab98d4b, type: 3}
+    mood: Stern
+  - speaker: Sigrid
+    text: <i>...can anyone hear... Ingrid was right behind me when the stones broke. She's hurt. Find her first. Do you hear me? Find her first...</i>
+    clip: {fileID: 8300000, guid: 52b54995e4e17964cb4cbd276d46d84f, type: 3}
+    mood: Scared
+  - speaker: Sigrid
+    text: A fire. Sit down, all of you, and get your breath back. Whatever is out there will still be there when we are done.
+    clip: {fileID: 8300000, guid: 800f23c744e3c9e45ac0def39d2abc50, type: 3}
+    mood: Tired
+  - speaker: Sigrid
+    text: A retreat is only a defeat if you learn nothing. What did we learn?
+    clip: {fileID: 8300000, guid: 66cd06d0129da4d4ca402df5d59edfd2, type: 3}
+    mood: Stern
+  - speaker: Sigrid
+    text: Almost! Hold it off, just a little longer!
+    clip: {fileID: 8300000, guid: ec5023652098a384da5f898cf713d78c, type: 3}
+    mood: Yelling
+  - speaker: Sigrid
+    text: And you. You came to us with a strong back and few questions. Nobody walks towards that forest by accident. Why are you here?
+    clip: {fileID: 8300000, guid: 0a56913d0906859498894cd014f8b722, type: 3}
+    mood: Neutral
+  - speaker: Sigrid
+    text: Anything else?
+    clip: {fileID: 8300000, guid: c20f3a24c2a15de4abc172f1c5f892b5, type: 3}
+    mood: Neutral
+  - speaker: Sigrid
+    text: At first light we find the four who went ahead. Ingrid. Bjarne. Tor. And...
+    clip: {fileID: 8300000, guid: 6bb2942bcbbb86944a4a1f109a2229fc, type: 3}
+    mood: Neutral
+  - speaker: Sigrid
+    text: Back in line. Thank you.
+    clip: {fileID: 8300000, guid: 69849ef4070d5334e99e75229b1e3b20, type: 3}
+    mood: Glad
+  - speaker: Sigrid
+    text: Because the only old things out there are stones and roots, and the marks on them are older than any village. Whatever is wrong, I expect to find it written down.
+    clip: {fileID: 8300000, guid: bc0672dadd9f6004381da668e007d479, type: 3}
+    mood: Neutral
+  - speaker: Sigrid
+    text: Behind you!
+    clip: {fileID: 8300000, guid: a8ab0f647cca8c64c927f8364427b944, type: 3}
+    mood: Yelling
+  - speaker: Sigrid
+    text: Behind you! Move!
+    clip: {fileID: 8300000, guid: 495dfdf4f712f554a935f6559cc1151f, type: 3}
+    mood: Yelling
+  - speaker: Sigrid
+    text: Careful. The ones who go looking for the truth of it are the ones who find it.
+    clip: {fileID: 8300000, guid: d3280af03114123499693762dde7da10, type: 3}
+    mood: Stern
+  - speaker: Sigrid
+    text: Clear. Get your breath.
+    clip: {fileID: 8300000, guid: a377c6b1b5fed474ab0cef6f14619373, type: 3}
+    mood: Glad
+  - speaker: Sigrid
+    text: Come back when it's done.
+    clip: {fileID: 8300000, guid: a191135623010ec49b319db85d6527e7, type: 3}
+    mood: Neutral
+  - speaker: Sigrid
+    text: Count heads. Everyone still here?
+    clip: {fileID: 8300000, guid: f0c90a22c21b621489315ece92733262, type: 3}
+    mood: Glad
+  - speaker: Sigrid
+    text: Don't you stop for me. That's an order.
+    clip: {fileID: 8300000, guid: f08432fac0d2bd04bbee093a9ab05ac2, type: 3}
+    mood: Tired
+  - speaker: Sigrid
+    text: 'Dry stone overhead. Good work. Now a fire, before anyone can think clearly: eight sticks and twelve small rocks off the forest floor, then build it beside the shelter (G).'
+    clip: {fileID: 8300000, guid: ccd248fd8a2be19479a6a510320b4aa3, type: 3}
+    mood: Neutral
+  - speaker: Sigrid
+    text: Eirik sees a great deal for a man who pretends not to. Yes. I have seen stones like these before, and I know what they do. Ask me again when you have to touch one.
+    clip: {fileID: 8300000, guid: 33ee6ec3623381f40996336a491726b8, type: 3}
+    mood: Neutral
+  - speaker: Sigrid
+    text: Finish your porridge and listen. This is the only quiet you will get today.
+    clip: {fileID: 8300000, guid: 51a1659c8a3ad324bb70f2649d1e775e, type: 3}
+    mood: Stern
+  - speaker: Sigrid
+    text: 'For anyone who slept through last night''s talk, and I know who you are: I am Sigrid, and we walk east today. The villages asked what is wrong in that forest. Two days ago I sent Ingrid, Bjarne, Tor and Liv ahead to look. They should have been back yesterday.'
+    clip: {fileID: 8300000, guid: e5e68a7b3f007004cafc5821d62cc65d, type: 3}
+    mood: Neutral
+  - speaker: Sigrid
+    text: Form up on me!
+    clip: {fileID: 8300000, guid: 30caa25582557ba47b7696088724df70, type: 3}
+    mood: Yelling
+  - speaker: Sigrid
+    text: Good. Move before more come.
+    clip: {fileID: 8300000, guid: 625b7f02d0d135242a9ed7da39b2d31d, type: 3}
+    mood: Glad
+  - speaker: Sigrid
+    text: Good. On your feet. I mean, on mine.
+    clip: {fileID: 8300000, guid: a1dab3ce050c9744bb9574acb41d4f3d, type: 3}
+    mood: Glad
+  - speaker: Sigrid
+    text: Here they come!
+    clip: {fileID: 8300000, guid: fdc346c5bfb3cda4fadf2f77aec5f7b6, type: 3}
+    mood: Yelling
+  - speaker: Sigrid
+    text: Hold still. Drink this.
+    clip: {fileID: 8300000, guid: c670ab93bb3fba14da9ee377428819c6, type: 3}
+    mood: Stern
+  - speaker: Sigrid
+    text: Hold together! Nobody gets left behind. We will find each other, whatever happens.
+    clip: {fileID: 8300000, guid: cef83a33b0472484098b0aed21cadc16, type: 3}
+    mood: Yelling
+  - speaker: Sigrid
+    text: I can see that. Light your torches, and take this one.
+    clip: {fileID: 8300000, guid: 035b81e87a1636046bbc8fb5f78ca244, type: 3}
+    mood: Stern
+  - speaker: Sigrid
+    text: I can't take much more of this.
+    clip: {fileID: 8300000, guid: 8c2a664d43eeca6439da4c8bd6a4e82f, type: 3}
+    mood: Scared
+  - speaker: Sigrid
+    text: I gave you an order once to leave me if it came to that. You didn't. We'll talk about discipline. Later.
+    clip: {fileID: 8300000, guid: e6e9566636aa2c44f87f7c6f75ab96df, type: 3}
+    mood: Stern
+  - speaker: Sigrid
+    text: 'I know what it feels like: a door left open in winter. Someone opened it on purpose. Whether they meant to let something in or out... that is what we came to find.'
+    clip: {fileID: 8300000, guid: 6e3fbb4f851e73541a8a181c4d07252a, type: 3}
+    mood: Calm
+  - speaker: Sigrid
+    text: I owe you one.
+    clip: {fileID: 8300000, guid: 7e1ed342704678d4e8436a7f79f3354d, type: 3}
+    mood: Glad
+  - speaker: Sigrid
+    text: I'll hold this spot.
+    clip: {fileID: 8300000, guid: bc943b456a217c14aaa8ac1e05d79787, type: 3}
+    mood: Neutral
+  - speaker: Sigrid
+    text: I'll keep back.
+    clip: {fileID: 8300000, guid: 718c37e203015dd4cb7acb8859aba786, type: 3}
+    mood: Neutral
+  - speaker: Sigrid
+    text: I'm hurt!
+    clip: {fileID: 8300000, guid: ca1f21a0b4980da408e3cc4f7b7d158e, type: 3}
+    mood: Scared
+  - speaker: Sigrid
+    text: 'Ingrid, Bjarne, Tor and Liv. An alchemist, a smith, a carpenter and a scholar: the ones who can make sense of what they find. I sent them on two days ago to look over the old road. It was a short job.'
+    clip: {fileID: 8300000, guid: 57080f5b8a62a7e42ac1d890c1884535, type: 3}
+    mood: Neutral
+  - speaker: Sigrid
+    text: It will not wake for me. It never has. You, then. Put your hand on the centre stone.
+    clip: {fileID: 8300000, guid: 60416b4c1a39d2a4fb65d21e98ca0edf, type: 3}
+    mood: Stern
+  - speaker: Sigrid
+    text: I've buried good people on less than what we just did. Write it down somewhere. It should outlast us.
+    clip: {fileID: 8300000, guid: 1800277adea1cae45ad248cec69b96ce, type: 3}
+    mood: Calm
+  - speaker: Sigrid
+    text: I've served under worse than you. Don't let it go to your head.
+    clip: {fileID: 8300000, guid: b0552f9fb2e4ac14c97324aca61d727b, type: 3}
+    mood: Neutral
+  - speaker: Sigrid
+    text: Keep the torch high and the road under your feet. The forest is listening tonight. Let it hear only footsteps.
+    clip: {fileID: 8300000, guid: 49533c4cb00330b42bd2bd76b40b87d8, type: 3}
+    mood: Calm
+  - speaker: Sigrid
+    text: Keep walking.
+    clip: {fileID: 8300000, guid: 3dc5a3d73b35f2847b637fee5dfc6ad5, type: 3}
+    mood: Stern
+  - speaker: Sigrid
+    text: Leave the fire! Take the old path north, to the standing stones. Now!
+    clip: {fileID: 8300000, guid: 9ac34d36ce337a44192fe056c06e10c8, type: 3}
+    mood: Yelling
+  - speaker: Sigrid
+    text: Liv. Of course. Eleven years I have known her, and for a moment there was a hole where her name should be.
+    clip: {fileID: 8300000, guid: b329fbfacb1b3d74ca233e4725c08510, type: 3}
+    mood: Neutral
+  - speaker: Sigrid
+    text: Not alone, and not before we are ready. Come back to the others.
+    clip: {fileID: 8300000, guid: bcedd102dc0412f40aace935112a2de8, type: 3}
+    mood: Stern
+  - speaker: Sigrid
+    text: Not yet, you don't. Drink.
+    clip: {fileID: 8300000, guid: aeb1e9f4c690dcc48b9ae146f8625d11, type: 3}
+    mood: Stern
+  - speaker: Sigrid
+    text: Nothing gets to you without going through me.
+    clip: {fileID: 8300000, guid: befbc45c61f1957429780542de382780, type: 3}
+    mood: Stern
+  - speaker: Sigrid
+    text: Point the way.
+    clip: {fileID: 8300000, guid: 35b658344761fed429e8aae4b0abd336, type: 3}
+    mood: Neutral
+  - speaker: Sigrid
+    text: Right behind you.
+    clip: {fileID: 8300000, guid: e45d12056145fe140b1c0c36ecd26c50, type: 3}
+    mood: Neutral
+  - speaker: Sigrid
+    text: Roots do not set ambushes on a road. Something taught them to. Keep moving. We need walls around us before more of them wake.
+    clip: {fileID: 8300000, guid: 1d9e0c8e97e06604fb0f60d8523377eb, type: 3}
+    mood: Stern
+  - speaker: Sigrid
+    text: Rumours grow in the telling. That is why we go and look, instead of sitting in a longhouse and listening.
+    clip: {fileID: 8300000, guid: 0802c3f9b4df5604da3a97747511d82e, type: 3}
+    mood: Neutral
+  - speaker: Sigrid
+    text: Save it for the road. We have until the porridge gets worse.
+    clip: {fileID: 8300000, guid: 3a68437ee51c341479fe349780da323a, type: 3}
+    mood: Neutral
+  - speaker: Sigrid
+    text: Seven went in. Tell me who's home.
+    clip: {fileID: 8300000, guid: a1d82be22710edc41aafea6259ac293f, type: 3}
+    mood: Stern
+  - speaker: Sigrid
+    text: Stand inside the ring. Whatever you see, do not let go of the stone until I say.
+    clip: {fileID: 8300000, guid: b1325970dcedc844c8ce46d3193798b9, type: 3}
+    mood: Stern
+  - speaker: Sigrid
+    text: Stand together! Nobody runs!
+    clip: {fileID: 8300000, guid: 44330b07a14869a448b5a6413c79e873, type: 3}
+    mood: Yelling
+  - speaker: Sigrid
+    text: Stay on the road. We keep a steady pace, and the others will wait if you fall behind.
+    clip: {fileID: 8300000, guid: 4249691968b1d2b46bab9f587cc0992b, type: 3}
+    mood: Stern
+  - speaker: Sigrid
+    text: Still here. Still here.
+    clip: {fileID: 8300000, guid: 0b2ab11a20f672540afe4b31d50e39c8, type: 3}
+    mood: Glad
+  - speaker: Sigrid
+    text: Still standing. Barely.
+    clip: {fileID: 8300000, guid: 0fa4667c4151f9e4d86ce4ced6dcb617, type: 3}
+    mood: Scared
+  - speaker: Sigrid
+    text: Take what time you need, but not too much. It is a long walk, and I want to be at the forest by noon.
+    clip: {fileID: 8300000, guid: 4531729940bf6a148ae3b338d8cf8c6c, type: 3}
+    mood: Neutral
+  - speaker: Sigrid
+    text: Thank you. I thought that was it.
+    clip: {fileID: 8300000, guid: 6d49f80677ac92444a2bc2ae70a42b7f, type: 3}
+    mood: Glad
+  - speaker: Sigrid
+    text: That is no thunder. An old one, a mountain troll, and it is walking towards our fire.
+    clip: {fileID: 8300000, guid: 93909d6548077e04caa339e543c101d2, type: 3}
+    mood: Stern
+  - speaker: Sigrid
+    text: That was no weather. The sun went down hours early and this storm came out of a clear sky. Ingrid, Bjarne, Tor and Liv walked into this two days ago, so we go on, not back. Follow the old road into the trees and find us dry shelter. We are right behind you.
+    clip: {fileID: 8300000, guid: a3a20971acbec3d40bf74ff7e84037e5, type: 3}
+    mood: Stern
+  - speaker: Sigrid
+    text: That's the last of them.
+    clip: {fileID: 8300000, guid: dd1568d2e195b6942b3079df404926a6, type: 3}
+    mood: Glad
+  - speaker: Sigrid
+    text: The cause. Trolls do not leave their crags for no reason, and wolves do not forget fire. Something in that forest has changed, and the villages want it named before it reaches their doors.
+    clip: {fileID: 8300000, guid: fab4957a227a3fb43b87d46392a3b804, type: 3}
+    mood: Stern
+  - speaker: Sigrid
+    text: 'The packs are tied and the fire is nearly out. Ingrid''s party should have been back yesterday, and the forest is half a morning down the road. If you have anything left to do here, do it now: once we set out, we do not come back for it. Are you ready?'
+    clip: {fileID: 8300000, guid: d4382ffa15e73194384e39cf1f4d5914, type: 3}
+    mood: Neutral
+  - speaker: Sigrid
+    text: The stones are drawing power! Hold them off until the connection forms!
+    clip: {fileID: 8300000, guid: 8066c856d41f13d43a1dcb7fa53f0812, type: 3}
+    mood: Yelling
+  - speaker: Sigrid
+    text: The villages think we came for wolves and witches. Let them. The stones out here are older than any village, and someone has been waking them.
+    clip: {fileID: 8300000, guid: 016f7e2907db03c4db290e6c39b085cf, type: 3}
+    mood: Neutral
+  - speaker: Sigrid
+    text: Then one thing first. Nobody walks that road unarmed. We carry spare arms in the packs. They are old and they are plain, but they will do. Take what suits you.
+    clip: {fileID: 8300000, guid: 35df69812ada50646b5e08461daedb17, type: 3}
+    mood: Neutral
+  - speaker: Sigrid
+    text: There you are. Come and stand by the fire with the rest of us. You should know who you are walking with before we set out.
+    clip: {fileID: 8300000, guid: c24604edeb859ac4abf9202c2e7c9c07, type: 3}
+    mood: Glad
+  - speaker: Sigrid
+    text: They did not send me. They asked for someone who could read the old marks, and I was the only one who answered. Draw your own conclusions. Everyone else does.
+    clip: {fileID: 8300000, guid: a2505b29dde59044bb6519b7c423e5f7, type: 3}
+    mood: Neutral
+  - speaker: Sigrid
+    text: Watch your back!
+    clip: {fileID: 8300000, guid: 7a1827ac7cc299345a8a61fd9de8506d, type: 3}
+    mood: Yelling
+  - speaker: Sigrid
+    text: We leave when you are ready. If you want to earn your porridge first, ask the others. They always have something.
+    clip: {fileID: 8300000, guid: 1788a4952f01a484a8f5f458185166d7, type: 3}
+    mood: Neutral
+  - speaker: Sigrid
+    text: Weapons up!
+    clip: {fileID: 8300000, guid: 3df35c1def9bbfb4b82acebc9ecb69d8, type: 3}
+    mood: Yelling
+  - speaker: Sigrid
+    text: Whatever you see, do not let go of the stone. There are things I should have told you, and there is no time left to tell them.
+    clip: {fileID: 8300000, guid: d81e69ef466350843bc536bdda250a58, type: 3}
+    mood: Stern
+  - speaker: Sigrid
+    text: Wolves that hunt by day and do not fear four armed people. Whatever happened to this cart was quick, and it did not end here. We go on.
+    clip: {fileID: 8300000, guid: 9c08e31b1694ddd44bb5fa66873ca8b8, type: 3}
+    mood: Stern
+  - speaker: Sigrid
+    text: Words for things your tongue has no names for. Most of them mean wait. One of them means open. Pray we only need the first kind.
+    clip: {fileID: 8300000, guid: 6b664d6830b38404084fe2437c1a7332, type: 3}
+    mood: Calm
+  - speaker: Sigrid
+    text: You asked me by the fire, so here it is. I have seen stones like these wake once. It took everyone who stood too near, and it put them somewhere else. Ingrid knew that when she came. Now you do.
+    clip: {fileID: 8300000, guid: 9f72940ec36efc24d8a3335b4d2226bf, type: 3}
+    mood: Calm
+  - speaker: Sigrid
+    text: You came back. I told them you would.
+    clip: {fileID: 8300000, guid: 10cf312e2a69da843841dbfa2e0cee74, type: 3}
+    mood: Glad
+  - speaker: Sigrid
+    text: You wanted to know if the stories were true. How are you finding it?
+    clip: {fileID: 8300000, guid: 4cd1aae57f8ef9147b9fdb02546a9ad1, type: 3}
+    mood: Neutral
+  - speaker: Sigrid
+    text: You're bleeding. Here.
+    clip: {fileID: 8300000, guid: 4457d8f362d59914390905af27a78f06, type: 3}
+    mood: Stern
+  - speaker: The Portal
+    text: '<i>A fire first, little one. Fallen branches and loose stones lie all around me: pick them up, open the build menu (G) and light it inside my ward. The sooner it burns, the sooner they can see it.</i>'
+    clip: {fileID: 8300000, guid: a2b574d661a62a44f9bea6d4d4460fad, type: 3}
+    mood: Calm
+  - speaker: The Portal
+    text: <i>A fire first. Then a home worth coming back to. Then we go and fetch them. And one day, little one, you will tell me why these old stones woke for your hand.</i>
+    clip: {fileID: 8300000, guid: cca676c07eff5dc49a15f06adc57887e, type: 3}
+    mood: Calm
+  - speaker: The Portal
+    text: <i>A horn at dusk, the expedition's signal. She is the last of them. Bring her home, little one.</i>
+    clip: {fileID: 8300000, guid: 21e15a690a561354e8b4963a043bd75e, type: 3}
+    mood: Calm
+  - speaker: The Portal
+    text: <i>A hundred winters I kept this clearing alone. I had forgotten how loud a home is. Do not stop.</i>
+    clip: {fileID: 8300000, guid: bab4b77253f1c4945a68aedb5c8bc20d, type: 3}
+    mood: Calm
+  - speaker: The Portal
+    text: <i>A saw, out where nobody saws. Your carpenter is hurt, but he is still measuring.</i>
+    clip: {fileID: 8300000, guid: 28860f3391c68914082d49a4ff1be6cc, type: 3}
+    mood: Calm
+  - speaker: The Portal
+    text: <i>A snare line, a mile of it, and at the end a man who did not mean to be caught.</i>
+    clip: {fileID: 8300000, guid: 85f9ddfa3dcc5c243a394677c0750660, type: 3}
+    mood: Calm
+  - speaker: The Portal
+    text: <i>A wall went up overnight out there, round nothing. Whoever built it will want to build a better one here.</i>
+    clip: {fileID: 8300000, guid: 6e2ca1faa93ad6d4b861fbbe9627f104, type: 3}
+    mood: Calm
+  - speaker: The Portal
+    text: <i>And the guardian under the roots, who kept the forest's half. Where is it now?</i>
+    clip: {fileID: 8300000, guid: ee453819a19976a4694774c6c50a1c97, type: 3}
+    mood: Calm
+  - speaker: The Portal
+    text: <i>And this. Their door, and the night kept from it, for as long as the fire burned.</i>
+    clip: {fileID: 8300000, guid: 95776a46879c4f74ea3405b97c68b607, type: 3}
+    mood: Calm
+  - speaker: The Portal
+    text: '<i>Bare hands bring little home, little one. A hatchet in your belt and a pick beside it bring wood and ore. Sticks and sharp stones: make them in your bag (B).</i>'
+    clip: {fileID: 8300000, guid: 2740700c16cdd924ca535772bad8580a, type: 3}
+    mood: Calm
+  - speaker: The Portal
+    text: <i>Come and sit by me, little one. There is something I should have told you before you went to that hollow.</i>
+    clip: {fileID: 8300000, guid: 24ca25d4fdee33145bf03360ebddb3c3, type: 3}
+    mood: Calm
+  - speaker: The Portal
+    text: <i>Did you see what grew out of them as they fell? Root. The same root that choked my stones, and closed the road behind your people.</i>
+    clip: {fileID: 8300000, guid: d602fe8f0331c8143baf195c965f6738, type: 3}
+    mood: Sad
+  - speaker: The Portal
+    text: <i>Do you feel that? The ward has remembered what it is for. And far out in the mist, little one, someone has stopped walking and turned to look.</i>
+    clip: {fileID: 8300000, guid: cd3edd3b7a6b7844d8be72fba32725d0, type: 3}
+    mood: Calm
+  - speaker: The Portal
+    text: <i>Every hearth in my light is a little more of the old pact kept.</i>
+    clip: {fileID: 8300000, guid: e8f71124c610a8a4e92f5554ea88ac6b, type: 3}
+    mood: Calm
+  - speaker: The Portal
+    text: <i>First the way home. Then their names. Then there is no one left to find.</i>
+    clip: {fileID: 8300000, guid: eb02ba9be387bf642949bf2227fd3c38, type: 3}
+    mood: Calm
+  - speaker: The Portal
+    text: <i>Go, little one. She is just beyond me, off the path. Come back through one of my doors before I close. What you wear I can always bring home. What you carry I cannot.</i>
+    clip: {fileID: 8300000, guid: ae0bad5cc79769544bdfec39591871a8, type: 3}
+    mood: Calm
+  - speaker: The Portal
+    text: <i>I am a door, little one, and I have gone to sleep. I am too thin to wake myself. Long ago people kept a hearth beside these stones, and I kept the night from their door. That was the pact. No fire has burned here in a hundred winters.</i>
+    clip: {fileID: 8300000, guid: e876171ee9e610f46a9fbb62bc2bfdaa, type: 3}
+    mood: Calm
+  - speaker: The Portal
+    text: '<i>I have not told you everything. The Heartroot was no monster. It was the forest''s guardian: its half of the pact. Your kind let the hearth beside me go cold a hundred winters ago. It kept its half for ninety winters after that, alone, until the hunger got into its roots.</i>'
+    clip: {fileID: 8300000, guid: 3fd5cc9260f173e4584b73dc9293c118, type: 3}
+    mood: Calm
+  - speaker: The Portal
+    text: <i>I listen for your people every night. Some nights I hear them.</i>
+    clip: {fileID: 8300000, guid: 28994191dbd3af94f8f15c29e4cb191b, type: 3}
+    mood: Calm
+  - speaker: The Portal
+    text: <i>I remember this. A fire beside my stones, and someone to keep it.</i>
+    clip: {fileID: 8300000, guid: 70aaab431ff8bcb45aa064a14f628865, type: 3}
+    mood: Calm
+  - speaker: The Portal
+    text: <i>It is all one thing, little one. Something old is pushing those roots, from somewhere deep in the woods. When the woods tell me where, I will tell you.</i>
+    clip: {fileID: 8300000, guid: 20183a6ba2a5c2d448b6a84741a03f1b, type: 3}
+    mood: Calm
+  - speaker: The Portal
+    text: <i>Its last word was for you. Hearth-keeper. Nobody has called anyone that in a hundred winters, and I did not teach it to you. One day you will tell me why these stones woke for your hand.</i>
+    clip: {fileID: 8300000, guid: 099669a60861b47458c1d3c6209f2a32, type: 3}
+    mood: Calm
+  - speaker: The Portal
+    text: <i>Listen, little one. Rest your hand on the stone.</i>
+    clip: {fileID: 8300000, guid: 47f021c2af1bec44fbd0f1cfc03ecdaa, type: 3}
+    mood: Calm
+  - speaker: The Portal
+    text: <i>Listen. A hammer, far off in the deep woods, slow and uneven. One of yours. Ask me what the woods hold before you go, and I will tell you where.</i>
+    clip: {fileID: 8300000, guid: feb837e2b9c472a4d8626a71c0b2f091, type: 3}
+    mood: Calm
+  - speaker: The Portal
+    text: '<i>Listen. Far off, at dusk, a horn: three long notes and a rest, over and over. The expedition''s signal. Someone out there has seen your light and is answering it.</i>'
+    clip: {fileID: 8300000, guid: bf7aad7fc17f7d441bb210eac14b2e4c, type: 3}
+    mood: Calm
+  - speaker: The Portal
+    text: <i>Little one, behind you! My ward is too thin yet. They are coming up through it.</i>
+    clip: {fileID: 8300000, guid: 65c84ba33797e2248b2d9ed85fa509ba, type: 3}
+    mood: Scared
+  - speaker: The Portal
+    text: <i>Look, now that there is light to see by. Three of my stones, choked in roots. And the roots are moving, little one. Slowly. Towards me.</i>
+    clip: {fileID: 8300000, guid: bb62719f007704640b29f67420bcfe93, type: 3}
+    mood: Calm
+  - speaker: The Portal
+    text: <i>Marks on the trees that only the dark shows. Go through at night.</i>
+    clip: {fileID: 8300000, guid: 6329a2be4ad8eed48a418423664d3240, type: 3}
+    mood: Calm
+  - speaker: The Portal
+    text: <i>My stones have gone quiet, but she is right. One spark burns close, just beyond me, hiding from the wolves. Make yourself tools, and go.</i>
+    clip: {fileID: 8300000, guid: bfbe03507f7aeef43886c2ab5bb32825, type: 3}
+    mood: Calm
+  - speaker: The Portal
+    text: <i>My ward keeps out the worst of the forest, not all of it. Put a wall between your fire and the trees.</i>
+    clip: {fileID: 8300000, guid: ae64ba3b9fa96564296c2d643e889132, type: 3}
+    mood: Calm
+  - speaker: The Portal
+    text: <i>Now bring me what you freed. Feed me that light and I will open for you, as I did in the dark.</i>
+    clip: {fileID: 8300000, guid: d56983cd10ed7a6428a760b7cf596c1c, type: 3}
+    mood: Calm
+  - speaker: The Portal
+    text: <i>Now feed yourself. Berries, water from the stream, a stew over your fire. You will be walking people home.</i>
+    clip: {fileID: 8300000, guid: 877935895dc76eb48b1120c4ead9f018, type: 3}
+    mood: Calm
+  - speaker: The Portal
+    text: '<i>Now the woods have told me. Something breathes under the roots, little one, in a hollow deep in the Misty Woods: a guardian, as old as my stones. It will not wake for steel. Take an ember from your own fire to it. That, it cannot ignore.</i>'
+    clip: {fileID: 8300000, guid: 98db259428deace43880f12a215bb382, type: 3}
+    mood: Calm
+  - speaker: The Portal
+    text: <i>Old stones are humming in the deep woods. Someone is inside the ring, writing.</i>
+    clip: {fileID: 8300000, guid: ddb3e92b41d99d043994c3a303242256, type: 3}
+    mood: Calm
+  - speaker: The Portal
+    text: '<i>One fire brought Ingrid home. The others will want more than a fire: a bench, a furnace, a dry place to set down what they carry. Build what they will need.</i>'
+    clip: {fileID: 8300000, guid: 21e8cdb925678224a8f1046b169be691, type: 3}
+    mood: Calm
+  - speaker: The Portal
+    text: '<i>One weapon is one answer, and it will not last for ever. Make a second at your workshop: a club stuns what a blade only cuts.</i>'
+    clip: {fileID: 8300000, guid: 4a679f47d0d179e47b828af65dcf0861, type: 3}
+    mood: Calm
+  - speaker: The Portal
+    text: <i>Rootlings, in my clearing. Feed me those orbs, and they will not get in so easily again.</i>
+    clip: {fileID: 8300000, guid: c7373c4ea4249d049a2aef50bbac72c9, type: 3}
+    mood: Stern
+  - speaker: The Portal
+    text: <i>Seven sparks, scattered through the Misty Woods. They are alive. I hear them when the wind is right. But the forest does not kill the lost, little one. It forgets them.</i>
+    clip: {fileID: 8300000, guid: 06112ce3b2b803847aa8b156a6f98efc, type: 3}
+    mood: Calm
+  - speaker: The Portal
+    text: <i>She is close, little one. Just beyond me, off the path, hiding. Find her, keep her near you, and bring her through.</i>
+    clip: {fileID: 8300000, guid: 46887ac32c53b0345bdcaea3106e1dd0, type: 3}
+    mood: Calm
+  - speaker: The Portal
+    text: <i>Smoke from a farmstead that burned long ago. Someone kept the seed.</i>
+    clip: {fileID: 8300000, guid: 8c488a7f1beb348489f7da2956d9d3ee, type: 3}
+    mood: Calm
+  - speaker: The Portal
+    text: <i>So light one. The forest cannot forget a hearth that someone tends. It will feed my ward, and out in the mist your people will see it and know which way is home.</i>
+    clip: {fileID: 8300000, guid: 78ffc9810abe0fa47881e46768436703, type: 3}
+    mood: Calm
+  - speaker: The Portal
+    text: <i>Someone is cooking out there. The wolves can smell it. So can I.</i>
+    clip: {fileID: 8300000, guid: af8543cfb04620148a31d97d340309e9, type: 3}
+    mood: Calm
+  - speaker: The Portal
+    text: <i>Something tests my ward. Out there, someone else is holding a clearing against the wolves. Bring him to hold mine.</i>
+    clip: {fileID: 8300000, guid: 86e4d95f0e519d84ab5886faa3602f86, type: 3}
+    mood: Stern
+  - speaker: The Portal
+    text: <i>That is what you killed. I am sorry. Someone had to.</i>
+    clip: {fileID: 8300000, guid: 6d446fac584bfe740aeb4399331d5c98, type: 3}
+    mood: Sad
+  - speaker: The Portal
+    text: <i>The brighter this place burns, the further it can be seen. Build. Clear the old growth. Give them something worth walking towards.</i>
+    clip: {fileID: 8300000, guid: e1e05aa8507ec6e4496f18c6ccac3643, type: 3}
+    mood: Calm
+  - speaker: The Portal
+    text: <i>The forest cannot forget a place that someone tends.</i>
+    clip: {fileID: 8300000, guid: 2724747ca5f838a4098d1f3e3c7544b8, type: 3}
+    mood: Calm
+  - speaker: The Portal
+    text: <i>The forest has put its roots in even here. Three stones around the clearing still hold my light, choked and cold. Free them, and bring the Life Orbs back.</i>
+    clip: {fileID: 8300000, guid: 4e55fd80a005fbb4b83707ecf565a258, type: 3}
+    mood: Calm
+  - speaker: The Portal
+    text: <i>The last of an old promise. I keep the dark from this clearing. But that is not what you need to know.</i>
+    clip: {fileID: 8300000, guid: 495056b8518576c46bc75fc2e6d14fd8, type: 3}
+    mood: Calm
+  - speaker: The Portal
+    text: <i>The light that reached her reached other things as well. They are on the old path now, testing me. Prepare yourself. When you are ready, tell me, and I will let them come.</i>
+    clip: {fileID: 8300000, guid: e29c3bcb4b9dee646bdab9d4eee22e01, type: 3}
+    mood: Calm
+  - speaker: The Portal
+    text: <i>Then she is still herself, and she is holding on. She will want the others home before her. Bring them, little one, and keep this fire high.</i>
+    clip: {fileID: 8300000, guid: edfaddb961b50a64b817d20fed6eff4a, type: 3}
+    mood: Calm
+  - speaker: The Portal
+    text: <i>There. A hearth beside my stones, after a hundred winters.</i>
+    clip: {fileID: 8300000, guid: 92501bcf7ce226941abbadd2eba70c0d, type: 3}
+    mood: Calm
+  - speaker: The Portal
+    text: <i>What you carry through me, the woods can take from you. What you leave here, I keep. Build a chest beside your workshop (G), and put in it what you cannot bear to lose.</i>
+    clip: {fileID: 8300000, guid: 67dfff8ced5006a47ac8e185cb37edbf, type: 3}
+    mood: Calm
+  - speaker: The Portal
+    text: <i>With its roots gone quiet I can reach further. North, past the troll country, the road is open. The old one that broke my stones the night you fell walks that road. It came for the door then. Go carefully.</i>
+    clip: {fileID: 8300000, guid: 4e877300c3b743f4b80579f413f7d503, type: 3}
+    mood: Calm
+  - speaker: The Portal
+    text: <i>With what? You have nothing but your hands, and I cannot open.</i>
+    clip: {fileID: 8300000, guid: 08ad8f258c3cd6c4e991b543e09aecf7, type: 3}
+    mood: Stern
+  - speaker: The Portal
+    text: <i>Would you have woken it, knowing? It could not be saved, only stopped. Better by the hand of someone who keeps a hearth.</i>
+    clip: {fileID: 8300000, guid: b8815cd1550a606419bb597f2f0190a0, type: 3}
+    mood: Calm
+  - speaker: The Portal
+    text: <i>You brought it down. Lay what you carried out of the hollow by the fire, little one, where it can feel the warmth. It is owed that much.</i>
+    clip: {fileID: 8300000, guid: 3edca4d7723e4f943b009bce0bf73f03, type: 3}
+    mood: Calm
+  - speaker: The Portal
+    text: '<i>You brought the woods home on your back. Now make something of them: a lodge by the trees, a saw that turns logs into planks. The smithy and the walls start with a plank.</i>'
+    clip: {fileID: 8300000, guid: f44e9644898c76746a77e9e003a9ad44, type: 3}
+    mood: Calm
+  - speaker: The Portal
+    text: <i>You came for coin. There is none here. Stay anyway. They need you to.</i>
+    clip: {fileID: 8300000, guid: 97bed2bd255ce06429306d728c819b38, type: 3}
+    mood: Calm
+  - speaker: The Portal
+    text: <i>You came for coin. There is none in this. But there is a debt now, and you have begun to pay it.</i>
+    clip: {fileID: 8300000, guid: ae145b9e211476d479631238064a59a0, type: 3}
+    mood: Calm
+  - speaker: The Portal
+    text: <i>You came for someone. Every one of your people is out there because of what was let go cold. Bring them home, and the debt grows smaller.</i>
+    clip: {fileID: 8300000, guid: d85174a3bbba2be49856c90b52a3ad2e, type: 3}
+    mood: Calm
+  - speaker: The Portal
+    text: <i>You came looking for someone. Now there are others looking for you. Let them find a light.</i>
+    clip: {fileID: 8300000, guid: fd3d0786a14d3114290a9cc050c68f54, type: 3}
+    mood: Calm
+  - speaker: The Portal
+    text: '<i>You came to see if the stories were true. Here is the one nobody tells: we broke the pact first.</i>'
+    clip: {fileID: 8300000, guid: ad95d5e6432ac6f40b6a333fe91d4c89, type: 3}
+    mood: Calm
+  - speaker: The Portal
+    text: <i>You came to see whether the stories were true. Now you are one of them.</i>
+    clip: {fileID: 8300000, guid: 1ed23c52d4c657448b67201578f40c43, type: 3}
+    mood: Calm
+  - speaker: The Portal
+    text: '<i>You have a fire. Now a roof to work under: a workshop beside it (G). What the woods break, it mends.</i>'
+    clip: {fileID: 8300000, guid: 64b42d68b6d472e45991c36cbef2ac45, type: 3}
+    mood: Calm
+  - speaker: The Portal
+    text: <i>Your people did, long before you were born. You are mending it. Every fire kept here is a payment on that debt.</i>
+    clip: {fileID: 8300000, guid: d2be176329f44fd429ca06b72bf413a9, type: 3}
+    mood: Calm
+  - speaker: The Portal
+    text: Warmth stirs in the old stone. <i>Little one. You fell out of the dark with the whole forest at your heels, and I caught you. I could only catch one.</i>
+    clip: {fileID: 8300000, guid: 5e908dad5b84b034aa1c89605501007c, type: 3}
+    mood: Calm
+  - speaker: Tor
+    text: Anything else?
+    clip: {fileID: 8300000, guid: 72de23cfcb9ce3748950e6605d30ee71, type: 3}
+    mood: Neutral
+  - speaker: Tor
+    text: Behind you!
+    clip: {fileID: 8300000, guid: 3478392cee0a6d14992642883bd551f4, type: 3}
+    mood: Yelling
+  - speaker: Tor
+    text: Clear. Get your breath.
+    clip: {fileID: 8300000, guid: b5abd2dbe85687042bce5933f7ede5b0, type: 3}
+    mood: Glad
+  - speaker: Tor
+    text: Here they come!
+    clip: {fileID: 8300000, guid: 0f8dda0024bd76d4abef90807961c006, type: 3}
+    mood: Yelling
+  - speaker: Tor
+    text: Hold still. Drink this.
+    clip: {fileID: 8300000, guid: 1acdeaf5a285de54c9e330164cec11cd, type: 3}
+    mood: Stern
+  - speaker: Tor
+    text: I can't take much more of this.
+    clip: {fileID: 8300000, guid: f549b64f04cb11e4491106b4c978587c, type: 3}
+    mood: Scared
+  - speaker: Tor
+    text: I owe you one.
+    clip: {fileID: 8300000, guid: 65f8a5079f5fb6e4abae06a42de6eccd, type: 3}
+    mood: Glad
+  - speaker: Tor
+    text: I'll hold this spot.
+    clip: {fileID: 8300000, guid: 356a6042acc62a0488f6fc3168bfe2b8, type: 3}
+    mood: Neutral
+  - speaker: Tor
+    text: I'll keep back.
+    clip: {fileID: 8300000, guid: a01f0faea2195234c8e3a55c27794e63, type: 3}
+    mood: Neutral
+  - speaker: Tor
+    text: I'm hurt!
+    clip: {fileID: 8300000, guid: 71215f8855ab31349b81bf3629b8c9a9, type: 3}
+    mood: Scared
+  - speaker: Tor
+    text: It's built crooked, you know. All of it. Give me a week.
+    clip: {fileID: 8300000, guid: b8abd1003293a6e438363cd6f965c716, type: 3}
+    mood: Neutral
+  - speaker: Tor
+    text: My tools. Leave them, if you have to. Not me.
+    clip: {fileID: 8300000, guid: 6d11f53227e8ff3438c116d8c7325b3b, type: 3}
+    mood: Tired
+  - speaker: Tor
+    text: Not yet, you don't. Drink.
+    clip: {fileID: 8300000, guid: 8363a6865595cc140a1936731f2cc580, type: 3}
+    mood: Stern
+  - speaker: Tor
+    text: Nothing gets to you without going through me.
+    clip: {fileID: 8300000, guid: 13fc2e541f24dfc4a9cd7610788aaba6, type: 3}
+    mood: Stern
+  - speaker: Tor
+    text: Point the way.
+    clip: {fileID: 8300000, guid: 974f9a5a16ed6c5448d0d7bc8ff8965a, type: 3}
+    mood: Neutral
+  - speaker: Tor
+    text: Right behind you.
+    clip: {fileID: 8300000, guid: 2199a36fa6935c540ba9bca7eb68a5d0, type: 3}
+    mood: Neutral
+  - speaker: Tor
+    text: Stay near the stones. We can still get out of this together.
+    clip: {fileID: 8300000, guid: 80a7b10dbb46b504b84b348e936ad626, type: 3}
+    mood: Stern
+  - speaker: Tor
+    text: Still here. Still here.
+    clip: {fileID: 8300000, guid: f66df6fc0122180468afea4c78b3f6fb, type: 3}
+    mood: Glad
+  - speaker: Tor
+    text: Still measuring. I knew someone would come, and I wanted something to show for it.
+    clip: {fileID: 8300000, guid: 54de7c6e93532c442afb2be3d1d7622e, type: 3}
+    mood: Tired
+  - speaker: Tor
+    text: Thank you. I thought that was it.
+    clip: {fileID: 8300000, guid: 45f142b969a14484680a2b44d41578eb, type: 3}
+    mood: Glad
+  - speaker: Tor
+    text: That's the last of them.
+    clip: {fileID: 8300000, guid: 2c53519ad0e473d48aef5e3d7de9e3fe, type: 3}
+    mood: Glad
+  - speaker: Tor
+    text: There's a hollow in the deep woods where nothing grows, and the ground breathes there. In, out, slow as a sleeper. I lay three nights on this leg listening to it. Whatever is down there is old, and it's what moves the roots. Now, where do you want your planks?
+    clip: {fileID: 8300000, guid: addf2974c5abbb54887c1330fe8f5bb9, type: 3}
+    mood: Neutral
+  - speaker: Tor
+    text: This stone is dry enough. Give me sound timber and a little daylight, and I could make somewhere worth staying. For now, this fire will do.
+    clip: {fileID: 8300000, guid: cc7da1ac72a2c39449bb2ed986e0a51b, type: 3}
+    mood: Neutral
+  - speaker: Tor
+    text: Watch your back!
+    clip: {fileID: 8300000, guid: 7e8baa4b66a79e74f9bd421e8ec9575f, type: 3}
+    mood: Yelling
+  - speaker: Tor
+    text: We came to learn why this forest has become bewitched. First, we need shelter. Follow the old road.
+    clip: {fileID: 8300000, guid: 1145757ac511ea841b0db4a8e688832e, type: 3}
+    mood: Neutral
+  - speaker: Tor
+    text: Weapons up!
+    clip: {fileID: 8300000, guid: 3718585d9624f4a4ba0ef1ccc6917507, type: 3}
+    mood: Yelling
+  - speaker: Tor
+    text: You're bleeding. Here.
+    clip: {fileID: 8300000, guid: 2b74aa70dfba66846a6ac1995b438a59, type: 3}
+    mood: Stern
+  - speaker: Yrsa
+    text: I can't go on... come back for me.
+    clip: {fileID: 8300000, guid: 1668b27669fa1bc4496e28a274da3c97, type: 3}
+    mood: Tired
+  - speaker: Yrsa
+    text: Mind the pot. If you've come to eat, you'll carry.
+    clip: {fileID: 8300000, guid: dd99dc6c12df6d848ad56f20cd74c4ab, type: 3}
+    mood: Neutral
+  - speaker: Yrsa
+    text: Show me your kitchen. No, on second thought, show me what you eat.
+    clip: {fileID: 8300000, guid: 0522fb080b1400041956fcad741b057c, type: 3}
+    mood: Neutral
+  handPlaced: []
+  subtitleTail: 0.6

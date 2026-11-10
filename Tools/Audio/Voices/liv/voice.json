@@ -1,0 +1,12 @@
+{
+  "name": "liv",
+  "description": "A young woman in her late twenties, a scholar of runes. A bright, sharp, confident voice, quick and precise, a little impatient.",
+  "reference_text": "There are old paths here, older than the villages. My teacher said the waystones connected places of shelter.",
+  "language": "English",
+  "seed": 3107,
+  "source": "designed",
+  "model": "Qwen3-TTS-12Hz-1.7B-VoiceDesign",
+  "created": "2026-11-10 19:38:37",
+  "seconds": 5.6,
+  "sample_rate": 24000
+}

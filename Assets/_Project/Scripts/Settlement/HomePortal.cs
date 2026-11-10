@@ -163,8 +163,8 @@ public sealed class HomePortal : MonoBehaviour, IArea, IBuildArea
             return;
         }
 
-        AudioManager.Play(voice, transform.position);
         questLineIndex = 0;
+        Speak();
         // Raised when the conversation ends, so the next quest doesn't appear while the portal is still speaking.
         menu ??= new HomePortalMenu(this, raid, station);
         ActionMenuWindow.Current.Open(() => menu.Build(user), user, transform, menuRange, () => RaiseTalked(user));
@@ -248,8 +248,21 @@ public sealed class HomePortal : MonoBehaviour, IArea, IBuildArea
             whisperIndex = (whisperIndex + 1) % whispers.Length;
         }
 
-        AudioManager.Play(voice, transform.position);
+        Speak();
     }
+
+    // Its line in its recorded voice when it has one (VoiceBank, under the name its story lines use), else the sound of
+    // its voice without words.
+    private void Speak()
+    {
+        if (!VoicePlayer.Say(SpeakerName, SpokenLine()))
+        {
+            AudioManager.Play(voice, transform.position);
+        }
+    }
+
+    /// <summary>The name the portal's lines are spoken under, in its menu and in story graphs alike.</summary>
+    public const string SpeakerName = "The Portal";
 
     private void DrawWard()
     {

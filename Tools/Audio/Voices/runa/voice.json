@@ -1,0 +1,12 @@
+{
+  "name": "runa",
+  "description": "A young woman in her twenties, a tracker and hunter. A quiet, alert, light and clear voice, soft-spoken but sure, quick.",
+  "reference_text": "Deer, boar, wolf, all running west out of the trees, out here where they don't belong. Nothing sleeps.",
+  "language": "English",
+  "seed": 3103,
+  "source": "designed",
+  "model": "Qwen3-TTS-12Hz-1.7B-VoiceDesign",
+  "created": "2026-11-10 19:36:31",
+  "seconds": 7.44,
+  "sample_rate": 24000
+}

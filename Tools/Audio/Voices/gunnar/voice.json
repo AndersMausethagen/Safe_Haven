@@ -1,0 +1,12 @@
+{
+  "name": "gunnar",
+  "description": "A man in his fifties, a hunter who lives alone. A low, quiet, gruff voice of few words, slow and wary.",
+  "reference_text": "You've been frightening my deer. Least you can do is give me a roof. I'll earn it.",
+  "language": "English",
+  "seed": 3109,
+  "source": "designed",
+  "model": "Qwen3-TTS-12Hz-1.7B-VoiceDesign",
+  "created": "2026-11-10 19:39:27",
+  "seconds": 5.76,
+  "sample_rate": 24000
+}

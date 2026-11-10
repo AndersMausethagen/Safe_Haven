@@ -434,6 +434,15 @@ public sealed class PrologueDirector : MonoBehaviour
         // failed raid, and what was carried does not. No durability penalty.
         if (definition.WornGearComesHome)
             GameSession.CarryPlayerState(PlayerSnapshot.Capture(Player.Current.gameObject).WhatWasWorn());
+        // The portal tells what happened at the stones, over the storm, while home loads behind it. The cinematic
+        // holds the game still, which does not stop this from waiting a frame at a time.
+        if (definition.EndingCinematic != null)
+        {
+            if (definition.LoadHomeDuringCinematic) SceneTransition.Preload(definition.HomeScene);
+            bool told = false;
+            CinematicScreen.Play(definition.EndingCinematic, () => told = true);
+            while (!told) yield return null;
+        }
         if (!SceneLoader.Load(definition.HomeScene, "Beside the old portal"))
         {
             Debug.LogError("The prologue could not start its home transition.", this);

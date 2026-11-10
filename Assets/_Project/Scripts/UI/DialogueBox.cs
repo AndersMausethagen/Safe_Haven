@@ -162,6 +162,8 @@ public sealed class DialogueBox : MonoBehaviour
     private float subtitleEnds = -1f;
     private float nextFightCheck;
     private float subtitleTimeMultiplier = 1f;
+    // True while the line shown is being heard from its recording (VoicePlayer).
+    private bool voicing;
     private bool demoting;
     // Speech bubbles (2026-11-09): a line from someone in the world is shown in a bubble over them (SpeechBubble); the
     // box then only holds the answers, if any. A voice with nobody to point at keeps the box.
@@ -203,6 +205,13 @@ public sealed class DialogueBox : MonoBehaviour
 
     /// <summary>Raised when the box closes (moved on past the last line, walked away or closed).</summary>
     public event Action Closed;
+
+    /// <summary>Raised with the speaker and the words when a line is said that has no recording: how the editor
+    /// learns of lines that still want a voice.</summary>
+    public static event Action<string, string> Unvoiced;
+
+    /// <summary>True while the line shown is being heard from its recording.</summary>
+    public bool IsVoicing => voicing && VoicePlayer.IsSpeaking;
 
     /// <summary>Shows a line; <paramref name="done"/> runs when the player moves on. Without a follow-up the box closes.</summary>
     public void Say(DialogueSpeaker speaker, string line, Action done = null, float subtitleTimeMultiplier = 1f)
@@ -379,9 +388,25 @@ public sealed class DialogueBox : MonoBehaviour
         UpdateHint();
     }
 
-    private static void Speak(DialogueSpeaker speaker, string line)
+    // The line's recording when the voice bank has one (found by speaker and words), which also ends the line before
+    // it. Otherwise the speaker's own sound, as before recordings: most people are then only read.
+    private void Speak(DialogueSpeaker speaker, string line)
     {
-        if (speaker.Voice == null || string.IsNullOrWhiteSpace(line))
+        voicing = false;
+        if (string.IsNullOrWhiteSpace(line))
+        {
+            VoicePlayer.Stop();
+            return;
+        }
+
+        if (VoicePlayer.Say(speaker.Name, line))
+        {
+            voicing = true;
+            return;
+        }
+
+        Unvoiced?.Invoke(speaker.Name, line);
+        if (speaker.Voice == null)
         {
             return;
         }
@@ -410,6 +435,20 @@ public sealed class DialogueBox : MonoBehaviour
         if (IsSubtitling && Time.time >= subtitleEnds)
         {
             FinishSubtitle();
+        }
+
+        if (IsVoicing)
+        {
+            // Nobody is left reading the line (walked away, moved on, closed): it stops with its words.
+            if (!window.IsOpen && !IsSubtitling)
+            {
+                VoicePlayer.Stop();
+                voicing = false;
+            }
+            else
+            {
+                VoicePlayer.FollowVolume();
+            }
         }
 
         if (!window.IsOpen)
@@ -591,7 +630,9 @@ public sealed class DialogueBox : MonoBehaviour
         }
 
         float seconds = (1f + (line ?? "").Length / SubtitleLettersPerSecond) * GameOptions.SubtitleHold;
-        subtitleEnds = Time.time + Mathf.Clamp(seconds, SubtitleMinSeconds, SubtitleMaxSeconds) * subtitleTimeMultiplier;
+        float reading = Mathf.Clamp(seconds, SubtitleMinSeconds, SubtitleMaxSeconds) * subtitleTimeMultiplier;
+        // A line that is heard stays until it has been said, however short its reading time.
+        subtitleEnds = Time.time + (IsVoicing ? Mathf.Max(reading, VoicePlayer.SecondsLeft + VoiceBank.Current.SubtitleTail) : reading);
     }
 
     // The line on screen when the fight started goes on as a subtitle, with whatever was to follow it.
