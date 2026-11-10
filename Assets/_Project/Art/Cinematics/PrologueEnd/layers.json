@@ -1,0 +1,180 @@
+{
+  "c01_hand": [
+    {
+      "name": "far",
+      "depth": 3.0,
+      "share": 0.588,
+      "file": "c01_hand_0_far.png"
+    },
+    {
+      "name": "middle",
+      "depth": 0.5,
+      "share": 0.326,
+      "file": "c01_hand_1_middle.png"
+    },
+    {
+      "name": "near",
+      "depth": -0.3,
+      "share": 0.085,
+      "file": "c01_hand_2_near.png"
+    }
+  ],
+  "c02_old_one": [
+    {
+      "name": "far",
+      "depth": 4.0,
+      "share": 0.594,
+      "file": "c02_old_one_0_far.png"
+    },
+    {
+      "name": "middle",
+      "depth": 1.0,
+      "share": 0.252,
+      "file": "c02_old_one_1_middle.png"
+    },
+    {
+      "name": "near",
+      "depth": 0.0,
+      "share": 0.12,
+      "file": "c02_old_one_2_near.png"
+    },
+    {
+      "name": "front",
+      "depth": -0.45,
+      "share": 0.034,
+      "file": "c02_old_one_3_front.png"
+    }
+  ],
+  "c03_break": [
+    {
+      "name": "far",
+      "depth": 3.0,
+      "share": 0.565,
+      "file": "c03_break_0_far.png"
+    },
+    {
+      "name": "middle",
+      "depth": 0.5,
+      "share": 0.363,
+      "file": "c03_break_1_middle.png"
+    },
+    {
+      "name": "near",
+      "depth": -0.3,
+      "share": 0.072,
+      "file": "c03_break_2_near.png"
+    }
+  ],
+  "c04_scattered": [
+    {
+      "name": "far",
+      "depth": 2.0,
+      "share": 0.633,
+      "file": "c04_scattered_0_far.png"
+    },
+    {
+      "name": "near",
+      "depth": 0.0,
+      "share": 0.367,
+      "file": "c04_scattered_1_near.png"
+    }
+  ],
+  "c05_catch": [
+    {
+      "name": "far",
+      "depth": 3.0,
+      "share": 0.494,
+      "file": "c05_catch_0_far.png"
+    },
+    {
+      "name": "middle",
+      "depth": 0.5,
+      "share": 0.376,
+      "file": "c05_catch_1_middle.png"
+    },
+    {
+      "name": "near",
+      "depth": -0.3,
+      "share": 0.129,
+      "file": "c05_catch_2_near.png"
+    }
+  ],
+  "c06_clearing": [
+    {
+      "name": "far",
+      "depth": 4.0,
+      "share": 0.416,
+      "file": "c06_clearing_0_far.png"
+    },
+    {
+      "name": "middle",
+      "depth": 1.0,
+      "share": 0.435,
+      "file": "c06_clearing_1_middle.png"
+    },
+    {
+      "name": "near",
+      "depth": 0.0,
+      "share": 0.131,
+      "file": "c06_clearing_2_near.png"
+    },
+    {
+      "name": "front",
+      "depth": -0.45,
+      "share": 0.018,
+      "file": "c06_clearing_3_front.png"
+    }
+  ],
+  "c07_lost": [
+    {
+      "name": "far",
+      "depth": 4.0,
+      "share": 0.537,
+      "file": "c07_lost_0_far.png"
+    },
+    {
+      "name": "middle",
+      "depth": 1.0,
+      "share": 0.361,
+      "file": "c07_lost_1_middle.png"
+    },
+    {
+      "name": "near",
+      "depth": 0.0,
+      "share": 0.084,
+      "file": "c07_lost_2_near.png"
+    },
+    {
+      "name": "front",
+      "depth": -0.45,
+      "share": 0.017,
+      "file": "c07_lost_3_front.png"
+    }
+  ],
+  "c08_hearth": [
+    {
+      "name": "far",
+      "depth": 4.0,
+      "share": 0.56,
+      "file": "c08_hearth_0_far.png"
+    },
+    {
+      "name": "middle",
+      "depth": 1.0,
+      "share": 0.293,
+      "file": "c08_hearth_1_middle.png"
+    },
+    {
+      "name": "near",
+      "depth": 0.0,
+      "share": 0.11,
+      "file": "c08_hearth_2_near.png"
+    },
+    {
+      "name": "front",
+      "depth": -0.45,
+      "share": 0.037,
+      "file": "c08_hearth_3_front.png"
+    }
+  ]
+}

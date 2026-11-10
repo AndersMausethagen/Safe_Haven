@@ -186,3 +186,5 @@ MonoBehaviour:
   recoveryText: Eirik pulls you back into shelter. Try again; your companions are still with you.
   endingSeconds: 3
   recoverySeconds: 2
+  endingCinematic: {fileID: 11400000, guid: 468c4ed3de124374fa17b8c85ad6970b, type: 2}
+  loadHomeDuringCinematic: 1

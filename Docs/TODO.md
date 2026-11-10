@@ -25,6 +25,18 @@ has listened to a single line yet.**
 - [ ] An empty folder `D:\Assets` is left from a first run that wrote its clips beside the wrong folder (moved since).
       It can be deleted.
 
+## Prologue-end cinematic "The Catch" (2026-11-10)
+
+Plays when the countdown at the waystones runs out, before home loads ([script](PrologueEndCinematic.md)). Checked in
+Play from the CLI: every shot by screenshots, and the real ending of the prologue on throwaway saves. Unheard.
+- [ ] Watch and listen to it by playing the prologue to its end (or, with the F1 cheats, skip ahead): the narration's
+      pace and feeling, the music (Eerie raid, then Nightsong from the dawn clearing), the rain, footfalls and breaking
+      stone under the first three shots.
+- [ ] 1:52 is long for a bridge between two scenes. Shots 2 and 7 are the ones to drop for about 1:10.
+- [ ] The portal's first conversation at home says some of this again ("I caught you. I could only catch one."). Trim
+      it if it reads as twice-told.
+- [ ] It plays every time the prologue ends, also after a reload of the last defence. Hold to skip is the answer for now.
+
 ## Backstory cinematic (2026-11-10)
 
 "The Old Story" plays when a new game starts ([script](BackstoryCinematic.md)). Checked in Play from the CLI: the pictures

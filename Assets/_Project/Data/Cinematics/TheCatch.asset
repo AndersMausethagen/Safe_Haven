@@ -1,0 +1,4074 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb9183cba16a7674fa31d49b8914e3da, type: 3}
+  m_Name: TheCatch
+  m_EditorClassIdentifier: SafeHaven::CinematicDefinition
+  title: The Catch
+  shots:
+  - name: The Hand On The Stone
+    arrives: 2
+    arriveSeconds: 2
+    layers:
+    - name: Far
+      kind: 0
+      picture: {fileID: 21300000, guid: 2ea60bb74e5299547bac99b15381267d, type: 3}
+      depth: 3
+      size: 1.012
+      round: 0
+      offset: {x: 0, y: 0}
+      tint: {r: 1, g: 1, b: 1, a: 1}
+      opacity:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      flicker: 0
+      flickerSpeed: 8
+      drift: {x: 0, y: 0}
+      additive: 0
+      motes:
+        count: 60
+        size: {x: 0.004, y: 0.012}
+        velocity: {x: 0, y: 0.05}
+        wander: 0.02
+        wanderSeconds: 3
+        twinkle: 0.3
+        area:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 1
+          height: 1
+        edgeFade: 0.15
+    - name: Middle
+      kind: 0
+      picture: {fileID: 21300000, guid: d23b0f5e4dc122e4d8afadf260a929e4, type: 3}
+      depth: 0.5
+      size: 1.012
+      round: 0
+      offset: {x: 0, y: 0}
+      tint: {r: 1, g: 1, b: 1, a: 1}
+      opacity:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      flicker: 0
+      flickerSpeed: 8
+      drift: {x: 0, y: 0}
+      additive: 0
+      motes:
+        count: 60
+        size: {x: 0.004, y: 0.012}
+        velocity: {x: 0, y: 0.05}
+        wander: 0.02
+        wanderSeconds: 3
+        twinkle: 0.3
+        area:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 1
+          height: 1
+        edgeFade: 0.15
+    - name: Runes Wake
+      kind: 0
+      picture: {fileID: 21300000, guid: 80f2cc667380ed34991e86eb1e524e6c, type: 3}
+      depth: 0
+      size: 0.7
+      round: 1
+      offset: {x: 0.13156, y: -0.01011999}
+      tint: {r: 1, g: 0.86, b: 0.5, a: 0.5}
+      opacity:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0.25
+          inSlope: 0
+          outSlope: 0.38641793
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 0.5175743
+          value: 0.45
+          inSlope: 0.38641793
+          outSlope: 2.7500002
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 0.7175743
+          value: 1
+          inSlope: 2.7500002
+          outSlope: -0.531113
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 0.85
+          inSlope: -0.531113
+          outSlope: 0
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      flicker: 0
+      flickerSpeed: 7
+      drift: {x: 0, y: 0}
+      additive: 1
+      motes:
+        count: 60
+        size: {x: 0.004, y: 0.012}
+        velocity: {x: 0, y: 0.05}
+        wander: 0.02
+        wanderSeconds: 3
+        twinkle: 0.3
+        area:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 1
+          height: 1
+        edgeFade: 0.15
+    - name: Near
+      kind: 0
+      picture: {fileID: 21300000, guid: 6c290bb6735bb5042b45622642b33998, type: 3}
+      depth: -0.3
+      size: 1.012
+      round: 0
+      offset: {x: 0, y: 0}
+      tint: {r: 1, g: 1, b: 1, a: 1}
+      opacity:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      flicker: 0
+      flickerSpeed: 8
+      drift: {x: 0, y: 0}
+      additive: 0
+      motes:
+        count: 60
+        size: {x: 0.004, y: 0.012}
+        velocity: {x: 0, y: 0.05}
+        wander: 0.02
+        wanderSeconds: 3
+        twinkle: 0.3
+        area:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 1
+          height: 1
+        edgeFade: 0.15
+    - name: Rain
+      kind: 1
+      picture: {fileID: 21300000, guid: 80f2cc667380ed34991e86eb1e524e6c, type: 3}
+      depth: -0.2
+      size: 1.25
+      round: 0
+      offset: {x: 0, y: 0}
+      tint: {r: 0.75, g: 0.83, b: 0.95, a: 0.5}
+      opacity:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      flicker: 0
+      flickerSpeed: 8
+      drift: {x: 0, y: 0}
+      additive: 0
+      motes:
+        count: 90
+        size: {x: 0.0015, y: 0.004}
+        velocity: {x: -0.12, y: -0.9}
+        wander: 0.01
+        wanderSeconds: 1
+        twinkle: 0.1
+        area:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 1
+          height: 1
+        edgeFade: 0.05
+    - name: Vignette
+      kind: 0
+      picture: {fileID: 21300000, guid: 46c955857d72ce946a9393f1df6b9f00, type: 3}
+      depth: 2000
+      size: 1.02
+      round: 0
+      offset: {x: 0, y: 0}
+      tint: {r: 1, g: 1, b: 1, a: 1}
+      opacity:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      flicker: 0
+      flickerSpeed: 8
+      drift: {x: 0, y: 0}
+      additive: 0
+      motes:
+        count: 60
+        size: {x: 0.004, y: 0.012}
+        velocity: {x: 0, y: 0.05}
+        wander: 0.02
+        wanderSeconds: 3
+        twinkle: 0.3
+        area:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 1
+          height: 1
+        edgeFade: 0.15
+    cameraFrom:
+      position: {x: 0, y: 0}
+      push: 0
+    cameraTo:
+      position: {x: 0, y: 0.008}
+      push: 0.06
+    easeCamera: 0
+    lines:
+    - voice: {fileID: 8300000, guid: f8cbb27cb3802de46875f5640cc00e26, type: 3}
+      subtitle: You put your hand on the stone, little one.
+      pauseBefore: 1.5
+      secondsWithoutVoice: 2.5
+    - voice: {fileID: 8300000, guid: 3c3ac55bef723264ba9e705420a753ca, type: 3}
+      subtitle: And far away, in my sleep, I felt it.
+      pauseBefore: 0.9
+      secondsWithoutVoice: 2.5
+    holdAfter: 1
+    sounds:
+    - clip: {fileID: 8300000, guid: 134dd94b00887ff42a738f5c2e36c63a, type: 3}
+      at: 0
+      volume: 0.3
+      loop: 1
+      fade: 1.5
+    - clip: {fileID: 8300000, guid: 9ec1cc51bc87f334ea26c9cceff28600, type: 3}
+      at: 5.60263
+      volume: 0.22
+      loop: 0
+      fade: 0.3
+  - name: The Old One
+    arrives: 1
+    arriveSeconds: 1.6
+    layers:
+    - name: Far
+      kind: 0
+      picture: {fileID: 21300000, guid: 3a998aefa356c3446b53f4f609576f3f, type: 3}
+      depth: 4
+      size: 1.1665599
+      round: 0
+      offset: {x: 0, y: 0}
+      tint: {r: 1, g: 1, b: 1, a: 1}
+      opacity:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      flicker: 0
+      flickerSpeed: 8
+      drift: {x: 0, y: 0}
+      additive: 0
+      motes:
+        count: 60
+        size: {x: 0.004, y: 0.012}
+        velocity: {x: 0, y: 0.05}
+        wander: 0.02
+        wanderSeconds: 3
+        twinkle: 0.3
+        area:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 1
+          height: 1
+        edgeFade: 0.15
+    - name: Lightning
+      kind: 0
+      picture: {fileID: 21300000, guid: 80f2cc667380ed34991e86eb1e524e6c, type: 3}
+      depth: 4
+      size: 1.1
+      round: 1
+      offset: {x: -0.15165278, y: 0.30330557}
+      tint: {r: 0.8, g: 0.88, b: 1, a: 0.55}
+      opacity:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 0.18
+          value: 0
+          inSlope: -0
+          outSlope: 40.000008
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 0.2
+          value: 0.8
+          inSlope: 40.000008
+          outSlope: -17.500004
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 0.24
+          value: 0.1
+          inSlope: -17.500004
+          outSlope: 25.000006
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 0.26
+          value: 0.6
+          inSlope: 25.000006
+          outSlope: -7.499999
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 0.34
+          value: 0
+          inSlope: -7.499999
+          outSlope: 0
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 0.7
+          value: 0
+          inSlope: -0
+          outSlope: 49.999897
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 0.72
+          value: 1
+          inSlope: 49.999897
+          outSlope: -26.666693
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 0.75
+          value: 0.2
+          inSlope: -26.666693
+          outSlope: 16.666683
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 0.78
+          value: 0.7
+          inSlope: 16.666683
+          outSlope: -6.999998
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 0.88
+          value: 0
+          inSlope: -6.999998
+          outSlope: 0
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 0
+          inSlope: -0
+          outSlope: 0
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      flicker: 0
+      flickerSpeed: 7
+      drift: {x: 0, y: 0}
+      additive: 1
+      motes:
+        count: 60
+        size: {x: 0.004, y: 0.012}
+        velocity: {x: 0, y: 0.05}
+        wander: 0.02
+        wanderSeconds: 3
+        twinkle: 0.3
+        area:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 1
+          height: 1
+        edgeFade: 0.15
+    - name: Middle
+      kind: 0
+      picture: {fileID: 21300000, guid: 1008af541af2e434d9364d5aa16d9038, type: 3}
+      depth: 1
+      size: 1.1665599
+      round: 0
+      offset: {x: 0, y: 0}
+      tint: {r: 1, g: 1, b: 1, a: 1}
+      opacity:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      flicker: 0
+      flickerSpeed: 8
+      drift: {x: 0, y: 0}
+      additive: 0
+      motes:
+        count: 60
+        size: {x: 0.004, y: 0.012}
+        velocity: {x: 0, y: 0.05}
+        wander: 0.02
+        wanderSeconds: 3
+        twinkle: 0.3
+        area:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 1
+          height: 1
+        edgeFade: 0.15
+    - name: Near
+      kind: 0
+      picture: {fileID: 21300000, guid: 05b55f1617e001f4da0120f070408836, type: 3}
+      depth: 0
+      size: 1.1665599
+      round: 0
+      offset: {x: 0, y: 0}
+      tint: {r: 1, g: 1, b: 1, a: 1}
+      opacity:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      flicker: 0
+      flickerSpeed: 8
+      drift: {x: 0, y: 0}
+      additive: 0
+      motes:
+        count: 60
+        size: {x: 0.004, y: 0.012}
+        velocity: {x: 0, y: 0.05}
+        wander: 0.02
+        wanderSeconds: 3
+        twinkle: 0.3
+        area:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 1
+          height: 1
+        edgeFade: 0.15
+    - name: Torch
+      kind: 0
+      picture: {fileID: 21300000, guid: 80f2cc667380ed34991e86eb1e524e6c, type: 3}
+      depth: 0
+      size: 0.16
+      round: 1
+      offset: {x: -0.11898911, y: -0.26247597}
+      tint: {r: 1, g: 0.62, b: 0.25, a: 0.45}
+      opacity:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      flicker: 0.45
+      flickerSpeed: 7
+      drift: {x: 0, y: 0}
+      additive: 1
+      motes:
+        count: 60
+        size: {x: 0.004, y: 0.012}
+        velocity: {x: 0, y: 0.05}
+        wander: 0.02
+        wanderSeconds: 3
+        twinkle: 0.3
+        area:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 1
+          height: 1
+        edgeFade: 0.15
+    - name: Torch
+      kind: 0
+      picture: {fileID: 21300000, guid: 80f2cc667380ed34991e86eb1e524e6c, type: 3}
+      depth: 0
+      size: 0.16
+      round: 1
+      offset: {x: 0.0046662493, y: -0.2706419}
+      tint: {r: 1, g: 0.62, b: 0.25, a: 0.45}
+      opacity:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      flicker: 0.45
+      flickerSpeed: 7
+      drift: {x: 0, y: 0}
+      additive: 1
+      motes:
+        count: 60
+        size: {x: 0.004, y: 0.012}
+        velocity: {x: 0, y: 0.05}
+        wander: 0.02
+        wanderSeconds: 3
+        twinkle: 0.3
+        area:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 1
+          height: 1
+        edgeFade: 0.15
+    - name: Front
+      kind: 0
+      picture: {fileID: 21300000, guid: 7246dac3b15212f4ebf71fa3b2227d23, type: 3}
+      depth: -0.45
+      size: 1.1665599
+      round: 0
+      offset: {x: 0, y: 0}
+      tint: {r: 1, g: 1, b: 1, a: 1}
+      opacity:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      flicker: 0
+      flickerSpeed: 8
+      drift: {x: 0, y: 0}
+      additive: 0
+      motes:
+        count: 60
+        size: {x: 0.004, y: 0.012}
+        velocity: {x: 0, y: 0.05}
+        wander: 0.02
+        wanderSeconds: 3
+        twinkle: 0.3
+        area:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 1
+          height: 1
+        edgeFade: 0.15
+    - name: Rain
+      kind: 1
+      picture: {fileID: 21300000, guid: 80f2cc667380ed34991e86eb1e524e6c, type: 3}
+      depth: -0.2
+      size: 1.25
+      round: 0
+      offset: {x: 0, y: 0}
+      tint: {r: 0.75, g: 0.83, b: 0.95, a: 0.5}
+      opacity:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      flicker: 0
+      flickerSpeed: 8
+      drift: {x: 0, y: 0}
+      additive: 0
+      motes:
+        count: 110
+        size: {x: 0.0015, y: 0.004}
+        velocity: {x: -0.12, y: -0.9}
+        wander: 0.01
+        wanderSeconds: 1
+        twinkle: 0.1
+        area:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 1
+          height: 1
+        edgeFade: 0.05
+    - name: Vignette
+      kind: 0
+      picture: {fileID: 21300000, guid: 46c955857d72ce946a9393f1df6b9f00, type: 3}
+      depth: 2000
+      size: 1.02
+      round: 0
+      offset: {x: 0, y: 0}
+      tint: {r: 1, g: 1, b: 1, a: 1}
+      opacity:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      flicker: 0
+      flickerSpeed: 8
+      drift: {x: 0, y: 0}
+      additive: 0
+      motes:
+        count: 60
+        size: {x: 0.004, y: 0.012}
+        velocity: {x: 0, y: 0.05}
+        wander: 0.02
+        wanderSeconds: 3
+        twinkle: 0.3
+        area:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 1
+          height: 1
+        edgeFade: 0.15
+    cameraFrom:
+      position: {x: 0, y: -0.03}
+      push: 0.03
+    cameraTo:
+      position: {x: 0, y: 0.03}
+      push: 0.03
+    easeCamera: 0
+    lines:
+    - voice: {fileID: 8300000, guid: bb65bf8f1c169ab439f54908b05f5dac, type: 3}
+      subtitle: The old one felt it too.
+      pauseBefore: 1
+      secondsWithoutVoice: 2.5
+    - voice: {fileID: 8300000, guid: 00d8affc5ea14aa4289f6c5734de880f, type: 3}
+      subtitle: It was already walking towards the stones.
+      pauseBefore: 0.7
+      secondsWithoutVoice: 2.5
+    holdAfter: 0.9
+    sounds:
+    - clip: {fileID: 8300000, guid: 134dd94b00887ff42a738f5c2e36c63a, type: 3}
+      at: 0
+      volume: 0.3
+      loop: 1
+      fade: 1
+    - clip: {fileID: 8300000, guid: 76c400206ba8e454ebe3149e4d2a7a66, type: 3}
+      at: 0.6
+      volume: 0.4
+      loop: 0
+      fade: 0.1
+    - clip: {fileID: 8300000, guid: 7d279377b25c0c84ebe3cbd45c2c5ab6, type: 3}
+      at: 4.3502946
+      volume: 0.5
+      loop: 0
+      fade: 0.1
+    - clip: {fileID: 8300000, guid: 79596768e555ce44c8c5abf4338f6a80, type: 3}
+      at: 6.350295
+      volume: 0.6
+      loop: 0
+      fade: 0.1
+  - name: The Road Tears
+    arrives: 0
+    arriveSeconds: 0
+    layers:
+    - name: Far
+      kind: 0
+      picture: {fileID: 21300000, guid: 966fe923f4f1a1f4d9ae336c70ce5eb1, type: 3}
+      depth: 3
+      size: 1.012
+      round: 0
+      offset: {x: 0, y: 0}
+      tint: {r: 1, g: 1, b: 1, a: 1}
+      opacity:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      flicker: 0
+      flickerSpeed: 8
+      drift: {x: 0, y: 0}
+      additive: 0
+      motes:
+        count: 60
+        size: {x: 0.004, y: 0.012}
+        velocity: {x: 0, y: 0.05}
+        wander: 0.02
+        wanderSeconds: 3
+        twinkle: 0.3
+        area:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 1
+          height: 1
+        edgeFade: 0.15
+    - name: Middle
+      kind: 0
+      picture: {fileID: 21300000, guid: e17a7cce25b26c7429eb74685f51c72d, type: 3}
+      depth: 0.5
+      size: 1.012
+      round: 0
+      offset: {x: 0, y: 0}
+      tint: {r: 1, g: 1, b: 1, a: 1}
+      opacity:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      flicker: 0
+      flickerSpeed: 8
+      drift: {x: 0, y: 0}
+      additive: 0
+      motes:
+        count: 60
+        size: {x: 0.004, y: 0.012}
+        velocity: {x: 0, y: 0.05}
+        wander: 0.02
+        wanderSeconds: 3
+        twinkle: 0.3
+        area:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 1
+          height: 1
+        edgeFade: 0.15
+    - name: Burst
+      kind: 0
+      picture: {fileID: 21300000, guid: 80f2cc667380ed34991e86eb1e524e6c, type: 3}
+      depth: 0
+      size: 1.5
+      round: 1
+      offset: {x: -0.01011999, y: -0.14167999}
+      tint: {r: 1, g: 0.93, b: 0.7, a: 0.75}
+      opacity:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0.55
+          inSlope: 0
+          outSlope: 0.0889109
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 0.5623609
+          value: 0.6
+          inSlope: 0.0889109
+          outSlope: 7.9999976
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 0.6123609
+          value: 1
+          inSlope: 7.9999976
+          outSlope: -2.5432527
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 0.8679391
+          value: 0.35
+          inSlope: -2.5432527
+          outSlope: -4.375001
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 0.9479391
+          value: 0
+          inSlope: -4.375001
+          outSlope: 0
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 0
+          inSlope: -0
+          outSlope: 0
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      flicker: 0.25
+      flickerSpeed: 7
+      drift: {x: 0, y: 0}
+      additive: 1
+      motes:
+        count: 60
+        size: {x: 0.004, y: 0.012}
+        velocity: {x: 0, y: 0.05}
+        wander: 0.02
+        wanderSeconds: 3
+        twinkle: 0.3
+        area:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 1
+          height: 1
+        edgeFade: 0.15
+    - name: Near
+      kind: 0
+      picture: {fileID: 21300000, guid: 6c97586700678904493c5a131c2abe5f, type: 3}
+      depth: -0.3
+      size: 1.012
+      round: 0
+      offset: {x: 0, y: 0}
+      tint: {r: 1, g: 1, b: 1, a: 1}
+      opacity:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      flicker: 0
+      flickerSpeed: 8
+      drift: {x: 0, y: 0}
+      additive: 0
+      motes:
+        count: 60
+        size: {x: 0.004, y: 0.012}
+        velocity: {x: 0, y: 0.05}
+        wander: 0.02
+        wanderSeconds: 3
+        twinkle: 0.3
+        area:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 1
+          height: 1
+        edgeFade: 0.15
+    - name: Shards
+      kind: 1
+      picture: {fileID: 21300000, guid: 80f2cc667380ed34991e86eb1e524e6c, type: 3}
+      depth: 0
+      size: 1.25
+      round: 0
+      offset: {x: 0, y: 0}
+      tint: {r: 1, g: 0.85, b: 0.5, a: 0.9}
+      opacity:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      flicker: 0
+      flickerSpeed: 8
+      drift: {x: 0, y: 0}
+      additive: 1
+      motes:
+        count: 60
+        size: {x: 0.003, y: 0.01}
+        velocity: {x: 0.09, y: 0.05}
+        wander: 0.12
+        wanderSeconds: 1.2
+        twinkle: 0.5
+        area:
+          serializedVersion: 2
+          x: 0.1
+          y: 0.1
+          width: 0.8
+          height: 0.8
+        edgeFade: 0.25
+    - name: Vignette
+      kind: 0
+      picture: {fileID: 21300000, guid: 46c955857d72ce946a9393f1df6b9f00, type: 3}
+      depth: 2000
+      size: 1.02
+      round: 0
+      offset: {x: 0, y: 0}
+      tint: {r: 1, g: 1, b: 1, a: 1}
+      opacity:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      flicker: 0
+      flickerSpeed: 8
+      drift: {x: 0, y: 0}
+      additive: 0
+      motes:
+        count: 60
+        size: {x: 0.004, y: 0.012}
+        velocity: {x: 0, y: 0.05}
+        wander: 0.02
+        wanderSeconds: 3
+        twinkle: 0.3
+        area:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 1
+          height: 1
+        edgeFade: 0.15
+    cameraFrom:
+      position: {x: 0, y: 0}
+      push: 0
+    cameraTo:
+      position: {x: 0, y: 0}
+      push: 0.1
+    easeCamera: 1
+    lines:
+    - voice: {fileID: 8300000, guid: 1b1bc6f67f576604ead8758e37121272, type: 3}
+      subtitle: Its blow fell as the way opened.
+      pauseBefore: 0.6
+      secondsWithoutVoice: 2.5
+    - voice: {fileID: 8300000, guid: 12824e0b52b80714a8f22bbf2d841c5a, type: 3}
+      subtitle: The stones broke, and the road tore.
+      pauseBefore: 0.7
+      secondsWithoutVoice: 2.5
+    holdAfter: 1.3
+    sounds:
+    - clip: {fileID: 8300000, guid: 134dd94b00887ff42a738f5c2e36c63a, type: 3}
+      at: 0
+      volume: 0.26
+      loop: 1
+      fade: 0.3
+    - clip: {fileID: 8300000, guid: 8a797451a2c21ce40b54d2023cebd50d, type: 3}
+      at: 0.90000004
+      volume: 0.6
+      loop: 0
+      fade: 0.05
+    - clip: {fileID: 8300000, guid: d73f30e980ced8046bbbbacc6d0676a1, type: 3}
+      at: 5.834517
+      volume: 0.55
+      loop: 0
+      fade: 0.05
+    - clip: {fileID: 8300000, guid: 9e884728a6ddee74ab65b5dccde199cb, type: 3}
+      at: 6.221578
+      volume: 0.5
+      loop: 0
+      fade: 0.05
+  - name: Scattered
+    arrives: 1
+    arriveSeconds: 1.6
+    layers:
+    - name: Far
+      kind: 0
+      picture: {fileID: 21300000, guid: 6aebf84038faa3e4da93b36b93de7d2d, type: 3}
+      depth: 2
+      size: 1.012
+      round: 0
+      offset: {x: 0, y: 0}
+      tint: {r: 1, g: 1, b: 1, a: 1}
+      opacity:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      flicker: 0
+      flickerSpeed: 8
+      drift: {x: 0, y: 0}
+      additive: 0
+      motes:
+        count: 60
+        size: {x: 0.004, y: 0.012}
+        velocity: {x: 0, y: 0.05}
+        wander: 0.02
+        wanderSeconds: 3
+        twinkle: 0.3
+        area:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 1
+          height: 1
+        edgeFade: 0.15
+    - name: Near
+      kind: 0
+      picture: {fileID: 21300000, guid: bd1d0ca59914c1645944c945e02a3a55, type: 3}
+      depth: 0
+      size: 1.012
+      round: 0
+      offset: {x: 0, y: 0}
+      tint: {r: 1, g: 1, b: 1, a: 1}
+      opacity:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      flicker: 0
+      flickerSpeed: 8
+      drift: {x: 0, y: 0}
+      additive: 0
+      motes:
+        count: 60
+        size: {x: 0.004, y: 0.012}
+        velocity: {x: 0, y: 0.05}
+        wander: 0.02
+        wanderSeconds: 3
+        twinkle: 0.3
+        area:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 1
+          height: 1
+        edgeFade: 0.15
+    - name: Spark 1
+      kind: 0
+      picture: {fileID: 21300000, guid: 80f2cc667380ed34991e86eb1e524e6c, type: 3}
+      depth: 0
+      size: 0.1
+      round: 1
+      offset: {x: -0.20239998, y: -0.08096001}
+      tint: {r: 1, g: 0.62, b: 0.25, a: 0.9}
+      opacity:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 0.06
+          value: 0
+          inSlope: -0
+          outSlope: 33.333336
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 0.089999996
+          value: 1
+          inSlope: 33.333336
+          outSlope: -1.4705883
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 0.26
+          value: 0.75
+          inSlope: -1.4705883
+          outSlope: -0.6081081
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 0.3
+          inSlope: -0.6081081
+          outSlope: 0
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      flicker: 0.3
+      flickerSpeed: 7
+      drift: {x: 0, y: 0}
+      additive: 1
+      motes:
+        count: 60
+        size: {x: 0.004, y: 0.012}
+        velocity: {x: 0, y: 0.05}
+        wander: 0.02
+        wanderSeconds: 3
+        twinkle: 0.3
+        area:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 1
+          height: 1
+        edgeFade: 0.15
+    - name: Spark 2
+      kind: 0
+      picture: {fileID: 21300000, guid: 80f2cc667380ed34991e86eb1e524e6c, type: 3}
+      depth: 0
+      size: 0.1
+      round: 1
+      offset: {x: 0.20239998, y: -0.06072}
+      tint: {r: 1, g: 0.62, b: 0.25, a: 0.9}
+      opacity:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 0.11329439
+          value: 0
+          inSlope: -0
+          outSlope: 33.333332
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 0.1432944
+          value: 1
+          inSlope: 33.333332
+          outSlope: -1.4705881
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 0.3132944
+          value: 0.75
+          inSlope: -1.4705881
+          outSlope: -0.65530264
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 0.3
+          inSlope: -0.65530264
+          outSlope: 0
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      flicker: 0.3
+      flickerSpeed: 7
+      drift: {x: 0, y: 0}
+      additive: 1
+      motes:
+        count: 60
+        size: {x: 0.004, y: 0.012}
+        velocity: {x: 0, y: 0.05}
+        wander: 0.02
+        wanderSeconds: 3
+        twinkle: 0.3
+        area:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 1
+          height: 1
+        edgeFade: 0.15
+    - name: Spark 3
+      kind: 0
+      picture: {fileID: 21300000, guid: 80f2cc667380ed34991e86eb1e524e6c, type: 3}
+      depth: 0
+      size: 0.1
+      round: 1
+      offset: {x: -0.42503998, y: 0.06072}
+      tint: {r: 1, g: 0.62, b: 0.25, a: 0.9}
+      opacity:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 0.16658878
+          value: 0
+          inSlope: -0
+          outSlope: 33.333332
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 0.19658878
+          value: 1
+          inSlope: 33.333332
+          outSlope: -1.4705883
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 0.36658877
+          value: 0.75
+          inSlope: -1.4705883
+          outSlope: -0.7104389
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 0.3
+          inSlope: -0.7104389
+          outSlope: 0
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      flicker: 0.3
+      flickerSpeed: 7
+      drift: {x: 0, y: 0}
+      additive: 1
+      motes:
+        count: 60
+        size: {x: 0.004, y: 0.012}
+        velocity: {x: 0, y: 0.05}
+        wander: 0.02
+        wanderSeconds: 3
+        twinkle: 0.3
+        area:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 1
+          height: 1
+        edgeFade: 0.15
+    - name: Spark 4
+      kind: 0
+      picture: {fileID: 21300000, guid: 80f2cc667380ed34991e86eb1e524e6c, type: 3}
+      depth: 2
+      size: 0.06
+      round: 1
+      offset: {x: 0.36432, y: 0.10120002}
+      tint: {r: 1, g: 0.62, b: 0.25, a: 0.9}
+      opacity:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 0.21988319
+          value: 0
+          inSlope: -0
+          outSlope: 33.333332
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 0.24988319
+          value: 1
+          inSlope: 33.333332
+          outSlope: -1.4705882
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 0.4198832
+          value: 0.75
+          inSlope: -1.4705882
+          outSlope: -0.7757058
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 0.3
+          inSlope: -0.7757058
+          outSlope: 0
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      flicker: 0.3
+      flickerSpeed: 7
+      drift: {x: 0, y: 0}
+      additive: 1
+      motes:
+        count: 60
+        size: {x: 0.004, y: 0.012}
+        velocity: {x: 0, y: 0.05}
+        wander: 0.02
+        wanderSeconds: 3
+        twinkle: 0.3
+        area:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 1
+          height: 1
+        edgeFade: 0.15
+    - name: Spark 5
+      kind: 0
+      picture: {fileID: 21300000, guid: 80f2cc667380ed34991e86eb1e524e6c, type: 3}
+      depth: 2
+      size: 0.06
+      round: 1
+      offset: {x: -0.06072, y: 0.10120002}
+      tint: {r: 1, g: 0.62, b: 0.25, a: 0.9}
+      opacity:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 0.2731776
+          value: 0
+          inSlope: -0
+          outSlope: 33.333332
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 0.3031776
+          value: 1
+          inSlope: 33.333332
+          outSlope: -1.4705881
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 0.4731776
+          value: 0.75
+          inSlope: -1.4705881
+          outSlope: -0.8541778
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 0.3
+          inSlope: -0.8541778
+          outSlope: 0
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      flicker: 0.3
+      flickerSpeed: 7
+      drift: {x: 0, y: 0}
+      additive: 1
+      motes:
+        count: 60
+        size: {x: 0.004, y: 0.012}
+        velocity: {x: 0, y: 0.05}
+        wander: 0.02
+        wanderSeconds: 3
+        twinkle: 0.3
+        area:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 1
+          height: 1
+        edgeFade: 0.15
+    - name: Spark 6
+      kind: 0
+      picture: {fileID: 21300000, guid: 80f2cc667380ed34991e86eb1e524e6c, type: 3}
+      depth: 2
+      size: 0.06
+      round: 1
+      offset: {x: -0.24288, y: 0.16192003}
+      tint: {r: 1, g: 0.62, b: 0.25, a: 0.9}
+      opacity:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 0.32647198
+          value: 0
+          inSlope: -0
+          outSlope: 33.333332
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 0.356472
+          value: 1
+          inSlope: 33.333332
+          outSlope: -1.4705883
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 0.526472
+          value: 0.75
+          inSlope: -1.4705883
+          outSlope: -0.9503133
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 0.3
+          inSlope: -0.9503133
+          outSlope: 0
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      flicker: 0.3
+      flickerSpeed: 7
+      drift: {x: 0, y: 0}
+      additive: 1
+      motes:
+        count: 60
+        size: {x: 0.004, y: 0.012}
+        velocity: {x: 0, y: 0.05}
+        wander: 0.02
+        wanderSeconds: 3
+        twinkle: 0.3
+        area:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 1
+          height: 1
+        edgeFade: 0.15
+    - name: Spark 7
+      kind: 0
+      picture: {fileID: 21300000, guid: 80f2cc667380ed34991e86eb1e524e6c, type: 3}
+      depth: 2
+      size: 0.06
+      round: 1
+      offset: {x: 0.16192003, y: 0.18216}
+      tint: {r: 1, g: 0.62, b: 0.25, a: 0.9}
+      opacity:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 0.37976637
+          value: 0
+          inSlope: -0
+          outSlope: 33.333332
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 0.40976638
+          value: 1
+          inSlope: 33.333332
+          outSlope: -1.4705881
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 0.5797664
+          value: 0.75
+          inSlope: -1.4705881
+          outSlope: -1.070833
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 0.3
+          inSlope: -1.070833
+          outSlope: 0
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      flicker: 0.3
+      flickerSpeed: 7
+      drift: {x: 0, y: 0}
+      additive: 1
+      motes:
+        count: 60
+        size: {x: 0.004, y: 0.012}
+        velocity: {x: 0, y: 0.05}
+        wander: 0.02
+        wanderSeconds: 3
+        twinkle: 0.3
+        area:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 1
+          height: 1
+        edgeFade: 0.15
+    - name: Mist Over The Trees
+      kind: 0
+      picture: {fileID: 21300000, guid: 63a5157df9ff02f4ea5361f716ec4277, type: 3}
+      depth: -0.3
+      size: 1.9
+      round: 0
+      offset: {x: 0, y: -0.2}
+      tint: {r: 0.78, g: 0.86, b: 1, a: 0.3}
+      opacity:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      flicker: 0
+      flickerSpeed: 8
+      drift: {x: 0.01, y: 0}
+      additive: 0
+      motes:
+        count: 60
+        size: {x: 0.004, y: 0.012}
+        velocity: {x: 0, y: 0.05}
+        wander: 0.02
+        wanderSeconds: 3
+        twinkle: 0.3
+        area:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 1
+          height: 1
+        edgeFade: 0.15
+    - name: Vignette
+      kind: 0
+      picture: {fileID: 21300000, guid: 46c955857d72ce946a9393f1df6b9f00, type: 3}
+      depth: 2000
+      size: 1.02
+      round: 0
+      offset: {x: 0, y: 0}
+      tint: {r: 1, g: 1, b: 1, a: 1}
+      opacity:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      flicker: 0
+      flickerSpeed: 8
+      drift: {x: 0, y: 0}
+      additive: 0
+      motes:
+        count: 60
+        size: {x: 0.004, y: 0.012}
+        velocity: {x: 0, y: 0.05}
+        wander: 0.02
+        wanderSeconds: 3
+        twinkle: 0.3
+        area:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 1
+          height: 1
+        edgeFade: 0.15
+    cameraFrom:
+      position: {x: 0, y: 0}
+      push: 0.22
+    cameraTo:
+      position: {x: 0, y: 0}
+      push: 0
+    easeCamera: 1
+    lines:
+    - voice: {fileID: 8300000, guid: e482f05743c6ba6479260594966415e4, type: 3}
+      subtitle: Everyone in that ring was thrown into the dark.
+      pauseBefore: 1
+      secondsWithoutVoice: 2.5
+    - voice: {fileID: 8300000, guid: 4b072d53f5513d74c9e05972a946472b, type: 3}
+      subtitle: Seven of your people are out there now, scattered like sparks across the Misty Woods.
+      pauseBefore: 0.8
+      secondsWithoutVoice: 2.5
+    holdAfter: 1.3
+    sounds:
+    - clip: {fileID: 8300000, guid: 472eedd262c69694a98e11e14897ecc3, type: 3}
+      at: 0
+      volume: 0.3
+      loop: 1
+      fade: 1.2
+  - name: The Catch
+    arrives: 1
+    arriveSeconds: 1.6
+    layers:
+    - name: Far
+      kind: 0
+      picture: {fileID: 21300000, guid: 98d7e37c754639b42a907818b9dfa8b3, type: 3}
+      depth: 3
+      size: 1.127657
+      round: 0
+      offset: {x: 0, y: 0}
+      tint: {r: 1, g: 1, b: 1, a: 1}
+      opacity:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      flicker: 0
+      flickerSpeed: 8
+      drift: {x: 0, y: 0}
+      additive: 0
+      motes:
+        count: 60
+        size: {x: 0.004, y: 0.012}
+        velocity: {x: 0, y: 0.05}
+        wander: 0.02
+        wanderSeconds: 3
+        twinkle: 0.3
+        area:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 1
+          height: 1
+        edgeFade: 0.15
+    - name: The Door's Light
+      kind: 0
+      picture: {fileID: 21300000, guid: 80f2cc667380ed34991e86eb1e524e6c, type: 3}
+      depth: 0.5
+      size: 1.1
+      round: 1
+      offset: {x: 0.1747868, y: 0.11276573}
+      tint: {r: 1, g: 0.86, b: 0.5, a: 0.6}
+      opacity:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0.15
+          inSlope: 0
+          outSlope: 0.2243851
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 0.44566238
+          value: 0.25
+          inSlope: 0.2243851
+          outSlope: 9.375002
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 0.52566236
+          value: 1
+          inSlope: 9.375002
+          outSlope: -0.8094153
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 0.64920837
+          value: 0.9
+          inSlope: -0.8094153
+          outSlope: -0.570139
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 0.7
+          inSlope: -0.570139
+          outSlope: 0
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      flicker: 0
+      flickerSpeed: 7
+      drift: {x: 0, y: 0}
+      additive: 1
+      motes:
+        count: 60
+        size: {x: 0.004, y: 0.012}
+        velocity: {x: 0, y: 0.05}
+        wander: 0.02
+        wanderSeconds: 3
+        twinkle: 0.3
+        area:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 1
+          height: 1
+        edgeFade: 0.15
+    - name: Middle
+      kind: 0
+      picture: {fileID: 21300000, guid: 700d15acd03d3124d92090692ce6ff8e, type: 3}
+      depth: 0.5
+      size: 1.127657
+      round: 0
+      offset: {x: 0, y: 0}
+      tint: {r: 1, g: 1, b: 1, a: 1}
+      opacity:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      flicker: 0
+      flickerSpeed: 8
+      drift: {x: 0, y: 0}
+      additive: 0
+      motes:
+        count: 60
+        size: {x: 0.004, y: 0.012}
+        velocity: {x: 0, y: 0.05}
+        wander: 0.02
+        wanderSeconds: 3
+        twinkle: 0.3
+        area:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 1
+          height: 1
+        edgeFade: 0.15
+    - name: Near
+      kind: 0
+      picture: {fileID: 21300000, guid: d468c606080a1a44b97b032c181155d3, type: 3}
+      depth: -0.3
+      size: 1.127657
+      round: 0
+      offset: {x: 0, y: 0}
+      tint: {r: 1, g: 1, b: 1, a: 1}
+      opacity:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      flicker: 0
+      flickerSpeed: 8
+      drift: {x: 0, y: 0}
+      additive: 0
+      motes:
+        count: 60
+        size: {x: 0.004, y: 0.012}
+        velocity: {x: 0, y: 0.05}
+        wander: 0.02
+        wanderSeconds: 3
+        twinkle: 0.3
+        area:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 1
+          height: 1
+        edgeFade: 0.15
+    - name: Motes
+      kind: 1
+      picture: {fileID: 21300000, guid: 80f2cc667380ed34991e86eb1e524e6c, type: 3}
+      depth: 0
+      size: 1.25
+      round: 0
+      offset: {x: 0, y: 0}
+      tint: {r: 1, g: 0.86, b: 0.5, a: 1}
+      opacity:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      flicker: 0
+      flickerSpeed: 8
+      drift: {x: 0, y: 0}
+      additive: 1
+      motes:
+        count: 50
+        size: {x: 0.002, y: 0.007}
+        velocity: {x: 0.004, y: 0.06}
+        wander: 0.03
+        wanderSeconds: 3
+        twinkle: 0.7
+        area:
+          serializedVersion: 2
+          x: 0.15
+          y: 0
+          width: 0.7
+          height: 0.9
+        edgeFade: 0.3
+    - name: Vignette
+      kind: 0
+      picture: {fileID: 21300000, guid: 46c955857d72ce946a9393f1df6b9f00, type: 3}
+      depth: 2000
+      size: 1.02
+      round: 0
+      offset: {x: 0, y: 0}
+      tint: {r: 1, g: 1, b: 1, a: 1}
+      opacity:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      flicker: 0
+      flickerSpeed: 8
+      drift: {x: 0, y: 0}
+      additive: 0
+      motes:
+        count: 60
+        size: {x: 0.004, y: 0.012}
+        velocity: {x: 0, y: 0.05}
+        wander: 0.02
+        wanderSeconds: 3
+        twinkle: 0.3
+        area:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 1
+          height: 1
+        edgeFade: 0.15
+    cameraFrom:
+      position: {x: 0, y: 0.04}
+      push: 0
+    cameraTo:
+      position: {x: 0, y: -0.02}
+      push: 0.06
+    easeCamera: 1
+    lines:
+    - voice: {fileID: 8300000, guid: 423ea9d87da841a4e8bf7a9a3706b39f, type: 3}
+      subtitle: I am old, and thin, and I had slept a hundred winters.
+      pauseBefore: 0.9
+      secondsWithoutVoice: 2.5
+    - voice: {fileID: 8300000, guid: c2ec8d29205b9a04ca7bb655dd1bf65b, type: 3}
+      subtitle: But I reached.
+      pauseBefore: 0.9
+      secondsWithoutVoice: 2.5
+    - voice: {fileID: 8300000, guid: a6bcc5e1b26e1b247836baf329f485bf, type: 3}
+      subtitle: I caught one. I could only catch one.
+      pauseBefore: 0.9
+      secondsWithoutVoice: 2.5
+    holdAfter: 1.4
+    sounds:
+    - clip: {fileID: 8300000, guid: 472eedd262c69694a98e11e14897ecc3, type: 3}
+      at: 0
+      volume: 0.22
+      loop: 1
+      fade: 1
+    - clip: {fileID: 8300000, guid: 49e337a5622782b458c0e5b5212176ef, type: 3}
+      at: 6.6182313
+      volume: 0.4
+      loop: 0
+      fade: 0.2
+  - name: The Clearing
+    arrives: 1
+    arriveSeconds: 2.2
+    layers:
+    - name: Far
+      kind: 0
+      picture: {fileID: 21300000, guid: 7c391b127f520f047bb11a6934acea20, type: 3}
+      depth: 4
+      size: 1.0303999
+      round: 0
+      offset: {x: 0, y: 0}
+      tint: {r: 1, g: 1, b: 1, a: 1}
+      opacity:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      flicker: 0
+      flickerSpeed: 8
+      drift: {x: 0, y: 0}
+      additive: 0
+      motes:
+        count: 60
+        size: {x: 0.004, y: 0.012}
+        velocity: {x: 0, y: 0.05}
+        wander: 0.02
+        wanderSeconds: 3
+        twinkle: 0.3
+        area:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 1
+          height: 1
+        edgeFade: 0.15
+    - name: Middle
+      kind: 0
+      picture: {fileID: 21300000, guid: 64ec704ad7a1c924cb24a0d405b74654, type: 3}
+      depth: 1
+      size: 1.0303999
+      round: 0
+      offset: {x: 0, y: 0}
+      tint: {r: 1, g: 1, b: 1, a: 1}
+      opacity:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      flicker: 0
+      flickerSpeed: 8
+      drift: {x: 0, y: 0}
+      additive: 0
+      motes:
+        count: 60
+        size: {x: 0.004, y: 0.012}
+        velocity: {x: 0, y: 0.05}
+        wander: 0.02
+        wanderSeconds: 3
+        twinkle: 0.3
+        area:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 1
+          height: 1
+        edgeFade: 0.15
+    - name: Near
+      kind: 0
+      picture: {fileID: 21300000, guid: 60f623b3fb43f974aad89e8c39a32d77, type: 3}
+      depth: 0
+      size: 1.0303999
+      round: 0
+      offset: {x: 0, y: 0}
+      tint: {r: 1, g: 1, b: 1, a: 1}
+      opacity:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      flicker: 0
+      flickerSpeed: 8
+      drift: {x: 0, y: 0}
+      additive: 0
+      motes:
+        count: 60
+        size: {x: 0.004, y: 0.012}
+        velocity: {x: 0, y: 0.05}
+        wander: 0.02
+        wanderSeconds: 3
+        twinkle: 0.3
+        area:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 1
+          height: 1
+        edgeFade: 0.15
+    - name: Front
+      kind: 0
+      picture: {fileID: 21300000, guid: f995dd49888ef364f8fecaf95668d3bc, type: 3}
+      depth: -0.45
+      size: 1.0303999
+      round: 0
+      offset: {x: 0, y: 0}
+      tint: {r: 1, g: 1, b: 1, a: 1}
+      opacity:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      flicker: 0
+      flickerSpeed: 8
+      drift: {x: 0, y: 0}
+      additive: 0
+      motes:
+        count: 60
+        size: {x: 0.004, y: 0.012}
+        velocity: {x: 0, y: 0.05}
+        wander: 0.02
+        wanderSeconds: 3
+        twinkle: 0.3
+        area:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 1
+          height: 1
+        edgeFade: 0.15
+    - name: Fireflies
+      kind: 1
+      picture: {fileID: 21300000, guid: 80f2cc667380ed34991e86eb1e524e6c, type: 3}
+      depth: 0.5
+      size: 1.25
+      round: 0
+      offset: {x: 0, y: 0}
+      tint: {r: 0.9, g: 1, b: 0.6, a: 0.9}
+      opacity:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      flicker: 0
+      flickerSpeed: 8
+      drift: {x: 0, y: 0}
+      additive: 1
+      motes:
+        count: 24
+        size: {x: 0.002, y: 0.005}
+        velocity: {x: 0.006, y: 0.004}
+        wander: 0.04
+        wanderSeconds: 4
+        twinkle: 0.9
+        area:
+          serializedVersion: 2
+          x: 0.1
+          y: 0.15
+          width: 0.8
+          height: 0.6
+        edgeFade: 0.25
+    - name: Morning Mist
+      kind: 0
+      picture: {fileID: 21300000, guid: 63a5157df9ff02f4ea5361f716ec4277, type: 3}
+      depth: 1.5
+      size: 1.9
+      round: 0
+      offset: {x: 0, y: -0.2}
+      tint: {r: 0.78, g: 0.86, b: 1, a: 0.2}
+      opacity:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      flicker: 0
+      flickerSpeed: 8
+      drift: {x: 0.008, y: 0}
+      additive: 0
+      motes:
+        count: 60
+        size: {x: 0.004, y: 0.012}
+        velocity: {x: 0, y: 0.05}
+        wander: 0.02
+        wanderSeconds: 3
+        twinkle: 0.3
+        area:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 1
+          height: 1
+        edgeFade: 0.15
+    - name: Vignette
+      kind: 0
+      picture: {fileID: 21300000, guid: 46c955857d72ce946a9393f1df6b9f00, type: 3}
+      depth: 2000
+      size: 1.02
+      round: 0
+      offset: {x: 0, y: 0}
+      tint: {r: 1, g: 1, b: 1, a: 0.5}
+      opacity:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      flicker: 0
+      flickerSpeed: 8
+      drift: {x: 0, y: 0}
+      additive: 0
+      motes:
+        count: 60
+        size: {x: 0.004, y: 0.012}
+        velocity: {x: 0, y: 0.05}
+        wander: 0.02
+        wanderSeconds: 3
+        twinkle: 0.3
+        area:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 1
+          height: 1
+        edgeFade: 0.15
+    cameraFrom:
+      position: {x: 0, y: -0.01}
+      push: 0.09
+    cameraTo:
+      position: {x: 0, y: 0.005}
+      push: 0
+    easeCamera: 1
+    lines:
+    - voice: {fileID: 8300000, guid: 1f53a58f17d56bd48804d34618802aa6, type: 3}
+      subtitle: 'So here you are: my clearing.'
+      pauseBefore: 1.3
+      secondsWithoutVoice: 2.5
+    - voice: {fileID: 8300000, guid: 697ac9cb9bf0c4f4f93da2978e3de1ac, type: 3}
+      subtitle: The last place the forest has not taken.
+      pauseBefore: 0.7
+      secondsWithoutVoice: 2.5
+    holdAfter: 1.2
+    sounds:
+    - clip: {fileID: 8300000, guid: abbb49de8e0306f44807c0280fe52ee7, type: 3}
+      at: 1.2
+      volume: 0.2
+      loop: 0
+      fade: 0.2
+    - clip: {fileID: 8300000, guid: 0349f31f793db2f43b85c009ecdc4899, type: 3}
+      at: 4.6
+      volume: 0.16
+      loop: 0
+      fade: 0.2
+  - name: The Forgetting
+    arrives: 1
+    arriveSeconds: 1.8
+    layers:
+    - name: Far
+      kind: 0
+      picture: {fileID: 21300000, guid: 92372841fbcd30d4998813f3a2af4dd8, type: 3}
+      depth: 4
+      size: 1.18496
+      round: 0
+      offset: {x: 0, y: 0}
+      tint: {r: 1, g: 1, b: 1, a: 1}
+      opacity:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      flicker: 0
+      flickerSpeed: 8
+      drift: {x: 0, y: 0}
+      additive: 0
+      motes:
+        count: 60
+        size: {x: 0.004, y: 0.012}
+        velocity: {x: 0, y: 0.05}
+        wander: 0.02
+        wanderSeconds: 3
+        twinkle: 0.3
+        area:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 1
+          height: 1
+        edgeFade: 0.15
+    - name: Lantern
+      kind: 0
+      picture: {fileID: 21300000, guid: 80f2cc667380ed34991e86eb1e524e6c, type: 3}
+      depth: 1
+      size: 0.12
+      round: 1
+      offset: {x: -0.071097605, y: -0.3673376}
+      tint: {r: 1, g: 0.62, b: 0.25, a: 0.7}
+      opacity:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: -0.13899222
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 0.7194649
+          value: 0.9
+          inSlope: -0.13899222
+          outSlope: -5.416666
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 0.8394649
+          value: 0.25
+          inSlope: -5.416666
+          outSlope: -0.80979174
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 0.12
+          inSlope: -0.80979174
+          outSlope: 0
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      flicker: 0.3
+      flickerSpeed: 7
+      drift: {x: 0, y: 0}
+      additive: 1
+      motes:
+        count: 60
+        size: {x: 0.004, y: 0.012}
+        velocity: {x: 0, y: 0.05}
+        wander: 0.02
+        wanderSeconds: 3
+        twinkle: 0.3
+        area:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 1
+          height: 1
+        edgeFade: 0.15
+    - name: Middle
+      kind: 0
+      picture: {fileID: 21300000, guid: 5b649255e6c72ec4d8facd91a9d9f319, type: 3}
+      depth: 1
+      size: 1.18496
+      round: 0
+      offset: {x: 0, y: 0}
+      tint: {r: 1, g: 1, b: 1, a: 1}
+      opacity:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      flicker: 0
+      flickerSpeed: 8
+      drift: {x: 0, y: 0}
+      additive: 0
+      motes:
+        count: 60
+        size: {x: 0.004, y: 0.012}
+        velocity: {x: 0, y: 0.05}
+        wander: 0.02
+        wanderSeconds: 3
+        twinkle: 0.3
+        area:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 1
+          height: 1
+        edgeFade: 0.15
+    - name: Mist Closing In
+      kind: 0
+      picture: {fileID: 21300000, guid: 63a5157df9ff02f4ea5361f716ec4277, type: 3}
+      depth: 0.6
+      size: 1.9
+      round: 0
+      offset: {x: 0, y: -0.2}
+      tint: {r: 0.78, g: 0.86, b: 1, a: 0.6}
+      opacity:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0.2
+          inSlope: 0
+          outSlope: 0.8
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0.8
+          outSlope: 0
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      flicker: 0
+      flickerSpeed: 8
+      drift: {x: 0.012, y: 0.003}
+      additive: 0
+      motes:
+        count: 60
+        size: {x: 0.004, y: 0.012}
+        velocity: {x: 0, y: 0.05}
+        wander: 0.02
+        wanderSeconds: 3
+        twinkle: 0.3
+        area:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 1
+          height: 1
+        edgeFade: 0.15
+    - name: Near
+      kind: 0
+      picture: {fileID: 21300000, guid: 73f75c3ac7f3ca14dbdcaec3e40e78d9, type: 3}
+      depth: 0
+      size: 1.18496
+      round: 0
+      offset: {x: 0, y: 0}
+      tint: {r: 1, g: 1, b: 1, a: 1}
+      opacity:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      flicker: 0
+      flickerSpeed: 8
+      drift: {x: 0, y: 0}
+      additive: 0
+      motes:
+        count: 60
+        size: {x: 0.004, y: 0.012}
+        velocity: {x: 0, y: 0.05}
+        wander: 0.02
+        wanderSeconds: 3
+        twinkle: 0.3
+        area:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 1
+          height: 1
+        edgeFade: 0.15
+    - name: Front
+      kind: 0
+      picture: {fileID: 21300000, guid: 9a1a8475077613949a3bf075972fba5c, type: 3}
+      depth: -0.45
+      size: 1.18496
+      round: 0
+      offset: {x: 0, y: 0}
+      tint: {r: 1, g: 1, b: 1, a: 1}
+      opacity:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      flicker: 0
+      flickerSpeed: 8
+      drift: {x: 0, y: 0}
+      additive: 0
+      motes:
+        count: 60
+        size: {x: 0.004, y: 0.012}
+        velocity: {x: 0, y: 0.05}
+        wander: 0.02
+        wanderSeconds: 3
+        twinkle: 0.3
+        area:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 1
+          height: 1
+        edgeFade: 0.15
+    - name: Vignette
+      kind: 0
+      picture: {fileID: 21300000, guid: 46c955857d72ce946a9393f1df6b9f00, type: 3}
+      depth: 2000
+      size: 1.02
+      round: 0
+      offset: {x: 0, y: 0}
+      tint: {r: 1, g: 1, b: 1, a: 1}
+      opacity:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      flicker: 0
+      flickerSpeed: 8
+      drift: {x: 0, y: 0}
+      additive: 0
+      motes:
+        count: 60
+        size: {x: 0.004, y: 0.012}
+        velocity: {x: 0, y: 0.05}
+        wander: 0.02
+        wanderSeconds: 3
+        twinkle: 0.3
+        area:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 1
+          height: 1
+        edgeFade: 0.15
+    cameraFrom:
+      position: {x: -0.03, y: 0}
+      push: 0.02
+    cameraTo:
+      position: {x: 0.03, y: 0}
+      push: 0.02
+    easeCamera: 0
+    lines:
+    - voice: {fileID: 8300000, guid: 01ff7f145a6f7854697f9728aa31e6d0, type: 3}
+      subtitle: The others are alive.
+      pauseBefore: 1
+      secondsWithoutVoice: 2.5
+    - voice: {fileID: 8300000, guid: 2531d771fe5f8b64c9feb359d013b1c2, type: 3}
+      subtitle: But the forest does not kill the lost. It forgets them.
+      pauseBefore: 0.7
+      secondsWithoutVoice: 2.5
+    - voice: {fileID: 8300000, guid: 2f075b6ff7684384ea0d1270a21280f8, type: 3}
+      subtitle: And it has already begun.
+      pauseBefore: 0.8
+      secondsWithoutVoice: 2.5
+    holdAfter: 1.1
+    sounds:
+    - clip: {fileID: 8300000, guid: 472eedd262c69694a98e11e14897ecc3, type: 3}
+      at: 0
+      volume: 0.26
+      loop: 1
+      fade: 1.2
+    - clip: {fileID: 8300000, guid: 46d9fd4f6abf526449d0ffc3b11e94d4, type: 3}
+      at: 2.2
+      volume: 0.26
+      loop: 0
+      fade: 0.2
+  - name: A Hearth
+    arrives: 1
+    arriveSeconds: 1.8
+    layers:
+    - name: Far
+      kind: 0
+      picture: {fileID: 21300000, guid: fcea002c4293acd40b546f75ca92e7a6, type: 3}
+      depth: 4
+      size: 1.012
+      round: 0
+      offset: {x: 0, y: 0}
+      tint: {r: 1, g: 1, b: 1, a: 1}
+      opacity:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      flicker: 0
+      flickerSpeed: 8
+      drift: {x: 0, y: 0}
+      additive: 0
+      motes:
+        count: 60
+        size: {x: 0.004, y: 0.012}
+        velocity: {x: 0, y: 0.05}
+        wander: 0.02
+        wanderSeconds: 3
+        twinkle: 0.3
+        area:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 1
+          height: 1
+        edgeFade: 0.15
+    - name: A Light Answers
+      kind: 0
+      picture: {fileID: 21300000, guid: 80f2cc667380ed34991e86eb1e524e6c, type: 3}
+      depth: 4
+      size: 0.07
+      round: 1
+      offset: {x: 0.22264002, y: 0.02023998}
+      tint: {r: 1, g: 0.62, b: 0.25, a: 0.9}
+      opacity:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 0.7096675
+          value: 0
+          inSlope: -0
+          outSlope: 19.999996
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 0.7596675
+          value: 1
+          inSlope: 19.999996
+          outSlope: -3.333334
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 0.9096675
+          value: 0.5
+          inSlope: -3.333334
+          outSlope: 2.2140422
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 0.7
+          inSlope: 2.2140422
+          outSlope: 0
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      flicker: 0.2
+      flickerSpeed: 7
+      drift: {x: 0, y: 0}
+      additive: 1
+      motes:
+        count: 60
+        size: {x: 0.004, y: 0.012}
+        velocity: {x: 0, y: 0.05}
+        wander: 0.02
+        wanderSeconds: 3
+        twinkle: 0.3
+        area:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 1
+          height: 1
+        edgeFade: 0.15
+    - name: Middle
+      kind: 0
+      picture: {fileID: 21300000, guid: 88c65339eea13974398d633473df54fc, type: 3}
+      depth: 1
+      size: 1.012
+      round: 0
+      offset: {x: 0, y: 0}
+      tint: {r: 1, g: 1, b: 1, a: 1}
+      opacity:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      flicker: 0
+      flickerSpeed: 8
+      drift: {x: 0, y: 0}
+      additive: 0
+      motes:
+        count: 60
+        size: {x: 0.004, y: 0.012}
+        velocity: {x: 0, y: 0.05}
+        wander: 0.02
+        wanderSeconds: 3
+        twinkle: 0.3
+        area:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 1
+          height: 1
+        edgeFade: 0.15
+    - name: Near
+      kind: 0
+      picture: {fileID: 21300000, guid: 7daae4f369e22834e8612e999ae77c88, type: 3}
+      depth: 0
+      size: 1.012
+      round: 0
+      offset: {x: 0, y: 0}
+      tint: {r: 1, g: 1, b: 1, a: 1}
+      opacity:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      flicker: 0
+      flickerSpeed: 8
+      drift: {x: 0, y: 0}
+      additive: 0
+      motes:
+        count: 60
+        size: {x: 0.004, y: 0.012}
+        velocity: {x: 0, y: 0.05}
+        wander: 0.02
+        wanderSeconds: 3
+        twinkle: 0.3
+        area:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 1
+          height: 1
+        edgeFade: 0.15
+    - name: Firelight
+      kind: 0
+      picture: {fileID: 21300000, guid: 80f2cc667380ed34991e86eb1e524e6c, type: 3}
+      depth: 0
+      size: 0.8
+      round: 1
+      offset: {x: 0.013156011, y: -0.22769998}
+      tint: {r: 1, g: 0.62, b: 0.25, a: 0.4}
+      opacity:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      flicker: 0.3
+      flickerSpeed: 7
+      drift: {x: 0, y: 0}
+      additive: 1
+      motes:
+        count: 60
+        size: {x: 0.004, y: 0.012}
+        velocity: {x: 0, y: 0.05}
+        wander: 0.02
+        wanderSeconds: 3
+        twinkle: 0.3
+        area:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 1
+          height: 1
+        edgeFade: 0.15
+    - name: Front
+      kind: 0
+      picture: {fileID: 21300000, guid: d765a23bcac0fe948b3cb5fae33fd10c, type: 3}
+      depth: -0.45
+      size: 1.012
+      round: 0
+      offset: {x: 0, y: 0}
+      tint: {r: 1, g: 1, b: 1, a: 1}
+      opacity:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      flicker: 0
+      flickerSpeed: 8
+      drift: {x: 0, y: 0}
+      additive: 0
+      motes:
+        count: 60
+        size: {x: 0.004, y: 0.012}
+        velocity: {x: 0, y: 0.05}
+        wander: 0.02
+        wanderSeconds: 3
+        twinkle: 0.3
+        area:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 1
+          height: 1
+        edgeFade: 0.15
+    - name: Sparks
+      kind: 1
+      picture: {fileID: 21300000, guid: 80f2cc667380ed34991e86eb1e524e6c, type: 3}
+      depth: 0
+      size: 1.25
+      round: 0
+      offset: {x: 0, y: 0}
+      tint: {r: 1, g: 0.42, b: 0.12, a: 1}
+      opacity:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      flicker: 0
+      flickerSpeed: 8
+      drift: {x: 0, y: 0}
+      additive: 1
+      motes:
+        count: 20
+        size: {x: 0.002, y: 0.006}
+        velocity: {x: 0.008, y: 0.1}
+        wander: 0.02
+        wanderSeconds: 2
+        twinkle: 0.5
+        area:
+          serializedVersion: 2
+          x: 0.44300002
+          y: 0.245
+          width: 0.14
+          height: 0.45
+        edgeFade: 0.3
+    - name: Vignette
+      kind: 0
+      picture: {fileID: 21300000, guid: 46c955857d72ce946a9393f1df6b9f00, type: 3}
+      depth: 2000
+      size: 1.02
+      round: 0
+      offset: {x: 0, y: 0}
+      tint: {r: 1, g: 1, b: 1, a: 0.75}
+      opacity:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      flicker: 0
+      flickerSpeed: 8
+      drift: {x: 0, y: 0}
+      additive: 0
+      motes:
+        count: 60
+        size: {x: 0.004, y: 0.012}
+        velocity: {x: 0, y: 0.05}
+        wander: 0.02
+        wanderSeconds: 3
+        twinkle: 0.3
+        area:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 1
+          height: 1
+        edgeFade: 0.15
+    cameraFrom:
+      position: {x: 0, y: 0}
+      push: 0
+    cameraTo:
+      position: {x: 0, y: -0.006}
+      push: 0.07
+    easeCamera: 0
+    lines:
+    - voice: {fileID: 8300000, guid: 439789d6b4e18dd4bba24c9e801cf0bb, type: 3}
+      subtitle: 'There is one thing it cannot forget: a hearth that someone tends.'
+      pauseBefore: 1
+      secondsWithoutVoice: 2.5
+    - voice: {fileID: 8300000, guid: 252a9ed72c5ca23489cf5a101c02e59b, type: 3}
+      subtitle: Light one beside my stones, and they will see it, and know which way is home.
+      pauseBefore: 0.8
+      secondsWithoutVoice: 2.5
+    holdAfter: 1.2
+    sounds: []
+  - name: Wake Up
+    arrives: 1
+    arriveSeconds: 2
+    layers:
+    - name: Far
+      kind: 0
+      picture: {fileID: 21300000, guid: 7c391b127f520f047bb11a6934acea20, type: 3}
+      depth: 4
+      size: 1.3064
+      round: 0
+      offset: {x: 0, y: 0}
+      tint: {r: 1, g: 1, b: 1, a: 1}
+      opacity:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      flicker: 0
+      flickerSpeed: 8
+      drift: {x: 0, y: 0}
+      additive: 0
+      motes:
+        count: 60
+        size: {x: 0.004, y: 0.012}
+        velocity: {x: 0, y: 0.05}
+        wander: 0.02
+        wanderSeconds: 3
+        twinkle: 0.3
+        area:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 1
+          height: 1
+        edgeFade: 0.15
+    - name: Middle
+      kind: 0
+      picture: {fileID: 21300000, guid: 64ec704ad7a1c924cb24a0d405b74654, type: 3}
+      depth: 1
+      size: 1.3064
+      round: 0
+      offset: {x: 0, y: 0}
+      tint: {r: 1, g: 1, b: 1, a: 1}
+      opacity:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      flicker: 0
+      flickerSpeed: 8
+      drift: {x: 0, y: 0}
+      additive: 0
+      motes:
+        count: 60
+        size: {x: 0.004, y: 0.012}
+        velocity: {x: 0, y: 0.05}
+        wander: 0.02
+        wanderSeconds: 3
+        twinkle: 0.3
+        area:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 1
+          height: 1
+        edgeFade: 0.15
+    - name: Near
+      kind: 0
+      picture: {fileID: 21300000, guid: 60f623b3fb43f974aad89e8c39a32d77, type: 3}
+      depth: 0
+      size: 1.3064
+      round: 0
+      offset: {x: 0, y: 0}
+      tint: {r: 1, g: 1, b: 1, a: 1}
+      opacity:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      flicker: 0
+      flickerSpeed: 8
+      drift: {x: 0, y: 0}
+      additive: 0
+      motes:
+        count: 60
+        size: {x: 0.004, y: 0.012}
+        velocity: {x: 0, y: 0.05}
+        wander: 0.02
+        wanderSeconds: 3
+        twinkle: 0.3
+        area:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 1
+          height: 1
+        edgeFade: 0.15
+    - name: Runes
+      kind: 0
+      picture: {fileID: 21300000, guid: 80f2cc667380ed34991e86eb1e524e6c, type: 3}
+      depth: 0
+      size: 0.6
+      round: 1
+      offset: {x: -0.078384, y: 0.11757596}
+      tint: {r: 1, g: 0.86, b: 0.5, a: 0.45}
+      opacity:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0.1
+          inSlope: 0
+          outSlope: 0.6975081
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 0.7168376
+          value: 0.6
+          inSlope: 0.6975081
+          outSlope: 1.4126167
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 1.4126167
+          outSlope: 0
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      flicker: 0
+      flickerSpeed: 7
+      drift: {x: 0, y: 0}
+      additive: 1
+      motes:
+        count: 60
+        size: {x: 0.004, y: 0.012}
+        velocity: {x: 0, y: 0.05}
+        wander: 0.02
+        wanderSeconds: 3
+        twinkle: 0.3
+        area:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 1
+          height: 1
+        edgeFade: 0.15
+    - name: Front
+      kind: 0
+      picture: {fileID: 21300000, guid: f995dd49888ef364f8fecaf95668d3bc, type: 3}
+      depth: -0.45
+      size: 1.3064
+      round: 0
+      offset: {x: 0, y: 0}
+      tint: {r: 1, g: 1, b: 1, a: 1}
+      opacity:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      flicker: 0
+      flickerSpeed: 8
+      drift: {x: 0, y: 0}
+      additive: 0
+      motes:
+        count: 60
+        size: {x: 0.004, y: 0.012}
+        velocity: {x: 0, y: 0.05}
+        wander: 0.02
+        wanderSeconds: 3
+        twinkle: 0.3
+        area:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 1
+          height: 1
+        edgeFade: 0.15
+    - name: Morning
+      kind: 0
+      picture: {fileID: 21300000, guid: 80f2cc667380ed34991e86eb1e524e6c, type: 3}
+      depth: 2000
+      size: 3.2
+      round: 1
+      offset: {x: 0, y: 0.100000024}
+      tint: {r: 1, g: 0.97, b: 0.88, a: 1}
+      opacity:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0
+          inSlope: 0
+          outSlope: 0.06975081
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 0.7168376
+          value: 0.05
+          inSlope: 0.06975081
+          outSlope: 3.2890298
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 0.8688581
+          value: 0.55
+          inSlope: 3.2890298
+          outSlope: 3.4313974
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 3.4313974
+          outSlope: 0
+          tangentMode: 69
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      flicker: 0
+      flickerSpeed: 7
+      drift: {x: 0, y: 0}
+      additive: 1
+      motes:
+        count: 60
+        size: {x: 0.004, y: 0.012}
+        velocity: {x: 0, y: 0.05}
+        wander: 0.02
+        wanderSeconds: 3
+        twinkle: 0.3
+        area:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 1
+          height: 1
+        edgeFade: 0.15
+    cameraFrom:
+      position: {x: -0.02, y: -0.12}
+      push: 0.08
+    cameraTo:
+      position: {x: -0.02, y: -0.12}
+      push: 0.2
+    easeCamera: 1
+    lines:
+    - voice: {fileID: 8300000, guid: 71df65ae4d1fde749b911a1ae8a33588, type: 3}
+      subtitle: Then build them something to come home to.
+      pauseBefore: 1
+      secondsWithoutVoice: 2.5
+    - voice: {fileID: 8300000, guid: bacdc63e8e19d214892bee414de9daf7, type: 3}
+      subtitle: Wake me, and I will open the way, and you will go and bring them back.
+      pauseBefore: 0.8
+      secondsWithoutVoice: 2.5
+    - voice: {fileID: 8300000, guid: f5fdc03eaf1167f4ebb6effdfc706bf5, type: 3}
+      subtitle: Now wake up, little one.
+      pauseBefore: 1.2
+      secondsWithoutVoice: 2.5
+    holdAfter: 2
+    sounds:
+    - clip: {fileID: 8300000, guid: ba3050625acb031479912eaf9d6e96c8, type: 3}
+      at: 0.8
+      volume: 0.2
+      loop: 0
+      fade: 0.2
+    - clip: {fileID: 8300000, guid: c802fdaca99e9e848ae4ee64a6751508, type: 3}
+      at: 5.2
+      volume: 0.18
+      loop: 0
+      fade: 0.2
+  music:
+  - clip: {fileID: 8300000, guid: d33bd38e4b80c7b44b05a8bbae974df8, type: 3}
+    fromShot: 0
+    delay: 0.5
+    toShot: 4
+    startAt: 0
+    volume: 0.34
+    fadeIn: 3
+    fadeOut: 3
+  - clip: {fileID: 8300000, guid: 560945074b2a2ff41ab6bc0855a756ca, type: 3}
+    fromShot: 5
+    delay: 0
+    toShot: 8
+    startAt: 0
+    volume: 0.58
+    fadeIn: 3
+    fadeOut: 2.5
+  musicWhileSpeaking: 0.55
+  endFadeSeconds: 1.5
+  subtitleLinger: 0.6
+  skipHoldSeconds: 1

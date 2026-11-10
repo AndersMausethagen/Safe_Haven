@@ -288,6 +288,88 @@ public sealed class CinematicTests
         StringAssert.Contains(guid, File.ReadAllText(MenuScenePath), "MainMenuView's Opening Cinematic should be the backstory.");
     }
 
+    // ----- The prologue's end: "The Catch" -----
+
+    private const string CatchPath = "Assets/_Project/Data/Cinematics/TheCatch.asset";
+    private const string ProloguePath = "Assets/_Project/Data/Prologue/ForestPrologue.asset";
+
+    private static CinematicDefinition Catch => AssetDatabase.LoadAssetAtPath<CinematicDefinition>(CatchPath);
+
+    [Test]
+    public void TheCatch_HasAVoiceAndASubtitleForEveryLine()
+    {
+        CinematicDefinition cinematic = Catch;
+        Assert.IsNotNull(cinematic, CatchPath + ": written by AgentScripts/BuildPrologueEndCinematic.cs");
+        Assert.AreEqual(9, cinematic.Shots.Count);
+        var timeline = new CinematicTimeline(cinematic);
+        Assert.AreEqual(21, timeline.Lines.Count);
+        foreach (CinematicTimeline.SpokenLine line in timeline.Lines)
+        {
+            Assert.IsNotNull(line.Line.voice, line.Line.subtitle);
+            Assert.IsNotEmpty(line.Line.subtitle);
+            Assert.That(line.Line.subtitle.Length, Is.LessThanOrEqualTo(95), "one sentence a subtitle: " + line.Line.subtitle);
+        }
+
+        Assert.That(timeline.Seconds, Is.InRange(70f, 135f), "a bridge between two scenes, not a film");
+    }
+
+    [Test]
+    public void TheCatch_NeverShowsTheEdgeOfAPainting()
+    {
+        CinematicDefinition cinematic = Catch;
+        var timeline = new CinematicTimeline(cinematic);
+        for (int i = 0; i < cinematic.Shots.Count; i++)
+        {
+            CinematicShot shot = cinematic.Shots[i];
+            foreach (CinematicLayer layer in shot.layers)
+            {
+                if (layer.kind != CinematicLayerKind.Picture || layer.additive || layer.size < 1f)
+                {
+                    continue;
+                }
+
+                Assert.IsNotNull(layer.picture, $"{shot.name} / {layer.name}");
+                for (float time = timeline.ShotStart(i); time <= timeline.StaysUntil(i); time += 0.25f)
+                {
+                    Assert.IsTrue(CinematicCamera.Covers(layer, timeline.Camera(i, time)), $"{shot.name} / {layer.name} at {time - timeline.ShotStart(i):0.0} s");
+                }
+            }
+        }
+    }
+
+    [Test]
+    public void TheCatch_SaysWhatHappened_WhoCaughtThePlayer_AndWhatToDo()
+    {
+        string said = string.Join(" ", new CinematicTimeline(Catch).Lines.Select(l => l.Line.subtitle)).ToLowerInvariant();
+        foreach (string told in new[] { "hand on the stone", "the stones broke", "i caught one", "forgets them", "a hearth", "light one", "bring them back" })
+        {
+            StringAssert.Contains(told, said);
+        }
+
+        // Why the old troll came, who let the hearth go cold and what the guardian was are the first act's to tell.
+        foreach (string secret in new[] { "heartroot", "for the door", "guardian", "pact", "your kind", "went cold" })
+        {
+            StringAssert.DoesNotContain(secret, said);
+        }
+    }
+
+    [Test]
+    public void ThePrologue_EndsWithTheCatch_BeforeHomeLoads()
+    {
+        var prologue = AssetDatabase.LoadAssetAtPath<PrologueDefinition>(ProloguePath);
+        Assert.IsNotNull(prologue, ProloguePath);
+        Assert.AreSame(Catch, prologue.EndingCinematic);
+        Assert.IsTrue(prologue.LoadHomeDuringCinematic);
+        // The director plays it after the gear is set to come home and before the scene is asked for.
+        string director = File.ReadAllText("Assets/_Project/Scripts/Prologue/PrologueDirector.cs");
+        int carried = director.IndexOf("GameSession.CarryPlayerState", System.StringComparison.Ordinal);
+        int played = director.IndexOf("CinematicScreen.Play(definition.EndingCinematic", System.StringComparison.Ordinal);
+        int loaded = director.IndexOf("SceneLoader.Load(definition.HomeScene", System.StringComparison.Ordinal);
+        Assert.That(carried, Is.GreaterThan(0));
+        Assert.That(played, Is.GreaterThan(carried));
+        Assert.That(loaded, Is.GreaterThan(played));
+    }
+
     [Test]
     public void TheVoice_HasItsOwnVolume()
     {
