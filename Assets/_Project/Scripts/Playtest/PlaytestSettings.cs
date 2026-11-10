@@ -15,12 +15,13 @@ public sealed class PlaytestSettings : GameSettings<PlaytestSettings>
     [Tooltip("Moments to time in every run. The first log row that matches marks the milestone.")]
     [SerializeField] private List<PlaytestMilestone> milestones = new List<PlaytestMilestone>
     {
-        new PlaytestMilestone("Awake", "QuestCompleted", "Awakening", "", 10f),
-        new PlaytestMilestone("First camp", "QuestCompleted", "FirstCamp", "", 25f),
-        new PlaytestMilestone("Portal awakened", "QuestCompleted", "AwakeningThePortal", "", 40f),
-        new PlaytestMilestone("First raid over", "RaidFinished", "", "", 60f),
-        new PlaytestMilestone("First extraction", "RaidFinished", "", "Extracted", 60f),
-        new PlaytestMilestone("Growing home", "QuestCompleted", "AGrowingHome", "", 90f),
+        // Minutes from New Game, the prologue included (Docs/QuestRedesign.md).
+        new PlaytestMilestone("Awake", "QuestCompleted", "Awakening", "", 16f),
+        new PlaytestMilestone("First fire", "QuestCompleted", "FirstCamp", "", 19f),
+        new PlaytestMilestone("Portal awakened", "QuestCompleted", "AwakeningThePortal", "", 24f),
+        new PlaytestMilestone("First raid over", "RaidFinished", "", "", 42f),
+        new PlaytestMilestone("First extraction", "RaidFinished", "", "Extracted", 42f),
+        new PlaytestMilestone("Growing home", "QuestCompleted", "AGrowingHome", "", 120f),
         new PlaytestMilestone("First death", "PlayerDied", "", "", 0f),
     };
 

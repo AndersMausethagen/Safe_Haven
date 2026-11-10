@@ -212,9 +212,6 @@ public sealed class PrologueTests
     {
         var repair = AssetDatabase.LoadAssetAtPath<QuestDefinition>("Assets/_Project/Data/Quests/AwakeningThePortal.asset");
         Assert.IsTrue(repair.Objectives[0].CountAlreadyOwned);
-        var rescue = AssetDatabase.LoadAssetAtPath<QuestDefinition>(Root + "/Quests/TheyAreStillOutThere.asset");
-        Assert.AreEqual(2, rescue.Objectives.Count);
-        Assert.IsTrue(rescue.Objectives.All(o => o.CountAlreadyOwned));
     }
 
     [Test]
@@ -356,7 +353,8 @@ public sealed class PrologueTests
         var copy = UnityEngine.Object.Instantiate(Definition);
         try
         {
-            var rescue = AssetDatabase.LoadAssetAtPath<QuestDefinition>(Root + "/Quests/TheyAreStillOutThere.asset");
+            var rescue = AssetDatabase.LoadAssetAtPath<QuestDefinition>("Assets/_Project/Data/Quests/Awakening.asset");
+            Assert.NotNull(rescue);
             var serialized = new SerializedObject(copy);
             SerializedProperty chapters = serialized.FindProperty("chapters");
             int index = chapters.arraySize++;

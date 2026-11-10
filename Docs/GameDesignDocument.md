@@ -804,6 +804,8 @@ Consider a **Corruption meter** that rises from repeated use of Cursed abilities
 
 Use concise, contextual objectives rather than a map cluttered with generic tasks. Main quests unlock the next major mechanic or story beat; side quests introduce folk tales, companions, unusual materials, and settlement improvements.
 
+**Five kinds of quest (November 10, 2026; `Docs/QuestRedesign.md`).** Each has its own colour on the tracker, the maps and the givers' marks. **Main Story** (gold): the pact, the door and what took the expedition. One at a time, and something happens in every one: a fight, a find, a choice or a reveal, never only "gather" or "build". **Rescue** (teal): one per person of the lost expedition; each opens a building, a job and recipes. **Haven** (green): building and learning at home. Optional, several open at once, given when the player has just felt the problem, and paying with something the next raid needs. **Tale** (silver): a folk tale found out in the woods. **Errand** (bronze): a small ask or bounty that lapses without cost. Nothing but the story and rescues may stand before a Main Story or Rescue quest, so the portal never waits for a building.
+
 Quest givers show their state with a small floating marker: "!" when a quest can be taken, "…" while the player is on it, and "?" when it is ready to hand in. Quests can optionally be handed back to their giver; this is off by default. When it is on, rewards arrive at the hand-in, not when the last objective completes. Once a giver's quest is done, the giver says an "after" line, or stops being interactable when it has none.
 
 The story leaves room to breathe. A quest that starts by itself waits a few seconds after the last one, and a fight is never followed straight away by a new quest or a line: the player gets a moment to see they won. Nothing starts over someone talking. A moment that matters can ask for a longer pause of its own; the troll after the wolves at the camp comes eight seconds after the last wolf falls.
@@ -997,8 +999,9 @@ tipped handcart lies on the road. Names and dialogue are provisional authored co
    the soldier offers limited nearby support and the Alchemist tends the player's wounds.
 7. The old troll walks out of the trees towards the stones in the last twenty seconds. Reaching zero opens the connection as its blow lands and separates the expedition. Falling during this final defence
    gives an abbreviated version of the same narrative transition, not an ordinary raid failure.
-8. Wake alive at the portal, without a raid report or durability penalty. The expedition supplies do not carry
-   into the settlement. Inspect the dormant portal and restore it to begin searching for the companions.
+8. Wake alive at the portal, without a raid report or durability penalty. What the player wears comes through with them
+   (armour, the chosen weapon, belt tools, backpack, lantern, and their arrows), by the rule of a failed raid; what they carried
+   does not. Listen to the portal, then light a fire and wake the door (§21.1 to §21.3).
 
 Before the final defence, falling returns the player to the current phase's checkpoint with health restored.
 Safe phases save automatically and allow manual saving; combat phases do not. Loading restarts the current phase
@@ -1024,15 +1027,17 @@ Construction Table needed for home crafting. Times in §21.1–21.5 describe the
 
 ### 21.1 Minutes 0–10: awakening
 
-The player wakes at the portal after losing contact with the expedition. A sunny clearing contains a stream, loose Small Rocks, fallen Sticks, and Berries, all gathered by hand at Tier 0. A short conversation with the portal gives the reason to build instead of a long opening cutscene: it caught only one, the other seven are alive, the forest is forgetting them, and a tended hearth is what they can see (§4.1). Reinforce the prologue's movement and interaction lessons while introducing permanent equipment and home crafting, then harvest Tier I Grey Stone and Oak Wood. Never require wood or Grey Stone to make the tool that first unlocks it.
+**As built (November 10, 2026): the door opens after three short steps, and the first raid comes before the first workshop.** The times in the headings of §21.1 to §21.5 are the old plan's; the new targets, counted from New Game, are in `Docs/QuestRedesign.md` (awake at about 13 minutes, in the first raid at about 22).
+
+The player wakes at the portal after losing contact with the expedition, in the gear they wore. A sunny clearing contains a stream, loose Small Rocks, fallen Sticks, and Berries, all gathered by hand at Tier 0. A short conversation with the portal gives the reason to build instead of a long opening cutscene: it caught only one, the other seven are alive, the forest is forgetting them, and a tended hearth is what they can see (§4.1). The main story then asks for one thing only: a fire. Never require wood or Grey Stone to make the tool that first unlocks it.
 
 ### 21.2 Minutes 10–25: first camp
 
-Build a campfire and construction table, prepare simple berry food, and fill water. The first fire is the first reward: the portal lights up, the ward wakes, and far out in the mist someone has turned to look. Demonstrate manageable hunger and thirst. Three nearby glowing stones are bound by enchanted roots; clearing them through simple interaction or puzzles releases the first Life Orbs.
+Light a campfire from the Sticks and Small Rocks lying around the portal (A Light in the Wood). The first fire is the first reward: the portal lights up, the ward wakes, and far out in the mist someone has turned to look. Three nearby glowing stones are bound by enchanted roots; freeing them releases the first Life Orbs (The Rootbound Stones). Tools (a hatchet and a pick, by hand) and food and water are Haven quests that open with the fire: they help, and the portal doesn't wait for them.
 
 ### 21.3 Minutes 25–40: awakening the portal
 
-Repair and activate the portal. Sigrid's voice comes through the stones: Ingrid is hurt and close, find her first. Introduce the Misty Woods destination and a clear briefing: “Carried inventory is lost on death. Your deployed equipment returns damaged and can be repaired at home. Your home remains safe.” The first raid is comparatively controlled and contains no major boss.
+Repair and activate the portal with the three Life Orbs (The Door Wakes): the repair asks for nothing else. Sigrid's voice comes through the stones: Ingrid is hurt and close, find her first. The Workshop, the chest and a second weapon are Haven quests from here on, beside Into the Misty Woods and Bring Ingrid Home. Introduce the Misty Woods destination and a clear briefing: “Carried inventory is lost on death. Your deployed equipment returns damaged and can be repaired at home. Your home remains safe.” The first raid is comparatively controlled and contains no major boss.
 
 ### 21.4 Minutes 40–60: first raid
 

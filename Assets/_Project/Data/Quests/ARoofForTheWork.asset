@@ -10,20 +10,20 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 702d2e93d0a019a40b6339daf41e2c2f, type: 3}
-  m_Name: SettlingIn
+  m_Name: ARoofForTheWork
   m_EditorClassIdentifier: Assembly-CSharp::QuestDefinition
-  id: settling_in
-  displayName: Gifts of the Clearing
-  description: 'A hearth starts small, and with bare hands. Pick up sticks and small rocks from the clearing floor: enough to bind into a hatchet and a pick.'
+  id: aroofforthework
+  displayName: A Roof for the Work
+  description: 'What the woods give you is only wood and ore until there is somewhere to work it. Raise a Workshop beside the fire (build menu: G). It mends what a raid wears down, and the chest, the club and the bandages all start at its bench.'
   chain: The First Days
-  journalNotes: Stone tools are made from your bag (B), with no station needed. Everything in the clearing that can be picked up, chopped or broken will be useful to you sooner or later.
-  rank: 0
+  journalNotes: 'The Workshop wants 24 Oak Wood, 12 Grey Stone and 12 Sticks: fell the oaks at the clearing''s edge with a hatchet and break the grey boulders with a pick. Repairs are made at its bench.'
+  rank: 4
   availableObjective: 
   announceStart: 1
   announceCompletion: 1
   showTimerInHud: 0
   prerequisites:
-  - {fileID: 11400000, guid: 00e21ff059394a4459d8cec92bc2d489, type: 2}
+  - {fileID: 11400000, guid: 2614c1d189f3a034691f98f3d3efeee0, type: 2}
   startedFirst: []
   start: 0
   startEvent: {fileID: 0}
@@ -53,34 +53,14 @@ MonoBehaviour:
   onStarted: []
   objectivesInOrder: 0
   objectives:
-  - type: 1
-    description: 
-    amount: 10
-    item: {fileID: 11400000, guid: e8bb5d2fbded52b42a179a47cce32d53, type: 2}
+  - type: 7
+    description: 'Build a Workshop (build menu: G)'
+    amount: 1
+    item: {fileID: 0}
     resource: {fileID: 0}
     monster: {fileID: 0}
     faction: 1
-    building: {fileID: 0}
-    raid: {fileID: 0}
-    mustExtract: 1
-    withinMinutes: 0
-    questEvent: {fileID: 0}
-    person: {fileID: 0}
-    target: {fileID: 0}
-    job: {fileID: 0}
-    breach: {fileID: 0}
-    rank: 1
-    tier: 2
-    bringHome: 0
-    countAlreadyOwned: 1
-  - type: 1
-    description: 
-    amount: 7
-    item: {fileID: 11400000, guid: 9f085f39a2da68c45b58d2db986835f4, type: 2}
-    resource: {fileID: 0}
-    monster: {fileID: 0}
-    faction: 1
-    building: {fileID: 0}
+    building: {fileID: 11400000, guid: cfa8f019a4062c84f8e9b8cd432080e0, type: 2}
     raid: {fileID: 0}
     mustExtract: 1
     withinMinutes: 0

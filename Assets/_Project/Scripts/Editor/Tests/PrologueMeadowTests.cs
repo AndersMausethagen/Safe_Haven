@@ -241,10 +241,11 @@ public sealed class PrologueMeadowTests
             Assert.AreEqual(QuestRank.Optional, Quest(name).Rank, name);
         }
 
-        Assert.AreEqual(QuestRank.SideQuest, AssetDatabase.LoadAssetAtPath<QuestDefinition>("Assets/_Project/Data/Quests/SmithsRequest.asset").Rank);
+        Assert.AreEqual(QuestRank.Optional, AssetDatabase.LoadAssetAtPath<QuestDefinition>("Assets/_Project/Data/Quests/SmithsRequest.asset").Rank, "a note on the board is an errand");
+        Assert.AreEqual(QuestRank.SideQuest, AssetDatabase.LoadAssetAtPath<QuestDefinition>("Assets/_Project/Data/Quests/EchoesInTheWilds.asset").Rank, "a tale is found out in the woods");
         QuestMarkerSettings settings = QuestMarkerSettings.Current;
-        Assert.AreNotEqual(settings.RankColor(QuestRank.MainStory), settings.RankColor(QuestRank.SideQuest));
-        Assert.AreNotEqual(settings.RankColor(QuestRank.SideQuest), settings.RankColor(QuestRank.Optional));
+        var ranks = (QuestRank[])System.Enum.GetValues(typeof(QuestRank));
+        Assert.AreEqual(ranks.Length, ranks.Select(settings.RankColor).Distinct().Count(), "every kind of quest has a colour of its own");
         Assert.IsTrue(settings.TryGetLook(QuestGiverState.Available, QuestRank.Optional, out _, out Color available));
         Assert.AreEqual(settings.RankColor(QuestRank.Optional), available, "A giver's ! takes the colour of the quest on offer.");
     }
@@ -254,7 +255,7 @@ public sealed class PrologueMeadowTests
     {
         QuestDefinition errand = Quest("HuntForThePot"), story = Quest("RoadToForest");
         Assert.IsNull(new DialogueChoice("Goodbye.").QuestTag(), "An ordinary answer has no tag.");
-        StringAssert.Contains("Starts optional quest: " + errand.DisplayName, new DialogueChoice("Yes", null, true, errand, QuestAnswer.Starts).QuestTag());
+        StringAssert.Contains("Starts errand: " + errand.DisplayName, new DialogueChoice("Yes", null, true, errand, QuestAnswer.Starts).QuestTag());
         StringAssert.Contains("Starts main quest: " + story.DisplayName, new DialogueChoice("Yes", null, true, story, QuestAnswer.Starts).QuestTag());
         StringAssert.Contains("Hands in: " + errand.DisplayName, new DialogueChoice("Done", null, true, errand, QuestAnswer.HandsIn).QuestTag());
         StringAssert.Contains(QuestMarkerSettings.Current.RankHex(errand.Rank), new DialogueChoice("Yes", null, true, errand, QuestAnswer.Starts).QuestTag());

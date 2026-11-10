@@ -17,7 +17,7 @@ MonoBehaviour:
   description: 'Sigrid''s voice came through the stones: Ingrid was right behind her when they broke, and she is hurt. Find her in the Misty Woods, keep her close, and bring her through an extraction point with you. If she falls she will wait where you found her.'
   chain: The Lost Expedition
   journalNotes: She is hurt and won't be quick. Clear the way before you lead her out. If she falls she doesn't die, but she will wait where you found her, and the forest is good at making people wait.
-  rank: 0
+  rank: 3
   availableObjective: 
   announceStart: 1
   announceCompletion: 1

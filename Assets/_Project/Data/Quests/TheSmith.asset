@@ -17,7 +17,7 @@ MonoBehaviour:
   description: Bjarne mends what the woods break, at half the cost, and smelts the copper you bring him. Give him the Smith's work, and raise the Smithy he showed you (G). At Tier II it makes copper tools.
   chain: Hands at Home
   journalNotes: 
-  rank: 0
+  rank: 4
   availableObjective: 
   announceStart: 1
   announceCompletion: 1

@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: Awakening
   m_EditorClassIdentifier: Assembly-CSharp::QuestDefinition
   id: awakening
-  displayName: Awakening
+  displayName: The One It Caught
   description: You wake on the grass of a quiet clearing, and you wake alone. At its heart stand cracked old stones, warm to the touch, and something in them seems to be waiting for you.
-  chain: The First Days
+  chain: The Hearth and the Door
   journalNotes: You remember the stones breaking and very little after that. The grass is dry and the air is quiet, and nothing here is trying to kill you, which already feels strange.
   rank: 0
   availableObjective: 

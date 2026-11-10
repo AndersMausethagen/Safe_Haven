@@ -16,15 +16,23 @@ public enum QuestStart
     WhenPlayerDoes = 3,
 }
 
-/// <summary>How much a quest matters to the story: the colour of its marks everywhere (QuestMarkerSettings). Saved by number.</summary>
+/// <summary>
+/// What kind of quest it is: the colour of its marks everywhere, its name for the player and its place in the tracker
+/// (QuestMarkerSettings). Saved by number, so new kinds go at the end; the tracker's order is QuestMarkerSettings.RankOrder.
+/// Docs/QuestRedesign.md says what belongs where.
+/// </summary>
 public enum QuestRank
 {
-    /// <summary>The main story: gold.</summary>
+    /// <summary>The main story: gold. Something happens in every one: a fight, a find, a choice, a reveal. Never only "gather" or "build".</summary>
     MainStory = 0,
-    /// <summary>A story of its own beside the main one: silver.</summary>
+    /// <summary>A tale found out in the woods, a story of its own beside the main one: silver.</summary>
     SideQuest = 1,
-    /// <summary>A small errand that can be left undone: bronze.</summary>
+    /// <summary>A small errand or bounty that can be left undone: bronze.</summary>
     Optional = 2,
+    /// <summary>Bringing one of the lost expedition home: teal. Each opens a building, a job and recipes.</summary>
+    Rescue = 3,
+    /// <summary>Building and learning at home: green. Optional, several open at once, and it never gates the portal.</summary>
+    Haven = 4,
 }
 
 /// <summary>

@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: AwakeningThePortal
   m_EditorClassIdentifier: Assembly-CSharp::QuestDefinition
   id: awakeningtheportal
-  displayName: Awakening the Portal
+  displayName: The Door Wakes
   description: At the heart of the clearing stand the stones that dropped you here. Feed them the Life Orbs and the way back to your people opens.
-  chain: The First Days
+  chain: The Hearth and the Door
   journalNotes: Once it opens it opens both ways. The portal will tell you so itself, in its own fashion. Read the raid planner carefully the first time, and note what you stand to lose.
   rank: 0
   availableObjective: 

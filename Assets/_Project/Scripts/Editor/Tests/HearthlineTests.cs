@@ -212,8 +212,10 @@ public sealed class HearthlineTests
     private static float Luminance(Color colour) => 0.2126f * colour.r + 0.7152f * colour.g + 0.0722f * colour.b;
 
     [TestCase(QuestRank.MainStory, "Main quest")]
-    [TestCase(QuestRank.SideQuest, "Side quest")]
-    [TestCase(QuestRank.Optional, "Optional quest")]
+    [TestCase(QuestRank.Rescue, "Rescue quest")]
+    [TestCase(QuestRank.Haven, "Haven quest")]
+    [TestCase(QuestRank.SideQuest, "Tale")]
+    [TestCase(QuestRank.Optional, "Errand")]
     public void MapQuestRank_IsAlsoWrittenInWords(QuestRank rank, string words)
     {
         StringAssert.Contains(words, WorldMapHud.QuestLabel("The old path", rank));

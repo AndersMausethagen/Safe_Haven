@@ -17,7 +17,7 @@ MonoBehaviour:
   description: 'Every raid sends your club and tools home more broken, and the Workshop can only patch them. Ingrid heard a hammer in the deep woods at dusk: Bjarne, the expedition''s smith. Look for him in the portal''s briefing, find him and bring him home.'
   chain: The Lost Expedition
   journalNotes: 
-  rank: 0
+  rank: 3
   availableObjective: 
   announceStart: 1
   announceCompletion: 1

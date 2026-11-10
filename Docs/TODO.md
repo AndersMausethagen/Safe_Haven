@@ -3,6 +3,23 @@
 Open work and ideas. Tick items off (`[x]`) or delete them when done. Architecture notes for each system live in
 [ARCHITECTURE.md](../Assets/_Project/Scripts/ARCHITECTURE.md).
 
+## Quest redesign (2026-11-10)
+
+The plan is [QuestRedesign.md](QuestRedesign.md). Step 1 is built: the kinds of quest, and the door that opens after the fire
+and the stones. Checked in Play on throwaway saves by completing the quests from the CLI, not played by hand.
+- [ ] Play it by hand from New Game: is the first raid reached at about minute 22 (with the prologue as it is, more like 30)?
+      Are 4 stick and 4 rock piles by the portal enough for the fire's 8 Sticks and 12 Small Rocks without a search?
+- [ ] Step 2, the prologue: 12 main quests to 7, the weapon chosen in the morning, a fight on the road, a camp defence that
+      lasts longer than 15 seconds.
+- [ ] Step 3, the first act's story: the three stones' lines and rootlings, the figure in raid 1, what each person remembers
+      on coming home, a quest for the Heartroot with the ember, the twist at the fire.
+- [ ] Into the Misty Woods and Bring Ingrid Home both say "Find Ingrid in the Misty Woods" in the tracker. Fine while they
+      are the only two; reword one if it reads as a mistake.
+- [ ] When the door wakes, four quests start one after another (the raid, Ingrid, the workshop, Know Your Enemy). Know Your
+      Enemy starts by itself and is only "kill two wolves": give it to someone to ask for, or drop it.
+- [ ] A new game started in the Haven directly shows "A Morning by the Fire: speak to Sigrid" in the tracker, as before.
+      Hide Available Objective lines for quests whose giver is in another scene.
+
 ## Found in the code review (2026-11-10)
 
 Fixed that day: the Damage Taken assist, Silent Takedown, block stamina by the blow after armor, loot for a companion's

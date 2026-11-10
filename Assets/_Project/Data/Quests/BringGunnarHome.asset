@@ -17,7 +17,7 @@ MonoBehaviour:
   description: Hides pile up in the stash and rot there, and copper is the last armour you can make without leather to line it. A hunter has been setting snares in the deep woods, alone by choice. Find him, and bring him home.
   chain: The Lost Expedition
   journalNotes: 
-  rank: 0
+  rank: 3
   availableObjective: 
   announceStart: 1
   announceCompletion: 1

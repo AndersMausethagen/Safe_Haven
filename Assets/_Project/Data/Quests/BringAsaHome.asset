@@ -17,7 +17,7 @@ MonoBehaviour:
   description: Berries and game don't stretch to a haven full of people, and long raids leave you hungry. A farmer was seen at a burned farmstead in the deep woods, still guarding her seed. Bring her home.
   chain: The Lost Expedition
   journalNotes: 
-  rank: 0
+  rank: 3
   availableObjective: 
   announceStart: 1
   announceCompletion: 1

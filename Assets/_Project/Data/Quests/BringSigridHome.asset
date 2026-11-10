@@ -17,7 +17,7 @@ MonoBehaviour:
   description: Everyone else is home. Only Sigrid, who led the expedition and whose voice you heard in the stones, is still out there. A horn has been heard at dusk, calling the expedition's signal.
   chain: The Lost Expedition
   journalNotes: 
-  rank: 0
+  rank: 3
   availableObjective: 
   announceStart: 1
   announceCompletion: 1

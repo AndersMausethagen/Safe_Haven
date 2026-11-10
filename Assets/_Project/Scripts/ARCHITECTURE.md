@@ -74,7 +74,7 @@ of the GDD, **Not started** = design only. Update this table when a system is ad
 | §18 UI, accessibility | Partial | `UI/*` (TMP), `DialogueBox` (conversations at the bottom of the screen: live `DialoguePortrait` of the speaker, name, typed-out line, answers 1-4; QuestGiver, companions and story graphs talk through it), `ActionMenuWindow` (world menus), `UIStateManager`, `UITheme` | Options screen with key rebinding, UI and text size, reduced shake and flashes (see "Options"). Colour-independent signals and audio cues are still open |
 | §19 Art, audio | Partial | `Audio/*` (a `SceneAudio` "Scene Music" component per scene), volumes `SafeHaven_Volume` / `MistyWoods_Volume`; environment in `Environment/*` (terrain moss, tree wind, `SurfaceLayerController` moss/rust on LocalSpawn models, grass and glowing plants, water and waterfalls, day/night and weather) | Composed music (`Audio/Safe Haven - *.mp3`) set per scene and as game-wide defaults in `AudioSettings`; effects from a CC0 library (`Audio/SFX`, credits in `Audio/SFX/CREDITS.md`), most of it made for the game by `Tools/Audio` because the free packs' interface blips and cartoon impacts read as arcade: combat, footsteps by ground layer (`PlayerAudio`), quests, crafting, building, interface, rain, wind, thunder and stream loops (`WorldAudio`), gathering. Models are placeholders. Day/night and weather are visual only; the Haven's hour is saved (`DayNightCycle` is an `ISaveable` on a SaveableEntity, and time spent on a raid moves the clock on), the weather is not (§11 "weather influences plans" not built); the raid has the same sky rig and stops the clock at the rolled hour (`RaidSky`). Volumetric fog, fog of war (unexplored ground, the night veil) and fire in the fog: `Environment/Atmosphere`, see [atmosphere](../../../Docs/Atmosphere.md) |
 | §20 Technical design | Done | Definitions vs runtime state vs `Save/*`, with any number of saved games (see "The save system in layers"); rules in settings assets (`GameSettings<T>`) | Raid crash recovery and seeds not built |
-| §21 First 90 minutes | Done (prototype), prologue added | `Prologue_MistyWoods.unity`, `Prologue/*`, `SafeHaven.unity`, `Raid_MistyWoods.unity`; quest chains "Prologue - The Unquiet Forest", "The Lost Expedition", "The First Days"; `Playtest/*` | Prologue uses a separate authored scene, not a raid. Three story escorts (Sigrid, Eirik, Runa) with camp topics; Bjarne, Tor, Liv and Ingrid are left out to be rescued later: Ingrid in the raid scene, the others through rumours (`Data/Raids/Rumours`). Weapon choice, cooking, troll ambush and the old troll are story graphs. Shelter and waystones are blockout art. |
+| §21 First 90 minutes | Done (prototype), prologue added | `Prologue_MistyWoods.unity`, `Prologue/*`, `SafeHaven.unity`, `Raid_MistyWoods.unity`; quest chains "Prologue - The Unquiet Forest", "The Hearth and the Door" (the story at home), "The Lost Expedition" (rescues), "The First Days" and "Hands at Home" (Haven quests); `Playtest/*` | Prologue uses a separate authored scene, not a raid. Three story escorts (Sigrid, Eirik, Runa) with camp topics; Bjarne, Tor, Liv and Ingrid are left out to be rescued later: Ingrid in the raid scene, the others through rumours (`Data/Raids/Rumours`). Weapon choice, cooking, troll ambush and the old troll are story graphs. Shelter and waystones are blockout art. |
 | §23–24 MVP / milestones | M0–M3 (no boss-earned skill enhancement yet), plus M4's recruit with a job and M5's scripted ward breach | – | Next per GDD: M4 companions (down/revive); M5 boss, environmental event and polish |
 
 ## Folders
@@ -161,7 +161,10 @@ LightFlicker components are scene-editable. Scene `GameEventTrigger`s control di
 `PrologueInteraction` handles portal activation, with editable before/after-step prompts. `PrologueDirector` derives its
 chapter from `GameSession.Quests`, owns temporary enemies/timers, and raises encounter/story facts. The camp quest
 counts the cleared encounter, not player kill credit. No `RaidSession`, regular raid loot loss, result screen or
-durability penalty is involved. Supplies deliberately reset to home starting contents.
+durability penalty is involved. What the player wears at the end (armour, weapon, belt tools, backpack, lantern) and their
+arrows come home, by the rule of a failed raid (`PlayerSnapshot.WhatWasWorn`, handed over in `PrologueDirector.EndSequence`;
+the definition's **Worn Gear Comes Home** turns it off). Everything carried stays behind, and the Haven's own starting contents,
+recipes, hunger and thirst stand.
 
 `BuildPlacer` retains its ordinary placement, footprint checks, material payment and Built event. In the forest
 the `PrologueDirector` enters its `PrologueBuildArea` as the build area (`IBuildArea`), which exposes only the prologue definition's Campfire, the same `Data/Buildings/Campfire.asset` the player builds at home
@@ -235,10 +238,14 @@ These are shared quest-system features, not prologue rules:
 - **Side Offers** (`QuestGiver`) are optional quests beside the ordered **Offers**: each is its own answer in conversation
   (**Ask Text**, **Thanks Text**), in any order and at the same time as the others, and doesn't hold up the main sequence. The
   floating mark shows the most pressing one. They need a `Talkable`.
-- **Rank** (`QuestDefinition`): Main Story (gold), Side Quest (silver), Optional (bronze). The colours are in `QuestMarkerSettings`
-  (Systems Editor) and reach the giver's mark, the tracker (main story first), the waypoint arrow, both maps, dialogue answers and
-  the Quest Map's strip.
-- Answers that do something to a quest say so in its rank's colour (`DialogueChoice.QuestTag`: "Starts optional quest: ...",
+- **Rank** (`QuestDefinition`), the kind of quest: Main Story (gold), Rescue (teal: one of the lost expedition), Haven (green:
+  building and learning at home), Side Quest (silver, shown as "Tale") and Optional (bronze, "Errand"). The colours are in
+  `QuestMarkerSettings` (Systems Editor) and reach the giver's mark, the tracker, the waypoint arrow, both maps, dialogue answers
+  and the Quest Map's strip. The enum's numbers are the order the kinds were added in (saves keep them); lists use
+  `QuestMarkerSettings.RankOrder`: story, rescues, haven, tales, errands. What belongs where is in
+  [QuestRedesign.md](../../../Docs/QuestRedesign.md): something happens in every Main Story quest, and nothing but the story
+  and rescues may stand before a Main Story or Rescue quest (`QuestCategoryTests`).
+- Answers that do something to a quest say so in its rank's colour (`DialogueChoice.QuestTag`: "Starts errand: ...",
   "Hands in: ..."). Quest givers set it through `MenuAction`; a story's Choice sets it when an answer leads straight to Start Quest.
 - **Catch Fish** objectives count `GameEventKind.FishCaught`, raised by `PlayerFishing` for a landed fish: of one kind, or any
   when the item is empty.
@@ -1036,7 +1043,7 @@ filled in when it is saved (`SaveableEntityTools`). Safe Haven > Scene > Assign 
 | Make a new cost (a station, an upgrade) payable from storage at home | Pay it through `MaterialPool.For(player)`; never take from the inventories directly |
 | Give a world object a menu of choices (an NPC, a station) | Write a method that builds a `MenuPage` of `MenuAction`s and call `ActionMenuWindow.Current.Open(BuildPage, user, transform)`; the page is rebuilt after every choice (see `HomePortal`). Pass `onClosed` to react when the conversation ends |
 | Keep something locked until the story reaches it (the rootbound stones, the portal) | Add `QuestGate` next to its `Interactable` and pick the quest; the prompt shows the locked text |
-| Change what the portal says at each step | Portal in SafeHaven: **Quest Whispers** (one line per active quest) |
+| Change what the portal says at each step | Portal in SafeHaven: **Quest Whispers** (one line per active quest). The last active one in the list speaks first, so the main story goes last; **Listen** goes through the lines of the other open quests. `AgentScripts/BuildQuestCategories.cs` sorts the list by kind |
 | Have a conversation with the portal at a step of the story | Give that step's Quest Whisper a **Moment** (a Quest Event) and make a Story Script that starts on it (**When Quest Event**). It replaces the tree's menu once; end the story with Raise Quest Event if a quest waits for the talk |
 | Make a quest wait for a Haven rank | A **Reach Haven Rank** objective (its rank as in Systems Editor › World › Haven); Count Already Owned counts a rank already reached. A story starts on it with **When Player: Reach Haven Rank** |
 | Make a quest ask the player to talk to someone, reach a place or use a thing | **Talk To** (choose the person), **Reach Place** / **Use Object** (choose or make a Quest Target with **New**). The quest's **Make It Work** list then offers to put a Quest Zone or Inspect Point for it at the Scene view, or to make the selected object it. No Quest Event is needed |

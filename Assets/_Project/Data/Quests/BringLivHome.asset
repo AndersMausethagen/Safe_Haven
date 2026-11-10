@@ -17,7 +17,7 @@ MonoBehaviour:
   description: The deep woods take more than steel. Liv, the expedition's rune scholar, could cut runes for a raid, and a ring of old stones is said to be humming with someone inside it.
   chain: The Lost Expedition
   journalNotes: 
-  rank: 0
+  rank: 3
   availableObjective: 
   announceStart: 1
   announceCompletion: 1

@@ -17,7 +17,7 @@ MonoBehaviour:
   description: 'Palisades burn and huts are cramped: the haven has outgrown wood. A mason has been seen in the deep woods, building walls round nothing at all. Bring her home.'
   chain: The Lost Expedition
   journalNotes: 
-  rank: 0
+  rank: 3
   availableObjective: 
   announceStart: 1
   announceCompletion: 1

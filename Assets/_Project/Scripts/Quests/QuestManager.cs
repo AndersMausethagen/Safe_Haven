@@ -328,7 +328,7 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
     private void OnQuestStarted(QuestDefinition quest)
     {
         if (quest.AnnounceStart)
-            GameMessages.Post($"New {(quest.Rank == QuestRank.MainStory ? "" : QuestMarkerSettings.RankName(quest.Rank).Split(' ')[0].ToLowerInvariant() + " ")}quest: {quest.DisplayName}", MessageKind.Info);
+            GameMessages.Post(QuestMarkerSettings.NewQuestText(quest), MessageKind.Info);
         GameEvents.Raise(new GameEvent(GameEventKind.QuestStarted, quest));
         RaiseAuthoredEvents(quest.OnStarted, quest);
         CountOwned(quest);

@@ -1,7 +1,9 @@
 # Quest redesign: the first two hours
 
-**Status: proposal (2026-11-10), not built.** Nothing in the game has changed. This covers the prologue, the first days at
-home and the first four raids, up to the Heartroot. The rescue order in `Docs/RescueOrder.md` stays as approved.
+**Status: approved by the user on 2026-11-10. Step 1 is built (categories and the open door); steps 2 and 3 are not.** See
+"What it takes to build" for what each step holds and "As built" for how step 1 differs from the plan. This covers the
+prologue, the first days at home and the first four raids, up to the Heartroot. The rescue order in `Docs/RescueOrder.md`
+stays as approved.
 
 ## In short
 
@@ -78,10 +80,10 @@ there than fun. That is the reason for planting three questions early (see the s
 | Category | Colour | What it is | Rules |
 |---|---|---|---|
 | **Main Story** | gold | The pact, the door and what took the expedition | One at a time. Every step is something that happens. A boss ends each act |
-| **The Lost Expedition** | new: ember red | One quest per person to bring home | The big progression quests: each opens a building, a job and recipes. Order as in `RescueOrder.md` |
-| **Haven** | new: green | Build and learn at home | Optional. Two to four open at once, in any order. Given by whoever needs it. The reward helps the next raid |
-| **Tales** | silver | Folk tales found out in the woods | Start by finding something. Each has a bargain, a riddle or a twist |
-| **Errands** | bronze | Small asks and bounties | Short. They lapse without cost |
+| **The Lost Expedition** ("Rescue quest") | new: teal, the colour of raids | One quest per person to bring home | The big progression quests: each opens a building, a job and recipes. Order as in `RescueOrder.md` |
+| **Haven** ("Haven quest") | new: green | Build and learn at home | Optional. Two to four open at once, in any order. Given by whoever needs it. The reward helps the next raid |
+| **Tales** ("Tale") | silver | Folk tales found out in the woods | Start by finding something. Each has a bargain, a riddle or a twist |
+| **Errands** ("Errand") | bronze | Small asks and bounties | Short. They lapse without cost |
 
 Where today's quests go:
 
@@ -193,13 +195,13 @@ fire a use in a raid.
 |---|---|---|---|---|
 | Tools of the Clearing | The fire burns | The portal | A hatchet and a pick, made by hand | Hardwood and ore come home from the first raid |
 | Strength for the Road | The fire burns | The portal, in Eirik's words | A stew and a drink | The Waterskin, and a meal that lasts into the raid |
-| A Roof for the Work | The first loot is home | The portal | The Workshop | Repairs, bandages and the recipes below |
-| A Safe Place | The Workshop stands and a raid is done | The portal | A chest with something in it | What is in it can't be lost |
+| A Roof for the Work | The door wakes | The portal | The Workshop | Repairs, bandages and the recipes below |
+| A Safe Place | The Workshop stands | The portal | A chest with something in it | What is in it can't be lost |
 | Something to Fight With | The Workshop stands | The portal | A Knotted Club | A weapon that stuns, beside the one from the prologue |
 | The Alchemist | Ingrid is home | Ingrid | Her job and the altar | Healing draughts, and a use for Cursed Essence |
 | A Smith's Hearth | Bjarne is home | Bjarne | His job, the Smithy and one repair | Repairs at half cost, copper |
-| Raise the Walls | The breach is warned | The portal | Four palisades | Fewer attackers reach the ward |
 | The Woodcutter's Lodge | Tor is home | Tor | His job and the lodge | Planks, the Round Shield |
+| Raise the Walls | The lodge stands: a palisade starts with a plank | The portal | Four palisades | Fewer attackers reach the ward |
 
 ## The first two hours, now and proposed
 
@@ -232,6 +234,28 @@ Three steps, each playable by itself.
    story graph nodes and objective types that exist: Reach Place, Craft Item, Kill Monster, Collect Item.
 
 After any step: update GDD §21 and the status table in `ARCHITECTURE.md`.
+
+## As built: step 1 (2026-11-10)
+
+`AgentScripts/BuildQuestCategories.cs` sets it up; `QuestCategoryTests` and `HomeStoryTests` hold it.
+
+- **Kinds.** `QuestRank` has Rescue and Haven beside Main Story, Side Quest ("Tale") and Optional ("Errand"). At home six
+  quests are gold: The One It Caught, A Light in the Wood, The Rootbound Stones, The Door Wakes, Into the Misty Woods and The
+  Weakening Ward. The 11 rescues are teal and 20 building and job quests are green.
+- **The door.** A Light in the Wood asks for the campfire only (8 Sticks, 12 Small Rocks). The repair still asks for three
+  Life Orbs and nothing else. Gifts of the Clearing and They Are Still Out There are gone.
+- **Haven quests.** Tools of the Clearing and Strength for the Road open with the fire. A Roof for the Work (new: the
+  Workshop) opens when the door wakes, and A Safe Place and Something to Fight With follow it.
+- **Gear.** What the player wears at the end of the prologue comes home, with their arrows. What they carried does not.
+- **The portal** speaks for every open quest: the story's line first, and Listen goes through the others.
+- **Into the Misty Woods** asks to find Ingrid and to extract once. Finding her is kept if the raid fails, but the quest waits
+  for an extraction: the first breach, which follows it, is only offered after one.
+- **Not checked by hand.** The flow was stepped in Play on throwaway saves by completing quests from the CLI: each step
+  started what it should, the portal said the right lines, and gear given in the prologue arrived at home. Nobody has played
+  it from New Game yet.
+
+The open questions below were answered with the recommendations: the errands stay as they are until step 2, the weapon is
+kept, there is no chest before the first raid, the twist stands, and the Heartroot comes at raid three or four.
 
 ## Open questions
 

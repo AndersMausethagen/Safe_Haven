@@ -88,10 +88,10 @@ public sealed class QuestTrackerView : MonoBehaviour
                     GameSession.Quests.StatusOf(quest) == QuestStatus.NotStarted && GameSession.Quests.PrerequisitesMet(quest))
                     available.Add(quest);
 
-        // The main story on top, then side quests, then errands.
+        // The main story on top, then rescues, the haven, tales and errands.
         string pinned = GameSession.Progress.Journal.PinnedQuest;
-        active.Sort((a, b) => (a.Quest.Id == pinned) != (b.Quest.Id == pinned) ? (a.Quest.Id == pinned ? -1 : 1) : a.Quest.Rank != b.Quest.Rank ? a.Quest.Rank.CompareTo(b.Quest.Rank) : string.CompareOrdinal(a.Quest.DisplayName, b.Quest.DisplayName));
-        available.Sort((a, b) => a.Rank != b.Rank ? a.Rank.CompareTo(b.Rank) : string.CompareOrdinal(a.DisplayName, b.DisplayName));
+        active.Sort((a, b) => (a.Quest.Id == pinned) != (b.Quest.Id == pinned) ? (a.Quest.Id == pinned ? -1 : 1) : ByRankThenName(a.Quest, b.Quest));
+        available.Sort(ByRankThenName);
         panel.SetActive(active.Count + available.Count + atHome > 0);
         var builder = new StringBuilder();
         timed = false;
@@ -190,6 +190,13 @@ public sealed class QuestTrackerView : MonoBehaviour
         }
 
         return false;
+    }
+
+    /// <summary>The tracker's order: by kind (QuestMarkerSettings.RankOrder), then by name.</summary>
+    public static int ByRankThenName(QuestDefinition a, QuestDefinition b)
+    {
+        int byRank = QuestMarkerSettings.RankOrder(a.Rank).CompareTo(QuestMarkerSettings.RankOrder(b.Rank));
+        return byRank != 0 ? byRank : string.CompareOrdinal(a.DisplayName, b.DisplayName);
     }
 
     private static string Title(QuestDefinition quest)

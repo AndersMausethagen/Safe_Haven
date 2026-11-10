@@ -17,7 +17,7 @@ MonoBehaviour:
   description: 'Something has started testing the ward, and walls alone won''t hold it. Someone has been holding a clearing against wolves for days: it can only be Eirik, who taught you to fight. Bring him home.'
   chain: The Lost Expedition
   journalNotes: 
-  rank: 0
+  rank: 3
   availableObjective: 
   announceStart: 1
   announceCompletion: 1

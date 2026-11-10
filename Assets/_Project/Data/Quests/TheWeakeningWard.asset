@@ -15,7 +15,7 @@ MonoBehaviour:
   id: theweakeningward
   displayName: The Weakening Ward
   description: The light that called Ingrid home was seen by other things too. Something is testing the ward. Prepare, then speak to the portal when you are ready.
-  chain: The First Days
+  chain: The Hearth and the Door
   journalNotes: A breach is announced, it comes while you are here to meet it, and it can't undo what you have built. You still don't want to meet it unprepared. Palisades, traps and a full stomach all help, and you choose when to begin.
   rank: 0
   availableObjective: 

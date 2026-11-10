@@ -27,6 +27,10 @@ public sealed class QuestMarkerSettings : GameSettings<QuestMarkerSettings>
     [SerializeField] private Color mainStoryColor = new Color(1f, 0.82f, 0.25f, 1f);
     [SerializeField] private Color sideQuestColor = new Color(0.82f, 0.87f, 0.94f, 1f);
     [SerializeField] private Color optionalColor = new Color(0.86f, 0.55f, 0.27f, 1f);
+    [Tooltip("Bringing someone home: the colour of raids.")]
+    [SerializeField] private Color rescueColor = new Color(0.49f, 0.8f, 0.82f, 1f);
+    [Tooltip("Building and learning at home.")]
+    [SerializeField] private Color havenColor = new Color(0.62f, 0.84f, 0.45f, 1f);
 
     [Header("Look")]
     [Tooltip("Meters above the giver's pivot.")]
@@ -49,13 +53,51 @@ public sealed class QuestMarkerSettings : GameSettings<QuestMarkerSettings>
     public TMP_FontAsset Font => font;
     public Material FontMaterial => fontMaterial;
 
-    public Color RankColor(QuestRank rank) => rank == QuestRank.SideQuest ? sideQuestColor : rank == QuestRank.Optional ? optionalColor : mainStoryColor;
+    public Color RankColor(QuestRank rank)
+    {
+        switch (rank)
+        {
+            case QuestRank.SideQuest: return sideQuestColor;
+            case QuestRank.Optional: return optionalColor;
+            case QuestRank.Rescue: return rescueColor;
+            case QuestRank.Haven: return havenColor;
+            default: return mainStoryColor;
+        }
+    }
 
     /// <summary>The rank's colour for rich text: "#FFD140".</summary>
     public string RankHex(QuestRank rank) => "#" + ColorUtility.ToHtmlStringRGB(RankColor(rank));
 
     /// <summary>The rank in words, for the player: "Main quest".</summary>
-    public static string RankName(QuestRank rank) => rank == QuestRank.SideQuest ? "Side quest" : rank == QuestRank.Optional ? "Optional quest" : "Main quest";
+    public static string RankName(QuestRank rank)
+    {
+        switch (rank)
+        {
+            case QuestRank.SideQuest: return "Tale";
+            case QuestRank.Optional: return "Errand";
+            case QuestRank.Rescue: return "Rescue quest";
+            case QuestRank.Haven: return "Haven quest";
+            default: return "Main quest";
+        }
+    }
+
+    /// <summary>Where a rank stands in lists, lowest first: the story, then the people to bring home, the haven, tales and
+    /// errands. The enum's numbers are the order they were added in, which saves depend on.</summary>
+    public static int RankOrder(QuestRank rank)
+    {
+        switch (rank)
+        {
+            case QuestRank.MainStory: return 0;
+            case QuestRank.Rescue: return 1;
+            case QuestRank.Haven: return 2;
+            case QuestRank.SideQuest: return 3;
+            default: return 4;
+        }
+    }
+
+    /// <summary>What a new quest is announced as: "New quest: ...", "New errand: ...".</summary>
+    public static string NewQuestText(QuestDefinition quest) =>
+        $"New {(quest.Rank == QuestRank.MainStory ? "quest" : RankName(quest.Rank).ToLowerInvariant())}: {quest.DisplayName}";
 
     /// <summary>The symbol and color for a giver state, in the colour of the quest's rank when it has something for the player;
     /// false when that state shows no marker.</summary>

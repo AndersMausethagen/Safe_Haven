@@ -17,13 +17,13 @@ MonoBehaviour:
   description: 'What you carry through the portal is lost if you fall out there. What you leave in a chest at home stays safe. Build a Small Chest beside the workshop (build menu: G), and before every raid leave in it whatever you can''t afford to lose.'
   chain: The First Days
   journalNotes: 
-  rank: 0
+  rank: 4
   availableObjective: 
   announceStart: 1
   announceCompletion: 1
   showTimerInHud: 0
   prerequisites:
-  - {fileID: 11400000, guid: f89173a9aeb790c4f9aeb1cc56e0e655, type: 2}
+  - {fileID: 11400000, guid: 3943d408532d51649b066fb789a31c5b, type: 2}
   startedFirst: []
   start: 0
   startEvent: {fileID: 0}

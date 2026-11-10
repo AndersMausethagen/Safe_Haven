@@ -15,7 +15,7 @@ MonoBehaviour:
   id: echoes_in_the_wilds
   displayName: Echoes in the Wilds
   description: Something calls from deeper in the Wilds. Fight your way to the western beacon.
-  chain: Side Quests
+  chain: Tales
   journalNotes: Runa would say that anything calling to you from deep in the woods wants something from you. She would probably also go and look.
   rank: 1
   availableObjective: 

@@ -17,7 +17,7 @@ MonoBehaviour:
   description: 'Logs are heavy and good for little: shields, walls and a dry shed all want planks, and a hatchet won''t make them. Bjarne says Tor, the expedition''s carpenter, was thrown into the deep woods with a broken leg. Listen for a saw where nobody saws, and bring him home.'
   chain: The Lost Expedition
   journalNotes: 
-  rank: 0
+  rank: 3
   availableObjective: 
   announceStart: 1
   announceCompletion: 1

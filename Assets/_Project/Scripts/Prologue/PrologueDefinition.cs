@@ -229,6 +229,8 @@ public sealed class PrologueDefinition : ScriptableObject
     [SerializeField, Min(1)] private int maximumEnemies = 14;
     [SerializeField] private SoundDefinition rumble;
     [SerializeField] private string homeScene = "SafeHaven";
+    [Tooltip("What the player wears at the end (armor, weapon, belt tools, backpack, lantern) and their arrows come home with them: the rule of a failed raid. Off: they arrive with nothing.")]
+    [SerializeField] private bool wornGearComesHome = true;
     [Header("Narrative")]
     [SerializeField, TextArea(2, 5)] private string survivedText;
     [SerializeField, TextArea(2, 5)] private string overwhelmedText;
@@ -263,6 +265,7 @@ public sealed class PrologueDefinition : ScriptableObject
     public int WaveSize(int wave) => Mathf.Min(firstWaveSize + Mathf.Max(0, wave - 1) * waveGrowth, maximumWaveSize);
     public SoundDefinition Rumble => rumble;
     public string HomeScene => homeScene;
+    public bool WornGearComesHome => wornGearComesHome;
     public string SurvivedText => survivedText;
     public string OverwhelmedText => overwhelmedText;
     public string EndingStatus => endingStatus;

@@ -14,16 +14,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::QuestDefinition
   id: firstcamp
   displayName: A Light in the Wood
-  description: The forest cannot forget a hearth that someone tends. Fell oak and break grey stone for a workshop, light a fire inside the portal's ward so your people can see it through the mist, and raise the workshop beside it. Open the build menu with G.
-  chain: The First Days
-  journalNotes: This is the old bargain, though you are only starting to understand it. A fire inside the ward feeds the ward. It also shows, a long way off, to anyone who is looking for it.
+  description: 'The forest cannot forget a hearth that someone tends. Pick up the fallen sticks and loose stones around the portal and light a fire inside its ward (build menu: G). Your people will see it through the mist.'
+  chain: The Hearth and the Door
+  journalNotes: 'Sticks and small rocks lie on the ground around the portal: walk up to them and pick them up (E). The build menu (G) shows what the fire costs: 8 Sticks and 12 Small Rocks. Everything else the clearing can teach waits for you. The fire is what wakes the ward.'
   rank: 0
   availableObjective: 
   announceStart: 1
   announceCompletion: 1
   showTimerInHud: 0
   prerequisites:
-  - {fileID: 11400000, guid: 826f30ec0fdf5f64388ccd2b2b1a0470, type: 2}
+  - {fileID: 11400000, guid: 00e21ff059394a4459d8cec92bc2d489, type: 2}
   startedFirst: []
   start: 0
   startEvent: {fileID: 0}
@@ -53,94 +53,14 @@ MonoBehaviour:
   onStarted: []
   objectivesInOrder: 0
   objectives:
-  - type: 1
-    description: 
-    amount: 24
-    item: {fileID: 11400000, guid: 8ae2883815327b74fa7975309c803f92, type: 2}
-    resource: {fileID: 0}
-    monster: {fileID: 0}
-    faction: 1
-    building: {fileID: 0}
-    raid: {fileID: 0}
-    mustExtract: 1
-    withinMinutes: 0
-    questEvent: {fileID: 0}
-    person: {fileID: 0}
-    target: {fileID: 0}
-    job: {fileID: 0}
-    breach: {fileID: 0}
-    rank: 1
-    tier: 2
-    bringHome: 0
-    countAlreadyOwned: 1
-  - type: 1
-    description: 
-    amount: 12
-    item: {fileID: 11400000, guid: b5567f7d75200bd46befbd1dab298f36, type: 2}
-    resource: {fileID: 0}
-    monster: {fileID: 0}
-    faction: 1
-    building: {fileID: 0}
-    raid: {fileID: 0}
-    mustExtract: 1
-    withinMinutes: 0
-    questEvent: {fileID: 0}
-    person: {fileID: 0}
-    target: {fileID: 0}
-    job: {fileID: 0}
-    breach: {fileID: 0}
-    rank: 1
-    tier: 2
-    bringHome: 0
-    countAlreadyOwned: 1
-  - type: 1
-    description: 
-    amount: 12
-    item: {fileID: 11400000, guid: e8bb5d2fbded52b42a179a47cce32d53, type: 2}
-    resource: {fileID: 0}
-    monster: {fileID: 0}
-    faction: 1
-    building: {fileID: 0}
-    raid: {fileID: 0}
-    mustExtract: 1
-    withinMinutes: 0
-    questEvent: {fileID: 0}
-    person: {fileID: 0}
-    target: {fileID: 0}
-    job: {fileID: 0}
-    breach: {fileID: 0}
-    rank: 1
-    tier: 2
-    bringHome: 0
-    countAlreadyOwned: 1
   - type: 7
-    description: 
+    description: 'Light a Campfire inside the ward (build menu: G)'
     amount: 1
     item: {fileID: 0}
     resource: {fileID: 0}
     monster: {fileID: 0}
     faction: 1
     building: {fileID: 11400000, guid: 95f7d6e0cc6f5144fa85269777959d65, type: 2}
-    raid: {fileID: 0}
-    mustExtract: 1
-    withinMinutes: 0
-    questEvent: {fileID: 0}
-    person: {fileID: 0}
-    target: {fileID: 0}
-    job: {fileID: 0}
-    breach: {fileID: 0}
-    rank: 1
-    tier: 2
-    bringHome: 0
-    countAlreadyOwned: 1
-  - type: 7
-    description: 
-    amount: 1
-    item: {fileID: 0}
-    resource: {fileID: 0}
-    monster: {fileID: 0}
-    faction: 1
-    building: {fileID: 11400000, guid: cfa8f019a4062c84f8e9b8cd432080e0, type: 2}
     raid: {fileID: 0}
     mustExtract: 1
     withinMinutes: 0

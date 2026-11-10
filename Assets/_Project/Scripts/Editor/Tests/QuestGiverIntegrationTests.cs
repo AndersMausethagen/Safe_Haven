@@ -365,7 +365,7 @@ public sealed class QuestGiverIntegrationTests
     public void HomecomingQuest_StartsThroughItsAuthoredEvent_NotAGiverBypass()
     {
         var quest = AssetDatabase.LoadAssetAtPath<QuestDefinition>(
-            "Assets/_Project/Data/Prologue/Quests/TheyAreStillOutThere.asset");
+            "Assets/_Project/Data/Quests/Awakening.asset");
         Assert.AreEqual(QuestStart.OnQuestEvent, quest.Start);
         Assert.NotNull(quest.StartEvent);
         Manager(quest);

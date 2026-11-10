@@ -411,7 +411,10 @@ public sealed class PrologueDirector : MonoBehaviour
         yield return new WaitForSeconds(definition.EndingSeconds);
         GameEvents.Raise(definition.FinishedEvent);
         GameSession.SetArrivalPoint(PlayerArrivalPoint.HomePortal);
-        // The expedition's supplies are not the settlement's starting inventory. No raid loss or durability penalty.
+        // The expedition's supplies are not the settlement's starting inventory: what was worn comes through, as after a
+        // failed raid, and what was carried does not. No durability penalty.
+        if (definition.WornGearComesHome)
+            GameSession.CarryPlayerState(PlayerSnapshot.Capture(Player.Current.gameObject).WhatWasWorn());
         if (!SceneLoader.Load(definition.HomeScene, "Beside the old portal"))
         {
             Debug.LogError("The prologue could not start its home transition.", this);

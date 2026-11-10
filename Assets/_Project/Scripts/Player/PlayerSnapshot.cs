@@ -66,6 +66,8 @@ public sealed class PlayerSnapshot
     private Condition condition = Condition.None;
     // Meals and other boons at work. Kept through the portal; a failed raid and a save file leave them behind.
     private readonly List<BoonRecord> boons = new List<BoonRecord>();
+    // True for WhatWasWorn: applying it adds to the player the next scene has, and replaces nothing but the worn gear.
+    private bool addsToPlayer;
 
     private PlayerSnapshot()
     {
@@ -258,6 +260,11 @@ public sealed class PlayerSnapshot
     /// </summary>
     public List<ItemAmount> ApplyTo(GameObject player)
     {
+        if (addsToPlayer)
+        {
+            return AddTo(player);
+        }
+
         ItemInventory items = player.GetComponent<ItemInventory>();
         ResourceInventory resourceInventory = player.GetComponent<ResourceInventory>();
         PlayerSkills skills = player.GetComponent<PlayerSkills>();
@@ -311,6 +318,50 @@ public sealed class PlayerSnapshot
                 homeless.Add(record.Stack);
             }
         }
+    }
+
+    /// <summary>
+    /// Only what the player wears (armor, weapon, the tools on the belt, backpack, lantern) and the arrows in the bag.
+    /// Applying it puts that gear on and adds the arrows, and leaves everything else as the next scene has it: its starting
+    /// contents, recipes, hunger and thirst. The prologue hands this to the Haven by the rule of a failed raid: what was
+    /// worn comes through, what was carried does not.
+    /// </summary>
+    public PlayerSnapshot WhatWasWorn()
+    {
+        var worn = new PlayerSnapshot { addsToPlayer = true, hasGear = hasGear };
+        worn.gear.AddRange(gear);
+        foreach (SlotRecord record in slots)
+        {
+            if (record.Stack.Item.IsArrow)
+            {
+                worn.slots.Add(record);
+            }
+        }
+
+        return worn;
+    }
+
+    // WhatWasWorn: the gear goes on first, so a backpack's room is there for what follows.
+    private List<ItemAmount> AddTo(GameObject player)
+    {
+        var unplaced = new List<ItemAmount>();
+        PlayerEquipment equipment = player.GetComponent<PlayerEquipment>();
+        if (equipment != null && hasGear)
+        {
+            equipment.Restore(gear, true);
+        }
+
+        ItemInventory items = player.GetComponent<ItemInventory>();
+        foreach (SlotRecord record in slots)
+        {
+            int added = items != null ? items.Container.AddStack(record.Stack) : 0;
+            if (added < record.Stack.Count)
+            {
+                unplaced.Add(new ItemAmount(record.Stack.Item, record.Stack.Count - added));
+            }
+        }
+
+        return unplaced;
     }
 
     /// <summary>

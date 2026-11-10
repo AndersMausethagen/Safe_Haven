@@ -15,9 +15,9 @@ MonoBehaviour:
   id: agrowinghome
   displayName: A Growing Home
   description: Ingrid, Bjarne and Tor are home, and more will come through that door. They need beds, and somewhere dry to set down what they carry. Build them.
-  chain: The First Days
+  chain: Hands at Home
   journalNotes: Tor will say your hearth was built crooked, Bjarne will want an anvil, and both will be right. Each building here opens the next, so the H window is the place to plan from.
-  rank: 0
+  rank: 4
   availableObjective: 
   announceStart: 1
   announceCompletion: 1

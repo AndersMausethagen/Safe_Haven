@@ -15,9 +15,9 @@ MonoBehaviour:
   id: know_your_enemy
   displayName: Know Your Enemy
   description: Forest-Bitten Wolves hunt the Misty Woods, on the same paths your people must walk home. Thin their numbers before they grow bolder.
-  chain: The First Days
+  chain: Errands
   journalNotes: Every wolf you kill is one fewer on the path home. They are not quite wolves any more, but they still hunt like wolves.
-  rank: 0
+  rank: 2
   availableObjective: 
   announceStart: 1
   announceCompletion: 1

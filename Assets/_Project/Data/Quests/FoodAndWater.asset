@@ -17,13 +17,13 @@ MonoBehaviour:
   description: 'Eirik was right: nobody fights well on an empty stomach, and you will be walking people home through the Misty Woods. Pick berries, fetch water from the stream and stew a meal at the campfire.'
   chain: The First Days
   journalNotes: You'll be walking people home through bad country, and the meal before a raid goes through the portal with you. Get in the habit of it.
-  rank: 0
+  rank: 4
   availableObjective: 
   announceStart: 1
   announceCompletion: 1
   showTimerInHud: 0
   prerequisites:
-  - {fileID: 11400000, guid: 1f3262601d6fae14abe8db6df70ed0b4, type: 2}
+  - {fileID: 11400000, guid: f89173a9aeb790c4f9aeb1cc56e0e655, type: 2}
   startedFirst: []
   start: 0
   startEvent: {fileID: 0}

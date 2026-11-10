@@ -27,7 +27,7 @@ public sealed class HomePortal : MonoBehaviour, IArea, IBuildArea
         public GameEventDefinition moment;
     }
 
-    [Tooltip("What the portal says while each quest is active. The last active one in the list wins. When none is active, it whispers the lines below.")]
+    [Tooltip("What the portal says while each quest is active. The last active one in the list speaks first, so the main story goes last; Listen goes through the others. When none is active, it whispers the lines below.")]
     [SerializeField] private QuestWhisper[] questWhispers = System.Array.Empty<QuestWhisper>();
     [Tooltip("What the portal whispers when no quest whisper applies, one line per listen, in order.")]
     [SerializeField, TextArea(2, 5)] private string[] whispers =
@@ -57,6 +57,8 @@ public sealed class HomePortal : MonoBehaviour, IArea, IBuildArea
     private CraftingStation station;
     private HomePortalMenu menu;
     private int whisperIndex;
+    private int questLineIndex;
+    private readonly List<string> questLines = new List<string>();
 
     /// <summary>The portal in the loaded scene, or null outside Safe Haven.</summary>
     public static HomePortal Current { get; private set; }
@@ -162,6 +164,7 @@ public sealed class HomePortal : MonoBehaviour, IArea, IBuildArea
         }
 
         AudioManager.Play(voice, transform.position);
+        questLineIndex = 0;
         // Raised when the conversation ends, so the next quest doesn't appear while the portal is still speaking.
         menu ??= new HomePortalMenu(this, raid, station);
         ActionMenuWindow.Current.Open(() => menu.Build(user), user, transform, menuRange, () => RaiseTalked(user));
@@ -192,40 +195,59 @@ public sealed class HomePortal : MonoBehaviour, IArea, IBuildArea
         return null;
     }
 
-    /// <summary>The portal's line for the current step of the story, or null when no quest whisper applies.</summary>
-    private string QuestLine()
+    /// <summary>The portal's lines for the quests the player is on, the one that speaks first at the front (the last in
+    /// the list: the main story). Empty when no quest whisper applies. The list is reused: read it, don't keep it.</summary>
+    private List<string> QuestLines()
     {
+        questLines.Clear();
         for (int i = questWhispers.Length - 1; i >= 0; i--)
         {
             QuestWhisper whisper = questWhispers[i];
             if (whisper.quest != null && !string.IsNullOrEmpty(whisper.text) && GameSession.Quests.StatusOf(whisper.quest) == QuestStatus.Active)
             {
-                return whisper.text;
+                questLines.Add(whisper.text);
             }
         }
 
-        return null;
+        return questLines;
     }
 
-    /// <summary>What the portal says now: the line for the story's step, or one of its whispers; null when it has nothing.</summary>
+    /// <summary>What the portal says now: its line for a quest the player is on (the story's step first), or one of its
+    /// whispers; null when it has nothing.</summary>
     public string SpokenLine()
     {
-        string questLine = QuestLine();
-        if (questLine != null)
+        List<string> lines = QuestLines();
+        if (lines.Count > 0)
         {
-            return questLine;
+            return lines[questLineIndex % lines.Count];
         }
 
         return whispers.Length > 0 ? whispers[Mathf.Clamp(whisperIndex, 0, whispers.Length - 1)] : null;
     }
 
-    /// <summary>True when it has more whispers to give (none while a story's step has its line).</summary>
-    public bool HasMoreToSay => QuestLine() == null && whispers.Length > 1;
+    /// <summary>True when it has more to say: a line for another quest the player is on, or more whispers when no quest has one.</summary>
+    public bool HasMoreToSay
+    {
+        get
+        {
+            int lines = QuestLines().Count;
+            return lines > 1 || (lines == 0 && whispers.Length > 1);
+        }
+    }
 
-    /// <summary>Its next whisper, aloud.</summary>
+    /// <summary>Its next line, aloud: the next open quest's, or its next whisper.</summary>
     public void SayNext()
     {
-        whisperIndex = (whisperIndex + 1) % whispers.Length;
+        int lines = QuestLines().Count;
+        if (lines > 1)
+        {
+            questLineIndex = (questLineIndex + 1) % lines;
+        }
+        else if (lines == 0 && whispers.Length > 0)
+        {
+            whisperIndex = (whisperIndex + 1) % whispers.Length;
+        }
+
         AudioManager.Play(voice, transform.position);
     }
 

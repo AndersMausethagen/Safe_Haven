@@ -18,32 +18,32 @@ MonoBehaviour:
     eventName: QuestCompleted
     subject: Awakening
     detail: 
-    targetMinutes: 10
-  - label: First camp
+    targetMinutes: 16
+  - label: First fire
     eventName: QuestCompleted
     subject: FirstCamp
     detail: 
-    targetMinutes: 25
+    targetMinutes: 19
   - label: Portal awakened
     eventName: QuestCompleted
     subject: AwakeningThePortal
     detail: 
-    targetMinutes: 40
+    targetMinutes: 24
   - label: First raid over
     eventName: RaidFinished
     subject: 
     detail: 
-    targetMinutes: 60
+    targetMinutes: 42
   - label: First extraction
     eventName: RaidFinished
     subject: 
     detail: Extracted
-    targetMinutes: 60
+    targetMinutes: 42
   - label: Growing home
     eventName: QuestCompleted
     subject: AGrowingHome
     detail: 
-    targetMinutes: 90
+    targetMinutes: 120
   - label: First death
     eventName: PlayerDied
     subject: 

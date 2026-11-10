@@ -14,16 +14,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::QuestDefinition
   id: firstweapon
   displayName: Something to Fight With
-  description: 'A hatchet fells trees; it won''t keep a wolf off you. Make a Knotted Club at the workshop, from oak and nettle fibre: it stuns what it hits. Wear it in your weapon slot (C) before you go near the portal.'
+  description: 'The weapon you came through with won''t last for ever, and it is one way to fight. Make a Knotted Club at the Workshop, from oak and nettle fibre: it stuns what it hits. Wear it in your weapon slot (C), or keep it in the chest for the day yours breaks.'
   chain: The First Days
-  journalNotes: 
-  rank: 0
+  journalNotes: 'Nettles grow at the clearing''s edge: pick them by hand for the fibre. Z swaps between the weapon in your hand and the one you held before it.'
+  rank: 4
   availableObjective: 
   announceStart: 1
   announceCompletion: 1
   showTimerInHud: 0
   prerequisites:
-  - {fileID: 11400000, guid: 56c6112e347c2994db25d8808b5e4599, type: 2}
+  - {fileID: 11400000, guid: 3943d408532d51649b066fb789a31c5b, type: 2}
   startedFirst: []
   start: 0
   startEvent: {fileID: 0}

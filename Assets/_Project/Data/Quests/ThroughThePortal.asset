@@ -14,9 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::QuestDefinition
   id: through_the_portal
   displayName: Into the Misty Woods
-  description: Your people are past the door, and the Misty Woods won't wait. Craft stone tools by hand from your bag (B), then step through. Bring home hardwood and iron ore for the haven, and get back to an extraction point before the portal closes. Carried things are lost if you fall; your tools and weapon come back damaged.
-  chain: The First Days
-  journalNotes: Your first raid. Bring tools you can afford to see damaged, put anything precious in your safe pocket, and turn back earlier than feels necessary.
+  description: 'Sigrid''s voice came through the stones: Ingrid is hurt, and close. Step through the portal, find her, and reach an extraction point before the portal closes. What you wear comes home with you whatever happens. What you carry is lost if you fall.'
+  chain: The Hearth and the Door
+  journalNotes: 'The briefing at the portal says what the woods hold on this run and what you stand to lose. A hatchet and a pick (Tools of the Clearing) let you bring hardwood and ore home as well. Finding Ingrid counts even when the raid goes wrong: she waits where you found her.'
   rank: 0
   availableObjective: 
   announceStart: 1
@@ -53,10 +53,10 @@ MonoBehaviour:
   onStarted: []
   objectivesInOrder: 0
   objectives:
-  - type: 4
-    description: 
+  - type: 12
+    description: Find Ingrid in the Misty Woods
     amount: 1
-    item: {fileID: 11400000, guid: 27afb578446f7154cade27406cec81d3, type: 2}
+    item: {fileID: 0}
     resource: {fileID: 0}
     monster: {fileID: 0}
     faction: 1
@@ -65,14 +65,14 @@ MonoBehaviour:
     mustExtract: 1
     withinMinutes: 0
     questEvent: {fileID: 0}
-    person: {fileID: 0}
+    person: {fileID: 11400000, guid: 272895da9ba7e784b8a97bcd2be637c8, type: 2}
     target: {fileID: 0}
     job: {fileID: 0}
     breach: {fileID: 0}
     rank: 1
     tier: 2
     bringHome: 0
-    countAlreadyOwned: 0
+    countAlreadyOwned: 1
   - type: 5
     description: Extract from the Misty Woods
     amount: 1

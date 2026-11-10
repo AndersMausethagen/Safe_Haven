@@ -15,9 +15,9 @@ MonoBehaviour:
   id: raisethewalls
   displayName: Raise the Walls
   description: The ward keeps the worst of the forest out, but not everything. Put up four lengths of palisade between the fire and the trees (G).
-  chain: The First Days
+  chain: Hands at Home
   journalNotes: Wood against the dark. It will not stop the old ones, but it tells the small ones where the Haven begins.
-  rank: 0
+  rank: 4
   availableObjective: 
   announceStart: 1
   announceCompletion: 1

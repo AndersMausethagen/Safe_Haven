@@ -12,7 +12,8 @@ using Object = UnityEngine.Object;
 /// how, while quests for new buildings piled up. Now the opening teaches before it builds: tools, a workshop, a chest (what stays
 /// safe at home), a weapon, food, then the Life Orbs and the portal, and the first raid. The Woodcutter's Lodge and the walls come
 /// after it, with what the raid brought home. Nobody arrives with a Haven rank any more: everyone comes home from a raid.
-/// Safe to run again.
+/// Replaced on 2026-11-10 by BuildQuestCategories (Docs/QuestRedesign.md): the door opens after the fire and the stones, and
+/// these lessons are Haven quests beside the story. Don't run this one again: Gifts of the Clearing no longer exists.
 /// </summary>
 public static class BuildOpeningOrder
 {

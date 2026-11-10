@@ -14,16 +14,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::QuestDefinition
   id: primitivetools
   displayName: Tools of the Clearing
-  description: Bind a sharp rock to a stick for a hatchet, and another for a pick. Craft both from your bag (B).
+  description: 'Bare hands bring berries home. A hatchet and a pick bring hardwood and ore. Bind a sharp rock to a stick for each: both are made from your bag (B), from sticks and small rocks off the clearing floor.'
   chain: The First Days
-  journalNotes: Stone and wood, and the patience to lash them. Every tool the Haven will ever have starts like this.
-  rank: 0
+  journalNotes: 'Stone tools are made from your bag (B), with no station needed: 5 Sticks and 3 or 4 Small Rocks each. They go on your belt by themselves. Without them a raid still brings people and loose finds home, but no wood and no ore.'
+  rank: 4
   availableObjective: 
   announceStart: 1
   announceCompletion: 1
   showTimerInHud: 0
   prerequisites:
-  - {fileID: 11400000, guid: 09a9774284d0e6c44a03b94ad09483f7, type: 2}
+  - {fileID: 11400000, guid: f89173a9aeb790c4f9aeb1cc56e0e655, type: 2}
   startedFirst: []
   start: 0
   startEvent: {fileID: 0}

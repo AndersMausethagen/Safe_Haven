@@ -17,7 +17,7 @@ MonoBehaviour:
   description: 'Every raid is a guess: you go through and take what the woods give. Runa, the expedition''s tracker, would know where to look. Marks cut on the trees and seen only at night may be hers.'
   chain: The Lost Expedition
   journalNotes: 
-  rank: 0
+  rank: 3
   availableObjective: 
   announceStart: 1
   announceCompletion: 1
