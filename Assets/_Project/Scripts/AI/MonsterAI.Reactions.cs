@@ -114,6 +114,12 @@ public sealed partial class MonsterAI
         }
 
         Combatant attacker = damage.Source;
+        // Game runs from whatever struck it (MonsterAI.Timid).
+        if (definition != null && definition.Timid && !IsRemote && !result.Killed)
+        {
+            Bolt(attacker != null ? attacker.transform.position : transform.position - damage.Direction);
+        }
+
         if (definition == null || CurrentState == State.Dead || attacker == null)
         {
             return;

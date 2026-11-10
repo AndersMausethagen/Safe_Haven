@@ -42,6 +42,7 @@ public sealed class WorldToolsWindow : EditorWindow
         "Safe Haven/World/Place/Scatter Brush", "Safe Haven/World/Place/Drop Selection to Ground _END",
         "Safe Haven/World/Place/Drop and Align to Slope #_END", "Safe Haven/World/Place/Drop with Physics %_END",
         "Safe Haven/World/Terrain/Add Gentle Relief...", "Safe Haven/World/Terrain/Add Moss to Selected Terrain",
+        "Safe Haven/World/Haven World Planner", "Safe Haven/World/Generate Haven World",
         "Safe Haven/World/Build Now", "Safe Haven/World/Rebuild Everything", "Safe Haven/World/Give Hand Paint Back to Features",
         "Safe Haven/World/Terrain Surface", "Safe Haven/World/Mesh Surface",
         "Safe Haven/World/Water/Create Pond", "Safe Haven/World/Water/Create River Section", "Safe Haven/World/Water/Create Waterfall...",
@@ -556,6 +557,13 @@ public sealed class WorldToolsWindow : EditorWindow
             }
 
             MenuButton("Gentle Relief…", "Safe Haven/World/Terrain/Add Gentle Relief...", "Soft rises and dips on flat ground");
+        }
+
+        Section("Whole World");
+        using (new EditorGUILayout.HorizontalScope())
+        {
+            MenuButton("Haven World Planner", "Safe Haven/World/Haven World Planner", "The Haven world's recipe drawn as a map and counted, before anything is generated");
+            MenuButton("Generate Haven World…", "Safe Haven/World/Generate Haven World", "Turns the recipe into the Haven's world (asks first)");
         }
 
         Section("Look");

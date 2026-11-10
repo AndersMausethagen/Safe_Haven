@@ -42,6 +42,7 @@ public sealed partial class HavenWorldPlan
         {
             float edge = Half - Mathf.Max(Mathf.Abs(point.x), Mathf.Abs(point.y));
             if (edge < Recipe.rim.y + 8f || point.magnitude < Recipe.haven || InWater(point, 3f) || Near(Rivers, point, 5f) || MountainWeight(point) > 0.6f
+                || BogWeight(point) > 0.05f
                 || Ravines.Exists(ravine => NearLine(ravine.Line, point, ravine.FloorWidth + 8f))
                 || Outcrops.Exists(outcrop => Vector2.Distance(outcrop.Centre, point) < outcrop.Radius + 3f)
                 || Pois.Exists(poi => Vector2.Distance(poi.At, point) < poi.Rule.clearing * 0.5f))
@@ -94,11 +95,13 @@ public sealed partial class HavenWorldPlan
         {
             for (int tries = 0; tries < Tries; tries++)
             {
-                // Square root leans them outward, where the woods are thickest and the work is.
-                float distance = Mathf.Lerp(Recipe.haven + 50f, MaxReach - 15f, Mathf.Sqrt((float)random.NextDouble()));
-                Vector2 at = Dir(Range(0f, 360f)) * distance;
+                // Anywhere in the woods, their corners too: more of them further out, where there is more wood.
+                Vector2 at = Around(Recipe.haven + 50f, MaxReach);
+                float distance = at.magnitude;
                 float radius = Range(Recipe.gladeRadius.x, Recipe.gladeRadius.y);
-                if (MountainWeight(at) > 0.45f || InWater(at, radius + 10f) || Near(Rivers, at, radius + 6f)
+                // A room on one bench: a cliff may wall it, never cut it in two.
+                if (MountainWeight(at) > 0.45f || InWater(at, radius + 10f) || Near(Rivers, at, radius + 6f) || BogWeight(at) > 0f
+                    || !OneBench(at, radius + 3f)
                     || Ravines.Exists(ravine => NearLine(ravine.Line, at, radius + 10f))
                     || Outcrops.Exists(outcrop => Vector2.Distance(outcrop.Centre, at) < outcrop.Radius + radius + 8f)
                     || Pois.Exists(poi => Vector2.Distance(poi.At, at) < poi.Rule.clearing + radius + 15f)
@@ -114,7 +117,7 @@ public sealed partial class HavenWorldPlan
                 }
 
                 // A path already through it, or a trail to the nearest one that can get there.
-                List<Vector2> trail = Near(Paths, at, radius) ? null : TrailTo(glade, NearestOn(Paths, at), 170f);
+                List<Vector2> trail = Near(Paths, at, radius) ? null : TrailTo(glade, NearestOn(Paths, at), 230f);
                 if (!Near(Paths, at, radius) && trail == null)
                 {
                     continue;
@@ -127,7 +130,9 @@ public sealed partial class HavenWorldPlan
 
                 float outward = Mathf.InverseLerp(Recipe.haven, MaxReach, distance);
                 float roll = Range(0f, 1f);
-                glade.Kind = roll < 0.12f ? GladeKind.Wet : roll < 0.12f + 0.25f + outward * 0.15f ? GladeKind.Lair : roll < 0.7f ? GladeKind.Rocky : GladeKind.Meadow;
+                // A third lairs far out, a fifth near home; the rest rooms to rest, gather and hunt in.
+                float lairs = 0.2f + outward * 0.12f;
+                glade.Kind = roll < 0.14f ? GladeKind.Wet : roll < 0.14f + lairs ? GladeKind.Lair : roll < 0.36f + lairs ? GladeKind.Rocky : GladeKind.Meadow;
                 if (glade.Kind == GladeKind.Wet)
                 {
                     AddGladePool(glade);

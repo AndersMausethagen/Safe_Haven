@@ -436,6 +436,12 @@ public sealed partial class MonsterAI : MonoBehaviour, IEventSubject, IStaggerab
             return;
         }
 
+        // Game runs instead of fighting (MonsterAI.Timid).
+        if (UpdateTimid())
+        {
+            return;
+        }
+
         if (Time.time < parryUntil && CanTarget(target))
         {
             transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(FlatToTarget()),

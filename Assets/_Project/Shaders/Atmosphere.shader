@@ -46,6 +46,9 @@ Shader "Hidden/Safe Haven/Atmosphere"
         float4 _TerrainMistTints[MAX_TERRAIN_MISTS]; // linear tint, sky fill
         float4 _TerrainMistWaves[MAX_TERRAIN_MISTS]; // amplitude, wavelength, travel speed
         float4 _TerrainMistPooling[MAX_TERRAIN_MISTS]; // lowland boost, depression depth, water boost
+        int _TerrainMistRegionIndex;                 // which mist has a region map (-1: none)
+        float _TerrainMistRegionDensity;             // its density where the map is white
+        TEXTURE2D(_TerrainMistRegionTex);            // white where its mist always lies
         #define MAX_MIST_VOLUMES 4
         int _MistVolumeCount;
         float4x4 _MistVolumeWorldToLocal[MAX_MIST_VOLUMES];
@@ -271,7 +274,12 @@ Shader "Hidden/Safe Haven/Atmosphere"
                         float edge = min(min(local.x, local.y), min(rect.z - local.x, rect.w - local.y));
                         float4 pooling = _TerrainMistPooling[i];
                         float pooled = 1.0 + pooling.x * saturate(habitat.a / max(0.1, pooling.y)) + pooling.z * habitat.b;
-                        float cloudDensity = MistCloudDensity(p.xz, p.y - supportHeight, edge, _TerrainMistShapes[i],
+                        // Where this terrain's region map is white the mist lies whatever the weather.
+                        float4 shape = _TerrainMistShapes[i];
+                        if (i == _TerrainMistRegionIndex)
+                            shape.x = max(shape.x, _TerrainMistRegionDensity
+                                * SAMPLE_TEXTURE2D_LOD(_TerrainMistRegionTex, sampler_LinearClamp, saturate(local / rect.zw), 0).r);
+                        float cloudDensity = MistCloudDensity(p.xz, p.y - supportHeight, edge, shape,
                             _TerrainMistClouds[i], _TerrainMistWinds[i], _TerrainMistWaves[i], pooled);
                         density += cloudDensity;
                         tintDensity += _TerrainMistTints[i].rgb * cloudDensity;

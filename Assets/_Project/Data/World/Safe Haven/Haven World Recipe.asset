@@ -22,9 +22,20 @@ MonoBehaviour:
   grassResolution: 1024
   rim: {x: 28, y: 45}
   havenHills: 3
-  outerHills: 16
   hillScale: 90
-  ridges: 8
+  terraceStep: 7
+  terraceRise: 21
+  terraceWander: 10
+  terraceScale: 180
+  roadValley: 0.9
+  roadValleyWidth: 40
+  benchRoll: 0.3
+  riserWidth: 3.5
+  rampLength: 30
+  scrambleSpacing: {x: 90, y: 150}
+  scrambleRadius: 8
+  cliffMinLength: 24
+  cliffRockNear: 30
   lakeAt: {x: 100, y: 300}
   lakeSize: {x: 110, y: 75}
   lakeDepth: 6
@@ -34,7 +45,6 @@ MonoBehaviour:
   mountainAt: {x: 315, y: 80}
   mountainFrom: 260
   mountainHeight: 60
-  mountainCliffs: {x: 4, y: 6}
   mountainRocks:
   - {fileID: 2518022239375361439, guid: 836e25c3b8a921447b4a532902f9f11e, type: 3}
   - {fileID: 4213716333530687708, guid: faf3c09d50b58154dbe3d230bf50d2b8, type: 3}
@@ -42,11 +52,29 @@ MonoBehaviour:
   - {fileID: 8754368635658585658, guid: b7599a01d63fcaf44a11df1a96e9bb39, type: 3}
   mountainRockCount: {x: 40, y: 55}
   mountainRockScale: {x: 0.7, y: 1.5}
+  meres:
+  - name: Tarn
+    at: {x: 25, y: 335}
+    size: {x: 36, y: 25}
+    depth: 2.5
+    islands: {x: 1, y: 1}
+  - name: Mere
+    at: {x: 248, y: 310}
+    size: {x: 54, y: 37}
+    depth: 3.5
+    islands: {x: 2, y: 3}
+  bogAt: {x: 195, y: 345}
+  bogRadius: 95
+  bogWater: 0.38
+  bogWoods: 0.22
   rivers: {x: 2, y: 2}
-  ponds: {x: 2, y: 4}
+  riverWidth: {x: 4.5, y: 6}
+  streams: {x: 5, y: 6}
+  streamWidth: {x: 1.6, y: 2.6}
+  ponds: {x: 4, y: 6}
   pondRadius: {x: 5, y: 12}
-  outcrops: {x: 6, y: 9}
-  ravines: {x: 6, y: 9}
+  outcrops: {x: 7, y: 10}
+  ravines: {x: 4, y: 6}
   ravineDepth: {x: 10, y: 18}
   ravineLength: {x: 70, y: 160}
   radialPaths: 6
@@ -58,9 +86,10 @@ MonoBehaviour:
   loopWidth: 2.2
   trailWidth: 1.7
   pathClearing: {x: 11, y: 7}
-  glades: {x: 16, y: 20}
-  gladeRadius: {x: 14, y: 28}
-  gladeLinks: 0.55
+  glades: {x: 30, y: 36}
+  gladeRadius: {x: 13, y: 28}
+  gladeLinks: 0.8
+  placeLinks: 0.65
   gladeLandmarks:
   - {fileID: 8896246634900274262, guid: e7e112141c69cef4bbacdc428bbaf5ce, type: 3}
   - {fileID: 2432845718604954315, guid: 59c9184e28e36c94daedba055f6d0418, type: 3}
@@ -69,14 +98,20 @@ MonoBehaviour:
   gladeLandmarkChance: 0.7
   woods: {fileID: 11400000, guid: f8e72667c076c3349ab8ddaa5bb747a5, type: 2}
   woodsDensity: {x: 0.15, y: 0.95}
-  groves: {x: 4, y: 5}
+  groves: {x: 6, y: 8}
   trailScenes:
   - {fileID: 753853000388544552, guid: 57caefaa61c0de94b81f7cf499a12fa9, type: 3}
   - {fileID: 2269726820070725017, guid: cac709e05e0b120449586c0237e3cb09, type: 3}
   - {fileID: 6253381937994354546, guid: 4ade6f357f6d3cb46aff2417551611f6, type: 3}
   - {fileID: 5327954161451364447, guid: d4a383034aadd6d468ff730796b8ba18, type: 3}
   - {fileID: 8008296470320194651, guid: 10805448c6f7e3e42b58190ebd1a6238, type: 3}
-  trailSceneSpacing: {x: 60, y: 90}
+  meadowScenes:
+  - {fileID: 5247349096305433117, guid: 169de01e057a8b8458f1cfeb3775e60d, type: 3}
+  - {fileID: 3370448384768982715, guid: f1ce51d927f87b645b848eaed9dac672, type: 3}
+  - {fileID: 7024032891297042690, guid: cd8fcbe4cbc3940419a89342c9bb9f2e, type: 3}
+  - {fileID: 5566532530764483944, guid: 2f972b73b43c2794aa59c6c7f0afffa0, type: 3}
+  trailSceneSpacing: {x: 45, y: 70}
+  longestDullWalk: 90
   junctionMarker: {fileID: 4905383062814407678, guid: b911fd387739c60428056fbbd56b1048, type: 3}
   rimStones:
   - {fileID: 215287014038029075, guid: c67c3f6cb76afa7468e2085a2c922228, type: 3}
@@ -131,22 +166,21 @@ MonoBehaviour:
   - {fileID: 1081900227693273794, guid: 7b0b180b92953f3428ac6f04ea9b6b17, type: 3}
   hollowedGrazer: {fileID: 284320703641946880, guid: e71a763a5d6957848aeb95d6536208f8, type: 3}
   pointsOfInterest:
-  - name: Ruined Watchtower
-    prefab: {fileID: 3890292879020267311, guid: 950d02f776d4a294fa75449c13c351ba, type: 3}
-    distance: {x: 240, y: 430}
-    count: 2
-    clearing: 12
-    high: 1
+  - name: Wayfarer's Stones
+    prefab: {fileID: 3962568519174778497, guid: 00a2eedf4d471cd4292c182b7baeebf6, type: 3}
+    distance: {x: 0, y: 0}
+    count: 4
+    clearing: 10
+    high: 0
     onIsland: 0
-    path: 1
-  - name: Standing Stones
-    prefab: {fileID: 8565077372226898001, guid: 7b6e33233f2f82c4883bc305b27b3661, type: 3}
-    distance: {x: 200, y: 380}
-    count: 1
-    clearing: 12
-    high: 1
-    onIsland: 0
-    path: 1
+    path: 0
+    atRoadEnd: 1
+    inBog: 0
+    onShore: 0
+    inMeadows: 0
+    rewards: 3
+    rewardKind: 4
+    rewardTiers: {x: 1, y: 3}
   - name: Island Stones
     prefab: {fileID: 8565077372226898001, guid: 7b6e33233f2f82c4883bc305b27b3661, type: 3}
     distance: {x: 0, y: 0}
@@ -155,14 +189,133 @@ MonoBehaviour:
     high: 0
     onIsland: 1
     path: 0
+    atRoadEnd: 0
+    inBog: 0
+    onShore: 0
+    inMeadows: 0
+    rewards: 0
+    rewardKind: 4
+    rewardTiers: {x: 0, y: 0}
+  - name: Drowned Stones
+    prefab: {fileID: 2950290045911184316, guid: 4126dd27acb5df145a49235dd0ec8fde, type: 3}
+    distance: {x: 0, y: 0}
+    count: 1
+    clearing: 10
+    high: 0
+    onIsland: 0
+    path: 1
+    atRoadEnd: 0
+    inBog: 1
+    onShore: 0
+    inMeadows: 0
+    rewards: 4
+    rewardKind: 3
+    rewardTiers: {x: 2, y: 3}
+  - name: Fisher's Rest
+    prefab: {fileID: 8964754456068251636, guid: a092a0b5a280e9a4c9e893121c1d7230, type: 3}
+    distance: {x: 0, y: 0}
+    count: 2
+    clearing: 8
+    high: 0
+    onIsland: 0
+    path: 1
+    atRoadEnd: 0
+    inBog: 0
+    onShore: 1
+    inMeadows: 0
+    rewards: 2
+    rewardKind: 4
+    rewardTiers: {x: 0, y: 1}
+  - name: Mother Maple
+    prefab: {fileID: 5277958212656880909, guid: 205da1323b2d32446a798c7b39777f57, type: 3}
+    distance: {x: 105, y: 175}
+    count: 1
+    clearing: 10
+    high: 0
+    onIsland: 0
+    path: 1
+    atRoadEnd: 0
+    inBog: 0
+    onShore: 0
+    inMeadows: 1
+    rewards: 3
+    rewardKind: 4
+    rewardTiers: {x: 0, y: 1}
+  - name: Shepherd's Fold
+    prefab: {fileID: 5400174762019959134, guid: c3cf24da625157342a3bc26a517b62eb, type: 3}
+    distance: {x: 110, y: 190}
+    count: 2
+    clearing: 8
+    high: 0
+    onIsland: 0
+    path: 1
+    atRoadEnd: 0
+    inBog: 0
+    onShore: 0
+    inMeadows: 1
+    rewards: 2
+    rewardKind: 3
+    rewardTiers: {x: 1, y: 1}
+  - name: Ruined Watchtower
+    prefab: {fileID: 3890292879020267311, guid: 950d02f776d4a294fa75449c13c351ba, type: 3}
+    distance: {x: 240, y: 430}
+    count: 2
+    clearing: 12
+    high: 1
+    onIsland: 0
+    path: 1
+    atRoadEnd: 0
+    inBog: 0
+    onShore: 0
+    inMeadows: 0
+    rewards: 0
+    rewardKind: 4
+    rewardTiers: {x: 0, y: 0}
+  - name: Standing Stones
+    prefab: {fileID: 8565077372226898001, guid: 7b6e33233f2f82c4883bc305b27b3661, type: 3}
+    distance: {x: 200, y: 380}
+    count: 1
+    clearing: 12
+    high: 1
+    onIsland: 0
+    path: 1
+    atRoadEnd: 0
+    inBog: 0
+    onShore: 0
+    inMeadows: 0
+    rewards: 0
+    rewardKind: 4
+    rewardTiers: {x: 0, y: 0}
+  - name: Lookout Cairn
+    prefab: {fileID: 6570838499332300780, guid: b0783d50d74367140a8b80475ae901ea, type: 3}
+    distance: {x: 230, y: 480}
+    count: 3
+    clearing: 7
+    high: 1
+    onIsland: 0
+    path: 1
+    atRoadEnd: 0
+    inBog: 0
+    onShore: 0
+    inMeadows: 0
+    rewards: 0
+    rewardKind: 4
+    rewardTiers: {x: 0, y: 0}
   - name: Old Barrow
     prefab: {fileID: 1795259351188993423, guid: 9c6e4c351415c1444b0b73c5e60ebed3, type: 3}
-    distance: {x: 300, y: 450}
+    distance: {x: 300, y: 480}
     count: 1
     clearing: 12
     high: 0
     onIsland: 0
     path: 1
+    atRoadEnd: 0
+    inBog: 0
+    onShore: 0
+    inMeadows: 0
+    rewards: 0
+    rewardKind: 4
+    rewardTiers: {x: 0, y: 0}
   - name: Burnt Farmstead
     prefab: {fileID: 6129885625216382527, guid: d549f8510f79ec8498b5133f630e19d5, type: 3}
     distance: {x: 210, y: 340}
@@ -171,28 +324,165 @@ MonoBehaviour:
     high: 0
     onIsland: 0
     path: 1
+    atRoadEnd: 0
+    inBog: 0
+    onShore: 0
+    inMeadows: 0
+    rewards: 0
+    rewardKind: 4
+    rewardTiers: {x: 0, y: 0}
   - name: Wolf Den
     prefab: {fileID: 1188941405601281374, guid: a1c672ed8d66fd641983fc204e5d0fba, type: 3}
-    distance: {x: 330, y: 460}
+    distance: {x: 330, y: 480}
     count: 1
     clearing: 12
     high: 0
     onIsland: 0
     path: 1
+    atRoadEnd: 0
+    inBog: 0
+    onShore: 0
+    inMeadows: 0
+    rewards: 0
+    rewardKind: 4
+    rewardTiers: {x: 0, y: 0}
+  - name: Old Quarry
+    prefab: {fileID: 8389995454061840656, guid: 2ffe5ce1d4e509443a6417b33b063470, type: 3}
+    distance: {x: 250, y: 480}
+    count: 2
+    clearing: 10
+    high: 0
+    onIsland: 0
+    path: 1
+    atRoadEnd: 0
+    inBog: 0
+    onShore: 0
+    inMeadows: 0
+    rewards: 4
+    rewardKind: 2
+    rewardTiers: {x: 2, y: 3}
+  - name: Elder Cedar
+    prefab: {fileID: 6380532574696431489, guid: e651b2a31d734734f8a1ce0e56180ff3, type: 3}
+    distance: {x: 280, y: 480}
+    count: 2
+    clearing: 10
+    high: 0
+    onIsland: 0
+    path: 1
+    atRoadEnd: 0
+    inBog: 0
+    onShore: 0
+    inMeadows: 0
+    rewards: 3
+    rewardKind: 4
+    rewardTiers: {x: 2, y: 3}
   - name: Woodland Camp
     prefab: {fileID: 2497257881728789026, guid: aad4d9e512db2d54a9843a73ec6a551a, type: 3}
-    distance: {x: 170, y: 330}
-    count: 2
+    distance: {x: 170, y: 480}
+    count: 3
     clearing: 9
     high: 0
     onIsland: 0
     path: 1
+    atRoadEnd: 0
+    inBog: 0
+    onShore: 0
+    inMeadows: 0
+    rewards: 0
+    rewardKind: 4
+    rewardTiers: {x: 0, y: 0}
   creatures:
+  - name: Meadow game
+    distance: {x: 105, y: 200}
+    zones: 5
+    group: {x: 2, y: 3}
+    respawnSeconds: 420
+    peaceful: 1
+    bogOnly: 0
+    creatures:
+    - prefab: {fileID: 521656396065286680, guid: 448df709229bff54d8d806dc72659cb7, type: 3}
+      weight: 3
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+    - prefab: {fileID: 1525303727578722730, guid: b01b74895410fa947980a46c9cb2a0ce, type: 3}
+      weight: 0.6
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+    - prefab: {fileID: 5304832244727438513, guid: d77378d760129e84293e440d8b7bfe2b, type: 3}
+      weight: 0.8
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+  - name: Woodland game
+    distance: {x: 200, y: 340}
+    zones: 7
+    group: {x: 2, y: 4}
+    respawnSeconds: 480
+    peaceful: 1
+    bogOnly: 0
+    creatures:
+    - prefab: {fileID: 521656396065286680, guid: 448df709229bff54d8d806dc72659cb7, type: 3}
+      weight: 2
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+    - prefab: {fileID: 1525303727578722730, guid: b01b74895410fa947980a46c9cb2a0ce, type: 3}
+      weight: 1
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+    - prefab: {fileID: 5304832244727438513, guid: d77378d760129e84293e440d8b7bfe2b, type: 3}
+      weight: 0.8
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+    - prefab: {fileID: 8653230728158633359, guid: e880d4ea2b9be22409acdbd5bf1e6f9e, type: 3}
+      weight: 1.2
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+  - name: Deep game
+    distance: {x: 340, y: 480}
+    zones: 6
+    group: {x: 2, y: 4}
+    respawnSeconds: 540
+    peaceful: 1
+    bogOnly: 0
+    creatures:
+    - prefab: {fileID: 1525303727578722730, guid: b01b74895410fa947980a46c9cb2a0ce, type: 3}
+      weight: 1.5
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+    - prefab: {fileID: 8653230728158633359, guid: e880d4ea2b9be22409acdbd5bf1e6f9e, type: 3}
+      weight: 1.5
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+    - prefab: {fileID: 521656396065286680, guid: 448df709229bff54d8d806dc72659cb7, type: 3}
+      weight: 1
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
   - name: Edge of the woods
     distance: {x: 200, y: 300}
     zones: 5
     group: {x: 1, y: 2}
     respawnSeconds: 600
+    peaceful: 0
+    bogOnly: 0
     creatures:
     - prefab: {fileID: 7477446688404098989, guid: 237fc76d161bb114aa2049a864298943, type: 3}
       weight: 2
@@ -214,9 +504,11 @@ MonoBehaviour:
       toTier: 0
   - name: Misty Woods
     distance: {x: 300, y: 400}
-    zones: 7
+    zones: 8
     group: {x: 2, y: 3}
     respawnSeconds: 600
+    peaceful: 0
+    bogOnly: 0
     creatures:
     - prefab: {fileID: 7477446688404098989, guid: 237fc76d161bb114aa2049a864298943, type: 3}
       weight: 2
@@ -250,9 +542,11 @@ MonoBehaviour:
       toTier: 0
   - name: Deep woods
     distance: {x: 390, y: 480}
-    zones: 8
+    zones: 12
     group: {x: 2, y: 4}
     respawnSeconds: 600
+    peaceful: 0
+    bogOnly: 0
     creatures:
     - prefab: {fileID: 6267209934607442583, guid: bb37a42ef72f5274d807155e3d054529, type: 3}
       weight: 0.8
@@ -290,6 +584,32 @@ MonoBehaviour:
       minPerGroup: 0
       fromTier: 0
       toTier: 0
+  - name: Bog
+    distance: {x: 0, y: 0}
+    zones: 4
+    group: {x: 2, y: 3}
+    respawnSeconds: 600
+    peaceful: 0
+    bogOnly: 1
+    creatures:
+    - prefab: {fileID: 4999243170976522981, guid: 07a704aacccfef242886f2875ff4fcdf, type: 3}
+      weight: 2
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+    - prefab: {fileID: 5318185529198269020, guid: d281dc652b3e50445a465365ff40b433, type: 3}
+      weight: 1.5
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+    - prefab: {fileID: 9066855856663566298, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
+      weight: 0.6
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
   resources:
   - name: Loose stone
     distance: {x: 80, y: 260}
@@ -298,13 +618,15 @@ MonoBehaviour:
     clusters: 10
     perCluster: {x: 2, y: 3}
     mountainOnly: 0
+    bogOnly: 0
   - name: Forage
     distance: {x: 80, y: 280}
     kind: 4
     tiers: {x: 0, y: 1}
-    clusters: 12
+    clusters: 14
     perCluster: {x: 2, y: 4}
     mountainOnly: 0
+    bogOnly: 0
   - name: Fibre plants
     distance: {x: 150, y: 400}
     kind: 3
@@ -312,6 +634,7 @@ MonoBehaviour:
     clusters: 12
     perCluster: {x: 2, y: 4}
     mountainOnly: 0
+    bogOnly: 0
   - name: Stone and copper
     distance: {x: 250, y: 400}
     kind: 2
@@ -319,27 +642,31 @@ MonoBehaviour:
     clusters: 16
     perCluster: {x: 2, y: 4}
     mountainOnly: 0
+    bogOnly: 0
   - name: Hard wood
     distance: {x: 300, y: 480}
     kind: 1
     tiers: {x: 2, y: 3}
-    clusters: 14
+    clusters: 18
     perCluster: {x: 1, y: 3}
     mountainOnly: 0
+    bogOnly: 0
   - name: Deep forage
     distance: {x: 300, y: 480}
     kind: 4
     tiers: {x: 1, y: 3}
-    clusters: 12
+    clusters: 16
     perCluster: {x: 2, y: 4}
     mountainOnly: 0
+    bogOnly: 0
   - name: Iron
     distance: {x: 380, y: 480}
     kind: 2
     tiers: {x: 2, y: 3}
-    clusters: 18
+    clusters: 22
     perCluster: {x: 2, y: 4}
     mountainOnly: 0
+    bogOnly: 0
   - name: Mountain ore
     distance: {x: 260, y: 480}
     kind: 2
@@ -347,4 +674,24 @@ MonoBehaviour:
     clusters: 16
     perCluster: {x: 3, y: 5}
     mountainOnly: 1
+    bogOnly: 0
+  - name: Bog plants
+    distance: {x: 0, y: 0}
+    kind: 3
+    tiers: {x: 1, y: 3}
+    clusters: 7
+    perCluster: {x: 2, y: 4}
+    mountainOnly: 0
+    bogOnly: 1
+  - name: Bog forage
+    distance: {x: 0, y: 0}
+    kind: 4
+    tiers: {x: 1, y: 3}
+    clusters: 6
+    perCluster: {x: 2, y: 4}
+    mountainOnly: 0
+    bogOnly: 1
+  woodsMist: 0.55
+  bogMist: 1
+  gladeMist: 0.35
   seed: 1

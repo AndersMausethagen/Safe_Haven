@@ -480,6 +480,51 @@ NavMesh data inside a scene makes Unity save the whole scene as binary).
 A demo: **Scenes/Demo/WorldBuilderDemo** (a river falling over a cliff, a ford, an outcrop and a dark forest).
 `AgentScripts/WorldDemo.cs` rebuilds it.
 
+## The Haven world (planner and generator)
+
+The Haven's world is generated from a recipe and then refined by hand. Why it is laid out as it is (terraces, roads in
+valleys, rooms and corridors, no walk with nothing on it) is in [the Haven world's design](HavenWorldDesign.md).
+
+**Safe Haven › World › Haven World Planner** (also World Tools › Ground › Whole World) shows the recipe on the left and
+the world it plans as a map on the right, north up. Changing a number replans in about a second, so tune here before
+generating:
+
+- **Seed / Roll / Keep This Seed:** the same recipe and seed always plan the same world. Roll until one pleases, then
+  Keep This Seed writes it to the recipe.
+- **Show:** water, cliffs, paths, glades, places, creatures, resources, scenes, mist, problems. With **Problems** on:
+  red hatching is ground nothing climbs to, red lines are walks that pass nothing for longer than the recipe's Longest
+  Dull Walk, red crosses are paths that end at nothing, pink dots are ground with nothing within 45 m.
+- **The counts** under the map say what the plan holds and how it measures up (places asked and placed, metres of
+  cliff with rock, the share of ground that can be walked to, the longest dull walk, dead ends, empty ground).
+- **Point at the map** to read a spot: where it is, which bench, how high, and what stands there.
+- **Save Picture** saves the map as a PNG. **Generate World** runs the generator (it asks first).
+
+**Safe Haven › World › Generate Haven World** turns the recipe into the world: the terrain, World Builder features
+(rivers and streams, paths, the cliffs between the terraces, outcrops, ravines, groves), woods, water, places, spawn
+zones, resource points and the mist map. It takes about three minutes, keeps the portal, buildings, residents, quest
+and story objects, and does not save the scene. **Everything it made before is replaced**, hand edits included: put
+lasting changes in the recipe or its builder scripts.
+
+What the recipe's sections do:
+
+| Section | What it sets |
+|---|---|
+| Rings, Terrain, Relief | The buildable middle, where the Haven's meadows give way to the woods, the terrain's size |
+| Terraces | The step between benches, how far the land climbs, how much the cliffs wander, ramps where paths climb, scrambles, the valleys roads run in, which cliffs get rock pieces |
+| Lake, Mountain, Meres and Bog | Where each lies and how big; islands; how much of the bog is under water |
+| Water and Rock | Rivers and streams (how many, how wide), ponds, outcrops, ravines |
+| Paths, Glades | Roads, the ring, glades and how many have a second way out |
+| Forest, Along the Way, Glade Dressing, Wildlife | The woods' density, scenes beside the paths (the woods' and the meadows'), what lies in each kind of glade |
+| What Is Found There | Places (where each may stand and what it gives), creature bands (Peaceful: game to hunt), resource bands |
+| Mist | How much mist always lies in the woods, the bog and the glades |
+
+The recipe's lists are filled by `AgentScripts/BuildHavenWorldRecipe.cs`; the places it points at are made by
+`BuildHavenWorldPlaces.cs` (and `BuildHavenWorldProps.cs`, `BuildHavenWayScenes.cs`), the game by `BuildGame.cs`.
+
+**Mist** lies where the generator's map says (`Data/World/Safe Haven/Haven World Mist.png`, white for mist, on the
+terrain's **Terrain Mist** › Region Map): the Misty Woods and the bog always, the Haven's meadows only with the
+weather and the morning. It is an ordinary picture: paint over it to move the mist (the next generation rewrites it).
+
 ## Scatter Brush
 
 **Safe Haven › World › Place › Scatter Brush** (or World Tools › Place). Pick a palette, press **Paint**, then click or drag over the ground.

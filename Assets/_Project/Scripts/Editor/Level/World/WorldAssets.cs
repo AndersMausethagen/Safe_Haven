@@ -496,11 +496,19 @@ public static class WorldAssets
         var material = AssetDatabase.LoadAssetAtPath<Material>(path);
         if (material != null)
         {
+            // A river fades into the still water it joins: its mesh carries the fade in its vertices' alpha.
+            if (material.GetFloat("_VertexAlpha") < 0.5f)
+            {
+                material.SetFloat("_VertexAlpha", 1f);
+                EditorUtility.SetDirty(material);
+            }
+
             return material;
         }
 
         WaterSetup.Set set = WaterSetup.EnsureAssets();
         material = new Material(set.River) { name = "Water River (World)" };
+        material.SetFloat("_VertexAlpha", 1f);
         material.SetFloat("_FlowFromMesh", 1f);
         material.SetFloat("_FlowSpeed", 1f);
         material.SetFloat("_SteepFaces", 1f);

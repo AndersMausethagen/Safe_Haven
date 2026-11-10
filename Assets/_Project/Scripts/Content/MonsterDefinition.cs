@@ -87,6 +87,13 @@ public sealed class MonsterDefinition : ScriptableObject, ICombatSounds
     [Tooltip("How much of what it sees a sleeper notices. Low enough to creep past.")]
     [SerializeField, Range(0f, 1f)] private float idleSleepAttention = 0.3f;
 
+    [Header("Game")]
+    [Tooltip("It runs instead of fighting: when struck, and when the player comes into its sight within its Detection Range (a sneaking " +
+             "hunter gets closer) or steps inside its Close Sense Range. For game to hunt, set Faction to Neutral as well.")]
+    [SerializeField] private bool timid;
+    [Tooltip("Seconds it runs before it settles again, wherever it has got to.")]
+    [SerializeField, Min(1f)] private float boltSeconds = 7f;
+
     [Header("In a Fight")]
     [Tooltip("A person-shaped creature, whom a finishing blow can line up with: a press close behind it while it staggers locks the two together for the stab.")]
     [SerializeField] private bool canBeFinished;
@@ -157,6 +164,9 @@ public sealed class MonsterDefinition : ScriptableObject, ICombatSounds
     public float AttackDamage => attackDamage;
     public float AttackCooldown => attackCooldown;
     public float MoveSpeed => moveSpeed;
+    /// <summary>Game: it runs instead of fighting (MonsterAI.Timid).</summary>
+    public bool Timid => timid;
+    public float BoltSeconds => boltSeconds;
     public float DetectionRange => detectionRange;
     public float ChaseRange => Mathf.Max(chaseRange, detectionRange);
     public float LeashRange => leashRange;

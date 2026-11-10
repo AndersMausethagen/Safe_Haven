@@ -19,6 +19,19 @@ public sealed class HavenPointOfInterest
     public bool onIsland;
     [Tooltip("A path leads to it from the nearest path.")]
     public bool path = true;
+    [Tooltip("Stands at the end of a road that runs out to the edge of the woods, one per road until they run out: no road ends at nothing.")]
+    public bool atRoadEnd;
+    [Tooltip("Stands in the bog, on dry ground among the pools.")]
+    public bool inBog;
+    [Tooltip("Stands by the water: the lake's or a mere's shore.")]
+    public bool onShore;
+    [Tooltip("Stands in the Haven's own meadows, inside the woods' edge (its distance still applies).")]
+    public bool inMeadows;
+    [Header("What it gives")]
+    [Tooltip("Resource points standing round it, so the walk there pays: how many (0: none), of what kind and tiers.")]
+    [Min(0)] public int rewards;
+    public ResourceNodeKind rewardKind = ResourceNodeKind.Forage;
+    public Vector2Int rewardTiers = new Vector2Int(1, 2);
 }
 
 /// <summary>Creatures the Haven world spawns between two distances from the portal, in drawn spawn zones (MobSpawnZone).</summary>
@@ -34,6 +47,11 @@ public sealed class HavenCreatureBand
     public Vector2Int group = new Vector2Int(1, 2);
     [Tooltip("Seconds before a cleared zone fills again.")]
     [Min(0f)] public float respawnSeconds = 600f;
+    [Tooltip("Game to hunt (and one day tame), not a threat: its zones may lie in the Haven's meadows, take the open glades rather " +
+             "than the lairs, and fill again by day as well as by night.")]
+    public bool peaceful;
+    [Tooltip("Only in the bog.")]
+    public bool bogOnly;
     public List<SpawnTable.Entry> creatures = new List<SpawnTable.Entry>();
 }
 
@@ -51,6 +69,22 @@ public sealed class HavenResourceBand
     public Vector2Int perCluster = new Vector2Int(2, 4);
     [Tooltip("Only in the mountains (rock and ore), or anywhere in the band.")]
     public bool mountainOnly;
+    [Tooltip("Only in the bog (its plants, bog ore).")]
+    public bool bogOnly;
+}
+
+/// <summary>A smaller lake in the woods or the hills, with islands of its own.</summary>
+[Serializable]
+public sealed class HavenMere
+{
+    public string name = "Mere";
+    [Tooltip("Direction from the portal (degrees, 0 = north, clockwise) and distance to its middle. It moves a little to find room.")]
+    public Vector2 at = new Vector2(240f, 300f);
+    [Tooltip("Half its length and half its width, in metres.")]
+    public Vector2 size = new Vector2(45f, 30f);
+    [Min(0.5f)] public float depth = 3f;
+    [Tooltip("Islands, least and most.")]
+    public Vector2Int islands = new Vector2Int(1, 2);
 }
 
 /// <summary>
@@ -84,12 +118,42 @@ public sealed class HavenWorldRecipe : ScriptableObject
     [Header("Relief")]
     [Tooltip("How far the Haven's ground rolls up and down, in metres.")]
     [Min(0f)] public float havenHills = 3f;
-    [Tooltip("How far the ground rolls at the edge of the world; it grows with distance from the Haven.")]
-    [Min(0f)] public float outerHills = 16f;
     [Tooltip("Metres across one roll of the hills.")]
     [Min(10f)] public float hillScale = 90f;
-    [Tooltip("Ridges between the valleys, in the outer woods.")]
-    [Min(0f)] public float ridges = 8f;
+
+    [Header("Terraces")]
+    [Tooltip("Height of one terrace, in metres. Outside the Haven the land is flat benches with a cliff between each and the next: " +
+             "from above a cliff reads at a glance, a slope does not.")]
+    [Min(2f)] public float terraceStep = 7f;
+    [Tooltip("How high the land has climbed, in metres, where the rim begins: about this many metres over the step is how many cliffs " +
+             "a walk straight out crosses.")]
+    [Min(0f)] public float terraceRise = 21f;
+    [Tooltip("How far the land swells above and sinks below that climb, in metres: it makes the cliffs wander into bays, headlands and " +
+             "lone table rocks instead of rings.")]
+    [Min(0f)] public float terraceWander = 10f;
+    [Tooltip("Metres across one such swell.")]
+    [Min(40f)] public float terraceScale = 180f;
+    [Tooltip("How deep the roads out from the Haven run below the land beside them, in terraces (0: none): a road in a valley has " +
+             "cliffs for walls, and the benches above it are rooms a trail climbs to.")]
+    [Range(0f, 1.5f)] public float roadValley = 0.9f;
+    [Tooltip("Metres from a road at which its valley has risen back to the land.")]
+    [Min(10f)] public float roadValleyWidth = 40f;
+    [Tooltip("How far a bench rolls and tilts, as a share of the Haven's hills (0 = dead flat).")]
+    [Range(0f, 1f)] public float benchRoll = 0.3f;
+    [Tooltip("Metres a cliff face takes from foot to top, seen from above.")]
+    [Min(1f)] public float riserWidth = 3.5f;
+    [Tooltip("Metres a path takes to climb one terrace: every path crossing a cliff gets a ramp this long.")]
+    [Min(8f)] public float rampLength = 30f;
+    [Tooltip("A way up without a path, where the cliff has crumbled into a slope: one about every so many metres along each cliff, " +
+             "least and most, so no bench is cut off.")]
+    public Vector2 scrambleSpacing = new Vector2(90f, 150f);
+    [Tooltip("Half the width of such a scramble, in metres.")]
+    [Min(3f)] public float scrambleRadius = 8f;
+    [Tooltip("Cliffs shorter than this get no rock pieces stood along them (the terrain's own rock still shows).")]
+    [Min(5f)] public float cliffMinLength = 24f;
+    [Tooltip("Rock pieces stand only along cliffs within this many metres of a path, a glade or a place, where they are walked beside; " +
+             "further off the terrain's own rock does. Rock pieces are the heaviest thing in the world: about 2 scene objects a metre.")]
+    [Min(0f)] public float cliffRockNear = 30f;
 
     [Header("Lake")]
     [Tooltip("Direction from the portal (degrees, 0 = north, clockwise) and distance to the lake's middle.")]
@@ -110,8 +174,6 @@ public sealed class HavenWorldRecipe : ScriptableObject
     [Min(50f)] public float mountainFrom = 260f;
     [Tooltip("How high it rises above the woods, in metres.")]
     [Min(0f)] public float mountainHeight = 60f;
-    [Tooltip("Cliff lines across its flanks, least and most.")]
-    public Vector2Int mountainCliffs = new Vector2Int(4, 6);
     [Tooltip("Rock faces and boulders strewn over its flanks: each faces down the slope if its shape faces one way.")]
     public List<GameObject> mountainRocks = new List<GameObject>();
     [Tooltip("How many, least and most.")]
@@ -119,9 +181,27 @@ public sealed class HavenWorldRecipe : ScriptableObject
     [Tooltip("Their size, least and most (1 = as modelled).")]
     public Vector2 mountainRockScale = new Vector2(0.7f, 1.5f);
 
+    [Header("Meres and Bog")]
+    [Tooltip("Smaller lakes with islands of their own.")]
+    public List<HavenMere> meres = new List<HavenMere>();
+    [Tooltip("The bog: direction from the portal (degrees) and distance to its middle. 0 distance: no bog.")]
+    public Vector2 bogAt = new Vector2(195f, 345f);
+    [Tooltip("How far it reaches from its middle, in metres.")]
+    [Min(0f)] public float bogRadius = 95f;
+    [Tooltip("How much of it stands under water, 0 to 1: pools and channels between the hummocks.")]
+    [Range(0f, 0.8f)] public float bogWater = 0.38f;
+    [Tooltip("How thin the woods stand in the bog, as a share of the woods around it.")]
+    [Range(0f, 1f)] public float bogWoods = 0.22f;
+
     [Header("Water and Rock")]
     [Tooltip("Rivers, least and most: from the mountain or the edge down to the lake.")]
     public Vector2Int rivers = new Vector2Int(2, 2);
+    [Tooltip("Their width, least and most, in metres.")]
+    public Vector2 riverWidth = new Vector2(4.5f, 6f);
+    [Tooltip("Streams, least and most: out of the meres and the bog and from springs in the hills, down to the nearest river or lake.")]
+    public Vector2Int streams = new Vector2Int(4, 5);
+    [Tooltip("Their width, least and most, in metres.")]
+    public Vector2 streamWidth = new Vector2(1.6f, 2.6f);
     [Tooltip("Ponds in the Haven's ring, least and most.")]
     public Vector2Int ponds = new Vector2Int(2, 4);
     public Vector2 pondRadius = new Vector2(5f, 12f);
@@ -154,6 +234,8 @@ public sealed class HavenWorldRecipe : ScriptableObject
     public Vector2 gladeRadius = new Vector2(14f, 28f);
     [Tooltip("Chance a glade gets a second trail, to another glade or path, so the woods are a network rather than dead ends.")]
     [Range(0f, 1f)] public float gladeLinks = 0.55f;
+    [Tooltip("Chance a place with a path gets a second way out, a trail on to the nearest glade: a walk to it carries on somewhere.")]
+    [Range(0f, 1f)] public float placeLinks = 0.6f;
     [Tooltip("What can stand in a glade's middle, so it reads from above (an old tree, stones); one is picked per glade that gets one.")]
     public List<GameObject> gladeLandmarks = new List<GameObject>();
     [Range(0f, 1f)] public float gladeLandmarkChance = 0.4f;
@@ -170,7 +252,12 @@ public sealed class HavenWorldRecipe : ScriptableObject
     [Tooltip("Small scenes beside the woods' paths (a fallen giant, a log stack, a waystone...), one every so many metres: " +
              "something to come across between the glades.")]
     public List<GameObject> trailScenes = new List<GameObject>();
-    public Vector2 trailSceneSpacing = new Vector2(60f, 90f);
+    [Tooltip("The same for paths through the Haven's own meadows (an old fence, boundary stones...). Empty: the woods' scenes are used there too.")]
+    public List<GameObject> meadowScenes = new List<GameObject>();
+    [Tooltip("How far a walk goes with nothing on it before a scene is set beside the path, least and most, in metres.")]
+    public Vector2 trailSceneSpacing = new Vector2(45f, 70f);
+    [Tooltip("The longest walk along a path with nothing to come across, in metres: the planner marks any longer one in red.")]
+    [Min(20f)] public float longestDullWalk = 90f;
     [Tooltip("Stands where a trail leaves another path (a cairn): the way can be found without the map.")]
     public GameObject junctionMarker;
     [Tooltip("Stones lining a ravine's lip, every so many metres, so the drop is seen before it is fallen into.")]
@@ -201,6 +288,14 @@ public sealed class HavenWorldRecipe : ScriptableObject
     public List<HavenPointOfInterest> pointsOfInterest = new List<HavenPointOfInterest>();
     public List<HavenCreatureBand> creatures = new List<HavenCreatureBand>();
     public List<HavenResourceBand> resources = new List<HavenResourceBand>();
+
+    [Header("Mist")]
+    [Tooltip("How much mist always lies in the Misty Woods, 0 to 1 (the Haven's own meadows keep only the weather's and the morning's).")]
+    [Range(0f, 1f)] public float woodsMist = 0.55f;
+    [Tooltip("How much always lies over the bog.")]
+    [Range(0f, 1f)] public float bogMist = 1f;
+    [Tooltip("How much lies in the glades, as a share of the woods around them: a glade is a clear room in the mist.")]
+    [Range(0f, 1f)] public float gladeMist = 0.35f;
 
     [Header("Seed")]
     public int seed = 1;

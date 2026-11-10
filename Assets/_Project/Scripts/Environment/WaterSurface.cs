@@ -23,6 +23,9 @@ public sealed class WaterSurface : MonoBehaviour
     [Tooltip("Spline rivers (written by the World Builder): the surface's centre line in local space, xyz = a point on " +
              "the surface, w = half the width there. Empty: the top of the mesh bounds is the water.")]
     [SerializeField, HideInInspector] private Vector4[] centreline = System.Array.Empty<Vector4>();
+    [Tooltip("Still water's true shoreline, as points round it (local x and z), when its mesh's box or oval is not it: a turned or " +
+             "ragged lake, a bog whose sheet lies under more ground than it wets. Rivers run in to this line. Empty: the mesh's bounds.")]
+    [SerializeField, HideInInspector] private Vector2[] shoreline = System.Array.Empty<Vector2>();
     [Tooltip("An oval pond: its outline is the oval inside the mesh's bounds (the mesh is a disc), not the whole box.")]
     [SerializeField] private bool oval;
     [Header("Drinking")]
@@ -242,6 +245,33 @@ public sealed class WaterSurface : MonoBehaviour
     public void SetCentreline(Vector4[] points) => centreline = points ?? System.Array.Empty<Vector4>();
 
     public bool HasCentreline => centreline.Length >= 2;
+
+    /// <summary>Gives still water its true shoreline (local x and z, in order round it). Null or fewer than three points goes
+    /// back to the mesh bounds.</summary>
+    public void SetShoreline(Vector2[] points) => shoreline = points ?? System.Array.Empty<Vector2>();
+
+    public bool HasShoreline => shoreline.Length >= 3;
+
+    /// <summary>Metres from a point (world x and z) to the shoreline: below zero it is in the water. Only with <see cref="HasShoreline"/>.</summary>
+    public float ShorelineDistance(float worldX, float worldZ)
+    {
+        Vector3 local = transform.InverseTransformPoint(new Vector3(worldX, transform.position.y, worldZ));
+        var point = new Vector2(local.x, local.z);
+        float nearest = float.MaxValue;
+        bool inside = false;
+        for (int i = 0, j = shoreline.Length - 1; i < shoreline.Length; j = i++)
+        {
+            Vector2 a = shoreline[j], b = shoreline[i], along = b - a;
+            float t = Mathf.Clamp01(Vector2.Dot(point - a, along) / Mathf.Max(1e-6f, along.sqrMagnitude));
+            nearest = Mathf.Min(nearest, (a + along * t - point).sqrMagnitude);
+            if ((a.y > point.y) != (b.y > point.y) && point.x < a.x + (point.y - a.y) / (b.y - a.y) * along.x)
+            {
+                inside = !inside;
+            }
+        }
+
+        return Mathf.Sqrt(nearest) * Mathf.Abs(transform.lossyScale.x) * (inside ? -1f : 1f);
+    }
 
     /// <summary>A river's centreline in world space: each point (x, surface height, z) with its half width in w; empty for still water.</summary>
     public Vector4[] WorldCentreline()

@@ -10,12 +10,13 @@ using Debug = UnityEngine.Debug;
 
 /// <summary>
 /// Safe Haven › World › Generate Haven World: turns a HavenWorldRecipe (through a HavenWorldPlan) into the Haven's world, as a baseline
-/// a designer refines by hand. What the World Builder already does, it does: rivers, paths, cliffs and outcrops, ravines and maple groves
-/// are ordinary World Builder features (each copied from the scene's own tuned feature of its kind, so the Haven's palettes, layers and
-/// materials carry over) and the World Builder shapes, paints and fills them. Around them it lays what the World Builder has no feature
-/// for: the land's shape (rings, mountain, lake basin, rim), the ground's paint (the Haven's and the Dark Forest's paint rules, blended by
-/// distance), the lake and ponds, the woods as terrain trees (the raids' forest and its habitats, cheap at this size and fellable),
-/// grass by ground, points of interest, creature spawn zones and resource points.
+/// a designer refines by hand. What the World Builder already does, it does: rivers and streams, paths, the cliffs between the terraces,
+/// outcrops, ravines and maple groves are ordinary World Builder features (each copied from the scene's own tuned feature of its kind, so
+/// the Haven's palettes, layers and materials carry over) and the World Builder shapes, paints and fills them. Around them it lays what
+/// the World Builder has no feature for: the land's shape (the terraces, mountain, lake valley, bog, rim), the ground's paint (the Haven's
+/// and the Dark Forest's paint rules, blended by distance; the bog's), the lake, meres, ponds and the bog's water, the woods as terrain
+/// trees (the raids' forest and its habitats, cheap at this size and fellable), grass by ground, points of interest, creature and game
+/// spawn zones, resource points and the map of where mist lies.
 ///
 /// Three steps, each runnable alone from the command line: <see cref="Prepare"/> (everything up to the features), <see cref="Build"/>
 /// (the World Builder builds them all) and <see cref="Finish"/> (what stands on the finished ground, moss, displacement, navmesh).
@@ -66,8 +67,9 @@ public static class HavenWorldGenerator
         }
 
         HavenWorldPlan plan = HavenWorldPlan.Make(recipe);
-        report.Append($"plan {clock.ElapsedMilliseconds} ms ({plan.Paths.Count} paths, {plan.Rivers.Count} rivers, {plan.Ponds.Count} ponds, {plan.Islands.Count} islands, " +
-                      $"{plan.Outcrops.Count} outcrops, {plan.Cliffs.Count} cliffs, {plan.Ravines.Count} ravines, {plan.Groves.Count} groves, {plan.Pois.Count} places, " +
+        report.Append($"plan {clock.ElapsedMilliseconds} ms ({plan.Paths.Count} paths, {plan.Rivers.Count} rivers and streams with {plan.Falls.Count} falls, {plan.Meres.Count} meres, " +
+                      $"{plan.Ponds.Count} ponds, {plan.Islands.Count} islands, {plan.Outcrops.Count} outcrops, {plan.Cliffs.Count} cliff lines ({plan.DressedCliffMetres:0} m), " +
+                      $"{plan.Scrambles.Count} scrambles, {plan.Ravines.Count} ravines, {plan.Groves.Count} groves, {plan.Pois.Count} places, " +
                       $"{plan.Glades.Count} glades, {plan.Zones.Count} spawn zones, {plan.Nodes.Count} resource points); ");
 
         SetBuildAutomatically(world, false);
@@ -221,7 +223,8 @@ public static class HavenWorldGenerator
         int[] havenIndex = haven.Rules.Select(rule => rule.layer != null ? Index(rule.layer.name) : -1).ToArray();
         int[] woodsIndex = woods.Rules.Select(rule => rule.layer != null ? Index(rule.layer.name) : -1).ToArray();
         int meadow = Index("Haven Meadow"), litter = Index("Cedar Litter"), scree = Index("Gravel"), mud = Index("Muddy Bank"), bank = Index("Haven Bank");
-        int moss = Index("Cedar Moss");
+        int moss = Index("Cedar Moss"), cliffRock = Index("Cliff Rock");
+        int riverBed = WorldLook.ForestLake.RiverBed != null ? Index(WorldLook.ForestLake.RiverBed.name) : -1;
         int count = layers.Length, resolution = data.alphamapResolution, heightsCount = heights.GetLength(0);
         Vector3 origin = terrain.transform.position;
         float size = data.size.x, cell = size / (heightsCount - 1);
@@ -279,8 +282,38 @@ public static class HavenWorldGenerator
                     a[l] = w;
                 }
 
-                Blend(a, mud, 1f - Mathf.Clamp01((lakeEdge + 1f) / 8f));
+                // Mud at the water's edge and under it, but not on an island's dry ground: that grows over like the shore.
+                bool island = plan.OnIsland(point);
+                if (!island)
+                {
+                    Blend(a, mud, 1f - Mathf.Clamp01((lakeEdge + 1f) / 8f));
+                    foreach (RaidLayoutPond mere in plan.Meres)
+                    {
+                        Blend(a, mud, 1f - Mathf.Clamp01((mere.Edge(point) + 1f) / 5f));
+                    }
+                }
+
                 Blend(a, bank, 1f - Mathf.Clamp01((pondEdge + 0.5f) / 3f));
+
+                // A river's gravel fans out into the water it runs into.
+                Blend(a, riverBed, plan.MouthFan(point) * 0.9f);
+
+                // The bog: moss on its hummocks, mud in and beside its pools.
+                float bog = plan.BogWeight(point);
+                if (bog > 0f)
+                {
+                    Blend(a, moss, bog * 0.85f);
+                    Blend(a, mud, bog * (1f - Mathf.Clamp01((h - plan.BogLevel + 0.05f) / 0.3f)));
+                }
+
+                // A cliff's face is rock whatever grows above and below it; a scramble is loose stone, so it reads as the way up.
+                Blend(a, cliffRock, Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(40f, 52f, slope)));
+                float ramp = plan.RampAt(point);
+                if (ramp > 0.4f && slope > 9f && slope < 40f && !HavenWorldPlan.Near(plan.Paths, point, 5f))
+                {
+                    Blend(a, scree, 0.55f * Mathf.InverseLerp(0.4f, 0.8f, ramp) * Mathf.InverseLerp(9f, 14f, slope));
+                }
+
                 for (int l = 0; l < count; l++) total += a[l];
                 for (int l = 0; l < count; l++) maps[y, x, l] = total > 0f ? a[l] / total : 0f;
             }
@@ -331,41 +364,127 @@ public static class HavenWorldGenerator
     {
         var holder = new GameObject("Water").transform;
         holder.SetParent(content, false);
-        Water(holder, "Lake", plan.Lake, material, true);
+        // Still water fades out at its mesh's edge (see Water): meshes without vertex colours count as whole, so nothing else changes.
+        if (material != null && material.HasProperty("_VertexAlpha") && material.GetFloat("_VertexAlpha") < 0.5f)
+        {
+            material.SetFloat("_VertexAlpha", 1f);
+            EditorUtility.SetDirty(material);
+        }
+
+        Water(holder, "Lake", plan.Lake, material);
+        for (int i = 0; i < plan.Meres.Count; i++)
+        {
+            Water(holder, plan.MereNames[i], plan.Meres[i], material);
+        }
+
         for (int i = 0; i < plan.Ponds.Count; i++)
         {
-            Water(holder, $"Pond {i + 1}", plan.Ponds[i], material, true);
+            Water(holder, $"Pond {i + 1}", plan.Ponds[i], material);
+        }
+
+        // The bog's water is one level sheet under the whole of it: its pools and channels are where the ground dips below. It
+        // follows the bog's own ragged edge (the bog is a basin, so past that edge the sheet is under the ground). Not for drinking.
+        if (plan.HasBog)
+        {
+            var shore = new Vector2[RimPoints];
+            var whole = new Vector2[RimPoints];
+            var gone = new Vector2[RimPoints];
+            float reach = plan.Recipe.bogRadius * 1.3f;
+            for (int i = 0; i < RimPoints; i++)
+            {
+                // Turning the way a pond's rim does (against the clock, seen from above), so the sheet faces up.
+                Vector2 outward = HavenWorldPlan.Dir(-i * 360f / RimPoints);
+                float far = reach;
+                for (float d = 4f; d < reach; d += 1.5f)
+                {
+                    if (plan.BogWeight(plan.BogCentre + outward * d) < 0.5f)
+                    {
+                        far = d;
+                        break;
+                    }
+                }
+
+                shore[i] = outward * far;
+                whole[i] = outward * (far + 2f);
+                gone[i] = outward * (far + 4.5f);
+            }
+
+            Water(holder, "Bog", plan.BogCentre, plan.BogLevel, shore, whole, gone, material, false);
         }
     }
 
-    // A disc running a little past the shore, under the banks: the terrain draws the waterline (as the raids' ponds).
-    private static void Water(Transform holder, string name, RaidLayoutPond water, Material material, bool drinkable)
+    private const int RimPoints = 64;
+
+    // The lake, a mere or a pond: its shore from its shape, the mesh running a little past it under the banks.
+    private static WaterSurface Water(Transform holder, string name, RaidLayoutPond water, Material material)
     {
-        const int points = 64;
+        var shore = new Vector2[RimPoints];
+        var whole = new Vector2[RimPoints];
+        var gone = new Vector2[RimPoints];
+        for (int i = 0; i < RimPoints; i++)
+        {
+            float angle = i * Mathf.PI * 2f / RimPoints;
+            shore[i] = water.Rim(angle, 0f) - water.Position;
+            whole[i] = water.Rim(angle, 0.5f) - water.Position;
+            gone[i] = water.Rim(angle, 2.5f) - water.Position;
+        }
+
+        return Water(holder, name, water.Position, water.Level, shore, whole, gone, material, true);
+    }
+
+    // A sheet of still water running a little past its shore, under the banks: the terrain draws the waterline (as the raids' ponds).
+    // Its last metres fade out, from `whole` to `gone` (the material's Edge Fade from Vertex Alpha): under a bank that is never
+    // seen, but where a river's channel comes in below the water's level the sheet's edge would lie across it as a line.
+    private static WaterSurface Water(Transform holder, string name, Vector2 position, float level, Vector2[] shore, Vector2[] whole, Vector2[] gone,
+                                      Material material, bool drinkable)
+    {
+        int points = shore.Length;
         var go = new GameObject(name);
         go.transform.SetParent(holder, false);
-        go.transform.position = new Vector3(water.Position.x, water.Level, water.Position.y);
-        var vertices = new Vector3[points + 1];
-        var normals = new Vector3[points + 1];
-        var uvs = new Vector2[points + 1];
-        var triangles = new int[points * 3];
+        go.transform.position = new Vector3(position.x, level, position.y);
+        var vertices = new Vector3[points * 2 + 1];
+        var normals = new Vector3[points * 2 + 1];
+        var uvs = new Vector2[points * 2 + 1];
+        var colours = new Color[points * 2 + 1];
+        var triangles = new int[points * 9];
+        float reach = 1f;
+        foreach (Vector2 point in gone)
+        {
+            reach = Mathf.Max(reach, point.magnitude);
+        }
+
         normals[0] = Vector3.up;
         uvs[0] = new Vector2(0.5f, 0.5f);
+        colours[0] = Color.white;
         for (int i = 0; i < points; i++)
         {
-            Vector2 rim = water.Rim(i * Mathf.PI * 2f / points, 2f) - water.Position;
-            vertices[i + 1] = new Vector3(rim.x, 0f, rim.y);
-            normals[i + 1] = Vector3.up;
-            uvs[i + 1] = new Vector2(0.5f + rim.x * 0.5f / water.Reach, 0.5f + rim.y * 0.5f / water.Reach);
-            triangles[i * 3] = 0;
-            triangles[i * 3 + 1] = (i + 1) % points + 1;
-            triangles[i * 3 + 2] = i + 1;
+            for (int ring = 0; ring < 2; ring++)
+            {
+                Vector2 rim = ring == 0 ? whole[i] : gone[i];
+                int index = 1 + ring * points + i;
+                vertices[index] = new Vector3(rim.x, 0f, rim.y);
+                normals[index] = Vector3.up;
+                uvs[index] = new Vector2(0.5f + rim.x * 0.5f / reach, 0.5f + rim.y * 0.5f / reach);
+                colours[index] = new Color(1f, 1f, 1f, ring == 0 ? 1f : 0f);
+            }
+
+            int here = 1 + i, next = 1 + (i + 1) % points, outer = here + points, outerNext = next + points;
+            triangles[i * 9] = 0;
+            triangles[i * 9 + 1] = next;
+            triangles[i * 9 + 2] = here;
+            triangles[i * 9 + 3] = here;
+            triangles[i * 9 + 4] = next;
+            triangles[i * 9 + 5] = outer;
+            triangles[i * 9 + 6] = outer;
+            triangles[i * 9 + 7] = next;
+            triangles[i * 9 + 8] = outerNext;
         }
 
         var mesh = new Mesh { name = name };
         mesh.SetVertices(vertices);
         mesh.SetNormals(normals);
         mesh.SetUVs(0, uvs);
+        mesh.SetColors(colours);
         mesh.SetTriangles(triangles, 0);
         mesh.RecalculateBounds();
         go.AddComponent<MeshFilter>().sharedMesh = mesh;
@@ -375,6 +494,9 @@ public static class HavenWorldGenerator
         var surface = go.AddComponent<WaterSurface>();
         surface.IsStill = true;
         surface.Drinkable = drinkable;
+        // Where the water really ends: rivers run in to this line, not to the mesh's box.
+        surface.SetShoreline(shore);
+        return surface;
     }
 
     // ----- Woods -----
@@ -408,12 +530,28 @@ public static class HavenWorldGenerator
                 int cell = y * resolution + x;
                 // The woods thin out beside the paths, so a walk along one sees into the trees and has room to fight.
                 float density = Mathf.Lerp(recipe.woodsDensity.x, recipe.woodsDensity.y, Mathf.InverseLerp(recipe.haven, plan.Half, point.magnitude)) *
-                                woods * (1f - plan.MountainWeight(point) * 0.55f) * (1f - 0.92f * thin[cell]);
-                bool open = point.magnitude < recipe.buildable + 20f || plan.Lake.Edge(point) < 4f || plan.Pois.Exists(poi => Vector2.Distance(poi.At, point) < poi.Rule.clearing);
+                                woods * (1f - plan.MountainWeight(point) * 0.55f) * (1f - 0.92f * thin[cell]) * Mathf.Lerp(1f, recipe.bogWoods, plan.BogWeight(point));
+                // Islands are wooded like the shore they were cut off from.
+                bool island = plan.OnIsland(point);
+                bool open = point.magnitude < recipe.buildable + 20f || (!island && (plan.Lake.Edge(point) < 4f || plan.Meres.Exists(mere => mere.Edge(point) < 3f)))
+                            || plan.Pois.Exists(poi => Vector2.Distance(poi.At, point) < poi.Rule.clearing);
                 forest[cell] = (byte)Mathf.RoundToInt(Mathf.Clamp01(density) * 255f);
                 clearing[cell] = open ? (byte)255 : (byte)Mathf.Max(verge[cell], Mathf.RoundToInt(plan.GladeOpen(point) * 255f));
                 // Seen from above a crown spreads 4-6 m: a place keeps that much more free of trees (undergrowth may stay).
                 if (!open && plan.Pois.Exists(poi => Vector2.Distance(poi.At, point) < poi.Rule.clearing + recipe.crownMargin))
+                {
+                    clearing[cell] = (byte)Mathf.Max(clearing[cell], 115);
+                }
+
+                // No tree within a few metres of a cliff, above it or below: from above its line shows through the woods, and a crown
+                // never hides the drop. (Undergrowth stays.)
+                if (!open && forest[cell] > 0 && !plan.OneBench(point, 4.5f))
+                {
+                    clearing[cell] = (byte)Mathf.Max(clearing[cell], 115);
+                }
+
+                // A scramble is open ground between two ends of cliff: no trees on it, so the way up shows from above.
+                if (!open && plan.Scrambles.Exists(scramble => (scramble - point).sqrMagnitude < (recipe.scrambleRadius + 2f) * (recipe.scrambleRadius + 2f)))
                 {
                     clearing[cell] = (byte)Mathf.Max(clearing[cell], 115);
                 }
@@ -435,12 +573,18 @@ public static class HavenWorldGenerator
         System.Func<Vector2, bool> water = local =>
         {
             Vector2 point = local + new Vector2(origin.x, origin.z);
-            return plan.Lake.Edge(point) < 1f || plan.Ponds.Exists(pond => pond.Edge(point) < 1f) || HavenWorldPlan.Near(plan.Rivers, point, 7f);
+            return (plan.InWater(point, 1f) && !plan.OnIsland(point)) || HavenWorldPlan.Near(plan.Rivers, point, 7f);
         };
         System.Func<Vector2, float> wet = local =>
         {
             Vector2 point = local + new Vector2(origin.x, origin.z);
-            return 1f - Mathf.Clamp01(plan.Lake.Edge(point) / 25f);
+            float damp = Mathf.Max(1f - Mathf.Clamp01(plan.Lake.Edge(point) / 25f), plan.BogWeight(point));
+            foreach (RaidLayoutPond mere in plan.Meres)
+            {
+                damp = Mathf.Max(damp, 1f - Mathf.Clamp01(mere.Edge(point) / 15f));
+            }
+
+            return damp;
         };
         int trees = RaidMapSurface.Scatter(data, scaled, new List<RaidMapSurface.Clearing>(), out int rocks, wet, water);
         Object.DestroyImmediate(scaled);
@@ -578,12 +722,26 @@ public static class HavenWorldGenerator
         WorldLook haven = WorldLook.ForestLake, woods = WorldLook.MossyForest;
         TerrainLayer rock = TerrainRock.CliffRock != null ? TerrainRock.CliffRock : woods.RockGround;
         int seed = plan.Recipe.seed;
+        // Makes sure the rivers' material fades by its mesh (a river fades into the lake it joins).
+        WorldAssets.RiverWater();
         for (int i = 0; i < plan.Rivers.Count; i++)
         {
-            RiverFeature river = Make(parent, $"River {i + 1}", templates.River, feature => feature.Configure(WorldAssets.RiverWater(), haven.RiverBed, haven.RiverBank, haven.Palette("River Stones"), haven.Palette("Riverbank")));
+            // A stream is a river made narrow and shallow: the same feature, so a designer widens one into the other.
+            bool stream = plan.RiverWidths[i] < plan.Recipe.riverWidth.x - 0.01f;
+            RiverFeature river = Make(parent, stream ? $"Stream {i + 1}" : $"River {i + 1}", templates.River,
+                feature => feature.Configure(WorldAssets.RiverWater(), haven.RiverBed, haven.RiverBank, haven.Palette("River Stones"), haven.Palette("Riverbank")));
             Line(river, plan, plan.Rivers[i], false, seed + i);
-            Set(river, "width", 4.5f + i);
-            Set(river, "depth", 1.3f);
+            Set(river, "width", plan.RiverWidths[i]);
+            Set(river, "depth", plan.RiverDepths[i]);
+            // Set for both: a new feature starts as a copy of whichever river the scene held, which may have been a stream.
+            Set(river, "bankWidth", stream ? 1.6f : 3f);
+            Set(river, "bankPaint", stream ? 1.2f : 2f);
+            Set(river, "stonesPer10m", stream ? 1f : 2f);
+            Set(river, "bankScatterPer10m", stream ? 1.5f : 3f);
+            if (stream)
+            {
+            }
+
             // The water follows the plan's downhill levels (the valley Height carved for it), not a running minimum of the shaped
             // ground, which a path's cutting or a bank could drag down metres for the rest of the river.
             Spline spline = river.Spline;
@@ -636,19 +794,58 @@ public static class HavenWorldGenerator
             Line(cliff, plan, outcrop.Loop, true, seed + 200 + i);
             Set(cliff, "height", outcrop.Height);
             Set(cliff, "plateau", outcrop.Radius);
+            // An outcrop's own settings, whatever cliff the scene's template was copied from.
+            Set(cliff, "faceDepth", 1.5f);
+            Set(cliff, "raggedness", 0.5f);
+            Set(cliff, "ledgeStrength", 0.5f);
+            Set(cliff, "faceNoise", 0f);
+            Set(cliff, "overlap", 0.3f);
+            Set(cliff, "rubblePer10m", 2f);
+            var crag = new SerializedObject(cliff);
+            crag.FindProperty("ledges").intValue = 0;
+            crag.FindProperty("sizeVariation").vector2Value = new Vector2(1.05f, 1.3f);
+            CliffKit outcropKit = plan.WoodsWeight(outcrop.Centre) > 0.5f ? woods.Crags : haven.Crags;
+            if (outcropKit != null)
+            {
+                crag.FindProperty("kit").objectReferenceValue = outcropKit;
+            }
+
+            crag.ApplyModifiedPropertiesWithoutUndo();
             SetEnum(cliff, "highSide", (int)CliffFeature.HighSide.Left);
             SetEnum(cliff, "shaping", (int)CliffFeature.Shaping.Raise);
         }
 
+        // The cliffs between the terraces, where they are walked beside. The plan has already stepped the ground: each line lies along
+        // the top of its face, and Cut only sharpens what is there (the low bench is already down), paints it and stands rock along it.
+        // Bigger pieces, less overlapped than an outcrop's: a metre of cliff costs about two scene objects instead of five.
         for (int i = 0; i < plan.Cliffs.Count; i++)
         {
             HavenWorldPlan.Cliff line = plan.Cliffs[i];
-            CliffFeature cliff = Make(parent, $"Mountain Cliff {i + 1}", templates.Cliff, feature => feature.Configure(null, woods.Palette("Rubble"), rock));
+            bool inWoods = plan.WoodsWeight(line.Line[line.Line.Count / 2]) > 0.5f;
+            CliffFeature cliff = Make(parent, $"Cliff {i + 1}", templates.Cliff, feature => feature.Configure(null, woods.Palette("Rubble"), rock));
             Line(cliff, plan, line.Line, false, seed + 300 + i);
-            Set(cliff, "height", line.Height);
-            Set(cliff, "plateau", 30f);
+            // A little under the step, so the cut never digs a ditch at the foot of a bench that leans.
+            Set(cliff, "height", line.Height * 0.92f);
+            Set(cliff, "plateau", 4f);
+            Set(cliff, "faceDepth", plan.Recipe.riserWidth * 0.75f);
+            Set(cliff, "raggedness", 0.6f);
+            Set(cliff, "ledgeStrength", 0.45f);
+            Set(cliff, "faceNoise", 0.5f);
+            Set(cliff, "overlap", 0.12f);
+            Set(cliff, "rubblePer10m", 1f);
             SetEnum(cliff, "highSide", (int)(line.HighOnLeft ? CliffFeature.HighSide.Left : CliffFeature.HighSide.Right));
-            SetEnum(cliff, "shaping", (int)CliffFeature.Shaping.Raise);
+            SetEnum(cliff, "shaping", (int)CliffFeature.Shaping.Cut);
+            var data = new SerializedObject(cliff);
+            data.FindProperty("ledges").intValue = 2;
+            // The woods' crags are big as modelled; the Haven's are stood larger to cover a 7 m face.
+            data.FindProperty("sizeVariation").vector2Value = inWoods ? new Vector2(0.95f, 1.25f) : new Vector2(1.25f, 1.6f);
+            CliffKit kit = inWoods ? woods.Crags : haven.Crags;
+            if (kit != null)
+            {
+                data.FindProperty("kit").objectReferenceValue = kit;
+            }
+
+            data.ApplyModifiedPropertiesWithoutUndo();
         }
 
         for (int i = 0; i < plan.Ravines.Count; i++)
@@ -847,7 +1044,7 @@ public static class HavenWorldGenerator
         zones.SetParent(content, false);
         foreach (HavenWorldPlan.Zone zone in plan.Zones)
         {
-            var go = new GameObject($"Spawn Zone ({zone.Band.name})");
+            var go = new GameObject(zone.Band.peaceful ? $"Game ({zone.Band.name})" : $"Spawn Zone ({zone.Band.name})");
             go.transform.SetParent(zones, false);
             go.transform.position = Ground(zone.At);
             var spawner = go.AddComponent<MobSpawnZone>();
@@ -876,8 +1073,12 @@ public static class HavenWorldGenerator
             data.FindProperty("respawn").boolValue = zone.Band.respawnSeconds > 0f;
             data.FindProperty("respawnSeconds").floatValue = zone.Band.respawnSeconds;
             data.ApplyModifiedPropertiesWithoutUndo();
-            // Home stays safe: refilled only at night, and never within reach of the ward as it grows.
-            spawner.ConfigureHome(true, WardKeepAway);
+            // Home stays safe: what hunts is refilled only at night, and never within reach of the ward as it grows. Game comes back
+            // by day too, and grazes right up to the ward.
+            if (!zone.Band.peaceful)
+            {
+                spawner.ConfigureHome(true, WardKeepAway);
+            }
         }
 
         var resources = new GameObject("Resources").transform;
@@ -979,12 +1180,58 @@ public static class HavenWorldGenerator
             moss.Rebuild();
         }
 
+        string mist = BakeMist(plan, terrain);
         GroundLayerPainter.RefreshDisplacement(terrain);
         GrassSetup.BakeGroundColour(terrain);
         string navmesh = WorldBuilder.RebakeNavMesh();
         EditorSceneManager.MarkSceneDirty(terrain.gameObject.scene);
         return $"Placed {plan.Pois.Count} places, {plan.Zones.Count} spawn zones, {plan.Nodes.Count} resource points, {marked} glade landmarks, {along} scenes, markers, dressing and rim stones, {herds} wildlife herds, {plan.Rocks.Count} mountain rocks ({cleared} trees cleared from under them) in {placed} ms; moss, displacement, " +
-               $"ground colour and navmesh ({navmesh}) in {clock.ElapsedMilliseconds - placed} ms.";
+               $"ground colour and navmesh ({navmesh}) in {clock.ElapsedMilliseconds - placed} ms; {mist}.";
+    }
+
+    public const string MistMapPath = "Assets/_Project/Data/World/Safe Haven/Haven World Mist.png";
+
+    /// <summary>
+    /// Where mist always lies (the Misty Woods and the bog, not the Haven's meadows): the plan's MistAt as a small picture, white for
+    /// mist, set on the terrain's TerrainMist. A designer can paint over it in any picture editor; the next generation rewrites it.
+    /// </summary>
+    public static string BakeMist(HavenWorldPlan plan, Terrain terrain)
+    {
+        if (!terrain.TryGetComponent(out TerrainMist mist))
+        {
+            return "no Terrain Mist on the terrain, so no mist map";
+        }
+
+        const int size = 256;
+        var pixels = new Color32[size * size];
+        float world = plan.Recipe.size;
+        System.Threading.Tasks.Parallel.For(0, size, y =>
+        {
+            for (int x = 0; x < size; x++)
+            {
+                byte amount = (byte)Mathf.RoundToInt(plan.MistAt(new Vector2((x + 0.5f) / size * world - plan.Half, (y + 0.5f) / size * world - plan.Half)) * 255f);
+                pixels[y * size + x] = new Color32(amount, amount, amount, 255);
+            }
+        });
+        var picture = new Texture2D(size, size, TextureFormat.RGBA32, false);
+        picture.SetPixels32(pixels);
+        System.IO.File.WriteAllBytes(MistMapPath, picture.EncodeToPNG());
+        Object.DestroyImmediate(picture);
+        AssetDatabase.ImportAsset(MistMapPath, ImportAssetOptions.ForceUpdate);
+        if (AssetImporter.GetAtPath(MistMapPath) is TextureImporter importer
+            && (importer.sRGBTexture || importer.mipmapEnabled || importer.wrapMode != TextureWrapMode.Clamp || importer.textureCompression != TextureImporterCompression.Uncompressed))
+        {
+            importer.sRGBTexture = false;
+            importer.mipmapEnabled = false;
+            importer.wrapMode = TextureWrapMode.Clamp;
+            importer.textureCompression = TextureImporterCompression.Uncompressed;
+            importer.SaveAndReimport();
+        }
+
+        var data = new SerializedObject(mist);
+        data.FindProperty("regionMap").objectReferenceValue = AssetDatabase.LoadAssetAtPath<Texture2D>(MistMapPath);
+        data.ApplyModifiedPropertiesWithoutUndo();
+        return "mist map baked";
     }
 
     // What makes the way between places worth walking and readable from above: scenes beside the paths, a cairn where a trail
@@ -1026,7 +1273,8 @@ public static class HavenWorldGenerator
         scenes.SetParent(root, false);
         foreach (HavenWorldPlan.Placed scene in plan.TrailScenes)
         {
-            Put(recipe.trailScenes[scene.Kind], scene.At, scene.Turn, 1f, scenes);
+            List<GameObject> kit = scene.Set == 1 ? recipe.meadowScenes : recipe.trailScenes;
+            Put(kit[scene.Kind % kit.Count], scene.At, scene.Turn, 1f, scenes);
         }
 
         var markers = new GameObject("Junction Markers").transform;
@@ -1121,6 +1369,12 @@ public static class HavenWorldGenerator
 
         foreach (HavenWorldPlan.Glade glade in plan.Glades)
         {
+            // Where real game grazes (a spawn zone, to be hunted), no herd that only bolts and is gone.
+            if (glade.HasGame)
+            {
+                continue;
+            }
+
             if (glade.Kind == HavenWorldPlan.GladeKind.Meadow || glade.Kind == HavenWorldPlan.GladeKind.Wet)
             {
                 Herd($"Grazers ({glade.Kind} Glade)", recipe.grazers, glade.Centre, glade.Radius * 0.6f, new Vector2Int(2, 4), dawnAndDusk);

@@ -452,9 +452,18 @@ public sealed class AtmosphereFeature : ScriptableRendererFeature
 
                 mistOrder.Sort((a, b) => a.DistanceSquared(cameraPosition).CompareTo(b.DistanceSquared(cameraPosition)));
                 int mists = hasGround ? Mathf.Min(MaxMists, mistOrder.Count) : 0;
+                // One terrain's map of where mist always lies (the nearest that has one).
+                int regionIndex = -1;
                 for (int i = 0; i < mists; i++)
                 {
                     TerrainMist mist = mistOrder[i];
+                    if (regionIndex < 0 && mist.RegionDensity > 0f)
+                    {
+                        regionIndex = i;
+                        material.SetTexture("_TerrainMistRegionTex", mist.RegionMap);
+                        material.SetFloat("_TerrainMistRegionDensity", mist.RegionDensity);
+                    }
+
                     Vector3 origin = mist.Terrain.transform.position;
                     Vector3 size = mist.Terrain.terrainData.size;
                     mistRects[i] = new Vector4(origin.x, origin.z, size.x, size.z);
@@ -469,6 +478,7 @@ public sealed class AtmosphereFeature : ScriptableRendererFeature
                 }
 
                 material.SetInt(MistCount, mists);
+                material.SetInt("_TerrainMistRegionIndex", regionIndex);
                 material.SetVectorArray(MistRects, mistRects);
                 material.SetVectorArray(MistShapes, mistShapes);
                 material.SetVectorArray(MistClouds, mistClouds);

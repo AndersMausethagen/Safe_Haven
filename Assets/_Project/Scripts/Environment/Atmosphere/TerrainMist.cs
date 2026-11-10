@@ -62,6 +62,13 @@ public sealed class TerrainMist : MonoBehaviour
     [SerializeField, Range(0f, 1f)] private float morningAmount = 0f;
     [Tooltip("0 keeps authored drift speed. 1 follows the blended weather's Wind multiplier (storm moves faster).")]
     [SerializeField, Range(0f, 1f)] private float weatherWindInfluence = 1f;
+    [Header("Where it always lies")]
+    [Tooltip("A map of the terrain, north up: white where mist always lies whatever the weather (misty woods, a bog), black where only the " +
+             "weather's, the golden hour's and the morning's mist comes. Empty: no such mist. The Haven world's generator bakes one; it can " +
+             "be painted over in any picture editor.")]
+    [SerializeField] private Texture2D regionMap;
+    [Tooltip("How much mist lies where the map is white, 0 to 1 of this layer's density.")]
+    [SerializeField, Range(0f, 1f)] private float regionAmount = 0.6f;
 
     public static IReadOnlyList<TerrainMist> Active => active;
     public Terrain Terrain => terrain;
@@ -79,6 +86,10 @@ public sealed class TerrainMist : MonoBehaviour
     public Vector4 Pooling => new Vector4(lowlandBoost, Mathf.Max(0.1f, poolingDepth), waterBoost, 0f);
     public float EdgeFade => Mathf.Max(0.1f, edgeFade);
     public float WeatherWindInfluence => weatherWindInfluence;
+    public Texture2D RegionMap => regionMap;
+    /// <summary>Extinction per metre where the region map is white (0 without a map). Whatever the weather, and whether or not
+    /// the scene's atmosphere otherwise comes from the weather alone (the Haven's does): the map is where mist always lies.</summary>
+    public float RegionDensity => regionMap != null ? density * regionAmount : 0f;
     public float EffectiveDensity => density * Mathf.Max(EvaluateAmount(
         AtmosphereConditions.WeatherOnlyAtmosphere ? 0f : baseAmount, weatherAmount,
         AtmosphereConditions.WeatherOnlyAtmosphere ? 0f : goldenHourAmount,

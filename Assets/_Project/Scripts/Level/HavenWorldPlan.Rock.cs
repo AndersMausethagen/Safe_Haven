@@ -3,7 +3,8 @@ using System.Linq;
 using UnityEngine;
 
 /// <summary>
-/// Rock: outcrops, cliff lines up the mountain, ravines grown through the woods, and the mountain's scattered rocks.
+/// Rock: outcrops, ravines grown through the woods, and the mountain's scattered rocks. (The cliffs between the terraces are
+/// traced from the land: HavenWorldPlan.Terraces.)
 /// Part of HavenWorldPlan, in its own file.
 /// </summary>
 public sealed partial class HavenWorldPlan
@@ -21,11 +22,12 @@ public sealed partial class HavenWorldPlan
             {
                 // A third in the Haven's ring (smaller), the rest in the woods.
                 bool haven = i < count / 3;
-                Vector2 at = haven ? Around(Recipe.buildable + 40f, Recipe.haven + 30f) : Around(Recipe.haven + 30f, MaxReach - 20f);
+                Vector2 at = haven ? Around(Recipe.buildable + 40f, Recipe.haven + 30f) : Around(Recipe.haven + 30f, MaxReach);
                 float radius = haven ? Range(7f, 12f) : Range(10f, 22f);
                 if (Near(Paths, at, radius + 8f) || Near(Rivers, at, radius + 10f) || InWater(at, radius + 14f)
                     || Pois.Exists(poi => Vector2.Distance(poi.At, at) < radius + poi.Rule.clearing + 8f)
-                    || Outcrops.Exists(other => Vector2.Distance(other.Centre, at) < other.Radius + radius + 15f) || MountainWeight(at) > 0.3f)
+                    || Outcrops.Exists(other => Vector2.Distance(other.Centre, at) < other.Radius + radius + 15f) || MountainWeight(at) > 0.3f
+                    || BogWeight(at) > 0f || !OneBench(at, radius + 6f))
                 {
                     continue;
                 }
@@ -50,47 +52,6 @@ public sealed partial class HavenWorldPlan
         return loop;
     }
 
-    // Terrace edges across the mountain's flanks, high side up the mountain, broken where the mountain path climbs.
-    private void PlaceMountainCliffs()
-    {
-        int count = random.Next(Recipe.mountainCliffs.x, Recipe.mountainCliffs.y + 1);
-        float half = Recipe.mountainAt.y * 0.5f;
-        for (int i = 0; i < count; i++)
-        {
-            float radius = Mathf.Lerp(Recipe.mountainFrom + 50f, MaxReach - 10f, (i + Range(0.2f, 0.8f)) / count);
-            float from = Recipe.mountainAt.x - half * Range(0.7f, 0.95f), to = Recipe.mountainAt.x + half * Range(0.7f, 0.95f);
-            var line = new List<Vector2>();
-            for (float bearing = from; bearing <= to; bearing += 3f)
-            {
-                bool gap = Mathf.Abs(Mathf.DeltaAngle(bearing, MountainPathAngle)) < 6f || Near(Rivers, Dir(bearing) * radius, 8f);
-                if (gap)
-                {
-                    AddCliff(line);
-                    line = new List<Vector2>();
-                    continue;
-                }
-
-                line.Add(Dir(bearing) * (radius + (Perlin(Dir(bearing) * 40f, 25f, 3f) - 0.5f) * 20f));
-            }
-
-            AddCliff(line);
-        }
-    }
-
-    private void AddCliff(List<Vector2> line)
-    {
-        if (line.Count < 3)
-        {
-            return;
-        }
-
-        // Drawn clockwise, the outside (up the mountain) is on the left.
-        Vector2 along = line[line.Count - 1] - line[0];
-        Vector2 left = new Vector2(-along.y, along.x);
-        bool highOnLeft = Vector2.Dot(left, line[line.Count / 2]) > 0f;
-        Cliffs.Add(new Cliff { Line = line, Height = Range(5f, 9f), HighOnLeft = highOnLeft });
-    }
-
     // In the woods, more of them further out; never across a path (a path has no neck over one), a river or the lake.
     private void PlaceRavines()
     {
@@ -99,8 +60,7 @@ public sealed partial class HavenWorldPlan
         {
             for (int tries = 0; tries < Tries; tries++)
             {
-                float r = Mathf.Lerp(Recipe.forest * 0.85f, MaxReach - 10f, Mathf.Sqrt((float)random.NextDouble()));
-                Vector2 start = Dir(Range(0f, 360f)) * r;
+                Vector2 start = Around(Recipe.forest * 0.85f, MaxReach);
                 float length = Range(Recipe.ravineLength.x, Recipe.ravineLength.y);
                 List<Vector2> line = GrowRavine(start, length);
                 if (line == null)
@@ -160,6 +120,7 @@ public sealed partial class HavenWorldPlan
     {
         float edge = Half - Mathf.Max(Mathf.Abs(point.x), Mathf.Abs(point.y));
         return edge > Recipe.rim.y + 10f && point.magnitude > Recipe.forest * 0.8f && !Near(Paths, point, 16f) && !Near(Rivers, point, 18f)
+            && BogWeight(point) <= 0f
             && !InWater(point, 20f) && !Pois.Exists(poi => Vector2.Distance(poi.At, point) < poi.Rule.clearing + 14f)
             && !Outcrops.Exists(outcrop => Vector2.Distance(outcrop.Centre, point) < outcrop.Radius + 12f)
             && !Ravines.Exists(other => NearLine(other.Line, point, 28f));

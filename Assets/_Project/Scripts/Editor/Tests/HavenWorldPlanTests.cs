@@ -5,7 +5,9 @@ using UnityEditor;
 using UnityEngine;
 
 /// <summary>The Haven world's plan from the project's recipe: the same seed always gives the same world (so a new game's seed can
-/// make its own), and what it strews over the mountain keeps to its rules.</summary>
+/// make its own), what it strews over the mountain keeps to its rules, and the rules a world read from above lives by hold:
+/// every path leads somewhere and no walk goes long with nothing on it, the ground can be walked to, cliffs break for paths
+/// and water, water lies below its shores, places stand on level ground and game keeps to its own zones.</summary>
 public sealed class HavenWorldPlanTests
 {
     private HavenWorldRecipe recipe;
@@ -89,6 +91,12 @@ public sealed class HavenWorldPlanTests
                 for (float t = 0f; t < 1f; t += 2f / Mathf.Max(2f, Vector2.Distance(line[i], line[i + 1])))
                 {
                     Vector2 point = Vector2.Lerp(line[i], line[i + 1], t);
+                    // The causeway into the bog crosses the bog's own stream: that is what it is for.
+                    if (plan.BogWeight(point) > 0f)
+                    {
+                        continue;
+                    }
+
                     Assert.That(HavenWorldPlan.Near(plan.Rivers, point, 3f), Is.False, $"{plan.PathKinds[p]} {p} steps into a river at {point}.");
                     Assert.That(plan.Ravines.Any(ravine => HavenWorldPlan.NearLine(ravine.Line, point, ravine.FloorWidth)), Is.False,
                                 $"{plan.PathKinds[p]} {p} runs into a ravine at {point}.");
@@ -124,6 +132,183 @@ public sealed class HavenWorldPlanTests
                     }
                 }
             }
+        }
+    }
+
+    [Test]
+    public void EveryPathLeadsSomewhereAndNoWalkIsDull([Values(1, 7, 23)] int seed)
+    {
+        HavenWorldPlan plan = HavenWorldPlan.Make(recipe, seed);
+        Assert.That(plan.DeadEnds, Is.Empty, "A path ends at nothing: not at a place, a glade, the water or another path.");
+        Assert.That(plan.LongestDullWalk, Is.LessThanOrEqualTo(recipe.longestDullWalk),
+                    $"A walk of {plan.LongestDullWalk:0} m passes nothing (the recipe allows {recipe.longestDullWalk:0} m).");
+        Assert.That(plan.EmptyShare, Is.LessThan(0.03f), "Too much ground has nothing within reach of it.");
+        // No road ends at nothing: each has a place within a few steps of its end.
+        foreach (Vector2 end in plan.RoadEnds)
+        {
+            Assert.That(plan.Pois.Any(poi => Vector2.Distance(poi.At, end) < poi.Rule.clearing + 10f), Is.True, $"The road ending at {end} leads to no place.");
+        }
+    }
+
+    [Test]
+    public void TheGroundCanBeWalkedAndWhatStandsOnItCanBeReached([Values(1, 7, 23)] int seed)
+    {
+        HavenWorldPlan plan = HavenWorldPlan.Make(recipe, seed);
+        Assert.That(plan.ReachableShare, Is.GreaterThan(0.985f), "Cliffs cut off too much ground: more scrambles or ramps are needed.");
+        foreach (HavenWorldPlan.Node node in plan.Nodes)
+        {
+            Assert.That(plan.Reachable(node.At), Is.True, $"The resource point at {node.At} cannot be walked to.");
+        }
+
+        foreach (HavenWorldPlan.Zone zone in plan.Zones)
+        {
+            Assert.That(plan.Reachable(zone.At), Is.True, $"The spawn zone at {zone.At} cannot be walked to.");
+        }
+    }
+
+    [Test]
+    public void CliffsBreakForPathsAndWaterAndPlacesStandLevel([Values(1, 7, 23)] int seed)
+    {
+        HavenWorldPlan plan = HavenWorldPlan.Make(recipe, seed);
+        Assert.That(plan.Cliffs, Is.Not.Empty, "The land has no cliffs.");
+        Assert.That(plan.Scrambles, Is.Not.Empty, "No cliff has a way up but the paths.");
+        foreach (HavenWorldPlan.Cliff cliff in plan.Cliffs)
+        {
+            Assert.That(cliff.Line.Count, Is.GreaterThanOrEqualTo(3));
+            foreach (Vector2 knot in cliff.Line)
+            {
+                Assert.That(HavenWorldPlan.Near(plan.Paths, knot, 1.5f), Is.False, $"A cliff stands across a path at {knot}.");
+                Assert.That(plan.InWater(knot, 0f), Is.False, $"A cliff stands in the water at {knot}.");
+            }
+        }
+
+        foreach (HavenWorldPlan.Poi poi in plan.Pois)
+        {
+            if (poi.Rule.onIsland || poi.Rule.inBog)
+            {
+                continue;
+            }
+
+            int tier = plan.Tier(poi.At);
+            for (int i = 0; i < 8; i++)
+            {
+                Vector2 edge = poi.At + HavenWorldPlan.Dir(i * 45f) * poi.Rule.clearing * 0.9f;
+                Assert.That(plan.Tier(edge), Is.EqualTo(tier), $"A cliff runs through {poi.Rule.name} at {poi.At}.");
+            }
+        }
+    }
+
+    [Test]
+    public void WaterLiesBelowItsShores([Values(1, 7, 23)] int seed)
+    {
+        HavenWorldPlan plan = HavenWorldPlan.Make(recipe, seed);
+        Assert.That(plan.Meres.Count, Is.EqualTo(recipe.meres.Count), "A mere found no room.");
+        for (int m = 0; m < plan.Meres.Count; m++)
+        {
+            RaidLayoutPond mere = plan.Meres[m];
+            Assert.That(plan.Islands.Any(island => island.Water == mere), Is.True, $"{plan.MereNames[m]} has no island.");
+            for (int i = 0; i < 16; i++)
+            {
+                Vector2 shore = mere.Rim(i * Mathf.PI / 8f, 6f);
+                // A stream's valley may leave it lower: only its own bank is asked.
+                if (!HavenWorldPlan.Near(plan.Rivers, shore, 12f))
+                {
+                    Assert.That(plan.Height(shore), Is.GreaterThan(mere.Level), $"{plan.MereNames[m]} stands above its shore at {shore}.");
+                }
+            }
+        }
+
+        if (plan.HasBog)
+        {
+            // A basin: nowhere round it is the ground lower than its water (it hung over the Haven's side once).
+            for (int i = 0; i < 48; i++)
+            {
+                Vector2 outward = HavenWorldPlan.Dir(i * 7.5f);
+                for (float d = recipe.bogRadius * 0.5f; d < recipe.bogRadius * 1.5f; d += 3f)
+                {
+                    Vector2 point = plan.BogCentre + outward * d;
+                    if (plan.BogWeight(point) > 0f)
+                    {
+                        continue;
+                    }
+
+                    // Where its road and its stream come in, the land is level with it: that is the way in and the way out.
+                    if (!HavenWorldPlan.Near(plan.Rivers, point, 14f) && !HavenWorldPlan.Near(plan.Paths, point, 45f))
+                    {
+                        Assert.That(plan.Height(point), Is.GreaterThan(plan.BogLevel), $"The bog's water stands above the ground at {point}.");
+                    }
+
+                    break;
+                }
+            }
+        }
+
+        // Every river that runs into still water has its fan there.
+        for (int r = 0; r < plan.Rivers.Count; r++)
+        {
+            Vector2 end = plan.Rivers[r][plan.Rivers[r].Count - 1];
+            if (plan.Lake.Edge(end) < 0f)
+            {
+                Assert.That(plan.Mouths.Any(mouth => mouth.At == end && mouth.Water == plan.Lake), Is.True, $"River {r} runs into the lake without a mouth.");
+                Assert.That(plan.MouthFan(end), Is.GreaterThan(0.5f));
+            }
+        }
+    }
+
+    [Test]
+    public void GameIsPeacefulAndKeepsToItsOwnGround([Values(1, 7)] int seed)
+    {
+        HavenWorldPlan plan = HavenWorldPlan.Make(recipe, seed);
+        Assert.That(plan.Zones.Count(zone => zone.Band.peaceful), Is.GreaterThanOrEqualTo(10), "Too little game found room.");
+        foreach (HavenWorldPlan.Zone zone in plan.Zones)
+        {
+            if (!zone.Band.peaceful)
+            {
+                Assert.That(zone.At.magnitude, Is.GreaterThanOrEqualTo(recipe.haven - 0.01f), $"What hunts you spawns inside the woods' edge at {zone.At}.");
+                continue;
+            }
+
+            Assert.That(zone.At.magnitude, Is.GreaterThan(recipe.buildable), $"Game spawns on the ground the Haven is built on at {zone.At}.");
+            Assert.That(zone.Glade == null || zone.Glade.Kind != HavenWorldPlan.GladeKind.Lair, Is.True, "Game was put in a lair.");
+            Assert.That(plan.Zones.Any(other => !other.Band.peaceful && other.Glade != null && other.Glade == zone.Glade), Is.False, "Game shares its glade with what hunts.");
+        }
+
+        // What the recipe calls game is game: it takes no side, runs instead of fighting and has no attack.
+        foreach (HavenCreatureBand band in recipe.creatures.Where(band => band.peaceful))
+        {
+            Assert.That(band.creatures, Is.Not.Empty, $"{band.name} has no creature: run AgentScripts/BuildGame.cs, then BuildHavenWorldRecipe.cs.");
+            foreach (SpawnTable.Entry entry in band.creatures)
+            {
+                MonsterDefinition definition = new SerializedObject(entry.prefab.GetComponent<MonsterAI>()).FindProperty("definition").objectReferenceValue as MonsterDefinition;
+                Assert.That(definition, Is.Not.Null, $"{entry.prefab.name} has no definition.");
+                Assert.That(definition.Faction, Is.EqualTo(Faction.Neutral), $"{definition.name} takes a side.");
+                Assert.That(definition.Timid, Is.True, $"{definition.name} is not timid.");
+                Assert.That(definition.Attack == null && definition.Attacks.Count == 0, Is.True, $"{definition.name} has an attack.");
+            }
+        }
+    }
+
+    [Test]
+    public void StillWaterKnowsItsTrueShoreline()
+    {
+        // A square pond turned 45 degrees: its mesh's box reaches past its corners, its shoreline does not.
+        var go = new GameObject("Shoreline Test Water", typeof(WaterSurface)) { hideFlags = HideFlags.HideAndDontSave };
+        try
+        {
+            var water = go.GetComponent<WaterSurface>();
+            go.transform.position = new Vector3(100f, 3f, 50f);
+            Assert.That(water.HasShoreline, Is.False);
+            water.SetShoreline(new[] { new Vector2(10f, 0f), new Vector2(0f, 10f), new Vector2(-10f, 0f), new Vector2(0f, -10f) });
+            Assert.That(water.HasShoreline, Is.True);
+            Assert.That(water.ShorelineDistance(100f, 50f), Is.LessThan(0f), "The middle is in the water.");
+            Assert.That(water.ShorelineDistance(100f, 50f), Is.EqualTo(-7.07f).Within(0.05f));
+            // Inside the box a mesh of it would have, outside the water.
+            Assert.That(water.ShorelineDistance(108f, 58f), Is.GreaterThan(0f), "A corner of the box is dry land.");
+            Assert.That(water.ShorelineDistance(120f, 50f), Is.EqualTo(10f).Within(0.01f));
+        }
+        finally
+        {
+            Object.DestroyImmediate(go);
         }
     }
 

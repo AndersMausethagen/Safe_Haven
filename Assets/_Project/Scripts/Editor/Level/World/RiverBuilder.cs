@@ -10,14 +10,16 @@ public sealed class RiverBuilder : FeatureBuilder
     private const float BankLip = 0.12f;     // banks meet the water this far above it, so the edge stays hidden
     private const float MeshOverlap = 0.6f;  // the water mesh reaches this far under the banks
     private const float ChannelInPond = 1.5f; // the channel runs this far past the shore, where the pond's own bed has dropped below it
-    private const float WaterEndsFromShore = 0.4f; // the river's water stops here, just over the pond's own
+    private const float WaterIntoPond = 3.5f; // the river's water runs this far out over the pond's own, fading as it goes
+    private const float WaterFadesFrom = 2.5f; // ...from this far up the river from the shore: no hard edge where the two meet
+    private const float WaterOverPond = 0.02f; // and lies this far over the pond's, so the two never flicker
     private const float ShorePaintFade = 2f;  // its bed and bank paint give way over the last of the way to the shore
     private readonly RiverFeature river;
     private float[] halfWidth;
     private float[] depth;
     private float[] surface;
     private float maxHalfWidth;
-    private readonly System.Collections.Generic.List<(Transform water, Bounds local, bool oval)> ponds = new System.Collections.Generic.List<(Transform, Bounds, bool)>();
+    private readonly System.Collections.Generic.List<(WaterSurface water, Bounds local)> ponds = new System.Collections.Generic.List<(WaterSurface, Bounds)>();
     private float[] toPond;
     private float mouthLength;
 
@@ -99,10 +101,9 @@ public sealed class RiverBuilder : FeatureBuilder
             }
 
             Bounds local = filter.sharedMesh.bounds;
-            if (WaterSetup.ShoreDistance(water.transform, local, water.Oval, first.x, first.y) < 0f
-                || WaterSetup.ShoreDistance(water.transform, local, water.Oval, last.x, last.y) < 0f)
+            if (Shore(water, local, first) < 0f || Shore(water, local, last) < 0f)
             {
-                ponds.Add((water.transform, local, water.Oval));
+                ponds.Add((water, local));
                 level = water.transform.TransformPoint(new Vector3(local.center.x, local.max.y, local.center.z)).y;
             }
         }
@@ -114,13 +115,18 @@ public sealed class RiverBuilder : FeatureBuilder
     private float ShoreAt(Vector2 xz)
     {
         float nearest = float.PositiveInfinity;
-        foreach ((Transform water, Bounds local, bool oval) in ponds)
+        foreach ((WaterSurface water, Bounds local) in ponds)
         {
-            nearest = Mathf.Min(nearest, WaterSetup.ShoreDistance(water, local, oval, xz.x, xz.y));
+            nearest = Mathf.Min(nearest, Shore(water, local, xz));
         }
 
         return nearest;
     }
+
+    // The water's own shoreline where it has one (a turned or ragged lake's mesh is not its shore: its box reaches tens of metres
+    // past the water at the corners, and a river stopped there, on dry land); else its mesh's box or oval.
+    private static float Shore(WaterSurface water, Bounds local, Vector2 xz) =>
+        water.HasShoreline ? water.ShorelineDistance(xz.x, xz.y) : WaterSetup.ShoreDistance(water.transform, local, water.Oval, xz.x, xz.y);
 
     // Only near a pond is it worth working out, cell by cell.
     private float ShoreNear(int segment, Vector2 xz) =>
@@ -184,12 +190,14 @@ public sealed class RiverBuilder : FeatureBuilder
         {
             Vector2 p = layer.Grid.World(x, y);
             float shore = ShoreNear(s, p);
-            if (shore <= 0f)
+            if (shore <= -ChannelInPond)
             {
                 return;
             }
 
+            // The banks give way at the shore; the bed carries on to the end of its channel, a little way out in the pond.
             float nearShore = WorldNoise2D.Smooth(shore / ShorePaintFade);
+            float bedNearShore = WorldNoise2D.Smooth((shore + ChannelInPond) / (ShorePaintFade + ChannelInPond));
             float noise = WorldNoise2D.Fbm(p.x * 0.35f, p.y * 0.35f, Feature.Seed);
             float w = Line.Lerp(halfWidth, s, f);
             float bankEdge = w + river.BankPaint * (0.5f + noise);
@@ -201,7 +209,7 @@ public sealed class RiverBuilder : FeatureBuilder
             float bedEdge = w + 0.3f + (noise - 0.5f) * 0.8f;
             if (bed >= 0 && d < bedEdge + 0.6f)
             {
-                layer.Paint(x, y, bed, (1f - WorldNoise2D.Smooth((d - bedEdge) / 0.6f)) * nearShore);
+                layer.Paint(x, y, bed, (1f - WorldNoise2D.Smooth((d - bedEdge) / 0.6f)) * bedNearShore);
             }
         });
     }
@@ -268,10 +276,10 @@ public sealed class RiverBuilder : FeatureBuilder
         go.transform.SetParent(root, false);
         Transform t = go.transform;
         const int across = 7;
-        // Only the river's own water: where it joins a pond, the pond's surface takes over at the shore.
+        // Only the river's own water: where it joins a pond it runs a little way out over the pond's and fades into it.
         int from = 0, to = Line.Count - 1;
-        while (from < to && toPond[from] < WaterEndsFromShore) from++;
-        while (to > from && toPond[to] < WaterEndsFromShore) to--;
+        while (from < to && toPond[from] < -WaterIntoPond) from++;
+        while (to > from && toPond[to] < -WaterIntoPond) to--;
         int rows = to - from + 1;
         if (rows < 2)
         {
@@ -282,6 +290,7 @@ public sealed class RiverBuilder : FeatureBuilder
         var vertices = new Vector3[rows * across];
         var uv = new Vector2[rows * across];
         var flow = new Vector2[rows * across];
+        var colours = new Color[rows * across];
         var centreline = new Vector4[rows];
         float meanHalfWidth = 0f;
         for (int i = from; i <= to; i++)
@@ -293,7 +302,9 @@ public sealed class RiverBuilder : FeatureBuilder
         for (int i = 0; i < rows; i++)
         {
             int sample = from + i;
-            Vector3 centre = new Vector3(Line.Points[sample].x, surface[sample], Line.Points[sample].z);
+            // Whole up the river, gone by the time it is out over the pond (the material's Edge Fade from Vertex Alpha).
+            float shown = float.IsPositiveInfinity(toPond[sample]) ? 1f : Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(-WaterIntoPond, WaterFadesFrom, toPond[sample]));
+            Vector3 centre = new Vector3(Line.Points[sample].x, surface[sample] + (toPond[sample] < WaterFadesFrom ? WaterOverPond : 0f), Line.Points[sample].z);
             if (i > 0)
             {
                 Vector3 previous = new Vector3(Line.Points[sample - 1].x, surface[sample - 1], Line.Points[sample - 1].z);
@@ -313,6 +324,7 @@ public sealed class RiverBuilder : FeatureBuilder
                 vertices[index] = t.InverseTransformPoint(centre + right * (u * extent));
                 uv[index] = new Vector2(u * extent, v);
                 flow[index] = new Vector2(flowLocal.x, flowLocal.z).normalized * speed;
+                colours[index] = new Color(1f, 1f, 1f, shown);
             }
 
             Vector3 local = t.InverseTransformPoint(centre);
@@ -339,6 +351,7 @@ public sealed class RiverBuilder : FeatureBuilder
         mesh.vertices = vertices;
         mesh.uv = uv;
         mesh.uv2 = flow;
+        mesh.colors = colours;
         mesh.triangles = triangles;
         mesh.RecalculateNormals();
         mesh.RecalculateTangents();
