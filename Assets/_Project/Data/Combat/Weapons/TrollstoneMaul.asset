@@ -15,7 +15,7 @@ MonoBehaviour:
   displayName: Trollstone Maul
   stance: 2
   kind: 0
-  damage: 40
+  damage: 50
   basicAttack: {fileID: 11400000, guid: 1b77eb34ce9a9d046872d336c401e61b, type: 2}
   combo:
   - {fileID: 11400000, guid: 1b77eb34ce9a9d046872d336c401e61b, type: 2}

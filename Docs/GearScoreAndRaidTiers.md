@@ -33,7 +33,10 @@ not the other way round.**
 | Head | 8% | 2 | 5 |
 | Feet | 7% | 1 | 4 |
 | Hands, neck | 6% each | 1 | 4 |
-| Waist, each of two rings | 5% each | 1 | 3 |
+| Waist, ring | 5% each | 1 | 3 |
+
+One ring is worn: the second finger is retired (`GearSlots.IsRetired`). The shares were set for two, so a full kit comes to 95% of
+Points Per Tier x tier, and the kit a tier is measured against (`GearBalance.KitOf`) wears one.
 
 Rarity adds 5% (Uncommon), 10% (Rare), 20% (Epic), 30% (Legendary). Broken gear counts for nothing, as it gives no stats. Backpacks and tools
 count for nothing either. An item's **Gear Score Override** replaces the rules: the torch and the fishing rod count for 1, as nobody's power
@@ -144,9 +147,11 @@ the gear alone used to; one ahead in skill finds it easier, one behind harder. E
 | Tier | Kit score | Damage | Armor | Health | Own kit: hits to kill / die | Kit before: kill / die |
 |---|---|---|---|---|---|---|
 | I | 18 | 12.8 | 32 | 150 | 4.9 / 13.2 | no gear: can't compare / 6.7 |
-| II | 40 | 19.1 | 67 | 160 | 4.9 / 13.2 | 7.4 / 9.8 |
-| III | 64 | 29.6 | 126 | 230 | 4.9 / 13.3 | 7.6 / 6.9 |
-| IV | 85 | 38.3 | 184 | 240 | 4.9 / 13.4 | 6.4 / 10.2 |
+| II | 38 | 18.8 | 67 | 160 | 5.0 / 13.2 | 7.4 / 9.8 |
+| III | 61 | 29.3 | 118 | 230 | 4.9 / 12.9 | 7.7 / 6.9 |
+| IV | 81 | 37.6 | 184 | 240 | 5.0 / 13.4 | 6.5 / 9.8 |
+
+Measured again on 2026-11-10 with one ring (the tool had worn two): own kit moved by 3% at most, so the multipliers stand.
 
 The multipliers are set so that own kit stays level: a new tier feels the same with the right gear. A kit makes a player about **1.2 to 1.5 times
 as deadly and 1.3 to 2 times as tough** per tier. A tier up with the old kit costs about 25-50% more hits to kill. Going back a tier feels the

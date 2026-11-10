@@ -261,7 +261,7 @@ public sealed class ArrowProjectile : MonoBehaviour
             struckBody = victim.Category == TargetCategory.Creature;
             bodyPart = struckBody ? NearestBodyPart(victim, hit.point) : null;
 
-            DamageInfo info = DamageCalculator.Build(owner, attack, damage, victim.Category, hit.point, direction, critical ? 0f : Random.value);
+            DamageInfo info = DamageCalculator.Build(owner, attack, damage, victim.Category, hit.point, direction, critical ? DamageCalculator.SureCrit : Random.value);
             if (technique != HitTechnique.None || critical)
             {
                 info = info.Scaled(1f, 1f, technique, critical && attack.CanCrit);

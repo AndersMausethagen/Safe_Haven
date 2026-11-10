@@ -368,7 +368,9 @@ public sealed partial class PlayerCombat : MonoBehaviour
     {
         if (health != null)
         {
-            health.DamageTakenMultiplier = IsPushingThrough ? 1f - Weapon.HeavySwingArmor : 1f;
+            // Written every frame, so it has to carry everything that scales what the player takes: the Damage Taken assist
+            // (Options) as well as a heavy weapon pushing through. Setting only the latter put the assist back to 1 each frame.
+            health.DamageTakenMultiplier = DamageTakenScale(GameOptions.DamageTakenShare, IsPushingThrough ? Weapon.HeavySwingArmor : 0f);
         }
 
         if (flinchUntil > 0f && !IsFlinching)
@@ -383,6 +385,10 @@ public sealed partial class PlayerCombat : MonoBehaviour
         ApplyPendingHits();
         mode.Tick(combatTimeout);
     }
+
+    /// <summary>What multiplies the damage the player takes: the assist's share, less what a heavy swing shrugs off.</summary>
+    public static float DamageTakenScale(float assistShare, float heavySwingArmor) =>
+        Mathf.Max(0f, assistShare) * (1f - Mathf.Clamp01(heavySwingArmor));
 
     private void UpdateRunning()
     {

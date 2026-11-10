@@ -7,6 +7,12 @@ using UnityEngine.AI;
 /// against what stands here, so a blow lands or misses on the player who sees it (no network delay to dodge around).
 /// Damage it takes here shows at once but can't kill it (<see cref="Damageable.HealthFloor"/>): the host's game decides
 /// when it dies, and each player's own copy then drops that player's loot.
+/// <para>
+/// What it is told and what it works out: where it is, its state and whom it is after come from the host; whether it is
+/// unaware (an ambush) is read from those (<see cref="IsRemoteUnaware"/>), as its own senses never look. A stagger is the
+/// host's too, shown here when its state says so; one begun here (this player's parry) is told to the host
+/// (<see cref="RemoteStaggered"/>) and stands meanwhile. A charge travels here by itself (<see cref="MonsterMovement.Detached"/>).
+/// </para>
 /// </summary>
 public sealed partial class MonsterAI
 {
@@ -16,6 +22,12 @@ public sealed partial class MonsterAI
 
     /// <summary>Seconds without a pose after which the creature is taken to have stood still meanwhile.</summary>
     private const double RemoteQuietGap = 0.25;
+
+    /// <summary>Seconds a stagger begun here stands whatever the host's poses say: time for the host's game to hear of it and answer.</summary>
+    private const float RemoteStaggerHoldSeconds = 0.6f;
+
+    /// <summary>How far ahead a strike is taken to be aimed when the host's game named no place for it.</summary>
+    private const float RemoteAimDistance = 4f;
 
     /// <summary>Whom the host's creature is after, as told to this player: nobody, them, or someone else on their side.</summary>
     public enum RemoteHunt : byte
@@ -29,6 +41,24 @@ public sealed partial class MonsterAI
     private RemoteHunt remoteHunt;
     private float remoteSpeed;
     private bool suppressed;
+    private float remoteStaggerHold = float.NegativeInfinity;
+
+    /// <summary>
+    /// Raised in a friend's game when something there staggers one of the host's creatures (this player's parry, a finishing
+    /// blow holding it), with the seconds: co-op tells the host's game, which staggers the real one for everybody.
+    /// </summary>
+    public static event System.Action<MonsterAI, float> RemoteStaggered;
+
+    // The host's creature has noticed nobody: it idles or walks its rounds and is after no one. Its awareness itself isn't
+    // sent, and this copy's own senses never look, so by them it would count as unaware for good: every blow an ambush.
+    private bool IsRemoteUnaware => remoteHunt == RemoteHunt.None && (CurrentState == State.Idle || CurrentState == State.Returning);
+
+    // Staggered by something in this game: it stands for a moment whatever the poses say, and the host's game is told.
+    private void NoteStaggeredHere(float seconds)
+    {
+        remoteStaggerHold = Mathf.Max(remoteStaggerHold, Time.time + Mathf.Max(RemoteStaggerHoldSeconds, seconds - RemoteStaggerHoldSeconds));
+        RemoteStaggered?.Invoke(this, seconds);
+    }
 
     /// <summary>The session's clock (co-op sets it): puppets are drawn on it, a little behind.</summary>
     public static System.Func<double> RemoteClock { get; set; }
@@ -63,10 +93,19 @@ public sealed partial class MonsterAI
     {
         IsRemote = true;
         remotePoses.Clear();
+        remoteHunt = RemoteHunt.None;
+        remoteStaggerHold = float.NegativeInfinity;
         if (TryGetComponent(out NavMeshAgent agent))
         {
             agent.enabled = false;
         }
+
+        if (movement != null)
+        {
+            movement.Detached = true;
+        }
+
+        RefreshAmbush();
     }
 
     /// <summary>Takes this creature back into this game (the host left the run): it thinks and finds its way again.</summary>
@@ -78,11 +117,19 @@ public sealed partial class MonsterAI
         }
 
         IsRemote = false;
+        remoteHunt = RemoteHunt.None;
+        if (movement != null)
+        {
+            movement.Detached = false;
+        }
+
         if (TryGetComponent(out NavMeshAgent agent))
         {
             agent.enabled = true;
             agent.Warp(transform.position);
         }
+
+        RefreshAmbush();
     }
 
     /// <summary>
@@ -102,34 +149,69 @@ public sealed partial class MonsterAI
         remotePoses.Add(new PoseSnapshot { Time = time, Position = position, Yaw = yaw });
         remoteSpeed = speed;
 
-        if (CurrentState != State.Attacking && CurrentState != State.Dead && state != State.Attacking && state != State.Dead)
+        bool dead = CurrentState == State.Dead || state == State.Dead;
+        // A stagger begun here stands until the host's game has had time to hear of it.
+        bool holdsStagger = CurrentState == State.Staggered && state != State.Staggered && Time.time < remoteStaggerHold;
+        if (!dead && !holdsStagger && state != CurrentState && definition != null)
         {
-            SetState(state);
+            if (state == State.Staggered)
+            {
+                // The host's creature staggers (its poise broke, someone parried it): shown here as a stagger is, open to the
+                // same blows and out of any strike it was playing, but not told back to the host.
+                BeginStagger(CombatTechniqueSettings.Current.StaggerSeconds);
+            }
+            else if (CurrentState != State.Attacking && state != State.Attacking)
+            {
+                // A strike in progress here finishes first; one in the host's game comes as a strike, not as a pose.
+                SetState(state);
+            }
         }
+
+        RefreshAmbush();
     }
 
     /// <summary>
     /// The host's creature strikes from <paramref name="from"/>: this one steps there (it is drawn a little behind) and the
-    /// same action plays here, at <paramref name="at"/> (this player) or straight ahead.
+    /// same action plays here, at <paramref name="at"/> (this player, where they really stand) or, for a strike at someone
+    /// else, at <paramref name="aimedAt"/>: where the host's creature aimed it.
     /// </summary>
-    public void PlayRemoteStrike(int action, IDamageable at, Vector3 from, float yaw)
+    public void PlayRemoteStrike(int action, IDamageable at, Vector3 from, float yaw, Vector3? aimedAt = null)
     {
         if (!IsRemote || CurrentState == State.Dead || definition == null)
         {
             return;
         }
 
+        // An action this game's creature doesn't have (it can't, from the same build), or nothing to strike with.
+        if (action >= definition.Attacks.Count || (action < 0 && definition.Attack == null))
+        {
+            return;
+        }
+
+        // Staggered here a moment ago (a parry) and the host's game hasn't heard yet: what it sent meanwhile is void.
+        if (CurrentState == State.Staggered && Time.time < remoteStaggerHold)
+        {
+            return;
+        }
+
         transform.SetPositionAndRotation(from, Quaternion.Euler(0f, yaw, 0f));
 
-        Vector3 toTarget = transform.forward;
+        Vector3 toTarget;
         if (at is Component body && CanTarget(at))
         {
             SetTarget(at, null);
             toTarget = body.transform.position - transform.position;
-            toTarget.y = 0f;
+        }
+        else
+        {
+            // Not at this player: nothing here is its target. A target kept from an earlier strike (or from this player's
+            // last blow on it) aimed its shots and follow-up blows at them, though the host's creature struck at someone else.
+            ClearTarget();
+            toTarget = aimedAt.HasValue ? aimedAt.Value - transform.position : transform.forward * RemoteAimDistance;
         }
 
-        BeginAttack(action, toTarget.sqrMagnitude > 0.0001f ? toTarget : transform.forward);
+        toTarget.y = 0f;
+        BeginAttack(action, toTarget.sqrMagnitude > 0.0001f ? toTarget : transform.forward * RemoteAimDistance);
     }
 
     /// <summary>

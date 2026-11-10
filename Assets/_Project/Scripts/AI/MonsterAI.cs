@@ -657,6 +657,12 @@ public sealed partial class MonsterAI : MonoBehaviour, IEventSubject, IStaggerab
 
         State previous = CurrentState;
         CurrentState = next;
+        // However a stagger ends (in a friend's game the host's word ends it, or its next strike), what it added goes with it.
+        if (previous == State.Staggered && damageable != null)
+        {
+            damageable.DamageTakenMultiplier = 1f;
+        }
+
         if (previous == State.Idle && idleLife != null)
         {
             idleLife.Reset();

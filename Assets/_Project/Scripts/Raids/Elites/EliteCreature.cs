@@ -217,12 +217,14 @@ public sealed class EliteCreature : MonoBehaviour
             }
         }
 
-        if (difficulty == null || blow.Source == null || !Player.IsPlayer(blow.Source.gameObject))
+        // A companion's finishing blow pays the player, as an ordinary creature's drop does (LootOnDeath.TakerOf).
+        Combatant taker = LootOnDeath.TakerOf(blow.Source);
+        if (difficulty == null || taker == null || !Player.IsPlayer(taker.gameObject))
         {
             return;
         }
 
-        GameObject killer = blow.Source.gameObject;
+        GameObject killer = taker.gameObject;
         var bag = killer.GetComponentInParent<ItemInventory>();
         if (bag != null)
         {

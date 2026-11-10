@@ -409,6 +409,13 @@ public sealed class MonsterAttacks
     // Others of its kind rise around it and go for the player. A raid gives them its own strength.
     private void Summon()
     {
+        // Co-op, in a friend's game: the host's creature calls its kin in the host's game, and they come here as every creature
+        // does. Made here they were removed at once (this game makes none), and readying them threw.
+        if (CreatureSource.Remote != null)
+        {
+            return;
+        }
+
         if (action.summonPrefab == null)
         {
             Debug.LogError($"{definition.DisplayName}: summon action has no prefab.", self);

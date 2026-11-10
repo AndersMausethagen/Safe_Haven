@@ -18,12 +18,34 @@ public sealed partial class MonsterAI
             return;
         }
 
+        BeginStagger(seconds);
+        if (IsRemote)
+        {
+            NoteStaggeredHere(seconds);
+        }
+    }
+
+    /// <summary>Staggers it for at least this long: a new stagger, or more of the one it is in (never less).</summary>
+    public void StaggerAtLeast(float seconds)
+    {
+        if (CurrentState == State.Staggered)
+        {
+            staggerUntil = Mathf.Max(staggerUntil, Time.time + seconds);
+            return;
+        }
+
+        Stagger(seconds);
+    }
+
+    private void BeginStagger(float seconds)
+    {
         attacks.Cancel();
         movement.Stop();
         staggerUntil = Time.time + seconds;
         pose?.Stagger(Time.time, seconds);
-        damageable.DamageTakenMultiplier = CombatTechniqueSettings.Current.StaggeredDamageTaken;
+        // After the state, which clears what the last stagger added.
         SetState(State.Staggered);
+        damageable.DamageTakenMultiplier = CombatTechniqueSettings.Current.StaggeredDamageTaken;
         Staggered?.Invoke(seconds);
         AnyStaggered?.Invoke(this, seconds);
     }
@@ -38,6 +60,11 @@ public sealed partial class MonsterAI
 
         staggerUntil = Mathf.Max(staggerUntil, Time.time + seconds);
         pose?.Stagger(Time.time, seconds);
+        if (IsRemote)
+        {
+            NoteStaggeredHere(seconds);
+        }
+
         HeldForFinish?.Invoke(bladeIn);
     }
 
@@ -78,7 +105,9 @@ public sealed partial class MonsterAI
             OnBackstabbed(result.Killed);
         }
 
-        if (poise != null && CurrentState != State.Staggered && CurrentState != State.Dead && !result.Killed
+        // A friend's copy of the host's creature (co-op) keeps no poise of its own: the blow goes to the host's game, whose
+        // creature's poise it wears down, and the stagger comes back from there for everyone.
+        if (!IsRemote && poise != null && CurrentState != State.Staggered && CurrentState != State.Dead && !result.Killed
             && poise.Hit(damage.Poise, Time.time))
         {
             Stagger(CombatTechniqueSettings.Current.StaggerSeconds);

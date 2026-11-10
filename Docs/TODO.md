@@ -3,6 +3,26 @@
 Open work and ideas. Tick items off (`[x]`) or delete them when done. Architecture notes for each system live in
 [ARCHITECTURE.md](../Assets/_Project/Scripts/ARCHITECTURE.md).
 
+## Found in the code review (2026-11-10)
+
+Fixed that day: the Damage Taken assist, Silent Takedown, block stamina by the blow after armor, loot for a companion's
+kill, sure criticals, the Trollstone Maul, and the friend's side of creatures in co-op (charges, strength, staggers,
+strikes at others). Left open, as each needs a decision or content:
+- [ ] Tests failing before the review, on content: `JournalTests.EveryQuest_HasNotes` (22 quests have no journal notes: the
+      ten Bring ... Home, the nine job quests, First Weapon, Heavy Loads, Safe Keeping), `LanternTests` (the prologue's Road
+      East no longer hands out a worn lantern), `GroundPaintTests.TheHavenGroves_StandOnOldGrowthFloor` (no groves found in
+      the reworked Haven), `PrologueMeadowTests.Footprints_OnEveryTerrain_AreTheHavens` (the meadow's displacement
+      strength is 0.3 in the uncommitted material, the Haven's 0.247), and the Young Tree prefab below.
+- [ ] The Bearded Greataxe (tier III, Common, 34 damage) is better than the Iron Greatsword (tier III, Uncommon, 30) on the
+      same swings and timings. Decide which the two-hander of the tier is, or give the axe its own trade-off. The Iron
+      Sword, Iron Spear and the axe are also Common where the rest of the iron is Uncommon.
+- [ ] Gear score shares add up to a full kit only with two rings, and one is worn: a full kit is 95% of Points Per Tier.
+      Move the second ring's 5% somewhere, or leave it.
+- [ ] Co-op: a friend's companion is never a creature's target in the host's game. A stash taken from in the same half
+      second as a workshop used it can hand a guest items the host no longer had (`StashShare.ApplyChange` logs it).
+- [ ] Co-op: the puppet's side of a fight was checked by driving a creature as a puppet in one Editor (charge lands,
+      strike at someone else, staggers, summons, a death the host declares). Between two machines it is unplayed.
+
 ## Second playtest list (2026-11-08)
 
 In the user's order. Fishing first, then the rest.

@@ -94,8 +94,9 @@ public sealed partial class MonsterAI
     }
 
     /// <summary>Not hunting anyone and hasn't noticed anything: a blow now is an ambush.</summary>
-    public bool IsUnaware => senses != null && CurrentState != State.Dead && CurrentState != State.Staggered
-        && !CanTarget(target) && senses.Stage == AwarenessStage.Unaware;
+    public bool IsUnaware => IsRemote ? IsRemoteUnaware
+        : senses != null && CurrentState != State.Dead && CurrentState != State.Staggered
+            && !CanTarget(target) && senses.Stage == AwarenessStage.Unaware;
 
     /// <summary>Whether the last blow it took found it unaware (read after the blow, when it already knows).</summary>
     public bool LastHitAmbushed { get; private set; }
@@ -108,7 +109,7 @@ public sealed partial class MonsterAI
             return;
         }
 
-        bool unaware = !CanTarget(target) && senses.Stage == AwarenessStage.Unaware;
+        bool unaware = IsRemote ? IsRemoteUnaware : !CanTarget(target) && senses.Stage == AwarenessStage.Unaware;
         damageable.DamageTakenMultiplier = unaware ? PerceptionSettings.Current.AmbushDamageTaken : 1f;
     }
 

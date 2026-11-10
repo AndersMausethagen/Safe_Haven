@@ -381,7 +381,7 @@ public sealed class MovementAndCombatPage : SystemsPage
             Derived("Best timed chain bonus", $"+{technique.MaxRhythm * technique.RhythmDamagePerStack:P0} damage, {(technique.RhythmSpeedPerStack > 0f ? $"+{technique.MaxRhythm * technique.RhythmSpeedPerStack:P0} speed" : "no speed-up")}");
             if (stamina != null && technique.BlockStaminaPerDamage > 0f)
             {
-                Derived("Guard holds against", $"{stamina.MaxStamina / technique.BlockStaminaPerDamage:0} damage from full stamina");
+                Derived("Guard holds against", $"{stamina.MaxStamina / technique.BlockStaminaPerDamage:0} damage from full stamina, counted after the player's armor");
             }
 
             Derived("Swings", technique.DodgeCancelsWindup ? "can be dodged out of at any time" : "are commitments: no dodging until they land");

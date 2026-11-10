@@ -7,8 +7,10 @@
 /// <list type="bullet">
 /// <item><c>CreatureSpawn</c> (reliable): new creatures near a friend, by prefab id, with elite affixes.</item>
 /// <item><c>CreaturePoses</c> (unreliable, 19 bytes each, with whom it is after): only those that moved or changed, each at least once a second.</item>
-/// <item><c>CreatureStrike</c>: a strike's action, target, time and where it began; <c>CreatureDied</c>, <c>CreatureGone</c>.</item>
-/// <item><c>CreatureHit</c> (friend to host): a blow landed on a puppet.</item>
+/// <item><c>CreatureStrike</c>: a strike's action, target, time, where it began and where it is aimed; <c>CreatureDied</c>, <c>CreatureGone</c>.</item>
+/// <item><c>CreatureHit</c> (friend to host): a blow landed on a puppet, by the friend or the companion they brought.</item>
+/// <item><c>CreatureStagger</c> (friend to host): the friend staggered a puppet (a parry, a finishing blow holding it):
+/// the host's creature staggers, and its state shows that to everyone.</item>
 /// <item><c>CreatureWake</c>, <c>CreatureCall</c> (friend to host): what the friend woke (an extraction beacon's alarm
 /// group by its path, an event's creatures by prefab id): made in the host's game and sent after the friend.</item>
 /// </list>
@@ -23,6 +25,7 @@ public sealed class CoopCreatures : ICoopPart
     public const string GoneMessage = "SafeHaven.CreatureGone";
     public const string WakeMessage = "SafeHaven.CreatureWake";
     public const string CallMessage = "SafeHaven.CreatureCall";
+    public const string StaggerMessage = "SafeHaven.CreatureStagger";
 
     /// <summary>Seconds between updates.</summary>
     public const float Interval = 0.1f;

@@ -40,6 +40,40 @@ public sealed class RaidTierTests
     }
 
     [Test]
+    public void TheKitATierIsTunedAgainst_WearsOneRing_AsThePlayerCan()
+    {
+        List<ItemDefinition> gear = GearBalance.AllGear();
+        foreach (RaidDifficulty tier in Raid.Difficulties)
+        {
+            GearBalance.Kit kit = GearBalance.KitOf(tier.tier, gear);
+            Assert.LessOrEqual(kit.Pieces.Count(piece => piece.ArmorSlot == ArmorSlot.Finger), 1, $"tier {tier.tier}: the second finger is retired");
+        }
+    }
+
+    [Test]
+    public void AHigherTiersBestWeapon_IsNeverWeakerThanTheTierBelows()
+    {
+        List<ItemDefinition> weapons = GearBalance.AllGear().Where(item => item.IsWeapon && !item.Weapon.IsShield && item.Weapon.Damage > 0f).ToList();
+        // Within a way of holding one: a spear's thrust and a greataxe's swing aren't measured against each other.
+        foreach (WeaponStance stance in weapons.Select(item => item.Weapon.Stance).Distinct())
+        {
+            float below = 0f;
+            foreach (int tier in weapons.Select(item => item.Tier).Distinct().OrderBy(tier => tier))
+            {
+                List<ItemDefinition> ofTier = weapons.Where(item => item.Tier == tier && item.Weapon.Stance == stance).ToList();
+                if (ofTier.Count == 0)
+                {
+                    continue;
+                }
+
+                float best = ofTier.Max(item => item.Weapon.Damage);
+                Assert.GreaterOrEqual(best, below, $"tier {tier} ({stance}): {ofTier.OrderByDescending(item => item.Weapon.Damage).First().name}");
+                below = best;
+            }
+        }
+    }
+
+    [Test]
     public void WhatIsNoGear_AddsNothing_AndATorchNextToNothing()
     {
         Assert.AreEqual(0, GearScore.Of(Item("BarkPack")), "a backpack");

@@ -287,7 +287,7 @@ public static class BuildGear
             so => so.FindProperty("heavyAttack").objectReferenceValue = hammerHeavy, "Human_Hammer", 1.4f);
         Melee("GraveBlade", "Grave Blade", "Barrow iron, reforged. It's cold in the hand and it never quite warms.", sword, "IronSword", 3, ItemRarity.Rare, 110, 3.2f, 25f, new Color(0.3f, 0.33f, 0.4f), forge, 28f,
             new[] { ("GraveIron", 3), ("IronIngot", 1), ("CuredLeather", 1) }, null, null, 0f, new StatBonus(StatType.FrostResistance, 0.08f));
-        Melee("TrollstoneMaul", "Trollstone Maul", "A lump of trollstone on an elderwood haft. A fair weight for a troll.", twoHand, "Greataxe", 4, ItemRarity.Rare, 160, 9f, 40f, Troll, forge, 34f,
+        Melee("TrollstoneMaul", "Trollstone Maul", "A lump of trollstone on an elderwood haft. A fair weight for a troll.", twoHand, "Greataxe", 5, ItemRarity.Epic, 330, 9f, 50f, Troll, forge, 34f,
             new[] { ("Trollstone", 2), ("Elderwood", 3), ("Deepstone", 2), ("IronIngot", 2) },
             so => so.FindProperty("heavyAttack").objectReferenceValue = hammerHeavy, "Human_Hammer", 1.8f, new StatBonus(StatType.Strength, 4f));
         Melee("MoonsilverBlade", "Moonsilver Blade", "It rings when drawn, faintly, for longer than it should.", sword, "IronSword", 4, ItemRarity.Rare, 190, 2.4f, 30f, Moonsilver, forge, 34f,

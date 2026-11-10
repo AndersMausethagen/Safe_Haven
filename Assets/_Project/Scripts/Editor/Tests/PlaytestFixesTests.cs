@@ -41,7 +41,8 @@ public sealed class PlaytestFixesTests
             typeof(CommandWheel).GetMethod("BuildView", inside).Invoke(wheel, null);
             System.Type choice = typeof(CommandWheel).GetNestedType("Choice", BindingFlags.NonPublic);
             var choices = (IList)typeof(CommandWheel).GetField("choices", inside).GetValue(wheel);
-            choices.Add(System.Activator.CreateInstance(choice, "Follow", null, null));
+            // Every argument, as reflection doesn't fill in a constructor's defaults (label, select, opens, dimmed).
+            choices.Add(System.Activator.CreateInstance(choice, "Follow", null, null, false));
             typeof(CommandWheel).GetMethod("ShowPage", inside).Invoke(wheel, new object[] { "Choose" });
 
             var root = (GameObject)typeof(CommandWheel).GetField("root", inside).GetValue(wheel);

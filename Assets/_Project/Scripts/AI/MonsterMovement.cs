@@ -22,6 +22,13 @@ public sealed class MonsterMovement
     private Vector3 asked;
     private bool hasAsked;
 
+    /// <summary>
+    /// Co-op: a friend's copy of the host's creature. Its agent is off (it goes where the host's goes), so the one move it
+    /// makes by itself, a charge, travels over the NavMesh without it. Left as it was, a charge found no agent, ended where
+    /// it began and never reached anyone.
+    /// </summary>
+    public bool Detached { get; set; }
+
     public MonsterMovement(Transform self, NavMeshAgent agent, float repathInterval, float turnSpeed)
     {
         this.self = self;
@@ -135,9 +142,41 @@ public sealed class MonsterMovement
     /// stopped it.</summary>
     public bool Rush(Vector3 direction, float distance)
     {
+        if (Detached)
+        {
+            return RushDetached(direction, distance);
+        }
+
         Vector3 before = self.position;
         bool blocked = agent.Raycast(before + direction * distance, out NavMeshHit wall);
         agent.Move(blocked ? wall.position - before : direction * distance);
+        return blocked;
+    }
+
+    // The same move asked of the NavMesh itself: stopped by its edges, kept on its ground (the agent's own height above it).
+    private bool RushDetached(Vector3 direction, float distance)
+    {
+        Vector3 before = self.position;
+        Vector3 step = direction * distance;
+        if (!NavMesh.SamplePosition(before, out NavMeshHit from, NavMeshSnapDistance, agent.areaMask))
+        {
+            // Off the NavMesh altogether (the host's stands where this game has none): straight on, as the host's went.
+            self.position = before + step;
+            return false;
+        }
+
+        Vector3 to = from.position + step;
+        bool blocked = NavMesh.Raycast(from.position, to, out NavMeshHit wall, agent.areaMask) && wall.hit;
+        if (blocked)
+        {
+            to = wall.position;
+        }
+        else if (NavMesh.SamplePosition(to, out NavMeshHit ground, NavMeshSnapDistance, agent.areaMask))
+        {
+            to = ground.position;
+        }
+
+        self.position = to + Vector3.up * agent.baseOffset;
         return blocked;
     }
 
@@ -152,6 +191,11 @@ public sealed class MonsterMovement
     /// <summary>True when it can move: on the NavMesh, or stepped onto it from close by.</summary>
     public bool EnsureOnNavMesh()
     {
+        if (Detached)
+        {
+            return true;
+        }
+
         if (!agent.isActiveAndEnabled)
         {
             return false;

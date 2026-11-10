@@ -72,9 +72,9 @@ public static class GearBalance
             Wear(Best(item => item.ArmorSlot == slot));
         }
 
-        ItemDefinition ring = Best(item => item.ArmorSlot == ArmorSlot.Finger);
-        Wear(ring);
-        Wear(ring);
+        // One ring: the second finger is retired (GearSlots.IsRetired), so a kit can't wear two. Counted twice, the ring's
+        // armor and crit made every tier's own kit look tougher and deadlier than the one a player can put on.
+        Wear(Best(item => item.ArmorSlot == ArmorSlot.Finger));
         Measure(kit);
         LevelingSettings skills = LevelingSettings.Current;
         kit.SkillDamage = LevelingSettings.BonusAt(skills.SkillTrainedBy(ProficiencyTraining.Melee), StatType.MeleeDamage, skills.ExpectedLevel(tier), skills);

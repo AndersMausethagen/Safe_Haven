@@ -34,7 +34,11 @@ public sealed class CreatureHost
         public string PrefabId;
         public bool HitByHost;
         public bool Scaled;
+        public System.Action OnStrike;
     }
+
+    /// <summary>The longest a friend's game may ask a creature to stagger for (a parry is 1.3 s; a finishing blow holds less).</summary>
+    private const float LongestAskedStagger = 3f;
 
     // A creature's pose as last sent to one friend: position exact, the rest in a byte each.
     private struct SentPose
@@ -76,6 +80,7 @@ public sealed class CreatureHost
         link.On(CoopCreatures.HitMessage, OnHit);
         link.On(CoopCreatures.WakeMessage, OnWake);
         link.On(CoopCreatures.CallMessage, OnCall);
+        link.On(CoopCreatures.StaggerMessage, OnStagger);
         Damageable.AnyDied += OnAnyDied;
         Damageable.AnyDamaged += OnAnyDamaged;
     }
@@ -98,6 +103,15 @@ public sealed class CreatureHost
 
     private void Forget()
     {
+        // Each creature told this of its strikes: no longer, or a session opened again would hear every strike twice over.
+        foreach (Hosted hosted in byId.Values)
+        {
+            if (hosted.Ai != null && hosted.OnStrike != null)
+            {
+                hosted.Ai.AttackStarted -= hosted.OnStrike;
+            }
+        }
+
         byId.Clear();
         byCreature.Clear();
         told.Clear();
@@ -171,7 +185,8 @@ public sealed class CreatureHost
             };
             byId[hosted.Id] = hosted;
             byCreature[creature] = hosted;
-            creature.AttackStarted += () => OnStrikeBegun(hosted);
+            hosted.OnStrike = () => OnStrikeBegun(hosted);
+            creature.AttackStarted += hosted.OnStrike;
         }
     }
 
@@ -387,6 +402,9 @@ public sealed class CreatureHost
         ulong at = creature.Target is FriendHitbox friend ? friend.ClientId
             : creature.Target is Component body && Player.IsPlayer(body.gameObject) ? NetworkManager.ServerClientId
             : CoopLink.NoOne;
+        // Where it is aimed, for everyone it isn't aimed at: their copy strikes that way, as far as this one does.
+        Vector3 aim = creature.Target is Component aimed && aimed != null ? aimed.transform.position
+            : creature.transform.position + creature.AttackDirection * 4f;
         foreach (KeyValuePair<ulong, HashSet<int>> pair in told)
         {
             if (!pair.Value.Contains(hosted.Id))
@@ -401,6 +419,7 @@ public sealed class CreatureHost
             writer.WriteValueSafe(link.Now);
             writer.WriteValueSafe(creature.transform.position);
             writer.WriteValueSafe(creature.transform.eulerAngles.y);
+            writer.WriteValueSafe(aim);
             link.Send(CoopCreatures.StrikeMessage, pair.Key, writer);
         }
     }
@@ -508,6 +527,34 @@ public sealed class CreatureHost
         return null;
     }
 
+    // Whether a blow of this size ends the creature as it stands: after its defenses, and unless it can't be hit just now.
+    private static bool WouldKill(Hosted hosted, float amount, DamageType type)
+    {
+        if (hosted.Health.IsInvulnerable || hosted.Combatant == null)
+        {
+            return false;
+        }
+
+        float worth = DamageCalculator.Mitigate(amount, type, hosted.Combatant.Stats, hosted.Combatant.Rules) * hosted.Health.DamageTakenMultiplier;
+        return worth >= hosted.Health.CurrentHealth - hosted.Health.HealthFloor;
+    }
+
+    // A friend staggered their copy of a creature (a parry, a finishing blow holding it): the real one staggers, at least
+    // that long, which every game then sees in its state. Without this a friend's parry stopped nothing: the creature here
+    // fought on, and its next strike played over the stagger in their game.
+    private void OnStagger(ulong sender, FastBufferReader reader)
+    {
+        reader.ReadValueSafe(out int id);
+        reader.ReadValueSafe(out float seconds);
+        if (!byId.TryGetValue(id, out Hosted hosted) || hosted.Ai == null || hosted.Health == null || !hosted.Health.IsAlive
+            || !(seconds > 0f) || FriendOnThisRun(sender) == null)
+        {
+            return;
+        }
+
+        hosted.Ai.StaggerAtLeast(Mathf.Min(seconds, LongestAskedStagger));
+    }
+
     // A friend's blow on one of the host's creatures: applied here, and the creature turns on them.
     private void OnHit(ulong sender, FastBufferReader reader)
     {
@@ -524,9 +571,12 @@ public sealed class CreatureHost
             return;
         }
 
-        // Struck by the host before: should this blow kill it, the kill and its loot count for the host too.
-        Combatant host = hosted.HitByHost && Player.Current != null ? Player.Current.GetComponent<Combatant>() : null;
-        hosted.Health.ApplyDamage(new DamageInfo(host, null, amount, (DamageType)type, critical, point, direction, poise, (HitTechnique)technique));
+        // Struck by the host before: should this blow kill it, the kill and its loot count for the host too. Only that blow
+        // carries the host's name. Every other is the friend's alone: named as the host's, each showed in the host's game as
+        // a blow of their own (its hit feedback, their stealth and their relics all listen for those).
+        Combatant host = hosted.HitByHost && Player.Current != null && WouldKill(hosted, amount, (DamageType)type) ? Player.Current.Combatant : null;
+        // Judged already: the friend's game put the blow to its copy's guard (a shield, as it faced there) before sending it.
+        hosted.Health.ApplyJudged(new DamageInfo(host, null, amount, (DamageType)type, critical, point, direction, poise, (HitTechnique)technique));
         foreach (NetworkPlayerAvatar friend in NetworkPlayerAvatar.All)
         {
             if (friend != null && friend.OwnerClientId == sender && friend.Body != null && friend.Body.TryGetComponent(out FriendHitbox hitbox))

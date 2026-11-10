@@ -5,7 +5,9 @@ using UnityEngine;
 /// <summary>
 /// What a monster leaves its killer: items rolled from its loot table, given straight to the killer's bag, resources
 /// (hides, Cursed Essence) given to their resource bars, and recipes it teaches (a boss unlocking iron smithing). Only a
-/// killer with an inventory (the player) collects anything. Whatever doesn't fit is reported rather than silently lost.
+/// killer with an inventory (the player) collects anything; what falls to someone on the player's side who carries no bag
+/// (a companion, a spike trap, a watch post's archer) is the player's haul (<see cref="TakerOf"/>). Whatever doesn't fit is
+/// reported rather than silently lost.
 /// </summary>
 [RequireComponent(typeof(Damageable))]
 public sealed class LootOnDeath : MonoBehaviour
@@ -47,14 +49,32 @@ public sealed class LootOnDeath : MonoBehaviour
         drops.Validate();
     }
 
+    /// <summary>
+    /// Who collects what <paramref name="killer"/> brought down: the killer, or the player when the killer fights on their
+    /// side and has no bag of its own. Before this a companion's finishing blow lost the player the whole drop.
+    /// </summary>
+    public static Combatant TakerOf(Combatant killer, Combatant player)
+    {
+        if (killer == null || player == null || !killer.Faction.IsPlayerSide() || killer.GetComponentInParent<ItemInventory>() != null)
+        {
+            return killer;
+        }
+
+        return player;
+    }
+
+    /// <summary><see cref="TakerOf(Combatant, Combatant)"/> for the player in this scene.</summary>
+    public static Combatant TakerOf(Combatant killer) => TakerOf(killer, Player.Current != null ? Player.Current.Combatant : null);
+
     private void OnDied(Damageable victim, DamageInfo killingBlow)
     {
-        if (killingBlow.Source == null)
+        Combatant taker = TakerOf(killingBlow.Source);
+        if (taker == null)
         {
             return;
         }
 
-        var inventory = killingBlow.Source.GetComponentInParent<ItemInventory>();
+        var inventory = taker.GetComponentInParent<ItemInventory>();
         if (inventory != null)
         {
             List<ItemAmount> items = drops.Roll();
@@ -71,7 +91,7 @@ public sealed class LootOnDeath : MonoBehaviour
             }
         }
 
-        if (killingBlow.Source.GetComponentInParent<ResourceInventory>() != null)
+        if (taker.GetComponentInParent<ResourceInventory>() != null)
         {
             List<ResourceAmount> rolled = drops.RollResources();
             if (WithholdsEssence)
@@ -79,11 +99,11 @@ public sealed class LootOnDeath : MonoBehaviour
                 rolled.RemoveAll(entry => entry.Resource == SettlementSettings.Current.CursedEssence);
             }
 
-            List<ResourceAmount> overflow = LootGrant.GiveResources(killingBlow.Source.gameObject, Reaped(rolled, killingBlow.Source));
+            List<ResourceAmount> overflow = LootGrant.GiveResources(taker.gameObject, Reaped(rolled, taker));
             if (overflow.Count > 0)
             {
                 GameMessages.Post("Can't carry more: " + AmountText.Describe(overflow) + " left behind.", MessageKind.Warning);
-                LootGrant.LeftBehind(killingBlow.Source.gameObject, overflow);
+                LootGrant.LeftBehind(taker.gameObject, overflow);
             }
         }
 
@@ -93,7 +113,7 @@ public sealed class LootOnDeath : MonoBehaviour
             RelicSettings.Grant(inventory.gameObject, new System.Random(Random.Range(0, int.MaxValue)), raid.Session.Tier);
         }
 
-        var crafting = killingBlow.Source.GetComponentInParent<PlayerCrafting>();
+        var crafting = taker.GetComponentInParent<PlayerCrafting>();
         if (crafting != null && unlocksRecipes.Count > 0)
         {
             crafting.Unlock(unlocksRecipes);

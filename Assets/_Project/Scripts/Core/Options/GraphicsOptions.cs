@@ -219,5 +219,6 @@ public static class GraphicsOptions
         authoredForQuality = null;
         occlusion = null;
         AuthoredTerrains.Clear();
+        AuthoredCameras.Clear();
     }
 }

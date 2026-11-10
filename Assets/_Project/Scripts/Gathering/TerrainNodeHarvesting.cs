@@ -22,6 +22,7 @@ public sealed class TerrainNodeHarvesting : MonoBehaviour
     private sealed class Stand
     {
         public ResourceNode Node;
+        public Interactable Use;
         public Renderer[] Renderers;
         public TreeInstance Original;
         public bool Drawn;
@@ -106,13 +107,14 @@ public sealed class TerrainNodeHarvesting : MonoBehaviour
                 continue;
             }
 
-            if (!stand.Drawn && stand.Node.GetComponent<Interactable>().IsInUse)
+            bool inUse = stand.Use != null && stand.Use.IsInUse;
+            if (!stand.Drawn && inUse)
             {
                 Draw(pair.Key, stand, true);
             }
 
             bool far = (positions[pair.Key] - player).sqrMagnitude > ReleaseRadius * ReleaseRadius;
-            if (far && !stand.Node.IsDepleted && !stand.Node.GetComponent<Interactable>().IsInUse)
+            if (far && !stand.Node.IsDepleted && !inUse)
             {
                 scratch.Add(pair.Key);
             }
@@ -145,7 +147,7 @@ public sealed class TerrainNodeHarvesting : MonoBehaviour
         GameObject copy = Instantiate(prefab, positions[index], Quaternion.Euler(0f, painted.rotation * Mathf.Rad2Deg, 0f), transform);
         copy.name = prefab.name + " " + index;
         copy.transform.localScale = new Vector3(painted.widthScale, painted.heightScale, painted.widthScale);
-        var stand = new Stand { Node = copy.GetComponent<ResourceNode>(), Renderers = copy.GetComponentsInChildren<Renderer>(true), Original = painted };
+        var stand = new Stand { Node = copy.GetComponent<ResourceNode>(), Use = copy.GetComponent<Interactable>(), Renderers = copy.GetComponentsInChildren<Renderer>(true), Original = painted };
         SetDrawn(stand, false);
         stand.Node.Swung += (_, __) => Draw(index, stand, true);
         stand.Node.Harvested += () => Draw(index, stand, true);

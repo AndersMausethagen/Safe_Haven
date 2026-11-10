@@ -9,6 +9,9 @@ using UnityEngine;
 /// </summary>
 public static class AttackResolver
 {
+    // Lists of hits, lent out and handed back: a hit can set off another attack (a burst on death), so one shared list won't do.
+    private static readonly Stack<List<HitDetector.Hit>> spareLists = new Stack<List<HitDetector.Hit>>();
+
     /// <summary>
     /// Hits everything the attack reaches from origin toward direction. weaponDamage is the damage of the weapon behind
     /// the attack, or 0 for attacks that don't use one. The player's technique (rhythm, counters, finishers) comes in as
@@ -26,15 +29,22 @@ public static class AttackResolver
         HitTechnique technique = HitTechnique.None,
         bool forceCritical = false)
     {
-        var hits = new List<HitDetector.Hit>(8);
-        HitDetector.FindTargets(origin, direction, attack, attacker.Faction, layerMask, hits);
-
-        foreach (HitDetector.Hit hit in hits)
+        List<HitDetector.Hit> hits = spareLists.Count > 0 ? spareLists.Pop() : new List<HitDetector.Hit>(8);
+        try
         {
-            Apply(attacker, attack, weaponDamage, hit, origin, direction, damageMultiplier, poiseMultiplier, technique, forceCritical);
-        }
+            HitDetector.FindTargets(origin, direction, attack, attacker.Faction, layerMask, hits);
+            for (int i = 0; i < hits.Count; i++)
+            {
+                Apply(attacker, attack, weaponDamage, hits[i], origin, direction, damageMultiplier, poiseMultiplier, technique, forceCritical);
+            }
 
-        return hits.Count;
+            return hits.Count;
+        }
+        finally
+        {
+            hits.Clear();
+            spareLists.Push(hits);
+        }
     }
 
     /// <summary>Lands the attack on one target already found. The player's swing strikes its targets one after another with this.</summary>
@@ -61,7 +71,7 @@ public static class AttackResolver
             hit.Target.Category,
             hit.Point,
             hitDirection,
-            forceCritical ? 0f : Random.value);
+            forceCritical ? DamageCalculator.SureCrit : Random.value);
         if (damageMultiplier != 1f || poiseMultiplier != 1f || technique != HitTechnique.None || forceCritical)
         {
             damage = damage.Scaled(damageMultiplier, poiseMultiplier, technique, forceCritical && attack.CanCrit);
@@ -71,5 +81,12 @@ public static class AttackResolver
         attacker.ReportDamageDealt(hit.Target, damage, result);
         StatusEffects.AfterHit(attack, hit.Target, attacker, result);
         return result;
+    }
+
+    // Entering Play doesn't reload scripts in this project: statics carry over from the last session unless cleared.
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession()
+    {
+        spareLists.Clear();
     }
 }

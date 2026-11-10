@@ -14,6 +14,7 @@ public sealed class FootprintDecals : MonoBehaviour
 
     private RenderingSettings settings;
     private PlayerAnimationController bound;
+    private Player boundPlayer;
     private bool left;
 
     public void Initialise(RenderingSettings rules)
@@ -23,8 +24,16 @@ public sealed class FootprintDecals : MonoBehaviour
 
     private void Update()
     {
-        // The player is made again in every scene: follow whichever one there is.
-        PlayerAnimationController current = Player.Current != null ? Player.Current.GetComponentInChildren<PlayerAnimationController>() : null;
+        // The player is made again in every scene: follow whichever one there is. Looked up when the player changes, not
+        // every frame (a search through the whole body, bones and all).
+        Player player = Player.Current;
+        if (player == boundPlayer && (bound != null || player == null))
+        {
+            return;
+        }
+
+        boundPlayer = player;
+        PlayerAnimationController current = player != null ? player.GetComponentInChildren<PlayerAnimationController>() : null;
         if (current == bound)
         {
             return;

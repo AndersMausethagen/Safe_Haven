@@ -239,4 +239,11 @@ public sealed class CanopyDebris : MonoBehaviour
         Material material = drawn != null ? drawn.sharedMaterial : null;
         return material != null && material.HasProperty("_TreeHeight") ? material.GetFloat("_TreeHeight") : 0f;
     }
+
+    // Entering Play doesn't reload scripts in this project: statics carry over from the last session unless cleared.
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession()
+    {
+        Current = null;
+    }
 }

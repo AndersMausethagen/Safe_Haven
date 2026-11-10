@@ -153,8 +153,18 @@ public sealed class PlayerGuard : MonoBehaviour, IHitGuard
         }
     }
 
-    // The Melee skill's share more or less stamina a block costs (a beginner's shield arm tires sooner).
-    private float BlockCostScale() => TryGetComponent(out Combatant self) ? Mathf.Max(0.1f, 1f + self.Stats.Get(StatType.BlockStaminaCost)) : 1f;
+    // What the blow is worth to the player (after their armor and resistances), times the Melee skill's share more or less
+    // stamina a block costs (a beginner's shield arm tires sooner).
+    private float BlockCost(in DamageInfo damage)
+    {
+        if (!TryGetComponent(out Combatant self))
+        {
+            return GuardRules.BlockCost(damage.Amount, Rules.BlockStaminaPerDamage, 1f);
+        }
+
+        float worth = DamageCalculator.Mitigate(damage.Amount, damage.Type, self.Stats, self.Rules);
+        return GuardRules.BlockCost(worth, Rules.BlockStaminaPerDamage, Mathf.Max(0.1f, 1f + self.Stats.Get(StatType.BlockStaminaCost)));
+    }
 
     public GuardOutcome Guard(in DamageInfo damage, out float letThrough)
     {
@@ -164,7 +174,7 @@ public sealed class PlayerGuard : MonoBehaviour, IHitGuard
             return GuardOutcome.None;
         }
 
-        float cost = damage.Amount * Rules.BlockStaminaPerDamage * BlockCostScale();
+        float cost = BlockCost(damage);
         GuardOutcome outcome = GuardRules.Resolve(IsGuarding, Time.time - raisedAt, transform.forward, damage.Direction,
             Rules.BlockArc, Rules.ParryWindow * GameOptions.TimingShare, stamina != null ? stamina.Current : float.PositiveInfinity, cost);
         switch (outcome)

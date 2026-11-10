@@ -66,7 +66,10 @@ by motion, sound and weight rather than on-screen text.
   (no attacking, guarding or dodging). Trading blows with a monster is a losing game, unless the weapon is heavy enough: the wind-up of a
   heavy swing pushes through hits with a hammer or maul (40% less damage) and a greatsword or two-handed axe (30% less). Lighter weapons dodge instead.
 - **Guard.** Blocks hits from the front. Part of each hit still gets through (60% with fists, 35–40% with a weapon,
-  10% with a shield) and each block costs stamina. Run out and the guard **breaks**: you reel for over a second.
+  10% with a shield) and each block costs stamina: 0.8 for each point of damage the blow would have done you, after your
+  armor and resistances (`GuardRules.BlockCost`), so armor makes a guard last and a raid's tier doesn't price blocking out
+  (a tier IV wolf's bite costs 17 in moonsilver, where its raw 61 damage would cost 49). Run out and the guard **breaks**:
+  you reel for over a second.
 - **Parry.** Raise the guard within 0.15 s before a hit lands: no damage, no stamina, the attacker staggers and your
   next swing is a **counter** (a critical hit; the sword's is a dashing thrust). Lowering the guard locks it for 0.3 s,
   so tapping it is no free parry. A monster's ground telegraph turns pale and the monster glints exactly when to raise

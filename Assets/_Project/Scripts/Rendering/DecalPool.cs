@@ -130,4 +130,11 @@ public sealed class DecalPool : MonoBehaviour
             Current = null;
         }
     }
+
+    // Entering Play doesn't reload scripts in this project: statics carry over from the last session unless cleared.
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession()
+    {
+        Current = null;
+    }
 }

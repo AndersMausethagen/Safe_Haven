@@ -13,6 +13,12 @@ using UnityEngine;
 /// </summary>
 public static class DamageCalculator
 {
+    /// <summary>
+    /// A crit roll that always comes up critical (for an attack that can crit): a counter, a backstab on a staggered
+    /// target, a perfect release. A roll of 0 would not, for an attacker with no crit chance at all.
+    /// </summary>
+    public const float SureCrit = -1f;
+
     /// <summary>Builds the hit an attacker's attack deals to one target. critRoll is a random value from 0 to 1.</summary>
     public static DamageInfo Build(
         Combatant attacker,

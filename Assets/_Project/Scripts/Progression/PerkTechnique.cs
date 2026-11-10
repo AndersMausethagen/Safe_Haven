@@ -150,4 +150,12 @@ public static class Techniques
             }
         }
     }
+
+    // Entering Play doesn't reload scripts in this project: statics carry over from the last session unless cleared.
+    [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession()
+    {
+        known.Clear();
+        forProgress = null;
+    }
 }

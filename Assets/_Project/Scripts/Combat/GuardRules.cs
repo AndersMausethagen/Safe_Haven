@@ -52,6 +52,15 @@ public static class GuardRules
         return stamina >= staminaCost ? GuardOutcome.Blocked : GuardOutcome.GuardBroken;
     }
 
+    /// <summary>
+    /// The stamina a block costs: a share of what the blow is worth to the one blocking it, which is its damage after their
+    /// armor and resistances (<paramref name="worth"/>), as a hit that got through would be. Going by the damage as it
+    /// arrived made blocking dearer with every raid tier (enemy damage is up to 3.4 times tier I's, stamina is not), until
+    /// one blow broke any guard whatever was worn.
+    /// </summary>
+    public static float BlockCost(float worth, float staminaPerDamage, float costScale) =>
+        Mathf.Max(0f, worth) * Mathf.Max(0f, staminaPerDamage) * Mathf.Max(0f, costScale);
+
     /// <summary>A shield held up all the time, with no stamina or parry to it: it takes what comes from the front, unless the blow is
     /// heavy enough to go through. Its poise still pays for what it takes, so it can be worn down too.</summary>
     public static GuardOutcome ResolveShield(float arc, Vector3 facing, Vector3 hitDirection, HitTechnique technique)

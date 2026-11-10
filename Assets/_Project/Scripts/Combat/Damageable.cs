@@ -148,14 +148,24 @@ public sealed class Damageable : MonoBehaviour, IDamageable, ISaveable, ISharedS
         combatant.Stats.Changed -= OnStatChanged;
     }
 
-    public DamageResult ApplyDamage(in DamageInfo hit)
+    public DamageResult ApplyDamage(in DamageInfo hit) => Apply(hit, true, false);
+
+    /// <summary>
+    /// Co-op, in the host's game: a friend's blow, which their game has already put to this creature's guard as they saw it
+    /// (its shield, where it faced there). Asking the guard again here would take its share off twice.
+    /// </summary>
+    public DamageResult ApplyJudged(in DamageInfo hit) => Apply(hit, false, false);
+
+    // askGuards: off for a blow another game has judged. exact: the amount is taken from health as it stands, past
+    // invulnerability and defenses (Finish), so a death decided elsewhere shows what was left and not a number made up to be sure.
+    private DamageResult Apply(in DamageInfo hit, bool askGuards, bool exact)
     {
         if (!IsAlive)
         {
             return DamageResult.None;
         }
 
-        if (IsInvulnerable)
+        if (IsInvulnerable && !exact)
         {
             // A poison tick during a dodge is no perfect dodge.
             if (!hit.IsOverTime)
@@ -168,7 +178,7 @@ public sealed class Damageable : MonoBehaviour, IDamageable, ISaveable, ISharedS
 
         DamageInfo damage = hit;
         GuardOutcome guard = GuardOutcome.None;
-        if (guards != null)
+        if (guards != null && askGuards && !exact)
         {
             foreach (IHitGuard candidate in guards)
             {
@@ -189,7 +199,7 @@ public sealed class Damageable : MonoBehaviour, IDamageable, ISaveable, ISharedS
             }
         }
 
-        float final = DamageCalculator.Mitigate(damage.Amount, damage.Type, combatant.Stats, combatant.Rules) * DamageTakenMultiplier;
+        float final = exact ? damage.Amount : DamageCalculator.Mitigate(damage.Amount, damage.Type, Owner.Stats, Owner.Rules) * DamageTakenMultiplier;
         float healthLost = Mathf.Min(final, Mathf.Max(0f, currentHealth - HealthFloor));
         currentHealth -= healthLost;
 
@@ -329,7 +339,7 @@ public sealed class Damageable : MonoBehaviour, IDamageable, ISaveable, ISharedS
         }
 
         HealthFloor = 0f;
-        ApplyDamage(new DamageInfo(killer, null, currentHealth * 1000f + 100000f, DamageType.Physical, false, transform.position, transform.forward, 0f, HitTechnique.None));
+        Apply(new DamageInfo(killer, null, currentHealth, DamageType.Physical, false, transform.position, transform.forward, 0f, HitTechnique.None), false, true);
     }
 
     /// <summary>

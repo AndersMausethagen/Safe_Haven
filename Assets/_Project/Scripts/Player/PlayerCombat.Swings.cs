@@ -165,18 +165,29 @@ public sealed partial class PlayerCombat
 
     // Silent Takedown: a blow from the shadows finishes an ordinary creature it has nearly done for anyway. Never a boss or
     // an elite, and never one that knows you are there.
-    private static float SilentTakedown(IDamageable target, float damage)
+    // <paramref name="damage"/> is the swing's multiplier so far, and what comes back is the multiplier to strike with.
+    private float SilentTakedown(IDamageable target, in PendingHit pending, float damage)
     {
         if (!(target is Damageable body) || !body.TryGetComponent(out MonsterAI monster) || !monster.IsUnaware
             || body.GetComponent<EliteCreature>() != null || body.GetComponentInParent<BossEncounter>() != null
-            || !Techniques.Has(PerkTechnique.SilentTakedown) || body.CurrentHealth > damage * TechniqueSettings.Current.TakedownReach)
+            || !Techniques.Has(PerkTechnique.SilentTakedown) || !body.TryGetComponent(out Combatant theirs))
+        {
+            return damage;
+        }
+
+        // What this blow is worth against this creature: as it leaves the hand (no lucky critical counted), then through the
+        // creature's own defenses and what being caught unaware adds.
+        float outgoing = DamageCalculator.CalculateOutgoing(combatant.Stats, combatant.Rules, pending.Attack, pending.WeaponDamage, target.Category, 1f, out _) * damage;
+        float blow = DamageCalculator.Mitigate(outgoing, pending.Attack.DamageType, theirs.Stats, theirs.Rules) * body.DamageTakenMultiplier;
+        if (!StrikeRules.IsTakedown(body.CurrentHealth, blow, TechniqueSettings.Current.TakedownReach))
         {
             return damage;
         }
 
         GameMessages.Post("Silent takedown.", MessageKind.Gain);
         Techniques.Used(PerkTechnique.SilentTakedown);
-        return Mathf.Max(damage, body.CurrentHealth * 100f);
+        // As hard as it takes to finish it and a little over, so the number shown is about what the creature had left.
+        return damage * Mathf.Max(1f, body.CurrentHealth / blow * 1.05f);
     }
 
     // The swing's stamina, after the Melee skill: a beginner tires sooner, a master later.
@@ -379,7 +390,7 @@ public sealed partial class PlayerCombat
         // The Melee skill scales every swing alike, before nothing else changes, so the order of blows (plain, backstab,
         // counter) holds at every level; a perk can add to a blow from the shadows.
         damage *= Mathf.Max(0f, 1f + combatant.Stats.Get(StatType.MeleeDamage)) * PlayerProficiencies.AmbushScale(combatant.Stats, target);
-        damage = SilentTakedown(target, damage);
+        damage = SilentTakedown(target, pending, damage);
         technique |= HitTechnique.Melee;
         AttackResolver.Apply(combatant, pending.Attack, pending.WeaponDamage, pending.Hit, pending.Origin, pending.Direction, damage,
             pending.Poise, technique, critical);

@@ -53,12 +53,14 @@ public sealed class CreaturePuppets : IRaidCreatureSource
         link.On(CoopCreatures.DiedMessage, OnDied);
         link.On(CoopCreatures.GoneMessage, OnGone);
         Damageable.AnyDamaged += OnAnyDamaged;
+        MonsterAI.RemoteStaggered += OnStaggeredHere;
     }
 
     /// <summary>The session ended: mid-raid, puppets become this game's own creatures rather than standing still.</summary>
     public void End()
     {
         Damageable.AnyDamaged -= OnAnyDamaged;
+        MonsterAI.RemoteStaggered -= OnStaggeredHere;
         HandBack(quiet: true);
         MonsterAI.RemoteClock = null;
         link = null;
@@ -241,6 +243,13 @@ public sealed class CreaturePuppets : IRaidCreatureSource
             }
 
             ai.MakeRemote();
+            // As strong as this raid makes its creatures, at its stage: the strikes play out here, so what they do to this
+            // player is worked out from this copy's stats. Unreadied, a tier IV creature hit a friend as a tier I one does.
+            if (GameSession.ActiveRaid != null && RaidDirector.Current != null)
+            {
+                RaidDirector.Current.Creatures.Prepare(copy, false);
+            }
+
             MakeElite(ai, affixes);
             var puppet = new Puppet { Id = id, Ai = ai, Health = copy.GetComponent<Damageable>() };
             if (puppet.Health != null)
@@ -315,13 +324,14 @@ public sealed class CreaturePuppets : IRaidCreatureSource
         reader.ReadValueSafe(out double time);
         reader.ReadValueSafe(out Vector3 from);
         reader.ReadValueSafe(out float yaw);
+        reader.ReadValueSafe(out Vector3 aim);
         if (link == null || link.Now - time > StaleStrike || !byId.TryGetValue(id, out Puppet puppet) || puppet.Ai == null)
         {
             return;
         }
 
-        IDamageable me = at == link.LocalId && Player.Current != null ? Player.Current.GetComponent<IDamageable>() : null;
-        puppet.Ai.PlayRemoteStrike(action, me, from, yaw);
+        IDamageable me = at == link.LocalId && Player.Current != null ? Player.Current.Health : null;
+        puppet.Ai.PlayRemoteStrike(action, me, from, yaw, aim);
     }
 
     private void OnDied(ulong sender, FastBufferReader reader)
@@ -396,10 +406,39 @@ public sealed class CreaturePuppets : IRaidCreatureSource
         link.ToHost(CoopCreatures.CallMessage, writer);
     }
 
-    // A blow this player landed on one of the host's creatures goes to the host.
+    // This player staggered their copy of one of the host's creatures: the host's game staggers the real one.
+    private void OnStaggeredHere(MonsterAI creature, float seconds)
+    {
+        if (!FromHost || link == null || creature == null || !byCreature.TryGetValue(creature, out Puppet puppet))
+        {
+            return;
+        }
+
+        using var writer = new FastBufferWriter(16, Allocator.Temp);
+        writer.WriteValueSafe(puppet.Id);
+        writer.WriteValueSafe(seconds);
+        link.ToHost(CoopCreatures.StaggerMessage, writer);
+    }
+
+    // This player, or the companion they brought on the raid: the blows that are theirs to send. Not anyone else on their
+    // side who stands in this game too (the host's residents, in a visit: the host's game counts those itself).
+    private static bool IsMine(Combatant source)
+    {
+        if (Player.IsPlayer(source.gameObject))
+        {
+            return true;
+        }
+
+        RaidDirector raid = RaidDirector.Current;
+        Companion mine = raid != null && raid.Companions != null ? raid.Companions.Companion : null;
+        return mine != null && source.gameObject == mine.gameObject;
+    }
+
+    // A blow this player (or their companion) landed on one of the host's creatures goes to the host. A companion's blows
+    // were left out before, so the one a friend brought fought the whole raid without leaving a mark.
     private void OnAnyDamaged(Damageable victim, DamageInfo damage, DamageResult result)
     {
-        if (!FromHost || link == null || victim == null || damage.Source == null || !Player.IsPlayer(damage.Source.gameObject)
+        if (!FromHost || link == null || victim == null || damage.Source == null || !IsMine(damage.Source)
             || !victim.TryGetComponent(out MonsterAI creature) || !byCreature.TryGetValue(creature, out Puppet puppet))
         {
             return;

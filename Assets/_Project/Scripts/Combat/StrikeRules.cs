@@ -68,6 +68,13 @@ public static class StrikeRules
     }
 
     /// <summary>
+    /// Silent Takedown: true when a creature with <paramref name="health"/> left is finished by a blow worth
+    /// <paramref name="blow"/> to it (its damage after the creature's defenses): its health is at most
+    /// <paramref name="reach"/> times that.
+    /// </summary>
+    public static bool IsTakedown(float health, float blow, float reach) => blow > 0f && health <= blow * Mathf.Max(1f, reach);
+
+    /// <summary>
     /// How hard a blow struck, from 0 to 1: the share of the target's health it took, how much the attack weighs (its Impact) and
     /// whether it was a strong or a killing one. Blood and ragdolls scale with it.
     /// </summary>
