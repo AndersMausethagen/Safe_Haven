@@ -28,6 +28,8 @@ public sealed class AudioSettingsDefinition : ScriptableObject
     [SerializeField, Range(0f, 1f)] private float musicVolume = 0.6f;
     [SerializeField, Range(0f, 1f)] private float ambienceVolume = 0.7f;
     [SerializeField, Range(0f, 1f)] private float effectsVolume = 0.9f;
+    [Tooltip("Spoken words: a cinematic's narration.")]
+    [SerializeField, Range(0f, 1f)] private float voiceVolume = 1f;
 
     [Header("Making Room (music and background dip while someone talks or a big moment is heard)")]
     [Tooltip("What the music's volume is multiplied by while someone talks. 0.35 is a clear dip without the music going away.")]
@@ -281,6 +283,8 @@ public sealed class AudioSettingsDefinition : ScriptableObject
                 return musicVolume;
             case AudioChannel.Ambience:
                 return ambienceVolume;
+            case AudioChannel.Voice:
+                return voiceVolume;
             default:
                 return effectsVolume;
         }

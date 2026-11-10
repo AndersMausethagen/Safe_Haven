@@ -1,0 +1,262 @@
+{
+  "s02_promise": [
+    {
+      "name": "far",
+      "depth": 4.0,
+      "share": 0.371,
+      "file": "s02_promise_0_far.png"
+    },
+    {
+      "name": "middle",
+      "depth": 1.0,
+      "share": 0.283,
+      "file": "s02_promise_1_middle.png"
+    },
+    {
+      "name": "near",
+      "depth": 0.0,
+      "share": 0.256,
+      "file": "s02_promise_2_near.png"
+    },
+    {
+      "name": "front",
+      "depth": -0.45,
+      "share": 0.091,
+      "file": "s02_promise_3_front.png"
+    }
+  ],
+  "s03_hearth": [
+    {
+      "name": "far",
+      "depth": 4.0,
+      "share": 0.334,
+      "file": "s03_hearth_0_far.png"
+    },
+    {
+      "name": "middle",
+      "depth": 1.0,
+      "share": 0.284,
+      "file": "s03_hearth_1_middle.png"
+    },
+    {
+      "name": "near",
+      "depth": 0.0,
+      "share": 0.306,
+      "file": "s03_hearth_2_near.png"
+    },
+    {
+      "name": "front",
+      "depth": -0.45,
+      "share": 0.076,
+      "file": "s03_hearth_3_front.png"
+    }
+  ],
+  "s04_summer": [
+    {
+      "file": "s04_summer_0_whole.png",
+      "name": "whole",
+      "depth": 0.0,
+      "share": 1.0
+    }
+  ],
+  "s04_autumn": [
+    {
+      "file": "s04_autumn_0_whole.png",
+      "name": "whole",
+      "depth": 0.0,
+      "share": 1.0
+    }
+  ],
+  "s04_winter": [
+    {
+      "file": "s04_winter_0_whole.png",
+      "name": "whole",
+      "depth": 0.0,
+      "share": 1.0
+    }
+  ],
+  "s05_cold_hearth": [
+    {
+      "name": "far",
+      "depth": 4.0,
+      "share": 0.396,
+      "file": "s05_cold_hearth_0_far.png"
+    },
+    {
+      "name": "middle",
+      "depth": 1.0,
+      "share": 0.225,
+      "file": "s05_cold_hearth_1_middle.png"
+    },
+    {
+      "name": "near",
+      "depth": 0.0,
+      "share": 0.262,
+      "file": "s05_cold_hearth_2_near.png"
+    },
+    {
+      "name": "front",
+      "depth": -0.45,
+      "share": 0.117,
+      "file": "s05_cold_hearth_3_front.png"
+    }
+  ],
+  "s06a_trail": [
+    {
+      "name": "far",
+      "depth": 4.0,
+      "share": 0.487,
+      "file": "s06a_trail_0_far.png"
+    },
+    {
+      "name": "middle",
+      "depth": 1.0,
+      "share": 0.239,
+      "file": "s06a_trail_1_middle.png"
+    },
+    {
+      "name": "near",
+      "depth": 0.0,
+      "share": 0.225,
+      "file": "s06a_trail_2_near.png"
+    },
+    {
+      "name": "front",
+      "depth": -0.45,
+      "share": 0.05,
+      "file": "s06a_trail_3_front.png"
+    }
+  ],
+  "s06b_names": [
+    {
+      "name": "far",
+      "depth": 3.0,
+      "share": 0.443,
+      "file": "s06b_names_0_far.png"
+    },
+    {
+      "name": "middle",
+      "depth": 0.5,
+      "share": 0.302,
+      "file": "s06b_names_1_middle.png"
+    },
+    {
+      "name": "near",
+      "depth": -0.3,
+      "share": 0.255,
+      "file": "s06b_names_2_near.png"
+    }
+  ],
+  "s06c_empty_village": [
+    {
+      "name": "far",
+      "depth": 3.0,
+      "share": 0.587,
+      "file": "s06c_empty_village_0_far.png"
+    },
+    {
+      "name": "middle",
+      "depth": 0.5,
+      "share": 0.253,
+      "file": "s06c_empty_village_1_middle.png"
+    },
+    {
+      "name": "near",
+      "depth": -0.3,
+      "share": 0.16,
+      "file": "s06c_empty_village_2_near.png"
+    }
+  ],
+  "s07_clearing": [
+    {
+      "name": "far",
+      "depth": 2.0,
+      "share": 0.566,
+      "file": "s07_clearing_0_far.png"
+    },
+    {
+      "name": "near",
+      "depth": 0.0,
+      "share": 0.434,
+      "file": "s07_clearing_1_near.png"
+    }
+  ],
+  "s08_four_went_in": [
+    {
+      "name": "far",
+      "depth": 4.0,
+      "share": 0.58,
+      "file": "s08_four_went_in_0_far.png"
+    },
+    {
+      "name": "middle",
+      "depth": 1.0,
+      "share": 0.305,
+      "file": "s08_four_went_in_1_middle.png"
+    },
+    {
+      "name": "near",
+      "depth": 0.0,
+      "share": 0.089,
+      "file": "s08_four_went_in_2_near.png"
+    },
+    {
+      "name": "front",
+      "depth": -0.45,
+      "share": 0.026,
+      "file": "s08_four_went_in_3_front.png"
+    }
+  ],
+  "s09_four_more": [
+    {
+      "name": "far",
+      "depth": 4.0,
+      "share": 0.481,
+      "file": "s09_four_more_0_far.png"
+    },
+    {
+      "name": "middle",
+      "depth": 1.0,
+      "share": 0.296,
+      "file": "s09_four_more_1_middle.png"
+    },
+    {
+      "name": "near",
+      "depth": 0.0,
+      "share": 0.152,
+      "file": "s09_four_more_2_near.png"
+    },
+    {
+      "name": "front",
+      "depth": -0.45,
+      "share": 0.072,
+      "file": "s09_four_more_3_front.png"
+    }
+  ],
+  "s10_morning_fire": [
+    {
+      "name": "far",
+      "depth": 4.0,
+      "share": 0.379,
+      "file": "s10_morning_fire_0_far.png"
+    },
+    {
+      "name": "middle",
+      "depth": 1.0,
+      "share": 0.367,
+      "file": "s10_morning_fire_1_middle.png"
+    },
+    {
+      "name": "near",
+      "depth": 0.0,
+      "share": 0.171,
+      "file": "s10_morning_fire_2_near.png"
+    },
+    {
+      "name": "front",
+      "depth": -0.45,
+      "share": 0.083,
+      "file": "s10_morning_fire_3_front.png"
+    }
+  ]
+}

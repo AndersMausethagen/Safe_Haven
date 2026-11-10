@@ -7,6 +7,8 @@ public enum AudioChannel
     Music = 0,
     Ambience = 1,
     Effects = 2,
+    /// <summary>Spoken words: a cinematic's narration.</summary>
+    Voice = 3,
 }
 
 /// <summary>What gives way when too many sounds play at once. Serialized as numbers, so add new ones at the end.</summary>

@@ -172,7 +172,25 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
     {
         Current = null;
         volumes.Clear();
+        musicHolds.Clear();
     }
+
+    private static readonly HashSet<object> musicHolds = new HashSet<object>();
+
+    /// <summary>True while something that brings its own score (a cinematic) has asked the scene's music and ambience to stay out.</summary>
+    public static bool MusicHeld => musicHolds.Count > 0;
+
+    /// <summary>Fades the scene's music and ambience out until <see cref="ReleaseMusic"/> is called with the same owner.</summary>
+    public static void HoldMusic(object owner)
+    {
+        if (owner != null)
+        {
+            musicHolds.Add(owner);
+        }
+    }
+
+    /// <summary>Lets the scene's music and ambience back in, once nobody else is holding them.</summary>
+    public static void ReleaseMusic(object owner) => musicHolds.Remove(owner);
     private static float masterVolume = 1f;
     private static float dipLevel;
     private float roomHeldUntil;
@@ -406,7 +424,7 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
         if (!sceneUnloading)
         {
             float raidTimeLeft = RaidDirector.Current != null ? RaidDirector.Current.Session.TimeRemaining : float.PositiveInfinity;
-            MusicChoice choice = MusicRules.Choose(sceneAudio, settings, Mood, raidTimeLeft);
+            MusicChoice choice = MusicHeld ? new MusicChoice(null, "Held: a cinematic is playing") : MusicRules.Choose(sceneAudio, settings, Mood, raidTimeLeft);
             MusicReason = choice.Reason;
             music.Switch(choice.Playlist);
             if (restartCombatMusic && choice.IsCombat)
@@ -415,7 +433,7 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
             }
 
             restartCombatMusic = false;
-            ambience.Switch(sceneAudio != null ? sceneAudio.Ambience : null);
+            ambience.Switch(sceneAudio != null && !MusicHeld ? sceneAudio.Ambience : null);
         }
 
         AudioListener.pause = GamePause.IsPaused;

@@ -3,6 +3,22 @@
 Open work and ideas. Tick items off (`[x]`) or delete them when done. Architecture notes for each system live in
 [ARCHITECTURE.md](../Assets/_Project/Scripts/ARCHITECTURE.md).
 
+## Backstory cinematic (2026-11-10)
+
+"The Old Story" plays when a new game starts ([script](BackstoryCinematic.md)). Checked in Play from the CLI: the pictures
+by screenshots of every shot, the flow by starting a new game on throwaway saves. Nobody has heard it yet.
+- [ ] Listen to it from New Game: the voice's pace (the model reads briskly and has no speed control; pauses were added
+      between sentences), the music under it (Nightsong, then Eerie raid from the forgetting to the lanterns, then
+      Nightsong), and the levels of the wind, birds and footsteps.
+- [ ] The portal still speaks in text only at home. Voice its main lines with the same voice, or leave it?
+- [ ] Watch it again from the journal's Backstory tab (the screen plays over any scene; the tab has no button yet).
+- [ ] The abandoned village (6c) came out without the guardians standing in it, and the promise (2) shows two of three.
+      Repaint if they are missed.
+- [ ] Layers are cut by a depth estimate and filled by mirroring. Good at these small moves; a bigger move would need
+      the hidden parts painted by the image model.
+- [ ] The first scene loading in the background stalls a frame or two at the cinematic's start (over a second, once,
+      in the Editor). The cinematic waits for it. Measure in a build.
+
 ## Quest redesign (2026-11-10)
 
 The plan is [QuestRedesign.md](QuestRedesign.md). Step 1 is built: the kinds of quest, and the door that opens after the fire

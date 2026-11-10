@@ -1,0 +1,11 @@
+{
+  "name": "portal_f_british_northern",
+  "description": "An old woman's voice, low and dry, warm, slightly hoarse, slow and calm, telling a folktale to a child by a fire. Soft northern English accent, from rural Yorkshire.",
+  "reference_text": "Listen, little one. This is an old story, and I am nearly the last who remembers it.",
+  "language": "English",
+  "seed": 1101,
+  "model": "Qwen3-TTS-12Hz-1.7B-VoiceDesign",
+  "created": "2026-11-10 17:21:09",
+  "seconds": 7.28,
+  "sample_rate": 24000
+}

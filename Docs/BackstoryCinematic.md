@@ -1,6 +1,9 @@
 # Backstory cinematic: "The Old Story"
 
-**Status:** draft for review, 2026-11-10. Nothing is built yet: no art, no voice, no Unity components.
+**Status:** built, 2026-11-10: it plays when a new game starts (1:56). Seen in screenshots of every shot and run from
+the main menu on throwaway saves; nobody has listened to it yet. How it is put together and how to change it is in
+[ARCHITECTURE.md](../Assets/_Project/Scripts/ARCHITECTURE.md) under "Cinematics". What differs from this script is listed
+at the end, in section 8.
 
 A painted, narrated opening of about 1 minute 45 seconds. Twelve shots, each a still painting cut into layers and
 moved by a slow camera, tell what happened before the game starts: the pact, the hearth, the winter the fire went out, what the
@@ -290,3 +293,21 @@ Open:
 3. **The portal in the game.** Its lines at home are text only. After a voiced opening a silent portal may feel
    odd. Voicing its main lines with the same voice is possible later.
 4. **One track or two.** See section 5.
+
+## 8. As built
+
+- **Voice:** `portal_f_british_northern`, a sixth test voice (an old woman, a soft northern English accent in its
+  description), chosen by ear. Each sentence is its own clip. The model speaks briskly (about 160 to 250 words a minute
+  within a sentence) and has no speed control, so the unhurried pace comes from the pauses between sentences.
+- **Length:** 1:56, with those pauses.
+- **Shot 1** has no painting: a glow from below the frame and rising embers.
+- **Shot 3 and 5:** no hands lay a log; the fire and the stone carry it. The cold hearth is its own painting with the
+  same framing, as a redraw of the lit one kept its flames.
+- **Shot 4:** three whole paintings fading into each other, with a slow pull back but no layers.
+- **Shot 6b:** the moss does not creep over the name; the camera tilts from the name to the notches.
+- **Shot 6c:** the guardians are not in the painting.
+- **Shot 7:** from a hill, not straight down, and a ring of stones, not the arch.
+- **Shot 8:** three lanterns, not four (the fourth traveller carries the staff). They go out right to left.
+- **The end** fades to black, not through white: the loading screen that follows is dark.
+- **Music:** Nightsong under shots 1 to 4, silence at 5, Eerie raid (quieter) under 6a to 8, Nightsong from 9.
+- **Not built:** watching it again from the journal.

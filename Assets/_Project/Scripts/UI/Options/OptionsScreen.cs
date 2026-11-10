@@ -351,6 +351,7 @@ public sealed class OptionsScreen : MonoBehaviour
         Volume("Music", "The score.", () => AudioManager.GetVolume(AudioChannel.Music), value => AudioManager.SetVolume(AudioChannel.Music, value));
         Volume("Ambience", "Wind, rain, water and the forest.", () => AudioManager.GetVolume(AudioChannel.Ambience), value => AudioManager.SetVolume(AudioChannel.Ambience, value));
         Volume("Sound Effects", "Fights, footsteps, work and the interface.", () => AudioManager.GetVolume(AudioChannel.Effects), value => AudioManager.SetVolume(AudioChannel.Effects, value));
+        Volume("Voice", "The storyteller.", () => AudioManager.GetVolume(AudioChannel.Voice), value => AudioManager.SetVolume(AudioChannel.Voice, value));
         OptionsWidgets.Section(content, "Other");
         Rows(new[] { GameOptions.MuteUnfocused });
     }

@@ -14,6 +14,10 @@ public sealed class MainMenuView : MonoBehaviour
     [SerializeField] private ContentDatabase content;
     [Tooltip("Where a new game starts.")]
     [SerializeField] private string newGameScene = "Prologue_MistyWoods";
+    [Tooltip("Played when a new game starts, before its first scene: the backstory. Empty goes straight to the scene.")]
+    [SerializeField] private CinematicDefinition openingCinematic;
+    [Tooltip("Loads the first scene in the background while the cinematic plays, so the wait after it is short.")]
+    [SerializeField] private bool loadDuringCinematic = true;
     [Tooltip("Where an existing save goes when its own scene no longer exists. Never restart its prologue.")]
     [SerializeField] private string fallbackLoadScene = "SafeHaven";
     [SerializeField] private Button newGameButton;
@@ -100,13 +104,29 @@ public sealed class MainMenuView : MonoBehaviour
     // A new game starts by making its character.
     private void NewGame() => CharacterCreationScreen.Open(StartNewGame);
 
+    // The backstory first, when there is one; the new game itself begins as it ends or is skipped.
     private void StartNewGame(CharacterAppearance look)
     {
-        if (SaveGameService.TryStartNewGame(newGameScene, look, out string problem))
+        if (openingCinematic == null)
         {
-            SetButtons(false);
+            BeginNewGame(look);
+            return;
         }
-        else
+
+        SetButtons(false);
+        if (loadDuringCinematic)
+        {
+            SceneTransition.Preload(newGameScene);
+        }
+
+        CinematicScreen.Play(openingCinematic, () => BeginNewGame(look));
+    }
+
+    private void BeginNewGame(CharacterAppearance look)
+    {
+        bool started = SaveGameService.TryStartNewGame(newGameScene, look, out string problem);
+        SetButtons(!started);
+        if (!started)
         {
             statusLabel.text = problem;
         }

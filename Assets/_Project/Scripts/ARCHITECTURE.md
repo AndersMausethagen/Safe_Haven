@@ -98,6 +98,7 @@ of the GDD, **Not started** = design only. Update this table when a system is ad
 | `Progression` | Skills, their experience, perks and Insight (see "Skills") |
 | `Quests` | Quest data (`QuestDefinition`, `QuestObjective`), per-player progress (`QuestLog`), `QuestManager`, `QuestGiver` (state-aware: marker, start, hand-in), `QuestMarker` + `QuestMarkerSettings` |
 | `Audio` | `AudioManager`, `SceneAudio` + `MusicPlaylist`/`MusicRules` (music), `SoundDefinition` + `DeathSound`/`SoundEmitter` (effects), `PlayerAudio` (footsteps, landing), `WorldAudio` (weather and water loops, thunder, interface sounds). Edited in **Safe Haven > Sound Editor**; the library is set up by **Safe Haven > Setup > Audio > Set Up Free Sound Library**, then `AgentScripts/BuildAudio.cs` for what lives outside it |
+| `Cinematics` | Narrated sequences of layered paintings: `CinematicDefinition` (the data), `CinematicTimeline` and `CinematicCamera` (timing and parallax, plain C#), `CinematicScreen` (plays one over any scene), `CinematicMotesGraphic` (specks). See "Cinematics" |
 | `Environment` | `TerrainMoss`: disposable terrain-alphamap-masked PBR moss and optional leafy sprigs; `MossWind`: shared shader wind, driven by a Directional `WindZone` on the same object when present (moss, `TreeWind.shader` trees and particles share it; see [tree wind](../../../Docs/TreeWind.md)); `TerrainMossBloom`: animated moss paint of the portal ward circle (runtime copy of TerrainData, so the asset is untouched in Play mode); `SurfaceLayerController`: per-object amount (`SetAmount`/`FadeTo` by layer name, via `MaterialPropertyBlock`) of the two live layers of `LayeredLit.shader` ("Safe Haven/Layered Lit"), which grows tileable moss/rust/dirt over a Local Generator model from its exported `_BlendMask` (curvature, edge wear, cavity, coverage). Grass: `Grass.shader` ("Safe Haven/Grass") on instanced terrain detail prototypes, `GrassInteractor` (up to 8 objects that push grass, as shader globals), `GrassTerrainColour` (baked ground colour the grass is tinted with); `Editor/Environment/GrassSetup` builds the assets and prototypes and rebakes on terrain paint (see [grass](../../../Docs/Grass.md)). Water: `Water.shader` ("Safe Haven/Water": depth colour, refraction, caustics, flow, waterfalls, foam), `WaterSurface` (a pond/river interactors look up; switches the simple look for cameras without depth/opaque textures), `WaterInteractor` (player/stone ripples, wake foam, splashes, or constant churn), `WaterRipples` (GPU ripple height field around the player, `Shaders/Resources/WaterRipples.shader`), `Waterfall` (generated falling sheet + plunge); `Editor/Environment/WaterSetup` makes the assets, creates water and carves beds (see [water](../../../Docs/Water.md)). Sky: `DayNightCycle` (+ `DayNightProfile` asset: sun/moon light, ambient probe, fog, reflections, Night/Golden Hour volume weights, `_SafeHavenNight`), `WeatherSystem` (+ `WeatherDefinition`s and a `ClimateDefinition`: wind via `MossWind.SetWeather`, `RainEffect`, Overcast volume, lightning); `Editor/Environment/WeatherSetup` adds the rig, `SkyControllerWindow` previews and drives it (see [weather](../../../Docs/Weather.md)). Grass also has glowing mushrooms/flowers, Nordic plants (fern, blueberry, lingonberry, heather, wild flowers) and `GrassSetup.FillByGround` (grass and plants by ground layer, none under water or objects). `TreeWind.shader` has Fast Leaf Lighting for leaf cards. `GeneratedTexturePostprocessor` gives new generated materials with a blend mask that shader (Assets > Safe Haven > Use Layered Lit converts others). `Editor/Environment` contains setup, `TreeWindMaterials` (Local Generator trees → Tree Wind materials and `_Wind` prefab variants), deterministic `ForestGroundTextures`, native Amplify graph creation (`ForestGroundShaders`) and preview-only `ForestGroundShowcase`. See [terrain moss usage](../../../Docs/TerrainMoss.md) for maps, materials and budgets. No gameplay/save coupling |
 | `Save` | The save system, in layers (see below), with any number of saved games (`SaveSlotInfo`, `SaveGameService.CurrentSlot`), plus `SaveableEntity` / `ISaveable` for objects in scenes |
 | `Environment` (raids) | The Misty Woods have their own weather and light: `Misty Woods Climate` (every weather in it has mist), `Misty Woods Day Night`, and the `MistyWoods_*` volumes (cold and darker than Haven, greens pulled toward teal), set by `AgentScripts/BuildPlaytestFixes.cs`. Generated raids keep the world's look: `TerrainGrowth` grows grass and plants by ground layer for both the editor's Grass and Plants tool and `RaidMap.Dress`, which also bakes the ground colour for grass and refreshes `TerrainSurface` on the map that was kept. `RaidMapDefinition` › Growth sets how much grows on each layer. The look is set up by `AgentScripts/BuildRaidLook.cs` (tessellated material, wind trees, mist, moss, footprints, Forest Wind); `RaidLookTests` guards it |
@@ -1717,6 +1718,53 @@ Anywhere the sky is dark, `Resources/NightSettings` applies, scaled by `Atmosphe
 
 - **Danger:** `RaidDirector` multiplies its enemy health and power by the hour; `NightProwlers` calls `NightSettings.Strengthen` on what it spawns and lets more prowl with every breach won (`ProwlersAlive`, `DeepProwler`). They still never step into light. How many creatures a raid holds is the hour's own: `RaidTimeOfDay.enemyDensity`, used by `RaidDefinition.GetSpawnRules`.
 - **Reward:** `LootOnDeath.Reaped` multiplies Cursed Essence by the night's share and the killer's Essence Find. Breach attackers carry no loot, so this can't turn a defense into a farm.
+
+## Cinematics: the backstory that opens a new game
+
+A new game starts with "The Old Story" ([script](../../../Docs/BackstoryCinematic.md)): twelve painted shots, the portal's
+narration with subtitles, sounds and the game's own music, about two minutes, skippable by holding Esc, Space or Enter.
+`MainMenuView` › **Opening Cinematic** plays it after character creation and starts the game when it ends or is skipped;
+empty goes straight to the first scene. **Load During Cinematic** loads that scene in the background meanwhile
+(`SceneTransition.Preload`), so the wait afterwards is a few seconds.
+
+- **A cinematic is data.** `CinematicDefinition` (`Data/Cinematics/Backstory.asset`) holds shots; a shot holds layers back to
+  front, a camera move, the lines spoken and the sounds heard. Nothing changes the asset at runtime.
+- **Depth is arithmetic, not a 3D scene.** Every layer is a UI image in a 16:9 frame. `CinematicCamera.Place` gives a layer at
+  depth d (0 = the subject, 4 = a far forest, -0.45 = a fern in front) its scale and slide for a camera pose, so near
+  layers move more than far ones. It draws over any scene, at any aspect (`ArtCover`: a wider screen crops at most a
+  fifth of the height, then black at the sides), with no camera, render feature or layer of its own.
+- **The voice sets the time.** A shot lasts its pauses, its lines' clips and the hold after them (`CinematicShot.Seconds`), and
+  `CinematicTimeline` adds the shots up: a line spoken again never breaks the timing. A layer's **Opacity** curve runs over
+  the shot (left edge its start), which is how the ember dies, the seasons change and the lanterns go out.
+- **Moving details are layers too:** a round additive glow with **Flicker** (firelight), a sliding **Drift** (mist), and
+  **Motes** (`CinematicMotesGraphic`: embers, snow, pollen, fireflies, placed from the speck's number and the time, so a
+  shot looks the same every time). Additive layers use `Resources/Cinematics/Cinematic Additive` (`SafeHaven/UI/Additive`).
+  That shader multiplies the light by its strength itself and blends One One, and reads the texture's alpha as
+  perceived brightness (raised to 2.2): with the strength left to the blend (SrcAlpha One) a glow on black came out in
+  rings with a hard rim, as its faint end is smaller than 8 bits can hold.
+- **While it plays** the game is paused (`GamePause`), the scene's music and ambience are held back
+  (`AudioManager.HoldMusic`/`ReleaseMusic`) and its own sources ignore the pause. Narration follows the new **Voice**
+  volume (`AudioChannel.Voice`, Options › Audio); music dips under each line (`Music While Speaking`).
+- **A stalled frame counts for at most 0.1 s** (`CinematicScreen`): the background scene load can hold a frame for seconds,
+  and jumping ahead by that much skipped the first line.
+- **Dissolves fade the new shot's layers in one by one**, not as one picture, so a near layer shows a little of its own
+  background through it halfway. Not noticeable at these lengths; a render texture per shot would cure it.
+
+**Changing it.** The asset is written by `AgentScripts/BuildBackstoryCinematic.cs`: shots, camera moves, pauses, glows and
+music are there, and re-running it rewrites the asset, so change it there and not in the Inspector. The parts it reads:
+
+| Part | Made by | Kept in |
+|---|---|---|
+| Paintings | `Tools/LocalSpawn/generate_backstory.py paintings` (LocalSpawn's Safe Haven styles; prompts in the script) | `Tools/LocalSpawn/Backstory/` |
+| Layers | `... generate_backstory.py layers` (`backstory_layers.py`: a depth estimate splits the painting, what a nearer layer hid is filled with its surroundings mirrored) | `Art/Cinematics/Backstory/` |
+| Glow, mist, vignette | `Tools/Art/cinematic_overlays.py` | `Art/Cinematics/Shared/` |
+| Narration | LocalSpawn's Voice tab or `Tools/Audio/backstory_voice.py` (Qwen3-TTS, voice `portal_f_british_northern`, kept in `Tools/Audio/Voices/`), then `Tools/Audio/narration.py` picks the take of each line that says its words and sets the level | `Audio/Voice/Backstory/` |
+
+Traps: the image model keeps a fire it is redrawing however cold the words are (paint the cold hearth afresh, without the
+word fire); it writes letters on any signpost; and it adds a wanderer to an empty place unless told nobody is there. The
+voice model has no speed control and ignores a slower reference clip. The builder saves only its own asset: saving all
+assets also wrote terrain data the World Builder had changed in memory. `CinematicTests` checks the arithmetic, that
+every line has a voice, that no painting's edge ever comes into frame, and that the script keeps the first act's secrets.
 
 ## Journal
 
