@@ -210,7 +210,7 @@ public sealed class QuestObjective
             case ObjectiveType.GatherResource:
                 return new[] { nameof(item), nameof(resource), nameof(countAlreadyOwned) };
             case ObjectiveType.KillMonster:
-                return new[] { nameof(monster), nameof(faction) };
+                return new[] { nameof(monster), nameof(faction), nameof(countAlreadyOwned) };
             case ObjectiveType.DestroyBuilding:
                 return new[] { nameof(building) };
             case ObjectiveType.CraftItem:
@@ -352,9 +352,18 @@ public sealed class QuestObjective
                 return stash == null ? 0 : item != null ? stash.Items.Count(item) : stash.Items.CountItems();
             case ObjectiveType.UpgradeBuilding:
                 return HavenVisit.IsVisiting ? 0 : StandingAtTier();
+            case ObjectiveType.KillMonster:
+                // A boss beaten before the quest (an older save, or the player got there first) counts: it won't come again.
+                return BossBeaten() ? Amount : 0;
             default:
                 return 0;
         }
+    }
+
+    private bool BossBeaten()
+    {
+        BossEncounter boss = monster != null && monster.Prefab != null ? monster.Prefab.GetComponent<BossEncounter>() : null;
+        return boss != null && boss.Definition != null && GameSession.Settlement.IsBossDefeated(boss.Definition.Id);
     }
 
     // Buildings of the kind (or any) standing at the tier asked for or above.

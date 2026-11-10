@@ -25,7 +25,7 @@ public static class BuildBossTurningPoint
             so.FindProperty("wakeSeconds").floatValue = 3.2f;
             so.FindProperty("wakeSound").objectReferenceValue = wake;
             so.FindProperty("trophy").objectReferenceValue = trophy;
-            so.FindProperty("defeatLine").stringValue = "The Heartroot lies still. What it knew of the forest's hold is yours now: you have learned Heartroot's Grasp. And something has opened: the portal can reach Troll Valley.";
+            so.FindProperty("defeatLine").stringValue = "The Heartroot sinks to its knees, and speaks once, in a voice like the portal's own: \"Hearth-keeper.\" Then it lies still. What it knew of the forest's hold is yours now: you have learned Heartroot's Grasp. And something has opened: the portal can reach Troll Valley.";
             SerializedProperty tracks = so.FindProperty("music").FindPropertyRelative("tracks");
             tracks.arraySize = 1;
             tracks.GetArrayElementAtIndex(0).FindPropertyRelative("clip").objectReferenceValue = Load<AudioClip>(Clips + "Heartroot Fight.wav") ?? throw new System.Exception("No fight music");
@@ -34,7 +34,7 @@ public static class BuildBossTurningPoint
                 "They say it's dead. The Heartroot. I felt the ground go quiet, and I don't know if I like it quiet.",
                 "You killed it? Truly? Then what else is out there that we were told couldn't be?",
                 "I'd have said nobody could. I'll say it about something else next time, and you can prove me wrong again.",
-                "Whatever you carried back from that hollow, keep it away from the fire. Please.",
+                "Whatever you carried back from that hollow, the portal wants it by the fire. I'd never have thought it.",
             });
         });
 

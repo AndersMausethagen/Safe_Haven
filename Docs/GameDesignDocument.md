@@ -164,7 +164,11 @@ Start in the protected Portal Clearing. Early raids explore the **Misty Woods** 
 
 ### 4.4 Narrative arcs
 
-**Act I – Find a home:** awaken, build shelter, restore the portal, and learn to return. **Act II – Gather a community:** recruit survivors, investigate the lost villages, and learn what fractured the pact. **Act III – Face the old powers:** defeat or negotiate with mythical guardians, recover the history of the portal, and confront the force consuming the forest. End-state choices can affect the relationship between settlers and spirits without turning every raid into a branching cinematic narrative.
+**Act I – Find a home:** awaken, build shelter, restore the portal, and learn to return. *As built (November 10, 2026;
+`Docs/QuestRedesign.md`, step 3):* the act ends at the Heartroot, which wakes only for an ember from the player's own fire.
+Brought down, it turns out to have been the forest's guardian, its half of the pact, which it kept alone for ninety winters
+after people let the hearth go cold. People broke the pact first. Its last word is for the player: "Hearth-keeper". Then
+the road north opens, which the old troll that broke the stones walks. **Act II – Gather a community:** recruit survivors, investigate the lost villages, and learn what fractured the pact. **Act III – Face the old powers:** defeat or negotiate with mythical guardians, recover the history of the portal, and confront the force consuming the forest. End-state choices can affect the relationship between settlers and spirits without turning every raid into a branching cinematic narrative.
 
 ### 4.5 Storytelling channels
 

@@ -13,12 +13,13 @@ MonoBehaviour:
   m_Name: TheHeartroot
   m_EditorClassIdentifier: SafeHaven::RaidRumourDefinition
   id: rumour_heartroot
-  briefing: Something old is breathing under the roots, deep in the woods. The portal has felt it turn over.
+  briefing: Something old is breathing under the roots, deep in the woods. The portal has felt it turn over. It will not wake for steel.
   site: {fileID: 11400000, guid: 001d56c4ab548284885775d7c7426dd6, type: 2}
   setPiece: {fileID: 11400000, guid: ea87a51a33af07646be878c32e34697e, type: 2}
   weight: 1
   hour: 0
   seeks: {fileID: 0}
+  afterHome: {fileID: 0}
   teaches: {fileID: 0}
   breachComing: 0
   afterExtractions: 2
@@ -26,3 +27,4 @@ MonoBehaviour:
   needsTier: 1
   untilBeaten: {fileID: 11400000, guid: 9b7313d497a67e54b8b12e51990184bb, type: 2}
   urgent: 1
+  seeksLost: 0

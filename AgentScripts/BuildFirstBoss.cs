@@ -221,15 +221,24 @@ public static class BuildFirstBoss
             so.FindProperty("displayName").stringValue = "The Heartroot's Hollow";
             so.FindProperty("weight").floatValue = 0f;
             so.FindProperty("sitePrefab").objectReferenceValue = Load<GameObject>(sitePath);
-            so.FindProperty("siteText").stringValue = "A stump as wide as a house, split down the middle, and breathing. Dead trees stand round it in a ring, and nothing grows inside. There will be no hiding once it wakes.";
+            so.FindProperty("siteText").stringValue = "A stump as wide as a house, split down the middle, and breathing. Dead trees stand round it in a ring, and nothing grows inside. It does not stir for footsteps or for steel. In the split, where a heart would be, the wood is black, as if a fire once burned there.";
             SerializedProperty choices = so.FindProperty("choices");
             choices.ClearArray();
             choices.InsertArrayElementAtIndex(0);
             SerializedProperty wake = choices.GetArrayElementAtIndex(0);
             wake.FindPropertyRelative("label").stringValue = "Wake it";
-            wake.FindPropertyRelative("detail").stringValue = "A fight to the end, in three stages. Beating it teaches you what it knows, for good.";
-            wake.FindPropertyRelative("result").stringValue = "The stump opens. Something stands up out of it.";
+            wake.FindPropertyRelative("detail").stringValue = "Lay a Hearth Ember in the split: only a hearth's fire wakes it. A fight to the end, in three stages. Beating it teaches you what it knows, for good.";
+            wake.FindPropertyRelative("result").stringValue = "You lay the ember in the split of the stump. The breathing stops. Then the stump opens, and something stands up out of it.";
+            // It wakes for an ember from the player's own fire (BuildFirstAct makes the Hearth Ember).
             wake.FindPropertyRelative("cost").ClearArray();
+            var ember = Load<ItemDefinition>("Assets/_Project/Data/Items/HearthEmber.asset");
+            if (ember != null)
+            {
+                SerializedProperty cost = wake.FindPropertyRelative("cost");
+                cost.arraySize = 1;
+                cost.GetArrayElementAtIndex(0).FindPropertyRelative("item").objectReferenceValue = ember;
+                cost.GetArrayElementAtIndex(0).FindPropertyRelative("amount").intValue = 1;
+            }
             SerializedProperty outcomes = wake.FindPropertyRelative("outcomes");
             outcomes.ClearArray();
             outcomes.InsertArrayElementAtIndex(0);
@@ -247,7 +256,7 @@ public static class BuildFirstBoss
         Edit(rumour, so =>
         {
             so.FindProperty("id").stringValue = "rumour_heartroot";
-            so.FindProperty("briefing").stringValue = "Something old is breathing under the roots, deep in the woods. The portal has felt it turn over.";
+            so.FindProperty("briefing").stringValue = "Something old is breathing under the roots, deep in the woods. The portal has felt it turn over. It will not wake for steel.";
             so.FindProperty("site").objectReferenceValue = site;
             so.FindProperty("setPiece").objectReferenceValue = Load<RaidSetPieceDefinition>("Assets/_Project/Data/Raids/SetPieces/Guardian's Hollow.asset");
             so.FindProperty("weight").floatValue = 1f;

@@ -20086,6 +20086,126 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3438282097654613417, guid: f48ce462d6818454dbbedde5ee33ad5b, type: 3}
   m_PrefabInstance: {fileID: 122263505}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &124133979
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 124133980}
+  - component: {fileID: 124133982}
+  - component: {fileID: 124133981}
+  m_Layer: 0
+  m_Name: Story - The Roots Move
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &124133980
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 124133979}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1258665220}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &124133981
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 124133979}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7585b9b1e2e24704186225f4b6f8d69a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::StoryScript
+  nodes:
+  - rid: 2623126018147484443
+  - rid: 2623126018147484444
+  - rid: 2623126018147484445
+  - rid: 2623126018147484446
+  links:
+  - from: bb7585706bd44c84bf202e379323b66b
+    output: 0
+    to: c5bf1c66e2264a4694a896ed477c1a9d
+  - from: c5bf1c66e2264a4694a896ed477c1a9d
+    output: 0
+    to: 62a3c71067f84c66973434fc782fa590
+  - from: c5bf1c66e2264a4694a896ed477c1a9d
+    output: 0
+    to: 5ee1d1041fa64ab9b4a0ba51da4d5d0f
+  logSteps: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 2623126018147484443
+      type: {class: WhenQuest, ns: , asm: SafeHaven}
+      data:
+        id: bb7585706bd44c84bf202e379323b66b
+        position: {x: 40, y: 60}
+        once: 1
+        quest: {fileID: 11400000, guid: 8fd8f4db8a0b4d74cb71c5b4837010ac, type: 2}
+        when: 0
+        alsoAfterLoading: 0
+    - rid: 2623126018147484444
+      type: {class: WaitNode, ns: , asm: SafeHaven}
+      data:
+        id: c5bf1c66e2264a4694a896ed477c1a9d
+        position: {x: 340, y: 60}
+        seconds: 6
+    - rid: 2623126018147484445
+      type: {class: FocusCameraNode, ns: , asm: SafeHaven}
+      data:
+        id: 62a3c71067f84c66973434fc782fa590
+        position: {x: 640, y: 60}
+        target: {fileID: 582269261}
+        seconds: 4
+        revealRadius: 10
+    - rid: 2623126018147484446
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 5ee1d1041fa64ab9b4a0ba51da4d5d0f
+        position: {x: 640, y: 230}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: <i>Look, now that there is light to see by. Three of my stones, choked in roots. And the roots are moving, little one. Slowly. Towards me.</i>
+        afterFightPause: 1
+        aside: 0
+--- !u!114 &124133982
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 124133979}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aecdc764a0346784e9958a956dddd948, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::SaveableEntity
+  id: bc635f46ab2941488b22908e9e833ef8
+  prefabId: 
+  saveTransform: 1
+  saveActiveState: 1
+  rememberDestruction: 1
+  saveComponents: 1
 --- !u!1001 &124929298
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -30069,6 +30189,133 @@ MonoBehaviour:
   onCleared:
     m_PersistentCalls:
       m_Calls: []
+--- !u!1 &175438972
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 175438973}
+  - component: {fileID: 175438975}
+  - component: {fileID: 175438974}
+  m_Layer: 0
+  m_Name: Story - The Root in Them
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &175438973
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 175438972}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1258665220}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &175438974
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 175438972}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7585b9b1e2e24704186225f4b6f8d69a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::StoryScript
+  nodes:
+  - rid: 2623126018147484424
+  - rid: 2623126018147484425
+  - rid: 2623126018147484426
+  - rid: 2623126018147484427
+  links:
+  - from: cf79ad2456e6400898eceb29c774ce58
+    output: 0
+    to: 627097a6dfe649f09f3e9830c2056252
+  - from: 627097a6dfe649f09f3e9830c2056252
+    output: 0
+    to: f37791924e70461881987afa66d0410e
+  - from: f37791924e70461881987afa66d0410e
+    output: 0
+    to: 16009188fe274db7a7d55ee9e24a0a7e
+  logSteps: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 2623126018147484424
+      type: {class: WhenQuest, ns: , asm: SafeHaven}
+      data:
+        id: cf79ad2456e6400898eceb29c774ce58
+        position: {x: 40, y: 60}
+        once: 1
+        quest: {fileID: 11400000, guid: fea0201f13773f04a96efbcb5b364ea9, type: 2}
+        when: 1
+        alsoAfterLoading: 0
+    - rid: 2623126018147484425
+      type: {class: WaitNode, ns: , asm: SafeHaven}
+      data:
+        id: 627097a6dfe649f09f3e9830c2056252
+        position: {x: 340, y: 60}
+        seconds: 3
+    - rid: 2623126018147484426
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: f37791924e70461881987afa66d0410e
+        position: {x: 640, y: 60}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: <i>Did you see what grew out of them as they fell? Root. The same root that choked my stones, and closed the road behind your people.</i>
+        afterFightPause: 1
+        aside: 0
+    - rid: 2623126018147484427
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 16009188fe274db7a7d55ee9e24a0a7e
+        position: {x: 940, y: 60}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: <i>It is all one thing, little one. Something old is pushing those roots, from somewhere deep in the woods. When the woods tell me where, I will tell you.</i>
+        afterFightPause: 1
+        aside: 0
+--- !u!114 &175438975
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 175438972}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aecdc764a0346784e9958a956dddd948, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::SaveableEntity
+  id: 89a89c4363ae49a299a82575baa9dd26
+  prefabId: 
+  saveTransform: 1
+  saveActiveState: 1
+  rememberDestruction: 1
+  saveComponents: 1
 --- !u!1001 &175831158
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -49215,6 +49462,139 @@ MonoBehaviour:
   tiers: {x: 1, y: 2}
   only: []
   stablePick: 1
+--- !u!1001 &278908796
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1258665220}
+    m_Modifications:
+    - target: {fileID: 500424062596816808, guid: eefa6649a4b17b24fa8383ad769dab93, type: 3}
+      propertyPath: m_Name
+      value: Rootlings Under the Ward
+      objectReference: {fileID: 0}
+    - target: {fileID: 4428770297748371014, guid: eefa6649a4b17b24fa8383ad769dab93, type: 3}
+      propertyPath: count.y
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4428770297748371014, guid: eefa6649a4b17b24fa8383ad769dab93, type: 3}
+      propertyPath: trigger
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4428770297748371014, guid: eefa6649a4b17b24fa8383ad769dab93, type: 3}
+      propertyPath: huntPlayer
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4428770297748371014, guid: eefa6649a4b17b24fa8383ad769dab93, type: 3}
+      propertyPath: wakeDistance
+      value: 40
+      objectReference: {fileID: 0}
+    - target: {fileID: 4428770297748371014, guid: eefa6649a4b17b24fa8383ad769dab93, type: 3}
+      propertyPath: creatures.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4428770297748371014, guid: eefa6649a4b17b24fa8383ad769dab93, type: 3}
+      propertyPath: corners.Array.data[0].x
+      value: -3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4428770297748371014, guid: eefa6649a4b17b24fa8383ad769dab93, type: 3}
+      propertyPath: corners.Array.data[0].z
+      value: -3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4428770297748371014, guid: eefa6649a4b17b24fa8383ad769dab93, type: 3}
+      propertyPath: corners.Array.data[1].x
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4428770297748371014, guid: eefa6649a4b17b24fa8383ad769dab93, type: 3}
+      propertyPath: corners.Array.data[1].z
+      value: -3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4428770297748371014, guid: eefa6649a4b17b24fa8383ad769dab93, type: 3}
+      propertyPath: corners.Array.data[2].x
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4428770297748371014, guid: eefa6649a4b17b24fa8383ad769dab93, type: 3}
+      propertyPath: corners.Array.data[2].z
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4428770297748371014, guid: eefa6649a4b17b24fa8383ad769dab93, type: 3}
+      propertyPath: corners.Array.data[3].x
+      value: -3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4428770297748371014, guid: eefa6649a4b17b24fa8383ad769dab93, type: 3}
+      propertyPath: corners.Array.data[3].z
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4428770297748371014, guid: eefa6649a4b17b24fa8383ad769dab93, type: 3}
+      propertyPath: creatures.Array.data[0].prefab
+      value: 
+      objectReference: {fileID: 2866313555139928703, guid: 9fbdfc124d142f84cb9c52f07f80903a, type: 3}
+    - target: {fileID: 4428770297748371014, guid: eefa6649a4b17b24fa8383ad769dab93, type: 3}
+      propertyPath: creatures.Array.data[0].weight
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7147372502583846198, guid: eefa6649a4b17b24fa8383ad769dab93, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7147372502583846198, guid: eefa6649a4b17b24fa8383ad769dab93, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.00091552734
+      objectReference: {fileID: 0}
+    - target: {fileID: 7147372502583846198, guid: eefa6649a4b17b24fa8383ad769dab93, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -7.3333335
+      objectReference: {fileID: 0}
+    - target: {fileID: 7147372502583846198, guid: eefa6649a4b17b24fa8383ad769dab93, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7147372502583846198, guid: eefa6649a4b17b24fa8383ad769dab93, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7147372502583846198, guid: eefa6649a4b17b24fa8383ad769dab93, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7147372502583846198, guid: eefa6649a4b17b24fa8383ad769dab93, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7147372502583846198, guid: eefa6649a4b17b24fa8383ad769dab93, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7147372502583846198, guid: eefa6649a4b17b24fa8383ad769dab93, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7147372502583846198, guid: eefa6649a4b17b24fa8383ad769dab93, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: eefa6649a4b17b24fa8383ad769dab93, type: 3}
+--- !u!114 &278908797 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4428770297748371014, guid: eefa6649a4b17b24fa8383ad769dab93, type: 3}
+  m_PrefabInstance: {fileID: 278908796}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c73904d3801ccee4aba129e47e1b5e4f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::MobSpawnZone
+--- !u!4 &278908798 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7147372502583846198, guid: eefa6649a4b17b24fa8383ad769dab93, type: 3}
+  m_PrefabInstance: {fileID: 278908796}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &279642472
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -56816,6 +57196,186 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4133738836922416544, guid: c67c3f6cb76afa7468e2085a2c922228, type: 3}
   m_PrefabInstance: {fileID: 325265842}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &326131108
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 326131109}
+  - component: {fileID: 326131111}
+  - component: {fileID: 326131110}
+  m_Layer: 0
+  m_Name: Story - The Stones Remember
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &326131109
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 326131108}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1258665220}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &326131110
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 326131108}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7585b9b1e2e24704186225f4b6f8d69a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::StoryScript
+  nodes:
+  - rid: 2623126018147484434
+  - rid: 2623126018147484435
+  - rid: 2623126018147484436
+  - rid: 2623126018147484437
+  - rid: 2623126018147484438
+  - rid: 2623126018147484439
+  - rid: 2623126018147484440
+  - rid: 2623126018147484441
+  - rid: 2623126018147484442
+  links:
+  - from: 774ab86363b14846b67a81a43abcbb6f
+    output: 0
+    to: f534beb1fdde44749b0c5d5860efadb7
+  - from: 774ab86363b14846b67a81a43abcbb6f
+    output: 0
+    to: 2efdab5019fa4c0b972691216ad1e628
+  - from: 076cc24ce9ed4d789c0f07dcef2cfa07
+    output: 0
+    to: b90196489b2544d9af142779ca1c4fd2
+  - from: 076cc24ce9ed4d789c0f07dcef2cfa07
+    output: 0
+    to: ac06ae723cb64e7f935f6b87d129f31f
+  - from: cb82f3519a6240f3889a3dcebfd77778
+    output: 0
+    to: ea7b85e0a5354037a133c6b0b74d6624
+  - from: cb82f3519a6240f3889a3dcebfd77778
+    output: 0
+    to: df29e32128714af98cf7410b8a5eda1d
+  logSteps: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 2623126018147484434
+      type: {class: WhenUsed, ns: , asm: SafeHaven}
+      data:
+        id: 774ab86363b14846b67a81a43abcbb6f
+        position: {x: 40, y: 60}
+        once: 1
+        target: {fileID: 1085129304}
+    - rid: 2623126018147484435
+      type: {class: WaitNode, ns: , asm: SafeHaven}
+      data:
+        id: f534beb1fdde44749b0c5d5860efadb7
+        position: {x: 340, y: 60}
+        seconds: 0.8
+    - rid: 2623126018147484436
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 2efdab5019fa4c0b972691216ad1e628
+        position: {x: 340, y: 230}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: <i>I remember this. A fire beside my stones, and someone to keep it.</i>
+        afterFightPause: 0
+        aside: 1
+    - rid: 2623126018147484437
+      type: {class: WhenUsed, ns: , asm: SafeHaven}
+      data:
+        id: 076cc24ce9ed4d789c0f07dcef2cfa07
+        position: {x: 40, y: 230}
+        once: 1
+        target: {fileID: 389930460}
+    - rid: 2623126018147484438
+      type: {class: WaitNode, ns: , asm: SafeHaven}
+      data:
+        id: b90196489b2544d9af142779ca1c4fd2
+        position: {x: 340, y: 400}
+        seconds: 0.8
+    - rid: 2623126018147484439
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: ac06ae723cb64e7f935f6b87d129f31f
+        position: {x: 340, y: 570}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: <i>And this. Their door, and the night kept from it, for as long as the fire burned.</i>
+        afterFightPause: 0
+        aside: 1
+    - rid: 2623126018147484440
+      type: {class: WhenUsed, ns: , asm: SafeHaven}
+      data:
+        id: cb82f3519a6240f3889a3dcebfd77778
+        position: {x: 40, y: 400}
+        once: 1
+        target: {fileID: 582269262}
+    - rid: 2623126018147484441
+      type: {class: WaitNode, ns: , asm: SafeHaven}
+      data:
+        id: ea7b85e0a5354037a133c6b0b74d6624
+        position: {x: 340, y: 740}
+        seconds: 0.8
+    - rid: 2623126018147484442
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: df29e32128714af98cf7410b8a5eda1d
+        position: {x: 340, y: 910}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: <i>And the guardian under the roots, who kept the forest's half. Where is it now?</i>
+        afterFightPause: 0
+        aside: 1
+--- !u!114 &326131111
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 326131108}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aecdc764a0346784e9958a956dddd948, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::SaveableEntity
+  id: 2a6399ddd6d745f381757cdb71266ec6
+  prefabId: 
+  saveTransform: 1
+  saveActiveState: 1
+  rememberDestruction: 1
+  saveComponents: 1
 --- !u!1001 &326169381
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -66913,6 +67473,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 459348204992816425, guid: 0fe564bf746ab6a4981ab527c459bf3a, type: 3}
   m_PrefabInstance: {fileID: 389930458}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &389930460 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3133301613012124359, guid: 0fe564bf746ab6a4981ab527c459bf3a, type: 3}
+  m_PrefabInstance: {fileID: 389930458}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f655434a56283ac419a02d53bb587f9e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Interactable
 --- !u!1 &390311998
 GameObject:
   m_ObjectHideFlags: 0
@@ -99982,6 +100553,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 459348204992816425, guid: 0fe564bf746ab6a4981ab527c459bf3a, type: 3}
   m_PrefabInstance: {fileID: 582269260}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &582269262 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3133301613012124359, guid: 0fe564bf746ab6a4981ab527c459bf3a, type: 3}
+  m_PrefabInstance: {fileID: 582269260}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f655434a56283ac419a02d53bb587f9e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Interactable
 --- !u!1001 &583335369
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -178706,6 +179288,12 @@ MonoBehaviour:
   - quest: {fileID: 11400000, guid: fea0201f13773f04a96efbcb5b364ea9, type: 2}
     text: <i>The light that reached her reached other things as well. They are on the old path now, testing me. Prepare yourself. When you are ready, tell me, and I will let them come.</i>
     moment: {fileID: 0}
+  - quest: {fileID: 11400000, guid: 002e81b2272f9d94ba3274891dd390d6, type: 2}
+    text: '<i>Now the woods have told me. Something breathes under the roots, little one, in a hollow deep in the Misty Woods: a guardian, as old as my stones. It will not wake for steel. Take an ember from your own fire to it. That, it cannot ignore.</i>'
+    moment: {fileID: 0}
+  - quest: {fileID: 11400000, guid: bd7dd70969be8174c8acfefd449bf963, type: 2}
+    text: <i>Come and sit by me, little one. There is something I should have told you before you went to that hollow.</i>
+    moment: {fileID: 11400000, guid: 44f42630a316f7f4993be640f28deba3, type: 2}
   whispers:
   - <i>Every hearth in my light is a little more of the old pact kept.</i>
   - <i>The forest cannot forget a place that someone tends.</i>
@@ -185178,6 +185766,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 459348204992816425, guid: 0fe564bf746ab6a4981ab527c459bf3a, type: 3}
   m_PrefabInstance: {fileID: 1085129302}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1085129304 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3133301613012124359, guid: 0fe564bf746ab6a4981ab527c459bf3a, type: 3}
+  m_PrefabInstance: {fileID: 1085129302}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f655434a56283ac419a02d53bb587f9e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Interactable
 --- !u!1001 &1085227151
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -215093,6 +215692,12 @@ Transform:
   - {fileID: 1577933049}
   - {fileID: 377451005}
   - {fileID: 1256036000}
+  - {fileID: 124133980}
+  - {fileID: 326131109}
+  - {fileID: 278908798}
+  - {fileID: 2113571145}
+  - {fileID: 175438973}
+  - {fileID: 1551441791}
   m_Father: {fileID: 130791071}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1259232621
@@ -262042,6 +262647,348 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2698961514027709685, guid: ed939970df0398342b77244b84d79e9f, type: 3}
   m_PrefabInstance: {fileID: 1551256524}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1551441790
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1551441791}
+  - component: {fileID: 1551441793}
+  - component: {fileID: 1551441792}
+  m_Layer: 0
+  m_Name: Story - The Road North
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1551441791
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1551441790}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1258665220}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1551441792
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1551441790}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7585b9b1e2e24704186225f4b6f8d69a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::StoryScript
+  nodes:
+  - rid: 2623126018147484409
+  - rid: 2623126018147484410
+  - rid: 2623126018147484411
+  - rid: 2623126018147484412
+  - rid: 2623126018147484413
+  - rid: 2623126018147484414
+  - rid: 2623126018147484415
+  - rid: 2623126018147484416
+  - rid: 2623126018147484417
+  - rid: 2623126018147484418
+  - rid: 2623126018147484419
+  - rid: 2623126018147484420
+  - rid: 2623126018147484421
+  - rid: 2623126018147484422
+  - rid: 2623126018147484423
+  links:
+  - from: 4c14a74fce334c9fa536f2540f560938
+    output: 0
+    to: 3c7fe6a1e43241c0b02990cfb3aeb498
+  - from: 3c7fe6a1e43241c0b02990cfb3aeb498
+    output: 0
+    to: 127e3032adcf427eab7fc9f005c0ac38
+  - from: 127e3032adcf427eab7fc9f005c0ac38
+    output: 0
+    to: 0a3d98d16fc64ce886f84e5a341540c8
+  - from: 0a3d98d16fc64ce886f84e5a341540c8
+    output: 0
+    to: 3d8618ee4fee4c1ebc7a9ba8d8238df6
+  - from: 0a3d98d16fc64ce886f84e5a341540c8
+    output: 1
+    to: 7b10092daba8439b9bc63d3857982dcd
+  - from: 3d8618ee4fee4c1ebc7a9ba8d8238df6
+    output: 0
+    to: c656f995332d423ea5765e9a36af141b
+  - from: 7b10092daba8439b9bc63d3857982dcd
+    output: 0
+    to: c656f995332d423ea5765e9a36af141b
+  - from: c656f995332d423ea5765e9a36af141b
+    output: 0
+    to: 5e5ad246f223421f9088c5ae2c7a7b2b
+  - from: c656f995332d423ea5765e9a36af141b
+    output: 1
+    to: c8c6bafb42b9476db94f8fb142b3ad02
+  - from: c8c6bafb42b9476db94f8fb142b3ad02
+    output: 0
+    to: ccdf26567bb14e13a01d9ce48d0a37b1
+  - from: c8c6bafb42b9476db94f8fb142b3ad02
+    output: 1
+    to: b3b68c26a6c5494c9aa6f46b97316063
+  - from: b3b68c26a6c5494c9aa6f46b97316063
+    output: 0
+    to: 528815942c4341e784314cc92d4a9d99
+  - from: b3b68c26a6c5494c9aa6f46b97316063
+    output: 1
+    to: bce621b450e44e00939fb833b688aacd
+  - from: 5e5ad246f223421f9088c5ae2c7a7b2b
+    output: 0
+    to: bce621b450e44e00939fb833b688aacd
+  - from: ccdf26567bb14e13a01d9ce48d0a37b1
+    output: 0
+    to: bce621b450e44e00939fb833b688aacd
+  - from: 528815942c4341e784314cc92d4a9d99
+    output: 0
+    to: bce621b450e44e00939fb833b688aacd
+  - from: bce621b450e44e00939fb833b688aacd
+    output: 0
+    to: ca71dc088408441e8b0475e397e46504
+  - from: ca71dc088408441e8b0475e397e46504
+    output: 0
+    to: 8a0280ccc3784659a962763436ea3dce
+  logSteps: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 2623126018147484409
+      type: {class: WhenQuestEvent, ns: , asm: SafeHaven}
+      data:
+        id: 4c14a74fce334c9fa536f2540f560938
+        position: {x: 40, y: 60}
+        once: 1
+        questEvent: {fileID: 11400000, guid: 44f42630a316f7f4993be640f28deba3, type: 2}
+    - rid: 2623126018147484410
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 3c7fe6a1e43241c0b02990cfb3aeb498
+        position: {x: 340, y: 60}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: <i>You brought it down. Lay what you carried out of the hollow by the fire, little one, where it can feel the warmth. It is owed that much.</i>
+        afterFightPause: 1
+        aside: 0
+    - rid: 2623126018147484411
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 127e3032adcf427eab7fc9f005c0ac38
+        position: {x: 640, y: 60}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: '<i>I have not told you everything. The Heartroot was no monster. It was the forest''s guardian: its half of the pact. Your kind let the hearth beside me go cold a hundred winters ago. It kept its half for ninety winters after that, alone, until the hunger got into its roots.</i>'
+        afterFightPause: 1
+        aside: 0
+    - rid: 2623126018147484412
+      type: {class: ChoiceNode, ns: , asm: SafeHaven}
+      data:
+        id: 0a3d98d16fc64ce886f84e5a341540c8
+        position: {x: 940, y: 60}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: <i>That is what you killed. I am sorry. Someone had to.</i>
+        answers:
+        - Then we broke the pact first.
+        - Why didn't you tell me?
+        mustAnswer: 1
+        afterFightPause: 1
+    - rid: 2623126018147484413
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 3d8618ee4fee4c1ebc7a9ba8d8238df6
+        position: {x: 1240, y: 60}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: <i>Your people did, long before you were born. You are mending it. Every fire kept here is a payment on that debt.</i>
+        afterFightPause: 1
+        aside: 0
+    - rid: 2623126018147484414
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 7b10092daba8439b9bc63d3857982dcd
+        position: {x: 1240, y: 230}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: <i>Would you have woken it, knowing? It could not be saved, only stopped. Better by the hand of someone who keeps a hearth.</i>
+        afterFightPause: 1
+        aside: 0
+    - rid: 2623126018147484415
+      type: {class: HasHappenedNode, ns: , asm: SafeHaven}
+      data:
+        id: c656f995332d423ea5765e9a36af141b
+        position: {x: 1540, y: 60}
+        questEvent: {fileID: 11400000, guid: 052e1548b0a161348bb7cf591b4333f7, type: 2}
+    - rid: 2623126018147484416
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 5e5ad246f223421f9088c5ae2c7a7b2b
+        position: {x: 1840, y: 60}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: <i>You came for coin. There is none in this. But there is a debt now, and you have begun to pay it.</i>
+        afterFightPause: 1
+        aside: 0
+    - rid: 2623126018147484417
+      type: {class: HasHappenedNode, ns: , asm: SafeHaven}
+      data:
+        id: c8c6bafb42b9476db94f8fb142b3ad02
+        position: {x: 1840, y: 230}
+        questEvent: {fileID: 11400000, guid: f1a0301acf429304ba7ad3d189da48bb, type: 2}
+    - rid: 2623126018147484418
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: ccdf26567bb14e13a01d9ce48d0a37b1
+        position: {x: 2140, y: 60}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: <i>You came for someone. Every one of your people is out there because of what was let go cold. Bring them home, and the debt grows smaller.</i>
+        afterFightPause: 1
+        aside: 0
+    - rid: 2623126018147484419
+      type: {class: HasHappenedNode, ns: , asm: SafeHaven}
+      data:
+        id: b3b68c26a6c5494c9aa6f46b97316063
+        position: {x: 2140, y: 230}
+        questEvent: {fileID: 11400000, guid: 1426971087cd5fb408c55293cb5e4e12, type: 2}
+    - rid: 2623126018147484420
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 528815942c4341e784314cc92d4a9d99
+        position: {x: 2440, y: 60}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: '<i>You came to see if the stories were true. Here is the one nobody tells: we broke the pact first.</i>'
+        afterFightPause: 1
+        aside: 0
+    - rid: 2623126018147484421
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: bce621b450e44e00939fb833b688aacd
+        position: {x: 2440, y: 230}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: <i>Its last word was for you. Hearth-keeper. Nobody has called anyone that in a hundred winters, and I did not teach it to you. One day you will tell me why these stones woke for your hand.</i>
+        afterFightPause: 1
+        aside: 0
+    - rid: 2623126018147484422
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: ca71dc088408441e8b0475e397e46504
+        position: {x: 2740, y: 60}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: <i>With its roots gone quiet I can reach further. North, past the troll country, the road is open. The old one that broke my stones the night you fell walks that road. It came for the door then. Go carefully.</i>
+        afterFightPause: 1
+        aside: 0
+    - rid: 2623126018147484423
+      type: {class: CountAsDoneNode, ns: , asm: SafeHaven}
+      data:
+        id: 8a0280ccc3784659a962763436ea3dce
+        position: {x: 3040, y: 60}
+        deed:
+          type: 9
+          description: 
+          amount: 1
+          item: {fileID: 0}
+          resource: {fileID: 0}
+          monster: {fileID: 0}
+          faction: 1
+          building: {fileID: 0}
+          raid: {fileID: 0}
+          mustExtract: 1
+          withinMinutes: 0
+          questEvent: {fileID: 0}
+          person: {fileID: 0}
+          target: {fileID: 11400000, guid: e835c314791108c43b5172c1cc4a57fd, type: 2}
+          job: {fileID: 0}
+          breach: {fileID: 0}
+          rank: 1
+          tier: 2
+          bringHome: 0
+          countAlreadyOwned: 0
+--- !u!114 &1551441793
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1551441790}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aecdc764a0346784e9958a956dddd948, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::SaveableEntity
+  id: eeb6b14bea864c7aa0a9990ea3c2ce98
+  prefabId: 
+  saveTransform: 1
+  saveActiveState: 1
+  rememberDestruction: 1
+  saveComponents: 1
 --- !u!1001 &1551858430
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -352744,6 +353691,155 @@ MonoBehaviour:
   tiers: {x: 1, y: 3}
   only: []
   stablePick: 1
+--- !u!1 &2113571144
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2113571145}
+  - component: {fileID: 2113571147}
+  - component: {fileID: 2113571146}
+  m_Layer: 0
+  m_Name: Story - Up Through the Ward
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2113571145
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2113571144}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1258665220}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2113571146
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2113571144}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7585b9b1e2e24704186225f4b6f8d69a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::StoryScript
+  nodes:
+  - rid: 2623126018147484428
+  - rid: 2623126018147484429
+  - rid: 2623126018147484430
+  - rid: 2623126018147484431
+  - rid: 2623126018147484432
+  - rid: 2623126018147484433
+  links:
+  - from: f215b8dfb3e44b64a93b5db4e8e86a75
+    output: 0
+    to: 08815e11a2554168b7a257efa3e27515
+  - from: f215b8dfb3e44b64a93b5db4e8e86a75
+    output: 0
+    to: b5dbf6cd69d7454d9710d8d38b3aaffc
+  - from: f215b8dfb3e44b64a93b5db4e8e86a75
+    output: 0
+    to: f382e5e27c1045d680c1d5f615f7eb07
+  - from: f215b8dfb3e44b64a93b5db4e8e86a75
+    output: 0
+    to: e02f6410d124440bb85a16aeffb8076d
+  - from: e02f6410d124440bb85a16aeffb8076d
+    output: 0
+    to: 442d6a32d7874b5c9bf1587e6abcd31d
+  logSteps: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 2623126018147484428
+      type: {class: WhenQuest, ns: , asm: SafeHaven}
+      data:
+        id: f215b8dfb3e44b64a93b5db4e8e86a75
+        position: {x: 40, y: 60}
+        once: 1
+        quest: {fileID: 11400000, guid: 8fd8f4db8a0b4d74cb71c5b4837010ac, type: 2}
+        when: 1
+        alsoAfterLoading: 0
+    - rid: 2623126018147484429
+      type: {class: ShakeCameraNode, ns: , asm: SafeHaven}
+      data:
+        id: 08815e11a2554168b7a257efa3e27515
+        position: {x: 340, y: 60}
+        strength: 0.4
+    - rid: 2623126018147484430
+      type: {class: PlaySoundNode, ns: , asm: SafeHaven}
+      data:
+        id: b5dbf6cd69d7454d9710d8d38b3aaffc
+        position: {x: 340, y: 230}
+        sound: {fileID: 11400000, guid: 7a7933cc7f7f0ad4aaf1e1190ea7248a, type: 2}
+        at: {fileID: 278908798}
+    - rid: 2623126018147484431
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: f382e5e27c1045d680c1d5f615f7eb07
+        position: {x: 340, y: 400}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: <i>Little one, behind you! My ward is too thin yet. They are coming up through it.</i>
+        afterFightPause: 0
+        aside: 1
+    - rid: 2623126018147484432
+      type: {class: SpawnEnemiesNode, ns: , asm: SafeHaven}
+      data:
+        id: e02f6410d124440bb85a16aeffb8076d
+        position: {x: 340, y: 570}
+        zone: {fileID: 278908797}
+        waitUntilDefeated: 1
+    - rid: 2623126018147484433
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 442d6a32d7874b5c9bf1587e6abcd31d
+        position: {x: 640, y: 60}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: <i>Rootlings, in my clearing. Feed me those orbs, and they will not get in so easily again.</i>
+        afterFightPause: 0
+        aside: 1
+--- !u!114 &2113571147
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2113571144}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aecdc764a0346784e9958a956dddd948, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::SaveableEntity
+  id: f022030c480f4b4583a4b2fb1930d1a4
+  prefabId: 
+  saveTransform: 1
+  saveActiveState: 1
+  rememberDestruction: 1
+  saveComponents: 1
 --- !u!1001 &2113677046
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -403,6 +403,8 @@ assigns the target instead of making an event:
   **Upgrade Building** (raise a building, or any, to a tier; Count Already Owned counts one standing there): quests teach an
   answer by doing it (A Safe Place, A Smith's Hearth, Heavy Loads).
 - **Story Event** (the old Quest Event objective): one-off moments only: a lesson learnt, an answer chosen.
+- **Kill Monster** with **Count Already Owned** counts a boss whose defeat is saved (its prefab's `BossEncounter`), as it won't
+  come again. Other monsters never count that way.
 
 Who someone is comes from the object: `Talkable` asks any `IQuestPerson` beside it (`ResidentNpc`, `PrologueCompanion`,
 `Companion`) for its resident record, so talking to an expedition member or resident needs no setup at all. Deeds are

@@ -17,14 +17,17 @@ MonoBehaviour:
   description: Smith from the expedition into the Unquiet Forest. Lost when the waystone connection broke.
   rescueLine: You took your time. Mind the hammer.
   arrivalLine: Where's the anvil? No, don't tell me. I'll find it.
-  welcomeLine: 
+  welcomeLine: I blazed the trees going in, a cut every twenty paces. Coming back, my marks were on the wrong side of them. The road hadn't moved. The roots had moved it, under us, in the night. Tor was thrown further in than me, with a bad leg. Listen for a saw where nobody saws.
   fallenLine: Tell Sigrid I kept it lit.
   fightLines:
     spotted: []
     behindYou: []
     hurt: []
     won: []
+    helpedUp: []
   model: {fileID: 4545198816639002052, guid: d1bff4db31900154b9550b8dd8a37606, type: 3}
   raidCompanion: {fileID: 11400000, guid: 60d284aaf3c06f24fba9e928940c43c5, type: 2}
+  memoryLines: []
+  returningLines: []
   jobs:
   - {fileID: 11400000, guid: be5a576d696f9f6459c1667a3521f7b8, type: 2}

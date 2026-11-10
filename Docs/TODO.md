@@ -14,8 +14,12 @@ and the stones. Checked in Play on throwaway saves by completing the quests from
 - [ ] Prologue by hand: time it from New Game without the errands (target 12 to 14 minutes). Are the three wolves at the cart
       fair for a player who skipped Eirik's lesson, and do the two camp waves feel like a fight and not a chore?
 - [ ] Prologue: the morning errands are still a chain (wood, then fish, then the hunt). Offer them at once, or keep the chain?
-- [ ] Step 3, the first act's story: the three stones' lines and rootlings, the figure in raid 1, what each person remembers
-      on coming home, a quest for the Heartroot with the ember, the twist at the fire.
+- [x] Step 3, the first act's story: the three stones' lines and rootlings, what each person remembers on coming home, a
+      quest for the Heartroot with the ember, the twist at the portal. Played from the CLI; the Heartroot not fought.
+- [ ] Wake the Heartroot in a launched raid with an ember: is the price clear at the site, and does the choice refuse
+      without one? Is an ember in the bag on the way out obvious enough (the portal and the quest both say so)?
+- [ ] The figure in Granheim mail and the old troll's footfalls in the first raid itself (now only in Ingrid's memory).
+- [ ] The rootlings that come up through the ward: are two fair for a player with only the prologue's weapon?
 - [ ] Into the Misty Woods and Bring Ingrid Home both say "Find Ingrid in the Misty Woods" in the tracker. Fine while they
       are the only two; reword one if it reads as a mistake.
 - [ ] When the door wakes, four quests start one after another (the raid, Ingrid, the workshop, Know Your Enemy). Know Your

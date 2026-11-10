@@ -216,6 +216,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: b1c908dc52f27d245ac297b292dc261b, type: 2}
   - {fileID: 11400000, guid: 9fd41ebfb0b7848419e49298716c7565, type: 2}
   - {fileID: 11400000, guid: 96b6b0cd58def654da67410cc7063135, type: 2}
+  - {fileID: 11400000, guid: 3bc5c06eef042084b9fc28865091670b, type: 2}
   resourceCatalog: {fileID: 11400000, guid: 82528be8462042341acfc62489e5c91f, type: 2}
   recipeBook: {fileID: 11400000, guid: cd7724124d8b393439143345d7f2b45f, type: 2}
   saveablePrefabs:
@@ -349,12 +350,14 @@ MonoBehaviour:
   - {fileID: 11400000, guid: a2c8684a2832f0c43b9d3c55f3682754, type: 2}
   - {fileID: 11400000, guid: 5c1ab1fafa323bd469319b7535534bc8, type: 2}
   - {fileID: 11400000, guid: a27b02dff679e08448ddebf15ec9fa94, type: 2}
+  - {fileID: 11400000, guid: bd7dd70969be8174c8acfefd449bf963, type: 2}
   - {fileID: 11400000, guid: 933d1de4d30ba9449985ab8bd2757b7e, type: 2}
   - {fileID: 11400000, guid: 26c34c56b5f966642ba1377c4e221cd7, type: 2}
   - {fileID: 11400000, guid: 336ec86166557214baa58cda9d5a9f91, type: 2}
   - {fileID: 11400000, guid: f2e1f14cdaba5e04489fb71d9fe5ccb3, type: 2}
   - {fileID: 11400000, guid: fea0201f13773f04a96efbcb5b364ea9, type: 2}
   - {fileID: 11400000, guid: 08ed06b5fb8d1854c86788aa2a00156f, type: 2}
+  - {fileID: 11400000, guid: 002e81b2272f9d94ba3274891dd390d6, type: 2}
   - {fileID: 11400000, guid: 449fc8864f45d83459f6ef5d2c3d8ea8, type: 2}
   residents:
   - {fileID: 11400000, guid: de521ad7beeb20b49878a9b40c96bced, type: 2}

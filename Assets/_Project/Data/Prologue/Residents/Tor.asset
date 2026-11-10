@@ -17,14 +17,17 @@ MonoBehaviour:
   description: Carpenter from the expedition into the Unquiet Forest. Lost when the waystone connection broke.
   rescueLine: Still measuring. I knew someone would come, and I wanted something to show for it.
   arrivalLine: It's built crooked, you know. All of it. Give me a week.
-  welcomeLine: 
+  welcomeLine: There's a hollow in the deep woods where nothing grows, and the ground breathes there. In, out, slow as a sleeper. I lay three nights on this leg listening to it. Whatever is down there is old, and it's what moves the roots. Now, where do you want your planks?
   fallenLine: My tools. Leave them, if you have to. Not me.
   fightLines:
     spotted: []
     behindYou: []
     hurt: []
     won: []
+    helpedUp: []
   model: {fileID: 8788668705461976432, guid: 16fd07cae11001b428f7eb54b6857a7b, type: 3}
   raidCompanion: {fileID: 11400000, guid: 60d284aaf3c06f24fba9e928940c43c5, type: 2}
+  memoryLines: []
+  returningLines: []
   jobs:
   - {fileID: 11400000, guid: b33d365bf7bdfe74793c6d3f0f4b33a5, type: 2}

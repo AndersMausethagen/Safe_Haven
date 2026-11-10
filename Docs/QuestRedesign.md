@@ -1,7 +1,7 @@
 # Quest redesign: the first two hours
 
-**Status: approved by the user on 2026-11-10. Steps 1 (categories and the open door) and 2 (the prologue) are built; step 3
-is not.** See "What it takes to build" for what each step holds and the "As built" sections for how they differ from the plan. This covers the
+**Status: approved by the user on 2026-11-10. All three steps are built: the categories and the open door, the prologue, and
+the first act's story. None of it has been played by hand.** See "What it takes to build" for what each step holds and the "As built" sections for how they differ from the plan. This covers the
 prologue, the first days at home and the first four raids, up to the Heartroot. The rescue order in `Docs/RescueOrder.md`
 stays as approved.
 
@@ -279,6 +279,39 @@ After any step: update GDD §21 and the status table in `ARCHITECTURE.md`.
   themselves.
 - **Not checked:** how long it takes a real player, and whether the two camp waves and the road wolves are too hard for a
   player who skipped Eirik's lesson. The target is 12 to 14 minutes without the errands.
+
+## As built: step 3 (2026-11-10)
+
+`AgentScripts/BuildFirstAct.cs` sets it up; `FirstActTests` holds it. All of it is quest data and story graphs under Home
+Moments in SafeHaven, plus one rule in the quest code.
+
+- **The roots move.** When The Rootbound Stones starts, the camera turns to the nearest stone and the portal says the roots
+  are moving towards it (Story - The Roots Move).
+- **The stones remember.** Each of the three stones by the portal says one piece of the pact as it is freed: the fire, the
+  door, and the guardian under the roots (Story - The Stones Remember). The stones the world spawns elsewhere say nothing.
+- **Up through the ward.** Once all three are free, two rootlings come up beside the portal (Story - Up Through the Ward).
+- **The root in them.** After the first breach, the portal says the root that grew out of the dead is the same root, and that
+  one thing pushes it (Story - The Root in Them).
+- **What Breathes Under the Roots** (Main Story, after The Weakening Ward): make a Hearth Ember at a campfire (3 Sticks, known
+  from the start) and bring down the Heartroot. Waking it costs the ember: it doesn't stir for steel. The briefing, the
+  site and the choice say so.
+- **A boss already beaten counts.** A Kill objective with Count Already Owned counts a boss whose defeat is saved
+  (`QuestObjective.Owned`), so a player who beat the Heartroot first is not stuck. Checked in Play.
+- **Its last word**, in the defeat line: "Hearth-keeper." The trophy line at home asks for it by the fire.
+- **The Road North** (Main Story): the portal's conversation (Story - The Road North). The Heartroot was the forest's
+  guardian; people let the hearth go cold first; a choice ("we broke the pact first" or "why didn't you tell me?"); a line for
+  the reason the player gave in the prologue; its last word; and the road north, which the old troll walks. Troll Valley
+  opens on the Heartroot's fall, as before.
+- **What they remember.** Ingrid's welcome line: the troll came for the door, and something in Granheim mail walked past her
+  and didn't know its name. Bjarne's: his blazes were on the wrong side of the trees, because the roots moved the road.
+  Tor's: the hollow where the ground breathes.
+- **Played in the Editor** on throwaway saves from the CLI: the roots line, the three stones' lines, the rootlings, the
+  breach's aftermath, the hunt completing at once with the Heartroot already beaten, and the whole twist. The Heartroot was
+  not fought: the waking in a raid has not been seen.
+
+**Left out, for later:** the figure in mail and the troll's footfalls in the first raid itself (the figure is in Ingrid's
+memory instead); a Reach Place step at the Guardian's Hollow; Sigrid's horn at the road north, which belongs to her rescue
+(she comes home last).
 
 The open questions below were answered with the recommendations: the errands stay as they are until step 2, the weapon is
 kept, there is no chest before the first raid, the twist stands, and the Heartroot comes at raid three or four.

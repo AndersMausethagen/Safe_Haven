@@ -22,13 +22,15 @@ MonoBehaviour:
   warningSound: {fileID: 0}
   sitePrefab: {fileID: 7819783059902628876, guid: b11076bec4f786e47b99c5cccf273a67, type: 3}
   siteDistance: {x: 35, y: 70}
-  siteText: A stump as wide as a house, split down the middle, and breathing. Dead trees stand round it in a ring, and nothing grows inside. There will be no hiding once it wakes.
+  siteText: A stump as wide as a house, split down the middle, and breathing. Dead trees stand round it in a ring, and nothing grows inside. It does not stir for footsteps or for steel. In the split, where a heart would be, the wood is black, as if a fire once burned there.
   onStart: []
   choices:
   - label: Wake it
-    detail: A fight to the end, in three stages. Beating it teaches you what it knows, for good.
-    cost: []
-    result: The stump opens. Something stands up out of it.
+    detail: 'Lay a Hearth Ember in the split: only a hearth''s fire wakes it. A fight to the end, in three stages. Beating it teaches you what it knows, for good.'
+    cost:
+    - item: {fileID: 11400000, guid: 3bc5c06eef042084b9fc28865091670b, type: 2}
+      amount: 1
+    result: You lay the ember in the split of the stump. The breathing stops. Then the stump opens, and something stands up out of it.
     outcomes:
     - rid: 2623125862064848931
   references:
