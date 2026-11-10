@@ -260,9 +260,15 @@ male narrator. That is a guess until the clips exist.
 - **Effects** come from `Tools/Audio` scripts, as the rest of the game's do. Several beds already exist there (fire,
   birds, seasons, wind, footsteps, the portal's hum). New for this piece: the ember hiss, the moss creep, the
   lanterns going out, the far tree groan.
-- **Music** is one piece in three parts that follow the colour: warm (shots 1 to 4), cold and nearly empty (5 to 8),
-  warm again (9 and 10). One held low note throughout, a fiddle or nyckelharpa over it. It must stay under the voice.
-  Whether this is a new piece or an existing track is open.
+- **Music** comes from the game's own tracks and follows the colour in three parts. Proposed, to be judged by ear:
+  - *Safe haven - Nightsong* (3:20) under the warm shots, 1 to 4. Its first 20 seconds are quiet and rise slowly,
+    which suits coming in under the embers.
+  - Silence at shot 5, then *Misty woods - Eerie raid* (3:00) under the cold shots, 6a to 8, starting from its quiet
+    opening and held low.
+  - *Nightsong* again from the hard cut to daylight at shot 9, to the end.
+
+  The music must stay under the voice: Eerie raid is about 4 dB louder than Nightsong and needs turning down to
+  match. If two tracks feel like too much for 1:45, Nightsong alone with the gap at shot 5 is the simpler version.
 - **Mix:** the voice leads. Music and effects duck under each line. The silence after shot 5 is part of the score.
 
 ## 6. Subtitles
@@ -270,15 +276,17 @@ male narrator. That is a guess until the clips exist.
 On by default, one sentence at a time, in the game's Hearthline style. No speaker name. They follow the game's
 Dialogue Speed option for how long each stays up.
 
-## 7. Decisions for review
+## 7. Decisions
 
-1. **Where it plays.** As written it opens a new game. The alternative is to play it at the Awakening, when the
-   player first rests a hand on the stone and the portal tells this story: it would then replace text the portal
-   speaks there now, and shots 9 and 10 would be rewritten to end on the seven sparks in the mist. The opening is
-   my recommendation, because it explains why the expedition is walking into the forest and also serves as trailer
-   material. It does mean the home scene repeats the pact, which could then be trimmed.
-2. **The voice.** A, B or C above, chosen by ear from test clips.
-3. **Length.** 1:45 as written. For about 1:15, drop shot 4 and make 6a to 6c one painting.
-4. **The portal in the game.** Its lines at home are text only. After a voiced opening a silent portal may feel
+Settled (2026-11-10):
+
+- **Where it plays:** on New Game. The portal's lines at home then repeat the pact, and can be trimmed later.
+- **Music:** the game's own Nightsong or Eerie raid, as proposed in section 5.
+
+Open:
+
+1. **The voice.** A, B or C above, chosen by ear from the test clips.
+2. **Length.** 1:45 as written. For about 1:15, drop shot 4 and make 6a to 6c one painting.
+3. **The portal in the game.** Its lines at home are text only. After a voiced opening a silent portal may feel
    odd. Voicing its main lines with the same voice is possible later.
-5. **Music.** A new piece, or an existing track.
+4. **One track or two.** See section 5.
