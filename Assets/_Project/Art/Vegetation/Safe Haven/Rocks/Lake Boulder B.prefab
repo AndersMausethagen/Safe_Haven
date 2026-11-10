@@ -114,7 +114,6 @@ GameObject:
   - component: {fileID: 2884632722869419054}
   - component: {fileID: 4495917315148972087}
   - component: {fileID: 2785650828936572508}
-  - component: {fileID: 7264805531657373878}
   m_Layer: 0
   m_Name: Lake Boulder B
   m_TagString: Untagged
@@ -196,22 +195,6 @@ CapsuleCollider:
   m_Height: 4.4481153
   m_Direction: 0
   m_Center: {x: 0, y: 0.93901265, z: 0}
---- !u!208 &7264805531657373878
-NavMeshObstacle:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4867805830388066015}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Shape: 0
-  m_Extents: {x: 2.2240577, y: 0.93901265, z: 2.2240577}
-  m_MoveThreshold: 0.1
-  m_Carve: 0
-  m_CarveOnlyStationary: 1
-  m_Center: {x: 0, y: 0.93901265, z: 0}
-  m_TimeToStationary: 0.5
 --- !u!1 &6603502704599191850
 GameObject:
   m_ObjectHideFlags: 0

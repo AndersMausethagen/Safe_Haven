@@ -106,6 +106,17 @@ public sealed class SkyOcclusionMap : MonoBehaviour
         at.x = Mathf.Round(at.x / texel) * texel;
         at.z = Mathf.Round(at.z / texel) * texel;
         above.transform.SetPositionAndRotation(new Vector3(at.x, at.y + 400f, at.z), Quaternion.LookRotation(Vector3.down, Vector3.forward));
+        // This camera draws only now and then. A terrain throws away what it built for a camera that has not drawn for a few
+        // frames, and builds it again on the next draw: with 130,000 trees that was 160 ms, a stutter every 12 m walked. Kept,
+        // the same draw takes 6 ms (measured in the Haven, 2026-11-10).
+        foreach (Terrain terrain in Terrain.activeTerrains)
+        {
+            if (!terrain.keepUnusedRenderingResources)
+            {
+                terrain.keepUnusedRenderingResources = true;
+            }
+        }
+
         above.Render();
         Shader.SetGlobalTexture(MapId, map);
         Shader.SetGlobalVector(RectId, new Vector4(at.x - area * 0.5f, at.z - area * 0.5f, 1f / area, strength));

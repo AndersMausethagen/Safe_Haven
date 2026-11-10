@@ -217,7 +217,6 @@ GameObject:
   - component: {fileID: 2307549838025555689}
   - component: {fileID: 704951197264844707}
   - component: {fileID: 1180316005167076724}
-  - component: {fileID: 8707785981244738945}
   m_Layer: 0
   m_Name: Stump C
   m_TagString: Untagged
@@ -304,22 +303,6 @@ CapsuleCollider:
   m_Height: 1.4261886
   m_Direction: 0
   m_Center: {x: 0, y: 0.42624187, z: 0}
---- !u!208 &8707785981244738945
-NavMeshObstacle:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1608439702712057764}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Shape: 0
-  m_Extents: {x: 0.7130943, y: 0.42624187, z: 0.7130943}
-  m_MoveThreshold: 0.1
-  m_Carve: 0
-  m_CarveOnlyStationary: 1
-  m_Center: {x: 0, y: 0.42624187, z: 0}
-  m_TimeToStationary: 0.5
 --- !u!1 &5393769508734906960
 GameObject:
   m_ObjectHideFlags: 0

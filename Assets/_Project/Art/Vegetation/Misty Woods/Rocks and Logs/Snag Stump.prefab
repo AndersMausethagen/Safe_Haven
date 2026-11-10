@@ -114,7 +114,6 @@ GameObject:
   - component: {fileID: 9035952252993816527}
   - component: {fileID: 6633631706743236388}
   - component: {fileID: 5128767988377326682}
-  - component: {fileID: 5021342809525367032}
   m_Layer: 0
   m_Name: Snag Stump
   m_TagString: Untagged
@@ -196,22 +195,6 @@ CapsuleCollider:
   m_Height: 1.7079672
   m_Direction: 1
   m_Center: {x: 0, y: 0.8539836, z: 0}
---- !u!208 &5021342809525367032
-NavMeshObstacle:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3913526623298648739}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Shape: 0
-  m_Extents: {x: 0.15855668, y: 0.8539836, z: 0.15855668}
-  m_MoveThreshold: 0.1
-  m_Carve: 0
-  m_CarveOnlyStationary: 1
-  m_Center: {x: 0, y: 0.8539836, z: 0}
-  m_TimeToStationary: 0.5
 --- !u!1 &4467547760554708668
 GameObject:
   m_ObjectHideFlags: 0

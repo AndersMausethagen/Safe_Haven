@@ -153,7 +153,7 @@ MeshRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3375095027438186941}
   m_Enabled: 1
-  m_CastShadows: 1
+  m_CastShadows: 0
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
   m_StaticShadowCaster: 0
@@ -423,7 +423,6 @@ GameObject:
   - component: {fileID: 6848782588125822451}
   - component: {fileID: 3477925426113130824}
   - component: {fileID: 852485970705868501}
-  - component: {fileID: 5993259753344917793}
   m_Layer: 0
   m_Name: Lake Crag A
   m_TagString: Untagged
@@ -505,19 +504,3 @@ CapsuleCollider:
   m_Height: 8.598243
   m_Direction: 0
   m_Center: {x: 0, y: 2.4385662, z: 0}
---- !u!208 &5993259753344917793
-NavMeshObstacle:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8552193928366429793}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Shape: 0
-  m_Extents: {x: 4.2991214, y: 2.4385662, z: 4.2991214}
-  m_MoveThreshold: 0.1
-  m_Carve: 0
-  m_CarveOnlyStationary: 1
-  m_Center: {x: 0, y: 2.4385662, z: 0}
-  m_TimeToStationary: 0.5

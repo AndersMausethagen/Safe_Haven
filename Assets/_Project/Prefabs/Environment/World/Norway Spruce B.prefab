@@ -116,6 +116,7 @@ MonoBehaviour:
   duration: 2
   range: 1.8
   deactivateOnComplete: 0
+  kind: 0
   started:
     m_PersistentCalls:
       m_Calls: []
@@ -158,6 +159,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: SafeHaven::ResourceNode
   node: {fileID: 11400000, guid: 0a3ad1d1b8eb1d74aa08464c83d48fef, type: 2}
+  keepOwnModel: 0
 --- !u!114 &952927217622937008
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -170,3 +172,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f9c0a17caeb0b8499b87857f58ed6c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: SafeHaven::ChoppableTree
+  wood: {fileID: 0}

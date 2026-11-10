@@ -423,7 +423,6 @@ GameObject:
   - component: {fileID: 8114418102593340693}
   - component: {fileID: 4687264648789468097}
   - component: {fileID: 3925033800335971653}
-  - component: {fileID: 4455786810840569775}
   m_Layer: 0
   m_Name: Cliff Slab
   m_TagString: Untagged
@@ -505,19 +504,3 @@ CapsuleCollider:
   m_Height: 13.470758
   m_Direction: 0
   m_Center: {x: 0, y: 1.111783, z: 0}
---- !u!208 &4455786810840569775
-NavMeshObstacle:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9003033690596199481}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Shape: 0
-  m_Extents: {x: 6.735379, y: 1.111783, z: 6.735379}
-  m_MoveThreshold: 0.1
-  m_Carve: 0
-  m_CarveOnlyStationary: 1
-  m_Center: {x: 0, y: 1.111783, z: 0}
-  m_TimeToStationary: 0.5

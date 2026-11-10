@@ -23,7 +23,7 @@ using Object = UnityEngine.Object;
 /// </list>
 /// Sources are never changed. Outputs are made once and kept: delete one to make it again (so tuning survives a rerun).
 /// </summary>
-public static class VegetationPackConverter
+public static partial class VegetationPackConverter
 {
     public const string WindShader = "Safe Haven/Tree Wind";
     /// <summary>
@@ -422,6 +422,11 @@ public static class VegetationPackConverter
                 }
             }
 
+            // Kept cheap (VegetationPackConverter.Optimise): one renderer a LOD level, no shadows from levels only seen past any
+            // shadow, and no obstacle on what can never be mined or felled (the NavMesh bake cuts round its collider instead).
+            MergeLodParts(root, folder, name);
+            TrimShadows(root);
+            DropStaticObstacle(root);
             return Save(root, path);
         }
         finally

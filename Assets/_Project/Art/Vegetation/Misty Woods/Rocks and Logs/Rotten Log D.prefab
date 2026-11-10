@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 6211437676034852193}
   - component: {fileID: 6072875343446150359}
   - component: {fileID: 5045621616840479116}
-  - component: {fileID: 4835330059236607761}
   m_Layer: 0
   m_Name: Rotten Log D
   m_TagString: Untagged
@@ -93,22 +92,6 @@ CapsuleCollider:
   m_Height: 2.406647
   m_Direction: 0
   m_Center: {x: 0, y: 0.13957125, z: 0}
---- !u!208 &4835330059236607761
-NavMeshObstacle:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 98706008514506587}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Shape: 0
-  m_Extents: {x: 1.2033235, y: 0.13957125, z: 1.2033235}
-  m_MoveThreshold: 0.1
-  m_Carve: 0
-  m_CarveOnlyStationary: 1
-  m_Center: {x: 0, y: 0.13957125, z: 0}
-  m_TimeToStationary: 0.5
 --- !u!1 &1391201642058856977
 GameObject:
   m_ObjectHideFlags: 0

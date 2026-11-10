@@ -227,8 +227,7 @@ public sealed class WaterSurface : MonoBehaviour
         float top = bounds.max.y;
         if (centreline.Length >= 2)
         {
-            NearestOnCentreline(centreline, new Vector2(local.x, local.z), out Vector4 at, out float away);
-            if (away > at.w)
+            if (!NearestInReach(new Vector2(local.x, local.z), out Vector4 at, out float away) || away > at.w)
             {
                 return false;
             }
@@ -341,6 +340,67 @@ public sealed class WaterSurface : MonoBehaviour
 
         float across = Mathf.Clamp01(distance / width);
         return direction * Mathf.Lerp(1f, 1f / 3f, across * across);
+    }
+
+    // A river's centreline in stretches of a few points, each with the box it lies in (grown by its widest half width). A river
+    // winds across the whole map, so its mesh's box holds most of the world: asking whether a point is in it walked every one of
+    // its thousand-odd points, for every creature, every frame (2 ms of each frame in the Haven). A point in the water is within
+    // a half width of some stretch, so it lies in that stretch's box: only such stretches are walked, and the answer is the same.
+    private const int Stretch = 12;
+    private Rect[] stretches;
+    private Vector4[] stretchedFor;
+
+    private bool NearestInReach(Vector2 xz, out Vector4 nearest, out float distance)
+    {
+        if (stretches == null || stretchedFor != centreline)
+        {
+            stretchedFor = centreline;
+            stretches = new Rect[(centreline.Length - 2) / Stretch + 1];
+            for (int s = 0; s < stretches.Length; s++)
+            {
+                int from = s * Stretch, to = Mathf.Min(from + Stretch, centreline.Length - 1);
+                float xMin = float.MaxValue, zMin = float.MaxValue, xMax = float.MinValue, zMax = float.MinValue, widest = 0f;
+                for (int i = from; i <= to; i++)
+                {
+                    xMin = Mathf.Min(xMin, centreline[i].x);
+                    xMax = Mathf.Max(xMax, centreline[i].x);
+                    zMin = Mathf.Min(zMin, centreline[i].z);
+                    zMax = Mathf.Max(zMax, centreline[i].z);
+                    widest = Mathf.Max(widest, centreline[i].w);
+                }
+
+                stretches[s] = Rect.MinMaxRect(xMin - widest, zMin - widest, xMax + widest, zMax + widest);
+            }
+        }
+
+        nearest = centreline[0];
+        distance = float.MaxValue;
+        for (int s = 0; s < stretches.Length; s++)
+        {
+            if (!stretches[s].Contains(xz))
+            {
+                continue;
+            }
+
+            int from = s * Stretch, to = Mathf.Min(from + Stretch, centreline.Length - 1);
+            for (int i = from; i < to; i++)
+            {
+                Vector4 a = centreline[i];
+                Vector4 b = centreline[i + 1];
+                Vector2 ab = new Vector2(b.x - a.x, b.z - a.z);
+                float lengthSq = ab.sqrMagnitude;
+                float t = lengthSq > 1e-8f ? Mathf.Clamp01(Vector2.Dot(xz - new Vector2(a.x, a.z), ab) / lengthSq) : 0f;
+                Vector4 p = Vector4.Lerp(a, b, t);
+                float d = Vector2.Distance(xz, new Vector2(p.x, p.z));
+                if (d < distance)
+                {
+                    distance = d;
+                    nearest = p;
+                }
+            }
+        }
+
+        return distance < float.MaxValue;
     }
 
     public static void NearestOnCentreline(Vector4[] line, Vector2 xz, out Vector4 nearest, out float distance)

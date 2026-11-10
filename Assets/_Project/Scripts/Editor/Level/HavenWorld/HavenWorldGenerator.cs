@@ -1198,7 +1198,7 @@ public static class HavenWorldGenerator
         string navmesh = WorldBuilder.RebakeNavMesh();
         EditorSceneManager.MarkSceneDirty(terrain.gameObject.scene);
         return $"Placed {plan.Pois.Count} places, {plan.Zones.Count} spawn zones, {plan.Nodes.Count} resource points, {marked} glade landmarks, {along} scenes, markers, dressing and rim stones, {herds} wildlife herds, {plan.Rocks.Count} mountain rocks ({cleared} trees cleared from under them) in {placed} ms; moss, displacement, " +
-               $"ground colour and navmesh ({navmesh}) in {clock.ElapsedMilliseconds - placed} ms; {mist}.";
+               $"ground colour and navmesh ({navmesh}: it bakes on in the background, so save once it is done) in {clock.ElapsedMilliseconds - placed} ms; {mist}.";
     }
 
     public const string MistMapPath = "Assets/_Project/Data/World/Safe Haven/Haven World Mist.png";
