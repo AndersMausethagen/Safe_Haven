@@ -76,6 +76,8 @@ public static class BuildHavenWorldRecipe
         recipe.trailSceneSpacing = new Vector2(45f, 70f);
         recipe.longestDullWalk = 90f;
 
+        // Game only: no scenery herds that bolt and vanish, so anything seen can be hunted.
+        recipe.sceneryHerds = false;
         recipe.woodsMist = 0.55f;
         recipe.bogMist = 1f;
         recipe.gladeMist = 0.35f;
@@ -130,9 +132,9 @@ public static class BuildHavenWorldRecipe
         {
             // Game: to hunt (and one day tame). In the Haven's meadows and the open glades, back by day as well as by night.
             // (Made by BuildGame: run it first.)
-            Band("Meadow game", 105f, 200f, 5, new Vector2Int(2, 3), true, false, 420f, ("Deer", 3f), ("Stag", 0.6f), ("Fox", 0.8f)),
-            Band("Woodland game", 200f, 340f, 7, new Vector2Int(2, 4), true, false, 480f, ("Deer", 2f), ("Stag", 1f), ("Fox", 0.8f), ("WildBoar", 1.2f)),
-            Band("Deep game", 340f, 480f, 6, new Vector2Int(2, 4), true, false, 540f, ("Stag", 1.5f), ("WildBoar", 1.5f), ("Deer", 1f)),
+            Band("Meadow game", 105f, 200f, 9, new Vector2Int(2, 3), true, false, 420f, ("Deer", 3f), ("Stag", 0.6f), ("Fox", 0.8f)),
+            Band("Woodland game", 200f, 340f, 10, new Vector2Int(2, 4), true, false, 480f, ("Deer", 2f), ("Stag", 1f), ("Fox", 0.8f), ("WildBoar", 1.2f)),
+            Band("Deep game", 340f, 480f, 9, new Vector2Int(2, 4), true, false, 540f, ("Stag", 1.5f), ("WildBoar", 1.5f), ("Deer", 1f)),
             Band("Edge of the woods", 200f, 300f, 5, new Vector2Int(1, 2), false, false, 600f, ("ForestBittenWolf", 2f), ("BlightBoar", 1f), ("Rootling", 1f)),
             Band("Misty Woods", 300f, 400f, 8, new Vector2Int(2, 3), false, false, 600f, ("ForestBittenWolf", 2f), ("BlightBoar", 1.5f), ("BogSpitter", 1f), ("MossShaman", 0.6f), ("Mistwing", 0.8f)),
             Band("Deep woods", 390f, 480f, 12, new Vector2Int(2, 4), false, false, 600f, ("SmallMossTroll", 0.8f), ("Draug", 1f), ("BarrowShieldbearer", 0.8f), ("MarshLight", 0.6f), ("Huldra", 0.4f), ("BogSpitter", 1f)),

@@ -289,6 +289,34 @@ public sealed class HavenWorldPlanTests
     }
 
     [Test]
+    public void TheHavenSceneHoldsItsWater()
+    {
+        // The saved scene, read as text (the test runner works in a scene of its own): the lake, the meres, the bog and every pond
+        // have their water. It was once found gone from the saved scene, and nothing said so.
+        const string path = "Assets/_Project/Scenes/SafeHaven.unity";
+        Assert.That(System.IO.File.Exists(path), Is.True, "The Haven's scene is missing.");
+        string scene = System.IO.File.ReadAllText(path);
+        // A name at the end of its line: "Pond 1" is not "Pond 10".
+        int Named(string name) => scene.Contains("m_Name: " + name + "\n") || scene.Contains("m_Name: " + name + "\r") ? 1 : 0;
+        HavenWorldPlan plan = HavenWorldPlan.Make(recipe);
+        Assert.That(Named("Lake"), Is.GreaterThanOrEqualTo(1), "The Haven's scene has no lake water: run the generator's Finish step and save.");
+        foreach (string mere in plan.MereNames)
+        {
+            Assert.That(Named(mere), Is.GreaterThanOrEqualTo(1), $"The Haven's scene has no water for {mere}: run the generator's Finish step and save.");
+        }
+
+        if (plan.HasBog)
+        {
+            Assert.That(Named("Bog"), Is.GreaterThanOrEqualTo(1), "The Haven's scene has no bog water: run the generator's Finish step and save.");
+        }
+
+        for (int i = 1; i <= plan.Ponds.Count; i++)
+        {
+            Assert.That(Named($"Pond {i}"), Is.GreaterThanOrEqualTo(1), $"Pond {i} has no water in the Haven's scene.");
+        }
+    }
+
+    [Test]
     public void StillWaterKnowsItsTrueShoreline()
     {
         // A square pond turned 45 degrees: its mesh's box reaches past its corners, its shoreline does not.

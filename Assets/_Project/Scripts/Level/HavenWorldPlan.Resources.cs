@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -38,6 +39,13 @@ public sealed partial class HavenWorldPlan
 
             for (int i = 0; i < band.zones; i++)
             {
+                // Game grazes the Haven's groves first: under the maples, a short walk from home.
+                if (band.peaceful && !band.bogOnly && GroveForGame(band, out Vector2 grove))
+                {
+                    Zones.Add(new Zone { Band = band, At = grove, Radius = 13f });
+                    continue;
+                }
+
                 Glade den = band.bogOnly ? null : band.peaceful
                     // Game grazes the open glades (and drinks at the wet ones); it leaves the lairs to what lives there.
                     ? Glades.Find(glade => !glade.HasGame && !glade.HasZone && (glade.Kind == GladeKind.Meadow || glade.Kind == GladeKind.Wet) && InBand(glade.Centre, band.distance))
@@ -73,6 +81,30 @@ public sealed partial class HavenWorldPlan
                 }
             }
         }
+    }
+
+    // The middle of a grove in the band that has no zone near it yet.
+    private bool GroveForGame(HavenCreatureBand band, out Vector2 at)
+    {
+        foreach (List<Vector2> grove in Groves)
+        {
+            Vector2 centre = Vector2.zero;
+            foreach (Vector2 point in grove)
+            {
+                centre += point;
+            }
+
+            centre /= Mathf.Max(1, grove.Count);
+            if (InBand(centre, band.distance) && centre.magnitude > Recipe.buildable + 35f && !InWater(centre, 8f) && !Near(Rivers, centre, 10f) && Reachable(centre)
+                && !Zones.Exists(zone => Vector2.Distance(zone.At, centre) < 45f))
+            {
+                at = centre;
+                return true;
+            }
+        }
+
+        at = default;
+        return false;
     }
 
     private void PlaceNodes()

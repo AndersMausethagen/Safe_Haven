@@ -7,6 +7,13 @@ using UnityEngine;
 /// height (stacked in rows on tall faces), its finished side turned outwards, its front moved onto the face (Inset decides
 /// how far up the slope) and its top onto the rim, the rest buried in the ground; neighbours overlap. Used by cliffs (one
 /// face along the line) and ravines (a face along each side).
+/// <para>
+/// A piece is stood by its own shape (<see cref="ShapeOf"/>), whatever the kit says of it. A scan of a rock face is an open
+/// sheet with a finished side: it stands as the kit measured it. A boulder is closed, has no finished side and was
+/// modelled lying down: stood as modelled and scaled until its small height met the face, it became a huge flat slab
+/// sticking out of the cliff. So a boulder is turned thinnest way into the cliff and longest way up, leaned back against
+/// the face, and all but its last fifth buried in it: rock that is part of the cliff, not laid at its foot.
+/// </para>
 /// </summary>
 public static class CragWall
 {
@@ -35,9 +42,101 @@ public static class CragWall
         public float Overhangs;
     }
 
+    /// <summary>A piece as it is stood: its points (prefab root space), the turn that stands it, and its size stood up at the
+    /// prefab's own scale (x across the face, y height, z depth into the cliff).</summary>
+    public sealed class Shape
+    {
+        public Vector3[] Points;
+        public Quaternion Stand;
+        public Vector3 Size;
+        /// <summary>A closed boulder (stood by its shape), not an open scan of a rock face (stood as the kit measured it).</summary>
+        public bool Boulder;
+    }
+
+    // An open sheet's faces mostly look one way: the sum of its triangles' area vectors is long. A closed boulder's cancel out.
+    private const float OpenSheet = 0.3f;
+
+    /// <summary>How a kit piece stands against a face, worked out from its mesh (see the class summary).</summary>
+    public static Shape ShapeOf(CliffKit.Piece piece, Dictionary<GameObject, Shape> shapes)
+    {
+        if (shapes.TryGetValue(piece.prefab, out Shape shape))
+        {
+            return shape;
+        }
+
+        var points = new List<Vector3>();
+        Vector3 facing = Vector3.zero;
+        float area = 0f;
+        Transform prefab = piece.prefab.transform;
+        foreach (MeshFilter filter in piece.prefab.GetComponentsInChildren<MeshFilter>())
+        {
+            if (filter.sharedMesh == null || filter.GetComponent<MeshRenderer>() == null ||
+                (filter.name.Contains("_LOD") && !filter.name.EndsWith("_LOD0")))
+            {
+                continue;
+            }
+
+            Matrix4x4 toRoot = prefab.worldToLocalMatrix * filter.transform.localToWorldMatrix;
+            Vector3[] vertices = filter.sharedMesh.vertices;
+            int[] triangles = filter.sharedMesh.triangles;
+            for (int t = 0; t + 2 < triangles.Length; t += 3)
+            {
+                Vector3 a = toRoot.MultiplyPoint3x4(vertices[triangles[t]]);
+                Vector3 cross = Vector3.Cross(toRoot.MultiplyPoint3x4(vertices[triangles[t + 1]]) - a, toRoot.MultiplyPoint3x4(vertices[triangles[t + 2]]) - a);
+                facing += cross;
+                area += cross.magnitude;
+            }
+
+            for (int i = 0; i < vertices.Length; i += 3)
+            {
+                points.Add(toRoot.MultiplyPoint3x4(vertices[i]));
+            }
+        }
+
+        Quaternion stand = WorldAssets.StandUp(piece);
+        Vector3 size = Extents(points, stand);
+        bool boulder = area <= 0f || facing.magnitude / area < OpenSheet;
+        if (boulder)
+        {
+            // Thinnest way into the cliff, longest way up, the third along the face.
+            int thin = size.x <= size.y && size.x <= size.z ? 0 : size.y <= size.z ? 1 : 2;
+            int tall = thin != 0 && size.x >= size.y && size.x >= size.z ? 0 : thin != 1 && (size.y >= size.z || thin == 2) ? 1 : 2;
+            if (tall == thin)
+            {
+                tall = (thin + 1) % 3;
+            }
+
+            Vector3 Axis(int i) => i == 0 ? Vector3.right : i == 1 ? Vector3.up : Vector3.forward;
+            stand = Quaternion.Inverse(Quaternion.LookRotation(Axis(thin), Axis(tall))) * stand;
+            size = Extents(points, stand);
+        }
+
+        shapes[piece.prefab] = shape = new Shape { Points = points.ToArray(), Stand = stand, Size = size * Mathf.Abs(prefab.localScale.y), Boulder = boulder };
+        return shape;
+    }
+
+    // How big a set of points is along each axis once turned.
+    private static Vector3 Extents(List<Vector3> points, Quaternion turn)
+    {
+        if (points.Count == 0)
+        {
+            return Vector3.one;
+        }
+
+        Vector3 min = turn * points[0], max = min;
+        foreach (Vector3 point in points)
+        {
+            Vector3 turned = turn * point;
+            min = Vector3.Min(min, turned);
+            max = Vector3.Max(max, turned);
+        }
+
+        return Vector3.Max(max - min, Vector3.one * 0.05f);
+    }
+
     public static void Stand(Transform root, Face face)
     {
-        var shapes = new Dictionary<GameObject, Vector3[]>();
+        var shapes = new Dictionary<GameObject, Shape>();
         SplineLine line = face.Line;
         float along = 0f;
         int guard = 0;
@@ -56,12 +155,13 @@ public static class CragWall
             WorldGround.TryGround(centre + high * (-face.FaceDepth - 0.4f + rag), out Vector3 foot, out _);
             float rim = face.Rim(s, f, centre);
             float faceHeight = Mathf.Max(rim - foot.y, 0.5f);
-            float size = Mathf.Max(piece.size.y, 0.1f);
+            Shape shape = ShapeOf(piece, shapes);
+            float size = Mathf.Max(shape.Size.y, 0.1f);
             int rows = Mathf.Max(1, Mathf.CeilToInt(faceHeight / (size * 2.5f)));
             float rowHeight = faceHeight / rows;
             float variation = Mathf.Lerp(face.SizeVariation.x, face.SizeVariation.y, (float)face.Random.NextDouble());
             float scale = Mathf.Clamp(rowHeight / size * variation, 0.3f, 4f);
-            float width = Mathf.Max(piece.size.x * scale, 0.5f);
+            float width = Mathf.Max(shape.Size.x * scale, 0.5f);
             along = Mathf.Min(along + width * 0.5f, line.Length);
             s = face.SegmentAt(along, out f);
             high = face.HighNormal(s);
@@ -76,14 +176,18 @@ public static class CragWall
                 float rowScale = row == 0 ? scale : scale * Mathf.Lerp(0.9f, 1.05f, (float)face.Random.NextDouble());
                 var instance = (GameObject)PrefabUtility.InstantiatePrefab(piece.prefab, root);
                 float yaw = ((float)face.Random.NextDouble() - 0.5f) * 14f;
-                float lean = 3f + (float)face.Random.NextDouble() * 5f; // a real crag leans back a little
+                // A real crag leans back a little; a boulder stood against a face leans with it, and no two stand quite alike.
+                float lean = shape.Boulder ? 7f + (float)face.Random.NextDouble() * 8f : 3f + (float)face.Random.NextDouble() * 5f;
+                float roll = shape.Boulder ? ((float)face.Random.NextDouble() - 0.5f) * 16f : 0f;
                 instance.transform.SetPositionAndRotation(new Vector3(front.x, rim, front.y),
-                    Quaternion.LookRotation(outward) * Quaternion.Euler(-lean, yaw, 0f) * WorldAssets.StandUp(piece));
+                    Quaternion.LookRotation(outward) * Quaternion.Euler(-lean, yaw, roll) * shape.Stand);
                 instance.transform.localScale = piece.prefab.transform.localScale * rowScale;
                 // Fit by the mesh itself: the bulk of its finished side onto the face (a few bumps and overhangs stick
                 // out further), its top onto the rim (lower rows lower).
-                Extent(instance, piece.prefab, shapes, outward, out float frontmost, out float top);
-                float wantedTop = rim + 0.15f - row * rowHeight * 0.9f;
+                Extent(instance, shape, outward, shape.Boulder ? 0.82f : 0.7f, out float frontmost, out float top);
+                // A boulder's top stands a little over or under the rim, so the cliff's edge is broken, not ruled.
+                float crown = shape.Boulder ? Mathf.Lerp(-0.45f, 0.35f, (float)face.Random.NextDouble()) : 0.15f;
+                float wantedTop = rim + crown - row * rowHeight * 0.9f;
                 float stepOut = row * 0.35f * face.FaceDepth; // lower rows stand a little further out
                 float wantedFront = Vector3.Dot(new Vector3(front.x, 0f, front.y), outward) + stepOut;
                 instance.transform.position += outward * (wantedFront - frontmost) + Vector3.up * (wantedTop - top);
@@ -96,11 +200,11 @@ public static class CragWall
                 var ledge = (GameObject)PrefabUtility.InstantiatePrefab(piece.prefab, root);
                 float tilt = 14f + (float)face.Random.NextDouble() * 16f;
                 ledge.transform.SetPositionAndRotation(new Vector3(front.x, rim, front.y),
-                    Quaternion.LookRotation(outward) * Quaternion.Euler(tilt, ((float)face.Random.NextDouble() - 0.5f) * 30f, 0f) * WorldAssets.StandUp(piece));
+                    Quaternion.LookRotation(outward) * Quaternion.Euler(tilt, ((float)face.Random.NextDouble() - 0.5f) * 30f, 0f) * shape.Stand);
                 ledge.transform.localScale = piece.prefab.transform.localScale * scale * 0.7f;
-                Extent(ledge, piece.prefab, shapes, outward, out float ledgeFront, out float ledgeTop);
+                Extent(ledge, shape, outward, 0.7f, out float ledgeFront, out float ledgeTop);
                 // Its top just above the rim, sticking out past the face by about a third of its size.
-                float reach = piece.size.x * scale * 0.7f * 0.35f;
+                float reach = shape.Size.x * scale * 0.7f * 0.35f;
                 float wantedLedgeFront = Vector3.Dot(new Vector3(front.x, 0f, front.y), outward) + reach;
                 ledge.transform.position += outward * (wantedLedgeFront - ledgeFront) + Vector3.up * (rim + 0.25f - ledgeTop);
             }
@@ -109,34 +213,12 @@ public static class CragWall
         }
     }
 
-    /// <summary>Where the placed piece's finished side stands (the 70th percentile of its points along
-    /// <paramref name="outward"/>, so a single overhang does not decide) and how high it reaches.</summary>
-    private static void Extent(GameObject instance, GameObject prefab, Dictionary<GameObject, Vector3[]> shapes, Vector3 outward,
-                               out float frontmost, out float top)
+    /// <summary>Where the placed piece's finished side stands (a share of the way through its points along
+    /// <paramref name="outward"/>, so a single overhang does not decide: the rest stands proud of the face) and how high it reaches.</summary>
+    private static void Extent(GameObject instance, Shape shape, Vector3 outward, float share, out float frontmost, out float top)
     {
-        if (!shapes.TryGetValue(prefab, out Vector3[] points))
-        {
-            var list = new List<Vector3>();
-            foreach (MeshFilter filter in prefab.GetComponentsInChildren<MeshFilter>())
-            {
-                if (filter.sharedMesh == null || filter.GetComponent<MeshRenderer>() == null ||
-                    (filter.name.Contains("_LOD") && !filter.name.EndsWith("_LOD0")))
-                {
-                    continue;
-                }
-
-                Matrix4x4 toRoot = prefab.transform.worldToLocalMatrix * filter.transform.localToWorldMatrix;
-                Vector3[] vertices = filter.sharedMesh.vertices;
-                for (int i = 0; i < vertices.Length; i += 3)
-                {
-                    list.Add(toRoot.MultiplyPoint3x4(vertices[i]));
-                }
-            }
-
-            shapes[prefab] = points = list.ToArray();
-        }
-
         // Points are in the prefab root's space; the instance root has the same hierarchy.
+        Vector3[] points = shape.Points;
         Matrix4x4 toWorld = instance.transform.localToWorldMatrix;
         var along = new float[points.Length];
         top = float.MinValue;
@@ -148,6 +230,6 @@ public static class CragWall
         }
 
         System.Array.Sort(along);
-        frontmost = along.Length > 0 ? along[Mathf.Min(along.Length - 1, (int)(along.Length * 0.7f))] : 0f;
+        frontmost = along.Length > 0 ? along[Mathf.Min(along.Length - 1, (int)(along.Length * share))] : 0f;
     }
 }

@@ -831,14 +831,17 @@ public static class HavenWorldGenerator
             Set(cliff, "raggedness", 0.6f);
             Set(cliff, "ledgeStrength", 0.45f);
             Set(cliff, "faceNoise", 0.5f);
-            Set(cliff, "overlap", 0.12f);
+            // Stood upright the pieces are narrow: overlapped by a third they close into a wall, with the terrain's rock only in the gaps.
+            Set(cliff, "overlap", 0.32f);
+            // A third of the way up the face: the pieces stand in the cliff, not at its foot.
+            Set(cliff, "inset", 0.35f);
             Set(cliff, "rubblePer10m", 1f);
             SetEnum(cliff, "highSide", (int)(line.HighOnLeft ? CliffFeature.HighSide.Left : CliffFeature.HighSide.Right));
             SetEnum(cliff, "shaping", (int)CliffFeature.Shaping.Cut);
             var data = new SerializedObject(cliff);
             data.FindProperty("ledges").intValue = 2;
-            // The woods' crags are big as modelled; the Haven's are stood larger to cover a 7 m face.
-            data.FindProperty("sizeVariation").vector2Value = inWoods ? new Vector2(0.95f, 1.25f) : new Vector2(1.25f, 1.6f);
+            // Each piece is sized to the face by its own shape (CragWall), so one range suits both kits.
+            data.FindProperty("sizeVariation").vector2Value = new Vector2(0.95f, 1.2f);
             CliffKit kit = inWoods ? woods.Crags : haven.Crags;
             if (kit != null)
             {
@@ -997,6 +1000,15 @@ public static class HavenWorldGenerator
         Terrain terrain = Terrain.activeTerrain;
         HavenWorldPlan plan = HavenWorldPlan.Make(recipe);
         Transform content = ContentRoot();
+        // The still water is laid again as well: it costs nothing, and a Finish run alone then always leaves the lake, the meres, the
+        // ponds and the bog with their water (they were once found gone from a saved scene).
+        Transform water = content.Find("Water");
+        if (water != null)
+        {
+            Object.DestroyImmediate(water.gameObject);
+        }
+
+        MakeWater(plan, terrain, StillWater(), content);
         foreach (string name in new[] { "Points of Interest", "Spawn Zones", "Resources", "Mountain Rocks", "Glades", "Along the Way", "Wildlife" })
         {
             Transform old = content.Find(name);
@@ -1159,7 +1171,7 @@ public static class HavenWorldGenerator
         }
 
         int along = PlaceAlongTheWay(plan, terrain, content, Ground, footprints);
-        int herds = PlaceWildlife(plan, content, Ground);
+        int herds = recipe.sceneryHerds ? PlaceWildlife(plan, content, Ground) : 0;
         int cleared = ClearTreesUnder(terrain, footprints);
 
         // Felled trees in the woods are kept in the save (TerrainTreeMemory), on the terrain's own saveable entity.

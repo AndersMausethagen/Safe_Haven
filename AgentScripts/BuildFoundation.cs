@@ -549,9 +549,14 @@ public static class BuildFoundation
         var component = hunting.GetComponent<HomeHunting>() ?? hunting.AddComponent<HomeHunting>();
         Edit(component, so =>
         {
+            // Game, not the blight's boars: neutral and timid (AgentScripts/BuildGame.cs), so what is seen by day can be hunted.
             SerializedProperty game = so.FindProperty("game");
-            game.arraySize = 1;
-            game.GetArrayElementAtIndex(0).objectReferenceValue = FindPrefab("BlightBoar");
+            string[] kinds = { "Deer", "Deer", "Stag", "WildBoar" };
+            game.arraySize = kinds.Length;
+            for (int i = 0; i < kinds.Length; i++)
+            {
+                game.GetArrayElementAtIndex(i).objectReferenceValue = FindPrefab(kinds[i]);
+            }
         });
         EditorSceneManager.MarkSceneDirty(scene);
         EditorSceneManager.SaveScene(scene);

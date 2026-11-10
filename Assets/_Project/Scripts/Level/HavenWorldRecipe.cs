@@ -277,6 +277,9 @@ public sealed class HavenWorldRecipe : ScriptableObject
     public Vector2Int dressingPerGlade = new Vector2Int(5, 9);
 
     [Header("Wildlife")]
+    [Tooltip("Scenery herds (WildlifeHerd): animals that bolt and are gone, in glades without game and in the groves. Off, the world " +
+             "has only game (the creature bands marked Peaceful), so anything seen can be hunted.")]
+    public bool sceneryHerds;
     [Tooltip("Timid grazers (deer, stag) in the meadow and wet glades and the Haven's groves, about at dawn and dusk.")]
     public List<Wildlife> grazers = new List<Wildlife>();
     [Tooltip("Foxes, in some of the rocky glades and lairs, about from dusk to dawn.")]

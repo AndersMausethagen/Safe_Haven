@@ -159,6 +159,7 @@ MonoBehaviour:
   - {fileID: 2316844624811504460, guid: 98dbed1ffc4531e4caecb17c290cb417, type: 3}
   - {fileID: 4912269930610114677, guid: 4de1b90b93204584ea219bd2413b97ab, type: 3}
   dressingPerGlade: {x: 5, y: 9}
+  sceneryHerds: 0
   grazers:
   - {fileID: 5851466330643986908, guid: 1633212582ba20640bbbed1f293159c4, type: 3}
   - {fileID: 1891235058169981651, guid: 530731b0216dffa40a52484a1666f75e, type: 3}
@@ -394,7 +395,7 @@ MonoBehaviour:
   creatures:
   - name: Meadow game
     distance: {x: 105, y: 200}
-    zones: 5
+    zones: 9
     group: {x: 2, y: 3}
     respawnSeconds: 420
     peaceful: 1
@@ -420,7 +421,7 @@ MonoBehaviour:
       toTier: 0
   - name: Woodland game
     distance: {x: 200, y: 340}
-    zones: 7
+    zones: 10
     group: {x: 2, y: 4}
     respawnSeconds: 480
     peaceful: 1
@@ -452,7 +453,7 @@ MonoBehaviour:
       toTier: 0
   - name: Deep game
     distance: {x: 340, y: 480}
-    zones: 6
+    zones: 9
     group: {x: 2, y: 4}
     respawnSeconds: 540
     peaceful: 1

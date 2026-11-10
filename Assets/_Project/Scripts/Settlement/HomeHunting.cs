@@ -4,7 +4,8 @@ using UnityEngine.AI;
 
 /// <summary>
 /// Game beyond the ward by day: a few creatures keep to the forest outside the light, so hide, meat and bone can be had before
-/// the first raid, for whoever walks out and hunts them (Valheim's deer). They never step into light (VisibilitySource.IsLit), so
+/// the first raid, for whoever walks out and hunts them (Valheim's deer). They are the world's own game (deer, stag, wild boar:
+/// neutral and timid, MonsterAI.Timid), so they run rather than fight and are hunted by sneaking or with a bow. They never step into light (VisibilitySource.IsLit), so
 /// the clearing stays safe, and they carry no Cursed Essence, which only raids give (GDD §13.5). They leave at nightfall and during
 /// a breach, when the woods belong to worse things. Lives in SafeHaven, beside the night prowlers.
 /// </summary>
