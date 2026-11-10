@@ -841,6 +841,12 @@ Measured in the 1 km Haven (editor, 1080p). Far from home, frames took 28–31 m
 
 Result: the woods went from 28–31 ms to 13–18 ms, and home from 13.3 ms to 12.3 ms.
 
+Profiled again on 2026-11-10 after the Haven's rework (Editor profiler, main thread; read the hierarchy, not summed marker recorders: those add in worker threads' job time, which made shadow culling look like 6 ms of the frame when it was none of the main thread's):
+- **Props are one renderer a LOD level** (`VegetationPackConverter.Optimise`, run by `Prop` and by **Safe Haven › World › Optimise Props**): `MergeLodParts` joins a level's pieces into one mesh (a pile of pebbles was 33 renderers, a crag 24; the scene went from 49,000 objects to 31,300), `TrimShadows` stops levels only seen past any shadow from casting, and `DropStaticObstacle` takes the NavMeshObstacle off what can never be mined or felled. Unity's bake leaves out anything carrying an obstacle, so those rocks were only steered round frame by frame; without one the bake cuts round their colliders (2,353 obstacles to 811, the NavMesh's update 1.8 ms to 0.6 ms). Traps: set a joined mesh's index format before combining (changing it after empties the mesh), and switch `MeshSurface` off while a renderer's mesh changes, or it pads the old piece's bounds and the LOD group is measured from them.
+- **The sky-occlusion camera's terrain data is kept** (`SkyOcclusionMap`: `Terrain.keepUnusedRenderingResources`). The camera draws only when the player has moved 12 m, and a terrain throws away what it built for a camera that has not drawn for a few frames: with 130,000 trees each draw rebuilt it, a 160 ms frame every couple of seconds of walking. Kept, the draw is 6 ms.
+- **A river answers "is this point in me" from the stretches near it** (`WaterSurface.NearestInReach`): its centreline in runs of 12 points with a box each. It used to walk the whole line (1,400-1,800 points) for every `WaterInteractor` every frame, 2.1 ms.
+- Left as found: the terrain's mask maps stay uncompressed (block compression steps the height, which tessellation shows); triangles in the woods follow the tessellation target and the screen's size, not the LOD bias; about 2 KB of garbage a frame (`ExperienceHud.LateUpdate` 768 B of it).
+
 Also: `TerrainDisplacementEditor.Apply` displaces the first 16 layers of a terrain with more, instead of refusing it. The refusal had left the Haven's relief tiled for its old 400 m size at 1 km.
 
 ## The Haven world: generated as a baseline
