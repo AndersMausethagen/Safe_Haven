@@ -16,7 +16,10 @@ MonoBehaviour:
   displayName: Into the Misty Woods
   description: 'Sigrid''s voice came through the stones: Ingrid is hurt, and close. Step through the portal, find her, and reach an extraction point before the portal closes. What you wear comes home with you whatever happens. What you carry is lost if you fall.'
   chain: The Hearth and the Door
-  journalNotes: 'The briefing at the portal says what the woods hold on this run and what you stand to lose. A hatchet and a pick (Tools of the Clearing) let you bring hardwood and ore home as well. Finding Ingrid counts even when the raid goes wrong: she waits where you found her.'
+  journalNotes: 'Your first raid. Put anything precious in your safe pocket, and turn back earlier than feels necessary. A hatchet and a pick let you bring hardwood and ore home as well as people.
+
+
+    Finding Ingrid counts even when the raid goes wrong: she waits where you found her.'
   rank: 0
   availableObjective: 
   announceStart: 1

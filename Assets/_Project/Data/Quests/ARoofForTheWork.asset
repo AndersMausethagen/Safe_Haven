@@ -16,7 +16,7 @@ MonoBehaviour:
   displayName: A Roof for the Work
   description: 'What the woods give you is only wood and ore until there is somewhere to work it. Raise a Workshop beside the fire (build menu: G). It mends what a raid wears down, and the chest, the club and the bandages all start at its bench.'
   chain: The First Days
-  journalNotes: 'The Workshop wants 24 Oak Wood, 12 Grey Stone and 12 Sticks: fell the oaks at the clearing''s edge with a hatchet and break the grey boulders with a pick. Repairs are made at its bench.'
+  journalNotes: 'The Workshop wants oak, grey stone and sticks: fell the oaks at the clearing''s edge with a hatchet and break the grey boulders with a pick. Repairs are made at its bench.'
   rank: 4
   availableObjective: 
   announceStart: 1

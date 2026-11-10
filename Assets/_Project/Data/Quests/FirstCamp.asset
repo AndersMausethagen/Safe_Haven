@@ -16,7 +16,10 @@ MonoBehaviour:
   displayName: A Light in the Wood
   description: 'The forest cannot forget a hearth that someone tends. Pick up the fallen sticks and loose stones around the portal and light a fire inside its ward (build menu: G). Your people will see it through the mist.'
   chain: The Hearth and the Door
-  journalNotes: 'Sticks and small rocks lie on the ground around the portal: walk up to them and pick them up (E). The build menu (G) shows what the fire costs: 8 Sticks and 12 Small Rocks. Everything else the clearing can teach waits for you. The fire is what wakes the ward.'
+  journalNotes: 'This is the old bargain, though you are only starting to understand it. A fire inside the ward feeds the ward. It also shows, a long way off, to anyone who is looking for it.
+
+
+    Sticks and small rocks lie on the ground around the portal: walk up to them and pick them up (E). The build menu (G) shows what the fire costs.'
   rank: 0
   availableObjective: 
   announceStart: 1

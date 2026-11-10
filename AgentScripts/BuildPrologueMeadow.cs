@@ -267,20 +267,22 @@ public static class BuildPrologueMeadow
         chapter.FindPropertyRelative("timeToTalk").boolValue = talk;
     }
 
-    // Gold for the story, silver for the side quests, bronze for the errands before the road.
+    // Gold for the prologue's story, bronze for the errands before the road. Only the prologue's own chains: every other
+    // quest's kind (rescues, the haven, tales, errands) is set by BuildQuestCategories, and this used to turn them all gold.
     private static string Ranks()
     {
-        int side = 0, optional = 0;
+        int story = 0, optional = 0;
         foreach (string guid in AssetDatabase.FindAssets("t:QuestDefinition"))
         {
             var quest = Load<QuestDefinition>(AssetDatabase.GUIDToAssetPath(guid));
-            QuestRank rank = quest.Chain == SideChain ? QuestRank.Optional : quest.Chain == "Side Quests" || quest.Chain == "Story Demo" ? QuestRank.SideQuest : QuestRank.MainStory;
-            side += rank == QuestRank.SideQuest ? 1 : 0;
+            if (quest.Chain != SideChain && quest.Chain != MainChain) continue;
+            QuestRank rank = quest.Chain == SideChain ? QuestRank.Optional : QuestRank.MainStory;
+            story += rank == QuestRank.MainStory ? 1 : 0;
             optional += rank == QuestRank.Optional ? 1 : 0;
             Edit(quest, so => so.FindProperty("rank").intValue = (int)rank);
         }
 
-        return $"{side} side quests, {optional} optional";
+        return $"{story} story quests, {optional} optional";
     }
 
     // The sword has no Tier I of its own in the game, so the expedition carries an old one: a copper sword's moves, the club's damage.

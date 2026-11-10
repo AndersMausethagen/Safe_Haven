@@ -75,7 +75,7 @@ public static class BuildQuestCategories
         Edit(Quest("FirstCamp"), so =>
         {
             so.FindProperty("description").stringValue = "The forest cannot forget a hearth that someone tends. Pick up the fallen sticks and loose stones around the portal and light a fire inside its ward (build menu: G). Your people will see it through the mist.";
-            so.FindProperty("journalNotes").stringValue = "Sticks and small rocks lie on the ground around the portal: walk up to them and pick them up (E). The build menu (G) shows what the fire costs: 8 Sticks and 12 Small Rocks. Everything else the clearing can teach waits for you. The fire is what wakes the ward.";
+            so.FindProperty("journalNotes").stringValue = "This is the old bargain, though you are only starting to understand it. A fire inside the ward feeds the ward. It also shows, a long way off, to anyone who is looking for it.\n\nSticks and small rocks lie on the ground around the portal: walk up to them and pick them up (E). The build menu (G) shows what the fire costs.";
             After(so, Quest("Awakening"));
             SerializedProperty objectives = so.FindProperty("objectives");
             for (int i = objectives.arraySize - 1; i >= 0; i--)
@@ -103,7 +103,7 @@ public static class BuildQuestCategories
         Edit(Quest("ThroughThePortal"), so =>
         {
             so.FindProperty("description").stringValue = "Sigrid's voice came through the stones: Ingrid is hurt, and close. Step through the portal, find her, and reach an extraction point before the portal closes. What you wear comes home with you whatever happens. What you carry is lost if you fall.";
-            so.FindProperty("journalNotes").stringValue = "The briefing at the portal says what the woods hold on this run and what you stand to lose. A hatchet and a pick (Tools of the Clearing) let you bring hardwood and ore home as well. Finding Ingrid counts even when the raid goes wrong: she waits where you found her.";
+            so.FindProperty("journalNotes").stringValue = "Your first raid. Put anything precious in your safe pocket, and turn back earlier than feels necessary. A hatchet and a pick let you bring hardwood and ore home as well as people.\n\nFinding Ingrid counts even when the raid goes wrong: she waits where you found her.";
             After(so, Quest("AwakeningThePortal"));
             SerializedProperty objectives = so.FindProperty("objectives");
             for (int i = objectives.arraySize - 1; i >= 0; i--)
@@ -134,7 +134,7 @@ public static class BuildQuestCategories
         Edit(Quest("PrimitiveTools"), so =>
         {
             so.FindProperty("description").stringValue = "Bare hands bring berries home. A hatchet and a pick bring hardwood and ore. Bind a sharp rock to a stick for each: both are made from your bag (B), from sticks and small rocks off the clearing floor.";
-            so.FindProperty("journalNotes").stringValue = "Stone tools are made from your bag (B), with no station needed: 5 Sticks and 3 or 4 Small Rocks each. They go on your belt by themselves. Without them a raid still brings people and loose finds home, but no wood and no ore.";
+            so.FindProperty("journalNotes").stringValue = "Stone tools are made from your bag (B), with no station needed, and go on your belt by themselves. Without them a raid still brings people and loose finds home, but no wood and no ore.";
             After(so, Quest("FirstCamp"));
         });
 
@@ -181,7 +181,7 @@ public static class BuildQuestCategories
             so.FindProperty("id").stringValue = "aroofforthework";
             so.FindProperty("displayName").stringValue = "A Roof for the Work";
             so.FindProperty("description").stringValue = "What the woods give you is only wood and ore until there is somewhere to work it. Raise a Workshop beside the fire (build menu: G). It mends what a raid wears down, and the chest, the club and the bandages all start at its bench.";
-            so.FindProperty("journalNotes").stringValue = "The Workshop wants 24 Oak Wood, 12 Grey Stone and 12 Sticks: fell the oaks at the clearing's edge with a hatchet and break the grey boulders with a pick. Repairs are made at its bench.";
+            so.FindProperty("journalNotes").stringValue = "The Workshop wants oak, grey stone and sticks: fell the oaks at the clearing's edge with a hatchet and break the grey boulders with a pick. Repairs are made at its bench.";
             so.FindProperty("chain").stringValue = FirstDays;
             so.FindProperty("start").intValue = (int)QuestStart.Automatically;
             so.FindProperty("startEvent").objectReferenceValue = null;

@@ -16,7 +16,7 @@ MonoBehaviour:
   displayName: Tools of the Clearing
   description: 'Bare hands bring berries home. A hatchet and a pick bring hardwood and ore. Bind a sharp rock to a stick for each: both are made from your bag (B), from sticks and small rocks off the clearing floor.'
   chain: The First Days
-  journalNotes: 'Stone tools are made from your bag (B), with no station needed: 5 Sticks and 3 or 4 Small Rocks each. They go on your belt by themselves. Without them a raid still brings people and loose finds home, but no wood and no ore.'
+  journalNotes: Stone tools are made from your bag (B), with no station needed, and go on your belt by themselves. Without them a raid still brings people and loose finds home, but no wood and no ore.
   rank: 4
   availableObjective: 
   announceStart: 1
