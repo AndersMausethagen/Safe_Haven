@@ -392,8 +392,65 @@ public static class BuildHorses
 
     // PlayerRidingAnimation's layer: the pack's rider clips, full body, over everything but the emotes. Its states are
     // played by name; the gaits and swimming follow parameters.
+    // The pack's saddle-sword clips were made at another height from its other rider clips (their body 0.06 high, the rest
+    // 0.75): played in the saddle they dropped the rider under the horse. Each take is lifted to the riding clips' height.
+    private static string LevelSwordClips()
+    {
+        string path = RiderClips + "Weapons While Riding/Rider_Weapon_Sword.FBX";
+        var importer = (ModelImporter)AssetImporter.GetAtPath(path);
+        AnimationClip idle = RiderClip("Idles/Rider_Idle_01");
+        AnimationCurve idleY = idle != null ? RootCurve(idle, "RootT.y") : null;
+        if (importer == null || idleY == null)
+        {
+            return "no sword clips";
+        }
+
+        float target = idleY.Evaluate(0f);
+        float Height(string take)
+        {
+            AnimationClip clip = RiderClip("Weapons While Riding/Rider_Weapon_Sword", take);
+            AnimationCurve y = clip != null ? RootCurve(clip, "RootT.y") : null;
+            if (y == null)
+            {
+                return target;
+            }
+
+            float sum = 0f;
+            for (int i = 0; i <= 8; i++)
+            {
+                sum += y.Evaluate(clip.length * i / 8f);
+            }
+
+            return sum / 9f;
+        }
+
+        // The offset doesn't show in the clip's curves (it is applied as the clip plays), so it is set outright from the
+        // curves each run, never added to: running this again changes nothing.
+        ModelImporterClipAnimation[] clips = importer.clipAnimations.Length > 0 ? importer.clipAnimations : importer.defaultClipAnimations;
+        bool changed = false;
+        foreach (ModelImporterClipAnimation clip in clips)
+        {
+            // A positive offset lowers the body (seen in Play: +0.7 put the rider on the ground), so lifting it is negative.
+            float off = Mathf.Round((Height(clip.name) - target) * 100f) / 100f;
+            changed |= !Mathf.Approximately(clip.heightOffset, off) || !clip.keepOriginalPositionXZ;
+            clip.heightOffset = off;
+            clip.keepOriginalPositionXZ = true;
+        }
+
+        if (changed)
+        {
+            importer.clipAnimations = clips;
+            importer.SaveAndReimport();
+        }
+
+        string result = $"sword clips offset {importer.clipAnimations[0].heightOffset:0.00} (riding {target:0.00})";
+        return result.Length > 0 ? result : "sword clips level";
+    }
+
     private static string RiderLayer()
     {
+        string level = LevelSwordClips();
+        report += "; " + level;
         var player = Load<AnimatorController>(CharacterAnimatorBuilder.PlayerControllerPath);
         if (player == null)
         {

@@ -79,6 +79,8 @@ public sealed class HorseMotion : MonoBehaviour
     private bool drinking;
     private float lastYaw;
     private float turnRate;
+    // Ridden or swimming: its speed along its facing. It goes where it faces, never sliding sideways through a turn.
+    private float pace;
     private Combatant strikeAt;
     private float strikeLands;
     private float nextTrample;
@@ -339,6 +341,7 @@ public sealed class HorseMotion : MonoBehaviour
     public void BeginRidden()
     {
         mode = Idle.Ridden;
+        pace = 0f;
         if (agent.enabled && agent.isOnNavMesh)
         {
             agent.ResetPath();
@@ -435,8 +438,8 @@ public sealed class HorseMotion : MonoBehaviour
 
         float wanted = wish.magnitude;
         galloping = rideGait > 0 && wanted > 0.1f && horse.Stamina > 0.5f && (horse.Taming == null || !horse.Taming.IsBreaking);
-        float pace = rideGait < 0 ? kind.WalkSpeed * 1.4f : galloping ? horse.Stats.gallopSpeed : kind.TrotSpeed;
-        pace *= horse.SpeedScale * HorseHitch.SpeedScaleFor(horse);
+        float speed = rideGait < 0 ? kind.WalkSpeed * 1.4f : galloping ? horse.Stats.gallopSpeed : kind.TrotSpeed;
+        speed *= horse.SpeedScale * HorseHitch.SpeedScaleFor(horse);
         if (galloping)
         {
             horse.Stamina = Mathf.Max(0f, horse.Stamina - kind.GallopCost * PlayerHorsemanship.GallopCostScale() * Time.deltaTime);
@@ -444,9 +447,11 @@ public sealed class HorseMotion : MonoBehaviour
         }
 
         Vector3 forward = Steer(wish, kind.TurnSpeed);
+        // Into a sharp turn it slows (more the faster it goes), out of it it picks up again.
         float alignment = wanted > 0.1f ? Mathf.Clamp01(Vector3.Dot(forward, wish.normalized) * 1.3f) : 0f;
-        Vector3 target = forward * (pace * wanted * alignment);
-        Velocity = Vector3.MoveTowards(Velocity, target, (target.sqrMagnitude > Velocity.sqrMagnitude ? 9f : 14f) * Time.deltaTime);
+        float targetPace = speed * wanted * alignment;
+        this.pace = Mathf.MoveTowards(this.pace, targetPace, (targetPace > this.pace ? 7f : 12f) * Time.deltaTime);
+        Velocity = forward * this.pace;
         if (!agent.enabled || !agent.isOnNavMesh || Velocity.sqrMagnitude < 0.0001f)
         {
             return;
@@ -500,6 +505,8 @@ public sealed class HorseMotion : MonoBehaviour
         {
             float moving = Mathf.Clamp01(Velocity.magnitude / Mathf.Max(0.1f, horse.Definition.WalkSpeed * 2f));
             float rate = Mathf.Lerp(Mathf.Min(turnSpeed, turnInPlaceRate * 1.3f), turnSpeed, moving);
+            // At a gallop it turns wider: a horse can't wheel round on the spot at full tilt.
+            rate *= Mathf.Lerp(1f, 0.65f, Mathf.InverseLerp(horse.Definition.TrotSpeed, horse.Stats.gallopSpeed, Velocity.magnitude));
             Quaternion facing = Quaternion.LookRotation(wish.normalized, Vector3.up);
             transform.rotation = Quaternion.RotateTowards(transform.rotation, facing, rate * Time.deltaTime);
         }
@@ -529,6 +536,7 @@ public sealed class HorseMotion : MonoBehaviour
         swimming = true;
         agent.enabled = false;
         galloping = false;
+        pace = Mathf.Min(pace, HorseSettings.Current.SwimSpeed);
         Vector3 at = transform.position + transform.forward * 0.8f;
         at.y = surface - HorseSettings.Current.SwimDepth;
         transform.position = at;
@@ -544,8 +552,8 @@ public sealed class HorseMotion : MonoBehaviour
         Vector3 forward = Steer(wish, horse.Definition.TurnSpeed * 0.6f);
         float wanted = wish.magnitude;
         float alignment = wanted > 0.1f ? Mathf.Clamp01(Vector3.Dot(forward, wish.normalized) * 1.3f) : 0f;
-        Vector3 target = forward * (settings.SwimSpeed * tired * wanted * alignment);
-        Velocity = Vector3.MoveTowards(Velocity, target, 4f * Time.deltaTime);
+        pace = Mathf.MoveTowards(pace, settings.SwimSpeed * tired * wanted * alignment, 4f * Time.deltaTime);
+        Velocity = forward * pace;
         Vector3 next = transform.position + Velocity * Time.deltaTime;
         if (WaterSurface.OpenAt(next + Vector3.up * settings.SwimDepth, 2.5f, out float surface, settings.SwimDepth * 0.7f) != null)
         {

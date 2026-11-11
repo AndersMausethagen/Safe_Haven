@@ -6,7 +6,8 @@ using UnityEngine.AI;
 /// The player's side of horses: holding a lassoed one (feet planted, facing it, hands on the rope, so no swing or other
 /// interaction gets in the way) and riding one. In the saddle the player sits on the horse's back (PlayerMovement's seat,
 /// as in a boat) and steers it with the movement keys, relative to the camera as walking is; Space gallops while the
-/// horse has the stamina, the sneak key walks it, and the whistle key (X) gets down. E is the breaking ride's alone (the
+/// horse has the stamina (standing still, it rears up on its hind legs), the sneak key walks it, and the whistle key (X)
+/// gets down. E is the breaking ride's alone (the
 /// barley it asks for), so feeding it never throws the player off by mistake.
 /// On a horse of their own the player fights from the saddle: their weapon swings and their bow draws as on foot
 /// (PlayerStateMachine › CanFightAboard), the pack's rider clips show it (PlayerRidingAnimation), and Horsemanship's
@@ -28,6 +29,8 @@ public sealed class PlayerRiding : MonoBehaviour
     private Coroutine moving;
     private bool feetFree;
     private float nextReminder;
+    private float nextRear;
+    private PlayerCombat combat;
 
     /// <summary>The frame the player last left the saddle: the same press of X mustn't whistle too (HorseWhistle).</summary>
     public int LeftSaddleFrame { get; private set; } = -10;
@@ -57,6 +60,7 @@ public sealed class PlayerRiding : MonoBehaviour
         movement = GetComponent<PlayerMovement>();
         health = GetComponent<Damageable>();
         body = TryGetComponent(out PlayerRidingAnimation found) ? found : gameObject.AddComponent<PlayerRidingAnimation>();
+        combat = GetComponent<PlayerCombat>();
     }
 
     /// <summary>How much harder a blow from the saddle lands: Horsemanship's Mounted Damage, and a quarter more at a gallop.
@@ -497,7 +501,15 @@ public sealed class PlayerRiding : MonoBehaviour
         }
 
         CountRidden(Riding);
-        stateMachine.CanFightAboard = Riding.IsTamed && !Riding.Motion.IsSwimming && holding == null && !IsMounting;
+        // From the saddle with a weapon only: bare fists can't reach anything from up there.
+        bool armed = combat != null && combat.Weapon != null && combat.Weapon.Stance != WeaponStance.Unarmed;
+        stateMachine.CanFightAboard = armed && Riding.IsTamed && !Riding.Motion.IsSwimming && holding == null && !IsMounting;
+        if (!armed && Riding.IsTamed && GameInput.Attack != null && GameInput.Attack.WasPressedThisFrame() && Time.time >= nextReminder
+            && (UIStateManager.Current == null || !UIStateManager.Current.IsAnyWindowOpen))
+        {
+            nextReminder = Time.time + 6f;
+            GameMessages.Post("Take a weapon in hand to fight from the saddle.", MessageKind.Info);
+        }
         if (IsMounting)
         {
             return;
@@ -514,6 +526,14 @@ public sealed class PlayerRiding : MonoBehaviour
         }
 
         Vector3 steer = free ? movement.MovementInput : Vector3.zero;
+        // Space while standing still: it rears up on its hind legs (a horse of the player's own).
+        if (free && Riding.IsTamed && GameInput.Dodge != null && GameInput.Dodge.WasPressedThisFrame() && steer.sqrMagnitude < 0.01f
+            && Riding.Motion.Velocity.magnitude < 0.6f && !Riding.Motion.IsSwimming && Time.time >= nextRear)
+        {
+            nextRear = Time.time + 2.5f;
+            Riding.Motion.PlayRear();
+        }
+
         int gait = free && GameInput.Dodge != null && GameInput.Dodge.IsPressed() ? 1
             : free && GameInput.Sneak != null && GameInput.Sneak.IsPressed() ? -1 : 0;
         Riding.Motion.Ride(steer, gait);
