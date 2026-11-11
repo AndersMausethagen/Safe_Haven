@@ -42,4 +42,6 @@ public enum UIWindowId
     Journal = 17,
     /// <summary>A tutorial: how one thing in the game works, with its picture (T, or the notice that one is waiting).</summary>
     Tutorial = 18,
+    /// <summary>Naming a horse once it is tamed, or again from its menu.</summary>
+    HorseName = 19,
 }

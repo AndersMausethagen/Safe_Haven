@@ -1,0 +1,52 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4349ebd0de959014aad2995652b37022, type: 3}
+  m_Name: Wild Horse
+  m_EditorClassIdentifier: SafeHaven::HorseDefinition
+  displayName: Wild Horse
+  description: Fast, wary and strong. A rope and patience make it yours.
+  prefab: {fileID: 4999098875364473333, guid: 641fe335760a6644f847cf14288887f7, type: 3}
+  coats:
+  - {r: 0.42, g: 0.25, b: 0.14, a: 1}
+  - {r: 0.55, g: 0.3, b: 0.14, a: 1}
+  - {r: 0.66, g: 0.55, b: 0.38, a: 1}
+  - {r: 0.6, g: 0.6, b: 0.58, a: 1}
+  - {r: 0.16, g: 0.14, b: 0.13, a: 1}
+  health: {x: 140, y: 200}
+  stamina: {x: 80, y: 120}
+  gallopSpeed: {x: 10, y: 12.5}
+  carryWeight: {x: 55, y: 85}
+  walkSpeed: 1.6
+  trotSpeed: 6.5
+  gallopCost: 9
+  staminaRegen: 6
+  turnSpeed: 220
+  shyDistance: 4
+  perHeardMetre: 1.3
+  wanderRadius: 14
+  fleeSeconds: 7
+  whinny: {fileID: 0}
+  lasso: {fileID: 11400000, guid: ff9d97d9d45a99f439a3df21add6df1a, type: 2}
+  lassoRange: 9
+  struggleStamina: 100
+  tapDrain: 3
+  pullStrain: 0.35
+  tapHold: 0.1
+  lungeSeconds: {x: 1.2, y: 2.6}
+  mountSeconds: 8
+  barley: {fileID: 11400000, guid: 05a3b8e12c05cb548b40065962d3b860, type: 2}
+  feedsNeeded: {x: 3, y: 5}
+  feedInterval: {x: 10, y: 30}
+  feedWindow: 6
+  spawnChancePerHour: 0.06
+  mostWild: 1
+  spawnRing: {x: 70, y: 150}

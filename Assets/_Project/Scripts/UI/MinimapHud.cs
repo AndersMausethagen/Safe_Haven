@@ -317,6 +317,15 @@ public sealed class MinimapHud : MonoBehaviour
             Add(transport.transform, null, style.Text, 6f);
         }
 
+        // The player's own horses, where they were left (the one ridden is under the player's arrow).
+        foreach (Horse horse in Horse.All)
+        {
+            if (horse != null && horse.IsTamed && horse.IsAlive && horse.Rider == null)
+            {
+                Add(horse.transform, dot, style.Accent, 8f);
+            }
+        }
+
         foreach (DroppedItem dropped in DroppedItem.All)
         {
             if (Found(dropped.transform.position, explored))

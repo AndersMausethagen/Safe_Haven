@@ -1,0 +1,2 @@
+Horse by Quaternius (Ultimate Animated Animals), CC0 1.0 Public Domain.
+Source: https://poly.pizza/m/qvTrSG9pZF (GLB, converted to FBX in Blender: the duplicate "AnimalArmature|" clips dropped).

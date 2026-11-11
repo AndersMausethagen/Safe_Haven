@@ -44,7 +44,7 @@ public sealed class Haulable : MonoBehaviour, ITransportDriver
     [SerializeField, Min(0f)] private float holdDistance = 0.55f;
 
     private Transport transport;
-    private PlayerTransport hauler;
+    private IHauler hauler;
     private Collider[] colliders;
     private float stuckFor;
     private float nextRumble;
@@ -60,6 +60,30 @@ public sealed class Haulable : MonoBehaviour, ITransportDriver
 
     public bool IsHeldBy(GameObject user) => hauler != null && hauler.gameObject == user;
 
+    /// <summary>Who pulls it now (the player, or a horse it is hitched to), or null.</summary>
+    public IHauler Hauler => hauler;
+
+    /// <summary>The nearest cart (not a barrow) nobody holds, within <paramref name="reach"/> metres, or null.</summary>
+    public static Haulable NearestFree(Vector3 point, float reach)
+    {
+        Haulable best = null;
+        float bestDistance = reach * reach;
+        foreach (Transport transport in Transport.All)
+        {
+            if (transport != null && transport.Driver is Haulable cart && !cart.pushed && cart.hauler == null)
+            {
+                float distance = (transport.transform.position - point).sqrMagnitude;
+                if (distance <= bestDistance)
+                {
+                    best = cart;
+                    bestDistance = distance;
+                }
+            }
+        }
+
+        return best;
+    }
+
     private void Awake()
     {
         transport = GetComponent<Transport>();
@@ -73,21 +97,28 @@ public sealed class Haulable : MonoBehaviour, ITransportDriver
     public void AddActions(MenuPage page, GameObject user)
     {
         var player = user != null ? user.GetComponent<PlayerTransport>() : null;
-        if (player != null)
+        if (hauler is HorseHitch hitch)
+        {
+            page.Add(new MenuAction($"Hitched to {hitch.Horse.HorseName}", "Unhitch it from the horse's menu", false, null));
+        }
+        else if (player != null)
         {
             page.Add(new MenuAction(pushed ? "Lift the handles" : "Take the shafts", transport.LoadText(), player.Using == null, () => Take(player), closesMenu: true));
         }
     }
 
     /// <summary>The player takes it. Their own body stops colliding with it, or they would push against what they pull.</summary>
-    public void Take(PlayerTransport player)
+    public void Take(PlayerTransport player) => Take((IHauler)player);
+
+    /// <summary>Something takes the handles: the player, or a horse it is hitched to.</summary>
+    public void Take(IHauler by)
     {
-        hauler = player;
+        hauler = by;
         stuckFor = 0f;
         Strain = 0f;
         IgnorePlayer(true);
         transport.Wake();
-        player.Began(transport);
+        by.Began(transport);
     }
 
     public void LetGo()
@@ -97,19 +128,26 @@ public sealed class Haulable : MonoBehaviour, ITransportDriver
             return;
         }
 
-        PlayerTransport was = hauler;
+        IHauler was = hauler;
         hauler = null;
         Strain = 0f;
         IgnorePlayer(false, was);
         was.Ended();
     }
 
-    private void IgnorePlayer(bool ignore, PlayerTransport player = null)
+    private void IgnorePlayer(bool ignore, IHauler by = null)
     {
-        CharacterController controller = (player != null ? player : hauler).Controller;
-        foreach (Collider part in colliders)
+        foreach (Collider own in (by ?? hauler).HaulerColliders)
         {
-            Physics.IgnoreCollision(controller, part, ignore);
+            if (own == null)
+            {
+                continue;
+            }
+
+            foreach (Collider part in colliders)
+            {
+                Physics.IgnoreCollision(own, part, ignore);
+            }
         }
     }
 
@@ -161,7 +199,7 @@ public sealed class Haulable : MonoBehaviour, ITransportDriver
         Vector3 at = handle.position;
         Vector3 reach = HoldPoint(at) - at;
         Vector3 spring = reach * Stiffness + (hauler.Velocity - body.GetPointVelocity(at)) * Damping;
-        Vector3 pull = Vector3.ClampMagnitude(spring * body.mass, transport.Definition.PullForce);
+        Vector3 pull = Vector3.ClampMagnitude(spring * body.mass, transport.Definition.PullForce * hauler.PullScale);
         if (pushed)
         {
             // A push at the handles is behind the centre of mass, like balancing a broom on its end: any slant grows. The
@@ -191,7 +229,7 @@ public sealed class Haulable : MonoBehaviour, ITransportDriver
         Vector3 toward = pushed ? hauler.transform.forward : handleAt - player;
         toward.y = 0f;
         toward = toward.sqrMagnitude > 0.0001f ? toward.normalized : -hauler.transform.forward;
-        return player + toward * holdDistance + Vector3.up * handleHeight;
+        return player + toward * (holdDistance + hauler.ExtraReach) + Vector3.up * handleHeight;
     }
 
     private void Steady(Rigidbody body)

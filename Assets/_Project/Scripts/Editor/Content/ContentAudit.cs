@@ -38,6 +38,7 @@ public static class ContentAudit
         "RecipeDefinition.itemCost", "BuildingDefinition.constructionItems", "BuildingDefinition.upgrades[].cost",
         "RaidEventDefinition.choices[].cost", "HavenRequestDefinition.wanted", "SettlementSettings.portalLevels",
         "QuestDefinition.objectives", "FishingSettings.bait", "LanternDefinition.refill", "JobDefinition.workTool", "TerritorySettings.pactRune",
+        "HorseDefinition.lasso", "HorseDefinition.barley",
     };
 
     private static readonly string[] ItemNeither =

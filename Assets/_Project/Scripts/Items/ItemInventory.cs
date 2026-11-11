@@ -259,6 +259,11 @@ public sealed class ItemInventory : MonoBehaviour
             return TransportDeployment.Deploy(gameObject, from, slot);
         }
 
+        if (item.IsLasso)
+        {
+            return HorseLasso.Throw(gameObject);
+        }
+
         if (item.Experience > 0)
         {
             // Reading a rune book: the experience is granted by whoever listens (ExperienceTracker).

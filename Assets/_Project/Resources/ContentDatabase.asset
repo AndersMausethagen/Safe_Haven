@@ -218,6 +218,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 96b6b0cd58def654da67410cc7063135, type: 2}
   - {fileID: 11400000, guid: 3bc5c06eef042084b9fc28865091670b, type: 2}
   - {fileID: 11400000, guid: c9c58cc9c8a25eb4787a64e96598e266, type: 2}
+  - {fileID: 11400000, guid: c6a7729fd9f90ed4b8dacc42b9900c04, type: 2}
+  - {fileID: 11400000, guid: ff9d97d9d45a99f439a3df21add6df1a, type: 2}
   resourceCatalog: {fileID: 11400000, guid: 82528be8462042341acfc62489e5c91f, type: 2}
   recipeBook: {fileID: 11400000, guid: cd7724124d8b393439143345d7f2b45f, type: 2}
   saveablePrefabs:
@@ -308,6 +310,7 @@ MonoBehaviour:
   - {fileID: 7050874655337320512, guid: 2726ae87dafb9d44284cbce448a87eea, type: 3}
   - {fileID: 4981802393601269089, guid: 90dc7b563332e1149a4ba290241efa49, type: 3}
   - {fileID: 8358629271383303412, guid: d7b2b0e38359eb344ad18712fb6f33db, type: 3}
+  - {fileID: 5328339517679984002, guid: 641fe335760a6644f847cf14288887f7, type: 3}
   quests:
   - {fileID: 11400000, guid: 83fc380c709c01a4383dfa7c9300d48a, type: 2}
   - {fileID: 11400000, guid: b2306560eba5c594886d38a592bdb05d, type: 2}

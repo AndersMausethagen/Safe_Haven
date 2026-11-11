@@ -315,6 +315,15 @@ public sealed class WorldMapHud : MonoBehaviour
         QuestLog log = QuestManager.Current != null ? QuestManager.Current.Log : GameSession.Quests;
         QuestMarkerSettings settings = QuestMarkerSettings.Current;
         int used = PlaceRaidMarks(width, height);
+        // The player's own horses, by name.
+        foreach (Horse horse in Horse.All)
+        {
+            if (horse != null && horse.IsTamed && horse.IsAlive && horse.Rider == null)
+            {
+                ShowMark(used++, horse.transform.position, UIStyle.Current.Accent, null, horse.HorseName, width, height);
+            }
+        }
+
         marked.Clear();
         foreach (QuestWaypoint waypoint in QuestWaypoint.Active)
         {

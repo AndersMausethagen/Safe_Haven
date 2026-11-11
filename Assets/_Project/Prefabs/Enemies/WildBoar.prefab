@@ -170,8 +170,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aecdc764a0346784e9958a956dddd948, type: 3}
   m_Name: 
   m_EditorClassIdentifier: SafeHaven::SaveableEntity
-  id: f46f1414a5254aa6b78491e5ecf7c59f
-  prefabId: a661dc05d2e43f943a476376f636ef9a
+  id: 
+  prefabId: e880d4ea2b9be22409acdbd5bf1e6f9e
   saveTransform: 1
   saveActiveState: 1
   rememberDestruction: 1

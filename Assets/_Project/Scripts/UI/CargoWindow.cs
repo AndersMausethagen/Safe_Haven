@@ -129,7 +129,7 @@ public sealed class CargoWindow : MonoBehaviour
     private Grid bag;
     private Grid cargo;
     private Transform anchor;
-    private Transport transport;
+    private ICargoHold transport;
     private GameObject viewer;
 
     public static CargoWindow Current { get; private set; }
@@ -158,7 +158,7 @@ public sealed class CargoWindow : MonoBehaviour
         return view;
     }
 
-    public void Open(Transport shown, GameObject user)
+    public void Open(ICargoHold shown, GameObject user)
     {
         ItemInventory items = user != null ? user.GetComponent<ItemInventory>() : null;
         if (items == null || TransportSettings.Current.SlotPrefab == null)
@@ -171,8 +171,8 @@ public sealed class CargoWindow : MonoBehaviour
         anchor = shown.transform;
         bag.Show(items.Container);
         cargo.Show(shown.Cargo);
-        titleLabel.text = shown.Definition.DisplayName;
-        descriptionLabel.text = shown.Definition.Description;
+        titleLabel.text = shown.CargoTitle;
+        descriptionLabel.text = shown.CargoDescription;
         Describe(ItemStack.Empty);
         window.Open();
         Refresh();
@@ -197,7 +197,7 @@ public sealed class CargoWindow : MonoBehaviour
             return;
         }
 
-        if (viewer == null || transport == null || (anchor.position - viewer.transform.position).sqrMagnitude > Reach * Reach)
+        if (viewer == null || transport == null || anchor == null || (anchor.position - viewer.transform.position).sqrMagnitude > Reach * Reach)
         {
             window.Close();
             return;
@@ -211,7 +211,7 @@ public sealed class CargoWindow : MonoBehaviour
         UIStyle style = UIStyle.Current;
         Rect screen = ((RectTransform)transform).rect;
         panel.localScale = Vector3.one * Mathf.Min(1f, (screen.width - ScreenMargin) / Width, (screen.height - ScreenMargin) / Height);
-        weightValue.text = $"{transport.Weight:0}<size=60%> / {transport.Definition.Capacity:0}";
+        weightValue.text = $"{transport.Weight:0}<size=60%> / {transport.Capacity:0}";
         weightValue.color = transport.IsOverfilled ? style.Warning : style.Text;
         speedValue.text = $"{(1f - transport.SpeedScale) * 100f:0}<size=60%>%";
         speedValue.color = transport.IsOverfilled ? style.Warning : style.Text;

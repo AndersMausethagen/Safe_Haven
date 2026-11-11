@@ -17,6 +17,11 @@ public sealed class PlayerTransportPose : MonoBehaviour
     private const float RowReach = 24f;
     private const float SeatThigh = -82f;
     private const float SeatShin = 78f;
+    // Astride a horse (PlayerRiding): thighs forward and apart round its back, shins down its sides, hands on the reins.
+    private const float RideThigh = -48f;
+    private const float RideSpread = 24f;
+    private const float RideShin = 58f;
+    private const float RideArms = -38f;
 
     private PlayerTransport transportUser;
     private Transform leftArm;
@@ -28,6 +33,8 @@ public sealed class PlayerTransportPose : MonoBehaviour
     private float armWeight;
     private float legWeight;
     private float armAngle;
+    private float rideWeight;
+    private PlayerRiding riding;
 
     private void Awake()
     {
@@ -52,6 +59,13 @@ public sealed class PlayerTransportPose : MonoBehaviour
         Transport used = transportUser.Using;
         var boat = used != null ? used.Driver as Rowboat : null;
         var cart = used != null ? used.Driver as Haulable : null;
+        if (riding == null)
+        {
+            TryGetComponent(out riding);
+        }
+
+        bool astride = riding != null && riding.IsRiding;
+        rideWeight = Mathf.MoveTowards(rideWeight, astride ? 1f : 0f, BlendSpeed * Time.deltaTime);
         armWeight = Mathf.MoveTowards(armWeight, used != null ? 1f : 0f, BlendSpeed * Time.deltaTime);
         legWeight = Mathf.MoveTowards(legWeight, boat != null ? 1f : 0f, BlendSpeed * Time.deltaTime);
         if (boat != null)
@@ -70,6 +84,18 @@ public sealed class PlayerTransportPose : MonoBehaviour
         Bend(rightThigh, across, SeatThigh * legWeight);
         Bend(leftShin, across, SeatShin * legWeight);
         Bend(rightShin, across, SeatShin * legWeight);
+        if (rideWeight > 0f)
+        {
+            Vector3 along = transform.forward;
+            Bend(leftThigh, across, RideThigh * rideWeight);
+            Bend(rightThigh, across, RideThigh * rideWeight);
+            Bend(leftThigh, along, -RideSpread * rideWeight);
+            Bend(rightThigh, along, RideSpread * rideWeight);
+            Bend(leftShin, across, RideShin * rideWeight);
+            Bend(rightShin, across, RideShin * rideWeight);
+            Bend(leftArm, across, RideArms * rideWeight);
+            Bend(rightArm, across, RideArms * rideWeight);
+        }
     }
 
     private static void Bend(Transform bone, Vector3 axis, float degrees)

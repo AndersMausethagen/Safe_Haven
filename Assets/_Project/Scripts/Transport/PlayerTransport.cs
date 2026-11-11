@@ -9,7 +9,7 @@ using UnityEngine;
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(PlayerMovement), typeof(PlayerStateMachine), typeof(CharacterController))]
-public sealed class PlayerTransport : MonoBehaviour
+public sealed class PlayerTransport : MonoBehaviour, IHauler
 {
     private const float BoardReach = 3.5f;
     private const float ArrivalSeconds = 5f;
@@ -39,6 +39,10 @@ public sealed class PlayerTransport : MonoBehaviour
 
     /// <summary>The player's speed over the ground, for the spring at the handle.</summary>
     public Vector3 Velocity => Movement.HorizontalVelocity;
+
+    float IHauler.PullScale => 1f;
+    float IHauler.ExtraReach => 0f;
+    System.Collections.Generic.IEnumerable<Collider> IHauler.HaulerColliders { get { yield return Controller; } }
 
     private void Awake()
     {

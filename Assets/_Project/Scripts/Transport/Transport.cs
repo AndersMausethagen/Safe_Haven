@@ -26,7 +26,7 @@ public interface ITransportDriver
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Rigidbody), typeof(Interactable))]
-public sealed class Transport : MonoBehaviour, ISaveable
+public sealed class Transport : MonoBehaviour, ISaveable, ICargoHold
 {
     /// <summary>What a raycast may stand a wheel or a person on: not transports themselves (Ignore Raycast), not water.</summary>
     public const int GroundMask = ~((1 << 2) | (1 << 4));
@@ -83,6 +83,9 @@ public sealed class Transport : MonoBehaviour, ISaveable
     public Rigidbody Body { get; private set; }
     public ITransportDriver Driver { get; private set; }
     public float Weight => Cargo.CurrentWeight;
+    public float Capacity => definition.Capacity;
+    public string CargoTitle => definition.DisplayName;
+    public string CargoDescription => definition.Description;
     public bool IsOverfilled => definition.IsOverfilled(Weight);
     /// <summary>The share of normal speed its load leaves.</summary>
     public float SpeedScale => definition.SpeedScale(Weight);

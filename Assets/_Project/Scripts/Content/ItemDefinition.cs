@@ -152,6 +152,12 @@ public sealed class ItemDefinition : ScriptableObject, IStackDefinition
     [Tooltip("Makes this item a light worn on the belt (the Light slot): how it shines and how long it lasts. Empty for other items.")]
     [SerializeField] private LanternDefinition lantern;
 
+    [Header("Horses")]
+    [Tooltip("Makes this item a lasso: using it throws it over a wild horse in reach, which has to be crept up on. It isn't used up.")]
+    [SerializeField] private bool lasso;
+    [Tooltip("Makes this item a saddle: on a tamed horse its bags hold this many stacks, as much as the horse can carry. 0 for other items.")]
+    [SerializeField, Min(0)] private int saddleSlots;
+
     [Header("Raid")]
     [Tooltip("Makes this item a raid modifier: picked at the raid portal and used up when the raid starts. Empty for other items.")]
     [SerializeField] private RaidModifierDefinition raidModifier;
@@ -193,6 +199,9 @@ public sealed class ItemDefinition : ScriptableObject, IStackDefinition
     public bool IsSapling => sapling != null;
     public LanternDefinition Lantern => lantern;
     public bool IsLantern => lantern != null;
+    public bool IsLasso => lasso;
+    public int SaddleSlots => saddleSlots;
+    public bool IsSaddle => saddleSlots > 0;
 
     /// <summary>Each stack keeps its own condition: durability for gear, the water level for a water container, the light
     /// left in a lantern.</summary>
@@ -208,7 +217,7 @@ public sealed class ItemDefinition : ScriptableObject, IStackDefinition
     public float GearRepair => gearRepair;
     public GameObject PlacesInRaid => placesInRaid;
     /// <summary>True when right-clicking does something: eat, drink, heal, equip or read.</summary>
-    public bool IsUsable => IsConsumable || IsEquippable || IsBlueprint || experience > 0 || transport != null || IsSapling;
+    public bool IsUsable => IsConsumable || IsEquippable || IsBlueprint || experience > 0 || transport != null || IsSapling || lasso;
     public TransportDefinition Transport => transport;
     public int CarryCapacityBonus => carryCapacityBonus;
     public float CarryNoise => carryNoise;
