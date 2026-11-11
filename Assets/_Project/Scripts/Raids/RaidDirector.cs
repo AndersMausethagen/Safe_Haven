@@ -313,6 +313,8 @@ public sealed class RaidDirector : MonoBehaviour
             PlayerTransport.Current.LeaveRaid(Report, extracted);
         }
 
+        HorseTravel.LeaveRaid(Report, extracted);
+
         Companions.Settle(Report, extracted);
         ExperienceTracker.SettleRaid(Report, extracted);
         GameSession.EndRaid(Report);

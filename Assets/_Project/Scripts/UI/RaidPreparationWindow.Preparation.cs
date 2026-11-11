@@ -224,6 +224,8 @@ public sealed partial class RaidPreparationWindow
         }
 
         string cart = PlayerTransport.Current != null ? PlayerTransport.Current.RaidWarning() : "";
+        string horse = HorseTravel.RaidWarning(Player.Current != null ? Player.Current.gameObject : null);
+        cart = cart.Length > 0 && horse.Length > 0 ? cart + " " + horse : cart + horse;
         riskLabel.text = cart.Length > 0
             ? $"<color={warning}>{cart}</color>\n{lossSummary}"
             : $"<color={warning}>{lossSummary}</color>\n{carrying}";

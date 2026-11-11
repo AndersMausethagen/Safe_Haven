@@ -258,6 +258,9 @@ public static class RaidLauncher
             transport.LeaveForRaid();
         }
 
+        // The horse ridden (or one following) goes through too.
+        HorseTravel.LeaveForRaid(player);
+
         PlayerSnapshot loadout = PlayerSnapshot.Capture(player);
         RaidSession session = Build(raid, modifiers, loadout, SceneManager.GetActiveScene().name, runSeed, difficulty, sparks, large,
             extraSeconds, extractionCut, foretoldEvents, companion, elapsed);

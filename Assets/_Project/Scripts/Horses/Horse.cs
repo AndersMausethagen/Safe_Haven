@@ -778,7 +778,15 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold, IStatusImmunit
             }
         }
 
-        if (IsStabled)
+        if (HorseTravel.InRaid == this)
+        {
+            // In a raid: tied at the portal it came through, it is safe and comes home whatever happens.
+            page.Add(HorseTravel.IsTied
+                ? new MenuAction("Untie it", "It can be hurt again, and must be near you when you extract", true, () => HorseTravel.Tie(this, false), closesMenu: true)
+                : new MenuAction("Tie it at the portal", HorseTravel.CanTieHere(this) ? "Safe here, and home whatever happens" : "Lead it back to the portal first",
+                    HorseTravel.CanTieHere(this) && Rider == null, () => HorseTravel.Tie(this, true), closesMenu: true));
+        }
+        else if (IsStabled)
         {
             page.Add(new MenuAction("Lead it out of the stable", "It waits by the door", !visiting, () => HorseStable.LeadOut(this), closesMenu: true));
         }
