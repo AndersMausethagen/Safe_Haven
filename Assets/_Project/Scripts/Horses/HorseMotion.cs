@@ -105,6 +105,10 @@ public sealed class HorseMotion : MonoBehaviour
     private float jumpPeak;
     private float nextJumpLook;
     private float nextFollow;
+    private float nextFright;
+    private float frightenedUntil;
+    // A kick on command from the saddle: when its forelegs land.
+    private float kickLands = -1f;
     private LineRenderer lead;
     private float nextLure;
     private float nextHand;
@@ -445,6 +449,18 @@ public sealed class HorseMotion : MonoBehaviour
             return;
         }
 
+        if (Time.time >= nextFright)
+        {
+            nextFright = Time.time + 0.5f;
+            ShyFromMonsters();
+        }
+
+        if (kickLands > 0f && Time.time >= kickLands)
+        {
+            kickLands = -1f;
+            KickLands();
+        }
+
         if (jumping)
         {
             UpdateJump();
@@ -538,6 +554,94 @@ public sealed class HorseMotion : MonoBehaviour
         }
 
         agent.Move(Velocity * Time.deltaTime);
+    }
+
+    // ----- What frightens it, and a kick on command -----
+
+    // A monster horses shy from (draugr, trolls) near: unless it is brave, very fond of its rider or barded, it panics:
+    // ridden, it rears (and may throw a rider it hardly knows); otherwise it runs.
+    private void ShyFromMonsters()
+    {
+        if (mode == Idle.Dead || mode == Idle.Stall || horse.Stats.Has(HorseTrait.Brave) || horse.Armour != null || horse.Definition.AlwaysArmoured
+            || Time.time < frightenedUntil || horse.IsTamed && horse.CurrentBond() >= 70f)
+        {
+            return;
+        }
+
+        foreach (MonsterAI monster in MonsterAI.Active)
+        {
+            MonsterDefinition kind = monster != null ? monster.Definition : null;
+            if (kind == null || kind.FrightensHorses <= 0f || !monster.TryGetComponent(out Damageable life) || !life.IsAlive
+                || (monster.transform.position - transform.position).sqrMagnitude > kind.FrightensHorses * kind.FrightensHorses)
+            {
+                continue;
+            }
+
+            frightenedUntil = Time.time + 10f;
+            if (horse.Rider != null)
+            {
+                PlayRear();
+                GameMessages.Post($"{horse.HorseName} shies at the {kind.DisplayName.ToLowerInvariant()}!", MessageKind.Warning);
+                if (HorseBondRules.Throws(horse.CurrentBond(), horse.Stats.temperament, HorseSettings.Current, Random.value))
+                {
+                    horse.Rider.Dismount(thrown: true);
+                    Flee(monster.transform.position, horse.Definition.FleeSeconds * horse.Temperament.panic);
+                }
+            }
+            else
+            {
+                Flee(monster.transform.position, horse.Definition.FleeSeconds * horse.Temperament.panic);
+            }
+
+            return;
+        }
+    }
+
+    /// <summary>Its rider asks it to rear and strike out with its forelegs at what is ahead (R). Any horse will at bond
+    /// 40; a bold one at once. False, when it won't.</summary>
+    public bool KickOnCommand()
+    {
+        if (mode != Idle.Ridden || jumping || swimming || kickLands > 0f)
+        {
+            return false;
+        }
+
+        if (horse.Stats.temperament != HorseTemperament.Bold && horse.CurrentBond() < 40f)
+        {
+            return false;
+        }
+
+        SetTrigger(StrikeId);
+        Acted?.Invoke(HorseAct.Strike, 0);
+        Neigh();
+        kickLands = Time.time + 0.5f;
+        return true;
+    }
+
+    // Its forelegs come down on whatever enemy is close in front.
+    private void KickLands()
+    {
+        Vector3 ahead = transform.position + transform.forward * 1.8f + Vector3.up;
+        int found = Physics.OverlapSphereNonAlloc(ahead, 1.6f, trampled, ~0, QueryTriggerInteraction.Ignore);
+        var struck = new System.Collections.Generic.HashSet<Damageable>();
+        for (int i = 0; i < found; i++)
+        {
+            Combatant target = trampled[i].GetComponentInParent<Combatant>();
+            if (target == null || target.Faction != Faction.Enemy || !target.TryGetComponent(out Damageable life) || !life.IsAlive || !struck.Add(life))
+            {
+                continue;
+            }
+
+            float damage = horse.Definition.StrikeDamage * 1.5f * (1f + PlayerHorsemanship.MountedDamage());
+            var blow = new DamageInfo(horse.Combatant, null, damage, DamageType.Physical, false, target.transform.position + Vector3.up, transform.forward, 70f, HitTechnique.None);
+            life.ApplyDamage(blow);
+            PlayerHorsemanship.Practise(HorseWork.MountedHit);
+        }
+
+        if (struck.Count > 0)
+        {
+            CameraShake.Add(0.15f);
+        }
     }
 
     // ----- Ground -----

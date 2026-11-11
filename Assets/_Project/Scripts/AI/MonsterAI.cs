@@ -140,6 +140,7 @@ public sealed partial class MonsterAI : MonoBehaviour, IEventSubject, IStaggerab
     private float ignoresTargetsUntil = float.NegativeInfinity;
 
     private static readonly System.Collections.Generic.List<MonsterAI> active = new System.Collections.Generic.List<MonsterAI>();
+
     private static readonly System.Collections.Generic.List<MonsterAI> all = new System.Collections.Generic.List<MonsterAI>();
 
     /// <summary>Every enabled monster, so systems (audio combat detection) don't have to search the scene.</summary>

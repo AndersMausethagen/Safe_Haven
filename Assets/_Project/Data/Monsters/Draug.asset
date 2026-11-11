@@ -50,6 +50,8 @@ MonoBehaviour:
   closeSenseRange: 3
   hearing: 1.1
   alertness: 0.8
+  huntsHorses: 1
+  frightensHorses: 12
   attacks:
   - attack: {fileID: 11400000, guid: 7c51c0a6123522543bd74150b578d845, type: 2}
     kind: 0
@@ -171,6 +173,8 @@ MonoBehaviour:
   idleGrazeChance: 0
   idleSleepChance: 0
   idleSleepAttention: 0.3
+  timid: 0
+  boltSeconds: 7
   canBeFinished: 1
   flankSpread: 0.5
   poise: 140

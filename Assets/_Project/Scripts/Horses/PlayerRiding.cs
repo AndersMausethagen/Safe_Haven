@@ -34,6 +34,7 @@ public sealed class PlayerRiding : MonoBehaviour
     private float spacePressedAt = -10f;
     private bool cruising;
     private const float TapSeconds = 0.22f;
+    private float nextKick;
     private PlayerCombat combat;
 
     /// <summary>The frame the player last left the saddle: the same press of X mustn't whistle too (HorseWhistle).</summary>
@@ -65,6 +66,13 @@ public sealed class PlayerRiding : MonoBehaviour
         health = GetComponent<Damageable>();
         body = TryGetComponent(out PlayerRidingAnimation found) ? found : gameObject.AddComponent<PlayerRidingAnimation>();
         combat = GetComponent<PlayerCombat>();
+    }
+
+    /// <summary>How much a blow from the saddle staggers: at a gallop, a charge knocks the struck off their feet (three
+    /// times the poise). 1 on foot or slower.</summary>
+    public static float ChargePoise(GameObject player)
+    {
+        return player != null && player.TryGetComponent(out PlayerRiding riding) && riding.Riding != null && riding.Riding.Motion.IsGalloping ? 3f : 1f;
     }
 
     /// <summary>How much harder a blow from the saddle lands: Horsemanship's Mounted Damage, and a quarter more at a gallop.
@@ -539,6 +547,20 @@ public sealed class PlayerRiding : MonoBehaviour
         }
 
         bool moving = steer.sqrMagnitude > 0.01f;
+        // R: the horse rears and strikes out ahead with its forelegs (bond 40, or a bold horse).
+        if (free && Riding.IsTamed && GameInput.HorseKick != null && GameInput.HorseKick.WasPressedThisFrame() && Time.time >= nextKick)
+        {
+            if (Riding.Motion.KickOnCommand())
+            {
+                nextKick = Time.time + 5f;
+            }
+            else if (Riding.Stats.temperament != HorseTemperament.Bold && Riding.CurrentBond() < 40f)
+            {
+                nextKick = Time.time + 2f;
+                GameMessages.Post($"{Riding.HorseName} won't strike out for you yet (a bond of 40, or a bold horse).", MessageKind.Info);
+            }
+        }
+
         if (free && GameInput.Dodge != null)
         {
             if (GameInput.Dodge.WasPressedThisFrame())

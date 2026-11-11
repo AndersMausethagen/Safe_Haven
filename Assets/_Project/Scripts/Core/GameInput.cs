@@ -50,6 +50,8 @@ public static class GameInput
     public static InputAction Ping => Find("Player/Ping");
     /// <summary>Whistle for a horse of yours (HorseWhistle).</summary>
     public static InputAction Whistle => Find("Player/Whistle");
+    /// <summary>In the saddle: the horse rears and strikes out ahead (PlayerRiding).</summary>
+    public static InputAction HorseKick => Find("Player/HorseKick");
 
     /// <summary>The action that casts skill bar slot <paramref name="slot"/> (0-based).</summary>
     public static InputAction Skill(int slot) => Find(SkillPaths[slot]);

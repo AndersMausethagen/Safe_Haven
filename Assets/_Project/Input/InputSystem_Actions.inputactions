@@ -268,6 +268,15 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "HorseKick",
+                    "type": "Button",
+                    "id": "1aafcc1b-5201-46fc-92b2-1d4fbf533efa",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "Whistle",
                     "type": "Button",
                     "id": "b2c4915f-6b5b-40a0-a295-d2e75ce64c6f",
@@ -935,6 +944,17 @@
                     "processors": "",
                     "groups": "Keyboard&Mouse",
                     "action": "Ping",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "7dfdd621-0f77-425c-aa42-8f9869921537",
+                    "path": "<Keyboard>/r",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "HorseKick",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

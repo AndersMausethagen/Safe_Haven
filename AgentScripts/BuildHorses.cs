@@ -86,11 +86,12 @@ public static class BuildHorses
         string stable = Stable();
         string journal = JournalPage();
         string rider = RiderLayer();
+        string monsters = MonsterReactions();
 
         AssetDatabase.SaveAssets();
         Load<ContentDatabase>("Assets/_Project/Resources/ContentDatabase.asset").CollectAll();
         AssetDatabase.SaveAssets();
-        return $"horses {wildPrefab.name} + {toxicPrefab.name} (seat {wildPrefab.Seat.name}), {controller.name}, gaits {lastGaits} m/s; {stable}; {journal}; {rider}{report}";
+        return $"horses {wildPrefab.name} + {toxicPrefab.name} (seat {wildPrefab.Seat.name}), {controller.name}, gaits {lastGaits} m/s; {stable}; {journal}; {rider}; {monsters}{report}";
     }
 
     // ----- The model and its clips -----
@@ -399,6 +400,36 @@ public static class BuildHorses
         transition.AddCondition(when ? AnimatorConditionMode.If : AnimatorConditionMode.IfNot, 0f, parameter);
         transition.hasExitTime = false;
         transition.duration = seconds;
+    }
+
+    // ----- Monsters and horses -----
+
+    // Wolves go for horses first; the dead and the big frighten them (within these metres).
+    private static string MonsterReactions()
+    {
+        (string monster, float hunts, float frightens)[] reactions =
+        {
+            ("ForestBittenWolf", 2.5f, 0f), ("Draug", 1f, 12f), ("BarrowShieldbearer", 1f, 10f), ("OldMossTroll", 1f, 18f),
+        };
+        int set = 0;
+        foreach ((string monster, float hunts, float frightens) in reactions)
+        {
+            var kind = Load<MonsterDefinition>($"Assets/_Project/Data/Monsters/{monster}.asset");
+            if (kind == null)
+            {
+                report += $"; no monster {monster}";
+                continue;
+            }
+
+            var so = new SerializedObject(kind);
+            so.FindProperty("huntsHorses").floatValue = hunts;
+            so.FindProperty("frightensHorses").floatValue = frightens;
+            so.ApplyModifiedPropertiesWithoutUndo();
+            EditorUtility.SetDirty(kind);
+            set++;
+        }
+
+        return $"{set} monsters react to horses";
     }
 
     // ----- The rider (the player's Animator) -----

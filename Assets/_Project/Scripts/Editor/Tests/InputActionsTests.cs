@@ -92,7 +92,7 @@ public sealed class InputActionsTests : InputTestFixture
             (Key.Escape, GameInput.Pause), (Key.F5, GameInput.QuickSave), (Key.F6, GameInput.QuickLoad), (Key.F1, GameInput.CheatMenu),
             (Key.E, GameInput.Advance), (Key.Enter, GameInput.Advance), (Key.Digit3, GameInput.Answer(2)),
             (Key.LeftShift, GameInput.SplitModifier), (Key.LeftCtrl, GameInput.DiscardModifier), (Key.Y, GameInput.Ping),
-            (Key.X, GameInput.Whistle),
+            (Key.X, GameInput.Whistle), (Key.R, GameInput.HorseKick),
         };
 
         foreach ((Key key, InputAction action) in cases)

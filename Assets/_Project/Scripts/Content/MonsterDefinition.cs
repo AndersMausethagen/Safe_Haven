@@ -59,6 +59,11 @@ public sealed class MonsterDefinition : ScriptableObject, ICombatSounds
     [SerializeField, Min(0f)] private float hearing = 1f;
     [Tooltip("Multiplies how quickly a glimpse turns into spotting you. Above 1 = watchful, below 1 = dull.")]
     [SerializeField, Min(0f)] private float alertness = 1f;
+    [Tooltip("It hunts horses first (wolves): a horse is noticed this many times as fast as anyone else. 1 = no preference.")]
+    [SerializeField, Min(1f)] private float huntsHorses = 1f;
+    [Tooltip("Horses shy from it (draugr, trolls): within this many metres, a horse that isn't brave, very fond of its rider or " +
+             "barded panics. 0 = horses don't mind it.")]
+    [SerializeField, Min(0f)] private float frightensHorses;
 
     [Header("Composable combat")]
     [Tooltip("Empty keeps the original single attack above. Otherwise these actions replace it.")]
@@ -174,6 +179,8 @@ public sealed class MonsterDefinition : ScriptableObject, ICombatSounds
     public float CloseSenseRange => closeSenseRange;
     public float Hearing => hearing;
     public float Alertness => alertness;
+    public float HuntsHorses => huntsHorses;
+    public float FrightensHorses => frightensHorses;
     public Sprite Portrait => portrait;
     public string JournalLore => journalLore;
     public string JournalAdvice => journalAdvice;

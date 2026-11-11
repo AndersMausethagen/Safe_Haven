@@ -407,8 +407,9 @@ public sealed partial class PlayerCombat
 
         damage = SilentTakedown(target, pending, damage);
         technique |= HitTechnique.Melee;
+        // A charge: at a gallop the blow knocks the struck off their feet.
         AttackResolver.Apply(combatant, pending.Attack, pending.WeaponDamage, pending.Hit, pending.Origin, pending.Direction, damage,
-            pending.Poise, technique, critical);
+            pending.Poise * PlayerRiding.ChargePoise(gameObject), technique, critical);
         if (backstab)
         {
             Backstabbed?.Invoke(target);

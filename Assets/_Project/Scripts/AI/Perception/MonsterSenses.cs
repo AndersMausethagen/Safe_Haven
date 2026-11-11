@@ -76,6 +76,12 @@ public sealed class MonsterSenses
             float distance = flat.magnitude;
             float angle = distance > 0.01f ? Vector3.Angle(self.forward, flat) : 0f;
             float rate = PerceptionRules.NoticeRate(distance, angle, senses, VisibilityOf(target), rules, environment);
+            // Wolves and their like go for horses first.
+            if (definition != null && definition.HuntsHorses > 1f && target.TryGetComponent(out Horse _))
+            {
+                rate *= definition.HuntsHorses;
+            }
+
             if (rate <= bestRate)
             {
                 continue;
