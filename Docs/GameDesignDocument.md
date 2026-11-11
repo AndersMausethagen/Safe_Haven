@@ -441,7 +441,7 @@ Use responsive, isometric/top-down 3D movement and directional attacks, broadly 
 | Move               | WASD / left stick   | 360-degree traversal                |
 | Aim                | Mouse / right stick | Attack and ability direction        |
 | Basic attack       | Left mouse          | Main weapon sequence                |
-| Weapon art         | Middle mouse        | Weapon-specific identity, paid with Focus (right mouse is the guard) |
+| Weapon art         | Middle mouse        | Weapon-specific identity, paid with Focus, or with stamina when Focus is short (also right then left mouse) |
 | Dodge              | Space               | Timed avoidance with cooldown       |
 | Active skills      | Q, E, R             | Equipped abilities and boss rewards |
 | Interact / harvest | F                   | Gather, speak, rescue, activate     |

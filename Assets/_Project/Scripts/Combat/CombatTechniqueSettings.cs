@@ -194,6 +194,9 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
     [Tooltip("Seconds Focus holds after the last gain, then how fast it drains away (per second).")]
     [SerializeField, Min(0f)] private float focusHoldSeconds = 10f;
     [SerializeField, Min(0f)] private float focusDrainPerSecond = 4f;
+    [Tooltip("Stamina a weapon art (guard then attack, or the middle button) costs instead when Focus is short of its price, " +
+             "so it always comes out. Paid in Focus it costs no stamina: fighting well makes it free.")]
+    [SerializeField, Min(0f)] private float artStaminaWithoutFocus = 30f;
 
     [Header("Eating and drinking (committed healing)")]
     [Tooltip("Seconds eating or drinking takes. Getting hit or dodging stops it, and the food is kept.")]
@@ -310,6 +313,7 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
     public float FocusOnBlock => focusOnBlock;
     public float FocusHoldSeconds => focusHoldSeconds;
     public float FocusDrainPerSecond => focusDrainPerSecond;
+    public float ArtStaminaWithoutFocus => artStaminaWithoutFocus;
     public float EatSeconds => eatSeconds;
     public float EatMoveSpeed => eatMoveSpeed;
     public float HealOverSeconds => healOverSeconds;

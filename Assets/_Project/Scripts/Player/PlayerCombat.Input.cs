@@ -22,8 +22,8 @@ public sealed partial class PlayerCombat
                 return;
             }
 
-            // Without a shield, attacking drops the guard: into the weapon art if Focus pays for it, else into a swing (a
-            // ready counter is spent here).
+            // Without a shield, attacking drops the guard into the weapon art, paid in Focus or else in stamina; a plain
+            // swing only when neither can pay (a ready counter is spent there).
             guard.Lower();
             if (CanAffordArt)
             {
@@ -83,8 +83,12 @@ public sealed partial class PlayerCombat
         return StrikeRules.IsRunningAttack(runningFor, Rules.RushRunSeconds, Vector3.Angle(movement.HorizontalVelocity, movement.AimDirection), Rules.RushRunAngle);
     }
 
+    // Focus pays for the art; short of it, stamina does (Combat Technique Settings › Art Stamina Without Focus). It used to
+    // be Focus alone, and guard-then-attack turned into a plain swing most of the time.
     private bool CanAffordArt => weapon != null && weapon.WeaponArt != null && !weapon.TakesAttackInput
-        && focus != null && focus.CanSpend(weapon.WeaponArtFocus);
+        && (focus == null || focus.CanSpend(weapon.WeaponArtFocus) || stamina == null || stamina.Current >= CostOfArtOnStamina());
+
+    private float CostOfArtOnStamina() => Rules.ArtStaminaWithoutFocus * Mathf.Max(0.1f, 1f + combatant.Stats.Get(StatType.MeleeStaminaCost));
 
     // The middle button: the next arrow with a bow (PlayerArchery), the weapon's art with anything else.
     private void OnArtRequested()
@@ -94,9 +98,9 @@ public sealed partial class PlayerCombat
             return;
         }
 
-        if (focus != null && !focus.CanSpend(weapon.WeaponArtFocus))
+        if (!CanAffordArt)
         {
-            focus.TrySpend(weapon.WeaponArtFocus); // refused: lets the HUD say so
+            if (focus != null) focus.TrySpend(weapon.WeaponArtFocus); // refused: lets the HUD say so
             return;
         }
 

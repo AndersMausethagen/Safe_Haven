@@ -12,7 +12,7 @@ by motion, sound and weight rather than on-screen text.
 | Left mouse / right trigger (tap) | Light swing, starting the moment you press. Pressed again **in time** after a swing lands, the next swing of the weapon's chain |
 | Left mouse (hold) | Held on (0.22 s), the light swing turns into the heavy swing while it still winds up: slow, nearly rooted, hard; breaks poise. You pay only the difference in stamina. Held on further, it waits at the top of its wind-up and charges (up to 0.9 s: +40% damage, +50% poise); letting go strikes |
 | Right mouse / left trigger (hold) | Guard. Raised just before a hit lands: parry |
-| Left mouse while guarding | Shield bash with a shield (off hand); without one it drops the guard into the weapon art if Focus pays for it, else into a swing |
+| Left mouse while guarding | Shield bash with a shield (off hand); without one it drops the guard into the weapon art, paid in Focus or, when Focus is short, in 30 stamina; a plain swing only when neither can pay |
 | Middle mouse | The weapon art (with a bow: next kind of arrow) |
 | Space / south button | Dodge: a quickstep, a roll or a heavy shoulder charge, by how much gear you wear |
 | Using food or drink | Stop and eat: takes a moment, heals over time |
@@ -27,7 +27,7 @@ by motion, sound and weight rather than on-screen text.
   ground marks it, and it is kept until another is clearly nearer the aim. A swing still winding up keeps turning toward it. While the
   aim points well away from it (over 100°) you look and swing where the aim points, so you can always turn on something else. Bows
   have their own target. Options › Gameplay › Focus on Enemy turns it off.
-- **Weapon arts.** Every armed weapon knows a special attack, paid for with Focus and no stamina: sword 30, dagger 25, one-handed
+- **Weapon arts.** Every armed weapon knows a special attack, paid for with Focus and no stamina (short of Focus, it costs 30 stamina instead: Combat Technique Settings › Art Stamina Without Focus): sword 30, dagger 25, one-handed
   axe or club 30, greataxe's whirlwind 40 (all around you), greatsword 35, hammer's ground blow 40 (all around you), spear 30.
 - **Backstab.** An enemy struck from behind (a pale wedge on the ground shows where) takes more if it is open. Staggering, it takes a sure
   critical at 1.75 times the damage, on top of the staggered bonus: that is the best blow there is, so parry, roll behind, strike. Caught in the

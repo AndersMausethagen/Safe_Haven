@@ -164,6 +164,8 @@ public sealed partial class PlayerCombat : MonoBehaviour
     private float pressTime = -1f;
     private ChainPress pressJudge = ChainPress.Late;
     private bool heavyStarted;
+    // The art now starting is paid in stamina, Focus being short.
+    private bool artOnStamina;
     // Stamina already paid for that light swing, taken off the heavy one's cost.
     private float heavyCredit;
     private SwingKind queuedKind;

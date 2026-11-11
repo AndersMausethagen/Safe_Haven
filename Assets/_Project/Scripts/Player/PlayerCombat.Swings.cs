@@ -27,11 +27,13 @@ public sealed partial class PlayerCombat
             case SwingKind.Art:
                 attack = weapon != null ? weapon.WeaponArt : null;
                 technique |= HitTechnique.WeaponArt;
-                // Focus may have run out while it waited in the buffer.
-                if (attack == null || (focus != null && !focus.TrySpend(weapon.WeaponArtFocus)))
+                if (attack == null)
                 {
                     return;
                 }
+
+                // Paid in Focus when there is enough (no stamina then), else in stamina (BaseCostOf).
+                artOnStamina = focus != null && !focus.TrySpend(weapon.WeaponArtFocus);
 
                 break;
             case SwingKind.Rush:
@@ -196,9 +198,14 @@ public sealed partial class PlayerCombat
 
     private float BaseCostOf(SwingKind kind, AttackDefinition attack)
     {
-        if (stamina == null || kind == SwingKind.Art)
+        if (stamina == null)
         {
             return 0f;
+        }
+
+        if (kind == SwingKind.Art)
+        {
+            return artOnStamina ? Rules.ArtStaminaWithoutFocus : 0f;
         }
 
         if (attack != null && attack.StaminaCost >= 0f)
