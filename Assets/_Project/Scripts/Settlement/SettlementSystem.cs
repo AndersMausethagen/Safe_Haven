@@ -36,7 +36,12 @@ public sealed class SettlementSystem : MonoBehaviour, IGameSystem
     {
         if (gameEvent.Kind == GameEventKind.RaidFinished && gameEvent.Outcome == RaidOutcome.Extracted)
         {
-            GameSession.Settlement.RecordExtraction();
+            // Co-op: a raid followed with the host counts for this player's own Haven (its breaches, the ward's strain),
+            // not the copy of the host's they stand in, which the host's next word would undo.
+            if (!HavenVisit.ChangeHome(own => own.RecordExtraction()))
+            {
+                GameSession.Settlement.RecordExtraction();
+            }
         }
     }
 

@@ -43,6 +43,8 @@ public sealed class QuestSceneUse
     public string TargetGuid;
     /// <summary>The component that uses it (a Talkable, a Quest Event Trigger...); null for a prefab override.</summary>
     public Type Component;
+    /// <summary>For a story: the node that uses it (WhenQuestEvent, HasHappenedNode...); null otherwise.</summary>
+    public string StoryNode;
 
     public bool IsScene => AssetPath.EndsWith(".unity", StringComparison.OrdinalIgnoreCase);
 
@@ -384,7 +386,8 @@ public static class QuestSceneIndex
             // A list's first member can be on the "- quest:" line or indented below another member.
             bool orderedOffer = type == typeof(QuestGiver) && reference.Groups[2].Value == "quest" &&
                 (RootFieldAt(document, reference.Index) == "offers" || RootFieldAt(document, reference.Index) == "sideOffers");
-            QuestSceneRole role = type == typeof(StoryScript) ? RoleOfStoryNode(NodeAt(document, reference.Index))
+            string node = type == typeof(StoryScript) ? NodeAt(document, reference.Index) : null;
+            QuestSceneRole role = type == typeof(StoryScript) ? RoleOfStoryNode(node)
                 : topLevel || orderedOffer ? RoleOf(type, reference.Groups[2].Value) : QuestSceneRole.Other;
             uses.Add(new QuestSceneUse
             {
@@ -393,6 +396,7 @@ public static class QuestSceneIndex
                 Role = role,
                 TargetGuid = guid,
                 Component = type,
+                StoryNode = node,
             });
         }
     }

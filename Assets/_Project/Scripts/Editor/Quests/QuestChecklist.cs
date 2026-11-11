@@ -364,7 +364,9 @@ public static class QuestChecklist
         string rewards = quest.DescribeRewards();
         checks.Add(rewards.Length > 0
             ? new QuestCheck(QuestCheck.State.Done, $"Rewards: {rewards}.")
-            : new QuestCheck(QuestCheck.State.Note, "Gives no rewards (fine for a story step; add some under Rewards otherwise)."));
+            : new QuestCheck(QuestCheck.State.Note, quest.Rank == QuestRank.Haven
+                ? "Gives no rewards: a Haven quest's pay is the job or building it sets up (GDD 17.1)."
+                : "Gives no rewards (fine for a story step; add some under Rewards otherwise)."));
     }
 
     // ---- Fixes

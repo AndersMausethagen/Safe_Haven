@@ -26,11 +26,13 @@ public sealed class WaitForQuietNode : StoryNode
     public override string Title => "Wait For Quiet";
     public override string Category => "Flow";
 
-    // Say and Choice do this themselves; this is for what comes without a line: a cutscene, a sound, a monster.
+    // Say and Choice do this themselves; this is for what comes without a line: a cutscene, a sound, a monster. It waits at
+    // most as long as a quest does (Story Pacing › Longest Hold), so a monster nobody can reach can't hold the story for good.
     public override IEnumerator Run(StoryContext context)
     {
         yield return null;
-        while (MonsterAI.AnyHuntingPlayerSide() || context.IsCatchingBreath)
+        float giveUpAt = Time.time + StoryPacingSettings.Current.LongestHoldSeconds;
+        while ((MonsterAI.AnyHuntingPlayerSide() || context.IsCatchingBreath) && Time.time < giveUpAt)
         {
             yield return null;
         }

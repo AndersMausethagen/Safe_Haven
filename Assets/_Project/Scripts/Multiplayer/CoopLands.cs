@@ -8,11 +8,14 @@ using Unity.Netcode;
 /// fishing there), a place found in a held region, a rot's heart burned on the host's run (once a run, however many burn it).
 /// The result comes back to everyone with the settlement. Lighting stones and standing watch are the host's; friends fight
 /// beside them, and the watch's creatures are the host's like any other (<see cref="CreatureHost"/>).
+/// It carries the guest's help for the host's Haven from a shared raid too (<see cref="HavenHelp"/>): a breach source struck,
+/// one of the host's lost led home.
 /// Plain C#: <see cref="CoopSession"/> owns the connection.
 /// </summary>
 public sealed class CoopLands : ICoopPart
 {
     private const string WorkMessage = "SafeHaven.LandWork";
+    private const string HelpMessage = "SafeHaven.HavenHelp";
 
     private CoopLink link;
 
@@ -22,10 +25,12 @@ public sealed class CoopLands : ICoopPart
         if (link.IsHost)
         {
             link.On(WorkMessage, OnWork);
+            link.On(HelpMessage, OnHelp);
         }
         else
         {
             Territory.ForHost = Send;
+            HavenHelp.ForHost = SendHelp;
         }
     }
 
@@ -38,6 +43,11 @@ public sealed class CoopLands : ICoopPart
         if (Territory.ForHost == (System.Action<LandWork, string, int>)Send)
         {
             Territory.ForHost = null;
+        }
+
+        if (HavenHelp.ForHost == (System.Action<HavenHelpKind, string, float, float, int>)SendHelp)
+        {
+            HavenHelp.ForHost = null;
         }
 
         link = null;
@@ -63,6 +73,45 @@ public sealed class CoopLands : ICoopPart
     {
         Read(reader, out LandWork work, out string region, out int detail);
         Territory.FromFriend(work, region, detail, NetworkPlayerAvatar.NameOf(sender));
+    }
+
+    private void SendHelp(HavenHelpKind kind, string id, float share, float most, int run)
+    {
+        if (link == null)
+        {
+            return;
+        }
+
+        using FastBufferWriter writer = CoopLink.Writer(128);
+        WriteHelp(writer, kind, id, share, most, run);
+        link.ToHost(HelpMessage, writer);
+    }
+
+    private void OnHelp(ulong sender, FastBufferReader reader)
+    {
+        ReadHelp(reader, out HavenHelpKind kind, out string id, out float share, out float most, out int run);
+        HavenHelp.FromFriend(kind, id, share, most, run, NetworkPlayerAvatar.NameOf(sender), UnityEngine.Resources.Load<ContentDatabase>(ContentDatabase.ResourceName));
+    }
+
+    /// <summary>The help message: what, who (a resident's id), the share and most a breach loses, and the run.</summary>
+    public static void WriteHelp(FastBufferWriter writer, HavenHelpKind kind, string id, float share, float most, int run)
+    {
+        writer.WriteValueSafe((byte)kind);
+        writer.WriteValueSafe(new FixedString64Bytes(id ?? string.Empty));
+        writer.WriteValueSafe(share);
+        writer.WriteValueSafe(most);
+        writer.WriteValueSafe(run);
+    }
+
+    public static void ReadHelp(FastBufferReader reader, out HavenHelpKind kind, out string id, out float share, out float most, out int run)
+    {
+        reader.ReadValueSafe(out byte what);
+        reader.ReadValueSafe(out FixedString64Bytes who);
+        reader.ReadValueSafe(out share);
+        reader.ReadValueSafe(out most);
+        reader.ReadValueSafe(out run);
+        kind = (HavenHelpKind)what;
+        id = who.ToString();
     }
 
     /// <summary>The message: what was done, where, and the task's kind or the run.</summary>

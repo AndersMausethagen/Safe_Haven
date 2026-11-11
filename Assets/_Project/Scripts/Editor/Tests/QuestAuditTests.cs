@@ -29,6 +29,12 @@ public sealed class QuestAuditTests
     }
 
     [Test]
+    public void NoStory_WaitsForWhatHappensInAnotherScene()
+    {
+        CollectionAssert.IsEmpty(QuestAudit.MissedInAnotherScene());
+    }
+
+    [Test]
     public void EveryPortalMoment_HasAStoryToPlay()
     {
         CollectionAssert.IsEmpty(QuestAudit.SilentPortalMoments());

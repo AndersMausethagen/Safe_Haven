@@ -79,6 +79,33 @@ public static class QuestAudit
     }
 
     /// <summary>
+    /// Stories that wait live for a Quest Event (When Story Event) that is only ever raised in another scene: it happens while
+    /// the story isn't loaded, so a once-only story never plays. Ask whether it has happened (Has It Happened?), or start the
+    /// story some other way. Raisers that aren't in a scene (a quest, a prefab, the game's own settings) may run anywhere.
+    /// </summary>
+    public static List<string> MissedInAnotherScene()
+    {
+        List<QuestDefinition> quests = Quests();
+        var found = new List<string>();
+        foreach (string guid in AssetDatabase.FindAssets("t:GameEventDefinition"))
+        {
+            var gameEvent = AssetDatabase.LoadAssetAtPath<GameEventDefinition>(AssetDatabase.GUIDToAssetPath(guid));
+            List<QuestSceneUse> uses = QuestSceneIndex.UsesOf(gameEvent);
+            List<QuestSceneUse> raisers = uses.Where(u => u.Role == QuestSceneRole.Raises || u.Role == QuestSceneRole.Other || u.Role == QuestSceneRole.PrefabOverride).ToList();
+            bool raisedAnywhere = raisers.Any(u => !u.IsScene) || quests.Any(q => q.CompletionEvent == gameEvent || q.OnStarted.Contains(gameEvent) || q.OnCompleted.Contains(gameEvent));
+            foreach (QuestSceneUse live in uses.Where(u => u.StoryNode == nameof(WhenQuestEvent) && u.IsScene))
+            {
+                if (!raisedAnywhere && raisers.Count > 0 && raisers.All(r => r.AssetPath != live.AssetPath))
+                {
+                    found.Add($"{live.Describe()} waits live for {gameEvent.name}, which is only raised in {string.Join(", ", raisers.Select(r => Path.GetFileNameWithoutExtension(r.AssetPath)).Distinct())}");
+                }
+            }
+        }
+
+        return found;
+    }
+
+    /// <summary>
     /// Portal whispers whose moment no story listens for. Using the portal during the quest raises the moment instead of
     /// opening the menu (HomePortal), so with no story to play it the click does nothing, once.
     /// </summary>

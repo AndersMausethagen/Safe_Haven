@@ -118,7 +118,8 @@ public sealed class RaidCompanions
 
         GameObject player = raid.Player;
         bool close = player != null && Vector3.Distance(player.transform.position, LostOne.transform.position) <= SettlementSettings.Current.FoundComesHomeWithin;
-        if (extracted && close && !LostOne.IsLost && !LostOne.IsDowned && GameSession.Settlement.FindAgain(LostOne.Resident))
+        // Co-op: a guest leads the host's lost home to the host's Haven (HavenHelp).
+        if (extracted && close && !LostOne.IsLost && !LostOne.IsDowned && HavenHelp.FoundAgain(LostOne.Resident))
         {
             report.FoundAgain = LostOne.Resident;
         }

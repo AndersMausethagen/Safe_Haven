@@ -455,6 +455,19 @@ followed with the host everything counts. Arriving anywhere recounts Count Alrea
 only ever adding), so a quest begun on a raid or in a friend's Haven sees the player's own buildings once home. A new
 objective type must be given a rule (`QuestCoopTests`).
 
+**Beyond quests: a guest's settlement is a mirror.** In a guest's game `GameSession.Settlement` is the host's, taken on every
+couple of seconds, so a change made to it there is quietly undone. Anything a visitor (or a follower on the host's raid)
+earns or does must go where it belongs (2026-11-11 sweep, `CoopHomeTests`):
+- **Theirs: to their own Haven**, the game kept as home (`HavenVisit.ChangeHome`, which reads it into a `SettlementState`, runs
+  the change by the usual rules and writes it back; also `RescuedHome`, `SpiritGiftHome`, `BossBeatenHome`): an extraction
+  (their Haven's breaches come by extractions), the Huldra's respect, a rescue, the Nøkk's air, a boss.
+- **The host's: to the host's game**, which applies it and sends the result back with the settlement: the lands
+  (`Territory.ForHost`/`FromFriend`), a breach source struck and one of the host's lost led home (`HavenHelp`), both carried by
+  `CoopLands`, once a run where every player has the same rumour.
+- **Neither: refused** (`HavenVisit.LeftToHost`): jobs, trades, the portal and ward, lighting stones.
+
+A new system that changes the settlement from something a guest can do needs one of the three.
+
 ### Who raises which game event
 
 | Event | Raised by |

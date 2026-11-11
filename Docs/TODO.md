@@ -19,13 +19,17 @@ game's inventory.
 
 QuestAudit and QuestAuditTests now check every quest, story, gate and portal moment. Fixed: Strength for the Road waited
 on a removed Drinking Spot; the Road North finished before its conversation; wrong counts and names in two descriptions;
-21 quests without journal notes. Co-op: one rule per objective type (ARCHITECTURE.md › Quests in co-op).
-- [ ] Haven quests are meant to pay "with something the next raid needs" (GDD §17.1), but 15 of them pay nothing (the jobs
-      and buildings, Safe Keeping, Raise the Walls, Heavy Loads...). Choose rewards, or say in the GDD that the job is the pay.
+21 quests without journal notes. Co-op: one rule per objective type (ARCHITECTURE.md › Quests in co-op). Across
+systems: four co-op leaks (a guest's extraction, the Huldra's respect, a struck breach source, the host's lost led home)
+went to the guest's copy of the host's settlement and were undone; Wait For Quiet could wait for ever.
+- [x] Haven quests without rewards: the job or building is the pay (the user, 2026-11-11; GDD 17.1 says so).
+- [ ] DefaultVolumeProfile and PC_Renderer reference four volume scripts and URP debug shaders this Unity no longer has
+      (found by the reference scan, 2026-11-11): harmless, but the Console may warn.
 - [ ] The Waking Stone (chain Story Demo) is given only in the StoryDemo scene: keep it as the story graph's example, or
       take it out of the ContentDatabase.
-- [ ] BuildFirstAct and the other story builders remake their stories from nothing: run again, every saved game plays
-      them again. Port BuildHavensReach's Fresh/KeepTriggerIds before running one on a game someone has played.
+- [ ] Story builders that remake their stories reset what saves remember of them. BuildFirstAct and BuildHavensReach keep
+      the ids now (Fresh/KeepTriggerIds); BuildPrologueMeadow, BuildIntroPart3 and BuildHomeStory still don't (the last two
+      are retired).
 - [ ] Saves that already finished the Road North the old way never heard the Heartroot's truth (nobody had, by hand).
 
 ## Holding the land (2026-11-11)

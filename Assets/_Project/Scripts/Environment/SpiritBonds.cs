@@ -74,10 +74,20 @@ public sealed class SpiritBonds : MonoBehaviour
             return;
         }
 
-        SettlementState settlement = GameSession.Settlement;
-        (int respect, int awayUntil, bool leaves) = AfterHuldra(settlement.HuldraRespect, settlement.HuldraAwayUntil, chased,
-            settlement.DaysPassed, respectForGift, awayDays);
-        settlement.SetHuldra(respect, awayUntil);
+        // Her respect is for this player's own Haven: in a friend's, it goes home with them (as the Nøkk's air does).
+        bool leaves = false;
+        void Answer(SettlementState settlement)
+        {
+            (int respect, int awayUntil, bool gift) = AfterHuldra(settlement.HuldraRespect, settlement.HuldraAwayUntil, chased,
+                settlement.DaysPassed, respectForGift, awayDays);
+            settlement.SetHuldra(respect, awayUntil);
+            leaves = gift;
+        }
+
+        if (!HavenVisit.ChangeHome(Answer))
+        {
+            Answer(GameSession.Settlement);
+        }
         if (chased)
         {
             GameMessages.Post("She is gone between the trees, and the woods feel colder for it.");

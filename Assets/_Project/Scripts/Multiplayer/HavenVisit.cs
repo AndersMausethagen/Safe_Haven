@@ -257,6 +257,26 @@ public static class HavenVisit
         return true;
     }
 
+    /// <summary>
+    /// Changes this guest's own Haven (the game kept as home, which saving while visiting and going home both write) by its
+    /// own rules, not the mirror of the host's, which the host's next word would undo: what they earn for their own Haven on a
+    /// visit or a raid followed with the host (an extraction, the Huldra's respect). False when not visiting. A settlement
+    /// read and written again is unchanged (checked on real saves, 2026-11-11).
+    /// </summary>
+    public static bool ChangeHome(System.Action<SettlementState> change)
+    {
+        if (home == null || change == null)
+        {
+            return false;
+        }
+
+        var content = Resources.Load<ContentDatabase>(ContentDatabase.ResourceName);
+        SettlementState own = SaveMapper.SettlementFrom(home.settlement ?? new SettlementSaveData(), content);
+        change(own);
+        home.settlement = SaveMapper.ToData(own);
+        return true;
+    }
+
     /// <summary>Whether this guest's own Haven holds a spirit's gift (what they learnt is theirs, wherever they stand).</summary>
     public static bool HomeHasSpiritGift(string id) =>
         home != null && home.settlement != null && home.settlement.spiritGifts != null && home.settlement.spiritGifts.Contains(id);

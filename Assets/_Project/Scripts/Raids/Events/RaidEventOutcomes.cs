@@ -370,7 +370,8 @@ public sealed class WeakenBreachOutcome : RaidEventOutcome
 
     public override string DisplayName => "Weaken the Next Breach";
 
-    public override void Apply(RaidEventContext context) => GameSession.Settlement.WeakenBreach(share, most);
+    // Co-op: a guest's blow goes to the host's game, whose breach it is (HavenHelp).
+    public override void Apply(RaidEventContext context) => HavenHelp.WeakenBreach(share, most);
 }
 
 /// <summary>Burns the rot's heart behind the forest's push on one of the Haven's lands: the push loses a share (Territory).</summary>
