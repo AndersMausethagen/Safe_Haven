@@ -33,6 +33,8 @@ public sealed class TerrainSurface : MonoBehaviour
         Apply();
     }
 
+    /// <summary>x relief on, y subdivision (the cap is multiplied by it, the screen pixel target divided), z relief range,
+    /// w height-based normals. Balanced draws triangles about 1.5 times as large as Ultra's, over three quarters of the range.</summary>
     public static Vector4 QualityParameters(DetailQuality value)
     {
         switch (value)

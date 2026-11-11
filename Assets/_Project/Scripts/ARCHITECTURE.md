@@ -899,6 +899,7 @@ Measured in the 1 km Haven (editor, 1080p). Far from home, frames took 28–31 m
 - **Nothing tessellated off screen** (`WorldPatchCulled`). Triangles wholly outside the view (the camera's, or a shadow cascade's) get a tessellation factor of 0. So do add-pass triangles where that pass's layers have no paint.
 - **Tree shadows from a lighter level** (`Editor/Environment/TreeShadowProxies`, run by `VegetationPackConverter.Tree`). The two finest LODs stop casting and carry a shadows-only copy of LOD2. The terrain draws these to the shadow map only (checked by tinting them red: no red pixels on screen). `TreeParts` and the interaction outline skip them.
 - **Tessellation target 6 px** (was 4) on the World terrain materials.
+- **Tessellation target 10 px, cap 16** (2026-11-11; was 6 px and 64). From the game camera the pixel target decides the subdivision, not the cap. In the misty woods at 4K (Editor, 8x MSAA) a cap of 64 and of 16 both cost 19.7 ms of GPU a frame, and 10 px cost 17.2 ms with no visible change. The ground was about 10 ms of the frame, tessellation about 6.5 ms of that. Terrain Detail's lower steps divide the pixel target by `_TerrainDetailQuality.y` as well as scaling the cap. Scaling only the cap left Balanced costing the same as Ultra (21.9 vs 21.8 ms). Afterwards, relief cost over Off went from 8.3 to 5.5 ms on Ultra and from 8.4 to 3.7 ms on Balanced; Low stayed at almost nothing.
 
 Result: the woods went from 28–31 ms to 13–18 ms, and home from 13.3 ms to 12.3 ms.
 

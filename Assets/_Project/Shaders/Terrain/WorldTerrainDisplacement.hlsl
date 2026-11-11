@@ -338,7 +338,9 @@ float WorldEdgeFactor(float3 a, float3 b)
     float projectedPixels = edgeMetres * abs(UNITY_MATRIX_P._m11) * _ScreenParams.y * 0.5;
     projectedPixels /= unity_OrthoParams.w > 0.5 ? 1 : distanceToCamera;
     float desired = edgeMetres / max(_TessellationEdgeLength, 0.005);
-    if (_TessellationPixels > 0) desired = min(desired, projectedPixels / _TessellationPixels);
+    // The pixel target, not the cap, is what decides the subdivision from the game camera (measured 2026-11-11: a cap of
+    // 64 and of 16 cost the same), so a lower Terrain Detail coarsens the target too: Ultra's 10 px becomes about 15.
+    if (_TessellationPixels > 0) desired = min(desired, projectedPixels / (_TessellationPixels / max(_TerrainDetailQuality.y, 0.05)));
     float factor = clamp(desired, 1.0, max(_TessellationFactor * _TerrainDetailQuality.y, 1.0));
     float displaces = max(max(step(0.0001, _DisplacementStrength), _FootprintSettings.w) * step(0.5, _DisplacementLayerCount),
                           step(0.0001, _CliffDisplacement * _CliffStrength));

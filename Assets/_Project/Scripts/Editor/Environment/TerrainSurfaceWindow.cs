@@ -68,6 +68,7 @@ public sealed class TerrainSurfaceWindow : EditorWindow
         Slider(material, "_DisplacementStrength", "Height Range (metres)", 0, 1);
         Slider(material, "_DisplacementNear", "Full Detail Distance", 0, 100);
         Slider(material, "_DisplacementFar", "Fade Distance", material.GetFloat("_DisplacementNear") + 0.1f, 200);
+        // From the game camera the screen edge limit decides the subdivision long before this cap does; 16 is plenty.
         Slider(material, "_TessellationFactor", "Maximum Subdivision", 1, 64);
         Slider(material, "_TessellationEdgeLength", "Target Edge Length (metres)", 0.005f, 0.2f);
         Slider(material, "_TessellationPixels", "Screen Edge Limit (pixels, 0 off)", 0, 32);
@@ -97,7 +98,7 @@ public sealed class TerrainSurfaceWindow : EditorWindow
         EditorGUILayout.LabelField("Quality Presets (keep height and layer settings)", EditorStyles.boldLabel);
         EditorGUILayout.BeginHorizontal();
         if (GUILayout.Button("Balanced")) Preset(material, 16, 0.04f, 12, 35);
-        if (GUILayout.Button("Maximum")) Preset(material, 64, 0.015f, 20, 50);
+        if (GUILayout.Button("Maximum")) Preset(material, 16, 0.015f, 20, 50);
         EditorGUILayout.EndHorizontal();
 
         EditorGUILayout.LabelField("Height Sources and Per-Layer Shape", EditorStyles.boldLabel);
@@ -208,8 +209,9 @@ public sealed class TerrainSurfaceWindow : EditorWindow
         material.SetFloat("_DisplacementNear", near);
         material.SetFloat("_DisplacementFar", far);
         // Triangles smaller than this many pixels show no more detail, only cost: about 9 ms of GPU at 1080p was spent
-        // on 1-pixel triangles round the Haven with this at 0 (see LevelDesign.md); 6 rather than 4 since the 1 km Haven.
-        material.SetFloat("_TessellationPixels", 6);
+        // on 1-pixel triangles round the Haven with this at 0 (see LevelDesign.md). 10 since 2026-11-11: it looked the same as
+        // 6 from the game camera and saved about 2.5 ms of GPU at 4K in the misty woods.
+        material.SetFloat("_TessellationPixels", 10);
         EditorUtility.SetDirty(material);
         terrain.GetComponent<TerrainSurface>().SetQuality(TerrainSurface.DetailQuality.Ultra);
         SceneView.RepaintAll();
