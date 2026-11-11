@@ -14,7 +14,10 @@ public sealed class MinimapTests
         Assert.IsNotNull(settings.Material);
         Assert.AreEqual("Safe Haven/UI/Minimap", settings.Material.shader.name);
         Assert.IsTrue(settings.Material.shader.isSupported);
-        Assert.Less(settings.NearReach, settings.FarReach);
+        float[] reaches = GameOptions.MinimapReaches;
+        Assert.AreEqual(GameOptions.MinimapDistance.Choices.Length, reaches.Length, "a reach for every Minimap Distance");
+        for (int i = 2; i < reaches.Length; i++) Assert.Less(reaches[i - 1], reaches[i], "each step reaches further");
+        Assert.Greater(reaches[(int)GameOptions.MinimapDistance.Default], 28f, "the default reaches further than the old 28 m");
     }
 
     [Test]

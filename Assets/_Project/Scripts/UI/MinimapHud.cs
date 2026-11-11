@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 /// <summary>
@@ -15,14 +16,10 @@ using UnityEngine.UI;
 /// </summary>
 public sealed class MinimapHud : MonoBehaviour
 {
-    private const string ZoomKey = "Minimap.Zoom.v2";
     private const float Margin = 26f;
     private const float RefreshSeconds = 0.25f;
     private const float ZoomSpeed = 8f;
     private const float RimInset = 7f;
-    private const int Far = 1;
-    private const int Hidden = 2;
-    private const int ZoomSteps = 3;
 
     private static readonly int CentreId = Shader.PropertyToID("_Centre");
     private static readonly int SpanId = Shader.PropertyToID("_Span");
@@ -59,7 +56,6 @@ public sealed class MinimapHud : MonoBehaviour
     private Sprite pointer;
     private Rect area;
     private int used;
-    private int zoom;
     private float reach;
     private float turn;
     private float nextRefresh;
@@ -95,12 +91,8 @@ public sealed class MinimapHud : MonoBehaviour
         return hud;
     }
 
-    /// <summary>Close in, zoomed out, hidden, and round again. Remembered between sessions.</summary>
-    public void CycleZoom()
-    {
-        zoom = (zoom + 1) % ZoomSteps;
-        SaveZoom();
-    }
+    /// <summary>True while the pointer is over the shown minimap: the mouse wheel there sets its distance, not the camera's.</summary>
+    public static bool TakesWheel { get; private set; }
 
     /// <summary>Where a world offset from the player lies on a map turned this far (radians), in map units at this scale.</summary>
     public static Vector2 Project(Vector3 offset, float turn, float unitsPerMetre)
@@ -108,18 +100,6 @@ public sealed class MinimapHud : MonoBehaviour
         float sine = Mathf.Sin(turn);
         float cosine = Mathf.Cos(turn);
         return new Vector2(offset.x * cosine - offset.z * sine, offset.x * sine + offset.z * cosine) * unitsPerMetre;
-    }
-
-    private void SaveZoom()
-    {
-        try
-        {
-            PlayerPrefs.SetInt(ZoomKey, zoom);
-        }
-        catch (PlayerPrefsException exception)
-        {
-            Debug.LogWarning(exception.Message);
-        }
     }
 
     private void OnEnable() => Current = this;
@@ -154,7 +134,6 @@ public sealed class MinimapHud : MonoBehaviour
     {
         settings = MinimapSettings.Current;
         UIStyle style = UIStyle.Current;
-        zoom = Mathf.Clamp(PlayerPrefs.GetInt(ZoomKey, 0), 0, ZoomSteps - 1);
         reach = TargetReach;
         dot = MakeSprite(Round);
         pointer = MakeSprite(Arrowhead);
@@ -226,17 +205,30 @@ public sealed class MinimapHud : MonoBehaviour
         });
     }
 
-    private float TargetReach => zoom == Far ? settings.FarReach : settings.NearReach;
+    // The player's Minimap Distance (Options › Gameplay; the wheel over the map). It was a fixed 28 m, too close.
+    private static float TargetReach => GameOptions.MinimapReaches[Mathf.Clamp(GameOptions.MinimapDistance.Index, 0, GameOptions.MinimapReaches.Length - 1)];
 
     private void LateUpdate()
     {
         Player player = Player.Current;
         bool windows = UIStateManager.Current != null && UIStateManager.Current.IsAnyWindowOpen;
-        bool shown = painted && player != null && zoom != Hidden && !windows && !WorldMapHud.IsOpen && !GamePause.IsPaused;
+        bool shown = painted && player != null && TargetReach > 0f && !windows && !WorldMapHud.IsOpen && !GamePause.IsPaused;
         group.alpha = shown ? 1f : 0f;
+        TakesWheel = shown && Mouse.current != null && RectTransformUtility.RectangleContainsScreenPoint(disc, Mouse.current.position.ReadValue(), null);
         if (!shown)
         {
             return;
+        }
+
+        if (TakesWheel)
+        {
+            float wheel = Mouse.current.scroll.ReadValue().y;
+            if (Mathf.Abs(wheel) > 0.01f)
+            {
+                // Up comes closer; never down to Hidden from the wheel (the option can hide it).
+                int index = Mathf.Clamp(GameOptions.MinimapDistance.Index - (int)Mathf.Sign(wheel), 1, GameOptions.MinimapReaches.Length - 1);
+                GameOptions.MinimapDistance.Value = index;
+            }
         }
 
         bool onRaid = RaidDirector.Current != null;

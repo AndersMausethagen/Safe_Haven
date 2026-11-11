@@ -18,8 +18,13 @@ public static class GameOptions
         "In a melee fight you face the enemy you are fighting and your swings follow it. Off, you always face the cursor.", true);
     public static readonly GameOption PoiseBars = GameOption.Toggle("PoiseBars", "Poise Bars", "A thin bar under an enemy's health: when it runs out, the enemy staggers.", true);
     public static readonly GameOption Blood = GameOption.Toggle("Blood", "Blood", "Blood from blows, and the stains it leaves.", true);
+    public static readonly GameOption MinimapDistance = GameOption.Choice("MinimapDistance", "Minimap Distance",
+        "How far around you the minimap reaches. The mouse wheel over the minimap changes it too.", 2, "Hidden", "30 m", "50 m", "75 m", "110 m");
 
-    public static readonly IReadOnlyList<GameOption> Gameplay = new[] { DamageNumbers, AutoGather, ToggleSneak, FocusTarget, PoiseBars, Blood };
+    public static readonly IReadOnlyList<GameOption> Gameplay = new[] { DamageNumbers, AutoGather, ToggleSneak, FocusTarget, PoiseBars, Blood, MinimapDistance };
+
+    /// <summary>The minimap's reach in metres for each Minimap Distance (0 for Hidden).</summary>
+    public static readonly float[] MinimapReaches = { 0f, 30f, 50f, 75f, 110f };
 
     // ----- Graphics: picture -----
 

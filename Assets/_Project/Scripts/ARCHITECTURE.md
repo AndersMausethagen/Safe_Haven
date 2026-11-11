@@ -1933,7 +1933,7 @@ Bodies come from CC0 models in `Art/Enemies/Downloaded` (`CREDITS.md` says whose
 - **Markers** are read four times a second and placed every frame, from the lists the game already keeps (`BuildingObject.Active`, `Transport.All`, `DroppedItem.All`, `ExtractionPoint.Active`, `Companion.Active`, `QuestWaypoint.Active`, `WardBreachDirector`). What hasn't been explored isn't marked. Quests and breach lanes stay pinned to the rim when out of reach.
 - **`MinimapHud.Project`** is the one place a world offset becomes a spot on the map; the shader does the same turn the other way round. Up is where the camera looks.
 - **M** (`GameInput.WorldMap`) opens the full explored world map, and M or Esc closes it. It shows at once, reusing the minimap's painted ground (`MinimapHud.PaintedMap`) instead of painting its own. The corner minimap keeps its close-range markers and hides while the world map is open.
-  Sizes and reaches: `Resources/MinimapSettings`.
+  Sizes: `Resources/MinimapSettings`. Its reach is the player's Minimap Distance (Options › Gameplay, `GameOptions.MinimapReaches`: hidden, 30, 50, 75 or 110 m, 50 by default); the mouse wheel over the map steps it, and the camera ignores the wheel there (`MinimapHud.TakesWheel`).
 - **Regions and named places (the Haven):** `WorldAtlas` (`Resources/Atlases/<scene name>`, so a scene without one has none: raids
   are laid out anew each time) holds a 512² grid of region indices over the terrain, each region's name and where to write it,
   and the named places. The world map draws the borders as one texture (a line where a cell's region differs from its east or

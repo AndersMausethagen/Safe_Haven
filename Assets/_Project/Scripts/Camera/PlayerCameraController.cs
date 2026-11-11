@@ -395,8 +395,8 @@ public sealed class PlayerCameraController : MonoBehaviour
         }
 
         float scroll = zoomAction.ReadValue<float>();
-        // While placing a building the wheel rotates the building instead.
-        if (Mathf.Abs(scroll) > 0.01f && !BuildPlacer.IsBusy)
+        // While placing a building the wheel rotates the building instead; over the minimap it sets the map's distance.
+        if (Mathf.Abs(scroll) > 0.01f && !BuildPlacer.IsBusy && !MinimapHud.TakesWheel)
         {
             // Direction only: scroll magnitudes differ between platforms and devices.
             zoomTarget = Mathf.Clamp01(zoomTarget - Mathf.Sign(scroll) * settings.ZoomStep);

@@ -13,10 +13,6 @@ public sealed class MinimapSettings : GameSettings<MinimapSettings>
     [SerializeField, Range(128, 1024)] private int mapSize = 512;
     [Tooltip("The map's size on screen, in UI units.")]
     [SerializeField, Min(80f)] private float size = 236f;
-    [Tooltip("Metres from the player to the edge, close in.")]
-    [SerializeField, Min(10f)] private float nearReach = 28f;
-    [Tooltip("Metres from the player to the edge, zoomed out.")]
-    [SerializeField, Min(10f)] private float farReach = 105f;
     [Tooltip("How far off a creature shows by day, in metres. Breach attackers always show.")]
     [SerializeField, Min(0f)] private float creatureSight = 24f;
     [Tooltip("How far off a creature shows in the dark of night: the map knows no more than the player sees.")]
@@ -29,8 +25,6 @@ public sealed class MinimapSettings : GameSettings<MinimapSettings>
     public Shader WorldMapShader => worldMapShader;
     public int MapSize => mapSize;
     public float Size => size;
-    public float NearReach => nearReach;
-    public float FarReach => farReach;
     public float BlockedShade => blockedShade;
     public Color Water => water;
 
