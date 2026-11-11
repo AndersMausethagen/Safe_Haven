@@ -3,7 +3,8 @@ using UnityEngine;
 /// <summary>
 /// The whistle (X): the player whistles, and the nearest of their horses that hears it comes at a canter: one whose bond
 /// is at least HorseSettings › Whistle Bond, within a reach that grows with the bond (HorseBondRules). A stabled horse, a
-/// ridden one or one on a rope stays where it is. Lives for the whole game, made by itself.
+/// ridden one or one on a rope stays where it is. In the saddle the same key gets the player down (PlayerRiding), and that
+/// press doesn't whistle. Lives for the whole game, made by itself.
 /// </summary>
 public sealed class HorseWhistle : MonoBehaviour
 {
@@ -32,7 +33,8 @@ public sealed class HorseWhistle : MonoBehaviour
         }
 
         Player player = Player.Current;
-        if (player == null || (player.TryGetComponent(out PlayerRiding riding) && (riding.IsRiding || riding.IsHoldingRope)))
+        if (player == null || (player.TryGetComponent(out PlayerRiding riding)
+                && (riding.IsRiding || riding.IsHoldingRope || riding.IsMounting || Time.frameCount - riding.LeftSaddleFrame <= 1)))
         {
             return;
         }

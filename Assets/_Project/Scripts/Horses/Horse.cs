@@ -568,7 +568,7 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold
         var riding = PlayerRiding.For(user);
         ItemInventory items = user.GetComponent<ItemInventory>();
         bool visiting = HavenVisit.IsVisiting;
-        page.Add(new MenuAction("Ride", !IsGrown ? "Too young to ride" : IsStabled ? "Lead it out first" : "Space gallops, on its stamina. E gets you down.",
+        page.Add(new MenuAction("Ride", !IsGrown ? "Too young to ride" : IsStabled ? "Lead it out first" : $"Space gallops, on its stamina. {GameInput.KeyLabel(GameInput.Whistle)} gets you down.",
             riding != null && Rider == null && !visiting && IsGrown && !IsStabled, () => riding.Mount(this), closesMenu: true));
         page.Add(new MenuAction("Feed it", "Barley, a turnip or bread from your bag", items != null && !visiting, () => Feed(items)));
         page.Add(new MenuAction("Groom it", PlantedTrees.Today - LastGroomed < 1f ? "Groomed today" : "Once a day, for its bond", !visiting, Groom));

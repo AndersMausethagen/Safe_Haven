@@ -6,7 +6,8 @@ using UnityEngine.AI;
 /// The player's side of horses: holding a lassoed one (feet planted, facing it, hands on the rope, so no swing or other
 /// interaction gets in the way) and riding one. In the saddle the player sits on the horse's back (PlayerMovement's seat,
 /// as in a boat) and steers it with the movement keys, relative to the camera as walking is; Space gallops while the
-/// horse has the stamina, the sneak key walks it, and E gets down (or, on a breaking ride, gives the barley it asks for).
+/// horse has the stamina, the sneak key walks it, and the whistle key (X) gets down. E is the breaking ride's alone (the
+/// barley it asks for), so feeding it never throws the player off by mistake.
 /// On a horse of their own the player fights from the saddle: their weapon swings and their bow draws as on foot
 /// (PlayerStateMachine › CanFightAboard), the pack's rider clips show it (PlayerRidingAnimation), and Horsemanship's
 /// Mounted Damage adds to it. Getting on is only from beside the horse: it turns its side to the player, who steps to its
@@ -26,6 +27,10 @@ public sealed class PlayerRiding : MonoBehaviour
     private PlayerRidingAnimation body;
     private Coroutine moving;
     private bool feetFree;
+    private float nextReminder;
+
+    /// <summary>The frame the player last left the saddle: the same press of X mustn't whistle too (HorseWhistle).</summary>
+    public int LeftSaddleFrame { get; private set; } = -10;
 
     /// <summary>True while getting on or off: no steering, no getting down again.</summary>
     public bool IsMounting => moving != null;
@@ -215,7 +220,7 @@ public sealed class PlayerRiding : MonoBehaviour
         if (!taught && horse.IsTamed)
         {
             taught = true;
-            GameMessages.Post($"Steer with the movement keys. Space gallops while it has the breath, {GameInput.KeyLabel(GameInput.Sneak)} walks it, {GameInput.KeyLabel(GameInput.Interact)} gets you down.");
+            GameMessages.Post($"Steer with the movement keys. Space gallops while it has the breath, {GameInput.KeyLabel(GameInput.Sneak)} walks it, {GameInput.KeyLabel(GameInput.Whistle)} gets you down.");
         }
     }
 
@@ -384,6 +389,7 @@ public sealed class PlayerRiding : MonoBehaviour
 
         Riding = null;
         horse.Rider = null;
+        LeftSaddleFrame = Time.frameCount;
         stateMachine.CanFightAboard = false;
         CountRidden(horse, force: true);
         horse.Motion.EndRidden();
@@ -407,21 +413,29 @@ public sealed class PlayerRiding : MonoBehaviour
             return;
         }
 
-        if (Riding != null)
+        // E in the saddle doesn't get the player down (the whistle key does): a reminder, now and then.
+        if (Riding != null && !IsMounting && Time.time >= nextReminder)
         {
-            if (IsMounting)
-            {
-                return;
-            }
-
-            if (Riding.Motion.IsSwimming)
-            {
-                GameMessages.Post("Not in deep water: ride it to the bank first.", MessageKind.Warning);
-                return;
-            }
-
-            Dismount(thrown: false);
+            nextReminder = Time.time + 6f;
+            GameMessages.Post($"{GameInput.KeyLabel(GameInput.Whistle)} gets you down.", MessageKind.Info);
         }
+    }
+
+    // The whistle key, in the saddle: getting down (from a horse being broken in too, which then bolts).
+    private void TryGetDown()
+    {
+        if (IsMounting)
+        {
+            return;
+        }
+
+        if (Riding.Motion.IsSwimming)
+        {
+            GameMessages.Post("Not in deep water: ride it to the bank first.", MessageKind.Warning);
+            return;
+        }
+
+        Dismount(thrown: false);
     }
 
     // The road ridden: every hundred metres the bond grows and Horsemanship is trained (a kilometre's worth every kilometre).
@@ -490,6 +504,15 @@ public sealed class PlayerRiding : MonoBehaviour
         }
 
         bool free = !GamePause.IsPaused && (UIStateManager.Current == null || !UIStateManager.Current.IsAnyWindowOpen) && !DialogueBox.IsOpen;
+        if (free && GameInput.Whistle != null && GameInput.Whistle.WasPressedThisFrame())
+        {
+            TryGetDown();
+            if (Riding == null || IsMounting)
+            {
+                return;
+            }
+        }
+
         Vector3 steer = free ? movement.MovementInput : Vector3.zero;
         int gait = free && GameInput.Dodge != null && GameInput.Dodge.IsPressed() ? 1
             : free && GameInput.Sneak != null && GameInput.Sneak.IsPressed() ? -1 : 0;

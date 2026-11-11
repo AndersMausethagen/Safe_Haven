@@ -1503,7 +1503,7 @@ public static class BuildHorses
             "On the rope it fights: tap E or left click, and lean away from it with the movement keys (that costs your breath). Tire it " +
             "before the rope slips, then get on its back.\n\n" +
             "Breaking it in, it veers and bucks: steer against it to keep your seat. When it tosses its head, give it barley (E). Fed " +
-            "enough, it is yours.\n\n" +
+            "enough, it is yours. In the saddle, X gets you down (E never does, so feeding can't throw you off).\n\n" +
             "Each horse has its nature: calm, skittish, stubborn or bold. Feed it, groom it once a day and ride it, and it grows fond of " +
             "you: more stamina, less panic, and it comes when you whistle (X). Saddles carry its bags; barding keeps blows off.\n\n" +
             "A Stable keeps horses safe at night and mends them. A mare and a stallion stabled together, both fond of you, may foal. " +
