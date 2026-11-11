@@ -325,7 +325,7 @@ public sealed class VisitorAccess : ICoopPart
             return;
         }
 
-        var question = new FriendAsk(sender, NameOf(sender), right);
+        var question = new FriendAsk(sender, NetworkPlayerAvatar.NameOf(sender), right);
         asks.Add(question);
         GameMessages.Post($"{question.Question} Answer from the Escape menu.");
         AsksChanged?.Invoke();
@@ -390,19 +390,6 @@ public sealed class VisitorAccess : ICoopPart
                 stashUsers.Add(pair.Key);
             }
         }
-    }
-
-    private static string NameOf(ulong clientId)
-    {
-        foreach (NetworkPlayerAvatar avatar in NetworkPlayerAvatar.All)
-        {
-            if (avatar != null && avatar.OwnerClientId == clientId && !string.IsNullOrEmpty(avatar.DisplayName))
-            {
-                return avatar.DisplayName;
-            }
-        }
-
-        return "A friend";
     }
 
     // Same channel as the world and its changes, so everything arrives in the order it was sent.

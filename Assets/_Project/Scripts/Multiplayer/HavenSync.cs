@@ -235,6 +235,7 @@ public sealed class HavenSync : IDisposable
         if (data != null)
         {
             GameSession.Settlement.TakeOn(SaveMapper.SettlementFrom(data, content));
+            Territory.MirrorArrived();
         }
     }
 

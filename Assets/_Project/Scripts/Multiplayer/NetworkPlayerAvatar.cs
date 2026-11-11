@@ -59,6 +59,20 @@ public sealed class NetworkPlayerAvatar : NetworkBehaviour
     /// <summary>Every player in the session, you included.</summary>
     public static IReadOnlyList<NetworkPlayerAvatar> All => all;
 
+    /// <summary>The name a player goes by in the session, or "A friend" before their avatar has arrived.</summary>
+    public static string NameOf(ulong clientId)
+    {
+        foreach (NetworkPlayerAvatar avatar in all)
+        {
+            if (avatar != null && avatar.OwnerClientId == clientId && !string.IsNullOrEmpty(avatar.DisplayName))
+            {
+                return avatar.DisplayName;
+            }
+        }
+
+        return "A friend";
+    }
+
     /// <summary>Raised when a friend arrives or leaves (with their name), for messages and lists.</summary>
     public static event Action<NetworkPlayerAvatar> FriendArrived;
     public static event Action<NetworkPlayerAvatar> FriendLeft;

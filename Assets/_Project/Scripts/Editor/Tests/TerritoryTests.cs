@@ -198,6 +198,132 @@ public sealed class TerritoryTests
         }
     }
 
+    // ----- Co-op: a guest's lands mirror the host's, so what they do goes to the host's game (CoopLands).
+
+    private static void Visiting(bool visiting) => typeof(HavenVisit).GetProperty(nameof(HavenVisit.IsVisiting)).SetValue(null, visiting);
+
+    private static void ForgetBurnedHearts() =>
+        ((System.Collections.Generic.HashSet<int>)typeof(Territory).GetField("burnedOnRuns", BindingFlags.NonPublic | BindingFlags.Static).GetValue(null)).Clear();
+
+    private static void CountTask(string region, RegionTaskKind kind) =>
+        typeof(Territory).GetMethod("Count", BindingFlags.NonPublic | BindingFlags.Static).Invoke(null, new object[] { region, kind });
+
+    [Test]
+    public void AGuest_SendsTheirWorkToTheHost_AndChangesNothingHere()
+    {
+        GameSession.StartNewGame();
+        TerritoryState lands = GameSession.Settlement.Territory;
+        lands.Claim(Region, Settings);
+        while (lands.Incursion == null)
+        {
+            lands.AdvanceTurn(Settings, 0f, Always, out _);
+        }
+
+        float hold = lands.HoldOf(Region);
+        var sent = new System.Collections.Generic.List<(LandWork work, string region, int detail)>();
+        var user = new GameObject("Guest");
+        try
+        {
+            Visiting(true);
+            Territory.ForHost = (work, region, detail) => sent.Add((work, region, detail));
+            user.AddComponent<ItemInventory>().Container.SetSlot(0, new ItemStack(Settings.PactRune, 1));
+
+            Assert.IsFalse(Territory.CanClaim("Eastwood", user, out string why), "Lighting the host's stones is theirs.");
+            StringAssert.Contains("Pact Rune", why, "and the guest is told how they can help");
+            Assert.IsFalse(Territory.CanStandWatch(out _), "The host calls the forest to a stone; friends stand with them.");
+
+            Assert.IsTrue(Territory.CanOffer(Region, user, out _));
+            Territory.Offer(Region, user);
+            Assert.AreEqual(0, Territory.RunesHeld(user), "The guest's own rune is spent.");
+
+            RegionTaskKind kind = Settings.Info(Region).task;
+            CountTask(Region, kind);
+            Territory.HeartBurned();
+
+            Assert.AreEqual(hold, lands.HoldOf(Region), 0.01f, "Nothing changes in the mirror: the host's answer comes back with the settlement.");
+            Assert.AreEqual(0, lands.Of(Region).TaskProgress);
+            Assert.AreEqual(0f, lands.Incursion.Weakened, 0.01f);
+            CollectionAssert.AreEqual(new[] { LandWork.Rune, LandWork.Task, LandWork.Heart }, sent.Select(s => s.work).ToArray());
+            Assert.IsTrue(sent.All(s => s.region == Region));
+            Assert.AreEqual((int)kind, sent[1].detail, "The task's kind goes with it, for the host to check.");
+
+            int turn = lands.Turn;
+            Territory.Turn(true);
+            Assert.AreEqual(turn, lands.Turn, "A guest's dawn is no turn for the host's lands.");
+        }
+        finally
+        {
+            Visiting(false);
+            HavenVisit.Forget();
+            Territory.ForHost = null;
+            Object.DestroyImmediate(user);
+            GameSession.StartNewGame();
+        }
+    }
+
+    [Test]
+    public void TheHost_TakesAFriendsWork_AndOneHeartARun()
+    {
+        GameSession.StartNewGame();
+        ForgetBurnedHearts();
+        TerritoryState lands = GameSession.Settlement.Territory;
+        try
+        {
+            lands.Claim(Region, Settings);
+            float hold = lands.HoldOf(Region);
+            Territory.FromFriend(LandWork.Rune, Region, 0, "Ingrid");
+            Assert.AreEqual(hold + Settings.RuneHold, lands.HoldOf(Region), 0.01f, "A friend's rune holds as the host's would.");
+            hold = lands.HoldOf(Region);
+            Territory.FromFriend(LandWork.Find, Region, 0, "Ingrid");
+            Assert.AreEqual(hold + Settings.FindHold, lands.HoldOf(Region), 0.01f);
+
+            TerritorySettings.RegionInfo info = Settings.Info(Region);
+            RegionTaskKind other = info.task == RegionTaskKind.Hunt ? RegionTaskKind.Fish : RegionTaskKind.Hunt;
+            Territory.FromFriend(LandWork.Task, Region, (int)other, "Ingrid");
+            Assert.AreEqual(0, lands.Of(Region).TaskProgress, "Work the region didn't ask for doesn't count.");
+            hold = lands.HoldOf(Region);
+            for (int i = 0; i < info.taskCount; i++)
+            {
+                Territory.FromFriend(LandWork.Task, Region, (int)info.task, "Ingrid");
+            }
+
+            Assert.AreEqual(Mathf.Min(100f, hold + Settings.TaskHold), lands.HoldOf(Region), 0.01f, "A friend's work finishes the task.");
+
+            Territory.FromFriend(LandWork.Rune, "Eastwood", 0, "Ingrid");
+            Assert.IsFalse(lands.IsClaimed("Eastwood"), "A rune at an unlit stone claims nothing.");
+
+            while (lands.Incursion == null)
+            {
+                lands.AdvanceTurn(Settings, 0f, Always, out _);
+            }
+
+            Territory.FromFriend(LandWork.Heart, lands.Incursion.Region, 4242, "Ingrid");
+            Assert.AreEqual(Settings.HeartShare, lands.Incursion.Weakened, 0.01f);
+            Territory.FromFriend(LandWork.Heart, lands.Incursion.Region, 4242, "Bjarne");
+            Assert.AreEqual(Settings.HeartShare, lands.Incursion.Weakened, 0.01f, "Everyone on a run has the heart's rumour, but it is one heart.");
+            Territory.FromFriend(LandWork.Heart, lands.Incursion.Region, 4343, "Ingrid");
+            Assert.AreEqual(Mathf.Min(1f, Settings.HeartShare * 2f), lands.Incursion.Weakened, 0.01f, "Another run's heart counts.");
+        }
+        finally
+        {
+            ForgetBurnedHearts();
+            GameSession.StartNewGame();
+        }
+    }
+
+    [Test]
+    public void TheLandWorkMessage_SurvivesTheWire()
+    {
+        using var writer = new Unity.Netcode.FastBufferWriter(128, Unity.Collections.Allocator.Temp);
+        CoopLands.Write(writer, LandWork.Heart, "The Drowning Fen", -123456789);
+        using var reader = new Unity.Netcode.FastBufferReader(writer, Unity.Collections.Allocator.Temp);
+        CoopLands.Read(reader, out LandWork work, out string region, out int detail);
+        Assert.AreEqual(LandWork.Heart, work);
+        Assert.AreEqual("The Drowning Fen", region);
+        Assert.AreEqual(-123456789, detail);
+        Assert.IsTrue(WorldAtlas.For("SafeHaven").Regions.All(r => System.Text.Encoding.UTF8.GetByteCount(r.name) < 60), "Region names fit the message.");
+    }
+
     [Test]
     public void ThePushHasARaidAnswer_AndTheRuneTurnsUp()
     {

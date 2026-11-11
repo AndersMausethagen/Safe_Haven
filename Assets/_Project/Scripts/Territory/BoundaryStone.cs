@@ -139,9 +139,10 @@ public sealed class BoundaryStone : MonoBehaviour, IInteractionName
         if (IsPushed)
         {
             bool watching = StoneDefence.Current != null;
-            page.Add(new MenuAction("Stand watch at the stone", watching ? "A watch is already being kept."
+            bool may = Territory.CanStandWatch(out string notYours);
+            page.Add(new MenuAction("Stand watch at the stone", !may ? notYours : watching ? "A watch is already being kept."
                     : "What the forest sends comes here. Beat it all and stay near the stone: the push is broken.",
-                !watching, () => StoneDefence.Begin(this, user), true));
+                may && !watching, () => StoneDefence.Begin(this, user), true));
         }
 
         return page;

@@ -3,6 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+/// <summary>What a guest does for the host's lands in co-op, sent to the host's game (Territory.ForHost, CoopLands).</summary>
+public enum LandWork : byte
+{
+    Rune = 1,
+    Task = 2,
+    Find = 3,
+    Heart = 4,
+}
+
 /// <summary>
 /// The Haven's Reach in play (Docs/Territory.md): TerritoryState's rules tied to the game. A turn passes at each dawn at home
 /// (Seasons) and whenever a raid ends; what a turn brings is told at once at home, or when the player is next home. Stones are
@@ -10,17 +19,29 @@ using UnityEngine;
 /// weakens it (WeakenIncursionOutcome). Held regions ask a task of the Haven (hunting, gathering, fishing there), counted from
 /// the game's own events; places found (PlaceDiscovery) give Insight and strengthen the hold. Secure regions send a tithe home at
 /// dawn, and the corruption's bands come from the weakest of the Haven's lands (CorruptionNights).
+/// In co-op a guest's lands only mirror the host's (they come with the settlement), so what a guest does for them is sent to the
+/// host's game (<see cref="ForHost"/>, CoopLands) and applied there (<see cref="FromFriend"/>); lighting stones and standing
+/// watch are the host's.
 /// </summary>
 public static class Territory
 {
     public const string HomeScene = "SafeHaven";
 
     private static readonly List<string> waiting = new List<string>();
+    // Runs whose rot's heart has been burned: every player on a run has the heart's rumour, but it weakens a push once.
+    private static readonly HashSet<int> burnedOnRuns = new HashSet<int>();
     private static WorldAtlas haven;
     private static Dictionary<string, List<WorldAtlas.Place>> placesByRegion;
 
     /// <summary>Raised whenever the hold on any region changes.</summary>
     public static event Action Changed;
+
+    /// <summary>
+    /// Set by co-op while this game may be a guest: sends what this player did for the host's lands to the host's game (the
+    /// work, the region, and the run or task kind). While visiting nothing is changed here: the host's answer comes back with
+    /// the settlement.
+    /// </summary>
+    public static Action<LandWork, string, int> ForHost { get; set; }
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void Listen()
@@ -30,10 +51,19 @@ public static class Territory
         ExperienceTracker.Practised -= OnPractised;
         ExperienceTracker.Practised += OnPractised;
         waiting.Clear();
+        burnedOnRuns.Clear();
         haven = null;
         placesByRegion = null;
         Changed = null;
+        ForHost = null;
     }
+
+    /// <summary>The host's lands have arrived in a guest's game (HavenSync): the stones show them.</summary>
+    public static void MirrorArrived() => Changed?.Invoke();
+
+    private static string Host => string.IsNullOrEmpty(HavenVisit.HostName) ? "your friend" : HavenVisit.HostName;
+
+    private static void SendToHost(LandWork work, string region, int detail) => ForHost?.Invoke(work, region, detail);
 
     private static TerritoryState State => GameSession.Settlement.Territory;
     private static TerritorySettings Settings => TerritorySettings.Current;
@@ -115,6 +145,12 @@ public static class Territory
             return false;
         }
 
+        if (HavenVisit.IsVisiting)
+        {
+            reason = $"These are {Host}'s lands: lighting their stones is for them to decide. A Pact Rune offered at a lit stone helps them hold it.";
+            return false;
+        }
+
         int needed = Math.Min(settings.PlacesToClaim, PlacesIn(region).Count);
         if (PlacesFound(region) < needed)
         {
@@ -181,12 +217,28 @@ public static class Territory
             return;
         }
 
-        if (SpendRune(user))
+        if (!SpendRune(user))
         {
-            State.Raise(region, Settings.RuneHold);
-            GameMessages.Post($"The rune sinks into the stone. {region}: {Describe(region)}.", MessageKind.Gain);
-            Changed?.Invoke();
+            return;
         }
+
+        if (HavenVisit.IsVisiting)
+        {
+            SendToHost(LandWork.Rune, region, 0);
+            GameMessages.Post($"The rune sinks into the stone. {Host}'s hold on {region} grows.", MessageKind.Gain);
+            return;
+        }
+
+        State.Raise(region, Settings.RuneHold);
+        GameMessages.Post($"The rune sinks into the stone. {region}: {Describe(region)}.", MessageKind.Gain);
+        Changed?.Invoke();
+    }
+
+    /// <summary>Whether this player can stand watch at a stone: in a friend's Haven, the host calls the forest, and friends stand with them.</summary>
+    public static bool CanStandWatch(out string reason)
+    {
+        reason = HavenVisit.IsVisiting ? $"Only {Host} can call the forest to their stone. Stand with them when they do." : null;
+        return reason == null;
     }
 
     public static int RunesHeld(GameObject user) =>
@@ -200,7 +252,7 @@ public static class Territory
     /// <summary>A watch held at a stone (StoneDefence).</summary>
     public static void Defended(string region)
     {
-        if (State.Defended(region, Settings))
+        if (!HavenVisit.IsVisiting && State.Defended(region, Settings))
         {
             ExperienceTracker.GrantInsight(Settings.DefenceInsight);
             GameMessages.Post($"The push on {region} is broken. {region}: {Describe(region)}.", MessageKind.Gain);
@@ -211,14 +263,41 @@ public static class Territory
     /// <summary>A rot's heart burned on a raid (WeakenIncursionOutcome).</summary>
     public static void HeartBurned()
     {
-        if (State.Weaken(Settings))
+        int run = GameSession.ActiveRaid != null ? GameSession.ActiveRaid.Seed : 0;
+        if (HavenVisit.IsVisiting)
         {
-            TerritoryState.Push push = State.Incursion;
-            GameMessages.Post(push.Weakened >= 0.999f
-                ? $"The rot's heart burns. The forest's push on {push.Region} has nothing left behind it."
-                : $"The rot's heart burns. The forest's push on {push.Region} falters.", MessageKind.Gain);
-            Changed?.Invoke();
+            TerritoryState.Push pushed = State.Incursion;
+            if (pushed != null)
+            {
+                SendToHost(LandWork.Heart, pushed.Region, run);
+                GameMessages.Post($"The rot's heart burns. The forest's push on {Host}'s {pushed.Region} falters.", MessageKind.Gain);
+            }
+
+            return;
         }
+
+        Weaken(run, null);
+    }
+
+    // Once a run (every player on it has the heart's rumour). Run 0: not on a raid, always counts.
+    private static void Weaken(int run, string friend)
+    {
+        if (State.Incursion == null || (run != 0 && burnedOnRuns.Contains(run)) || !State.Weaken(Settings))
+        {
+            return;
+        }
+
+        if (run != 0)
+        {
+            burnedOnRuns.Add(run);
+        }
+
+        TerritoryState.Push push = State.Incursion;
+        string who = friend != null ? $"{friend} burned the rot's heart." : "The rot's heart burns.";
+        GameMessages.Post(push.Weakened >= 0.999f
+            ? $"{who} The forest's push on {push.Region} has nothing left behind it."
+            : $"{who} The forest's push on {push.Region} falters.", MessageKind.Gain);
+        Changed?.Invoke();
     }
 
     /// <summary>A named place found (PlaceDiscovery): Insight, and a firmer hold on its region if it is the Haven's.</summary>
@@ -226,12 +305,61 @@ public static class Territory
     {
         ExperienceTracker.GrantInsight(Settings.FindInsight);
         string region = Atlas?.RegionAt(new Vector3(place.at.x, 0f, place.at.y))?.name;
-        if (State.IsClaimed(region))
+        if (!State.IsClaimed(region))
         {
-            State.Raise(region, Settings.FindHold);
+            return;
         }
 
+        if (HavenVisit.IsVisiting)
+        {
+            SendToHost(LandWork.Find, region, 0);
+            return;
+        }
+
+        State.Raise(region, Settings.FindHold);
         Changed?.Invoke();
+    }
+
+    /// <summary>
+    /// The host's game applies what a friend did for its lands (CoopLands): a rune offered, a task's work, a place found, a heart
+    /// burned on the run (<paramref name="detail"/>: the task's kind, or the run).
+    /// </summary>
+    public static void FromFriend(LandWork work, string region, int detail, string friend)
+    {
+        if (HavenVisit.IsVisiting || string.IsNullOrEmpty(region))
+        {
+            return;
+        }
+
+        friend = string.IsNullOrEmpty(friend) ? "A friend" : friend;
+        switch (work)
+        {
+            case LandWork.Rune:
+                if (!State.IsClaimed(region))
+                {
+                    GameMessages.Post($"{friend}'s Pact Rune found no lit stone in {region}.", MessageKind.Warning);
+                    return;
+                }
+
+                State.Raise(region, Settings.RuneHold);
+                GameMessages.Post($"{friend} offered a Pact Rune at the stone of {region}. {region}: {Describe(region)}.", MessageKind.Gain);
+                Changed?.Invoke();
+                break;
+            case LandWork.Task:
+                Count(region, (RegionTaskKind)detail);
+                break;
+            case LandWork.Find:
+                if (State.IsClaimed(region))
+                {
+                    State.Raise(region, Settings.FindHold);
+                    Changed?.Invoke();
+                }
+
+                break;
+            case LandWork.Heart:
+                Weaken(detail, friend);
+                break;
+        }
     }
 
     // ----- Turns -----
@@ -360,6 +488,12 @@ public static class Territory
         TerritorySettings.RegionInfo info = region != null ? Settings.Info(region) : null;
         if (info == null || info.task != kind || !State.TaskOpen(region))
         {
+            return;
+        }
+
+        if (HavenVisit.IsVisiting)
+        {
+            SendToHost(LandWork.Task, region, (int)kind);
             return;
         }
 

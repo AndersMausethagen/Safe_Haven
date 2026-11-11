@@ -27,7 +27,7 @@ public sealed class StoneDefence : MonoBehaviour
 
     public static void Begin(BoundaryStone at, GameObject user)
     {
-        if (Current != null || at == null || user == null)
+        if (Current != null || at == null || user == null || !Territory.CanStandWatch(out _))
         {
             return;
         }

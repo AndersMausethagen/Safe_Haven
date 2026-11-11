@@ -57,12 +57,27 @@ All are in `Resources/TerritorySettings` (written by `AgentScripts/BuildTerritor
 | Renown | 6 held, 12 Secure | All eleven Secure is 132 renown: a large share of the 300 for the top rank, never all of it. |
 | Find | 25 Insight | The 27 places are worth about four extracted raids in all. |
 
+## In co-op
+
+The lands are the host's. Friends visiting see them as the host holds them (they come with the settlement), and no turn
+passes in a friend's game.
+
+| A friend... | What happens |
+|---|---|
+| offers a Pact Rune at a lit stone | their own rune; the host's hold rises by 25 |
+| hunts, gathers or fishes in a held region | counts towards that region's task in the host's game |
+| finds a place in a held region | their own Insight; +5 hold for the host |
+| burns the rot's heart on the host's run | weakens the host's push, but **once a run**: everyone on the run has the heart's rumour, and it is one heart. Each burner keeps their Pact Rune |
+| wants to light a stone or stand watch | can't: those are the host's calls. When the host stands watch, the forest's creatures are shared like any of the host's, and friends fight beside them |
+
+What a friend finds (places, tutorials) is their own and goes home with them. The Haven's geography is the same in every game.
+
 ## Where it lives
 
 `Scripts/Territory/`: `TerritoryState` (the rules, plain C#, saved in `SettlementSaveData.territory`), `Territory` (the
 game's side: turns, messages, tasks from game events, the corruption's way in), `BoundaryStone` and `StoneDefence` (the
 stone and the watch), `TerritorySpawner` (stands the stones at runtime from the atlas, so the scene file never changes),
-`TerritorySettings`. The Haven window's **Lands** tab (`HavenLands`), the region's name on entering it and above the
+`TerritorySettings`; in co-op, `CoopLands` (Multiplayer). The Haven window's **Lands** tab (`HavenLands`), the region's name on entering it and above the
 minimap (`RegionTitleHud`), the world map (held lands in the accent colour, a pushed one in warning, the stones once
 known). The raid side: `RaidRumourDefinition` › Forest Pushing, `WeakenIncursionOutcome`, the Rot's Heart rumour and event.
 Tests: `TerritoryTests`.
