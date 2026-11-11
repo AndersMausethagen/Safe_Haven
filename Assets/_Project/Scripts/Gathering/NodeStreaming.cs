@@ -195,13 +195,23 @@ public sealed class NodeStreaming : MonoBehaviour
         Debug.Log($"[NodeStreaming] {scene.name}: {entries.Count} trees drawn without scripts until the player is near ({kinds.Count} kinds).");
     }
 
-    // Trees of one kind share a mesh and a gathering definition.
+    // Trees of one kind share a gathering definition, meshes and materials. Materials too: variants of one model in other
+    // colours (a blossoming one, an autumn one) share its mesh, and a live copy of the first one's template took its colours.
     private static string Kind(GameObject placed)
     {
         var kind = new System.Text.StringBuilder(placed.GetComponent<ResourceNode>().Definition.name);
         foreach (MeshFilter filter in placed.GetComponentsInChildren<MeshFilter>(true))
         {
             kind.Append('|').Append(filter.sharedMesh != null ? filter.sharedMesh.GetEntityId().ToString() : "0");
+        }
+
+        foreach (Renderer renderer in placed.GetComponentsInChildren<Renderer>(true))
+        {
+            kind.Append(renderer.enabled ? '#' : '-');
+            foreach (Material material in renderer.sharedMaterials)
+            {
+                kind.Append(material != null ? material.GetEntityId().ToString() : "0").Append(',');
+            }
         }
 
         return kind.ToString();

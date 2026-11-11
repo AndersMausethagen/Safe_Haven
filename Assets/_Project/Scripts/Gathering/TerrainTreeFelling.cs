@@ -413,10 +413,19 @@ public sealed class TerrainTreeFelling : MonoBehaviour
     {
         OwnTheData();
         TreeInstance tree = terrain.terrainData.GetTreeInstance(index);
-        GameObject burst = TreeChoppingSettings.Current.SmallTreeBreak;
-        if (burst != null)
+        // The tree's own leaves (a young spruce sheds needles, not broad leaves), in its colour, from its crown.
+        GameObject prefab = terrain.terrainData.treePrototypes[tree.prototypeIndex].prefab;
+        TreeParts parts = TreeParts.Of(prefab, positions[index], Quaternion.Euler(0f, tree.rotation * Mathf.Rad2Deg, 0f),
+            new Vector3(tree.widthScale, tree.heightScale, tree.widthScale));
+        GameObject burst = parts.LeafFall != null ? parts.LeafFall : TreeChoppingSettings.Current.SmallTreeBreak;
+        if (parts.HasFoliage)
         {
-            Destroy(Instantiate(burst, positions[index] + Vector3.up, Quaternion.identity), 4f);
+            TreeEffects.Play(burst, parts.Base + parts.Crown.center, Quaternion.identity, parts.Crown.size, parts.LeafTint,
+                Mathf.RoundToInt(Mathf.Clamp(parts.Height * 8f, 15f, 60f)));
+        }
+        else if (burst != null)
+        {
+            TreeEffects.Play(burst, positions[index] + Vector3.up, Quaternion.identity, Vector3.one * 1.5f, parts.LeafTint, 25);
         }
 
         Down(index, tree);
