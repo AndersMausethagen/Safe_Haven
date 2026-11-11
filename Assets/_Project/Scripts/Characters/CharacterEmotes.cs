@@ -3,7 +3,8 @@ using UnityEngine;
 
 /// <summary>
 /// Plays emotes on the Animator's "Emote" layer (built by EmoteLayerBuilder): one-shots that fade out when done, and held
-/// poses (sitting, sleeping) that last until <see cref="Stop"/> or until the character starts moving. The layer only has
+/// poses (sitting, sleeping) that last until <see cref="Stop"/> (playing their ending) or until the character starts moving
+/// (no ending: the layer fades out under the steps). The layer only has
 /// weight while an emote plays, so it never covers the other layers otherwise.
 /// </summary>
 [DisallowMultipleComponent]
@@ -121,7 +122,13 @@ public sealed class CharacterEmotes : MonoBehaviour
             return;
         }
 
-        if (phase != Phase.None && Time.time - started > fade)
+        // Walking off ends any emote at once and the layer fades out under the steps. Playing a held pose's ending (getting
+        // up from the ground, 2 s) or a one-shot on, at full weight, slid the character along in it.
+        if (phase != Phase.None && IsMoving && (phase == Phase.Ending || Time.time - started > fade))
+        {
+            Finish();
+        }
+        else if (phase != Phase.None && Time.time - started > fade)
         {
             UpdatePhase();
         }
@@ -136,12 +143,6 @@ public sealed class CharacterEmotes : MonoBehaviour
 
     private void UpdatePhase()
     {
-        if (current.IsHeld && phase == Phase.Playing && hasSpeed && animator.GetFloat(SpeedHash) > moveToStop)
-        {
-            Stop();
-            return;
-        }
-
         if (animator.IsInTransition(layer))
         {
             return;
