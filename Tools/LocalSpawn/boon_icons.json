@@ -1,0 +1,10 @@
+{
+  "_about": "Icons for the boons that come from no item (meals and tonics show their own item's icon), keyed by the start of the boon's id (PlayerBoons), for Tools/LocalSpawn/generate_item_icons.py --set boons; AgentScripts/BuildUIArt.cs puts them in Resources/ConditionIconSettings.",
+  "haven_rested": "A soft straw bed with a folded wool blanket and a feather pillow under a small crescent moon",
+  "festival": "A garland of wildflowers and birch leaves wound around a small carved wooden horn of mead",
+  "offering": "A small flat offering stone with a bowl of berries, bread and a lit candle on it",
+  "place": "A tall standing stone carved with a glowing warm golden rune, a little moss at its foot",
+  "event": "A small carved bone charm hanging on a red cord, glowing faintly gold",
+  "technique": "A green leaf with a small winged leather boot beside it, a faint golden glow",
+  "boon": "A round bronze amulet on a leather cord, a radiant sun symbol embossed on it"
+}

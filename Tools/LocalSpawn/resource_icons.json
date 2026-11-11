@@ -1,0 +1,9 @@
+{
+  "_about": "Icons for the essences and portal lights (ResourceDefinition, by id), for Tools/LocalSpawn/generate_item_icons.py --set resources. The other resources' icons were painted before; these were flat placeholder orbs. Each a thing of light or magic held in a small physical form, so it reads beside the ores and herbs.",
+  "cursed_essence": "A small jagged crystal shard of dark purple glass with restless dark violet smoke curling inside and around it, a sickly purple glow",
+  "purified_essence": "A small smooth teardrop crystal of clear white glass glowing with pure warm white-gold light inside, a few soft sparkles",
+  "lesser_life_orb": "A tiny round mote of soft glowing green light, a small bright sphere with a soft halo, resting in a curled green leaf",
+  "life_orb": "A round glowing orb of soft green forest light wrapped in thin twisting roots, like light freed from a root ball",
+  "greater_life_orb": "A large blazing orb of brilliant green-gold light held in a cradle of old carved wooden roots, radiant",
+  "portal_spark": "A small spark of bright teal-blue light caught inside a tiny ring of carved grey stone, like a miniature portal"
+}

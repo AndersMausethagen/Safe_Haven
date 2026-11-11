@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 450f342abab65894abb30d361ef3ad72, type: 3}
+  m_Name: ConditionIconSettings
+  m_EditorClassIdentifier: SafeHaven::ConditionIconSettings
+  boonIcons:
+  - idStartsWith: event
+    icon: {fileID: 21300000, guid: e89a8cfa189e2af41af2fdd80076d090, type: 3}
+  - idStartsWith: festival
+    icon: {fileID: 21300000, guid: dd3feaf93dbfc174d861947da40a4203, type: 3}
+  - idStartsWith: haven_rested
+    icon: {fileID: 21300000, guid: 11ecd41c093b77e418063fc29873271e, type: 3}
+  - idStartsWith: offering
+    icon: {fileID: 21300000, guid: 1399740e35297e346b1c4b83f6663b4d, type: 3}
+  - idStartsWith: place
+    icon: {fileID: 21300000, guid: 0cce60ef9c4b0184195db5edb15154ef, type: 3}
+  - idStartsWith: technique
+    icon: {fileID: 21300000, guid: 2787d5eb4398f884899ebc084a89d34e, type: 3}
+  otherBoon: {fileID: 21300000, guid: cc00cc24fea503144aa38fc8e7f85122, type: 3}

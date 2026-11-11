@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Roots
   description: 'Roots hold your feet. Hit back: you can still fight.'
   color: {r: 0.7, g: 0.6, b: 0.35, a: 1}
+  icon: {fileID: 21300000, guid: 1635a2f3a83860546a6d43ddd48e7965, type: 3}
   seconds: 1.6
   damagePerSecond: 0
   damageType: 0

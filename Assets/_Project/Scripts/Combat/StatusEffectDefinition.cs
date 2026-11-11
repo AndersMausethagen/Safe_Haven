@@ -16,6 +16,8 @@ public sealed class StatusEffectDefinition : ScriptableObject, IDisplayName
     [SerializeField, TextArea] private string description;
     [Tooltip("Colour of its name on the HUD.")]
     [SerializeField] private Color color = Color.white;
+    [Tooltip("Its icon beside the vitals (LocalSpawn: Tools/LocalSpawn/condition_icons.json). Empty: the name alone.")]
+    [SerializeField] private Sprite icon;
 
     [Header("Effect")]
     [Tooltip("Seconds it lasts. A new hit restarts the time; effects don't stack.")]
@@ -30,6 +32,7 @@ public sealed class StatusEffectDefinition : ScriptableObject, IDisplayName
     public string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;
     public string Description => description;
     public Color Color => color;
+    public Sprite Icon => icon;
     public float Seconds => seconds;
     public float DamagePerSecond => damagePerSecond;
     public DamageType DamageType => damageType;

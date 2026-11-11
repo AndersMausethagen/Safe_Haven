@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Poison
   description: Venom in the blood. Health drains until it runs its course or an antidote clears it.
   color: {r: 0.55, g: 0.85, b: 0.35, a: 1}
+  icon: {fileID: 21300000, guid: c37877ee2a74160468d27999d2fd5bc0, type: 3}
   seconds: 7
   damagePerSecond: 3
   damageType: 3

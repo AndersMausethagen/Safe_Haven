@@ -20,6 +20,7 @@ public class PaintedIconTests
         yield return Case<SkillDefinition>("skill_icons.json", "SkillIcons", s => s.Id, s => s.Icon);
         yield return Case<ProficiencyDefinition>("proficiency_icons.json", "ProficiencyIcons", p => p.Id, p => p.Icon);
         yield return Case<PerkDefinition>("perk_icons.json", "PerkIcons", p => p.Id, p => p.Icon);
+        yield return Case<StatusEffectDefinition>("condition_icons.json", "ConditionIcons", s => s.Id, s => s.Icon);
     }
 
     private static TestCaseData Case<T>(string wanted, string painted, System.Func<T, string> id, System.Func<T, Sprite> icon) where T : Object
@@ -28,6 +29,19 @@ public class PaintedIconTests
             AssetDatabase.FindAssets("t:" + typeof(T).Name).Select(AssetDatabase.GUIDToAssetPath).Select(AssetDatabase.LoadAssetAtPath<T>)
                 .Where(x => x != null).Select(x => (id(x), x.name, icon(x))).ToList();
         return new TestCaseData("Tools/LocalSpawn/" + wanted, "Tools/LocalSpawn/" + painted + "/", definitions).SetName(typeof(T).Name);
+    }
+
+    // BuildIcons writes the painting at half size and marks the importer with the painting's hash; and icons are mipmapped,
+    // as they are drawn small.
+    private static bool IsPaintingOf(string icon, string painting)
+    {
+        var importer = (TextureImporter)AssetImporter.GetAtPath(icon);
+        Assert.IsTrue(importer.mipmapEnabled, icon + " has no mipmaps: small icons turn grainy.");
+        using (var md5 = System.Security.Cryptography.MD5.Create())
+        {
+            string hash = System.BitConverter.ToString(md5.ComputeHash(File.ReadAllBytes(painting))).Replace("-", "").ToLowerInvariant();
+            return importer.userData == "painted:" + hash;
+        }
     }
 
     private static HashSet<string> Ids(string wanted) =>
@@ -47,8 +61,35 @@ public class PaintedIconTests
             Assert.IsTrue(File.Exists(source), $"{name}: {source} has not been painted." + Fix);
             Assert.IsNotNull(icon, $"{name} has no icon." + Fix);
             string shown = AssetDatabase.GetAssetPath(icon);
-            Assert.IsTrue(File.ReadAllBytes(shown).SequenceEqual(File.ReadAllBytes(source)), $"{name} shows {shown}, not its painting {source}." + Fix);
+            Assert.IsTrue(IsPaintingOf(shown, source), $"{name} shows {shown}, not its painting {source}." + Fix);
         }
+    }
+
+    // Only the essences and portal lights were placeholders; the other resources were painted before.
+    [Test]
+    public void EveryListedEssence_ShowsItsPainting()
+    {
+        HashSet<string> ids = Ids("Tools/LocalSpawn/resource_icons.json");
+        Assert.AreEqual(6, ids.Count);
+        var resources = AssetDatabase.FindAssets("t:ResourceDefinition").Select(AssetDatabase.GUIDToAssetPath)
+            .Select(AssetDatabase.LoadAssetAtPath<ResourceDefinition>).Where(r => r != null && ids.Contains(r.Id)).ToList();
+        Assert.AreEqual(ids.Count, resources.Count, "Every listed id is a resource.");
+        foreach (ResourceDefinition resource in resources)
+        {
+            string source = "Tools/LocalSpawn/ResourceIcons/" + resource.Id + ".png";
+            Assert.IsTrue(IsPaintingOf(AssetDatabase.GetAssetPath(resource.Icon), source), resource.DisplayName + Fix);
+        }
+    }
+
+    [Test]
+    public void ABoon_ShowsItsItemsIcon_OrOneForItsKind()
+    {
+        ConditionIconSettings icons = ConditionIconSettings.Current;
+        Assert.IsNotNull(icons.ForBoon(HavenReadiness.RestedId), "Well Rested has its own.");
+        Assert.IsNotNull(icons.ForBoon("something_new"), "Anything else has the fallback.");
+        var meal = AssetDatabase.FindAssets("t:ItemDefinition").Select(AssetDatabase.GUIDToAssetPath).Select(AssetDatabase.LoadAssetAtPath<ItemDefinition>)
+            .First(i => i != null && i.HasBoon && i.Icon != null);
+        Assert.AreEqual(meal.Icon, icons.ForBoon(meal.Id), "A meal or tonic shows its own item.");
     }
 
     [TestCaseSource(nameof(Sets))]

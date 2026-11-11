@@ -106,7 +106,7 @@ public static class BuildIcons
 
         int inPlace = 0, ownFile = 0;
         var missing = new List<string>();
-        var toImport = new List<(Object definition, string path)>();
+        var toImport = new List<(Object definition, string path, string source)>();
         AssetDatabase.StartAssetEditing();
         try
         {
@@ -123,8 +123,8 @@ public static class BuildIcons
                 bool alone = current != null && current.EndsWith(".png") && users.TryGetValue(current, out int count) && count == 1;
                 string target = alone ? current : set.Own + Path.GetFileName(source);
                 Directory.CreateDirectory(Path.GetDirectoryName(target));
-                File.Copy(source, target, true);
-                toImport.Add((found.definition, target));
+                WriteHalved(source, target);
+                toImport.Add((found.definition, target, source));
                 if (alone)
                 {
                     inPlace++;
@@ -140,15 +140,19 @@ public static class BuildIcons
             AssetDatabase.StopAssetEditing();
         }
 
-        foreach ((Object definition, string path) in toImport)
+        foreach ((Object definition, string path, string source) in toImport)
         {
             AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
             var importer = (TextureImporter)AssetImporter.GetAtPath(path);
             importer.textureType = TextureImporterType.Sprite;
             importer.spriteImportMode = SpriteImportMode.Single;
             importer.alphaIsTransparency = true;
-            importer.mipmapEnabled = false;
+            // Icons are drawn from 22 to 96 px: without mips the small ones turn grainy and shimmer as they move.
+            importer.mipmapEnabled = true;
+            importer.mipmapFilter = TextureImporterMipFilter.KaiserFilter;
+            importer.filterMode = FilterMode.Trilinear;
             importer.maxTextureSize = MaxSize;
+            importer.userData = PaintedMark(source);
             importer.SaveAndReimport();
             var sprite = AssetDatabase.LoadAssetAtPath<Sprite>(path);
             var so = new SerializedObject(definition);
@@ -165,5 +169,64 @@ public static class BuildIcons
 
         return $"{label} icons: {inPlace} written into the definition's own icon file, {ownFile} given a file of their own"
                + (missing.Count > 0 ? $"; not done ({missing.Count}): {string.Join(", ", missing)}" : ".");
+    }
+
+    /// <summary>
+    /// What an icon's importer remembers of the painting it was made from (its userData): the painting's hash, so a test can tell
+    /// the icon in the game is that painting and not a placeholder a builder put back.
+    /// </summary>
+    public static string PaintedMark(string source)
+    {
+        using (var md5 = System.Security.Cryptography.MD5.Create())
+        {
+            return "painted:" + System.BitConverter.ToString(md5.ComputeHash(File.ReadAllBytes(source))).Replace("-", "").ToLowerInvariant();
+        }
+    }
+
+    // The painting at half its size (512 -> 256, the size it is imported at), so the project doesn't keep a second full-size copy.
+    // Each pixel is the alpha-weighted mean of four: transparent pixels don't darken the edges. Any other size is copied as it is.
+    private static void WriteHalved(string source, string target)
+    {
+        var painting = new Texture2D(2, 2, TextureFormat.RGBA32, false);
+        painting.LoadImage(File.ReadAllBytes(source));
+        if (painting.width != MaxSize * 2 || painting.height != MaxSize * 2)
+        {
+            Object.DestroyImmediate(painting);
+            File.Copy(source, target, true);
+            return;
+        }
+
+        Color32[] from = painting.GetPixels32();
+        var to = new Color32[MaxSize * MaxSize];
+        int wide = painting.width;
+        for (int y = 0; y < MaxSize; y++)
+        {
+            for (int x = 0; x < MaxSize; x++)
+            {
+                float r = 0f, g = 0f, b = 0f, a = 0f;
+                for (int dy = 0; dy < 2; dy++)
+                {
+                    for (int dx = 0; dx < 2; dx++)
+                    {
+                        Color32 c = from[(y * 2 + dy) * wide + x * 2 + dx];
+                        r += c.r * c.a;
+                        g += c.g * c.a;
+                        b += c.b * c.a;
+                        a += c.a;
+                    }
+                }
+
+                to[y * MaxSize + x] = a > 0f
+                    ? new Color32((byte)Mathf.RoundToInt(r / a), (byte)Mathf.RoundToInt(g / a), (byte)Mathf.RoundToInt(b / a), (byte)Mathf.RoundToInt(a / 4f))
+                    : new Color32(0, 0, 0, 0);
+            }
+        }
+
+        var half = new Texture2D(MaxSize, MaxSize, TextureFormat.RGBA32, false);
+        half.SetPixels32(to);
+        half.Apply();
+        File.WriteAllBytes(target, half.EncodeToPNG());
+        Object.DestroyImmediate(painting);
+        Object.DestroyImmediate(half);
     }
 }

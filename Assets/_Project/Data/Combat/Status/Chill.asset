@@ -16,6 +16,7 @@ MonoBehaviour:
   displayName: Chill
   description: Grave-cold in the limbs. You move slowly; warm food and frost protection help.
   color: {r: 0.55, g: 0.8, b: 1, a: 1}
+  icon: {fileID: 21300000, guid: b2d99109d715777419536b4e202dcefc, type: 3}
   seconds: 5
   damagePerSecond: 0
   damageType: 2

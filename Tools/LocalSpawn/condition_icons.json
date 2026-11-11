@@ -1,0 +1,6 @@
+{
+  "_about": "Icons for what can be at work on the player (StatusEffectDefinition, by id), for Tools/LocalSpawn/generate_item_icons.py --set conditions. Shown small beside the vitals: one bold shape and colour each.",
+  "chill": "A cluster of pale icy-blue frost crystals, sharp and cold, with a white snowflake in the middle",
+  "poison": "A single fat drop of glossy bright green venom dripping from a dark curved fang",
+  "roots": "Thick gnarled brown roots coiled tightly into a knot, as if gripping an ankle"
+}
