@@ -4,9 +4,11 @@ using UnityEngine.UI;
 using static CodeUI;
 
 /// <summary>
-/// The notice that a tutorial is waiting: a small card at the right edge with the newest one's painting and name and the key to read it (T).
-/// Clicking it, or the key, opens TutorialWindow. It stays until every waiting tutorial is read, and steps aside while a window covers the
-/// screen. It only reads Tutorials. Built in code for every scene with a player (ExperienceTracker).
+/// The notice that a tutorial is waiting. When one opens, a card at the right edge fades in quickly with the newest one's painting and
+/// name and the key to read it (T); left unread it fades slowly away after a few seconds (not while the pointer is on it), leaving only a
+/// small line at the edge that says how many wait ("2 unread tutorials · T"), which stays until they are read. Clicking either, or the
+/// key, opens TutorialWindow. Both step aside while a window covers the screen. It only reads Tutorials. Built in code for every scene with
+/// a player (ExperienceTracker).
 /// </summary>
 public sealed class TutorialNoticeHud : MonoBehaviour
 {
@@ -17,6 +19,12 @@ public sealed class TutorialNoticeHud : MonoBehaviour
     // Up from the middle of the right edge, clear of the quest tracker above and the minimap below.
     private const float EdgeGap = 24f;
     private const float RaisedBy = 40f;
+    // The card: in quickly, held a while, out slowly; the small line after it.
+    private const float FadeIn = 0.15f;
+    private const float HoldSeconds = 8f;
+    private const float FadeOut = 2.5f;
+    private const float LineWidth = 250f;
+    private const float LineHeight = 30f;
 
     private RectTransform card;
     private Outline rim;
@@ -26,6 +34,11 @@ public sealed class TutorialNoticeHud : MonoBehaviour
     private TMP_Text title;
     private TMP_Text hint;
     private int shownCount;
+    private CanvasGroup cardFade;
+    private RectTransform line;
+    private CanvasGroup lineFade;
+    private TMP_Text lineText;
+    private float shownUntil;
 
     public static TutorialNoticeHud Current { get; private set; }
 
@@ -54,6 +67,8 @@ public sealed class TutorialNoticeHud : MonoBehaviour
 
     /// <summary>Whether the card is up, for tests and probes.</summary>
     public bool Showing => card != null && card.gameObject.activeSelf;
+    /// <summary>Whether the small "unread" line is up instead.</summary>
+    public bool ShowingLine => line != null && line.gameObject.activeSelf;
 
     private void Awake()
     {
@@ -117,7 +132,24 @@ public sealed class TutorialNoticeHud : MonoBehaviour
             text.raycastTarget = false;
         }
 
+        cardFade = card.gameObject.AddComponent<CanvasGroup>();
+        cardFade.alpha = 0f;
         card.gameObject.SetActive(false);
+
+        // The small line left at the edge once the card has faded: how many wait, and the key.
+        line = Box("Unread", root, new Vector2(1f, 0.5f), new Vector2(LineWidth, LineHeight), new Vector2(-EdgeGap - LineWidth * 0.5f, RaisedBy - CardHeight * 0.5f + LineHeight * 0.5f));
+        var lineBackground = line.gameObject.AddComponent<Image>();
+        lineBackground.color = new Color(style.Panel.r, style.Panel.g, style.Panel.b, 0.8f);
+        var lineButton = line.gameObject.AddComponent<Button>();
+        lineButton.targetGraphic = lineBackground;
+        lineButton.onClick.AddListener(TutorialWindow.ShowPending);
+        lineButton.transition = Selectable.Transition.None;
+        line.gameObject.AddComponent<UIHover>();
+        lineText = Label("Text", line, 12f, 0f, LineWidth - 24f, LineHeight, 15f, style.Accent, TextAlignmentOptions.MidlineRight);
+        lineText.raycastTarget = false;
+        lineFade = line.gameObject.AddComponent<CanvasGroup>();
+        lineFade.alpha = 0f;
+        line.gameObject.SetActive(false);
         Refresh();
     }
 
@@ -128,18 +160,32 @@ public sealed class TutorialNoticeHud : MonoBehaviour
             return;
         }
 
-        // Out of the way while a window is up (the tutorial itself, the bag, a station...), back when it closes.
-        bool wanted = Tutorials.Pending.Count > 0 && (UIStateManager.Current == null || !UIStateManager.Current.IsAnyWindowOpen);
-        if (wanted != card.gameObject.activeSelf)
+        // Out of the way while a window is up (the tutorial itself, the bag, a station...), back when it closes. The card only for a
+        // while after a tutorial opens (longer while the pointer rests on it); then the small line.
+        bool waiting = Tutorials.Pending.Count > 0 && (UIStateManager.Current == null || !UIStateManager.Current.IsAnyWindowOpen);
+        if (card.gameObject.activeSelf && Hovered(card))
         {
-            card.gameObject.SetActive(wanted);
-            if (wanted)
-            {
-                UIMotion.Pop(card, 0.8f, 0.3f);
-            }
+            shownUntil = Mathf.Max(shownUntil, Time.unscaledTime + 1f);
         }
 
-        if (wanted)
+        bool wanted = waiting && Time.unscaledTime < shownUntil;
+        float dt = Time.unscaledDeltaTime;
+        cardFade.alpha = Mathf.MoveTowards(cardFade.alpha, wanted ? 1f : 0f, dt / (wanted ? FadeIn : FadeOut));
+        bool cardUp = cardFade.alpha > 0.001f;
+        if (cardUp != card.gameObject.activeSelf)
+        {
+            card.gameObject.SetActive(cardUp);
+        }
+
+        bool lineWanted = waiting && !wanted && cardFade.alpha < 0.3f;
+        lineFade.alpha = Mathf.MoveTowards(lineFade.alpha, lineWanted ? 1f : 0f, dt / 0.4f);
+        bool lineUp = lineFade.alpha > 0.001f;
+        if (lineUp != line.gameObject.activeSelf)
+        {
+            line.gameObject.SetActive(lineUp);
+        }
+
+        if (cardUp)
         {
             Color accent = UIStyle.Current.Accent;
             rim.effectColor = new Color(accent.r, accent.g, accent.b, Mathf.Lerp(0.35f, 1f, UIMotion.Breath(0.6f)));
@@ -167,6 +213,13 @@ public sealed class TutorialNoticeHud : MonoBehaviour
         thumb.enabled = newest.art != null;
         thumbGlyph.text = newest.art == null && !string.IsNullOrEmpty(newest.title) ? newest.title.Substring(0, 1) : "";
         hint.text = GameInput.WithRebinds("Press (T) or click to read");
+        lineText.text = GameInput.WithRebinds(count > 1 ? $"{count} unread tutorials  ·  (T)" : "1 unread tutorial  ·  (T)");
+        // A new one brings the card back, quickly, for a while.
+        if (count > shownCount)
+        {
+            shownUntil = Time.unscaledTime + HoldSeconds;
+        }
+
         // Motion and sound are the game's: none in the Editor's tests.
         if (count > shownCount && card.gameObject.activeSelf && Application.isPlaying)
         {
@@ -179,5 +232,16 @@ public sealed class TutorialNoticeHud : MonoBehaviour
         }
 
         shownCount = count;
+    }
+
+    private static bool Hovered(RectTransform rect)
+    {
+        if (GameInput.Point == null)
+        {
+            return false;
+        }
+
+        Vector2 pointer = GameInput.Point.ReadValue<Vector2>();
+        return RectTransformUtility.RectangleContainsScreenPoint(rect, pointer, null);
     }
 }
