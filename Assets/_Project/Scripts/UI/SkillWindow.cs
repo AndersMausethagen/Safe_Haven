@@ -275,7 +275,9 @@ public sealed class SkillWindow : MonoBehaviour, IItemSlotHandler
         for (int i = 0; i < barSlots.Count; i++)
         {
             SkillDefinition skill = skills.Loadout.Get(i);
-            barSlots[i].Show(skill != null ? skill.Icon : null, Tint(skill), PlayerInputHandler.SkillKeyLabel(i));
+            ItemDefinition item = skills.Loadout.GetItem(i);
+            // A consumable put on the bar from the bag (a skill key over it there).
+            barSlots[i].Show(skill != null ? skill.Icon : item != null ? item.Icon : null, Tint(skill), PlayerInputHandler.SkillKeyLabel(i));
         }
 
         for (int i = 0; i < bookSlots.Count; i++)

@@ -95,6 +95,15 @@ public static class SaveMapper
                 }
             }
 
+            if (player.SkillBarItems != null)
+            {
+                data.player.skillBarItems = new List<string>();
+                foreach (ItemDefinition item in player.SkillBarItems)
+                {
+                    data.player.skillBarItems.Add(item != null ? item.Id : "");
+                }
+            }
+
             PlayerSnapshot.Condition state = player.State;
             data.player.hasNeeds = state.HasNeeds;
             data.player.hunger = state.Hunger;
@@ -580,6 +589,17 @@ public static class SaveMapper
             }
 
             loaded.Player.WithQuickItems(quick);
+        }
+
+        if (player.skillBarItems != null)
+        {
+            var onBar = new List<ItemDefinition>();
+            foreach (string id in player.skillBarItems)
+            {
+                onBar.Add(string.IsNullOrEmpty(id) ? null : Resolve(content.FindItem(id), "item", id, loaded.MissingContent));
+            }
+
+            loaded.Player.WithSkillBarItems(onBar);
         }
 
         StashSaveData stash = data.stash ?? new StashSaveData();

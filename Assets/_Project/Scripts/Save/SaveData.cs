@@ -290,6 +290,8 @@ public sealed class PlayerSaveData
     public List<SlotSaveData> gear = new List<SlotSaveData>();
     /// <summary>The quickbar's items (hold F), by item id, in order. Missing in older saves.</summary>
     public List<string> quickItems;
+    /// <summary>The items on the skill bar, by slot: an item id, or "" where a skill or nothing is. Missing in older saves.</summary>
+    public List<string> skillBarItems;
 }
 
 [Serializable]

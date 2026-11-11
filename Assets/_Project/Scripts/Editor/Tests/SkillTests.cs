@@ -34,6 +34,54 @@ public sealed class SkillTests
     }
 
     [Test]
+    public void ASlotHoldsAnItemOrASkill_AndEachIsInOneSlotAtMost()
+    {
+        var loadout = new SkillLoadout();
+        var potion = ScriptableObject.CreateInstance<ItemDefinition>();
+        var bread = ScriptableObject.CreateInstance<ItemDefinition>();
+        try
+        {
+            loadout.Equip(0, a);
+            Assert.IsTrue(loadout.EquipItem(0, potion), "an item takes a skill's slot");
+            Assert.IsNull(loadout.Get(0));
+            Assert.AreEqual(potion, loadout.GetItem(0));
+            Assert.AreEqual(1, loadout.FirstEmptySlot(), "a slot with an item isn't empty");
+
+            Assert.IsTrue(loadout.EquipItem(2, potion), "a slotted item moves");
+            Assert.IsNull(loadout.GetItem(0));
+            Assert.AreEqual(potion, loadout.GetItem(2));
+
+            loadout.Equip(3, b);
+            Assert.IsTrue(loadout.Move(2, 3), "an item and a skill swap places");
+            Assert.AreEqual(b, loadout.Get(2));
+            Assert.AreEqual(potion, loadout.GetItem(3));
+
+            Assert.IsTrue(loadout.Equip(3, c), "a skill takes an item's slot");
+            Assert.IsNull(loadout.GetItem(3));
+            Assert.AreEqual(-1, loadout.IndexOf(potion));
+
+            loadout.EquipItem(4, bread);
+            Assert.IsTrue(loadout.Clear(4));
+            Assert.IsNull(loadout.GetItem(4));
+
+            // Restoring: skills first, then the items in the slots no skill took (duplicates dropped).
+            loadout.SetAll(new[] { a, null, null, null, null });
+            loadout.SetItems(new[] { potion, bread, bread, null, potion });
+            Assert.AreEqual(a, loadout.Get(0));
+            Assert.IsNull(loadout.GetItem(0), "a skill's slot keeps the skill");
+            Assert.AreEqual(bread, loadout.GetItem(1));
+            Assert.IsNull(loadout.GetItem(2), "only the first of a duplicate");
+            Assert.IsNull(loadout.GetItem(4));
+            CollectionAssert.AreEqual(new ItemDefinition[] { null, bread, null, null, null }, loadout.ToItemArray());
+        }
+        finally
+        {
+            Object.DestroyImmediate(potion);
+            Object.DestroyImmediate(bread);
+        }
+    }
+
+    [Test]
     public void EquippingASlottedSkillMovesItAndSwaps()
     {
         var loadout = new SkillLoadout();

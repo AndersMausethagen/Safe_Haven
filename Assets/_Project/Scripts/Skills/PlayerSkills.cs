@@ -12,6 +12,8 @@ public enum SkillCastResult
     Busy,
     NoStamina,
     NoFocus,
+    /// <summary>An item's slot, and none of it is carried.</summary>
+    NoneCarried,
 }
 
 /// <summary>
@@ -61,6 +63,9 @@ public sealed class PlayerSkills : MonoBehaviour
 
     /// <summary>Raised when a cast from a slot was refused, and why.</summary>
     public event Action<int, SkillCastResult> CastRefused;
+
+    /// <summary>Raised when the item in a slot was used, with the slot. The skill bar listens.</summary>
+    public event Action<int, ItemDefinition> BarItemUsed;
 
     /// <summary>Raised after the set of known skills changes.</summary>
     public event Action KnownSkillsChanged;
@@ -168,7 +173,7 @@ public sealed class PlayerSkills : MonoBehaviour
     /// Makes the book and bar exactly the given ones, for a scene handover. Called by PlayerSnapshot, possibly before
     /// this component's Awake; it replaces the starting setup.
     /// </summary>
-    public void Restore(IEnumerable<SkillDefinition> knownSkills, SkillDefinition[] slots)
+    public void Restore(IEnumerable<SkillDefinition> knownSkills, SkillDefinition[] slots, ItemDefinition[] slotItems = null)
     {
         EnsureInitialised();
         known.Clear();
@@ -187,12 +192,18 @@ public sealed class PlayerSkills : MonoBehaviour
         }
 
         loadout.SetAll(allowed);
+        loadout.SetItems(slotItems);
         KnownSkillsChanged?.Invoke();
     }
 
     /// <summary>Casts the skill in a bar slot. Everything that can refuse it is checked before anything is paid.</summary>
     public SkillCastResult TryCast(int slot)
     {
+        if (loadout.GetItem(slot) != null)
+        {
+            return UseBarItem(slot);
+        }
+
         SkillDefinition skill = loadout.Get(slot);
         SkillCastResult result = CheckCast(skill);
         PlayerFocus focus = GetComponent<PlayerFocus>();
@@ -220,6 +231,31 @@ public sealed class PlayerSkills : MonoBehaviour
 
         Perform(skill);
         SkillCast?.Invoke(slot, skill);
+        return result;
+    }
+
+    // A consumable on the bar: its key uses one from the bag (or the safe pocket), as the quickbar does. Eating and
+    // drinking keep their own commitment (PlayerEating); only being dead or mid-dodge refuses it here.
+    private SkillCastResult UseBarItem(int slot)
+    {
+        ItemDefinition item = loadout.GetItem(slot);
+        ItemInventory inventory = GetComponent<ItemInventory>();
+        SkillCastResult result = !health.IsAlive || (dodge != null && dodge.IsDodging) || stateMachine.CurrentState == PlayerState.Interacting
+            ? SkillCastResult.Busy
+            : inventory == null || inventory.CountCarried(item) <= 0 ? SkillCastResult.NoneCarried
+            : inventory.UseFirst(item) ? SkillCastResult.Cast : SkillCastResult.Busy;
+        if (result == SkillCastResult.NoneCarried)
+        {
+            GameMessages.Post($"No {item.DisplayName} left.", MessageKind.Warning);
+        }
+
+        if (result != SkillCastResult.Cast)
+        {
+            CastRefused?.Invoke(slot, result);
+            return result;
+        }
+
+        BarItemUsed?.Invoke(slot, item);
         return result;
     }
 

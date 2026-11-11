@@ -160,6 +160,16 @@ public sealed class ItemInventoryWindow : MonoBehaviour, IItemSlotHandler
             ToggleQuick(ContainerOf(hovered).GetSlot(hovered.Index));
         }
 
+        // A skill key over a usable item puts it on that slot of the skill bar (again: takes it off).
+        for (int slot = 0; hovered != null && dragFrom < 0 && slot < SkillLoadout.SlotCount; slot++)
+        {
+            if (Pressed(GameInput.Skill(slot)))
+            {
+                ToggleOnSkillBar(ContainerOf(hovered).GetSlot(hovered.Index), slot);
+                break;
+            }
+        }
+
         // Recipes depend on what is carried, so they are rechecked now and then while the window is open.
         if (recipesDirty || Time.unscaledTime >= nextRecipeRefresh)
         {
@@ -302,9 +312,10 @@ public sealed class ItemInventoryWindow : MonoBehaviour, IItemSlotHandler
     // ----- Quickbar and use feedback -----
 
     // The Player map is off while a window is open, so the quickbar key is read from its bound controls (rebinds included).
-    private static bool QuickKeyPressed()
+    private static bool QuickKeyPressed() => Pressed(GameInput.QuickItems);
+
+    private static bool Pressed(InputAction action)
     {
-        InputAction action = GameInput.QuickItems;
         if (action == null)
         {
             return false;
@@ -329,9 +340,44 @@ public sealed class ItemInventoryWindow : MonoBehaviour, IItemSlotHandler
         }
 
         string key = GameInput.KeyLabel(GameInput.QuickItems);
-        return inventory.Quick.Contains(stack.Item)
+        string quick = inventory.Quick.Contains(stack.Item)
             ? $"<color={UIStyle.Current.AccentHex}>On the quickbar (hold {key}). {key}: take it off.</color>"
             : $"<color={UIStyle.Current.MutedHex}>{key}: add to the quickbar (hold {key} to use it anywhere).</color>";
+        PlayerSkills skills = Player.Current != null ? Player.Current.Skills : null;
+        int onBar = skills != null ? skills.Loadout.IndexOf(stack.Item) : -1;
+        string first = PlayerInputHandler.SkillKeyLabel(0), last = PlayerInputHandler.SkillKeyLabel(SkillLoadout.SlotCount - 1);
+        string bar = onBar >= 0
+            ? $"<color={UIStyle.Current.AccentHex}>On the skill bar ({PlayerInputHandler.SkillKeyLabel(onBar)}). {PlayerInputHandler.SkillKeyLabel(onBar)}: take it off.</color>"
+            : $"<color={UIStyle.Current.MutedHex}>{first}-{last}: put it on the skill bar.</color>";
+        return quick + "\n" + bar;
+    }
+
+    private void ToggleOnSkillBar(ItemStack stack, int slot)
+    {
+        PlayerSkills skills = Player.Current != null ? Player.Current.Skills : null;
+        if (stack.IsEmpty || skills == null)
+        {
+            return;
+        }
+
+        string key = PlayerInputHandler.SkillKeyLabel(slot);
+        if (!QuickItems.Accepts(stack.Item))
+        {
+            GameMessages.Post("Only things you can use go on the skill bar.", MessageKind.Warning);
+        }
+        else if (skills.Loadout.GetItem(slot) == stack.Item)
+        {
+            skills.Loadout.Clear(slot);
+            GameMessages.Post($"{stack.Item.DisplayName} is off the skill bar.", MessageKind.Info);
+        }
+        else
+        {
+            SkillDefinition replaced = skills.Loadout.Get(slot);
+            skills.Loadout.EquipItem(slot, stack.Item);
+            GameMessages.Post($"{stack.Item.DisplayName} is on the skill bar: {key} uses it" + (replaced != null ? $" ({replaced.DisplayName} went back to the skill book)." : "."), MessageKind.Info);
+        }
+
+        tooltip.Show(stack, QuickHint(stack));
     }
 
     private void ToggleQuick(ItemStack stack)

@@ -4,8 +4,8 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// The always-visible skill bar on the HUD, V Rising style: the five loadout slots with their keys, a radial shade and
-/// seconds counter while a skill cools down, a bright pulse when it is cast and a red one when a cast is refused. The
+/// The always-visible skill bar on the HUD, V Rising style: the five loadout slots with their keys (a skill, or a
+/// consumable with how many are carried), a radial shade and seconds counter while a skill cools down, a bright pulse when it is cast and a red one when a cast is refused. The
 /// slots are the same ItemSlotView cells the bag and skill window use; this view only feeds them. It changes nothing:
 /// casting is input -> PlayerSkills, arranging is the skill window.
 /// <para>
@@ -29,6 +29,7 @@ public sealed class SkillBarView : MonoBehaviour
         [NonSerialized] public float flashUntil = -1f;
         [NonSerialized] public Color flashColor;
         [NonSerialized] public int shownSeconds = -1;
+        [NonSerialized] public int shownCount = -1;
     }
 
     [SerializeField] private Slot[] slots = new Slot[SkillLoadout.SlotCount];
@@ -40,6 +41,7 @@ public sealed class SkillBarView : MonoBehaviour
 
     private Player bound;
     private PlayerSkills skills;
+    private ItemInventory inventory;
 
     private void OnEnable()
     {
@@ -68,6 +70,7 @@ public sealed class SkillBarView : MonoBehaviour
         Unbind();
         bound = player;
         skills = bound != null ? bound.Skills : null;
+        inventory = bound != null ? bound.GetComponent<ItemInventory>() : null;
         if (skills == null)
         {
             return;
@@ -76,6 +79,7 @@ public sealed class SkillBarView : MonoBehaviour
         skills.Loadout.SlotChanged += OnSlotChanged;
         skills.SkillCast += OnSkillCast;
         skills.CastRefused += OnCastRefused;
+        skills.BarItemUsed += OnBarItemUsed;
         for (int i = 0; i < slots.Length; i++)
         {
             OnSlotChanged(i);
@@ -92,10 +96,12 @@ public sealed class SkillBarView : MonoBehaviour
             skills.Loadout.SlotChanged -= OnSlotChanged;
             skills.SkillCast -= OnSkillCast;
             skills.CastRefused -= OnCastRefused;
+            skills.BarItemUsed -= OnBarItemUsed;
         }
 
         bound = null;
         skills = null;
+        inventory = null;
     }
 
     private void OnSlotChanged(int index)
@@ -106,14 +112,29 @@ public sealed class SkillBarView : MonoBehaviour
         }
 
         SkillDefinition skill = skills.Loadout.Get(index);
-        slots[index].view.Show(
-            skill != null ? skill.Icon : null,
-            skill != null ? SkillSchools.ColorOf(skill.School) : Color.clear,
-            PlayerInputHandler.SkillKeyLabel(index));
+        ItemDefinition item = skills.Loadout.GetItem(index);
+        if (item != null)
+        {
+            // A consumable: its icon and how many are carried (greyed when none).
+            int carried = inventory != null ? inventory.CountCarried(item) : 0;
+            slots[index].view.Show(item.Icon, Color.clear, PlayerInputHandler.SkillKeyLabel(index), carried.ToString(), isLocked: carried <= 0);
+            slots[index].shownCount = carried;
+        }
+        else
+        {
+            slots[index].view.Show(
+                skill != null ? skill.Icon : null,
+                skill != null ? SkillSchools.ColorOf(skill.School) : Color.clear,
+                PlayerInputHandler.SkillKeyLabel(index));
+            slots[index].shownCount = -1;
+        }
+
         slots[index].shownSeconds = -1;
     }
 
     private void OnSkillCast(int index, SkillDefinition skill) => Flash(index, castColor);
+
+    private void OnBarItemUsed(int index, ItemDefinition item) => Flash(index, castColor);
 
     private void OnCastRefused(int index, SkillCastResult result)
     {
@@ -154,6 +175,11 @@ public sealed class SkillBarView : MonoBehaviour
         for (int i = 0; i < slots.Length; i++)
         {
             UpdateSlot(slots[i], skills.Loadout.Get(i));
+            ItemDefinition item = skills.Loadout.GetItem(i);
+            if (item != null && slots[i] != null && inventory != null && inventory.CountCarried(item) != slots[i].shownCount)
+            {
+                OnSlotChanged(i);
+            }
         }
     }
 
