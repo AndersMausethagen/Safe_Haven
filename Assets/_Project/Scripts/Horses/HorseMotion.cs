@@ -54,7 +54,11 @@ public sealed class HorseMotion : MonoBehaviour
     // three to a canter's, four quick ones to a gallop's.
     private static readonly float[] HoofBeats = { 0.28f, 0.34f, 0.2f, 0.12f, 0.1f };
 
-    private enum Idle { Graze, Wander, Flee, Held, Ridden, Come, Strike, Stall, Dead }
+    private enum Idle { Graze, Wander, Flee, Held, Ridden, Come, Strike, Stall, Lure, Approach, Dead }
+
+    // A wild horse notices barley left on the ground this far off, and comes to a crouched, still player with food this far.
+    private const float LureReach = 28f;
+    private const float HandReach = 18f;
 
     [Tooltip("Metres a second each gait's clip shows at the body's size, walk to sprint (measured from the clips' root motion by BuildHorses).")]
     [SerializeField] private float[] gaitSpeeds = { 1.42f, 3.35f, 5.18f, 7.83f, 10.94f };
@@ -84,6 +88,9 @@ public sealed class HorseMotion : MonoBehaviour
     private Combatant strikeAt;
     private float strikeLands;
     private float nextTrample;
+    private DroppedItem lure;
+    private float nextLure;
+    private float nextHand;
     private static readonly Collider[] trampled = new Collider[16];
 
     /// <summary>Its speed over the ground, for the rider and a hitched cart.</summary>
@@ -266,6 +273,23 @@ public sealed class HorseMotion : MonoBehaviour
     }
 
     /// <summary>A shake of the head, a look about or a step: idle life, and its answer to a brush.</summary>
+    /// <summary>It throws its head up and round the way it is about to go (a tell on the rope).</summary>
+    public void PlayHeadToss(Vector3 toward)
+    {
+        if (animator == null)
+        {
+            return;
+        }
+
+        animator.SetInteger(FidgetId, 0);
+        animator.SetTrigger(FidgetingId);
+        Acted?.Invoke(HorseAct.Fidget, 0);
+        if (horse.Definition.Snort != null)
+        {
+            AudioManager.Play(horse.Definition.Snort, transform.position);
+        }
+    }
+
     public void PlayFidget()
     {
         if (animator == null)
@@ -431,9 +455,10 @@ public sealed class HorseMotion : MonoBehaviour
         HorseDefinition kind = horse.Definition;
         Vector3 wish = rideDirection;
         // Under a rider it doesn't know yet, it veers off this way and that (HorseTaming); the rider steers against it.
+        // Balking or rearing, it goes nowhere.
         if (horse.Taming != null && horse.Taming.IsBreaking)
         {
-            wish = Vector3.ClampMagnitude(wish + horse.Taming.Veer, 1f);
+            wish = horse.Taming.IsBalking || horse.Taming.IsRearing ? Vector3.zero : Vector3.ClampMagnitude(wish + horse.Taming.Veer, 1f);
         }
 
         float wanted = wish.magnitude;
@@ -632,6 +657,12 @@ public sealed class HorseMotion : MonoBehaviour
                 }
 
                 return;
+            case Idle.Lure:
+                UpdateLure();
+                return;
+            case Idle.Approach:
+                UpdateApproach();
+                return;
             case Idle.Strike:
                 if (strikeAt != null && Time.time >= strikeLands)
                 {
@@ -649,14 +680,8 @@ public sealed class HorseMotion : MonoBehaviour
         if (Time.time >= nextLook)
         {
             nextLook = Time.time + 0.3f;
-            if (horse.IsWild && Frightened(out Vector3 from))
+            if (Startled() || horse.IsWild && (LookForLure() || LookForHand()))
             {
-                Flee(from, horse.Definition.FleeSeconds * horse.Temperament.panic);
-                if (horse.Definition.Whinny != null)
-                {
-                    AudioManager.Play(horse.Definition.Whinny, transform.position);
-                }
-
                 return;
             }
         }
@@ -674,6 +699,188 @@ public sealed class HorseMotion : MonoBehaviour
         {
             Graze();
         }
+    }
+
+    // A wild horse that hears the player too near, or sees something hunting, bolts.
+    private bool Startled()
+    {
+        if (!horse.IsWild || !Frightened(out Vector3 from))
+        {
+            return false;
+        }
+
+        lure = null;
+        Flee(from, horse.Definition.FleeSeconds * horse.Temperament.panic);
+        if (horse.Definition.Whinny != null)
+        {
+            AudioManager.Play(horse.Definition.Whinny, transform.position);
+        }
+
+        return true;
+    }
+
+    // ----- Winning a wild horse's trust: barley on the ground, and food from the hand -----
+
+    // Barley (or any food it eats) left on the ground within its reach, with no player close by it: it goes to it.
+    private bool LookForLure()
+    {
+        if (Time.time < nextLure)
+        {
+            return false;
+        }
+
+        nextLure = Time.time + 1.5f;
+        Player player = Player.Current;
+        DroppedItem best = null;
+        float bestDistance = LureReach * LureReach;
+        foreach (DroppedItem dropped in DroppedItem.All)
+        {
+            if (dropped == null || dropped.Stack.IsEmpty || !dropped.Stack.Item.IsHorseTreat)
+            {
+                continue;
+            }
+
+            float distance = (dropped.transform.position - transform.position).sqrMagnitude;
+            bool crowded = player != null && (player.transform.position - dropped.transform.position).sqrMagnitude < 5f * 5f;
+            if (distance < bestDistance && !crowded)
+            {
+                best = dropped;
+                bestDistance = distance;
+            }
+        }
+
+        if (best == null || !NavMesh.SamplePosition(best.transform.position, out NavMeshHit hit, 2f, agent.areaMask))
+        {
+            return false;
+        }
+
+        lure = best;
+        mode = Idle.Lure;
+        until = Time.time + 30f;
+        agent.speed = horse.Definition.WalkSpeed;
+        agent.isStopped = false;
+        agent.SetDestination(hit.position);
+        return true;
+    }
+
+    private void UpdateLure()
+    {
+        if (Time.time >= nextLook)
+        {
+            nextLook = Time.time + 0.3f;
+            if (Startled())
+            {
+                return;
+            }
+        }
+
+        if (lure == null || lure.Stack.IsEmpty || Time.time > until)
+        {
+            lure = null;
+            home = transform.position;
+            Graze();
+            return;
+        }
+
+        if ((lure.transform.position - transform.position).sqrMagnitude > 1.8f * 1.8f)
+        {
+            return;
+        }
+
+        // At it: head down, a mouthful, a little calmer; then the next, while any is left.
+        ItemStack food = lure.Stack;
+        if (food.Count > 1)
+        {
+            lure.Hold(new ItemStack(food.Item, food.Count - 1));
+        }
+        else
+        {
+            lure.Vanish();
+            lure = null;
+        }
+
+        horse.Calm();
+        until = Time.time + 4f;
+        mode = Idle.Graze;
+        agent.isStopped = true;
+        nextLure = Time.time + 5f;
+    }
+
+    // A crouched player who keeps still with food in their bag: a horse that has begun to trust them (or a calm one)
+    // comes up to eat from their hand.
+    private bool LookForHand()
+    {
+        Player player = Player.Current;
+        if (Time.time < nextHand || player == null || (horse.Trust < 1 && horse.Stats.temperament != HorseTemperament.Calm) || !OffersFood(player))
+        {
+            return false;
+        }
+
+        Vector3 offset = player.transform.position - transform.position;
+        offset.y = 0f;
+        if (offset.magnitude > HandReach)
+        {
+            return false;
+        }
+
+        Vector3 near = player.transform.position - offset.normalized * 1.7f;
+        if (!NavMesh.SamplePosition(near, out NavMeshHit hit, 2f, agent.areaMask))
+        {
+            return false;
+        }
+
+        mode = Idle.Approach;
+        until = Time.time + 20f;
+        agent.speed = horse.Definition.WalkSpeed * 0.8f;
+        agent.isStopped = false;
+        agent.SetDestination(hit.position);
+        return true;
+    }
+
+    private static bool OffersFood(Player player)
+    {
+        bool still = !player.TryGetComponent(out PlayerMovement feet) || feet.MovementInput.sqrMagnitude < 0.01f;
+        return still && player.Noise != null && player.Noise.IsSneaking && Horse.TreatIn(player.GetComponent<ItemInventory>()) != null;
+    }
+
+    private void UpdateApproach()
+    {
+        if (Time.time >= nextLook)
+        {
+            nextLook = Time.time + 0.3f;
+            if (Startled())
+            {
+                return;
+            }
+        }
+
+        Player player = Player.Current;
+        // Stood up, walked off or out of food: it thinks better of it, and keeps its distance a while.
+        if (player == null || !OffersFood(player) || Time.time > until)
+        {
+            nextHand = Time.time + 15f;
+            home = transform.position;
+            Graze();
+            return;
+        }
+
+        Vector3 offset = player.transform.position - transform.position;
+        offset.y = 0f;
+        if (offset.magnitude > 2.3f)
+        {
+            return;
+        }
+
+        if (offset.sqrMagnitude > 0.01f)
+        {
+            transform.rotation = Quaternion.LookRotation(offset.normalized, Vector3.up);
+        }
+
+        horse.TakeFromHand(player);
+        nextHand = Time.time + 12f;
+        until = Time.time + 4f;
+        mode = Idle.Graze;
+        agent.isStopped = true;
     }
 
     private void StrikeLands()
@@ -704,7 +911,12 @@ public sealed class HorseMotion : MonoBehaviour
         if (player != null && (horse.Taming == null || !horse.Taming.IsHeld))
         {
             float heard = player.Noise != null ? player.Noise.Level : 0f;
-            float startle = (horse.Definition.ShyDistance + heard * horse.Definition.PerHeardMetre) * horse.Temperament.shyness;
+            float startle = (horse.Definition.ShyDistance + heard * horse.Definition.PerHeardMetre) * horse.Temperament.shyness * horse.ShyScale;
+            // Coming to eat from the hand, it lets the crouched player be.
+            if (mode == Idle.Approach)
+            {
+                startle *= 0.3f;
+            }
             Vector3 offset = player.transform.position - transform.position;
             offset.y = 0f;
             if (offset.sqrMagnitude < startle * startle)

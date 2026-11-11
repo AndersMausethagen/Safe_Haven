@@ -40,6 +40,19 @@ public static class HorseTamingRules
         return Mathf.Clamp01((Vector3.Dot(Vector3.ClampMagnitude(input, 1f), fromHorse.normalized) - 0.3f) / 0.7f);
     }
 
+    /// <summary>True when a lean caught the pull: hard against it (at least 0.6) within <paramref name="window"/> seconds of
+    /// its start, after the horse's tell.</summary>
+    public static bool CaughtPull(float sincePullStarted, float lean, float window) =>
+        sincePullStarted >= 0f && sincePullStarted <= window && lean >= 0.6f;
+
+    /// <summary>True when the movement keys go with the horse's pull rather than against it: that gives it rope.</summary>
+    public static bool LeansWith(Vector3 input, Vector3 pull)
+    {
+        input.y = 0f;
+        pull.y = 0f;
+        return input.sqrMagnitude > 0.01f && pull.sqrMagnitude > 0.0001f && Vector3.Dot(input.normalized, pull.normalized) > 0.4f;
+    }
+
     public static bool Slipped(float strain) => strain >= 1f;
 
     public static bool GivenIn(float stamina) => stamina <= 0f;

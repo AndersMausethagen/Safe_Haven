@@ -29,6 +29,13 @@ public sealed class HorseTaming : MonoBehaviour
     // Walked this far from a spent horse, the rope slips.
     private const float SlackReach = 11f;
     private const float ResistSeconds = 0.5f;
+    // The tell before each pull, and how soon after the pull starts a lean against it counts as catching it.
+    private const float TellSeconds = 0.55f;
+    private const float CatchWindow = 0.7f;
+    private const float BalkSeconds = 3.5f;
+    private const float CoaxSeconds = 1.2f;
+    private const float LassoSnapChance = 0.25f;
+    private const float RearWindow = 0.9f;
 
     private Horse horse;
     private Player handler;
@@ -49,6 +56,12 @@ public sealed class HorseTaming : MonoBehaviour
     private float veerUntil;
     private float nextVeer;
     private float lastResisted;
+    private float tellUntil;
+    private bool caught;
+    private float spinRate;
+    private float balkUntil;
+    private float coaxed;
+    private float rearUntil;
 
     /// <summary>The horse the local player is taming, for the HUD; null when none.</summary>
     public static HorseTaming Active { get; private set; }
@@ -63,11 +76,21 @@ public sealed class HorseTaming : MonoBehaviour
     public float Strain => strain;
     /// <summary>What strength it has left to fight with, 0-1.</summary>
     public float Strength => FullStruggle > 0f ? struggle / FullStruggle : 0f;
-    private float FullStruggle => horse.Definition.StruggleStamina * horse.Temperament.fight;
+    private float FullStruggle => horse.Definition.StruggleStamina * horse.Temperament.fight * horse.FightScale;
     /// <summary>How hard the player leans on the rope now, 0-1 (for the HUD).</summary>
     public float Lean { get; private set; }
     /// <summary>True while it drags a player who isn't holding against it.</summary>
     public bool IsDragging { get; private set; }
+    /// <summary>True while it throws its head before a pull: the way it is about to go (lean the other way).</summary>
+    public bool IsTelling => phase == Phase.Struggle && Time.time < tellUntil;
+    /// <summary>The way it pulls (or is about to), on the ground from the player.</summary>
+    public Vector3 PullDirection { get; private set; }
+    /// <summary>When the player last caught a pull with a timed lean (the HUD shows it a moment).</summary>
+    public float CaughtAt { get; private set; } = -99f;
+    /// <summary>A stubborn horse on its breaking ride has planted its feet: the rider pushes it on (forward).</summary>
+    public bool IsBalking => phase == Phase.Breaking && Time.time < balkUntil;
+    /// <summary>A bold horse rears under the rider: they lean forward (the movement keys ahead) or slide off.</summary>
+    public bool IsRearing => phase == Phase.Breaking && Time.time < rearUntil;
     /// <summary>The rider's balance on the breaking ride, 0-1: at 0 they are thrown.</summary>
     public float Balance => balance;
     /// <summary>Where it is veering off to now (its length is how hard), zero between veers; HorseMotion adds it to the rider's steering.</summary>
@@ -176,13 +199,14 @@ public sealed class HorseTaming : MonoBehaviour
                 lastResisted = Time.time;
             }
 
-            // Leaning away from it holds as a few taps a second would, while the player has the stamina for it.
+            // Leaning against the way it pulls holds as a few taps a second would, while the player has the stamina for it;
+            // leaning with it gives it rope. Caught just as the pull starts, after its tell, a lean holds it hard.
             PlayerMovement feet = handler.GetComponent<PlayerMovement>();
             PlayerStamina breath = handler.Stamina;
             if (feet != null && breath != null && breath.Current > 0.5f)
             {
                 HorseSettings settings = HorseSettings.Current;
-                Lean = HorseTamingRules.Lean(feet.MovementInput, handler.transform.position - transform.position);
+                Lean = HorseTamingRules.Lean(feet.MovementInput, -PullDirection);
                 if (Lean > 0f)
                 {
                     if (Lean > 0.15f)
@@ -193,11 +217,27 @@ public sealed class HorseTaming : MonoBehaviour
                     taps += Lean * settings.LeanTapsPerSecond * Time.deltaTime;
                     breath.Drain(Lean * settings.LeanStaminaPerSecond * Time.deltaTime);
                 }
+
+                if (!IsTelling && !caught && HorseTamingRules.CaughtPull(Time.time - tellUntil, Lean, CatchWindow))
+                {
+                    caught = true;
+                    CaughtAt = Time.time;
+                    strain = Mathf.Max(0f, strain - 0.2f);
+                    struggle = Mathf.Max(0f, struggle - horse.Definition.TapDrain * 4f * (1f + PlayerHorsemanship.TamingHold()));
+                    CameraShake.Add(0.08f);
+                }
+
+                if (HorseTamingRules.LeansWith(feet.MovementInput, PullDirection))
+                {
+                    strain = Mathf.Min(1f, strain + 0.3f * Time.deltaTime);
+                }
             }
         }
 
         float quality = horse.Stats.Quality(horse.Definition);
-        HorseTamingRules.Struggle(ref strain, ref struggle, taps, Time.deltaTime, quality, horse.Definition, horse.Temperament.pull,
+        // During its tell it only gathers itself: the pull comes after.
+        float pulling = horse.Temperament.pull * (IsTelling ? 0.3f : 1f);
+        HorseTamingRules.Struggle(ref strain, ref struggle, taps, Time.deltaTime, quality, horse.Definition, pulling,
             1f + PlayerHorsemanship.TamingHold());
         if (HorseTamingRules.Slipped(strain))
         {
@@ -232,10 +272,25 @@ public sealed class HorseTaming : MonoBehaviour
             NextLunge();
         }
 
-        // It can't go further than the rope: the lunge ends on the circle round the player.
+        // It can't go further than the rope: the lunge ends on the circle round the player. Its tell: it stands and turns
+        // its head and body the way it is about to go.
         Vector3 holder = handler.transform.position;
         Vector3 offset = lungeTo - holder;
         offset.y = 0f;
+        PullDirection = offset.sqrMagnitude > 0.01f ? offset.normalized : PullDirection;
+        if (IsTelling)
+        {
+            horse.Motion.Lunge(transform.position, 0f);
+            Vector3 face = lungeTo - transform.position;
+            face.y = 0f;
+            if (face.sqrMagnitude > 0.01f)
+            {
+                horse.Motion.TurnToward(Quaternion.LookRotation(face.normalized, Vector3.up));
+            }
+
+            return;
+        }
+
         Vector3 point = holder + Vector3.ClampMagnitude(offset, RopeLength);
         horse.Motion.Lunge(point, horse.Definition.TrotSpeed * (0.6f + 0.6f * strain));
     }
@@ -249,7 +304,10 @@ public sealed class HorseTaming : MonoBehaviour
         float turn = (float)(random.NextDouble() * 160.0 - 80.0);
         lungeTo = transform.position + Quaternion.Euler(0f, turn, 0f) * away * 8f;
         Vector2 seconds = horse.Definition.LungeSeconds;
-        lungeUntil = Time.time + Mathf.Lerp(seconds.x, seconds.y, (float)random.NextDouble());
+        tellUntil = Time.time + TellSeconds;
+        caught = false;
+        lungeUntil = tellUntil + Mathf.Lerp(seconds.x, seconds.y, (float)random.NextDouble());
+        horse.Motion.PlayHeadToss(lungeTo - transform.position);
         CameraShake.Add(HorseSettings.Current.RopeJolt * 0.5f);
         if (random.NextDouble() < 0.35)
         {
@@ -328,36 +386,107 @@ public sealed class HorseTaming : MonoBehaviour
     {
         HorseSettings settings = HorseSettings.Current;
         float bucking = horse.Temperament.bucking;
-        if (Time.time >= nextVeer)
-        {
-            Vector2 seconds = settings.BuckSeconds;
-            nextVeer = Time.time + Mathf.Lerp(seconds.x, seconds.y, (float)random.NextDouble()) / Mathf.Max(0.3f, bucking);
-            veerUntil = Time.time + Mathf.Lerp(1f, 1.7f, (float)random.NextDouble());
-            Vector3 side = transform.right * (random.NextDouble() < 0.5 ? -1f : 1f);
-            veer = (side * 0.85f + transform.forward * 0.25f) * Mathf.Clamp(bucking, 0.4f, 1.2f);
-            if (random.NextDouble() < 0.4)
-            {
-                horse.Motion.PlayBuck();
-                bool sure = Techniques.Has(PerkTechnique.SureSeat);
-                if (sure)
-                {
-                    Techniques.Used(PerkTechnique.SureSeat);
-                }
-
-                balance = Mathf.Max(0f, balance - settings.BuckBalance * 0.5f * bucking * (sure ? 0.5f : 1f));
-                Whinny();
-            }
-        }
-
+        bool sure = Techniques.Has(PerkTechnique.SureSeat);
         PlayerMovement feet = handler.GetComponent<PlayerMovement>();
         bool free = UIStateManager.Current == null || !UIStateManager.Current.IsAnyWindowOpen;
         Vector3 input = feet != null && free ? feet.MovementInput : Vector3.zero;
-        float loss = settings.BuckBalance * (Techniques.Has(PerkTechnique.SureSeat) ? 0.5f : 1f);
+        float ahead = input.sqrMagnitude > 0.01f ? Vector3.Dot(input.normalized, transform.forward) : 0f;
+        if (Time.time >= nextVeer && !IsBalking && !IsRearing)
+        {
+            Vector2 seconds = settings.BuckSeconds;
+            nextVeer = Time.time + Mathf.Lerp(seconds.x, seconds.y, (float)random.NextDouble()) / Mathf.Max(0.3f, bucking);
+            NextTrick(settings, bucking, sure);
+        }
+
+        // A skittish horse spins: the veer goes round, and the rider must keep steering against it.
+        if (spinRate != 0f && Time.time < veerUntil)
+        {
+            veer = Quaternion.Euler(0f, spinRate * Time.deltaTime, 0f) * veer;
+        }
+
+        // A stubborn one balks: pushed on (forward) long enough it walks on; left to stand, it bucks.
+        if (IsBalking)
+        {
+            coaxed = ahead > 0.6f ? coaxed + Time.deltaTime : Mathf.Max(0f, coaxed - Time.deltaTime * 0.5f);
+            if (coaxed >= CoaxSeconds)
+            {
+                balkUntil = 0f;
+                GameMessages.Post("It gives in and walks on.", MessageKind.Gain);
+            }
+            else if (Time.time >= balkUntil - 0.05f)
+            {
+                balkUntil = 0f;
+                Buck(settings, bucking, sure, 0.5f);
+            }
+        }
+
+        // A bold one rears: leaning forward keeps the seat; sitting back, the rider slides off its rump.
+        if (IsRearing && ahead > 0.6f)
+        {
+            rearUntil = 0f;
+            GameMessages.Post("You lean into its neck and hold on.", MessageKind.Gain);
+        }
+        else if (rearUntil > 0f && Time.time >= rearUntil)
+        {
+            rearUntil = 0f;
+            balance = Mathf.Max(0f, balance - settings.BuckBalance * 1.2f * (sure ? 0.5f : 1f));
+        }
+
+        float loss = settings.BuckBalance * (sure ? 0.5f : 1f);
         balance = HorseTamingRules.Balance(balance, Veer, input, Time.deltaTime, loss, settings.SteadyPerSecond, bucking);
         if (balance <= 0f)
         {
             Escape("It bucks you clean off and bolts.");
         }
+    }
+
+    // What it does next to throw the rider, by its nature: every horse veers and bucks; a skittish one spins round, a
+    // stubborn one plants its feet, a bold one rears.
+    private void NextTrick(HorseSettings settings, float bucking, bool sure)
+    {
+        veerUntil = Time.time + Mathf.Lerp(1f, 1.7f, (float)random.NextDouble());
+        Vector3 side = transform.right * (random.NextDouble() < 0.5 ? -1f : 1f);
+        float calm = horse.Stats.temperament == HorseTemperament.Calm ? 0.7f : 1f;
+        veer = (side * 0.85f + transform.forward * 0.25f) * Mathf.Clamp(bucking, 0.4f, 1.2f) * calm;
+        spinRate = 0f;
+        double roll = random.NextDouble();
+        switch (horse.Stats.temperament)
+        {
+            case HorseTemperament.Skittish when roll < 0.45:
+                spinRate = (random.NextDouble() < 0.5 ? -1f : 1f) * 200f;
+                veerUntil = Time.time + 1.8f;
+                Whinny();
+                return;
+            case HorseTemperament.Stubborn when roll < 0.4:
+                veerUntil = 0f;
+                balkUntil = Time.time + BalkSeconds;
+                coaxed = 0f;
+                GameMessages.Post("It plants its feet and won't go on. Push it forward.", MessageKind.Warning);
+                return;
+            case HorseTemperament.Bold when roll < 0.4:
+                veerUntil = 0f;
+                rearUntil = Time.time + RearWindow;
+                horse.Motion.PlayRear();
+                GameMessages.Post("It rears! Lean forward.", MessageKind.Warning);
+                return;
+        }
+
+        if (roll > 0.6)
+        {
+            Buck(settings, bucking, sure, 0.5f);
+        }
+    }
+
+    private void Buck(HorseSettings settings, float bucking, bool sure, float share)
+    {
+        horse.Motion.PlayBuck();
+        if (sure)
+        {
+            Techniques.Used(PerkTechnique.SureSeat);
+        }
+
+        balance = Mathf.Max(0f, balance - settings.BuckBalance * share * bucking * (sure ? 0.5f : 1f));
+        Whinny();
     }
 
     private void Mount()
@@ -468,10 +597,32 @@ public sealed class HorseTaming : MonoBehaviour
     {
         Phase was = phase;
         Player from = handler;
+        bool thrown = horse.Rider != null;
         Stop();
         if (horse.Rider != null)
         {
             horse.Rider.Dismount(thrown: true);
+        }
+
+        // It got away: warier of this player; a slipped rope may snap the lasso; a rider thrown off lands hard.
+        if (message != null && from != null && was != Phase.None)
+        {
+            horse.GotAway();
+            if (was == Phase.Struggle && horse.Definition.Lasso != null && random.NextDouble() < LassoSnapChance
+                && from.TryGetComponent(out ItemInventory items) && items.Container.Remove(horse.Definition.Lasso, 1) > 0)
+            {
+                message += " The lasso snaps.";
+            }
+
+            if (thrown && from.TryGetComponent(out Damageable body) && body.IsAlive)
+            {
+                body.ApplyDamage(new DamageInfo(null, null, body.MaxHealth * 0.06f, DamageType.Physical, false, from.transform.position + Vector3.up,
+                    Vector3.down, 0f, HitTechnique.None));
+                if (from.TryGetComponent(out PlayerCombat combat))
+                {
+                    combat.Rebuff(1f);
+                }
+            }
         }
 
         horse.SetTamingState(Horse.Mode.Wild);

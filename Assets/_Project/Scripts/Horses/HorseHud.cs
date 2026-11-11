@@ -104,7 +104,9 @@ public sealed class HorseHud : MonoBehaviour
             second.Show(true);
             first.Set(taming.Strain, taming.Strain > 0.75f ? style.Danger : style.Warning);
             second.Set(taming.Strength, style.Accent);
-            hint.text = taming.IsDragging ? $"It drags you! Tap {key}, lean away" : taming.Lean > 0.05f ? $"Tap {key}" : $"Tap {key}, lean away";
+            hint.text = Time.time - taming.CaughtAt < 0.8f ? "Caught it!"
+                : taming.IsTelling ? "It throws its head: lean the other way"
+                : taming.IsDragging ? $"It drags you! Tap {key}, lean back" : taming.Lean > 0.05f ? $"Tap {key}" : $"Tap {key}, lean against it";
         }
         else if (taming != null && taming.Current == HorseTaming.Phase.GivenIn)
         {
@@ -128,6 +130,8 @@ public sealed class HorseHud : MonoBehaviour
 
             ItemDefinition barley = taming.Horse.Definition.Barley;
             hint.text = taming.IsAsking ? $"{key}: {(barley != null ? barley.DisplayName.ToLowerInvariant() : "food")} ({taming.Fed}/{taming.Needed})"
+                : taming.IsBalking ? "It won't move: push forward"
+                : taming.IsRearing ? "It rears: lean forward!"
                 : taming.Veer.sqrMagnitude > 0.01f ? "Steer against it!" : "";
         }
         else if (riding != null && riding.IsRiding)

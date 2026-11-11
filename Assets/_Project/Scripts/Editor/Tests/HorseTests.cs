@@ -212,6 +212,18 @@ public sealed class HorseTests
     }
 
     [Test]
+    public void TheRope_RewardsALeanCaughtAfterTheTell_AndPunishesLeaningWithIt()
+    {
+        Assert.IsTrue(HorseTamingRules.CaughtPull(0.2f, 0.8f, 0.7f), "hard against it, just after the pull starts");
+        Assert.IsFalse(HorseTamingRules.CaughtPull(-0.1f, 1f, 0.7f), "not during the tell, before it pulls");
+        Assert.IsFalse(HorseTamingRules.CaughtPull(1.2f, 1f, 0.7f), "nor long after");
+        Assert.IsFalse(HorseTamingRules.CaughtPull(0.2f, 0.3f, 0.7f), "nor a half-hearted lean");
+        Assert.IsTrue(HorseTamingRules.LeansWith(Vector3.forward, Vector3.forward), "the keys with the pull give it rope");
+        Assert.IsFalse(HorseTamingRules.LeansWith(Vector3.back, Vector3.forward));
+        Assert.AreEqual(1f, HorseTamingRules.Lean(Vector3.back, -Vector3.forward), 0.001f, "against the pull counts in full");
+    }
+
+    [Test]
     public void Bond_GrowsWithCare_WearsDownWithout_AndGivesWhatItSays()
     {
         HorseSettings settings = HorseSettings.Current;

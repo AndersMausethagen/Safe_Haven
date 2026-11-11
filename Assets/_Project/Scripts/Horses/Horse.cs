@@ -82,6 +82,17 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold
     public bool IsGrown => Stats.IsGrown;
     public HorseTemperamentRules Temperament => HorseSettings.Current.Temperament(Stats.temperament);
 
+    /// <summary>A wild horse's trust, 0-3: barley it found on the ground or ate from the player's hand. Each step lets the
+    /// player nearer and takes fight out of it on the rope. Not saved: a wild horse isn't.</summary>
+    public int Trust { get; private set; }
+    /// <summary>How often this wild horse has got away from the player: each time it is shyer and fights longer.</summary>
+    public int Wariness { get; private set; }
+    public const int MostTrust = 3;
+    /// <summary>Its shy distance, times this (trust nearer, wariness farther).</summary>
+    public float ShyScale => (1f - 0.18f * Trust) * (1f + 0.4f * Wariness);
+    /// <summary>Its fight on the rope, times this.</summary>
+    public float FightScale => (1f - 0.15f * Trust) * (1f + 0.2f * Wariness);
+
     /// <summary>The bond with the player, 0-100 (HorseBondRules).</summary>
     public float Bond { get; private set; }
     /// <summary>The in-game day it was last fed, groomed or ridden, for the bond's wearing down.</summary>
@@ -249,6 +260,51 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold
         }
     }
 
+    // ----- A wild horse's trust -----
+
+    /// <summary>It ate barley the player left for it, or from their hand: a little calmer.</summary>
+    public void Calm()
+    {
+        if (!IsWild)
+        {
+            return;
+        }
+
+        Trust = Mathf.Min(MostTrust, Trust + 1);
+        Motion.PlayEat();
+        Player player = Player.Current;
+        if (player != null && (player.transform.position - transform.position).sqrMagnitude < 35f * 35f)
+        {
+            GameMessages.Post(Trust >= MostTrust ? "The horse eats, and lets you be. It trusts you as far as a wild one can." : $"The horse eats, and is a little calmer ({Trust} of {MostTrust}).", MessageKind.Gain);
+        }
+    }
+
+    /// <summary>Eats food from a crouched player's hand (the best in their bag): it trusts them more.</summary>
+    public bool TakeFromHand(Player player)
+    {
+        ItemInventory items = player != null ? player.GetComponent<ItemInventory>() : null;
+        ItemDefinition treat = TreatIn(items);
+        if (treat == null || !IsWild)
+        {
+            return false;
+        }
+
+        if (items.Container.Remove(treat, 1) < 1 && (items.SafePocket == null || items.SafePocket.Remove(treat, 1) < 1))
+        {
+            return false;
+        }
+
+        Calm();
+        return true;
+    }
+
+    /// <summary>It got away from the player: warier from now on.</summary>
+    public void GotAway()
+    {
+        Wariness++;
+        Trust = 0;
+    }
+
     // ----- Bond -----
 
     /// <summary>The bond grows (feeding, grooming, riding), and it counts as cared for today.</summary>
@@ -289,7 +345,7 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold
     /// none or it isn't hungry yet.</summary>
     public bool Feed(ItemInventory from)
     {
-        ItemDefinition treat = FindTreat(from);
+        ItemDefinition treat = TreatIn(from);
         if (treat == null)
         {
             GameMessages.Post("You have nothing it would eat: barley, a turnip or bread.", MessageKind.Warning);
@@ -317,9 +373,15 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold
         return true;
     }
 
-    private static ItemDefinition FindTreat(ItemInventory from)
+    /// <summary>The food in a bag a horse likes best (bread before barley), or null.</summary>
+    public static ItemDefinition TreatIn(ItemInventory from)
     {
         ItemDefinition best = null;
+        if (from == null)
+        {
+            return null;
+        }
+
         foreach (ItemContainer container in new[] { from.Container, from.SafePocket })
         {
             for (int i = 0; container != null && i < container.SlotCount; i++)
@@ -552,7 +614,8 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold
 
         if (!IsTamed)
         {
-            GameMessages.Post(IsWild ? "It won't let you near. A lasso, thrown from close, might hold it." : "Not now: it is fighting you.", MessageKind.Info);
+            GameMessages.Post(IsWild ? "It won't let you near. Leave barley on the ground for it, or crouch still with some in your bag; then a lasso, thrown from close, might hold it."
+                : "Not now: it is fighting you.", MessageKind.Info);
             return;
         }
 
