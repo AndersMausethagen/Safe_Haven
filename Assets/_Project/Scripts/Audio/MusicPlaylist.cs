@@ -85,6 +85,18 @@ public sealed class MusicPlaylist
 
     public bool HasTracks => PlayableCount > 0;
 
+    /// <summary>True when both play the same clips in the same order: the same music, though not the same playlist.</summary>
+    public bool SameMusicAs(MusicPlaylist other)
+    {
+        if (other == null || other.tracks.Count != tracks.Count) return false;
+        for (int i = 0; i < tracks.Count; i++)
+        {
+            if (tracks[i]?.clip != other.tracks[i]?.clip) return false;
+        }
+
+        return true;
+    }
+
     public int PlayableCount
     {
         get

@@ -2796,5 +2796,11 @@
   "text": "The stones are still out there. They only want a hand that keeps a fire.",
   "mood": "Calm",
   "by": "kind"
+ },
+ "b60cc7da801d": {
+  "speaker": "Sigrid",
+  "text": "I can see that. Light your torches. You, take this: fireflies in a jar. No flame for the r",
+  "mood": "Stern",
+  "by": "direction"
  }
 }

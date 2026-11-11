@@ -12,6 +12,8 @@ public sealed class CompanionBody
     // Where the walk sits on the controllers' Speed blend, and how fast it covers ground. Beyond it the blend mixes in the
     // run: its lean, and a stride that doesn't fit the ground.
     private const float WalkOnBlend = 1.5f;
+    // Where the run sits on the locomotion blend (Villager and the Quaternius bodies: walk 1.5, run 3.5 m/s).
+    private const float RunOnBlend = 3.5f;
 
     private readonly Animator animator;
     private readonly bool hasSpeed;
@@ -63,8 +65,9 @@ public sealed class CompanionBody
         else weaponModel.SetActive(wasVisible);
     }
 
-    /// <summary>How fast it moves. With a <paramref name="walkingPace"/> (a party keeping step) it stays upright in the walk,
-    /// which plays as fast as that pace needs, instead of blending towards a run.</summary>
+    /// <summary>How fast it moves. With a <paramref name="walkingPace"/> (a party keeping step) it keeps to one clip, the
+    /// walk or (for a pace nearer a run) the run, played as fast as that pace needs, instead of a blend between them that
+    /// changes with every step. The prologue's road party (3.5 m/s) ran its walk at 2.3 times speed.</summary>
     public void SetSpeed(float speed, float walkingPace = 0f)
     {
         if (!hasSpeed)
@@ -74,9 +77,10 @@ public sealed class CompanionBody
 
         if (walkingPace > 0f)
         {
+            float clip = walkingPace >= (WalkOnBlend + RunOnBlend) * 0.5f ? RunOnBlend : WalkOnBlend;
             float moving = Mathf.Clamp01(speed / walkingPace);
-            animator.SetFloat(SpeedHash, moving * WalkOnBlend, 0.15f, Time.deltaTime);
-            animator.speed = Mathf.Lerp(1f, walkingPace / WalkOnBlend, moving);
+            animator.SetFloat(SpeedHash, moving * clip, 0.15f, Time.deltaTime);
+            animator.speed = Mathf.Lerp(1f, walkingPace / clip, moving);
             return;
         }
 

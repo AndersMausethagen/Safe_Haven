@@ -1070,8 +1070,8 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: cef83a33b0472484098b0aed21cadc16, type: 3}
     mood: Yelling
   - speaker: Sigrid
-    text: I can see that. Light your torches, and take this one.
-    clip: {fileID: 8300000, guid: 035b81e87a1636046bbc8fb5f78ca244, type: 3}
+    text: 'I can see that. Light your torches. You, take this: fireflies in a jar. No flame for the rain to put out.'
+    clip: {fileID: 8300000, guid: 5dbd6d36c7dd38b49bb478c097033dc4, type: 3}
     mood: Stern
   - speaker: Sigrid
     text: I can't take much more of this.

@@ -2977,13 +2977,13 @@
   }
  },
  {
-  "id": "0dea2076e3a3",
+  "id": "b60cc7da801d",
   "voice": "sigrid",
-  "text": "I can see that. Light your torches, and take this one.",
+  "text": "I can see that. Light your torches. You, take this: fireflies in a jar. No flame for the rain to put out.",
   "engine": "acted",
   "mood": "Stern",
   "effects": {},
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/0dea2076e3a3.wav"
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/b60cc7da801d.wav"
  },
  {
   "id": "e1ef4f263cca",

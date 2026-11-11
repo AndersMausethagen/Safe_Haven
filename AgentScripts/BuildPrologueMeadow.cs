@@ -1733,7 +1733,7 @@ public static class BuildPrologueMeadow
         SerializedProperty eerieTracks = eerie.FindPropertyRelative("music.tracks");
         eerieTracks.arraySize = 1;
         eerieTracks.GetArrayElementAtIndex(0).FindPropertyRelative("clip").objectReferenceValue =
-            Load<AudioClip>("Assets/_Project/Audio/Misty woods - Eerie raid.mp3");
+            Load<AudioClip>(ForestMusic);
         eerieTracks.GetArrayElementAtIndex(0).FindPropertyRelative("volume").floatValue = 1f;
         eerieTracks.GetArrayElementAtIndex(0).FindPropertyRelative("startAt").floatValue = 0f;
         eerie.FindPropertyRelative("fightsInterrupt").boolValue = true;
@@ -1799,12 +1799,17 @@ public static class BuildPrologueMeadow
         var music = Story(moments, "Story - Morning Music");
         var sceneStarts = new WhenSceneStarts { once = false };
         var inTheSun = new HasHappenedNode { questEvent = entered };
-        var play = new MusicNode { change = MusicNode.Change.Play };
+        // Fights interrupt it: the wolves on the road brought no combat music (the user, 2026-11-11).
+        var play = new MusicNode { change = MusicNode.Change.Play, fightsInterrupt = true };
         var clip = Load<AudioClip>("Assets/_Project/Audio/Safe Haven - Heartwood Sanctuary.mp3");
+        // Loaded on the road after the wolves: the forest's music, as it was when saved.
+        var pastWolves = new HasHappenedNode { questEvent = Event("RoadWolvesBeaten", "prologue.road_wolves_beaten", "Beat the Wolves on the Road", "") };
+        var playForest = new MusicNode { change = MusicNode.Change.Play, fightsInterrupt = true };
         var seenWest = new RevealGroundNode { centre = Mark(moments, "Known Ground (west)", -335f, 0f), radius = 125f };
         var seenEast = new RevealGroundNode { centre = Mark(moments, "Known Ground (east)", -212f, 0f), radius = 112f };
-        Link(music, (sceneStarts, 0, inTheSun), (inTheSun, 1, play), (inTheSun, 1, seenWest), (inTheSun, 1, seenEast));
+        Link(music, (sceneStarts, 0, inTheSun), (inTheSun, 1, pastWolves), (pastWolves, 1, play), (pastWolves, 0, playForest), (inTheSun, 1, seenWest), (inTheSun, 1, seenEast));
         PlaylistOf(music, play, clip);
+        PlaylistOf(music, playForest, Load<AudioClip>(ForestMusic));
 
         // ----- Everyone says who they are -----
         var intro = Story(moments, "Story - The Morning Fire");
@@ -2149,6 +2154,12 @@ public static class BuildPrologueMeadow
         var wolvesCome = new SpawnEnemiesNode { zone = roadWolves, waitUntilDefeated = true };
         var moveOn = Aside(S(), "Wolves that hunt by day and do not fear four armed people. Whatever happened to this cart was quick, and it did not end here. We go on.");
         Link(walkStory, (walk, 0, sighted), (sighted, 0, looked), (looked, 0, running), (looked, 0, behindThem), (behindThem, 0, wolvesCry), (behindThem, 0, wolvesCome), (wolvesCome, 0, moveOn));
+        // After the wolves the forest's music comes early, over the rest of the road (the user, 2026-11-11). The tree line
+        // plays it again (Reactions), which carries on without restarting (SceneAudio.PlayEventMusic).
+        var beaten = new RaiseQuestEventNode { questEvent = Ev("RoadWolvesBeaten") };
+        var forestMusic = new MusicNode { change = MusicNode.Change.Play, fightsInterrupt = true };
+        Link(walkStory, (wolvesCome, 0, beaten), (wolvesCome, 0, forestMusic));
+        PlaylistOf(walkStory, forestMusic, Load<AudioClip>(ForestMusic));
         float[] runToZ = { 6f, 1f, -13f };
         for (int i = 0; i < runners.Length; i++)
         {
@@ -2188,9 +2199,10 @@ public static class BuildPrologueMeadow
         Link(walkStory, (moveOn, 0, toBirds), (toBirds, 0, quiet));
 
         var toTorches = new WaitForWalkNode { reaches = 0.55f };
-        var lightUp = Aside(S(), "I can see that. Light your torches, and take this one.");
+        // The player is given a firefly lantern, not a torch (the user, 2026-11-11): no flame for the mist, both hands free.
+        var lightUp = Aside(S(), "I can see that. Light your torches. You, take this: fireflies in a jar. No flame for the rain to put out.");
         var torchesOnce = new HasHappenedNode { questEvent = Ev("TorchesLit") };
-        var giveTorch = new GiveItemsNode { equip = true, items = { new ItemAmount(Item("HandTorch"), 1) } };
+        var giveTorch = new GiveItemsNode { equip = true, items = { new ItemAmount(Item("PrimitiveFireflyLantern"), 1) } };
         var torchesNow = new RaiseQuestEventNode { questEvent = Ev("TorchesLit") };
         var lightAgain = new RaiseQuestEventNode { questEvent = Ev("TorchesLit") };
         Link(walkStory, (moveOn, 0, toTorches), (toTorches, 0, lightUp), (lightUp, 0, torchesOnce), (torchesOnce, 1, giveTorch), (giveTorch, 0, torchesNow), (torchesOnce, 0, lightAgain));
@@ -2441,6 +2453,8 @@ public static class BuildPrologueMeadow
         EditorSceneManager.SaveScene(scene);
         return $"echo after {end.questEvent.name}; problems: {string.Join("; ", story.FindProblems())}; dirty {scene.isDirty}";
     }
+
+    private const string ForestMusic = "Assets/_Project/Audio/Misty woods - Eerie raid.mp3";
 
     private static void PlaylistOf(StoryScript story, MusicNode node, AudioClip clip)
     {

@@ -51,7 +51,13 @@ public sealed class SceneAudio : MonoBehaviour
             return;
         }
         musicOverridden = true;
-        eventMusic = playlist;
+        // The same music asked for again (the prologue's forest music after the wolves, then at the tree line) carries on
+        // instead of starting over: the music player tells playlists apart, not their clips.
+        if (eventMusic == null || !eventMusic.SameMusicAs(playlist))
+        {
+            eventMusic = playlist;
+        }
+
         fightsInterruptEventMusic = fightsInterrupt;
     }
 
