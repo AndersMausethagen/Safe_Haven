@@ -30,6 +30,10 @@ public sealed class PlayerRiding : MonoBehaviour
     private bool feetFree;
     private float nextReminder;
     private float nextRear;
+    // Space: a tap toggles the canter (free), a hold gallops (on its stamina).
+    private float spacePressedAt = -10f;
+    private bool cruising;
+    private const float TapSeconds = 0.22f;
     private PlayerCombat combat;
 
     /// <summary>The frame the player last left the saddle: the same press of X mustn't whistle too (HorseWhistle).</summary>
@@ -224,7 +228,7 @@ public sealed class PlayerRiding : MonoBehaviour
         if (!taught && horse.IsTamed)
         {
             taught = true;
-            GameMessages.Post($"Steer with the movement keys. Space gallops while it has the breath, {GameInput.KeyLabel(GameInput.Sneak)} walks it, {GameInput.KeyLabel(GameInput.Whistle)} gets you down.");
+            GameMessages.Post($"Steer with the movement keys. Tap {GameInput.KeyLabel(GameInput.Dodge)} to canter, hold it to gallop on its breath; {GameInput.KeyLabel(GameInput.Sneak)} walks it, {GameInput.KeyLabel(GameInput.Whistle)} gets you down.");
         }
     }
 
@@ -534,8 +538,29 @@ public sealed class PlayerRiding : MonoBehaviour
             Riding.Motion.PlayRear();
         }
 
-        int gait = free && GameInput.Dodge != null && GameInput.Dodge.IsPressed() ? 1
-            : free && GameInput.Sneak != null && GameInput.Sneak.IsPressed() ? -1 : 0;
+        bool moving = steer.sqrMagnitude > 0.01f;
+        if (free && GameInput.Dodge != null)
+        {
+            if (GameInput.Dodge.WasPressedThisFrame())
+            {
+                spacePressedAt = Time.time;
+            }
+
+            if (GameInput.Dodge.WasReleasedThisFrame() && Time.time - spacePressedAt <= TapSeconds && moving)
+            {
+                cruising = !cruising;
+            }
+        }
+
+        // Stopping ends the canter.
+        if (!moving && Riding.Motion.Velocity.magnitude < 0.3f)
+        {
+            cruising = false;
+        }
+
+        bool burst = free && GameInput.Dodge != null && GameInput.Dodge.IsPressed() && Time.time - spacePressedAt > TapSeconds;
+        bool walk = free && GameInput.Sneak != null && GameInput.Sneak.IsPressed();
+        int gait = walk ? -1 : burst ? 1 : cruising ? 2 : 0;
         Riding.Motion.Ride(steer, gait);
     }
 }

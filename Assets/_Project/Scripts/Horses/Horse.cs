@@ -22,6 +22,10 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold
 {
     public enum Mode { Wild, Lassoed, Breaking, Tamed }
 
+    /// <summary>What a tamed horse does when nobody rides it: grazes about where it was left, follows the player (behind
+    /// them on foot, on a lead behind the horse they ride), or stays put.</summary>
+    public enum Orders { Graze, Follow, Stay }
+
     private const float MenuRange = 3.5f;
     private const float FeedCooldownSeconds = 30f;
 
@@ -42,6 +46,11 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold
 
     private static readonly List<Horse> all = new List<Horse>();
     private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
+    private static readonly int BaseMapId = Shader.PropertyToID("_BaseMap");
+    private float roughMetres;
+    private float swumMetres;
+    private float rodeMetres;
+    private int hurtRidden;
 
     private Damageable health;
     private Combatant combatant;
@@ -92,6 +101,9 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold
     public float ShyScale => (1f - 0.18f * Trust) * (1f + 0.4f * Wariness);
     /// <summary>Its fight on the rope, times this.</summary>
     public float FightScale => (1f - 0.15f * Trust) * (1f + 0.2f * Wariness);
+
+    /// <summary>What it does while nobody rides it.</summary>
+    public Orders Order { get; private set; } = Orders.Graze;
 
     /// <summary>The bond with the player, 0-100 (HorseBondRules).</summary>
     public float Bond { get; private set; }
@@ -258,6 +270,78 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold
             health.RemoveInvulnerability(this);
             combatant.SetFaction(Faction.Ally);
         }
+    }
+
+    // ----- Orders -----
+
+    public void Command(Orders order)
+    {
+        Order = order;
+        GameMessages.Post(order == Orders.Follow ? $"{HorseName} follows you." : order == Orders.Stay ? $"{HorseName} stays here." : $"{HorseName} grazes where it is.", MessageKind.Info);
+    }
+
+    // ----- Traits from use -----
+
+    /// <summary>The way it went this frame, for what it learns by it: rough ground, swimming, distance.</summary>
+    public void Travelled(float metres, bool rough, bool swimming)
+    {
+        if (!IsTamed || metres <= 0f)
+        {
+            return;
+        }
+
+        HorseSettings settings = HorseSettings.Current;
+        rodeMetres += metres;
+        if (rough)
+        {
+            roughMetres += metres;
+        }
+
+        if (swimming)
+        {
+            swumMetres += metres;
+        }
+
+        if (roughMetres >= settings.SureFootedMetres)
+        {
+            Learn(HorseTrait.SureFooted, "sure-footed: rough ground no longer slows it");
+        }
+
+        if (swumMetres >= settings.SwimmerMetres)
+        {
+            Learn(HorseTrait.Swimmer, "a strong swimmer: it swims faster and tires less");
+        }
+
+        if (rodeMetres >= settings.EnduringMetres)
+        {
+            Learn(HorseTrait.Enduring, "enduring: its breath comes back sooner and a gallop costs it less");
+        }
+    }
+
+    /// <summary>It learns a trait (once): told to the player, and passed on to its foals half the time.</summary>
+    public void Learn(HorseTrait trait, string what)
+    {
+        if (Stats.Has(trait))
+        {
+            return;
+        }
+
+        HorseStats stats = Stats;
+        stats.traits |= trait;
+        Stats = stats;
+        GameMessages.Post($"{HorseName} has grown {what}.", MessageKind.Gain);
+        Changed?.Invoke(this);
+    }
+
+    /// <summary>The names of what it has learned, for its panel.</summary>
+    public string TraitNames()
+    {
+        var names = new List<string>();
+        if (Stats.Has(HorseTrait.SureFooted)) names.Add("Sure-footed");
+        if (Stats.Has(HorseTrait.Brave)) names.Add("Brave");
+        if (Stats.Has(HorseTrait.Swimmer)) names.Add("Swimmer");
+        if (Stats.Has(HorseTrait.Enduring)) names.Add("Enduring");
+        return names.Count > 0 ? string.Join(", ", names) : "";
     }
 
     // ----- A wild horse's trust -----
@@ -631,7 +715,7 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold
         var riding = PlayerRiding.For(user);
         ItemInventory items = user.GetComponent<ItemInventory>();
         bool visiting = HavenVisit.IsVisiting;
-        page.Add(new MenuAction("Ride", !IsGrown ? "Too young to ride" : IsStabled ? "Lead it out first" : $"Space gallops, on its stamina. {GameInput.KeyLabel(GameInput.Whistle)} gets you down.",
+        page.Add(new MenuAction("Ride", !IsGrown ? "Too young to ride" : IsStabled ? "Lead it out first" : $"Tap {GameInput.KeyLabel(GameInput.Dodge)} to canter, hold it to gallop. {GameInput.KeyLabel(GameInput.Whistle)} gets you down.",
             riding != null && Rider == null && !visiting && IsGrown && !IsStabled, () => riding.Mount(this), closesMenu: true));
         page.Add(new MenuAction("Feed it", "Barley, a turnip or bread from your bag", items != null && !visiting, () => Feed(items)));
         page.Add(new MenuAction("Groom it", PlantedTrees.Today - LastGroomed < 1f ? "Groomed today" : "Once a day, for its bond", !visiting, Groom));
@@ -671,6 +755,15 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold
                 page.Add(new MenuAction($"Stable it ({stable.Occupants} of {stable.Stalls} stalls)", stable.HasRoom ? "Safe at night, healing; a mare and a stallion may foal" : "The stable is full",
                     !visiting && stable.HasRoom && Rider == null, () => stable.Keep(this), closesMenu: true));
             }
+        }
+
+        if (!IsStabled)
+        {
+            page.Add(new MenuAction(Order == Orders.Follow ? "Stop following" : "Follow me",
+                Order == Orders.Follow ? "It grazes where it is" : "Behind you on foot; on a lead behind the horse you ride", !visiting && IsGrown,
+                () => Command(Order == Orders.Follow ? Orders.Graze : Orders.Follow), closesMenu: true));
+            page.Add(new MenuAction(Order == Orders.Stay ? "Let it graze" : "Stay here", Order == Orders.Stay ? "It wanders a little" : "It waits right here",
+                !visiting, () => Command(Order == Orders.Stay ? Orders.Graze : Orders.Stay), closesMenu: true));
         }
 
         page.Add(new MenuAction("Give it a name", HasName ? $"It is called {horseName}" : "It has none yet", !visiting, () => HorseNameWindow.Ask(this), closesMenu: true));
@@ -718,7 +811,16 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold
 
         HorseSettings settings = HorseSettings.Current;
         float panic = definition.FleeSeconds * Temperament.panic * (IsTamed ? HorseBondRules.PanicScale(CurrentBond(), settings) : 1f);
-        if (Rider != null)
+        if (Rider != null && IsTamed && ++hurtRidden >= settings.BraveHits)
+        {
+            Learn(HorseTrait.Brave, "brave: it no longer panics, throws you or shies from monsters");
+        }
+
+        if (Rider != null && Stats.Has(HorseTrait.Brave))
+        {
+            // A brave horse takes the blow and keeps going.
+        }
+        else if (Rider != null)
         {
             // A horse that hardly knows its rider throws them now and then; a bold one hardly ever; never a Sure Seat.
             bool throws = HorseBondRules.Throws(CurrentBond(), Stats.temperament, settings, UnityEngine.Random.value);
@@ -820,12 +922,30 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold
             }
         }
 
-        if (Stats.coat < 0 || Stats.coat >= definition.Coats.Length)
+        RareCoat? rare = definition.RareCoatOf(Stats.rareCoat);
+        if (rare.HasValue && rare.Value.mane >= 0 && rare.Value.mane < manes.Length && manes[rare.Value.mane] != null)
+        {
+            foreach (Renderer hair in hairParts)
+            {
+                if (hair != null)
+                {
+                    Material[] worn = hair.sharedMaterials;
+                    for (int i = 0; i < worn.Length; i++)
+                    {
+                        worn[i] = manes[rare.Value.mane];
+                    }
+
+                    hair.sharedMaterials = worn;
+                }
+            }
+        }
+
+        if (!rare.HasValue && (Stats.coat < 0 || Stats.coat >= definition.Coats.Length))
         {
             return;
         }
 
-        Color coat = definition.Coats[Stats.coat];
+        Color coat = rare.HasValue ? rare.Value.tint : definition.Coats[Stats.coat];
         var block = new MaterialPropertyBlock();
         foreach (Renderer drawn in GetComponentsInChildren<Renderer>(true))
         {
@@ -842,6 +962,11 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold
                 Color own = material.GetColor(BaseColorId);
                 float shade = material.name.Contains("Dark") ? 0.65f : material.name.Contains("Light") ? 1.3f : 1f;
                 block.SetColor(BaseColorId, Color.Lerp(own, coat * shade, 0.85f));
+                if (rare.HasValue && rare.Value.pattern != null)
+                {
+                    block.SetTexture(BaseMapId, rare.Value.pattern);
+                }
+
                 drawn.SetPropertyBlock(block, i);
             }
         }
@@ -866,6 +991,11 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold
         public float withFoalSince = -1f;
         public string foalSire = "";
         public float lastFoaled = -99f;
+        public int order;
+        public float roughMetres;
+        public float swumMetres;
+        public float rodeMetres;
+        public int hurtRidden;
     }
 
     string ISaveable.SaveKey => "horse";
@@ -877,6 +1007,7 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold
             name = horseName, stats = Stats, stamina = Stamina, saddle = saddle != null ? saddle.Id : "",
             armour = armour != null ? armour.Id : "", bond = Bond, lastCared = LastCared, lastGroomed = LastGroomed, stabledIn = StabledIn,
             bornOn = BornOn, withFoalSince = WithFoalSince, foalSire = FoalSire, lastFoaled = LastFoaled,
+            order = (int)Order, roughMetres = roughMetres, swumMetres = swumMetres, rodeMetres = rodeMetres, hurtRidden = hurtRidden,
         };
         if (Cargo != null)
         {
@@ -914,6 +1045,11 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold
         WithFoalSince = saved.withFoalSince;
         FoalSire = saved.foalSire ?? "";
         LastFoaled = saved.lastFoaled;
+        Order = (Orders)Mathf.Clamp(saved.order, 0, 2);
+        roughMetres = saved.roughMetres;
+        swumMetres = saved.swumMetres;
+        rodeMetres = saved.rodeMetres;
+        hurtRidden = saved.hurtRidden;
         SetStabled(saved.stabledIn);
         var content = Resources.Load<ContentDatabase>(ContentDatabase.ResourceName);
         ItemDefinition Find(string id) => string.IsNullOrEmpty(id) || content == null ? null : content.FindItem(id);

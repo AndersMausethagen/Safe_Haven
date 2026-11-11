@@ -51,7 +51,8 @@ public static class BuildHorses
     {
         "Idles/H_Idle_01", "Actions/H_Eat", "Actions/H_Drink", "Actions/H_Sleep", "Swim/H_Swim_Idle", "Swim/H_Swim_Forward",
     };
-    private static readonly string[] Once = { "Actions/H_Neigh", "Attacks/H_Attack_Back_Legs", "Attacks/H_Attack_Front_Legs" };
+    private static readonly string[] Once = { "Actions/H_Neigh", "Attacks/H_Attack_Back_Legs", "Attacks/H_Attack_Front_Legs",
+        "Jumps/H_Jump_Forward", "Jumps/H_Jump_Canter", "Jumps/H_Jump_Gallop", "Jumps/H_Jump_Sprint" };
     // Turning: on the spot, and each gait's own turning to either side (in place, as the straight ones are).
     private static readonly string[] Turning = { "Locomotion/H_Turn_Left", "Locomotion/H_Turn_Right" };
 
@@ -264,7 +265,7 @@ public static class BuildHorses
             controller.AddParameter(number, AnimatorControllerParameterType.Int);
         }
 
-        foreach (string trigger in new[] { "Rear", "Buck", "Strike", "Hit", "Fidgeting" })
+        foreach (string trigger in new[] { "Rear", "Buck", "Strike", "Hit", "Fidgeting", "Jump" })
         {
             controller.AddParameter(trigger, AnimatorControllerParameterType.Trigger);
         }
@@ -318,6 +319,21 @@ public static class BuildHorses
             to.duration = 0.25f;
             Back(fidget, move, 0.85f);
         }
+
+        // A jump, by the gait it was going at: from a trot, a canter, a gallop or a sprint.
+        AnimatorState jump = controller.CreateBlendTreeInController("Jump", out BlendTree leaps);
+        leaps.blendParameter = "Gait";
+        leaps.useAutomaticThresholds = false;
+        leaps.AddChild(Clip("Jumps/H_Jump_Forward"), 2f);
+        leaps.AddChild(Clip("Jumps/H_Jump_Canter"), 3f);
+        leaps.AddChild(Clip("Jumps/H_Jump_Gallop"), 4f);
+        leaps.AddChild(Clip("Jumps/H_Jump_Sprint"), 5f);
+        AnimatorStateTransition toJump = machine.AddAnyStateTransition(jump);
+        toJump.AddCondition(AnimatorConditionMode.If, 0f, "Jump");
+        toJump.AddCondition(AnimatorConditionMode.IfNot, 0f, "Dead");
+        toJump.duration = 0.08f;
+        toJump.canTransitionToSelf = false;
+        Back(jump, move, 0.85f);
 
         // Rearing (the pack's neigh, up on its hind legs), bucking and striking, from anywhere but death.
         Action(machine, move, "Rear", "Actions/H_Neigh", "Rear");
@@ -536,6 +552,14 @@ public static class BuildHorses
         }
 
         Once("Ride Rear", RiderClip("Actions/Rider_Neigh"), 0.9f, ride);
+        AnimatorState rideJump = player.CreateBlendTreeInController("Ride Jump", out BlendTree riderLeaps, layerIndex);
+        riderLeaps.blendParameter = "RideGait";
+        riderLeaps.useAutomaticThresholds = false;
+        riderLeaps.AddChild(Need(RiderClip("Jumps/Rider_Jump_Forward")), 2f);
+        riderLeaps.AddChild(Need(RiderClip("Jumps/Rider_Jump_Canter")), 3f);
+        riderLeaps.AddChild(Need(RiderClip("Jumps/Rider_Jump_Gallop")), 4f);
+        riderLeaps.AddChild(Need(RiderClip("Jumps/Rider_Jump_Sprint")), 5f);
+        Back(rideJump, ride, 0.85f);
         Once("Ride Buck", RiderClip("Attacks/Rider_Attack_Back_Legs"), 0.9f, ride);
         Once("Ride Strike", RiderClip("Attacks/Rider_Attack_Front_Legs"), 0.9f, ride);
         string[] fidgets = { "Idles/Rider_Idle_HeadShake", "Idles/Rider_Idle03_Look", "Idles/Rider_Idle03_Look", "Idles/Rider_Idle04_Step", "Idles/Rider_Idle_05_Hop" };
@@ -841,6 +865,9 @@ public static class BuildHorses
         so.FindProperty("tapDrain").floatValue = 3f;
         so.FindProperty("struggleStamina").floatValue = toxic ? 140f : 100f;
         so.FindProperty("trotSpeed").floatValue = 6f;
+        // A tap of Space picks a canter, free of stamina, between the trot and the gallop.
+        so.FindProperty("canterSpeed").floatValue = toxic ? 9.5f : 8.5f;
+        so.FindProperty("abilities").intValue = toxic ? (int)(HorseAbility.BogStrider | HorseAbility.PoisonProof | HorseAbility.NightGlow) : 0;
         so.FindProperty("strikeDamage").floatValue = toxic ? 26f : 16f;
         // The breaking ride: barley every 6-14 seconds, 2-4 times (3-5 for the toxic horse), so it is over in about half a
         // minute; and a spent horse waits 12 seconds for the player to walk up to it.
@@ -1085,6 +1112,23 @@ public static class BuildHorses
         so.FindProperty("ropeShake").floatValue = 0.15f;
         so.FindProperty("ropeJolt").floatValue = 0.26f;
         so.FindProperty("dragSpeed").floatValue = 2.6f;
+        // Grounds, by a word in the Haven's and the raids' terrain layers: paths quick, mud and bog slow, rock and forest floor a
+        // little slow.
+        (string word, float speed, bool soft)[] grounds =
+        {
+            ("Path", 1.15f, false), ("Gravel", 1.1f, false), ("Road", 1.15f, false), ("Muddy", 0.72f, true), ("Mud", 0.72f, true),
+            ("Bog", 0.68f, true), ("Damp", 0.82f, true), ("Bank", 0.85f, true), ("Cliff", 0.8f, false), ("Rock", 0.88f, false),
+            ("Litter", 0.92f, false), ("Humus", 0.92f, false), ("Snow", 0.8f, true),
+        };
+        SerializedProperty groundList = so.FindProperty("grounds");
+        groundList.arraySize = grounds.Length;
+        for (int i = 0; i < grounds.Length; i++)
+        {
+            SerializedProperty ground = groundList.GetArrayElementAtIndex(i);
+            ground.FindPropertyRelative("word").stringValue = grounds[i].word;
+            ground.FindPropertyRelative("speed").floatValue = grounds[i].speed;
+            ground.FindPropertyRelative("soft").boolValue = grounds[i].soft;
+        }
         // How often each is born, how near it lets you come, how hard it pulls, how much fight it has, feeds more or fewer,
         // how hard it bucks, how long it runs when hurt.
         (HorseTemperament kind, float weight, float shy, float pull, float fight, int feeds, float bucking, float panic, string text)[] natures =

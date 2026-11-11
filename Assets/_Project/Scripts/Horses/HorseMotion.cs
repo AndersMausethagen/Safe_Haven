@@ -11,6 +11,7 @@ public enum HorseAct
     Strike = 2,
     Fidget = 3,
     Hit = 4,
+    Jump = 5,
 }
 
 /// <summary>
@@ -49,6 +50,7 @@ public sealed class HorseMotion : MonoBehaviour
     private static readonly int HitSideId = Animator.StringToHash("HitSide");
     private static readonly int FidgetId = Animator.StringToHash("Fidget");
     private static readonly int FidgetingId = Animator.StringToHash("Fidgeting");
+    private static readonly int JumpId = Animator.StringToHash("Jump");
 
     // Seconds between hoofbeats at each gait's own speed, walk to sprint: four beats to a walk's stride, two to a trot's,
     // three to a canter's, four quick ones to a gallop's.
@@ -89,6 +91,21 @@ public sealed class HorseMotion : MonoBehaviour
     private float strikeLands;
     private float nextTrample;
     private DroppedItem lure;
+    // Ground and slope under it (sampled a few times a second): its speed over them.
+    private float groundScale = 1f;
+    private bool roughGround;
+    private float nextGround;
+    private Vector3 lastPlace;
+    // A jump: from, to, how far through, how long, how high.
+    private bool jumping;
+    private Vector3 jumpFrom;
+    private Vector3 jumpTo;
+    private float jumpT;
+    private float jumpSeconds;
+    private float jumpPeak;
+    private float nextJumpLook;
+    private float nextFollow;
+    private LineRenderer lead;
     private float nextLure;
     private float nextHand;
     private static readonly Collider[] trampled = new Collider[16];
@@ -98,6 +115,7 @@ public sealed class HorseMotion : MonoBehaviour
     public bool IsGalloping => galloping;
     public bool IsFleeing => mode == Idle.Flee;
     public bool IsSwimming => swimming;
+    public bool IsJumping => jumping;
     public bool IsComing => mode == Idle.Come;
     /// <summary>The gait it shows now: 0 standing, 1 walk ... 5 sprint (the rider's animation follows it).</summary>
     public int Gait { get; private set; }
@@ -113,6 +131,7 @@ public sealed class HorseMotion : MonoBehaviour
         animator = GetComponentInChildren<Animator>();
         home = transform.position;
         lastYaw = transform.eulerAngles.y;
+        lastPlace = transform.position;
         nextFidget = Time.time + Random.Range(6f, 20f);
     }
 
@@ -394,7 +413,7 @@ public sealed class HorseMotion : MonoBehaviour
     }
 
     /// <summary>The rider's wish this frame: a direction on the ground (length up to 1) and a gait (-1 walk, 0 trot,
-    /// 1 gallop while its stamina lasts).</summary>
+    /// 1 gallop while its stamina lasts, 2 canter: free).</summary>
     public void Ride(Vector3 direction, int gait)
     {
         rideDirection = Vector3.ClampMagnitude(new Vector3(direction.x, 0f, direction.z), 1f);
@@ -426,7 +445,11 @@ public sealed class HorseMotion : MonoBehaviour
             return;
         }
 
-        if (swimming)
+        if (jumping)
+        {
+            UpdateJump();
+        }
+        else if (swimming)
         {
             UpdateSwimming();
         }
@@ -440,12 +463,23 @@ public sealed class HorseMotion : MonoBehaviour
             Velocity = agent.enabled ? agent.velocity : Vector3.zero;
         }
 
-        // Stamina comes back while it neither gallops nor swims.
+        // Stamina comes back while it neither gallops nor swims (sooner for an enduring horse).
         if (!galloping && !swimming)
         {
-            horse.Stamina = Mathf.Min(horse.MaxStamina, horse.Stamina + horse.Definition.StaminaRegen * Time.deltaTime);
+            float regen = horse.Definition.StaminaRegen * (horse.Stats.Has(HorseTrait.Enduring) ? 1.25f : 1f);
+            horse.Stamina = Mathf.Min(horse.MaxStamina, horse.Stamina + regen * Time.deltaTime);
         }
 
+        // What it learns by going: rough ground, swims, the road.
+        Vector3 place = transform.position;
+        float moved = Vector3.Distance(new Vector3(place.x, 0f, place.z), new Vector3(lastPlace.x, 0f, lastPlace.z));
+        lastPlace = place;
+        if (moved < 5f)
+        {
+            horse.Travelled(moved, roughGround, swimming);
+        }
+
+        UpdateLead();
         Animate(Velocity.magnitude);
         Sound(Velocity.magnitude);
     }
@@ -462,12 +496,14 @@ public sealed class HorseMotion : MonoBehaviour
         }
 
         float wanted = wish.magnitude;
-        galloping = rideGait > 0 && wanted > 0.1f && horse.Stamina > 0.5f && (horse.Taming == null || !horse.Taming.IsBreaking);
-        float speed = rideGait < 0 ? kind.WalkSpeed * 1.4f : galloping ? horse.Stats.gallopSpeed : kind.TrotSpeed;
-        speed *= horse.SpeedScale * HorseHitch.SpeedScaleFor(horse);
+        bool breaking = horse.Taming != null && horse.Taming.IsBreaking;
+        galloping = rideGait == 1 && wanted > 0.1f && horse.Stamina > 0.5f && !breaking;
+        float speed = rideGait < 0 ? kind.WalkSpeed * 1.4f : galloping ? horse.Stats.gallopSpeed : rideGait == 2 && !breaking ? kind.CanterSpeed : kind.TrotSpeed;
+        speed *= horse.SpeedScale * HorseHitch.SpeedScaleFor(horse) * GroundScale();
         if (galloping)
         {
-            horse.Stamina = Mathf.Max(0f, horse.Stamina - kind.GallopCost * PlayerHorsemanship.GallopCostScale() * Time.deltaTime);
+            float enduring = horse.Stats.Has(HorseTrait.Enduring) ? 0.85f : 1f;
+            horse.Stamina = Mathf.Max(0f, horse.Stamina - kind.GallopCost * PlayerHorsemanship.GallopCostScale() * enduring * Time.deltaTime);
             Trample();
         }
 
@@ -482,6 +518,17 @@ public sealed class HorseMotion : MonoBehaviour
             return;
         }
 
+        // Something low in the way, a ditch or a narrow stream, at a trot or faster: it jumps it.
+        if (wanted > 0.1f && this.pace >= kind.TrotSpeed * 0.8f && Time.time >= nextJumpLook && HorseHitch.Pulling(horse) == null)
+        {
+            nextJumpLook = Time.time + 0.1f;
+            if (FindJump(out Vector3 landing, out float over))
+            {
+                BeginJump(landing, over);
+                return;
+            }
+        }
+
         // Deep water ahead: it wades in and swims. Otherwise Move keeps it on the NavMesh, stopping at walls as anything
         // walking does.
         if (wanted > 0.1f && WaterAhead(out float surface))
@@ -491,6 +538,125 @@ public sealed class HorseMotion : MonoBehaviour
         }
 
         agent.Move(Velocity * Time.deltaTime);
+    }
+
+    // ----- Ground -----
+
+    // Its speed over the ground under it (paths quicker, mud and rock slower) and up the slope ahead. A bog-strider
+    // doesn't slow in mud; a sure-footed horse doesn't slow on rough ground.
+    private float GroundScale()
+    {
+        if (Time.time >= nextGround)
+        {
+            nextGround = Time.time + 0.25f;
+            HorseSettings settings = HorseSettings.Current;
+            float ground = settings.GroundSpeedOf(HorseGround.LayerAt(transform.position), out bool soft);
+            float grade = HorseGround.GradeAhead(transform.position, transform.forward, 1.5f);
+            roughGround = ground < 1f && !soft || grade > 0.25f;
+            if (soft && horse.Definition.Has(HorseAbility.BogStrider) || !soft && horse.Stats.Has(HorseTrait.SureFooted))
+            {
+                ground = Mathf.Max(1f, ground);
+            }
+
+            float climb = grade > 0f ? Mathf.Lerp(1f, settings.SteepClimb, Mathf.Clamp01(grade) * (horse.Stats.Has(HorseTrait.SureFooted) ? 0.5f : 1f)) : 1f;
+            groundScale = ground * climb;
+        }
+
+        return groundScale;
+    }
+
+    // ----- Jumping -----
+
+    // Low enough to clear and ground to land on beyond: a log, a fence, a ditch, a stream. Creatures it runs down
+    // (Trample) or turns from; walls it stops at.
+    private bool FindJump(out Vector3 landing, out float over)
+    {
+        HorseSettings settings = HorseSettings.Current;
+        landing = transform.position;
+        over = 0f;
+        Vector3 at = transform.position;
+        Vector3 ahead = transform.forward;
+        float look = Mathf.Clamp(pace * 0.3f, 1.6f, 3.2f);
+        bool blocked = false;
+        if (Physics.Raycast(at + Vector3.up * 0.45f, ahead, out RaycastHit low, look, ~0, QueryTriggerInteraction.Ignore)
+            && !low.collider.transform.IsChildOf(transform) && !(low.collider is TerrainCollider) && low.collider.GetComponentInParent<Combatant>() == null
+            && low.collider.GetComponentInParent<Player>() == null)
+        {
+            Vector3 above = low.point + ahead * 0.2f + Vector3.up * (settings.JumpHeight + 0.6f);
+            over = Physics.Raycast(above, Vector3.down, out RaycastHit top, settings.JumpHeight + 1.2f, ~0, QueryTriggerInteraction.Ignore)
+                ? top.point.y - at.y : settings.JumpHeight;
+            if (over > settings.JumpHeight || Physics.Raycast(at + Vector3.up * (settings.JumpHeight + 0.5f), ahead, look + 1.5f, ~0, QueryTriggerInteraction.Ignore))
+            {
+                return false;
+            }
+
+            blocked = true;
+        }
+        else if (NavMesh.Raycast(at, at + ahead * look, out NavMeshHit _, NavMesh.AllAreas))
+        {
+            // The ground runs out ahead (a ditch, a stream): a low jump across.
+            blocked = true;
+            over = 0.2f;
+        }
+
+        if (!blocked)
+        {
+            return false;
+        }
+
+        for (float distance = Mathf.Max(settings.JumpLength.x, look + 1.2f); distance <= settings.JumpLength.y; distance += 0.75f)
+        {
+            Vector3 target = at + ahead * distance;
+            if (NavMesh.SamplePosition(target, out NavMeshHit hit, 1f, NavMesh.AllAreas) && Mathf.Abs(hit.position.y - at.y) < 1.6f
+                && WaterSurface.OpenAt(hit.position + Vector3.up, 2f, out _, 0.4f) == null)
+            {
+                landing = hit.position;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private void BeginJump(Vector3 landing, float over)
+    {
+        jumping = true;
+        jumpFrom = transform.position;
+        jumpTo = landing;
+        jumpT = 0f;
+        float distance = Vector3.Distance(jumpFrom, jumpTo);
+        jumpSeconds = Mathf.Clamp(distance / Mathf.Max(pace, 4f), 0.5f, 0.95f);
+        jumpPeak = Mathf.Max(0f, over) + 0.6f;
+        agent.enabled = false;
+        SetTrigger(JumpId);
+        Acted?.Invoke(HorseAct.Jump, 0);
+    }
+
+    private void UpdateJump()
+    {
+        jumpT = Mathf.Min(1f, jumpT + Time.deltaTime / jumpSeconds);
+        Vector3 line = Vector3.Lerp(jumpFrom, jumpTo, jumpT);
+        Vector3 next = line + Vector3.up * (4f * jumpPeak * jumpT * (1f - jumpT));
+        Velocity = (jumpTo - jumpFrom) / jumpSeconds;
+        transform.position = next;
+        if (jumpT < 1f)
+        {
+            return;
+        }
+
+        // Down: on the NavMesh again, and a thud.
+        jumping = false;
+        agent.enabled = true;
+        agent.Warp(jumpTo);
+        if (horse.Rider != null)
+        {
+            CameraShake.Add(0.12f);
+        }
+
+        if (horse.Definition.Hooves != null)
+        {
+            AudioManager.Play(horse.Definition.Hooves, transform.position);
+        }
     }
 
     // Trample (Horsemanship's technique): at a gallop, a creature in its path is run down and knocked off its feet.
@@ -573,7 +739,9 @@ public sealed class HorseMotion : MonoBehaviour
         bool ridden = mode == Idle.Ridden;
         Vector3 wish = ridden ? rideDirection : ShoreDirection();
         float tired = horse.Stamina > 0.5f ? 1f : 0.55f;
-        horse.Stamina = Mathf.Max(0f, horse.Stamina - settings.SwimCost * Time.deltaTime);
+        bool swimmer = horse.Stats.Has(HorseTrait.Swimmer);
+        tired *= swimmer ? 1.3f : 1f;
+        horse.Stamina = Mathf.Max(0f, horse.Stamina - settings.SwimCost * (swimmer ? 0.5f : 1f) * Time.deltaTime);
         Vector3 forward = Steer(wish, horse.Definition.TurnSpeed * 0.6f);
         float wanted = wish.magnitude;
         float alignment = wanted > 0.1f ? Mathf.Clamp01(Vector3.Dot(forward, wish.normalized) * 1.3f) : 0f;
@@ -686,6 +854,24 @@ public sealed class HorseMotion : MonoBehaviour
             }
         }
 
+        if (horse.IsTamed && horse.Order == Horse.Orders.Follow)
+        {
+            UpdateFollow();
+            return;
+        }
+
+        // Told to stay, it stands where it is (it still runs from a blow).
+        if (horse.IsTamed && horse.Order == Horse.Orders.Stay)
+        {
+            if (mode != Idle.Graze)
+            {
+                Graze();
+            }
+
+            until = Time.time + 5f;
+            return;
+        }
+
         if (Time.time < until)
         {
             return;
@@ -698,6 +884,106 @@ public sealed class HorseMotion : MonoBehaviour
         else if (!agent.pathPending && agent.remainingDistance < 0.6f)
         {
             Graze();
+        }
+    }
+
+    // ----- Following, and a pack horse on a lead -----
+
+    /// <summary>The player, or the horse they ride: who a following horse keeps behind.</summary>
+    private Transform Leader(out bool led, out float leaderSpeed)
+    {
+        led = false;
+        leaderSpeed = 0f;
+        Player player = Player.Current;
+        if (player == null)
+        {
+            return null;
+        }
+
+        if (player.TryGetComponent(out PlayerRiding riding) && riding.Riding != null && riding.Riding != horse)
+        {
+            led = true;
+            leaderSpeed = riding.Riding.Motion.Velocity.magnitude;
+            return riding.Riding.transform;
+        }
+
+        leaderSpeed = player.TryGetComponent(out CharacterController body) ? body.velocity.magnitude : 0f;
+        return player.transform;
+    }
+
+    private void UpdateFollow()
+    {
+        if (Time.time < nextFollow)
+        {
+            return;
+        }
+
+        nextFollow = Time.time + 0.25f;
+        HorseSettings settings = HorseSettings.Current;
+        Transform leader = Leader(out bool led, out float leaderSpeed);
+        if (leader == null)
+        {
+            return;
+        }
+
+        Vector3 behind = leader.position - leader.forward * settings.FollowDistance + leader.right * (led ? 1.1f : 0.6f);
+        float distance = Vector3.Distance(transform.position, leader.position);
+        if (distance < settings.FollowDistance * 0.85f && leaderSpeed < 0.5f)
+        {
+            agent.isStopped = true;
+            mode = Idle.Graze;
+            return;
+        }
+
+        if (!NavMesh.SamplePosition(behind, out NavMeshHit hit, 4f, agent.areaMask))
+        {
+            return;
+        }
+
+        mode = Idle.Wander;
+        agent.speed = Mathf.Clamp(leaderSpeed * 1.15f + distance * 0.25f, horse.Definition.WalkSpeed, horse.Stats.gallopSpeed) * horse.SpeedScale;
+        agent.isStopped = false;
+        agent.SetDestination(hit.position);
+    }
+
+    // A horse led behind a ridden one is on a rope from the rider's hand to its head.
+    private void UpdateLead()
+    {
+        Player player = Player.Current;
+        bool shown = horse.IsTamed && horse.Order == Horse.Orders.Follow && mode != Idle.Ridden && player != null
+            && player.TryGetComponent(out PlayerRiding riding) && riding.Riding != null && riding.Riding != horse
+            && Vector3.Distance(riding.Riding.transform.position, transform.position) < HorseSettings.Current.LeadReach;
+        if (shown && lead == null)
+        {
+            var holder = new GameObject("Lead Rope");
+            holder.transform.SetParent(transform, false);
+            lead = holder.AddComponent<LineRenderer>();
+            lead.positionCount = 10;
+            lead.widthMultiplier = 0.04f;
+            lead.useWorldSpace = true;
+            lead.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            var material = new Material(Shader.Find("Universal Render Pipeline/Unlit"));
+            material.SetColor("_BaseColor", new Color(0.55f, 0.42f, 0.28f));
+            lead.sharedMaterial = material;
+        }
+
+        if (lead == null)
+        {
+            return;
+        }
+
+        lead.enabled = shown;
+        if (!shown)
+        {
+            return;
+        }
+
+        Vector3 hand = player.transform.position + Vector3.up * 1.25f + player.transform.forward * 0.25f - player.transform.right * 0.2f;
+        Vector3 head = horse.Seat.position + transform.forward * 0.9f + Vector3.up * 0.2f;
+        for (int i = 0; i < lead.positionCount; i++)
+        {
+            float t = i / (lead.positionCount - 1f);
+            lead.SetPosition(i, Vector3.Lerp(hand, head, t) + Vector3.down * (0.5f * 4f * t * (1f - t)));
         }
     }
 

@@ -67,12 +67,31 @@ public static class HorseBreeding
             carryWeight = Mathf.Round(Mix(mother.carryWeight, father.carryWeight, kind.CarryWeight)),
             coat = from.coat,
             mane = from.mane,
+            // A rare coat comes down with the parent it takes after; what each parent learned, half the time.
+            rareCoat = from.rareCoat,
+            traits = InheritTraits(mother.traits, father.traits, random),
             feedsNeeded = 0,
             sex = random.NextDouble() < 0.5 ? HorseSex.Mare : HorseSex.Stallion,
             temperament = random.NextDouble() < 0.2 ? settings.RollTemperament(random) : (random.NextDouble() < 0.5 ? mother : father).temperament,
             growth = settings.FoalSize,
             generation = Mathf.Max(mother.generation, father.generation) + 1,
         };
+    }
+
+    /// <summary>Each trait either parent has, passed on half the time.</summary>
+    public static HorseTrait InheritTraits(HorseTrait mother, HorseTrait father, System.Random random)
+    {
+        HorseTrait both = mother | father;
+        HorseTrait inherited = HorseTrait.None;
+        foreach (HorseTrait trait in new[] { HorseTrait.SureFooted, HorseTrait.Brave, HorseTrait.Swimmer, HorseTrait.Enduring })
+        {
+            if ((both & trait) != 0 && random.NextDouble() < 0.5)
+            {
+                inherited |= trait;
+            }
+        }
+
+        return inherited;
     }
 
     /// <summary>How grown a foal is after some in-game days: from Foal Size to 1 over Days To Grow.</summary>

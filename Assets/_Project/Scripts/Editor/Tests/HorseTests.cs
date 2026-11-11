@@ -224,6 +224,31 @@ public sealed class HorseTests
     }
 
     [Test]
+    public void Grounds_PathsAreQuick_MudIsSlow_AndTraitsComeDownToFoals()
+    {
+        HorseSettings settings = HorseSettings.Current;
+        Assert.Greater(settings.GroundSpeedOf("Haven Path", out bool pathSoft), 1f, "a path is quicker");
+        Assert.IsFalse(pathSoft);
+        Assert.Less(settings.GroundSpeedOf("Muddy Bank", out bool mudSoft), 0.85f, "mud is slower");
+        Assert.IsTrue(mudSoft, "and soft, for a bog-strider");
+        Assert.AreEqual(1f, settings.GroundSpeedOf("Haven Meadow", out _), "a meadow is as it is");
+        Assert.Less(Wild.TrotSpeed, Wild.CanterSpeed, "the canter is between the trot");
+        Assert.Less(Wild.CanterSpeed, Wild.GallopSpeed.x, "and the gallop");
+        var random = new System.Random(3);
+        int kept = 0;
+        for (int i = 0; i < 400; i++)
+        {
+            HorseTrait foal = HorseBreeding.InheritTraits(HorseTrait.Brave, HorseTrait.Swimmer, random);
+            Assert.AreEqual(HorseTrait.None, foal & ~(HorseTrait.Brave | HorseTrait.Swimmer), "only what its parents have");
+            kept += (foal & HorseTrait.Brave) != 0 ? 1 : 0;
+        }
+
+        Assert.That(kept, Is.InRange(150, 250), "each trait half the time");
+        HorseDefinition toxic = System.Linq.Enumerable.First(settings.SpecialHorses, k => k != null && k.Home == HorseHome.Bog);
+        Assert.IsTrue(toxic.Has(HorseAbility.BogStrider), "the bog's horse strides through mud");
+    }
+
+    [Test]
     public void Bond_GrowsWithCare_WearsDownWithout_AndGivesWhatItSays()
     {
         HorseSettings settings = HorseSettings.Current;

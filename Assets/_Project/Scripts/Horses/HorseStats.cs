@@ -8,6 +8,21 @@ public enum HorseSex
     Stallion = 1,
 }
 
+/// <summary>What a horse has learned by living (Horse: traits from use), and passes on to its foals half the time.</summary>
+[Flags]
+public enum HorseTrait
+{
+    None = 0,
+    /// <summary>Kilometres on rough ground (rock, slopes, forest floor): it doesn't slow on it.</summary>
+    SureFooted = 1,
+    /// <summary>Hurt often under a rider and kept going: it never panics, throws its rider or shies from monsters.</summary>
+    Brave = 2,
+    /// <summary>Long swims: it swims faster and tires less in the water.</summary>
+    Swimmer = 4,
+    /// <summary>A great many kilometres: its stamina comes back faster and a gallop costs it less.</summary>
+    Enduring = 8,
+}
+
 /// <summary>
 /// One horse's own numbers, rolled once from its <see cref="HorseDefinition"/>'s ranges when it is first met (or inherited
 /// from its parents, HorseBreeding) and kept for life (saved with a tamed horse). Plain data so it can be tested and saved
@@ -32,10 +47,16 @@ public struct HorseStats
     public float growth;
     /// <summary>0 for a horse met wild, 1 for its foal, 2 for that foal's...</summary>
     public int generation;
+    /// <summary>What it has learned (HorseTrait), inherited half the time.</summary>
+    public HorseTrait traits;
+    /// <summary>1 + its rare coat's index (HorseDefinition › Rare Coats), or 0 for a common coat (so saves from before
+    /// rare coats load as common).</summary>
+    public int rareCoat;
 
     public bool IsRolled => maxHealth > 0f;
     public bool IsGrown => growth <= 0f || growth >= 0.999f;
     public string SexName => sex == HorseSex.Mare ? "mare" : "stallion";
+    public bool Has(HorseTrait trait) => (traits & trait) != 0;
 
     public static HorseStats Roll(HorseDefinition definition, System.Random random)
     {
@@ -54,6 +75,7 @@ public struct HorseStats
             sex = random.NextDouble() < 0.5 ? HorseSex.Mare : HorseSex.Stallion,
             temperament = HorseSettings.Current.RollTemperament(random),
             growth = 1f,
+            rareCoat = definition.RollRareCoat(random),
         };
     }
 

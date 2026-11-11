@@ -73,6 +73,31 @@ public sealed class HorseSettings : GameSettings<HorseSettings>
     [Tooltip("Balance a second won back by steering against the veer.")]
     [SerializeField, Min(0f)] private float steadyPerSecond = 0.35f;
 
+    [Header("Ground")]
+    [Tooltip("How fast a horse goes over each ground (the terrain layer under it, by a word in its name, first match wins): " +
+             "quicker on paths, slower in mud and bog, a little slower on rock and forest floor.")]
+    [SerializeField] private List<GroundSpeed> grounds = new List<GroundSpeed>();
+    [Tooltip("Uphill: the speed left at the steepest climb it takes (a 1 in 1 grade).")]
+    [SerializeField, Range(0.2f, 1f)] private float steepClimb = 0.55f;
+
+    [Header("Jumping")]
+    [Tooltip("At a trot or faster it jumps what is in its way, up to this high (metres), and gaps and streams up to this far.")]
+    [SerializeField, Min(0.2f)] private float jumpHeight = 1.3f;
+    [SerializeField] private Vector2 jumpLength = new Vector2(3.5f, 7f);
+
+    [Header("Following")]
+    [Tooltip("Metres behind its leader a following horse keeps, and how far a led one (a pack horse behind a rider) may fall back.")]
+    [SerializeField, Min(1f)] private float followDistance = 3.5f;
+    [SerializeField, Min(2f)] private float leadReach = 8f;
+
+    [Header("Traits from use")]
+    [Tooltip("Metres on rough ground (rock, forest floor, a steep climb) before it is sure-footed, metres swum before it is a swimmer, " +
+             "metres ridden in all before it is enduring, and blows taken under a rider before it is brave.")]
+    [SerializeField, Min(1f)] private float sureFootedMetres = 2000f;
+    [SerializeField, Min(1f)] private float swimmerMetres = 300f;
+    [SerializeField, Min(1f)] private float enduringMetres = 20000f;
+    [SerializeField, Min(1)] private int braveHits = 10;
+
     [Header("Getting on")]
     [Tooltip("Metres from the horse the player may stand and still get on (it turns its side to them).")]
     [SerializeField, Min(0.5f)] private float mountReach = 2.4f;
@@ -116,6 +141,34 @@ public sealed class HorseSettings : GameSettings<HorseSettings>
     public float RopeShake => ropeShake;
     public float RopeJolt => ropeJolt;
     public float MountReach => mountReach;
+    public float SureFootedMetres => sureFootedMetres;
+    public float SwimmerMetres => swimmerMetres;
+    public float EnduringMetres => enduringMetres;
+    public int BraveHits => braveHits;
+    public float SteepClimb => steepClimb;
+    public float JumpHeight => jumpHeight;
+    public Vector2 JumpLength => jumpLength;
+    public float FollowDistance => followDistance;
+    public float LeadReach => leadReach;
+
+    /// <summary>How fast a horse goes over a ground (a terrain layer's name), 1 for one not listed.</summary>
+    public float GroundSpeedOf(string ground, out bool soft)
+    {
+        soft = false;
+        if (!string.IsNullOrEmpty(ground))
+        {
+            foreach (GroundSpeed kind in grounds)
+            {
+                if (!string.IsNullOrEmpty(kind.word) && ground.IndexOf(kind.word, System.StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    soft = kind.soft;
+                    return kind.speed;
+                }
+            }
+        }
+
+        return 1f;
+    }
     public float MountSeconds => mountSeconds;
 
     /// <summary>The rider's offset from the saddle (xyz, in their own size) and turn (w, degrees) a share of the way through
@@ -244,4 +297,15 @@ public sealed class HorseSettings : GameSettings<HorseSettings>
 
         return temperaments[temperaments.Count - 1].temperament;
     }
+}
+
+/// <summary>A kind of ground a horse goes faster or slower over (HorseSettings › Grounds).</summary>
+[System.Serializable]
+public struct GroundSpeed
+{
+    [Tooltip("A word in the terrain layer's name (Path, Mud, Bog, Rock...).")]
+    public string word;
+    [Range(0.3f, 1.5f)] public float speed;
+    [Tooltip("Mud and bog: a bog-strider doesn't slow on it.")]
+    public bool soft;
 }

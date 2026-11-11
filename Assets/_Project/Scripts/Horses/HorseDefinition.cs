@@ -1,5 +1,32 @@
 using UnityEngine;
 
+/// <summary>What a special breed can do that the common horse can't.</summary>
+[System.Flags]
+public enum HorseAbility
+{
+    None = 0,
+    /// <summary>Mud and bog don't slow it.</summary>
+    BogStrider = 1,
+    /// <summary>Poison and rot don't hurt it.</summary>
+    PoisonProof = 2,
+    /// <summary>It glows in the dark: a light about it at night.</summary>
+    NightGlow = 4,
+    /// <summary>Frost doesn't slow or hurt it.</summary>
+    ColdProof = 8,
+}
+
+/// <summary>A coat rarer than the common ones: its own look (a tint, and a pattern texture for dapples or patches) and mane.</summary>
+[System.Serializable]
+public struct RareCoat
+{
+    public string name;
+    public Color tint;
+    [Tooltip("The body's texture for this coat (dapples, patches); empty for the common coat's with the tint.")]
+    public Texture2D pattern;
+    [Tooltip("Index into Manes for its mane, or -1 for the horse's own roll.")]
+    public int mane;
+}
+
 /// <summary>Where a kind of horse is met.</summary>
 public enum HorseHome
 {
@@ -25,6 +52,11 @@ public sealed class HorseDefinition : ScriptableObject
     [SerializeField] private Material[] manes = System.Array.Empty<Material>();
     [Tooltip("For each coat, the manes it goes with (indices into Manes, comma-separated, e.g. \"0,2\"). Empty: any mane.")]
     [SerializeField] private string[] coatManes = System.Array.Empty<string>();
+    [Tooltip("Rare coats (palomino, dapple, pinto...): rolled now and then for a wild horse, and passed on by breeding.")]
+    [SerializeField] private RareCoat[] rareCoats = System.Array.Empty<RareCoat>();
+    [SerializeField, Range(0f, 1f)] private float rareCoatChance = 0.06f;
+    [Tooltip("What this breed can do that the common horse can't.")]
+    [SerializeField] private HorseAbility abilities;
 
     [Header("Stats (each horse rolls its own)")]
     [SerializeField] private Vector2 health = new Vector2(140f, 200f);
@@ -38,6 +70,8 @@ public sealed class HorseDefinition : ScriptableObject
     [SerializeField, Min(0.1f)] private float walkSpeed = 1.6f;
     [Tooltip("Ridden without a gallop.")]
     [SerializeField, Min(0.1f)] private float trotSpeed = 6.5f;
+    [Tooltip("The canter a rider picks with a tap of Space: faster than a trot, and free (no stamina).")]
+    [SerializeField, Min(0.1f)] private float canterSpeed = 8.5f;
     [Tooltip("Stamina a second spent at a gallop; it comes back at Stamina Regen while it doesn't gallop.")]
     [SerializeField, Min(0f)] private float gallopCost = 9f;
     [SerializeField, Min(0f)] private float staminaRegen = 6f;
@@ -115,6 +149,7 @@ public sealed class HorseDefinition : ScriptableObject
     public Vector2 CarryWeight => carryWeight;
     public float WalkSpeed => walkSpeed;
     public float TrotSpeed => trotSpeed;
+    public float CanterSpeed => canterSpeed;
     public float GallopCost => gallopCost;
     public float StaminaRegen => staminaRegen;
     public float TurnSpeed => turnSpeed;
@@ -128,6 +163,16 @@ public sealed class HorseDefinition : ScriptableObject
     public SoundDefinition Breathing => breathing;
     public SoundDefinition Hooves => hooves;
     public Material[] Manes => manes;
+    public RareCoat[] RareCoats => rareCoats;
+    public HorseAbility Abilities => abilities;
+    public bool Has(HorseAbility ability) => (abilities & ability) != 0;
+
+    /// <summary>A rare coat now and then (Rare Coat Chance): 1 + its index, or 0 for a common one.</summary>
+    public int RollRareCoat(System.Random random) =>
+        rareCoats.Length > 0 && random.NextDouble() < rareCoatChance ? random.Next(rareCoats.Length) + 1 : 0;
+
+    /// <summary>A horse's rare coat (1 + index), or null.</summary>
+    public RareCoat? RareCoatOf(int rare) => rare > 0 && rare <= rareCoats.Length ? rareCoats[rare - 1] : (RareCoat?)null;
     public HorseHome Home => home;
     public bool IsSpecial => special;
     public bool AlwaysArmoured => alwaysArmoured;

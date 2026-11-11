@@ -33,12 +33,16 @@ MonoBehaviour:
   - 0,1,2
   - 3,4
   - 0
+  rareCoats: []
+  rareCoatChance: 0.06
+  abilities: 0
   health: {x: 140, y: 200}
   stamina: {x: 80, y: 120}
   gallopSpeed: {x: 10, y: 12.5}
   carryWeight: {x: 55, y: 85}
   walkSpeed: 1.6
   trotSpeed: 6
+  canterSpeed: 8.5
   gallopCost: 9
   staminaRegen: 6
   turnSpeed: 220

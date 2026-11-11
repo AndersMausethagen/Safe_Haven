@@ -19,12 +19,16 @@ MonoBehaviour:
   manes:
   - {fileID: 2100000, guid: 79fee6b5b76e151448a333b1fd3d5f9b, type: 2}
   coatManes: []
+  rareCoats: []
+  rareCoatChance: 0.06
+  abilities: 7
   health: {x: 220, y: 300}
   stamina: {x: 120, y: 160}
   gallopSpeed: {x: 11.5, y: 13.5}
   carryWeight: {x: 70, y: 100}
   walkSpeed: 1.6
   trotSpeed: 6
+  canterSpeed: 9.5
   gallopCost: 9
   staminaRegen: 6
   turnSpeed: 220

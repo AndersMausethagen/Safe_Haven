@@ -81,6 +81,55 @@ MonoBehaviour:
   buckSeconds: {x: 2.5, y: 5}
   buckBalance: 0.28
   steadyPerSecond: 0.35
+  grounds:
+  - word: Path
+    speed: 1.15
+    soft: 0
+  - word: Gravel
+    speed: 1.1
+    soft: 0
+  - word: Road
+    speed: 1.15
+    soft: 0
+  - word: Muddy
+    speed: 0.72
+    soft: 1
+  - word: Mud
+    speed: 0.72
+    soft: 1
+  - word: Bog
+    speed: 0.68
+    soft: 1
+  - word: Damp
+    speed: 0.82
+    soft: 1
+  - word: Bank
+    speed: 0.85
+    soft: 1
+  - word: Cliff
+    speed: 0.8
+    soft: 0
+  - word: Rock
+    speed: 0.88
+    soft: 0
+  - word: Litter
+    speed: 0.92
+    soft: 0
+  - word: Humus
+    speed: 0.92
+    soft: 0
+  - word: Snow
+    speed: 0.8
+    soft: 1
+  steepClimb: 0.55
+  jumpHeight: 1.3
+  jumpLength: {x: 3.5, y: 7}
+  followDistance: 3.5
+  leadReach: 8
+  sureFootedMetres: 2000
+  swimmerMetres: 300
+  enduringMetres: 20000
+  braveHits: 10
   mountReach: 2.8
   mountPath:
   - {x: -0.518897, y: -0.660475, z: -0.12085813, w: 86.78125}

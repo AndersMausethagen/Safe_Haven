@@ -189,7 +189,7 @@ public sealed class PlayerRidingAnimation : MonoBehaviour
 
     private void OnHorseActed(HorseAct act, int which)
     {
-        if (Time.time < acting && act != HorseAct.Hit && act != HorseAct.Buck && act != HorseAct.Rear)
+        if (Time.time < acting && act != HorseAct.Hit && act != HorseAct.Buck && act != HorseAct.Rear && act != HorseAct.Jump)
         {
             return;
         }
@@ -201,6 +201,7 @@ public sealed class PlayerRidingAnimation : MonoBehaviour
             case HorseAct.Strike: Play("Ride Strike", 0.1f); break;
             case HorseAct.Fidget: Play("Ride Fidget " + which, 0.2f); break;
             case HorseAct.Hit: Play("Ride Hit " + which, 0.08f); break;
+            case HorseAct.Jump: Play("Ride Jump", 0.06f); break;
         }
 
         acting = Time.time + 0.6f;
