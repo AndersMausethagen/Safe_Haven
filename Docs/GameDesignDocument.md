@@ -559,6 +559,18 @@ A wild horse comes, rarely, to graze on the land round the Haven (never more tha
 
 Every horse rolls its own **health, stamina, gallop speed and carry weight** (and a coat), so one is worth more taming than another. Ridden, it trots, **gallops on its stamina** (Space) or walks; a **Hide Saddle** (10 rough hide at the Workshop) gives it **8 slots of saddle bags**, as much as it can carry before slowing. A cart can be hitched to it. Monsters attack horses as they attack the player's side. Hurt, a horse runs; killed, it drops its saddle and load where it fell. Owned horses show on the minimap and the world map, and interacting with one shows its name, numbers and bags.
 
+**Keeping horses (November 11, 2026).**
+- **Nature.** Every horse is a **mare or a stallion** and has a **temperament**. Calm horses let you near, give in sooner and run less far. Skittish ones bolt early, buck hard and run far, but tire soon on the rope. Stubborn ones pull hard, fight long and need one more feed. Bold ones strike back with their forelegs instead of running.
+- **Taming, harder and fairer.** On the rope, the player also **leans away** with the movement keys, on their own stamina. On the breaking ride the horse **veers and bucks** every few seconds, and the player **steers against it** to keep their balance; with no balance left they are thrown.
+- **Bond (0-100).** It grows by **feeding** (barley, turnip, berries, bread: E on its menu), **grooming** once a day, and every kilometre **ridden**. Each day with none of these wears it down. A fond horse has more stamina, panics less when hurt, no longer throws its rider, and comes when you **whistle (X)**, from farther the fonder it is.
+- **Stable** (a building: 16 planks, 10 oak, 6 cord, 10 barley). Four stalls, where horses are safe from night and breaches, mend, and get their breath back. A mare and a stallion stabled together, both at bond 50, **foal** after 2 days. A foal takes its parents' numbers (their average, give or take 8%), one parent's coat and nature, and **grows up over 3 days** before it can be ridden or saddled.
+- **Gear.** The **Leather Saddle** (12 slots, Tannery) and **Reinforced Saddle** (16, Anvil). **Barding**: Painted, Blackened and Silvered, which keep 20, 25 and 33% of a blow off and show on the horse in the pack's colourings.
+- **Horsemanship**, a skill of its own (the Riding group), trained by taming, feeding, grooming, riding, foals and blows from the saddle. Its levels and perks improve the hold on the rope, the gallop's cost, the bond and **mounted damage**. Its techniques: **Sure Seat** (no blow throws you) and **Trample** (at a gallop, run a creature down).
+- **Riding.** The rider sits each gait with the horse, rears, bucks and flinches with it, and gets on and off from either side, all with the pack's rider clips. From the saddle of your own horse you **swing your weapon and draw your bow**, a quarter harder at a gallop. Horses **swim** deep water, on their stamina.
+- **The first horse** is promised: with no horse by day 3, a calm one grazes near the yard, a resident says so, and the journal opens its Horses page.
+- **The Toxic Horse** is a special horse of the **bog**, met there only from dusk to dawn, and rarely. Its hide is grown through with something green that glows, it wears its own bone barding, and its breath is a fog. It is stronger and faster than the common horse, and harder to break.
+- What a horse needs to show is two thin bars over its head, and while taming one short line of what to press.
+
 ## 11. Survival, cooking, drinking, and farming
 
 ### 11.1 Design purpose

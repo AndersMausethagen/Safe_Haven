@@ -346,6 +346,18 @@ public sealed class Damageable : MonoBehaviour, IDamageable, ISaveable, ISharedS
     /// Brings a dead object back with a share of its health, such as the player waking at the portal. Only for objects
     /// that aren't destroyed on death.
     /// </summary>
+    /// <summary>Sets a living thing's health to a share of its maximum, without a blow (a tamed horse keeps the wild one's hurts).</summary>
+    public void SetHealthFraction(float healthFraction)
+    {
+        if (!IsAlive)
+        {
+            return;
+        }
+
+        currentHealth = Mathf.Max(1f, MaxHealth * Mathf.Clamp01(healthFraction));
+        HealthChanged?.Invoke(currentHealth, MaxHealth);
+    }
+
     public void Revive(float healthFraction = 1f)
     {
         if (IsAlive)

@@ -7,9 +7,18 @@ Open work and ideas. Tick items off (`[x]`) or delete them when done. Architectu
 
 Built and checked in Play (see GDD §10.9); none of it played by hand yet.
 - [x] The Undead Horse & Knight pack is in (downloaded through the Editor's Asset Store client, 2026-11-11), made a
-      living horse. Next from it: its rider clips (Humanoid: idle, trot, canter, gallop, mount and dismount) for the
-      player in the saddle, in place of PlayerTransportPose's bent bones, and a hitched-cart pose (Rider_CarriageCart).
-- [ ] A whinny: `HorseDefinition.whinny` is empty (make it in Tools/Audio first).
+      living horse, and its rider clips are the Riding layer of the player's Animator (2026-11-11).
+- [ ] A hitched-cart pose for the rider (Rider_CarriageCart clips) and a seat on the cart itself.
+- [x] Sounds: the pack's whinny, neigh, snort, breathing, hooves and whistle (2026-11-11).
+- [ ] Keeping horses (2026-11-11), tested in edit mode, not played by hand: temperament, leaning on the rope, the
+      breaking ride's balance, bond, the whistle, the Stable and foals, saddles and barding, Horsemanship (Sure Seat,
+      Trample), fighting from the saddle, swimming, the first horse by day 3, the bog's Toxic Horse. Tune by hand:
+      veers every 2.5-5 s costing 0.28 balance a second, the bond's numbers (4 a feed, 8 a grooming, 6 a kilometre,
+      2 lost a day), breeding at bond 50 and 2 days, the Toxic Horse's 5% an hour from dusk to dawn.
+- [ ] Mounting is the pack's clip played in place while the body is moved from the ground to the saddle; if it reads
+      badly, line the clip's own root motion up with the seat instead.
+- [ ] The saddle is the pack's undead one (bones and spikes hang from it); a living horse wants a plainer one.
+- [ ] The Stable's model is the Haven's shed and Skigard put together; it wants its own from a concept.
 - [ ] Co-op: horses aren't networked. A visitor can't catch, ride or saddle the host's horses; a host's ride isn't seen by friends.
 - [ ] Tune by hand: the struggle (pull 0.35 a second, 0.1 a tap: 3.5-4.6 taps a second hold it), the breaking ride's
       10-30 s and 6 s of patience, and the gallop (9 stamina a second). The gallop wasn't measured in Play (Space is real input).

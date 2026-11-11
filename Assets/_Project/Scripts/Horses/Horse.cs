@@ -195,7 +195,7 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold
         Bond = Mathf.Max(Bond, HorseSettings.Current.BondWhenTamed);
         LastCared = PlantedTrees.Today;
         Give(stats);
-        health.Revive(Mathf.Clamp01(healthFraction));
+        health.SetHealthFraction(healthFraction);
         Changed?.Invoke(this);
     }
 
@@ -207,7 +207,7 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold
         Bond = 30f;
         LastCared = BornOn;
         Give(stats);
-        health.Revive(1f);
+        health.SetHealthFraction(1f);
         if (!string.IsNullOrEmpty(stable))
         {
             SetStabled(stable);
@@ -792,7 +792,6 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold
         public string name;
         public HorseStats stats;
         public float stamina;
-        public float health = 1f;
         public string saddle;
         public string armour;
         public List<SlotSaveData> bags = new List<SlotSaveData>();
@@ -812,7 +811,7 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold
     {
         var saved = new Saved
         {
-            name = horseName, stats = Stats, stamina = Stamina, health = health.HealthFraction, saddle = saddle != null ? saddle.Id : "",
+            name = horseName, stats = Stats, stamina = Stamina, saddle = saddle != null ? saddle.Id : "",
             armour = armour != null ? armour.Id : "", bond = Bond, lastCared = LastCared, lastGroomed = LastGroomed, stabledIn = StabledIn,
             bornOn = BornOn, withFoalSince = WithFoalSince, foalSire = FoalSire, lastFoaled = LastFoaled,
         };
@@ -844,12 +843,8 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold
             stats.growth = 1f;
         }
 
+        // Its health is its Damageable's to save.
         Give(stats);
-        if (saved.health > 0f && saved.health < 1f)
-        {
-            health.Revive(saved.health);
-        }
-
         horseName = saved.name ?? "";
         Stamina = Mathf.Clamp(saved.stamina, 0f, MaxStamina);
         LastGroomed = saved.lastGroomed;
