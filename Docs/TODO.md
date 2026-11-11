@@ -3,6 +3,20 @@
 Open work and ideas. Tick items off (`[x]`) or delete them when done. Architecture notes for each system live in
 [ARCHITECTURE.md](../Assets/_Project/Scripts/ARCHITECTURE.md).
 
+## Horses and the playtest list (2026-11-11)
+
+Built and checked in Play (see GDD §10.9); none of it played by hand yet.
+- [ ] Download the **Undead Horse & Knight** pack in the Package Manager (My Assets; it needs your account), then its
+      animations (or a less undead body made in Blender) can replace the CC0 Quaternius horse: the body and clips are data
+      in `BuildHorses` (Model, Controller), and HorseMotion only needs Idle, Walk, Gallop, Eating, Death and a buck.
+- [ ] A whinny: `HorseDefinition.whinny` is empty (make it in Tools/Audio first).
+- [ ] Co-op: horses aren't networked. A visitor can't catch, ride or saddle the host's horses; a host's ride isn't seen by friends.
+- [ ] Tune by hand: the struggle (pull 0.35 a second, 0.1 a tap: 3.5-4.6 taps a second hold it), the breaking ride's
+      10-30 s and 6 s of patience, and the gallop (9 stamina a second). The gallop wasn't measured in Play (Space is real input).
+- [ ] Horses stay at home: a ridden horse can't go through the portal (the player has to get down to use it).
+- [ ] The pink tree from the playtest list: not reproduced (no broken or missing materials near trees in the prologue);
+      the user will look again. Placed trees that share a mesh but not materials no longer share a streaming template.
+
 ## Item icons (2026-11-11)
 
 All 204 items have icons painted with LocalSpawn (Qwen-Image draft, the "Safe Haven - Item icon" style), in place of the

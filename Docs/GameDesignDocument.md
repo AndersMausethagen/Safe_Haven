@@ -550,6 +550,15 @@ Prototype values (tunable in the Systems Editor): spotting a plainly visible pla
 3 s at the edge of sight; a lost target is searched for 6 s after 3 s out of sight; footsteps carry 5 m walking and
 1.2 m sneaking; an ambush deals +50%. Night, fog and light will later change visibility and sight range.
 
+### 10.9 Horses (November 11, 2026)
+
+A wild horse comes, rarely, to graze on the land round the Haven (never more than one at a time). It is caught, not bought:
+- **Sneak up.** It bolts from a walking player at about 10 m and from a sneaking one at about 6; the **lasso** (4 nettle cord and a rough hide, by hand) reaches 9.
+- **Hold it.** Roped, it fights in random directions. Tap E or left click to hold it: the rope strains while it pulls and each tap eases the strain and tires it. At full strain it tears free and runs. Worn out, it stands for a few seconds to be mounted.
+- **Break it in.** On its back, it asks for **barley** every 10-30 seconds. Unfed in time, or got off, it throws the rider and bolts. Fed 3-5 times (each horse its own number), it is the player's, and they **name** it.
+
+Every horse rolls its own **health, stamina, gallop speed and carry weight** (and a coat), so one is worth more taming than another. Ridden, it trots, **gallops on its stamina** (Space) or walks; a **Hide Saddle** (10 rough hide at the Workshop) gives it **8 slots of saddle bags**, as much as it can carry before slowing. A cart can be hitched to it. Monsters attack horses as they attack the player's side. Hurt, a horse runs; killed, it drops its saddle and load where it fell. Owned horses show on the minimap and the world map, and interacting with one shows its name, numbers and bags.
+
 ## 11. Survival, cooking, drinking, and farming
 
 ### 11.1 Design purpose
