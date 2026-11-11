@@ -75,14 +75,17 @@ public sealed class HavenListPage
     private object selectedKey;
     private readonly float detailWidth;
     private readonly float detailIconSize;
+    private readonly float detailIconWidth;
     private readonly float detailBodyTop;
 
     /// <param name="runAction">Runs an entry's button; the window decides what else that means (closing, reading again).</param>
+    /// <param name="detailPictureAspect">The detail picture's width over its height: 1 for icons and portraits, 16/9 for paintings.</param>
     public HavenListPage(RectTransform parent, string title, float width, float height, int columns, string emptyText, Action<HavenAction> runAction,
-        float detailWidth = DefaultDetailWidth, float detailIconSize = DefaultIconSize)
+        float detailWidth = DefaultDetailWidth, float detailIconSize = DefaultIconSize, float detailPictureAspect = 1f)
     {
         this.detailWidth = detailWidth;
         this.detailIconSize = detailIconSize;
+        detailIconWidth = detailIconSize * Mathf.Max(1f, detailPictureAspect);
         detailBodyTop = detailIconSize + 16f;
         this.columns = Mathf.Max(1, columns);
         this.height = height;
@@ -433,11 +436,11 @@ public sealed class HavenListPage
     {
         RectTransform rect = At("Detail", root, x, TitleTop, detailWidth, height - TitleTop - 10f);
         detail = rect.gameObject;
-        detailIcon = At("Icon", rect, 0f, 0f, detailIconSize, detailIconSize).gameObject.AddComponent<Image>();
+        detailIcon = At("Icon", rect, 0f, 0f, detailIconWidth, detailIconSize).gameObject.AddComponent<Image>();
         detailIcon.preserveAspect = true;
         detailIcon.raycastTarget = false;
         detailGlyph = Label("Glyph", rect, 0f, 0f, detailIconSize, detailIconSize, 52f, style.Accent, TextAlignmentOptions.Center);
-        float textLeft = detailIconSize + 16f;
+        float textLeft = detailIconWidth + 16f;
         detailName = Label("Name", rect, textLeft, 2f, detailWidth - textLeft, 44f, 30f, style.Text);
         style.Title(detailName);
         detailName.fontSizeMax = detailName.fontSize;

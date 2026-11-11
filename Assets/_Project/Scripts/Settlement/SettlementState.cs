@@ -119,6 +119,9 @@ public sealed class SettlementState
 
     public const float BlightEasedPerDay = 0.02f;
 
+    /// <summary>The Haven's hold on the regions round it (Territory): which are claimed, how firmly, and the forest's push.</summary>
+    public TerritoryState Territory { get; private set; } = new TerritoryState();
+
     /// <summary>Spreads (positive) or eases (negative) the blight.</summary>
     public void ChangeBlight(float by) => Blight = Math.Min(1f, Math.Max(0f, Blight + by));
 

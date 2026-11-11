@@ -1,0 +1,74 @@
+# The Haven's Reach: holding the land round home
+
+The Haven's world is split into regions (the world map draws them; `WorldAtlas`). Beyond the meadows, each region can be
+claimed for the Haven and has to be held against the forest. This is the loop that ties exploring, raiding and the
+corruption together, with goals for the next ten minutes and for the next ten hours.
+
+## The loop
+
+1. **Find** a region's named places (walking up to one finds it: +25 Insight).
+2. **Claim** it at its **boundary stone**, which stands beside a path near the region's middle. The pact marked its
+   borders with these stones; lighting one says the land is the Haven's. The first claim is free ("the stone answers to
+   the hearth"); every later claim costs a **Pact Rune**.
+3. **Hold** it. A claimed region has a *hold* from 0 to 100. It starts at 40 and wears away a little every turn, faster
+   the more blight there is. Below 25 it is *Slipping*, from 70 *Secure*. At 0 the forest takes it back: its stone goes
+   dark, the blight spreads, and it has to be claimed again.
+4. **Answer the forest.** Now and then the forest gathers against the weakest of the Haven's lands and says so: in two
+   turns it will push in and take 30 hold (more under blight). The player can
+   - **stand watch** at that region's boundary stone: what the forest sends comes for the stone; beat it all without
+     straying and the push is broken (+15 hold, 60 Insight); or
+   - **burn the rot's heart** on a raid: while a push is coming, every raid's briefing has an urgent rumour of it. Burning
+     one halves the push and gives a Pact Rune; two stop it; or
+   - **let it come**, and lose that much hold.
+5. **Grow it.** Each held region asks for a task now and then (hunt, gather or fish there: +10 hold, 60 Insight); a Pact
+   Rune adds 25; finding its places adds 5 each.
+
+## What holding land gives
+
+| Standing | Gives |
+|---|---|
+| Held | 6 renown (towards the Haven's ranks) |
+| Secure | 12 renown, a **tithe** of the region's own goods into the stash at every dawn (Greyfell: stone and copper ore; the Fen: bog venom and cloudberries...), and **the corruption never comes from it**: corrupted nights come from the region the forest is pushing on, or the weakest held land, or anywhere that isn't Secure |
+
+So the long goal is a ring of Secure lands round the Haven: safer nights, a steady trickle of goods, and a big share of
+the renown for the top ranks. The short goals are always in reach: a place to find, a stone to light, a task to finish,
+a push to answer.
+
+## Turns
+
+Time in this loop goes by in **turns**: a dawn at home, and every raid that ends. A push can't be missed by being away on
+raids (each raid is a turn, so it comes even if the player never sleeps at home), and it isn't rushed either: two turns
+of warning is two raids, or a raid and a night, or two nights.
+
+## The numbers, and why
+
+All are in `Resources/TerritorySettings` (written by `AgentScripts/BuildTerritory.cs`, which leaves the numbers as tuned).
+
+| Dial | Value | Why |
+|---|---|---|
+| Claim hold | 40 | One unanswered push (30) nearly takes a fresh claim: claiming is a promise to come back. |
+| Erosion | 1 + 4 × blight per turn | Without blight a fresh claim lasts ~40 turns untended (a long evening); under heavy blight about 8. |
+| First push | 3 turns after the first claim | Time to learn the stone before the forest tests it. |
+| Push chance | 20% + 40% × blight per turn (at most 60%), 3 turns' rest after each | At no blight about one push every 8 turns (~2-3 hours of play); under heavy blight every 4-5. Blight comes from corrupted nights the player let get away, so the pressure answers how well home is defended. |
+| Push strength | 30 + 25 × blight, 60% on a Secure region | Secure land is safer, not safe. |
+| Rot's heart | halves the push, gives a Pact Rune | Two raids answer a push without going home; the rune feeds the next claim. |
+| Watch | 3 + danger creatures, 4 minutes, stay within 40 m | Deadly regions defend harder; the reward is the same, so the player picks their fights. |
+| Pact Rune | 5% per supply cache, 1 per rot's heart | About one raid in two finds one by chance; answering pushes on raids is the steady source. Ten more claims and a hold of 70 everywhere is a long goal, not a grind. |
+| Renown | 6 held, 12 Secure | All eleven Secure is 132 renown: a large share of the 300 for the top rank, never all of it. |
+| Find | 25 Insight | The 27 places are worth about four extracted raids in all. |
+
+## Where it lives
+
+`Scripts/Territory/`: `TerritoryState` (the rules, plain C#, saved in `SettlementSaveData.territory`), `Territory` (the
+game's side: turns, messages, tasks from game events, the corruption's way in), `BoundaryStone` and `StoneDefence` (the
+stone and the watch), `TerritorySpawner` (stands the stones at runtime from the atlas, so the scene file never changes),
+`TerritorySettings`. The Haven window's **Lands** tab (`HavenLands`), the region's name on entering it and above the
+minimap (`RegionTitleHud`), the world map (held lands in the accent colour, a pushed one in warning, the stones once
+known). The raid side: `RaidRumourDefinition` › Forest Pushing, `WeakenIncursionOutcome`, the Rot's Heart rumour and event.
+Tests: `TerritoryTests`.
+
+## Not yet
+
+- Residents sent out to work a held region (hunting in Eastwood, fishing Stillwater) while the player raids.
+- A region's own weather and music; creature pages saying where each is found, from the atlas.
+- Spreading blight shown on the map as a tint, region by region.

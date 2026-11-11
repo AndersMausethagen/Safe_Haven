@@ -372,3 +372,12 @@ public sealed class WeakenBreachOutcome : RaidEventOutcome
 
     public override void Apply(RaidEventContext context) => GameSession.Settlement.WeakenBreach(share, most);
 }
+
+/// <summary>Burns the rot's heart behind the forest's push on one of the Haven's lands: the push loses a share (Territory).</summary>
+[System.Serializable]
+public sealed class WeakenIncursionOutcome : RaidEventOutcome
+{
+    public override string DisplayName => "Weaken the Forest's Push";
+
+    public override void Apply(RaidEventContext context) => Territory.HeartBurned();
+}

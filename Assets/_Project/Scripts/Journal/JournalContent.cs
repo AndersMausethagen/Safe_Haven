@@ -27,7 +27,9 @@ public static class JournalContent
             }
 
             known++;
-            ShelfFor(shelves, page.group).Entries.Add(EntryOf(page, progress));
+            HavenEntry entry = EntryOf(page, progress);
+            entry.Icon = page.art;
+            ShelfFor(shelves, page.group).Entries.Add(entry);
         }
 
         summary = $"{known} of {settings.Backstory.Count} pages written";

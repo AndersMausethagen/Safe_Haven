@@ -23,6 +23,7 @@ MonoBehaviour:
   sitePrefab: {fileID: 3059714547979966575, guid: 2ebf1cc60013d0a4380d52fcd6cc5dd4, type: 3}
   siteDistance: {x: 35, y: 70}
   siteText: A stone-framed door into the mound. Silver in the dark, and an old smell. Whoever lies in there has not been disturbed in a long time.
+  artwork: {fileID: 21300000, guid: fd21f62745909f740be7b6128c06ce18, type: 3}
   onStart: []
   choices:
   - label: Reach in and take it

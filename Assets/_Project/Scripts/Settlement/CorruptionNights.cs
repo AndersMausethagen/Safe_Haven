@@ -97,7 +97,8 @@ public sealed class CorruptionNights : MonoBehaviour
         comeAt = Time.time + (afterSeconds >= 0f ? afterSeconds : settings.Delay);
         fought = false;
         // The night's direction is chosen now, so the warning comes from where the band will.
-        bearing = Random.Range(0f, 360f);
+        // From the weakest of the Haven's lands, or where the forest is pushing (Territory).
+        bearing = Territory.NightBearing(Centre());
         Vector3 edge = Centre() + Direction(bearing) * settings.Distance.x;
         AudioManager.Play(settings.WarningSound, edge);
         BringWeather(settings);

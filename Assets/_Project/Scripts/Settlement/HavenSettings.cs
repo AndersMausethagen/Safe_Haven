@@ -24,6 +24,8 @@ public sealed class HavenSettings : GameSettings<HavenSettings>
         public GameEventDefinition reachedEvent;
         [Tooltip("Someone drawn by the name this rank has made: they come to live here and take up their first job. Optional.")]
         public ResidentDefinition settler;
+        [Tooltip("The Haven window's picture of the camp at this rank (LocalSpawn: Tools/LocalSpawn/haven_art.json). Optional.")]
+        public Sprite picture;
     }
 
     [Tooltip("Each more building of a kind already standing brings this share of its renown: variety is worth more.")]

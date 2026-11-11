@@ -1,0 +1,70 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2f02987ee9197d4682f5db8cbc7a967, type: 3}
+  m_Name: RotsHeart
+  m_EditorClassIdentifier: SafeHaven::RaidEventDefinition
+  id: RotsHeart
+  displayName: The Rot's Heart
+  weight: 0
+  earliestSeconds: 30
+  latestSecondsLeft: 60
+  minimumStage: 0
+  warning: 
+  warningSound: {fileID: 0}
+  sitePrefab: {fileID: 3587139044830951848, guid: 4b5befddc72dfe940a9f019b42bedab8, type: 3}
+  siteDistance: {x: 35, y: 70}
+  siteText: A knot of black wood as big as a man, half sunk in the ground, and it beats. Every vein of blight in this part of the woods runs to it.
+  artwork: {fileID: 21300000, guid: 768899815488eb840bda039d4736f4fd, type: 3}
+  onStart: []
+  choices:
+  - label: Burn out the heart
+    detail: Costs 20 seconds, and what guards it will wake. The forest's push falters, and the heart gives up a Pact Rune.
+    cost: []
+    result: It burns slowly, then all at once. Something in the stone at its core is warm and clean.
+    outcomes:
+    - rid: 2623126038171615344
+    - rid: 2623126038171615345
+    - rid: 2623126038171615346
+    - rid: 2623126038171615347
+  - label: Leave it beating
+    detail: The push on the Haven's land comes on as it was.
+    cost: []
+    result: You leave it. The beat follows you a long way.
+    outcomes: []
+  references:
+    version: 2
+    RefIds:
+    - rid: 2623126038171615344
+      type: {class: ChangeTimeOutcome, ns: , asm: SafeHaven}
+      data:
+        seconds: -20
+    - rid: 2623126038171615345
+      type: {class: SpawnCreaturesOutcome, ns: , asm: SafeHaven}
+      data:
+        prefabs:
+        - {fileID: 6176781864247096722, guid: a8ac1434006f7a44fb55b3c510633858, type: 3}
+        count: 1
+        radius: 6
+        hunt: 1
+    - rid: 2623126038171615346
+      type: {class: WeakenIncursionOutcome, ns: , asm: SafeHaven}
+      data: 
+    - rid: 2623126038171615347
+      type: {class: GiveLootOutcome, ns: , asm: SafeHaven}
+      data:
+        loot:
+          entries:
+          - item: {fileID: 11400000, guid: c9c58cc9c8a25eb4787a64e96598e266, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 1
+            maxQuantity: 1
+            probability: 1

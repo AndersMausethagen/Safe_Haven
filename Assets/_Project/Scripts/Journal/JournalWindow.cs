@@ -105,7 +105,10 @@ public sealed class JournalWindow : MonoBehaviour
             Tab tab = Tabs[i];
             Button button = AddTab(tab.ToString(), panel, Margin + i * (TabWidth + 8f), 8f, TabWidth, 44f, style, out TMP_Text label, out Image underline);
             button.onClick.AddListener(() => Show(tab));
-            var page = new HavenListPage(body, tab.ToString(), Width, height, 1, EmptyText(tab), Run, ReadingWidth, tab == Tab.Creatures ? PortraitSize : 84f);
+            // Creatures have a portrait; the backstory and mechanics pages a painting, wide, with the page's name beside it.
+            bool painted = tab == Tab.Backstory || tab == Tab.Mechanics;
+            var page = new HavenListPage(body, tab.ToString(), Width, height, 1, EmptyText(tab), Run, ReadingWidth,
+                tab == Tab.Creatures || painted ? PortraitSize : 84f, painted ? 16f / 9f : 1f);
             page.Chosen += OnChosen;
             tabViews.Add(new TabView { Tab = tab, Button = button, Label = label, Underline = underline, Page = page });
         }

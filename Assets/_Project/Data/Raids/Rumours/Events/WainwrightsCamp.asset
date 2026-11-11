@@ -23,6 +23,7 @@ MonoBehaviour:
   sitePrefab: {fileID: 2115659598568535546, guid: 6e0c5bc5566a9bc42ae72dff4f92c0c9, type: 3}
   siteDistance: {x: 35, y: 70}
   siteText: A half-built wheel, a cold fire and a chest nobody came back for.
+  artwork: {fileID: 21300000, guid: f127ae6a2289bd3429106ac6d7b32bf0, type: 3}
   onStart: []
   choices:
   - label: Take the ledger

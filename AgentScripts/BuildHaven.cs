@@ -74,7 +74,8 @@ public static class BuildHaven
             AssetDatabase.CreateAsset(material, path);
         }
 
-        material.SetColor("_BaseColor", colour);
+        // A painted material (BuildUIArt.Surfaces: the banner's cloth) keeps white, or the painting would be tinted.
+        material.SetColor("_BaseColor", material.GetTexture("_BaseMap") != null ? Color.white : colour);
         material.SetFloat("_Smoothness", 0.2f);
         if (emission.maxColorComponent > 0f)
         {

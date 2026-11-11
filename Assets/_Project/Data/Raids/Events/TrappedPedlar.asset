@@ -23,6 +23,7 @@ MonoBehaviour:
   sitePrefab: {fileID: 8216466046246968194, guid: c01d4d922b5f33041ba5c004979e6d57, type: 3}
   siteDistance: {x: 35, y: 70}
   siteText: A pedlar lies pinned under a fallen spruce, his pack just out of his reach. "Please. They'll smell me soon."
+  artwork: {fileID: 21300000, guid: 28e3fb90cff3ffa499b1fb7a6e27529f, type: 3}
   onStart: []
   choices:
   - label: Lift the log

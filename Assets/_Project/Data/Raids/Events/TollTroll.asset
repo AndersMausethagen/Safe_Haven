@@ -23,6 +23,7 @@ MonoBehaviour:
   sitePrefab: {fileID: 3364091344855052720, guid: 129b9139513b1754f98d0d115c6ede3d, type: 3}
   siteDistance: {x: 35, y: 70}
   siteText: A troll sits across the way, chin on its fists. "Toll," it says. "Or riddle. What runs and never walks, has a bed and never sleeps?"
+  artwork: {fileID: 21300000, guid: 390f841f37daf3f4c96afdc728c3344d, type: 3}
   onStart: []
   choices:
   - label: Pay the toll

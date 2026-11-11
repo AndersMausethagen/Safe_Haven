@@ -187,6 +187,7 @@ public static class SaveMapper
         into.successfulExtractions = settlement.SuccessfulExtractions;
         into.daysPassed = settlement.DaysPassed;
         into.blight = settlement.Blight;
+        into.territory = WriteTerritory(settlement.Territory);
         into.spiritGifts = new List<string>(settlement.SpiritGifts);
         into.huldraRespect = settlement.HuldraRespect;
         into.huldraAwayUntil = settlement.HuldraAwayUntil;
@@ -268,6 +269,7 @@ public static class SaveMapper
         settlement.RestorePortal(saved.portalLevel);
         settlement.RestoreDays(saved.daysPassed);
         settlement.RestoreBlight(saved.blight);
+        ReadTerritory(saved.territory, settlement.Territory);
         settlement.RestoreSpirits(saved.spiritGifts, saved.huldraRespect, saved.huldraAwayUntil);
         settlement.RestoreRequests(saved.requests, saved.requestsAnswered, saved.orderRenown);
         if (saved.tradeBought != null)
@@ -657,6 +659,7 @@ public static class SaveMapper
         into.journal.found.AddRange(journal.Found);
         into.journal.killedBy.AddRange(journal.KilledBy);
         into.journal.tried.AddRange(journal.Tried);
+        into.journal.discovered.AddRange(journal.Discovered);
         foreach (RaidRecord raid in journal.Raids)
         {
             into.journal.raids.Add(new RaidRecordSaveData { raid = raid.Raid, outcome = raid.Outcome, seconds = raid.Seconds, value = raid.Value, broughtDownBy = raid.BroughtDownBy ?? "", lines = new List<string>(raid.Lines) });
@@ -722,7 +725,7 @@ public static class SaveMapper
         }
 
         progress.Journal.Restore(journal.read ?? new List<string>(), journal.announced ?? new List<string>(), journal.found ?? new List<string>(), journal.killedBy ?? new List<string>(), raids, string.IsNullOrEmpty(journal.pinned) ? null : journal.pinned,
-            journal.tried ?? new List<string>());
+            journal.tried ?? new List<string>(), journal.discovered ?? new List<string>());
         return progress;
     }
 
@@ -829,5 +832,59 @@ public static class SaveMapper
         }
 
         return found;
+    }
+
+    private static TerritorySaveData WriteTerritory(TerritoryState territory)
+    {
+        var saved = new TerritorySaveData
+        {
+            turn = territory.Turn,
+            restUntil = territory.RestUntil,
+            firstClaimTurn = territory.FirstClaimTurn,
+            freeClaimUsed = territory.FreeClaimUsed,
+            hasPush = territory.Incursion != null,
+        };
+        foreach (TerritoryState.Hold hold in territory.Holds)
+        {
+            saved.holds.Add(new RegionHoldSaveData
+            {
+                region = hold.Region, claimed = hold.Claimed, everClaimed = hold.EverClaimed, hold = hold.Value,
+                taskProgress = hold.TaskProgress, taskFrom = hold.TaskFrom, tasksDone = hold.TasksDone,
+            });
+        }
+
+        if (territory.Incursion != null)
+        {
+            saved.pushRegion = territory.Incursion.Region;
+            saved.pushDue = territory.Incursion.DueTurn;
+            saved.pushStrength = territory.Incursion.Strength;
+            saved.pushWeakened = territory.Incursion.Weakened;
+        }
+
+        return saved;
+    }
+
+    private static void ReadTerritory(TerritorySaveData saved, TerritoryState into)
+    {
+        if (saved == null)
+        {
+            into.Restore(0, 0, -1, false, null, null);
+            return;
+        }
+
+        var holds = new List<TerritoryState.Hold>();
+        foreach (RegionHoldSaveData hold in saved.holds ?? new List<RegionHoldSaveData>())
+        {
+            holds.Add(new TerritoryState.Hold
+            {
+                Region = hold.region, Claimed = hold.claimed, EverClaimed = hold.everClaimed, Value = hold.hold,
+                TaskProgress = hold.taskProgress, TaskFrom = hold.taskFrom, TasksDone = hold.tasksDone,
+            });
+        }
+
+        TerritoryState.Push push = saved.hasPush && !string.IsNullOrEmpty(saved.pushRegion)
+            ? new TerritoryState.Push { Region = saved.pushRegion, DueTurn = saved.pushDue, Strength = saved.pushStrength, Weakened = saved.pushWeakened }
+            : null;
+        into.Restore(saved.turn, saved.restUntil, saved.firstClaimTurn, saved.freeClaimUsed, holds, push);
     }
 }

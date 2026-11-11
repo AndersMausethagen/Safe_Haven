@@ -23,6 +23,7 @@ MonoBehaviour:
   sitePrefab: {fileID: 0}
   siteDistance: {x: 35, y: 70}
   siteText: 
+  artwork: {fileID: 21300000, guid: 9ef79a3a2658be545b4b5d1299528144, type: 3}
   onStart:
   - rid: 287758281410609294
   - rid: 287758281410609295

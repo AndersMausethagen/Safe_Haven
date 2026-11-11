@@ -23,6 +23,7 @@ MonoBehaviour:
   sitePrefab: {fileID: 7345240531865155924, guid: 1eba7bdc41134f94a844bfdfae426775, type: 3}
   siteDistance: {x: 35, y: 70}
   siteText: A lean-to of split logs, every joint square. A man sits under it with a broken leg, still measuring.
+  artwork: {fileID: 21300000, guid: f5f198d61cc841d42ae2b82cf3d80995, type: 3}
   onStart: []
   choices:
   - label: Cut him out

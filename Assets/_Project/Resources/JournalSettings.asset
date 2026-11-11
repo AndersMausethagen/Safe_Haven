@@ -25,7 +25,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
     unlockedBySkill: {fileID: 0}
-    art: {fileID: 0}
+    art: {fileID: 21300000, guid: be9b38a6d1e80f04b9412f36fe351069, type: 3}
     summary: 
   - group: The old world
     title: What the Forest Does
@@ -39,7 +39,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
     unlockedBySkill: {fileID: 0}
-    art: {fileID: 0}
+    art: {fileID: 21300000, guid: 4309b569c79f91447abd766ead239143, type: 3}
     summary: 
   - group: The old world
     title: The Hearth
@@ -56,7 +56,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
     unlockedBySkill: {fileID: 0}
-    art: {fileID: 0}
+    art: {fileID: 21300000, guid: c89a5bcf92e164347b7e6ec84e091158, type: 3}
     summary: 
   - group: The old world
     title: The Portal
@@ -70,7 +70,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
     unlockedBySkill: {fileID: 0}
-    art: {fileID: 0}
+    art: {fileID: 21300000, guid: 084db206456f42e46a331a84e1af59f6, type: 3}
     summary: 
   - group: The expedition
     title: Seven Went In
@@ -87,7 +87,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
     unlockedBySkill: {fileID: 0}
-    art: {fileID: 0}
+    art: {fileID: 21300000, guid: 55b4e1172114b804ca7eeca9d56c0489, type: 3}
     summary: 
   - group: The expedition
     title: The Day the Stones Broke
@@ -104,7 +104,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
     unlockedBySkill: {fileID: 0}
-    art: {fileID: 0}
+    art: {fileID: 21300000, guid: 2dbe96364a9b5f045b67fd500c07b820, type: 3}
     summary: 
   - group: The expedition
     title: Ingrid's Word
@@ -118,7 +118,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
     unlockedBySkill: {fileID: 0}
-    art: {fileID: 0}
+    art: {fileID: 21300000, guid: 549b1d6c09f61624db2b6d1ca1e75e16, type: 3}
     summary: 
   - group: The forest's own
     title: The Guardians
@@ -132,7 +132,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
     unlockedBySkill: {fileID: 0}
-    art: {fileID: 0}
+    art: {fileID: 21300000, guid: c3b37904069014841a0dcd346c26acd2, type: 3}
     summary: 
   - group: The forest's own
     title: The First of Them
@@ -146,7 +146,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
     unlockedBySkill: {fileID: 0}
-    art: {fileID: 0}
+    art: {fileID: 21300000, guid: 7a61a48f6e3663244a3ffc24f4680a9e, type: 3}
     summary: 
   - group: The forest's own
     title: Troll Country
@@ -160,7 +160,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
     unlockedBySkill: {fileID: 0}
-    art: {fileID: 0}
+    art: {fileID: 21300000, guid: 0f8550ed498e12241a3a12a44e3bb053, type: 3}
     summary: 
   - group: The forest's own
     title: The Barrow Dead
@@ -174,7 +174,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
     unlockedBySkill: {fileID: 0}
-    art: {fileID: 0}
+    art: {fileID: 21300000, guid: 4b229cbf90a12f344ba05af46771aeb5, type: 3}
     summary: 
   - group: The people
     title: Sigrid
@@ -191,7 +191,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 11400000, guid: b230d041259b863428e4e973c6ff0d86, type: 2}
     foundInRaids: 0
     unlockedBySkill: {fileID: 0}
-    art: {fileID: 0}
+    art: {fileID: 21300000, guid: d44ee5592bb9a2c4aa2953eb4fab1ad7, type: 3}
     summary: 
   - group: The people
     title: Eirik
@@ -208,7 +208,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 11400000, guid: 33e7204287863854f8c6ad025490f531, type: 2}
     foundInRaids: 0
     unlockedBySkill: {fileID: 0}
-    art: {fileID: 0}
+    art: {fileID: 21300000, guid: 226878f3b74cac74f92744bfe07aca7f, type: 3}
     summary: 
   - group: The people
     title: Runa
@@ -225,7 +225,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 11400000, guid: 4260d606f7c62c042b848adc806c44d3, type: 2}
     foundInRaids: 0
     unlockedBySkill: {fileID: 0}
-    art: {fileID: 0}
+    art: {fileID: 21300000, guid: 597886e2642f88c4eab3fc52a1e60eb4, type: 3}
     summary: 
   - group: The people
     title: Bjarne
@@ -242,7 +242,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 11400000, guid: de521ad7beeb20b49878a9b40c96bced, type: 2}
     foundInRaids: 0
     unlockedBySkill: {fileID: 0}
-    art: {fileID: 0}
+    art: {fileID: 21300000, guid: cebe443fe120590438073ac16c885b26, type: 3}
     summary: 
   - group: The people
     title: Tor
@@ -259,7 +259,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 11400000, guid: df34e8e1df8ff0241a216bfddf9b631c, type: 2}
     foundInRaids: 0
     unlockedBySkill: {fileID: 0}
-    art: {fileID: 0}
+    art: {fileID: 21300000, guid: 34f6a519f6c1b304094d0d38d7c6689a, type: 3}
     summary: 
   - group: The people
     title: Liv
@@ -276,7 +276,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 11400000, guid: 8adfc30233928ec499c01587419eabaa, type: 2}
     foundInRaids: 0
     unlockedBySkill: {fileID: 0}
-    art: {fileID: 0}
+    art: {fileID: 21300000, guid: a68b4df3b2228c44aa638d42833cedec, type: 3}
     summary: 
   - group: Found in the woods
     title: A Letter, Unsent
@@ -293,7 +293,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 1
     unlockedBySkill: {fileID: 0}
-    art: {fileID: 0}
+    art: {fileID: 21300000, guid: da47952fda29d084cbe75b901262741f, type: 3}
     summary: 
   - group: Found in the woods
     title: Liv's Notes on the Stones
@@ -313,7 +313,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 1
     unlockedBySkill: {fileID: 0}
-    art: {fileID: 0}
+    art: {fileID: 21300000, guid: f7acd31b0d110644cb72c5789d2250b5, type: 3}
     summary: 
   - group: Found in the woods
     title: The Last Smith's Note
@@ -330,7 +330,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 1
     unlockedBySkill: {fileID: 0}
-    art: {fileID: 0}
+    art: {fileID: 21300000, guid: 5aa62c88656ebf340ab5a9d8dabf5a22, type: 3}
     summary: 
   - group: Found in the woods
     title: A Waystone Rubbing
@@ -351,7 +351,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 1
     unlockedBySkill: {fileID: 0}
-    art: {fileID: 0}
+    art: {fileID: 21300000, guid: 10e0ae7a661139940994890c891d05a9, type: 3}
     summary: 
   - group: Found in the woods
     title: The Lost Man's Song
@@ -376,7 +376,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 1
     unlockedBySkill: {fileID: 0}
-    art: {fileID: 0}
+    art: {fileID: 21300000, guid: 8ce0b158af6046c41956e616f0e2e711, type: 3}
     summary: 
   - group: Found in the woods
     title: The Troll Toll
@@ -399,7 +399,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 1
     unlockedBySkill: {fileID: 0}
-    art: {fileID: 0}
+    art: {fileID: 21300000, guid: 6c00416e61ff33349a28fc7fde039531, type: 3}
     summary: 
   - group: Found in the woods
     title: Barrow Inscription
@@ -416,7 +416,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 1
     unlockedBySkill: {fileID: 0}
-    art: {fileID: 0}
+    art: {fileID: 21300000, guid: 94d913258f8068a449d54e66787c7bc3, type: 3}
     summary: 
   - group: Found in the woods
     title: The Hearth Law
@@ -433,7 +433,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 1
     unlockedBySkill: {fileID: 0}
-    art: {fileID: 0}
+    art: {fileID: 21300000, guid: 7aee147a37d03104fbb95a90aaba2d27, type: 3}
     summary: 
   - group: Found in the woods
     title: A Tally on Bark
@@ -447,7 +447,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 1
     unlockedBySkill: {fileID: 0}
-    art: {fileID: 0}
+    art: {fileID: 21300000, guid: fd049309f7114524fac3de4f7f65ca31, type: 3}
     summary: 
   - group: Found in the woods
     title: Something Runa Left
@@ -464,7 +464,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 1
     unlockedBySkill: {fileID: 0}
-    art: {fileID: 0}
+    art: {fileID: 21300000, guid: fc10e401fb174e54887378e64aa6ee77, type: 3}
     summary: 
   mechanics:
   - group: Getting about

@@ -67,6 +67,8 @@ public sealed class SettlementSaveData
     public int daysPassed;
     /// <summary>How far the blight has crept into the woods round home (0-1). 0 in older saves.</summary>
     public float blight;
+    /// <summary>The Haven's hold on the regions round it (Territory). Missing in older saves.</summary>
+    public TerritorySaveData territory = new TerritorySaveData();
     /// <summary>Lasting gifts of the spirits (SpiritBonds). Empty in older saves.</summary>
     public List<string> spiritGifts = new List<string>();
     public int huldraRespect;
@@ -211,6 +213,8 @@ public sealed class JournalSaveData
     public List<RaidRecordSaveData> raids = new List<RaidRecordSaveData>();
     /// <summary>Skills tried at least once, which open their mechanics pages. Missing in older saves.</summary>
     public List<string> tried = new List<string>();
+    /// <summary>Named places found on the map. Missing in older saves.</summary>
+    public List<string> discovered = new List<string>();
 }
 
 [Serializable]
@@ -318,4 +322,31 @@ public sealed class AmountSaveData
 {
     public string id;
     public int amount;
+}
+
+[Serializable]
+public sealed class TerritorySaveData
+{
+    public int turn;
+    public int restUntil;
+    public int firstClaimTurn = -1;
+    public bool freeClaimUsed;
+    public List<RegionHoldSaveData> holds = new List<RegionHoldSaveData>();
+    public bool hasPush;
+    public string pushRegion = "";
+    public int pushDue;
+    public float pushStrength;
+    public float pushWeakened;
+}
+
+[Serializable]
+public sealed class RegionHoldSaveData
+{
+    public string region;
+    public bool claimed;
+    public bool everClaimed;
+    public float hold;
+    public int taskProgress;
+    public int taskFrom;
+    public int tasksDone;
 }

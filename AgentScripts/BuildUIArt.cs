@@ -7,8 +7,9 @@ using UnityEngine;
 /// <summary>
 /// Puts LocalSpawn's interface paintings (Tools/LocalSpawn/generate_ui_art.py, generate_item_icons.py --set boons) into the game:
 /// residents' portraits for the People page, each raid's place painting and results artwork, and the boon icons beside the vitals
-/// (Resources/ConditionIconSettings). Run with `unity command script run --file AgentScripts/BuildUIArt.cs --entry BuildUIArt.All`
-/// (or Residents, Raids, Boons). Tutorial pictures and creature portraits are BuildJournal's. Re-running only copies what changed.
+/// (Resources/ConditionIconSettings), raid events' scenes and the Haven window's camp at each rank. Run with `unity command script run
+/// --file AgentScripts/BuildUIArt.cs --entry BuildUIArt.All` (or Residents, Raids, Boons, Events, Haven). Tutorial, backstory and
+/// creature pictures are BuildJournal's. Re-running only copies what changed.
 /// </summary>
 public static class BuildUIArt
 {
@@ -20,7 +21,146 @@ public static class BuildUIArt
     private const string BoonArt = "Assets/_Project/Art/Icons/Boons/";
     private const string ConditionIcons = "Assets/_Project/Resources/ConditionIconSettings.asset";
 
-    public static string All() => string.Join("\n", Residents(), Raids(), Boons());
+    public static string All() => string.Join("\n", Residents(), Raids(), Boons(), Events(), Haven(), Surfaces());
+
+    /// <summary>
+    /// Painted surfaces in the world (Tools/LocalSpawn/surface_art.json): the Haven Banner's cloth (its own material, used by nothing
+    /// else), and the notes on the notice board by the portal, which get a material of their own (the board's note shared the
+    /// stations' cloth). The note is in SafeHaven.unity, so that part needs the scene open; it is saved only when it was clean.
+    /// </summary>
+    public static string Surfaces()
+    {
+        var log = new List<string>();
+        Texture2D cloth = TextureIn("Tools/LocalSpawn/SurfaceArt/banner_cloth.png", "Assets/_Project/Art/Haven/Textures/Banner Cloth.png");
+        if (cloth != null)
+        {
+            var banner = AssetDatabase.LoadAssetAtPath<Material>("Assets/_Project/Materials/Haven/Banner Cloth.mat");
+            Paint(banner, cloth);
+            log.Add("banner cloth");
+        }
+
+        Texture2D notes = TextureIn("Tools/LocalSpawn/SurfaceArt/notice_paper.png", "Assets/_Project/Art/Haven/Textures/Notice Paper.png");
+        if (notes != null)
+        {
+            const string paperPath = "Assets/_Project/Materials/Haven/Notice Paper.mat";
+            var paper = AssetDatabase.LoadAssetAtPath<Material>(paperPath);
+            if (paper == null)
+            {
+                paper = new Material(AssetDatabase.LoadAssetAtPath<Material>("Assets/_Project/Materials/Stations/StationCloth.mat"));
+                AssetDatabase.CreateAsset(paper, paperPath);
+            }
+
+            Paint(paper, notes);
+            log.Add(NoteOnTheBoard(paper));
+        }
+
+        AssetDatabase.SaveAssets();
+        return "Surfaces: " + (log.Count > 0 ? string.Join(", ", log) : "none painted yet");
+    }
+
+    private static void Paint(Material material, Texture2D texture)
+    {
+        material.SetTexture("_BaseMap", texture);
+        material.SetTexture("_MainTex", texture);
+        // White: the painting carries the colour (BuildHaven's MakeMaterial leaves a painted material's colour alone).
+        material.SetColor("_BaseColor", Color.white);
+        EditorUtility.SetDirty(material);
+    }
+
+    private static string NoteOnTheBoard(Material paper)
+    {
+        UnityEngine.SceneManagement.Scene scene = UnityEditor.SceneManagement.EditorSceneManager.GetActiveScene();
+        if (scene.name != "SafeHaven")
+        {
+            return "notice paper (the board's note needs SafeHaven open)";
+        }
+
+        foreach (Transform board in scene.GetRootGameObjects().SelectMany(g => g.GetComponentsInChildren<Transform>(true)).Where(t => t.name == "Notice Board"))
+        {
+            Transform note = board.Find("Note");
+            if (note != null && note.TryGetComponent(out MeshRenderer renderer) && renderer.sharedMaterial != paper)
+            {
+                bool wasClean = !scene.isDirty;
+                renderer.sharedMaterial = paper;
+                UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(scene);
+                if (wasClean)
+                {
+                    UnityEditor.SceneManagement.EditorSceneManager.SaveScene(scene);
+                }
+
+                return wasClean ? "notice paper on the board (scene saved)" : "notice paper on the board (scene not saved: it had other changes)";
+            }
+        }
+
+        return "notice paper (the board already has it, or no Notice Board/Note)";
+    }
+
+    // A painting copied in as an ordinary texture (mipmapped, for a surface in the world); null until it is painted.
+    private static Texture2D TextureIn(string source, string path)
+    {
+        if (!File.Exists(source))
+        {
+            return null;
+        }
+
+        Directory.CreateDirectory(Path.GetDirectoryName(path));
+        if (!File.Exists(path) || !File.ReadAllBytes(path).SequenceEqual(File.ReadAllBytes(source)))
+        {
+            File.Copy(source, path, true);
+            AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
+        }
+
+        var importer = (TextureImporter)AssetImporter.GetAtPath(path);
+        if (importer.maxTextureSize != 1024 || !importer.mipmapEnabled)
+        {
+            importer.textureType = TextureImporterType.Default;
+            importer.mipmapEnabled = true;
+            importer.maxTextureSize = 1024;
+            importer.SaveAndReimport();
+        }
+
+        return AssetDatabase.LoadAssetAtPath<Texture2D>(path);
+    }
+
+    /// <summary>Each raid event's painting, shown above its words and choices.</summary>
+    public static string Events()
+    {
+        int done = 0;
+        foreach (RaidEventDefinition raidEvent in Find<RaidEventDefinition>())
+        {
+            string source = "Tools/LocalSpawn/EventArt/" + raidEvent.name + ".png";
+            if (File.Exists(source))
+            {
+                Set(raidEvent, "artwork", CopyIn(source, "Assets/_Project/Art/UI/Events/" + raidEvent.name + ".png", 2048, false));
+                done++;
+            }
+        }
+
+        return $"{done} raid events given their painting.";
+    }
+
+    /// <summary>The Haven window's picture of the camp at each rank (HavenSettings > Ranks, in order: 1.png is the first).</summary>
+    public static string Haven()
+    {
+        var settings = AssetDatabase.LoadAssetAtPath<HavenSettings>("Assets/_Project/Resources/HavenSettings.asset");
+        var so = new SerializedObject(settings);
+        SerializedProperty ranks = so.FindProperty("ranks");
+        int done = 0;
+        for (int i = 0; i < ranks.arraySize; i++)
+        {
+            string source = "Tools/LocalSpawn/HavenArt/" + (i + 1) + ".png";
+            if (File.Exists(source))
+            {
+                ranks.GetArrayElementAtIndex(i).FindPropertyRelative("picture").objectReferenceValue =
+                    CopyIn(source, "Assets/_Project/Art/UI/Haven/Rank " + (i + 1) + ".png", 2048, false);
+                done++;
+            }
+        }
+
+        so.ApplyModifiedPropertiesWithoutUndo();
+        AssetDatabase.SaveAssetIfDirty(settings);
+        return $"{done} of {ranks.arraySize} ranks given their picture.";
+    }
 
     public static string Residents()
     {

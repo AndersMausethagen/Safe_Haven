@@ -1,0 +1,171 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c82d7cde050405e47ba60a9b3e632b64, type: 3}
+  m_Name: TerritorySettings
+  m_EditorClassIdentifier: SafeHaven::TerritorySettings
+  stonePrefab: {fileID: 2721250850413415460, guid: b0d6bb89d7da5934fbfe730e5b527509, type: 3}
+  pactRune: {fileID: 11400000, guid: c9c58cc9c8a25eb4787a64e96598e266, type: 2}
+  firstClaimFree: 1
+  placesToClaim: 1
+  claimHold: 40
+  runeHold: 25
+  findHold: 5
+  slippingBelow: 25
+  secureFrom: 70
+  erosion: 1
+  erosionPerBlight: 4
+  firstPushAfter: 3
+  restAfterPush: 3
+  pushChance: 0.2
+  pushChancePerBlight: 0.4
+  mostPushChance: 0.6
+  warningTurns: 2
+  pushStrength: 30
+  pushStrengthPerBlight: 25
+  secureShare: 0.6
+  heartShare: 0.5
+  lostBlight: 0.05
+  defenceCreatures: []
+  defenceCount: 3
+  defencePerDanger: 1
+  defenceDistance: {x: 16, y: 26}
+  defenceLeash: 40
+  defenceAway: 12
+  defenceSeconds: 240
+  defenceHold: 15
+  defenceInsight: 60
+  taskHold: 10
+  taskInsight: 60
+  taskRest: 1
+  heldRenown: 6
+  secureRenown: 12
+  findInsight: 25
+  regions:
+  - region: Ravenwood
+    description: Old pines north of the meadows, where the ravens sit and watch the road. The tarn lies at its edge.
+    danger: 1
+    gives: Softwood, berries, game
+    task: 0
+    taskCount: 6
+    tithe:
+    - item: {fileID: 11400000, guid: 8ae2883815327b74fa7975309c803f92, type: 2}
+      amount: 4
+    - item: {fileID: 11400000, guid: d799dc8161ff2854dae1eedf4b74fb09, type: 2}
+      amount: 2
+  - region: Eastwood
+    description: Open woods between the lake and the hills, crossed by trappers' paths. The old quarries are here.
+    danger: 1
+    gives: Softwood, stone, hides
+    task: 0
+    taskCount: 6
+    tithe:
+    - item: {fileID: 11400000, guid: 8ae2883815327b74fa7975309c803f92, type: 2}
+      amount: 3
+    - item: {fileID: 11400000, guid: b5567f7d75200bd46befbd1dab298f36, type: 2}
+      amount: 3
+  - region: The Hollow Pines
+    description: Tall, dead-straight pines south of the Haven with nothing growing under them. Sound carries strangely here.
+    danger: 2
+    gives: Hardwood, mushrooms, iron
+    task: 1
+    taskCount: 10
+    tithe:
+    - item: {fileID: 11400000, guid: 183fddc5567e8b8479fcb1618e73496c, type: 2}
+      amount: 2
+    - item: {fileID: 11400000, guid: 15d1c587fc1b8f34696d9b01c733b94e, type: 2}
+      amount: 2
+  - region: The Wolfwood
+    description: 'Where the cursed packs den: the Wolf Den is here, and the Old Barrow. Few go in, and fewer come out the same.'
+    danger: 3
+    gives: Fangs, thick hides, grave iron
+    task: 0
+    taskCount: 8
+    tithe:
+    - item: {fileID: 11400000, guid: 5148bc82bfb79f94ca5482ed8e4ea69f, type: 2}
+      amount: 1
+    - item: {fileID: 11400000, guid: 8f121a970bae6f54dbcc8ff5e2c2a48e, type: 2}
+      amount: 1
+  - region: Westwood
+    description: Quiet cedar woods west of the meadows, with the old watchtowers on their ridges and the mere among them.
+    danger: 1
+    gives: Hardwood, healing herbs
+    task: 1
+    taskCount: 10
+    tithe:
+    - item: {fileID: 11400000, guid: 183fddc5567e8b8479fcb1618e73496c, type: 2}
+      amount: 2
+    - item: {fileID: 11400000, guid: 7e57bf86766de2341bd9c47b5830cf76, type: 2}
+      amount: 2
+  - region: The Grey Pines
+    description: A thin strip of pines under Greyfell's cliffs, littered with fallen stone and the stumps of old cuttings.
+    danger: 1
+    gives: Softwood, stone
+    task: 1
+    taskCount: 8
+    tithe:
+    - item: {fileID: 11400000, guid: b5567f7d75200bd46befbd1dab298f36, type: 2}
+      amount: 3
+    - item: {fileID: 11400000, guid: 8ae2883815327b74fa7975309c803f92, type: 2}
+      amount: 2
+  - region: Greyfell
+    description: 'The mountain: bare benches of rock climbing to the highest ground in the land. Ore in the cliffs, and the wind.'
+    danger: 2
+    gives: Stone, granite, copper and iron ore
+    task: 1
+    taskCount: 10
+    tithe:
+    - item: {fileID: 11400000, guid: b5567f7d75200bd46befbd1dab298f36, type: 2}
+      amount: 4
+    - item: {fileID: 11400000, guid: a9f806359436036488427616ef8b8c44, type: 2}
+      amount: 2
+  - region: The Drowning Fen
+    description: 'The bog: black pools between hummocks, and a causeway to the Drowned Stones at its heart. It keeps what it takes.'
+    danger: 3
+    gives: Bog venom, herbs, cloudberries
+    task: 0
+    taskCount: 6
+    tithe:
+    - item: {fileID: 11400000, guid: 54e1b03f55c96d14c96beff689a77318, type: 2}
+      amount: 1
+    - item: {fileID: 11400000, guid: bb670a5310dbb494296de3c93180cebd, type: 2}
+      amount: 2
+  - region: Stillwater
+    description: The great lake below the Haven, with the Island Stones out on the water and the landing on its shore.
+    danger: 0
+    gives: Fish, flax
+    task: 2
+    taskCount: 4
+    tithe:
+    - item: {fileID: 11400000, guid: 1deba4cfdd0cc854ba9f9d3fa96aacd9, type: 2}
+      amount: 2
+    - item: {fileID: 11400000, guid: acb3416df6dae1b439a8b3945c3f098e, type: 2}
+      amount: 2
+  - region: Hightarn
+    description: A cold tarn in the northern hills, its water black and very still. The fish there are old and wary.
+    danger: 1
+    gives: Fish
+    task: 2
+    taskCount: 3
+    tithe:
+    - item: {fileID: 11400000, guid: c21953f6b8b2a344fab83a50731723fa, type: 2}
+      amount: 1
+  - region: Alder Mere
+    description: A reedy mere in the south-west woods, ringed with alders and quiet as a held breath.
+    danger: 0
+    gives: Fish, flax, reeds
+    task: 2
+    taskCount: 3
+    tithe:
+    - item: {fileID: 11400000, guid: 0318e752045b5e54f87bb7ba2814fb8e, type: 2}
+      amount: 1
+    - item: {fileID: 11400000, guid: acb3416df6dae1b439a8b3945c3f098e, type: 2}
+      amount: 2

@@ -23,6 +23,7 @@ MonoBehaviour:
   sitePrefab: {fileID: 852558878823289175, guid: 0c99e9713ece39a41bc74e652c5dddcf, type: 3}
   siteDistance: {x: 35, y: 70}
   siteText: A swarm the size of a man hangs from a dead limb, and the whole clearing hums.
+  artwork: {fileID: 21300000, guid: 417fe673f5a37184f916988c0e73817c, type: 3}
   onStart: []
   choices:
   - label: Take the swarm

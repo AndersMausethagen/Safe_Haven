@@ -23,6 +23,7 @@ MonoBehaviour:
   sitePrefab: {fileID: 7819783059902628876, guid: b11076bec4f786e47b99c5cccf273a67, type: 3}
   siteDistance: {x: 35, y: 70}
   siteText: A stump as wide as a house, split down the middle, and breathing. Dead trees stand round it in a ring, and nothing grows inside. It does not stir for footsteps or for steel. In the split, where a heart would be, the wood is black, as if a fire once burned there.
+  artwork: {fileID: 21300000, guid: 047582d5994612e47be72d74a4306f7f, type: 3}
   onStart: []
   choices:
   - label: Wake it

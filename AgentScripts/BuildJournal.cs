@@ -391,6 +391,7 @@ public static class BuildJournal
             page.FindPropertyRelative("unlockedByCreature").objectReferenceValue = creature != null ? Monster(creature) : null;
             page.FindPropertyRelative("unlockedByResident").objectReferenceValue = null;
             page.FindPropertyRelative("foundInRaids").boolValue = false;
+            page.FindPropertyRelative("art").objectReferenceValue = PageArt(title);
         }
 
         foreach ((string who, string line, string body) in People)
@@ -402,6 +403,8 @@ public static class BuildJournal
             page.FindPropertyRelative("unlockedByCreature").objectReferenceValue = null;
             page.FindPropertyRelative("unlockedByResident").objectReferenceValue = Resident(who);
             page.FindPropertyRelative("foundInRaids").boolValue = false;
+            // A person's page shows their portrait (BuildUIArt.Residents).
+            page.FindPropertyRelative("art").objectReferenceValue = Resident(who).Portrait;
         }
 
         foreach ((string title, string line, string body) in Finds)
@@ -413,6 +416,7 @@ public static class BuildJournal
             page.FindPropertyRelative("unlockedByCreature").objectReferenceValue = null;
             page.FindPropertyRelative("unlockedByResident").objectReferenceValue = null;
             page.FindPropertyRelative("foundInRaids").boolValue = true;
+            page.FindPropertyRelative("art").objectReferenceValue = PageArt(title);
         }
 
         SerializedProperty mechanics = so.FindProperty("mechanics");
@@ -547,6 +551,13 @@ public static class BuildJournal
 
     /// <summary>A file name from a page's or creature's name: "The Clock and the Way Out" -> the_clock_and_the_way_out.</summary>
     public static string Slug(string name) => System.Text.RegularExpressions.Regex.Replace(name.ToLowerInvariant(), "[^a-z0-9]+", "_").Trim('_');
+
+    // A backstory page's or find's picture (Tools/LocalSpawn/generate_ui_art.py journal), copied into the game; none until it is painted.
+    private static Sprite PageArt(string title)
+    {
+        string source = "Tools/LocalSpawn/JournalArt/" + Slug(title) + ".png";
+        return File.Exists(source) ? CopyIn(source, "Assets/_Project/Art/UI/Journal/Pages/" + Slug(title) + ".png", 2048) : null;
+    }
 
     // The page's painting from LocalSpawn (Tools/LocalSpawn/generate_ui_art.py tutorials), copied into the game; none until it is painted.
     private static Sprite TutorialArt(string title)

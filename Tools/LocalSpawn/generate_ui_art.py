@@ -7,6 +7,12 @@ folder the finished paintings go to, which the Unity builders read:
   creatures   creature_portraits.json  768x768    -> CreaturePortraits/<asset>.png  BuildJournal.cs (PaintedPortraits)
   residents   resident_portraits.json  768x768    -> ResidentPortraits/<asset>.png  AgentScripts/BuildUIArt.cs (Residents)
   raids       raid_art.json            1920x1088  -> RaidArt/<asset>.png            AgentScripts/BuildUIArt.cs (Raids)
+  events      event_art.json           1280x720   -> EventArt/<asset>.png           AgentScripts/BuildUIArt.cs (Events)
+  journal     journal_art.json         1280x720   -> JournalArt/<slug>.png          AgentScripts/BuildJournal.cs (Apply)
+  haven       haven_art.json           1920x1088  -> HavenArt/<rank>.png            AgentScripts/BuildUIArt.cs (Haven)
+  surfaces    surface_art.json         per entry  -> SurfaceArt/<key>.png           AgentScripts/BuildUIArt.cs (Surfaces)
+
+An entry may give its own "width" and "height" (multiples of 16).
 
   generate_ui_art.py SET [key ...] [--force] [--model NAME]
 
@@ -28,7 +34,7 @@ from PIL import Image
 HERE = os.path.dirname(os.path.abspath(__file__))
 AGENT = r"D:\ComfyUI\agent"
 PYTHON = r"D:\ComfyUI\.venv\Scripts\python.exe"
-STYLES = {"home": "Safe Haven - Home", "raid": "Safe Haven - Raid"}
+STYLES = {"home": "Safe Haven - Home", "raid": "Safe Haven - Raid", "none": "None"}
 
 # set -> (list, folder, width, height, default style, size it is saved at (None: as painted), slug the key)
 SETS = {
@@ -36,6 +42,10 @@ SETS = {
     "creatures": ("creature_portraits.json", "CreaturePortraits", 768, 768, "raid", 512, False),
     "residents": ("resident_portraits.json", "ResidentPortraits", 768, 768, "home", 512, False),
     "raids": ("raid_art.json", "RaidArt", 1920, 1088, "raid", None, False),
+    "events": ("event_art.json", "EventArt", 1280, 720, "raid", None, False),
+    "journal": ("journal_art.json", "JournalArt", 1280, 720, "home", None, True),
+    "haven": ("haven_art.json", "HavenArt", 1920, 1088, "home", None, False),
+    "surfaces": ("surface_art.json", "SurfaceArt", 1024, 1024, "none", None, False),
 }
 
 
@@ -88,7 +98,9 @@ def main():
                 continue
             entry = wanted[key]
             prompt, style = (entry, default_style) if isinstance(entry, str) else (entry["prompt"], entry.get("style", default_style))
-            took = paint(key, prompt, STYLES[style], width, height, model, target, size)
+            wide = entry.get("width", width) if isinstance(entry, dict) else width
+            high = entry.get("height", height) if isinstance(entry, dict) else height
+            took = paint(key, prompt, STYLES[style], wide, high, model, target, size)
             done += 1
             print(f"[{done}] {key:34s} {took:5.1f} s", flush=True)
         print(f"{done} {args[0]} painted with {model}.")

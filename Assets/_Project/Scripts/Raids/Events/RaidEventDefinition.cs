@@ -40,6 +40,8 @@ public sealed class RaidEventDefinition : ScriptableObject, IDisplayName
     [SerializeField] private Vector2 siteDistance = new Vector2(35f, 70f);
     [Tooltip("What the player sees on arriving, shown above the choices.")]
     [SerializeField, TextArea(2, 5)] private string siteText;
+    [Tooltip("A painting of the scene, above its words and choices (LocalSpawn: Tools/LocalSpawn/event_art.json). Optional.")]
+    [SerializeField] private Sprite artwork;
 
     [Header("What happens")]
     [Tooltip("Carried out when it begins, at the site if it has one.")]
@@ -55,6 +57,7 @@ public sealed class RaidEventDefinition : ScriptableObject, IDisplayName
     public GameObject SitePrefab => sitePrefab;
     public Vector2 SiteDistance => siteDistance;
     public string SiteText => siteText;
+    public Sprite Artwork => artwork;
     public IReadOnlyList<RaidEventOutcome> OnStart => onStart;
     public IReadOnlyList<RaidEventChoice> Choices => choices;
 

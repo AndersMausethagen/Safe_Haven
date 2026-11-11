@@ -5,7 +5,8 @@ using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 /// <summary>Shows the whole painted and explored world map, with where the player's quests are and who has quests for them, each
-/// in the colour of its quest's rank. M opens and closes it; Escape also returns to play.</summary>
+/// in the colour of its quest's rank. Where the scene has a WorldAtlas (the Haven) its regions are drawn with their borders and
+/// names, and the named places the player has found (PlaceDiscovery) with theirs. M opens and closes it; Escape also returns to play.</summary>
 public sealed class WorldMapHud : MonoBehaviour
 {
     private static readonly int ExploredId = Shader.PropertyToID("_Explored");
@@ -36,6 +37,20 @@ public sealed class WorldMapHud : MonoBehaviour
     }
 
     private readonly System.Collections.Generic.List<QuestMark> questMarks = new System.Collections.Generic.List<QuestMark>();
+    // The atlas's regions and places, when the scene has one.
+    private WorldAtlas atlas;
+    private Texture2D borders;
+    private readonly System.Collections.Generic.List<TMP_Text> regionLabels = new System.Collections.Generic.List<TMP_Text>();
+    private readonly System.Collections.Generic.List<(WorldAtlas.Place place, RectTransform root)> placeMarks =
+        new System.Collections.Generic.List<(WorldAtlas.Place, RectTransform)>();
+    private static readonly Color BorderColour = new Color(0.94f, 0.86f, 0.64f, 0.7f);
+    private static readonly Color RegionColour = new Color(0.94f, 0.88f, 0.72f, 0.62f);
+    private static readonly Color PlaceColour = new Color(0.96f, 0.92f, 0.8f, 1f);
+    private const float PlaceLabelWide = 150f;
+    private const float PlaceLabelHigh = 17f;
+    private readonly System.Collections.Generic.List<Vector2> placed = new System.Collections.Generic.List<Vector2>();
+    private readonly System.Collections.Generic.List<(string region, RectTransform root)> stoneMarks =
+        new System.Collections.Generic.List<(string, RectTransform)>();
     private readonly System.Collections.Generic.List<Vector3> marked = new System.Collections.Generic.List<Vector3>();
 
     public static WorldMapHud Current { get; private set; }
@@ -107,6 +122,11 @@ public sealed class WorldMapHud : MonoBehaviour
             Destroy(map);
         }
 
+        if (borders != null)
+        {
+            Destroy(borders);
+        }
+
         if (material != null)
         {
             Destroy(material);
@@ -150,7 +170,7 @@ public sealed class WorldMapHud : MonoBehaviour
         RectTransform helpRect = Rect("Help", transform, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(1100f, 34f), new Vector2(0f, 34f));
         TMP_Text help = helpRect.gameObject.AddComponent<TextMeshProUGUI>();
         string mapKey = GameInput.KeyLabel(GameInput.WorldMap);
-        help.text = (RaidDirector.Current != null ? "Doorways: exits  •  Rings: rough rumours  •  Stars: open events  •  " : "Quest names include their rank  •  ") + "Unexplored areas remain hidden  •  " + (string.IsNullOrEmpty(mapKey) ? "" : mapKey + " or ") + "Esc to return";
+        help.text = (RaidDirector.Current != null ? "Doorways: exits  •  Rings: rough rumours  •  Stars: open events  •  " : "Quest names include their rank  •  Stars: places you have found  •  Hearths: boundary stones  •  ") + "Unexplored areas remain hidden  •  " + (string.IsNullOrEmpty(mapKey) ? "" : mapKey + " or ") + "Esc to return";
         help.fontSize = 18f;
         help.alignment = TextAlignmentOptions.Center;
         help.color = UIStyle.Current.Muted;
@@ -172,6 +192,8 @@ public sealed class WorldMapHud : MonoBehaviour
         material = new Material(shader);
         material.SetColor(FogId, UIStyle.Current.Panel);
         mapImage.material = material;
+
+        BuildAtlas();
 
         RectTransform marker = Rect("Player", mapRect, Vector2.one * 0.5f, Vector2.one * 0.5f, new Vector2(28f, 28f), Vector2.zero);
         playerMarker = marker.gameObject.AddComponent<TextMeshProUGUI>();
@@ -269,6 +291,7 @@ public sealed class WorldMapHud : MonoBehaviour
 
         ExplorationMap exploration = ExplorationMap.Current;
         material.SetTexture(ExploredId, exploration != null ? exploration.Texture : Texture2D.whiteTexture);
+        PlaceAtlas(width, height);
         PlaceQuestMarks(width, height);
 
         Player player = Player.Current;
@@ -413,6 +436,185 @@ public sealed class WorldMapHud : MonoBehaviour
 
         mark.Label.rectTransform.anchoredPosition = new Vector2(0f, -24f - under * 20f);
     }
+
+    // The regions' borders as one picture over the map (a line wherever a cell's region differs from the one east or north of it),
+    // a name for each region, and a mark for every place: hidden until it is found.
+    private void BuildAtlas()
+    {
+        atlas = WorldAtlas.For(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
+        if (atlas == null || atlas.GridSize <= 0)
+        {
+            atlas = null;
+            return;
+        }
+
+        int size = atlas.GridSize;
+        borders = new Texture2D(size, size, TextureFormat.RGBA32, false) { wrapMode = TextureWrapMode.Clamp, filterMode = FilterMode.Bilinear, name = "Region Borders" };
+        var pixels = new Color32[size * size];
+        Color32 line = BorderColour;
+        for (int y = 0; y < size; y++)
+        {
+            for (int x = 0; x < size; x++)
+            {
+                byte here = atlas.RegionAtCell(x, y);
+                bool edge = (x + 1 < size && atlas.RegionAtCell(x + 1, y) != here) || (y + 1 < size && atlas.RegionAtCell(x, y + 1) != here);
+                pixels[y * size + x] = edge ? line : new Color32(0, 0, 0, 0);
+            }
+        }
+
+        borders.SetPixels32(pixels);
+        borders.Apply();
+        RectTransform overlay = Rect("Region Borders", mapRect, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
+        var image = overlay.gameObject.AddComponent<RawImage>();
+        image.texture = borders;
+        image.raycastTarget = false;
+        // The map shows the scene's area; the atlas covers its own (the same terrain): the part of it under the map.
+        Rect covered = atlas.Area;
+        image.uvRect = new Rect((area.xMin - covered.xMin) / covered.width, (area.yMin - covered.yMin) / covered.height,
+            area.width / covered.width, area.height / covered.height);
+
+        foreach (WorldAtlas.Region region in atlas.Regions)
+        {
+            RectTransform words = Rect("Region " + region.name, mapRect, Vector2.one * 0.5f, Vector2.one * 0.5f, new Vector2(360f, 40f), Vector2.zero);
+            var text = words.gameObject.AddComponent<TextMeshProUGUI>();
+            UIStyle.Current.OnWorld(text, true);
+            text.text = region.name.ToUpperInvariant();
+            // Small regions get smaller names, so the tarn's name doesn't drown the woods around it.
+            text.fontSize = Mathf.Lerp(13f, 21f, Mathf.InverseLerp(0.01f, 0.2f, region.share));
+            text.characterSpacing = 8f;
+            text.alignment = TextAlignmentOptions.Center;
+            text.textWrappingMode = TextWrappingModes.NoWrap;
+            text.color = RegionColour;
+            text.raycastTarget = false;
+            regionLabels.Add(text);
+        }
+
+        // Each region's boundary stone (Territory), once the region is known.
+        foreach (WorldAtlas.Region region in atlas.Regions)
+        {
+            if (region.stoneAt == Vector2.zero)
+            {
+                continue;
+            }
+
+            RectTransform root = Rect("Stone " + region.name, mapRect, Vector2.one * 0.5f, Vector2.one * 0.5f, new Vector2(18f, 18f), Vector2.zero);
+            var mark = root.gameObject.AddComponent<Image>();
+            mark.sprite = UIStyle.Current.Hearthmark;
+            mark.raycastTarget = false;
+            var shade = root.gameObject.AddComponent<Outline>();
+            shade.effectColor = new Color(0f, 0f, 0f, 0.85f);
+            shade.effectDistance = new Vector2(1f, -1f);
+            stoneMarks.Add((region.name, root));
+        }
+
+        foreach (WorldAtlas.Place place in atlas.Places)
+        {
+            RectTransform root = Rect("Place " + place.name, mapRect, Vector2.one * 0.5f, Vector2.one * 0.5f, Vector2.zero, Vector2.zero);
+            RectTransform shape = Rect("Icon", root, Vector2.one * 0.5f, Vector2.one * 0.5f, new Vector2(16f, 16f), Vector2.zero);
+            var icon = shape.gameObject.AddComponent<Image>();
+            icon.sprite = UIStyle.Current.EventMark;
+            icon.color = PlaceColour;
+            icon.raycastTarget = false;
+            var outline = shape.gameObject.AddComponent<Outline>();
+            outline.effectColor = new Color(0f, 0f, 0f, 0.85f);
+            outline.effectDistance = new Vector2(1f, -1f);
+            RectTransform words = Rect("Label", root, Vector2.one * 0.5f, Vector2.one * 0.5f, new Vector2(260f, 24f), new Vector2(0f, -18f));
+            var text = words.gameObject.AddComponent<TextMeshProUGUI>();
+            UIStyle.Current.OnWorld(text);
+            text.text = place.name;
+            text.fontSize = 15f;
+            text.fontStyle = FontStyles.Italic;
+            text.alignment = TextAlignmentOptions.Center;
+            text.textWrappingMode = TextWrappingModes.NoWrap;
+            text.color = PlaceColour;
+            text.raycastTarget = false;
+            placeMarks.Add((place, root));
+        }
+    }
+
+    private void PlaceAtlas(float width, float height)
+    {
+        if (atlas == null)
+        {
+            return;
+        }
+
+        TerritoryState lands = GameSession.Settlement.Territory;
+        UIStyle style = UIStyle.Current;
+        for (int i = 0; i < regionLabels.Count && i < atlas.Regions.Count; i++)
+        {
+            string name = atlas.Regions[i].name;
+            regionLabels[i].rectTransform.anchoredPosition = OnMap(atlas.Regions[i].label, width, height);
+            // Held lands in the accent, the one the forest pushes on in warning, the wild as the map's own ink.
+            bool pushed = lands.Incursion != null && lands.Incursion.Region == name;
+            regionLabels[i].color = pushed ? style.Warning : lands.IsClaimed(name) ? style.Accent : RegionColour;
+            regionLabels[i].text = pushed ? name.ToUpperInvariant() + "  !" : name.ToUpperInvariant();
+        }
+
+        foreach ((string region, RectTransform root) in stoneMarks)
+        {
+            bool known = lands.IsClaimed(region) || Territory.PlacesFound(region) > 0;
+            root.gameObject.SetActive(known);
+            if (known)
+            {
+                WorldAtlas.Region at = null;
+                foreach (WorldAtlas.Region candidate in atlas.Regions)
+                {
+                    if (candidate.name == region)
+                    {
+                        at = candidate;
+                    }
+                }
+
+                root.anchoredPosition = OnMap(at.stoneAt, width, height);
+                root.GetComponent<Image>().color = lands.Incursion != null && lands.Incursion.Region == region ? style.Warning
+                    : lands.IsClaimed(region) ? style.Accent : style.Muted;
+            }
+        }
+
+        JournalRecord record = GameSession.Progress.Journal;
+        placed.Clear();
+        // The regions' names take their room first: a place's name keeps clear of them too.
+        foreach (TMP_Text region in regionLabels)
+        {
+            placed.Add(region.rectTransform.anchoredPosition);
+        }
+
+        foreach ((WorldAtlas.Place place, RectTransform root) in placeMarks)
+        {
+            bool found = record.HasDiscovered(place.id);
+            if (root.gameObject.activeSelf != found)
+            {
+                root.gameObject.SetActive(found);
+            }
+
+            if (!found)
+            {
+                continue;
+            }
+
+            root.anchoredPosition = OnMap(place.at, width, height);
+            // A name that would print over one already placed goes above its star instead, then further out.
+            var words = (RectTransform)root.GetChild(1);
+            float[] tries = { -18f, 18f, -36f, 36f };
+            Vector2 label = root.anchoredPosition + new Vector2(0f, tries[0]);
+            foreach (float offset in tries)
+            {
+                label = root.anchoredPosition + new Vector2(0f, offset);
+                if (!placed.Exists(other => Mathf.Abs(other.x - label.x) < PlaceLabelWide && Mathf.Abs(other.y - label.y) < PlaceLabelHigh))
+                {
+                    break;
+                }
+            }
+
+            words.anchoredPosition = label - root.anchoredPosition;
+            placed.Add(label);
+        }
+    }
+
+    private Vector2 OnMap(Vector2 world, float width, float height) => new Vector2(
+        (Mathf.Clamp01((world.x - area.xMin) / area.width) - 0.5f) * width,
+        (Mathf.Clamp01((world.y - area.yMin) / area.height) - 0.5f) * height);
 
     private void OnCancel(InputAction.CallbackContext context) => Close();
 

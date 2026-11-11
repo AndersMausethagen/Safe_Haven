@@ -53,16 +53,25 @@ public sealed class RaidRumourDefinition : ScriptableObject
     [SerializeField] private bool urgent;
     [Tooltip("Only while someone lost on a raid is still out there. {0} in the briefing is their name.")]
     [SerializeField] private bool seeksLost;
+    [Tooltip("Only while the forest is gathering to push on one of the Haven's lands (Territory). {0} in the briefing is the region.")]
+    [SerializeField] private bool forestPushing;
 
     public string Id => string.IsNullOrWhiteSpace(id) ? name : id;
     public string Briefing => briefing;
     public bool SeeksLost => seeksLost;
+    public bool ForestPushing => forestPushing;
 
     /// <summary>The line in the briefing as this game has it: the name of whoever it leads to.</summary>
     public string BriefingFor(SettlementState settlement)
     {
         FallenRecord lost = seeksLost ? settlement.LostToFind : null;
-        return lost != null ? string.Format(briefing, lost.Resident.DisplayName) : briefing;
+        if (lost != null)
+        {
+            return string.Format(briefing, lost.Resident.DisplayName);
+        }
+
+        TerritoryState.Push push = forestPushing ? settlement.Territory.Incursion : null;
+        return push != null ? string.Format(briefing, push.Region) : briefing;
     }
     public RaidEventDefinition Site => site;
     public RaidSetPieceDefinition SetPiece => setPiece;
@@ -85,6 +94,11 @@ public sealed class RaidRumourDefinition : ScriptableObject
         }
 
         if (seeksLost && settlement.LostToFind == null)
+        {
+            return false;
+        }
+
+        if (forestPushing && settlement.Territory.Incursion == null)
         {
             return false;
         }

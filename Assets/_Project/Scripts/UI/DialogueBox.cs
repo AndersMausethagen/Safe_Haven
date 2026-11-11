@@ -333,12 +333,14 @@ public sealed class DialogueBox : MonoBehaviour
             window.Open();
         }
 
-        bool live = speaker.Portrait == null && speaker.Model != null && !bubbled;
+        // A resident speaks with their painted portrait; anyone else without a picture of their own is filmed live.
+        Sprite still = speaker.Portrait != null ? speaker.Portrait : PaintedPortraitOf(speaker.Model);
+        bool live = still == null && speaker.Model != null && !bubbled;
         portrait.gameObject.SetActive(live);
-        picture.gameObject.SetActive(!live && !bubbled && speaker.Portrait != null);
-        picture.sprite = speaker.Portrait;
+        picture.gameObject.SetActive(!live && !bubbled && still != null);
+        picture.sprite = still;
         portraitCamera.Show(live ? speaker.Model : null);
-        LayOutFor(live || (!bubbled && speaker.Portrait != null));
+        LayOutFor(live || (!bubbled && still != null));
         Frame(speaker.Model, speaker.CameraDistance);
         if (!string.IsNullOrWhiteSpace(line))
         {
@@ -416,6 +418,13 @@ public sealed class DialogueBox : MonoBehaviour
     }
 
     // The portal and a voice through its stones have no face to show, so their words take its place.
+    // The resident a speaker is (their ResidentNpc, PrologueCompanion or Companion), if they have a painted portrait.
+    private static Sprite PaintedPortraitOf(Transform model)
+    {
+        IQuestPerson person = model != null ? model.GetComponentInParent<IQuestPerson>() : null;
+        return person != null && person.Resident != null ? person.Resident.Portrait : null;
+    }
+
     private void LayOutFor(bool hasFace)
     {
         float freed = hasFace ? 0f : FaceWidth;

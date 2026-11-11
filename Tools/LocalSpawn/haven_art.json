@@ -1,0 +1,8 @@
+{
+  "_about": "The Haven window's overview painting, one for each rank of Safe Haven (HavenSettings > Ranks, in order), so the picture grows with the camp (Tools/LocalSpawn/generate_ui_art.py haven, 1920x1088, the Home style; AgentScripts/BuildUIArt.cs Haven). Keyed by the rank's position, 1 to 5. The same clearing each time: a ring of cracked old standing stones (the portal) in the middle of a forest clearing, seen from a little above.",
+  "1": "A small overgrown forest clearing around a ring of cracked old standing stones, a single campfire burning beside them, a lean-to of branches, weeds and young birches everywhere, early morning light, the dark forest close all round.",
+  "2": "A forest clearing around a ring of old standing stones, a campfire and a small log workshop with a turf roof, a woodpile and a few stumps where trees were cleared, a path trodden through the grass, warm afternoon light.",
+  "3": "A small hamlet in a forest clearing around a ring of old standing stones: three log cabins with turf roofs, a smithy with smoke rising, a woodcutter's lodge, a garden plot and a well, a low fence of slanted poles, golden evening light.",
+  "4": "A Norse village in a wide forest clearing around a ring of old standing stones: many turf-roofed log houses, a kitchen and a sauna with smoke rising, a trading post, farm plots, lanterns along the paths, a palisade, warm glowing windows at dusk.",
+  "5": "A thriving Norse village called Safe Haven in a great clearing around a ring of glowing standing stones: a banner of green and gold flying, a stone wall and watch posts, busy workshops, fields and a dock on a lake, a faint golden dome of light over it all holding back the misty forest, sunset."
+}

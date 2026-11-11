@@ -15,7 +15,7 @@ public sealed class HavenWindow : MonoBehaviour
 {
     private const float Width = 1240f;
     private const float TabBarHeight = 56f;
-    private const float TabWidth = 190f;
+    private const float TabWidth = 176f;
     private const float Height = 776f + TabBarHeight;
     private const float Margin = 44f;
     private const float ColumnsTop = 314f;
@@ -39,10 +39,11 @@ public sealed class HavenWindow : MonoBehaviour
         Stores,
         Buildings,
         People,
+        Lands,
         Raids,
     }
 
-    private static readonly Tab[] Tabs = { Tab.Overview, Tab.Stores, Tab.Buildings, Tab.People, Tab.Raids };
+    private static readonly Tab[] Tabs = { Tab.Overview, Tab.Stores, Tab.Buildings, Tab.People, Tab.Lands, Tab.Raids };
     private static Tab lastTab = Tab.Overview;
 
     private sealed class TabView
@@ -89,10 +90,12 @@ public sealed class HavenWindow : MonoBehaviour
     private UIWindow window;
     private RectTransform panel;
     private RectTransform overviewPage;
+    private RawImage rankArt;
     private HavenListPage storesPage;
     private HavenListPage buildingsPage;
     private HavenListPage peoplePage;
     private HavenListPage raidsPage;
+    private HavenListPage landsPage;
     private readonly List<TabView> tabViews = new List<TabView>();
     private Tab shown = Tab.Overview;
     private TMP_Text rankName;
@@ -199,6 +202,8 @@ public sealed class HavenWindow : MonoBehaviour
         buildingsPage.SetVisible(tab == Tab.Buildings);
         peoplePage.SetVisible(tab == Tab.People);
         raidsPage.SetVisible(tab == Tab.Raids);
+        landsPage.SetVisible(tab == Tab.Lands);
+        landsPage.ScrollToTop();
         storesPage.ScrollToTop();
         buildingsPage.ScrollToTop();
         peoplePage.ScrollToTop();
@@ -247,7 +252,8 @@ public sealed class HavenWindow : MonoBehaviour
         List<HavenShelf> buildings = HavenBuildings.Read(user != null ? user.GetComponent<PlayerCrafting>() : null, user != null ? MaterialPool.For(user) : null,
             Resources.Load<ContentDatabase>(ContentDatabase.ResourceName), user != null ? user.GetComponent<BuildPlacer>() : null);
         List<HavenShelf> residents = HavenPeople.Read();
-        DrawTabs(buildings, residents);
+        List<HavenShelf> lands = HavenLands.Read();
+        DrawTabs(buildings, residents, lands);
         switch (shown)
         {
             case Tab.Stores:
@@ -262,18 +268,22 @@ public sealed class HavenWindow : MonoBehaviour
             case Tab.Raids:
                 raidsPage.Draw(HavenReadiness.Read(), "What the base does for you out there.");
                 break;
+            case Tab.Lands:
+                landsPage.Draw(lands, HavenLands.Summary());
+                break;
         }
 
         buildLabel.text = $"Build  ({GameInput.KeyLabel(GameInput.Build)})";
     }
 
-    private void DrawTabs(List<HavenShelf> buildings, List<HavenShelf> residents)
+    private void DrawTabs(List<HavenShelf> buildings, List<HavenShelf> residents, List<HavenShelf> lands)
     {
         UIStyle style = UIStyle.Current;
         foreach (TabView view in tabViews)
         {
             bool on = view.Tab == shown;
-            int wanted = view.Tab == Tab.Buildings ? WantingAttention(buildings) : view.Tab == Tab.People ? WantingAttention(residents) : 0;
+            int wanted = view.Tab == Tab.Buildings ? WantingAttention(buildings) : view.Tab == Tab.People ? WantingAttention(residents)
+                : view.Tab == Tab.Lands ? WantingAttention(lands) : 0;
             view.Label.text = wanted > 0 ? $"{view.Tab}  <color={UIStyle.Hex(style.Warning)}>{wanted}</color>" : view.Tab.ToString();
             view.Label.color = on ? style.Accent : style.Text;
             view.Underline.enabled = on;
@@ -355,6 +365,7 @@ public sealed class HavenWindow : MonoBehaviour
 
         HavenSettings.Rank now = ranks[overview.Rank];
         rankName.text = now.name;
+        ShowRankArt(now.picture);
         rankLine.text = now.line;
         renownValue.text = last ? overview.Renown.ToString() : $"{overview.Renown}<size=60%> / {ranks[overview.Rank + 1].renown}";
         nextLine.text = last ? "Safe Haven has reached its highest rank." : NextRank(now, ranks[overview.Rank + 1], overview.Renown);
@@ -478,6 +489,7 @@ public sealed class HavenWindow : MonoBehaviour
         buildingsPage = new HavenListPage(body, "Buildings", Width, PageHeight, 2, "Nothing to show yet.", RunAction);
         peoplePage = new HavenListPage(body, "People", Width, PageHeight, 1, "Nobody has come home yet.", RunAction, detailIconSize: 150f);
         raidsPage = new HavenListPage(body, "Raids", Width, PageHeight, 1, "", RunAction);
+        landsPage = new HavenListPage(body, "Lands", Width, PageHeight, 1, "No regions are known yet.", RunAction);
         BuildFooter(body, style);
 
         window = root.gameObject.AddComponent<UIWindow>();
@@ -498,8 +510,19 @@ public sealed class HavenWindow : MonoBehaviour
         Hairline(panel, Margin, TabBarHeight, Width - Margin * 2f, 1f, style);
     }
 
+    private const float HeaderArtHeight = 168f;
+
     private void BuildHeader(UIStyle style)
     {
+        // The camp as it stands at this rank, behind the header: solid under the name, darkened under the figures.
+        rankArt = At("Rank Art", overviewPage, 0f, 0f, Width, HeaderArtHeight).gameObject.AddComponent<RawImage>();
+        rankArt.raycastTarget = false;
+        rankArt.enabled = false;
+        var fade = At("Rank Art Fade", overviewPage, 0f, 0f, Width, HeaderArtHeight).gameObject.AddComponent<RawImage>();
+        fade.texture = HeaderFade();
+        fade.color = style.Panel;
+        fade.raycastTarget = false;
+
         TMP_Text kicker = Label("Kicker", overviewPage, Margin, 34f, 500f, 24f, 17f, style.Accent);
         kicker.text = "SAFE HAVEN";
         kicker.characterSpacing = 12f;
@@ -513,6 +536,45 @@ public sealed class HavenWindow : MonoBehaviour
         wardValue = Figure("Ward", 812f, 124f, style.Text, style);
         clearedValue = Figure("Cleared", 936f, 124f, style.Text, style);
         buildingsValue = Figure("Buildings", 1060f, 136f, style.Text, style);
+    }
+
+    // Alpha only, tinted the panel's colour: solid at the left under the rank's name, never clearer than half on the right
+    // (the figures stand on it), solid again along the bottom.
+    private static Texture2D HeaderFade()
+    {
+        const int width = 128;
+        const int height = 32;
+        var texture = new Texture2D(width, height, TextureFormat.RGBA32, false) { wrapMode = TextureWrapMode.Clamp, name = "Haven Header Fade" };
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                float across = Mathf.InverseLerp(0.62f, 0.3f, x / (width - 1f));
+                float down = Mathf.InverseLerp(0.35f, 0f, y / (height - 1f));
+                float alpha = Mathf.Max(Mathf.SmoothStep(0f, 1f, Mathf.Max(across, down)), 0.5f);
+                texture.SetPixel(x, y, new Color(1f, 1f, 1f, alpha));
+            }
+        }
+
+        texture.Apply();
+        return texture;
+    }
+
+    // The middle band of the painting that fits the header's shape.
+    private void ShowRankArt(Sprite art)
+    {
+        rankArt.enabled = art != null;
+        if (art == null)
+        {
+            return;
+        }
+
+        Rect rect = art.textureRect;
+        Texture texture = art.texture;
+        float band = Mathf.Min(1f, HeaderArtHeight / Width * rect.width / rect.height);
+        rankArt.texture = texture;
+        rankArt.uvRect = new Rect(rect.x / texture.width, (rect.y + rect.height * (0.5f - band * 0.5f)) / texture.height,
+            rect.width / texture.width, rect.height * band / texture.height);
     }
 
     private TMP_Text Figure(string label, float x, float width, Color colour, UIStyle style)

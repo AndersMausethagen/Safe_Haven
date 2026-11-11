@@ -23,6 +23,7 @@ MonoBehaviour:
   sitePrefab: {fileID: 7345240531865155924, guid: a3ac699dc99789f4eb89fde236a0a0dd, type: 3}
   siteDistance: {x: 35, y: 70}
   siteText: A forge built from what the woods left lying. A big man sits against it with one arm bound to his chest, hammer across his knees.
+  artwork: {fileID: 21300000, guid: 84101dd80a3e14946aabe6bdb0a6a571, type: 3}
   onStart: []
   choices:
   - label: Help him up

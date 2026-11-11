@@ -94,6 +94,7 @@ public sealed class Seasons : MonoBehaviour
         if (lastHour >= 0f && lastHour < 6f && hour >= 6f && hour - lastHour < 2f)
         {
             GameSession.Settlement.PassDay();
+            global::Territory.Turn(true);
         }
 
         lastHour = hour;

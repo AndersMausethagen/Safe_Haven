@@ -23,6 +23,7 @@ MonoBehaviour:
   sitePrefab: {fileID: 6300785177508054535, guid: f6b55623a86789d4596845f67db2bf63, type: 3}
   siteDistance: {x: 35, y: 70}
   siteText: Sigrid leans on a broken spear, a horn in her other hand, hurt worse than she'll say.
+  artwork: {fileID: 21300000, guid: a8c6180a98e6b7147a6e1b5e5737a40f, type: 3}
   onStart: []
   choices:
   - label: Take her weight

@@ -23,6 +23,7 @@ MonoBehaviour:
   sitePrefab: {fileID: 7819783059902628876, guid: 03cd33812c655e5469457169b3a9d51d, type: 3}
   siteDistance: {x: 35, y: 70}
   siteText: A stone hearth on a bare rise, stacked with dry wood. You can see a long way from here, and a long way off, things can see it.
+  artwork: {fileID: 21300000, guid: 1f5bc08810268aa40b0dcf7740f71cd9, type: 3}
   onStart: []
   choices:
   - label: Light it

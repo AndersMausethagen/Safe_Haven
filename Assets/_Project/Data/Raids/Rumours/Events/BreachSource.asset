@@ -23,6 +23,7 @@ MonoBehaviour:
   sitePrefab: {fileID: 6054274067264939789, guid: d2ae06c188317a247beb9add6f4ccf7b, type: 3}
   siteDistance: {x: 35, y: 70}
   siteText: Bones and antlers tied to a dead tree, and tracks all around it, all pointing towards home.
+  artwork: {fileID: 21300000, guid: 78239b06c04ea8c4ab293e44933781cf, type: 3}
   onStart: []
   choices:
   - label: Tear it down

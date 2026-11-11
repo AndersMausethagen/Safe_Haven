@@ -126,7 +126,7 @@ public sealed class RaidEventSite : MonoBehaviour, IInteractionName, IInteractio
             return null;
         }
 
-        var page = new MenuPage { Title = definition.DisplayName, Body = definition.SiteText };
+        var page = new MenuPage { Title = definition.DisplayName, Body = definition.SiteText, Picture = definition.Artwork };
         MaterialPool pool = MaterialPool.For(user);
         for (int i = 0; i < definition.Choices.Count; i++)
         {

@@ -533,6 +533,11 @@ MonoBehaviour:
       minQuantity: 1
       maxQuantity: 1
       probability: 0.05
+    - item: {fileID: 11400000, guid: c9c58cc9c8a25eb4787a64e96598e266, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.05
   lockPins: 3
   fullVisual: {fileID: 7691639898665871457}
   emptyVisual: {fileID: 2452368823239758751}

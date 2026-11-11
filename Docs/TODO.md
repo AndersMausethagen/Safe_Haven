@@ -15,6 +15,33 @@ game's inventory.
 - [x] Building, skill and perk icons are still placeholders or renders: the same pipeline would do them. (Done 2026-11-11:
       34 buildings, 7 abilities, 13 skills, 130 perks, 6 essences, 3 status effects, 7 boon icons.)
 
+## Holding the land (2026-11-11)
+
+Regions are claimed at boundary stones and held against the forest (Docs/Territory.md). Built and tested by rules
+(TerritoryTests) and in Play from the CLI: a claim, a push after six turns, a watch at the stone that broke it. Not played
+by hand, and the balance is a first guess.
+- [ ] Play a few evenings: does a push come often enough to matter and seldom enough not to nag? Are Pact Runes too rare
+      (5% a cache) or too common? Tune in Resources/TerritorySettings.
+- [ ] The boundary stone is the Runic Ward Totem's model: a stone of its own (a Blender kit piece, or LocalSpawn) would read
+      better from the top-down camera, and it is easy to miss in the outer woods' mist: a beam or a mark at night?
+- [ ] Next steps (Docs/Territory.md › Not yet): residents working held regions, blight on the map, region weather.
+
+## Map regions and more paintings (2026-11-11)
+
+The Haven's map shows 12 named regions with their borders and the 27 named places once found (WorldAtlas, PlaceDiscovery,
+AgentScripts/BuildHavenAtlas.cs). Residents speak with their painted portraits; raid events, backstory pages and the Haven
+overview (one picture per rank) have paintings; the banner's cloth and the notice board's note are painted.
+- [ ] Walk the Haven and judge the names and borders: the woods are split between the roads and named by where they lie;
+      rename freely in BuildHavenAtlas (Woods, Names) and bake again.
+- [ ] Bake the atlas again whenever the Haven world is generated again (WorldAtlasTests.TheAtlas_IsTheWorldThatWasGenerated).
+- [ ] Ideas: show the region's name for a moment on entering it; list found places in the journal; let the minimap name
+      the region the player is in.
+- [ ] The Oskorei and Thickening Fog events have no choices, so their paintings are never shown (an event without choices
+      only posts a message): show them in the warning, or give the events a choice.
+- [ ] Shields and rune carvings were suggested as painted surfaces, but neither has a surface of its own to paint (they
+      are parts of baked models); the Haven's kit materials (Base Timber, Base Stone...) are flat colours and could all
+      be textured, which would change every building's look: a decision for an art pass.
+
 ## Tutorials and interface art (2026-11-11)
 
 Mechanics pages of the journal open as tutorials the first time a thing is tried (see ARCHITECTURE.md › Journal); the

@@ -44,27 +44,32 @@ MonoBehaviour:
     line: A fire and a tree, and the forest pressing in.
     reachedEvent: {fileID: 0}
     settler: {fileID: 0}
+    picture: {fileID: 21300000, guid: dbad434c7ef747a429eb46b4d61636fd, type: 3}
   - name: Homestead
     renown: 25
     wardBonus: 3
     line: Someone lives here now. The ward reaches further.
     reachedEvent: {fileID: 0}
     settler: {fileID: 0}
+    picture: {fileID: 21300000, guid: 77778d91af6ac804fb348c463766ad9c, type: 3}
   - name: Hamlet
     renown: 90
     wardBonus: 6
     line: Smoke from more than one chimney.
     reachedEvent: {fileID: 0}
     settler: {fileID: 0}
+    picture: {fileID: 21300000, guid: de53093bdac94aa4aadd0d25f77bf85e, type: 3}
   - name: Village
     renown: 180
     wardBonus: 10
     line: Travellers speak of a light in the old wood.
     reachedEvent: {fileID: 0}
     settler: {fileID: 0}
+    picture: {fileID: 21300000, guid: 1650a55b31fcc4445b8ccb5346b0b014, type: 3}
   - name: Haven
     renown: 300
     wardBonus: 15
     line: A true haven. The forest itself seems to breathe easier.
     reachedEvent: {fileID: 0}
     settler: {fileID: 0}
+    picture: {fileID: 21300000, guid: c1c40bb7cae200e4085d99500b37538b, type: 3}

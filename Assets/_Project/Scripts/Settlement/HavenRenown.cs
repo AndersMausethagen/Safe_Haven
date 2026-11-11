@@ -79,6 +79,13 @@ public static class HavenRenown
             parts?.Add(new Part("Good work for its people", orders));
         }
 
+        int lands = Territory.Renown;
+        if (lands > 0)
+        {
+            total += lands;
+            parts?.Add(new Part($"The Haven's lands ({GameSession.Settlement.Territory.ClaimedCount} held)", lands));
+        }
+
         int residents = GameSession.Settlement.Residents.Count * settings.ResidentRenown;
         if (residents > 0)
         {

@@ -105,6 +105,9 @@ public sealed class ExperienceTracker : MonoBehaviour, IGameSystem
             JournalWindow.Create();
             TutorialWindow.Create();
             TutorialNoticeHud.Create();
+            PlaceDiscovery.Begin(scene.name);
+            TerritorySpawner.Begin(scene.name);
+            RegionTitleHud.Create(scene.name);
             JournalNotices.CheckPages();
             MinimapHud.Create();
         }

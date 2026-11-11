@@ -23,6 +23,7 @@ MonoBehaviour:
   sitePrefab: {fileID: 7345240531865155924, guid: 3d8191b4a917bfd4e85112d74ff2dcbe, type: 3}
   siteDistance: {x: 35, y: 70}
   siteText: A ring of dry-stone wall, chest high and dead level. From inside it someone tells you to mind the coping.
+  artwork: {fileID: 21300000, guid: 1278a836f4bca8f44b63267e7fb79d66, type: 3}
   onStart: []
   choices:
   - label: Help her finish it, then climb out

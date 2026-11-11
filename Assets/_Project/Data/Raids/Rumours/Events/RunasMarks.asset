@@ -23,6 +23,7 @@ MonoBehaviour:
   sitePrefab: {fileID: 2772389168641020343, guid: 148be15bbc41c654687701678ffb1929, type: 3}
   siteDistance: {x: 35, y: 70}
   siteText: The marks lead here and stop. Someone drops out of the branches beside you without a sound.
+  artwork: {fileID: 21300000, guid: d0e65af87ea30bc46973e8a4e0a4c3d7, type: 3}
   onStart: []
   choices:
   - label: Follow her out

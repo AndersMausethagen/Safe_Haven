@@ -33,6 +33,8 @@ public sealed class MenuPage
 {
     public string Title = "";
     public string Body = "";
+    /// <summary>A painting above the title (a raid event's scene), or null for none.</summary>
+    public Sprite Picture;
     public readonly List<MenuAction> Actions = new List<MenuAction>();
 
     public MenuPage Add(MenuAction action)
@@ -65,7 +67,11 @@ public sealed class ActionMenuWindow : MonoBehaviour
     [Tooltip("Seconds between automatic refreshes while open.")]
     [SerializeField, Min(0.1f)] private float refreshInterval = 0.5f;
 
+    // A page's picture sits above its title, at most this tall, its width as the panel allows.
+    private const float PictureHeight = 250f;
+
     private readonly List<ActionRowView> rows = new List<ActionRowView>();
+    private Image picture;
     private Func<MenuPage> source;
     private Action closed;
     private Transform anchor;
@@ -86,6 +92,7 @@ public sealed class ActionMenuWindow : MonoBehaviour
         Current = this;
         rowTemplate.gameObject.SetActive(false);
         closeButton.onClick.AddListener(Close);
+        AddPicture();
         window.OpenChanged += OnOpenChanged;
     }
 
@@ -140,6 +147,8 @@ public sealed class ActionMenuWindow : MonoBehaviour
             return;
         }
 
+        picture.sprite = page.Picture;
+        picture.gameObject.SetActive(page.Picture != null);
         titleLabel.text = page.Title;
         bodyLabel.text = page.Body;
         bodyLabel.gameObject.SetActive(!string.IsNullOrEmpty(page.Body));
@@ -161,6 +170,21 @@ public sealed class ActionMenuWindow : MonoBehaviour
         }
 
         LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform)actionList.parent);
+    }
+
+    // Built here rather than in the prefab: one more child of the panel's layout, just above the title.
+    private void AddPicture()
+    {
+        var holder = new GameObject("Picture", typeof(RectTransform));
+        holder.transform.SetParent(titleLabel.transform.parent, false);
+        holder.transform.SetSiblingIndex(titleLabel.transform.GetSiblingIndex());
+        picture = holder.AddComponent<Image>();
+        picture.preserveAspect = true;
+        picture.raycastTarget = false;
+        var layout = holder.AddComponent<LayoutElement>();
+        layout.preferredHeight = PictureHeight;
+        layout.minHeight = PictureHeight;
+        holder.SetActive(false);
     }
 
     private void Update()

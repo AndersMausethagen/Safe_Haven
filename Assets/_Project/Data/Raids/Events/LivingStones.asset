@@ -23,6 +23,7 @@ MonoBehaviour:
   sitePrefab: {fileID: 1745827551758765297, guid: c3220598a4d922b4cb9f391a54f9ebd3, type: 3}
   siteDistance: {x: 35, y: 70}
   siteText: 'Three runestones stand where the path should be. One is green with fresh moss. One is warm to the touch. One is scored with claw marks. Old rhyme: "Moss grows slow, so moss won''t lie."'
+  artwork: {fileID: 21300000, guid: b3c0ce1e315ba624d9bb1b8df0ae46bc, type: 3}
   onStart: []
   choices:
   - label: Follow the mossy stone
