@@ -1,2 +1,4 @@
-Horse by Quaternius (Ultimate Animated Animals), CC0 1.0 Public Domain.
-Source: https://poly.pizza/m/qvTrSG9pZF (GLB, converted to FBX in Blender: the duplicate "AnimalArmature|" clips dropped).
+The horse (Assets/Malbers Animations/Horse AnimSet Pro/Undead Horse/Models/Undead_Horse_Re.fbx and the Horse AnimSet Pro clips it uses)
+comes from "Undead Horse & Knight" by MalberS Animations, Unity Asset Store (https://assetstore.unity.com/packages/3d/characters/animals/undead-horse-knight-169073),
+under the Unity Asset Store EULA (Standard). Only the realistic horse, its mane textures and the clips listed in AgentScripts/BuildHorses.cs were taken from the pack.
+HorseCoat.png is ours: baked in Blender onto the body's UVs in place of the undead textures, so it reads as a living horse.

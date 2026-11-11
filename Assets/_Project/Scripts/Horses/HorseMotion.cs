@@ -7,24 +7,24 @@ using UnityEngine.AI;
 /// a creature on the hunt nearby sends it off too. Tamed, it stays near where it was left. Hurt, it runs from what hurt it
 /// for a while. Ridden, it goes where the rider steers (<see cref="Ride"/>) at a trot, a gallop on its stamina or a walk.
 /// <para>
-/// One clip at a time, played as fast as the speed needs (the walk below about 3.5 m/s, the gallop above), rather than a
-/// blend between a walk and a gallop that matches neither. Its Animator has a float "Speed" (the clip: 0 idle, 1.6 walk,
-/// 10 gallop), bools "Eating" and "Dead", and a trigger "Rear".
+/// One gait at a time (walk, trot, canter, gallop, sprint: the Horse AnimSet Pro clips), the one whose own speed is nearest,
+/// played as fast as the speed needs, rather than a blend of two that matches neither. Its Animator has a float "Gait"
+/// (0 standing, 1 walk ... 5 sprint), bools "Eating" and "Dead", and a trigger "Rear".
 /// </para>
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Horse), typeof(NavMeshAgent))]
 public sealed class HorseMotion : MonoBehaviour
 {
-    public const float WalkClip = 1.6f;
-    public const float GallopClip = 10f;
-
-    private static readonly int SpeedId = Animator.StringToHash("Speed");
+    private static readonly int GaitId = Animator.StringToHash("Gait");
     private static readonly int EatingId = Animator.StringToHash("Eating");
     private static readonly int DeadId = Animator.StringToHash("Dead");
     private static readonly int RearId = Animator.StringToHash("Rear");
 
     private enum Idle { Graze, Wander, Flee, Held, Ridden, Dead }
+
+    [Tooltip("Metres a second each gait's clip shows at the body's size, walk to sprint (measured from the clips' root motion by BuildHorses).")]
+    [SerializeField] private float[] gaitSpeeds = { 1.42f, 3.35f, 5.18f, 7.83f, 10.94f };
 
     private Horse horse;
     private NavMeshAgent agent;
@@ -164,7 +164,7 @@ public sealed class HorseMotion : MonoBehaviour
         if (animator != null)
         {
             animator.SetBool(DeadId, true);
-            animator.SetFloat(SpeedId, 0f);
+            animator.SetFloat(GaitId, 0f);
         }
     }
 
@@ -330,6 +330,26 @@ public sealed class HorseMotion : MonoBehaviour
         }
     }
 
+    /// <summary>The gait for a speed: 0 standing, else the gait (1 walk ... n) whose clip's own speed is nearest.</summary>
+    public static int GaitFor(float speed, float[] gaits)
+    {
+        if (speed < 0.15f || gaits == null || gaits.Length == 0)
+        {
+            return 0;
+        }
+
+        int gait = 1;
+        for (int i = 1; i < gaits.Length; i++)
+        {
+            if (speed > (gaits[i - 1] + gaits[i]) * 0.5f)
+            {
+                gait = i + 1;
+            }
+        }
+
+        return gait;
+    }
+
     private void Animate(float speed)
     {
         if (animator == null)
@@ -337,9 +357,9 @@ public sealed class HorseMotion : MonoBehaviour
             return;
         }
 
-        float clip = speed < 0.15f ? 0f : speed < 3.5f ? WalkClip : GallopClip;
-        animator.SetFloat(SpeedId, clip, 0.12f, Time.deltaTime);
-        animator.speed = clip <= 0f ? 1f : Mathf.Clamp(speed / clip, 0.55f, 1.6f);
+        int gait = GaitFor(speed, gaitSpeeds);
+        animator.SetFloat(GaitId, gait, 0.1f, Time.deltaTime);
+        animator.speed = gait == 0 ? 1f : Mathf.Clamp(speed / gaitSpeeds[gait - 1], 0.6f, 1.5f);
         animator.SetBool(EatingId, mode == Idle.Graze && speed < 0.15f && Time.time < until - 1.5f && !horse.IsTamed || mode == Idle.Graze && horse.IsTamed && speed < 0.15f);
     }
 }

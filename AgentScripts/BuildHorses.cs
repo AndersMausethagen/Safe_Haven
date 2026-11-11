@@ -15,7 +15,7 @@ using UnityEngine.AI;
 public static class BuildHorses
 {
     private const string Art = "Assets/_Project/Art/Wildlife/Horse";
-    private const string Model = Art + "/Horse.fbx";
+    private const string Model = "Assets/Malbers Animations/Horse AnimSet Pro/Undead Horse/Models/Undead_Horse_Re.fbx";
     private const string ControllerPath = Art + "/Horse.controller";
     private const string PrefabPath = "Assets/_Project/Prefabs/World/Living/Wild Horse.prefab";
     private const string Data = "Assets/_Project/Data/Horses";
@@ -24,7 +24,8 @@ public static class BuildHorses
     private const string Lit = "Universal Render Pipeline/Lit";
     // Head up, ears to hooves: a horse about 1.6 m at the withers.
     private const float Height = 2.2f;
-    private const float HipHeight = 0.86f;
+    // The rider's hips stand 1.02 m above their feet and sit about 0.1 m above the saddle's seat.
+    private const float HipHeight = 0.92f;
 
     public static string Apply()
     {
@@ -49,57 +50,121 @@ public static class BuildHorses
         AssetDatabase.SaveAssets();
         Load<ContentDatabase>("Assets/_Project/Resources/ContentDatabase.asset").CollectAll();
         AssetDatabase.SaveAssets();
-        return $"horse {prefab.name} (seat {prefab.Seat.name}), {controller.name}, lasso, saddle, recipes, settings";
+        return $"horse {prefab.name} (seat {prefab.Seat.name}), {controller.name}, gaits {lastGaits} m/s, lasso, saddle, recipes, settings";
     }
 
     // ----- The model -----
+
+    // The Undead Horse & Knight pack (MalberS, Asset Store; only the realistic horse and the Horse AnimSet Pro clips it
+    // needs were taken from it), made a living horse: its own body, mane and tail, a coat baked in Blender in place of the
+    // rotting one (Art/Wildlife/Horse/HorseCoat.png), no armour; the pack's saddle shows once it is saddled.
+    private const string Pack = "Assets/Malbers Animations/Horse AnimSet Pro/";
+    private const string Clips = Pack + "2 - Animations/Animations Clips/Horse/";
+    private static readonly string[] Gaits = { "Locomotion/H_Walk", "Locomotion/H_Trot", "Locomotion/H_Canter", "Locomotion/H_Gallop", "Locomotion/H_Sprint" };
 
     private static GameObject Import()
     {
         var importer = (ModelImporter)AssetImporter.GetAtPath(Model);
         importer.animationType = ModelImporterAnimationType.Generic;
-        importer.materialImportMode = ModelImporterMaterialImportMode.ImportViaMaterialDescription;
-        ModelImporterClipAnimation[] clips = importer.defaultClipAnimations;
-        foreach (ModelImporterClipAnimation clip in clips)
+        importer.materialImportMode = ModelImporterMaterialImportMode.None;
+        importer.importAnimation = false;
+        importer.SaveAndReimport();
+        foreach (string clip in Gaits.Select(g => g + "_IP").Concat(new[] { "Idles/H_Idle_01", "Actions/H_Eat" }))
         {
-            string shortName = clip.name.Contains("|") ? clip.name.Substring(clip.name.LastIndexOf('|') + 1) : clip.name;
-            clip.name = shortName;
-            clip.loopTime = shortName.StartsWith("Idle") || shortName == "Eating" || shortName == "Walk" || shortName == "Gallop";
+            Loop(Clips + clip + ".FBX", true);
         }
 
-        importer.clipAnimations = clips;
-        importer.SaveAndReimport();
+        foreach (string clip in new[] { "Attacks/H_Attack_Back_Legs", "Deaths/H_Death01", "Actions/H_Neigh", "Damage/H_Get Hit_Left" })
+        {
+            Loop(Clips + clip + ".FBX", false);
+        }
+
+        Texture(Art + "/HorseCoat.png", 2048);
+        Texture(Pack + "Undead Horse/Materials & Textures/Realistic/Body/Undead_Horse_Mane_AlbedoTransparency.png", 1024);
+        Texture(Pack + "Undead Horse/Materials & Textures/Realistic/Body/Undead_Horse_Mane_Normal.png", 1024, normal: true);
         return Load<GameObject>(Model);
     }
 
-    private static AnimationClip Clip(string name) =>
-        AssetDatabase.LoadAllAssetsAtPath(Model).OfType<AnimationClip>().FirstOrDefault(c => c.name == name && !c.name.StartsWith("__preview__"));
+    private static void Loop(string path, bool loop)
+    {
+        var importer = (ModelImporter)AssetImporter.GetAtPath(path);
+        ModelImporterClipAnimation[] clips = importer.clipAnimations.Length > 0 ? importer.clipAnimations : importer.defaultClipAnimations;
+        bool changed = false;
+        foreach (ModelImporterClipAnimation clip in clips)
+        {
+            changed |= clip.loopTime != loop;
+            clip.loopTime = loop;
+        }
+
+        if (changed)
+        {
+            importer.clipAnimations = clips;
+            importer.SaveAndReimport();
+        }
+    }
+
+    private static void Texture(string path, int size, bool normal = false)
+    {
+        var importer = (TextureImporter)AssetImporter.GetAtPath(path);
+        if (importer == null || (importer.maxTextureSize == size && (importer.textureType == TextureImporterType.NormalMap) == normal))
+        {
+            return;
+        }
+
+        importer.maxTextureSize = size;
+        if (normal)
+        {
+            importer.textureType = TextureImporterType.NormalMap;
+        }
+
+        importer.SaveAndReimport();
+    }
+
+    private static AnimationClip Clip(string file) =>
+        AssetDatabase.LoadAllAssetsAtPath(Clips + file + ".FBX").OfType<AnimationClip>().FirstOrDefault(c => !c.name.StartsWith("__preview__"));
+
+    // What each gait's clip shows, from its root-motion twin: metres a second at the pack's size, times the body's scale.
+    private static float[] GaitSpeeds(float scale) => Gaits.Select(g =>
+    {
+        AnimationClip clip = Clip(g);
+        float Travel(string axis)
+        {
+            EditorCurveBinding binding = AnimationUtility.GetCurveBindings(clip).FirstOrDefault(b => b.path == "" && b.propertyName == "RootT." + axis);
+            AnimationCurve curve = binding.propertyName != null ? AnimationUtility.GetEditorCurve(clip, binding) : null;
+            return curve != null ? curve.Evaluate(clip.length) - curve.Evaluate(0f) : 0f;
+        }
+
+        return Mathf.Round(new Vector2(Travel("x"), Travel("z")).magnitude / clip.length * scale * 100f) / 100f;
+    }).ToArray();
 
     private static AnimatorController Controller()
     {
         AssetDatabase.DeleteAsset(ControllerPath);
         AnimatorController controller = AnimatorController.CreateAnimatorControllerAtPath(ControllerPath);
-        controller.AddParameter("Speed", AnimatorControllerParameterType.Float);
+        controller.AddParameter("Gait", AnimatorControllerParameterType.Float);
         controller.AddParameter("Eating", AnimatorControllerParameterType.Bool);
         controller.AddParameter("Dead", AnimatorControllerParameterType.Bool);
         controller.AddParameter("Rear", AnimatorControllerParameterType.Trigger);
         AnimatorStateMachine machine = controller.layers[0].stateMachine;
         AnimatorState move = controller.CreateBlendTreeInController("Move", out BlendTree tree);
-        tree.blendParameter = "Speed";
+        tree.blendParameter = "Gait";
         tree.useAutomaticThresholds = false;
-        tree.AddChild(Clip("Idle"), 0f);
-        tree.AddChild(Clip("Walk"), HorseMotion.WalkClip);
-        tree.AddChild(Clip("Gallop"), HorseMotion.GallopClip);
+        tree.AddChild(Clip("Idles/H_Idle_01"), 0f);
+        for (int i = 0; i < Gaits.Length; i++)
+        {
+            tree.AddChild(Clip(Gaits[i] + "_IP"), i + 1);
+        }
+
         machine.defaultState = move;
 
         AnimatorState eat = machine.AddState("Eating");
-        eat.motion = Clip("Eating");
+        eat.motion = Clip("Actions/H_Eat");
         Transition(move, eat, "Eating", true, 0.35f);
         Transition(eat, move, "Eating", false, 0.25f);
 
-        // Bucking on the rope: the kick, then back to moving.
+        // Bucking on the rope: a kick of the back legs, then back to moving.
         AnimatorState rear = machine.AddState("Rear");
-        rear.motion = Clip("Attack_Kick");
+        rear.motion = Clip("Attacks/H_Attack_Back_Legs");
         AnimatorStateTransition toRear = machine.AddAnyStateTransition(rear);
         toRear.AddCondition(AnimatorConditionMode.If, 0f, "Rear");
         toRear.AddCondition(AnimatorConditionMode.IfNot, 0f, "Dead");
@@ -111,7 +176,7 @@ public static class BuildHorses
         fromRear.duration = 0.2f;
 
         AnimatorState death = machine.AddState("Death");
-        death.motion = Clip("Death");
+        death.motion = Clip("Deaths/H_Death01");
         AnimatorStateTransition die = machine.AddAnyStateTransition(death);
         die.AddCondition(AnimatorConditionMode.If, 0f, "Dead");
         die.duration = 0.15f;
@@ -128,15 +193,9 @@ public static class BuildHorses
         transition.duration = seconds;
     }
 
-    // The pack's bright colours turned down for a northern wood, as the deer's are.
-    private static Material Muted(Material source)
+    private static Material Material(string name, Texture2D albedo, Color colour, float smoothness, Texture2D normal = null, bool cutout = false)
     {
-        if (source == null)
-        {
-            return null;
-        }
-
-        string path = $"{Art}/Horse {source.name.Replace('.', ' ')}.mat";
+        string path = $"{Art}/Horse {name}.mat";
         Material material = Load<Material>(path);
         if (material == null)
         {
@@ -144,11 +203,32 @@ public static class BuildHorses
             AssetDatabase.CreateAsset(material, path);
         }
 
-        Color colour = source.HasProperty("_BaseColor") ? source.GetColor("_BaseColor") : source.HasProperty("_Color") ? source.color : Color.grey;
-        Color.RGBToHSV(colour, out float h, out float s, out float v);
-        bool eye = source.name.ToLowerInvariant().Contains("eye");
-        material.SetColor("_BaseColor", Color.HSVToRGB(h, s * 0.8f, v * 0.88f));
-        material.SetFloat("_Smoothness", eye ? 0.6f : 0.08f);
+        material.SetTexture("_BaseMap", albedo);
+        material.SetColor("_BaseColor", colour);
+        material.SetFloat("_Smoothness", smoothness);
+        material.SetTexture("_BumpMap", normal);
+        if (normal != null)
+        {
+            material.EnableKeyword("_NORMALMAP");
+        }
+        else
+        {
+            material.DisableKeyword("_NORMALMAP");
+        }
+
+        // Hair cards: cut out at their edges and seen from both sides.
+        material.SetFloat("_AlphaClip", cutout ? 1f : 0f);
+        material.SetFloat("_Cutoff", 0.45f);
+        material.SetFloat("_Cull", cutout ? 0f : 2f);
+        if (cutout)
+        {
+            material.EnableKeyword("_ALPHATEST_ON");
+        }
+        else
+        {
+            material.DisableKeyword("_ALPHATEST_ON");
+        }
+
         material.enableInstancing = true;
         EditorUtility.SetDirty(material);
         return material;
@@ -202,6 +282,7 @@ public static class BuildHorses
         so.FindProperty("pullStrain").floatValue = 0.35f;
         so.FindProperty("tapHold").floatValue = 0.1f;
         so.FindProperty("tapDrain").floatValue = 3f;
+        so.FindProperty("trotSpeed").floatValue = 6f;
         // Bay, chestnut, dun, grey, black: the colours of northern horses.
         Color[] coats =
         {
@@ -307,21 +388,57 @@ public static class BuildHorses
         {
             var body = (GameObject)PrefabUtility.InstantiatePrefab(model, root.transform);
             body.name = "Model";
+            Transform Part(string name) => body.transform.Find(name);
+            // A living horse: no armour, no reins; the saddle only once it wears one.
+            foreach (string part in new[] { "Horse_Undead_Armor_Re", "Horse_Undead_Reins_Re", "Horse_Undead_ReinsHead_Re" })
+            {
+                Transform found = Part(part);
+                if (found != null)
+                {
+                    found.gameObject.SetActive(false);
+                }
+            }
+
+            Transform saddleModel = Part("Horse_Undead_Saddle_Re");
+            string textures = Pack + "Undead Horse/Materials & Textures/";
+            Material coat = Material("Main", Load<Texture2D>(Art + "/HorseCoat.png"), Color.white, 0.22f);
+            Material hair = Material("Hair", Load<Texture2D>(textures + "Realistic/Body/Undead_Horse_Mane_AlbedoTransparency.png"), new Color(0.2f, 0.16f, 0.13f),
+                0.3f, Load<Texture2D>(textures + "Realistic/Body/Undead_Horse_Mane_Normal.png"), cutout: true);
+            Material eyes = Material("Eye", null, new Color(0.03f, 0.025f, 0.02f), 0.85f);
+            Material leather = Material("Saddle", null, new Color(0.32f, 0.2f, 0.11f), 0.3f);
+            void Wear(string part, Material material)
+            {
+                Transform found = Part(part);
+                if (found != null && found.TryGetComponent(out Renderer drawn))
+                {
+                    drawn.sharedMaterials = Enumerable.Repeat(material, drawn.sharedMaterials.Length).ToArray();
+                    drawn.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
+                }
+            }
+
+            Wear("Horse_Undead_Body_Re", coat);
+            Wear("Horse_Undead_Mane_Re", hair);
+            Wear("Horse_Undead_Tail_Re", hair);
+            Wear("Horse_Undead_Eyes_Re", eyes);
+            Wear("Horse_Undead_Saddle_Re", leather);
+
             Bounds raw = BoundsOf(body);
             float scale = Height / Mathf.Max(0.01f, raw.size.y);
             body.transform.localScale = Vector3.one * scale;
+            // Facing +Z: turn the body round if its head is behind its hips.
+            Transform head = body.GetComponentsInChildren<Transform>(true).FirstOrDefault(t => t.name == "Head");
+            Transform hips = body.GetComponentsInChildren<Transform>(true).FirstOrDefault(t => t.name == "Pelvis");
+            if (head != null && hips != null && head.position.z < hips.position.z)
+            {
+                body.transform.localRotation = Quaternion.Euler(0f, 180f, 0f);
+            }
+
             Bounds bounds = BoundsOf(body);
-            // Facing +Z: the head is the end with the higher top.
-            body.transform.localPosition = new Vector3(-bounds.center.x, -bounds.min.y, -bounds.center.z);
+            body.transform.localPosition += new Vector3(-bounds.center.x, -bounds.min.y, -bounds.center.z);
             Animator animator = Ensure<Animator>(body);
             animator.runtimeAnimatorController = controller;
             animator.applyRootMotion = false;
             animator.cullingMode = AnimatorCullingMode.CullUpdateTransforms;
-            foreach (Renderer part in body.GetComponentsInChildren<Renderer>())
-            {
-                part.sharedMaterials = part.sharedMaterials.Select(Muted).ToArray();
-                part.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
-            }
 
             bounds = BoundsOf(body);
             float length = Mathf.Max(bounds.size.x, bounds.size.z);
@@ -333,7 +450,7 @@ public static class BuildHorses
             agent.angularSpeed = 260f;
             agent.obstacleAvoidanceType = ObstacleAvoidanceType.LowQualityObstacleAvoidance;
             var capsule = root.AddComponent<CapsuleCollider>();
-            capsule.direction = bounds.size.z >= bounds.size.x ? 2 : 0;
+            capsule.direction = 2;
             capsule.radius = 0.48f;
             capsule.height = length * 0.85f;
             capsule.center = new Vector3(0f, 1.15f, 0f);
@@ -357,15 +474,32 @@ public static class BuildHorses
             use.ApplyModifiedPropertiesWithoutUndo();
             root.AddComponent<SaveableEntity>();
 
-            Transform seat = Seat(body, bounds);
+            Transform seat = Seat(body, saddleModel != null ? saddleModel.GetComponent<SkinnedMeshRenderer>() : null, bounds);
+            if (saddleModel != null)
+            {
+                saddleModel.gameObject.SetActive(false);
+            }
+
             var horse = root.AddComponent<Horse>();
-            root.AddComponent<HorseMotion>();
+            var motion = root.AddComponent<HorseMotion>();
             root.AddComponent<HorseTaming>();
             var data = new SerializedObject(horse);
             data.FindProperty("definition").objectReferenceValue = definition;
             data.FindProperty("seat").objectReferenceValue = seat;
             data.FindProperty("seatOffset").vector3Value = seat.InverseTransformVector(Vector3.down * HipHeight);
+            data.FindProperty("saddleModel").objectReferenceValue = saddleModel != null ? saddleModel.gameObject : null;
             data.ApplyModifiedPropertiesWithoutUndo();
+            var moving = new SerializedObject(motion);
+            float[] speeds = GaitSpeeds(scale);
+            SerializedProperty gaits = moving.FindProperty("gaitSpeeds");
+            gaits.arraySize = speeds.Length;
+            for (int i = 0; i < speeds.Length; i++)
+            {
+                gaits.GetArrayElementAtIndex(i).floatValue = speeds[i];
+            }
+
+            moving.ApplyModifiedPropertiesWithoutUndo();
+            lastGaits = string.Join(", ", speeds.Select(v => v.ToString("0.00")));
 
             GameObject saved = PrefabUtility.SaveAsPrefabAsset(root, PrefabPath);
             var entity = new SerializedObject(saved.GetComponent<SaveableEntity>());
@@ -380,39 +514,46 @@ public static class BuildHorses
         }
     }
 
-    // Where the rider sits: on top of the back between the legs, on the Torso bone so it moves with the body. The seat
-    // faces the way the horse does in its resting pose, so the rider faces forward.
-    private static Transform Seat(GameObject body, Bounds bounds)
+    private static string lastGaits = "";
+
+    // Where the rider sits: in the saddle's seat (its lowest point between pommel and cantle, not its top), on the spine so
+    // it moves with the back, facing the way the horse does. The seat was once set on the saddle's top edge: 0.2 m too high.
+    private static Transform Seat(GameObject body, SkinnedMeshRenderer saddle, Bounds fallback)
     {
-        Transform torso = body.GetComponentsInChildren<Transform>().FirstOrDefault(t => t.name == "Torso")
-                          ?? body.GetComponentsInChildren<Transform>().FirstOrDefault(t => t.name == "Back") ?? body.transform;
-        float top = bounds.min.y + bounds.size.y * 0.66f;
-        var baked = new Mesh();
-        foreach (SkinnedMeshRenderer skin in body.GetComponentsInChildren<SkinnedMeshRenderer>())
+        Transform[] bones = body.GetComponentsInChildren<Transform>(true);
+        Transform spine = bones.FirstOrDefault(t => t.name == "Spine1") ?? bones.FirstOrDefault(t => t.name == "Spine") ?? body.transform;
+        Vector3 at = new Vector3(fallback.center.x, fallback.min.y + fallback.size.y * 0.7f, fallback.center.z);
+        if (saddle != null)
         {
-            skin.BakeMesh(baked, true);
-            Matrix4x4 toWorld = skin.transform.localToWorldMatrix;
+            var baked = new Mesh();
+            saddle.BakeMesh(baked, true);
+            Matrix4x4 toWorld = saddle.transform.localToWorldMatrix;
+            Bounds bounds = saddle.bounds;
+            Vector3 forward = body.transform.parent.forward, right = body.transform.parent.right;
+            float seat = float.MinValue;
             foreach (Vector3 vertex in baked.vertices)
             {
-                Vector3 world = toWorld.MultiplyPoint3x4(vertex);
-                if (Mathf.Abs(world.x - bounds.center.x) < 0.22f && Mathf.Abs(world.z - bounds.center.z) < 0.3f)
+                Vector3 offset = toWorld.MultiplyPoint3x4(vertex) - bounds.center;
+                if (Mathf.Abs(Vector3.Dot(offset, right)) < 0.08f && Mathf.Abs(Vector3.Dot(offset, forward)) < 0.08f)
                 {
-                    top = Mathf.Max(top, world.y);
+                    seat = Mathf.Max(seat, bounds.center.y + offset.y);
                 }
             }
+
+            Object.DestroyImmediate(baked);
+            at = new Vector3(bounds.center.x, seat > float.MinValue ? seat : bounds.center.y, bounds.center.z);
         }
 
-        Object.DestroyImmediate(baked);
-        var seat = new GameObject("Seat").transform;
-        seat.SetParent(torso, false);
-        seat.position = new Vector3(bounds.center.x, top + 0.02f, bounds.center.z);
-        seat.rotation = body.transform.parent.rotation;
-        return seat;
+        var made = new GameObject("Seat").transform;
+        made.SetParent(spine, false);
+        made.position = at;
+        made.rotation = body.transform.parent.rotation;
+        return made;
     }
 
     private static Bounds BoundsOf(GameObject root)
     {
-        Renderer[] renderers = root.GetComponentsInChildren<Renderer>();
+        Renderer[] renderers = root.GetComponentsInChildren<Renderer>().Where(r => r.gameObject.activeInHierarchy).ToArray();
         Bounds bounds = renderers.Length > 0 ? renderers[0].bounds : new Bounds(root.transform.position, Vector3.one);
         foreach (Renderer part in renderers)
         {

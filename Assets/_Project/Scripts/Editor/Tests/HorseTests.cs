@@ -93,7 +93,17 @@ public sealed class HorseTests
         Assert.AreEqual(entity, content.FindPrefab(entity.PrefabId));
         Assert.AreNotEqual(prefab.transform, prefab.Seat, "the rider sits on its back");
         Assert.IsNotNull(prefab.GetComponentInChildren<Animator>().runtimeAnimatorController);
-        Assert.AreEqual(1, prefab.GetComponentsInChildren<Renderer>(true).Length, "only the body: no stray helper meshes");
+        // A prefab asset is in no scene, so nothing in it is active in a hierarchy: what is switched on is what shows.
+        Renderer[] shown = System.Array.FindAll(prefab.GetComponentsInChildren<Renderer>(true), r => r.gameObject.activeSelf);
+        Assert.AreEqual(4, shown.Length, "a living horse: body, mane, tail and eyes; no armour or reins");
+        var saddleModel = new SerializedObject(prefab).FindProperty("saddleModel").objectReferenceValue as GameObject;
+        Assert.IsNotNull(saddleModel, "the saddle it wears once saddled");
+        Assert.IsFalse(saddleModel.activeSelf, "and not before");
+        float[] gaits = (float[])typeof(HorseMotion).GetField("gaitSpeeds", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).GetValue(prefab.GetComponent<HorseMotion>());
+        Assert.AreEqual(5, gaits.Length, "walk, trot, canter, gallop, sprint");
+        for (int i = 1; i < gaits.Length; i++) Assert.Greater(gaits[i], gaits[i - 1], "each gait faster than the last");
+        Assert.That(HorseMotion.GaitFor(kind.TrotSpeed, gaits), Is.InRange(3, 4), "ridden, it canters or gallops");
+        Assert.AreEqual(5, HorseMotion.GaitFor(kind.GallopSpeed.x, gaits), "spurred on, it sprints");
         Assert.Less(kind.ShyDistance + 1.5f * kind.PerHeardMetre, kind.LassoRange, "a sneaking player gets within the lasso's reach");
         Assert.Greater(kind.ShyDistance + 5f * kind.PerHeardMetre, kind.LassoRange, "a walking one doesn't");
     }

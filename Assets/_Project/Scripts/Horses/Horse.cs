@@ -26,6 +26,8 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold
     [Tooltip("Where the rider sits (on the horse's back; moves with the body).")]
     [SerializeField] private Transform seat;
     [SerializeField] private Vector3 seatOffset;
+    [Tooltip("The saddle on its back, shown while it wears one.")]
+    [SerializeField] private GameObject saddleModel;
 
     private static readonly List<Horse> all = new List<Horse>();
     private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
@@ -48,7 +50,7 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold
     public Mode State { get; private set; } = Mode.Wild;
     public bool IsTamed => State == Mode.Tamed;
     public bool IsWild => State == Mode.Wild;
-    public string HorseName => string.IsNullOrWhiteSpace(horseName) ? (definition != null ? definition.DisplayName : "Horse") : horseName;
+    public string HorseName => !string.IsNullOrWhiteSpace(horseName) ? horseName : IsTamed ? "Your horse" : definition != null ? definition.DisplayName : "Horse";
     public bool HasName => !string.IsNullOrWhiteSpace(horseName);
     public float Stamina { get; set; }
     public ItemDefinition Saddle => saddle;
@@ -189,6 +191,11 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold
     private void WearSaddle(ItemDefinition item)
     {
         saddle = item;
+        if (saddleModel != null)
+        {
+            saddleModel.SetActive(item != null);
+        }
+
         if (Cargo != null)
         {
             Cargo.WeightChanged -= OnLoadChanged;

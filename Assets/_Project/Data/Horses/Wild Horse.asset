@@ -26,7 +26,7 @@ MonoBehaviour:
   gallopSpeed: {x: 10, y: 12.5}
   carryWeight: {x: 55, y: 85}
   walkSpeed: 1.6
-  trotSpeed: 6.5
+  trotSpeed: 6
   gallopCost: 9
   staminaRegen: 6
   turnSpeed: 220

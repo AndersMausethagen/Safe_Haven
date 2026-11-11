@@ -6,9 +6,9 @@ Open work and ideas. Tick items off (`[x]`) or delete them when done. Architectu
 ## Horses and the playtest list (2026-11-11)
 
 Built and checked in Play (see GDD §10.9); none of it played by hand yet.
-- [ ] Download the **Undead Horse & Knight** pack in the Package Manager (My Assets; it needs your account), then its
-      animations (or a less undead body made in Blender) can replace the CC0 Quaternius horse: the body and clips are data
-      in `BuildHorses` (Model, Controller), and HorseMotion only needs Idle, Walk, Gallop, Eating, Death and a buck.
+- [x] The Undead Horse & Knight pack is in (downloaded through the Editor's Asset Store client, 2026-11-11), made a
+      living horse. Next from it: its rider clips (Humanoid: idle, trot, canter, gallop, mount and dismount) for the
+      player in the saddle, in place of PlayerTransportPose's bent bones, and a hitched-cart pose (Rider_CarriageCart).
 - [ ] A whinny: `HorseDefinition.whinny` is empty (make it in Tools/Audio first).
 - [ ] Co-op: horses aren't networked. A visitor can't catch, ride or saddle the host's horses; a host's ride isn't seen by friends.
 - [ ] Tune by hand: the struggle (pull 0.35 a second, 0.1 a tap: 3.5-4.6 taps a second hold it), the breaking ride's
