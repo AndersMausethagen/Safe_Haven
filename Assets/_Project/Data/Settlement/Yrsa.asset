@@ -15,6 +15,7 @@ MonoBehaviour:
   id: settler.yrsa
   displayName: Yrsa
   description: She cooked for a jarl once, and tells you so. People came from three valleys for her stew.
+  portrait: {fileID: 21300000, guid: 6dcc86f101c2d2d4b8dc9818d1af5cc3, type: 3}
   rescueLine: Mind the pot. If you've come to eat, you'll carry.
   arrivalLine: Show me your kitchen. No, on second thought, show me what you eat.
   welcomeLine: 

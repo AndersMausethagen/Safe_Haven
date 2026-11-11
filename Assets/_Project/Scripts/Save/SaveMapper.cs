@@ -656,6 +656,7 @@ public static class SaveMapper
         into.journal.announced.AddRange(journal.Announced);
         into.journal.found.AddRange(journal.Found);
         into.journal.killedBy.AddRange(journal.KilledBy);
+        into.journal.tried.AddRange(journal.Tried);
         foreach (RaidRecord raid in journal.Raids)
         {
             into.journal.raids.Add(new RaidRecordSaveData { raid = raid.Raid, outcome = raid.Outcome, seconds = raid.Seconds, value = raid.Value, broughtDownBy = raid.BroughtDownBy ?? "", lines = new List<string>(raid.Lines) });
@@ -720,7 +721,8 @@ public static class SaveMapper
             raids.Add(new RaidRecord { Raid = raid.raid, Outcome = raid.outcome, Seconds = raid.seconds, Value = raid.value, BroughtDownBy = string.IsNullOrEmpty(raid.broughtDownBy) ? null : raid.broughtDownBy, Lines = raid.lines ?? new List<string>() });
         }
 
-        progress.Journal.Restore(journal.read ?? new List<string>(), journal.announced ?? new List<string>(), journal.found ?? new List<string>(), journal.killedBy ?? new List<string>(), raids, string.IsNullOrEmpty(journal.pinned) ? null : journal.pinned);
+        progress.Journal.Restore(journal.read ?? new List<string>(), journal.announced ?? new List<string>(), journal.found ?? new List<string>(), journal.killedBy ?? new List<string>(), raids, string.IsNullOrEmpty(journal.pinned) ? null : journal.pinned,
+            journal.tried ?? new List<string>());
         return progress;
     }
 

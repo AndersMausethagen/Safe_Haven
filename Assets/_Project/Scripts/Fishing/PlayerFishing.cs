@@ -305,6 +305,8 @@ public sealed class PlayerFishing : MonoBehaviour
 
     private void Throw()
     {
+        // The first cast opens the fishing tutorial, bait or no bait: it says where bait comes from.
+        JournalNotices.Tried(ProficiencyTraining.Fishing);
         FishingSettings settings = FishingSettings.Current;
         Vector3 direction = Flat(transform.forward).normalized;
         float distance = Mathf.Lerp(settings.MinimumCast, settings.MaximumCast, castCharge);

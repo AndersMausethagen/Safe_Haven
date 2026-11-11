@@ -114,8 +114,14 @@ public sealed class RaidDefinition : ScriptableObject
     [Tooltip("Optional artwork behind the report after dying or the raid collapsing. Empty uses the default.")]
     [SerializeField] private Sprite failedArtwork;
 
+    [Tooltip("A painting of the place, shown in the raid planner when it is chosen (LocalSpawn: Tools/LocalSpawn/raid_art.json).")]
+    [SerializeField] private Sprite placeArtwork;
+
     /// <summary>This raid's own results artwork for the outcome, or null to use the default.</summary>
     public Sprite ResultArtwork(bool extracted) => extracted ? extractedArtwork : failedArtwork;
+
+    /// <summary>A painting of the place for the raid planner, or null.</summary>
+    public Sprite PlaceArtwork => placeArtwork;
 
     public string Id => string.IsNullOrWhiteSpace(id) ? name : id;
     public string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;

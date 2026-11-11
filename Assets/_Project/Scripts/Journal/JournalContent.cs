@@ -43,7 +43,7 @@ public static class JournalContent
             if (IsUnlocked(page, log, progress))
             {
                 known++;
-                ShelfFor(shelves, page.group).Entries.Add(EntryOf(page, progress));
+                ShelfFor(shelves, page.group).Entries.Add(MechanicOf(page, progress));
             }
         }
 
@@ -195,6 +195,12 @@ public static class JournalContent
             return false;
         }
 
+        // Experience counts too: a save from before skills opened pages had trained them already.
+        if (page.unlockedBySkill != null && !progress.Journal.HasTried(page.unlockedBySkill.Id) && progress.ExperienceOf(page.unlockedBySkill) == 0)
+        {
+            return false;
+        }
+
         return !page.foundInRaids || progress.Journal.HasFound(page.title);
     }
 
@@ -256,6 +262,20 @@ public static class JournalContent
             entry.Badge = UnreadMark;
             entry.State = HavenEntryState.Ready;
         }
+    }
+
+    /// <summary>How the journal shows a page of how things work: its painting, what it is, then how it works, and a way to see it as the tutorial.</summary>
+    private static HavenEntry MechanicOf(JournalPage page, CharacterProgress progress)
+    {
+        HavenEntry entry = EntryOf(page, progress);
+        entry.Icon = page.art;
+        if (!string.IsNullOrWhiteSpace(page.summary))
+        {
+            entry.Description = $"<i>{GameInput.WithRebinds(page.summary)}</i>\n\n{entry.Description}";
+        }
+
+        entry.Actions.Add(new HavenAction("Open with its picture", () => TutorialWindow.Show(page), true, true, false));
+        return entry;
     }
 
     private static HavenEntry EntryOf(JournalPage page, CharacterProgress progress)

@@ -15,6 +15,7 @@ MonoBehaviour:
   id: expedition.sigrid
   displayName: Sigrid
   description: Expedition Leader from the expedition into the Unquiet Forest. Lost when the waystone connection broke.
+  portrait: {fileID: 21300000, guid: d44ee5592bb9a2c4aa2953eb4fab1ad7, type: 3}
   rescueLine: You came back. I told them you would.
   arrivalLine: Seven went in. Tell me who's home.
   welcomeLine: 
@@ -48,5 +49,6 @@ MonoBehaviour:
   - kind: 4
     lines:
     - I've served under worse than you. Don't let it go to your head.
+  returningLines: []
   jobs:
   - {fileID: 11400000, guid: 4c4fcc29299e0dd4b9ba5cfd68e28c5b, type: 2}

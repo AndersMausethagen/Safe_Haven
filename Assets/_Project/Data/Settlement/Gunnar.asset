@@ -15,6 +15,7 @@ MonoBehaviour:
   id: settler.gunnar
   displayName: Gunnar
   description: A hunter who has been walking these woods for years, alone by choice, until the choice ran out.
+  portrait: {fileID: 21300000, guid: e7660c02df638bc46bcd176886f9751e, type: 3}
   rescueLine: Took you long enough. That boar's been lying on me since yesterday.
   arrivalLine: You've been frightening my deer. Least you can do is give me a roof.
   welcomeLine: 

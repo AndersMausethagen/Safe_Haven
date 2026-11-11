@@ -48,6 +48,7 @@ public static class HavenPeople
             State = job == null && canWork ? HavenEntryState.Attention : HavenEntryState.Good,
             Status = job != null ? $"Home, working as {job.DisplayName}" : "Home",
             Description = person.Description,
+            Icon = person.Portrait,
         };
 
         if (job != null)
@@ -156,6 +157,7 @@ public static class HavenPeople
             State = HavenEntryState.Locked,
             Status = "Still out there",
             Description = person.Description,
+            Icon = person.Portrait,
         };
 
         List<JobDefinition> jobs = GameSession.Settlement.JobsOpenTo(person).Where(one => one != null).ToList();

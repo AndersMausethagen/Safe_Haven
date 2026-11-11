@@ -19,6 +19,9 @@ public static class BuildJournal
     private const string Portraits = "Assets/_Project/Art/UI/Journal/Creatures/";
     private const string Monsters = "Assets/_Project/Data/Monsters/";
     private const int PortraitSize = 384;
+    private const string PaintedTutorials = "Tools/LocalSpawn/TutorialArt/";
+    private const string TutorialArtFolder = "Assets/_Project/Art/UI/Tutorials/";
+    private const string PaintedCreatures = "Tools/LocalSpawn/CreaturePortraits/";
 
     // ----- Backstory: group, title, line, body, the quest and the creature that open it -----
 
@@ -127,6 +130,11 @@ public static class BuildJournal
 
     private static readonly Dictionary<string, string> Habitats = new Dictionary<string, string>
     {
+        ["Boar"] = "The meadows and woods near home",
+        ["WildBoar"] = "The open glades around the Haven, by day",
+        ["Deer"] = "Meadows and open glades around the Haven, by day",
+        ["Stag"] = "Open glades around the Haven, at dawn and dusk",
+        ["Fox"] = "The edges of the meadows, all year round",
         ["ForestBittenWolf"] = "The paths of the Misty Woods and Troll Valley, in packs",
         ["BlightBoar"] = "Blighted thickets and clearings, in both the Misty Woods and Troll Valley",
         ["Rootling"] = "Anywhere the roots are near the surface, usually several at once",
@@ -145,6 +153,11 @@ public static class BuildJournal
 
     private static readonly Dictionary<string, int> KillsToKnow = new Dictionary<string, int>
     {
+        ["Boar"] = 1,
+        ["WildBoar"] = 1,
+        ["Deer"] = 1,
+        ["Stag"] = 1,
+        ["Fox"] = 1,
         ["OldMossTroll"] = 1,
         ["TheHeartroot"] = 1,
         ["Huldra"] = 1,
@@ -160,60 +173,120 @@ public static class BuildJournal
         ["What You Can Lose"] = "AwakeningThePortal",
         ["Carrying It Home"] = "AwakeningThePortal",
         ["Companions"] = "ThroughThePortal",
-        ["Building"] = "LightFire",
         ["The Ward and Renown"] = "FirstCamp",
         ["Stations and Work"] = "FirstCamp",
         ["Nights and Breaches"] = "TheWeakeningWard",
         ["Essence"] = "TheAlchemist",
     };
 
-    // ----- Mechanics: group, title, line, body. Keys in () or [] follow a rebind. -----
+    // ----- Which skill, tried for the first time, opens a mechanics page (by the skill's id). -----
 
-    private static readonly (string group, string title, string line, string body)[] Mechanics =
+    private static readonly Dictionary<string, string> MechanicsTriedBy = new Dictionary<string, string>
+    {
+        ["Sneaking"] = "sneaking",
+        ["Swings and Chains"] = "melee",
+        ["Guard and Parry"] = "melee",
+        ["Dodging"] = "melee",
+        ["Stamina and Focus"] = "melee",
+        ["Poise and Stagger"] = "melee",
+        ["Backstabs and Finishing Blows"] = "melee",
+        ["Getting Hit"] = "melee",
+        ["Woodcutting"] = "woodcutting",
+        ["Mining"] = "mining",
+        ["Foraging"] = "foraging",
+        ["Fishing"] = "fishing",
+        ["Archery"] = "archery",
+        ["Abilities"] = "runecraft",
+        ["Building"] = "construction",
+    };
+
+    // ----- Mechanics: group, title, line, summary (what it is), body (how it works). Keys in () or [] follow a rebind. -----
+
+    private static readonly (string group, string title, string line, string summary, string body)[] Mechanics =
     {
         ("Getting about", "Your Windows", "What each key opens",
-            "(B) your bag and what you can make by hand\n(C) your character and what you wear\n(K) skills\n(N) level and talents\n(H) the Haven, from anywhere in it\n(G) the build menu\n(M) the map\n(J) this journal\n[E] use whatever is in front of you\n\nAny of these can be changed under Options, Controls, and this page will follow."),
+            "Everything you carry, make and know has a window of its own, each on its own key.",
+            "(B) your bag and what you can make by hand\n(C) your character and what you wear\n(K) your abilities and the skill bar\n(N) your skills and perks\n(H) the Haven, from anywhere in it\n(G) the build menu\n(M) the map\n(J) this journal\n(T) the newest tutorial\n[E] use whatever is in front of you\n\nAny of these can be changed under Options, Controls, and this page will follow."),
         ("Getting about", "Your Journal", "It fills in as you go",
+            "The journal keeps what you learn: the story so far, your quests, the creatures you have met and how things work.",
             "A dot marks anything you haven't read yet, and a tab's count shows how many of them it holds.\n\nA creature's page starts with little more than its name. It fills in as they fall: first how it fights and what it leaves, then how to live through it (being killed by one teaches you that too), and last what is told of it. People you bring home add what they know.\n\nSearching caches in a raid can turn up lost pages, which go in Backstory. Raids keeps a record of how each one ended.\n\nOn Quests you can pin a quest to the top of your tracker and, at home, go straight to where it wants you."),
         ("Getting about", "Sneaking", "Quiet, slow and worth it",
+            "Moving slowly and quietly so the forest's creatures don't notice you, and striking first when they haven't.",
             "Hold Left Ctrl to sneak: half speed, quiet and hard to see. A hit on a creature that hasn't noticed you is an ambush, worth half again as much.\n\nCreatures notice you three ways. They see in a cone in front of them, and cover blocks it. They sense what is very close. And they hear, so running, fighting, chopping and picking locks all carry. Rain muffles you. A heavy bag doesn't."),
+        ("Gathering", "Woodcutting", "Fell it, then work it where it lies",
+            "Cut trees with an axe for logs and sticks. Well-timed swings bring down more wood.",
+            "Walk up to a tree with an axe and hold the attack button, or [E], to raise it. Let go to swing. A glint at the top of the backswing is the perfect moment: let go then for a critical blow. Inside the yellow zone is a sound blow. Too early or too late is a glancing blow, and wears the axe.\n\nCriticals in a row build a combo that widens the perfect moment, and each one adds a log when the tree comes down.\n\nThe last blow fells the tree. Then the work moves to the ground: take the branches off for sticks, and cut the trunk into sections from the butt up, each one more logs.\n\nOn a raid every swing is heard. Chop too long in one place and the forest grows angry, and sends something to see what the noise is."),
+        ("Gathering", "Mining", "Read the rock and strike true",
+            "Break rock and ore with a pickaxe. Better ore needs a better pick.",
+            "Hold the attack button, or [E], at a rock to raise your pickaxe, and let go to strike. Let go at the glint for a critical blow, inside the yellow zone for a sound one. Glancing blows wear the pick.\n\nCriticals in a row widen the perfect moment, and every critical adds ore when the rock breaks.\n\nOre comes in tiers: copper first, then iron, then moonsilver and the stranger stones of the deep woods. A pick below a rock's tier is slow going.\n\nOn a raid the ring of a pick carries a long way. Mine too long in one place and the forest sends something to find out why."),
+        ("Gathering", "Foraging", "Berries, herbs, fibre and mushrooms",
+            "Pick plants by hand, or cut them with a sickle, for food, medicine and cloth.",
+            "Press [E] at a plant to pick it by hand. It takes a moment, and a better Foraging skill makes it quicker.\n\nSome plants are cut with a sickle instead, with the same swing as an axe: hold to raise, let go at the glint.\n\nBerries and mushrooms are food, herbs go into salves and draughts, and nettle and flax become cloth and cord.\n\nForaging is quiet work, the safest there is on a raid."),
+        ("Gathering", "Fishing", "Patience, then a fight",
+            "Catch fish with a rod and bait. Landing one is a tug of war you win by being steady.",
+            "With a rod in hand, hold the attack button to raise it and swing it back, then let go to cast. Each cast takes one bait from your bag: grubs from rotten logs and stumps, or berries.\n\nWait for the float to go under, then strike. Now the fight is on: hold to reel in, let go to give line. When the fish runs to one side, lean the rod against it with the movement keys.\n\nToo much tension for too long and the line snaps. Too much slack and a fresh fish throws the hook. Steady pressure tires it, and a tired fish at the bank is yours.\n\nDifferent fish bite in still water and in rivers. And in still water, not everything that bites is a fish."),
         ("Combat", "Swings and Chains", "Patience beats clicking",
+            "Your weapon's attacks come as a chain of swings, and timing matters more than speed.",
             "Tap the left mouse button for a light swing. Press again after it has landed and you go on to the next swing of the weapon's chain, and the last one is a finisher: wider, harder and better at breaking poise.\n\nPressing right as a swing recovers is on the rhythm, a small edge in damage. Swings never get faster, so mashing gains nothing.\n\nHold the button and the swing turns heavy: slow, nearly rooted, and hard enough to break poise. Keep holding to charge it, then let go to strike."),
         ("Combat", "Guard and Parry", "Part of a blow, or none of it",
+            "A guard takes part of a blow. A guard raised at the last moment takes none of it and opens the attacker up.",
             "Hold the right mouse button to guard. It stops blows from the front, but part of each still gets through (a lot with bare fists, much less with a shield) and each block costs stamina. Run out and your guard breaks, and you reel for over a second.\n\nRaise the guard just before a blow lands and it is a parry: no damage, no stamina, the attacker staggers and your next swing is a sure critical. A creature's warning on the ground turns pale and the creature glints at exactly that moment.\n\nLowering your guard locks it for a moment, so tapping it is no free parry."),
         ("Combat", "Dodging", "Your way out of almost anything",
+            "A quick roll or step out of harm's way, and the surest way out of a bad spot.",
             "Space dodges. A dodge can cut a swing short at any time, though during the wind-up that swing is lost and its stamina spent.\n\nDodging through a blow as it lands is a perfect dodge, and readies a counter. With an enemy in focus, a dodge steered towards or past it curves around to the spot behind it.\n\nWhat you wear decides how you dodge. Light gear gives a short, cheap quickstep, normal gear a roll, and heavy gear a slow shoulder charge that barges enemies at the end."),
         ("Combat", "Stamina and Focus", "One holds you up, the other pays for skills",
+            "Two bars run a fight: stamina for everything you do, Focus for your abilities.",
             "Stamina runs everything physical and comes back quickly once you stop spending it. Watch it: an empty bar in the middle of a fight is how most people die.\n\nFocus, the gold bar, is earned by fighting well. Every hit adds some, a perfect dodge more and a parry most of all. It holds for ten seconds after your last gain, then drains. Skills and weapon arts cost Focus, so they are what good fighting buys and not what opens a fight."),
         ("Combat", "Poise and Stagger", "The thin amber bar",
+            "Wear a creature down and it staggers, open to your best blows.",
             "Every hit wears down a creature's poise, the thin amber bar under its health. Heavy swings, finishers and counters wear it most. At zero it staggers: its attack is cancelled, it reels, and it takes more damage. A parry staggers it too.\n\nPoise comes back after a couple of seconds without being hit, so keep at it."),
         ("Combat", "Backstabs and Finishing Blows", "The best blow there is",
+            "Striking a staggered enemy from behind is the strongest blow there is.",
             "A pale wedge on the ground shows the spot behind an enemy. A staggered enemy struck from there takes a sure critical at far more damage: that is the best blow in the game. So parry, roll behind, strike.\n\nA backstab straight out of a dodge gives back half of what the dodge cost.\n\nBehind a staggered person-shaped creature, such as a draug, a press locks you together for a finishing blow, and nothing can knock you out of it before the blade lands.\n\nEnemies learn. One that has taken a backstab, or seen one nearby, starts to see the next coming, and the wedge warms from pale to red as it does. It forgets given time. Great beasts and elites are only ever open while staggered."),
         ("Combat", "Getting Hit", "Don't trade blows",
+            "What happens when a blow gets through, and why trading hits is a losing game.",
             "A hit that gets through while you wind up costs you the swing and leaves you reeling. Trading blows with a monster is a losing game, unless you are swinging something heavy: the wind-up of a heavy swing pushes through hits with a hammer, maul, greatsword or two-handed axe.\n\nSome attacks leave something behind if they get through. Poison drains your health and an Antidote cures it. Chill slows you and a Warming Brew cures it. Roots hold you in place, though you can still fight."),
+        ("Combat", "Archery", "Draw, breathe, release",
+            "Shoot arrows with a bow. A full draw, let go at the right moment, hits hardest.",
+            "With a bow in hand, hold the attack button to draw and let go to loose. The arrow flies at the creature nearest your aim, outlined in red. A part draw is weaker, slower and less accurate.\n\nLet go just as the draw fills for a perfect release: a sure critical that flies true. In a fight the guard button aims instead of guarding: slower, but steadier.\n\nAfter a perfect dodge the next press looses an instant counter shot, even while reloading. A creature that hasn't noticed you takes an ambush bonus from an arrow too.\n\nArrows are used up, so bring enough."),
+        ("Combat", "Abilities", "What Focus is for",
+            "Abilities are strong moves and spells on keys 1 to 5, paid for with Focus and stamina.",
+            "Your abilities are in the skill book (K). Drag one onto the bar to use it, and press (1) to (5) to use what is in each slot.\n\nAn ability costs Focus, the gold bar you earn by fighting well, and stamina, and then has to cool down before it can be used again.\n\nNew abilities come from rune books. At the altar, Purified Essence deepens the ones you know.\n\nEvery spell you cast trains Runecraft, and a better Runecraft makes them hit harder."),
         ("Raids", "Setting Out", "What you decide at the portal",
+            "A raid is a trip through the portal into the forest, to find what the Haven needs and bring it home.",
             "The portal's planner shows where you can go and what you will meet. You choose a destination and a tier, and can pay Portal Sparks for more time (three minutes each, up to two) and carry runes that change what waits on the other side.\n\nEach raid has a reason, usually a rumour pointing you at something worth finding. The woods are laid out anew every time, so nothing is where you left it."),
         ("Raids", "The Clock and the Way Out", "Leave before it closes",
+            "Every raid runs on a clock, and you must reach an exit and get through it before time runs out.",
             "A raid runs on a clock. As it runs down the woods grow more dangerous in stages, and the way home narrows.\n\nTo leave you have to reach an exit, light it and hold it until it opens. Holding takes time and can draw attention, so light one with time to spare.\n\nThe map (M) and the way line show you where to go."),
         ("Raids", "What You Can Lose", "Before you find out the hard way",
+            "Falling on a raid costs what you carry. Knowing what is at stake helps you decide what to bring.",
             "If you fall or time runs out, you wake at the portal. What you carry is lost: materials, food and anything found in the raid.\n\nThe tools, weapons and packs you bring come back damaged, and can be repaired at home.\n\nYour safe pocket keeps what is in it no matter what, so put the one thing you can't bear to lose there. Your home, your storage, your recipes and what you have learned are never at risk from a raid."),
         ("Raids", "Carrying It Home", "Greed has a weight",
+            "Everything you carry has weight, and a heavy load slows you down.",
             "Materials are items with weight. Past most of your bag's limit you slow down, tire faster and make more noise, and it gets worse the fuller it is. A Haul Sack carries more, but it is slower and louder still.\n\nCarts carry far more than you can, and can come through the portal with you, but creatures will raid one left alone."),
         ("Raids", "Companions", "Company has a price",
+            "Someone from the Haven can come with you on a raid, at a risk.",
             "You can take someone with you. They fight beside you and take orders in conversation: follow, stay, defend, retreat or attack your target.\n\nIf they fall, they may be lost to the forest, and it will start to forget them. You can find them again, but it takes a rumour and a raid to do it, and they may not remember everything when they come home."),
         ("Safe Haven", "The Ward and Renown", "Why a bigger home is a safer one",
+            "The portal's ward keeps the clearing safe, and it grows as the Haven grows.",
             "The portal's ward is what keeps the clearing peaceful. Everything you build and clear adds renown, and renown raises the Haven's rank, which widens the ward and lights the way a little further for anyone still out there.\n\nThe Haven window (H) shows what counts, what to do next and how far along you are."),
         ("Safe Haven", "Building", "Each thing opens the next",
+            "Raise new buildings inside the ward. Each one opens new things to make and do.",
             "Press (G) to build inside the ward. Most buildings go up as a scaffold you hammer with [E]. Each one opens the next, and every tier of a building opens something new to make, takes a chore off your hands or answers a problem you will meet in the woods.\n\nRecipes you can't make yet still show at the station, with what they need, so you can see what to aim for."),
         ("Safe Haven", "Stations and Work", "It goes on without you",
+            "Crafting stations work while you are away, and your people can work them for you.",
             "Stations keep working while you are away. Pay on queuing, leave for a raid, and come back to a finished output slot. Crops on a Farm Plot grow the same way.\n\nGive someone a job from the Haven window and they make things from what is in your stash while you are gone. People want somewhere to sleep, and beds help them, but beds are never what stops you from growing."),
         ("Safe Haven", "Nights and Breaches", "Safe, but not perfectly",
+            "Night brings creatures to the edge of the light, and now and then something tests the ward.",
             "After the first breach is won, weak creatures prowl just outside the light at night, so keep your fires lit. Cursed Essence is richer after dark too, if you want to go looking.\n\nNow and then something tests the ward. A breach is always announced ahead of time: you get a warning, time to prepare, the defence itself and a chance to recover. It only happens while you are there, and it can't wipe out the home you have built. Damaged buildings can be repaired."),
         ("Keeping going", "Hunger and Thirst", "They won't kill you",
+            "You need to eat and drink to stay at your best, and a good meal does more than fill you.",
             "Hunger and thirst wear down what you can do, but they never kill you. Berries and a stream will do to start with.\n\nCooked meals give timed bonuses on top of what they restore. You can have two at once, and a third pushes out the one closest to ending. Tonics from the Cauldron take no meal slot. Both go through the portal with you, so the meal before a raid counts, but a failed raid loses them.\n\nEating stops you for a moment, and a hit that gets through interrupts it, though the food is kept. Its healing arrives over several seconds."),
-        ("Keeping going", "Levels and Talents", "Getting better at it",
-            "Experience comes from fighting, working and finishing things. Each level gives talent points to spend in four trees at (N), freely mixed. Talents can be reset for free, beside the portal."),
+        ("Keeping going", "Skills and Perks", "Getting better at it",
+            "You get better at what you do: thirteen skills, from Woodcutting to Runecraft, each with its own level and perks.",
+            "Every skill grows by doing it. Swing an axe and Woodcutting grows, land blows and Melee grows, cook and Cooking grows. Work done on a raid counts half again, but that share only comes home if you do.\n\nEvery ten levels a skill reaches a milestone and you choose one of two perks. You can choose again at home, beside the portal.\n\nQuests, raids, first crafts, catches and new places give Insight instead. Put it into any skill you like at (N).\n\nA skill grows faster once its mentor building at home is upgraded, and after a good night's sleep."),
         ("Keeping going", "Essence", "What the forest leaves behind",
+            "Cursed Essence comes from the forest. Purified at the altar, it makes your gear and skills stronger.",
             "Cursed Essence comes from the forest and its creatures. Purify it at the altar and Purified Essence will empower your gear, enchant it and deepen your skills.\n\nEvery offer at the altar says what it costs and what it does, and none of them can fail or waste your essence. Where there is a risk, it is a stated price."),
     };
 
@@ -224,7 +297,7 @@ public static class BuildJournal
         ["MorningCamp"] = "Bjarne, Tor, Liv and Ingrid went on ahead two days ago to see what they could of the forest. Nobody here will say they are worried. Everybody has found a reason to stay near Sigrid this morning.",
         ["EirikLesson"] = "Eirik was a soldier before this and teaches the way soldiers do: briefly, and assuming you'll need it by nightfall. What he is really showing you is that a staggered enemy struck from behind takes the most. The Mechanics tab has the rest.",
         ["FishForBreakfast"] = "Nobody has ever been talked out of porridge on an expedition, but Eirik keeps trying.",
-        ["HuntForThePot"] = "Runa doesn't like it. Boar don't come this far onto open grass, and they don't look like that. She hasn't said what she thinks it means, but she has stopped lending out arrows without counting them.",
+        ["HuntForThePot"] = "Runa doesn't like it. Boar don't come this far onto open grass. She hasn't said what she thinks it means, but she has stopped lending out arrows without counting them.",
         ["WoodForTheRoad"] = "Any tree can be felled with an axe. Bigger trees give more logs, and now and then something better than plain wood.",
         ["RoadToForest"] = "The old road runs straight at the trees. Somebody built it to go somewhere, and nobody at the camp knows where.\n\nChoose your weapon by how you want to fight rather than by its numbers. You will be making others soon enough.",
         ["FindShelter"] = "It really is noon. Everyone agrees on that and no one can explain the stars. Runa says the forest has moved since the others came through, which is not something forests do.\n\nSticks and small rocks lie about on the forest floor, and you can pick them up as you walk: this is how every fire you ever build starts. Press (G) to open the build menu. It is the first fire anyone has lit in here for a very long time, though you won't know that yet.",
@@ -260,6 +333,16 @@ public static class BuildJournal
             "They come in packs and take turns at you, so keep them in front of you and watch for the lunge. A tier II wolf learns to pounce. Parry the bite, and don't chase one that backs away, as that is how the others get behind you."),
         ("BlightBoar", "Boar gone sour in the blighted thickets. They graze where nothing should grow any more, and Eirik won't eat the meat until it has been cooked twice.",
             "It leaves you alone at a distance. Step too close and it charges straight at you, then stands blown and open when the charge is spent. Roll aside, and strike it then."),
+        ("Boar", "An ordinary wild boar, the kind the old villages hunted every autumn. There are fewer of them than there were, and the ones left are wary.",
+            "It will run if it can and fight if it can't. Come at it from where it can't see you, and keep out of the way of the tusks once it turns."),
+        ("WildBoar", "A big old boar, grey about the snout, that has lived through enough winters to trust nothing on two legs.",
+            "It bolts at the first sight or sound of you. Creep close, or bring a bow: one good arrow before it runs is worth three after."),
+        ("Deer", "Roe deer, grazing the meadows and the glades by day. Where there are deer the forest is still itself, and Gunnar watches how many there are.",
+            "It runs at the first sight or sound of you. Sneak, or shoot from further off than you think you need to."),
+        ("Stag", "A red deer stag, carrying its crown through the glades. Seeing one at dawn was a good omen once.",
+            "Quick to bolt and quick to spot you. Come from downwind, from cover, and make the first arrow count."),
+        ("Fox", "A red fox, sharp-eared and never far from the meadow's edge. In winter its coat goes white.",
+            "Small, fast and off at the first sound. Not much meat, but a fine pelt."),
         ("Rootling", "A knee-high scrap of root and moss that has learned to walk. They are not very clever, and Liv thinks there may be only one of them, in a sense.",
             "One is nothing, but they are never one. Don't let them gather around you, and if something is calling them up, go for it first."),
         ("Mistwing", "A low-flying thing of the deep mist, all leather and hunger. Birds go quiet when they pass.",
@@ -334,7 +417,8 @@ public static class BuildJournal
 
         SerializedProperty mechanics = so.FindProperty("mechanics");
         mechanics.ClearArray();
-        foreach ((string group, string title, string line, string body) in Mechanics)
+        int painted = 0;
+        foreach ((string group, string title, string line, string summary, string body) in Mechanics)
         {
             mechanics.InsertArrayElementAtIndex(mechanics.arraySize);
             SerializedProperty page = mechanics.GetArrayElementAtIndex(mechanics.arraySize - 1);
@@ -343,7 +427,14 @@ public static class BuildJournal
             page.FindPropertyRelative("unlockedByCreature").objectReferenceValue = null;
             page.FindPropertyRelative("unlockedByResident").objectReferenceValue = null;
             page.FindPropertyRelative("foundInRaids").boolValue = false;
+            page.FindPropertyRelative("unlockedBySkill").objectReferenceValue = MechanicsTriedBy.TryGetValue(title, out string skill) ? Skill(skill, log) : null;
+            page.FindPropertyRelative("summary").stringValue = summary;
+            Sprite art = TutorialArt(title);
+            page.FindPropertyRelative("art").objectReferenceValue = art;
+            painted += art != null ? 1 : 0;
         }
+
+        log.Add($"{painted} of {Mechanics.Length} mechanics pages painted.");
 
         SerializedProperty listed = so.FindProperty("creatures");
         listed.ClearArray();
@@ -439,9 +530,104 @@ public static class BuildJournal
         return null;
     }
 
-    // Head and shoulders, in a preview scene so nothing lands in the open one, on the window's own colour.
+    private static ProficiencyDefinition Skill(string id, List<string> log)
+    {
+        foreach (string guid in AssetDatabase.FindAssets("t:ProficiencyDefinition"))
+        {
+            var skill = AssetDatabase.LoadAssetAtPath<ProficiencyDefinition>(AssetDatabase.GUIDToAssetPath(guid));
+            if (skill != null && skill.Id == id)
+            {
+                return skill;
+            }
+        }
+
+        log.Add($"No skill {id}.");
+        return null;
+    }
+
+    /// <summary>A file name from a page's or creature's name: "The Clock and the Way Out" -> the_clock_and_the_way_out.</summary>
+    public static string Slug(string name) => System.Text.RegularExpressions.Regex.Replace(name.ToLowerInvariant(), "[^a-z0-9]+", "_").Trim('_');
+
+    // The page's painting from LocalSpawn (Tools/LocalSpawn/generate_ui_art.py tutorials), copied into the game; none until it is painted.
+    private static Sprite TutorialArt(string title)
+    {
+        string source = $"{PaintedTutorials}{Slug(title)}.png";
+        if (!File.Exists(source))
+        {
+            return null;
+        }
+
+        string path = $"{TutorialArtFolder}{Slug(title)}.png";
+        return CopyIn(source, path, 2048);
+    }
+
+    // A painting copied into the project as a sprite, unless the same picture is there already.
+    private static Sprite CopyIn(string source, string path, int maxSize, bool mipmaps = true)
+    {
+        Directory.CreateDirectory(Path.GetDirectoryName(path));
+        if (!File.Exists(path) || !File.ReadAllBytes(path).SequenceEqual(File.ReadAllBytes(source)))
+        {
+            File.Copy(source, path, true);
+            AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
+        }
+
+        var importer = (TextureImporter)AssetImporter.GetAtPath(path);
+        if (importer.textureType != TextureImporterType.Sprite || importer.maxTextureSize != maxSize || importer.mipmapEnabled != mipmaps)
+        {
+            importer.textureType = TextureImporterType.Sprite;
+            importer.spriteImportMode = SpriteImportMode.Single;
+            // Mips for what is also drawn small (a portrait in a list row, a tutorial's thumbnail): none for full-screen art.
+            importer.mipmapEnabled = mipmaps;
+            importer.filterMode = mipmaps ? FilterMode.Trilinear : FilterMode.Bilinear;
+            importer.maxTextureSize = maxSize;
+            importer.SaveAndReimport();
+        }
+
+        return AssetDatabase.LoadAssetAtPath<Sprite>(path);
+    }
+
+    /// <summary>
+    /// Every creature with a LocalSpawn portrait (Tools/LocalSpawn/generate_ui_art.py creatures) gets it, the journal's listed ones and the
+    /// animals beside them, which had no picture of their own (run with --entry BuildJournal.PaintedPortraits).
+    /// </summary>
+    public static string PaintedPortraits()
+    {
+        int done = 0;
+        foreach (string guid in AssetDatabase.FindAssets("t:MonsterDefinition"))
+        {
+            var creature = AssetDatabase.LoadAssetAtPath<MonsterDefinition>(AssetDatabase.GUIDToAssetPath(guid));
+            Sprite painted = creature != null ? PaintedPortrait(creature) : null;
+            if (painted == null)
+            {
+                continue;
+            }
+
+            var entry = new SerializedObject(creature);
+            entry.FindProperty("portrait").objectReferenceValue = painted;
+            entry.ApplyModifiedPropertiesWithoutUndo();
+            AssetDatabase.SaveAssetIfDirty(creature);
+            done++;
+        }
+
+        return $"{done} creatures given their painted portrait.";
+    }
+
+    private static Sprite PaintedPortrait(MonsterDefinition creature)
+    {
+        string source = $"{PaintedCreatures}{creature.name}.png";
+        return File.Exists(source) ? CopyIn(source, $"{Portraits}{creature.name}.png", 512) : null;
+    }
+
+    // Head and shoulders, in a preview scene so nothing lands in the open one, on the window's own colour. A creature painted with
+    // LocalSpawn keeps its painting instead.
     private static Sprite Portrait(MonsterDefinition creature)
     {
+        Sprite painted = PaintedPortrait(creature);
+        if (painted != null)
+        {
+            return painted;
+        }
+
         string path = $"{Portraits}{creature.name}.png";
         Scene scene = EditorSceneManager.NewPreviewScene();
         var sheet = new Texture2D(PortraitSize, PortraitSize, TextureFormat.RGB24, false, false);

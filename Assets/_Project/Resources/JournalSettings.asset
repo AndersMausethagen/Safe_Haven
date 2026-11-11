@@ -24,6 +24,9 @@ MonoBehaviour:
     unlockedByCreature: {fileID: 0}
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
+    unlockedBySkill: {fileID: 0}
+    art: {fileID: 0}
+    summary: 
   - group: The old world
     title: What the Forest Does
     line: It doesn't kill the lost
@@ -35,6 +38,9 @@ MonoBehaviour:
     unlockedByCreature: {fileID: 0}
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
+    unlockedBySkill: {fileID: 0}
+    art: {fileID: 0}
+    summary: 
   - group: The old world
     title: The Hearth
     line: The one thing it cannot forget
@@ -49,6 +55,9 @@ MonoBehaviour:
     unlockedByCreature: {fileID: 0}
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
+    unlockedBySkill: {fileID: 0}
+    art: {fileID: 0}
+    summary: 
   - group: The old world
     title: The Portal
     line: An old thing, and awake
@@ -60,6 +69,9 @@ MonoBehaviour:
     unlockedByCreature: {fileID: 0}
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
+    unlockedBySkill: {fileID: 0}
+    art: {fileID: 0}
+    summary: 
   - group: The expedition
     title: Seven Went In
     line: Why anyone came here
@@ -74,6 +86,9 @@ MonoBehaviour:
     unlockedByCreature: {fileID: 0}
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
+    unlockedBySkill: {fileID: 0}
+    art: {fileID: 0}
+    summary: 
   - group: The expedition
     title: The Day the Stones Broke
     line: How you came to be alone
@@ -88,6 +103,9 @@ MonoBehaviour:
     unlockedByCreature: {fileID: 0}
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
+    unlockedBySkill: {fileID: 0}
+    art: {fileID: 0}
+    summary: 
   - group: The expedition
     title: Ingrid's Word
     line: The first to come home
@@ -99,6 +117,9 @@ MonoBehaviour:
     unlockedByCreature: {fileID: 0}
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
+    unlockedBySkill: {fileID: 0}
+    art: {fileID: 0}
+    summary: 
   - group: The forest's own
     title: The Guardians
     line: What was set to keep the woods
@@ -110,6 +131,9 @@ MonoBehaviour:
     unlockedByCreature: {fileID: 11400000, guid: 2f66a8d86463697438ce75621f51e12d, type: 2}
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
+    unlockedBySkill: {fileID: 0}
+    art: {fileID: 0}
+    summary: 
   - group: The forest's own
     title: The First of Them
     line: Grown vast under its hollow
@@ -121,6 +145,9 @@ MonoBehaviour:
     unlockedByCreature: {fileID: 11400000, guid: d0d3ffee305a6ca489fca58781bf31c1, type: 2}
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
+    unlockedBySkill: {fileID: 0}
+    art: {fileID: 0}
+    summary: 
   - group: The forest's own
     title: Troll Country
     line: North, where the valleys start
@@ -132,6 +159,9 @@ MonoBehaviour:
     unlockedByCreature: {fileID: 11400000, guid: 916ab17a0415c3041aec1267259d1567, type: 2}
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
+    unlockedBySkill: {fileID: 0}
+    art: {fileID: 0}
+    summary: 
   - group: The forest's own
     title: The Barrow Dead
     line: Still in their mail
@@ -143,6 +173,9 @@ MonoBehaviour:
     unlockedByCreature: {fileID: 11400000, guid: 18c8362f09cf64a468e9ae4ae6d4422b, type: 2}
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
+    unlockedBySkill: {fileID: 0}
+    art: {fileID: 0}
+    summary: 
   - group: The people
     title: Sigrid
     line: Leader of the expedition
@@ -157,6 +190,9 @@ MonoBehaviour:
     unlockedByCreature: {fileID: 0}
     unlockedByResident: {fileID: 11400000, guid: b230d041259b863428e4e973c6ff0d86, type: 2}
     foundInRaids: 0
+    unlockedBySkill: {fileID: 0}
+    art: {fileID: 0}
+    summary: 
   - group: The people
     title: Eirik
     line: Soldier and warden
@@ -171,6 +207,9 @@ MonoBehaviour:
     unlockedByCreature: {fileID: 0}
     unlockedByResident: {fileID: 11400000, guid: 33e7204287863854f8c6ad025490f531, type: 2}
     foundInRaids: 0
+    unlockedBySkill: {fileID: 0}
+    art: {fileID: 0}
+    summary: 
   - group: The people
     title: Runa
     line: Tracker
@@ -185,6 +224,9 @@ MonoBehaviour:
     unlockedByCreature: {fileID: 0}
     unlockedByResident: {fileID: 11400000, guid: 4260d606f7c62c042b848adc806c44d3, type: 2}
     foundInRaids: 0
+    unlockedBySkill: {fileID: 0}
+    art: {fileID: 0}
+    summary: 
   - group: The people
     title: Bjarne
     line: Smith
@@ -199,6 +241,9 @@ MonoBehaviour:
     unlockedByCreature: {fileID: 0}
     unlockedByResident: {fileID: 11400000, guid: de521ad7beeb20b49878a9b40c96bced, type: 2}
     foundInRaids: 0
+    unlockedBySkill: {fileID: 0}
+    art: {fileID: 0}
+    summary: 
   - group: The people
     title: Tor
     line: Carpenter
@@ -213,6 +258,9 @@ MonoBehaviour:
     unlockedByCreature: {fileID: 0}
     unlockedByResident: {fileID: 11400000, guid: df34e8e1df8ff0241a216bfddf9b631c, type: 2}
     foundInRaids: 0
+    unlockedBySkill: {fileID: 0}
+    art: {fileID: 0}
+    summary: 
   - group: The people
     title: Liv
     line: Rune scholar
@@ -227,6 +275,9 @@ MonoBehaviour:
     unlockedByCreature: {fileID: 0}
     unlockedByResident: {fileID: 11400000, guid: 8adfc30233928ec499c01587419eabaa, type: 2}
     foundInRaids: 0
+    unlockedBySkill: {fileID: 0}
+    art: {fileID: 0}
+    summary: 
   - group: Found in the woods
     title: A Letter, Unsent
     line: Folded small, in a dry tin
@@ -241,6 +292,9 @@ MonoBehaviour:
     unlockedByCreature: {fileID: 0}
     unlockedByResident: {fileID: 0}
     foundInRaids: 1
+    unlockedBySkill: {fileID: 0}
+    art: {fileID: 0}
+    summary: 
   - group: Found in the woods
     title: Liv's Notes on the Stones
     line: Her hand, and three different inks
@@ -258,6 +312,9 @@ MonoBehaviour:
     unlockedByCreature: {fileID: 0}
     unlockedByResident: {fileID: 0}
     foundInRaids: 1
+    unlockedBySkill: {fileID: 0}
+    art: {fileID: 0}
+    summary: 
   - group: Found in the woods
     title: The Last Smith's Note
     line: Scratched on a rusted plate
@@ -272,6 +329,9 @@ MonoBehaviour:
     unlockedByCreature: {fileID: 0}
     unlockedByResident: {fileID: 0}
     foundInRaids: 1
+    unlockedBySkill: {fileID: 0}
+    art: {fileID: 0}
+    summary: 
   - group: Found in the woods
     title: A Waystone Rubbing
     line: Charcoal on birch bark
@@ -290,6 +350,9 @@ MonoBehaviour:
     unlockedByCreature: {fileID: 0}
     unlockedByResident: {fileID: 0}
     foundInRaids: 1
+    unlockedBySkill: {fileID: 0}
+    art: {fileID: 0}
+    summary: 
   - group: Found in the woods
     title: The Lost Man's Song
     line: A children's counting song, on a torn page
@@ -312,6 +375,9 @@ MonoBehaviour:
     unlockedByCreature: {fileID: 0}
     unlockedByResident: {fileID: 0}
     foundInRaids: 1
+    unlockedBySkill: {fileID: 0}
+    art: {fileID: 0}
+    summary: 
   - group: Found in the woods
     title: The Troll Toll
     line: A trader's list, much handled
@@ -332,6 +398,9 @@ MonoBehaviour:
     unlockedByCreature: {fileID: 0}
     unlockedByResident: {fileID: 0}
     foundInRaids: 1
+    unlockedBySkill: {fileID: 0}
+    art: {fileID: 0}
+    summary: 
   - group: Found in the woods
     title: Barrow Inscription
     line: Copied from a door lintel
@@ -346,6 +415,9 @@ MonoBehaviour:
     unlockedByCreature: {fileID: 0}
     unlockedByResident: {fileID: 0}
     foundInRaids: 1
+    unlockedBySkill: {fileID: 0}
+    art: {fileID: 0}
+    summary: 
   - group: Found in the woods
     title: The Hearth Law
     line: A page from an old rule of the house
@@ -360,6 +432,9 @@ MonoBehaviour:
     unlockedByCreature: {fileID: 0}
     unlockedByResident: {fileID: 0}
     foundInRaids: 1
+    unlockedBySkill: {fileID: 0}
+    art: {fileID: 0}
+    summary: 
   - group: Found in the woods
     title: A Tally on Bark
     line: Notches, and one word
@@ -371,6 +446,9 @@ MonoBehaviour:
     unlockedByCreature: {fileID: 0}
     unlockedByResident: {fileID: 0}
     foundInRaids: 1
+    unlockedBySkill: {fileID: 0}
+    art: {fileID: 0}
+    summary: 
   - group: Found in the woods
     title: Something Runa Left
     line: Tied to a branch with a bit of red cord
@@ -385,6 +463,9 @@ MonoBehaviour:
     unlockedByCreature: {fileID: 0}
     unlockedByResident: {fileID: 0}
     foundInRaids: 1
+    unlockedBySkill: {fileID: 0}
+    art: {fileID: 0}
+    summary: 
   mechanics:
   - group: Getting about
     title: Your Windows
@@ -393,9 +474,9 @@ MonoBehaviour:
 
       (C) your character and what you wear
 
-      (K) skills
+      (K) your abilities and the skill bar
 
-      (N) level and talents
+      (N) your skills and perks
 
       (H) the Haven, from anywhere in it
 
@@ -405,6 +486,8 @@ MonoBehaviour:
 
       (J) this journal
 
+      (T) the newest tutorial
+
       [E] use whatever is in front of you
 
 
@@ -413,6 +496,9 @@ MonoBehaviour:
     unlockedByCreature: {fileID: 0}
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
+    unlockedBySkill: {fileID: 0}
+    art: {fileID: 21300000, guid: 22db94b9ccae2104aadefa5b986d4c37, type: 3}
+    summary: Everything you carry, make and know has a window of its own, each on its own key.
   - group: Getting about
     title: Your Journal
     line: It fills in as you go
@@ -430,6 +516,9 @@ MonoBehaviour:
     unlockedByCreature: {fileID: 0}
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
+    unlockedBySkill: {fileID: 0}
+    art: {fileID: 21300000, guid: 242e9835e13c1fe4d8de161e7692ec81, type: 3}
+    summary: 'The journal keeps what you learn: the story so far, your quests, the creatures you have met and how things work.'
   - group: Getting about
     title: Sneaking
     line: Quiet, slow and worth it
@@ -441,6 +530,89 @@ MonoBehaviour:
     unlockedByCreature: {fileID: 0}
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
+    unlockedBySkill: {fileID: 11400000, guid: cada299a42945b04b8c891d31b0c5351, type: 2}
+    art: {fileID: 21300000, guid: 73168179ecadba64aa0f05aa045be5e0, type: 3}
+    summary: Moving slowly and quietly so the forest's creatures don't notice you, and striking first when they haven't.
+  - group: Gathering
+    title: Woodcutting
+    line: Fell it, then work it where it lies
+    body: 'Walk up to a tree with an axe and hold the attack button, or [E], to raise it. Let go to swing. A glint at the top of the backswing is the perfect moment: let go then for a critical blow. Inside the yellow zone is a sound blow. Too early or too late is a glancing blow, and wears the axe.
+
+
+      Criticals in a row build a combo that widens the perfect moment, and each one adds a log when the tree comes down.
+
+
+      The last blow fells the tree. Then the work moves to the ground: take the branches off for sticks, and cut the trunk into sections from the butt up, each one more logs.
+
+
+      On a raid every swing is heard. Chop too long in one place and the forest grows angry, and sends something to see what the noise is.'
+    unlockedByQuest: {fileID: 0}
+    unlockedByCreature: {fileID: 0}
+    unlockedByResident: {fileID: 0}
+    foundInRaids: 0
+    unlockedBySkill: {fileID: 11400000, guid: a277ba53f2eae0648aa06826e44cbfd8, type: 2}
+    art: {fileID: 21300000, guid: 0c0b7be86e94b4b4a971fc035b8fe418, type: 3}
+    summary: Cut trees with an axe for logs and sticks. Well-timed swings bring down more wood.
+  - group: Gathering
+    title: Mining
+    line: Read the rock and strike true
+    body: 'Hold the attack button, or [E], at a rock to raise your pickaxe, and let go to strike. Let go at the glint for a critical blow, inside the yellow zone for a sound one. Glancing blows wear the pick.
+
+
+      Criticals in a row widen the perfect moment, and every critical adds ore when the rock breaks.
+
+
+      Ore comes in tiers: copper first, then iron, then moonsilver and the stranger stones of the deep woods. A pick below a rock''s tier is slow going.
+
+
+      On a raid the ring of a pick carries a long way. Mine too long in one place and the forest sends something to find out why.'
+    unlockedByQuest: {fileID: 0}
+    unlockedByCreature: {fileID: 0}
+    unlockedByResident: {fileID: 0}
+    foundInRaids: 0
+    unlockedBySkill: {fileID: 11400000, guid: e9528bdd6784e9d4eaa85d8753dfa51c, type: 2}
+    art: {fileID: 21300000, guid: 33eef5039153005419ad83faba57856e, type: 3}
+    summary: Break rock and ore with a pickaxe. Better ore needs a better pick.
+  - group: Gathering
+    title: Foraging
+    line: Berries, herbs, fibre and mushrooms
+    body: 'Press [E] at a plant to pick it by hand. It takes a moment, and a better Foraging skill makes it quicker.
+
+
+      Some plants are cut with a sickle instead, with the same swing as an axe: hold to raise, let go at the glint.
+
+
+      Berries and mushrooms are food, herbs go into salves and draughts, and nettle and flax become cloth and cord.
+
+
+      Foraging is quiet work, the safest there is on a raid.'
+    unlockedByQuest: {fileID: 0}
+    unlockedByCreature: {fileID: 0}
+    unlockedByResident: {fileID: 0}
+    foundInRaids: 0
+    unlockedBySkill: {fileID: 11400000, guid: 4fde8ce0d82ef0d42b6bc607ec3f9a7a, type: 2}
+    art: {fileID: 21300000, guid: de00f5232f0e6fc439112f1356d4e8e6, type: 3}
+    summary: Pick plants by hand, or cut them with a sickle, for food, medicine and cloth.
+  - group: Gathering
+    title: Fishing
+    line: Patience, then a fight
+    body: 'With a rod in hand, hold the attack button to raise it and swing it back, then let go to cast. Each cast takes one bait from your bag: grubs from rotten logs and stumps, or berries.
+
+
+      Wait for the float to go under, then strike. Now the fight is on: hold to reel in, let go to give line. When the fish runs to one side, lean the rod against it with the movement keys.
+
+
+      Too much tension for too long and the line snaps. Too much slack and a fresh fish throws the hook. Steady pressure tires it, and a tired fish at the bank is yours.
+
+
+      Different fish bite in still water and in rivers. And in still water, not everything that bites is a fish.'
+    unlockedByQuest: {fileID: 0}
+    unlockedByCreature: {fileID: 0}
+    unlockedByResident: {fileID: 0}
+    foundInRaids: 0
+    unlockedBySkill: {fileID: 11400000, guid: b7b0a5e2ce2709341b1d81708498a315, type: 2}
+    art: {fileID: 21300000, guid: 4bfbc7941652ae6459908fec8bfee9d1, type: 3}
+    summary: Catch fish with a rod and bait. Landing one is a tug of war you win by being steady.
   - group: Combat
     title: Swings and Chains
     line: Patience beats clicking
@@ -455,6 +627,9 @@ MonoBehaviour:
     unlockedByCreature: {fileID: 0}
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
+    unlockedBySkill: {fileID: 11400000, guid: 98481e79d59499846a4c2d233cfe5948, type: 2}
+    art: {fileID: 21300000, guid: 7c67b2279454d4b408f27add06b9e25b, type: 3}
+    summary: Your weapon's attacks come as a chain of swings, and timing matters more than speed.
   - group: Combat
     title: Guard and Parry
     line: Part of a blow, or none of it
@@ -469,6 +644,9 @@ MonoBehaviour:
     unlockedByCreature: {fileID: 0}
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
+    unlockedBySkill: {fileID: 11400000, guid: 98481e79d59499846a4c2d233cfe5948, type: 2}
+    art: {fileID: 21300000, guid: 93da85e4e0d667b41a6deb8751bb1fcc, type: 3}
+    summary: A guard takes part of a blow. A guard raised at the last moment takes none of it and opens the attacker up.
   - group: Combat
     title: Dodging
     line: Your way out of almost anything
@@ -483,6 +661,9 @@ MonoBehaviour:
     unlockedByCreature: {fileID: 0}
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
+    unlockedBySkill: {fileID: 11400000, guid: 98481e79d59499846a4c2d233cfe5948, type: 2}
+    art: {fileID: 21300000, guid: aaacc12f67da1d34384aa499ec5f4489, type: 3}
+    summary: A quick roll or step out of harm's way, and the surest way out of a bad spot.
   - group: Combat
     title: Stamina and Focus
     line: One holds you up, the other pays for skills
@@ -494,6 +675,9 @@ MonoBehaviour:
     unlockedByCreature: {fileID: 0}
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
+    unlockedBySkill: {fileID: 11400000, guid: 98481e79d59499846a4c2d233cfe5948, type: 2}
+    art: {fileID: 21300000, guid: 97a1cd59086df964295e568fcf764acc, type: 3}
+    summary: 'Two bars run a fight: stamina for everything you do, Focus for your abilities.'
   - group: Combat
     title: Poise and Stagger
     line: The thin amber bar
@@ -505,6 +689,9 @@ MonoBehaviour:
     unlockedByCreature: {fileID: 0}
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
+    unlockedBySkill: {fileID: 11400000, guid: 98481e79d59499846a4c2d233cfe5948, type: 2}
+    art: {fileID: 21300000, guid: 3ec88d50adef5e849a6e644c1b950c1d, type: 3}
+    summary: Wear a creature down and it staggers, open to your best blows.
   - group: Combat
     title: Backstabs and Finishing Blows
     line: The best blow there is
@@ -522,6 +709,9 @@ MonoBehaviour:
     unlockedByCreature: {fileID: 0}
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
+    unlockedBySkill: {fileID: 11400000, guid: 98481e79d59499846a4c2d233cfe5948, type: 2}
+    art: {fileID: 21300000, guid: c4d1a7d56cb31d8409bdd56417434419, type: 3}
+    summary: Striking a staggered enemy from behind is the strongest blow there is.
   - group: Combat
     title: Getting Hit
     line: Don't trade blows
@@ -533,6 +723,49 @@ MonoBehaviour:
     unlockedByCreature: {fileID: 0}
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
+    unlockedBySkill: {fileID: 11400000, guid: 98481e79d59499846a4c2d233cfe5948, type: 2}
+    art: {fileID: 21300000, guid: a801f1ab35ac02f41aca7387aef7936a, type: 3}
+    summary: What happens when a blow gets through, and why trading hits is a losing game.
+  - group: Combat
+    title: Archery
+    line: Draw, breathe, release
+    body: 'With a bow in hand, hold the attack button to draw and let go to loose. The arrow flies at the creature nearest your aim, outlined in red. A part draw is weaker, slower and less accurate.
+
+
+      Let go just as the draw fills for a perfect release: a sure critical that flies true. In a fight the guard button aims instead of guarding: slower, but steadier.
+
+
+      After a perfect dodge the next press looses an instant counter shot, even while reloading. A creature that hasn''t noticed you takes an ambush bonus from an arrow too.
+
+
+      Arrows are used up, so bring enough.'
+    unlockedByQuest: {fileID: 0}
+    unlockedByCreature: {fileID: 0}
+    unlockedByResident: {fileID: 0}
+    foundInRaids: 0
+    unlockedBySkill: {fileID: 11400000, guid: c02bc5ecd6589b94daa2ae6d5320cfb6, type: 2}
+    art: {fileID: 21300000, guid: 6e8443e0fad678943bef5c172ef7d827, type: 3}
+    summary: Shoot arrows with a bow. A full draw, let go at the right moment, hits hardest.
+  - group: Combat
+    title: Abilities
+    line: What Focus is for
+    body: 'Your abilities are in the skill book (K). Drag one onto the bar to use it, and press (1) to (5) to use what is in each slot.
+
+
+      An ability costs Focus, the gold bar you earn by fighting well, and stamina, and then has to cool down before it can be used again.
+
+
+      New abilities come from rune books. At the altar, Purified Essence deepens the ones you know.
+
+
+      Every spell you cast trains Runecraft, and a better Runecraft makes them hit harder.'
+    unlockedByQuest: {fileID: 0}
+    unlockedByCreature: {fileID: 0}
+    unlockedByResident: {fileID: 0}
+    foundInRaids: 0
+    unlockedBySkill: {fileID: 11400000, guid: 0bf8c75e4c32304428c7000e1e01913b, type: 2}
+    art: {fileID: 21300000, guid: d03cfd5169e5ca240a4efca33f4f72f5, type: 3}
+    summary: Abilities are strong moves and spells on keys 1 to 5, paid for with Focus and stamina.
   - group: Raids
     title: Setting Out
     line: What you decide at the portal
@@ -544,6 +777,9 @@ MonoBehaviour:
     unlockedByCreature: {fileID: 0}
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
+    unlockedBySkill: {fileID: 0}
+    art: {fileID: 21300000, guid: 47081b5d7f0750b4ca34505de73bc596, type: 3}
+    summary: A raid is a trip through the portal into the forest, to find what the Haven needs and bring it home.
   - group: Raids
     title: The Clock and the Way Out
     line: Leave before it closes
@@ -558,6 +794,9 @@ MonoBehaviour:
     unlockedByCreature: {fileID: 0}
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
+    unlockedBySkill: {fileID: 0}
+    art: {fileID: 21300000, guid: 4e65a6e3278530d4c82d1bdd3810c280, type: 3}
+    summary: Every raid runs on a clock, and you must reach an exit and get through it before time runs out.
   - group: Raids
     title: What You Can Lose
     line: Before you find out the hard way
@@ -572,6 +811,9 @@ MonoBehaviour:
     unlockedByCreature: {fileID: 0}
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
+    unlockedBySkill: {fileID: 0}
+    art: {fileID: 21300000, guid: 99bb56b3d61b2d24580e64220d0475d3, type: 3}
+    summary: Falling on a raid costs what you carry. Knowing what is at stake helps you decide what to bring.
   - group: Raids
     title: Carrying It Home
     line: Greed has a weight
@@ -583,6 +825,9 @@ MonoBehaviour:
     unlockedByCreature: {fileID: 0}
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
+    unlockedBySkill: {fileID: 0}
+    art: {fileID: 21300000, guid: 314f3d943d6c38549afc8ffe5480e69c, type: 3}
+    summary: Everything you carry has weight, and a heavy load slows you down.
   - group: Raids
     title: Companions
     line: Company has a price
@@ -594,6 +839,9 @@ MonoBehaviour:
     unlockedByCreature: {fileID: 0}
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
+    unlockedBySkill: {fileID: 0}
+    art: {fileID: 21300000, guid: d9fea10ab2d58cf4f837866b9dc87a21, type: 3}
+    summary: Someone from the Haven can come with you on a raid, at a risk.
   - group: Safe Haven
     title: The Ward and Renown
     line: Why a bigger home is a safer one
@@ -605,6 +853,9 @@ MonoBehaviour:
     unlockedByCreature: {fileID: 0}
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
+    unlockedBySkill: {fileID: 0}
+    art: {fileID: 21300000, guid: 60a0b7c0a0b81d44cb1c5ddcaf53ba18, type: 3}
+    summary: The portal's ward keeps the clearing safe, and it grows as the Haven grows.
   - group: Safe Haven
     title: Building
     line: Each thing opens the next
@@ -612,10 +863,13 @@ MonoBehaviour:
 
 
       Recipes you can''t make yet still show at the station, with what they need, so you can see what to aim for.'
-    unlockedByQuest: {fileID: 11400000, guid: 2ba326763b19a9e46be36507850aed82, type: 2}
+    unlockedByQuest: {fileID: 0}
     unlockedByCreature: {fileID: 0}
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
+    unlockedBySkill: {fileID: 11400000, guid: 71d286514cbbbe149ba663b354b4f1ae, type: 2}
+    art: {fileID: 21300000, guid: b8881e57aaf87664791862c7672142d4, type: 3}
+    summary: Raise new buildings inside the ward. Each one opens new things to make and do.
   - group: Safe Haven
     title: Stations and Work
     line: It goes on without you
@@ -627,6 +881,9 @@ MonoBehaviour:
     unlockedByCreature: {fileID: 0}
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
+    unlockedBySkill: {fileID: 0}
+    art: {fileID: 21300000, guid: 53ba481bb31f8fb4fa92e183265ef1c9, type: 3}
+    summary: Crafting stations work while you are away, and your people can work them for you.
   - group: Safe Haven
     title: Nights and Breaches
     line: Safe, but not perfectly
@@ -638,6 +895,9 @@ MonoBehaviour:
     unlockedByCreature: {fileID: 0}
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
+    unlockedBySkill: {fileID: 0}
+    art: {fileID: 21300000, guid: 69ad07a97c5115840a66eae67d0d706a, type: 3}
+    summary: Night brings creatures to the edge of the light, and now and then something tests the ward.
   - group: Keeping going
     title: Hunger and Thirst
     line: They won't kill you
@@ -652,14 +912,29 @@ MonoBehaviour:
     unlockedByCreature: {fileID: 0}
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
+    unlockedBySkill: {fileID: 0}
+    art: {fileID: 21300000, guid: 6d70f426af47d0242b7c7793361c6028, type: 3}
+    summary: You need to eat and drink to stay at your best, and a good meal does more than fill you.
   - group: Keeping going
-    title: Levels and Talents
+    title: Skills and Perks
     line: Getting better at it
-    body: Experience comes from fighting, working and finishing things. Each level gives talent points to spend in four trees at (N), freely mixed. Talents can be reset for free, beside the portal.
+    body: 'Every skill grows by doing it. Swing an axe and Woodcutting grows, land blows and Melee grows, cook and Cooking grows. Work done on a raid counts half again, but that share only comes home if you do.
+
+
+      Every ten levels a skill reaches a milestone and you choose one of two perks. You can choose again at home, beside the portal.
+
+
+      Quests, raids, first crafts, catches and new places give Insight instead. Put it into any skill you like at (N).
+
+
+      A skill grows faster once its mentor building at home is upgraded, and after a good night''s sleep.'
     unlockedByQuest: {fileID: 0}
     unlockedByCreature: {fileID: 0}
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
+    unlockedBySkill: {fileID: 0}
+    art: {fileID: 21300000, guid: 5cc9278b6487dbc43a5261fd3732c42b, type: 3}
+    summary: 'You get better at what you do: thirteen skills, from Woodcutting to Runecraft, each with its own level and perks.'
   - group: Keeping going
     title: Essence
     line: What the forest leaves behind
@@ -671,9 +946,17 @@ MonoBehaviour:
     unlockedByCreature: {fileID: 0}
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
+    unlockedBySkill: {fileID: 0}
+    art: {fileID: 21300000, guid: ad682811bacef654688bf3f0c8496e03, type: 3}
+    summary: Cursed Essence comes from the forest. Purified at the altar, it makes your gear and skills stronger.
   creatures:
   - {fileID: 11400000, guid: afbf4a58442496641826a078787f7e2e, type: 2}
   - {fileID: 11400000, guid: e646ff37405b36e43a4fa710a23060e2, type: 2}
+  - {fileID: 11400000, guid: b22c293353a041944aa0e1f4eb3bcb99, type: 2}
+  - {fileID: 11400000, guid: 87ebac26be444f642bbd6de5b4fa2766, type: 2}
+  - {fileID: 11400000, guid: 1d702ae3d8ee6e442a576d496cbec3d4, type: 2}
+  - {fileID: 11400000, guid: f728b8ea230e9154b865d39c8e5d49be, type: 2}
+  - {fileID: 11400000, guid: 73e1e95ef9042da4bab4b30a2b0d157f, type: 2}
   - {fileID: 11400000, guid: 20c7f11cbb9bb214f95fc0f2a51db9d9, type: 2}
   - {fileID: 11400000, guid: abf292b6af701c64eb533aad22ee47c6, type: 2}
   - {fileID: 11400000, guid: 1fc74e15f41da234fb9eeedcfe1067f0, type: 2}
@@ -686,7 +969,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 489a951193635d0419115cdcc5775d51, type: 2}
   - {fileID: 11400000, guid: 916ab17a0415c3041aec1267259d1567, type: 2}
   - {fileID: 11400000, guid: d0d3ffee305a6ca489fca58781bf31c1, type: 2}
-  - {fileID: 11400000, guid: b22c293353a041944aa0e1f4eb3bcb99, type: 2}
   residentNotes:
   - who: {fileID: 11400000, guid: 4260d606f7c62c042b848adc806c44d3, type: 2}
     about: {fileID: 11400000, guid: afbf4a58442496641826a078787f7e2e, type: 2}

@@ -233,6 +233,7 @@ public sealed class PlayerInputHandler : MonoBehaviour
         Hook(GameInput.SwapWeapon, OnSwapWeapon, on);
         Hook(GameInput.Talents, OnTalents, on);
         Hook(GameInput.Journal, OnJournal, on);
+        Hook(GameInput.Tutorial, OnTutorial, on);
         Hook(GameInput.Haven, OnHaven, on);
         Hook(GameInput.WorldMap, OnWorldMap, on);
         Hook(GameInput.CommandWheel, OnCommandWheel, on);
@@ -271,6 +272,12 @@ public sealed class PlayerInputHandler : MonoBehaviour
             return;
         }
 
+        if (context.performed)
+        {
+            // The first crouch opens the sneaking tutorial, before any creature is near enough to train it.
+            JournalNotices.Tried(ProficiencyTraining.Sneaking);
+        }
+
         if (!GameOptions.ToggleSneak.On)
         {
             stealth.SetSneaking(context.performed);
@@ -307,6 +314,8 @@ public sealed class PlayerInputHandler : MonoBehaviour
 
     private void OnTalents(InputAction.CallbackContext context) => RequestWindow(UIWindowId.Proficiencies);
     private void OnJournal(InputAction.CallbackContext context) => RequestWindow(UIWindowId.Journal);
+
+    private void OnTutorial(InputAction.CallbackContext context) => TutorialWindow.Toggle();
 
     private void OnHaven(InputAction.CallbackContext context) => RequestWindow(UIWindowId.Haven);
 

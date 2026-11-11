@@ -75,11 +75,11 @@ MonoBehaviour:
   fallsByAnimation: 1
   sizeVariation: 0.08
   shadeVariation: 0.12
-  portrait: {fileID: 21300000, guid: afd57db930e4b6443ac343b993132c70, type: 3}
-  journalLore: An ordinary boar, the kind that roots along the woods' edge. Good meat, a bad temper.
-  journalAdvice: It leaves you alone at a distance. Step too close and it charges straight at you, then stands blown and open when the charge is spent. Roll aside, and strike it then.
-  journalHabitat: The Haven's meadows and the glades of the woods.
-  journalKillsToKnow: 3
+  portrait: {fileID: 21300000, guid: 310729cc44d02cc45a8934cd3853a9ac, type: 3}
+  journalLore: A red fox, sharp-eared and never far from the meadow's edge. In winter its coat goes white.
+  journalAdvice: Small, fast and off at the first sound. Not much meat, but a fine pelt.
+  journalHabitat: The edges of the meadows, all year round
+  journalKillsToKnow: 1
   deathSound: {fileID: 11400000, guid: ca8ba3725c4bbe045acd0ef82418f064, type: 2}
   hurtSound: {fileID: 11400000, guid: 761daa7b76534764cb2030171e6109aa, type: 2}
   attackSound: {fileID: 11400000, guid: df77dee7138a08e4da8697c220f0024b, type: 2}

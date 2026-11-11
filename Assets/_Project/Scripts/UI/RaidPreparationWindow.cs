@@ -142,6 +142,7 @@ public sealed partial class RaidPreparationWindow : MonoBehaviour
     private RectTransform panel;
     private ItemTooltipView tooltip;
     private TMP_Text titleLabel;
+    private RawImage placeArt;
     private TMP_Text descriptionLabel;
     private GameObject briefing;
     private TMP_Text thisRunHeading;
@@ -341,6 +342,7 @@ public sealed partial class RaidPreparationWindow : MonoBehaviour
         enterLabel.text = closed ? "Locked" : "Enter Raid";
 
         titleLabel.text = raid != null ? raid.DisplayName : "The portal is dormant";
+        ShowPlace(raid != null ? raid.PlaceArtwork : null);
         descriptionLabel.text = raid != null ? raid.Description : "";
         briefing.SetActive(raid != null);
         preparation.SetActive(raid != null && !closed);

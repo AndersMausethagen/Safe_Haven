@@ -209,6 +209,8 @@ public sealed class JournalSaveData
     public List<string> killedBy = new List<string>();
     public string pinned = "";
     public List<RaidRecordSaveData> raids = new List<RaidRecordSaveData>();
+    /// <summary>Skills tried at least once, which open their mechanics pages. Missing in older saves.</summary>
+    public List<string> tried = new List<string>();
 }
 
 [Serializable]

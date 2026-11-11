@@ -19,6 +19,19 @@ public sealed partial class RaidPreparationWindow
         panel.gameObject.AddComponent<Outline>().effectDistance = new Vector2(1f, -1f);
         panel.gameObject.AddComponent<UIRole>().Set(UIRole.Kind.Window);
 
+        // The chosen place's painting across the header, fading into the panel to the left and below so the title stays readable.
+        // Inset from the top and right edges so the panel's carved corners stay in view.
+        placeArt = At("Place Art", panel, 0f, FrameInset, Width - FrameInset, HeaderHeight - FrameInset).gameObject.AddComponent<RawImage>();
+        placeArt.raycastTarget = false;
+        placeArt.enabled = false;
+        var fade = At("Place Fade", panel, 0f, FrameInset, Width - FrameInset, HeaderHeight - FrameInset).gameObject.AddComponent<RawImage>();
+        fade.texture = HeaderFade();
+        fade.color = style.Panel;
+        fade.raycastTarget = false;
+        // Behind everything else on the panel, the carved corners included.
+        fade.transform.SetAsFirstSibling();
+        placeArt.transform.SetAsFirstSibling();
+
         TMP_Text kicker = Label("Kicker", panel, Margin, 30f, 500f, 24f, 17f, style.Accent);
         kicker.text = "THE PORTAL";
         kicker.characterSpacing = 12f;
@@ -36,6 +49,48 @@ public sealed partial class RaidPreparationWindow
         BuildStats(style);
         BuildFooter(style);
         BuildTooltip(style);
+    }
+
+    private const float HeaderHeight = 160f;
+    private const float FrameInset = 38f;
+
+    // Clear at the top right, solid from the left edge to the title's end and behind the description: alpha only, tinted the panel's colour.
+    private static Texture2D HeaderFade()
+    {
+        const int width = 128;
+        const int height = 32;
+        var texture = new Texture2D(width, height, TextureFormat.RGBA32, false) { wrapMode = TextureWrapMode.Clamp, name = "Raid Header Fade" };
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                float across = Mathf.InverseLerp(0.75f, 0.32f, x / (width - 1f));
+                // Solid under the description line (the lower third), clearing towards the top.
+                float down = Mathf.InverseLerp(0.7f, 0.36f, y / (height - 1f));
+                float alpha = Mathf.SmoothStep(0f, 1f, Mathf.Max(across, down));
+                texture.SetPixel(x, y, new Color(1f, 1f, 1f, Mathf.Max(alpha, 0.18f)));
+            }
+        }
+
+        texture.Apply();
+        return texture;
+    }
+
+    // The middle band of the painting that fits the header's shape.
+    private void ShowPlace(Sprite art)
+    {
+        placeArt.enabled = art != null;
+        if (art == null)
+        {
+            return;
+        }
+
+        Texture texture = art.texture;
+        Rect rect = art.textureRect;
+        float band = Mathf.Min(1f, (HeaderHeight - FrameInset) / (Width - FrameInset) * rect.width / rect.height);
+        placeArt.texture = texture;
+        placeArt.uvRect = new Rect(rect.x / texture.width, (rect.y + rect.height * (0.55f - band * 0.5f)) / texture.height,
+            rect.width / texture.width, rect.height * band / texture.height);
     }
 
     private void BuildBriefing(UIStyle style)

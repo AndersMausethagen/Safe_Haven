@@ -15,6 +15,7 @@ MonoBehaviour:
   id: expedition.eirik
   displayName: Eirik
   description: Soldier from the expedition into the Unquiet Forest. Lost when the waystone connection broke.
+  portrait: {fileID: 21300000, guid: 226878f3b74cac74f92744bfe07aca7f, type: 3}
   rescueLine: Took you long enough. How many are behind you?
   arrivalLine: Show me the wall. Then show me where it's weakest.
   welcomeLine: 
@@ -48,5 +49,6 @@ MonoBehaviour:
   - kind: 2
     lines:
     - That many, and I'm still here. Don't tell the young ones. They'll want to try it.
+  returningLines: []
   jobs:
   - {fileID: 11400000, guid: f918ba89b7b235448905310320940c70, type: 2}

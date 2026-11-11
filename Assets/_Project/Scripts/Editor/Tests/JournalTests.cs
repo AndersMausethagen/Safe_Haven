@@ -265,7 +265,11 @@ public sealed class JournalTests
             Animator animator = creature.Prefab.GetComponentInChildren<Animator>();
             Assert.IsNotNull(animator, creature.name);
             Assert.IsNotNull(animator.runtimeAnimatorController, $"{creature.name} has no controller: bodies of one model share theirs.");
-            Assert.IsNotNull(animator.avatar, creature.name);
+            // The game animals (Quaternius deer, stag and fox) play generic clips bound by path, which need no avatar.
+            if (!creature.Timid)
+            {
+                Assert.IsNotNull(animator.avatar, creature.name);
+            }
         }
 
         var heartroot = Settings.Creatures.First(c => c.name == "TheHeartroot").Prefab.GetComponent<CapsuleCollider>();

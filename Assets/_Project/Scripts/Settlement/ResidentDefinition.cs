@@ -14,6 +14,8 @@ public sealed class ResidentDefinition : ScriptableObject, IQuestTarget
     [SerializeField] private string displayName;
     [Tooltip("Who they are, in a sentence or two. Shown when talking to them.")]
     [SerializeField, TextArea(2, 4)] private string description;
+    [Tooltip("A painted head-and-shoulders portrait for the Haven window's People page (LocalSpawn: Tools/LocalSpawn/resident_portraits.json).")]
+    [SerializeField] private Sprite portrait;
 
     [Header("Lines")]
     [Tooltip("Said when the player frees them in a raid.")]
@@ -48,6 +50,7 @@ public sealed class ResidentDefinition : ScriptableObject, IQuestTarget
     public string QuestId => Id;
     public string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;
     public string Description => description;
+    public Sprite Portrait => portrait;
     public string RescueLine => rescueLine;
     public string ArrivalLine => arrivalLine;
     public string WelcomeLine => welcomeLine;

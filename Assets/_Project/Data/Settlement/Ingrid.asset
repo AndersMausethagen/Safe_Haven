@@ -15,6 +15,7 @@ MonoBehaviour:
   id: ingrid
   displayName: Ingrid
   description: The expedition's alchemist, and the first of the seven to come home. She knows more about the curse than she lets on.
+  portrait: {fileID: 21300000, guid: 32762d1dc60e5bb47af321d3959d552d, type: 3}
   rescueLine: It's you! I saw a light through the trees and thought the forest had finally taken my wits. Get me out of here.
   arrivalLine: I kept saying the word so the forest couldn't take it. Fire. Fire. Fire. And then I saw yours.
   welcomeLine: 'I watched your fire for three nights from under a root. You should know two things. The old troll at the stones didn''t come for us: it came for the door. And on the second night something walked past my root in Granheim mail, like Eirik''s. I called to it. It turned, and it didn''t know its name. When the stones broke I heard Bjarne''s hammer start up, somewhere deep in the woods, slow, like he''s working one-handed. Let me be of use until we find them.'

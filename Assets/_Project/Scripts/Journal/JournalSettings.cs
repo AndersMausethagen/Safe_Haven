@@ -20,6 +20,12 @@ public sealed class JournalPage
     public ResidentDefinition unlockedByResident;
     [Tooltip("Hidden until it is found in a raid: searching a cache can turn it up, in the order the pages are listed.")]
     public bool foundInRaids;
+    [Tooltip("Hidden until the player first tries this skill (swings at a tree, casts a line, lands a blow). A mechanics page that opens is shown as a tutorial.")]
+    public ProficiencyDefinition unlockedBySkill;
+    [Tooltip("A painting of it, for the tutorial window and the journal (LocalSpawn: Tools/LocalSpawn/tutorial_art.json). Mechanics pages only.")]
+    public Sprite art;
+    [Tooltip("What it is, in a sentence or two, above how it works (the body). Mechanics pages only.")]
+    [TextArea(2, 4)] public string summary;
 }
 
 /// <summary>What someone at home has to say about a creature, shown on its page once they are back.</summary>

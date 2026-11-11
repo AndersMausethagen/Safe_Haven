@@ -1,0 +1,9 @@
+{
+  "_about": "Paintings of each raid (Tools/LocalSpawn/generate_ui_art.py raids, 1920x1088): <Raid> is the place, shown in the raid planner; <Raid>_extracted and <Raid>_failed are the results screen after getting out alive or not (RaidDefinition's Extracted and Failed Artwork). Keyed by the RaidDefinition asset's name. Wide landscapes, the person small or absent.",
+  "MistyWoods": "The Misty Woods: an ancient Nordic pine forest where thick mist hangs between huge mossy trunks, a faint path winding into the grey, old rune-carved standing stones half swallowed by moss, eerie pale light, cursed and quiet.",
+  "MistyWoods_extracted": "A traveller seen from behind stepping out of a glowing portal of warm golden light between ancient standing stones, a heavy pack of loot on their back, leaving the dark misty pine forest behind for a warm sunrise over a small Norse village.",
+  "MistyWoods_failed": "A dropped pack and a broken spear lying in the moss of a dark misty pine forest at night, the contents scattered, cold mist swallowing everything, glowing eyes far between the trees.",
+  "TrollValley": {"style": "raid", "prompt": "Troll Valley: a deep Nordic valley of grey boulders and old arched stone bridges over a rushing river, huge mossy troll shapes lumbering in the distance, mountains and pine slopes in the mist, the light grey-green and cold."},
+  "TrollValley_extracted": "A traveller seen from behind crossing an old stone bridge towards a glowing golden portal, a sack of grey-green trollstone on their back, a huge troll far behind in the misty valley, dawn light breaking over the mountains.",
+  "TrollValley_failed": "An old arched stone bridge in a grey misty valley, a dropped pack and a shattered shield lying on its stones, a huge mossy troll's shadow falling across it, cold drizzle."
+}

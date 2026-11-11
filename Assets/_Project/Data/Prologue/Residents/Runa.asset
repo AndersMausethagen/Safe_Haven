@@ -15,6 +15,7 @@ MonoBehaviour:
   id: expedition.runa
   displayName: Runa
   description: Tracker from the expedition into the Unquiet Forest. Lost when the waystone connection broke.
+  portrait: {fileID: 21300000, guid: 597886e2642f88c4eab3fc52a1e60eb4, type: 3}
   rescueLine: I've watched you for two days. You leave a trail like a cart.
   arrivalLine: This place can be found. Good. So can everything else, by the same road.
   welcomeLine: 
@@ -48,5 +49,6 @@ MonoBehaviour:
   - kind: 1
     lines:
     - The forest doesn't hate us. It doesn't notice us. That's worse. Next time I pick the way.
+  returningLines: []
   jobs:
   - {fileID: 11400000, guid: 6af8ca180b22423448d6e1e307037eb6, type: 2}

@@ -3,7 +3,8 @@ using UnityEngine;
 
 /// <summary>
 /// Tells the player when the journal has something new, finds torn pages in raids and writes each raid down. The journal's window only reads what this leaves
-/// behind, so all of this goes on with the window closed.
+/// behind, so all of this goes on with the window closed. A page of how things work that opens becomes a tutorial (Tutorials): the first time a skill is
+/// tried (Tried, from practice and from the systems that start one: a swing at a node, a cast) opens the pages that wait for it.
 /// </summary>
 public static class JournalNotices
 {
@@ -12,7 +13,23 @@ public static class JournalNotices
     {
         GameEvents.Raised -= OnGameEvent;
         GameEvents.Raised += OnGameEvent;
+        ExperienceTracker.Practised -= OnPractised;
+        ExperienceTracker.Practised += OnPractised;
     }
+
+    private static void OnPractised(ProficiencyDefinition skill, float amount) => Tried(skill);
+
+    /// <summary>The player has just tried a skill: the first time, the pages that wait for it open.</summary>
+    public static void Tried(ProficiencyDefinition skill)
+    {
+        if (skill != null && GameSession.Progress.Journal.NoteTried(skill.Id))
+        {
+            CheckPages();
+        }
+    }
+
+    /// <summary>Tried for the skill a kind of practice trains (fishing, melee...).</summary>
+    public static void Tried(ProficiencyTraining training) => Tried(LevelingSettings.Current.SkillTrainedBy(training));
 
     private static void OnGameEvent(GameEvent happened)
     {
@@ -30,7 +47,15 @@ public static class JournalNotices
         CharacterProgress progress = GameSession.Progress;
         var fresh = new List<string>();
         Collect(settings.Backstory, log, progress, fresh);
-        Collect(settings.Mechanics, log, progress, fresh);
+        // How things work is told by the tutorial notice, not in words.
+        foreach (JournalPage page in settings.Mechanics)
+        {
+            if (JournalContent.IsUnlocked(page, log, progress) && progress.Journal.Announce(page.title))
+            {
+                Tutorials.Add(page);
+            }
+        }
+
         if (fresh.Count == 1)
         {
             Post($"New in your journal: {fresh[0]} (J)");

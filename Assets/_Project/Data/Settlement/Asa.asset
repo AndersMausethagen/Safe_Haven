@@ -15,6 +15,7 @@ MonoBehaviour:
   id: settler.asa
   displayName: Asa
   description: A farmer from a village that isn't there any more. She brought the seed, and little else.
+  portrait: {fileID: 21300000, guid: 00080c620758e334298ab876619b788e, type: 3}
   rescueLine: You're not from the village. Doesn't matter. Help me with this sack.
   arrivalLine: There's good dirt under all this moss. Who's been using it?
   welcomeLine: 

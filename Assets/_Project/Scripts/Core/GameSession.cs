@@ -163,6 +163,7 @@ public static class GameSession
     public static void StartNewGame(CharacterAppearance look = null)
     {
         Reset();
+        Tutorials.Clear();
         Appearance = look;
     }
 
@@ -170,6 +171,8 @@ public static class GameSession
     public static void LoadGame(LoadedGame game)
     {
         Reset();
+        // Tutorials waiting belong to the game they opened in.
+        Tutorials.Clear();
         stash = game.Stash;
         world = game.World;
         quests = game.Quests;

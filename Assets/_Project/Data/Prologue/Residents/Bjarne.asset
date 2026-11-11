@@ -15,6 +15,7 @@ MonoBehaviour:
   id: expedition.bjarne
   displayName: Bjarne
   description: Smith from the expedition into the Unquiet Forest. Lost when the waystone connection broke.
+  portrait: {fileID: 21300000, guid: cebe443fe120590438073ac16c885b26, type: 3}
   rescueLine: You took your time. Mind the hammer.
   arrivalLine: Where's the anvil? No, don't tell me. I'll find it.
   welcomeLine: I blazed the trees going in, a cut every twenty paces. Coming back, my marks were on the wrong side of them. The road hadn't moved. The roots had moved it, under us, in the night. Tor was thrown further in than me, with a bad leg. Listen for a saw where nobody saws.

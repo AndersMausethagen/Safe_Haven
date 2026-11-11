@@ -24,6 +24,7 @@ public sealed class JournalRecord
     private readonly HashSet<string> announced = new HashSet<string>();
     private readonly HashSet<string> found = new HashSet<string>();
     private readonly HashSet<string> killedBy = new HashSet<string>();
+    private readonly HashSet<string> tried = new HashSet<string>();
     private readonly List<RaidRecord> raids = new List<RaidRecord>();
 
     public string PinnedQuest { get; set; }
@@ -31,6 +32,8 @@ public sealed class JournalRecord
     public IEnumerable<string> Announced => announced;
     public IEnumerable<string> Found => found;
     public IEnumerable<string> KilledBy => killedBy;
+    /// <summary>The skills the player has tried at least once (by id), which open their mechanics pages.</summary>
+    public IEnumerable<string> Tried => tried;
     public IReadOnlyList<RaidRecord> Raids => raids;
 
     public bool HasRead(string key) => read.Contains(key);
@@ -39,6 +42,9 @@ public sealed class JournalRecord
     public void NoteFound(string page) => found.Add(page);
     public bool WasKilledBy(string creatureId) => creatureId != null && killedBy.Contains(creatureId);
     public void NoteKilledBy(string creatureId) => killedBy.Add(creatureId);
+    public bool HasTried(string skillId) => skillId != null && tried.Contains(skillId);
+    /// <summary>True the first time a skill is tried.</summary>
+    public bool NoteTried(string skillId) => skillId != null && tried.Add(skillId);
 
     /// <summary>True the first time a page is told about.</summary>
     public bool Announce(string page) => announced.Add(page);
@@ -52,9 +58,12 @@ public sealed class JournalRecord
         }
     }
 
-    public void Restore(IEnumerable<string> savedRead, IEnumerable<string> savedAnnounced, IEnumerable<string> savedFound, IEnumerable<string> savedKilledBy, IEnumerable<RaidRecord> savedRaids, string pinned)
+    public void Restore(IEnumerable<string> savedRead, IEnumerable<string> savedAnnounced, IEnumerable<string> savedFound, IEnumerable<string> savedKilledBy, IEnumerable<RaidRecord> savedRaids, string pinned,
+        IEnumerable<string> savedTried = null)
     {
         read.Clear();
+        tried.Clear();
+        tried.UnionWith(savedTried ?? new string[0]);
         announced.Clear();
         found.Clear();
         killedBy.Clear();

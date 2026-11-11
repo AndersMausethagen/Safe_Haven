@@ -180,6 +180,8 @@ MonoBehaviour:
   idleGrazeChance: 0.6
   idleSleepChance: 0.1
   idleSleepAttention: 0.3
+  timid: 0
+  boltSeconds: 7
   canBeFinished: 0
   flankSpread: 0.4
   poise: 40
@@ -193,11 +195,11 @@ MonoBehaviour:
   fallsByAnimation: 0
   sizeVariation: 0.08
   shadeVariation: 0.12
-  portrait: {fileID: 21300000, guid: afd57db930e4b6443ac343b993132c70, type: 3}
-  journalLore: An ordinary boar, the kind that roots along the woods' edge. Good meat, a bad temper.
-  journalAdvice: It leaves you alone at a distance. Step too close and it charges straight at you, then stands blown and open when the charge is spent. Roll aside, and strike it then.
-  journalHabitat: Meadows and the woods' edge
-  journalKillsToKnow: 3
+  portrait: {fileID: 21300000, guid: ab66feaef411117448f1348aa709939b, type: 3}
+  journalLore: An ordinary wild boar, the kind the old villages hunted every autumn. There are fewer of them than there were, and the ones left are wary.
+  journalAdvice: It will run if it can and fight if it can't. Come at it from where it can't see you, and keep out of the way of the tusks once it turns.
+  journalHabitat: The meadows and woods near home
+  journalKillsToKnow: 1
   deathSound: {fileID: 11400000, guid: ca8ba3725c4bbe045acd0ef82418f064, type: 2}
   hurtSound: {fileID: 11400000, guid: 761daa7b76534764cb2030171e6109aa, type: 2}
   attackSound: {fileID: 11400000, guid: df77dee7138a08e4da8697c220f0024b, type: 2}

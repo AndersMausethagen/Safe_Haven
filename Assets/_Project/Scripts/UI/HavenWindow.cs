@@ -476,7 +476,7 @@ public sealed class HavenWindow : MonoBehaviour
         BuildPeople(style);
         storesPage = new HavenListPage(body, "Stores", Width, PageHeight, 2, "Nothing is stored in camp yet. Build a chest and bring something home.", RunAction);
         buildingsPage = new HavenListPage(body, "Buildings", Width, PageHeight, 2, "Nothing to show yet.", RunAction);
-        peoplePage = new HavenListPage(body, "People", Width, PageHeight, 1, "Nobody has come home yet.", RunAction);
+        peoplePage = new HavenListPage(body, "People", Width, PageHeight, 1, "Nobody has come home yet.", RunAction, detailIconSize: 150f);
         raidsPage = new HavenListPage(body, "Raids", Width, PageHeight, 1, "", RunAction);
         BuildFooter(body, style);
 

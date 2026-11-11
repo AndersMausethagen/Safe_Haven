@@ -293,6 +293,8 @@ public sealed class PlayerGathering : MonoBehaviour
         }
 
         GatheringNodeDefinition definition = startedNode.Definition;
+        // The first swing at a tree or a rock (or the first plant picked) opens its tutorial, before any experience is earned.
+        JournalNotices.Tried(LevelingSettings.Current.SkillFor(definition.GatherTool));
         GatheringMinigameSettings settings = GatheringMinigameSettings.Current;
         GatheringToolProfile profile = settings.Enabled ? settings.Profile(definition.GatherTool) : null;
         if (profile == null)

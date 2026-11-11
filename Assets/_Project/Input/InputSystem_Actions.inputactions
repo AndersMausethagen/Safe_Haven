@@ -205,6 +205,15 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "Tutorial",
+                    "type": "Button",
+                    "id": "b76ffde2-bc0e-4eae-8e63-c518c773214c",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "Talents",
                     "type": "Button",
                     "id": "0160a0ed-47bd-450a-85d2-058ce60b03be",
@@ -840,6 +849,17 @@
                     "processors": "",
                     "groups": "Keyboard&Mouse",
                     "action": "Journal",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "3bfd88e2-d373-41a3-9e2c-582d31436893",
+                    "path": "<Keyboard>/t",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "Tutorial",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

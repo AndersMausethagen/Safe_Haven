@@ -40,4 +40,6 @@ public enum UIWindowId
     Cheats = 16,
     /// <summary>The journal (J): backstory, quests, creatures and how things work.</summary>
     Journal = 17,
+    /// <summary>A tutorial: how one thing in the game works, with its picture (T, or the notice that one is waiting).</summary>
+    Tutorial = 18,
 }

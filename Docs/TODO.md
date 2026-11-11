@@ -12,7 +12,24 @@ game's inventory.
       line in `Tools/LocalSpawn/item_icons.json`, `generate_item_icons.py all <id> --force`, then BuildItemIcons.Apply.
 - [ ] Grave Iron's bar took a gold sheen from its prompt ("shaped like a gold bar"); a pair item (gloves, boots) often
       shows one of the pair.
-- [ ] Building, skill and perk icons are still placeholders or renders: the same pipeline would do them.
+- [x] Building, skill and perk icons are still placeholders or renders: the same pipeline would do them. (Done 2026-11-11:
+      34 buildings, 7 abilities, 13 skills, 130 perks, 6 essences, 3 status effects, 7 boon icons.)
+
+## Tutorials and interface art (2026-11-11)
+
+Mechanics pages of the journal open as tutorials the first time a thing is tried (see ARCHITECTURE.md › Journal); the
+notice and the window were seen in Play from the CLI, before their pictures were painted. Creature, resident and raid
+paintings and the status icons beside the vitals are new too.
+- [ ] Play it by hand from a new game: is the notice noticed, is T found, and is opening five tutorials at once at the
+      first scene too many? (Your Windows, Your Journal, Hunger and Thirst and Skills and Perks come at once.)
+- [ ] The seven combat pages all open on the first blow that lands. Spread them (parry, dodge, first stagger) if it is
+      too much at once.
+- [ ] Look at the paintings in the game: the tutorial window, the journal's creatures, the People page, the raid
+      planner's header and the results screen; the status icons beside the vitals.
+- [ ] 21 quests from 2026-11-10 have no Journal Notes (BringAsaHome and the other homecomings, the job quests,
+      HeavyLoads, SafeKeeping): JournalTests.EveryQuest_HasNotes fails until they are written in BuildJournal.QuestNotes.
+- [ ] Opening SafeHaven.unity rebuilds the world's scatter (a 280k-line scene diff and the terrain assets) though no
+      world feature changed: find out why the fingerprints differ on load.
 
 ## Spoken dialogue (2026-11-10)
 
