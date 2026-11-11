@@ -15,8 +15,11 @@ Built and checked in Play (see GDD §10.9); none of it played by hand yet.
       Trample), fighting from the saddle, swimming, the first horse by day 3, the bog's Toxic Horse. Tune by hand:
       veers every 2.5-5 s costing 0.28 balance a second, the bond's numbers (4 a feed, 8 a grooming, 6 a kilometre,
       2 lost a day), breeding at bond 50 and 2 days, the Toxic Horse's 5% an hour from dusk to dawn.
-- [ ] Mounting is the pack's clip played in place while the body is moved from the ground to the saddle; if it reads
-      badly, line the clip's own root motion up with the seat instead.
+- [x] Mounting follows the pack's clip's own path (measured from its root motion: HorseSettings › Mount Path), only from
+      beside the horse, which turns its side to the player (2026-11-11, from the user's playtest). The horse steps round
+      when it turns (H_Turn clips, a 2D blend with the gaits' turning clips) and pivots no faster than 84° a second.
+- [ ] Tune by hand (2026-11-11): the drag (2.6 m/s at full strain after 0.5 s without a tap or a lean), the shake (0.15,
+      0.26 a jolt), the camera's 80% while taming, barley every 6-14 s, 2-4 times.
 - [ ] The saddle is the pack's undead one (bones and spikes hang from it); a living horse wants a plainer one.
 - [ ] The Stable's model is the Haven's shed and Skigard put together; it wants its own from a concept.
 - [ ] Co-op: horses aren't networked. A visitor can't catch, ride or saddle the host's horses; a host's ride isn't seen by friends.

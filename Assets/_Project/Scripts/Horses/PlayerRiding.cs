@@ -9,8 +9,9 @@ using UnityEngine.AI;
 /// horse has the stamina, the sneak key walks it, and E gets down (or, on a breaking ride, gives the barley it asks for).
 /// On a horse of their own the player fights from the saddle: their weapon swings and their bow draws as on foot
 /// (PlayerStateMachine › CanFightAboard), the pack's rider clips show it (PlayerRidingAnimation), and Horsemanship's
-/// Mounted Damage adds to it. Getting on and off plays the pack's clips while the body is moved between the ground beside
-/// the horse and the saddle. Added to the player the first time it is needed (<see cref="For"/>).
+/// Mounted Damage adds to it. Getting on is only from beside the horse: it turns its side to the player, who steps to its
+/// shoulder and climbs on along the pack's clip's own path (HorseSettings › Mount Path); getting off runs it backwards.
+/// Added to the player the first time it is needed (<see cref="For"/>).
 /// </summary>
 [DisallowMultipleComponent]
 public sealed class PlayerRiding : MonoBehaviour
@@ -24,6 +25,7 @@ public sealed class PlayerRiding : MonoBehaviour
     private float ridden;
     private PlayerRidingAnimation body;
     private Coroutine moving;
+    private bool feetFree;
 
     /// <summary>True while getting on or off: no steering, no getting down again.</summary>
     public bool IsMounting => moving != null;
@@ -95,7 +97,23 @@ public sealed class PlayerRiding : MonoBehaviour
     public void HoldRope(HorseTaming horse)
     {
         holding = horse;
+        feetFree = false;
         stateMachine.SetAboard(true);
+        movement.SetSpeedScale(this, 0f);
+    }
+
+    /// <summary>The horse has given in: the player keeps the rope but walks up to it to get on.</summary>
+    public void SlackRope()
+    {
+        feetFree = true;
+        movement.ClearFocusDirection();
+        movement.SetSpeedScale(this, 1f);
+    }
+
+    /// <summary>It fights again: feet planted, facing it.</summary>
+    public void TautenRope()
+    {
+        feetFree = false;
         movement.SetSpeedScale(this, 0f);
     }
 
@@ -107,6 +125,7 @@ public sealed class PlayerRiding : MonoBehaviour
         }
 
         holding = null;
+        feetFree = false;
         movement.ClearFocusDirection();
         movement.SetSpeedScale(this, 1f);
         if (Riding == null)
@@ -117,11 +136,57 @@ public sealed class PlayerRiding : MonoBehaviour
 
     // ----- In the saddle -----
 
+    /// <summary>Whether the player can get on this horse now: near enough (HorseSettings › Mount Reach), it grown, out of
+    /// its stall and nobody on it. <paramref name="why"/> says why not, for the player.</summary>
+    public bool CanMount(Horse horse, out string why)
+    {
+        why = null;
+        if (horse == null || !horse.IsAlive || horse.Rider != null || Riding != null)
+        {
+            return false;
+        }
+
+        if (horse.IsStabled)
+        {
+            why = "Lead it out of the stable first.";
+            return false;
+        }
+
+        if (!horse.IsGrown)
+        {
+            why = "It is too young to ride.";
+            return false;
+        }
+
+        Vector3 to = transform.position - horse.transform.position;
+        to.y = 0f;
+        if (to.magnitude > HorseSettings.Current.MountReach)
+        {
+            why = "Walk up beside it to get on.";
+            return false;
+        }
+
+        return true;
+    }
+
     public void Mount(Horse horse) => Mount(horse, animate: true);
 
+    /// <summary>Gets on: animated, the horse turns its side to the player, they step to it and climb on along the pack's
+    /// own path (only from near enough, <see cref="CanMount"/>); not animated (the tamed copy taking the wild horse's
+    /// place), straight into the saddle.</summary>
     public void Mount(Horse horse, bool animate)
     {
-        if (horse == null || !horse.IsAlive || horse.Rider != null || horse.IsStabled || !horse.IsGrown)
+        if (animate && !CanMount(horse, out string why))
+        {
+            if (!string.IsNullOrEmpty(why))
+            {
+                GameMessages.Post(why, MessageKind.Warning);
+            }
+
+            return;
+        }
+
+        if (horse == null || !horse.IsAlive || horse.Rider != null)
         {
             return;
         }
@@ -134,14 +199,14 @@ public sealed class PlayerRiding : MonoBehaviour
         Riding = horse;
         horse.Rider = this;
         stateMachine.SetAboard(true);
-        Vector3 from = horse.Seat.InverseTransformPoint(transform.position);
-        movement.SitAt(horse.Seat, horse.SeatOffset);
         horse.Motion.BeginRidden();
         if (animate && body.HasLayer)
         {
-            bool right = Vector3.Dot(transform.position - horse.transform.position, horse.transform.right) > 0f;
-            body.PlayMount(true, right);
-            moving = StartCoroutine(Climb(horse, from, horse.SeatOffset, null));
+            moving = StartCoroutine(GetOn(horse));
+        }
+        else
+        {
+            movement.SitAt(horse.Seat, horse.SeatOffset);
         }
 
         lastSeat = horse.transform.position;
@@ -168,25 +233,83 @@ public sealed class PlayerRiding : MonoBehaviour
         Mount(tamed, animate: false);
     }
 
-    // Moves the body from one place by the seat to another while the clip plays, then does what comes after.
-    private IEnumerator Climb(Horse horse, Vector3 from, Vector3 to, System.Action then)
+    private IEnumerator GetOn(Horse horse)
     {
+        HorseSettings settings = HorseSettings.Current;
+        Vector3 to = transform.position - horse.transform.position;
+        to.y = 0f;
+        bool right = Vector3.Dot(to, horse.transform.right) > 0f;
+        // It turns its side to the rider: whichever side they are on.
+        Vector3 side = to.sqrMagnitude > 0.01f ? to.normalized : right ? horse.transform.right : -horse.transform.right;
+        Vector3 forward = Quaternion.Euler(0f, -90f, 0f) * (right ? side : -side);
+        Quaternion facing = Quaternion.LookRotation(forward, Vector3.up);
         float started = Time.time;
-        while (Time.time - started < PlayerRidingAnimation.MountSeconds && horse != null)
+        while (horse != null && !horse.Motion.TurnToward(facing) && Time.time - started < 1.6f)
         {
-            float t = Mathf.SmoothStep(0f, 1f, (Time.time - started) / PlayerRidingAnimation.MountSeconds);
-            movement.SitAt(horse.Seat, Vector3.Lerp(from, to, t));
+            horse.Motion.Ride(Vector3.zero, 0);
+            yield return null;
+        }
+
+        // A step to where the pack's clip starts: beside its shoulder, facing it.
+        Vector3 start = PathPoint(horse, 0f, right, out _);
+        started = Time.time;
+        while (horse != null && Time.time - started < 0.9f)
+        {
+            Vector3 step = start - transform.position;
+            step.y = 0f;
+            if (step.magnitude < 0.06f)
+            {
+                break;
+            }
+
+            movement.Lunge(step.normalized * Mathf.Min(1.8f, step.magnitude / Mathf.Max(Time.deltaTime, 0.001f)), Time.deltaTime * 1.5f);
+            horse.Motion.Ride(Vector3.zero, 0);
+            yield return null;
+        }
+
+        if (horse == null)
+        {
+            moving = null;
+            yield break;
+        }
+
+        // Up into the saddle along the clip's own path, so the body rises only when the clip climbs.
+        float ground = transform.position.y;
+        body.PlayMount(true, right, settings.MountSeconds);
+        started = Time.time;
+        while (horse != null && Time.time - started < settings.MountSeconds)
+        {
+            Follow(horse, (Time.time - started) / settings.MountSeconds, right, ground);
             horse.Motion.Ride(Vector3.zero, 0);
             yield return null;
         }
 
         if (horse != null)
         {
-            movement.SitAt(horse.Seat, to);
+            movement.SitAt(horse.Seat, horse.SeatOffset);
         }
 
         moving = null;
-        then?.Invoke();
+    }
+
+    // Where the body is a share of the way through getting on (0 beside the horse, 1 in the saddle), from one side: the
+    // clip's path from the saddle, in the rider's own size, along the horse's facing.
+    private Vector3 PathPoint(Horse horse, float t, bool right, out float turn)
+    {
+        Vector4 point = HorseSettings.Current.MountPoint(t, right);
+        turn = point.w;
+        Vector3 seated = horse.Seat.TransformPoint(horse.SeatOffset);
+        Quaternion facing = Quaternion.Euler(0f, horse.transform.eulerAngles.y, 0f);
+        return seated + facing * ((Vector3)point * body.HumanScale);
+    }
+
+    // The body on the path; its start is put on the ground it stood on, whatever the horse's height, easing out by the saddle.
+    private void Follow(Horse horse, float t, bool right, float ground)
+    {
+        Vector3 at = PathPoint(horse, t, right, out float turn);
+        Vector3 start = PathPoint(horse, 0f, right, out _);
+        at.y += (ground - start.y) * (1f - Mathf.SmoothStep(0f, 1f, t));
+        movement.SitAt(horse.Seat, horse.Seat.InverseTransformPoint(at), turn);
     }
 
     private void StopMoving()
@@ -208,29 +331,48 @@ public sealed class PlayerRiding : MonoBehaviour
         }
 
         StopMoving();
-        Vector3 side = horse.transform.right * (thrown ? 1.8f : 1.2f);
-        Vector3 spot = horse.transform.position + side;
-        bool right = true;
-        if (!NavMesh.SamplePosition(spot, out NavMeshHit hit, 2.5f, NavMesh.AllAreas))
+        // Getting down: off the side with ground, the pack's clip along the same path backwards.
+        if (!thrown && horse.IsAlive && body.HasLayer)
         {
-            right = false;
-            if (!NavMesh.SamplePosition(horse.transform.position - side, out hit, 2.5f, NavMesh.AllAreas))
+            foreach (bool right in new[] { false, true })
             {
-                hit.position = horse.transform.position;
+                Vector3 foot = PathPoint(horse, 0f, right, out _);
+                if (NavMesh.SamplePosition(foot, out NavMeshHit ground, 1.2f, NavMesh.AllAreas))
+                {
+                    stateMachine.CanFightAboard = false;
+                    moving = StartCoroutine(GetOff(horse, right, ground.position));
+                    return;
+                }
             }
         }
 
-        // Getting down: the clip, the body lowered to the ground beside it, and then the horse is free.
-        if (!thrown && horse.IsAlive && body.HasLayer)
+        Vector3 side = horse.transform.right * (thrown ? 1.8f : 1.2f);
+        if (!NavMesh.SamplePosition(horse.transform.position + side, out NavMeshHit hit, 2.5f, NavMesh.AllAreas)
+            && !NavMesh.SamplePosition(horse.transform.position - side, out hit, 2.5f, NavMesh.AllAreas))
         {
-            stateMachine.CanFightAboard = false;
-            body.PlayMount(false, right);
-            Vector3 ground = hit.position;
-            moving = StartCoroutine(Climb(horse, horse.SeatOffset, horse.Seat.InverseTransformPoint(ground), () => GetDown(horse, ground)));
-            return;
+            hit.position = horse.transform.position;
         }
 
         GetDown(horse, hit.position);
+    }
+
+    private IEnumerator GetOff(Horse horse, bool right, Vector3 ground)
+    {
+        HorseSettings settings = HorseSettings.Current;
+        body.PlayMount(false, right, settings.MountSeconds);
+        float started = Time.time;
+        while (horse != null && Time.time - started < settings.MountSeconds)
+        {
+            Follow(horse, 1f - (Time.time - started) / settings.MountSeconds, right, ground.y);
+            horse.Motion.Ride(Vector3.zero, 0);
+            yield return null;
+        }
+
+        moving = null;
+        if (horse != null)
+        {
+            GetDown(horse, ground);
+        }
     }
 
     private void GetDown(Horse horse, Vector3 at)
@@ -319,7 +461,7 @@ public sealed class PlayerRiding : MonoBehaviour
 
     private void Update()
     {
-        if (holding != null)
+        if (holding != null && !feetFree)
         {
             Vector3 toward = holding.transform.position - transform.position;
             toward.y = 0f;

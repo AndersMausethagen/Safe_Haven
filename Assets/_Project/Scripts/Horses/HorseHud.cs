@@ -104,7 +104,7 @@ public sealed class HorseHud : MonoBehaviour
             second.Show(true);
             first.Set(taming.Strain, taming.Strain > 0.75f ? style.Danger : style.Warning);
             second.Set(taming.Strength, style.Accent);
-            hint.text = taming.Lean > 0.05f ? $"Tap {key}" : $"Tap {key}, lean away";
+            hint.text = taming.IsDragging ? $"It drags you! Tap {key}, lean away" : taming.Lean > 0.05f ? $"Tap {key}" : $"Tap {key}, lean away";
         }
         else if (taming != null && taming.Current == HorseTaming.Phase.GivenIn)
         {
@@ -112,7 +112,8 @@ public sealed class HorseHud : MonoBehaviour
             first.Show(true);
             second.Show(false);
             first.Set(taming.MountLeft / Mathf.Max(1f, taming.Horse.Definition.MountSeconds), style.Good);
-            hint.text = $"{key}: get on";
+            bool near = player != null && Vector3.Distance(player.transform.position, taming.Horse.transform.position) <= HorseSettings.Current.MountReach;
+            hint.text = near ? $"{key}: get on" : "Walk up beside it";
         }
         else if (taming != null && taming.Current == HorseTaming.Phase.Breaking)
         {

@@ -62,11 +62,25 @@ public sealed class HorseSettings : GameSettings<HorseSettings>
     [SerializeField, Min(0f)] private float leanTapsPerSecond = 3f;
     [Tooltip("Player stamina a second spent leaning on the rope.")]
     [SerializeField, Min(0f)] private float leanStaminaPerSecond = 9f;
+    [Tooltip("Metres a second the horse drags a player who neither leans nor taps, at full strain on the rope.")]
+    [SerializeField, Min(0f)] private float dragSpeed = 2.6f;
+    [Tooltip("Screen shake while it fights the rope (at full strain), and the jolt when it rears or turns to pull another way.")]
+    [SerializeField, Range(0f, 1f)] private float ropeShake = 0.15f;
+    [SerializeField, Range(0f, 1f)] private float ropeJolt = 0.26f;
     [Tooltip("On the breaking ride, seconds between bucks and veers, and how much balance one costs if not steered against.")]
     [SerializeField] private Vector2 buckSeconds = new Vector2(2.5f, 5f);
     [SerializeField, Range(0f, 1f)] private float buckBalance = 0.28f;
     [Tooltip("Balance a second won back by steering against the veer.")]
     [SerializeField, Min(0f)] private float steadyPerSecond = 0.35f;
+
+    [Header("Getting on")]
+    [Tooltip("Metres from the horse the player may stand and still get on (it turns its side to them).")]
+    [SerializeField, Min(0.5f)] private float mountReach = 2.4f;
+    [Tooltip("The rider's path onto a horse from its left, from the pack's Rider_Mount_Left clip (BuildHorses measures it): " +
+             "each point the body's offset from where it ends in the saddle (x right, y up, z forward, in the rider's own size) and, in w, " +
+             "its turn from the horse's facing. From the right it is mirrored, and getting off runs it backwards.")]
+    [SerializeField] private Vector4[] mountPath = System.Array.Empty<Vector4>();
+    [SerializeField, Min(0.1f)] private float mountSeconds = 1.67f;
 
     [Header("Stable")]
     [Tooltip("Share of its health a stabled horse gets back each in-game hour.")]
@@ -98,6 +112,30 @@ public sealed class HorseSettings : GameSettings<HorseSettings>
     public string FirstHorseLine => firstHorseLine;
     public float LeanTapsPerSecond => leanTapsPerSecond;
     public float LeanStaminaPerSecond => leanStaminaPerSecond;
+    public float DragSpeed => dragSpeed;
+    public float RopeShake => ropeShake;
+    public float RopeJolt => ropeJolt;
+    public float MountReach => mountReach;
+    public float MountSeconds => mountSeconds;
+
+    /// <summary>The rider's offset from the saddle (xyz, in their own size) and turn (w, degrees) a share of the way through
+    /// getting on, from the given side. Without a measured path: a straight climb from beside the horse.</summary>
+    public Vector4 MountPoint(float t, bool fromRight)
+    {
+        Vector4 point;
+        if (mountPath == null || mountPath.Length < 2)
+        {
+            point = Vector4.Lerp(new Vector4(-0.55f, -0.66f, -0.1f, 90f), Vector4.zero, Mathf.SmoothStep(0f, 1f, t));
+        }
+        else
+        {
+            float at = Mathf.Clamp01(t) * (mountPath.Length - 1);
+            int i = Mathf.Min(Mathf.FloorToInt(at), mountPath.Length - 2);
+            point = Vector4.Lerp(mountPath[i], mountPath[i + 1], at - i);
+        }
+
+        return fromRight ? new Vector4(-point.x, point.y, point.z, -point.w) : point;
+    }
     public Vector2 BuckSeconds => buckSeconds;
     public float BuckBalance => buckBalance;
     public float SteadyPerSecond => steadyPerSecond;

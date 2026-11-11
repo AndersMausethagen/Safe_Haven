@@ -12,8 +12,6 @@ public sealed class PlayerRidingAnimation : MonoBehaviour
 {
     public const string LayerName = "Riding";
     private const float BlendSpeed = 5f;
-    // How long getting on or off takes: the pack's clips, 50 frames at 30 a second.
-    public const float MountSeconds = 1.6f;
 
     private static readonly int GaitId = Animator.StringToHash("RideGait");
     private static readonly int SpeedId = Animator.StringToHash("RideSpeed");
@@ -37,6 +35,8 @@ public sealed class PlayerRidingAnimation : MonoBehaviour
 
     /// <summary>True when the player's Animator has the Riding layer: then the bones aren't bent by hand (PlayerTransportPose).</summary>
     public bool HasLayer => layer >= 0;
+    /// <summary>The player's size against the clips' (a humanoid's), for the mount path.</summary>
+    public float HumanScale => animator != null && animator.isHuman ? animator.humanScale : 1f;
 
     private void Awake()
     {
@@ -50,7 +50,7 @@ public sealed class PlayerRidingAnimation : MonoBehaviour
     private void OnDisable() => Listen(null);
 
     /// <summary>Getting on (from the left or right of the horse) or off: the clip plays while PlayerRiding moves the body.</summary>
-    public void PlayMount(bool on, bool fromRight)
+    public void PlayMount(bool on, bool fromRight, float seconds)
     {
         if (!HasLayer)
         {
@@ -60,7 +60,7 @@ public sealed class PlayerRidingAnimation : MonoBehaviour
         weight = 1f;
         animator.SetLayerWeight(layer, 1f);
         Play((on ? "Mount " : "Dismount ") + (fromRight ? "Right" : "Left"), 0.08f);
-        mountingUntil = Time.time + MountSeconds;
+        mountingUntil = Time.time + seconds;
         acting = mountingUntil;
     }
 

@@ -23,8 +23,9 @@ public enum HorseAct
 /// its stamina or a walk, and swims across deep water (off the NavMesh, on its stamina) until it finds ground again.
 /// <para>
 /// One gait at a time (walk, trot, canter, gallop, sprint: the Horse AnimSet Pro clips), the one whose own speed is nearest,
-/// played as fast as the speed needs, rather than a blend of two that matches neither. Its Animator has a float "Gait"
-/// (0 standing, 1 walk ... 5 sprint), bools "Eating", "Drinking", "Sleeping", "Swimming" and "Dead", ints "HitSide",
+/// played as fast as the speed needs, rather than a blend of two that matches neither; turning, it steps round (the pack's
+/// turning clips, by how fast it turns), and it never pivots faster than they show, so it doesn't slide round on the spot.
+/// Its Animator has floats "Gait" (0 standing, 1 walk ... 5 sprint) and "Turn" (-1 left ... 1 right), bools "Eating", "Drinking", "Sleeping", "Swimming" and "Dead", ints "HitSide",
 /// "Fidget" and "DeathKind", and triggers "Rear", "Buck", "Strike", "Hit" and "Fidgeting" (BuildHorses makes it). Hoofbeats
 /// fall on every beat of its gait, and it breathes hard when it is blown.
 /// </para>
@@ -34,6 +35,7 @@ public enum HorseAct
 public sealed class HorseMotion : MonoBehaviour
 {
     private static readonly int GaitId = Animator.StringToHash("Gait");
+    private static readonly int TurnId = Animator.StringToHash("Turn");
     private static readonly int EatingId = Animator.StringToHash("Eating");
     private static readonly int DrinkingId = Animator.StringToHash("Drinking");
     private static readonly int SleepingId = Animator.StringToHash("Sleeping");
@@ -56,6 +58,8 @@ public sealed class HorseMotion : MonoBehaviour
 
     [Tooltip("Metres a second each gait's clip shows at the body's size, walk to sprint (measured from the clips' root motion by BuildHorses).")]
     [SerializeField] private float[] gaitSpeeds = { 1.42f, 3.35f, 5.18f, 7.83f, 10.94f };
+    [Tooltip("Degrees a second its turn on the spot shows (measured from the pack's H_Turn clips by BuildHorses).")]
+    [SerializeField, Min(10f)] private float turnInPlaceRate = 84f;
 
     private Horse horse;
     private NavMeshAgent agent;
@@ -73,6 +77,8 @@ public sealed class HorseMotion : MonoBehaviour
     private float nextBreath;
     private float nextFidget;
     private bool drinking;
+    private float lastYaw;
+    private float turnRate;
     private Combatant strikeAt;
     private float strikeLands;
     private float nextTrample;
@@ -97,6 +103,7 @@ public sealed class HorseMotion : MonoBehaviour
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponentInChildren<Animator>();
         home = transform.position;
+        lastYaw = transform.eulerAngles.y;
         nextFidget = Time.time + Random.Range(6f, 20f);
     }
 
@@ -485,16 +492,27 @@ public sealed class HorseMotion : MonoBehaviour
         }
     }
 
-    // It turns toward the rein before it goes there: no strafing sideways.
+    // It turns toward the rein before it goes there: no strafing sideways. Standing it pivots no faster than its turning
+    // clip steps round; moving, as fast as its kind turns.
     private Vector3 Steer(Vector3 wish, float turnSpeed)
     {
         if (wish.sqrMagnitude > 0.01f)
         {
+            float moving = Mathf.Clamp01(Velocity.magnitude / Mathf.Max(0.1f, horse.Definition.WalkSpeed * 2f));
+            float rate = Mathf.Lerp(Mathf.Min(turnSpeed, turnInPlaceRate * 1.3f), turnSpeed, moving);
             Quaternion facing = Quaternion.LookRotation(wish.normalized, Vector3.up);
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, facing, turnSpeed * Time.deltaTime);
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, facing, rate * Time.deltaTime);
         }
 
         return transform.forward;
+    }
+
+    /// <summary>Turns on the spot toward a facing, at its turning clip's pace (a rider about to get on: it shows its side).
+    /// True once it faces it.</summary>
+    public bool TurnToward(Quaternion facing)
+    {
+        transform.rotation = Quaternion.RotateTowards(transform.rotation, facing, turnInPlaceRate * 1.3f * Time.deltaTime);
+        return Quaternion.Angle(transform.rotation, facing) < 3f;
     }
 
     // ----- Swimming -----
@@ -749,6 +767,11 @@ public sealed class HorseMotion : MonoBehaviour
     private void Animate(float speed)
     {
         Gait = swimming ? (speed > 0.3f ? 1 : 0) : GaitFor(speed, gaitSpeeds);
+        // How fast it turns, from its own facing, whoever turned it (a rider, its agent, a rider getting on).
+        float yaw = transform.eulerAngles.y;
+        float rate = Time.deltaTime > 0f ? Mathf.DeltaAngle(lastYaw, yaw) / Time.deltaTime : 0f;
+        lastYaw = yaw;
+        turnRate = Mathf.Lerp(turnRate, rate, 1f - Mathf.Exp(-12f * Time.deltaTime));
         if (animator == null)
         {
             return;
@@ -756,7 +779,8 @@ public sealed class HorseMotion : MonoBehaviour
 
         animator.SetBool(SwimmingId, swimming);
         animator.SetFloat(GaitId, Gait, 0.1f, Time.deltaTime);
-        animator.speed = swimming || Gait == 0 ? 1f : Mathf.Clamp(speed / gaitSpeeds[Gait - 1], 0.6f, 1.5f);
+        animator.SetFloat(TurnId, swimming ? 0f : Mathf.Clamp(turnRate / turnInPlaceRate, -1f, 1f), 0.08f, Time.deltaTime);
+        animator.speed = swimming || Gait == 0 ? 1f : Mathf.Clamp(speed / gaitSpeeds[Gait - 1], 0.35f, 1.5f);
         bool still = speed < 0.15f && !swimming;
         bool grazing = mode == Idle.Graze && still && (horse.IsTamed || Time.time < until - 1.5f);
         animator.SetBool(EatingId, grazing && !drinking);

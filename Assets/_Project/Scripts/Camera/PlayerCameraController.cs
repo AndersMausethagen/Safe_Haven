@@ -129,6 +129,28 @@ public sealed class PlayerCameraController : MonoBehaviour
     private float closeUpYaw;
     private bool closeUpNear;
     private float closeUpNearWeight;
+    private readonly System.Collections.Generic.Dictionary<object, float> closeness = new System.Collections.Generic.Dictionary<object, float>();
+    private float closenessNow = 1f;
+    private float closenessVelocity;
+
+    /// <summary>Brings the view in a little while <paramref name="source"/> asks (taming a horse): its distance times
+    /// <paramref name="scale"/>, eased in and out; 1 lets it go. With several asking, the nearest wins.</summary>
+    public void SetCloseness(object source, float scale)
+    {
+        if (source == null)
+        {
+            return;
+        }
+
+        if (Mathf.Abs(scale - 1f) < 0.001f)
+        {
+            closeness.Remove(source);
+        }
+        else
+        {
+            closeness[source] = Mathf.Clamp(scale, 0.3f, 1f);
+        }
+    }
 
     /// <summary>Brings the view down and in on the player and <paramref name="subject"/> together (a fish on the line): it
     /// swings round behind the player to look out at the subject, lower to the ground, keeping both in view, until
@@ -609,6 +631,27 @@ public sealed class PlayerCameraController : MonoBehaviour
         float viewPitch = Mathf.Lerp(pitch, actionPitch, w);
         dialogueDistanceNow = Mathf.SmoothDamp(dialogueDistanceNow, dialogueDistance, ref dialogueDistanceVelocity, settings.DialogueTargetSmoothTime, Mathf.Infinity, Time.unscaledDeltaTime);
         distance *= Mathf.Lerp(1f, dialogueDistanceNow, Mathf.SmoothStep(0f, 1f, dialogueWeight));
+        float wantedCloseness = 1f;
+        object gone = null;
+        foreach (var asked in closeness)
+        {
+            // Whatever asked and is gone (destroyed) no longer holds the view in.
+            if (asked.Key is Object thing && thing == null)
+            {
+                gone = asked.Key;
+                continue;
+            }
+
+            wantedCloseness = Mathf.Min(wantedCloseness, asked.Value);
+        }
+
+        if (gone != null)
+        {
+            closeness.Remove(gone);
+        }
+
+        closenessNow = Mathf.SmoothDamp(closenessNow, wantedCloseness, ref closenessVelocity, 0.6f, Mathf.Infinity, Time.unscaledDeltaTime);
+        distance *= closenessNow;
         float close = Mathf.SmoothStep(0f, 1f, Mathf.Min(closeUpWeight, closeUpNearWeight)) * (1f - w);
         float viewYaw = yaw;
         if (close > 0f)

@@ -23,7 +23,7 @@ public sealed class HorseTests
             Assert.That(stats.maxStamina, Is.InRange(kind.Stamina.x, kind.Stamina.y));
             Assert.That(stats.gallopSpeed, Is.InRange(kind.GallopSpeed.x - 0.05f, kind.GallopSpeed.y + 0.05f));
             Assert.That(stats.carryWeight, Is.InRange(kind.CarryWeight.x, kind.CarryWeight.y));
-            Assert.That(stats.feedsNeeded, Is.InRange(3, 5), "3-5 feeds to tame");
+            Assert.That(stats.feedsNeeded, Is.InRange(2, 4), "2-4 feeds to tame");
             Assert.That(stats.coat, Is.InRange(-1, kind.Coats.Length - 1));
             Assert.That(stats.Quality(kind), Is.InRange(0f, 1f));
             differ |= !Mathf.Approximately(stats.gallopSpeed, first.gallopSpeed);
@@ -61,14 +61,29 @@ public sealed class HorseTests
     }
 
     [Test]
-    public void TheBreakingRide_AsksEveryTenToThirtySeconds_UntilFedEnough()
+    public void TheBreakingRide_AsksEverySixToFourteenSeconds_UntilFedEnough()
     {
         HorseDefinition kind = Wild;
         var random = new System.Random(9);
+        float total = 0f;
         for (int i = 0; i < 100; i++)
         {
-            Assert.That(HorseTamingRules.NextAsk(kind, random), Is.InRange(10f, 30f));
+            float ask = HorseTamingRules.NextAsk(kind, random);
+            Assert.That(ask, Is.InRange(6f, 14f));
+            total += ask;
         }
+
+        // About half a minute for a horse of three feeds (the user found 10-30 s, 3-5 times, too long).
+        Assert.Less(total / 100f * 3f, 40f);
+        HorseSettings settings = HorseSettings.Current;
+        Assert.Greater(settings.MountReach, 2.6f, "getting on works from where the horse's menu opens");
+        Vector4 start = settings.MountPoint(0f, false), end = settings.MountPoint(1f, false);
+        Assert.Less(start.x, -0.3f, "climbing on from the left starts beside its shoulder");
+        Assert.Less(start.y, -0.4f, "on the ground, below the saddle");
+        Assert.AreEqual(0f, end.magnitude, 0.01f, "and ends in the saddle");
+        Assert.AreEqual(-start.x, settings.MountPoint(0f, true).x, 0.001f, "from the right it is mirrored");
+        Assert.That((float)new SerializedObject(Wild.Prefab.GetComponent<HorseMotion>()).FindProperty("turnInPlaceRate").floatValue, Is.InRange(50f, 140f),
+            "it turns on the spot at its clip's pace");
 
         var stats = new HorseStats { feedsNeeded = 4 };
         Assert.IsFalse(HorseTamingRules.IsBroken(3, stats));

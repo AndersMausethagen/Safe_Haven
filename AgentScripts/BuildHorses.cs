@@ -52,6 +52,8 @@ public static class BuildHorses
         "Idles/H_Idle_01", "Actions/H_Eat", "Actions/H_Drink", "Actions/H_Sleep", "Swim/H_Swim_Idle", "Swim/H_Swim_Forward",
     };
     private static readonly string[] Once = { "Actions/H_Neigh", "Attacks/H_Attack_Back_Legs", "Attacks/H_Attack_Front_Legs" };
+    // Turning: on the spot, and each gait's own turning to either side (in place, as the straight ones are).
+    private static readonly string[] Turning = { "Locomotion/H_Turn_Left", "Locomotion/H_Turn_Right" };
 
     private static string report = "";
 
@@ -99,7 +101,7 @@ public static class BuildHorses
         importer.materialImportMode = ModelImporterMaterialImportMode.None;
         importer.importAnimation = false;
         importer.SaveAndReimport();
-        foreach (string clip in Gaits.Select(g => g + "_IP").Concat(Looping))
+        foreach (string clip in Gaits.Select(g => g + "_IP").Concat(Gaits.Select(g => g + "_Left_IP")).Concat(Gaits.Select(g => g + "_Right_IP")).Concat(Turning).Concat(Looping))
         {
             Loop(Clips + clip + ".FBX", true);
         }
@@ -173,6 +175,63 @@ public static class BuildHorses
     private static AnimationClip Clip(string file) =>
         AssetDatabase.LoadAllAssetsAtPath(Clips + file + ".FBX").OfType<AnimationClip>().FirstOrDefault(c => !c.name.StartsWith("__preview__"));
 
+    private static AnimationCurve RootCurve(AnimationClip clip, string property)
+    {
+        EditorCurveBinding binding = AnimationUtility.GetCurveBindings(clip).FirstOrDefault(b => b.path == "" && b.propertyName == property);
+        return binding.propertyName != null ? AnimationUtility.GetEditorCurve(clip, binding) : null;
+    }
+
+    private static float RootYaw(AnimationClip clip, float time)
+    {
+        AnimationCurve x = RootCurve(clip, "RootQ.x"), y = RootCurve(clip, "RootQ.y"), z = RootCurve(clip, "RootQ.z"), w = RootCurve(clip, "RootQ.w");
+        return w == null ? 0f : new Quaternion(x.Evaluate(time), y.Evaluate(time), z.Evaluate(time), w.Evaluate(time)).eulerAngles.y;
+    }
+
+    // Degrees a second the turn on the spot shows, from its root's yaw.
+    private static float TurnRate()
+    {
+        AnimationClip clip = Clip(Turning[0]);
+        if (clip == null || clip.length <= 0f)
+        {
+            return 84f;
+        }
+
+        float turned = 0f;
+        for (int i = 0; i < 16; i++)
+        {
+            turned += Mathf.DeltaAngle(RootYaw(clip, clip.length * i / 16f), RootYaw(clip, clip.length * (i + 1) / 16f));
+        }
+
+        return Mathf.Round(Mathf.Abs(turned) / clip.length);
+    }
+
+    // The rider's path onto a horse from its left (the pack's Rider_Mount_Left): the body's offset from where it ends in the
+    // saddle and its turn, at even steps through the clip (HorseSettings › Mount Path).
+    private static (Vector4[] path, float seconds) MountPath()
+    {
+        AnimationClip clip = AssetDatabase.LoadAllAssetsAtPath(Pack + "2 - Animations/Animations Clips/Rider/Mount Dismount/Rider_Mount_Dismount_Left.FBX")
+            .OfType<AnimationClip>().FirstOrDefault(c => c.name == "Rider_Mount_Left");
+        AnimationCurve x = clip != null ? RootCurve(clip, "RootT.x") : null;
+        if (x == null)
+        {
+            report += "; no mount path";
+            return (System.Array.Empty<Vector4>(), 1.67f);
+        }
+
+        AnimationCurve y = RootCurve(clip, "RootT.y"), z = RootCurve(clip, "RootT.z");
+        Vector3 end = new Vector3(x.Evaluate(clip.length), y.Evaluate(clip.length), z.Evaluate(clip.length));
+        float endYaw = RootYaw(clip, clip.length);
+        var path = new Vector4[17];
+        for (int i = 0; i < path.Length; i++)
+        {
+            float time = clip.length * i / (path.Length - 1f);
+            Vector3 at = new Vector3(x.Evaluate(time), y.Evaluate(time), z.Evaluate(time)) - end;
+            path[i] = new Vector4(at.x, at.y, at.z, Mathf.DeltaAngle(endYaw, RootYaw(clip, time)));
+        }
+
+        return (path, clip.length);
+    }
+
     // What each gait's clip shows, from its root-motion twin: metres a second at the pack's size, times the body's scale.
     private static float[] GaitSpeeds(float scale) => Gaits.Select(g =>
     {
@@ -194,6 +253,7 @@ public static class BuildHorses
         AssetDatabase.DeleteAsset(ControllerPath);
         AnimatorController controller = AnimatorController.CreateAnimatorControllerAtPath(ControllerPath);
         controller.AddParameter("Gait", AnimatorControllerParameterType.Float);
+        controller.AddParameter("Turn", AnimatorControllerParameterType.Float);
         foreach (string flag in new[] { "Eating", "Drinking", "Sleeping", "Swimming", "Dead" })
         {
             controller.AddParameter(flag, AnimatorControllerParameterType.Bool);
@@ -210,13 +270,20 @@ public static class BuildHorses
         }
 
         AnimatorStateMachine machine = controller.layers[0].stateMachine;
+        // By gait (0 standing ... 5 sprint) and turn (-1 left ... 1 right): standing it steps round on the spot, moving it
+        // leans into the turn, so it never slides round with its legs still.
         AnimatorState move = controller.CreateBlendTreeInController("Move", out BlendTree tree);
+        tree.blendType = BlendTreeType.FreeformCartesian2D;
         tree.blendParameter = "Gait";
-        tree.useAutomaticThresholds = false;
-        tree.AddChild(Clip("Idles/H_Idle_01"), 0f);
+        tree.blendParameterY = "Turn";
+        tree.AddChild(Clip("Idles/H_Idle_01"), new Vector2(0f, 0f));
+        tree.AddChild(Clip(Turning[0]), new Vector2(0f, -1f));
+        tree.AddChild(Clip(Turning[1]), new Vector2(0f, 1f));
         for (int i = 0; i < Gaits.Length; i++)
         {
-            tree.AddChild(Clip(Gaits[i] + "_IP"), i + 1);
+            tree.AddChild(Clip(Gaits[i] + "_IP"), new Vector2(i + 1, 0f));
+            tree.AddChild(Clip(Gaits[i] + "_Left_IP") ?? Clip(Gaits[i] + "_IP"), new Vector2(i + 1, -1f));
+            tree.AddChild(Clip(Gaits[i] + "_Right_IP") ?? Clip(Gaits[i] + "_IP"), new Vector2(i + 1, 1f));
         }
 
         machine.defaultState = move;
@@ -718,6 +785,11 @@ public static class BuildHorses
         so.FindProperty("struggleStamina").floatValue = toxic ? 140f : 100f;
         so.FindProperty("trotSpeed").floatValue = 6f;
         so.FindProperty("strikeDamage").floatValue = toxic ? 26f : 16f;
+        // The breaking ride: barley every 6-14 seconds, 2-4 times (3-5 for the toxic horse), so it is over in about half a
+        // minute; and a spent horse waits 12 seconds for the player to walk up to it.
+        so.FindProperty("feedInterval").vector2Value = toxic ? new Vector2(7f, 15f) : new Vector2(6f, 14f);
+        so.FindProperty("feedsNeeded").vector2IntValue = toxic ? new Vector2Int(3, 5) : new Vector2Int(2, 4);
+        so.FindProperty("mountSeconds").floatValue = 12f;
         if (toxic)
         {
             so.FindProperty("displayName").stringValue = "Toxic Horse";
@@ -726,7 +798,6 @@ public static class BuildHorses
             so.FindProperty("stamina").vector2Value = new Vector2(120f, 160f);
             so.FindProperty("gallopSpeed").vector2Value = new Vector2(11.5f, 13.5f);
             so.FindProperty("carryWeight").vector2Value = new Vector2(70f, 100f);
-            so.FindProperty("feedsNeeded").vector2IntValue = new Vector2Int(4, 6);
             so.FindProperty("home").intValue = (int)HorseHome.Bog;
             so.FindProperty("special").boolValue = true;
             so.FindProperty("alwaysArmoured").boolValue = true;
@@ -942,6 +1013,21 @@ public static class BuildHorses
         special.arraySize = 1;
         special.GetArrayElementAtIndex(0).objectReferenceValue = toxic;
         so.FindProperty("whistle").objectReferenceValue = whistle;
+        (Vector4[] mountPath, float mountSeconds) = MountPath();
+        SerializedProperty points = so.FindProperty("mountPath");
+        points.arraySize = mountPath.Length;
+        for (int i = 0; i < mountPath.Length; i++)
+        {
+            points.GetArrayElementAtIndex(i).vector4Value = mountPath[i];
+        }
+
+        so.FindProperty("mountSeconds").floatValue = mountSeconds;
+        // The horse menu opens from 2.6 m: getting on works from where it opens.
+        so.FindProperty("mountReach").floatValue = 2.8f;
+        // The rope: a light shake as it strains, a jolt when it turns or rears, a horse that drags a player who lets it.
+        so.FindProperty("ropeShake").floatValue = 0.15f;
+        so.FindProperty("ropeJolt").floatValue = 0.26f;
+        so.FindProperty("dragSpeed").floatValue = 2.6f;
         // How often each is born, how near it lets you come, how hard it pulls, how much fight it has, feeds more or fewer,
         // how hard it bucks, how long it runs when hurt.
         (HorseTemperament kind, float weight, float shy, float pull, float fight, int feeds, float bucking, float panic, string text)[] natures =
@@ -1036,7 +1122,8 @@ public static class BuildHorses
             agent.height = 1.8f;
             agent.speed = 1.6f;
             agent.acceleration = 12f;
-            agent.angularSpeed = 260f;
+            // Its agent turns it no faster than it can step round (HorseMotion's turning clips).
+            agent.angularSpeed = 140f;
             agent.obstacleAvoidanceType = ObstacleAvoidanceType.LowQualityObstacleAvoidance;
             var capsule = root.AddComponent<CapsuleCollider>();
             capsule.direction = 2;
@@ -1116,6 +1203,7 @@ public static class BuildHorses
                 gaits.GetArrayElementAtIndex(i).floatValue = speeds[i];
             }
 
+            moving.FindProperty("turnInPlaceRate").floatValue = TurnRate();
             moving.ApplyModifiedPropertiesWithoutUndo();
             lastGaits = string.Join(", ", speeds.Select(v => v.ToString("0.00")));
 

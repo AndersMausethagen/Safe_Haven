@@ -39,6 +39,7 @@ public sealed class PlayerMovement : MonoBehaviour
     private bool floating;
     private float floatHeight;
     private Transform seat;
+    private float seatTurn;
     private Vector3 seatOffset;
 
     public PlayerMovementSettings Settings => settings;
@@ -152,7 +153,7 @@ public sealed class PlayerMovement : MonoBehaviour
     {
         if (seat != null)
         {
-            transform.SetPositionAndRotation(seat.TransformPoint(seatOffset), seat.rotation);
+            transform.SetPositionAndRotation(seat.TransformPoint(seatOffset), seat.rotation * Quaternion.Euler(0f, seatTurn, 0f));
             return;
         }
 
@@ -242,11 +243,13 @@ public sealed class PlayerMovement : MonoBehaviour
         floatHeight = feetHeight;
     }
 
-    /// <summary>Sits on <paramref name="at"/>: the controller is switched off and the character goes where the seat goes.</summary>
-    public void SitAt(Transform at, Vector3 offset)
+    /// <summary>Sits on <paramref name="at"/>: the controller is switched off and the character goes where the seat goes,
+    /// turned <paramref name="turn"/> degrees from the seat's facing (a rider climbing on faces the horse's side).</summary>
+    public void SitAt(Transform at, Vector3 offset, float turn = 0f)
     {
         seat = at;
         seatOffset = offset;
+        seatTurn = turn;
         horizontalVelocity = Vector3.zero;
         verticalVelocity = 0f;
         floating = false;

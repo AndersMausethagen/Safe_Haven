@@ -58,10 +58,10 @@ MonoBehaviour:
   pullStrain: 0.35
   tapHold: 0.1
   lungeSeconds: {x: 1.2, y: 2.6}
-  mountSeconds: 8
+  mountSeconds: 12
   barley: {fileID: 11400000, guid: 05a3b8e12c05cb548b40065962d3b860, type: 2}
-  feedsNeeded: {x: 3, y: 5}
-  feedInterval: {x: 10, y: 30}
+  feedsNeeded: {x: 2, y: 4}
+  feedInterval: {x: 6, y: 14}
   feedWindow: 6
   home: 0
   special: 0

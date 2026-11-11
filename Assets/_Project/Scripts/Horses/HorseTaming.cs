@@ -6,13 +6,15 @@ using UnityEngine;
 /// <item>The struggle. It whinnies and pulls this way and that on the rope; the player, feet planted, taps E or left click
 /// and leans away from it with the movement keys (which spends their stamina) to hold it. Strain on the rope builds while
 /// it pulls and every tap and every moment of leaning takes some off and tires it (HorseTamingRules); at full strain the
-/// rope slips and it is gone, worn out it stands, head low, for a few seconds to be mounted (E).</item>
+/// rope slips and it is gone. A player who neither taps nor leans is dragged along behind it, and the camera shakes with
+/// the rope. Worn out, it stands, head low, for a few seconds: the player walks up to it and gets on (E, from beside it).</item>
 /// <item>The breaking ride. With the player on its back it veers off and bucks every few seconds, and the player steers
 /// against it to keep their balance (lost, they are thrown); and it asks for barley every 10-30 seconds (E feeds it from
 /// the bag); left unfed past its patience, or got off of, it throws the rider and bolts. Fed as often as it needs (3-5
 /// times, its own number, more or fewer by its temperament), it is tamed: a saved copy of the horse takes its place under
 /// the rider, and it is given a name.</item>
 /// </list>
+/// The whole of it is a fight for the music (AudioManager.KeepCombat).
 /// Its temperament (HorseSettings › Temperament) sets how hard it pulls, how much fight it has and how hard it bucks;
 /// Horsemanship's Hold on the Rope makes each tap and lean count for more. The HUD (HorseHud) shows the rope's strain and
 /// the horse's strength, the rider's balance and the feeding.
@@ -24,6 +26,9 @@ public sealed class HorseTaming : MonoBehaviour
     public enum Phase { None, Struggle, GivenIn, Breaking }
 
     private const float RopeLength = 6.5f;
+    // Walked this far from a spent horse, the rope slips.
+    private const float SlackReach = 11f;
+    private const float ResistSeconds = 0.5f;
 
     private Horse horse;
     private Player handler;
@@ -43,6 +48,7 @@ public sealed class HorseTaming : MonoBehaviour
     private Vector3 veer;
     private float veerUntil;
     private float nextVeer;
+    private float lastResisted;
 
     /// <summary>The horse the local player is taming, for the HUD; null when none.</summary>
     public static HorseTaming Active { get; private set; }
@@ -60,6 +66,8 @@ public sealed class HorseTaming : MonoBehaviour
     private float FullStruggle => horse.Definition.StruggleStamina * horse.Temperament.fight;
     /// <summary>How hard the player leans on the rope now, 0-1 (for the HUD).</summary>
     public float Lean { get; private set; }
+    /// <summary>True while it drags a player who isn't holding against it.</summary>
+    public bool IsDragging { get; private set; }
     /// <summary>The rider's balance on the breaking ride, 0-1: at 0 they are thrown.</summary>
     public float Balance => balance;
     /// <summary>Where it is veering off to now (its length is how hard), zero between veers; HorseMotion adds it to the rider's steering.</summary>
@@ -91,12 +99,14 @@ public sealed class HorseTaming : MonoBehaviour
         handler = player;
         phase = Phase.Struggle;
         strain = 0.25f;
+        lastResisted = Time.time;
         struggle = FullStruggle;
         horse.SetTamingState(Horse.Mode.Lassoed);
         horse.Motion.Hold(true);
         PlayerRiding.For(player.gameObject).HoldRope(this);
         Active = this;
         HorseHud.Ensure();
+        Frame(0.8f, true);
         ShowRope(true);
         NextLunge();
         Whinny();
@@ -116,6 +126,7 @@ public sealed class HorseTaming : MonoBehaviour
             return;
         }
 
+        AudioManager.KeepCombat();
         switch (phase)
         {
             case Phase.Struggle:
@@ -123,11 +134,21 @@ public sealed class HorseTaming : MonoBehaviour
                 break;
             case Phase.GivenIn:
                 horse.Motion.Lunge(transform.position, 0f);
+                IsDragging = false;
+                Vector3 away = handler.transform.position - transform.position;
+                away.y = 0f;
+                if (away.magnitude > SlackReach)
+                {
+                    Escape("You let the rope run out too far. It slips free and is gone.");
+                    return;
+                }
+
                 if (Time.time > mountUntil)
                 {
                     phase = Phase.Struggle;
                     struggle = FullStruggle * 0.4f;
                     strain = Mathf.Max(strain, 0.3f);
+                    PlayerRiding.For(handler.gameObject).TautenRope();
                     NextLunge();
                     Whinny();
                     GameMessages.Post("It has its breath back, and fights again!", MessageKind.Warning);
@@ -150,6 +171,11 @@ public sealed class HorseTaming : MonoBehaviour
         {
             if (GameInput.Interact != null && GameInput.Interact.WasPressedThisFrame()) taps++;
             if (GameInput.Attack != null && GameInput.Attack.WasPressedThisFrame()) taps++;
+            if (taps > 0f)
+            {
+                lastResisted = Time.time;
+            }
+
             // Leaning away from it holds as a few taps a second would, while the player has the stamina for it.
             PlayerMovement feet = handler.GetComponent<PlayerMovement>();
             PlayerStamina breath = handler.Stamina;
@@ -159,6 +185,11 @@ public sealed class HorseTaming : MonoBehaviour
                 Lean = HorseTamingRules.Lean(feet.MovementInput, handler.transform.position - transform.position);
                 if (Lean > 0f)
                 {
+                    if (Lean > 0.15f)
+                    {
+                        lastResisted = Time.time;
+                    }
+
                     taps += Lean * settings.LeanTapsPerSecond * Time.deltaTime;
                     breath.Drain(Lean * settings.LeanStaminaPerSecond * Time.deltaTime);
                 }
@@ -177,9 +208,23 @@ public sealed class HorseTaming : MonoBehaviour
         if (HorseTamingRules.GivenIn(struggle))
         {
             phase = Phase.GivenIn;
+            IsDragging = false;
             mountUntil = Time.time + horse.Definition.MountSeconds;
-            GameMessages.Post($"It is spent and stands, head low. Get on its back: {GameInput.KeyLabel(GameInput.Interact)}.", MessageKind.Gain);
+            PlayerRiding.For(handler.gameObject).SlackRope();
+            GameMessages.Post($"It is spent and stands, head low. Walk up beside it and get on: {GameInput.KeyLabel(GameInput.Interact)}.", MessageKind.Gain);
             return;
+        }
+
+        // The rope shakes the camera as it strains; and a player who holds nothing against it is dragged along.
+        HorseSettings rules = HorseSettings.Current;
+        CameraShake.AtLeast(rules.RopeShake * strain);
+        Vector3 pull = transform.position - handler.transform.position;
+        pull.y = 0f;
+        IsDragging = Time.time - lastResisted > ResistSeconds && pull.magnitude > RopeLength * 0.8f;
+        if (IsDragging && handler.TryGetComponent(out PlayerMovement dragged))
+        {
+            dragged.Lunge(pull.normalized * rules.DragSpeed * Mathf.Lerp(0.45f, 1f, strain), 0.12f);
+            CameraShake.AtLeast(rules.RopeShake * 1.4f);
         }
 
         if (Time.time >= lungeUntil)
@@ -205,15 +250,26 @@ public sealed class HorseTaming : MonoBehaviour
         lungeTo = transform.position + Quaternion.Euler(0f, turn, 0f) * away * 8f;
         Vector2 seconds = horse.Definition.LungeSeconds;
         lungeUntil = Time.time + Mathf.Lerp(seconds.x, seconds.y, (float)random.NextDouble());
+        CameraShake.Add(HorseSettings.Current.RopeJolt * 0.5f);
         if (random.NextDouble() < 0.35)
         {
             horse.Motion.PlayRear();
+            CameraShake.Add(HorseSettings.Current.RopeJolt * 0.5f);
             Whinny();
         }
     }
 
     private void UpdateBreaking()
     {
+        // Nothing asks or bucks while the rider is still climbing on.
+        PlayerRiding rider = horse.Rider;
+        if (rider == null || rider.IsMounting)
+        {
+            nextAsk += Time.deltaTime;
+            nextVeer += Time.deltaTime;
+            return;
+        }
+
         UpdateBalance();
         if (phase != Phase.Breaking)
         {
@@ -244,7 +300,15 @@ public sealed class HorseTaming : MonoBehaviour
             case Phase.Struggle:
                 return true;
             case Phase.GivenIn:
-                Mount();
+                if (PlayerRiding.For(handler.gameObject).CanMount(horse, out string why))
+                {
+                    Mount();
+                }
+                else if (!string.IsNullOrEmpty(why))
+                {
+                    GameMessages.Post(why, MessageKind.Info);
+                }
+
                 return true;
             case Phase.Breaking:
                 if (asking)
@@ -299,6 +363,7 @@ public sealed class HorseTaming : MonoBehaviour
     private void Mount()
     {
         ShowRope(false);
+        Frame(0.85f, false);
         balance = 1f;
         veer = Vector3.zero;
         nextVeer = Time.time + 2f;
@@ -371,6 +436,7 @@ public sealed class HorseTaming : MonoBehaviour
     {
         Horse wild = horse;
         PlayerRiding rider = wild.Rider;
+        Frame(1f, false);
         phase = Phase.None;
         asking = false;
         Active = null;
@@ -441,12 +507,33 @@ public sealed class HorseTaming : MonoBehaviour
         }
 
         ShowRope(false);
+        Frame(1f, false);
         phase = Phase.None;
         asking = false;
         handler = null;
         if (Active == this)
         {
             Active = null;
+        }
+    }
+
+    // The camera comes in a little while taming (and keeps the horse in the picture while it fights the rope).
+    private void Frame(float closeness, bool keepInView)
+    {
+        PlayerCameraController view = PlayerCameraController.Current;
+        if (view == null)
+        {
+            return;
+        }
+
+        view.SetCloseness(this, closeness);
+        if (keepInView)
+        {
+            view.KeepInView(transform);
+        }
+        else
+        {
+            view.EndCloseUp(transform);
         }
     }
 
