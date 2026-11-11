@@ -15,6 +15,6 @@ MonoBehaviour:
   id: build_patch_up
   displayName: Patch Up
   description: Mending what a breach broke costs half.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 8a2d500f24a689a49a615730001eb6c1, type: 3}
   technique: 17
   bonuses: []

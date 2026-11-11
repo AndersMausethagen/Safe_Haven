@@ -15,6 +15,6 @@ MonoBehaviour:
   id: sneak_silent_takedown
   displayName: Silent Takedown
   description: A blow from the shadows finishes an ordinary creature it has nearly done for.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 16e779170b10d1c4f84915c82fab1c84, type: 3}
   technique: 25
   bonuses: []

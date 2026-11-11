@@ -16,7 +16,7 @@ MonoBehaviour:
   displayName: Woodcutting
   description: 'The axe in a practised hand: where to stand, where to cut, when to let the tree do the work.'
   trainedBy: felling and splitting trees
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: f590b91aa98384a49981619343f1da1d, type: 3}
   group: 0
   training: 0
   crafts: 0

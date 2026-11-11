@@ -15,7 +15,7 @@ MonoBehaviour:
   id: forage_master_forager
   displayName: Master Forager
   description: Nothing that grows is hidden from you.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 9f9340ddcf85ee345a1fb51567eff066, type: 3}
   technique: 0
   bonuses:
   - stat: 46

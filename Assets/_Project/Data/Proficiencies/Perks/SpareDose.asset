@@ -15,6 +15,6 @@ MonoBehaviour:
   id: alch_spare_dose
   displayName: Spare Dose
   description: A draught or tonic now and then isn't used up.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: d5db76d1672a52c47a8d9f876975341f, type: 3}
   technique: 16
   bonuses: []

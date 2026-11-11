@@ -15,7 +15,7 @@ MonoBehaviour:
   id: alch_spell_distillation
   displayName: Spell Distillation
   description: A rune in a bottle.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 8c01653dc82b7bb4aae30a8905662fa5, type: 3}
   technique: 0
   bonuses:
   - stat: 5

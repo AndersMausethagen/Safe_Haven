@@ -15,7 +15,7 @@ MonoBehaviour:
   id: weapon_runed_edges
   displayName: Runed Edges
   description: A mark cut into the fuller, for luck.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 79147da5ec09b5b4fbc6ae5c7d74c3eb, type: 3}
   technique: 0
   bonuses:
   - stat: 4

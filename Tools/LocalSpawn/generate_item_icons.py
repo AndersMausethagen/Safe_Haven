@@ -1,20 +1,22 @@
-"""Item icons with LocalSpawn, in place of the painted placeholders (Editor/Content/PlaceholderIconPainter).
+"""Item, building, skill and perk icons with LocalSpawn, in place of the painted placeholders and 3D renders.
 
 What each icon shows is in item_icons.json (item id -> the object). Every icon is painted in LocalSpawn's
 "Safe Haven - Item icon" style at its icon size (512 x 512), its background removed (BiRefNet), and fitted to the frame
 with the same margin, so icons of every kind sit alike in an inventory slot. Each item gets its own file: several used
 to share one (five meals shared the stew).
 
-  test  [model ...]   A few items with each model named (default: z-image and qwen-image), for choosing a model
+  test  [model [id ...]]  A few icons (or those listed) with the model named (default: z-image and qwen-image), to compare
                       -> Tools/LocalSpawn/ItemIcons/_test/<model>/<id>.png
   all   --model NAME  Every item in item_icons.json that has no icon yet -> Tools/LocalSpawn/ItemIcons/<id>.png
                       (--force paints them again; item ids are listed to paint only those)
+  --set NAME          Another kind of icon (default items), each with its own list and folder (SETS below):
+                      buildings, skills (combat skills), proficiencies (the 13 skills), perks, resources, conditions, boons
 
-Then in Unity: AgentScripts/BuildItemIcons.cs, entry Apply, puts them in the game: into the item's own icon file where
+Then in Unity: AgentScripts/BuildIcons.cs (entry Items, Buildings, Skills, Proficiencies, Perks or All) puts them in the game: into the item's own icon file where
 no other item uses it (so content builders that load that file keep it), a new file where several shared one.
-Run with LocalSpawn's Python, with Unity closed (the image model needs about 13 GB of RAM):
+Run with LocalSpawn's Python (the image model runs on the GPU; Unity can stay open):
   D:\\ComfyUI\\.venv\\Scripts\\python.exe Tools/LocalSpawn/generate_item_icons.py test
-  D:\\ComfyUI\\.venv\\Scripts\\python.exe Tools/LocalSpawn/generate_item_icons.py all --model z-image
+  D:\\ComfyUI\\.venv\\Scripts\\python.exe Tools/LocalSpawn/generate_item_icons.py all --model qwen-image-draft --set perks
 """
 import json
 import os
@@ -31,9 +33,21 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HERE, "..", ".."))
 AGENT = r"D:\ComfyUI\agent"
 PYTHON = r"D:\ComfyUI\.venv\Scripts\python.exe"
-WANTED = os.path.join(HERE, "item_icons.json")
-TEST = os.path.join(HERE, "ItemIcons", "_test")
-ICONS = os.path.join(HERE, "ItemIcons")  # the finished icons; AgentScripts/BuildItemIcons.cs puts them in the game
+# Each kind of icon: (what each shows, where the finished icons go; AgentScripts/BuildIcons.cs puts them in the game).
+SETS = {
+    "items": ("item_icons.json", "ItemIcons"),
+    "buildings": ("building_icons.json", "BuildingIcons"),
+    "skills": ("skill_icons.json", "SkillIcons"),
+    "proficiencies": ("proficiency_icons.json", "ProficiencyIcons"),
+    "perks": ("perk_icons.json", "PerkIcons"),
+    "resources": ("resource_icons.json", "ResourceIcons"),
+    "conditions": ("condition_icons.json", "ConditionIcons"),
+    "boons": ("boon_icons.json", "BoonIcons"),
+}
+SET = sys.argv[sys.argv.index("--set") + 1] if "--set" in sys.argv else "items"
+WANTED = os.path.join(HERE, SETS[SET][0])
+ICONS = os.path.join(HERE, SETS[SET][1])
+TEST = os.path.join(ICONS, "_test")
 STYLE = "Safe Haven - Item icon"
 SIZE = 512  # LocalSpawn's "Icon 512x512"
 # Of the frame, how much the object may fill at most (its longer side), so icons of every shape sit alike.
@@ -64,7 +78,7 @@ def fit(path, target):
 
 
 def paint(item_id, prompt, model, target):
-    scratch = os.path.join(HERE, "ItemIcons", "_new")
+    scratch = os.path.join(ICONS, "_new")
     shutil.rmtree(scratch, ignore_errors=True)
     os.makedirs(scratch, exist_ok=True)
     prompt_file = os.path.join(scratch, "prompt.txt")
@@ -91,13 +105,14 @@ def stop():
 
 
 def main():
-    args = [a for a in sys.argv[1:] if not a.startswith("--")]
+    valued = {"--model", "--set"}
+    args = [a for i, a in enumerate(sys.argv[1:], 1) if not a.startswith("--") and sys.argv[i - 1] not in valued]
     step = args[0] if args else "test"
     wanted = {k: v for k, v in json.load(open(WANTED, encoding="utf-8")).items() if not k.startswith("_")}
     try:
         if step == "test":
-            for model in args[1:] or ["z-image", "qwen-image"]:
-                for item_id in TEST_ITEMS:
+            for model in args[1:2] or ["z-image", "qwen-image"]:
+                for item_id in [i for i in args[2:] if i in wanted] or (TEST_ITEMS if SET == "items" else list(wanted)[:6]):
                     took = paint(item_id, wanted[item_id], model, os.path.join(TEST, model, file_name(item_id)))
                     print(f"{model:11s} {item_id:16s} {took:5.1f} s", flush=True)
         elif step == "all":
@@ -111,7 +126,7 @@ def main():
                 took = paint(item_id, wanted[item_id], model, target)
                 done += 1
                 print(f"[{done}] {item_id:26s} {took:5.1f} s", flush=True)
-            print(f"{done} icons painted with {model}.")
+            print(f"{done} {SET} icons painted with {model}.")
     finally:
         stop()
 

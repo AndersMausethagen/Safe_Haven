@@ -15,6 +15,6 @@ MonoBehaviour:
   id: weapon_sure_hand
   displayName: Sure Hand
   description: After four plain pieces in a row, the next is Fine for sure.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 7646ad64e098461488671f8d38c856fa, type: 3}
   technique: 9
   bonuses: []

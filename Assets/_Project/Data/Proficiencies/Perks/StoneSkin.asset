@@ -15,7 +15,7 @@ MonoBehaviour:
   id: build_stone_skin
   displayName: Stone Skin
   description: Hard as the walls you raise.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: d9fd46fdf400de24581d8cca2641705b, type: 3}
   technique: 0
   bonuses:
   - stat: 7

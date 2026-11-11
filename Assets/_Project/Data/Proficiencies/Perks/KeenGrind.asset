@@ -15,7 +15,7 @@ MonoBehaviour:
   id: weapon_keen_grind
   displayName: Keen Grind
   description: A whetstone and patience.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: ed46407283092de4e8805c74eacfd3d9, type: 3}
   technique: 0
   bonuses:
   - stat: 35

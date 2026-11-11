@@ -15,6 +15,6 @@ MonoBehaviour:
   id: wood_steady_rhythm
   displayName: Steady Rhythm
   description: 'A sound swing keeps the run going: only a glancing blow breaks your combo.'
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: cf06de95c37c92342bf99bf8e9f51ff4, type: 3}
   technique: 1
   bonuses: []

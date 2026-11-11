@@ -16,7 +16,7 @@ MonoBehaviour:
   displayName: Mining
   description: 'Reading stone: the seam, the fault, the blow that splits it.'
   trainedBy: breaking rock and ore
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: c7c075ccfd0a14340958bca14df0a43f, type: 3}
   group: 0
   training: 0
   crafts: 0

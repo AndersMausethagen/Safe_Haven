@@ -15,7 +15,7 @@ MonoBehaviour:
   id: fish_old_lines
   displayName: Old Lines
   description: Knots your grandmother taught you.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 65731385640f619449db3dd30b931189, type: 3}
   technique: 0
   bonuses:
   - stat: 47

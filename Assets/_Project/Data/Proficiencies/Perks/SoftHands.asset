@@ -15,7 +15,7 @@ MonoBehaviour:
   id: sneak_soft_hands
   displayName: Soft Hands
   description: The lock tells your fingers what it wants.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: a9dab240669f13e4abb5302bb04b7b09, type: 3}
   technique: 0
   bonuses:
   - stat: 34

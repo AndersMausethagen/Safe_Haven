@@ -15,6 +15,6 @@ MonoBehaviour:
   id: bow_deadly_draw
   displayName: Deadly Draw
   description: A perfect shot hits half again as hard.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 289ab6401f0988f45972986f5585e464, type: 3}
   technique: 21
   bonuses: []

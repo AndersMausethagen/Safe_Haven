@@ -16,7 +16,7 @@ MonoBehaviour:
   displayName: Weaponcrafting
   description: 'Edges, hafts and fletching: the feel of a good balance and a true line.'
   trainedBy: making weapons, tools and arrows
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 8020a2de92688a045b9967ab77e10004, type: 3}
   group: 1
   training: 7
   crafts: 7

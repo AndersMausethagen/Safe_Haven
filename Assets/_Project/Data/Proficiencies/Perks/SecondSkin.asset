@@ -15,7 +15,7 @@ MonoBehaviour:
   id: armor_second_skin
   displayName: Second Skin
   description: You forget you are wearing it.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 59307289655313644a2fad4adf4a349c, type: 3}
   technique: 0
   bonuses:
   - stat: 7

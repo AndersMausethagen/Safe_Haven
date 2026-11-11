@@ -15,7 +15,7 @@ MonoBehaviour:
   id: alch_bitter_root
   displayName: Bitter Root
   description: A taste that keeps out the cold and the flame.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: ba6b917bd8c598d4092c7544fe94335d, type: 3}
   technique: 0
   bonuses:
   - stat: 9

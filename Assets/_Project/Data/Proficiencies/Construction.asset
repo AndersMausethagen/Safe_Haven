@@ -16,7 +16,7 @@ MonoBehaviour:
   displayName: Construction
   description: 'Beams, stone and joinery: raising the Haven, and readying what it is built from.'
   trainedBy: hammering buildings up and refining planks, ingots and blocks
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: d0dcee7d2dd3fa54ab417b974c8d3240, type: 3}
   group: 1
   training: 6
   crafts: 64

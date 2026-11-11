@@ -16,7 +16,7 @@ MonoBehaviour:
   displayName: Foraging
   description: 'Berries, herbs, mushrooms and fibre: knowing what grows where, and taking it without spoiling it.'
   trainedBy: picking plants by hand and cutting them with the sickle
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 916b3df6dc705a449a13e3ca143e7e53, type: 3}
   group: 0
   training: 0
   crafts: 0

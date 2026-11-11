@@ -15,7 +15,7 @@ MonoBehaviour:
   id: melee_hunters_patience
   displayName: Hunter's Patience
   description: Wait for the moment, then end it.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 9977d669fb6b39948ae29b0f0c45995c, type: 3}
   technique: 0
   bonuses:
   - stat: 4

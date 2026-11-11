@@ -15,6 +15,6 @@ MonoBehaviour:
   id: cook_third_plate
   displayName: Third Plate
   description: Room for one more meal's bonus at a time.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: ddb4faf22109b2443ac1c5e4c06fd51f, type: 3}
   technique: 13
   bonuses: []

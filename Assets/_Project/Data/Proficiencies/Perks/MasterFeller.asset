@@ -15,7 +15,7 @@ MonoBehaviour:
   id: wood_master_feller
   displayName: Master Feller
   description: Trees fall where you tell them.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 3cbb3c313d3504344ab5e44cb0bddd00, type: 3}
   technique: 0
   bonuses:
   - stat: 23

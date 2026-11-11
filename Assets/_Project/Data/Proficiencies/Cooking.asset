@@ -16,7 +16,7 @@ MonoBehaviour:
   displayName: Cooking
   description: 'Fire, pot and patience: food that fills you and keeps you going.'
   trainedBy: cooking at the campfire and the kitchen
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: e575a61ab74cc3f489b9b49f8efa9990, type: 3}
   group: 1
   training: 7
   crafts: 16

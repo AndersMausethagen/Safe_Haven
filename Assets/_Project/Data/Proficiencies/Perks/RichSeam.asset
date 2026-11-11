@@ -15,6 +15,6 @@ MonoBehaviour:
   id: mine_rich_seam
   displayName: Rich Seam
   description: Every critical blow on rock brings one more ore.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 72618ef7f84d6f24fb1445e7d6b3af9f, type: 3}
   technique: 3
   bonuses: []

@@ -15,7 +15,7 @@ MonoBehaviour:
   id: sneak_cutpurse
   displayName: Cutpurse
   description: The forest's curses come away in your hand.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 309b239608980d646acaa3816756db4b, type: 3}
   technique: 0
   bonuses:
   - stat: 21

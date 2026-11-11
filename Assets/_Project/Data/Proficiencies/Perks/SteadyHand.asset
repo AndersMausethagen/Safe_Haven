@@ -15,7 +15,7 @@ MonoBehaviour:
   id: alch_steady_hand
   displayName: Steady Hand
   description: Not a drop spilled.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 1419d74e537d9b04689f3a446450a95f, type: 3}
   technique: 0
   bonuses:
   - stat: 42

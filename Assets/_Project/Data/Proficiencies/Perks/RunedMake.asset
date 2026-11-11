@@ -15,6 +15,6 @@ MonoBehaviour:
   id: weapon_runed_make
   displayName: Runed Make
   description: A Masterwork weapon or tool comes from the anvil already empowered once.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: ef2a68c31daff1243aadc28732a13340, type: 3}
   technique: 10
   bonuses: []

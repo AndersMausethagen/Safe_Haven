@@ -15,6 +15,6 @@ MonoBehaviour:
   id: mine_shatter
   displayName: Shatter
   description: 'A critical blow splits the rock: it counts as two.'
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 5e15ee1281be0d94ea9f8962feee4a68, type: 3}
   technique: 4
   bonuses: []

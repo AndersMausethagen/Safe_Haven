@@ -16,7 +16,7 @@ MonoBehaviour:
   displayName: Sneaking
   description: 'Moving unseen and unheard: where to put a foot, when to stand still, how to open a lock without a sound.'
   trainedBy: ambushes, slipping past monsters, losing those that hunt you, and silent lock pins
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: f382704bda79e47438f2c2d468394ec5, type: 3}
   group: 3
   training: 2
   crafts: 0

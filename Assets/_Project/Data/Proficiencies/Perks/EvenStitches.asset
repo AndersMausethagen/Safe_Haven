@@ -15,7 +15,7 @@ MonoBehaviour:
   id: armor_even_stitches
   displayName: Even Stitches
   description: Small, tight, every one the same.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: bc4d0f31f5f6ff84680cbc0a2f261080, type: 3}
   technique: 0
   bonuses:
   - stat: 37

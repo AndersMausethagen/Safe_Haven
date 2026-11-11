@@ -15,7 +15,7 @@ MonoBehaviour:
   id: armor_padded_lining
   displayName: Padded Lining
   description: Wool under the leather.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: cf828848db6e7e0468b9df1b0741167a, type: 3}
   technique: 0
   bonuses:
   - stat: 0

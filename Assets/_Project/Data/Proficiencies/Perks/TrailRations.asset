@@ -15,7 +15,7 @@ MonoBehaviour:
   id: cook_trail_rations
   displayName: Trail Rations
   description: Food that walks with you.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 56523c1d6dbb0454e98d2db7f34c72e8, type: 3}
   technique: 0
   bonuses:
   - stat: 15

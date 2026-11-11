@@ -15,7 +15,7 @@ MonoBehaviour:
   id: spiketrap
   displayName: Spike Trap
   description: Sharpened stakes under a thin cover. Enemies that walk over it get hurt; your people know where to step.
-  icon: {fileID: 21300000, guid: 95b4111a562655b40b0f2e3f68d5033a, type: 3}
+  icon: {fileID: 21300000, guid: 6081aff030b4d4441a840b14469f8ff5, type: 3}
   faction: 0
   combatStats: {fileID: 11400000, guid: 01155c9e2dd7c27468c1a359f747e1a1, type: 2}
   prefab: {fileID: 3439831117555005679, guid: 4b3d14bbe504c444fa9e9a12da035871, type: 3}

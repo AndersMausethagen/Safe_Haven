@@ -16,7 +16,7 @@ MonoBehaviour:
   displayName: Melee
   description: 'The weapon in hand and the shield on the arm: striking, blocking, and knowing when to step aside.'
   trainedBy: weapon blows that hurt monsters, parries and perfect dodges
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 0b19b633d8e84e645bb2dc997aa89a93, type: 3}
   group: 2
   training: 1
   crafts: 0

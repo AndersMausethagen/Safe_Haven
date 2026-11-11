@@ -16,7 +16,7 @@ MonoBehaviour:
   displayName: Alchemy
   description: 'Herbs, essences and the cauldron: draughts that turn a fight and cures that save a life.'
   trainedBy: brewing tonics and remedies
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: dcdf2e59873642a45b5cc1f698717bb3, type: 3}
   group: 1
   training: 7
   crafts: 32

@@ -15,7 +15,7 @@ MonoBehaviour:
   id: fish_patient_line
   displayName: Patient Line
   description: Let it run, then bring it in.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 078e308cb8645474e9625531abf54963, type: 3}
   technique: 0
   bonuses:
   - stat: 47

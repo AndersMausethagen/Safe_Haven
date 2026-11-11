@@ -16,7 +16,7 @@ MonoBehaviour:
   displayName: Fishing
   description: 'Line, lure and patience: reading the water and keeping a fighting fish on the hook.'
   trainedBy: landing fish
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 5a04bcb5acbecf84fab051f6f30b52ca, type: 3}
   group: 0
   training: 5
   crafts: 128

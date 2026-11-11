@@ -15,6 +15,6 @@ MonoBehaviour:
   id: armor_sure_fit
   displayName: Sure Fit
   description: After four plain pieces in a row, the next is Fine for sure.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: d460060736bd5c04d9bea4d9fe90871f, type: 3}
   technique: 11
   bonuses: []

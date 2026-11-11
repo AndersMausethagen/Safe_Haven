@@ -15,7 +15,7 @@ MonoBehaviour:
   id: fish_master_angler
   displayName: Master Angler
   description: The river gives up what you ask of it.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 926ce478de7450b45a48695320bd21ff, type: 3}
   technique: 0
   bonuses:
   - stat: 47

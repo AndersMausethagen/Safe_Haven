@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SkillDefinition
   displayName: Frost Rune
   description: Carve Isa into the air. A spear of winter breaks from it and pierces the line ahead.
-  icon: {fileID: 21300000, guid: ce3f2b5efc6006540ab69c42ae026a53, type: 3}
+  icon: {fileID: 21300000, guid: baefdcf469e54c745b07d528fd6707a9, type: 3}
   school: 2
   cooldown: 10
   staminaCost: 20

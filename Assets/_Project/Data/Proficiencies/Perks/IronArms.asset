@@ -15,7 +15,7 @@ MonoBehaviour:
   id: mine_iron_arms
   displayName: Iron Arms
   description: Hauling stone builds more than walls.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: b76fe0596518c114eb421be2964a5c09, type: 3}
   technique: 0
   bonuses:
   - stat: 13

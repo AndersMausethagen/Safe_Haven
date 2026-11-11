@@ -15,7 +15,7 @@ MonoBehaviour:
   id: build_quick_hammer
   displayName: Quick Hammer
   description: Three blows where others need five.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 0d03451ce341f4a46b6c04123b41edc3, type: 3}
   technique: 0
   bonuses:
   - stat: 43

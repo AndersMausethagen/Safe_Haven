@@ -15,7 +15,7 @@ MonoBehaviour:
   id: sneak_keen_eye
   displayName: Keen Eye
   description: You see them first, and where it will hurt.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 03450e3cd6776484ebfaee62568f38fb, type: 3}
   technique: 0
   bonuses:
   - stat: 3

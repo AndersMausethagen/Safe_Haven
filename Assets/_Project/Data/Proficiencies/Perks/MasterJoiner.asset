@@ -15,7 +15,7 @@ MonoBehaviour:
   id: build_master_joiner
   displayName: Master Joiner
   description: Nothing wasted, every offcut used.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: affd660692d4f404085d89cc8ef97b81, type: 3}
   technique: 0
   bonuses:
   - stat: 44

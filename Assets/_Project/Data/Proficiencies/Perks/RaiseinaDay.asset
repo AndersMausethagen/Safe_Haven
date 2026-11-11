@@ -15,6 +15,6 @@ MonoBehaviour:
   id: build_raise_in_a_day
   displayName: Raise in a Day
   description: Your hammer works twice as fast.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 5b6fcd7ea5ab0ec46927969419fa4995, type: 3}
   technique: 18
   bonuses: []

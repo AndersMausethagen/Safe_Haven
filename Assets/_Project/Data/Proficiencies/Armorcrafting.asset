@@ -16,7 +16,7 @@ MonoBehaviour:
   displayName: Armorcrafting
   description: 'Leather, cloth, rings and plates: what turns a blow, and what lets you move.'
   trainedBy: making armour, shields and packs
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 18567b54b1a1d6b4d8aad4d86effd60c, type: 3}
   group: 1
   training: 7
   crafts: 8

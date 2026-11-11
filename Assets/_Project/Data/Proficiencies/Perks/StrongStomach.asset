@@ -15,7 +15,7 @@ MonoBehaviour:
   id: cook_strong_stomach
   displayName: Strong Stomach
   description: Nothing you ate ever did you harm.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: ed1105d406002fa4b92e1c5207bcf38b, type: 3}
   technique: 0
   bonuses:
   - stat: 0

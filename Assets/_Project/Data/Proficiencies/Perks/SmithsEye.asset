@@ -15,7 +15,7 @@ MonoBehaviour:
   id: weapon_smiths_eye
   displayName: Smith's Eye
   description: The colour of the steel tells you when.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: b8476cd4948cf8042853dcd9b1fcb299, type: 3}
   technique: 0
   bonuses:
   - stat: 35

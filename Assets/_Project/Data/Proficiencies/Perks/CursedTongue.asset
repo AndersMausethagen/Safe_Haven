@@ -15,7 +15,7 @@ MonoBehaviour:
   id: rune_cursed_tongue
   displayName: Cursed Tongue
   description: What the curse takes, you keep.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 71ac41742a2791a4f8c132f3441781e3, type: 3}
   technique: 0
   bonuses:
   - stat: 20

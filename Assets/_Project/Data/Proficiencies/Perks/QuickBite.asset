@@ -15,6 +15,6 @@ MonoBehaviour:
   id: fish_quick_bite
   displayName: Quick Bite
   description: Fish bite twice as soon.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: b7b87afaffcd84942ac33ccc0022008b, type: 3}
   technique: 7
   bonuses: []

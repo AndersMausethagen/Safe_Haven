@@ -15,6 +15,6 @@ MonoBehaviour:
   id: wood_heartwood_strike
   displayName: Heartwood Strike
   description: 'A critical swing bites twice as deep: it counts as two.'
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 83735abc0700a10419572d60beaa327c, type: 3}
   technique: 2
   bonuses: []

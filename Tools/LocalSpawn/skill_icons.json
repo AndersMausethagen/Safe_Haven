@@ -1,0 +1,10 @@
+{
+  "_about": "What each combat skill's icon (skill bar, skill book, altar) shows, for Tools/LocalSpawn/generate_item_icons.py --set skills. The skill as one object in action, with its effect: a bold shape and one strong colour each, so they tell apart on the skill bar.",
+  "AshladsEmber": "A small old wooden tinderbox, its lid open, a big solid cone of bright orange fire and chunky sparks bursting out of it",
+  "FrostRune": "A jagged spear of solid pale blue ice crystal flying forward, the Norse rune Isa (a single straight vertical line) glowing white on it, solid ice shards breaking off behind it",
+  "HeartrootsGrasp": "Thick gnarled tree roots bursting up out of a clod of dark earth and curling like grasping fingers, glowing faint green along the bark",
+  "HuldrasBlessing": "A cupped pair of slender green leaves holding a softly glowing golden-green orb of light, small white flowers and sparkles around it",
+  "TrollsbaneWrath": "A huge heavy war hammer with a dark iron head bound with leather, striking down onto cracked rock, chunks of broken stone flying out",
+  "WhirlingSteel": "Three Norse steel swords arranged in a spinning pinwheel around a centre point, their tips joined by thick curved solid silver crescent swoosh shapes, like a whirlwind of blades",
+  "WolfsLunge": "The head of a snarling grey wolf leaping forward with jaws open, a streak of motion behind it"
+}

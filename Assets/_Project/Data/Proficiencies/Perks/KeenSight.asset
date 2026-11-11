@@ -15,7 +15,7 @@ MonoBehaviour:
   id: bow_keen_sight
   displayName: Keen Sight
   description: Aim for the gap in the hide.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: a6ac30b5ae3667e43bb2ea6c290460cb, type: 3}
   technique: 0
   bonuses:
   - stat: 3

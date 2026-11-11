@@ -15,7 +15,7 @@ MonoBehaviour:
   id: fish_nokkens_respect
   displayName: Nokken's Respect
   description: The water spirit lets you be.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 8fa72785144412345963f69b3a440fa7, type: 3}
   technique: 0
   bonuses:
   - stat: 11

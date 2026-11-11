@@ -15,7 +15,7 @@ MonoBehaviour:
   id: alch_long_brew
   displayName: Long Brew
   description: Let it steep another night.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: dee07bd94031061439ad0f412afb888c, type: 3}
   technique: 0
   bonuses:
   - stat: 41

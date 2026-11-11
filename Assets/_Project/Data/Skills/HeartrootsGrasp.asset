@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SkillDefinition
   displayName: Heartroot's Grasp
   description: What the old guardian knew of the forest's hold. Roots break from the ground along the line ahead and take what stands there.
-  icon: {fileID: 21300000, guid: ce3f2b5efc6006540ab69c42ae026a53, type: 3}
+  icon: {fileID: 21300000, guid: 08f0d02d1cd668842bfa43ede6761ead, type: 3}
   school: 2
   cooldown: 10
   staminaCost: 20

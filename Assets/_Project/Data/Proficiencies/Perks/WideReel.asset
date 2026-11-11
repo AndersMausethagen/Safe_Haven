@@ -15,7 +15,7 @@ MonoBehaviour:
   id: fish_wide_reel
   displayName: Wide Reel
   description: Room to give and take.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 4b577b41df0a24f4f8ec2203fdc72fb1, type: 3}
   technique: 0
   bonuses:
   - stat: 47

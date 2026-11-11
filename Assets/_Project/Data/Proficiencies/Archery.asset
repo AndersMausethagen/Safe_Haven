@@ -16,7 +16,7 @@ MonoBehaviour:
   displayName: Archery
   description: 'Bow and arrow: the draw, the breath, the release.'
   trainedBy: arrows that hurt monsters
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 612ef82d431676d4f875ab99e4b7534a, type: 3}
   group: 2
   training: 3
   crafts: 0

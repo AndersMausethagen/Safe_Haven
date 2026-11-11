@@ -15,7 +15,7 @@ MonoBehaviour:
   id: build_master_builder
   displayName: Master Builder
   description: The Haven stands in your hands' shape.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: cd191fb3acb7275469d163a79a6c5b62, type: 3}
   technique: 0
   bonuses:
   - stat: 43

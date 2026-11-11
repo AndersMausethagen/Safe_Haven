@@ -15,7 +15,7 @@ MonoBehaviour:
   id: fish_strong_wrists
   displayName: Strong Wrists
   description: A rod is a weapon of a kind.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 7b6ff4b172778794697edad8bca2b3d7, type: 3}
   technique: 0
   bonuses:
   - stat: 15

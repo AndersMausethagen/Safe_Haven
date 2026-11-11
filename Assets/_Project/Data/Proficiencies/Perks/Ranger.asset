@@ -15,7 +15,7 @@ MonoBehaviour:
   id: bow_ranger
   displayName: Ranger
   description: From the shadows, one arrow is enough.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 9023c804c3488fd4388d283356895fd1, type: 3}
   technique: 0
   bonuses:
   - stat: 33

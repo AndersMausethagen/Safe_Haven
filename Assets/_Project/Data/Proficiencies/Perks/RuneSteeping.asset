@@ -15,7 +15,7 @@ MonoBehaviour:
   id: alch_rune_steeping
   displayName: Rune Steeping
   description: Words spoken over the pot.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 5cb822e343094ef4c8970bee0876d209, type: 3}
   technique: 0
   bonuses:
   - stat: 2

@@ -15,7 +15,7 @@ MonoBehaviour:
   id: wood_axe_fighter
   displayName: Axe Fighter
   description: Twenty winters of felling make a fearsome arm.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: a8916cbe783452b419211347e01db315, type: 3}
   technique: 0
   bonuses:
   - stat: 28

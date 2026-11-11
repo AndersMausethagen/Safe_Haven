@@ -15,7 +15,7 @@ MonoBehaviour:
   id: armor_master_armourer
   displayName: Master Armourer
   description: Others come to be measured.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 0c4057a886befaa419a203419e1e6d3b, type: 3}
   technique: 0
   bonuses:
   - stat: 37

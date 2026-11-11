@@ -15,6 +15,6 @@ MonoBehaviour:
   id: bow_pinning_shot
   displayName: Pinning Shot
   description: A critical arrow roots what it hits for a moment.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 80308082ac3d51049938a807041ad51f, type: 3}
   technique: 22
   bonuses: []

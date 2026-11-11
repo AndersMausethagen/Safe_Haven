@@ -15,7 +15,7 @@ MonoBehaviour:
   id: bow_master_archer
   displayName: Master Archer
   description: The bow is an arm you were born with.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: fe0c1e6c8f250b14380b4a9f0d33973c, type: 3}
   technique: 0
   bonuses:
   - stat: 48

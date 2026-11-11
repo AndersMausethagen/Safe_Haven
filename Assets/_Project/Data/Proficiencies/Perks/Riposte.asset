@@ -15,6 +15,6 @@ MonoBehaviour:
   id: melee_riposte
   displayName: Riposte
   description: A parry readies a counter, as a perfect dodge does.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: d011598c52d48a64bbf8c0935e69a0a9, type: 3}
   technique: 19
   bonuses: []

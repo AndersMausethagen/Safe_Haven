@@ -15,7 +15,7 @@ MonoBehaviour:
   id: weapon_know_your_steel
   displayName: Know Your Steel
   description: You made it; you know what it can do.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: d6ef493e992637f43af8c7cc96ba7e96, type: 3}
   technique: 0
   bonuses:
   - stat: 28

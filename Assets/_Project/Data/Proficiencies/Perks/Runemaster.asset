@@ -15,7 +15,7 @@ MonoBehaviour:
   id: rune_runemaster
   displayName: Runemaster
   description: The old words answer to you.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 69f449651abaf00498d90f713abd8811, type: 3}
   technique: 0
   bonuses:
   - stat: 49

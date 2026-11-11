@@ -15,7 +15,7 @@ MonoBehaviour:
   id: sneak_nightstalker
   displayName: Nightstalker
   description: The dark is yours, and everything in it.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 0bc113b82a277924596437abd3218c3c, type: 3}
   technique: 0
   bonuses:
   - stat: 33

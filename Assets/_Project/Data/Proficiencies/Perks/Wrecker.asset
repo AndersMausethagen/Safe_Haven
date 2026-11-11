@@ -15,7 +15,7 @@ MonoBehaviour:
   id: mine_wrecker
   displayName: Wrecker
   description: Every wall has a weak joint.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: f673780e7d5e49449a821786f8140d76, type: 3}
   technique: 0
   bonuses:
   - stat: 12

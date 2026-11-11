@@ -15,7 +15,7 @@ MonoBehaviour:
   id: melee_warden
   displayName: Warden
   description: Behind you, the Haven. In front, nothing gets past.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: d86023d9c8db5c04f9bbea80b5cb13e0, type: 3}
   technique: 0
   bonuses:
   - stat: 0

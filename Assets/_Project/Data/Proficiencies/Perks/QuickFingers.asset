@@ -15,7 +15,7 @@ MonoBehaviour:
   id: forage_quick_fingers
   displayName: Quick Fingers
   description: Pick, drop, pick again.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: e8117b82c7cd11b409b9017023b12ca4, type: 3}
   technique: 0
   bonuses:
   - stat: 45

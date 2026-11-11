@@ -15,7 +15,7 @@ MonoBehaviour:
   id: sneak_low_profile
   displayName: Low Profile
   description: A shape among shapes.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 13baf9e9ff636824dbeb2982a755fe5d, type: 3}
   technique: 0
   bonuses:
   - stat: 32

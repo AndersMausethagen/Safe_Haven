@@ -15,7 +15,7 @@ MonoBehaviour:
   id: sneak_assassin
   displayName: Assassin
   description: Unaware is as good as undefended.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 0d1448d65aa6cf840a053ac19c507ed0, type: 3}
   technique: 0
   bonuses:
   - stat: 33

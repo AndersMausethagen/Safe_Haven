@@ -15,7 +15,7 @@ MonoBehaviour:
   id: alch_master_alchemist
   displayName: Master Alchemist
   description: The cauldron does what you ask.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: ce4f48483aa11eb45829fb07f5e9d911, type: 3}
   technique: 0
   bonuses:
   - stat: 41

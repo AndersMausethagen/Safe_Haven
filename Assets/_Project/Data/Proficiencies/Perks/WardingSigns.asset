@@ -15,7 +15,7 @@ MonoBehaviour:
   id: rune_warding_signs
   displayName: Warding Signs
   description: Marks against flame and frost.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: a57a12d7495fd274ba5c0166d91dadb4, type: 3}
   technique: 0
   bonuses:
   - stat: 9

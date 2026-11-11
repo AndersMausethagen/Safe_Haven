@@ -15,7 +15,7 @@ MonoBehaviour:
   id: irontrap
   displayName: Iron Trap
   description: Forged jaws under a thin cover. It bites far harder than a stake, and your people know where to step.
-  icon: {fileID: 21300000, guid: 95b4111a562655b40b0f2e3f68d5033a, type: 3}
+  icon: {fileID: 21300000, guid: 554b9f1c00a138a4db7331e0ba5d6768, type: 3}
   faction: 0
   combatStats: {fileID: 11400000, guid: 01155c9e2dd7c27468c1a359f747e1a1, type: 2}
   prefab: {fileID: 3439831117555005679, guid: 3342b4f97beac5a49b89c68220512701, type: 3}

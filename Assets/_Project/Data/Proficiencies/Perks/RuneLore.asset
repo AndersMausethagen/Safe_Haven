@@ -15,7 +15,7 @@ MonoBehaviour:
   id: rune_rune_lore
   displayName: Rune Lore
   description: Old words, carved deeper.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 07943611735228e44bf1d6c28eccac21, type: 3}
   technique: 0
   bonuses:
   - stat: 2

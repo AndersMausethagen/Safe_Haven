@@ -15,6 +15,6 @@ MonoBehaviour:
   id: rune_soul_siphon
   displayName: Soul Siphon
   description: A kill with a spell heals a tenth of your health.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 20928f0da41a3e7469bc3b61c2b58ada, type: 3}
   technique: 24
   bonuses: []

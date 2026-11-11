@@ -15,6 +15,6 @@ MonoBehaviour:
   id: cook_hearty_meals
   displayName: Hearty Meals
   description: A meal heals a quarter of your health as well.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: edb4d40e67ae9b34088882fcca9cfd2e, type: 3}
   technique: 14
   bonuses: []

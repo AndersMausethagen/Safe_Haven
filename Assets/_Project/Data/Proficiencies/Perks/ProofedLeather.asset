@@ -15,7 +15,7 @@ MonoBehaviour:
   id: armor_proofed_leather
   displayName: Proofed Leather
   description: Boiled, waxed and boiled again.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: e3d13cd174e245f4b9e833c3d00e96c8, type: 3}
   technique: 0
   bonuses:
   - stat: 8

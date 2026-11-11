@@ -15,7 +15,7 @@ MonoBehaviour:
   id: bow_broadheads
   displayName: Broadheads
   description: Wide iron, deep wounds.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: ffb09284375275c41af521226f4092f5, type: 3}
   technique: 0
   bonuses:
   - stat: 48

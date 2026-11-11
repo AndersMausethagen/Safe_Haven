@@ -1,0 +1,16 @@
+{
+  "_about": "What each of the 13 skills' icon (Skills window) shows, for Tools/LocalSpawn/generate_item_icons.py --set proficiencies. One tool or object that is the craft itself, a different shape and colour for each, readable at 26 px.",
+  "alchemy": "A round glass flask of glowing green potion with a cork, a sprig of herbs tied around its neck",
+  "archery": "A curved wooden longbow with a nocked arrow with grey goose feathers, drawn at an angle",
+  "armorcrafting": "A small iron helmet with a nose guard resting on a folded piece of chain mail",
+  "construction": "A wooden mallet crossed with a carpenter's square, over a squared timber beam",
+  "cooking": "A small black iron cooking pot with a wooden ladle, steam rising, a sprig of thyme on the rim",
+  "fishing": "A wooden fishing rod with a line ending in a silver hook, a small silver trout hanging from it",
+  "foraging": "A small woven wicker basket full of red lingonberries, a golden chanterelle mushroom and green leaves",
+  "melee": "A Norse steel sword crossed over a round wooden shield painted red with an iron boss",
+  "mining": "An iron pickaxe with a wooden haft resting on a chunk of grey rock with a seam of orange copper ore",
+  "runecraft": "A flat grey rune stone with a glowing pale blue Norse rune carved into it",
+  "sneaking": "A dark grey hooded cloak, the hood empty and shadowed, a small dagger at its side",
+  "weaponcrafting": "A blacksmith's hammer resting on a black iron anvil beside a glowing orange sword blade",
+  "woodcutting": "A felling axe with a long wooden haft stuck into the top of a round birch log with white bark"
+}

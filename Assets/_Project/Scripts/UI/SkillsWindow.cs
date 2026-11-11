@@ -23,13 +23,17 @@ public sealed class SkillsWindow : MonoBehaviour
     private const float MilestoneTop = 395f;
     private const float MilestoneHeight = 64f;
     private const float MilestoneGap = 6f;
-    private const float CardWidth = 375f;
+    private const float LevelColumn = 70f;
+    private const float CardWidth = 385f;
+    private const float RowIcon = 24f;
+    private const float CardIcon = 46f;
     private const int MilestoneRows = 5;
 
     private sealed class SkillRow
     {
         public ProficiencyDefinition Skill;
         public Image Background;
+        public Image Icon;
         public Image Selected;
         public TMP_Text Name;
         public TMP_Text Level;
@@ -40,6 +44,7 @@ public sealed class SkillsWindow : MonoBehaviour
     {
         public PerkDefinition Perk;
         public Image Background;
+        public Image Icon;
         public Image Owned;
         public TMP_Text Text;
         public Button Button;
@@ -51,6 +56,7 @@ public sealed class SkillsWindow : MonoBehaviour
     private RectTransform panel;
     private TMP_Text header;
     private TMP_Text skillName;
+    private Image skillIcon;
     private TMP_Text skillExperience;
     private TMP_Text skillAbout;
     private TMP_Text skillBonuses;
@@ -203,7 +209,8 @@ public sealed class SkillsWindow : MonoBehaviour
         var hover = rect.gameObject.AddComponent<UnityEngine.EventSystems.EventTrigger>();
         AddTrigger(hover, UnityEngine.EventSystems.EventTriggerType.PointerEnter, () => ShowNext(skill, rect));
         AddTrigger(hover, UnityEngine.EventSystems.EventTriggerType.PointerExit, HideNext);
-        row.Name = CodeUI.Label("Name", rect, 14f, 2f, ListWidth - 120f, RowHeight - 10f, 18f, style.Text);
+        row.Icon = Icon("Icon", rect, 14f, 0f, RowIcon, skill.Icon);
+        row.Name = CodeUI.Label("Name", rect, 46f, 2f, ListWidth - 152f, RowHeight - 10f, 18f, style.Text);
         row.Level = CodeUI.Label("Level", rect, ListWidth - 104f, 2f, 90f, RowHeight - 10f, 18f, style.Accent, TextAlignmentOptions.Right);
         Image track = CodeUI.At("Track", rect, 14f, RowHeight - 9f, ListWidth - 28f, 3f).gameObject.AddComponent<Image>();
         track.color = style.Track;
@@ -281,7 +288,8 @@ public sealed class SkillsWindow : MonoBehaviour
 
     private void BuildDetail(UIStyle style)
     {
-        skillName = CodeUI.Label("Skill Name", panel, DetailX, 116f, DetailWidth, 40f, 30f, style.Accent);
+        skillIcon = Icon("Skill Icon", panel, DetailX, 114f, 42f, null);
+        skillName = CodeUI.Label("Skill Name", panel, DetailX + 52f, 116f, DetailWidth - 52f, 40f, 30f, style.Accent);
         skillExperience = CodeUI.Label("Skill Experience", panel, DetailX, 156f, DetailWidth, 28f, 18f, style.Muted);
         skillAbout = CodeUI.Paragraph("Skill About", panel, DetailX, 186f, DetailWidth, 72f, 17f, style.Text);
         skillAbout.richText = true;
@@ -294,9 +302,9 @@ public sealed class SkillsWindow : MonoBehaviour
         for (int i = 0; i < MilestoneRows; i++)
         {
             float y = MilestoneTop + i * (MilestoneHeight + MilestoneGap);
-            TMP_Text level = CodeUI.Label("Milestone " + (i + 1), panel, DetailX, y, 80f, MilestoneHeight, 24f, style.Accent, TextAlignmentOptions.Center);
-            PerkCard first = AddCard("First " + (i + 1), DetailX + 90f, y, style);
-            PerkCard second = AddCard("Second " + (i + 1), DetailX + 90f + CardWidth + 10f, y, style);
+            TMP_Text level = CodeUI.Label("Milestone " + (i + 1), panel, DetailX, y, LevelColumn - 10f, MilestoneHeight, 24f, style.Accent, TextAlignmentOptions.Center);
+            PerkCard first = AddCard("First " + (i + 1), DetailX + LevelColumn, y, style);
+            PerkCard second = AddCard("Second " + (i + 1), DetailX + LevelColumn + CardWidth + 10f, y, style);
             milestones.Add((level, first, second));
         }
     }
@@ -309,8 +317,14 @@ public sealed class SkillsWindow : MonoBehaviour
         card.Button.targetGraphic = card.Background;
         card.Button.onClick.AddListener(() => Choose(card.Perk));
         rect.gameObject.AddComponent<UIRole>().Set(UIRole.Kind.Button);
-        card.Text = CodeUI.Paragraph("Text", rect, 12f, 6f, CardWidth - 20f, MilestoneHeight - 10f, 15f, style.Text);
+        card.Icon = Icon("Icon", rect, 10f, (MilestoneHeight - CardIcon) * 0.5f, CardIcon, null);
+        float textX = 18f + CardIcon;
+        card.Text = CodeUI.Paragraph("Text", rect, textX, 6f, CardWidth - textX - 8f, MilestoneHeight - 10f, 15f, style.Text);
         card.Text.richText = true;
+        // A long name and two bonuses would run out of the card: they shrink a little instead.
+        card.Text.enableAutoSizing = true;
+        card.Text.fontSizeMin = 12f;
+        card.Text.fontSizeMax = 15f;
         card.Owned = CodeUI.At("Owned", rect, 0f, 0f, 4f, MilestoneHeight).gameObject.AddComponent<Image>();
         card.Owned.color = style.Accent;
         card.Owned.raycastTarget = false;
@@ -318,6 +332,17 @@ public sealed class SkillsWindow : MonoBehaviour
     }
 
     // Milestones reached and waiting for a choice breathe in the accent, so the eye goes to them.
+    // A skill's or perk's painted icon (BuildIcons); hidden while there is none.
+    private static Image Icon(string name, Transform parent, float x, float y, float size, Sprite sprite)
+    {
+        var icon = CodeUI.At(name, parent, x, y, size, size).gameObject.AddComponent<Image>();
+        icon.preserveAspect = true;
+        icon.raycastTarget = false;
+        icon.sprite = sprite;
+        icon.enabled = sprite != null;
+        return icon;
+    }
+
     private void Breathe()
     {
         if (window == null || !window.IsOpen || selected == null)
@@ -516,6 +541,8 @@ public sealed class SkillsWindow : MonoBehaviour
     {
         bool shown = selected != null;
         skillName.gameObject.SetActive(shown);
+        skillIcon.sprite = shown ? selected.Icon : null;
+        skillIcon.enabled = skillIcon.sprite != null;
         skillExperience.gameObject.SetActive(shown);
         skillAbout.gameObject.SetActive(shown);
         skillBonuses.gameObject.SetActive(shown);
@@ -585,6 +612,10 @@ public sealed class SkillsWindow : MonoBehaviour
         card.Background.color = open ? style.ControlLit : style.Filled;
         card.Owned.enabled = owned;
         card.Button.interactable = perk != null;
+        card.Icon.sprite = perk != null ? perk.Icon : null;
+        card.Icon.enabled = card.Icon.sprite != null;
+        // Locked perks are drawn faded, like their words.
+        card.Icon.color = open || owned ? Color.white : new Color(1f, 1f, 1f, 0.45f);
         if (perk == null)
         {
             card.Text.text = "";

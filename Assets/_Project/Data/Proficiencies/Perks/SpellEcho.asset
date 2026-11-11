@@ -15,6 +15,6 @@ MonoBehaviour:
   id: rune_spell_echo
   displayName: Spell Echo
   description: Now and then a spell leaves no cooldown behind.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 329a909f101477d4ea7b59927a4655a4, type: 3}
   technique: 23
   bonuses: []

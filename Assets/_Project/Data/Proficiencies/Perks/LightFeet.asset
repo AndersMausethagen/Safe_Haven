@@ -15,7 +15,7 @@ MonoBehaviour:
   id: sneak_light_feet
   displayName: Light Feet
   description: Moss under the boots, never twigs.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 6f5024ef3c1b40d4d870cdf4da81e06d, type: 3}
   technique: 0
   bonuses:
   - stat: 16

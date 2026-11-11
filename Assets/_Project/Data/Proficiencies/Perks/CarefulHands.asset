@@ -15,7 +15,7 @@ MonoBehaviour:
   id: mine_careful_hands
   displayName: Careful Hands
   description: A pick lasts as long as the hand is patient.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 027eef0fdc01083479656519d66024ac, type: 3}
   technique: 0
   bonuses:
   - stat: 19

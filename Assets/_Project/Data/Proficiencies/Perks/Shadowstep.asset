@@ -15,6 +15,6 @@ MonoBehaviour:
   id: sneak_shadowstep
   displayName: Shadowstep
   description: You sneak a third faster.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 31307f2aa99988947a114c80e281eb76, type: 3}
   technique: 26
   bonuses: []

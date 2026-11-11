@@ -15,7 +15,7 @@ MonoBehaviour:
   id: mine_prospector
   displayName: Prospector
   description: You see the seam before the pick does.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 81ddbd4c1d699c049937c615a57f8f75, type: 3}
   technique: 0
   bonuses:
   - stat: 27

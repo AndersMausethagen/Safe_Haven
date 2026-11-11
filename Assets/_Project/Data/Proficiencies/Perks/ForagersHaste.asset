@@ -15,6 +15,6 @@ MonoBehaviour:
   id: forage_foragers_haste
   displayName: Forager's Haste
   description: Every plant picked puts a spring in your step for a while.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 8c7decb8289ed6b4bb3464fb9ab23e52, type: 3}
   technique: 6
   bonuses: []

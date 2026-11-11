@@ -15,7 +15,7 @@ MonoBehaviour:
   id: bow_quick_nock
   displayName: Quick Nock
   description: The next arrow is on the string before the first lands.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: f2da8225395e8644db2f42010450a841, type: 3}
   technique: 0
   bonuses:
   - stat: 17

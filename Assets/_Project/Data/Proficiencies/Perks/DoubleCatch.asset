@@ -15,6 +15,6 @@ MonoBehaviour:
   id: fish_double_catch
   displayName: Double Catch
   description: Now and then two fish come up on the one line.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: d60d47e72ebbcda4584abfee082498b5, type: 3}
   technique: 8
   bonuses: []

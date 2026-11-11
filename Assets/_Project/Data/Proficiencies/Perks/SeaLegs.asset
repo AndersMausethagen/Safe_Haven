@@ -15,7 +15,7 @@ MonoBehaviour:
   id: fish_sea_legs
   displayName: Sea Legs
   description: Steady on any footing.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: cf704fd1bc177ae449893301b138ec59, type: 3}
   technique: 0
   bonuses:
   - stat: 0

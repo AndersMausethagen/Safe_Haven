@@ -15,7 +15,7 @@ MonoBehaviour:
   id: weapon_hammer_arm
   displayName: Hammer Arm
   description: A thousand blows on the anvil.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 5128f33b2884b79439b9c131c583ca8e, type: 3}
   technique: 0
   bonuses:
   - stat: 13

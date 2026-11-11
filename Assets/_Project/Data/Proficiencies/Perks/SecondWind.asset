@@ -15,6 +15,6 @@ MonoBehaviour:
   id: melee_second_wind
   displayName: Second Wind
   description: A kill with your weapon gives back 20 stamina.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: a430db5e9cb2dd048a876471ce4b5b56, type: 3}
   technique: 20
   bonuses: []

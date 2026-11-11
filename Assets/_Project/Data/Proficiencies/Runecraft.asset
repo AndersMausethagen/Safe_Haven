@@ -16,7 +16,7 @@ MonoBehaviour:
   displayName: Runecraft
   description: 'Old words cut and spoken: Purified and Cursed alike.'
   trainedBy: spells that hurt monsters, and every spell cast
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 3554b2b7341f2d649bd911236a8fe717, type: 3}
   group: 2
   training: 4
   crafts: 0

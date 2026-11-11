@@ -15,7 +15,7 @@ MonoBehaviour:
   id: cook_hearty_portions
   displayName: Hearty Portions
   description: Always enough for one more.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 592763d25ef63474eadbd0ab2270f31f, type: 3}
   technique: 0
   bonuses:
   - stat: 40

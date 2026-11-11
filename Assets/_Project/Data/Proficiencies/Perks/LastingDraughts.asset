@@ -15,7 +15,7 @@ MonoBehaviour:
   id: alch_lasting_draughts
   displayName: Lasting Draughts
   description: The warmth stays in the blood.
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 1458f6a355932e24e9e731a9fddc8012, type: 3}
   technique: 0
   bonuses:
   - stat: 41
