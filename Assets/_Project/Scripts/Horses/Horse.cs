@@ -18,13 +18,13 @@ using UnityEngine.AI;
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(NavMeshAgent), typeof(Damageable), typeof(Combatant))]
-public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold
+public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold, IStatusImmunity
 {
     public enum Mode { Wild, Lassoed, Breaking, Tamed }
 
     /// <summary>What a tamed horse does when nobody rides it: grazes about where it was left, follows the player (behind
     /// them on foot, on a lead behind the horse they ride), or stays put.</summary>
-    public enum Orders { Graze, Follow, Stay }
+    public enum Orders { Graze, Follow, Stay, Work }
 
     private const float MenuRange = 3.5f;
     private const float FeedCooldownSeconds = 30f;
@@ -104,6 +104,9 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold
 
     /// <summary>What it does while nobody rides it.</summary>
     public Orders Order { get; private set; } = Orders.Graze;
+    /// <summary>Put to work: which job (HorseSettings › Jobs) and where; -1 while it isn't.</summary>
+    public int Job { get; private set; } = -1;
+    public Vector3 WorkAt { get; private set; }
 
     /// <summary>The bond with the player, 0-100 (HorseBondRules).</summary>
     public float Bond { get; private set; }
@@ -277,7 +280,39 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold
     public void Command(Orders order)
     {
         Order = order;
+        if (order != Orders.Work)
+        {
+            Job = -1;
+        }
+
         GameMessages.Post(order == Orders.Follow ? $"{HorseName} follows you." : order == Orders.Stay ? $"{HorseName} stays here." : $"{HorseName} grazes where it is.", MessageKind.Info);
+    }
+
+    /// <summary>Puts it to work beside a station (ploughing by the farm plots, hauling for the sawbench).</summary>
+    public void PutToWork(int job, Vector3 at)
+    {
+        Order = Orders.Work;
+        Job = job;
+        WorkAt = at;
+        var jobs = HorseSettings.Current.Jobs;
+        if (job >= 0 && job < jobs.Count)
+        {
+            GameMessages.Post($"{HorseName} is put to work: {jobs[job].name.ToLowerInvariant()}. Stations of its kind nearby work {jobs[job].bonus * 100f:0}% faster.", MessageKind.Gain);
+        }
+    }
+
+    // ----- Status effects a breed shrugs off -----
+
+    public bool Resists(StatusEffectDefinition effect)
+    {
+        if (effect == null || definition == null)
+        {
+            return false;
+        }
+
+        string name = (effect.Id + " " + effect.DisplayName).ToLowerInvariant();
+        return definition.Has(HorseAbility.PoisonProof) && (name.Contains("poison") || name.Contains("rot") || name.Contains("venom"))
+            || definition.Has(HorseAbility.ColdProof) && (name.Contains("chill") || name.Contains("frost") || name.Contains("cold"));
     }
 
     // ----- Traits from use -----
@@ -757,6 +792,28 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold
             }
         }
 
+        if (!IsStabled && IsGrown)
+        {
+            var jobs = HorseSettings.Current.Jobs;
+            if (Order == Orders.Work)
+            {
+                page.Add(new MenuAction("Stop working", Job >= 0 && Job < jobs.Count ? jobs[Job].name : null, !visiting, () => Command(Orders.Graze), closesMenu: true));
+            }
+            else
+            {
+                for (int i = 0; i < jobs.Count; i++)
+                {
+                    int chosen = i;
+                    CraftingStation station = HorseJobs.NearestStation(jobs[i].station, transform.position, 30f);
+                    if (station != null)
+                    {
+                        page.Add(new MenuAction(jobs[i].name, $"{jobs[i].description} (+{jobs[i].bonus * 100f:0}%)", !visiting,
+                            () => PutToWork(chosen, station.transform.position), closesMenu: true));
+                    }
+                }
+            }
+        }
+
         if (!IsStabled)
         {
             page.Add(new MenuAction(Order == Orders.Follow ? "Stop following" : "Follow me",
@@ -996,6 +1053,8 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold
         public float swumMetres;
         public float rodeMetres;
         public int hurtRidden;
+        public int job = -1;
+        public Vector3 workAt;
     }
 
     string ISaveable.SaveKey => "horse";
@@ -1007,7 +1066,7 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold
             name = horseName, stats = Stats, stamina = Stamina, saddle = saddle != null ? saddle.Id : "",
             armour = armour != null ? armour.Id : "", bond = Bond, lastCared = LastCared, lastGroomed = LastGroomed, stabledIn = StabledIn,
             bornOn = BornOn, withFoalSince = WithFoalSince, foalSire = FoalSire, lastFoaled = LastFoaled,
-            order = (int)Order, roughMetres = roughMetres, swumMetres = swumMetres, rodeMetres = rodeMetres, hurtRidden = hurtRidden,
+            order = (int)Order, job = Job, workAt = WorkAt, roughMetres = roughMetres, swumMetres = swumMetres, rodeMetres = rodeMetres, hurtRidden = hurtRidden,
         };
         if (Cargo != null)
         {
@@ -1045,7 +1104,13 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold
         WithFoalSince = saved.withFoalSince;
         FoalSire = saved.foalSire ?? "";
         LastFoaled = saved.lastFoaled;
-        Order = (Orders)Mathf.Clamp(saved.order, 0, 2);
+        Order = (Orders)Mathf.Clamp(saved.order, 0, 3);
+        Job = saved.job;
+        WorkAt = saved.workAt;
+        if (Order == Orders.Work && Job < 0)
+        {
+            Order = Orders.Graze;
+        }
         roughMetres = saved.roughMetres;
         swumMetres = saved.swumMetres;
         rodeMetres = saved.rodeMetres;

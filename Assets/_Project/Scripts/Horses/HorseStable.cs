@@ -8,9 +8,13 @@ using UnityEngine;
 /// a saved horse of the mare's kind, its numbers its parents' (HorseBreeding), born into a free stall, that grows up over
 /// a few days more. A horse is stabled and led out from the stable's menu or its own (Horse); which stable keeps it is saved
 /// on the horse, and on a load the stable puts it back in a stall. If the stable is pulled down, its horses wait at its door.
+/// <para>
+/// Its feed trough (four places, filled from the bag in the cargo window, saved with the stable): every few hours each
+/// stabled horse eats a meal from it (barley, a turnip, bread), and while fed it mends twice as fast and grows fonder.
+/// </para>
 /// </summary>
 [DisallowMultipleComponent]
-public sealed class HorseStable : MonoBehaviour
+public sealed class HorseStable : MonoBehaviour, ISaveable, ICargoHold
 {
     /// <summary>How near a horse must stand to a stable to be led into it.</summary>
     public const float LeadReach = 16f;
@@ -27,6 +31,9 @@ public sealed class HorseStable : MonoBehaviour
     private float nextCheck;
     private float lastHour = -1f;
     private readonly System.Random random = new System.Random();
+    private readonly ItemContainer trough = new ItemContainer(4, 1);
+    // The in-game hour each stall's horse is fed until.
+    private readonly float[] fedUntil = new float[8];
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetForNewPlaySession() => all.Clear();
@@ -107,6 +114,9 @@ public sealed class HorseStable : MonoBehaviour
         TakeInLoaded();
         var page = new MenuPage { Title = "Stable", Body = $"{Occupants} of {Stalls} stalls taken. Horses here are safe, mend and rest; a mare and a stallion both fond of you may foal." };
         bool visiting = HavenVisit.IsVisiting;
+        GameObject user = interactable.Interactor;
+        page.Add(new MenuAction($"Feed trough ({Meals()} meals)", "Fed horses mend twice as fast and grow fonder", !visiting && user != null,
+            () => CargoWindow.Create().Open(this, user), closesMenu: true));
         for (int i = 0; i < Stalls; i++)
         {
             Horse horse = kept[i];
@@ -273,14 +283,93 @@ public sealed class HorseStable : MonoBehaviour
         for (int i = 0; i < Stalls; i++)
         {
             Horse horse = kept[i];
-            if (horse != null && horse.IsAlive)
+            if (horse == null || !horse.IsAlive)
             {
-                horse.Health.Heal(horse.Health.MaxHealth * settings.StableHealPerHour * Mathf.Min(hours, 24f));
-                horse.Stamina = horse.MaxStamina;
+                continue;
+            }
+
+            // A meal from the trough when the last one has worn off: while fed, it mends twice as fast and grows fonder.
+            if (fedUntil[i] <= hour)
+            {
+                ItemDefinition meal = TakeMeal();
+                if (meal != null)
+                {
+                    fedUntil[i] = hour + settings.TroughMealHours;
+                    horse.Befriend(meal.HorseTreat * 0.5f);
+                }
+            }
+
+            bool fed = fedUntil[i] > hour;
+            float mend = settings.StableHealPerHour * Mathf.Min(hours, 24f) * (fed ? 2f : 1f);
+            horse.Health.Heal(horse.Health.MaxHealth * mend);
+            horse.Stamina = horse.MaxStamina;
+            if (fed)
+            {
+                horse.Befriend(settings.TroughBondPerHour * Mathf.Min(hours, 24f));
             }
         }
 
         Breed(settings);
+    }
+
+    private ItemDefinition TakeMeal()
+    {
+        for (int i = 0; i < trough.SlotCount; i++)
+        {
+            ItemStack stack = trough.GetSlot(i);
+            if (!stack.IsEmpty && stack.Item.IsHorseTreat && trough.Remove(stack.Item, 1) > 0)
+            {
+                return stack.Item;
+            }
+        }
+
+        return null;
+    }
+
+    private int Meals()
+    {
+        int count = 0;
+        for (int i = 0; i < trough.SlotCount; i++)
+        {
+            ItemStack stack = trough.GetSlot(i);
+            if (!stack.IsEmpty && stack.Item.IsHorseTreat)
+            {
+                count += stack.Count;
+            }
+        }
+
+        return count;
+    }
+
+    // ICargoHold: the trough in the cargo window.
+    public ItemContainer Cargo => trough;
+    public string CargoTitle => "Feed trough";
+    public string CargoDescription => $"Barley, turnips or bread. Every {HorseSettings.Current.TroughMealHours:0} hours each stabled horse eats a meal, and while fed it mends twice as fast and grows fonder.";
+    public float Weight => trough.CurrentWeight;
+    public float Capacity => 1000f;
+    public bool IsOverfilled => false;
+    public float SpeedScale => 1f;
+
+    // Saving: the trough's food.
+    [System.Serializable]
+    private sealed class Saved
+    {
+        public System.Collections.Generic.List<SlotSaveData> trough = new System.Collections.Generic.List<SlotSaveData>();
+    }
+
+    string ISaveable.SaveKey => "stable";
+
+    public string CaptureState() => JsonUtility.ToJson(new Saved { trough = SaveMapper.ToSlots(trough) });
+
+    public void RestoreState(string state)
+    {
+        Saved saved = JsonUtility.FromJson<Saved>(state);
+        var content = Resources.Load<ContentDatabase>(ContentDatabase.ResourceName);
+        trough.Clear();
+        if (saved != null && saved.trough != null && content != null)
+        {
+            SaveMapper.ReadSlots(saved.trough, trough, content, new System.Collections.Generic.List<string>());
+        }
     }
 
     // Horses saved as stabled here come back from the load in the open: each goes back to a stall.

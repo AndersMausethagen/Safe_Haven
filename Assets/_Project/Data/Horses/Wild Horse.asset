@@ -33,7 +33,23 @@ MonoBehaviour:
   - 0,1,2
   - 3,4
   - 0
-  rareCoats: []
+  rareCoats:
+  - name: Palomino
+    tint: {r: 0.86, g: 0.66, b: 0.36, a: 1}
+    pattern: {fileID: 0}
+    mane: 4
+  - name: Silver Dapple
+    tint: {r: 0.66, g: 0.66, b: 0.68, a: 1}
+    pattern: {fileID: 2800000, guid: 619ebbc38df91c3409ed80b7d87f15e8, type: 3}
+    mane: 4
+  - name: Pinto
+    tint: {r: 1, g: 1, b: 1, a: 1}
+    pattern: {fileID: 2800000, guid: 87a3f44d98912044db8128fd021dbe5e, type: 3}
+    mane: -1
+  - name: Cremello
+    tint: {r: 0.95, g: 0.9, b: 0.78, a: 1}
+    pattern: {fileID: 0}
+    mane: 4
   rareCoatChance: 0.06
   abilities: 0
   health: {x: 140, y: 200}

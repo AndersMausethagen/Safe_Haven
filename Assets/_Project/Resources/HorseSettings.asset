@@ -126,6 +126,29 @@ MonoBehaviour:
   jumpLength: {x: 3.5, y: 7}
   followDistance: 3.5
   leadReach: 8
+  jobs:
+  - name: Plough the fields
+    description: It pulls the plough between the farm plots
+    station: 11
+    bonus: 0.35
+    reach: 16
+  - name: Haul timber
+    description: It drags logs up to the sawbench
+    station: 7
+    bonus: 0.3
+    reach: 14
+  - name: Haul for the wainwright
+    description: It pulls the wainwright's loads
+    station: 13
+    bonus: 0.25
+    reach: 14
+  troughMealHours: 8
+  troughBondPerHour: 0.5
+  tradeBase: 40
+  tradePerQuality: 90
+  tradePerTrait: 20
+  tradeRareCoat: 60
+  tradeSellShare: 0.6
   sureFootedMetres: 2000
   swimmerMetres: 300
   enduringMetres: 20000

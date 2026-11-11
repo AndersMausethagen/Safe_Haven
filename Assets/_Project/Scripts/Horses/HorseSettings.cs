@@ -90,6 +90,21 @@ public sealed class HorseSettings : GameSettings<HorseSettings>
     [SerializeField, Min(1f)] private float followDistance = 3.5f;
     [SerializeField, Min(2f)] private float leadReach = 8f;
 
+    [Header("Work")]
+    [Tooltip("What a tamed horse can be put to at the Haven: ploughing beside the farm plots, hauling for the sawbench...")]
+    [SerializeField] private List<HorseJob> jobs = new List<HorseJob>();
+    [Tooltip("Hours a meal from the stable's feed trough lasts a stabled horse: meanwhile it mends twice as fast and grows fonder.")]
+    [SerializeField, Min(1f)] private float troughMealHours = 8f;
+    [SerializeField, Min(0f)] private float troughBondPerHour = 0.5f;
+
+    [Header("The horse trade (the Trading Post)")]
+    [Tooltip("A horse's price: a base, more for its quality (0-1) and each trait, more for a rare coat; doubled for a special breed, halved for a foal. The caravan pays the player this share of it.")]
+    [SerializeField, Min(0f)] private float tradeBase = 40f;
+    [SerializeField, Min(0f)] private float tradePerQuality = 90f;
+    [SerializeField, Min(0f)] private float tradePerTrait = 20f;
+    [SerializeField, Min(0f)] private float tradeRareCoat = 60f;
+    [SerializeField, Range(0f, 1f)] private float tradeSellShare = 0.6f;
+
     [Header("Traits from use")]
     [Tooltip("Metres on rough ground (rock, forest floor, a steep climb) before it is sure-footed, metres swum before it is a swimmer, " +
              "metres ridden in all before it is enduring, and blows taken under a rider before it is brave.")]
@@ -141,6 +156,14 @@ public sealed class HorseSettings : GameSettings<HorseSettings>
     public float RopeShake => ropeShake;
     public float RopeJolt => ropeJolt;
     public float MountReach => mountReach;
+    public IReadOnlyList<HorseJob> Jobs => jobs;
+    public float TroughMealHours => troughMealHours;
+    public float TroughBondPerHour => troughBondPerHour;
+    public float TradeBase => tradeBase;
+    public float TradePerQuality => tradePerQuality;
+    public float TradePerTrait => tradePerTrait;
+    public float TradeRareCoat => tradeRareCoat;
+    public float TradeSellShare => tradeSellShare;
     public float SureFootedMetres => sureFootedMetres;
     public float SwimmerMetres => swimmerMetres;
     public float EnduringMetres => enduringMetres;

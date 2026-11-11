@@ -113,6 +113,9 @@ public static class BuildHorses
         }
 
         Texture(Art + "/HorseCoat.png", 2048);
+        // Rare coats' patterns (Tools/Horses/make_coats.py).
+        Texture(Art + "/HorseCoat Dapple.png", 2048);
+        Texture(Art + "/HorseCoat Pinto.png", 2048);
         foreach (string body in new[] { "Mane", "Toxic" })
         {
             Texture($"{Textures}Realistic/Body/Undead_Horse_{body}_AlbedoTransparency.png", 1024);
@@ -910,6 +913,25 @@ public static class BuildHorses
             }
 
             SetMaterials(so.FindProperty("manes"), looks.Manes);
+            // Rare coats: palomino (gold, a white mane), silver dapple (the dapple pattern, grey), pinto (bay with white
+            // patches, coloured in, so a white tint), cremello (cream, a white mane). One wild horse in about sixteen.
+            (string name, Color tint, string pattern, int mane)[] rare =
+            {
+                ("Palomino", new Color(0.86f, 0.66f, 0.36f), null, 4), ("Silver Dapple", new Color(0.66f, 0.66f, 0.68f), "Dapple", 4),
+                ("Pinto", Color.white, "Pinto", -1), ("Cremello", new Color(0.95f, 0.9f, 0.78f), null, 4),
+            };
+            SerializedProperty rareList = so.FindProperty("rareCoats");
+            rareList.arraySize = rare.Length;
+            for (int i = 0; i < rare.Length; i++)
+            {
+                SerializedProperty coat = rareList.GetArrayElementAtIndex(i);
+                coat.FindPropertyRelative("name").stringValue = rare[i].name;
+                coat.FindPropertyRelative("tint").colorValue = rare[i].tint;
+                coat.FindPropertyRelative("pattern").objectReferenceValue = rare[i].pattern != null ? Load<Texture2D>($"{Art}/HorseCoat {rare[i].pattern}.png") : null;
+                coat.FindPropertyRelative("mane").intValue = rare[i].mane;
+            }
+
+            so.FindProperty("rareCoatChance").floatValue = 0.06f;
             // Manes: 0 black, 1 brown, 2 blond, 3 grey, 4 white.
             string[] fits = { "0,1", "1,2", "0,1,2", "3,4", "0" };
             SerializedProperty manes = so.FindProperty("coatManes");
@@ -1112,6 +1134,24 @@ public static class BuildHorses
         so.FindProperty("ropeShake").floatValue = 0.15f;
         so.FindProperty("ropeJolt").floatValue = 0.26f;
         so.FindProperty("dragSpeed").floatValue = 2.6f;
+        // Work at the Haven: beside the farm plots (ploughing), the sawbench (hauling timber), the wainwright's yard.
+        (string name, string text, CraftingStationType station, float bonus, float reach)[] jobs =
+        {
+            ("Plough the fields", "It pulls the plough between the farm plots", CraftingStationType.Farm, 0.35f, 16f),
+            ("Haul timber", "It drags logs up to the sawbench", CraftingStationType.Sawbench, 0.3f, 14f),
+            ("Haul for the wainwright", "It pulls the wainwright's loads", CraftingStationType.Wainwright, 0.25f, 14f),
+        };
+        SerializedProperty jobList = so.FindProperty("jobs");
+        jobList.arraySize = jobs.Length;
+        for (int i = 0; i < jobs.Length; i++)
+        {
+            SerializedProperty job = jobList.GetArrayElementAtIndex(i);
+            job.FindPropertyRelative("name").stringValue = jobs[i].name;
+            job.FindPropertyRelative("description").stringValue = jobs[i].text;
+            job.FindPropertyRelative("station").intValue = (int)jobs[i].station;
+            job.FindPropertyRelative("bonus").floatValue = jobs[i].bonus;
+            job.FindPropertyRelative("reach").floatValue = jobs[i].reach;
+        }
         // Grounds, by a word in the Haven's and the raids' terrain layers: paths quick, mud and bog slow, rock and forest floor a
         // little slow.
         (string word, float speed, bool soft)[] grounds =
@@ -1266,6 +1306,19 @@ public static class BuildHorses
                 }
 
                 Fog(body, looks.Gas);
+                // It glows at night (NightGlow): a soft green light about it, which HorseGlow turns up after dusk.
+                var light = new GameObject("Night Glow").AddComponent<Light>();
+                light.transform.SetParent(root.transform, false);
+                light.transform.localPosition = new Vector3(0f, 1.6f, 0f);
+                light.type = LightType.Point;
+                light.color = new Color(0.55f, 1f, 0.4f);
+                light.range = 8f;
+                light.intensity = 0f;
+                light.shadows = LightShadows.None;
+                light.enabled = false;
+                var glow = new SerializedObject(root.AddComponent<HorseGlow>());
+                glow.FindProperty("glow").objectReferenceValue = light;
+                glow.ApplyModifiedPropertiesWithoutUndo();
             }
 
             var horse = root.AddComponent<Horse>();

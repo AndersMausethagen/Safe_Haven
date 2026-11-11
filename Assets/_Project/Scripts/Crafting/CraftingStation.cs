@@ -159,14 +159,16 @@ public sealed class CraftingStation : MonoBehaviour
     public int QueueLength => (building != null && building.Definition != null ? building.Definition.QueueLength : DefaultQueueLength)
         + Mathf.RoundToInt(Upgrades(level => level.extraQueue));
 
-    /// <summary>How fast it works: upgrades, plus a resident whose job works here (WorkerSpeedBonus).</summary>
+    /// <summary>How fast it works: upgrades, plus a resident whose job works here (WorkerSpeedBonus), plus a horse at work
+    /// beside it (HorseJobs).</summary>
     public float Speed
     {
         get
         {
             ResidentRecord worker = Worker;
             float staffed = worker == null ? 0f : WorkerSpeedBonus + (GameSession.Settlement.HasBed(worker) ? BedSpeedBonus : 0f);
-            return 1f + Upgrades(level => level.craftSpeed) + staffed;
+            // A horse put to work beside it (ploughing, hauling) adds its job's bonus.
+            return 1f + Upgrades(level => level.craftSpeed) + staffed + HorseJobs.SpeedBonusFor(this);
         }
     }
 

@@ -41,6 +41,12 @@ public sealed class StatusEffects : MonoBehaviour
             return null;
         }
 
+        // Some can't take it at all (a poison-proof horse).
+        if (target.TryGetComponent(out IStatusImmunity immune) && immune.Resists(effect))
+        {
+            return null;
+        }
+
         if (!target.TryGetComponent(out StatusEffects effects))
         {
             effects = target.gameObject.AddComponent<StatusEffects>();
@@ -176,4 +182,10 @@ public sealed class StatusEffects : MonoBehaviour
 
         movement.SetSpeedScale(this, scale);
     }
+}
+
+/// <summary>Something that shrugs off some status effects altogether (a poison-proof horse): StatusEffects.Apply asks it first.</summary>
+public interface IStatusImmunity
+{
+    bool Resists(StatusEffectDefinition effect);
 }

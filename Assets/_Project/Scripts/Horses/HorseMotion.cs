@@ -860,6 +860,12 @@ public sealed class HorseMotion : MonoBehaviour
             return;
         }
 
+        if (horse.IsTamed && horse.Order == Horse.Orders.Work)
+        {
+            UpdateWork();
+            return;
+        }
+
         // Told to stay, it stands where it is (it still runs from a blow).
         if (horse.IsTamed && horse.Order == Horse.Orders.Stay)
         {
@@ -944,6 +950,34 @@ public sealed class HorseMotion : MonoBehaviour
         agent.speed = Mathf.Clamp(leaderSpeed * 1.15f + distance * 0.25f, horse.Definition.WalkSpeed, horse.Stats.gallopSpeed) * horse.SpeedScale;
         agent.isStopped = false;
         agent.SetDestination(hit.position);
+    }
+
+    // At work: a slow round beside the station, as a horse pulling a plough or a load goes, with rests between.
+    private void UpdateWork()
+    {
+        if (Time.time < until || agent.pathPending || agent.remainingDistance > 0.6f && mode == Idle.Wander)
+        {
+            return;
+        }
+
+        if (mode == Idle.Wander)
+        {
+            // A rest at the end of each furrow.
+            mode = Idle.Graze;
+            until = Time.time + Random.Range(2f, 5f);
+            agent.isStopped = true;
+            return;
+        }
+
+        float angle = Random.Range(0f, Mathf.PI * 2f);
+        Vector3 target = horse.WorkAt + new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle)) * Random.Range(3f, 6f);
+        if (NavMesh.SamplePosition(target, out NavMeshHit hit, 3f, agent.areaMask))
+        {
+            mode = Idle.Wander;
+            agent.speed = horse.Definition.WalkSpeed * 0.8f;
+            agent.isStopped = false;
+            agent.SetDestination(hit.position);
+        }
     }
 
     // A horse led behind a ridden one is on a rope from the rider's hand to its head.

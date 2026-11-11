@@ -83,7 +83,26 @@ public sealed class TradingPost : MonoBehaviour
             page.Add(new MenuAction($"Buy {offer.amount} {offer.item.DisplayName}", stock, left > 0 && purse >= offer.price, () => Buy(user, chosen)));
         }
 
+        // The caravan's horse trade: the player's horses standing near the post, and one of its own each time it comes.
+        HorseTrader.AddTo(page, user, user != null ? FindPost(user.transform.position) : null);
         return page;
+    }
+
+    private static Transform FindPost(Vector3 near)
+    {
+        TradingPost best = null;
+        float bestDistance = float.MaxValue;
+        foreach (TradingPost post in FindObjectsByType<TradingPost>(FindObjectsInactive.Exclude))
+        {
+            float distance = (post.transform.position - near).sqrMagnitude;
+            if (distance < bestDistance)
+            {
+                best = post;
+                bestDistance = distance;
+            }
+        }
+
+        return best != null ? best.transform : null;
     }
 
     private static void Sell(GameObject user, TradeSettings.Sale sale)
